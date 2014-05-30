@@ -33,7 +33,7 @@ typedef struct PayloadContext PayloadContext;
 typedef struct RTPDynamicProtocolHandler RTPDynamicProtocolHandler;
 
 #define RTP_MIN_PACKET_LENGTH 12
-#define RTP_MAX_PACKET_LENGTH 1500
+#define RTP_MAX_PACKET_LENGTH 8192
 
 #define RTP_REORDER_QUEUE_DEFAULT_SIZE 10
 
@@ -51,10 +51,6 @@ int ff_rtp_parse_packet(RTPDemuxContext *s, AVPacket *pkt,
 void ff_rtp_parse_close(RTPDemuxContext *s);
 int64_t ff_rtp_queued_packet_time(RTPDemuxContext *s);
 void ff_rtp_reset_packet_queue(RTPDemuxContext *s);
-int ff_rtp_get_local_rtp_port(URLContext *h);
-int ff_rtp_get_local_rtcp_port(URLContext *h);
-
-int ff_rtp_set_remote_url(URLContext *h, const char *uri);
 
 /**
  * Send a dummy packet on both port pairs to set up the connection
@@ -209,7 +205,7 @@ int ff_parse_fmtp(AVStream *stream, PayloadContext *data, const char *p,
                                     PayloadContext *data,
                                     char *attr, char *value));
 
-void av_register_rtp_dynamic_payload_handlers(void);
+void ff_register_rtp_dynamic_payload_handlers(void);
 
 /**
  * Close the dynamic buffer and make a packet from it.

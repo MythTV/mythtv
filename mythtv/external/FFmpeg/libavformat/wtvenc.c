@@ -28,9 +28,9 @@
 #include "libavutil/intreadwrite.h"
 #include "libavutil/avassert.h"
 #include "avformat.h"
+#include "avio_internal.h"
 #include "internal.h"
 #include "wtv.h"
-#include "asf.h"
 
 #define WTV_BIGSECTOR_SIZE (1 << WTV_BIGSECTOR_BITS)
 #define INDEX_BASE 0x2
@@ -87,10 +87,10 @@ typedef struct {
 typedef struct {
     int64_t timeline_start_pos;
     WtvFile file[WTV_FILES];
-    int64_t serial;         /** chunk serial number */
-    int64_t last_chunk_pos; /** last chunk position */
-    int64_t last_timestamp_pos; /** last timestamp chunk position */
-    int64_t first_index_pos;    /** first index_chunk position */
+    int64_t serial;         /**< chunk serial number */
+    int64_t last_chunk_pos; /**< last chunk position */
+    int64_t last_timestamp_pos; /**< last timestamp chunk position */
+    int64_t first_index_pos;    /**< first index_chunk position */
 
     WtvChunkEntry index[MAX_NB_INDEX];
     int nb_index;
@@ -127,22 +127,7 @@ typedef struct {
     WTVHeaderWriteFunc *write_header;
 } WTVRootEntryTable;
 
-static int write_pad(AVIOContext *pb, int size)
-{
-    for (; size > 0; size--)
-        avio_w8(pb, 0);
-    return 0;
-}
-
-static const ff_asf_guid *get_codec_guid(enum AVCodecID id, const AVCodecGuid *av_guid)
-{
-    int i;
-    for (i = 0; av_guid[i].id != AV_CODEC_ID_NONE; i++) {
-        if (id == av_guid[i].id)
-            return &(av_guid[i].guid);
-    }
-    return NULL;
-}
+#define write_pad(pb, size) ffio_fill(pb, 0, size)
 
 /**
  * Write chunk header. If header chunk (0x80000000 set) then add to list of header chunks
@@ -272,6 +257,7 @@ static void put_videoinfoheader2(AVIOContext *pb, AVStream *st)
 static int write_stream_codec_info(AVFormatContext *s, AVStream *st)
 {
     const ff_asf_guid *g, *media_type, *format_type;
+    const AVCodecTag *tags;
     AVIOContext *pb = s->pb;
     int64_t  hdr_pos_start;
     int hdr_size = 0;
@@ -279,18 +265,15 @@ static int write_stream_codec_info(AVFormatContext *s, AVStream *st)
     if (st->codec->codec_type  == AVMEDIA_TYPE_VIDEO) {
         g = get_codec_guid(st->codec->codec_id, ff_video_guids);
         media_type = &ff_mediatype_video;
-        format_type = &ff_format_mpeg2_video;
+        format_type = st->codec->codec_id == AV_CODEC_ID_MPEG2VIDEO ? &ff_format_mpeg2_video : &ff_format_videoinfo2;
+        tags = ff_codec_bmp_tags;
     } else if (st->codec->codec_type == AVMEDIA_TYPE_AUDIO) {
         g = get_codec_guid(st->codec->codec_id, ff_codec_wav_guids);
         media_type = &ff_mediatype_audio;
         format_type = &ff_format_waveformatex;
+        tags = ff_codec_wav_tags;
     } else {
         av_log(s, AV_LOG_ERROR, "unknown codec_type (0x%x)\n", st->codec->codec_type);
-        return -1;
-    }
-
-    if (g == NULL) {
-        av_log(s, AV_LOG_ERROR, "can't get video codec_id (0x%x) guid.\n", st->codec->codec_id);
         return -1;
     }
 
@@ -304,7 +287,8 @@ static int write_stream_codec_info(AVFormatContext *s, AVStream *st)
     if (st->codec->codec_type == AVMEDIA_TYPE_VIDEO) {
         put_videoinfoheader2(pb, st);
     } else {
-        ff_put_wav_header(pb, st->codec);
+        if (ff_put_wav_header(pb, st->codec) < 0)
+            format_type = &ff_format_none;
     }
     hdr_size = avio_tell(pb) - hdr_pos_start;
 
@@ -312,7 +296,17 @@ static int write_stream_codec_info(AVFormatContext *s, AVStream *st)
     avio_seek(pb, -(hdr_size + 4), SEEK_CUR);
     avio_wl32(pb, hdr_size + 32);
     avio_seek(pb, hdr_size, SEEK_CUR);
-    ff_put_guid(pb, g);           // actual_subtype
+    if (g) {
+        ff_put_guid(pb, g);           // actual_subtype
+    } else {
+        int tag = ff_codec_get_tag(tags, st->codec->codec_id);
+        if (!tag) {
+            av_log(s, AV_LOG_ERROR, "unsupported codec_id (0x%x)\n", st->codec->codec_id);
+            return -1;
+        }
+        avio_wl32(pb, tag);
+        avio_write(pb, (const uint8_t[]){FF_MEDIASUBTYPE_BASE_GUID}, 12);
+    }
     ff_put_guid(pb, format_type); // actual_formattype
 
     return 0;
@@ -492,7 +486,6 @@ static int write_packet(AVFormatContext *s, AVPacket *pkt)
     write_pad(pb, WTV_PAD8(pkt->size) - pkt->size);
 
     wctx->serial++;
-    avio_flush(pb);
     return 0;
 }
 

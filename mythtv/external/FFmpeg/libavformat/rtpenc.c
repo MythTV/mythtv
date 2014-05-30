@@ -28,8 +28,6 @@
 
 #include "rtpenc.h"
 
-//#define DEBUG
-
 static const AVOption options[] = {
     FF_RTP_FLAG_OPTS(RTPMuxContext, flags),
     { "payload_type", "Specify RTP payload type", offsetof(RTPMuxContext, payload_type), AV_OPT_TYPE_INT, {.i64 = -1 }, -1, 127, AV_OPT_FLAG_ENCODING_PARAM },
@@ -264,7 +262,7 @@ fail:
 }
 
 /* send an rtcp sender report packet */
-static void rtcp_send_sr(AVFormatContext *s1, int64_t ntp_time)
+static void rtcp_send_sr(AVFormatContext *s1, int64_t ntp_time, int bye)
 {
     RTPMuxContext *s = s1->priv_data;
     uint32_t rtp_ts;
@@ -274,12 +272,11 @@ static void rtcp_send_sr(AVFormatContext *s1, int64_t ntp_time)
     s->last_rtcp_ntp_time = ntp_time;
     rtp_ts = av_rescale_q(ntp_time - s->first_rtcp_ntp_time, (AVRational){1, 1000000},
                           s1->streams[0]->time_base) + s->base_timestamp;
-    avio_w8(s1->pb, (RTP_VERSION << 6));
+    avio_w8(s1->pb, RTP_VERSION << 6);
     avio_w8(s1->pb, RTCP_SR);
     avio_wb16(s1->pb, 6); /* length in words - 1 */
     avio_wb32(s1->pb, s->ssrc);
-    avio_wb32(s1->pb, ntp_time / 1000000);
-    avio_wb32(s1->pb, ((ntp_time % 1000000) << 32) / 1000000);
+    avio_wb64(s1->pb, NTP_TO_RTP_FORMAT(ntp_time));
     avio_wb32(s1->pb, rtp_ts);
     avio_wb32(s1->pb, s->packet_count);
     avio_wb32(s1->pb, s->octet_count);
@@ -299,6 +296,13 @@ static void rtcp_send_sr(AVFormatContext *s1, int64_t ntp_time)
             avio_w8(s1->pb, 0);
     }
 
+    if (bye) {
+        avio_w8(s1->pb, (RTP_VERSION << 6) | 1);
+        avio_w8(s1->pb, RTCP_BYE);
+        avio_wb16(s1->pb, 1); /* length in words - 1 */
+        avio_wb32(s1->pb, s->ssrc);
+    }
+
     avio_flush(s1->pb);
 }
 
@@ -311,7 +315,7 @@ void ff_rtp_send_data(AVFormatContext *s1, const uint8_t *buf1, int len, int m)
     av_dlog(s1, "rtp_send_data size=%d\n", len);
 
     /* build the RTP header */
-    avio_w8(s1->pb, (RTP_VERSION << 6));
+    avio_w8(s1->pb, RTP_VERSION << 6);
     avio_w8(s1->pb, (s->payload_type & 0x7f) | ((m & 0x01) << 7));
     avio_wb16(s1->pb, s->seq);
     avio_wb32(s1->pb, s->timestamp);
@@ -497,7 +501,7 @@ static int rtp_write_packet(AVFormatContext *s1, AVPacket *pkt)
     if ((s->first_packet || ((rtcp_bytes >= RTCP_SR_SIZE) &&
                             (ff_ntp_time() - s->last_rtcp_ntp_time > 5000000))) &&
         !(s->flags & FF_RTP_FLAG_SKIP_RTCP)) {
-        rtcp_send_sr(s1, ff_ntp_time());
+        rtcp_send_sr(s1, ff_ntp_time(), 0);
         s->last_octet_count = s->octet_count;
         s->first_packet = 0;
     }
@@ -553,6 +557,10 @@ static int rtp_write_packet(AVFormatContext *s1, AVPacket *pkt)
             const uint8_t *mb_info =
                 av_packet_get_side_data(pkt, AV_PKT_DATA_H263_MB_INFO,
                                         &mb_info_size);
+            if (!mb_info) {
+                av_log(s1, AV_LOG_ERROR, "failed to allocate side data\n");
+                return AVERROR(ENOMEM);
+            }
             ff_rtp_send_h263_rfc2190(s1, pkt->data, size, mb_info, mb_info_size);
             break;
         }
@@ -593,6 +601,10 @@ static int rtp_write_trailer(AVFormatContext *s1)
 {
     RTPMuxContext *s = s1->priv_data;
 
+    /* If the caller closes and recreates ->pb, this might actually
+     * be NULL here even if it was successfully allocated at the start. */
+    if (s1->pb && (s->flags & FF_RTP_FLAG_SEND_BYE))
+        rtcp_send_sr(s1, ff_ntp_time(), 1);
     av_freep(&s->buf);
 
     return 0;

@@ -58,31 +58,26 @@ static int concatenate_packet(unsigned int* offset,
                               const ogg_packet* packet)
 {
     const char* message = NULL;
-    uint8_t* newdata    = NULL;
     int newsize = avc_context->extradata_size + 2 + packet->bytes;
-    int ret;
+    int err = AVERROR_INVALIDDATA;
 
     if (packet->bytes < 0) {
         message = "ogg_packet has negative size";
-        ret = AVERROR_INVALIDDATA;
     } else if (packet->bytes > 0xffff) {
         message = "ogg_packet is larger than 65535 bytes";
-        ret = AVERROR_INVALIDDATA;
     } else if (newsize < avc_context->extradata_size) {
         message = "extradata_size would overflow";
-        ret = AVERROR_INVALIDDATA;
     } else {
-        newdata = av_realloc(avc_context->extradata, newsize);
-        if (!newdata)
+        if ((err = av_reallocp(&avc_context->extradata, newsize)) < 0) {
+            avc_context->extradata_size = 0;
             message = "av_realloc failed";
-        ret = AVERROR(ENOMEM);
+        }
     }
     if (message) {
         av_log(avc_context, AV_LOG_ERROR, "concatenate_packet failed: %s\n", message);
-        return ret;
+        return err;
     }
 
-    avc_context->extradata      = newdata;
     avc_context->extradata_size = newsize;
     AV_WB16(avc_context->extradata + (*offset), packet->bytes);
     *offset += 2;
@@ -207,11 +202,11 @@ static av_cold int encode_init(AVCodecContext* avc_context)
     avcodec_get_chroma_sub_sample(avc_context->pix_fmt, &h->uv_hshift, &h->uv_vshift);
 
     if (avc_context->flags & CODEC_FLAG_QSCALE) {
-        /* to be constant with the libvorbis implementation, clip global_quality to 0 - 10
-           Theora accepts a quality parameter p, which is:
-                * 0 <= p <=63
-                * an int value
-         */
+        /* Clip global_quality in QP units to the [0 - 10] range
+           to be consistent with the libvorbis implementation.
+           Theora accepts a quality parameter which is an int value in
+           the [0 - 63] range.
+        */
         t_info.quality        = av_clipf(avc_context->global_quality / (float)FF_QP2LAMBDA, 0, 10) * 6.3;
         t_info.target_bitrate = 0;
     } else {
@@ -264,7 +259,7 @@ static av_cold int encode_init(AVCodecContext* avc_context)
     th_comment_clear(&t_comment);
 
     /* Set up the output AVFrame */
-    avc_context->coded_frame= avcodec_alloc_frame();
+    avc_context->coded_frame = av_frame_alloc();
 
     return 0;
 }
@@ -368,6 +363,7 @@ static av_cold int encode_close(AVCodecContext* avc_context)
 /** AVCodec struct exposed to libavcodec */
 AVCodec ff_libtheora_encoder = {
     .name           = "libtheora",
+    .long_name      = NULL_IF_CONFIG_SMALL("libtheora Theora"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_THEORA,
     .priv_data_size = sizeof(TheoraContext),
@@ -378,5 +374,4 @@ AVCodec ff_libtheora_encoder = {
     .pix_fmts       = (const enum AVPixelFormat[]){
         AV_PIX_FMT_YUV420P, AV_PIX_FMT_YUV422P, AV_PIX_FMT_YUV444P, AV_PIX_FMT_NONE
     },
-    .long_name      = NULL_IF_CONFIG_SMALL("libtheora Theora"),
 };

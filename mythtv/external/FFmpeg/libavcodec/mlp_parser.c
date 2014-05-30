@@ -28,6 +28,7 @@
 
 #include "libavutil/channel_layout.h"
 #include "libavutil/crc.h"
+#include "libavutil/internal.h"
 #include "get_bits.h"
 #include "parser.h"
 #include "mlp_parser.h"
@@ -169,14 +170,17 @@ int ff_mlp_read_major_sync(void *log, MLPHeaderInfo *mh, GetBitContext *gb)
         mh->group1_samplerate = mlp_samplerate(ratebits);
         mh->group2_samplerate = 0;
 
-        skip_bits(gb, 8);
+        skip_bits(gb, 4);
+
+        mh->channel_modifier_thd_stream0 = get_bits(gb, 2);
+        mh->channel_modifier_thd_stream1 = get_bits(gb, 2);
 
         mh->channel_arrangement=
         channel_arrangement            = get_bits(gb, 5);
         mh->channels_thd_stream1       = truehd_channels(channel_arrangement);
         mh->channel_layout_thd_stream1 = ff_truehd_layout(channel_arrangement);
 
-        skip_bits(gb, 2);
+        mh->channel_modifier_thd_stream2 = get_bits(gb, 2);
 
         channel_arrangement            = get_bits(gb, 13);
         mh->channels_thd_stream2       = truehd_channels(channel_arrangement);
@@ -331,13 +335,17 @@ static int mlp_parse(AVCodecParserContext *s,
         if (mh.stream_type == 0xbb) {
             /* MLP stream */
 #if FF_API_REQUEST_CHANNELS
+FF_DISABLE_DEPRECATION_WARNINGS
             if (avctx->request_channels > 0 && avctx->request_channels <= 2 &&
                 mh.num_substreams > 1) {
                 avctx->channels       = 2;
                 avctx->channel_layout = AV_CH_LAYOUT_STEREO;
+FF_ENABLE_DEPRECATION_WARNINGS
             } else
 #endif
-            if (avctx->request_channel_layout == AV_CH_LAYOUT_STEREO &&
+            if (avctx->request_channel_layout &&
+                (avctx->request_channel_layout & AV_CH_LAYOUT_STEREO) ==
+                avctx->request_channel_layout &&
                 mh.num_substreams > 1) {
                 avctx->channels       = 2;
                 avctx->channel_layout = AV_CH_LAYOUT_STEREO;
@@ -348,6 +356,7 @@ static int mlp_parse(AVCodecParserContext *s,
         } else { /* mh.stream_type == 0xba */
             /* TrueHD stream */
 #if FF_API_REQUEST_CHANNELS
+FF_DISABLE_DEPRECATION_WARNINGS
             if (avctx->request_channels > 0 && avctx->request_channels <= 2 &&
                 mh.num_substreams > 1) {
                 avctx->channels       = 2;
@@ -356,14 +365,19 @@ static int mlp_parse(AVCodecParserContext *s,
                        avctx->request_channels <= mh.channels_thd_stream1) {
                 avctx->channels       = mh.channels_thd_stream1;
                 avctx->channel_layout = mh.channel_layout_thd_stream1;
+FF_ENABLE_DEPRECATION_WARNINGS
             } else
 #endif
-            if (avctx->request_channel_layout == AV_CH_LAYOUT_STEREO &&
-                mh.num_substreams > 1) {
+                if (avctx->request_channel_layout &&
+                    (avctx->request_channel_layout & AV_CH_LAYOUT_STEREO) ==
+                    avctx->request_channel_layout &&
+                    mh.num_substreams > 1) {
                 avctx->channels       = 2;
                 avctx->channel_layout = AV_CH_LAYOUT_STEREO;
-            } else if (avctx->request_channel_layout == mh.channel_layout_thd_stream1 ||
-                       !mh.channels_thd_stream2) {
+            } else if (!mh.channels_thd_stream2 ||
+                       (avctx->request_channel_layout &&
+                        (avctx->request_channel_layout & mh.channel_layout_thd_stream1) ==
+                        avctx->request_channel_layout)) {
                 avctx->channels       = mh.channels_thd_stream1;
                 avctx->channel_layout = mh.channel_layout_thd_stream1;
             } else {

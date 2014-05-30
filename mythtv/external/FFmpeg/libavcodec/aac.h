@@ -157,7 +157,7 @@ typedef struct LongTermPrediction {
 typedef struct IndividualChannelStream {
     uint8_t max_sfb;            ///< number of scalefactor bands per group
     enum WindowSequence window_sequence[2];
-    uint8_t use_kb_window[2];   ///< If set, use Kaiser-Bessel window, otherwise use a sinus window.
+    uint8_t use_kb_window[2];   ///< If set, use Kaiser-Bessel window, otherwise use a sine window.
     int num_window_groups;
     uint8_t group_len[8];
     LongTermPrediction ltp;
@@ -234,7 +234,7 @@ typedef struct SingleChannelElement {
     int sf_idx[128];                                ///< scalefactor indices (used by encoder)
     uint8_t zeroes[128];                            ///< band is not coded (used by encoder)
     DECLARE_ALIGNED(32, float,   coeffs)[1024];     ///< coefficients for IMDCT
-    DECLARE_ALIGNED(32, float,   saved)[1024];      ///< overlap
+    DECLARE_ALIGNED(32, float,   saved)[1536];      ///< overlap
     DECLARE_ALIGNED(32, float,   ret_buf)[2048];    ///< PCM output buffer
     DECLARE_ALIGNED(16, float,   ltp_state)[3072];  ///< time signal for LTP
     PredictorState predictor_state[MAX_PREDICTORS];
@@ -290,6 +290,7 @@ struct AACContext {
      */
     FFTContext mdct;
     FFTContext mdct_small;
+    FFTContext mdct_ld;
     FFTContext mdct_ltp;
     FmtConvertContext fmt_conv;
     AVFloatDSPContext fdsp;

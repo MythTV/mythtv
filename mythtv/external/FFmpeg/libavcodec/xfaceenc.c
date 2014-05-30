@@ -125,7 +125,7 @@ static void encode_block(char *bitmap, int w, int h, int level, ProbRangesQueue 
 
 static av_cold int xface_encode_init(AVCodecContext *avctx)
 {
-    avctx->coded_frame = avcodec_alloc_frame();
+    avctx->coded_frame = av_frame_alloc();
     if (!avctx->coded_frame)
         return AVERROR(ENOMEM);
     avctx->coded_frame->pict_type = AV_PICTURE_TYPE_I;
@@ -227,6 +227,7 @@ static av_cold int xface_encode_close(AVCodecContext *avctx)
 
 AVCodec ff_xface_encoder = {
     .name           = "xface",
+    .long_name      = NULL_IF_CONFIG_SMALL("X-face image"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_XFACE,
     .priv_data_size = sizeof(XFaceContext),
@@ -234,5 +235,4 @@ AVCodec ff_xface_encoder = {
     .close          = xface_encode_close,
     .encode2        = xface_encode_frame,
     .pix_fmts       = (const enum PixelFormat[]) { AV_PIX_FMT_MONOWHITE, AV_PIX_FMT_NONE },
-    .long_name      = NULL_IF_CONFIG_SMALL("X-face image"),
 };

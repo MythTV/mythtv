@@ -21,10 +21,11 @@
 
 #include "avcodec.h"
 #include "get_bits.h"
+#include "internal.h"
 
 
 typedef struct {
-    AVFrame picture;
+    AVFrame *frame;
 } AvsContext;
 
 typedef enum {
@@ -51,7 +52,7 @@ avs_decode_frame(AVCodecContext * avctx,
     int buf_size = avpkt->size;
     AvsContext *const avs = avctx->priv_data;
     AVFrame *picture = data;
-    AVFrame *const p =  &avs->picture;
+    AVFrame *const p =  avs->frame;
     const uint8_t *table, *vect;
     uint8_t *out;
     int i, j, x, y, stride, ret, vect_w = 3, vect_h = 3;
@@ -59,16 +60,13 @@ avs_decode_frame(AVCodecContext * avctx,
     AvsBlockType type;
     GetBitContext change_map = {0}; //init to silence warning
 
-    if ((ret = avctx->reget_buffer(avctx, p)) < 0) {
-        av_log(avctx, AV_LOG_ERROR, "reget_buffer() failed\n");
+    if ((ret = ff_reget_buffer(avctx, p)) < 0)
         return ret;
-    }
-    p->reference = 3;
     p->pict_type = AV_PICTURE_TYPE_P;
     p->key_frame = 0;
 
-    out = avs->picture.data[0];
-    stride = avs->picture.linesize[0];
+    out    = p->data[0];
+    stride = p->linesize[0];
 
     if (buf_end - buf < 4)
         return AVERROR_INVALIDDATA;
@@ -78,7 +76,7 @@ avs_decode_frame(AVCodecContext * avctx,
 
     if (type == AVS_PALETTE) {
         int first, last;
-        uint32_t *pal = (uint32_t *) avs->picture.data[1];
+        uint32_t *pal = (uint32_t *) p->data[1];
 
         first = AV_RL16(buf);
         last = first + AV_RL16(buf + 2);
@@ -151,7 +149,8 @@ avs_decode_frame(AVCodecContext * avctx,
             align_get_bits(&change_map);
     }
 
-    *picture   = avs->picture;
+    if ((ret = av_frame_ref(picture, p)) < 0)
+        return ret;
     *got_frame = 1;
 
     return buf_size;
@@ -159,24 +158,29 @@ avs_decode_frame(AVCodecContext * avctx,
 
 static av_cold int avs_decode_init(AVCodecContext * avctx)
 {
-    AvsContext *const avs = avctx->priv_data;
+    AvsContext *s = avctx->priv_data;
+
+    s->frame = av_frame_alloc();
+    if (!s->frame)
+        return AVERROR(ENOMEM);
+
     avctx->pix_fmt = AV_PIX_FMT_PAL8;
-    avcodec_get_frame_defaults(&avs->picture);
-    avcodec_set_dimensions(avctx, 318, 198);
+    ff_set_dimensions(avctx, 318, 198);
+
     return 0;
 }
 
 static av_cold int avs_decode_end(AVCodecContext *avctx)
 {
     AvsContext *s = avctx->priv_data;
-    if (s->picture.data[0])
-        avctx->release_buffer(avctx, &s->picture);
+    av_frame_free(&s->frame);
     return 0;
 }
 
 
 AVCodec ff_avs_decoder = {
     .name           = "avs",
+    .long_name      = NULL_IF_CONFIG_SMALL("AVS (Audio Video Standard) video"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_AVS,
     .priv_data_size = sizeof(AvsContext),
@@ -184,5 +188,4 @@ AVCodec ff_avs_decoder = {
     .decode         = avs_decode_frame,
     .close          = avs_decode_end,
     .capabilities   = CODEC_CAP_DR1,
-    .long_name      = NULL_IF_CONFIG_SMALL("AVS (Audio Video Standard) video"),
 };

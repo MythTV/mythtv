@@ -22,7 +22,7 @@
 
 #include "dxva2_internal.h"
 
-#define MAX_SLICES (SLICE_MAX_START_CODE - SLICE_MIN_START_CODE + 1)
+#define MAX_SLICES 1024
 struct dxva2_picture_context {
     DXVA_PictureParameters pp;
     DXVA_QmatrixData       qm;
@@ -139,8 +139,7 @@ static void fill_slice(AVCodecContext *avctx,
     init_get_bits(&gb, &buffer[4], 8 * (size - 4));
 
     slice->wQuantizerScaleCode = get_bits(&gb, 5);
-    while (get_bits1(&gb))
-        skip_bits(&gb, 8);
+    skip_1stop_8data_bits(&gb);
 
     slice->wMBbitOffset        = 4 * 8 + get_bits_count(&gb);
 }
@@ -151,7 +150,7 @@ static int commit_bitstream_and_slice_buffer(AVCodecContext *avctx,
     const struct MpegEncContext *s = avctx->priv_data;
     struct dxva_context *ctx = avctx->hwaccel_context;
     struct dxva2_picture_context *ctx_pic =
-        s->current_picture_ptr->f.hwaccel_picture_private;
+        s->current_picture_ptr->hwaccel_picture_private;
     const int is_field = s->picture_structure != PICT_FRAME;
     const unsigned mb_count = s->mb_width * (s->mb_height >> is_field);
     uint8_t  *dxva_data, *current, *end;
@@ -210,7 +209,7 @@ static int dxva2_mpeg2_start_frame(AVCodecContext *avctx,
     const struct MpegEncContext *s = avctx->priv_data;
     struct dxva_context *ctx = avctx->hwaccel_context;
     struct dxva2_picture_context *ctx_pic =
-        s->current_picture_ptr->f.hwaccel_picture_private;
+        s->current_picture_ptr->hwaccel_picture_private;
 
     if (!ctx->decoder || !ctx->cfg || ctx->surface_count <= 0)
         return -1;
@@ -230,7 +229,7 @@ static int dxva2_mpeg2_decode_slice(AVCodecContext *avctx,
 {
     const struct MpegEncContext *s = avctx->priv_data;
     struct dxva2_picture_context *ctx_pic =
-        s->current_picture_ptr->f.hwaccel_picture_private;
+        s->current_picture_ptr->hwaccel_picture_private;
     unsigned position;
 
     if (ctx_pic->slice_count >= MAX_SLICES)
@@ -250,7 +249,7 @@ static int dxva2_mpeg2_end_frame(AVCodecContext *avctx)
 {
     struct MpegEncContext *s = avctx->priv_data;
     struct dxva2_picture_context *ctx_pic =
-        s->current_picture_ptr->f.hwaccel_picture_private;
+        s->current_picture_ptr->hwaccel_picture_private;
     int ret;
 
     if (ctx_pic->slice_count <= 0 || ctx_pic->bitstream_size <= 0)

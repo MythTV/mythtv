@@ -686,7 +686,7 @@ bool NuppelDecoder::InitAVCodecVideo(int codec)
             default: codec = -1;
         }
     }
-    mpa_vidcodec = avcodec_find_decoder((enum CodecID)codec);
+    mpa_vidcodec = avcodec_find_decoder((enum AVCodecID)codec);
 
     if (!mpa_vidcodec)
     {
@@ -707,7 +707,7 @@ bool NuppelDecoder::InitAVCodecVideo(int codec)
 
     mpa_vidctx = avcodec_alloc_context3(NULL);
 
-    mpa_vidctx->codec_id = (enum CodecID)codec;
+    mpa_vidctx->codec_id = (enum AVCodecID)codec;
     mpa_vidctx->codec_type = AVMEDIA_TYPE_VIDEO;
     mpa_vidctx->width = video_width;
     mpa_vidctx->height = video_height;
@@ -770,7 +770,7 @@ bool NuppelDecoder::InitAVCodecAudio(int codec)
             default: codec = -1;
         }
     }
-    mpa_audcodec = avcodec_find_decoder((enum CodecID)codec);
+    mpa_audcodec = avcodec_find_decoder((enum AVCodecID)codec);
 
     if (!mpa_audcodec)
     {
@@ -787,7 +787,7 @@ bool NuppelDecoder::InitAVCodecAudio(int codec)
 
     mpa_audctx = avcodec_alloc_context3(NULL);
 
-    mpa_audctx->codec_id = (enum CodecID)codec;
+    mpa_audctx->codec_id = (enum AVCodecID)codec;
     mpa_audctx->codec_type = AVMEDIA_TYPE_AUDIO;
 
     QMutexLocker locker(avcodeclock);

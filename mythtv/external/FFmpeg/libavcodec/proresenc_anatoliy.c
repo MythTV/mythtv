@@ -581,7 +581,7 @@ static av_cold int prores_encode_init(AVCodecContext *avctx)
         scale_mat(QMAT_CHROMA[avctx->profile], ctx->qmat_chroma[i - 1], i);
     }
 
-    avctx->coded_frame = avcodec_alloc_frame();
+    avctx->coded_frame = av_frame_alloc();
     avctx->coded_frame->key_frame = 1;
     avctx->coded_frame->pict_type = AV_PICTURE_TYPE_I;
 
@@ -597,8 +597,9 @@ static av_cold int prores_encode_close(AVCodecContext *avctx)
     return 0;
 }
 
-AVCodec ff_prores_anatoliy_encoder = {
-    .name           = "prores_anatoliy",
+AVCodec ff_prores_aw_encoder = {
+    .name           = "prores_aw",
+    .long_name      = NULL_IF_CONFIG_SMALL("Apple ProRes"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_PRORES,
     .priv_data_size = sizeof(ProresContext),
@@ -606,13 +607,13 @@ AVCodec ff_prores_anatoliy_encoder = {
     .close          = prores_encode_close,
     .encode2        = prores_encode_frame,
     .pix_fmts       = (const enum AVPixelFormat[]){AV_PIX_FMT_YUV422P10, AV_PIX_FMT_NONE},
-    .long_name      = NULL_IF_CONFIG_SMALL("Apple ProRes"),
     .capabilities   = CODEC_CAP_FRAME_THREADS | CODEC_CAP_INTRA_ONLY,
     .profiles       = profiles
 };
 
 AVCodec ff_prores_encoder = {
     .name           = "prores",
+    .long_name      = NULL_IF_CONFIG_SMALL("Apple ProRes"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_PRORES,
     .priv_data_size = sizeof(ProresContext),
@@ -620,7 +621,6 @@ AVCodec ff_prores_encoder = {
     .close          = prores_encode_close,
     .encode2        = prores_encode_frame,
     .pix_fmts       = (const enum AVPixelFormat[]){AV_PIX_FMT_YUV422P10, AV_PIX_FMT_NONE},
-    .long_name      = NULL_IF_CONFIG_SMALL("Apple ProRes"),
     .capabilities   = CODEC_CAP_FRAME_THREADS | CODEC_CAP_INTRA_ONLY,
     .profiles       = profiles
 };

@@ -59,65 +59,24 @@
 #include "libavutil/pixdesc.h"
 #include "libavcodec/dsputil.h"
 
-#include "transform.h"
+#include "deshake.h"
+#include "deshake_opencl.h"
 
 #define CHROMA_WIDTH(link)  -((-link->w) >> av_pix_fmt_desc_get(link->format)->log2_chroma_w)
 #define CHROMA_HEIGHT(link) -((-link->h) >> av_pix_fmt_desc_get(link->format)->log2_chroma_h)
 
-enum SearchMethod {
-    EXHAUSTIVE,        ///< Search all possible positions
-    SMART_EXHAUSTIVE,  ///< Search most possible positions (faster)
-    SEARCH_COUNT
-};
-
-typedef struct {
-    int x;             ///< Horizontal shift
-    int y;             ///< Vertical shift
-} IntMotionVector;
-
-typedef struct {
-    double x;             ///< Horizontal shift
-    double y;             ///< Vertical shift
-} MotionVector;
-
-typedef struct {
-    MotionVector vector;  ///< Motion vector
-    double angle;         ///< Angle of rotation
-    double zoom;          ///< Zoom percentage
-} Transform;
-
-typedef struct {
-    const AVClass *class;
-    AVFilterBufferRef *ref;    ///< Previous frame
-    int rx;                    ///< Maximum horizontal shift
-    int ry;                    ///< Maximum vertical shift
-    int edge;                  ///< Edge fill method
-    int blocksize;             ///< Size of blocks to compare
-    int contrast;              ///< Contrast threshold
-    int search;                ///< Motion search method
-    AVCodecContext *avctx;
-    DSPContext c;              ///< Context providing optimized SAD methods
-    Transform last;            ///< Transform from last frame
-    int refcount;              ///< Number of reference frames (defines averaging window)
-    FILE *fp;
-    Transform avg;
-    int cw;                    ///< Crop motion search to this box
-    int ch;
-    int cx;
-    int cy;
-    char *filename;            ///< Motion search detailed log filename
-} DeshakeContext;
-
 #define OFFSET(x) offsetof(DeshakeContext, x)
 #define FLAGS AV_OPT_FLAG_VIDEO_PARAM|AV_OPT_FLAG_FILTERING_PARAM
+
+#define MAX_R 64
 
 static const AVOption deshake_options[] = {
     { "x", "set x for the rectangular search area",      OFFSET(cx), AV_OPT_TYPE_INT, {.i64=-1}, -1, INT_MAX, .flags = FLAGS },
     { "y", "set y for the rectangular search area",      OFFSET(cy), AV_OPT_TYPE_INT, {.i64=-1}, -1, INT_MAX, .flags = FLAGS },
     { "w", "set width for the rectangular search area",  OFFSET(cw), AV_OPT_TYPE_INT, {.i64=-1}, -1, INT_MAX, .flags = FLAGS },
     { "h", "set height for the rectangular search area", OFFSET(ch), AV_OPT_TYPE_INT, {.i64=-1}, -1, INT_MAX, .flags = FLAGS },
-    { "rx", "set x for the rectangular search area",     OFFSET(rx), AV_OPT_TYPE_INT, {.i64=16}, 0, 64, .flags = FLAGS },
-    { "ry", "set y for the rectangular search area",     OFFSET(ry), AV_OPT_TYPE_INT, {.i64=16}, 0, 64, .flags = FLAGS },
+    { "rx", "set x for the rectangular search area",     OFFSET(rx), AV_OPT_TYPE_INT, {.i64=16}, 0, MAX_R, .flags = FLAGS },
+    { "ry", "set y for the rectangular search area",     OFFSET(ry), AV_OPT_TYPE_INT, {.i64=16}, 0, MAX_R, .flags = FLAGS },
     { "edge", "set edge mode", OFFSET(edge), AV_OPT_TYPE_INT, {.i64=FILL_MIRROR}, FILL_BLANK, FILL_COUNT-1, FLAGS, "edge"},
         { "blank",    "fill zeroes at blank locations",         0, AV_OPT_TYPE_CONST, {.i64=FILL_BLANK},    INT_MIN, INT_MAX, FLAGS, "edge" },
         { "original", "original image at blank locations",      0, AV_OPT_TYPE_CONST, {.i64=FILL_ORIGINAL}, INT_MIN, INT_MAX, FLAGS, "edge" },
@@ -129,6 +88,7 @@ static const AVOption deshake_options[] = {
         { "exhaustive", "exhaustive search",      0, AV_OPT_TYPE_CONST, {.i64=EXHAUSTIVE},       INT_MIN, INT_MAX, FLAGS, "smode" },
         { "less",       "less exhaustive search", 0, AV_OPT_TYPE_CONST, {.i64=SMART_EXHAUSTIVE}, INT_MIN, INT_MAX, FLAGS, "smode" },
     { "filename", "set motion search detailed log file name", OFFSET(filename), AV_OPT_TYPE_STRING, {.str=NULL}, .flags = FLAGS },
+    { "opencl", "use OpenCL filtering capabilities", OFFSET(opencl), AV_OPT_TYPE_INT, {.i64=0}, 0, 1, .flags = FLAGS },
     { NULL }
 };
 
@@ -190,8 +150,8 @@ static void find_block_motion(DeshakeContext *deshake, uint8_t *src1,
         }
     } else if (deshake->search == SMART_EXHAUSTIVE) {
         // Compare every other possible position and find the best match
-        for (y = -deshake->ry + 1; y < deshake->ry - 2; y += 2) {
-            for (x = -deshake->rx + 1; x < deshake->rx - 2; x += 2) {
+        for (y = -deshake->ry + 1; y < deshake->ry; y += 2) {
+            for (x = -deshake->rx + 1; x < deshake->rx; x += 2) {
                 diff = CMP(cx - x, cy - y);
                 if (diff < smallest) {
                     smallest = diff;
@@ -237,12 +197,12 @@ static void find_block_motion(DeshakeContext *deshake, uint8_t *src1,
 static int block_contrast(uint8_t *src, int x, int y, int stride, int blocksize)
 {
     int highest = 0;
-    int lowest = 0;
+    int lowest = 255;
     int i, j, pos;
 
     for (i = 0; i <= blocksize * 2; i++) {
         // We use a width of 16 here to match the libavcodec sad functions
-        for (j = 0; i <= 15; i++) {
+        for (j = 0; j <= 15; j++) {
             pos = (y - i) * stride + (x - j);
             if (src[pos] < lowest)
                 lowest = src[pos];
@@ -284,7 +244,7 @@ static void find_motion(DeshakeContext *deshake, uint8_t *src1, uint8_t *src2,
 {
     int x, y;
     IntMotionVector mv = {0, 0};
-    int counts[128][128];
+    int counts[2*MAX_R+1][2*MAX_R+1];
     int count_max_value = 0;
     int contrast;
 
@@ -346,8 +306,8 @@ static void find_motion(DeshakeContext *deshake, uint8_t *src1, uint8_t *src2,
         //av_log(NULL, AV_LOG_ERROR, "\n");
     }
 
-    p_x = (center_x - width / 2);
-    p_y = (center_y - height / 2);
+    p_x = (center_x - width / 2.0);
+    p_y = (center_y - height / 2.0);
     t->vector.x += (cos(t->angle)-1)*p_x  - sin(t->angle)*p_y;
     t->vector.y += sin(t->angle)*p_x  + (cos(t->angle)-1)*p_y;
 
@@ -360,27 +320,45 @@ static void find_motion(DeshakeContext *deshake, uint8_t *src1, uint8_t *src2,
     av_free(angles);
 }
 
-static av_cold int init(AVFilterContext *ctx, const char *args)
+static int deshake_transform_c(AVFilterContext *ctx,
+                                    int width, int height, int cw, int ch,
+                                    const float *matrix_y, const float *matrix_uv,
+                                    enum InterpolateMethod interpolate,
+                                    enum FillMethod fill, AVFrame *in, AVFrame *out)
+{
+    int i = 0, ret = 0;
+    const float *matrixs[3];
+    int plane_w[3], plane_h[3];
+    matrixs[0] = matrix_y;
+    matrixs[1] =  matrixs[2] = matrix_uv;
+    plane_w[0] = width;
+    plane_w[1] = plane_w[2] = cw;
+    plane_h[0] = height;
+    plane_h[1] = plane_h[2] = ch;
+
+    for (i = 0; i < 3; i++) {
+        // Transform the luma and chroma planes
+        ret = avfilter_transform(in->data[i], out->data[i], in->linesize[i], out->linesize[i],
+                                 plane_w[i], plane_h[i], matrixs[i], interpolate, fill);
+        if (ret < 0)
+            return ret;
+    }
+    return ret;
+}
+
+static av_cold int init(AVFilterContext *ctx)
 {
     int ret;
     DeshakeContext *deshake = ctx->priv;
-    static const char *shorthand[] = {
-        "x", "y", "w", "h", "rx", "ry", "edge",
-        "blocksize", "contrast", "search", "filename",
-        NULL
-    };
 
     deshake->refcount = 20; // XXX: add to options?
-
-    deshake->class = &deshake_class;
-    av_opt_set_defaults(deshake);
-
-    ret = av_opt_set_from_string(deshake, args, shorthand, "=", ":");
-    if (ret < 0)
-        return ret;
-
     deshake->blocksize /= 2;
     deshake->blocksize = av_clip(deshake->blocksize, 4, 128);
+
+    if (deshake->rx % 16) {
+        av_log(ctx, AV_LOG_ERROR, "rx must be a multiple of 16\n");
+        return AVERROR_PATCHWELCOME;
+    }
 
     if (deshake->filename)
         deshake->fp = fopen(deshake->filename, "w");
@@ -393,7 +371,18 @@ static av_cold int init(AVFilterContext *ctx, const char *args)
         deshake->cw += deshake->cx - (deshake->cx & ~15);
         deshake->cx &= ~15;
     }
+    deshake->transform = deshake_transform_c;
+    if (!CONFIG_OPENCL && deshake->opencl) {
+        av_log(ctx, AV_LOG_ERROR, "OpenCL support was not enabled in this build, cannot be selected\n");
+        return AVERROR(EINVAL);
+    }
 
+    if (CONFIG_OPENCL && deshake->opencl) {
+        deshake->transform = ff_opencl_transform;
+        ret = ff_opencl_deshake_init(ctx);
+        if (ret < 0)
+            return ret;
+    }
     av_log(ctx, AV_LOG_VERBOSE, "cx: %d, cy: %d, cw: %d, ch: %d, rx: %d, ry: %d, edge: %d blocksize: %d contrast: %d search: %d\n",
            deshake->cx, deshake->cy, deshake->cw, deshake->ch,
            deshake->rx, deshake->ry, deshake->edge, deshake->blocksize * 2, deshake->contrast, deshake->search);
@@ -425,7 +414,7 @@ static int config_props(AVFilterLink *link)
     deshake->last.zoom = 0;
 
     deshake->avctx = avcodec_alloc_context3(NULL);
-    dsputil_init(&deshake->c, deshake->avctx);
+    avpriv_dsputil_init(&deshake->c, deshake->avctx);
 
     return 0;
 }
@@ -433,32 +422,40 @@ static int config_props(AVFilterLink *link)
 static av_cold void uninit(AVFilterContext *ctx)
 {
     DeshakeContext *deshake = ctx->priv;
-
-    avfilter_unref_buffer(deshake->ref);
+    if (CONFIG_OPENCL && deshake->opencl) {
+        ff_opencl_deshake_uninit(ctx);
+    }
+    av_frame_free(&deshake->ref);
     if (deshake->fp)
         fclose(deshake->fp);
     if (deshake->avctx)
         avcodec_close(deshake->avctx);
     av_freep(&deshake->avctx);
-    av_opt_free(deshake);
 }
 
-static int filter_frame(AVFilterLink *link, AVFilterBufferRef *in)
+static int filter_frame(AVFilterLink *link, AVFrame *in)
 {
     DeshakeContext *deshake = link->dst->priv;
     AVFilterLink *outlink = link->dst->outputs[0];
-    AVFilterBufferRef *out;
+    AVFrame *out;
     Transform t = {{0},0}, orig = {{0},0};
-    float matrix[9];
+    float matrix_y[9], matrix_uv[9];
     float alpha = 2.0 / deshake->refcount;
     char tmp[256];
+    int ret = 0;
 
-    out = ff_get_video_buffer(outlink, AV_PERM_WRITE, outlink->w, outlink->h);
+    out = ff_get_video_buffer(outlink, outlink->w, outlink->h);
     if (!out) {
-        avfilter_unref_bufferp(&in);
+        av_frame_free(&in);
         return AVERROR(ENOMEM);
     }
-    avfilter_copy_buffer_ref_props(out, in);
+    av_frame_copy_props(out, in);
+
+    if (CONFIG_OPENCL && deshake->opencl) {
+        ret = ff_opencl_deshake_process_inout_buf(link->dst,in, out);
+        if (ret < 0)
+            return ret;
+    }
 
     if (deshake->cx < 0 || deshake->cy < 0 || deshake->cw < 0 || deshake->ch < 0) {
         // Find the most likely global motion for the current frame
@@ -532,20 +529,18 @@ static int filter_frame(AVFilterLink *link, AVFilterBufferRef *in)
     deshake->last.zoom = t.zoom;
 
     // Generate a luma transformation matrix
-    avfilter_get_matrix(t.vector.x, t.vector.y, t.angle, 1.0 + t.zoom / 100.0, matrix);
-
-    // Transform the luma plane
-    avfilter_transform(in->data[0], out->data[0], in->linesize[0], out->linesize[0], link->w, link->h, matrix, INTERPOLATE_BILINEAR, deshake->edge);
-
+    avfilter_get_matrix(t.vector.x, t.vector.y, t.angle, 1.0 + t.zoom / 100.0, matrix_y);
     // Generate a chroma transformation matrix
-    avfilter_get_matrix(t.vector.x / (link->w / CHROMA_WIDTH(link)), t.vector.y / (link->h / CHROMA_HEIGHT(link)), t.angle, 1.0 + t.zoom / 100.0, matrix);
-
-    // Transform the chroma planes
-    avfilter_transform(in->data[1], out->data[1], in->linesize[1], out->linesize[1], CHROMA_WIDTH(link), CHROMA_HEIGHT(link), matrix, INTERPOLATE_BILINEAR, deshake->edge);
-    avfilter_transform(in->data[2], out->data[2], in->linesize[2], out->linesize[2], CHROMA_WIDTH(link), CHROMA_HEIGHT(link), matrix, INTERPOLATE_BILINEAR, deshake->edge);
+    avfilter_get_matrix(t.vector.x / (link->w / CHROMA_WIDTH(link)), t.vector.y / (link->h / CHROMA_HEIGHT(link)), t.angle, 1.0 + t.zoom / 100.0, matrix_uv);
+    // Transform the luma and chroma planes
+    ret = deshake->transform(link->dst, link->w, link->h, CHROMA_WIDTH(link), CHROMA_HEIGHT(link),
+                             matrix_y, matrix_uv, INTERPOLATE_BILINEAR, deshake->edge, in, out);
 
     // Cleanup the old reference frame
-    avfilter_unref_buffer(deshake->ref);
+    av_frame_free(&deshake->ref);
+
+    if (ret < 0)
+        return ret;
 
     // Store the current frame as the reference frame for calculating the
     // motion of the next frame
@@ -560,7 +555,6 @@ static const AVFilterPad deshake_inputs[] = {
         .type         = AVMEDIA_TYPE_VIDEO,
         .filter_frame = filter_frame,
         .config_props = config_props,
-        .min_perms    = AV_PERM_READ | AV_PERM_PRESERVE,
     },
     { NULL }
 };
@@ -573,7 +567,7 @@ static const AVFilterPad deshake_outputs[] = {
     { NULL }
 };
 
-AVFilter avfilter_vf_deshake = {
+AVFilter ff_vf_deshake = {
     .name          = "deshake",
     .description   = NULL_IF_CONFIG_SMALL("Stabilize shaky video."),
     .priv_size     = sizeof(DeshakeContext),

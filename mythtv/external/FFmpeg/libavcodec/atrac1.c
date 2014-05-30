@@ -1,5 +1,5 @@
 /*
- * Atrac 1 compatible decoder
+ * ATRAC1 compatible decoder
  * Copyright (c) 2009 Maxim Poliakovski
  * Copyright (c) 2009 Benjamin Larsson
  *
@@ -22,7 +22,7 @@
 
 /**
  * @file
- * Atrac 1 compatible decoder.
+ * ATRAC1 compatible decoder.
  * This decoder handles raw ATRAC1 data and probably SDDS data.
  */
 
@@ -287,10 +287,8 @@ static int atrac1_decode_frame(AVCodecContext *avctx, void *data,
 
     /* get output buffer */
     frame->nb_samples = AT1_SU_SAMPLES;
-    if ((ret = ff_get_buffer(avctx, frame)) < 0) {
-        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
+    if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
         return ret;
-    }
 
     for (ch = 0; ch < avctx->channels; ch++) {
         AT1SUCtx* su = &q->SUs[ch];
@@ -344,7 +342,7 @@ static av_cold int atrac1_decode_init(AVCodecContext *avctx)
     }
 
     if (avctx->block_align <= 0) {
-        av_log_ask_for_sample(avctx, "unsupported block align\n");
+        av_log(avctx, AV_LOG_ERROR, "Unsupported block align.");
         return AVERROR_PATCHWELCOME;
     }
 
@@ -379,6 +377,7 @@ static av_cold int atrac1_decode_init(AVCodecContext *avctx)
 
 AVCodec ff_atrac1_decoder = {
     .name           = "atrac1",
+    .long_name      = NULL_IF_CONFIG_SMALL("ATRAC1 (Adaptive TRansform Acoustic Coding)"),
     .type           = AVMEDIA_TYPE_AUDIO,
     .id             = AV_CODEC_ID_ATRAC1,
     .priv_data_size = sizeof(AT1Ctx),
@@ -386,7 +385,6 @@ AVCodec ff_atrac1_decoder = {
     .close          = atrac1_decode_end,
     .decode         = atrac1_decode_frame,
     .capabilities   = CODEC_CAP_DR1,
-    .long_name      = NULL_IF_CONFIG_SMALL("Atrac 1 (Adaptive TRansform Acoustic Coding)"),
     .sample_fmts    = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_FLTP,
                                                       AV_SAMPLE_FMT_NONE },
 };

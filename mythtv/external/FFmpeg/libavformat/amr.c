@@ -56,7 +56,6 @@ static int amr_write_header(AVFormatContext *s)
 static int amr_write_packet(AVFormatContext *s, AVPacket *pkt)
 {
     avio_write(s->pb, pkt->data, pkt->size);
-    avio_flush(s->pb);
     return 0;
 }
 #endif /* CONFIG_AMR_MUXER */
@@ -133,8 +132,6 @@ static int amr_read_packet(AVFormatContext *s, AVPacket *pkt)
         };
 
         size = packed_size[mode];
-    } else {
-        av_assert0(0);
     }
 
     if (!size || av_new_packet(pkt, size))

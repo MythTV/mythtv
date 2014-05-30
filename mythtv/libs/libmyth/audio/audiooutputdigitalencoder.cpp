@@ -92,7 +92,7 @@ void *AudioOutputDigitalEncoder::realloc(void *ptr,
 }
 
 bool AudioOutputDigitalEncoder::Init(
-    CodecID codec_id, int bitrate, int samplerate, int channels)
+    AVCodecID codec_id, int bitrate, int samplerate, int channels)
 {
     AVCodec *codec;
     int ret;

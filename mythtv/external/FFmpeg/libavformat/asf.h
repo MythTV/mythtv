@@ -39,8 +39,11 @@ typedef struct ASFStream {
     /* use for reading */
     AVPacket pkt;
     int frag_offset;
+    int packet_obj_size;
     int timestamp;
     int64_t duration;
+    int skip_to_key;
+    int pkt_clean;
 
     int ds_span;                /* descrambling  */
     int ds_packet_size;
@@ -86,6 +89,8 @@ typedef struct ASFMainHeader {
 typedef struct ASFIndex {
     uint32_t packet_number;
     uint16_t packet_count;
+    uint64_t send_time;
+    uint64_t offset;
 } ASFIndex;
 
 extern const ff_asf_guid ff_asf_header;
@@ -112,6 +117,7 @@ extern const ff_asf_guid ff_asf_ext_stream_audio_stream;
 extern const ff_asf_guid ff_asf_metadata_header;
 extern const ff_asf_guid ff_asf_metadata_library_header;
 extern const ff_asf_guid ff_asf_marker_header;
+extern const ff_asf_guid ff_asf_reserved_4;
 extern const ff_asf_guid ff_asf_my_guid;
 extern const ff_asf_guid ff_asf_language_guid;
 extern const ff_asf_guid ff_asf_content_encryption;
@@ -182,7 +188,5 @@ extern const AVMetadataConv ff_asf_metadata_conv[];
 #define ASF_PL_FLAG_KEY_FRAME 0x80 //1000 0000
 
 extern AVInputFormat ff_asf_demuxer;
-
-void ff_put_guid(AVIOContext *s, const ff_asf_guid *g);
 
 #endif /* AVFORMAT_ASF_H */

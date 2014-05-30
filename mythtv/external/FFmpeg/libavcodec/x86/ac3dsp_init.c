@@ -19,37 +19,51 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/attributes.h"
 #include "libavutil/mem.h"
 #include "libavutil/x86/asm.h"
 #include "libavutil/x86/cpu.h"
-#include "dsputil_mmx.h"
+#include "dsputil_x86.h"
 #include "libavcodec/ac3.h"
 #include "libavcodec/ac3dsp.h"
 
-extern void ff_ac3_exponent_min_mmx   (uint8_t *exp, int num_reuse_blocks, int nb_coefs);
-extern void ff_ac3_exponent_min_mmxext(uint8_t *exp, int num_reuse_blocks, int nb_coefs);
-extern void ff_ac3_exponent_min_sse2  (uint8_t *exp, int num_reuse_blocks, int nb_coefs);
+void ff_ac3_exponent_min_mmx   (uint8_t *exp, int num_reuse_blocks, int nb_coefs);
+void ff_ac3_exponent_min_mmxext(uint8_t *exp, int num_reuse_blocks, int nb_coefs);
+void ff_ac3_exponent_min_sse2  (uint8_t *exp, int num_reuse_blocks, int nb_coefs);
 
-extern int ff_ac3_max_msb_abs_int16_mmx  (const int16_t *src, int len);
-extern int ff_ac3_max_msb_abs_int16_mmxext(const int16_t *src, int len);
-extern int ff_ac3_max_msb_abs_int16_sse2 (const int16_t *src, int len);
-extern int ff_ac3_max_msb_abs_int16_ssse3(const int16_t *src, int len);
+int ff_ac3_max_msb_abs_int16_mmx  (const int16_t *src, int len);
+int ff_ac3_max_msb_abs_int16_mmxext(const int16_t *src, int len);
+int ff_ac3_max_msb_abs_int16_sse2 (const int16_t *src, int len);
+int ff_ac3_max_msb_abs_int16_ssse3(const int16_t *src, int len);
 
-extern void ff_ac3_lshift_int16_mmx (int16_t *src, unsigned int len, unsigned int shift);
-extern void ff_ac3_lshift_int16_sse2(int16_t *src, unsigned int len, unsigned int shift);
+void ff_ac3_lshift_int16_mmx (int16_t *src, unsigned int len, unsigned int shift);
+void ff_ac3_lshift_int16_sse2(int16_t *src, unsigned int len, unsigned int shift);
 
-extern void ff_ac3_rshift_int32_mmx (int32_t *src, unsigned int len, unsigned int shift);
-extern void ff_ac3_rshift_int32_sse2(int32_t *src, unsigned int len, unsigned int shift);
+void ff_ac3_rshift_int32_mmx (int32_t *src, unsigned int len, unsigned int shift);
+void ff_ac3_rshift_int32_sse2(int32_t *src, unsigned int len, unsigned int shift);
 
-extern void ff_float_to_fixed24_3dnow(int32_t *dst, const float *src, unsigned int len);
-extern void ff_float_to_fixed24_sse  (int32_t *dst, const float *src, unsigned int len);
-extern void ff_float_to_fixed24_sse2 (int32_t *dst, const float *src, unsigned int len);
+void ff_float_to_fixed24_3dnow(int32_t *dst, const float *src, unsigned int len);
+void ff_float_to_fixed24_sse  (int32_t *dst, const float *src, unsigned int len);
+void ff_float_to_fixed24_sse2 (int32_t *dst, const float *src, unsigned int len);
 
-extern int ff_ac3_compute_mantissa_size_sse2(uint16_t mant_cnt[6][16]);
+int ff_ac3_compute_mantissa_size_sse2(uint16_t mant_cnt[6][16]);
 
-extern void ff_ac3_extract_exponents_3dnow(uint8_t *exp, int32_t *coef, int nb_coefs);
-extern void ff_ac3_extract_exponents_sse2 (uint8_t *exp, int32_t *coef, int nb_coefs);
-extern void ff_ac3_extract_exponents_ssse3(uint8_t *exp, int32_t *coef, int nb_coefs);
+void ff_ac3_extract_exponents_3dnow(uint8_t *exp, int32_t *coef, int nb_coefs);
+void ff_ac3_extract_exponents_sse2 (uint8_t *exp, int32_t *coef, int nb_coefs);
+void ff_ac3_extract_exponents_ssse3(uint8_t *exp, int32_t *coef, int nb_coefs);
+
+void ff_apply_window_int16_round_mmxext(int16_t *output, const int16_t *input,
+                                        const int16_t *window, unsigned int len);
+void ff_apply_window_int16_round_sse2(int16_t *output, const int16_t *input,
+                                      const int16_t *window, unsigned int len);
+void ff_apply_window_int16_mmxext(int16_t *output, const int16_t *input,
+                                  const int16_t *window, unsigned int len);
+void ff_apply_window_int16_sse2(int16_t *output, const int16_t *input,
+                                const int16_t *window, unsigned int len);
+void ff_apply_window_int16_ssse3(int16_t *output, const int16_t *input,
+                                 const int16_t *window, unsigned int len);
+void ff_apply_window_int16_ssse3_atom(int16_t *output, const int16_t *input,
+                                      const int16_t *window, unsigned int len);
 
 #if ARCH_X86_32 && defined(__INTEL_COMPILER)
 #       undef HAVE_7REGS
@@ -185,47 +199,59 @@ static void ac3_downmix_sse(float **samples, float (*matrix)[2],
 
 av_cold void ff_ac3dsp_init_x86(AC3DSPContext *c, int bit_exact)
 {
-    int mm_flags = av_get_cpu_flags();
+    int cpu_flags = av_get_cpu_flags();
 
-    if (EXTERNAL_MMX(mm_flags)) {
+    if (EXTERNAL_MMX(cpu_flags)) {
         c->ac3_exponent_min = ff_ac3_exponent_min_mmx;
         c->ac3_max_msb_abs_int16 = ff_ac3_max_msb_abs_int16_mmx;
         c->ac3_lshift_int16 = ff_ac3_lshift_int16_mmx;
         c->ac3_rshift_int32 = ff_ac3_rshift_int32_mmx;
     }
-    if (EXTERNAL_AMD3DNOW(mm_flags)) {
-        c->extract_exponents = ff_ac3_extract_exponents_3dnow;
+    if (EXTERNAL_AMD3DNOW(cpu_flags)) {
         if (!bit_exact) {
             c->float_to_fixed24 = ff_float_to_fixed24_3dnow;
         }
     }
-    if (EXTERNAL_MMXEXT(mm_flags)) {
+    if (EXTERNAL_MMXEXT(cpu_flags)) {
         c->ac3_exponent_min = ff_ac3_exponent_min_mmxext;
         c->ac3_max_msb_abs_int16 = ff_ac3_max_msb_abs_int16_mmxext;
+        if (bit_exact) {
+            c->apply_window_int16 = ff_apply_window_int16_mmxext;
+        } else {
+            c->apply_window_int16 = ff_apply_window_int16_round_mmxext;
+        }
     }
-    if (EXTERNAL_SSE(mm_flags)) {
+    if (EXTERNAL_SSE(cpu_flags)) {
         c->float_to_fixed24 = ff_float_to_fixed24_sse;
     }
-    if (EXTERNAL_SSE2(mm_flags)) {
+    if (EXTERNAL_SSE2(cpu_flags)) {
         c->ac3_exponent_min = ff_ac3_exponent_min_sse2;
         c->ac3_max_msb_abs_int16 = ff_ac3_max_msb_abs_int16_sse2;
         c->float_to_fixed24 = ff_float_to_fixed24_sse2;
         c->compute_mantissa_size = ff_ac3_compute_mantissa_size_sse2;
         c->extract_exponents = ff_ac3_extract_exponents_sse2;
-        if (!(mm_flags & AV_CPU_FLAG_SSE2SLOW)) {
+        if (!(cpu_flags & AV_CPU_FLAG_SSE2SLOW)) {
             c->ac3_lshift_int16 = ff_ac3_lshift_int16_sse2;
             c->ac3_rshift_int32 = ff_ac3_rshift_int32_sse2;
         }
+        if (bit_exact) {
+            c->apply_window_int16 = ff_apply_window_int16_sse2;
+        } else if (!(cpu_flags & AV_CPU_FLAG_SSE2SLOW)) {
+            c->apply_window_int16 = ff_apply_window_int16_round_sse2;
+        }
     }
-    if (EXTERNAL_SSSE3(mm_flags)) {
+    if (EXTERNAL_SSSE3(cpu_flags)) {
         c->ac3_max_msb_abs_int16 = ff_ac3_max_msb_abs_int16_ssse3;
-        if (!(mm_flags & AV_CPU_FLAG_ATOM)) {
+        if (cpu_flags & AV_CPU_FLAG_ATOM) {
+            c->apply_window_int16 = ff_apply_window_int16_ssse3_atom;
+        } else {
             c->extract_exponents = ff_ac3_extract_exponents_ssse3;
+            c->apply_window_int16 = ff_apply_window_int16_ssse3;
         }
     }
 
 #if HAVE_SSE_INLINE && HAVE_7REGS
-    if (INLINE_SSE(mm_flags)) {
+    if (INLINE_SSE(cpu_flags)) {
         c->downmix = ac3_downmix_sse;
     }
 #endif

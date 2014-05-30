@@ -24,7 +24,7 @@ various FFmpeg APIs.
 @chapter Options
 @c man begin OPTIONS
 
-@include avtools-common-opts.texi
+@include fftools-common-opts.texi
 
 @section Main options
 
@@ -73,16 +73,22 @@ Default value is "video", if video is not present or cannot be played
 You can interactively cycle through the available show modes by
 pressing the key @key{w}.
 
-@item -vf @var{filter_graph}
-Create the filter graph specified by @var{filter_graph} and use it to
+@item -vf @var{filtergraph}
+Create the filtergraph specified by @var{filtergraph} and use it to
 filter the video stream.
 
-@var{filter_graph} is a description of the filter graph to apply to
+@var{filtergraph} is a description of the filtergraph to apply to
 the stream, and must have a single video input and a single video
-output. In the filter graph, the input is associated to the label
+output. In the filtergraph, the input is associated to the label
 @code{in}, and the output to the label @code{out}. See the
 ffmpeg-filters manual for more information about the filtergraph
 syntax.
+
+@item -af @var{filtergraph}
+@var{filtergraph} is a description of the filtergraph to apply to
+the input audio.
+Use the option "-filters" to show all the available filters (including
+sources and sinks).
 
 @item -i @var{input_file}
 Read @var{input_file}.
@@ -93,9 +99,13 @@ Read @var{input_file}.
 @item -pix_fmt @var{format}
 Set pixel format.
 This option has been deprecated in favor of private options, try -pixel_format.
+
 @item -stats
-Show the stream duration, the codec parameters, the current position in
-the stream and the audio/video synchronisation drift.
+Print several playback statistics, in particular show the stream
+duration, the codec parameters, the current position in the stream and
+the audio/video synchronisation drift. It is on by default, to
+explicitly disable it you need to specify @code{-nostats}.
+
 @item -bug
 Work around bugs.
 @item -fast
@@ -164,16 +174,25 @@ Toggle full screen.
 Pause.
 
 @item a
-Cycle audio channel.
+Cycle audio channel in the curret program.
 
 @item v
 Cycle video channel.
 
 @item t
-Cycle subtitle channel.
+Cycle subtitle channel in the current program.
+
+@item c
+Cycle program.
 
 @item w
 Show audio waves.
+
+@item s
+Step to the next frame.
+
+Pause if the stream is not already paused, step to the next video
+frame, and pause.
 
 @item left/right
 Seek backward/forward 10 seconds.
@@ -182,6 +201,8 @@ Seek backward/forward 10 seconds.
 Seek backward/forward 1 minute.
 
 @item page down/page up
+Seek to the previous/next chapter.
+or if there are no chapters
 Seek backward/forward 10 minutes.
 
 @item mouse click
@@ -191,9 +212,43 @@ Seek to percentage in file corresponding to fraction of width.
 
 @c man end
 
+@include config.texi
+@ifset config-all
+@set config-readonly
+@ifset config-avutil
+@include utils.texi
+@end ifset
+@ifset config-avcodec
+@include codecs.texi
+@include bitstream_filters.texi
+@end ifset
+@ifset config-avformat
+@include formats.texi
+@include protocols.texi
+@end ifset
+@ifset config-avdevice
+@include devices.texi
+@end ifset
+@ifset config-swresample
+@include resampler.texi
+@end ifset
+@ifset config-swscale
+@include scaler.texi
+@end ifset
+@ifset config-avfilter
+@include filters.texi
+@end ifset
+@end ifset
+
 @chapter See Also
 
 @ifhtml
+@ifset config-all
+@url{ffplay.html,ffplay},
+@end ifset
+@ifset config-not-all
+@url{ffplay-all.html,ffmpeg-all},
+@end ifset
 @url{ffmpeg.html,ffmpeg}, @url{ffprobe.html,ffprobe}, @url{ffserver.html,ffserver},
 @url{ffmpeg-utils.html,ffmpeg-utils},
 @url{ffmpeg-scaler.html,ffmpeg-scaler},
@@ -207,6 +262,12 @@ Seek to percentage in file corresponding to fraction of width.
 @end ifhtml
 
 @ifnothtml
+@ifset config-all
+ffplay(1),
+@end ifset
+@ifset config-not-all
+ffplay-all(1),
+@end ifset
 ffmpeg(1), ffprobe(1), ffserver(1),
 ffmpeg-utils(1), ffmpeg-scaler(1), ffmpeg-resampler(1),
 ffmpeg-codecs(1), ffmpeg-bitstream-filters(1), ffmpeg-formats(1),

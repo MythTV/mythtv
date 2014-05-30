@@ -38,6 +38,10 @@
 #include "simple_idct_template.c"
 #undef BIT_DEPTH
 
+#define BIT_DEPTH 12
+#include "simple_idct_template.c"
+#undef BIT_DEPTH
+
 /* 2x4x8 idct */
 
 #define CN_SHIFT 12
@@ -228,6 +232,8 @@ void ff_prores_idct(int16_t *block, const int16_t *qmat)
     for (i = 0; i < 8; i++)
         idctRowCondDC_10(block + i*8, 2);
 
-    for (i = 0; i < 8; i++)
+    for (i = 0; i < 8; i++) {
+        block[i] += 8192;
         idctSparseCol_10(block + i);
+    }
 }

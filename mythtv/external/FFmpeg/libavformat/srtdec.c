@@ -69,7 +69,6 @@ static int64_t get_pts(const char **buf, int *duration,
             return start;
         }
         *buf += ff_subtitles_next_line(*buf);
-
     }
     return AV_NOPTS_VALUE;
 }

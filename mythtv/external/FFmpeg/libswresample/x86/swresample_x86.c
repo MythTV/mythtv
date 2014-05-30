@@ -21,14 +21,14 @@
 #include "libswresample/swresample_internal.h"
 #include "libswresample/audioconvert.h"
 
-#define PROTO(pre, in, out, cap) void ff ## pre ## _ ##in## _to_ ##out## _a_ ##cap(uint8_t **dst, const uint8_t **src, int len);
+#define PROTO(pre, in, out, cap) void ff ## pre ## in## _to_ ##out## _a_ ##cap(uint8_t **dst, const uint8_t **src, int len);
 #define PROTO2(pre, out, cap) PROTO(pre, int16, out, cap) PROTO(pre, int32, out, cap) PROTO(pre, float, out, cap)
 #define PROTO3(pre, cap) PROTO2(pre, int16, cap) PROTO2(pre, int32, cap) PROTO2(pre, float, cap)
 #define PROTO4(pre) PROTO3(pre, mmx) PROTO3(pre, sse) PROTO3(pre, sse2) PROTO3(pre, ssse3) PROTO3(pre, sse4) PROTO3(pre, avx)
-PROTO4()
-PROTO4(_pack_2ch)
-PROTO4(_pack_6ch)
-PROTO4(_unpack_2ch)
+PROTO4(_)
+PROTO4(_pack_2ch_)
+PROTO4(_pack_6ch_)
+PROTO4(_unpack_2ch_)
 
 av_cold void swri_audio_convert_init_x86(struct AudioConvert *ac,
                                  enum AVSampleFormat out_fmt,
@@ -169,6 +169,7 @@ av_cold void swri_rematrix_init_x86(struct SwrContext *s){
             s->mix_2_1_simd = ff_mix_2_1_a_int16_sse2;
         }
         s->native_simd_matrix = av_mallocz(2 * num * sizeof(int16_t));
+        s->native_simd_one    = av_mallocz(2 * sizeof(int16_t));
         for(i=0; i<nb_out; i++){
             int sh = 0;
             for(j=0; j<nb_in; j++)
@@ -180,6 +181,8 @@ av_cold void swri_rematrix_init_x86(struct SwrContext *s){
                     ((((int*)s->native_matrix)[i * nb_in + j]) + (1<<sh>>1)) >> sh;
             }
         }
+        ((int16_t*)s->native_simd_one)[1] = 14;
+        ((int16_t*)s->native_simd_one)[0] = 16384;
     } else if(s->midbuf.fmt == AV_SAMPLE_FMT_FLTP){
         if(mm_flags & AV_CPU_FLAG_SSE) {
             s->mix_1_1_simd = ff_mix_1_1_a_float_sse;
@@ -191,5 +194,7 @@ av_cold void swri_rematrix_init_x86(struct SwrContext *s){
         }
         s->native_simd_matrix = av_mallocz(num * sizeof(float));
         memcpy(s->native_simd_matrix, s->native_matrix, num * sizeof(float));
+        s->native_simd_one = av_mallocz(sizeof(float));
+        memcpy(s->native_simd_one, s->native_one, sizeof(float));
     }
 }

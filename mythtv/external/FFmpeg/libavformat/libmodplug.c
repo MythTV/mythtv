@@ -22,6 +22,7 @@
 * @todo better probing than extensions matching
 */
 
+#define MODPLUG_STATIC
 #include <libmodplug/modplug.h>
 #include "libavutil/avstring.h"
 #include "libavutil/eval.h"
@@ -166,14 +167,14 @@ static int modplug_read_header(AVFormatContext *s)
     AVIOContext *pb = s->pb;
     ModPlug_Settings settings;
     ModPlugContext *modplug = s->priv_data;
-    int sz = avio_size(pb);
+    int64_t sz = avio_size(pb);
 
     if (sz < 0) {
         av_log(s, AV_LOG_WARNING, "Could not determine file size\n");
         sz = modplug->max_size;
     } else if (modplug->max_size && sz > modplug->max_size) {
         sz = modplug->max_size;
-        av_log(s, AV_LOG_WARNING, "Max file size reach%s, allocating %dB "
+        av_log(s, AV_LOG_WARNING, "Max file size reach%s, allocating %"PRIi64"B "
                "but demuxing is likely to fail due to incomplete buffer\n",
                sz == FF_MODPLUG_DEF_FILE_SIZE ? " (see -max_size)" : "", sz);
     }
@@ -353,9 +354,9 @@ static int modplug_probe(AVProbeData *p)
 {
     if (av_match_ext(p->filename, modplug_extensions)) {
         if (p->buf_size < 16384)
-            return AVPROBE_SCORE_MAX/4-1;
+            return AVPROBE_SCORE_EXTENSION/2-1;
         else
-            return AVPROBE_SCORE_MAX/2;
+            return AVPROBE_SCORE_EXTENSION;
     }
     return 0;
 }

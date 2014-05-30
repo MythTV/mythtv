@@ -131,16 +131,10 @@ static int select_voice(struct voice_entry **entry_ret, const char *voice_name, 
     return AVERROR(EINVAL);
 }
 
-static av_cold int init(AVFilterContext *ctx, const char *args)
+static av_cold int init(AVFilterContext *ctx)
 {
     FliteContext *flite = ctx->priv;
     int ret = 0;
-
-    flite->class = &flite_class;
-    av_opt_set_defaults(flite);
-
-    if ((ret = av_set_options_string(flite, args, "=", ":")) < 0)
-        return ret;
 
     if (flite->list_voices) {
         list_voices(ctx, "\n");
@@ -200,8 +194,6 @@ static av_cold void uninit(AVFilterContext *ctx)
 {
     FliteContext *flite = ctx->priv;
 
-    av_opt_free(flite);
-
     if (!--flite->voice_entry->usage_count)
         flite->voice_entry->unregister_fn(flite->voice);
     flite->voice = NULL;
@@ -245,22 +237,22 @@ static int config_props(AVFilterLink *outlink)
 
 static int request_frame(AVFilterLink *outlink)
 {
-    AVFilterBufferRef *samplesref;
+    AVFrame *samplesref;
     FliteContext *flite = outlink->src->priv;
     int nb_samples = FFMIN(flite->wave_nb_samples, flite->frame_nb_samples);
 
     if (!nb_samples)
         return AVERROR_EOF;
 
-    samplesref = ff_get_audio_buffer(outlink, AV_PERM_WRITE, nb_samples);
+    samplesref = ff_get_audio_buffer(outlink, nb_samples);
     if (!samplesref)
         return AVERROR(ENOMEM);
 
     memcpy(samplesref->data[0], flite->wave_samples,
            nb_samples * flite->wave->num_channels * 2);
     samplesref->pts = flite->pts;
-    samplesref->pos = -1;
-    samplesref->audio->sample_rate = flite->wave->sample_rate;
+    av_frame_set_pkt_pos(samplesref, -1);
+    av_frame_set_sample_rate(samplesref, flite->wave->sample_rate);
     flite->pts += nb_samples;
     flite->wave_samples += nb_samples * flite->wave->num_channels;
     flite->wave_nb_samples -= nb_samples;
@@ -278,14 +270,14 @@ static const AVFilterPad flite_outputs[] = {
     { NULL }
 };
 
-AVFilter avfilter_asrc_flite = {
-    .name        = "flite",
-    .description = NULL_IF_CONFIG_SMALL("Synthesize voice from text using libflite."),
+AVFilter ff_asrc_flite = {
+    .name          = "flite",
+    .description   = NULL_IF_CONFIG_SMALL("Synthesize voice from text using libflite."),
     .query_formats = query_formats,
-    .init        = init,
-    .uninit      = uninit,
-    .priv_size   = sizeof(FliteContext),
-    .inputs      = NULL,
-    .outputs     = flite_outputs,
-    .priv_class  = &flite_class,
+    .init          = init,
+    .uninit        = uninit,
+    .priv_size     = sizeof(FliteContext),
+    .inputs        = NULL,
+    .outputs       = flite_outputs,
+    .priv_class    = &flite_class,
 };

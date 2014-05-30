@@ -29,9 +29,8 @@
 
 static const AVFilterPad avfilter_af_anull_inputs[] = {
     {
-        .name             = "default",
-        .type             = AVMEDIA_TYPE_AUDIO,
-        .get_audio_buffer = ff_null_get_audio_buffer,
+        .name = "default",
+        .type = AVMEDIA_TYPE_AUDIO,
     },
     { NULL }
 };
@@ -44,15 +43,10 @@ static const AVFilterPad avfilter_af_anull_outputs[] = {
     { NULL }
 };
 
-AVFilter avfilter_af_anull = {
-    .name      = "anull",
-    .description = NULL_IF_CONFIG_SMALL("Pass the source unchanged to the output."),
-
-    .priv_size = 0,
-
+AVFilter ff_af_anull = {
+    .name          = "anull",
+    .description   = NULL_IF_CONFIG_SMALL("Pass the source unchanged to the output."),
     .query_formats = ff_query_formats_all,
-
-    .inputs    = avfilter_af_anull_inputs,
-
-    .outputs   = avfilter_af_anull_outputs,
+    .inputs        = avfilter_af_anull_inputs,
+    .outputs       = avfilter_af_anull_outputs,
 };

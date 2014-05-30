@@ -41,6 +41,8 @@
 enum Outer{
     ITERATION_COUNT,
     NORMALIZED_ITERATION_COUNT,
+    WHITE,
+    OUTZ,
 };
 
 enum Inner{
@@ -58,9 +60,8 @@ typedef struct Point {
 typedef struct {
     const AVClass *class;
     int w, h;
-    AVRational time_base;
+    AVRational frame_rate;
     uint64_t pts;
-    char *rate;
     int maxiter;
     double start_x;
     double start_y;
@@ -76,6 +77,10 @@ typedef struct {
     Point *next_cache;
     double (*zyklus)[2];
     uint32_t dither;
+
+    double morphxf;
+    double morphyf;
+    double morphamp;
 } MBContext;
 
 #define OFFSET(x) offsetof(MBContext, x)
@@ -84,8 +89,8 @@ typedef struct {
 static const AVOption mandelbrot_options[] = {
     {"size",        "set frame size",                OFFSET(w),       AV_OPT_TYPE_IMAGE_SIZE, {.str="640x480"},  CHAR_MIN, CHAR_MAX, FLAGS },
     {"s",           "set frame size",                OFFSET(w),       AV_OPT_TYPE_IMAGE_SIZE, {.str="640x480"},  CHAR_MIN, CHAR_MAX, FLAGS },
-    {"rate",        "set frame rate",                OFFSET(rate),    AV_OPT_TYPE_STRING,     {.str="25"},  CHAR_MIN, CHAR_MAX, FLAGS },
-    {"r",           "set frame rate",                OFFSET(rate),    AV_OPT_TYPE_STRING,     {.str="25"},  CHAR_MIN, CHAR_MAX, FLAGS },
+    {"rate",        "set frame rate",                OFFSET(frame_rate), AV_OPT_TYPE_VIDEO_RATE, {.str="25"},  CHAR_MIN, CHAR_MAX, FLAGS },
+    {"r",           "set frame rate",                OFFSET(frame_rate), AV_OPT_TYPE_VIDEO_RATE, {.str="25"},  CHAR_MIN, CHAR_MAX, FLAGS },
     {"maxiter",     "set max iterations number",     OFFSET(maxiter), AV_OPT_TYPE_INT,        {.i64=7189},  1,        INT_MAX, FLAGS },
     {"start_x",     "set the initial x position",    OFFSET(start_x), AV_OPT_TYPE_DOUBLE,     {.dbl=-0.743643887037158704752191506114774}, -100, 100, FLAGS },
     {"start_y",     "set the initial y position",    OFFSET(start_y), AV_OPT_TYPE_DOUBLE,     {.dbl=-0.131825904205311970493132056385139}, -100, 100, FLAGS },
@@ -93,10 +98,15 @@ static const AVOption mandelbrot_options[] = {
     {"end_scale",   "set the terminal scale value",  OFFSET(end_scale), AV_OPT_TYPE_DOUBLE,   {.dbl=0.3},  0, FLT_MAX, FLAGS },
     {"end_pts",     "set the terminal pts value",    OFFSET(end_pts), AV_OPT_TYPE_DOUBLE,     {.dbl=400},  0, INT64_MAX, FLAGS },
     {"bailout",     "set the bailout value",         OFFSET(bailout), AV_OPT_TYPE_DOUBLE,     {.dbl=10},   0, FLT_MAX, FLAGS },
+    {"morphxf",     "set morph x frequency",         OFFSET(morphxf), AV_OPT_TYPE_DOUBLE,     {.dbl=0.01},   -FLT_MAX, FLT_MAX, FLAGS },
+    {"morphyf",     "set morph y frequency",         OFFSET(morphyf), AV_OPT_TYPE_DOUBLE,     {.dbl=0.0123}, -FLT_MAX, FLT_MAX, FLAGS },
+    {"morphamp",    "set morph amplitude",           OFFSET(morphamp), AV_OPT_TYPE_DOUBLE,    {.dbl=0},      -FLT_MAX, FLT_MAX, FLAGS },
 
     {"outer",       "set outer coloring mode",       OFFSET(outer), AV_OPT_TYPE_INT, {.i64=NORMALIZED_ITERATION_COUNT}, 0, INT_MAX, FLAGS, "outer" },
     {"iteration_count", "set iteration count mode",  0, AV_OPT_TYPE_CONST, {.i64=ITERATION_COUNT}, INT_MIN, INT_MAX, FLAGS, "outer" },
     {"normalized_iteration_count", "set normalized iteration count mode",   0, AV_OPT_TYPE_CONST, {.i64=NORMALIZED_ITERATION_COUNT}, INT_MIN, INT_MAX, FLAGS, "outer" },
+    {"white", "set white mode",                      0, AV_OPT_TYPE_CONST, {.i64=WHITE}, INT_MIN, INT_MAX, FLAGS, "outer" },
+    {"outz",        "set outz mode",                 0, AV_OPT_TYPE_CONST, {.i64=OUTZ}, INT_MIN, INT_MAX, FLAGS, "outer" },
 
     {"inner",       "set inner coloring mode",       OFFSET(inner), AV_OPT_TYPE_INT, {.i64=MINCOL}, 0, INT_MAX, FLAGS, "inner" },
     {"black",       "set black mode",                0, AV_OPT_TYPE_CONST, {.i64=BLACK}, INT_MIN, INT_MAX, FLAGS, "inner"},
@@ -109,28 +119,14 @@ static const AVOption mandelbrot_options[] = {
 
 AVFILTER_DEFINE_CLASS(mandelbrot);
 
-static av_cold int init(AVFilterContext *ctx, const char *args)
+static av_cold int init(AVFilterContext *ctx)
 {
     MBContext *mb = ctx->priv;
-    AVRational rate_q;
-    int err;
 
-    mb->class = &mandelbrot_class;
-    av_opt_set_defaults(mb);
-
-    if ((err = (av_set_options_string(mb, args, "=", ":"))) < 0)
-        return err;
     mb->bailout *= mb->bailout;
 
     mb->start_scale /=mb->h;
     mb->end_scale /=mb->h;
-
-    if (av_parse_video_rate(&rate_q, mb->rate) < 0) {
-        av_log(ctx, AV_LOG_ERROR, "Invalid frame rate: %s\n", mb->rate);
-        return AVERROR(EINVAL);
-    }
-    mb->time_base.num = rate_q.den;
-    mb->time_base.den = rate_q.num;
 
     mb->cache_allocated = mb->w * mb->h * 3;
     mb->cache_used = 0;
@@ -145,7 +141,6 @@ static av_cold void uninit(AVFilterContext *ctx)
 {
     MBContext *mb = ctx->priv;
 
-    av_freep(&mb->rate);
     av_freep(&mb->point_cache);
     av_freep(&mb-> next_cache);
     av_freep(&mb->zyklus);
@@ -172,13 +167,15 @@ static int config_props(AVFilterLink *inlink)
 
     inlink->w = mb->w;
     inlink->h = mb->h;
-    inlink->time_base = mb->time_base;
+    inlink->time_base = av_inv_q(mb->frame_rate);
 
     return 0;
 }
 
 static void fill_from_cache(AVFilterContext *ctx, uint32_t *color, int *in_cidx, int *out_cidx, double py, double scale){
     MBContext *mb = ctx->priv;
+    if(mb->morphamp)
+        return;
     for(; *in_cidx < mb->cache_used; (*in_cidx)++){
         Point *p= &mb->point_cache[*in_cidx];
         int x;
@@ -276,13 +273,18 @@ static void draw_mandelbrot(AVFilterContext *ctx, uint32_t *color, int linesize,
 
             if(color[x + y*linesize] & 0xFF000000)
                 continue;
-            if(interpol(mb, color, x, y, linesize)){
-                if(next_cidx < mb->cache_allocated){
-                    mb->next_cache[next_cidx  ].p[0]= cr;
-                    mb->next_cache[next_cidx  ].p[1]= ci;
-                    mb->next_cache[next_cidx++].val = color[x + y*linesize];
+            if(!mb->morphamp){
+                if(interpol(mb, color, x, y, linesize)){
+                    if(next_cidx < mb->cache_allocated){
+                        mb->next_cache[next_cidx  ].p[0]= cr;
+                        mb->next_cache[next_cidx  ].p[1]= ci;
+                        mb->next_cache[next_cidx++].val = color[x + y*linesize];
+                    }
+                    continue;
                 }
-                continue;
+            }else{
+                zr += cos(pts * mb->morphxf) * mb->morphamp;
+                zi += sin(pts * mb->morphyf) * mb->morphamp;
             }
 
             use_zyklus= (x==0 || mb->inner!=BLACK ||color[x-1 + y*linesize] == 0xFF000000);
@@ -328,10 +330,22 @@ static void draw_mandelbrot(AVFilterContext *ctx, uint32_t *color, int linesize,
                         zi= mb->zyklus[i][1];
                         if(zr*zr + zi*zi > mb->bailout){
                             switch(mb->outer){
-                            case            ITERATION_COUNT: zr = i; break;
-                            case NORMALIZED_ITERATION_COUNT: zr= i + log2(log(mb->bailout) / log(zr*zr + zi*zi)); break;
+                            case            ITERATION_COUNT:
+                                zr = i;
+                                c = lrintf((sin(zr)+1)*127) + lrintf((sin(zr/1.234)+1)*127)*256*256 + lrintf((sin(zr/100)+1)*127)*256;
+                                break;
+                            case NORMALIZED_ITERATION_COUNT:
+                                zr = i + log2(log(mb->bailout) / log(zr*zr + zi*zi));
+                                c = lrintf((sin(zr)+1)*127) + lrintf((sin(zr/1.234)+1)*127)*256*256 + lrintf((sin(zr/100)+1)*127)*256;
+                                break;
+                            case                      WHITE:
+                                c = 0xFFFFFF;
+                                break;
+                            case                      OUTZ:
+                                zr /= mb->bailout;
+                                zi /= mb->bailout;
+                                c = (((int)(zr*128+128))&0xFF)*256 + (((int)(zi*128+128))&0xFF);
                             }
-                            c= lrintf((sin(zr)+1)*127) + lrintf((sin(zr/1.234)+1)*127)*256*256 + lrintf((sin(zr/100)+1)*127)*256;
                             break;
                         }
                     }
@@ -382,15 +396,15 @@ static void draw_mandelbrot(AVFilterContext *ctx, uint32_t *color, int linesize,
 static int request_frame(AVFilterLink *link)
 {
     MBContext *mb = link->src->priv;
-    AVFilterBufferRef *picref = ff_get_video_buffer(link, AV_PERM_WRITE, mb->w, mb->h);
-    picref->video->sample_aspect_ratio = (AVRational) {1, 1};
+    AVFrame *picref = ff_get_video_buffer(link, mb->w, mb->h);
+    if (!picref)
+        return AVERROR(ENOMEM);
+
+    picref->sample_aspect_ratio = (AVRational) {1, 1};
     picref->pts = mb->pts++;
-    picref->pos = -1;
 
     draw_mandelbrot(link->src, (uint32_t*)picref->data[0], picref->linesize[0]/4, picref->pts);
-    ff_filter_frame(link, picref);
-
-    return 0;
+    return ff_filter_frame(link, picref);
 }
 
 static const AVFilterPad mandelbrot_outputs[] = {
@@ -400,19 +414,17 @@ static const AVFilterPad mandelbrot_outputs[] = {
         .request_frame = request_frame,
         .config_props  = config_props,
     },
-    { NULL },
+    { NULL }
 };
 
-AVFilter avfilter_vsrc_mandelbrot = {
-    .name        = "mandelbrot",
-    .description = NULL_IF_CONFIG_SMALL("Render a Mandelbrot fractal."),
-
-    .priv_size = sizeof(MBContext),
-    .init      = init,
-    .uninit    = uninit,
-
+AVFilter ff_vsrc_mandelbrot = {
+    .name          = "mandelbrot",
+    .description   = NULL_IF_CONFIG_SMALL("Render a Mandelbrot fractal."),
+    .priv_size     = sizeof(MBContext),
+    .priv_class    = &mandelbrot_class,
+    .init          = init,
+    .uninit        = uninit,
     .query_formats = query_formats,
     .inputs        = NULL,
     .outputs       = mandelbrot_outputs,
-    .priv_class    = &mandelbrot_class,
 };

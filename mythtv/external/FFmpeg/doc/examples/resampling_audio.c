@@ -21,7 +21,7 @@
  */
 
 /**
- * @example doc/examples/resampling_audio.c
+ * @example resampling_audio.c
  * libswresample API use example.
  */
 
@@ -62,7 +62,7 @@ static int get_format_from_sample_fmt(const char **fmt,
 /**
  * Fill dst buffer with nb_samples, generated starting from t.
  */
-void fill_samples(double *dst, int nb_samples, int nb_channels, int sample_rate, double *t)
+static void fill_samples(double *dst, int nb_samples, int nb_channels, int sample_rate, double *t)
 {
     int i, j;
     double tincr = 1.0 / sample_rate, *dstp = dst;
@@ -76,18 +76,6 @@ void fill_samples(double *dst, int nb_samples, int nb_channels, int sample_rate,
         dstp += nb_channels;
         *t += tincr;
     }
-}
-
-int alloc_samples_array_and_data(uint8_t ***data, int *linesize, int nb_channels,
-                                    int nb_samples, enum AVSampleFormat sample_fmt, int align)
-{
-    int nb_planes = av_sample_fmt_is_planar(sample_fmt) ? nb_channels : 1;
-
-    *data = av_malloc(sizeof(*data) * nb_planes);
-    if (!*data)
-        return AVERROR(ENOMEM);
-    return av_samples_alloc(*data, linesize, nb_channels,
-                            nb_samples, sample_fmt, align);
 }
 
 int main(int argc, char **argv)
@@ -149,8 +137,8 @@ int main(int argc, char **argv)
     /* allocate source and destination samples buffers */
 
     src_nb_channels = av_get_channel_layout_nb_channels(src_ch_layout);
-    ret = alloc_samples_array_and_data(&src_data, &src_linesize, src_nb_channels,
-                                       src_nb_samples, src_sample_fmt, 0);
+    ret = av_samples_alloc_array_and_samples(&src_data, &src_linesize, src_nb_channels,
+                                             src_nb_samples, src_sample_fmt, 0);
     if (ret < 0) {
         fprintf(stderr, "Could not allocate source samples\n");
         goto end;
@@ -164,8 +152,8 @@ int main(int argc, char **argv)
 
     /* buffer is going to be directly written to a rawaudio file, no alignment */
     dst_nb_channels = av_get_channel_layout_nb_channels(dst_ch_layout);
-    ret = alloc_samples_array_and_data(&dst_data, &dst_linesize, dst_nb_channels,
-                                       dst_nb_samples, dst_sample_fmt, 0);
+    ret = av_samples_alloc_array_and_samples(&dst_data, &dst_linesize, dst_nb_channels,
+                                             dst_nb_samples, dst_sample_fmt, 0);
     if (ret < 0) {
         fprintf(stderr, "Could not allocate destination samples\n");
         goto end;
@@ -196,6 +184,10 @@ int main(int argc, char **argv)
         }
         dst_bufsize = av_samples_get_buffer_size(&dst_linesize, dst_nb_channels,
                                                  ret, dst_sample_fmt, 1);
+        if (dst_bufsize < 0) {
+            fprintf(stderr, "Could not get sample buffer size\n");
+            goto end;
+        }
         printf("t:%f in:%d out:%d\n", t, src_nb_samples, ret);
         fwrite(dst_data[0], 1, dst_bufsize, dst_file);
     } while (t < 10);

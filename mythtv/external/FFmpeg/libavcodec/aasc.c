@@ -29,12 +29,13 @@
 #include <string.h>
 
 #include "avcodec.h"
+#include "internal.h"
 #include "msrledec.h"
 
 typedef struct AascContext {
     AVCodecContext *avctx;
     GetByteContext gb;
-    AVFrame frame;
+    AVFrame *frame;
 
     uint32_t palette[AVPALETTE_COUNT];
     int palette_size;
@@ -68,7 +69,10 @@ static av_cold int aasc_decode_init(AVCodecContext *avctx)
         av_log(avctx, AV_LOG_ERROR, "Unsupported bit depth: %d\n", avctx->bits_per_coded_sample);
         return -1;
     }
-    avcodec_get_frame_defaults(&s->frame);
+
+    s->frame = av_frame_alloc();
+    if (!s->frame)
+        return AVERROR(ENOMEM);
 
     return 0;
 }
@@ -87,12 +91,8 @@ static int aasc_decode_frame(AVCodecContext *avctx,
         return AVERROR_INVALIDDATA;
     }
 
-    s->frame.reference = 3;
-    s->frame.buffer_hints = FF_BUFFER_HINTS_VALID | FF_BUFFER_HINTS_PRESERVE | FF_BUFFER_HINTS_REUSABLE;
-    if ((ret = avctx->reget_buffer(avctx, &s->frame)) < 0) {
-        av_log(avctx, AV_LOG_ERROR, "reget_buffer() failed\n");
+    if ((ret = ff_reget_buffer(avctx, s->frame)) < 0)
         return ret;
-    }
 
     compr     = AV_RL32(buf);
     buf      += 4;
@@ -101,25 +101,23 @@ static int aasc_decode_frame(AVCodecContext *avctx,
     switch (avctx->codec_tag) {
     case MKTAG('A', 'A', 'S', '4'):
         bytestream2_init(&s->gb, buf - 4, buf_size + 4);
-        ff_msrle_decode(avctx, (AVPicture*)&s->frame, 8, &s->gb);
+        ff_msrle_decode(avctx, (AVPicture*)s->frame, 8, &s->gb);
         break;
     case MKTAG('A', 'A', 'S', 'C'):
     switch (compr) {
     case 0:
         stride = (avctx->width * psize + psize) & ~psize;
+        if (buf_size < stride * avctx->height)
+            return AVERROR_INVALIDDATA;
         for (i = avctx->height - 1; i >= 0; i--) {
-            if (avctx->width * psize > buf_size) {
-                av_log(avctx, AV_LOG_ERROR, "Next line is beyond buffer bounds\n");
-                break;
-            }
-            memcpy(s->frame.data[0] + i*s->frame.linesize[0], buf, avctx->width * psize);
+            memcpy(s->frame->data[0] + i * s->frame->linesize[0], buf, avctx->width * psize);
             buf += stride;
             buf_size -= stride;
         }
         break;
     case 1:
         bytestream2_init(&s->gb, buf, buf_size);
-        ff_msrle_decode(avctx, (AVPicture*)&s->frame, 8, &s->gb);
+        ff_msrle_decode(avctx, (AVPicture*)s->frame, 8, &s->gb);
         break;
     default:
         av_log(avctx, AV_LOG_ERROR, "Unknown compression type %d\n", compr);
@@ -132,10 +130,11 @@ static int aasc_decode_frame(AVCodecContext *avctx,
     }
 
     if (avctx->pix_fmt == AV_PIX_FMT_PAL8)
-        memcpy(s->frame.data[1], s->palette, s->palette_size);
+        memcpy(s->frame->data[1], s->palette, s->palette_size);
 
     *got_frame = 1;
-    *(AVFrame*)data = s->frame;
+    if ((ret = av_frame_ref(data, s->frame)) < 0)
+        return ret;
 
     /* report that the buffer was completely consumed */
     return buf_size;
@@ -145,15 +144,14 @@ static av_cold int aasc_decode_end(AVCodecContext *avctx)
 {
     AascContext *s = avctx->priv_data;
 
-    /* release the last frame */
-    if (s->frame.data[0])
-        avctx->release_buffer(avctx, &s->frame);
+    av_frame_free(&s->frame);
 
     return 0;
 }
 
 AVCodec ff_aasc_decoder = {
     .name           = "aasc",
+    .long_name      = NULL_IF_CONFIG_SMALL("Autodesk RLE"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_AASC,
     .priv_data_size = sizeof(AascContext),
@@ -161,5 +159,4 @@ AVCodec ff_aasc_decoder = {
     .close          = aasc_decode_end,
     .decode         = aasc_decode_frame,
     .capabilities   = CODEC_CAP_DR1,
-    .long_name      = NULL_IF_CONFIG_SMALL("Autodesk RLE"),
 };

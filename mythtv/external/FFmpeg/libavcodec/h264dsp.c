@@ -26,7 +26,10 @@
  */
 
 #include <stdint.h>
+
+#include "libavutil/attributes.h"
 #include "libavutil/avassert.h"
+
 #include "avcodec.h"
 #include "h264dsp.h"
 #include "h264idct.h"
@@ -60,7 +63,36 @@
 #include "h264addpx_template.c"
 #undef BIT_DEPTH
 
-void ff_h264dsp_init(H264DSPContext *c, const int bit_depth, const int chroma_format_idc)
+static int h264_find_start_code_candidate_c(const uint8_t *buf, int size)
+{
+    int i = 0;
+#if HAVE_FAST_UNALIGNED
+    /* we check i < size instead of i + 3 / 7 because it is
+     * simpler and there must be FF_INPUT_BUFFER_PADDING_SIZE
+     * bytes at the end.
+     */
+#       if HAVE_FAST_64BIT
+    while (i < size &&
+            !((~*(const uint64_t *)(buf + i) &
+                    (*(const uint64_t *)(buf + i) - 0x0101010101010101ULL)) &
+                    0x8080808080808080ULL))
+        i += 8;
+#       else
+    while (i < size &&
+            !((~*(const uint32_t *)(buf + i) &
+                    (*(const uint32_t *)(buf + i) - 0x01010101U)) &
+                    0x80808080U))
+        i += 4;
+#       endif
+#endif
+    for (; i < size; i++)
+        if (!buf[i])
+            break;
+    return i;
+}
+
+av_cold void ff_h264dsp_init(H264DSPContext *c, const int bit_depth,
+                             const int chroma_format_idc)
 {
 #undef FUNC
 #define FUNC(a, depth) a ## _ ## depth ## _c
@@ -82,13 +114,13 @@ void ff_h264dsp_init(H264DSPContext *c, const int bit_depth, const int chroma_fo
     c->h264_idct8_dc_add= FUNC(ff_h264_idct8_dc_add, depth);\
     c->h264_idct_add16     = FUNC(ff_h264_idct_add16, depth);\
     c->h264_idct8_add4     = FUNC(ff_h264_idct8_add4, depth);\
-    if (chroma_format_idc == 1)\
+    if (chroma_format_idc <= 1)\
         c->h264_idct_add8  = FUNC(ff_h264_idct_add8, depth);\
     else\
         c->h264_idct_add8  = FUNC(ff_h264_idct_add8_422, depth);\
     c->h264_idct_add16intra= FUNC(ff_h264_idct_add16intra, depth);\
     c->h264_luma_dc_dequant_idct= FUNC(ff_h264_luma_dc_dequant_idct, depth);\
-    if (chroma_format_idc == 1)\
+    if (chroma_format_idc <= 1)\
         c->h264_chroma_dc_dequant_idct= FUNC(ff_h264_chroma_dc_dequant_idct, depth);\
     else\
         c->h264_chroma_dc_dequant_idct= FUNC(ff_h264_chroma422_dc_dequant_idct, depth);\
@@ -109,20 +141,20 @@ void ff_h264dsp_init(H264DSPContext *c, const int bit_depth, const int chroma_fo
     c->h264_h_loop_filter_luma_intra= FUNC(h264_h_loop_filter_luma_intra, depth);\
     c->h264_h_loop_filter_luma_mbaff_intra= FUNC(h264_h_loop_filter_luma_mbaff_intra, depth);\
     c->h264_v_loop_filter_chroma= FUNC(h264_v_loop_filter_chroma, depth);\
-    if (chroma_format_idc == 1)\
+    if (chroma_format_idc <= 1)\
         c->h264_h_loop_filter_chroma= FUNC(h264_h_loop_filter_chroma, depth);\
     else\
         c->h264_h_loop_filter_chroma= FUNC(h264_h_loop_filter_chroma422, depth);\
-    if (chroma_format_idc == 1)\
+    if (chroma_format_idc <= 1)\
         c->h264_h_loop_filter_chroma_mbaff= FUNC(h264_h_loop_filter_chroma_mbaff, depth);\
     else\
         c->h264_h_loop_filter_chroma_mbaff= FUNC(h264_h_loop_filter_chroma422_mbaff, depth);\
     c->h264_v_loop_filter_chroma_intra= FUNC(h264_v_loop_filter_chroma_intra, depth);\
-    if (chroma_format_idc == 1)\
+    if (chroma_format_idc <= 1)\
         c->h264_h_loop_filter_chroma_intra= FUNC(h264_h_loop_filter_chroma_intra, depth);\
     else\
         c->h264_h_loop_filter_chroma_intra= FUNC(h264_h_loop_filter_chroma422_intra, depth);\
-    if (chroma_format_idc == 1)\
+    if (chroma_format_idc <= 1)\
         c->h264_h_loop_filter_chroma_mbaff_intra= FUNC(h264_h_loop_filter_chroma_mbaff_intra, depth);\
     else\
         c->h264_h_loop_filter_chroma_mbaff_intra= FUNC(h264_h_loop_filter_chroma422_mbaff_intra, depth);\
@@ -146,8 +178,10 @@ void ff_h264dsp_init(H264DSPContext *c, const int bit_depth, const int chroma_fo
         H264_DSP(8);
         break;
     }
+    c->h264_find_start_code_candidate = h264_find_start_code_candidate_c;
 
+    if (ARCH_AARCH64) ff_h264dsp_init_aarch64(c, bit_depth, chroma_format_idc);
     if (ARCH_ARM) ff_h264dsp_init_arm(c, bit_depth, chroma_format_idc);
-    if (HAVE_ALTIVEC) ff_h264dsp_init_ppc(c, bit_depth, chroma_format_idc);
+    if (ARCH_PPC) ff_h264dsp_init_ppc(c, bit_depth, chroma_format_idc);
     if (ARCH_X86) ff_h264dsp_init_x86(c, bit_depth, chroma_format_idc);
 }

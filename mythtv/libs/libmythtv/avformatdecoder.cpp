@@ -225,7 +225,7 @@ static int has_codec_parameters(AVStream *st)
 }
 
 #ifdef USING_VDPAU
-static AVCodec *find_vdpau_decoder(AVCodec *c, enum CodecID id)
+static AVCodec *find_vdpau_decoder(AVCodec *c, enum AVCodecID id)
 {
     AVCodec *codec = c;
     while (codec)
@@ -2433,7 +2433,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 #endif // USING_DXVA2
                 if (foundgpudecoder)
                 {
-                    enc->codec_id = (CodecID) myth2av_codecid(video_codec_id);
+                    enc->codec_id = (AVCodecID) myth2av_codecid(video_codec_id);
                 }
             }
 
@@ -3253,7 +3253,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
 
     while (bufptr < bufend)
     {
-        bufptr = avpriv_mpv_find_start_code(bufptr, bufend, &start_code_state);
+        bufptr = avpriv_find_start_code(bufptr, bufend, &start_code_state);
 
         float aspect_override = -1.0f;
         if (ringBuffer->IsDVD())
@@ -4007,7 +4007,7 @@ bool AvFormatDecoder::ProcessRawTextPacket(AVPacket *pkt)
 bool AvFormatDecoder::ProcessDataPacket(AVStream *curstream, AVPacket *pkt,
                                         DecodeType decodetype)
 {
-    enum CodecID codec_id = curstream->codec->codec_id;
+    enum AVCodecID codec_id = curstream->codec->codec_id;
 
     switch (codec_id)
     {
@@ -4233,7 +4233,7 @@ static vector<int> filter_type(const sinfo_vec_t &tracks, AudioTrackType type)
 int AvFormatDecoder::filter_max_ch(const AVFormatContext *ic,
                                    const sinfo_vec_t     &tracks,
                                    const vector<int>     &fs,
-                                   enum CodecID           codecId,
+                                   enum AVCodecID         codecId,
                                    int                    profile)
 {
     int selectedTrack = -1, max_seen = -1;

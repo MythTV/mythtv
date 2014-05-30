@@ -20,13 +20,14 @@
 
 #include <stdint.h>
 
+#include "libavutil/attributes.h"
 #include "libavutil/mem.h"
 #include "dct32.h"
 #include "mathops.h"
 #include "mpegaudiodsp.h"
 #include "mpegaudio.h"
 
-#if CONFIG_FLOAT
+#if USE_FLOATS
 #define RENAME(n) n##_float
 
 static inline float round_sample(float *sum)
@@ -124,7 +125,7 @@ void RENAME(ff_mpadsp_apply_window)(MPA_INT *synth_buf, MPA_INT *window,
     register const MPA_INT *w, *w2, *p;
     int j;
     OUT_INT *samples2;
-#if CONFIG_FLOAT
+#if USE_FLOATS
     float sum, sum2;
 #else
     int64_t sum, sum2;
@@ -199,7 +200,7 @@ av_cold void RENAME(ff_mpa_synth_init)(MPA_INT *window)
     for(i=0;i<257;i++) {
         INTFLOAT v;
         v = ff_mpa_enwindow[i];
-#if CONFIG_FLOAT
+#if USE_FLOATS
         v *= 1.0 / (1LL<<(16 + FRAC_BITS));
 #endif
         window[i] = v;
@@ -220,7 +221,7 @@ av_cold void RENAME(ff_mpa_synth_init)(MPA_INT *window)
             window[512+128+16*i+j] = window[64*i+48-j];
 }
 
-void RENAME(ff_init_mpadsp_tabs)(void)
+av_cold void RENAME(ff_init_mpadsp_tabs)(void)
 {
     int i, j;
     /* compute mdct windows */

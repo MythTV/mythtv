@@ -2,20 +2,20 @@
  * Discworld II BMV video and audio decoder
  * Copyright (c) 2011 Konstantin Shishkov
  *
- * This file is part of Libav.
+ * This file is part of FFmpeg.
  *
- * Libav is free software; you can redistribute it and/or
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
  *
- * Libav is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with Libav; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -44,7 +44,6 @@ enum BMVFlags{
 
 typedef struct BMVDecContext {
     AVCodecContext *avctx;
-    AVFrame pic;
 
     uint8_t *frame, frame_base[SCREEN_WIDE * (SCREEN_HIGH + 1)];
     uint32_t pal[256];
@@ -140,7 +139,7 @@ static int decode_bmv_frame(const uint8_t *source, int src_len, uint8_t *frame, 
         mode += 1 + advance_mode;
         if (mode >= 4)
             mode -= 3;
-        if (FFABS(dst_end - dst) < len)
+        if (len <= 0 || FFABS(dst_end - dst) < len)
             return AVERROR_INVALIDDATA;
         switch (mode) {
         case 1:
@@ -200,6 +199,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
                         AVPacket *pkt)
 {
     BMVDecContext * const c = avctx->priv_data;
+    AVFrame *frame = data;
     int type, scr_off;
     int i, ret;
     uint8_t *srcptr, *outptr;
@@ -242,34 +242,27 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
         scr_off = 0;
     }
 
-    if (c->pic.data[0])
-        avctx->release_buffer(avctx, &c->pic);
-
-    c->pic.reference = 3;
-    if ((ret = ff_get_buffer(avctx, &c->pic)) < 0) {
-        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
+    if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
         return ret;
-    }
 
     if (decode_bmv_frame(c->stream, pkt->size - (c->stream - pkt->data), c->frame, scr_off)) {
         av_log(avctx, AV_LOG_ERROR, "Error decoding frame data\n");
         return AVERROR_INVALIDDATA;
     }
 
-    memcpy(c->pic.data[1], c->pal, AVPALETTE_SIZE);
-    c->pic.palette_has_changed = type & BMV_PALETTE;
+    memcpy(frame->data[1], c->pal, AVPALETTE_SIZE);
+    frame->palette_has_changed = type & BMV_PALETTE;
 
-    outptr = c->pic.data[0];
+    outptr = frame->data[0];
     srcptr = c->frame;
 
     for (i = 0; i < avctx->height; i++) {
         memcpy(outptr, srcptr, avctx->width);
         srcptr += avctx->width;
-        outptr += c->pic.linesize[0];
+        outptr += frame->linesize[0];
     }
 
     *got_frame = 1;
-    *(AVFrame*)data = c->pic;
 
     /* always report that the buffer was completely consumed */
     return pkt->size;
@@ -288,16 +281,6 @@ static av_cold int decode_init(AVCodecContext *avctx)
     }
 
     c->frame = c->frame_base + 640;
-
-    return 0;
-}
-
-static av_cold int decode_end(AVCodecContext *avctx)
-{
-    BMVDecContext *c = avctx->priv_data;
-
-    if (c->pic.data[0])
-        avctx->release_buffer(avctx, &c->pic);
 
     return 0;
 }
@@ -335,10 +318,8 @@ static int bmv_aud_decode_frame(AVCodecContext *avctx, void *data,
 
     /* get output buffer */
     frame->nb_samples = total_blocks * 32;
-    if ((ret = ff_get_buffer(avctx, frame)) < 0) {
-        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
+    if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
         return ret;
-    }
     output_samples = (int16_t *)frame->data[0];
 
     for (blocks = 0; blocks < total_blocks; blocks++) {
@@ -359,22 +340,21 @@ static int bmv_aud_decode_frame(AVCodecContext *avctx, void *data,
 
 AVCodec ff_bmv_video_decoder = {
     .name           = "bmv_video",
+    .long_name      = NULL_IF_CONFIG_SMALL("Discworld II BMV video"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_BMV_VIDEO,
     .priv_data_size = sizeof(BMVDecContext),
     .init           = decode_init,
-    .close          = decode_end,
     .decode         = decode_frame,
     .capabilities   = CODEC_CAP_DR1,
-    .long_name      = NULL_IF_CONFIG_SMALL("Discworld II BMV video"),
 };
 
 AVCodec ff_bmv_audio_decoder = {
     .name           = "bmv_audio",
+    .long_name      = NULL_IF_CONFIG_SMALL("Discworld II BMV audio"),
     .type           = AVMEDIA_TYPE_AUDIO,
     .id             = AV_CODEC_ID_BMV_AUDIO,
     .init           = bmv_aud_decode_init,
     .decode         = bmv_aud_decode_frame,
     .capabilities   = CODEC_CAP_DR1,
-    .long_name      = NULL_IF_CONFIG_SMALL("Discworld II BMV audio"),
 };

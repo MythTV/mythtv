@@ -28,7 +28,7 @@
 #include "libavutil/channel_layout.h"
 #include "libavutil/mem.h"
 #include "libavutil/pixdesc.h"
-#include "libavfilter/avfiltergraph.h"
+#include "libavfilter/avfilter.h"
 
 #if !HAVE_GETOPT
 #include "compat/getopt.c"
@@ -36,7 +36,7 @@
 
 static void usage(void)
 {
-    printf("Convert a libavfilter graph to a dot file\n");
+    printf("Convert a libavfilter graph to a dot file.\n");
     printf("Usage: graph2dot [OPTIONS]\n");
     printf("\n"
            "Options:\n"
@@ -58,7 +58,7 @@ static void print_digraph(FILE *outfile, AVFilterGraph *graph)
     fprintf(outfile, "node [shape=box]\n");
     fprintf(outfile, "rankdir=LR\n");
 
-    for (i = 0; i < graph->filter_count; i++) {
+    for (i = 0; i < graph->nb_filters; i++) {
         char filter_ctx_label[128];
         const AVFilterContext *filter_ctx = graph->filters[i];
 
@@ -66,7 +66,7 @@ static void print_digraph(FILE *outfile, AVFilterGraph *graph)
                  filter_ctx->name,
                  filter_ctx->filter->name);
 
-        for (j = 0; j < filter_ctx->output_count; j++) {
+        for (j = 0; j < filter_ctx->nb_outputs; j++) {
             AVFilterLink *link = filter_ctx->outputs[j];
             if (link) {
                 char dst_filter_ctx_label[128];
@@ -137,7 +137,7 @@ int main(int argc, char **argv)
         infilename = "/dev/stdin";
     infile = fopen(infilename, "r");
     if (!infile) {
-        fprintf(stderr, "Impossible to open input file '%s': %s\n",
+        fprintf(stderr, "Failed to open input file '%s': %s\n",
                 infilename, strerror(errno));
         return 1;
     }
@@ -146,7 +146,7 @@ int main(int argc, char **argv)
         outfilename = "/dev/stdout";
     outfile = fopen(outfilename, "w");
     if (!outfile) {
-        fprintf(stderr, "Impossible to open output file '%s': %s\n",
+        fprintf(stderr, "Failed to open output file '%s': %s\n",
                 outfilename, strerror(errno));
         return 1;
     }
@@ -179,7 +179,7 @@ int main(int argc, char **argv)
     avfilter_register_all();
 
     if (avfilter_graph_parse(graph, graph_string, NULL, NULL, NULL) < 0) {
-        fprintf(stderr, "Impossible to parse the graph description\n");
+        fprintf(stderr, "Failed to parse the graph description\n");
         return 1;
     }
 

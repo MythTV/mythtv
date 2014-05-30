@@ -27,11 +27,13 @@
  * @author Josh Allmann <joshua.allmann@gmail.com>
  */
 
+#include "libavutil/attributes.h"
 #include "libavutil/avassert.h"
 #include "libavutil/avstring.h"
 #include "libavutil/base64.h"
 #include "libavcodec/bytestream.h"
 
+#include "internal.h"
 #include "rtpdec.h"
 #include "rtpdec_formats.h"
 
@@ -69,8 +71,8 @@ static void xiph_free_context(PayloadContext * data)
     av_free(data);
 }
 
-static int xiph_vorbis_init(AVFormatContext *ctx, int st_index,
-                            PayloadContext *data)
+static av_cold int xiph_vorbis_init(AVFormatContext *ctx, int st_index,
+                                    PayloadContext *data)
 {
     if (st_index < 0)
         return 0;
@@ -287,11 +289,11 @@ parse_packed_headers(const uint8_t * packed_headers,
      * -- FF_INPUT_BUFFER_PADDING_SIZE required */
     extradata_alloc = length + length/255 + 3 + FF_INPUT_BUFFER_PADDING_SIZE;
 
-    ptr = codec->extradata = av_malloc(extradata_alloc);
-    if (!ptr) {
+    if (ff_alloc_extradata(codec, extradata_alloc)) {
         av_log(codec, AV_LOG_ERROR, "Out of memory\n");
         return AVERROR(ENOMEM);
     }
+    ptr = codec->extradata;
     *ptr++ = 2;
     ptr += av_xiphlacing(ptr, length1);
     ptr += av_xiphlacing(ptr, length2);

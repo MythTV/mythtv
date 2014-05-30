@@ -20,22 +20,19 @@ LIBAVCODEC_$MAJOR {
                 ff_faan*;
                 ff_mmx_idct;
                 ff_fdct*;
-                ff_ue_golomb_vlc_code;
-                ff_golomb_vlc_len;
-                ff_se_golomb_vlc_code;
                 fdct_ifast;
                 j_rev_dct;
                 ff_mmxext_idct;
                 ff_idct_xvid*;
                 ff_jpeg_fdct*;
-                #XBMC's configure checks for ff_vdpau_vc1_decode_picture()
-                ff_vdpau_vc1_decode_picture;
                 ff_dnxhd_get_cid_table;
                 ff_dnxhd_cid_table;
+                ff_ue_golomb_vlc_code;
+                ff_golomb_vlc_len;
+                ff_se_golomb_vlc_code;
                 ff_codec_type_string;
                 ff_codec_id_string;
-                ff_*golomb*code;
-                ff_*golomb*len;
-                ff_inv_zigzag_direct16;
+                ff_zigzag_direct;
+                avpriv_find_start_code;
         local:  *;
 };

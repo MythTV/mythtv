@@ -134,7 +134,7 @@ static av_cold int mpc8_decode_init(AVCodecContext * avctx)
     }
     channels = get_bits(&gb, 4) + 1;
     if (channels > 2) {
-        av_log_missing_feature(avctx, "Multichannel MPC SV8", 1);
+        avpriv_request_sample(avctx, "Multichannel MPC SV8");
         return AVERROR_PATCHWELCOME;
     }
     c->MSS = get_bits1(&gb);
@@ -254,10 +254,8 @@ static int mpc8_decode_frame(AVCodecContext * avctx, void *data,
 
     /* get output buffer */
     frame->nb_samples = MPC_FRAME_SIZE;
-    if ((res = ff_get_buffer(avctx, frame)) < 0) {
-        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
+    if ((res = ff_get_buffer(avctx, frame, 0)) < 0)
         return res;
-    }
 
     keyframe = c->cur_frame == 0;
 
@@ -437,6 +435,7 @@ static av_cold void mpc8_decode_flush(AVCodecContext *avctx)
 
 AVCodec ff_mpc8_decoder = {
     .name           = "mpc8",
+    .long_name      = NULL_IF_CONFIG_SMALL("Musepack SV8"),
     .type           = AVMEDIA_TYPE_AUDIO,
     .id             = AV_CODEC_ID_MUSEPACK8,
     .priv_data_size = sizeof(MPCContext),
@@ -444,7 +443,6 @@ AVCodec ff_mpc8_decoder = {
     .decode         = mpc8_decode_frame,
     .flush          = mpc8_decode_flush,
     .capabilities   = CODEC_CAP_DR1,
-    .long_name      = NULL_IF_CONFIG_SMALL("Musepack SV8"),
     .sample_fmts    = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_S16P,
                                                       AV_SAMPLE_FMT_NONE },
 };

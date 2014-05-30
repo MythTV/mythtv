@@ -72,11 +72,11 @@ SPDIFEncoder::SPDIFEncoder(QString muxer, int codec_id)
 
     AVCodecContext *codec = m_stream->codec;
 
-    codec->codec_id       = (CodecID)codec_id;
+    codec->codec_id       = (AVCodecID)codec_id;
     avformat_write_header(m_oc, NULL);
 
     LOG(VB_AUDIO, LOG_INFO, LOC + QString("Creating %1 encoder (for %2)")
-            .arg(muxer).arg(ff_codec_id_string((CodecID)codec_id)));
+            .arg(muxer).arg(ff_codec_id_string((AVCodecID)codec_id)));
 
     m_complete = true;
 }

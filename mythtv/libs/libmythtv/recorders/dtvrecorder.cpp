@@ -451,7 +451,7 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
 
     while (bufptr < bufend)
     {
-        bufptr = avpriv_mpv_find_start_code(bufptr, bufend, &_start_code);
+        bufptr = avpriv_find_start_code(bufptr, bufend, &_start_code);
         bytes_left = bufend - bufptr;
         if ((_start_code & 0xffffff00) == 0x00000100)
         {
@@ -1060,7 +1060,7 @@ void DTVRecorder::FindPSKeyFrames(const uint8_t *buffer, uint len)
 
         const uint8_t *tmp = bufptr;
         bufptr =
-            avpriv_mpv_find_start_code(bufptr + skip, bufend, &_start_code);
+            avpriv_find_start_code(bufptr + skip, bufend, &_start_code);
         _audio_bytes_remaining = 0;
         _other_bytes_remaining = 0;
         _video_bytes_remaining -= std::min(

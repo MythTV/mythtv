@@ -28,6 +28,7 @@
 #include "libavutil/avassert.h"
 #include "avcodec.h"
 #include "bytestream.h"
+#include "internal.h"
 #include "roqvideo.h"
 
 static void roqvideo_decode_frame(RoqContext *ri)
@@ -78,7 +79,7 @@ static void roqvideo_decode_frame(RoqContext *ri)
         for (yp = ypos; yp < ypos + 16; yp += 8)
             for (xp = xpos; xp < xpos + 16; xp += 8) {
                 if (bytestream2_tell(&ri->gb) >= chunk_start + chunk_size) {
-                    av_log(ri->avctx, AV_LOG_ERROR, "Input buffer too small\n");
+                    av_log(ri->avctx, AV_LOG_VERBOSE, "Chunk is too short\n");
                     return;
                 }
                 if (vqflg_pos < 0) {
@@ -113,7 +114,7 @@ static void roqvideo_decode_frame(RoqContext *ri)
                         if(k & 0x02) y += 4;
 
                         if (bytestream2_tell(&ri->gb) >= chunk_start + chunk_size) {
-                            av_log(ri->avctx, AV_LOG_ERROR, "Input buffer too small\n");
+                            av_log(ri->avctx, AV_LOG_VERBOSE, "Chunk is too short\n");
                             return;
                         }
                         if (vqflg_pos < 0) {
@@ -179,10 +180,15 @@ static av_cold int roq_decode_init(AVCodecContext *avctx)
 
     s->width = avctx->width;
     s->height = avctx->height;
-    avcodec_get_frame_defaults(&s->frames[0]);
-    avcodec_get_frame_defaults(&s->frames[1]);
-    s->last_frame    = &s->frames[0];
-    s->current_frame = &s->frames[1];
+
+    s->last_frame    = av_frame_alloc();
+    s->current_frame = av_frame_alloc();
+    if (!s->current_frame || !s->last_frame) {
+        av_frame_free(&s->current_frame);
+        av_frame_free(&s->last_frame);
+        return AVERROR(ENOMEM);
+    }
+
     avctx->pix_fmt = AV_PIX_FMT_YUV444P;
 
     return 0;
@@ -198,11 +204,8 @@ static int roq_decode_frame(AVCodecContext *avctx,
     int copy= !s->current_frame->data[0];
     int ret;
 
-    s->current_frame->reference = 3;
-    if ((ret = avctx->reget_buffer(avctx, s->current_frame)) < 0) {
-        av_log(avctx, AV_LOG_ERROR, "reget_buffer() failed\n");
+    if ((ret = ff_reget_buffer(avctx, s->current_frame)) < 0)
         return ret;
-    }
 
     if(copy)
         av_picture_copy((AVPicture*)s->current_frame, (AVPicture*)s->last_frame,
@@ -211,8 +214,9 @@ static int roq_decode_frame(AVCodecContext *avctx,
     bytestream2_init(&s->gb, buf, buf_size);
     roqvideo_decode_frame(s);
 
+    if ((ret = av_frame_ref(data, s->current_frame)) < 0)
+        return ret;
     *got_frame      = 1;
-    *(AVFrame*)data = *s->current_frame;
 
     /* shuffle frames */
     FFSWAP(AVFrame *, s->current_frame, s->last_frame);
@@ -224,17 +228,15 @@ static av_cold int roq_decode_end(AVCodecContext *avctx)
 {
     RoqContext *s = avctx->priv_data;
 
-    /* release the last frame */
-    if (s->last_frame->data[0])
-        avctx->release_buffer(avctx, s->last_frame);
-    if (s->current_frame->data[0])
-        avctx->release_buffer(avctx, s->current_frame);
+    av_frame_free(&s->current_frame);
+    av_frame_free(&s->last_frame);
 
     return 0;
 }
 
 AVCodec ff_roq_decoder = {
     .name           = "roqvideo",
+    .long_name      = NULL_IF_CONFIG_SMALL("id RoQ video"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_ROQ,
     .priv_data_size = sizeof(RoqContext),
@@ -242,5 +244,4 @@ AVCodec ff_roq_decoder = {
     .close          = roq_decode_end,
     .decode         = roq_decode_frame,
     .capabilities   = CODEC_CAP_DR1,
-    .long_name      = NULL_IF_CONFIG_SMALL("id RoQ video"),
 };

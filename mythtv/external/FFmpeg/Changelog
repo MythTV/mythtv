@@ -1,6 +1,155 @@
 Entries are sorted chronologically from oldest to youngest within each release,
 releases are sorted from youngest to oldest.
 
+version 2.2:
+
+- HNM version 4 demuxer and video decoder
+- Live HDS muxer
+- setsar/setdar filters now support variables in ratio expressions
+- elbg filter
+- string validation in ffprobe
+- support for decoding through VDPAU in ffmpeg (the -hwaccel option)
+- complete Voxware MetaSound decoder
+- remove mp3_header_compress bitstream filter
+- Windows resource files for shared libraries
+- aeval filter
+- stereoscopic 3d metadata handling
+- WebP encoding via libwebp
+- ATRAC3+ decoder
+- VP8 in Ogg demuxing
+- side & metadata support in NUT
+- framepack filter
+- XYZ12 rawvideo support in NUT
+- Exif metadata support in WebP decoder
+- OpenGL device
+- Use metadata_header_padding to control padding in ID3 tags (currently used in
+  MP3, AIFF, and OMA files), FLAC header, and the AVI "junk" block.
+- Mirillis FIC video decoder
+- Support DNx444
+- libx265 encoder
+- dejudder filter
+- Autodetect VDA like all other hardware accelerations
+
+
+version 2.1:
+
+- aecho filter
+- perspective filter ported from libmpcodecs
+- ffprobe -show_programs option
+- compand filter
+- RTMP seek support
+- when transcoding with ffmpeg (i.e. not streamcopying), -ss is now accurate
+  even when used as an input option. Previous behavior can be restored with
+  the -noaccurate_seek option.
+- ffmpeg -t option can now be used for inputs, to limit the duration of
+  data read from an input file
+- incomplete Voxware MetaSound decoder
+- read EXIF metadata from JPEG
+- DVB teletext decoder
+- phase filter ported from libmpcodecs
+- w3fdif filter
+- Opus support in Matroska
+- FFV1 version 1.3 is stable and no longer experimental
+- FFV1: YUVA(444,422,420) 9, 10 and 16 bit support
+- changed DTS stream id in lavf mpeg ps muxer from 0x8a to 0x88, to be
+  more consistent with other muxers.
+- adelay filter
+- pullup filter ported from libmpcodecs
+- ffprobe -read_intervals option
+- Lossless and alpha support for WebP decoder
+- Error Resilient AAC syntax (ER AAC LC) decoding
+- Low Delay AAC (ER AAC LD) decoding
+- mux chapters in ASF files
+- SFTP protocol (via libssh)
+- libx264: add ability to encode in YUVJ422P and YUVJ444P
+- Fraps: use BT.709 colorspace by default for yuv, as reference fraps decoder does
+- make decoding alpha optional for prores, ffv1 and vp6 by setting
+  the skip_alpha flag.
+- ladspa wrapper filter
+- native VP9 decoder
+- dpx parser
+- max_error_rate parameter in ffmpeg
+- PulseAudio output device
+- ReplayGain scanner
+- Enhanced Low Delay AAC (ER AAC ELD) decoding (no LD SBR support)
+- Linux framebuffer output device
+- HEVC decoder
+- raw HEVC, HEVC in MOV/MP4, HEVC in Matroska, HEVC in MPEG-TS demuxing
+- mergeplanes filter
+
+
+version 2.0:
+
+- curves filter
+- reference-counting for AVFrame and AVPacket data
+- ffmpeg now fails when input options are used for output file
+  or vice versa
+- support for Monkey's Audio versions from 3.93
+- perms and aperms filters
+- audio filtering support in ffplay
+- 10% faster aac encoding on x86 and MIPS
+- sine audio filter source
+- WebP demuxing and decoding support
+- ffmpeg options -filter_script and -filter_complex_script, which allow a
+  filtergraph description to be read from a file
+- OpenCL support
+- audio phaser filter
+- separatefields filter
+- libquvi demuxer
+- uniform options syntax across all filters
+- telecine filter
+- interlace filter
+- smptehdbars source
+- inverse telecine filters (fieldmatch and decimate)
+- colorbalance filter
+- colorchannelmixer filter
+- The matroska demuxer can now output proper verbatim ASS packets. It will
+  become the default at the next libavformat major bump.
+- decent native animated GIF encoding
+- asetrate filter
+- interleave filter
+- timeline editing with filters
+- vidstabdetect and vidstabtransform filters for video stabilization using
+  the vid.stab library
+- astats filter
+- trim and atrim filters
+- ffmpeg -t and -ss (output-only) options are now sample-accurate when
+  transcoding audio
+- Matroska muxer can now put the index at the beginning of the file.
+- extractplanes filter
+- avectorscope filter
+- ADPCM DTK decoder
+- ADP demuxer
+- RSD demuxer
+- RedSpark demuxer
+- ADPCM IMA Radical decoder
+- zmq filters
+- DCT denoiser filter (dctdnoiz)
+- Wavelet denoiser filter ported from libmpcodecs as owdenoise (formerly "ow")
+- Apple Intermediate Codec decoder
+- Escape 130 video decoder
+- FTP protocol support
+- V4L2 output device
+- 3D LUT filter (lut3d)
+- SMPTE 302M audio encoder
+- support for slice multithreading in libavfilter
+- Hald CLUT support (generation and filtering)
+- VC-1 interlaced B-frame support
+- support for WavPack muxing (raw and in Matroska)
+- XVideo output device
+- vignette filter
+- True Audio (TTA) encoder
+- Go2Webinar decoder
+- mcdeint filter ported from libmpcodecs
+- sab filter ported from libmpcodecs
+- ffprobe -show_chapters option
+- WavPack encoding through libwavpack
+- rotate filter
+- spp filter ported from libmpcodecs
+- libgme support
+- psnr filter
+
+
 version 1.2:
 
 - VDPAU hardware acceleration through normal hwaccel
@@ -535,7 +684,7 @@ version 0.6:
 - LPCM support in MPEG-TS (HDMV RID as found on Blu-ray disks)
 - WMA Pro decoder
 - Core Audio Format demuxer
-- Atrac1 decoder
+- ATRAC1 decoder
 - MD STUDIO audio demuxer
 - RF64 support in WAV demuxer
 - MPEG-4 Audio Lossless Coding (ALS) decoder
@@ -635,7 +784,7 @@ version 0.5:
 - MXF demuxer
 - VC-1/WMV3/WMV9 video decoder
 - MacIntel support
-- AVISynth support
+- AviSynth support
 - VMware video decoder
 - VP5 video decoder
 - VP6 video decoder
@@ -663,7 +812,7 @@ version 0.5:
 - Interplay C93 demuxer and video decoder
 - Bethsoft VID demuxer and video decoder
 - CRYO APC demuxer
-- Atrac3 decoder
+- ATRAC3 decoder
 - V.Flash PTX decoder
 - RoQ muxer, RoQ audio encoder
 - Renderware TXD demuxer and decoder

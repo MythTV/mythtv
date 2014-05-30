@@ -272,6 +272,8 @@ class MPEG2fixup
     int framenum;
     int status_update_time;
     uint64_t last_written_pos;
+    uint16_t inv_zigzag_direct16[64];
+    bool zigzag_init;
 };
 
 #ifdef NO_MYTH

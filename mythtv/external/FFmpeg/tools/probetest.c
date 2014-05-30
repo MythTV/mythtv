@@ -23,9 +23,16 @@
 #include "libavformat/avformat.h"
 #include "libavcodec/put_bits.h"
 #include "libavutil/lfg.h"
+#include "libavutil/timer.h"
 
-static int score_array[1000]; //this must be larger than the number of formats
+#define MAX_FORMATS 1000 //this must be larger than the number of formats
+static int score_array[MAX_FORMATS];
+static int64_t time_array[MAX_FORMATS];
 static int failures = 0;
+
+#ifndef AV_READ_TIME
+#define AV_READ_TIME(x) 0
+#endif
 
 static void probe(AVProbeData *pd, int type, int p, int size)
 {
@@ -36,7 +43,10 @@ static void probe(AVProbeData *pd, int type, int p, int size)
         if (fmt->flags & AVFMT_NOFILE)
             continue;
         if (fmt->read_probe) {
-            int score = fmt->read_probe(pd);
+            int score;
+            int64_t start = AV_READ_TIME();
+            score = fmt->read_probe(pd);
+            time_array[i] += AV_READ_TIME() - start;
             if (score > score_array[i] && score > AVPROBE_SCORE_MAX / 4) {
                 score_array[i] = score;
                 fprintf(stderr,
@@ -44,6 +54,22 @@ static void probe(AVProbeData *pd, int type, int p, int size)
                         fmt->name, score, type, p, size);
                 failures++;
             }
+        }
+        i++;
+    }
+}
+
+static void print_times(void)
+{
+    int i = 0;
+    AVInputFormat *fmt = NULL;
+
+    while ((fmt = av_iformat_next(fmt))) {
+        if (fmt->flags & AVFMT_NOFILE)
+            continue;
+        if (time_array[i] > 1000000) {
+            fprintf(stderr, "%12"PRIu64" cycles, %12s\n",
+                    time_array[i], fmt->name);
         }
         i++;
     }
@@ -83,6 +109,11 @@ int main(int argc, char **argv)
         pd.buf_size = size;
         pd.buf      = av_realloc(pd.buf, size + AVPROBE_PADDING_SIZE);
         pd.filename = "";
+
+        if (!pd.buf) {
+            fprintf(stderr, "out of memory\n");
+            return 1;
+        }
 
         memset(pd.buf, 0, size + AVPROBE_PADDING_SIZE);
 
@@ -141,5 +172,7 @@ int main(int argc, char **argv)
             }
         }
     }
+    if(AV_READ_TIME())
+        print_times();
     return failures;
 }

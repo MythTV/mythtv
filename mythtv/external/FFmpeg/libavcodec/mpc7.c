@@ -61,8 +61,7 @@ static av_cold int mpc7_decode_init(AVCodecContext * avctx)
 
     /* Musepack SV7 is always stereo */
     if (avctx->channels != 2) {
-        av_log_ask_for_sample(avctx, "Unsupported number of channels: %d\n",
-                              avctx->channels);
+        avpriv_request_sample(avctx, "%d channels", avctx->channels);
         return AVERROR_PATCHWELCOME;
     }
 
@@ -225,10 +224,8 @@ static int mpc7_decode_frame(AVCodecContext * avctx, void *data,
 
     /* get output buffer */
     frame->nb_samples = MPC_FRAME_SIZE;
-    if ((ret = ff_get_buffer(avctx, frame)) < 0) {
-        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
+    if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
         return ret;
-    }
 
     av_fast_padded_malloc(&c->bits, &c->buf_size, buf_size);
     if (!c->bits)
@@ -332,6 +329,7 @@ static av_cold int mpc7_decode_close(AVCodecContext *avctx)
 
 AVCodec ff_mpc7_decoder = {
     .name           = "mpc7",
+    .long_name      = NULL_IF_CONFIG_SMALL("Musepack SV7"),
     .type           = AVMEDIA_TYPE_AUDIO,
     .id             = AV_CODEC_ID_MUSEPACK7,
     .priv_data_size = sizeof(MPCContext),
@@ -340,7 +338,6 @@ AVCodec ff_mpc7_decoder = {
     .decode         = mpc7_decode_frame,
     .flush          = mpc7_decode_flush,
     .capabilities   = CODEC_CAP_DR1,
-    .long_name      = NULL_IF_CONFIG_SMALL("Musepack SV7"),
     .sample_fmts    = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_S16P,
                                                       AV_SAMPLE_FMT_NONE },
 };

@@ -25,9 +25,13 @@
 
 static int lvf_probe(AVProbeData *p)
 {
-    if (AV_RL32(p->buf) == MKTAG('L', 'V', 'F', 'F'))
-        return AVPROBE_SCORE_MAX / 2;
-    return 0;
+    if (AV_RL32(p->buf) != MKTAG('L', 'V', 'F', 'F'))
+        return 0;
+
+    if (!AV_RL32(p->buf + 16) || AV_RL32(p->buf + 16) > 256)
+        return AVPROBE_SCORE_MAX / 8;
+
+    return AVPROBE_SCORE_EXTENSION;
 }
 
 static int lvf_read_header(AVFormatContext *s)
@@ -41,7 +45,7 @@ static int lvf_read_header(AVFormatContext *s)
     if (!nb_streams)
         return AVERROR_INVALIDDATA;
     if (nb_streams > 2) {
-        av_log_ask_for_sample(s, "too many streams\n");
+        avpriv_request_sample(s, "%d streams", nb_streams);
         return AVERROR_PATCHWELCOME;
     }
 
@@ -87,7 +91,7 @@ static int lvf_read_header(AVFormatContext *s)
             avio_seek(s->pb, 2048 + 8, SEEK_SET);
             return 0;
         default:
-            av_log_ask_for_sample(s, "unknown id\n");
+            avpriv_request_sample(s, "id %d", id);
             return AVERROR_PATCHWELCOME;
         }
 

@@ -43,16 +43,22 @@ extern const char program_name[];
  */
 extern const int program_birth_year;
 
-/**
- * this year, defined by the program for show_banner()
- */
-extern const int this_year;
-
 extern AVCodecContext *avcodec_opts[AVMEDIA_TYPE_NB];
 extern AVFormatContext *avformat_opts;
 extern struct SwsContext *sws_opts;
 extern AVDictionary *swr_opts;
 extern AVDictionary *format_opts, *codec_opts, *resample_opts;
+extern int hide_banner;
+
+/**
+ * Register a program-specific cleanup routine.
+ */
+void register_exit(void (*cb)(int ret));
+
+/**
+ * Wraps exit with a program-specific cleanup routine.
+ */
+void exit_program(int ret);
 
 /**
  * Initialize the cmdutils option system, in particular
@@ -72,6 +78,11 @@ void uninit_opts(void);
 void log_callback_help(void* ptr, int level, const char* fmt, va_list vl);
 
 /**
+ * Override the cpuflags.
+ */
+int opt_cpuflags(void *optctx, const char *opt, const char *arg);
+
+/**
  * Fallback for options that are not explicitly handled, these will be
  * parsed through AVOptions.
  */
@@ -86,9 +97,13 @@ int opt_report(const char *opt);
 
 int opt_max_alloc(void *optctx, const char *opt, const char *arg);
 
-int opt_cpuflags(void *optctx, const char *opt, const char *arg);
-
 int opt_codec_debug(void *optctx, const char *opt, const char *arg);
+
+#if CONFIG_OPENCL
+int opt_opencl(void *optctx, const char *opt, const char *arg);
+
+int opt_opencl_bench(void *optctx, const char *opt, const char *arg);
+#endif
 
 /**
  * Limit the execution time.
@@ -162,6 +177,8 @@ typedef struct OptionDef {
                                    an int containing element count in the array. */
 #define OPT_TIME  0x10000
 #define OPT_DOUBLE 0x20000
+#define OPT_INPUT  0x40000
+#define OPT_OUTPUT 0x80000
      union {
         void *dst_ptr;
         int (*func_arg)(void *, const char *, const char *);
@@ -242,6 +259,11 @@ typedef struct OptionGroupDef {
      * are terminated by a non-option argument (e.g. ffmpeg output files)
      */
     const char *sep;
+    /**
+     * Option flags that must be set on each option that is
+     * applied to this group
+     */
+    int flags;
 } OptionGroupDef;
 
 typedef struct OptionGroup {
@@ -393,6 +415,13 @@ void show_banner(int argc, char **argv, const OptionDef *options);
 int show_version(void *optctx, const char *opt, const char *arg);
 
 /**
+ * Print the build configuration of the program to stdout. The contents
+ * depend on the definition of FFMPEG_CONFIGURATION.
+ * This option processing function does not utilize the arguments.
+ */
+int show_buildconf(void *optctx, const char *opt, const char *arg);
+
+/**
  * Print the license of the program to stdout. The license depends on
  * the license of the libraries compiled into the program.
  * This option processing function does not utilize the arguments.
@@ -467,6 +496,12 @@ int show_layouts(void *optctx, const char *opt, const char *arg);
 int show_sample_fmts(void *optctx, const char *opt, const char *arg);
 
 /**
+ * Print a listing containing all the color names and values recognized
+ * by the program.
+ */
+int show_colors(void *optctx, const char *opt, const char *arg);
+
+/**
  * Return a positive value if a line read from standard input
  * starts with [yY], otherwise return 0.
  */
@@ -479,7 +514,7 @@ int read_yesno(void);
  * @param filename file to read from
  * @param bufptr location where pointer to buffer is returned
  * @param size   location where size of buffer is returned
- * @return 0 in case of success, a negative value corresponding to an
+ * @return >= 0 in case of success, a negative value corresponding to an
  * AVERROR error code in case of failure.
  */
 int cmdutils_read_file(const char *filename, char **bufptr, size_t *size);
@@ -517,51 +552,10 @@ FILE *get_preset_file(char *filename, size_t filename_size,
  */
 void *grow_array(void *array, int elem_size, int *size, int new_size);
 
+#define media_type_string av_get_media_type_string
+
 #define GROW_ARRAY(array, nb_elems)\
     array = grow_array(array, sizeof(*array), &nb_elems, nb_elems + 1)
-
-typedef struct FrameBuffer {
-    uint8_t *base[4];
-    uint8_t *data[4];
-    int  linesize[4];
-
-    int h, w;
-    enum AVPixelFormat pix_fmt;
-
-    int refcount;
-    struct FrameBuffer **pool;  ///< head of the buffer pool
-    struct FrameBuffer *next;
-} FrameBuffer;
-
-/**
- * Get a frame from the pool. This is intended to be used as a callback for
- * AVCodecContext.get_buffer.
- *
- * @param s codec context. s->opaque must be a pointer to the head of the
- *          buffer pool.
- * @param frame frame->opaque will be set to point to the FrameBuffer
- *              containing the frame data.
- */
-int codec_get_buffer(AVCodecContext *s, AVFrame *frame);
-
-/**
- * A callback to be used for AVCodecContext.release_buffer along with
- * codec_get_buffer().
- */
-void codec_release_buffer(AVCodecContext *s, AVFrame *frame);
-
-/**
- * A callback to be used for AVFilterBuffer.free.
- * @param fb buffer to free. fb->priv must be a pointer to the FrameBuffer
- *           containing the buffer data.
- */
-void filter_release_buffer(AVFilterBuffer *fb);
-
-/**
- * Free all the buffers in the pool. This must be called after all the
- * buffers have been released.
- */
-void free_buffer_pool(FrameBuffer **pool);
 
 #define GET_PIX_FMT_NAME(pix_fmt)\
     const char *name = av_get_pix_fmt_name(pix_fmt);

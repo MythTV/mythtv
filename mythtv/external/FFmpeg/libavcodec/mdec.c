@@ -35,7 +35,7 @@
 typedef struct MDECContext {
     AVCodecContext *avctx;
     DSPContext dsp;
-    AVFrame picture;
+    ThreadFrame frame;
     GetBitContext gb;
     ScanTable scantable;
     int version;
@@ -121,7 +121,7 @@ static inline int mdec_decode_block_intra(MDECContext *a, int16_t *block, int n)
 static inline int decode_mb(MDECContext *a, int16_t block[6][64])
 {
     int i, ret;
-    const int block_index[6] = { 5, 4, 0, 1, 2, 3 };
+    static const int block_index[6] = { 5, 4, 0, 1, 2, 3 };
 
     a->dsp.clear_blocks(block[0]);
 
@@ -135,14 +135,14 @@ static inline int decode_mb(MDECContext *a, int16_t block[6][64])
     return 0;
 }
 
-static inline void idct_put(MDECContext *a, int mb_x, int mb_y)
+static inline void idct_put(MDECContext *a, AVFrame *frame, int mb_x, int mb_y)
 {
     int16_t (*block)[64] = a->block;
-    int linesize = a->picture.linesize[0];
+    int linesize = frame->linesize[0];
 
-    uint8_t *dest_y  = a->picture.data[0] + (mb_y * 16 * linesize              ) + mb_x * 16;
-    uint8_t *dest_cb = a->picture.data[1] + (mb_y * 8  * a->picture.linesize[1]) + mb_x * 8;
-    uint8_t *dest_cr = a->picture.data[2] + (mb_y * 8  * a->picture.linesize[2]) + mb_x * 8;
+    uint8_t *dest_y  = frame->data[0] + (mb_y * 16* linesize              ) + mb_x * 16;
+    uint8_t *dest_cb = frame->data[1] + (mb_y * 8 * frame->linesize[1]) + mb_x * 8;
+    uint8_t *dest_cr = frame->data[2] + (mb_y * 8 * frame->linesize[2]) + mb_x * 8;
 
     a->dsp.idct_put(dest_y,                    linesize, block[0]);
     a->dsp.idct_put(dest_y                + 8, linesize, block[1]);
@@ -150,8 +150,8 @@ static inline void idct_put(MDECContext *a, int mb_x, int mb_y)
     a->dsp.idct_put(dest_y + 8 * linesize + 8, linesize, block[3]);
 
     if (!(a->avctx->flags & CODEC_FLAG_GRAY)) {
-        a->dsp.idct_put(dest_cb, a->picture.linesize[1], block[4]);
-        a->dsp.idct_put(dest_cr, a->picture.linesize[2], block[5]);
+        a->dsp.idct_put(dest_cb, frame->linesize[1], block[4]);
+        a->dsp.idct_put(dest_cr, frame->linesize[2], block[5]);
     }
 }
 
@@ -162,29 +162,20 @@ static int decode_frame(AVCodecContext *avctx,
     MDECContext * const a = avctx->priv_data;
     const uint8_t *buf    = avpkt->data;
     int buf_size          = avpkt->size;
-    AVFrame *picture      = data;
-    AVFrame * const p     = &a->picture;
-    int i, ret;
+    ThreadFrame frame     = { .f = data };
+    int ret;
 
-    if (p->data[0])
-        ff_thread_release_buffer(avctx, p);
-
-    p->reference = 0;
-    if ((ret = ff_thread_get_buffer(avctx, p)) < 0) {
-        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
+    if ((ret = ff_thread_get_buffer(avctx, &frame, 0)) < 0)
         return ret;
-    }
-    p->pict_type = AV_PICTURE_TYPE_I;
-    p->key_frame = 1;
+    frame.f->pict_type = AV_PICTURE_TYPE_I;
+    frame.f->key_frame = 1;
 
-    av_fast_malloc(&a->bitstream_buffer, &a->bitstream_buffer_size, buf_size + FF_INPUT_BUFFER_PADDING_SIZE);
+    av_fast_padded_malloc(&a->bitstream_buffer, &a->bitstream_buffer_size, buf_size);
     if (!a->bitstream_buffer)
         return AVERROR(ENOMEM);
-    for (i = 0; i < buf_size; i += 2) {
-        a->bitstream_buffer[i]     = buf[i + 1];
-        a->bitstream_buffer[i + 1] = buf[i];
-    }
-    init_get_bits(&a->gb, a->bitstream_buffer, buf_size * 8);
+    a->dsp.bswap16_buf((uint16_t *)a->bitstream_buffer, (uint16_t *)buf, (buf_size + 1) / 2);
+    if ((ret = init_get_bits8(&a->gb, a->bitstream_buffer, buf_size)) < 0)
+        return ret;
 
     /* skip over 4 preamble bytes in stream (typically 0xXX 0xXX 0x00 0x38) */
     skip_bits(&a->gb, 32);
@@ -199,14 +190,10 @@ static int decode_frame(AVCodecContext *avctx,
             if ((ret = decode_mb(a, a->block)) < 0)
                 return ret;
 
-            idct_put(a, a->mb_x, a->mb_y);
+            idct_put(a, frame.f, a->mb_x, a->mb_y);
         }
     }
 
-    p->quality = a->qscale * FF_QP2LAMBDA;
-    memset(p->qscale_table, a->qscale, a->mb_width);
-
-    *picture   = a->picture;
     *got_frame = 1;
 
     return (get_bits_count(&a->gb) + 31) / 32 * 4;
@@ -215,13 +202,10 @@ static int decode_frame(AVCodecContext *avctx,
 static av_cold int decode_init(AVCodecContext *avctx)
 {
     MDECContext * const a = avctx->priv_data;
-    AVFrame *p            = &a->picture;
 
     a->mb_width  = (avctx->coded_width  + 15) / 16;
     a->mb_height = (avctx->coded_height + 15) / 16;
 
-    avcodec_get_frame_defaults(&a->picture);
-    avctx->coded_frame = &a->picture;
     a->avctx           = avctx;
 
     ff_dsputil_init(&a->dsp, avctx);
@@ -230,8 +214,6 @@ static av_cold int decode_init(AVCodecContext *avctx)
 
     if (avctx->idct_algo == FF_IDCT_AUTO)
         avctx->idct_algo = FF_IDCT_SIMPLE;
-    p->qstride      = 0;
-    p->qscale_table = av_mallocz(a->mb_width);
     avctx->pix_fmt  = AV_PIX_FMT_YUVJ420P;
 
     return 0;
@@ -240,12 +222,8 @@ static av_cold int decode_init(AVCodecContext *avctx)
 static av_cold int decode_init_thread_copy(AVCodecContext *avctx)
 {
     MDECContext * const a = avctx->priv_data;
-    AVFrame *p            = &a->picture;
 
-    avctx->coded_frame = p;
     a->avctx           = avctx;
-
-    p->qscale_table= av_mallocz(a->mb_width);
 
     return 0;
 }
@@ -254,10 +232,7 @@ static av_cold int decode_end(AVCodecContext *avctx)
 {
     MDECContext * const a = avctx->priv_data;
 
-    if (a->picture.data[0])
-        avctx->release_buffer(avctx, &a->picture);
     av_freep(&a->bitstream_buffer);
-    av_freep(&a->picture.qscale_table);
     a->bitstream_buffer_size = 0;
 
     return 0;
@@ -265,6 +240,7 @@ static av_cold int decode_end(AVCodecContext *avctx)
 
 AVCodec ff_mdec_decoder = {
     .name             = "mdec",
+    .long_name        = NULL_IF_CONFIG_SMALL("Sony PlayStation MDEC (Motion DECoder)"),
     .type             = AVMEDIA_TYPE_VIDEO,
     .id               = AV_CODEC_ID_MDEC,
     .priv_data_size   = sizeof(MDECContext),
@@ -272,6 +248,5 @@ AVCodec ff_mdec_decoder = {
     .close            = decode_end,
     .decode           = decode_frame,
     .capabilities     = CODEC_CAP_DR1 | CODEC_CAP_FRAME_THREADS,
-    .long_name        = NULL_IF_CONFIG_SMALL("Sony PlayStation MDEC (Motion DECoder)"),
     .init_thread_copy = ONLY_IF_THREADS_ENABLED(decode_init_thread_copy)
 };

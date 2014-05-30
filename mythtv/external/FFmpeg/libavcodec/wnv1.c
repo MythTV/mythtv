@@ -31,9 +31,6 @@
 
 
 typedef struct WNV1Context {
-    AVCodecContext *avctx;
-    AVFrame pic;
-
     int shift;
     GetBitContext gb;
 } WNV1Context;
@@ -65,14 +62,14 @@ static int decode_frame(AVCodecContext *avctx,
     WNV1Context * const l = avctx->priv_data;
     const uint8_t *buf    = avpkt->data;
     int buf_size          = avpkt->size;
-    AVFrame * const p     = &l->pic;
+    AVFrame * const p     = data;
     unsigned char *Y,*U,*V;
     int i, j, ret;
     int prev_y = 0, prev_u = 0, prev_v = 0;
     uint8_t *rbuf;
 
-    if(buf_size<=8) {
-        av_log(avctx, AV_LOG_ERROR, "buf_size %d is too small\n", buf_size);
+    if (buf_size <= 8) {
+        av_log(avctx, AV_LOG_ERROR, "Packet size %d is too small\n", buf_size);
         return AVERROR_INVALIDDATA;
     }
 
@@ -81,13 +78,9 @@ static int decode_frame(AVCodecContext *avctx,
         av_log(avctx, AV_LOG_ERROR, "Cannot allocate temporary buffer\n");
         return AVERROR(ENOMEM);
     }
+    memset(rbuf + buf_size, 0, FF_INPUT_BUFFER_PADDING_SIZE);
 
-    if (p->data[0])
-        avctx->release_buffer(avctx, p);
-
-    p->reference = 0;
-    if ((ret = ff_get_buffer(avctx, p)) < 0) {
-        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
+    if ((ret = ff_get_buffer(avctx, p, 0)) < 0) {
         av_free(rbuf);
         return ret;
     }
@@ -102,12 +95,14 @@ static int decode_frame(AVCodecContext *avctx,
     else {
         l->shift = 8 - (buf[2] >> 4);
         if (l->shift > 4) {
-            av_log_ask_for_sample(avctx, "Unknown WNV1 frame header value %i\n",
+            avpriv_request_sample(avctx,
+                                  "Unknown WNV1 frame header value %i",
                                   buf[2] >> 4);
             l->shift = 4;
         }
         if (l->shift < 1) {
-            av_log_ask_for_sample(avctx, "Unknown WNV1 frame header value %i\n",
+            avpriv_request_sample(avctx,
+                                  "Unknown WNV1 frame header value %i",
                                   buf[2] >> 4);
             l->shift = 1;
         }
@@ -130,7 +125,6 @@ static int decode_frame(AVCodecContext *avctx,
 
 
     *got_frame      = 1;
-    *(AVFrame*)data = l->pic;
     av_free(rbuf);
 
     return buf_size;
@@ -138,12 +132,9 @@ static int decode_frame(AVCodecContext *avctx,
 
 static av_cold int decode_init(AVCodecContext *avctx)
 {
-    WNV1Context * const l = avctx->priv_data;
     static VLC_TYPE code_table[1 << CODE_VLC_BITS][2];
 
-    l->avctx       = avctx;
     avctx->pix_fmt = AV_PIX_FMT_YUV422P;
-    avcodec_get_frame_defaults(&l->pic);
 
     code_vlc.table           = code_table;
     code_vlc.table_allocated = 1 << CODE_VLC_BITS;
@@ -154,25 +145,13 @@ static av_cold int decode_init(AVCodecContext *avctx)
     return 0;
 }
 
-static av_cold int decode_end(AVCodecContext *avctx)
-{
-    WNV1Context * const l = avctx->priv_data;
-    AVFrame *pic = &l->pic;
-
-    if (pic->data[0])
-        avctx->release_buffer(avctx, pic);
-
-    return 0;
-}
-
 AVCodec ff_wnv1_decoder = {
     .name           = "wnv1",
+    .long_name      = NULL_IF_CONFIG_SMALL("Winnov WNV1"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_WNV1,
     .priv_data_size = sizeof(WNV1Context),
     .init           = decode_init,
-    .close          = decode_end,
     .decode         = decode_frame,
     .capabilities   = CODEC_CAP_DR1,
-    .long_name      = NULL_IF_CONFIG_SMALL("Winnov WNV1"),
 };

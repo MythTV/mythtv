@@ -24,9 +24,7 @@
 
 #include "parser.h"
 #include "dca.h"
-#include "dca_parser.h"
 #include "get_bits.h"
-#include "put_bits.h"
 
 typedef struct DCAParseContext {
     ParseContext pc;
@@ -63,6 +61,7 @@ static int dca_find_frame_end(DCAParseContext * pc1, const uint8_t * buf,
                 if (!pc1->lastmarker || state == pc1->lastmarker || pc1->lastmarker == DCA_HD_MARKER) {
                     start_found = 1;
                     pc1->lastmarker = state;
+                    i++;
                     break;
                 }
             }
@@ -77,10 +76,6 @@ static int dca_find_frame_end(DCAParseContext * pc1, const uint8_t * buf,
             if (IS_MARKER(state, i, buf, buf_size) && (state == pc1->lastmarker || pc1->lastmarker == DCA_HD_MARKER)) {
                 if(pc1->framesize > pc1->size)
                     continue;
-                // We have to check that we really read a full frame here, and that it isn't a pure HD frame, because their size is not constant.
-                if(!pc1->framesize && state == pc1->lastmarker && state != DCA_HD_MARKER){
-                    pc1->framesize = pc1->hd_pos ? pc1->hd_pos : pc1->size;
-                }
                 pc->frame_start_found = 0;
                 pc->state = -1;
                 pc1->size = 0;
@@ -101,43 +96,8 @@ static av_cold int dca_parse_init(AVCodecParserContext * s)
     return 0;
 }
 
-int ff_dca_convert_bitstream(const uint8_t *src, int src_size, uint8_t *dst,
-                             int max_size)
-{
-    uint32_t mrk;
-    int i, tmp;
-    const uint16_t *ssrc = (const uint16_t *) src;
-    uint16_t *sdst = (uint16_t *) dst;
-    PutBitContext pb;
-
-    if ((unsigned) src_size > (unsigned) max_size)
-        src_size = max_size;
-
-    mrk = AV_RB32(src);
-    switch (mrk) {
-    case DCA_MARKER_RAW_BE:
-        memcpy(dst, src, src_size);
-        return src_size;
-    case DCA_MARKER_RAW_LE:
-        for (i = 0; i < (src_size + 1) >> 1; i++)
-            *sdst++ = av_bswap16(*ssrc++);
-        return src_size;
-    case DCA_MARKER_14B_BE:
-    case DCA_MARKER_14B_LE:
-        init_put_bits(&pb, dst, max_size);
-        for (i = 0; i < (src_size + 1) >> 1; i++, src += 2) {
-            tmp = ((mrk == DCA_MARKER_14B_BE) ? AV_RB16(src) : AV_RL16(src)) & 0x3FFF;
-            put_bits(&pb, 14, tmp);
-        }
-        flush_put_bits(&pb);
-        return (put_bits_count(&pb) + 7) >> 3;
-    default:
-        return AVERROR_INVALIDDATA;
-    }
-}
-
 static int dca_parse_params(const uint8_t *buf, int buf_size, int *duration,
-                            int *sample_rate)
+                            int *sample_rate, int *framesize)
 {
     GetBitContext gb;
     uint8_t hdr[12 + FF_INPUT_BUFFER_PADDING_SIZE] = { 0 };
@@ -157,7 +117,11 @@ static int dca_parse_params(const uint8_t *buf, int buf_size, int *duration,
         return AVERROR_INVALIDDATA;
     *duration = 256 * (sample_blocks / 8);
 
-    skip_bits(&gb, 20);
+    *framesize = get_bits(&gb, 14) + 1;
+    if (*framesize < 95)
+        return AVERROR_INVALIDDATA;
+
+    skip_bits(&gb, 6);
     sr_code = get_bits(&gb, 4);
     *sample_rate = avpriv_dca_sample_rates[sr_code];
     if (*sample_rate == 0)
@@ -188,7 +152,7 @@ static int dca_parse(AVCodecParserContext * s,
     }
 
     /* read the duration and sample rate from the frame header */
-    if (!dca_parse_params(buf, buf_size, &duration, &sample_rate)) {
+    if (!dca_parse_params(buf, buf_size, &duration, &sample_rate, &pc1->framesize)) {
         s->duration = duration;
         avctx->sample_rate = sample_rate;
     } else

@@ -26,7 +26,7 @@
 
 static av_cold int v408_encode_init(AVCodecContext *avctx)
 {
-    avctx->coded_frame = avcodec_alloc_frame();
+    avctx->coded_frame = av_frame_alloc();
 
     if (!avctx->coded_frame) {
         av_log(avctx, AV_LOG_ERROR, "Could not allocate frame.\n");
@@ -47,7 +47,6 @@ static int v408_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
         return ret;
     dst = pkt->data;
 
-    avctx->coded_frame->reference = 0;
     avctx->coded_frame->key_frame = 1;
     avctx->coded_frame->pict_type = AV_PICTURE_TYPE_I;
 
@@ -91,24 +90,24 @@ static av_cold int v408_encode_close(AVCodecContext *avctx)
 #if CONFIG_AYUV_ENCODER
 AVCodec ff_ayuv_encoder = {
     .name         = "ayuv",
+    .long_name    = NULL_IF_CONFIG_SMALL("Uncompressed packed MS 4:4:4:4"),
     .type         = AVMEDIA_TYPE_VIDEO,
     .id           = AV_CODEC_ID_AYUV,
     .init         = v408_encode_init,
     .encode2      = v408_encode_frame,
     .close        = v408_encode_close,
     .pix_fmts     = (const enum AVPixelFormat[]){ AV_PIX_FMT_YUVA444P, AV_PIX_FMT_NONE },
-    .long_name    = NULL_IF_CONFIG_SMALL("Uncompressed packed MS 4:4:4:4"),
 };
 #endif
 #if CONFIG_V408_ENCODER
 AVCodec ff_v408_encoder = {
     .name         = "v408",
+    .long_name    = NULL_IF_CONFIG_SMALL("Uncompressed packed QT 4:4:4:4"),
     .type         = AVMEDIA_TYPE_VIDEO,
     .id           = AV_CODEC_ID_V408,
     .init         = v408_encode_init,
     .encode2      = v408_encode_frame,
     .close        = v408_encode_close,
     .pix_fmts     = (const enum AVPixelFormat[]){ AV_PIX_FMT_YUVA444P, AV_PIX_FMT_NONE },
-    .long_name    = NULL_IF_CONFIG_SMALL("Uncompressed packed QT 4:4:4:4"),
 };
 #endif

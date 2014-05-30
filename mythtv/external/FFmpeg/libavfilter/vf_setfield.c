@@ -54,42 +54,24 @@ static const AVOption setfield_options[] = {
 
 AVFILTER_DEFINE_CLASS(setfield);
 
-static av_cold int init(AVFilterContext *ctx, const char *args)
-{
-    SetFieldContext *setfield = ctx->priv;
-    static const char *shorthand[] = { "mode", NULL };
-
-    setfield->class = &setfield_class;
-    av_opt_set_defaults(setfield);
-
-    return av_opt_set_from_string(setfield, args, shorthand, "=", ":");
-}
-
-static av_cold void uninit(AVFilterContext *ctx)
-{
-    SetFieldContext *setfield = ctx->priv;
-    av_opt_free(setfield);
-}
-
-static int filter_frame(AVFilterLink *inlink, AVFilterBufferRef *picref)
+static int filter_frame(AVFilterLink *inlink, AVFrame *picref)
 {
     SetFieldContext *setfield = inlink->dst->priv;
 
     if (setfield->mode == MODE_PROG) {
-        picref->video->interlaced = 0;
+        picref->interlaced_frame = 0;
     } else if (setfield->mode != MODE_AUTO) {
-        picref->video->interlaced = 1;
-        picref->video->top_field_first = setfield->mode;
+        picref->interlaced_frame = 1;
+        picref->top_field_first = setfield->mode;
     }
     return ff_filter_frame(inlink->dst->outputs[0], picref);
 }
 
 static const AVFilterPad setfield_inputs[] = {
     {
-        .name             = "default",
-        .type             = AVMEDIA_TYPE_VIDEO,
-        .get_video_buffer = ff_null_get_video_buffer,
-        .filter_frame     = filter_frame,
+        .name         = "default",
+        .type         = AVMEDIA_TYPE_VIDEO,
+        .filter_frame = filter_frame,
     },
     { NULL }
 };
@@ -102,14 +84,11 @@ static const AVFilterPad setfield_outputs[] = {
     { NULL }
 };
 
-AVFilter avfilter_vf_setfield = {
-    .name      = "setfield",
+AVFilter ff_vf_setfield = {
+    .name        = "setfield",
     .description = NULL_IF_CONFIG_SMALL("Force field for the output video frame."),
-    .init      = init,
-    .uninit    = uninit,
-
-    .priv_size = sizeof(SetFieldContext),
-    .inputs    = setfield_inputs,
-    .outputs   = setfield_outputs,
-    .priv_class = &setfield_class,
+    .priv_size   = sizeof(SetFieldContext),
+    .priv_class  = &setfield_class,
+    .inputs      = setfield_inputs,
+    .outputs     = setfield_outputs,
 };

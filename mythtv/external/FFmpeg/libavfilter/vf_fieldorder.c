@@ -23,50 +23,20 @@
  * video field order filter, heavily influenced by vf_pad.c
  */
 
-/* #define DEBUG */
-
-#include <stdio.h>
-#include <string.h>
-
 #include "libavutil/imgutils.h"
 #include "libavutil/internal.h"
+#include "libavutil/opt.h"
 #include "libavutil/pixdesc.h"
 #include "avfilter.h"
 #include "formats.h"
 #include "internal.h"
 #include "video.h"
 
-typedef struct
-{
-    unsigned int dst_tff;      ///< output bff/tff
+typedef struct {
+    const AVClass *class;
+    int dst_tff;               ///< output bff/tff
     int          line_size[4]; ///< bytes of pixel data per line for each plane
 } FieldOrderContext;
-
-static av_cold int init(AVFilterContext *ctx, const char *args)
-{
-    FieldOrderContext *fieldorder = ctx->priv;
-
-    const char *tff = "tff";
-    const char *bff = "bff";
-
-    if (!args) {
-        fieldorder->dst_tff = 1;
-    } else if (sscanf(args, "%u", &fieldorder->dst_tff) == 1) {
-        fieldorder->dst_tff = !!fieldorder->dst_tff;
-    } else if (!strcmp(tff, args)) {
-        fieldorder->dst_tff = 1;
-    } else if (!strcmp(bff, args)) {
-        fieldorder->dst_tff = 0;
-    } else {
-        av_log(ctx, AV_LOG_ERROR, "Invalid argument '%s'.\n", args);
-        return AVERROR(EINVAL);
-    }
-
-    av_log(ctx, AV_LOG_VERBOSE, "output field order: %s\n",
-            fieldorder->dst_tff ? tff : bff);
-
-    return 0;
-}
 
 static int query_formats(AVFilterContext *ctx)
 {
@@ -80,8 +50,9 @@ static int query_formats(AVFilterContext *ctx)
         formats = NULL;
         for (pix_fmt = 0; pix_fmt < AV_PIX_FMT_NB; pix_fmt++) {
             const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(pix_fmt);
-            if (!(desc->flags & PIX_FMT_HWACCEL ||
-                  desc->flags & PIX_FMT_BITSTREAM) &&
+            if (!(desc->flags & AV_PIX_FMT_FLAG_HWACCEL ||
+                  desc->flags & AV_PIX_FMT_FLAG_PAL     ||
+                  desc->flags & AV_PIX_FMT_FLAG_BITSTREAM) &&
                 desc->nb_components && !desc->log2_chroma_h &&
                 (ret = ff_add_format(&formats, pix_fmt)) < 0) {
                 ff_formats_unref(&formats);
@@ -97,50 +68,51 @@ static int query_formats(AVFilterContext *ctx)
 
 static int config_input(AVFilterLink *inlink)
 {
-    AVFilterContext   *ctx        = inlink->dst;
-    FieldOrderContext *fieldorder = ctx->priv;
-    int               plane;
+    AVFilterContext   *ctx = inlink->dst;
+    FieldOrderContext *s   = ctx->priv;
 
-    /** full an array with the number of bytes that the video
-     *  data occupies per line for each plane of the input video */
-    for (plane = 0; plane < 4; plane++) {
-        fieldorder->line_size[plane] = av_image_get_linesize(
-                inlink->format,
-                inlink->w,
-                plane);
-    }
-
-    return 0;
+    return av_image_fill_linesizes(s->line_size, inlink->format, inlink->w);
 }
 
-static AVFilterBufferRef *get_video_buffer(AVFilterLink *inlink, int perms, int w, int h)
-{
-    AVFilterContext   *ctx        = inlink->dst;
-    AVFilterLink      *outlink    = ctx->outputs[0];
-
-    return ff_get_video_buffer(outlink, perms, w, h);
-}
-
-static int filter_frame(AVFilterLink *inlink, AVFilterBufferRef *frame)
+static int filter_frame(AVFilterLink *inlink, AVFrame *frame)
 {
     AVFilterContext   *ctx     = inlink->dst;
     FieldOrderContext *s       = ctx->priv;
     AVFilterLink      *outlink = ctx->outputs[0];
-    int h, plane, line_step, line_size, line;
-    uint8_t *data;
+    int h, plane, src_line_step, dst_line_step, line_size, line;
+    uint8_t *dst, *src;
+    AVFrame *out;
 
-    if (!frame->video->interlaced ||
-        frame->video->top_field_first == s->dst_tff)
+    if (!frame->interlaced_frame ||
+        frame->top_field_first == s->dst_tff) {
+        av_log(ctx, AV_LOG_VERBOSE,
+               "Skipping %s.\n",
+               frame->interlaced_frame ?
+               "frame with same field order" : "progressive frame");
         return ff_filter_frame(outlink, frame);
+    }
+
+    if (av_frame_is_writable(frame)) {
+        out = frame;
+    } else {
+        out = ff_get_video_buffer(outlink, outlink->w, outlink->h);
+        if (!out) {
+            av_frame_free(&frame);
+            return AVERROR(ENOMEM);
+        }
+        av_frame_copy_props(out, frame);
+    }
 
     av_dlog(ctx,
             "picture will move %s one line\n",
             s->dst_tff ? "up" : "down");
-    h = frame->video->h;
+    h = frame->height;
     for (plane = 0; plane < 4 && frame->data[plane] && frame->linesize[plane]; plane++) {
-        line_step = frame->linesize[plane];
+        dst_line_step = out->linesize[plane];
+        src_line_step = frame->linesize[plane];
         line_size = s->line_size[plane];
-        data = frame->data[plane];
+        dst = out->data[plane];
+        src = frame->data[plane];
         if (s->dst_tff) {
             /** Move every line up one line, working from
              *  the top to the bottom of the frame.
@@ -148,12 +120,13 @@ static int filter_frame(AVFilterLink *inlink, AVFilterBufferRef *frame)
              *  The new last line is created as a copy of the
              *  penultimate line from that field. */
             for (line = 0; line < h; line++) {
-                if (1 + line < frame->video->h) {
-                    memcpy(data, data + line_step, line_size);
+                if (1 + line < frame->height) {
+                    memcpy(dst, src + src_line_step, line_size);
                 } else {
-                    memcpy(data, data - line_step - line_step, line_size);
+                    memcpy(dst, src - 2 * src_line_step, line_size);
                 }
-                data += line_step;
+                dst += dst_line_step;
+                src += src_line_step;
             }
         } else {
             /** Move every line down one line, working from
@@ -161,30 +134,44 @@ static int filter_frame(AVFilterLink *inlink, AVFilterBufferRef *frame)
              *  The original bottom line is lost.
              *  The new first line is created as a copy of the
              *  second line from that field. */
-            data += (h - 1) * line_step;
+            dst += (h - 1) * dst_line_step;
+            src += (h - 1) * src_line_step;
             for (line = h - 1; line >= 0 ; line--) {
                 if (line > 0) {
-                    memcpy(data, data - line_step, line_size);
+                    memcpy(dst, src - src_line_step, line_size);
                 } else {
-                    memcpy(data, data + line_step + line_step, line_size);
+                    memcpy(dst, src + 2 * src_line_step, line_size);
                 }
-                data -= line_step;
+                dst -= dst_line_step;
+                src -= src_line_step;
             }
         }
     }
-    frame->video->top_field_first = s->dst_tff;
+    out->top_field_first = s->dst_tff;
 
-    return ff_filter_frame(outlink, frame);
+    if (frame != out)
+        av_frame_free(&frame);
+    return ff_filter_frame(outlink, out);
 }
+
+#define OFFSET(x) offsetof(FieldOrderContext, x)
+#define FLAGS AV_OPT_FLAG_FILTERING_PARAM|AV_OPT_FLAG_VIDEO_PARAM
+
+static const AVOption fieldorder_options[] = {
+    { "order", "output field order", OFFSET(dst_tff), AV_OPT_TYPE_INT, { .i64 = 1 }, 0, 1, FLAGS, "order" },
+        { "bff", "bottom field first", 0, AV_OPT_TYPE_CONST, { .i64 = 0 }, .flags=FLAGS, .unit = "order" },
+        { "tff", "top field first",    0, AV_OPT_TYPE_CONST, { .i64 = 1 }, .flags=FLAGS, .unit = "order" },
+    { NULL }
+};
+
+AVFILTER_DEFINE_CLASS(fieldorder);
 
 static const AVFilterPad avfilter_vf_fieldorder_inputs[] = {
     {
-        .name             = "default",
-        .type             = AVMEDIA_TYPE_VIDEO,
-        .config_props     = config_input,
-        .get_video_buffer = get_video_buffer,
-        .filter_frame     = filter_frame,
-        .min_perms        = AV_PERM_READ | AV_PERM_WRITE,
+        .name         = "default",
+        .type         = AVMEDIA_TYPE_VIDEO,
+        .config_props = config_input,
+        .filter_frame = filter_frame,
     },
     { NULL }
 };
@@ -197,12 +184,13 @@ static const AVFilterPad avfilter_vf_fieldorder_outputs[] = {
     { NULL }
 };
 
-AVFilter avfilter_vf_fieldorder = {
+AVFilter ff_vf_fieldorder = {
     .name          = "fieldorder",
     .description   = NULL_IF_CONFIG_SMALL("Set the field order."),
-    .init          = init,
     .priv_size     = sizeof(FieldOrderContext),
+    .priv_class    = &fieldorder_class,
     .query_formats = query_formats,
     .inputs        = avfilter_vf_fieldorder_inputs,
     .outputs       = avfilter_vf_fieldorder_outputs,
+    .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC,
 };

@@ -81,18 +81,21 @@ void ff_snow_reset_contexts(SnowContext *s){ //FIXME better initial contexts
 }
 
 int ff_snow_alloc_blocks(SnowContext *s){
-    int w= -((-s->avctx->width )>>LOG2_MB_SIZE);
-    int h= -((-s->avctx->height)>>LOG2_MB_SIZE);
+    int w= FF_CEIL_RSHIFT(s->avctx->width,  LOG2_MB_SIZE);
+    int h= FF_CEIL_RSHIFT(s->avctx->height, LOG2_MB_SIZE);
 
     s->b_width = w;
     s->b_height= h;
 
     av_free(s->block);
     s->block= av_mallocz(w * h * sizeof(BlockNode) << (s->block_max_depth*2));
+    if (!s->block)
+        return AVERROR(ENOMEM);
+
     return 0;
 }
 
-static void init_qexp(void){
+static av_cold void init_qexp(void){
     int i;
     double v=128;
 
@@ -294,7 +297,7 @@ static void mc_block(Plane *p, uint8_t *dst, const uint8_t *src, int stride, int
     }
 }
 
-void ff_snow_pred_block(SnowContext *s, uint8_t *dst, uint8_t *tmp, int stride, int sx, int sy, int b_w, int b_h, BlockNode *block, int plane_index, int w, int h){
+void ff_snow_pred_block(SnowContext *s, uint8_t *dst, uint8_t *tmp, ptrdiff_t stride, int sx, int sy, int b_w, int b_h, BlockNode *block, int plane_index, int w, int h){
     if(block->type & BLOCK_INTRA){
         int x, y;
         const unsigned color  = block->color[plane_index];
@@ -334,7 +337,7 @@ void ff_snow_pred_block(SnowContext *s, uint8_t *dst, uint8_t *tmp, int stride, 
             }
         }
     }else{
-        uint8_t *src= s->last_picture[block->ref].data[plane_index];
+        uint8_t *src= s->last_picture[block->ref]->data[plane_index];
         const int scale= plane_index ?  (2*s->mv_scale)>>s->chroma_h_shift : 2*s->mv_scale;
         int mx= block->mx*scale;
         int my= block->my*scale;
@@ -346,14 +349,15 @@ void ff_snow_pred_block(SnowContext *s, uint8_t *dst, uint8_t *tmp, int stride, 
         src += sx + sy*stride;
         if(   (unsigned)sx >= FFMAX(w - b_w - (HTAPS_MAX-2), 0)
            || (unsigned)sy >= FFMAX(h - b_h - (HTAPS_MAX-2), 0)){
-            s->vdsp.emulated_edge_mc(tmp + MB_SIZE, src, stride, b_w+HTAPS_MAX-1, b_h+HTAPS_MAX-1, sx, sy, w, h);
+            s->vdsp.emulated_edge_mc(tmp + MB_SIZE, src,
+                                     stride, stride,
+                                     b_w+HTAPS_MAX-1, b_h+HTAPS_MAX-1,
+                                     sx, sy, w, h);
             src= tmp + MB_SIZE;
         }
 
         av_assert2(s->chroma_h_shift == s->chroma_v_shift); // only one mv_scale
 
-//        assert(b_w == b_h || 2*b_w == b_h || b_w == 2*b_h);
-//        assert(!(b_w&(b_w-1)));
         av_assert2(b_w>1 && b_h>1);
         av_assert2((tab_index>=0 && tab_index<4) || b_w==32);
         if((dx&3) || (dy&3) || !(b_w == b_h || 2*b_w == b_h || b_w == 2*b_h) || (b_w&(b_w-1)) || !s->plane[plane_index].fast_mc )
@@ -401,6 +405,7 @@ av_cold int ff_snow_common_init(AVCodecContext *avctx){
     s->max_ref_frames=1; //just make sure it's not an invalid value in case of no initial keyframe
 
     ff_dsputil_init(&s->dsp, avctx);
+    ff_hpeldsp_init(&s->hdsp, avctx->flags);
     ff_videodsp_init(&s->vdsp, 8);
     ff_dwt_init(&s->dwt);
     ff_h264qpel_init(&s->h264qpel, 8);
@@ -431,11 +436,11 @@ av_cold int ff_snow_common_init(AVCodecContext *avctx){
     mcf(12,12)
 
 #define mcfh(dx,dy)\
-    s->dsp.put_pixels_tab       [0][dy/4+dx/8]=\
-    s->dsp.put_no_rnd_pixels_tab[0][dy/4+dx/8]=\
+    s->hdsp.put_pixels_tab       [0][dy/4+dx/8]=\
+    s->hdsp.put_no_rnd_pixels_tab[0][dy/4+dx/8]=\
         mc_block_hpel ## dx ## dy ## 16;\
-    s->dsp.put_pixels_tab       [1][dy/4+dx/8]=\
-    s->dsp.put_no_rnd_pixels_tab[1][dy/4+dx/8]=\
+    s->hdsp.put_pixels_tab       [1][dy/4+dx/8]=\
+    s->hdsp.put_no_rnd_pixels_tab[1][dy/4+dx/8]=\
         mc_block_hpel ## dx ## dy ## 8;
 
     mcfh(0, 0)
@@ -456,9 +461,18 @@ av_cold int ff_snow_common_init(AVCodecContext *avctx){
     FF_ALLOCZ_OR_GOTO(avctx, s->temp_idwt_buffer,    width * sizeof(IDWTELEM), fail);
     FF_ALLOC_OR_GOTO(avctx,  s->run_buffer,          ((width + 1) >> 1) * ((height + 1) >> 1) * sizeof(*s->run_buffer), fail);
 
-    for(i=0; i<MAX_REF_FRAMES; i++)
+    for(i=0; i<MAX_REF_FRAMES; i++) {
         for(j=0; j<MAX_REF_FRAMES; j++)
             ff_scale_mv_ref[i][j] = 256*(i+1)/(j+1);
+        s->last_picture[i] = av_frame_alloc();
+        if (!s->last_picture[i])
+            goto fail;
+    }
+
+    s->mconly_picture = av_frame_alloc();
+    s->current_picture = av_frame_alloc();
+    if (!s->mconly_picture || !s->current_picture)
+        goto fail;
 
     return 0;
 fail:
@@ -471,21 +485,20 @@ int ff_snow_common_init_after_header(AVCodecContext *avctx) {
     int ret, emu_buf_size;
 
     if(!s->scratchbuf) {
-        if ((ret = ff_get_buffer(s->avctx, &s->mconly_picture)) < 0) {
-            av_log(s->avctx, AV_LOG_ERROR, "get_buffer() failed\n");
+        if ((ret = ff_get_buffer(s->avctx, s->mconly_picture,
+                                 AV_GET_BUFFER_FLAG_REF)) < 0)
             return ret;
-        }
-        FF_ALLOCZ_OR_GOTO(avctx, s->scratchbuf, FFMAX(s->mconly_picture.linesize[0], 2*avctx->width+256)*7*MB_SIZE, fail);
-        emu_buf_size = FFMAX(s->mconly_picture.linesize[0], 2*avctx->width+256) * (2 * MB_SIZE + HTAPS_MAX - 1);
+        FF_ALLOCZ_OR_GOTO(avctx, s->scratchbuf, FFMAX(s->mconly_picture->linesize[0], 2*avctx->width+256)*7*MB_SIZE, fail);
+        emu_buf_size = FFMAX(s->mconly_picture->linesize[0], 2*avctx->width+256) * (2 * MB_SIZE + HTAPS_MAX - 1);
         FF_ALLOC_OR_GOTO(avctx, s->emu_edge_buffer, emu_buf_size, fail);
     }
 
-    if(s->mconly_picture.format != avctx->pix_fmt) {
+    if(s->mconly_picture->format != avctx->pix_fmt) {
         av_log(avctx, AV_LOG_ERROR, "pixel format changed\n");
         return AVERROR_INVALIDDATA;
     }
 
-    for(plane_index=0; plane_index<3; plane_index++){
+    for(plane_index=0; plane_index < s->nb_planes; plane_index++){
         int w= s->avctx->width;
         int h= s->avctx->height;
 
@@ -525,6 +538,8 @@ int ff_snow_common_init_after_header(AVCodecContext *avctx) {
                 //FIXME avoid this realloc
                 av_freep(&b->x_coeff);
                 b->x_coeff=av_mallocz(((b->width+1) * b->height+1)*sizeof(x_and_coeff));
+                if (!b->x_coeff)
+                    goto fail;
             }
             w= (w+1)>>1;
             h= (h+1)>>1;
@@ -538,10 +553,10 @@ fail:
 
 #define USE_HALFPEL_PLANE 0
 
-static void halfpel_interpol(SnowContext *s, uint8_t *halfpel[4][4], AVFrame *frame){
+static int halfpel_interpol(SnowContext *s, uint8_t *halfpel[4][4], AVFrame *frame){
     int p,x,y;
 
-    for(p=0; p<3; p++){
+    for(p=0; p < s->nb_planes; p++){
         int is_chroma= !!p;
         int w= is_chroma ? s->avctx->width >>s->chroma_h_shift : s->avctx->width;
         int h= is_chroma ? s->avctx->height>>s->chroma_v_shift : s->avctx->height;
@@ -551,6 +566,8 @@ static void halfpel_interpol(SnowContext *s, uint8_t *halfpel[4][4], AVFrame *fr
         halfpel[1][p] = (uint8_t*) av_malloc(ls * (h + 2 * EDGE_WIDTH)) + EDGE_WIDTH * (1 + ls);
         halfpel[2][p] = (uint8_t*) av_malloc(ls * (h + 2 * EDGE_WIDTH)) + EDGE_WIDTH * (1 + ls);
         halfpel[3][p] = (uint8_t*) av_malloc(ls * (h + 2 * EDGE_WIDTH)) + EDGE_WIDTH * (1 + ls);
+        if (!halfpel[1][p] || !halfpel[2][p] || !halfpel[3][p])
+            return AVERROR(ENOMEM);
 
         halfpel[0][p]= src;
         for(y=0; y<h; y++){
@@ -578,6 +595,7 @@ static void halfpel_interpol(SnowContext *s, uint8_t *halfpel[4][4], AVFrame *fr
 
 //FIXME border!
     }
+    return 0;
 }
 
 void ff_snow_release_buffer(AVCodecContext *avctx)
@@ -585,47 +603,53 @@ void ff_snow_release_buffer(AVCodecContext *avctx)
     SnowContext *s = avctx->priv_data;
     int i;
 
-    if(s->last_picture[s->max_ref_frames-1].data[0]){
-        avctx->release_buffer(avctx, &s->last_picture[s->max_ref_frames-1]);
+    if(s->last_picture[s->max_ref_frames-1]->data[0]){
+        av_frame_unref(s->last_picture[s->max_ref_frames-1]);
         for(i=0; i<9; i++)
             if(s->halfpel_plane[s->max_ref_frames-1][1+i/3][i%3])
-                av_free(s->halfpel_plane[s->max_ref_frames-1][1+i/3][i%3] - EDGE_WIDTH*(1+s->current_picture.linesize[i%3]));
+                av_free(s->halfpel_plane[s->max_ref_frames-1][1+i/3][i%3] - EDGE_WIDTH*(1+s->current_picture->linesize[i%3]));
     }
 }
 
 int ff_snow_frame_start(SnowContext *s){
-   AVFrame tmp;
+   AVFrame *tmp;
+   int i, ret;
    int w= s->avctx->width; //FIXME round up to x16 ?
    int h= s->avctx->height;
 
-    if (s->current_picture.data[0] && !(s->avctx->flags&CODEC_FLAG_EMU_EDGE)) {
-        s->dsp.draw_edges(s->current_picture.data[0],
-                          s->current_picture.linesize[0], w   , h   ,
+    if (s->current_picture->data[0] && !(s->avctx->flags&CODEC_FLAG_EMU_EDGE)) {
+        s->dsp.draw_edges(s->current_picture->data[0],
+                          s->current_picture->linesize[0], w   , h   ,
                           EDGE_WIDTH  , EDGE_WIDTH  , EDGE_TOP | EDGE_BOTTOM);
-        s->dsp.draw_edges(s->current_picture.data[1],
-                          s->current_picture.linesize[1], w>>s->chroma_h_shift, h>>s->chroma_v_shift,
-                          EDGE_WIDTH>>s->chroma_h_shift, EDGE_WIDTH>>s->chroma_v_shift, EDGE_TOP | EDGE_BOTTOM);
-        s->dsp.draw_edges(s->current_picture.data[2],
-                          s->current_picture.linesize[2], w>>s->chroma_h_shift, h>>s->chroma_v_shift,
-                          EDGE_WIDTH>>s->chroma_h_shift, EDGE_WIDTH>>s->chroma_v_shift, EDGE_TOP | EDGE_BOTTOM);
+        if (s->current_picture->data[2]) {
+            s->dsp.draw_edges(s->current_picture->data[1],
+                            s->current_picture->linesize[1], w>>s->chroma_h_shift, h>>s->chroma_v_shift,
+                            EDGE_WIDTH>>s->chroma_h_shift, EDGE_WIDTH>>s->chroma_v_shift, EDGE_TOP | EDGE_BOTTOM);
+            s->dsp.draw_edges(s->current_picture->data[2],
+                            s->current_picture->linesize[2], w>>s->chroma_h_shift, h>>s->chroma_v_shift,
+                            EDGE_WIDTH>>s->chroma_h_shift, EDGE_WIDTH>>s->chroma_v_shift, EDGE_TOP | EDGE_BOTTOM);
+        }
     }
 
     ff_snow_release_buffer(s->avctx);
 
     tmp= s->last_picture[s->max_ref_frames-1];
-    memmove(s->last_picture+1, s->last_picture, (s->max_ref_frames-1)*sizeof(AVFrame));
+    for(i=s->max_ref_frames-1; i>0; i--)
+        s->last_picture[i] = s->last_picture[i-1];
     memmove(s->halfpel_plane+1, s->halfpel_plane, (s->max_ref_frames-1)*sizeof(void*)*4*4);
-    if(USE_HALFPEL_PLANE && s->current_picture.data[0])
-        halfpel_interpol(s, s->halfpel_plane[0], &s->current_picture);
-    s->last_picture[0]= s->current_picture;
-    s->current_picture= tmp;
+    if(USE_HALFPEL_PLANE && s->current_picture->data[0]) {
+        if((ret = halfpel_interpol(s, s->halfpel_plane[0], s->current_picture)) < 0)
+            return ret;
+    }
+    s->last_picture[0] = s->current_picture;
+    s->current_picture = tmp;
 
     if(s->keyframe){
         s->ref_frames= 0;
     }else{
         int i;
-        for(i=0; i<s->max_ref_frames && s->last_picture[i].data[0]; i++)
-            if(i && s->last_picture[i-1].key_frame)
+        for(i=0; i<s->max_ref_frames && s->last_picture[i]->data[0]; i++)
+            if(i && s->last_picture[i-1]->key_frame)
                 break;
         s->ref_frames= i;
         if(s->ref_frames==0){
@@ -634,13 +658,10 @@ int ff_snow_frame_start(SnowContext *s){
         }
     }
 
-    s->current_picture.reference= 3;
-    if(ff_get_buffer(s->avctx, &s->current_picture) < 0){
-        av_log(s->avctx, AV_LOG_ERROR, "get_buffer() failed\n");
-        return -1;
-    }
+    if ((ret = ff_get_buffer(s->avctx, s->current_picture, AV_GET_BUFFER_FLAG_REF)) < 0)
+        return ret;
 
-    s->current_picture.key_frame= s->keyframe;
+    s->current_picture->key_frame= s->keyframe;
 
     return 0;
 }
@@ -668,13 +689,13 @@ av_cold void ff_snow_common_end(SnowContext *s)
     for(i=0; i<MAX_REF_FRAMES; i++){
         av_freep(&s->ref_mvs[i]);
         av_freep(&s->ref_scores[i]);
-        if(s->last_picture[i].data[0]) {
-            av_assert0(s->last_picture[i].data[0] != s->current_picture.data[0]);
-            s->avctx->release_buffer(s->avctx, &s->last_picture[i]);
+        if(s->last_picture[i]->data[0]) {
+            av_assert0(s->last_picture[i]->data[0] != s->current_picture->data[0]);
         }
+        av_frame_free(&s->last_picture[i]);
     }
 
-    for(plane_index=0; plane_index<3; plane_index++){
+    for(plane_index=0; plane_index < s->nb_planes; plane_index++){
         for(level=s->spatial_decomposition_count-1; level>=0; level--){
             for(orientation=level ? 1 : 0; orientation<4; orientation++){
                 SubBand *b= &s->plane[plane_index].band[level][orientation];
@@ -683,8 +704,6 @@ av_cold void ff_snow_common_end(SnowContext *s)
             }
         }
     }
-    if (s->mconly_picture.data[0])
-        s->avctx->release_buffer(s->avctx, &s->mconly_picture);
-    if (s->current_picture.data[0])
-        s->avctx->release_buffer(s->avctx, &s->current_picture);
+    av_frame_free(&s->mconly_picture);
+    av_frame_free(&s->current_picture);
 }

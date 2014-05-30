@@ -30,8 +30,8 @@
 #include "internal.h"
 
 typedef struct YopDecContext {
-    AVFrame frame;
     AVCodecContext *avctx;
+    AVFrame *frame;
 
     int num_pal_colors;
     int first_color[2];
@@ -79,6 +79,15 @@ static const int8_t motion_vector[16][2] =
      { 4, -2}, {-2,  0},
     };
 
+static av_cold int yop_decode_close(AVCodecContext *avctx)
+{
+    YopDecContext *s = avctx->priv_data;
+
+    av_frame_free(&s->frame);
+
+    return 0;
+}
+
 static av_cold int yop_decode_init(AVCodecContext *avctx)
 {
     YopDecContext *s = avctx->priv_data;
@@ -97,7 +106,6 @@ static av_cold int yop_decode_init(AVCodecContext *avctx)
 
     avctx->pix_fmt = AV_PIX_FMT_PAL8;
 
-    avcodec_get_frame_defaults(&s->frame);
     s->num_pal_colors = avctx->extradata[0];
     s->first_color[0] = avctx->extradata[1];
     s->first_color[1] = avctx->extradata[2];
@@ -109,14 +117,10 @@ static av_cold int yop_decode_init(AVCodecContext *avctx)
         return AVERROR_INVALIDDATA;
     }
 
-    return 0;
-}
+    s->frame = av_frame_alloc();
+    if (!s->frame)
+        return AVERROR(ENOMEM);
 
-static av_cold int yop_decode_close(AVCodecContext *avctx)
-{
-    YopDecContext *s = avctx->priv_data;
-    if (s->frame.data[0])
-        avctx->release_buffer(avctx, &s->frame);
     return 0;
 }
 
@@ -125,17 +129,17 @@ static av_cold int yop_decode_close(AVCodecContext *avctx)
  * @param s codec context
  * @param tag the tag that was in the nibble
  */
-static int yop_paint_block(YopDecContext *s, int tag)
+static int yop_paint_block(YopDecContext *s, int linesize, int tag)
 {
     if (s->src_end - s->srcptr < paint_lut[tag][3]) {
         av_log(s->avctx, AV_LOG_ERROR, "Packet too small.\n");
         return AVERROR_INVALIDDATA;
     }
 
-    s->dstptr[0]                        = s->srcptr[0];
-    s->dstptr[1]                        = s->srcptr[paint_lut[tag][0]];
-    s->dstptr[s->frame.linesize[0]]     = s->srcptr[paint_lut[tag][1]];
-    s->dstptr[s->frame.linesize[0] + 1] = s->srcptr[paint_lut[tag][2]];
+    s->dstptr[0]            = s->srcptr[0];
+    s->dstptr[1]            = s->srcptr[paint_lut[tag][0]];
+    s->dstptr[linesize]     = s->srcptr[paint_lut[tag][1]];
+    s->dstptr[linesize + 1] = s->srcptr[paint_lut[tag][2]];
 
     // The number of src bytes consumed is in the last part of the lut entry.
     s->srcptr += paint_lut[tag][3];
@@ -146,22 +150,22 @@ static int yop_paint_block(YopDecContext *s, int tag)
  * Copy a previously painted macroblock to the current_block.
  * @param copy_tag the tag that was in the nibble
  */
-static int yop_copy_previous_block(YopDecContext *s, int copy_tag)
+static int yop_copy_previous_block(YopDecContext *s, int linesize, int copy_tag)
 {
     uint8_t *bufptr;
 
     // Calculate position for the copy source
     bufptr = s->dstptr + motion_vector[copy_tag][0] +
-             s->frame.linesize[0] * motion_vector[copy_tag][1];
+             linesize * motion_vector[copy_tag][1];
     if (bufptr < s->dstbuf) {
         av_log(s->avctx, AV_LOG_ERROR, "File probably corrupt\n");
         return AVERROR_INVALIDDATA;
     }
 
-    s->dstptr[0]                        = bufptr[0];
-    s->dstptr[1]                        = bufptr[1];
-    s->dstptr[s->frame.linesize[0]]     = bufptr[s->frame.linesize[0]];
-    s->dstptr[s->frame.linesize[0] + 1] = bufptr[s->frame.linesize[0] + 1];
+    s->dstptr[0]            = bufptr[0];
+    s->dstptr[1]            = bufptr[1];
+    s->dstptr[linesize]     = bufptr[linesize];
+    s->dstptr[linesize + 1] = bufptr[linesize + 1];
 
     return 0;
 }
@@ -188,6 +192,7 @@ static int yop_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
                             AVPacket *avpkt)
 {
     YopDecContext *s = avctx->priv_data;
+    AVFrame *frame = s->frame;
     int tag, firstcolor, is_odd_frame;
     int ret, i, x, y;
     uint32_t *palette;
@@ -197,20 +202,14 @@ static int yop_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
         return AVERROR_INVALIDDATA;
     }
 
-    if (s->frame.data[0])
-        avctx->release_buffer(avctx, &s->frame);
-
-    ret = ff_get_buffer(avctx, &s->frame);
-    if (ret < 0) {
-        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
+    if ((ret = ff_reget_buffer(avctx, frame)) < 0)
         return ret;
-    }
 
     if (!avctx->frame_number)
-        memset(s->frame.data[1], 0, AVPALETTE_SIZE);
+        memset(frame->data[1], 0, AVPALETTE_SIZE);
 
-    s->dstbuf     = s->frame.data[0];
-    s->dstptr     = s->frame.data[0];
+    s->dstbuf     = frame->data[0];
+    s->dstptr     = frame->data[0];
     s->srcptr     = avpkt->data + 4;
     s->src_end    = avpkt->data + avpkt->size;
     s->low_nibble = NULL;
@@ -221,7 +220,7 @@ static int yop_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
         return AVERROR_INVALIDDATA;
     }
     firstcolor   = s->first_color[is_odd_frame];
-    palette      = (uint32_t *)s->frame.data[1];
+    palette      = (uint32_t *)frame->data[1];
 
     for (i = 0; i < s->num_pal_colors; i++, s->srcptr += 3) {
         palette[i + firstcolor] = (s->srcptr[0] << 18) |
@@ -231,7 +230,7 @@ static int yop_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
                                    (palette[i + firstcolor] >> 6) & 0x30303;
     }
 
-    s->frame.palette_has_changed = 1;
+    frame->palette_has_changed = 1;
 
     for (y = 0; y < avctx->height; y += 2) {
         for (x = 0; x < avctx->width; x += 2) {
@@ -243,34 +242,34 @@ static int yop_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
             tag = yop_get_next_nibble(s);
 
             if (tag != 0xf) {
-                ret = yop_paint_block(s, tag);
+                ret = yop_paint_block(s, frame->linesize[0], tag);
                 if (ret < 0)
                     return ret;
             } else {
                 tag = yop_get_next_nibble(s);
-                ret = yop_copy_previous_block(s, tag);
-                if (ret < 0) {
-                    avctx->release_buffer(avctx, &s->frame);
+                ret = yop_copy_previous_block(s, frame->linesize[0], tag);
+                if (ret < 0)
                     return ret;
-                }
             }
             s->dstptr += 2;
         }
-        s->dstptr += 2*s->frame.linesize[0] - x;
+        s->dstptr += 2*frame->linesize[0] - x;
     }
 
+    if ((ret = av_frame_ref(data, s->frame)) < 0)
+        return ret;
+
     *got_frame = 1;
-    *(AVFrame *) data = s->frame;
     return avpkt->size;
 }
 
 AVCodec ff_yop_decoder = {
     .name           = "yop",
+    .long_name      = NULL_IF_CONFIG_SMALL("Psygnosis YOP Video"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_YOP,
     .priv_data_size = sizeof(YopDecContext),
     .init           = yop_decode_init,
     .close          = yop_decode_close,
     .decode         = yop_decode_frame,
-    .long_name      = NULL_IF_CONFIG_SMALL("Psygnosis YOP Video"),
 };

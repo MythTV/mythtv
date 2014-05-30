@@ -54,10 +54,15 @@ fate-vsynth%-dv-50:              ENCOPTS = -dct int -s pal -pix_fmt yuv422p \
 fate-vsynth%-dv-50:              DECOPTS = -sws_flags neighbor
 fate-vsynth%-dv-50:              FMT     = dv
 
-FATE_VCODEC-$(call ENCDEC, FFV1, AVI)   += ffv1
-fate-vsynth%-ffv1:               ENCOPTS = -strict -2
+FATE_VCODEC-$(call ENCDEC, FFV1, AVI)   += ffv1 ffv1.0
+fate-vsynth%-ffv1:               ENCOPTS = -slices 4
+fate-vsynth%-ffv1.0:             CODEC   = ffv1
 
-FATE_VCODEC-$(call ENCDEC, FFVHUFF, AVI) += ffvhuff
+FATE_VCODEC-$(call ENCDEC, FFVHUFF, AVI) += ffvhuff ffvhuff444 ffvhuff420p12 ffvhuff422p10left ffvhuff444p16
+fate-vsynth%-ffvhuff444:         ENCOPTS = -strict -2 -vcodec ffvhuff -pix_fmt yuv444p
+fate-vsynth%-ffvhuff420p12:      ENCOPTS = -strict -2 -vcodec ffvhuff -pix_fmt yuv420p12le
+fate-vsynth%-ffvhuff422p10left:  ENCOPTS = -strict -2 -vcodec ffvhuff -pix_fmt yuv422p10le -pred left
+fate-vsynth%-ffvhuff444p16:      ENCOPTS = -strict -2 -vcodec ffvhuff -pix_fmt yuv444p16le -pred plane
 
 FATE_VCODEC-$(call ENCDEC, FLASHSV, FLV) += flashsv
 fate-vsynth%-flashsv:            ENCOPTS = -sws_flags neighbor+full_chroma_int
@@ -73,8 +78,9 @@ FATE_VCODEC-$(call ENCDEC, FLV, FLV)    += flv
 fate-vsynth%-flv:                ENCOPTS = -qscale 10
 fate-vsynth%-flv:                FMT     = flv
 
-FATE_VCODEC-$(call ENCDEC, H261, AVI)   += h261
+FATE_VCODEC-$(call ENCDEC, H261, AVI)   += h261 h261-trellis
 fate-vsynth%-h261:               ENCOPTS = -qscale 11
+fate-vsynth%-h261-trellis:       ENCOPTS = -qscale 12 -trellis 1 -mbd rd
 
 FATE_VCODEC-$(call ENCDEC, H263, AVI)   += h263 h263-obmc h263p
 fate-vsynth%-h263:               ENCOPTS = -qscale 10
@@ -89,9 +95,11 @@ FATE_VCODEC-$(call ENCDEC, JPEGLS, AVI) += jpegls
 fate-vsynth%-jpegls:             ENCOPTS = -sws_flags neighbor+full_chroma_int
 fate-vsynth%-jpegls:             DECOPTS = -sws_flags area
 
-FATE_VCODEC-$(call ENCDEC, JPEG2000, AVI) += j2k
-fate-vsynth%-j2k:                ENCOPTS = -qscale 7 -strict experimental -pix_fmt rgb24
-fate-vsynth%-j2k:                DECINOPTS = -vcodec j2k -strict experimental
+FATE_VCODEC-$(call ENCDEC, JPEG2000, AVI) += jpeg2000 jpeg2000-97
+fate-vsynth%-jpeg2000:                ENCOPTS = -qscale 7 -strict experimental -pred 1 -pix_fmt rgb24
+fate-vsynth%-jpeg2000:                DECINOPTS = -vcodec jpeg2000
+fate-vsynth%-jpeg2000-97:             ENCOPTS = -qscale 7 -strict experimental -pix_fmt rgb24
+fate-vsynth%-jpeg2000-97:             DECINOPTS = -vcodec jpeg2000
 
 FATE_VCODEC-$(call ENCDEC, LJPEG MJPEG, AVI) += ljpeg
 fate-vsynth%-ljpeg:              ENCOPTS = -strict -1
@@ -124,7 +132,7 @@ $(FATE_MPEG2:%=fate-vsynth\%-%): FMT    = mpeg2video
 $(FATE_MPEG2:%=fate-vsynth\%-%): CODEC  = mpeg2video
 
 fate-vsynth%-mpeg2:              ENCOPTS = -qscale 10
-fate-vsynth%-mpeg2-422:          ENCOPTS = -vb 1000k                    \
+fate-vsynth%-mpeg2-422:          ENCOPTS = -b:v 1000k                   \
                                            -bf 2                        \
                                            -trellis 1                   \
                                            -flags +mv0+ildct+ilme       \
@@ -134,7 +142,7 @@ fate-vsynth%-mpeg2-422:          ENCOPTS = -vb 1000k                    \
                                            -pix_fmt yuv422p
 fate-vsynth%-mpeg2-idct-int:     ENCOPTS = -qscale 10 -idct int -dct int
 fate-vsynth%-mpeg2-ilace:        ENCOPTS = -qscale 10 -flags +ildct+ilme
-fate-vsynth%-mpeg2-ivlc-qprd:    ENCOPTS = -vb 500k                     \
+fate-vsynth%-mpeg2-ivlc-qprd:    ENCOPTS = -b:v 500k                    \
                                            -bf 2                        \
                                            -trellis 1                   \
                                            -flags +mv0                  \
@@ -202,11 +210,11 @@ fate-vsynth%-mpng:               CODEC   = png
 
 FATE_VCODEC-$(call ENCDEC, MSVIDEO1, AVI) += msvideo1
 
-FATE_VCODEC-$(call ENCDEC, PRORES, MOV) += prores prores_kostya
+FATE_VCODEC-$(call ENCDEC, PRORES, MOV) += prores prores_ks
 fate-vsynth%-prores:             FMT     = mov
 
-fate-vsynth%-prores_kostya:      ENCOPTS = -profile hq
-fate-vsynth%-prores_kostya:      FMT     = mov
+fate-vsynth%-prores_ks:          ENCOPTS = -profile hq
+fate-vsynth%-prores_ks:          FMT     = mov
 
 FATE_VCODEC-$(call ENCDEC, QTRLE, MOV)  += qtrle qtrlegray
 fate-vsynth%-qtrle:              FMT     = mov

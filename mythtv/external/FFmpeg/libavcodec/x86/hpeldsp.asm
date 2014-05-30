@@ -423,30 +423,30 @@ cglobal avg_pixels8_xy2, 4,5
     mova         m6, [pb_1]
     lea          r4, [r2*2]
     mova         m0, [r1]
-    pavgb        m0, [r1+1]
+    PAVGB        m0, [r1+1]
 .loop:
     mova         m2, [r1+r4]
     mova         m1, [r1+r2]
     psubusb      m2, m6
-    pavgb        m1, [r1+r2+1]
-    pavgb        m2, [r1+r4+1]
+    PAVGB        m1, [r1+r2+1]
+    PAVGB        m2, [r1+r4+1]
     add          r1, r4
-    pavgb        m0, m1
-    pavgb        m1, m2
-    pavgb        m0, [r0]
-    pavgb        m1, [r0+r2]
+    PAVGB        m0, m1
+    PAVGB        m1, m2
+    PAVGB        m0, [r0]
+    PAVGB        m1, [r0+r2]
     mova       [r0], m0
     mova    [r0+r2], m1
     mova         m1, [r1+r2]
     mova         m0, [r1+r4]
-    pavgb        m1, [r1+r2+1]
-    pavgb        m0, [r1+r4+1]
+    PAVGB        m1, [r1+r2+1]
+    PAVGB        m0, [r1+r4+1]
     add          r0, r4
     add          r1, r4
-    pavgb        m2, m1
-    pavgb        m1, m0
-    pavgb        m2, [r0]
-    pavgb        m1, [r0+r2]
+    PAVGB        m2, m1
+    PAVGB        m1, m0
+    PAVGB        m2, [r0]
+    PAVGB        m1, [r0+r2]
     mova       [r0], m2
     mova    [r0+r2], m1
     add          r0, r4
@@ -459,44 +459,3 @@ INIT_MMX mmxext
 AVG_PIXELS8_XY2
 INIT_MMX 3dnow
 AVG_PIXELS8_XY2
-
-INIT_XMM sse2
-; void put_pixels16_sse2(uint8_t *block, const uint8_t *pixels, ptrdiff_t line_size, int h)
-cglobal put_pixels16, 4,5,4
-    lea          r4, [r2*3]
-.loop:
-    movu         m0, [r1]
-    movu         m1, [r1+r2]
-    movu         m2, [r1+r2*2]
-    movu         m3, [r1+r4]
-    lea          r1, [r1+r2*4]
-    mova       [r0], m0
-    mova    [r0+r2], m1
-    mova  [r0+r2*2], m2
-    mova    [r0+r4], m3
-    sub         r3d, 4
-    lea          r0, [r0+r2*4]
-    jnz       .loop
-    REP_RET
-
-; void avg_pixels16_sse2(uint8_t *block, const uint8_t *pixels, ptrdiff_t line_size, int h)
-cglobal avg_pixels16, 4,5,4
-    lea          r4, [r2*3]
-.loop:
-    movu         m0, [r1]
-    movu         m1, [r1+r2]
-    movu         m2, [r1+r2*2]
-    movu         m3, [r1+r4]
-    lea          r1, [r1+r2*4]
-    pavgb        m0, [r0]
-    pavgb        m1, [r0+r2]
-    pavgb        m2, [r0+r2*2]
-    pavgb        m3, [r0+r4]
-    mova       [r0], m0
-    mova    [r0+r2], m1
-    mova  [r0+r2*2], m2
-    mova    [r0+r4], m3
-    sub         r3d, 4
-    lea          r0, [r0+r2*4]
-    jnz       .loop
-    REP_RET

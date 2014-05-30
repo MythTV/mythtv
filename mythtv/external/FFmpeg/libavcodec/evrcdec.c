@@ -276,7 +276,7 @@ static av_cold int evrc_decode_init(AVCodecContext *avctx)
  */
 static int decode_lspf(EVRCContext *e)
 {
-    const float **codebooks = evrc_lspq_codebooks[e->bitrate];
+    const float * const *codebooks = evrc_lspq_codebooks[e->bitrate];
     int i, j, k = 0;
 
     for (i = 0; i < evrc_lspq_nb_codebooks[e->bitrate]; i++) {
@@ -746,7 +746,7 @@ static int evrc_decode_frame(AVCodecContext *avctx, void *data,
     int   i, j, ret, error_flag = 0;
 
     frame->nb_samples = 160;
-    if ((ret = ff_get_buffer(avctx, frame)) < 0)
+    if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
         return ret;
     samples = (float *)frame->data[0];
 
@@ -907,11 +907,11 @@ erasure:
 
 AVCodec ff_evrc_decoder = {
     .name           = "evrc",
+    .long_name      = NULL_IF_CONFIG_SMALL("EVRC (Enhanced Variable Rate Codec)"),
     .type           = AVMEDIA_TYPE_AUDIO,
     .id             = AV_CODEC_ID_EVRC,
     .init           = evrc_decode_init,
     .decode         = evrc_decode_frame,
     .capabilities   = CODEC_CAP_DR1,
     .priv_data_size = sizeof(EVRCContext),
-    .long_name      = NULL_IF_CONFIG_SMALL("EVRC (Enhanced Variable Rate Codec)"),
 };

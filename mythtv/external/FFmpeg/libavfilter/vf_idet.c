@@ -47,9 +47,9 @@ typedef struct {
 
     uint8_t history[HIST_SIZE];
 
-    AVFilterBufferRef *cur;
-    AVFilterBufferRef *next;
-    AVFilterBufferRef *prev;
+    AVFrame *cur;
+    AVFrame *next;
+    AVFrame *prev;
     int (*filter_line)(const uint8_t *prev, const uint8_t *cur, const uint8_t *next, int w);
 
     const AVPixFmtDescriptor *csp;
@@ -113,13 +113,13 @@ static void filter(AVFilterContext *ctx)
     int match = 0;
 
     for (i = 0; i < idet->csp->nb_components; i++) {
-        int w = idet->cur->video->w;
-        int h = idet->cur->video->h;
+        int w = idet->cur->width;
+        int h = idet->cur->height;
         int refs = idet->cur->linesize[i];
 
         if (i && i<3) {
-            w >>= idet->csp->log2_chroma_w;
-            h >>= idet->csp->log2_chroma_h;
+            w = FF_CEIL_RSHIFT(w, idet->csp->log2_chroma_w);
+            h = FF_CEIL_RSHIFT(h, idet->csp->log2_chroma_h);
         }
 
         for (y = 2; y < h - 2; y++) {
@@ -165,13 +165,13 @@ static void filter(AVFilterContext *ctx)
     }
 
     if      (idet->last_type == TFF){
-        idet->cur->video->top_field_first = 1;
-        idet->cur->video->interlaced = 1;
+        idet->cur->top_field_first = 1;
+        idet->cur->interlaced_frame = 1;
     }else if(idet->last_type == BFF){
-        idet->cur->video->top_field_first = 0;
-        idet->cur->video->interlaced = 1;
+        idet->cur->top_field_first = 0;
+        idet->cur->interlaced_frame = 1;
     }else if(idet->last_type == PROGRSSIVE){
-        idet->cur->video->interlaced = 0;
+        idet->cur->interlaced_frame = 0;
     }
 
     idet->prestat [           type] ++;
@@ -179,13 +179,13 @@ static void filter(AVFilterContext *ctx)
     av_log(ctx, AV_LOG_DEBUG, "Single frame:%s, Multi frame:%s\n", type2str(type), type2str(idet->last_type));
 }
 
-static int filter_frame(AVFilterLink *link, AVFilterBufferRef *picref)
+static int filter_frame(AVFilterLink *link, AVFrame *picref)
 {
     AVFilterContext *ctx = link->dst;
     IDETContext *idet = ctx->priv;
 
     if (idet->prev)
-        avfilter_unref_buffer(idet->prev);
+        av_frame_free(&idet->prev);
     idet->prev = idet->cur;
     idet->cur  = idet->next;
     idet->next = picref;
@@ -194,7 +194,7 @@ static int filter_frame(AVFilterLink *link, AVFilterBufferRef *picref)
         return 0;
 
     if (!idet->prev)
-        idet->prev = avfilter_ref_buffer(idet->cur, ~0);
+        idet->prev = av_frame_clone(idet->cur);
 
     if (!idet->csp)
         idet->csp = av_pix_fmt_desc_get(link->format);
@@ -203,22 +203,7 @@ static int filter_frame(AVFilterLink *link, AVFilterBufferRef *picref)
 
     filter(ctx);
 
-    return ff_filter_frame(ctx->outputs[0], avfilter_ref_buffer(idet->cur, ~0));
-}
-
-static int request_frame(AVFilterLink *link)
-{
-    AVFilterContext *ctx = link->src;
-    IDETContext *idet = ctx->priv;
-
-    do {
-        int ret;
-
-        if ((ret = ff_request_frame(link->src->inputs[0])))
-            return ret;
-    } while (!idet->cur);
-
-    return 0;
+    return ff_filter_frame(ctx->outputs[0], av_frame_clone(idet->cur));
 }
 
 static av_cold void uninit(AVFilterContext *ctx)
@@ -238,9 +223,9 @@ static av_cold void uninit(AVFilterContext *ctx)
            idet->poststat[UNDETERMINED]
     );
 
-    avfilter_unref_bufferp(&idet->prev);
-    avfilter_unref_bufferp(&idet->cur );
-    avfilter_unref_bufferp(&idet->next);
+    av_frame_free(&idet->prev);
+    av_frame_free(&idet->cur );
+    av_frame_free(&idet->next);
 }
 
 static int query_formats(AVFilterContext *ctx)
@@ -255,15 +240,15 @@ static int query_formats(AVFilterContext *ctx)
         AV_PIX_FMT_YUVJ420P,
         AV_PIX_FMT_YUVJ422P,
         AV_PIX_FMT_YUVJ444P,
-        AV_NE( AV_PIX_FMT_GRAY16BE, AV_PIX_FMT_GRAY16LE ),
+        AV_PIX_FMT_GRAY16,
         AV_PIX_FMT_YUV440P,
         AV_PIX_FMT_YUVJ440P,
-        AV_NE( AV_PIX_FMT_YUV420P10BE, AV_PIX_FMT_YUV420P10LE ),
-        AV_NE( AV_PIX_FMT_YUV422P10BE, AV_PIX_FMT_YUV422P10LE ),
-        AV_NE( AV_PIX_FMT_YUV444P10BE, AV_PIX_FMT_YUV444P10LE ),
-        AV_NE( AV_PIX_FMT_YUV420P16BE, AV_PIX_FMT_YUV420P16LE ),
-        AV_NE( AV_PIX_FMT_YUV422P16BE, AV_PIX_FMT_YUV422P16LE ),
-        AV_NE( AV_PIX_FMT_YUV444P16BE, AV_PIX_FMT_YUV444P16LE ),
+        AV_PIX_FMT_YUV420P10,
+        AV_PIX_FMT_YUV422P10,
+        AV_PIX_FMT_YUV444P10,
+        AV_PIX_FMT_YUV420P16,
+        AV_PIX_FMT_YUV422P16,
+        AV_PIX_FMT_YUV444P16,
         AV_PIX_FMT_YUVA420P,
         AV_PIX_FMT_NONE
     };
@@ -273,17 +258,15 @@ static int query_formats(AVFilterContext *ctx)
     return 0;
 }
 
-static av_cold int init(AVFilterContext *ctx, const char *args)
+static int config_output(AVFilterLink *outlink)
+{
+    outlink->flags |= FF_LINK_FLAG_REQUEST_LOOP;
+    return 0;
+}
+
+static av_cold int init(AVFilterContext *ctx)
 {
     IDETContext *idet = ctx->priv;
-    static const char *shorthand[] = { "intl_thres", "prog_thres", NULL };
-    int ret;
-
-    idet->class = &idet_class;
-    av_opt_set_defaults(idet);
-
-    if ((ret = av_opt_set_from_string(idet, args, shorthand, "=", ":")) < 0)
-        return ret;
 
     idet->last_type = UNDETERMINED;
     memset(idet->history, UNDETERMINED, HIST_SIZE);
@@ -299,25 +282,22 @@ static const AVFilterPad idet_inputs[] = {
         .name         = "default",
         .type         = AVMEDIA_TYPE_VIDEO,
         .filter_frame = filter_frame,
-        .min_perms    = AV_PERM_PRESERVE,
     },
     { NULL }
 };
 
 static const AVFilterPad idet_outputs[] = {
     {
-        .name          = "default",
-        .type          = AVMEDIA_TYPE_VIDEO,
-        .rej_perms     = AV_PERM_WRITE,
-        .request_frame = request_frame,
+        .name         = "default",
+        .type         = AVMEDIA_TYPE_VIDEO,
+        .config_props = config_output,
     },
     { NULL }
 };
 
-AVFilter avfilter_vf_idet = {
+AVFilter ff_vf_idet = {
     .name          = "idet",
     .description   = NULL_IF_CONFIG_SMALL("Interlace detect Filter."),
-
     .priv_size     = sizeof(IDETContext),
     .init          = init,
     .uninit        = uninit,

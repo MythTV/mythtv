@@ -40,12 +40,12 @@ PCA *ff_pca_init(int n){
     if(n<=0)
         return NULL;
 
-    pca= av_mallocz(sizeof(PCA));
+    pca= av_mallocz(sizeof(*pca));
     pca->n= n;
     pca->z = av_malloc(sizeof(*pca->z) * n);
     pca->count=0;
-    pca->covariance= av_mallocz(sizeof(double)*n*n);
-    pca->mean= av_mallocz(sizeof(double)*n);
+    pca->covariance= av_calloc(n*n, sizeof(double));
+    pca->mean= av_calloc(n, sizeof(double));
 
     return pca;
 }

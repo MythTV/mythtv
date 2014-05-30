@@ -11,6 +11,8 @@
             <xsd:element name="packets"  type="ffprobe:packetsType" minOccurs="0" maxOccurs="1" />
             <xsd:element name="frames"   type="ffprobe:framesType"  minOccurs="0" maxOccurs="1" />
             <xsd:element name="streams"  type="ffprobe:streamsType" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="programs" type="ffprobe:programsType" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="chapters" type="ffprobe:chaptersType" minOccurs="0" maxOccurs="1" />
             <xsd:element name="format"   type="ffprobe:formatType"  minOccurs="0" maxOccurs="1" />
             <xsd:element name="error"    type="ffprobe:errorType"   minOccurs="0" maxOccurs="1" />
             <xsd:element name="program_version"  type="ffprobe:programVersionType"  minOccurs="0" maxOccurs="1" />
@@ -26,7 +28,10 @@
 
     <xsd:complexType name="framesType">
         <xsd:sequence>
-            <xsd:element name="frame" type="ffprobe:frameType" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:choice minOccurs="0" maxOccurs="unbounded">
+                <xsd:element name="frame" type="ffprobe:frameType" minOccurs="0" maxOccurs="unbounded"/>
+                <xsd:element name="subtitle" type="ffprobe:subtitleType" minOccurs="0" maxOccurs="unbounded"/>
+            </xsd:choice>
         </xsd:sequence>
     </xsd:complexType>
 
@@ -56,6 +61,8 @@
       <xsd:attribute name="pkt_pts_time"  type="xsd:float"/>
       <xsd:attribute name="pkt_dts"       type="xsd:long" />
       <xsd:attribute name="pkt_dts_time"  type="xsd:float"/>
+      <xsd:attribute name="best_effort_timestamp"      type="xsd:long" />
+      <xsd:attribute name="best_effort_timestamp_time" type="xsd:float" />
       <xsd:attribute name="pkt_duration"  type="xsd:long" />
       <xsd:attribute name="pkt_duration_time" type="xsd:float"/>
       <xsd:attribute name="pkt_pos"       type="xsd:long" />
@@ -78,12 +85,27 @@
       <xsd:attribute name="interlaced_frame"       type="xsd:int"   />
       <xsd:attribute name="top_field_first"        type="xsd:int"   />
       <xsd:attribute name="repeat_pict"            type="xsd:int"   />
-      <xsd:attribute name="reference"              type="xsd:int"   />
+    </xsd:complexType>
+
+    <xsd:complexType name="subtitleType">
+      <xsd:attribute name="media_type"         type="xsd:string" fixed="subtitle" use="required"/>
+      <xsd:attribute name="pts"                type="xsd:long" />
+      <xsd:attribute name="pts_time"           type="xsd:float"/>
+      <xsd:attribute name="format"             type="xsd:int"  />
+      <xsd:attribute name="start_display_time" type="xsd:int"  />
+      <xsd:attribute name="end_display_time"   type="xsd:int"  />
+      <xsd:attribute name="num_rects"          type="xsd:int"  />
     </xsd:complexType>
 
     <xsd:complexType name="streamsType">
         <xsd:sequence>
             <xsd:element name="stream" type="ffprobe:streamType" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="programsType">
+        <xsd:sequence>
+            <xsd:element name="program" type="ffprobe:programType" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
     </xsd:complexType>
 
@@ -103,8 +125,8 @@
 
     <xsd:complexType name="streamType">
       <xsd:sequence>
-        <xsd:element name="tag" type="ffprobe:tagType" minOccurs="0" maxOccurs="unbounded"/>
         <xsd:element name="disposition" type="ffprobe:streamDispositionType" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="tag" type="ffprobe:tagType" minOccurs="0" maxOccurs="unbounded"/>
       </xsd:sequence>
 
       <xsd:attribute name="index"            type="xsd:int" use="required"/>
@@ -131,6 +153,7 @@
       <xsd:attribute name="sample_fmt"       type="xsd:string"/>
       <xsd:attribute name="sample_rate"      type="xsd:int"/>
       <xsd:attribute name="channels"         type="xsd:int"/>
+      <xsd:attribute name="channel_layout"   type="xsd:string"/>
       <xsd:attribute name="bits_per_sample"  type="xsd:int"/>
 
       <xsd:attribute name="id"               type="xsd:string"/>
@@ -147,6 +170,23 @@
       <xsd:attribute name="nb_read_packets"  type="xsd:int"/>
     </xsd:complexType>
 
+    <xsd:complexType name="programType">
+      <xsd:sequence>
+        <xsd:element name="tag" type="ffprobe:tagType" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element name="streams" type="ffprobe:streamsType" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+
+      <xsd:attribute name="program_id"           type="xsd:int"    use="required"/>
+      <xsd:attribute name="program_num"          type="xsd:int"    use="required"/>
+      <xsd:attribute name="nb_streams"           type="xsd:int"    use="required"/>
+      <xsd:attribute name="start_time"           type="xsd:float"/>
+      <xsd:attribute name="start_pts"            type="xsd:long"/>
+      <xsd:attribute name="end_time"             type="xsd:float"/>
+      <xsd:attribute name="end_pts"              type="xsd:long"/>
+      <xsd:attribute name="pmt_pid"              type="xsd:int"    use="required"/>
+      <xsd:attribute name="pcr_pid"              type="xsd:int"    use="required"/>
+    </xsd:complexType>
+
     <xsd:complexType name="formatType">
       <xsd:sequence>
         <xsd:element name="tag" type="ffprobe:tagType" minOccurs="0" maxOccurs="unbounded"/>
@@ -154,12 +194,14 @@
 
       <xsd:attribute name="filename"         type="xsd:string" use="required"/>
       <xsd:attribute name="nb_streams"       type="xsd:int"    use="required"/>
+      <xsd:attribute name="nb_programs"      type="xsd:int"    use="required"/>
       <xsd:attribute name="format_name"      type="xsd:string" use="required"/>
       <xsd:attribute name="format_long_name" type="xsd:string"/>
       <xsd:attribute name="start_time"       type="xsd:float"/>
       <xsd:attribute name="duration"         type="xsd:float"/>
       <xsd:attribute name="size"             type="xsd:long"/>
       <xsd:attribute name="bit_rate"         type="xsd:long"/>
+      <xsd:attribute name="probe_score"      type="xsd:int"/>
     </xsd:complexType>
 
     <xsd:complexType name="tagType">
@@ -180,6 +222,25 @@
       <xsd:attribute name="compiler_type"    type="xsd:string" use="required"/>
       <xsd:attribute name="compiler_version" type="xsd:string" use="required"/>
       <xsd:attribute name="configuration"    type="xsd:string" use="required"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="chaptersType">
+      <xsd:sequence>
+        <xsd:element name="chapter" type="ffprobe:chapterType" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="chapterType">
+      <xsd:sequence>
+        <xsd:element name="tag" type="ffprobe:tagType" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+
+      <xsd:attribute name="id"         type="xsd:int" use="required"/>
+      <xsd:attribute name="time_base"  type="xsd:string" use="required"/>
+      <xsd:attribute name="start"      type="xsd:int" use="required"/>
+      <xsd:attribute name="start_time" type="xsd:float"/>
+      <xsd:attribute name="end"        type="xsd:int" use="required"/>
+      <xsd:attribute name="end_time"   type="xsd:float" use="required"/>
     </xsd:complexType>
 
     <xsd:complexType name="libraryVersionType">

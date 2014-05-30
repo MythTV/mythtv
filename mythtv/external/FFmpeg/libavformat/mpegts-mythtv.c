@@ -703,7 +703,7 @@ static void mpegts_push_section(MpegTSFilter *filter, const uint8_t *section, in
 typedef struct {
     uint32_t stream_type;
     enum AVMediaType codec_type;
-    enum CodecID codec_id;
+    enum AVCodecID codec_id;
 } StreamType;
 
 static const StreamType ISO_types[] = {
@@ -2027,7 +2027,7 @@ static void mpegts_cleanup_streams(MpegTSContext *ts)
 }
 
 static AVStream *new_section_av_stream(SectionContext *sect, enum AVMediaType type,
-                                       enum CodecID id)
+                                       enum AVCodecID id)
 {
     FF_ALLOCZ_OR_GOTO(NULL, sect->st, sizeof(AVStream), fail);
 

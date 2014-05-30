@@ -26,10 +26,10 @@
  
 #include "avcodec.h"
 
-/** \fn codec_id_string(enum CodecID)
- *  returns a human readable string for the CodecID enum.
+/** \fn codec_id_string(enum AVCodecID)
+ *  returns a human readable string for the AVCodecID enum.
  */
-const char *ff_codec_id_string(enum CodecID codec_id)
+const char *ff_codec_id_string(enum AVCodecID codec_id)
 {
     switch (codec_id)
     {

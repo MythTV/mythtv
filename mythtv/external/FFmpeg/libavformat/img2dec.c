@@ -20,6 +20,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include <sys/stat.h>
 #include "libavutil/avstring.h"
 #include "libavutil/log.h"
 #include "libavutil/opt.h"
@@ -52,8 +53,8 @@ typedef struct {
     int split_planes;       /**< use independent file for each Y, U, V plane */
     char path[1024];
     char *pixel_format;     /**< Set by a private option. */
-    char *video_size;       /**< Set by a private option. */
-    char *framerate;        /**< Set by a private option. */
+    int width, height;      /**< Set by a private option. */
+    AVRational framerate;   /**< Set by a private option. */
     int loop;
     enum { PT_GLOB_SEQUENCE, PT_GLOB, PT_SEQUENCE } pattern_type;
     int use_glob;
@@ -63,6 +64,7 @@ typedef struct {
     int start_number;
     int start_number_range;
     int frame_size;
+    int ts_from_file;
 } VideoDemuxData;
 
 static const int sizes[][2] = {
@@ -185,7 +187,7 @@ static int img_read_probe(AVProbeData *p)
         else if (av_match_ext(p->filename, "raw") || av_match_ext(p->filename, "gif"))
             return 5;
         else
-            return AVPROBE_SCORE_MAX / 2;
+            return AVPROBE_SCORE_EXTENSION;
     }
     return 0;
 }
@@ -193,11 +195,9 @@ static int img_read_probe(AVProbeData *p)
 static int img_read_header(AVFormatContext *s1)
 {
     VideoDemuxData *s = s1->priv_data;
-    int first_index, last_index, ret = 0;
-    int width = 0, height = 0;
+    int first_index, last_index;
     AVStream *st;
     enum AVPixelFormat pix_fmt = AV_PIX_FMT_NONE;
-    AVRational framerate;
 
     s1->ctx_flags |= AVFMTCTX_NOHEADER;
 
@@ -212,17 +212,6 @@ static int img_read_header(AVFormatContext *s1)
                s->pixel_format);
         return AVERROR(EINVAL);
     }
-    if (s->video_size &&
-        (ret = av_parse_video_size(&width, &height, s->video_size)) < 0) {
-        av_log(s, AV_LOG_ERROR,
-               "Could not parse video size: %s.\n", s->video_size);
-        return ret;
-    }
-    if ((ret = av_parse_video_rate(&framerate, s->framerate)) < 0) {
-        av_log(s, AV_LOG_ERROR,
-               "Could not parse framerate: %s.\n", s->framerate);
-        return ret;
-    }
 
     av_strlcpy(s->path, s1->filename, sizeof(s->path));
     s->img_number = 0;
@@ -236,11 +225,14 @@ static int img_read_header(AVFormatContext *s1)
         st->need_parsing = AVSTREAM_PARSE_FULL;
     }
 
-    avpriv_set_pts_info(st, 60, framerate.den, framerate.num);
+    if (s->ts_from_file)
+        avpriv_set_pts_info(st, 64, 1, 1);
+    else
+        avpriv_set_pts_info(st, 64, s->framerate.den, s->framerate.num);
 
-    if (width && height) {
-        st->codec->width  = width;
-        st->codec->height = height;
+    if (s->width && s->height) {
+        st->codec->width  = s->width;
+        st->codec->height = s->height;
     }
 
     if (!s->is_pipe) {
@@ -280,7 +272,7 @@ static int img_read_header(AVFormatContext *s1)
             if (find_image_range(&first_index, &last_index, s->path,
                                  s->start_number, s->start_number_range) < 0) {
                 av_log(s1, AV_LOG_ERROR,
-                       "Could find no file with with path '%s' and index in the range %d-%d\n",
+                       "Could find no file with path '%s' and index in the range %d-%d\n",
                        s->path, s->start_number, s->start_number + s->start_number_range - 1);
                 return AVERROR(ENOENT);
             }
@@ -309,8 +301,10 @@ static int img_read_header(AVFormatContext *s1)
         s->img_last   = last_index;
         s->img_number = first_index;
         /* compute duration */
-        st->start_time = 0;
-        st->duration   = last_index - first_index + 1;
+        if (!s->ts_from_file) {
+            st->start_time = 0;
+            st->duration   = last_index - first_index + 1;
+        }
     }
 
     if (s1->video_codec_id) {
@@ -394,8 +388,15 @@ static int img_read_packet(AVFormatContext *s1, AVPacket *pkt)
         return AVERROR(ENOMEM);
     pkt->stream_index = 0;
     pkt->flags       |= AV_PKT_FLAG_KEY;
-    if (!s->is_pipe)
+    if (s->ts_from_file) {
+        struct stat img_stat;
+        if (stat(filename, &img_stat))
+            return AVERROR(EIO);
+        pkt->pts = (int64_t)img_stat.st_mtime;
+        av_add_index_entry(s1->streams[0], s->img_number, pkt->pts, 0, 0, AVINDEX_KEYFRAME);
+    } else if (!s->is_pipe) {
         pkt->pts      = s->pts;
+    }
 
     pkt->size = 0;
     for (i = 0; i < 3; i++) {
@@ -433,6 +434,15 @@ static int img_read_close(struct AVFormatContext* s1)
 static int img_read_seek(AVFormatContext *s, int stream_index, int64_t timestamp, int flags)
 {
     VideoDemuxData *s1 = s->priv_data;
+    AVStream *st = s->streams[0];
+
+    if (s1->ts_from_file) {
+        int index = av_index_search_timestamp(st, timestamp, flags);
+        if(index < 0)
+            return -1;
+        s1->img_number = st->index_entries[index].pos;
+        return 0;
+    }
 
     if (timestamp < 0 || !s1->loop && timestamp > s1->img_last - s1->img_first)
         return -1;
@@ -444,7 +454,7 @@ static int img_read_seek(AVFormatContext *s, int stream_index, int64_t timestamp
 #define OFFSET(x) offsetof(VideoDemuxData, x)
 #define DEC AV_OPT_FLAG_DECODING_PARAM
 static const AVOption options[] = {
-    { "framerate",    "set the video framerate",             OFFSET(framerate),    AV_OPT_TYPE_STRING, {.str = "25"}, 0, 0,       DEC },
+    { "framerate",    "set the video framerate",             OFFSET(framerate),    AV_OPT_TYPE_VIDEO_RATE, {.str = "25"}, 0, 0,   DEC },
     { "loop",         "force loop over input file sequence", OFFSET(loop),         AV_OPT_TYPE_INT,    {.i64 = 0   }, 0, 1,       DEC },
 
     { "pattern_type", "set pattern type",                    OFFSET(pattern_type), AV_OPT_TYPE_INT,    {.i64=PT_GLOB_SEQUENCE}, 0,       INT_MAX, DEC, "pattern_type"},
@@ -455,8 +465,9 @@ static const AVOption options[] = {
     { "pixel_format", "set video pixel format",              OFFSET(pixel_format), AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0,       DEC },
     { "start_number", "set first number in the sequence",    OFFSET(start_number), AV_OPT_TYPE_INT,    {.i64 = 0   }, 0, INT_MAX, DEC },
     { "start_number_range", "set range for looking at the first sequence number", OFFSET(start_number_range), AV_OPT_TYPE_INT, {.i64 = 5}, 1, INT_MAX, DEC },
-    { "video_size",   "set video size",                      OFFSET(video_size),   AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0,       DEC },
+    { "video_size",   "set video size",                      OFFSET(width),        AV_OPT_TYPE_IMAGE_SIZE, {.str = NULL}, 0, 0,   DEC },
     { "frame_size",   "force frame size in bytes",           OFFSET(frame_size),   AV_OPT_TYPE_INT,    {.i64 = 0   }, 0, INT_MAX, DEC },
+    { "ts_from_file", "set frame timestamp from file's one", OFFSET(ts_from_file), AV_OPT_TYPE_INT,    {.i64 = 0   }, 0, 1,       DEC },
     { NULL },
 };
 

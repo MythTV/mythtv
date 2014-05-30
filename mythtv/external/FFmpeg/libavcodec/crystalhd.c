@@ -122,7 +122,7 @@ typedef struct OpaqueList {
 typedef struct {
     AVClass *av_class;
     AVCodecContext *avctx;
-    AVFrame pic;
+    AVFrame *pic;
     HANDLE dev;
 
     uint8_t *orig_extradata;
@@ -324,8 +324,7 @@ static void flush(AVCodecContext *avctx)
     priv->skip_next_output  = 0;
     priv->decode_wait       = BASE_WAIT;
 
-    if (priv->pic.data[0])
-        avctx->release_buffer(avctx, &priv->pic);
+    av_frame_unref (priv->pic);
 
     /* Flush mode 4 flushes all software and hardware buffers. */
     DtsFlushInput(priv->dev, 4);
@@ -362,8 +361,7 @@ static av_cold int uninit(AVCodecContext *avctx)
 
     av_free(priv->sps_pps_buf);
 
-    if (priv->pic.data[0])
-        avctx->release_buffer(avctx, &priv->pic);
+    av_frame_free (&priv->pic);
 
     if (priv->head) {
        OpaqueList *node = priv->head;
@@ -411,6 +409,7 @@ static av_cold int init(AVCodecContext *avctx)
     priv->is_nal       = avctx->extradata_size > 0 && *(avctx->extradata) == 1;
     priv->last_picture = -1;
     priv->decode_wait  = BASE_WAIT;
+    priv->pic          = av_frame_alloc();
 
     subtype = id2subtype(priv, avctx->codec->id);
     switch (subtype) {
@@ -635,18 +634,14 @@ static inline CopyRet copy_frame(AVCodecContext *avctx,
     av_log(avctx, AV_LOG_VERBOSE, "Interlaced state: %d | trust_interlaced %d\n",
            interlaced, trust_interlaced);
 
-    if (priv->pic.data[0] && !priv->need_second_field)
-        avctx->release_buffer(avctx, &priv->pic);
+    if (priv->pic->data[0] && !priv->need_second_field)
+        av_frame_unref(priv->pic);
 
     priv->need_second_field = interlaced && !priv->need_second_field;
 
-    priv->pic.buffer_hints = FF_BUFFER_HINTS_VALID | FF_BUFFER_HINTS_PRESERVE |
-                             FF_BUFFER_HINTS_REUSABLE;
-    if (!priv->pic.data[0]) {
-        if (ff_get_buffer(avctx, &priv->pic) < 0) {
-            av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
+    if (!priv->pic->data[0]) {
+        if (ff_get_buffer(avctx, priv->pic, AV_GET_BUFFER_FLAG_REF) < 0)
             return RET_ERROR;
-        }
     }
 
     bwidth = av_image_get_linesize(avctx->pix_fmt, width, 0);
@@ -663,8 +658,8 @@ static inline CopyRet copy_frame(AVCodecContext *avctx,
         sStride = bwidth;
     }
 
-    dStride = priv->pic.linesize[0];
-    dst     = priv->pic.data[0];
+    dStride = priv->pic->linesize[0];
+    dst     = priv->pic->data[0];
 
     av_log(priv->avctx, AV_LOG_VERBOSE, "CrystalHD: Copying out frame\n");
 
@@ -689,15 +684,17 @@ static inline CopyRet copy_frame(AVCodecContext *avctx,
         av_image_copy_plane(dst, dStride, src, sStride, bwidth, height);
     }
 
-    priv->pic.interlaced_frame = interlaced;
+    priv->pic->interlaced_frame = interlaced;
     if (interlaced)
-        priv->pic.top_field_first = !bottom_first;
+        priv->pic->top_field_first = !bottom_first;
 
-    priv->pic.pkt_pts = pkt_pts;
+    priv->pic->pkt_pts = pkt_pts;
 
     if (!priv->need_second_field) {
         *got_frame       = 1;
-        *(AVFrame *)data = priv->pic;
+        if ((ret = av_frame_ref(data, priv->pic)) < 0) {
+            return ret;
+        }
     }
 
     /*
@@ -918,8 +915,8 @@ static int decode(AVCodecContext *avctx, void *data, int *got_frame, AVPacket *a
                 H264Context *h = priv->parser->priv_data;
 
                 index = av_parser_parse2(priv->parser, avctx, &pout, &psize,
-                                         in_data, len, avctx->pkt->pts,
-                                         avctx->pkt->dts, 0);
+                                         in_data, len, avctx->internal->pkt->pts,
+                                         avctx->internal->pkt->dts, 0);
                 if (index < 0) {
                     av_log(avctx, AV_LOG_WARNING,
                            "CrystalHD: Failed to parse h.264 packet to "
@@ -953,7 +950,7 @@ static int decode(AVCodecContext *avctx, void *data, int *got_frame, AVPacket *a
              * avoiding mangling so we need to build a mapping to values
              * we know will not be mangled.
              */
-            uint64_t pts = opaque_list_push(priv, avctx->pkt->pts, pic_type);
+            uint64_t pts = opaque_list_push(priv, avctx->internal->pkt->pts, pic_type);
             if (!pts) {
                 if (free_data) {
                     av_freep(&in_data);
@@ -1091,6 +1088,7 @@ static AVClass h264_class = {
 
 AVCodec ff_h264_crystalhd_decoder = {
     .name           = "h264_crystalhd",
+    .long_name      = NULL_IF_CONFIG_SMALL("H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10 (CrystalHD acceleration)"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_H264,
     .priv_data_size = sizeof(CHDContext),
@@ -1099,7 +1097,6 @@ AVCodec ff_h264_crystalhd_decoder = {
     .decode         = decode,
     .capabilities   = CODEC_CAP_DR1 | CODEC_CAP_DELAY,
     .flush          = flush,
-    .long_name      = NULL_IF_CONFIG_SMALL("H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10 (CrystalHD acceleration)"),
     .pix_fmts       = (const enum AVPixelFormat[]){AV_PIX_FMT_YUYV422, AV_PIX_FMT_NONE},
     .priv_class     = &h264_class,
 };
@@ -1115,6 +1112,7 @@ static AVClass mpeg2_class = {
 
 AVCodec ff_mpeg2_crystalhd_decoder = {
     .name           = "mpeg2_crystalhd",
+    .long_name      = NULL_IF_CONFIG_SMALL("MPEG-2 Video (CrystalHD acceleration)"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_MPEG2VIDEO,
     .priv_data_size = sizeof(CHDContext),
@@ -1123,7 +1121,6 @@ AVCodec ff_mpeg2_crystalhd_decoder = {
     .decode         = decode,
     .capabilities   = CODEC_CAP_DR1 | CODEC_CAP_DELAY,
     .flush          = flush,
-    .long_name      = NULL_IF_CONFIG_SMALL("MPEG-2 Video (CrystalHD acceleration)"),
     .pix_fmts       = (const enum AVPixelFormat[]){AV_PIX_FMT_YUYV422, AV_PIX_FMT_NONE},
     .priv_class     = &mpeg2_class,
 };
@@ -1139,6 +1136,7 @@ static AVClass mpeg4_class = {
 
 AVCodec ff_mpeg4_crystalhd_decoder = {
     .name           = "mpeg4_crystalhd",
+    .long_name      = NULL_IF_CONFIG_SMALL("MPEG-4 Part 2 (CrystalHD acceleration)"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_MPEG4,
     .priv_data_size = sizeof(CHDContext),
@@ -1147,7 +1145,6 @@ AVCodec ff_mpeg4_crystalhd_decoder = {
     .decode         = decode,
     .capabilities   = CODEC_CAP_DR1 | CODEC_CAP_DELAY,
     .flush          = flush,
-    .long_name      = NULL_IF_CONFIG_SMALL("MPEG-4 Part 2 (CrystalHD acceleration)"),
     .pix_fmts       = (const enum AVPixelFormat[]){AV_PIX_FMT_YUYV422, AV_PIX_FMT_NONE},
     .priv_class     = &mpeg4_class,
 };
@@ -1163,6 +1160,7 @@ static AVClass msmpeg4_class = {
 
 AVCodec ff_msmpeg4_crystalhd_decoder = {
     .name           = "msmpeg4_crystalhd",
+    .long_name      = NULL_IF_CONFIG_SMALL("MPEG-4 Part 2 Microsoft variant version 3 (CrystalHD acceleration)"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_MSMPEG4V3,
     .priv_data_size = sizeof(CHDContext),
@@ -1171,7 +1169,6 @@ AVCodec ff_msmpeg4_crystalhd_decoder = {
     .decode         = decode,
     .capabilities   = CODEC_CAP_DR1 | CODEC_CAP_DELAY | CODEC_CAP_EXPERIMENTAL,
     .flush          = flush,
-    .long_name      = NULL_IF_CONFIG_SMALL("MPEG-4 Part 2 Microsoft variant version 3 (CrystalHD acceleration)"),
     .pix_fmts       = (const enum AVPixelFormat[]){AV_PIX_FMT_YUYV422, AV_PIX_FMT_NONE},
     .priv_class     = &msmpeg4_class,
 };
@@ -1187,6 +1184,7 @@ static AVClass vc1_class = {
 
 AVCodec ff_vc1_crystalhd_decoder = {
     .name           = "vc1_crystalhd",
+    .long_name      = NULL_IF_CONFIG_SMALL("SMPTE VC-1 (CrystalHD acceleration)"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_VC1,
     .priv_data_size = sizeof(CHDContext),
@@ -1195,7 +1193,6 @@ AVCodec ff_vc1_crystalhd_decoder = {
     .decode         = decode,
     .capabilities   = CODEC_CAP_DR1 | CODEC_CAP_DELAY,
     .flush          = flush,
-    .long_name      = NULL_IF_CONFIG_SMALL("SMPTE VC-1 (CrystalHD acceleration)"),
     .pix_fmts       = (const enum AVPixelFormat[]){AV_PIX_FMT_YUYV422, AV_PIX_FMT_NONE},
     .priv_class     = &vc1_class,
 };
@@ -1211,6 +1208,7 @@ static AVClass wmv3_class = {
 
 AVCodec ff_wmv3_crystalhd_decoder = {
     .name           = "wmv3_crystalhd",
+    .long_name      = NULL_IF_CONFIG_SMALL("Windows Media Video 9 (CrystalHD acceleration)"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_WMV3,
     .priv_data_size = sizeof(CHDContext),
@@ -1219,7 +1217,6 @@ AVCodec ff_wmv3_crystalhd_decoder = {
     .decode         = decode,
     .capabilities   = CODEC_CAP_DR1 | CODEC_CAP_DELAY,
     .flush          = flush,
-    .long_name      = NULL_IF_CONFIG_SMALL("Windows Media Video 9 (CrystalHD acceleration)"),
     .pix_fmts       = (const enum AVPixelFormat[]){AV_PIX_FMT_YUYV422, AV_PIX_FMT_NONE},
     .priv_class     = &wmv3_class,
 };

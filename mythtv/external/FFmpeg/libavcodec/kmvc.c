@@ -30,6 +30,7 @@
 #include "avcodec.h"
 #include "bytestream.h"
 #include "internal.h"
+#include "libavutil/common.h"
 
 #define KMVC_KEYFRAME 0x80
 #define KMVC_PALETTE  0x40
@@ -41,13 +42,12 @@
  */
 typedef struct KmvcContext {
     AVCodecContext *avctx;
-    AVFrame pic;
 
     int setpal;
     int palsize;
     uint32_t pal[MAX_PALSIZE];
     uint8_t *cur, *prev;
-    uint8_t *frm0, *frm1;
+    uint8_t frm0[320 * 200], frm1[320 * 200];
     GetByteContext g;
 } KmvcContext;
 
@@ -56,7 +56,7 @@ typedef struct BitBuf {
     int bitbuf;
 } BitBuf;
 
-#define BLK(data, x, y)  data[(x) + (y) * 320]
+#define BLK(data, x, y)  data[av_clip((x) + (y) * 320, 0, 320 * 200 -1)]
 
 #define kmvc_init_getbits(bb, g)  bb.bits = 7; bb.bitbuf = bytestream2_get_byte(g);
 
@@ -263,6 +263,7 @@ static int decode_frame(AVCodecContext * avctx, void *data, int *got_frame,
                         AVPacket *avpkt)
 {
     KmvcContext *const ctx = avctx->priv_data;
+    AVFrame *frame = data;
     uint8_t *out, *src;
     int i, ret;
     int header;
@@ -270,15 +271,9 @@ static int decode_frame(AVCodecContext * avctx, void *data, int *got_frame,
     const uint8_t *pal = av_packet_get_side_data(avpkt, AV_PKT_DATA_PALETTE, NULL);
 
     bytestream2_init(&ctx->g, avpkt->data, avpkt->size);
-    if (ctx->pic.data[0])
-        avctx->release_buffer(avctx, &ctx->pic);
 
-    ctx->pic.reference = 3;
-    ctx->pic.buffer_hints = FF_BUFFER_HINTS_VALID;
-    if ((ret = ff_get_buffer(avctx, &ctx->pic)) < 0) {
-        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
+    if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
         return ret;
-    }
 
     header = bytestream2_get_byte(&ctx->g);
 
@@ -293,15 +288,15 @@ static int decode_frame(AVCodecContext * avctx, void *data, int *got_frame,
     }
 
     if (header & KMVC_KEYFRAME) {
-        ctx->pic.key_frame = 1;
-        ctx->pic.pict_type = AV_PICTURE_TYPE_I;
+        frame->key_frame = 1;
+        frame->pict_type = AV_PICTURE_TYPE_I;
     } else {
-        ctx->pic.key_frame = 0;
-        ctx->pic.pict_type = AV_PICTURE_TYPE_P;
+        frame->key_frame = 0;
+        frame->pict_type = AV_PICTURE_TYPE_P;
     }
 
     if (header & KMVC_PALETTE) {
-        ctx->pic.palette_has_changed = 1;
+        frame->palette_has_changed = 1;
         // palette starts from index 1 and has 127 entries
         for (i = 1; i <= ctx->palsize; i++) {
             ctx->pal[i] = 0xFFU << 24 | bytestream2_get_be24(&ctx->g);
@@ -309,17 +304,17 @@ static int decode_frame(AVCodecContext * avctx, void *data, int *got_frame,
     }
 
     if (pal) {
-        ctx->pic.palette_has_changed = 1;
+        frame->palette_has_changed = 1;
         memcpy(ctx->pal, pal, AVPALETTE_SIZE);
     }
 
     if (ctx->setpal) {
         ctx->setpal = 0;
-        ctx->pic.palette_has_changed = 1;
+        frame->palette_has_changed = 1;
     }
 
     /* make the palette available on the way out */
-    memcpy(ctx->pic.data[1], ctx->pal, 1024);
+    memcpy(frame->data[1], ctx->pal, 1024);
 
     blocksize = bytestream2_get_byte(&ctx->g);
 
@@ -344,12 +339,12 @@ static int decode_frame(AVCodecContext * avctx, void *data, int *got_frame,
         return AVERROR_INVALIDDATA;
     }
 
-    out = ctx->pic.data[0];
+    out = frame->data[0];
     src = ctx->cur;
     for (i = 0; i < avctx->height; i++) {
         memcpy(out, src, avctx->width);
         src += 320;
-        out += ctx->pic.linesize[0];
+        out += frame->linesize[0];
     }
 
     /* flip buffers */
@@ -362,7 +357,6 @@ static int decode_frame(AVCodecContext * avctx, void *data, int *got_frame,
     }
 
     *got_frame = 1;
-    *(AVFrame *) data = ctx->pic;
 
     /* always report that the buffer was completely consumed */
     return avpkt->size;
@@ -385,8 +379,6 @@ static av_cold int decode_init(AVCodecContext * avctx)
         return AVERROR(EINVAL);
     }
 
-    c->frm0 = av_mallocz(320 * 200);
-    c->frm1 = av_mallocz(320 * 200);
     c->cur = c->frm0;
     c->prev = c->frm1;
 
@@ -416,37 +408,18 @@ static av_cold int decode_init(AVCodecContext * avctx)
         c->setpal = 1;
     }
 
-    avcodec_get_frame_defaults(&c->pic);
     avctx->pix_fmt = AV_PIX_FMT_PAL8;
-
-    return 0;
-}
-
-
-
-/*
- * Uninit kmvc decoder
- */
-static av_cold int decode_end(AVCodecContext * avctx)
-{
-    KmvcContext *const c = avctx->priv_data;
-
-    av_freep(&c->frm0);
-    av_freep(&c->frm1);
-    if (c->pic.data[0])
-        avctx->release_buffer(avctx, &c->pic);
 
     return 0;
 }
 
 AVCodec ff_kmvc_decoder = {
     .name           = "kmvc",
+    .long_name      = NULL_IF_CONFIG_SMALL("Karl Morton's video codec"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_KMVC,
     .priv_data_size = sizeof(KmvcContext),
     .init           = decode_init,
-    .close          = decode_end,
     .decode         = decode_frame,
     .capabilities   = CODEC_CAP_DR1,
-    .long_name      = NULL_IF_CONFIG_SMALL("Karl Morton's video codec"),
 };

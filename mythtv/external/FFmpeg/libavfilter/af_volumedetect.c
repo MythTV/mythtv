@@ -49,12 +49,12 @@ static int query_formats(AVFilterContext *ctx)
     return 0;
 }
 
-static int filter_frame(AVFilterLink *inlink, AVFilterBufferRef *samples)
+static int filter_frame(AVFilterLink *inlink, AVFrame *samples)
 {
     AVFilterContext *ctx = inlink->dst;
     VolDetectContext *vd = ctx->priv;
-    int64_t layout  = samples->audio->channel_layout;
-    int nb_samples  = samples->audio->nb_samples;
+    int64_t layout  = samples->channel_layout;
+    int nb_samples  = samples->nb_samples;
     int nb_channels = av_get_channel_layout_nb_channels(layout);
     int nb_planes   = nb_channels;
     int plane, i;
@@ -126,18 +126,16 @@ static void print_stats(AVFilterContext *ctx)
     }
 }
 
-static void uninit(AVFilterContext *ctx)
+static av_cold void uninit(AVFilterContext *ctx)
 {
     print_stats(ctx);
 }
 
 static const AVFilterPad volumedetect_inputs[] = {
     {
-        .name             = "default",
-        .type             = AVMEDIA_TYPE_AUDIO,
-        .get_audio_buffer = ff_null_get_audio_buffer,
-        .filter_frame     = filter_frame,
-        .min_perms        = AV_PERM_READ,
+        .name         = "default",
+        .type         = AVMEDIA_TYPE_AUDIO,
+        .filter_frame = filter_frame,
     },
     { NULL }
 };
@@ -150,10 +148,9 @@ static const AVFilterPad volumedetect_outputs[] = {
     { NULL }
 };
 
-AVFilter avfilter_af_volumedetect = {
+AVFilter ff_af_volumedetect = {
     .name          = "volumedetect",
     .description   = NULL_IF_CONFIG_SMALL("Detect audio volume."),
-
     .priv_size     = sizeof(VolDetectContext),
     .query_formats = query_formats,
     .uninit        = uninit,

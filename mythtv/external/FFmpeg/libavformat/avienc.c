@@ -26,6 +26,8 @@
 #include "avi.h"
 #include "avio_internal.h"
 #include "riff.h"
+#include "libavformat/avlanguage.h"
+#include "libavutil/avstring.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/dict.h"
 #include "libavutil/avassert.h"
@@ -57,7 +59,7 @@ typedef struct {
 
 typedef struct  {
     int64_t frames_hdr_strm;
-    int audio_strm_length;
+    int64_t audio_strm_length;
     int packet_count;
     int entry;
 
@@ -152,6 +154,7 @@ static int avi_write_header(AVFormatContext *s)
     AVCodecContext *stream, *video_enc;
     int64_t list1, list2, strh, strf;
     AVDictionaryEntry *t = NULL;
+    int padding;
 
     if (s->nb_streams > AVI_MAX_STREAM_COUNT) {
         av_log(s, AV_LOG_ERROR, "AVI does not support >%d streams\n",
@@ -309,6 +312,16 @@ static int avi_write_header(AVFormatContext *s)
             ff_riff_write_info_tag(s->pb, "strn", t->value);
             t = NULL;
         }
+        if(stream->codec_id == AV_CODEC_ID_XSUB
+           && (t = av_dict_get(s->streams[i]->metadata, "language", NULL, 0))) {
+            const char* langstr = av_convert_lang_to(t->value, AV_LANG_ISO639_1);
+            t = NULL;
+            if (langstr) {
+                char* str = av_asprintf("Subtitle - %s-xx;02", langstr);
+                ff_riff_write_info_tag(s->pb, "strn", str);
+                av_free(str);
+            }
+        }
       }
 
         if (pb->seekable) {
@@ -385,11 +398,18 @@ static int avi_write_header(AVFormatContext *s)
 
     ff_riff_write_info(s);
 
+
+    padding = s->metadata_header_padding;
+    if (padding < 0)
+        padding = 1016;
+
     /* some padding for easier tag editing */
-    list2 = ff_start_tag(pb, "JUNK");
-    for (i = 0; i < 1016; i += 4)
-        avio_wl32(pb, 0);
-    ff_end_tag(pb, list2);
+    if (padding) {
+        list2 = ff_start_tag(pb, "JUNK");
+        for (i = padding; i > 0; i -= 4)
+            avio_wl32(pb, 0);
+        ff_end_tag(pb, list2);
+    }
 
     avi->movi_list = ff_start_tag(pb, "LIST");
     ffio_wfourcc(pb, "movi");
@@ -567,8 +587,11 @@ static int avi_write_packet(AVFormatContext *s, AVPacket *pkt)
         int id = idx->entry % AVI_INDEX_CLUSTER_SIZE;
         if (idx->ents_allocated <= idx->entry) {
             idx->cluster = av_realloc_f(idx->cluster, sizeof(void*), cl+1);
-            if (!idx->cluster)
+            if (!idx->cluster) {
+                idx->ents_allocated = 0;
+                idx->entry = 0;
                 return AVERROR(ENOMEM);
+            }
             idx->cluster[cl] = av_malloc(AVI_INDEX_CLUSTER_SIZE*sizeof(AVIIentry));
             if (!idx->cluster[cl])
                 return AVERROR(ENOMEM);
@@ -587,7 +610,6 @@ static int avi_write_packet(AVFormatContext *s, AVPacket *pkt)
     if (size & 1)
         avio_w8(pb, 0);
 
-    avio_flush(pb);
     return 0;
 }
 
@@ -637,7 +659,7 @@ static int avi_write_trailer(AVFormatContext *s)
     for (i=0; i<s->nb_streams; i++) {
          AVIStream *avist= s->streams[i]->priv_data;
          for (j=0; j<avist->indexes.ents_allocated/AVI_INDEX_CLUSTER_SIZE; j++)
-              av_free(avist->indexes.cluster[j]);
+              av_freep(&avist->indexes.cluster[j]);
          av_freep(&avist->indexes.cluster);
          avist->indexes.ents_allocated = avist->indexes.entry = 0;
     }
@@ -659,5 +681,4 @@ AVOutputFormat ff_avi_muxer = {
     .codec_tag         = (const AVCodecTag* const []){
         ff_codec_bmp_tags, ff_codec_wav_tags, 0
     },
-    .flags             = AVFMT_VARIABLE_FPS,
 };

@@ -2,20 +2,20 @@
  * Copyright (C) 2011 Michael Niedermayer (michaelni@gmx.at)
  * Copyright (c) 2012 Justin Ruggles <justin.ruggles@gmail.com>
  *
- * This file is part of Libav.
+ * This file is part of FFmpeg.
  *
- * Libav is free software; you can redistribute it and/or
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
  *
- * Libav is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with Libav; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -126,8 +126,13 @@ int avresample_build_matrix(uint64_t in_layout, uint64_t out_layout,
     /* mix front center to front left/right */
     if (unaccounted & AV_CH_FRONT_CENTER) {
         if ((out_layout & AV_CH_LAYOUT_STEREO) == AV_CH_LAYOUT_STEREO) {
-            matrix[FRONT_LEFT ][FRONT_CENTER] += M_SQRT1_2;
-            matrix[FRONT_RIGHT][FRONT_CENTER] += M_SQRT1_2;
+            if ((in_layout & AV_CH_LAYOUT_STEREO) == AV_CH_LAYOUT_STEREO) {
+                matrix[FRONT_LEFT ][FRONT_CENTER] += center_mix_level;
+                matrix[FRONT_RIGHT][FRONT_CENTER] += center_mix_level;
+            } else {
+                matrix[FRONT_LEFT ][FRONT_CENTER] += M_SQRT1_2;
+                matrix[FRONT_RIGHT][FRONT_CENTER] += M_SQRT1_2;
+            }
         } else
             return AVERROR_PATCHWELCOME;
     }

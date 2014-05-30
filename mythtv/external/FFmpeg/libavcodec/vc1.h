@@ -175,6 +175,21 @@ enum FrameCodingMode {
     ILACE_FIELD         ///<  in the bitstream is reported as 11b
 };
 
+/**
+ * Imode types
+ * @{
+ */
+enum Imode {
+    IMODE_RAW,
+    IMODE_NORM2,
+    IMODE_DIFF2,
+    IMODE_NORM6,
+    IMODE_DIFF6,
+    IMODE_ROWSKIP,
+    IMODE_COLSKIP
+};
+/** @} */ //imode defines
+
 /** The VC1 Context
  * @todo Change size wherever another size is more efficient
  * Many members are only used for Advanced Profile
@@ -296,8 +311,11 @@ typedef struct VC1Context{
     int dmb_is_raw;                 ///< direct mb plane is raw
     int fmb_is_raw;                 ///< forward mb plane is raw
     int skip_is_raw;                ///< skip mb plane is not coded
-    uint8_t luty[256], lutuv[256];  ///< lookup tables used for intensity compensation
-    int use_ic;                     ///< use intensity compensation in B-frames
+    uint8_t last_luty[2][256], last_lutuv[2][256];  ///< lookup tables used for intensity compensation
+    uint8_t  aux_luty[2][256],  aux_lutuv[2][256];  ///< lookup tables used for intensity compensation
+    uint8_t next_luty[2][256], next_lutuv[2][256];  ///< lookup tables used for intensity compensation
+    uint8_t (*curr_luty)[256]  ,(*curr_lutuv)[256];
+    int last_use_ic, *curr_use_ic, next_use_ic, aux_use_ic;
     int rnd;                        ///< rounding control
 
     /** Frame decoding info for S/M profiles only */
@@ -340,7 +358,6 @@ typedef struct VC1Context{
     int intcomp;
     uint8_t lumscale2;  ///< for interlaced field P picture
     uint8_t lumshift2;
-    uint8_t luty2[256], lutuv2[256]; // lookup tables used for intensity compensation
     VLC* mbmode_vlc;
     VLC* imv_vlc;
     VLC* twomvbp_vlc;
@@ -352,7 +369,6 @@ typedef struct VC1Context{
     uint8_t zzi_8x8[64];
     uint8_t *blk_mv_type_base, *blk_mv_type;    ///< 0: frame MV, 1: field MV (interlaced frame)
     uint8_t *mv_f_base, *mv_f[2];               ///< 0: MV obtained from same field, 1: opposite field
-    uint8_t *mv_f_last_base, *mv_f_last[2];
     uint8_t *mv_f_next_base, *mv_f_next[2];
     int field_mode;         ///< 1 for interlaced field pictures
     int fptype;
@@ -377,7 +393,7 @@ typedef struct VC1Context{
     //@{
     int new_sprite;
     int two_sprites;
-    AVFrame sprite_output_frame;
+    AVFrame *sprite_output_frame;
     int output_width, output_height, sprite_width, sprite_height;
     uint8_t* sr_rows[2][2];      ///< Sprite resizer line cache
     //@}
@@ -398,8 +414,7 @@ typedef struct VC1Context{
     int end_mb_x;                ///< Horizontal macroblock limit (used only by mss2)
 
     int parse_only;              ///< Context is used within parser
-
-    int warn_interlaced;
+    int resync_marker;           ///< could this stream contain resync markers
 } VC1Context;
 
 /** Find VC-1 marker in buffer

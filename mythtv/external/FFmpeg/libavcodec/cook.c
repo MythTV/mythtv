@@ -51,6 +51,7 @@
 #include "fft.h"
 #include "internal.h"
 #include "sinewin.h"
+#include "unary.h"
 
 #include "cookdata.h"
 
@@ -228,7 +229,7 @@ static av_cold int init_cook_mlt(COOKContext *q)
 
     /* Initialize the MDCT. */
     if ((ret = ff_mdct_init(&q->mdct_ctx, av_log2(mlt_size) + 1, 1, 1.0 / 32768.0))) {
-        av_free(q->mlt_window);
+        av_freep(&q->mlt_window);
         return ret;
     }
     av_log(q->avctx, AV_LOG_DEBUG, "MDCT initialized, order = %d.\n",
@@ -302,8 +303,8 @@ static av_cold int cook_decode_close(AVCodecContext *avctx)
     av_log(avctx, AV_LOG_DEBUG, "Deallocating memory.\n");
 
     /* Free allocated memory buffers. */
-    av_free(q->mlt_window);
-    av_free(q->decoded_bytes_buffer);
+    av_freep(&q->mlt_window);
+    av_freep(&q->decoded_bytes_buffer);
 
     /* Free the transform. */
     ff_mdct_end(&q->mdct_ctx);
@@ -331,11 +332,7 @@ static void decode_gain_info(GetBitContext *gb, int *gaininfo)
 {
     int i, n;
 
-    while (get_bits1(gb)) {
-        /* NOTHING */
-    }
-
-    n = get_bits_count(gb) - 1;     // amount of elements*2 to update
+    n = get_unary(gb, 0, get_bits_left(gb));     // amount of elements*2 to update
 
     i = 0;
     while (n--) {
@@ -970,10 +967,8 @@ static int cook_decode_frame(AVCodecContext *avctx, void *data,
     /* get output buffer */
     if (q->discarded_packets >= 2) {
         frame->nb_samples = q->samples_per_channel;
-        if ((ret = ff_get_buffer(avctx, frame)) < 0) {
-            av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
+        if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
             return ret;
-        }
         samples = (float **)frame->extended_data;
     }
 
@@ -1117,7 +1112,7 @@ static av_cold int cook_decode_init(AVCodecContext *avctx)
         switch (q->subpacket[s].cookversion) {
         case MONO:
             if (avctx->channels != 1) {
-                av_log_ask_for_sample(avctx, "Container channels != 1.\n");
+                avpriv_request_sample(avctx, "Container channels != 1");
                 return AVERROR_PATCHWELCOME;
             }
             av_log(avctx, AV_LOG_DEBUG, "MONO\n");
@@ -1131,7 +1126,7 @@ static av_cold int cook_decode_init(AVCodecContext *avctx)
             break;
         case JOINT_STEREO:
             if (avctx->channels != 2) {
-                av_log_ask_for_sample(avctx, "Container channels != 2.\n");
+                avpriv_request_sample(avctx, "Container channels != 2");
                 return AVERROR_PATCHWELCOME;
             }
             av_log(avctx, AV_LOG_DEBUG, "JOINT_STEREO\n");
@@ -1171,7 +1166,8 @@ static av_cold int cook_decode_init(AVCodecContext *avctx)
 
             break;
         default:
-            av_log_ask_for_sample(avctx, "Unknown Cook version.\n");
+            avpriv_request_sample(avctx, "Cook version %d",
+                                  q->subpacket[s].cookversion);
             return AVERROR_PATCHWELCOME;
         }
 
@@ -1187,7 +1183,7 @@ static av_cold int cook_decode_init(AVCodecContext *avctx)
 
         /* Try to catch some obviously faulty streams, othervise it might be exploitable */
         if (q->subpacket[s].total_subbands > 53) {
-            av_log_ask_for_sample(avctx, "total_subbands > 53\n");
+            avpriv_request_sample(avctx, "total_subbands > 53");
             return AVERROR_PATCHWELCOME;
         }
 
@@ -1199,11 +1195,11 @@ static av_cold int cook_decode_init(AVCodecContext *avctx)
         }
 
         if (q->subpacket[s].subbands > 50) {
-            av_log_ask_for_sample(avctx, "subbands > 50\n");
+            avpriv_request_sample(avctx, "subbands > 50");
             return AVERROR_PATCHWELCOME;
         }
         if (q->subpacket[s].subbands == 0) {
-            av_log_ask_for_sample(avctx, "subbands is 0\n");
+            avpriv_request_sample(avctx, "subbands = 0");
             return AVERROR_PATCHWELCOME;
         }
         q->subpacket[s].gains1.now      = q->subpacket[s].gain_1;
@@ -1219,7 +1215,7 @@ static av_cold int cook_decode_init(AVCodecContext *avctx)
         q->num_subpackets++;
         s++;
         if (s > MAX_SUBPACKETS) {
-            av_log_ask_for_sample(avctx, "Too many subpackets > 5\n");
+            avpriv_request_sample(avctx, "subpackets > %d", MAX_SUBPACKETS);
             return AVERROR_PATCHWELCOME;
         }
     }
@@ -1261,8 +1257,7 @@ static av_cold int cook_decode_init(AVCodecContext *avctx)
     /* Try to catch some obviously faulty streams, othervise it might be exploitable */
     if (q->samples_per_channel != 256 && q->samples_per_channel != 512 &&
         q->samples_per_channel != 1024) {
-        av_log_ask_for_sample(avctx,
-                              "unknown amount of samples_per_channel = %d\n",
+        avpriv_request_sample(avctx, "samples_per_channel = %d",
                               q->samples_per_channel);
         return AVERROR_PATCHWELCOME;
     }
@@ -1281,6 +1276,7 @@ static av_cold int cook_decode_init(AVCodecContext *avctx)
 
 AVCodec ff_cook_decoder = {
     .name           = "cook",
+    .long_name      = NULL_IF_CONFIG_SMALL("Cook / Cooker / Gecko (RealAudio G2)"),
     .type           = AVMEDIA_TYPE_AUDIO,
     .id             = AV_CODEC_ID_COOK,
     .priv_data_size = sizeof(COOKContext),
@@ -1288,7 +1284,6 @@ AVCodec ff_cook_decoder = {
     .close          = cook_decode_close,
     .decode         = cook_decode_frame,
     .capabilities   = CODEC_CAP_DR1,
-    .long_name      = NULL_IF_CONFIG_SMALL("Cook / Cooker / Gecko (RealAudio G2)"),
     .sample_fmts    = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_FLTP,
                                                       AV_SAMPLE_FMT_NONE },
 };

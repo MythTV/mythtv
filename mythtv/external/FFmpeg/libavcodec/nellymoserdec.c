@@ -171,10 +171,8 @@ static int decode_tag(AVCodecContext *avctx, void *data,
 
     /* get output buffer */
     frame->nb_samples = NELLY_SAMPLES * blocks;
-    if ((ret = ff_get_buffer(avctx, frame)) < 0) {
-        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
+    if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
         return ret;
-    }
     samples_flt = (float *)frame->data[0];
 
     for (i=0 ; i<blocks ; i++) {
@@ -198,6 +196,7 @@ static av_cold int decode_end(AVCodecContext * avctx) {
 
 AVCodec ff_nellymoser_decoder = {
     .name           = "nellymoser",
+    .long_name      = NULL_IF_CONFIG_SMALL("Nellymoser Asao"),
     .type           = AVMEDIA_TYPE_AUDIO,
     .id             = AV_CODEC_ID_NELLYMOSER,
     .priv_data_size = sizeof(NellyMoserDecodeContext),
@@ -205,7 +204,6 @@ AVCodec ff_nellymoser_decoder = {
     .close          = decode_end,
     .decode         = decode_tag,
     .capabilities   = CODEC_CAP_DR1 | CODEC_CAP_PARAM_CHANGE,
-    .long_name      = NULL_IF_CONFIG_SMALL("Nellymoser Asao"),
     .sample_fmts    = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_FLT,
                                                       AV_SAMPLE_FMT_NONE },
 };

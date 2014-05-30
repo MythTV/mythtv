@@ -63,7 +63,7 @@ static av_cold int truespeech_decode_init(AVCodecContext * avctx)
     TSContext *c = avctx->priv_data;
 
     if (avctx->channels != 1) {
-        av_log_ask_for_sample(avctx, "Unsupported channel count: %d\n", avctx->channels);
+        avpriv_request_sample(avctx, "Channel count %d", avctx->channels);
         return AVERROR_PATCHWELCOME;
     }
 
@@ -325,10 +325,8 @@ static int truespeech_decode_frame(AVCodecContext *avctx, void *data,
 
     /* get output buffer */
     frame->nb_samples = iterations * 240;
-    if ((ret = ff_get_buffer(avctx, frame)) < 0) {
-        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
+    if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
         return ret;
-    }
     samples = (int16_t *)frame->data[0];
 
     memset(samples, 0, iterations * 240 * sizeof(*samples));
@@ -358,11 +356,11 @@ static int truespeech_decode_frame(AVCodecContext *avctx, void *data,
 
 AVCodec ff_truespeech_decoder = {
     .name           = "truespeech",
+    .long_name      = NULL_IF_CONFIG_SMALL("DSP Group TrueSpeech"),
     .type           = AVMEDIA_TYPE_AUDIO,
     .id             = AV_CODEC_ID_TRUESPEECH,
     .priv_data_size = sizeof(TSContext),
     .init           = truespeech_decode_init,
     .decode         = truespeech_decode_frame,
     .capabilities   = CODEC_CAP_DR1,
-    .long_name      = NULL_IF_CONFIG_SMALL("DSP Group TrueSpeech"),
 };

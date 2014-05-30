@@ -211,10 +211,8 @@ static int dpcm_decode_frame(AVCodecContext *avctx, void *data,
 
     /* get output buffer */
     frame->nb_samples = (out + avctx->channels - 1) / avctx->channels;
-    if ((ret = ff_get_buffer(avctx, frame)) < 0) {
-        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
+    if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
         return ret;
-    }
     output_samples = (int16_t *)frame->data[0];
     samples_end = output_samples + out;
 
@@ -330,13 +328,13 @@ static int dpcm_decode_frame(AVCodecContext *avctx, void *data,
 #define DPCM_DECODER(id_, name_, long_name_)                \
 AVCodec ff_ ## name_ ## _decoder = {                        \
     .name           = #name_,                               \
+    .long_name      = NULL_IF_CONFIG_SMALL(long_name_),     \
     .type           = AVMEDIA_TYPE_AUDIO,                   \
     .id             = id_,                                  \
     .priv_data_size = sizeof(DPCMContext),                  \
     .init           = dpcm_decode_init,                     \
     .decode         = dpcm_decode_frame,                    \
     .capabilities   = CODEC_CAP_DR1,                        \
-    .long_name      = NULL_IF_CONFIG_SMALL(long_name_),     \
 }
 
 DPCM_DECODER(AV_CODEC_ID_INTERPLAY_DPCM, interplay_dpcm, "DPCM Interplay");

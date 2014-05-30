@@ -32,7 +32,7 @@
 #define RV30_LOWPASS(OPNAME, OP) \
 static av_unused void OPNAME ## rv30_tpel8_h_lowpass(uint8_t *dst, uint8_t *src, int dstStride, int srcStride, const int C1, const int C2){\
     const int h = 8;\
-    uint8_t *cm = ff_cropTbl + MAX_NEG_CROP;\
+    const uint8_t *cm = ff_cropTbl + MAX_NEG_CROP;\
     int i;\
     for(i = 0; i < h; i++)\
     {\
@@ -51,7 +51,7 @@ static av_unused void OPNAME ## rv30_tpel8_h_lowpass(uint8_t *dst, uint8_t *src,
 \
 static void OPNAME ## rv30_tpel8_v_lowpass(uint8_t *dst, uint8_t *src, int dstStride, int srcStride, const int C1, const int C2){\
     const int w = 8;\
-    uint8_t *cm = ff_cropTbl + MAX_NEG_CROP;\
+    const uint8_t *cm = ff_cropTbl + MAX_NEG_CROP;\
     int i;\
     for(i = 0; i < w; i++)\
     {\
@@ -82,7 +82,7 @@ static void OPNAME ## rv30_tpel8_v_lowpass(uint8_t *dst, uint8_t *src, int dstSt
 static void OPNAME ## rv30_tpel8_hv_lowpass(uint8_t *dst, uint8_t *src, int dstStride, int srcStride){\
     const int w = 8;\
     const int h = 8;\
-    uint8_t *cm = ff_cropTbl + MAX_NEG_CROP;\
+    const uint8_t *cm = ff_cropTbl + MAX_NEG_CROP;\
     int i, j;\
     for(j = 0; j < h; j++){\
         for(i = 0; i < w; i++){\
@@ -101,7 +101,7 @@ static void OPNAME ## rv30_tpel8_hv_lowpass(uint8_t *dst, uint8_t *src, int dstS
 static void OPNAME ## rv30_tpel8_hhv_lowpass(uint8_t *dst, uint8_t *src, int dstStride, int srcStride){\
     const int w = 8;\
     const int h = 8;\
-    uint8_t *cm = ff_cropTbl + MAX_NEG_CROP;\
+    const uint8_t *cm = ff_cropTbl + MAX_NEG_CROP;\
     int i, j;\
     for(j = 0; j < h; j++){\
         for(i = 0; i < w; i++){\
@@ -120,7 +120,7 @@ static void OPNAME ## rv30_tpel8_hhv_lowpass(uint8_t *dst, uint8_t *src, int dst
 static void OPNAME ## rv30_tpel8_hvv_lowpass(uint8_t *dst, uint8_t *src, int dstStride, int srcStride){\
     const int w = 8;\
     const int h = 8;\
-    uint8_t *cm = ff_cropTbl + MAX_NEG_CROP;\
+    const uint8_t *cm = ff_cropTbl + MAX_NEG_CROP;\
     int i, j;\
     for(j = 0; j < h; j++){\
         for(i = 0; i < w; i++){\
@@ -139,7 +139,7 @@ static void OPNAME ## rv30_tpel8_hvv_lowpass(uint8_t *dst, uint8_t *src, int dst
 static void OPNAME ## rv30_tpel8_hhvv_lowpass(uint8_t *dst, uint8_t *src, int dstStride, int srcStride){\
     const int w = 8;\
     const int h = 8;\
-    uint8_t *cm = ff_cropTbl + MAX_NEG_CROP;\
+    const uint8_t *cm = ff_cropTbl + MAX_NEG_CROP;\
     int i, j;\
     for(j = 0; j < h; j++){\
         for(i = 0; i < w; i++){\
@@ -210,35 +210,43 @@ static void OPNAME ## rv30_tpel16_hhvv_lowpass(uint8_t *dst, uint8_t *src, int d
 \
 
 #define RV30_MC(OPNAME, SIZE) \
-static void OPNAME ## rv30_tpel ## SIZE ## _mc10_c(uint8_t *dst, uint8_t *src, int stride){\
+static void OPNAME ## rv30_tpel ## SIZE ## _mc10_c(uint8_t *dst, uint8_t *src, ptrdiff_t stride)\
+{\
     OPNAME ## rv30_tpel ## SIZE ## _h_lowpass(dst, src, stride, stride, 12, 6);\
 }\
 \
-static void OPNAME ## rv30_tpel ## SIZE ## _mc20_c(uint8_t *dst, uint8_t *src, int stride){\
+static void OPNAME ## rv30_tpel ## SIZE ## _mc20_c(uint8_t *dst, uint8_t *src, ptrdiff_t stride)\
+{\
     OPNAME ## rv30_tpel ## SIZE ## _h_lowpass(dst, src, stride, stride, 6, 12);\
 }\
 \
-static void OPNAME ## rv30_tpel ## SIZE ## _mc01_c(uint8_t *dst, uint8_t *src, int stride){\
+static void OPNAME ## rv30_tpel ## SIZE ## _mc01_c(uint8_t *dst, uint8_t *src, ptrdiff_t stride)\
+{\
     OPNAME ## rv30_tpel ## SIZE ## _v_lowpass(dst, src, stride, stride, 12, 6);\
 }\
 \
-static void OPNAME ## rv30_tpel ## SIZE ## _mc02_c(uint8_t *dst, uint8_t *src, int stride){\
+static void OPNAME ## rv30_tpel ## SIZE ## _mc02_c(uint8_t *dst, uint8_t *src, ptrdiff_t stride)\
+{\
     OPNAME ## rv30_tpel ## SIZE ## _v_lowpass(dst, src, stride, stride, 6, 12);\
 }\
 \
-static void OPNAME ## rv30_tpel ## SIZE ## _mc11_c(uint8_t *dst, uint8_t *src, int stride){\
+static void OPNAME ## rv30_tpel ## SIZE ## _mc11_c(uint8_t *dst, uint8_t *src, ptrdiff_t stride)\
+{\
     OPNAME ## rv30_tpel ## SIZE ## _hv_lowpass(dst, src, stride, stride);\
 }\
 \
-static void OPNAME ## rv30_tpel ## SIZE ## _mc12_c(uint8_t *dst, uint8_t *src, int stride){\
+static void OPNAME ## rv30_tpel ## SIZE ## _mc12_c(uint8_t *dst, uint8_t *src, ptrdiff_t stride)\
+{\
     OPNAME ## rv30_tpel ## SIZE ## _hvv_lowpass(dst, src, stride, stride);\
 }\
 \
-static void OPNAME ## rv30_tpel ## SIZE ## _mc21_c(uint8_t *dst, uint8_t *src, int stride){\
+static void OPNAME ## rv30_tpel ## SIZE ## _mc21_c(uint8_t *dst, uint8_t *src, ptrdiff_t stride)\
+{\
     OPNAME ## rv30_tpel ## SIZE ## _hhv_lowpass(dst, src, stride, stride);\
 }\
 \
-static void OPNAME ## rv30_tpel ## SIZE ## _mc22_c(uint8_t *dst, uint8_t *src, int stride){\
+static void OPNAME ## rv30_tpel ## SIZE ## _mc22_c(uint8_t *dst, uint8_t *src, ptrdiff_t stride)\
+{\
     OPNAME ## rv30_tpel ## SIZE ## _hhvv_lowpass(dst, src, stride, stride);\
 }\
 \

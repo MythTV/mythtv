@@ -30,6 +30,7 @@
  */
 
 #include "libavutil/channel_layout.h"
+#include "libavutil/internal.h"
 #include "libavutil/intreadwrite.h"
 #include "avformat.h"
 #include "internal.h"
@@ -126,7 +127,7 @@ static int str_probe(AVProbeData *p)
     }
     /* MPEG files (like those ripped from VCDs) can also look like this;
      * only return half certainty */
-    if(vid+aud > 3)  return 50;
+    if(vid+aud > 3)  return AVPROBE_SCORE_EXTENSION;
     else if(vid+aud) return 1;
     else             return 0;
 }
@@ -220,6 +221,7 @@ static int str_read_packet(AVFormatContext *s,
                     av_free_packet(pkt);
                     if (av_new_packet(pkt, sector_count*VIDEO_DATA_CHUNK_SIZE))
                         return AVERROR(EIO);
+                    memset(pkt->data, 0, sector_count*VIDEO_DATA_CHUNK_SIZE);
 
                     pkt->pos= avio_tell(pb) - RAW_CD_SECTOR_SIZE;
                     pkt->stream_index =
@@ -235,6 +237,12 @@ static int str_read_packet(AVFormatContext *s,
                     *ret_pkt = *pkt;
                     pkt->data= NULL;
                     pkt->size= -1;
+                    pkt->buf = NULL;
+#if FF_API_DESTRUCT_PACKET
+FF_DISABLE_DEPRECATION_WARNINGS
+                    pkt->destruct = NULL;
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
                     return 0;
                 }
 

@@ -85,14 +85,15 @@ static int rtmp_http_send_cmd(URLContext *h, const char *cmd)
 static int rtmp_http_write(URLContext *h, const uint8_t *buf, int size)
 {
     RTMP_HTTPContext *rt = h->priv_data;
-    void *ptr;
 
     if (rt->out_size + size > rt->out_capacity) {
+        int err;
         rt->out_capacity = (rt->out_size + size) * 2;
-        ptr = av_realloc(rt->out_data, rt->out_capacity);
-        if (!ptr)
-            return AVERROR(ENOMEM);
-        rt->out_data = ptr;
+        if ((err = av_reallocp(&rt->out_data, rt->out_capacity)) < 0) {
+            rt->out_size = 0;
+            rt->out_capacity = 0;
+            return err;
+        }
     }
 
     memcpy(rt->out_data + rt->out_size, buf, size);
@@ -112,7 +113,7 @@ static int rtmp_http_read(URLContext *h, uint8_t *buf, int size)
         if (ret < 0 && ret != AVERROR_EOF)
             return ret;
 
-        if (ret == AVERROR_EOF) {
+        if (!ret || ret == AVERROR_EOF) {
             if (rt->finishing) {
                 /* Do not send new requests when the client wants to
                  * close the connection. */
@@ -226,7 +227,7 @@ static int rtmp_http_open(URLContext *h, const char *uri, int flags)
     /* read the server reply which contains a unique ID */
     for (;;) {
         ret = ffurl_read(rt->stream, rt->client_id + off, sizeof(rt->client_id) - off);
-        if (ret == AVERROR_EOF)
+        if (!ret || ret == AVERROR_EOF)
             break;
         if (ret < 0)
             goto fail;

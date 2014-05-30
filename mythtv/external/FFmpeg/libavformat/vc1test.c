@@ -39,7 +39,7 @@ static int vc1t_probe(AVProbeData *p)
     if (p->buf[3] != 0xC5 || AV_RL32(&p->buf[4]) != 4 || AV_RL32(&p->buf[20]) != 0xC)
         return 0;
 
-    return AVPROBE_SCORE_MAX/2;
+    return AVPROBE_SCORE_EXTENSION;
 }
 
 static int vc1t_read_header(AVFormatContext *s)
@@ -61,9 +61,8 @@ static int vc1t_read_header(AVFormatContext *s)
     st->codec->codec_type = AVMEDIA_TYPE_VIDEO;
     st->codec->codec_id = AV_CODEC_ID_WMV3;
 
-    st->codec->extradata = av_malloc(VC1_EXTRADATA_SIZE);
-    st->codec->extradata_size = VC1_EXTRADATA_SIZE;
-    avio_read(pb, st->codec->extradata, VC1_EXTRADATA_SIZE);
+    if (ff_get_extradata(st->codec, pb, VC1_EXTRADATA_SIZE) < 0)
+        return AVERROR(ENOMEM);
     st->codec->height = avio_rl32(pb);
     st->codec->width = avio_rl32(pb);
     if(avio_rl32(pb) != 0xC)

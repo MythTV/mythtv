@@ -97,9 +97,6 @@ static int aac_encode_close(AVCodecContext *avctx)
 
     if (s->handle)
         aacEncClose(&s->handle);
-#if FF_API_OLD_ENCODE_AUDIO
-    av_freep(&avctx->coded_frame);
-#endif
     av_freep(&avctx->extradata);
     ff_af_queue_close(&s->afq);
 
@@ -154,6 +151,20 @@ static av_cold int aac_encode_init(AVCodecContext *avctx)
     case 4: mode = MODE_1_2_1;   sce = 2; cpe = 1; break;
     case 5: mode = MODE_1_2_2;   sce = 1; cpe = 2; break;
     case 6: mode = MODE_1_2_2_1; sce = 2; cpe = 2; break;
+/* The version macro is introduced the same time as the 7.1 support, so this
+   should suffice. */
+#ifdef AACENCODER_LIB_VL0
+    case 8:
+        sce = 2;
+        cpe = 3;
+        if (avctx->channel_layout == AV_CH_LAYOUT_7POINT1) {
+            mode = MODE_7_1_REAR_SURROUND;
+        } else {
+            // MODE_1_2_2_2_1 and MODE_7_1_FRONT_CENTER use the same channel layout
+            mode = MODE_7_1_FRONT_CENTER;
+        }
+        break;
+#endif
     default:
         av_log(avctx, AV_LOG_ERROR,
                "Unsupported number of channels %d\n", avctx->channels);
@@ -200,6 +211,7 @@ static av_cold int aac_encode_init(AVCodecContext *avctx)
             avctx->bit_rate = (96*sce + 128*cpe) * avctx->sample_rate / 44;
             if (avctx->profile == FF_PROFILE_AAC_HE ||
                 avctx->profile == FF_PROFILE_AAC_HE_V2 ||
+                avctx->profile == FF_PROFILE_MPEG2_AAC_HE ||
                 s->eld_sbr)
                 avctx->bit_rate /= 2;
         }
@@ -275,13 +287,6 @@ static av_cold int aac_encode_init(AVCodecContext *avctx)
         goto error;
     }
 
-#if FF_API_OLD_ENCODE_AUDIO
-    avctx->coded_frame = avcodec_alloc_frame();
-    if (!avctx->coded_frame) {
-        ret = AVERROR(ENOMEM);
-        goto error;
-    }
-#endif
     avctx->frame_size = info.frameLength;
     avctx->delay      = info.encoderDelay;
     ff_af_queue_init(avctx, &s->afq);
@@ -393,6 +398,10 @@ static const uint64_t aac_channel_layout[] = {
     AV_CH_LAYOUT_4POINT0,
     AV_CH_LAYOUT_5POINT0_BACK,
     AV_CH_LAYOUT_5POINT1_BACK,
+#ifdef AACENCODER_LIB_VL0
+    AV_CH_LAYOUT_7POINT1_WIDE_BACK,
+    AV_CH_LAYOUT_7POINT1,
+#endif
     0,
 };
 
@@ -403,6 +412,7 @@ static const int aac_sample_rates[] = {
 
 AVCodec ff_libfdk_aac_encoder = {
     .name                  = "libfdk_aac",
+    .long_name             = NULL_IF_CONFIG_SMALL("Fraunhofer FDK AAC"),
     .type                  = AVMEDIA_TYPE_AUDIO,
     .id                    = AV_CODEC_ID_AAC,
     .priv_data_size        = sizeof(AACContext),
@@ -412,7 +422,6 @@ AVCodec ff_libfdk_aac_encoder = {
     .capabilities          = CODEC_CAP_SMALL_LAST_FRAME | CODEC_CAP_DELAY,
     .sample_fmts           = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_S16,
                                                             AV_SAMPLE_FMT_NONE },
-    .long_name             = NULL_IF_CONFIG_SMALL("Fraunhofer FDK AAC"),
     .priv_class            = &aac_enc_class,
     .defaults              = aac_encode_defaults,
     .profiles              = profiles,

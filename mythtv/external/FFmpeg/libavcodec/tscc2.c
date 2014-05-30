@@ -28,11 +28,12 @@
 #include "avcodec.h"
 #include "get_bits.h"
 #include "bytestream.h"
+#include "internal.h"
 #include "tscc2data.h"
 
 typedef struct TSCC2Context {
     AVCodecContext *avctx;
-    AVFrame        pic;
+    AVFrame       *pic;
     int            mb_width, mb_height;
     uint8_t        *slice_quants;
     int            quant[2];
@@ -191,7 +192,8 @@ static int tscc2_decode_slice(TSCC2Context *c, int mb_y,
     int i, mb_x, q, ret;
     int off;
 
-    init_get_bits(&c->gb, buf, buf_size * 8);
+    if ((ret = init_get_bits8(&c->gb, buf, buf_size)) < 0)
+        return ret;
 
     for (mb_x = 0; mb_x < c->mb_width; mb_x++) {
         q = c->slice_quants[mb_x + c->mb_width * mb_y];
@@ -199,9 +201,9 @@ static int tscc2_decode_slice(TSCC2Context *c, int mb_y,
         if (q == 0 || q == 3) // skip block
             continue;
         for (i = 0; i < 3; i++) {
-            off = mb_x * 16 + mb_y * 8 * c->pic.linesize[i];
+            off = mb_x * 16 + mb_y * 8 * c->pic->linesize[i];
             ret = tscc2_decode_mb(c, c->q[q - 1], c->quant[q - 1] - 2,
-                                  c->pic.data[i] + off, c->pic.linesize[i], i);
+                                  c->pic->data[i] + off, c->pic->linesize[i], i);
             if (ret)
                 return ret;
         }
@@ -229,17 +231,14 @@ static int tscc2_decode_frame(AVCodecContext *avctx, void *data,
         return AVERROR_INVALIDDATA;
     }
 
-    c->pic.reference    = 3;
-    c->pic.buffer_hints = FF_BUFFER_HINTS_VALID | FF_BUFFER_HINTS_PRESERVE |
-                          FF_BUFFER_HINTS_REUSABLE;
-    if ((ret = avctx->reget_buffer(avctx, &c->pic)) < 0) {
-        av_log(avctx, AV_LOG_ERROR, "reget_buffer() failed\n");
+    if ((ret = ff_reget_buffer(avctx, c->pic)) < 0) {
         return ret;
     }
 
     if (frame_type == 0) {
         *got_frame      = 1;
-        *(AVFrame*)data = c->pic;
+        if ((ret = av_frame_ref(data, c->pic)) < 0)
+            return ret;
 
         return buf_size;
     }
@@ -323,10 +322,22 @@ static int tscc2_decode_frame(AVCodecContext *avctx, void *data,
     }
 
     *got_frame      = 1;
-    *(AVFrame*)data = c->pic;
+    if ((ret = av_frame_ref(data, c->pic)) < 0)
+        return ret;
 
     /* always report that the buffer was completely consumed */
     return buf_size;
+}
+
+static av_cold int tscc2_decode_end(AVCodecContext *avctx)
+{
+    TSCC2Context * const c = avctx->priv_data;
+
+    av_frame_free(&c->pic);
+    av_freep(&c->slice_quants);
+    free_vlcs(c);
+
+    return 0;
 }
 
 static av_cold int tscc2_decode_init(AVCodecContext *avctx)
@@ -352,25 +363,18 @@ static av_cold int tscc2_decode_init(AVCodecContext *avctx)
         return AVERROR(ENOMEM);
     }
 
-    avctx->coded_frame = &c->pic;
-
-    return 0;
-}
-
-static av_cold int tscc2_decode_end(AVCodecContext *avctx)
-{
-    TSCC2Context * const c = avctx->priv_data;
-
-    if (c->pic.data[0])
-        avctx->release_buffer(avctx, &c->pic);
-    av_freep(&c->slice_quants);
-    free_vlcs(c);
+    c->pic = av_frame_alloc();
+    if (!c->pic) {
+        tscc2_decode_end(avctx);
+        return AVERROR(ENOMEM);
+    }
 
     return 0;
 }
 
 AVCodec ff_tscc2_decoder = {
     .name           = "tscc2",
+    .long_name      = NULL_IF_CONFIG_SMALL("TechSmith Screen Codec 2"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_TSCC2,
     .priv_data_size = sizeof(TSCC2Context),
@@ -378,5 +382,4 @@ AVCodec ff_tscc2_decoder = {
     .close          = tscc2_decode_end,
     .decode         = tscc2_decode_frame,
     .capabilities   = CODEC_CAP_DR1,
-    .long_name      = NULL_IF_CONFIG_SMALL("TechSmith Screen Codec 2"),
 };

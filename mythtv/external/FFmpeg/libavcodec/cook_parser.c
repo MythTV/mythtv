@@ -1,20 +1,20 @@
 /*
  * Copyright (c) 2012 Justin Ruggles <justin.ruggles@gmail.com>
  *
- * This file is part of Libav.
+ * This file is part of FFmpeg.
  *
- * Libav is free software; you can redistribute it and/or
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
  *
- * Libav is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with Libav; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -40,10 +40,11 @@ static int cook_parse(AVCodecParserContext *s1, AVCodecContext *avctx,
 {
     CookParseContext *s = s1->priv_data;
 
-    if (s->duration)
-        s1->duration = s->duration;
-    else if (avctx->extradata && avctx->extradata_size >= 8 && avctx->channels)
+    if (!s->duration &&
+                avctx->extradata && avctx->extradata_size >= 8 && avctx->channels)
         s->duration = AV_RB16(avctx->extradata + 4) / avctx->channels;
+
+    s1->duration = s->duration;
 
     /* always return the full packet. this parser isn't doing any splitting or
        combining, only setting packet duration */

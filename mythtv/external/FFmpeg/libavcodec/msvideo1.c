@@ -34,6 +34,7 @@
 #include "libavutil/internal.h"
 #include "libavutil/intreadwrite.h"
 #include "avcodec.h"
+#include "internal.h"
 
 #define PALETTE_COUNT 256
 #define CHECK_STREAM_PTR(n) \
@@ -46,7 +47,7 @@
 typedef struct Msvideo1Context {
 
     AVCodecContext *avctx;
-    AVFrame frame;
+    AVFrame *frame;
 
     const unsigned char *buf;
     int size;
@@ -66,13 +67,16 @@ static av_cold int msvideo1_decode_init(AVCodecContext *avctx)
     if (s->avctx->bits_per_coded_sample == 8) {
         s->mode_8bit = 1;
         avctx->pix_fmt = AV_PIX_FMT_PAL8;
+        if (avctx->extradata_size >= AVPALETTE_SIZE)
+            memcpy(s->pal, avctx->extradata, AVPALETTE_SIZE);
     } else {
         s->mode_8bit = 0;
         avctx->pix_fmt = AV_PIX_FMT_RGB555;
     }
 
-    avcodec_get_frame_defaults(&s->frame);
-    s->frame.data[0] = NULL;
+    s->frame = av_frame_alloc();
+    if (!s->frame)
+        return AVERROR(ENOMEM);
 
     return 0;
 }
@@ -93,8 +97,8 @@ static void msvideo1_decode_8bit(Msvideo1Context *s)
     unsigned short flags;
     int skip_blocks;
     unsigned char colors[8];
-    unsigned char *pixels = s->frame.data[0];
-    int stride = s->frame.linesize[0];
+    unsigned char *pixels = s->frame->data[0];
+    int stride = s->frame->linesize[0];
 
     stream_ptr = 0;
     skip_blocks = 0;
@@ -174,7 +178,7 @@ static void msvideo1_decode_8bit(Msvideo1Context *s)
 
     /* make the palette available on the way out */
     if (s->avctx->pix_fmt == AV_PIX_FMT_PAL8)
-        memcpy(s->frame.data[1], s->pal, AVPALETTE_SIZE);
+        memcpy(s->frame->data[1], s->pal, AVPALETTE_SIZE);
 }
 
 static void msvideo1_decode_16bit(Msvideo1Context *s)
@@ -193,8 +197,8 @@ static void msvideo1_decode_16bit(Msvideo1Context *s)
     unsigned short flags;
     int skip_blocks;
     unsigned short colors[8];
-    unsigned short *pixels = (unsigned short *)s->frame.data[0];
-    int stride = s->frame.linesize[0] / 2;
+    unsigned short *pixels = (unsigned short *)s->frame->data[0];
+    int stride = s->frame->linesize[0] / 2;
 
     stream_ptr = 0;
     skip_blocks = 0;
@@ -293,23 +297,20 @@ static int msvideo1_decode_frame(AVCodecContext *avctx,
     const uint8_t *buf = avpkt->data;
     int buf_size = avpkt->size;
     Msvideo1Context *s = avctx->priv_data;
+    int ret;
 
     s->buf = buf;
     s->size = buf_size;
 
-    s->frame.reference = 3;
-    s->frame.buffer_hints = FF_BUFFER_HINTS_VALID | FF_BUFFER_HINTS_PRESERVE | FF_BUFFER_HINTS_REUSABLE;
-    if (avctx->reget_buffer(avctx, &s->frame)) {
-        av_log(s->avctx, AV_LOG_ERROR, "reget_buffer() failed\n");
-        return -1;
-    }
+    if ((ret = ff_reget_buffer(avctx, s->frame)) < 0)
+        return ret;
 
     if (s->mode_8bit) {
         const uint8_t *pal = av_packet_get_side_data(avpkt, AV_PKT_DATA_PALETTE, NULL);
 
         if (pal) {
             memcpy(s->pal, pal, AVPALETTE_SIZE);
-            s->frame.palette_has_changed = 1;
+            s->frame->palette_has_changed = 1;
         }
     }
 
@@ -318,8 +319,10 @@ static int msvideo1_decode_frame(AVCodecContext *avctx,
     else
         msvideo1_decode_16bit(s);
 
+    if ((ret = av_frame_ref(data, s->frame)) < 0)
+        return ret;
+
     *got_frame      = 1;
-    *(AVFrame*)data = s->frame;
 
     /* report that the buffer was completely consumed */
     return buf_size;
@@ -329,14 +332,14 @@ static av_cold int msvideo1_decode_end(AVCodecContext *avctx)
 {
     Msvideo1Context *s = avctx->priv_data;
 
-    if (s->frame.data[0])
-        avctx->release_buffer(avctx, &s->frame);
+    av_frame_free(&s->frame);
 
     return 0;
 }
 
 AVCodec ff_msvideo1_decoder = {
     .name           = "msvideo1",
+    .long_name      = NULL_IF_CONFIG_SMALL("Microsoft Video 1"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_MSVIDEO1,
     .priv_data_size = sizeof(Msvideo1Context),
@@ -344,5 +347,4 @@ AVCodec ff_msvideo1_decoder = {
     .close          = msvideo1_decode_end,
     .decode         = msvideo1_decode_frame,
     .capabilities   = CODEC_CAP_DR1,
-    .long_name      = NULL_IF_CONFIG_SMALL("Microsoft Video 1"),
 };

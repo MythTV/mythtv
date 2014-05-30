@@ -483,7 +483,6 @@ static av_cold int alac_encode_close(AVCodecContext *avctx)
     ff_lpc_end(&s->lpc_ctx);
     av_freep(&avctx->extradata);
     avctx->extradata_size = 0;
-    av_freep(&avctx->coded_frame);
     return 0;
 }
 
@@ -579,12 +578,6 @@ static av_cold int alac_encode_init(AVCodecContext *avctx)
         goto error;
     }
 
-    avctx->coded_frame = avcodec_alloc_frame();
-    if (!avctx->coded_frame) {
-        ret = AVERROR(ENOMEM);
-        goto error;
-    }
-
     s->avctx = avctx;
 
     if ((ret = ff_lpc_init(&s->lpc_ctx, avctx->frame_size,
@@ -641,6 +634,7 @@ static int alac_encode_frame(AVCodecContext *avctx, AVPacket *avpkt,
 
 AVCodec ff_alac_encoder = {
     .name           = "alac",
+    .long_name      = NULL_IF_CONFIG_SMALL("ALAC (Apple Lossless Audio Codec)"),
     .type           = AVMEDIA_TYPE_AUDIO,
     .id             = AV_CODEC_ID_ALAC,
     .priv_data_size = sizeof(AlacEncodeContext),
@@ -652,5 +646,4 @@ AVCodec ff_alac_encoder = {
     .sample_fmts    = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_S32P,
                                                      AV_SAMPLE_FMT_S16P,
                                                      AV_SAMPLE_FMT_NONE },
-    .long_name      = NULL_IF_CONFIG_SMALL("ALAC (Apple Lossless Audio Codec)"),
 };

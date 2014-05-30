@@ -22,9 +22,10 @@
 #include "libavutil/attributes.h"
 #include "libavutil/cpu.h"
 #include "libavutil/x86/asm.h"
+#include "libavutil/x86/cpu.h"
 #include "libavcodec/avcodec.h"
 #include "libavcodec/mpegvideo.h"
-#include "dsputil_mmx.h"
+#include "dsputil_x86.h"
 
 #if HAVE_MMX_INLINE
 
@@ -111,7 +112,7 @@ static void dct_unquantize_h263_inter_mmx(MpegEncContext *s,
     qmul = qscale << 1;
     qadd = (qscale - 1) | 1;
 
-    assert(s->block_last_index[n]>=0 || s->h263_aic);
+    av_assert2(s->block_last_index[n]>=0 || s->h263_aic);
 
     nCoeffs= s->inter_scantable.raster_end[ s->block_last_index[n] ];
 
@@ -164,28 +165,6 @@ __asm__ volatile(
         );
 }
 
-
-/*
-  We can suppose that result of two multiplications can't be greater than 0xFFFF
-  i.e. is 16-bit, so we use here only PMULLW instruction and can avoid
-  a complex multiplication.
-=====================================================
- Full formula for multiplication of 2 integer numbers
- which are represent as high:low words:
- input: value1 = high1:low1
-        value2 = high2:low2
- output: value3 = value1*value2
- value3=high3:low3 (on overflow: modulus 2^32 wrap-around)
- this mean that for 0x123456 * 0x123456 correct result is 0x766cb0ce4
- but this algorithm will compute only 0x66cb0ce4
- this limited by 16-bit size of operands
- ---------------------------------
- tlow1 = high1*low2
- tlow2 = high2*low1
- tlow1 = tlow1 + tlow2
- high3:low3 = low1*low2
- high3 += tlow1
-*/
 static void dct_unquantize_mpeg1_intra_mmx(MpegEncContext *s,
                                      int16_t *block, int n, int qscale)
 {
@@ -464,124 +443,14 @@ __asm__ volatile(
         );
 }
 
-static void  denoise_dct_mmx(MpegEncContext *s, int16_t *block){
-    const int intra= s->mb_intra;
-    int *sum= s->dct_error_sum[intra];
-    uint16_t *offset= s->dct_offset[intra];
-
-    s->dct_count[intra]++;
-
-    __asm__ volatile(
-        "pxor %%mm7, %%mm7                      \n\t"
-        "1:                                     \n\t"
-        "pxor %%mm0, %%mm0                      \n\t"
-        "pxor %%mm1, %%mm1                      \n\t"
-        "movq (%0), %%mm2                       \n\t"
-        "movq 8(%0), %%mm3                      \n\t"
-        "pcmpgtw %%mm2, %%mm0                   \n\t"
-        "pcmpgtw %%mm3, %%mm1                   \n\t"
-        "pxor %%mm0, %%mm2                      \n\t"
-        "pxor %%mm1, %%mm3                      \n\t"
-        "psubw %%mm0, %%mm2                     \n\t"
-        "psubw %%mm1, %%mm3                     \n\t"
-        "movq %%mm2, %%mm4                      \n\t"
-        "movq %%mm3, %%mm5                      \n\t"
-        "psubusw (%2), %%mm2                    \n\t"
-        "psubusw 8(%2), %%mm3                   \n\t"
-        "pxor %%mm0, %%mm2                      \n\t"
-        "pxor %%mm1, %%mm3                      \n\t"
-        "psubw %%mm0, %%mm2                     \n\t"
-        "psubw %%mm1, %%mm3                     \n\t"
-        "movq %%mm2, (%0)                       \n\t"
-        "movq %%mm3, 8(%0)                      \n\t"
-        "movq %%mm4, %%mm2                      \n\t"
-        "movq %%mm5, %%mm3                      \n\t"
-        "punpcklwd %%mm7, %%mm4                 \n\t"
-        "punpckhwd %%mm7, %%mm2                 \n\t"
-        "punpcklwd %%mm7, %%mm5                 \n\t"
-        "punpckhwd %%mm7, %%mm3                 \n\t"
-        "paddd (%1), %%mm4                      \n\t"
-        "paddd 8(%1), %%mm2                     \n\t"
-        "paddd 16(%1), %%mm5                    \n\t"
-        "paddd 24(%1), %%mm3                    \n\t"
-        "movq %%mm4, (%1)                       \n\t"
-        "movq %%mm2, 8(%1)                      \n\t"
-        "movq %%mm5, 16(%1)                     \n\t"
-        "movq %%mm3, 24(%1)                     \n\t"
-        "add $16, %0                            \n\t"
-        "add $32, %1                            \n\t"
-        "add $16, %2                            \n\t"
-        "cmp %3, %0                             \n\t"
-            " jb 1b                             \n\t"
-        : "+r" (block), "+r" (sum), "+r" (offset)
-        : "r"(block+64)
-    );
-}
-
-static void  denoise_dct_sse2(MpegEncContext *s, int16_t *block){
-    const int intra= s->mb_intra;
-    int *sum= s->dct_error_sum[intra];
-    uint16_t *offset= s->dct_offset[intra];
-
-    s->dct_count[intra]++;
-
-    __asm__ volatile(
-        "pxor %%xmm7, %%xmm7                    \n\t"
-        "1:                                     \n\t"
-        "pxor %%xmm0, %%xmm0                    \n\t"
-        "pxor %%xmm1, %%xmm1                    \n\t"
-        "movdqa (%0), %%xmm2                    \n\t"
-        "movdqa 16(%0), %%xmm3                  \n\t"
-        "pcmpgtw %%xmm2, %%xmm0                 \n\t"
-        "pcmpgtw %%xmm3, %%xmm1                 \n\t"
-        "pxor %%xmm0, %%xmm2                    \n\t"
-        "pxor %%xmm1, %%xmm3                    \n\t"
-        "psubw %%xmm0, %%xmm2                   \n\t"
-        "psubw %%xmm1, %%xmm3                   \n\t"
-        "movdqa %%xmm2, %%xmm4                  \n\t"
-        "movdqa %%xmm3, %%xmm5                  \n\t"
-        "psubusw (%2), %%xmm2                   \n\t"
-        "psubusw 16(%2), %%xmm3                 \n\t"
-        "pxor %%xmm0, %%xmm2                    \n\t"
-        "pxor %%xmm1, %%xmm3                    \n\t"
-        "psubw %%xmm0, %%xmm2                   \n\t"
-        "psubw %%xmm1, %%xmm3                   \n\t"
-        "movdqa %%xmm2, (%0)                    \n\t"
-        "movdqa %%xmm3, 16(%0)                  \n\t"
-        "movdqa %%xmm4, %%xmm6                  \n\t"
-        "movdqa %%xmm5, %%xmm0                  \n\t"
-        "punpcklwd %%xmm7, %%xmm4               \n\t"
-        "punpckhwd %%xmm7, %%xmm6               \n\t"
-        "punpcklwd %%xmm7, %%xmm5               \n\t"
-        "punpckhwd %%xmm7, %%xmm0               \n\t"
-        "paddd (%1), %%xmm4                     \n\t"
-        "paddd 16(%1), %%xmm6                   \n\t"
-        "paddd 32(%1), %%xmm5                   \n\t"
-        "paddd 48(%1), %%xmm0                   \n\t"
-        "movdqa %%xmm4, (%1)                    \n\t"
-        "movdqa %%xmm6, 16(%1)                  \n\t"
-        "movdqa %%xmm5, 32(%1)                  \n\t"
-        "movdqa %%xmm0, 48(%1)                  \n\t"
-        "add $32, %0                            \n\t"
-        "add $64, %1                            \n\t"
-        "add $32, %2                            \n\t"
-        "cmp %3, %0                             \n\t"
-            " jb 1b                             \n\t"
-        : "+r" (block), "+r" (sum), "+r" (offset)
-        : "r"(block+64)
-          XMM_CLOBBERS_ONLY("%xmm0", "%xmm1", "%xmm2", "%xmm3",
-                            "%xmm4", "%xmm5", "%xmm6", "%xmm7")
-    );
-}
-
 #endif /* HAVE_MMX_INLINE */
 
 av_cold void ff_MPV_common_init_x86(MpegEncContext *s)
 {
 #if HAVE_MMX_INLINE
-    int mm_flags = av_get_cpu_flags();
+    int cpu_flags = av_get_cpu_flags();
 
-    if (mm_flags & AV_CPU_FLAG_MMX) {
+    if (INLINE_MMX(cpu_flags)) {
         s->dct_unquantize_h263_intra = dct_unquantize_h263_intra_mmx;
         s->dct_unquantize_h263_inter = dct_unquantize_h263_inter_mmx;
         s->dct_unquantize_mpeg1_intra = dct_unquantize_mpeg1_intra_mmx;
@@ -589,12 +458,6 @@ av_cold void ff_MPV_common_init_x86(MpegEncContext *s)
         if(!(s->flags & CODEC_FLAG_BITEXACT))
             s->dct_unquantize_mpeg2_intra = dct_unquantize_mpeg2_intra_mmx;
         s->dct_unquantize_mpeg2_inter = dct_unquantize_mpeg2_inter_mmx;
-
-        if (mm_flags & AV_CPU_FLAG_SSE2) {
-            s->denoise_dct= denoise_dct_sse2;
-        } else {
-                s->denoise_dct= denoise_dct_mmx;
-        }
     }
 #endif /* HAVE_MMX_INLINE */
 }

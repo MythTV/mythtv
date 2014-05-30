@@ -413,7 +413,7 @@ uint32_t H264Parser::addBytes(const uint8_t  *bytes,
 
     while (startP < bytes + byte_count && !on_frame)
     {
-        endP = avpriv_mpv_find_start_code(startP,
+        endP = avpriv_find_start_code(startP,
                                   bytes + byte_count, &sync_accumulator);
 
         found_start_code = ((sync_accumulator & 0xffffff00) == 0x00000100);

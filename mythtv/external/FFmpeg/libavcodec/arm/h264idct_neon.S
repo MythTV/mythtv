@@ -113,8 +113,8 @@ function ff_h264_idct_add16_neon, export=1
         movne           lr,  #0
         cmp             lr,  #0
         ite             ne
-        adrne           lr,  ff_h264_idct_dc_add_neon + CONFIG_THUMB
-        adreq           lr,  ff_h264_idct_add_neon    + CONFIG_THUMB
+        adrne           lr,  X(ff_h264_idct_dc_add_neon) + CONFIG_THUMB
+        adreq           lr,  X(ff_h264_idct_add_neon)    + CONFIG_THUMB
         blx             lr
 2:      subs            ip,  ip,  #1
         add             r1,  r1,  #32
@@ -138,8 +138,8 @@ function ff_h264_idct_add16intra_neon, export=1
         cmp             r8,  #0
         ldrsh           r8,  [r1]
         iteet           ne
-        adrne           lr,  ff_h264_idct_add_neon    + CONFIG_THUMB
-        adreq           lr,  ff_h264_idct_dc_add_neon + CONFIG_THUMB
+        adrne           lr,  X(ff_h264_idct_add_neon)    + CONFIG_THUMB
+        adreq           lr,  X(ff_h264_idct_dc_add_neon) + CONFIG_THUMB
         cmpeq           r8,  #0
         blxne           lr
         subs            ip,  ip,  #1
@@ -166,8 +166,8 @@ function ff_h264_idct_add8_neon, export=1
         cmp             r8,  #0
         ldrsh           r8,  [r1]
         iteet           ne
-        adrne           lr,  ff_h264_idct_add_neon    + CONFIG_THUMB
-        adreq           lr,  ff_h264_idct_dc_add_neon + CONFIG_THUMB
+        adrne           lr,  X(ff_h264_idct_add_neon)    + CONFIG_THUMB
+        adreq           lr,  X(ff_h264_idct_dc_add_neon) + CONFIG_THUMB
         cmpeq           r8,  #0
         blxne           lr
         add             r12, r12, #1
@@ -187,8 +187,8 @@ endfunc
         vshr.s16        q2,  q10, #1
         vadd.i16        q0,  q8,  q12
         vld1.16         {q14-q15},[r1,:128]
-        vst1.16         {q7},     [r1,:128]!
-        vst1.16         {q7},     [r1,:128]!
+        vst1.16         {q3},     [r1,:128]!
+        vst1.16         {q3},     [r1,:128]!
         vsub.i16        q1,  q8,  q12
         vshr.s16        q3,  q14, #1
         vsub.i16        q2,  q2,  q14
@@ -267,16 +267,16 @@ endfunc
 .endm
 
 function ff_h264_idct8_add_neon, export=1
-        vmov.i16        q7,       #0
+        vmov.i16        q3,       #0
         vld1.16         {q8-q9},  [r1,:128]
-        vst1.16         {q7},     [r1,:128]!
-        vst1.16         {q7},     [r1,:128]!
+        vst1.16         {q3},     [r1,:128]!
+        vst1.16         {q3},     [r1,:128]!
         vld1.16         {q10-q11},[r1,:128]
-        vst1.16         {q7},     [r1,:128]!
-        vst1.16         {q7},     [r1,:128]!
+        vst1.16         {q3},     [r1,:128]!
+        vst1.16         {q3},     [r1,:128]!
         vld1.16         {q12-q13},[r1,:128]
-        vst1.16         {q7},     [r1,:128]!
-        vst1.16         {q7},     [r1,:128]!
+        vst1.16         {q3},     [r1,:128]!
+        vst1.16         {q3},     [r1,:128]!
 
         idct8x8_cols    0
         idct8x8_cols    1
@@ -388,8 +388,8 @@ function ff_h264_idct8_add4_neon, export=1
         movne           lr,  #0
         cmp             lr,  #0
         ite             ne
-        adrne           lr,  ff_h264_idct8_dc_add_neon + CONFIG_THUMB
-        adreq           lr,  ff_h264_idct8_add_neon    + CONFIG_THUMB
+        adrne           lr,  X(ff_h264_idct8_dc_add_neon) + CONFIG_THUMB
+        adreq           lr,  X(ff_h264_idct8_add_neon)    + CONFIG_THUMB
         blx             lr
 2:      subs            r12, r12, #4
         add             r1,  r1,  #128

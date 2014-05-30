@@ -240,7 +240,7 @@ static void eval_ir(const float *Az, int pitch_lag, float *freq,
     float tmp1[SUBFR_SIZE+1], tmp2[LP_FILTER_ORDER+1];
     int i;
 
-    tmp1[0] = 1.;
+    tmp1[0] = 1.0;
     for (i = 0; i < LP_FILTER_ORDER; i++) {
         tmp1[i+1] = Az[i] * ff_pow_0_55[i];
         tmp2[i  ] = Az[i] * ff_pow_0_7 [i];
@@ -543,10 +543,8 @@ static int sipr_decode_frame(AVCodecContext *avctx, void *data,
     /* get output buffer */
     frame->nb_samples = mode_par->frames_per_packet * subframe_size *
                         mode_par->subframe_count;
-    if ((ret = ff_get_buffer(avctx, frame)) < 0) {
-        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
+    if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
         return ret;
-    }
     samples = (float *)frame->data[0];
 
     init_get_bits(&gb, buf, mode_par->bits_per_frame);
@@ -566,11 +564,11 @@ static int sipr_decode_frame(AVCodecContext *avctx, void *data,
 
 AVCodec ff_sipr_decoder = {
     .name           = "sipr",
+    .long_name      = NULL_IF_CONFIG_SMALL("RealAudio SIPR / ACELP.NET"),
     .type           = AVMEDIA_TYPE_AUDIO,
     .id             = AV_CODEC_ID_SIPR,
     .priv_data_size = sizeof(SiprContext),
     .init           = sipr_decoder_init,
     .decode         = sipr_decode_frame,
     .capabilities   = CODEC_CAP_DR1,
-    .long_name      = NULL_IF_CONFIG_SMALL("RealAudio SIPR / ACELP.NET"),
 };

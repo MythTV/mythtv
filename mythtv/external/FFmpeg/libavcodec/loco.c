@@ -45,7 +45,6 @@ enum LOCO_MODE {
 
 typedef struct LOCOContext {
     AVCodecContext *avctx;
-    AVFrame pic;
     int lossy;
     int mode;
 } LOCOContext;
@@ -136,7 +135,7 @@ static int loco_decode_plane(LOCOContext *l, uint8_t *data, int width, int heigh
     if(buf_size<=0)
         return -1;
 
-    init_get_bits(&rc.gb, buf, buf_size*8);
+    init_get_bits8(&rc.gb, buf, buf_size);
     rc.save  = 0;
     rc.run   = 0;
     rc.run2  = 0;
@@ -176,17 +175,11 @@ static int decode_frame(AVCodecContext *avctx,
     LOCOContext * const l = avctx->priv_data;
     const uint8_t *buf    = avpkt->data;
     int buf_size          = avpkt->size;
-    AVFrame * const p     = &l->pic;
+    AVFrame * const p     = data;
     int decoded, ret;
 
-    if (p->data[0])
-        avctx->release_buffer(avctx, p);
-
-    p->reference = 0;
-    if ((ret = ff_get_buffer(avctx, p)) < 0) {
-        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
+    if ((ret = ff_get_buffer(avctx, p, 0)) < 0)
         return ret;
-    }
     p->key_frame = 1;
 
 #define ADVANCE_BY_DECODED do { \
@@ -247,7 +240,6 @@ static int decode_frame(AVCodecContext *avctx,
     buf_size -= decoded;
 
     *got_frame      = 1;
-    *(AVFrame*)data = l->pic;
 
     return avpkt->size - buf_size;
 buf_too_small:
@@ -276,7 +268,7 @@ static av_cold int decode_init(AVCodecContext *avctx)
         break;
     default:
         l->lossy = AV_RL32(avctx->extradata + 8);
-        av_log_ask_for_sample(avctx, "This is LOCO codec version %i.\n", version);
+        avpriv_request_sample(avctx, "LOCO codec version %i", version);
     }
 
     l->mode = AV_RL32(avctx->extradata + 4);
@@ -305,30 +297,16 @@ static av_cold int decode_init(AVCodecContext *avctx)
     if (avctx->debug & FF_DEBUG_PICT_INFO)
         av_log(avctx, AV_LOG_INFO, "lossy:%i, version:%i, mode: %i\n", l->lossy, version, l->mode);
 
-    avcodec_get_frame_defaults(&l->pic);
-
-    return 0;
-}
-
-static av_cold int decode_end(AVCodecContext *avctx)
-{
-    LOCOContext * const l = avctx->priv_data;
-    AVFrame *pic = &l->pic;
-
-    if (pic->data[0])
-        avctx->release_buffer(avctx, pic);
-
     return 0;
 }
 
 AVCodec ff_loco_decoder = {
     .name           = "loco",
+    .long_name      = NULL_IF_CONFIG_SMALL("LOCO"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_LOCO,
     .priv_data_size = sizeof(LOCOContext),
     .init           = decode_init,
-    .close          = decode_end,
     .decode         = decode_frame,
     .capabilities   = CODEC_CAP_DR1,
-    .long_name      = NULL_IF_CONFIG_SMALL("LOCO"),
 };

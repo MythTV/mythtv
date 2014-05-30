@@ -19,6 +19,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include <stdint.h>
+
+#include "libavutil/attributes.h"
 #include "libavutil/fifo.h"
 #include "libavutil/log.h"
 #include "libavutil/mathematics.h"
@@ -264,8 +267,7 @@ static int put_system_header(AVFormatContext *ctx, uint8_t *buf,int only_for_str
     flush_put_bits(&pb);
     size = put_bits_ptr(&pb) - pb.buf;
     /* patch packet size */
-    buf[4] = (size - 6) >> 8;
-    buf[5] = (size - 6) & 0xff;
+    AV_WB16(buf + 4, size - 6);
 
     return size;
 }
@@ -293,7 +295,7 @@ static int get_system_header_size(AVFormatContext *ctx)
     return buf_index;
 }
 
-static int mpeg_mux_init(AVFormatContext *ctx)
+static av_cold int mpeg_mux_init(AVFormatContext *ctx)
 {
     MpegMuxContext *s = ctx->priv_data;
     int bitrate, i, mpa_id, mpv_id, mps_id, ac3_id, dts_id, lpcm_id, j;
@@ -320,7 +322,7 @@ static int mpeg_mux_init(AVFormatContext *ctx)
     } else
         s->packet_size = 2048;
     if (ctx->max_delay < 0) /* Not set by the caller */
-        ctx->max_delay = 0;
+        ctx->max_delay = 0.7*AV_TIME_BASE;
 
     s->vcd_padding_bytes_written = 0;
     s->vcd_padding_bitrate=0;
@@ -344,6 +346,15 @@ static int mpeg_mux_init(AVFormatContext *ctx)
 
         switch(st->codec->codec_type) {
         case AVMEDIA_TYPE_AUDIO:
+            if (!s->is_mpeg2 &&
+                (st->codec->codec_id == AV_CODEC_ID_AC3 ||
+                 st->codec->codec_id == AV_CODEC_ID_DTS ||
+                 st->codec->codec_id == AV_CODEC_ID_PCM_S16BE))
+                 av_log(ctx, AV_LOG_WARNING,
+                        "%s in MPEG-1 system streams is not widely supported, "
+                        "consider using the vob or the dvd muxer "
+                        "to force a MPEG-2 program stream.\n",
+                        avcodec_get_name(st->codec->codec_id));
             if        (st->codec->codec_id == AV_CODEC_ID_AC3) {
                 stream->id = ac3_id++;
             } else if (st->codec->codec_id == AV_CODEC_ID_DTS) {
@@ -378,6 +389,10 @@ static int mpeg_mux_init(AVFormatContext *ctx)
             else {
                 av_log(ctx, AV_LOG_WARNING, "VBV buffer size not set, muxing may fail\n");
                 stream->max_buffer_size = 230*1024; //FIXME this is probably too small as default
+            }
+            if (stream->max_buffer_size > 1024 * 8191) {
+                av_log(ctx, AV_LOG_WARNING, "buffer size %d, too large\n", stream->max_buffer_size);
+                stream->max_buffer_size = 1024 * 8191;
             }
             s->video_bound++;
             break;
@@ -424,6 +439,10 @@ static int mpeg_mux_init(AVFormatContext *ctx)
         bitrate += bitrate / 20;
         bitrate += 10000;
         s->mux_rate = (bitrate + (8 * 50) - 1) / (8 * 50);
+        if (s->mux_rate >= (1<<22)) {
+            av_log(ctx, AV_LOG_WARNING, "mux rate %d is too large\n", s->mux_rate);
+            s->mux_rate = (1<<22) - 1;
+        }
     }
 
     if (s->is_vcd) {
@@ -905,7 +924,7 @@ static int remove_decoded_packets(AVFormatContext *ctx, int64_t scr){
             if(stream->buffer_index < pkt_desc->size ||
                stream->predecode_packet == stream->premux_packet){
                 av_log(ctx, AV_LOG_ERROR,
-                       "buffer underflow i=%d bufi=%d size=%d\n",
+                       "buffer underflow st=%d bufi=%d size=%d\n",
                        i, stream->buffer_index, pkt_desc->size);
                 break;
             }
@@ -947,14 +966,16 @@ retry:
             return 0;
         if(avail_data==0)
             continue;
-        assert(avail_data>0);
+        av_assert0(avail_data>0);
 
         if(space < s->packet_size && !ignore_constraints)
             continue;
 
         if(next_pkt && next_pkt->dts - scr > max_delay)
             continue;
-
+        if (   stream->predecode_packet
+            && stream->predecode_packet->size > stream->buffer_index)
+            rel_space += 1<<28;
         if(rel_space > best_score){
             best_score= rel_space;
             best_i = i;
@@ -1144,7 +1165,7 @@ static int mpeg_mux_end(AVFormatContext *ctx)
 #define OFFSET(x) offsetof(MpegMuxContext, x)
 #define E AV_OPT_FLAG_ENCODING_PARAM
 static const AVOption options[] = {
-    { "muxrate", NULL, OFFSET(user_mux_rate), AV_OPT_TYPE_INT, {.i64 = 0}, 0, INT_MAX, E },
+    { "muxrate", NULL, OFFSET(user_mux_rate), AV_OPT_TYPE_INT, {.i64 = 0}, 0, ((1<<22) - 1) * (8 * 50), E },
     { "preload", "Initial demux-decode delay in microseconds.", OFFSET(preload),  AV_OPT_TYPE_INT, {.i64 = 500000}, 0, INT_MAX, E},
     { NULL },
 };

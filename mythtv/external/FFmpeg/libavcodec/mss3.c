@@ -27,6 +27,7 @@
 #include "avcodec.h"
 #include "bytestream.h"
 #include "dsputil.h"
+#include "internal.h"
 #include "mss34dsp.h"
 
 #define HEADER_SIZE 27
@@ -107,7 +108,7 @@ typedef struct HaarBlockCoder {
 
 typedef struct MSS3Context {
     AVCodecContext   *avctx;
-    AVFrame          pic;
+    AVFrame          *pic;
 
     int              got_error;
     RangeCoder       coder;
@@ -730,18 +731,14 @@ static int mss3_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
         return buf_size;
     c->got_error = 0;
 
-    c->pic.reference    = 3;
-    c->pic.buffer_hints = FF_BUFFER_HINTS_VALID | FF_BUFFER_HINTS_PRESERVE |
-                          FF_BUFFER_HINTS_REUSABLE;
-    if ((ret = avctx->reget_buffer(avctx, &c->pic)) < 0) {
-        av_log(avctx, AV_LOG_ERROR, "reget_buffer() failed\n");
+    if ((ret = ff_reget_buffer(avctx, c->pic)) < 0)
         return ret;
-    }
-    c->pic.key_frame = keyframe;
-    c->pic.pict_type = keyframe ? AV_PICTURE_TYPE_I : AV_PICTURE_TYPE_P;
+    c->pic->key_frame = keyframe;
+    c->pic->pict_type = keyframe ? AV_PICTURE_TYPE_I : AV_PICTURE_TYPE_P;
     if (!bytestream2_get_bytes_left(&gb)) {
+        if ((ret = av_frame_ref(data, c->pic)) < 0)
+            return ret;
         *got_frame      = 1;
-        *(AVFrame*)data = c->pic;
 
         return buf_size;
     }
@@ -752,9 +749,9 @@ static int mss3_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
 
     mb_width  = dec_width  >> 4;
     mb_height = dec_height >> 4;
-    dst[0] = c->pic.data[0] + dec_x     +  dec_y      * c->pic.linesize[0];
-    dst[1] = c->pic.data[1] + dec_x / 2 + (dec_y / 2) * c->pic.linesize[1];
-    dst[2] = c->pic.data[2] + dec_x / 2 + (dec_y / 2) * c->pic.linesize[2];
+    dst[0] = c->pic->data[0] + dec_x     +  dec_y      * c->pic->linesize[0];
+    dst[1] = c->pic->data[1] + dec_x / 2 + (dec_y / 2) * c->pic->linesize[1];
+    dst[2] = c->pic->data[2] + dec_x / 2 + (dec_y / 2) * c->pic->linesize[2];
     for (y = 0; y < mb_height; y++) {
         for (x = 0; x < mb_width; x++) {
             for (i = 0; i < 3; i++) {
@@ -765,23 +762,23 @@ static int mss3_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
                 case FILL_BLOCK:
                     decode_fill_block(acoder, c->fill_coder + i,
                                       dst[i] + x * blk_size,
-                                      c->pic.linesize[i], blk_size);
+                                      c->pic->linesize[i], blk_size);
                     break;
                 case IMAGE_BLOCK:
                     decode_image_block(acoder, c->image_coder + i,
                                        dst[i] + x * blk_size,
-                                       c->pic.linesize[i], blk_size);
+                                       c->pic->linesize[i], blk_size);
                     break;
                 case DCT_BLOCK:
                     decode_dct_block(acoder, c->dct_coder + i,
                                      dst[i] + x * blk_size,
-                                     c->pic.linesize[i], blk_size,
+                                     c->pic->linesize[i], blk_size,
                                      c->dctblock, x, y);
                     break;
                 case HAAR_BLOCK:
                     decode_haar_block(acoder, c->haar_coder + i,
                                       dst[i] + x * blk_size,
-                                      c->pic.linesize[i], blk_size,
+                                      c->pic->linesize[i], blk_size,
                                       c->hblock);
                     break;
                 }
@@ -793,15 +790,29 @@ static int mss3_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
                 }
             }
         }
-        dst[0] += c->pic.linesize[0] * 16;
-        dst[1] += c->pic.linesize[1] * 8;
-        dst[2] += c->pic.linesize[2] * 8;
+        dst[0] += c->pic->linesize[0] * 16;
+        dst[1] += c->pic->linesize[1] * 8;
+        dst[2] += c->pic->linesize[2] * 8;
     }
 
+    if ((ret = av_frame_ref(data, c->pic)) < 0)
+        return ret;
+
     *got_frame      = 1;
-    *(AVFrame*)data = c->pic;
 
     return buf_size;
+}
+
+static av_cold int mss3_decode_end(AVCodecContext *avctx)
+{
+    MSS3Context * const c = avctx->priv_data;
+    int i;
+
+    av_frame_free(&c->pic);
+    for (i = 0; i < 3; i++)
+        av_freep(&c->dct_coder[i].prev_dc);
+
+    return 0;
 }
 
 static av_cold int mss3_decode_init(AVCodecContext *avctx)
@@ -827,6 +838,7 @@ static av_cold int mss3_decode_init(AVCodecContext *avctx)
                                             b_width * b_height);
         if (!c->dct_coder[i].prev_dc) {
             av_log(avctx, AV_LOG_ERROR, "Cannot allocate buffer\n");
+            av_frame_free(&c->pic);
             while (i >= 0) {
                 av_freep(&c->dct_coder[i].prev_dc);
                 i--;
@@ -835,29 +847,22 @@ static av_cold int mss3_decode_init(AVCodecContext *avctx)
         }
     }
 
+    c->pic = av_frame_alloc();
+    if (!c->pic) {
+        mss3_decode_end(avctx);
+        return AVERROR(ENOMEM);
+    }
+
     avctx->pix_fmt     = AV_PIX_FMT_YUV420P;
-    avctx->coded_frame = &c->pic;
 
     init_coders(c);
 
     return 0;
 }
 
-static av_cold int mss3_decode_end(AVCodecContext *avctx)
-{
-    MSS3Context * const c = avctx->priv_data;
-    int i;
-
-    if (c->pic.data[0])
-        avctx->release_buffer(avctx, &c->pic);
-    for (i = 0; i < 3; i++)
-        av_freep(&c->dct_coder[i].prev_dc);
-
-    return 0;
-}
-
 AVCodec ff_msa1_decoder = {
     .name           = "msa1",
+    .long_name      = NULL_IF_CONFIG_SMALL("MS ATC Screen"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_MSA1,
     .priv_data_size = sizeof(MSS3Context),
@@ -865,5 +870,4 @@ AVCodec ff_msa1_decoder = {
     .close          = mss3_decode_end,
     .decode         = mss3_decode_frame,
     .capabilities   = CODEC_CAP_DR1,
-    .long_name      = NULL_IF_CONFIG_SMALL("MS ATC Screen"),
 };

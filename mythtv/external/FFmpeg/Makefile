@@ -8,30 +8,34 @@ vpath %.cpp  $(SRC_DIR)
 vpath %.h    $(SRC_DIR)
 vpath %.S    $(SRC_DIR)
 vpath %.asm  $(SRC_DIR)
+vpath %.rc   $(SRC_DIR)
 vpath %.v    $(SRC_DIR)
 vpath %.texi $(SRC_DIR)
 vpath %/fate_config.sh.template $(SRC_DIR)
 
-PROGS-$(CONFIG_FFMPEG)   += ffmpeg
-PROGS-$(CONFIG_FFPLAY)   += ffplay
-PROGS-$(CONFIG_FFPROBE)  += ffprobe
-PROGS-$(CONFIG_FFSERVER) += ffserver
+AVPROGS-$(CONFIG_FFMPEG)   += ffmpeg
+AVPROGS-$(CONFIG_FFPLAY)   += ffplay
+AVPROGS-$(CONFIG_FFPROBE)  += ffprobe
+AVPROGS-$(CONFIG_FFSERVER) += ffserver
 
-PROGS      := $(PROGS-yes:%=%$(PROGSSUF)$(EXESUF))
-INSTPROGS   = $(PROGS-yes:%=%$(PROGSSUF)$(EXESUF))
+AVPROGS    := $(AVPROGS-yes:%=%$(PROGSSUF)$(EXESUF))
+INSTPROGS   = $(AVPROGS-yes:%=%$(PROGSSUF)$(EXESUF))
+PROGS      += $(AVPROGS)
 
-OBJS        = cmdutils.o $(EXEOBJS)
-OBJS-ffmpeg = ffmpeg_opt.o ffmpeg_filter.o
-TESTTOOLS   = audiogen videogen rotozoom tiny_psnr base64
+AVBASENAMES  = ffmpeg ffplay ffprobe ffserver
+ALLAVPROGS   = $(AVBASENAMES:%=%$(PROGSSUF)$(EXESUF))
+ALLAVPROGS_G = $(AVBASENAMES:%=%$(PROGSSUF)_g$(EXESUF))
+
+$(foreach prog,$(AVBASENAMES),$(eval OBJS-$(prog) += cmdutils.o))
+$(foreach prog,$(AVBASENAMES),$(eval OBJS-$(prog)-$(CONFIG_OPENCL) += cmdutils_opencl.o))
+
+OBJS-ffmpeg                   += ffmpeg_opt.o ffmpeg_filter.o
+OBJS-ffmpeg-$(HAVE_VDPAU_X11) += ffmpeg_vdpau.o
+TESTTOOLS   = audiogen videogen rotozoom tiny_psnr tiny_ssim base64
 HOSTPROGS  := $(TESTTOOLS:%=tests/%) doc/print_options
-TOOLS       = qt-faststart trasher
+TOOLS       = qt-faststart trasher uncoded_frame
 TOOLS-$(CONFIG_ZLIB) += cws2fws
 MYTHPROGS   = $(addprefix myth, ${PROGS})
-
-BASENAMES   = ffmpeg ffplay ffprobe ffserver
-ALLPROGS    = $(BASENAMES:%=%$(PROGSSUF)$(EXESUF))
-ALLPROGS_G  = $(BASENAMES:%=%$(PROGSSUF)_g$(EXESUF))
-ALLMANPAGES = $(BASENAMES:%=%.1)
 
 FFLIBS-$(CONFIG_AVDEVICE) += avdevice
 FFLIBS-$(CONFIG_AVFILTER) += avfilter
@@ -47,23 +51,21 @@ FFLIBS := avutil
 DATA_FILES := $(wildcard $(SRC_PATH)/presets/*.ffpreset) $(SRC_PATH)/doc/ffprobe.xsd
 EXAMPLES_FILES := $(wildcard $(SRC_PATH)/doc/examples/*.c) $(SRC_PATH)/doc/examples/Makefile $(SRC_PATH)/doc/examples/README
 
-SKIPHEADERS = cmdutils_common_opts.h
+SKIPHEADERS = cmdutils_common_opts.h compat/w32pthreads.h
 
 include common.mak
 
 FF_EXTRALIBS := $(FFEXTRALIBS)
 FF_DEP_LIBS  := $(DEP_LIBS)
 
-all: $(PROGS)
-
-$(PROGS): %$(EXESUF): %_g$(EXESUF)
-	$(CP) $< $@
-	$(STRIP) $@
+all: $(AVPROGS)
 
 $(TOOLS): %$(EXESUF): %.o $(EXEOBJS)
 	$(LD) $(LDFLAGS) $(LD_O) $^ $(ELIBS)
 
 tools/cws2fws$(EXESUF): ELIBS = $(ZLIB)
+tools/uncoded_frame$(EXESUF): $(FF_DEP_LIBS)
+tools/uncoded_frame$(EXESUF): ELIBS = $(FF_EXTRALIBS)
 
 ${MYTHPROGS}: myth%: %
 	$(CP) $< $@
@@ -80,7 +82,7 @@ SUBDIR_VARS := CLEANFILES EXAMPLES FFLIBS HOSTPROGS TESTPROGS TOOLS      \
                ALTIVEC-OBJS VIS-OBJS                                     \
                MMX-OBJS YASM-OBJS                                        \
                MIPSFPU-OBJS MIPSDSPR2-OBJS MIPSDSPR1-OBJS MIPS32R2-OBJS  \
-               OBJS HOSTOBJS TESTOBJS
+               OBJS SLIBOBJS HOSTOBJS TESTOBJS
 
 define RESET
 $(1) :=
@@ -97,8 +99,10 @@ endef
 
 $(foreach D,$(FFLIBS),$(eval $(call DOSUBDIR,lib$(D))))
 
+include $(SRC_PATH)/doc/Makefile
+
 define DOPROG
-OBJS-$(1) += $(1).o cmdutils.o $(EXEOBJS)
+OBJS-$(1) += $(1).o $(EXEOBJS) $(OBJS-$(1)-yes)
 $(1)$(PROGSSUF)_g$(EXESUF): $$(OBJS-$(1))
 $$(OBJS-$(1)): CFLAGS  += $(CFLAGS-$(1))
 $(1)$(PROGSSUF)_g$(EXESUF): LDFLAGS += $(LDFLAGS-$(1))
@@ -106,7 +110,13 @@ $(1)$(PROGSSUF)_g$(EXESUF): FF_EXTRALIBS += $(LIBS-$(1))
 -include $$(OBJS-$(1):.o=.d)
 endef
 
-$(foreach P,$(PROGS-yes),$(eval $(call DOPROG,$(P))))
+$(foreach P,$(PROGS),$(eval $(call DOPROG,$(P:$(PROGSSUF)$(EXESUF)=))))
+
+ffprobe.o cmdutils.o : libavutil/ffversion.h
+
+$(PROGS): %$(PROGSSUF)$(EXESUF): %$(PROGSSUF)_g$(EXESUF)
+	$(CP) $< $@
+	$(STRIP) $@
 
 %$(PROGSSUF)_g$(EXESUF): %.o $(FF_DEP_LIBS)
 	$(LD) $(LDFLAGS) $(LD_O) $(OBJS-$*) $(FF_EXTRALIBS)
@@ -121,14 +131,14 @@ GIT_LOG     = $(SRC_PATH_BARE)/.git/logs/HEAD
 .version: $(wildcard $(GIT_LOG)) $(VERSION_SH) config.mak
 .version: M=@
 
-version.h .version:
-	$(M)$(VERSION_SH) $(SRC_PATH) version.h $(EXTRA_VERSION)
+libavutil/ffversion.h .version:
+	$(M)$(VERSION_SH) $(SRC_PATH) libavutil/ffversion.h $(EXTRA_VERSION)
 	$(Q)touch .version
 
 # force version.sh to run whenever version might have changed
 -include .version
 
-ifdef PROGS
+ifdef AVPROGS
 install: install-mythprogs
 endif
 
@@ -139,7 +149,7 @@ install-libs: install-libs-yes
 install-progs-yes:
 install-progs-$(CONFIG_SHARED): install-libs
 
-install-progs: install-progs-yes $(PROGS)
+install-progs: install-progs-yes $(AVPROGS)
 	$(Q)mkdir -p "$(BINDIR)"
 	$(INSTALL) -c -m 755 $(INSTPROGS) "$(BINDIR)"
 
@@ -155,37 +165,27 @@ install-data: $(DATA_FILES) $(EXAMPLES_FILES)
 uninstall: uninstall-libs uninstall-headers uninstall-progs uninstall-data
 
 uninstall-progs:
-	$(RM) $(addprefix "$(BINDIR)/", $(ALLPROGS))
+	$(RM) $(addprefix "$(BINDIR)/", $(ALLAVPROGS))
 
 uninstall-data:
 	$(RM) -r "$(DATADIR)"
 
 clean::
-	$(RM) $(ALLPROGS) $(ALLPROGS_G)
+	$(RM) $(ALLAVPROGS) $(ALLAVPROGS_G)
 	$(RM) $(CLEANSUFFIXES)
 	$(RM) $(CLEANSUFFIXES:%=tools/%)
-	$(RM) coverage.info
 	$(RM) -r coverage-html
+	$(RM) -rf coverage.info lcov
 
 distclean::
 	$(RM) $(DISTCLEANSUFFIXES)
-	$(RM) config.* .version version.h libavutil/avconfig.h libavcodec/codec_names.h
+	$(RM) config.* .config libavutil/avconfig.h .version version.h libavutil/ffversion.h libavcodec/codec_names.h
 
 config:
 	$(SRC_PATH)/configure $(value FFMPEG_CONFIGURATION)
 
-# Without the sed genthml thinks "libavutil" and "./libavutil" are two different things
-coverage.info: $(wildcard *.gcda *.gcno */*.gcda */*.gcno */*/*.gcda */*/*.gcno)
-	$(Q)lcov -c -d . -b . | sed -e 's#/./#/#g' > $@
-
-coverage-html: coverage.info
-	$(Q)mkdir -p $@
-	$(Q)genhtml -o $@ $<
-	$(Q)touch $@
-
 #check: all alltools examples testprogs fate
 
-#include $(SRC_PATH)/doc/Makefile
 #include $(SRC_PATH)/tests/Makefile
 
 $(sort $(OBJDIRS)):

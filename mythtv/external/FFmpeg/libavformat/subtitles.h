@@ -25,11 +25,17 @@
 #include "avformat.h"
 #include "libavutil/bprint.h"
 
+enum sub_sort {
+    SUB_SORT_TS_POS = 0,    ///< sort by timestamps, then position
+    SUB_SORT_POS_TS,        ///< sort by position, then timestamps
+};
+
 typedef struct {
     AVPacket *subs;         ///< array of subtitles packets
     int nb_subs;            ///< number of subtitles packets
     int allocated_size;     ///< allocated size for subs
     int current_sub_idx;    ///< current position for the read packet callback
+    enum sub_sort sort;     ///< sort method to use when finalizing subtitles
 } FFDemuxSubtitlesQueue;
 
 /**
@@ -99,11 +105,17 @@ void ff_subtitles_read_chunk(AVIOContext *pb, AVBPrint *buf);
 /**
  * Get the number of characters to increment to jump to the next line, or to
  * the end of the string.
+ * The function handles the following line breaks schemes:
+ * LF, CRLF (MS), or standalone CR (old MacOS).
  */
 static av_always_inline int ff_subtitles_next_line(const char *ptr)
 {
-    int n = strcspn(ptr, "\n");
+    int n = strcspn(ptr, "\r\n");
     ptr += n;
+    if (*ptr == '\r') {
+        ptr++;
+        n++;
+    }
     if (*ptr == '\n')
         n++;
     return n;

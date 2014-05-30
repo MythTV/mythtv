@@ -56,7 +56,6 @@
 typedef struct LclEncContext {
 
     AVCodecContext *avctx;
-    AVFrame pic;
 
     // Image type
     int imgtype;
@@ -73,20 +72,15 @@ typedef struct LclEncContext {
  *
  */
 static int encode_frame(AVCodecContext *avctx, AVPacket *pkt,
-                        const AVFrame *pict, int *got_packet)
+                        const AVFrame *p, int *got_packet)
 {
     LclEncContext *c = avctx->priv_data;
-    AVFrame * const p = &c->pic;
     int i, ret;
     int zret; // Zlib return code
     int max_size = deflateBound(&c->zstream, avctx->width * avctx->height * 3);
 
     if ((ret = ff_alloc_packet2(avctx, pkt, max_size)) < 0)
-            return ret;
-
-    *p = *pict;
-    p->pict_type= AV_PICTURE_TYPE_I;
-    p->key_frame= 1;
+        return ret;
 
     if(avctx->pix_fmt != AV_PIX_FMT_BGR24){
         av_log(avctx, AV_LOG_ERROR, "Format not supported!\n");
@@ -137,8 +131,16 @@ static av_cold int encode_init(AVCodecContext *avctx)
 
     av_assert0(avctx->width && avctx->height);
 
-    avctx->extradata= av_mallocz(8);
-    avctx->coded_frame= &c->pic;
+    avctx->extradata = av_mallocz(8 + FF_INPUT_BUFFER_PADDING_SIZE);
+    if (!avctx->extradata)
+        return AVERROR(ENOMEM);
+
+    avctx->coded_frame = av_frame_alloc();
+    if (!avctx->coded_frame)
+        return AVERROR(ENOMEM);
+
+    avctx->coded_frame->pict_type = AV_PICTURE_TYPE_I;
+    avctx->coded_frame->key_frame = 1;
 
     c->compression = avctx->compression_level == FF_COMPRESSION_DEFAULT ?
                             COMP_ZLIB_NORMAL :
@@ -181,11 +183,14 @@ static av_cold int encode_end(AVCodecContext *avctx)
     av_freep(&avctx->extradata);
     deflateEnd(&c->zstream);
 
+    av_frame_free(&avctx->coded_frame);
+
     return 0;
 }
 
 AVCodec ff_zlib_encoder = {
     .name           = "zlib",
+    .long_name      = NULL_IF_CONFIG_SMALL("LCL (LossLess Codec Library) ZLIB"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_ZLIB,
     .priv_data_size = sizeof(LclEncContext),
@@ -193,5 +198,4 @@ AVCodec ff_zlib_encoder = {
     .encode2        = encode_frame,
     .close          = encode_end,
     .pix_fmts       = (const enum AVPixelFormat[]) { AV_PIX_FMT_BGR24, AV_PIX_FMT_NONE },
-    .long_name      = NULL_IF_CONFIG_SMALL("LCL (LossLess Codec Library) ZLIB"),
 };

@@ -20,9 +20,9 @@
 #include "internal.h"
 #include "libavutil/internal.h"
 
-static int filter_frame(AVFilterLink *link, AVFilterBufferRef *frame)
+static int filter_frame(AVFilterLink *link, AVFrame *frame)
 {
-    avfilter_unref_bufferp(&frame);
+    av_frame_free(&frame);
     return 0;
 }
 
@@ -35,7 +35,7 @@ static const AVFilterPad avfilter_vsink_nullsink_inputs[] = {
     { NULL },
 };
 
-AVFilter avfilter_vsink_nullsink = {
+AVFilter ff_vsink_nullsink = {
     .name        = "nullsink",
     .description = NULL_IF_CONFIG_SMALL("Do absolutely nothing with the input video."),
 

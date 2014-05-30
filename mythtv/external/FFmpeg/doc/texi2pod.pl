@@ -1,4 +1,4 @@
-#! /usr/bin/perl
+#!/usr/bin/env perl
 
 #   Copyright (C) 1999, 2000, 2001 Free Software Foundation, Inc.
 
@@ -121,7 +121,7 @@ INF: while(<$inf>) {
         $chapters{$chapter_name} .= postprocess($chapter) if ($chapter_name);
 
         # start new chapter
-        $chapter_name = $1, push (@chapters_sequence, $chapter_name);
+        $chapter_name = $1, push (@chapters_sequence, $chapter_name) unless $skipping;
         $chapters{$chapter_name} = "" unless exists $chapters{$chapter_name};
         $chapter = "";
         $output = 1;
@@ -327,6 +327,9 @@ die "No filename or title\n" unless defined $fn && defined $tl;
 $chapters{NAME} = "$fn \- $tl\n";
 $chapters{FOOTNOTES} .= "=back\n" if exists $chapters{FOOTNOTES};
 
+# always use utf8
+print "=encoding utf8\n\n";
+
 unshift @chapters_sequence, "NAME";
 for $chapter (@chapters_sequence) {
     if (exists $chapters{$chapter}) {
@@ -377,8 +380,8 @@ sub postprocess
     s/\(?\@xref\{(?:[^\}]*)\}(?:[^.<]|(?:<[^<>]*>))*\.\)?//g;
     s/\s+\(\@pxref\{(?:[^\}]*)\}\)//g;
     s/;\s+\@pxref\{(?:[^\}]*)\}//g;
-    s/\@ref\{(?:[^,\}]*,)(?:[^,\}]*,)([^,\}]*).*\}/$1/g;
-    s/\@ref\{([^\}]*)\}/$1/g;
+    s/\@ref\{(?:[^,\}]*,)(?:[^,\}]*,)([^,\}]*).*\}/B<$1>/g;
+    s/\@ref\{([^\}]*)\}/B<$1>/g;
     s/\@noindent\s*//g;
     s/\@refill//g;
     s/\@gol//g;

@@ -23,6 +23,8 @@
 #include "avformat.h"
 #include "rawdec.h"
 
+#include "libavutil/intreadwrite.h"
+
 #define SEQ_START_CODE          0x000001b3
 #define GOP_START_CODE          0x000001b8
 #define PICTURE_START_CODE      0x00000100
@@ -35,14 +37,29 @@ static int mpegvideo_probe(AVProbeData *p)
 {
     uint32_t code= -1;
     int pic=0, seq=0, slice=0, pspack=0, vpes=0, apes=0, res=0, sicle=0;
-    int i;
+    int i, j;
     uint32_t last = 0;
 
     for(i=0; i<p->buf_size; i++){
         code = (code<<8) + p->buf[i];
         if ((code & 0xffffff00) == 0x100) {
             switch(code){
-            case     SEQ_START_CODE:   seq++; break;
+            case     SEQ_START_CODE:
+                if (!(p->buf[i+1+3+1+2] & 0x20))
+                    break;
+                j = i;
+                if (p->buf[j+8] & 2)
+                    j+= 64;
+                if (j >= p->buf_size)
+                    break;
+                if (p->buf[j+8] & 1)
+                    j+= 64;
+                if (j >= p->buf_size)
+                    break;
+                if (AV_RB24(p->buf + j + 9) & 0xFFFFFE)
+                    break;
+                seq++;
+            break;
             case PICTURE_START_CODE:   pic++; break;
             case    PACK_START_CODE: pspack++; break;
             case              0x1b6:
@@ -63,8 +80,8 @@ static int mpegvideo_probe(AVProbeData *p)
         }
     }
     if(seq && seq*9<=pic*10 && pic*9<=slice*10 && !pspack && !apes && !res && slice > sicle) {
-        if(vpes) return AVPROBE_SCORE_MAX/8;
-        else     return pic>1 ? AVPROBE_SCORE_MAX/2+1 : AVPROBE_SCORE_MAX/4; // +1 for .mpg
+        if(vpes) return AVPROBE_SCORE_EXTENSION / 4;
+        else     return pic>1 ? AVPROBE_SCORE_EXTENSION + 1 : AVPROBE_SCORE_EXTENSION / 2; // +1 for .mpg
     }
     return 0;
 }

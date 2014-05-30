@@ -23,6 +23,7 @@
 #include "libavutil/parseutils.h"
 #include "avformat.h"
 #include "internal.h"
+#include "url.h"
 
 typedef struct {
     char *url;
@@ -37,6 +38,7 @@ typedef struct {
     unsigned nb_files;
     AVFormatContext *avf;
     int safe;
+    int seekable;
 } ConcatContext;
 
 static int concat_probe(AVProbeData *probe)
@@ -82,25 +84,26 @@ static int add_file(AVFormatContext *avf, char *filename, ConcatFile **rfile,
 {
     ConcatContext *cat = avf->priv_data;
     ConcatFile *file;
-    char *url;
+    char *url = NULL;
     size_t url_len;
+    int ret;
 
     if (cat->safe > 0 && !safe_filename(filename)) {
         av_log(avf, AV_LOG_ERROR, "Unsafe file name '%s'\n", filename);
-        return AVERROR(EPERM);
+        FAIL(AVERROR(EPERM));
     }
     url_len = strlen(avf->filename) + strlen(filename) + 16;
     if (!(url = av_malloc(url_len)))
-        return AVERROR(ENOMEM);
+        FAIL(AVERROR(ENOMEM));
     ff_make_absolute_url(url, url_len, avf->filename, filename);
-    av_free(filename);
+    av_freep(&filename);
 
     if (cat->nb_files >= *nb_files_alloc) {
         size_t n = FFMAX(*nb_files_alloc * 2, 16);
         ConcatFile *new_files;
         if (n <= cat->nb_files || n > SIZE_MAX / sizeof(*cat->files) ||
             !(new_files = av_realloc(cat->files, n * sizeof(*cat->files))))
-            return AVERROR(ENOMEM);
+            FAIL(AVERROR(ENOMEM));
         cat->files = new_files;
         *nb_files_alloc = n;
     }
@@ -114,6 +117,11 @@ static int add_file(AVFormatContext *avf, char *filename, ConcatFile **rfile,
     file->duration   = AV_NOPTS_VALUE;
 
     return 0;
+
+fail:
+    av_free(url);
+    av_free(filename);
+    return ret;
 }
 
 static int open_file(AVFormatContext *avf, unsigned fileno)
@@ -122,9 +130,18 @@ static int open_file(AVFormatContext *avf, unsigned fileno)
     ConcatFile *file = &cat->files[fileno];
     int ret;
 
+    if (cat->avf)
+        avformat_close_input(&cat->avf);
+
+    cat->avf = avformat_alloc_context();
+    if (!cat->avf)
+        return AVERROR(ENOMEM);
+
+    cat->avf->interrupt_callback = avf->interrupt_callback;
     if ((ret = avformat_open_input(&cat->avf, file->url, NULL, NULL)) < 0 ||
         (ret = avformat_find_stream_info(cat->avf, NULL)) < 0) {
         av_log(avf, AV_LOG_ERROR, "Impossible to open '%s'\n", file->url);
+        avformat_close_input(&cat->avf);
         return ret;
     }
     cat->cur_file = file;
@@ -207,6 +224,8 @@ static int concat_read_header(AVFormatContext *avf)
     }
     if (ret < 0)
         FAIL(ret);
+    if (!cat->nb_files)
+        FAIL(AVERROR_INVALIDDATA);
 
     for (i = 0; i < cat->nb_files; i++) {
         if (cat->files[i].start_time == AV_NOPTS_VALUE)
@@ -217,8 +236,10 @@ static int concat_read_header(AVFormatContext *avf)
             break;
         time += cat->files[i].duration;
     }
-    if (i == cat->nb_files)
+    if (i == cat->nb_files) {
         avf->duration = time;
+        cat->seekable = 1;
+    }
 
     if ((ret = open_file(avf, 0)) < 0)
         FAIL(ret);
@@ -251,7 +272,6 @@ static int open_next_file(AVFormatContext *avf)
 
     if (++fileno >= cat->nb_files)
         return AVERROR_EOF;
-    avformat_close_input(&cat->avf);
     return open_file(avf, fileno);
 }
 
@@ -266,6 +286,9 @@ static int concat_read_packet(AVFormatContext *avf, AVPacket *pkt)
             (ret = open_next_file(avf)) < 0)
             break;
     }
+    if (ret < 0)
+        return ret;
+
     delta = av_rescale_q(cat->cur_file->start_time - cat->avf->start_time,
                          AV_TIME_BASE_Q,
                          cat->avf->streams[pkt->stream_index]->time_base);
@@ -273,6 +296,95 @@ static int concat_read_packet(AVFormatContext *avf, AVPacket *pkt)
         pkt->pts += delta;
     if (pkt->dts != AV_NOPTS_VALUE)
         pkt->dts += delta;
+    return ret;
+}
+
+static void rescale_interval(AVRational tb_in, AVRational tb_out,
+                             int64_t *min_ts, int64_t *ts, int64_t *max_ts)
+{
+    *ts     = av_rescale_q    (*    ts, tb_in, tb_out);
+    *min_ts = av_rescale_q_rnd(*min_ts, tb_in, tb_out,
+                               AV_ROUND_UP   | AV_ROUND_PASS_MINMAX);
+    *max_ts = av_rescale_q_rnd(*max_ts, tb_in, tb_out,
+                               AV_ROUND_DOWN | AV_ROUND_PASS_MINMAX);
+}
+
+static int try_seek(AVFormatContext *avf, int stream,
+                    int64_t min_ts, int64_t ts, int64_t max_ts, int flags)
+{
+    ConcatContext *cat = avf->priv_data;
+    int64_t t0 = cat->cur_file->start_time - cat->avf->start_time;
+
+    ts -= t0;
+    min_ts = min_ts == INT64_MIN ? INT64_MIN : min_ts - t0;
+    max_ts = max_ts == INT64_MAX ? INT64_MAX : max_ts - t0;
+    if (stream >= 0) {
+        if (stream >= cat->avf->nb_streams)
+            return AVERROR(EIO);
+        rescale_interval(AV_TIME_BASE_Q, cat->avf->streams[stream]->time_base,
+                         &min_ts, &ts, &max_ts);
+    }
+    return avformat_seek_file(cat->avf, stream, min_ts, ts, max_ts, flags);
+}
+
+static int real_seek(AVFormatContext *avf, int stream,
+                     int64_t min_ts, int64_t ts, int64_t max_ts, int flags)
+{
+    ConcatContext *cat = avf->priv_data;
+    int ret, left, right;
+
+    if (stream >= 0) {
+        if (stream >= avf->nb_streams)
+            return AVERROR(EINVAL);
+        rescale_interval(avf->streams[stream]->time_base, AV_TIME_BASE_Q,
+                         &min_ts, &ts, &max_ts);
+    }
+
+    left  = 0;
+    right = cat->nb_files;
+    while (right - left > 1) {
+        int mid = (left + right) / 2;
+        if (ts < cat->files[mid].start_time)
+            right = mid;
+        else
+            left  = mid;
+    }
+
+    if ((ret = open_file(avf, left)) < 0)
+        return ret;
+
+    ret = try_seek(avf, stream, min_ts, ts, max_ts, flags);
+    if (ret < 0 &&
+        left < cat->nb_files - 1 &&
+        cat->files[left + 1].start_time < max_ts) {
+        if ((ret = open_file(avf, left + 1)) < 0)
+            return ret;
+        ret = try_seek(avf, stream, min_ts, ts, max_ts, flags);
+    }
+    return ret;
+}
+
+static int concat_seek(AVFormatContext *avf, int stream,
+                       int64_t min_ts, int64_t ts, int64_t max_ts, int flags)
+{
+    ConcatContext *cat = avf->priv_data;
+    ConcatFile *cur_file_saved = cat->cur_file;
+    AVFormatContext *cur_avf_saved = cat->avf;
+    int ret;
+
+    if (!cat->seekable)
+        return AVERROR(ESPIPE); /* XXX: can we use it? */
+    if (flags & (AVSEEK_FLAG_BYTE | AVSEEK_FLAG_FRAME))
+        return AVERROR(ENOSYS);
+    cat->avf = NULL;
+    if ((ret = real_seek(avf, stream, min_ts, ts, max_ts, flags)) < 0) {
+        if (cat->avf)
+            avformat_close_input(&cat->avf);
+        cat->avf      = cur_avf_saved;
+        cat->cur_file = cur_file_saved;
+    } else {
+        avformat_close_input(&cur_avf_saved);
+    }
     return ret;
 }
 
@@ -301,5 +413,6 @@ AVInputFormat ff_concat_demuxer = {
     .read_header    = concat_read_header,
     .read_packet    = concat_read_packet,
     .read_close     = concat_read_close,
+    .read_seek2     = concat_seek,
     .priv_class     = &concat_class,
 };

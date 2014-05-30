@@ -36,7 +36,7 @@ static av_cold int encode_init(AVCodecContext *avctx)
         av_log(avctx, AV_LOG_WARNING, "bits per raw sample: %d != 10-bit\n",
                avctx->bits_per_raw_sample);
 
-    avctx->coded_frame = avcodec_alloc_frame();
+    avctx->coded_frame = av_frame_alloc();
     if (!avctx->coded_frame)
         return AVERROR(ENOMEM);
 
@@ -116,11 +116,11 @@ static av_cold int encode_close(AVCodecContext *avctx)
 
 AVCodec ff_v210_encoder = {
     .name           = "v210",
+    .long_name      = NULL_IF_CONFIG_SMALL("Uncompressed 4:2:2 10-bit"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_V210,
     .init           = encode_init,
     .encode2        = encode_frame,
     .close          = encode_close,
     .pix_fmts       = (const enum AVPixelFormat[]){ AV_PIX_FMT_YUV422P10, AV_PIX_FMT_NONE },
-    .long_name      = NULL_IF_CONFIG_SMALL("Uncompressed 4:2:2 10-bit"),
 };

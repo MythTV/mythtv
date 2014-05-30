@@ -26,7 +26,6 @@
  */
 
 #include "avassert.h"
-//#include <math.h>
 #include <limits.h>
 
 #include "common.h"
@@ -111,11 +110,14 @@ AVRational av_d2q(double d, int max)
     int64_t den;
     if (isnan(d))
         return (AVRational) { 0,0 };
-    if (isinf(d))
+    if (fabs(d) > INT_MAX + 3LL)
         return (AVRational) { d < 0 ? -1 : 1, 0 };
     exponent = FFMAX( (int)(log(fabs(d) + 1e-20)/LOG2), 0);
     den = 1LL << (61 - exponent);
-    av_reduce(&a.num, &a.den, (int64_t)(d * den + 0.5), den, max);
+    // (int64_t)rint() and llrint() do not work with gcc on ia64 and sparc64
+    av_reduce(&a.num, &a.den, floor(d * den + 0.5), den, max);
+    if ((!a.num || !a.den) && d && max>0 && max<INT_MAX)
+        av_reduce(&a.num, &a.den, floor(d * den + 0.5), den, INT_MAX);
 
     return a;
 }
@@ -165,6 +167,36 @@ int main(void)
                     r = av_sub_q(av_add_q(b,a), b);
                     if(b.den && (r.num*a.den != a.num*r.den || !r.num != !a.num || !r.den != !a.den))
                         av_log(NULL, AV_LOG_ERROR, "%d/%d ", r.num, r.den);
+                }
+            }
+        }
+    }
+
+    for (a.num = 1; a.num <= 10; a.num++) {
+        for (a.den = 1; a.den <= 10; a.den++) {
+            if (av_gcd(a.num, a.den) > 1)
+                continue;
+            for (b.num = 1; b.num <= 10; b.num++) {
+                for (b.den = 1; b.den <= 10; b.den++) {
+                    int start;
+                    if (av_gcd(b.num, b.den) > 1)
+                        continue;
+                    if (av_cmp_q(b, a) < 0)
+                        continue;
+                    for (start = 0; start < 10 ; start++) {
+                        int acc= start;
+                        int i;
+
+                        for (i = 0; i<100; i++) {
+                            int exact = start + av_rescale_q(i+1, b, a);
+                            acc = av_add_stable(a, acc, b, 1);
+                            if (FFABS(acc - exact) > 2) {
+                                av_log(NULL, AV_LOG_ERROR, "%d/%d %d/%d, %d %d\n", a.num,
+                                       a.den, b.num, b.den, acc, exact);
+                                return 1;
+                            }
+                        }
+                    }
                 }
             }
         }

@@ -31,19 +31,23 @@
 #include "libavutil/imgutils.h"
 #include "internal.h"
 
-typedef struct PCXContext {
-    AVFrame picture;
-} PCXContext;
-
 static const uint32_t monoblack_pal[16] = { 0x000000, 0xFFFFFF };
 
 static av_cold int pcx_encode_init(AVCodecContext *avctx)
 {
-    PCXContext *s = avctx->priv_data;
+    avctx->coded_frame = av_frame_alloc();
+    if (!avctx->coded_frame)
+        return AVERROR(ENOMEM);
 
-    avcodec_get_frame_defaults(&s->picture);
-    avctx->coded_frame = &s->picture;
+    avctx->coded_frame->pict_type = AV_PICTURE_TYPE_I;
+    avctx->coded_frame->key_frame = 1;
 
+    return 0;
+}
+
+static av_cold int pcx_encode_close(AVCodecContext *avctx)
+{
+    av_frame_free(&avctx->coded_frame);
     return 0;
 }
 
@@ -100,8 +104,6 @@ static int pcx_rle_encode(      uint8_t *dst, int dst_size,
 static int pcx_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
                             const AVFrame *frame, int *got_packet)
 {
-    PCXContext *s = avctx->priv_data;
-    AVFrame *const pict = &s->picture;
     const uint8_t *buf_end;
     uint8_t *buf;
 
@@ -109,10 +111,6 @@ static int pcx_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
     const uint32_t *pal = NULL;
     uint32_t palette256[256];
     const uint8_t *src;
-
-    *pict = *frame;
-    pict->pict_type = AV_PICTURE_TYPE_I;
-    pict->key_frame = 1;
 
     if (avctx->width > 65535 || avctx->height > 65535) {
         av_log(avctx, AV_LOG_ERROR, "image dimensions do not fit in 16 bits\n");
@@ -137,7 +135,7 @@ static int pcx_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
     case AV_PIX_FMT_PAL8:
         bpp = 8;
         nplanes = 1;
-        pal = (uint32_t *)pict->data[1];
+        pal = (uint32_t *)frame->data[1];
         break;
     case AV_PIX_FMT_MONOBLACK:
         bpp = 1;
@@ -182,7 +180,7 @@ static int pcx_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
     while (buf - pkt->data < 128)
         *buf++= 0;
 
-    src = pict->data[0];
+    src = frame->data[0];
 
     for (y = 0; y < avctx->height; y++) {
         if ((written = pcx_rle_encode(buf, buf_end - buf,
@@ -191,7 +189,7 @@ static int pcx_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
             return -1;
         }
         buf += written;
-        src += pict->linesize[0];
+        src += frame->linesize[0];
     }
 
     if (nplanes == 1 && bpp == 8) {
@@ -214,10 +212,11 @@ static int pcx_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
 
 AVCodec ff_pcx_encoder = {
     .name           = "pcx",
+    .long_name      = NULL_IF_CONFIG_SMALL("PC Paintbrush PCX image"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_PCX,
-    .priv_data_size = sizeof(PCXContext),
     .init           = pcx_encode_init,
+    .close          = pcx_encode_close,
     .encode2        = pcx_encode_frame,
     .pix_fmts       = (const enum AVPixelFormat[]){
         AV_PIX_FMT_RGB24,
@@ -226,5 +225,4 @@ AVCodec ff_pcx_encoder = {
         AV_PIX_FMT_MONOBLACK,
         AV_PIX_FMT_NONE
     },
-    .long_name      = NULL_IF_CONFIG_SMALL("PC Paintbrush PCX image"),
 };
