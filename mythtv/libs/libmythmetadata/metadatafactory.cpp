@@ -682,12 +682,11 @@ LookupType GuessLookupType(VideoMetadata *metadata)
 {
     LookupType ret = kUnknownVideo;
 
-    if (metadata->GetSeason() > 0 || metadata->GetEpisode() > 0)
+    if (metadata->GetSeason() > 0 || metadata->GetEpisode() > 0 ||
+        !metadata->GetSubtitle().isEmpty())
         ret = kProbableTelevision;
-    else if (metadata->GetSubtitle().isEmpty())
-        ret = kProbableMovie;
     else
-        ret = kUnknownVideo;
+        ret = kProbableMovie;
 
     return ret;
 }
