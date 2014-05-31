@@ -135,12 +135,7 @@ void MetadataFactory::Lookup(VideoMetadata *metadata, bool automatic,
 
     lookup->SetStep(kLookupSearch);
     lookup->SetType(kMetadataVideo);
-    if (metadata->GetSeason() > 0 || metadata->GetEpisode() > 0)
-        lookup->SetSubtype(kProbableTelevision);
-    else if (metadata->GetSubtitle().isEmpty())
-        lookup->SetSubtype(kProbableMovie);
-    else
-        lookup->SetSubtype(kUnknownVideo);
+    lookup->SetSubtype(GuessLookupType(metadata));
     lookup->SetData(qVariantFromValue(metadata));
     lookup->SetAutomatic(automatic);
     lookup->SetHandleImages(getimages);
@@ -683,6 +678,19 @@ LookupType GuessLookupType(MetadataLookup *lookup)
     return ret;
 }
 
+LookupType GuessLookupType(VideoMetadata *metadata)
+{
+    LookupType ret = kUnknownVideo;
+
+    if (metadata->GetSeason() > 0 || metadata->GetEpisode() > 0)
+        ret = kProbableTelevision;
+    else if (metadata->GetSubtitle().isEmpty())
+        ret = kProbableMovie;
+    else
+        ret = kUnknownVideo;
+
+    return ret;
+}
 
 LookupType GuessLookupType(RecordingRule *recrule)
 {
