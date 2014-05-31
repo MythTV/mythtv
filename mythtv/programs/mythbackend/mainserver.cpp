@@ -1541,9 +1541,9 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
 
         PlaybackSockEventsMode eventsMode =
             (PlaybackSockEventsMode)commands[3].toInt();
-        LOG(VB_GENERAL, LOG_INFO, LOC + QString("MainServer::ANN %1")
+        LOG(VB_NETWORK, LOG_INFO, LOC + QString("MainServer::ANN %1")
                                             .arg(commands[1]));
-        LOG(VB_GENERAL, LOG_INFO, LOC +
+        LOG(VB_NETWORK, LOG_INFO, LOC +
             QString("adding: %1 as a client (events: %2)")
                 .arg(commands[2]).arg(eventsMode));
         PlaybackSock *pbs = new PlaybackSock(this, socket, commands[2],

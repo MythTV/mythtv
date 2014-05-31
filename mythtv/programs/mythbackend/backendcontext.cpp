@@ -40,8 +40,8 @@ void BackendContext::SetFrontendConnected(Frontend *frontend)
         return;
     }
 
-    LOG(VB_GENERAL, LOG_DEBUG, QString("BackendContext: Frontend '%1' "
-                                       "connected.").arg(frontend->name));
+    LOG(VB_GENERAL, LOG_INFO, QString("BackendContext: Frontend '%1' "
+                                      "connected.").arg(frontend->name));
 
     frontend->connectionCount++;
     m_connectedFrontends.insert(frontend->name, frontend);
@@ -73,8 +73,8 @@ void BackendContext::SetFrontendDisconnected(const QString& name)
         {
             // Will still be referenced in knownFrontends, so no leak here
             m_connectedFrontends.remove(name);
-            LOG(VB_GENERAL, LOG_DEBUG, QString("BackendContext: Frontend '%1' "
-                                       "disconnected.").arg(frontend->name));
+            LOG(VB_GENERAL, LOG_INFO, QString("BackendContext: Frontend '%1' "
+                                              "disconnected.").arg(frontend->name));
         }
 
         return;
