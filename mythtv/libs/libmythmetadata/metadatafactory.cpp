@@ -372,7 +372,7 @@ void MetadataFactory::OnVideoResult(MetadataLookup *lookup)
 
     if (metadata->GetTagline().isEmpty())
         metadata->SetTagline(lookup->GetTagline());
-    if (metadata->GetYear() == 1895 || metadata->GetYear() == 0)
+    if (metadata->GetYear() == VIDEO_YEAR_DEFAULT || metadata->GetYear() == 0)
         metadata->SetYear(lookup->GetYear());
     if (metadata->GetReleaseDate() == QDate())
         metadata->SetReleaseDate(lookup->GetReleaseDate());
