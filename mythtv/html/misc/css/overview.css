@@ -1,0 +1,115 @@
+
+.header
+{
+    width:660px;
+    margin: 10px auto;
+    color: #FFFFFF;
+    padding: 20px;
+    background-color:   #000000;
+    background-image:   radial-gradient(circle, #151515 2px, transparent 2px),
+                        radial-gradient(circle, #151515 2px, transparent 2px);
+    background-size:    6px 6px;
+    background-position: 0 0, 3px 3px;
+    border: 1px solid #000000;
+    border-right: 1px solid #353535;
+    border-bottom: 1px solid #353535;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+
+.contentContainer
+{
+    margin: 0 auto;
+    width: 680px;
+    padding: 10px;
+    background-color:   #000000;
+    background-image:   radial-gradient(circle, #151515 2px, transparent 2px),
+                        radial-gradient(circle, #151515 2px, transparent 2px);
+    background-size:    6px 6px;
+    background-position: 0 0, 3px 3px;
+}
+
+.content
+{
+    width: 660px;
+    padding: 10px;
+    background-color: #000000;
+    border-radius: 5px;
+    border: 1px solid #1A1A1A;
+}
+
+.galleria-container
+{
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.indented ul
+{
+    margin: 0px;
+    padding: 0px;
+    list-style: none;
+}
+
+.indented ul li
+{
+    border-top: 1px solid #333333;
+    border-bottom: 1px solid #111111;
+}
+
+.indented ul li:first-child
+{
+    border-top: none;
+}
+
+.indented ul li:last-child
+{
+    border-bottom: none;
+}
+
+.indented ul li
+{
+    padding: 10px;
+    display: block;
+    color: #FFFFFF;
+    text-decoration: none;
+}
+
+.indented ul li a:hover
+{
+    background: #111111;
+}
+
+.frontendList
+{
+    display: table;
+}
+
+.frontendRow
+{
+    display: table-row;
+}
+
+.frontendName
+{
+    display: table-cell;
+}
+
+.frontendStatus
+{
+    display: table-cell;
+}
+
+.frontendOnline
+{
+    background-color: #009900;
+    text-align: center;
+    color: #000000;
+    /*font-weight: bold;*/
+}
+
+.frontendOffline
+{
+    background-color: #990000;
+}

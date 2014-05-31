@@ -1,15 +1,15 @@
 <html>
 <head>
 <title><i18n>MythTV System Overview</i18n></title>
+<link rel="stylesheet" type="text/css" href="/misc/css/overview.css">
 </head>
 <body>
 
-    <div style="margin: 0 auto; width:660px;" class="pressed">
+    <div class="header">
         <h2><i18n>Last Ten Recordings</i18n></h2>
     </div>
 
-    <div style="margin: 0 auto;" id="lasttencontainer">
-        <div style="padding: 10px 0px;" id="lasttencontent">
+    <div class="contentContainer" id="lasttencontent">
 <%
             var oDvr = new Dvr();
             var list = oDvr.GetRecordedList( true, 0, 10, "", "", "" );
@@ -59,20 +59,19 @@
                     month_names[program.StartTime.getMonth()],
                     program.StartTime.getDate(), startTime);
 %>
-                <img title="<%= title %>" alt="<%= desc %>" height="382" src="/Content/GetPreviewImage?ChanId=<%=program.Channel.ChanId %>&Height=382&StartTime=<%=UTCDateString( program.Recording.StartTs ) %>&Format=JPG"/>
+                <img title="<%=title%>" alt="<%=desc%>" height="382" src="/Content/GetPreviewImage?ChanId=<%=program.Channel.ChanId %>&Height=382&StartTime=<%=UTCDateString( program.Recording.StartTs ) %>&Format=JPG"/>
 <%
             } 
 %>
-        </div>
-    <div>
+    </div>
 
-    <div style="margin: 0 auto; width:660px;" class="pressed">
+    <div class="header">
         <h2><i18n>Current Tuner Activity</i18n></h2>
     </div>
 
-    <div style="padding: 10px 0px;" id="encodercontainer">
-        <div class="blackbox galleria-container indented" style="width:680px; padding: 0px 10px 0px 10px;" id="encodercontent">
-        <ul>
+    <div class="contentContainer">
+        <div class="content indented" id="encodercontent">
+            <ul>
 <%
             var oDvr = new Dvr();
             var encoderlist = oDvr.GetEncoderList();
@@ -109,9 +108,42 @@
             }
 %>
 
-        </ul>
+            </ul>
         </div>
-    <div>
+    </div>
+
+    <div class="header">
+        <h2><i18n>Frontend Status</i18n></h2>
+    </div>
+
+    <div class="contentContainer">
+        <div class="content frontendList">
+<%
+    var myth = new Myth();
+    var frontendList = myth.GetFrontends(false).Frontends;
+    for (var nIdx = 0; nIdx < frontendList.length; nIdx++)
+    {
+        var status = qsTr("Offline");
+        var statusClass = "frontendOffline";
+        if (frontendList[nIdx].OnLine)
+        {
+            status = qsTr("Online");
+            statusClass = "frontendOnline";
+        }
+%>
+            <div class="frontendRow">
+                <div class="frontendName">
+                    <%=frontendList[nIdx].Name%>
+                </div>
+                <div class="frontendStatus <%=statusClass%>">
+                    <%=status%>
+                </div>
+            </div>
+<%
+    }
+%>
+        </div>
+    </div>
 
 </body>
 </html>
@@ -154,8 +186,8 @@ function UTCDateString(d)
     $(document).ready(function($){
         Galleria.loadTheme('/3rdParty/jquery/galleria/themes/classic/galleria.classic.min.js');
         $("#lasttencontent").galleria({
-            width: 700,
-            height: 452,
+            width: 680,
+            height: 440,
             autoplay: 7000,
             imageCrop: true,
             showInfo: true
