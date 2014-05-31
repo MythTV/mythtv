@@ -61,7 +61,8 @@ static int aac_adtstoasc_filter(AVBitStreamFilterContext *bsfc,
     }
 
     if (!hdr.crc_absent && hdr.num_aac_frames > 1) {
-        av_log_missing_feature(avctx, "Multiple RDBs per frame with CRC", 0);
+        avpriv_report_missing_feature(avctx,
+                                      "Multiple RDBs per frame with CRC");
         return AVERROR_PATCHWELCOME;
     }
 
@@ -74,7 +75,10 @@ static int aac_adtstoasc_filter(AVBitStreamFilterContext *bsfc,
         if (!hdr.chan_config) {
             init_get_bits(&gb, buf, buf_size * 8);
             if (get_bits(&gb, 3) != 5) {
-                av_log_missing_feature(avctx, "PCE based channel configuration, where the PCE is not the first syntax element", 0);
+                avpriv_report_missing_feature(avctx,
+                                              "PCE-based channel configuration "
+                                              "without PCE as first syntax "
+                                              "element");
                 return AVERROR_PATCHWELCOME;
             }
             init_put_bits(&pb, pce_data, MAX_PCE_SIZE);
@@ -83,6 +87,7 @@ static int aac_adtstoasc_filter(AVBitStreamFilterContext *bsfc,
             buf_size -= get_bits_count(&gb)/8;
             buf      += get_bits_count(&gb)/8;
         }
+        av_free(avctx->extradata);
         avctx->extradata_size = 2 + pce_size;
         avctx->extradata = av_mallocz(avctx->extradata_size + FF_INPUT_BUFFER_PADDING_SIZE);
 
@@ -108,7 +113,7 @@ static int aac_adtstoasc_filter(AVBitStreamFilterContext *bsfc,
 }
 
 AVBitStreamFilter ff_aac_adtstoasc_bsf = {
-    "aac_adtstoasc",
-    sizeof(AACBSFContext),
-    aac_adtstoasc_filter,
+    .name           = "aac_adtstoasc",
+    .priv_data_size = sizeof(AACBSFContext),
+    .filter         = aac_adtstoasc_filter,
 };

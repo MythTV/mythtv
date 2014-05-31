@@ -26,7 +26,7 @@ AudioOutputDigitalEncoder::AudioOutputDigitalEncoder(void) :
     in(NULL), inp(NULL), in_size(0),
     outlen(0), inlen(0),
     samples_per_frame(0),
-    m_spdifenc(NULL)
+    m_spdifenc(NULL), m_frame(NULL)
 {
     out = (outbuf_t *)av_mallocz(OUTBUFSIZE);
     if (out)
@@ -67,6 +67,8 @@ void AudioOutputDigitalEncoder::Reset(void)
         avcodec_close(av_context);
         av_freep(&av_context);
     }
+    av_frame_free(&m_frame);
+
     delete m_spdifenc;
     m_spdifenc = NULL;
 
@@ -92,7 +94,7 @@ void *AudioOutputDigitalEncoder::realloc(void *ptr,
 }
 
 bool AudioOutputDigitalEncoder::Init(
-    CodecID codec_id, int bitrate, int samplerate, int channels)
+    AVCodecID codec_id, int bitrate, int samplerate, int channels)
 {
     AVCodec *codec;
     int ret;
@@ -202,19 +204,32 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
     int frames           = inlen / sizeof(inbuf_t) / samples_per_frame;
     int i                = 0;
     int channels         = av_context->channels;
-    AVFrame *frame       = avcodec_alloc_frame();
     int size_channel     = av_context->frame_size *
         AudioOutputSettings::SampleSize(FORMAT_S16);
-    frame->extended_data = frame->data;
-    frame->nb_samples    = av_context->frame_size;
-    frame->pts           = AV_NOPTS_VALUE;
+    if (!m_frame)
+    {
+        if (!(m_frame = av_frame_alloc()))
+        {
+            in = NULL;
+            in_size = 0;
+            LOG(VB_AUDIO, LOG_ERR, LOC +
+                "AC-3 encode error, insufficient memory");
+            return outlen;
+        }
+    }
+    else
+    {
+        av_frame_unref(m_frame);
+    }
+    m_frame->nb_samples = av_context->frame_size;
+    m_frame->pts        = AV_NOPTS_VALUE;
 
     if (frames > 0)
     {
             // init AVFrame for planar data (input is interleaved)
         for (int j = 0, jj = 0; j < channels; j++, jj += av_context->frame_size)
         {
-            frame->data[j] = (uint8_t*)(inp + jj);
+            m_frame->data[j] = (uint8_t*)(inp + jj);
         }
     }
 
@@ -232,13 +247,12 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
             (uint8_t*)(in + i * samples_per_frame),
             size_channel * channels);
 
-        int ret           = avcodec_encode_audio2(av_context, &pkt, frame,
+        int ret           = avcodec_encode_audio2(av_context, &pkt, m_frame,
                                                   &got_packet);
 
         if (ret < 0)
         {
             LOG(VB_AUDIO, LOG_ERR, LOC + "AC-3 encode error");
-            avcodec_free_frame(&frame);
             return ret;
         }
         i++;
@@ -265,7 +279,6 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
                 (realloc(out, out_size, required_len));
             if (!tmp)
             {
-                avcodec_free_frame(&frame);
                 out = NULL;
                 out_size = 0;
                 LOG(VB_AUDIO, LOG_ERR, LOC +
@@ -280,7 +293,6 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
         outlen += data_size;
         inlen  -= samples_per_frame * sizeof(inbuf_t);
     }
-    avcodec_free_frame(&frame);
 
     memmove(in, in + i * samples_per_frame, inlen);
     return outlen;

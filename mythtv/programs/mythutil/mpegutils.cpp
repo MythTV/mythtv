@@ -372,7 +372,7 @@ bool PTSListener::ProcessTSPacket(const TSPacket &tspacket)
 
     while (bufptr < bufend)
     {
-        bufptr = avpriv_mpv_find_start_code(bufptr, bufend, &m_start_code);
+        bufptr = avpriv_find_start_code(bufptr, bufend, &m_start_code);
         int bytes_left = bufend - bufptr;
         if ((m_start_code & 0xffffff00) == 0x00000100)
         {

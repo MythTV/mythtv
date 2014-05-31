@@ -21,24 +21,24 @@
 
 #include "bit_depth_template.c"
 void FUNC(ff_emulated_edge_mc)(uint8_t *buf, const uint8_t *src,
-                                      ptrdiff_t linesize_arg,
-                                      int block_w, int block_h,
-                                      int src_x, int src_y, int w, int h)
+                               ptrdiff_t buf_linesize,
+                               ptrdiff_t src_linesize,
+                               int block_w, int block_h,
+                               int src_x, int src_y, int w, int h)
 {
     int x, y;
     int start_y, start_x, end_y, end_x;
-    int linesize = linesize_arg;
 
     if (!w || !h)
         return;
 
     if (src_y >= h) {
-        src -= src_y * linesize;
-        src += (h - 1) * linesize;
+        src -= src_y * src_linesize;
+        src += (h - 1) * src_linesize;
         src_y = h - 1;
     } else if (src_y <= -block_h) {
-        src -= src_y * linesize;
-        src += (1 - block_h) * linesize;
+        src -= src_y * src_linesize;
+        src += (1 - block_h) * src_linesize;
         src_y = 1 - block_h;
     }
     if (src_x >= w) {
@@ -57,30 +57,30 @@ void FUNC(ff_emulated_edge_mc)(uint8_t *buf, const uint8_t *src,
     av_assert2(start_x < end_x && block_w);
 
     w    = end_x - start_x;
-    src += start_y * linesize + start_x * sizeof(pixel);
+    src += start_y * src_linesize + start_x * sizeof(pixel);
     buf += start_x * sizeof(pixel);
 
     // top
     for (y = 0; y < start_y; y++) {
         memcpy(buf, src, w * sizeof(pixel));
-        buf += linesize;
+        buf += buf_linesize;
     }
 
     // copy existing part
     for (; y < end_y; y++) {
         memcpy(buf, src, w * sizeof(pixel));
-        src += linesize;
-        buf += linesize;
+        src += src_linesize;
+        buf += buf_linesize;
     }
 
     // bottom
-    src -= linesize;
+    src -= src_linesize;
     for (; y < block_h; y++) {
         memcpy(buf, src, w * sizeof(pixel));
-        buf += linesize;
+        buf += buf_linesize;
     }
 
-    buf -= block_h * linesize + start_x * sizeof(pixel);
+    buf -= block_h * buf_linesize + start_x * sizeof(pixel);
     while (block_h--) {
         pixel *bufp = (pixel *) buf;
 
@@ -93,6 +93,6 @@ void FUNC(ff_emulated_edge_mc)(uint8_t *buf, const uint8_t *src,
         for (x = end_x; x < block_w; x++) {
             bufp[x] = bufp[end_x - 1];
         }
-        buf += linesize;
+        buf += buf_linesize;
     }
 }

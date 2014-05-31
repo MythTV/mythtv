@@ -101,7 +101,7 @@ typedef struct URLProtocol {
  * is to be opened
  * @param int_cb interrupt callback to use for the URLContext, may be
  * NULL
- * @return 0 in case of success, a negative value corresponding to an
+ * @return >= 0 in case of success, a negative value corresponding to an
  * AVERROR code in case of failure
  */
 int ffurl_alloc(URLContext **puc, const char *filename, int flags,
@@ -130,7 +130,7 @@ int ffurl_connect(URLContext *uc, AVDictionary **options);
  * @param options  A dictionary filled with protocol-private options. On return
  * this parameter will be destroyed and replaced with a dict containing options
  * that were not found. May be NULL.
- * @return 0 in case of success, a negative value corresponding to an
+ * @return >= 0 in case of success, a negative value corresponding to an
  * AVERROR code in case of failure
  */
 int ffurl_open(URLContext **puc, const char *filename, int flags,
@@ -226,10 +226,8 @@ int ffurl_shutdown(URLContext *h, int flags);
 
 /**
  * Register the URLProtocol protocol.
- *
- * @param size the size of the URLProtocol struct referenced
  */
-int ffurl_register_protocol(URLProtocol *protocol, int size);
+int ffurl_register_protocol(URLProtocol *protocol);
 
 /**
  * Check if the user has requested to interrup a blocking function
@@ -247,5 +245,42 @@ URLProtocol *ffurl_protocol_next(URLProtocol *prev);
 /* udp.c */
 int ff_udp_set_remote_url(URLContext *h, const char *uri);
 int ff_udp_get_local_port(URLContext *h);
+
+/**
+ * Assemble a URL string from components. This is the reverse operation
+ * of av_url_split.
+ *
+ * Note, this requires networking to be initialized, so the caller must
+ * ensure ff_network_init has been called.
+ *
+ * @see av_url_split
+ *
+ * @param str the buffer to fill with the url
+ * @param size the size of the str buffer
+ * @param proto the protocol identifier, if null, the separator
+ *              after the identifier is left out, too
+ * @param authorization an optional authorization string, may be null.
+ *                      An empty string is treated the same as a null string.
+ * @param hostname the host name string
+ * @param port the port number, left out from the string if negative
+ * @param fmt a generic format string for everything to add after the
+ *            host/port, may be null
+ * @return the number of characters written to the destination buffer
+ */
+int ff_url_join(char *str, int size, const char *proto,
+                const char *authorization, const char *hostname,
+                int port, const char *fmt, ...) av_printf_format(7, 8);
+
+/**
+ * Convert a relative url into an absolute url, given a base url.
+ *
+ * @param buf the buffer where output absolute url is written
+ * @param size the size of buf
+ * @param base the base url, may be equal to buf.
+ * @param rel the new url, which is interpreted relative to base
+ */
+void ff_make_absolute_url(char *buf, int size, const char *base,
+                          const char *rel);
+
 
 #endif /* AVFORMAT_URL_H */

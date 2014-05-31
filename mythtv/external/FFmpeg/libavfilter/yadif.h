@@ -1,19 +1,19 @@
 /*
  * This file is part of FFmpeg.
  *
- * FFmpeg is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * FFmpeg is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
  *
  * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along
- * with FFmpeg; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with FFmpeg; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 #ifndef AVFILTER_YADIF_H
@@ -49,21 +49,19 @@ typedef struct YADIFContext {
 
     int frame_pending;
 
-    AVFilterBufferRef *cur;
-    AVFilterBufferRef *next;
-    AVFilterBufferRef *prev;
-    AVFilterBufferRef *out;
+    AVFrame *cur;
+    AVFrame *next;
+    AVFrame *prev;
+    AVFrame *out;
 
     /**
      * Required alignment for filter_line
      */
-    int req_align;
     void (*filter_line)(void *dst,
                         void *prev, void *cur, void *next,
                         int w, int prefs, int mrefs, int parity, int mode);
     void (*filter_edges)(void *dst, void *prev, void *cur, void *next,
-                         int w, int prefs, int mrefs, int parity, int mode,
-                         int l_edge);
+                         int w, int prefs, int mrefs, int parity, int mode);
 
     const AVPixFmtDescriptor *csp;
     int eof;

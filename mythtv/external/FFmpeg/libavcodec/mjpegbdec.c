@@ -45,10 +45,10 @@ static int mjpegb_decode_frame(AVCodecContext *avctx,
     int buf_size = avpkt->size;
     MJpegDecodeContext *s = avctx->priv_data;
     const uint8_t *buf_end, *buf_ptr;
-    AVFrame *picture = data;
     GetBitContext hgb; /* for the header */
     uint32_t dqt_offs, dht_offs, sof_offs, sos_offs, second_field_offs;
     uint32_t field_size, sod_offs;
+    int ret;
 
     buf_ptr = buf;
     buf_end = buf + buf_size;
@@ -119,7 +119,7 @@ read_header:
                       8 * FFMIN(field_size, buf_end - buf_ptr - sos_offs));
         s->mjpb_skiptosod = (sod_offs - sos_offs - show_bits(&s->gb, 16));
         s->start_code = SOS;
-        if (ff_mjpeg_decode_sos(s, NULL, NULL) < 0 &&
+        if (ff_mjpeg_decode_sos(s, NULL, 0, NULL) < 0 &&
             (avctx->err_recognition & AV_EF_EXPLODE))
           return AVERROR_INVALIDDATA;
     }
@@ -141,17 +141,13 @@ read_header:
         return buf_size;
     }
 
-    *picture= *s->picture_ptr;
+    if ((ret = av_frame_ref(data, s->picture_ptr)) < 0)
+        return ret;
     *got_frame = 1;
 
-    if(!s->lossless){
-        picture->quality= FFMAX3(s->qscale[0], s->qscale[1], s->qscale[2]);
-        picture->qstride= 0;
-        picture->qscale_table= s->qscale_table;
-        memset(picture->qscale_table, picture->quality, (s->width+15)/16);
-        if(avctx->debug & FF_DEBUG_QP)
-            av_log(avctx, AV_LOG_DEBUG, "QP: %d\n", picture->quality);
-        picture->quality*= FF_QP2LAMBDA;
+    if (!s->lossless && avctx->debug & FF_DEBUG_QP) {
+        av_log(avctx, AV_LOG_DEBUG, "QP: %d\n",
+               FFMAX3(s->qscale[0], s->qscale[1], s->qscale[2]));
     }
 
     return buf_size;
@@ -159,6 +155,7 @@ read_header:
 
 AVCodec ff_mjpegb_decoder = {
     .name           = "mjpegb",
+    .long_name      = NULL_IF_CONFIG_SMALL("Apple MJPEG-B"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_MJPEGB,
     .priv_data_size = sizeof(MJpegDecodeContext),
@@ -167,5 +164,4 @@ AVCodec ff_mjpegb_decoder = {
     .decode         = mjpegb_decode_frame,
     .capabilities   = CODEC_CAP_DR1,
     .max_lowres     = 3,
-    .long_name      = NULL_IF_CONFIG_SMALL("Apple MJPEG-B"),
 };

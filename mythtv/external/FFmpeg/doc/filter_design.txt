@@ -29,6 +29,11 @@ Format negotiation
   same format amongst a supported list, all it has to do is use a reference
   to the same list of formats.
 
+  query_formats can leave some formats unset and return AVERROR(EAGAIN) to
+  cause the negotiation mechanism to try again later. That can be used by
+  filters with complex requirements to use the format negotiated on one link
+  to set the formats supported on another.
+
 
 Buffer references ownership and permissions
 ===========================================
@@ -161,7 +166,7 @@ Buffer references ownership and permissions
       WRITE permission.
 
     * Filters that read their input to produce a new frame on output (like
-      scale) need the READ permission on input and and must request a buffer
+      scale) need the READ permission on input and must request a buffer
       with the WRITE permission.
 
     * Filters that intend to keep a reference after the filtering process
@@ -199,7 +204,7 @@ Frame scheduling
     filter; these buffered frames must be flushed immediately if a new input
     produces new output.
 
-    (Example: framerate-doubling filter: filter_frame must (1) flush the
+    (Example: frame rate-doubling filter: filter_frame must (1) flush the
     second copy of the previous frame, if it is still there, (2) push the
     first copy of the incoming frame, (3) keep the second copy for later.)
 

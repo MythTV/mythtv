@@ -30,9 +30,9 @@
 #if HAVE_PTHREADS
 #include <pthread.h>
 #elif HAVE_W32THREADS
-#include "w32pthreads.h"
+#include "compat/w32pthreads.h"
 #elif HAVE_OS2THREADS
-#include "os2threads.h"
+#include "compat/os2threads.h"
 #endif
 
 #define MAX_THREADS 64
@@ -92,9 +92,9 @@ static void * attribute_align_arg worker(void *v){
 
         ret = avcodec_encode_video2(avctx, pkt, frame, &got_packet);
         pthread_mutex_lock(&c->buffer_mutex);
-        c->parent_avctx->release_buffer(c->parent_avctx, frame);
+        av_frame_unref(frame);
         pthread_mutex_unlock(&c->buffer_mutex);
-        av_freep(&frame);
+        av_frame_free(&frame);
         if(got_packet) {
             av_dup_packet(pkt);
         } else {
@@ -125,8 +125,33 @@ int ff_frame_thread_encoder_init(AVCodecContext *avctx, AVDictionary *options){
        || !(avctx->codec->capabilities & CODEC_CAP_INTRA_ONLY))
         return 0;
 
+    if(   !avctx->thread_count
+       && avctx->codec_id == AV_CODEC_ID_MJPEG
+       && !(avctx->flags & CODEC_FLAG_QSCALE)) {
+        av_log(avctx, AV_LOG_DEBUG,
+               "Forcing thread count to 1 for MJPEG encoding, use -thread_type slice "
+               "or a constant quantizer if you want to use multiple cpu cores\n");
+        avctx->thread_count = 1;
+    }
+    if(   avctx->thread_count > 1
+       && avctx->codec_id == AV_CODEC_ID_MJPEG
+       && !(avctx->flags & CODEC_FLAG_QSCALE))
+        av_log(avctx, AV_LOG_WARNING,
+               "MJPEG CBR encoding works badly with frame multi-threading, consider "
+               "using -threads 1, -thread_type slice or a constant quantizer.\n");
+
+    if (avctx->codec_id == AV_CODEC_ID_HUFFYUV ||
+        avctx->codec_id == AV_CODEC_ID_FFVHUFF) {
+        // huffyuv doesnt support these with multiple frame threads currently
+        if (avctx->context_model > 0 || (avctx->flags & CODEC_FLAG_PASS1)) {
+            av_log(avctx, AV_LOG_WARNING,
+               "Forcing thread count to 1 for huffyuv encoding with first pass or context 1\n");
+            avctx->thread_count = 1;
+        }
+    }
+
     if(!avctx->thread_count) {
-        avctx->thread_count = ff_get_logical_cpus(avctx);
+        avctx->thread_count = av_cpu_count();
         avctx->thread_count = FFMIN(avctx->thread_count, MAX_THREADS);
     }
 
@@ -222,11 +247,11 @@ int ff_thread_video_encode_frame(AVCodecContext *avctx, AVPacket *pkt, const AVF
 
     if(frame){
         if(!(avctx->flags & CODEC_FLAG_INPUT_PRESERVED)){
-            AVFrame *new = avcodec_alloc_frame();
+            AVFrame *new = av_frame_alloc();
             if(!new)
                 return AVERROR(ENOMEM);
             pthread_mutex_lock(&c->buffer_mutex);
-            ret = ff_get_buffer(c->parent_avctx, new);
+            ret = ff_get_buffer(c->parent_avctx, new, 0);
             pthread_mutex_unlock(&c->buffer_mutex);
             if(ret<0)
                 return ret;

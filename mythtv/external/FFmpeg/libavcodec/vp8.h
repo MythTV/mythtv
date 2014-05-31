@@ -26,16 +26,18 @@
 #ifndef AVCODEC_VP8_H
 #define AVCODEC_VP8_H
 
+#include "libavutil/buffer.h"
+
 #include "vp56.h"
-#include "vp56data.h"
 #include "vp8dsp.h"
 #include "h264pred.h"
+#include "thread.h"
 #if HAVE_PTHREADS
 #include <pthread.h>
-#elif HAVE_W32THREADS
-#include "w32pthreads.h"
 #elif HAVE_OS2THREADS
-#include "os2threads.h"
+#include "compat/os2threads.h"
+#elif HAVE_W32THREADS
+#include "compat/w32pthreads.h"
 #endif
 
 #define VP8_MAX_QUANT 127
@@ -120,18 +122,25 @@ typedef struct VP8ThreadData {
 #endif
     int thread_mb_pos; // (mb_y << 16) | (mb_x & 0xFFFF)
     int wait_mb_pos; // What the current thread is waiting on.
-    uint8_t *edge_emu_buffer;
+
+#define EDGE_EMU_LINESIZE 32
+    DECLARE_ALIGNED(16, uint8_t, edge_emu_buffer)[21 * EDGE_EMU_LINESIZE];
     VP8FilterStrength *filter_strength;
 } VP8ThreadData;
+
+typedef struct VP8Frame {
+    ThreadFrame tf;
+    AVBufferRef *seg_map;
+} VP8Frame;
 
 #define MAX_THREADS 8
 typedef struct VP8Context {
     VP8ThreadData *thread_data;
     AVCodecContext *avctx;
-    AVFrame *framep[4];
-    AVFrame *next_framep[4];
-    AVFrame *curframe;
-    AVFrame *prev_frame;
+    VP8Frame *framep[4];
+    VP8Frame *next_framep[4];
+    VP8Frame *curframe;
+    VP8Frame *prev_frame;
 
     uint16_t mb_width;   /* number of horizontal MB */
     uint16_t mb_height;  /* number of vertical MB */
@@ -253,17 +262,8 @@ typedef struct VP8Context {
     VP8DSPContext vp8dsp;
     H264PredContext hpc;
     vp8_mc_func put_pixels_tab[3][3][3];
-    AVFrame frames[5];
+    VP8Frame frames[5];
 
-    /**
-     * A list of segmentation_map buffers that are to be free()'ed in
-     * the next decoding iteration. We can't free() them right away
-     * because the map may still be used by subsequent decoding threads.
-     * Unused if frame threading is off.
-     */
-    uint8_t *segmentation_maps[5];
-    int num_maps_to_be_freed;
-    int maps_are_invalid;
     int num_jobs;
     /**
      * This describes the macroblock memory layout.
@@ -272,5 +272,12 @@ typedef struct VP8Context {
      */
     int mb_layout;
 } VP8Context;
+
+int ff_vp8_decode_init(AVCodecContext *avctx);
+
+int ff_vp8_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
+                        AVPacket *avpkt);
+
+int ff_vp8_decode_free(AVCodecContext *avctx);
 
 #endif /* AVCODEC_VP8_H */

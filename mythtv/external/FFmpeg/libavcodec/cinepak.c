@@ -40,6 +40,7 @@
 #include "libavutil/common.h"
 #include "libavutil/intreadwrite.h"
 #include "avcodec.h"
+#include "internal.h"
 
 
 typedef uint8_t cvid_codebook[12];
@@ -57,7 +58,7 @@ typedef struct {
 typedef struct CinepakContext {
 
     AVCodecContext *avctx;
-    AVFrame frame;
+    AVFrame *frame;
 
     const unsigned char *data;
     int size;
@@ -143,14 +144,14 @@ static int cinepak_decode_vectors (CinepakContext *s, cvid_strip *strip,
     for (y=strip->y1; y < strip->y2; y+=4) {
 
 /* take care of y dimension not being multiple of 4, such streams exist */
-        ip0 = ip1 = ip2 = ip3 = s->frame.data[0] +
-          (s->palette_video?strip->x1:strip->x1*3) + (y * s->frame.linesize[0]);
+        ip0 = ip1 = ip2 = ip3 = s->frame->data[0] +
+          (s->palette_video?strip->x1:strip->x1*3) + (y * s->frame->linesize[0]);
         if(s->avctx->height - y > 1) {
-            ip1 = ip0 + s->frame.linesize[0];
+            ip1 = ip0 + s->frame->linesize[0];
             if(s->avctx->height - y > 2) {
-                ip2 = ip1 + s->frame.linesize[0];
+                ip2 = ip1 + s->frame->linesize[0];
                 if(s->avctx->height - y > 3) {
-                    ip3 = ip2 + s->frame.linesize[0];
+                    ip3 = ip2 + s->frame->linesize[0];
                 }
             }
         }
@@ -331,7 +332,7 @@ static int cinepak_decode (CinepakContext *s)
     /* if this is the first frame, check for deviant Sega FILM data */
     if (s->sega_film_skip_bytes == -1) {
         if (!encoded_buf_size) {
-            av_log_ask_for_sample(s->avctx, "encoded_buf_size is 0");
+            avpriv_request_sample(s->avctx, "encoded_buf_size 0");
             return AVERROR_PATCHWELCOME;
         }
         if (encoded_buf_size != s->size && (s->size % encoded_buf_size) != 0) {
@@ -359,7 +360,7 @@ static int cinepak_decode (CinepakContext *s)
 
     num_strips = FFMIN(num_strips, MAX_STRIPS);
 
-    s->frame.key_frame = 0;
+    s->frame->key_frame = 0;
 
     for (i=0; i < num_strips; i++) {
         if ((s->data + 12) > eod)
@@ -375,7 +376,7 @@ static int cinepak_decode (CinepakContext *s)
         s->strips[i].x2 = AV_RB16 (&s->data[10]);
 
         if (s->strips[i].id == 0x10)
-            s->frame.key_frame = 1;
+            s->frame->key_frame = 1;
 
         strip_size = AV_RB24 (&s->data[1]) - 12;
         if (strip_size < 0)
@@ -420,8 +421,9 @@ static av_cold int cinepak_decode_init(AVCodecContext *avctx)
         avctx->pix_fmt = AV_PIX_FMT_PAL8;
     }
 
-    avcodec_get_frame_defaults(&s->frame);
-    s->frame.data[0] = NULL;
+    s->frame = av_frame_alloc();
+    if (!s->frame)
+        return AVERROR(ENOMEM);
 
     return 0;
 }
@@ -437,18 +439,13 @@ static int cinepak_decode_frame(AVCodecContext *avctx,
     s->data = buf;
     s->size = buf_size;
 
-    s->frame.reference = 3;
-    s->frame.buffer_hints = FF_BUFFER_HINTS_VALID | FF_BUFFER_HINTS_PRESERVE |
-                            FF_BUFFER_HINTS_REUSABLE;
-    if ((ret = avctx->reget_buffer(avctx, &s->frame))) {
-        av_log(avctx, AV_LOG_ERROR, "reget_buffer() failed\n");
+    if ((ret = ff_reget_buffer(avctx, s->frame)) < 0)
         return ret;
-    }
 
     if (s->palette_video) {
         const uint8_t *pal = av_packet_get_side_data(avpkt, AV_PKT_DATA_PALETTE, NULL);
         if (pal) {
-            s->frame.palette_has_changed = 1;
+            s->frame->palette_has_changed = 1;
             memcpy(s->pal, pal, AVPALETTE_SIZE);
         }
     }
@@ -458,10 +455,12 @@ static int cinepak_decode_frame(AVCodecContext *avctx,
     }
 
     if (s->palette_video)
-        memcpy (s->frame.data[1], s->pal, AVPALETTE_SIZE);
+        memcpy (s->frame->data[1], s->pal, AVPALETTE_SIZE);
+
+    if ((ret = av_frame_ref(data, s->frame)) < 0)
+        return ret;
 
     *got_frame = 1;
-    *(AVFrame*)data = s->frame;
 
     /* report that the buffer was completely consumed */
     return buf_size;
@@ -471,14 +470,14 @@ static av_cold int cinepak_decode_end(AVCodecContext *avctx)
 {
     CinepakContext *s = avctx->priv_data;
 
-    if (s->frame.data[0])
-        avctx->release_buffer(avctx, &s->frame);
+    av_frame_free(&s->frame);
 
     return 0;
 }
 
 AVCodec ff_cinepak_decoder = {
     .name           = "cinepak",
+    .long_name      = NULL_IF_CONFIG_SMALL("Cinepak"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_CINEPAK,
     .priv_data_size = sizeof(CinepakContext),
@@ -486,5 +485,4 @@ AVCodec ff_cinepak_decoder = {
     .close          = cinepak_decode_end,
     .decode         = cinepak_decode_frame,
     .capabilities   = CODEC_CAP_DR1,
-    .long_name      = NULL_IF_CONFIG_SMALL("Cinepak"),
 };

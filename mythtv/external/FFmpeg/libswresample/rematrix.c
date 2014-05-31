@@ -34,6 +34,10 @@
 #include "rematrix_template.c"
 #undef TEMPLATE_REMATRIX_S16
 
+#define TEMPLATE_REMATRIX_S32
+#include "rematrix_template.c"
+#undef TEMPLATE_REMATRIX_S32
+
 #define FRONT_LEFT             0
 #define FRONT_RIGHT            1
 #define FRONT_CENTER           2
@@ -113,6 +117,7 @@ av_cold static int auto_matrix(SwrContext *s)
     double maxcoef=0;
     char buf[128];
     const int matrix_encoding = s->matrix_encoding;
+    float maxval;
 
     in_ch_layout = clean_layout(s, s->in_ch_layout);
     out_ch_layout = clean_layout(s, s->out_ch_layout);
@@ -121,6 +126,11 @@ av_cold static int auto_matrix(SwrContext *s)
        && (in_ch_layout & AV_CH_LAYOUT_STEREO_DOWNMIX) == 0
     )
         out_ch_layout = AV_CH_LAYOUT_STEREO;
+
+    if(    in_ch_layout == AV_CH_LAYOUT_STEREO_DOWNMIX
+       && (out_ch_layout & AV_CH_LAYOUT_STEREO_DOWNMIX) == 0
+    )
+        in_ch_layout = AV_CH_LAYOUT_STEREO;
 
     if(!sane_layout(in_ch_layout)){
         av_get_channel_layout_string(buf, sizeof(buf), -1, s->in_ch_layout);
@@ -303,8 +313,16 @@ av_cold static int auto_matrix(SwrContext *s)
     if(s->rematrix_volume  < 0)
         maxcoef = -s->rematrix_volume;
 
-    if((   av_get_packed_sample_fmt(s->out_sample_fmt) < AV_SAMPLE_FMT_FLT
-        || av_get_packed_sample_fmt(s->int_sample_fmt) < AV_SAMPLE_FMT_FLT) && maxcoef > 1.0){
+    if (s->rematrix_maxval > 0) {
+        maxval = s->rematrix_maxval;
+    } else if (   av_get_packed_sample_fmt(s->out_sample_fmt) < AV_SAMPLE_FMT_FLT
+               || av_get_packed_sample_fmt(s->int_sample_fmt) < AV_SAMPLE_FMT_FLT) {
+        maxval = 1.0;
+    } else
+        maxval = INT_MAX;
+
+    if(maxcoef > maxval || s->rematrix_volume  < 0){
+        maxcoef /= maxval;
         for(i=0; i<SWR_CH_MAX; i++)
             for(j=0; j<SWR_CH_MAX; j++){
                 s->matrix[i][j] /= maxcoef;
@@ -340,7 +358,7 @@ av_cold int swri_rematrix_init(SwrContext *s){
             return r;
     }
     if (s->midbuf.fmt == AV_SAMPLE_FMT_S16P){
-        s->native_matrix = av_mallocz(nb_in * nb_out * sizeof(int));
+        s->native_matrix = av_calloc(nb_in * nb_out, sizeof(int));
         s->native_one    = av_mallocz(sizeof(int));
         for (i = 0; i < nb_out; i++)
             for (j = 0; j < nb_in; j++)
@@ -350,7 +368,7 @@ av_cold int swri_rematrix_init(SwrContext *s){
         s->mix_2_1_f = (mix_2_1_func_type*)sum2_s16;
         s->mix_any_f = (mix_any_func_type*)get_mix_any_func_s16(s);
     }else if(s->midbuf.fmt == AV_SAMPLE_FMT_FLTP){
-        s->native_matrix = av_mallocz(nb_in * nb_out * sizeof(float));
+        s->native_matrix = av_calloc(nb_in * nb_out, sizeof(float));
         s->native_one    = av_mallocz(sizeof(float));
         for (i = 0; i < nb_out; i++)
             for (j = 0; j < nb_in; j++)
@@ -360,7 +378,7 @@ av_cold int swri_rematrix_init(SwrContext *s){
         s->mix_2_1_f = (mix_2_1_func_type*)sum2_float;
         s->mix_any_f = (mix_any_func_type*)get_mix_any_func_float(s);
     }else if(s->midbuf.fmt == AV_SAMPLE_FMT_DBLP){
-        s->native_matrix = av_mallocz(nb_in * nb_out * sizeof(double));
+        s->native_matrix = av_calloc(nb_in * nb_out, sizeof(double));
         s->native_one    = av_mallocz(sizeof(double));
         for (i = 0; i < nb_out; i++)
             for (j = 0; j < nb_in; j++)
@@ -369,6 +387,17 @@ av_cold int swri_rematrix_init(SwrContext *s){
         s->mix_1_1_f = (mix_1_1_func_type*)copy_double;
         s->mix_2_1_f = (mix_2_1_func_type*)sum2_double;
         s->mix_any_f = (mix_any_func_type*)get_mix_any_func_double(s);
+    }else if(s->midbuf.fmt == AV_SAMPLE_FMT_S32P){
+        // Only for dithering currently
+//         s->native_matrix = av_calloc(nb_in * nb_out, sizeof(double));
+        s->native_one    = av_mallocz(sizeof(int));
+//         for (i = 0; i < nb_out; i++)
+//             for (j = 0; j < nb_in; j++)
+//                 ((double*)s->native_matrix)[i * nb_in + j] = s->matrix[i][j];
+        *((int*)s->native_one) = 32768;
+        s->mix_1_1_f = (mix_1_1_func_type*)copy_s32;
+        s->mix_2_1_f = (mix_2_1_func_type*)sum2_s32;
+        s->mix_any_f = (mix_any_func_type*)get_mix_any_func_s32(s);
     }else
         av_assert0(0);
     //FIXME quantize for integeres
@@ -391,6 +420,7 @@ av_cold void swri_rematrix_free(SwrContext *s){
     av_freep(&s->native_matrix);
     av_freep(&s->native_one);
     av_freep(&s->native_simd_matrix);
+    av_freep(&s->native_simd_one);
 }
 
 int swri_rematrix(SwrContext *s, AudioData *out, AudioData *in, int len, int mustcopy){
@@ -408,8 +438,8 @@ int swri_rematrix(SwrContext *s, AudioData *out, AudioData *in, int len, int mus
         off = len1 * out->bps;
     }
 
-    av_assert0(out->ch_count == av_get_channel_layout_nb_channels(s->out_ch_layout));
-    av_assert0(in ->ch_count == av_get_channel_layout_nb_channels(s-> in_ch_layout));
+    av_assert0(!s->out_ch_layout || out->ch_count == av_get_channel_layout_nb_channels(s->out_ch_layout));
+    av_assert0(!s-> in_ch_layout || in ->ch_count == av_get_channel_layout_nb_channels(s-> in_ch_layout));
 
     for(out_i=0; out_i<out->ch_count; out_i++){
         switch(s->matrix_ch[out_i][0]){

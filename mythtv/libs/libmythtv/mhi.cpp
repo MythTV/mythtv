@@ -1815,7 +1815,7 @@ void MHIBitmap::CreateFromMPEG(const unsigned char *data, int length)
         return;
 
     c = avcodec_alloc_context3(NULL);
-    picture = avcodec_alloc_frame();
+    picture = av_frame_alloc();
 
     if (avcodec_open2(c, codec, NULL) < 0)
         goto Close;
@@ -1887,7 +1887,7 @@ Close:
     av_free_packet(&pkt);
     avcodec_close(c);
     av_free(c);
-    av_free(picture);
+    av_frame_free(&picture);
 }
 
 // Scale the bitmap.  Only used for image derived from MPEG I-frames.

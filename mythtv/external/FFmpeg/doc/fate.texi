@@ -27,7 +27,7 @@ by visiting this website:
 
   This is especially recommended for all people contributing source
 code to FFmpeg, as it can be seen if some test on some platform broke
-with there recent contribution. This usually happens on the platforms
+with their recent contribution. This usually happens on the platforms
 the developers could not test on.
 
   The second part of this document describes how you can run FATE to
@@ -131,7 +131,12 @@ of the server and to accept its host key. This can usually be achieved by
 running your SSH client manually and killing it after you accepted the key.
 The FATE server's fingerprint is:
 
-  b1:31:c8:79:3f:04:1d:f8:f2:23:26:5a:fd:55:fa:92
+@table @option
+@item RSA
+   d3:f1:83:97:a4:75:2b:a6:fb:d6:e8:aa:81:93:97:51
+@item ECDSA
+   76:9f:68:32:04:1e:d5:d4:ec:47:3f:dc:fc:18:17:86
+@end table
 
   If you have problems connecting to the FATE server, it may help to try out
 the @command{ssh} command with one or more @option{-v} options. You should
@@ -148,20 +153,20 @@ the synchronisation of the samples directory.
 
 @table @option
 @item fate-rsync
-    Download/synchronize sample files to the configured samples directory.
+Download/synchronize sample files to the configured samples directory.
 
 @item fate-list
-    Will list all fate/regression test targets.
+Will list all fate/regression test targets.
 
 @item fate
-    Run the FATE test suite (requires the fate-suite dataset).
+Run the FATE test suite (requires the fate-suite dataset).
 @end table
 
 @section Makefile variables
 
 @table @option
 @item V
-    Verbosity level, can be set to 0, 1 or 2.
+Verbosity level, can be set to 0, 1 or 2.
     @itemize
         @item 0: show just the test arguments
         @item 1: show just the command used in the test
@@ -169,22 +174,28 @@ the synchronisation of the samples directory.
     @end itemize
 
 @item SAMPLES
-    Specify or override the path to the FATE samples at make time, it has a
-    meaning only while running the regression tests.
+Specify or override the path to the FATE samples at make time, it has a
+meaning only while running the regression tests.
 
 @item THREADS
-    Specify how many threads to use while running regression tests, it is
-    quite useful to detect thread-related regressions.
+Specify how many threads to use while running regression tests, it is
+quite useful to detect thread-related regressions.
+
 @item THREAD_TYPE
-    Specify which threading strategy test, either @var{slice} or @var{frame},
-    by default @var{slice+frame}
+Specify which threading strategy test, either @var{slice} or @var{frame},
+by default @var{slice+frame}
+
 @item CPUFLAGS
-    Specify CPU flags.
+Specify CPU flags.
+
 @item TARGET_EXEC
-    Specify or override the wrapper used to run the tests.
-    The @var{TARGET_EXEC} option provides a way to run FATE wrapped in
-    @command{valgrind}, @command{qemu-user} or @command{wine} or on remote targets
-    through @command{ssh}.
+Specify or override the wrapper used to run the tests.
+The @var{TARGET_EXEC} option provides a way to run FATE wrapped in
+@command{valgrind}, @command{qemu-user} or @command{wine} or on remote targets
+through @command{ssh}.
+
+@item GEN
+Set to @var{1} to generate the missing or mismatched references.
 @end table
 
 @section Examples

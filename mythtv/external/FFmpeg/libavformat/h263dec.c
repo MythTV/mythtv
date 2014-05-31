@@ -35,7 +35,7 @@ static int h263_probe(AVProbeData *p)
     for(i=0; i<p->buf_size; i++){
         code = (code<<8) + p->buf[i];
         if ((code & 0xfffffc0000) == 0x800000) {
-            src_fmt= (code>>2)&3;
+            src_fmt= (code>>2)&7;
             if(   src_fmt != last_src_fmt
                && last_src_fmt>0 && last_src_fmt<6
                && src_fmt<6)
@@ -56,9 +56,9 @@ static int h263_probe(AVProbeData *p)
         }
     }
     if(valid_psc > 2*invalid_psc + 2*res_change + 3){
-        return 50;
+        return AVPROBE_SCORE_EXTENSION;
     }else if(valid_psc > 2*invalid_psc)
-        return 25;
+        return AVPROBE_SCORE_EXTENSION / 2;
     return 0;
 }
 

@@ -106,7 +106,7 @@ QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # Headers needed by frontend & backend
 HEADERS += filter.h                 format.h
-HEADERS += frame.h
+HEADERS += mythframe.h
 
 # LZO used by NuppelDecoder & NuppelVideoRecorder
 HEADERS += lzoconf.h

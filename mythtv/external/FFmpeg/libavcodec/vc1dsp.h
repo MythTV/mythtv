@@ -29,9 +29,10 @@
 #define AVCODEC_VC1DSP_H
 
 #include "dsputil.h"
+#include "hpeldsp.h"
 #include "h264chroma.h"
 
-typedef void (*vc1op_pixels_func)(uint8_t *block/*align width (8 or 16)*/, const uint8_t *pixels/*align 1*/, int line_size, int h);
+typedef void (*vc1op_pixels_func)(uint8_t *block/*align width (8 or 16)*/, const uint8_t *pixels/*align 1*/, ptrdiff_t line_size, int h);
 
 typedef struct VC1DSPContext {
     /* vc1 functions */
@@ -76,7 +77,9 @@ typedef struct VC1DSPContext {
 } VC1DSPContext;
 
 void ff_vc1dsp_init(VC1DSPContext* c);
-void ff_vc1dsp_init_altivec(VC1DSPContext* c);
+void ff_vc1dsp_init_aarch64(VC1DSPContext* dsp);
+void ff_vc1dsp_init_arm(VC1DSPContext* dsp);
+void ff_vc1dsp_init_ppc(VC1DSPContext *c);
 void ff_vc1dsp_init_x86(VC1DSPContext* dsp);
 
 #endif /* AVCODEC_VC1DSP_H */

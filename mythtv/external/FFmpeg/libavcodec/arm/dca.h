@@ -1,20 +1,20 @@
 /*
  * Copyright (c) 2011 Mans Rullgard <mans@mansr.com>
  *
- * This file is part of Libav.
+ * This file is part of FFmpeg.
  *
- * Libav is free software; you can redistribute it and/or
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
  *
- * Libav is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with Libav; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -24,15 +24,16 @@
 #include <stdint.h>
 
 #include "config.h"
+#include "libavcodec/dcadsp.h"
 #include "libavcodec/mathops.h"
 
 #if HAVE_ARMV6_INLINE && AV_GCC_VERSION_AT_LEAST(4,4) && !CONFIG_THUMB
 
 #define decode_blockcodes decode_blockcodes
 static inline int decode_blockcodes(int code1, int code2, int levels,
-                                    int *values)
+                                    int32_t *values)
 {
-    int v0, v1, v2, v3, v4, v5;
+    int32_t v0, v1, v2, v3, v4, v5;
 
     __asm__ ("smmul   %0,  %6,  %10           \n"
              "smmul   %3,  %7,  %10           \n"
@@ -74,28 +75,6 @@ static inline int decode_blockcodes(int code1, int code2, int levels,
              : "memory");
 
     return code1 | code2;
-}
-
-#endif
-
-#if HAVE_NEON_INLINE && HAVE_ASM_MOD_Y
-
-#define int8x8_fmul_int32 int8x8_fmul_int32
-static inline void int8x8_fmul_int32(float *dst, const int8_t *src, int scale)
-{
-    __asm__ ("vcvt.f32.s32 %2,  %2,  #4         \n"
-             "vld1.8       {d0},     [%1,:64]   \n"
-             "vmovl.s8     q0,  d0              \n"
-             "vmovl.s16    q1,  d1              \n"
-             "vmovl.s16    q0,  d0              \n"
-             "vcvt.f32.s32 q0,  q0              \n"
-             "vcvt.f32.s32 q1,  q1              \n"
-             "vmul.f32     q0,  q0,  %y2        \n"
-             "vmul.f32     q1,  q1,  %y2        \n"
-             "vst1.32      {q0-q1},  [%m0,:128] \n"
-             : "=Um"(*(float (*)[8])dst)
-             : "r"(src), "x"(scale)
-             : "d0", "d1", "d2", "d3");
 }
 
 #endif

@@ -98,7 +98,7 @@ static int encode_mp2_audio(audio_frame_t *aframe, uint8_t *buffer, int bufsize)
 		return 1;
 	}
  
-	c = avcodec_alloc_context();
+	c = avcodec_alloc_context3(codec);
 
 	/* put sample parameters */
 	c->bit_rate = aframe->bit_rate;
@@ -107,7 +107,7 @@ static int encode_mp2_audio(audio_frame_t *aframe, uint8_t *buffer, int bufsize)
 	c->sample_fmt = AV_SAMPLE_FMT_S16;
 
     /* open it */
-	if (avcodec_open(c, codec) < 0) {
+	if (avcodec_open2(c, codec, NULL) < 0) {
 		LOG(VB_GENERAL, LOG_ERR, "could not open codec");
 		av_free(c);
 		return 1;

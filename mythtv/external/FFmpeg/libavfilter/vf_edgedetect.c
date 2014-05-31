@@ -45,21 +45,14 @@ typedef struct {
 static const AVOption edgedetect_options[] = {
     { "high", "set high threshold", OFFSET(high), AV_OPT_TYPE_DOUBLE, {.dbl=50/255.}, 0, 1, FLAGS },
     { "low",  "set low threshold",  OFFSET(low),  AV_OPT_TYPE_DOUBLE, {.dbl=20/255.}, 0, 1, FLAGS },
-    { NULL },
+    { NULL }
 };
 
 AVFILTER_DEFINE_CLASS(edgedetect);
 
-static av_cold int init(AVFilterContext *ctx, const char *args)
+static av_cold int init(AVFilterContext *ctx)
 {
-    int ret;
     EdgeDetectContext *edgedetect = ctx->priv;
-
-    edgedetect->class = &edgedetect_class;
-    av_opt_set_defaults(edgedetect);
-
-    if ((ret = av_set_options_string(edgedetect, args, "=", ":")) < 0)
-        return ret;
 
     edgedetect->low_u8  = edgedetect->low  * 255. + .5;
     edgedetect->high_u8 = edgedetect->high * 255. + .5;
@@ -249,21 +242,27 @@ static void double_threshold(AVFilterContext *ctx, int w, int h,
     }
 }
 
-static int filter_frame(AVFilterLink *inlink, AVFilterBufferRef *in)
+static int filter_frame(AVFilterLink *inlink, AVFrame *in)
 {
     AVFilterContext *ctx = inlink->dst;
     EdgeDetectContext *edgedetect = ctx->priv;
     AVFilterLink *outlink = inlink->dst->outputs[0];
     uint8_t  *tmpbuf    = edgedetect->tmpbuf;
     uint16_t *gradients = edgedetect->gradients;
-    AVFilterBufferRef *out;
+    int direct = 0;
+    AVFrame *out;
 
-    out = ff_get_video_buffer(outlink, AV_PERM_WRITE, outlink->w, outlink->h);
-    if (!out) {
-        avfilter_unref_bufferp(&in);
-        return AVERROR(ENOMEM);
+    if (av_frame_is_writable(in)) {
+        direct = 1;
+        out = in;
+    } else {
+        out = ff_get_video_buffer(outlink, outlink->w, outlink->h);
+        if (!out) {
+            av_frame_free(&in);
+            return AVERROR(ENOMEM);
+        }
+        av_frame_copy_props(out, in);
     }
-    avfilter_copy_buffer_ref_props(out, in);
 
     /* gaussian filter to reduce noise  */
     gaussian_blur(ctx, inlink->w, inlink->h,
@@ -287,7 +286,8 @@ static int filter_frame(AVFilterLink *inlink, AVFilterBufferRef *in)
                      out->data[0], out->linesize[0],
                      tmpbuf,       inlink->w);
 
-    avfilter_unref_bufferp(&in);
+    if (!direct)
+        av_frame_free(&in);
     return ff_filter_frame(outlink, out);
 }
 
@@ -305,7 +305,6 @@ static const AVFilterPad edgedetect_inputs[] = {
         .type         = AVMEDIA_TYPE_VIDEO,
         .config_props = config_props,
         .filter_frame = filter_frame,
-        .min_perms    = AV_PERM_READ,
      },
      { NULL }
 };
@@ -318,7 +317,7 @@ static const AVFilterPad edgedetect_outputs[] = {
      { NULL }
 };
 
-AVFilter avfilter_vf_edgedetect = {
+AVFilter ff_vf_edgedetect = {
     .name          = "edgedetect",
     .description   = NULL_IF_CONFIG_SMALL("Detect and draw edge."),
     .priv_size     = sizeof(EdgeDetectContext),
@@ -328,4 +327,5 @@ AVFilter avfilter_vf_edgedetect = {
     .inputs        = edgedetect_inputs,
     .outputs       = edgedetect_outputs,
     .priv_class    = &edgedetect_class,
+    .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC,
 };

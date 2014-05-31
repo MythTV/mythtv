@@ -108,14 +108,14 @@ AVFilterFormats *ff_merge_formats(AVFilterFormats *a, AVFilterFormats *b,
        To avoid that, pretend that there are no common formats to force the
        insertion of a conversion filter. */
     if (type == AVMEDIA_TYPE_VIDEO)
-        for (i = 0; i < a->format_count; i++)
-            for (j = 0; j < b->format_count; j++) {
+        for (i = 0; i < a->nb_formats; i++)
+            for (j = 0; j < b->nb_formats; j++) {
                 const AVPixFmtDescriptor *adesc = av_pix_fmt_desc_get(a->formats[i]);
                 const AVPixFmtDescriptor *bdesc = av_pix_fmt_desc_get(b->formats[j]);
-                alpha2 |= adesc->flags & bdesc->flags & PIX_FMT_ALPHA;
+                alpha2 |= adesc->flags & bdesc->flags & AV_PIX_FMT_FLAG_ALPHA;
                 chroma2|= adesc->nb_components > 1 && bdesc->nb_components > 1;
                 if (a->formats[i] == b->formats[j]) {
-                    alpha1 |= adesc->flags & PIX_FMT_ALPHA;
+                    alpha1 |= adesc->flags & AV_PIX_FMT_FLAG_ALPHA;
                     chroma1|= adesc->nb_components > 1;
                 }
             }
@@ -124,7 +124,7 @@ AVFilterFormats *ff_merge_formats(AVFilterFormats *a, AVFilterFormats *b,
     if (alpha2 > alpha1 || chroma2 > chroma1)
         return NULL;
 
-    MERGE_FORMATS(ret, a, b, formats, format_count, AVFilterFormats, fail);
+    MERGE_FORMATS(ret, a, b, formats, nb_formats, AVFilterFormats, fail);
 
     return ret;
 fail:
@@ -143,9 +143,9 @@ AVFilterFormats *ff_merge_samplerates(AVFilterFormats *a,
 
     if (a == b) return a;
 
-    if (a->format_count && b->format_count) {
-        MERGE_FORMATS(ret, a, b, formats, format_count, AVFilterFormats, fail);
-    } else if (a->format_count) {
+    if (a->nb_formats && b->nb_formats) {
+        MERGE_FORMATS(ret, a, b, formats, nb_formats, AVFilterFormats, fail);
+    } else if (a->nb_formats) {
         MERGE_REF(a, b, formats, AVFilterFormats, fail);
         ret = a;
     } else {
@@ -184,6 +184,10 @@ AVFilterChannelLayouts *ff_merge_channel_layouts(AVFilterChannelLayouts *a,
             for (i = j = 0; i < b->nb_channel_layouts; i++)
                 if (KNOWN(b->channel_layouts[i]))
                     b->channel_layouts[j++] = b->channel_layouts[i];
+            /* Not optimal: the unknown layouts of b may become known after
+               another merge. */
+            if (!j)
+                return NULL;
             b->nb_channel_layouts = j;
         }
         MERGE_REF(b, a, channel_layouts, AVFilterChannelLayouts, fail);
@@ -270,20 +274,6 @@ int ff_fmt_is_in(int fmt, const int *fmts)
     }                                                                   \
 }
 
-int *ff_copy_int_list(const int * const list)
-{
-    int *ret = NULL;
-    COPY_INT_LIST(ret, list, int);
-    return ret;
-}
-
-int64_t *ff_copy_int64_list(const int64_t * const list)
-{
-    int64_t *ret = NULL;
-    COPY_INT_LIST(ret, list, int64_t);
-    return ret;
-}
-
 #define MAKE_FORMAT_LIST(type, field, count_field)                      \
     type *formats;                                                      \
     int count = 0;                                                      \
@@ -303,7 +293,7 @@ int64_t *ff_copy_int64_list(const int64_t * const list)
 
 AVFilterFormats *ff_make_format_list(const int *fmts)
 {
-    MAKE_FORMAT_LIST(AVFilterFormats, formats, format_count);
+    MAKE_FORMAT_LIST(AVFilterFormats, formats, nb_formats);
     while (count--)
         formats->formats[count] = fmts[count];
 
@@ -339,7 +329,7 @@ do {                                                        \
 
 int ff_add_format(AVFilterFormats **avff, int64_t fmt)
 {
-    ADD_FORMAT(avff, fmt, int, formats, format_count);
+    ADD_FORMAT(avff, fmt, int, formats, nb_formats);
     return 0;
 }
 
@@ -360,7 +350,7 @@ AVFilterFormats *ff_all_formats(enum AVMediaType type)
     for (fmt = 0; fmt < num_formats; fmt++) {
         const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(fmt);
         if ((type != AVMEDIA_TYPE_VIDEO) ||
-            (type == AVMEDIA_TYPE_VIDEO && !(desc->flags & PIX_FMT_HWACCEL)))
+            (type == AVMEDIA_TYPE_VIDEO && !(desc->flags & AV_PIX_FMT_FLAG_HWACCEL)))
             ff_add_format(&ret, fmt);
     }
 
@@ -625,10 +615,21 @@ int ff_parse_sample_rate(int *ret, const char *arg, void *log_ctx)
     return 0;
 }
 
-int ff_parse_channel_layout(int64_t *ret, const char *arg, void *log_ctx)
+int ff_parse_channel_layout(int64_t *ret, int *nret, const char *arg,
+                            void *log_ctx)
 {
     char *tail;
-    int64_t chlayout = av_get_channel_layout(arg);
+    int64_t chlayout, count;
+
+    if (nret) {
+        count = strtol(arg, &tail, 10);
+        if (*tail == 'c' && !tail[1] && count > 0 && count < 63) {
+            *nret = count;
+            *ret = 0;
+            return 0;
+        }
+    }
+    chlayout = av_get_channel_layout(arg);
     if (chlayout == 0) {
         chlayout = strtol(arg, &tail, 10);
         if (*tail || chlayout == 0) {
@@ -637,6 +638,8 @@ int ff_parse_channel_layout(int64_t *ret, const char *arg, void *log_ctx)
         }
     }
     *ret = chlayout;
+    if (nret)
+        *nret = av_get_channel_layout_nb_channels(chlayout);
     return 0;
 }
 

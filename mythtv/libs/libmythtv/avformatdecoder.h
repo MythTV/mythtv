@@ -21,7 +21,7 @@
 #include "mythplayer.h"
 
 extern "C" {
-#include "frame.h"
+#include "mythframe.h"
 #include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"
 #include "libavcodec/audioconvert.h"
@@ -52,7 +52,7 @@ class AudioInfo
         do_passthru(false), original_channels(-1)
     {;}
 
-    AudioInfo(CodecID id, AudioFormat fmt, int sr, int ch, bool passthru,
+    AudioInfo(AVCodecID id, AudioFormat fmt, int sr, int ch, bool passthru,
               int original_ch, int profile = 0) :
         codec_id(id), format(fmt),
         sample_size(ch * AudioOutputSettings::SampleSize(fmt)),
@@ -61,7 +61,7 @@ class AudioInfo
     {
     }
 
-    CodecID codec_id;
+    AVCodecID codec_id;
     AudioFormat format;
     int sample_size, sample_rate, channels, codec_profile;
     bool do_passthru;
@@ -201,7 +201,7 @@ class AvFormatDecoder : public DecoderBase
     int  filter_max_ch(const AVFormatContext *ic,
                        const sinfo_vec_t     &tracks,
                        const vector<int>     &fs,
-                       enum CodecID           codecId = AV_CODEC_ID_NONE,
+                       enum AVCodecID         codecId = AV_CODEC_ID_NONE,
                        int                    profile = -1);
 
     friend int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic);

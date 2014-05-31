@@ -1,37 +1,38 @@
 /*
- * Copyright (c) 2007 The Libav Project
+ * Copyright (c) 2007 The FFmpeg Project
  *
- * This file is part of Libav.
+ * This file is part of FFmpeg.
  *
- * Libav is free software; you can redistribute it and/or
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
  *
- * Libav is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with Libav; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "libavutil/avutil.h"
+#include <fcntl.h>
 #include "network.h"
-#include "libavcodec/internal.h"
-#include "libavutil/mem.h"
 #include "url.h"
+#include "libavcodec/internal.h"
+#include "libavutil/avutil.h"
+#include "libavutil/mem.h"
 #include "libavutil/time.h"
 
 #if HAVE_THREADS
 #if HAVE_PTHREADS
 #include <pthread.h>
 #elif HAVE_OS2THREADS
-#include "libavcodec/os2threads.h"
+#include "compat/os2threads.h"
 #else
-#include "libavcodec/w32pthreads.h"
+#include "compat/w32pthreads.h"
 #endif
 #endif
 
@@ -40,7 +41,6 @@
 static int openssl_init;
 #if HAVE_THREADS
 #include <openssl/crypto.h>
-#include "libavutil/avutil.h"
 pthread_mutex_t *openssl_mutexes;
 static void openssl_lock(int mode, int type, const char *file, int line)
 {
@@ -156,12 +156,12 @@ int ff_network_wait_fd_timeout(int fd, int write, int64_t timeout, AVIOInterrupt
     int64_t wait_start = 0;
 
     while (1) {
+        if (ff_check_interrupt(int_cb))
+            return AVERROR_EXIT;
         ret = ff_network_wait_fd(fd, write);
         if (ret != AVERROR(EAGAIN))
             return ret;
-        if (ff_check_interrupt(int_cb))
-            return AVERROR_EXIT;
-        if (timeout) {
+        if (timeout > 0) {
             if (!wait_start)
                 wait_start = av_gettime();
             else if (av_gettime() - wait_start > timeout)
@@ -211,4 +211,177 @@ int ff_is_multicast_address(struct sockaddr *addr)
 #endif
 
     return 0;
+}
+
+static int ff_poll_interrupt(struct pollfd *p, nfds_t nfds, int timeout,
+                             AVIOInterruptCB *cb)
+{
+    int runs = timeout / POLLING_TIME;
+    int ret = 0;
+
+    do {
+        if (ff_check_interrupt(cb))
+            return AVERROR_EXIT;
+        ret = poll(p, nfds, POLLING_TIME);
+        if (ret != 0)
+            break;
+    } while (timeout <= 0 || runs-- > 0);
+
+    if (!ret)
+        return AVERROR(ETIMEDOUT);
+    if (ret < 0)
+        return AVERROR(errno);
+    return ret;
+}
+
+int ff_socket(int af, int type, int proto)
+{
+    int fd;
+
+#ifdef SOCK_CLOEXEC
+    fd = socket(af, type | SOCK_CLOEXEC, proto);
+    if (fd == -1 && errno == EINVAL)
+#endif
+    {
+        fd = socket(af, type, proto);
+#if HAVE_FCNTL
+        if (fd != -1) {
+            if (fcntl(fd, F_SETFD, FD_CLOEXEC) == -1)
+                av_log(NULL, AV_LOG_DEBUG, "Failed to set close on exec\n");
+        }
+#endif
+    }
+    return fd;
+}
+
+int ff_listen_bind(int fd, const struct sockaddr *addr,
+                   socklen_t addrlen, int timeout, URLContext *h)
+{
+    int ret;
+    int reuse = 1;
+    struct pollfd lp = { fd, POLLIN, 0 };
+    if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse))) {
+        av_log(NULL, AV_LOG_WARNING, "setsockopt(SO_REUSEADDR) failed\n");
+    }
+    ret = bind(fd, addr, addrlen);
+    if (ret)
+        return ff_neterrno();
+
+    ret = listen(fd, 1);
+    if (ret)
+        return ff_neterrno();
+
+    ret = ff_poll_interrupt(&lp, 1, timeout, &h->interrupt_callback);
+    if (ret < 0)
+        return ret;
+
+    ret = accept(fd, NULL, NULL);
+    if (ret < 0)
+        return ff_neterrno();
+
+    closesocket(fd);
+
+    if (ff_socket_nonblock(ret, 1) < 0)
+        av_log(NULL, AV_LOG_DEBUG, "ff_socket_nonblock failed\n");
+
+    return ret;
+}
+
+int ff_listen_connect(int fd, const struct sockaddr *addr,
+                      socklen_t addrlen, int timeout, URLContext *h,
+                      int will_try_next)
+{
+    struct pollfd p = {fd, POLLOUT, 0};
+    int ret;
+    socklen_t optlen;
+
+    if (ff_socket_nonblock(fd, 1) < 0)
+        av_log(NULL, AV_LOG_DEBUG, "ff_socket_nonblock failed\n");
+
+    while ((ret = connect(fd, addr, addrlen))) {
+        ret = ff_neterrno();
+        switch (ret) {
+        case AVERROR(EINTR):
+            if (ff_check_interrupt(&h->interrupt_callback))
+                return AVERROR_EXIT;
+            continue;
+        case AVERROR(EINPROGRESS):
+        case AVERROR(EAGAIN):
+            ret = ff_poll_interrupt(&p, 1, timeout, &h->interrupt_callback);
+            if (ret < 0)
+                return ret;
+            optlen = sizeof(ret);
+            if (getsockopt (fd, SOL_SOCKET, SO_ERROR, &ret, &optlen))
+                ret = AVUNERROR(ff_neterrno());
+            if (ret != 0) {
+                char errbuf[100];
+                ret = AVERROR(ret);
+                av_strerror(ret, errbuf, sizeof(errbuf));
+                if (will_try_next)
+                    av_log(h, AV_LOG_WARNING,
+                           "Connection to %s failed (%s), trying next address\n",
+                           h->filename, errbuf);
+                else
+                    av_log(h, AV_LOG_ERROR, "Connection to %s failed: %s\n",
+                           h->filename, errbuf);
+            }
+        default:
+            return ret;
+        }
+    }
+    return ret;
+}
+
+static int match_host_pattern(const char *pattern, const char *hostname)
+{
+    int len_p, len_h;
+    if (!strcmp(pattern, "*"))
+        return 1;
+    // Skip a possible *. at the start of the pattern
+    if (pattern[0] == '*')
+        pattern++;
+    if (pattern[0] == '.')
+        pattern++;
+    len_p = strlen(pattern);
+    len_h = strlen(hostname);
+    if (len_p > len_h)
+        return 0;
+    // Simply check if the end of hostname is equal to 'pattern'
+    if (!strcmp(pattern, &hostname[len_h - len_p])) {
+        if (len_h == len_p)
+            return 1; // Exact match
+        if (hostname[len_h - len_p - 1] == '.')
+            return 1; // The matched substring is a domain and not just a substring of a domain
+    }
+    return 0;
+}
+
+int ff_http_match_no_proxy(const char *no_proxy, const char *hostname)
+{
+    char *buf, *start;
+    int ret = 0;
+    if (!no_proxy)
+        return 0;
+    if (!hostname)
+        return 0;
+    buf = av_strdup(no_proxy);
+    if (!buf)
+        return 0;
+    start = buf;
+    while (start) {
+        char *sep, *next = NULL;
+        start += strspn(start, " ,");
+        sep = start + strcspn(start, " ,");
+        if (*sep) {
+            next = sep + 1;
+            *sep = '\0';
+        }
+        if (match_host_pattern(start, hostname)) {
+            ret = 1;
+            break;
+        }
+        start = next;
+    }
+    av_free(buf);
+    return ret;
 }

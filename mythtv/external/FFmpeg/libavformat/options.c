@@ -19,6 +19,7 @@
  */
 #include "avformat.h"
 #include "avio_internal.h"
+#include "internal.h"
 #include "libavutil/opt.h"
 
 /**
@@ -86,7 +87,7 @@ static AVClassCategory get_category(void *ptr)
 static const AVClass av_format_context_class = {
     .class_name     = "AVFormatContext",
     .item_name      = format_to_name,
-    .option         = options,
+    .option         = avformat_options,
     .version        = LIBAVUTIL_VERSION_INT,
     .child_next     = format_child_next,
     .child_class_next = format_child_class_next,
@@ -109,6 +110,13 @@ AVFormatContext *avformat_alloc_context(void)
     ic = av_malloc(sizeof(AVFormatContext));
     if (!ic) return ic;
     avformat_get_context_defaults(ic);
+
+    ic->internal = av_mallocz(sizeof(*ic->internal));
+    if (!ic->internal) {
+        avformat_free_context(ic);
+        return NULL;
+    }
+
     return ic;
 }
 

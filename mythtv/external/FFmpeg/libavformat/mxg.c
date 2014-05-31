@@ -20,6 +20,7 @@
  */
 
 #include "libavutil/channel_layout.h"
+#include "libavutil/internal.h"
 #include "libavutil/intreadwrite.h"
 #include "libavcodec/mjpeg.h"
 #include "avformat.h"
@@ -74,7 +75,7 @@ static int mxg_read_header(AVFormatContext *s)
 static uint8_t* mxg_find_startmarker(uint8_t *p, uint8_t *end)
 {
     for (; p < end - 3; p += 4) {
-        uint32_t x = *(uint32_t*)p;
+        uint32_t x = AV_RN32(p);
 
         if (x & (~(x+0x01010101)) & 0x80808080) {
             if (p[0] == 0xff) {
@@ -170,7 +171,12 @@ static int mxg_read_packet(AVFormatContext *s, AVPacket *pkt)
 
                 pkt->pts = pkt->dts = mxg->dts;
                 pkt->stream_index = 0;
+#if FF_API_DESTRUCT_PACKET
+FF_DISABLE_DEPRECATION_WARNINGS
                 pkt->destruct = NULL;
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
+                pkt->buf  = NULL;
                 pkt->size = mxg->buffer_ptr - mxg->soi_ptr;
                 pkt->data = mxg->soi_ptr;
 
@@ -208,7 +214,12 @@ static int mxg_read_packet(AVFormatContext *s, AVPacket *pkt)
                     /* time (GMT) of first sample in usec since 1970, little-endian */
                     pkt->pts = pkt->dts = AV_RL64(startmarker_ptr + 8);
                     pkt->stream_index = 1;
+#if FF_API_DESTRUCT_PACKET
+FF_DISABLE_DEPRECATION_WARNINGS
                     pkt->destruct = NULL;
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
+                    pkt->buf  = NULL;
                     pkt->size = size - 14;
                     pkt->data = startmarker_ptr + 16;
 

@@ -4,7 +4,7 @@
 
 #include <stdlib.h>
 #include "filter.h"
-#include "frame.h"
+#include "mythframe.h"
 
 static VideoFilter *
 new_force_template (VideoFrameType inpixfmt, VideoFrameType outpixfmt,

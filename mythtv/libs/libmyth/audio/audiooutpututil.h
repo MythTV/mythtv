@@ -22,6 +22,10 @@ class MPUBLIC AudioOutputUtil
     static int DecodeAudio(AVCodecContext *ctx,
                            uint8_t *buffer, int &data_size,
                            const AVPacket *pkt);
+    /**
+     * MAX_SIZE_BUFFER is the maximum size of a buffer to be used with DecodeAudio
+     */
+    static const int MAX_SIZE_BUFFER = 192000;
 
     // Actually now in AudioConvert class, kept here for compatibility
     static int  toFloat(AudioFormat format, void *out, const void *in, int bytes);

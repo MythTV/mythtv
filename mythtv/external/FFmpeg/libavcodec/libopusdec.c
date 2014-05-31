@@ -108,8 +108,8 @@ static av_cold int libopus_decode_init(AVCodecContext *avc)
     }
 #endif
 
-    avc->internal->skip_samples = opus->pre_skip;
-    avc->delay = 3840;  /* Decoder delay (in samples) at 48kHz */
+    /* Decoder delay (in samples) at 48kHz */
+    avc->delay = avc->internal->skip_samples = opus->pre_skip;
 
     return 0;
 }
@@ -132,11 +132,8 @@ static int libopus_decode(AVCodecContext *avc, void *data,
     int ret, nb_samples;
 
     frame->nb_samples = MAX_FRAME_SIZE;
-    ret = ff_get_buffer(avc, frame);
-    if (ret < 0) {
-        av_log(avc, AV_LOG_ERROR, "get_buffer() failed\n");
+    if ((ret = ff_get_buffer(avc, frame, 0)) < 0)
         return ret;
-    }
 
     if (avc->sample_fmt == AV_SAMPLE_FMT_S16)
         nb_samples = opus_multistream_decode(opus->dec, pkt->data, pkt->size,
@@ -186,6 +183,7 @@ static void libopus_flush(AVCodecContext *avc)
 
 AVCodec ff_libopus_decoder = {
     .name           = "libopus",
+    .long_name      = NULL_IF_CONFIG_SMALL("libopus Opus"),
     .type           = AVMEDIA_TYPE_AUDIO,
     .id             = AV_CODEC_ID_OPUS,
     .priv_data_size = sizeof(struct libopus_context),
@@ -194,7 +192,6 @@ AVCodec ff_libopus_decoder = {
     .decode         = libopus_decode,
     .flush          = libopus_flush,
     .capabilities   = CODEC_CAP_DR1,
-    .long_name      = NULL_IF_CONFIG_SMALL("libopus Opus"),
     .sample_fmts    = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_FLT,
                                                      AV_SAMPLE_FMT_S16,
                                                      AV_SAMPLE_FMT_NONE },

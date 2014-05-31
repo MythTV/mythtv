@@ -5,7 +5,7 @@
 #ifndef _FILTER_H
 #define _FILTER_H
 
-#include "frame.h"
+#include "mythframe.h"
 
 #ifdef __cplusplus
 extern "C" {

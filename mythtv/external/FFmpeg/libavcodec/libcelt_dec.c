@@ -111,11 +111,8 @@ static int libcelt_dec_decode(AVCodecContext *c, void *data,
     int16_t *pcm;
 
     frame->nb_samples = c->frame_size;
-    err = ff_get_buffer(c, frame);
-    if (err < 0) {
-        av_log(c, AV_LOG_ERROR, "get_buffer() failed\n");
+    if ((err = ff_get_buffer(c, frame, 0)) < 0)
         return err;
-    }
     pcm = (int16_t *)frame->data[0];
     err = celt_decode(celt->dec, pkt->data, pkt->size, pcm, c->frame_size);
     if (err < 0)
@@ -132,6 +129,7 @@ static int libcelt_dec_decode(AVCodecContext *c, void *data,
 
 AVCodec ff_libcelt_decoder = {
     .name           = "libcelt",
+    .long_name      = NULL_IF_CONFIG_SMALL("Xiph CELT decoder using libcelt"),
     .type           = AVMEDIA_TYPE_AUDIO,
     .id             = AV_CODEC_ID_CELT,
     .priv_data_size = sizeof(struct libcelt_context),
@@ -139,5 +137,4 @@ AVCodec ff_libcelt_decoder = {
     .close          = libcelt_dec_close,
     .decode         = libcelt_dec_decode,
     .capabilities   = CODEC_CAP_DR1,
-    .long_name      = NULL_IF_CONFIG_SMALL("Xiph CELT decoder using libcelt"),
 };

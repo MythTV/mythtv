@@ -25,7 +25,7 @@
 #include "internal.h"
 #include "rawdec.h"
 #include "id3v1.h"
-
+#include "apetag.h"
 
 static int adts_aac_probe(AVProbeData *p)
 {
@@ -55,9 +55,9 @@ static int adts_aac_probe(AVProbeData *p)
         if(buf == buf0)
             first_frames= frames;
     }
-    if   (first_frames>=3) return AVPROBE_SCORE_MAX/2+1;
-    else if(max_frames>500)return AVPROBE_SCORE_MAX/2;
-    else if(max_frames>=3) return AVPROBE_SCORE_MAX/4;
+    if   (first_frames>=3) return AVPROBE_SCORE_EXTENSION + 1;
+    else if(max_frames>500)return AVPROBE_SCORE_EXTENSION;
+    else if(max_frames>=3) return AVPROBE_SCORE_EXTENSION / 2;
     else if(max_frames>=1) return 1;
     else                   return 0;
 }
@@ -75,6 +75,12 @@ static int adts_aac_read_header(AVFormatContext *s)
     st->need_parsing = AVSTREAM_PARSE_FULL_RAW;
 
     ff_id3v1_read(s);
+    if (s->pb->seekable &&
+        !av_dict_get(s->metadata, "", NULL, AV_DICT_IGNORE_SUFFIX)) {
+        int64_t cur = avio_tell(s->pb);
+        ff_ape_parse_tag(s);
+        avio_seek(s->pb, cur, SEEK_SET);
+    }
 
     //LCM of all possible ADTS sample rates
     avpriv_set_pts_info(st, 64, 1, 28224000);

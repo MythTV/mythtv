@@ -51,6 +51,8 @@ static const char *const var_names[] = {
     "dar",
     "hsub",
     "vsub",
+    "ohsub",
+    "ovsub",
     NULL
 };
 
@@ -64,6 +66,8 @@ enum var_name {
     VAR_DAR,
     VAR_HSUB,
     VAR_VSUB,
+    VAR_OHSUB,
+    VAR_OVSUB,
     VARS_NB
 };
 
@@ -71,14 +75,15 @@ typedef struct {
     const AVClass *class;
     struct SwsContext *sws;     ///< software scaler context
     struct SwsContext *isws[2]; ///< software scaler context for interlaced material
+    AVDictionary *opts;
 
     /**
      * New dimensions. Special values are:
      *   0 = original width/height
      *  -1 = keep original aspect
+     *  -N = try to keep aspect but make sure it is divisible by N
      */
     int w, h;
-    char *flags_str;            ///sws flags string
     char *size_str;
     unsigned int flags;         ///sws flags
 
@@ -90,51 +95,35 @@ typedef struct {
 
     char *w_expr;               ///< width  expression string
     char *h_expr;               ///< height expression string
+    char *flags_str;
+
+    char *in_color_matrix;
+    char *out_color_matrix;
+
+    int in_range;
+    int out_range;
+
+    int out_h_chr_pos;
+    int out_v_chr_pos;
+    int in_h_chr_pos;
+    int in_v_chr_pos;
+
+    int force_original_aspect_ratio;
 } ScaleContext;
 
-#define OFFSET(x) offsetof(ScaleContext, x)
-#define FLAGS AV_OPT_FLAG_VIDEO_PARAM|AV_OPT_FLAG_FILTERING_PARAM
-
-static const AVOption scale_options[] = {
-    { "w",      "set width expression",    OFFSET(w_expr), AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0, FLAGS },
-    { "width",  "set width expression",    OFFSET(w_expr), AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0, FLAGS },
-    { "h",      "set height expression",   OFFSET(h_expr), AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0, FLAGS },
-    { "height", "set height expression",   OFFSET(h_expr), AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0, FLAGS },
-    { "flags",  "set libswscale flags",    OFFSET(flags_str), AV_OPT_TYPE_STRING, {.str = NULL}, 0, INT_MAX, FLAGS },
-    { "interl", "set interlacing", OFFSET(interlaced), AV_OPT_TYPE_INT, {.i64 = 0 }, -1, 1, FLAGS },
-    { "size",   "set video size",          OFFSET(size_str), AV_OPT_TYPE_STRING, {.str = NULL}, 0, FLAGS },
-    { "s",      "set video size",          OFFSET(size_str), AV_OPT_TYPE_STRING, {.str = NULL}, 0, FLAGS },
-    { NULL },
-};
-
-AVFILTER_DEFINE_CLASS(scale);
-
-static av_cold int init(AVFilterContext *ctx, const char *args)
+static av_cold int init_dict(AVFilterContext *ctx, AVDictionary **opts)
 {
     ScaleContext *scale = ctx->priv;
-    static const char *shorthand[] = { "w", "h", NULL };
     int ret;
-    const char *args0 = args;
-
-    scale->class = &scale_class;
-    av_opt_set_defaults(scale);
-
-    if (args && (scale->size_str = av_get_token(&args, ":"))) {
-        if (av_parse_video_size(&scale->w, &scale->h, scale->size_str) < 0) {
-            av_freep(&scale->size_str);
-            args = args0;
-        } else if (*args)
-            args++;
-    }
-
-    if ((ret = av_opt_set_from_string(scale, args, shorthand, "=", ":")) < 0)
-        return ret;
 
     if (scale->size_str && (scale->w_expr || scale->h_expr)) {
         av_log(ctx, AV_LOG_ERROR,
                "Size and width/height expressions cannot be set at the same time.\n");
             return AVERROR(EINVAL);
     }
+
+    if (scale->w_expr && !scale->h_expr)
+        FFSWAP(char *, scale->w_expr, scale->size_str);
 
     if (scale->size_str) {
         char buf[32];
@@ -156,7 +145,8 @@ static av_cold int init(AVFilterContext *ctx, const char *args)
     av_log(ctx, AV_LOG_VERBOSE, "w:%s h:%s flags:'%s' interl:%d\n",
            scale->w_expr, scale->h_expr, (char *)av_x_if_null(scale->flags_str, ""), scale->interlaced);
 
-    scale->flags = SWS_BILINEAR;
+    scale->flags = 0;
+
     if (scale->flags_str) {
         const AVClass *class = sws_get_class();
         const AVOption    *o = av_opt_find(&class, "sws_flags", NULL, 0,
@@ -165,6 +155,8 @@ static av_cold int init(AVFilterContext *ctx, const char *args)
         if (ret < 0)
             return ret;
     }
+    scale->opts = *opts;
+    *opts = NULL;
 
     return 0;
 }
@@ -176,7 +168,7 @@ static av_cold void uninit(AVFilterContext *ctx)
     sws_freeContext(scale->isws[0]);
     sws_freeContext(scale->isws[1]);
     scale->sws = NULL;
-    av_opt_free(scale);
+    av_dict_free(&scale->opts);
 }
 
 static int query_formats(AVFilterContext *ctx)
@@ -188,7 +180,8 @@ static int query_formats(AVFilterContext *ctx)
     if (ctx->inputs[0]) {
         formats = NULL;
         for (pix_fmt = 0; pix_fmt < AV_PIX_FMT_NB; pix_fmt++)
-            if (   sws_isSupportedInput(pix_fmt)
+            if ((sws_isSupportedInput(pix_fmt) ||
+                 sws_isSupportedEndiannessConversion(pix_fmt))
                 && (ret = ff_add_format(&formats, pix_fmt)) < 0) {
                 ff_formats_unref(&formats);
                 return ret;
@@ -198,7 +191,8 @@ static int query_formats(AVFilterContext *ctx)
     if (ctx->outputs[0]) {
         formats = NULL;
         for (pix_fmt = 0; pix_fmt < AV_PIX_FMT_NB; pix_fmt++)
-            if (   (sws_isSupportedOutput(pix_fmt) || pix_fmt == AV_PIX_FMT_PAL8)
+            if ((sws_isSupportedOutput(pix_fmt) || pix_fmt == AV_PIX_FMT_PAL8 ||
+                 sws_isSupportedEndiannessConversion(pix_fmt))
                 && (ret = ff_add_format(&formats, pix_fmt)) < 0) {
                 ff_formats_unref(&formats);
                 return ret;
@@ -209,6 +203,28 @@ static int query_formats(AVFilterContext *ctx)
     return 0;
 }
 
+static const int *parse_yuv_type(const char *s, enum AVColorSpace colorspace)
+{
+    if (!s)
+        s = "bt601";
+
+    if (s && strstr(s, "bt709")) {
+        colorspace = AVCOL_SPC_BT709;
+    } else if (s && strstr(s, "fcc")) {
+        colorspace = AVCOL_SPC_FCC;
+    } else if (s && strstr(s, "smpte240m")) {
+        colorspace = AVCOL_SPC_SMPTE240M;
+    } else if (s && (strstr(s, "bt601") || strstr(s, "bt470") || strstr(s, "smpte170m"))) {
+        colorspace = AVCOL_SPC_BT470BG;
+    }
+
+    if (colorspace < 1 || colorspace > 7) {
+        colorspace = AVCOL_SPC_BT470BG;
+    }
+
+    return sws_getCoefficients(colorspace);
+}
+
 static int config_props(AVFilterLink *outlink)
 {
     AVFilterContext *ctx = outlink->src;
@@ -216,10 +232,12 @@ static int config_props(AVFilterLink *outlink)
     enum AVPixelFormat outfmt = outlink->format;
     ScaleContext *scale = ctx->priv;
     const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(inlink->format);
+    const AVPixFmtDescriptor *out_desc = av_pix_fmt_desc_get(outlink->format);
     int64_t w, h;
     double var_values[VARS_NB], res;
     char *expr;
     int ret;
+    int factor_w, factor_h;
 
     var_values[VAR_IN_W]  = var_values[VAR_IW] = inlink->w;
     var_values[VAR_IN_H]  = var_values[VAR_IH] = inlink->h;
@@ -231,6 +249,8 @@ static int config_props(AVFilterLink *outlink)
     var_values[VAR_DAR]   = var_values[VAR_A] * var_values[VAR_SAR];
     var_values[VAR_HSUB]  = 1 << desc->log2_chroma_w;
     var_values[VAR_VSUB]  = 1 << desc->log2_chroma_h;
+    var_values[VAR_OHSUB] = 1 << out_desc->log2_chroma_w;
+    var_values[VAR_OVSUB] = 1 << out_desc->log2_chroma_h;
 
     /* evaluate width and height */
     av_expr_parse_and_eval(&res, (expr = scale->w_expr),
@@ -252,22 +272,47 @@ static int config_props(AVFilterLink *outlink)
     w = scale->w;
     h = scale->h;
 
-    /* sanity check params */
-    if (w <  -1 || h <  -1) {
-        av_log(ctx, AV_LOG_ERROR, "Size values less than -1 are not acceptable.\n");
-        return AVERROR(EINVAL);
+    /* Check if it is requested that the result has to be divisible by a some
+     * factor (w or h = -n with n being the factor). */
+    factor_w = 1;
+    factor_h = 1;
+    if (w < -1) {
+        factor_w = -w;
     }
-    if (w == -1 && h == -1)
+    if (h < -1) {
+        factor_h = -h;
+    }
+
+    if (w < 0 && h < 0)
         scale->w = scale->h = 0;
 
     if (!(w = scale->w))
         w = inlink->w;
     if (!(h = scale->h))
         h = inlink->h;
-    if (w == -1)
-        w = av_rescale(h, inlink->w, inlink->h);
-    if (h == -1)
-        h = av_rescale(w, inlink->h, inlink->w);
+
+    /* Make sure that the result is divisible by the factor we determined
+     * earlier. If no factor was set, it is nothing will happen as the default
+     * factor is 1 */
+    if (w < 0)
+        w = av_rescale(h, inlink->w, inlink->h * factor_w) * factor_w;
+    if (h < 0)
+        h = av_rescale(w, inlink->h, inlink->w * factor_h) * factor_h;
+
+    /* Note that force_original_aspect_ratio may overwrite the previous set
+     * dimensions so that it is not divisible by the set factors anymore. */
+    if (scale->force_original_aspect_ratio) {
+        int tmp_w = av_rescale(h, inlink->w, inlink->h);
+        int tmp_h = av_rescale(w, inlink->h, inlink->w);
+
+        if (scale->force_original_aspect_ratio == 1) {
+             w = FFMIN(tmp_w, w);
+             h = FFMIN(tmp_h, h);
+        } else {
+             w = FFMAX(tmp_w, w);
+             h = FFMAX(tmp_h, h);
+        }
+    }
 
     if (w > INT_MAX || h > INT_MAX ||
         (h * inlink->w) > INT_MAX  ||
@@ -279,33 +324,59 @@ static int config_props(AVFilterLink *outlink)
 
     /* TODO: make algorithm configurable */
 
-    scale->input_is_pal = desc->flags & PIX_FMT_PAL ||
-                          desc->flags & PIX_FMT_PSEUDOPAL;
+    scale->input_is_pal = desc->flags & AV_PIX_FMT_FLAG_PAL ||
+                          desc->flags & AV_PIX_FMT_FLAG_PSEUDOPAL;
     if (outfmt == AV_PIX_FMT_PAL8) outfmt = AV_PIX_FMT_BGR8;
-    scale->output_is_pal = av_pix_fmt_desc_get(outfmt)->flags & PIX_FMT_PAL ||
-                           av_pix_fmt_desc_get(outfmt)->flags & PIX_FMT_PSEUDOPAL;
+    scale->output_is_pal = av_pix_fmt_desc_get(outfmt)->flags & AV_PIX_FMT_FLAG_PAL ||
+                           av_pix_fmt_desc_get(outfmt)->flags & AV_PIX_FMT_FLAG_PSEUDOPAL;
 
     if (scale->sws)
         sws_freeContext(scale->sws);
+    if (scale->isws[0])
+        sws_freeContext(scale->isws[0]);
+    if (scale->isws[1])
+        sws_freeContext(scale->isws[1]);
+    scale->isws[0] = scale->isws[1] = scale->sws = NULL;
     if (inlink->w == outlink->w && inlink->h == outlink->h &&
         inlink->format == outlink->format)
-        scale->sws = NULL;
+        ;
     else {
-        scale->sws = sws_getContext(inlink ->w, inlink ->h, inlink ->format,
-                                    outlink->w, outlink->h, outfmt,
-                                    scale->flags, NULL, NULL, NULL);
-        if (scale->isws[0])
-            sws_freeContext(scale->isws[0]);
-        scale->isws[0] = sws_getContext(inlink ->w, inlink ->h/2, inlink ->format,
-                                        outlink->w, outlink->h/2, outfmt,
-                                        scale->flags, NULL, NULL, NULL);
-        if (scale->isws[1])
-            sws_freeContext(scale->isws[1]);
-        scale->isws[1] = sws_getContext(inlink ->w, inlink ->h/2, inlink ->format,
-                                        outlink->w, outlink->h/2, outfmt,
-                                        scale->flags, NULL, NULL, NULL);
-        if (!scale->sws || !scale->isws[0] || !scale->isws[1])
-            return AVERROR(EINVAL);
+        struct SwsContext **swscs[3] = {&scale->sws, &scale->isws[0], &scale->isws[1]};
+        int i;
+
+        for (i = 0; i < 3; i++) {
+            struct SwsContext **s = swscs[i];
+            *s = sws_alloc_context();
+            if (!*s)
+                return AVERROR(ENOMEM);
+
+            if (scale->opts) {
+                AVDictionaryEntry *e = NULL;
+
+                while ((e = av_dict_get(scale->opts, "", e, AV_DICT_IGNORE_SUFFIX))) {
+                    if ((ret = av_opt_set(*s, e->key, e->value, 0)) < 0)
+                        return ret;
+                }
+            }
+
+            av_opt_set_int(*s, "srcw", inlink ->w, 0);
+            av_opt_set_int(*s, "srch", inlink ->h >> !!i, 0);
+            av_opt_set_int(*s, "src_format", inlink->format, 0);
+            av_opt_set_int(*s, "dstw", outlink->w, 0);
+            av_opt_set_int(*s, "dsth", outlink->h >> !!i, 0);
+            av_opt_set_int(*s, "dst_format", outfmt, 0);
+            av_opt_set_int(*s, "sws_flags", scale->flags, 0);
+
+            av_opt_set_int(*s, "src_h_chr_pos", scale->in_h_chr_pos, 0);
+            av_opt_set_int(*s, "src_v_chr_pos", scale->in_v_chr_pos, 0);
+            av_opt_set_int(*s, "dst_h_chr_pos", scale->out_h_chr_pos, 0);
+            av_opt_set_int(*s, "dst_v_chr_pos", scale->out_v_chr_pos, 0);
+
+            if ((ret = sws_init_context(*s, NULL, NULL)) < 0)
+                return ret;
+            if (!scale->interlaced)
+                break;
+        }
     }
 
     if (inlink->sample_aspect_ratio.num){
@@ -329,7 +400,7 @@ fail:
     return ret;
 }
 
-static int scale_slice(AVFilterLink *link, AVFilterBufferRef *out_buf, AVFilterBufferRef *cur_pic, struct SwsContext *sws, int y, int h, int mul, int field)
+static int scale_slice(AVFilterLink *link, AVFrame *out_buf, AVFrame *cur_pic, struct SwsContext *sws, int y, int h, int mul, int field)
 {
     ScaleContext *scale = link->dst->priv;
     const uint8_t *in[4];
@@ -353,17 +424,18 @@ static int scale_slice(AVFilterLink *link, AVFilterBufferRef *out_buf, AVFilterB
                          out,out_stride);
 }
 
-static int filter_frame(AVFilterLink *link, AVFilterBufferRef *in)
+static int filter_frame(AVFilterLink *link, AVFrame *in)
 {
     ScaleContext *scale = link->dst->priv;
     AVFilterLink *outlink = link->dst->outputs[0];
-    AVFilterBufferRef *out;
+    AVFrame *out;
     const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(link->format);
     char buf[32];
+    int in_range;
 
-    if(   in->video->w != link->w
-       || in->video->h != link->h
-       || in->format   != link->format) {
+    if(   in->width  != link->w
+       || in->height != link->h
+       || in->format != link->format) {
         int ret;
         snprintf(buf, sizeof(buf)-1, "%d", outlink->w);
         av_opt_set(scale, "w", buf, 0);
@@ -371,8 +443,8 @@ static int filter_frame(AVFilterLink *link, AVFilterBufferRef *in)
         av_opt_set(scale, "h", buf, 0);
 
         link->dst->inputs[0]->format = in->format;
-        link->dst->inputs[0]->w      = in->video->w;
-        link->dst->inputs[0]->h      = in->video->h;
+        link->dst->inputs[0]->w      = in->width;
+        link->dst->inputs[0]->h      = in->height;
 
         if ((ret = config_props(outlink)) < 0)
             return ret;
@@ -384,41 +456,125 @@ static int filter_frame(AVFilterLink *link, AVFilterBufferRef *in)
     scale->hsub = desc->log2_chroma_w;
     scale->vsub = desc->log2_chroma_h;
 
-    out = ff_get_video_buffer(outlink, AV_PERM_WRITE|AV_PERM_ALIGN, outlink->w, outlink->h);
+    out = ff_get_video_buffer(outlink, outlink->w, outlink->h);
     if (!out) {
-        avfilter_unref_bufferp(&in);
+        av_frame_free(&in);
         return AVERROR(ENOMEM);
     }
 
-    avfilter_copy_buffer_ref_props(out, in);
-    out->video->w = outlink->w;
-    out->video->h = outlink->h;
+    av_frame_copy_props(out, in);
+    out->width  = outlink->w;
+    out->height = outlink->h;
 
     if(scale->output_is_pal)
         avpriv_set_systematic_pal2((uint32_t*)out->data[1], outlink->format == AV_PIX_FMT_PAL8 ? AV_PIX_FMT_BGR8 : outlink->format);
 
-    av_reduce(&out->video->sample_aspect_ratio.num, &out->video->sample_aspect_ratio.den,
-              (int64_t)in->video->sample_aspect_ratio.num * outlink->h * link->w,
-              (int64_t)in->video->sample_aspect_ratio.den * outlink->w * link->h,
+    in_range = av_frame_get_color_range(in);
+
+    if (   scale->in_color_matrix
+        || scale->out_color_matrix
+        || scale-> in_range != AVCOL_RANGE_UNSPECIFIED
+        || in_range != AVCOL_RANGE_UNSPECIFIED
+        || scale->out_range != AVCOL_RANGE_UNSPECIFIED) {
+        int in_full, out_full, brightness, contrast, saturation;
+        const int *inv_table, *table;
+
+        sws_getColorspaceDetails(scale->sws, (int **)&inv_table, &in_full,
+                                 (int **)&table, &out_full,
+                                 &brightness, &contrast, &saturation);
+
+        if (scale->in_color_matrix)
+            inv_table = parse_yuv_type(scale->in_color_matrix, av_frame_get_colorspace(in));
+        if (scale->out_color_matrix)
+            table     = parse_yuv_type(scale->out_color_matrix, AVCOL_SPC_UNSPECIFIED);
+
+        if (scale-> in_range != AVCOL_RANGE_UNSPECIFIED)
+            in_full  = (scale-> in_range == AVCOL_RANGE_JPEG);
+        else if (in_range != AVCOL_RANGE_UNSPECIFIED)
+            in_full  = (in_range == AVCOL_RANGE_JPEG);
+        if (scale->out_range != AVCOL_RANGE_UNSPECIFIED)
+            out_full = (scale->out_range == AVCOL_RANGE_JPEG);
+
+        sws_setColorspaceDetails(scale->sws, inv_table, in_full,
+                                 table, out_full,
+                                 brightness, contrast, saturation);
+        if (scale->isws[0])
+            sws_setColorspaceDetails(scale->isws[0], inv_table, in_full,
+                                     table, out_full,
+                                     brightness, contrast, saturation);
+        if (scale->isws[1])
+            sws_setColorspaceDetails(scale->isws[1], inv_table, in_full,
+                                     table, out_full,
+                                     brightness, contrast, saturation);
+    }
+
+    av_reduce(&out->sample_aspect_ratio.num, &out->sample_aspect_ratio.den,
+              (int64_t)in->sample_aspect_ratio.num * outlink->h * link->w,
+              (int64_t)in->sample_aspect_ratio.den * outlink->w * link->h,
               INT_MAX);
 
-    if(scale->interlaced>0 || (scale->interlaced<0 && in->video->interlaced)){
+    if(scale->interlaced>0 || (scale->interlaced<0 && in->interlaced_frame)){
         scale_slice(link, out, in, scale->isws[0], 0, (link->h+1)/2, 2, 0);
         scale_slice(link, out, in, scale->isws[1], 0,  link->h   /2, 2, 1);
     }else{
         scale_slice(link, out, in, scale->sws, 0, link->h, 1, 0);
     }
 
-    avfilter_unref_bufferp(&in);
+    av_frame_free(&in);
     return ff_filter_frame(outlink, out);
 }
 
+static const AVClass *child_class_next(const AVClass *prev)
+{
+    return prev ? NULL : sws_get_class();
+}
+
+#define OFFSET(x) offsetof(ScaleContext, x)
+#define FLAGS AV_OPT_FLAG_VIDEO_PARAM|AV_OPT_FLAG_FILTERING_PARAM
+
+static const AVOption scale_options[] = {
+    { "w",     "Output video width",          OFFSET(w_expr),    AV_OPT_TYPE_STRING,        .flags = FLAGS },
+    { "width", "Output video width",          OFFSET(w_expr),    AV_OPT_TYPE_STRING,        .flags = FLAGS },
+    { "h",     "Output video height",         OFFSET(h_expr),    AV_OPT_TYPE_STRING,        .flags = FLAGS },
+    { "height","Output video height",         OFFSET(h_expr),    AV_OPT_TYPE_STRING,        .flags = FLAGS },
+    { "flags", "Flags to pass to libswscale", OFFSET(flags_str), AV_OPT_TYPE_STRING, { .str = "bilinear" }, .flags = FLAGS },
+    { "interl", "set interlacing", OFFSET(interlaced), AV_OPT_TYPE_INT, {.i64 = 0 }, -1, 1, FLAGS },
+    { "size",   "set video size",          OFFSET(size_str), AV_OPT_TYPE_STRING, {.str = NULL}, 0, FLAGS },
+    { "s",      "set video size",          OFFSET(size_str), AV_OPT_TYPE_STRING, {.str = NULL}, 0, FLAGS },
+    {  "in_color_matrix", "set input YCbCr type",   OFFSET(in_color_matrix),  AV_OPT_TYPE_STRING, { .str = "auto" }, .flags = FLAGS },
+    { "out_color_matrix", "set output YCbCr type",  OFFSET(out_color_matrix), AV_OPT_TYPE_STRING, { .str = NULL }, .flags = FLAGS },
+    {  "in_range", "set input color range",  OFFSET( in_range), AV_OPT_TYPE_INT, {.i64 = AVCOL_RANGE_UNSPECIFIED }, 0, 2, FLAGS, "range" },
+    { "out_range", "set output color range", OFFSET(out_range), AV_OPT_TYPE_INT, {.i64 = AVCOL_RANGE_UNSPECIFIED }, 0, 2, FLAGS, "range" },
+    { "auto",   NULL, 0, AV_OPT_TYPE_CONST, {.i64 = AVCOL_RANGE_UNSPECIFIED }, 0, 0, FLAGS, "range" },
+    { "full",   NULL, 0, AV_OPT_TYPE_CONST, {.i64 = AVCOL_RANGE_JPEG}, 0, 0, FLAGS, "range" },
+    { "jpeg",   NULL, 0, AV_OPT_TYPE_CONST, {.i64 = AVCOL_RANGE_JPEG}, 0, 0, FLAGS, "range" },
+    { "mpeg",   NULL, 0, AV_OPT_TYPE_CONST, {.i64 = AVCOL_RANGE_MPEG}, 0, 0, FLAGS, "range" },
+    { "tv",     NULL, 0, AV_OPT_TYPE_CONST, {.i64 = AVCOL_RANGE_MPEG}, 0, 0, FLAGS, "range" },
+    { "pc",     NULL, 0, AV_OPT_TYPE_CONST, {.i64 = AVCOL_RANGE_JPEG}, 0, 0, FLAGS, "range" },
+    { "in_v_chr_pos",   "input vertical chroma position in luma grid/256"  , OFFSET(in_v_chr_pos), AV_OPT_TYPE_INT, { .i64 = -1}, -1, 512, FLAGS },
+    { "in_h_chr_pos",   "input horizontal chroma position in luma grid/256", OFFSET(in_h_chr_pos), AV_OPT_TYPE_INT, { .i64 = -1}, -1, 512, FLAGS },
+    { "out_v_chr_pos",   "output vertical chroma position in luma grid/256"  , OFFSET(out_v_chr_pos), AV_OPT_TYPE_INT, { .i64 = -1}, -1, 512, FLAGS },
+    { "out_h_chr_pos",   "output horizontal chroma position in luma grid/256", OFFSET(out_h_chr_pos), AV_OPT_TYPE_INT, { .i64 = -1}, -1, 512, FLAGS },
+    { "force_original_aspect_ratio", "decrease or increase w/h if necessary to keep the original AR", OFFSET(force_original_aspect_ratio), AV_OPT_TYPE_INT, { .i64 = 0}, 0, 2, FLAGS, "force_oar" },
+    { "disable",  NULL, 0, AV_OPT_TYPE_CONST, {.i64 = 0 }, 0, 0, FLAGS, "force_oar" },
+    { "decrease", NULL, 0, AV_OPT_TYPE_CONST, {.i64 = 1 }, 0, 0, FLAGS, "force_oar" },
+    { "increase", NULL, 0, AV_OPT_TYPE_CONST, {.i64 = 2 }, 0, 0, FLAGS, "force_oar" },
+    { NULL }
+};
+
+static const AVClass scale_class = {
+    .class_name       = "scale",
+    .item_name        = av_default_item_name,
+    .option           = scale_options,
+    .version          = LIBAVUTIL_VERSION_INT,
+    .child_class_next = child_class_next,
+};
+
 static const AVFilterPad avfilter_vf_scale_inputs[] = {
     {
-        .name        = "default",
-        .type        = AVMEDIA_TYPE_VIDEO,
+        .name         = "default",
+        .type         = AVMEDIA_TYPE_VIDEO,
         .filter_frame = filter_frame,
-        .min_perms   = AV_PERM_READ,
     },
     { NULL }
 };
@@ -432,18 +588,14 @@ static const AVFilterPad avfilter_vf_scale_outputs[] = {
     { NULL }
 };
 
-AVFilter avfilter_vf_scale = {
-    .name      = "scale",
-    .description = NULL_IF_CONFIG_SMALL("Scale the input video to width:height size and/or convert the image format."),
-
-    .init      = init,
-    .uninit    = uninit,
-
+AVFilter ff_vf_scale = {
+    .name          = "scale",
+    .description   = NULL_IF_CONFIG_SMALL("Scale the input video size and/or convert the image format."),
+    .init_dict     = init_dict,
+    .uninit        = uninit,
     .query_formats = query_formats,
-
-    .priv_size = sizeof(ScaleContext),
-
-    .inputs    = avfilter_vf_scale_inputs,
-    .outputs   = avfilter_vf_scale_outputs,
-    .priv_class = &scale_class,
+    .priv_size     = sizeof(ScaleContext),
+    .priv_class    = &scale_class,
+    .inputs        = avfilter_vf_scale_inputs,
+    .outputs       = avfilter_vf_scale_outputs,
 };

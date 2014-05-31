@@ -35,13 +35,12 @@
  * an output packet will always start at the same point as one of the input
  * packets.
  */
-#define OGGVORBIS_FRAME_SIZE 64
+#define LIBVORBIS_FRAME_SIZE 64
 
 #define BUFFER_SIZE (1024 * 64)
 
-typedef struct OggVorbisEncContext {
+typedef struct LibvorbisEncContext {
     AVClass *av_class;                  /**< class for AVOptions            */
-    AVFrame frame;
     vorbis_info vi;                     /**< vorbis_info used during init   */
     vorbis_dsp_state vd;                /**< DSP state used for analysis    */
     vorbis_block vb;                    /**< vorbis_block used for analysis */
@@ -52,10 +51,10 @@ typedef struct OggVorbisEncContext {
     double iblock;                      /**< impulse block bias option      */
     VorbisParseContext vp;              /**< parse context to get durations */
     AudioFrameQueue afq;                /**< frame queue for timestamps     */
-} OggVorbisEncContext;
+} LibvorbisEncContext;
 
 static const AVOption options[] = {
-    { "iblock", "Sets the impulse block bias", offsetof(OggVorbisEncContext, iblock), AV_OPT_TYPE_DOUBLE, { .dbl = 0 }, -15, 0, AV_OPT_FLAG_AUDIO_PARAM | AV_OPT_FLAG_ENCODING_PARAM },
+    { "iblock", "Sets the impulse block bias", offsetof(LibvorbisEncContext, iblock), AV_OPT_TYPE_DOUBLE, { .dbl = 0 }, -15, 0, AV_OPT_FLAG_AUDIO_PARAM | AV_OPT_FLAG_ENCODING_PARAM },
     { NULL }
 };
 
@@ -64,7 +63,7 @@ static const AVCodecDefault defaults[] = {
     { NULL },
 };
 
-static const AVClass class = {
+static const AVClass vorbis_class = {
     .class_name = "libvorbis",
     .item_name  = av_default_item_name,
     .option     = options,
@@ -81,10 +80,9 @@ static int vorbis_error_to_averror(int ov_err)
     }
 }
 
-static av_cold int oggvorbis_init_encoder(vorbis_info *vi,
-                                          AVCodecContext *avctx)
+static av_cold int libvorbis_setup(vorbis_info *vi, AVCodecContext *avctx)
 {
-    OggVorbisEncContext *s = avctx->priv_data;
+    LibvorbisEncContext *s = avctx->priv_data;
     double cfreq;
     int ret;
 
@@ -173,9 +171,9 @@ static int xiph_len(int l)
     return 1 + l / 255 + l;
 }
 
-static av_cold int oggvorbis_encode_close(AVCodecContext *avctx)
+static av_cold int libvorbis_encode_close(AVCodecContext *avctx)
 {
-    OggVorbisEncContext *s = avctx->priv_data;
+    LibvorbisEncContext *s = avctx->priv_data;
 
     /* notify vorbisenc this is EOF */
     if (s->dsp_initialized)
@@ -187,24 +185,21 @@ static av_cold int oggvorbis_encode_close(AVCodecContext *avctx)
 
     av_fifo_free(s->pkt_fifo);
     ff_af_queue_close(&s->afq);
-#if FF_API_OLD_ENCODE_AUDIO
-    av_freep(&avctx->coded_frame);
-#endif
     av_freep(&avctx->extradata);
 
     return 0;
 }
 
-static av_cold int oggvorbis_encode_init(AVCodecContext *avctx)
+static av_cold int libvorbis_encode_init(AVCodecContext *avctx)
 {
-    OggVorbisEncContext *s = avctx->priv_data;
+    LibvorbisEncContext *s = avctx->priv_data;
     ogg_packet header, header_comm, header_code;
     uint8_t *p;
     unsigned int offset;
     int ret;
 
     vorbis_info_init(&s->vi);
-    if ((ret = oggvorbis_init_encoder(&s->vi, avctx))) {
+    if ((ret = libvorbis_setup(&s->vi, avctx))) {
         av_log(avctx, AV_LOG_ERROR, "encoder setup failed\n");
         goto error;
     }
@@ -258,7 +253,7 @@ static av_cold int oggvorbis_encode_init(AVCodecContext *avctx)
 
     vorbis_comment_clear(&s->vc);
 
-    avctx->frame_size = OGGVORBIS_FRAME_SIZE;
+    avctx->frame_size = LIBVORBIS_FRAME_SIZE;
     ff_af_queue_init(avctx, &s->afq);
 
     s->pkt_fifo = av_fifo_alloc(BUFFER_SIZE);
@@ -267,24 +262,16 @@ static av_cold int oggvorbis_encode_init(AVCodecContext *avctx)
         goto error;
     }
 
-#if FF_API_OLD_ENCODE_AUDIO
-    avctx->coded_frame = avcodec_alloc_frame();
-    if (!avctx->coded_frame) {
-        ret = AVERROR(ENOMEM);
-        goto error;
-    }
-#endif
-
     return 0;
 error:
-    oggvorbis_encode_close(avctx);
+    libvorbis_encode_close(avctx);
     return ret;
 }
 
-static int oggvorbis_encode_frame(AVCodecContext *avctx, AVPacket *avpkt,
+static int libvorbis_encode_frame(AVCodecContext *avctx, AVPacket *avpkt,
                                   const AVFrame *frame, int *got_packet_ptr)
 {
-    OggVorbisEncContext *s = avctx->priv_data;
+    LibvorbisEncContext *s = avctx->priv_data;
     ogg_packet op;
     int ret, duration;
 
@@ -374,16 +361,16 @@ static int oggvorbis_encode_frame(AVCodecContext *avctx, AVPacket *avpkt,
 
 AVCodec ff_libvorbis_encoder = {
     .name           = "libvorbis",
+    .long_name      = NULL_IF_CONFIG_SMALL("libvorbis"),
     .type           = AVMEDIA_TYPE_AUDIO,
     .id             = AV_CODEC_ID_VORBIS,
-    .priv_data_size = sizeof(OggVorbisEncContext),
-    .init           = oggvorbis_encode_init,
-    .encode2        = oggvorbis_encode_frame,
-    .close          = oggvorbis_encode_close,
+    .priv_data_size = sizeof(LibvorbisEncContext),
+    .init           = libvorbis_encode_init,
+    .encode2        = libvorbis_encode_frame,
+    .close          = libvorbis_encode_close,
     .capabilities   = CODEC_CAP_DELAY,
     .sample_fmts    = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_FLTP,
                                                       AV_SAMPLE_FMT_NONE },
-    .long_name      = NULL_IF_CONFIG_SMALL("libvorbis"),
-    .priv_class     = &class,
+    .priv_class     = &vorbis_class,
     .defaults       = defaults,
 };

@@ -86,8 +86,9 @@ static uint32_t samples_per_packet(enum AVCodecID codec_id, int channels) {
         return 1152;
     case AV_CODEC_ID_AC3:
         return 1536;
-    case AV_CODEC_ID_ALAC:
     case AV_CODEC_ID_QDM2:
+        return 2048 * channels;
+    case AV_CODEC_ID_ALAC:
         return 4096;
     case AV_CODEC_ID_ADPCM_IMA_WAV:
         return (1024 - 4 * channels) * 8 / (4 * channels) + 1;
@@ -106,6 +107,11 @@ static int caf_write_header(AVFormatContext *s)
     AVDictionaryEntry *t = NULL;
     unsigned int codec_tag = ff_codec_get_tag(ff_codec_caf_tags, enc->codec_id);
     int64_t chunk_size = 0;
+
+    if (s->nb_streams != 1) {
+        av_log(s, AV_LOG_ERROR, "CAF files have exactly one stream\n");
+        return AVERROR(EINVAL);
+    }
 
     switch (enc->codec_id) {
     case AV_CODEC_ID_AAC:

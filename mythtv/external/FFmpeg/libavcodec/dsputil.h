@@ -32,9 +32,7 @@
 
 #include "libavutil/intreadwrite.h"
 #include "avcodec.h"
-
-
-//#define DEBUG
+#include "rnd_avg.h"
 
 /* encoding scans */
 extern const uint8_t ff_alternate_horizontal_scan[64];
@@ -49,28 +47,16 @@ extern const uint8_t ff_zigzag248_direct[64];
 extern uint32_t ff_squareTbl[512];
 extern const uint8_t ff_cropTbl[256 + 2 * MAX_NEG_CROP];
 
-#define PUTAVG_PIXELS(depth)\
-void ff_put_pixels8x8_ ## depth ## _c(uint8_t *dst, uint8_t *src, int stride);\
-void ff_avg_pixels8x8_ ## depth ## _c(uint8_t *dst, uint8_t *src, int stride);\
-void ff_put_pixels16x16_ ## depth ## _c(uint8_t *dst, uint8_t *src, int stride);\
-void ff_avg_pixels16x16_ ## depth ## _c(uint8_t *dst, uint8_t *src, int stride);
-
-PUTAVG_PIXELS( 8)
-PUTAVG_PIXELS( 9)
-PUTAVG_PIXELS(10)
-PUTAVG_PIXELS(12)
-PUTAVG_PIXELS(14)
-
-#define ff_put_pixels8x8_c ff_put_pixels8x8_8_c
-#define ff_avg_pixels8x8_c ff_avg_pixels8x8_8_c
-#define ff_put_pixels16x16_c ff_put_pixels16x16_8_c
-#define ff_avg_pixels16x16_c ff_avg_pixels16x16_8_c
+void ff_put_pixels8x8_c(uint8_t *dst, uint8_t *src, ptrdiff_t stride);
+void ff_avg_pixels8x8_c(uint8_t *dst, uint8_t *src, ptrdiff_t stride);
+void ff_put_pixels16x16_c(uint8_t *dst, uint8_t *src, ptrdiff_t stride);
+void ff_avg_pixels16x16_c(uint8_t *dst, uint8_t *src, ptrdiff_t stride);
 
 /* RV40 functions */
-void ff_put_rv40_qpel16_mc33_c(uint8_t *dst, uint8_t *src, int stride);
-void ff_avg_rv40_qpel16_mc33_c(uint8_t *dst, uint8_t *src, int stride);
-void ff_put_rv40_qpel8_mc33_c(uint8_t *dst, uint8_t *src, int stride);
-void ff_avg_rv40_qpel8_mc33_c(uint8_t *dst, uint8_t *src, int stride);
+void ff_put_rv40_qpel16_mc33_c(uint8_t *dst, uint8_t *src, ptrdiff_t stride);
+void ff_avg_rv40_qpel16_mc33_c(uint8_t *dst, uint8_t *src, ptrdiff_t stride);
+void ff_put_rv40_qpel8_mc33_c(uint8_t *dst, uint8_t *src, ptrdiff_t stride);
+void ff_avg_rv40_qpel8_mc33_c(uint8_t *dst, uint8_t *src, ptrdiff_t stride);
 
 void ff_gmc_c(uint8_t *dst, uint8_t *src, int stride, int h, int ox, int oy,
               int dxx, int dxy, int dyx, int dyy, int shift, int r, int width, int height);
@@ -91,16 +77,15 @@ could be reached easily ...
 /* add and put pixel (decoding) */
 // blocksizes for op_pixels_func are 8x4,8x8 16x8 16x16
 //h for op_pixels_func is limited to {width/2, width} but never larger than 16 and never smaller than 4
-typedef void (*op_pixels_func)(uint8_t *block/*align width (8 or 16)*/, const uint8_t *pixels/*align 1*/, ptrdiff_t line_size, int h);
 typedef void (*tpel_mc_func)(uint8_t *block/*align width (8 or 16)*/, const uint8_t *pixels/*align 1*/, int line_size, int w, int h);
-typedef void (*qpel_mc_func)(uint8_t *dst/*align width (8 or 16)*/, uint8_t *src/*align 1*/, int stride);
+typedef void (*qpel_mc_func)(uint8_t *dst/*align width (8 or 16)*/, uint8_t *src/*align 1*/, ptrdiff_t stride);
 
 typedef void (*op_fill_func)(uint8_t *block/*align width (8 or 16)*/, uint8_t value, int line_size, int h);
 
 #define DEF_OLD_QPEL(name)\
-void ff_put_        ## name (uint8_t *dst/*align width (8 or 16)*/, uint8_t *src/*align 1*/, int stride);\
-void ff_put_no_rnd_ ## name (uint8_t *dst/*align width (8 or 16)*/, uint8_t *src/*align 1*/, int stride);\
-void ff_avg_        ## name (uint8_t *dst/*align width (8 or 16)*/, uint8_t *src/*align 1*/, int stride);
+void ff_put_        ## name (uint8_t *dst/*align width (8 or 16)*/, uint8_t *src/*align 1*/, ptrdiff_t stride);\
+void ff_put_no_rnd_ ## name (uint8_t *dst/*align width (8 or 16)*/, uint8_t *src/*align 1*/, ptrdiff_t stride);\
+void ff_avg_        ## name (uint8_t *dst/*align width (8 or 16)*/, uint8_t *src/*align 1*/, ptrdiff_t stride);
 
 DEF_OLD_QPEL(qpel16_mc11_old_c)
 DEF_OLD_QPEL(qpel16_mc31_old_c)
@@ -114,12 +99,6 @@ DEF_OLD_QPEL(qpel8_mc12_old_c)
 DEF_OLD_QPEL(qpel8_mc32_old_c)
 DEF_OLD_QPEL(qpel8_mc13_old_c)
 DEF_OLD_QPEL(qpel8_mc33_old_c)
-
-#define CALL_2X_PIXELS(a, b, n)\
-static void a(uint8_t *block, const uint8_t *pixels, ptrdiff_t line_size, int h){\
-    b(block  , pixels  , line_size, h);\
-    b(block+n, pixels+n, line_size, h);\
-}
 
 /* motion estimation */
 // h is limited to {width/2, width, 2*width} but never larger than 16 and never smaller than 2
@@ -143,11 +122,6 @@ void ff_init_scantable_permutation(uint8_t *idct_permutation,
  * DSPContext.
  */
 typedef struct DSPContext {
-    /**
-     * Size of DCT coefficients.
-     */
-    int dct_bits;
-
     /* pixel ops : interface with DCT */
     void (*get_pixels)(int16_t *block/*align 16*/, const uint8_t *pixels/*align 8*/, int line_size);
     void (*diff_pixels)(int16_t *block/*align 16*/, const uint8_t *s1/*align 8*/, const uint8_t *s2/*align 8*/, int stride);
@@ -197,54 +171,6 @@ typedef struct DSPContext {
                              int size);
 
     /**
-     * Halfpel motion compensation with rounding (a+b+1)>>1.
-     * this is an array[4][4] of motion compensation functions for 4
-     * horizontal blocksizes (8,16) and the 4 halfpel positions<br>
-     * *pixels_tab[ 0->16xH 1->8xH ][ xhalfpel + 2*yhalfpel ]
-     * @param block destination where the result is stored
-     * @param pixels source
-     * @param line_size number of bytes in a horizontal line of block
-     * @param h height
-     */
-    op_pixels_func put_pixels_tab[4][4];
-
-    /**
-     * Halfpel motion compensation with rounding (a+b+1)>>1.
-     * This is an array[4][4] of motion compensation functions for 4
-     * horizontal blocksizes (8,16) and the 4 halfpel positions<br>
-     * *pixels_tab[ 0->16xH 1->8xH ][ xhalfpel + 2*yhalfpel ]
-     * @param block destination into which the result is averaged (a+b+1)>>1
-     * @param pixels source
-     * @param line_size number of bytes in a horizontal line of block
-     * @param h height
-     */
-    op_pixels_func avg_pixels_tab[4][4];
-
-    /**
-     * Halfpel motion compensation with no rounding (a+b)>>1.
-     * this is an array[2][4] of motion compensation functions for 2
-     * horizontal blocksizes (8,16) and the 4 halfpel positions<br>
-     * *pixels_tab[ 0->16xH 1->8xH ][ xhalfpel + 2*yhalfpel ]
-     * @param block destination where the result is stored
-     * @param pixels source
-     * @param line_size number of bytes in a horizontal line of block
-     * @param h height
-     */
-    op_pixels_func put_no_rnd_pixels_tab[4][4];
-
-    /**
-     * Halfpel motion compensation with no rounding (a+b)>>1.
-     * this is an array[4] of motion compensation functions for 1
-     * horizontal blocksize (16) and the 4 halfpel positions<br>
-     * *pixels_tab[0][ xhalfpel + 2*yhalfpel ]
-     * @param block destination into which the result is averaged (a+b)>>1
-     * @param pixels source
-     * @param line_size number of bytes in a horizontal line of block
-     * @param h height
-     */
-    op_pixels_func avg_no_rnd_pixels_tab[4];
-
-    /**
      * Thirdpel motion compensation with rounding (a+b+1)>>1.
      * this is an array[12] of motion compensation functions for the 9 thirdpe
      * positions<br>
@@ -278,11 +204,6 @@ typedef struct DSPContext {
     /* this might write to dst[w] */
     void (*bswap_buf)(uint32_t *dst, const uint32_t *src, int w);
     void (*bswap16_buf)(uint16_t *dst, const uint16_t *src, int len);
-
-    void (*h263_v_loop_filter)(uint8_t *src, int stride, int qscale);
-    void (*h263_h_loop_filter)(uint8_t *src, int stride, int qscale);
-
-    void (*h261_loop_filter)(uint8_t *src, int stride);
 
     /* assume len is a multiple of 8, and arrays are 16-byte aligned */
     void (*vector_clipf)(float *dst /* align 16 */, const float *src /* align 16 */, float min, float max, int len /* align 16 */);
@@ -354,20 +275,6 @@ typedef struct DSPContext {
     int32_t (*scalarproduct_and_madd_int16)(int16_t *v1/*align 16*/, const int16_t *v2, const int16_t *v3, int len, int mul);
 
     /**
-     * Apply symmetric window in 16-bit fixed-point.
-     * @param output destination array
-     *               constraints: 16-byte aligned
-     * @param input  source array
-     *               constraints: 16-byte aligned
-     * @param window window array
-     *               constraints: 16-byte aligned, at least len/2 elements
-     * @param len    full window length
-     *               constraints: multiple of ? greater than zero
-     */
-    void (*apply_window_int16)(int16_t *output, const int16_t *input,
-                               const int16_t *window, unsigned int len);
-
-    /**
      * Clip each element in an array of int32_t to a given minimum and maximum value.
      * @param dst  destination array
      *             constraints: 16-byte aligned
@@ -388,6 +295,7 @@ typedef struct DSPContext {
 
 void ff_dsputil_static_init(void);
 void ff_dsputil_init(DSPContext* p, AVCodecContext *avctx);
+void avpriv_dsputil_init(DSPContext* p, AVCodecContext *avctx);
 attribute_deprecated void dsputil_init(DSPContext* c, AVCodecContext *avctx);
 
 int ff_check_alignment(void);
@@ -397,10 +305,10 @@ void ff_set_cmp(DSPContext* c, me_cmp_func *cmp, int type);
 void ff_dsputil_init_alpha(DSPContext* c, AVCodecContext *avctx);
 void ff_dsputil_init_arm(DSPContext* c, AVCodecContext *avctx);
 void ff_dsputil_init_bfin(DSPContext* c, AVCodecContext *avctx);
-void ff_dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx);
 void ff_dsputil_init_ppc(DSPContext* c, AVCodecContext *avctx);
 void ff_dsputil_init_sh4(DSPContext* c, AVCodecContext *avctx);
 void ff_dsputil_init_vis(DSPContext* c, AVCodecContext *avctx);
+void ff_dsputil_init_x86(DSPContext* c, AVCodecContext *avctx);
 
 void ff_dsputil_init_dwt(DSPContext *c);
 

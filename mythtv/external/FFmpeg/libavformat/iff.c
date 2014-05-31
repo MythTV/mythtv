@@ -118,7 +118,7 @@ static int get_metadata(AVFormatContext *s,
     if (!buf)
         return AVERROR(ENOMEM);
 
-    if (avio_read(s->pb, buf, data_size) < 0) {
+    if (avio_read(s->pb, buf, data_size) != data_size) {
         av_free(buf);
         return AVERROR(EIO);
     }
@@ -250,8 +250,11 @@ static int iff_read_header(AVFormatContext *s)
             break;
 
         case ID_CMAP:
-            if (data_size > INT_MAX - IFF_EXTRA_VIDEO_SIZE - FF_INPUT_BUFFER_PADDING_SIZE)
-                return AVERROR_INVALIDDATA;
+            if (data_size < 3 || data_size > 768 || data_size % 3) {
+                 av_log(s, AV_LOG_ERROR, "Invalid CMAP chunk size %d\n",
+                        data_size);
+                 return AVERROR_INVALIDDATA;
+            }
             st->codec->extradata_size = data_size + IFF_EXTRA_VIDEO_SIZE;
             st->codec->extradata      = av_malloc(data_size + IFF_EXTRA_VIDEO_SIZE + FF_INPUT_BUFFER_PADDING_SIZE);
             if (!st->codec->extradata)
@@ -298,7 +301,7 @@ static int iff_read_header(AVFormatContext *s)
             else if (fmt_size == sizeof(deep_abgr) && !memcmp(fmt, deep_abgr, sizeof(deep_abgr)))
                 st->codec->pix_fmt = AV_PIX_FMT_ABGR;
             else {
-                av_log_ask_for_sample(s, "unsupported color format\n");
+                avpriv_request_sample(s, "color format %.16s", fmt);
                 return AVERROR_PATCHWELCOME;
             }
             break;
@@ -364,7 +367,7 @@ static int iff_read_header(AVFormatContext *s)
             } else if (iff->maud_bits ==  8 && iff->maud_compression == 3) {
                 st->codec->codec_id = AV_CODEC_ID_PCM_MULAW;
             } else {
-                av_log_ask_for_sample(s, "unsupported compression %d and bit depth %d\n", iff->maud_compression, iff->maud_bits);
+                avpriv_request_sample(s, "compression %d and bit depth %d", iff->maud_compression, iff->maud_bits);
                 return AVERROR_PATCHWELCOME;
             }
 
@@ -459,6 +462,10 @@ static int iff_read_packet(AVFormatContext *s,
         buf = pkt->data;
         bytestream_put_be16(&buf, 2);
         ret = avio_read(pb, buf, iff->body_size);
+        if (ret<0) {
+            av_free_packet(pkt);
+        } else if (ret < iff->body_size)
+            av_shrink_packet(pkt, ret + 2);
     } else {
         av_assert0(0);
     }

@@ -33,12 +33,6 @@ typedef struct TAKParseContext {
     int           index;
 } TAKParseContext;
 
-static av_cold int tak_init(AVCodecParserContext *s)
-{
-    ff_tak_init_crc();
-    return 0;
-}
-
 static int tak_parse(AVCodecParserContext *s, AVCodecContext *avctx,
                      const uint8_t **poutbuf, int *poutbuf_size,
                      const uint8_t *buf, int buf_size)
@@ -90,6 +84,7 @@ static int tak_parse(AVCodecParserContext *s, AVCodecContext *avctx,
                         s->duration           = t->ti.last_frame_samples ?
                                                 t->ti.last_frame_samples :
                                                 t->ti.frame_samples;
+                        s->key_frame          = !!(t->ti.flags & TAK_FRAME_FLAG_HAS_INFO);
                     } else {
                         pc->frame_start_found = 0;
                         next                  = t->index - pc->index;
@@ -122,7 +117,6 @@ found:
 AVCodecParser ff_tak_parser = {
     .codec_ids      = { AV_CODEC_ID_TAK },
     .priv_data_size = sizeof(TAKParseContext),
-    .parser_init    = tak_init,
     .parser_parse   = tak_parse,
     .parser_close   = ff_parse_close,
 };

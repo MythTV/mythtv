@@ -25,7 +25,7 @@
 
 static av_cold int yuv4_encode_init(AVCodecContext *avctx)
 {
-    avctx->coded_frame = avcodec_alloc_frame();
+    avctx->coded_frame = av_frame_alloc();
 
     if (!avctx->coded_frame) {
         av_log(avctx, AV_LOG_ERROR, "Could not allocate frame.\n");
@@ -46,7 +46,6 @@ static int yuv4_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
         return ret;
     dst = pkt->data;
 
-    avctx->coded_frame->reference = 0;
     avctx->coded_frame->key_frame = 1;
     avctx->coded_frame->pict_type = AV_PICTURE_TYPE_I;
 
@@ -82,11 +81,11 @@ static av_cold int yuv4_encode_close(AVCodecContext *avctx)
 
 AVCodec ff_yuv4_encoder = {
     .name         = "yuv4",
+    .long_name    = NULL_IF_CONFIG_SMALL("Uncompressed packed 4:2:0"),
     .type         = AVMEDIA_TYPE_VIDEO,
     .id           = AV_CODEC_ID_YUV4,
     .init         = yuv4_encode_init,
     .encode2      = yuv4_encode_frame,
     .close        = yuv4_encode_close,
     .pix_fmts     = (const enum AVPixelFormat[]){ AV_PIX_FMT_YUV420P, AV_PIX_FMT_NONE },
-    .long_name    = NULL_IF_CONFIG_SMALL("Uncompressed packed 4:2:0"),
 };

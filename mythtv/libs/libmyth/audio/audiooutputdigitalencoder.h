@@ -20,7 +20,7 @@ class AudioOutputDigitalEncoder
     AudioOutputDigitalEncoder(void);
     ~AudioOutputDigitalEncoder();
 
-    bool   Init(CodecID codec_id, int bitrate, int samplerate, int channels);
+    bool   Init(AVCodecID codec_id, int bitrate, int samplerate, int channels);
     size_t Encode(void *buf, int len, AudioFormat format);
     size_t GetFrames(void *ptr, int maxlen);
     int    Buffered(void) const
@@ -40,6 +40,7 @@ class AudioOutputDigitalEncoder
     int             inlen;
     size_t          samples_per_frame;
     SPDIFEncoder   *m_spdifenc;
+    AVFrame        *m_frame;
 };
 
 #endif

@@ -30,6 +30,8 @@
 #include "libavutil/common.h"
 #include "libavutil/imgutils.h"
 #include "avcodec.h"
+#include "internal.h"
+#include "libvpx.h"
 
 typedef struct VP8DecoderContext {
     struct vpx_codec_ctx decoder;
@@ -65,6 +67,7 @@ static int vp8_decode(AVCodecContext *avctx,
     AVFrame *picture = data;
     const void *iter = NULL;
     struct vpx_image *img;
+    int ret;
 
     if (vpx_codec_decode(&ctx->decoder, avpkt->data, avpkt->size, NULL, 0) !=
         VPX_CODEC_OK) {
@@ -88,18 +91,14 @@ static int vp8_decode(AVCodecContext *avctx,
         if ((int) img->d_w != avctx->width || (int) img->d_h != avctx->height) {
             av_log(avctx, AV_LOG_INFO, "dimension change! %dx%d -> %dx%d\n",
                    avctx->width, avctx->height, img->d_w, img->d_h);
-            if (av_image_check_size(img->d_w, img->d_h, 0, avctx))
-                return AVERROR_INVALIDDATA;
-            avcodec_set_dimensions(avctx, img->d_w, img->d_h);
+            ret = ff_set_dimensions(avctx, img->d_w, img->d_h);
+            if (ret < 0)
+                return ret;
         }
-        picture->data[0]     = img->planes[0];
-        picture->data[1]     = img->planes[1];
-        picture->data[2]     = img->planes[2];
-        picture->data[3]     = NULL;
-        picture->linesize[0] = img->stride[0];
-        picture->linesize[1] = img->stride[1];
-        picture->linesize[2] = img->stride[2];
-        picture->linesize[3] = 0;
+        if ((ret = ff_get_buffer(avctx, picture, 0)) < 0)
+            return ret;
+        av_image_copy(picture->data, picture->linesize, (const uint8_t **)img->planes,
+                      img->stride, avctx->pix_fmt, img->d_w, img->d_h);
         *got_frame           = 1;
     }
     return avpkt->size;
@@ -120,14 +119,14 @@ static av_cold int vp8_init(AVCodecContext *avctx)
 
 AVCodec ff_libvpx_vp8_decoder = {
     .name           = "libvpx",
+    .long_name      = NULL_IF_CONFIG_SMALL("libvpx VP8"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_VP8,
     .priv_data_size = sizeof(VP8Context),
     .init           = vp8_init,
     .close          = vp8_free,
     .decode         = vp8_decode,
-    .capabilities   = CODEC_CAP_AUTO_THREADS,
-    .long_name      = NULL_IF_CONFIG_SMALL("libvpx VP8"),
+    .capabilities   = CODEC_CAP_AUTO_THREADS | CODEC_CAP_DR1,
 };
 #endif /* CONFIG_LIBVPX_VP8_DECODER */
 
@@ -139,13 +138,14 @@ static av_cold int vp9_init(AVCodecContext *avctx)
 
 AVCodec ff_libvpx_vp9_decoder = {
     .name           = "libvpx-vp9",
+    .long_name      = NULL_IF_CONFIG_SMALL("libvpx VP9"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_VP9,
     .priv_data_size = sizeof(VP8Context),
     .init           = vp9_init,
     .close          = vp8_free,
     .decode         = vp8_decode,
-    .capabilities   = CODEC_CAP_AUTO_THREADS | CODEC_CAP_EXPERIMENTAL,
-    .long_name      = NULL_IF_CONFIG_SMALL("libvpx VP9"),
+    .capabilities   = CODEC_CAP_AUTO_THREADS | CODEC_CAP_DR1,
+    .init_static_data = ff_vp9_init_static,
 };
 #endif /* CONFIG_LIBVPX_VP9_DECODER */

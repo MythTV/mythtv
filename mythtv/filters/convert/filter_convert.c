@@ -12,7 +12,7 @@
 #include <math.h>
 
 #include "filter.h"
-#include "frame.h"
+#include "mythframe.h"
 
 /*
   Disabled conversion filter Oct 2, 2006 -- dtk

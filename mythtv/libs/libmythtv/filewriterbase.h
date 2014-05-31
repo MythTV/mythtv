@@ -3,7 +3,7 @@
 
 #include <QString>
 
-#include "frame.h"
+#include "mythframe.h"
 #include "audiooutputsettings.h"
 
 class MTV_PUBLIC FileWriterBase

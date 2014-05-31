@@ -32,6 +32,8 @@
  * optional background_frame
  */
 
+#include <stdint.h>
+
 #include "libavutil/intreadwrite.h"
 #include "libavutil/mathematics.h"
 #include "avformat.h"
@@ -125,19 +127,15 @@ static av_cold int rl2_read_header(AVFormatContext *s)
     if(signature == RLV3_TAG && back_size > 0)
         st->codec->extradata_size += back_size;
 
-    st->codec->extradata = av_mallocz(st->codec->extradata_size +
-                                          FF_INPUT_BUFFER_PADDING_SIZE);
-    if(!st->codec->extradata)
+    if(ff_get_extradata(st->codec, pb, st->codec->extradata_size) < 0)
         return AVERROR(ENOMEM);
-
-    if(avio_read(pb,st->codec->extradata,st->codec->extradata_size) !=
-                      st->codec->extradata_size)
-        return AVERROR(EIO);
 
     /** setup audio stream if present */
     if(sound_rate){
-        if(channels <= 0)
+        if (!channels || channels > 42) {
+            av_log(s, AV_LOG_ERROR, "Invalid number of channels: %d\n", channels);
             return AVERROR_INVALIDDATA;
+        }
 
         pts_num = def_sound_size;
         pts_den = rate;

@@ -27,6 +27,7 @@
  */
 
 #include <float.h>
+#include "attributes.h"
 #include "avutil.h"
 #include "common.h"
 #include "eval.h"
@@ -34,6 +35,7 @@
 #include "mathematics.h"
 #include "time.h"
 #include "avstring.h"
+#include "timer.h"
 
 typedef struct Parser {
     const AVClass *class;
@@ -52,7 +54,7 @@ typedef struct Parser {
     double *var;
 } Parser;
 
-static const AVClass class = { "Eval", av_default_item_name, NULL, LIBAVUTIL_VERSION_INT, offsetof(Parser,log_offset), offsetof(Parser,log_ctx) };
+static const AVClass eval_class = { "Eval", av_default_item_name, NULL, LIBAVUTIL_VERSION_INT, offsetof(Parser,log_offset), offsetof(Parser,log_ctx) };
 
 static const int8_t si_prefixes['z' - 'E' + 1] = {
     ['y'-'E']= -24,
@@ -145,7 +147,7 @@ struct AVExpr {
         e_pow, e_mul, e_div, e_add,
         e_last, e_st, e_while, e_taylor, e_root, e_floor, e_ceil, e_trunc,
         e_sqrt, e_not, e_random, e_hypot, e_gcd,
-        e_if, e_ifnot, e_print,
+        e_if, e_ifnot, e_print, e_bitand, e_bitor, e_between,
     } type;
     double value; // is sign in other types
     union {
@@ -185,6 +187,11 @@ static double eval_expr(Parser *p, AVExpr *e)
                                           e->param[2] ? eval_expr(p, e->param[2]) : 0);
         case e_ifnot:  return e->value * (!eval_expr(p, e->param[0]) ? eval_expr(p, e->param[1]) :
                                           e->param[2] ? eval_expr(p, e->param[2]) : 0);
+        case e_between: {
+            double d = eval_expr(p, e->param[0]);
+            return e->value * (d >= eval_expr(p, e->param[1]) &&
+                               d <= eval_expr(p, e->param[2]));
+        }
         case e_print: {
             double x = eval_expr(p, e->param[0]);
             int level = e->param[1] ? av_clip(eval_expr(p, e->param[1]), INT_MIN, INT_MAX) : AV_LOG_INFO;
@@ -284,6 +291,8 @@ static double eval_expr(Parser *p, AVExpr *e)
                 case e_last:return e->value * d2;
                 case e_st : return e->value * (p->var[av_clip(d, 0, VARS-1)]= d2);
                 case e_hypot:return e->value * (sqrt(d*d + d2*d2));
+                case e_bitand: return isnan(d) || isnan(d2) ? NAN : e->value * ((long int)d & (long int)d2);
+                case e_bitor:  return isnan(d) || isnan(d2) ? NAN : e->value * ((long int)d | (long int)d2);
             }
         }
     }
@@ -424,6 +433,9 @@ static int parse_primary(AVExpr **e, Parser *p)
     else if (strmatch(next, "gcd"   )) d->type = e_gcd;
     else if (strmatch(next, "if"    )) d->type = e_if;
     else if (strmatch(next, "ifnot" )) d->type = e_ifnot;
+    else if (strmatch(next, "bitand")) d->type = e_bitand;
+    else if (strmatch(next, "bitor" )) d->type = e_bitor;
+    else if (strmatch(next, "between"))d->type = e_between;
     else {
         for (i=0; p->func1_names && p->func1_names[i]; i++) {
             if (strmatch(next, p->func1_names[i])) {
@@ -452,7 +464,7 @@ static int parse_primary(AVExpr **e, Parser *p)
     return 0;
 }
 
-static AVExpr *new_eval_expr(int type, int value, AVExpr *p0, AVExpr *p1)
+static AVExpr *make_eval_expr(int type, int value, AVExpr *p0, AVExpr *p1)
 {
     AVExpr *e = av_mallocz(sizeof(AVExpr));
     if (!e)
@@ -477,7 +489,7 @@ static int parse_dB(AVExpr **e, Parser *p, int *sign)
        for example, -3dB is not the same as -(3dB) */
     if (*p->s == '-') {
         char *next;
-        double av_unused v = strtod(p->s, &next);
+        double av_unused ignored = strtod(p->s, &next);
         if (next != p->s && next[0] == 'd' && next[1] == 'B') {
             *sign = 0;
             return parse_primary(e, p);
@@ -499,7 +511,7 @@ static int parse_factor(AVExpr **e, Parser *p)
             av_expr_free(e1);
             return ret;
         }
-        e0 = new_eval_expr(e_pow, 1, e1, e2);
+        e0 = make_eval_expr(e_pow, 1, e1, e2);
         if (!e0) {
             av_expr_free(e1);
             av_expr_free(e2);
@@ -526,7 +538,7 @@ static int parse_term(AVExpr **e, Parser *p)
             av_expr_free(e1);
             return ret;
         }
-        e0 = new_eval_expr(c == '*' ? e_mul : e_div, 1, e1, e2);
+        e0 = make_eval_expr(c == '*' ? e_mul : e_div, 1, e1, e2);
         if (!e0) {
             av_expr_free(e1);
             av_expr_free(e2);
@@ -549,7 +561,7 @@ static int parse_subexpr(AVExpr **e, Parser *p)
             av_expr_free(e1);
             return ret;
         }
-        e0 = new_eval_expr(e_add, 1, e1, e2);
+        e0 = make_eval_expr(e_add, 1, e1, e2);
         if (!e0) {
             av_expr_free(e1);
             av_expr_free(e2);
@@ -578,7 +590,7 @@ static int parse_expr(AVExpr **e, Parser *p)
             av_expr_free(e1);
             return ret;
         }
-        e0 = new_eval_expr(e_last, 1, e1, e2);
+        e0 = make_eval_expr(e_last, 1, e1, e2);
         if (!e0) {
             av_expr_free(e1);
             av_expr_free(e2);
@@ -619,6 +631,10 @@ static int verify_expr(AVExpr *e)
         case e_taylor:
             return verify_expr(e->param[0]) && verify_expr(e->param[1])
                    && (!e->param[2] || verify_expr(e->param[2]));
+        case e_between:
+            return verify_expr(e->param[0]) &&
+                   verify_expr(e->param[1]) &&
+                   verify_expr(e->param[2]);
         default: return verify_expr(e->param[0]) && verify_expr(e->param[1]) && !e->param[2];
     }
 }
@@ -643,7 +659,7 @@ int av_expr_parse(AVExpr **expr, const char *s,
         if (!av_isspace(*s++)) *wp++ = s[-1];
     *wp++ = 0;
 
-    p.class      = &class;
+    p.class      = &eval_class;
     p.stack_index=100;
     p.s= w;
     p.const_names = const_names;
@@ -809,6 +825,12 @@ int main(int argc, char **argv)
         "gauss(0.1)",
         "hypot(4,3)",
         "gcd(30,55)*print(min(9,1))",
+        "bitor(42, 12)",
+        "bitand(42, 12)",
+        "bitand(NAN, 1)",
+        "between(10, -3, 10)",
+        "between(-4, -2, -1)",
+        "between(1,2)",
         NULL
     };
 

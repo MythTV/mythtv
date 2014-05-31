@@ -4,6 +4,7 @@
 #include <QString>
 
 #include "output.h"
+#include "audiooutput.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h"
@@ -32,7 +33,7 @@ class MPUBLIC SPDIFEncoder
     bool                m_complete;
     AVFormatContext    *m_oc;
     AVStream           *m_stream;
-    unsigned char       m_buffer[AVCODEC_MAX_AUDIO_FRAME_SIZE];
+    unsigned char       m_buffer[AudioOutput::MAX_SIZE_BUFFER];
     long                m_size;
 };
 

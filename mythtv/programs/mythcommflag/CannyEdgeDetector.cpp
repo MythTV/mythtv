@@ -3,7 +3,7 @@
 
 // MythTV headers
 #include "mythplayer.h"
-#include "frame.h"          // VideoFrame
+#include "mythframe.h"          // VideoFrame
 #include "mythlogging.h"
 
 // Commercial Flagging headers

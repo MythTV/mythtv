@@ -26,10 +26,15 @@
 #ifndef AVUTIL_COMMON_H
 #define AVUTIL_COMMON_H
 
+#if defined(__cplusplus) && !defined(__STDC_CONSTANT_MACROS) && !defined(UINT64_C)
+#error missing -D__STDC_CONSTANT_MACROS / #define __STDC_CONSTANT_MACROS
+#endif
+
 #include <errno.h>
 #include <inttypes.h>
 #include <limits.h>
 #include <math.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -48,6 +53,9 @@
 #define RSHIFT(a,b) ((a) > 0 ? ((a) + ((1<<(b))>>1))>>(b) : ((a) + ((1<<(b))>>1)-1)>>(b))
 /* assume b>0 */
 #define ROUNDED_DIV(a,b) (((a)>0 ? (a) + ((b)>>1) : (a) - ((b)>>1))/(b))
+/* assume a>0 and b>0 */
+#define FF_CEIL_RSHIFT(a,b) (!av_builtin_constant_p(b) ? -((-(a)) >> (b)) \
+                                                       : ((a) + (1<<(b)) - 1) >> (b))
 #define FFUDIV(a,b) (((a)>0 ?(a):(a)-(b)+1) / (b))
 #define FFUMOD(a,b) ((a)-(b)*FFUDIV(a,b))
 #define FFABS(a) ((a) >= 0 ? (a) : (-(a)))
@@ -172,7 +180,7 @@ static av_always_inline av_const int16_t av_clip_int16_c(int a)
  */
 static av_always_inline av_const int32_t av_clipl_int32_c(int64_t a)
 {
-    if ((a+0x80000000u) & ~UINT64_C(0xFFFFFFFF)) return (a>>63) ^ 0x7FFFFFFF;
+    if ((a+0x80000000u) & ~UINT64_C(0xFFFFFFFF)) return (int32_t)((a>>63) ^ 0x7FFFFFFF);
     else                                         return (int32_t)a;
 }
 
@@ -229,6 +237,23 @@ static av_always_inline av_const float av_clipf_c(float a, float amin, float ama
     else               return a;
 }
 
+/**
+ * Clip a double value into the amin-amax range.
+ * @param a value to clip
+ * @param amin minimum value of the clip range
+ * @param amax maximum value of the clip range
+ * @return clipped value
+ */
+static av_always_inline av_const double av_clipd_c(double a, double amin, double amax)
+{
+#if defined(HAVE_AV_CONFIG_H) && defined(ASSERT_LEVEL) && ASSERT_LEVEL >= 2
+    if (amin > amax) abort();
+#endif
+    if      (a < amin) return amin;
+    else if (a > amax) return amax;
+    else               return a;
+}
+
 /** Compute ceil(log2(x)).
  * @param x value used to compute ceil(log2(x))
  * @return computed ceiling of log2(x)
@@ -259,7 +284,7 @@ static av_always_inline av_const int av_popcount_c(uint32_t x)
  */
 static av_always_inline av_const int av_popcount64_c(uint64_t x)
 {
-    return av_popcount((uint32_t)x) + av_popcount(x >> 32);
+    return av_popcount((uint32_t)x) + av_popcount((uint32_t)(x >> 32));
 }
 
 #define MKTAG(a,b,c,d) ((a) | ((b) << 8) | ((c) << 16) | ((unsigned)(d) << 24))
@@ -275,12 +300,17 @@ static av_always_inline av_const int av_popcount64_c(uint64_t x)
  *                 input, this could be *ptr++.
  * @param ERROR    Expression to be evaluated on invalid input,
  *                 typically a goto statement.
+ *
+ * @warning ERROR should not contain a loop control statement which
+ * could interact with the internal while loop, and should force an
+ * exit from the macro code (e.g. through a goto or a return) in order
+ * to prevent undefined results.
  */
 #define GET_UTF8(val, GET_BYTE, ERROR)\
     val= GET_BYTE;\
     {\
         uint32_t top = (val & 128) >> 1;\
-        if ((val & 0xc0) == 0x80)\
+        if ((val & 0xc0) == 0x80 || val >= 0xFE)\
             ERROR\
         while (val & top) {\
             int tmp= GET_BYTE - 128;\
@@ -427,6 +457,9 @@ static av_always_inline av_const int av_popcount64_c(uint64_t x)
 #endif
 #ifndef av_clipf
 #   define av_clipf         av_clipf_c
+#endif
+#ifndef av_clipd
+#   define av_clipd         av_clipd_c
 #endif
 #ifndef av_popcount
 #   define av_popcount      av_popcount_c

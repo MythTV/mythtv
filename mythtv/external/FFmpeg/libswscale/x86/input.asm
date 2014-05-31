@@ -4,20 +4,20 @@
 ;* into YUV planes also.
 ;* Copyright (c) 2012 Ronald S. Bultje <rsbultje@gmail.com>
 ;*
-;* This file is part of Libav.
+;* This file is part of FFmpeg.
 ;*
-;* Libav is free software; you can redistribute it and/or
+;* FFmpeg is free software; you can redistribute it and/or
 ;* modify it under the terms of the GNU Lesser General Public
 ;* License as published by the Free Software Foundation; either
 ;* version 2.1 of the License, or (at your option) any later version.
 ;*
-;* Libav is distributed in the hope that it will be useful,
+;* FFmpeg is distributed in the hope that it will be useful,
 ;* but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ;* Lesser General Public License for more details.
 ;*
 ;* You should have received a copy of the GNU Lesser General Public
-;* License along with Libav; if not, write to the Free Software
+;* License along with FFmpeg; if not, write to the Free Software
 ;* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ;******************************************************************************
 
@@ -37,31 +37,57 @@ SECTION_RODATA
 
 rgb_Yrnd:        times 4 dd 0x80100        ;  16.5 << 15
 rgb_UVrnd:       times 4 dd 0x400100       ; 128.5 << 15
-bgr_Ycoeff_12x4: times 2 dw BY, GY, 0, BY
-bgr_Ycoeff_3x56: times 2 dw RY, 0, GY, RY
-rgb_Ycoeff_12x4: times 2 dw RY, GY, 0, RY
-rgb_Ycoeff_3x56: times 2 dw BY, 0, GY, BY
-bgr_Ucoeff_12x4: times 2 dw BU, GU, 0, BU
-bgr_Ucoeff_3x56: times 2 dw RU, 0, GU, RU
-rgb_Ucoeff_12x4: times 2 dw RU, GU, 0, RU
-rgb_Ucoeff_3x56: times 2 dw BU, 0, GU, BU
-bgr_Vcoeff_12x4: times 2 dw BV, GV, 0, BV
-bgr_Vcoeff_3x56: times 2 dw RV, 0, GV, RV
-rgb_Vcoeff_12x4: times 2 dw RV, GV, 0, RV
-rgb_Vcoeff_3x56: times 2 dw BV, 0, GV, BV
+%define bgr_Ycoeff_12x4 16*4 + 16* 0 + tableq
+%define bgr_Ycoeff_3x56 16*4 + 16* 1 + tableq
+%define rgb_Ycoeff_12x4 16*4 + 16* 2 + tableq
+%define rgb_Ycoeff_3x56 16*4 + 16* 3 + tableq
+%define bgr_Ucoeff_12x4 16*4 + 16* 4 + tableq
+%define bgr_Ucoeff_3x56 16*4 + 16* 5 + tableq
+%define rgb_Ucoeff_12x4 16*4 + 16* 6 + tableq
+%define rgb_Ucoeff_3x56 16*4 + 16* 7 + tableq
+%define bgr_Vcoeff_12x4 16*4 + 16* 8 + tableq
+%define bgr_Vcoeff_3x56 16*4 + 16* 9 + tableq
+%define rgb_Vcoeff_12x4 16*4 + 16*10 + tableq
+%define rgb_Vcoeff_3x56 16*4 + 16*11 + tableq
 
-rgba_Ycoeff_rb:  times 4 dw RY, BY
-rgba_Ycoeff_br:  times 4 dw BY, RY
-rgba_Ycoeff_ga:  times 4 dw GY, 0
-rgba_Ycoeff_ag:  times 4 dw 0,  GY
-rgba_Ucoeff_rb:  times 4 dw RU, BU
-rgba_Ucoeff_br:  times 4 dw BU, RU
-rgba_Ucoeff_ga:  times 4 dw GU, 0
-rgba_Ucoeff_ag:  times 4 dw 0,  GU
-rgba_Vcoeff_rb:  times 4 dw RV, BV
-rgba_Vcoeff_br:  times 4 dw BV, RV
-rgba_Vcoeff_ga:  times 4 dw GV, 0
-rgba_Vcoeff_ag:  times 4 dw 0,  GV
+%define rgba_Ycoeff_rb 16*4 + 16*12 + tableq
+%define rgba_Ycoeff_br 16*4 + 16*13 + tableq
+%define rgba_Ycoeff_ga 16*4 + 16*14 + tableq
+%define rgba_Ycoeff_ag 16*4 + 16*15 + tableq
+%define rgba_Ucoeff_rb 16*4 + 16*16 + tableq
+%define rgba_Ucoeff_br 16*4 + 16*17 + tableq
+%define rgba_Ucoeff_ga 16*4 + 16*18 + tableq
+%define rgba_Ucoeff_ag 16*4 + 16*19 + tableq
+%define rgba_Vcoeff_rb 16*4 + 16*20 + tableq
+%define rgba_Vcoeff_br 16*4 + 16*21 + tableq
+%define rgba_Vcoeff_ga 16*4 + 16*22 + tableq
+%define rgba_Vcoeff_ag 16*4 + 16*23 + tableq
+
+; bgr_Ycoeff_12x4: times 2 dw BY, GY, 0, BY
+; bgr_Ycoeff_3x56: times 2 dw RY, 0, GY, RY
+; rgb_Ycoeff_12x4: times 2 dw RY, GY, 0, RY
+; rgb_Ycoeff_3x56: times 2 dw BY, 0, GY, BY
+; bgr_Ucoeff_12x4: times 2 dw BU, GU, 0, BU
+; bgr_Ucoeff_3x56: times 2 dw RU, 0, GU, RU
+; rgb_Ucoeff_12x4: times 2 dw RU, GU, 0, RU
+; rgb_Ucoeff_3x56: times 2 dw BU, 0, GU, BU
+; bgr_Vcoeff_12x4: times 2 dw BV, GV, 0, BV
+; bgr_Vcoeff_3x56: times 2 dw RV, 0, GV, RV
+; rgb_Vcoeff_12x4: times 2 dw RV, GV, 0, RV
+; rgb_Vcoeff_3x56: times 2 dw BV, 0, GV, BV
+
+; rgba_Ycoeff_rb:  times 4 dw RY, BY
+; rgba_Ycoeff_br:  times 4 dw BY, RY
+; rgba_Ycoeff_ga:  times 4 dw GY, 0
+; rgba_Ycoeff_ag:  times 4 dw 0,  GY
+; rgba_Ucoeff_rb:  times 4 dw RU, BU
+; rgba_Ucoeff_br:  times 4 dw BU, RU
+; rgba_Ucoeff_ga:  times 4 dw GU, 0
+; rgba_Ucoeff_ag:  times 4 dw 0,  GU
+; rgba_Vcoeff_rb:  times 4 dw RV, BV
+; rgba_Vcoeff_br:  times 4 dw BV, RV
+; rgba_Vcoeff_ga:  times 4 dw GV, 0
+; rgba_Vcoeff_ag:  times 4 dw 0,  GV
 
 shuf_rgb_12x4:   db 0, 0x80, 1, 0x80,  2, 0x80,  3, 0x80, \
                     6, 0x80, 7, 0x80,  8, 0x80,  9, 0x80
@@ -82,7 +108,7 @@ SECTION .text
 ; %1 = nr. of XMM registers
 ; %2 = rgb or bgr
 %macro RGB24_TO_Y_FN 2-3
-cglobal %2 %+ 24ToY, 6, 6, %1, dst, src, u1, u2, w, u3
+cglobal %2 %+ 24ToY, 6, 6, %1, dst, src, u1, u2, w, table
 %if mmsize == 8
     mova           m5, [%2_Ycoeff_12x4]
     mova           m6, [%2_Ycoeff_3x56]
@@ -171,7 +197,7 @@ cglobal %2 %+ 24ToY, 6, 6, %1, dst, src, u1, u2, w, u3
 ; %1 = nr. of XMM registers
 ; %2 = rgb or bgr
 %macro RGB24_TO_UV_FN 2-3
-cglobal %2 %+ 24ToUV, 7, 7, %1, dstU, dstV, u1, src, u2, w, u3
+cglobal %2 %+ 24ToUV, 7, 7, %1, dstU, dstV, u1, src, u2, w, table
 %if ARCH_X86_64
     mova           m8, [%2_Ucoeff_12x4]
     mova           m9, [%2_Ucoeff_3x56]
@@ -311,7 +337,7 @@ RGB24_FUNCS 11, 13
 ; %1 = nr. of XMM registers
 ; %2-5 = rgba, bgra, argb or abgr (in individual characters)
 %macro RGB32_TO_Y_FN 5-6
-cglobal %2%3%4%5 %+ ToY, 6, 6, %1, dst, src, u1, u2, w, u3
+cglobal %2%3%4%5 %+ ToY, 6, 6, %1, dst, src, u1, u2, w, table
     mova           m5, [rgba_Ycoeff_%2%4]
     mova           m6, [rgba_Ycoeff_%3%5]
 %if %0 == 6
@@ -354,7 +380,7 @@ cglobal %2%3%4%5 %+ ToY, 6, 6, %1, dst, src, u1, u2, w, u3
 ; %1 = nr. of XMM registers
 ; %2-5 = rgba, bgra, argb or abgr (in individual characters)
 %macro RGB32_TO_UV_FN 5-6
-cglobal %2%3%4%5 %+ ToUV, 7, 7, %1, dstU, dstV, u1, src, u2, w, u3
+cglobal %2%3%4%5 %+ ToUV, 7, 7, %1, dstU, dstV, u1, src, u2, w, table
 %if ARCH_X86_64
     mova           m8, [rgba_Ucoeff_%2%4]
     mova           m9, [rgba_Ucoeff_%3%5]

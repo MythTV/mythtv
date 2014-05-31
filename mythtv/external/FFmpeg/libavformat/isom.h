@@ -110,7 +110,7 @@ typedef struct MOVStreamContext {
     int ctts_index;
     int ctts_sample;
     unsigned int sample_size; ///< may contain value calculated from stsd or value from stsz atom
-    unsigned int alt_sample_size; ///< always contains sample size from stsz atom
+    unsigned int stsz_sample_size; ///< always contains sample size from stsz atom
     unsigned int sample_count;
     int *sample_sizes;
     int keyframe_absent;
@@ -142,6 +142,9 @@ typedef struct MOVStreamContext {
     int start_pad;        ///< amount of samples to skip due to enc-dec delay
     unsigned int rap_group_count;
     MOVSbgp *rap_group;
+
+    int nb_frames_for_fps;
+    int64_t duration_for_fps;
 } MOVStreamContext;
 
 typedef struct MOVContext {
@@ -162,6 +165,8 @@ typedef struct MOVContext {
     int use_absolute_path;
     int ignore_editlist;
     int64_t next_root_atom; ///< offset of the next root atom
+    int *bitrates;          ///< bitrates read before streams creation
+    int bitrates_count;
 } MOVContext;
 
 int ff_mp4_read_descr_len(AVIOContext *pb);
@@ -199,6 +204,27 @@ void ff_mp4_parse_es_descr(AVIOContext *pb, int *es_id);
 
 #define MOV_FRAG_SAMPLE_FLAG_DEPENDS_NO                0x02000000
 #define MOV_FRAG_SAMPLE_FLAG_DEPENDS_YES               0x01000000
+
+#define MOV_TKHD_FLAG_ENABLED       0x0001
+#define MOV_TKHD_FLAG_IN_MOVIE      0x0002
+#define MOV_TKHD_FLAG_IN_PREVIEW    0x0004
+#define MOV_TKHD_FLAG_IN_POSTER     0x0008
+
+#define TAG_IS_AVCI(tag)                    \
+    ((tag) == MKTAG('a', 'i', '5', 'p') ||  \
+     (tag) == MKTAG('a', 'i', '5', 'q') ||  \
+     (tag) == MKTAG('a', 'i', '5', '2') ||  \
+     (tag) == MKTAG('a', 'i', '5', '3') ||  \
+     (tag) == MKTAG('a', 'i', '5', '5') ||  \
+     (tag) == MKTAG('a', 'i', '5', '6') ||  \
+     (tag) == MKTAG('a', 'i', '1', 'p') ||  \
+     (tag) == MKTAG('a', 'i', '1', 'q') ||  \
+     (tag) == MKTAG('a', 'i', '1', '2') ||  \
+     (tag) == MKTAG('a', 'i', '1', '3') ||  \
+     (tag) == MKTAG('a', 'i', '1', '5') ||  \
+     (tag) == MKTAG('a', 'i', '1', '6') ||  \
+     (tag) == MKTAG('A', 'V', 'i', 'n'))
+
 
 int ff_mov_read_esds(AVFormatContext *fc, AVIOContext *pb, MOVAtom atom);
 enum AVCodecID ff_mov_get_lpcm_codec_id(int bps, int flags);

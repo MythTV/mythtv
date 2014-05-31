@@ -3,7 +3,7 @@
 #ifndef VIDEOOUTBASE_H_
 #define VIDEOOUTBASE_H_
 
-#include "frame.h"
+#include "mythframe.h"
 #include "filter.h"
 
 #include <QSize>

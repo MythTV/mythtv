@@ -32,10 +32,18 @@
 #if HAVE_IO_H
 #include <io.h>
 #endif
+#include <stdarg.h>
 #include <stdlib.h>
 #include "avutil.h"
+#include "bprint.h"
 #include "common.h"
+#include "internal.h"
 #include "log.h"
+
+#if HAVE_PTHREADS
+#include <pthread.h>
+static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+#endif
 
 #define LINE_SZ 1024
 
@@ -67,9 +75,6 @@ static const uint8_t color[16 + AV_CLASS_CATEGORY_NB] = {
 
 static int16_t background, attr_orig;
 static HANDLE con;
-#define set_color(x)  SetConsoleTextAttribute(con, background | color[x])
-#define set_256color set_color
-#define reset_color() SetConsoleTextAttribute(con, attr_orig)
 #else
 
 static const uint32_t color[16 + AV_CLASS_CATEGORY_NB] = {
@@ -93,9 +98,6 @@ static const uint32_t color[16 + AV_CLASS_CATEGORY_NB] = {
     [16+AV_CLASS_CATEGORY_SWRESAMPLER     ] = 147 << 8 | 0x14,
 };
 
-#define set_color(x)  fprintf(stderr, "\033[%d;3%dm", (color[x] >> 4) & 15, color[x] & 15)
-#define set_256color(x) fprintf(stderr, "\033[48;5;%dm\033[38;5;%dm", (color[x] >> 16) & 0xff, (color[x] >> 8) & 0xff)
-#define reset_color() fprintf(stderr, "\033[0m")
 #endif
 static int use_color = -1;
 
@@ -127,14 +129,29 @@ static void colored_fputs(int level, const char *str)
 #endif
     }
 
-    if (use_color == 1) {
-        set_color(level);
-    } else if (use_color == 256)
-        set_256color(level);
+#if HAVE_SETCONSOLETEXTATTRIBUTE
+    if (use_color && level != AV_LOG_INFO/8)
+        SetConsoleTextAttribute(con, background | color[level]);
     fputs(str, stderr);
-    if (use_color) {
-        reset_color();
-    }
+    if (use_color && level != AV_LOG_INFO/8)
+        SetConsoleTextAttribute(con, attr_orig);
+#else
+    if (use_color == 1 && level != AV_LOG_INFO/8) {
+        fprintf(stderr,
+                "\033[%d;3%dm%s\033[0m",
+                (color[level] >> 4) & 15,
+                color[level] & 15,
+                str);
+    } else if (use_color == 256 && level != AV_LOG_INFO/8) {
+        fprintf(stderr,
+                "\033[48;5;%dm\033[38;5;%dm%s\033[0m",
+                (color[level] >> 16) & 0xff,
+                (color[level] >> 8) & 0xff,
+                str);
+    } else
+        fputs(str, stderr);
+#endif
+
 }
 
 const char *av_default_item_name(void *ptr)
@@ -168,38 +185,45 @@ static int get_category(void *ptr){
     return avc->category + 16;
 }
 
-static void format_line(void *ptr, int level, const char *fmt, va_list vl,
-                        char part[3][LINE_SZ], int part_size, int *print_prefix, int type[2])
+static void format_line(void *avcl, int level, const char *fmt, va_list vl,
+                        AVBPrint part[3], int *print_prefix, int type[2])
 {
-    AVClass* avc = ptr ? *(AVClass **) ptr : NULL;
-    part[0][0] = part[1][0] = part[2][0] = 0;
+    AVClass* avc = avcl ? *(AVClass **) avcl : NULL;
+    av_bprint_init(part+0, 0, 1);
+    av_bprint_init(part+1, 0, 1);
+    av_bprint_init(part+2, 0, 65536);
+
     if(type) type[0] = type[1] = AV_CLASS_CATEGORY_NA + 16;
     if (*print_prefix && avc) {
         if (avc->parent_log_context_offset) {
-            AVClass** parent = *(AVClass ***) (((uint8_t *) ptr) +
+            AVClass** parent = *(AVClass ***) (((uint8_t *) avcl) +
                                    avc->parent_log_context_offset);
             if (parent && *parent) {
-                snprintf(part[0], part_size, "[%s @ %p] ",
+                av_bprintf(part+0, "[%s @ %p] ",
                          (*parent)->item_name(parent), parent);
                 if(type) type[0] = get_category(parent);
             }
         }
-        snprintf(part[1], part_size, "[%s @ %p] ",
-                 avc->item_name(ptr), ptr);
-        if(type) type[1] = get_category(ptr);
+        av_bprintf(part+1, "[%s @ %p] ",
+                 avc->item_name(avcl), avcl);
+        if(type) type[1] = get_category(avcl);
     }
 
-    vsnprintf(part[2], part_size, fmt, vl);
+    av_vbprintf(part+2, fmt, vl);
 
-    *print_prefix = strlen(part[2]) && part[2][strlen(part[2]) - 1] == '\n';
+    if(*part[0].str || *part[1].str || *part[2].str) {
+        char lastc = part[2].len && part[2].len <= part[2].size ? part[2].str[part[2].len - 1] : 0;
+        *print_prefix = lastc == '\n' || lastc == '\r';
+    }
 }
 
 void av_log_format_line(void *ptr, int level, const char *fmt, va_list vl,
                         char *line, int line_size, int *print_prefix)
 {
-    char part[3][LINE_SZ];
-    format_line(ptr, level, fmt, vl, part, sizeof(part[0]), print_prefix, NULL);
-    snprintf(line, line_size, "%s%s%s", part[0], part[1], part[2]);
+    AVBPrint part[3];
+    format_line(ptr, level, fmt, vl, part, print_prefix, NULL);
+    snprintf(line, line_size, "%s%s%s", part[0].str, part[1].str, part[2].str);
+    av_bprint_finalize(part+2, NULL);
 }
 
 void av_log_default_callback(void* ptr, int level, const char* fmt, va_list vl)
@@ -207,38 +231,48 @@ void av_log_default_callback(void* ptr, int level, const char* fmt, va_list vl)
     static int print_prefix = 1;
     static int count;
     static char prev[LINE_SZ];
-    char part[3][LINE_SZ];
+    AVBPrint part[3];
     char line[LINE_SZ];
     static int is_atty;
     int type[2];
 
     if (level > av_log_level)
         return;
-    format_line(ptr, level, fmt, vl, part, sizeof(part[0]), &print_prefix, type);
-    snprintf(line, sizeof(line), "%s%s%s", part[0], part[1], part[2]);
+#if HAVE_PTHREADS
+    pthread_mutex_lock(&mutex);
+#endif
+
+    format_line(ptr, level, fmt, vl, part, &print_prefix, type);
+    snprintf(line, sizeof(line), "%s%s%s", part[0].str, part[1].str, part[2].str);
 
 #if HAVE_ISATTY
     if (!is_atty)
         is_atty = isatty(2) ? 1 : -1;
 #endif
 
-    if (print_prefix && (flags & AV_LOG_SKIP_REPEATED) && !strcmp(line, prev)){
+    if (print_prefix && (flags & AV_LOG_SKIP_REPEATED) && !strcmp(line, prev) &&
+        *line && line[strlen(line) - 1] != '\r'){
         count++;
         if (is_atty == 1)
             fprintf(stderr, "    Last message repeated %d times\r", count);
-        return;
+        goto end;
     }
     if (count > 0) {
         fprintf(stderr, "    Last message repeated %d times\n", count);
         count = 0;
     }
     strcpy(prev, line);
-    sanitize(part[0]);
-    colored_fputs(type[0], part[0]);
-    sanitize(part[1]);
-    colored_fputs(type[1], part[1]);
-    sanitize(part[2]);
-    colored_fputs(av_clip(level >> 3, 0, 6), part[2]);
+    sanitize(part[0].str);
+    colored_fputs(type[0], part[0].str);
+    sanitize(part[1].str);
+    colored_fputs(type[1], part[1].str);
+    sanitize(part[2].str);
+    colored_fputs(av_clip(level >> 3, 0, 6), part[2].str);
+end:
+    av_bprint_finalize(part+2, NULL);
+#if HAVE_PTHREADS
+    pthread_mutex_unlock(&mutex);
+#endif
 }
 
 static void (*av_log_callback)(void*, int, const char*, va_list) =
@@ -258,8 +292,9 @@ void av_log(void* avcl, int level, const char *fmt, ...)
 
 void av_vlog(void* avcl, int level, const char *fmt, va_list vl)
 {
-    if(av_log_callback)
-        av_log_callback(avcl, level, fmt, vl);
+    void (*log_callback)(void*, int, const char*, va_list) = av_log_callback;
+    if (log_callback)
+        log_callback(avcl, level, fmt, vl);
 }
 
 int av_log_get_level(void)
@@ -280,4 +315,36 @@ void av_log_set_flags(int arg)
 void av_log_set_callback(void (*callback)(void*, int, const char*, va_list))
 {
     av_log_callback = callback;
+}
+
+static void missing_feature_sample(int sample, void *avc, const char *msg,
+                                   va_list argument_list)
+{
+    av_vlog(avc, AV_LOG_WARNING, msg, argument_list);
+    av_log(avc, AV_LOG_WARNING, " is not implemented. Update your FFmpeg "
+           "version to the newest one from Git. If the problem still "
+           "occurs, it means that your file has a feature which has not "
+           "been implemented.\n");
+    if (sample)
+        av_log(avc, AV_LOG_WARNING, "If you want to help, upload a sample "
+               "of this file to ftp://upload.ffmpeg.org/MPlayer/incoming/ "
+               "and contact the ffmpeg-devel mailing list.\n");
+}
+
+void avpriv_request_sample(void *avc, const char *msg, ...)
+{
+    va_list argument_list;
+
+    va_start(argument_list, msg);
+    missing_feature_sample(1, avc, msg, argument_list);
+    va_end(argument_list);
+}
+
+void avpriv_report_missing_feature(void *avc, const char *msg, ...)
+{
+    va_list argument_list;
+
+    va_start(argument_list, msg);
+    missing_feature_sample(0, avc, msg, argument_list);
+    va_end(argument_list);
 }

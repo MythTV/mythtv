@@ -77,7 +77,7 @@ static AVClassCategory get_category(void *ptr)
 static const AVClass av_codec_context_class = {
     .class_name              = "AVCodecContext",
     .item_name               = context_to_name,
-    .option                  = options,
+    .option                  = avcodec_options,
     .version                 = LIBAVUTIL_VERSION_INT,
     .log_level_offset_offset = offsetof(AVCodecContext, log_level_offset),
     .child_next              = codec_child_next,
@@ -85,14 +85,6 @@ static const AVClass av_codec_context_class = {
     .category                = AV_CLASS_CATEGORY_ENCODER,
     .get_category            = get_category,
 };
-
-#if FF_API_ALLOC_CONTEXT
-void avcodec_get_context_defaults2(AVCodecContext *s, enum AVMediaType codec_type){
-    AVCodec c= {0};
-    c.type= codec_type;
-    avcodec_get_context_defaults3(s, &c);
-}
-#endif
 
 int avcodec_get_context_defaults3(AVCodecContext *s, const AVCodec *codec)
 {
@@ -102,6 +94,9 @@ int avcodec_get_context_defaults3(AVCodecContext *s, const AVCodec *codec)
     s->av_class = &av_codec_context_class;
 
     s->codec_type = codec ? codec->type : AVMEDIA_TYPE_UNKNOWN;
+    if (codec)
+        s->codec_id = codec->id;
+
     if(s->codec_type == AVMEDIA_TYPE_AUDIO)
         flags= AV_OPT_FLAG_AUDIO_PARAM;
     else if(s->codec_type == AVMEDIA_TYPE_VIDEO)
@@ -111,8 +106,7 @@ int avcodec_get_context_defaults3(AVCodecContext *s, const AVCodec *codec)
     av_opt_set_defaults2(s, flags, flags);
 
     s->time_base           = (AVRational){0,1};
-    s->get_buffer          = avcodec_default_get_buffer;
-    s->release_buffer      = avcodec_default_release_buffer;
+    s->get_buffer2         = avcodec_default_get_buffer2;
     s->get_format          = avcodec_default_get_format;
     s->execute             = avcodec_default_execute;
     s->execute2            = avcodec_default_execute2;
@@ -121,7 +115,6 @@ int avcodec_get_context_defaults3(AVCodecContext *s, const AVCodec *codec)
     s->sample_fmt          = AV_SAMPLE_FMT_NONE;
     s->timecode_frame_start = -1;
 
-    s->reget_buffer        = avcodec_default_reget_buffer;
     s->reordered_opaque    = AV_NOPTS_VALUE;
     if(codec && codec->priv_data_size){
         if(!s->priv_data){
@@ -161,26 +154,6 @@ AVCodecContext *avcodec_alloc_context3(const AVCodec *codec)
     return avctx;
 }
 
-#if FF_API_ALLOC_CONTEXT
-AVCodecContext *avcodec_alloc_context2(enum AVMediaType codec_type){
-    AVCodecContext *avctx= av_malloc(sizeof(AVCodecContext));
-
-    if(avctx==NULL) return NULL;
-
-    avcodec_get_context_defaults2(avctx, codec_type);
-
-    return avctx;
-}
-
-void avcodec_get_context_defaults(AVCodecContext *s){
-    avcodec_get_context_defaults2(s, AVMEDIA_TYPE_UNKNOWN);
-}
-
-AVCodecContext *avcodec_alloc_context(void){
-    return avcodec_alloc_context2(AVMEDIA_TYPE_UNKNOWN);
-}
-#endif
-
 int avcodec_copy_context(AVCodecContext *dest, const AVCodecContext *src)
 {
     if (avcodec_is_open(dest)) { // check that the dest context is uninitialized
@@ -189,6 +162,10 @@ int avcodec_copy_context(AVCodecContext *dest, const AVCodecContext *src)
                src, dest);
         return AVERROR(EINVAL);
     }
+
+    av_opt_free(dest);
+    av_free(dest->priv_data);
+
     memcpy(dest, src, sizeof(*dest));
 
     /* set values specific to opened codecs back to their default state */
@@ -196,7 +173,6 @@ int avcodec_copy_context(AVCodecContext *dest, const AVCodecContext *src)
     dest->codec           = NULL;
     dest->slice_offset    = NULL;
     dest->hwaccel         = NULL;
-    dest->thread_opaque   = NULL;
     dest->internal        = NULL;
 
     /* reallocate values that should be allocated separately */
@@ -225,6 +201,7 @@ int avcodec_copy_context(AVCodecContext *dest, const AVCodecContext *src)
     alloc_and_copy_or_fail(intra_matrix, 64 * sizeof(int16_t), 0);
     alloc_and_copy_or_fail(inter_matrix, 64 * sizeof(int16_t), 0);
     alloc_and_copy_or_fail(rc_override,  src->rc_override_count * sizeof(*src->rc_override), 0);
+    alloc_and_copy_or_fail(subtitle_header, src->subtitle_header_size, 1);
 #undef alloc_and_copy_or_fail
 
     return 0;

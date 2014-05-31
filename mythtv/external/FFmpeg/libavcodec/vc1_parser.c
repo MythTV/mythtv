@@ -25,6 +25,7 @@
  * VC-1 and WMV3 parser
  */
 
+#include "libavutil/attributes.h"
 #include "parser.h"
 #include "vc1.h"
 #include "get_bits.h"
@@ -44,11 +45,13 @@ static void vc1_extract_headers(AVCodecParserContext *s, AVCodecContext *avctx,
 
     vpc->v.s.avctx = avctx;
     vpc->v.parse_only = 1;
+    vpc->v.first_pic_header_flag = 1;
     next = buf;
     s->repeat_pict = 0;
 
     for(start = buf, end = buf + buf_size; next < end; start = next){
         int buf2_size, size;
+        int ret;
 
         next = find_next_marker(start + 4, end);
         size = next - start - 4;
@@ -64,9 +67,12 @@ static void vc1_extract_headers(AVCodecParserContext *s, AVCodecContext *avctx,
             break;
         case VC1_CODE_FRAME:
             if(vpc->v.profile < PROFILE_ADVANCED)
-                ff_vc1_parse_frame_header    (&vpc->v, &gb);
+                ret = ff_vc1_parse_frame_header    (&vpc->v, &gb);
             else
-                ff_vc1_parse_frame_header_adv(&vpc->v, &gb);
+                ret = ff_vc1_parse_frame_header_adv(&vpc->v, &gb);
+
+            if (ret < 0)
+                break;
 
             /* keep AV_PICTURE_TYPE_BI internal to VC1 */
             if (vpc->v.s.pict_type == AV_PICTURE_TYPE_BI)
@@ -87,6 +93,11 @@ static void vc1_extract_headers(AVCodecParserContext *s, AVCodecContext *avctx,
                     s->repeat_pict = vpc->v.rptfrm * 2 + 1;
                 }
             }
+
+            if (vpc->v.broadcast && vpc->v.interlace && !vpc->v.psf)
+                s->field_order = vpc->v.tff ? AV_FIELD_TT : AV_FIELD_BB;
+            else
+                s->field_order = AV_FIELD_PROGRESSIVE;
 
             break;
         }
@@ -184,7 +195,7 @@ static int vc1_split(AVCodecContext *avctx,
     return 0;
 }
 
-static int vc1_parse_init(AVCodecParserContext *s)
+static av_cold int vc1_parse_init(AVCodecParserContext *s)
 {
     VC1ParseContext *vpc = s->priv_data;
     vpc->v.s.slice_context_count = 1;

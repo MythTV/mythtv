@@ -8,25 +8,26 @@
  * Copyright 2007 Collabora Ltd, Philippe Kalaf
  * Copyright 2010 Mark Nauwelaerts
  *
- * This file is part of Libav.
+ * This file is part of FFmpeg.
  *
- * Libav is free software; you can redistribute it and/or
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
  *
- * Libav is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with Libav; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 #include "avformat.h"
 #include "rtpdec_formats.h"
+#include "libavutil/attributes.h"
 #include "libavutil/intreadwrite.h"
 #include "libavcodec/get_bits.h"
 
@@ -55,7 +56,7 @@ static void h263_free_context(PayloadContext *data)
     av_free(data);
 }
 
-static int h263_init(AVFormatContext *ctx, int st_index, PayloadContext *data)
+static av_cold int h263_init(AVFormatContext *ctx, int st_index, PayloadContext *data)
 {
     if (st_index < 0)
         return 0;

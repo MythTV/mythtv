@@ -15,6 +15,7 @@ git://source.ffmpeg.org/ffmpeg.git at SHA1 c9ea1f7f on July 16th, 2013 (jya) (re
 git://source.ffmpeg.org/ffmpeg.git at SHA1 875649bf on July 27th, 2013 (jya) (release/1.2 branch)
 git://source.ffmpeg.org/ffmpeg.git at SHA1 f9c87262 on August 12th, 2013 (jya) (release/1.2 branch)
 git://source.ffmpeg.org/ffmpeg.git at SHA1 3d79041f on May 4th, 2014 (jya) (release/1.2 branch, release 1.2.6))
+git://source.ffmpeg.org/ffmpeg.git at n2.2.2-30-gacafd18 on May 4th, 2014 (jya) (release/2.2 branch, release 2.2.2))
 
 List of files modified from original FFmpeg:
 Makefile
@@ -32,7 +33,7 @@ libavcodec/get_bits.h
 libavcodec/golomb.h
 libavcodec/h264_refs.c
 libavcodec/libavcodec.v
-libavcodec/mpeg12.c
+libavcodec/mpeg12dec.c
 libavcodec/mpeg4videodec.c
 libavcodec/mpeg4videoenc.c
 libavcodec/mpegaudio_parser.c
@@ -46,7 +47,7 @@ libavcodec/pgssubdec.c
 libavformat/Makefile
 libavformat/allformats.c
 libavformat/avformat.h
-libavformat/avidec.c
+libavformat/avidec.c   <-- to revisit
 libavformat/mov.c
 libavformat/mpeg.c
 libavformat/mpeg.h

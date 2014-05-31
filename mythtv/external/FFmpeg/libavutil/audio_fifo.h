@@ -2,20 +2,20 @@
  * Audio FIFO
  * Copyright (c) 2012 Justin Ruggles <justin.ruggles@gmail.com>
  *
- * This file is part of Libav.
+ * This file is part of FFmpeg.
  *
- * Libav is free software; you can redistribute it and/or
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
  *
- * Libav is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with Libav; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -85,7 +85,8 @@ int av_audio_fifo_realloc(AVAudioFifo *af, int nb_samples);
  * @param data        audio data plane pointers
  * @param nb_samples  number of samples to write
  * @return            number of samples actually written, or negative AVERROR
- *                    code on failure.
+ *                    code on failure. If successful, the number of samples
+ *                    actually written will always be nb_samples.
  */
 int av_audio_fifo_write(AVAudioFifo *af, void **data, int nb_samples);
 
@@ -99,7 +100,9 @@ int av_audio_fifo_write(AVAudioFifo *af, void **data, int nb_samples);
  * @param data        audio data plane pointers
  * @param nb_samples  number of samples to read
  * @return            number of samples actually read, or negative AVERROR code
- *                    on failure.
+ *                    on failure. The number of samples actually read will not
+ *                    be greater than nb_samples, and will only be less than
+ *                    nb_samples if av_audio_fifo_size is less than nb_samples.
  */
 int av_audio_fifo_read(AVAudioFifo *af, void **data, int nb_samples);
 

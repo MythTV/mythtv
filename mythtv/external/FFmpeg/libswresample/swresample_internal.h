@@ -82,6 +82,7 @@ struct SwrContext {
     float clev;                                     ///< center mixing level
     float lfe_mix_level;                            ///< LFE mixing level
     float rematrix_volume;                          ///< rematrixing volume coefficient
+    float rematrix_maxval;                          ///< maximum value for rematrixing output
     enum AVMatrixEncoding matrix_encoding;          /**< matrixed stereo encoding */
     const int *channel_map;                         ///< channel index (or -1 if muted channel) map
     int used_ch_count;                              ///< number of used input channels (mapped channel count if channel_map, otherwise in.ch_count)
@@ -134,6 +135,7 @@ struct SwrContext {
     float matrix[SWR_CH_MAX][SWR_CH_MAX];           ///< floating point rematrixing coefficients
     uint8_t *native_matrix;
     uint8_t *native_one;
+    uint8_t *native_simd_one;
     uint8_t *native_simd_matrix;
     int32_t matrix32[SWR_CH_MAX][SWR_CH_MAX];       ///< 17.15 fixed point rematrixing coefficients
     uint8_t matrix_ch[SWR_CH_MAX][SWR_CH_MAX+1];    ///< Lists of input channels per output channel that have non zero rematrixing coefficients

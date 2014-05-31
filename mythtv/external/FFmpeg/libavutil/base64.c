@@ -27,6 +27,7 @@
 #include "common.h"
 #include "base64.h"
 #include "intreadwrite.h"
+#include "timer.h"
 
 /* ---------------- private code */
 static const uint8_t map2[256] =
@@ -270,7 +271,10 @@ int main(int argc, char ** argv)
         }
     }
 
-    return error_count;
+    if (error_count)
+        printf("Error Count: %d.\n", error_count);
+
+    return !!error_count;
 }
 
 // LCOV_EXCL_STOP

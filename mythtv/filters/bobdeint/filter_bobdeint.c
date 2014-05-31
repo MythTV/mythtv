@@ -13,7 +13,7 @@
 #include <string.h>
 
 #include "filter.h"
-#include "frame.h"
+#include "mythframe.h"
 
 typedef struct BDFilter
 {

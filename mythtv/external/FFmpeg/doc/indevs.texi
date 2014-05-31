@@ -86,7 +86,7 @@ fail to open.
 Set the video size in the captured video.
 
 @item framerate
-Set the framerate in the captured video.
+Set the frame rate in the captured video.
 
 @item sample_rate
 Set the sample rate (in Hz) of the captured audio.
@@ -485,86 +485,51 @@ For more information about OSS see:
 
 @section pulse
 
-pulseaudio input device.
+PulseAudio input device.
 
-To enable this input device during configuration you need libpulse-simple
-installed in your system.
+To enable this output device you need to configure FFmpeg with @code{--enable-libpulse}.
 
 The filename to provide to the input device is a source device or the
 string "default"
 
-To list the pulse source devices and their properties you can invoke
+To list the PulseAudio source devices and their properties you can invoke
 the command @command{pactl list sources}.
 
+More information about PulseAudio can be found on @url{http://www.pulseaudio.org}.
+
+@subsection Options
+@table @option
+@item server
+Connect to a specific PulseAudio server, specified by an IP address.
+Default server is used when not provided.
+
+@item name
+Specify the application name PulseAudio will use when showing active clients,
+by default it is the @code{LIBAVFORMAT_IDENT} string.
+
+@item stream_name
+Specify the stream name PulseAudio will use when showing active streams,
+by default it is "record".
+
+@item sample_rate
+Specify the samplerate in Hz, by default 48kHz is used.
+
+@item channels
+Specify the channels in use, by default 2 (stereo) is set.
+
+@item frame_size
+Specify the number of bytes per frame, by default it is set to 1024.
+
+@item fragment_size
+Specify the minimal buffering fragment in PulseAudio, it will affect the
+audio latency. By default it is unset.
+@end table
+
+@subsection Examples
+Record a stream from default device:
 @example
 ffmpeg -f pulse -i default /tmp/pulse.wav
 @end example
-
-@subsection @var{server} AVOption
-
-The syntax is:
-@example
--server @var{server name}
-@end example
-
-Connects to a specific server.
-
-@subsection @var{name} AVOption
-
-The syntax is:
-@example
--name @var{application name}
-@end example
-
-Specify the application name pulse will use when showing active clients,
-by default it is the LIBAVFORMAT_IDENT string
-
-@subsection @var{stream_name} AVOption
-
-The syntax is:
-@example
--stream_name @var{stream name}
-@end example
-
-Specify the stream name pulse will use when showing active streams,
-by default it is "record"
-
-@subsection @var{sample_rate} AVOption
-
-The syntax is:
-@example
--sample_rate @var{samplerate}
-@end example
-
-Specify the samplerate in Hz, by default 48kHz is used.
-
-@subsection @var{channels} AVOption
-
-The syntax is:
-@example
--channels @var{N}
-@end example
-
-Specify the channels in use, by default 2 (stereo) is set.
-
-@subsection @var{frame_size} AVOption
-
-The syntax is:
-@example
--frame_size @var{bytes}
-@end example
-
-Specify the number of byte per frame, by default it is set to 1024.
-
-@subsection @var{fragment_size} AVOption
-
-The syntax is:
-@example
--fragment_size @var{bytes}
-@end example
-
-Specify the minimal buffering fragment in pulseaudio, it will affect the
-audio latency. By default it is unset.
 
 @section sndio
 
@@ -590,8 +555,8 @@ Video4Linux2 input video device.
 "v4l2" can be used as alias for "video4linux2".
 
 If FFmpeg is built with v4l-utils support (by using the
-@code{--enable-libv4l2} configure option), the device will always rely
-on libv4l2.
+@code{--enable-libv4l2} configure option), it is possible to use it with the
+@code{-use_libv4l2} input device option.
 
 The name of the device to grab is a file device node, usually Linux
 systems tend to automatically create such nodes when the device
@@ -600,7 +565,7 @@ kind @file{/dev/video@var{N}}, where @var{N} is a number associated to
 the device.
 
 Video4Linux2 devices usually support a limited set of
-@var{width}x@var{height} sizes and framerates. You can check which are
+@var{width}x@var{height} sizes and frame rates. You can check which are
 supported using @command{-list_formats all} for Video4Linux2 devices.
 Some devices, like TV cards, support one or more standards. It is possible
 to list all the supported standards using @command{-list_standards all}.
@@ -623,7 +588,7 @@ ffplay -f video4linux2 -framerate 30 -video_size hd720 /dev/video0
 
 @item
 Grab and record the input of a video4linux2 device, leave the
-framerate and size as previously set:
+frame rate and size as previously set:
 @example
 ffmpeg -f video4linux2 -input_format mjpeg -i /dev/video0 out.mpeg
 @end example
@@ -640,7 +605,8 @@ list of the supported standards, use the @option{list_standards}
 option.
 
 @item channel
-Set the input channel number. Default to 0.
+Set the input channel number. Default to -1, which means using the
+previously selected channel.
 
 @item video_size
 Set the video frame size. The argument must be a string in the form
@@ -655,7 +621,7 @@ This option allows to select the input format, when several are
 available.
 
 @item framerate
-Set the preferred video framerate.
+Set the preferred video frame rate.
 
 @item list_formats
 List available formats (supported pixel formats, codecs, and frame
@@ -735,12 +701,12 @@ properties of your X11 display (e.g. grep for "name" or "dimensions").
 
 For example to grab from @file{:0.0} using @command{ffmpeg}:
 @example
-ffmpeg -f x11grab -r 25 -s cif -i :0.0 out.mpg
+ffmpeg -f x11grab -framerate 25 -video_size cif -i :0.0 out.mpg
 @end example
 
 Grab at position @code{10,20}:
 @example
-ffmpeg -f x11grab -r 25 -s cif -i :0.0+10,20 out.mpg
+ffmpeg -f x11grab -framerate 25 -video_size cif -i :0.0+10,20 out.mpg
 @end example
 
 @subsection Options
@@ -761,17 +727,17 @@ zero) to the edge of region.
 
 For example:
 @example
-ffmpeg -f x11grab -follow_mouse centered -r 25 -s cif -i :0.0 out.mpg
+ffmpeg -f x11grab -follow_mouse centered -framerate 25 -video_size cif -i :0.0 out.mpg
 @end example
 
 To follow only when the mouse pointer reaches within 100 pixels to edge:
 @example
-ffmpeg -f x11grab -follow_mouse 100 -r 25 -s cif -i :0.0 out.mpg
+ffmpeg -f x11grab -follow_mouse 100 -framerate 25 -video_size cif -i :0.0 out.mpg
 @end example
 
 @item framerate
 Set the grabbing frame rate. Default value is @code{ntsc},
-corresponding to a framerate of @code{30000/1001}.
+corresponding to a frame rate of @code{30000/1001}.
 
 @item show_region
 Show grabbed region on screen.
@@ -782,12 +748,12 @@ know what is being grabbed if only a portion of the screen is grabbed.
 
 For example:
 @example
-ffmpeg -f x11grab -show_region 1 -r 25 -s cif -i :0.0+10,20 out.mpg
+ffmpeg -f x11grab -show_region 1 -framerate 25 -video_size cif -i :0.0+10,20 out.mpg
 @end example
 
 With @var{follow_mouse}:
 @example
-ffmpeg -f x11grab -follow_mouse centered -show_region 1 -r 25 -s cif -i :0.0 out.mpg
+ffmpeg -f x11grab -follow_mouse centered -show_region 1 -framerate 25 -video_size cif -i :0.0 out.mpg
 @end example
 
 @item video_size

@@ -31,23 +31,23 @@ static void print_formats(AVFilterContext *filter_ctx)
     int i, j;
 
 #define PRINT_FMTS(inout, outin, INOUT)                                 \
-    for (i = 0; i < filter_ctx->inout##put_count; i++) {                     \
+    for (i = 0; i < filter_ctx->nb_##inout##puts; i++) {                     \
         if (filter_ctx->inout##puts[i]->type == AVMEDIA_TYPE_VIDEO) {   \
             AVFilterFormats *fmts =                                     \
                 filter_ctx->inout##puts[i]->outin##_formats;            \
-            for (j = 0; j < fmts->format_count; j++)                    \
+            for (j = 0; j < fmts->nb_formats; j++)                    \
                 if(av_get_pix_fmt_name(fmts->formats[j]))               \
                 printf(#INOUT "PUT[%d] %s: fmt:%s\n",                   \
-                       i, filter_ctx->filter->inout##puts[i].name,      \
+                       i, filter_ctx->inout##put_pads[i].name,      \
                        av_get_pix_fmt_name(fmts->formats[j]));          \
         } else if (filter_ctx->inout##puts[i]->type == AVMEDIA_TYPE_AUDIO) { \
             AVFilterFormats *fmts;                                      \
             AVFilterChannelLayouts *layouts;                            \
                                                                         \
             fmts = filter_ctx->inout##puts[i]->outin##_formats;         \
-            for (j = 0; j < fmts->format_count; j++)                    \
+            for (j = 0; j < fmts->nb_formats; j++)                    \
                 printf(#INOUT "PUT[%d] %s: fmt:%s\n",                   \
-                       i, filter_ctx->filter->inout##puts[i].name,      \
+                       i, filter_ctx->inout##put_pads[i].name,      \
                        av_get_sample_fmt_name(fmts->formats[j]));       \
                                                                         \
             layouts = filter_ctx->inout##puts[i]->outin##_channel_layouts; \
@@ -56,7 +56,7 @@ static void print_formats(AVFilterContext *filter_ctx)
                 av_get_channel_layout_string(buf, sizeof(buf), -1,      \
                                              layouts->channel_layouts[j]);         \
                 printf(#INOUT "PUT[%d] %s: chlayout:%s\n",              \
-                       i, filter_ctx->filter->inout##puts[i].name, buf); \
+                       i, filter_ctx->inout##put_pads[i].name, buf); \
             }                                                           \
         }                                                               \
     }                                                                   \
@@ -69,6 +69,7 @@ int main(int argc, char **argv)
 {
     AVFilter *filter;
     AVFilterContext *filter_ctx;
+    AVFilterGraph *graph_ctx;
     const char *filter_name;
     const char *filter_args = NULL;
     int i;
@@ -84,6 +85,11 @@ int main(int argc, char **argv)
     if (argc > 2)
         filter_args = argv[2];
 
+    /* allocate graph */
+    graph_ctx = avfilter_graph_alloc();
+    if (!graph_ctx)
+        return 1;
+
     avfilter_register_all();
 
     /* get a corresponding filter and open it */
@@ -92,26 +98,27 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    if (avfilter_open(&filter_ctx, filter, NULL) < 0) {
+    /* open filter and add it to the graph */
+    if (!(filter_ctx = avfilter_graph_alloc_filter(graph_ctx, filter, filter_name))) {
         fprintf(stderr, "Impossible to open filter with name '%s'\n",
                 filter_name);
         return 1;
     }
-    if (avfilter_init_filter(filter_ctx, filter_args, NULL) < 0) {
+    if (avfilter_init_str(filter_ctx, filter_args) < 0) {
         fprintf(stderr, "Impossible to init filter '%s' with arguments '%s'\n",
                 filter_name, filter_args);
         return 1;
     }
 
     /* create a link for each of the input pads */
-    for (i = 0; i < filter_ctx->input_count; i++) {
+    for (i = 0; i < filter_ctx->nb_inputs; i++) {
         AVFilterLink *link = av_mallocz(sizeof(AVFilterLink));
-        link->type = filter_ctx->filter->inputs[i].type;
+        link->type = filter_ctx->input_pads[i].type;
         filter_ctx->inputs[i] = link;
     }
-    for (i = 0; i < filter_ctx->output_count; i++) {
+    for (i = 0; i < filter_ctx->nb_outputs; i++) {
         AVFilterLink *link = av_mallocz(sizeof(AVFilterLink));
-        link->type = filter_ctx->filter->outputs[i].type;
+        link->type = filter_ctx->output_pads[i].type;
         filter_ctx->outputs[i] = link;
     }
 
@@ -123,6 +130,7 @@ int main(int argc, char **argv)
     print_formats(filter_ctx);
 
     avfilter_free(filter_ctx);
+    avfilter_graph_free(&graph_ctx);
     fflush(stdout);
     return 0;
 }

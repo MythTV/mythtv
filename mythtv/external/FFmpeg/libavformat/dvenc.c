@@ -33,7 +33,7 @@
 #include "avformat.h"
 #include "internal.h"
 #include "libavcodec/dv_profile.h"
-#include "libavcodec/dvdata.h"
+#include "libavcodec/dv.h"
 #include "dv.h"
 #include "libavutil/fifo.h"
 #include "libavutil/mathematics.h"
@@ -390,7 +390,6 @@ static int dv_write_packet(struct AVFormatContext *s, AVPacket *pkt)
                               pkt->data, pkt->size, &frame);
     if (fsize > 0) {
         avio_write(s->pb, frame, fsize);
-        avio_flush(s->pb);
     }
     return 0;
 }

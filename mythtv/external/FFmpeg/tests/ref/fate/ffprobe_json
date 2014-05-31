@@ -22,6 +22,8 @@
             "pkt_pts_time": "0.000000",
             "pkt_dts": 0,
             "pkt_dts_time": "0.000000",
+            "best_effort_timestamp": 0,
+            "best_effort_timestamp_time": "0.000000",
             "pkt_duration": 1024,
             "pkt_duration_time": "0.023220",
             "pkt_pos": "572",
@@ -52,6 +54,8 @@
             "pkt_pts_time": "0.000000",
             "pkt_dts": 0,
             "pkt_dts_time": "0.000000",
+            "best_effort_timestamp": 0,
+            "best_effort_timestamp_time": "0.000000",
             "pkt_duration": 2048,
             "pkt_duration_time": "0.040000",
             "pkt_pos": "2647",
@@ -64,8 +68,7 @@
             "display_picture_number": 0,
             "interlaced_frame": 0,
             "top_field_first": 0,
-            "repeat_pict": 0,
-            "reference": 0
+            "repeat_pict": 0
         },
         {
             "type": "packet",
@@ -89,6 +92,8 @@
             "pkt_pts_time": "0.000000",
             "pkt_dts": 0,
             "pkt_dts_time": "0.000000",
+            "best_effort_timestamp": 0,
+            "best_effort_timestamp_time": "0.000000",
             "pkt_duration": 2048,
             "pkt_duration_time": "0.040000",
             "pkt_pos": "233068",
@@ -101,8 +106,7 @@
             "display_picture_number": 0,
             "interlaced_frame": 0,
             "top_field_first": 0,
-            "repeat_pict": 0,
-            "reference": 0
+            "repeat_pict": 0
         },
         {
             "type": "packet",
@@ -126,6 +130,8 @@
             "pkt_pts_time": "0.023220",
             "pkt_dts": 1024,
             "pkt_dts_time": "0.023220",
+            "best_effort_timestamp": 1024,
+            "best_effort_timestamp_time": "0.023220",
             "pkt_duration": 1024,
             "pkt_duration_time": "0.023220",
             "pkt_pos": "263073",
@@ -156,6 +162,8 @@
             "pkt_pts_time": "0.040000",
             "pkt_dts": 2048,
             "pkt_dts_time": "0.040000",
+            "best_effort_timestamp": 2048,
+            "best_effort_timestamp_time": "0.040000",
             "pkt_duration": 2048,
             "pkt_duration_time": "0.040000",
             "pkt_pos": "265151",
@@ -168,8 +176,7 @@
             "display_picture_number": 0,
             "interlaced_frame": 0,
             "top_field_first": 0,
-            "repeat_pict": 0,
-            "reference": 0
+            "repeat_pict": 0
         },
         {
             "type": "packet",
@@ -193,6 +200,8 @@
             "pkt_pts_time": "0.040000",
             "pkt_dts": 2048,
             "pkt_dts_time": "0.040000",
+            "best_effort_timestamp": 2048,
+            "best_effort_timestamp_time": "0.040000",
             "pkt_duration": 2048,
             "pkt_duration_time": "0.040000",
             "pkt_pos": "495575",
@@ -205,8 +214,7 @@
             "display_picture_number": 0,
             "interlaced_frame": 0,
             "top_field_first": 0,
-            "repeat_pict": 0,
-            "reference": 0
+            "repeat_pict": 0
         },
         {
             "type": "packet",
@@ -230,6 +238,8 @@
             "pkt_pts_time": "0.046440",
             "pkt_dts": 2048,
             "pkt_dts_time": "0.046440",
+            "best_effort_timestamp": 2048,
+            "best_effort_timestamp_time": "0.046440",
             "pkt_duration": 1024,
             "pkt_duration_time": "0.023220",
             "pkt_pos": "525580",
@@ -260,6 +270,8 @@
             "pkt_pts_time": "0.069660",
             "pkt_dts": 3072,
             "pkt_dts_time": "0.069660",
+            "best_effort_timestamp": 3072,
+            "best_effort_timestamp_time": "0.069660",
             "pkt_duration": 1024,
             "pkt_duration_time": "0.023220",
             "pkt_pos": "527651",
@@ -290,6 +302,8 @@
             "pkt_pts_time": "0.080000",
             "pkt_dts": 4096,
             "pkt_dts_time": "0.080000",
+            "best_effort_timestamp": 4096,
+            "best_effort_timestamp_time": "0.080000",
             "pkt_duration": 2048,
             "pkt_duration_time": "0.040000",
             "pkt_pos": "529729",
@@ -302,8 +316,7 @@
             "display_picture_number": 0,
             "interlaced_frame": 0,
             "top_field_first": 0,
-            "repeat_pict": 0,
-            "reference": 0
+            "repeat_pict": 0
         },
         {
             "type": "packet",
@@ -327,6 +340,8 @@
             "pkt_pts_time": "0.080000",
             "pkt_dts": 4096,
             "pkt_dts_time": "0.080000",
+            "best_effort_timestamp": 4096,
+            "best_effort_timestamp_time": "0.080000",
             "pkt_duration": 2048,
             "pkt_duration_time": "0.040000",
             "pkt_pos": "760153",
@@ -339,8 +354,7 @@
             "display_picture_number": 0,
             "interlaced_frame": 0,
             "top_field_first": 0,
-            "repeat_pict": 0,
-            "reference": 0
+            "repeat_pict": 0
         },
         {
             "type": "packet",
@@ -364,6 +378,8 @@
             "pkt_pts_time": "0.092880",
             "pkt_dts": 4096,
             "pkt_dts_time": "0.092880",
+            "best_effort_timestamp": 4096,
+            "best_effort_timestamp_time": "0.092880",
             "pkt_duration": 1024,
             "pkt_duration_time": "0.023220",
             "pkt_pos": "790158",
@@ -394,6 +410,8 @@
             "pkt_pts_time": "0.116100",
             "pkt_dts": 5120,
             "pkt_dts_time": "0.116100",
+            "best_effort_timestamp": 5120,
+            "best_effort_timestamp_time": "0.116100",
             "pkt_duration": 1024,
             "pkt_duration_time": "0.023220",
             "pkt_pos": "792229",
@@ -424,6 +442,8 @@
             "pkt_pts_time": "0.120000",
             "pkt_dts": 6144,
             "pkt_dts_time": "0.120000",
+            "best_effort_timestamp": 6144,
+            "best_effort_timestamp_time": "0.120000",
             "pkt_duration": 2048,
             "pkt_duration_time": "0.040000",
             "pkt_pos": "794307",
@@ -436,8 +456,7 @@
             "display_picture_number": 0,
             "interlaced_frame": 0,
             "top_field_first": 0,
-            "repeat_pict": 0,
-            "reference": 0
+            "repeat_pict": 0
         },
         {
             "type": "packet",
@@ -461,6 +480,8 @@
             "pkt_pts_time": "0.120000",
             "pkt_dts": 6144,
             "pkt_dts_time": "0.120000",
+            "best_effort_timestamp": 6144,
+            "best_effort_timestamp_time": "0.120000",
             "pkt_duration": 2048,
             "pkt_duration_time": "0.040000",
             "pkt_pos": "1024731",
@@ -473,8 +494,7 @@
             "display_picture_number": 0,
             "interlaced_frame": 0,
             "top_field_first": 0,
-            "repeat_pict": 0,
-            "reference": 0
+            "repeat_pict": 0
         }
     ],
     "streams": [
@@ -494,8 +514,6 @@
             "time_base": "1/44100",
             "start_pts": 0,
             "start_time": "0.000000",
-            "duration_ts": 527406,
-            "duration": "11.959320",
             "bit_rate": "705600",
             "nb_read_frames": "6",
             "nb_read_packets": "6",
@@ -535,8 +553,6 @@
             "time_base": "1/51200",
             "start_pts": 0,
             "start_time": "0.000000",
-            "duration_ts": 612317,
-            "duration": "11.959316",
             "nb_read_frames": "4",
             "nb_read_packets": "4",
             "disposition": {
@@ -576,8 +592,6 @@
             "time_base": "1/51200",
             "start_pts": 0,
             "start_time": "0.000000",
-            "duration_ts": 612317,
-            "duration": "11.959316",
             "nb_read_frames": "4",
             "nb_read_packets": "4",
             "disposition": {
@@ -598,11 +612,13 @@
     "format": {
         "filename": "tests/data/ffprobe-test.nut",
         "nb_streams": 3,
+        "nb_programs": 0,
         "format_name": "nut",
         "start_time": "0.000000",
-        "duration": "11.959320",
+        "duration": "0.120000",
         "size": "1054812",
-        "bit_rate": "705599",
+        "bit_rate": "70320800",
+        "probe_score": 100,
         "tags": {
             "title": "ffprobe test file",
             "comment": "'A comment with CSV, XML & JSON special chars': <tag value=\"x\">",

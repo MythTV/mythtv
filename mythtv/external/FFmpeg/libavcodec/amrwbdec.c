@@ -99,7 +99,7 @@ static av_cold int amrwb_decode_init(AVCodecContext *avctx)
     int i;
 
     if (avctx->channels > 1) {
-        av_log_missing_feature(avctx, "multi-channel AMR", 0);
+        avpriv_report_missing_feature(avctx, "multi-channel AMR");
         return AVERROR_PATCHWELCOME;
     }
 
@@ -1112,10 +1112,8 @@ static int amrwb_decode_frame(AVCodecContext *avctx, void *data,
 
     /* get output buffer */
     frame->nb_samples = 4 * AMRWB_SFR_SIZE_16k;
-    if ((ret = ff_get_buffer(avctx, frame)) < 0) {
-        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
+    if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
         return ret;
-    }
     buf_out = (float *)frame->data[0];
 
     header_size      = decode_mime_header(ctx, buf);
@@ -1137,7 +1135,7 @@ static int amrwb_decode_frame(AVCodecContext *avctx, void *data,
         av_log(avctx, AV_LOG_ERROR, "Encountered a bad or corrupted frame\n");
 
     if (ctx->fr_cur_mode == MODE_SID) { /* Comfort noise frame */
-        av_log_missing_feature(avctx, "SID mode", 1);
+        avpriv_request_sample(avctx, "SID mode");
         return AVERROR_PATCHWELCOME;
     }
 
@@ -1269,13 +1267,13 @@ static int amrwb_decode_frame(AVCodecContext *avctx, void *data,
 
 AVCodec ff_amrwb_decoder = {
     .name           = "amrwb",
+    .long_name      = NULL_IF_CONFIG_SMALL("AMR-WB (Adaptive Multi-Rate WideBand)"),
     .type           = AVMEDIA_TYPE_AUDIO,
     .id             = AV_CODEC_ID_AMR_WB,
     .priv_data_size = sizeof(AMRWBContext),
     .init           = amrwb_decode_init,
     .decode         = amrwb_decode_frame,
     .capabilities   = CODEC_CAP_DR1,
-    .long_name      = NULL_IF_CONFIG_SMALL("AMR-WB (Adaptive Multi-Rate WideBand)"),
     .sample_fmts    = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_FLT,
                                                      AV_SAMPLE_FMT_NONE },
 };

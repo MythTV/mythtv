@@ -34,19 +34,27 @@ static int framecrc_write_packet(struct AVFormatContext *s, AVPacket *pkt)
     if (pkt->flags != AV_PKT_FLAG_KEY)
         av_strlcatf(buf, sizeof(buf), ", F=0x%0X", pkt->flags);
     if (pkt->side_data_elems) {
-        int i;
+        int i, j;
         av_strlcatf(buf, sizeof(buf), ", S=%d", pkt->side_data_elems);
 
         for (i=0; i<pkt->side_data_elems; i++) {
-            uint32_t side_data_crc = av_adler32_update(0,
-                                                    pkt->side_data[i].data,
-                                                    pkt->side_data[i].size);
+            uint32_t side_data_crc = 0;
+            if (HAVE_BIGENDIAN && AV_PKT_DATA_PALETTE == pkt->side_data[i].type) {
+                for (j=0; j<pkt->side_data[i].size; j++) {
+                    side_data_crc = av_adler32_update(side_data_crc,
+                                                      pkt->side_data[i].data + (j^3),
+                                                      1);
+                }
+            } else {
+                side_data_crc = av_adler32_update(0,
+                                                  pkt->side_data[i].data,
+                                                  pkt->side_data[i].size);
+            }
             av_strlcatf(buf, sizeof(buf), ", %8d, 0x%08x", pkt->side_data[i].size, side_data_crc);
         }
     }
     av_strlcatf(buf, sizeof(buf), "\n");
     avio_write(s->pb, buf, strlen(buf));
-    avio_flush(s->pb);
     return 0;
 }
 
@@ -57,5 +65,6 @@ AVOutputFormat ff_framecrc_muxer = {
     .video_codec       = AV_CODEC_ID_RAWVIDEO,
     .write_header      = ff_framehash_write_header,
     .write_packet      = framecrc_write_packet,
-    .flags             = AVFMT_VARIABLE_FPS | AVFMT_TS_NONSTRICT,
+    .flags             = AVFMT_VARIABLE_FPS | AVFMT_TS_NONSTRICT |
+                         AVFMT_TS_NEGATIVE,
 };

@@ -1,6 +1,10 @@
 /*
  * Copyright (c) 2001-2003 The ffmpeg Project
  *
+ * first version by Francois Revol (revol@free.fr)
+ * fringe ADPCM codecs (e.g., DK3, DK4, Westwood)
+ *   by Mike Melanson (melanson@pcisys.net)
+ *
  * This file is part of FFmpeg.
  *
  * FFmpeg is free software; you can redistribute it and/or
@@ -28,10 +32,6 @@
 /**
  * @file
  * ADPCM encoders
- * First version by Francois Revol (revol@free.fr)
- * Fringe ADPCM codecs (e.g., DK3, DK4, Westwood)
- *   by Mike Melanson (melanson@pcisys.net)
- *
  * See ADPCM decoder reference documents for codec information.
  */
 
@@ -144,11 +144,6 @@ static av_cold int adpcm_encode_init(AVCodecContext *avctx)
         goto error;
     }
 
-#if FF_API_OLD_ENCODE_AUDIO
-    if (!(avctx->coded_frame = avcodec_alloc_frame()))
-        goto error;
-#endif
-
     return 0;
 error:
     adpcm_encode_close(avctx);
@@ -158,9 +153,6 @@ error:
 static av_cold int adpcm_encode_close(AVCodecContext *avctx)
 {
     ADPCMEncodeContext *s = avctx->priv_data;
-#if FF_API_OLD_ENCODE_AUDIO
-    av_freep(&avctx->coded_frame);
-#endif
     av_freep(&s->paths);
     av_freep(&s->node_buf);
     av_freep(&s->nodep_buf);
@@ -716,6 +708,7 @@ static const enum AVSampleFormat sample_fmts_p[] = {
 #define ADPCM_ENCODER(id_, name_, sample_fmts_, long_name_) \
 AVCodec ff_ ## name_ ## _encoder = {                        \
     .name           = #name_,                               \
+    .long_name      = NULL_IF_CONFIG_SMALL(long_name_),     \
     .type           = AVMEDIA_TYPE_AUDIO,                   \
     .id             = id_,                                  \
     .priv_data_size = sizeof(ADPCMEncodeContext),           \
@@ -723,7 +716,6 @@ AVCodec ff_ ## name_ ## _encoder = {                        \
     .encode2        = adpcm_encode_frame,                   \
     .close          = adpcm_encode_close,                   \
     .sample_fmts    = sample_fmts_,                         \
-    .long_name      = NULL_IF_CONFIG_SMALL(long_name_),     \
 }
 
 ADPCM_ENCODER(AV_CODEC_ID_ADPCM_IMA_QT,  adpcm_ima_qt,  sample_fmts_p, "ADPCM IMA QuickTime");

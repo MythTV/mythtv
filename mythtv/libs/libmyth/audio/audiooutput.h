@@ -17,6 +17,7 @@
 // forward declaration
 struct AVCodecContext;
 struct AVPacket;
+struct AVFrame;
 
 class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
 {
@@ -60,7 +61,8 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
 
     AudioOutput() :
         VolumeBase(),             OutputListeners(),
-        lastError(QString::null), lastWarn(QString::null), pulsewassuspended(false) {}
+        lastError(QString::null), lastWarn(QString::null),
+        pulsewassuspended(false), _frame(NULL) {}
 
     virtual ~AudioOutput();
 
@@ -172,6 +174,10 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
     int DecodeAudio(AVCodecContext *ctx,
                     uint8_t *buffer, int &data_size,
                     const AVPacket *pkt);
+    /**
+     * MAX_SIZE_BUFFER is the maximum size of a buffer to be used with DecodeAudio
+     */
+    static const int MAX_SIZE_BUFFER = 192000;
 
   protected:
     void Error(const QString &msg);
@@ -183,6 +189,7 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
     QString lastError;
     QString lastWarn;
     bool pulsewassuspended;
+    AVFrame *_frame;
 };
 
 #endif

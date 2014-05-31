@@ -30,7 +30,14 @@
 #include "audio_frame_queue.h"
 #include "psymodel.h"
 
-#define AAC_CODER_NB 4
+typedef enum AACCoder {
+    AAC_CODER_FAAC = 0,
+    AAC_CODER_ANMR,
+    AAC_CODER_TWOLOOP,
+    AAC_CODER_FAST,
+
+    AAC_CODER_NB,
+}AACCoder;
 
 typedef struct AACEncOptions {
     int stereo_mode;
@@ -84,5 +91,7 @@ typedef struct AACEncContext {
 } AACEncContext;
 
 extern float ff_aac_pow34sf_tab[428];
+
+void ff_aac_coder_init_mips(AACEncContext *c);
 
 #endif /* AVCODEC_AACENC_H */

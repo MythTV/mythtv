@@ -29,23 +29,24 @@
 #include "internal.h"
 #include "video.h"
 
-static AVFilterBufferRef *get_video_buffer(AVFilterLink *link, int perms,
-                                           int w, int h)
+static void do_swap(AVFrame *frame)
 {
-    AVFilterBufferRef *picref =
-        ff_default_get_video_buffer(link, perms, w, h);
+    FFSWAP(uint8_t*,     frame->data[1],     frame->data[2]);
+    FFSWAP(int,          frame->linesize[1], frame->linesize[2]);
+    FFSWAP(uint64_t,     frame->error[1],    frame->error[2]);
+    FFSWAP(AVBufferRef*, frame->buf[1],      frame->buf[2]);
+}
 
-    FFSWAP(uint8_t*, picref->data[1], picref->data[2]);
-    FFSWAP(int, picref->linesize[1], picref->linesize[2]);
-
+static AVFrame *get_video_buffer(AVFilterLink *link, int w, int h)
+{
+    AVFrame *picref = ff_default_get_video_buffer(link, w, h);
+    do_swap(picref);
     return picref;
 }
 
-static int filter_frame(AVFilterLink *link, AVFilterBufferRef *inpicref)
+static int filter_frame(AVFilterLink *link, AVFrame *inpicref)
 {
-    FFSWAP(uint8_t*, inpicref->data[1], inpicref->data[2]);
-    FFSWAP(int, inpicref->linesize[1], inpicref->linesize[2]);
-
+    do_swap(inpicref);
     return ff_filter_frame(link->dst->outputs[0], inpicref);
 }
 
@@ -53,7 +54,7 @@ static int is_planar_yuv(const AVPixFmtDescriptor *desc)
 {
     int i;
 
-    if (desc->flags & ~(PIX_FMT_BE | PIX_FMT_PLANAR | PIX_FMT_ALPHA) ||
+    if (desc->flags & ~(AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_ALPHA) ||
         desc->nb_components < 3 ||
         (desc->comp[1].depth_minus1 != desc->comp[2].depth_minus1))
         return 0;
@@ -100,10 +101,9 @@ static const AVFilterPad swapuv_outputs[] = {
     { NULL }
 };
 
-AVFilter avfilter_vf_swapuv = {
-    .name      = "swapuv",
-    .description = NULL_IF_CONFIG_SMALL("Swap U and V components."),
-    .priv_size = 0,
+AVFilter ff_vf_swapuv = {
+    .name          = "swapuv",
+    .description   = NULL_IF_CONFIG_SMALL("Swap U and V components."),
     .query_formats = query_formats,
     .inputs        = swapuv_inputs,
     .outputs       = swapuv_outputs,

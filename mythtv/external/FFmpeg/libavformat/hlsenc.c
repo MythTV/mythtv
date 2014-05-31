@@ -20,6 +20,7 @@
  */
 
 #include <float.h>
+#include <stdint.h>
 
 #include "libavutil/mathematics.h"
 #include "libavutil/parseutils.h"
@@ -49,7 +50,7 @@ typedef struct HLSContext {
     int has_video;
     int64_t start_pts;
     int64_t end_pts;
-    int64_t duration;      ///< last segment duration computed so far, in seconds
+    int64_t duration;      // last segment duration computed so far, in seconds
     int nb_entries;
     ListEntry *list;
     ListEntry *end_list;
@@ -69,6 +70,7 @@ static int hls_mux_init(AVFormatContext *s)
 
     oc->oformat            = hls->oformat;
     oc->interrupt_callback = s->interrupt_callback;
+    av_dict_copy(&oc->metadata, s->metadata, 0);
 
     for (i = 0; i < s->nb_streams; i++) {
         AVStream *st;
@@ -164,14 +166,12 @@ static int hls_start(AVFormatContext *s)
     AVFormatContext *oc = c->avf;
     int err = 0;
 
-    if (c->wrap)
-        c->number %= c->wrap;
-
     if (av_get_frame_filename(oc->filename, sizeof(oc->filename),
-                              c->basename, c->number++) < 0) {
+                              c->basename, c->wrap ? c->number % c->wrap : c->number) < 0) {
         av_log(oc, AV_LOG_ERROR, "Invalid segment filename template '%s'\n", c->basename);
         return AVERROR(EINVAL);
     }
+    c->number++;
 
     if ((err = avio_open2(&oc->pb, oc->filename, AVIO_FLAG_WRITE,
                           &s->interrupt_callback, NULL)) < 0)
@@ -253,25 +253,28 @@ static int hls_write_packet(AVFormatContext *s, AVPacket *pkt)
     AVFormatContext *oc = hls->avf;
     AVStream *st = s->streams[pkt->stream_index];
     int64_t end_pts = hls->recording_time * hls->number;
-    int ret, is_ref_pkt = 0;
+    int is_ref_pkt = 1;
+    int ret, can_split = 1;
 
     if (hls->start_pts == AV_NOPTS_VALUE) {
         hls->start_pts = pkt->pts;
         hls->end_pts   = pkt->pts;
     }
 
-    if ((hls->has_video && st->codec->codec_type == AVMEDIA_TYPE_VIDEO)      &&
-        pkt->pts != AV_NOPTS_VALUE) {
-        is_ref_pkt = 1;
+    if (hls->has_video) {
+        can_split = st->codec->codec_type == AVMEDIA_TYPE_VIDEO &&
+                    pkt->flags & AV_PKT_FLAG_KEY;
+        is_ref_pkt = st->codec->codec_type == AVMEDIA_TYPE_VIDEO;
+    }
+    if (pkt->pts == AV_NOPTS_VALUE)
+        is_ref_pkt = can_split = 0;
+
+    if (is_ref_pkt)
         hls->duration = av_rescale(pkt->pts - hls->end_pts,
                                    st->time_base.num, st->time_base.den);
-    }
 
-    if (is_ref_pkt &&
-        av_compare_ts(pkt->pts - hls->start_pts, st->time_base,
-                      end_pts, AV_TIME_BASE_Q) >= 0 &&
-        pkt->flags & AV_PKT_FLAG_KEY) {
-
+    if (can_split && av_compare_ts(pkt->pts - hls->start_pts, st->time_base,
+                                   end_pts, AV_TIME_BASE_Q) >= 0) {
         ret = append_entry(hls, hls->duration);
         if (ret)
             return ret;

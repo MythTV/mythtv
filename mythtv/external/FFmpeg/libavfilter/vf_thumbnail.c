@@ -27,37 +27,39 @@
  * @see http://notbrainsurgery.livejournal.com/29773.html
  */
 
+#include "libavutil/opt.h"
 #include "avfilter.h"
 #include "internal.h"
 
 #define HIST_SIZE (3*256)
 
 struct thumb_frame {
-    AVFilterBufferRef *buf;     ///< cached frame
+    AVFrame *buf;               ///< cached frame
     int histogram[HIST_SIZE];   ///< RGB color distribution histogram of the frame
 };
 
 typedef struct {
+    const AVClass *class;
     int n;                      ///< current frame
     int n_frames;               ///< number of frames for analysis
     struct thumb_frame *frames; ///< the n_frames frames
+    AVRational tb;              ///< copy of the input timebase to ease access
 } ThumbContext;
 
-static av_cold int init(AVFilterContext *ctx, const char *args)
+#define OFFSET(x) offsetof(ThumbContext, x)
+#define FLAGS AV_OPT_FLAG_VIDEO_PARAM|AV_OPT_FLAG_FILTERING_PARAM
+
+static const AVOption thumbnail_options[] = {
+    { "n", "set the frames batch size", OFFSET(n_frames), AV_OPT_TYPE_INT, {.i64=100}, 2, INT_MAX, FLAGS },
+    { NULL }
+};
+
+AVFILTER_DEFINE_CLASS(thumbnail);
+
+static av_cold int init(AVFilterContext *ctx)
 {
     ThumbContext *thumb = ctx->priv;
 
-    if (!args) {
-        thumb->n_frames = 100;
-    } else {
-        int n = sscanf(args, "%d", &thumb->n_frames);
-        if (n != 1 || thumb->n_frames < 2) {
-            thumb->n_frames = 0;
-            av_log(ctx, AV_LOG_ERROR,
-                   "Invalid number of frames specified (minimum is 2).\n");
-            return AVERROR(EINVAL);
-        }
-    }
     thumb->frames = av_calloc(thumb->n_frames, sizeof(*thumb->frames));
     if (!thumb->frames) {
         av_log(ctx, AV_LOG_ERROR,
@@ -86,14 +88,52 @@ static double frame_sum_square_err(const int *hist, const double *median)
     return sum_sq_err;
 }
 
-static int filter_frame(AVFilterLink *inlink, AVFilterBufferRef *frame)
+static AVFrame *get_best_frame(AVFilterContext *ctx)
 {
+    AVFrame *picref;
+    ThumbContext *thumb = ctx->priv;
     int i, j, best_frame_idx = 0;
+    int nb_frames = thumb->n;
     double avg_hist[HIST_SIZE] = {0}, sq_err, min_sq_err = -1;
+
+    // average histogram of the N frames
+    for (j = 0; j < FF_ARRAY_ELEMS(avg_hist); j++) {
+        for (i = 0; i < nb_frames; i++)
+            avg_hist[j] += (double)thumb->frames[i].histogram[j];
+        avg_hist[j] /= nb_frames;
+    }
+
+    // find the frame closer to the average using the sum of squared errors
+    for (i = 0; i < nb_frames; i++) {
+        sq_err = frame_sum_square_err(thumb->frames[i].histogram, avg_hist);
+        if (i == 0 || sq_err < min_sq_err)
+            best_frame_idx = i, min_sq_err = sq_err;
+    }
+
+    // free and reset everything (except the best frame buffer)
+    for (i = 0; i < nb_frames; i++) {
+        memset(thumb->frames[i].histogram, 0, sizeof(thumb->frames[i].histogram));
+        if (i != best_frame_idx)
+            av_frame_free(&thumb->frames[i].buf);
+    }
+    thumb->n = 0;
+
+    // raise the chosen one
+    picref = thumb->frames[best_frame_idx].buf;
+    av_log(ctx, AV_LOG_INFO, "frame id #%d (pts_time=%f) selected "
+           "from a set of %d images\n", best_frame_idx,
+           picref->pts * av_q2d(thumb->tb), nb_frames);
+    thumb->frames[best_frame_idx].buf = NULL;
+
+    return picref;
+}
+
+static int filter_frame(AVFilterLink *inlink, AVFrame *frame)
+{
+    int i, j;
     AVFilterContext *ctx  = inlink->dst;
     ThumbContext *thumb   = ctx->priv;
     AVFilterLink *outlink = ctx->outputs[0];
-    AVFilterBufferRef *picref;
     int *hist = thumb->frames[thumb->n].histogram;
     const uint8_t *p = frame->data[0];
 
@@ -111,40 +151,11 @@ static int filter_frame(AVFilterLink *inlink, AVFilterBufferRef *frame)
     }
 
     // no selection until the buffer of N frames is filled up
-    if (thumb->n < thumb->n_frames - 1) {
-        thumb->n++;
+    thumb->n++;
+    if (thumb->n < thumb->n_frames)
         return 0;
-    }
 
-    // average histogram of the N frames
-    for (j = 0; j < FF_ARRAY_ELEMS(avg_hist); j++) {
-        for (i = 0; i < thumb->n_frames; i++)
-            avg_hist[j] += (double)thumb->frames[i].histogram[j];
-        avg_hist[j] /= thumb->n_frames;
-    }
-
-    // find the frame closer to the average using the sum of squared errors
-    for (i = 0; i < thumb->n_frames; i++) {
-        sq_err = frame_sum_square_err(thumb->frames[i].histogram, avg_hist);
-        if (i == 0 || sq_err < min_sq_err)
-            best_frame_idx = i, min_sq_err = sq_err;
-    }
-
-    // free and reset everything (except the best frame buffer)
-    for (i = 0; i < thumb->n_frames; i++) {
-        memset(thumb->frames[i].histogram, 0, sizeof(thumb->frames[i].histogram));
-        if (i == best_frame_idx)
-            continue;
-        avfilter_unref_bufferp(&thumb->frames[i].buf);
-    }
-    thumb->n = 0;
-
-    // raise the chosen one
-    picref = thumb->frames[best_frame_idx].buf;
-    av_log(ctx, AV_LOG_INFO, "frame id #%d (pts_time=%f) selected\n",
-           best_frame_idx, picref->pts * av_q2d(inlink->time_base));
-    thumb->frames[best_frame_idx].buf = NULL;
-    return ff_filter_frame(outlink, picref);
+    return ff_filter_frame(outlink, get_best_frame(ctx));
 }
 
 static av_cold void uninit(AVFilterContext *ctx)
@@ -152,44 +163,38 @@ static av_cold void uninit(AVFilterContext *ctx)
     int i;
     ThumbContext *thumb = ctx->priv;
     for (i = 0; i < thumb->n_frames && thumb->frames[i].buf; i++)
-        avfilter_unref_bufferp(&thumb->frames[i].buf);
+        av_frame_free(&thumb->frames[i].buf);
     av_freep(&thumb->frames);
 }
 
 static int request_frame(AVFilterLink *link)
 {
-    ThumbContext *thumb = link->src->priv;
+    AVFilterContext *ctx = link->src;
+    ThumbContext *thumb = ctx->priv;
 
     /* loop until a frame thumbnail is available (when a frame is queued,
      * thumb->n is reset to zero) */
     do {
-        int ret = ff_request_frame(link->src->inputs[0]);
+        int ret = ff_request_frame(ctx->inputs[0]);
+        if (ret == AVERROR_EOF && thumb->n) {
+            ret = ff_filter_frame(link, get_best_frame(ctx));
+            if (ret < 0)
+                return ret;
+            ret = AVERROR_EOF;
+        }
         if (ret < 0)
             return ret;
     } while (thumb->n);
     return 0;
 }
 
-static int poll_frame(AVFilterLink *link)
+static int config_props(AVFilterLink *inlink)
 {
-    ThumbContext *thumb  = link->src->priv;
-    AVFilterLink *inlink = link->src->inputs[0];
-    int ret, available_frames = ff_poll_frame(inlink);
+    AVFilterContext *ctx = inlink->dst;
+    ThumbContext *thumb = ctx->priv;
 
-    /* If the input link is not able to provide any frame, we can't do anything
-     * at the moment and thus have zero thumbnail available. */
-    if (!available_frames)
-        return 0;
-
-    /* Since at least one frame is available and the next frame will allow us
-     * to compute a thumbnail, we can return 1 frame. */
-    if (thumb->n == thumb->n_frames - 1)
-        return 1;
-
-    /* we have some frame(s) available in the input link, but not yet enough to
-     * output a thumbnail, so we request more */
-    ret = ff_request_frame(inlink);
-    return ret < 0 ? ret : 0;
+    thumb->tb = inlink->time_base;
+    return 0;
 }
 
 static int query_formats(AVFilterContext *ctx)
@@ -204,11 +209,10 @@ static int query_formats(AVFilterContext *ctx)
 
 static const AVFilterPad thumbnail_inputs[] = {
     {
-        .name             = "default",
-        .type             = AVMEDIA_TYPE_VIDEO,
-        .get_video_buffer = ff_null_get_video_buffer,
-        .min_perms        = AV_PERM_PRESERVE,
-        .filter_frame     = filter_frame,
+        .name         = "default",
+        .type         = AVMEDIA_TYPE_VIDEO,
+        .config_props = config_props,
+        .filter_frame = filter_frame,
     },
     { NULL }
 };
@@ -218,12 +222,11 @@ static const AVFilterPad thumbnail_outputs[] = {
         .name          = "default",
         .type          = AVMEDIA_TYPE_VIDEO,
         .request_frame = request_frame,
-        .poll_frame    = poll_frame,
     },
     { NULL }
 };
 
-AVFilter avfilter_vf_thumbnail = {
+AVFilter ff_vf_thumbnail = {
     .name          = "thumbnail",
     .description   = NULL_IF_CONFIG_SMALL("Select the most representative frame in a given sequence of consecutive frames."),
     .priv_size     = sizeof(ThumbContext),
@@ -232,4 +235,5 @@ AVFilter avfilter_vf_thumbnail = {
     .query_formats = query_formats,
     .inputs        = thumbnail_inputs,
     .outputs       = thumbnail_outputs,
+    .priv_class    = &thumbnail_class,
 };

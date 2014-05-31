@@ -1,22 +1,24 @@
 /*
  * Copyright (c) 2012 Justin Ruggles <justin.ruggles@gmail.com>
  *
- * This file is part of Libav.
+ * This file is part of FFmpeg.
  *
- * Libav is free software; you can redistribute it and/or
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
  *
- * Libav is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with Libav; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
+
+#include <stdint.h>
 
 #include "libavutil/mathematics.h"
 #include "libavutil/mem.h"
@@ -33,7 +35,7 @@
 #define OFFSET(x) offsetof(AVAudioResampleContext, x)
 #define PARAM AV_OPT_FLAG_AUDIO_PARAM
 
-static const AVOption options[] = {
+static const AVOption avresample_options[] = {
     { "in_channel_layout",      "Input Channel Layout",     OFFSET(in_channel_layout),      AV_OPT_TYPE_INT64,  { .i64 = 0              }, INT64_MIN,            INT64_MAX,              PARAM },
     { "in_sample_fmt",          "Input Sample Format",      OFFSET(in_sample_fmt),          AV_OPT_TYPE_INT,    { .i64 = AV_SAMPLE_FMT_S16 }, AV_SAMPLE_FMT_U8,     AV_SAMPLE_FMT_NB-1,     PARAM },
     { "in_sample_rate",         "Input Sample Rate",        OFFSET(in_sample_rate),         AV_OPT_TYPE_INT,    { .i64 = 48000          }, 1,                    INT_MAX,                PARAM },
@@ -87,7 +89,7 @@ static const AVOption options[] = {
 static const AVClass av_resample_context_class = {
     .class_name = "AVAudioResampleContext",
     .item_name  = av_default_item_name,
-    .option     = options,
+    .option     = avresample_options,
     .version    = LIBAVUTIL_VERSION_INT,
 };
 

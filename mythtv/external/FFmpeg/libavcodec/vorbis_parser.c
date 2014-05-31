@@ -1,20 +1,20 @@
 /*
  * Copyright (c) 2012 Justin Ruggles
  *
- * This file is part of Libav.
+ * This file is part of FFmpeg.
  *
- * Libav is free software; you can redistribute it and/or
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
  *
- * Libav is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with Libav; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -141,8 +141,9 @@ static int parse_setup_header(AVCodecContext *avctx, VorbisParseContext *s,
      * we may need to approach this the long way and parse the whole Setup
      * header, but I hope very much that it never comes to that. */
     if (last_mode_count > 2) {
-        av_log_ask_for_sample(avctx, "%d modes found. This is either a false "
-                              "positive or a sample from an unknown encoder.\n",
+        avpriv_request_sample(avctx,
+                              "%d modes (either a false positive or a "
+                              "sample from an unknown encoder)",
                               last_mode_count);
     }
     /* We're limiting the mode count to 63 so that we know that the previous
@@ -200,8 +201,8 @@ int avpriv_vorbis_parse_extradata(AVCodecContext *avctx, VorbisParseContext *s)
     return 0;
 }
 
-int avpriv_vorbis_parse_frame(VorbisParseContext *s, const uint8_t *buf,
-                              int buf_size)
+int avpriv_vorbis_parse_frame_flags(VorbisParseContext *s, const uint8_t *buf,
+                                    int buf_size, int *flags)
 {
     int duration = 0;
 
@@ -210,6 +211,22 @@ int avpriv_vorbis_parse_frame(VorbisParseContext *s, const uint8_t *buf,
         int previous_blocksize = s->previous_blocksize;
 
         if (buf[0] & 1) {
+            /* If the user doesn't care about special packets, it's a bad one. */
+            if (!flags)
+                goto bad_packet;
+
+            /* Set the flag for which kind of special packet it is. */
+            if (buf[0] == 1)
+                *flags |= VORBIS_FLAG_HEADER;
+            else if (buf[0] == 3)
+                *flags |= VORBIS_FLAG_COMMENT;
+            else
+                goto bad_packet;
+
+            /* Special packets have no duration. */
+            return 0;
+
+bad_packet:
             av_log(s->avctx, AV_LOG_ERROR, "Invalid packet\n");
             return AVERROR_INVALIDDATA;
         }
@@ -231,6 +248,12 @@ int avpriv_vorbis_parse_frame(VorbisParseContext *s, const uint8_t *buf,
     }
 
     return duration;
+}
+
+int avpriv_vorbis_parse_frame(VorbisParseContext *s, const uint8_t *buf,
+                              int buf_size)
+{
+    return avpriv_vorbis_parse_frame_flags(s, buf, buf_size, NULL);
 }
 
 void avpriv_vorbis_parse_reset(VorbisParseContext *s)

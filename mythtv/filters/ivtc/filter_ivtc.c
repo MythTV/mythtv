@@ -13,7 +13,7 @@
 
 #include "config.h"
 #include "filter.h"
-#include "frame.h"
+#include "mythframe.h"
 
 #include "pullup.h"
 

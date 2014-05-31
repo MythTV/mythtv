@@ -85,6 +85,8 @@ typedef enum {
  * Filter state machine
  */
 typedef struct {
+    const AVClass *class;
+
     // ring-buffer of input samples, necessary because some times
     // input fragment position may be adjusted backwards:
     uint8_t *buffer;
@@ -121,8 +123,9 @@ typedef struct {
     // tempo scaling factor:
     double tempo;
 
-    // cumulative alignment drift:
-    int drift;
+    // a snapshot of previous fragment input and output position values
+    // captured when the tempo scale factor was set most recently:
+    int64_t origin[2];
 
     // current/previous fragment ring-buffer:
     AudioFragment frag[2];
@@ -139,13 +142,33 @@ typedef struct {
     FFTSample *correlation;
 
     // for managing AVFilterPad.request_frame and AVFilterPad.filter_frame
-    int request_fulfilled;
-    AVFilterBufferRef *dst_buffer;
+    AVFrame *dst_buffer;
     uint8_t *dst;
     uint8_t *dst_end;
     uint64_t nsamples_in;
     uint64_t nsamples_out;
 } ATempoContext;
+
+#define OFFSET(x) offsetof(ATempoContext, x)
+
+static const AVOption atempo_options[] = {
+    { "tempo", "set tempo scale factor",
+      OFFSET(tempo), AV_OPT_TYPE_DOUBLE, { .dbl = 1.0 }, 0.5, 2.0,
+      AV_OPT_FLAG_AUDIO_PARAM | AV_OPT_FLAG_FILTERING_PARAM },
+    { NULL }
+};
+
+AVFILTER_DEFINE_CLASS(atempo);
+
+inline static AudioFragment *yae_curr_frag(ATempoContext *atempo)
+{
+    return &atempo->frag[atempo->nfrag % 2];
+}
+
+inline static AudioFragment *yae_prev_frag(ATempoContext *atempo)
+{
+    return &atempo->frag[(atempo->nfrag + 1) % 2];
+}
 
 /**
  * Reset filter to initial state, do not deallocate existing local buffers.
@@ -156,12 +179,14 @@ static void yae_clear(ATempoContext *atempo)
     atempo->head = 0;
     atempo->tail = 0;
 
-    atempo->drift = 0;
     atempo->nfrag = 0;
     atempo->state = YAE_LOAD_FRAGMENT;
 
     atempo->position[0] = 0;
     atempo->position[1] = 0;
+
+    atempo->origin[0] = 0;
+    atempo->origin[1] = 0;
 
     atempo->frag[0].position[0] = 0;
     atempo->frag[0].position[1] = 0;
@@ -177,11 +202,10 @@ static void yae_clear(ATempoContext *atempo)
     atempo->frag[0].position[0] = -(int64_t)(atempo->window / 2);
     atempo->frag[0].position[1] = -(int64_t)(atempo->window / 2);
 
-    avfilter_unref_bufferp(&atempo->dst_buffer);
+    av_frame_free(&atempo->dst_buffer);
     atempo->dst     = NULL;
     atempo->dst_end = NULL;
 
-    atempo->request_fulfilled = 0;
     atempo->nsamples_in       = 0;
     atempo->nsamples_out      = 0;
 }
@@ -297,6 +321,7 @@ static int yae_reset(ATempoContext *atempo,
 
 static int yae_set_tempo(AVFilterContext *ctx, const char *arg_tempo)
 {
+    const AudioFragment *prev;
     ATempoContext *atempo = ctx->priv;
     char   *tail = NULL;
     double tempo = av_strtod(arg_tempo, &tail);
@@ -312,18 +337,11 @@ static int yae_set_tempo(AVFilterContext *ctx, const char *arg_tempo)
         return AVERROR(EINVAL);
     }
 
+    prev = yae_prev_frag(atempo);
+    atempo->origin[0] = prev->position[0] + atempo->window / 2;
+    atempo->origin[1] = prev->position[1] + atempo->window / 2;
     atempo->tempo = tempo;
     return 0;
-}
-
-inline static AudioFragment *yae_curr_frag(ATempoContext *atempo)
-{
-    return &atempo->frag[atempo->nfrag % 2];
-}
-
-inline static AudioFragment *yae_prev_frag(ATempoContext *atempo)
-{
-    return &atempo->frag[(atempo->nfrag + 1) % 2];
 }
 
 /**
@@ -678,12 +696,21 @@ static int yae_adjust_position(ATempoContext *atempo)
     const AudioFragment *prev = yae_prev_frag(atempo);
     AudioFragment       *frag = yae_curr_frag(atempo);
 
+    const double prev_output_position =
+        (double)(prev->position[1] - atempo->origin[1] + atempo->window / 2);
+
+    const double ideal_output_position =
+        (double)(prev->position[0] - atempo->origin[0] + atempo->window / 2) /
+        atempo->tempo;
+
+    const int drift = (int)(prev_output_position - ideal_output_position);
+
     const int delta_max  = atempo->window / 2;
     const int correction = yae_align(frag,
                                      prev,
                                      atempo->window,
                                      delta_max,
-                                     atempo->drift,
+                                     drift,
                                      atempo->correlation,
                                      atempo->complex_to_real);
 
@@ -693,9 +720,6 @@ static int yae_adjust_position(ATempoContext *atempo)
 
         // clear so that the fragment can be reloaded:
         frag->nsamples = 0;
-
-        // update cumulative correction drift counter:
-        atempo->drift += correction;
     }
 
     return correction;
@@ -949,16 +973,12 @@ static int yae_flush(ATempoContext *atempo,
     return atempo->position[1] == stop_here ? 0 : AVERROR(EAGAIN);
 }
 
-static av_cold int init(AVFilterContext *ctx, const char *args)
+static av_cold int init(AVFilterContext *ctx)
 {
     ATempoContext *atempo = ctx->priv;
-
-    // NOTE: this assumes that the caller has memset ctx->priv to 0:
     atempo->format = AV_SAMPLE_FMT_NONE;
-    atempo->tempo  = 1.0;
     atempo->state  = YAE_LOAD_FRAGMENT;
-
-    return args ? yae_set_tempo(ctx, args) : 0;
+    return 0;
 }
 
 static av_cold void uninit(AVFilterContext *ctx)
@@ -1017,15 +1037,19 @@ static int config_props(AVFilterLink *inlink)
     int sample_rate = (int)inlink->sample_rate;
     int channels = av_get_channel_layout_nb_channels(inlink->channel_layout);
 
+    ctx->outputs[0]->flags |= FF_LINK_FLAG_REQUEST_LOOP;
+
     return yae_reset(atempo, format, sample_rate, channels);
 }
 
-static void push_samples(ATempoContext *atempo,
-                         AVFilterLink *outlink,
-                         int n_out)
+static int push_samples(ATempoContext *atempo,
+                        AVFilterLink *outlink,
+                        int n_out)
 {
-    atempo->dst_buffer->audio->sample_rate = outlink->sample_rate;
-    atempo->dst_buffer->audio->nb_samples  = n_out;
+    int ret;
+
+    atempo->dst_buffer->sample_rate = outlink->sample_rate;
+    atempo->dst_buffer->nb_samples  = n_out;
 
     // adjust the PTS:
     atempo->dst_buffer->pts =
@@ -1033,22 +1057,25 @@ static void push_samples(ATempoContext *atempo,
                      (AVRational){ 1, outlink->sample_rate },
                      outlink->time_base);
 
-    ff_filter_frame(outlink, atempo->dst_buffer);
+    ret = ff_filter_frame(outlink, atempo->dst_buffer);
     atempo->dst_buffer = NULL;
     atempo->dst        = NULL;
     atempo->dst_end    = NULL;
+    if (ret < 0)
+        return ret;
 
     atempo->nsamples_out += n_out;
+    return 0;
 }
 
-static int filter_frame(AVFilterLink *inlink,
-                           AVFilterBufferRef *src_buffer)
+static int filter_frame(AVFilterLink *inlink, AVFrame *src_buffer)
 {
     AVFilterContext  *ctx = inlink->dst;
     ATempoContext *atempo = ctx->priv;
     AVFilterLink *outlink = ctx->outputs[0];
 
-    int n_in = src_buffer->audio->nb_samples;
+    int ret = 0;
+    int n_in = src_buffer->nb_samples;
     int n_out = (int)(0.5 + ((double)n_in) / atempo->tempo);
 
     const uint8_t *src = src_buffer->data[0];
@@ -1056,10 +1083,10 @@ static int filter_frame(AVFilterLink *inlink,
 
     while (src < src_end) {
         if (!atempo->dst_buffer) {
-            atempo->dst_buffer = ff_get_audio_buffer(outlink,
-                                                     AV_PERM_WRITE,
-                                                     n_out);
-            avfilter_copy_buffer_ref_props(atempo->dst_buffer, src_buffer);
+            atempo->dst_buffer = ff_get_audio_buffer(outlink, n_out);
+            if (!atempo->dst_buffer)
+                return AVERROR(ENOMEM);
+            av_frame_copy_props(atempo->dst_buffer, src_buffer);
 
             atempo->dst = atempo->dst_buffer->data[0];
             atempo->dst_end = atempo->dst + n_out * atempo->stride;
@@ -1068,14 +1095,18 @@ static int filter_frame(AVFilterLink *inlink,
         yae_apply(atempo, &src, src_end, &atempo->dst, atempo->dst_end);
 
         if (atempo->dst == atempo->dst_end) {
-            push_samples(atempo, outlink, n_out);
-            atempo->request_fulfilled = 1;
+            int n_samples = ((atempo->dst - atempo->dst_buffer->data[0]) /
+                             atempo->stride);
+            ret = push_samples(atempo, outlink, n_samples);
+            if (ret < 0)
+                goto end;
         }
     }
 
     atempo->nsamples_in += n_in;
-    avfilter_unref_bufferp(&src_buffer);
-    return 0;
+end:
+    av_frame_free(&src_buffer);
+    return ret;
 }
 
 static int request_frame(AVFilterLink *outlink)
@@ -1084,11 +1115,7 @@ static int request_frame(AVFilterLink *outlink)
     ATempoContext *atempo = ctx->priv;
     int ret;
 
-    atempo->request_fulfilled = 0;
-    do {
-        ret = ff_request_frame(ctx->inputs[0]);
-    }
-    while (!atempo->request_fulfilled && ret >= 0);
+    ret = ff_request_frame(ctx->inputs[0]);
 
     if (ret == AVERROR_EOF) {
         // flush the filter:
@@ -1098,9 +1125,9 @@ static int request_frame(AVFilterLink *outlink)
 
         while (err == AVERROR(EAGAIN)) {
             if (!atempo->dst_buffer) {
-                atempo->dst_buffer = ff_get_audio_buffer(outlink,
-                                                         AV_PERM_WRITE,
-                                                         n_max);
+                atempo->dst_buffer = ff_get_audio_buffer(outlink, n_max);
+                if (!atempo->dst_buffer)
+                    return AVERROR(ENOMEM);
 
                 atempo->dst = atempo->dst_buffer->data[0];
                 atempo->dst_end = atempo->dst + n_max * atempo->stride;
@@ -1112,11 +1139,11 @@ static int request_frame(AVFilterLink *outlink)
                      atempo->stride);
 
             if (n_out) {
-                push_samples(atempo, outlink, n_out);
+                ret = push_samples(atempo, outlink, n_out);
             }
         }
 
-        avfilter_unref_bufferp(&atempo->dst_buffer);
+        av_frame_free(&atempo->dst_buffer);
         atempo->dst     = NULL;
         atempo->dst_end = NULL;
 
@@ -1142,7 +1169,6 @@ static const AVFilterPad atempo_inputs[] = {
         .type         = AVMEDIA_TYPE_AUDIO,
         .filter_frame = filter_frame,
         .config_props = config_props,
-        .min_perms    = AV_PERM_READ,
     },
     { NULL }
 };
@@ -1156,7 +1182,7 @@ static const AVFilterPad atempo_outputs[] = {
     { NULL }
 };
 
-AVFilter avfilter_af_atempo = {
+AVFilter ff_af_atempo = {
     .name            = "atempo",
     .description     = NULL_IF_CONFIG_SMALL("Adjust audio tempo."),
     .init            = init,
@@ -1164,6 +1190,7 @@ AVFilter avfilter_af_atempo = {
     .query_formats   = query_formats,
     .process_command = process_command,
     .priv_size       = sizeof(ATempoContext),
+    .priv_class      = &atempo_class,
     .inputs          = atempo_inputs,
     .outputs         = atempo_outputs,
 };

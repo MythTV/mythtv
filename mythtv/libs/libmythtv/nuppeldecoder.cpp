@@ -47,7 +47,7 @@ NuppelDecoder::NuppelDecoder(MythPlayer *parent,
       disablevideo(false), totalLength(0), totalFrames(0), effdsp(0),
       directframe(NULL),            decoded_video_frame(NULL),
       mpa_vidcodec(0), mpa_vidctx(0), mpa_audcodec(0), mpa_audctx(0),
-      directrendering(false),
+      m_mpa_pic(NULL), directrendering(false),
       lastct('1'), strm_buf(0), strm(0), buf(0), buf2(0),
       videosizetotal(0), videoframesread(0), setreadahead(false)
 {
@@ -57,8 +57,7 @@ NuppelDecoder::NuppelDecoder(MythPlayer *parent,
     memset(&extradata, 0, sizeof(extendeddata));
     memset(&tmppicture, 0, sizeof(AVPicture));
     planes[0] = planes[1] = planes[2] = 0;
-    m_audioSamples = (uint8_t *)av_mallocz(AVCODEC_MAX_AUDIO_FRAME_SIZE *
-                                           sizeof(int32_t));
+    m_audioSamples = (uint8_t *)av_mallocz(AudioOutputUtil::MAX_SIZE_BUFFER);
 
     // set parent class variables
     positionMapType = MARK_KEYFRAME;
@@ -97,7 +96,8 @@ NuppelDecoder::~NuppelDecoder()
     if (strm_buf)
         delete [] strm_buf;
 
-    av_free(m_audioSamples);
+    av_freep(&m_audioSamples);
+    av_frame_free(&m_mpa_pic);
 
     while (!StoredData.empty())
     {
@@ -686,7 +686,7 @@ bool NuppelDecoder::InitAVCodecVideo(int codec)
             default: codec = -1;
         }
     }
-    mpa_vidcodec = avcodec_find_decoder((enum CodecID)codec);
+    mpa_vidcodec = avcodec_find_decoder((enum AVCodecID)codec);
 
     if (!mpa_vidcodec)
     {
@@ -707,7 +707,7 @@ bool NuppelDecoder::InitAVCodecVideo(int codec)
 
     mpa_vidctx = avcodec_alloc_context3(NULL);
 
-    mpa_vidctx->codec_id = (enum CodecID)codec;
+    mpa_vidctx->codec_id = (enum AVCodecID)codec;
     mpa_vidctx->codec_type = AVMEDIA_TYPE_VIDEO;
     mpa_vidctx->width = video_width;
     mpa_vidctx->height = video_height;
@@ -770,7 +770,7 @@ bool NuppelDecoder::InitAVCodecAudio(int codec)
             default: codec = -1;
         }
     }
-    mpa_audcodec = avcodec_find_decoder((enum CodecID)codec);
+    mpa_audcodec = avcodec_find_decoder((enum AVCodecID)codec);
 
     if (!mpa_audcodec)
     {
@@ -787,7 +787,7 @@ bool NuppelDecoder::InitAVCodecAudio(int codec)
 
     mpa_audctx = avcodec_alloc_context3(NULL);
 
-    mpa_audctx->codec_id = (enum CodecID)codec;
+    mpa_audctx->codec_id = (enum AVCodecID)codec;
     mpa_audctx->codec_type = AVMEDIA_TYPE_AUDIO;
 
     QMutexLocker locker(avcodeclock);
@@ -838,7 +838,6 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
     int r;
     lzo_uint out_len;
     int compoff = 0;
-    AVPacket pkt;
 
     unsigned char *outbuf = frame->buf;
     directframe = frame;
@@ -913,7 +912,19 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
         if (!mpa_vidcodec)
             InitAVCodecVideo(frameheader->comptype - '3');
 
-        AVFrame mpa_pic;
+        if (!m_mpa_pic)
+        {
+            if (!(m_mpa_pic = av_frame_alloc()))
+            {
+                LOG(VB_GENERAL, LOG_ERR, "DecodeFrame: Out of memory");
+                return false;
+            }
+        }
+        else
+        {
+            av_frame_unref(m_mpa_pic);
+        }
+        AVPacket pkt;
         av_init_packet(&pkt);
         pkt.data = lstrm;
         pkt.size = frameheader->packetlength;
@@ -922,7 +933,7 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
             QMutexLocker locker(avcodeclock);
             // if directrendering, writes into buf
             int gotpicture = 0;
-            int ret = avcodec_decode_video2(mpa_vidctx, &mpa_pic, &gotpicture,
+            int ret = avcodec_decode_video2(mpa_vidctx, m_mpa_pic, &gotpicture,
                                             &pkt);
             directframe = NULL;
             if (ret < 0)
@@ -964,7 +975,7 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
                        video_height);
 
         myth_sws_img_convert(
-            &tmppicture, PIX_FMT_YUV420P, (AVPicture *)&mpa_pic,
+            &tmppicture, PIX_FMT_YUV420P, (AVPicture *)m_mpa_pic,
                     mpa_vidctx->pix_fmt, video_width, video_height);
     }
 

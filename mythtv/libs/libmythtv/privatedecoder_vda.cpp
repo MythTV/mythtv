@@ -5,7 +5,7 @@
 #define LOC QString("VDADec: ")
 #define ERR QString("VDADec error: ")
 
-#include "frame.h"
+#include "mythframe.h"
 #include "myth_imgconvert.h"
 #include "util-osx-cocoa.h"
 #include "privatedecoder_vda.h"

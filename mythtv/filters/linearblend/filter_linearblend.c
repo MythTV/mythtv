@@ -21,7 +21,7 @@
 #define PAVGUSB(a,b) "pavgusb " #a ", " #b " \n\t"
 
 #include "filter.h"
-#include "frame.h"
+#include "mythframe.h"
 
 typedef struct LBFilter
 {

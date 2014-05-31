@@ -26,6 +26,10 @@
 
 #define MAX_URL_SIZE 4096
 
+/** size of probe buffer, for guessing file type from file contents */
+#define PROBE_BUF_MIN 2048
+#define PROBE_BUF_MAX (1 << 20)
+
 #ifdef DEBUG
 #    define hex_dump_debug(class, buf, size) av_hex_dump_log(class, AV_LOG_DEBUG, buf, size)
 #else
@@ -41,6 +45,14 @@ typedef struct CodecMime{
     char str[32];
     enum AVCodecID id;
 } CodecMime;
+
+struct AVFormatInternal {
+    /**
+     * Number of streams relevant for interleaving.
+     * Muxing only.
+     */
+    int nb_interleaved_streams;
+};
 
 #ifdef __GNUC__
 #define dynarray_add(tab, nb_ptr, elem)\
@@ -88,31 +100,6 @@ void ff_read_frame_flush(AVFormatContext *s);
 
 /** Get the current time since NTP epoch in microseconds. */
 uint64_t ff_ntp_time(void);
-
-/**
- * Assemble a URL string from components. This is the reverse operation
- * of av_url_split.
- *
- * Note, this requires networking to be initialized, so the caller must
- * ensure ff_network_init has been called.
- *
- * @see av_url_split
- *
- * @param str the buffer to fill with the url
- * @param size the size of the str buffer
- * @param proto the protocol identifier, if null, the separator
- *              after the identifier is left out, too
- * @param authorization an optional authorization string, may be null.
- *                      An empty string is treated the same as a null string.
- * @param hostname the host name string
- * @param port the port number, left out from the string if negative
- * @param fmt a generic format string for everything to add after the
- *            host/port, may be null
- * @return the number of characters written to the destination buffer
- */
-int ff_url_join(char *str, int size, const char *proto,
-                const char *authorization, const char *hostname,
-                int port, const char *fmt, ...) av_printf_format(7, 8);
 
 /**
  * Append the media-specific SDP fragment for the media stream c
@@ -240,17 +227,6 @@ AVChapter *avpriv_new_chapter(AVFormatContext *s, int id, AVRational time_base,
  */
 void ff_reduce_index(AVFormatContext *s, int stream_index);
 
-/**
- * Convert a relative url into an absolute url, given a base url.
- *
- * @param buf the buffer where output absolute url is written
- * @param size the size of buf
- * @param base the base url, may be equal to buf.
- * @param rel the new url, which is interpreted relative to base
- */
-void ff_make_absolute_url(char *buf, int size, const char *base,
-                          const char *rel);
-
 enum AVCodecID ff_guess_image2_codec(const char *filename);
 
 /**
@@ -277,6 +253,9 @@ int ff_seek_frame_binary(AVFormatContext *s, int stream_index,
  * @param ref_st reference stream giving time_base of param timestamp
  */
 void ff_update_cur_dts(AVFormatContext *s, AVStream *ref_st, int64_t timestamp);
+
+int ff_find_last_ts(AVFormatContext *s, int stream_index, int64_t *ts, int64_t *pos,
+                    int64_t (*read_timestamp)(struct AVFormatContext *, int , int64_t *, int64_t ));
 
 /**
  * Perform a binary search using read_timestamp().
@@ -386,10 +365,51 @@ enum AVCodecID ff_get_pcm_codec_id(int bps, int flt, int be, int sflags);
 AVRational ff_choose_timebase(AVFormatContext *s, AVStream *st, int min_precission);
 
 /**
- * Generate standard extradata for AVC-Intra based on width/height and field order.
+ * Generate standard extradata for AVC-Intra based on width/height and field
+ * order.
  */
-void ff_generate_avci_extradata(AVStream *st);
+int ff_generate_avci_extradata(AVStream *st);
 
-int ff_http_match_no_proxy(const char *no_proxy, const char *hostname);
+/**
+ * Allocate extradata with additional FF_INPUT_BUFFER_PADDING_SIZE at end
+ * which is always set to 0.
+ *
+ * @param size size of extradata
+ * @return 0 if OK, AVERROR_xxx on error
+ */
+int ff_alloc_extradata(AVCodecContext *avctx, int size);
+
+/**
+ * Allocate extradata with additional FF_INPUT_BUFFER_PADDING_SIZE at end
+ * which is always set to 0 and fill it from pb.
+ *
+ * @param size size of extradata
+ * @return >= 0 if OK, AVERROR_xxx on error
+ */
+int ff_get_extradata(AVCodecContext *avctx, AVIOContext *pb, int size);
+
+/**
+ * add frame for rfps calculation.
+ *
+ * @param dts timestamp of the i-th frame
+ * @return 0 if OK, AVERROR_xxx on error
+ */
+int ff_rfps_add_frame(AVFormatContext *ic, AVStream *st, int64_t dts);
+
+void ff_rfps_calculate(AVFormatContext *ic);
+
+/**
+ * Flags for AVFormatContext.write_uncoded_frame()
+ */
+enum AVWriteUncodedFrameFlags {
+
+    /**
+     * Query whether the feature is possible on this stream.
+     * The frame argument is ignored.
+     */
+    AV_WRITE_UNCODED_FRAME_QUERY           = 0x0001,
+
+};
+
 
 #endif /* AVFORMAT_INTERNAL_H */

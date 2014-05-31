@@ -2,7 +2,7 @@
 #include "mythlogging.h"
 #include "mythxdisplay.h"
 #include "mythcodecid.h"
-#include "frame.h"
+#include "mythframe.h"
 #include "vaapicontext.h"
 #include "mythmainwindow.h"
 #include "myth_imgconvert.h"

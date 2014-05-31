@@ -38,11 +38,11 @@ static int mpsub_probe(AVProbeData *p)
 
     while (ptr < ptr_end) {
         int inc;
-        int n;
 
-        if (!memcmp(ptr, "FORMAT=TIME", 11) ||
-            sscanf(ptr, "FORMAT=%d", &n) == 1)
-            return AVPROBE_SCORE_MAX/2;
+        if (!memcmp(ptr, "FORMAT=TIME", 11))
+            return AVPROBE_SCORE_EXTENSION;
+        if (!memcmp(ptr, "FORMAT=", 7))
+            return AVPROBE_SCORE_EXTENSION / 3;
         inc = ff_subtitles_next_line(ptr);
         if (!inc)
             break;

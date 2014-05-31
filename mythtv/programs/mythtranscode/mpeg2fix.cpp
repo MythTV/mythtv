@@ -25,6 +25,13 @@
 #include "mythdate.h"
 #include "mthread.h"
 
+extern "C" {
+#include "libavcodec/dsputil.h"
+#include "mpeg2.h"          // for mpeg2_decoder_t, mpeg2_fbuf_t, et c
+#include "attributes.h"     // for ATTR_ALIGN()
+#include "mpeg2_internal.h"
+}
+
 #ifdef _WIN32
 #include <winsock2.h>
 #else
@@ -34,8 +41,6 @@
 #ifndef O_LARGEFILE
 #define O_LARGEFILE 0
 #endif
-
-#define ATTR_ALIGN(align) __attribute__ ((__aligned__ (align)))
 
 static void *my_malloc(unsigned size, mpeg2_alloc_t reason)
 {
@@ -201,7 +206,7 @@ MPEG2fixup::MPEG2fixup(const QString &inf, const QString &outf,
                        const char *fmt, int norp, int fixPTS, int maxf,
                        bool showprog, int otype, void (*update_func)(float),
                        int (*check_func)())
-           : inputFC(NULL)
+           : inputFC(NULL), picture(NULL)
 {
     displayFrame = 0;
 
@@ -269,6 +274,7 @@ MPEG2fixup::MPEG2fixup(const QString &inf, const QString &outf,
         const QFileInfo finfo(inf);
         filesize = finfo.size();
     }
+    zigzag_init = false;
 }
 
 MPEG2fixup::~MPEG2fixup()
@@ -278,6 +284,7 @@ MPEG2fixup::~MPEG2fixup()
 
     if (inputFC)
         avformat_close_input(&inputFC);
+    av_frame_free(&picture);
 
     MPEG2frame *tmpFrame;
 
@@ -1066,10 +1073,6 @@ void MPEG2fixup::WriteData(QString filename, uint8_t *data, int size)
     close(fh);
 }
 
-extern "C" {
-#include "helper.h"
-}
-
 bool MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
 {
     const mpeg2_info_t *info;
@@ -1092,7 +1095,17 @@ bool MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
         WriteYUV(tmpstr, info);
     }
 
-    picture = avcodec_alloc_frame();
+    if (!picture)
+    {
+        if (!(picture = av_frame_alloc()))
+        {
+            return true;
+        }
+    }
+    else
+    {
+        av_frame_unref(picture);
+    }
 
     pkt->data = (uint8_t *)av_malloc(outbuf_size);
 
@@ -1106,7 +1119,18 @@ bool MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
 
     picture->opaque = info->display_fbuf->id;
 
-    copy_quant_matrix(img_decoder, intra_matrix);
+    //copy_quant_matrix(img_decoder, intra_matrix);
+    if (!zigzag_init)
+    {
+        for (int i = 0; i < 64; i++)
+        {
+            inv_zigzag_direct16[ff_zigzag_direct[i]] = i + 1;
+        }
+    }
+    for (int i = 0; i < 64; i++)
+    {
+        intra_matrix[inv_zigzag_direct16[i] - 1] = img_decoder->quantizer_matrix[0][i];
+    }
 
     if (info->display_picture->nb_fields % 2)
         picture->top_field_first = !(info->display_picture->flags &
@@ -1122,7 +1146,6 @@ bool MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
 
     if (!out_codec)
     {
-        free(picture);
         LOG(VB_GENERAL, LOG_ERR, "Couldn't find MPEG2 encoder");
         return true;
     }
@@ -1165,7 +1188,6 @@ bool MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
 
     if (avcodec_open2(c, out_codec, NULL) < 0)
     {
-        free(picture);
         LOG(VB_GENERAL, LOG_ERR, "could not open codec");
         return true;
     }
@@ -1183,7 +1205,6 @@ bool MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
 
         if (ret < 0)
         {
-            free(picture);
             LOG(VB_GENERAL, LOG_ERR,
                 QString("avcodec_encode_video2 failed (%1)").arg(ret));
             return true;
@@ -1208,7 +1229,6 @@ bool MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
 
     avcodec_close(c);
     av_freep(&c);
-    av_freep(&picture);
 
     return false;
 }

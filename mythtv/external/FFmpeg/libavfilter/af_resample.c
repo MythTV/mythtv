@@ -1,19 +1,18 @@
 /*
+ * This file is part of FFmpeg.
  *
- * This file is part of Libav.
- *
- * Libav is free software; you can redistribute it and/or
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
  *
- * Libav is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with Libav; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -37,6 +36,7 @@
 #include "internal.h"
 
 typedef struct ResampleContext {
+    const AVClass *class;
     AVAudioResampleContext *avr;
     AVDictionary *options;
 
@@ -46,25 +46,29 @@ typedef struct ResampleContext {
     int got_output;
 } ResampleContext;
 
-static av_cold int init(AVFilterContext *ctx, const char *args)
+static av_cold int init(AVFilterContext *ctx, AVDictionary **opts)
 {
     ResampleContext *s = ctx->priv;
+    const AVClass *avr_class = avresample_get_class();
+    AVDictionaryEntry *e = NULL;
 
-    if (args) {
-        int ret = av_dict_parse_string(&s->options, args, "=", ":", 0);
-        if (ret < 0) {
-            av_log(ctx, AV_LOG_ERROR, "error setting option string: %s\n", args);
-            return ret;
-        }
-
-        /* do not allow the user to override basic format options */
-        av_dict_set(&s->options,  "in_channel_layout", NULL, 0);
-        av_dict_set(&s->options, "out_channel_layout", NULL, 0);
-        av_dict_set(&s->options,  "in_sample_fmt",     NULL, 0);
-        av_dict_set(&s->options, "out_sample_fmt",     NULL, 0);
-        av_dict_set(&s->options,  "in_sample_rate",    NULL, 0);
-        av_dict_set(&s->options, "out_sample_rate",    NULL, 0);
+    while ((e = av_dict_get(*opts, "", e, AV_DICT_IGNORE_SUFFIX))) {
+        if (av_opt_find(&avr_class, e->key, NULL, 0,
+                        AV_OPT_SEARCH_FAKE_OBJ | AV_OPT_SEARCH_CHILDREN))
+            av_dict_set(&s->options, e->key, e->value, 0);
     }
+
+    e = NULL;
+    while ((e = av_dict_get(s->options, "", e, AV_DICT_IGNORE_SUFFIX)))
+        av_dict_set(opts, e->key, NULL, 0);
+
+    /* do not allow the user to override basic format options */
+    av_dict_set(&s->options,  "in_channel_layout", NULL, 0);
+    av_dict_set(&s->options, "out_channel_layout", NULL, 0);
+    av_dict_set(&s->options,  "in_sample_fmt",     NULL, 0);
+    av_dict_set(&s->options, "out_sample_fmt",     NULL, 0);
+    av_dict_set(&s->options,  "in_sample_rate",    NULL, 0);
+    av_dict_set(&s->options, "out_sample_rate",    NULL, 0);
 
     return 0;
 }
@@ -174,7 +178,7 @@ static int request_frame(AVFilterLink *outlink)
 
     /* flush the lavr delay buffer */
     if (ret == AVERROR_EOF && s->avr) {
-        AVFilterBufferRef *buf;
+        AVFrame *frame;
         int nb_samples = av_rescale_rnd(avresample_get_delay(s->avr),
                                         outlink->sample_rate,
                                         ctx->inputs[0]->sample_rate,
@@ -183,25 +187,25 @@ static int request_frame(AVFilterLink *outlink)
         if (!nb_samples)
             return ret;
 
-        buf = ff_get_audio_buffer(outlink, AV_PERM_WRITE, nb_samples);
-        if (!buf)
+        frame = ff_get_audio_buffer(outlink, nb_samples);
+        if (!frame)
             return AVERROR(ENOMEM);
 
-        ret = avresample_convert(s->avr, buf->extended_data,
-                                 buf->linesize[0], nb_samples,
+        ret = avresample_convert(s->avr, frame->extended_data,
+                                 frame->linesize[0], nb_samples,
                                  NULL, 0, 0);
         if (ret <= 0) {
-            avfilter_unref_buffer(buf);
+            av_frame_free(&frame);
             return (ret == 0) ? AVERROR_EOF : ret;
         }
 
-        buf->pts = s->next_pts;
-        return ff_filter_frame(outlink, buf);
+        frame->pts = s->next_pts;
+        return ff_filter_frame(outlink, frame);
     }
     return ret;
 }
 
-static int filter_frame(AVFilterLink *inlink, AVFilterBufferRef *buf)
+static int filter_frame(AVFilterLink *inlink, AVFrame *in)
 {
     AVFilterContext  *ctx = inlink->dst;
     ResampleContext    *s = ctx->priv;
@@ -209,27 +213,26 @@ static int filter_frame(AVFilterLink *inlink, AVFilterBufferRef *buf)
     int ret;
 
     if (s->avr) {
-        AVFilterBufferRef *buf_out;
+        AVFrame *out;
         int delay, nb_samples;
 
         /* maximum possible samples lavr can output */
         delay      = avresample_get_delay(s->avr);
-        nb_samples = av_rescale_rnd(buf->audio->nb_samples + delay,
+        nb_samples = av_rescale_rnd(in->nb_samples + delay,
                                     outlink->sample_rate, inlink->sample_rate,
                                     AV_ROUND_UP);
 
-        buf_out = ff_get_audio_buffer(outlink, AV_PERM_WRITE, nb_samples);
-        if (!buf_out) {
+        out = ff_get_audio_buffer(outlink, nb_samples);
+        if (!out) {
             ret = AVERROR(ENOMEM);
             goto fail;
         }
 
-        ret     = avresample_convert(s->avr, buf_out->extended_data,
-                                     buf_out->linesize[0], nb_samples,
-                                     buf->extended_data, buf->linesize[0],
-                                     buf->audio->nb_samples);
+        ret = avresample_convert(s->avr, out->extended_data, out->linesize[0],
+                                 nb_samples, in->extended_data, in->linesize[0],
+                                 in->nb_samples);
         if (ret <= 0) {
-            avfilter_unref_buffer(buf_out);
+            av_frame_free(&out);
             if (ret < 0)
                 goto fail;
         }
@@ -237,48 +240,74 @@ static int filter_frame(AVFilterLink *inlink, AVFilterBufferRef *buf)
         av_assert0(!avresample_available(s->avr));
 
         if (s->next_pts == AV_NOPTS_VALUE) {
-            if (buf->pts == AV_NOPTS_VALUE) {
+            if (in->pts == AV_NOPTS_VALUE) {
                 av_log(ctx, AV_LOG_WARNING, "First timestamp is missing, "
                        "assuming 0.\n");
                 s->next_pts = 0;
             } else
-                s->next_pts = av_rescale_q(buf->pts, inlink->time_base,
+                s->next_pts = av_rescale_q(in->pts, inlink->time_base,
                                            outlink->time_base);
         }
 
         if (ret > 0) {
-            buf_out->audio->nb_samples = ret;
-            if (buf->pts != AV_NOPTS_VALUE) {
-                buf_out->pts = av_rescale_q(buf->pts, inlink->time_base,
+            out->nb_samples = ret;
+
+            ret = av_frame_copy_props(out, in);
+            if (ret < 0) {
+                av_frame_free(&out);
+                goto fail;
+            }
+
+            out->sample_rate = outlink->sample_rate;
+            if (in->pts != AV_NOPTS_VALUE) {
+                out->pts = av_rescale_q(in->pts, inlink->time_base,
                                             outlink->time_base) -
                                av_rescale(delay, outlink->sample_rate,
                                           inlink->sample_rate);
             } else
-                buf_out->pts = s->next_pts;
+                out->pts = s->next_pts;
 
-            s->next_pts = buf_out->pts + buf_out->audio->nb_samples;
+            s->next_pts = out->pts + out->nb_samples;
 
-            ret = ff_filter_frame(outlink, buf_out);
+            ret = ff_filter_frame(outlink, out);
             s->got_output = 1;
         }
 
 fail:
-        avfilter_unref_buffer(buf);
+        av_frame_free(&in);
     } else {
-        buf->format = outlink->format;
-        ret = ff_filter_frame(outlink, buf);
+        in->format = outlink->format;
+        ret = ff_filter_frame(outlink, in);
         s->got_output = 1;
     }
 
     return ret;
 }
 
+static const AVClass *resample_child_class_next(const AVClass *prev)
+{
+    return prev ? NULL : avresample_get_class();
+}
+
+static void *resample_child_next(void *obj, void *prev)
+{
+    ResampleContext *s = obj;
+    return prev ? NULL : s->avr;
+}
+
+static const AVClass resample_class = {
+    .class_name       = "resample",
+    .item_name        = av_default_item_name,
+    .version          = LIBAVUTIL_VERSION_INT,
+    .child_class_next = resample_child_class_next,
+    .child_next       = resample_child_next,
+};
+
 static const AVFilterPad avfilter_af_resample_inputs[] = {
     {
-        .name           = "default",
-        .type           = AVMEDIA_TYPE_AUDIO,
-        .filter_frame   = filter_frame,
-        .min_perms      = AV_PERM_READ
+        .name          = "default",
+        .type          = AVMEDIA_TYPE_AUDIO,
+        .filter_frame  = filter_frame,
     },
     { NULL }
 };
@@ -293,15 +322,14 @@ static const AVFilterPad avfilter_af_resample_outputs[] = {
     { NULL }
 };
 
-AVFilter avfilter_af_resample = {
+AVFilter ff_af_resample = {
     .name          = "resample",
     .description   = NULL_IF_CONFIG_SMALL("Audio resampling and conversion."),
     .priv_size     = sizeof(ResampleContext),
-
-    .init           = init,
-    .uninit         = uninit,
-    .query_formats  = query_formats,
-
-    .inputs    = avfilter_af_resample_inputs,
-    .outputs   = avfilter_af_resample_outputs,
+    .priv_class    = &resample_class,
+    .init_dict     = init,
+    .uninit        = uninit,
+    .query_formats = query_formats,
+    .inputs        = avfilter_af_resample_inputs,
+    .outputs       = avfilter_af_resample_outputs,
 };

@@ -2,20 +2,20 @@
  * Copyright (c) 2002 Fabrice Bellard
  * Copyright (c) 2012 Justin Ruggles <justin.ruggles@gmail.com>
  *
- * This file is part of Libav.
+ * This file is part of FFmpeg.
  *
- * Libav is free software; you can redistribute it and/or
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
  *
- * Libav is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with Libav; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -91,7 +91,7 @@ static void audiogen(AVLFG *rnd, void **data, enum AVSampleFormat sample_fmt,
 
     k = 0;
 
-    /* 1 second of single freq sinus at 1000 Hz */
+    /* 1 second of single freq sine at 1000 Hz */
     a = 0;
     for (i = 0; i < 1 * sample_rate && k < nb_samples; i++, k++) {
         v = sin(a) * 0.30;

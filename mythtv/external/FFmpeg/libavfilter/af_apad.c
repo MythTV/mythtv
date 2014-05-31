@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *
  */
 
 /**
@@ -51,24 +50,16 @@ static const AVOption apad_options[] = {
     { "packet_size", "set silence packet size", OFFSET(packet_size), AV_OPT_TYPE_INT, { .i64 = 4096 }, 0, INT_MAX, A },
     { "pad_len",     "number of samples of silence to add",          OFFSET(pad_len),   AV_OPT_TYPE_INT64, { .i64 = 0 }, 0, INT64_MAX, A },
     { "whole_len",   "target number of samples in the audio stream", OFFSET(whole_len), AV_OPT_TYPE_INT64, { .i64 = 0 }, 0, INT64_MAX, A },
-    { NULL },
+    { NULL }
 };
 
 AVFILTER_DEFINE_CLASS(apad);
 
-static av_cold int init(AVFilterContext *ctx, const char *args)
+static av_cold int init(AVFilterContext *ctx)
 {
-    int ret;
     APadContext *apad = ctx->priv;
 
-    apad->class = &apad_class;
     apad->next_pts = AV_NOPTS_VALUE;
-
-    av_opt_set_defaults(apad);
-
-    if ((ret = av_opt_set_from_string(apad, args, NULL, "=", ":")) < 0)
-        return ret;
-
     if (apad->whole_len && apad->pad_len) {
         av_log(ctx, AV_LOG_ERROR, "Both whole and pad length are set, this is not possible\n");
         return AVERROR(EINVAL);
@@ -77,15 +68,15 @@ static av_cold int init(AVFilterContext *ctx, const char *args)
     return 0;
 }
 
-static int filter_frame(AVFilterLink *inlink, AVFilterBufferRef *frame)
+static int filter_frame(AVFilterLink *inlink, AVFrame *frame)
 {
     AVFilterContext *ctx = inlink->dst;
     APadContext *apad = ctx->priv;
 
     if (apad->whole_len)
-        apad->whole_len -= frame->audio->nb_samples;
+        apad->whole_len -= frame->nb_samples;
 
-    apad->next_pts = frame->pts + av_rescale_q(frame->audio->nb_samples, (AVRational){1, inlink->sample_rate}, inlink->time_base);
+    apad->next_pts = frame->pts + av_rescale_q(frame->nb_samples, (AVRational){1, inlink->sample_rate}, inlink->time_base);
     return ff_filter_frame(ctx->outputs[0], frame);
 }
 
@@ -97,9 +88,9 @@ static int request_frame(AVFilterLink *outlink)
 
     ret = ff_request_frame(ctx->inputs[0]);
 
-    if (ret == AVERROR_EOF) {
+    if (ret == AVERROR_EOF && !ctx->is_disabled) {
         int n_out = apad->packet_size;
-        AVFilterBufferRef *outsamplesref;
+        AVFrame *outsamplesref;
 
         if (apad->whole_len > 0) {
             apad->pad_len = apad->whole_len;
@@ -113,16 +104,16 @@ static int request_frame(AVFilterLink *outlink)
         if(!n_out)
             return AVERROR_EOF;
 
-        outsamplesref = ff_get_audio_buffer(outlink, AV_PERM_WRITE, n_out);
+        outsamplesref = ff_get_audio_buffer(outlink, n_out);
         if (!outsamplesref)
             return AVERROR(ENOMEM);
 
-        av_assert0(outsamplesref->audio->sample_rate == outlink->sample_rate);
-        av_assert0(outsamplesref->audio->nb_samples  == n_out);
+        av_assert0(outsamplesref->sample_rate == outlink->sample_rate);
+        av_assert0(outsamplesref->nb_samples  == n_out);
 
         av_samples_set_silence(outsamplesref->extended_data, 0,
                                n_out,
-                               outsamplesref->audio->channels,
+                               av_frame_get_channels(outsamplesref),
                                outsamplesref->format);
 
         outsamplesref->pts = apad->next_pts;
@@ -139,9 +130,8 @@ static const AVFilterPad apad_inputs[] = {
         .name         = "default",
         .type         = AVMEDIA_TYPE_AUDIO,
         .filter_frame = filter_frame,
-        .min_perms    = AV_PERM_READ,
     },
-    { NULL },
+    { NULL }
 };
 
 static const AVFilterPad apad_outputs[] = {
@@ -150,10 +140,10 @@ static const AVFilterPad apad_outputs[] = {
         .request_frame = request_frame,
         .type          = AVMEDIA_TYPE_AUDIO,
     },
-    { NULL },
+    { NULL }
 };
 
-AVFilter avfilter_af_apad = {
+AVFilter ff_af_apad = {
     .name          = "apad",
     .description   = NULL_IF_CONFIG_SMALL("Pad audio with silence."),
     .init          = init,
@@ -161,4 +151,5 @@ AVFilter avfilter_af_apad = {
     .inputs        = apad_inputs,
     .outputs       = apad_outputs,
     .priv_class    = &apad_class,
+    .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_INTERNAL,
 };

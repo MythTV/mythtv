@@ -22,6 +22,7 @@ cmp_shift=${12:-0}
 cmp_target=${13:-0}
 size_tolerance=${14:-0}
 cmp_unit=${15:-2}
+gen=${16:-no}
 
 outdir="tests/data/fate"
 outfile="${outdir}/${test}"
@@ -74,6 +75,10 @@ probefmt(){
     run ffprobe -show_entries format=format_name -print_format default=nw=1:nk=1 -v 0 "$@"
 }
 
+probeframes(){
+    run ffprobe -show_frames -v 0 "$@"
+}
+
 ffmpeg(){
     dec_opts="-threads $threads -thread_type $thread_type"
     ffmpeg_args="-nostats -cpuflags $cpuflags"
@@ -85,11 +90,11 @@ ffmpeg(){
 }
 
 framecrc(){
-    ffmpeg "$@" -f framecrc -
+    ffmpeg "$@" -flags +bitexact -f framecrc -
 }
 
 framemd5(){
-    ffmpeg "$@" -f framemd5 -
+    ffmpeg "$@" -flags +bitexact -f framemd5 -
 }
 
 crc(){
@@ -145,23 +150,62 @@ enc_dec(){
     tests/tiny_psnr $srcfile $decfile $cmp_unit $cmp_shift
 }
 
-regtest(){
-    t="${test#$2-}"
-    ref=${base}/ref/$2/$t
-    ${base}/${1}-regression.sh $t $2 $3 "$target_exec" "$target_path" "$threads" "$thread_type" "$cpuflags" "$samples"
-}
-
 lavffatetest(){
-    regtest lavf lavf-fate tests/vsynth1
+    t="${test#lavf-fate-}"
+    ref=${base}/ref/lavf-fate/$t
+    ${base}/lavf-regression.sh $t lavf-fate tests/vsynth1 "$target_exec" "$target_path" "$threads" "$thread_type" "$cpuflags" "$samples"
 }
 
 lavftest(){
-    regtest lavf lavf tests/vsynth1
+    t="${test#lavf-}"
+    ref=${base}/ref/lavf/$t
+    ${base}/lavf-regression.sh $t lavf tests/vsynth1 "$target_exec" "$target_path" "$threads" "$thread_type" "$cpuflags" "$samples"
 }
 
-lavfitest(){
-    cleanfiles="tests/data/lavfi/${test#lavfi-}.nut"
-    regtest lavfi lavfi tests/vsynth1
+video_filter(){
+    filters=$1
+    shift
+    label=${test#filter-}
+    raw_src="${target_path}/tests/vsynth1/%02d.pgm"
+    printf '%-20s' $label
+    ffmpeg $DEC_OPTS -f image2 -vcodec pgmyuv -i $raw_src \
+        $FLAGS $ENC_OPTS -vf "$filters" -vcodec rawvideo $* -f nut md5:
+}
+
+pixdesc(){
+    pix_fmts="$(ffmpeg -pix_fmts list 2>/dev/null | awk 'NR > 8 && /^IO/ { print $2 }' | sort)"
+    for pix_fmt in $pix_fmts; do
+        test=$pix_fmt
+        video_filter "format=$pix_fmt,pixdesctest" -pix_fmt $pix_fmt
+    done
+}
+
+pixfmts(){
+    filter=${test#filter-pixfmts-}
+    filter=${filter%_*}
+    filter_args=$1
+    prefilter_chain=$2
+
+    showfiltfmts="$target_exec $target_path/libavfilter/filtfmts-test"
+    scale_exclude_fmts=${outfile}_scale_exclude_fmts
+    scale_in_fmts=${outfile}_scale_in_fmts
+    scale_out_fmts=${outfile}_scale_out_fmts
+    in_fmts=${outfile}_in_fmts
+
+    # exclude pixel formats which are not supported as input
+    $showfiltfmts scale | awk -F '[ \r]' '/^INPUT/{ fmt=substr($3, 5); print fmt }' | sort >$scale_in_fmts
+    $showfiltfmts scale | awk -F '[ \r]' '/^OUTPUT/{ fmt=substr($3, 5); print fmt }' | sort >$scale_out_fmts
+    comm -12 $scale_in_fmts $scale_out_fmts >$scale_exclude_fmts
+
+    $showfiltfmts $filter | awk -F '[ \r]' '/^INPUT/{ fmt=substr($3, 5); print fmt }' | sort >$in_fmts
+    pix_fmts=$(comm -12 $scale_exclude_fmts $in_fmts)
+
+    for pix_fmt in $pix_fmts; do
+        test=$pix_fmt
+        video_filter "${prefilter_chain}format=$pix_fmt,$filter=$filter_args" -pix_fmt $pix_fmt
+    done
+
+    rm $in_fmts $scale_in_fmts $scale_out_fmts $scale_exclude_fmts
 }
 
 mkdir -p "$outdir"
@@ -197,9 +241,17 @@ fi
 
 echo "${test}:${sig:-$err}:$($base64 <$cmpfile):$($base64 <$errfile)" >$repfile
 
+if test $err != 0 && test $gen != "no" ; then
+    echo "GEN     $ref"
+    cp -f "$outfile" "$ref"
+    err=$?
+fi
+
 if test $err = 0; then
     rm -f $outfile $errfile $cmpfile $cleanfiles
-else
+elif test $gen = "no"; then
     echo "Test $test failed. Look at $errfile for details."
+else
+    echo "Updating reference failed, possibly no output file was generated."
 fi
 exit $err

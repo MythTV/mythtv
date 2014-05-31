@@ -43,7 +43,7 @@ static av_noinline void FUNC(hl_decode_mb)(H264Context *h)
     const int mb_x    = h->mb_x;
     const int mb_y    = h->mb_y;
     const int mb_xy   = h->mb_xy;
-    const int mb_type = h->cur_pic.f.mb_type[mb_xy];
+    const int mb_type = h->cur_pic.mb_type[mb_xy];
     uint8_t *dest_y, *dest_cb, *dest_cr;
     int linesize, uvlinesize /*dct_offset*/;
     int i, j;
@@ -53,7 +53,7 @@ static av_noinline void FUNC(hl_decode_mb)(H264Context *h)
     const int is_h264 = !CONFIG_SVQ3_DECODER || SIMPLE || h->avctx->codec_id == AV_CODEC_ID_H264;
     void (*idct_add)(uint8_t *dst, int16_t *block, int stride);
     const int block_h   = 16 >> h->chroma_y_shift;
-    const int chroma422 = CHROMA422;
+    const int chroma422 = CHROMA422(h);
 
     dest_y  = h->cur_pic.f.data[0] + ((mb_x << PIXEL_SHIFT)     + mb_y * h->linesize)  * 16;
     dest_cb = h->cur_pic.f.data[1] +  (mb_x << PIXEL_SHIFT) * 8 + mb_y * h->uvlinesize * block_h;
@@ -64,7 +64,7 @@ static av_noinline void FUNC(hl_decode_mb)(H264Context *h)
 
     h->list_counts[mb_xy] = h->list_count;
 
-    if (!SIMPLE && MB_FIELD) {
+    if (!SIMPLE && MB_FIELD(h)) {
         linesize     = h->mb_linesize = h->linesize * 2;
         uvlinesize   = h->mb_uvlinesize = h->uvlinesize * 2;
         block_offset = &h->block_offset[48];
@@ -73,7 +73,7 @@ static av_noinline void FUNC(hl_decode_mb)(H264Context *h)
             dest_cb -= h->uvlinesize * (block_h - 1);
             dest_cr -= h->uvlinesize * (block_h - 1);
         }
-        if (FRAME_MBAFF) {
+        if (FRAME_MBAFF(h)) {
             int list;
             for (list = 0; list < h->list_count; list++) {
                 if (!USES_LIST(mb_type, list))
@@ -138,8 +138,8 @@ static av_noinline void FUNC(hl_decode_mb)(H264Context *h)
             if (SIMPLE || !CONFIG_GRAY || !(h->flags & CODEC_FLAG_GRAY)) {
                 if (!h->sps.chroma_format_idc) {
                     for (i = 0; i < 8; i++) {
-                        memset(dest_cb + i*uvlinesize, 1 << (bit_depth - 1), 8);
-                        memset(dest_cr + i*uvlinesize, 1 << (bit_depth - 1), 8);
+                        memset(dest_cb + i * uvlinesize, 1 << (bit_depth - 1), 8);
+                        memset(dest_cr + i * uvlinesize, 1 << (bit_depth - 1), 8);
                     }
                 } else {
                     const uint8_t *src_cb = h->intra_pcm_ptr + 256;
@@ -272,7 +272,7 @@ static av_noinline void FUNC(hl_decode_mb_444)(H264Context *h)
     const int mb_x    = h->mb_x;
     const int mb_y    = h->mb_y;
     const int mb_xy   = h->mb_xy;
-    const int mb_type = h->cur_pic.f.mb_type[mb_xy];
+    const int mb_type = h->cur_pic.mb_type[mb_xy];
     uint8_t *dest[3];
     int linesize;
     int i, j, p;
@@ -289,13 +289,13 @@ static av_noinline void FUNC(hl_decode_mb_444)(H264Context *h)
 
     h->list_counts[mb_xy] = h->list_count;
 
-    if (!SIMPLE && MB_FIELD) {
+    if (!SIMPLE && MB_FIELD(h)) {
         linesize     = h->mb_linesize = h->mb_uvlinesize = h->linesize * 2;
         block_offset = &h->block_offset[48];
         if (mb_y & 1) // FIXME move out of this function?
             for (p = 0; p < 3; p++)
                 dest[p] -= h->linesize * 15;
-        if (FRAME_MBAFF) {
+        if (FRAME_MBAFF(h)) {
             int list;
             for (list = 0; list < h->list_count; list++) {
                 if (!USES_LIST(mb_type, list))

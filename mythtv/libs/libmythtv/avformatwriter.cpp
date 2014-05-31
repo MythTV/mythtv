@@ -45,7 +45,7 @@ AVFormatWriter::AVFormatWriter()
       m_ctx(NULL),
       m_videoStream(NULL),   m_avVideoCodec(NULL),
       m_audioStream(NULL),   m_avAudioCodec(NULL),
-      m_picture(NULL),       m_tmpPicture(NULL),
+      m_picture(NULL),
       m_audPicture(NULL),
       m_audioInBuf(NULL),    m_audioInPBuf(NULL)
 {
@@ -78,6 +78,8 @@ AVFormatWriter::~AVFormatWriter()
         avcodec_free_frame(&m_audPicture);
 
     Cleanup();
+
+    av_frame_free(&m_picture);
 }
 
 bool AVFormatWriter::Init(void)
@@ -244,6 +246,7 @@ int AVFormatWriter::WriteVideoFrame(VideoFrame *frame)
     planes[2] = planes[1] + (frame->width * frame->height) /
         4; // (pictureFormat == PIX_FMT_YUV422P ? 2 : 4);
 
+    av_frame_unref(m_picture);
     m_picture->data[0] = planes[0];
     m_picture->data[1] = planes[1];
     m_picture->data[2] = planes[2];
@@ -583,24 +586,19 @@ bool AVFormatWriter::OpenVideo(void)
         return false;
     }
 
-    m_picture = AllocPicture(c->pix_fmt);
     if (!m_picture)
     {
-        LOG(VB_RECORD, LOG_ERR,
-            LOC + "OpenVideo(): AllocPicture() failed");
-        return false;
-    }
-
-    m_tmpPicture = NULL;
-    if (c->pix_fmt != PIX_FMT_YUV420P)
-    {
-        m_tmpPicture = AllocPicture(PIX_FMT_YUV420P);
-        if (!m_tmpPicture)
+        m_picture = AllocPicture(c->pix_fmt);
+        if (!m_picture)
         {
             LOG(VB_RECORD, LOG_ERR,
-                LOC + "OpenVideo(): m_tmpPicture AllocPicture() failed");
+                LOC + "OpenVideo(): AllocPicture() failed");
             return false;
         }
+    }
+    else
+    {
+        av_frame_unref(m_picture);
     }
 
     return true;

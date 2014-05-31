@@ -41,7 +41,6 @@
 
 typedef struct Rl2Context {
     AVCodecContext *avctx;
-    AVFrame frame;
 
     uint16_t video_base;  ///< initial drawing offset
     uint32_t clr_count;   ///< number of used colors (currently unused)
@@ -138,7 +137,6 @@ static av_cold int rl2_decode_init(AVCodecContext *avctx)
 
     s->avctx       = avctx;
     avctx->pix_fmt = AV_PIX_FMT_PAL8;
-    avcodec_get_frame_defaults(&s->frame);
 
     /** parse extra data */
     if (!avctx->extradata || avctx->extradata_size < EXTRADATA1_SIZE) {
@@ -178,29 +176,22 @@ static int rl2_decode_frame(AVCodecContext *avctx,
                             void *data, int *got_frame,
                             AVPacket *avpkt)
 {
+    AVFrame *frame     = data;
     const uint8_t *buf = avpkt->data;
     int ret, buf_size  = avpkt->size;
     Rl2Context *s = avctx->priv_data;
 
-    if (s->frame.data[0])
-        avctx->release_buffer(avctx, &s->frame);
-
-    /** get buffer */
-    s->frame.reference = 0;
-    if ((ret = ff_get_buffer(avctx, &s->frame)) < 0) {
-        av_log(s->avctx, AV_LOG_ERROR, "get_buffer() failed\n");
+    if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
         return ret;
-    }
 
     /** run length decode */
-    rl2_rle_decode(s, buf, buf_size, s->frame.data[0], s->frame.linesize[0],
+    rl2_rle_decode(s, buf, buf_size, frame->data[0], frame->linesize[0],
                    s->video_base);
 
     /** make the palette available on the way out */
-    memcpy(s->frame.data[1], s->palette, AVPALETTE_SIZE);
+    memcpy(frame->data[1], s->palette, AVPALETTE_SIZE);
 
     *got_frame = 1;
-    *(AVFrame*)data = s->frame;
 
     /** report that the buffer was completely consumed */
     return buf_size;
@@ -216,9 +207,6 @@ static av_cold int rl2_decode_end(AVCodecContext *avctx)
 {
     Rl2Context *s = avctx->priv_data;
 
-    if (s->frame.data[0])
-        avctx->release_buffer(avctx, &s->frame);
-
     av_free(s->back_frame);
 
     return 0;
@@ -227,6 +215,7 @@ static av_cold int rl2_decode_end(AVCodecContext *avctx)
 
 AVCodec ff_rl2_decoder = {
     .name           = "rl2",
+    .long_name      = NULL_IF_CONFIG_SMALL("RL2 video"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_RL2,
     .priv_data_size = sizeof(Rl2Context),
@@ -234,5 +223,4 @@ AVCodec ff_rl2_decoder = {
     .close          = rl2_decode_end,
     .decode         = rl2_decode_frame,
     .capabilities   = CODEC_CAP_DR1,
-    .long_name      = NULL_IF_CONFIG_SMALL("RL2 video"),
 };

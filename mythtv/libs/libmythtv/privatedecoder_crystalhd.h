@@ -11,7 +11,7 @@ typedef void                *HANDLE;
 #endif
 #endif
 
-#include "frame.h"
+#include "mythframe.h"
 #include <libcrystalhd/bc_dts_types.h>
 #include <libcrystalhd/bc_dts_defs.h>
 #include <libcrystalhd/libcrystalhd_if.h>

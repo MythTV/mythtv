@@ -38,6 +38,15 @@ static void fill_picture_parameters(AVCodecContext *avctx,
 {
     const MpegEncContext *s = &v->s;
     const Picture *current_picture = s->current_picture_ptr;
+    int intcomp = 0;
+
+    // determine if intensity compensation is needed
+    if (s->pict_type == AV_PICTURE_TYPE_P) {
+      if ((v->fcm == ILACE_FRAME && v->intcomp) || (v->fcm != ILACE_FRAME && v->mv_mode == MV_PMODE_INTENSITY_COMP)) {
+        if (v->lumscale != 32 || v->lumshift != 0 || (s->picture_structure != PICT_FRAME && (v->lumscale2 != 32 && v->lumshift2 != 0)))
+          intcomp = 1;
+      }
+    }
 
     memset(pp, 0, sizeof(*pp));
     pp->wDecodedPictureIndex    =
@@ -74,7 +83,7 @@ static void fill_picture_parameters(AVCodecContext *avctx,
     pp->bBidirectionalAveragingMode = (1                                           << 7) |
                                       ((ctx->cfg->ConfigIntraResidUnsigned != 0)   << 6) |
                                       ((ctx->cfg->ConfigResidDiffAccelerator != 0) << 5) |
-                                      ((v->lumscale != 32 || v->lumshift != 0)     << 4) |
+                                      (intcomp                                     << 4) |
                                       ((v->profile == PROFILE_ADVANCED)            << 3);
     pp->bMVprecisionAndChromaRelation = ((v->mv_mode == MV_PMODE_1MV_HPEL_BILIN) << 3) |
                                         (1                                       << 2) |
@@ -97,7 +106,7 @@ static void fill_picture_parameters(AVCodecContext *avctx,
                                   (v->vstransform      );
     pp->bPicOverflowBlocks      = (v->quantizer_mode << 6) |
                                   (v->multires       << 5) |
-                                  (s->resync_marker  << 4) |
+                                  (v->resync_marker  << 4) |
                                   (v->rangered       << 3) |
                                   (s->max_b_frames       );
     pp->bPicExtrapolation       = (!v->interlace || v->fcm == PROGRESSIVE) ? 1 : 2;
@@ -122,15 +131,25 @@ static void fill_picture_parameters(AVCodecContext *avctx,
                                   (v->range_mapuv_flag << 3) |
                                   (v->range_mapuv          );
     pp->bPicBinPB               = 0;
-    pp->bMV_RPS                 = 0;
-    pp->bReservedBits           = 0;
+    pp->bMV_RPS                 = (v->fcm == ILACE_FIELD && pp->bPicBackwardPrediction) ? v->refdist + 9 : 0;
+    pp->bReservedBits           = v->pq;
     if (s->picture_structure == PICT_FRAME) {
-        pp->wBitstreamFcodes        = v->lumscale;
-        pp->wBitstreamPCEelements   = v->lumshift;
+        if (intcomp) {
+            pp->wBitstreamFcodes      = v->lumscale;
+            pp->wBitstreamPCEelements = v->lumshift;
+        } else {
+            pp->wBitstreamFcodes      = 32;
+            pp->wBitstreamPCEelements = 0;
+        }
     } else {
         /* Syntax: (top_field_param << 8) | bottom_field_param */
-        pp->wBitstreamFcodes        = (v->lumscale << 8) | v->lumscale;
-        pp->wBitstreamPCEelements   = (v->lumshift << 8) | v->lumshift;
+        if (intcomp) {
+            pp->wBitstreamFcodes      = (v->lumscale << 8) | v->lumscale2;
+            pp->wBitstreamPCEelements = (v->lumshift << 8) | v->lumshift2;
+        } else {
+            pp->wBitstreamFcodes      = (32 << 8) | 32;
+            pp->wBitstreamPCEelements = 0;
+        }
     }
     pp->bBitstreamConcealmentNeed   = 0;
     pp->bBitstreamConcealmentMethod = 0;
@@ -148,8 +167,8 @@ static void fill_slice(AVCodecContext *avctx, DXVA_SliceInfo *slice,
     slice->dwSliceBitsInBuffer = 8 * size;
     slice->dwSliceDataLocation = position;
     slice->bStartCodeBitOffset = 0;
-    slice->bReservedBits       = 0;
-    slice->wMBbitOffset        = get_bits_count(&s->gb);
+    slice->bReservedBits       = (s->pict_type == AV_PICTURE_TYPE_B && !v->bi_type) ? v->bfraction_lut_index + 9 : 0;
+    slice->wMBbitOffset        = v->p_frame_skipped ? 0xffff : get_bits_count(&s->gb);
     slice->wNumberMBsInSlice   = s->mb_width * s->mb_height; /* XXX We assume 1 slice */
     slice->wQuantizerScaleCode = v->pq;
     slice->wBadSliceChopping   = 0;
@@ -162,7 +181,7 @@ static int commit_bitstream_and_slice_buffer(AVCodecContext *avctx,
     const VC1Context *v = avctx->priv_data;
     struct dxva_context *ctx = avctx->hwaccel_context;
     const MpegEncContext *s = &v->s;
-    struct dxva2_picture_context *ctx_pic = s->current_picture_ptr->f.hwaccel_picture_private;
+    struct dxva2_picture_context *ctx_pic = s->current_picture_ptr->hwaccel_picture_private;
 
     DXVA_SliceInfo *slice = &ctx_pic->si;
 
@@ -217,7 +236,7 @@ static int dxva2_vc1_start_frame(AVCodecContext *avctx,
 {
     const VC1Context *v = avctx->priv_data;
     struct dxva_context *ctx = avctx->hwaccel_context;
-    struct dxva2_picture_context *ctx_pic = v->s.current_picture_ptr->f.hwaccel_picture_private;
+    struct dxva2_picture_context *ctx_pic = v->s.current_picture_ptr->hwaccel_picture_private;
 
     if (!ctx->decoder || !ctx->cfg || ctx->surface_count <= 0)
         return -1;
@@ -236,7 +255,7 @@ static int dxva2_vc1_decode_slice(AVCodecContext *avctx,
 {
     const VC1Context *v = avctx->priv_data;
     const Picture *current_picture = v->s.current_picture_ptr;
-    struct dxva2_picture_context *ctx_pic = current_picture->f.hwaccel_picture_private;
+    struct dxva2_picture_context *ctx_pic = current_picture->hwaccel_picture_private;
 
     if (ctx_pic->bitstream_size > 0)
         return -1;
@@ -257,7 +276,7 @@ static int dxva2_vc1_decode_slice(AVCodecContext *avctx,
 static int dxva2_vc1_end_frame(AVCodecContext *avctx)
 {
     VC1Context *v = avctx->priv_data;
-    struct dxva2_picture_context *ctx_pic = v->s.current_picture_ptr->f.hwaccel_picture_private;
+    struct dxva2_picture_context *ctx_pic = v->s.current_picture_ptr->hwaccel_picture_private;
     int ret;
 
     if (ctx_pic->bitstream_size <= 0)

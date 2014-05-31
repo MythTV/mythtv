@@ -247,6 +247,8 @@ class MPEG2fixup
     pthread_t thread;
 
     AVFormatContext *inputFC;
+    AVFrame *picture;
+
     int vid_id;
     int ext_count;
     QMap <int, int> aud_map;
@@ -272,6 +274,8 @@ class MPEG2fixup
     int framenum;
     int status_update_time;
     uint64_t last_written_pos;
+    uint16_t inv_zigzag_direct16[64];
+    bool zigzag_init;
 };
 
 #ifdef NO_MYTH

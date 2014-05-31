@@ -96,7 +96,7 @@ QString toString(MythCodecID codecid)
 int myth2av_codecid(MythCodecID codec_id, bool &vdpau)
 {
     vdpau = false;
-    CodecID ret = AV_CODEC_ID_NONE;
+    AVCodecID ret = AV_CODEC_ID_NONE;
     switch (codec_id)
     {
         case kCodec_NONE:

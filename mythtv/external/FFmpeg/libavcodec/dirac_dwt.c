@@ -535,6 +535,7 @@ int ff_spatial_idwt_init2(DWTContext *d, IDWTELEM *buffer, int width, int height
         d->vertical_compose_l0 = (void*)vertical_compose_fidelityiL0;
         d->vertical_compose_h0 = (void*)vertical_compose_fidelityiH0;
         d->horizontal_compose = horizontal_compose_fidelityi;
+        d->support = 0; // not really used
         break;
     case DWT_DIRAC_DAUB9_7:
         d->spatial_compose = spatial_compose_daub97i_dy;
@@ -569,17 +570,3 @@ void ff_spatial_idwt_slice2(DWTContext *d, int y)
     }
 }
 
-int ff_spatial_idwt2(IDWTELEM *buffer, int width, int height, int stride,
-                     enum dwt_type type, int decomposition_count, IDWTELEM *temp)
-{
-    DWTContext d;
-    int y;
-
-    if (ff_spatial_idwt_init2(&d, buffer, width, height, stride, type, decomposition_count, temp))
-        return -1;
-
-    for (y = 0; y < d.height; y += 4)
-        ff_spatial_idwt_slice2(&d, y);
-
-    return 0;
-}

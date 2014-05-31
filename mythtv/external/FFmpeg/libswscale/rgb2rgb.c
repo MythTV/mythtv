@@ -73,15 +73,19 @@ void (*yuy2toyv12)(const uint8_t *src, uint8_t *ydst,
                    uint8_t *udst, uint8_t *vdst,
                    int width, int height,
                    int lumStride, int chromStride, int srcStride);
-void (*rgb24toyv12)(const uint8_t *src, uint8_t *ydst,
-                    uint8_t *udst, uint8_t *vdst,
-                    int width, int height,
-                    int lumStride, int chromStride, int srcStride);
+void (*ff_rgb24toyv12)(const uint8_t *src, uint8_t *ydst,
+                       uint8_t *udst, uint8_t *vdst,
+                       int width, int height,
+                       int lumStride, int chromStride, int srcStride,
+                       int32_t *rgb2yuv);
 void (*planar2x)(const uint8_t *src, uint8_t *dst, int width, int height,
                  int srcStride, int dstStride);
 void (*interleaveBytes)(const uint8_t *src1, const uint8_t *src2, uint8_t *dst,
                         int width, int height, int src1Stride,
                         int src2Stride, int dstStride);
+void (*deinterleaveBytes)(const uint8_t *src, uint8_t *dst1, uint8_t *dst2,
+                          int width, int height, int srcStride,
+                          int dst1Stride, int dst2Stride);
 void (*vu9_to_vu12)(const uint8_t *src1, const uint8_t *src2,
                     uint8_t *dst1, uint8_t *dst2,
                     int width, int height,
@@ -105,7 +109,6 @@ void (*yuyvtoyuv422)(uint8_t *ydst, uint8_t *udst, uint8_t *vdst,
                      const uint8_t *src, int width, int height,
                      int lumStride, int chromStride, int srcStride);
 
-#define RGB2YUV_SHIFT 8
 #define BY ((int)( 0.098 * (1 << RGB2YUV_SHIFT) + 0.5))
 #define BV ((int)(-0.071 * (1 << RGB2YUV_SHIFT) + 0.5))
 #define BU ((int)( 0.439 * (1 << RGB2YUV_SHIFT) + 0.5))
@@ -129,7 +132,7 @@ void (*yuyvtoyuv422)(uint8_t *ydst, uint8_t *udst, uint8_t *vdst,
 av_cold void sws_rgb2rgb_init(void)
 {
     rgb2rgb_init_c();
-    if (HAVE_MMX)
+    if (ARCH_X86)
         rgb2rgb_init_x86();
 }
 

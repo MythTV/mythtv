@@ -7,7 +7,7 @@
 // MythTV headers
 #include "mythlogging.h"
 #include "mythplayer.h"
-#include "frame.h"          /* VideoFrame */
+#include "mythframe.h"          /* VideoFrame */
 
 // Commercial Flagging headers
 #include "CommDetector2.h"

@@ -31,6 +31,7 @@
 #include "avcodec.h"
 #define BITSTREAM_READER_LE
 #include "get_bits.h"
+#include "internal.h"
 #include "libavutil/imgutils.h"
 #include "libavutil/mem.h"
 
@@ -39,8 +40,8 @@
 
 typedef struct TgvContext {
     AVCodecContext *avctx;
-    AVFrame frame;
-    AVFrame last_frame;
+    AVFrame *last_frame;
+    uint8_t *frame_buffer;
     int width,height;
     uint32_t palette[AVPALETTE_COUNT];
 
@@ -56,8 +57,11 @@ static av_cold int tgv_decode_init(AVCodecContext *avctx)
     s->avctx         = avctx;
     avctx->time_base = (AVRational){1, 15};
     avctx->pix_fmt   = AV_PIX_FMT_PAL8;
-    avcodec_get_frame_defaults(&s->frame);
-    avcodec_get_frame_defaults(&s->last_frame);
+
+    s->last_frame = av_frame_alloc();
+    if (!s->last_frame)
+        return AVERROR(ENOMEM);
+
     return 0;
 }
 
@@ -140,8 +144,8 @@ static int unpack(const uint8_t *src, const uint8_t *src_end,
  * Decode inter-frame
  * @return 0 on success, -1 on critical buffer underflow
  */
-static int tgv_decode_inter(TgvContext *s, const uint8_t *buf,
-                            const uint8_t *buf_end)
+static int tgv_decode_inter(TgvContext *s, AVFrame *frame,
+                            const uint8_t *buf, const uint8_t *buf_end)
 {
     int num_mvs;
     int num_blocks_raw;
@@ -169,12 +173,19 @@ static int tgv_decode_inter(TgvContext *s, const uint8_t *buf,
 
     /* allocate codebook buffers as necessary */
     if (num_mvs > s->num_mvs) {
-        s->mv_codebook = av_realloc(s->mv_codebook, num_mvs*2*sizeof(int));
+        if (av_reallocp_array(&s->mv_codebook, num_mvs, sizeof(*s->mv_codebook))) {
+            s->num_mvs = 0;
+            return AVERROR(ENOMEM);
+        }
         s->num_mvs = num_mvs;
     }
 
     if (num_blocks_packed > s->num_blocks_packed) {
-        s->block_codebook = av_realloc(s->block_codebook, num_blocks_packed*16);
+        int err;
+        if ((err = av_reallocp(&s->block_codebook, num_blocks_packed * 16)) < 0) {
+            s->num_blocks_packed = 0;
+            return err;
+        }
         s->num_blocks_packed = num_blocks_packed;
     }
 
@@ -226,8 +237,8 @@ static int tgv_decode_inter(TgvContext *s, const uint8_t *buf,
                     continue;
                 }
 
-                src = s->last_frame.data[0] + mx + my * s->last_frame.linesize[0];
-                src_stride = s->last_frame.linesize[0];
+                src = s->last_frame->data[0] + mx + my * s->last_frame->linesize[0];
+                src_stride = s->last_frame->linesize[0];
             } else {
                 int offset = vector - num_mvs;
                 if (offset < num_blocks_raw)
@@ -241,20 +252,11 @@ static int tgv_decode_inter(TgvContext *s, const uint8_t *buf,
 
             for (j = 0; j < 4; j++)
                 for (i = 0; i < 4; i++)
-                    s->frame.data[0][(y * 4 + j) * s->frame.linesize[0] + (x * 4 + i)] =
+                    frame->data[0][(y * 4 + j) * frame->linesize[0] + (x * 4 + i)] =
                         src[j * src_stride + i];
     }
 
     return 0;
-}
-
-/** release AVFrame buffers if allocated */
-static void cond_release_buffer(AVFrame *pic)
-{
-    if (pic->data[0]) {
-        av_freep(&pic->data[0]);
-        av_free(pic->data[1]);
-    }
 }
 
 static int tgv_decode_frame(AVCodecContext *avctx,
@@ -265,6 +267,7 @@ static int tgv_decode_frame(AVCodecContext *avctx,
     int buf_size           = avpkt->size;
     TgvContext *s          = avctx->priv_data;
     const uint8_t *buf_end = buf + buf_size;
+    AVFrame *frame         = data;
     int chunk_type, ret;
 
     if (buf_end - buf < EA_PREAMBLE_SIZE)
@@ -283,9 +286,10 @@ static int tgv_decode_frame(AVCodecContext *avctx,
         s->width  = AV_RL16(&buf[0]);
         s->height = AV_RL16(&buf[2]);
         if (s->avctx->width != s->width || s->avctx->height != s->height) {
-            avcodec_set_dimensions(s->avctx, s->width, s->height);
-            cond_release_buffer(&s->frame);
-            cond_release_buffer(&s->last_frame);
+            av_freep(&s->frame_buffer);
+            av_frame_unref(s->last_frame);
+            if ((ret = ff_set_dimensions(s->avctx, s->width, s->height)) < 0)
+                return ret;
         }
 
         pal_count = AV_RL16(&buf[6]);
@@ -296,49 +300,46 @@ static int tgv_decode_frame(AVCodecContext *avctx,
         }
     }
 
-    if ((ret = av_image_check_size(s->width, s->height, 0, avctx)) < 0)
+    if ((ret = ff_get_buffer(avctx, frame, AV_GET_BUFFER_FLAG_REF)) < 0)
         return ret;
 
-    /* shuffle */
-    FFSWAP(AVFrame, s->frame, s->last_frame);
-    if (!s->frame.data[0]) {
-        s->frame.reference = 3;
-        s->frame.buffer_hints = FF_BUFFER_HINTS_VALID;
-        s->frame.linesize[0] = s->width;
-
-        s->frame.data[0] = av_malloc(s->width * s->height);
-        if (!s->frame.data[0])
-            return AVERROR(ENOMEM);
-        s->frame.data[1] = av_malloc(AVPALETTE_SIZE);
-        if (!s->frame.data[1]) {
-            av_freep(&s->frame.data[0]);
-            return AVERROR(ENOMEM);
-        }
-    }
-    memcpy(s->frame.data[1], s->palette, AVPALETTE_SIZE);
+    memcpy(frame->data[1], s->palette, AVPALETTE_SIZE);
 
     if (chunk_type == kVGT_TAG) {
-        s->frame.key_frame = 1;
-        s->frame.pict_type = AV_PICTURE_TYPE_I;
-        if (unpack(buf, buf_end, s->frame.data[0], s->avctx->width, s->avctx->height) < 0) {
+        int y;
+        frame->key_frame = 1;
+        frame->pict_type = AV_PICTURE_TYPE_I;
+
+        if (!s->frame_buffer &&
+            !(s->frame_buffer = av_mallocz(s->width * s->height)))
+            return AVERROR(ENOMEM);
+
+        if (unpack(buf, buf_end, s->frame_buffer, s->avctx->width, s->avctx->height) < 0) {
             av_log(avctx, AV_LOG_WARNING, "truncated intra frame\n");
             return AVERROR_INVALIDDATA;
         }
+        for (y = 0; y < s->height; y++)
+            memcpy(frame->data[0]  + y * frame->linesize[0],
+                   s->frame_buffer + y * s->width,
+                   s->width);
     } else {
-        if (!s->last_frame.data[0]) {
+        if (!s->last_frame->data[0]) {
             av_log(avctx, AV_LOG_WARNING, "inter frame without corresponding intra frame\n");
             return buf_size;
         }
-        s->frame.key_frame = 0;
-        s->frame.pict_type = AV_PICTURE_TYPE_P;
-        if (tgv_decode_inter(s, buf, buf_end) < 0) {
+        frame->key_frame = 0;
+        frame->pict_type = AV_PICTURE_TYPE_P;
+        if (tgv_decode_inter(s, frame, buf, buf_end) < 0) {
             av_log(avctx, AV_LOG_WARNING, "truncated inter frame\n");
             return AVERROR_INVALIDDATA;
         }
     }
 
+    av_frame_unref(s->last_frame);
+    if ((ret = av_frame_ref(s->last_frame, frame)) < 0)
+        return ret;
+
     *got_frame = 1;
-    *(AVFrame*)data = s->frame;
 
     return buf_size;
 }
@@ -346,8 +347,8 @@ static int tgv_decode_frame(AVCodecContext *avctx,
 static av_cold int tgv_decode_end(AVCodecContext *avctx)
 {
     TgvContext *s = avctx->priv_data;
-    cond_release_buffer(&s->frame);
-    cond_release_buffer(&s->last_frame);
+    av_frame_free(&s->last_frame);
+    av_freep(&s->frame_buffer);
     av_free(s->mv_codebook);
     av_free(s->block_codebook);
     return 0;
@@ -355,11 +356,12 @@ static av_cold int tgv_decode_end(AVCodecContext *avctx)
 
 AVCodec ff_eatgv_decoder = {
     .name           = "eatgv",
+    .long_name      = NULL_IF_CONFIG_SMALL("Electronic Arts TGV video"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_TGV,
     .priv_data_size = sizeof(TgvContext),
     .init           = tgv_decode_init,
     .close          = tgv_decode_end,
     .decode         = tgv_decode_frame,
-    .long_name      = NULL_IF_CONFIG_SMALL("Electronic Arts TGV video"),
+    .capabilities   = CODEC_CAP_DR1,
 };

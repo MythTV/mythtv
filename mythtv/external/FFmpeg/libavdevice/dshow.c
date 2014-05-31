@@ -183,7 +183,7 @@ static char *dup_wchar_to_utf8(wchar_t *w)
 static int shall_we_drop(AVFormatContext *s)
 {
     struct dshow_ctx *ctx = s->priv_data;
-    const uint8_t dropscore[] = {62, 75, 87, 100};
+    static const uint8_t dropscore[] = {62, 75, 87, 100};
     const int ndropscores = FF_ARRAY_ELEMS(dropscore);
     unsigned int buffer_fullness = (ctx->curbufsize*100)/s->max_picture_buffer;
 
@@ -774,9 +774,9 @@ dshow_add_device(AVFormatContext *avctx,
         codec->width      = bih->biWidth;
         codec->height     = bih->biHeight;
         codec->pix_fmt    = dshow_pixfmt(bih->biCompression, bih->biBitCount);
-        if(bih->biCompression == MKTAG('H', 'D', 'Y', 'C')) {
-          av_log(avctx, AV_LOG_DEBUG, "attempt use full range for HDYC...");
-          codec->color_range = AVCOL_RANGE_MPEG; // just in case it needs this...
+        if (bih->biCompression == MKTAG('H', 'D', 'Y', 'C')) {
+            av_log(avctx, AV_LOG_DEBUG, "attempt to use full range for HDYC...\n");
+            codec->color_range = AVCOL_RANGE_MPEG; // just in case it needs this...
         }
         if (codec->pix_fmt == AV_PIX_FMT_NONE) {
             codec->codec_id = ff_codec_get_id(avformat_get_riff_video_tags(), bih->biCompression);
@@ -1059,7 +1059,7 @@ static int dshow_read_packet(AVFormatContext *s, AVPacket *pkt)
 #define DEC AV_OPT_FLAG_DECODING_PARAM
 static const AVOption options[] = {
     { "video_size", "set video size given a string such as 640x480 or hd720.", OFFSET(requested_width), AV_OPT_TYPE_IMAGE_SIZE, {.str = NULL}, 0, 0, DEC },
-    { "pixel_format", "set video pixel format", OFFSET(pixel_format), AV_OPT_TYPE_PIXEL_FMT, {.i64 = AV_PIX_FMT_NONE}, -1, AV_PIX_FMT_NB-1, DEC },
+    { "pixel_format", "set video pixel format", OFFSET(pixel_format), AV_OPT_TYPE_PIXEL_FMT, {.i64 = AV_PIX_FMT_NONE}, -1, INT_MAX, DEC },
     { "framerate", "set video frame rate", OFFSET(framerate), AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0, DEC },
     { "sample_rate", "set audio sample rate", OFFSET(sample_rate), AV_OPT_TYPE_INT, {.i64 = 0}, 0, INT_MAX, DEC },
     { "sample_size", "set audio sample size", OFFSET(sample_size), AV_OPT_TYPE_INT, {.i64 = 0}, 0, 16, DEC },

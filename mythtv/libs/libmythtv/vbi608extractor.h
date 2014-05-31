@@ -24,7 +24,7 @@
 
 #include <QList>
 
-#include "frame.h"
+#include "mythframe.h"
 
 class VBI608Extractor
 {

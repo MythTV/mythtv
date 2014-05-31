@@ -81,10 +81,8 @@ static int ws_snd_decode_frame(AVCodecContext *avctx, void *data,
 
     /* get output buffer */
     frame->nb_samples = out_size;
-    if ((ret = ff_get_buffer(avctx, frame)) < 0) {
-        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
+    if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
         return ret;
-    }
     samples     = frame->data[0];
     samples_end = samples + out_size;
 
@@ -174,10 +172,10 @@ static int ws_snd_decode_frame(AVCodecContext *avctx, void *data,
 
 AVCodec ff_ws_snd1_decoder = {
     .name           = "ws_snd1",
+    .long_name      = NULL_IF_CONFIG_SMALL("Westwood Audio (SND1)"),
     .type           = AVMEDIA_TYPE_AUDIO,
     .id             = AV_CODEC_ID_WESTWOOD_SND1,
     .init           = ws_snd_decode_init,
     .decode         = ws_snd_decode_frame,
     .capabilities   = CODEC_CAP_DR1,
-    .long_name      = NULL_IF_CONFIG_SMALL("Westwood Audio (SND1)"),
 };

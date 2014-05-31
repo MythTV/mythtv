@@ -34,6 +34,7 @@
 #include "libavutil/intreadwrite.h"
 #include "avcodec.h"
 #include "bytestream.h"
+#include "internal.h"
 
 #define MM_PREAMBLE_SIZE    6
 
@@ -47,7 +48,7 @@
 
 typedef struct MmContext {
     AVCodecContext *avctx;
-    AVFrame frame;
+    AVFrame *frame;
     int palette[AVPALETTE_COUNT];
     GetByteContext gb;
 } MmContext;
@@ -60,8 +61,9 @@ static av_cold int mm_decode_init(AVCodecContext *avctx)
 
     avctx->pix_fmt = AV_PIX_FMT_PAL8;
 
-    avcodec_get_frame_defaults(&s->frame);
-    s->frame.reference = 3;
+    s->frame = av_frame_alloc();
+    if (!s->frame)
+        return AVERROR(ENOMEM);
 
     return 0;
 }
@@ -108,9 +110,9 @@ static int mm_decode_intra(MmContext * s, int half_horiz, int half_vert)
             return AVERROR_INVALIDDATA;
 
         if (color) {
-            memset(s->frame.data[0] + y*s->frame.linesize[0] + x, color, run_length);
+            memset(s->frame->data[0] + y*s->frame->linesize[0] + x, color, run_length);
             if (half_vert)
-                memset(s->frame.data[0] + (y+1)*s->frame.linesize[0] + x, color, run_length);
+                memset(s->frame->data[0] + (y+1)*s->frame->linesize[0] + x, color, run_length);
         }
         x+= run_length;
 
@@ -129,7 +131,8 @@ static int mm_decode_intra(MmContext * s, int half_horiz, int half_vert)
  */
 static int mm_decode_inter(MmContext * s, int half_horiz, int half_vert)
 {
-    int data_off = bytestream2_get_le16(&s->gb), y = 0;
+    int data_off = bytestream2_get_le16(&s->gb);
+    int y = 0;
     GetByteContext data_ptr;
 
     if (bytestream2_get_bytes_left(&s->gb) < data_off)
@@ -158,13 +161,13 @@ static int mm_decode_inter(MmContext * s, int half_horiz, int half_vert)
                     return AVERROR_INVALIDDATA;
                 if (replace) {
                     int color = bytestream2_get_byte(&data_ptr);
-                    s->frame.data[0][y*s->frame.linesize[0] + x] = color;
+                    s->frame->data[0][y*s->frame->linesize[0] + x] = color;
                     if (half_horiz)
-                        s->frame.data[0][y*s->frame.linesize[0] + x + 1] = color;
+                        s->frame->data[0][y*s->frame->linesize[0] + x + 1] = color;
                     if (half_vert) {
-                        s->frame.data[0][(y+1)*s->frame.linesize[0] + x] = color;
+                        s->frame->data[0][(y+1)*s->frame->linesize[0] + x] = color;
                         if (half_horiz)
-                            s->frame.data[0][(y+1)*s->frame.linesize[0] + x + 1] = color;
+                            s->frame->data[0][(y+1)*s->frame->linesize[0] + x + 1] = color;
                     }
                 }
                 x += 1 + half_horiz;
@@ -193,10 +196,8 @@ static int mm_decode_frame(AVCodecContext *avctx,
     buf_size -= MM_PREAMBLE_SIZE;
     bytestream2_init(&s->gb, buf, buf_size);
 
-    if ((res = avctx->reget_buffer(avctx, &s->frame)) < 0) {
-        av_log(avctx, AV_LOG_ERROR, "reget_buffer() failed\n");
+    if ((res = ff_reget_buffer(avctx, s->frame)) < 0)
         return res;
-    }
 
     switch(type) {
     case MM_TYPE_PALETTE   : res = mm_decode_pal(s); return avpkt->size;
@@ -213,10 +214,12 @@ static int mm_decode_frame(AVCodecContext *avctx,
     if (res < 0)
         return res;
 
-    memcpy(s->frame.data[1], s->palette, AVPALETTE_SIZE);
+    memcpy(s->frame->data[1], s->palette, AVPALETTE_SIZE);
+
+    if ((res = av_frame_ref(data, s->frame)) < 0)
+        return res;
 
     *got_frame      = 1;
-    *(AVFrame*)data = s->frame;
 
     return avpkt->size;
 }
@@ -225,14 +228,14 @@ static av_cold int mm_decode_end(AVCodecContext *avctx)
 {
     MmContext *s = avctx->priv_data;
 
-    if(s->frame.data[0])
-        avctx->release_buffer(avctx, &s->frame);
+    av_frame_free(&s->frame);
 
     return 0;
 }
 
 AVCodec ff_mmvideo_decoder = {
     .name           = "mmvideo",
+    .long_name      = NULL_IF_CONFIG_SMALL("American Laser Games MM Video"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_MMVIDEO,
     .priv_data_size = sizeof(MmContext),
@@ -240,5 +243,4 @@ AVCodec ff_mmvideo_decoder = {
     .close          = mm_decode_end,
     .decode         = mm_decode_frame,
     .capabilities   = CODEC_CAP_DR1,
-    .long_name      = NULL_IF_CONFIG_SMALL("American Laser Games MM Video"),
 };

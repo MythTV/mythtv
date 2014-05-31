@@ -30,6 +30,7 @@
 
 #include <stdio.h>
 #include "libavutil/avassert.h"
+#include "libavutil/intreadwrite.h"
 #include "oggdec.h"
 #include "avformat.h"
 #include "internal.h"
@@ -47,6 +48,7 @@ static const struct ogg_codec * const ogg_codecs[] = {
     &ff_flac_codec,
     &ff_celt_codec,
     &ff_opus_codec,
+    &ff_vp8_codec,
     &ff_old_dirac_codec,
     &ff_old_flac_codec,
     &ff_ogm_video_codec,
@@ -76,6 +78,8 @@ static int ogg_save(AVFormatContext *s)
         struct ogg_stream *os = ogg->streams + i;
         os->buf = av_mallocz(os->bufsize + FF_INPUT_BUFFER_PADDING_SIZE);
         memcpy(os->buf, ost->streams[i].buf, os->bufpos);
+        os->new_metadata      = NULL;
+        os->new_metadata_size = 0;
     }
 
     ogg->state = ost;
@@ -88,7 +92,7 @@ static int ogg_restore(AVFormatContext *s, int discard)
     struct ogg *ogg = s->priv_data;
     AVIOContext *bc = s->pb;
     struct ogg_state *ost = ogg->state;
-    int i;
+    int i, err;
 
     if (!ost)
         return 0;
@@ -96,25 +100,21 @@ static int ogg_restore(AVFormatContext *s, int discard)
     ogg->state = ost->next;
 
     if (!discard) {
-        struct ogg_stream *old_streams = ogg->streams;
 
         for (i = 0; i < ogg->nstreams; i++)
-            av_free(ogg->streams[i].buf);
+            av_freep(&ogg->streams[i].buf);
 
         avio_seek(bc, ost->pos, SEEK_SET);
         ogg->page_pos = -1;
         ogg->curidx   = ost->curidx;
         ogg->nstreams = ost->nstreams;
-        ogg->streams  = av_realloc(ogg->streams,
-                                   ogg->nstreams * sizeof(*ogg->streams));
-
-        if (ogg->streams) {
+        if ((err = av_reallocp_array(&ogg->streams, ogg->nstreams,
+                                     sizeof(*ogg->streams))) < 0) {
+            ogg->nstreams = 0;
+            return err;
+        } else
             memcpy(ogg->streams, ost->streams,
                    ost->nstreams * sizeof(*ogg->streams));
-        } else {
-            av_free(old_streams);
-            ogg->nstreams = 0;
-        }
     }
 
     av_free(ost);
@@ -145,6 +145,9 @@ static int ogg_reset(AVFormatContext *s)
         if (start_pos <= s->data_offset) {
             os->lastpts = 0;
         }
+        os->end_trimming = 0;
+        av_freep(&os->new_metadata);
+        os->new_metadata_size = 0;
     }
 
     ogg->page_pos = -1;
@@ -195,7 +198,7 @@ static int ogg_replace_stream(AVFormatContext *s, uint32_t serial, int nsegs)
         if (i >= ogg->nstreams)
             return ogg_new_stream(s, serial);
     } else if (ogg->nstreams != 1) {
-        av_log_missing_feature(s, "Changing stream parameters in multistream ogg", 0);
+        avpriv_report_missing_feature(s, "Changing stream parameters in multistream ogg");
         return AVERROR_PATCHWELCOME;
     }
 
@@ -636,14 +639,15 @@ static int ogg_read_close(AVFormatContext *s)
     int i;
 
     for (i = 0; i < ogg->nstreams; i++) {
-        av_free(ogg->streams[i].buf);
+        av_freep(&ogg->streams[i].buf);
         if (ogg->streams[i].codec &&
             ogg->streams[i].codec->cleanup) {
             ogg->streams[i].codec->cleanup(s, i);
         }
-        av_free(ogg->streams[i].private);
+        av_freep(&ogg->streams[i].private);
+        av_freep(&ogg->streams[i].new_metadata);
     }
-    av_free(ogg->streams);
+    av_freep(&ogg->streams);
     return 0;
 }
 
@@ -671,7 +675,12 @@ static int ogg_read_header(AVFormatContext *s)
             av_log(s, AV_LOG_ERROR, "Header parsing failed for stream %d\n", i);
             ogg->streams[i].codec = NULL;
         } else if (os->codec && os->nb_header < os->codec->nb_header) {
-            av_log(s, AV_LOG_WARNING, "Number of headers (%d) mismatch for stream %d\n", os->nb_header, i);
+            av_log(s, AV_LOG_WARNING,
+                   "Headers mismatch for stream %d: "
+                   "expected %d received %d.\n",
+                   i, os->codec->nb_header, os->nb_header);
+            if (s->error_recognition & AV_EF_EXPLODE)
+                return AVERROR_INVALIDDATA;
         }
         if (os->start_granule != OGG_NOGRANULE_VALUE)
             os->lastpts = s->streams[i]->start_time =
@@ -718,8 +727,16 @@ static void ogg_validate_keyframe(AVFormatContext *s, int idx, int pstart, int p
 {
     struct ogg *ogg = s->priv_data;
     struct ogg_stream *os = ogg->streams + idx;
-    if (psize && s->streams[idx]->codec->codec_id == AV_CODEC_ID_THEORA) {
-        if (!!(os->pflags & AV_PKT_FLAG_KEY) != !(os->buf[pstart] & 0x40)) {
+    int invalid = 0;
+    if (psize) {
+        switch (s->streams[idx]->codec->codec_id) {
+        case AV_CODEC_ID_THEORA:
+            invalid = !!(os->pflags & AV_PKT_FLAG_KEY) != !(os->buf[pstart] & 0x40);
+        break;
+        case AV_CODEC_ID_VP8:
+            invalid = !!(os->pflags & AV_PKT_FLAG_KEY) != !(os->buf[pstart] & 1);
+        }
+        if (invalid) {
             os->pflags ^= AV_PKT_FLAG_KEY;
             av_log(s, AV_LOG_WARNING, "Broken file, %skeyframe not correctly marked.\n",
                    (os->pflags & AV_PKT_FLAG_KEY) ? "" : "non-");
@@ -734,6 +751,11 @@ static int ogg_read_packet(AVFormatContext *s, AVPacket *pkt)
     int idx, ret;
     int pstart, psize;
     int64_t fpos, pts, dts;
+
+    if (s->io_repositioned) {
+        ogg_reset(s);
+        s->io_repositioned = 0;
+    }
 
     //Get an ogg packet
 retry:
@@ -766,6 +788,28 @@ retry:
     pkt->flags    = os->pflags;
     pkt->duration = os->pduration;
     pkt->pos      = fpos;
+
+    if (os->end_trimming) {
+        uint8_t *side_data = av_packet_new_side_data(pkt,
+                                                     AV_PKT_DATA_SKIP_SAMPLES,
+                                                     10);
+        if(side_data == NULL) {
+            av_free_packet(pkt);
+            av_free(pkt);
+            return AVERROR(ENOMEM);
+        }
+        AV_WL32(side_data + 4, os->end_trimming);
+        os->end_trimming = 0;
+    }
+
+    if (os->new_metadata) {
+        uint8_t *side_data = av_packet_new_side_data(pkt,
+                                                     AV_PKT_DATA_METADATA_UPDATE,
+                                                     os->new_metadata_size);
+        memcpy(side_data, os->new_metadata, os->new_metadata_size);
+        av_freep(&os->new_metadata);
+        os->new_metadata_size = 0;
+    }
 
     return psize;
 }
@@ -854,5 +898,5 @@ AVInputFormat ff_ogg_demuxer = {
     .read_seek      = ogg_read_seek,
     .read_timestamp = ogg_read_timestamp,
     .extensions     = "ogg",
-    .flags          = AVFMT_GENERIC_INDEX | AVFMT_TS_DISCONT,
+    .flags          = AVFMT_GENERIC_INDEX | AVFMT_TS_DISCONT | AVFMT_NOBINSEARCH,
 };

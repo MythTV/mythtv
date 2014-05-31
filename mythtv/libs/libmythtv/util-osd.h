@@ -3,7 +3,7 @@
 
 #include "mythlogging.h"
 #include "mythimage.h"
-#include "frame.h"
+#include "mythframe.h"
 
 #define ALIGN_C 2
 #ifdef MMX

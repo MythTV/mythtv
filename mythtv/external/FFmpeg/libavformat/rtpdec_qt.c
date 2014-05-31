@@ -97,8 +97,8 @@ static int qt_rtp_parse_packet(AVFormatContext *s, PayloadContext *qt,
         is_start  = get_bits1(&gb);
         is_finish = get_bits1(&gb);
         if (!is_start || !is_finish) {
-            av_log_missing_feature(s, "RTP-X-QT with payload description "
-                                      "split over several packets", 1);
+            avpriv_request_sample(s, "RTP-X-QT with payload description "
+                                  "split over several packets");
             return AVERROR_PATCHWELCOME;
         }
         skip_bits(&gb, 12); // reserved
@@ -161,7 +161,7 @@ static int qt_rtp_parse_packet(AVFormatContext *s, PayloadContext *qt,
         avio_seek(&pb, 4, SEEK_SET);
 
     if (has_packet_info) {
-        av_log_missing_feature(s, "RTP-X-QT with packet specific info", 1);
+        avpriv_request_sample(s, "RTP-X-QT with packet-specific info");
         return AVERROR_PATCHWELCOME;
     }
 
@@ -172,26 +172,32 @@ static int qt_rtp_parse_packet(AVFormatContext *s, PayloadContext *qt,
     switch (packing_scheme) {
     case 3: /* one data packet spread over 1 or multiple RTP packets */
         if (qt->pkt.size > 0 && qt->timestamp == *timestamp) {
-            qt->pkt.data = av_realloc(qt->pkt.data, qt->pkt.size + alen +
-                                      FF_INPUT_BUFFER_PADDING_SIZE);
+            int err;
+            if ((err = av_reallocp(&qt->pkt.data, qt->pkt.size + alen +
+                                   FF_INPUT_BUFFER_PADDING_SIZE)) < 0) {
+                qt->pkt.size = 0;
+                return err;
+            }
         } else {
             av_freep(&qt->pkt.data);
             av_init_packet(&qt->pkt);
-            qt->pkt.data = av_malloc(alen + FF_INPUT_BUFFER_PADDING_SIZE);
+            qt->pkt.data = av_realloc(NULL, alen + FF_INPUT_BUFFER_PADDING_SIZE);
+            if (!qt->pkt.data)
+                return AVERROR(ENOMEM);
             qt->pkt.size = 0;
             qt->timestamp = *timestamp;
         }
-        if (!qt->pkt.data)
-            return AVERROR(ENOMEM);
         memcpy(qt->pkt.data + qt->pkt.size, buf + avio_tell(&pb), alen);
         qt->pkt.size += alen;
         if (has_marker_bit) {
-            *pkt = qt->pkt;
+            int ret = av_packet_from_data(pkt, qt->pkt.data, qt->pkt.size);
+            if (ret < 0)
+                return ret;
+
             qt->pkt.size = 0;
             qt->pkt.data = NULL;
             pkt->flags        = flags & RTP_FLAG_KEY ? AV_PKT_FLAG_KEY : 0;
             pkt->stream_index = st->index;
-            pkt->destruct     = av_destruct_packet;
             memset(pkt->data + pkt->size, 0, FF_INPUT_BUFFER_PADDING_SIZE);
             return 0;
         }
@@ -209,7 +215,7 @@ static int qt_rtp_parse_packet(AVFormatContext *s, PayloadContext *qt,
         pkt->stream_index = st->index;
         if (qt->remaining > 0) {
             av_freep(&qt->pkt.data);
-            qt->pkt.data = av_malloc(qt->remaining * qt->bytes_per_frame);
+            qt->pkt.data = av_realloc(NULL, qt->remaining * qt->bytes_per_frame);
             if (!qt->pkt.data) {
                 av_free_packet(pkt);
                 return AVERROR(ENOMEM);
@@ -224,7 +230,7 @@ static int qt_rtp_parse_packet(AVFormatContext *s, PayloadContext *qt,
         return 0;
 
     default:  /* unimplemented */
-        av_log_missing_feature(NULL, "RTP-X-QT with packing scheme 2", 1);
+        avpriv_request_sample(NULL, "RTP-X-QT with packing scheme 2");
         return AVERROR_PATCHWELCOME;
     }
 }

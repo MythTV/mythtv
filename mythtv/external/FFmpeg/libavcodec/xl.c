@@ -29,11 +29,6 @@
 #include "avcodec.h"
 #include "internal.h"
 
-typedef struct VideoXLContext{
-    AVCodecContext *avctx;
-    AVFrame pic;
-} VideoXLContext;
-
 static const int xl_table[32] = {
    0,   1,   2,   3,   4,   5,   6,   7,
    8,   9,  12,  15,  20,  25,  34,  46,
@@ -46,39 +41,31 @@ static int decode_frame(AVCodecContext *avctx,
                         AVPacket *avpkt)
 {
     const uint8_t *buf = avpkt->data;
-    int buf_size = avpkt->size;
-    VideoXLContext * const a = avctx->priv_data;
-    AVFrame * const p = &a->pic;
+    int buf_size       = avpkt->size;
+    AVFrame *const p   = data;
     uint8_t *Y, *U, *V;
     int i, j, ret;
     int stride;
     uint32_t val;
     int y0, y1, y2, y3 = 0, c0 = 0, c1 = 0;
 
-    if (avctx->width & 3) {
+    if (avctx->width % 4) {
         av_log(avctx, AV_LOG_ERROR, "width is not a multiple of 4\n");
         return AVERROR_INVALIDDATA;
     }
-
     if (buf_size < avctx->width * avctx->height) {
         av_log(avctx, AV_LOG_ERROR, "Packet is too small\n");
         return AVERROR_INVALIDDATA;
     }
 
-    if (p->data[0])
-        avctx->release_buffer(avctx, p);
-
-    p->reference = 0;
-    if ((ret = ff_get_buffer(avctx, p)) < 0){
-        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
+    if ((ret = ff_get_buffer(avctx, p, 0)) < 0)
         return ret;
-    }
     p->pict_type = AV_PICTURE_TYPE_I;
     p->key_frame = 1;
 
-    Y = a->pic.data[0];
-    U = a->pic.data[1];
-    V = a->pic.data[2];
+    Y = p->data[0];
+    U = p->data[1];
+    V = p->data[2];
 
     stride = avctx->width - 4;
 
@@ -88,27 +75,27 @@ static int decode_frame(AVCodecContext *avctx,
 
         for (j = 0; j < avctx->width; j += 4) {
             /* value is stored in LE dword with word swapped */
-            val = AV_RL32(buf);
+            val  = AV_RL32(buf);
             buf -= 4;
-            val = ((val >> 16) & 0xFFFF) | ((val & 0xFFFF) << 16);
+            val  = ((val >> 16) & 0xFFFF) | ((val & 0xFFFF) << 16);
 
-            if(!j)
+            if (!j)
                 y0 = (val & 0x1F) << 2;
             else
                 y0 = y3 + xl_table[val & 0x1F];
             val >>= 5;
-            y1 = y0 + xl_table[val & 0x1F];
+            y1    = y0 + xl_table[val & 0x1F];
             val >>= 5;
-            y2 = y1 + xl_table[val & 0x1F];
+            y2    = y1 + xl_table[val & 0x1F];
             val >>= 6; /* align to word */
-            y3 = y2 + xl_table[val & 0x1F];
+            y3    = y2 + xl_table[val & 0x1F];
             val >>= 5;
-            if(!j)
+            if (!j)
                 c0 = (val & 0x1F) << 2;
             else
                 c0 += xl_table[val & 0x1F];
             val >>= 5;
-            if(!j)
+            if (!j)
                 c1 = (val & 0x1F) << 2;
             else
                 c1 += xl_table[val & 0x1F];
@@ -123,46 +110,29 @@ static int decode_frame(AVCodecContext *avctx,
         }
 
         buf += avctx->width + 4;
-        Y += a->pic.linesize[0];
-        U += a->pic.linesize[1];
-        V += a->pic.linesize[2];
+        Y   += p->linesize[0];
+        U   += p->linesize[1];
+        V   += p->linesize[2];
     }
 
     *got_frame = 1;
-    *(AVFrame*)data = a->pic;
 
     return buf_size;
 }
 
 static av_cold int decode_init(AVCodecContext *avctx)
 {
-    VideoXLContext * const a = avctx->priv_data;
-
-    avcodec_get_frame_defaults(&a->pic);
     avctx->pix_fmt = AV_PIX_FMT_YUV411P;
 
     return 0;
 }
 
-static av_cold int decode_end(AVCodecContext *avctx)
-{
-    VideoXLContext * const a = avctx->priv_data;
-    AVFrame *pic = &a->pic;
-
-    if (pic->data[0])
-        avctx->release_buffer(avctx, pic);
-
-    return 0;
-}
-
 AVCodec ff_xl_decoder = {
-    .name           = "xl",
-    .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = AV_CODEC_ID_VIXL,
-    .priv_data_size = sizeof(VideoXLContext),
-    .init           = decode_init,
-    .close          = decode_end,
-    .decode         = decode_frame,
-    .capabilities   = CODEC_CAP_DR1,
-    .long_name      = NULL_IF_CONFIG_SMALL("Miro VideoXL"),
+    .name         = "xl",
+    .long_name    = NULL_IF_CONFIG_SMALL("Miro VideoXL"),
+    .type         = AVMEDIA_TYPE_VIDEO,
+    .id           = AV_CODEC_ID_VIXL,
+    .init         = decode_init,
+    .decode       = decode_frame,
+    .capabilities = CODEC_CAP_DR1,
 };

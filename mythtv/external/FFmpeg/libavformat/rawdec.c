@@ -70,7 +70,6 @@ int ff_raw_video_read_header(AVFormatContext *s)
 {
     AVStream *st;
     FFRawVideoDemuxerContext *s1 = s->priv_data;
-    AVRational framerate;
     int ret = 0;
 
 
@@ -84,16 +83,22 @@ int ff_raw_video_read_header(AVFormatContext *s)
     st->codec->codec_id = s->iformat->raw_codec_id;
     st->need_parsing = AVSTREAM_PARSE_FULL_RAW;
 
-    if ((ret = av_parse_video_rate(&framerate, s1->framerate)) < 0) {
-        av_log(s, AV_LOG_ERROR, "Could not parse framerate: %s.\n", s1->framerate);
-        goto fail;
-    }
-
-    st->codec->time_base = av_inv_q(framerate);
+    st->codec->time_base = av_inv_q(s1->framerate);
     avpriv_set_pts_info(st, 64, 1, 1200000);
 
 fail:
     return ret;
+}
+
+static int ff_raw_data_read_header(AVFormatContext *s)
+{
+    AVStream *st = avformat_new_stream(s, NULL);
+    if (!st)
+        return AVERROR(ENOMEM);
+    st->codec->codec_type = AVMEDIA_TYPE_DATA;
+    st->codec->codec_id = s->iformat->raw_codec_id;
+    st->start_time = 0;
+    return 0;
 }
 
 /* Note: Do not forget to add new entries to the Makefile as well. */
@@ -101,9 +106,19 @@ fail:
 #define OFFSET(x) offsetof(FFRawVideoDemuxerContext, x)
 #define DEC AV_OPT_FLAG_DECODING_PARAM
 const AVOption ff_rawvideo_options[] = {
-    { "framerate", "", OFFSET(framerate), AV_OPT_TYPE_STRING, {.str = "25"}, 0, 0, DEC},
+    { "framerate", "", OFFSET(framerate), AV_OPT_TYPE_VIDEO_RATE, {.str = "25"}, 0, 0, DEC},
     { NULL },
 };
+
+#if CONFIG_DATA_DEMUXER
+AVInputFormat ff_data_demuxer = {
+    .name           = "data",
+    .long_name      = NULL_IF_CONFIG_SMALL("raw data"),
+    .read_header    = ff_raw_data_read_header,
+    .read_packet    = ff_raw_read_partial_packet,
+    .raw_codec_id   = AV_CODEC_ID_NONE,
+};
+#endif
 
 #if CONFIG_LATM_DEMUXER
 AVInputFormat ff_latm_demuxer = {

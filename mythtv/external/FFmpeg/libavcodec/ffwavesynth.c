@@ -93,7 +93,6 @@ struct wavesynth_context {
     int64_t cur_ts;
     int64_t next_ts;
     int32_t *sin;
-    AVFrame frame;
     struct ws_interval *inter;
     uint32_t dither_state;
     uint32_t pink_state;
@@ -341,8 +340,6 @@ static av_cold int wavesynth_init(AVCodecContext *avc)
         ws->pink_need += ws->inter[i].type == WS_NOISE;
     ws->pink_state = MKTAG('P','I','N','K');
     ws->pink_pos = PINK_UNIT;
-    avcodec_get_frame_defaults(&ws->frame);
-    avc->coded_frame = &ws->frame;
     wavesynth_seek(ws, 0);
     avc->sample_fmt = AV_SAMPLE_FMT_S16;
     return 0;
@@ -428,6 +425,7 @@ static int wavesynth_decode(AVCodecContext *avc, void *rframe, int *rgot_frame,
                             AVPacket *packet)
 {
     struct wavesynth_context *ws = avc->priv_data;
+    AVFrame *frame = rframe;
     int64_t ts;
     int duration;
     int s, c, r;
@@ -443,11 +441,11 @@ static int wavesynth_decode(AVCodecContext *avc, void *rframe, int *rgot_frame,
     duration = AV_RL32(packet->data + 8);
     if (duration <= 0)
         return AVERROR(EINVAL);
-    ws->frame.nb_samples = duration;
-    r = ff_get_buffer(avc, &ws->frame);
+    frame->nb_samples = duration;
+    r = ff_get_buffer(avc, frame, 0);
     if (r < 0)
         return r;
-    pcm = (int16_t *)ws->frame.data[0];
+    pcm = (int16_t *)frame->data[0];
     for (s = 0; s < duration; s++, ts++) {
         memset(channels, 0, avc->channels * sizeof(*channels));
         if (ts >= ws->next_ts)
@@ -458,7 +456,6 @@ static int wavesynth_decode(AVCodecContext *avc, void *rframe, int *rgot_frame,
     }
     ws->cur_ts += duration;
     *rgot_frame = 1;
-    *(AVFrame *)rframe = ws->frame;
     return packet->size;
 }
 
@@ -473,6 +470,7 @@ static av_cold int wavesynth_close(AVCodecContext *avc)
 
 AVCodec ff_ffwavesynth_decoder = {
     .name           = "wavesynth",
+    .long_name      = NULL_IF_CONFIG_SMALL("Wave synthesis pseudo-codec"),
     .type           = AVMEDIA_TYPE_AUDIO,
     .id             = AV_CODEC_ID_FFWAVESYNTH,
     .priv_data_size = sizeof(struct wavesynth_context),
@@ -480,5 +478,4 @@ AVCodec ff_ffwavesynth_decoder = {
     .close          = wavesynth_close,
     .decode         = wavesynth_decode,
     .capabilities   = CODEC_CAP_DR1,
-    .long_name      = NULL_IF_CONFIG_SMALL("Wave synthesis pseudo-codec"),
 };

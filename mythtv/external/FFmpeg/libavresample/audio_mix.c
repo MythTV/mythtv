@@ -1,20 +1,20 @@
 /*
  * Copyright (c) 2012 Justin Ruggles <justin.ruggles@gmail.com>
  *
- * This file is part of Libav.
+ * This file is part of FFmpeg.
  *
- * Libav is free software; you can redistribute it and/or
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
  *
- * Libav is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with Libav; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -201,23 +201,23 @@ static void mix_1_to_2_fltp_flt_c(float **samples, float **matrix, int len,
 
     while (len > 4) {
         v = *src++;
-        *dst0++ = v * m1;
-        *dst1++ = v * m0;
+        *dst0++ = v * m0;
+        *dst1++ = v * m1;
         v = *src++;
-        *dst0++ = v * m1;
-        *dst1++ = v * m0;
+        *dst0++ = v * m0;
+        *dst1++ = v * m1;
         v = *src++;
-        *dst0++ = v * m1;
-        *dst1++ = v * m0;
+        *dst0++ = v * m0;
+        *dst1++ = v * m1;
         v = *src++;
-        *dst0++ = v * m1;
-        *dst1++ = v * m0;
+        *dst0++ = v * m0;
+        *dst1++ = v * m1;
         len -= 4;
     }
     while (len > 0) {
         v = *src++;
-        *dst0++ = v * m1;
-        *dst1++ = v * m0;
+        *dst0++ = v * m0;
+        *dst1++ = v * m1;
         len--;
     }
 }
@@ -282,7 +282,7 @@ static void mix_2_to_6_fltp_flt_c(float **samples, float **matrix, int len,
     }
 }
 
-static int mix_function_init(AudioMix *am)
+static av_cold int mix_function_init(AudioMix *am)
 {
     am->func_descr = am->func_descr_generic = "n/a";
     am->mix = am->mix_generic = NULL;
@@ -447,7 +447,7 @@ int ff_audio_mix(AudioMix *am, AudioData *src)
 
     if (am->in_matrix_channels && am->out_matrix_channels) {
         uint8_t **data;
-        uint8_t *data0[AVRESAMPLE_MAX_CHANNELS];
+        uint8_t *data0[AVRESAMPLE_MAX_CHANNELS] = { NULL };
 
         if (am->out_matrix_channels < am->out_channels ||
              am->in_matrix_channels <  am->in_channels) {
@@ -559,9 +559,12 @@ static void reduce_matrix(AudioMix *am, const double *matrix, int stride)
         if (zero) {
             am->output_zero[o] = 1;
             am->out_matrix_channels--;
+            if (o < am->in_channels)
+                am->in_matrix_channels--;
         }
     }
-    if (am->out_matrix_channels == 0) {
+    if (am->out_matrix_channels == 0 || am->in_matrix_channels == 0) {
+        am->out_matrix_channels = 0;
         am->in_matrix_channels = 0;
         return;
     }
@@ -683,7 +686,7 @@ int ff_audio_mix_set_matrix(AudioMix *am, const double *matrix, int stride)
                                      am->in_matrix_channels;                \
         for (i = 0, i0 = 0; i < am->in_channels; i++) {                     \
             double v;                                                       \
-            if (am->input_skip[i])                                          \
+            if (am->input_skip[i] || am->output_zero[i])                    \
                 continue;                                                   \
             v = matrix[o * stride + i];                                     \
             am->matrix_## type[o0][i0] = expr;                              \
@@ -726,7 +729,7 @@ int ff_audio_mix_set_matrix(AudioMix *am, const double *matrix, int stride)
         for (i = 0; i < am->in_channels; i++) {
             if (am->output_zero[o])
                 av_log(am->avr, AV_LOG_DEBUG, "  (ZERO)");
-            else if (am->input_skip[i] || am->output_skip[o])
+            else if (am->input_skip[i] || am->output_zero[i] || am->output_skip[o])
                 av_log(am->avr, AV_LOG_DEBUG, "  (SKIP)");
             else
                 av_log(am->avr, AV_LOG_DEBUG, "  %0.3f ",

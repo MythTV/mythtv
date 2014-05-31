@@ -43,8 +43,9 @@ typedef struct {
 static int timed_line(const char *ptr)
 {
     char c;
+    int fs, fe;
     return (sscanf(ptr, "%*u:%*u:%*u.%*u %*u:%*u:%*u.%*u %c", &c) == 1 ||
-            sscanf(ptr, "@%*u @%*u %c",                       &c) == 1);
+            (sscanf(ptr, "@%u @%u %c", &fs, &fe, &c) == 3 && fs < fe));
 }
 
 static int jacosub_probe(AVProbeData *p)
@@ -60,7 +61,7 @@ static int jacosub_probe(AVProbeData *p)
             ptr++;
         if (*ptr != '#' && *ptr != '\n') {
             if (timed_line(ptr))
-                return AVPROBE_SCORE_MAX/2 + 1;
+                return AVPROBE_SCORE_EXTENSION + 1;
             return 0;
         }
         ptr += ff_subtitles_next_line(ptr);

@@ -52,7 +52,6 @@ class MTV_PUBLIC AVFormatWriter : public FileWriterBase
     AVStream              *m_audioStream;
     AVCodec               *m_avAudioCodec;
     AVFrame               *m_picture;
-    AVFrame               *m_tmpPicture;
     AVFrame               *m_audPicture;
     unsigned char         *m_audioInBuf;
     unsigned char         *m_audioInPBuf;
