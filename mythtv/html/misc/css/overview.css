@@ -96,6 +96,12 @@
     display: table-cell;
 }
 
+.frontendName A
+{
+    color: #FFFFFF;
+    text-decoration: none;
+}
+
 .frontendStatus
 {
     display: table-cell;

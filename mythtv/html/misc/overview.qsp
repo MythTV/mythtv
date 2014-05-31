@@ -133,7 +133,7 @@
 %>
             <div class="frontendRow">
                 <div class="frontendName">
-                    <%=frontendList[nIdx].Name%>
+                    <a href="//<%=frontendList[nIdx].IP%>:6547/"><%=frontendList[nIdx].Name%></a>
                 </div>
                 <div class="frontendStatus <%=statusClass%>">
                     <%=status%>
