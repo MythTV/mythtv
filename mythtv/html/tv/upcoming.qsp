@@ -55,7 +55,7 @@ import "/tv/js/tvutil.qjs"
 <script src="/js/utility.js"></script> <!-- ECMA not JS -->
 <script src="/js/util.qjs"></script>
 <script src="/tv/js/common.js"></script>
-<script src="/tv/js/upcoming.js"></script>
+<!-- <script src="/tv/js/upcoming.js"></script> -->
 </head>
 <body>
 
