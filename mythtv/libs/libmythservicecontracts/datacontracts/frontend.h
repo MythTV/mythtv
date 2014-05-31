@@ -26,13 +26,13 @@ class SERVICE_PUBLIC Frontend : public QObject
     Q_OBJECT
     Q_CLASSINFO( "version"    , "1.0" );
 
-    Q_PROPERTY( QString  Name             READ  Name             WRITE  setName       )
-    Q_PROPERTY( QString  IP               READ  IP               WRITE  setIP         )
-    Q_PROPERTY( int      ConnectionCount  READ  ConnectionCount  WRITE  setConnectionCount )
+    Q_PROPERTY( QString  Name    READ  Name    WRITE  setName   )
+    Q_PROPERTY( QString  IP      READ  IP      WRITE  setIP     )
+    Q_PROPERTY( int      OnLine  READ  OnLine  WRITE  setOnLine )
 
     PROPERTYIMP    ( QString    , Name            )
     PROPERTYIMP    ( QString    , IP              )
-    PROPERTYIMP    ( int        , ConnectionCount )
+    PROPERTYIMP    ( bool       , OnLine          )
 
     public:
         static inline void InitializeCustomTypes();
@@ -41,7 +41,7 @@ class SERVICE_PUBLIC Frontend : public QObject
 
         Frontend(QObject *parent = 0)
             : QObject         ( parent ),
-            m_ConnectionCount(0)
+            m_OnLine(false)
         {
         }
 
@@ -54,7 +54,7 @@ class SERVICE_PUBLIC Frontend : public QObject
         {
             m_Name            = src.m_Name;
             m_IP              = src.m_IP;
-            m_ConnectionCount = src.m_ConnectionCount;
+            m_OnLine = src.m_OnLine;
         }
 };
 

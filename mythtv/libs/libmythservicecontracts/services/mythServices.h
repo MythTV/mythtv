@@ -111,7 +111,7 @@ class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
                                                 const QString   &Level,
                                                 const QString   &MsgContains ) = 0;
 
-        virtual DTC::FrontendList*  GetFrontends        ( bool Connected ) = 0;
+        virtual DTC::FrontendList*  GetFrontends        ( bool OnLine ) = 0;
 
         virtual DTC::SettingList*   GetSetting          ( const QString   &HostName,
                                                           const QString   &Key,

@@ -564,11 +564,11 @@ DTC::LogMessageList *Myth::GetLogs(  const QString   &HostName,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::FrontendList *Myth::GetFrontends( bool Connected )
+DTC::FrontendList *Myth::GetFrontends( bool OnLine )
 {
     DTC::FrontendList *pList = new DTC::FrontendList();
     QMap<QString, Frontend*> frontends;
-    if (Connected)
+    if (OnLine)
         frontends = gBackendContext->GetConnectedFrontends();
     else
         frontends = gBackendContext->GetFrontends();
@@ -579,7 +579,7 @@ DTC::FrontendList *Myth::GetFrontends( bool Connected )
         DTC::Frontend *pFrontend = pList->AddNewFrontend();
         pFrontend->setName((*it)->name);
         pFrontend->setIP((*it)->ip.toString());
-        pFrontend->setConnectionCount((*it)->connectionCount);
+        pFrontend->setOnLine((*it)->connectionCount > 0);
     }
 
     return pList;

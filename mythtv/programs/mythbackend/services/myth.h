@@ -82,7 +82,7 @@ class Myth : public MythServices
                                                 );
 
 
-        DTC::FrontendList*  GetFrontends        ( bool Connected );
+        DTC::FrontendList*  GetFrontends        ( bool OnLine );
 
         DTC::SettingList*   GetSetting          ( const QString   &HostName,
                                                   const QString   &Key,
