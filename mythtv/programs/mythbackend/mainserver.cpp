@@ -5322,7 +5322,7 @@ void MainServer::HandleScanMusic(const QStringList &slist, PlaybackSock *pbs)
                     // this is the master BE with a music storage group directory defined so run the file scanner
                     LOG(VB_GENERAL, LOG_INFO, LOC +
                         QString("HandleScanMusic: running filescanner on master BE '%1'").arg(hostname));
-                    QScopedPointer<MythSystem> cmd(MythSystem::Create("mythutil --scanmusic",
+                    QScopedPointer<MythSystem> cmd(MythSystem::Create(GetAppBinDir() + "mythutil --scanmusic",
                                                                       kMSAutoCleanup | kMSRunBackground |
                                                                       kMSDontDisableDrawing | kMSProcessEvents |
                                                                       kMSDontBlockInputDevs));
@@ -5353,7 +5353,7 @@ void MainServer::HandleScanMusic(const QStringList &slist, PlaybackSock *pbs)
         LOG(VB_GENERAL, LOG_INFO,  LOC +
             QString("HandleScanMusic: running filescanner on slave BE '%1'")
                 .arg(gCoreContext->GetHostName()));
-        QScopedPointer<MythSystem> cmd(MythSystem::Create("mythutil --scanmusic",
+        QScopedPointer<MythSystem> cmd(MythSystem::Create(GetAppBinDir() + "mythutil --scanmusic",
                                                           kMSAutoCleanup | kMSRunBackground |
                                                           kMSDontDisableDrawing | kMSProcessEvents |
                                                           kMSDontBlockInputDevs));
@@ -5413,7 +5413,7 @@ void MainServer::HandleMusicTagUpdateVolatile(const QStringList &slist, Playback
         paramList.append(QString("--playcount='%1'").arg(slist[4]));
         paramList.append(QString("--lastplayed='%1'").arg(slist[5]));
 
-        QString command = "mythutil --updatemeta " + paramList.join(" ");
+        QString command = GetAppBinDir() + "mythutil --updatemeta " + paramList.join(" ");
 
         LOG(VB_GENERAL, LOG_INFO, LOC +
             QString("HandleMusicTagUpdateVolatile: running %1'").arg(command));
@@ -5474,7 +5474,7 @@ void MainServer::HandleMusicCalcTrackLen(const QStringList &slist, PlaybackSock 
         QStringList paramList;
         paramList.append(QString("--songid='%1'").arg(slist[2]));
 
-        QString command = "mythutil --calctracklen " + paramList.join(" ");
+        QString command = GetAppBinDir() + "mythutil --calctracklen " + paramList.join(" ");
 
         LOG(VB_GENERAL, LOG_INFO, LOC +
             QString("HandleMusicCalcTrackLen: running %1'").arg(command));
@@ -5722,7 +5722,7 @@ void MainServer::HandleMusicFindAlbumArt(const QStringList &slist, PlaybackSock 
                 paramList.append(QString("--songid='%1'").arg(mdata->ID()));
                 paramList.append(QString("--imagetype='%1'").arg(image->imageType));
 
-                QString command = "mythutil --extractimage " + paramList.join(" ");
+                QString command = GetAppBinDir() + "mythutil --extractimage " + paramList.join(" ");
                 QScopedPointer<MythSystem> cmd(MythSystem::Create(command,
                                                     kMSAutoCleanup | kMSRunBackground |
                                                     kMSDontDisableDrawing | kMSProcessEvents |
@@ -5779,7 +5779,7 @@ void MainServer::HandleMusicTagGetImage(const QStringList &slist, PlaybackSock *
         paramList.append(QString("--songid='%1'").arg(songid));
         paramList.append(QString("--imagetype='%1'").arg(imagetype));
 
-        QString command = "mythutil --extractimage " + paramList.join(" ");
+        QString command = GetAppBinDir() + "mythutil --extractimage " + paramList.join(" ");
 
         QScopedPointer<MythSystem> cmd(MythSystem::Create(command,
                                        kMSAutoCleanup | kMSRunBackground |
@@ -5931,7 +5931,7 @@ void MainServer::HandleMusicTagChangeImage(const QStringList &slist, PlaybackSoc
                     paramList.append(QString("--songid='%1'").arg(mdata->ID()));
                     paramList.append(QString("--imagetype='%1'").arg(image->imageType));
 
-                    QString command = "mythutil --extractimage " + paramList.join(" ");
+                    QString command = GetAppBinDir() + "mythutil --extractimage " + paramList.join(" ");
 
                     QScopedPointer<MythSystem> cmd(MythSystem::Create(command,
                                                    kMSAutoCleanup | kMSRunBackground |
