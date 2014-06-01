@@ -211,7 +211,7 @@ for (var progIdx = 0; progIdx < programs.length; progIdx++)
             <span class="watchRecordingLink"><a onClick="javascript:loadContent('/tv/tvplayer.qsp?ChanId=<%=program.Channel.ChanId%>&amp;StartTime=<%=program.Recording.StartTs.toISOString()%>')"><%=qsTr("Watch")%></a></span>
         </div>
         <div class="programBox">
-            <div class="programInnerBox <%=statusClass%>" id="<%=programIdentifier%>" onMouseOver="startDetailTimer(this, 'recording');" onMouseOut="hideDetail(this);" onClick="showMenu(this, '<%=menu%>');">
+            <div class="programInnerBox <%=statusClass%>" id="<%=programIdentifier%>" data-chanid="<%=program.Channel.ChanId%>" data-recstarttime="<%=program.Recording.StartTs.toISOString()%>" data-starttime="<%=program.StartTime.toISOString()%>" data-recordid="<%=program.Recording.RecordId%>" onMouseOver="startDetailTimer(this, 'recording');" onMouseOut="hideDetail(this);" onClick="showMenu(this, '<%=menu%>');">
                 <div class="programHeader">
                     <span class="programTitle"><%=escapeHTML(program.Title)%> <% if (isValidObject(program.Airdate) && program.Airdate.getFullYear() && program.CatType == "movie") {%>(<%=program.Airdate.getFullYear()%>)<%}%></span>
                     <span class="programStartTime"><%=myth.GetFormatDate(program.StartTime)%>, <%=myth.GetFormatTime(program.StartTime)%></span>
