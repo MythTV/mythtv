@@ -65,14 +65,16 @@ class MythCoreContextPrivate : public QObject
     QObject         *m_GUIobject;
     QString          m_appBinaryVersion;
 
-    QMutex  m_localHostLock;     ///< Locking for m_localHostname
-    QString m_localHostname;     ///< hostname from config.xml or gethostname()
-    QMutex  m_masterHostLock;    ///< Locking for m_masterHostname
-    QString m_masterHostname;    ///< master backend hostname
+    QMutex  m_localHostLock;        ///< Locking for m_localHostname
+    QString m_localHostname;        ///< hostname from config.xml or gethostname()
+    QMutex  m_masterHostLock;       ///< Locking for m_masterHostname
+    QString m_masterHostname;       ///< master backend hostname
+    QMutex  m_scopesLock;           ///< Locking for m_masterHostname
+    QMap<QString, QString> m_scopes;///< Scope Id cache for Link-Local addresses
 
-    QMutex      m_sockLock;      ///< protects both m_serverSock and m_eventSock
-    MythSocket *m_serverSock;    ///< socket for sending MythProto requests
-    MythSocket *m_eventSock;     ///< socket events arrive on
+    QMutex      m_sockLock;         ///< protects both m_serverSock and m_eventSock
+    MythSocket *m_serverSock;       ///< socket for sending MythProto requests
+    MythSocket *m_eventSock;        ///< socket events arrive on
 
     QMutex         m_WOLInProgressLock;
     QWaitCondition m_WOLInProgressWaitCondition;
@@ -876,8 +878,14 @@ QString MythCoreContext::GetBackendServerIP(const QString &host)
     QString addr4, addr6;
 #if !defined(QT_NO_IPV6)
     if (!ServerPool::DefaultListenIPv6().isEmpty())
+    {
         // we have IPv6 addresses, assume we can connect to them
         addr6 = GetSettingOnHost("BackendServerIP6", host, "");
+        QHostAddress addr(addr6);
+        // remove scope Id
+        addr.setScopeId(QString());
+        addr6 = addr.toString();
+    }
 #endif
     if (!ServerPool::DefaultListenIPv4().isEmpty())
         addr4 = GetSettingOnHost("BackendServerIP", host, "");
@@ -900,6 +908,51 @@ QString MythCoreContext::GetBackendServerIP(const QString &host)
         return addr4;
     else
         return addr6;
+}
+
+/**
+ * \fn void GetScopeForAddress(QHostAddress &addr)
+ * Return the cached scope Id for the given address.
+ * If unknown returns false, else returns true and set scope Id to given address
+ */
+bool MythCoreContext::GetScopeForAddress(QHostAddress &addr) const
+{
+    QHostAddress addr1  = addr;
+    addr1.setScopeId(QString());
+    QString addrstr     = addr1.toString();
+    QMutexLocker lock(&d->m_scopesLock);
+
+    if (!d->m_scopes.contains(addrstr))
+        return false;
+
+    addr.setScopeId(d->m_scopes[addrstr]);
+    return true;
+}
+
+/**
+ * \fn void SetScopeForAddress(QHostAddress &addr)
+ * Record the scope Id of the given IP address
+ */
+void MythCoreContext::SetScopeForAddress(const QHostAddress &addr)
+{
+    QHostAddress addr1 = addr;
+    addr1.setScopeId(QString());
+    QMutexLocker lock(&d->m_scopesLock);
+
+    d->m_scopes.insert(addr1.toString(), addr.scopeId());
+}
+
+/**
+ * \fn void SetScopeForAddress(QHostAddress &addr, int scope)
+ * This is an overloaded function.
+ */
+void MythCoreContext::SetScopeForAddress(const QHostAddress &addr, int scope)
+{
+    QHostAddress addr1 = addr;
+    addr1.setScopeId(QString());
+    QMutexLocker lock(&d->m_scopesLock);
+
+    d->m_scopes.insert(addr1.toString(), QString::number(scope));
 }
 
 void MythCoreContext::OverrideSettingForSession(const QString &key,
