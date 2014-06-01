@@ -339,7 +339,7 @@ if (chanGroups.length)
             var programIdentifier = channel.ChanId + "_" + program.StartTime.toISOString();
 %>
                 <div class="programBox" style="width:<%=width%>%;">
-                    <div class="programBoxInner <%=categoryClass%> <%=statusClass%> <%=startClass%> <%=endClass%>" id="<%=programIdentifier%>" data-recordid="<%=program.Recording.RecordId%>" onMouseOver="startDetailTimer(this, 'program');" onMouseOut="hideDetail(this);" onClick="showMenu(this, '<%=menu%>');">
+                    <div class="programBoxInner <%=categoryClass%> <%=statusClass%> <%=startClass%> <%=endClass%>" id="<%=programIdentifier%>" data-recordid="<%=program.Recording.RecordId%>" data-chanid="<%=channel.ChanId%>" data-starttime="<%=program.StartTime.toISOString()%>" onMouseOver="startDetailTimer(this, 'program');" onMouseOut="hideDetail(this);" onClick="showMenu(this, '<%=menu%>');">
                         <div class="programHeader">
                             <div class="programTitle">
                                 <% if (program.CatType == CategoryType.MOVIE) {%><img src="/tv/images/cat_movie.svg" width="18" height="13" alt="<%=qsTr("Movie")%>" title="<%=qsTr("Movie")%>" /><%}%> <%=escapeHTML(program.Title)%> <% if (isValidObject(program.Airdate) && program.Airdate.getFullYear() && program.CatType == "movie") {%>(<%=program.Airdate.getFullYear()%>)<%}%>

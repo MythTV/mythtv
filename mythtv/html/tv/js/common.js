@@ -110,8 +110,10 @@ function isClassSet(element, className)
 }
 
 var selectedElement;
-var gChanID = 0; // Need to move away from these to the data- attributes
-var gStartTime = ""; // Need to move away from these to the data- attributes
+// Need to move away from these global vars to the data- attributes or
+// something better
+var gChanID = 0;
+var gStartTime = "";
 function showMenu(parent, typeStr)
 {
     hideDetail(parent);
@@ -124,13 +126,21 @@ function showMenu(parent, typeStr)
     }
 
     var parentID = parent.id;
-    var values = parentID.split("_", 2);
     // Old Way
-    gChanID = values[0];
-    gStartTime = values[1];
+    // TODO: This is really ugly, it only gets a little better when we switch to
+    // recording ids. We need to rethink how this is done without increasing
+    // the LOC or HTML
+    // Old Way
+    gChanID = parent.getAttribute("data-chanid");
+    if (isValidVar(parent.getAttribute("data-recstarttime")))
+        gStartTime = parent.getAttribute("data-recstarttime");
+    else
+        gStartTime = parent.getAttribute("data-starttime");
+    console.log("gChanId " + gChanID + " StartTime " + gStartTime);
+
     // New Way
-//     $('#optMenu').data('chanID', values[0]);
-//     $('#optMenu').data('startTime', values[1]);
+//     $('#optMenu').data('chanID', parent.getAttribute("data-chanid"));
+//     $('#optMenu').data('startTime', parentID.getAttribute("data-starttime"));
 
     var menu = document.getElementById("optMenu");
     var types = typeStr.split(' ');
@@ -212,11 +222,20 @@ function showDetail(parentID, type)
     if (isClassSet(parent, "itemSelected"))
         return;
 
-    var values = parentID.split("_", 2);
-    var chanId = values[0];
-    var startTime = values[1];
-//     $('#programDetails').data('chanID', values[0]);
-//     $('#programDetails').data('startTime', values[1]);
+    // TODO: This is really ugly, it only gets a little better when we switch to
+    // recording ids. We need to rethink how this is done without increasing
+    // the LOC or HTML
+    // Old Way
+    chanId = parent.getAttribute("data-chanid");
+    if (isValidVar(parent.getAttribute("data-recstarttime")))
+        startTime = parent.getAttribute("data-recstarttime");
+    else
+        startTime = parent.getAttribute("data-starttime");
+    console.log("Chan ID " + chanId + " StartTime " + startTime);
+
+    // New Way
+//     $('#optMenu').data('chanID', parent.getAttribute("data-chanid"));
+//     $('#optMenu').data('startTime', parentID.getAttribute("data-starttime"));
 
     // FIXME: We should be able to get a Program object back from
     // from the Services API that contains all the information available

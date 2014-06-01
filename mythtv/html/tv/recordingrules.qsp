@@ -150,7 +150,7 @@ for (var listIdx = 0; listIdx < recRules.length; listIdx++)
 %>
     <div class="recRuleRow" id="<%=recRule.Id%>_row">
         <div class="recRuleBox">
-            <div class="recRuleInnerBox" id="<%=programIdentifier%>" data-recordid="<%=recRule.Id%>" onClick="showMenu(this, '<%=menu%>');">
+            <div class="recRuleInnerBox" id="<%=programIdentifier%>" data-recordid="<%=recRule.Id%>" data-chanid="<%=recRule.ChanId%>" data-starttime="<%=recRule.StartTime.toISOString()%>" onClick="showMenu(this, '<%=menu%>');">
                 <div class="recRuleHeader">
                     <span class="recRuleTitle"><%=escapeHTML(recRule.Title)%></span>
                     <span class="recRuleRecType"><%=escapeHTML(recTypeStr)%></span>
