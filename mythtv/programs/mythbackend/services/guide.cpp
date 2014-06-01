@@ -209,7 +209,7 @@ DTC::Program* Guide::GetProgramDetails( int              nChanId,
     if (!rawStartTime.isValid())
         throw( "StartTime is invalid" );
 
-    QDateTime dtStartTime = rawStartTime;
+    QDateTime dtStartTime = rawStartTime.toUTC();
 
     // ----------------------------------------------------------------------
     // -=>TODO: Add support for getting Recorded Program Info
