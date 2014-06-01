@@ -270,6 +270,10 @@ function loadScheduler(chanID, startTime)
         return;
     }
     var recRuleID = layer.getAttribute("data-recordid");
+    if (isValidVar(layer.getAttribute("data-chanid")))
+        chanID = layer.getAttribute("data-chanid");
+    if (isValidVar(layer.getAttribute("data-starttime")))
+        startTime = layer.getAttribute("data-starttime");
     loadContent('/tv/schedule.qsp?chanId=' + chanID + '&amp;startTime=' + startTime + '&amp;recRuleId=' + recRuleID);
 }
 

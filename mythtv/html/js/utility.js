@@ -53,6 +53,11 @@ function isValidObject(variable)
             && (variable != null));
 }
 
+function isValidVar(variable)
+{
+    return ((variable != null) && (variable != ""));
+}
+
 // For debugging only, this isn't JSON
 function objectDump(arr)
 {

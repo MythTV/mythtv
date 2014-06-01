@@ -19,7 +19,17 @@ BackendContext::BackendContext()
 
 BackendContext::~BackendContext()
 {
+    QMap<QString, Frontend*>::iterator it = m_knownFrontends.begin();
+    while (it != m_knownFrontends.end())
+    {
+        Frontend *fe = (*it);
+        delete fe;
+        fe = NULL;
+        ++it;
+    }
 
+    m_connectedFrontends.clear();
+    m_knownFrontends.clear();
 }
 
 void BackendContext::SetFrontendConnected(Frontend *frontend)
@@ -27,16 +37,22 @@ void BackendContext::SetFrontendConnected(Frontend *frontend)
     if (!frontend || frontend->name.isEmpty())
         return;
 
-    if (m_connectedFrontends.contains(frontend->name))
+    if (m_knownFrontends.contains(frontend->name))
     {
-        Frontend *fe = m_connectedFrontends.value(frontend->name);
+        Frontend *fe = m_knownFrontends.value(frontend->name);
+        // Frontend may have changed IP since we last saw it
+        fe->ip = frontend->ip;
+        delete frontend;
+        frontend = NULL;
+
+        if (!m_connectedFrontends.contains(fe->name))
+            m_connectedFrontends.insert(fe->name, fe);
+
         fe->connectionCount++;
         LOG(VB_GENERAL, LOG_DEBUG, QString("BackendContext: Increasing "
                                            "connection count for (%1) to %2 ")
                                             .arg(fe->name)
                                             .arg(fe->connectionCount));
-        delete frontend;
-        frontend = NULL;
         return;
     }
 
@@ -46,16 +62,13 @@ void BackendContext::SetFrontendConnected(Frontend *frontend)
     frontend->connectionCount++;
     m_connectedFrontends.insert(frontend->name, frontend);
 
-    if (!m_knownFrontends.contains(frontend->name))
-    {
-        // TODO: We want to store this information in the database so that
-        //       it persists between backend restarts. We can then give users
-        //       an overview of the number of frontends on the network, those
-        //       connected at any given moment and in the future give them the
-        //       option to forget clients including associated settings, deny
-        //       unknown clients from connecting and other cool stuff
-        m_knownFrontends.insert(frontend->name, frontend);
-    }
+    // TODO: We want to store this information in the database so that
+    //       it persists between backend restarts. We can then give users
+    //       an overview of the number of frontends on the network, those
+    //       connected at any given moment and in the future give them the
+    //       option to forget clients including associated settings, deny
+    //       unknown clients from connecting and other cool stuff
+    m_knownFrontends.insert(frontend->name, frontend);
 
 }
 

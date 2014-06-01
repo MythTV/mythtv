@@ -105,13 +105,13 @@
 .frontendStatus
 {
     display: table-cell;
+    text-align: center;
+    color: #000000;
 }
 
 .frontendOnline
 {
     background-color: #009900;
-    text-align: center;
-    color: #000000;
     /*font-weight: bold;*/
 }
 
