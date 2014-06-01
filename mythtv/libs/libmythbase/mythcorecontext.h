@@ -156,6 +156,10 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     QString GetBackendServerIP(void);
     QString GetBackendServerIP(const QString &host);
 
+    bool GetScopeForAddress(QHostAddress &addr) const;
+    void SetScopeForAddress(const QHostAddress &addr);
+    void SetScopeForAddress(const QHostAddress &addr, int scope);
+
     void ClearSettingsCache(const QString &myKey = QString(""));
     void ActivateSettingsCache(bool activate = true);
     void OverrideSettingForSession(const QString &key, const QString &value);

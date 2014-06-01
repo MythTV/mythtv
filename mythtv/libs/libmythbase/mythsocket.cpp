@@ -599,7 +599,7 @@ void MythSocket::IsDataAvailableReal(bool *ret) const
     m_dataAvailable.fetchAndStoreOrdered((*ret) ? 1 : 0);
 }
 
-void MythSocket::ConnectToHostReal(QHostAddress addr, quint16 port, bool *ret)
+void MythSocket::ConnectToHostReal(QHostAddress _addr, quint16 port, bool *ret)
 {
     if (m_tcpSocket->state() == QAbstractSocket::ConnectedState)
     {
@@ -607,6 +607,9 @@ void MythSocket::ConnectToHostReal(QHostAddress addr, quint16 port, bool *ret)
             "connect() called with already open socket, closing");
         m_tcpSocket->close();
     }
+
+    QHostAddress addr = _addr;
+    addr.setScopeId(QString());
 
     s_loopbackCacheLock.lock();
     bool usingLoopback = s_loopbackCache.contains(addr.toString());
@@ -621,7 +624,10 @@ void MythSocket::ConnectToHostReal(QHostAddress addr, quint16 port, bool *ret)
         QList<QHostAddress> localIPs = QNetworkInterface::allAddresses();
         for (int i = 0; i < localIPs.count() && !usingLoopback; ++i)
         {
-            if (addr == localIPs[i])
+            QHostAddress local = localIPs[i];
+            local.setScopeId(QString());
+
+            if (addr == local)
             {
                 QHostAddress::SpecialAddress loopback = QHostAddress::LocalHost;
                 if (addr.protocol() == QAbstractSocket::IPv6Protocol)
@@ -644,9 +650,63 @@ void MythSocket::ConnectToHostReal(QHostAddress addr, quint16 port, bool *ret)
     LOG(VB_SOCKET, LOG_INFO, LOC + QString("attempting connect() to (%1:%2)")
         .arg(addr.toString()).arg(port));
 
-    m_tcpSocket->connectToHost(addr, port, QAbstractSocket::ReadWrite);
+    bool ok = false;
 
-    bool ok = m_tcpSocket->waitForConnected();
+    if (!usingLoopback && (addr.protocol() == QAbstractSocket::IPv6Protocol) &&
+        addr.isInSubnet(QHostAddress::parseSubnet("fe80::/10")) &&
+        !gCoreContext->GetScopeForAddress(addr))
+    {
+        // Address is IPv6 link-local, we need to find the right scope id
+        QList<QNetworkInterface> cards = QNetworkInterface::allInterfaces();
+
+        // try using all available cards
+        foreach (QNetworkInterface card, cards)
+        {
+            unsigned int flags = card.flags();
+            bool isLoopback = flags & QNetworkInterface::IsLoopBack;
+            bool isP2P = flags & QNetworkInterface::IsPointToPoint;
+            bool isRunning = flags & QNetworkInterface::IsRunning;
+
+            if (!isRunning || !card.isValid() || isLoopback || isP2P)
+            {
+                // this is a loopback interface, not up or a point to point interface
+                // no point checking
+                continue;
+            }
+
+            bool foundv6 = false;
+            // check that IPv6 is enabled on that interface
+            QList<QNetworkAddressEntry> addresses = card.addressEntries();
+            foreach (QNetworkAddressEntry ae, addresses)
+            {
+                if (ae.ip().protocol() == QAbstractSocket::IPv6Protocol)
+                {
+                    foundv6 = true;
+                    break;
+                }
+            }
+            if (!foundv6)
+            {
+                // No IPv6 available on that interface, skip it
+                continue;
+            }
+
+            addr.setScopeId(QString::number(card.index()));
+            m_tcpSocket->connectToHost(addr, port, QAbstractSocket::ReadWrite);
+            ok = m_tcpSocket->waitForConnected(5000);
+            if (ok)
+            {
+                // Save it for future searches
+                gCoreContext->SetScopeForAddress(addr, card.index());
+                break;
+            }
+        }
+    }
+    else
+    {
+        m_tcpSocket->connectToHost(addr, port, QAbstractSocket::ReadWrite);
+        ok = m_tcpSocket->waitForConnected();
+    }
 
     if (ok)
     {
