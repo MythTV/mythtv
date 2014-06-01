@@ -752,8 +752,8 @@ void HTTPLiveStream::SetOutputVars(void)
 
     m_httpPrefix = gCoreContext->GetSetting("HTTPLiveStreamPrefix", QString(
         "http://%1:%2/StorageGroup/Streaming/")
-        .arg(gCoreContext->GetSetting("MasterServerIP"))
-        .arg(gCoreContext->GetSetting("BackendStatusPort")));
+        .arg(gCoreContext->GetMasterServerIP())
+        .arg(gCoreContext->GetMasterServerStatusPort()));
 
     if (!m_httpPrefix.endsWith("/"))
         m_httpPrefix.append("/");
