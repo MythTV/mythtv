@@ -528,6 +528,11 @@ function saveFormData(formElement, callback)
     return false;
 }
 
+function scrollCallback()
+{
+    $("#NumPages").val(Number($("#NumPages").val())+1);
+}
+
 function loadJScroll()
 {
     // Always have at least one window heights worth loaded off-screen

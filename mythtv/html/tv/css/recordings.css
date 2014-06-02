@@ -52,7 +52,8 @@
     padding-left: 6px;
     z-index: -5;
     width: 124px;
-    text-align:center;
+    text-align: center;
+    padding-bottom: 0px;
 }
 
 .recordingList .previewImageBackground
@@ -72,31 +73,55 @@
     overflow: hidden;
 }
 
-.recordingList .watchRecordingLink
+.recordingList .watchButtons
 {
-    clear: both;
-    float: left;
+    clear: left;
+    float: right;
+    background-image: linear-gradient(to bottom, #555555 1px, transparent 6px);
+    width: 119px;
+    height: 33px;
+    padding: 4px 0px 0px 0px; /* Top Right Bottom Left */
     font-weight: bold;
     font-size: 1.1em;
-    padding: 2px 0px 0px 23px; /* Top Right Bottom Left */
-    height: 22px;
-    background-image: url('/tv/images/play_arrow.svg');
-    background-size: 21px 20px;
-    background-repeat: no-repeat;
-    margin: 5px 0px 0px 15px;
-    opacity: 0.5;
-    cursor: pointer;
+    color: #FFFFFF;
+    margin: 0px;
 }
 
-.recordingList .watchRecordingLink A
+.recordingList .watchButton
+{
+    float: left;
+    opacity: 0.5;
+    height: 100%;
+    border-right: 1px solid #000000;
+}
+
+.recordingList .watchButton A
 {
     color: #FFFFFF;
     text-decoration: none;
 }
 
-.recordingList .watchRecordingLink:hover
+.recordingList .watchButton:hover
 {
     opacity: 1.0;
+}
+
+.recordingList .watchRecordingLink
+{
+    padding: 6px 10px 0px 30px; /* Top Right Bottom Left */
+    background-image: url('/tv/images/play_arrow.svg');
+    background-position: 10px 5px;
+    background-size: 21px 20px;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    width: 95px;
+}
+
+.recordingList .playlistLink
+{
+    padding: 6px 6px 0px 6px; /* Top Right Bottom Left */
+    cursor: pointer;
+    width: 24px;
 }
 
 .recordingList .programBox

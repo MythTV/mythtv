@@ -123,11 +123,6 @@ function submitGuideForm(context)
     fixGuideHeight();
 }
 
-function scrollCallback()
-{
-    $("#NumPages").val(Number($("#NumPages").val())+1);
-}
-
 function fixGuideHeight()
 {
     $('.channels').height($(window).height() - $('.channels').offset().top - 15);
