@@ -94,6 +94,8 @@ package MythTV::Program;
         $self->{'parttotal'}         = $_[47]; # part total
         $self->{'categorytype'}      = $_[48]; # category type (enum)
 
+        $self->{'recordedid'}        = $_[49]; # recordedid
+
     # Load the channel data
         if ($self->{'chanid'}) {
             $self->{'channel'} = $self->{'_mythtv'}->channel($self->{'chanid'});
@@ -144,52 +146,55 @@ package MythTV::Program;
                     $self->{'description'}    , # 02 description
                     $self->{'season'}         , # 03 season
                     $self->{'episode'}        , # 04 episode
-                    $self->{'syndicatedepisode'}, # 05 syndicated episode
-                    $self->{'category'}       , # 06 category
-                    $self->{'chanid'}         , # 07 chanid
-                    $self->{'channum'}        , # 08 chanstr
-                    $self->{'callsign'}       , # 09 chansign
-                    $self->{'channame'}       , # 10 channame
-                    $self->{'filename'}       , # 11 pathname
-                    $self->{'filesize'}       , # 12 filesize
+                    $self->{'totalepisodes'}  , # 05 episode
+                    $self->{'syndicatedepisode'}, # 06 syndicated episode
+                    $self->{'category'}       , # 07 category
+                    $self->{'chanid'}         , # 08 chanid
+                    $self->{'channum'}        , # 09 chanstr
+                    $self->{'callsign'}       , # 10 chansign
+                    $self->{'channame'}       , # 11 channame
+                    $self->{'filename'}       , # 12 pathname
+                    $self->{'filesize'}       , # 13 filesize
 
-                    $self->{'starttime'}      , # 13 startts
-                    $self->{'endtime'}        , # 14 endts
-                    $self->{'findid'}         , # 15 findid
-                    $self->{'hostname'}       , # 16 hostname
-                    $self->{'sourceid'}       , # 17 sourceid
-                    $self->{'cardid'}         , # 18 cardid
-                    $self->{'inputid'}        , # 19 inputid
-                    $self->{'recpriority'}    , # 20 recpriority
-                    $self->{'recstatus'}      , # 21 recstatus
-                    $self->{'recordid'}       , # 22 recordid
+                    $self->{'starttime'}      , # 14 startts
+                    $self->{'endtime'}        , # 15 endts
+                    $self->{'findid'}         , # 16 findid
+                    $self->{'hostname'}       , # 17 hostname
+                    $self->{'sourceid'}       , # 18 sourceid
+                    $self->{'cardid'}         , # 19 cardid
+                    $self->{'inputid'}        , # 20 inputid
+                    $self->{'recpriority'}    , # 21 recpriority
+                    $self->{'recstatus'}      , # 22 recstatus
+                    $self->{'recordid'}       , # 23 recordid
 
-                    $self->{'rectype'}        , # 23 rectype
-                    $self->{'dupin'}          , # 24 dupin
-                    $self->{'dupmethod'}      , # 25 dupmethod
-                    $self->{'recstartts'}     , # 26 recstartts
-                    $self->{'recendts'}       , # 27 recendts
-                    $self->{'progflags'}      , # 28 programflags
-                    $self->{'recgroup'}       , # 29 recgroup
-                    $self->{'outputfilters'}  , # 30 chanOutputFilters
-                    $self->{'seriesid'}       , # 31 seriesid
-                    $self->{'programid'}      , # 32 programid
-                    $self->{'inetref'}        , # 33 inetref
+                    $self->{'rectype'}        , # 24 rectype
+                    $self->{'dupin'}          , # 25 dupin
+                    $self->{'dupmethod'}      , # 26 dupmethod
+                    $self->{'recstartts'}     , # 27 recstartts
+                    $self->{'recendts'}       , # 28 recendts
+                    $self->{'progflags'}      , # 29 programflags
+                    $self->{'recgroup'}       , # 30 recgroup
+                    $self->{'outputfilters'}  , # 31 chanOutputFilters
+                    $self->{'seriesid'}       , # 32 seriesid
+                    $self->{'programid'}      , # 33 programid
+                    $self->{'inetref'}        , # 34 inetref
 
-                    $self->{'lastmodified'}   , # 34 lastmodified
-                    $self->{'stars'}          , # 35 stars
-                    $self->{'airdate'}        , # 36 originalAirDate
-                    $self->{'playgroup'}      , # 37 playgroup
-                    $self->{'recpriority2'}   , # 38 recpriority2
-                    $self->{'parentid'}       , # 39 parentid
-                    $self->{'storagegroup'}   , # 40 storagegroup
-                    $self->{'audio_props'}    , # 41 audio properties
-                    $self->{'video_props'}    , # 42 video properties
-                    $self->{'subtitle_type'}  , # 43 subtitle type
+                    $self->{'lastmodified'}   , # 35 lastmodified
+                    $self->{'stars'}          , # 36 stars
+                    $self->{'airdate'}        , # 37 originalAirDate
+                    $self->{'playgroup'}      , # 38 playgroup
+                    $self->{'recpriority2'}   , # 39 recpriority2
+                    $self->{'parentid'}       , # 40 parentid
+                    $self->{'storagegroup'}   , # 41 storagegroup
+                    $self->{'audio_props'}    , # 42 audio properties
+                    $self->{'video_props'}    , # 43 video properties
+                    $self->{'subtitle_type'}  , # 44 subtitle type
 
-                    $self->{'year'}           , # 44 production year
-                    $self->{'partnumber'}     , # 45 part number
-                    $self->{'parttotal'}      , # 46 part total
+                    $self->{'year'}           , # 45 production year
+                    $self->{'partnumber'}     , # 46 part number
+                    $self->{'parttotal'}      , # 47 part total
+                    $self->{'categorytype'}   , # 48 part total
+                    $self->{'recordedid'}     , # 49 part total
                     ''                          # trailing separator
                    );
     }

@@ -26,6 +26,7 @@ class SERVICE_PUBLIC RecordingInfo : public QObject
     Q_OBJECT
     Q_CLASSINFO( "version", "1.02" );
 
+    Q_PROPERTY( uint                    RecordedId READ RecordedId WRITE setRecordedId    )
     Q_PROPERTY( int                     Status     READ Status     WRITE setStatus    )
     Q_PROPERTY( int                     Priority   READ Priority   WRITE setPriority  )
     Q_PROPERTY( QDateTime               StartTs    READ StartTs    WRITE setStartTs   )
@@ -51,6 +52,7 @@ class SERVICE_PUBLIC RecordingInfo : public QObject
     Q_ENUMS( RecordingDupMethodType )
     */
 
+    PROPERTYIMP     ( uint                   , RecordedId  )
     PROPERTYIMP_ENUM( RecStatusType          , Status      )
     PROPERTYIMP     ( int                    , Priority    )
     PROPERTYIMP     ( QDateTime              , StartTs     )
@@ -78,6 +80,7 @@ class SERVICE_PUBLIC RecordingInfo : public QObject
 
         RecordingInfo(QObject *parent = 0) 
             : QObject           ( parent          ),
+              m_RecordedId      ( 0               ),
               m_Status          ( rsUnknown       ),
               m_Priority        ( 0               ),
               m_RecordId        ( 0               ),
@@ -96,6 +99,7 @@ class SERVICE_PUBLIC RecordingInfo : public QObject
 
         void Copy( const RecordingInfo &src )
         {
+            m_RecordedId      = src.m_RecordedId       ;
             m_Status          = src.m_Status           ;
             m_Priority        = src.m_Priority         ;
             m_StartTs         = src.m_StartTs          ;

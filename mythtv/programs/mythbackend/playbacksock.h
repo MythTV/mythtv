@@ -89,7 +89,7 @@ class PlaybackSock : public ReferenceCounter
     ProgramInfo *GetRecording(uint cardid);
     bool EncoderIsRecording(int capturecardnum, const ProgramInfo *pginfo);
     RecStatusType StartRecording(int capturecardnum,
-                                 const ProgramInfo *pginfo);
+                                 ProgramInfo *pginfo);
     RecStatusType GetRecordingStatus(int capturecardnum);
     void RecordPending(int capturecardnum, const ProgramInfo *pginfo,
                        int secsleft, bool hasLater);

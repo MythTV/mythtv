@@ -429,14 +429,14 @@ int EncoderLink::LockTuner()
     return m_capturecardnum;
 }
 
-/** \fn EncoderLink::StartRecording(const ProgramInfo*)
+/** \fn EncoderLink::StartRecording(ProgramInfo*)
  *  \brief Tells TVRec to Start recording the program "rec" as soon as possible.
  *
  *  \return +1 if the recording started successfully,
  *          -1 if TVRec is busy doing something else, 0 otherwise.
  *  \sa RecordPending(const ProgramInfo*, int, bool), StopRecording()
  */
-RecStatusType EncoderLink::StartRecording(const ProgramInfo *rec)
+RecStatusType EncoderLink::StartRecording(ProgramInfo *rec)
 {
     RecStatusType retval = rsAborted;
 

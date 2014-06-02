@@ -4464,6 +4464,8 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
         ProgramInfo pginfo(it, slist.end());
 
         retlist << QString::number(enc->StartRecording(&pginfo));
+        retlist << QString::number(pginfo.GetRecordingID());
+        retlist << QString::number(pginfo.GetRecordingStartTime().toTime_t());
     }
     else if (command == "GET_RECORDING_STATUS")
     {

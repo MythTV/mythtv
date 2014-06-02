@@ -841,7 +841,8 @@ class Program( CMPRecord, DictData, RECSTATUS, AUDIO_PROPS, \
                      'airdate',      'playgroup',    'recpriority2',
                      'parentid',     'storagegroup', 'audio_props',
                      'video_props',  'subtitle_type','year',
-                     'part_number',  'part_total',   'categorytype']
+                     'part_number',  'part_total',   'categorytype',
+                     'recordedid']
     _field_type = [  3,      3,      3,
                      0,      0,      0,
                      3,
@@ -858,7 +859,8 @@ class Program( CMPRecord, DictData, RECSTATUS, AUDIO_PROPS, \
                      5,      3,      0,
                      3,      3,      0,
                      0,      0,      0,
-                     0,      0,      0]
+                     0,      0,      0,
+                     0  ]
     def __str__(self):
         return u"<Program '%s','%s' at %s>" % (self.title,
                  self.starttime.isoformat(' '), hex(id(self)))

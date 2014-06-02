@@ -287,7 +287,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
     mutable class RecordingRule *record;
 
   protected:
-    static bool InsertProgram(const RecordingInfo *pg,
+    static bool InsertProgram(RecordingInfo *pg,
                               const RecordingRule *rule);
 
     static QString unknownTitle;

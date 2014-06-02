@@ -399,14 +399,14 @@ void TVRec::CancelNextRecording(bool cancel)
         QString("CancelNextRecording(%1) -- end").arg(cancel));
 }
 
-/** \fn TVRec::StartRecording(const ProgramInfo*)
+/** \fn TVRec::StartRecording(ProgramInfo*)
  *  \brief Tells TVRec to Start recording the program "rcinfo"
  *         as soon as possible.
  *
- *  \sa EncoderLink::StartRecording(const ProgramInfo*)
+ *  \sa EncoderLink::StartRecording(ProgramInfo*)
  *      RecordPending(const ProgramInfo*, int, bool), StopRecording()
  */
-RecStatusType TVRec::StartRecording(const ProgramInfo *pginfo)
+RecStatusType TVRec::StartRecording(ProgramInfo *pginfo)
 {
     RecordingInfo ri(*pginfo);
     ri.SetDesiredStartTime(ri.GetRecordingStartTime());
@@ -604,6 +604,8 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *pginfo)
         curRecording = new RecordingInfo(*rcinfo);
         curRecording->MarkAsInUse(true, kRecorderInUseID);
         StartedRecording(curRecording);
+        pginfo->SetRecordingID(curRecording->GetRecordingID());
+        pginfo->SetRecordingStartTime(curRecording->GetRecordingStartTime());
 
         // Make sure scheduler is allowed to end this recording
         ClearFlags(kFlagCancelNextRecording);

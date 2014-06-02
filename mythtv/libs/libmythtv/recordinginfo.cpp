@@ -974,7 +974,7 @@ void RecordingInfo::StartedRecording(QString ext)
     SendAddedEvent();
 }
 
-bool RecordingInfo::InsertProgram(const RecordingInfo *pg,
+bool RecordingInfo::InsertProgram(RecordingInfo *pg,
                                   const RecordingRule *rule)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1075,6 +1075,8 @@ bool RecordingInfo::InsertProgram(const RecordingInfo *pg,
     query.bindValue(":PROFILE",     null_to_empty(rule->m_recProfile));
 
     bool ok = query.exec() && (query.numRowsAffected() > 0);
+    if (ok)
+        pg->recordedid = query.lastInsertId().toUInt();
     bool active = query.isActive();
 
     if (!query.exec("UNLOCK TABLES"))

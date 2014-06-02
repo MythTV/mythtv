@@ -66,7 +66,7 @@ const QString ProgramInfo::kFromRecordedQuery =
     "       r.findid,           rec.dupin,      rec.dupmethod,     "//45-47
     "       p.syndicatedepisodenumber, p.partnumber, p.parttotal,  "//48-50
     "       p.season,           p.episode,      p.totalepisodes,   "//51-53
-    "       p.category_type                                        "//54
+    "       p.category_type,    r.recordedid                       "//54-55
     "FROM recorded AS r "
     "LEFT JOIN channel AS c "
     "ON (r.chanid    = c.chanid) "
@@ -180,6 +180,8 @@ ProgramInfo::ProgramInfo(void) :
     dupin(kDupsInAll),
     dupmethod(kDupCheckSubThenDesc),
 
+    recordedid(0),
+
     // everything below this line is not serialized
     availableStatus(asAvailable),
     spread(-1),
@@ -262,6 +264,8 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other) :
     dupin(other.dupin),
     dupmethod(other.dupmethod),
 
+    recordedid(other.recordedid),
+
     // everything below this line is not serialized
     availableStatus(other.availableStatus),
     spread(other.spread),
@@ -288,6 +292,7 @@ ProgramInfo::ProgramInfo(uint _chanid, const QDateTime &_recstartts) :
  *  \brief Constructs a ProgramInfo from data in 'recorded' table
  */
 ProgramInfo::ProgramInfo(
+    uint  _recordedid,
     const QString &_title,
     const QString &_subtitle,
     const QString &_description,
@@ -415,6 +420,8 @@ ProgramInfo::ProgramInfo(
     dupin(_dupin),
     dupmethod(_dupmethod),
 
+    recordedid(_recordedid),
+
     // everything below this line is not serialized
     availableStatus(asAvailable),
     spread(-1),
@@ -530,6 +537,8 @@ ProgramInfo::ProgramInfo(
     rectype(_rectype),
     dupin(0),
     dupmethod(0),
+
+    recordedid(0),
 
     // everything below this line is not serialized
     availableStatus(asAvailable),
@@ -660,6 +669,8 @@ ProgramInfo::ProgramInfo(
     dupin(kDupsInAll),
     dupmethod(kDupCheckSubThenDesc),
 
+    recordedid(0),
+
     // everything below this line is not serialized
     availableStatus(asAvailable),
     spread(-1),
@@ -699,6 +710,7 @@ ProgramInfo::ProgramInfo(
         dupin       = s.dupin;
         dupmethod   = s.dupmethod;
         findid      = s.findid;
+        recordedid  = s.recordedid;
 
         // This is the exact showing (same chanid or callsign)
         // which will be recorded
@@ -816,6 +828,8 @@ ProgramInfo::ProgramInfo(
     rectype(kNotRecording),
     dupin(kDupsInAll),
     dupmethod(kDupCheckSubThenDesc),
+
+    recordedid(0),
 
     // everything below this line is not serialized
     availableStatus(asAvailable),
@@ -1056,6 +1070,8 @@ void ProgramInfo::clone(const ProgramInfo &other,
     dupin = other.dupin;
     dupmethod = other.dupmethod;
 
+    recordedid = other.recordedid;
+
     sourceid = other.sourceid;
     inputid = other.inputid;
     cardid = other.cardid;
@@ -1163,6 +1179,8 @@ void ProgramInfo::clear(void)
     rectype = kNotRecording;
     dupin = kDupsInAll;
     dupmethod = kDupCheckSubThenDesc;
+
+    recordedid = 0;
 
     sourceid = 0;
     inputid = 0;
@@ -1328,6 +1346,8 @@ void ProgramInfo::ToStringList(QStringList &list) const
     INT_TO_LIST(partnumber);   // 46
     INT_TO_LIST(parttotal);    // 47
     INT_TO_LIST(catType);      // 48
+
+    INT_TO_LIST(recordedid);   //49
 /* do not forget to update the NUMPROGRAMLINES defines! */
 }
 
@@ -1432,6 +1452,8 @@ bool ProgramInfo::FromStringList(QStringList::const_iterator &it,
     INT_FROM_LIST(partnumber);        // 46
     INT_FROM_LIST(parttotal);         // 47
     ENUM_FROM_LIST(catType, CategoryType); // 48
+
+    INT_FROM_LIST(recordedid);        // 49
 
     if (!origChanid || !origRecstartts.isValid() ||
         (origChanid != chanid) || (origRecstartts != recstartts))
@@ -1572,6 +1594,9 @@ void ProgramInfo::ToMap(InfoMap &progMap,
         MythDate::toString(lastmodified, kDateFull | kSimplify);
     progMap["lastmodified"] =
         MythDate::toString(lastmodified, kDateTimeFull | kSimplify);
+
+    if (recordedid)
+        progMap["recordedid"] = recordedid;
 
     progMap["channum"] = chanstr;
     progMap["chanid"] = chanid;
@@ -1995,6 +2020,8 @@ bool ProgramInfo::LoadProgramFromRecorded(
     /**///rectype;
     dupin        = RecordingDupInType(query.value(46).toInt());
     dupmethod    = RecordingDupMethodType(query.value(47).toInt());
+
+    recordedid   = query.value(55).toUInt();
 
     // ancillary data -- begin
     programflags = FL_NONE;
@@ -5450,6 +5477,7 @@ bool LoadFromRecorded(
 
         destination.push_back(
             new ProgramInfo(
+                query.value(55).toUInt(),
                 query.value(0).toString(),
                 query.value(1).toString(),
                 query.value(2).toString(),

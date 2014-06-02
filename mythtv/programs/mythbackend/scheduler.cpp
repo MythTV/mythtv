@@ -2615,6 +2615,8 @@ bool Scheduler::HandleRecording(
             schedLock.unlock();
             recStatus = nexttv->StartRecording(&tempri);
             schedLock.lock();
+            ri.SetRecordingID(tempri.GetRecordingID());
+            ri.SetRecordingStartTime(tempri.GetRecordingStartTime());
 
             // activate auto expirer
             if (m_expirer)

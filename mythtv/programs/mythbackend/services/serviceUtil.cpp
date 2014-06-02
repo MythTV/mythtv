@@ -117,6 +117,7 @@ void FillProgramInfo( DTC::Program *pProgram,
 
         DTC::RecordingInfo *pRecording = pProgram->Recording();
 
+        pRecording->setRecordedId ( pInfo->GetRecordingID()     );
         pRecording->setStatus  ( pInfo->GetRecordingStatus()    );
         pRecording->setPriority( pInfo->GetRecordingPriority()  );
         pRecording->setStartTs ( pInfo->GetRecordingStartTime() );

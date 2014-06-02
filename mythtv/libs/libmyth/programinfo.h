@@ -30,7 +30,7 @@
    mythtv/bindings/python/MythTV/static.py (version number)
    mythtv/bindings/python/MythTV/mythproto.py (layout)
 */
-#define NUMPROGRAMLINES 49
+#define NUMPROGRAMLINES 50
 
 class ProgramInfo;
 typedef AutoDeleteDeque<ProgramInfo*> ProgramList;
@@ -83,7 +83,8 @@ class MPUBLIC ProgramInfo
     /// Constructs a ProgramInfo from data in 'recorded' table
     ProgramInfo(uint chanid, const QDateTime &recstartts);
     /// Constructs a ProgramInfo from data in 'recorded' table
-    ProgramInfo(const QString &title,
+    ProgramInfo(uint recordedid,
+                const QString &title,
                 const QString &subtitle,
                 const QString &description,
                 uint season,
@@ -425,6 +426,7 @@ class MPUBLIC ProgramInfo
     uint    GetStars(uint range_max)      const
         { return (int)(stars * range_max + 0.5f); }
 
+    uint    GetRecordingID(void)              const { return recordedid; }
     RecStatusType GetRecordingStatus(void)    const
         { return (RecStatusType)recstatus; }
     RecStatusType GetOldRecordingStatus(void) const
@@ -532,6 +534,7 @@ class MPUBLIC ProgramInfo
         programflags &= ~FL_IGNOREBOOKMARK;
         programflags |= (ignore) ? FL_IGNOREBOOKMARK : 0;
     }
+    void SetRecordingID(uint _recordedid) { recordedid = _recordedid; }
     void SetRecordingStatus(RecStatusType status) { recstatus = status; }
     void SetRecordingRuleType(RecordingType type) { rectype   = type;   }
     void SetPositionMapDBReplacement(PMapDBReplacement *pmap)
@@ -746,6 +749,8 @@ class MPUBLIC ProgramInfo
     uint8_t rectype;
     uint8_t dupin;
     uint8_t dupmethod;
+
+    uint    recordedid;
 
 // everything below this line is not serialized
     uint8_t availableStatus; // only used for playbackbox.cpp

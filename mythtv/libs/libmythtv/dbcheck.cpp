@@ -2679,6 +2679,19 @@ NULL
             return false;
     }
 
+    if (dbver == "1324")
+    {
+        const char *updates[] = {
+            "ALTER TABLE recorded "
+            " DROP PRIMARY KEY, "
+            " ADD recordedid INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, "
+            " ADD UNIQUE KEY (chanid, starttime) ;",
+            NULL
+        };
+
+        if (!performActualUpdate(updates, "1325", dbver))
+            return false;
+    }
 
     return true;
 }

@@ -12,7 +12,7 @@
 /// Update this whenever the plug-in ABI changes.
 /// Including changes in the libmythbase, libmyth, libmythtv, libmythav* and
 /// libmythui class methods in exported headers.
-#define MYTH_BINARY_VERSION "0.28.20140531-1"
+#define MYTH_BINARY_VERSION "0.28.20140601-2"
 
 /** \brief Increment this whenever the MythTV network protocol changes.
  *
@@ -23,11 +23,11 @@
  *       mythweb/modules/tv/classes/Program.php (layout)
  *
  *   MythTV Perl Bindings
- *       mythtv/bindings/perl/MythTV.pm (version number)
+ *       mythtv/bindings/perl/MythTV.pm (version number and layout)
  *       mythtv/bindings/perl/MythTV/Program.pm (layout)
  *
  *   MythTV PHP Bindings
- *       mythtv/bindings/php/MythBackend.php (version number)
+ *       mythtv/bindings/php/MythBackend.php (version number and layout)
  *       mythtv/bindings/php/MythTVProgram.php (layout)
  *       mythtv/bindings/php/MythTVRecording.php (layout)
  *
@@ -39,8 +39,8 @@
  *       http://www.mythtv.org/wiki/Category:Myth_Protocol_Commands
  *       http://www.mythtv.org/wiki/Category:Myth_Protocol
  */
-#define MYTH_PROTO_VERSION "81"
-#define MYTH_PROTO_TOKEN "MultiRecDos"
+#define MYTH_PROTO_VERSION "82"
+#define MYTH_PROTO_TOKEN "IdIdO"
 
 /** \brief Increment this whenever the MythTV core database schema changes.
  *
@@ -61,7 +61,7 @@
  *      mythtv/bindings/php/MythBackend.php
 #endif
 
-#define MYTH_DATABASE_VERSION "1324"
+#define MYTH_DATABASE_VERSION "1325"
 
 
  MBASE_PUBLIC  const char *GetMythSourceVersion();

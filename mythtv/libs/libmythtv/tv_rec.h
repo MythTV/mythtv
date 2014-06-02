@@ -149,7 +149,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     bool Init(void);
 
     void RecordPending(const ProgramInfo *rcinfo, int secsleft, bool hasLater);
-    RecStatusType StartRecording(const ProgramInfo *rcinfo);
+    RecStatusType StartRecording(ProgramInfo *rcinfo);
     RecStatusType GetRecordingStatus(void) const;
 
     void StopRecording(bool killFile = false);
