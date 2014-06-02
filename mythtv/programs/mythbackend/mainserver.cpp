@@ -7367,8 +7367,8 @@ void MainServer::reconnectTimeout(void)
 {
     MythSocket *masterServerSock = new MythSocket(-1, this);
 
-    QString server = gCoreContext->GetMasterServerIP();
-    int port = gCoreContext->GetMasterServerIPort();
+    QString server = gCoreContext->GetSetting("MasterServerIP", "127.0.0.1");
+    int port = gCoreContext->GetNumSetting("MasterServerPort", 6543);
 
     LOG(VB_GENERAL, LOG_NOTICE, LOC +
         QString("Connecting to master server: %1:%2")

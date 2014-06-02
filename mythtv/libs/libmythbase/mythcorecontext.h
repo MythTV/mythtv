@@ -155,11 +155,6 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
 
     QString GetBackendServerIP(void);
     QString GetBackendServerIP(const QString &host);
-    QString GetMasterServerIP(void);
-    QString GetMasterServerPort(void);
-    QString GetMasterServerStatusPort(void);
-    int GetMasterServerIPort(void);
-    int GetMasterServerStatusIPort(void);
 
     bool GetScopeForAddress(QHostAddress &addr) const;
     void SetScopeForAddress(const QHostAddress &addr);
