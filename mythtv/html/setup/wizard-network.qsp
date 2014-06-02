@@ -24,8 +24,8 @@
             </td></tr>
 </table>
 <div id='navigation' style="text-align:right">
-    <input type=button value='Back' onClick='javascript:$("#wizardtabs").tabs("select", 0)'>
-    <input type=button value='Next' onClick='javascript:$("#wizardtabs").tabs("select", 2)'>
+    <input type=button value='Back' onClick='javascript:$("#wizardtabs").tabs("option", "active", 0)'>
+    <input type=button value='Next' onClick='javascript:$("#wizardtabs").tabs("option", "active", 2)'>
 </div>
 <hr>
 If the setting you are looking for is not available here, you can go to the <a href="javascript:hideEditWindow(); 

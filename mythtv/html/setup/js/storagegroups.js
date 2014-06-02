@@ -17,14 +17,13 @@ function appendTabRow(tabID, id, host, dir) {
 function initStorageGroups(selectedGroup) {
     var selectedHost = $("#sgShowHost").val();
 
-    $("#storagegrouptabs").tabs({ select: null });
+    var tabs = $("#storagegrouptabs").tabs();
 
-    while (sgTabCount > 0) {
-        $("#storagegrouptabs").tabs("remove", 0);
-        sgTabCount--;
-    }
-    /* now remove the '+' tab */
-    $("#storagegrouptabs").tabs("remove", 0);
+    var ul = tabs.find("ul");
+    $("#storagegrouptabs ul li").each(function() {
+        var panelId = $(this).remove().attr("aria-controls");
+        $("#" + panelId).remove();
+    });
 
     sgTabIDs = new Array();
     sgTabNames = new Array();
@@ -49,8 +48,8 @@ function initStorageGroups(selectedGroup) {
                 sgTabID = sgTabCount++;
                 sgTabIDs[value.GroupName] = sgTabID;
                 sgTabNames[sgTabID] = value.GroupName;
-                $("#storagegrouptabs").tabs("add", "#sgtabs-" + sgTabID, value.GroupName, sgTabID);
-                $("#sgtabs-" + sgTabID).html("<input type=button value='Add Directory' onClick='javascript:addNewStorageGroupDir(" + sgTabID + ")'><table id='sgtable-" + sgTabID + "' width='100%'><thead class='ui-widget-header'><th class='invisible'>DirID</th><th>Host Name</th><th>Directory Path</th><th>Actions</th></thead></tr></table>");
+                $("<li><a href='#sgtabs-" + sgTabID + "'>" + value.GroupName + "</a></li>").appendTo(ul);
+                $("<div id='sgtabs-" + sgTabID + "'><input type=button value='Add Directory' onClick='javascript:addNewStorageGroupDir(" + sgTabID + ")'><table id='sgtable-" + sgTabID + "' width='100%'><thead class='ui-widget-header'><th class='invisible'>DirID</th><th>Host Name</th><th>Directory Path</th><th>Actions</th></thead></tr></table></div>").appendTo(tabs);
             }
 
             appendTabRow(sgTabID, value.Id, value.HostName, value.DirName);
@@ -81,16 +80,12 @@ function initStorageGroups(selectedGroup) {
         $("#sgHostSelect").html(sgHostSelect);
         setUIAttributes();
 
-        $("#storagegrouptabs").tabs("add", "#sgtabs-addNewGroup", "+", sgTabID + 1);
-        $("#storagegrouptabs").tabs({
-            select: function(event, ui) {
-                if (ui.panel.id == "sgtabs-addNewGroup") {
-                    addNewStorageGroup();
-                    return false;
-                }
-        
-                return true;
-            }
+        $("<li><a href='#sgtabs-addNewGroup'>+</a></li>").appendTo(ul);
+        $("<div id='sgtabs-addNewGroup'></div>").appendTo(tabs);
+        tabs.tabs("refresh");
+
+        $("a[href='#sgtabs-addNewGroup']").click(function() {
+            addNewStorageGroup();
         });
     });
 }
@@ -159,7 +154,7 @@ function saveNewDir(group, tabID) {
     if (addStorageGroupDir(group, dir, host)) {
         $("#edit").dialog('close');
         if (tabID != undefined)
-            appendTabRow(tabID, 0, group, host, dir);
+            appendTabRow(tabID, 0, host, dir);
         else
             initStorageGroups();
         setUIAttributes();
