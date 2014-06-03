@@ -3710,6 +3710,9 @@ void ProgramInfo::SavePositionMap(
     if (!query.exec())
         MythDB::DBError("position map clear", query);
 
+    if (posMap.isEmpty())
+        return;
+
     // Use the multi-value insert syntax to reduce database I/O
     QStringList q("INSERT INTO ");
     QString qfields;
@@ -3765,6 +3768,9 @@ void ProgramInfo::SavePositionMap(
 void ProgramInfo::SavePositionMapDelta(
     frm_pos_map_t &posMap, MarkTypes type) const
 {
+    if (posMap.isEmpty())
+        return;
+
     if (positionMapDBReplacement)
     {
         QMutexLocker locker(positionMapDBReplacement->lock);
