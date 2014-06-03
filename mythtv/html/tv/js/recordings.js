@@ -42,6 +42,7 @@ function playInBrowser(chanID, recStartTime)
 
 function playOnFrontend(chanID, recStartTime, ip)
 {
-    $.ajax( "http://" + ip + ":6547/Frontend/PlayRecording?ChanID=" + chanID +
-            "&StartTime=" + recStartTime );
+    var surl = "http://" + ip + ":6547/Frontend/PlayRecording?ChanID=" + chanID +
+            "&StartTime=" + recStartTime;
+    $.ajax({ url: surl, type: 'POST' });
 }
