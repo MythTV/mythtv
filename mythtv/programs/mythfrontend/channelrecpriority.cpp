@@ -317,8 +317,13 @@ void ChannelRecPriority::updateList()
 
         item->DisplayState("normal", "status");
 
-        item->SetImage(chanInfo->icon, "icon");
-        item->SetImage(chanInfo->icon);
+        if (!chanInfo->icon.isEmpty())
+        {
+            QString iconUrl = gCoreContext->GetMasterHostPrefix("ChannelIcons",
+                                                                chanInfo->icon);
+            item->SetImage(iconUrl, "icon");
+            item->SetImage(iconUrl);
+        }
 
         item->SetText(QString::number(chanInfo->recpriority), "priority", fontState);
 
