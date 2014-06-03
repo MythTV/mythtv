@@ -932,14 +932,13 @@ bool Myth::BackupDatabase(void)
 {
     bool bResult = false;
 
-    DBUtil *dbutil = new DBUtil();
+    DBUtil dbutil;
     MythDBBackupStatus status = kDB_Backup_Unknown;
     QString filename;
 
     LOG(VB_GENERAL, LOG_NOTICE, "Performing API invoked DB Backup.");
 
-    if (dbutil)
-        status = dbutil->BackupDB(filename);
+    status = dbutil.BackupDB(filename);
 
     if (status == kDB_Backup_Completed)
     {
@@ -948,8 +947,6 @@ bool Myth::BackupDatabase(void)
     }
     else
         LOG(VB_GENERAL, LOG_ERR, "Database backup failed.");
-
-    delete dbutil;
 
     return bResult;
 }
@@ -962,19 +959,14 @@ bool Myth::CheckDatabase( bool repair )
 {
     bool bResult = false;
 
-    DBUtil *dbutil = new DBUtil();
-
     LOG(VB_GENERAL, LOG_NOTICE, "Performing API invoked DB Check.");
 
-    if (dbutil)
-        bResult = dbutil->CheckTables(repair);
+    bResult = DBUtil::CheckTables(repair);
 
     if (bResult)
         LOG(VB_GENERAL, LOG_NOTICE, "Database check complete.");
     else
         LOG(VB_GENERAL, LOG_ERR, "Database check failed.");
-
-    delete dbutil;
 
     return bResult;
 }
@@ -987,16 +979,12 @@ bool Myth::ProfileSubmit()
 {
     bool bResult = false;
 
-    HardwareProfile *profile = new HardwareProfile();
-    if (profile)
-    {
-        LOG(VB_GENERAL, LOG_NOTICE, "Profile Submission...");
-        profile->GenerateUUIDs();
-        bResult = profile->SubmitProfile();
-        if (bResult)
-            LOG(VB_GENERAL, LOG_NOTICE, "Profile Submitted.");
-    }
-    delete profile;
+    HardwareProfile profile;
+    LOG(VB_GENERAL, LOG_NOTICE, "Profile Submission...");
+    profile.GenerateUUIDs();
+    bResult = profile.SubmitProfile();
+    if (bResult)
+        LOG(VB_GENERAL, LOG_NOTICE, "Profile Submitted.");
 
     return bResult;
 }
@@ -1009,16 +997,12 @@ bool Myth::ProfileDelete()
 {
     bool bResult = false;
 
-    HardwareProfile *profile = new HardwareProfile();
-    if (profile)
-    {
-        LOG(VB_GENERAL, LOG_NOTICE, "Profile Deletion...");
-        profile->GenerateUUIDs();
-        bResult = profile->DeleteProfile();
-        if (bResult)
-            LOG(VB_GENERAL, LOG_NOTICE, "Profile Deleted.");
-    }
-    delete profile;
+    HardwareProfile profile;
+    LOG(VB_GENERAL, LOG_NOTICE, "Profile Deletion...");
+    profile.GenerateUUIDs();
+    bResult = profile.DeleteProfile();
+    if (bResult)
+        LOG(VB_GENERAL, LOG_NOTICE, "Profile Deleted.");
 
     return bResult;
 }
@@ -1031,14 +1015,10 @@ QString Myth::ProfileURL()
 {
     QString sProfileURL;
 
-    HardwareProfile *profile = new HardwareProfile();
-    if (profile)
-    {
-        profile->GenerateUUIDs();
-        sProfileURL = profile->GetProfileURL();
-        LOG(VB_GENERAL, LOG_NOTICE, QString("ProfileURL: %1").arg(sProfileURL));
-    }
-    delete profile;
+    HardwareProfile profile;
+    profile.GenerateUUIDs();
+    sProfileURL = profile.GetProfileURL();
+    LOG(VB_GENERAL, LOG_NOTICE, QString("ProfileURL: %1").arg(sProfileURL));
 
     return sProfileURL;
 }
@@ -1051,16 +1031,12 @@ QString Myth::ProfileUpdated()
 {
     QString sProfileUpdate;
 
-    HardwareProfile *profile = new HardwareProfile();
-    if (profile)
-    {
-        profile->GenerateUUIDs();
-        QDateTime tUpdated;
-        tUpdated = profile->GetLastUpdate();
-        sProfileUpdate = tUpdated.toString(
-            gCoreContext->GetSetting( "DateFormat", "MM.dd.yyyy"));
-    }
-    delete profile;
+    HardwareProfile profile;
+    profile.GenerateUUIDs();
+    QDateTime tUpdated;
+    tUpdated = profile.GetLastUpdate();
+    sProfileUpdate = tUpdated.toString(
+    gCoreContext->GetSetting( "DateFormat", "MM.dd.yyyy"));
 
     return sProfileUpdate;
 }
@@ -1073,10 +1049,8 @@ QString Myth::ProfileText()
 {
     QString sProfileText;
 
-    HardwareProfile *profile = new HardwareProfile();
-    if (profile)
-        sProfileText = profile->GetHardwareProfile();
-    delete profile;
+    HardwareProfile profile;
+    sProfileText = profile.GetHardwareProfile();
 
     return sProfileText;
 }
