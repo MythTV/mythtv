@@ -1642,7 +1642,7 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
                         QUrl sgurl = *iter;
                         QString path = sgurl.path();
 
-                        QString subdir = folder_path.right(folder_path.length() - (prefix.length() + 2));
+                        QString subdir = folder_path.right(folder_path.length() - (prefix.length() + 1));
 
                         path = path + "/" + subdir;
 
