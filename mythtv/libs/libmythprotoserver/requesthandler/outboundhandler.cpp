@@ -33,9 +33,9 @@ bool OutboundRequestHandler::DoConnectToMaster(void)
 
     m_socket = new MythSocket(-1, m_parent);
 
-    QString server   = gCoreContext->GetSetting("MasterServerIP", "localhost");
+    QString server   = gCoreContext->GetMasterServerIP();
     QString hostname = gCoreContext->GetMasterHostName();
-    int port         = gCoreContext->GetNumSetting("MasterServerPort", 6543);
+    int port         = gCoreContext->GetMasterServerPort();
 
     if (!m_socket->ConnectToHost(server, port))
     {

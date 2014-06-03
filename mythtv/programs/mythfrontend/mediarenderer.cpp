@@ -60,9 +60,8 @@ class MythFrontendStatus : public HttpServerExtension
         QString hostname   = gCoreContext->GetHostName();
         QDateTime qdtNow   = MythDate::current();
         QString masterhost = gCoreContext->GetMasterHostName();
-        QString masterip   = gCoreContext->GetSetting("MasterServerIP");
-        QString masterport = gCoreContext->GetSettingOnHost("BackendStatusPort",
-                                                            masterhost, "6544");
+        QString masterip   = gCoreContext->GetMasterServerIP();
+        int masterport = gCoreContext->GetMasterServerStatusPort();
 
         QTextStream stream ( &pRequest->m_response );
         stream.setCodec("UTF-8");

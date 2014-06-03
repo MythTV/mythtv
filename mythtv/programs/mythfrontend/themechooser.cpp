@@ -984,8 +984,8 @@ ThemeUpdateChecker::ThemeUpdateChecker() :
         m_mythVersion.replace(QRegExp("\\.[0-9]{8,}.*"), "");
     }
 
-    m_infoPackage = gCoreContext->GenMythURL(gCoreContext->GetSetting("MasterServerIP"),
-                                             0,
+    m_infoPackage = gCoreContext->GenMythURL(gCoreContext->GetMasterServerIP(),
+                                             gCoreContext->GetMasterServerPort(),
                                              "remotethemes/themes.zip",
                                              "Temp");
 
@@ -1016,8 +1016,8 @@ void ThemeUpdateChecker::checkForUpdate(void)
     if (RemoteFile::Exists(m_infoPackage))
     {
         QString remoteThemeDir =
-            gCoreContext->GenMythURL(gCoreContext->GetSetting("MasterServerIP"),
-                                     0,
+            gCoreContext->GenMythURL(gCoreContext->GetMasterServerIP(),
+                                     gCoreContext->GetMasterServerPort(),
                                      QString("remotethemes/%1/%2")
                                              .arg(m_mythVersion)
                                              .arg(GetMythUI()->GetThemeName()),

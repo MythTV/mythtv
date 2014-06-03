@@ -441,9 +441,8 @@ void UPNPScanner::Start()
     m_watchdogTimer->start(1000 * 10); // every 10s
 
     // avoid connecting to the master backend
-    m_masterHost = gCoreContext->GetSetting("MasterServerIP");
-    m_masterPort = gCoreContext->GetSettingOnHost("BackendStatusPort",
-                                             m_masterHost, "6544").toInt();
+    m_masterHost = gCoreContext->GetMasterServerIP();
+    m_masterPort = gCoreContext->GetMasterServerStatusPort();
 
     m_lock.unlock();
     LOG(VB_GENERAL, LOG_INFO, LOC + "Started");
@@ -925,9 +924,8 @@ void UPNPScanner::AddServer(const QString &usn, const QString &url)
     // sometimes initialisation is too early and m_masterHost is empty
     if (m_masterHost.isEmpty())
     {
-        m_masterHost = gCoreContext->GetSetting("MasterServerIP");
-        m_masterPort = gCoreContext->GetSettingOnHost("BackendStatusPort",
-                                                  m_masterHost, "6544").toInt();
+        m_masterHost = gCoreContext->GetMasterServerIP();
+        m_masterPort = gCoreContext->GetMasterServerStatusPort();
     }
 
     QUrl qurl(url);

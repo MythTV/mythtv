@@ -330,8 +330,8 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
     {
         numbes++;
         QString masterhost = gCoreContext->GetMasterHostName();
-        QString masterip   = gCoreContext->GetSetting("MasterServerIP");
-        QString masterport = gCoreContext->GetSettingOnHost("BackendStatusPort", masterhost, "6544");
+        QString masterip   = gCoreContext->GetMasterServerIP();
+        int masterport = gCoreContext->GetMasterServerStatusPort();
 
         QDomElement mbe = pDoc->createElement("Backend");
         backends.appendChild(mbe);
