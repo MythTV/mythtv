@@ -685,11 +685,11 @@ QString MythCoreContext::GenMythURL(QString host, int port, QString path, QStrin
 
 #if !defined(QT_NO_IPV6)
     // Basically if it appears to be an IPv6 IP surround the IP with [] otherwise don't bother
-    if (( addr.protocol() == QAbstractSocket::IPv6Protocol ) || (host.contains(":")))
-        m_host = "[" + host + "]";
+    if (addr.protocol() == QAbstractSocket::IPv6Protocol)
+        m_host = "[" + addr.toString().toLower() + "]";
 #endif
 
-    if (port > 0)
+    if (port > 0 && port != 6543)
         m_port = QString(":%1").arg(port);
     else
         m_port = "";
