@@ -81,6 +81,8 @@ class MPUBLIC ProgramInfo
     /// Copy constructor
     ProgramInfo(const ProgramInfo &other);
     /// Constructs a ProgramInfo from data in 'recorded' table
+    ProgramInfo(uint recordedid);
+    /// Constructs a ProgramInfo from data in 'recorded' table
     ProgramInfo(uint chanid, const QDateTime &recstartts);
     /// Constructs a ProgramInfo from data in 'recorded' table
     ProgramInfo(uint recordedid,

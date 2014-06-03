@@ -278,6 +278,33 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other) :
 {
 }
 
+/** \fn ProgramInfo::ProgramInfo(uint _recordedid)
+ *  \brief Constructs a ProgramInfo from data in 'recorded' table
+ */
+ProgramInfo::ProgramInfo(uint _recordedid)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT chanid, starttime "
+        "FROM recorded "
+        "WHERE recordedid = :RECORDEDID");
+    query.bindValue(":RECORDEDID", _recordedid);
+
+    if (query.exec() && query.next())
+    {
+        uint _chanid          = query.value(0).toUInt();
+        QDateTime _recstartts = MythDate::as_utc(query.value(1).toDateTime());
+        LoadProgramFromRecorded(_chanid, _recstartts);
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Failed to find recorded entry for %1.")
+            .arg(_recordedid));
+        clear();
+    }
+}
+
 /** \fn ProgramInfo::ProgramInfo(uint _chanid, const QDateTime &_recstartts)
  *  \brief Constructs a ProgramInfo from data in 'recorded' table
  */
