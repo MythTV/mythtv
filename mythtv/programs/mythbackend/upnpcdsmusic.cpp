@@ -296,8 +296,8 @@ void UPnpCDSMusic::AddItem( const UPnpCDSRequest    *pRequest,
         m_mapBackendPort[ sHostName ] = gCoreContext->GetSettingOnHost("BackendStatusPort", sHostName);
 #endif
 
-    QString sServerIp = gCoreContext->GetSetting( "BackendServerIp"   );
-    QString sPort     = gCoreContext->GetSetting( "BackendStatusPort" );
+    QString sServerIp   = gCoreContext->GetBackendServerIP4();
+    int sPort           = gCoreContext->GetBackendStatusPort();
 
     // ----------------------------------------------------------------------
     // Build Support Strings

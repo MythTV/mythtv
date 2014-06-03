@@ -269,12 +269,12 @@ void UPnpCDSVideo::AddItem( const UPnpCDSRequest    *pRequest,
         if (sHostName.isEmpty())
         {
             m_mapBackendIp[sHostName] = 
-                gCoreContext->GetSetting( "BackendServerIP" );
+                gCoreContext->GetBackendServerIP4();
         }
         else
         {
             m_mapBackendIp[sHostName] = 
-                gCoreContext->GetSettingOnHost( "BackendServerIp", sHostName);
+                gCoreContext->GetBackendServerIP4(sHostName);
         }
     }
 
@@ -283,12 +283,12 @@ void UPnpCDSVideo::AddItem( const UPnpCDSRequest    *pRequest,
         if (sHostName.isEmpty())
         {
             m_mapBackendPort[sHostName] = 
-                gCoreContext->GetSetting( "BackendStatusPort" );
+                gCoreContext->GetBackendStatusPort();
         }
         else
         {
             m_mapBackendPort[sHostName] = 
-                gCoreContext->GetSettingOnHost("BackendStatusPort", sHostName);
+                gCoreContext->GetBackendStatusPort(sHostName);
         }
     }
     

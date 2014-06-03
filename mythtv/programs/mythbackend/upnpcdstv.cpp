@@ -309,10 +309,10 @@ void UPnpCDSTv::AddItem( const UPnpCDSRequest    *pRequest,
     // ----------------------------------------------------------------------
 
     if (!m_mapBackendIp.contains( sHostName ))
-        m_mapBackendIp[ sHostName ] = gCoreContext->GetSettingOnHost( "BackendServerIp", sHostName);
+        m_mapBackendIp[ sHostName ] = gCoreContext->GetBackendServerIP4(sHostName);
 
     if (!m_mapBackendPort.contains( sHostName ))
-        m_mapBackendPort[ sHostName ] = gCoreContext->GetSettingOnHost("BackendStatusPort", sHostName);
+        m_mapBackendPort[ sHostName ] = gCoreContext->GetBackendStatusPort(sHostName);
 
     // ----------------------------------------------------------------------
     // Build Support Strings

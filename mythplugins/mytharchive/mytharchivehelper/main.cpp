@@ -1001,8 +1001,8 @@ int NativeArchive::importRecording(const QDomElement &itemNode,
         }
     }
 
-    QString destFile = gCoreContext->GenMythURL(gCoreContext->GetSetting("MasterServerIP"),
-                                                gCoreContext->GetSetting("MasterServerPort"),
+    QString destFile = gCoreContext->GenMythURL(gCoreContext->GetMasterServerIP(),
+                                                gCoreContext->GetMasterServerPort(),
                                                 basename , "Default");
 
     // copy file to recording directory

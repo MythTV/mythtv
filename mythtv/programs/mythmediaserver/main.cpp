@@ -141,9 +141,8 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_CONNECT_ERROR;
     }
 
-    int     port = gCoreContext->GetNumSetting("BackendServerPort", 6543);
-    if (gCoreContext->GetSetting("BackendServerIP").isEmpty() &&
-        gCoreContext->GetSetting("BackendServerIP6").isEmpty())
+    int     port = gCoreContext->GetBackendServerPort();
+    if (gCoreContext->GetBackendServerIP().isEmpty())
     {
         cerr << "No setting found for this machine's BackendServerIP.\n"
              << "Please run setup on this machine and modify the first page\n"

@@ -122,11 +122,7 @@ MythSocket *RemoteFile::openSocket(bool control)
 
     if (port <= 0)
     {
-        port = GetMythDB()->GetSettingOnHost("BackendServerPort", host).toInt();
-
-        // if we still have no port use the default
-        if (port <= 0)
-            port = 6543;
+        port = gCoreContext->GetBackendServerPort(host);
     }
 
     if (!lsock->ConnectToHost(host, port))

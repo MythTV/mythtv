@@ -458,8 +458,7 @@ bool RemoteGetFileList(QString host, QString path, QStringList* list,
         QString ann = QString("ANN Playback %1 0")
                         .arg(gCoreContext->GetHostName());
         QString addr = gCoreContext->GetBackendServerIP(host);
-        int port = gCoreContext->GetNumSettingOnHost("BackendServerPort",
-                                                     host, 6543);
+        int port = gCoreContext->GetBackendServerPort(host);
         bool mismatch = false;
 
         MythSocket *sock = gCoreContext->ConnectCommandSocket(

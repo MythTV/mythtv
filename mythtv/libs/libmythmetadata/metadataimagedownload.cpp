@@ -473,9 +473,8 @@ QString getLocalWritePath(MetadataType metadatatype, VideoArtworkType type)
 QString getStorageGroupURL(VideoArtworkType type, QString host)
 {
     QString sgroup;
-    QString ip = gCoreContext->GetSettingOnHost("BackendServerIP", host);
-    uint port = gCoreContext->GetSettingOnHost("BackendServerPort",
-                                               host).toUInt();
+    QString ip = gCoreContext->GetBackendServerIP(host);
+    uint port = gCoreContext->GetBackendServerPort(host);
 
     if (type == kArtworkCoverart)
         sgroup = "Coverart";

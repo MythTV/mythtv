@@ -730,12 +730,13 @@ int main(int argc, char *argv[])
 
 static int transUnlink(QString filename, ProgramInfo *pginfo)
 {
+    QString hostname = pginfo->GetHostname();
+
     if (pginfo != NULL && !pginfo->GetStorageGroup().isEmpty() &&
-        !pginfo->GetHostname().isEmpty())
+        !hostname.isEmpty())
     {
-        QString ip = gCoreContext->GetBackendServerIP(pginfo->GetHostname());
-        QString port = gCoreContext->GetSettingOnHost("BackendServerPort",
-                                                      pginfo->GetHostname());
+        QString ip = gCoreContext->GetBackendServerIP(hostname);
+        int port = gCoreContext->GetBackendServerPort(hostname);
         QString basename = filename.section('/', -1);
         QString uri = gCoreContext->GenMythURL(ip, port, basename,
                                                pginfo->GetStorageGroup());
