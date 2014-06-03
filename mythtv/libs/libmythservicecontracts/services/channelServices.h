@@ -75,7 +75,7 @@ class SERVICE_PUBLIC ChannelServices : public Service
 
         virtual DTC::ChannelInfo*      GetChannelInfo      ( uint           ChanID     ) = 0;
 
-        virtual bool                   UpdateDBChannel     ( uint          MplexID,
+        virtual bool                   AddDBChannel        ( uint          MplexID,
                                                              uint          SourceID,
                                                              uint          ChannelID,
                                                              const QString &CallSign,
@@ -92,7 +92,7 @@ class SERVICE_PUBLIC ChannelServices : public Service
                                                              const QString &XMLTVID,
                                                              const QString &DefaultAuthority ) = 0;
 
-        virtual bool                   AddDBChannel        ( uint          MplexID,
+        virtual bool                   UpdateDBChannel     ( uint          MplexID,
                                                              uint          SourceID,
                                                              uint          ChannelID,
                                                              const QString &CallSign,
@@ -117,17 +117,6 @@ class SERVICE_PUBLIC ChannelServices : public Service
 
         virtual DTC::VideoSource*         GetVideoSource         ( uint SourceID ) = 0;
 
-        virtual bool                      UpdateVideoSource      ( uint          SourceID,
-                                                                   const QString &SourceName,
-                                                                   const QString &Grabber,
-                                                                   const QString &UserId,
-                                                                   const QString &FreqTable,
-                                                                   const QString &LineupId,
-                                                                   const QString &Password,
-                                                                   bool          UseEIT,
-                                                                   const QString &ConfigPath,
-                                                                   int           NITId ) = 0;
-
         virtual int                       AddVideoSource         ( const QString &SourceName,
                                                                    const QString &Grabber,
                                                                    const QString &UserId,
@@ -139,6 +128,17 @@ class SERVICE_PUBLIC ChannelServices : public Service
                                                                    int           NITId ) = 0;
 
         virtual bool                      RemoveVideoSource      ( uint          SourceID ) = 0;
+
+        virtual bool                      UpdateVideoSource      ( uint          SourceID,
+                                                                   const QString &SourceName,
+                                                                   const QString &Grabber,
+                                                                   const QString &UserId,
+                                                                   const QString &FreqTable,
+                                                                   const QString &LineupId,
+                                                                   const QString &Password,
+                                                                   bool          UseEIT,
+                                                                   const QString &ConfigPath,
+                                                                   int           NITId ) = 0;
 
         virtual DTC::LineupList*          GetDDLineupList        ( const QString &Source,
                                                                    const QString &UserId,

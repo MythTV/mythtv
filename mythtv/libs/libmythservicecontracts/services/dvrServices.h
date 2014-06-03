@@ -45,13 +45,17 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
     Q_CLASSINFO( "version"    , "4.6" );
-    Q_CLASSINFO( "RemoveRecordedItem_Method",                   "POST" )
+    Q_CLASSINFO( "RemoveRecorded_Method",                       "POST" )
+    Q_CLASSINFO( "DeleteRecording_Method",                      "POST" )
+    Q_CLASSINFO( "UnDeleteRecording",                           "POST" )
+    Q_CLASSINFO( "UpdateRecordedWatchedStatus_Method",          "POST" )
     Q_CLASSINFO( "AddRecordSchedule_Method",                    "POST" )
+    Q_CLASSINFO( "UpdateRecordSchedule_Method",                 "POST" )
     Q_CLASSINFO( "RemoveRecordSchedule_Method",                 "POST" )
+    Q_CLASSINFO( "AddDontRecordSchedule",                       "POST" )
     Q_CLASSINFO( "EnableRecordSchedule_Method",                 "POST" )
     Q_CLASSINFO( "DisableRecordSchedule_Method",                "POST" )
-    Q_CLASSINFO( "UpdateRecordSchedule_Method",                 "POST" )
-    Q_CLASSINFO( "UpdateRecordedWatchedStatus_Method",          "POST" )
+
 
     public:
 

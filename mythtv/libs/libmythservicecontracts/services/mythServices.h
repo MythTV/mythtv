@@ -44,11 +44,13 @@ class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
     Q_CLASSINFO( "version"    , "3.0" );
-    Q_CLASSINFO( "PutSetting_Method",            "POST" )
     Q_CLASSINFO( "AddStorageGroupDir_Method",    "POST" )
     Q_CLASSINFO( "RemoveStorageGroupDir_Method", "POST" )
+    Q_CLASSINFO( "PutSetting_Method",            "POST" )
     Q_CLASSINFO( "ChangePassword_Method",        "POST" )
     Q_CLASSINFO( "TestDBSettings_Method",        "POST" )
+    Q_CLASSINFO( "SendMessage_Method",           "POST" )
+    Q_CLASSINFO( "SendNotification_Method",      "POST" )
     Q_CLASSINFO( "BackupDatabase_Method",        "POST" )
     Q_CLASSINFO( "CheckDatabase_Method",         "POST" )
     Q_CLASSINFO( "ProfileSubmit_Method",         "POST" )

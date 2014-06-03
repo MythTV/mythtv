@@ -8,7 +8,13 @@
 class SERVICE_PUBLIC FrontendServices : public Service
 {
     Q_OBJECT
-    Q_CLASSINFO("version", "1.0");
+    Q_CLASSINFO( "version", "1.0" );
+    Q_CLASSINFO( "SendMessage_Method",            "POST" )
+    Q_CLASSINFO( "SendNotification_Method",       "POST" )
+    Q_CLASSINFO( "SendAction_Method",             "POST" )
+    Q_CLASSINFO( "PlayRecording_Method",          "POST" )
+    Q_CLASSINFO( "PlayVideo_Method",              "POST" )
+
 
   public:
     FrontendServices(QObject *parent = 0) : Service(parent)

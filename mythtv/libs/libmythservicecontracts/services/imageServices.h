@@ -14,9 +14,16 @@ class SERVICE_PUBLIC ImageServices : public Service
 {
     Q_OBJECT
     Q_CLASSINFO( "version"    , "1.0" )
-    Q_CLASSINFO( "SetImageInfo_Method",         "POST" )
-    Q_CLASSINFO( "StartSync_Method",            "POST" )
-    Q_CLASSINFO( "StopSync_Method",             "POST" )
+    Q_CLASSINFO( "SetImageInfo_Method",             "POST" )
+    Q_CLASSINFO( "RemoveImageFromDB_Method",        "POST" )
+    Q_CLASSINFO( "RemoveImage_Method",              "POST" )
+    Q_CLASSINFO( "StartSync_Method",                "POST" )
+    Q_CLASSINFO( "StopSync_Method",                 "POST" )
+    Q_CLASSINFO( "StartThumbnailGeneration_Method", "POST" )
+    Q_CLASSINFO( "StopThumbnailGeneration_Method",  "POST" )
+    Q_CLASSINFO( "CreateThumbnail_Method",          "POST" )
+    Q_CLASSINFO( "RecreateThumbnail_Method",        "POST" )
+    Q_CLASSINFO( "SetThumbnailSize_Method",         "POST" )
 
     public:
 
