@@ -1432,6 +1432,7 @@ QString VideoDialog::GetImageFromFolder(VideoMetadata *metadata)
     QStringList test_files;
     test_files.append(filename + ".png");
     test_files.append(filename + ".jpg");
+    test_files.append(filename + ".jpeg");
     test_files.append(filename + ".gif");
     bool foundCover;
 
@@ -1471,9 +1472,11 @@ QString VideoDialog::GetImageFromFolder(VideoMetadata *metadata)
         QStringList imageTypes;
         imageTypes.append(metadata->GetTitle() + ".png");
         imageTypes.append(metadata->GetTitle() + ".jpg");
+        imageTypes.append(metadata->GetTitle() + ".jpeg");
         imageTypes.append(metadata->GetTitle() + ".gif");
         imageTypes.append("*.png");
         imageTypes.append("*.jpg");
+        imageTypes.append("*.jpeg");
         imageTypes.append("*.gif");
 
         QStringList fList;
@@ -1505,6 +1508,7 @@ QString VideoDialog::GetImageFromFolder(VideoMetadata *metadata)
                         {
                             QRegExp rx(*pattern);
                             rx.setPatternSyntax(QRegExp::Wildcard);
+                            rx.setCaseSensitivity(Qt::CaseInsensitive);
                             QStringList matches = tmpList.filter(rx);
                             if (!matches.isEmpty())
                             {
@@ -1582,6 +1586,7 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
         QStringList test_files;
         test_files.append(filename + ".png");
         test_files.append(filename + ".jpg");
+        test_files.append(filename + ".jpeg");
         test_files.append(filename + ".gif");
         bool foundCover;
 
@@ -1624,6 +1629,7 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
             QStringList imageTypes;
             imageTypes.append("*.png");
             imageTypes.append("*.jpg");
+            imageTypes.append("*.jpeg");
             imageTypes.append("*.gif");
 
             QStringList fList;
@@ -1656,6 +1662,7 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
                             {
                                 QRegExp rx(*pattern);
                                 rx.setPatternSyntax(QRegExp::Wildcard);
+                                rx.setCaseSensitivity(Qt::CaseInsensitive);
                                 QStringList matches = tmpList.filter(rx);
                                 if (!matches.isEmpty())
                                 {
