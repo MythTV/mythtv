@@ -2374,14 +2374,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 bool foundgpudecoder = false;
 
 #ifdef USING_VDPAU
-                // HACK -- begin
-                // Force MPEG2 decoder on MPEG1 streams.
-                // Needed for broken transmitters which mark
-                // MPEG2 streams as MPEG1 streams, and should
-                // be harmless for unbroken ones.
-                if (enc->codec_id == AV_CODEC_ID_MPEG1VIDEO)
-                    enc->codec_id = AV_CODEC_ID_MPEG2VIDEO;
-                // HACK -- end
                 MythCodecID vdpau_mcid;
                 vdpau_mcid =
                     VideoOutputVDPAU::GetBestSupportedCodec(width, height, dec,
