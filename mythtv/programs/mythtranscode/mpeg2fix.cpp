@@ -1078,7 +1078,6 @@ bool MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
     const mpeg2_info_t *info;
     int outbuf_size;
     uint16_t intra_matrix[64] ATTR_ALIGN(16);
-    AVFrame *picture;
     AVCodecContext *c = NULL;
     AVCodec *out_codec;
     int64_t savedPts = pkt->pts; // save the original pts
