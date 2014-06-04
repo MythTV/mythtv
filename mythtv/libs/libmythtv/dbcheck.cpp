@@ -2693,6 +2693,17 @@ NULL
             return false;
     }
 
+    if (dbver == "1325")
+    {
+        const char *updates[] = {
+            "ALTER TABLE recorded ADD inputname VARCHAR(32);",
+            NULL
+        };
+
+        if (!performActualUpdate(&updates[0], "1326", dbver))
+            return false;
+    }
+
     return true;
 }
 

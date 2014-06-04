@@ -664,6 +664,7 @@ void ProgDetails::loadPage(void)
     addItem("FINDID", tr("Find ID"), s);
 
     QString recordingHost;
+    QString recordingInput;
     QString recordedFilename;
     QString recordedFileSize;
     QString recordingGroup;
@@ -671,9 +672,11 @@ void ProgDetails::loadPage(void)
     QString playbackGroup;
     QString recordingProfile;
 
+    recordingHost = m_progInfo.GetHostname();
+    recordingInput = m_progInfo.QueryInputDisplayName();
+
     if (recorded)
     {
-        recordingHost = m_progInfo.GetHostname();
         recordedFilename = m_progInfo.GetBasename();
         recordedFileSize = QString("%1 ")
             .arg(m_progInfo.GetFilesize()/((double)(1<<30)),0,'f',2);
@@ -698,6 +701,7 @@ void ProgDetails::loadPage(void)
         recordingProfile =  record->m_recProfile;
     }
     addItem("RECORDING_HOST", tr("Recording Host"), recordingHost);
+    addItem("RECORDING_INPUT", tr("Recording Input"), recordingInput);
     addItem("RECORDED_FILE_NAME", tr("Recorded File Name"), recordedFilename);
     addItem("RECORDED_FILE_SIZE", tr("Recorded File Size"), recordedFileSize);
     addItem("RECORDING_PROFILE", tr("Recording Profile"), recordingProfile);

@@ -553,7 +553,7 @@ class RecordedProgram( CMPRecord, DBDataWrite ):
                  'programid':'', 'manualid':0,           'generic':0,
                  'first':0,      'listingsource':0,      'last':0,
                  'audioprop':u'','videoprop':u'',        
-                 'subtitletypes':u''}
+                 'subtitletypes':u'', 'inputname':u''}
 
     def __str__(self):
         if self._wheredat is None:

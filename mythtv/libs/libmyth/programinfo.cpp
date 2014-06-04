@@ -4885,27 +4885,44 @@ bool ProgramInfo::QueryTuningInfo(QString &channum, QString &input) const
  */
 QString ProgramInfo::QueryInputDisplayName(void) const
 {
-    if (!inputid)
-        return QString::null;
+    QString result;
 
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT displayname, cardid, inputname "
-                  "FROM cardinput "
-                  "WHERE cardinputid = :INPUTID");
-    query.bindValue(":INPUTID", inputid);
-
-    if (!query.exec())
-        MythDB::DBError("ProgramInfo::GetInputDisplayName(uint)", query);
-    else if (query.next())
+    if (recordedid)
     {
-        QString result = query.value(0).toString();
-        if (result.isEmpty())
-            result = QString("%1: %2").arg(query.value(1).toInt())
-                                      .arg(query.value(2).toString());
-        return result;
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("SELECT inputname "
+                      "FROM recorded "
+                      "WHERE recordedid = :RECORDEDID");
+        query.bindValue(":RECORDEDID", recordedid);
+
+        if (!query.exec())
+            MythDB::DBError("ProgramInfo::GetInputDisplayName()", query);
+        else if (query.next())
+            result = query.value(0).toString();
     }
 
-    return QString::null;
+    if (result.isEmpty() && inputid)
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("SELECT displayname, cardid, inputname "
+                      "FROM cardinput "
+                      "WHERE cardinputid = :INPUTID");
+        query.bindValue(":INPUTID", inputid);
+
+        if (!query.exec())
+            MythDB::DBError("ProgramInfo::GetInputDisplayName()", query);
+        else if (query.next())
+        {
+            result = query.value(0).toString();
+            if (result.isEmpty())
+            {
+                result = QString("%1: %2").arg(query.value(1).toInt())
+                    .arg(query.value(2).toString());
+            }
+        }
+    }
+
+    return result;
 }
 
 static int init_tr(void)

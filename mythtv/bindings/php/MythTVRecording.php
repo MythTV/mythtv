@@ -45,6 +45,7 @@ class MythTVRecording {
     public  $storagegroup;
     public  $bookmarkupdate;
     public  $recordedid;
+    public  $inputname;
 
     public function __construct(&$MythTV, $ChanID = NULL, $StartTime = NULL) {
         $this->MythTV       = $MythTV;
