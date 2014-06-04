@@ -529,7 +529,7 @@ QStringList Guide::GetCategoryList( ) //int nStartIndex, int nCount)
     QStringList catList;
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare("SELECT DISTINCT category FROM program");
+    query.prepare("SELECT DISTINCT category FROM program ORDER BY category");
 
     if (!query.exec())
         return catList;
@@ -546,24 +546,26 @@ QStringList Guide::GetCategoryList( ) //int nStartIndex, int nCount)
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QStringList Guide::GetStoredFilterTerms( const QString& sType )
+QStringList Guide::GetStoredSearches( const QString& sType )
 {
-    QStringList catList;
+    QStringList keywordList;
     MSqlQuery query(MSqlQuery::InitCon());
 
     RecSearchType iType = searchTypeFromString(sType);
 
-    query.prepare("SELECT DISTINCT phrase FROM keyword WHERE type = :TYPE");
+    query.prepare("SELECT DISTINCT phrase FROM keyword "
+                  "WHERE searchtype = :TYPE "
+                  "ORDER BY phrase");
     query.bindValue(":TYPE", static_cast<int>(iType));
 
     if (!query.exec())
-        return catList;
+        return keywordList;
 
     while (query.next())
     {
-        catList << query.value(0).toString();
+        keywordList << query.value(0).toString();
     }
 
-    return catList;
+    return keywordList;
 }
 

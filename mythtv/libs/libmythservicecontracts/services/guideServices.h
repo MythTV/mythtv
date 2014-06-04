@@ -90,7 +90,7 @@ class SERVICE_PUBLIC GuideServices : public Service  //, public QScriptable ???
 
         virtual QStringList         GetCategoryList     ( ) = 0;
 
-        virtual QStringList         GetStoredFilterTerms( const QString &Type ) = 0;
+        virtual QStringList         GetStoredSearches   ( const QString &Type ) = 0;
 };
 
 #endif
