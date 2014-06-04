@@ -273,7 +273,7 @@ uint TVBrowseHelper::GetChanId(
 void TVBrowseHelper::GetNextProgram(
     BrowseDirection direction, InfoMap &infoMap) const
 {
-    if (!m_ctx->recorder)
+    if (!m_ctx || !m_ctx->recorder)
         return;
 
     QString title, subtitle, desc, category, endtime, callsign, iconpath;
