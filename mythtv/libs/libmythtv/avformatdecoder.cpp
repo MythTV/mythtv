@@ -1530,13 +1530,10 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     AVCodec *codec = avcodec_find_decoder(enc->codec_id);
 
 #ifdef USING_VDPAU
-    // When using non-nvidia vdpau driver or nvidia with a format
-    // other than mpeg, use older FFmpeg API
+    // When using non-nvidia vdpau driver, use older FFmpeg API
     // which requires to use an explicit vdpau capable codec
     if (codec_is_vdpau(video_codec_id) && !CODEC_IS_VDPAU(codec) &&
-        !(VideoOutputVDPAU::IsNVIDIA() &&
-          QString(ic->iformat->name).contains("mpeg") &&
-          gCoreContext->GetNumSetting("vdpauhwaccel", 1)))
+        !VideoOutputVDPAU::IsNVIDIA())
     {
         codec = find_vdpau_decoder(codec, enc->codec_id);
     }
@@ -2480,9 +2477,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
 #ifdef USING_VDPAU
             if (codec_is_vdpau(video_codec_id) && !CODEC_IS_VDPAU(codec) &&
-                !(VideoOutputVDPAU::IsNVIDIA() &&
-                  QString(ic->iformat->name).contains("mpeg") &&
-                  gCoreContext->GetNumSetting("vdpauhwaccel", 1)))
+                !VideoOutputVDPAU::IsNVIDIA())
             {
                 codec = find_vdpau_decoder(codec, enc->codec_id);
             }
@@ -2862,11 +2857,10 @@ int get_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic)
 
     struct vdpau_render_state *render = (struct vdpau_render_state *)frame->buf;
     render->state |= FF_VDPAU_STATE_USED_FOR_REFERENCE;
+    pic->data[3] = (uint8_t*)(uintptr_t)render->surface;
     static uint8_t *dummy[1] = { 0 };
-    if (nd->GetPlayer() && (c->pix_fmt == AV_PIX_FMT_VDPAU))
+    if (nd->GetPlayer())
     {
-        // Using hwaccel API
-        pic->data[3] = (uint8_t*)(uintptr_t)render->surface;
         c->hwaccel_context = nd->GetPlayer()->GetDecoderContext(NULL, dummy[0]);
     }
 
