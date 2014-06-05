@@ -583,6 +583,8 @@ void VideoOutputVDPAU::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
     if (!m_checked_surface_ownership)
         ClaimVideoSurfaces();
 
+    bool hwaccel = frame->pix_fmt == (int)AV_PIX_FMT_VDPAU;
+
     struct vdpau_render_state *render = (struct vdpau_render_state *)frame->buf;
     if (!render)
     {
@@ -603,7 +605,7 @@ void VideoOutputVDPAU::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
         uint max_refs = MIN_REFERENCE_FRAMES;
         if (video_codec_id == kCodec_H264_VDPAU)
         {
-            max_refs = IsNVIDIA() ?
+            max_refs = hwaccel ?
                 m_context.info.h264.num_ref_frames :
                 render->info.h264.num_ref_frames;
             if (max_refs < 1 || max_refs > MAX_REFERENCE_FRAMES)
@@ -700,7 +702,7 @@ void VideoOutputVDPAU::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
         return;
     }
 
-    m_render->Decode(m_decoder, render, IsNVIDIA() ? &m_context : NULL);
+    m_render->Decode(m_decoder, render, hwaccel ? &m_context : NULL);
 }
 
 void VideoOutputVDPAU::Show(FrameScanType scan)
