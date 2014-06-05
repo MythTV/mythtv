@@ -525,7 +525,7 @@ int PrivateDecoderCrystalHD::GetFrame(AVStream *stream,
     if (!available)
         return result;
 
-    if (avctx->get_buffer(avctx, picture) < 0)
+    if (avctx->get_buffer2(avctx, picture, 0) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("%1 decoded frames available but no video buffers.")

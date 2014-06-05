@@ -3682,7 +3682,9 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
 
     m_parent->ReleaseNextVideoFrame(picframe, temppts);
     if (private_dec)
-        context->release_buffer(context, mpa_pic);
+    {
+        av_frame_unref(mpa_pic);
+    }
 
     decoded_video_frame = picframe;
     gotVideoFrame = 1;

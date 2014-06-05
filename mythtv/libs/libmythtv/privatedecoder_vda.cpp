@@ -645,7 +645,7 @@ int  PrivateDecoderVDA::GetFrame(AVStream *stream,
     VDAFrame vdaframe = m_decoded_frames.takeLast();
     m_frame_lock.unlock();
 
-    if (avctx->get_buffer(avctx, picture) < 0)
+    if (avctx->get_buffer2(avctx, picture, 0) < 0)
         return -1;
 
     picture->reordered_opaque = vdaframe.pts;
