@@ -219,13 +219,13 @@ DTC::ProgramList* Guide::GetProgramList(int              nStartIndex,
     if (!rawStartTime.isNull() && !rawStartTime.isValid())
         throw( "StartTime is invalid" );
 
-    if (!rawStartTime.isNull() && !rawEndTime.isValid())
+    if (!rawEndTime.isNull() && !rawEndTime.isValid())
         throw( "EndTime is invalid" );
 
     QDateTime dtStartTime = rawStartTime;
     QDateTime dtEndTime = rawEndTime;
 
-    if (dtEndTime < dtStartTime)
+    if (!rawEndTime.isNull() && dtEndTime < dtStartTime)
         throw( "EndTime is before StartTime");
 
     MSqlQuery query(MSqlQuery::InitCon());
