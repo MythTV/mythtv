@@ -155,18 +155,22 @@ static float get_aspect(H264Parser &p)
 }
 
 
-int  get_avf_buffer(struct AVCodecContext *c, AVFrame *pic);
-void release_avf_buffer(struct AVCodecContext *c, AVFrame *pic);
+int  get_avf_buffer(struct AVCodecContext *c, AVFrame *pic, int flase);
+void release_avf_buffer(void *opaque, uint8_t *data);
 #ifdef USING_VDPAU
-int  get_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic);
-void release_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic);
+int  get_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic, int flags);
+void release_avf_buffer_vdpau(void *opaque, uint8_t *data);
 int render_wrapper_vdpau(struct AVCodecContext *s, AVFrame *src,
                          const VdpPictureInfo *info,
                          uint32_t count,
                          const VdpBitstreamBuffer *buffers);
 #endif
-int  get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic);
-int  get_avf_buffer_vaapi(struct AVCodecContext *c, AVFrame *pic);
+#ifdef USING_DXVA2
+int  get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic, int flags);
+#endif
+#ifdef USING_VAAPI
+int  get_avf_buffer_vaapi(struct AVCodecContext *c, AVFrame *pic, int flags);
+#endif
 
 static int determinable_frame_size(struct AVCodecContext *avctx)
 {
@@ -1413,6 +1417,7 @@ static enum PixelFormat get_format_vdpau(struct AVCodecContext *avctx,
 }
 #endif
 
+#ifdef USING_DXVA2
 // Declared separately to allow attribute
 static enum PixelFormat get_format_dxva2(struct AVCodecContext *,
                                          const enum PixelFormat *) MUNUSED;
@@ -1428,7 +1433,9 @@ enum PixelFormat get_format_dxva2(struct AVCodecContext *avctx,
             break;
     return fmt[i];
 }
+#endif
 
+#ifdef USING_VAAPI
 static bool IS_VAAPI_PIX_FMT(enum PixelFormat fmt)
 {
     return fmt == PIX_FMT_VAAPI_MOCO ||
@@ -1451,6 +1458,7 @@ enum PixelFormat get_format_vaapi(struct AVCodecContext *avctx,
             break;
     return fmt[i];
 }
+#endif
 
 static bool IS_DR1_PIX_FMT(const enum PixelFormat fmt)
 {
@@ -1477,9 +1485,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         directrendering = false;
 
     enc->opaque = (void *)this;
-    enc->get_buffer = get_avf_buffer;
-    enc->release_buffer = release_avf_buffer;
-    enc->draw_horiz_band = NULL;
+    enc->get_buffer2 = get_avf_buffer;
     enc->slice_flags = 0;
 
     enc->err_recognition = AV_EF_COMPLIANT;
@@ -1509,27 +1515,30 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
 #ifdef USING_VDPAU
     if (codec_is_vdpau(video_codec_id))
     {
-        enc->get_buffer      = get_avf_buffer_vdpau;
+        enc->get_buffer2     = get_avf_buffer_vdpau;
         enc->get_format      = get_format_vdpau;
-        enc->release_buffer  = release_avf_buffer_vdpau;
         enc->slice_flags     = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
     }
     else
 #endif
-        if (CODEC_IS_DXVA2(codec, enc))
+#ifdef USING_DXVA2
+    if (CODEC_IS_DXVA2(codec, enc))
     {
-        enc->get_buffer      = get_avf_buffer_dxva2;
+        enc->get_buffer2     = get_avf_buffer_dxva2;
         enc->get_format      = get_format_dxva2;
-        enc->release_buffer  = release_avf_buffer;
     }
-    else if (CODEC_IS_VAAPI(codec, enc))
+    else
+#endif
+#ifdef USING_VAAPI
+    if (CODEC_IS_VAAPI(codec, enc))
     {
-        enc->get_buffer      = get_avf_buffer_vaapi;
+        enc->get_buffer2     = get_avf_buffer_vaapi;
         enc->get_format      = get_format_vaapi;
-        enc->release_buffer  = release_avf_buffer;
         enc->slice_flags     = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
     }
-    else if (codec && codec->capabilities & CODEC_CAP_DR1)
+    else
+#endif
+    if (codec && codec->capabilities & CODEC_CAP_DR1)
     {
         enc->flags          |= CODEC_FLAG_EMU_EDGE;
     }
@@ -2698,36 +2707,6 @@ void AvFormatDecoder::SetupAudioStreamSubIndexes(int streamIndex)
     tracks[kTrackTypeAudio].erase(next);
 }
 
-int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
-{
-    AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
-
-    if (!IS_DR1_PIX_FMT(c->pix_fmt))
-    {
-        nd->directrendering = false;
-        return avcodec_default_get_buffer(c, pic);
-    }
-    nd->directrendering = true;
-
-    VideoFrame *frame = nd->GetPlayer()->GetNextVideoFrame();
-
-    if (!frame)
-        return -1;
-
-    for (int i = 0; i < 3; i++)
-    {
-        pic->data[i]     = frame->buf + frame->offsets[i];
-        pic->linesize[i] = frame->pitches[i];
-    }
-
-    pic->opaque = frame;
-    pic->type = FF_BUFFER_TYPE_USER;
-
-    pic->reordered_opaque = c->reordered_opaque;
-
-    return 0;
-}
-
 /** \brief remove audio streams from the context
  * used by dvd code during title transitions to remove
  * stale audio streams
@@ -2751,47 +2730,67 @@ void AvFormatDecoder::RemoveAudioStreams()
     }
 }
 
-void release_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
+int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic, int flags)
 {
-    (void)c;
+    AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
 
-    if (pic->type == FF_BUFFER_TYPE_INTERNAL)
+    if (!IS_DR1_PIX_FMT(c->pix_fmt))
     {
-        avcodec_default_release_buffer(c, pic);
-        return;
+        nd->directrendering = false;
+        return avcodec_default_get_buffer2(c, pic, flags);
+    }
+    nd->directrendering = true;
+
+    VideoFrame *frame = nd->GetPlayer()->GetNextVideoFrame();
+
+    if (!frame)
+        return -1;
+
+    for (int i = 0; i < 3; i++)
+    {
+        pic->data[i]     = frame->buf + frame->offsets[i];
+        pic->linesize[i] = frame->pitches[i];
     }
 
-    AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
+    pic->opaque = frame;
+    pic->reordered_opaque = c->reordered_opaque;
+
+    // Set release method
+    AVBufferRef *buffer =
+        av_buffer_create((uint8_t*)frame, 0, release_avf_buffer, nd, 0);
+    pic->buf[0] = buffer;
+
+    return 0;
+}
+
+void release_avf_buffer(void *opaque, uint8_t *data)
+{
+    AvFormatDecoder *nd = (AvFormatDecoder *)opaque;
+    VideoFrame *frame   = (VideoFrame*)data;
+
     if (nd && nd->GetPlayer())
-        nd->GetPlayer()->DeLimboFrame((VideoFrame*)pic->opaque);
-
-    assert(pic->type == FF_BUFFER_TYPE_USER);
-
-    for (uint i = 0; i < 4; i++)
-        pic->data[i] = NULL;
+        nd->GetPlayer()->DeLimboFrame(frame);
 }
 
 #ifdef USING_VDPAU
-int get_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic)
+int get_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic, int flags)
 {
     AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
-    VideoFrame *frame = nd->GetPlayer()->GetNextVideoFrame();
-
-    pic->data[0] = frame->buf;
-    pic->data[1] = pic->data[2] = NULL;
-
-    pic->linesize[0] = 0;
-    pic->linesize[1] = 0;
-    pic->linesize[2] = 0;
-
-    pic->opaque = frame;
-    pic->type = FF_BUFFER_TYPE_USER;
-
-    frame->pix_fmt = c->pix_fmt;
+    VideoFrame *frame   = nd->GetPlayer()->GetNextVideoFrame();
 
     struct vdpau_render_state *render = (struct vdpau_render_state *)frame->buf;
     render->state |= FF_VDPAU_STATE_USED_FOR_REFERENCE;
-    pic->data[3] = (uint8_t*)(uintptr_t)render->surface;
+
+    for (int i = 0; i < 4; i++)
+    {
+        pic->data[i]     = NULL;
+        pic->linesize[i] = 0;
+    }
+    pic->opaque     = frame;
+    pic->data[3]    = (uint8_t*)(uintptr_t)render->surface;
+    frame->pix_fmt  = c->pix_fmt;
+    pic->reordered_opaque = c->reordered_opaque;
+
     static uint8_t *dummy[1] = { 0 };
     if (nd->GetPlayer())
     {
@@ -2799,24 +2798,24 @@ int get_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic)
         ((AVVDPAUContext*)(c->hwaccel_context))->render2 = render_wrapper_vdpau;
     }
 
-    pic->reordered_opaque = c->reordered_opaque;
+    // Set release method
+    AVBufferRef *buffer =
+        av_buffer_create((uint8_t*)frame, 0, release_avf_buffer_vdpau, nd, 0);
+    pic->buf[0] = buffer;
 
     return 0;
 }
 
-void release_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic)
+void release_avf_buffer_vdpau(void *opaque, uint8_t *data)
 {
-    assert(pic->type == FF_BUFFER_TYPE_USER);
+    AvFormatDecoder *nd = (AvFormatDecoder *)opaque;
+    VideoFrame *frame   = (VideoFrame*)data;
 
-    struct vdpau_render_state *render = (struct vdpau_render_state *)pic->data[0];
+    struct vdpau_render_state *render = (struct vdpau_render_state *)frame->buf;
     render->state &= ~FF_VDPAU_STATE_USED_FOR_REFERENCE;
 
-    AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
     if (nd && nd->GetPlayer())
-        nd->GetPlayer()->DeLimboFrame((VideoFrame*)pic->opaque);
-
-    for (uint i = 0; i < 4; i++)
-        pic->data[i] = NULL;
+        nd->GetPlayer()->DeLimboFrame(frame);
 }
 
 int render_wrapper_vdpau(struct AVCodecContext *s, AVFrame *src,
@@ -2853,21 +2852,21 @@ int render_wrapper_vdpau(struct AVCodecContext *s, AVFrame *src,
 }
 #endif // USING_VDPAU
 
-int get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic)
+#ifdef USING_DXVA2
+int get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic, int flags)
 {
     AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
     VideoFrame *frame = nd->GetPlayer()->GetNextVideoFrame();
+
     for (int i = 0; i < 4; i++)
     {
         pic->data[i]     = NULL;
         pic->linesize[i] = 0;
     }
-    pic->reordered_opaque = c->reordered_opaque;
     pic->opaque      = frame;
-    pic->type        = FF_BUFFER_TYPE_USER;
     frame->pix_fmt   = c->pix_fmt;
+    pic->reordered_opaque = c->reordered_opaque;
 
-#ifdef USING_DXVA2
     if (nd->GetPlayer())
     {
         static uint8_t *dummy[1] = { 0 };
@@ -2876,35 +2875,44 @@ int get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic)
         pic->data[0] = (uint8_t*)frame->buf;
         pic->data[3] = (uint8_t*)frame->buf;
     }
-#endif
+
+    // Set release method
+    AVBufferRef *buffer =
+        av_buffer_create((uint8_t*)frame, 0, release_avf_buffer, nd, 0);
+    pic->buf[0] = buffer;
 
     return 0;
 }
+#endif
 
-int get_avf_buffer_vaapi(struct AVCodecContext *c, AVFrame *pic)
+#ifdef USING_VAAPI
+int get_avf_buffer_vaapi(struct AVCodecContext *c, AVFrame *pic, int flags)
 {
     AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
     VideoFrame *frame = nd->GetPlayer()->GetNextVideoFrame();
 
-    pic->data[0]     = frame->buf;
-    pic->data[1]     = NULL;
-    pic->data[2]     = NULL;
-    pic->data[3]     = NULL;
-    pic->linesize[0] = 0;
-    pic->linesize[1] = 0;
-    pic->linesize[2] = 0;
-    pic->linesize[3] = 0;
+    for (int i = 0; i < 4; i++)
+    {
+        pic->data[i]     = NULL;
+        pic->linesize[i] = 0;
+    }
     pic->opaque      = frame;
-    pic->type        = FF_BUFFER_TYPE_USER;
     frame->pix_fmt   = c->pix_fmt;
 
-#ifdef USING_VAAPI
     if (nd->GetPlayer())
-        c->hwaccel_context = (vaapi_context*)nd->GetPlayer()->GetDecoderContext(frame->buf, pic->data[3]);
-#endif
+    {
+        c->hwaccel_context =
+            (vaapi_context*)nd->GetPlayer()->GetDecoderContext(frame->buf, pic->data[3]);
+    }
+
+    // Set release method
+    AVBufferRef *buffer =
+        av_buffer_create((uint8_t*)frame, 0, release_avf_buffer, nd, 0);
+    pic->buf[0] = buffer;
 
     return 0;
 }
+#endif
 
 void AvFormatDecoder::DecodeDTVCC(const uint8_t *buf, uint len, bool scte)
 {

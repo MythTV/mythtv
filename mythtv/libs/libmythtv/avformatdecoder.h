@@ -204,8 +204,9 @@ class AvFormatDecoder : public DecoderBase
                        enum AVCodecID         codecId = AV_CODEC_ID_NONE,
                        int                    profile = -1);
 
-    friend int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic);
-    friend void release_avf_buffer(struct AVCodecContext *c, AVFrame *pic);
+    friend int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic,
+                              int flags);
+    friend void release_avf_buffer(void *opaque, uint8_t *data);
 
     friend int open_avf(URLContext *h, const char *filename, int flags);
     friend int read_avf(URLContext *h, uint8_t *buf, int buf_size);
