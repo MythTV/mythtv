@@ -29,7 +29,7 @@ VideoOutputNullVDPAU::VideoOutputNullVDPAU()
     m_checked_surface_ownership(false), m_shadowBuffers(NULL),
     m_surfaceSize(QSize(0,0))
 {
-    m_context.bitstream_buffers_allocated = 0;
+    memset(&m_context, 0, sizeof(AVVDPAUContext));
 }
 
 VideoOutputNullVDPAU::~VideoOutputNullVDPAU()
@@ -74,13 +74,6 @@ bool VideoOutputNullVDPAU::InitRender(void)
 {
     QMutexLocker locker(&m_lock);
 
-    if (m_context.bitstream_buffers_allocated)
-    {
-        av_freep(&m_context.bitstream_buffers);
-    }
-    memset(&m_context, 0, sizeof(AVVDPAUContext));
-    m_context.render = Render;
-
     m_render = new MythRenderVDPAU();
     if (m_render->CreateDecodeOnly())
         return true;
@@ -96,12 +89,6 @@ void VideoOutputNullVDPAU::DeleteRender(void)
         if (m_decoder)
             m_render->DestroyDecoder(m_decoder);
         m_render->DecrRef();
-    }
-
-    if (m_context.bitstream_buffers_allocated)
-    {
-        av_freep(&m_context.bitstream_buffers);
-        m_context.bitstream_buffers_allocated = 0;
     }
 
     m_decoder = 0;
@@ -266,13 +253,9 @@ void VideoOutputNullVDPAU::DrawSlice(VideoFrame *frame, int x, int y, int w, int
     if (!m_checked_surface_ownership)
         ClaimVideoSurfaces();
 
-    struct vdpau_render_state *render = (struct vdpau_render_state *)frame->buf;
-    if (!render)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "No video surface to decode to.");
-        errorState = kError_Unknown;
-        return;
-    }
+    struct vdpau_render_state *render =
+        (struct vdpau_render_state *)frame->priv[0];
+    const VdpPictureInfo *info = (const VdpPictureInfo *)frame->priv[1];
 
     if (frame->pix_fmt != m_pix_fmt)
     {
@@ -286,9 +269,7 @@ void VideoOutputNullVDPAU::DrawSlice(VideoFrame *frame, int x, int y, int w, int
         uint max_refs = MIN_REFERENCE_FRAMES;
         if (video_codec_id == kCodec_H264_VDPAU)
         {
-            max_refs = m_render->gVDPAUNVIDIA ?
-                m_context.info.h264.num_ref_frames :
-                render->info.h264.num_ref_frames;
+            max_refs = ((VdpPictureInfoH264*)info)->num_ref_frames;
             if (max_refs < 1 || max_refs > MAX_REFERENCE_FRAMES)
             {
                 uint32_t round_width  = (frame->width + 15) & ~15;
@@ -389,8 +370,7 @@ void VideoOutputNullVDPAU::DrawSlice(VideoFrame *frame, int x, int y, int w, int
         return;
     }
 
-    m_render->Decode(m_decoder, render,
-                     m_render->gVDPAUNVIDIA ? &m_context : NULL);
+    m_render->Decode(m_decoder, render, info);
 }
 
 void VideoOutputNullVDPAU::ClearAfterSeek(void)
@@ -635,12 +615,4 @@ bool VideoOutputNullVDPAU::BufferSizeCheck(void)
 void* VideoOutputNullVDPAU::GetDecoderContext(unsigned char* buf, uint8_t*& id)
 {
     return &m_context;
-}
-
-VdpStatus VideoOutputNullVDPAU::Render(VdpDecoder decoder, VdpVideoSurface target,
-                                       VdpPictureInfo const *picture_info,
-                                       uint32_t bitstream_buffer_count,
-                                       VdpBitstreamBuffer const *bitstream_buffers)
-{
-    return VDP_STATUS_OK;
 }

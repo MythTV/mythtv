@@ -136,8 +136,9 @@ class MUI_PUBLIC MythRenderVDPAU : public MythRender
     void  ClearVideoSurface(uint id);
     void  ChangeVideoSurfaceOwner(uint id);
 
+    void  Decode(uint id, struct vdpau_render_state *render);
     void  Decode(uint id, struct vdpau_render_state *render,
-                 AVVDPAUContext *context);
+                 const VdpPictureInfo *info);
     void  SetVideoFlip(void) { m_flipFrames = true; }
 
   private:

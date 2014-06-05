@@ -1530,8 +1530,13 @@ void MythRenderVDPAU::ChangeVideoSurfaceOwner(uint id)
     m_videoSurfaces[id].m_owner = QThread::currentThread();
 }
 
+void MythRenderVDPAU::Decode(uint id, struct vdpau_render_state *render)
+{
+    Decode(id, render, (VdpPictureInfo const *)&render->info);
+}
+
 void MythRenderVDPAU::Decode(uint id, struct vdpau_render_state *render,
-                             AVVDPAUContext *context)
+                             const VdpPictureInfo *info)
 {
     CHECK_VIDEO_SURFACES()
 
@@ -1544,20 +1549,9 @@ void MythRenderVDPAU::Decode(uint id, struct vdpau_render_state *render,
 
     INIT_ST
 
-    if (context)
-    {
-        vdp_st = vdp_decoder_render(m_decoders[id].m_id, render->surface,
-                                    (VdpPictureInfo const *)&(context->info),
-                                    context->bitstream_buffers_used,
-                                    context->bitstream_buffers);
-    }
-    else
-    {
-        vdp_st = vdp_decoder_render(m_decoders[id].m_id, render->surface,
-                                    (VdpPictureInfo const *)&(render->info),
-                                    render->bitstream_buffers_used,
-                                    render->bitstream_buffers);
-    }
+    vdp_st = vdp_decoder_render(m_decoders[id].m_id, render->surface, info,
+                                render->bitstream_buffers_used,
+                                render->bitstream_buffers);
 
     CHECK_ST
 }

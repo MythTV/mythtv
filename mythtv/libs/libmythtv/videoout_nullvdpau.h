@@ -71,10 +71,6 @@ class VideoOutputNullVDPAU : public VideoOutput
                                     const QString &name) { return false; }
     virtual MythPainter *GetOSDPainter(void) { return NULL; }
     virtual void DrawSlice(VideoFrame *frame, int x, int y, int w, int h);
-    static VdpStatus Render(VdpDecoder decoder, VdpVideoSurface target,
-                            VdpPictureInfo const *picture_info,
-                            uint32_t bitstream_buffer_count,
-                            VdpBitstreamBuffer const *bitstream_buffers);
 
     virtual VideoFrame *GetLastDecodedFrame(void);
     virtual VideoFrame *GetLastShownFrame(void);
