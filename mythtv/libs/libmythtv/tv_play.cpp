@@ -577,6 +577,8 @@ void TV::InitKeys(void)
             "Change Recording Group"), "");
     REG_KEY("TV Frontend", "CHANGEGROUPVIEW", QT_TRANSLATE_NOOP("MythControls",
             "Change Group View"), "");
+    REG_KEY("TV Frontend", ACTION_LISTRECORDEDEPISODES, QT_TRANSLATE_NOOP("MythControls",
+            "List recorded episodes"), "");
 
     REG_KEY("TV Playback", "BACK", QT_TRANSLATE_NOOP("MythControls",
             "Exit or return to DVD menu"), "Esc");

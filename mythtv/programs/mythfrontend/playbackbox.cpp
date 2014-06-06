@@ -3157,6 +3157,9 @@ void PlaybackBox::ShowActionPopup(const ProgramInfo &pginfo)
 
         m_popupMenu->AddItem(tr("Recording Options"), NULL, createRecordingMenu());
 
+        if (m_groupList->GetItemPos(m_groupList->GetItemCurrent()) == 0)
+            m_popupMenu->AddItem(tr("List Recorded Episodes"), SLOT(ShowRecordedEpisodes()));
+
         m_popupMenu->AddItem(tr("Delete"), SLOT(askDelete()));
 
         DisplayPopupMenu();
@@ -3209,6 +3212,9 @@ void PlaybackBox::ShowActionPopup(const ProgramInfo &pginfo)
     m_popupMenu->AddItem(tr("Storage Options"), NULL, createStorageMenu());
     m_popupMenu->AddItem(tr("Recording Options"), NULL, createRecordingMenu());
     m_popupMenu->AddItem(tr("Job Options"), NULL, createJobMenu());
+
+    if (m_groupList->GetItemPos(m_groupList->GetItemCurrent()) == 0)
+        m_popupMenu->AddItem(tr("List Recorded Episodes"), SLOT(ShowRecordedEpisodes()));
 
     if (!sameProgram)
     {
@@ -3507,6 +3513,22 @@ void PlaybackBox::Delete(DeleteFlags flags)
         MythEvent *e = new MythEvent("DELETE_FAILURES", m_delList);
         m_delList.clear();
         QCoreApplication::postEvent(this, e);
+    }
+}
+
+void PlaybackBox::ShowRecordedEpisodes()
+{
+    ProgramInfo *pginfo = CurrentItem();
+    if (pginfo) {
+        QString title = pginfo->GetTitle().toLower();
+        MythUIButtonListItem* group = m_groupList->GetItemByData(qVariantFromValue(title));
+        if (group)
+        {
+            m_groupList->SetItemCurrent(group);
+            // set focus back to previous item
+            MythUIButtonListItem *previousItem = m_recordingList->GetItemByData(qVariantFromValue(pginfo));
+            m_recordingList->SetItemCurrent(previousItem);
+        }
     }
 }
 
@@ -3877,6 +3899,24 @@ bool PlaybackBox::keyPressEvent(QKeyEvent *event)
 
             if (!nextGroup.isEmpty())
                 displayRecGroup(nextGroup);
+        }
+        else if (action == "NEXTVIEW")
+        {
+            int curpos = m_groupList->GetItemPos(m_groupList->GetItemCurrent());
+            if (++curpos >= m_groupList->GetCount())
+                curpos = 0;
+            m_groupList->SetItemCurrent(curpos);
+        }
+        else if (action == "PREVVIEW")
+        {
+            int curpos = m_groupList->GetItemPos(m_groupList->GetItemCurrent());
+            if (--curpos < 0)
+                curpos = m_groupList->GetCount() - 1;
+            m_groupList->SetItemCurrent(curpos);
+        }
+        else if (action == ACTION_LISTRECORDEDEPISODES)
+        {
+            ShowRecordedEpisodes();
         }
         else if (action == "CHANGERECGROUP")
             showGroupFilter();
