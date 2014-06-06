@@ -452,10 +452,7 @@ void ScheduleCommon::customEvent(QEvent *event)
             }
             else if (resulttext == tr("Stop this recording"))
             {
-                ProgramInfo pginfo(
-                    recInfo.GetChanID(), recInfo.GetRecordingStartTime());
-                if (pginfo.GetChanID())
-                    RemoteStopRecording(&pginfo);
+                RemoteStopRecording(&recInfo);
             }
             else if (resulttext == tr("Modify recording options") ||
                      resulttext == tr("Add override rule"))
