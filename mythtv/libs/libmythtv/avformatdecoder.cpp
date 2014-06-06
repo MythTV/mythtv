@@ -37,6 +37,7 @@ using namespace std;
 #include "mythuihelper.h"
 #include "DVD/dvdringbuffer.h"
 #include "Bluray/bdringbuffer.h"
+#include "mythavutil.h"
 
 #include "lcddevice.h"
 
@@ -3474,9 +3475,12 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     int ret = 0, gotpicture = 0;
     int64_t pts = 0;
     AVCodecContext *context = curstream->codec;
-    AVFrame mpa_pic;
-    avcodec_get_frame_defaults(&mpa_pic);
-    mpa_pic.reordered_opaque = AV_NOPTS_VALUE;
+    MythAVFrame mpa_pic;
+    if (!mpa_pic)
+    {
+        return false;
+    }
+    mpa_pic->reordered_opaque = AV_NOPTS_VALUE;
 
     if (pkt->pts != (int64_t)AV_NOPTS_VALUE)
         pts_detected = true;
@@ -3489,12 +3493,12 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
         // TODO disallow private decoders for dvd playback
         // N.B. we do not reparse the frame as it breaks playback for
         // everything but libmpeg2
-        ret = private_dec->GetFrame(curstream, &mpa_pic, &gotpicture, pkt);
+        ret = private_dec->GetFrame(curstream, mpa_pic, &gotpicture, pkt);
     }
     else
     {
         context->reordered_opaque = pkt->pts;
-        ret = avcodec_decode_video2(context, &mpa_pic, &gotpicture, pkt);
+        ret = avcodec_decode_video2(context, mpa_pic, &gotpicture, pkt);
     }
     avcodeclock->unlock();
 
@@ -3515,10 +3519,10 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
         faulty_dts += (pkt->dts <= last_dts_for_fault_detection);
         last_dts_for_fault_detection = pkt->dts;
     }
-    if (mpa_pic.reordered_opaque != (int64_t)AV_NOPTS_VALUE)
+    if (mpa_pic->reordered_opaque != (int64_t)AV_NOPTS_VALUE)
     {
-        faulty_pts += (mpa_pic.reordered_opaque <= last_pts_for_fault_detection);
-        last_pts_for_fault_detection = mpa_pic.reordered_opaque;
+        faulty_pts += (mpa_pic->reordered_opaque <= last_pts_for_fault_detection);
+        last_pts_for_fault_detection = mpa_pic->reordered_opaque;
         reordered_pts_detected = true;
     }
 
@@ -3541,15 +3545,15 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
         pts_selected = false;
     }
     else if (private_dec && private_dec->NeedsReorderedPTS() &&
-             mpa_pic.reordered_opaque != (int64_t)AV_NOPTS_VALUE)
+             mpa_pic->reordered_opaque != (int64_t)AV_NOPTS_VALUE)
     {
-        pts = mpa_pic.reordered_opaque;
+        pts = mpa_pic->reordered_opaque;
         pts_selected = true;
     }
     else if (faulty_pts <= faulty_dts && reordered_pts_detected)
     {
-        if (mpa_pic.reordered_opaque != (int64_t)AV_NOPTS_VALUE)
-            pts = mpa_pic.reordered_opaque;
+        if (mpa_pic->reordered_opaque != (int64_t)AV_NOPTS_VALUE)
+            pts = mpa_pic->reordered_opaque;
         pts_selected = true;
     }
     else if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
@@ -3560,13 +3564,13 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
 
     LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_DEBUG, LOC +
         QString("video packet timestamps reordered %1 pts %2 dts %3 (%4)")
-            .arg(mpa_pic.reordered_opaque).arg(pkt->pts).arg(pkt->dts)
+            .arg(mpa_pic->reordered_opaque).arg(pkt->pts).arg(pkt->dts)
             .arg((force_dts_timestamps) ? "dts forced" :
                  (pts_selected) ? "reordered" : "dts"));
 
-    mpa_pic.reordered_opaque = pts;
+    mpa_pic->reordered_opaque = pts;
 
-    ProcessVideoFrame(curstream, &mpa_pic);
+    ProcessVideoFrame(curstream, mpa_pic);
 
     return true;
 }
@@ -3681,10 +3685,6 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
     picframe->directrendering  = directrendering ? 1 : 0;
 
     m_parent->ReleaseNextVideoFrame(picframe, temppts);
-    if (private_dec)
-    {
-        av_frame_unref(mpa_pic);
-    }
 
     decoded_video_frame = picframe;
     gotVideoFrame = 1;
@@ -4742,14 +4742,18 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
     if (private_dec && private_dec->HasBufferedFrames() &&
        (selectedTrack[kTrackTypeVideo].av_stream_index > -1))
     {
+        int got_picture  = 0;
         AVStream *stream = ic->streams[selectedTrack[kTrackTypeVideo]
                                  .av_stream_index];
-        AVFrame mpa_pic;
-        avcodec_get_frame_defaults(&mpa_pic);
-        int got_picture = 0;
-        private_dec->GetFrame(stream, &mpa_pic, &got_picture, NULL);
+        MythAVFrame mpa_pic;
+        if (!mpa_pic)
+        {
+            return false;
+        }
+
+        private_dec->GetFrame(stream, mpa_pic, &got_picture, NULL);
         if (got_picture)
-            ProcessVideoFrame(stream, &mpa_pic);
+            ProcessVideoFrame(stream, mpa_pic);
     }
 
     while (!allowedquit)
