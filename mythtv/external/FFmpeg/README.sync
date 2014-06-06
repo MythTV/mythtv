@@ -15,7 +15,8 @@ git://source.ffmpeg.org/ffmpeg.git at SHA1 c9ea1f7f on July 16th, 2013 (jya) (re
 git://source.ffmpeg.org/ffmpeg.git at SHA1 875649bf on July 27th, 2013 (jya) (release/1.2 branch)
 git://source.ffmpeg.org/ffmpeg.git at SHA1 f9c87262 on August 12th, 2013 (jya) (release/1.2 branch)
 git://source.ffmpeg.org/ffmpeg.git at SHA1 3d79041f on May 4th, 2014 (jya) (release/1.2 branch, release 1.2.6))
-git://source.ffmpeg.org/ffmpeg.git at n2.2.2-30-gacafd18 on May 4th, 2014 (jya) (release/2.2 branch, release 2.2.2))
+git://source.ffmpeg.org/ffmpeg.git at n2.2.2-30-gacafd18 on May 30th, 2014 (jya) (release/2.2 branch, release 2.2.2))
+git://source.ffmpeg.org/ffmpeg.git at n2.2.3 on May 6th, 2014 (jya) (release/2.2 branch, release 2.2.3))
 
 List of files modified from original FFmpeg:
 Makefile
@@ -23,44 +24,45 @@ README.sync
 common.mak
 configure
 libavcodec/Makefile
-libavcodec/avcodec.h
-libavcodec/old_codec_ids.h
-libavcodec/dsputil.h
-libavcodec/dvbsub_parser.c
-libavcodec/dvbsubdec.c
+libavcodec/avcodec.h            // add subtitle support
+libavcodec/codec_desc.c         // add subtitle codec description
+libavcodec/dvbsubdec.c          // DVB subtitles fixes
+libavcodec/dvbsub_parser.c      // Fix for #5978
 libavcodec/dvdsubdec.c
 libavcodec/get_bits.h
 libavcodec/golomb.h
 libavcodec/h264_refs.c
 libavcodec/libavcodec.v
-libavcodec/mpeg12dec.c
-libavcodec/mpeg4videodec.c
+libavcodec/mpeg12dec.c          // CEA-708/608 support
+libavcodec/mpeg4videodec.c      // fixes for #3001 + fix for h263 frame rate
 libavcodec/mpeg4videoenc.c
-libavcodec/mpegaudio_parser.c
+libavcodec/mpegaudio_parser.c   // add support for dual language
+libavcodec/mpegaudio_template.c // small change to reduce verbosity
 libavcodec/mpegaudiodec.c
-libavcodec/mpegaudiodecheader.c
-libavcodec/mpegvideo.c
-libavcodec/mpegvideo.h
+libavcodec/mpegaudiodecheader.c // Add support for dual language detection
+libavcodec/mpegaudiodecheader.h
+libavcodec/mpegvideo.c          // CEA-708/608 support
+libavcodec/mpegvideo.h          // rename member as it cause compilation with C++,  CEA-708/608 support
 libavcodec/utils-mythtv.c <- new file
-libavcodec/pcm.c
-libavcodec/pgssubdec.c
+libavcodec/pcm.c                // Fix to allow playing stream marked with 0 channels
+libavcodec/pgssubdec.c          // support for forced display of PGS subtitle
 libavformat/Makefile
-libavformat/allformats.c
-libavformat/avformat.h
-libavformat/avidec.c   <-- to revisit
-libavformat/mov.c
-libavformat/mpeg.c
-libavformat/mpeg.h
+libavformat/allformats.c        // add MythTV mpegts demuxer
+libavformat/avformat.h          // extra field to all callbacks for stream change
+libavformat/mov.c               // Fix http streaming of iPhone videos (Fix from xbmc)
+libavformat/mpeg.c              // support for AAC/LATM, mpeg2vbi stream and stream change callback
+libavformat/mpeg.h              // AAC/LATM stream type definition
 libavformat/mpegts-mythtv.c  <- new file
 libavformat/mpegts-mythtv.h  <- new file
-libavformat/mpegts.c
+libavformat/mpegts.c            // rename some functions so they do not conflict with mythtv mpegts demuxer
 libavformat/mpegts.h
 libavformat/utils-mythtv.c  <- new file
-libavformat/utils.c
+libavformat/utils.c             // fix to make Myth mpegts demux higher priority than FFmpeg's own, some minor diff to prevent corner cases crash
 libavformat/rtpdec_mpegts.c <- header change
 libavformat/rtsp.c <- header change
 libavformat/wtvdec.c <- header change
 libavutil/bswap.h
+libavutil/frame.c               // CEA-708/608 AVFrame members addition
 libpostproc/Makefile
 libpostproc/postprocess.c
-library.mak
+library.mak                     // change so it doesn't install pkgconfig info

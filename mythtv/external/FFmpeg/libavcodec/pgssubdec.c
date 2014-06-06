@@ -53,7 +53,7 @@ typedef struct PGSSubPictureReference {
 typedef struct PGSSubPresentation {
     int                    id_number;
     int                    object_count;
-    int object_forced;
+    int                    object_forced;
     PGSSubPictureReference *objects;
     int64_t pts;
 } PGSSubPresentation;
