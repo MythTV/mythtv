@@ -16,6 +16,7 @@
 #include "myth_imgconvert.h"
 #include "mythlogging.h"
 #include "mythmainwindow.h"
+#include "mythavutil.h"
 
 static bool       ft_loaded = false;
 static FT_Library ft_library;
@@ -1803,7 +1804,7 @@ void MHIBitmap::CreateFromJPEG(const unsigned char *data, int length)
 void MHIBitmap::CreateFromMPEG(const unsigned char *data, int length)
 {
     AVCodecContext *c = NULL;
-    AVFrame *picture = NULL;
+    MythAVFrame picture;
     AVPacket pkt;
     uint8_t *buff = NULL;
     int gotPicture = 0, len;
@@ -1813,9 +1814,10 @@ void MHIBitmap::CreateFromMPEG(const unsigned char *data, int length)
     AVCodec *codec = avcodec_find_decoder(CODEC_ID_MPEG2VIDEO);
     if (!codec)
         return;
+    if (!picture)
+        return;
 
     c = avcodec_alloc_context3(NULL);
-    picture = av_frame_alloc();
 
     if (avcodec_open2(c, codec, NULL) < 0)
         goto Close;
@@ -1861,8 +1863,9 @@ void MHIBitmap::CreateFromMPEG(const unsigned char *data, int length)
         avpicture_fill(&retbuf, outputbuf, PIX_FMT_RGB24,
                        nContentWidth, nContentHeight);
 
+        AVFrame *tmp = picture;
         myth_sws_img_convert(
-            &retbuf, PIX_FMT_RGB24, (AVPicture*)picture, c->pix_fmt,
+            &retbuf, PIX_FMT_RGB24, (AVPicture*)tmp, c->pix_fmt,
                     nContentWidth, nContentHeight);
 
         uint8_t * buf = outputbuf;
@@ -1887,7 +1890,6 @@ Close:
     av_free_packet(&pkt);
     avcodec_close(c);
     av_free(c);
-    av_frame_free(&picture);
 }
 
 // Scale the bitmap.  Only used for image derived from MPEG I-frames.

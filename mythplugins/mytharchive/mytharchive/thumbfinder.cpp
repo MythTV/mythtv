@@ -643,7 +643,7 @@ bool ThumbFinder::initAVCodec(const QString &inFile)
     int bufflen = m_frameWidth * m_frameHeight * 4;
     m_outputbuf = new unsigned char[bufflen];
 
-    m_frame = avcodec_alloc_frame();
+    m_frame = av_frame_alloc();
 
     m_frameFile = getTempDirectory() + "work/frame.jpg";
 
@@ -847,6 +847,7 @@ bool ThumbFinder::getFrameImage(bool needKeyFrame, int64_t requiredPTS)
             if (m_firstIFramePTS == -1)
                 m_firstIFramePTS = pkt.dts;
 
+            av_frame_unref(m_frame);
             avcodec_decode_video2(m_codecCtx, m_frame, &frameFinished, &pkt);
 
             if (requiredPTS != -1 && pkt.dts != (int64_t)AV_NOPTS_VALUE && pkt.dts < requiredPTS)
@@ -899,7 +900,7 @@ void ThumbFinder::closeAVCodec()
         delete[] m_outputbuf;
 
     // free the frame
-    av_free(m_frame);
+    av_frame_free(&m_frame);
 
     // close the codec
     if (m_codecCtx)

@@ -253,7 +253,6 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
 
     AVCodec *mpa_vidcodec;
     AVCodecContext *mpa_vidctx;
-    AVFrame mpa_picture;
 
     int targetbitrate;
     int scalebitrate;
