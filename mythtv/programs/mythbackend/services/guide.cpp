@@ -230,24 +230,6 @@ DTC::ProgramList* Guide::GetProgramList(int              nStartIndex,
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    // ----------------------------------------------------------------------
-    // Check that the requested channel exists
-    // ----------------------------------------------------------------------
-    if (nChanId < 0)
-        nChanId = 0;
-
-//     if (nChanId > 0)
-//     {
-//         query.prepare( "SELECT chanid FROM channel WHERE chanid = :CHANID " );
-//
-//         query.bindValue(":CHANID", nChanId );
-//
-//         if (!query.exec())
-//             MythDB::DBError("Select ChanId", query);
-//
-//         if (!query.next())
-//             throw( "ChanId is invalid");
-//     }
 
     // ----------------------------------------------------------------------
     // Build SQL statement for Program Listing
@@ -273,6 +255,9 @@ DTC::ProgramList* Guide::GetProgramList(int              nStartIndex,
         sSQL = "WHERE ";
 
     sSQL +=    "visible != 0 AND program.manualid = 0 "; // Exclude programmes created purely for 'manual' recording schedules
+
+    if (nChanId < 0)
+        nChanId = 0;
 
     if (nChanId > 0)
     {
@@ -334,6 +319,12 @@ DTC::ProgramList* Guide::GetProgramList(int              nStartIndex,
     else
         sSQL += "ASC ";
 
+    if (nCount > 0)
+        sSQL += QString("LIMIT %1 ").arg(nCount);
+
+    if (nStartIndex > 0)
+        sSQL += QString("OFFSET %1 ").arg(nStartIndex);
+
     // ----------------------------------------------------------------------
     // Get all Pending Scheduled Programs
     // ----------------------------------------------------------------------
@@ -351,17 +342,16 @@ DTC::ProgramList* Guide::GetProgramList(int              nStartIndex,
 
     DTC::ProgramList *pPrograms = new DTC::ProgramList();
 
-    nStartIndex   = min( nStartIndex, (int)progList.size() );
-    nCount        = (nCount > 0) ? min( nCount, (int)progList.size() ) : progList.size();
-    int nEndIndex = min((nStartIndex + nCount), (int)progList.size() );
+    nCount        = (int)progList.size();
+    int nEndIndex = (int)progList.size();
 
-    for( int n = nStartIndex; n < nEndIndex; n++)
+    for( int n = 0; n < nEndIndex; n++)
     {
         ProgramInfo *pInfo = progList[ n ];
 
         DTC::Program *pProgram = pPrograms->AddNewProgram();
 
-        FillProgramInfo( pProgram, pInfo, true, bDetails, false ); // No cast info, loading this takes far too longs
+        FillProgramInfo( pProgram, pInfo, true, bDetails, false ); // No cast info, loading this takes far too long
     }
 
     // ----------------------------------------------------------------------
