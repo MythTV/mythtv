@@ -7,6 +7,7 @@
 #include "audiooutpututil.h"
 #include "audioconvert.h"
 #include "bswap.h"
+#include "libmythtv/mythavutil.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h"
@@ -243,13 +244,13 @@ int AudioOutputUtil::DecodeAudio(AVCodecContext *ctx,
                                  uint8_t *buffer, int &data_size,
                                  const AVPacket *pkt)
 {
-    AVFrame *frame;
+    MythAVFrame frame;
     int got_frame = 0;
     int ret;
     char error[AV_ERROR_MAX_STRING_SIZE];
 
     data_size = 0;
-    if (!(frame = av_frame_alloc()))
+    if (!frame)
     {
         return AVERROR(ENOMEM);
     }
@@ -261,7 +262,6 @@ int AudioOutputUtil::DecodeAudio(AVCodecContext *ctx,
             QString("audio decode error: %1 (%2)")
             .arg(av_make_error_string(error, sizeof(error), ret))
             .arg(got_frame));
-        av_frame_free(&frame);
         return ret;
     }
 
@@ -269,7 +269,6 @@ int AudioOutputUtil::DecodeAudio(AVCodecContext *ctx,
     {
         LOG(VB_AUDIO, LOG_DEBUG, LOC +
             QString("audio decode, no frame decoded (%1)").arg(ret));
-        av_frame_free(&frame);
         return ret;
     }
 
@@ -288,7 +287,6 @@ int AudioOutputUtil::DecodeAudio(AVCodecContext *ctx,
         // data is already compacted... simply copy it
         memcpy(buffer, frame->extended_data[0], data_size);
     }
-    av_frame_free(&frame);
 
     return ret;
 }

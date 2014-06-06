@@ -23,6 +23,7 @@ using namespace std;
 #include "myth_imgconvert.h"
 #include "programinfo.h"
 #include "audiooutpututil.h"
+#include "mythavutil.h"
 
 #include "minilzo.h"
 
@@ -47,7 +48,7 @@ NuppelDecoder::NuppelDecoder(MythPlayer *parent,
       disablevideo(false), totalLength(0), totalFrames(0), effdsp(0),
       directframe(NULL),            decoded_video_frame(NULL),
       mpa_vidcodec(0), mpa_vidctx(0), mpa_audcodec(0), mpa_audctx(0),
-      m_mpa_pic(NULL), directrendering(false),
+      directrendering(false),
       lastct('1'), strm_buf(0), strm(0), buf(0), buf2(0),
       videosizetotal(0), videoframesread(0), setreadahead(false)
 {
@@ -97,7 +98,6 @@ NuppelDecoder::~NuppelDecoder()
         delete [] strm_buf;
 
     av_freep(&m_audioSamples);
-    av_frame_free(&m_mpa_pic);
 
     while (!StoredData.empty())
     {
@@ -912,18 +912,9 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
         if (!mpa_vidcodec)
             InitAVCodecVideo(frameheader->comptype - '3');
 
-        if (!m_mpa_pic)
-        {
-            if (!(m_mpa_pic = av_frame_alloc()))
-            {
-                LOG(VB_GENERAL, LOG_ERR, "DecodeFrame: Out of memory");
-                return false;
-            }
-        }
-        else
-        {
-            av_frame_unref(m_mpa_pic);
-        }
+        MythAVFrame mpa_pic;
+        if (!mpa_pic)
+            return false;
         AVPacket pkt;
         av_init_packet(&pkt);
         pkt.data = lstrm;
@@ -933,7 +924,7 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
             QMutexLocker locker(avcodeclock);
             // if directrendering, writes into buf
             int gotpicture = 0;
-            int ret = avcodec_decode_video2(mpa_vidctx, m_mpa_pic, &gotpicture,
+            int ret = avcodec_decode_video2(mpa_vidctx, mpa_pic, &gotpicture,
                                             &pkt);
             directframe = NULL;
             if (ret < 0)
@@ -974,8 +965,9 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
         avpicture_fill(&tmppicture, outbuf, PIX_FMT_YUV420P, video_width,
                        video_height);
 
+        AVFrame *tmp = mpa_pic;
         myth_sws_img_convert(
-            &tmppicture, PIX_FMT_YUV420P, (AVPicture *)m_mpa_pic,
+            &tmppicture, PIX_FMT_YUV420P, (AVPicture *)tmp,
                     mpa_vidctx->pix_fmt, video_width, video_height);
     }
 
