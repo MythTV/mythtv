@@ -1998,7 +1998,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                         gCoreContext->GetBackendServerPort(hostname);
                 p->SetPathname(gCoreContext->GenMythURL(backendIpMap[hostname],
                                                         backendPortMap[hostname],
-                                                        hostname));
+                                                        p->GetBasename()));
             }
         }
 
