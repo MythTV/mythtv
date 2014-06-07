@@ -27,7 +27,6 @@ using namespace std;
 #include "exitcodes.h"
 #include "compat.h"
 
-#include <stdlib.h>
 #define SYSLOG_NAMES
 #ifndef _WIN32
 #include <syslog.h>
