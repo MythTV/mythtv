@@ -1080,17 +1080,13 @@ void MythMainWindow::Init(QString forcedpainter)
     if ((painter == AUTO_PAINTER && (!d->painter && !d->paintwin)) ||
         painter.contains(OPENGL_PAINTER))
     {
-        if (painter == OPENGL_PAINTER)
-            LOG(VB_GENERAL, LOG_INFO, "Trying the OpenGL painter");
-        else if (painter == OPENGL2_PAINTER)
-            LOG(VB_GENERAL, LOG_INFO, "Trying the OpenGL 2 painter");
-        d->painter = new MythOpenGLPainter();
         d->render = MythRenderOpenGL::Create(painter);
-        MythRenderOpenGL *gl = dynamic_cast<MythRenderOpenGL*>(d->render);
-        d->paintwin = new MythPainterWindowGL(this, d, gl);
-        QGLWidget *qgl = dynamic_cast<QGLWidget *>(d->paintwin);
-        if (qgl)
+        if (d->render)
         {
+            d->painter = new MythOpenGLPainter();
+            MythRenderOpenGL *gl = dynamic_cast<MythRenderOpenGL*>(d->render);
+            d->paintwin = new MythPainterWindowGL(this, d, gl);
+            QGLWidget *qgl = static_cast<QGLWidget*>(d->paintwin);
             bool teardown = false;
             if (!qgl->isValid())
             {

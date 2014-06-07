@@ -3,6 +3,7 @@
 using namespace std;
 
 #include "mythlogging.h"
+#include "mythuitype.h"
 #include "mythrender_opengl.h"
 #include "mythxdisplay.h"
 
@@ -84,17 +85,42 @@ MythRenderOpenGL* MythRenderOpenGL::Create(const QString &painter,
     if (setswapinterval)
         format.setSwapInterval(1);
 
+    // Check OpenGL version supported
+    QGLWidget *dummy = new QGLWidget;
+    dummy->makeCurrent();
+    QGLFormat qglFormat = dummy->format();
+    delete dummy;
+
 #ifdef USING_OPENGLES
+    if (!(qglFormat.openGLVersionFlags() & QGLFormat::OpenGL_ES_Version_2_0))
+    {
+        LOG(VB_GENERAL, LOG_WARNING,
+            "Using OpenGL ES 2.0 render, however OpenGL ES 2.0 "
+            "version not supported");
+    }
     if (device)
         return new MythRenderOpenGL2ES(format, device);
     return new MythRenderOpenGL2ES(format);
 #else
-    if (painter.contains("opengl2"))
+    if ((qglFormat.openGLVersionFlags() & QGLFormat::OpenGL_Version_2_0) &&
+        (painter.contains(OPENGL2_PAINTER) || painter.contains(AUTO_PAINTER) ||
+         painter.isEmpty()))
     {
+        LOG(VB_GENERAL, LOG_INFO, "Trying the OpenGL 2.0 render");
+        format.setVersion(2,0);
         if (device)
             return new MythRenderOpenGL2(format, device);
         return new MythRenderOpenGL2(format);
     }
+
+    if (!(qglFormat.openGLVersionFlags() & QGLFormat::OpenGL_Version_1_2))
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "OpenGL 1.2 not supported, get new hardware!");
+        return NULL;
+    }
+
+    LOG(VB_GENERAL, LOG_INFO, "Trying the OpenGL 1.2 render");
+    format.setVersion(1,3);
     if (device)
         return new MythRenderOpenGL1(format, device);
     return new MythRenderOpenGL1(format);
