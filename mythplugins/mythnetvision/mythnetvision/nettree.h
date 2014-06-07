@@ -1,6 +1,8 @@
 #ifndef NETTREE_H
 #define NETTREE_H
 
+#include "netbase.h"
+
 // libmythui
 #include <mythuibuttonlist.h>
 #include <mythuibuttontree.h>
@@ -36,9 +38,7 @@ enum NodeOrder {
     kOrderItem
 };
 
-class MythUIBusyDialog;
-
-class NetTree : public MythScreenType
+class NetTree : public NetBase
 {
   Q_OBJECT
 
@@ -51,14 +51,11 @@ class NetTree : public MythScreenType
 
     void populateResultList(ResultItem::resultList list);
 
-  public slots:
-
   protected:
-    void createBusyDialog(QString title);
+    virtual ResultItem *GetStreamItem();
 
   private:
     virtual void Load();
-    virtual void Init();
 
     void fillTree(void);
     void SetCurrentNode(MythGenericTree *node);
@@ -72,10 +69,6 @@ class NetTree : public MythScreenType
                           QStringList paths,
                           QString dirthumb,
                           QList<ResultItem*> videos);
-
-    void cleanCacheDir(void);
-
-    void initProgressDialog();
 
     MythGenericTree *AddDirNode(
                     MythGenericTree *where_to_add,
@@ -97,21 +90,7 @@ class NetTree : public MythScreenType
 
     MythUIText         *m_noSites;
 
-    MythUIImage        *m_thumbImage;
-
-    MythUIStateType    *m_downloadable;
-
-    MythUIBusyDialog   *m_busyPopup;
-
-    MythDialogBox        *m_menuPopup;
-    MythScreenStack      *m_popupStack;
-    MythUIProgressDialog *m_progressDialog;
-
-    MetadataImageDownload *m_imageDownload;
     GrabberDownloadThread *m_gdt;
-    QString               m_downloadFile;
-
-    GrabberScript::scriptList m_grabberList;
     RSSSite::rssList m_rssList;
 
     DialogType          m_type;
@@ -121,10 +100,6 @@ class NetTree : public MythScreenType
     bool                m_treeAutoUpdate;
 
   private slots:
-    void streamWebVideo(void);
-    void showWebVideo(void);
-    void doDownloadAndPlay(void);
-    void doPlayVideo(QString filename);
     void showMenu(void);
     MythMenu* createShowViewMenu(void);
     MythMenu* createShowManageMenu(void);
@@ -142,16 +117,12 @@ class NetTree : public MythScreenType
     void toggleRSSUpdates();
     void toggleTreeUpdates();
 
-    void slotDeleteVideo(void);
-    void doDeleteVideo(bool remove);
-
     void slotItemChanged();
 
     void doTreeRefresh();
     void TreeRefresh();
 
     void customEvent(QEvent *levent);
-    void DownloadVideo(QString url, QString dest);
 
   protected:
     static const QString RSSNode;

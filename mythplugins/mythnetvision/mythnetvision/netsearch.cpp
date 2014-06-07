@@ -16,10 +16,10 @@
 #include <remotefile.h>
 #include <netgrabbermanager.h>
 #include <netutils.h>
+#include <metadata/metadataimagedownload.h>
 #include <metadata/videoutils.h>
 #include <rssparse.h>
 #include <mythcoreutil.h>
-#include <mythdate.h>
 
 #include "netsearch.h"
 #include "netcommon.h"
@@ -31,24 +31,18 @@ using namespace std;
 // ---------------------------------------------------
 
 NetSearch::NetSearch(MythScreenStack *parent, const char *name)
-    : MythScreenType(parent, name),
+    : NetBase(parent, name),
       m_searchResultList(NULL),      m_siteList(NULL),
       m_search(NULL),                m_pageText(NULL),
-      m_noSites(NULL),               m_thumbImage(NULL),
-      m_downloadable(NULL),          m_progress(NULL),
-      m_busyPopup(NULL),             m_okPopup(NULL),
-      m_menuPopup(NULL),
-      m_popupStack(GetMythMainWindow()->GetStack("popup stack")),
-      m_progressDialog(NULL),        m_netSearch(NULL),
+      m_noSites(NULL),               m_progress(NULL),
+      m_okPopup(NULL),               m_netSearch(NULL),
+
       m_reply(NULL),                 m_download(new MythDownloadManager()),
-      m_imageDownload(new MetadataImageDownload(this)),
-      m_file(NULL),                  m_currentSearch(QString()),
-      m_currentGrabber(0),           m_currentCmd(QString()),
-      m_downloadFile(QString()),     m_pagenum(0),
+      m_currentSearch(QString()),    m_currentGrabber(0),
+      m_currentCmd(QString()),       m_pagenum(0),
       m_maxpage(0),                  m_playing(false),
       m_redirects(0),                m_mythXML(GetMythXMLURL())
 {
-    gCoreContext->addListener(this);
 }
 
 bool NetSearch::Create()
@@ -111,18 +105,8 @@ void NetSearch::Load()
     m_grabberList = findAllDBSearchGrabbers(VIDEO_FILE);
 }
 
-void NetSearch::Init()
-{
-    loadData();
-}
-
 NetSearch::~NetSearch()
 {
-    cleanCacheDir();
-
-    qDeleteAll(m_grabberList);
-    m_grabberList.clear();
-
     if (m_netSearch)
     {
         m_netSearch->disconnect();
@@ -130,21 +114,8 @@ NetSearch::~NetSearch()
         m_netSearch = NULL;
     }
 
-    if (m_download)
-    {
-        delete m_download;
-        m_download = NULL;
-    }
-
-    cleanThumbnailCacheDir();
-
-    if (m_imageDownload)
-    {
-        delete m_imageDownload;
-        m_imageDownload = NULL;
-    }
-
-    gCoreContext->removeListener(this);
+    delete m_download;
+    m_download = NULL;
 }
 
 void NetSearch::loadData(void)
@@ -188,25 +159,6 @@ bool NetSearch::keyPressEvent(QKeyEvent *event)
     return handled;
 }
 
-void NetSearch::createBusyDialog(QString title)
-{
-    if (m_busyPopup)
-        return;
-
-    QString message = title;
-
-    m_busyPopup = new MythUIBusyDialog(message, m_popupStack,
-            "mythvideobusydialog");
-
-    if (m_busyPopup->Create())
-        m_popupStack->AddScreen(m_busyPopup);
-    else
-    {
-        delete m_busyPopup;
-        m_busyPopup = NULL;
-    }
-}
-
 void NetSearch::showMenu(void)
 {
     QString label = tr("Search Options");
@@ -222,20 +174,16 @@ void NetSearch::showMenu(void)
 
         if (m_searchResultList->GetCount() > 0)
         {
-            ResultItem *item =
-                  qVariantValue<ResultItem *>(m_searchResultList->GetDataValue());
-
-            QString filename;
-            bool exists = false;
-
+            ResultItem *item = GetStreamItem();
             if (item)
             {
                 if (item->GetDownloadable())
                     menuPopup->AddButton(tr("Stream Video"), SLOT(streamWebVideo()));
                 menuPopup->AddButton(tr("Open Web Link"), SLOT(showWebVideo()));
 
-                filename = GetDownloadFilename(item->GetTitle(),
-                                          item->GetMediaURL());
+                QString filename = GetDownloadFilename(item->GetTitle(),
+                    item->GetMediaURL());
+                bool exists = false;
 
                 if (filename.startsWith("myth://"))
                     exists = RemoteFile::Exists(filename);
@@ -293,25 +241,6 @@ void NetSearch::fillGrabberButtonList()
     }
 }
 
-void NetSearch::cleanCacheDir()
-{
-    QString cache = QString("%1/cache/netvision-thumbcache")
-                       .arg(GetConfDir());
-    QDir cacheDir(cache);
-    QStringList thumbs = cacheDir.entryList(QDir::Files);
-
-    for (QStringList::const_iterator i = thumbs.end() - 1;
-            i != thumbs.begin() - 1; --i)
-    {
-        QString filename = QString("%1/%2").arg(cache).arg(*i);
-        LOG(VB_GENERAL, LOG_DEBUG, QString("Deleting file %1").arg(filename));
-        QFileInfo fi(filename);
-        QDateTime lastmod = fi.lastModified();
-        if (lastmod.addDays(7) < MythDate::current())
-            QFile::remove(filename);
-    }
-}
-
 void NetSearch::doSearch()
 {
     m_searchResultList->Reset();
@@ -340,7 +269,7 @@ void NetSearch::doSearch()
 
     QString title = tr("Searching %1 for \"%2\"...")
                     .arg(grabber).arg(query);
-    createBusyDialog(title);
+    CreateBusyDialog(title);
 
     m_netSearch = new QNetworkAccessManager(this);
     connect(m_netSearch, SIGNAL(finished(QNetworkReply*)),
@@ -363,7 +292,7 @@ void NetSearch::getLastResults()
     QString title = tr("Changing to page %1 of search \"%2\"...")
                     .arg(QString::number(m_pagenum))
                     .arg(m_currentSearch);
-    createBusyDialog(title);
+    CreateBusyDialog(title);
 
     QUrl req = GetMythXMLSearch(m_mythXML, m_currentSearch,
                                 m_currentCmd, m_pagenum);
@@ -379,7 +308,7 @@ void NetSearch::getMoreResults()
     QString title = tr("Changing to page %1 of search \"%2\"...")
                     .arg(QString::number(m_pagenum))
                     .arg(m_currentSearch);
-    createBusyDialog(title);
+    CreateBusyDialog(title);
 
     QUrl req = GetMythXMLSearch(m_mythXML, m_currentSearch,
                                 m_currentCmd, m_pagenum);
@@ -442,7 +371,6 @@ void NetSearch::searchTimeout(Search *)
     QString message = tr("Timed out waiting for query to "
                          "finish.  API might be down.");
 
-//    MythConfirmationDialog *okPopup =
     if (!m_okPopup)
     {
         m_okPopup = new MythConfirmationDialog(m_popupStack,
@@ -497,146 +425,9 @@ void NetSearch::populateResultList(ResultItem::resultList list)
     }
 }
 
-void NetSearch::streamWebVideo()
+ResultItem* NetSearch::GetStreamItem()
 {
-    ResultItem *item =
-        qVariantValue<ResultItem *>(m_searchResultList->GetDataValue());
-
-    if (!item)
-        return;
-
-    if (!item->GetDownloadable())
-    {
-        showWebVideo();
-        return;
-    }
-
-    GetMythMainWindow()->HandleMedia(
-        "Internal", item->GetMediaURL(),
-        item->GetDescription(), item->GetTitle(), item->GetSubtitle(),
-        QString(), item->GetSeason(), item->GetEpisode(), QString(),
-        item->GetTime().toInt(), item->GetDate().toString("yyyy"));
-}
-
-void NetSearch::showWebVideo()
-{
-    ResultItem *item =
-        qVariantValue<ResultItem *>(m_searchResultList->GetDataValue());
-
-    if (!item)
-        return;
-
-    if (!item->GetPlayer().isEmpty())
-    {
-        QString cmd = item->GetPlayer();
-        QStringList args = item->GetPlayerArguments();
-        if (!args.size())
-        {
-            args += item->GetMediaURL();
-            if (!args.size())
-                args += item->GetURL();
-        }
-        else
-        {
-            args.replaceInStrings("%DIR%", QString(GetConfDir() + "/MythNetvision"));
-            args.replaceInStrings("%MEDIAURL%", item->GetMediaURL());
-            args.replaceInStrings("%URL%", item->GetURL());
-            args.replaceInStrings("%TITLE%", item->GetTitle());
-        }
-        QString playerCommand = cmd + " " + args.join(" ");
-
-        myth_system(playerCommand);
-    }
-    else
-    {
-        QString url = item->GetURL();
-
-        LOG(VB_GENERAL, LOG_DEBUG, QString("Web URL = %1").arg(url));
-
-        if (url.isEmpty())
-            return;
-
-        QString browser = gCoreContext->GetSetting("WebBrowserCommand", "");
-        QString zoom = gCoreContext->GetSetting("WebBrowserZoomLevel", "1.0");
-
-        if (browser.isEmpty())
-        {
-            ShowOkPopup(tr("No browser command set! MythNetVision needs MythBrowser "
-                           "installed to display the video."));
-            return;
-        }
-
-        if (browser.toLower() == "internal")
-        {
-            GetMythMainWindow()->HandleMedia("WebBrowser", url);
-            return;
-        }
-        else
-        {
-            QString cmd = browser;
-            cmd.replace("%ZOOM%", zoom);
-            cmd.replace("%URL%", url);
-            cmd.replace('\'', "%27");
-            cmd.replace("&","\\&");
-            cmd.replace(";","\\;");
-
-            GetMythMainWindow()->AllowInput(false);
-            myth_system(cmd, kMSDontDisableDrawing);
-            GetMythMainWindow()->AllowInput(true);
-            return;
-        }
-    }
-}
-
-void NetSearch::doPlayVideo(QString filename)
-{
-    ResultItem *item =
-          qVariantValue<ResultItem *>(m_searchResultList->GetDataValue());
-
-    if (!item)
-        return;
-
-    GetMythMainWindow()->HandleMedia("Internal", filename);
-}
-
-void NetSearch::slotDeleteVideo()
-{
-    QString message = tr("Are you sure you want to delete this file?");
-
-    MythConfirmationDialog *confirmdialog =
-            new MythConfirmationDialog(m_popupStack,message);
-
-    if (confirmdialog->Create())
-    {
-        m_popupStack->AddScreen(confirmdialog);
-        connect(confirmdialog, SIGNAL(haveResult(bool)),
-                SLOT(doDeleteVideo(bool)));
-    }
-    else
-        delete confirmdialog;
-}
-
-void NetSearch::doDeleteVideo(bool remove)
-{
-    if (!remove)
-        return;
-
-    ResultItem *item =
-          qVariantValue<ResultItem *>(m_searchResultList->GetDataValue());
-
-    if (!item)
-        return;
-
-    QString filename = GetDownloadFilename(item->GetTitle(),
-                                          item->GetMediaURL());
-
-    if (filename.startsWith("myth://"))
-        RemoteFile::DeleteFile(filename);
-    else
-    {
-        QFile file(filename);
-        file.remove();
-    }
+    return qVariantValue<ResultItem *>(m_searchResultList->GetDataValue());
 }
 
 void NetSearch::runSearchEditor()
@@ -647,7 +438,7 @@ void NetSearch::runSearchEditor()
 
     if (searchedit->Create())
     {
-        connect(searchedit, SIGNAL(itemsChanged()), this,
+        connect(searchedit, SIGNAL(ItemsChanged()), this,
                        SLOT(doListRefresh()));
 
         mainStack->AddScreen(searchedit);
@@ -665,59 +456,6 @@ void NetSearch::doListRefresh()
         runSearchEditor();
 
     loadData();
-}
-
-void NetSearch::doDownloadAndPlay()
-{
-    ResultItem *item =
-          qVariantValue<ResultItem *>(m_searchResultList->GetDataValue());
-
-    if (!item)
-        return;
-
-    QString baseFilename = GetDownloadFilename(item->GetTitle(),
-                                          item->GetMediaURL());
-
-    QString finalFilename = generate_file_url("Default",
-                              gCoreContext->GetMasterHostName(),
-                              baseFilename);
-
-    LOG(VB_GENERAL, LOG_INFO, QString("Downloading %1 to %2")
-            .arg(item->GetMediaURL()) .arg(finalFilename));
-
-    // Does the file already exist?
-    bool exists = RemoteFile::Exists(finalFilename);
-
-    if (exists)
-    {
-        doPlayVideo(finalFilename);
-        return;
-    }
-    else
-        DownloadVideo(item->GetMediaURL(), baseFilename);
-}
-
-void NetSearch::DownloadVideo(QString url, QString dest)
-{
-    initProgressDialog();
-    m_downloadFile = RemoteDownloadFile(url, "Default", dest);
-}
-
-void NetSearch::initProgressDialog()
-{
-    QString message = tr("Downloading Video...");
-    m_progressDialog = new MythUIProgressDialog(message,
-               m_popupStack, "videodownloadprogressdialog");
-
-    if (m_progressDialog->Create())
-    {
-        m_popupStack->AddScreen(m_progressDialog, false);
-    }
-    else
-    {
-        delete m_progressDialog;
-        m_progressDialog = NULL;
-    }
 }
 
 void NetSearch::slotItemChanged()
@@ -834,54 +572,8 @@ void NetSearch::customEvent(QEvent *event)
             item->SetImage(file);
         }
     }
-    else if ((MythEvent::Type)(event->type()) == MythEvent::MythEventMessage)
+    else
     {
-        MythEvent *me = (MythEvent *)event;
-        QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);
-
-        if (tokens.isEmpty())
-            return;
-
-        if (tokens[0] == "DOWNLOAD_FILE")
-        {
-            QStringList args = me->ExtraDataList();
-            if ((tokens.size() != 2) ||
-                (args[1] != m_downloadFile))
-                return;
-
-            if (tokens[1] == "UPDATE")
-            {
-                QString message = tr("Downloading Video...\n"
-                                     "(%1 of %2 MB)")
-                                     .arg(QString::number(args[2].toInt() / 1024.0 / 1024.0, 'f', 2))
-                                     .arg(QString::number(args[3].toInt() / 1024.0 / 1024.0, 'f', 2));
-                m_progressDialog->SetMessage(message);
-                m_progressDialog->SetTotal(args[3].toInt());
-                m_progressDialog->SetProgress(args[2].toInt());
-            }
-            else if (tokens[1] == "FINISHED")
-            {
-                int fileSize  = args[2].toInt();
-                int errorCode = args[4].toInt();
-
-                if (m_progressDialog)
-                    m_progressDialog->Close();
-
-                QFileInfo file(m_downloadFile);
-                if ((m_downloadFile.startsWith("myth://")))
-                {
-                    if ((errorCode == 0) &&
-                        (fileSize > 0))
-                    {
-                        doPlayVideo(m_downloadFile);
-                    }
-                    else
-                    {
-                        ShowOkPopup(tr("Error downloading video to backend."));
-                    }
-                }
-            }
-        }
+        NetBase::customEvent(event);
     }
 }
-

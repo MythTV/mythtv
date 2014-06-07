@@ -6,6 +6,7 @@
 #include <QUrl>
 
 #include <netutils.h>
+#include <mythscreentype.h>
 
 // Generic Data Formatting
 QString GetThumbnailFilename(QString url, QString title);

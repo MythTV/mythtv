@@ -1,12 +1,8 @@
 #include <QDir>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
-#include <QEventLoop>
 
 #include <mythdirs.h>
-#include <mythdb.h>
 #include <mythcontext.h>
-#include <netgrabbermanager.h>
+#include <remotefile.h>
 
 #include "netcommon.h"
 
