@@ -653,6 +653,152 @@ ResultItem* NetTree::GetStreamItem()
     return item;
 }
 
+void NetTree::UpdateResultItem(ResultItem *item)
+{
+    InfoMap metadataMap;
+    item->toMap(metadataMap);
+    SetTextFromMap(metadataMap);
+
+    if (!item->GetThumbnail().isEmpty() && m_thumbImage)
+    {
+        m_thumbImage->Reset();
+        QString dlfile = item->GetThumbnail();
+        if (dlfile.contains("%SHAREDIR%"))
+        {
+            dlfile.replace("%SHAREDIR%", GetShareDir());
+            m_thumbImage->SetFilename(dlfile);
+            m_thumbImage->Load();
+        }
+        else
+        {
+            QString sFilename = getDownloadFilename(item->GetTitle(),
+                                                    item->GetThumbnail());
+
+            bool exists = QFile::exists(sFilename);
+            if (exists)
+            {
+                m_thumbImage->SetFilename(sFilename);
+                m_thumbImage->Load();
+            }
+            else if (item->GetThumbnail().startsWith("http"))
+            {
+                m_imageDownload->addThumb(item->GetTitle(),
+                                          item->GetThumbnail(),
+                                          qVariantFromValue<uint>(0));
+            }
+        }
+    }
+    else if (m_thumbImage)
+        m_thumbImage->Reset();
+
+    if (m_downloadable)
+    {
+        if (item->GetDownloadable())
+            m_downloadable->DisplayState("yes");
+        else
+            m_downloadable->DisplayState("no");
+    }
+}
+
+void NetTree::UpdateSiteItem(RSSSite *site)
+{
+    ResultItem res =
+        ResultItem(site->GetTitle(), QString(), site->GetDescription(),
+                   site->GetURL(), site->GetImage(), QString(),
+                   site->GetAuthor(), QDateTime(), 0, 0, -1, QString(),
+                   QStringList(), QString(), QStringList(), 0, 0, QString(),
+                   0, QStringList(), 0, 0, 0);
+
+    InfoMap metadataMap;
+    res.toMap(metadataMap);
+    SetTextFromMap(metadataMap);
+
+    if (!site->GetImage().isEmpty() && m_thumbImage)
+    {
+        m_thumbImage->SetFilename(site->GetImage());
+        m_thumbImage->Load();
+    }
+    else if (m_thumbImage)
+        m_thumbImage->Reset();
+
+    if (m_downloadable)
+        m_downloadable->Reset();
+}
+
+void NetTree::UpdateCurrentItem(void)
+{
+    QString title;
+
+    if (m_type == DLG_TREE)
+        title = m_siteMap->GetItemCurrent()->GetText();
+    else
+        title = m_siteButtonList->GetItemCurrent()->GetText();
+
+    QString thumb;
+    if (m_type == DLG_TREE)
+        thumb = m_siteMap->GetCurrentNode()->GetData().toString();
+    else
+    {
+        MythGenericTree *node =
+            GetNodePtrFromButton(m_siteButtonList->GetItemCurrent());
+
+        if (node)
+            thumb = node->GetData().toString();
+    }
+
+    ResultItem res =
+        ResultItem(title, QString(), QString(), QString(), thumb, QString(),
+                   QString(), QDateTime(), 0, 0, -1, QString(),
+                   QStringList(), QString(), QStringList(), 0, 0, QString(),
+                   0, QStringList(), 0, 0, 0);
+
+    InfoMap metadataMap;
+    res.toMap(metadataMap);
+    SetTextFromMap(metadataMap);
+
+    if (m_thumbImage)
+    {
+        if (!thumb.startsWith("http://"))
+        {
+            if (thumb.contains("%SHAREDIR%"))
+                thumb.replace("%SHAREDIR%", GetShareDir());
+
+            bool exists = QFile::exists(thumb);
+
+            if (exists)
+            {
+                m_thumbImage->SetFilename(thumb);
+                m_thumbImage->Load();
+            }
+            else
+                m_thumbImage->Reset();
+        }
+        else
+        {
+            QString url = thumb;
+            QString title;
+            if (m_type == DLG_TREE)
+                title = m_siteMap->GetItemCurrent()->GetText();
+            else
+                title = m_siteButtonList->GetItemCurrent()->GetText();
+
+            QString sFilename = GetDownloadFilename(title, url);
+
+            bool exists = QFile::exists(sFilename);
+            if (exists && !url.isEmpty())
+            {
+                m_thumbImage->SetFilename(sFilename);
+                m_thumbImage->Load();
+            }
+            else
+                m_thumbImage->Reset();
+        }
+    }
+
+    if (m_downloadable)
+        m_downloadable->Reset();
+}
+
 void NetTree::SlotItemChanged()
 {
     ResultItem *item;
@@ -677,150 +823,11 @@ void NetTree::SlotItemChanged()
     }
 
     if (item)
-    {
-        InfoMap metadataMap;
-        item->toMap(metadataMap);
-        SetTextFromMap(metadataMap);
-
-        if (!item->GetThumbnail().isEmpty() && m_thumbImage)
-        {
-            m_thumbImage->Reset();
-            QString dlfile = item->GetThumbnail();
-            if (dlfile.contains("%SHAREDIR%"))
-            {
-                dlfile.replace("%SHAREDIR%", GetShareDir());
-                m_thumbImage->SetFilename(dlfile);
-                m_thumbImage->Load();
-            }
-            else
-            {
-                QString sFilename = getDownloadFilename(item->GetTitle(),
-                                                        item->GetThumbnail());
-
-                bool exists = QFile::exists(sFilename);
-                if (exists)
-                {
-                    m_thumbImage->SetFilename(sFilename);
-                    m_thumbImage->Load();
-                }
-                else if (item->GetThumbnail().startsWith("http"))
-                {
-                    m_imageDownload->addThumb(item->GetTitle(),
-                                              item->GetThumbnail(),
-                                              qVariantFromValue<uint>(0));
-                }
-            }
-        }
-        else if (m_thumbImage)
-            m_thumbImage->Reset();
-
-        if (m_downloadable)
-        {
-            if (item->GetDownloadable())
-                m_downloadable->DisplayState("yes");
-            else
-                m_downloadable->DisplayState("no");
-        }
-    }
+        UpdateResultItem(item);
     else if (site)
-    {
-        ResultItem res =
-            ResultItem(site->GetTitle(), QString(), site->GetDescription(),
-                       site->GetURL(), site->GetImage(), QString(),
-                       site->GetAuthor(), QDateTime(), 0, 0, -1, QString(),
-                       QStringList(), QString(), QStringList(), 0, 0, QString(),
-                       0, QStringList(), 0, 0, 0);
-
-        InfoMap metadataMap;
-        res.toMap(metadataMap);
-        SetTextFromMap(metadataMap);
-
-        if (!site->GetImage().isEmpty() && m_thumbImage)
-        {
-            m_thumbImage->SetFilename(site->GetImage());
-            m_thumbImage->Load();
-        }
-        else if (m_thumbImage)
-            m_thumbImage->Reset();
-
-        if (m_downloadable)
-            m_downloadable->Reset();
-    }
+        UpdateSiteItem(site);
     else
-    {
-        QString title;
-
-        if (m_type == DLG_TREE)
-            title = m_siteMap->GetItemCurrent()->GetText();
-        else
-            title = m_siteButtonList->GetItemCurrent()->GetText();
-
-        QString thumb;
-        if (m_type == DLG_TREE)
-            thumb = m_siteMap->GetCurrentNode()->
-                        GetData().toString();
-        else
-        {
-            MythGenericTree *node =
-                GetNodePtrFromButton(m_siteButtonList->GetItemCurrent());
-
-            if (node)
-                thumb = node->GetData().toString();
-        }
-
-        ResultItem res =
-            ResultItem(title, QString(), QString(), QString(), thumb, QString(),
-                       QString(), QDateTime(), 0, 0, -1, QString(),
-                       QStringList(), QString(), QStringList(), 0, 0, QString(),
-                       0, QStringList(), 0, 0, 0);
-
-        InfoMap metadataMap;
-        res.toMap(metadataMap);
-        SetTextFromMap(metadataMap);
-
-        if (m_thumbImage)
-        {
-            if (!thumb.startsWith("http://"))
-            {
-                if (thumb.contains("%SHAREDIR%"))
-                    thumb.replace("%SHAREDIR%", GetShareDir());
-
-                bool exists = QFile::exists(thumb);
-
-                if (exists)
-                {
-                    m_thumbImage->SetFilename(thumb);
-                    m_thumbImage->Load();
-                }
-                else
-                    m_thumbImage->Reset();
-            }
-            else
-            {
-
-                QString url = thumb;
-                QString title;
-                if (m_type == DLG_TREE)
-                    title = m_siteMap->GetItemCurrent()->GetText();
-                else
-                    title = m_siteButtonList->GetItemCurrent()->GetText();
-
-                QString sFilename = GetDownloadFilename(title, url);
-
-                bool exists = QFile::exists(sFilename);
-                if (exists && !url.isEmpty())
-                {
-                    m_thumbImage->SetFilename(sFilename);
-                    m_thumbImage->Load();
-                }
-                else
-                    m_thumbImage->Reset();
-            }
-        }
-
-        if (m_downloadable)
-            m_downloadable->Reset();
-    }
+        UpdateCurrentItem();
 }
 
 void NetTree::RunTreeEditor()

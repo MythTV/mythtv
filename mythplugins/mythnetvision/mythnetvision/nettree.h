@@ -73,6 +73,10 @@ class NetTree : public NetBase
 
     void SwitchView(void);
 
+    void UpdateResultItem(ResultItem *item);
+    void UpdateSiteItem(RSSSite *site);
+    void UpdateCurrentItem(void);
+
     // Only to keep track of what to delete
     QList<ResultItem*> m_videos;
 
