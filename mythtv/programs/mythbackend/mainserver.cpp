@@ -258,10 +258,16 @@ MainServer::MainServer(bool master, int port,
 
     // test to make sure listen addresses are available
     // no reason to run the backend if the mainserver is not active
-    QHostAddress config_v4(gCoreContext->GetSetting("BackendServerIP"));
+    QHostAddress config_v4(gCoreContext->resolveSettingAddress(
+                                           "BackendServerIP",
+                                           QString(),
+                                           gCoreContext->ResolveIPv4, true));
     bool v4IsSet = config_v4.isNull() ? false : true;
 #if !defined(QT_NO_IPV6)
-    QHostAddress config_v6(gCoreContext->GetSetting("BackendServerIP6"));
+    QHostAddress config_v6(gCoreContext->resolveSettingAddress(
+                                           "BackendServerIP6",
+                                           QString(),
+                                           gCoreContext->ResolveIPv6, true));
     bool v6IsSet = config_v6.isNull() ? false : true;
 #endif
     QList<QHostAddress> listenAddrs = mythserver->DefaultListen();
