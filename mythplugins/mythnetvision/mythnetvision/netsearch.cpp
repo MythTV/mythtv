@@ -224,14 +224,11 @@ void NetSearch::fillGrabberButtonList()
     {
         MythUIButtonListItem *item =
                     new MythUIButtonListItem(m_siteList, (*i)->GetTitle());
-        if (item)
-        {
-            item->SetText((*i)->GetTitle(), "title");
-            item->SetData((*i)->GetCommandline());
-            QString thumb = QString("%1mythnetvision/icons/%2").arg(GetShareDir())
-                                .arg((*i)->GetImage());
-            item->SetImage(thumb);
-        }
+        item->SetText((*i)->GetTitle(), "title");
+        item->SetData((*i)->GetCommandline());
+        QString thumb = QString("%1mythnetvision/icons/%2").arg(GetShareDir())
+                            .arg((*i)->GetImage());
+        item->SetImage(thumb);
     }
 }
 
@@ -388,33 +385,29 @@ void NetSearch::populateResultList(ResultItem::resultList list)
     {
         QString title = (*i)->GetTitle();
         MythUIButtonListItem *item =
-                    new MythUIButtonListItem(
-                    m_searchResultList, title);
-        if (item)
+            new MythUIButtonListItem(m_searchResultList, title);
+        InfoMap metadataMap;
+        (*i)->toMap(metadataMap);
+        item->SetTextFromMap(metadataMap);
+
+        item->SetData(qVariantFromValue(*i));
+
+        if (!(*i)->GetThumbnail().isEmpty())
         {
-            InfoMap metadataMap;
-            (*i)->toMap(metadataMap);
-            item->SetTextFromMap(metadataMap);
+            QString dlfile = (*i)->GetThumbnail();
 
-            item->SetData(qVariantFromValue(*i));
-
-            if (!(*i)->GetThumbnail().isEmpty())
+            if (dlfile.contains("%SHAREDIR%"))
             {
-                QString dlfile = (*i)->GetThumbnail();
+                dlfile.replace("%SHAREDIR%", GetShareDir());
+                item->SetImage(dlfile);
+            }
+            else
+            {
+                uint pos = m_searchResultList->GetItemPos(item);
 
-                if (dlfile.contains("%SHAREDIR%"))
-                {
-                    dlfile.replace("%SHAREDIR%", GetShareDir());
-                    item->SetImage(dlfile);
-                }
-                else
-                {
-                    uint pos = m_searchResultList->GetItemPos(item);
-
-                    m_imageDownload->addThumb((*i)->GetTitle(),
-                                              (*i)->GetThumbnail(),
-                                              qVariantFromValue<uint>(pos));
-                }
+                m_imageDownload->addThumb((*i)->GetTitle(),
+                                          (*i)->GetThumbnail(),
+                                          qVariantFromValue<uint>(pos));
             }
         }
     }
