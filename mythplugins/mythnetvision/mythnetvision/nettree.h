@@ -68,11 +68,12 @@ class NetTree : public NetBase
                           QString dirthumb,
                           QList<ResultItem*> videos);
 
-    int AddFileNode(MythGenericTree *where_to_add,
-                    ResultItem *video);
+    void AddFileNode(MythGenericTree *where_to_add,
+                     ResultItem *video);
 
     void SwitchView(void);
 
+    void SetSubfolderData(MythGenericTree *folder);
     void UpdateResultItem(ResultItem *item);
     void UpdateSiteItem(RSSSite *site);
     void UpdateCurrentItem(void);

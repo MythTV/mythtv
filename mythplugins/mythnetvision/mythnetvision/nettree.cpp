@@ -548,9 +548,11 @@ void NetTree::FillTree()
             ResultItem::resultList::iterator it = items.begin();
             for (; it != items.end(); ++it)
                 AddFileNode(ret, *it);
+            SetSubfolderData(ret);
         }
 
         m_siteGeneric->addNode(rssGeneric);
+        SetSubfolderData(rssGeneric);
     }
 
     // Now let's add all the grabber trees
@@ -582,6 +584,7 @@ void NetTree::FillTree()
             BuildGenericTree(ret, curPaths, dirthumb, videos);
         }
         m_siteGeneric->addNode(ret);
+        SetSubfolderData(ret);
     }
 }
 
@@ -623,16 +626,21 @@ void NetTree::BuildGenericTree(MythGenericTree *dst, QStringList paths,
                 it != videos.end(); ++it)
             AddFileNode(folder, *it);
     }
+    SetSubfolderData(folder);
 }
 
-int NetTree::AddFileNode(MythGenericTree *where_to_add, ResultItem *video)
+void NetTree::AddFileNode(MythGenericTree *where_to_add, ResultItem *video)
 {
     QString title = video->GetTitle();
     title.replace("&amp;", "&");
     MythGenericTree *sub_node = where_to_add->addNode(title, 0, true);
     sub_node->SetData(qVariantFromValue(video));
+
+    InfoMap textMap;
+    video->toMap(textMap);
+    sub_node->SetTextFromMap(textMap);
+
     m_videos.append(video);
-    return 1;
 }
 
 ResultItem* NetTree::GetStreamItem()
@@ -965,4 +973,11 @@ void NetTree::customEvent(QEvent *event)
     }
     else
         NetBase::customEvent(event);
+}
+
+void NetTree::SetSubfolderData(MythGenericTree *folder)
+{
+    folder->SetText(QString("%1").arg(folder->visibleChildCount()),
+                    "childcount");
+    folder->DisplayState("subfolder", "nodetype");
 }
