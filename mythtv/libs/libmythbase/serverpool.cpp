@@ -92,11 +92,16 @@ void ServerPool::SelectDefaultListen(bool force)
     naList_6.clear();
 
     // populate stored IPv4 and IPv6 addresses
-    // if address is not defined, QHostAddress will be invalid and Null
-    QHostAddress config_v4(gCoreContext->GetSetting("BackendServerIP"));
+    QHostAddress config_v4(gCoreContext->resolveSettingAddress(
+                                           "BackendServerIP",
+                                           QString(),
+                                           gCoreContext->ResolveIPv4, true));
     bool v4IsSet = config_v4.isNull() ? true : false;
 #if !defined(QT_NO_IPV6)
-    QHostAddress config_v6(gCoreContext->GetSetting("BackendServerIP6"));
+    QHostAddress config_v6(gCoreContext->resolveSettingAddress(
+                                           "BackendServerIP6",
+                                           QString(),
+                                           gCoreContext->ResolveIPv6, true));
     bool v6IsSet = config_v6.isNull() ? true : false;
 #endif
     bool allowLinkLocal = gCoreContext->GetNumSetting("AllowLinkLocal", true) > 0;
