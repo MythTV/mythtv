@@ -735,8 +735,9 @@ ResultItem::resultList Parse::parseRSS(QDomDocument domDoc)
 
 ResultItem* Parse::ParseItem(const QDomElement& item) const
 {
-    QString title, subtitle, description, url, author, duration, rating,
-            thumbnail, mediaURL, player, language, download;
+    QString title(""), subtitle(""), description(""), url(""), author(""),
+            duration(""), rating(""), thumbnail(""), mediaURL(""), player(""),
+            language(""), download("");
     off_t filesize = 0;
     uint width = 0, height = 0, season = 0, episode = 0;
     QDateTime date;
@@ -957,7 +958,7 @@ QString Parse::GetLink(const QDomElement& parent) const
 
 QString Parse::GetAuthor(const QDomElement& parent) const
 {
-    QString result;
+    QString result("");
     QDomNodeList nodes = parent.elementsByTagNameNS(ITunes,
         "author");
     if (nodes.size())
