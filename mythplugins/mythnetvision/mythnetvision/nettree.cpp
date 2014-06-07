@@ -703,6 +703,12 @@ void NetTree::SlotItemChanged()
                     m_thumbImage->SetFilename(sFilename);
                     m_thumbImage->Load();
                 }
+                else if (item->GetThumbnail().startsWith("http"))
+                {
+                    m_imageDownload->addThumb(item->GetTitle(),
+                                              item->GetThumbnail(),
+                                              qVariantFromValue<uint>(0));
+                }
             }
         }
         else if (m_thumbImage)
