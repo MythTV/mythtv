@@ -2021,6 +2021,9 @@ IPTVTuningData ChannelUtil::GetIPTVTuningData(uint chanid)
 
 // TODO This should be modified to load a complete channelinfo object including
 //      all fields from the database
+/**
+ * \deprecated Use ChannelInfo::LoadChannels() instead
+ */
 ChannelInfoList ChannelUtil::GetChannelsInternal(
     uint sourceid, bool vis_only, bool include_disconnected,
     const QString &grp, uint changrpid)
@@ -2104,7 +2107,7 @@ ChannelInfoList ChannelUtil::GetChannelsInternal(
         QStringList groupIDs = query.value(10).toString().split(",");
         QString groupid;
         while (!groupIDs.isEmpty())
-                chan.AddCardId(groupIDs.takeFirst().toUInt());
+                chan.AddGroupId(groupIDs.takeFirst().toUInt());
         
         list.push_back(chan);
 
@@ -2382,6 +2385,134 @@ uint ChannelUtil::GetNextChannel(
     }
 
     return it->chanid;
+}
+
+/**
+ * \brief Load channels from database into a list of ChannelInfo objects
+ *
+ * \note This replaces all previous methods e.g. GetChannels() and
+ *       GetAllChannels() in channelutil.h
+ */
+ChannelInfoList ChannelUtil::LoadChannels(uint startIndex, uint count,
+                                          ChannelUtil::OrderBy orderBy,
+                                          bool ignoreHidden, uint sourceID,
+                                          uint channelGroupID)
+{
+    ChannelInfoList channelList;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    QString sql = "SELECT channum, freqid, channel.sourceid, "
+                  "callsign, name, icon, finetune, videofilters, xmltvid, "
+                  "channel.recpriority, channel.contrast, channel.brightness, "
+                  "channel.colour, channel.hue, tvformat, "
+                  "visible, outputfilters, useonairguide, mplexid, "
+                  "serviceid, atsc_major_chan, atsc_minor_chan, last_record, "
+                  "default_authority, commmethod, tmoffset, iptvid, "
+                  "channel.chanid, "
+                  "GROUP_CONCAT(DISTINCT channelgroup.grpid), " // Creates a CSV list of channel groupids for this channel
+                  "GROUP_CONCAT(DISTINCT cardinput.cardid) " // Creates a CSV list of cardids for this channel
+                  "FROM channel "
+                  "LEFT JOIN channelgroup ON channel.chanid = channelgroup.chanid "
+                  "LEFT JOIN cardinput    ON cardinput.sourceid = channel.sourceid "
+                  "LEFT JOIN capturecard  ON cardinput.cardid   = capturecard.cardid ";
+
+    QStringList cond;
+    if (ignoreHidden)
+        cond << "visible = :VISIBLE ";
+
+    if (channelGroupID > 0)
+        cond << "channelgroup.grpid = :CHANGROUPID ";
+
+    if (sourceID > 0)
+        cond << "sourceid = :SOURCEID ";
+
+    if (!cond.isEmpty())
+        sql += QString("WHERE %1").arg(cond.join("AND "));
+
+    sql += "GROUP BY channel.chanid ";
+
+    sql += "ORDER BY :ORDERBY ";
+
+    if (count > 0)
+        sql += "LIMIT :LIMIT ";
+
+    if (startIndex > 0)
+        sql += "OFFSET :STARTINDEX ";
+
+    query.prepare(sql);
+
+    if (ignoreHidden)
+        query.bindValue(":VISIBLE", 1);
+
+    if (channelGroupID > 0)
+        query.bindValue(":CHANGROUPID", channelGroupID);
+
+    if (sourceID > 0)
+        query.bindValue(":SOURCEID", sourceID);
+
+    if (orderBy & kChanOrderByName)
+        query.bindValue(":ORDERBY", "channel.name");
+    else // kChanOrderByChanNum
+        query.bindValue(":ORDERBY", "channel.channum");
+
+    if (count > 0)
+        query.bindValue(":LIMIT", count);
+
+    if (startIndex > 0)
+        query.bindValue(":LIMIT", startIndex);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("ChannelInfo::Load()", query);
+        return channelList;
+    }
+
+    while (query.next())
+    {
+        ChannelInfo channelInfo;
+        channelInfo.channum       = query.value(0).toString();
+        channelInfo.freqid        = query.value(1).toString();
+        channelInfo.sourceid      = query.value(2).toUInt();
+        channelInfo.callsign      = query.value(3).toString();
+        channelInfo.name          = query.value(4).toString();
+        channelInfo.icon          = query.value(5).toString();
+        channelInfo.finetune      = query.value(6).toInt();
+        channelInfo.videofilters  = query.value(7).toString();
+        channelInfo.xmltvid       = query.value(8).toString();
+        channelInfo.recpriority   = query.value(9).toInt();
+        channelInfo.contrast      = query.value(10).toUInt();
+        channelInfo.brightness    = query.value(11).toUInt();
+        channelInfo.colour        = query.value(12).toUInt();
+        channelInfo.hue           = query.value(13).toUInt();
+        channelInfo.tvformat      = query.value(14).toString();
+        channelInfo.visible       = query.value(15).toBool();
+        channelInfo.outputfilters = query.value(16).toString();
+        channelInfo.useonairguide = query.value(17).toBool();
+        channelInfo.mplexid       = query.value(18).toUInt();
+        channelInfo.serviceid     = query.value(19).toUInt();
+        channelInfo.atsc_major_chan = query.value(20).toUInt();
+        channelInfo.atsc_minor_chan = query.value(21).toUInt();
+        channelInfo.last_record   = query.value(22).toDateTime();
+        channelInfo.default_authority = query.value(23).toString();
+        channelInfo.commmethod    = query.value(24).toUInt();
+        channelInfo.tmoffset      = query.value(25).toUInt();
+        channelInfo.iptvid        = query.value(26).toUInt();
+        channelInfo.chanid        = query.value(27).toUInt();
+
+        QStringList groupIDs = query.value(28).toString().split(",");
+        QString groupid;
+        while (!groupIDs.isEmpty())
+                channelInfo.AddGroupId(groupIDs.takeFirst().toUInt());
+
+        QStringList cardIDs = query.value(29).toString().split(",");
+        QString cardid;
+        while (!cardIDs.isEmpty())
+                channelInfo.AddCardId(cardIDs.takeFirst().toUInt());
+
+        channelList.push_back(channelInfo);
+    }
+
+    return channelList;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
