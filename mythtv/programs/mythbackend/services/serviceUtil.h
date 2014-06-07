@@ -39,6 +39,7 @@
 #include "videometadatalistmanager.h"
 #include "channelgroup.h"
 #include "inputinfo.h"
+#include "channelinfo.h"
 
 void FillProgramInfo( DTC::Program *pProgram,
                       ProgramInfo  *pInfo,
@@ -48,6 +49,10 @@ void FillProgramInfo( DTC::Program *pProgram,
 
 bool FillChannelInfo( DTC::ChannelInfo *pChannel,
                       uint              nChanID,
+                      bool              bDetails = true );
+
+bool FillChannelInfo( DTC::ChannelInfo *pChannel,
+                      const ChannelInfo &channelInfo,
                       bool              bDetails = true );
 
 void FillChannelGroup( DTC::ChannelGroup *pGroup, ChannelGroupItem pGroupItem);

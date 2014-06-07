@@ -52,9 +52,10 @@ DTC::ChannelInfoList* Channel::GetChannelInfoList( uint nSourceID,
                                                    uint nCount,
                                                    bool bOnlyVisible )
 {
-    vector<uint> chanList;
+    ChannelInfoList chanList;
 
-    chanList = ChannelUtil::GetChanIDs(nSourceID, bOnlyVisible);
+    chanList = ChannelUtil::LoadChannels( 0, 0, ChannelUtil::kChanOrderByChanNum,
+                                         bOnlyVisible, nSourceID ); //, nChanGroupID
 
     // ----------------------------------------------------------------------
     // Build Response
@@ -62,38 +63,39 @@ DTC::ChannelInfoList* Channel::GetChannelInfoList( uint nSourceID,
 
     DTC::ChannelInfoList *pChannelInfos = new DTC::ChannelInfoList();
 
-    nStartIndex   = min( nStartIndex, (uint)chanList.size() );
-    nCount        = (nCount > 0) ? min( nCount, (uint)chanList.size() ) : chanList.size();
-    int nEndIndex = min((nStartIndex + nCount), (uint)chanList.size() );
+    uint nTotalAvailable = static_cast<uint>(chanList.size());
+    nStartIndex   = min( nStartIndex, nTotalAvailable );
+    nCount        = (nCount > 0) ? min( nCount, nTotalAvailable ) : nTotalAvailable;
+    int nEndIndex = min((nStartIndex + nCount), nTotalAvailable );
 
     for( int n = nStartIndex; n < nEndIndex; n++)
     {
         DTC::ChannelInfo *pChannelInfo = pChannelInfos->AddNewChannelInfo();
 
-        uint chanid = chanList.at(n);
+        ChannelInfo channelInfo = chanList.at(n);
 
-        if (!FillChannelInfo(pChannelInfo, chanid, true))
+        if (!FillChannelInfo(pChannelInfo, channelInfo, true))
             throw( QString("Channel ID appears invalid."));
     }
 
-    int curPage = 0, totalPages = 0;
+    int nCurPage = 0, nTotalPages = 0;
     if (nCount == 0)
-        totalPages = 1;
+        nTotalPages = 1;
     else
-        totalPages = (int)ceil((float)chanList.size() / nCount);
+        nTotalPages = (int)ceil((float)nTotalAvailable / nCount);
 
-    if (totalPages == 1)
-        curPage = 1;
+    if (nTotalPages == 1)
+        nCurPage = 1;
     else
     {
-        curPage = (int)ceil((float)nStartIndex / nCount) + 1;
+        nCurPage = (int)ceil((float)nStartIndex / nCount) + 1;
     }
 
     pChannelInfos->setStartIndex    ( nStartIndex     );
     pChannelInfos->setCount         ( nCount          );
-    pChannelInfos->setCurrentPage   ( curPage         );
-    pChannelInfos->setTotalPages    ( totalPages      );
-    pChannelInfos->setTotalAvailable( chanList.size() );
+    pChannelInfos->setCurrentPage   ( nCurPage        );
+    pChannelInfos->setTotalPages    ( nTotalPages     );
+    pChannelInfos->setTotalAvailable( nTotalAvailable );
     pChannelInfos->setAsOf          ( MythDate::current() );
     pChannelInfos->setVersion       ( MYTH_BINARY_VERSION );
     pChannelInfos->setProtoVer      ( MYTH_PROTO_VERSION  );

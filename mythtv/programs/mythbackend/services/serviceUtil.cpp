@@ -167,60 +167,73 @@ bool FillChannelInfo( DTC::ChannelInfo *pChannel,
     ChannelInfo channel;
     if (channel.Load(nChanID))
     {
-        // TODO update DTC::ChannelInfo to match functionality of ChannelInfo,
-        //      ultimately replacing it's progenitor?
-        pChannel->setChanId(channel.chanid);
-        pChannel->setChanNum(channel.channum);
-        pChannel->setCallSign(channel.callsign);
-        if (!channel.icon.isEmpty())
-        {
-            QString sIconURL  = QString( "/Guide/GetChannelIcon?ChanId=%3")
-                                       .arg( nChanID );
-            pChannel->setIconURL( sIconURL );
-        }
-        pChannel->setChannelName(channel.name);
-        pChannel->setVisible(channel.visible);
-
-        pChannel->setSerializeDetails( bDetails );
-
-        if (bDetails)
-        {
-            pChannel->setMplexId(channel.mplexid);
-            pChannel->setServiceId(channel.serviceid);
-            pChannel->setATSCMajorChan(channel.atsc_major_chan);
-            pChannel->setATSCMinorChan(channel.atsc_minor_chan);
-            pChannel->setFormat(channel.tvformat);
-            pChannel->setFineTune(channel.finetune);
-            pChannel->setFrequencyId(channel.freqid);
-            pChannel->setChanFilters(channel.videofilters);
-            pChannel->setSourceId(channel.sourceid);
-            pChannel->setCommFree(channel.commmethod == -2);
-            pChannel->setUseEIT(channel.useonairguide);
-            pChannel->setXMLTVID(channel.xmltvid);
-            pChannel->setDefaultAuth(channel.default_authority);
-
-            // Extended data - This doesn't come from the channel table but the
-            // dtv_multiplex table
-            QString format, modulation, freqtable, freqid, dtv_si_std;
-            uint64_t frequency = 0;
-            uint transportid = 0;
-            uint networkid = 0;
-            ChannelUtil::GetTuningParams(channel.mplexid, modulation, frequency,
-                                        transportid, networkid, dtv_si_std);
-
-            pChannel->setModulation(modulation);
-            pChannel->setFrequencyTable(freqtable);
-            pChannel->setFrequency((long)frequency);
-            pChannel->setSIStandard(dtv_si_std);
-            pChannel->setTransportId(transportid);
-            pChannel->setNetworkId(networkid);
-        }
-
-        return true;
+        return FillChannelInfo(pChannel, channel, bDetails);
     }
 
     return false;
 }
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool FillChannelInfo( DTC::ChannelInfo *pChannel,
+                      const ChannelInfo &channelInfo,
+                      bool              bDetails  /* = true */ )
+{
+
+    // TODO update DTC::ChannelInfo to match functionality of ChannelInfo,
+    //      ultimately replacing it's progenitor?
+    pChannel->setChanId(channelInfo.chanid);
+    pChannel->setChanNum(channelInfo.channum);
+    pChannel->setCallSign(channelInfo.callsign);
+    if (!channelInfo.icon.isEmpty())
+    {
+        QString sIconURL  = QString( "/Guide/GetChannelIcon?ChanId=%3")
+                                    .arg( channelInfo.chanid );
+        pChannel->setIconURL( sIconURL );
+    }
+    pChannel->setChannelName(channelInfo.name);
+    pChannel->setVisible(channelInfo.visible);
+
+    pChannel->setSerializeDetails( bDetails );
+
+    if (bDetails)
+    {
+        pChannel->setMplexId(channelInfo.mplexid);
+        pChannel->setServiceId(channelInfo.serviceid);
+        pChannel->setATSCMajorChan(channelInfo.atsc_major_chan);
+        pChannel->setATSCMinorChan(channelInfo.atsc_minor_chan);
+        pChannel->setFormat(channelInfo.tvformat);
+        pChannel->setFineTune(channelInfo.finetune);
+        pChannel->setFrequencyId(channelInfo.freqid);
+        pChannel->setChanFilters(channelInfo.videofilters);
+        pChannel->setSourceId(channelInfo.sourceid);
+        pChannel->setCommFree(channelInfo.commmethod == -2);
+        pChannel->setUseEIT(channelInfo.useonairguide);
+        pChannel->setXMLTVID(channelInfo.xmltvid);
+        pChannel->setDefaultAuth(channelInfo.default_authority);
+
+        // Extended data - This doesn't come from the channel table but the
+        // dtv_multiplex table
+        QString format, modulation, freqtable, freqid, dtv_si_std;
+        uint64_t frequency = 0;
+        uint transportid = 0;
+        uint networkid = 0;
+        ChannelUtil::GetTuningParams(channelInfo.mplexid, modulation, frequency,
+                                    transportid, networkid, dtv_si_std);
+
+        pChannel->setModulation(modulation);
+        pChannel->setFrequencyTable(freqtable);
+        pChannel->setFrequency((long)frequency);
+        pChannel->setSIStandard(dtv_si_std);
+        pChannel->setTransportId(transportid);
+        pChannel->setNetworkId(networkid);
+    }
+
+    return true;
+}
+
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
