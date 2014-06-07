@@ -199,7 +199,7 @@ class MTV_PUBLIC ChannelUtil
     {
         return GetChannelsInternal(sourceid, false, true, QString(), 0);
     }
-    static vector<uint> GetChanIDs(int sourceid = -1);
+    static vector<uint> GetChanIDs(int sourceid = -1, bool onlyVisible = false);
     static uint    GetChannelCount(int sourceid = -1);
     static void    SortChannels(ChannelInfoList &list, const QString &order,
                                 bool eliminate_duplicates = false);

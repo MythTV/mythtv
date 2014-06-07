@@ -2113,13 +2113,24 @@ ChannelInfoList ChannelUtil::GetChannelsInternal(
     return list;
 }
 
-vector<uint> ChannelUtil::GetChanIDs(int sourceid)
+vector<uint> ChannelUtil::GetChanIDs(int sourceid, bool onlyVisible)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    QString select = "SELECT chanid FROM channel";
-    if (sourceid > 0)
-        select += " WHERE sourceid=" + QString::number(sourceid);
+    QString select = "SELECT chanid FROM channel ";
+    // Yes, this a little ugly
+    if (onlyVisible || sourceid > 0)
+    {
+        select += "WHERE ";
+        if (onlyVisible)
+            select += "visible = 1 ";
+        if (sourceid > 0)
+        {
+            if (onlyVisible)
+                select += "AND ";
+            select += "sourceid=" + QString::number(sourceid);
+        }
+    }
 
     vector<uint> list;
     if (!query.exec(select))
