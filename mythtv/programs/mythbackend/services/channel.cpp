@@ -50,7 +50,8 @@
 DTC::ChannelInfoList* Channel::GetChannelInfoList( uint nSourceID,
                                                    uint nStartIndex,
                                                    uint nCount,
-                                                   bool bOnlyVisible )
+                                                   bool bOnlyVisible,
+                                                   bool bDetails )
 {
     ChannelInfoList chanList;
 
@@ -74,7 +75,7 @@ DTC::ChannelInfoList* Channel::GetChannelInfoList( uint nSourceID,
 
         ChannelInfo channelInfo = chanList.at(n);
 
-        if (!FillChannelInfo(pChannelInfo, channelInfo, true))
+        if (!FillChannelInfo(pChannelInfo, channelInfo, bDetails))
             throw( QString("Channel ID appears invalid."));
     }
 

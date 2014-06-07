@@ -41,7 +41,7 @@
 class SERVICE_PUBLIC ChannelServices : public Service
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.4" );
+    Q_CLASSINFO( "version"    , "1.5" );
     Q_CLASSINFO( "AddDBChannel_Method",              "POST" )
     Q_CLASSINFO( "UpdateDBChannel_Method",           "POST" )
     Q_CLASSINFO( "RemoveDBChannel_Method",           "POST" )
@@ -72,7 +72,8 @@ class SERVICE_PUBLIC ChannelServices : public Service
         virtual DTC::ChannelInfoList*  GetChannelInfoList  ( uint           SourceID,
                                                              uint           StartIndex,
                                                              uint           Count,
-                                                             bool           OnlyVisible ) = 0;
+                                                             bool           OnlyVisible,
+                                                             bool           Details ) = 0;
 
         virtual DTC::ChannelInfo*      GetChannelInfo      ( uint           ChanID     ) = 0;
 

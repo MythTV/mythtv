@@ -45,7 +45,8 @@ class Channel : public ChannelServices
         DTC::ChannelInfoList*  GetChannelInfoList  ( uint      SourceID,
                                                      uint      StartIndex,
                                                      uint      Count,
-                                                     bool      OnlyVisible );
+                                                     bool      OnlyVisible,
+                                                     bool      Details );
 
         DTC::ChannelInfo*      GetChannelInfo      ( uint     ChanID     );
 
@@ -163,12 +164,13 @@ class ScriptableChannel : public QObject
 
     public slots:
 
-        QObject* GetChannelInfoList  ( int      SourceID,
-                                       int      StartIndex,
-                                       int      Count,
-                                       bool     OnlyVisible = false )
+        QObject* GetChannelInfoList  ( int      SourceID = 0,
+                                       int      StartIndex = 0,
+                                       int      Count = 0,
+                                       bool     OnlyVisible = false,
+                                       bool     Details = false )
         {
-            return m_obj.GetChannelInfoList( SourceID, StartIndex, Count, OnlyVisible );
+            return m_obj.GetChannelInfoList( SourceID, StartIndex, Count, OnlyVisible, Details );
         }
 
         QObject* GetChannelInfo      ( int      ChanID     )

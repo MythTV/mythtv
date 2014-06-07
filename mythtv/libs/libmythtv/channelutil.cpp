@@ -723,7 +723,7 @@ bool ChannelUtil::GetTuningParams(uint      mplexid,
         "WHERE mplexid = :MPLEXID");
     query.bindValue(":MPLEXID", mplexid);
 
-    if (!query.exec() || !query.isActive())
+    if (!query.exec())
     {
         MythDB::DBError("GetTuningParams failed ", query);
         return false;
