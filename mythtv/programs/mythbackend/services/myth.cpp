@@ -64,11 +64,11 @@ DTC::ConnectionInfo* Myth::GetConnectionInfo( const QString  &sPin )
     // Check for DBHostName of "localhost" and change to public name or IP
     // ----------------------------------------------------------------------
 
-    QString sServerIP = gCoreContext->GetSetting( "BackendServerIP", "localhost" );
+    QString sServerIP = gCoreContext->GetBackendServerIP();
     //QString sPeerIP   = pRequest->GetPeerAddress();
 
     if ((params.dbHostName == "localhost") &&
-        (sServerIP         != "localhost"))  // &&
+        !sServerIP.isEmpty())  // &&
         //(sServerIP         != sPeerIP    ))
     {
         params.dbHostName = sServerIP;
