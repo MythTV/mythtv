@@ -17,7 +17,6 @@ NetBase::NetBase(MythScreenStack *parent, const char *name)
     : MythScreenType(parent, name),
       m_thumbImage(NULL),
       m_downloadable(NULL),
-      m_busyPopup(NULL),
       m_popupStack(GetMythMainWindow()->GetStack("popup stack")),
       m_progressDialog(NULL),
       m_imageDownload(new MetadataImageDownload(this))
@@ -63,23 +62,6 @@ void NetBase::InitProgressDialog()
     {
         delete m_progressDialog;
         m_progressDialog = NULL;
-    }
-}
-
-void NetBase::CreateBusyDialog(const QString &title)
-{
-    if (m_busyPopup)
-        return;
-
-    m_busyPopup = new MythUIBusyDialog(title, m_popupStack,
-        "netvisionbusydialog");
-
-    if (m_busyPopup->Create())
-        m_popupStack->AddScreen(m_busyPopup);
-    else
-    {
-        delete m_busyPopup;
-        m_busyPopup = NULL;
     }
 }
 

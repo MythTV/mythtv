@@ -28,7 +28,6 @@ class NetBase : public MythScreenType
     virtual ResultItem *GetStreamItem() = 0;
     virtual void LoadData(void) = 0;
     void InitProgressDialog();
-    void CreateBusyDialog(const QString &title);
     void CleanCacheDir();
     void DownloadVideo(const QString &url, const QString &dest);
     void RunCmdWithoutScreensaver(const QString &cmd);
@@ -45,7 +44,6 @@ class NetBase : public MythScreenType
   protected:
     MythUIImage           *m_thumbImage;
     MythUIStateType       *m_downloadable;
-    MythUIBusyDialog      *m_busyPopup;
     MythScreenStack       *m_popupStack;
     MythUIProgressDialog  *m_progressDialog;
     MetadataImageDownload *m_imageDownload;

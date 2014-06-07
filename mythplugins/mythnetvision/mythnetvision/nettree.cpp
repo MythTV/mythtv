@@ -857,11 +857,7 @@ void NetTree::RunRSSEditor()
 
 void NetTree::DoTreeRefresh()
 {
-    if (m_busyPopup)
-    {
-        m_busyPopup->Close();
-        m_busyPopup = NULL;
-    }
+    CloseBusyPopup();
 
     TreeRefresh();
 }
@@ -886,7 +882,7 @@ void NetTree::UpdateRSS()
         return;
 
     QString title(tr("Updating RSS.  This could take a while..."));
-    CreateBusyDialog(title);
+    OpenBusyPopup(title);
 
     RSSManager *rssMan = new RSSManager();
     connect(rssMan, SIGNAL(finished()), this, SLOT(DoTreeRefresh()));
@@ -900,7 +896,7 @@ void NetTree::UpdateTrees()
         return;
 
     QString title(tr("Updating Site Maps.  This could take a while..."));
-    CreateBusyDialog(title);
+    OpenBusyPopup(title);
     m_gdt->refreshAll();
 }
 

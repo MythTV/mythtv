@@ -259,7 +259,7 @@ void NetSearch::DoSearch()
 
     QString title = tr("Searching %1 for \"%2\"...")
                     .arg(grabber).arg(query);
-    CreateBusyDialog(title);
+    OpenBusyPopup(title);
 
     if (!m_netSearch)
         m_netSearch = new QNetworkAccessManager(this);
@@ -283,7 +283,7 @@ void NetSearch::GetLastResults()
     QString title = tr("Changing to page %1 of search \"%2\"...")
                     .arg(QString::number(m_pagenum))
                     .arg(m_currentSearch);
-    CreateBusyDialog(title);
+    OpenBusyPopup(title);
 
     QUrl req = GetMythXMLSearch(m_mythXML, m_currentSearch,
                                 m_currentCmd, m_pagenum);
@@ -299,7 +299,7 @@ void NetSearch::GetMoreResults()
     QString title = tr("Changing to page %1 of search \"%2\"...")
                     .arg(QString::number(m_pagenum))
                     .arg(m_currentSearch);
-    CreateBusyDialog(title);
+    OpenBusyPopup(title);
 
     QUrl req = GetMythXMLSearch(m_mythXML, m_currentSearch,
                                 m_currentCmd, m_pagenum);
@@ -308,11 +308,7 @@ void NetSearch::GetMoreResults()
 
 void NetSearch::SearchFinished(void)
 {
-    if (m_busyPopup)
-    {
-        m_busyPopup->Close();
-        m_busyPopup = NULL;
-    }
+    CloseBusyPopup();
 
     Search *item = new Search();
     QByteArray data = m_reply->readAll();
@@ -352,11 +348,7 @@ void NetSearch::SearchFinished(void)
 
 void NetSearch::SearchTimeout(Search *)
 {
-    if (m_busyPopup)
-    {
-        m_busyPopup->Close();
-        m_busyPopup = NULL;
-    }
+    CloseBusyPopup();
 
     QString message = tr("Timed out waiting for query to "
                          "finish.  API might be down.");
