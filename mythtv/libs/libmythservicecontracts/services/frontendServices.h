@@ -8,7 +8,7 @@
 class SERVICE_PUBLIC FrontendServices : public Service
 {
     Q_OBJECT
-    Q_CLASSINFO( "version", "1.1" );
+    Q_CLASSINFO( "version", "2.0" );
     Q_CLASSINFO( "SendMessage_Method",            "POST" )
     Q_CLASSINFO( "SendNotification_Method",       "POST" )
     Q_CLASSINFO( "SendAction_Method",             "POST" )

@@ -13,7 +13,7 @@
 class SERVICE_PUBLIC ImageServices : public Service
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.1" )
+    Q_CLASSINFO( "version"    , "2.0" )
     Q_CLASSINFO( "SetImageInfo_Method",             "POST" )
     Q_CLASSINFO( "RemoveImageFromDB_Method",        "POST" )
     Q_CLASSINFO( "RemoveImage_Method",              "POST" )
