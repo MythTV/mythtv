@@ -42,7 +42,7 @@ NetBase::~NetBase()
 
 void NetBase::Init()
 {
-    loadData();
+    LoadData();
 }
 
 void NetBase::DownloadVideo(const QString &url, const QString &dest)
@@ -104,7 +104,7 @@ void NetBase::CleanCacheDir()
     }
 }
 
-void NetBase::streamWebVideo()
+void NetBase::StreamWebVideo()
 {
     ResultItem *item = GetStreamItem();
 
@@ -113,7 +113,7 @@ void NetBase::streamWebVideo()
 
     if (!item->GetDownloadable())
     {
-        showWebVideo();
+        ShowWebVideo();
         return;
     }
 
@@ -124,7 +124,7 @@ void NetBase::streamWebVideo()
         item->GetTime().toInt(), item->GetDate().toString("yyyy"));
 }
 
-void NetBase::showWebVideo()
+void NetBase::ShowWebVideo()
 {
     ResultItem *item = GetStreamItem();
 
@@ -200,7 +200,7 @@ void NetBase::RunCmdWithoutScreensaver(const QString &cmd)
     GetMythUI()->RestoreScreensaver();
 }
 
-void NetBase::slotDeleteVideo()
+void NetBase::SlotDeleteVideo()
 {
     QString message = tr("Are you sure you want to delete this file?");
 
@@ -211,13 +211,13 @@ void NetBase::slotDeleteVideo()
     {
         m_popupStack->AddScreen(confirmdialog);
         connect(confirmdialog, SIGNAL(haveResult(bool)),
-                SLOT(doDeleteVideo(bool)));
+                SLOT(DoDeleteVideo(bool)));
     }
     else
         delete confirmdialog;
 }
 
-void NetBase::doDeleteVideo(bool remove)
+void NetBase::DoDeleteVideo(bool remove)
 {
     if (!remove)
         return;
@@ -279,7 +279,7 @@ void NetBase::customEvent(QEvent *event)
                     if ((errorCode == 0) &&
                         (fileSize > 0))
                     {
-                        doPlayVideo(m_downloadFile);
+                        DoPlayVideo(m_downloadFile);
                     }
                     else
                     {
@@ -291,7 +291,7 @@ void NetBase::customEvent(QEvent *event)
     }
 }
 
-void NetBase::doDownloadAndPlay()
+void NetBase::DoDownloadAndPlay()
 {
     ResultItem *item = GetStreamItem();
     if (!item)
@@ -312,14 +312,14 @@ void NetBase::doDownloadAndPlay()
 
     if (exists)
     {
-        doPlayVideo(finalFilename);
+        DoPlayVideo(finalFilename);
         return;
     }
     else
         DownloadVideo(item->GetMediaURL(), baseFilename);
 }
 
-void NetBase::doPlayVideo(const QString &filename)
+void NetBase::DoPlayVideo(const QString &filename)
 {
     ResultItem *item = GetStreamItem();
     if (!item)

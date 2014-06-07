@@ -58,13 +58,13 @@ class RSSEditPopup : public MythScreenType
     QNetworkReply          *m_reply;
 
   signals:
-    void saving(void);
+    void Saving(void);
 
   private slots:
-    void slotCheckRedirect(QNetworkReply* reply);
-    void parseAndSave(void);
-    void slotSave(QNetworkReply *reply);
-    void doFileBrowser(void);
+    void SlotCheckRedirect(QNetworkReply* reply);
+    void ParseAndSave(void);
+    void SlotSave(QNetworkReply *reply);
+    void DoFileBrowser(void);
     void SelectImagePopup(const QString &prefix,
                         QObject &inst,
                         const QString &returnEvent);
@@ -101,17 +101,17 @@ class RSSEditor : public MythScreenType
     MythUIText       *m_author;
 
   signals:
-    void itemsChanged(void);
+    void ItemsChanged(void);
 
   public slots:
-    void slotItemChanged();
-    void loadData(void);
+    void SlotItemChanged();
+    void LoadData(void);
 
-    void slotDeleteSite(void);
-    void doDeleteSite(bool remove);
-    void slotEditSite(void);
-    void slotNewSite(void);
-    void listChanged(void);
+    void SlotDeleteSite(void);
+    void DoDeleteSite(bool remove);
+    void SlotEditSite(void);
+    void SlotNewSite(void);
+    void ListChanged(void);
 };
 
 #endif /* RSSEDITOR_H */

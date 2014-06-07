@@ -46,7 +46,7 @@ NetTree::NetTree(DialogType type, MythScreenStack *parent, const char *name)
       m_currentNode(NULL),           m_noSites(NULL),
       m_gdt(new GrabberDownloadThread(this)), m_type(type)
 {
-    connect(m_gdt, SIGNAL(finished()), SLOT(doTreeRefresh()));
+    connect(m_gdt, SIGNAL(finished()), SLOT(DoTreeRefresh()));
     m_updateFreq = gCoreContext->GetNumSetting(
                        "mythNetTree.updateFreq", 6);
     m_rssAutoUpdate = gCoreContext->GetNumSetting(
@@ -108,20 +108,20 @@ bool NetTree::Create()
         SetFocusWidget(m_siteMap);
 
         connect(m_siteMap, SIGNAL(itemClicked(MythUIButtonListItem *)),
-                SLOT(streamWebVideo(void)));
+                SLOT(StreamWebVideo(void)));
         connect(m_siteMap, SIGNAL(itemSelected(MythUIButtonListItem *)),
-                SLOT(slotItemChanged(void)));
+                SLOT(SlotItemChanged(void)));
         connect(m_siteMap, SIGNAL(nodeChanged(MythGenericTree *)),
-                SLOT(slotItemChanged(void)));
+                SLOT(SlotItemChanged(void)));
     }
     else
     {
         SetFocusWidget(m_siteButtonList);
 
         connect(m_siteButtonList, SIGNAL(itemClicked(MythUIButtonListItem *)),
-                SLOT(handleSelect(MythUIButtonListItem *)));
+                SLOT(HandleSelect(MythUIButtonListItem *)));
         connect(m_siteButtonList, SIGNAL(itemSelected(MythUIButtonListItem *)),
-                SLOT(slotItemChanged(void)));
+                SLOT(SlotItemChanged(void)));
     }
 
     return true;
@@ -132,7 +132,7 @@ void NetTree::Load()
     m_grabberList = findAllDBTreeGrabbersByHost(VIDEO_FILE);
     m_rssList = findAllDBRSS();
 
-    fillTree();
+    FillTree();
 }
 
 void NetTree::SetCurrentNode(MythGenericTree *node)
@@ -160,7 +160,7 @@ NetTree::~NetTree()
     m_videos.clear();
 }
 
-void NetTree::loadData(void)
+void NetTree::LoadData(void)
 {
     if (m_type == DLG_TREE)
         m_siteMap->AssignTree(m_siteGeneric);
@@ -197,7 +197,7 @@ void NetTree::loadData(void)
             }
         }
 
-        slotItemChanged();
+        SlotItemChanged();
     }
 
     if (m_siteGeneric->childCount() == 0 && m_noSites)
@@ -206,7 +206,7 @@ void NetTree::loadData(void)
         m_noSites->SetVisible(false);
 
     if (m_siteGeneric->childCount() == 0)
-        runTreeEditor();
+        RunTreeEditor();
 }
 
 void NetTree::UpdateItem(MythUIButtonListItem *item)
@@ -306,7 +306,7 @@ void NetTree::UpdateItem(MythUIButtonListItem *item)
     }
 }
 
-void NetTree::handleSelect(MythUIButtonListItem *item)
+void NetTree::HandleSelect(MythUIButtonListItem *item)
 {
     MythGenericTree *node = GetNodePtrFromButton(item);
     if (!node)
@@ -317,29 +317,29 @@ void NetTree::handleSelect(MythUIButtonListItem *item)
     switch (nodeInt)
     {
         case kSubFolder:
-            handleDirSelect(node);
+            HandleDirSelect(node);
             break;
         case kUpFolder:
-            goBack();
+            GoBack();
             break;
         default:
         {
-            streamWebVideo();
+            StreamWebVideo();
         }
     }
-    slotItemChanged();
+    SlotItemChanged();
 }
 
-void NetTree::handleDirSelect(MythGenericTree *node)
+void NetTree::HandleDirSelect(MythGenericTree *node)
 {
     if (m_imageDownload && m_imageDownload->isRunning())
         m_imageDownload->cancel();
 
     SetCurrentNode(node);
-    loadData();
+    LoadData();
 }
 
-bool NetTree::goBack()
+bool NetTree::GoBack()
 {
     bool handled = false;
 
@@ -356,7 +356,7 @@ bool NetTree::goBack()
         }
     }
 
-    loadData();
+    LoadData();
 
     return handled;
 }
@@ -377,14 +377,14 @@ bool NetTree::keyPressEvent(QKeyEvent *event)
 
         if (action == "MENU")
         {
-            showMenu();
+            ShowMenu();
         }
         else if (action == "ESCAPE")
         {
             if (m_type != DLG_TREE
                     && !GetMythMainWindow()->IsExitingToMain()
                     && m_currentNode != m_siteGeneric)
-                handled = goBack();
+                handled = GoBack();
             else
                 handled = false;
         }
@@ -398,7 +398,7 @@ bool NetTree::keyPressEvent(QKeyEvent *event)
     return handled;
 }
 
-void NetTree::showMenu(void)
+void NetTree::ShowMenu(void)
 {
     QString label = tr("Playback/Download Options");
 
@@ -423,15 +423,15 @@ void NetTree::showMenu(void)
     if (item)
     {
         if (item->GetDownloadable())
-            menu->AddItem(tr("Stream Video"), SLOT(streamWebVideo()));
-        menu->AddItem(tr("Open Web Link"), SLOT(showWebVideo()));
+            menu->AddItem(tr("Stream Video"), SLOT(StreamWebVideo()));
+        menu->AddItem(tr("Open Web Link"), SLOT(ShowWebVideo()));
 
         if (item->GetDownloadable())
-            menu->AddItem(tr("Save This Video"), SLOT(doDownloadAndPlay()));
+            menu->AddItem(tr("Save This Video"), SLOT(DoDownloadAndPlay()));
     }
 
-    menu->AddItem(tr("Scan/Manage Subscriptions"), NULL, createShowManageMenu());
-    menu->AddItem(tr("Change View"), NULL, createShowViewMenu());
+    menu->AddItem(tr("Scan/Manage Subscriptions"), NULL, CreateShowManageMenu());
+    menu->AddItem(tr("Change View"), NULL, CreateShowViewMenu());
 
     MythDialogBox *menuPopup = new MythDialogBox(menu, m_popupStack, "mythnettreemenupopup");
 
@@ -441,64 +441,64 @@ void NetTree::showMenu(void)
         delete menuPopup;
 }
 
-MythMenu* NetTree::createShowViewMenu()
+MythMenu* NetTree::CreateShowViewMenu()
 {
     QString label = tr("View Options");
 
     MythMenu *menu = new MythMenu(label, this, "options");
 
     if (m_type != DLG_TREE)
-        menu->AddItem(tr("Switch to List View"), SLOT(switchTreeView()));
+        menu->AddItem(tr("Switch to List View"), SLOT(SwitchTreeView()));
     if (m_type != DLG_GALLERY)
-        menu->AddItem(tr("Switch to Gallery View"), SLOT(switchGalleryView()));
+        menu->AddItem(tr("Switch to Gallery View"), SLOT(SwitchGalleryView()));
     if (m_type != DLG_BROWSER)
-        menu->AddItem(tr("Switch to Browse View"), SLOT(switchBrowseView()));
+        menu->AddItem(tr("Switch to Browse View"), SLOT(SwitchBrowseView()));
 
     return menu;
 }
 
-MythMenu* NetTree::createShowManageMenu()
+MythMenu* NetTree::CreateShowManageMenu()
 {
     QString label = tr("Subscription Management");
 
     MythMenu *menu = new MythMenu(label, this, "options");
 
 
-    menu->AddItem(tr("Update Site Maps"), SLOT(updateTrees()));
-    menu->AddItem(tr("Update RSS"), SLOT(updateRSS()));
-    menu->AddItem(tr("Manage Site Subscriptions"), SLOT(runTreeEditor()));
-    menu->AddItem(tr("Manage RSS Subscriptions"), SLOT(runRSSEditor()));
+    menu->AddItem(tr("Update Site Maps"), SLOT(UpdateTrees()));
+    menu->AddItem(tr("Update RSS"), SLOT(UpdateRSS()));
+    menu->AddItem(tr("Manage Site Subscriptions"), SLOT(RunTreeEditor()));
+    menu->AddItem(tr("Manage RSS Subscriptions"), SLOT(RunRSSEditor()));
     if (!m_treeAutoUpdate)
-        menu->AddItem(tr("Enable Automatic Site Updates"), SLOT(toggleTreeUpdates()));
+        menu->AddItem(tr("Enable Automatic Site Updates"), SLOT(ToggleTreeUpdates()));
     else
-        menu->AddItem(tr("Disable Automatic Site Updates"), SLOT(toggleTreeUpdates()));
+        menu->AddItem(tr("Disable Automatic Site Updates"), SLOT(ToggleTreeUpdates()));
 //    if (!m_rssAutoUpdate)
-//        menu->AddItem(tr("Enable Automatic RSS Updates"), SLOT(toggleRSSUpdates()));
+//        menu->AddItem(tr("Enable Automatic RSS Updates"), SLOT(ToggleRSSUpdates()));
 //    else
-//        menu->AddItem(tr("Disable Automatic RSS Updates"), SLOT(toggleRSSUpdates()));
+//        menu->AddItem(tr("Disable Automatic RSS Updates"), SLOT(ToggleRSSUpdates()));
 
     return menu;
 }
 
-void NetTree::switchTreeView()
+void NetTree::SwitchTreeView()
 {
     m_type = DLG_TREE;
-    switchView();
+    SwitchView();
 }
 
-void NetTree::switchGalleryView()
+void NetTree::SwitchGalleryView()
 {
     m_type = DLG_GALLERY;
-    switchView();
+    SwitchView();
 }
 
-void NetTree::switchBrowseView()
+void NetTree::SwitchBrowseView()
 {
     m_type = DLG_BROWSER;
-    switchView();
+    SwitchView();
 }
 
-void NetTree::switchView()
+void NetTree::SwitchView()
 {
     NetTree *nettree =
             new NetTree(m_type, GetMythMainWindow()->GetMainStack(), "nettree");
@@ -515,7 +515,7 @@ void NetTree::switchView()
         delete nettree;
 }
 
-void NetTree::fillTree()
+void NetTree::FillTree()
 {
     // First let's add all the RSS
 
@@ -591,13 +591,13 @@ void NetTree::fillTree()
             QStringList curPaths = (*i).first.split("/");
             QString dirthumb = (*i).second;
             QList<ResultItem*> videos = treePathsNodes.values(*i);
-            buildGenericTree(ret, curPaths, dirthumb, videos);
+            BuildGenericTree(ret, curPaths, dirthumb, videos);
         }
         m_siteGeneric->addNode(ret);
     }
 }
 
-void NetTree::buildGenericTree(MythGenericTree *dst, QStringList paths,
+void NetTree::BuildGenericTree(MythGenericTree *dst, QStringList paths,
                                QString dirthumb, QList<ResultItem*> videos)
 {
     MythGenericTree *folder = NULL;
@@ -630,7 +630,7 @@ void NetTree::buildGenericTree(MythGenericTree *dst, QStringList paths,
     }
 
     if (paths.size())
-        buildGenericTree(folder, paths, dirthumb, videos);
+        BuildGenericTree(folder, paths, dirthumb, videos);
     else
     {
         // File Handling
@@ -668,7 +668,7 @@ ResultItem* NetTree::GetStreamItem()
     return item;
 }
 
-void NetTree::slotItemChanged()
+void NetTree::SlotItemChanged()
 {
     ResultItem *item;
     RSSSite *site;
@@ -827,7 +827,7 @@ void NetTree::slotItemChanged()
     }
 }
 
-void NetTree::runTreeEditor()
+void NetTree::RunTreeEditor()
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
@@ -836,7 +836,7 @@ void NetTree::runTreeEditor()
     if (treeedit->Create())
     {
         connect(treeedit, SIGNAL(ItemsChanged()), this,
-                       SLOT(doTreeRefresh()));
+                       SLOT(DoTreeRefresh()));
 
         mainStack->AddScreen(treeedit);
     }
@@ -846,7 +846,7 @@ void NetTree::runTreeEditor()
     }
 }
 
-void NetTree::runRSSEditor()
+void NetTree::RunRSSEditor()
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
@@ -855,7 +855,7 @@ void NetTree::runRSSEditor()
     if (rssedit->Create())
     {
         connect(rssedit, SIGNAL(ItemsChanged()), this,
-                       SLOT(updateRSS()));
+                       SLOT(UpdateRSS()));
 
         mainStack->AddScreen(rssedit);
     }
@@ -865,7 +865,7 @@ void NetTree::runRSSEditor()
     }
 }
 
-void NetTree::doTreeRefresh()
+void NetTree::DoTreeRefresh()
 {
     if (m_busyPopup)
     {
@@ -884,12 +884,12 @@ void NetTree::TreeRefresh()
     m_grabberList = findAllDBTreeGrabbers();
     m_rssList = findAllDBRSS();
 
-    fillTree();
-    loadData();
-    switchView();
+    FillTree();
+    LoadData();
+    SwitchView();
 }
 
-void NetTree::updateRSS()
+void NetTree::UpdateRSS()
 {
     if (findAllDBRSS().isEmpty())
         return;
@@ -899,12 +899,12 @@ void NetTree::updateRSS()
 
     RSSManager *rssMan = new RSSManager();
     connect(rssMan, SIGNAL(finished()), this,
-                   SLOT(doTreeRefresh()));
+                   SLOT(DoTreeRefresh()));
     rssMan->startTimer();
     rssMan->doUpdate();
 }
 
-void NetTree::updateTrees()
+void NetTree::UpdateTrees()
 {
     if (m_grabberList.count() == 0)
         return;
@@ -914,14 +914,14 @@ void NetTree::updateTrees()
     m_gdt->refreshAll();
 }
 
-void NetTree::toggleRSSUpdates()
+void NetTree::ToggleRSSUpdates()
 {
     m_rssAutoUpdate = !m_rssAutoUpdate;
     gCoreContext->SaveSetting("mythnetvision.rssBackgroundFetch",
                          m_rssAutoUpdate);
 }
 
-void NetTree::toggleTreeUpdates()
+void NetTree::ToggleTreeUpdates()
 {
     m_treeAutoUpdate = !m_treeAutoUpdate;
     gCoreContext->SaveSetting("mythnetvision.backgroundFetch",

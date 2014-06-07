@@ -26,7 +26,7 @@ class NetBase : public MythScreenType
   protected:
     virtual void Init();
     virtual ResultItem *GetStreamItem() = 0;
-    virtual void loadData(void) = 0;
+    virtual void LoadData(void) = 0;
     void InitProgressDialog();
     void CreateBusyDialog(const QString &title);
     void CleanCacheDir();
@@ -34,12 +34,12 @@ class NetBase : public MythScreenType
     void RunCmdWithoutScreensaver(const QString &cmd);
 
   protected slots:
-    void streamWebVideo(void);
-    void showWebVideo(void);
-    void doDownloadAndPlay(void);
-    void doPlayVideo(const QString &filename);
-    void slotDeleteVideo(void);
-    void doDeleteVideo(bool remove);
+    void StreamWebVideo(void);
+    void ShowWebVideo(void);
+    void DoDownloadAndPlay(void);
+    void DoPlayVideo(const QString &filename);
+    void SlotDeleteVideo(void);
+    void DoDeleteVideo(bool remove);
     virtual void customEvent(QEvent *event);
 
   protected:

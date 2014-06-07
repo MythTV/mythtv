@@ -97,9 +97,9 @@ bool RSSEditPopup::Create(void)
         return false;
     }
 
-    connect(m_okButton, SIGNAL(Clicked()), this, SLOT(parseAndSave()));
+    connect(m_okButton, SIGNAL(Clicked()), this, SLOT(ParseAndSave()));
     connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(Close()));
-    connect(m_thumbButton, SIGNAL(Clicked()), this, SLOT(doFileBrowser()));
+    connect(m_thumbButton, SIGNAL(Clicked()), this, SLOT(DoFileBrowser()));
 
     m_urlEdit->SetMaxLength(0);
     m_titleEdit->SetMaxLength(255);
@@ -146,7 +146,7 @@ bool RSSEditPopup::keyPressEvent(QKeyEvent *event)
     return handled;
 }
 
-void RSSEditPopup::parseAndSave(void)
+void RSSEditPopup::ParseAndSave(void)
 {
     if (m_editing)
     {
@@ -166,7 +166,7 @@ void RSSEditPopup::parseAndSave(void)
 
         if (insertInDB(new RSSSite(title, filename, VIDEO_PODCAST,
                 desc, link, author, download, MythDate::current())))
-            emit saving();
+            emit Saving();
         Close();
     }
     else
@@ -177,7 +177,7 @@ void RSSEditPopup::parseAndSave(void)
         m_reply = m_manager->get(QNetworkRequest(qurl));
 
         connect(m_manager, SIGNAL(finished(QNetworkReply*)), this,
-                           SLOT(slotCheckRedirect(QNetworkReply*)));
+                           SLOT(SlotCheckRedirect(QNetworkReply*)));
     }
 }
 
@@ -190,7 +190,7 @@ QUrl RSSEditPopup::redirectUrl(const QUrl& possibleRedirectUrl,
     return redirectUrl;
 }
 
-void RSSEditPopup::slotCheckRedirect(QNetworkReply* reply)
+void RSSEditPopup::SlotCheckRedirect(QNetworkReply* reply)
 {
     QVariant possibleRedirectUrl =
          reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
@@ -207,12 +207,12 @@ void RSSEditPopup::slotCheckRedirect(QNetworkReply* reply)
     else
     {
 //        urlRedirectedTo.clear();
-        slotSave(reply);
+        SlotSave(reply);
     }
     reply->deleteLater();
 }
 
-void RSSEditPopup::slotSave(QNetworkReply* reply)
+void RSSEditPopup::SlotSave(QNetworkReply* reply)
 {
     QDomDocument document;
     document.setContent(reply->read(reply->bytesAvailable()), true);
@@ -314,13 +314,13 @@ void RSSEditPopup::slotSave(QNetworkReply* reply)
 
         if (insertInDB(new RSSSite(title, filename, VIDEO_PODCAST, description, link,
                 author, download, MythDate::current())))
-            emit saving();
+            emit Saving();
     }
 
     Close();
 }
 
-void RSSEditPopup::doFileBrowser()
+void RSSEditPopup::DoFileBrowser()
 {
     SelectImagePopup(GetConfDir() + "/MythNetvision" + "/sitecovers", *this, CEID_NEWIMAGE);
 }
@@ -368,7 +368,7 @@ RSSEditor::~RSSEditor()
     QMutexLocker locker(&m_lock);
 
     if (m_changed)
-        emit itemsChanged();
+        emit ItemsChanged();
 }
 
 bool RSSEditor::Create(void)
@@ -400,31 +400,31 @@ bool RSSEditor::Create(void)
     }
 
     connect(m_sites, SIGNAL(itemClicked(MythUIButtonListItem*)),
-            this, SLOT(slotEditSite(void)));
+            this, SLOT(SlotEditSite(void)));
 
     connect(m_delete, SIGNAL(Clicked(void)),
-            SLOT(slotDeleteSite(void)));
+            SLOT(SlotDeleteSite(void)));
     connect(m_edit, SIGNAL(Clicked(void)),
-            SLOT(slotEditSite(void)));
+            SLOT(SlotEditSite(void)));
     connect(m_new, SIGNAL(Clicked(void)),
-            SLOT(slotNewSite(void)));
+            SLOT(SlotNewSite(void)));
 
     connect(m_sites, SIGNAL(itemSelected(MythUIButtonListItem *)),
-            SLOT(slotItemChanged(void)));
+            SLOT(SlotItemChanged(void)));
 
     BuildFocusList();
 
-    loadData();
+    LoadData();
 
     if (m_sites->GetCount() == 0)
         SetFocusWidget(m_new);
     else
-        slotItemChanged();
+        SlotItemChanged();
 
     return true;
 }
 
-void RSSEditor::loadData()
+void RSSEditor::LoadData()
 {
     qDeleteAll(m_siteList);
     m_siteList = findAllDBRSS();
@@ -458,11 +458,11 @@ bool RSSEditor::keyPressEvent(QKeyEvent *event)
 
         if (action == "DELETE" && GetFocusWidget() == m_sites)
         {
-            slotDeleteSite();
+            SlotDeleteSite();
         }
         else if (action == "EDIT" && GetFocusWidget() == m_sites)
         {
-            slotEditSite();
+            SlotEditSite();
         }
         else
             handled = false;
@@ -495,7 +495,7 @@ void RSSEditor::fillRSSButtonList()
     }
 }
 
-void RSSEditor::slotItemChanged()
+void RSSEditor::SlotItemChanged()
 {
     RSSSite *site = qVariantValue<RSSSite *>(m_sites->GetItemCurrent()->GetData());
 
@@ -524,7 +524,7 @@ void RSSEditor::slotItemChanged()
     }
 }
 
-void RSSEditor::slotDeleteSite()
+void RSSEditor::SlotDeleteSite()
 {
     QMutexLocker locker(&m_lock);
 
@@ -540,13 +540,13 @@ void RSSEditor::slotDeleteSite()
         m_popupStack->AddScreen(confirmdialog);
 
         connect(confirmdialog, SIGNAL(haveResult(bool)),
-                SLOT(doDeleteSite(bool)));
+                SLOT(DoDeleteSite(bool)));
     }
     else
         delete confirmdialog;
 }
 
-void RSSEditor::slotEditSite()
+void RSSEditor::SlotEditSite()
 {
     QMutexLocker locker(&m_lock);
 
@@ -560,8 +560,8 @@ void RSSEditor::slotEditSite()
 
         if (rsseditpopup->Create())
         {
-            connect(rsseditpopup, SIGNAL(saving()), this,
-                           SLOT(listChanged()));
+            connect(rsseditpopup, SIGNAL(Saving()), this,
+                           SLOT(ListChanged()));
 
             mainStack->AddScreen(rsseditpopup);
         }
@@ -572,7 +572,7 @@ void RSSEditor::slotEditSite()
     }
 }
 
-void RSSEditor::slotNewSite()
+void RSSEditor::SlotNewSite()
 {
     QMutexLocker locker(&m_lock);
 
@@ -582,8 +582,8 @@ void RSSEditor::slotNewSite()
 
     if (rsseditpopup->Create())
     {
-        connect(rsseditpopup, SIGNAL(saving()), this,
-                       SLOT(listChanged()));
+        connect(rsseditpopup, SIGNAL(Saving()), this,
+                       SLOT(ListChanged()));
 
         mainStack->AddScreen(rsseditpopup);
     }
@@ -593,7 +593,7 @@ void RSSEditor::slotNewSite()
     }
 }
 
-void RSSEditor::doDeleteSite(bool remove)
+void RSSEditor::DoDeleteSite(bool remove)
 {
     QMutexLocker locker(&m_lock);
 
@@ -603,11 +603,11 @@ void RSSEditor::doDeleteSite(bool remove)
     RSSSite *site = qVariantValue<RSSSite *>(m_sites->GetItemCurrent()->GetData());
 
     if (removeFromDB(site))
-        listChanged();
+        ListChanged();
 }
 
-void RSSEditor::listChanged()
+void RSSEditor::ListChanged()
 {
     m_changed = true;
-    loadData();
+    LoadData();
 }

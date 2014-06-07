@@ -28,7 +28,7 @@ class NetSearch : public NetBase
     bool Create(void);
     bool keyPressEvent(QKeyEvent *);
 
-    void populateResultList(ResultItem::resultList list);
+    void PopulateResultList(ResultItem::resultList list);
 
   protected:
     virtual ResultItem *GetStreamItem();
@@ -59,21 +59,18 @@ class NetSearch : public NetBase
     RSSSite::rssList    m_rssList;
 
   private slots:
-    void showMenu(void);
-    void getMoreResults();
-    void getLastResults();
-    void runSearchEditor();
-    void doListRefresh();
+    void ShowMenu(void);
+    void GetMoreResults();
+    void GetLastResults();
+    void RunSearchEditor();
+    void DoListRefresh();
 
-    void doSearch(void);
-    void searchFinished(void);
-    void searchTimeout(Search *item);
-    void loadData(void);
-    void fillGrabberButtonList(void);
-    void slotItemChanged(void);
-    void slotDoProgress(qint64 bytesReceived,
-                        qint64 bytesTotal);
-    void slotDownloadFinished(void);
+    void DoSearch(void);
+    void SearchFinished(void);
+    void SearchTimeout(Search *item);
+    void LoadData(void);
+    void FillGrabberButtonList(void);
+    void SlotItemChanged(void);
     void customEvent(QEvent *levent);
 };
 

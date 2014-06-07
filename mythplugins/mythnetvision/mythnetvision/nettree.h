@@ -49,23 +49,21 @@ class NetTree : public NetBase
     bool Create(void);
     bool keyPressEvent(QKeyEvent *);
 
-    void populateResultList(ResultItem::resultList list);
-
   protected:
     virtual ResultItem *GetStreamItem();
 
   private:
     virtual void Load();
 
-    void fillTree(void);
+    void FillTree(void);
     void SetCurrentNode(MythGenericTree *node);
-    void handleDirSelect(MythGenericTree *node);
-    bool goBack();
+    void HandleDirSelect(MythGenericTree *node);
+    bool GoBack();
     void UpdateItem(MythUIButtonListItem *item);
 
-    void buildGenericTree(MythGenericTree* dst,
+    void BuildGenericTree(MythGenericTree* dst,
                     QDomElement& domElem);
-    void buildGenericTree(MythGenericTree *dst,
+    void BuildGenericTree(MythGenericTree *dst,
                           QStringList paths,
                           QString dirthumb,
                           QList<ResultItem*> videos);
@@ -73,7 +71,7 @@ class NetTree : public NetBase
     int AddFileNode(MythGenericTree *where_to_add,
                     ResultItem *video);
 
-    void switchView(void);
+    void SwitchView(void);
 
     // Only to keep track of what to delete
     QList<ResultItem*> m_videos;
@@ -96,26 +94,26 @@ class NetTree : public NetBase
     bool                m_treeAutoUpdate;
 
   private slots:
-    void showMenu(void);
-    MythMenu* createShowViewMenu(void);
-    MythMenu* createShowManageMenu(void);
-    void runTreeEditor(void);
-    void runRSSEditor(void);
-    void loadData(void);
-    void handleSelect(MythUIButtonListItem *item);
+    void ShowMenu(void);
+    MythMenu* CreateShowViewMenu(void);
+    MythMenu* CreateShowManageMenu(void);
+    void RunTreeEditor(void);
+    void RunRSSEditor(void);
+    void LoadData(void);
+    void HandleSelect(MythUIButtonListItem *item);
 
-    void switchTreeView(void);
-    void switchGalleryView(void);
-    void switchBrowseView(void);
+    void SwitchTreeView(void);
+    void SwitchGalleryView(void);
+    void SwitchBrowseView(void);
 
-    void updateRSS();
-    void updateTrees();
-    void toggleRSSUpdates();
-    void toggleTreeUpdates();
+    void UpdateRSS();
+    void UpdateTrees();
+    void ToggleRSSUpdates();
+    void ToggleTreeUpdates();
 
-    void slotItemChanged();
+    void SlotItemChanged();
 
-    void doTreeRefresh();
+    void DoTreeRefresh();
     void TreeRefresh();
 
     void customEvent(QEvent *levent);

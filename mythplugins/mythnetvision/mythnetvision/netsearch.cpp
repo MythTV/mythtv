@@ -82,13 +82,13 @@ bool NetSearch::Create()
 
     // UI Hookups
     connect(m_siteList, SIGNAL(itemSelected(MythUIButtonListItem *)),
-                       SLOT(slotItemChanged()));
+                       SLOT(SlotItemChanged()));
     connect(m_siteList, SIGNAL(itemClicked(MythUIButtonListItem *)),
-                       SLOT(doSearch(void)));
+                       SLOT(DoSearch(void)));
     connect(m_searchResultList, SIGNAL(itemClicked(MythUIButtonListItem *)),
-                       SLOT(streamWebVideo(void)));
+                       SLOT(StreamWebVideo(void)));
     connect(m_searchResultList, SIGNAL(itemSelected(MythUIButtonListItem *)),
-                       SLOT(slotItemChanged()));
+                       SLOT(SlotItemChanged()));
 
     BuildFocusList();
 
@@ -112,9 +112,9 @@ NetSearch::~NetSearch()
     }
 }
 
-void NetSearch::loadData(void)
+void NetSearch::LoadData(void)
 {
-    fillGrabberButtonList();
+    FillGrabberButtonList();
 
     if (m_grabberList.count() == 0 && m_noSites)
         m_noSites->SetVisible(true);
@@ -122,7 +122,7 @@ void NetSearch::loadData(void)
         m_noSites->SetVisible(false);
 
     if (m_grabberList.isEmpty())
-        runSearchEditor();
+        RunSearchEditor();
 }
 
 bool NetSearch::keyPressEvent(QKeyEvent *event)
@@ -141,7 +141,7 @@ bool NetSearch::keyPressEvent(QKeyEvent *event)
 
         if (action == "MENU")
         {
-            showMenu();
+            ShowMenu();
         }
         else
             handled = false;
@@ -153,7 +153,7 @@ bool NetSearch::keyPressEvent(QKeyEvent *event)
     return handled;
 }
 
-void NetSearch::showMenu(void)
+void NetSearch::ShowMenu(void)
 {
     QString label = tr("Search Options");
 
@@ -172,8 +172,8 @@ void NetSearch::showMenu(void)
             if (item)
             {
                 if (item->GetDownloadable())
-                    menuPopup->AddButton(tr("Stream Video"), SLOT(streamWebVideo()));
-                menuPopup->AddButton(tr("Open Web Link"), SLOT(showWebVideo()));
+                    menuPopup->AddButton(tr("Stream Video"), SLOT(StreamWebVideo()));
+                menuPopup->AddButton(tr("Open Web Link"), SLOT(ShowWebVideo()));
 
                 QString filename = GetDownloadFilename(item->GetTitle(),
                     item->GetMediaURL());
@@ -188,25 +188,25 @@ void NetSearch::showMenu(void)
                     GetFocusWidget() == m_searchResultList)
                 {
                     if (exists)
-                        menuPopup->AddButton(tr("Play"), SLOT(doPlayVideo(filename)));
+                        menuPopup->AddButton(tr("Play"), SLOT(DoPlayVideo(filename)));
                     else
-                        menuPopup->AddButton(tr("Save This Video"), SLOT(doDownloadAndPlay()));
+                        menuPopup->AddButton(tr("Save This Video"), SLOT(DoDownloadAndPlay()));
                 }
 
                 if (item->GetDownloadable() &&
                     GetFocusWidget() == m_searchResultList &&
                     exists)
                 {
-                    menuPopup->AddButton(tr("Delete"), SLOT(slotDeleteVideo()));
+                    menuPopup->AddButton(tr("Delete"), SLOT(SlotDeleteVideo()));
                 }
             }
 
             if (m_pagenum > 1)
-                menuPopup->AddButton(tr("Previous Page"), SLOT(getLastResults()));
+                menuPopup->AddButton(tr("Previous Page"), SLOT(GetLastResults()));
             if (m_searchResultList->GetCount() > 0 && m_pagenum < m_maxpage)
-                menuPopup->AddButton(tr("Next Page"), SLOT(getMoreResults()));
+                menuPopup->AddButton(tr("Next Page"), SLOT(GetMoreResults()));
         }
-        menuPopup->AddButton(tr("Manage Search Scripts"), SLOT(runSearchEditor()));
+        menuPopup->AddButton(tr("Manage Search Scripts"), SLOT(RunSearchEditor()));
 
     }
     else
@@ -215,7 +215,7 @@ void NetSearch::showMenu(void)
     }
 }
 
-void NetSearch::fillGrabberButtonList()
+void NetSearch::FillGrabberButtonList()
 {
     m_siteList->Reset();
 
@@ -232,7 +232,7 @@ void NetSearch::fillGrabberButtonList()
     }
 }
 
-void NetSearch::doSearch()
+void NetSearch::DoSearch()
 {
     m_searchResultList->Reset();
 
@@ -265,7 +265,7 @@ void NetSearch::doSearch()
     if (!m_netSearch)
         m_netSearch = new QNetworkAccessManager(this);
     connect(m_netSearch, SIGNAL(finished(QNetworkReply*)),
-                       SLOT(searchFinished(void)));
+                       SLOT(SearchFinished(void)));
 
     QUrl init = GetMythXMLSearch(m_mythXML, m_currentSearch,
                                 m_currentCmd, m_pagenum);
@@ -275,7 +275,7 @@ void NetSearch::doSearch()
     m_reply = m_netSearch->get(QNetworkRequest(req));
 }
 
-void NetSearch::getLastResults()
+void NetSearch::GetLastResults()
 {
     m_searchResultList->Reset();
 
@@ -291,7 +291,7 @@ void NetSearch::getLastResults()
     m_reply = m_netSearch->get(QNetworkRequest(req));
 }
 
-void NetSearch::getMoreResults()
+void NetSearch::GetMoreResults()
 {
     m_searchResultList->Reset();
 
@@ -307,7 +307,7 @@ void NetSearch::getMoreResults()
     m_reply = m_netSearch->get(QNetworkRequest(req));
 }
 
-void NetSearch::searchFinished(void)
+void NetSearch::SearchFinished(void)
 {
     if (m_busyPopup)
     {
@@ -349,10 +349,10 @@ void NetSearch::searchFinished(void)
                         .arg(QString::number(m_maxpage)));
 
     ResultItem::resultList list = item->GetVideoList();
-    populateResultList(list);
+    PopulateResultList(list);
 }
 
-void NetSearch::searchTimeout(Search *)
+void NetSearch::SearchTimeout(Search *)
 {
     if (m_busyPopup)
     {
@@ -378,7 +378,7 @@ void NetSearch::searchTimeout(Search *)
     }
 }
 
-void NetSearch::populateResultList(ResultItem::resultList list)
+void NetSearch::PopulateResultList(ResultItem::resultList list)
 {
     for (ResultItem::resultList::iterator i = list.begin();
             i != list.end(); ++i)
@@ -418,7 +418,7 @@ ResultItem* NetSearch::GetStreamItem()
     return qVariantValue<ResultItem *>(m_searchResultList->GetDataValue());
 }
 
-void NetSearch::runSearchEditor()
+void NetSearch::RunSearchEditor()
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
@@ -427,7 +427,7 @@ void NetSearch::runSearchEditor()
     if (searchedit->Create())
     {
         connect(searchedit, SIGNAL(ItemsChanged()), this,
-                       SLOT(doListRefresh()));
+                       SLOT(DoListRefresh()));
 
         mainStack->AddScreen(searchedit);
     }
@@ -437,16 +437,16 @@ void NetSearch::runSearchEditor()
     }
 }
 
-void NetSearch::doListRefresh()
+void NetSearch::DoListRefresh()
 {
     m_grabberList = findAllDBSearchGrabbers(VIDEO_FILE);
     if (m_grabberList.isEmpty())
-        runSearchEditor();
+        RunSearchEditor();
 
-    loadData();
+    LoadData();
 }
 
-void NetSearch::slotItemChanged()
+void NetSearch::SlotItemChanged()
 {
     ResultItem *item =
               qVariantValue<ResultItem *>(m_searchResultList->GetDataValue());
@@ -508,25 +508,6 @@ void NetSearch::slotItemChanged()
             }
         }
     }
-}
-
-void NetSearch::slotDoProgress(qint64 bytesReceived, qint64 bytesTotal)
-{
-    if (m_progress)
-    {
-        int total = bytesTotal/100;
-        int received = bytesReceived/100;
-        m_progress->SetTotal(total);
-        m_progress->SetUsed(received);
-        LOG(VB_GENERAL, LOG_DEBUG, QString("Progress event received: %1/%2")
-                               .arg(received).arg(total));
-    }
-}
-
-void NetSearch::slotDownloadFinished()
-{
-    if (m_progress)
-       m_progress->SetVisible(false);
 }
 
 void NetSearch::customEvent(QEvent *event)
