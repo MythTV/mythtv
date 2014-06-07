@@ -37,20 +37,17 @@ NetSearch::NetSearch(MythScreenStack *parent, const char *name)
       m_noSites(NULL),               m_progress(NULL),
       m_okPopup(NULL),               m_netSearch(NULL),
 
-      m_reply(NULL),                 m_download(new MythDownloadManager()),
+      m_reply(NULL),
       m_currentSearch(QString()),    m_currentGrabber(0),
       m_currentCmd(QString()),       m_pagenum(0),
-      m_maxpage(0),                  m_playing(false),
-      m_redirects(0),                m_mythXML(GetMythXMLURL())
+      m_maxpage(0),                  m_mythXML(GetMythXMLURL())
 {
 }
 
 bool NetSearch::Create()
 {
-    bool foundtheme = false;
-
     // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("netvision-ui.xml", "netsearch", this);
+    bool foundtheme = LoadWindowFromXML("netvision-ui.xml", "netsearch", this);
 
     if (!foundtheme)
         return false;
@@ -113,9 +110,6 @@ NetSearch::~NetSearch()
         m_netSearch->deleteLater();
         m_netSearch = NULL;
     }
-
-    delete m_download;
-    m_download = NULL;
 }
 
 void NetSearch::loadData(void)
@@ -136,9 +130,9 @@ bool NetSearch::keyPressEvent(QKeyEvent *event)
     if (GetFocusWidget()->keyPressEvent(event))
         return true;
 
-    bool handled = false;
     QStringList actions;
-    handled = GetMythMainWindow()->TranslateKeyPress("Internet Video", event, actions);
+    bool handled = GetMythMainWindow()->TranslateKeyPress("Internet Video",
+                                                          event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
@@ -271,7 +265,8 @@ void NetSearch::doSearch()
                     .arg(grabber).arg(query);
     CreateBusyDialog(title);
 
-    m_netSearch = new QNetworkAccessManager(this);
+    if (!m_netSearch)
+        m_netSearch = new QNetworkAccessManager(this);
     connect(m_netSearch, SIGNAL(finished(QNetworkReply*)),
                        SLOT(searchFinished(void)));
 

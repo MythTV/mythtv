@@ -22,9 +22,6 @@ class NetSearch : public NetBase
 
   public:
 
-    enum DialogType { DLG_DEFAULT = 0, DLG_SEARCH = 0x1, DLG_RSS = 0x2,
-                      dtLast };
-
     NetSearch(MythScreenStack *parent, const char *name = 0);
     ~NetSearch();
 
@@ -51,19 +48,15 @@ class NetSearch : public NetBase
 
     QNetworkAccessManager *m_netSearch;
     QNetworkReply         *m_reply;
-    MythDownloadManager   *m_download;
 
     QString             m_currentSearch;
     int                 m_currentGrabber;
     QString             m_currentCmd;
     uint                m_pagenum;
     uint                m_maxpage;
-    bool                m_playing;
-    uint                m_redirects;
     QString             m_mythXML;
 
     RSSSite::rssList    m_rssList;
-    QMap<MythUIButtonListItem*,ResultItem> m_rssitems;
 
   private slots:
     void showMenu(void);

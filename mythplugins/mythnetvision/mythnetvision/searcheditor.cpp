@@ -25,4 +25,3 @@ bool SearchEditor::Matches(bool search, bool /*tree*/)
 {
     return search;
 }
-

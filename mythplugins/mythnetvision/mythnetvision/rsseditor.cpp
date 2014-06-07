@@ -136,9 +136,9 @@ bool RSSEditPopup::keyPressEvent(QKeyEvent *event)
     if (GetFocusWidget()->keyPressEvent(event))
         return true;
 
-    bool handled = false;
     QStringList actions;
-    handled = GetMythMainWindow()->TranslateKeyPress("Internet Video", event, actions);
+    bool handled = GetMythMainWindow()->TranslateKeyPress("Internet Video",
+                                                          event, actions);
 
     if (!handled && MythScreenType::keyPressEvent(event))
         handled = true;
@@ -448,9 +448,8 @@ bool RSSEditor::keyPressEvent(QKeyEvent *event)
     if (GetFocusWidget()->keyPressEvent(event))
         return true;
 
-    bool handled = false;
     QStringList actions;
-    handled = GetMythMainWindow()->TranslateKeyPress("Internet Video", event, actions);
+    bool handled = GetMythMainWindow()->TranslateKeyPress("Internet Video", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {

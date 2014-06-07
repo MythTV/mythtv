@@ -43,9 +43,8 @@ NetTree::NetTree(DialogType type, MythScreenStack *parent, const char *name)
     : NetBase(parent, name),
       m_siteMap(NULL),               m_siteButtonList(NULL),
       m_siteGeneric(NULL),           m_rssGeneric(NULL),
-      m_searchGeneric(NULL),         m_currentNode(NULL),
-      m_noSites(NULL),               m_gdt(new GrabberDownloadThread(this)),
-      m_type(type)
+      m_currentNode(NULL),           m_noSites(NULL),
+      m_gdt(new GrabberDownloadThread(this)), m_type(type)
 {
     connect(m_gdt, SIGNAL(finished()), SLOT(doTreeRefresh()));
     m_updateFreq = gCoreContext->GetNumSetting(
@@ -327,7 +326,7 @@ void NetTree::handleSelect(MythUIButtonListItem *item)
         {
             streamWebVideo();
         }
-    };
+    }
     slotItemChanged();
 }
 
@@ -367,9 +366,9 @@ bool NetTree::keyPressEvent(QKeyEvent *event)
     if (GetFocusWidget()->keyPressEvent(event))
         return true;
 
-    bool handled = false;
     QStringList actions;
-    handled = GetMythMainWindow()->TranslateKeyPress("Internet Video", event, actions);
+    bool handled = GetMythMainWindow()->TranslateKeyPress("Internet Video",
+                                                          event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
@@ -526,7 +525,7 @@ void NetTree::fillTree()
     // Add an upfolder
     if (m_type != DLG_TREE)
     {
-          m_rssGeneric->addNode(tr("Back"), kUpFolder, true, false);
+        m_rssGeneric->addNode(tr("Back"), kUpFolder, true, false);
     }
 
     m_rssGeneric->SetData(QString("%1/mythnetvision/icons/rss.png")
@@ -639,17 +638,6 @@ void NetTree::buildGenericTree(MythGenericTree *dst, QStringList paths,
                 it != videos.end(); ++it)
             AddFileNode(folder, *it);
     }
-}
-
-MythGenericTree *NetTree::AddDirNode(MythGenericTree *where_to_add,
-            QString name, QString thumbnail)
-{
-    QString title = name;
-    title.replace("&amp;", "&");
-    MythGenericTree *sub_node =
-            where_to_add->addNode(title, kSubFolder, false);
-    sub_node->SetData(thumbnail);
-    return sub_node;
 }
 
 int NetTree::AddFileNode(MythGenericTree *where_to_add, ResultItem *video)

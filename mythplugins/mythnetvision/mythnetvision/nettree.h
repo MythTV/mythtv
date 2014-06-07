@@ -70,9 +70,6 @@ class NetTree : public NetBase
                           QString dirthumb,
                           QList<ResultItem*> videos);
 
-    MythGenericTree *AddDirNode(
-                    MythGenericTree *where_to_add,
-                    QString name, QString thumbnail);
     int AddFileNode(MythGenericTree *where_to_add,
                     ResultItem *video);
 
@@ -85,7 +82,6 @@ class NetTree : public NetBase
     MythUIButtonList   *m_siteButtonList;
     MythGenericTree    *m_siteGeneric;
     MythGenericTree    *m_rssGeneric;
-    MythGenericTree    *m_searchGeneric;
     MythGenericTree    *m_currentNode;
 
     MythUIText         *m_noSites;
@@ -131,4 +127,3 @@ class NetTree : public NetBase
 };
 
 #endif
-
