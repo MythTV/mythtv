@@ -344,6 +344,7 @@ void NetSearch::SearchFinished(void)
 
     ResultItem::resultList list = item->GetVideoList();
     PopulateResultList(list);
+    SetFocusWidget(m_searchResultList);
 }
 
 void NetSearch::SearchTimeout(Search *)
