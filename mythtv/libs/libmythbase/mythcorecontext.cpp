@@ -979,7 +979,7 @@ QString MythCoreContext::GetBackendServerIP4(const QString &host)
  */
 QString MythCoreContext::GetBackendServerIP6(void)
 {
-    return GetBackendServerIP4(d->m_localHostname);
+    return GetBackendServerIP6(d->m_localHostname);
 }
 
 /**
