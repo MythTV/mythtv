@@ -3921,7 +3921,6 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
                subtitle, curstream->codec->codec_id == AV_CODEC_ID_XSUB,
                m_parent->GetAllowForcedSubtitles());
         m_parent->EnableForcedSubtitles(forcedon || isForcedTrack);
-        avsubtitle_free(&subtitle);
     }
 
     return true;
