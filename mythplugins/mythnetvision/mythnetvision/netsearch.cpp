@@ -375,12 +375,11 @@ void NetSearch::PopulateResultList(ResultItem::resultList list)
     {
         QString title = (*i)->GetTitle();
         MythUIButtonListItem *item =
-            new MythUIButtonListItem(m_searchResultList, title);
+            new MythUIButtonListItem(m_searchResultList, title,
+                                     qVariantFromValue(*i));
         InfoMap metadataMap;
         (*i)->toMap(metadataMap);
         item->SetTextFromMap(metadataMap);
-
-        item->SetData(qVariantFromValue(*i));
 
         if (!(*i)->GetThumbnail().isEmpty())
         {
@@ -441,24 +440,7 @@ void NetSearch::SlotItemChanged()
 
     if (item && GetFocusWidget() == m_searchResultList)
     {
-        InfoMap metadataMap;
-        item->toMap(metadataMap);
-        SetTextFromMap(metadataMap);
-
-        if (!item->GetThumbnail().isEmpty() && m_thumbImage)
-        {
-            MythUIButtonListItem *btn = m_searchResultList->GetItemCurrent();
-            QString filename = btn->GetImageFilename();
-            if (filename.contains("%SHAREDIR%"))
-                filename.replace("%SHAREDIR%", GetShareDir());
-            m_thumbImage->Reset();
-
-            if (!filename.isEmpty())
-            {
-                m_thumbImage->SetFilename(filename);
-                m_thumbImage->Load();
-            }
-        }
+        SetTextAndThumbnail(m_searchResultList->GetItemCurrent(), item);
 
         if (m_downloadable)
         {
@@ -470,31 +452,42 @@ void NetSearch::SlotItemChanged()
     }
     else if (GetFocusWidget() == m_siteList)
     {
-        MythUIButtonListItem *item = m_siteList->GetItemCurrent();
+        MythUIButtonListItem *btn = m_siteList->GetItemCurrent();
 
-        ResultItem res(item->GetText(), QString(), QString(),
+        ResultItem res(btn->GetText(), QString(), QString(),
                        QString(), QString(), QString(), QString(),
                        QDateTime(), 0, 0, -1, QString(), QStringList(),
                        QString(), QStringList(), 0, 0, QString(),
                        0, QStringList(), 0, 0, 0);
 
-        InfoMap metadataMap;
-        res.toMap(metadataMap);
-        SetTextFromMap(metadataMap);
+        SetTextAndThumbnail(btn, &res);
+    }
+}
 
-        if (m_thumbImage)
+void NetSearch::SetTextAndThumbnail(MythUIButtonListItem *btn, ResultItem *item)
+{
+    InfoMap metadataMap;
+    item->toMap(metadataMap);
+    SetTextFromMap(metadataMap);
+
+    SetThumbnail(btn);
+}
+
+void NetSearch::SetThumbnail(MythUIButtonListItem *btn)
+{
+    if (m_thumbImage)
+    {
+        QString filename = btn->GetImageFilename();
+        if (filename.contains("%SHAREDIR%"))
+            filename.replace("%SHAREDIR%", GetShareDir());
+
+        if (!filename.isEmpty())
         {
-            QString filename = item->GetImageFilename();
-            m_thumbImage->Reset();
-            if (filename.contains("%SHAREDIR%"))
-                filename.replace("%SHAREDIR%", GetShareDir());
-
-            if (!filename.isEmpty())
-            {
-                m_thumbImage->SetFilename(filename);
-                m_thumbImage->Load();
-            }
+            m_thumbImage->SetFilename(filename);
+            m_thumbImage->Load();
         }
+        else
+            m_thumbImage->Reset();
     }
 }
 
@@ -503,10 +496,6 @@ void NetSearch::customEvent(QEvent *event)
     if (event->type() == ThumbnailDLEvent::kEventType)
     {
         ThumbnailDLEvent *tde = (ThumbnailDLEvent *)event;
-
-        if (!tde)
-            return;
-
         ThumbnailData *data = tde->thumb;
 
         if (!data)
@@ -523,6 +512,9 @@ void NetSearch::customEvent(QEvent *event)
 
         if (item && item->GetText() == title)
             item->SetImage(file);
+
+        if (m_searchResultList->GetItemCurrent() == item)
+            SetThumbnail(item);
     }
     else
         NetBase::customEvent(event);

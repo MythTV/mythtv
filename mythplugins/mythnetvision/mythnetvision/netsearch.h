@@ -71,6 +71,8 @@ class NetSearch : public NetBase
     void LoadData(void);
     void FillGrabberButtonList(void);
     void SlotItemChanged(void);
+    void SetTextAndThumbnail(MythUIButtonListItem *btn, ResultItem *item);
+    void SetThumbnail(MythUIButtonListItem *btn);
     void customEvent(QEvent *levent);
 };
 
