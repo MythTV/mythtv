@@ -92,9 +92,9 @@ void RSSManager::processAndInsertRSS(RSSSite *site)
     {
         // Insert in the DB here.
         insertRSSArticleInDB(site->GetTitle(), *it, site->GetType());
-        m_inprogress.removeOne(site);
     }
 
+    m_inprogress.removeOne(site);
     if (m_inprogress.isEmpty())
         emit finished();
 }
@@ -207,7 +207,10 @@ void RSSSite::process(void)
     m_articleList.clear();
 
     if (!m_data.size())
+    {
+        emit finished(this);
         return;
+    }
 
     QDomDocument domDoc;
 
@@ -215,6 +218,7 @@ void RSSSite::process(void)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             "Failed to set content from downloaded XML");
+        emit finished(this);
         return;
     }
 
@@ -246,11 +250,9 @@ void RSSSite::process(void)
                (*i)->GetSeason(),
                (*i)->GetEpisode(), false));
         }
-        emit finished(this);
     }
     else
-    {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Data is not valid RSS-feed");
-        emit finished(this);
-    }
+
+    emit finished(this);
 }
