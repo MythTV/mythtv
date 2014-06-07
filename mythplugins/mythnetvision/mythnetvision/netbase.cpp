@@ -255,7 +255,10 @@ void NetBase::customEvent(QEvent *event)
                 int errorCode = args[4].toInt();
 
                 if (m_progressDialog)
+                {
                     m_progressDialog->Close();
+                    m_progressDialog = NULL;
+                }
 
                 if ((m_downloadFile.startsWith("myth://")))
                 {
