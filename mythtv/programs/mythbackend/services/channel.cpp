@@ -49,11 +49,12 @@
 
 DTC::ChannelInfoList* Channel::GetChannelInfoList( uint nSourceID,
                                                    uint nStartIndex,
-                                                   uint nCount )
+                                                   uint nCount,
+                                                   bool bOnlyVisible )
 {
     vector<uint> chanList;
 
-    chanList = ChannelUtil::GetChanIDs(nSourceID);
+    chanList = ChannelUtil::GetChanIDs(nSourceID, bOnlyVisible);
 
     // ----------------------------------------------------------------------
     // Build Response
