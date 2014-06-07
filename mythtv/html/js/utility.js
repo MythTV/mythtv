@@ -27,7 +27,7 @@ function getIntegerArg(name)
 function getBoolArg(name)
 {
     // Should check for string types here such as 'true' and 'false'
-    return Boolean(getIntArg(name));
+    return Boolean(getIntegerArg(name));
 }
 
 function toCapitalCase(str)
@@ -89,4 +89,17 @@ function objectDump(arr)
     }
     objectString += "</dl>\n";
     return objectString;
+}
+
+function toQueryString(obj)
+{
+  var str = [];
+  for(var key in obj)
+  {
+    if (obj.hasOwnProperty(key))
+    {
+      str.push(encodeURIComponent(key) + "=" + encodeURIComponent(obj[key]));
+    }
+  }
+  return str.join("&amp;");
 }
