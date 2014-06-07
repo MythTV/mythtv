@@ -42,8 +42,8 @@ namespace
 NetTree::NetTree(DialogType type, MythScreenStack *parent, const char *name)
     : NetBase(parent, name),
       m_siteMap(NULL),               m_siteButtonList(NULL),
-      m_siteGeneric(NULL),           m_rssGeneric(NULL),
-      m_currentNode(NULL),           m_noSites(NULL),
+      m_siteGeneric(NULL),           m_currentNode(NULL),
+      m_noSites(NULL),
       m_gdt(new GrabberDownloadThread(this)), m_type(type)
 {
     connect(m_gdt, SIGNAL(finished()), SLOT(DoTreeRefresh()));
@@ -518,17 +518,18 @@ void NetTree::SwitchView()
 void NetTree::FillTree()
 {
     // First let's add all the RSS
-
-    m_rssGeneric = new MythGenericTree(
-                    RSSNode, kSubFolder, false);
+    if (!m_rssList.isEmpty())
+    {
+        MythGenericTree *rssGeneric =
+            new MythGenericTree(RSSNode, kSubFolder, false);
 
     // Add an upfolder
     if (m_type != DLG_TREE)
     {
-        m_rssGeneric->addNode(tr("Back"), kUpFolder, true, false);
+        rssGeneric->addNode(tr("Back"), kUpFolder, true, false);
     }
 
-    m_rssGeneric->SetData(QString("%1/mythnetvision/icons/rss.png")
+    rssGeneric->SetData(QString("%1/mythnetvision/icons/rss.png")
          .arg(GetShareDir()));
 
     RSSSite::rssList::iterator i = m_rssList.begin();
@@ -539,7 +540,7 @@ void NetTree::FillTree()
         MythGenericTree *ret = new MythGenericTree(
                    (*i)->GetTitle(), kSubFolder, false);
         ret->SetData(qVariantFromValue(*i));
-        m_rssGeneric->addNode(ret);
+        rssGeneric->addNode(ret);
 
         // Add an upfolder
         if (m_type != DLG_TREE)
@@ -554,12 +555,7 @@ void NetTree::FillTree()
         }
     }
 
-    if (m_rssList.count() > 0)
-        m_siteGeneric->addNode(m_rssGeneric);
-    else
-    {
-        delete m_rssGeneric;
-        m_rssGeneric = NULL;
+    m_siteGeneric->addNode(rssGeneric);
     }
 
     // Now let's add all the grabber trees
@@ -878,6 +874,7 @@ void NetTree::DoTreeRefresh()
 
 void NetTree::TreeRefresh()
 {
+    delete m_siteGeneric;
     m_siteGeneric = new MythGenericTree("site root", 0, false);
     m_currentNode = m_siteGeneric;
 

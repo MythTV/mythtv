@@ -79,7 +79,6 @@ class NetTree : public NetBase
     MythUIButtonTree   *m_siteMap;
     MythUIButtonList   *m_siteButtonList;
     MythGenericTree    *m_siteGeneric;
-    MythGenericTree    *m_rssGeneric;
     MythGenericTree    *m_currentNode;
 
     MythUIText         *m_noSites;
