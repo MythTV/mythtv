@@ -76,8 +76,7 @@ class RSSEditor : public MythScreenType
     Q_OBJECT
 
   public:
-    RSSEditor(MythScreenStack *parent,
-              const QString &name = "RSSEditor");
+    RSSEditor(MythScreenStack *parent, const QString &name = "RSSEditor");
    ~RSSEditor();
 
     bool Create(void);

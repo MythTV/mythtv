@@ -62,7 +62,7 @@ class NetTree : public NetBase
     void UpdateItem(MythUIButtonListItem *item);
 
     void BuildGenericTree(MythGenericTree* dst,
-                    QDomElement& domElem);
+                          QDomElement& domElem);
     void BuildGenericTree(MythGenericTree *dst,
                           QStringList paths,
                           QString dirthumb,

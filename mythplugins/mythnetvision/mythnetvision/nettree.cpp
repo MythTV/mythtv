@@ -145,11 +145,8 @@ void NetTree::SetCurrentNode(MythGenericTree *node)
 
 NetTree::~NetTree()
 {
-    if (m_siteGeneric)
-    {
-        delete m_siteGeneric;
-        m_siteGeneric = NULL;
-    }
+    delete m_siteGeneric;
+    m_siteGeneric = NULL;
 
     delete m_gdt;
     m_gdt = NULL;
@@ -226,7 +223,8 @@ void NetTree::UpdateItem(MythUIButtonListItem *item)
 
     if (nodeInt == kSubFolder)
     {
-        item->SetText(QString("%1").arg(node->visibleChildCount()), "childcount");
+        item->SetText(QString("%1").arg(node->visibleChildCount()),
+                      "childcount");
         item->DisplayState("subfolder", "nodetype");
         item->SetText(node->GetText(), "title");
         item->SetText(node->GetText());
@@ -265,7 +263,7 @@ void NetTree::UpdateItem(MythUIButtonListItem *item)
             dlfile.replace("%SHAREDIR%", GetShareDir());
         else
             dlfile = getDownloadFilename(video->GetTitle(),
-                         video->GetThumbnail());
+                                         video->GetThumbnail());
 
         if (QFile::exists(dlfile))
             item->SetImage(dlfile);
@@ -414,7 +412,8 @@ void NetTree::ShowMenu(void)
     }
     else
     {
-        MythGenericTree *node = GetNodePtrFromButton(m_siteButtonList->GetItemCurrent());
+        MythGenericTree *node =
+            GetNodePtrFromButton(m_siteButtonList->GetItemCurrent());
 
         if (node)
             item = qVariantValue<ResultItem *>(node->GetData());
@@ -433,7 +432,8 @@ void NetTree::ShowMenu(void)
     menu->AddItem(tr("Scan/Manage Subscriptions"), NULL, CreateShowManageMenu());
     menu->AddItem(tr("Change View"), NULL, CreateShowViewMenu());
 
-    MythDialogBox *menuPopup = new MythDialogBox(menu, m_popupStack, "mythnettreemenupopup");
+    MythDialogBox *menuPopup =
+        new MythDialogBox(menu, m_popupStack, "mythnettreemenupopup");
 
     if (menuPopup->Create())
         m_popupStack->AddScreen(menuPopup);
@@ -463,15 +463,16 @@ MythMenu* NetTree::CreateShowManageMenu()
 
     MythMenu *menu = new MythMenu(label, this, "options");
 
-
     menu->AddItem(tr("Update Site Maps"), SLOT(UpdateTrees()));
     menu->AddItem(tr("Update RSS"), SLOT(UpdateRSS()));
     menu->AddItem(tr("Manage Site Subscriptions"), SLOT(RunTreeEditor()));
     menu->AddItem(tr("Manage RSS Subscriptions"), SLOT(RunRSSEditor()));
     if (!m_treeAutoUpdate)
-        menu->AddItem(tr("Enable Automatic Site Updates"), SLOT(ToggleTreeUpdates()));
+        menu->AddItem(tr("Enable Automatic Site Updates"),
+                      SLOT(ToggleTreeUpdates()));
     else
-        menu->AddItem(tr("Disable Automatic Site Updates"), SLOT(ToggleTreeUpdates()));
+        menu->AddItem(tr("Disable Automatic Site Updates"),
+                      SLOT(ToggleTreeUpdates()));
 //    if (!m_rssAutoUpdate)
 //        menu->AddItem(tr("Enable Automatic RSS Updates"), SLOT(ToggleRSSUpdates()));
 //    else
@@ -501,7 +502,7 @@ void NetTree::SwitchBrowseView()
 void NetTree::SwitchView()
 {
     NetTree *nettree =
-            new NetTree(m_type, GetMythMainWindow()->GetMainStack(), "nettree");
+        new NetTree(m_type, GetMythMainWindow()->GetMainStack(), "nettree");
 
     if (nettree->Create())
     {
@@ -523,43 +524,36 @@ void NetTree::FillTree()
         MythGenericTree *rssGeneric =
             new MythGenericTree(RSSNode, kSubFolder, false);
 
-    // Add an upfolder
-    if (m_type != DLG_TREE)
-    {
-        rssGeneric->addNode(tr("Back"), kUpFolder, true, false);
-    }
-
-    rssGeneric->SetData(QString("%1/mythnetvision/icons/rss.png")
-         .arg(GetShareDir()));
-
-    RSSSite::rssList::iterator i = m_rssList.begin();
-    for (; i != m_rssList.end(); ++i)
-    {
-        ResultItem::resultList items =
-                   getRSSArticles((*i)->GetTitle(), VIDEO_PODCAST);
-        MythGenericTree *ret = new MythGenericTree(
-                   (*i)->GetTitle(), kSubFolder, false);
-        ret->SetData(qVariantFromValue(*i));
-        rssGeneric->addNode(ret);
-
         // Add an upfolder
         if (m_type != DLG_TREE)
+            rssGeneric->addNode(tr("Back"), kUpFolder, true, false);
+
+        rssGeneric->SetData(QString("%1/mythnetvision/icons/rss.png")
+                            .arg(GetShareDir()));
+
+        RSSSite::rssList::iterator i = m_rssList.begin();
+        for (; i != m_rssList.end(); ++i)
         {
-            ret->addNode(tr("Back"), kUpFolder, true, false);
+            ResultItem::resultList items = getRSSArticles((*i)->GetTitle(),
+                                                          VIDEO_PODCAST);
+            MythGenericTree *ret =
+                new MythGenericTree((*i)->GetTitle(), kSubFolder, false);
+            ret->SetData(qVariantFromValue(*i));
+            rssGeneric->addNode(ret);
+
+            // Add an upfolder
+            if (m_type != DLG_TREE)
+                ret->addNode(tr("Back"), kUpFolder, true, false);
+
+            ResultItem::resultList::iterator it = items.begin();
+            for (; it != items.end(); ++it)
+                AddFileNode(ret, *it);
         }
 
-        ResultItem::resultList::iterator it = items.begin();
-        for (; it != items.end(); ++it)
-        {
-            AddFileNode(ret, *it);
-        }
-    }
-
-    m_siteGeneric->addNode(rssGeneric);
+        m_siteGeneric->addNode(rssGeneric);
     }
 
     // Now let's add all the grabber trees
-
     for (GrabberScript::scriptList::iterator i = m_grabberList.begin();
             i != m_grabberList.end(); ++i)
     {
@@ -577,9 +571,7 @@ void NetTree::FillTree()
 
         // Add an upfolder
         if (m_type != DLG_TREE)
-        {
             ret->addNode(tr("Back"), kUpFolder, true, false);
-        }
 
         for (QList<QPair<QString, QString> >::iterator i = paths.begin();
                 i != paths.end(); ++i)
@@ -609,8 +601,7 @@ void NetTree::BuildGenericTree(MythGenericTree *dst, QStringList paths,
         if (tmp)
             dst = tmp;
         else
-            folder = new MythGenericTree(
-                     curPath, kSubFolder, false);
+            folder = new MythGenericTree(curPath, kSubFolder, false);
     }
 
     if (!folder)
@@ -621,9 +612,7 @@ void NetTree::BuildGenericTree(MythGenericTree *dst, QStringList paths,
 
     // Add an upfolder
     if (m_type != DLG_TREE)
-    {
-          folder->addNode(tr("Back"), kUpFolder, true, false);
-    }
+        folder->addNode(tr("Back"), kUpFolder, true, false);
 
     if (paths.size())
         BuildGenericTree(folder, paths, dirthumb, videos);
@@ -640,8 +629,7 @@ int NetTree::AddFileNode(MythGenericTree *where_to_add, ResultItem *video)
 {
     QString title = video->GetTitle();
     title.replace("&amp;", "&");
-    MythGenericTree *sub_node = where_to_add->
-                    addNode(title, 0, true);
+    MythGenericTree *sub_node = where_to_add->addNode(title, 0, true);
     sub_node->SetData(qVariantFromValue(video));
     m_videos.append(video);
     return 1;
@@ -652,7 +640,8 @@ ResultItem* NetTree::GetStreamItem()
     ResultItem *item = NULL;
 
     if (m_type == DLG_TREE)
-        item = qVariantValue<ResultItem *>(m_siteMap->GetCurrentNode()->GetData());
+        item =
+            qVariantValue<ResultItem *>(m_siteMap->GetCurrentNode()->GetData());
     else
     {
         MythGenericTree *node =
@@ -671,12 +660,14 @@ void NetTree::SlotItemChanged()
 
     if (m_type == DLG_TREE)
     {
-        item = qVariantValue<ResultItem *>(m_siteMap->GetCurrentNode()->GetData());
+        item =
+            qVariantValue<ResultItem *>(m_siteMap->GetCurrentNode()->GetData());
         site = qVariantValue<RSSSite *>(m_siteMap->GetCurrentNode()->GetData());
     }
     else
     {
-        MythGenericTree *node = GetNodePtrFromButton(m_siteButtonList->GetItemCurrent());
+        MythGenericTree *node =
+            GetNodePtrFromButton(m_siteButtonList->GetItemCurrent());
 
         if (!node)
             return;
@@ -703,7 +694,8 @@ void NetTree::SlotItemChanged()
             }
             else
             {
-                QString sFilename = getDownloadFilename(item->GetTitle(), item->GetThumbnail());
+                QString sFilename = getDownloadFilename(item->GetTitle(),
+                                                        item->GetThumbnail());
 
                 bool exists = QFile::exists(sFilename);
                 if (exists)
@@ -726,10 +718,12 @@ void NetTree::SlotItemChanged()
     }
     else if (site)
     {
-        ResultItem res = ResultItem(site->GetTitle(), QString(), site->GetDescription(),
-              site->GetURL(), site->GetImage(), QString(), site->GetAuthor(), QDateTime(),
-              0, 0, -1, QString(), QStringList(), QString(), QStringList(), 0, 0, QString(),
-              0, QStringList(), 0, 0, 0);
+        ResultItem res =
+            ResultItem(site->GetTitle(), QString(), site->GetDescription(),
+                       site->GetURL(), site->GetImage(), QString(),
+                       site->GetAuthor(), QDateTime(), 0, 0, -1, QString(),
+                       QStringList(), QString(), QStringList(), 0, 0, QString(),
+                       0, QStringList(), 0, 0, 0);
 
         InfoMap metadataMap;
         res.toMap(metadataMap);
@@ -744,9 +738,7 @@ void NetTree::SlotItemChanged()
             m_thumbImage->Reset();
 
         if (m_downloadable)
-        {
             m_downloadable->Reset();
-        }
     }
     else
     {
@@ -763,16 +755,18 @@ void NetTree::SlotItemChanged()
                         GetData().toString();
         else
         {
-            MythGenericTree *node = GetNodePtrFromButton(m_siteButtonList->GetItemCurrent());
+            MythGenericTree *node =
+                GetNodePtrFromButton(m_siteButtonList->GetItemCurrent());
 
             if (node)
                 thumb = node->GetData().toString();
         }
 
-        ResultItem res = ResultItem(title, QString(), QString(),
-              QString(), thumb, QString(), QString(), QDateTime(),
-              0, 0, -1, QString(), QStringList(), QString(), QStringList(), 0, 0, QString(),
-              0, QStringList(), 0, 0, 0);
+        ResultItem res =
+            ResultItem(title, QString(), QString(), QString(), thumb, QString(),
+                       QString(), QDateTime(), 0, 0, -1, QString(),
+                       QStringList(), QString(), QStringList(), 0, 0, QString(),
+                       0, QStringList(), 0, 0, 0);
 
         InfoMap metadataMap;
         res.toMap(metadataMap);
@@ -831,15 +825,12 @@ void NetTree::RunTreeEditor()
 
     if (treeedit->Create())
     {
-        connect(treeedit, SIGNAL(ItemsChanged()), this,
-                       SLOT(DoTreeRefresh()));
+        connect(treeedit, SIGNAL(ItemsChanged()), this, SLOT(DoTreeRefresh()));
 
         mainStack->AddScreen(treeedit);
     }
     else
-    {
         delete treeedit;
-    }
 }
 
 void NetTree::RunRSSEditor()
@@ -850,15 +841,12 @@ void NetTree::RunRSSEditor()
 
     if (rssedit->Create())
     {
-        connect(rssedit, SIGNAL(ItemsChanged()), this,
-                       SLOT(UpdateRSS()));
+        connect(rssedit, SIGNAL(ItemsChanged()), this, SLOT(UpdateRSS()));
 
         mainStack->AddScreen(rssedit);
     }
     else
-    {
         delete rssedit;
-    }
 }
 
 void NetTree::DoTreeRefresh()
@@ -895,8 +883,7 @@ void NetTree::UpdateRSS()
     CreateBusyDialog(title);
 
     RSSManager *rssMan = new RSSManager();
-    connect(rssMan, SIGNAL(finished()), this,
-                   SLOT(DoTreeRefresh()));
+    connect(rssMan, SIGNAL(finished()), this, SLOT(DoTreeRefresh()));
     rssMan->startTimer();
     rssMan->doUpdate();
 }
@@ -915,14 +902,14 @@ void NetTree::ToggleRSSUpdates()
 {
     m_rssAutoUpdate = !m_rssAutoUpdate;
     gCoreContext->SaveSetting("mythnetvision.rssBackgroundFetch",
-                         m_rssAutoUpdate);
+                              m_rssAutoUpdate);
 }
 
 void NetTree::ToggleTreeUpdates()
 {
     m_treeAutoUpdate = !m_treeAutoUpdate;
     gCoreContext->SaveSetting("mythnetvision.backgroundFetch",
-                         m_treeAutoUpdate);
+                              m_treeAutoUpdate);
 }
 
 void NetTree::customEvent(QEvent *event)
@@ -959,21 +946,14 @@ void NetTree::customEvent(QEvent *event)
         else
         {
             if (!((uint)m_siteButtonList->GetCount() >= pos))
-            {
                 return;
-            }
 
-            MythUIButtonListItem *item =
-                      m_siteButtonList->GetItemAt(pos);
+            MythUIButtonListItem *item = m_siteButtonList->GetItemAt(pos);
 
             if (item && item->GetText() == title)
-            {
                 item->SetImage(file);
-            }
         }
     }
     else
-    {
-      NetBase::customEvent(event);
-    }
+        NetBase::customEvent(event);
 }

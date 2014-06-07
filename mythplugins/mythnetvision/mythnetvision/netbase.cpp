@@ -15,12 +15,12 @@
 
 NetBase::NetBase(MythScreenStack *parent, const char *name)
     : MythScreenType(parent, name),
-    m_thumbImage(NULL),
-    m_downloadable(NULL),
-    m_busyPopup(NULL),
-    m_popupStack(GetMythMainWindow()->GetStack("popup stack")),
-    m_progressDialog(NULL),
-    m_imageDownload(new MetadataImageDownload(this))
+      m_thumbImage(NULL),
+      m_downloadable(NULL),
+      m_busyPopup(NULL),
+      m_popupStack(GetMythMainWindow()->GetStack("popup stack")),
+      m_progressDialog(NULL),
+      m_imageDownload(new MetadataImageDownload(this))
 {
     gCoreContext->addListener(this);
 }
@@ -58,9 +58,7 @@ void NetBase::InitProgressDialog()
         m_popupStack, "videodownloadprogressdialog");
 
     if (m_progressDialog->Create())
-    {
         m_popupStack->AddScreen(m_progressDialog, false);
-    }
     else
     {
         delete m_progressDialog;
@@ -117,8 +115,7 @@ void NetBase::StreamWebVideo()
         return;
     }
 
-    GetMythMainWindow()->HandleMedia(
-        "Internal", item->GetMediaURL(),
+    GetMythMainWindow()->HandleMedia("Internal", item->GetMediaURL(),
         item->GetDescription(), item->GetTitle(), item->GetSubtitle(),
         QString(), item->GetSeason(), item->GetEpisode(), QString(),
         item->GetTime().toInt(), item->GetDate().toString("yyyy"));
@@ -143,11 +140,13 @@ void NetBase::ShowWebVideo()
         }
         else
         {
-            args.replaceInStrings("%DIR%", QString(GetConfDir() + "/MythNetvision"));
+            args.replaceInStrings("%DIR%",
+                                  QString(GetConfDir() + "/MythNetvision"));
             args.replaceInStrings("%MEDIAURL%", item->GetMediaURL());
             args.replaceInStrings("%URL%", item->GetURL());
             args.replaceInStrings("%TITLE%", item->GetTitle());
         }
+
         QString playerCommand = cmd + " " + args.join(" ");
         RunCmdWithoutScreensaver(playerCommand);
     }
@@ -165,8 +164,8 @@ void NetBase::ShowWebVideo()
 
         if (browser.isEmpty())
         {
-            ShowOkPopup(tr("No browser command set! MythNetTree needs MythBrowser "
-                           "installed to display the video."));
+            ShowOkPopup(tr("No browser command set! MythNetTree needs "
+                           "MythBrowser installed to display the video."));
             return;
         }
 
@@ -260,8 +259,10 @@ void NetBase::customEvent(QEvent *event)
             {
                 QString message = tr("Downloading Video...\n"
                                      "(%1 of %2 MB)")
-                    .arg(QString::number(args[2].toInt() / 1024.0 / 1024.0, 'f', 2))
-                    .arg(QString::number(args[3].toInt() / 1024.0 / 1024.0, 'f', 2));
+                    .arg(QString::number(args[2].toInt() / 1024.0 / 1024.0,
+                                         'f', 2))
+                    .arg(QString::number(args[3].toInt() / 1024.0 / 1024.0,
+                                         'f', 2));
                 m_progressDialog->SetMessage(message);
                 m_progressDialog->SetTotal(args[3].toInt());
                 m_progressDialog->SetProgress(args[2].toInt());
@@ -298,14 +299,14 @@ void NetBase::DoDownloadAndPlay()
         return;
 
     QString baseFilename = GetDownloadFilename(item->GetTitle(),
-                                          item->GetMediaURL());
+                                               item->GetMediaURL());
 
     QString finalFilename = generate_file_url("Default",
-                              gCoreContext->GetMasterHostName(),
-                              baseFilename);
+                                              gCoreContext->GetMasterHostName(),
+                                              baseFilename);
 
     LOG(VB_GENERAL, LOG_INFO, QString("Downloading %1 to %2")
-        .arg(item->GetMediaURL()) .arg(finalFilename));
+        .arg(item->GetMediaURL()).arg(finalFilename));
 
     // Does the file already exist?
     bool exists = RemoteFile::Exists(finalFilename);

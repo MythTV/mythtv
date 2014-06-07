@@ -35,9 +35,7 @@ namespace
 
         QList<QByteArray> exts = QImageReader::supportedImageFormats();
         for (QList<QByteArray>::iterator p = exts.begin(); p != exts.end(); ++p)
-        {
             ret.append(QString("*.").append(*p));
-        }
 
         return ret;
     }
@@ -75,7 +73,8 @@ RSSEditPopup::~RSSEditPopup()
 bool RSSEditPopup::Create(void)
 {
     // Load the theme for this screen
-    bool foundtheme = LoadWindowFromXML("netvision-ui.xml", "rsseditpopup", this);
+    bool foundtheme =
+        LoadWindowFromXML("netvision-ui.xml", "rsseditpopup", this);
 
     if (!foundtheme)
         return false;
@@ -123,7 +122,7 @@ bool RSSEditPopup::Create(void)
         }
 
         if (m_site->GetDownload() == 1)
-           m_download->SetCheckState(MythUIStateType::Full);
+            m_download->SetCheckState(MythUIStateType::Full);
     }
 
     BuildFocusList();
@@ -164,8 +163,9 @@ void RSSEditPopup::ParseAndSave(void)
 
         removeFromDB(m_urlText, VIDEO_PODCAST);
 
-        if (insertInDB(new RSSSite(title, filename, VIDEO_PODCAST,
-                desc, link, author, download, MythDate::current())))
+        RSSSite site(title, filename, VIDEO_PODCAST,
+                     desc, link, author, download, MythDate::current());
+        if (insertInDB(&site))
             emit Saving();
         Close();
     }
@@ -193,13 +193,13 @@ QUrl RSSEditPopup::redirectUrl(const QUrl& possibleRedirectUrl,
 void RSSEditPopup::SlotCheckRedirect(QNetworkReply* reply)
 {
     QVariant possibleRedirectUrl =
-         reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
+        reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
 
     QUrl urlRedirectedTo;
     urlRedirectedTo = redirectUrl(
         possibleRedirectUrl.toUrl(), urlRedirectedTo);
 
-    if(!urlRedirectedTo.isEmpty())
+    if (!urlRedirectedTo.isEmpty())
     {
         m_urlEdit->SetText(urlRedirectedTo.toString());
         m_manager->get(QNetworkRequest(urlRedirectedTo));
@@ -228,7 +228,7 @@ void RSSEditPopup::SlotSave(QNetworkReply* reply)
 
     QDomElement root = document.documentElement();
     QDomElement channel = root.firstChildElement ("channel");
-    if (!channel.isNull ())
+    if (!channel.isNull())
     {
         Parse parser;
         if (title.isEmpty())
@@ -242,7 +242,8 @@ void RSSEditPopup::SlotSave(QNetworkReply* reply)
         if (author.isEmpty())
             author = channel.firstChildElement("webMaster").text();
 
-        QString thumbnailURL = channel.firstChildElement("image").attribute("url");
+        QString thumbnailURL =
+            channel.firstChildElement("image").attribute("url");
         if (thumbnailURL.isEmpty())
         {
             QDomElement thumbElem = channel.firstChildElement("image");
@@ -252,10 +253,12 @@ void RSSEditPopup::SlotSave(QNetworkReply* reply)
         if (thumbnailURL.isEmpty())
         {
             QDomNodeList nodes = channel.elementsByTagNameNS(
-                           "http://www.itunes.com/dtds/podcast-1.0.dtd", "image");
+                           "http://www.itunes.com/dtds/podcast-1.0.dtd",
+                           "image");
             if (nodes.size())
             {
-                thumbnailURL = nodes.at(0).toElement().attributeNode("href").value();
+                thumbnailURL =
+                    nodes.at(0).toElement().attributeNode("href").value();
                 if (thumbnailURL.isEmpty())
                     thumbnailURL = nodes.at(0).toElement().text();
             }
@@ -270,50 +273,16 @@ void RSSEditPopup::SlotSave(QNetworkReply* reply)
         QDateTime updated = MythDate::current();
         QString filename("");
 
-        if (file.isEmpty())
+        if (!file.isEmpty())
             filename = file;
+        else if (!thumbnailURL.isEmpty())
+            filename = thumbnailURL;
 
         QString link = m_urlEdit->GetText();
 
-        if (!thumbnailURL.isEmpty() && filename.isEmpty())
-        {
-            QString fileprefix = GetConfDir();
-
-            QDir dir(fileprefix);
-            if (!dir.exists())
-                    dir.mkdir(fileprefix);
-
-            fileprefix += "/MythNetvision";
-
-            dir = QDir(fileprefix);
-            if (!dir.exists())
-                dir.mkdir(fileprefix);
-
-            fileprefix += "/sitecovers";
-
-            dir = QDir(fileprefix);
-            if (!dir.exists())
-                dir.mkdir(fileprefix);
-
-            QFileInfo fi(thumbnailURL);
-            QString rawFilename = fi.fileName();
-
-            filename = QString("%1/%2").arg(fileprefix).arg(rawFilename);
-
-            if (!QFile::exists(filename))
-            {
-                if (!GetMythDownloadManager()->download(thumbnailURL, filename))
-                {
-                    LOG(VB_GENERAL, LOG_ERR,
-                        QString("RSSEditPopup: failed to download thumbnail from: %1")
-                                .arg(thumbnailURL));
-                    filename = "";
-                }
-            }
-        }
-
-        if (insertInDB(new RSSSite(title, filename, VIDEO_PODCAST, description, link,
-                author, download, MythDate::current())))
+        RSSSite site(title, filename, VIDEO_PODCAST, description, link,
+                     author, download, MythDate::current());
+        if (insertInDB(&site))
             emit Saving();
     }
 
@@ -322,24 +291,24 @@ void RSSEditPopup::SlotSave(QNetworkReply* reply)
 
 void RSSEditPopup::DoFileBrowser()
 {
-    SelectImagePopup(GetConfDir() + "/MythNetvision" + "/sitecovers", *this, CEID_NEWIMAGE);
+    SelectImagePopup(GetConfDir() + "/MythNetvision" + "/sitecovers", *this,
+                     CEID_NEWIMAGE);
 }
 
 void RSSEditPopup::SelectImagePopup(const QString &prefix,
                             QObject &inst, const QString &returnEvent)
 {
-        MythScreenStack *popupStack =
-                GetMythMainWindow()->GetStack("popup stack");
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-        MythUIFileBrowser *fb = new MythUIFileBrowser(popupStack, prefix);
-        fb->SetNameFilter(GetSupportedImageExtensionFilter());
-        if (fb->Create())
-        {
-            fb->SetReturnEvent(&inst, returnEvent);
-            popupStack->AddScreen(fb);
-        }
-        else
-            delete fb;
+    MythUIFileBrowser *fb = new MythUIFileBrowser(popupStack, prefix);
+    fb->SetNameFilter(GetSupportedImageExtensionFilter());
+    if (fb->Create())
+    {
+        fb->SetReturnEvent(&inst, returnEvent);
+        popupStack->AddScreen(fb);
+    }
+    else
+        delete fb;
 }
 
 void RSSEditPopup::customEvent(QEvent *levent)
@@ -449,7 +418,8 @@ bool RSSEditor::keyPressEvent(QKeyEvent *event)
         return true;
 
     QStringList actions;
-    bool handled = GetMythMainWindow()->TranslateKeyPress("Internet Video", event, actions);
+    bool handled = GetMythMainWindow()->TranslateKeyPress("Internet Video",
+                                                          event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
@@ -497,7 +467,8 @@ void RSSEditor::fillRSSButtonList()
 
 void RSSEditor::SlotItemChanged()
 {
-    RSSSite *site = qVariantValue<RSSSite *>(m_sites->GetItemCurrent()->GetData());
+    RSSSite *site =
+        qVariantValue<RSSSite *>(m_sites->GetItemCurrent()->GetData());
 
     if (site)
     {
@@ -509,7 +480,7 @@ void RSSEditor::SlotItemChanged()
 
             if (!thumb.isEmpty())
             {
-                m_image->SetFilename(site->GetImage());
+                m_image->SetFilename(thumb);
                 m_image->Load();
             }
         }
@@ -528,12 +499,14 @@ void RSSEditor::SlotDeleteSite()
 {
     QMutexLocker locker(&m_lock);
 
-    QString message = tr("Are you sure you want to unsubscribe from this feed?");
+    QString message =
+        tr("Are you sure you want to unsubscribe from this feed?");
 
-    MythScreenStack *m_popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythScreenStack *m_popupStack =
+        GetMythMainWindow()->GetStack("popup stack");
 
     MythConfirmationDialog *confirmdialog =
-            new MythConfirmationDialog(m_popupStack,message);
+        new MythConfirmationDialog(m_popupStack,message);
 
     if (confirmdialog->Create())
     {
@@ -552,23 +525,22 @@ void RSSEditor::SlotEditSite()
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    RSSSite *site = qVariantValue<RSSSite *>(m_sites->GetItemCurrent()->GetData());
+    RSSSite *site =
+        qVariantValue<RSSSite *>(m_sites->GetItemCurrent()->GetData());
 
     if (site)
     {
-        RSSEditPopup *rsseditpopup = new RSSEditPopup(site->GetURL(), true, mainStack, "rsseditpopup");
+        RSSEditPopup *rsseditpopup =
+            new RSSEditPopup(site->GetURL(), true, mainStack, "rsseditpopup");
 
         if (rsseditpopup->Create())
         {
-            connect(rsseditpopup, SIGNAL(Saving()), this,
-                           SLOT(ListChanged()));
+            connect(rsseditpopup, SIGNAL(Saving()), this, SLOT(ListChanged()));
 
             mainStack->AddScreen(rsseditpopup);
         }
         else
-        {
             delete rsseditpopup;
-        }
     }
 }
 
@@ -578,19 +550,17 @@ void RSSEditor::SlotNewSite()
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    RSSEditPopup *rsseditpopup = new RSSEditPopup("", false, mainStack, "rsseditpopup");
+    RSSEditPopup *rsseditpopup =
+        new RSSEditPopup("", false, mainStack, "rsseditpopup");
 
     if (rsseditpopup->Create())
     {
-        connect(rsseditpopup, SIGNAL(Saving()), this,
-                       SLOT(ListChanged()));
+        connect(rsseditpopup, SIGNAL(Saving()), this, SLOT(ListChanged()));
 
         mainStack->AddScreen(rsseditpopup);
     }
     else
-    {
         delete rsseditpopup;
-    }
 }
 
 void RSSEditor::DoDeleteSite(bool remove)
@@ -600,7 +570,8 @@ void RSSEditor::DoDeleteSite(bool remove)
     if (!remove)
         return;
 
-    RSSSite *site = qVariantValue<RSSSite *>(m_sites->GetItemCurrent()->GetData());
+    RSSSite *site =
+        qVariantValue<RSSSite *>(m_sites->GetItemCurrent()->GetData());
 
     if (removeFromDB(site))
         ListChanged();

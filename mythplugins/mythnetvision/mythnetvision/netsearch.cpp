@@ -36,7 +36,6 @@ NetSearch::NetSearch(MythScreenStack *parent, const char *name)
       m_search(NULL),                m_pageText(NULL),
       m_noSites(NULL),               m_progress(NULL),
       m_okPopup(NULL),               m_netSearch(NULL),
-
       m_reply(NULL),
       m_currentSearch(QString()),    m_currentGrabber(0),
       m_currentCmd(QString()),       m_pagenum(0),
@@ -82,13 +81,13 @@ bool NetSearch::Create()
 
     // UI Hookups
     connect(m_siteList, SIGNAL(itemSelected(MythUIButtonListItem *)),
-                       SLOT(SlotItemChanged()));
+            SLOT(SlotItemChanged()));
     connect(m_siteList, SIGNAL(itemClicked(MythUIButtonListItem *)),
-                       SLOT(DoSearch(void)));
+            SLOT(DoSearch(void)));
     connect(m_searchResultList, SIGNAL(itemClicked(MythUIButtonListItem *)),
-                       SLOT(StreamWebVideo(void)));
+            SLOT(StreamWebVideo(void)));
     connect(m_searchResultList, SIGNAL(itemSelected(MythUIButtonListItem *)),
-                       SLOT(SlotItemChanged()));
+            SLOT(SlotItemChanged()));
 
     BuildFocusList();
 
@@ -140,9 +139,7 @@ bool NetSearch::keyPressEvent(QKeyEvent *event)
         handled = true;
 
         if (action == "MENU")
-        {
             ShowMenu();
-        }
         else
             handled = false;
     }
@@ -158,7 +155,7 @@ void NetSearch::ShowMenu(void)
     QString label = tr("Search Options");
 
     MythDialogBox *menuPopup = new MythDialogBox(label, m_popupStack,
-                                                    "mythnetvisionmenupopup");
+                                                 "mythnetvisionmenupopup");
 
     if (menuPopup->Create())
     {
@@ -172,11 +169,12 @@ void NetSearch::ShowMenu(void)
             if (item)
             {
                 if (item->GetDownloadable())
-                    menuPopup->AddButton(tr("Stream Video"), SLOT(StreamWebVideo()));
+                    menuPopup->AddButton(tr("Stream Video"),
+                                         SLOT(StreamWebVideo()));
                 menuPopup->AddButton(tr("Open Web Link"), SLOT(ShowWebVideo()));
 
                 QString filename = GetDownloadFilename(item->GetTitle(),
-                    item->GetMediaURL());
+                                                       item->GetMediaURL());
                 bool exists = false;
 
                 if (filename.startsWith("myth://"))
@@ -188,9 +186,11 @@ void NetSearch::ShowMenu(void)
                     GetFocusWidget() == m_searchResultList)
                 {
                     if (exists)
-                        menuPopup->AddButton(tr("Play"), SLOT(DoPlayVideo(filename)));
+                        menuPopup->AddButton(tr("Play"),
+                                             SLOT(DoPlayVideo(filename)));
                     else
-                        menuPopup->AddButton(tr("Save This Video"), SLOT(DoDownloadAndPlay()));
+                        menuPopup->AddButton(tr("Save This Video"),
+                                             SLOT(DoDownloadAndPlay()));
                 }
 
                 if (item->GetDownloadable() &&
@@ -202,17 +202,16 @@ void NetSearch::ShowMenu(void)
             }
 
             if (m_pagenum > 1)
-                menuPopup->AddButton(tr("Previous Page"), SLOT(GetLastResults()));
+                menuPopup->AddButton(tr("Previous Page"),
+                                     SLOT(GetLastResults()));
             if (m_searchResultList->GetCount() > 0 && m_pagenum < m_maxpage)
                 menuPopup->AddButton(tr("Next Page"), SLOT(GetMoreResults()));
         }
-        menuPopup->AddButton(tr("Manage Search Scripts"), SLOT(RunSearchEditor()));
-
+        menuPopup->AddButton(tr("Manage Search Scripts"),
+                             SLOT(RunSearchEditor()));
     }
     else
-    {
         delete menuPopup;
-    }
 }
 
 void NetSearch::FillGrabberButtonList()
@@ -265,10 +264,10 @@ void NetSearch::DoSearch()
     if (!m_netSearch)
         m_netSearch = new QNetworkAccessManager(this);
     connect(m_netSearch, SIGNAL(finished(QNetworkReply*)),
-                       SLOT(SearchFinished(void)));
+            SLOT(SearchFinished(void)));
 
     QUrl init = GetMythXMLSearch(m_mythXML, m_currentSearch,
-                                m_currentCmd, m_pagenum);
+                                 m_currentCmd, m_pagenum);
     QUrl req(init.toEncoded(), QUrl::TolerantMode);
     LOG(VB_GENERAL, LOG_INFO,
         QString("Using Search URL %1").arg(req.toString()));
@@ -342,8 +341,7 @@ void NetSearch::SearchFinished(void)
         else
             m_maxpage = (searchresults/returned);
     }
-    if (m_pageText && m_maxpage > 0 && m_pagenum > 0 &&
-        returned > 0)
+    if (m_pageText && m_maxpage > 0 && m_pagenum > 0 && returned > 0)
         m_pageText->SetText(QString("%1 / %2")
                         .arg(QString::number(m_pagenum))
                         .arg(QString::number(m_maxpage)));
@@ -365,8 +363,7 @@ void NetSearch::SearchTimeout(Search *)
 
     if (!m_okPopup)
     {
-        m_okPopup = new MythConfirmationDialog(m_popupStack,
-                                         message, false);
+        m_okPopup = new MythConfirmationDialog(m_popupStack, message, false);
 
         if (m_okPopup->Create())
             m_popupStack->AddScreen(m_okPopup);
@@ -426,15 +423,13 @@ void NetSearch::RunSearchEditor()
 
     if (searchedit->Create())
     {
-        connect(searchedit, SIGNAL(ItemsChanged()), this,
-                       SLOT(DoListRefresh()));
+        connect(searchedit, SIGNAL(ItemsChanged()),
+                this, SLOT(DoListRefresh()));
 
         mainStack->AddScreen(searchedit);
     }
     else
-    {
         delete searchedit;
-    }
 }
 
 void NetSearch::DoListRefresh()
@@ -529,20 +524,13 @@ void NetSearch::customEvent(QEvent *event)
         uint pos = qVariantValue<uint>(data->data);
 
         if (file.isEmpty() || !((uint)m_searchResultList->GetCount() >= pos))
-        {
             return;
-        }
 
-        MythUIButtonListItem *item =
-                  m_searchResultList->GetItemAt(pos);
+        MythUIButtonListItem *item = m_searchResultList->GetItemAt(pos);
 
         if (item && item->GetText() == title)
-        {
             item->SetImage(file);
-        }
     }
     else
-    {
         NetBase::customEvent(event);
-    }
 }
