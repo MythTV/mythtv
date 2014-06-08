@@ -24,13 +24,30 @@
 #include <vector>
 using namespace std;
 
+#include <QObject>
 // MythGallery headers
 #include "iconview.h"
 #include "sequence.h"
 
+class MThread;
 class QImage;
+class QMutex;
+class QRunnable;
 class QTimer;
+class QWaitCondition;
+class ImageView;
 class ThumbItem;
+
+/** Handler for events related to LoadAlbumListener */
+class LoadAlbumListener : public QObject {
+    Q_OBJECT
+    ImageView *m_parent;
+public:
+    LoadAlbumListener(ImageView *parent);
+    virtual ~LoadAlbumListener();
+private slots:
+    void finishLoading() const;
+};  
 
 class ImageView
 {
@@ -39,6 +56,7 @@ class ImageView
   public:
     ImageView(const ThumbList &itemList,
               int *pos, int slideShow, int sortorder);
+    ThumbItem *getCurrentItem() const;
     virtual ~ImageView();
 
   protected:
@@ -59,6 +77,13 @@ class ImageView
     void UpdateLCD(const ThumbItem *item);
     QString GetDescriptionStatus(void) const;
     void GetScreenShot(QImage& image, const ThumbItem *item);
+    virtual void AddItems(const ThumbList &itemList);
+    ThumbItem *advanceItem();
+    ThumbItem *retreatItem();
+
+  private:
+    friend class LoadAlbumListener;
+    void finishLoading();
 
   protected:
     QSize                  m_screenSize;
@@ -66,7 +91,6 @@ class ImageView
     float                  m_hmult;
     int                    m_pos;
     int                   *m_savedPos;
-    ThumbList              m_itemList;
     int                    m_movieState;
     float                  m_zoom;
 
@@ -75,9 +99,8 @@ class ImageView
 
     // Common slideshow variables
     bool                   m_slideshow_running;
-    int                    m_slideshow_sequencing;
+    const int              m_slideshow_sequencing;
     int                    m_slideshow_sequencing_inc_order;
-    SequenceBase          *m_slideshow_sequence;
     int                    m_slideshow_frame_delay;
     int                    m_slideshow_frame_delay_state;
     QTimer                *m_slideshow_timer;
@@ -89,6 +112,18 @@ class ImageView
     QString                m_effect_method;
     QMap<QString,QString>  m_effect_map;
     bool                   m_effect_random;
+
+private:
+    class LoadAlbumRunnable;
+
+    LoadAlbumRunnable     *m_loaderRunnable;
+    LoadAlbumListener      m_listener;
+    MThread               *m_loaderThread;
+    QWaitCondition         m_imagesLoaded;
+    // This lock must be held to access m_itemList and m_slideshow_sequence.
+    mutable QMutex         m_itemListLock;
+    ThumbList              m_itemList;
+    SequenceBase          *m_slideshow_sequence;
 };
 
 #endif /* IMAGEVIEW_H */

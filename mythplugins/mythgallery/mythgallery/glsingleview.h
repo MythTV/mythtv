@@ -161,13 +161,10 @@ class GLSingleView : public QGLWidget, public ImageView
 class KenBurnsImageLoader : public MThread
 {
 public:
-    KenBurnsImageLoader(GLSingleView *singleView, ThumbList &itemList, QSize m_texSize, QSize m_screenSize);
-    void Initialize(int pos);
+    KenBurnsImageLoader(GLSingleView *singleView, QSize m_texSize, QSize m_screenSize);
     void run();
 private:
     GLSingleView *m_singleView;
-    ThumbList     m_itemList;
-    int           m_pos;
     bool          m_tex1First;
     QSize         m_screenSize;
     QSize         m_texSize;
