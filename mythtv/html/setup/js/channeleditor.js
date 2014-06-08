@@ -100,7 +100,7 @@ function reloadChannelGrid() {
     var sourceid = $("#sourceList").val();
 
     $('#channels').setGridParam({
-        url:'/Channel/GetChannelInfoList?SourceID=' + sourceid,
+        url:'/Channel/GetChannelInfoList?Details=1&SourceID=' + sourceid,
         datatype:'json',
         page:1}); 
     $('#channels').trigger("reloadGrid");
@@ -139,11 +139,8 @@ function editSelectedChannel() {
     $("#channelDetailSettingXMLTVID").val(rowdata.XMLTVID);
     $("#channelDetailSettingIconURL").val(rowdata.IconURL);
     var preview = $("#channelDetailSettingIconPreview");
-    if ((rowdata.IconURL.length > 0) &&
-        (rowdata.IconURL.substring(0,1) != "/")) {
-        preview.attr('src',
-            '/Content/GetFile?StorageGroup=ChannelIcons&FileName=' +
-            rowdata.IconURL);
+    if (rowdata.IconURL.length > 0) {
+        preview.attr('src', rowdata.IconURL);
     }
     else
         preview.attr('src', '/images/blank.gif');
