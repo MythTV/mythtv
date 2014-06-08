@@ -2431,7 +2431,14 @@ ChannelInfoList ChannelUtil::LoadChannels(uint startIndex, uint count,
 
     sql += "GROUP BY channel.chanid ";
 
-    sql += "ORDER BY :ORDERBY ";
+    if (orderBy & kChanOrderByName)
+        sql += "ORDER BY channel.name ";
+    else // kChanOrderByChanNum
+    {
+        // Natural sorting including subchannels e.g. 2_4, 1.3
+        sql += "ORDER BY LPAD(CAST(channel.channum AS UNSIGNED), 10, 0), "
+               "         LPAD(channel.channum,  10, 0)";
+    }
 
     if (count > 0)
         sql += "LIMIT :LIMIT ";
@@ -2449,11 +2456,6 @@ ChannelInfoList ChannelUtil::LoadChannels(uint startIndex, uint count,
 
     if (sourceID > 0)
         query.bindValue(":SOURCEID", sourceID);
-
-    if (orderBy & kChanOrderByName)
-        query.bindValue(":ORDERBY", "channel.name");
-    else // kChanOrderByChanNum
-        query.bindValue(":ORDERBY", "channel.channum");
 
     if (count > 0)
         query.bindValue(":LIMIT", count);
