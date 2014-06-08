@@ -239,7 +239,6 @@ DTC::ProgramList* Guide::GetProgramList(int              nStartIndex,
     ProgramList  schedList;
     MSqlBindings bindings;
 
-    // lpad is to allow natural sorting of numbers
     QString      sSQL;
 
     if (!sPersonFilter.isEmpty())
@@ -301,6 +300,10 @@ DTC::ProgramList* Guide::GetProgramList(int              nStartIndex,
         bindings[":Keyword3"] = filter;
     }
 
+    // FIXME: This is only added to prevent FromProgramQuery from inserting
+    //        it's own GROUP BY which will break the query. This line doen't
+    //        affect the result and can be removed when FromProgramQuery is
+    //        fixed
     sSQL +=     "GROUP BY program.starttime, channel.chanid ";
 
     if (sSort == "starttime")
@@ -319,12 +322,6 @@ DTC::ProgramList* Guide::GetProgramList(int              nStartIndex,
     else
         sSQL += "ASC ";
 
-    if (nCount > 0)
-        sSQL += QString("LIMIT %1 ").arg(nCount);
-
-    if (nStartIndex > 0)
-        sSQL += QString("OFFSET %1 ").arg(nStartIndex);
-
     // ----------------------------------------------------------------------
     // Get all Pending Scheduled Programs
     // ----------------------------------------------------------------------
@@ -334,7 +331,9 @@ DTC::ProgramList* Guide::GetProgramList(int              nStartIndex,
 
     // ----------------------------------------------------------------------
 
-    LoadFromProgram( progList, sSQL, bindings, schedList );
+    uint nTotalAvailable = 0;
+    LoadFromProgram( progList, sSQL, bindings, schedList,
+                     (uint)nStartIndex, (uint)nCount, nTotalAvailable);
 
     // ----------------------------------------------------------------------
     // Build Response
@@ -358,7 +357,7 @@ DTC::ProgramList* Guide::GetProgramList(int              nStartIndex,
 
     pPrograms->setStartIndex    ( nStartIndex     );
     pPrograms->setCount         ( nCount          );
-    pPrograms->setTotalAvailable( progList.size() );
+    pPrograms->setTotalAvailable( nTotalAvailable );
     pPrograms->setAsOf          ( MythDate::current() );
     pPrograms->setVersion       ( MYTH_BINARY_VERSION );
     pPrograms->setProtoVer      ( MYTH_PROTO_VERSION  );
