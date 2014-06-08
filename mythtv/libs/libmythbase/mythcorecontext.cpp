@@ -861,7 +861,9 @@ double MythCoreContext::GetFloatSettingOnHost(const QString &key,
  */
 QString MythCoreContext::GetMasterServerIP(void)
 {
-    return resolveSettingAddress("MasterServerIP");
+    QString master = resolveSettingAddress("MasterServerIP");
+
+    return master.isEmpty() ? "localhost" : master;
 }
 
 /**
