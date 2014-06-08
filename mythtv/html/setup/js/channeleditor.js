@@ -2,7 +2,7 @@ function initChannelEditor() {
     var sourceid = $("#sourceList").val();
 
     $("#channels").jqGrid({
-        url:'/Channel/GetChannelInfoList?SourceID=' + sourceid,
+        url:'/Channel/GetChannelInfoList?Details=1&SourceID=' + sourceid,
         datatype: 'json',
         colNames:['Channel ID', 'Channel Number', 'Callsign', 'Channel Name', 'XMLTVID', 'Visible', 'Icon Path',
                   'Multiplex ID', 'Transport ID', 'Service ID', 'Network ID', 'ATSC Major Channel',
