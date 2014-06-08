@@ -213,22 +213,6 @@ bool FillChannelInfo( DTC::ChannelInfo *pChannel,
         pChannel->setUseEIT(channelInfo.useonairguide);
         pChannel->setXMLTVID(channelInfo.xmltvid);
         pChannel->setDefaultAuth(channelInfo.default_authority);
-
-        // Extended data - This doesn't come from the channel table but the
-        // dtv_multiplex table
-        QString format, modulation, freqtable, freqid, dtv_si_std;
-        uint64_t frequency = 0;
-        uint transportid = 0;
-        uint networkid = 0;
-        ChannelUtil::GetTuningParams(channelInfo.mplexid, modulation, frequency,
-                                    transportid, networkid, dtv_si_std);
-
-        pChannel->setModulation(modulation);
-        pChannel->setFrequencyTable(freqtable);
-        pChannel->setFrequency((long)frequency);
-        pChannel->setSIStandard(dtv_si_std);
-        pChannel->setTransportId(transportid);
-        pChannel->setNetworkId(networkid);
     }
 
     return true;

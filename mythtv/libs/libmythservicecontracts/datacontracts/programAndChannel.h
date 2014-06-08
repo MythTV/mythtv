@@ -30,7 +30,7 @@ class Program;
 class SERVICE_PUBLIC ChannelInfo : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version", "1.07" );
+    Q_CLASSINFO( "version", "2.0" );
 
     // Q_CLASSINFO Used to augment Metadata for properties. 
     // See datacontracthelper.h for details
@@ -44,18 +44,12 @@ class SERVICE_PUBLIC ChannelInfo : public QObject
     Q_PROPERTY( QString   ChannelName     READ ChannelName    WRITE setChannelName   )
 
     Q_PROPERTY( uint      MplexId         READ MplexId        WRITE setMplexId        DESIGNABLE SerializeDetails )
-    Q_PROPERTY( uint      TransportId     READ TransportId    WRITE setTransportId    DESIGNABLE SerializeDetails )
     Q_PROPERTY( uint      ServiceId       READ ServiceId      WRITE setServiceId      DESIGNABLE SerializeDetails )
-    Q_PROPERTY( uint      NetworkId       READ NetworkId      WRITE setNetworkId      DESIGNABLE SerializeDetails )
     Q_PROPERTY( uint      ATSCMajorChan   READ ATSCMajorChan  WRITE setATSCMajorChan  DESIGNABLE SerializeDetails )
     Q_PROPERTY( uint      ATSCMinorChan   READ ATSCMinorChan  WRITE setATSCMinorChan  DESIGNABLE SerializeDetails )
     Q_PROPERTY( QString   Format          READ Format         WRITE setFormat         DESIGNABLE SerializeDetails )
-    Q_PROPERTY( QString   Modulation      READ Modulation     WRITE setModulation     DESIGNABLE SerializeDetails )
-    Q_PROPERTY( long      Frequency       READ Frequency      WRITE setFrequency      DESIGNABLE SerializeDetails )
     Q_PROPERTY( QString   FrequencyId     READ FrequencyId    WRITE setFrequencyId    DESIGNABLE SerializeDetails )
-    Q_PROPERTY( QString   FrequencyTable  READ FrequencyTable WRITE setFrequencyTable DESIGNABLE SerializeDetails )
     Q_PROPERTY( int       FineTune        READ FineTune       WRITE setFineTune       DESIGNABLE SerializeDetails )
-    Q_PROPERTY( QString   SIStandard      READ SIStandard     WRITE setSIStandard     DESIGNABLE SerializeDetails )
     Q_PROPERTY( QString   ChanFilters     READ ChanFilters    WRITE setChanFilters    DESIGNABLE SerializeDetails )
     Q_PROPERTY( int       SourceId        READ SourceId       WRITE setSourceId       DESIGNABLE SerializeDetails )
     Q_PROPERTY( int       InputId         READ InputId        WRITE setInputId        DESIGNABLE SerializeDetails )
@@ -73,18 +67,12 @@ class SERVICE_PUBLIC ChannelInfo : public QObject
     PROPERTYIMP       ( QString     , IconURL        )
     PROPERTYIMP       ( QString     , ChannelName    )
     PROPERTYIMP       ( uint        , MplexId        )
-    PROPERTYIMP       ( uint        , TransportId    )
     PROPERTYIMP       ( uint        , ServiceId      )
-    PROPERTYIMP       ( uint        , NetworkId      )
     PROPERTYIMP       ( uint        , ATSCMajorChan  )
     PROPERTYIMP       ( uint        , ATSCMinorChan  )
     PROPERTYIMP       ( QString     , Format         )
-    PROPERTYIMP       ( QString     , Modulation     )
-    PROPERTYIMP       ( uint64_t    , Frequency      )
     PROPERTYIMP       ( QString     , FrequencyId    )
-    PROPERTYIMP       ( QString     , FrequencyTable )
     PROPERTYIMP       ( int         , FineTune       )
-    PROPERTYIMP       ( QString     , SIStandard     )
     PROPERTYIMP       ( QString     , ChanFilters    )
     PROPERTYIMP       ( int         , SourceId       )
     PROPERTYIMP       ( int         , InputId        )
@@ -109,12 +97,9 @@ class SERVICE_PUBLIC ChannelInfo : public QObject
             : QObject           ( parent ),
               m_ChanId          ( 0      ),
               m_MplexId         ( 0      ),
-              m_TransportId     ( 0      ),
               m_ServiceId       ( 0      ),
-              m_NetworkId       ( 0      ),
               m_ATSCMajorChan   ( 0      ),
               m_ATSCMinorChan   ( 0      ),
-              m_Frequency       ( 0      ),
               m_FineTune        ( 0      ),
               m_SourceId        ( 0      ),
               m_InputId         ( 0      ),
