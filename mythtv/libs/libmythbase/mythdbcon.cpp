@@ -663,7 +663,7 @@ bool MSqlQuery::exec()
         }
     }
 
-    if (VERBOSE_LEVEL_CHECK(VB_DATABASE, LOG_DEBUG))
+    if (VERBOSE_LEVEL_CHECK(VB_DATABASE, LOG_INFO))
     {
         QString str = lastQuery();
 
@@ -682,7 +682,7 @@ bool MSqlQuery::exec()
                 str.replace(b.key(), '\'' + b.value().toString() + '\'');
             }
 
-            LOG(VB_DATABASE, LOG_DEBUG,
+            LOG(VB_DATABASE, LOG_INFO,
                 QString("MSqlQuery::exec(%1) %2%3")
                         .arg(m_db->MSqlDatabase::GetConnectionName()).arg(str)
                         .arg(isSelect() ? QString(" <<<< Returns %1 row(s)")
@@ -717,7 +717,7 @@ bool MSqlQuery::exec(const QString &query)
     if (!result && QSqlQuery::lastError().number() == 2006 && Reconnect())
         result = QSqlQuery::exec(query);
 
-    LOG(VB_DATABASE, LOG_DEBUG,
+    LOG(VB_DATABASE, LOG_INFO,
             QString("MSqlQuery::exec(%1) %2%3")
                     .arg(m_db->MSqlDatabase::GetConnectionName()).arg(query)
                     .arg(isSelect() ? QString(" <<<< Returns %1 row(s)")
