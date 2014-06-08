@@ -185,6 +185,13 @@ class VAAPIDisplay : ReferenceCounter
         return ret;
     }
 
+    static bool HasDisplay(void)
+    {
+        QMutexLocker locker(&s_VAAPIDisplayLock);
+
+        return s_VAAPIDisplay;
+    }
+
     static VAAPIDisplay *GetDisplay(VAAPIDisplayType display_type, bool noreuse)
     {
         if (noreuse)
@@ -235,6 +242,12 @@ bool VAAPIContext::IsFormatAccelerated(QSize size, MythCodecID codec,
                                        PixelFormat &pix_fmt)
 {
     bool result = false;
+
+    if (VAAPIDisplay::HasDisplay())
+    {
+        return false;
+    }
+
     VAAPIContext *ctx = new VAAPIContext(kVADisplayX11, codec);
     if (ctx->CreateDisplay(size, true))
     {
