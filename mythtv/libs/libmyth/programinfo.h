@@ -773,12 +773,20 @@ class MPUBLIC ProgramInfo
     static bool usingProgIDAuth;
 };
 
-
 MPUBLIC bool LoadFromProgram(
     ProgramList        &destination,
     const QString      &sql,
     const MSqlBindings &bindings,
     const ProgramList  &schedList);
+
+MPUBLIC bool LoadFromProgram(
+    ProgramList        &destination,
+    const QString      &sql,
+    const MSqlBindings &bindings,
+    const ProgramList  &schedList,
+    const uint         &start,
+    const uint         &limit,
+    uint               &count);
 
 MPUBLIC ProgramInfo*  LoadProgramFromProgram(
         const uint chanid, const QDateTime &starttime);
