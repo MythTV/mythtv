@@ -823,6 +823,13 @@ bool MSqlQuery::prepare(const QString& query)
         return false;
     }
 
+    // QT docs indicate that there are significant speed ups and a reduction
+    // in memory usage by enabling forward-only cursors
+    //
+    // Unconditionally enable this since all existing uses of the database
+    // iterate forward over the result set.
+    setForwardOnly(true);
+
     bool ok = QSqlQuery::prepare(query);
 
     // if the prepare failed with "MySQL server has gone away"
