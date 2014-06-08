@@ -1,5 +1,6 @@
 #include "videoout_openglvaapi.h"
 #include "vaapicontext.h"
+#include "mythmainwindow.h"
 
 #define LOC QString("VidOutGLVAAPI: ")
 #define ERR QString("VidOutGLVAAPI Error: ")
@@ -132,7 +133,8 @@ bool VideoOutputOpenGLVAAPI::CreateVAAPIContext(QSize size)
         DeleteVAAPIContext();
 
     m_ctx = new VAAPIContext(kVADisplayGLX, video_codec_id);
-    if (m_ctx && m_ctx->CreateDisplay(size) && m_ctx->CreateBuffers())
+    if (m_ctx && m_ctx->CreateDisplay(size, false, gl_context) &&
+        m_ctx->CreateBuffers())
     {
         int num_buffers = m_ctx->GetNumBuffers();
         const QSize video_dim = window.GetActualVideoDim();
@@ -309,4 +311,55 @@ MythCodecID VideoOutputOpenGLVAAPI::GetBestSupportedCodec(
 
     pix_fmt = fmt;
     return test_cid;
+}
+
+bool VideoOutputOpenGLVAAPI::SetupContext(void)
+{
+    QMutexLocker locker(&gl_context_lock);
+
+    if (gl_context)
+    {
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Re-using context"));
+        return true;
+    }
+
+    MythMainWindow* win = MythMainWindow::getMainWindow();
+    if (!win)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to get MythMainWindow");
+        return false;
+    }
+
+    gl_context = dynamic_cast<MythRenderOpenGL*>(win->GetRenderDevice());
+
+    if (gl_context && gl_context->Type() == kRenderOpenGL1)
+    {
+        gl_context->IncrRef();
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + "Using main UI render context");
+        return true;
+    }
+
+    QWidget *device = QWidget::find(gl_parent_win);
+    if (!device)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to find parent window");
+        return false;
+    }
+
+    gl_context = MythRenderOpenGL::Create(OPENGL_PAINTER, device);
+    if (gl_context && gl_context->create())
+    {
+        gl_context->Init();
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            "Created MythRenderOpenGL 1.x device.");
+        return true;
+    }
+
+    LOG(VB_GENERAL, LOG_ERR, LOC +
+        "Failed to create MythRenderOpenGL 1.x device.");
+    if (gl_context)
+        gl_context->DecrRef();
+    gl_context = NULL;
+
+    return false;
 }

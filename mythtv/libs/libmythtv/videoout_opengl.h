@@ -72,7 +72,7 @@ class VideoOutputOpenGL : public VideoOutput
     void DestroyGPUResources(void);
     virtual bool CreateBuffers(void);
     bool CreatePauseFrame(void);
-    bool SetupContext(void);
+    virtual bool SetupContext(void);
     bool SetupOpenGL(void);
     void CreatePainter(void);
 

@@ -687,7 +687,7 @@ QString VideoDisplayProfile::GetDecoderHelp(QString decoder)
     if (decoder == "vaapi")
         msg += QObject::tr(
             "VAAPI will attempt to use the graphics hardware to "
-            "accelerate video decoding. REQUIRES OPENGL PAINTER.");
+            "accelerate video decoding. Requires OpenGL.");
 
     if (decoder == "vda")
         msg += QObject::tr(

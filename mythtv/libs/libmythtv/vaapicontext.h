@@ -19,6 +19,7 @@ struct vaapi_surface
 
 class VAAPIDisplay;
 class OpenGLVideo;
+class MythRenderOpenGL;
 
 enum VAAPIDisplayType
 {
@@ -34,11 +35,12 @@ class VAAPIContext
     VAAPIContext(VAAPIDisplayType display_type, MythCodecID codec);
    ~VAAPIContext();
 
-    bool  CreateDisplay(QSize size, bool noreuse = false);
+    bool  CreateDisplay(QSize size, bool noreuse = false, 
+                        MythRenderOpenGL *render = NULL);
     bool  CreateBuffers(void);
     void* GetVideoSurface(int i);
     uint8_t* GetSurfaceIDPointer(void* buf);
-    
+
     int   GetNumBuffers(void)        const { return m_numSurfaces; }
     PixelFormat GetPixelFormat(void) const { return m_pix_fmt;     }
 
