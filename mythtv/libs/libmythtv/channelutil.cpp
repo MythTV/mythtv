@@ -2418,13 +2418,13 @@ ChannelInfoList ChannelUtil::LoadChannels(uint startIndex, uint count,
 
     QStringList cond;
     if (ignoreHidden)
-        cond << "visible = :VISIBLE ";
+        cond << "channel.visible = :VISIBLE ";
 
     if (channelGroupID > 0)
         cond << "channelgroup.grpid = :CHANGROUPID ";
 
     if (sourceID > 0)
-        cond << "sourceid = :SOURCEID ";
+        cond << "channel.sourceid = :SOURCEID ";
 
     if (!cond.isEmpty())
         sql += QString("WHERE %1").arg(cond.join("AND "));
