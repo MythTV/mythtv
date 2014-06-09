@@ -112,7 +112,6 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &rawStartTime ,
                 "AND program.endtime >= :StartDate "
                 "AND program.starttime <= :EndDate "
                 "AND program.manualid = 0 " // Exclude programmes created purely for 'manual' recording schedules
-                "GROUP BY program.starttime, channel.chanid "
                 "ORDER BY LPAD(CAST(channum AS UNSIGNED), 10, 0), "
                 "         LPAD(channum,  10, 0),             "
                 "         callsign,                          "
@@ -299,12 +298,6 @@ DTC::ProgramList* Guide::GetProgramList(int              nStartIndex,
         bindings[":Keyword2"] = filter;
         bindings[":Keyword3"] = filter;
     }
-
-    // FIXME: This is only added to prevent FromProgramQuery from inserting
-    //        it's own GROUP BY which will break the query. This line doen't
-    //        affect the result and can be removed when FromProgramQuery is
-    //        fixed
-    sSQL +=     "GROUP BY program.starttime, channel.chanid ";
 
     if (sSort == "starttime")
         sSQL += "ORDER BY program.starttime ";
