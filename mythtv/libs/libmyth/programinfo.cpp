@@ -5215,32 +5215,6 @@ static bool FromProgramQuery(const QString &sql, const MSqlBindings &bindings,
         "    program.starttime = oldrecstatus.starttime "
         ) + sql;
 
-    // ------------------------------------------------------------------------
-    // FIXME: Remove the following. These make assumptions about the content
-    //        of the sql passed in, they can end up breaking that query by
-    //        inserting a WHERE clause after a GROUP BY, or a GROUP BY after
-    //        an ORDER BY. These should be part of the sql passed in otherwise
-    //        the caller isn't getting what they asked for and to fix that they
-    //        are forced to include a GROUP BY, ORDER BY or WHERE that they
-    //        do not want
-    if (!sql.contains("WHERE"))
-        querystr += " WHERE visible != 0 ";
-    if (!sql.contains("GROUP BY"))
-        querystr += " GROUP BY program.starttime, channel.channum, "
-                    "          channel.callsign, program.title ";
-    if (!sql.contains("ORDER BY"))
-    {
-        querystr += " ORDER BY program.starttime, ";
-        QString chanorder =
-            gCoreContext->GetSetting("ChannelOrdering", "channum");
-        if (chanorder != "channum")
-            querystr += chanorder + " ";
-        else // approximation which the DB can handle
-            querystr += "atsc_major_chan,atsc_minor_chan,channum,callsign ";
-    }
-
-    // ------------------------------------------------------------------------
-
     // If a limit arg was given then append the LIMIT, otherwise set a hard
     // limit of 20000.
     if (limit > 0)
@@ -5248,6 +5222,7 @@ static bool FromProgramQuery(const QString &sql, const MSqlBindings &bindings,
     else if (!querystr.contains("LIMIT"))
         querystr += " LIMIT 20000 "; // For performance reasons we have to have an upper limit
 
+    MSqlBindings::const_iterator it;
     // Some end users need to know the total number of matching records,
     // irrespective of any LIMIT clause
     //
@@ -5264,23 +5239,25 @@ static bool FromProgramQuery(const QString &sql, const MSqlBindings &bindings,
     //      Same query but only one column and with SQL_CALC_FOUND_ROWS - 370ms
     //      Total to fetch both the count and the data = 590ms vs 1920ms
     //      Therefore two queries is 1.4 seconds faster than one query.
-    QString countStr = querystr.arg("SQL_CALC_FOUND_ROWS program.chanid");
-    query.prepare(countStr);
-    MSqlBindings::const_iterator it;
-    for (it = bindings.begin(); it != bindings.end(); ++it)
+    if (start > 0 || limit > 0)
     {
-        if (countStr.contains(it.key()))
-            query.bindValue(it.key(), it.value());
-    }
+        QString countStr = querystr.arg("SQL_CALC_FOUND_ROWS program.chanid");
+        query.prepare(countStr);
+        for (it = bindings.begin(); it != bindings.end(); ++it)
+        {
+            if (countStr.contains(it.key()))
+                query.bindValue(it.key(), it.value());
+        }
 
-    if (!query.exec())
-    {
-        MythDB::DBError("LoadFromProgramQuery", query);
-        return false;
-    }
+        if (!query.exec())
+        {
+            MythDB::DBError("LoadFromProgramQuery", query);
+            return false;
+        }
 
-    if (query.exec("SELECT FOUND_ROWS()") && query.next())
-        count = query.value(0).toUInt();
+        if (query.exec("SELECT FOUND_ROWS()") && query.next())
+            count = query.value(0).toUInt();
+    }
 
     if (start > 0)
         querystr += QString("OFFSET %1 ").arg(start);
@@ -5307,6 +5284,42 @@ bool LoadFromProgram(ProgramList &destination,
                      const ProgramList &schedList)
 {
     uint count;
+
+    QString queryStr = sql;
+    // ------------------------------------------------------------------------
+    // FIXME: Remove the following. These all make assumptions about the content
+    //        of the sql passed in, they can end up breaking that query by
+    //        inserting a WHERE clause after a GROUP BY, or a GROUP BY after
+    //        an ORDER BY. These should be part of the sql passed in otherwise
+    //        the caller isn't getting what they asked for and to fix that they
+    //        are forced to include a GROUP BY, ORDER BY or WHERE that they
+    //        do not want
+    if (!queryStr.contains("WHERE"))
+        queryStr += " WHERE visible != 0 ";
+
+    // NOTE: Any GROUP BY clause with a LIMIT is slow, adding at least
+    // a couple of seconds to the query execution time
+
+    // TODO: This one seems to be dealing with eliminating duplicate channels (same
+    // programming, different source), but using GROUP BY for that isn't very
+    // efficient so another approach is required
+    if (!queryStr.contains("GROUP BY"))
+        queryStr += " GROUP BY program.starttime, channel.channum, "
+                    "          channel.callsign, program.title ";
+
+    if (!queryStr.contains("ORDER BY"))
+    {
+        queryStr += " ORDER BY program.starttime, ";
+        QString chanorder =
+            gCoreContext->GetSetting("ChannelOrdering", "channum");
+        if (chanorder != "channum")
+            queryStr += chanorder + " ";
+        else // approximation which the DB can handle
+            queryStr += "atsc_major_chan,atsc_minor_chan,channum,callsign ";
+    }
+
+    // ------------------------------------------------------------------------
+
     return LoadFromProgram(destination, sql, bindings, schedList, 0, 0, count);
 }
 
@@ -5321,6 +5334,9 @@ bool LoadFromProgram( ProgramList &destination,
     query.setForwardOnly(true);
     if (!FromProgramQuery(sql, bindings, query, start, limit, count))
         return false;
+
+    if (count == 0)
+        count = query.size();
 
     while (query.next())
     {
