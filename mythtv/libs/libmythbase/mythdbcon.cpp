@@ -10,6 +10,7 @@
 #include <QSqlError>
 #include <QSqlField>
 #include <QSqlRecord>
+#include <QElapsedTimer>
 
 // MythTV
 #include "compat.h"
@@ -626,7 +627,11 @@ bool MSqlQuery::exec()
         return false;
     }
 
+    QElapsedTimer timer;
+    timer.start();
+
     bool result = QSqlQuery::exec();
+    qint64 elapsed = timer.elapsed();
 
     // if the query failed with "MySQL server has gone away"
     // Close and reopen the database connection and retry the query if it
@@ -652,7 +657,9 @@ bool MSqlQuery::exec()
         if (has_null_strings)
         {
             bindValues(tmp);
+            timer.restart();
             result = QSqlQuery::exec();
+            elapsed = timer.elapsed();
         }
         if (result)
         {
@@ -683,9 +690,10 @@ bool MSqlQuery::exec()
             }
 
             LOG(VB_DATABASE, LOG_INFO,
-                QString("MSqlQuery::exec(%1) %2%3")
+                QString("MSqlQuery::exec(%1) %2%3%4")
                         .arg(m_db->MSqlDatabase::GetConnectionName()).arg(str)
-                        .arg(isSelect() ? QString(" <<<< Returns %1 row(s)")
+                        .arg(QString(" <<<< Took %1ms").arg(QString::number(elapsed)))
+                        .arg(isSelect() ? QString(", Returned %1 row(s)")
                                               .arg(size()) : QString()));
         }
     }
