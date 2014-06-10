@@ -165,6 +165,15 @@ static inline void clear(VideoFrame *vf)
 
 static inline bool compatible(const VideoFrame *a, const VideoFrame *b)
 {
+    if (a->codec == b->codec && a->codec == FMT_YV12)
+    {
+        return a && b &&
+            (a->codec      == b->codec)      &&
+            (a->width      == b->width)      &&
+            (a->height     == b->height)     &&
+            (a->size       == b->size);
+    }
+
     return a && b &&
         (a->codec      == b->codec)      &&
         (a->width      == b->width)      &&
@@ -176,6 +185,18 @@ static inline bool compatible(const VideoFrame *a, const VideoFrame *b)
         (a->pitches[0] == b->pitches[0]) &&
         (a->pitches[1] == b->pitches[1]) &&
         (a->pitches[2] == b->pitches[2]);
+}
+
+static inline void copyplane(unsigned char *dst, int dst_pitch,
+                             const unsigned char *src, int src_pitch,
+                             int width, int height)
+{
+    for (int y = 0; y < height; y++)
+    {
+        memcpy(dst, src, width);
+        src += src_pitch;
+        dst += dst_pitch;
+    }
 }
 
 static inline void copy(VideoFrame *dst, const VideoFrame *src)
@@ -190,6 +211,28 @@ static inline void copy(VideoFrame *dst, const VideoFrame *src)
 
     if (FMT_YV12 == codec)
     {
+        int width   = src->width;
+        int height  = src->height;
+        int dwidth  = dst->width;
+        int dheight = dst->height;
+
+        if (height == dheight && width == dwidth &&
+            dst->pitches[0] != src->pitches[0])
+        {
+            // We have a different stride between the two frames
+            // drop the garbage data
+            copyplane(dst->buf + dst->offsets[0], dst->pitches[0],
+                      src->buf + src->offsets[0], src->pitches[0],
+                      width, height);
+            copyplane(dst->buf + dst->offsets[1], dst->pitches[1],
+                      src->buf + src->offsets[1], src->pitches[1],
+                      width / 2, height / 2);
+            copyplane(dst->buf + dst->offsets[2], dst->pitches[2],
+                      src->buf + src->offsets[2], src->pitches[2],
+                      width / 2, height / 2);
+            return;
+        }
+
         int height0 = (dst->height < src->height) ? dst->height : src->height;
         int height1 = height0 >> 1;
         int height2 = height0 >> 1;
