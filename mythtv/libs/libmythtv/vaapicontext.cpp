@@ -673,9 +673,8 @@ bool VAAPIContext::InitImage(const void *buf)
     const vaapi_surface *surf = (vaapi_surface*)buf;
     for (int i = 0; i < num_formats; i++)
     {
-        if(formats[i].fourcc == VA_FOURCC('Y','V','1','2') ||
-           formats[i].fourcc == VA_FOURCC('I','4','2','0') ||
-           formats[i].fourcc == VA_FOURCC('N','V','1','2'))
+        if (formats[i].fourcc == VA_FOURCC('Y','V','1','2') ||
+            formats[i].fourcc == VA_FOURCC('I','4','2','0'))
         {
             if (vaCreateImage(m_ctx.display, &formats[i],
                               m_size.width(), m_size.height(), &m_image))
@@ -739,46 +738,25 @@ bool VAAPIContext::CopySurfaceToFrame(VideoFrame *frame, const void *buf)
         if (vaMapBuffer(m_ctx.display, m_image.buf, &source))
             return false;
 
-        if (m_image.format.fourcc == VA_FOURCC('Y','V','1','2') ||
-            m_image.format.fourcc == VA_FOURCC('I','4','2','0'))
-        {
-            bool swap = m_image.format.fourcc == VA_FOURCC('Y','V','1','2');
-            VideoFrame src;
-            init(&src, FMT_YV12, (unsigned char*)source, m_image.width,
-                 m_image.height, m_image.data_size, NULL,
-                 NULL, frame->aspect, frame->frame_rate);
-            src.pitches[0] = m_image.pitches[0];
-            src.pitches[1] = m_image.pitches[swap ? 2 : 1];
-            src.pitches[2] = m_image.pitches[swap ? 1 : 2];
-            src.offsets[0] = m_image.offsets[0];
-            src.offsets[1] = m_image.offsets[swap ? 2 : 1];
-            src.offsets[2] = m_image.offsets[swap ? 1 : 2];
-            copy(frame, &src);
-        }
-        else if (m_image.format.fourcc == VA_FOURCC('N','V','1','2'))
-        {
-            AVPicture img_in, img_out;
-            avpicture_fill(&img_out, (uint8_t *)frame->buf, PIX_FMT_YUV420P,
-                           frame->width, frame->height);
-            avpicture_fill(&img_in, (uint8_t *)source, PIX_FMT_NV12,
-                           m_image.width, m_image.height);
-            myth_sws_img_convert(&img_out, PIX_FMT_YUV420P,
-                                 &img_in, PIX_FMT_NV12,
-                                 frame->width, frame->height);
-            // Is this needed? Is it safe?
-            frame->pitches[0] = img_out.linesize[0];
-            frame->pitches[1] = img_out.linesize[1];
-            frame->pitches[2] = img_out.linesize[2];
-            frame->offsets[0] = 0;
-            frame->offsets[1] = img_out.data[1] - img_out.data[0];
-            frame->offsets[2] = img_out.data[2] - img_out.data[0];
-        }
+        bool swap = m_image.format.fourcc == VA_FOURCC('Y','V','1','2');
+        VideoFrame src;
+        init(&src, FMT_YV12, (unsigned char*)source, m_image.width,
+             m_image.height, m_image.data_size, NULL,
+             NULL, frame->aspect, frame->frame_rate);
+        src.pitches[0] = m_image.pitches[0];
+        src.pitches[1] = m_image.pitches[swap ? 2 : 1];
+        src.pitches[2] = m_image.pitches[swap ? 1 : 2];
+        src.offsets[0] = m_image.offsets[0];
+        src.offsets[1] = m_image.offsets[swap ? 2 : 1];
+        src.offsets[2] = m_image.offsets[swap ? 1 : 2];
+        copy(frame, &src);
+
         if (vaUnmapBuffer(m_ctx.display, m_image.buf))
             return false;
+
+        return true;
     }
 
-    if (ok)
-        return true;
     LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to get image");
     return false;
 }
