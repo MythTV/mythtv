@@ -196,6 +196,7 @@ class MythMainWindowPrivate
         idleTime(0),
         standby(false),
         enteringStandby(false),
+        disableIdle(false),
         NC(NULL),
         firstinit(true),
         m_bSavedPOS(false)
@@ -293,6 +294,7 @@ class MythMainWindowPrivate
     int  idleTime;
     bool standby;
     bool enteringStandby;
+    bool disableIdle;
     MythNotificationCenter *NC;
         // window aspect
     bool firstinit;
@@ -2914,6 +2916,9 @@ void MythMainWindow::HideMouseTimeout(void)
 
 void MythMainWindow::ResetIdleTimer(void)
 {
+    if (d->disableIdle)
+        return;
+
     if (d->idleTime == 0 ||
         !d->idleTimer->isActive() ||
         (d->standby && d->enteringStandby))
@@ -2927,6 +2932,9 @@ void MythMainWindow::ResetIdleTimer(void)
 
 void MythMainWindow::PauseIdleTimer(bool pause)
 {
+    if (d->disableIdle)
+        return;
+
     // don't do anything if the idle timer is disabled
     if (d->idleTime == 0)
         return;
@@ -2947,6 +2955,9 @@ void MythMainWindow::PauseIdleTimer(bool pause)
 
 void MythMainWindow::IdleTimeout(void)
 {
+    if (d->disableIdle)
+        return;
+
     d->enteringStandby = false;
 
     if (d->idleTime > 0 && !d->standby)
@@ -3016,5 +3027,12 @@ void MythMainWindow::ExitStandby(bool manual)
     MythUIStateTracker::SetState(state);
 }
 
+void MythMainWindow::DisableIdleTimer(bool disableIdle)
+{
+    if ((d->disableIdle = disableIdle))
+        d->idleTimer->stop();
+    else
+        d->idleTimer->start();
+}
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

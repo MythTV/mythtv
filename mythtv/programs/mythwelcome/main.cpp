@@ -113,6 +113,7 @@ int main(int argc, char **argv)
 
     MythMainWindow *mainWindow = GetMythMainWindow();
     mainWindow->Init();
+    mainWindow->DisableIdleTimer();
 
     initKeys();
 

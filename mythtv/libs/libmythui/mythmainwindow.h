@@ -134,6 +134,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
 
     void ResetIdleTimer(void);
     void PauseIdleTimer(bool pause);
+    void DisableIdleTimer(bool disableIdle = true);
     void EnterStandby(bool manual = true);
     void ExitStandby(bool manual = true);
 
