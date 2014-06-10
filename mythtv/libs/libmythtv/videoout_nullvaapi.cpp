@@ -45,7 +45,7 @@ bool VideoOutputNullVAAPI::CreateVAAPIContext(QSize size)
         DeleteVAAPIContext();
 
     m_ctx = new VAAPIContext(kVADisplayX11, video_codec_id);
-    if (m_ctx && m_ctx->CreateDisplay(size))
+    if (m_ctx && m_ctx->CreateDisplay(size, true))
         return true;
     return false;
 }
