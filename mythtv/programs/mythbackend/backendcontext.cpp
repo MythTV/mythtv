@@ -46,7 +46,11 @@ void BackendContext::SetFrontendConnected(Frontend *frontend)
         frontend = NULL;
 
         if (!m_connectedFrontends.contains(fe->name))
+        {
             m_connectedFrontends.insert(fe->name, fe);
+            LOG(VB_GENERAL, LOG_INFO, QString("BackendContext: Frontend '%1' "
+                                      "connected.").arg(frontend->name));
+        }
 
         fe->connectionCount++;
         LOG(VB_GENERAL, LOG_DEBUG, QString("BackendContext: Increasing "
