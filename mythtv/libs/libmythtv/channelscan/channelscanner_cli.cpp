@@ -74,7 +74,7 @@ void ChannelScannerCLI::HandleEvent(const ScannerEvent *scanEvent)
             QString error = scanEvent->strValue();
             InformUser(error);
         }
-        else if (sigmonScanner && !transports.empty())
+        else if (!transports.empty())
             Process(transports);
 
         done = true;
