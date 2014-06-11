@@ -1576,7 +1576,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         else
             delete frontend;
 
-        if (eventsMode != kPBSEvents_None && commands[2] != "tzcheck")
+        if (eventsMode != kPBSEvents_None)
             gCoreContext->SendSystemEvent(
                 QString("CLIENT_CONNECTED HOSTNAME %1").arg(commands[2]));
     }
@@ -7007,7 +7007,7 @@ void MainServer::connectionClosed(MythSocket *socket)
                     QString("SLAVE_DISCONNECTED HOSTNAME %1")
                             .arg(pbs->getHostname()));
             }
-            else if (ismaster && pbs->getHostname() != "tzcheck")
+            else if (ismaster)
             {
                 if (gBackendContext)
                     gBackendContext->SetFrontendDisconnected(pbs->getHostname());
