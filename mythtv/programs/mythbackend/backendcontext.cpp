@@ -2,6 +2,7 @@
 #include "backendcontext.h"
 
 #include "mythlogging.h"
+#include "mythcorecontext.h"
 
 QMap<int, EncoderLink *> tvList;
 AutoExpire  *expirer      = NULL;
@@ -60,6 +61,8 @@ void BackendContext::SetFrontendConnected(Frontend *frontend)
         return;
     }
 
+    gCoreContext->SendSystemEvent(
+                QString("CLIENT_CONNECTED HOSTNAME %1").arg(frontend->name));
     LOG(VB_GENERAL, LOG_INFO, QString("BackendContext: Frontend '%1' "
                                       "connected.").arg(frontend->name));
 
@@ -90,6 +93,10 @@ void BackendContext::SetFrontendDisconnected(const QString& name)
         {
             // Will still be referenced in knownFrontends, so no leak here
             m_connectedFrontends.remove(name);
+
+            gCoreContext->SendSystemEvent(
+                    QString("CLIENT_DISCONNECTED HOSTNAME %1")
+                            .arg(frontend->name));
             LOG(VB_GENERAL, LOG_INFO, QString("BackendContext: Frontend '%1' "
                                               "disconnected.").arg(frontend->name));
         }

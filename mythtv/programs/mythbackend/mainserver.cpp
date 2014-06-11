@@ -1576,9 +1576,6 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         else
             delete frontend;
 
-        if (eventsMode != kPBSEvents_None)
-            gCoreContext->SendSystemEvent(
-                QString("CLIENT_CONNECTED HOSTNAME %1").arg(commands[2]));
     }
     else if (commands[1] == "MediaServer")
     {
@@ -7011,9 +7008,6 @@ void MainServer::connectionClosed(MythSocket *socket)
             {
                 if (gBackendContext)
                     gBackendContext->SetFrontendDisconnected(pbs->getHostname());
-                gCoreContext->SendSystemEvent(
-                    QString("CLIENT_DISCONNECTED HOSTNAME %1")
-                            .arg(pbs->getHostname()));
             }
 
             LiveTVChain *chain;
