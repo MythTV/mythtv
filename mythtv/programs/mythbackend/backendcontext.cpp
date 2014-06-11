@@ -49,7 +49,7 @@ void BackendContext::SetFrontendConnected(Frontend *frontend)
         {
             m_connectedFrontends.insert(fe->name, fe);
             LOG(VB_GENERAL, LOG_INFO, QString("BackendContext: Frontend '%1' "
-                                      "connected.").arg(frontend->name));
+                                      "connected.").arg(fe->name));
         }
 
         fe->connectionCount++;
