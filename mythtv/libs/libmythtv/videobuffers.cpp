@@ -20,17 +20,32 @@ extern "C" {
 
 int next_dbg_str = 0;
 
-YUVInfo::YUVInfo(uint w, uint h, uint sz, const int *p, const int *o)
+YUVInfo::YUVInfo(uint w, uint h, uint sz, const int *p, const int *o,
+                 int aligned)
     : width(w), height(h), size(sz)
 {
+    // make sure all our pitches are a multiple of "aligned" bytes
+    // Needs to take into consideration that U and V channels are half
+    // the width of Y channel
+    uint width_aligned;
+
+    if (!aligned)
+    {
+        width_aligned = width;
+    }
+    else
+    {
+        width_aligned = (width + aligned - 1) & ~(aligned - 1);
+    }
+
     if (p)
     {
         memcpy(pitches, p, 3 * sizeof(int));
     }
     else
     {
-        pitches[0] = width;
-        pitches[1] = pitches[2] = width >> 1;
+        pitches[0] = width_aligned;
+        pitches[1] = pitches[2] = width_aligned >> 1;
     }
 
     if (o)
@@ -40,7 +55,7 @@ YUVInfo::YUVInfo(uint w, uint h, uint sz, const int *p, const int *o)
     else
     {
         offsets[0] = 0;
-        offsets[1] = width * height;
+        offsets[1] = width_aligned * height;
         offsets[2] = offsets[1] + (offsets[1] >> 2);
     }
 }

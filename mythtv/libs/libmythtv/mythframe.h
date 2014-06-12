@@ -70,7 +70,8 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
                         unsigned char *_buf, int _width, int _height, int _size,
                         const int *p = 0,
                         const int *o = 0,
-                        float _aspect = -1.0f, double _rate = -1.0f) MUNUSED;
+                        float _aspect = -1.0f, double _rate = -1.0f,
+                        int _aligned = 0) MUNUSED;
 static inline void clear(VideoFrame *vf);
 static inline bool compatible(const VideoFrame *a,
                               const VideoFrame *b) MUNUSED;
@@ -79,7 +80,7 @@ static inline int  bitsperpixel(VideoFrameType type);
 static inline void init(VideoFrame *vf, VideoFrameType _codec,
                         unsigned char *_buf, int _width, int _height,
                         int _size, const int *p, const int *o,
-                        float _aspect, double _rate)
+                        float _aspect, double _rate, int _aligned)
 {
     vf->bpp    = bitsperpixel(_codec);
     vf->codec  = _codec;
@@ -106,6 +107,16 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
 
     memset(vf->priv, 0, 4 * sizeof(unsigned char *));
 
+    uint width_aligned;
+    if (!_aligned)
+    {
+        width_aligned = _width;
+    }
+    else
+    {
+        width_aligned = (_width + _aligned - 1) & ~(_aligned - 1);
+    }
+
     if (p)
     {
         memcpy(vf->pitches, p, 3 * sizeof(int));
@@ -114,12 +125,12 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
     {
         if (FMT_YV12 == _codec || FMT_YUV422P == _codec)
         {
-            vf->pitches[0] = _width;
-            vf->pitches[1] = vf->pitches[2] = _width >> 1;
+            vf->pitches[0] = width_aligned;
+            vf->pitches[1] = vf->pitches[2] = width_aligned >> 1;
         }
         else
         {
-            vf->pitches[0] = (_width * vf->bpp) >> 3;
+            vf->pitches[0] = (width_aligned * vf->bpp) >> 3;
             vf->pitches[1] = vf->pitches[2] = 0;
         }
     }
@@ -133,13 +144,13 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
         if (FMT_YV12 == _codec)
         {
             vf->offsets[0] = 0;
-            vf->offsets[1] = _width * _height;
+            vf->offsets[1] = width_aligned * _height;
             vf->offsets[2] = vf->offsets[1] + (vf->offsets[1] >> 2);
         }
         else if (FMT_YUV422P == _codec)
         {
             vf->offsets[0] = 0;
-            vf->offsets[1] = _width * _height;
+            vf->offsets[1] = width_aligned * _height;
             vf->offsets[2] = vf->offsets[1] + (vf->offsets[1] >> 1);
         }
         else
@@ -280,18 +291,29 @@ static inline int bitsperpixel(VideoFrameType type)
     return res;
 }
 
-static inline uint buffersize(VideoFrameType type, int width, int height)
+static inline uint buffersize(VideoFrameType type, int width, int height,
+                              int _aligned = 16)
 {
     int  type_bpp = bitsperpixel(type);
     uint bpp = type_bpp / 4; /* bits per pixel div common factor */
     uint bpb =  8 / 4; /* bits per byte div common factor */
 
-    // If the buffer sizes are not a multple of 16, adjust.
+    // make sure all our pitches are a multiple of 16 bytes
+    // as U and V channels are half the size of Y channel
+    // This allow for SSE/HW accelerated code on all planes
+    // If the buffer sizes are not 32 bytes aligned, adjust.
     // old versions of MythTV allowed people to set invalid
     // dimensions for MPEG-4 capture, no need to segfault..
-    uint adj_w = (width  + 15) & ~0xF;
-    uint adj_h = (height + 15) & ~0xF;
-    return (adj_w * adj_h * bpp + 4/* to round up */) / bpb;
+    uint adj_w;
+    if (!_aligned)
+    {
+        adj_w = width;
+    }
+    else
+    {
+        adj_w = (width  + _aligned - 1) & ~(_aligned - 1);
+    }
+    return (adj_w * height * bpp + 4/* to round up */) / bpb;
 }
 
 #endif /* __cplusplus */
