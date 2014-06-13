@@ -45,7 +45,7 @@ YUVInfo::YUVInfo(uint w, uint h, uint sz, const int *p, const int *o,
     else
     {
         pitches[0] = width_aligned;
-        pitches[1] = pitches[2] = width_aligned >> 1;
+        pitches[1] = pitches[2] = (width_aligned+1) >> 1;
     }
 
     if (o)
@@ -56,7 +56,7 @@ YUVInfo::YUVInfo(uint w, uint h, uint sz, const int *p, const int *o,
     {
         offsets[0] = 0;
         offsets[1] = width_aligned * height;
-        offsets[2] = offsets[1] + (offsets[1] >> 2);
+        offsets[2] = offsets[1] + ((width_aligned+1) >> 1) * ((height+1) >> 1);
     }
 }
 
