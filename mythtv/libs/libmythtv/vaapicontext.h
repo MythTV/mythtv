@@ -76,7 +76,6 @@ class VAAPIContext
     int            m_pictureAttributeCount;
     int            m_hueBase;
     VAImage        m_image;
-    bool           m_deriveSupport;
 };
 
 #endif // VAAPICONTEXT_H
