@@ -259,7 +259,7 @@ VAAPIContext::VAAPIContext(VAAPIDisplayType display_type,
     m_vaEntrypoint(VAEntrypointEncSlice),
     m_pix_fmt(PIX_FMT_YUV420P), m_numSurfaces(NUM_VAAPI_BUFFERS),
     m_surfaces(NULL), m_surfaceData(NULL), m_pictureAttributes(NULL),
-    m_pictureAttributeCount(0), m_hueBase(0)
+    m_pictureAttributeCount(0), m_hueBase(0), m_deriveSupport(false)
 {
     memset(&m_ctx, 0, sizeof(vaapi_context));
     memset(&m_image, 0, sizeof(m_image));
@@ -671,10 +671,22 @@ bool VAAPIContext::InitImage(const void *buf)
     CHECK_ST;
 
     const vaapi_surface *surf = (vaapi_surface*)buf;
+    unsigned int deriveImageFormat = 0;
+
+    if (vaDeriveImage(m_ctx.display, surf->m_id, &m_image) == VA_STATUS_SUCCESS)
+    {
+        m_deriveSupport = true;
+        deriveImageFormat = m_image.format.fourcc;
+        vaDestroyImage(m_ctx.display, m_image.image_id);
+    }
+
+    int nv12support = -1;
+
     for (int i = 0; i < num_formats; i++)
     {
-        if (formats[i].fourcc == VA_FOURCC('Y','V','1','2') ||
-            formats[i].fourcc == VA_FOURCC('I','4','2','0'))
+        if (formats[i].fourcc == VA_FOURCC_YV12 ||
+            formats[i].fourcc == VA_FOURCC_IYUV ||
+            formats[i].fourcc == VA_FOURCC_NV12)
         {
             if (vaCreateImage(m_ctx.display, &formats[i],
                               m_size.width(), m_size.height(), &m_image))
@@ -690,8 +702,32 @@ bool VAAPIContext::InitImage(const void *buf)
                 m_image.image_id = VA_INVALID_ID;
                 continue;
             }
+
+            if (formats[i].fourcc == VA_FOURCC_NV12)
+            {
+                // mark as NV12 as supported, but favor other formats first
+                nv12support = i;
+                vaDestroyImage(m_ctx.display, m_image.image_id);
+                m_image.image_id = VA_INVALID_ID;
+                continue;
+            }
             break;
         }
+    }
+
+    if (m_image.image_id == VA_INVALID_ID && nv12support >= 0)
+    {
+        // only nv12 is supported, use that format
+        if (vaCreateImage(m_ctx.display, &formats[nv12support],
+                          m_size.width(), m_size.height(), &m_image))
+        {
+            m_image.image_id = VA_INVALID_ID;
+        }
+    }
+    else if (m_deriveSupport && deriveImageFormat != m_image.format.fourcc)
+    {
+        // only use vaDerive if it's giving us a format we can handle natively
+        m_deriveSupport = false;
     }
 
     delete [] formats;
@@ -704,9 +740,15 @@ bool VAAPIContext::InitImage(const void *buf)
 
     LOG(VB_GENERAL, LOG_DEBUG,
         LOC + QString("InitImage: id %1, width %2 height %3 "
-                      "format %4")
+                      "format %4 vaDeriveSupport:%5")
         .arg(m_image.image_id).arg(m_image.width).arg(m_image.height)
-        .arg(m_image.format.fourcc));
+        .arg(m_image.format.fourcc).arg(m_deriveSupport));
+
+    if (m_deriveSupport)
+    {
+        vaDestroyImage(m_ctx.display, m_image.image_id );
+        m_image.image_id = VA_INVALID_ID;
+    }
 
     return true;
 }
@@ -715,11 +757,11 @@ bool VAAPIContext::CopySurfaceToFrame(VideoFrame *frame, const void *buf)
 {
     MythXLocker locker(m_display->m_x_disp);
 
-    if (m_image.image_id == VA_INVALID_ID)
+    if (!m_deriveSupport && m_image.image_id == VA_INVALID_ID)
         InitImage(buf);
 
     if (!frame || !buf || (m_dispType != kVADisplayX11) ||
-        m_image.image_id == VA_INVALID_ID)
+        (!m_deriveSupport && m_image.image_id == VA_INVALID_ID))
         return false;
 
     const vaapi_surface *surf = (vaapi_surface*)buf;
@@ -728,32 +770,61 @@ bool VAAPIContext::CopySurfaceToFrame(VideoFrame *frame, const void *buf)
     va_status = vaSyncSurface(m_ctx.display, surf->m_id);
     CHECK_ST;
 
-    va_status = vaGetImage(m_ctx.display, surf->m_id, 0, 0,
-                           m_size.width(), m_size.height(), m_image.image_id);
+    if (m_deriveSupport)
+    {
+        va_status = vaDeriveImage(m_ctx.display, surf->m_id, &m_image);
+    }
+    else
+    {
+        va_status = vaGetImage(m_ctx.display, surf->m_id, 0, 0,
+                               m_size.width(), m_size.height(),
+                               m_image.image_id);
+    }
     CHECK_ST;
 
     if (ok)
     {
+        VideoFrame src;
         void* source = NULL;
+
         if (vaMapBuffer(m_ctx.display, m_image.buf, &source))
             return false;
 
-        bool swap = m_image.format.fourcc == VA_FOURCC('Y','V','1','2');
-        VideoFrame src;
-        init(&src, FMT_YV12, (unsigned char*)source, m_image.width,
-             m_image.height, m_image.data_size, NULL,
-             NULL, frame->aspect, frame->frame_rate);
-        src.pitches[0] = m_image.pitches[0];
-        src.pitches[1] = m_image.pitches[swap ? 2 : 1];
-        src.pitches[2] = m_image.pitches[swap ? 1 : 2];
-        src.offsets[0] = m_image.offsets[0];
-        src.offsets[1] = m_image.offsets[swap ? 2 : 1];
-        src.offsets[2] = m_image.offsets[swap ? 1 : 2];
+        if (m_image.format.fourcc == VA_FOURCC_NV12)
+        {
+            init(&src, FMT_NV12, (unsigned char*)source, m_image.width,
+                 m_image.height, m_image.data_size, NULL,
+                 NULL, frame->aspect, frame->frame_rate);
+            for (int i = 0; i < 2; i++)
+            {
+                src.pitches[i] = m_image.pitches[i];
+                src.offsets[i] = m_image.offsets[i];
+            }
+        }
+        else
+        {
+            // Our VideoFrame YV12 format, is really YUV420P/IYUV
+            bool swap = m_image.format.fourcc == VA_FOURCC_YV12;
+            init(&src, FMT_YV12, (unsigned char*)source, m_image.width,
+                 m_image.height, m_image.data_size, NULL,
+                 NULL, frame->aspect, frame->frame_rate);
+            src.pitches[0] = m_image.pitches[0];
+            src.pitches[1] = m_image.pitches[swap ? 2 : 1];
+            src.pitches[2] = m_image.pitches[swap ? 1 : 2];
+            src.offsets[0] = m_image.offsets[0];
+            src.offsets[1] = m_image.offsets[swap ? 2 : 1];
+            src.offsets[2] = m_image.offsets[swap ? 1 : 2];
+        }
         copy(frame, &src);
 
         if (vaUnmapBuffer(m_ctx.display, m_image.buf))
             return false;
 
+        if (m_deriveSupport)
+        {
+            vaDestroyImage(m_ctx.display, m_image.image_id );
+            m_image.image_id = VA_INVALID_ID;
+        }
         return true;
     }
 
