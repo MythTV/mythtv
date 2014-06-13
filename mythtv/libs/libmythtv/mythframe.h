@@ -131,7 +131,7 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
         if (FMT_YV12 == _codec || FMT_YUV422P == _codec)
         {
             vf->pitches[0] = width_aligned;
-            vf->pitches[1] = vf->pitches[2] = (width_aligned+1) >> 1;
+            vf->pitches[1] = vf->pitches[2] = width_aligned >> 1;
         }
         else if (FMT_NV12 == _codec)
         {
@@ -156,15 +156,13 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
         {
             vf->offsets[0] = 0;
             vf->offsets[1] = width_aligned * _height;
-            vf->offsets[2] =
-                vf->offsets[1] + ((width_aligned+1) >> 1) * ((_height+1) >> 1);
+            vf->offsets[2] = vf->offsets[1] + (vf->offsets[1] >> 2);
         }
         else if (FMT_YUV422P == _codec)
         {
             vf->offsets[0] = 0;
             vf->offsets[1] = width_aligned * _height;
-            vf->offsets[2] =
-                vf->offsets[1] + ((width_aligned+1) >> 1) * _height;
+            vf->offsets[2] = vf->offsets[1] + (vf->offsets[1] >> 1);
         }
         else if (FMT_NV12 == _codec)
         {
@@ -184,7 +182,7 @@ static inline void clear(VideoFrame *vf)
     if (!vf)
         return;
 
-    int uv_height = (vf->height+1) >> 1;
+    int uv_height = vf->height >> 1;
     if (FMT_YV12 == vf->codec)
     {
         memset(vf->buf + vf->offsets[0],   0, vf->pitches[0] * vf->height);
