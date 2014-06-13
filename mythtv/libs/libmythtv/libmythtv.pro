@@ -171,7 +171,6 @@ SOURCES += avfringbuffer.cpp
 SOURCES += ringbuffer.cpp           fileringBuffer.cpp
 SOURCES += streamingringbuffer.cpp  metadataimagehelper.cpp
 SOURCES += icringbuffer.cpp
-SOURCES += mythframe.cpp
 
 # DiSEqC
 HEADERS += diseqc.h                 diseqcsettings.h

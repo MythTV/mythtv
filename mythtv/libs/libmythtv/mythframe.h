@@ -25,7 +25,6 @@ typedef enum FrameType_
     FMT_VAAPI,
     FMT_YUY2,
     FMT_DXVA2,
-    FMT_NV12
 } VideoFrameType;
 
 typedef struct VideoFrame_
@@ -67,10 +66,6 @@ typedef struct VideoFrame_
 #endif
 
 #ifdef __cplusplus
-
-void MTV_PUBLIC framecopy(VideoFrame *dst, const VideoFrame *src,
-                          bool useSSE = true);
-
 static inline void init(VideoFrame *vf, VideoFrameType _codec,
                         unsigned char *_buf, int _width, int _height, int _size,
                         const int *p = 0,
@@ -133,12 +128,6 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
             vf->pitches[0] = width_aligned;
             vf->pitches[1] = vf->pitches[2] = width_aligned >> 1;
         }
-        else if (FMT_NV12 == _codec)
-        {
-            vf->pitches[0] = width_aligned;
-            vf->pitches[1] = width_aligned;
-            vf->pitches[2] = 0;
-        }
         else
         {
             vf->pitches[0] = (width_aligned * vf->bpp) >> 3;
@@ -164,12 +153,6 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
             vf->offsets[1] = width_aligned * _height;
             vf->offsets[2] = vf->offsets[1] + (vf->offsets[1] >> 1);
         }
-        else if (FMT_NV12 == _codec)
-        {
-            vf->offsets[0] = 0;
-            vf->offsets[1] = width_aligned * _height;
-            vf->offsets[2] = 0;
-        }
         else
         {
             vf->offsets[0] = vf->offsets[1] = vf->offsets[2] = 0;
@@ -182,24 +165,18 @@ static inline void clear(VideoFrame *vf)
     if (!vf)
         return;
 
-    int uv_height = vf->height >> 1;
     if (FMT_YV12 == vf->codec)
     {
+        int uv_height = vf->height >> 1;
         memset(vf->buf + vf->offsets[0],   0, vf->pitches[0] * vf->height);
         memset(vf->buf + vf->offsets[1], 127, vf->pitches[1] * uv_height);
         memset(vf->buf + vf->offsets[2], 127, vf->pitches[2] * uv_height);
-    }
-    else if (FMT_NV12 == vf->codec)
-    {
-        memset(vf->buf + vf->offsets[0],   0, vf->pitches[0] * vf->height);
-        memset(vf->buf + vf->offsets[1], 127, vf->pitches[1] * uv_height);
     }
 }
 
 static inline bool compatible(const VideoFrame *a, const VideoFrame *b)
 {
-    if (a->codec == b->codec &&
-        (a->codec == FMT_YV12 || a->codec == FMT_NV12))
+    if (a->codec == b->codec && a->codec == FMT_YV12)
     {
         return a && b &&
             (a->codec      == b->codec)      &&
@@ -221,16 +198,69 @@ static inline bool compatible(const VideoFrame *a, const VideoFrame *b)
         (a->pitches[2] == b->pitches[2]);
 }
 
-/**
- * copy: copy one frame into another
- * copy only works with the following assumptions:
- * frames are of the same resolution
- * destination frame is in YV12 format
- * source frame is either YV12 or NV12 format
- */
+static inline void copyplane(unsigned char *dst, int dst_pitch,
+                             const unsigned char *src, int src_pitch,
+                             int width, int height)
+{
+    for (int y = 0; y < height; y++)
+    {
+        memcpy(dst, src, width);
+        src += src_pitch;
+        dst += dst_pitch;
+    }
+}
+
 static inline void copy(VideoFrame *dst, const VideoFrame *src)
 {
-    framecopy(dst, src, true);
+    VideoFrameType codec = dst->codec;
+    if (dst->codec != src->codec)
+        return;
+
+    dst->interlaced_frame = src->interlaced_frame;
+    dst->repeat_pict      = src->repeat_pict;
+    dst->top_field_first  = src->top_field_first;
+
+    if (FMT_YV12 == codec)
+    {
+        int width   = src->width;
+        int height  = src->height;
+        int dwidth  = dst->width;
+        int dheight = dst->height;
+
+        if (height == dheight && width == dwidth &&
+            dst->pitches[0] != src->pitches[0])
+        {
+            // We have a different stride between the two frames
+            // drop the garbage data
+            copyplane(dst->buf + dst->offsets[0], dst->pitches[0],
+                      src->buf + src->offsets[0], src->pitches[0],
+                      width, height);
+            copyplane(dst->buf + dst->offsets[1], dst->pitches[1],
+                      src->buf + src->offsets[1], src->pitches[1],
+                      width / 2, height / 2);
+            copyplane(dst->buf + dst->offsets[2], dst->pitches[2],
+                      src->buf + src->offsets[2], src->pitches[2],
+                      width / 2, height / 2);
+            return;
+        }
+
+        int height0 = (dst->height < src->height) ? dst->height : src->height;
+        int height1 = height0 >> 1;
+        int height2 = height0 >> 1;
+        int pitch0  = ((dst->pitches[0] < src->pitches[0]) ?
+                       dst->pitches[0] : src->pitches[0]);
+        int pitch1  = ((dst->pitches[1] < src->pitches[1]) ?
+                       dst->pitches[1] : src->pitches[1]);
+        int pitch2  = ((dst->pitches[2] < src->pitches[2]) ?
+                       dst->pitches[2] : src->pitches[2]);
+
+        memcpy(dst->buf + dst->offsets[0],
+               src->buf + src->offsets[0], pitch0 * height0);
+        memcpy(dst->buf + dst->offsets[1],
+               src->buf + src->offsets[1], pitch1 * height1);
+        memcpy(dst->buf + dst->offsets[2],
+               src->buf + src->offsets[2], pitch2 * height2);
+    }
 }
 
 static inline int bitsperpixel(VideoFrameType type)
@@ -251,7 +281,6 @@ static inline int bitsperpixel(VideoFrameType type)
             res = 16;
             break;
         case FMT_YV12:
-        case FMT_NV12:
             res = 12;
             break;
         case FMT_IA44:
@@ -290,3 +319,4 @@ static inline uint buffersize(VideoFrameType type, int width, int height,
 #endif /* __cplusplus */
 
 #endif
+
