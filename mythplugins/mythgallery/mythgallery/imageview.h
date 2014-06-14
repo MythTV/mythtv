@@ -124,6 +124,7 @@ private:
     mutable QMutex         m_itemListLock;
     ThumbList              m_itemList;
     SequenceBase          *m_slideshow_sequence;
+    bool                   m_finishedLoading;
 };
 
 #endif /* IMAGEVIEW_H */

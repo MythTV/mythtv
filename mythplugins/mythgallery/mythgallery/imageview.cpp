@@ -90,8 +90,8 @@ ImageView::ImageView(const ThumbList &itemList,
       m_loaderRunnable(NULL),
       m_listener(this),
       m_loaderThread(NULL),
-      m_itemList(itemList),
-      m_slideshow_sequence(NULL)
+      m_slideshow_sequence(NULL),
+      m_finishedLoading(false)
 {
 
     int xbase, ybase, screenwidth, screenheight;
@@ -122,8 +122,13 @@ ImageView::ImageView(const ThumbList &itemList,
         m_loaderThread->start();
 
         // Wait for at least one image to be loaded.
-        QMutexLocker guard(&m_itemListLock);
-        m_imagesLoaded.wait(&m_itemListLock);
+        {
+            QMutexLocker guard(&m_itemListLock);
+            while (m_itemList.empty() && !m_finishedLoading)
+            {
+                m_imagesLoaded.wait(&m_itemListLock);
+            }
+        }
     }
 
     // --------------------------------------------------------------------
@@ -169,12 +174,14 @@ ImageView::~ImageView()
         m_slideshow_sequence = NULL;
     }
 
-    if (m_loaderRunnable) {
+    if (m_loaderRunnable)
+    {
         delete m_loaderRunnable;
         m_loaderRunnable = NULL;
     }
 
-    if (m_loaderThread) {
+    if (m_loaderThread)
+    {
         delete m_loaderThread;
         m_loaderThread = NULL;
     }
@@ -270,7 +277,8 @@ void ImageView::AddItems(const ThumbList &itemList)
         m_slideshow_sequence = new SequenceInc(m_itemList.size());
     }
 
-    if (!m_itemList.empty()) {
+    if (!m_itemList.empty())
+    {
         m_imagesLoaded.wakeAll();
     }
 }
@@ -298,6 +306,7 @@ ThumbItem *ImageView::retreatItem()
 void ImageView::finishLoading()
 {
     QMutexLocker guard(&m_itemListLock);
+    m_finishedLoading = true;
     m_imagesLoaded.wakeAll();
 }
 
@@ -313,7 +322,8 @@ ImageView::LoadAlbumRunnable::LoadAlbumRunnable(
 }
 
 /** Request that all processing stop */
-void ImageView::LoadAlbumRunnable::abort() {
+void ImageView::LoadAlbumRunnable::abort()
+{
     QMutexLocker guard(&m_isAliveLock);
     m_isAlive = false;
 }
