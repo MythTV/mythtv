@@ -24,7 +24,22 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include <mythtimer.h>
+#include "mythconfig.h"
 #include "mythframe.h"
+#include "mythcorecontext.h"
+#include "mythlogging.h"
+
+extern "C" {
+#include "libavcodec/avcodec.h"
+}
+
+#ifndef __MAX
+#   define __MAX(a, b)   ( ((a) > (b)) ? (a) : (b) )
+#endif
+#ifndef __MIN
+#   define __MIN(a, b)   ( ((a) < (b)) ? (a) : (b) )
+#endif
 
 #if ARCH_X86
 
@@ -52,8 +67,8 @@ inline void cpuid(int CPUInfo[4],int InfoType)
     :"=a" (CPUInfo[0]),
     [ebx] "=r"(CPUInfo[1]),
     "=c" (CPUInfo[2]),
-    "=d" (CPUInfo[3]) :
-    "a" (InfoType)
+    "=d" (CPUInfo[3])
+    :"a" (InfoType)
     );
 }
 #endif
@@ -96,6 +111,18 @@ static inline bool sse3_check()
     sse2_check();
 
     return has_sse3;
+}
+
+static inline bool sse4_check()
+{
+    if (has_sse4 != -1)
+    {
+        return has_sse4;
+    }
+
+    sse2_check();
+
+    return has_sse4;
 }
 
 static inline void SSE_splitplanes(uint8_t* dstu, int dstu_pitch,
@@ -349,4 +376,379 @@ void framecopy(VideoFrame* dst, const VideoFrame* src, bool useSSE)
         memcpy(dst->buf + dst->offsets[2],
                src->buf + src->offsets[2], pitch2 * height2);
     }
+}
+
+/***************************************
+ * USWC Fast Copy
+ *
+ * https://software.intel.com/en-us/articles/copying-accelerated-video-decode-frame-buffers:
+ ***************************************/
+#if ARCH_X86
+#define COPY16(dstp, srcp, load, store) \
+    asm volatile (                      \
+        load "  0(%[src]), %%xmm1\n"    \
+        store " %%xmm1,    0(%[dst])\n" \
+        : : [dst]"r"(dstp), [src]"r"(srcp) : "memory", "xmm1")
+
+#define COPY64(dstp, srcp, load, store) \
+    asm volatile (                      \
+        load "  0(%[src]), %%xmm1\n"    \
+        load " 16(%[src]), %%xmm2\n"    \
+        load " 32(%[src]), %%xmm3\n"    \
+        load " 48(%[src]), %%xmm4\n"    \
+        store " %%xmm1,    0(%[dst])\n" \
+        store " %%xmm2,   16(%[dst])\n" \
+        store " %%xmm3,   32(%[dst])\n" \
+        store " %%xmm4,   48(%[dst])\n" \
+        : : [dst]"r"(dstp), [src]"r"(srcp) : "memory", "xmm1", "xmm2", "xmm3", "xmm4")
+
+/*
+ * Optimized copy from "Uncacheable Speculative Write Combining" memory
+ * as used by some hardware accelerated decoder (VAAPI and DXVA2).
+ */
+static void CopyFromUswc(uint8_t *dst, int dst_pitch,
+                         const uint8_t *src, int src_pitch,
+                         int width, int height)
+{
+    const bool sse4 = sse4_check();
+
+    asm volatile ("mfence");
+
+    for (int y = 0; y < height; y++)
+    {
+        const int unaligned = (-(uintptr_t)src) & 0x0f;
+        int x = unaligned;
+
+        if (sse4)
+        {
+            if (!unaligned)
+            {
+                for (; x+63 < width; x += 64)
+                {
+                    COPY64(&dst[x], &src[x], "movntdqa", "movdqa");
+                }
+            }
+            else
+            {
+                COPY16(dst, src, "movdqu", "movdqa");
+                for (; x+63 < width; x += 64)
+                {
+                    COPY64(&dst[x], &src[x], "movntdqa", "movdqu");
+                }
+            }
+        }
+        else
+        {
+            if (!unaligned)
+            {
+                for (; x+63 < width; x += 64)
+                {
+                    COPY64(&dst[x], &src[x], "movdqa", "movdqa");
+                }
+            }
+            else
+            {
+                COPY16(dst, src, "movdqu", "movdqa");
+                for (; x+63 < width; x += 64)
+                {
+                    COPY64(&dst[x], &src[x], "movdqa", "movdqu");
+                }
+            }
+        }
+
+        for (; x < width; x++)
+        {
+            dst[x] = src[x];
+        }
+
+        src += src_pitch;
+        dst += dst_pitch;
+    }
+    asm volatile ("mfence");
+}
+
+static void Copy2d(uint8_t *dst, int dst_pitch,
+                   const uint8_t *src, int src_pitch,
+                   int width, int height)
+{
+    for (int y = 0; y < height; y++)
+    {
+        int x = 0;
+
+        bool unaligned = ((intptr_t)dst & 0x0f) != 0;
+        if (!unaligned)
+        {
+            for (; x+63 < width; x += 64)
+            {
+                COPY64(&dst[x], &src[x], "movdqa", "movntdq");
+            }
+        }
+        else
+        {
+            for (; x+63 < width; x += 64)
+            {
+                COPY64(&dst[x], &src[x], "movdqa", "movdqu");
+            }
+        }
+
+        for (; x < width; x++)
+        {
+            dst[x] = src[x];
+        }
+
+        src += src_pitch;
+        dst += dst_pitch;
+    }
+}
+
+static void SSE_copyplane(uint8_t *dst, int dst_pitch,
+                          const uint8_t *src, int src_pitch,
+                          uint8_t *cache, size_t cache_size,
+                          unsigned width, unsigned height)
+{
+    const unsigned w16 = (width+15) & ~15;
+    const unsigned hstep = cache_size / w16;
+
+    for (int y = 0; y < height; y += hstep)
+    {
+        const int hblock =  __MIN(hstep, height - y);
+
+        /* Copy a bunch of line into our cache */
+        CopyFromUswc(cache, w16,
+                     src, src_pitch,
+                     width, hblock);
+
+        /* Copy from our cache to the destination */
+        Copy2d(dst, dst_pitch,
+               cache, w16,
+               width, hblock);
+
+        /* */
+        src += src_pitch * hblock;
+        dst += dst_pitch * hblock;
+    }
+}
+
+static void SSE_splitplanes(uint8_t *dstu, int dstu_pitch,
+                            uint8_t *dstv, int dstv_pitch,
+                            const uint8_t *src, int src_pitch,
+                            uint8_t *cache, int cache_size,
+                            int width, int height)
+{
+    const int w16 = (2*width+15) & ~15;
+    const int hstep = cache_size / w16;
+
+    for (int y = 0; y < height; y += hstep)
+    {
+        const int hblock =  __MIN(hstep, height - y);
+
+        /* Copy a bunch of line into our cache */
+        CopyFromUswc(cache, w16, src, src_pitch,
+                     2*width, hblock);
+
+        /* Copy from our cache to the destination */
+        SSE_splitplanes(dstu, dstu_pitch, dstv, dstv_pitch,
+                        cache, w16, width, hblock);
+
+        /* */
+        src  += src_pitch  * hblock;
+        dstu += dstu_pitch * hblock;
+        dstv += dstv_pitch * hblock;
+    }
+}
+#endif // ARCH_X86
+
+MythUSWCCopy::MythUSWCCopy(int width, bool nocache)
+    :m_cache(NULL), m_size(0), m_uswc(-1)
+{
+    if (!nocache)
+    {
+        allocateCache(width);
+    }
+}
+
+MythUSWCCopy::~MythUSWCCopy()
+{
+    m_size = 0;
+    av_freep(&m_cache);
+}
+
+/**
+ * \fn copy
+ * Copy frame src into dst.
+ * Both frames must be of the same dimensions. Pitch can be different
+ * src can be a frame in either YV12 or NV12 format
+ * dst must be a YV12 frane
+ * The first time copy is called, it will attempt to detect which copy
+ * algorithm is the fastest.
+ */
+
+void MythUSWCCopy::copy(VideoFrame *dst, VideoFrame *src)
+{
+    dst->interlaced_frame = src->interlaced_frame;
+    dst->repeat_pict      = src->repeat_pict;
+    dst->top_field_first  = src->top_field_first;
+
+    int width   = src->width;
+    int height  = src->height;
+
+    if (src->codec == FMT_NV12)
+    {
+#if ARCH_X86
+        if (sse2_check())
+        {
+            MythTimer *timer;
+
+            if (m_uswc <= 0 && m_cache)
+            {
+                if (m_uswc < 0)
+                {
+                    timer = new MythTimer(MythTimer::kStartRunning);
+                }
+                SSE_copyplane(dst->buf + dst->offsets[0], dst->pitches[0],
+                              src->buf + src->offsets[0], src->pitches[0],
+                              m_cache, m_size,
+                              width, height);
+                SSE_splitplanes(dst->buf + dst->offsets[1], dst->pitches[1],
+                                dst->buf + dst->offsets[2], dst->pitches[2],
+                                src->buf + src->offsets[1], src->pitches[1],
+                                m_cache, m_size,
+                                (width+1) / 2, (height+1) / 2);
+                if (m_uswc < 0)
+                {
+                    // Measure how long standard method takes
+                    // if shorter, use it in the future
+                    long duration = timer->nsecsElapsed();
+                    timer->restart();
+                    copyplane(dst->buf + dst->offsets[0], dst->pitches[0],
+                              src->buf + src->offsets[0], src->pitches[0],
+                              width, height);
+                    SSE_splitplanes(dst->buf + dst->offsets[1], dst->pitches[1],
+                                    dst->buf + dst->offsets[2], dst->pitches[2],
+                                    src->buf + src->offsets[1], src->pitches[1],
+                                    (width+1) / 2, (height+1) / 2);
+                    m_uswc = timer->nsecsElapsed() < duration;
+                    if (m_uswc == 0)
+                    {
+                        LOG(VB_GENERAL, LOG_DEBUG, "Enabling USWC code acceleration");
+                    }
+                    delete timer;
+                }
+            }
+            else
+            {
+                copyplane(dst->buf + dst->offsets[0], dst->pitches[0],
+                          src->buf + src->offsets[0], src->pitches[0],
+                          width, height);
+                SSE_splitplanes(dst->buf + dst->offsets[1], dst->pitches[1],
+                                dst->buf + dst->offsets[2], dst->pitches[2],
+                                src->buf + src->offsets[1], src->pitches[1],
+                                (width+1) / 2, (height+1) / 2);
+            }
+            asm volatile ("emms");
+            return;
+        }
+#endif
+        copyplane(dst->buf + dst->offsets[0], dst->pitches[0],
+                  src->buf + src->offsets[0], src->pitches[0],
+                  width, height);
+        splitplanes(dst->buf + dst->offsets[1], dst->pitches[1],
+                    dst->buf + dst->offsets[2], dst->pitches[2],
+                    src->buf + src->offsets[1], src->pitches[1],
+                    (width+1) / 2, (height+1) / 2);
+        return;
+    }
+
+#if ARCH_X86
+    if (sse2_check() && m_uswc <= 0 && m_cache)
+    {
+        MythTimer *timer;
+
+        if (m_uswc < 0)
+        {
+            timer = new MythTimer(MythTimer::kStartRunning);
+        }
+        SSE_copyplane(dst->buf + dst->offsets[0], dst->pitches[0],
+                      src->buf + src->offsets[0], src->pitches[0],
+                      m_cache, m_size,
+                      width, height);
+        SSE_copyplane(dst->buf + dst->offsets[1], dst->pitches[1],
+                      src->buf + src->offsets[1], src->pitches[1],
+                      m_cache, m_size,
+                      (width+1) / 2, (height+1) / 2);
+        SSE_copyplane(dst->buf + dst->offsets[2], dst->pitches[2],
+                      src->buf + src->offsets[2], src->pitches[2],
+                      m_cache, m_size,
+                      (width+1) / 2, (height+1) / 2);
+        if (m_uswc < 0)
+        {
+            // Measure how long standard method takes
+            // if shorter, use it in the future
+            long duration = timer->nsecsElapsed();
+            timer->restart();
+            copyplane(dst->buf + dst->offsets[0], dst->pitches[0],
+                      src->buf + src->offsets[0], src->pitches[0],
+                      width, height);
+            copyplane(dst->buf + dst->offsets[1], dst->pitches[1],
+                      src->buf + src->offsets[1], src->pitches[1],
+                      (width+1) / 2, (height+1) / 2);
+            copyplane(dst->buf + dst->offsets[2], dst->pitches[2],
+                      src->buf + src->offsets[2], src->pitches[2],
+                      (width+1) / 2, (height+1) / 2);
+            m_uswc = timer->nsecsElapsed() < duration;
+            if (m_uswc == 0)
+            {
+                LOG(VB_GENERAL, LOG_DEBUG, "Enabling USWC code acceleration");
+            }
+            delete timer;
+        }
+        asm volatile ("emms");
+        return;
+    }
+#endif
+    copyplane(dst->buf + dst->offsets[0], dst->pitches[0],
+              src->buf + src->offsets[0], src->pitches[0],
+              width, height);
+    copyplane(dst->buf + dst->offsets[1], dst->pitches[1],
+              src->buf + src->offsets[1], src->pitches[1],
+              (width+1) / 2, (height+1) / 2);
+    copyplane(dst->buf + dst->offsets[2], dst->pitches[2],
+              src->buf + src->offsets[2], src->pitches[2],
+              (width+1) / 2, (height+1) / 2);
+}
+
+/**
+ * \fn resetUSWCDetection
+ * reset USWC detection. USWC detection will be made during the next copy
+ */
+void MythUSWCCopy::resetUSWCDetection(void)
+{
+    m_uswc = -1;
+}
+
+void MythUSWCCopy::allocateCache(int width)
+{
+    av_freep(&m_cache);
+    m_size  = __MAX((width + 63) & ~63, 4096);
+    m_cache = (uint8_t*)av_malloc(m_size);
+}
+
+/**
+ * \fn setUSWC
+ * disable USWC detection. If true: USWC code will always be used, otherwise
+ * will use generic SSE code (faster with non-USWC memory
+ */
+void MythUSWCCopy::setUSWC(bool uswc)
+{
+    m_uswc = !uswc;
+}
+
+/**
+ * \fn reset
+ * Will reset the cache for a frame with "width" and reset USWC detection.
+ */
+void MythUSWCCopy::reset(int width)
+{
+    allocateCache(width);
+    resetUSWCDetection();
 }

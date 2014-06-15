@@ -68,6 +68,25 @@ typedef struct VideoFrame_
 
 #ifdef __cplusplus
 
+class MTV_PUBLIC MythUSWCCopy
+{
+public:
+    MythUSWCCopy(int width, bool nocache = false);
+    virtual ~MythUSWCCopy();
+
+    void copy(VideoFrame *dst, VideoFrame *src);
+    void reset(int width);
+    void resetUSWCDetection(void);
+    void setUSWC(bool uswc);
+
+private:
+    void allocateCache(int width);
+
+    uint8_t* m_cache;
+    int m_size;
+    int m_uswc;
+};
+
 void MTV_PUBLIC framecopy(VideoFrame *dst, const VideoFrame *src,
                           bool useSSE = true);
 
