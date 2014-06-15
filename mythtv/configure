@@ -3465,7 +3465,7 @@ else
 fi
 
 add_cflags $extra_cflags
-#add_cxxflags $extra_cxxflags
+add_cxxflags $extra_cxxflags
 add_asflags $extra_cflags
 
 if test -n "$sysroot"; then
@@ -4784,6 +4784,7 @@ check_exec -lm << EOF && enable cpu_clips_negative
     }
 EOF
 
+enabled x86 && enabled sse2
 # test for distcc
 enabled distcc && check_cmd distcc --version || disable distcc
 if enabled distcc; then
