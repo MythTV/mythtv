@@ -5347,9 +5347,7 @@ check_exec -lm << EOF && enable cpu_clips_negative
     }
 EOF
 
-# required to compile inline sse with some compilers
-enabled x86 && enabled sse2 && add_cxxflags "-msse"
-
+enabled x86 && enabled sse2
 # test for distcc
 enabled distcc && check_cmd distcc --version || disable distcc
 if enabled distcc; then
