@@ -3158,7 +3158,11 @@ void PlaybackBox::ShowActionPopup(const ProgramInfo &pginfo)
         m_popupMenu->AddItem(tr("Recording Options"), NULL, createRecordingMenu());
 
         if (m_groupList->GetItemPos(m_groupList->GetItemCurrent()) == 0)
-            m_popupMenu->AddItem(tr("List Recorded Episodes"), SLOT(ShowRecordedEpisodes()));
+            m_popupMenu->AddItem(tr("List Recorded Episodes"),
+				 SLOT(ShowRecordedEpisodes()));
+        else
+            m_popupMenu->AddItem(tr("List All Recordings"),
+				 SLOT(ShowAllRecordings()));
 
         m_popupMenu->AddItem(tr("Delete"), SLOT(askDelete()));
 
@@ -3214,7 +3218,11 @@ void PlaybackBox::ShowActionPopup(const ProgramInfo &pginfo)
     m_popupMenu->AddItem(tr("Job Options"), NULL, createJobMenu());
 
     if (m_groupList->GetItemPos(m_groupList->GetItemCurrent()) == 0)
-        m_popupMenu->AddItem(tr("List Recorded Episodes"), SLOT(ShowRecordedEpisodes()));
+        m_popupMenu->AddItem(tr("List Recorded Episodes"),
+			     SLOT(ShowRecordedEpisodes()));
+    else
+        m_popupMenu->AddItem(tr("List All Recordings"),
+			     SLOT(ShowAllRecordings()));
 
     if (!sameProgram)
     {
@@ -3529,6 +3537,19 @@ void PlaybackBox::ShowRecordedEpisodes()
             MythUIButtonListItem *previousItem = m_recordingList->GetItemByData(qVariantFromValue(pginfo));
             m_recordingList->SetItemCurrent(previousItem);
         }
+    }
+}
+
+void PlaybackBox::ShowAllRecordings(void)
+{
+    ProgramInfo *pginfo = CurrentItem();
+    m_groupList->SetItemCurrent(0);
+    if (pginfo)
+    {
+        // set focus back to previous item
+        MythUIButtonListItem *previousitem =
+	    m_recordingList->GetItemByData(qVariantFromValue(pginfo));
+        m_recordingList->SetItemCurrent(previousitem);
     }
 }
 
@@ -3906,7 +3927,10 @@ bool PlaybackBox::keyPressEvent(QKeyEvent *event)
         }
         else if (action == ACTION_LISTRECORDEDEPISODES)
         {
-            ShowRecordedEpisodes();
+            if (m_groupList->GetItemPos(m_groupList->GetItemCurrent()) == 0)
+                ShowRecordedEpisodes();
+            else
+                ShowAllRecordings();
         }
         else if (action == "CHANGERECGROUP")
             showGroupFilter();

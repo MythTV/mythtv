@@ -191,6 +191,7 @@ class PlaybackBox : public ScheduleCommon
         { Delete((DeleteFlags)((int)kIgnore|(int)kAllRemaining)); }
 
     void ShowRecordedEpisodes();
+    void ShowAllRecordings();
 
     void toggleWatched();
     void toggleAutoExpire();
