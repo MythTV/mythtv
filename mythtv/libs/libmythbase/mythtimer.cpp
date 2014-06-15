@@ -107,6 +107,27 @@ int MythTimer::elapsed(void) const
     return static_cast<int>(e + m_offset);
 }
 
+/** Returns nanoseconds elapsed since last start() or restart()
+ *
+ * \note If timer had not been started before this is called,
+ *       this returns zero.
+ *
+ * \note If addMSecs() has been called and the total offset applied
+ *       is negative then this can return a negative number.
+ */
+int64_t MythTimer::nsecsElapsed(void) const
+{
+    if (!m_timer.isValid())
+    {
+#ifdef DEBUG_TIMER_API_USAGE
+        assert(0 == "elapsed called without timer being started");
+#endif
+        return 0;
+    }
+
+    return m_timer.nsecsElapsed() + 1000000LL * m_offset;
+}
+
 /** Returns true if start() or restart() has been called at least
  *  once since construction and since any call to stop().
  */

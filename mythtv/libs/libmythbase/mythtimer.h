@@ -26,6 +26,7 @@ class MBASE_PUBLIC MythTimer
     void addMSecs(int ms);
 
     int elapsed(void) const;
+    int64_t nsecsElapsed(void) const;
     bool isRunning(void) const;
 
   private:
