@@ -40,9 +40,17 @@ static int has_sse4     = -1;
 inline void cpuid(int CPUInfo[4],int InfoType)
 {
     __asm__ __volatile__ (
-    "cpuid":
-    "=a" (CPUInfo[0]),
-    "=b" (CPUInfo[1]),
+    // pic requires to save ebx/rbx
+#if ARCH_X86_32
+    "push       %%ebx\n"
+#endif
+    "cpuid\n"
+    "movl %%ebx ,%[ebx]\n"
+#if ARCH_X86_32
+    "pop        %%ebx\n"
+#endif
+    :"=a" (CPUInfo[0]),
+    [ebx] "=r"(CPUInfo[1]),
     "=c" (CPUInfo[2]),
     "=d" (CPUInfo[3]) :
     "a" (InfoType)
@@ -66,8 +74,8 @@ static inline bool sse2_check()
     {
         cpuid(info,0x00000001);
         has_sse2  = (info[3] & ((int)1 << 26)) != 0;
-        has_sse3  = 1;//(info[2] & ((int)1 <<  0)) != 0;
-        has_sse4  = 0;//(info[2] & ((int)1 << 19)) != 0;
+        has_sse3  = (info[2] & ((int)1 <<  0)) != 0;
+        has_sse4  = (info[2] & ((int)1 << 19)) != 0;
     }
     else
     {
