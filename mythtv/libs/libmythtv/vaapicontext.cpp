@@ -259,7 +259,8 @@ VAAPIContext::VAAPIContext(VAAPIDisplayType display_type,
     m_vaEntrypoint(VAEntrypointEncSlice),
     m_pix_fmt(PIX_FMT_YUV420P), m_numSurfaces(NUM_VAAPI_BUFFERS),
     m_surfaces(NULL), m_surfaceData(NULL), m_pictureAttributes(NULL),
-    m_pictureAttributeCount(0), m_hueBase(0), m_deriveSupport(false)
+    m_pictureAttributeCount(0), m_hueBase(0), m_deriveSupport(false),
+    m_copy(NULL)
 {
     memset(&m_ctx, 0, sizeof(vaapi_context));
     memset(&m_image, 0, sizeof(m_image));
@@ -311,6 +312,8 @@ VAAPIContext::~VAAPIContext()
         m_display->DecrRef();
     }
 
+    delete m_copy;
+
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "Deleted context");
 }
 
@@ -318,6 +321,15 @@ bool VAAPIContext::CreateDisplay(QSize size, bool noreuse,
                                  MythRenderOpenGL *render)
 {
     m_size = size;
+    if (!m_copy)
+    {
+        m_copy = new MythUSWCCopy(m_size.width());
+    }
+    else
+    {
+        m_copy->reset(m_size.width());
+    }
+
     bool ok = true;
     m_display = VAAPIDisplay::GetDisplay(m_dispType, noreuse, render);
     CREATE_CHECK(!m_size.isEmpty(), "Invalid size");
@@ -815,7 +827,7 @@ bool VAAPIContext::CopySurfaceToFrame(VideoFrame *frame, const void *buf)
             src.offsets[1] = m_image.offsets[swap ? 2 : 1];
             src.offsets[2] = m_image.offsets[swap ? 1 : 2];
         }
-        copy(frame, &src);
+        m_copy->copy(frame, &src);
 
         if (vaUnmapBuffer(m_ctx.display, m_image.buf))
             return false;
