@@ -127,6 +127,7 @@ void HLSStreamHandler::run(void)
         return;
     m_hls->Throttle(false);
 
+    int remainder = 0;
     while (_running_desired)
     {
         if (!m_hls->IsOpen(url))
@@ -145,7 +146,10 @@ void HLSStreamHandler::run(void)
             m_throttle = false;
         }
 
-        int size = m_hls->Read(m_readbuffer, BUFFER_SIZE);
+        int size = m_hls->Read(&m_readbuffer[remainder],
+                               BUFFER_SIZE - remainder);
+
+        size += remainder;
 
         if (size < 0)
         {
@@ -177,19 +181,20 @@ void HLSStreamHandler::run(void)
             continue;
         }
 
-        int remainder = 0;
         {
             QMutexLocker locker(&_listener_lock);
             HLSStreamHandler::StreamDataList::const_iterator sit;
             sit = _stream_data_list.begin();
             for (; sit != _stream_data_list.end(); ++sit)
-            {
                 remainder = sit.key()->ProcessData(m_readbuffer, size);
-            }
         }
 
-        if (remainder != 0)
+        if (remainder > 0)
         {
+            if (size > remainder) // unprocessed bytes
+                memmove(m_readbuffer, &(m_readbuffer[size - remainder]),
+                        remainder);
+
             LOG(VB_RECORD, LOG_INFO, LOC +
                 QString("data_length = %1 remainder = %2")
                 .arg(size).arg(remainder));
@@ -198,7 +203,12 @@ void HLSStreamHandler::run(void)
         if (m_hls->IsThrottled())
             usleep(999999);
         else if (size < BUFFER_SIZE)
-            usleep(100000); // tenth of a second.
+        {
+            LOG(VB_RECORD, LOG_DEBUG, LOC +
+                QString("Requested %1 bytes, got %2 bytes.")
+                .arg(BUFFER_SIZE).arg(size));
+            usleep(10000); // hundredth of a second.
+        }
         else
             usleep(1000);
     }
