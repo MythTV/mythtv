@@ -460,6 +460,10 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
             }
             else if (line.startsWith(QLatin1String("#EXT-X-KEY")))
             {
+#ifndef USING_LIBCRYPTO
+                LOG(VB_RECORD, LOG_ERR, LOC + "#EXT-X-KEY needs libcrypto");
+                return false;
+#endif
                 QString path, iv;
                 if (!M3U::ParseKey(hls->Version(), line, m_aesmsg,  StreamURL(),
                                    path, iv))
