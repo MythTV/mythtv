@@ -460,10 +460,7 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
             }
             else if (line.startsWith(QLatin1String("#EXT-X-KEY")))
             {
-#ifndef USING_LIBCRYPTO
-                LOG(VB_RECORD, LOG_ERR, LOC + "#EXT-X-KEY needs libcrypto");
-                return false;
-#endif
+#ifdef USING_LIBCRYPTO
                 QString path, iv;
                 if (!M3U::ParseKey(hls->Version(), line, m_aesmsg,  StreamURL(),
                                    path, iv))
@@ -476,6 +473,10 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
                     LOG(VB_RECORD, LOG_ERR, LOC + "invalid IV");
                     return false;
                 }
+#else
+                LOG(VB_RECORD, LOG_ERR, LOC + "#EXT-X-KEY needs libcrypto");
+                return false;
+#endif
             }
             else if (line.startsWith(QLatin1String("#EXT-X-PROGRAM-DATE-TIME")))
             {
