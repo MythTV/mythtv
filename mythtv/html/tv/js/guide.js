@@ -39,6 +39,7 @@ function checkRecordingStatus(chanID, startTime)
 function reloadGuideContent()
 {
     loadTVContent(currentContentURL, "guideGrid", "dissolve", {"GuideOnly": "1"});  // currentContentURL is defined in util.qjs
+    fixGuideHeight();
 }
 
 function pageLeft()
