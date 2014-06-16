@@ -3783,19 +3783,21 @@ long long MythPlayer::CalcMaxFFTime(long long ffframes, bool setjump) const
         if (behind < maxtime * 3)
             limitKeyRepeat = true;
     }
+    else if (IsPaused())
+    {
+        uint64_t lastFrame  = deleteMap.IsEmpty() ? totalFrames
+                                                 : deleteMap.GetLastFrame();
+        if (framesPlayed + ffframes >= lastFrame)
+            ret = lastFrame - 1 - framesPlayed;
+    }
     else
     {
-        if (totalFrames > 0)
-        {
-            float behind = secsWritten - secsPlayed;
-            if (behind < maxtime)
-                ret = 0;
-            else if (behind - ff <= maxtime * 2)
-            {
-                uint64_t ms = 1000 * (secsWritten - maxtime * 2);
-                ret = TranslatePositionMsToFrame(ms, true) - framesPlayed;
-            }
-        }
+        float secsMax = secsWritten - 2.f * maxtime;
+        if (secsMax <= 0.f)
+            ret = 0;
+        else if (secsMax < secsPlayed + ff)
+            ret = TranslatePositionMsToFrame(1000 * secsMax, true)
+                    - framesPlayed;
     }
 
     return ret;
