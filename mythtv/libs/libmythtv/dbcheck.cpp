@@ -2704,6 +2704,27 @@ NULL
             return false;
     }
 
+    if (dbver == "1326")
+    {
+        const char *updates[] = {
+// Add this time filter
+"REPLACE INTO recordfilter (filterid, description, clause, newruledefault) "
+"  VALUES (8, 'This time', 'ABS(TIMESTAMPDIFF(MINUTE, CONVERT_TZ("
+"  ADDTIME(RECTABLE.startdate, RECTABLE.starttime), ''Etc/UTC'', ''SYSTEM''), "
+"  CONVERT_TZ(program.starttime, ''Etc/UTC'', ''SYSTEM''))) MOD 1440 "
+"  NOT BETWEEN 11 AND 1429', 0)",
+// Add this day and time filter
+"REPLACE INTO recordfilter (filterid, description, clause, newruledefault) "
+"  VALUES (9, 'This day and time', 'ABS(TIMESTAMPDIFF(MINUTE, CONVERT_TZ("
+"  ADDTIME(RECTABLE.startdate, RECTABLE.starttime), ''Etc/UTC'', ''SYSTEM''), "
+"  CONVERT_TZ(program.starttime, ''Etc/UTC'', ''SYSTEM''))) MOD 10080 "
+"  NOT BETWEEN 11 AND 10069', 0)",
+NULL
+};
+        if (!performActualUpdate(updates, "1327", dbver))
+            return false;
+    }
+
     return true;
 }
 
