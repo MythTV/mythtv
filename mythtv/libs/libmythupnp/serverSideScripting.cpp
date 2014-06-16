@@ -48,6 +48,7 @@ QScriptValue formatStr(QScriptContext *context, QScriptEngine *interpreter)
 
 ServerSideScripting::ServerSideScripting()
 {
+    Lock();
     // ----------------------------------------------------------------------
     // Enable Translation functions
     // ----------------------------------------------------------------------
@@ -68,6 +69,7 @@ ServerSideScripting::ServerSideScripting()
     // Q_SCRIPT_DECLARE_QMETAOBJECT( DTC::MythService, QObject*)
     // QScriptValue oClass = engine.scriptValueFromQMetaObject< DTC::MythService >();
     // engine.globalObject().setProperty("Myth", oClass);
+    Unlock();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -96,9 +98,11 @@ ServerSideScripting::~ServerSideScripting()
 
 QString ServerSideScripting::SetResourceRootPath( const QString &path )
 {
+    Lock();
     QString sOrig = m_sResRootPath;
 
     m_sResRootPath = path;
+    Unlock();
 
     return sOrig;
 }
@@ -111,10 +115,12 @@ void ServerSideScripting::RegisterMetaObjectType( const QString &sName,
                                                   const QMetaObject *pMetaObject,
                                                   QScriptEngine::FunctionSignature  pFunction)
 {
+    Lock();
     QScriptValue ctor = m_engine.newFunction( pFunction );
 
     QScriptValue metaObject = m_engine.newQMetaObject( pMetaObject, ctor );
     m_engine.globalObject().setProperty( sName, metaObject );
+    Unlock();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -144,6 +150,7 @@ bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &
 {
     try
     {
+
         ScriptInfo *pInfo = NULL;
 
         // ------------------------------------------------------------------
@@ -159,6 +166,7 @@ bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &
         QFileInfo  fileInfo ( sFileName );
         QDateTime  dtLastModified = fileInfo.lastModified();
 
+        Lock();
         if ((pInfo == NULL) || (pInfo->m_dtTimeStamp != dtLastModified ))
         {
             QString      sCode = CreateMethodFromFile( sFileName );
@@ -173,6 +181,7 @@ bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &
                         .arg(m_engine.uncaughtExceptionLineNumber())
                         .arg(m_engine.uncaughtException().toString()));
 
+                Unlock();
                 return false;
             }
 
@@ -184,9 +193,7 @@ bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &
             else
             {
                 pInfo = new ScriptInfo( func, dtLastModified );
-                Lock();
                 m_mapScripts[ sFileName ] = pInfo;
-                Unlock();
             }
         }
 
@@ -335,14 +342,17 @@ bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &
                 QString("Error calling QSP File: %1 - %2")
                     .arg(sFileName)
                     .arg(m_engine.uncaughtException().toString()));
+            Unlock();
             return false;
         }
+        Unlock();
     }
     catch(...)
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("Exception while evaluating QSP File: %1") .arg(sFileName));
 
+        Unlock();
         return false;
     }
 
@@ -353,7 +363,7 @@ bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &
 //
 //////////////////////////////////////////////////////////////////////////////
 
-QString ServerSideScripting::CreateMethodFromFile( const QString &sFileName )
+QString ServerSideScripting::CreateMethodFromFile( const QString &sFileName ) const
 {
     bool        bInCode = false;
     QString     sBuffer;
@@ -397,7 +407,7 @@ QString ServerSideScripting::CreateMethodFromFile( const QString &sFileName )
 //
 //////////////////////////////////////////////////////////////////////////////
 
-QString ServerSideScripting::ReadFileContents( const QString &sFileName )
+QString ServerSideScripting::ReadFileContents( const QString &sFileName ) const
 {
     QString  sCode;
     QFile    scriptFile( sFileName );
@@ -429,7 +439,7 @@ QString ServerSideScripting::ReadFileContents( const QString &sFileName )
 bool ServerSideScripting::ProcessLine( QTextStream &sCode, 
                                        QString     &sLine, 
                                        bool         bInCode,
-                                       QString     &sTransBuffer )
+                                       QString     &sTransBuffer ) const
 {
     QString sLowerLine = sLine.toLower();
 

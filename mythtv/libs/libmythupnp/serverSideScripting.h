@@ -40,23 +40,12 @@ class ScriptInfo
 
 class UPNP_PUBLIC ServerSideScripting
 {
-    protected:
-
-        QMutex                           m_mutex;
-        QMap< QString, ScriptInfo* >     m_mapScripts;
-        QString                          m_sResRootPath;
-
-        void Lock       () { m_mutex.lock();   }
-        void Unlock     () { m_mutex.unlock(); }
-
     public:
 
-         QScriptEngine                   m_engine;
+        QScriptEngine                   m_engine;
 
-    public:
-
-         ServerSideScripting();
-        ~ServerSideScripting();
+        ServerSideScripting();
+       ~ServerSideScripting();
 
         QString SetResourceRootPath( const QString     &path );
 
@@ -69,16 +58,23 @@ class UPNP_PUBLIC ServerSideScripting
 
     protected:
 
+        QMutex                           m_mutex;
+        QMap< QString, ScriptInfo* >     m_mapScripts;
+        QString                          m_sResRootPath;
+
+        void Lock       () { m_mutex.lock();   }
+        void Unlock     () { m_mutex.unlock(); }
+
         ScriptInfo *GetLoadedScript ( const QString &sFileName );
 
-        QString ReadFileContents    ( const QString &sFileName );
+        QString ReadFileContents    ( const QString &sFileName ) const;
 
-        QString CreateMethodFromFile( const QString &sFileName );
+        QString CreateMethodFromFile( const QString &sFileName ) const;
 
         bool    ProcessLine         ( QTextStream &sCode, 
                                       QString     &sLine, 
                                       bool         bInCode,
-                                      QString     &sTransBuffer );
+                                      QString     &sTransBuffer ) const;
 };
 
 
