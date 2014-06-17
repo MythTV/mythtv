@@ -535,6 +535,12 @@ QStringList Guide::GetStoredSearches( const QString& sType )
 
     RecSearchType iType = searchTypeFromString(sType);
 
+    if (iType == kNoSearch)
+    {
+        //throw( "Invalid Type" );
+        return keywordList;
+    }
+
     query.prepare("SELECT DISTINCT phrase FROM keyword "
                   "WHERE searchtype = :TYPE "
                   "ORDER BY phrase");
