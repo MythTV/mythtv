@@ -56,7 +56,7 @@ class LoggerThread;
 typedef struct tm tmType;
 
 #define SET_LOGGING_ARG(arg){ \
-                                if (arg) { free(const_cast<char*>(arg)); } \
+                                free(arg); \
                                 arg = strdup(val.toLocal8Bit().constData()); \
                             }
 
@@ -152,12 +152,12 @@ class LoggingItem: public QObject, public ReferenceCounter
     LogLevel_t          m_level;
     int                 m_facility;
     qlonglong           m_epoch;
-    const char         *m_file;
-    const char         *m_function;
+    char               *m_file;
+    char               *m_function;
     char               *m_threadName;
-    const char         *m_appName;
-    const char         *m_table;
-    const char         *m_logFile;
+    char               *m_appName;
+    char               *m_table;
+    char               *m_logFile;
     char                m_message[LOGLINE_MAX+1];
 
   private:

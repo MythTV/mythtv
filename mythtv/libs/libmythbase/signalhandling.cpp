@@ -297,13 +297,13 @@ void SignalHandler::handleSignal(void)
 
     if (infoComplete)
     {
-        const char *signame = strsignal(signum);
+        char *signame = strsignal(signum);
         signame = strdup(signame ? signame : "Unknown Signal");
         LOG(VB_GENERAL, LOG_CRIT,
             QString("Received %1: Code %2, PID %3, UID %4, Value 0x%5")
             .arg(signame) .arg(signalInfo.code) .arg(signalInfo.pid)
             .arg(signalInfo.uid) .arg(signalInfo.value,8,16,QChar('0')));
-        free((void *)signame);
+        free(signame);
     }
 
     SigHandlerFunc handler = NULL;

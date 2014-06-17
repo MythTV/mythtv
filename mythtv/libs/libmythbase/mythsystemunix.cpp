@@ -839,7 +839,7 @@ void MythSystemLegacyUnix::Fork(time_t timeout)
     SetArgs( args );
 
     QByteArray cmdUTF8 = GetCommand().toUtf8();
-    const char *command = strdup(cmdUTF8.constData());
+    char *command = strdup(cmdUTF8.constData());
 
     char **cmdargs = (char **)malloc((args.size() + 1) * sizeof(char *));
     int i;
@@ -851,7 +851,7 @@ void MythSystemLegacyUnix::Fork(time_t timeout)
     }
     cmdargs[i] = NULL;
 
-    const char *directory = NULL;
+    char *directory = NULL;
     QString dir = GetDirectory();
     if (GetSetting("SetDirectory") && !dir.isEmpty())
         directory = strdup(dir.toUtf8().constData());
@@ -1067,11 +1067,9 @@ void MythSystemLegacyUnix::Fork(time_t timeout)
     /* Parent */
 
     // clean up the memory use
-    if( command )
-        free((void *)command);
+    free(command);
 
-    if( directory )
-        free((void *)directory);
+    free(directory);
 
     if( cmdargs )
     {
