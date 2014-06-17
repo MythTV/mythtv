@@ -511,7 +511,8 @@ QStringList Guide::GetCategoryList( ) //int nStartIndex, int nCount)
     QStringList catList;
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare("SELECT DISTINCT category FROM program ORDER BY category");
+    query.prepare("SELECT DISTINCT category FROM program WHERE category != '' "
+                  "ORDER BY category");
 
     if (!query.exec())
         return catList;
