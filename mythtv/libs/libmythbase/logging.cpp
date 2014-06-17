@@ -174,23 +174,17 @@ LoggingItem::LoggingItem(const char *_file, const char *_function,
 
 LoggingItem::~LoggingItem()
 {
-    if (m_file)
-        free(const_cast<char*>(m_file));
+    free(m_file);
 
-    if (m_function)
-        free(const_cast<char*>(m_function));
+    free(m_function);
 
-    if (m_threadName)
-        free(m_threadName);
+    free(m_threadName);
 
-    if (m_appName)
-        free(const_cast<char*>(m_appName));
+    free(m_appName);
 
-    if (m_table)
-        free(const_cast<char*>(m_table));
+    free(m_table);
 
-    if (m_logFile)
-        free(const_cast<char*>(m_logFile));
+    free(m_logFile);
 }
 
 QByteArray LoggingItem::toByteArray(void)
