@@ -159,6 +159,7 @@ class Scheduler : public MThread, public MythScheduler
                          const RecList &reclist);
     void FillDirectoryInfoCache(bool force = false);
 
+    void RecordFilterFixups(void);
     void OldRecordedFixups(void);
     void ResetDuplicates(uint recordid, uint findid, const QString &title,
                          const QString &subtitle, const QString &descrip,
