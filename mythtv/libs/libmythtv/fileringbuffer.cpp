@@ -242,6 +242,13 @@ bool FileRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
                     lasterror = 2;
                     close(fd2);
                     fd2 = -1;
+                    if (ret == 0 && openAttempts > 5 &&
+                        !gCoreContext->IsRegisteredFileForWrite(filename))
+                    {
+                        // file won't grow, abort early
+                        break;
+                    }
+
                     if (oldfile)
                         break; // if it's an old file it won't grow..
                     usleep(10 * 1000);
