@@ -181,9 +181,11 @@ for (var listIdx = 0; listIdx < recRules.length; listIdx++)
 </div> <!-- End recordingrulesList -->
 </div> <!-- End recordingrulesList-container -->
 
+<% if (programs.length > 0) {%>
 <script>
     loadJScroll();
 </script>
+<%}%>
 
 </body>
 </html>

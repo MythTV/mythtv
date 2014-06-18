@@ -217,9 +217,11 @@ for (var listIdx = 0; listIdx < programs.length; listIdx++)
 </div> <!-- End upcomingList -->
 </div> <!-- End upcomingList-container -->
 
+<% if (programs.length > 0) {%>
 <script>
     loadJScroll();
 </script>
+<%}%>
 
 </body>
 </html>
