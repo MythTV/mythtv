@@ -932,9 +932,9 @@ bool Dvr::UpdateRecordSchedule ( uint      nRecordId,
     if (!pRule.IsValid(msg))
         throw msg;
 
-    pRule.Save();
+    bool bResult = pRule.Save();
 
-    return true;
+    return bResult;
 }
 
 bool Dvr::RemoveRecordSchedule ( uint nRecordId )
@@ -1099,8 +1099,7 @@ bool Dvr::EnableRecordSchedule ( uint nRecordId )
     if (pRule.IsLoaded())
     {
         pRule.m_isInactive = false;
-        pRule.Save();
-        bResult = true;
+        bResult = pRule.Save();
     }
 
     return bResult;
@@ -1120,8 +1119,7 @@ bool Dvr::DisableRecordSchedule( uint nRecordId )
     if (pRule.IsLoaded())
     {
         pRule.m_isInactive = true;
-        pRule.Save();
-        bResult = true;
+        bResult = pRule.Save();
     }
 
     return bResult;
