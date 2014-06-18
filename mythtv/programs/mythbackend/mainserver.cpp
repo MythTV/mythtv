@@ -1672,10 +1672,19 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             ft = new FileTransfer(filename, socket, usereadahead, timeout_ms);
         }
 
-        ft->IncrRef();
-
         sockListLock.lockForWrite();
         controlSocketList.remove(socket);
+        if (!ft->isOpen())
+        {
+            sockListLock.unlock();
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("Can't open %1").arg(filename));
+            errlist << "filetransfer_unable_to_open_file";
+            socket->WriteStringList(errlist);
+            ft->DecrRef();
+            return;
+        }
+        ft->IncrRef();
         fileTransferList.push_back(ft);
         sockListLock.unlock();
 
