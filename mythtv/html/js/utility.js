@@ -30,6 +30,14 @@ function getBoolArg(name)
     return Boolean(getIntegerArg(name));
 }
 
+function getArgCount()
+{
+    if (isValidObject(this.Parameters))
+        return Number(Object.keys(this.Parameters).length);
+    else
+        return Number(0);
+}
+
 function toCapitalCase(str)
 {
     return str.charAt(0).toUpperCase() + str.slice(1);
