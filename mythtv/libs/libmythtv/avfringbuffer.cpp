@@ -18,11 +18,9 @@ int AVFRingBuffer::AVF_Read(URLContext *h, uint8_t *buf, int buf_size)
     AVFRingBuffer *avfr = (AVFRingBuffer *)h->priv_data;
 
     if (!avfr)
-        return AVERROR(EBADF);
+        return 0;
 
-    int ret = avfr->GetRingBuffer()->Read(buf, buf_size);
-
-    return (ret < 0) ? AVERROR(errno) : ret;
+    return avfr->GetRingBuffer()->Read(buf, buf_size);
 }
 
 int AVFRingBuffer::AVF_Write(URLContext *h, const uint8_t *buf, int buf_size)
@@ -30,11 +28,9 @@ int AVFRingBuffer::AVF_Write(URLContext *h, const uint8_t *buf, int buf_size)
     AVFRingBuffer *avfr = (AVFRingBuffer *)h->priv_data;
 
     if (!avfr)
-        return AVERROR(EBADF);
+        return 0;
 
-    int ret = avfr->GetRingBuffer()->Write(buf, buf_size);
-
-    return (ret < 0) ? AVERROR(errno) : ret;
+    return avfr->GetRingBuffer()->Write(buf, buf_size);
 }
 
 int64_t AVFRingBuffer::AVF_Seek(URLContext *h, int64_t offset, int whence)
@@ -42,7 +38,7 @@ int64_t AVFRingBuffer::AVF_Seek(URLContext *h, int64_t offset, int whence)
     AVFRingBuffer *avfr = (AVFRingBuffer *)h->priv_data;
 
     if (!avfr)
-        return AVERROR(EBADF);
+        return 0;
 
     if (whence == AVSEEK_SIZE)
         return avfr->GetRingBuffer()->GetRealFileSize();

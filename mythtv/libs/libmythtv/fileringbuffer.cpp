@@ -724,10 +724,8 @@ long long FileRingBuffer::SeekInternal(long long pos, int whence)
             // end, so we need to recheck if reads are allowed.
             if (new_pos > readpos)
             {
-                ateof           = false;
-                readsallowed    = false;
-                readsdesired    = false;
-                recentseek      = true;
+                ateof = false;
+                readsallowed = false;
             }
             readpos = new_pos;
             poslock.unlock();
@@ -835,10 +833,8 @@ long long FileRingBuffer::SeekInternal(long long pos, int whence)
             }
             else
             {
-                ateof           = false;
-                readsallowed    = false;
-                readsdesired    = false;
-                recentseek      = true;
+                ateof = false;
+                readsallowed = false;
             }
 
             poslock.unlock();
