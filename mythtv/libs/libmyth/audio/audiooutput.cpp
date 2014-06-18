@@ -276,13 +276,15 @@ void AudioOutput::ClearWarning(void)
 AudioOutput::AudioDeviceConfig* AudioOutput::GetAudioDeviceConfig(
     QString &name, QString &desc, bool willsuspendpa)
 {
-    AudioOutputSettings aosettings;
+    AudioOutputSettings aosettings(true);
     AudioOutput::AudioDeviceConfig *adc;
 
     AudioOutput *ao = OpenAudio(name, QString::null, willsuspendpa);
-    aosettings = *(ao->GetOutputSettingsCleaned());
-    delete ao;
-
+    if (ao)
+    {
+        aosettings = *(ao->GetOutputSettingsCleaned());
+        delete ao;
+    }
     if (aosettings.IsInvalid())
     {
         if (!willsuspendpa)
