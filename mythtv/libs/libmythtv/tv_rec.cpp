@@ -4677,6 +4677,7 @@ RecordingInfo *TVRec::SwitchRecordingRingBuffer(const RecordingInfo &rcinfo)
     RingBuffer *rb = RingBuffer::Create(ri->GetPathname(), write);
     if (!rb->IsOpen())
     {
+        delete rb;
         ri->SetRecordingStatus(rsFailed);
         FinishedRecording(ri, NULL);
         ri->MarkAsInUse(false, kRecorderInUseID);
