@@ -175,7 +175,7 @@ int FileTransfer::WriteBlock(int size)
         int request = size - tot;
         int received;
 
-        received = GetSocket()->Read(buf, (uint)request, 50 /*ms */);
+        received = GetSocket()->Read(buf, (uint)request, 200 /*ms */);
 
         if (received != request)
         {
@@ -190,7 +190,7 @@ int FileTransfer::WriteBlock(int size)
             if (received == 0)
             {
                 attempts++;
-                if (attempts >= 3)
+                if (attempts > 3)
                 {
                     LOG(VB_FILE, LOG_ERR,
                         "WriteBlock(): Read tried too many times, aborting "
@@ -200,6 +200,7 @@ int FileTransfer::WriteBlock(int size)
                 continue;
             }
         }
+        attempts = 0;
         ret = rbuffer->Write(buf, received);
         if (ret <= 0)
         {
