@@ -128,17 +128,19 @@ AudioConfigSettings::AudioConfigSettings(ConfigurationWizard *parent) :
     QString name = m_OutputDevice->getValue();
     AudioOutput::AudioDeviceConfig *adc =
         AudioOutput::GetAudioDeviceConfig(name, name, true);
-    if (adc->settings.IsInvalid())
+    if (adc)
     {
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("Audio device %1 isn't usable Check audio configuration")
-                .arg(name));
+        if (adc->settings.IsInvalid())
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Audio device %1 isn't usable Check audio configuration")
+                    .arg(name));
+        }
+        audiodevs.insert(name, *adc);
+        devices.append(*adc);
+
+        delete adc;
     }
-    audiodevs.insert(name, *adc);
-    devices.append(*adc);
-
-    delete adc;
-
     ConfigurationGroup *maingroup = new VerticalConfigurationGroup(false,
                                                                    false);
     addChild(maingroup);
