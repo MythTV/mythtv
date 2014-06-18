@@ -2725,6 +2725,18 @@ NULL
             return false;
     }
 
+    if (dbver == "1327")
+    {
+        const char *updates[] = {
+            "ALTER TABLE record DROP INDEX chanid",
+            "ALTER TABLE record ADD UNIQUE INDEX "
+            " (chanid, starttime, startdate, title, type)",
+            NULL
+        };
+        if (!performActualUpdate(updates, "1328", dbver))
+            return false;
+    }
+
     return true;
 }
 
