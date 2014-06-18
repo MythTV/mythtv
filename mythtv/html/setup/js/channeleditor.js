@@ -69,6 +69,7 @@ function initChannelEditor() {
 
     $(window).bind('resize', function() {
         $("#channels").setGridWidth($(window).width() - 55);
+        $("#channels").setGridHeight($(window).height() - 205);
     }).trigger('resize');
 
     /* Sort ascending by Channel Number on load */
