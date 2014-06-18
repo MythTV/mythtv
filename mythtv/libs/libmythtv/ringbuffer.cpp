@@ -896,6 +896,13 @@ void RingBuffer::run(void)
 
     while (readaheadrunning)
     {
+        if (!IsOpen())
+        {
+            poslock.lockForWrite();
+            readaheadrunning = false;
+            generalWait.wakeAll();
+            poslock.unlock();
+        }
         if (PauseAndWait())
         {
             ignore_for_read_timing = true;
