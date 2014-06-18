@@ -274,7 +274,7 @@ function openFileBrowserWindow(title, dirs, saveCallback, onlyDirs, storageGroup
     $("#fileBrowserWindow").dialog({
         modal: true,
         width: fileBrowserWidth,
-        height: 515,
+        height: 535,
         'title': title,
         closeOnEscape: false,
         buttons: {
