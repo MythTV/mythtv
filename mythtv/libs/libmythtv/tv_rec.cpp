@@ -4652,6 +4652,10 @@ bool TVRec::SwitchLiveTVRingBuffer(const QString & channum,
         curRecording = pginfo;
         SetRingBuffer(rb);
     }
+    else
+    {
+        delete rb;
+    }
 
     return true;
 }
