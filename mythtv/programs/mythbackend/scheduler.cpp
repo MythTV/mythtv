@@ -1766,6 +1766,45 @@ bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
     return false;
 }
 
+void Scheduler::RecordFilterFixups(void)
+{
+    MSqlQuery query(dbConn);
+
+    // Fix the 'This time' and 'This day and time' filters.  Since we
+    // can't do a proper schema update in the fixes branch, check
+    // every time we startup and do the fix if needed.
+
+    query.prepare("SELECT filterid FROM recordfilter "
+                  "WHERE filterid = 9 AND clause LIKE '%BETWEEN%'");
+    if (!query.exec())
+        MythDB::DBError("RecordFilterFixupsCheck", query);
+
+    if (query.next())
+        return;
+
+    LOG(VB_GENERAL, LOG_NOTICE, "Fixing 'This [day and] time' filters");
+
+    // Fix this time filter
+    query.prepare(
+"REPLACE INTO recordfilter (filterid, description, clause, newruledefault) "
+"  VALUES (8, 'This time', 'ABS(TIMESTAMPDIFF(MINUTE, CONVERT_TZ("
+"  ADDTIME(RECTABLE.startdate, RECTABLE.starttime), ''Etc/UTC'', ''SYSTEM''), "
+"  CONVERT_TZ(program.starttime, ''Etc/UTC'', ''SYSTEM''))) MOD 1440 "
+"  NOT BETWEEN 11 AND 1429', 0)");
+    if (!query.exec())
+        MythDB::DBError("RecordFilterFixupsThisTime", query);
+
+    // Fix this day and time filter
+    query.prepare(
+"REPLACE INTO recordfilter (filterid, description, clause, newruledefault) "
+"  VALUES (9, 'This day and time', 'ABS(TIMESTAMPDIFF(MINUTE, CONVERT_TZ("
+"  ADDTIME(RECTABLE.startdate, RECTABLE.starttime), ''Etc/UTC'', ''SYSTEM''), "
+"  CONVERT_TZ(program.starttime, ''Etc/UTC'', ''SYSTEM''))) MOD 10080 "
+"  NOT BETWEEN 11 AND 10069', 0)");
+    if (!query.exec())
+        MythDB::DBError("RecordFilterFixupsThisDayAndTime", query);
+}
+
 void Scheduler::OldRecordedFixups(void)
 {
     MSqlQuery query(dbConn);
@@ -1817,6 +1856,8 @@ void Scheduler::run(void)
         QMutexLocker lockit(&schedLock);
         reschedWait.wakeAll();
     }
+
+    RecordFilterFixups();
 
     OldRecordedFixups();
 
