@@ -452,9 +452,8 @@ int connect_to_master(void)
 
         QStringList tempMonitorDone("DONE");
 
-        QString announceStr = QString("ANN Monitor %1 0")
-                                            .arg(gCoreContext->GetHostName());
-        QStringList tempMonitorAnnounce = announceStr.split(" ");
+        QStringList tempMonitorAnnounce(QString("ANN Monitor %1 0")
+                                            .arg(gCoreContext->GetHostName()));
         tempMonitorConnection->SendReceiveStringList(tempMonitorAnnounce);
         if (tempMonitorAnnounce.empty() ||
             tempMonitorAnnounce[0] == "ERROR")
