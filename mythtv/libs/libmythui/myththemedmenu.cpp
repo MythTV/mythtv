@@ -215,7 +215,12 @@ bool MythThemedMenu::keyPressEvent(QKeyEvent *event)
         QString action = actions[i];
         handled = true;
 
-        if (action == "ESCAPE" || action == "EXIT" || action == "EXITPROMPT")
+        if (action == "STANDBYMODE")
+        {
+            QString arg("standby_mode");
+            m_state->m_callback(m_state->m_callbackdata, arg);
+        }
+        else if (action == "ESCAPE" || action == "EXIT" || action == "EXITPROMPT")
         {
             bool    callbacks  = m_state->m_callback;
             bool    lastScreen = (GetMythMainWindow()->GetMainStack()
@@ -304,6 +309,9 @@ void MythThemedMenu::ShowMenu()
     // HACK Implement a better check for this
     if (QCoreApplication::applicationName() == MYTH_APPNAME_MYTHFRONTEND)
         m_menuPopup->AddButton(tr("Enter standby mode"), QVariant("standby"));
+
+    m_menuPopup->AddButton(tr("Exit application"), QVariant("exit"));
+
     switch (override_menu)
     {
         case 2:
@@ -387,6 +395,11 @@ void MythThemedMenu::customEvent(QEvent *event)
             else if (action == "standby")
             {
                 QString arg("standby_mode");
+                m_state->m_callback(m_state->m_callbackdata, arg);
+            }
+            else if (action == "exit")
+            {
+                QString arg("exiting_app");
                 m_state->m_callback(m_state->m_callbackdata, arg);
             }
         }

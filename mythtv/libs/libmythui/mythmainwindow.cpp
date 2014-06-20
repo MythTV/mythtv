@@ -1309,6 +1309,8 @@ void MythMainWindow::InitKeys()
         "Display System Exit Prompt"),      "Esc");
     RegisterKey("Main Menu",    "EXIT",       QT_TRANSLATE_NOOP("MythControls",
         "System Exit"),                     "");
+    RegisterKey("Main Menu",    "STANDBYMODE",QT_TRANSLATE_NOOP("MythControls",
+        "Enter Standby Mode"),              "");
 }
 
 void MythMainWindow::ReloadKeys()

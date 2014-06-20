@@ -140,7 +140,7 @@ static void SetupMenuCallback(void* data, QString& selection)
         else
             delete msee;
     }
-    else if (sel.startsWith("exiting_app"))
+    else if (sel.startsWith("exiting_app") || (sel == "standby_mode"))
     {
         if (!exitPrompt)
             exitPrompt = new ExitPrompter();
