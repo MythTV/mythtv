@@ -896,6 +896,20 @@ void RingBuffer::run(void)
 
     while (readaheadrunning)
     {
+        rwlock.unlock();
+        bool isopened = IsOpen();
+        rwlock.lockForRead();
+
+        if (!isopened)
+        {
+            LOG(VB_FILE, LOG_WARNING, LOC +
+                QString("File not opened, terminating readahead thread"));
+            poslock.lockForWrite();
+            readaheadrunning = false;
+            generalWait.wakeAll();
+            poslock.unlock();
+            break;
+        }
         if (PauseAndWait())
         {
             ignore_for_read_timing = true;
