@@ -84,5 +84,108 @@
 
     </window>
 
+    <window name="standbymode">
+        <area>0,-1,100%,400</area>
+        <shape name="background">
+            <area>0,0,100%,100%</area>
+            <fill color="#000000" alpha="200" />
+        </shape>
+
+        <fontdef name="info" from="basesmall">
+            <color>#ffffff</color>
+            <size>16</size>
+            <weight>bold</weight>
+        </fontdef>
+
+        <fontdef name="warning" from="basesmall">
+            <color>#ff0000</color>
+            <size>16</size>
+            <shadowcolor>#000000</shadowcolor>
+            <shadowoffset>2,2</shadowoffset>
+            <weight>bold</weight>
+        </fontdef>
+
+        <group name="popup">
+            <area>0,0,1280,400</area>
+            <shape name="background" from="basebackground">
+                <area>0,0,100%,100%</area>
+                <fill color="#000000" alpha="255" />
+            </shape>
+
+            <textarea name="heading">
+                <area>20,20,1240,40</area>
+                <font>baselarge</font>
+                <align>allcenter</align>
+                <value>MythTV is in standby</value>
+            </textarea>
+
+            <statetype name="backendstatus">
+                <area>20,75,1240,100</area>
+                <state name="idle">
+                    <area>0,0,1240,100</area>
+                    <!--<imagetype name="icon">-->
+                    <shape name="iconplaceholder">
+                        <area>450,10,80,80</area>
+                        <fill color="#666666" />
+                    </shape>
+                    <!-- </imagetype>-->
+                    <textarea name="status">
+                        <area>550,15,440,80</area>
+                        <font>basemedium</font>
+                        <value>Backend is idle</value>
+                        <multiline>true</multiline>
+                    </textarea>
+                </state>
+                <state name="recording" from="idle">
+                    <shape name="iconplaceholder">
+                        <fill color="#80DF00" />
+                    </shape>
+                    <textarea name="status">
+                        <value>Backend is recording</value>
+                    </textarea>
+                </state>
+                <state name="shuttingdown" from="idle">
+                    <shape name="iconplaceholder">
+                        <fill color="#FFFF33" />
+                    </shape>
+                    <textarea name="status">
+                        <value>Backend is shutting down</value>
+                    </textarea>
+                </state>
+                <state name="offline" from="idle">
+                    <shape name="iconplaceholder">
+                        <fill color="#800900" />
+                    </shape>
+                    <textarea name="status">
+                        <value>Backend is offline</value>
+                    </textarea>
+                </state>
+            </statetype>
+
+            <textarea name="nextrecordingheading">
+                <area>20,190,1240,30</area>
+                <font>basemedium</font>
+                <align>allcenter</align>
+                <value>Next recording:</value>
+            </textarea>
+            <textarea name="nextrecording">
+                <area>20,230,1240,120</area>
+                <multiline>yes</multiline>
+                <font>info</font>
+                <align>allcenter</align>
+                <value></value>
+            </textarea>
+            <!--
+                scheduled recordings conflict warning
+            -->
+            <textarea name="conflicts">
+                <area>20,360,1240,30</area>
+                <font>warning</font>
+                <align>hcenter</align>
+                <value>WARNING: There are conflicting scheduled recordings!</value>
+            </textarea>
+        </group>
+    </window>
+
 </mythuitheme>
 

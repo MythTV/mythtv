@@ -19,7 +19,10 @@
 IdleScreen::IdleScreen(MythScreenStack *parent)
               :MythScreenType(parent, "standbymode"),
               m_updateStatusTimer(new QTimer(this)), m_statusState(NULL),
-              m_secondsToShutdown(0), m_backendRecording(false)
+              m_scheduledText(NULL), m_warningText(NULL),
+              m_secondsToShutdown(0), m_backendRecording(false),
+              m_pendingSchedUpdate(false), m_hasConflicts(false)
+
 {
     gCoreContext->addListener(this);
     GetMythMainWindow()->EnterStandby();
@@ -48,11 +51,23 @@ bool IdleScreen::Create(void)
     if (!foundtheme)
         return false;
 
-    m_statusState = dynamic_cast<MythUIStateType*>
-                                            (GetChild("backendstatus"));
+    bool err = false;
+    UIUtilE::Assign(this, m_statusState, "backendstatus", &err);
 
-    if (!m_statusState)
+    /* nextrecording and conflicts are optional */
+    UIUtilE::Assign(this, m_scheduledText, "nextrecording");
+    UIUtilE::Assign(this, m_warningText, "conflicts");
+
+    if (err)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'standbymode'");
         return false;
+    }
+
+    if (m_warningText)
+        m_warningText->SetVisible(false);
+
+    UpdateScheduledList();
 
     return true;
 }
@@ -106,28 +121,82 @@ void IdleScreen::UpdateStatus(void)
     }
 
     m_statusState->DisplayState(state);
+
+    MythUIType* shuttingdown = m_statusState->GetState("shuttingdown");
+
+    if (shuttingdown)
+    {
+        MythUIText *statusText = dynamic_cast<MythUIText *>(shuttingdown->GetChild("status"));
+
+        if (statusText)
+        {
+            if (m_secondsToShutdown)
+            {
+                QString status = tr("Backend will shutdown in %n "
+                                    "second(s).", "", m_secondsToShutdown);
+
+                statusText->SetText(status);
+            }
+            else
+                statusText->Reset();
+        }
+    }
+
+    if (m_warningText)
+        m_warningText->SetVisible(m_hasConflicts);
 }
 
 void IdleScreen::UpdateScreen(void)
 {
+    QString scheduled;
 
-    MythUIText *statusText = dynamic_cast<MythUIText *>(GetChild("status"));
-
-    if (statusText)
+    // update scheduled
+    if (!m_scheduledList.empty())
     {
-        QString status;
+        ProgramInfo progInfo = m_scheduledList[0];
 
-        if (m_secondsToShutdown)
-            status = tr("MythTV is idle and will shutdown in %n "
-                        "second(s).", "", m_secondsToShutdown);
+        InfoMap infomap;
+        progInfo.ToMap(infomap);
 
-        if (!status.isEmpty())
-            statusText->SetText(status);
-        else
-            statusText->Reset();
+        scheduled = infomap["channame"] + "\n";
+        scheduled += infomap["title"];
+        if (!infomap["subtitle"].isEmpty())
+            scheduled += "\n(" + infomap["subtitle"] + ")";
+
+        scheduled += "\n" + infomap["timedate"];
     }
+    else
+        scheduled = tr("There are no scheduled recordings");
+
+    if (m_scheduledText)
+        m_scheduledText->SetText(scheduled);
 
     UpdateStatus();
+}
+
+bool IdleScreen::UpdateScheduledList()
+{
+    {
+        // clear pending flag early in case something happens while
+        // we're updating
+        QMutexLocker lock(&m_schedUpdateMutex);
+        SetPendingSchedUpdate(false);
+    }
+
+    m_scheduledList.clear();
+    m_hasConflicts = false;
+
+    if (!gCoreContext->IsConnectedToMaster())
+    {
+        return false;
+    }
+
+    GetNextRecordingList(m_nextRecordingStart, &m_hasConflicts,
+                         &m_scheduledList);
+
+    UpdateScreen();
+
+    return true;
 }
 
 bool IdleScreen::keyPressEvent(QKeyEvent* event)
@@ -137,7 +206,6 @@ bool IdleScreen::keyPressEvent(QKeyEvent* event)
 
 void IdleScreen::customEvent(QEvent* event)
 {
-
     if ((MythEvent::Type)(event->type()) == MythEvent::MythEventMessage)
     {
         MythEvent *me = static_cast<MythEvent *>(event);
@@ -163,6 +231,16 @@ void IdleScreen::customEvent(QEvent* event)
                      if (!poweroff_cmd.isEmpty())
                          myth_system(poweroff_cmd);
                 }
+            }
+        }
+        else if (me->Message().startsWith("SCHEDULE_CHANGE"))
+        {
+            QMutexLocker lock(&m_schedUpdateMutex);
+
+            if (!PendingSchedUpdate())
+            {
+                QTimer::singleShot(500, this, SLOT(UpdateScheduledList()));
+                SetPendingSchedUpdate(true);
             }
         }
     }
