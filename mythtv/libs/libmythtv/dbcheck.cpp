@@ -2728,6 +2728,13 @@ NULL
     if (dbver == "1327")
     {
         const char *updates[] = {
+            "DELETE r1 FROM record r1, record r2 "
+            "  WHERE r1.chanid = r2.chanid AND "
+            "        r1.starttime = r2.starttime AND "
+            "        r1.startdate = r2.startdate AND "
+            "        r1.title = r2.title AND "
+            "        r1.type = r2.type AND "
+            "        r1.recordid > r2.recordid",
             "ALTER TABLE record DROP INDEX chanid",
             "ALTER TABLE record ADD UNIQUE INDEX "
             " (chanid, starttime, startdate, title, type)",
