@@ -1,0 +1,56 @@
+
+.galleryList
+{
+    margin: 50px auto;
+    width: 90%;
+}
+
+.videoBox
+{
+    background-color: #444444;
+    border-radius: 6px 6px 6px 6px;
+    float: left;
+    height: 300px;
+    overflow: hidden;
+    margin-right:25px;
+    margin-bottom: 25px;
+    width: 250px;
+    right: 0px;
+
+}
+
+.videoHeader
+{
+    padding: 5px 8px 4px 7px;
+    color: #FFFFFF;
+    height: 25px;
+    background: linear-gradient(to bottom, #777777 1%, #555555 20%, #222222 99%);
+    border-radius: inherit;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 0px;
+
+}
+.videoTitle
+{
+    width:98%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    float: left;
+    display: block;
+    font-size: 1.0em;
+    font-weight: bold;
+
+}
+.videoArtwork
+{
+    margin:5px 5px auto 10px;
+    border: 1px solid #222222;
+    float: left;
+    width: 100px;
+}
+.videoDescription
+{
+    float:left;
+}

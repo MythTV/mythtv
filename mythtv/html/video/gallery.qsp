@@ -1,0 +1,51 @@
+
+<link rel="stylesheet" type="text/css" href="/video/css/gallery.css">
+<div class="galleryList">
+    <%
+
+        var video = new Video();
+        var videoList = video.GetVideoList("","",false, 0, 0);
+
+
+    %>
+
+    <%
+        for (var listIdx = 0; listIdx < videoList.VideoMetadataInfos.length; listIdx++)
+        {
+            //does this video have artwork?
+            var thisVideo = videoList.VideoMetadataInfos[listIdx];
+            var thisArtwork = videoList.VideoMetadataInfos[listIdx].Artwork;
+            var artworkLength = thisArtwork.ArtworkInfos.length;
+            var artworkURL = "";
+
+            if(artworkLength > 0)
+            {
+                for(var artworkIdx=0; artworkIdx < artworkLength; artworkIdx++)
+                {
+                    if(thisArtwork.ArtworkInfos[artworkIdx].Type == "coverart")    //we have the cover art
+                    {
+                        artworkURL = thisArtwork.ArtworkInfos[artworkIdx].URL + "&Width=200";
+                    }
+                }
+            }
+
+            var description = thisVideo.Description;
+
+
+    %>
+        <div class="videoBox">
+            <div class="videoHeader">
+                <div class="videoTitle">
+                    <%=thisVideo.Title%>
+                </div>
+            </div>
+
+            <img class="videoArtwork" src="<%=artworkURL%>" />
+            <%=description%>
+
+        </div>
+    <%
+        }
+     %>
+
+</div>
