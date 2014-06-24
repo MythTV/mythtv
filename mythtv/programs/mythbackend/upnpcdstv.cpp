@@ -49,7 +49,7 @@ UPnpCDSRootInfo UPnpCDSTv::g_RootNodes[] =
             "ORDER BY starttime DESC",
         "", "starttime DESC" },
 
-    {   "By Title",
+    {   "By Title (newest first)",
         "title",
         "SELECT title as id, "
           "title as name, "
@@ -58,7 +58,29 @@ UPnpCDSRootInfo UPnpCDSTv::g_RootNodes[] =
             "%1 "
             "GROUP BY title "
             "ORDER BY title",
-        "WHERE title=:KEY", "title" },
+        "WHERE title=:KEY", "starttime DESC" },
+
+    {   "By Title (oldest first)",
+        "title",
+        "SELECT title as id, "
+          "title as name, "
+          "count( title ) as children "
+            "FROM recorded "
+            "%1 "
+            "GROUP BY title "
+            "ORDER BY title",
+        "WHERE title=:KEY", "starttime" },
+        
+    {   "By Title (ordered by subtitle)",
+        "title",
+        "SELECT title as id, "
+          "title as name, "
+          "count( title ) as children "
+            "FROM recorded "
+            "%1 "
+            "GROUP BY title "
+            "ORDER BY title",
+        "WHERE title=:KEY", "subtitle" },
 
     {   "By Genre",
         "category",
