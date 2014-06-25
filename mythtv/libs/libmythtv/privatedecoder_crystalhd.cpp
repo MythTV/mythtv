@@ -344,7 +344,7 @@ bool PrivateDecoderCrystalHD::CreateFilter(AVCodecContext *avctx)
     uint8_t *outbuf = NULL;
     int res = av_bitstream_filter_filter(m_filter, avctx, NULL, &outbuf,
                                          &outbuf_size, test, testsize, 0);
-    delete outbuf;
+    av_freep(&outbuf);
     return res > 0;
 }
 
@@ -353,9 +353,9 @@ void inline free_frame(VideoFrame* frame)
     if (frame)
     {
         if (frame->buf)
-            delete [] frame->buf;
+            av_freep(&frame->buf);
         if (frame->priv[0])
-            delete [] frame->priv[0];
+            av_freep(&frame->priv[0]);
         delete frame;
     }
 }
@@ -365,7 +365,7 @@ void inline free_buffer(PacketBuffer* buffer)
     if (buffer)
     {
         if (buffer->buf)
-            delete [] buffer->buf;
+            av_freep(&buffer->buf);
         delete buffer;
     }
 }
@@ -425,7 +425,7 @@ int PrivateDecoderCrystalHD::ProcessPacket(AVStream *stream, AVPacket *pkt)
     if (!buffer)
         return result;
 
-    buffer->buf  = new unsigned char[pkt->size];
+    buffer->buf  = (unsigned char*)av_malloc(pkt->size);
     buffer->size = pkt->size;
     buffer->pts  = pkt->pts;
     memcpy(buffer->buf, pkt->data, pkt->size);
@@ -436,7 +436,6 @@ int PrivateDecoderCrystalHD::ProcessPacket(AVStream *stream, AVPacket *pkt)
 
     while (m_packet_buffers.size() > 0)
     {
-
         PacketBuffer *buffer = m_packet_buffers.last();
         if (GetTxFreeSize(0) < buffer->size)
         {
@@ -489,7 +488,7 @@ int PrivateDecoderCrystalHD::ProcessPacket(AVStream *stream, AVPacket *pkt)
         CHECK_ST;
 
         if (free_buf)
-            delete buf;
+            av_freep(&buf);
 
         free_buffer(buffer);
         if (!ok)
@@ -636,27 +635,27 @@ void PrivateDecoderCrystalHD::FillFrame(BC_DTS_PROC_OUT *out)
     int in_height  = out->PicInfo.height;
     int out_width  = (in_width + 15) & (~0xf);
     int out_height = in_height;
-    int size       = ((out_width * (out_height + 1)) * 3) / 2;
+    int size       = buffersize(FMT_YV12, out_width, out_height);
     uint8_t* src   = out->Ybuff;
 
     if (!m_frame)
     {
-        unsigned char* buf  = new unsigned char[size];
+        unsigned char* buf  = (unsigned char*)av_malloc(size);
         m_frame = new VideoFrame();
-        init(m_frame, FMT_YV12, buf, out_width, out_height, size);
+        // Force pitches to be equal to the width as the code below
+        // is likely wrong if that's not the case
+        init(m_frame, FMT_YV12, buf, out_width, out_height, size,
+             NULL, NULL, -1.0f, -1.0f, 0);
         m_frame->timecode = (int64_t)out->PicInfo.timeStamp;
         m_frame->frameNumber = out->PicInfo.picture_number;
     }
-
-    if (!m_frame)
-        return;
 
     // line 21 data (608/708 captions)
     // this appears to be unimplemented in the driver
     if (out->UserData && out->UserDataSz)
     {
         int size = out->UserDataSz > 1024 ? 1024 : out->UserDataSz;
-        m_frame->priv[0] = new unsigned char[size];
+        m_frame->priv[0] = (unsigned char*)av_malloc(size);
         memcpy(m_frame->priv[0], out->UserData, size);
         m_frame->qstride = size; // don't try this at home
     }
