@@ -524,12 +524,13 @@ void VideoOutputXv::CreatePauseFrame(VOSType subtype)
 {
     if (av_pause_frame.buf)
     {
-        delete [] av_pause_frame.buf;
+        av_freep(&av_pause_frame.buf);
         av_pause_frame.buf = NULL;
     }
 
-    init(&av_pause_frame, FMT_YV12,
-         new unsigned char[vbuffers.GetScratchFrame()->size + 128],
+    unsigned char* buf =
+        (unsigned char*)av_malloc(vbuffers.GetScratchFrame()->size + 128);
+    init(&av_pause_frame, FMT_YV12, buf,
          vbuffers.GetScratchFrame()->width,
          vbuffers.GetScratchFrame()->height,
          vbuffers.GetScratchFrame()->size);
@@ -1277,7 +1278,7 @@ void VideoOutputXv::DeleteBuffers(VOSType subtype, bool delete_pause_frame)
     {
         if (av_pause_frame.buf)
         {
-            delete [] av_pause_frame.buf;
+            av_freep(&av_pause_frame.buf);
             av_pause_frame.buf = NULL;
         }
         if (av_pause_frame.qscale_table)
@@ -1436,7 +1437,8 @@ void VideoOutputXv::PrepareFrameMem(VideoFrame *buffer, FrameScanType /*scan*/)
 
     int out_width  = display_visible_rect.width()  & ~0x1;
     int out_height = display_visible_rect.height() & ~0x1;
-    unsigned char *sbuf = new unsigned char[out_width * out_height * 3 / 2];
+    int size       = buffersize(FMT_YV12, out_width, out_height);
+    unsigned char *sbuf = (unsigned char*)av_malloc(size);
     AVPicture image_in, image_out;
     static struct SwsContext  *scontext;
 
@@ -1482,7 +1484,7 @@ void VideoOutputXv::PrepareFrameMem(VideoFrame *buffer, FrameScanType /*scan*/)
         disp->Unlock();
     }
 
-    delete [] sbuf;
+    av_freep(&sbuf);
 }
 
 // this is documented in videooutbase.cpp
