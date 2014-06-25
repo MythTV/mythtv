@@ -141,7 +141,7 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
     display_visible_rect  = displayVisibleRect;
     display_video_rect    = displayVideoRect;
     video_rect            = videoRect;
-    masterViewportSize    = QSize(1920, 1080);
+    masterViewportSize    = display_visible_rect.size();
     frameBufferRect       = QRect(QPoint(0,0), video_disp_dim);
     softwareDeinterlacer  = "";
     hardwareDeinterlacing = false;
