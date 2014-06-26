@@ -5855,7 +5855,8 @@ void TV::PxPToggleType(PlayerContext *mctx, bool wantPBP)
     if (wantPBP)
     {
         GetPlayer(mctx, 0)->SetPIPState(kPBPLeft);
-        GetPlayer(mctx, 1)->SetPIPState(kPBPRight);
+        if (player.size() > 1)
+            GetPlayer(mctx, 1)->SetPIPState(kPBPRight);
     }
     else
     {
