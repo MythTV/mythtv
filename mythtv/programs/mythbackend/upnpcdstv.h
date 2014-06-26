@@ -36,6 +36,7 @@ class UPnpCDSTv : public UPnpCDSExtension
         virtual int              GetRootCount  ( );
         virtual QString          GetTableName  ( QString sColumn );
         virtual QString          GetItemListSQL( QString sColumn = "" );
+        virtual QString          BuildSQLWhere ( QString sColumn, QString sWhere = "" );
 
         virtual void             BuildItemQuery( MSqlQuery        &query,
                                                  const QStringMap &mapParams );

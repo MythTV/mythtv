@@ -173,6 +173,21 @@ void UPnpCDSTv::BuildItemQuery( MSqlQuery &query, const QStringMap &mapParams )
 //
 /////////////////////////////////////////////////////////////////////////////
 
+QString UPnpCDSTv::BuildSQLWhere ( QString sColumn, QString sWhere )
+{
+    if ( sColumn != "recgroup" )
+    {
+        if ( sWhere == "" ) sWhere = "recgroup <> 'Deleted'";
+        else sWhere += " AND recgroup <> 'Deleted'";
+    }
+
+    return UPnpCDSExtension::BuildSQLWhere ( sColumn, sWhere );
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 bool UPnpCDSTv::IsBrowseRequestForUs( UPnpCDSRequest *pRequest )
 {
     // ----------------------------------------------------------------------

@@ -1084,7 +1084,9 @@ UPnpCDSExtensionResults *
 
                 if (query.isConnected())
                 {
-                    QString sSQL = QString(pInfo->sql) .arg(pInfo->where);
+                    QString sSQL =
+                        QString(pInfo->sql)
+                            .arg( BuildSQLWhere ( pInfo->column, pInfo->where ) );
 
                     // -=>TODO: There is a problem when called for an Item,
                     //          instead of a container
@@ -1183,10 +1185,8 @@ UPnpCDSExtensionResults *
 
             if (query.isConnected())
             {
-                // Remove where clause placeholder.
-                QString sSQL = pInfo->sql;
-
-                sSQL.remove( "%1" );
+                 QString sSQL = QString(pInfo->sql)
+                                   .arg( BuildSQLWhere ( pInfo->column, "" ) );
                 sSQL += QString( " LIMIT %2, %3" )
                            .arg( pRequest->m_nStartingIndex  )
                            .arg( pRequest->m_nRequestedCount );
@@ -1249,15 +1249,17 @@ int UPnpCDSExtension::GetDistinctCount( UPnpCDSRootInfo *pInfo )
 
         if (strncmp( pInfo->column, "*", 1) == 0)
         {
-            sSQL = QString( "SELECT count( %1 ) FROM %2" )
+            sSQL = QString( "SELECT count( %1 ) FROM %2 %3" )
                       .arg( pInfo->column )
-                      .arg( GetTableName( pInfo->column ));
+                      .arg( GetTableName( pInfo->column ))
+                      .arg( BuildSQLWhere( pInfo->column, "" ) );
         }
         else
         {
-            sSQL = QString( "SELECT count( DISTINCT %1 ) FROM %2" )
+            sSQL = QString( "SELECT count( DISTINCT %1 ) FROM %2 %3" )
                       .arg( pInfo->column )
-                      .arg( GetTableName( pInfo->column ) );
+                      .arg( GetTableName( pInfo->column ) )
+                      .arg( BuildSQLWhere( pInfo->column, "" ) );
         }
 
         query.prepare( sSQL );
@@ -1287,7 +1289,9 @@ int UPnpCDSExtension::GetCount( const QString &sColumn, const QString &sKey )
                        .arg( sColumn ).arg( GetTableName( sColumn ) );
 
         if ( sKey.length() )
-            sSQL += " WHERE " + sColumn + " = :KEY";
+            sSQL += " " + BuildSQLWhere( sColumn, sColumn + "=:KEY" );
+        else
+            sSQL += " " + BuildSQLWhere( sColumn, "" );
 
         query.prepare( sSQL );
         if ( sKey.length() )
@@ -1337,7 +1341,7 @@ void UPnpCDSExtension::CreateItems( UPnpCDSRequest          *pRequest,
 
         if ( sKey.length() > 0)
         {
-           sWhere = QString( "WHERE %1=:KEY " )
+           sWhere = QString( "%1=:KEY " )
                        .arg( pInfo->column );
         }
 
@@ -1349,7 +1353,8 @@ void UPnpCDSExtension::CreateItems( UPnpCDSRequest          *pRequest,
 
         QString sSQL = QString( "%1 %2 LIMIT %3, %4" )
                           .arg( GetItemListSQL( pInfo->column )  )
-                          .arg( sWhere + sOrder )
+                          .arg( BuildSQLWhere ( pInfo->column, sWhere )
+                                     + " " + sOrder ) 
                           .arg( pRequest->m_nStartingIndex  )
                           .arg( pRequest->m_nRequestedCount );
 
@@ -1365,5 +1370,22 @@ void UPnpCDSExtension::CreateItems( UPnpCDSRequest          *pRequest,
         }
     }
 }
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QString UPnpCDSExtension::BuildSQLWhere ( QString /* sColumn */, QString sWhere )
+{
+    // This adds WHERE to any non-empty where
+    // The main purpose of this method is to allow global constraints in tables
+    // through class inheritance. Specifically this was added to allow RecTv to avoid
+    // showing "Deleted" recordings.
+    if ( sWhere != "" && sWhere.left(6) != "WHERE " ) return "WHERE " + sWhere;
+    else return sWhere;
+}
+
+
 
 // vim:ts=4:sw=4:ai:et:si:sts=4
