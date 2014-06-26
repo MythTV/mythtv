@@ -31,14 +31,151 @@ UPnpCDSRootInfo UPnpCDSVideo::g_RootNodes[] =
             "FROM videometadata "
             "%1 "
             "ORDER BY title",
-        "", "title" }
+        "", "title" },
+
+    {   "By Folder",
+        "fldr.folder",
+        "SELECT "
+            "fldr.folder          AS id, "
+            "fldr.folder          AS name, "
+            "COUNT( fldr.folder ) AS children "
+          "FROM ( "
+            "SELECT "
+                "SUBSTRING_INDEX(SUBSTRING_INDEX(filename,'/',-2),'/',1) "
+                  "AS folder "
+              "FROM videometadata "
+          ") AS fldr "
+          "%1 "
+          "GROUP BY fldr.folder "
+          "ORDER BY fldr.folder",
+        "WHERE fldr.folder =  :KEY", "title" },
+
+    {   "By Length (10min int)",
+        "ROUND(length+4,-1)",
+        "SELECT "
+            "ROUND(length+4,-1)          AS id, "
+            "ROUND(length+4,-1)          AS name, "
+            "COUNT( ROUND(length+4,-1) ) AS children "
+          "FROM videometadata "
+          "%1 "
+          "GROUP BY name "
+          "ORDER BY ROUND(length+4,-1)",
+        "WHERE ROUND(length+4,-1) = :KEY", "title" },
+
+    {   "By User Rating (rounded)",
+        "ROUND(userrating)",
+        "SELECT "
+            "ROUND(userrating)          AS id, "
+            "ROUND(userrating)          AS name, "
+            "COUNT( ROUND(userrating) ) AS children "
+          "FROM videometadata "
+          "%1 "
+          "GROUP BY ROUND(userrating) "
+          "ORDER BY ROUND(userrating)",
+        "WHERE ROUND(userrating)=ROUND(:KEY)", "title" },
+
+    {   "By Maturity Rating",
+        "rating",
+        "SELECT "
+            "rating          AS id, "
+            "rating          AS name, "
+            "COUNT( rating ) AS children "
+          "FROM videometadata "
+          "%1 "
+          "GROUP BY rating "
+          "ORDER BY rating",
+        "WHERE rating=:KEY", "title" },
+
+    {   "By Category",
+        "category",
+        "SELECT "
+            "videometadata.category          AS id, "
+            "videocategory.category          AS name, "
+            "COUNT( videometadata.category ) AS children "
+          "FROM videometadata "
+            "LEFT JOIN videocategory ON videocategory.intid = videometadata.category "
+          "%1 "
+          "GROUP BY videometadata.category "
+          "ORDER BY videometadata.category",
+        "WHERE videometadata.category=:KEY", "title" },
+
+    {   "By Director",
+        "director",
+        "SELECT "
+            "director          AS id, "
+            "director          AS name, "
+            "COUNT( director ) AS children "
+          "FROM videometadata "
+          "%1 "
+          "GROUP BY director "
+          "ORDER BY director",
+        "WHERE director=:KEY", "title" },
+
+    {   "By Studio",
+        "studio",
+        "SELECT "
+            "studio          AS id, "
+            "studio          AS name, "
+            "COUNT( studio ) AS children "
+          "FROM videometadata "
+            "%1 "
+            "GROUP BY studio "
+            "ORDER BY studio",
+        "WHERE studio=:KEY", "title" },
+
+    {   "By Homepage",
+        "homepage",
+        "SELECT "
+            "homepage          AS id, "
+            "homepage          AS name, "
+            "COUNT( homepage ) AS children "
+          "FROM videometadata "
+          "%1 "
+          "GROUP BY homepage "
+          "ORDER BY homepage",
+        "WHERE homepage=:KEY", "title" },
+
+    {   "By Year",
+        "year",
+        "SELECT "
+            "year          AS id, "
+            "year          AS name, "
+            "COUNT( year ) AS children "
+          "FROM videometadata "
+          "%1 "
+          "GROUP BY year "
+          "ORDER BY year",
+        "WHERE year=:KEY", "title" },
+
+    {   "By Content Type",
+        "contenttype",
+        "SELECT "
+            "contenttype          AS id, "
+            "contenttype          AS name, "
+            "COUNT( contenttype ) AS children "
+          "FROM videometadata "
+          "%1 "
+          "GROUP BY contenttype "
+          "ORDER BY contenttype",
+        "WHERE contenttype=:KEY", "title" },
+
+    {   "By Season",
+        "season",
+        "SELECT "
+            "season          AS id, "
+            "season          AS name, "
+            "COUNT( season ) AS children "
+          "FROM videometadata "
+          "%1 "
+          "GROUP BY season "
+          "ORDER BY season",
+        "WHERE season=:KEY", "title" }
+
 
 };
 
-int UPnpCDSVideo::g_nRootCount = 1;
-
-//int UPnpCDSVideo::g_nRootCount;
-// = sizeof( g_RootNodes ) / sizeof( UPnpCDSRootInfo );
+int UPnpCDSVideo::g_nRootCount = sizeof( UPnpCDSVideo::g_RootNodes ) /
+                                 sizeof( UPnpCDSRootInfo );
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -67,7 +204,14 @@ int UPnpCDSVideo::GetRootCount()
 
 QString UPnpCDSVideo::GetTableName( QString sColumn )
 {
-    return "videometadata";
+    if(sColumn == "fldr.folder")
+    {
+        return "( SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(filename,'/',-2),'/',1) "
+                           "AS folder from videometadata ) "
+               "AS fldr";
+    }
+    else
+        return "videometadata";
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -76,10 +220,21 @@ QString UPnpCDSVideo::GetTableName( QString sColumn )
 
 QString UPnpCDSVideo::GetItemListSQL( QString sColumn )
 {
-    return "SELECT intid, title, subtitle, filename, director, plot, "
-            "rating, year, userrating, length, "
-            "season, episode, coverfile, insertdate, host FROM videometadata";
-
+    return "SELECT "
+           "videometadata.intid, title, subtitle, filename, director, plot, "
+           "rating, year, userrating, length, "
+           "season, episode, coverfile, insertdate, host, "
+           "category, studio, collectionref, homepage, contenttype, "
+           "round(length+4,-1) AS length10, "
+           "fldr.folder AS folder , "
+           "playcount "
+         "FROM videometadata "
+            "INNER JOIN ( "
+              "SELECT "
+                  "intid,SUBSTRING_INDEX(SUBSTRING_INDEX(filename,'/',-2),'/',1) "
+                    "AS folder "
+                "FROM videometadata "
+            ") AS fldr ON fldr.intid=videometadata.intid";
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -211,27 +366,6 @@ bool UPnpCDSVideo::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-int UPnpCDSVideo::GetDistinctCount( UPnpCDSRootInfo *pInfo )
-{
-    int nCount = 0;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    query.prepare("SELECT COUNT(*) FROM videometadata");
-
-    if (query.exec() && query.next())
-    {
-        nCount = query.value(0).toInt();
-    }
-
-    return nCount;
-}
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
 void UPnpCDSVideo::AddItem( const UPnpCDSRequest    *pRequest,
                             const QString           &sObjectId,
                             UPnpCDSExtensionResults *pResults,
@@ -255,6 +389,10 @@ void UPnpCDSVideo::AddItem( const UPnpCDSRequest    *pRequest,
     QDateTime      dtInsertDate =
         MythDate::as_utc(query.value(13).toDateTime());
     QString        sHostName    = query.value(14).toString();
+//    int            nCategory    = query.value(15).toInt();
+//    QString        sStudio      = query.value(16).toString();
+//    QString        sHomePage    = query.value(17).toString();
+//    QString        sContentType = query.value(18).toString();
 
     // ----------------------------------------------------------------------
     // Cache Host ip Address & Port

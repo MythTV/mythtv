@@ -35,8 +35,6 @@ class UPnpCDSVideo : public UPnpCDSExtension
         virtual bool             IsBrowseRequestForUs( UPnpCDSRequest *pRequest );
         virtual bool             IsSearchRequestForUs( UPnpCDSRequest *pRequest );
 
-        virtual int              GetDistinctCount( UPnpCDSRootInfo *pInfo );
-
         virtual UPnpCDSRootInfo *GetRootInfo   (int nIdx);
         virtual int              GetRootCount  ( );
         virtual QString          GetTableName  ( QString sColumn );
