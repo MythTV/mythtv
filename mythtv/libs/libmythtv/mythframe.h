@@ -17,6 +17,7 @@ typedef enum FrameType_
     FMT_YV12,
     FMT_IA44,
     FMT_AI44,
+    FMT_RGB32,   // endian dependent format, ARGB or BGRA
     FMT_ARGB32,
     FMT_RGBA32,
     FMT_YUV422P,
@@ -262,6 +263,7 @@ static inline int bitsperpixel(VideoFrameType type)
         case FMT_BGRA:
         case FMT_RGBA32:
         case FMT_ARGB32:
+        case FMT_RGB32:
             res = 32;
             break;
         case FMT_RGB24:
@@ -308,6 +310,70 @@ static inline uint buffersize(VideoFrameType type, int width, int height,
     return (adj_w * height * bpp + 4/* to round up */) / bpb;
 }
 
+static inline void copybuffer(VideoFrame *dst, uint8_t *buffer,
+                              int pitch, VideoFrameType type = FMT_YV12)
+{
+    if (type == FMT_YV12)
+    {
+        VideoFrame framein;
+        int chroma_pitch  = pitch >> 1;
+        int chroma_height = dst->height >> 1;
+        int offsets[3] =
+            { 0,
+              pitch * dst->height,
+              pitch * dst->height + chroma_pitch * chroma_height };
+        int pitches[3] = { pitch, chroma_pitch, chroma_pitch };
+
+        init(&framein, type, buffer, dst->width, dst->height, dst->size,
+             pitches, offsets);
+        copy(dst, &framein);
+    }
+    else if (type == FMT_NV12)
+    {
+        VideoFrame framein;
+        int offsets[3] = { 0, pitch * dst->height, 0 };
+        int pitches[3] = { pitch, pitch, 0 };
+
+        init(&framein, type, buffer, dst->width, dst->height, dst->size,
+             pitches, offsets);
+        copy(dst, &framein);
+    }
+}
+
+static inline void copybuffer(uint8_t *dstbuffer, const VideoFrame *src,
+                              int pitch = 0, VideoFrameType type = FMT_YV12)
+{
+    if (pitch == 0)
+    {
+        pitch = src->width;
+    }
+
+    if (type == FMT_YV12)
+    {
+        VideoFrame frameout;
+        int chroma_pitch  = pitch >> 1;
+        int chroma_height = src->height >> 1;
+        int offsets[3] =
+            { 0,
+              pitch * src->height,
+              pitch * src->height + chroma_pitch * chroma_height };
+        int pitches[3] = { pitch, chroma_pitch, chroma_pitch };
+
+        init(&frameout, type, dstbuffer, src->width, src->height, src->size,
+             pitches, offsets);
+        copy(&frameout, src);
+    }
+    else if (type == FMT_NV12)
+    {
+        VideoFrame frameout;
+        int offsets[3] = { 0, pitch * src->height, 0 };
+        int pitches[3] = { pitch, pitch, 0 };
+
+        init(&frameout, type, dstbuffer, src->width, src->height, src->size,
+             pitches, offsets);
+        copy(&frameout, src);
+    }
+}
 #endif /* __cplusplus */
 
 #endif

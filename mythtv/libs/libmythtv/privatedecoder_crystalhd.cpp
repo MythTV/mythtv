@@ -1,6 +1,7 @@
 #include "privatedecoder_crystalhd.h"
 #include "myth_imgconvert.h"
 #include "mythlogging.h"
+#include "mythavutil.h"
 
 #define LOC  QString("CrystalHD: ")
 #define ERR  QString("CrystalHD Err: ")
@@ -16,7 +17,7 @@ void FetcherThread::run(void)
     RunEpilog();
 }
 
-PixelFormat bcmpixfmt_to_pixfmt(BC_OUTPUT_FORMAT fmt);
+AVPixelFormat bcmpixfmt_to_pixfmt(BC_OUTPUT_FORMAT fmt);
 QString device_to_string(BC_DEVICE_TYPE device);
 QString bcmerr_to_string(BC_STATUS err);
 QString bcmpixfmt_to_string(BC_OUTPUT_FORMAT fmt);
@@ -635,17 +636,14 @@ void PrivateDecoderCrystalHD::FillFrame(BC_DTS_PROC_OUT *out)
     int in_height  = out->PicInfo.height;
     int out_width  = (in_width + 15) & (~0xf);
     int out_height = in_height;
-    int size       = buffersize(FMT_YV12, out_width, out_height);
     uint8_t* src   = out->Ybuff;
 
     if (!m_frame)
     {
-        unsigned char* buf  = (unsigned char*)av_malloc(size);
+        int size = buffersize(FMT_YV12, out_width, out_height);
+        unsigned char* buf = (unsigned char*)av_malloc(size);
         m_frame = new VideoFrame();
-        // Force pitches to be equal to the width as the code below
-        // is likely wrong if that's not the case
-        init(m_frame, FMT_YV12, buf, out_width, out_height, size,
-             NULL, NULL, -1.0f, -1.0f, 0);
+        init(m_frame, FMT_YV12, buf, out_width, out_height, size);
         m_frame->timecode = (int64_t)out->PicInfo.timeStamp;
         m_frame->frameNumber = out->PicInfo.picture_number;
     }
@@ -660,23 +658,23 @@ void PrivateDecoderCrystalHD::FillFrame(BC_DTS_PROC_OUT *out)
         m_frame->qstride = size; // don't try this at home
     }
 
-    PixelFormat out_fmt = PIX_FMT_YUV420P;
-    PixelFormat in_fmt  = bcmpixfmt_to_pixfmt(m_pix_fmt);
-    AVPicture img_in, img_out;
-    avpicture_fill(&img_out, (uint8_t *)m_frame->buf, out_fmt,
-                   out_width, out_height);
-    avpicture_fill(&img_in, src, in_fmt,
-                   in_width, in_height);
+    AVPixelFormat out_fmt = AV_PIX_FMT_YUV420P;
+    AVPixelFormat in_fmt  = bcmpixfmt_to_pixfmt(m_pix_fmt);
+    AVPicture img_in;
+
+    avpicture_fill(&img_in, src, in_fmt, in_width, in_height);
 
     if (!(out->PicInfo.flags & VDEC_FLAG_INTERLACED_SRC))
     {
-        myth_sws_img_convert(&img_out, out_fmt, &img_in, in_fmt,
-                             in_width, in_height);
+        AVPictureCopy(m_frame, &img_in, in_fmt);
         m_frame->interlaced_frame = 0;
         AddFrameToQueue();
     }
     else
     {
+        AVPicture img_out;
+
+        AVPictureFill(&img_out, m_frame);
         img_out.linesize[0] *= 2;
         img_out.linesize[1] *= 2;
         img_out.linesize[2] *= 2;
@@ -930,13 +928,13 @@ QString poutflags_to_string(int flags)
     return res;
 }
 
-PixelFormat bcmpixfmt_to_pixfmt(BC_OUTPUT_FORMAT fmt)
+AVPixelFormat bcmpixfmt_to_pixfmt(BC_OUTPUT_FORMAT fmt)
 {
     switch (fmt)
     {
-        case OUTPUT_MODE420:      return PIX_FMT_YUV420P;
-        case OUTPUT_MODE422_YUY2: return PIX_FMT_YUYV422;
-        case OUTPUT_MODE422_UYVY: return PIX_FMT_UYVY422;
+        case OUTPUT_MODE420:      return AV_PIX_FMT_YUV420P;
+        case OUTPUT_MODE422_YUY2: return AV_PIX_FMT_YUYV422;
+        case OUTPUT_MODE422_UYVY: return AV_PIX_FMT_UYVY422;
     }
     return PIX_FMT_YUV420P;
 }

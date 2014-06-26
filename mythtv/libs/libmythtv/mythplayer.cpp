@@ -64,6 +64,7 @@ using namespace std;
 #include "icringbuffer.h"
 #include "audiooutput.h"
 #include "cardutil.h"
+#include "mythavutil.h"
 
 extern "C" {
 #include "vbitext/vbi.h"
@@ -4437,21 +4438,13 @@ char *MythPlayer::GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
         return NULL;
     }
 
-    avpicture_fill(&orig, data, PIX_FMT_YUV420P,
-                   video_dim.width(), video_dim.height());
-
+    AVPictureFill(&orig, frame);
     avpicture_deinterlace(&orig, &orig, PIX_FMT_YUV420P,
                           video_dim.width(), video_dim.height());
 
     bufflen = video_dim.width() * video_dim.height() * 4;
     outputbuf = new unsigned char[bufflen];
-
-    avpicture_fill(&retbuf, outputbuf, PIX_FMT_RGB32,
-                   video_dim.width(), video_dim.height());
-
-    myth_sws_img_convert(
-        &retbuf, PIX_FMT_RGB32, &orig, PIX_FMT_YUV420P,
-                video_dim.width(), video_dim.height());
+    AVPictureCopy(&retbuf, frame, outputbuf, AV_PIX_FMT_RGB32);
 
     vw = video_disp_dim.width();
     vh = video_disp_dim.height();

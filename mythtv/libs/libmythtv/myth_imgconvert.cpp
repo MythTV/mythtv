@@ -34,17 +34,19 @@ extern "C" {
 #include "mythlogging.h"
 #include "myth_imgconvert.h"
 
-int myth_sws_img_convert(AVPicture *dst, PixelFormat dst_pix_fmt, AVPicture *src,
-                PixelFormat pix_fmt, int width, int height)
+int myth_sws_img_convert(AVPicture *dst, PixelFormat dst_pix_fmt,
+                         const AVPicture *src, PixelFormat pix_fmt,
+                         int width, int height)
 {
     static QMutex ctx_lock;
-    static struct SwsContext *convert_ctx;
+    static struct SwsContext *convert_ctx = NULL;
 
     QMutexLocker locker(&ctx_lock);
     convert_ctx = sws_getCachedContext(convert_ctx, width, height, pix_fmt,
                                        width, height, dst_pix_fmt,
                                        SWS_FAST_BILINEAR, NULL, NULL, NULL);
-    if (convert_ctx == NULL) {
+    if (convert_ctx == NULL)
+    {
         LOG(VB_GENERAL, LOG_ERR, "myth_sws_img_convert: Cannot initialize "
                                  "the image conversion context");
         return -1;
