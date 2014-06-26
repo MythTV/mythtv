@@ -1487,6 +1487,102 @@ static void CleanupMyOldInUsePrograms(void)
         MythDB::DBError("CleanupMyOldInUsePrograms", query);
 }
 
+static bool WasAutomaticStart(void)
+{
+    bool autoStart = false;
+
+    // Is backend running?
+    //
+    if( gCoreContext->BackendIsRunning() )
+    {
+        QDateTime startupTime = QDateTime();
+
+        if( gCoreContext->IsMasterHost() )
+        {
+            QString s = gCoreContext->GetSetting("MythShutdownWakeupTime", "");
+            if (s.length())
+                startupTime = MythDate::fromString(s);
+
+            // if we don't have a valid startup time assume we were started manually
+            if (startupTime.isValid())
+            {
+                int startupSecs = gCoreContext->GetNumSetting("StartupSecsBeforeRecording");
+                // If we started within 'StartupSecsBeforeRecording' OR 15 minutes
+                // of the saved wakeup time assume we either started automatically
+                // to record, to obtain guide data or or for a
+                // daily wakeup/shutdown period
+                if (abs(startupTime.secsTo(MythDate::current())) <
+                    max(startupSecs, 15 * 60))
+                {
+                    LOG(VB_GENERAL, LOG_INFO,
+                        "Close to auto-start time, AUTO-Startup assumed");
+
+                    QString str = gCoreContext->GetSetting("MythFillSuggestedRunTime");
+                    QDateTime guideRunTime = MythDate::fromString(str);
+                    if (guideRunTime.secsTo(MythDate::current()) <
+                        max(startupSecs, 15 * 60))
+                    {
+                        LOG(VB_GENERAL, LOG_INFO,
+                            "Close to MythFillDB suggested run time, AUTO-Startup to fetch guide data?");
+                    }
+                    autoStart = true;
+                }
+                else
+                    LOG(VB_GENERAL, LOG_DEBUG,
+                        "NOT close to auto-start time, USER-initiated startup assumed");
+            }
+        }
+        else
+        {
+            QString wakeupCmd = gCoreContext->GetSetting("WakeUpCommand");
+
+            // A slave backend that has no wakeup command cannot be woken
+            // automatically so can be ignored.
+            if (!wakeupCmd.isEmpty())
+            {
+                ProgramList progList;
+                bool        bConflicts;
+                QDateTime   nextRecordingStart;
+
+                if (LoadFromScheduler(progList, bConflicts))
+                {
+                    // Find the first recording to be recorded
+                    // on this machine
+                    QString hostname = gCoreContext->GetHostName();
+                    ProgramList::const_iterator it = progList.begin();
+                    for (; it != progList.end(); ++it)
+                    {
+                        if (((*it)->GetRecordingStatus() == rsWillRecord) &&
+                            ((*it)->GetHostname() == hostname) &&
+                            (nextRecordingStart.isNull() ||
+                             nextRecordingStart > (*it)->GetRecordingStartTime()))
+                        {
+                            nextRecordingStart = (*it)->GetRecordingStartTime();
+                        }
+                    }
+
+                    if (!nextRecordingStart.isNull() &&
+                        (abs(nextRecordingStart.secsTo(MythDate::current())) < (4 * 60)))
+                    {
+                        LOG(VB_GENERAL, LOG_INFO,
+                            "Close to start time, AUTO-Startup assumed");
+
+                        // If we started within 4 minutes of the next recording,
+                        // we almost certainly started automatically.
+                        autoStart = true;
+                    }
+                    else
+                        LOG(VB_GENERAL, LOG_DEBUG,
+                            "NOT close to auto-start time, USER-initiated startup assumed");
+
+                }
+            }
+        }
+    }
+
+    return autoStart;
+}
+
 int main(int argc, char **argv)
 {
     bool bPromptForBackend    = false;
@@ -1814,6 +1910,14 @@ int main(int argc, char **argv)
                     .arg(mmw->EnumerateDestinations().join(", ")));
             return GENERIC_EXIT_INVALID_CMDLINE;
         }
+    }
+
+    if (WasAutomaticStart())
+    {
+        // We appear to have been started automatically
+        // so enter standby so that the machine can
+        // shutdown again as soon as possible if necessary.
+        standbyScreen();
     }
 
     int ret = qApp->exec();

@@ -1,6 +1,7 @@
 #ifndef MYTHTIMER_H_
 #define MYTHTIMER_H_
 
+#include <inttypes.h>
 #include <QElapsedTimer>
 #include "mythbaseexp.h"
 

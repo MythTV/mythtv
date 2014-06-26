@@ -788,8 +788,10 @@ switch ($tools.Get_Item( 'FFmpeg'))
         if ($VCVerStr -eq "Visual Studio 10")
         {
             $vs2010inc = "$rootPath/platform/win32/msvc/include-2010"
-            $ffmpegExtra = $ffmpegExtra + " -I $vs2010inc"
+            $ffmpegExtra = $ffmpegExtra + " -I$vs2010inc"
         }
+
+        Write-Host "ffmpegExtra = [$ffmpegExtra]"
 
         $FFmegsConfigure = "./configure --toolchain=msvc "        + `
                                        "--enable-shared "         + `
@@ -798,6 +800,8 @@ switch ($tools.Get_Item( 'FFmpeg'))
                                        "--shlibdir=$OutPath "     + `
                                        "--extra-cflags='$ffmpegExtra' "      + `
                                        "--extra-cxxflags='$ffmpegExtra' "    + `
+                                       "--host-cflags='$ffmpegExtra' "    + `
+                                       "--host-cppflags='$ffmpegExtra' "    + `
                                        "--disable-decoder=mpeg_xvmc"
 
         Out-File $scriptFile         -Encoding Ascii -InputObject "cd $rootPath/external/FFmpeg"
