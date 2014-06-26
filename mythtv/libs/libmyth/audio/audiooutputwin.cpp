@@ -151,9 +151,15 @@ AudioOutputSettings* AudioOutputWin::GetOutputSettings(bool /*digital*/)
     // Support all standard formats
     settings->AddSupportedFormat(FORMAT_U8);
     settings->AddSupportedFormat(FORMAT_S16);
+#if 0 // 24-bit integer is not supported
     settings->AddSupportedFormat(FORMAT_S24);
+#endif
+#if 0 // 32-bit integer (OGG) is not supported on all platforms.
     settings->AddSupportedFormat(FORMAT_S32);
+#endif
+#if 0 // 32-bit floating point (AC3) is not supported on all platforms.
     settings->AddSupportedFormat(FORMAT_FLT);
+#endif
 
     // Guess that we can do up to 5.1
     for (uint i = 2; i < 7; i++)

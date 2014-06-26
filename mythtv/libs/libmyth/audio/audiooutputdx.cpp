@@ -420,15 +420,20 @@ AudioOutputSettings* AudioOutputDX::GetOutputSettings(bool passthrough)
            (rate <= devcaps.dwMaxSecondarySampleRate))
             settings->AddSupportedRate(rate);
 
-    /* We can only test for 8 and 16 bit support, DS uses float internally
-       Guess that we can support S24 and S32 too */
+    /* We can only test for 8 and 16 bit support, DS uses float internally */
     if (devcaps.dwFlags & DSCAPS_PRIMARY8BIT)
         settings->AddSupportedFormat(FORMAT_U8);
     if (devcaps.dwFlags & DSCAPS_PRIMARY16BIT)
         settings->AddSupportedFormat(FORMAT_S16);
+#if 0 // 24-bit integer is not supported
     settings->AddSupportedFormat(FORMAT_S24);
+#endif
+#if 0 // 32-bit integer (OGG) is not supported on all platforms.
     settings->AddSupportedFormat(FORMAT_S32);
+#endif
+#if 0 // 32-bit floating point (AC3) is not supported on all platforms.
     settings->AddSupportedFormat(FORMAT_FLT);
+#endif
 
     /* No way to test anything other than mono or stereo, guess that we can do
        up to 5.1 */
