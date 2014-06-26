@@ -10,11 +10,11 @@
     background-color: #444444;
     border-radius: 6px 6px 6px 6px;
     float: left;
-    height: 300px;
+    height: 220px;
     overflow: hidden;
+    width:200px;
     margin-right:25px;
     margin-bottom: 25px;
-    width: 250px;
     right: 0px;
 
 }
@@ -41,16 +41,28 @@
     display: block;
     font-size: 1.0em;
     font-weight: bold;
+    cursor: pointer; cursor: hand
 
 }
 .videoArtwork
 {
-    margin:5px 5px auto 10px;
-    border: 1px solid #222222;
-    float: left;
     width: 100px;
+    margin:10px auto;
+    cursor: pointer; cursor: hand
 }
 .videoDescription
 {
     float:left;
+}
+.videoDetailOverlay
+{
+    position:fixed;
+    top: 50%;
+    left: 50%;
+    width:30em;
+    height:18em;
+    margin-top: -9em; /*set to a negative number 1/2 of your height*/
+    margin-left: -15em; /*set to a negative number 1/2 of your width*/
+    border: 1px solid #ccc;
+    background-color: #f3f3f3;
 }

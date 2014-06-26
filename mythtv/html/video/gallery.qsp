@@ -1,5 +1,6 @@
 
 <link rel="stylesheet" type="text/css" href="/video/css/gallery.css">
+<script src="/video/js/gallery.js"></script>
 <div class="galleryList">
     <%
 
@@ -16,7 +17,7 @@
             var thisVideo = videoList.VideoMetadataInfos[listIdx];
             var thisArtwork = videoList.VideoMetadataInfos[listIdx].Artwork;
             var artworkLength = thisArtwork.ArtworkInfos.length;
-            var artworkURL = "";
+            var artworkURL = "/video/images/unknown.png";
 
             if(artworkLength > 0)
             {
@@ -35,13 +36,15 @@
     %>
         <div class="videoBox">
             <div class="videoHeader">
-                <div class="videoTitle">
+                <div class="videoTitle" onClick="showVideoDetail(<%=thisVideo.Id%>);">
                     <%=thisVideo.Title%>
                 </div>
             </div>
 
-            <img class="videoArtwork" src="<%=artworkURL%>" />
-            <%=description%>
+            <div class="videoArtwork" onClick="showVideoDetail(<%=thisVideo.Id%>);">
+                <img width=100 src="<%=artworkURL%>" />
+            </div>
+
 
         </div>
     <%
