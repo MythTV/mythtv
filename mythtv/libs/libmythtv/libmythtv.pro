@@ -858,7 +858,7 @@ LIBS += $$EXTRA_LIBS $$QMAKE_LIBS_DYNLOAD
     using_mheg: POST_TARGETDEPS += ../libmythfreemheg/libmythfreemheg-$${MYTH_SHLIB_EXT}
     using_live: POST_TARGETDEPS += ../libmythlivemedia/libmythlivemedia-$${MYTH_SHLIB_EXT}
     using_hdhomerun: POST_TARGETDEPS += ../../external/libhdhomerun/libmythhdhomerun-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
-    using_backend: POST_TARGETDEPS += ../../external/minilzo/libmythminilzo-$${MYTH_SHLIB_EXT}
+    using_backend: POST_TARGETDEPS += ../../external/minilzo/libmythminilzo-$${MYTH_LIB_EXT}
 }
 
 include ( ../libs-targetfix.pro )
