@@ -1,6 +1,6 @@
 include ../config.mak
 
-SUBDIRS = FFmpeg qjson libmythbluray libmythdvdnav libsamplerate
+SUBDIRS = FFmpeg qjson libmythbluray libmythdvdnav libsamplerate minilzo
 ifeq ($(CONFIG_MYTHLOGSERVER),yes)
     SUBDIRS += zeromq nzmqt
 endif
@@ -63,4 +63,7 @@ libmythdvdnav-all libmythdvdnav-clean libmythdvdnav-distclean libmythdvdnav-inst
 
 libsamplerate-all libsamplerate-clean libsamplerate-distclean libsamplerate-install libsamplerate-uninstall:
 	${MAKE} -C libsamplerate ${@:libsamplerate-%=%}
+
+minilzo-all minilzo-clean minilzo-distclean minilzo-install minilzo-uninstall:
+	${MAKE} -C minilzo ${@:minilzo-%=%}
 

@@ -571,7 +571,7 @@ using_backend {
 
     # Simple NuppelVideo Recorder
     INCLUDEPATH += ../../external/minilzo
-    DEPENDPATH += ../../external/libsamplerate
+    DEPENDPATH += ../../external/minilzo
     using_ffmpeg_threads:DEFINES += USING_FFMPEG_THREADS
     !mingw:!win32-msvc*:HEADERS += recorders/NuppelVideoRecorder.h
     HEADERS += recorders/RTjpegN.h
@@ -845,7 +845,7 @@ using_mheg: LIBS += -L../libmythfreemheg -lmythfreemheg-$$LIBVERSION
 using_live: LIBS += -L../libmythlivemedia -lmythlivemedia-$$LIBVERSION
 using_hdhomerun: LIBS += -L../../external/libhdhomerun -lmythhdhomerun-$$LIBVERSION
 using_backend: LIBS += -lmp3lame
-using_backend: LIBS += -L../../external/minilzo -lmythminilzo-$${LIBVERSION}
+using_backend: LIBS += -L../../external/minilzo -lmythminilzo-$$LIBVERSION
 LIBS += $$EXTRA_LIBS $$QMAKE_LIBS_DYNLOAD
 
 !win32-msvc* {

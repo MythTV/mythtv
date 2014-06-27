@@ -7222,6 +7222,8 @@ echo "Configuring libmythdvdnav..."
 echo "Configuring libsamplerate..."
 (cd external/libsamplerate ; \
        ${qmakeconf} -o Makefile)
-
+echo "Configuring minilzo..."
+(cd external/minilzo ; \
+       ${qmakeconf} -o Makefile)
 
 test -n "$WARNINGS" && printf "\n$WARNINGS" || exit 0
