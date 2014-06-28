@@ -872,8 +872,7 @@ void VideoOutputOpenGL::ShowPIP(VideoFrame  *frame,
                      dvr, position,
                      QRect(0, 0, pipVideoWidth, pipVideoHeight),
                      false, options, false);
-        QSize viewport = gl_videochain ? gl_videochain->GetViewPort() :
-                                         window.GetDisplayVisibleRect().size();
+        QSize viewport = window.GetDisplayVisibleRect().size();
         gl_pipchain->SetMasterViewport(viewport);
         if (!success)
         {
@@ -898,8 +897,7 @@ void VideoOutputOpenGL::ShowPIP(VideoFrame  *frame,
             QRect(0, 0, pipVideoWidth, pipVideoHeight),
             false, options, false);
 
-        QSize viewport = gl_videochain ? gl_videochain->GetViewPort() :
-                                         window.GetDisplayVisibleRect().size();
+        QSize viewport = window.GetDisplayVisibleRect().size();
         gl_pipchain->SetMasterViewport(viewport);
 
         if (!success)

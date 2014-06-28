@@ -47,7 +47,7 @@ class YUVInfo
 {
   public:
     YUVInfo(uint w, uint h, uint size, const int *p, const int *o,
-            int aligned = 0);
+            int aligned = 64);
 
   public:
     uint width;

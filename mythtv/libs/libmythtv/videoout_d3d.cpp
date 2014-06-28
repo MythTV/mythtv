@@ -14,15 +14,12 @@ using namespace std;
 #include "mythmainwindow.h"
 #include "myth_imgconvert.h"
 #include "mythplayer.h"
+#include "mythavutil.h"
 
 #include "mmsystem.h"
 #include "tv.h"
 
 #undef UNICODE
-
-extern "C" {
-#include "libavcodec/avcodec.h"
-}
 
 const int kNumBuffers = 31;
 const int kNeedFreeFrames = 1;
@@ -464,47 +461,15 @@ void VideoOutputD3D::UpdateFrame(VideoFrame *frame, D3D9Image *img)
     uint8_t *buf = img->GetBuffer(hardware_conv, pitch);
     if (buf && hardware_conv)
     {
-        int i;
-        uint8_t *dst      = buf;
-        uint8_t *src      = frame->buf;
-        int chroma_width  = frame->width >> 1;
-        int chroma_height = frame->height >> 1;
-        int chroma_pitch  = pitch >> 1;
-        for (i = 0; i < frame->height; i++)
-        {
-            memcpy(dst, src, frame->width);
-            dst += pitch;
-            src += frame->width;
-        }
-
-        dst = buf +  (frame->height * pitch);
-        src = frame->buf + (frame->height * frame->width * 5/4);
-        for (i = 0; i < chroma_height; i++)
-        {
-            memcpy(dst, src, chroma_width);
-            dst += chroma_pitch;
-            src += chroma_width;
-        }
-
-        dst = buf + (frame->height * pitch * 5/4);
-        src = frame->buf + (frame->height * frame->width);
-        for (i = 0; i < chroma_height; i++)
-        {
-            memcpy(dst, src, chroma_width);
-            dst += chroma_pitch;
-            src += chroma_width;
-        }
+        copybuffer(buf, frame, pitch);
     }
     else if (buf && !hardware_conv)
     {
-        AVPicture image_in, image_out;
+        AVPicture image_out;
         avpicture_fill(&image_out, (uint8_t*)buf,
                        PIX_FMT_RGB32, frame->width, frame->height);
         image_out.linesize[0] = pitch;
-        avpicture_fill(&image_in, frame->buf,
-                       PIX_FMT_YUV420P, frame->width, frame->height);
-        myth_sws_img_convert(&image_out, PIX_FMT_RGB32, &image_in,
-                             PIX_FMT_YUV420P, frame->width, frame->height);
+        AVPictureCopy(&image_out, frame,(uint8_t*)buf, PIX_FMT_RGB32);
     }
     img->ReleaseBuffer();
 }

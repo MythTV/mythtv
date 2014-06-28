@@ -38,7 +38,7 @@ extern "C" {
  * the software scaler (swscale).
  */
 MTV_PUBLIC int myth_sws_img_convert(AVPicture *dst, PixelFormat dst_pix_fmt,
-                                 AVPicture *src, PixelFormat pix_fmt,
-                                 int width, int height);
+                                    const AVPicture *src, PixelFormat pix_fmt,
+                                    int width, int height);
 
 #endif /* MYTH_IMGCONVERT_H */

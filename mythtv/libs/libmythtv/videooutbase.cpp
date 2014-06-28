@@ -15,6 +15,7 @@
 #include "mythpainter_yuva.h"
 #include "util-osd.h"
 #include "mythxdisplay.h"
+#include "mythavutil.h"
 
 #ifdef USING_XV
 #include "videoout_xv.h"
@@ -998,9 +999,10 @@ void VideoOutput::DoPipResize(int pipwidth, int pipheight)
     pip_video_size   = vid_size;
     pip_display_size = pip_desired_display_size;
 
-    int sz = pip_display_size.height() * pip_display_size.width() * 3 / 2;
-    pip_tmp_buf = new unsigned char[sz];
-    pip_tmp_buf2 = new unsigned char[sz];
+    int sz = buffersize(FMT_YV12,
+                        pip_display_size.width(), pip_display_size.height());
+    pip_tmp_buf = (unsigned char*)av_malloc(sz);
+    pip_tmp_buf2 = (unsigned char*)av_malloc(sz);
 
     pip_scaling_context = sws_getCachedContext(pip_scaling_context,
                               pip_video_size.width(), pip_video_size.height(),
@@ -1021,14 +1023,12 @@ void VideoOutput::ShutdownPipResize(void)
 {
     if (pip_tmp_buf)
     {
-        delete [] pip_tmp_buf;
-        pip_tmp_buf   = NULL;
+        av_freep(&pip_tmp_buf);
     }
 
     if (pip_tmp_buf2)
     {
-        delete [] pip_tmp_buf2;
-        pip_tmp_buf2 = NULL;
+        av_freep(&pip_tmp_buf2);
     }
 
     if (pip_scaling_context)
@@ -1108,13 +1108,11 @@ void VideoOutput::ShowPIP(VideoFrame  *frame,
         if (pip_tmp_buf && pip_scaling_context)
         {
             AVPicture img_in, img_out;
-
-            avpicture_fill(
+            int size = avpicture_fill(
                 &img_out, (uint8_t *)pip_tmp_buf, PIX_FMT_YUV420P,
                 pip_display_size.width(), pip_display_size.height());
 
-            avpicture_fill(&img_in, (uint8_t *)pipimage->buf, PIX_FMT_YUV420P,
-                           pipw, piph);
+            AVPictureFill(&img_in, pipimage);
 
             sws_scale(pip_scaling_context, img_in.data, img_in.linesize, 0,
                       piph, img_out.data, img_out.linesize);
@@ -1138,11 +1136,17 @@ void VideoOutput::ShowPIP(VideoFrame  *frame,
             {
                 pipbuf = pip_tmp_buf;
             }
-
+            int pitches[3] = { img_out.linesize[0],
+                               img_out.linesize[1],
+                               img_out.linesize[2] };
+            int offsets[3] = { 0,
+                               img_out.data[1] - img_out.data[0],
+                               img_out.data[2] - img_out.data[0] };
             pipw = pip_display_size.width();
             piph = pip_display_size.height();
 
-            init(&pip_tmp_image, FMT_YV12, pipbuf, pipw, piph, sizeof(*pipbuf));
+            init(&pip_tmp_image, FMT_YV12, pipbuf, pipw, piph, size,
+                 pitches, offsets);
         }
     }
 
@@ -1507,53 +1511,7 @@ void VideoOutput::CopyFrame(VideoFrame *to, const VideoFrame *from)
     to->frameNumber = from->frameNumber;
     to->disp_timecode = from->disp_timecode;
 
-    // guaranteed to be correct sizes.
-    if (from->size == to->size)
-        memcpy(to->buf, from->buf, from->size);
-    else if ((to->pitches[0] == from->pitches[0]) &&
-             (to->pitches[1] == from->pitches[1]) &&
-             (to->pitches[2] == from->pitches[2]))
-    {
-        memcpy(to->buf + to->offsets[0], from->buf + from->offsets[0],
-               from->pitches[0] * from->height);
-        memcpy(to->buf + to->offsets[1], from->buf + from->offsets[1],
-               from->pitches[1] * (from->height>>1));
-        memcpy(to->buf + to->offsets[2], from->buf + from->offsets[2],
-               from->pitches[2] * (from->height>>1));
-    }
-    else if ((from->height >= 0) && (to->height >= 0))
-    {
-        int f[3] = { from->height,   from->height>>1, from->height>>1, };
-        int t[3] = { to->height,     to->height>>1,   to->height>>1,   };
-        int h[3] = { min(f[0],t[0]), min(f[1],t[1]),  min(f[2],t[2]),  };
-        for (uint i = 0; i < 3; i++)
-        {
-            for (int j = 0; j < h[i]; j++)
-            {
-                memcpy(to->buf   + to->offsets[i]   + (j * to->pitches[i]),
-                       from->buf + from->offsets[i] + (j * from->pitches[i]),
-                       min(from->pitches[i], to->pitches[i]));
-            }
-        }
-    }
-
-/* XXX: Broken.
-    if (from->qstride > 0 && from->qscale_table != NULL)
-    {
-        int tablesize = from->qstride * ((from->height + 15) / 16);
-
-        if (to->qstride != from->qstride || to->qscale_table == NULL)
-        {
-            to->qstride = from->qstride;
-            if (to->qscale_table)
-                delete [] to->qscale_table;
-
-            to->qscale_table = new unsigned char[tablesize];
-        }
-
-        memcpy(to->qscale_table, from->qscale_table, tablesize);
-    }
-*/
+    copy(to, from);
 }
 
 QRect VideoOutput::GetImageRect(const QRect &rect, QRect *display)
