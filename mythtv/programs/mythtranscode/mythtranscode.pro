@@ -34,6 +34,10 @@ DEPENDPATH += ../../libs/libavcodec
 DEPENDPATH += ../../libs/libavformat
 DEPENDPATH += ../../libs/libavutil
 DEPENDPATH += ../../libs/libmythtv/recorders
+DEPENDPATH += ../../external/minilzo
+
+LIBS += -L../../external/minilzo -lmythminilzo-$$LIBVERSION
+POST_TARGETDEPS += ../../external/minilzo/libmythminilzo-$${MYTH_LIB_EXT}
 
 !contains( CONFIG_LIBMPEG2EXTERNAL, yes) {
         DEPENDPATH += ../../libs/libmythmpeg2
