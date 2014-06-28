@@ -322,6 +322,18 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     m_topMenuSupported   = false;
     m_firstPlaySupported = false;
     const BLURAY_DISC_INFO *discinfo = bd_get_disc_info(bdnav);
+    if (!discinfo || (discinfo->aacs_detected && !discinfo->aacs_handled) ||
+        (discinfo->bdplus_detected && !discinfo->bdplus_handled))
+    {
+        // couldn't decrypt bluray
+        bd_close(bdnav);
+        bdnav = NULL;
+        lastError = tr("Could not open Blu-ray device %1, failed to decrypt")
+                    .arg(filename);
+        rwlock.unlock();
+        mythfile_open_register_callback(filename.toLocal8Bit().data(), this, NULL);
+        return false;
+    }
 
     // The following settings affect HDMV navigation
     // (default audio track selection,
