@@ -101,6 +101,10 @@
             <weight>bold</weight>
         </fontdef>
 
+        <fontdef name="clock" from="small">
+            <pixelsize>28</pixelsize>
+        </fontdef>
+
         <clock name="clock">
             <area>780,40,480,40</area>
             <font>clock</font>
