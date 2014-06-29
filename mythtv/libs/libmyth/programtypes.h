@@ -9,7 +9,7 @@
 // and for database values: hence when removing something from
 // these enums leave a gap, and when adding a new value give it
 // a explicit integer value.
-// 
+//
 //////////////////////////////////////////////////////////////////////
 
 // ANSI C
