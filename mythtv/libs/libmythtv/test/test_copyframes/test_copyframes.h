@@ -22,6 +22,7 @@
 
 #include "mythcorecontext.h"
 #include "mythframe.h"
+#include "mythavutil.h"
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 #define MSKIP(MSG) QSKIP(MSG, SkipSingle)
