@@ -136,39 +136,38 @@
                 <area>20,75,1240,100</area>
                 <state name="idle">
                     <area>0,0,1240,100</area>
-                    <!--<imagetype name="icon">-->
-                    <shape name="iconplaceholder">
+                    <imagetype name="icon">
                         <area>450,10,80,80</area>
-                        <fill color="#666666" />
-                    </shape>
-                    <!-- </imagetype>-->
+                        <filename>watermark/play.png</filename>
+                    </imagetype>
                     <textarea name="status">
-                        <area>550,15,440,80</area>
+                        <area>550,10,440,80</area>
                         <font>basemedium</font>
+                        <align>left,vcenter</align>
                         <value>Backend is idle</value>
                         <multiline>true</multiline>
                     </textarea>
                 </state>
                 <state name="recording" from="idle">
-                    <shape name="iconplaceholder">
-                        <fill color="#80DF00" />
-                    </shape>
+                    <imagetype name="icon">
+                        <filename>watermark/record.png</filename>
+                    </imagetype>
                     <textarea name="status">
                         <value>Backend is recording</value>
                     </textarea>
                 </state>
                 <state name="shuttingdown" from="idle">
-                    <shape name="iconplaceholder">
-                        <fill color="#FFFF33" />
-                    </shape>
+                    <imagetype name="icon">
+                        <filename>watermark/big_arrow_down.png</filename>
+                    </imagetype>
                     <textarea name="status">
                         <value>Backend is shutting down</value>
                     </textarea>
                 </state>
                 <state name="offline" from="idle">
-                    <shape name="iconplaceholder">
-                        <fill color="#800900" />
-                    </shape>
+                    <imagetype name="icon">
+                        <filename>watermark/error.png</filename>
+                    </imagetype>
                     <textarea name="status">
                         <value>Backend is offline</value>
                     </textarea>
