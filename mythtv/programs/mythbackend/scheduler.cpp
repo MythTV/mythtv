@@ -4437,7 +4437,7 @@ void Scheduler::GetAllScheduled(RecList &proglist, SchedSortColumn sortBy,
                                     result.value(19).toTime(), Qt::UTC);
         // Prevent invalid date/time warnings later
         if (!startts.isValid())
-            startts = QDateTime(MythDate::current().date(), QTime(0,0), 
+            startts = QDateTime(MythDate::current().date(), QTime(0,0),
                                 Qt::UTC);
         if (!endts.isValid())
             endts = startts;

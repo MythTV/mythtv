@@ -140,7 +140,7 @@ class DataDirect_config: public VerticalConfigurationGroup
 {
     Q_OBJECT
   public:
-    DataDirect_config(const VideoSource& _parent, int _ddsource); 
+    DataDirect_config(const VideoSource& _parent, int _ddsource);
 
     virtual void Load(void);
 
@@ -160,7 +160,7 @@ class DataDirect_config: public VerticalConfigurationGroup
     int source;
 };
 
-class XMLTV_generic_config: public VerticalConfigurationGroup 
+class XMLTV_generic_config: public VerticalConfigurationGroup
 {
     Q_OBJECT
 
@@ -381,7 +381,7 @@ class HDHomeRunDevice
 };
 
 typedef QMap<QString, HDHomeRunDevice> HDHomeRunDeviceList;
- 
+
 class HDHomeRunDeviceIDList;
 class HDHomeRunDeviceID;
 class HDHomeRunIP;
@@ -577,7 +577,7 @@ class DVBConfigurationGroup : public VerticalConfigurationGroup
 
     virtual void Save(void);
     virtual void Save(QString /*destination*/) { Save(); }
-    
+
   public slots:
     void probeCard(const QString& cardNumber);
     void DiSEqCPanel(void);
@@ -745,7 +745,7 @@ class MTV_PUBLIC VideoSourceEditor : public QObject, public ConfigurationDialog
     virtual MythDialog* dialogWidget(MythMainWindow* parent,
                                      const char* widgetName=0);
 
-    bool cardTypesInclude(const int& SourceID, 
+    bool cardTypesInclude(const int& SourceID,
                           const QString& thecardtype);
 
     virtual DialogCode exec(void);
