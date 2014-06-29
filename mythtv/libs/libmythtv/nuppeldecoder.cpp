@@ -24,6 +24,7 @@ using namespace std;
 #include "programinfo.h"
 #include "audiooutpututil.h"
 #include "mythavutil.h"
+#include "fourcc.h"
 
 #include "minilzo.h"
 
@@ -49,14 +50,13 @@ NuppelDecoder::NuppelDecoder(MythPlayer *parent,
       directframe(NULL),            decoded_video_frame(NULL),
       mpa_vidcodec(0), mpa_vidctx(0), mpa_audcodec(0), mpa_audctx(0),
       directrendering(false),
-      lastct('1'), strm_buf(0), strm(0), buf(0), buf2(0),
+      lastct('1'), strm(0), buf(0), buf2(0),
       videosizetotal(0), videoframesread(0), setreadahead(false)
 {
     // initialize structures
     memset(&fileheader, 0, sizeof(rtfileheader));
     memset(&frameheader, 0, sizeof(rtframeheader));
     memset(&extradata, 0, sizeof(extendeddata));
-    memset(&tmppicture, 0, sizeof(AVPicture));
     planes[0] = planes[1] = planes[2] = 0;
     m_audioSamples = (uint8_t *)av_mallocz(AudioOutputUtil::MAX_SIZE_BUFFER);
 
@@ -91,11 +91,11 @@ NuppelDecoder::~NuppelDecoder()
     if (ffmpeg_extradata)
         delete [] ffmpeg_extradata;
     if (buf)
-        delete [] buf;
+        av_freep(&buf);
     if (buf2)
-        delete [] buf2;
-    if (strm_buf)
-        delete [] strm_buf;
+        av_freep(&buf2);
+    if (strm)
+        av_freep(&strm);
 
     av_freep(&m_audioSamples);
 
@@ -617,9 +617,8 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     ringBuffer->Seek(startpos, SEEK_SET);
 
-    buf = new unsigned char[video_size];
-    strm_buf = new unsigned char[video_size * 2 + 16];
-    strm = (unsigned char*) (((long)strm_buf + 15) & ~0xf);
+    buf = (unsigned char*)av_malloc(video_size);
+    strm = (unsigned char*)av_malloc(video_size * 2);
 
     if (hasFullPositionMap)
         return 1;
@@ -819,17 +818,9 @@ void NuppelDecoder::CloseAVCodecAudio(void)
 static void CopyToVideo(unsigned char *buf, int video_width,
                         int video_height, VideoFrame *frame)
 {
-    uint ysize = video_width * video_height;
-    uint uvsize = ysize >> 2;
-
-    unsigned char *planes[3];
-    planes[0] = buf;
-    planes[1] = planes[0] + ysize;
-    planes[2] = planes[1] + uvsize;
-
-    memcpy(frame->buf + frame->offsets[0], planes[0], ysize);
-    memcpy(frame->buf + frame->offsets[1], planes[1], uvsize);
-    memcpy(frame->buf + frame->offsets[2], planes[2], uvsize);
+    (void)video_width;
+    (void)video_height;
+    copybuffer(frame, buf, frame->width);
 }
 
 bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
@@ -839,26 +830,30 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
     lzo_uint out_len;
     int compoff = 0;
 
-    unsigned char *outbuf = frame->buf;
     directframe = frame;
 
     if (!buf2)
     {
-        buf2 = new unsigned char[video_size + 64];
+        buf2 = (unsigned char*)av_malloc(video_size + 64);
         planes[0] = buf;
         planes[1] = planes[0] + video_width * video_height;
         planes[2] = planes[1] + (video_width * video_height) / 4;
     }
 
-    if (frameheader->comptype == 'N') {
-        memset(outbuf, 0, video_width * video_height);
-        memset(outbuf + video_width * video_height, 127,
-               (video_width * video_height)/2);
+    if (frameheader->comptype == 'N')
+    {
+        memset(frame->buf, 0, frame->pitches[0] * video_height);
+        memset(frame->buf + frame->offsets[1], 127,
+               frame->pitches[1] * frame->height / 2);
+        memset(frame->buf + frame->offsets[2], 127,
+               frame->pitches[2] * frame->height / 2);
         return true;
     }
 
-    if (frameheader->comptype == 'L') {
-        switch(lastct) {
+    if (frameheader->comptype == 'L')
+    {
+        switch(lastct)
+        {
             case '0': case '3':
                 CopyToVideo(buf2, video_width, video_height, frame);
                 break;
@@ -962,13 +957,8 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
         if (directrendering)
             return true;
 
-        avpicture_fill(&tmppicture, outbuf, PIX_FMT_YUV420P, video_width,
-                       video_height);
-
         AVFrame *tmp = mpa_pic;
-        myth_sws_img_convert(
-            &tmppicture, PIX_FMT_YUV420P, (AVPicture *)tmp,
-                    mpa_vidctx->pix_fmt, video_width, video_height);
+        AVPictureCopy(frame, (AVPicture*)tmp, mpa_vidctx->pix_fmt);
     }
 
     return true;

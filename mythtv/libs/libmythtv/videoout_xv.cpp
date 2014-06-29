@@ -46,6 +46,7 @@ using namespace std;
 #include "mythmainwindow.h"
 #include "myth_imgconvert.h"
 #include "mythuihelper.h"
+#include "mythavutil.h"
 
 #define LOC      QString("VideoOutputXv: ")
 
@@ -524,12 +525,13 @@ void VideoOutputXv::CreatePauseFrame(VOSType subtype)
 {
     if (av_pause_frame.buf)
     {
-        delete [] av_pause_frame.buf;
+        av_freep(&av_pause_frame.buf);
         av_pause_frame.buf = NULL;
     }
 
-    init(&av_pause_frame, FMT_YV12,
-         new unsigned char[vbuffers.GetScratchFrame()->size + 128],
+    unsigned char* buf =
+        (unsigned char*)av_malloc(vbuffers.GetScratchFrame()->size + 128);
+    init(&av_pause_frame, FMT_YV12, buf,
          vbuffers.GetScratchFrame()->width,
          vbuffers.GetScratchFrame()->height,
          vbuffers.GetScratchFrame()->size);
@@ -1277,7 +1279,7 @@ void VideoOutputXv::DeleteBuffers(VOSType subtype, bool delete_pause_frame)
     {
         if (av_pause_frame.buf)
         {
-            delete [] av_pause_frame.buf;
+            av_freep(&av_pause_frame.buf);
             av_pause_frame.buf = NULL;
         }
         if (av_pause_frame.qscale_table)
@@ -1436,22 +1438,22 @@ void VideoOutputXv::PrepareFrameMem(VideoFrame *buffer, FrameScanType /*scan*/)
 
     int out_width  = display_visible_rect.width()  & ~0x1;
     int out_height = display_visible_rect.height() & ~0x1;
-    unsigned char *sbuf = new unsigned char[out_width * out_height * 3 / 2];
     AVPicture image_in, image_out;
-    static struct SwsContext  *scontext;
-
-    avpicture_fill(&image_out, (uint8_t *)sbuf, PIX_FMT_YUV420P,
-                   out_width, out_height);
+    static struct SwsContext  *scontext = NULL;
 
     if ((out_width  == width) &&
         (out_height == height))
     {
-        memcpy(sbuf, buffer->buf, width * height * 3 / 2);
+        AVPictureCopy(&image_out, buffer);
     }
     else
     {
-        avpicture_fill(&image_in, buffer->buf, PIX_FMT_YUV420P,
-                       width, height);
+        int size = buffersize(FMT_YV12, out_width, out_height);
+        unsigned char *sbuf = (unsigned char*)av_malloc(size);
+
+        avpicture_fill(&image_out, (uint8_t *)sbuf, PIX_FMT_YUV420P,
+                       out_width, out_height);
+        AVPictureFill(&image_in, buffer);
         scontext = sws_getCachedContext(scontext, width, height,
                        PIX_FMT_YUV420P, out_width,
                        out_height, PIX_FMT_YUV420P,
@@ -1482,7 +1484,7 @@ void VideoOutputXv::PrepareFrameMem(VideoFrame *buffer, FrameScanType /*scan*/)
         disp->Unlock();
     }
 
-    delete [] sbuf;
+    av_freep(&image_out.data[0]);
 }
 
 // this is documented in videooutbase.cpp

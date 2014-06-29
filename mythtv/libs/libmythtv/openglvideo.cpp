@@ -4,11 +4,7 @@
 #include "openglvideo.h"
 #include "myth_imgconvert.h"
 #include "mythrender_opengl.h"
-
-// AVLib header
-extern "C" {
-#include "libavcodec/avcodec.h"
-}
+#include "mythavutil.h"
 
 #define LOC QString("GLVid: ")
 #define COLOUR_UNIFORM "m_colourMatrix"
@@ -141,7 +137,7 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
     display_visible_rect  = displayVisibleRect;
     display_video_rect    = displayVideoRect;
     video_rect            = videoRect;
-    masterViewportSize    = QSize(1920, 1080);
+    masterViewportSize    = display_visible_rect.size();
     frameBufferRect       = QRect(QPoint(0,0), video_disp_dim);
     softwareDeinterlacer  = "";
     hardwareDeinterlacing = false;
@@ -813,7 +809,7 @@ void OpenGLVideo::UpdateInputFrame(const VideoFrame *frame, bool soft_bob)
         MYTHTV_UYVY == videoTextureType)
     {
         // software conversion
-        AVPicture img_in, img_out;
+        AVPicture img_out;
         PixelFormat out_fmt = PIX_FMT_BGRA;
         if ((GL_YCBCR_MESA == videoTextureType) ||
             (GL_YCBCR_422_APPLE == videoTextureType) ||
@@ -821,13 +817,7 @@ void OpenGLVideo::UpdateInputFrame(const VideoFrame *frame, bool soft_bob)
         {
             out_fmt = PIX_FMT_UYVY422;
         }
-
-        avpicture_fill(&img_out, (uint8_t *)buf, out_fmt,
-                       frame->width, frame->height);
-        avpicture_fill(&img_in, (uint8_t *)frame->buf, PIX_FMT_YUV420P,
-                       frame->width, frame->height);
-        myth_sws_img_convert(&img_out, out_fmt, &img_in, PIX_FMT_YUV420P,
-                       frame->width, frame->height);
+        AVPictureCopy(&img_out, frame, (unsigned char*)buf, out_fmt);
     }
     else if (frame->interlaced_frame && !soft_bob)
     {

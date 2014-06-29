@@ -33,6 +33,7 @@ using namespace std;
 #include "vbitext/cc.h"
 #include "vbitext/vbi.h"
 #include "mythavutil.h"
+#include "fourcc.h"
 
 #if HAVE_BIGENDIAN
 extern "C" {

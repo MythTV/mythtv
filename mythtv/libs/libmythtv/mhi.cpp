@@ -1858,7 +1858,7 @@ void MHIBitmap::CreateFromMPEG(const unsigned char *data, int length)
         memset(&retbuf, 0, sizeof(AVPicture));
 
         int bufflen = nContentWidth * nContentHeight * 3;
-        unsigned char *outputbuf = new unsigned char[bufflen];
+        unsigned char *outputbuf = (unsigned char*)av_malloc(bufflen);
 
         avpicture_fill(&retbuf, outputbuf, PIX_FMT_RGB24,
                        nContentWidth, nContentHeight);
@@ -1882,7 +1882,7 @@ void MHIBitmap::CreateFromMPEG(const unsigned char *data, int length)
                 m_image.setPixel(j, i, qRgb(red, green, blue));
             }
         }
-        delete [] outputbuf;
+        av_freep(&outputbuf);
     }
 
 Close:

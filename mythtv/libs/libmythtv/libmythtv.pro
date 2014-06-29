@@ -245,7 +245,8 @@ SOURCES += srtwriter.cpp
 
 inc.path = $${PREFIX}/include/mythtv/
 inc.files  = playgroup.h
-inc.files += mythtvexp.h            metadataimagehelper.h mythavutil.h
+inc.files += mythtvexp.h            metadataimagehelper.h
+inc.files += mythavutil.h           mythframe.h
 
 INSTALLS += inc
 

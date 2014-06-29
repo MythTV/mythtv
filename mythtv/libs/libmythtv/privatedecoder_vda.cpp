@@ -9,6 +9,8 @@
 #include "myth_imgconvert.h"
 #include "util-osx-cocoa.h"
 #include "privatedecoder_vda.h"
+#include "mythavutil.h"
+
 #ifdef USING_QUARTZ_VIDEO
 #undef CodecType
 #import  "QuickTime/ImageCompression.h"
@@ -655,26 +657,19 @@ int  PrivateDecoderVDA::GetFrame(AVStream *stream,
     VideoFrame *frame         = (VideoFrame*)picture->opaque;
 
     PixelFormat in_fmt  = PIX_FMT_NONE;
-    PixelFormat out_fmt = PIX_FMT_NONE;
     if (vdaframe.format == 'BGRA')
         in_fmt = PIX_FMT_BGRA;
     else if (vdaframe.format == '2vuy')
         in_fmt = PIX_FMT_UYVY422;
 
-    if (frame->codec == FMT_YV12)
-        out_fmt = PIX_FMT_YUV420P;
-
-    if (out_fmt != PIX_FMT_NONE && in_fmt != PIX_FMT_NONE && frame->buf)
+    if (frame->codec == FMT_YV12 && in_fmt != PIX_FMT_NONE && frame->buf)
     {
         CVPixelBufferLockBaseAddress(vdaframe.buffer, 0);
         uint8_t* base = (uint8_t*)CVPixelBufferGetBaseAddressOfPlane(vdaframe.buffer, 0);
-        AVPicture img_in, img_out;
-        avpicture_fill(&img_out, (uint8_t *)frame->buf, out_fmt,
-                       frame->width, frame->height);
+        AVPicture img_in;
         avpicture_fill(&img_in, base, in_fmt,
                        frame->width, frame->height);
-        myth_sws_img_convert(&img_out, out_fmt, &img_in, in_fmt,
-                       frame->width, frame->height);
+        AVPictureCopy(frame, &img_in, in_fmt);
         CVPixelBufferUnlockBaseAddress(vdaframe.buffer, 0);
     }
     else
