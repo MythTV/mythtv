@@ -2,6 +2,7 @@
 #include "myth_imgconvert.h"
 #include "mythlogging.h"
 #include "mythavutil.h"
+#include "fourcc.h"
 
 #define LOC  QString("CrystalHD: ")
 #define ERR  QString("CrystalHD Err: ")
