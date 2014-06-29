@@ -86,9 +86,9 @@
 
     <window name="standbymode">
         <area>0,-1,100%,400</area>
-        <shape name="background">
+        <shape name="background" from="basebackground">
             <area>0,0,100%,100%</area>
-            <fill color="#000000" alpha="200" />
+            <fill color="#000000" alpha="255" />
         </shape>
 
         <fontdef name="info" from="basesmall">
@@ -107,10 +107,6 @@
 
         <group name="popup">
             <area>0,0,1280,400</area>
-            <shape name="background" from="basebackground">
-                <area>0,0,100%,100%</area>
-                <fill color="#000000" alpha="255" />
-            </shape>
 
             <textarea name="heading">
                 <area>20,20,1240,40</area>
