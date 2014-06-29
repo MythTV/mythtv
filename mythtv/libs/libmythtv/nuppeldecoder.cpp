@@ -24,6 +24,7 @@ using namespace std;
 #include "programinfo.h"
 #include "audiooutpututil.h"
 #include "mythavutil.h"
+#include "fourcc.h"
 
 #include "minilzo.h"
 

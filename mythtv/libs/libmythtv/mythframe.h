@@ -3,7 +3,6 @@
 
 #include <string.h>
 #include <stdint.h>
-#include "fourcc.h"
 #include "mythtvexp.h" // for MUNUSED
 
 #ifdef __cplusplus
