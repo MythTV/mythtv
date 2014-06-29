@@ -1,13 +1,21 @@
 
 <link rel="stylesheet" type="text/css" href="/video/css/gallery.css">
 <script src="/video/js/gallery.js"></script>
+
+
+<div id="videoOverlay" class="videoOverlay">
+    <div id="videoDetailBox" class="videoDetailBox">
+        TEST
+    </div>
+</div>
+
+
 <div class="galleryList">
+
     <%
 
         var video = new Video();
         var videoList = video.GetVideoList("","",false, 0, 0);
-
-
     %>
 
     <%
@@ -31,9 +39,8 @@
             }
 
             var description = thisVideo.Description;
-
-
     %>
+
         <div class="videoBox">
             <div class="videoHeader">
                 <div class="videoTitle" onClick="showVideoDetail(<%=thisVideo.Id%>);">
@@ -44,11 +51,16 @@
             <div class="videoArtwork" onClick="showVideoDetail(<%=thisVideo.Id%>);">
                 <img width=100 src="<%=artworkURL%>" />
             </div>
-
-
         </div>
     <%
         }
      %>
 
+
 </div>
+
+
+
+
+
+

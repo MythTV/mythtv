@@ -54,15 +54,123 @@
 {
     float:left;
 }
-.videoDetailOverlay
+.videoDetailBox
 {
     position:fixed;
     top: 50%;
     left: 50%;
-    width:30em;
-    height:18em;
-    margin-top: -9em; /*set to a negative number 1/2 of your height*/
-    margin-left: -15em; /*set to a negative number 1/2 of your width*/
-    border: 1px solid #ccc;
-    background-color: #f3f3f3;
+    width:750px;
+    height:400px;
+    margin-top: -200px; /*set to a negative number 1/2 of your height*/
+    margin-left: -375px; /*set to a negative number 1/2 of your width*/
+    background-color: #000000;
+    border: 1px solid: #222;
+    border-radius: 6px 6px 6px 6px;
+    padding: 20px 10px 10px 10px;
+    z-index:101;
 }
+.videoOverlay
+{
+    position: fixed;
+    background-color: rgba(22, 22, 22, 0.75);
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+    display: none;
+}
+
+
+/*Items specific to the video detail popup*/
+.detailTitle
+{
+    width:100%;
+    text-align:center;
+    font-weight: bold;
+    font-size: 1.5em;
+    margin-bottom: 15px;
+}
+.detailCoverart
+{
+    float:left;
+    width:200px;
+    height:300px;
+    position: relative;
+    left: 15px;
+}
+.detailText
+{
+    float:left;
+    width: 500px;
+    height: 200px;
+    padding: 10px;
+    position: relative;
+    left: 25px;
+    overflow: auto;
+
+
+}
+.detailFineDetail
+{
+    float:left;
+    width: 500px;
+    height: 60px;
+    padding: 10px;
+    position: relative;
+    left: 25px;
+    overflow: auto;
+
+}
+.detailDirector
+{
+    float:left;
+}
+.detailYear
+{
+    float: right;
+}
+.detailRuntime
+{
+    margin-top:5px;
+    clear:left;
+    float: left;
+}
+.detailUserRating
+{
+    margin-top:5px;
+    margin-left:40px;
+    float: left;
+}
+.detailFilmRating
+{
+    margin-top:5px;
+    margin-left:40px;
+    float: left;
+}
+.detailButtonContainer
+{
+    width: 500px;
+    float:right;
+}
+.detailDoneButton
+{
+    margin-left: 20px;
+    float: left;
+    width: 200px;
+}
+.detailDoneButton button
+{
+    width: 200px;
+}
+.detailPlayButton
+{
+    float: right;
+    margin-right: 20px;
+    width: 200px;
+}
+.detailPlayButton button
+{
+    width: 200px;
+}
+
