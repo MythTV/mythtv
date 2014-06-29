@@ -86,5 +86,131 @@
 
     </window>
 
+    <window name="standbymode">
+        <fontdef name="info" from="basesmall">
+            <color>#ffffff</color>
+            <size>16</size>
+            <weight>bold</weight>
+        </fontdef>
+
+        <fontdef name="warning" from="basesmall">
+            <color>#ff0000</color>
+            <size>16</size>
+            <shadowcolor>#000000</shadowcolor>
+            <shadowoffset>2,2</shadowoffset>
+            <weight>bold</weight>
+        </fontdef>
+
+        <fontdef name="clock" from="small">
+            <pixelsize>28</pixelsize>
+        </fontdef>
+
+        <clock name="clock">
+            <area>780,40,480,40</area>
+            <font>clock</font>
+            <template>%DATE%, %TIME%</template>
+            <align>center</align>
+        </clock>
+
+        <imagetype name="watermark">
+            <position>24,28</position>
+            <filename>title/title_main.png</filename>
+        </imagetype>
+
+        <imagetype name="logo">
+            <position>30,594</position>
+            <filename>ui/mythtv_logo.png</filename>
+        </imagetype>
+
+        <group name="popup">
+            <area>0,110,1280,400</area>
+
+            <textarea name="heading">
+                <area>20,20,1240,40</area>
+                <font>baseextralarge</font>
+                <align>allcenter</align>
+                <value>MythTV is in standby</value>
+            </textarea>
+
+            <statetype name="backendstatus">
+                <area>20,75,1240,100</area>
+                <state name="idle">
+                    <area>0,0,1240,100</area>
+                    <imagetype name="icon">
+                        <area>450,10,80,80</area>
+                        <filename>watermark/play.png</filename>
+                    </imagetype>
+                    <textarea name="status">
+                        <area>550,10,440,80</area>
+                        <font>basemedium</font>
+                        <align>left,vcenter</align>
+                        <value>Backend is idle</value>
+                        <multiline>true</multiline>
+                    </textarea>
+                </state>
+                <state name="recording" from="idle">
+                    <imagetype name="icon">
+                        <filename>watermark/record.png</filename>
+                    </imagetype>
+                    <textarea name="status">
+                        <value>Backend is recording</value>
+                    </textarea>
+                </state>
+                <state name="shuttingdown" from="idle">
+                    <imagetype name="icon">
+                        <filename>watermark/big_arrow_down.png</filename>
+                    </imagetype>
+                    <textarea name="status">
+                        <value>Backend is shutting down</value>
+                    </textarea>
+                </state>
+                <state name="offline" from="idle">
+                    <imagetype name="icon">
+                        <filename>watermark/error.png</filename>
+                    </imagetype>
+                    <textarea name="status">
+                        <value>Backend is offline</value>
+                    </textarea>
+                </state>
+            </statetype>
+
+            <imagetype name="horizon_top">
+                <position>265,170</position>
+                <filename>ui/horizon.png</filename>
+                <alpha>100</alpha>
+            </imagetype>
+
+            <textarea name="nextrecordingheading">
+                <area>20,190,1240,30</area>
+                <font>basemedium</font>
+                <align>allcenter</align>
+                <value>Next recording:</value>
+            </textarea>
+            <textarea name="nextrecording">
+                <area>20,230,1240,120</area>
+                <multiline>yes</multiline>
+                <font>info</font>
+                <align>allcenter</align>
+                <value></value>
+            </textarea>
+
+            <imagetype name="horizon_bottom">
+                <position>265,349</position>
+                <filename>ui/horizon.png</filename>
+                <alpha>100</alpha>
+            </imagetype>
+
+            <!--
+                scheduled recordings conflict warning
+            -->
+            <textarea name="conflicts">
+                <area>20,360,1240,30</area>
+                <font>warning</font>
+                <align>hcenter</align>
+                <value>WARNING: There are conflicting scheduled recordings!</value>
+            </textarea>
+        </group>
+    </window>
+
 </mythuitheme>
 
