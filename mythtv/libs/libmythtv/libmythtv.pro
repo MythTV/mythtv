@@ -166,7 +166,7 @@ SOURCES += avfringbuffer.cpp
 SOURCES += ringbuffer.cpp           fileringBuffer.cpp
 SOURCES += streamingringbuffer.cpp  metadataimagehelper.cpp
 SOURCES += icringbuffer.cpp
-SOURCES += mythframe.cpp
+SOURCES += mythframe.cpp            mythavutil.cpp
 
 # DiSEqC
 HEADERS += diseqc.h                 diseqcsettings.h
@@ -246,7 +246,7 @@ SOURCES += srtwriter.cpp
 inc.path = $${PREFIX}/include/mythtv/
 inc.files  = playgroup.h
 inc.files += mythtvexp.h            metadataimagehelper.h
-inc.files += mythavutil.h           mythframe.h
+inc.files += mythavutil.h
 
 INSTALLS += inc
 
