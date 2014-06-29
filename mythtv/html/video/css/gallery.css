@@ -34,7 +34,7 @@
 }
 .videoTitle
 {
-    width:98%;
+    width:88%;
     text-overflow: ellipsis;
     overflow: hidden;
     float: left;
@@ -44,11 +44,23 @@
     cursor: pointer; cursor: hand
 
 }
+.videoFolder
+{
+    float:right;
+}
 .videoArtwork
 {
     width: 100px;
-    margin:10px auto;
-    cursor: pointer; cursor: hand
+    margin:10px auto 0px auto;
+    cursor: pointer; cursor: hand;
+}
+
+.videoSubTitle
+{
+    width:100%;
+    text-align:center;
+    font-weight: bold;
+    cursor: pointer; cursor: hand;
 }
 .videoDescription
 {

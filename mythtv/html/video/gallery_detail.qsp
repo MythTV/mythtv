@@ -43,9 +43,14 @@ import "/js/utility.js"
             var director = thisVideo.Director;
             var length = thisVideo.Length;
             var filmRating = thisVideo.Certification;
+            var subtitle = thisVideo.SubTitle;
+
+
+            if(subtitle!="")
+                subtitle=" - " + subtitle;
 %>
         <div class="detailTitle">
-           <%=thisVideo.Title %>
+           <%=thisVideo.Title %><%= subtitle%>
         </div>
         <div class="detailCoverart">
             <img src="<%=artworkURL%>" />

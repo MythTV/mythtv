@@ -21,3 +21,6 @@ function showVideoDetail(videoId)
                  $("#videoDetailBox").html(data);
               });
 }
+
+
+
