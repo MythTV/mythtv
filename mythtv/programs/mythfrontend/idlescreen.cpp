@@ -55,8 +55,8 @@ bool IdleScreen::Create(void)
     UIUtilE::Assign(this, m_statusState, "backendstatus", &err);
 
     /* nextrecording and conflicts are optional */
-    UIUtilE::Assign(this, m_scheduledText, "nextrecording");
-    UIUtilE::Assign(this, m_warningText, "conflicts");
+    UIUtilW::Assign(this, m_scheduledText, "nextrecording");
+    UIUtilW::Assign(this, m_warningText, "conflicts");
 
     if (err)
     {
