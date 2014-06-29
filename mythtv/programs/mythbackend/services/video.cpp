@@ -55,6 +55,14 @@ DTC::VideoMetadataInfoList* Video::GetVideoList( const QString &Folder,
                                                  int nStartIndex,
                                                  int nCount       )
 {
+    QString fields = "title,director,studio,plot,rating,year,releasedate,"
+                     "userrating,length,playcount,filename,hash,showlevel,"
+                     "coverfile,inetref,collectionref,homepage,childid,browse,watched,"
+                     "playcommand,category,intid,trailer,screenshot,banner,fanart,"
+                     "subtitle,tagline,season,episode,host,insertdate,processed,contenttype";
+
+    QStringList sortFields = fields.split(',');
+
     VideoMetadataListManager::metadata_list videolist;
 
     QString sql = "";
@@ -67,6 +75,8 @@ DTC::VideoMetadataInfoList* Video::GetVideoList( const QString &Folder,
         sql.append("insertdate");
     else if (sort == "released")
         sql.append("releasedate");
+    else if (sortFields.contains(sort))
+        sql.append(sort);
     else
         sql.append("intid");
 
