@@ -49,7 +49,7 @@ extern "C" {
 }
 
 // size of the buffer used for streaming
-#define BUFFER_SIZE 16384
+#define BUFFER_SIZE 65536
 
 // streaming callbacks
 static int ReadFunc(void *opaque, uint8_t *buf, int buf_size)
