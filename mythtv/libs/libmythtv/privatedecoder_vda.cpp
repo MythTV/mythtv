@@ -6,10 +6,8 @@
 #define ERR QString("VDADec error: ")
 
 #include "mythframe.h"
-#include "myth_imgconvert.h"
 #include "util-osx-cocoa.h"
 #include "privatedecoder_vda.h"
-#include "mythavutil.h"
 
 #ifdef USING_QUARTZ_VIDEO
 #undef CodecType
@@ -667,9 +665,8 @@ int  PrivateDecoderVDA::GetFrame(AVStream *stream,
         CVPixelBufferLockBaseAddress(vdaframe.buffer, 0);
         uint8_t* base = (uint8_t*)CVPixelBufferGetBaseAddressOfPlane(vdaframe.buffer, 0);
         AVPicture img_in;
-        avpicture_fill(&img_in, base, in_fmt,
-                       frame->width, frame->height);
-        AVPictureCopy(frame, &img_in, in_fmt);
+        avpicture_fill(&img_in, base, in_fmt, frame->width, frame->height);
+        m_copyCtx.Copy(frame, &img_in, in_fmt);
         CVPixelBufferUnlockBaseAddress(vdaframe.buffer, 0);
     }
     else

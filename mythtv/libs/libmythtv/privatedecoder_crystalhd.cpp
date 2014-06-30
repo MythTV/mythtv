@@ -1,7 +1,5 @@
 #include "privatedecoder_crystalhd.h"
-#include "myth_imgconvert.h"
 #include "mythlogging.h"
-#include "mythavutil.h"
 #include "fourcc.h"
 
 #define LOC  QString("CrystalHD: ")
@@ -667,7 +665,7 @@ void PrivateDecoderCrystalHD::FillFrame(BC_DTS_PROC_OUT *out)
 
     if (!(out->PicInfo.flags & VDEC_FLAG_INTERLACED_SRC))
     {
-        AVPictureCopy(m_frame, &img_in, in_fmt);
+        m_copyCtx.Copy(m_frame, &img_in, in_fmt);
         m_frame->interlaced_frame = 0;
         AddFrameToQueue();
     }
@@ -687,8 +685,7 @@ void PrivateDecoderCrystalHD::FillFrame(BC_DTS_PROC_OUT *out)
             img_out.data[1] += out_width >> 1;
             img_out.data[2] += out_width >> 1;
         }
-        myth_sws_img_convert(&img_out, out_fmt, &img_in,
-                             in_fmt, in_width, in_height / 2);
+        m_copyCtx.Copy(&img_out, out_fmt, &img_in, in_fmt, in_width, in_height / 2);
         if (second_field)
             AddFrameToQueue();
     }

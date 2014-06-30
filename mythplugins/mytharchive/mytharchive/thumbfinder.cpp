@@ -55,9 +55,6 @@
 #include <mythuibuttonlist.h>
 #include <mythimage.h>
 #include <mythconfig.h>
-extern "C" {
-#include <swscale.h>
-}
 
 #ifndef INT64_C    // Used in FFmpeg headers to define some constants
 #define INT64_C(v)   (v ## LL)
@@ -778,32 +775,6 @@ bool ThumbFinder::seekBackward()
     return true;
 }
 
-// Note: copied this function from myth_imgconvert.cpp -- dtk 2009-08-17
-static int myth_sws_img_convert(
-    AVPicture *dst, PixelFormat dst_pix_fmt, AVPicture *src,
-    PixelFormat pix_fmt, int width, int height)
-{
-    static QMutex lock;
-    QMutexLocker locker(&lock);
-
-    static struct SwsContext *convert_ctx;
-
-    convert_ctx = sws_getCachedContext(convert_ctx, width, height, pix_fmt,
-                                       width, height, dst_pix_fmt,
-                                       SWS_FAST_BILINEAR, NULL, NULL, NULL);
-    if (!convert_ctx)
-    {
-        LOG(VB_GENERAL, LOG_ERR, "myth_sws_img_convert: Cannot initialize "
-                                 "the image conversion context");
-        return -1;
-    }
-
-    sws_scale(convert_ctx, src->data, src->linesize,
-              0, height, dst->data, dst->linesize);
-
-    return 0;
-}
-
 bool ThumbFinder::getFrameImage(bool needKeyFrame, int64_t requiredPTS)
 {
     AVPacket pkt;
@@ -865,8 +836,8 @@ bool ThumbFinder::getFrameImage(bool needKeyFrame, int64_t requiredPTS)
         avpicture_deinterlace(tmp, tmp, m_codecCtx->pix_fmt,
                               m_frameWidth, m_frameHeight);
 
-        myth_sws_img_convert(&retbuf, PIX_FMT_RGB32, tmp, m_codecCtx->pix_fmt,
-                             m_frameWidth, m_frameHeight);
+        m_copy.Copy(&retbuf, PIX_FMT_RGB32, tmp, m_codecCtx->pix_fmt,
+                    m_frameWidth, m_frameHeight);
 
         QImage img(m_outputbuf, m_frameWidth, m_frameHeight,
                    QImage::Format_RGB32);

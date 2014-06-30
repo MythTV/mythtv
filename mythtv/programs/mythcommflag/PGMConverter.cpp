@@ -8,6 +8,7 @@
 #include "mythlogging.h"
 #include "mythplayer.h"
 #include "mythframe.h"          /* VideoFrame */
+#include "mythavutil.h"
 
 // Commercial Flagging headers
 #include "CommDetector2.h"
@@ -22,6 +23,7 @@ PGMConverter::PGMConverter(void)
     , height(-1)
 #ifdef PGM_CONVERT_GREYSCALE
     , time_reported(false)
+    , m_copy(NULL)
 #endif /* PGM_CONVERT_GREYSCALE */
 {
     memset(&pgm, 0, sizeof(pgm));
@@ -34,6 +36,7 @@ PGMConverter::~PGMConverter(void)
 #ifdef PGM_CONVERT_GREYSCALE
     avpicture_free(&pgm);
     memset(&pgm, 0, sizeof(pgm));
+    delete m_copy;
 #endif /* PGM_CONVERT_GREYSCALE */
 }
 
@@ -60,6 +63,11 @@ PGMConverter::MythPlayerInited(const MythPlayer *player)
                 .arg(width).arg(height));
         return -1;
     }
+    if (m_copy)
+    {
+        delete m_copy;
+    }
+    m_copy = new MythAVCopy;
     LOG(VB_COMMFLAG, LOG_INFO, QString("PGMConverter::MythPlayerInited "
                                        "using true greyscale conversion"));
 #else  /* !PGM_CONVERT_GREYSCALE */
@@ -89,7 +97,7 @@ PGMConverter::getImage(const VideoFrame *frame, long long _frameno,
 
 #ifdef PGM_CONVERT_GREYSCALE
     (void)gettimeofday(&start, NULL);
-    if (pgm_fill(&pgm, frame))
+    if (m_copy->Copy(&pgm, frame, pgm.data[0], PIX_FMT_GRAY8) < 0)
         goto error;
     (void)gettimeofday(&end, NULL);
     timersub(&end, &start, &elapsed);

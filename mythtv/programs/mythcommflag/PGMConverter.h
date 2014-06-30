@@ -13,6 +13,7 @@ extern "C" {
 
 typedef struct VideoFrame_ VideoFrame;
 class MythPlayer;
+class MythAVCopy;
 
 /*
  * PGM_CONVERT_GREYSCALE:
@@ -45,6 +46,7 @@ private:
 #ifdef PGM_CONVERT_GREYSCALE
     struct timeval  convert_time;
     bool            time_reported;
+    MythAVCopy     *m_copy;
 #endif /* PGM_CONVERT_GREYSCALE */
 };
 

@@ -54,7 +54,6 @@ using namespace std;
 #include "NuppelVideoRecorder.h"
 #include "tv_play.h"
 #include "interactivetv.h"
-#include "myth_imgconvert.h"
 #include "mythsystemevent.h"
 #include "mythpainter.h"
 #include "mythimage.h"
@@ -4374,6 +4373,7 @@ char *MythPlayer::GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
     VideoFrame    *frame     = NULL;
     AVPicture      orig;
     AVPicture      retbuf;
+    MythAVCopy     copyCtx;
     memset(&orig,   0, sizeof(AVPicture));
     memset(&retbuf, 0, sizeof(AVPicture));
 
@@ -4444,7 +4444,7 @@ char *MythPlayer::GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
 
     bufflen = video_dim.width() * video_dim.height() * 4;
     outputbuf = new unsigned char[bufflen];
-    AVPictureCopy(&retbuf, frame, outputbuf, AV_PIX_FMT_RGB32);
+    copyCtx.Copy(&retbuf, frame, outputbuf, AV_PIX_FMT_RGB32);
 
     vw = video_disp_dim.width();
     vh = video_disp_dim.height();

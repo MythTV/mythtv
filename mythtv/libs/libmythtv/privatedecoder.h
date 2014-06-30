@@ -13,6 +13,7 @@ extern "C" {
 #include "videodisplayprofile.h"
 #include "mythcodecid.h"
 #include "mythplayer.h"
+#include "mythavutil.h"
 
 class PrivateDecoder
 {
@@ -34,6 +35,9 @@ class PrivateDecoder
                           AVPacket *pkt) = 0;
     virtual bool HasBufferedFrames(void) { return false; }
     virtual bool NeedsReorderedPTS(void) { return false; }
+
+protected:
+    MythAVCopy m_copyCtx;
 };
 
 #endif // PRIVATEDECODER_H

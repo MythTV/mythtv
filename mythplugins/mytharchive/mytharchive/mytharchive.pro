@@ -14,6 +14,7 @@ LIBS += -lmythavformat
 LIBS += -lmythavcodec
 LIBS += -lmythavutil
 LIBS += -lmythmetadata-$$LIBVERSION
+LIBS += -lmythtv-$$LIBVERSION
 
 TEMPLATE = lib opengl
 CONFIG += plugin thread

@@ -10,6 +10,7 @@ using namespace std;
 #include "videooutbase.h"
 #include "videoouttypes.h"
 #include "mythrender_opengl.h"
+#include "mythavutil.h"
 
 enum OpenGLFilterType
 {
@@ -132,5 +133,6 @@ class OpenGLVideo
     uint           gl_features;
     uint           videoTextureType;
     bool           preferYCBCR;
+    MythAVCopy     m_copyCtx;
 };
 #endif // _OPENGL_VIDEO_H__

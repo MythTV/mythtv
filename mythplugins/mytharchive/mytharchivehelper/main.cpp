@@ -70,7 +70,6 @@ using namespace std;
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
-#include <libswscale/swscale.h>
 #include "pxsup2dast.h"
 }
 
@@ -1582,32 +1581,6 @@ static int doImportArchive(const QString &inFile, int chanID)
     return na.doImportArchive(inFile, chanID);
 }
 
-// Note: copied this function from myth_imgconvert.cpp -- dtk 2009-08-17
-static int myth_sws_img_convert(
-    AVPicture *dst, PixelFormat dst_pix_fmt, AVPicture *src,
-    PixelFormat pix_fmt, int width, int height)
-{
-    static QMutex lock;
-    QMutexLocker locker(&lock);
-
-    static struct SwsContext *convert_ctx;
-
-    convert_ctx = sws_getCachedContext(convert_ctx, width, height, pix_fmt,
-                                       width, height, dst_pix_fmt,
-                                       SWS_FAST_BILINEAR, NULL, NULL, NULL);
-    if (!convert_ctx)
-    {
-        LOG(VB_GENERAL, LOG_ERR, "myth_sws_img_convert: Cannot initialize "
-                                 "the image conversion context");
-        return -1;
-    }
-
-    sws_scale(convert_ctx, src->data, src->linesize,
-              0, height, dst->data, dst->linesize);
-
-    return 0;
-}
-
 static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int frameCount)
 {
     av_register_all();
@@ -1690,6 +1663,7 @@ static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int
     AVPicture retbuf;
     memset(&orig, 0, sizeof(AVPicture));
     memset(&retbuf, 0, sizeof(AVPicture));
+    MythAVCopy copyframe;
 
     int bufflen = width * height * 4;
     unsigned char *outputbuf = new unsigned char[bufflen];
@@ -1751,10 +1725,9 @@ static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int
                                               (AVPicture*)tmp,
                                               codecCtx->pix_fmt, width, height);
 
-                        myth_sws_img_convert(
-                                    &retbuf, PIX_FMT_RGB32,
-                                    (AVPicture*) tmp,
-                                    codecCtx->pix_fmt, width, height);
+                        copyframe.Copy(&retbuf, PIX_FMT_RGB32,
+                                       (AVPicture*) tmp,
+                                       codecCtx->pix_fmt, width, height);
 
                         QImage img(outputbuf, width, height,
                                    QImage::Format_RGB32);

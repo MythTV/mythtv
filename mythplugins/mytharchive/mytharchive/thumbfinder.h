@@ -81,6 +81,7 @@ class ThumbFinder : public MythScreenType
     AVCodecContext  *m_codecCtx;
     AVCodec         *m_codec;
     MythAVFrame      m_frame;
+    MythAVCopy       m_copy;
 
     float            m_fps;
     unsigned char   *m_outputbuf;

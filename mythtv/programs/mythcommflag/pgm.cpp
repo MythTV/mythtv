@@ -7,7 +7,6 @@ extern "C" {
 }
 #include "mythframe.h"
 #include "mythlogging.h"
-#include "myth_imgconvert.h"
 #include "pgm.h"
 
 // TODO: verify this
@@ -25,35 +24,6 @@ static enum PixelFormat pixelTypeOfVideoFrameType(VideoFrameType codec)
     default:            break;
     }
     return PIX_FMT_NONE;
-}
-
-int pgm_fill(AVPicture *dst, const VideoFrame *frame)
-{
-    enum PixelFormat        srcfmt;
-    AVPicture               src;
-
-    if ((srcfmt = pixelTypeOfVideoFrameType(frame->codec)) == PIX_FMT_NONE)
-    {
-        LOG(VB_COMMFLAG, LOG_ERR, QString("pgm_fill unknown codec: %1")
-                .arg(frame->codec));
-        return -1;
-    }
-
-    if (avpicture_fill(&src, frame->buf, srcfmt, frame->width,
-                frame->height) < 0)
-    {
-        LOG(VB_COMMFLAG, LOG_ERR, "pgm_fill avpicture_fill failed");
-        return -1;
-    }
-
-    if (myth_sws_img_convert(dst, PIX_FMT_GRAY8, &src, srcfmt, frame->width,
-                             frame->height))
-    {
-        LOG(VB_COMMFLAG, LOG_ERR, "pgm_fill img_convert failed");
-        return -1;
-    }
-
-    return 0;
 }
 
 int pgm_read(unsigned char *buf, int width, int height, const char *filename)
