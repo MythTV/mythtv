@@ -74,7 +74,7 @@ public:
     MythUSWCCopy(int width, bool nocache = false);
     virtual ~MythUSWCCopy();
 
-    void copy(VideoFrame *dst, VideoFrame *src);
+    void copy(VideoFrame *dst, const VideoFrame *src);
     void reset(int width);
     void resetUSWCDetection(void);
     void setUSWC(bool uswc);

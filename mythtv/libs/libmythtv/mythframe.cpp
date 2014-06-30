@@ -583,7 +583,7 @@ MythUSWCCopy::~MythUSWCCopy()
  * algorithm is the fastest.
  */
 
-void MythUSWCCopy::copy(VideoFrame *dst, VideoFrame *src)
+void MythUSWCCopy::copy(VideoFrame *dst, const VideoFrame *src)
 {
     dst->interlaced_frame = src->interlaced_frame;
     dst->repeat_pict      = src->repeat_pict;
