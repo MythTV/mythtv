@@ -1813,8 +1813,15 @@ int AudioOutputBase::GetAudioData(uchar *buffer, int size, bool full_buffer,
  */
 void AudioOutputBase::Drain()
 {
-    while (audioready() > fragment_size)
+    while (!pauseaudio && audioready() > fragment_size)
         usleep(1000);
+    if (pauseaudio)
+    {
+        // Audio is paused and can't be drained, clear ringbuffer
+        QMutexLocker lock(&audio_buflock);
+
+        waud = raud = 0;
+    }
 }
 
 /**
