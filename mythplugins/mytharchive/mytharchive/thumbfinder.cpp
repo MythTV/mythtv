@@ -88,7 +88,7 @@ ThumbFinder::ThumbFinder(MythScreenStack *parent, ArchiveItem *archiveItem,
                          const QString &menuTheme)
             :MythScreenType(parent, "ThumbFinder"),
     m_inputFC(NULL),        m_codecCtx(NULL),
-    m_codec(NULL),          m_frame(NULL),
+    m_codec(NULL),
     m_fps(0.0),             m_outputbuf(NULL),
     m_frameWidth(0),        m_frameHeight(0),
     m_videostream(0),       m_currentSeek(0),
@@ -643,8 +643,6 @@ bool ThumbFinder::initAVCodec(const QString &inFile)
     int bufflen = m_frameWidth * m_frameHeight * 4;
     m_outputbuf = new unsigned char[bufflen];
 
-    m_frame = av_frame_alloc();
-
     m_frameFile = getTempDirectory() + "work/frame.jpg";
 
     return true;
@@ -862,13 +860,13 @@ bool ThumbFinder::getFrameImage(bool needKeyFrame, int64_t requiredPTS)
     if (frameFinished)
     {
         avpicture_fill(&retbuf, m_outputbuf, PIX_FMT_RGB32, m_frameWidth, m_frameHeight);
+        AVPicture *tmp = (AVPicture*)(AVFrame*)m_frame;
 
-        avpicture_deinterlace((AVPicture*)m_frame, (AVPicture*)m_frame,
-                                m_codecCtx->pix_fmt, m_frameWidth, m_frameHeight);
+        avpicture_deinterlace(tmp, tmp, m_codecCtx->pix_fmt,
+                              m_frameWidth, m_frameHeight);
 
-        myth_sws_img_convert(
-                    &retbuf, PIX_FMT_RGB32,
-                        (AVPicture*) m_frame, m_codecCtx->pix_fmt, m_frameWidth, m_frameHeight);
+        myth_sws_img_convert(&retbuf, PIX_FMT_RGB32, tmp, m_codecCtx->pix_fmt,
+                             m_frameWidth, m_frameHeight);
 
         QImage img(m_outputbuf, m_frameWidth, m_frameHeight,
                    QImage::Format_RGB32);
@@ -898,9 +896,6 @@ void ThumbFinder::closeAVCodec()
 {
     if (m_outputbuf)
         delete[] m_outputbuf;
-
-    // free the frame
-    av_frame_free(&m_frame);
 
     // close the codec
     if (m_codecCtx)
@@ -1011,4 +1006,3 @@ int ThumbFinder::calcFinalDuration()
 
     return m_archiveItem->duration;
 }
-
