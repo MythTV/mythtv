@@ -251,34 +251,38 @@ bool avfDecoder::initialize()
     {
         // if the input is not a file then setup the buffer
         // and iocontext to stream from it
+        bool isSG = dynamic_cast<MusicSGIODevice*>(input());
         unsigned char *buffer =
-            (unsigned char*) av_malloc(BUFFER_SIZE + FF_INPUT_BUFFER_PADDING_SIZE);
+            (unsigned char*)av_malloc(BUFFER_SIZE + FF_INPUT_BUFFER_PADDING_SIZE);
         m_byteIOContext = avio_alloc_context(buffer, BUFFER_SIZE, 0, input(),
                                              &ReadFunc, &WriteFunc, &SeekFunc);
-        filename = "stream";
 
         // we can only seek in files streamed using MusicSGIODevice
-        m_byteIOContext->seekable = (dynamic_cast<MusicSGIODevice*>(input()) != NULL) ? 1 : 0;
+        m_byteIOContext->seekable = isSG;
 
-        // probe the stream
-        AVProbeData probe_data;
-        probe_data.filename = filename.toLocal8Bit().constData();
-        probe_data.buf_size = min(BUFFER_SIZE, (int) input()->bytesAvailable());
-        probe_data.buf = buffer;
-        input()->peek((char*)probe_data.buf, probe_data.buf_size);
-        m_inputFormat = av_probe_input_format(&probe_data, 1);
-
-        if (!m_inputFormat)
+        if (!isSG)
         {
-            error("Could not identify the stream type in "
-                  "avfDecoder::initialize");
-            deinit();
-            return false;
-        }
+            // probe the stream
+            filename = "stream";
+            AVProbeData probe_data;
+            probe_data.filename = filename.toLocal8Bit().constData();
+            probe_data.buf_size = min(BUFFER_SIZE, (int)input()->bytesAvailable());
+            probe_data.buf = buffer;
+            input()->peek((char*)probe_data.buf, probe_data.buf_size);
+            m_inputFormat = av_probe_input_format(&probe_data, 1);
 
-        LOG(VB_PLAYBACK, LOG_INFO,
-            QString("avfDecoder: playing stream, format probed is: %1")
-                .arg(m_inputFormat->long_name));
+            if (!m_inputFormat)
+            {
+                error("Could not identify the stream type in "
+                      "avfDecoder::initialize");
+                deinit();
+                return false;
+            }
+
+            LOG(VB_PLAYBACK, LOG_INFO,
+                QString("avfDecoder: playing stream, format probed is: %1")
+                    .arg(m_inputFormat->long_name));
+        }
     }
 
     // open the media file
