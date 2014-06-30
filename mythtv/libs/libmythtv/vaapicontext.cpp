@@ -5,7 +5,6 @@
 #include "mythframe.h"
 #include "vaapicontext.h"
 #include "mythmainwindow.h"
-#include "myth_imgconvert.h"
 
 #define LOC QString("VAAPI: ")
 #define ERR QString("VAAPI Error: ")
