@@ -44,7 +44,6 @@ class avfDecoder : public Decoder
     AVCodecContext *m_audioDec;
 
     bool m_inputIsFile;
-    unsigned char *m_buffer;
     AVIOContext *m_byteIOContext;
 
     int m_errCode;

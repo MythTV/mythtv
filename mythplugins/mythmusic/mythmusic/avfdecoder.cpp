@@ -182,8 +182,7 @@ avfDecoder::avfDecoder(const QString &file, DecoderFactory *d, AudioOutput *o) :
     m_seekTime(-1.0),             m_devicename(""),
     m_inputFormat(NULL),          m_inputContext(NULL),
     m_audioDec(NULL),             m_inputIsFile(false),
-    m_buffer(NULL),               m_byteIOContext(NULL),
-    m_errCode(0)
+    m_byteIOContext(NULL),        m_errCode(0)
 {
     setObjectName("avfDecoder");
     setFilename(file);
@@ -252,8 +251,9 @@ bool avfDecoder::initialize()
     {
         // if the input is not a file then setup the buffer
         // and iocontext to stream from it
-        m_buffer = (unsigned char*) av_malloc(BUFFER_SIZE + FF_INPUT_BUFFER_PADDING_SIZE);
-        m_byteIOContext = avio_alloc_context(m_buffer, BUFFER_SIZE, 0, input(),
+        unsigned char *buffer =
+            (unsigned char*) av_malloc(BUFFER_SIZE + FF_INPUT_BUFFER_PADDING_SIZE);
+        m_byteIOContext = avio_alloc_context(buffer, BUFFER_SIZE, 0, input(),
                                              &ReadFunc, &WriteFunc, &SeekFunc);
         filename = "stream";
 
@@ -264,7 +264,7 @@ bool avfDecoder::initialize()
         AVProbeData probe_data;
         probe_data.filename = filename.toLocal8Bit().constData();
         probe_data.buf_size = min(BUFFER_SIZE, (int) input()->bytesAvailable());
-        probe_data.buf = m_buffer;
+        probe_data.buf = buffer;
         input()->peek((char*)probe_data.buf, probe_data.buf_size);
         m_inputFormat = av_probe_input_format(&probe_data, 1);
 
@@ -406,15 +406,8 @@ void avfDecoder::deinit()
     m_audioDec = NULL;
     m_inputFormat = NULL;
 
-    if (m_buffer)
-    {
-        av_freep(&m_buffer);
-    }
-
-    if (m_byteIOContext)
-    {
-        av_freep(&m_byteIOContext);
-    }
+    av_freep(&m_byteIOContext->buffer);
+    av_freep(&m_byteIOContext);
 }
 
 void avfDecoder::run()
