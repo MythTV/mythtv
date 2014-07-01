@@ -16,6 +16,7 @@ extern "C" {
 // mytharchive
 #include "archiveutil.h"
 #include "remoteavformatcontext.h"
+#include "mythavutil.h"
 
 typedef struct SeekAmount
 {
@@ -79,7 +80,8 @@ class ThumbFinder : public MythScreenType
     RemoteAVFormatContext m_inputFC;
     AVCodecContext  *m_codecCtx;
     AVCodec         *m_codec;
-    AVFrame         *m_frame;
+    MythAVFrame      m_frame;
+    MythAVCopy       m_copy;
 
     float            m_fps;
     unsigned char   *m_outputbuf;

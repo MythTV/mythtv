@@ -12,7 +12,6 @@ using namespace std;
 #include "fourcc.h"
 #include "videodisplayprofile.h"
 #include "mythmainwindow.h"
-#include "myth_imgconvert.h"
 #include "mythplayer.h"
 #include "mythavutil.h"
 
@@ -469,7 +468,7 @@ void VideoOutputD3D::UpdateFrame(VideoFrame *frame, D3D9Image *img)
         avpicture_fill(&image_out, (uint8_t*)buf,
                        PIX_FMT_RGB32, frame->width, frame->height);
         image_out.linesize[0] = pitch;
-        AVPictureCopy(&image_out, frame,(uint8_t*)buf, PIX_FMT_RGB32);
+        m_copyFrame.Copy(&image_out, frame,(uint8_t*)buf, PIX_FMT_RGB32);
     }
     img->ReleaseBuffer();
 }

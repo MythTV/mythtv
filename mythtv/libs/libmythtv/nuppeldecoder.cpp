@@ -20,7 +20,6 @@ using namespace std;
 #include "mythplayer.h"
 #include "remoteencoder.h"
 #include "mythlogging.h"
-#include "myth_imgconvert.h"
 #include "programinfo.h"
 #include "audiooutpututil.h"
 #include "mythavutil.h"
@@ -958,7 +957,7 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
             return true;
 
         AVFrame *tmp = mpa_pic;
-        AVPictureCopy(frame, (AVPicture*)tmp, mpa_vidctx->pix_fmt);
+        copyFrame.Copy(frame, (AVPicture*)tmp, mpa_vidctx->pix_fmt);
     }
 
     return true;

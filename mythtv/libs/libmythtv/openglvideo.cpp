@@ -2,7 +2,6 @@
 #include "mythcontext.h"
 #include "tv.h"
 #include "openglvideo.h"
-#include "myth_imgconvert.h"
 #include "mythrender_opengl.h"
 #include "mythavutil.h"
 
@@ -817,7 +816,7 @@ void OpenGLVideo::UpdateInputFrame(const VideoFrame *frame, bool soft_bob)
         {
             out_fmt = PIX_FMT_UYVY422;
         }
-        AVPictureCopy(&img_out, frame, (unsigned char*)buf, out_fmt);
+        m_copyCtx.Copy(&img_out, frame, (unsigned char*)buf, out_fmt);
     }
     else if (frame->interlaced_frame && !soft_bob)
     {

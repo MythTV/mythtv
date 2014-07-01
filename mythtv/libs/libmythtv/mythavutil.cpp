@@ -8,7 +8,9 @@
 
 #include "mythframe.h"
 #include "mythavutil.h"
-#include "myth_imgconvert.h"
+extern "C" {
+#include "libswscale/swscale.h"
+}
 
 AVPixelFormat FrameTypeToPixelFormat(VideoFrameType type)
 {
@@ -66,8 +68,129 @@ int AVPictureFill(AVPicture *pic, const VideoFrame *frame, AVPixelFormat fmt)
     return (int)buffersize(frame->codec, frame->width, frame->height);
 }
 
-int AVPictureCopy(AVPicture *pic, const VideoFrame *frame,
-                  unsigned char *buffer, AVPixelFormat fmt)
+class MythAVCopyPrivate
+{
+public:
+    MythAVCopyPrivate(bool uswc)
+    : swsctx(NULL), copyctx(new MythUSWCCopy(4096, !uswc)),
+      width(0), height(0), size(0), format(AV_PIX_FMT_NONE)
+    {
+    }
+
+    ~MythAVCopyPrivate()
+    {
+        if (swsctx)
+        {
+            sws_freeContext(swsctx);
+        }
+        delete copyctx;
+    }
+
+    int SizeData(int _width, int _height, AVPixelFormat _fmt)
+    {
+        if (_width == width && _height == height && _fmt == format)
+        {
+            return size;
+        }
+        size    = avpicture_get_size(_fmt, _width, _height);
+        width   = _width;
+        height  = _height;
+        format  = _fmt;
+        return size;
+    }
+
+    SwsContext *swsctx;
+    MythUSWCCopy *copyctx;
+    int width, height, size;
+    AVPixelFormat format;
+};
+
+MythAVCopy::MythAVCopy(bool uswc) : d(new MythAVCopyPrivate(uswc))
+{
+}
+
+MythAVCopy::~MythAVCopy()
+{
+    delete d;
+}
+
+void MythAVCopy::FillFrame(VideoFrame *frame, const AVPicture *pic, int pitch,
+                           int width, int height, AVPixelFormat pix_fmt)
+{
+    int size = avpicture_get_size(pix_fmt, width, height);
+
+    if (pix_fmt == AV_PIX_FMT_YUV420P)
+    {
+        int chroma_pitch  = pitch >> 1;
+        int chroma_height = height >> 1;
+        int offsets[3] =
+            { 0,
+              pitch * height,
+              pitch * height + chroma_pitch * chroma_height };
+        int pitches[3] = { pitch, chroma_pitch, chroma_pitch };
+
+        init(frame, FMT_YV12, pic->data[0], width, height, size, pitches, offsets);
+    }
+    else if (pix_fmt == AV_PIX_FMT_NV12)
+    {
+        int offsets[3] = { 0, pitch * height, 0 };
+        int pitches[3] = { pitch, pitch, 0 };
+
+        init(frame, FMT_NV12, pic->data[0], width, height, size, pitches, offsets);
+    }
+}
+
+int MythAVCopy::Copy(AVPicture *dst, AVPixelFormat dst_pix_fmt,
+                 const AVPicture *src, AVPixelFormat pix_fmt,
+                 int width, int height)
+{
+    if ((pix_fmt == AV_PIX_FMT_YUV420P || pix_fmt == AV_PIX_FMT_NV12) &&
+        (dst_pix_fmt == AV_PIX_FMT_YUV420P || dst_pix_fmt == AV_PIX_FMT_NV12))
+    {
+        VideoFrame framein, frameout;
+
+        FillFrame(&framein, src, width, width, height, pix_fmt);
+        FillFrame(&frameout, dst, width, width, height, dst_pix_fmt);
+
+        d->copyctx->copy(&frameout, &framein);
+        return frameout.size;
+    }
+
+    d->swsctx = sws_getCachedContext(d->swsctx, width, height, pix_fmt,
+                                     width, height, dst_pix_fmt,
+                                     SWS_FAST_BILINEAR, NULL, NULL, NULL);
+    if (d->swsctx == NULL)
+    {
+        return -1;
+    }
+
+    sws_scale(d->swsctx, src->data, src->linesize,
+              0, height, dst->data, dst->linesize);
+
+    return d->SizeData(width, height, dst_pix_fmt);
+}
+
+int MythAVCopy::Copy(VideoFrame *dst, const VideoFrame *src)
+{
+    if ((src->codec == FMT_YV12 || src->codec == FMT_NV12) &&
+        (dst->codec == FMT_YV12 || dst->codec == FMT_NV12))
+    {
+        d->copyctx->copy(dst, src);
+        return dst->size;
+    }
+
+    AVPicture srcpic, dstpic;
+
+    AVPictureFill(&srcpic, src);
+    AVPictureFill(&dstpic, dst);
+
+    return Copy(&dstpic, FrameTypeToPixelFormat(dst->codec),
+                &srcpic, FrameTypeToPixelFormat(src->codec),
+                src->width, src->height);
+}
+
+int MythAVCopy::Copy(AVPicture *pic, const VideoFrame *frame,
+                 unsigned char *buffer, AVPixelFormat fmt)
 {
     VideoFrameType type = PixelFormatToFrameType(fmt);
     int size = buffersize(type, frame->width, frame->height, 0) + 16;
@@ -78,43 +201,26 @@ int AVPictureCopy(AVPicture *pic, const VideoFrame *frame,
         return 0;
     }
 
-    avpicture_fill(pic, sbuf, fmt, frame->width, frame->height);
-    if ((type == FMT_YV12 || type == FMT_NV12) &&
-        (frame->codec == FMT_NV12 || frame->codec == FMT_YV12))
-    {
-        copybuffer(sbuf, frame, pic->linesize[0], type);
-    }
-    else
-    {
-        AVPixelFormat fmt_in = FrameTypeToPixelFormat(frame->codec);
-        AVPicture img_in;
-        AVPictureFill(&img_in, frame);
-        myth_sws_img_convert(pic, fmt, &img_in, fmt_in,
-                             frame->width, frame->height);
-    }
+    AVPicture pic_in;
+    AVPixelFormat fmt_in = FrameTypeToPixelFormat(frame->codec);
 
-    return size;
+    AVPictureFill(&pic_in, frame, fmt_in);
+    avpicture_fill(pic, sbuf, fmt, frame->width, frame->height);
+    return Copy(pic, fmt, &pic_in, fmt_in, frame->width, frame->height);
 }
 
-int AVPictureCopy(VideoFrame *frame, const AVPicture *pic, AVPixelFormat fmt)
+int MythAVCopy::Copy(VideoFrame *frame, const AVPicture *pic, AVPixelFormat fmt)
 {
-    VideoFrameType type = PixelFormatToFrameType(fmt);
-    int size = buffersize(type, frame->width, frame->height, 0) + 16;
-    unsigned char *sbuf = (unsigned char*)av_malloc(size);
+    if (fmt == AV_PIX_FMT_NV12 || AV_PIX_FMT_YUV420P)
+    {
+        VideoFrame framein;
+        FillFrame(&framein, pic, frame->width, frame->width, frame->height, fmt);
+        return Copy(frame, &framein);
+    }
 
-    if ((type == FMT_YV12 || type == FMT_NV12) &&
-        (frame->codec == FMT_NV12 || frame->codec == FMT_YV12))
-    {
-        copybuffer(sbuf, frame, pic->linesize[0], type);
-    }
-    else
-    {
-        // Can't handle those natively, convert it first
-        AVPixelFormat fmt_out = FrameTypeToPixelFormat(frame->codec);
-        AVPicture img_out;
-        AVPictureFill(&img_out, frame);
-        myth_sws_img_convert(&img_out, fmt_out, pic, fmt,
-                             frame->width, frame->height);
-    }
-    return frame->size;
+    AVPicture frame_out;
+    AVPixelFormat fmt_out = FrameTypeToPixelFormat(frame->codec);
+
+    AVPictureFill(&frame_out, frame, fmt_out);
+    return Copy(&frame_out, fmt_out, pic, fmt, frame->width, frame->height);
 }

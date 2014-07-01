@@ -10,7 +10,6 @@
 struct VideoFrame_;
 struct AVPicture;
 
-int pgm_fill(struct AVPicture *dst, const struct VideoFrame_ *frame);
 int pgm_read(unsigned char *buf, int width, int height, const char *filename);
 int pgm_write(const unsigned char *buf, int width, int height,
         const char *filename);

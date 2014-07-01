@@ -32,15 +32,12 @@ using namespace std;
 #include "mythdeque.h"
 #include "mthread.h"
 
-extern "C" {
-#include "libavcodec/avcodec.h" // to decode single MPEG I-frames
-}
-
 class MythPainter;
 class InteractiveScreen;
 class DSMCCPacket;
 class MHIImageData;
 class MHIContext;
+class MythAVCopy;
 
 /** \class MHIContext
  *  \brief Contains various utility functions for interactive television.
@@ -258,9 +255,8 @@ class MHIText : public MHTextDisplay
 class MHIBitmap : public MHBitmapDisplay
 {
   public:
-    MHIBitmap(MHIContext *parent, bool tiled)
-        : m_parent(parent), m_tiled(tiled), m_opaque(false) {}
-    virtual ~MHIBitmap() {}
+    MHIBitmap(MHIContext *parent, bool tiled);
+    virtual ~MHIBitmap();
 
     /// Create bitmap from PNG
     virtual void CreateFromPNG(const unsigned char *data, int length);
@@ -292,6 +288,7 @@ class MHIBitmap : public MHBitmapDisplay
     bool        m_tiled;
     QImage      m_image;
     bool        m_opaque;
+    MythAVCopy *m_copyCtx;
 };
 
 /** \class MHIDLA

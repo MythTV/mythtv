@@ -173,6 +173,8 @@ void MythUIButtonList::Reset()
     StopLoad();
     Update();
     MythUIType::Reset();
+
+    emit DependChanged(true);
 }
 
 void MythUIButtonList::Update()
@@ -1499,6 +1501,7 @@ void MythUIButtonList::InsertItem(MythUIButtonListItem *item, int listPosition)
     {
         m_selPosition = m_topPosition = 0;
         emit itemSelected(item);
+        emit DependChanged(false);
     }
 
     Update();
@@ -1537,6 +1540,9 @@ void MythUIButtonList::RemoveItem(MythUIButtonListItem *item)
         emit itemSelected(m_itemList.at(m_selPosition));
     else
         emit itemSelected(NULL);
+
+    if (IsEmpty())
+        emit DependChanged(true);
 }
 
 void MythUIButtonList::SetValueByData(QVariant data)

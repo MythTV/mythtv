@@ -1,7 +1,6 @@
 #include "dvdringbuffer.h"
 #include "DetectLetterbox.h"
 #include "audiooutput.h"
-#include "myth_imgconvert.h"
 #include "avformatdecoderdvd.h"
 #include "mythdvdplayer.h"
 

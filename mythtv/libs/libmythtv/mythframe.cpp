@@ -561,16 +561,20 @@ static void SSE_splitplanes(uint8_t *dstu, int dstu_pitch,
 MythUSWCCopy::MythUSWCCopy(int width, bool nocache)
     :m_cache(NULL), m_size(0), m_uswc(-1)
 {
+#if ARCH_X86
     if (!nocache)
     {
         allocateCache(width);
     }
+#endif
 }
 
 MythUSWCCopy::~MythUSWCCopy()
 {
     m_size = 0;
+#if ARCH_X86
     av_freep(&m_cache);
+#endif
 }
 
 /**
@@ -583,7 +587,7 @@ MythUSWCCopy::~MythUSWCCopy()
  * algorithm is the fastest.
  */
 
-void MythUSWCCopy::copy(VideoFrame *dst, VideoFrame *src)
+void MythUSWCCopy::copy(VideoFrame *dst, const VideoFrame *src)
 {
     dst->interlaced_frame = src->interlaced_frame;
     dst->repeat_pict      = src->repeat_pict;
@@ -749,6 +753,8 @@ void MythUSWCCopy::setUSWC(bool uswc)
  */
 void MythUSWCCopy::reset(int width)
 {
+#if ARCH_X86
     allocateCache(width);
+#endif
     resetUSWCDetection();
 }

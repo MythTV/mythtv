@@ -62,7 +62,7 @@ class GeneralDBOptions
         audiosamplerate(-1),  skip_btaudio(false),
         signal_timeout(1000), channel_timeout(3000),
         wait_for_seqstart(false) {}
-  
+
     QString videodev;
     QString vbidev;
     QString audiodev;

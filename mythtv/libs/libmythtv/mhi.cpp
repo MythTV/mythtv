@@ -13,7 +13,6 @@
 #include "mythuiimage.h"
 #include "osd.h"
 #include "mythdirs.h"
-#include "myth_imgconvert.h"
 #include "mythlogging.h"
 #include "mythmainwindow.h"
 #include "mythavutil.h"
@@ -1737,6 +1736,16 @@ void MHIDLA::DrawPoly(bool isFilled, int nPoints, const int *xArray, const int *
     }
 }
 
+MHIBitmap::MHIBitmap(MHIContext *parent, bool tiled)
+    : m_parent(parent), m_tiled(tiled), m_opaque(false),
+      m_copyCtx(new MythAVCopy(false))
+{
+}
+
+MHIBitmap::~MHIBitmap()
+{
+    delete m_copyCtx;
+}
 
 void MHIBitmap::Draw(int x, int y, QRect rect, bool tiled, bool bUnder)
 {
@@ -1864,9 +1873,8 @@ void MHIBitmap::CreateFromMPEG(const unsigned char *data, int length)
                        nContentWidth, nContentHeight);
 
         AVFrame *tmp = picture;
-        myth_sws_img_convert(
-            &retbuf, PIX_FMT_RGB24, (AVPicture*)tmp, c->pix_fmt,
-                    nContentWidth, nContentHeight);
+        m_copyCtx->Copy(&retbuf, PIX_FMT_RGB24, (AVPicture*)tmp, c->pix_fmt,
+                     nContentWidth, nContentHeight);
 
         uint8_t * buf = outputbuf;
 

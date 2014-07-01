@@ -44,7 +44,6 @@ using namespace std;
 #include "tv.h"
 #include "fourcc.h"
 #include "mythmainwindow.h"
-#include "myth_imgconvert.h"
 #include "mythuihelper.h"
 #include "mythavutil.h"
 
@@ -1439,21 +1438,23 @@ void VideoOutputXv::PrepareFrameMem(VideoFrame *buffer, FrameScanType /*scan*/)
     int out_width  = display_visible_rect.width()  & ~0x1;
     int out_height = display_visible_rect.height() & ~0x1;
     AVPicture image_in, image_out;
-    static struct SwsContext  *scontext = NULL;
 
     if ((out_width  == width) &&
         (out_height == height))
     {
-        AVPictureCopy(&image_out, buffer);
+        m_copyFrame.Copy(&image_out, buffer);
     }
     else
     {
+        static QMutex lock;
+        static struct SwsContext *scontext = NULL;
         int size = buffersize(FMT_YV12, out_width, out_height);
         unsigned char *sbuf = (unsigned char*)av_malloc(size);
 
         avpicture_fill(&image_out, (uint8_t *)sbuf, PIX_FMT_YUV420P,
                        out_width, out_height);
         AVPictureFill(&image_in, buffer);
+        QMutexLocker locker(&lock);
         scontext = sws_getCachedContext(scontext, width, height,
                        PIX_FMT_YUV420P, out_width,
                        out_height, PIX_FMT_YUV420P,
@@ -1466,11 +1467,8 @@ void VideoOutputXv::PrepareFrameMem(VideoFrame *buffer, FrameScanType /*scan*/)
     avpicture_fill(&image_in, (uint8_t *)XJ_non_xv_image->data,
                    non_xv_av_format, out_width, out_height);
 
-
-    // XXX TODO: join with the scaling after removing img_convert, img_resample
-    myth_sws_img_convert(
-        &image_in, non_xv_av_format, &image_out, PIX_FMT_YUV420P,
-         out_width, out_height);
+    m_copyFrame.Copy(&image_in, non_xv_av_format, &image_out, PIX_FMT_YUV420P,
+                out_width, out_height);
 
     {
         QMutexLocker locker(&global_lock);

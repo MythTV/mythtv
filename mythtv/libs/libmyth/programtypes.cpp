@@ -71,7 +71,7 @@ QString toUIState(RecStatusType recstatus)
         return "error";
     }
 
-    if (recstatus == rsRepeat       || 
+    if (recstatus == rsRepeat       ||
         recstatus == rsNeverRecord  || recstatus == rsDontRecord   ||
         (recstatus != rsDontRecord && recstatus <= rsEarlierShowing))
     {

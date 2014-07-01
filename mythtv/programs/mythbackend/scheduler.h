@@ -45,7 +45,7 @@ class Scheduler : public MThread, public MythScheduler
     void Reschedule(const QStringList &request);
     void RescheduleMatch(uint recordid, uint sourceid, uint mplexid,
                          const QDateTime &maxstarttime, const QString &why)
-    { Reschedule(ScheduledRecording::BuildMatchRequest(recordid, sourceid, 
+    { Reschedule(ScheduledRecording::BuildMatchRequest(recordid, sourceid,
                                                mplexid, maxstarttime, why)); };
     void RescheduleCheck(const RecordingInfo &recinfo, const QString &why)
     { Reschedule(ScheduledRecording::BuildCheckRequest(recinfo, why)); };
@@ -112,14 +112,14 @@ class Scheduler : public MThread, public MythScheduler
     void DeleteTempTables(void);
     void UpdateDuplicates(void);
     bool FillRecordList(void);
-    void UpdateMatches(uint recordid, uint sourceid, uint mplexid, 
+    void UpdateMatches(uint recordid, uint sourceid, uint mplexid,
                        const QDateTime &maxstarttime);
     void UpdateManuals(uint recordid);
     void BuildWorkList(void);
     bool ClearWorkList(void);
     void AddNewRecords(void);
     void AddNotListed(void);
-    void BuildNewRecordsQueries(uint recordid, QStringList &from, 
+    void BuildNewRecordsQueries(uint recordid, QStringList &from,
                                 QStringList &where, MSqlBindings &bindings);
     void PruneOverlaps(void);
     void BuildListMaps(void);

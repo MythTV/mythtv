@@ -12,6 +12,7 @@ using namespace std;
 #include "mythdbcon.h"
 #include "programinfo.h"
 #include "mythcodecid.h"
+#include "mythavutil.h"
 
 class RingBuffer;
 class TeletextViewer;
@@ -307,6 +308,7 @@ class DecoderBase
     long long lastKey;
     int keyframedist;
     long long indexOffset;
+    MythAVCopy copyFrame;
 
     // The totalDuration field is only valid when the video is played
     // from start to finish without any jumping.  trackTotalDuration
