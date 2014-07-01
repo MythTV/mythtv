@@ -68,59 +68,6 @@ int AVPictureFill(AVPicture *pic, const VideoFrame *frame, AVPixelFormat fmt)
     return (int)buffersize(frame->codec, frame->width, frame->height);
 }
 
-int AVPictureCopy(AVPicture *pic, const VideoFrame *frame,
-                  unsigned char *buffer, AVPixelFormat fmt)
-{
-    VideoFrameType type = PixelFormatToFrameType(fmt);
-    int size = buffersize(type, frame->width, frame->height, 0) + 16;
-    unsigned char *sbuf = buffer ? buffer : (unsigned char*)av_malloc(size);
-
-    if (!sbuf)
-    {
-        return 0;
-    }
-
-    avpicture_fill(pic, sbuf, fmt, frame->width, frame->height);
-    if ((type == FMT_YV12 || type == FMT_NV12) &&
-        (frame->codec == FMT_NV12 || frame->codec == FMT_YV12))
-    {
-        copybuffer(sbuf, frame, pic->linesize[0], type);
-    }
-    else
-    {
-        AVPixelFormat fmt_in = FrameTypeToPixelFormat(frame->codec);
-        AVPicture img_in;
-        AVPictureFill(&img_in, frame);
-        MythAVCopy copy;
-        copy.Copy(pic, fmt, &img_in, fmt_in, frame->width, frame->height);
-    }
-
-    return size;
-}
-
-int AVPictureCopy(VideoFrame *frame, const AVPicture *pic, AVPixelFormat fmt)
-{
-    VideoFrameType type = PixelFormatToFrameType(fmt);
-    int size = buffersize(type, frame->width, frame->height, 0) + 16;
-    unsigned char *sbuf = (unsigned char*)av_malloc(size);
-
-    if ((type == FMT_YV12 || type == FMT_NV12) &&
-        (frame->codec == FMT_NV12 || frame->codec == FMT_YV12))
-    {
-        copybuffer(sbuf, frame, pic->linesize[0], type);
-    }
-    else
-    {
-        // Can't handle those natively, convert it first
-        AVPixelFormat fmt_out = FrameTypeToPixelFormat(frame->codec);
-        AVPicture img_out;
-        AVPictureFill(&img_out, frame);
-        MythAVCopy copy;
-        copy.Copy(&img_out, fmt_out, pic, fmt, frame->width, frame->height);
-    }
-    return frame->size;
-}
-
 class MythAVCopyPrivate
 {
 public:

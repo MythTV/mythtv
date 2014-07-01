@@ -65,42 +65,12 @@ private:
 };
 
 typedef struct VideoFrame_ VideoFrame;
-
-/**
- * AVPictureFill
- * Initialise AVPicture pic with content from VideoFrame frame
- */
-int MTV_PUBLIC AVPictureFill(AVPicture *pic, const VideoFrame *frame,
-                             AVPixelFormat fmt = AV_PIX_FMT_NONE);
-
-/**
- * AVPictureCopy
- * Initialise AVPicture pic, create buffer if required and copy content of
- * VideoFrame frame into it, performing the required conversion if any
- * Returns size of buffer allocated
- * Data would have to be deleted once finished with object with:
- * av_freep(pic->data[0])
- */
-int MTV_PUBLIC AVPictureCopy(AVPicture *pic, const VideoFrame *frame,
-                             unsigned char *buffer = NULL,
-                             AVPixelFormat fmt = AV_PIX_FMT_YUV420P);
-
-/**
- * AVPictureCopy
- * Copy AVPicture pic into VideoFrame frame, performing the required conversion
- * Returns size of frame data
- */
-int MTV_PUBLIC AVPictureCopy(VideoFrame *frame, const AVPicture *pic,
-                             AVPixelFormat fmt = AV_PIX_FMT_YUV420P);
-
 class MythAVCopyPrivate;
 
 /**
- * AVCopy
- * Copy picture/frame pic, performing the required conversion
- * Returns size of frame data
+ * MythAVCopy
+ * Copy AVPicture<->frame, performing the required conversion if any
  */
-
 class MTV_PUBLIC MythAVCopy
 {
 public:
@@ -135,4 +105,12 @@ private:
                    int width, int height, AVPixelFormat pix_fmt);
     MythAVCopyPrivate *d;
 };
+
+/**
+ * AVPictureFill
+ * Initialise AVPicture pic with content from VideoFrame frame
+ */
+int MTV_PUBLIC AVPictureFill(AVPicture *pic, const VideoFrame *frame,
+                             AVPixelFormat fmt = AV_PIX_FMT_NONE);
+
 #endif
