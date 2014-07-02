@@ -35,7 +35,7 @@
 #ifndef __MINILZO_H
 #define __MINILZO_H 1
 
-#define MINILZO_VERSION         0x2070
+#define MINILZO_VERSION         0x2080
 
 #ifdef __LZOCONF_H
 #  error "you cannot use both LZO and miniLZO"

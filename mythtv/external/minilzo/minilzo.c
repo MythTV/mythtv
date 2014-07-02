@@ -3020,7 +3020,7 @@ LZO_COMPILE_TIME_ASSERT_HEADER(sizeof(lzo_int_fast64_t) == sizeof(lzo_uint_fast6
 #undef LZO_HAVE_CONFIG_H
 #include "minilzo.h"
 
-#if !defined(MINILZO_VERSION) || (MINILZO_VERSION != 0x2070)
+#if !defined(MINILZO_VERSION) || (MINILZO_VERSION != 0x2080)
 #  error "version mismatch in miniLZO source files"
 #endif
 
@@ -3048,7 +3048,7 @@ LZO_COMPILE_TIME_ASSERT_HEADER(sizeof(lzo_int_fast64_t) == sizeof(lzo_uint_fast6
 #endif
 #endif
 
-#if (LZO_VERSION < 0x2070) || !defined(__LZOCONF_H_INCLUDED)
+#if (LZO_VERSION < 0x2080) || !defined(__LZOCONF_H_INCLUDED)
 #  error "version mismatch"
 #endif
 
@@ -3557,7 +3557,7 @@ __lzo_static_forceinline lzo_uint32_t lzo_memops_get_le32(const lzo_voidp ss)
     v = (lzo_uint32_t) vv;
 #else
     const lzo_memops_TU1p s = (const lzo_memops_TU1p) ss;
-    v = (lzo_uint32_t) (((lzo_uint32_t)s[0] << 24) | ((lzo_uint32_t)s[1] << 16) | ((lzo_uint32_t)s[2] << 8) | ((lzo_uint32_t)s[3]));
+    v = (lzo_uint32_t) (((lzo_uint32_t)s[0]) | ((lzo_uint32_t)s[1] << 8) | ((lzo_uint32_t)s[2] << 16) | ((lzo_uint32_t)s[3] << 24));
 #endif
     return v;
 }
@@ -3959,10 +3959,10 @@ _lzo_version_date(void)
 #define LZO_NMAX 5552
 
 #define LZO_DO1(buf,i)  s1 += buf[i]; s2 += s1
-#define LZO_DO2(buf,i)  LZO_DO1(buf,i); LZO_DO1(buf,i+1);
-#define LZO_DO4(buf,i)  LZO_DO2(buf,i); LZO_DO2(buf,i+2);
-#define LZO_DO8(buf,i)  LZO_DO4(buf,i); LZO_DO4(buf,i+4);
-#define LZO_DO16(buf,i) LZO_DO8(buf,i); LZO_DO8(buf,i+8);
+#define LZO_DO2(buf,i)  LZO_DO1(buf,i); LZO_DO1(buf,i+1)
+#define LZO_DO4(buf,i)  LZO_DO2(buf,i); LZO_DO2(buf,i+2)
+#define LZO_DO8(buf,i)  LZO_DO4(buf,i); LZO_DO4(buf,i+4)
+#define LZO_DO16(buf,i) LZO_DO8(buf,i); LZO_DO8(buf,i+8)
 
 LZO_PUBLIC(lzo_uint32_t)
 lzo_adler32(lzo_uint32_t adler, const lzo_bytep buf, lzo_uint len)
@@ -4164,6 +4164,14 @@ _lzo_config_check(void)
     r &= UA_GET_LE16(p) == 0;
     u.b[1] = 128;
     r &= UA_GET_LE16(p) == 128;
+    u.b[2] = 129;
+    r &= UA_GET_LE16(p) == LZO_UINT16_C(0x8180);
+#if (LZO_ABI_BIG_ENDIAN)
+    r &= UA_GET_NE16(p) == LZO_UINT16_C(0x8081);
+#endif
+#if (LZO_ABI_LITTLE_ENDIAN)
+    r &= UA_GET_NE16(p) == LZO_UINT16_C(0x8180);
+#endif
     u.a[0] = u.a[1] = 0;
     u.b[0] = 3; u.b[5] = 4;
     p = u2p(&u, 1);
@@ -4171,6 +4179,14 @@ _lzo_config_check(void)
     r &= UA_GET_LE32(p) == 0;
     u.b[1] = 128;
     r &= UA_GET_LE32(p) == 128;
+    u.b[2] = 129; u.b[3] = 130; u.b[4] = 131;
+    r &= UA_GET_LE32(p) == LZO_UINT32_C(0x83828180);
+#if (LZO_ABI_BIG_ENDIAN)
+    r &= UA_GET_NE32(p) == LZO_UINT32_C(0x80818283);
+#endif
+#if (LZO_ABI_LITTLE_ENDIAN)
+    r &= UA_GET_NE32(p) == LZO_UINT32_C(0x83828180);
+#endif
 #if defined(UA_GET_NE64)
     u.c[0] = u.c[1] = 0;
     u.b[0] = 5; u.b[9] = 6;

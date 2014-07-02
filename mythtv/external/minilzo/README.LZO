@@ -6,8 +6,8 @@
  Author  : Markus Franz Xaver Johannes Oberhumer
            <markus@oberhumer.com>
            http://www.oberhumer.com/opensource/lzo/
- Version : 2.07
- Date    : 25 Jun 2014
+ Version : 2.08
+ Date    : 29 Jun 2014
 
  I've created miniLZO for projects where it is inconvenient to
  include (or require) the full LZO source code just because you

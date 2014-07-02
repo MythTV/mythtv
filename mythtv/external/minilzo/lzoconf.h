@@ -29,9 +29,9 @@
 #ifndef __LZOCONF_H_INCLUDED
 #define __LZOCONF_H_INCLUDED 1
 
-#define LZO_VERSION             0x2070
-#define LZO_VERSION_STRING      "2.07"
-#define LZO_VERSION_DATE        "Jun 25 2014"
+#define LZO_VERSION             0x2080
+#define LZO_VERSION_STRING      "2.08"
+#define LZO_VERSION_DATE        "Jun 29 2014"
 
 /* internal Autoconf configuration file - only used when building LZO */
 #if defined(LZO_HAVE_CONFIG_H)
@@ -441,4 +441,4 @@ typedef union { lzo_bytep a; lzo_uint32_t b; } __lzo_pu32_u;
 #endif /* already included */
 
 
-/* vim:set ts=4 et: */
+/* vim:set ts=4 sw=4 et: */
