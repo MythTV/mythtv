@@ -65,7 +65,7 @@ QString dvb_decode_text(const unsigned char *src, uint raw_length,
         ((0x15 < src[0]) && (src[0] < 0x20)))
     {
         // TODO: Handle multi-byte encodings
-        LOG(VB_SIPARSER, LOG_ERR, 
+        LOG(VB_SIPARSER, LOG_ERR,
             "dvb_decode_text: Multi-byte coded text is not yet supported.");
         return "";
     }
@@ -194,9 +194,9 @@ QString dvb_decode_short_name(const unsigned char *src, uint raw_length)
                     dst[length++] = 0x20;
             }
 
-    QString sStr = (!length) ? dvb_decode_text(src, raw_length) 
+    QString sStr = (!length) ? dvb_decode_text(src, raw_length)
                              : decode_text(dst, length);
-                                     
+
     delete [] dst;
 
     return sStr;
@@ -291,7 +291,7 @@ void ContentDescriptor::Init(void)
         return;
 
     //: %1 is the main category, %2 is the subcategory
-    QString subCatStr = QCoreApplication::translate("(Categories)", 
+    QString subCatStr = QCoreApplication::translate("(Categories)",
         "%1 - %2", "Category with subcategory display");
 
     categoryDesc[0x10] = QCoreApplication::translate("(Categories)", "Movie");
@@ -300,29 +300,29 @@ void ContentDescriptor::Init(void)
         .arg(QCoreApplication::translate("(Categories)", "Detective/Thriller"));
     categoryDesc[0x12] = subCatStr
         .arg(QCoreApplication::translate("(Categories)", "Movie"))
-        .arg(QCoreApplication::translate("(Categories)", 
+        .arg(QCoreApplication::translate("(Categories)",
                                          "Adventure/Western/War"));
     categoryDesc[0x13] = subCatStr
         .arg(QCoreApplication::translate("(Categories)", "Movie"))
-        .arg(QCoreApplication::translate("(Categories)", 
+        .arg(QCoreApplication::translate("(Categories)",
                                          "Science Fiction/Fantasy/Horror"));
     categoryDesc[0x14] = subCatStr
         .arg(QCoreApplication::translate("(Categories)", "Movie"))
         .arg(QCoreApplication::translate("(Categories)", "Comedy"));
     categoryDesc[0x15] = subCatStr
         .arg(QCoreApplication::translate("(Categories)", "Movie"))
-        .arg(QCoreApplication::translate("(Categories)", 
+        .arg(QCoreApplication::translate("(Categories)",
                                          "Soap/melodrama/folkloric"));
     categoryDesc[0x16] = subCatStr
         .arg(QCoreApplication::translate("(Categories)", "Movie"))
         .arg(QCoreApplication::translate("(Categories)", "Romance"));
     categoryDesc[0x17] = subCatStr
         .arg(QCoreApplication::translate("(Categories)","Movie"))
-        .arg(QCoreApplication::translate("(Categories)", 
+        .arg(QCoreApplication::translate("(Categories)",
             "Serious/Classical/Religious/Historical Movie/Drama"));
     categoryDesc[0x18] = subCatStr
         .arg(QCoreApplication::translate("(Categories)","Movie"))
-        .arg(QCoreApplication::translate("(Categories)", "Adult", 
+        .arg(QCoreApplication::translate("(Categories)", "Adult",
                                          "Adult Movie"));
 
     categoryDesc[0x20] = QCoreApplication::translate("(Categories)", "News");
@@ -355,7 +355,7 @@ void ContentDescriptor::Init(void)
     categoryDesc[0x44] = QCoreApplication::translate("(Categories)",
                                                      "Tennis/Squash");
     categoryDesc[0x45] = QCoreApplication::translate("(Categories)",
-                                                     "Misc. Team Sports"); 
+                                                     "Misc. Team Sports");
                                                      // not football/soccer
     categoryDesc[0x46] = QCoreApplication::translate("(Categories)",
                                                      "Athletics");
@@ -605,7 +605,7 @@ QString DataBroadcastDescriptor::toString(void) const
     for (uint i = 0; i < SelectorLength(); i++)
         ret += QString("%1 ").arg(Selector()[i], 0, 16);
     ret += ") ";
-    
+
     ret += QString("ISO_639_language_code(%1) ")
         .arg(LanguageString());
 
@@ -666,5 +666,3 @@ QString AC3Descriptor::toString(void) const
         ret += QString("asvc(%1) ").arg(ASVC());
     return ret;
 }
-
-

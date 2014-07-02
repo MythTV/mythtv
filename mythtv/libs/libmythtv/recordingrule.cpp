@@ -186,7 +186,7 @@ bool RecordingRule::Load(bool asTemplate)
 
     m_isOverride = (m_type == kOverrideRecord || m_type == kDontRecord);
     m_isTemplate = (m_type == kTemplateRecord);
-    m_template = (asTemplate || m_isTemplate) ? 
+    m_template = (asTemplate || m_isTemplate) ?
         query.value(30).toString() : "";
 
     if (!asTemplate)
@@ -792,7 +792,7 @@ unsigned RecordingRule::GetDefaultFilter(void)
 
     if (!query.next())
         return 0;
-    
+
     return query.value(0).toUInt();
 }
 

@@ -2028,7 +2028,7 @@ int HLSRingBuffer::ParseKey(HLSStream *hls, const QString &line)
 #endif
     else
     {
-#ifndef _MSC_VER  
+#ifndef _MSC_VER
         LOG(VB_PLAYBACK, LOG_ERR, LOC +
             "invalid encryption type, only NONE "
 #ifdef USING_LIBCRYPTO

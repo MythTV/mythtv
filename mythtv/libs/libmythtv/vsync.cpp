@@ -323,7 +323,7 @@ int DRMVideoSync::WaitForFrame(int sync_delay)
         drmWaitVBlank(m_dri_fd, &blank);
         m_delay = CalcDelay();
 #if 0
-        LOG(VB_GENERAL, LOG_DEBUG, 
+        LOG(VB_GENERAL, LOG_DEBUG,
             QString("Wait %1 intervals. Count %2 Delay %3")
                 .arg(n) .arg(blank.request.sequence) .arg(m_delay));
 #endif
@@ -352,7 +352,7 @@ bool RTCVideoSync::TryInit(void)
     m_rtcfd = open("/dev/rtc", O_RDONLY);
     if (m_rtcfd < 0)
     {
-        LOG(VB_PLAYBACK, LOG_ERR, LOC + 
+        LOG(VB_PLAYBACK, LOG_ERR, LOC +
             "RTCVideoSync: Could not open /dev/rtc: " + ENO);
         return false;
     }
@@ -360,14 +360,14 @@ bool RTCVideoSync::TryInit(void)
     // FIXME, does it make sense to tie RTCRATE to the desired framerate?
     if ((ioctl(m_rtcfd, RTC_IRQP_SET, RTCRATE) < 0))
     {
-        LOG(VB_PLAYBACK, LOG_ERR, LOC + 
+        LOG(VB_PLAYBACK, LOG_ERR, LOC +
             "RTCVideoSync: Could not set RTC frequency: " + ENO);
         return false;
     }
 
     if (ioctl(m_rtcfd, RTC_PIE_ON, 0) < 0)
     {
-        LOG(VB_PLAYBACK, LOG_ERR, LOC + 
+        LOG(VB_PLAYBACK, LOG_ERR, LOC +
             "RTCVideoSync: Could not enable periodic timer interrupts: " + ENO);
         return false;
     }
@@ -468,4 +468,3 @@ int USleepVideoSync::WaitForFrame(int sync_delay)
         usleep(m_delay);
     return 0;
 }
-

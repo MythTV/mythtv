@@ -126,7 +126,7 @@ NetStream::~NetStream()
     Abort();
 
     (NAMThread::manager()).disconnect(this);
-    
+
     QMutexLocker locker(&m_mutex);
 
     if (m_reply)
@@ -742,14 +742,14 @@ void NAMThread::run()
     QScopedPointer<QNetworkDiskCache> cache(new QNetworkDiskCache());
 
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-	cache->setCacheDirectory(
-		QStandardPaths::standardLocations(
-		    QStandardPaths::CacheLocation).value(0) );
+        cache->setCacheDirectory(
+                QStandardPaths::standardLocations(
+                    QStandardPaths::CacheLocation).value(0) );
 #else
-	cache->setCacheDirectory(
-		QDesktopServices::storageLocation(QDesktopServices::CacheLocation) );
+        cache->setCacheDirectory(
+                QDesktopServices::storageLocation(QDesktopServices::CacheLocation) );
 #endif
-	m_nam->setCache(cache.take());
+        m_nam->setCache(cache.take());
 
     // Setup a network proxy
     QString proxy(getenv("HTTP_PROXY"));

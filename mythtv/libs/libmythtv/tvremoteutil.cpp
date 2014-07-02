@@ -158,7 +158,7 @@ RemoteRequestFreeRecorderInputList(const vector<uint> &excluded_cardids,
         return list;
 
     QStringList::const_iterator it = strlist.begin();
-    for (; it != strlist.end(); ++it) 
+    for (; it != strlist.end(); ++it)
         list.push_back((*it).toUInt());
 
     return list;

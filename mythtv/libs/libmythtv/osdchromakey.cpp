@@ -296,4 +296,3 @@ bool ChromaKeyOSD::ProcessOSD(OSD *osd)
 
     return (visible || was_visible);
 }
-

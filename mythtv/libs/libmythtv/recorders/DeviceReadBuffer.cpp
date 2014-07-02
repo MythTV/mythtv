@@ -50,7 +50,7 @@ DeviceReadBuffer::DeviceReadBuffer(
         wake_pipe_flags[i] = 0;
     }
 
-#ifdef USING_MINGW 
+#ifdef USING_MINGW
 #warning mingw DeviceReadBuffer::Poll
     if (using_poll)
     {

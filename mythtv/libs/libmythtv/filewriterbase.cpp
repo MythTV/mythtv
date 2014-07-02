@@ -55,4 +55,3 @@ int FileWriterBase::WriteAudioFrame(unsigned char *buf, int fnum, long long &tim
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
-

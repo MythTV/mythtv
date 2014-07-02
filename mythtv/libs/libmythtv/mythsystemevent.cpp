@@ -54,7 +54,7 @@ class SystemEventThread : public QRunnable
                 QString("Command '%1' returned %2")
                     .arg(m_command).arg(result));
 
-        if (m_event.isEmpty()) 
+        if (m_event.isEmpty())
             return;
 
         gCoreContext->SendMessage(

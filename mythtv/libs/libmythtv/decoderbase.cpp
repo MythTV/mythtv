@@ -1206,7 +1206,7 @@ QString toString(AudioTrackType type)
             str = QObject::tr("Normal", "Ordinary audio track");
             break;
     }
-    
+
     return str;
 }
 

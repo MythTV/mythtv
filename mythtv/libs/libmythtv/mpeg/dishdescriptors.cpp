@@ -111,7 +111,7 @@ QString DishEventTagsDescriptor::programid(void) const
 
     QString id = QString("%1%2%3").arg(prefix).arg(series).arg(episode, 4, 0);
 
-    return id;      
+    return id;
 }
 
 QString DishEventTagsDescriptor::seriesid(void) const
@@ -595,7 +595,7 @@ void DishContentDescriptor::Init(void)
                                                          "Variety");
     dishCategoryDesc[0x8c] = QCoreApplication::translate("(Categories)",
                                                          "Volleyball");
-    dishCategoryDesc[0x8d] = QCoreApplication::translate("(Categories)", 
+    dishCategoryDesc[0x8d] = QCoreApplication::translate("(Categories)",
                                                          "War");
     dishCategoryDesc[0x8e] = QCoreApplication::translate("(Categories)",
                                                          "Watersports");
@@ -708,5 +708,3 @@ void DishContentDescriptor::Init(void)
 
     dishCategoryDescExists = true;
 }
-
-

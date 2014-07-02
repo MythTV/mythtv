@@ -2004,7 +2004,7 @@ int DVDRingBuffer::GetAudioTrackType(uint idx)
 {
     int ret = -1;
     audio_attr_t attributes;
-    
+
     int physicalStreamId = dvdnav_get_audio_logical_stream(m_dvdnav, idx);
 
     if (physicalStreamId < 0)

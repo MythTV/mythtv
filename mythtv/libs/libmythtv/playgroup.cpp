@@ -67,7 +67,7 @@ class SkipAhead : public SpinBoxSetting, public PlayGroupDBStorage
   public:
     SkipAhead(const PlayGroupConfig& _parent):
         SpinBoxSetting(this, 0, 600, 5, true, PlayGroupConfig::tr("(default)")),
-        PlayGroupDBStorage(this, _parent, "skipahead") 
+        PlayGroupDBStorage(this, _parent, "skipahead")
     {
         setLabel(PlayGroupConfig::tr("Skip ahead (seconds)"));
         setHelpText(PlayGroupConfig::tr("How many seconds to skip forward on "
@@ -106,7 +106,7 @@ class TimeStretch : public SpinBoxSetting, public PlayGroupDBStorage
 {
   public:
     TimeStretch(const PlayGroupConfig& _parent):
-        SpinBoxSetting(this, 45, 200, 5, false, 
+        SpinBoxSetting(this, 45, 200, 5, false,
             PlayGroupConfig::tr("(default)")),
         PlayGroupDBStorage(this, _parent, "timestretch")
     {

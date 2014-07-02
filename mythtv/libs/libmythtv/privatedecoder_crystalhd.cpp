@@ -475,9 +475,9 @@ int PrivateDecoderCrystalHD::ProcessPacket(AVStream *stream, AVPacket *pkt)
 
         usleep(1000);
         uint64_t chd_timestamp = 0; // 100 nsec units
-        if (buffer->pts != (int64_t)AV_NOPTS_VALUE) 
+        if (buffer->pts != (int64_t)AV_NOPTS_VALUE)
             chd_timestamp = (uint64_t)(av_q2d(stream->time_base) *
-                                       buffer->pts * 10000000); 
+                                       buffer->pts * 10000000);
         LOG(VB_TIMESTAMP, LOG_DEBUG, LOC +
             QString("decoder input timecode %1 ms (pts %2)")
                 .arg(chd_timestamp / 10000).arg(buffer->pts));
@@ -816,7 +816,7 @@ int PrivateDecoderCrystalHD::GetTxFreeSize(bool hwsel)
     CHECK_ST;
     if (!ok)
         return -1;
-    
+
     return status.cpbEmptySize;
 }
 

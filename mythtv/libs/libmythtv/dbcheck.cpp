@@ -2555,7 +2555,7 @@ NULL
         if (!performActualUpdate(&updates[0], "1318", dbver))
             return false;
     }
-    
+
     if (dbver == "1318")
     {
         const char *updates[] = {

@@ -178,8 +178,8 @@ static CardUtil::CARD_TYPES get_cardtype(uint sourceid)
     if (cardids.empty())
     {
         MythPopupBox::showOkPopup(
-            GetMythMainWindow(), 
-            QObject::tr("Transport Editor"), 
+            GetMythMainWindow(),
+            QObject::tr("Transport Editor"),
             QObject::tr(
                 "Sorry, the Transport Editor can only be used to "
                 "edit transports which are connected to a card input."));
@@ -203,8 +203,8 @@ static CardUtil::CARD_TYPES get_cardtype(uint sourceid)
             (CardUtil::ERROR_PROBE   == nType))
         {
             MythPopupBox::showOkPopup(
-                GetMythMainWindow(), 
-                QObject::tr("Transport Editor"), 
+                GetMythMainWindow(),
+                QObject::tr("Transport Editor"),
                 QObject::tr(
                     "Failed to probe a capture card connected to this "
                     "transport's video source. Please make sure the "
@@ -234,8 +234,8 @@ static CardUtil::CARD_TYPES get_cardtype(uint sourceid)
             continue;
 
         MythPopupBox::showOkPopup(
-            GetMythMainWindow(), 
-            QObject::tr("Transport Editor"), 
+            GetMythMainWindow(),
+            QObject::tr("Transport Editor"),
             QObject::tr(
                 "The Video Sources to which this Transport is connected "
                 "are incompatible, please create separate video sources "
@@ -317,9 +317,9 @@ void TransportListEditor::Delete(void)
     uint mplexid = m_list->getValue().toInt();
 
     DialogCode val = MythPopupBox::Show2ButtonPopup(
-        GetMythMainWindow(), "", 
-        tr("Are you sure you would like to delete this transport?"), 
-        tr("Yes, delete the transport"), 
+        GetMythMainWindow(), "",
+        tr("Are you sure you would like to delete this transport?"),
+        tr("Yes, delete the transport"),
         tr("No, don't"), kDialogCodeButton1);
 
     if (kDialogCodeButton0 != val)
@@ -352,10 +352,10 @@ void TransportListEditor::Menu(void)
     }
 
     DialogCode val = MythPopupBox::Show2ButtonPopup(
-        GetMythMainWindow(), 
-        "", 
-        tr("Transport Menu"), 
-        tr("Edit..."), 
+        GetMythMainWindow(),
+        "",
+        tr("Transport Menu"),
+        tr("Edit..."),
         tr("Delete..."), kDialogCodeButton0);
 
     if (kDialogCodeButton0 == val)

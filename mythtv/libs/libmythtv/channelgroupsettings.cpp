@@ -149,7 +149,7 @@ void ChannelGroupEditor::open(QString name)
     {
         name = "";
 
-        bool ok = MythPopupBox::showGetTextPopup(GetMythMainWindow(), 
+        bool ok = MythPopupBox::showGetTextPopup(GetMythMainWindow(),
             tr("Create New Channel Group"),
             tr("Enter group name or press SELECT to enter text via the "
                "On Screen Keyboard"), name);

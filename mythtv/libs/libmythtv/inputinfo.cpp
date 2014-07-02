@@ -110,4 +110,3 @@ void ChannelInputInfo::Clear(void)
     ChannelInputInfo blank;
     *this = blank;
 }
-

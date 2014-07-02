@@ -1198,4 +1198,3 @@ subtitle_t *sub_read_file (demux_sputext_t *demuxstr) {
 
   return first;
 }
-

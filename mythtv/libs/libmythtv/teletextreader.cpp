@@ -463,7 +463,7 @@ void TeletextReader::AddTeletextData(int magazine, int row,
             break;
 
         default: /// other packet codes...
-        
+
             if (( row >= 1 ) && ( row <= 24 ))  // Page Data
             {
                 if (vbimode == VBI_DVB || vbimode == VBI_DVB_SUBTITLE)

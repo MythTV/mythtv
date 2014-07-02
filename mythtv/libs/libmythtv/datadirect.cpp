@@ -2320,7 +2320,7 @@ static QString get_lineup_type(uint sourceid)
 }
 
 /*
- * This function taken from: 
+ * This function taken from:
  * http://stackoverflow.com/questions/2690328/qt-quncompress-gzip-data
  *
  * Based on zlib example code.

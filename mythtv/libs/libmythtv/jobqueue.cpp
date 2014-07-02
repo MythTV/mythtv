@@ -2034,7 +2034,7 @@ void JobQueue::DoTranscodeThread(int jobID)
                 if (st.exists())
                 {
                     filesize = st.size();
-                    /*: %1 is transcoder name, %2 is the original file size 
+                    /*: %1 is transcoder name, %2 is the original file size
                         and %3 is the current file size */
                     QString comment = tr("%1: %2 => %3")
                                         .arg(transcoderName)

@@ -168,7 +168,7 @@ class TimeOffset : public SpinBoxSetting, public ChannelDBStorage
         SpinBoxSetting(this, -1440, 1440, 1),
         ChannelDBStorage(this, id, "tmoffset")
     {
-        setLabel(QCoreApplication::translate("(ChannelSettings)", 
+        setLabel(QCoreApplication::translate("(ChannelSettings)",
                                              "DataDirect Time Offset"));
 
         setHelpText(QCoreApplication::translate("(ChannelSettings)",
@@ -216,7 +216,7 @@ class VideoFilters : public LineEditSetting, public ChannelDBStorage
     VideoFilters(const ChannelID &id) :
         LineEditSetting(this), ChannelDBStorage(this, id, "videofilters")
     {
-        setLabel(QCoreApplication::translate("(ChannelSettings)", 
+        setLabel(QCoreApplication::translate("(ChannelSettings)",
                                              "Video filters"));
 
         setHelpText(QCoreApplication::translate("(ChannelSettings)",
@@ -251,7 +251,7 @@ class XmltvID : public ComboBoxSetting, public ChannelDBStorage
     {
         setLabel(QCoreApplication::translate("(Common)", "XMLTV ID"));
 
-        setHelpText(QCoreApplication::translate("(ChannelSettings)", 
+        setHelpText(QCoreApplication::translate("(ChannelSettings)",
             "ID used by listing services to get an exact correspondence "
             "between a channel in your line-up and a channel in their "
             "database. Normally this is set automatically when "
@@ -333,7 +333,7 @@ class Visible : public CheckBoxSetting, public ChannelDBStorage
 
         setLabel(QCoreApplication::translate("(ChannelSettings)", "Visible"));
 
-        setHelpText(QCoreApplication::translate("(ChannelSettings)", 
+        setHelpText(QCoreApplication::translate("(ChannelSettings)",
             "If enabled, the channel will be visible in the EPG."));
     }
 };
@@ -347,7 +347,7 @@ class OnAirGuide : public CheckBoxSetting, public ChannelDBStorage
         setLabel(QCoreApplication::translate("(ChannelSettings)",
                                              "Use on air guide"));
 
-        setHelpText(QCoreApplication::translate("(ChannelSettings)", 
+        setHelpText(QCoreApplication::translate("(ChannelSettings)",
             "If enabled, guide information for this channel will be updated "
             "using 'Over-the-Air' program listings."));
     }
@@ -378,10 +378,10 @@ class Finetune : public SliderSetting, public ChannelDBStorage
         : SliderSetting(this, -300, 300, 1),
         ChannelDBStorage(this, id, "finetune")
     {
-        setLabel(QCoreApplication::translate("(ChannelSettings)", 
+        setLabel(QCoreApplication::translate("(ChannelSettings)",
                                              "Finetune (kHz)"));
 
-        setHelpText(QCoreApplication::translate("(ChannelSettings)", 
+        setHelpText(QCoreApplication::translate("(ChannelSettings)",
             "Value to be added to your desired frequency (in kHz) for "
             "'fine tuning'."));
     }
@@ -649,7 +649,7 @@ void ChannelOptionsRawTS::Load(void)
                           .arg(it->GetPID(),2,16,QLatin1Char('0')));
         sids[i]->setValue(QString::number(it->GetComposite()&0x1ff));
         pcrs[i]->setValue(it->IsPCRPID());
-        
+
         ++it;
         ++i;
     }

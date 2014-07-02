@@ -1440,7 +1440,7 @@ bool VideoOutputQuartz::CreateQuartzBuffers(void)
     QString     renderer  = QString::null;
 
     QString tmp = db_vdisp_profile->GetVideoRenderer();
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + 
+    LOG(VB_PLAYBACK, LOG_INFO, LOC +
         QString("CreateQuartzBuffers() render: %1, allowed: %2")
             .arg(tmp).arg(toCommaList(renderers)));
 

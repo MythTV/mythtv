@@ -231,7 +231,7 @@ bool CommBreakMap::AutoCommercialSkip(uint64_t &jumpToFrame,
     skipTime.sprintf("%d:%02d", skipped_seconds / 60,
                      abs(skipped_seconds) % 60);
     if (kCommSkipOn == autocommercialskip)
-    {        
+    {
         //: %1 is the skip time
         comm_msg = tr("Skip %1").arg(skipTime);
     }

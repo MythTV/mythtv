@@ -829,4 +829,3 @@ SubtitleReader *MythCCExtractorPlayer::GetSubReader(uint id)
     }
     return m_dvbsub_info[id].reader;
 }
-

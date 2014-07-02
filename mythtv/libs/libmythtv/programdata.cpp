@@ -270,9 +270,9 @@ uint DBEvent::UpdateDB(
     // Update an existing program or insert a new program.
     if (match >= match_threshold)
     {
-	// We have a good match; update program[i] in the database
-	// with the new program data and move the overlapping programs
-	// out of the way.
+        // We have a good match; update program[i] in the database
+        // with the new program data and move the overlapping programs
+        // out of the way.
         LOG(VB_EIT, LOG_DEBUG,
             QString("EIT: accept match[%1]: %2 '%3' vs. '%4'")
                 .arg(i).arg(match).arg(title.left(35))
@@ -281,9 +281,9 @@ uint DBEvent::UpdateDB(
     }
     else
     {
-	// If we are here then either we have a match but the match is
-	// not good enough (the "i >= 0" case) or we did not find
-	// a match at all.
+        // If we are here then either we have a match but the match is
+        // not good enough (the "i >= 0" case) or we did not find
+        // a match at all.
         if (i >= 0)
         {
             LOG(VB_EIT, LOG_DEBUG,
@@ -292,8 +292,8 @@ uint DBEvent::UpdateDB(
                     .arg(programs[i].title.left(35)));
         }
 
-	// Move the overlapping programs out of the way and
-	// insert the new program.
+        // Move the overlapping programs out of the way and
+        // insert the new program.
         return UpdateDB(query, chanid, programs, -1);
     }
 }
@@ -573,7 +573,7 @@ uint DBEvent::UpdateDB(
             LOG(VB_EIT, LOG_DEBUG,
                 QString("EIT:  skip '%1' starttime is in the past")
                         .arg(title.left(35)));
-	    return 0;
+            return 0;
         }
     }
 
@@ -708,7 +708,7 @@ uint DBEvent::UpdateDB(
         for (uint i = 0; i < credits->size(); i++)
             (*credits)[i].InsertDB(query, chanid, starttime);
     }
-    
+
     QList<EventRating>::const_iterator j = ratings.begin();
     for (; j != ratings.end(); ++j)
     {
@@ -828,7 +828,7 @@ bool DBEvent::MoveOutOfTheWayDB(
     if (prog.starttime >= starttime && prog.endtime <= endtime)
     {
         // Old program completely inside our new program.
-	// Delete the old program completely.
+        // Delete the old program completely.
         LOG(VB_EIT, LOG_DEBUG,
             QString("EIT: delete '%1' %2 - %3")
                     .arg(prog.title.left(35))
@@ -839,26 +839,26 @@ bool DBEvent::MoveOutOfTheWayDB(
     else if (prog.starttime < starttime && prog.endtime > starttime)
     {
         // Old program starts before, but ends during or after our new program.
-	// Adjust the end time of the old program to the start time
-	// of our new program.
-	// This will leave a hole after our new program when the end time of
-	// the old program was after the end time of the new program!!
+        // Adjust the end time of the old program to the start time
+        // of our new program.
+        // This will leave a hole after our new program when the end time of
+        // the old program was after the end time of the new program!!
         LOG(VB_EIT, LOG_DEBUG,
             QString("EIT: change '%1' endtime to %2")
                     .arg(prog.title.left(35))
                     .arg(starttime.toString(Qt::ISODate)));
         return change_program(query, chanid, prog.starttime,
                               prog.starttime, // Keep the start time
-			      starttime);     // New end time is our start time
+                              starttime);     // New end time is our start time
     }
     else if (prog.starttime < endtime && prog.endtime > endtime)
     {
         // Old program starts during, but ends after our new program.
-	// Adjust the starttime of the old program to the end time
-	// of our new program.
-	// If there is already a program starting just when our
-	// new program ends we cannot move the old program
-	// so then we have to delete the old program.
+        // Adjust the starttime of the old program to the end time
+        // of our new program.
+        // If there is already a program starting just when our
+        // new program ends we cannot move the old program
+        // so then we have to delete the old program.
         if (program_exists(query, chanid, endtime))
         {
             LOG(VB_EIT, LOG_DEBUG,
@@ -875,7 +875,7 @@ bool DBEvent::MoveOutOfTheWayDB(
 
         return change_program(query, chanid, prog.starttime,
                               endtime,        // New start time is our endtime
-			      prog.endtime);  // Keep the end time
+                              prog.endtime);  // Keep the end time
     }
     // must be non-conflicting...
     return true;

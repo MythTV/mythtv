@@ -326,4 +326,3 @@ void yuv888_to_i44(unsigned char *dest, MythImage *osd_image, QSize dst_size,
         dst   += dst_wrap;
     }
 }
-

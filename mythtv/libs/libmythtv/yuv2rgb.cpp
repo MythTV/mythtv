@@ -43,7 +43,7 @@ extern "C" {
 extern "C" {
 #include "libavutil/cpu.h"
 }
-int has_altivec(void); 
+int has_altivec(void);
 #if HAVE_ALTIVEC_H
 #include <altivec.h>
 #else

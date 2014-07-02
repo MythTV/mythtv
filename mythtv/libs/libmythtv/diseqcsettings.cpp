@@ -732,7 +732,7 @@ class LNBPresetSetting : public ComboBoxSetting, public Storage
 
         uint i = 0;
         for (; !lnb_presets[i].name.isEmpty(); i++)
-			addSelection(DeviceTree::tr( lnb_presets[i].name.toUtf8() ), 
+                        addSelection(DeviceTree::tr( lnb_presets[i].name.toUtf8() ),
                          QString::number(i));
         addSelection(DeviceTree::tr("Custom"), QString::number(i));
     }

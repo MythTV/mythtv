@@ -312,7 +312,7 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
             {
                 case 0x00:          //attribute
 #if 0
-                    LOG(VB_VBI, LOG_DEBUG, 
+                    LOG(VB_VBI, LOG_DEBUG,
                         QString("<ATTRIBUTE %1 %2>").arg(b1).arg(b2));
 #endif
                     break;
@@ -1436,7 +1436,7 @@ bool CC608Decoder::XDSPacketParseProgram(
         }
         else
         {
-            LOG(VB_VBI, LOG_ERR, loc + 
+            LOG(VB_VBI, LOG_ERR, loc +
                     QString("VChip Unhandled -- rs(%1) rating(%2:%3)")
                 .arg(rating_system).arg(tv_rating).arg(movie_rating));
         }
@@ -1685,7 +1685,7 @@ static void init_xds_program_type(QString xds_program_type[96])
                                                        "Suspense");
     xds_program_type[88] = QCoreApplication::translate("(Categories)",
                                                        "Talk");
-    xds_program_type[89] = QCoreApplication::translate("(Categories)", 
+    xds_program_type[89] = QCoreApplication::translate("(Categories)",
                                                        "Technical");
     xds_program_type[90] = QCoreApplication::translate("(Categories)",
                                                        "Tennis");

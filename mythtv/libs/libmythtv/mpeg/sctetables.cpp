@@ -163,7 +163,7 @@ QString ModulationModeSubtable::toStringXML(uint indent_level) const
     }
 
     return str + indent_0 + "</ModulationMode>";
-} 
+}
 
 bool SCTENetworkInformationTable::Parse(void)
 {
@@ -445,7 +445,7 @@ QString VirtualChannelMapSubtable::toStringXML(uint indent_level) const
         str += "\n" + indent_2;
         str += QString("descriptors_count=\"%1\"").arg(DescriptorsCount(i));
         str += ">\n";
-        
+
         vector<const unsigned char*> desc =
             MPEGDescriptor::Parse(Descriptors(i), DescriptorsLength(i));
         for (uint i = 0; i < desc.size(); i++)

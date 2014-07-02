@@ -701,7 +701,7 @@ int MythDVDPlayer::GetCurrentAngle(void) const
 {
     if (player_ctx->buffer->DVD() && player_ctx->buffer->DVD()->IsOpen())
         return player_ctx->buffer->DVD()->GetCurrentAngle();
-    return -1; 
+    return -1;
 }
 
 QString MythDVDPlayer::GetAngleName(int angle) const

@@ -258,7 +258,7 @@ QString ChannelInfo::GetSourceName()
 {
     if (sourceid > 0 && m_sourcename.isNull())
         m_sourcename = SourceUtil::GetSourceName(sourceid);
-    
+
     return m_sourcename;
 }
 
@@ -271,9 +271,9 @@ void ChannelInfo::ToMap(InfoMap& infoMap)
     infoMap["channelid"] = QString().setNum(chanid);
     infoMap["channelsourcename"] = GetSourceName();
     infoMap["channelrecpriority"] = QString().setNum(recpriority);
-    
+
     infoMap["channelnumber"] = channum;
-    
+
     infoMap["majorchan"] = QString().setNum(atsc_major_chan);
     infoMap["minorchan"] = QString().setNum(atsc_minor_chan);
     infoMap["mplexid"] = QString().setNum(mplexid);
@@ -293,7 +293,7 @@ void ChannelInfo::LoadCardIds()
             "JOIN capturecard ON cardinput.cardid = capturecard.cardid "
             "WHERE chanid = :CHANID");
         query.bindValue(":CHANID", chanid);
-        
+
         if (!query.exec())
             MythDB::DBError("ChannelInfo::GetCardIds()", query);
         else

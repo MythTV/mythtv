@@ -327,4 +327,3 @@ void ProfileGroupEditor::callDelete(void)
     }
 
 }
-

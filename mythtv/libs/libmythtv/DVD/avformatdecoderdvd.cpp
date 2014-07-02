@@ -308,7 +308,7 @@ bool AvFormatDecoderDVD::ProcessVideoPacket(AVStream *stream, AVPacket *pkt)
     CheckContext(pts);
 
     bool ret = AvFormatDecoder::ProcessVideoPacket(stream, pkt);
-        
+
     if( ret &&
         m_curContext &&
         pts != AV_NOPTS_VALUE &&
@@ -663,7 +663,7 @@ long long AvFormatDecoderDVD::DVDFindPosition(long long desiredFrame)
 AudioTrackType AvFormatDecoderDVD::GetAudioTrackType(uint stream_index)
 {
     int type = 0;
-    
+
     if (ringBuffer && ringBuffer->DVD())
     {
         int logical_idx = ringBuffer->DVD()->GetAudioTrackNum(ic->streams[stream_index]->id);

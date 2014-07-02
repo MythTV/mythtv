@@ -217,7 +217,7 @@ int MythBDPlayer::GetCurrentAngle(void) const
 {
     if (player_ctx->buffer->BD() && player_ctx->buffer->BD()->IsOpen())
         return player_ctx->buffer->BD()->GetCurrentAngle();
-    return -1; 
+    return -1;
 }
 
 int MythBDPlayer::GetTitleDuration(int title) const

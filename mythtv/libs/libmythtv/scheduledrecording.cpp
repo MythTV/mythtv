@@ -28,8 +28,8 @@ void ScheduledRecording::SendReschedule(const QStringList &request)
     }
 }
 
-QStringList ScheduledRecording::BuildMatchRequest(uint recordid, 
-                uint sourceid, uint mplexid, const QDateTime &maxstarttime, 
+QStringList ScheduledRecording::BuildMatchRequest(uint recordid,
+                uint sourceid, uint mplexid, const QDateTime &maxstarttime,
                 const QString &why)
 {
     return QStringList(QString("MATCH %1 %2 %3 %4 %5")

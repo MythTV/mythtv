@@ -751,7 +751,7 @@ bool DiSEqCDevTree::ResetDiseqc(bool hard_reset, bool is_SCR)
             LOG(VB_GENERAL, LOG_ERR, LOC + "DiSEqC reset failed" + ENO);
             return false;
         }
-        
+
         if (is_SCR)
             diseqc_bus_already_reset = true;
     }

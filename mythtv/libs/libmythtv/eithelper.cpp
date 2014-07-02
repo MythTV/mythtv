@@ -499,47 +499,47 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
                 ContentDescriptor content(content_data);
                 switch (content.Nibble1(0))
                 {
-                    case 0x01: 
-                        category = "Movie"; 
+                    case 0x01:
+                        category = "Movie";
                         break;
-                    case 0x02: 
-                        category = "News"; 
+                    case 0x02:
+                        category = "News";
                         break;
-                    case 0x03: 
-                        category = "Entertainment"; 
+                    case 0x03:
+                        category = "Entertainment";
                         break;
-                    case 0x04: 
-                        category = "Sport"; 
+                    case 0x04:
+                        category = "Sport";
                         break;
-                    case 0x05: 
-                        category = "Children"; 
+                    case 0x05:
+                        category = "Children";
                         break;
-                    case 0x06: 
-                        category = "Music"; 
+                    case 0x06:
+                        category = "Music";
                         break;
-                    case 0x07: 
-                        category = "Arts/Culture"; 
+                    case 0x07:
+                        category = "Arts/Culture";
                         break;
-                    case 0x08: 
-                        category = "Current Affairs"; 
+                    case 0x08:
+                        category = "Current Affairs";
                         break;
-                    case 0x09: 
-                        category = "Education"; 
+                    case 0x09:
+                        category = "Education";
                         break;
-                    case 0x0A: 
-                        category = "Infotainment"; 
+                    case 0x0A:
+                        category = "Infotainment";
                         break;
-                    case 0x0B: 
-                        category = "Special"; 
+                    case 0x0B:
+                        category = "Special";
                         break;
-                    case 0x0C: 
-                        category = "Comedy"; 
+                    case 0x0C:
+                        category = "Comedy";
                         break;
-                    case 0x0D: 
-                        category = "Drama"; 
+                    case 0x0D:
+                        category = "Drama";
                         break;
-                    case 0x0E: 
-                        category = "Documentary"; 
+                    case 0x0E:
+                        category = "Documentary";
                         break;
                     default:
                         category = "";
@@ -1087,11 +1087,11 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     // Canal Digitaal DVB-S 19.2 Dutch/Belgian ONID 53 covers all CanalDigitaal TiD
     fix[   53U << 16] = EITFixUp::kFixNL;
     // Canal Digitaal DVB-S 23.5 Dutch/Belgian
-    fix[  3202LL << 32 | 3U << 16] = EITFixUp::kFixNL; 
-    fix[  3208LL << 32 | 3U << 16] = EITFixUp::kFixNL; 
-    fix[  3211LL << 32 | 3U << 16] = EITFixUp::kFixNL; 
-    fix[  3222LL << 32 | 3U << 16] = EITFixUp::kFixNL; 
-    fix[  3225LL << 32 | 3U << 16] = EITFixUp::kFixNL; 
+    fix[  3202LL << 32 | 3U << 16] = EITFixUp::kFixNL;
+    fix[  3208LL << 32 | 3U << 16] = EITFixUp::kFixNL;
+    fix[  3211LL << 32 | 3U << 16] = EITFixUp::kFixNL;
+    fix[  3222LL << 32 | 3U << 16] = EITFixUp::kFixNL;
+    fix[  3225LL << 32 | 3U << 16] = EITFixUp::kFixNL;
 
     // Finland
     fix[      8438U << 16] = // DVB-T Espoo
@@ -1250,7 +1250,7 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
 
     // DVB-C T-Kábel Hungary
     // FIXME this should be more specific. Is the encoding really wrong for all services?
-    fix[  100 << 16] = EITFixUp::kEFixForceISO8859_2; 
+    fix[  100 << 16] = EITFixUp::kEFixForceISO8859_2;
 }
 
 /** \fn EITHelper::RescheduleRecordings(void)

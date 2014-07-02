@@ -876,7 +876,7 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
     else if (req->GetURI() == "/getProperty")
     {
         status = HTTP_STATUS_NOT_FOUND;
-    }  
+    }
     else if (req->GetURI() == "/rate")
     {
         float rate = req->GetQueryValue("value").toFloat();

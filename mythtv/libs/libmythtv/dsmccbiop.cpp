@@ -118,7 +118,7 @@ bool BiopMessage::Process(DSMCCCacheModuleData *cachep, DSMCCCache *filecache,
     // Parse header
     if (! ProcessMsgHdr(data, curp))
     {
-        LOG(VB_DSMCC, LOG_ERR, 
+        LOG(VB_DSMCC, LOG_ERR,
             "[biop] Invalid biop header, dropping rest of module");
 
         /* not valid, skip rest of data */

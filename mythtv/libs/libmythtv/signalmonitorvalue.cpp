@@ -227,4 +227,3 @@ int SignalMonitorValue::MaxWait(const SignalMonitorList& slist)
     }
     return (minWait<0) ? -1 : wait;
 }
-

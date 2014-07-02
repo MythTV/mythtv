@@ -189,16 +189,16 @@ void EITFixUp::Fix(DBEventEIT &event) const
 
     if (kFixAUDescription & event.fixup)
         FixAUDescription(event);
-        
+
     if (kFixAUFreeview & event.fixup)
         FixAUFreeview(event);
-        
+
     if (kFixAUNine & event.fixup)
         FixAUNine(event);
-        
+
     if (kFixAUSeven & event.fixup)
         FixAUSeven(event);
-    
+
     if (kFixMCA & event.fixup)
         FixMCA(event);
 
@@ -1263,7 +1263,7 @@ void EITFixUp::FixAUDescription(DBEventEIT &event) const
     }
     if (event.description.endsWith("Copyright West TV Ltd. 2011)"))
         event.description.resize(event.description.length()-40);
-    
+
     if (event.description.isEmpty() && !event.subtitle.isEmpty())//due to ten's copyright info, this won't be caught before
     {
         event.description = event.subtitle;
@@ -1355,19 +1355,19 @@ void EITFixUp::FixAUFreeview(DBEventEIT &event) const
     if (event.description.endsWith(".."))//has been truncated to fit within the 'subtitle' eit field, so none of the following will work (ABC)
         return;
 
-    if (m_AUFreeviewSY.indexIn(event.description.trimmed(), 0) != -1) 
+    if (m_AUFreeviewSY.indexIn(event.description.trimmed(), 0) != -1)
     {
         if (event.subtitle.isEmpty())//nine sometimes has an actual subtitle field and the brackets thingo)
             event.subtitle = m_AUFreeviewSY.cap(2);
         event.airdate = m_AUFreeviewSY.cap(3).toUInt();
         event.description = m_AUFreeviewSY.cap(1);
     }
-    else if (m_AUFreeviewY.indexIn(event.description.trimmed(), 0) != -1) 
+    else if (m_AUFreeviewY.indexIn(event.description.trimmed(), 0) != -1)
     {
         event.airdate = m_AUFreeviewY.cap(2).toUInt();
         event.description = m_AUFreeviewY.cap(1);
     }
-    else if (m_AUFreeviewSYC.indexIn(event.description.trimmed(), 0) != -1) 
+    else if (m_AUFreeviewSYC.indexIn(event.description.trimmed(), 0) != -1)
     {
         if (event.subtitle.isEmpty())
             event.subtitle = m_AUFreeviewSYC.cap(2);
@@ -1377,7 +1377,7 @@ void EITFixUp::FixAUFreeview(DBEventEIT &event) const
             event.AddPerson(DBPerson::kActor, actors.at(i));
         event.description = m_AUFreeviewSYC.cap(1);
     }
-    else if (m_AUFreeviewYC.indexIn(event.description.trimmed(), 0) != -1) 
+    else if (m_AUFreeviewYC.indexIn(event.description.trimmed(), 0) != -1)
     {
         event.airdate = m_AUFreeviewYC.cap(2).toUInt();
         QStringList actors = m_AUFreeviewYC.cap(3).split("/");
@@ -2109,7 +2109,7 @@ void EITFixUp::FixDK(DBEventEIT &event) const
 
     if (season > 0)
         event.season = season;
-    
+
     //Feature:
     tmpRegEx = m_dkFeatures;
     position = event.description.indexOf(tmpRegEx);

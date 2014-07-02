@@ -303,7 +303,7 @@ bool VideoOutputXv::InputChanged(const QSize &video_dim_buf,
 
     if (!ok)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + 
+        LOG(VB_GENERAL, LOG_ERR, LOC +
             "InputChanged(): Failed to recreate buffers");
         errorState = kError_Unknown;
     }
@@ -770,7 +770,7 @@ bool VideoOutputXv::CreateOSD(void)
         if ((xv_colorkey == (int)XJ_letterbox_colour) ||
             (video_output_subtype < XVideo))
         {
-            LOG(VB_PLAYBACK, LOG_ERR, LOC + 
+            LOG(VB_PLAYBACK, LOG_ERR, LOC +
                 "Disabling ChromaKeyOSD as colorkeying will not work.");
         }
         else if (!((32 == disp->GetDepth()) || (24 == disp->GetDepth())))

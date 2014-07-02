@@ -644,7 +644,7 @@ static void parse_cc_packet(CC708Reader* cb_cbs, CaptionPacket* pkt,
         block_data_offset = (0x7==service_number && block_size!=0) ?
             off+2 : off+1;
 #if DEBUG_CC_SERVICE_BLOCK
-        LOG(VB_VBI, LOG_DEBUG, 
+        LOG(VB_VBI, LOG_DEBUG,
             QString("service_block size(%1) num(%2) off(%3)")
                 .arg(block_size) .arg(service_number) .arg(block_data_offset));
 #endif

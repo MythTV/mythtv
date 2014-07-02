@@ -1132,7 +1132,7 @@ uint ProgramMapTable::GetAudioType(uint i) const
     if (iso_lang.AudioType() == 0x0 &&
         iso_lang.LanguageString() == "nar")
         return 0x03;
-    
+
     return iso_lang.AudioType();
 }
 
@@ -1156,7 +1156,7 @@ QString ConditionalAccessTable::toString(void) const
     QString str =
         QString("Condiditional Access Section %1")
         .arg(PSIPTable::toString());
-    
+
     vector<const unsigned char*> gdesc =
         MPEGDescriptor::Parse(Descriptors(), DescriptorsLength());
     for (uint i = 0; i < gdesc.size(); i++)
@@ -1418,7 +1418,7 @@ QString SpliceInformationTable::toString(int64_t first, int64_t last) const
 
 QString SpliceInsertView::toString(int64_t first, int64_t last) const
 {
-    QString str = 
+    QString str =
         QString("eventid(0x%1) cancel(%2) "
                 "out_of_network(%3) program_splice(%4) "
                 "duration(%5) immediate(%6)\n  ")
@@ -1450,7 +1450,7 @@ QString SpliceInformationTable::toStringXML(
     if (first >= 0)
     {
         cap_time = QString("pts=\"%1\" ").arg(first);
-        if (last >= 0) 
+        if (last >= 0)
         {
             QTime abs = QTime(0,0,0,0).addMSecs((last - first)/90);
             cap_time += QString("capture_time=\"%1\" ")
@@ -1516,7 +1516,7 @@ QString SpliceInsertView::toStringXML(
         .arg(indent_1)
         .arg(AvailNum())
         .arg(AvailsExpected());
-    
+
     if (IsProgramSplice() && !IsSpliceImmediate())
     {
         str += SpliceTime().toStringXML(indent_level + 1, first, last) + "\n";

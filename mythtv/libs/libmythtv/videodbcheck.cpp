@@ -805,4 +805,3 @@ bool doUpgradeVideoDatabaseSchema(void)
 
     return true;
 }
-

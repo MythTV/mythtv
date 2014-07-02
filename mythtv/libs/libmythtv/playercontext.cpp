@@ -394,7 +394,7 @@ bool PlayerContext::CreatePlayer(TV *tv, QWidget *widget,
     else
         player = new MythPlayer((PlayerFlags)playerflags);
 
-    QString passthru_device = 
+    QString passthru_device =
         gCoreContext->GetNumSetting("PassThruDeviceOverride", false) ?
         gCoreContext->GetSetting("PassThruOutputDevice") : QString::null;
 

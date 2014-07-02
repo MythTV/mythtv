@@ -243,7 +243,7 @@ RingBuffer::RingBuffer(RingBufferType rbtype) :
 #undef NDEBUG
 #include <cassert>
 
-/** \brief Deletes 
+/** \brief Deletes
  *  \Note Classes inheriting from RingBuffer must implement
  *        a destructor that calls KillReadAheadThread().
  *        We can not do that here because this would leave
@@ -1117,7 +1117,7 @@ void RingBuffer::run(void)
                 eofreads++;
                 if (eofreads >= 3 && readblocksize >= KB512)
                 {
-                    // not reading anything 
+                    // not reading anything
                     readblocksize = CHUNK;
                     CalcReadAheadThresh();
                 }

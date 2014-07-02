@@ -3273,4 +3273,3 @@ void NuppelVideoRecorder::WriteText(unsigned char *buf, int len, int timecode,
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
-

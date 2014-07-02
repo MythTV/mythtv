@@ -223,7 +223,7 @@ const char *descriptor_tag_strings[256] =
     /* 0x1A */ "DSM-CC Stream Event",   /* 0x1B */ "MPEG-4 Video",
     /* 0x1C */ "MPEG-4 Audio",          /* 0x1D */ "IOD",
     /* 0x1E */ "SL",                    /* 0x1F */ "FMC",
-    
+
     /* 0x20 */ "External ES ID",        /* 0x21 */ "Multimpex Code",
     /* 0x22 */ "FMX buffer Size",       /* 0x23 */ "Multiplex Buffer",
     /* 0x24 */ "Content Labeling",      /* 0x25 */ "Metadata Pointer",
