@@ -509,7 +509,9 @@ void MythUIType::Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod,
     if (p->ShowBorders())
     {
         static const QBrush nullbrush(Qt::NoBrush);
-        p->DrawRect(realArea, nullbrush, QPen(m_BorderColor), 255);
+        QPen pen(m_BorderColor);
+        pen.setWidth(1);
+        p->DrawRect(realArea, nullbrush, pen, 255);
 
         if (p->ShowTypeNames())
         {
