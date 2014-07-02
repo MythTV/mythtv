@@ -1085,11 +1085,11 @@ QString MythCoreContext::resolveSettingAddress(const QString &name,
 
     if (host.isEmpty())
     {
-        value = gCoreContext->GetSetting(name);
+        value = GetSetting(name);
     }
     else
     {
-        value = gCoreContext->GetSettingOnHost(name, host);
+        value = GetSettingOnHost(name, host);
     }
 
     return resolveAddress(value, type, keepscope);
