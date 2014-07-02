@@ -1150,6 +1150,7 @@ void LogForwardThread::run(void)
     m_zmqContext = nzmqt::createDefaultContext(NULL);
     nzmqt::PollingZMQContext *ctx = static_cast<nzmqt::PollingZMQContext *>
                                         (m_zmqContext);
+    ctx->setInterval(100);
     ctx->start();
 
     m_zmqPubSock = m_zmqContext->createSocket(nzmqt::ZMQSocket::TYP_PUB, this);
