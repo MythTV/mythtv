@@ -80,7 +80,7 @@ bool InternetContent::ProcessRequest( HTTPRequest *pRequest )
                 GetInternetSearch( pRequest );
                 return true;
             }
-            
+
             // --------------------------------------------------------------
 
             if (pRequest->m_sMethod == "GetInternetSources")

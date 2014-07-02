@@ -391,7 +391,7 @@ QMap<QString,QString> GetSettingsMap(MythSettingList &settings,
         "FROM settings "
         "WHERE hostname IS NULL AND "
         "      value in (" + list + ")";
-    
+
     if (!list.isEmpty())
     {
         if (!query.exec(qstr))
@@ -710,7 +710,7 @@ bool load_settings(MythSettingList &settings, const QString &hostname)
         "FROM settings "
         "WHERE hostname IS NULL AND "
         "      value in (" + list + ")";
-    
+
     if (!list.isEmpty())
     {
         if (!query.exec(qstr))

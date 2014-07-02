@@ -150,7 +150,7 @@ void HttpStatus::GetStatusXML( HTTPRequest *pRequest )
     pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 5000";
 
     QTextStream stream( &pRequest->m_response );
-    stream.setCodec("UTF-8");	// Otherwise locale default is used.
+    stream.setCodec("UTF-8");   // Otherwise locale default is used.
     stream << doc.toString();
 }
 

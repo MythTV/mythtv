@@ -181,7 +181,7 @@ bool UPnpCDSMusic::IsBrowseRequestForUs( UPnpCDSRequest *pRequest )
 
     // Xbox360 compatibility code.
 
-    if (pRequest->m_eClient == CDS_ClientXBox && 
+    if (pRequest->m_eClient == CDS_ClientXBox &&
         pRequest->m_sContainerID == "7")
     {
         pRequest->m_sObjectId = "Music";
@@ -192,7 +192,7 @@ bool UPnpCDSMusic::IsBrowseRequestForUs( UPnpCDSRequest *pRequest )
         return true;
     }
 
-    if ((pRequest->m_sObjectId.isEmpty()) && 
+    if ((pRequest->m_sObjectId.isEmpty()) &&
         (!pRequest->m_sContainerID.isEmpty()))
         pRequest->m_sObjectId = pRequest->m_sContainerID;
 
@@ -214,7 +214,7 @@ bool UPnpCDSMusic::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
 
     // XBox 360 compatibility code
 
-    if (pRequest->m_eClient == CDS_ClientXBox && 
+    if (pRequest->m_eClient == CDS_ClientXBox &&
         pRequest->m_sContainerID == "7")
     {
         pRequest->m_sObjectId       = "Music/1";
@@ -237,7 +237,7 @@ bool UPnpCDSMusic::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
         return true;
     }
 
-    if ((pRequest->m_sObjectId.isEmpty()) && 
+    if ((pRequest->m_sObjectId.isEmpty()) &&
         (!pRequest->m_sContainerID.isEmpty()))
         pRequest->m_sObjectId = pRequest->m_sContainerID;
 
@@ -251,7 +251,7 @@ bool UPnpCDSMusic::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpCDSMusic::AddItem( const UPnpCDSRequest    *pRequest, 
+void UPnpCDSMusic::AddItem( const UPnpCDSRequest    *pRequest,
                             const QString           &sObjectId,
                             UPnpCDSExtensionResults *pResults,
                             bool                     bAddRef,

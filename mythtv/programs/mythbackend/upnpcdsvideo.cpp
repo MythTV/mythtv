@@ -1,7 +1,7 @@
 // Program Name: upnpcdsvideo.cpp
-//                                                                            
+//
 // Purpose - UPnP Content Directory Extension for MythVideo Videos
-//                                                                            
+//
 //////////////////////////////////////////////////////////////////////////////
 
 // POSIX headers
@@ -21,9 +21,9 @@
 #define LOC_WARN QString("UPnpCDSVideo, Warning: ")
 #define LOC_ERR QString("UPnpCDSVideo, Error: ")
 
-UPnpCDSRootInfo UPnpCDSVideo::g_RootNodes[] = 
+UPnpCDSRootInfo UPnpCDSVideo::g_RootNodes[] =
 {
-    {   "All Videos", 
+    {   "All Videos",
         "*",
         "SELECT 0 as key, "
           "title as name, "
@@ -77,7 +77,7 @@ QString UPnpCDSVideo::GetTableName( QString sColumn )
 QString UPnpCDSVideo::GetItemListSQL( QString sColumn )
 {
     return "SELECT intid, title, subtitle, filename, director, plot, "
-            "rating, year, userrating, length, " 
+            "rating, year, userrating, length, "
             "season, episode, coverfile, insertdate, host FROM videometadata";
 
 }
@@ -112,9 +112,9 @@ bool UPnpCDSVideo::IsBrowseRequestForUs( UPnpCDSRequest *pRequest )
     // Xbox360 compatibility code.
     // ----------------------------------------------------------------------
 
-    if (pRequest->m_eClient == CDS_ClientXBox && 
+    if (pRequest->m_eClient == CDS_ClientXBox &&
         pRequest->m_sContainerID == "15" &&
-        gCoreContext->GetSetting("UPnP/WMPSource") == "1") 
+        gCoreContext->GetSetting("UPnP/WMPSource") == "1")
     {
         pRequest->m_sObjectId = "Videos/0";
 
@@ -123,7 +123,7 @@ bool UPnpCDSVideo::IsBrowseRequestForUs( UPnpCDSRequest *pRequest )
         return true;
     }
 
-    if ((pRequest->m_sObjectId.isEmpty()) && 
+    if ((pRequest->m_sObjectId.isEmpty()) &&
         (!pRequest->m_sContainerID.isEmpty()))
         pRequest->m_sObjectId = pRequest->m_sContainerID;
 
@@ -135,7 +135,7 @@ bool UPnpCDSVideo::IsBrowseRequestForUs( UPnpCDSRequest *pRequest )
     //
     // ----------------------------------------------------------------------
 
-    if (pRequest->m_eClient == CDS_ClientWMP && 
+    if (pRequest->m_eClient == CDS_ClientWMP &&
         pRequest->m_sContainerID == "13" &&
         pRequest->m_nClientVersion < 12.0 &&
         gCoreContext->GetSetting("UPnP/WMPSource") == "1")
@@ -168,9 +168,9 @@ bool UPnpCDSVideo::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
     // ----------------------------------------------------------------------
 
 
-    if (pRequest->m_eClient == CDS_ClientXBox && 
+    if (pRequest->m_eClient == CDS_ClientXBox &&
         pRequest->m_sContainerID == "15" &&
-        gCoreContext->GetSetting("UPnP/WMPSource") == "1") 
+        gCoreContext->GetSetting("UPnP/WMPSource") == "1")
     {
         pRequest->m_sObjectId = "Videos/0";
 
@@ -179,7 +179,7 @@ bool UPnpCDSVideo::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
         return true;
     }
 
-    if ((pRequest->m_sObjectId.isEmpty()) && 
+    if ((pRequest->m_sObjectId.isEmpty()) &&
         (!pRequest->m_sContainerID.isEmpty()))
         pRequest->m_sObjectId = pRequest->m_sContainerID;
 
@@ -191,14 +191,14 @@ bool UPnpCDSVideo::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
     // WMP11 compatibility code
     // ----------------------------------------------------------------------
 
-    if ( bOurs && pRequest->m_eClient == CDS_ClientWMP && 
+    if ( bOurs && pRequest->m_eClient == CDS_ClientWMP &&
          pRequest->m_nClientVersion < 12.0 )
     {
         if ( gCoreContext->GetSetting("UPnP/WMPSource") == "1")
         {
             pRequest->m_sObjectId = "Videos/0";
             // -=>TODO: Not sure why this was added.
-            pRequest->m_sParentId = "8"; 
+            pRequest->m_sParentId = "8";
         }
         else
             bOurs = false;
@@ -232,7 +232,7 @@ int UPnpCDSVideo::GetDistinctCount( UPnpCDSRootInfo *pInfo )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpCDSVideo::AddItem( const UPnpCDSRequest    *pRequest, 
+void UPnpCDSVideo::AddItem( const UPnpCDSRequest    *pRequest,
                             const QString           &sObjectId,
                             UPnpCDSExtensionResults *pResults,
                             bool                     bAddRef,
@@ -268,12 +268,12 @@ void UPnpCDSVideo::AddItem( const UPnpCDSRequest    *pRequest,
     {
         if (sHostName.isEmpty())
         {
-            m_mapBackendIp[sHostName] = 
+            m_mapBackendIp[sHostName] =
                 gCoreContext->GetBackendServerIP4();
         }
         else
         {
-            m_mapBackendIp[sHostName] = 
+            m_mapBackendIp[sHostName] =
                 gCoreContext->GetBackendServerIP4(sHostName);
         }
     }
@@ -282,17 +282,17 @@ void UPnpCDSVideo::AddItem( const UPnpCDSRequest    *pRequest,
     {
         if (sHostName.isEmpty())
         {
-            m_mapBackendPort[sHostName] = 
+            m_mapBackendPort[sHostName] =
                 gCoreContext->GetBackendStatusPort();
         }
         else
         {
-            m_mapBackendPort[sHostName] = 
+            m_mapBackendPort[sHostName] =
                 gCoreContext->GetBackendStatusPort(sHostName);
         }
     }
-    
-    
+
+
     // ----------------------------------------------------------------------
     // Build Support Strings
     // ----------------------------------------------------------------------
@@ -304,7 +304,7 @@ void UPnpCDSVideo::AddItem( const UPnpCDSRequest    *pRequest,
     }
 
     QString sURIBase   = QString( "http://%1:%2/Content/" )
-                            .arg( m_mapBackendIp  [sHostName] ) 
+                            .arg( m_mapBackendIp  [sHostName] )
                             .arg( m_mapBackendPort[sHostName] );
 
     QString sURIParams = QString( "?Id=%1" ).arg( nVidID );
@@ -426,7 +426,7 @@ void UPnpCDSVideo::AddItem( const UPnpCDSRequest    *pRequest,
     // If we are dealing with a Sony Blu-ray player then we fake the
     // MIME type to force the video to appear
     if ( pRequest->m_eClient == CDS_ClientSonyDB )
-    {   
+    {
         sMimeType = "video/avi";
     }
 

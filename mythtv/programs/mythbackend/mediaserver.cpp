@@ -137,9 +137,9 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
     // ------------------------------------------------------------------
     // Register Service Types with Scripting Engine
     //
-    // -=>NOTE: We need to know the actual type at compile time for this 
+    // -=>NOTE: We need to know the actual type at compile time for this
     //          to work, so it needs to be done here.  I'm still looking
-    //          into ways that we may encapsulate this in the service 
+    //          into ways that we may encapsulate this in the service
     //          classes.
     // ------------------------------------------------------------------
 
@@ -230,7 +230,7 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
             // Register CDS Extensions
             // ----------------------------------------------------------------
 
-            LOG(VB_UPNP, LOG_INFO, 
+            LOG(VB_UPNP, LOG_INFO,
                 "MediaServer::Registering UPnpCDSTv Extension");
 
             RegisterExtension(new UPnpCDSTv());

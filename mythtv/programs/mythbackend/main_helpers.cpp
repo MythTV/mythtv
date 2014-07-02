@@ -691,7 +691,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
         LOG(VB_GENERAL, LOG_CRIT,
             "Backend exiting, MainServer initialization error.");
         cleanup();
-	return exitCode;
+        return exitCode;
     }
 
     if (httpStatus && mainServer)

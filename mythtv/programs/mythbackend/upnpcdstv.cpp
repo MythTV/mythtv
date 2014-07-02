@@ -183,9 +183,9 @@ bool UPnpCDSTv::IsBrowseRequestForUs( UPnpCDSRequest *pRequest )
     // Xbox360 compatibility code.
     // ----------------------------------------------------------------------
 
-    if (pRequest->m_eClient == CDS_ClientXBox && 
+    if (pRequest->m_eClient == CDS_ClientXBox &&
         pRequest->m_sContainerID == "15" &&
-        gCoreContext->GetSetting("UPnP/WMPSource") != "1") 
+        gCoreContext->GetSetting("UPnP/WMPSource") != "1")
     {
         pRequest->m_sObjectId = "Videos/0";
 
@@ -197,8 +197,8 @@ bool UPnpCDSTv::IsBrowseRequestForUs( UPnpCDSRequest *pRequest )
     // ----------------------------------------------------------------------
     // WMP11 compatibility code
     // ----------------------------------------------------------------------
-    if (pRequest->m_eClient == CDS_ClientWMP && 
-        pRequest->m_nClientVersion < 12.0 && 
+    if (pRequest->m_eClient == CDS_ClientWMP &&
+        pRequest->m_nClientVersion < 12.0 &&
         pRequest->m_sContainerID == "13" &&
         gCoreContext->GetSetting("UPnP/WMPSource") != "1")
     {
@@ -229,9 +229,9 @@ bool UPnpCDSTv::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
     // XBox 360 compatibility code
     // ----------------------------------------------------------------------
 
-    if (pRequest->m_eClient == CDS_ClientXBox && 
+    if (pRequest->m_eClient == CDS_ClientXBox &&
         pRequest->m_sContainerID == "15" &&
-        gCoreContext->GetSetting("UPnP/WMPSource") !=  "1") 
+        gCoreContext->GetSetting("UPnP/WMPSource") !=  "1")
     {
         pRequest->m_sObjectId = "Videos/0";
 
@@ -241,7 +241,7 @@ bool UPnpCDSTv::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
     }
 
 
-    if ((pRequest->m_sObjectId.isEmpty()) && 
+    if ((pRequest->m_sObjectId.isEmpty()) &&
         (!pRequest->m_sContainerID.isEmpty()))
         pRequest->m_sObjectId = pRequest->m_sContainerID;
 
@@ -257,7 +257,7 @@ bool UPnpCDSTv::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
     //
     // ----------------------------------------------------------------------
 
-    if ( bOurs && pRequest->m_eClient == CDS_ClientWMP && 
+    if ( bOurs && pRequest->m_eClient == CDS_ClientWMP &&
          pRequest->m_nClientVersion < 12.0)
     {
         // GetBoolSetting()?
@@ -265,7 +265,7 @@ bool UPnpCDSTv::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
         {
             pRequest->m_sObjectId = "RecTv/0";
             // -=>TODO: Not sure why this was added
-            pRequest->m_sParentId = '8';        
+            pRequest->m_sParentId = '8';
         }
         else
             bOurs = false;
@@ -278,7 +278,7 @@ bool UPnpCDSTv::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpCDSTv::AddItem( const UPnpCDSRequest    *pRequest, 
+void UPnpCDSTv::AddItem( const UPnpCDSRequest    *pRequest,
                          const QString           &sObjectId,
                          UPnpCDSExtensionResults *pResults,
                          bool                     bAddRef,
@@ -421,7 +421,7 @@ void UPnpCDSTv::AddItem( const UPnpCDSRequest    *pRequest,
     uint uiStart = dtProgStart.toTime_t();
     uint uiEnd   = dtProgEnd.toTime_t();
     uint uiDur   = uiEnd - uiStart;
-    
+
     MSqlQuery query2(MSqlQuery::InitCon());
     query2.prepare( "SELECT data FROM recordedmarkup WHERE chanid=:CHANID AND "
                     "starttime=:STARTTIME AND type = 33" );
