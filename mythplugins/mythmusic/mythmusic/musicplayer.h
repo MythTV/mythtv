@@ -82,6 +82,7 @@ class MusicPlayer : public QObject, public MythObservable
     void incVolume(void);
     void decVolume(void);
     uint getVolume(void) const;
+    void saveVolume(void);
 
     void  setSpeed(float speed);
     void  incSpeed();
