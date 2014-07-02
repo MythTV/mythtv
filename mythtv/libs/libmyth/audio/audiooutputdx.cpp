@@ -87,10 +87,10 @@ class AudioOutputDXPrivate
                                            LPCWSTR lpcstrModule,
                                            LPVOID  lpContext);
 #else
-		static int CALLBACK DSEnumCallback(LPGUID lpGuid,
-			LPCSTR lpcstrDesc,
-			LPCSTR lpcstrModule,
-			LPVOID lpContext);
+                static int CALLBACK DSEnumCallback(LPGUID lpGuid,
+                        LPCSTR lpcstrDesc,
+                        LPCSTR lpcstrModule,
+                        LPVOID lpContext);
 #endif
     public:
         AudioOutputDX       *parent;
@@ -141,14 +141,14 @@ int CALLBACK AudioOutputDXPrivate::DSEnumCallback(LPGUID  lpGuid,
                                                   LPCWSTR lpcstrModule,
                                                   LPVOID  lpContext)
 {
-	QString enum_desc = QString::fromWCharArray( lpcstrDesc );
+        QString enum_desc = QString::fromWCharArray( lpcstrDesc );
 #else
 int CALLBACK AudioOutputDXPrivate::DSEnumCallback(LPGUID lpGuid,
-												  LPCSTR lpcstrDesc,
-												  LPCSTR lpcstrModule,
-												  LPVOID lpContext)
+                                                                                                  LPCSTR lpcstrDesc,
+                                                                                                  LPCSTR lpcstrModule,
+                                                                                                  LPVOID lpContext)
 {
-	QString enum_desc = QString::fromLocal8Bit( lpcstrDesc );
+        QString enum_desc = QString::fromLocal8Bit( lpcstrDesc );
 
 #endif
     AudioOutputDXPrivate *context = static_cast<AudioOutputDXPrivate*>(lpContext);

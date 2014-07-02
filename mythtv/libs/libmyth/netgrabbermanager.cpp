@@ -67,7 +67,7 @@ void GrabberScript::run()
 
         QByteArray result = getTree.ReadAll();
 
-	QDomDocument domDoc;
+        QDomDocument domDoc;
         domDoc.setContent(result, true);
         QDomElement root = domDoc.documentElement();
         QDomElement channel = root.firstChildElement("channel");
@@ -397,4 +397,3 @@ void Search::SetData(QByteArray data)
     m_document.setContent(m_data, true);
 
 }
-

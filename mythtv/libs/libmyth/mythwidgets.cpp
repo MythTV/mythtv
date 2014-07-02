@@ -631,7 +631,7 @@ void MythRemoteLineEdit::startCycle(QString current_choice, QString set)
 {
     if (active_cycle)
     {
-        LOG(VB_GENERAL, LOG_ALERT, 
+        LOG(VB_GENERAL, LOG_ALERT,
                  "startCycle() called, but edit is already in a cycle.");
         return;
     }
@@ -946,7 +946,7 @@ void MythRemoteLineEdit::setCycleTime(float desired_interval)
 {
     if (desired_interval < 0.5 || desired_interval > 10.0)
     {
-        LOG(VB_GENERAL, LOG_ALERT, 
+        LOG(VB_GENERAL, LOG_ALERT,
                  QString("cycle interval of %1 milliseconds ")
                      .arg((int) (desired_interval * 1000)) +
                  "\n\t\t\tis outside of the allowed range of "

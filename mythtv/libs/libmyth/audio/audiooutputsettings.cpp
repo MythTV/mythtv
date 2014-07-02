@@ -76,7 +76,7 @@ int AudioOutputSettings::GetNextRate()
 void AudioOutputSettings::AddSupportedRate(int rate)
 {
     m_rates.push_back(rate);
-    LOG(VB_AUDIO, LOG_INFO, LOC + 
+    LOG(VB_AUDIO, LOG_INFO, LOC +
         QString("Sample rate %1 is supported").arg(rate));
 }
 
@@ -131,7 +131,7 @@ AudioFormat AudioOutputSettings::GetNextFormat()
 
 void AudioOutputSettings::AddSupportedFormat(AudioFormat format)
 {
-    LOG(VB_AUDIO, LOG_INFO, LOC + 
+    LOG(VB_AUDIO, LOG_INFO, LOC +
         QString("Format %1 is supported").arg(FormatToString(format)));
     m_formats.push_back(format);
 }
@@ -344,7 +344,7 @@ AudioOutputSettings* AudioOutputSettings::GetCleaned(bool newcopy)
         // as it's mandatory under the bluray standard
 //#if LIBAVFORMAT_VERSION_INT > AV_VERSION_INT( 52, 83, 0 )
         if (m_passthrough >= 0 && IsSupportedChannels(8) &&
-	    IsSupportedRate(192000))
+            IsSupportedRate(192000))
             aosettings->setFeature(FEATURE_TRUEHD | FEATURE_DTSHD |
                                    FEATURE_EAC3);
 //#endif
@@ -394,7 +394,7 @@ AudioOutputSettings* AudioOutputSettings::GetUsers(bool newcopy)
     bool bAC3  = aosettings->canFeature(FEATURE_AC3) &&
         gCoreContext->GetNumSetting("AC3PassThru", false);
 
-    bool bDTS  = aosettings->canFeature(FEATURE_DTS) && 
+    bool bDTS  = aosettings->canFeature(FEATURE_DTS) &&
         gCoreContext->GetNumSetting("DTSPassThru", false);
 
     bool bLPCM = aosettings->canFeature(FEATURE_LPCM) &&
@@ -448,7 +448,7 @@ int AudioOutputSettings::GetMaxHDRate()
 }
 
 #define ARG(x) ((tmp.isEmpty() ? "" : ",") + QString(x))
-    
+
 QString AudioOutputSettings::FeaturesToString(DigitalFeature arg)
 {
     QString tmp;
@@ -472,7 +472,7 @@ QString AudioOutputSettings::FeaturesToString(DigitalFeature arg)
         "AAC",
         NULL
     };
-    
+
     for (unsigned int i = 0; feature[i] != (DigitalFeature)-1; i++)
     {
         if (arg & feature[i])

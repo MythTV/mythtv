@@ -206,7 +206,7 @@ bool BackendSelection::ConnectBackend(DeviceLocation *dev)
     switch (stat)
     {
         case UPnPResult_Success:
-            LOG(VB_UPNP, LOG_INFO, 
+            LOG(VB_UPNP, LOG_INFO,
                 QString("ConnectBackend() - success. New hostname: %1")
                 .arg(m_DBparams->dbHostName));
             return true;
@@ -221,14 +221,14 @@ bool BackendSelection::ConnectBackend(DeviceLocation *dev)
             break;
 
         case UPnPResult_ActionNotAuthorized:
-            LOG(VB_GENERAL, LOG_ERR, 
+            LOG(VB_GENERAL, LOG_ERR,
                 QString("Access denied for %1. Wrong PIN?")
                 .arg(backendName));
             PromptForPassword();
             break;
 
         default:
-            LOG(VB_GENERAL, LOG_ERR, 
+            LOG(VB_GENERAL, LOG_ERR,
                 QString("GetConnectionInfo() failed for %1 : %2")
                 .arg(backendName).arg(message));
             ShowOkPopup(message);
@@ -314,7 +314,7 @@ void BackendSelection::customEvent(QEvent *event)
         QString    URL     = me->ExtraData(2);
 
 
-        LOG(VB_UPNP, LOG_DEBUG, 
+        LOG(VB_UPNP, LOG_DEBUG,
                  QString("BackendSelection::customEvent(%1, %2, %3, %4)")
                 .arg(message).arg(URI).arg(URN).arg(URL));
 

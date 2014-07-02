@@ -1,7 +1,7 @@
 /*
  * eldutils.cpp (c) Jean-Yves Avenard <jyavenard@mythtv.org>
  * a utility class to decode EDID Like Data (ELD) byte stream
- * 
+ *
  * Based on ALSA hda_eld.c
  * Copyright(c) 2008 Intel Corporation.
  *

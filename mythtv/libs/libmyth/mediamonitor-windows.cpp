@@ -110,7 +110,7 @@ bool MediaMonitorWindows::AddDevice(MythMediaDevice *pDevice)
     {
         if ((*itr)->getDevicePath() == path)
         {
-            LOG(VB_MEDIA, LOG_INFO, 
+            LOG(VB_MEDIA, LOG_INFO,
                      "MediamonitorWindows::AddDevice() -- " +
                      QString("Not adding '%1', it appears to be a duplicate.")
                          .arg(path));

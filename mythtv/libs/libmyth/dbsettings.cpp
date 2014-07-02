@@ -240,7 +240,7 @@ void MythDbSettings1::Load(void)
 
     if (params.dbHostName.isEmpty())
     {
-        //: %1 is the required field name 
+        //: %1 is the required field name
         dbHostName->setLabel(DatabaseSettings::tr("* %1", "Required field")
                              .arg(dbHostName->getLabel()));
         dbHostName->setValue(m_DBhostOverride);

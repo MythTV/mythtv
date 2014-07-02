@@ -78,7 +78,7 @@ bool PulseHandler::Suspend(enum PulseAction action)
         }
         else
         {
-            LOG(VB_GENERAL, LOG_ERR, LOC + 
+            LOG(VB_GENERAL, LOG_ERR, LOC +
                 "Failed to create PulseHandler object");
             return false;
         }

@@ -96,7 +96,7 @@ void SPDIFEncoder::WriteFrame(unsigned char *data, int size)
     AVPacket packet;
     av_init_packet(&packet);
     static int pts = 1; // to avoid warning "Encoder did not produce proper pts"
-    packet.pts  = pts++; 
+    packet.pts  = pts++;
     packet.data    = data;
     packet.size    = size;
 

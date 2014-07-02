@@ -7,7 +7,7 @@
 
 #include "audiosettings.h"
 
-// startup_upmixer 
+// startup_upmixer
 AudioSettings::AudioSettings() :
     main_device(QString::null),
     passthru_device(QString::null),

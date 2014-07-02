@@ -383,4 +383,3 @@ void AudioOutputOSS::SetVolumeChannel(int channel, int volume)
             VBERROR(QString("Error setting volume on channel %1").arg(channel));
     }
 }
-

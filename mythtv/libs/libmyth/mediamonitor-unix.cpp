@@ -91,15 +91,15 @@ static const QString LOC = QString("MMUnix:");
 // TODO: are these used?
 static void fstabError(const QString &methodName)
 {
-    LOG(VB_GENERAL, LOG_ALERT, 
+    LOG(VB_GENERAL, LOG_ALERT,
              LOC + methodName + " Error: failed to open " + _PATH_FSTAB +
              " for reading, " + ENO);
 }
 
 static void statError(const QString &methodName, const QString &devPath)
 {
-    LOG(VB_GENERAL, LOG_ALERT, 
-             LOC + methodName + " Error: failed to stat " + devPath + 
+    LOG(VB_GENERAL, LOG_ALERT,
+             LOC + methodName + " Error: failed to stat " + devPath +
              ", " + ENO);
 }
 
@@ -352,7 +352,7 @@ QString MediaMonitorUnix::GetDeviceFile(const QString &sysfs)
         }
         else
         {
-            LOG(VB_GENERAL, LOG_ALERT, 
+            LOG(VB_GENERAL, LOG_ALERT,
                      msg + " udev_device_new_from_syspath returned NULL");
             ret = "";
         }
@@ -360,7 +360,7 @@ QString MediaMonitorUnix::GetDeviceFile(const QString &sysfs)
         udev_unref(udev);
     }
     else
-        LOG(VB_GENERAL, LOG_ALERT, 
+        LOG(VB_GENERAL, LOG_ALERT,
                  "MediaMonitorUnix::GetDeviceFile udev_new failed");
   #else   // HAVE_LIBUDEV
     // Use udevadm info to determine the name
@@ -584,7 +584,7 @@ bool MediaMonitorUnix::AddDevice(MythMediaDevice* pDevice)
         if (sb.st_rdev == new_rdev)
         {
             LOG(VB_MEDIA, LOG_INFO,
-                     LOC + ":AddDevice() - not adding " + path + 
+                     LOC + ":AddDevice() - not adding " + path +
                      "\n                        "
                      "because it appears to be a duplicate of " +
                      (*itr)->getDevicePath());
@@ -760,8 +760,8 @@ void MediaMonitorUnix::deviceRemoved( QDBusObjectPath o)
  */
 bool MediaMonitorUnix::FindPartitions(const QString &dev, bool checkPartitions)
 {
-    LOG(VB_MEDIA, LOG_DEBUG, 
-             LOC + ":FindPartitions(" + dev + 
+    LOG(VB_MEDIA, LOG_DEBUG,
+             LOC + ":FindPartitions(" + dev +
              QString(",%1").arg(checkPartitions ? " true" : " false" ) + ")");
     MythMediaDevice* pDevice = NULL;
 
@@ -865,4 +865,3 @@ void MediaMonitorUnix::CheckDeviceNotifications(void)
     }
 }
 #endif //!CONFIG_QTDBUS
-

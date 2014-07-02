@@ -661,7 +661,7 @@ int AudioOutputALSA::GetBufferedOnSoundcard(void) const
  * < 0 : an error occurred
  * 0   : Succeeded
  * > 0 : Buffer timelength returned by ALSA which is less than what we asked for
- */ 
+ */
 int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
                                    uint channels, uint rate, uint buffer_time,
                                    uint period_time)

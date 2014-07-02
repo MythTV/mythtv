@@ -84,7 +84,7 @@ StorageGroupEditor::StorageGroupEditor(QString group) :
     addChild(listbox);
 }
 
-void StorageGroupEditor::open(QString name) 
+void StorageGroupEditor::open(QString name)
 {
     lastValue = name;
 
@@ -92,7 +92,7 @@ void StorageGroupEditor::open(QString name)
     {
         name = "";
         SGPopupResult result = StorageGroupPopup::showPopup(
-            GetMythMainWindow(), 
+            GetMythMainWindow(),
             tr("Add Storage Group Directory"),
             tr("Enter directory name or press SELECT to enter text via the "
                "On Screen Keyboard"), name);
@@ -117,7 +117,7 @@ void StorageGroupEditor::open(QString name)
             lastValue = name;
     } else {
         SGPopupResult result = StorageGroupPopup::showPopup(
-            GetMythMainWindow(), 
+            GetMythMainWindow(),
             tr("Edit Storage Group Directory"),
             tr("Enter directory name or press SELECT to enter text via the "
                "On Screen Keyboard"), name);
@@ -151,7 +151,7 @@ void StorageGroupEditor::open(QString name)
     }
 };
 
-void StorageGroupEditor::doDelete(void) 
+void StorageGroupEditor::doDelete(void)
 {
     QString name = listbox->getValue();
     if (name == "__CREATE_NEW_STORAGE_DIRECTORY__")
@@ -259,7 +259,7 @@ StorageGroupListEditor::StorageGroupListEditor(void) :
     addChild(listbox);
 }
 
-void StorageGroupListEditor::open(QString name) 
+void StorageGroupListEditor::open(QString name)
 {
     lastValue = name;
 
@@ -273,7 +273,7 @@ void StorageGroupListEditor::open(QString name)
         {
             name = "";
             SGPopupResult result = StorageGroupPopup::showPopup(
-                GetMythMainWindow(), 
+                GetMythMainWindow(),
                 tr("Create New Storage Group"),
                 tr("Enter group name or press SELECT to enter text via the "
                    "On Screen Keyboard"), name);
@@ -289,7 +289,7 @@ void StorageGroupListEditor::open(QString name)
     }
 };
 
-void StorageGroupListEditor::doDelete(void) 
+void StorageGroupListEditor::doDelete(void)
 {
     QString name = listbox->getValue();
     if (name.startsWith("__CREATE_NEW_STORAGE_GROUP__"))

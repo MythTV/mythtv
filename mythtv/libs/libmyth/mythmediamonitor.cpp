@@ -104,7 +104,7 @@ void MediaMonitor::SetCDSpeed(const char *device, int speed)
         return;
     }
 
-    LOG(VB_MEDIA, LOG_INFO, 
+    LOG(VB_MEDIA, LOG_INFO,
              QString("MediaMonitor::setSpeed(%1) - Cannot find/create CDROM?")
                   .arg(device));
 }
@@ -150,7 +150,7 @@ QList<MythMediaDevice*> MediaMonitor::GetRemovable(bool showMounted,
 
         if (showUsable && !(*it)->isUsable())
             continue;
-        
+
         if (QString(typeid(**it).name()).contains("MythCDROM") ||
                (showMounted && (*it)->isMounted(false)))
             drives.append(*it);
@@ -181,7 +181,7 @@ MythMediaDevice * MediaMonitor::selectDrivePopup(const QString &label,
 
     if (drives.count() == 1)
     {
-        LOG(VB_MEDIA, LOG_INFO, 
+        LOG(VB_MEDIA, LOG_INFO,
                  "MediaMonitor::selectDrivePopup(" + label +
                  ") - One suitable device");
         return drives.front();
@@ -329,7 +329,7 @@ MediaMonitor::MediaMonitor(QObject* par, unsigned long interval,
             if (m_IgnoreList.filter(target).isEmpty())
             {
                 LOG(VB_MEDIA, LOG_INFO,
-                         "Also ignoring " + target + " (symlinked from " + 
+                         "Also ignoring " + target + " (symlinked from " +
                          *dev + ").");
                 m_IgnoreList += target;
             }
@@ -588,7 +588,7 @@ QList<MythMediaDevice*> MediaMonitor::GetMedias(MythMediaType mediatype)
 void MediaMonitor::MonitorRegisterExtensions(uint mediatype,
                                              const QString &extensions)
 {
-    LOG(VB_GENERAL, LOG_DEBUG, 
+    LOG(VB_GENERAL, LOG_DEBUG,
              QString("MonitorRegisterExtensions(0x%1, %2)")
                  .arg(mediatype, 0, 16).arg(extensions));
 
@@ -616,7 +616,7 @@ void MediaMonitor::RegisterMediaHandler(const QString  &destination,
         if (extensions.length())
             msg += QString(", ext(%1)").arg(extensions);
 
-        LOG(VB_MEDIA, LOG_INFO, 
+        LOG(VB_MEDIA, LOG_INFO,
                  "Registering '" + destination + "' as a media handler for " +
                  msg);
 
@@ -650,7 +650,7 @@ void MediaMonitor::JumpToMediaHandler(MythMediaDevice* pMedia)
         {
             LOG(VB_GENERAL, LOG_NOTICE,
                 QString("Found a handler for %1 - '%2'")
-                .arg(pMedia->MediaTypeString()) .arg(itr.key())); 
+                .arg(pMedia->MediaTypeString()) .arg(itr.key()));
             handlers.append(*itr);
         }
         itr++;
@@ -735,7 +735,7 @@ bool MediaMonitor::shouldIgnore(const MythMediaDevice* device)
         LOG(VB_MEDIA, LOG_DEBUG,
                  "Not ignoring: " + device->getDevicePath() + " / " +
                  device->getMountPath());
-        LOG(VB_MEDIA, LOG_DEBUG, 
+        LOG(VB_MEDIA, LOG_DEBUG,
                  "Paths not in: " + m_IgnoreList.join(", "));
     }
 #endif
