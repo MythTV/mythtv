@@ -90,10 +90,6 @@ __inline AVRational GetAVTimeBaseQ()
 
 #define LOC QString("AFD: ")
 
-#define MAX_AC3_FRAME_SIZE 6144
-
-static const float eps = 1E-5;
-
 static const int max_video_queue_size = 220;
 
 static int cc608_parity(uint8_t byte);
