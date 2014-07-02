@@ -42,12 +42,12 @@ class CECAdapterPriv
         powerOnTV(false),   powerOnTVAllowed(false),  powerOnTVOnStart(false),
         switchInput(false), switchInputAllowed(true)
     {
-		// libcec2's ICECCallbacks has a constructor that clears
-		// all the entries. We're using 1.x....
-		memset(&callbacks, 0, sizeof(callbacks));
-		callbacks.CBCecLogMessage = &CECLogMessageCallback;
-		callbacks.CBCecKeyPress   = &CECKeyPressCallback;
-		callbacks.CBCecCommand    = &CECCommandCallback;
+                // libcec2's ICECCallbacks has a constructor that clears
+                // all the entries. We're using 1.x....
+                memset(&callbacks, 0, sizeof(callbacks));
+                callbacks.CBCecLogMessage = &CECLogMessageCallback;
+                callbacks.CBCecKeyPress   = &CECKeyPressCallback;
+                callbacks.CBCecCommand    = &CECCommandCallback;
     }
 
     static QString addressToString(enum cec_logical_address addr, bool source)
@@ -729,7 +729,7 @@ void CECAdapter::Action(const QString &action)
         m_priv->powerOnTV = true;
     else if (ACTION_TVPOWEROFF == action)
         m_priv->powerOffTV = true;
-	gActionsReady->wakeAll();
+        gActionsReady->wakeAll();
 }
 
 static int CECLogMessageCallback(void *adapter, const cec_log_message &message)
@@ -746,4 +746,3 @@ static int CECCommandCallback(void *adapter, const cec_command &command)
 {
     return ((CECAdapterPriv*)adapter)->HandleCommand(command);
 }
-

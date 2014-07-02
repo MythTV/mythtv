@@ -101,4 +101,3 @@ void MythThemeBase::Init(void)
 
     new MythScreenStack(mainWindow, "popup stack");
 }
-

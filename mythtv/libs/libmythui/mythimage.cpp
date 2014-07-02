@@ -520,4 +520,3 @@ MythImageReader::~MythImageReader()
         m_networkReply = NULL;
     }
 }
-

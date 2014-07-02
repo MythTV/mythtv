@@ -2,7 +2,7 @@
 #include "mythdisplay.h"
 #include "mythmainwindow.h"
 
-#if defined(Q_OS_MAC) 
+#if defined(Q_OS_MAC)
 #import "util-osx.h"
 #elif USING_X11
 #include "mythxdisplay.h"
@@ -98,7 +98,7 @@ DisplayInfo MythDisplay::GetDisplayInfo(int video_rate)
     MythXDisplay *disp = OpenMythXDisplay();
     if (!disp)
         return ret;
-    
+
     float rate = disp->GetRefreshRate();
     if (VALID_RATE(rate))
         ret.rate = 1000000.0f / rate;
@@ -131,5 +131,3 @@ int MythDisplay::GetNumberXineramaScreens(void)
 
     return nr_xinerama_screens;
 }
-
-

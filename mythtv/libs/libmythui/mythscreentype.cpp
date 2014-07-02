@@ -126,7 +126,7 @@ MythUIType *MythScreenType::GetFocusWidget(void) const
 }
 
 bool MythScreenType::SetFocusWidget(MythUIType *widget)
-{ 
+{
     if (!widget || !widget->IsVisible())
     {
         QMap<int, MythUIType *>::iterator it = m_FocusWidgetList.begin();
@@ -150,7 +150,7 @@ bool MythScreenType::SetFocusWidget(MythUIType *widget)
 
     if (m_CurrentFocusWidget == widget)
         return true;
-    
+
     MythUIText *helpText = dynamic_cast<MythUIText *>(GetChild("helptext"));
     if (helpText)
         helpText->Reset();

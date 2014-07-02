@@ -415,7 +415,7 @@ void MythThemedMenu::customEvent(QEvent *event)
             {
                 QString timestamp_setting = QString("%1Time").arg(button.password);
                 QDateTime curr_time = MythDate::current();
-                QString last_time_stamp = 
+                QString last_time_stamp =
                     MythDate::toString(curr_time, MythDate::kDatabase);
                 GetMythDB()->SaveSetting(timestamp_setting, last_time_stamp);
                 buttonAction(item, true);

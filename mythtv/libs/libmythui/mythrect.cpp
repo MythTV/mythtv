@@ -520,4 +520,3 @@ QPoint MythPoint::toQPoint() const
 {
     return QPoint(x(),y());
 }
-

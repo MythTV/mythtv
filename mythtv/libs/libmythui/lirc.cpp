@@ -90,7 +90,7 @@ LIRC::LIRC(QObject *main_window,
     configFile.detach();
     buf.resize(0);
 }
-  
+
 LIRC::~LIRC()
 {
     TeardownAll();
@@ -112,27 +112,27 @@ void LIRC::TeardownAll(void)
         wait();
         lock.lock();
     }
-  
+
     if (d)
     {
         delete d;
         d = NULL;
     }
 }
-  
+
 static QByteArray get_ip(const QString &h)
 {
     QByteArray hba = h.toLatin1();
     struct in_addr sin_addr;
     if (inet_aton(hba.constData(), &sin_addr))
         return hba;
-  
+
     struct addrinfo hints;
     memset(&hints, 0, sizeof(hints));
     hints.ai_family   = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_protocol = IPPROTO_TCP;
-  
+
     struct addrinfo *result;
     int err = getaddrinfo(hba.constData(), NULL, &hints, &result);
     if (err)
@@ -161,7 +161,7 @@ static QByteArray get_ip(const QString &h)
 
     return hba;
 }
-  
+
 bool LIRC::Init(void)
 {
     QMutexLocker locker(&lock);
@@ -180,25 +180,25 @@ bool LIRC::Init(void)
             LOG(vtype, LOG_ERR, LOC +
                 QString("lircdDevice '%1'").arg(lircdDevice) +
                 " is too long for the 'unix' socket API");
-  
+
             return false;
         }
-  
+
         lircd_socket = socket(AF_UNIX, SOCK_STREAM, 0);
         if (lircd_socket < 0)
         {
             LOG(vtype, LOG_ERR, LOC + QString("Failed to open Unix socket '%1'")
                     .arg(lircdDevice) + ENO);
-  
+
             return false;
         }
-  
+
         struct sockaddr_un addr;
         memset(&addr, 0, sizeof(sockaddr_un));
         addr.sun_family = AF_UNIX;
         strncpy(addr.sun_path, dev.constData(),107);
 
-        int ret = ::connect(lircd_socket, (struct sockaddr*) &addr, 
+        int ret = ::connect(lircd_socket, (struct sockaddr*) &addr,
                             sizeof(addr));
 
         if (ret < 0)
@@ -218,7 +218,7 @@ bool LIRC::Init(void)
         {
             LOG(vtype, LOG_ERR, LOC + QString("Failed to open TCP socket '%1'")
                     .arg(lircdDevice) + ENO);
-  
+
             return false;
         }
 
@@ -235,7 +235,7 @@ bool LIRC::Init(void)
         memset(&addr, 0, sizeof(sockaddr_in));
         addr.sin_family = AF_INET;
         addr.sin_port   = htons(port);
-  
+
         if (!inet_aton(device.constData(), &addr.sin_addr))
         {
             LOG(vtype, LOG_ERR, LOC + QString("Failed to parse IP address '%1'")
@@ -245,7 +245,7 @@ bool LIRC::Init(void)
             return false;
         }
 
-        int ret = ::connect(lircd_socket, (struct sockaddr*) &addr, 
+        int ret = ::connect(lircd_socket, (struct sockaddr*) &addr,
                             sizeof(addr));
         if (ret < 0)
         {
@@ -260,7 +260,7 @@ bool LIRC::Init(void)
         // On Linux, select() can indicate data when there isn't
         // any due to TCP checksum in-particular; to avoid getting
         // stuck on a read() call add the O_NONBLOCK flag.
-        int flags = fcntl(lircd_socket, F_GETFD); 
+        int flags = fcntl(lircd_socket, F_GETFD);
         if (flags >= 0)
         {
             ret = fcntl(lircd_socket, F_SETFD, flags | O_NONBLOCK);
@@ -271,7 +271,7 @@ bool LIRC::Init(void)
                         .arg(lircdDevice) + ENO);
             }
         }
-  
+
         // Attempt to inline out-of-band messages and keep the connection open..
         int i = 1;
         ret = setsockopt(lircd_socket, SOL_SOCKET, SO_OOBINLINE, &i, sizeof(i));
@@ -298,7 +298,7 @@ bool LIRC::Init(void)
         return false;
     }
     d->lircState->lirc_lircd = lircd_socket;
-  
+
     // parse the config file
     if (!d->lircConfig)
     {
@@ -318,7 +318,7 @@ bool LIRC::Init(void)
     LOG(VB_GENERAL, LOG_INFO, LOC +
         QString("Successfully initialized '%1' using '%2' config")
             .arg(lircdDevice).arg(configFile));
-    
+
     return true;
 }
 
@@ -431,7 +431,7 @@ void LIRC::run(void)
                 continue;
             }
             LOG(VB_FILE, LOG_WARNING, LOC + "EOF -- reconnecting");
-  
+
             lirc_deinit(d->lircState);
             d->lircState = NULL;
 
@@ -439,7 +439,7 @@ void LIRC::run(void)
                 retryCount = 0;
             else
                 sleep(2); // wait a while before we retry..
-            
+
             continue;
         }
 
@@ -475,7 +475,7 @@ void LIRC::run(void)
 #endif
     RunEpilog();
 }
-  
+
 QList<QByteArray> LIRC::GetCodes(void)
 {
     QList<QByteArray> ret;
@@ -534,4 +534,3 @@ QList<QByteArray> LIRC::GetCodes(void)
     buf_offset = buf.size();
     return ret;
 }
-

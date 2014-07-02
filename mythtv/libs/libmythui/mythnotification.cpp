@@ -48,7 +48,7 @@ QString MythPlaybackNotification::stringFromSeconds(int time)
     int   minute  = (time - hour * 3600) / 60;
     int seconds   = time - hour * 3600 - minute * 60;
     QString str;
-    
+
     if (hour)
     {
         str += QString("%1:").arg(hour);

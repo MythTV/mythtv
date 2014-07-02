@@ -152,4 +152,3 @@ void MythQtPainter::DeleteFormatImagePriv(MythImage *im)
         qim->SetPixmap(NULL);
     }
 }
-

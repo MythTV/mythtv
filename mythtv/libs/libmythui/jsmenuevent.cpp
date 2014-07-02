@@ -9,4 +9,3 @@
 
 QEvent::Type JoystickKeycodeEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
-

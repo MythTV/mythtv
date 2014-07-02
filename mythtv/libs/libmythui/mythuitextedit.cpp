@@ -241,7 +241,7 @@ QString MythUITextEdit::GetText(void) const
 {
     QString ret = m_Message;
     ret.detach();
-    return ret;   
+    return ret;
 }
 
 void MythUITextEdit::InsertText(const QString &text)

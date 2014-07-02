@@ -140,4 +140,3 @@ void MythUIClock::CreateCopy(MythUIType *parent)
     MythUIClock *clock = new MythUIClock(parent, objectName());
     clock->CopyFrom(this);
 }
-

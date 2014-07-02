@@ -93,7 +93,7 @@ int GetNvidiaRates(t_screenrate& screenmap)
     int screen, display_devices, mask, major, minor, len, j;
     char *str, *start;
     int nDisplayDevice;
-    
+
     char *pMetaModes, *pModeLines[8], *tmp, *modeString;
     char *modeLine, *modeName;
     int MetaModeLen, ModeLineLen[8];
@@ -110,7 +110,7 @@ int GetNvidiaRates(t_screenrate& screenmap)
      * extension is present on the screen we want to use.
      */
 
-    dpy = d->GetDisplay();    
+    dpy = d->GetDisplay();
     screen = d->GetScreen();
 
     if (!XNVCTRLIsNvScreen(dpy, screen))
@@ -429,7 +429,7 @@ static void parse_mode_string(char *modeString, char **modeName, int *mask)
     {
         if (*s == ' ' && *(s+1) == '@')
             s_end = s;
-    } 
+    }
 
     tmp = *s_end;
     *s_end = '\0';

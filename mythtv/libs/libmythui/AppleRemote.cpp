@@ -405,7 +405,7 @@ bool AppleRemote::_openDevice()
     queue = (*hidDeviceInterface)->allocQueue(hidDeviceInterface);
     if (!queue)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + 
+        LOG(VB_GENERAL, LOG_ERR, LOC +
             "_openDevice() - error allocating queue");
         return false;
     }
@@ -434,7 +434,7 @@ bool AppleRemote::_openDevice()
                                               this, NULL);
     if (ioReturnValue != KERN_SUCCESS)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + 
+        LOG(VB_GENERAL, LOG_ERR, LOC +
             "_openDevice() - error registering callback");
         return false;
     }

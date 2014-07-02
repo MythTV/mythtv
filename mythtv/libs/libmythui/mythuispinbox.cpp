@@ -65,8 +65,8 @@ void MythUISpinBox::SetRange(int low, int high, int step, uint pageMultiple)
                                            QCoreApplication::UnicodeUTF8,
                                            qAbs(value));
 #else
-					text = qApp->translate("ThemeUI", temp.toUtf8(), NULL,
-					qAbs(value));
+                                        text = qApp->translate("ThemeUI", temp.toUtf8(), NULL,
+                                        qAbs(value));
 #endif
                 else
                     text = qApp->translate("ThemeUI", temp.toUtf8());
@@ -106,7 +106,7 @@ void MythUISpinBox::AddSelection(int value, const QString &label)
             return;
         }
     }
-    
+
     int insertPos=-1;
 
     for (int pos = 0; pos < m_itemList.size(); pos++)

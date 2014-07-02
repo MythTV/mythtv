@@ -501,4 +501,3 @@ FontMap *GetGlobalFontMap(void)
 {
     return FontMap::GetGlobalFontMap();
 }
-

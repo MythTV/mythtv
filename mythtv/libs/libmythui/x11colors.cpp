@@ -19,7 +19,7 @@ QColor createColor(const QString &color)
     QMutexLocker locker(&x11colormapLock);
     if (x11colormap.empty())
     {
-        static const colormap cmap[] = {      
+        static const colormap cmap[] = {
         { "snow", 255, 250, 250},
         { "ghost", 248, 248, 255},
         { "ghostwhite", 248, 248, 255},
@@ -771,7 +771,7 @@ QColor createColor(const QString &color)
         { "dark", 139, 0, 0},
         { "darkred", 139, 0, 0},
         { "light", 144, 238, 144},
-        { "lightgreen", 144, 238, 144}  
+        { "lightgreen", 144, 238, 144}
         };
 
         for (unsigned int i = 0; i < (sizeof(cmap) / sizeof(cmap[0])); i++)
@@ -786,4 +786,3 @@ QColor createColor(const QString &color)
 
     return QColor(color);
 }
-

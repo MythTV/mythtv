@@ -215,4 +215,3 @@ QColor inline rgb_to_yuv(const QColor &original)
 
     return QColor(y, u, v, a);
 }
-

@@ -24,7 +24,7 @@ void MythQImagePainter::Begin(QPaintDevice *parent)
 {
     if (!parent)
     {
-        LOG(VB_GENERAL, LOG_ERR, 
+        LOG(VB_GENERAL, LOG_ERR,
             "FATAL ERROR: No parent widget defined for QT Painter, bailing");
         return;
     }

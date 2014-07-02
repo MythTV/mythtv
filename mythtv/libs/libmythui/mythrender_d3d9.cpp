@@ -773,11 +773,11 @@ bool MythRenderD3D9::SetRenderTarget(IDirect3DTexture9 *texture)
         {
             hr = dev->SetRenderTarget(0, m_default_surface);
             if (FAILED(hr))
-                LOG(VB_GENERAL, LOG_ERR, D3DLOC + 
+                LOG(VB_GENERAL, LOG_ERR, D3DLOC +
                     "Failed to set render target.");
         }
         else
-            LOG(VB_GENERAL, LOG_ERR, D3DLOC + 
+            LOG(VB_GENERAL, LOG_ERR, D3DLOC +
                 "No default surface for render target.");
     }
     else

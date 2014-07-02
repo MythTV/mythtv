@@ -155,7 +155,7 @@ bool DisplayRes::SwitchToVideo(int iwidth, int iheight, double frate)
     bool chg = !(next == m_last) ||
                !(DisplayResScreen::compare_rates(m_last.RefreshRate(),
                                                  target_rate));
-    
+
     LOG(VB_GENERAL, LOG_INFO, QString("%1 %2x%3 %4 Hz")
         .arg(chg ? "Changing to" : "Using")
         .arg(next.Width()).arg(next.Height())

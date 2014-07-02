@@ -62,4 +62,3 @@ int MythUIStateTracker::TimeSinceLastUpdate(void)
     gUIStateLock->unlock();
     return age < 0 ? 1000000 : age;
 }
-

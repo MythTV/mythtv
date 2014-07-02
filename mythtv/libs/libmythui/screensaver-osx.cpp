@@ -2,7 +2,7 @@
 
 #include <CoreServices/CoreServices.h>
 
-class ScreenSaverOSXPrivate 
+class ScreenSaverOSXPrivate
 {
 public:
     static void timerCallback(CFRunLoopTimerRef timer, void *info)
@@ -11,25 +11,25 @@ public:
         (void)info;
         UpdateSystemActivity(OverallAct);
     };
-    
+
     CFRunLoopTimerRef m_timer;
 
     friend class ScreenSaverOSX;
 };
 
-ScreenSaverOSX::ScreenSaverOSX() 
+ScreenSaverOSX::ScreenSaverOSX()
 {
     d = new ScreenSaverOSXPrivate();
     d->m_timer = NULL;
 }
 
-ScreenSaverOSX::~ScreenSaverOSX() 
+ScreenSaverOSX::~ScreenSaverOSX()
 {
     Restore();
     delete d;
 }
 
-void ScreenSaverOSX::Disable(void) 
+void ScreenSaverOSX::Disable(void)
 {
     CFRunLoopTimerContext context = { 0, NULL, NULL, NULL, NULL };
     if (!d->m_timer)
@@ -45,7 +45,7 @@ void ScreenSaverOSX::Disable(void)
     }
 }
 
-void ScreenSaverOSX::Restore(void) 
+void ScreenSaverOSX::Restore(void)
 {
     if (d->m_timer)
     {
@@ -65,4 +65,3 @@ bool ScreenSaverOSX::Asleep(void)
 {
     return 0;
 }
-

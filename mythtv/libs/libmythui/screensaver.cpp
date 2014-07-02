@@ -19,7 +19,7 @@ ScreenSaverControl* ScreenSaverControl::get(void)
 {
     if (!ScreenSaverSingleton)
     {
-  
+
 #if defined(USING_X11)
         ScreenSaverSingleton = new ScreenSaverX11();
 #elif CONFIG_DARWIN
@@ -28,6 +28,6 @@ ScreenSaverControl* ScreenSaverControl::get(void)
         ScreenSaverSingleton = new ScreenSaverNull();
 #endif
     }
-    
+
     return ScreenSaverSingleton;
 }

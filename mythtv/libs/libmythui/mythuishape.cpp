@@ -173,4 +173,3 @@ void MythUIShape::CreateCopy(MythUIType *parent)
     MythUIShape *shape = new MythUIShape(parent, objectName());
     shape->CopyFrom(this);
 }
-

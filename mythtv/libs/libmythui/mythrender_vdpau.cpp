@@ -156,7 +156,7 @@ class VDPAULayer
 class VDPAUResource
 {
   public:
-    VDPAUResource() : m_id(0) {} 
+    VDPAUResource() : m_id(0) {}
     VDPAUResource(uint id, QSize size) : m_id(id), m_size(size) { }
     virtual ~VDPAUResource() {}
 
@@ -573,7 +573,7 @@ bool MythRenderVDPAU::GetScreenShot(int width, int height, QString filename)
         if (height <= 0)
             height = img.height();
 
-        img = img.scaled(width, height, Qt::KeepAspectRatio, 
+        img = img.scaled(width, height, Qt::KeepAspectRatio,
                          Qt::SmoothTransformation);
         success = window->SaveScreenShot(img, filename);
     }
