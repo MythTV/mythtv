@@ -754,6 +754,24 @@ bool MPEG2fixup::InitAV(QString inputfile, const char *type, int64_t offset)
         return false;
     }
 
+    if (inputFC->iformat && !strcmp(inputFC->iformat->name, "mpegts") &&
+        gCoreContext->GetNumSetting("FFMPEGTS", false))
+    {
+        fmt = av_find_input_format("mpegts-ffmpeg");
+        if (fmt)
+        {
+            LOG(VB_PLAYBACK, LOG_INFO, "Using FFmpeg MPEG-TS demuxer (forced)");
+            avformat_close_input(&inputFC);
+            ret = avformat_open_input(&inputFC, ifname, fmt, NULL);
+            if (ret)
+            {
+                LOG(VB_GENERAL, LOG_ERR,
+                    QString("Couldn't open input file, error #%1").arg(ret));
+                return false;
+            }
+        }
+    }
+
     mkvfile = !strcmp(inputFC->iformat->name, "mkv") ? 1 : 0;
 
     if (offset)
