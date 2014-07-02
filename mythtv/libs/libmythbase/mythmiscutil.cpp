@@ -42,6 +42,7 @@ using namespace std;
 #include <QFile>
 #include <QDir>
 #include <QUrl>
+#include <QHostAddress>
 
 // Myth headers
 #include "mythcorecontext.h"
@@ -227,8 +228,17 @@ bool ping(const QString &host, int timeout)
                          kMSProcessEvents) != GENERIC_EXIT_OK)
         return false;
 #else
-    QString cmd = QString("ping -t %1 -c 1  %2  >/dev/null 2>&1")
-                  .arg(timeout).arg(host);
+    QString addrstr =
+        gCoreContext->resolveAddress(host, gCoreContext->ResolveAny, true);
+    QHostAddress addr = QHostAddress(addrstr);
+    QString pingcmd =
+#if !defined(QT_NO_IPV6)
+        addr.protocol() == QAbstractSocket::IPv6Protocol ? "ping6" : "ping";
+#else
+        "ping";
+#endif
+    QString cmd = QString("%1 -t %2 -c 1  %3  >/dev/null 2>&1")
+                  .arg(pingcmd).arg(timeout).arg(host);
 
     if (myth_system(cmd, kMSDontBlockInputDevs | kMSDontDisableDrawing |
                          kMSProcessEvents) != GENERIC_EXIT_OK)
@@ -236,13 +246,13 @@ bool ping(const QString &host, int timeout)
         // ping command may not like -t argument, or the host might not
         // be listening. Try to narrow down with a quick ping to localhost:
 
-        cmd = "ping -t 1 -c 1 localhost >/dev/null 2>&1";
+        cmd = pingcmd + " -t 1 -c 1 localhost >/dev/null 2>&1";
 
         if (myth_system(cmd, kMSDontBlockInputDevs | kMSDontDisableDrawing |
                              kMSProcessEvents) != GENERIC_EXIT_OK)
         {
             // Assume -t is bad - do a ping that might cause a timeout:
-            cmd = QString("ping -c 1 %1 >/dev/null 2>&1").arg(host);
+            cmd = QString("%1 -c 1 %2 >/dev/null 2>&1").arg(pingcmd).arg(host);
 
             if (myth_system(cmd, kMSDontBlockInputDevs | kMSDontDisableDrawing |
                                  kMSProcessEvents) != GENERIC_EXIT_OK)
