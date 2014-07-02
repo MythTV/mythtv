@@ -25,5 +25,7 @@ LIBS += -lmythavcodec
 LIBS += -lmythavcodec
 LIBS += -lmythavutil
 LIBS += -lz
+using_live: LIBS += -lmythlivemedia-$$LIBVERSION
+using_mheg: LIBS += -lmythfreemheg-$$LIBVERSION
 
 QT += xml sql opengl network
