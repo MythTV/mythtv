@@ -30,6 +30,9 @@ void MythTranscodeCommandLineParser::LoadArguments(void)
         ->SetGroup("Encoding");
     add("--audiotrack", "audiotrack", 0, "Select specific audio track.", "")
         ->SetGroup("Encoding");
+    add("--allaudiotracks", "allaudio", 0,
+        "Keep all audio tracks including those marked with 0 channels.", "")
+        ->SetGroup("Encoding");
     add(QStringList( QStringList() << "-m" << "--mpeg2" ), "mpeg2", false,
             "Specifies that a lossless transcode should be used.", "")
         ->SetGroup("Encoding");
