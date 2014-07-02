@@ -1386,7 +1386,15 @@ int MPEG2fixup::GetFrame(AVPacket *pkt)
                 break;
 
             case AVMEDIA_TYPE_AUDIO:
-                aFrame[pkt->stream_index]->append(tmpFrame);
+                if (aFrame.contains(pkt->stream_index))
+                {
+                    aFrame[pkt->stream_index]->append(tmpFrame);
+                }
+                else
+                {
+                    LOG(VB_GENERAL, LOG_DEBUG,
+                        QString("Invalid stream ID %1, ignoring").arg(pkt->stream_index));
+                }
                 av_free_packet(pkt);
                 return 0;
 
