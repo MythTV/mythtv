@@ -192,4 +192,3 @@ void PlayerSettings::fillRegionList()
     if (item)
         m_blurayRegionList->SetItemCurrent(item);
 }
-

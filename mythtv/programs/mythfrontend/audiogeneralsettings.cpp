@@ -220,8 +220,8 @@ void AudioConfigSettings::AudioRescan()
             QString msg = tr("%1 is invalid or not useable.").arg(name);
 
             MythPopupBox::showOkPopup(
-                GetMythMainWindow(), 
-                QCoreApplication::translate("(Common)", "Warning"), 
+                GetMythMainWindow(),
+                QCoreApplication::translate("(Common)", "Warning"),
                 msg);
 
             LOG(VB_GENERAL, LOG_ERR, QString("Audio device %1 isn't usable")
@@ -239,7 +239,7 @@ void AudioConfigSettings::AudioRescan()
             gCoreContext->GetSetting("PassThruOutputDevice");
 
         MythPopupBox::showOkPopup(
-            GetMythMainWindow(), 
+            GetMythMainWindow(),
             QCoreApplication::translate("(Common)", "Warning"),
             msg);
 
@@ -444,7 +444,7 @@ HostComboBox *AudioConfigSettings::MaxAudioChannels()
 
     gc->setLabel(tr("Speaker configuration"));
 
-    gc->addSelection(QCoreApplication::translate("(Common)", "Stereo"), 
+    gc->addSelection(QCoreApplication::translate("(Common)", "Stereo"),
                      "2", true); // default
 
     gc->setHelpText(tr("Select the maximum number of audio "
@@ -647,7 +647,7 @@ void AudioTestThread::run()
 {
     RunProlog();
     m_interrupted = false;
-    int smptelayout[7][8] = { 
+    int smptelayout[7][8] = {
         { 0, 1, 1 },                    //stereo
         { },                            //not used
         { },                            //not used
@@ -936,7 +936,7 @@ void AudioTest::togglequality()
         QString msg = tr("Audio device is invalid or not useable.");
 
         MythPopupBox::showOkPopup(
-            GetMythMainWindow(), QCoreApplication::translate("(Common)", 
+            GetMythMainWindow(), QCoreApplication::translate("(Common)",
                                                              "Warning"), msg);
     }
 }
@@ -1225,7 +1225,7 @@ HostComboBox *AudioAdvancedSettings::PassThroughOutputDevice()
 
     gc->setLabel(tr("Digital output device"));
 
-    gc->addSelection(QCoreApplication::translate("(Common)", "Default"), 
+    gc->addSelection(QCoreApplication::translate("(Common)", "Default"),
                      "Default");
 #ifdef _WIN32
     gc->addSelection("DirectX:Primary Sound Driver");

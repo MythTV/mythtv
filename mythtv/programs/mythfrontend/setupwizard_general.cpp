@@ -304,4 +304,3 @@ void GeneralSetupWizard::CreateBusyDialog(QString message)
     if (m_busyPopup->Create())
         m_popupStack->AddScreen(m_busyPopup);
 }
-

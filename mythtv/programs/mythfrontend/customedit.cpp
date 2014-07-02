@@ -219,7 +219,7 @@ QString CustomEdit::evaluate(QString clause)
             QDateTime midnight = QDateTime(date.date());
             repl = QString("%1").arg(midnight.secsTo(date));
         } else if (!mid.compare("ENDSEC")) {
-            QDateTime date = m_pginfo->GetScheduledEndTime(); 
+            QDateTime date = m_pginfo->GetScheduledEndTime();
             QDateTime midnight = QDateTime(date.date());
             repl = QString("%1").arg(midnight.secsTo(date));
         }
@@ -954,4 +954,3 @@ bool CustomEdit::keyPressEvent(QKeyEvent *event)
 
     return handled;
 }
-

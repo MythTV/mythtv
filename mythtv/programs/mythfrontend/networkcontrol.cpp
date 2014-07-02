@@ -830,14 +830,14 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
     }
     else if (is_abbrev("subtitles", nc->getArg(1), 2))
     {
-	if (nc->getArgCount() < 3)
-	    message = QString("NETWORK_CONTROL SUBTITLES 0");
-	else if (!nc->getArg(2).toLower().contains(QRegExp("^\\d+$")))
-	    return QString("ERROR: See 'help %1' for usage information")
-		.arg(nc->getArg(0));
-	else
-	    message = QString("NETWORK_CONTROL SUBTITLES %1")
-		.arg(nc->getArg(2));
+        if (nc->getArgCount() < 3)
+            message = QString("NETWORK_CONTROL SUBTITLES 0");
+        else if (!nc->getArg(2).toLower().contains(QRegExp("^\\d+$")))
+            return QString("ERROR: See 'help %1' for usage information")
+                .arg(nc->getArg(0));
+        else
+            message = QString("NETWORK_CONTROL SUBTITLES %1")
+                .arg(nc->getArg(2));
     }
     else
         return QString("ERROR: See 'help %1' for usage information")
@@ -1291,7 +1291,7 @@ void NetworkControl::customEvent(QEvent *e)
                 for (int i = 4; i < tokens.size(); i++)
                     answer += QString(" ") + tokens[i];
                 gotAnswer = true;
-            } 
+            }
 
         }
         else if (message.startsWith("NETWORK_CONTROL"))
@@ -1553,4 +1553,3 @@ QString NetworkCommand::getFrom(int arg)
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
-

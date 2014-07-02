@@ -543,7 +543,7 @@ void StatusBox::doListingsStatus()
     mfdLastRunEnd = MythDate::fromString(tmp);
     tmp = gCoreContext->GetSetting("MythFillSuggestedRunTime");
     mfdNextRunStart = MythDate::fromString(tmp);
-    
+
     mfdLastRunStatus = gCoreContext->GetSetting("mythfilldatabaseLastRunStatus");
     DataDirectMessage = gCoreContext->GetSetting("DataDirectMessage");
 

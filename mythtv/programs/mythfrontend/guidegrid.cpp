@@ -1303,12 +1303,12 @@ void GuideGrid::fillTimeInfos()
         if (mins % 30 == 0)
         {
             QString timeStr = MythDate::toString(starttime, MythDate::kTime);
-            
+
             InfoMap infomap;
             infomap["starttime"] = timeStr;
-            
+
             QDateTime endtime = starttime.addSecs(60 * 30);
-            
+
             infomap["endtime"] = MythDate::toString(endtime, MythDate::kTime);
 
             MythUIButtonListItem *item =
@@ -2051,7 +2051,7 @@ void GuideGrid::generateListings()
 void GuideGrid::ChannelGroupMenu(int mode)
 {
     ChannelGroupList channels = ChannelGroup::GetChannelGroups(mode == 0);
-    
+
     if (channels.empty())
     {
       QString message = tr("You don't have any channel groups defined");
@@ -2091,7 +2091,7 @@ void GuideGrid::ChannelGroupMenu(int mode)
         {
             menuPopup->AddButton(channels[i].name);
         }
-        
+
         popupStack->AddScreen(menuPopup);
     }
     else
@@ -2600,4 +2600,3 @@ void GuideGrid::ShowJumpToTime(void)
     else
         delete timedlg;
 }
-

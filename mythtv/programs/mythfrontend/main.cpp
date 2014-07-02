@@ -124,7 +124,7 @@ void handleSIGUSR2(void);
 static bool gLoaded = false;
 #endif
 
-static const QString _Location = qApp->translate("(Common)", 
+static const QString _Location = qApp->translate("(Common)",
                                                  "MythFrontend");
 
 namespace
@@ -317,7 +317,7 @@ static void startAppearWiz(void)
     bool reload = false;
 
     if (isWindowed)
-        ShowOkPopup(qApp->translate("(MythFrontendMain)", 
+        ShowOkPopup(qApp->translate("(MythFrontendMain)",
                     "The ScreenSetupWizard cannot be used while "
                     "mythfrontend is operating in windowed mode."));
     else
@@ -628,7 +628,7 @@ static void standbyScreen(void)
 
 static void RunVideoScreen(VideoDialog::DialogType type, bool fromJump = false)
 {
-    QString message = qApp->translate("(MythFrontendMain)", 
+    QString message = qApp->translate("(MythFrontendMain)",
                                       "Loading videos ...");
 
     MythScreenStack *popupStack =
@@ -787,7 +787,7 @@ static void handleDVDMedia(MythMediaDevice *dvd)
 
     if (!dvd->isUsable()) // This isn't infallible, on some drives both a mount and libudf fail
         return;
-    
+
     switch (gCoreContext->GetNumSetting("DVDOnInsertDVD", 1))
     {
         case 0 : // Do nothing
@@ -1161,9 +1161,9 @@ static int internal_play_media(const QString &mrl, const QString &plot,
         }
         else
         {
-            ShowNotificationError(qApp->translate("(MythFrontendMain)", 
-                                                  "DVD Failure"), 
-                                                  _Location, 
+            ShowNotificationError(qApp->translate("(MythFrontendMain)",
+                                                  "DVD Failure"),
+                                                  _Location,
                                                   dvd->GetLastError());
             delete dvd;
             delete pginfo;

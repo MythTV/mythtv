@@ -3159,10 +3159,10 @@ void PlaybackBox::ShowActionPopup(const ProgramInfo &pginfo)
 
         if (m_groupList->GetItemPos(m_groupList->GetItemCurrent()) == 0)
             m_popupMenu->AddItem(tr("List Recorded Episodes"),
-				 SLOT(ShowRecordedEpisodes()));
+                                 SLOT(ShowRecordedEpisodes()));
         else
             m_popupMenu->AddItem(tr("List All Recordings"),
-				 SLOT(ShowAllRecordings()));
+                                 SLOT(ShowAllRecordings()));
 
         m_popupMenu->AddItem(tr("Delete"), SLOT(askDelete()));
 
@@ -3219,10 +3219,10 @@ void PlaybackBox::ShowActionPopup(const ProgramInfo &pginfo)
 
     if (m_groupList->GetItemPos(m_groupList->GetItemCurrent()) == 0)
         m_popupMenu->AddItem(tr("List Recorded Episodes"),
-			     SLOT(ShowRecordedEpisodes()));
+                             SLOT(ShowRecordedEpisodes()));
     else
         m_popupMenu->AddItem(tr("List All Recordings"),
-			     SLOT(ShowAllRecordings()));
+                             SLOT(ShowAllRecordings()));
 
     if (!sameProgram)
     {
@@ -3548,7 +3548,7 @@ void PlaybackBox::ShowAllRecordings(void)
     {
         // set focus back to previous item
         MythUIButtonListItem *previousitem =
-	    m_recordingList->GetItemByData(qVariantFromValue(pginfo));
+            m_recordingList->GetItemByData(qVariantFromValue(pginfo));
         m_recordingList->SetItemCurrent(previousitem);
     }
 }

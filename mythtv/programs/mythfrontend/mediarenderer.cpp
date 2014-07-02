@@ -291,7 +291,7 @@ MediaRenderer::MediaRenderer(): m_pUPnpCMGR(NULL)
         m_pHttpServer->RegisterExtension( m_pUPnpCMGR );
 
 #if 0
-        LOG(VB_UPNP, LOG_INFO, 
+        LOG(VB_UPNP, LOG_INFO,
             "MediaRenderer::Registering RenderingControl Service.");
         m_pUPnpRCTL= new UPnpRCTL( RootDevice() );
         m_pHttpServer->RegisterExtension( m_pUPnpRCTL );

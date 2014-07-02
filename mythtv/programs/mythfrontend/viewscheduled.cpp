@@ -251,7 +251,7 @@ void ViewScheduled::LoadList(bool useExistingData)
     if (currentItem)
     {
         ProgramInfo *currentpginfo = currentItem->GetData()
-					.value<ProgramInfo*>();
+                                        .value<ProgramInfo*>();
         if (currentpginfo)
         {
             callsign   = currentpginfo->GetChannelSchedulingID();

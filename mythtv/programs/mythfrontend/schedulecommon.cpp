@@ -291,7 +291,7 @@ void ScheduleCommon::EditRecording(ProgramInfo *pginfo)
             else
                 menuPopup->AddButton(tr("Record one showing (this episode)"),
                                      qVariantFromValue(recinfo));
-            
+
         }
         menuPopup->AddButton(tr("Record all showings (this channel)"),
                              qVariantFromValue(recinfo));

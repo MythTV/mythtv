@@ -469,4 +469,3 @@ void ChannelRecPriority::customEvent(QEvent *event)
         }
     }
 }
-

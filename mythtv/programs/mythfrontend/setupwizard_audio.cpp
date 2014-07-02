@@ -263,7 +263,7 @@ AudioOutputSettings AudioSetupWizard::UpdateCapabilities(bool restore, bool AC3)
     if (m_speakerNumberButtonList->GetItemCurrent() != NULL)
     {
         cur_speakers = m_speakerNumberButtonList->GetItemCurrent()->GetData()
-			              .value<int>();
+                                      .value<int>();
     }
     if (cur_speakers > m_maxspeakers)
     {
@@ -377,7 +377,7 @@ void AudioSetupWizard::save(void)
     gCoreContext->SaveSetting("PassThruOutputDevice", QString::null);
 
     int channels = m_speakerNumberButtonList->GetItemCurrent()->GetData()
-		               .value<int>();
+                               .value<int>();
     gCoreContext->SaveSetting("MaxChannels", channels);
 
     QString device =

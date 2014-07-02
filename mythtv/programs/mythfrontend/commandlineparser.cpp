@@ -52,4 +52,3 @@ QString MythFrontendCommandLineParser::GetHelpHeader(void) const
            "is used for playback of scheduled and live recordings, and management \n"
            "of recording rules.";
 }
-

@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
 // Program Name: MythFE.cpp
-//                                                                            
+//
 // Purpose - Frontend Html & XML status HttpServerExtension
-//                                                                            
+//
 //////////////////////////////////////////////////////////////////////////////
 
 #include "mythfexml.h"
@@ -111,7 +111,7 @@ bool MythFEXML::ProcessRequest( HTTPRequest *pRequest )
             UPnp::FormatErrorResponse(pRequest, UPnPResult_InvalidAction);
     }
     return true;
-}           
+}
 
 // ==========================================================================
 // Request handler Methods
@@ -138,7 +138,7 @@ void MythFEXML::GetScreenShot(HTTPRequest *pRequest)
         LOG(VB_GENERAL, LOG_ERR, "Invalid screen shot format: " + sFormat);
         return;
     }
-   
+
     LOG(VB_GENERAL, LOG_INFO,
         QString("Screen shot requested (%1x%2), format %3")
             .arg(nWidth).arg(nHeight).arg(sFormat));

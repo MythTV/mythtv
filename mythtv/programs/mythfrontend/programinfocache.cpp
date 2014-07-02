@@ -33,9 +33,9 @@ class ProgramInfoLoader : public QRunnable
     ProgramInfoLoader(ProgramInfoCache &c, const bool updateUI)
       : m_cache(c), m_updateUI(updateUI) {}
 
-    void run(void) 
-    { 
-        m_cache.Load(m_updateUI); 
+    void run(void)
+    {
+        m_cache.Load(m_updateUI);
     }
 
     ProgramInfoCache &m_cache;
@@ -90,7 +90,7 @@ void ProgramInfoCache::Load(const bool updateUI)
     if (updateUI)
         QCoreApplication::postEvent(
             m_listener, new MythEvent("UPDATE_UI_LIST"));
-    
+
     m_loads_in_progress--;
     m_load_wait.wakeAll();
 }
@@ -109,7 +109,7 @@ void ProgramInfoCache::WaitForLoadToComplete(void) const
 }
 
 /** \brief Refreshed the cache.
- *  
+ *
  *  If a new list has been loaded this fills the cache with that list
  *  if not, this simply removes list items marked for deletion from the
  *  the list.
@@ -255,7 +255,7 @@ ProgramInfo *ProgramInfoCache::GetProgramInfo(
     uint chanid, const QDateTime &recstartts) const
 {
     Cache::const_iterator it = m_cache.find(PICKey(chanid,recstartts));
-    
+
     if (it != m_cache.end())
         return it->second;
 
@@ -278,4 +278,3 @@ void ProgramInfoCache::Clear(void)
         delete it->second;
     m_cache.clear();
 }
-

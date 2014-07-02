@@ -247,4 +247,3 @@ void IdleScreen::customEvent(QEvent* event)
 
     MythUIType::customEvent(event);
 }
-
