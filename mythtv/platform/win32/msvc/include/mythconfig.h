@@ -13,7 +13,7 @@
 #define HAVE_MMX2 HAVE_MMXEXT
 #define ASMALIGN(ZEROBITS) ".p2align " #ZEROBITS "\n\t"
 #define SIZEOF_INT 4
-#define SIZEOF_LONG 8
+#define SIZEOF_LONG 4
 #define ARCH_AARCH64 0
 #define ARCH_ALPHA 0
 #define ARCH_ARM 0
