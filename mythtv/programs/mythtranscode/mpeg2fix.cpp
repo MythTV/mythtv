@@ -275,6 +275,7 @@ MPEG2fixup::MPEG2fixup(const QString &inf, const QString &outf,
         filesize = finfo.size();
     }
     zigzag_init = false;
+    allaudio = false;
 }
 
 MPEG2fixup::~MPEG2fixup()
@@ -809,7 +810,7 @@ bool MPEG2fixup::InitAV(QString inputfile, const char *type, int64_t offset)
                 break;
 
             case AVMEDIA_TYPE_AUDIO:
-                if (inputFC->streams[i]->codec->channels == 0)
+                if (!allaudio && inputFC->streams[i]->codec->channels == 0)
                 {
                     LOG(VB_GENERAL, LOG_ERR,
                         QString("Skipping invalid audio stream: %1").arg(i));
