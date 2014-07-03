@@ -83,7 +83,6 @@ class RECSTATUS( object ):
     rsInactive          = 10
     rsNeverRecord       = 11
     rsOffline           = 12
-    rsOtherShowing      = 13
 
 class AUDIO_PROPS( object ):
     AUD_UNKNOWN         = 0x00

@@ -299,9 +299,7 @@ void ScheduleCommon::EditRecording(ProgramInfo *pginfo)
                              qVariantFromValue(recinfo));
     }
     else if (recinfo.GetRecordingStatus() == rsRecording ||
-        recinfo.GetRecordingStatus() == rsTuning ||
-        recinfo.GetRecordingStatus() == rsOtherRecording ||
-        recinfo.GetRecordingStatus() == rsOtherTuning)
+             recinfo.GetRecordingStatus() == rsTuning)
     {
         menuPopup->AddButton(tr("Stop this recording"),
                              qVariantFromValue(recinfo));
@@ -351,11 +349,9 @@ void ScheduleCommon::EditRecording(ProgramInfo *pginfo)
              recinfo.GetRecordingStatus() == rsTooManyRecordings ||
              recinfo.GetRecordingStatus() == rsConflict ||
              recinfo.GetRecordingStatus() == rsLaterShowing ||
-             recinfo.GetRecordingStatus() == rsOffLine ||
-             recinfo.GetRecordingStatus() == rsOtherShowing))
+             recinfo.GetRecordingStatus() == rsOffLine))
         {
             if (recinfo.GetRecordingStatus() == rsWillRecord ||
-                recinfo.GetRecordingStatus() == rsOtherShowing ||
                 recinfo.GetRecordingStatus() == rsConflict)
                 menuPopup->AddButton(tr("Don't record this showing"),
                                      qVariantFromValue(recinfo));

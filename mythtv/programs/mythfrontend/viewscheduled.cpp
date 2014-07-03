@@ -293,8 +293,7 @@ void ViewScheduled::LoadList(bool useExistingData)
               ++toomanycounts[pginfo->GetRecordingRuleID()] <= 1) ||
              (recstatus > rsTooManyRecordings &&
               recstatus != rsRepeat &&
-              recstatus != rsNeverRecord &&
-              recstatus != rsOtherShowing)))
+              recstatus != rsNeverRecord)))
         {
             m_cardref[pginfo->GetCardID()]++;
             if (pginfo->GetCardID() > m_maxcard)
@@ -421,9 +420,7 @@ void ViewScheduled::FillList()
 
         const RecStatusType recstatus = pginfo->GetRecordingStatus();
         if (recstatus == rsRecording      ||
-            recstatus == rsTuning         ||
-            recstatus == rsOtherRecording ||
-            recstatus == rsOtherTuning)
+            recstatus == rsTuning)
             state = "running";
         else if (recstatus == rsConflict  ||
                  recstatus == rsOffLine   ||
@@ -432,8 +429,7 @@ void ViewScheduled::FillList()
                  recstatus == rsAborted   ||
                  recstatus == rsMissed)
             state = "error";
-        else if (recstatus == rsWillRecord ||
-                 recstatus == rsOtherShowing)
+        else if (recstatus == rsWillRecord)
         {
             if ((m_curcard == 0 && m_curinput == 0) ||
                 pginfo->GetCardID() == m_curcard ||

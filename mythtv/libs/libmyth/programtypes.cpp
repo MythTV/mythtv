@@ -56,12 +56,10 @@ QString toString(MarkTypes type)
 
 QString toUIState(RecStatusType recstatus)
 {
-    if (recstatus == rsRecorded     || recstatus == rsWillRecord   ||
-        recstatus == rsOtherShowing)
+    if (recstatus == rsRecorded     || recstatus == rsWillRecord)
         return "normal";
 
-    if (recstatus == rsRecording    || recstatus == rsTuning       ||
-        recstatus == rsOtherRecording || recstatus == rsOtherTuning)
+    if (recstatus == rsRecording    || recstatus == rsTuning)
         return "running";
 
     if (recstatus == rsConflict     || recstatus == rsOffLine      ||
@@ -156,15 +154,6 @@ QString toString(RecStatusType recstatus, uint id)
         case rsOffLine:
             ret = QObject::tr("F", "RecStatusChar rsOffLine");
             break;
-        case rsOtherShowing:
-            ret = QString::number(id);
-            break;
-        case rsOtherRecording:
-            ret = QString::number(id);
-            break;
-        case rsOtherTuning:
-            ret = QString::number(id);
-            break;
         case rsUnknown:
             break;
     }
@@ -226,12 +215,6 @@ QString toString(RecStatusType recstatus, RecordingType rectype)
             return QObject::tr("Never Record");
         case rsOffLine:
             return QObject::tr("Recorder Off-Line");
-        case rsOtherShowing:
-            return QObject::tr("Other Showing");
-        case rsOtherRecording:
-            return QObject::tr("Other Recording");
-        case rsOtherTuning:
-            return QObject::tr("Other Tuning");
         case rsUnknown:
             return QObject::tr("Unknown");
     }
@@ -249,8 +232,7 @@ QString toDescription(RecStatusType recstatus, RecordingType rectype,
     QString message;
     QDateTime now = MythDate::current();
 
-    if (recstatus <= rsWillRecord ||
-        recstatus == rsOtherShowing)
+    if (recstatus <= rsWillRecord)
     {
         switch (recstatus)
         {
@@ -262,14 +244,6 @@ QString toDescription(RecStatusType recstatus, RecordingType rectype,
                 break;
             case rsTuning:
                 message = QObject::tr("The showing is being tuned.");
-                break;
-            case rsOtherRecording:
-                message = QObject::tr("This showing is being recorded on "
-                                      "a different channel.");
-                break;
-            case rsOtherTuning:
-                message = QObject::tr("The showing is being tuned on a "
-                                      "different channel.");
                 break;
             case rsRecorded:
                 message = QObject::tr("This showing was recorded.");
@@ -298,10 +272,6 @@ QString toDescription(RecStatusType recstatus, RecordingType rectype,
             case rsFailed:
                 message = QObject::tr("This showing was not recorded because "
                                       "the recorder failed.");
-                break;
-            case rsOtherShowing:
-                message += QObject::tr("This showing will be recorded on a "
-                                       "different channel.");
                 break;
             default:
                 message = QObject::tr("The status of this showing is unknown.");

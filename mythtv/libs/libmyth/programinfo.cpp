@@ -752,12 +752,7 @@ ProgramInfo::ProgramInfo(
             break;
         }
 
-        if (s.recstatus == rsWillRecord)
-            recstatus = rsOtherShowing;
-        else if (s.recstatus == rsRecording)
-            recstatus = rsOtherRecording;
-        else if (s.recstatus == rsTuning)
-            recstatus = rsOtherTuning;
+        recstatus = s.recstatus;
     }
 }
 
