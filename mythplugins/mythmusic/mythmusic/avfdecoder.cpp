@@ -410,8 +410,11 @@ void avfDecoder::deinit()
     m_audioDec = NULL;
     m_inputFormat = NULL;
 
-    av_freep(&m_byteIOContext->buffer);
-    av_freep(&m_byteIOContext);
+    if (m_byteIOContext)
+    {
+        av_freep(&m_byteIOContext->buffer);
+        av_freep(&m_byteIOContext);
+    }
 }
 
 void avfDecoder::run()
