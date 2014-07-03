@@ -284,9 +284,10 @@ void ViewScheduled::LoadList(bool useExistingData)
         if ((pginfo->GetRecordingEndTime() >= now ||
              pginfo->GetScheduledEndTime() >= now ||
              recstatus == rsRecording ||
-             recstatus == rsTuning) &&
+             recstatus == rsTuning ||
+             recstatus == rsFailing) &&
             (m_showAll ||
-             (recstatus >= rsTuning &&
+             (recstatus >= rsFailing &&
               recstatus <= rsWillRecord) ||
              recstatus == rsDontRecord ||
              (recstatus == rsTooManyRecordings &&
@@ -426,6 +427,7 @@ void ViewScheduled::FillList()
                  recstatus == rsOffLine   ||
                  recstatus == rsTunerBusy ||
                  recstatus == rsFailed    ||
+                 recstatus == rsFailing   ||
                  recstatus == rsAborted   ||
                  recstatus == rsMissed)
             state = "error";

@@ -299,7 +299,8 @@ void ScheduleCommon::EditRecording(ProgramInfo *pginfo)
                              qVariantFromValue(recinfo));
     }
     else if (recinfo.GetRecordingStatus() == rsRecording ||
-             recinfo.GetRecordingStatus() == rsTuning)
+             recinfo.GetRecordingStatus() == rsTuning    ||
+             recinfo.GetRecordingStatus() == rsFailing)
     {
         menuPopup->AddButton(tr("Stop this recording"),
                              qVariantFromValue(recinfo));

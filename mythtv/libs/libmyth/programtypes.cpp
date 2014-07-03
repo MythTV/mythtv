@@ -64,7 +64,8 @@ QString toUIState(RecStatusType recstatus)
 
     if (recstatus == rsConflict     || recstatus == rsOffLine      ||
         recstatus == rsTunerBusy    || recstatus == rsFailed       ||
-        recstatus == rsAborted      || recstatus == rsMissed)
+        recstatus == rsAborted      || recstatus == rsMissed       ||
+        recstatus == rsFailing)
     {
         return "error";
     }
@@ -95,6 +96,9 @@ QString toString(RecStatusType recstatus, uint id)
             ret = QString::number(id);
             break;
         case rsTuning:
+            ret = QString::number(id);
+            break;
+        case rsFailing:
             ret = QString::number(id);
             break;
         case rsWillRecord:
@@ -177,6 +181,8 @@ QString toString(RecStatusType recstatus, RecordingType rectype)
             return QObject::tr("Recording");
         case rsTuning:
             return QObject::tr("Tuning");
+        case rsFailing:
+            return QObject::tr("Failing");
         case rsWillRecord:
             return QObject::tr("Will Record");
         case rsDontRecord:
@@ -244,6 +250,10 @@ QString toDescription(RecStatusType recstatus, RecordingType rectype,
                 break;
             case rsTuning:
                 message = QObject::tr("The showing is being tuned.");
+                break;
+            case rsFailing:
+                message = QObject::tr("The showing is failing to record "
+                                      "because of errors.");
                 break;
             case rsRecorded:
                 message = QObject::tr("This showing was recorded.");

@@ -534,7 +534,7 @@ DTC::ProgramList* Dvr::GetUpcomingList( int  nStartIndex,
             ((*it)->GetRecordingStatus() != nRecStatus))
             continue;
 
-        if (!bShowAll && ((((*it)->GetRecordingStatus() >= rsTuning) &&
+        if (!bShowAll && ((((*it)->GetRecordingStatus() >= rsFailing) &&
                            ((*it)->GetRecordingStatus() <= rsWillRecord)) ||
                           ((*it)->GetRecordingStatus() == rsConflict)) &&
             ((*it)->GetRecordingEndTime() > MythDate::current()))

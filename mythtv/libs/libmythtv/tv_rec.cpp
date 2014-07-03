@@ -667,7 +667,9 @@ RecStatusType TVRec::StartRecording(ProgramInfo *pginfo)
         QMutexLocker locker(&pendingRecLock);
         if ((curRecording) &&
             (curRecording->GetRecordingStatus() == rsFailed) &&
-            (m_recStatus == rsRecording || m_recStatus == rsTuning))
+            (m_recStatus == rsRecording ||
+             m_recStatus == rsTuning ||
+             m_recStatus == rsFailing))
         {
             SetRecordingStatus(rsFailed, __LINE__, true);
         }

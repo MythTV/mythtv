@@ -60,6 +60,7 @@ class RECSEARCHTYPE( object ):
     kManualSearch       = 5
 
 class RECSTATUS( object ):
+    rsFailing           = -14
     rsTuning            = -10
     rsFailed            = -9
     rsTunerBusy         = -8

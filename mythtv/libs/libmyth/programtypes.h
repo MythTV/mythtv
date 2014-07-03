@@ -208,6 +208,7 @@ typedef enum SubtitleTypes {
 #define kSubtitlePropertyMask (0x0f<<kSubtitlePropertyOffset)
 
 typedef enum RecStatusTypes {
+    rsFailing = -14,
     //rsOtherRecording = -13, (obsolete)
     //rsOtherTuning = -12, (obsolete)
     rsMissedFuture = -11,

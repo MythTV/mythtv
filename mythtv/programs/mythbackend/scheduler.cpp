@@ -234,6 +234,7 @@ static inline bool Recording(const RecordingInfo *p)
 {
     return (p->GetRecordingStatus() == rsRecording ||
             p->GetRecordingStatus() == rsTuning ||
+            p->GetRecordingStatus() == rsFailing ||
             p->GetRecordingStatus() == rsWillRecord);
 }
 
@@ -320,9 +321,11 @@ static bool comp_recstart(RecordingInfo *a, RecordingInfo *b)
 static bool comp_priority(RecordingInfo *a, RecordingInfo *b)
 {
     int arec = (a->GetRecordingStatus() != rsRecording &&
-                a->GetRecordingStatus() != rsTuning);
+                a->GetRecordingStatus() != rsTuning &&
+                a->GetRecordingStatus() != rsFailing);
     int brec = (b->GetRecordingStatus() != rsRecording &&
-                b->GetRecordingStatus() != rsTuning);
+                b->GetRecordingStatus() != rsTuning &&
+                b->GetRecordingStatus() != rsFailing);
 
     if (arec != brec)
         return arec < brec;
@@ -368,9 +371,11 @@ static bool comp_priority(RecordingInfo *a, RecordingInfo *b)
 static bool comp_retry(RecordingInfo *a, RecordingInfo *b)
 {
     int arec = (a->GetRecordingStatus() != rsRecording &&
-                a->GetRecordingStatus() != rsTuning);
+                a->GetRecordingStatus() != rsTuning &&
+                a->GetRecordingStatus() != rsFailing);
     int brec = (b->GetRecordingStatus() != rsRecording &&
-                b->GetRecordingStatus() != rsTuning);
+                b->GetRecordingStatus() != rsTuning &&
+                b->GetRecordingStatus() != rsFailing);
 
     if (arec != brec)
         return arec < brec;
@@ -635,7 +640,8 @@ void Scheduler::UpdateRecStatus(RecordingInfo *pginfo)
             // made after the 0.25 code freeze.
             if (pginfo->GetRecordingStatus() == rsUnknown)
             {
-                if (p->GetRecordingStatus() == rsTuning)
+                if (p->GetRecordingStatus() == rsTuning ||
+                    p->GetRecordingStatus() == rsFailing)
                     pginfo->SetRecordingStatus(rsFailed);
                 else if (p->GetRecordingStatus() == rsRecording)
                     pginfo->SetRecordingStatus(rsRecorded);
@@ -833,7 +839,8 @@ void Scheduler::SlaveConnected(RecordingList &slavelist)
             }
             else if (sp->GetCardID() == rp->GetCardID() &&
                      (rp->GetRecordingStatus() == rsRecording ||
-                      rp->GetRecordingStatus() == rsTuning))
+                      rp->GetRecordingStatus() == rsTuning ||
+                      rp->GetRecordingStatus() == rsFailing))
             {
                 rp->SetRecordingStatus(rsAborted);
                 reclist_changed = true;
@@ -872,7 +879,8 @@ void Scheduler::SlaveDisconnected(uint cardid)
 
         if (rp->GetCardID() == cardid &&
             (rp->GetRecordingStatus() == rsRecording ||
-             rp->GetRecordingStatus() == rsTuning))
+             rp->GetRecordingStatus() == rsTuning ||
+             rp->GetRecordingStatus() == rsFailing))
         {
             rp->SetRecordingStatus(rsAborted);
             reclist_changed = true;
@@ -891,7 +899,8 @@ void Scheduler::BuildWorkList(void)
     {
         RecordingInfo *p = *i;
         if (p->GetRecordingStatus() == rsRecording ||
-            p->GetRecordingStatus() == rsTuning)
+            p->GetRecordingStatus() == rsTuning ||
+            p->GetRecordingStatus() == rsFailing)
             worklist.push_back(new RecordingInfo(*p));
     }
 }
@@ -978,6 +987,7 @@ void Scheduler::BuildListMaps(void)
         RecordingInfo *p = *i;
         if (p->GetRecordingStatus() == rsRecording ||
             p->GetRecordingStatus() == rsTuning ||
+            p->GetRecordingStatus() == rsFailing ||
             p->GetRecordingStatus() == rsWillRecord ||
             p->GetRecordingStatus() == rsUnknown)
         {
@@ -1195,7 +1205,8 @@ bool Scheduler::TryAnotherShowing(RecordingInfo *p, bool samePriority,
     PrintRec(p, "     >");
 
     if (p->GetRecordingStatus() == rsRecording ||
-        p->GetRecordingStatus() == rsTuning)
+        p->GetRecordingStatus() == rsTuning ||
+        p->GetRecordingStatus() == rsFailing)
         return false;
 
     RecList *showinglist = &recordidlistmap[p->GetRecordingRuleID()];
@@ -1428,6 +1439,7 @@ void Scheduler::PruneRedundants(void)
         // change history, can we?
         if (p->GetRecordingStatus() != rsRecording &&
             p->GetRecordingStatus() != rsTuning &&
+            p->GetRecordingStatus() != rsFailing &&
             p->GetRecordingStatus() != rsMissedFuture &&
             p->GetScheduledEndTime() < schedTime &&
             p->GetRecordingEndTime() < schedTime)
@@ -1611,7 +1623,8 @@ QMap<QString,ProgramInfo*> Scheduler::GetRecording(void) const
     for (; it != reclist.end(); ++it)
     {
         if (rsRecording == (*it)->GetRecordingStatus() ||
-            rsTuning == (*it)->GetRecordingStatus())
+            rsTuning == (*it)->GetRecordingStatus() ||
+            rsFailing == (*it)->GetRecordingStatus())
             recMap[(*it)->MakeUniqueKey()] = new ProgramInfo(**it);
     }
 
@@ -1627,7 +1640,8 @@ RecStatusType Scheduler::GetRecStatus(const ProgramInfo &pginfo)
         if (pginfo.IsSameRecording(**it))
         {
             return (rsRecording == (**it).GetRecordingStatus() ||
-                    rsTuning == (**it).GetRecordingStatus()) ?
+                    rsTuning == (**it).GetRecordingStatus() ||
+                    rsFailing == (**it).GetRecordingStatus()) ?
                 (**it).GetRecordingStatus() : pginfo.GetRecordingStatus();
         }
     }
@@ -1776,10 +1790,13 @@ void Scheduler::OldRecordedFixups(void)
 
     // Mark anything that was recording as aborted.
     query.prepare("UPDATE oldrecorded SET recstatus = :RSABORTED "
-                  "  WHERE recstatus = :RSRECORDING OR recstatus = :RSTUNING");
+                  "  WHERE recstatus = :RSRECORDING OR "
+                  "        recstatus = :RSTUNING OR "
+                  "        recstatus = :RSFAILING");
     query.bindValue(":RSABORTED", rsAborted);
     query.bindValue(":RSRECORDING", rsRecording);
     query.bindValue(":RSTUNING", rsTuning);
+    query.bindValue(":RSFAILING", rsFailing);
     if (!query.exec())
         MythDB::DBError("UpdateAborted", query);
 
@@ -3025,9 +3042,10 @@ void Scheduler::PutInactiveSlavesToSleep(void)
     {
         RecordingInfo *pginfo = *recIter;
 
-        if ((pginfo->GetRecordingStatus() != rsRecording) &&
-            (pginfo->GetRecordingStatus() != rsTuning) &&
-            (pginfo->GetRecordingStatus() != rsWillRecord))
+        if (pginfo->GetRecordingStatus() != rsRecording &&
+            pginfo->GetRecordingStatus() != rsTuning &&
+            pginfo->GetRecordingStatus() != rsFailing &&
+            pginfo->GetRecordingStatus() != rsWillRecord)
             continue;
 
         secsleft = curtime.secsTo(

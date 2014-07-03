@@ -2604,7 +2604,8 @@ void MainServer::HandleStopRecording(QStringList &slist, PlaybackSock *pbs)
             {
                 ProgramInfo *pInfo = schedList[n];
                 if ((pInfo->GetRecordingStatus() == rsTuning ||
-                    pInfo->GetRecordingStatus() == rsRecording)
+                     pInfo->GetRecordingStatus() == rsFailing ||
+                     pInfo->GetRecordingStatus() == rsRecording)
                     && recinfo.IsSameProgram(*pInfo))
                     recinfo.SetChanID(pInfo->GetChanID());
             }
