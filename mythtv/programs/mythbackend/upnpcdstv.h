@@ -25,7 +25,7 @@ class UPnpCDSTv : public UPnpCDSExtension
         static int             g_nRootCount;
 
         QStringMap             m_mapBackendIp;
-        QStringMap             m_mapBackendPort;
+        QMap<QString, int>     m_mapBackendPort;
 
     protected:
 
