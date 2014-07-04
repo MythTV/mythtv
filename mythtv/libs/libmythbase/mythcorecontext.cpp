@@ -1008,7 +1008,7 @@ int MythCoreContext::GetBackendServerPort(const QString &host)
  */
 int MythCoreContext::GetBackendStatusPort(void)
 {
-    return GetBackendServerPort(d->m_localHostname);
+    return GetBackendStatusPort(d->m_localHostname);
 }
 
 /**
