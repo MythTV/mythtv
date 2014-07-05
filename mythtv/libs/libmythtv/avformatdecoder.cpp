@@ -10,6 +10,7 @@
 using namespace std;
 
 #include <QTextCodec>
+#include <QFileInfo>
 
 // MythTV headers
 #include "mythtvexp.h"
@@ -1212,6 +1213,17 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         // generate timings based on the video stream to avoid bogus ffmpeg
         // values for duration and bitrate
         av_update_stream_timings_video(ic);
+    }
+
+    // FLAC, MP3 or M4A file may contains an artwork image, a single frame MJPEG,
+    // we need to ignore it as we don't handle single frames or images in place of video
+    // TODO: display single frame
+    QString extension = QFileInfo(fnames).suffix();
+    if (!strcmp(fmt->name, "mp3") || !strcmp(fmt->name, "flac") ||
+        !strcmp(fmt->name, "ogg") ||
+        !extension.compare("m4a", Qt::CaseInsensitive))
+    {
+        novideo = true;
     }
 
     // Scan for the initial A/V streams
