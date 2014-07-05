@@ -318,11 +318,9 @@ void VideoOutputNullVDPAU::DrawSlice(VideoFrame *frame, int x, int y, int w, int
                                                FMT_VDPAU))
                         {
                             created++;
-                            int size = (m_surfaceSize.width() *
-                                        m_surfaceSize.height() * 3) / 2;
                             m_shadowBuffers->AddBuffer(m_surfaceSize.width(),
                                                        m_surfaceSize.height(),
-                                                       new unsigned char[size],
+                                                       NULL,
                                                        FMT_YV12);
                         }
                     }

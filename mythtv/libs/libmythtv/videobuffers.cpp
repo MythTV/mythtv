@@ -775,6 +775,12 @@ uint VideoBuffers::AddBuffer(int width, int height, void* data,
     buffers[num].interlaced_frame = -1;
     buffers[num].top_field_first  = 1;
     vbufferMap[At(num)] = num;
+    if (!data)
+    {
+        int size = buffersize(fmt, width, height);
+        data = av_malloc(size);
+        allocated_arrays.push_back((unsigned char*)data);
+    }
     init(&buffers[num], fmt, (unsigned char*)data, width, height, 0);
     buffers[num].priv[0] = ffmpeg_hack;
     buffers[num].priv[1] = ffmpeg_hack;
