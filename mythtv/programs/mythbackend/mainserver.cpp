@@ -3366,9 +3366,12 @@ void MainServer::HandleSGGetFileList(QStringList &sList,
                                    " path = %3 wanthost = %4")
             .arg(groupname).arg(host).arg(path).arg(wantHost));
 
+    QString addr4 = gCoreContext->GetBackendServerIP4();
+    QString addr6 = gCoreContext->GetBackendServerIP6();
+
     if ((host.toLower() == wantHost.toLower()) ||
-        (gCoreContext->GetBackendServerIP4() == wantHostaddr.toString()) ||
-        (gCoreContext->GetBackendServerIP6() == wantHostaddr.toString()))
+        (!addr4.isEmpty() && addr4 == wantHostaddr.toString()) ||
+        (!addr6.isEmpty() && addr6 == wantHostaddr.toString()))
     {
         StorageGroup sg(groupname, host);
         LOG(VB_FILE, LOG_INFO, "HandleSGGetFileList: Getting local info");
@@ -3423,6 +3426,7 @@ void MainServer::HandleSGFileQuery(QStringList &sList,
         return;
     }
 
+    QString host = gCoreContext->GetHostName();
     QString wantHost = sList.at(1);
     QHostAddress wantHostaddr(wantHost);
     QString groupname = sList.at(2);
@@ -3433,9 +3437,12 @@ void MainServer::HandleSGFileQuery(QStringList &sList,
     LOG(VB_FILE, LOG_INFO, QString("HandleSGFileQuery: %1")
             .arg(gCoreContext->GenMythURL(wantHost, 0, filename, groupname)));
 
-    if ((wantHost.toLower() == gCoreContext->GetHostName().toLower()) ||
-        (wantHostaddr.toString() == gCoreContext->GetBackendServerIP4()) ||
-        (wantHostaddr.toString() == gCoreContext->GetBackendServerIP6()))
+    QString addr4 = gCoreContext->GetBackendServerIP4();
+    QString addr6 = gCoreContext->GetBackendServerIP6();
+
+    if ((host.toLower() == wantHost.toLower()) ||
+        (!addr4.isEmpty() && addr4 == wantHostaddr.toString()) ||
+        (!addr6.isEmpty() && addr6 == wantHostaddr.toString()))
     {
         LOG(VB_FILE, LOG_INFO, "HandleSGFileQuery: Getting local info");
         StorageGroup sg(groupname, gCoreContext->GetHostName());
