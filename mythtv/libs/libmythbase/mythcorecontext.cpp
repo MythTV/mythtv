@@ -643,7 +643,7 @@ bool MythCoreContext::IsThisHost(const QString &addr, const QString &host)
     QString thisip  = GetBackendServerIP4(host);
     QString thisip6 = GetBackendServerIP6(host);
 
-    return ((addrstr == thisip) || (addrstr == thisip6));
+    return ((addrstr == thisip) || (!thisip6.isEmpty() && addrstr == thisip6));
 }
 
 bool MythCoreContext::IsFrontendOnly(void)
