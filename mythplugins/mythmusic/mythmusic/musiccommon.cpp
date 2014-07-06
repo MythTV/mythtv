@@ -464,11 +464,12 @@ void MusicCommon::switchView(MusicView view)
             PlaylistView *view = new PlaylistView(mainStack, this);
 
             if (view->Create())
+            {
                 mainStack->AddScreen(view);
+                connect(view, SIGNAL(Exiting()), this, SLOT(viewExited()));
+            }
             else
                 delete view;
-
-            connect(view, SIGNAL(Exiting()), this, SLOT(viewExited()));
 
             break;
         }
@@ -487,11 +488,12 @@ void MusicCommon::switchView(MusicView view)
             PlaylistEditorView *view = new PlaylistEditorView(mainStack, parentScreen, "tree", restorePos);
 
             if (view->Create())
+            {
                 mainStack->AddScreen(view);
+                connect(view, SIGNAL(Exiting()), this, SLOT(viewExited()));
+            }
             else
                 delete view;
-
-            connect(view, SIGNAL(Exiting()), this, SLOT(viewExited()));
 
             if (oldView)
             {
@@ -516,11 +518,12 @@ void MusicCommon::switchView(MusicView view)
             PlaylistEditorView *view = new PlaylistEditorView(mainStack, parentScreen, "gallery", restorePos);
 
             if (view->Create())
+            {
                 mainStack->AddScreen(view);
+                connect(view, SIGNAL(Exiting()), this, SLOT(viewExited()));
+            }
             else
                 delete view;
-
-            connect(view, SIGNAL(Exiting()), this, SLOT(viewExited()));
 
             if (oldView)
             {
@@ -536,11 +539,12 @@ void MusicCommon::switchView(MusicView view)
             SearchView *view = new SearchView(mainStack, this);
 
             if (view->Create())
+            {
                 mainStack->AddScreen(view);
+                connect(view, SIGNAL(Exiting()), this, SLOT(viewExited()));
+            }
             else
                 delete view;
-
-            connect(view, SIGNAL(Exiting()), this, SLOT(viewExited()));
 
             break;
         }
@@ -550,11 +554,12 @@ void MusicCommon::switchView(MusicView view)
             VisualizerView *view = new VisualizerView(mainStack, this);
 
             if (view->Create())
+            {
                 mainStack->AddScreen(view);
+                connect(view, SIGNAL(Exiting()), this, SLOT(viewExited()));
+            }
             else
                 delete view;
-
-            connect(view, SIGNAL(Exiting()), this, SLOT(viewExited()));
 
             break;
         }
@@ -564,11 +569,12 @@ void MusicCommon::switchView(MusicView view)
             StreamView *view = new StreamView(mainStack, this);
 
             if (view->Create())
+            {
                 mainStack->AddScreen(view);
+                connect(view, SIGNAL(Exiting()), this, SLOT(viewExited()));
+            }
             else
                 delete view;
-
-            connect(view, SIGNAL(Exiting()), this, SLOT(viewExited()));
 
             break;
         }
