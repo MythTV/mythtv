@@ -1376,6 +1376,7 @@ int MPEG2fixup::GetFrame(AVPacket *pkt)
                 {
                     LOG(VB_GENERAL, LOG_DEBUG,
                         QString("Invalid stream ID %1, ignoring").arg(pkt->stream_index));
+                    framePool.enqueue(tmpFrame);
                 }
                 av_free_packet(pkt);
                 return 0;
