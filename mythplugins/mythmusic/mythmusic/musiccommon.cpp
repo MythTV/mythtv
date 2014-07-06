@@ -564,23 +564,8 @@ void MusicCommon::switchView(MusicView view)
             break;
         }
 
-        case MV_RADIO:
-        {
-            StreamView *view = new StreamView(mainStack, this);
-
-            if (view->Create())
-            {
-                mainStack->AddScreen(view);
-                connect(view, SIGNAL(Exiting()), this, SLOT(viewExited()));
-            }
-            else
-                delete view;
-
-            break;
-        }
-
         default:
-            return;
+            break;
     }
 
     gPlayer->setAllowRestorePos(true);
