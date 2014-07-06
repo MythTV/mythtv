@@ -737,7 +737,7 @@ static int transUnlink(QString filename, ProgramInfo *pginfo)
 {
     QString hostname = pginfo->GetHostname();
 
-    if (pginfo != NULL && !pginfo->GetStorageGroup().isEmpty() &&
+    if (!pginfo->GetStorageGroup().isEmpty() &&
         !hostname.isEmpty())
     {
         QString ip = gCoreContext->GetBackendServerIP(hostname);
