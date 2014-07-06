@@ -283,6 +283,8 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other) :
  */
 ProgramInfo::ProgramInfo(uint _recordedid)
 {
+    clear();
+
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT chanid, starttime "
@@ -309,9 +311,10 @@ ProgramInfo::ProgramInfo(uint _recordedid)
  *  \brief Constructs a ProgramInfo from data in 'recorded' table
  */
 ProgramInfo::ProgramInfo(uint _chanid, const QDateTime &_recstartts) :
-    chanid(0),
     positionMapDBReplacement(NULL)
 {
+    clear();
+
     LoadProgramFromRecorded(_chanid, _recstartts);
 }
 
@@ -869,12 +872,11 @@ ProgramInfo::ProgramInfo(
  *  \brief Constructs a ProgramInfo for a pathname.
  */
 ProgramInfo::ProgramInfo(const QString &_pathname) :
-    chanid(0),
     positionMapDBReplacement(NULL)
 {
+    clear();
     if (_pathname.isEmpty())
     {
-        clear();
         return;
     }
 
