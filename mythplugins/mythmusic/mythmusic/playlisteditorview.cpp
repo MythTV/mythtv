@@ -630,26 +630,29 @@ void PlaylistEditorView::ShowMenu(void)
         MythMenu *menu = NULL;
         MusicGenericTree *mnode = dynamic_cast<MusicGenericTree*>(m_playlistTree->GetCurrentNode());
 
-        if (mnode->getAction() == "smartplaylists" ||
-            mnode->getAction() == "smartplaylistcategory" ||
-            mnode->getAction() == "smartplaylist")
+        if (mnode)
         {
-            menu = createSmartPlaylistMenu();
-        }
-        else if (mnode->getAction() == "playlists" ||
-                 mnode->getAction() == "playlist")
-        {
-            menu = createPlaylistMenu();
-        }
-        else if (mnode->getAction() == "trackid")
-        {
-        }
-        else
-        {
-            menu = createPlaylistOptionsMenu();
-        }
+            if (mnode->getAction() == "smartplaylists" ||
+                mnode->getAction() == "smartplaylistcategory" ||
+                mnode->getAction() == "smartplaylist")
+            {
+                menu = createSmartPlaylistMenu();
+            }
+            else if (mnode->getAction() == "playlists" ||
+                        mnode->getAction() == "playlist")
+            {
+                menu = createPlaylistMenu();
+            }
+            else if (mnode->getAction() == "trackid")
+            {
+            }
+            else
+            {
+                menu = createPlaylistOptionsMenu();
+            }
 
-        updateSonglist(mnode);
+            updateSonglist(mnode);
+        }
 
         if (menu)
         {
