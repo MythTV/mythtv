@@ -73,12 +73,18 @@ static int CheckRecordings(const MythUtilCommandLineParser &cmdline)
     std::vector<ProgramInfo *>  zeroByteRecordings;
     std::vector<ProgramInfo *>  noSeektableRecordings;
 
+    if (!recordingList)
+    {
+        cout << "ERROR - failed to get recording list from backend" << endl;
+        return GENERIC_EXIT_NOT_OK;
+    }
+
     bool foundFile = false;
     bool fixSeektable = cmdline.toBool("fixseektable");
 
     cout << "Fix seektable is: " << fixSeektable << endl;
 
-    if (recordingList && !recordingList->empty())
+    if (!recordingList->empty())
     {
         vector<ProgramInfo *>::iterator i = recordingList->begin();
         for ( ; i != recordingList->end(); ++i)
