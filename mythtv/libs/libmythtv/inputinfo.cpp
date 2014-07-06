@@ -13,7 +13,10 @@ InputInfo::InputInfo(
     cardid(_cardid),
     mplexid(_mplexid),
     chanid(_chanid),
-    livetvorder(_livetvorder)
+    recPriority(0),
+    scheduleOrder(0),
+    livetvorder(_livetvorder),
+    quickTune(false)
 {
     name.detach();
 }
