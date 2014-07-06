@@ -12,6 +12,7 @@
 #include "remoteutil.h"
 #include "remotefile.h"
 #include "mythsystem.h"
+#include "mythdirs.h"
 
 // Local includes
 #include "recordingutils.h"
@@ -149,7 +150,8 @@ static int CheckRecordings(const MythUtilCommandLineParser &cmdline)
 
                 if (foundFile && fixSeektable)
                 {
-                    QString command = QString("mythcommflag --rebuild --chanid %1 --starttime %2")
+                    QString command = QString(GetAppBinDir() + "mythcommflag " +
+                                              "--rebuild --chanid %1 --starttime %2")
                                               .arg(p->GetChanID())
                                               .arg(p->GetRecordingStartTime(MythDate::ISODate));
                     cout << "Running - " << qPrintable(command) << endl;
