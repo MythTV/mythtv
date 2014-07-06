@@ -20,7 +20,6 @@
 #include <metadata/videoutils.h>
 #include <rssparse.h>
 #include <mythcoreutil.h>
-#include <boost/concept_check.hpp>
 
 #include "netsearch.h"
 #include "netcommon.h"
