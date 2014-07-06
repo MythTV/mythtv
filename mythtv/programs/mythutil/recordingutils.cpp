@@ -139,8 +139,8 @@ static int CheckRecordings(const MythUtilCommandLineParser &cmdline)
             p->QueryPositionMap(posMap, MARK_GOP_BYFRAME);
             if (posMap.isEmpty())
                 p->QueryPositionMap(posMap, MARK_GOP_START);
-                if (posMap.isEmpty())
-                    p->QueryPositionMap(posMap, MARK_KEYFRAME);
+            if (posMap.isEmpty())
+                p->QueryPositionMap(posMap, MARK_KEYFRAME);
 
             if (posMap.isEmpty())
             {
