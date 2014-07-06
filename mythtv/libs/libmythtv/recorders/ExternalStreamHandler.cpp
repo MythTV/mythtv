@@ -27,7 +27,8 @@
 
 ExternIO::ExternIO(const QString & app,
                    const QStringList & args)
-    : m_bufsize(0), m_buffer(NULL)
+    : m_appin(-1), m_appout(-1), m_apperr(-1),
+      m_pid(-1), m_bufsize(0), m_buffer(NULL)
 {
     m_app  = (app);
 
@@ -53,8 +54,6 @@ ExternIO::ExternIO(const QString & app,
     if (!m_args.contains("-q"))
         m_args << "-q";
     m_args.prepend(m_app.baseName());
-
-    m_appin = m_appout = m_apperr = -1;
 }
 
 ExternIO::~ExternIO(void)
