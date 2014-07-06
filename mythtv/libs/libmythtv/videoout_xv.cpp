@@ -525,15 +525,16 @@ void VideoOutputXv::CreatePauseFrame(VOSType subtype)
     if (av_pause_frame.buf)
     {
         av_freep(&av_pause_frame.buf);
-        av_pause_frame.buf = NULL;
     }
 
-    unsigned char* buf =
-        (unsigned char*)av_malloc(vbuffers.GetScratchFrame()->size + 128);
+    int size = buffersize(FMT_YV12,
+                          vbuffers.GetScratchFrame()->width,
+                          vbuffers.GetScratchFrame()->height);
+    unsigned char* buf = (unsigned char*)av_malloc(size);
     init(&av_pause_frame, FMT_YV12, buf,
          vbuffers.GetScratchFrame()->width,
          vbuffers.GetScratchFrame()->height,
-         vbuffers.GetScratchFrame()->size);
+         size);
 
     av_pause_frame.frameNumber = vbuffers.GetScratchFrame()->frameNumber;
 
@@ -1279,12 +1280,10 @@ void VideoOutputXv::DeleteBuffers(VOSType subtype, bool delete_pause_frame)
         if (av_pause_frame.buf)
         {
             av_freep(&av_pause_frame.buf);
-            av_pause_frame.buf = NULL;
         }
         if (av_pause_frame.qscale_table)
         {
-            delete [] av_pause_frame.qscale_table;
-            av_pause_frame.qscale_table = NULL;
+            av_freep(&av_pause_frame.qscale_table);
         }
     }
 

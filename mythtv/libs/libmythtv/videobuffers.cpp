@@ -218,11 +218,7 @@ void VideoBuffers::Reset()
     frame_vector_t::iterator it = buffers.begin();
     for (;it != buffers.end(); ++it)
     {
-        if (it->qscale_table)
-        {
-            delete [] it->qscale_table;
-            it->qscale_table = NULL;
-        }
+        av_freep(&it->qscale_table);
     }
 
     available.clear();
@@ -811,11 +807,7 @@ void VideoBuffers::DeleteBuffers()
     {
         buffers[i].buf = NULL;
 
-        if (buffers[i].qscale_table)
-        {
-            delete [] buffers[i].qscale_table;
-            buffers[i].qscale_table = NULL;
-        }
+        av_freep(&buffers[i].qscale_table);
     }
 
     for (uint i = 0; i < allocated_arrays.size(); i++)

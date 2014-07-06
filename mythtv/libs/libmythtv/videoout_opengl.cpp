@@ -120,13 +120,11 @@ void VideoOutputOpenGL::DestroyCPUResources(void)
 
     if (av_pause_frame.buf)
     {
-        delete [] av_pause_frame.buf;
-        av_pause_frame.buf = NULL;
+        av_freep(&av_pause_frame.buf);
     }
     if (av_pause_frame.qscale_table)
     {
-        delete [] av_pause_frame.qscale_table;
-        av_pause_frame.qscale_table = NULL;
+        av_freep(&av_pause_frame.qscale_table);
     }
     gl_context_lock.unlock();
 }
@@ -424,11 +422,15 @@ bool VideoOutputOpenGL::CreateBuffers(void)
 
 bool VideoOutputOpenGL::CreatePauseFrame(void)
 {
+    int size = buffersize(FMT_YV12,
+                          vbuffers.GetScratchFrame()->width,
+                          vbuffers.GetScratchFrame()->height);
+    unsigned char *buffer = (unsigned char *)av_malloc(size);
     init(&av_pause_frame, FMT_YV12,
-         new unsigned char[vbuffers.GetScratchFrame()->size + 128],
+         buffer,
          vbuffers.GetScratchFrame()->width,
          vbuffers.GetScratchFrame()->height,
-         vbuffers.GetScratchFrame()->size);
+         size);
 
     av_pause_frame.frameNumber = vbuffers.GetScratchFrame()->frameNumber;
 
