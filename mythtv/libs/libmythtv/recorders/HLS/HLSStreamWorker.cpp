@@ -71,7 +71,7 @@ void HLSStreamWorker::run(void)
             if (retries == 10)
                 m_parent->ResetSequence();
 
-            delay = 500 * retries * retries;
+            delay = (uint64_t)500 * retries * retries;
             if (delay > 20000)
                 delay = 20000;
         }
