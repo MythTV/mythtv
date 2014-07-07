@@ -405,7 +405,7 @@ void IPTVStreamHandlerReadHelper::ReadPending(void)
 
 IPTVStreamHandlerWriteHelper::IPTVStreamHandlerWriteHelper(IPTVStreamHandler *p)
   : m_parent(p),                m_timer(0),             m_timer_rtcp(0),
-    m_last_sequence_number(0),  m_last_timestamp(0),
+    m_last_sequence_number(0),  m_last_timestamp(0),    m_previous_last_sequence_number(0),
     m_lost(0),                  m_lost_interval(0)
 {
 }
