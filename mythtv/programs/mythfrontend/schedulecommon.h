@@ -23,7 +23,6 @@ class ScheduleCommon : public MythScreenType
 
     void ShowDetails(ProgramInfo *pginfo) const;
     void ShowUpcoming(const QString &title, const QString &seriesid) const;
-    void ShowUpcomingScheduled(ProgramInfo *pginfo) const;
     void ShowPrevious(ProgramInfo *pginfo) const;
     void ShowPrevious(uint recordid, const QString &title) const;
     void QuickRecord(ProgramInfo *pginfo);
@@ -38,6 +37,7 @@ class ScheduleCommon : public MythScreenType
 
   protected slots:
     virtual void ShowUpcoming(void) const;
+    virtual void ShowUpcomingScheduled(void) const;
 
   private:
     bool IsFindApplicable(const RecordingInfo &recInfo) const;

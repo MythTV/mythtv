@@ -78,8 +78,9 @@ void ScheduleCommon::ShowUpcoming(void) const
 /**
 *  \brief Show the upcoming recordings for this recording rule
 */
-void ScheduleCommon::ShowUpcomingScheduled(ProgramInfo *pginfo) const
+void ScheduleCommon::ShowUpcomingScheduled(void) const
 {
+    ProgramInfo *pginfo = GetCurrentProgram();
     if (!pginfo)
         return;
 
