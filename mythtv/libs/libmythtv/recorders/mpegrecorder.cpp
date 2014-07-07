@@ -1332,7 +1332,16 @@ bool MpegRecorder::StartEncoding(void)
             // does not reliably start the data flow.  A read() seems
             // to consistently work, though.
             uint8_t dummy;
-            read(readfd, &dummy, 0);
+            ssize_t len = read(readfd, &dummy, 0);
+            if (len < 0)
+            {
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    "StartEncoding: read from video device failed." + ENO);
+                _error = "Failed to start recording";
+                close(readfd);
+                readfd = -1;
+                return false;
+            }
         }
 
         LOG(VB_RECORD, LOG_INFO, LOC + "Encoding started");
