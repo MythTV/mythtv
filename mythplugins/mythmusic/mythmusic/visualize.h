@@ -89,7 +89,7 @@ class VisualBase
     virtual int getDesiredFPS(void) { return m_fps; }
     // Override this if you need the potential of capturing more data than the default
     virtual unsigned long getDesiredSamples(void) { return SAMPLES_DEFAULT_SIZE; }
-    void drawWarning(QPainter *p, const QColor &back, const QSize &color, QString warning, int fontsize = 28);
+    void drawWarning(QPainter *p, const QColor &back, const QSize &size, QString warning, int fontsize = 28);
 
   protected:
     int m_fps;
