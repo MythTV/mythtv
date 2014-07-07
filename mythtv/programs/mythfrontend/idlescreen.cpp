@@ -275,7 +275,6 @@ void IdleScreen::customEvent(QEvent* event)
                  me->Message().startsWith("RECORDING_LIST_CHANGE") ||
                  me->Message() == "UPDATE_PROG_INFO")
         {
-            LOG(VB_GENERAL, LOG_INFO, QString("IdleScreen:%1").arg(me->Message()));
             QMutexLocker lock(&m_schedUpdateMutex);
 
             if (!PendingSchedUpdate())
