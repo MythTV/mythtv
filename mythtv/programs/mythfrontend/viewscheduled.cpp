@@ -814,3 +814,9 @@ void ViewScheduled::customEvent(QEvent *event)
             ScheduleCommon::customEvent(event);
     }
 }
+
+ProgramInfo *ViewScheduled::GetCurrentProgram(void)
+{
+    MythUIButtonListItem *item = m_schedulesList->GetItemCurrent();
+    return item ? item->GetData().value<ProgramInfo*>() : NULL;
+}

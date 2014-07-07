@@ -60,6 +60,7 @@ class ProgFinder : public ScheduleCommon
     virtual bool formatSelectedData(QString &data, int charNum);
     virtual void restoreSelectedData(QString &data);
     virtual void whereClauseGetSearchData(QString &where, MSqlBindings &bindings);
+    virtual ProgramInfo *GetCurrentProgram(void);
 
     void ShowMenu(void);
     void getShowNames(void);

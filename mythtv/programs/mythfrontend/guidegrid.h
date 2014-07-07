@@ -173,6 +173,8 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
               bool allowFinder = true,
               int changrpid = -1);
    ~GuideGrid();
+    virtual ProgramInfo *GetCurrentProgram(void)
+        { return m_programInfos[m_currentRow][m_currentCol]; };
 
   private slots:
     void updateTimeout(void);

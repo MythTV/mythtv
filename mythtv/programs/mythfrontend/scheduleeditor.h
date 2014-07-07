@@ -201,6 +201,9 @@ class ScheduleEditor : public ScheduleCommon,
 
     void showTemplateMenu(void);
 
+    virtual ProgramInfo *GetCurrentProgram(void)
+        { return m_recInfo; };
+
     RecordingInfo *m_recInfo;
     RecordingRule *m_recordingRule;
 

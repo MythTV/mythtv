@@ -1662,4 +1662,10 @@ void ProgramRecPriority::RemoveItemFromList(MythUIButtonListItem *item)
     m_programList->RemoveItem(item);
 }
 
+ProgramInfo *ProgramRecPriority::GetCurrentProgram(void)
+{
+    MythUIButtonListItem *item = m_programList->GetItemCurrent();
+    return item ? item->GetData().value<ProgramRecPriorityInfo*>() : NULL;
+}
+
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

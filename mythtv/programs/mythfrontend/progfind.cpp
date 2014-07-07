@@ -1131,6 +1131,13 @@ void RuProgFinder::restoreSelectedData(QString& data)
 {
     (void)data;
 }
+
+ProgramInfo *ProgFinder::GetCurrentProgram(void)
+{
+    return (GetFocusWidget() == m_timesList) ?
+        m_showData[m_timesList->GetCurrentPos()] : NULL;
+};
+
 //////////////////////////////////////////////////////////////////////////////
 
 SearchInputDialog::SearchInputDialog(MythScreenStack *parent,

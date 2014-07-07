@@ -248,13 +248,13 @@ bool ProgLister::keyPressEvent(QKeyEvent *e)
             SwitchToNextView();
         else if (action == "CUSTOMEDIT")
         {
-            if (GetCurrent())
-                ScheduleCommon::EditCustom(GetCurrent());
+            if (GetCurrentProgram())
+                ScheduleCommon::EditCustom(GetCurrentProgram());
         }
         else if (action == "EDIT")
         {
-            if (GetCurrent())
-                ScheduleCommon::EditScheduled(GetCurrent());
+            if (GetCurrentProgram())
+                ScheduleCommon::EditScheduled(GetCurrentProgram());
         }
         else if (action == "DELETE")
             ShowDeleteItemMenu();
@@ -616,15 +616,7 @@ bool ProgLister::PowerStringToSQL(
     return output.contains("programgenres");
 }
 
-const ProgramInfo *ProgLister::GetCurrent(void) const
-{
-    int pos = m_progList->GetCurrentPos();
-    if (pos >= 0 && pos < (int) m_itemList.size())
-        return m_itemList[pos];
-    return NULL;
-}
-
-ProgramInfo *ProgLister::GetCurrent(void)
+ProgramInfo *ProgLister::GetCurrentProgram(void)
 {
     int pos = m_progList->GetCurrentPos();
     if (pos >= 0 && pos < (int) m_itemList.size())
@@ -634,14 +626,14 @@ ProgramInfo *ProgLister::GetCurrent(void)
 
 void ProgLister::RecordSelected(void)
 {
-    ProgramInfo *pi = GetCurrent();
+    ProgramInfo *pi = GetCurrentProgram();
     if (pi)
         QuickRecord(pi);
 }
 
 void ProgLister::HandleClicked(void)
 {
-    ProgramInfo *pi = GetCurrent();
+    ProgramInfo *pi = GetCurrentProgram();
     if (pi)
     {
         if (m_type == plPreviouslyRecorded)
@@ -661,7 +653,7 @@ void ProgLister::ShowDeleteItemMenu(void)
 
 void ProgLister::ShowDeleteRuleMenu(void)
 {
-    ProgramInfo *pi = GetCurrent();
+    ProgramInfo *pi = GetCurrentProgram();
 
     if (!pi || !pi->GetRecordingRuleID())
         return;
@@ -692,7 +684,7 @@ void ProgLister::ShowDeleteRuleMenu(void)
 
 void ProgLister::ShowDeleteOldEpisodeMenu(void)
 {
-    ProgramInfo *pi = GetCurrent();
+    ProgramInfo *pi = GetCurrentProgram();
 
     if (!pi)
         return;
@@ -704,7 +696,7 @@ void ProgLister::ShowDeleteOldEpisodeMenu(void)
 
 void ProgLister::DeleteOldEpisode(bool ok)
 {
-    ProgramInfo *pi = GetCurrent();
+    ProgramInfo *pi = GetCurrentProgram();
     if (!ok || !pi)
         return;
 
@@ -725,7 +717,7 @@ void ProgLister::DeleteOldEpisode(bool ok)
 
 void ProgLister::ShowDeleteOldSeriesMenu(void)
 {
-    ProgramInfo *pi = GetCurrent();
+    ProgramInfo *pi = GetCurrentProgram();
 
     if (!pi)
         return;
@@ -737,7 +729,7 @@ void ProgLister::ShowDeleteOldSeriesMenu(void)
 
 void ProgLister::DeleteOldSeries(bool ok)
 {
-    ProgramInfo *pi = GetCurrent();
+    ProgramInfo *pi = GetCurrentProgram();
     if (!ok || !pi)
         return;
 
@@ -758,7 +750,7 @@ void ProgLister::DeleteOldSeries(bool ok)
 
 void ProgLister::ShowOldRecordedMenu(void)
 {
-    ProgramInfo *pi = GetCurrent();
+    ProgramInfo *pi = GetCurrentProgram();
 
     if (!pi)
         return;
@@ -793,7 +785,7 @@ void ProgLister::ShowOldRecordedMenu(void)
 
 void ProgLister::ShowGuide(void)
 {
-    ProgramInfo *pi = GetCurrent();
+    ProgramInfo *pi = GetCurrentProgram();
     if (pi)
     {
         GuideGrid::RunProgramGuide(pi->GetChanID(), pi->GetChanNum(),
@@ -803,14 +795,14 @@ void ProgLister::ShowGuide(void)
 
 void ProgLister::ShowUpcoming(void)
 {
-    ProgramInfo *pi = GetCurrent();
+    ProgramInfo *pi = GetCurrentProgram();
     if (pi && m_type != plTitle)
         ScheduleCommon::ShowUpcoming(pi);
 }
 
 void ProgLister::ShowPrevious(void)
 {
-    ProgramInfo *pi = GetCurrent();
+    ProgramInfo *pi = GetCurrentProgram();
     if (pi && m_type != plPreviouslyRecorded)
         ScheduleCommon::ShowPrevious(pi);
 }
@@ -1399,7 +1391,7 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
     }
 
     ProgramInfo        selected;
-    const ProgramInfo *selectedP = (restorePosition) ? GetCurrent() : NULL;
+    const ProgramInfo *selectedP = (restorePosition) ? GetCurrentProgram() : NULL;
     if (selectedP)
     {
         selected = *selectedP;
@@ -1686,7 +1678,7 @@ void ProgLister::customEvent(QEvent *event)
             {
                 case 0:
                 {
-                    ProgramInfo *pi = GetCurrent();
+                    ProgramInfo *pi = GetCurrentProgram();
                     if (pi)
                     {
                         RecordingInfo ri(*pi);

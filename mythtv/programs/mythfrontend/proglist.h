@@ -60,10 +60,10 @@ class ProgLister : public ScheduleCommon
     void SetViewFromList(QString item);
     void SetViewFromTime(QDateTime searchTime);
 
-    void EditScheduled(void) { ScheduleCommon::EditScheduled(GetCurrent()); }
-    void EditCustom(void)    { ScheduleCommon::EditCustom(GetCurrent());    }
+    void EditScheduled(void) { ScheduleCommon::EditScheduled(GetCurrentProgram()); }
+    void EditCustom(void)    { ScheduleCommon::EditCustom(GetCurrentProgram());    }
 
-    void ShowDetails(void)   { ScheduleCommon::ShowDetails(GetCurrent());   }
+    void ShowDetails(void)   { ScheduleCommon::ShowDetails(GetCurrentProgram());   }
     void ShowGuide(void);
     void ShowUpcoming(void);
     void ShowPrevious(void);
@@ -95,8 +95,7 @@ class ProgLister : public ScheduleCommon
     SortBy GetSortBy(void) const;
     void SortList(SortBy sortby, bool reverseSort);
 
-    ProgramInfo *GetCurrent(void);
-    const ProgramInfo *GetCurrent(void) const;
+    virtual ProgramInfo *GetCurrentProgram(void);
 
     bool PowerStringToSQL(
         const QString &qphrase, QString &output, MSqlBindings &bindings) const;
