@@ -957,7 +957,7 @@ void MythUIWebBrowser::Init(void)
         parentObject = parentObject->parent();
     }
 
-    if (!m_parentScreen)
+    if (!m_parentScreen && parent() != GetGlobalObjectStore())
         LOG(VB_GENERAL, LOG_ERR,
             "MythUIWebBrowser: failed to find our parent screen");
 
