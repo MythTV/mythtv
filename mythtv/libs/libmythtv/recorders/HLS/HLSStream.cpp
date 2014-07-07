@@ -11,9 +11,12 @@ HLSRecStream::HLSRecStream(int seq, uint64_t bitrate, const QString& url)
     : m_id(seq),
       m_version(1),
       m_targetduration(-1),
+      m_curbyterate(0),
       m_bitrate(bitrate),
       m_duration(0LL),
       m_live(true),
+      m_bandwidth(0),
+      m_sumbandwidth(0.0),
       m_url(url),
       m_cache(false),
       m_retries(0)
