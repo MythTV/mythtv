@@ -697,10 +697,11 @@ bool Spectrum::process(VisualNode *node)
 
     for (i = 0; (int)i < rects.size(); i++, w += analyzerBarWidth)
     {
-        magL = (log(sq(real(lout[index])) + sq(real(lout[FFTW_N - index]))) - 22.0) *
-               scaleFactor;
-        magR = (log(sq(real(rout[index])) + sq(real(rout[FFTW_N - index]))) - 22.0) *
-               scaleFactor;
+        tmp = sq(real(lout[index])) + sq(real(lout[FFTW_N - index]));
+        magL = (tmp > 1.) ? (log(tmp) - 22.0) * scaleFactor : 0.;
+
+        tmp = sq(real(rout[index])) + sq(real(rout[FFTW_N - index]));
+        magR = (tmp > 1.) ? (log(tmp) - 22.0) * scaleFactor : 0.;
 
         if (magL > size.height() / 2)
         {
