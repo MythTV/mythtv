@@ -3,7 +3,9 @@ include ( ../../settings.pro )
 include ( ../../programs-libs.pro )
 include (config.pro)
 
-QT += xml sql opengl network webkit
+QT += xml sql opengl network
+contains(QT_VERSION, ^4\\.[0-9]\\..*) : QT += webkit
+contains(QT_VERSION, ^5\\.[0-9]\\..*) : QT += widgets webkitwidgets
 
 !exists( config.pro ) {
    error(Missing config.pro: please run the configure script)
