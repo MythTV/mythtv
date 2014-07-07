@@ -291,10 +291,10 @@ void ExternIO::Fork(void)
             int i = 0;
             while (arguments[i])
             {
-                delete arguments[i];
+                delete[] arguments[i];
                 ++i;
             }
-            delete arguments;
+            delete[] arguments;
         }
 
         LOG(VB_RECORD, LOG_INFO, "Spawned");
