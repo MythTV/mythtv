@@ -4,7 +4,9 @@ include (../../programs-libs.pro )
 
 LIBS += -lmythtv-$$LIBVERSION
 
-QT += network xml sql opengl webkit
+QT += network xml sql opengl
+contains(QT_VERSION, ^4\\.[0-9]\\..*) : QT += webkit
+contains(QT_VERSION, ^5\\.[0-9]\\..*) : QT += widgets webkitwidgets
 
 TEMPLATE = lib
 CONFIG += thread opengl plugin warn_on
