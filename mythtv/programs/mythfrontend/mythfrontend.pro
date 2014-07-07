@@ -9,6 +9,7 @@ using_qtdbus: CONFIG += qdbus
 }
 contains(QT_VERSION, ^5\\.[0-9]\\..*) {
 QT += widgets
+QT += webkitwidgets
 using_qtdbus: QT += dbus
 }
 

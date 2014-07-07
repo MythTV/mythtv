@@ -6,7 +6,7 @@ QT += webkit
 }
 contains(QT_VERSION, ^5\\.[0-9]\\..*) {
 QT += widgets
-# QT += webkitwidgets # this does not seem to work..
+QT += webkitwidgets
 }
 
 TEMPLATE = lib
@@ -64,10 +64,7 @@ SOURCES += mythuisimpletext.cpp mythuistatetracker.cpp
 SOURCES += mythuianimation.cpp mythuiscrollbar.cpp
 SOURCES += mythnotificationcenter.cpp mythnotification.cpp
 SOURCES += mythuicomposite.cpp
-
-contains(QT_VERSION, ^4\\.[0-9]\\..*) {
 SOURCES += mythuiwebbrowser.cpp
-}
 
 inc.path = $${PREFIX}/include/mythtv/libmythui/
 
