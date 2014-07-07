@@ -41,7 +41,6 @@ class ProgFinder : public ScheduleCommon
     void select();
     void customEdit();
     void previous();
-    void details();
     void quickRecord();
 
     void customEvent(QEvent *e);

@@ -63,7 +63,6 @@ class ProgLister : public ScheduleCommon
     void EditScheduled(void) { ScheduleCommon::EditScheduled(GetCurrentProgram()); }
     void EditCustom(void)    { ScheduleCommon::EditCustom(GetCurrentProgram());    }
 
-    void ShowDetails(void)   { ScheduleCommon::ShowDetails(GetCurrentProgram());   }
     void ShowGuide(void);
     void ShowPrevious(void);
     void ShowDeleteRuleMenu(void);

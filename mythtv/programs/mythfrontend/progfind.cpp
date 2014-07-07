@@ -195,7 +195,7 @@ bool ProgFinder::keyPressEvent(QKeyEvent *event)
         else if (action == "PREVRECORDED")
             previous();
         else if (action == "DETAILS" || action == "INFO")
-            details();
+            ShowDetails();
         else if (action == "TOGGLERECORD")
             quickRecord();
         else if (action == "GUIDE" || action == "4")
@@ -305,7 +305,7 @@ void ProgFinder::customEvent(QEvent *event)
             }
             else if (resulttext == tr("Program Details"))
             {
-                details();
+                ShowDetails();
             }
             else if (resulttext == tr("Upcoming"))
             {
@@ -488,15 +488,6 @@ void ProgFinder::previous()
     {
         ShowPrevious(0, m_showList->GetValue());
     }
-}
-
-void ProgFinder::details()
-{
-    if (GetFocusWidget() != m_timesList)
-        return;
-
-    ProgramInfo *curPick = m_showData[m_timesList->GetCurrentPos()];
-    ShowDetails(curPick);
 }
 
 void ProgFinder::quickRecord()

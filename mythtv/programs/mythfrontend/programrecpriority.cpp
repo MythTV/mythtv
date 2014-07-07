@@ -610,7 +610,7 @@ bool ProgramRecPriority::keyPressEvent(QKeyEvent *event)
             upcoming();
         }
         else if (action == "INFO" || action == "DETAILS")
-            details();
+            ShowDetails();
         else
             handled = false;
     }
@@ -703,7 +703,7 @@ void ProgramRecPriority::customEvent(QEvent *event)
             }
             else if (resulttext == tr("Program Details"))
             {
-                details();
+                ShowDetails();
             }
             else if (resulttext == tr("Upcoming"))
             {
@@ -1138,18 +1138,6 @@ void ProgramRecPriority::upcoming(void)
         else
             delete pl;
     }
-}
-
-void ProgramRecPriority::details(void)
-{
-    MythUIButtonListItem *item = m_programList->GetItemCurrent();
-    if (!item)
-        return;
-
-    ProgramRecPriorityInfo *pgRecInfo = item->GetData().value<ProgramRecPriorityInfo *>
-                                                            ();
-
-    ShowDetails(pgRecInfo);
 }
 
 void ProgramRecPriority::changeRecPriority(int howMuch)

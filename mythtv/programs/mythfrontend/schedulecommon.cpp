@@ -27,8 +27,9 @@
 /**
 *  \brief Show the Program Details screen
 */
-void ScheduleCommon::ShowDetails(ProgramInfo *pginfo) const
+void ScheduleCommon::ShowDetails(void) const
 {
+    ProgramInfo *pginfo = GetCurrentProgram();
     if (!pginfo)
         return;
 

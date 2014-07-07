@@ -821,7 +821,7 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
         else if (action == "PREVRECORDED")
             previous();
         else if (action == "DETAILS" || action == "INFO")
-            details();
+            ShowDetails();
         else if (action == ACTION_TOGGLERECORD)
             quickRecord();
         else if (action == ACTION_TOGGLEFAV)
@@ -1706,7 +1706,7 @@ void GuideGrid::customEvent(QEvent *event)
             }
             else if (resulttext == tr("Program Details"))
             {
-                details();
+                ShowDetails();
             }
             else if (resulttext == tr("Reverse Channel Order"))
             {
@@ -2431,19 +2431,6 @@ void GuideGrid::previous()
         return;
 
     ShowPrevious(pginfo);
-}
-
-void GuideGrid::details()
-{
-    ProgramInfo *pginfo = m_programInfos[m_currentRow][m_currentCol];
-
-    if (!pginfo)
-        return;
-
-    if (pginfo->GetTitle() == kUnknownTitle)
-        return;
-
-    ShowDetails(pginfo);
 }
 
 void GuideGrid::channelUpdate(void)

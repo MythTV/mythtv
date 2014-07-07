@@ -161,8 +161,6 @@ class ScheduleEditor : public ScheduleCommon,
     void showPrevious(void);
     void showUpcomingByRule(void);
     void showUpcomingByTitle(void);
-    void ShowDetails(ProgramInfo *pginfo) const
-    { ScheduleCommon::ShowDetails(pginfo); };
 
     /// Callback
     static void *RunScheduleEditor(ProgramInfo *proginfo, void *player = NULL);

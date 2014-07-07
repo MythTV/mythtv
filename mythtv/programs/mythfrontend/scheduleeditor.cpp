@@ -540,7 +540,7 @@ bool ScheduleEditor::keyPressEvent(QKeyEvent *event)
         if (action == "MENU")
             showMenu();
         else if (action == "INFO")
-            ShowDetails(m_recInfo);
+            ShowDetails();
         else if (action == "UPCOMING")
             showUpcomingByTitle();
         else if (action == "PREVVIEW")
@@ -594,7 +594,7 @@ void ScheduleEditor::customEvent(QEvent *event)
         else if (resultid == "schedinfo")
         {
             if (resulttext == tr("Program Details"))
-                ShowDetails(m_recInfo);
+                ShowDetails();
             else if (resulttext == tr("Upcoming Episodes"))
                 showUpcomingByTitle();
             else if (resulttext == tr("Upcoming Recordings"))
@@ -918,7 +918,7 @@ bool SchedEditChild::keyPressEvent(QKeyEvent *event)
         if (action == "MENU")
             m_editor->showMenu();
         else if (action == "INFO")
-            m_editor->ShowDetails(m_recInfo);
+            m_editor->ShowDetails();
         else if (action == "UPCOMING")
             m_editor->showUpcomingByTitle();
         if (action == "ESCAPE")

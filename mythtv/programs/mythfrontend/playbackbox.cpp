@@ -2333,13 +2333,6 @@ void PlaybackBox::customEdit()
         EditCustom(pginfo);
 }
 
-void PlaybackBox::details()
-{
-    ProgramInfo *pginfo = GetCurrentProgram();
-    if (pginfo)
-        ShowDetails(pginfo);
-}
-
 void PlaybackBox::selected(MythUIButtonListItem *item)
 {
     if (!item)
@@ -2978,7 +2971,7 @@ MythMenu* PlaybackBox::createRecordingMenu(void)
 
     menu->AddItem(tr("Allow this episode to re-record"), SLOT(doAllowRerecord()));
 
-    menu->AddItem(tr("Show Recording Details"), SLOT(showProgramDetails()));
+    menu->AddItem(tr("Show Recording Details"), SLOT(ShowDetails()));
 
     menu->AddItem(tr("Change Recording Metadata"), SLOT(showMetadataEditor()));
 
@@ -3298,13 +3291,6 @@ void PlaybackBox::askStop(void)
         push_onto_del(m_delList, *pginfo);
         ShowDeletePopup(kStopRecording);
     }
-}
-
-void PlaybackBox::showProgramDetails()
-{
-    ProgramInfo *pginfo = GetCurrentProgram();
-    if (pginfo)
-        ShowDetails(pginfo);
 }
 
 void PlaybackBox::doEditScheduled()
@@ -3939,7 +3925,7 @@ bool PlaybackBox::keyPressEvent(QKeyEvent *event)
             else if (action == ACTION_PLAYBACK)
                 PlayFromBookmark();
             else if (action == "DETAILS" || action == "INFO")
-                details();
+                ShowDetails();
             else if (action == "CUSTOMEDIT")
                 customEdit();
             else if (action == "UPCOMING")

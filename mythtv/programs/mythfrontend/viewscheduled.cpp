@@ -173,7 +173,7 @@ bool ViewScheduled::keyPressEvent(QKeyEvent *event)
         else if (action == "PREVRECORDED")
             previous();
         else if (action == "DETAILS" || action == "INFO")
-            details();
+            ShowDetails();
         else if (action == "GUIDE")
             showGuide();
         else if (action == "1")
@@ -618,20 +618,6 @@ void ViewScheduled::previous()
     //EmbedTVWindow();
 }
 
-void ViewScheduled::details()
-{
-    MythUIButtonListItem *item = m_schedulesList->GetItemCurrent();
-
-    if (!item)
-        return;
-
-    ProgramInfo *pginfo = item->GetData().value<ProgramInfo*>();
-    if (pginfo)
-        ShowDetails(pginfo);
-
-    EmbedTVWindow();
-}
-
 void ViewScheduled::selected(MythUIButtonListItem *item)
 {
     if (!item)
@@ -744,7 +730,7 @@ void ViewScheduled::customEvent(QEvent *event)
             }
             else if (resulttext == tr("Program Details"))
             {
-                details();
+                ShowDetails();
             }
             else if (resulttext == tr("Program Guide"))
             {

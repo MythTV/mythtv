@@ -149,7 +149,6 @@ class PlaybackBox : public ScheduleCommon
     void ShowGroupPopup(void);
     void customEdit();
     void previous();
-    void details();
     void StopSelected(void);
     void showMetadataEditor();
     void showGroupFilter();
@@ -163,7 +162,6 @@ class PlaybackBox : public ScheduleCommon
     MythMenu* createPlaylistStorageMenu();
     MythMenu* createPlaylistJobMenu();
     void changeProfileAndTranscode(int id);
-    void showProgramDetails();
     void showIconHelp();
     void ShowRecGroupChangerUsePlaylist(void)  { ShowRecGroupChanger(true);  }
     void ShowPlayGroupChangerUsePlaylist(void) { ShowPlayGroupChanger(true); }

@@ -96,7 +96,6 @@ class ProgramRecPriority : public ScheduleCommon
     void remove();
     void deactivate();
     void upcoming();
-    void details();
 
     void showMenu(void);
     void showSortMenu(void);

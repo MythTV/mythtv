@@ -21,7 +21,6 @@ class ScheduleCommon : public MythScreenType
         : MythScreenType(parent, name) {};
    ~ScheduleCommon() {};
 
-    void ShowDetails(ProgramInfo *pginfo) const;
     void ShowUpcoming(const QString &title, const QString &seriesid) const;
     void ShowPrevious(ProgramInfo *pginfo) const;
     void ShowPrevious(uint recordid, const QString &title) const;
@@ -34,6 +33,9 @@ class ScheduleCommon : public MythScreenType
 
     virtual void customEvent(QEvent*);
     virtual ProgramInfo *GetCurrentProgram(void) const { return NULL; };
+
+  public slots:
+    virtual void ShowDetails(void) const;
 
   protected slots:
     virtual void ShowUpcoming(void) const;
