@@ -94,11 +94,17 @@
     </window>
 
     <window name="standbymode">
-        <area>0,-1,100%,430</area>
-        <shape name="background">
+        <area>0,0,100%,100%</area>
+        <shape name="background" from="basebackground">
             <area>0,0,100%,100%</area>
-            <fill color="#000000" alpha="200" />
+            <fill color="#000000" alpha="255" />
         </shape>
+
+        <fontdef name="label" from="basesmall">
+            <color>#ffff00</color>
+            <size>18</size>
+            <weight>bold</weight>
+        </fontdef>
 
         <fontdef name="info" from="basesmall">
             <color>#ffffff</color>
@@ -114,87 +120,136 @@
             <weight>bold</weight>
         </fontdef>
 
-        <group name="popup">
-            <area>0,0,800,430</area>
-            <shape name="background" from="basebackground">
-                <area>0,0,100%,100%</area>
-                <fill color="#000000" alpha="255" />
-            </shape>
+        <textarea name="heading">
+            <area>20,10,760,40</area>
+            <font>baselarge</font>
+            <align>allcenter</align>
+            <value>MythTV is in standby</value>
+        </textarea>
 
-            <textarea name="heading">
-                <area>20,20,760,40</area>
-                <font>baselarge</font>
-                <align>allcenter</align>
-                <value>MythTV is in standby</value>
-            </textarea>
+        <statetype name="backendstatus">
+            <area>20,60,760,100</area>
+            <state name="idle">
+                <area>0,0,760,100</area>
+                <!--<imagetype name="icon">-->
+                <shape name="iconplaceholder">
+                    <area>210,10,80,80</area>
+                    <fill color="#666666" />
+                </shape>
+                <!-- </imagetype>-->
+                <textarea name="status">
+                    <area>310,15,440,80</area>
+                    <font>basemedium</font>
+                    <value>Backend is idle</value>
+                    <multiline>true</multiline>
+                </textarea>
+            </state>
+            <state name="recording" from="idle">
+                <shape name="iconplaceholder">
+                    <fill color="#80DF00" />
+                </shape>
+                <textarea name="status">
+                    <value>Backend is recording</value>
+                </textarea>
+            </state>
+            <state name="shuttingdown" from="idle">
+                <shape name="iconplaceholder">
+                    <fill color="#FFFF33" />
+                </shape>
+                <textarea name="status">
+                    <value>Backend is shutting down</value>
+                </textarea>
+            </state>
+            <state name="offline" from="idle">
+                <shape name="iconplaceholder">
+                    <fill color="#800900" />
+                </shape>
+                <textarea name="status">
+                    <value>Backend is offline</value>
+                </textarea>
+            </state>
+        </statetype>
 
-            <statetype name="backendstatus">
-                <area>20,75,760,100</area>
-                <state name="idle">
-                    <area>0,0,760,100</area>
-                    <!--<imagetype name="icon">-->
-                    <shape name="iconplaceholder">
-                        <area>210,10,80,80</area>
-                        <fill color="#666666" />
-                    </shape>
-                    <!-- </imagetype>-->
-                    <textarea name="status">
-                        <area>310,15,440,80</area>
-                        <font>basemedium</font>
-                        <value>Backend is idle</value>
-                        <multiline>true</multiline>
+        <textarea name="currentrecordingheading">
+            <area>20,170,760,30</area>
+            <font>label</font>
+            <align>allcenter</align>
+            <value>Current Recording(s)</value>
+        </textarea>
+        <textarea name="nothingrecording" depends="!currentrecording">
+            <area>20,200,760,90</area>
+            <font>info</font>
+            <value>There are no recordings currently taking place</value>
+            <align>allcenter</align>
+        </textarea>
+        <buttonlist name="currentrecording">
+            <area>20,200,760,90</area>
+            <layout>vertical</layout>
+            <spacing>4</spacing>
+            <buttonarea>0,0,100%,100%</buttonarea>
+            <statetype name="buttonitem">
+                <area>0,0,100%,26</area>
+                <state name="active">
+                    <textarea name="shorttimedate">
+                        <font>basesmall</font>
+                        <align>vcenter</align>
+                        <area>0,1,200,24</area>
+                    </textarea>
+                    <textarea name="channame" from="shorttimedate">
+                        <area>210,1,130,24</area>
+                    </textarea>
+                    <textarea name="titlesubtitle" from="shorttimedate">
+                        <area>340,1,420,24</area>
                     </textarea>
                 </state>
-                <state name="recording" from="idle">
-                    <shape name="iconplaceholder">
-                        <fill color="#80DF00" />
-                    </shape>
-                    <textarea name="status">
-                        <value>Backend is recording</value>
-                    </textarea>
-                </state>
-                <state name="shuttingdown" from="idle">
-                    <shape name="iconplaceholder">
-                        <fill color="#FFFF33" />
-                    </shape>
-                    <textarea name="status">
-                        <value>Backend is shutting down</value>
-                    </textarea>
-                </state>
-                <state name="offline" from="idle">
-                    <shape name="iconplaceholder">
-                        <fill color="#800900" />
-                    </shape>
-                    <textarea name="status">
-                        <value>Backend is offline</value>
-                    </textarea>
-                </state>
+                <state name="selectedactive" from="active"/>
+                <state name="selectedinactive" from="selectedactive" />
             </statetype>
+        </buttonlist>
 
-            <textarea name="nextrecordingheading">
-                <area>20,190,760,30</area>
-                <font>basemedium</font>
-                <align>allcenter</align>
-                <value>Next recording:</value>
-            </textarea>
-            <textarea name="nextrecording">
-                <area>20,230,760,120</area>
-                <multiline>yes</multiline>
-                <font>info</font>
-                <align>allcenter</align>
-                <value></value>
-            </textarea>
-            <!--
-                scheduled recordings conflict warning
-            -->
-            <textarea name="conflicts">
-                <area>20,360,760,60</area>
-                <font>warning</font>
-                <align>allcenter</align>
-                <multiline>yes</multiline>
-                <value>WARNING: There are conflicting scheduled recordings!</value>
-            </textarea>
-        </group>
+        <textarea name="nextrecordingheading">
+            <area>20,315,760,30</area>
+            <font>label</font>
+            <align>allcenter</align>
+            <value>Next recording(s)</value>
+        </textarea>
+        <textarea name="nothingscheduled" depends="!nextrecording">
+            <area>20,350,760,120</area>
+            <font>info</font>
+            <value>There are no scheduled recordings</value>
+            <align>allcenter</align>
+        </textarea>
+        <buttonlist name="nextrecording" from="currentrecording">
+            <area>20,350,760,120</area>
+        </buttonlist>
+        <!--
+            scheduled recordings conflict warning
+        -->
+        <textarea name="conflictsheading" depends="conflicts">
+            <area>20,500,760,30</area>
+            <font>label</font>
+            <align>allcenter</align>
+            <value>Schedule conflict(s)</value>
+        </textarea>
+        <buttonlist name="conflicts" from="currentrecording">
+            <area>20,530,760,60</area>
+            <statetype name="buttonitem">
+                <area>0,0,100%,26</area>
+                <state name="active">
+                    <textarea name="shorttimedate" from="shorttimedate">
+                        <font>warning</font>
+                    </textarea>
+                    <textarea name="channame" from="channame">
+                        <font>warning</font>
+                    </textarea>
+                    <textarea name="titlesubtitle" from="titlesubtitle">
+                        <font>warning</font>
+                    </textarea>
+                </state>
+                <state name="selectedactive" from="active"/>
+                <state name="selectedinactive" from="selectedactive" />
+            </statetype>
+        </buttonlist>
     </window>
 
 </mythuitheme>

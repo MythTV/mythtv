@@ -6,7 +6,6 @@
 #include "programinfo.h"
 
 class MythUIStateType;
-class MythUIText;
 class MythUIButtonList;
 class QTimer;
 
@@ -26,7 +25,7 @@ class IdleScreen : public MythScreenType
   public slots:
     void UpdateStatus(void);
     void UpdateScreen(void);
-    bool UpdateScheduledList(void);
+    bool UpdateScheduledList();
 
   protected:
     void Load(void);
@@ -34,23 +33,21 @@ class IdleScreen : public MythScreenType
 
   private:
     bool CheckConnectionToServer(void);
-    bool PendingSchedUpdate() const           { return m_pendingSchedUpdate; }
-    void SetPendingSchedUpdate(bool newState) { m_pendingSchedUpdate = newState; }
+    bool PendingSchedUpdate() const             { return m_pendingSchedUpdate; }
+    void SetPendingSchedUpdate(bool newState)   { m_pendingSchedUpdate = newState; }
 
-    QTimer        *m_updateStatusTimer;
+    QTimer        *m_updateScreenTimer;
 
     MythUIStateType  *m_statusState;
-    MythUIText       *m_scheduledText;
-    MythUIText       *m_warningText;
+    MythUIButtonList *m_currentRecordings;
+    MythUIButtonList *m_nextRecordings;
+    MythUIButtonList *m_conflictingRecordings;
 
-    int m_secondsToShutdown;
-    bool m_backendRecording;
+    int             m_secondsToShutdown;
 
     QMutex          m_schedUpdateMutex;
     bool            m_pendingSchedUpdate;
-    bool            m_hasConflicts;
-    QDateTime       m_nextRecordingStart;
-    vector<ProgramInfo> m_scheduledList;
+    ProgramList     m_scheduledList;
 };
 
 #endif
