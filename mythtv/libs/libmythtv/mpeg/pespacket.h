@@ -27,6 +27,8 @@ class MTV_PUBLIC PESPacket
   protected:
     /** noop constructor, only for use by derived classes */
     PESPacket()
+        : _pesdata(NULL), _fullbuffer(NULL),  _psiOffset(0),
+          _ccLast(255), _pesdataSize(0), _allocSize(0), _badPacket(false)
     { ; }
 
   public:
