@@ -651,8 +651,8 @@ static void pxsubtitle(const char * supfile, FILE * ofh, eu8 palette[16][3],
     char  sptsstr[32];
     eu8   data[65536];
     eu8 * ctrl;
-    time_t pt = 0, ct;
-    bool last = false;
+    time_t volatile pt = 0;
+    bool volatile last = false;
     /*char  transparent[8]; */
     FILE * sfh = xfopen(supfile, "rb");
     if (memcmp(xxfread(sfh, data, 2), "SP", 2) != 0)
@@ -665,7 +665,7 @@ static void pxsubtitle(const char * supfile, FILE * ofh, eu8 palette[16][3],
 
     exc_try 
     {
-        eu32 lastendpts = 0;
+        eu32 volatile lastendpts = 0;
 
         while (1)
         {
@@ -692,6 +692,7 @@ static void pxsubtitle(const char * supfile, FILE * ofh, eu8 palette[16][3],
             last = true;
             exc_end;
             {
+                time_t ct;
                 BoundStr bs;
                 int  prev;
                 int x1 = -1, x2 = -1, y1 = -1, y2 = -1;
