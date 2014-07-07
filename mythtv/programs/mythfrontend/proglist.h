@@ -65,7 +65,6 @@ class ProgLister : public ScheduleCommon
 
     void ShowDetails(void)   { ScheduleCommon::ShowDetails(GetCurrentProgram());   }
     void ShowGuide(void);
-    void ShowUpcoming(void);
     void ShowPrevious(void);
     void ShowDeleteRuleMenu(void);
     void ShowDeleteOldEpisodeMenu(void);

@@ -66,8 +66,9 @@ void ScheduleCommon::ShowUpcoming(const QString &title,
 /**
 *  \brief Show the upcoming recordings for this title
 */
-void ScheduleCommon::ShowUpcoming(ProgramInfo *pginfo) const
+void ScheduleCommon::ShowUpcoming(void) const
 {
+    ProgramInfo *pginfo = GetCurrentProgram();
     if (!pginfo)
         return;
 
@@ -490,3 +491,4 @@ bool ScheduleCommon::IsFindApplicable(const RecordingInfo& recInfo) const
     return recInfo.GetRecordingRuleType() == kDailyRecord ||
            recInfo.GetRecordingRuleType() == kWeeklyRecord;
 }
+

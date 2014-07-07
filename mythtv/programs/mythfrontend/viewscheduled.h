@@ -45,7 +45,6 @@ class ViewScheduled : public ScheduleCommon
     void edit();
     void customEdit();
     void deleteRule();
-    void upcoming();
     void upcomingScheduled();
     void previous();
     void details();

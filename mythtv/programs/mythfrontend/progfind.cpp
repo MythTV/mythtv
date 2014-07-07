@@ -191,7 +191,7 @@ bool ProgFinder::keyPressEvent(QKeyEvent *event)
         else if (action == "CUSTOMEDIT")
             customEdit();
         else if (action == "UPCOMING")
-            upcoming();
+            ShowUpcoming();
         else if (action == "PREVRECORDED")
             previous();
         else if (action == "DETAILS" || action == "INFO")
@@ -309,7 +309,7 @@ void ProgFinder::customEvent(QEvent *event)
             }
             else if (resulttext == tr("Upcoming"))
             {
-                upcoming();
+                ShowUpcoming();
             }
             else if (resulttext == tr("Previously Recorded"))
             {
@@ -473,15 +473,6 @@ void ProgFinder::customEdit()
     {
         ProgramInfo *pginfo = m_showData[m_timesList->GetCurrentPos()];
         EditCustom(pginfo);
-    }
-}
-
-void ProgFinder::upcoming()
-{
-    if (GetFocusWidget() == m_timesList)
-    {
-        ProgramInfo *pginfo = m_showData[m_timesList->GetCurrentPos()];
-        ShowUpcoming(pginfo);
     }
 }
 

@@ -258,7 +258,7 @@ bool ProgLister::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "DELETE")
             ShowDeleteItemMenu();
-        else if (action == "UPCOMING")
+        else if (action == "UPCOMING" && m_type != plTitle)
             ShowUpcoming();
         else if (action == "PREVRECORDED")
             ShowPrevious();
@@ -334,7 +334,7 @@ void ProgLister::ShowMenu(void)
     menu->AddItem(tr("Program Details"), SLOT(ShowDetails()));
     menu->AddItem(tr("Program Guide"),   SLOT(ShowGuide()));
     if (m_type != plTitle)
-        menu->AddItem(tr("Upcoming"),        SLOT(ShowUpcoming()));
+        menu->AddItem(tr("Upcoming"),    SLOT(ShowUpcoming()));
     if (m_type != plPreviouslyRecorded)
         menu->AddItem(tr("Previously Recorded"),SLOT(ShowPrevious()));
     menu->AddItem(tr("Custom Edit"),     SLOT(EditCustom()));
@@ -791,13 +791,6 @@ void ProgLister::ShowGuide(void)
         GuideGrid::RunProgramGuide(pi->GetChanID(), pi->GetChanNum(),
                                    pi->GetScheduledStartTime());
     }
-}
-
-void ProgLister::ShowUpcoming(void)
-{
-    ProgramInfo *pi = GetCurrentProgram();
-    if (pi && m_type != plTitle)
-        ScheduleCommon::ShowUpcoming(pi);
 }
 
 void ProgLister::ShowPrevious(void)

@@ -2309,13 +2309,6 @@ void PlaybackBox::previous()
         ShowPrevious(pginfo);
 }
 
-void PlaybackBox::upcoming()
-{
-    ProgramInfo *pginfo = GetCurrentProgram();
-    if (pginfo)
-        ShowUpcoming(pginfo);
-}
-
 void PlaybackBox::upcomingScheduled()
 {
     ProgramInfo *pginfo = GetCurrentProgram();
@@ -3957,7 +3950,7 @@ bool PlaybackBox::keyPressEvent(QKeyEvent *event)
             else if (action == "CUSTOMEDIT")
                 customEdit();
             else if (action == "UPCOMING")
-                upcoming();
+                ShowUpcoming();
             else if (action == ACTION_VIEWSCHEDULED)
                 upcomingScheduled();
             else if (action == ACTION_PREVRECORDED)

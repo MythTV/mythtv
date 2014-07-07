@@ -40,7 +40,6 @@ class ProgFinder : public ScheduleCommon
     void showGuide();
     void select();
     void customEdit();
-    void upcoming();
     void previous();
     void details();
     void quickRecord();
