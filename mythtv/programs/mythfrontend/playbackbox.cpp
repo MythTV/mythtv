@@ -2323,7 +2323,7 @@ void PlaybackBox::upcomingScheduled()
         ShowUpcomingScheduled(pginfo);
 }
 
-ProgramInfo *PlaybackBox::GetCurrentProgram(void)
+ProgramInfo *PlaybackBox::GetCurrentProgram(void) const
 {
     ProgramInfo *pginfo = NULL;
 

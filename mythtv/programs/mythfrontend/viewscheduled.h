@@ -57,7 +57,7 @@ class ViewScheduled : public ScheduleCommon
   protected:
     virtual void Load(void); // MythScreenType
     virtual void Init(void); // MythScreenType
-    virtual ProgramInfo *GetCurrentProgram(void);
+    virtual ProgramInfo *GetCurrentProgram(void) const;
 
   private:
     void FillList(void);

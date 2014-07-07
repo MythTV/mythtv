@@ -35,7 +35,7 @@ class ScheduleCommon : public MythScreenType
     void MakeOverride(RecordingInfo *recinfo);
 
     virtual void customEvent(QEvent*);
-    virtual ProgramInfo *GetCurrentProgram(void) { return NULL; };
+    virtual ProgramInfo *GetCurrentProgram(void) const { return NULL; };
 
   private:
     bool IsFindApplicable(const RecordingInfo &recInfo) const;

@@ -284,7 +284,7 @@ class PlaybackBox : public ScheduleCommon
               bool ignoreBookmark,
               bool underNetworkControl);
 
-    virtual ProgramInfo *GetCurrentProgram(void);
+    virtual ProgramInfo *GetCurrentProgram(void) const;
 
     void togglePlayListItem(ProgramInfo *pginfo);
     void randomizePlayList(void);

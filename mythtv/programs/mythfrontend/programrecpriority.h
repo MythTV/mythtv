@@ -101,7 +101,7 @@ class ProgramRecPriority : public ScheduleCommon
     void showMenu(void);
     void showSortMenu(void);
 
-    virtual ProgramInfo *GetCurrentProgram(void);
+    virtual ProgramInfo *GetCurrentProgram(void) const;
 
     QMap<int, ProgramRecPriorityInfo> m_programData;
     vector<ProgramRecPriorityInfo*> m_sortedProgram;

@@ -616,7 +616,7 @@ bool ProgLister::PowerStringToSQL(
     return output.contains("programgenres");
 }
 
-ProgramInfo *ProgLister::GetCurrentProgram(void)
+ProgramInfo *ProgLister::GetCurrentProgram(void) const
 {
     int pos = m_progList->GetCurrentPos();
     if (pos >= 0 && pos < (int) m_itemList.size())

@@ -95,7 +95,7 @@ class ProgLister : public ScheduleCommon
     SortBy GetSortBy(void) const;
     void SortList(SortBy sortby, bool reverseSort);
 
-    virtual ProgramInfo *GetCurrentProgram(void);
+    virtual ProgramInfo *GetCurrentProgram(void) const;
 
     bool PowerStringToSQL(
         const QString &qphrase, QString &output, MSqlBindings &bindings) const;

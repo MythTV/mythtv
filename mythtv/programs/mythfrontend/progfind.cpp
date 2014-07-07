@@ -1132,7 +1132,7 @@ void RuProgFinder::restoreSelectedData(QString& data)
     (void)data;
 }
 
-ProgramInfo *ProgFinder::GetCurrentProgram(void)
+ProgramInfo *ProgFinder::GetCurrentProgram(void) const
 {
     return (GetFocusWidget() == m_timesList) ?
         m_showData[m_timesList->GetCurrentPos()] : NULL;

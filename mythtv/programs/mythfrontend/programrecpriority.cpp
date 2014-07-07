@@ -1662,7 +1662,7 @@ void ProgramRecPriority::RemoveItemFromList(MythUIButtonListItem *item)
     m_programList->RemoveItem(item);
 }
 
-ProgramInfo *ProgramRecPriority::GetCurrentProgram(void)
+ProgramInfo *ProgramRecPriority::GetCurrentProgram(void) const
 {
     MythUIButtonListItem *item = m_programList->GetItemCurrent();
     return item ? item->GetData().value<ProgramRecPriorityInfo*>() : NULL;
