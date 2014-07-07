@@ -697,7 +697,7 @@ static void pxsubtitle(const char * supfile, FILE * ofh, eu8 palette[16][3],
                 int  prev;
                 int x1 = -1, x2 = -1, y1 = -1, y2 = -1;
                 int top_field = -1, bot_field = -1;
-                int start = 0, end = 0;
+                int end = 0;
                 int colcon_length;
                 eu8 this_palette[4][3];
                 boundstr_init(&bs, ctrl, size - pack);
@@ -718,7 +718,6 @@ static void pxsubtitle(const char * supfile, FILE * ofh, eu8 palette[16][3],
                             case 0x00:      /* force display: */
                                 continue;
                             case 0x01:      /* start date (read above) */
-                                start = date;
                                 continue;
                             case 0x02:      /* stop date (read above) */
                                 end = date;
@@ -880,7 +879,7 @@ int sup2dast(const char *supfile, const char *ifofile ,int delay_ms)
 {
     exc_try 
     {
-        int jc, i;
+        int i;
         eu8 yuvpalette[16][3], rgbpalette[16][3];
         char fnbuf[1024];
         char * p;
@@ -970,7 +969,6 @@ int sup2dast(const char *supfile, const char *ifofile ,int delay_ms)
             strcpy(&buf[i - 3], "xml");
             unlink(buf);
             rename(fnbuf, buf);
-            jc = 0; 
         }
         p[0] = '\0';
         printf("Output files reside in %s\n", fnbuf);
