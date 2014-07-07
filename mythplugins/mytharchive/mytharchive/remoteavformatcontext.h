@@ -79,10 +79,7 @@ class RemoteAVFormatContext
         }
         else
         {
-            const char *type = NULL;
-            AVInputFormat *fmt = type ? av_find_input_format(type) : NULL;
-
-            int ret = avformat_open_input(&m_inputFC,  qPrintable(filename), fmt, NULL);
+            int ret = avformat_open_input(&m_inputFC,  qPrintable(filename), NULL, NULL);
             if (ret)
                 return false;
         }
