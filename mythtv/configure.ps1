@@ -575,11 +575,11 @@ switch ($tools.Get_Item( 'libexpat.lib'))
 
 # ---------------------------------------------------------------------------
 
-exiv2_params$ = @( "/target:build", "/p:Configuration=$BuildType" )
+$exiv2_params = @( "/target:build", "/p:Configuration=$BuildType" )
 
 if ($VCVerStr -eq "Visual Studio 12")
 {
-   exiv2_params$ = exiv2_params$ + "/p:PlatformToolset=v120"
+   $exiv2_params = $exiv2_params + "/p:PlatformToolset=v120"
 }
 
 # ---------------------------------------------------------------------------
@@ -613,12 +613,11 @@ switch ($tools.Get_Item( 'xmpsdk.lib'))
         {
             # -- Build Solution
 
-            xmpsdk_params$ = @()
-            xmpsdk_params$ = exiv2_params$ + "mythxmpsdk.vcxproj"
+            $xmpsdk_params = $exiv2_params + "mythxmpsdk.vcxproj"
 
             Run-Exe "$basePath\platform\win32\msvc\external\exiv2\" `
                     "msbuild.exe"                                   `
-                    xmpsdk_params$ )
+                     $xmpsdk_params 
         }
 
         # -- Copy lib to shared folder
@@ -658,11 +657,11 @@ switch ($tools.Get_Item( 'exiv2.lib'))
         {
             # -- Build Solution
 
-            exiv2_params$ = exiv2_params$ + "mythexiv2lib.vcxproj"
+            $exiv2_params = $exiv2_params + "mythexiv2lib.vcxproj"
 
             Run-Exe "$basePath\platform\win32\msvc\external\exiv2\" `
                     "msbuild.exe"                                   `
-                     exiv2_params$ )
+                     $exiv2_params
         }
 
         # -- Copy lib & dll to shared folder
