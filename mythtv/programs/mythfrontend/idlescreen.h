@@ -42,12 +42,14 @@ class IdleScreen : public MythScreenType
     MythUIButtonList *m_currentRecordings;
     MythUIButtonList *m_nextRecordings;
     MythUIButtonList *m_conflictingRecordings;
+    MythUIText       *m_conflictWarning;
 
     int             m_secondsToShutdown;
 
     QMutex          m_schedUpdateMutex;
     bool            m_pendingSchedUpdate;
     ProgramList     m_scheduledList;
+    bool            m_hasConflicts;
 };
 
 #endif

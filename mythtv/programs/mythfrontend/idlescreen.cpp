@@ -21,8 +21,11 @@ IdleScreen::IdleScreen(MythScreenStack *parent)
               m_updateScreenTimer(new QTimer(this)), m_statusState(NULL),
               m_currentRecordings(NULL),
               m_nextRecordings(NULL),
+              m_conflictingRecordings(NULL),
+              m_conflictWarning(NULL),
               m_secondsToShutdown(0),
-              m_pendingSchedUpdate(false)
+              m_pendingSchedUpdate(false),
+              m_hasConflicts(false)
 {
     gCoreContext->addListener(this);
     GetMythMainWindow()->EnterStandby();
@@ -54,10 +57,11 @@ bool IdleScreen::Create(void)
     bool err = false;
     UIUtilE::Assign(this, m_statusState, "backendstatus", &err);
 
-    /* currentrecording, nextrecording and conflicts are optional */
+    /* currentrecording, nextrecording, conflicts and conflictwarning are optional */
     UIUtilW::Assign(this, m_currentRecordings, "currentrecording");
     UIUtilW::Assign(this, m_nextRecordings, "nextrecording");
     UIUtilW::Assign(this, m_conflictingRecordings, "conflicts");
+    UIUtilW::Assign(this, m_conflictWarning, "conflictwarning");
 
     if (err)
     {
@@ -161,6 +165,9 @@ void IdleScreen::UpdateScreen(void)
         m_conflictingRecordings->SetCanTakeFocus(false);
     }
 
+    if (m_conflictWarning)
+        m_conflictWarning->SetVisible(m_hasConflicts);
+
     // update scheduled
     if (!m_scheduledList.empty())
     {
@@ -221,7 +228,6 @@ bool IdleScreen::UpdateScheduledList()
         SetPendingSchedUpdate(false);
     }
 
-    bool hasConflicts;
     m_scheduledList.clear();
 
     if (!gCoreContext->IsConnectedToMaster())
@@ -229,7 +235,7 @@ bool IdleScreen::UpdateScheduledList()
         return false;
     }
 
-    if (!LoadFromScheduler(m_scheduledList, hasConflicts))
+    if (!LoadFromScheduler(m_scheduledList, m_hasConflicts))
         return false;
 
     UpdateScreen();
