@@ -63,6 +63,7 @@ class META_PUBLIC MetaIOID3 : public MetaIOTagLib
 
     bool writePlayCount(TagLib::ID3v2::Tag *tag, int playcount);
     bool writeRating(TagLib::ID3v2::Tag *tag, int rating);
+    bool writeLastPlay(TagLib::ID3v2::Tag *tag, QDateTime lastPlay);
 
     AlbumArtList readAlbumArt(TagLib::ID3v2::Tag *tag);
     UserTextIdentificationFrame* find(TagLib::ID3v2::Tag *tag,

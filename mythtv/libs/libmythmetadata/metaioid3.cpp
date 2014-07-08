@@ -175,6 +175,7 @@ bool MetaIOID3::write(const QString &filename, MusicMetadata* mdata)
     // MythTV rating and playcount, stored in POPM frame
     writeRating(tag, mdata->Rating());
     writePlayCount(tag, mdata->PlayCount());
+    writeLastPlay(tag, mdata->LastPlay());
 
     // MusicBrainz ID
     UserTextIdentificationFrame *musicbrainz = NULL;
@@ -365,6 +366,14 @@ MusicMetadata *MetaIOID3::read(const QString &filename)
 
     LOG(VB_FILE, LOG_DEBUG,
             QString("MetaIOID3::read: Length for '%1' from properties is '%2'\n").arg(filename).arg(metadata->Length()));
+
+    // Look for MythTVLastPlayed in TXXX Frame
+    UserTextIdentificationFrame *lastplayed = find(tag, "MythTVLastPlayed");
+    if (lastplayed)
+    {
+        QString lastPlayStr = TStringToQString(lastplayed->toString());
+        metadata->setLastPlay(QDateTime::fromString(lastPlayStr, Qt::ISODate));
+    }
 
     return metadata;
 }
@@ -873,6 +882,7 @@ bool MetaIOID3::writeVolatileMetadata(const QString &filename, MusicMetadata* md
 
     int rating = mdata->Rating();
     int playcount = mdata->PlayCount();
+    QDateTime lastPlay = mdata->LastPlay();
 
     if (!OpenFile(filename, true))
         return false;
@@ -882,7 +892,8 @@ bool MetaIOID3::writeVolatileMetadata(const QString &filename, MusicMetadata* md
     if (!tag)
         return false;
 
-    bool result = (writeRating(tag, rating) && writePlayCount(tag, playcount));
+    bool result = (writeRating(tag, rating) && writePlayCount(tag, playcount) &&
+                   writeLastPlay(tag, lastPlay));
 
     if (!SaveFile())
         return false;
@@ -918,6 +929,25 @@ bool MetaIOID3::writeRating(TagLib::ID3v2::Tag *tag, int rating)
         gpopm->setEmail("");
     }
     gpopm->setRating(popmrating);
+
+    return true;
+}
+
+bool MetaIOID3::writeLastPlay(TagLib::ID3v2::Tag *tag, QDateTime lastPlay)
+{
+    if (!tag)
+        return false;
+
+    // MythTV Specific Rating Tag
+    UserTextIdentificationFrame *txxx = find(tag, "MythTVLastPlayed");
+
+    if (!txxx)
+    {
+        txxx = new UserTextIdentificationFrame();
+        tag->addFrame(txxx);
+        txxx->setDescription("MythTVLastPlayed");
+    }
+    txxx->setText(QStringToTString(lastPlay.toString(Qt::ISODate)));
 
     return true;
 }
