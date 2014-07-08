@@ -73,6 +73,10 @@ void ScheduleCommon::ShowUpcoming(void) const
     if (!pginfo)
         return;
 
+    if (pginfo->GetChanID() == 0 &&
+        pginfo->GetRecordingRuleID() > 0)
+        return ShowUpcomingScheduled();
+
     ShowUpcoming(pginfo->GetTitle(), pginfo->GetSeriesID());
 }
 
