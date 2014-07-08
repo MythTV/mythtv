@@ -47,7 +47,7 @@ static int has_sse2     = -1;
 static int has_sse3     = -1;
 static int has_sse4     = -1;
 
-#ifdef _WIN32
+#if defined _WIN32 && !defined __MINGW32__
 //  Windows
 #define cpuid    __cpuid
 
