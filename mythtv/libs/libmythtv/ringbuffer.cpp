@@ -346,6 +346,12 @@ void RingBuffer::SetBufferSizeFactors(bool estbitrate, bool matroska)
     CreateReadAheadBuffer();
 }
 
+bool RingBuffer::IsReadyToRead() const
+{
+    QReadLocker lock(&rwlock);
+    return readsallowed;
+}
+
 /** \fn RingBuffer::CalcReadAheadThresh(void)
  *  \brief Calculates fill_min, fill_threshold, and readblocksize
  *         from the estimated effective bitrate of the stream.

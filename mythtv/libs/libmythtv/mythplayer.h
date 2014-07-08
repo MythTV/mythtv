@@ -610,8 +610,7 @@ class MTV_PUBLIC MythPlayer
     void  CheckExtraAudioDecode(void);
 
     // Private LiveTV stuff
-    void  SwitchToProgram(void);
-    void  JumpToProgram(void);
+    void  ChangeProgram(bool bJump);
     void  JumpToStream(const QString&);
 
   protected:
