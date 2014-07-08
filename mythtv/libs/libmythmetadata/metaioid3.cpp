@@ -286,9 +286,16 @@ MusicMetadata *MetaIOID3::read(const QString &filename)
         metadata->setCompilationArtist(compilation_artist);
     }
 
-    // MythTV rating and playcount, stored in POPM frame
-    PopularimeterFrame *popm = findPOPM(tag, email);
+    // Rating and playcount, stored in POPM frame
+    PopularimeterFrame *popm = findPOPM(tag, ""); // Global (all apps) tag
 
+    // If no 'global' tag exists, look for the MythTV specific one
+    if (!popm)
+    {
+        popm = findPOPM(tag, email);
+    }
+
+    // Fallback to using any POPM tag we can find
     if (!popm)
     {
         if (!tag->frameListMap()["POPM"].isEmpty())
@@ -833,6 +840,7 @@ bool MetaIOID3::writePlayCount(TagLib::ID3v2::Tag *tag, int playcount)
     if (!tag)
         return false;
 
+    // MythTV Specific playcount Tag
     PopularimeterFrame *popm = findPOPM(tag, email);
 
     if (!popm)
@@ -842,7 +850,18 @@ bool MetaIOID3::writePlayCount(TagLib::ID3v2::Tag *tag, int playcount)
         popm->setEmail(email);
     }
 
-    popm->setCounter(playcount);
+    int prevCount = popm->counter();
+    int countDiff = playcount - prevCount;
+    // Allow for situations where the user has rolled back to an old DB backup
+    if (countDiff > 0)
+        popm->setCounter(playcount);
+
+    // Global playcount Tag - Updated by all apps/hardware that support it
+    if (countDiff > 0)
+    {
+        PopularimeterFrame *gpopm = findPOPM(tag, "");
+        gpopm->setCounter(gpopm->counter() + countDiff);
+    }
 
     return true;
 }
@@ -876,6 +895,10 @@ bool MetaIOID3::writeRating(TagLib::ID3v2::Tag *tag, int rating)
     if (!tag)
         return false;
 
+    int popmrating = static_cast<int>(((static_cast<float>(rating) / 10.0)
+                                                               * 255.0) + 0.5);
+
+    // MythTV Specific Rating Tag
     PopularimeterFrame *popm = findPOPM(tag, email);
 
     if (!popm)
@@ -884,9 +907,17 @@ bool MetaIOID3::writeRating(TagLib::ID3v2::Tag *tag, int rating)
         tag->addFrame(popm);
         popm->setEmail(email);
     }
-    int popmrating = static_cast<int>(((static_cast<float>(rating) / 10.0)
-                                                               * 255.0) + 0.5);
     popm->setRating(popmrating);
+
+    // Global Rating Tag
+    PopularimeterFrame *gpopm = findPOPM(tag, "");
+    if (!gpopm)
+    {
+        gpopm = new PopularimeterFrame();
+        tag->addFrame(gpopm);
+        gpopm->setEmail("");
+    }
+    gpopm->setRating(popmrating);
 
     return true;
 }
