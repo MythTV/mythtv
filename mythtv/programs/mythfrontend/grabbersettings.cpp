@@ -85,145 +85,54 @@ GrabberSettings::~GrabberSettings()
 
 void GrabberSettings::Load(void)
 {
-    QDir TVScriptPath = QString("%1metadata/Television/").arg(GetShareDir());
-    QStringList TVScripts = TVScriptPath.entryList(QDir::Files);
-    QDir MovieScriptPath = QString("%1metadata/Movie/").arg(GetShareDir());
-    QStringList MovieScripts = MovieScriptPath.entryList(QDir::Files);
-    QDir GameScriptPath = QString("%1metadata/Game/").arg(GetShareDir());
-    QStringList GameScripts = GameScriptPath.entryList(QDir::Files);
-
-    if (MovieScripts.count())
-    {
-        for (QStringList::const_iterator i = MovieScripts.begin();
-             i != MovieScripts.end(); ++i)
-        {
-            QString commandline = QString("%1/%2")
-                                      .arg(MovieScriptPath.path()).arg(*i);
-            MythSystemLegacy grabber(commandline, QStringList() << "-v", kMSRunShell | kMSStdOut);
-            grabber.Run();
-            grabber.Wait();
-            QByteArray result = grabber.ReadAll();
-
-            if (!result.isEmpty())
-            {
-                QDomDocument doc;
-                doc.setContent(result, true);
-                QDomElement root = doc.documentElement();
-                if (!root.isNull())
-                {
-                    MetaGrabberScript *script = ParseGrabberVersion(root);
-                    if (!script->GetName().isEmpty())
-                        m_movieGrabberList.append(script);
-                }
-            }
-        }
-    }
-
-    if (TVScripts.count())
-    {
-        for (QStringList::const_iterator i = TVScripts.end() - 1;
-                i != TVScripts.begin() - 1; --i)
-        {
-            QString commandline = QString("%1/%2")
-                                      .arg(TVScriptPath.path()).arg(*i);
-            MythSystemLegacy grabber(commandline, QStringList() << "-v", kMSRunShell | kMSStdOut);
-            grabber.Run();
-            grabber.Wait();
-            QByteArray result = grabber.ReadAll();
-
-            if (!result.isEmpty())
-            {
-                QDomDocument doc;
-                doc.setContent(result, true);
-                QDomElement root = doc.documentElement();
-                if (!root.isNull())
-                {
-                    MetaGrabberScript *script = ParseGrabberVersion(root);
-                    if (!script->GetName().isEmpty())
-                        m_tvGrabberList.append(script);
-
-                }
-            }
-        }
-    }
-
-    if (GameScripts.count())
-    {
-        for (QStringList::const_iterator i = GameScripts.end() - 1;
-                i != GameScripts.begin() - 1; --i)
-        {
-            QString commandline = QString("%1/%2")
-                                      .arg(GameScriptPath.path()).arg(*i);
-            MythSystemLegacy grabber(commandline, QStringList() << "-v", kMSRunShell | kMSStdOut);
-            grabber.Run();
-            grabber.Wait();
-            QByteArray result = grabber.ReadAll();
-
-            if (!result.isEmpty())
-            {
-                QDomDocument doc;
-                doc.setContent(result, true);
-                QDomElement root = doc.documentElement();
-                if (!root.isNull())
-                {
-                    MetaGrabberScript *script = ParseGrabberVersion(root);
-                    if (!script->GetName().isEmpty())
-                        m_gameGrabberList.append(script);
-                }
-            }
-        }
-    }
+    m_movieGrabberList = MetaGrabberScript::GetList(kGrabberMovie, true);
+    m_tvGrabberList = MetaGrabberScript::GetList(kGrabberTelevision);
+    m_gameGrabberList = MetaGrabberScript::GetList(kGrabberGame);
 }
 
 void GrabberSettings::Init(void)
 {
-    for (QList<MetaGrabberScript*>::const_iterator it =
-             m_movieGrabberList.begin();
+    for (GrabberList::const_iterator it = m_movieGrabberList.begin();
          it != m_movieGrabberList.end(); ++it)
     {
-        QString commandline = QString("metadata/Movie/%1")
-                    .arg((*it)->GetCommand());
         InfoMap map;
-        (*it)->toMap(map);
+        it->toMap(map);
         MythUIButtonListItem *item =
-                    new MythUIButtonListItem(m_movieGrabberButtonList, (*it)->GetName());
-        item->SetData(commandline);
+                    new MythUIButtonListItem(m_movieGrabberButtonList, it->GetName());
+        item->SetData(it->GetRelPath());
         item->SetTextFromMap(map);
     }
 
     m_movieGrabberList.clear();
 
-    for (QList<MetaGrabberScript*>::const_iterator it = m_tvGrabberList.begin();
+    for (GrabberList::const_iterator it = m_tvGrabberList.begin();
          it != m_tvGrabberList.end(); ++it)
     {
-        QString commandline = QString("metadata/Television/%1")
-                    .arg((*it)->GetCommand());
         InfoMap map;
-        (*it)->toMap(map);
+        it->toMap(map);
         MythUIButtonListItem *item =
-                    new MythUIButtonListItem(m_tvGrabberButtonList, (*it)->GetName());
-        item->SetData(commandline);
+                    new MythUIButtonListItem(m_tvGrabberButtonList, it->GetName());
+        item->SetData(it->GetRelPath());
         item->SetTextFromMap(map);
     }
 
     m_tvGrabberList.clear();
 
-    for (QList<MetaGrabberScript*>::const_iterator it =
-             m_gameGrabberList.begin();
+    for (GrabberList::const_iterator it = m_gameGrabberList.begin();
          it != m_gameGrabberList.end(); ++it)
     {
-        QString commandline = QString("metadata/Game/%1")
-                    .arg((*it)->GetCommand());
         InfoMap map;
-        (*it)->toMap(map);
+        it->toMap(map);
         MythUIButtonListItem *item =
-                    new MythUIButtonListItem(m_gameGrabberButtonList, (*it)->GetName());
-        item->SetData(commandline);
+                    new MythUIButtonListItem(m_gameGrabberButtonList, it->GetName());
+        item->SetData(it->GetRelPath());
         item->SetTextFromMap(map);
     }
 
     m_gameGrabberList.clear();
 
+    // TODO
+    // pull these values from MetaGrabberScript so we're not defining them in multiple locations
     QString currentTVGrabber = gCoreContext->GetSetting("TelevisionGrabber",
                                          "metadata/Television/ttvdb.py");
     QString currentMovieGrabber = gCoreContext->GetSetting("MovieGrabber",

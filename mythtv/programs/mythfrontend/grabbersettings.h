@@ -11,6 +11,7 @@
 #include "mythuicheckbox.h"
 #include "mythscreentype.h"
 #include "mythdialogbox.h"
+#include "metadatagrabber.h"
 
 class MetaGrabberScript;
 class GrabberSettings : public MythScreenType
@@ -29,9 +30,9 @@ class GrabberSettings : public MythScreenType
     virtual void Load(void);
     virtual void Init(void);
 
-    QList<MetaGrabberScript*> m_movieGrabberList;
-    QList<MetaGrabberScript*> m_tvGrabberList;
-    QList<MetaGrabberScript*> m_gameGrabberList;
+    GrabberList m_movieGrabberList;
+    GrabberList m_tvGrabberList;
+    GrabberList m_gameGrabberList;
 
     MythUIButtonList   *m_movieGrabberButtonList;
     MythUIButtonList   *m_tvGrabberButtonList;

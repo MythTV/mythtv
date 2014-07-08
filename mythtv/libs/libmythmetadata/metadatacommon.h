@@ -15,6 +15,7 @@
 #include "mythmetaexp.h"
 #include "metadataimagehelper.h"
 #include "referencecounterlist.h"
+#include "metadatagrabber.h"
 
 class ProgramInfo;
 
@@ -482,54 +483,6 @@ META_PUBLIC QString nearestName(const QString &actual,
 
 META_PUBLIC QDateTime RFC822TimeToQDateTime(const QString &t);
 
-enum GrabberType {
-    kGrabberMovie = 0,
-    kGrabberTelevision = 1,
-    kGrabberMusic = 2,
-    kGrabberGame = 3
-};
-
-class META_PUBLIC MetaGrabberScript : public QObject
-{
-  public:
-    MetaGrabberScript();
-    ~MetaGrabberScript();
-
-    MetaGrabberScript(
-        const QString &name,
-        const QString &author,
-        const QString &thumbnail,
-        const QString &command,
-        const GrabberType type,
-        const QString &typestring,
-        const QString &description,
-        const float version);
-
-    QString GetName(void) const { return m_name; };
-    QString GetAuthor(void) const { return m_author; };
-    QString GetThumbnail(void) const { return m_thumbnail; };
-    QString GetCommand(void) const { return m_command; };
-    GrabberType GetType(void) const { return m_type; };
-    QString GetTypeString(void) const { return m_typestring; };
-    QString GetDescription(void) const { return m_description; };
-    float GetVersion(void) const { return m_version; };
-
-    void toMap(InfoMap &metadataMap);
-
-  private:
-    QString m_name;
-    QString m_author;
-    QString m_thumbnail;
-    QString m_command;
-    GrabberType m_type;
-    QString m_typestring;
-    QString m_description;
-    float m_version;
-};
-
-META_PUBLIC MetaGrabberScript *ParseGrabberVersion(const QDomElement &item);
-
-Q_DECLARE_METATYPE(MetaGrabberScript*)
 Q_DECLARE_METATYPE(MetadataLookup*)
 Q_DECLARE_METATYPE(RefCountHandler<MetadataLookup>)
 
