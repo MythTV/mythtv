@@ -3442,6 +3442,8 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
                     (enc->codec) && (enc->thread_count>1))
                 {
                     QMutexLocker locker(avcodeclock);
+                    // flush all buffers
+                    avcodec_flush_buffers(enc);
                     const AVCodec *codec = enc->codec;
                     avcodec_close(enc);
                     int open_val = avcodec_open2(enc, codec, NULL);
