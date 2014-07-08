@@ -123,17 +123,17 @@
         </imagetype>
 
         <group name="popup">
-            <area>0,110,1280,400</area>
+            <area>0,70,1280,400</area>
 
             <textarea name="heading">
-                <area>20,20,1240,40</area>
+                <area>20,0,1240,40</area>
                 <font>baseextralarge</font>
                 <align>allcenter</align>
                 <value>MythTV is in standby</value>
             </textarea>
 
             <statetype name="backendstatus">
-                <area>20,75,1240,100</area>
+                <area>20,55,1240,100</area>
                 <state name="idle">
                     <area>0,0,1240,100</area>
                     <imagetype name="icon">
@@ -180,22 +180,66 @@
                 <alpha>100</alpha>
             </imagetype>
 
-            <textarea name="nextrecordingheading">
-                <area>20,190,1240,30</area>
-                <font>basemedium</font>
+            <textarea name="currentrecordingheading">
+                <area>20,180,1240,30</area>
+                <font>label</font>
                 <align>allcenter</align>
-                <value>Next recording:</value>
-            </textarea>
-            <textarea name="nextrecording">
-                <area>20,230,1240,120</area>
-                <multiline>yes</multiline>
-                <font>info</font>
-                <align>allcenter</align>
-                <value></value>
+                <value>Current Recordings</value>
             </textarea>
 
+            <textarea name="nothingrecording" depends="!currentrecording">
+                <area>20,210,1240,50</area>
+                <font>info</font>
+                <value>There are no recordings currently taking place</value>
+                <align>allcenter</align>
+            </textarea>
+
+            <buttonlist name="currentrecording">
+                <area>20,210,1240,115</area>
+                <layout>vertical</layout>
+                <spacing>4</spacing>
+                <buttonarea>0,0,100%,100%</buttonarea>
+                <statetype name="buttonitem">
+                    <area>0,0,100%,26</area>
+                    <state name="active">
+                        <textarea name="title">
+                            <font>basesmall</font>
+                            <align>allcenter</align>
+                            <area>0,1,1240,24</area>
+                            <template>%TITLESUBTITLE% on %CHANNAME% (%SHORTTIMEDATE%)</template>
+                        </textarea>
+                    </state>
+                    <state name="selectedactive" from="active"/>
+                    <state name="selectedinactive" from="selectedactive" />
+                </statetype>
+            </buttonlist>
+
+            <imagetype name="horizon_middle">
+                <position>265,340</position>
+                <filename>ui/horizon.png</filename>
+                <alpha>100</alpha>
+            </imagetype>
+
+            <textarea name="nextrecordingheading">
+                <area>20,350,1240,30</area>
+                <font>label</font>
+                <align>allcenter</align>
+                <value>Next recordings</value>
+            </textarea>
+
+            <textarea name="nothingscheduled" depends="!nextrecording">
+                <area>20,380,1240,50</area>
+                <font>info</font>
+                <value>There are no scheduled recordings</value>
+                <align>allcenter</align>
+            </textarea>
+
+            <buttonlist name="nextrecording" from="currentrecording">
+                <area>20,380,1240,120</area>
+            </buttonlist>
+
             <imagetype name="horizon_bottom">
-                <position>265,349</position>
+                <position>265,510</position>
                 <filename>ui/horizon.png</filename>
                 <alpha>100</alpha>
             </imagetype>
@@ -203,8 +247,8 @@
             <!--
                 scheduled recordings conflict warning
             -->
-            <textarea name="conflicts">
-                <area>20,360,1240,30</area>
+            <textarea name="conflictwarning">
+                <area>20,610,1240,30</area>
                 <font>warning</font>
                 <align>hcenter</align>
                 <value>WARNING: There are conflicting scheduled recordings!</value>
