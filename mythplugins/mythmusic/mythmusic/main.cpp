@@ -351,10 +351,13 @@ static int runMenu(QString which_menu)
 
     while (parentObject)
     {
-        mainMenu = dynamic_cast<MythThemedMenu *>(parentObject);
+        MythThemedMenu *menu = dynamic_cast<MythThemedMenu *>(parentObject);
 
-        if (mainMenu && mainMenu->objectName() == "mainmenu")
+        if (menu && menu->objectName() == "mainmenu")
+        {
+            mainMenu = menu;
             break;
+        }
 
         parentObject = parentObject->parent();
     }
@@ -366,11 +369,6 @@ static int runMenu(QString which_menu)
     // save the callback from the main menu
     if (mainMenu)
         mainMenu->getCallback(&m_callback, &m_callbackdata);
-    else
-    {
-        m_callback = NULL;
-        m_callbackdata = NULL;
-    }
 
     diag->setCallback(MusicCallback, NULL);
     diag->setKillable();
