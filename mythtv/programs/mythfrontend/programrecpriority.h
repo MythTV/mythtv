@@ -95,7 +95,6 @@ class ProgramRecPriority : public ScheduleCommon
     void newTemplate(QString category);
     void remove();
     void deactivate();
-    void upcoming();
 
     void showMenu(void);
     void showSortMenu(void);

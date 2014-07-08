@@ -607,7 +607,7 @@ bool ProgramRecPriority::keyPressEvent(QKeyEvent *event)
         else if (action == "UPCOMING")
         {
             saveRecPriority();
-            upcoming();
+            ShowUpcoming();
         }
         else if (action == "INFO" || action == "DETAILS")
             ShowDetails();
@@ -708,7 +708,7 @@ void ProgramRecPriority::customEvent(QEvent *event)
             else if (resulttext == tr("Upcoming"))
             {
                 saveRecPriority();
-                upcoming();
+                ShowUpcoming();
             }
             else if (resulttext == tr("Custom Edit"))
             {
@@ -1098,45 +1098,6 @@ void ProgramRecPriority::deactivate(void)
                 item->DisplayState("disabled", "status");
             }
         }
-    }
-}
-
-void ProgramRecPriority::upcoming(void)
-{
-    MythUIButtonListItem *item = m_programList->GetItemCurrent();
-    if (!item)
-        return;
-
-    ProgramRecPriorityInfo *pgRecInfo =
-                        item->GetData().value<ProgramRecPriorityInfo*>();
-
-    if (!pgRecInfo)
-        return;
-
-    if (m_listMatch[pgRecInfo->GetRecordingRuleID()] > 0)
-    {
-        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-        ProgLister *pl = new ProgLister(
-            mainStack, plRecordid,
-            QString::number(pgRecInfo->GetRecordingRuleID()), "");
-
-        if (pl->Create())
-            mainStack->AddScreen(pl);
-        else
-            delete pl;
-    }
-    else
-    {
-        ProgLister *pl = NULL;
-        QString trimTitle = pgRecInfo->title;
-        trimTitle.remove(QRegExp(" \\(.*\\)$"));
-        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-        pl = new ProgLister(mainStack, plTitle, trimTitle,
-                            pgRecInfo->GetSeriesID());
-        if (pl->Create())
-            mainStack->AddScreen(pl);
-        else
-            delete pl;
     }
 }
 
