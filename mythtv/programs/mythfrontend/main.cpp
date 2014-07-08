@@ -1030,6 +1030,10 @@ static void TVMenuCallback(void *data, QString &selection)
         handleExit(false);
     else if (sel == "standby_mode")
         standbyScreen();
+    else if (sel == "exiting_menu")
+    {
+        //ignore
+    }
     else
         LOG(VB_GENERAL, LOG_ERR, "Unknown menu action: " + selection);
 
