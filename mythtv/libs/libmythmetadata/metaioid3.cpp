@@ -866,11 +866,14 @@ bool MetaIOID3::writePlayCount(TagLib::ID3v2::Tag *tag, int playcount)
         popm->setCounter(playcount);
 
     // Global playcount Tag - Updated by all apps/hardware that support it
-    if (countDiff > 0)
+    PopularimeterFrame *gpopm = findPOPM(tag, "");
+    if (!gpopm)
     {
-        PopularimeterFrame *gpopm = findPOPM(tag, "");
-        gpopm->setCounter(gpopm->counter() + countDiff);
+        gpopm = new PopularimeterFrame();
+        tag->addFrame(gpopm);
+        gpopm->setEmail("");
     }
+    gpopm->setCounter(gpopm->counter() > 0 ? gpopm->counter() + countDiff : playcount);
 
     return true;
 }
