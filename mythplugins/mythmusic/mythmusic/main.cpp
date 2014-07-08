@@ -254,6 +254,10 @@ static void startImport(void)
         delete import;
 }
 
+// these point to the the mainmenu callback if found
+static void (*m_callback)(void *, QString &) = NULL;
+static void *m_callbackdata = NULL;
+
 static void MusicCallback(void *data, QString &selection)
 {
     (void) data;
@@ -328,15 +332,45 @@ static void MusicCallback(void *data, QString &selection)
         else
             delete is;
     }
+    else
+    {
+        // if we have found the mainmenu callback
+        // pass the selection on to it
+        if (m_callback && m_callbackdata)
+            m_callback(m_callbackdata, selection);
+    }
 }
 
 static int runMenu(QString which_menu)
 {
     QString themedir = GetMythUI()->GetThemeDir();
 
+    // find the 'mainmenu' MythThemedMenu so we can use the callback from it
+    MythThemedMenu *mainMenu = NULL;
+    QObject *parentObject = GetMythMainWindow()->GetMainStack()->GetTopScreen();
+
+    while (parentObject)
+    {
+        mainMenu = dynamic_cast<MythThemedMenu *>(parentObject);
+
+        if (mainMenu && mainMenu->objectName() == "mainmenu")
+            break;
+
+        parentObject = parentObject->parent();
+    }
+
     MythThemedMenu *diag = new MythThemedMenu(
         themedir, which_menu, GetMythMainWindow()->GetMainStack(),
         "music menu");
+
+    // save the callback from the main menu
+    if (mainMenu)
+        mainMenu->getCallback(&m_callback, &m_callbackdata);
+    else
+    {
+        m_callback = NULL;
+        m_callbackdata = NULL;
+    }
 
     diag->setCallback(MusicCallback, NULL);
     diag->setKillable();
