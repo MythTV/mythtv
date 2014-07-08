@@ -205,6 +205,8 @@ def buildVersion():
     etree.SubElement(version, "description").text = \
                                 'Search and metadata downloads for themoviedb.org'
     etree.SubElement(version, "version").text = __version__
+    etree.SubElement(version, "accepts").text = 'tmdb.py'
+    etree.SubElement(version, "accepts").text = 'tmdb.pl'
     sys.stdout.write(etree.tostring(version, encoding='UTF-8', pretty_print=True,
                                     xml_declaration=True))
     sys.exit(0)
