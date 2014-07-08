@@ -154,6 +154,14 @@ bool MythThemedMenu::foundTheme(void)
     return m_foundtheme;
 }
 
+/// \brief Get the themed menus callback function and data for that function
+void MythThemedMenu::getCallback(void (**lcallback)(void *, QString &),
+                                 void **data)
+{
+    *lcallback = m_state->m_callback;
+    *data = m_state->m_callbackdata;
+}
+
 /// \brief Set the themed menus callback function and data for that function
 void MythThemedMenu::setCallback(void (*lcallback)(void *, QString &),
                                  void *data)

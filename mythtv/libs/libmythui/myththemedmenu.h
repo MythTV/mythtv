@@ -71,6 +71,7 @@ class MUI_PUBLIC MythThemedMenu : public MythThemedMenuState
 
     bool foundTheme(void);
 
+    void getCallback(void (**lcallback)(void *, QString &), void **data);
     void setCallback(void (*lcallback)(void *, QString &), void *data);
     void setKillable(void);
 
