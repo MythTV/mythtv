@@ -503,11 +503,11 @@ static void Copy2d(uint8_t *dst, int dst_pitch,
 
 static void SSE_copyplane(uint8_t *dst, int dst_pitch,
                           const uint8_t *src, int src_pitch,
-                          uint8_t *cache, size_t cache_size,
-                          unsigned width, unsigned height)
+                          uint8_t *cache, int cache_size,
+                          int width, int height)
 {
-    const unsigned w16 = (width+15) & ~15;
-    const unsigned hstep = cache_size / w16;
+    const int w16 = (width+15) & ~15;
+    const int hstep = cache_size / w16;
 
     for (int y = 0; y < height; y += hstep)
     {
