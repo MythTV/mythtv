@@ -548,8 +548,7 @@ MetadataLookupList MetadataDownload::handleTelevision(MetadataLookup *lookup)
                 // no inetref given, use the title
                 list = grabber.Search(lookup->GetTitle(), lookup);
         else
-            list = grabber.LookupData(lookup->GetInetref(), lookup->GetSeason(),
-                                      lookup->GetEpisode(), lookup);
+            list = grabber.LookupData(lookup->GetInetref(), lookup);
     }
     else if (lookup->GetStep() == kLookupData)
         // we have an inetref, pull data
