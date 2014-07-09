@@ -453,7 +453,8 @@ MetadataLookupList MetadataDownload::readNFO(QString NFOpath,
 MetadataLookupList MetadataDownload::handleGame(MetadataLookup *lookup)
 {
     MetadataLookupList list;
-    MetaGrabberScript grabber;
+    MetaGrabberScript grabber =
+        MetaGrabberScript::GetGrabber(kGrabberGame, lookup);
 
     // If the inetref is populated, even in kLookupSearch mode,
     // become a kLookupData grab and use that.
@@ -462,19 +463,6 @@ MetadataLookupList MetadataDownload::handleGame(MetadataLookup *lookup)
          lookup->GetInetref() != "00000000"))
     {
         lookup->SetStep(kLookupData);
-    }
-
-    if (!lookup->GetInetref().isEmpty() &&
-        lookup->GetInetref() != "00000000")
-    {
-        // inetref is defined, see if we have a pre-defined grabber
-        grabber = MetaGrabberScript::FromInetref(lookup->GetInetref());
-    }
-
-    if (!grabber.IsValid())
-    {
-        // matching grabber was not found, just use the default
-        grabber = MetaGrabberScript::GetType(kGrabberGame);
     }
 
     if (lookup->GetStep() == kLookupSearch)
@@ -520,19 +508,8 @@ MetadataLookupList MetadataDownload::handleMovie(MetadataLookup *lookup)
             lookup->SetStep(kLookupData);
         }
 
-        MetaGrabberScript grabber;
-
-        if (!lookup->GetInetref().isEmpty() && lookup->GetInetref() != "00000000")
-        {
-            // inetref is defined, see if we have a pre-defined grabber
-            grabber = MetaGrabberScript::FromInetref(lookup->GetInetref());
-        }
-
-        if (!grabber.IsValid())
-        {
-            // matching grabber was not found, just use the default
-            grabber = MetaGrabberScript::GetType(kGrabberMovie);
-        }
+        MetaGrabberScript grabber =
+            MetaGrabberScript::GetGrabber(kGrabberMovie, lookup);
 
         if (lookup->GetStep() == kLookupSearch)
         {
@@ -551,21 +528,8 @@ MetadataLookupList MetadataDownload::handleMovie(MetadataLookup *lookup)
 MetadataLookupList MetadataDownload::handleTelevision(MetadataLookup *lookup)
 {
     MetadataLookupList list;
-    MetaGrabberScript grabber;
-
-    // for some reason, we can perform a search even when an inetref is defined
-    // so we'll try to pull the pre-defined grabber first
-    if (!lookup->GetInetref().isEmpty() &&
-        lookup->GetInetref() != "00000000")
-    {
-        grabber = MetaGrabberScript::FromInetref(lookup->GetInetref());
-    }
-
-    if (!grabber.IsValid())
-    {
-        // matching grabber was not found, just use the default
-        grabber = MetaGrabberScript::GetType(kGrabberTelevision);
-    }
+    MetaGrabberScript grabber =
+        MetaGrabberScript::GetGrabber(kGrabberTelevision, lookup);
 
     // there's some special logic going on with searches
     if (lookup->GetStep() == kLookupSearch)
@@ -612,19 +576,8 @@ MetadataLookupList MetadataDownload::handleTelevision(MetadataLookup *lookup)
 MetadataLookupList MetadataDownload::handleVideoUndetermined(MetadataLookup *lookup)
 {
     MetadataLookupList list;
-    MetaGrabberScript grabber;
-
-    if (!lookup->GetInetref().isEmpty() &&
-        lookup->GetInetref() != "00000000")
-    {
-        grabber = MetaGrabberScript::FromInetref(lookup->GetInetref());
-    }
-
-    if (!grabber.IsValid())
-    {
-        // matching grabber was not found, just use the default
-        grabber = MetaGrabberScript::GetType(kGrabberTelevision);
-    }
+    MetaGrabberScript grabber =
+        MetaGrabberScript::GetGrabber(kGrabberTelevision, lookup);
 
     if (lookup->GetInetref().isEmpty() || lookup->GetInetref() == "00000000")
     {

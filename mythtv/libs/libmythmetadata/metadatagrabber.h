@@ -42,6 +42,8 @@ class META_PUBLIC MetaGrabberScript : public QObject
     static GrabberList          GetList(GrabberType type,
                                         bool refresh=false);
 
+    static MetaGrabberScript    GetGrabber(GrabberType defaultType,
+                                           const MetadataLookup *lookup = NULL);
     static MetaGrabberScript    GetType(const QString &type);
     static MetaGrabberScript    GetType(GrabberType type);
     static MetaGrabberScript    FromTag(const QString &tag,
