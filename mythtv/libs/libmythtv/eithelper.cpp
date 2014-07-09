@@ -566,11 +566,20 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
                     // The CRID is a URI.  It could contain UTF8 sequences encoded
                     // as %XX but there's no advantage in decoding them.
                     // The BBC currently uses private types 0x31 and 0x32.
+                    // IDs from the authority eventis.nl are not fit for our scheduler
                     if (desc.ContentType(k) == 0x01 || desc.ContentType(k) == 0x31)
-                        programId = desc.ContentId(k);
+                    {
+                        if (!desc.ContentId(k).startsWith ("eventis.nl/"))
+                        {
+                            programId = desc.ContentId(k);
+                        }
+                    }
                     else if (desc.ContentType(k) == 0x02 || desc.ContentType(k) == 0x32)
                     {
-                        seriesId = desc.ContentId(k);
+                        if (!desc.ContentId(k).startsWith ("eventis.nl/"))
+                        {
+                            seriesId = desc.ContentId(k);
+                        }
                         category_type = ProgramInfo::kCategorySeries;
                     }
                 }
