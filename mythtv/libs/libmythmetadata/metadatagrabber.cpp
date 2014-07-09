@@ -153,6 +153,33 @@ GrabberList MetaGrabberScript::GetList(GrabberType type,
     return retGrabberList;
 }
 
+MetaGrabberScript MetaGrabberScript::GetGrabber(GrabberType defaultType,
+                                                const MetadataLookup *lookup)
+{
+    if (!lookup)
+    {
+        return GetType(defaultType);
+    }
+
+    MetaGrabberScript grabber;
+
+    if (!lookup->GetInetref().isEmpty() &&
+        lookup->GetInetref() != "00000000")
+    {
+        // inetref is defined, see if we have a pre-defined grabber
+        MetaGrabberScript grabber = lookup->GetInetref();
+
+        if (grabber.IsValid())
+        {
+            return grabber;
+        }
+        // matching grabber was not found, just use the default
+        // fall through
+    }
+
+    return GetType(defaultType);
+}
+
 MetaGrabberScript MetaGrabberScript::GetType(const QString &type)
 {
     QString tmptype = type.toLower();
@@ -195,7 +222,7 @@ MetaGrabberScript MetaGrabberScript::GetType(const GrabberType type)
 }
 
 MetaGrabberScript MetaGrabberScript::FromTag(const QString &tag,
-                                                    bool absolute)
+                                            bool absolute)
 {
     GrabberList list = GetList();
     GrabberList::const_iterator it = list.begin();
@@ -226,7 +253,7 @@ MetaGrabberScript MetaGrabberScript::FromTag(const QString &tag,
 }
 
 MetaGrabberScript MetaGrabberScript::FromInetref(const QString &inetref,
-                                                        bool absolute)
+                                                 bool absolute)
 {
     QMutexLocker lock(&reLock);
 
