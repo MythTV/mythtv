@@ -8,6 +8,9 @@ using namespace std;
 // Qt headers
 #include <QCoreApplication>
 #include <QEventLoop>
+#ifdef Q_OS_MAC
+#include <QProcessEnvironment>
+#endif
 
 // libmyth headers
 #include "exitcodes.h"
@@ -77,6 +80,15 @@ int main(int argc, char *argv[])
 
     QCoreApplication a(argc, argv);
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHMETADATALOOKUP);
+
+#ifdef Q_OS_MAC
+    QString path = QCoreApplication::applicationDirPath();
+    setenv("PYTHONPATH",
+           QString("%1/../Resources/lib/python2.6/site-packages:%2")
+           .arg(path)
+           .arg(QProcessEnvironment::systemEnvironment().value("PYTHONPATH"))
+           .toUtf8().constData(), 1);
+#endif
 
     int retval;
     if ((retval = cmdline.ConfigureLogging()) != GENERIC_EXIT_OK)
