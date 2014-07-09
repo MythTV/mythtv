@@ -307,6 +307,16 @@ void diskAppearedCallback(DADiskRef disk, void *context)
     }
 
     model     = getModel(details);
+
+    if (model.contains("Apple Disk Image"))
+    {
+        LOG(VB_MEDIA, LOG_INFO, msg + QString("DMG %1 mounted, ignoring")
+            .arg(BSDname));
+        CFRelease(details);
+        free(volName);
+        return;
+    }
+
     mediaType = MediaTypeForBSDName(BSDname);
     isCDorDVD = (mediaType == MEDIATYPE_DVD) || (mediaType == MEDIATYPE_AUDIO);
 
