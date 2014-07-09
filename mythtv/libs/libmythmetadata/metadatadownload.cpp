@@ -533,10 +533,7 @@ MetadataLookupList MetadataDownload::handleTelevision(MetadataLookup *lookup)
     MetaGrabberScript grabber;
     if (!lookup->GetInetref().isEmpty() &&
         lookup->GetInetref() != "00000000")
-    {
-        lookup->SetStep(kLookupData);
-        grabber = MetaGrabberScript::FromInetref(lookup->GetInetref());
-    }
+            grabber = MetaGrabberScript::FromInetref(lookup->GetInetref());
 
     if (!grabber.IsValid())
         // matching grabber was not found, just use the default
