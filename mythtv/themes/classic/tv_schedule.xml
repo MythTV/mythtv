@@ -46,7 +46,7 @@
     <button>
         <type>TV_CONFLICTS</type>
         <text>Upcoming Recordings</text>
-        <description>VCR-like recording scheduler</description>
+        <description>See what will be recorded next</description>
         <action>TV_FIX_CONFLICTS</action>
     </button>
 
