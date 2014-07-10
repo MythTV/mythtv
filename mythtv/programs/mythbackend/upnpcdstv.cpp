@@ -465,10 +465,10 @@ void UPnpCDSTv::AddItem( const UPnpCDSRequest    *pRequest,
 
     sURI = QString( "%1GetPreviewImage%2%3").arg( sURIBase   )
                                             .arg( sURIParams )
-                                            .arg( "&amp;Width=160" );
+                                            .arg( "&amp;Width=160&amp;Format=JPG" );
 
-    // TODO: Must be JPG for minimal compliance
-    sProtocol = QString( "http-get:*:image/png:DLNA.ORG_PN=PNG_TN");
+    // Must be JPG for minimal compliance
+    sProtocol = QString( "http-get:*:image/png:DLNA.ORG_PN=JPEG_TN");
     pItem->AddResource( sProtocol, sURI );
 
     // ----------------------------------------------------------------------
@@ -480,7 +480,7 @@ void UPnpCDSTv::AddItem( const UPnpCDSRequest    *pRequest,
                                               .arg( sInetRef   );
 
     QList<Property*> propList = pItem->GetProperties("albumArtURI");
-    if (propList.size() >= 4)
+    if (propList.size() >= 4  && sInetRef != "")
     {
         // Prefer JPEG over PNG here, although PNG is allowed JPEG probably
         // has wider device support and crucially the filesizes are smaller
