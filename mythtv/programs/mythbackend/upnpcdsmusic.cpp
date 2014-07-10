@@ -268,7 +268,7 @@ void UPnpCDSMusic::AddItem( const UPnpCDSRequest    *pRequest,
     int            nTrackNum    = query.value( 6).toInt();
     QString        sDescription = query.value( 7).toString();
     QString        sFileName    = query.value( 8).toString();
-    uint           nLength      = query.value( 9).toInt();
+    uint           nLengthMS    = query.value( 9).toInt();
     uint64_t       nFileSize    = (quint64)query.value(10).toULongLong();
 
 #if 0
@@ -429,14 +429,15 @@ void UPnpCDSMusic::AddItem( const UPnpCDSRequest    *pRequest,
 
     Resource *pRes = pItem->AddResource( sProtocol, sURI );
 
-    nLength /= 1000;
+    int nLengthSecs = nLengthMS / 1000;
 
     QString sDur;
 
-    sDur.sprintf("%02d:%02d:%02d",
-                  (nLength / 3600) % 24,
-                  (nLength / 60) % 60,
-                  nLength % 60);
+    sDur.sprintf("%02d:%02d:%02d.%03d",
+                  (nLengthSecs / 3600) % 24,
+                  (nLengthSecs / 60) % 60,
+                  nLengthSecs % 60,
+                  nLengthMS % 1000);
 
     pRes->AddAttribute( "duration"  , sDur      );
     if (nFileSize > 0)
