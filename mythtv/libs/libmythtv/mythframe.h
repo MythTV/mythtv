@@ -16,7 +16,7 @@ typedef enum FrameType_
     FMT_YV12,
     FMT_IA44,
     FMT_AI44,
-    FMT_RGB32,   // endian dependent format, ARGB or BGRA
+    FMT_RGB32,   ///< endian dependent format, ARGB or BGRA
     FMT_ARGB32,
     FMT_RGBA32,
     FMT_YUV422P,
@@ -44,22 +44,22 @@ typedef struct VideoFrame_
     long long timecode;
     int64_t   disp_timecode;
 
-    unsigned char *priv[4]; // random empty storage
+    unsigned char *priv[4]; ///< random empty storage
 
     unsigned char *qscale_table;
     int            qstride;
 
-    int interlaced_frame; // 1 if interlaced.
-    int top_field_first; // 1 if top field is first.
+    int interlaced_frame; ///< 1 if interlaced.
+    int top_field_first; ///< 1 if top field is first.
     int repeat_pict;
-    int forcekey; // hardware encoded .nuv
+    int forcekey; ///< hardware encoded .nuv
     int dummy;
 
-    int pitches[3]; // Y, U, & V pitches
-    int offsets[3]; // Y, U, & V offsets
+    int pitches[3]; ///< Y, U, & V pitches
+    int offsets[3]; ///< Y, U, & V offsets
 
     int pix_fmt;
-    int directrendering; // 1 if managed by FFmpeg
+    int directrendering; ///< 1 if managed by FFmpeg
 } VideoFrame;
 
 #ifdef __cplusplus
