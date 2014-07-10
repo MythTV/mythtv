@@ -928,7 +928,7 @@ int MythPlayer::OpenFile(uint retries)
     int testreadsize = 2048;
 
     MythTimer bigTimer; bigTimer.start();
-    int timeout = max((retries + 1) * 500, 15000U);
+    int timeout = (retries + 1) * 600;
     while (testreadsize <= kDecoderProbeBufferSize)
     {
         MythTimer peekTimer; peekTimer.start();
