@@ -863,17 +863,19 @@ bool MetaIOID3::writePlayCount(TagLib::ID3v2::Tag *tag, int playcount)
     int countDiff = playcount - prevCount;
     // Allow for situations where the user has rolled back to an old DB backup
     if (countDiff > 0)
+    {
         popm->setCounter(playcount);
 
-    // Global playcount Tag - Updated by all apps/hardware that support it
-    PopularimeterFrame *gpopm = findPOPM(tag, "");
-    if (!gpopm)
-    {
-        gpopm = new PopularimeterFrame();
-        tag->addFrame(gpopm);
-        gpopm->setEmail("");
+        // Global playcount Tag - Updated by all apps/hardware that support it
+        PopularimeterFrame *gpopm = findPOPM(tag, "");
+        if (!gpopm)
+        {
+            gpopm = new PopularimeterFrame();
+            tag->addFrame(gpopm);
+            gpopm->setEmail("");
+        }
+        gpopm->setCounter(gpopm->counter() > 0 && count ? gpopm->counter() + countDiff : playcount);
     }
-    gpopm->setCounter(gpopm->counter() > 0 ? gpopm->counter() + countDiff : playcount);
 
     return true;
 }
