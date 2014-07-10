@@ -532,6 +532,8 @@ long long RingBuffer::Seek(long long pos, int whence, bool has_lock)
         ret = SeekInternal(pos, whence);
     }
 
+    generalWait.wakeAll();
+
     if (!has_lock)
     {
         rwlock.unlock();
@@ -927,7 +929,7 @@ void RingBuffer::run(void)
 
         // These are conditions where we want to sleep to allow
         // other threads to do stuff.
-        if (setswitchtonext || (ateof && readsallowed))
+        if (setswitchtonext || (ateof && readsdesired))
         {
             ignore_for_read_timing = true;
             generalWait.wait(&rwlock, 1000);
@@ -1236,7 +1238,7 @@ bool RingBuffer::WaitForReadsAllowed(void)
            !request_pause && !commserror && readaheadrunning)
     {
         generalWait.wait(&rwlock, clamp(timeout_ms - t.elapsed(), 10, 100));
-        if (!readsallowed && t.elapsed() > 1000 && (count % 10) == 0)
+        if (!check && t.elapsed() > 1000 && (count % 10) == 0)
         {
             LOG(VB_GENERAL, LOG_WARNING, LOC +
                 "Taking too long to be allowed to read..");
@@ -1472,6 +1474,7 @@ int RingBuffer::ReadPriv(void *buf, int count, bool peek)
         rwlock.lockForWrite();
         ateof = true;
         wanttoread = 0;
+        generalWait.wakeAll();
         rwlock.unlock();
         return count;
     }
