@@ -48,19 +48,19 @@ void InitializeStaticMaps(void)
             return;
 
         grabberTypes[kGrabberMovie] =
-                (GrabberOpts) { "%1metadata/Movie/",
+                              { "%1metadata/Movie/",
                                 "MovieGrabber",
                                 "metadata/Movie/tmdb3.py"};
         grabberTypes[kGrabberTelevision] =
-                (GrabberOpts) { "%1metadata/Television/",
+                              { "%1metadata/Television/",
                                 "TelevisionGrabber",
                                 "metadata/Television/ttvdb.py" };
         grabberTypes[kGrabberGame]       =
-                (GrabberOpts) { "%1metadata/Game/",
+                              { "%1metadata/Game/",
                                 "mythgame.MetadataGrabber",
                                 "metadata/Game/giantbomb.py" };
         grabberTypes[kGrabberMusic]      =
-                (GrabberOpts) { "%1metadata/Music",
+                              { "%1metadata/Music",
                                 "",
                                 "" };
 
