@@ -303,16 +303,13 @@ void UPnpCDSMusic::AddItem( const UPnpCDSRequest    *pRequest,
     // Build Support Strings
     // ----------------------------------------------------------------------
 
-    QString sURIBase   = QString( "http://%1:%2/Content/" )
-                            .arg( sServerIp )
-                            .arg( sPort     );
+    QUrl URIBase;
+    URIBase.setScheme("http");
+    URIBase.setHost(sServerIp);
+    URIBase.setPort(sPort);
 
-    QString sURIParams = QString( "?Id=%1" )
+    QString sId        = QString( "Music/1/item?Id=%1")
                             .arg( nId );
-
-
-    QString sId        = QString( "Music/1/item%1")
-                            .arg( sURIParams );
 
     CDSObject *pItem   = CDSObject::CreateMusicTrack( sId,
                                                       sName,
@@ -323,9 +320,8 @@ void UPnpCDSMusic::AddItem( const UPnpCDSRequest    *pRequest,
 
     if ( bAddRef )
     {
-        QString sRefId = QString( "%1/0/item%2")
-                            .arg( m_sExtensionId )
-                            .arg( sURIParams     );
+        QString sRefId = QString( "%1/0/item?Id=%2").arg( m_sExtensionId )
+                                                    .arg( nId            );
 
         pItem->SetPropValue( "refID", sRefId );
     }
@@ -353,8 +349,10 @@ void UPnpCDSMusic::AddItem( const UPnpCDSRequest    *pRequest,
     pObject->AddProperty( new Property( "date"                , "dc"   ));
 #endif
 
-    QString sArtURI = QString( "%1GetAlbumArt?Id=%2").arg( sURIBase   )
-                                                     .arg( nId );
+
+    QUrl artURI = URIBase;
+    artURI.setPath("Content/GetAlbumArt");
+    artURI.addQueryItem("Id", QString::number(nId));
 
     QList<Property*> propList = pItem->GetProperties("albumArtURI");
     if (propList.size() >= 4)
@@ -373,8 +371,10 @@ void UPnpCDSMusic::AddItem( const UPnpCDSRequest    *pRequest,
         if (pProp)
         {
             // Must be no more than 1024x768
-            pProp->m_sValue = sArtURI;
-            pProp->m_sValue.append("&amp;Width=1024&amp;Height=768");
+            QUrl mediumURI = artURI;
+            mediumURI.addQueryItem("Width", "1024");
+            mediumURI.addQueryItem("Height", "768");
+            pProp->m_sValue = mediumURI.toEncoded();
             pProp->AddAttribute("dlna:profileID", "JPG_MED");
             pProp->AddAttribute("xmlns:dlna", "urn:schemas-dlna-org:metadata-1-0");
         }
@@ -385,8 +385,10 @@ void UPnpCDSMusic::AddItem( const UPnpCDSRequest    *pRequest,
         {
             // At least one albumArtURI must be a ThumbNail (TN) no larger
             // than 160x160, and it must also be a jpeg
-            pProp->m_sValue = sArtURI;
-            pProp->m_sValue.append("&amp;Width=160&amp;Height=160");
+            QUrl thumbURI = artURI;
+            thumbURI.addQueryItem("Width", "160");
+            thumbURI.addQueryItem("Height", "160");
+            pProp->m_sValue = thumbURI.toEncoded();
             pProp->AddAttribute("dlna:profileID", "JPG_TN");
             pProp->AddAttribute("xmlns:dlna", "urn:schemas-dlna-org:metadata-1-0");
         }
@@ -396,8 +398,10 @@ void UPnpCDSMusic::AddItem( const UPnpCDSRequest    *pRequest,
         if (pProp)
         {
             // Must be no more than 640x480
-            pProp->m_sValue = sArtURI;
-            pProp->m_sValue.append("&amp;Width=640&amp;Height=480");
+            QUrl smallURI = artURI;
+            smallURI.addQueryItem("Width", "640");
+            smallURI.addQueryItem("Height", "480");
+            pProp->m_sValue = smallURI.toEncoded();
             pProp->AddAttribute("dlna:profileID", "JPG_SM");
             pProp->AddAttribute("xmlns:dlna", "urn:schemas-dlna-org:metadata-1-0");
         }
@@ -408,7 +412,7 @@ void UPnpCDSMusic::AddItem( const UPnpCDSRequest    *pRequest,
         {
             // Must be no more than 4096x4096 - for our purposes, just return
             // a fullsize image
-            pProp->m_sValue = sArtURI;
+            pProp->m_sValue = artURI.toEncoded();
             pProp->AddAttribute("dlna:profileID", "JPG_LRG");
             pProp->AddAttribute("xmlns:dlna", "urn:schemas-dlna-org:metadata-1-0");
         }
@@ -424,15 +428,16 @@ void UPnpCDSMusic::AddItem( const UPnpCDSRequest    *pRequest,
 
     QString sMimeType = HTTPRequest::GetMimeType( fInfo.suffix() );
     QString sProtocol = QString( "http-get:*:%1:DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=01500000000000000000000000000000" ).arg( sMimeType  );
-    QString sURI      = QString( "%1GetMusic%2").arg( sURIBase   )
-                                                .arg( sURIParams );
+    QUrl    resURI    = URIBase;
+    resURI.setPath("Content/GetMusic");
+    resURI.addQueryItem("Id", QString::number(nId));
 
-    Resource *pRes = pItem->AddResource( sProtocol, sURI );
-
+    Resource *pRes = pItem->AddResource( sProtocol, resURI.toEncoded() );
+    LOG(VB_GENERAL, LOG_NOTICE, resURI.toEncoded());
     int nLengthSecs = nLengthMS / 1000;
 
     QString sDur;
-
+    // H:M:S[.MS]
     sDur.sprintf("%02d:%02d:%02d.%03d",
                   (nLengthSecs / 3600) % 24,
                   (nLengthSecs / 60) % 60,

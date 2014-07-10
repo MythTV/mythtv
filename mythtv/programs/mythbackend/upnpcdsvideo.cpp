@@ -303,12 +303,12 @@ void UPnpCDSVideo::AddItem( const UPnpCDSRequest    *pRequest,
         sName += " - " + sSubtitle;
     }
 
-    QString sURIBase   = QString( "http://%1:%2/Content/" )
-                            .arg( m_mapBackendIp  [sHostName] )
-                            .arg( m_mapBackendPort[sHostName] );
+    QUrl URIBase;
+    URIBase.setScheme("http");
+    URIBase.setHost(m_mapBackendIp[sHostName]);
+    URIBase.setPort(m_mapBackendPort[sHostName]);
 
-    QString sURIParams = QString( "?Id=%1" ).arg( nVidID );
-    QString sId        = QString( "Videos/0/item%1").arg( sURIParams );
+    QString sId        = QString( "Videos/0/item?Id=%1").arg( nVidID );
 
     QString sParentID = "Videos/0";
 
@@ -335,9 +335,9 @@ void UPnpCDSVideo::AddItem( const UPnpCDSRequest    *pRequest,
     //pItem->SetPropValue( "relation"       , );
     //pItem->SetPropValue( "region"         , );
 
-    QString sArtURI= QString( "%1GetVideoArtwork%2")
-                        .arg( sURIBase   )
-                        .arg( sURIParams );
+    QUrl artURI = URIBase;
+    artURI.setPath("Content/GetVideoArtwork");
+    artURI.addQueryItem("Id", QString::number(nVidID));
 
     QList<Property*> propList = pItem->GetProperties("albumArtURI");
     if ((!sCoverArt.isEmpty()) && (sCoverArt != "No Cover")
@@ -357,8 +357,10 @@ void UPnpCDSVideo::AddItem( const UPnpCDSRequest    *pRequest,
         if (pProp)
         {
             // Must be no more than 1024x768
-            pProp->m_sValue = sArtURI;
-            pProp->m_sValue.append("&amp;Width=1024&amp;Height=768");
+            QUrl mediumURI = artURI;
+            mediumURI.addQueryItem("Width", "1024");
+            mediumURI.addQueryItem("Height", "768");
+            pProp->m_sValue = mediumURI.toEncoded();
             pProp->AddAttribute("dlna:profileID", "JPG_MED");
             pProp->AddAttribute("xmlns:dlna", "urn:schemas-dlna-org:metadata-1-0");
         }
@@ -369,20 +371,24 @@ void UPnpCDSVideo::AddItem( const UPnpCDSRequest    *pRequest,
         {
             // At least one albumArtURI must be a ThumbNail (TN) no larger
             // than 160x160, and it must also be a jpeg
-            pProp->m_sValue = sArtURI;
-            pProp->m_sValue.append("&amp;Width=160&amp;Height=160");
+            QUrl thumbURI = artURI;
+            thumbURI.addQueryItem("Width", "160");
+            thumbURI.addQueryItem("Height", "160");
+            pProp->m_sValue = thumbURI.toEncoded();
             pProp->AddAttribute("dlna:profileID", "JPG_TN");
             pProp->AddAttribute("xmlns:dlna", "urn:schemas-dlna-org:metadata-1-0");
         }
 
-        // Medium
+        // Small
         pProp = propList.at(2);
         if (pProp)
         {
             // Must be no more than 1024x768
-            pProp->m_sValue = sArtURI;
-            pProp->m_sValue.append("&amp;Width=1024&amp;Height=768");
-            pProp->AddAttribute("dlna:profileID", "JPG_MED");
+            QUrl smallURI = artURI;
+            smallURI.addQueryItem("Width", "640");
+            smallURI.addQueryItem("Height", "480");
+            pProp->m_sValue = smallURI.toEncoded();
+            pProp->AddAttribute("dlna:profileID", "JPG_SM");
             pProp->AddAttribute("xmlns:dlna", "urn:schemas-dlna-org:metadata-1-0");
         }
 
@@ -392,7 +398,7 @@ void UPnpCDSVideo::AddItem( const UPnpCDSRequest    *pRequest,
         {
             // Must be no more than 4096x4096 - for our purposes, just return
             // a fullsize image
-            pProp->m_sValue = sArtURI;
+            pProp->m_sValue = artURI.toEncoded();
             pProp->AddAttribute("dlna:profileID", "JPG_LRG");
             pProp->AddAttribute("xmlns:dlna", "urn:schemas-dlna-org:metadata-1-0");
         }
@@ -400,8 +406,8 @@ void UPnpCDSVideo::AddItem( const UPnpCDSRequest    *pRequest,
 
     if ( bAddRef )
     {
-        QString sRefId = QString( "%1/0/item%2").arg( m_sExtensionId )
-                                                .arg( sURIParams     );
+        QString sRefId = QString( "%1/0/item?Id=%2").arg( m_sExtensionId )
+                                                    .arg( nVidID         );
 
         pItem->SetPropValue( "refID", sRefId );
     }
@@ -433,15 +439,18 @@ void UPnpCDSVideo::AddItem( const UPnpCDSRequest    *pRequest,
     QString sProtocol = QString( "http-get:*:%1:DLNA.ORG_OP=01;DLNA.ORG_CI=0;"
                                  "DLNA.ORG_FLAGS=0150000000000000000000000000"
                                  "0000" ).arg( sMimeType  );
-    QString sURI      = QString( "%1GetVideo%2").arg( sURIBase   )
-                                                .arg( sURIParams );
 
-    Resource *pRes = pItem->AddResource( sProtocol, sURI );
+    QUrl    resURI    = URIBase;
+    resURI.setPath("Content/GetVideo");
+    resURI.addQueryItem("Id", QString::number(nVidID));
 
+    Resource *pRes = pItem->AddResource( sProtocol, resURI.toEncoded() );
+    LOG(VB_GENERAL, LOG_NOTICE, resURI.toEncoded());
     pRes->AddAttribute( "size"      , QString("%1").arg(fInfo.size()) );
 
     QString sDur;
-    sDur.sprintf("%02d:%02d:00", (nLength / 60), nLength % 60 );
+    // H:M:S[.MS] (We don't store the number of seconds for videos)
+    sDur.sprintf("%02d:%02d:00.000", (nLength / 60), nLength % 60 );
 
     pRes->AddAttribute( "duration"  , sDur      );
 }

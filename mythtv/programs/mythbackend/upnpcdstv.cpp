@@ -320,16 +320,14 @@ void UPnpCDSTv::AddItem( const UPnpCDSRequest    *pRequest,
 
     QString sName      = sTitle + ": " + (sSubtitle.isEmpty() ? sDescription.left(128) : sSubtitle);
 
-    QString sURIBase   = QString( "http://%1:%2/Content/" )
-                            .arg( m_mapBackendIp  [ sHostName ] )
-                            .arg( m_mapBackendPort[ sHostName ] );
+    QUrl URIBase;
+    URIBase.setScheme("http");
+    URIBase.setHost(m_mapBackendIp[sHostName]);
+    URIBase.setPort(m_mapBackendPort[sHostName]);
 
-    QString sURIParams = QString( "?ChanId=%1&amp;StartTime=%2" )
+    QString sId        = QString( "RecTv/0/item?ChanId=%1&amp;StartTime=%2")
                             .arg( nChanid )
                             .arg( dtStartTime.toString(Qt::ISODate));
-
-    QString sId        = QString( "RecTv/0/item%1")
-                            .arg( sURIParams );
 
     CDSObject *pItem   = CDSObject::CreateVideoItem( sId,
                                                      sName,
@@ -340,9 +338,10 @@ void UPnpCDSTv::AddItem( const UPnpCDSRequest    *pRequest,
 
     if ( bAddRef )
     {
-        QString sRefId = QString( "%1/0/item%2")
+        QString sRefId = QString( "%1/0/item?ChanId=%2&amp;StartTime=%3")
                             .arg( m_sExtensionId )
-                            .arg( sURIParams     );
+                            .arg( nChanid )
+                            .arg( dtStartTime.toString(Qt::ISODate));
 
         pItem->SetPropValue( "refID", sRefId );
     }
@@ -396,31 +395,31 @@ void UPnpCDSTv::AddItem( const UPnpCDSRequest    *pRequest,
         sMimeType = "video/x-ms-dvr";
     }
 
-    // If we are dealing with a Sony Blu-ray player then we fake the
+    // HACK: If we are dealing with a Sony Blu-ray player then we fake the
     // MIME type to force the video to appear
     if ( pRequest->m_eClient == CDS_ClientSonyDB )
-    {
         sMimeType = "video/avi";
-    }
 
-
-    // DLNA string below is temp fix for ps3 seeking.
+    // HACK: DLNA string below is temp fix for ps3 seeking.
     QString sProtocol = QString( "http-get:*:%1:DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=01500000000000000000000000000000" ).arg( sMimeType  );
-    QString sURI      = QString( "%1GetRecording%2").arg( sURIBase   )
-                                                    .arg( sURIParams );
 
-    // Sony BDPS370 requires a DLNA Profile Name
+    // HACK: Sony BDPS370 requires a DLNA Profile Name
     // FIXME: detection to determine the correct DLNA Profile Name
     if (sMimeType == "video/mpeg")
     {
         sProtocol += ";DLNA.ORG_PN=MPEG_TS_SD_NA_ISO";
     }
 
-    Resource *pRes = pItem->AddResource( sProtocol, sURI );
+    QUrl    resURI    = URIBase;
+    resURI.setPath("Content/GetRecording");
+    resURI.addQueryItem("ChanId", QString::number(nChanid));
+    resURI.addQueryItem("StartTime", dtStartTime.toString(Qt::ISODate));
 
+    Resource *pRes = pItem->AddResource( sProtocol, resURI.toEncoded() );
+    LOG(VB_GENERAL, LOG_NOTICE, resURI.toEncoded());
     uint uiStart = dtProgStart.toTime_t();
     uint uiEnd   = dtProgEnd.toTime_t();
-    uint uiDur   = uiEnd - uiStart;
+    uint uiDurMS   = (uiEnd - uiStart) * 1000;
 
     MSqlQuery query2(MSqlQuery::InitCon());
     query2.prepare( "SELECT data FROM recordedmarkup WHERE chanid=:CHANID AND "
@@ -428,112 +427,108 @@ void UPnpCDSTv::AddItem( const UPnpCDSRequest    *pRequest,
     query2.bindValue(":CHANID", (int)nChanid);
     query2.bindValue(":STARTTIME", dtProgStart);
     if (query2.exec() && query2.next())
-        uiDur = query2.value(0).toUInt() / 1000;
+        uiDurMS = query2.value(0).toUInt();
 
     QString sDur;
-
-    sDur.sprintf("%02d:%02d:%02d",
-                  (uiDur / 3600) % 24,
-                  (uiDur / 60) % 60,
-                   uiDur % 60);
+    // H:M:S[.MS] (We don't store the number of seconds for recordings)
+    sDur.sprintf("%02d:%02d:%02d.%03d",
+                  (uiDurMS / 3600000) % 24,
+                  (uiDurMS / 60000) % 60,
+                   uiDurMS % 60000,
+                   uiDurMS % 1000);
 
     LOG(VB_UPNP, LOG_DEBUG, "Duration: " + sDur );
 
     pRes->AddAttribute( "duration"  , sDur      );
     pRes->AddAttribute( "size"      , QString::number( nFileSize) );
 
-/*
-    // ----------------------------------------------------------------------
-    // Add Video Resource Element based on File extension (mythtv)
-    // ----------------------------------------------------------------------
-
-    sProtocol = QString( "myth:*:%1:*"     ).arg( sMimeType  );
-    sURI      = QString( "myth://%1/%2" )
-                   .arg( m_mapBackendIp  [ sHostName ] )
-                   .arg( sBaseName );
-
-    pRes = pItem->AddResource( sProtocol, sURI );
-
-    pRes->AddAttribute( "duration"  , sDur      );
-    pRes->AddAttribute( "size"      , QString::number( nFileSize) );
-*/
-
     // ----------------------------------------------------------------------
     // Add Preview URI as <res>
     // MUST be _TN and 160px
     // ----------------------------------------------------------------------
 
-    sURI = QString( "%1GetPreviewImage%2%3").arg( sURIBase   )
-                                            .arg( sURIParams )
-                                            .arg( "&amp;Width=160" );
-
-    // TODO: Must be JPG for minimal compliance
-    sProtocol = QString( "http-get:*:image/png:DLNA.ORG_PN=PNG_TN");
-    pItem->AddResource( sProtocol, sURI );
+    QUrl previewURI = URIBase;
+    previewURI.setPath("Content/GetPreviewImage");
+    previewURI.addQueryItem("ChanId", QString::number(nChanid));
+    previewURI.addQueryItem("StartTime", dtStartTime.toString(Qt::ISODate));
+    previewURI.addQueryItem("Width", "160");
+    previewURI.addQueryItem("Format", "JPG");
+    sProtocol = QString( "http-get:*:image/png:DLNA.ORG_PN=JPG_TN");
+    pItem->AddResource( sProtocol, previewURI.toEncoded());
 
     // ----------------------------------------------------------------------
     // Add Artwork URI as albumArt
     // ----------------------------------------------------------------------
 
-    sURI = QString( "%1GetRecordingArtwork?Type=coverart&amp;Inetref=%3")
-                                              .arg( sURIBase   )
-                                              .arg( sInetRef   );
-
-    QList<Property*> propList = pItem->GetProperties("albumArtURI");
-    if (propList.size() >= 4)
+    if (!sInetRef.isEmpty())
     {
-        // Prefer JPEG over PNG here, although PNG is allowed JPEG probably
-        // has wider device support and crucially the filesizes are smaller
-        // which speeds up loading times over the network
+        QUrl artURI = URIBase;
+        artURI.setPath("Content/GetRecordingArtwork");
+        artURI.addQueryItem("Type", "coverart");
+        artURI.addQueryItem("Inetref", sInetRef);
 
-        // We MUST include the thumbnail size, but since some clients may use the
-        // first image they see and the thumbnail is tiny, instead return the
-        // medium first. The large could be very large, which is no good if the
-        // client is pulling images for an entire list at once!
-
-        // Medium
-        Property *pProp = propList.at(0);
-        if (pProp)
+        QList<Property*> propList = pItem->GetProperties("albumArtURI");
+        if (propList.size() >= 4)
         {
-            // Must be no more than 1024x768
-            pProp->m_sValue = sURI;
-            pProp->m_sValue.append("&amp;Width=1024&amp;Height=768");
-            pProp->AddAttribute("dlna:profileID", "JPG_MED");
-            pProp->AddAttribute("xmlns:dlna", "urn:schemas-dlna-org:metadata-1-0");
-        }
+            // Prefer JPEG over PNG here, although PNG is allowed JPEG probably
+            // has wider device support and crucially the filesizes are smaller
+            // which speeds up loading times over the network
 
-        // Thumbnail
-        pProp = propList.at(1);
-        if (pProp)
-        {
-            // At least one albumArtURI must be a ThumbNail (TN) no larger
-            // than 160x160, and it must also be a jpeg
-            pProp->m_sValue = sURI;
-            pProp->m_sValue.append("&amp;Width=160&amp;Height=160");
-            pProp->AddAttribute("dlna:profileID", "JPG_TN");
-            pProp->AddAttribute("xmlns:dlna", "urn:schemas-dlna-org:metadata-1-0");
-        }
+            // We MUST include the thumbnail size, but since some clients may use the
+            // first image they see and the thumbnail is tiny, instead return the
+            // medium first. The large could be very large, which is no good if the
+            // client is pulling images for an entire list at once!
 
-        // Medium
-        pProp = propList.at(2);
-        if (pProp)
-        {
-            // Must be no more than 1024x768
-            pProp->m_sValue = sURI;
-            pProp->m_sValue.append("&amp;Width=1024&amp;Height=768");
-            pProp->AddAttribute("dlna:profileID", "JPG_MED");
-            pProp->AddAttribute("xmlns:dlna", "urn:schemas-dlna-org:metadata-1-0");
-        }
+            // Medium
+            Property *pProp = propList.at(0);
+            if (pProp)
+            {
+                // Must be no more than 1024x768
+                QUrl mediumURI = artURI;
+                mediumURI.addQueryItem("Width", "1024");
+                mediumURI.addQueryItem("Height", "768");
+                pProp->m_sValue = mediumURI.toEncoded();
+                pProp->AddAttribute("dlna:profileID", "JPG_MED");
+                pProp->AddAttribute("xmlns:dlna", "urn:schemas-dlna-org:metadata-1-0");
+            }
 
-        // Large
-        pProp = propList.at(3);
-        if (pProp)
-        {
-            // Must be no more than 4096x4096 - for our purposes, just return
-            // a fullsize image
-            pProp->m_sValue = sURI;
-            pProp->AddAttribute("dlna:profileID", "JPG_LRG");
-            pProp->AddAttribute("xmlns:dlna", "urn:schemas-dlna-org:metadata-1-0");
+            // Thumbnail
+            pProp = propList.at(1);
+            if (pProp)
+            {
+                // At least one albumArtURI must be a ThumbNail (TN) no larger
+                // than 160x160, and it must also be a jpeg
+                QUrl thumbURI = artURI;
+                thumbURI.addQueryItem("Width", "160");
+                thumbURI.addQueryItem("Height", "160");
+                pProp->m_sValue = thumbURI.toEncoded();
+                pProp->AddAttribute("dlna:profileID", "JPG_TN");
+                pProp->AddAttribute("xmlns:dlna", "urn:schemas-dlna-org:metadata-1-0");
+            }
+
+            // Small
+            pProp = propList.at(2);
+            if (pProp)
+            {
+                // Must be no more than 640x480
+                QUrl smallURI = artURI;
+                smallURI.addQueryItem("Width", "640");
+                smallURI.addQueryItem("Height", "480");
+                pProp->m_sValue = smallURI.toEncoded();
+                pProp->AddAttribute("dlna:profileID", "JPG_SM");
+                pProp->AddAttribute("xmlns:dlna", "urn:schemas-dlna-org:metadata-1-0");
+            }
+
+            // Large
+            pProp = propList.at(3);
+            if (pProp)
+            {
+                // Must be no more than 4096x4096 - for our purposes, just return
+                // a fullsize image
+                pProp->m_sValue = artURI.toEncoded();
+                pProp->AddAttribute("dlna:profileID", "JPG_LRG");
+                pProp->AddAttribute("xmlns:dlna", "urn:schemas-dlna-org:metadata-1-0");
+            }
         }
     }
 
