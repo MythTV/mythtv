@@ -874,7 +874,7 @@ bool MetaIOID3::writePlayCount(TagLib::ID3v2::Tag *tag, int playcount)
             tag->addFrame(gpopm);
             gpopm->setEmail("");
         }
-        gpopm->setCounter(gpopm->counter() > 0 && count ? gpopm->counter() + countDiff : playcount);
+        gpopm->setCounter((gpopm->counter() > 0) ? gpopm->counter() + countDiff : playcount);
     }
 
     return true;
