@@ -411,7 +411,6 @@ void VideoOutputVDPAU::PrepareFrame(VideoFrame *frame, FrameScanType scan,
                                     OSD *osd)
 {
     QMutexLocker locker(&m_lock);
-    (void)osd;
     CHECK_ERROR("PrepareFrame");
 
     if (!m_render)
@@ -555,13 +554,8 @@ void VideoOutputVDPAU::ClaimVideoSurfaces(void)
     m_checked_surface_ownership = true;
 }
 
-void VideoOutputVDPAU::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
+void VideoOutputVDPAU::DrawSlice(VideoFrame *frame, int /* x */, int /* y */, int /* w */, int /* h */)
 {
-    (void)x;
-    (void)y;
-    (void)w;
-    (void)h;
-
     CHECK_ERROR("DrawSlice");
 
     if (codec_is_std(video_codec_id) || !m_render)
@@ -910,9 +904,8 @@ int VideoOutputVDPAU::SetPictureAttribute(PictureAttribute attribute,
 }
 
 QStringList VideoOutputVDPAU::GetAllowedRenderers(
-    MythCodecID myth_codec_id, const QSize &video_dim)
+    MythCodecID myth_codec_id, const QSize & /* video_dim */)
 {
-    (void) video_dim;
     QStringList list;
     if ((codec_is_std(myth_codec_id) || codec_is_vdpau_hw(myth_codec_id)) &&
          !getenv("NO_VDPAU"))
@@ -1102,10 +1095,9 @@ void VideoOutputVDPAU::DeinitPIPLayer(void)
     m_pip_ready = false;
 }
 
-void VideoOutputVDPAU::ShowPIP(VideoFrame *frame, MythPlayer *pipplayer,
+void VideoOutputVDPAU::ShowPIP(VideoFrame * /* frame */, MythPlayer *pipplayer,
                                PIPLocation loc)
 {
-    (void) frame;
     if (!pipplayer || !m_render)
         return;
 
