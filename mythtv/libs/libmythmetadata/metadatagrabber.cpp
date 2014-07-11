@@ -306,6 +306,8 @@ MetaGrabberScript::MetaGrabberScript(const QDomElement &dom) :
 MetaGrabberScript::MetaGrabberScript(const QString &path) :
     m_valid(false)
 {
+    if (path.isEmpty())
+        return;
     m_fullcommand = path;
     if (path[0] != '/')
         m_fullcommand.prepend(QString("%1metadata").arg(GetShareDir()));
