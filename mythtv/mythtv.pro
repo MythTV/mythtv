@@ -12,8 +12,8 @@ win32-msvc* {
 
 } else {
 
-    message( "MythTV.pro is only used for building on windows with Visual Studio 2010+." );
-    message( "Run ./configure on your system." );
-
+    message( "MythTV.pro is only used for building on windows with Visual Studio 2010+." )
+    message( "Run ./configure on your system." )
+    error  ( "Bailing out!" )
 }
 
