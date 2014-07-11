@@ -17,9 +17,9 @@
 #define LOC QString("Metadata Grabber: ")
 #define kGrabberRefresh 60
 
-GrabberList     grabberList;
-QMutex          grabberLock;
-QDateTime       grabberAge = MythDate::current().addSecs(-kGrabberRefresh);
+static GrabberList     grabberList;
+static QMutex          grabberLock;
+static QDateTime       grabberAge;
 
 typedef struct GrabberOpts {
     QString     path;
@@ -32,9 +32,9 @@ typedef struct GrabberOpts {
 // to compile.  apparently initializer lists are supported in QT5/CPP11 that
 // will make this work.  for now, use a lock and initialize on first access.
 // https://bugreports.qt-project.org/browse/QTBUG-25679
-QMap<GrabberType, GrabberOpts> grabberTypes;
-QMap<QString, GrabberType> grabberTypeStrings;
-bool initialized = false;
+static QMap<GrabberType, GrabberOpts> grabberTypes;
+static QMap<QString, GrabberType> grabberTypeStrings;
+static bool initialized = false;
 static QMutex typeLock;
 
 GrabberOpts GrabberOptsMaker (QString thepath, QString thesetting, QString thedefault)
@@ -117,7 +117,8 @@ GrabberList MetaGrabberScript::GetList(GrabberType type,
         // refresh grabber scripts every 60 seconds
         // this might have to be revised, or made more intelligent if
         // the delay during refreshes is too great
-        if (refresh || (grabberAge.secsTo(now) > kGrabberRefresh))
+        if (refresh || !grabberAge.isValid() ||
+            (grabberAge.secsTo(now) > kGrabberRefresh))
         {
             grabberList.clear();
             LOG(VB_GENERAL, LOG_DEBUG, LOC + "Clearing grabber cache");
@@ -215,16 +216,7 @@ MetaGrabberScript MetaGrabberScript::GetType(const GrabberType type)
         cmd = grabberTypes[type].def;
     }
 
-    if (grabberAge.secsTo(MythDate::current()) > kGrabberRefresh)
-    {
-        // polling the cache will cause a refresh, so lets just grab and
-        // process the script directly
-        QString fullcmd = QString("%1%2").arg(GetShareDir()).arg(cmd);
-        MetaGrabberScript script(fullcmd);
-        if (script.IsValid())
-            return script;
-    }
-    else
+    if (grabberAge.isValid() && grabberAge.secsTo(MythDate::current()) <= kGrabberRefresh)
     {
         // just pull it from the cache
         GrabberList list = GetList();
@@ -233,6 +225,16 @@ MetaGrabberScript MetaGrabberScript::GetType(const GrabberType type)
         for (; it != list.end(); ++it)
             if (it->GetPath().endsWith(cmd))
                 return *it;
+    }
+
+    // polling the cache will cause a refresh, so lets just grab and
+    // process the script directly
+    QString fullcmd = QString("%1%2").arg(GetShareDir()).arg(cmd);
+    MetaGrabberScript script(fullcmd);
+
+    if (script.IsValid())
+    {
+        return script;
     }
 
     return MetaGrabberScript();
