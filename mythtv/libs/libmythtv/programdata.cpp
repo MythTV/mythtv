@@ -972,7 +972,6 @@ ProgInfo &ProgInfo::operator=(const ProgInfo &other)
     channel         = other.channel;
     startts         = other.startts;
     endts           = other.endts;
-    stars           = other.stars;
     title_pronounce = other.title_pronounce;
     showtype        = other.showtype;
     colorcode       = other.colorcode;
@@ -982,7 +981,6 @@ ProgInfo &ProgInfo::operator=(const ProgInfo &other)
     channel.squeeze();
     startts.squeeze();
     endts.squeeze();
-    stars.squeeze();
     title_pronounce.squeeze();
     showtype.squeeze();
     colorcode.squeeze();
@@ -998,7 +996,6 @@ void ProgInfo::Squeeze(void)
     channel.squeeze();
     startts.squeeze();
     endts.squeeze();
-    stars.squeeze();
     title_pronounce.squeeze();
     showtype.squeeze();
     colorcode.squeeze();

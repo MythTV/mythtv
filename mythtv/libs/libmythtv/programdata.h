@@ -243,7 +243,6 @@ class MTV_PUBLIC ProgInfo : public DBEvent
         channel(QString::null),
         startts(QString::null),
         endts(QString::null),
-        stars(QString::null),
         title_pronounce(QString::null),
         showtype(QString::null),
         colorcode(QString::null),
@@ -263,7 +262,6 @@ class MTV_PUBLIC ProgInfo : public DBEvent
     QString       channel;
     QString       startts;
     QString       endts;
-    QString       stars;
     QString       title_pronounce;
     QString       showtype;
     QString       colorcode;
