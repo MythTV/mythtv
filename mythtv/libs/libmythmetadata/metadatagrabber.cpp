@@ -197,6 +197,13 @@ MetaGrabberScript MetaGrabberScript::GetType(const GrabberType type)
     QString cmd = gCoreContext->GetSetting(grabberTypes[type].setting,
                                            grabberTypes[type].def);
 
+    if (cmd.isEmpty())
+    {
+        // should the python bindings had not been installed at any stage
+        // the settings could have been set to an empty string, so use default
+        cmd = grabberTypes[type].def;
+    }
+
     if (grabberAge.secsTo(MythDate::current()) > kGrabberRefresh)
     {
         // polling the cache will cause a refresh, so lets just grab and
@@ -211,8 +218,7 @@ MetaGrabberScript MetaGrabberScript::GetType(const GrabberType type)
         // just pull it from the cache
         GrabberList list = GetList();
         GrabberList::const_iterator it = list.begin();
-        QString cmd = gCoreContext->GetSetting(grabberTypes[type].setting,
-                                               grabberTypes[type].def);
+
         for (; it != list.end(); ++it)
             if (it->GetPath().endsWith(cmd))
                 return *it;
