@@ -13,6 +13,8 @@ TARGET = mythbackend
 target.path = $${PREFIX}/bin
 INSTALLS = target
 
+DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000
+
 setting.path = $${PREFIX}/share/mythtv/
 setting.files += devicemaster.xml deviceslave.xml MXML_scpd.xml
 
