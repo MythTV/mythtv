@@ -360,7 +360,7 @@ void UPnpCDSVideo::AddItem( const UPnpCDSRequest    *pRequest,
             QUrl mediumURI = artURI;
             mediumURI.addQueryItem("Width", "1024");
             mediumURI.addQueryItem("Height", "768");
-            pProp->m_sValue = mediumURI.toEncoded();
+            pProp->SetValue(mediumURI.toEncoded());
             pProp->AddAttribute("dlna:profileID", "JPG_MED");
             pProp->AddAttribute("xmlns:dlna", "urn:schemas-dlna-org:metadata-1-0");
         }
@@ -374,7 +374,7 @@ void UPnpCDSVideo::AddItem( const UPnpCDSRequest    *pRequest,
             QUrl thumbURI = artURI;
             thumbURI.addQueryItem("Width", "160");
             thumbURI.addQueryItem("Height", "160");
-            pProp->m_sValue = thumbURI.toEncoded();
+            pProp->SetValue(thumbURI.toEncoded());
             pProp->AddAttribute("dlna:profileID", "JPG_TN");
             pProp->AddAttribute("xmlns:dlna", "urn:schemas-dlna-org:metadata-1-0");
         }
@@ -387,7 +387,7 @@ void UPnpCDSVideo::AddItem( const UPnpCDSRequest    *pRequest,
             QUrl smallURI = artURI;
             smallURI.addQueryItem("Width", "640");
             smallURI.addQueryItem("Height", "480");
-            pProp->m_sValue = smallURI.toEncoded();
+            pProp->SetValue(smallURI.toEncoded());
             pProp->AddAttribute("dlna:profileID", "JPG_SM");
             pProp->AddAttribute("xmlns:dlna", "urn:schemas-dlna-org:metadata-1-0");
         }
@@ -398,7 +398,7 @@ void UPnpCDSVideo::AddItem( const UPnpCDSRequest    *pRequest,
         {
             // Must be no more than 4096x4096 - for our purposes, just return
             // a fullsize image
-            pProp->m_sValue = artURI.toEncoded();
+            pProp->SetValue(artURI.toEncoded());
             pProp->AddAttribute("dlna:profileID", "JPG_LRG");
             pProp->AddAttribute("xmlns:dlna", "urn:schemas-dlna-org:metadata-1-0");
         }

@@ -124,7 +124,7 @@ void CDSObject::SetPropValue( const QString &sName, const QString &sValue )
             LOG(VB_UPNP, LOG_WARNING,
                 QString("SetPropValue(%1) called on property with bAllowMulti. "
                         "Only the last inserted property will be updated."));
-        (*it)->m_sValue = HTTPRequest::Encode(sValue);
+        (*it)->SetValue(sValue);
     }
 }
 
@@ -142,7 +142,7 @@ QString CDSObject::GetPropValue(const QString &sName) const
             LOG(VB_UPNP, LOG_WARNING,
                 QString("GetPropValue(%1) called on property with bAllowMulti. "
                         "Only the last inserted property will be return."));
-        return QUrl::fromPercentEncoding((*it)->m_sValue.toUtf8());
+        return (*it)->GetValue().toUtf8();
     }
     
     return "";
@@ -230,7 +230,7 @@ void CDSObject::toXml(QTextStream &os, FilterMap &filter) const
         {
             os << "<container id=\"" << m_sId << "\" parentID=\"" << m_sParentId
                << "\" childCount=\"" << GetChildCount() << "\" restricted=\"" << GetBool( m_bRestricted )
-               << "\" searchable=\"" << GetBool( m_bSearchable ) << "\" >";
+               << "\" searchable=\"" << GetBool( m_bSearchable ) << "\" >" << endl;
 
             sEndTag = "</container>";
 
@@ -239,7 +239,7 @@ void CDSObject::toXml(QTextStream &os, FilterMap &filter) const
         case OT_Item:
         {
             os << "<item id=\"" << m_sId << "\" parentID=\"" << m_sParentId
-               << "\" restricted=\"" << GetBool( m_bRestricted ) << "\" >";
+               << "\" restricted=\"" << GetBool( m_bRestricted ) << "\" >" << endl;
 
             sEndTag = "</item>";
 
@@ -248,8 +248,8 @@ void CDSObject::toXml(QTextStream &os, FilterMap &filter) const
         default: break;
     }
 
-    os << "<dc:title>"   << m_sTitle << "</dc:title>";
-    os << "<upnp:class>" << m_sClass << "</upnp:class>";
+    os << "<dc:title>"   << m_sTitle << "</dc:title>" << endl;
+    os << "<upnp:class>" << m_sClass << "</upnp:class>" << endl;
 
     // ----------------------------------------------------------------------
     // Output all Properties
@@ -260,7 +260,7 @@ void CDSObject::toXml(QTextStream &os, FilterMap &filter) const
     {
         const Property *pProp = *it;
 
-        if (pProp->m_bRequired || (pProp->m_sValue.length() > 0))
+        if (pProp->m_bRequired || (!pProp->GetValue().isEmpty()))
         {
             QString sName;
             
@@ -279,8 +279,8 @@ void CDSObject::toXml(QTextStream &os, FilterMap &filter) const
                         os << " " <<(*nit).sName << "=\"" << (*nit).sValue << "\"";
 
                 os << ">";
-                os << pProp->m_sValue;
-                os << "</" << sName << ">";
+                os << pProp->GetEncodedValue();
+                os << "</" << sName << ">" << endl;
             }
         }
     }
@@ -299,7 +299,7 @@ void CDSObject::toXml(QTextStream &os, FilterMap &filter) const
             os << (*nit).sName << "=\"" << (*nit).sValue << "\" ";
 
         os << ">" << (*rit)->m_sURI;
-        os << "</res>\r\n";
+        os << "</res>" << endl;
     }
 
     // ----------------------------------------------------------------------
@@ -314,7 +314,7 @@ void CDSObject::toXml(QTextStream &os, FilterMap &filter) const
     // Close Element Tag
     // ----------------------------------------------------------------------
 
-    os << sEndTag;
+    os << sEndTag << endl;
     os << flush;
 }
 

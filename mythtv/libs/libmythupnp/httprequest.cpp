@@ -1710,6 +1710,22 @@ QString HTTPRequest::Encode(const QString &sIn)
 //
 /////////////////////////////////////////////////////////////////////////////
 
+QString HTTPRequest::Decode(const QString& sIn)
+{
+    QString sStr = sIn;
+    sStr.replace("&amp;", "&");
+    sStr.replace("&lt;", "<");
+    sStr.replace("&gt;", ">");
+    sStr.replace("&quot;", "\"");
+    sStr.replace("&apos;", "'");
+
+    return sStr;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 QString HTTPRequest::GetETagHash(const QByteArray &data)
 {
     QByteArray hash = QCryptographicHash::hash( data.data(), QCryptographicHash::Sha1);

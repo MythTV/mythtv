@@ -19,6 +19,7 @@
 #include <QMap>
 
 #include "upnpexp.h"
+#include "httprequest.h"
 
 class CDSObject;
 class QTextStream;
@@ -47,7 +48,6 @@ class Property
         QString  m_sName;
         QString  m_sNameSpace;
         bool     m_bRequired;
-        QString  m_sValue;
         bool     m_bMultiValue;
         NameValues      m_lstAttributes;
 
@@ -63,15 +63,33 @@ class Property
             m_sName       = sName;
             m_sNameSpace  = sNameSpace;
             m_bRequired   = bRequired;
-            m_sValue      = sValue;
+            m_sValue      = HTTPRequest::Encode(sValue);
             m_bMultiValue = bMultiValue;
+        }
+
+        void SetValue(const QString &value)
+        {
+            m_sValue = value;
+        }
+
+        QString GetValue(void) const
+        {
+            return m_sValue;
+        }
+
+        QString GetEncodedValue(void) const
+        {
+            return HTTPRequest::Encode(m_sValue);
         }
 
         void AddAttribute( const QString &sName,
                            const QString &sValue )
         {
-            m_lstAttributes.push_back(NameValue(sName, sValue));
+            m_lstAttributes.push_back(NameValue(sName, HTTPRequest::Encode(sValue)));
         }
+
+    protected:
+        QString  m_sValue;
 };
 
 typedef QMap<QString,Property*> Properties;
@@ -96,13 +114,13 @@ class Resource
                   const QString &sURI )
         {
             m_sProtocolInfo = sProtocolInfo;
-            m_sURI          = sURI;
+            m_sURI          = HTTPRequest::Encode(sURI);
         }
 
         void AddAttribute( const QString &sName,
                            const QString &sValue )
         {
-            m_lstAttributes.push_back(NameValue(sName, sValue));
+            m_lstAttributes.push_back(NameValue(sName, HTTPRequest::Encode(sValue)));
         }
 };
 
