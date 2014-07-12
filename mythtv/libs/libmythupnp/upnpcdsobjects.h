@@ -205,7 +205,8 @@ class UPNP_PUBLIC CDSObject
         ContainerClass *AddSearchClass( ContainerClass *pClass );
         ContainerClass *AddCreateClass( ContainerClass *pClass );
 
-        void          SetPropValue( const QString &sName, const QString &sValue );
+        void          SetPropValue( const QString &sName, const QString &sValue,
+                                    const QString &type = "" );
         QString       GetPropValue( const QString &sName ) const;
         QString       toXml      ( FilterMap &filter ) const;
         void          toXml      ( QTextStream &os, FilterMap &filter ) const;

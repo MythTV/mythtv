@@ -44,51 +44,51 @@ UPnpCDSRootInfo UPnpCDSTv::g_RootNodes[] =
         "SELECT 0 as key, "
           "CONCAT( title, ': ', subtitle) as name, "
           "1 as children "
-            "FROM recorded "
+            "FROM recorded r "
             "%1 "
-            "ORDER BY starttime DESC",
-        "", "starttime DESC" },
+            "ORDER BY r.starttime DESC",
+        "", "r.starttime DESC" },
 
     {   "By Title",
-        "title",
-        "SELECT title as id, "
-          "title as name, "
-          "count( title ) as children "
-            "FROM recorded "
+        "r.title",
+        "SELECT r.title as id, "
+          "r.title as name, "
+          "count( r.title ) as children "
+            "FROM recorded r "
             "%1 "
-            "GROUP BY title "
-            "ORDER BY title",
-        "WHERE title=:KEY", "title" },
+            "GROUP BY r.title "
+            "ORDER BY r.title",
+        "WHERE r.title=:KEY", "r.title" },
 
     {   "By Genre",
-        "category",
-        "SELECT category as id, "
-          "category as name, "
-          "count( category ) as children "
-            "FROM recorded "
+        "r.category",
+        "SELECT r.category as id, "
+          "r.category as name, "
+          "count( r.category ) as children "
+            "FROM recorded r "
             "%1 "
-            "GROUP BY category "
-            "ORDER BY category",
-        "WHERE category=:KEY", "category" },
+            "GROUP BY r.category "
+            "ORDER BY r.category",
+        "WHERE r.category=:KEY", "r.category" },
 
     {   "By Date",
-        "DATE_FORMAT(starttime, '%Y-%m-%d')",
-        "SELECT  DATE_FORMAT(starttime, '%Y-%m-%d') as id, "
-          "DATE_FORMAT(starttime, '%Y-%m-%d %W') as name, "
-          "count( DATE_FORMAT(starttime, '%Y-%m-%d %W') ) as children "
-            "FROM recorded "
+        "DATE_FORMAT(r.starttime, '%Y-%m-%d')",
+        "SELECT  DATE_FORMAT(r.starttime, '%Y-%m-%d') as id, "
+          "DATE_FORMAT(r.starttime, '%Y-%m-%d %W') as name, "
+          "count( DATE_FORMAT(r.starttime, '%Y-%m-%d %W') ) as children "
+            "FROM recorded r "
             "%1 "
             "GROUP BY name "
-            "ORDER BY starttime DESC",
-        "WHERE DATE_FORMAT(starttime, '%Y-%m-%d') =:KEY", "starttime DESC" },
+            "ORDER BY r.starttime DESC",
+        "WHERE DATE_FORMAT(r.starttime, '%Y-%m-%d') =:KEY", "r.starttime DESC" },
 
     {   "By Channel",
-        "chanid",
+        "r.chanid",
         "SELECT channel.chanid as id, "
           "CONCAT(channel.channum, ' ', channel.callsign) as name, "
           "count( channum ) as children "
             "FROM channel "
-                "INNER JOIN recorded ON channel.chanid = recorded.chanid "
+                "INNER JOIN recorded r ON channel.chanid = r.chanid "
             "%1 "
             "GROUP BY name "
             "ORDER BY channel.chanid",
@@ -134,7 +134,7 @@ int UPnpCDSTv::GetRootCount()
 
 QString UPnpCDSTv::GetTableName( QString /* sColumn */)
 {
-    return "recorded";
+    return "recorded r";
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -143,12 +143,19 @@ QString UPnpCDSTv::GetTableName( QString /* sColumn */)
 
 QString UPnpCDSTv::GetItemListSQL( QString /* sColumn */ )
 {
-    return "SELECT chanid, starttime, endtime, title, " \
-                  "subtitle, description, category, "   \
-                  "hostname, recgroup, filesize, "      \
-                  "basename, progstart, progend, "      \
-                  "storagegroup, inetref "              \
-           "FROM recorded ";
+    return "SELECT r.chanid, r.starttime, r.endtime, r.title, " \
+                  "r.subtitle, r.description, r.category, "     \
+                  "r.hostname, r.recgroup, r.filesize, "        \
+                  "r.basename, r.progstart, r.progend, "        \
+                  "r.storagegroup, r.inetref, "                 \
+                  "p.category_type, c.callsign, c.channum, "    \
+                  "p.episode, p.totalepisodes, p.season, "      \
+                  "r.programid, r.seriesid, r.recordid, "       \
+                  "c.default_authority, c.name "                \
+           "FROM recorded r "                                   \
+           "LEFT JOIN channel c ON r.chanid=c.chanid "          \
+           "LEFT JOIN recordedprogram p ON p.chanid=r.chanid "  \
+           "                          AND p.starttime=r.progstart";
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -160,7 +167,7 @@ void UPnpCDSTv::BuildItemQuery( MSqlQuery &query, const QStringMap &mapParams )
     int     nChanId    = mapParams[ "ChanId"    ].toInt();
     QString sStartTime = mapParams[ "StartTime" ];
 
-    QString sSQL = QString("%1 WHERE chanid=:CHANID AND starttime=:STARTTIME ")
+    QString sSQL = QString("%1 WHERE r.chanid=:CHANID AND r.starttime=:STARTTIME ")
                       .arg( GetItemListSQL() );
 
     query.prepare( sSQL );
@@ -303,6 +310,20 @@ void UPnpCDSTv::AddItem( const UPnpCDSRequest    *pRequest,
     QString        sStorageGrp  = query.value(13).toString();
 
     QString        sInetRef     = query.value(14).toString();
+    QString        sCatType     = query.value(15).toString();
+    QString        sCallsign    = query.value(16).toString();
+    QString        sChanNum     = query.value(17).toString();
+
+    int            nEpisode      = query.value(18).toInt();
+    int            nEpisodeTotal = query.value(19).toInt();
+    int            nSeason       = query.value(20).toInt();
+
+    QString        sProgramId   = query.value(21).toString();
+    QString        sSeriesId    = query.value(22).toString();
+    int            nRecordId    = query.value(23).toInt();
+
+    QString        sDefaultAuthority = query.value(24).toString();
+    QString        sChanName    = query.value(25).toString();
 
     // ----------------------------------------------------------------------
     // Cache Host ip Address & Port
@@ -350,6 +371,59 @@ void UPnpCDSTv::AddItem( const UPnpCDSRequest    *pRequest,
     pItem->SetPropValue( "longDescription", sDescription );
     pItem->SetPropValue( "description"    , sSubtitle    );
 
+    pItem->SetPropValue( "channelName"    , sChanName   );
+    pItem->SetPropValue( "channelID"      , QString::number(nChanid), "NETWORK");
+    pItem->SetPropValue( "callSign"       , sCallsign    );
+    pItem->SetPropValue( "channelNr"      , sChanNum     );
+
+    if (sCatType != "movie")
+    {
+        pItem->SetPropValue( "seriesTitle"  , sTitle);
+        pItem->SetPropValue( "programTitle"  , sSubtitle);
+    }
+    else
+        pItem->SetPropValue( "programTitle"  , sTitle);
+
+    if (   nEpisode > 0 || nSeason > 0) // There has got to be a better way
+    {
+        pItem->SetPropValue( "episodeNumber" , QString::number(nEpisode));
+        pItem->SetPropValue( "episodeCount"  , QString::number(nEpisodeTotal));
+    }
+
+    pItem->SetPropValue( "recordedStartDateTime", dtStartTime.toString(Qt::ISODate)); //dtStartTime
+    //pItem->SetPropValue( "recordedDuration", );
+    pItem->SetPropValue( "recordedDayOfWeek"    , dtStartTime.toString("ddd"));
+    pItem->SetPropValue( "srsRecordScheduleID"  , QString::number(nRecordId));
+
+    if (!sSeriesId.isEmpty())
+    {
+        // FIXME: This should be set correctly for EIT data to SI_SERIESID and
+        //        for known sources such as TMS to the correct identifier
+        QString sIdType = "mythtv.org_XMLTV";
+        if (sProgramId.contains(sDefaultAuthority))
+            sIdType = "mythtv.org_EIT";
+
+        pItem->SetPropValue( "seriesID", sSeriesId, sIdType );
+    }
+
+    if (!sProgramId.isEmpty())
+    {
+        // FIXME: This should be set correctly for EIT data to SI_PROGRAMID and
+        //        for known sources such as TMS to the correct identifier
+        QString sIdType = "mythtv.org_XMLTV";
+        if (sProgramId.contains(sDefaultAuthority))
+            sIdType = "mythtv.org_EIT";
+
+        pItem->SetPropValue( "programID", sProgramId, sIdType );
+    }
+
+    pItem->SetPropValue( "date"          , dtStartTime.toString(Qt::ISODate));
+
+
+    // Bookmark support
+    //pItem->SetPropValue( "lastPlaybackPosition", QString::number());
+
+
     //pItem->SetPropValue( "producer"       , );
     //pItem->SetPropValue( "rating"         , );
     //pItem->SetPropValue( "actor"          , );
@@ -364,11 +438,10 @@ void UPnpCDSTv::AddItem( const UPnpCDSRequest    *pRequest,
     // (Won't display correct Title without them)
     // ----------------------------------------------------------------------
 
-    pItem->SetPropValue( "creator"       , "[Unknown Author]" );
-    pItem->SetPropValue( "artist"        , "[Unknown Author]" );
-    pItem->SetPropValue( "album"         , "[Unknown Series]" );
-    pItem->SetPropValue( "actor"         , "[Unknown Author]" );
-    pItem->SetPropValue( "date"          , dtStartTime.toString(Qt::ISODate));
+//     pItem->SetPropValue( "creator"       , "[Unknown Author]" );
+//     pItem->SetPropValue( "artist"        , "[Unknown Author]" );
+//     pItem->SetPropValue( "album"         , "[Unknown Series]" );
+//     pItem->SetPropValue( "actor"         , "[Unknown Author]" );
 
     pResults->Add( pItem );
 
@@ -416,7 +489,6 @@ void UPnpCDSTv::AddItem( const UPnpCDSRequest    *pRequest,
     resURI.addQueryItem("StartTime", dtStartTime.toString(Qt::ISODate));
 
     Resource *pRes = pItem->AddResource( sProtocol, resURI.toEncoded() );
-    LOG(VB_GENERAL, LOG_NOTICE, resURI.toEncoded());
     uint uiStart = dtProgStart.toTime_t();
     uint uiEnd   = dtProgEnd.toTime_t();
     uint uiDurMS   = (uiEnd - uiStart) * 1000;

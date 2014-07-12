@@ -146,7 +146,8 @@ QString UPnpCDSMusic::GetItemListSQL( QString /* sColumn */ )
     return "SELECT song.song_id as intid, artist.artist_name as artist, "     \
            "album.album_name as album, song.name as title, "                  \
            "genre.genre, song.year, song.track as tracknum, "                 \
-           "song.description, song.filename, song.length, song.size "         \
+           "song.description, song.filename, song.length, song.size, "         \
+           "song.numplays, song.lastplay "                                    \
            "FROM music_songs song "                                           \
            " join music_artists artist on artist.artist_id = song.artist_id " \
            " join music_albums album on album.album_id = song.album_id "      \
@@ -271,6 +272,9 @@ void UPnpCDSMusic::AddItem( const UPnpCDSRequest    *pRequest,
     uint           nLengthMS    = query.value( 9).toInt();
     uint64_t       nFileSize    = (quint64)query.value(10).toULongLong();
 
+    int            nPlaybackCount = query.value(11).toInt();
+    QDateTime      lastPlayedTime = query.value(12).toDateTime();
+
 #if 0
     if ((nNodeIdx == 0) || (nNodeIdx == 1))
     {
@@ -331,23 +335,14 @@ void UPnpCDSMusic::AddItem( const UPnpCDSRequest    *pRequest,
     pItem->SetPropValue( "longDescription"      , sDescription);
 
     pItem->SetPropValue( "artist"               ,  sArtist    );
+    pItem->SetPropValue( "creator"              ,  sArtist    );
     pItem->SetPropValue( "album"                ,  sAlbum     );
     pItem->SetPropValue( "originalTrackNumber"  ,  QString::number(nTrackNum));
     if (nYear > 0 && nYear < 9999)
         pItem->SetPropValue( "date",  QDate(nYear,1,1).toString(Qt::ISODate));
 
-#if 0
-    pObject->AddProperty( new Property( "publisher"       , "dc"   ));
-    pObject->AddProperty( new Property( "language"        , "dc"   ));
-    pObject->AddProperty( new Property( "relation"        , "dc"   ));
-    pObject->AddProperty( new Property( "rights"          , "dc"   ));
-
-
-    pObject->AddProperty( new Property( "playlist"            , "upnp" ));
-    pObject->AddProperty( new Property( "storageMedium"       , "upnp" ));
-    pObject->AddProperty( new Property( "contributor"         , "dc"   ));
-    pObject->AddProperty( new Property( "date"                , "dc"   ));
-#endif
+    pItem->SetPropValue( "playbackCount"        , QString::number(nPlaybackCount));
+    pItem->SetPropValue( "lastPlaybackTime"     , lastPlayedTime.toString(Qt::ISODate));
 
 
     QUrl artURI = URIBase;

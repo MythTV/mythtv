@@ -115,7 +115,8 @@ QList<Property*> CDSObject::GetProperties( const QString &sName )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void CDSObject::SetPropValue( const QString &sName, const QString &sValue )
+void CDSObject::SetPropValue( const QString &sName, const QString &sValue,
+                              const QString &sType )
 {
     Properties::iterator it = m_properties.find(sName);
     if (it !=  m_properties.end() && *it)
@@ -125,6 +126,9 @@ void CDSObject::SetPropValue( const QString &sName, const QString &sValue )
                 QString("SetPropValue(%1) called on property with bAllowMulti. "
                         "Only the last inserted property will be updated."));
         (*it)->SetValue(sValue);
+
+        if (!sType.isEmpty())
+            (*it)->AddAttribute( "type", sType );
     }
 }
 
@@ -399,12 +403,29 @@ CDSObject *CDSObject::CreateMusicTrack( QString sId, QString sTitle, QString sPa
     pObject->AddProperty( new Property( "playlist"            , "upnp" ));
     pObject->AddProperty( new Property( "storageMedium"       , "upnp" ));
     pObject->AddProperty( new Property( "contributor"         , "dc"   ));
+    pObject->AddProperty( new Property( "creator"             , "dc"   ));
     pObject->AddProperty( new Property( "date"                , "dc"   ));
+
+    pObject->AddProperty( new Property( "playbackCount"       , "upnp" ));
+    pObject->AddProperty( new Property( "lastPlaybackTime"    , "upnp" ));
 
     pObject->AddProperty( new Property( "albumArtURI", "upnp", false, "", true)); // TN
     pObject->AddProperty( new Property( "albumArtURI", "upnp", false, "", true)); // SM
     pObject->AddProperty( new Property( "albumArtURI", "upnp", false, "", true)); // MED
     pObject->AddProperty( new Property( "albumArtURI", "upnp", false, "", true)); // LRG
+
+#if 0
+    pObject->AddProperty( new Property( "publisher"       , "dc"   ));
+    pObject->AddProperty( new Property( "language"        , "dc"   ));
+    pObject->AddProperty( new Property( "relation"        , "dc"   ));
+    pObject->AddProperty( new Property( "rights"          , "dc"   ));
+
+
+    pObject->AddProperty( new Property( "playlist"            , "upnp" ));
+    pObject->AddProperty( new Property( "storageMedium"       , "upnp" ));
+    pObject->AddProperty( new Property( "contributor"         , "dc"   ));
+    pObject->AddProperty( new Property( "date"                , "dc"   ));
+#endif
 
     return( pObject );
 }
@@ -468,10 +489,25 @@ CDSObject *CDSObject::CreateVideoItem( QString sId, QString sTitle, QString sPar
     pObject->AddProperty( new Property( "rating"         , "upnp" ));
     pObject->AddProperty( new Property( "actor"          , "upnp" ));
     pObject->AddProperty( new Property( "director"       , "upnp" ));
+    pObject->AddProperty( new Property( "episodeNumber"  , "upnp" ));
+    pObject->AddProperty( new Property( "episodeCount"   , "upnp" ));
+    pObject->AddProperty( new Property( "seriesTitle"    , "upnp" ));
+    pObject->AddProperty( new Property( "programTitle"   , "upnp" ));
     pObject->AddProperty( new Property( "description"    , "dc"   ));
     pObject->AddProperty( new Property( "publisher"      , "dc"   ));
     pObject->AddProperty( new Property( "language"       , "dc"   ));
     pObject->AddProperty( new Property( "relation"       , "dc"   ));
+
+    pObject->AddProperty( new Property( "channelID"      , "upnp" ));
+    pObject->AddProperty( new Property( "callSign"       , "upnp" ));
+    pObject->AddProperty( new Property( "channelNr"      , "upnp" ));
+
+    pObject->AddProperty( new Property( "recordedStartDateTime"   , "upnp" ));
+    pObject->AddProperty( new Property( "recordedDuration"        , "upnp" ));
+    pObject->AddProperty( new Property( "recordedDayOfWeek"       , "upnp" ));
+
+    pObject->AddProperty( new Property( "programID"      , "upnp" ));
+    pObject->AddProperty( new Property( "seriesID"       , "upnp" ));
 
     // Added for Microsoft Media Player Compatibility
 
@@ -490,7 +526,7 @@ CDSObject *CDSObject::CreateVideoItem( QString sId, QString sTitle, QString sPar
 
 /////////////////////////////////////////////////////////////////////////////
 
-CDSObject *CDSObject::CreateMovie( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )  
+CDSObject *CDSObject::CreateMovie( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )
 {
     if (pObject == NULL)
     {
@@ -524,6 +560,7 @@ CDSObject *CDSObject::CreateVideoBroadcast( QString sId, QString sTitle, QString
     pObject->AddProperty( new Property( "icon"     , "upnp" ));
     pObject->AddProperty( new Property( "region"   , "upnp" ));
     pObject->AddProperty( new Property( "channelNr", "upnp" ));
+    pObject->AddProperty( new Property( "callsign" , "upnp" ));
 
     return( pObject );
 }

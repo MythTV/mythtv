@@ -383,8 +383,8 @@ void UPnpCDSVideo::AddItem( const UPnpCDSRequest    *pRequest,
     // int             nYear        = query.value( 7).toInt();
     // int             nUserRating  = query.value( 8).toInt();
     int            nLength      = query.value( 9).toInt();
-    // int             nSeason      = query.value(10).toInt();
-    // int             nEpisode     = query.value(11).toInt();
+    int            nSeason      = query.value(10).toInt();
+    int            nEpisode     = query.value(11).toInt();
     QString        sCoverArt    = query.value(12).toString();
     QDateTime      dtInsertDate =
         MythDate::as_utc(query.value(13).toDateTime());
@@ -457,13 +457,26 @@ void UPnpCDSVideo::AddItem( const UPnpCDSRequest    *pRequest,
     pItem->m_sWriteStatus = "WRITABLE";
 
     pItem->SetPropValue( "longDescription", sPlot );
-    // ?? pItem->SetPropValue( "description"    , sTitle );
+    // ?? pItem->SetPropValue( "description"    , sPlot );
     pItem->SetPropValue( "director"       , sDirector );
 
+    if (nEpisode > 0 || nSeason > 0) // There has got to be a better way
+    {
+        pItem->SetPropValue( "seriesTitle"  , sTitle);
+        pItem->SetPropValue( "programTitle"  , sSubtitle);
+        pItem->SetPropValue( "episodeNumber"  , QString::number(nEpisode));
+        //pItem->SetPropValue( "episodeCount"  , nEpisodeCount);
+    }
+
+    // TODO Implement the following
+    // pItem->SetPropValue( "genre"       , sCategory );
+
+    // HACK: Windows Media Centre Compat
     pItem->SetPropValue( "genre"          , "[Unknown Genre]"     );
     pItem->SetPropValue( "actor"          , "[Unknown Author]"    );
     pItem->SetPropValue( "creator"        , "[Unknown Creator]"   );
     pItem->SetPropValue( "album"          , "[Unknown Album]"     );
+    ////
 
     //pItem->SetPropValue( "producer"       , );
     //pItem->SetPropValue( "rating"         , );
