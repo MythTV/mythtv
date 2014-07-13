@@ -50,6 +50,7 @@ class META_PUBLIC MetaGrabberScript : public QObject
                                         bool absolute=false);
     static MetaGrabberScript    FromInetref(const QString &inetref,
                                             bool absolute=false);
+    static QString              CleanedInetref(const QString &inetref);
 
     bool          IsValid(void) const         { return m_valid; }
 

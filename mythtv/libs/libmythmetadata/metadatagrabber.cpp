@@ -85,10 +85,6 @@ void InitializeStaticMaps(void)
     }
 }
 
-static QRegExp retagref("^([a-zA-Z0-9_\\-\\.]+\\.[a-zA-Z0-9]{1,3}):(.*)");
-static QMutex reLock;
-
-
 GrabberList MetaGrabberScript::GetList(bool refresh)
 {
     return MetaGrabberScript::GetList(kGrabberAll, refresh);
@@ -274,6 +270,8 @@ MetaGrabberScript MetaGrabberScript::FromTag(const QString &tag,
 MetaGrabberScript MetaGrabberScript::FromInetref(const QString &inetref,
                                                  bool absolute)
 {
+    static QRegExp retagref("^([a-zA-Z0-9_\\-\\.]+\\.[a-zA-Z0-9]{1,3}):(.*)");
+    static QMutex reLock;
     QMutexLocker lock(&reLock);
 
     if (retagref.indexIn(inetref) > -1)
@@ -287,6 +285,19 @@ MetaGrabberScript MetaGrabberScript::FromInetref(const QString &inetref,
 
     // no working match, return a blank
     return MetaGrabberScript();
+}
+
+QString MetaGrabberScript::CleanedInetref(const QString &inetref)
+{
+    static QRegExp retagref("^([a-zA-Z0-9_\\-\\.]+\\.[a-zA-Z0-9]{1,3}):(.*)");
+    static QMutex reLock;
+    QMutexLocker lock(&reLock);
+
+    // try to strip grabber tag from inetref
+    if (retagref.indexIn(inetref) > -1)
+        return retagref.cap(2);
+
+    return inetref;
 }
 
 MetaGrabberScript::MetaGrabberScript(void) :
@@ -494,17 +505,8 @@ MetadataLookupList MetaGrabberScript::Search(const QString &title,
     QStringList args;
     SetDefaultArgs(args);
 
-    QString tmptitle = title;
-    {
-        // television grabber may search using inetref for some reason, so test
-        // it for a grabber tag
-        QMutexLocker lock(&reLock);
-        if (retagref.indexIn(title) > -1)
-            tmptitle = retagref.cap(2);
-    }
-
     args << "-M"
-         << tmptitle;
+         << title;
 
     return RunGrabber(args, lookup, passseas);
 }
@@ -516,15 +518,8 @@ MetadataLookupList MetaGrabberScript::SearchSubtitle(const QString &title,
     QStringList args;
     SetDefaultArgs(args);
 
-    QString tmptitle = title;
-    {
-        QMutexLocker lock(&reLock);
-        if (retagref.indexIn(title) > -1)
-            tmptitle = retagref.cap(2);
-    }
-
     args << "-N"
-         << tmptitle
+         << title
          << subtitle;
 
     return RunGrabber(args, lookup, passseas);
@@ -536,16 +531,8 @@ MetadataLookupList MetaGrabberScript::LookupData(const QString &inetref,
     QStringList args;
     SetDefaultArgs(args);
 
-    QString tmpref = inetref;
-    {
-        // try to strip grabber tag from inetref
-        QMutexLocker lock(&reLock);
-        if (retagref.indexIn(inetref) > -1)
-            tmpref = retagref.cap(2);
-    }
-
     args << "-D"
-         << tmpref;
+         << CleanedInetref(inetref);
 
     return RunGrabber(args, lookup, passseas);
 }
@@ -557,16 +544,8 @@ MetadataLookupList MetaGrabberScript::LookupData(const QString &inetref,
     QStringList args;
     SetDefaultArgs(args);
 
-    QString tmpref = inetref;
-    {
-        // try to strip grabber tag from inetref
-        QMutexLocker lock(&reLock);
-        if (retagref.indexIn(inetref) > -1)
-            tmpref = retagref.cap(2);
-    }
-
     args << "-D"
-         << tmpref
+         << CleanedInetref(inetref)
          << QString::number(season)
          << QString::number(episode);
 
@@ -581,7 +560,7 @@ MetadataLookupList MetaGrabberScript::LookupCollection(
     SetDefaultArgs(args);
 
     args << "-C"
-         << collectionref;
+         << CleanedInetref(collectionref);
 
     return RunGrabber(args, lookup, passseas);
 }
