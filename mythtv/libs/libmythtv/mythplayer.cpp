@@ -1510,8 +1510,8 @@ void MythPlayer::SetCaptionsEnabled(bool enable, bool osd_msg)
         {
             EnableCaptions(mode, osd_msg);
         }
-        ResetCaptions();
     }
+    ResetCaptions();
 }
 
 bool MythPlayer::GetCaptionsEnabled(void)
@@ -3975,7 +3975,11 @@ void MythPlayer::ClearAfterSeek(bool clearvideobuffers)
     tc_wrap[TC_AUDIO] = savedAudioTimecodeOffset;
 
     audio.Reset();
-    ResetCaptions();
+    // Reenable (or re-disable) subtitles, which ultimately does
+    // nothing except to call ResetCaptions() to erase any captions
+    // currently on-screen.  The key is that the erasing is done in
+    // the UI thread, not the decoder thread.
+    EnableSubtitles(GetCaptionsEnabled());
     deleteMap.TrackerReset(framesPlayed);
     commBreakMap.SetTracker(framesPlayed);
     commBreakMap.ResetLastSkip();
