@@ -47,7 +47,10 @@ UPnpCDSRootInfo UPnpCDSTv::g_RootNodes[] =
             "FROM recorded r "
             "%1 "
             "ORDER BY r.starttime DESC",
-        "", "r.starttime DESC" },
+        "",
+        "r.starttime DESC",
+        "object.container",
+        "object.item.videoItem" },
 
     {   "By Title",
         "r.title",
@@ -58,7 +61,10 @@ UPnpCDSRootInfo UPnpCDSTv::g_RootNodes[] =
             "%1 "
             "GROUP BY r.title "
             "ORDER BY r.title",
-        "WHERE r.title=:KEY", "r.title" },
+        "WHERE r.title=:KEY",
+        "r.title",
+        "object.container",
+        "object.container" },
 
     {   "By Genre",
         "r.category",
@@ -69,7 +75,10 @@ UPnpCDSRootInfo UPnpCDSTv::g_RootNodes[] =
             "%1 "
             "GROUP BY r.category "
             "ORDER BY r.category",
-        "WHERE r.category=:KEY", "r.category" },
+        "WHERE r.category=:KEY",
+        "r.category",
+        "object.container",
+        "object.container.genre.movieGenre" },
 
     {   "By Date",
         "DATE_FORMAT(r.starttime, '%Y-%m-%d')",
@@ -80,7 +89,11 @@ UPnpCDSRootInfo UPnpCDSTv::g_RootNodes[] =
             "%1 "
             "GROUP BY name "
             "ORDER BY r.starttime DESC",
-        "WHERE DATE_FORMAT(r.starttime, '%Y-%m-%d') =:KEY", "r.starttime DESC" },
+        "WHERE DATE_FORMAT(r.starttime, '%Y-%m-%d') =:KEY",
+        "r.starttime DESC",
+        "object.container",
+        "object.container"
+    },
 
     {   "By Channel",
         "r.chanid",
@@ -92,7 +105,10 @@ UPnpCDSRootInfo UPnpCDSTv::g_RootNodes[] =
             "%1 "
             "GROUP BY name "
             "ORDER BY channel.chanid",
-        "WHERE channel.chanid=:KEY", ""},
+        "WHERE channel.chanid=:KEY",
+        "",
+        "object.container",
+        "object.container"}, // Cannot be .channelGroup because children of channelGroup must be videoBroadcast items
 
     {   "By Group",
         "recgroup",
@@ -102,7 +118,10 @@ UPnpCDSRootInfo UPnpCDSTv::g_RootNodes[] =
             "%1 "
             "GROUP BY recgroup "
             "ORDER BY recgroup",
-        "WHERE recgroup=:KEY", "recgroup" }
+        "WHERE recgroup=:KEY",
+        "recgroup",
+        "object.container",
+        "object.container.album" }
 };
 
 int UPnpCDSTv::g_nRootCount = sizeof( g_RootNodes ) / sizeof( UPnpCDSRootInfo );

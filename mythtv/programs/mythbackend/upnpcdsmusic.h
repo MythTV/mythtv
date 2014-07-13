@@ -25,6 +25,7 @@ class UPnpCDSMusic : public UPnpCDSExtension
 
         static UPnpCDSRootInfo g_RootNodes[];
         static int             g_nRootCount;
+        QUrl                   m_URIBase;
 
     protected:
 
@@ -44,13 +45,21 @@ class UPnpCDSMusic : public UPnpCDSExtension
                                           UPnpCDSExtensionResults *pResults,
                                           bool                     bAddRef,
                                           MSqlQuery               &query );
+
+        virtual CDSObject       *CreateContainer( const QString &sId,
+                                                  const QString &sTitle,
+                                                  const QString &sParentId,
+                                                  const QString &sClass );
+
+        virtual void             PopulateAlbumContainer( CDSObject *pContainer,
+                                                         const QString &sId );
+
+        virtual void             PopulateArtworkURIS( CDSObject *pItem,
+                                                      int albumID );
+
     public:
 
-        UPnpCDSMusic( ) : UPnpCDSExtension( "Music", "Music",
-                                            "object.item.audioItem.musicTrack" )
-        {
-        }
-
+        UPnpCDSMusic();
         virtual ~UPnpCDSMusic() {}
 };
 

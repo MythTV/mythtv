@@ -865,7 +865,7 @@ UPnpCDSExtensionResults *
             pResults->m_nTotalMatches   = 1;
             pResults->m_nUpdateID       = 1;
 
-            CDSObject *pRoot = CreateContainer( m_sExtensionId, m_sName, "0");
+            CDSObject *pRoot = CreateContainer( m_sExtensionId, m_sName, "0", "");
 
             pRoot->SetChildCount( nRootCount );
 
@@ -898,9 +898,10 @@ UPnpCDSExtensionResults *
                                           .arg(pRequest->m_sObjectId)
                                           .arg(nIdx);
 
-                        CDSObject *pItem =
-                            CreateContainer( sId, QObject::tr( pInfo->title ),
-                                             m_sExtensionId );
+                        CDSObject *pItem = CreateContainer( sId,
+                                                     QObject::tr( pInfo->title ), // FIXME: This translate call won't do anything
+                                                     m_sExtensionId,
+                                                     pInfo->containerClass );
 
                         pItem->SetChildCount( GetDistinctCount( pInfo ) );
 
@@ -953,7 +954,8 @@ UPnpCDSExtensionResults *
                 CDSObject *pItem =
                     CreateContainer( pRequest->m_sObjectId,
                                      QObject::tr( pInfo->title ),
-                                     m_sExtensionId );
+                                     m_sExtensionId,
+                                     pInfo->containerClass );
 
                 pItem->SetChildCount( GetDistinctCount( pInfo ) );
 
@@ -1106,7 +1108,8 @@ UPnpCDSExtensionResults *
                         CDSObject *pItem =
                             CreateContainer( pRequest->m_sObjectId,
                                              query.value(1).toString(),
-                                             pRequest->m_sParentId );
+                                             pRequest->m_sParentId,
+                                             pInfo->childClass );
 
                         pItem->SetChildCount( GetDistinctCount( pInfo ));
 
@@ -1163,7 +1166,8 @@ UPnpCDSExtensionResults *
 
             CDSObject *pItem = CreateContainer( pRequest->m_sObjectId,
                                                 QObject::tr( pInfo->title ),
-                                                m_sExtensionId );
+                                                m_sExtensionId,
+                                                pInfo->containerClass );
 
             pItem->SetChildCount( GetDistinctCount( pInfo ));
 
@@ -1208,8 +1212,10 @@ UPnpCDSExtensionResults *
                                          .arg( pRequest->m_sParentId )
                                          .arg( sKey );
 
-                        CDSObject *pRoot =
-                            CreateContainer(sId, sTitle, pRequest->m_sParentId);
+                        CDSObject *pRoot = CreateContainer(sId,
+                                                           sTitle,
+                                                           pRequest->m_sParentId,
+                                                           pInfo->childClass);
 
                         pRoot->SetChildCount( nCount );
 
@@ -1364,6 +1370,47 @@ void UPnpCDSExtension::CreateItems( UPnpCDSRequest          *pRequest,
                          query );
         }
     }
+}
+
+CDSObject* UPnpCDSExtension::CreateContainer(const QString& sId,
+                                             const QString& sTitle,
+                                             const QString& sParentId,
+                                             const QString& sClass)
+{
+    CDSObject* pContainer = NULL;
+
+    if (sClass == "object.container.person")
+    {
+        pContainer = CDSObject::CreatePerson( sId, sTitle, sParentId );
+    }
+    else if (sClass == "object.container.playlistContainer")
+    {
+        pContainer = CDSObject::CreatePlaylistContainer( sId, sTitle, sParentId );
+    }
+    else if (sClass == "object.container.album")
+    {
+        pContainer = CDSObject::CreateAlbum( sId, sTitle, sParentId );
+    }
+    else if (sClass == "object.container.genre")
+    {
+        pContainer = CDSObject::CreateGenre( sId, sTitle, sParentId );
+    }
+    else if (sClass == "object.container.storageSystem")
+    {
+        pContainer = CDSObject::CreateStorageSystem( sId, sTitle, sParentId );
+    }
+    else if (sClass == "object.container.storageVolume")
+    {
+        pContainer = CDSObject::CreateStorageVolume( sId, sTitle, sParentId );
+    }
+    else if (sClass == "object.container.storageFolder")
+    {
+        pContainer = CDSObject::CreateStorageFolder( sId, sTitle, sParentId );
+    }
+    else
+        pContainer = CDSObject::CreateContainer( sId, sTitle, sParentId );
+
+    return pContainer;
 }
 
 // vim:ts=4:sw=4:ai:et:si:sts=4

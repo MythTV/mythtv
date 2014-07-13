@@ -143,6 +143,8 @@ typedef struct
     const char *sql;
     const char *where;
     const char *orderColumn;
+    const char *containerClass;
+    const char *childClass;
 
 } UPnpCDSRootInfo;
          
@@ -205,11 +207,8 @@ class UPNP_PUBLIC UPnpCDSExtension
 
         virtual CDSObject *CreateContainer( const QString &sId,
                                             const QString &sTitle,
-                                            const QString &sParentId )
-        {
-            return CDSObject::CreateContainer( sId, sTitle, sParentId );
-        }
-
+                                            const QString &sParentId,
+                                            const QString &sClass );
 
     public:
 

@@ -31,7 +31,10 @@ UPnpCDSRootInfo UPnpCDSVideo::g_RootNodes[] =
             "FROM videometadata "
             "%1 "
             "ORDER BY title",
-        "", "title" },
+        "",
+        "title",
+        "object.container",
+        "object.item.videoItem" },
 
     {   "By Folder",
         "fldr.folder",
@@ -48,7 +51,10 @@ UPnpCDSRootInfo UPnpCDSVideo::g_RootNodes[] =
           "%1 "
           "GROUP BY fldr.folder "
           "ORDER BY fldr.folder",
-        "WHERE fldr.folder =  :KEY", "title" },
+        "WHERE fldr.folder =  :KEY",
+        "title",
+        "object.container.storageSystem",
+        "object.container.storageFolder" },
 
     {   "By Length (10min int)",
         "ROUND(length+4,-1)",
@@ -60,7 +66,10 @@ UPnpCDSRootInfo UPnpCDSVideo::g_RootNodes[] =
           "%1 "
           "GROUP BY name "
           "ORDER BY ROUND(length+4,-1)",
-        "WHERE ROUND(length+4,-1) = :KEY", "title" },
+        "WHERE ROUND(length+4,-1) = :KEY",
+        "title",
+        "object.container",
+        "object.container" },
 
     {   "By User Rating (rounded)",
         "ROUND(userrating)",
@@ -72,7 +81,10 @@ UPnpCDSRootInfo UPnpCDSVideo::g_RootNodes[] =
           "%1 "
           "GROUP BY ROUND(userrating) "
           "ORDER BY ROUND(userrating)",
-        "WHERE ROUND(userrating)=ROUND(:KEY)", "title" },
+        "WHERE ROUND(userrating)=ROUND(:KEY)",
+        "title",
+        "object.container",
+        "object.container" },
 
     {   "By Maturity Rating",
         "rating",
@@ -84,9 +96,12 @@ UPnpCDSRootInfo UPnpCDSVideo::g_RootNodes[] =
           "%1 "
           "GROUP BY rating "
           "ORDER BY rating",
-        "WHERE rating=:KEY", "title" },
+        "WHERE rating=:KEY",
+        "title",
+        "object.container",
+        "object.container" },
 
-    {   "By Category",
+    {   "By Genre",
         "category",
         "SELECT "
             "videometadata.category          AS id, "
@@ -97,7 +112,10 @@ UPnpCDSRootInfo UPnpCDSVideo::g_RootNodes[] =
           "%1 "
           "GROUP BY videometadata.category "
           "ORDER BY videometadata.category",
-        "WHERE videometadata.category=:KEY", "title" },
+        "WHERE videometadata.category=:KEY",
+        "title",
+        "object.container",
+        "object.container.genre.movieGenre" },
 
     {   "By Director",
         "director",
@@ -109,7 +127,10 @@ UPnpCDSRootInfo UPnpCDSVideo::g_RootNodes[] =
           "%1 "
           "GROUP BY director "
           "ORDER BY director",
-        "WHERE director=:KEY", "title" },
+        "WHERE director=:KEY",
+        "title",
+        "object.container",
+        "object.container.person" },
 
     {   "By Studio",
         "studio",
@@ -121,19 +142,10 @@ UPnpCDSRootInfo UPnpCDSVideo::g_RootNodes[] =
             "%1 "
             "GROUP BY studio "
             "ORDER BY studio",
-        "WHERE studio=:KEY", "title" },
-
-    {   "By Homepage",
-        "homepage",
-        "SELECT "
-            "homepage          AS id, "
-            "homepage          AS name, "
-            "COUNT( homepage ) AS children "
-          "FROM videometadata "
-          "%1 "
-          "GROUP BY homepage "
-          "ORDER BY homepage",
-        "WHERE homepage=:KEY", "title" },
+        "WHERE studio=:KEY",
+        "title",
+        "object.container",
+        "object.container" },
 
     {   "By Year",
         "year",
@@ -145,7 +157,10 @@ UPnpCDSRootInfo UPnpCDSVideo::g_RootNodes[] =
           "%1 "
           "GROUP BY year "
           "ORDER BY year",
-        "WHERE year=:KEY", "title" },
+        "WHERE year=:KEY",
+        "title",
+        "object.container",
+        "object.container" },
 
     {   "By Content Type",
         "contenttype",
@@ -157,7 +172,10 @@ UPnpCDSRootInfo UPnpCDSVideo::g_RootNodes[] =
           "%1 "
           "GROUP BY contenttype "
           "ORDER BY contenttype",
-        "WHERE contenttype=:KEY", "title" },
+        "WHERE contenttype=:KEY",
+        "title",
+        "object.container",
+        "object.container.album" },
 
     {   "By Season",
         "season",
@@ -169,8 +187,10 @@ UPnpCDSRootInfo UPnpCDSVideo::g_RootNodes[] =
           "%1 "
           "GROUP BY season "
           "ORDER BY season",
-        "WHERE season=:KEY", "title" }
-
+        "WHERE season=:KEY",
+        "title",
+        "object.container",
+        "object.container" }
 
 };
 

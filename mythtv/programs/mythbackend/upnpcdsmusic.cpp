@@ -54,7 +54,10 @@ UPnpCDSRootInfo UPnpCDSMusic::g_RootNodes[] =
             "FROM music_songs song "
             "%1 "
             "ORDER BY name",
-        "", "name" },
+        "",
+        "name",
+        "object.container",
+        "object.item.audioItem.musicTrack" },
 
 #if 0
 // This is currently broken... need to handle list of items with single parent
@@ -80,7 +83,11 @@ UPnpCDSRootInfo UPnpCDSMusic::g_RootNodes[] =
             "%1 "
             "GROUP BY a.album_name "
             "ORDER BY a.album_name",
-        "WHERE song.album_id=:KEY", "album.album_name" },
+        "WHERE song.album_id=:KEY",
+        "album.album_name",
+        "object.container",
+        "object.container.album.musicAlbum" },
+
     {   "By Artist",
         "song.artist_id",
         "SELECT a.artist_id as id, "
@@ -90,9 +97,12 @@ UPnpCDSRootInfo UPnpCDSMusic::g_RootNodes[] =
             "%1 "
             "GROUP BY a.artist_id "
             "ORDER BY a.artist_name",
-        "WHERE song.artist_id=:KEY", "" },
+        "WHERE song.artist_id=:KEY",
+        "",
+        "object.container",
+        "object.container.person.musicArtist" },
 
-{   "By Genre",
+    {   "By Genre",
         "song.genre_id",
         "SELECT g.genre_id as id, "
           "genre as name, "
@@ -101,11 +111,25 @@ UPnpCDSRootInfo UPnpCDSMusic::g_RootNodes[] =
             "%1 "
             "GROUP BY g.genre_id "
             "ORDER BY g.genre",
-        "WHERE song.genre_id=:KEY", "" },
+        "WHERE song.genre_id=:KEY",
+        "",
+        "object.container",
+        "object.container.genre.musicGenre" },
 
 };
 
 int UPnpCDSMusic::g_nRootCount = sizeof( g_RootNodes ) / sizeof( UPnpCDSRootInfo );
+
+UPnpCDSMusic::UPnpCDSMusic()
+             : UPnpCDSExtension( "Music", "Music",
+                                 "object.item.audioItem.musicTrack" )
+{
+    QString sServerIp   = gCoreContext->GetBackendServerIP4();
+    int sPort           = gCoreContext->GetBackendStatusPort();
+    m_URIBase.setScheme("http");
+    m_URIBase.setHost(sServerIp);
+    m_URIBase.setPort(sPort);
+}
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -300,17 +324,9 @@ void UPnpCDSMusic::AddItem( const UPnpCDSRequest    *pRequest,
         m_mapBackendPort[ sHostName ] = gCoreContext->GetSettingOnHost("BackendStatusPort", sHostName);
 #endif
 
-    QString sServerIp   = gCoreContext->GetBackendServerIP4();
-    int sPort           = gCoreContext->GetBackendStatusPort();
-
     // ----------------------------------------------------------------------
     // Build Support Strings
     // ----------------------------------------------------------------------
-
-    QUrl URIBase;
-    URIBase.setScheme("http");
-    URIBase.setHost(sServerIp);
-    URIBase.setPort(sPort);
 
     QString sId        = QString( "Music/1/item?Id=%1")
                             .arg( nId );
@@ -344,10 +360,103 @@ void UPnpCDSMusic::AddItem( const UPnpCDSRequest    *pRequest,
     pItem->SetPropValue( "playbackCount"        , QString::number(nPlaybackCount));
     pItem->SetPropValue( "lastPlaybackTime"     , lastPlayedTime.toString(Qt::ISODate));
 
+    // Artwork
+    PopulateArtworkURIS(pItem, nId);
 
-    QUrl artURI = URIBase;
+    pResults->Add( pItem );
+
+    // ----------------------------------------------------------------------
+    // Add Music Resource Element based on File extension (HTTP)
+    // ----------------------------------------------------------------------
+
+    QFileInfo fInfo( sFileName );
+
+    QString sMimeType = HTTPRequest::GetMimeType( fInfo.suffix() );
+    QString sProtocol = QString( "http-get:*:%1:DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=01500000000000000000000000000000" ).arg( sMimeType  );
+    QUrl    resURI    = m_URIBase;
+    resURI.setPath("Content/GetMusic");
+    resURI.addQueryItem("Id", QString::number(nId));
+
+    Resource *pRes = pItem->AddResource( sProtocol, resURI.toEncoded() );
+    int nLengthSecs = nLengthMS / 1000;
+
+    QString sDur;
+    // H:M:S[.MS]
+    sDur.sprintf("%02d:%02d:%02d.%03d",
+                  (nLengthSecs / 3600) % 24,
+                  (nLengthSecs / 60) % 60,
+                  nLengthSecs % 60,
+                  nLengthMS % 1000);
+
+    pRes->AddAttribute( "duration"  , sDur      );
+    if (nFileSize > 0)
+        pRes->AddAttribute( "size"      , QString::number( nFileSize) );
+}
+
+CDSObject* UPnpCDSMusic::CreateContainer(const QString& sId,
+                                         const QString& sTitle,
+                                         const QString& sParentId,
+                                         const QString& sClass )
+{
+    CDSObject *pContainer = NULL;
+    if (sClass == "object.container.person.musicArtist")
+    {
+        pContainer = CDSObject::CreateMusicGenre( sId, sTitle, m_sExtensionId );
+    }
+    else if (sClass == "object.container.album.musicAlbum")
+    {
+        pContainer = CDSObject::CreateMusicAlbum( sId, sTitle, m_sExtensionId );
+
+        PopulateAlbumContainer( pContainer, sId );
+    }
+    else if (sClass == "object.container.genre.musicGenre")
+    {
+        pContainer = CDSObject::CreateMusicGenre( sId, sTitle, m_sExtensionId );
+    }
+    else
+        pContainer = UPnpCDSExtension::CreateContainer(sId, sTitle, sParentId, sClass);
+
+    return pContainer;
+}
+
+void UPnpCDSMusic::PopulateAlbumContainer(CDSObject* pContainer,
+                                          const QString& sId)
+{
+
+    int nAlbumId = sId.section('=',1).toInt();
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("SELECT a.album_name, t.artist_name, a.year, a.compilation, "
+                  "s.song_id, g.genre "
+                  "FROM music_albums a "
+                  "LEFT JOIN music_artists t ON a.artist_id=t.artist_id "
+                  "LEFT JOIN music_songs s ON a.album_id=s.album_id "
+                  "LEFT JOIN music_genres g ON s.genre_id=g.genre_id "
+                  "WHERE a.album_id=:ALBUM_ID LIMIT 1");
+    query.bindValue(":ALBUM_ID", nAlbumId);
+    if (query.exec() && query.next())
+    {
+        QString sAlbumName = query.value(0).toString();
+        QString sArtist = query.value(1).toString();
+        QString sYear = query.value(2).toString();
+        bool bCompilation = query.value(3).toBool();
+        int nSongId = query.value(4).toInt(); // TODO: Allow artwork lookups by album ID
+        QString sGenre = query.value(5).toString();
+
+        pContainer->SetPropValue("artist", sArtist);
+        pContainer->SetPropValue("date", sYear);
+        pContainer->SetPropValue("genre", sGenre);
+
+        // Artwork
+        PopulateArtworkURIS(pContainer, nSongId);
+    }
+}
+
+void UPnpCDSMusic::PopulateArtworkURIS(CDSObject* pItem, int nAlbumID)
+{
+    QUrl artURI = m_URIBase;
     artURI.setPath("Content/GetAlbumArt");
-    artURI.addQueryItem("Id", QString::number(nId));
+    artURI.addQueryItem("Id", QString::number(nAlbumID));
 
     QList<Property*> propList = pItem->GetProperties("albumArtURI");
     if (propList.size() >= 4)
@@ -412,35 +521,6 @@ void UPnpCDSMusic::AddItem( const UPnpCDSRequest    *pRequest,
             pProp->AddAttribute("xmlns:dlna", "urn:schemas-dlna-org:metadata-1-0");
         }
     }
-
-    pResults->Add( pItem );
-
-    // ----------------------------------------------------------------------
-    // Add Music Resource Element based on File extension (HTTP)
-    // ----------------------------------------------------------------------
-
-    QFileInfo fInfo( sFileName );
-
-    QString sMimeType = HTTPRequest::GetMimeType( fInfo.suffix() );
-    QString sProtocol = QString( "http-get:*:%1:DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=01500000000000000000000000000000" ).arg( sMimeType  );
-    QUrl    resURI    = URIBase;
-    resURI.setPath("Content/GetMusic");
-    resURI.addQueryItem("Id", QString::number(nId));
-
-    Resource *pRes = pItem->AddResource( sProtocol, resURI.toEncoded() );
-    int nLengthSecs = nLengthMS / 1000;
-
-    QString sDur;
-    // H:M:S[.MS]
-    sDur.sprintf("%02d:%02d:%02d.%03d",
-                  (nLengthSecs / 3600) % 24,
-                  (nLengthSecs / 60) % 60,
-                  nLengthSecs % 60,
-                  nLengthMS % 1000);
-
-    pRes->AddAttribute( "duration"  , sDur      );
-    if (nFileSize > 0)
-        pRes->AddAttribute( "size"      , QString::number( nFileSize) );
 }
 
 // vim:ts=4:sw=4:ai:et:si:sts=4
