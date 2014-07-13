@@ -587,6 +587,7 @@ MetadataLookupList MetadataDownload::handleVideoUndetermined(MetadataLookup *loo
     else
     {
         list = grabber.SearchSubtitle(lookup->GetInetref(),
+                                      lookup->GetTitle(),
                                       lookup->GetSubtitle(), lookup, false);
     }
 

@@ -525,6 +525,21 @@ MetadataLookupList MetaGrabberScript::SearchSubtitle(const QString &title,
     return RunGrabber(args, lookup, passseas);
 }
 
+MetadataLookupList MetaGrabberScript::SearchSubtitle(const QString &inetref,
+                        const QString &title, const QString &subtitle,
+                        MetadataLookup *lookup, bool passseas)
+{
+    (void)title;
+    QStringList args;
+    SetDefaultArgs(args);
+
+    args << "-N"
+         << CleanedInetref(inetref)
+         << subtitle;
+
+    return RunGrabber(args, lookup, passseas);
+}
+
 MetadataLookupList MetaGrabberScript::LookupData(const QString &inetref,
                         MetadataLookup *lookup, bool passseas)
 {
