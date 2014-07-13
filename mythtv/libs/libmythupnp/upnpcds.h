@@ -196,6 +196,7 @@ class UPNP_PUBLIC UPnpCDSExtension
         virtual QString          GetTableName  ( QString sColumn      ) = 0;
         virtual QString          GetItemListSQL( QString sColumn = "" ) = 0;
         virtual void             BuildItemQuery( MSqlQuery &query, const QStringMap &mapParams ) = 0;
+        virtual QString          BuildSQLWhere ( QString sColumn, QString sWhere = "" );
 
         virtual void       AddItem( const UPnpCDSRequest    *pRequest,
                                     const QString           &sObjectId,
