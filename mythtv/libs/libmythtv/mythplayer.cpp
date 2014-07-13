@@ -4021,7 +4021,7 @@ void MythPlayer::ClearAfterSeek(bool clearvideobuffers)
     tc_wrap[TC_AUDIO] = savedAudioTimecodeOffset;
 
     audio.Reset();
-    EnableSubtitles(false);
+    ResetCaptions();
     deleteMap.TrackerReset(framesPlayed);
     commBreakMap.SetTracker(framesPlayed);
     commBreakMap.ResetLastSkip();
