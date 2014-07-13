@@ -113,7 +113,7 @@ void MetadataDownload::run()
             {
                 if (lookup->GetSeason() > 0 || lookup->GetEpisode() > 0)
                     list = handleTelevision(lookup);
-                else if (!lookup->GetSubtitle().isEmpty())
+                else
                     list = handleVideoUndetermined(lookup);
 
                 if (list.isEmpty())
@@ -127,9 +127,9 @@ void MetadataDownload::run()
             }
             else
             {
-                list = handleRecordingGeneric(lookup);
+                list = handleVideoUndetermined(lookup);
                 if (lookup->GetInetref().isEmpty())
-                    list.append(handleMovie(lookup));
+                    list.append(handleRecordingGeneric(lookup));
             }
         }
         else if (lookup->GetType() == kMetadataGame)
@@ -576,19 +576,34 @@ MetadataLookupList MetadataDownload::handleTelevision(MetadataLookup *lookup)
 MetadataLookupList MetadataDownload::handleVideoUndetermined(MetadataLookup *lookup)
 {
     MetadataLookupList list;
-    MetaGrabberScript grabber =
-        MetaGrabberScript::GetGrabber(kGrabberTelevision, lookup);
 
-    if (lookup->GetInetref().isEmpty() || lookup->GetInetref() == "00000000")
+    if (lookup->GetSubtype() != kProbableMovie &&
+        !lookup->GetSubtitle().isEmpty())
     {
-        list = grabber.SearchSubtitle(lookup->GetTitle(),
-                                      lookup->GetSubtitle(), lookup, false);
+        MetaGrabberScript grabber =
+            MetaGrabberScript::GetGrabber(kGrabberTelevision, lookup);
+
+        if (lookup->GetInetref().isEmpty() || lookup->GetInetref() == "00000000")
+        {
+            list = grabber.SearchSubtitle(lookup->GetTitle(),
+                                          lookup->GetSubtitle(), lookup, false);
+        }
+        else
+        {
+            list = grabber.SearchSubtitle(lookup->GetInetref(),
+                                          lookup->GetTitle(),
+                                          lookup->GetSubtitle(), lookup, false);
+        }
     }
-    else
+    if (lookup->GetSubtype() != kProbableMovie &&
+        (lookup->GetSeason() > 0 || lookup->GetEpisode() > 0))
     {
-        list = grabber.SearchSubtitle(lookup->GetInetref(),
-                                      lookup->GetTitle(),
-                                      lookup->GetSubtitle(), lookup, false);
+        list.append(handleTelevision(lookup));
+    }
+
+    if (lookup->GetSubtype() != kProbableTelevision)
+    {
+        list.append(handleMovie(lookup));
     }
 
     if (list.count() == 1)
