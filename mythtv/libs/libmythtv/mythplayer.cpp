@@ -4078,7 +4078,9 @@ bool MythPlayer::HandleProgramEditorActions(QStringList &actions)
             if (seekamount == 0) // 1 frame
                 DoRewind(1, kInaccuracyNone);
             else if (seekamount > 0)
-                DoRewindSecs(seekamount, kInaccuracyEditor, false);
+                // Use fully-accurate seeks for less than 1 second.
+                DoRewindSecs(seekamount, seekamount < 1.0 ? kInaccuracyNone :
+                             kInaccuracyEditor, false);
             else
                 HandleArbSeek(false);
         }
@@ -4087,7 +4089,9 @@ bool MythPlayer::HandleProgramEditorActions(QStringList &actions)
             if (seekamount == 0) // 1 frame
                 DoFastForward(1, kInaccuracyNone);
             else if (seekamount > 0)
-                DoFastForwardSecs(seekamount, kInaccuracyEditor, false);
+                // Use fully-accurate seeks for less than 1 second.
+                DoFastForwardSecs(seekamount, seekamount < 1.0 ? kInaccuracyNone :
+                             kInaccuracyEditor, false);
             else
                 HandleArbSeek(true);
         }
