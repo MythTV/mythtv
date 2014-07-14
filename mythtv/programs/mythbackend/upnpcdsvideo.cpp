@@ -111,7 +111,7 @@ UPnpCDSRootInfo UPnpCDSVideo::g_RootNodes[] =
             "LEFT JOIN videocategory ON videocategory.intid = videometadata.category "
           "%1 "
           "GROUP BY videometadata.category "
-          "ORDER BY videometadata.category",
+          "ORDER BY videocategory.category",
         "WHERE videometadata.category=:KEY",
         "title",
         "object.container",
