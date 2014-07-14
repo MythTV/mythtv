@@ -5982,8 +5982,7 @@ PlaybackSock *MainServer::GetSlaveByHostname(const QString &hostname)
     {
         PlaybackSock *pbs = *iter;
         if (pbs->isSlaveBackend() &&
-            ((pbs->getHostname().toLower() == hostname.toLower()) ||
-             (gCoreContext->IsThisHost(hostname, pbs->getHostname()))))
+            gCoreContext->IsThisHost(hostname, pbs->getHostname()))
         {
             sockListLock.unlock();
             pbs->IncrRef();
@@ -6008,8 +6007,7 @@ PlaybackSock *MainServer::GetMediaServerByHostname(const QString &hostname)
     {
         PlaybackSock *pbs = *iter;
         if (pbs->isMediaServer() &&
-            ((pbs->getHostname().toLower() == hostname.toLower()) ||
-             (gCoreContext->IsThisHost(hostname, pbs->getHostname()))))
+            gCoreContext->IsThisHost(hostname, pbs->getHostname()))
         {
             pbs->IncrRef();
             return pbs;

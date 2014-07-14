@@ -637,14 +637,22 @@ bool MythCoreContext::IsThisHost(const QString &addr)
 
 bool MythCoreContext::IsThisHost(const QString &addr, const QString &host)
 {
+    if (addr.toLower() == host.toLower())
+        return true;
+
     QHostAddress addrfix(addr);
     addrfix.setScopeId(QString());
     QString addrstr = addrfix.toString();
+
+    if (addrfix.isNull())
+    {
+        addrstr = resolveAddress(addr);
+    }
+
     QString thisip  = GetBackendServerIP4(host);
     QString thisip6 = GetBackendServerIP6(host);
 
-    return (addrfix.protocol() == QAbstractSocket::IPv4Protocol && thisip == addrstr) ||
-           (addrfix.protocol() == QAbstractSocket::IPv6Protocol && thisip6 == addrstr);
+    return !addrstr.isEmpty() && ((addrstr == thisip) || (addrstr == thisip6));
 }
 
 bool MythCoreContext::IsFrontendOnly(void)
