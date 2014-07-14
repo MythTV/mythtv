@@ -259,15 +259,24 @@ MetaGrabberScript MetaGrabberScript::FromTag(const QString &tag,
 MetaGrabberScript MetaGrabberScript::FromInetref(const QString &inetref,
                                                  bool absolute)
 {
-    static QRegExp retagref("^([a-zA-Z0-9_\\-\\.]+\\.[a-zA-Z0-9]{1,3}):(.*)");
+    static QRegExp retagref("^([a-zA-Z0-9_\\-\\.]+\\.[a-zA-Z0-9]{1,3})_(.*)");
+    static QRegExp retagref2("^([a-zA-Z0-9_\\-\\.]+\\.[a-zA-Z0-9]{1,3}):(.*)");
     static QMutex reLock;
     QMutexLocker lock(&reLock);
+    QString tag;
 
     if (retagref.indexIn(inetref) > -1)
     {
+        tag = retagref.cap(1);
+    }
+    else if (retagref2.indexIn(inetref) > -1)
+    {
+        tag = retagref2.cap(1);
+    }
+    if (!tag.isEmpty())
+    {
         // match found, pull out the grabber
-        MetaGrabberScript script = MetaGrabberScript::FromTag(retagref.cap(1),
-                                                              absolute);
+        MetaGrabberScript script = MetaGrabberScript::FromTag(tag, absolute);
         if (script.IsValid())
             return script;
     }
@@ -278,13 +287,16 @@ MetaGrabberScript MetaGrabberScript::FromInetref(const QString &inetref,
 
 QString MetaGrabberScript::CleanedInetref(const QString &inetref)
 {
-    static QRegExp retagref("^([a-zA-Z0-9_\\-\\.]+\\.[a-zA-Z0-9]{1,3}):(.*)");
+    static QRegExp retagref("^([a-zA-Z0-9_\\-\\.]+\\.[a-zA-Z0-9]{1,3})_(.*)");
+    static QRegExp retagref2("^([a-zA-Z0-9_\\-\\.]+\\.[a-zA-Z0-9]{1,3}):(.*)");
     static QMutex reLock;
     QMutexLocker lock(&reLock);
 
     // try to strip grabber tag from inetref
     if (retagref.indexIn(inetref) > -1)
         return retagref.cap(2);
+    if (retagref2.indexIn(inetref) > -1)
+        return retagref2.cap(2);
 
     return inetref;
 }
@@ -356,7 +368,6 @@ MetaGrabberScript::MetaGrabberScript(const MetaGrabberScript &other) :
     m_valid(other.m_valid)
 {
 }
-
 
 MetaGrabberScript& MetaGrabberScript::operator=(const MetaGrabberScript &other)
 {
@@ -449,7 +460,7 @@ MetadataLookupList MetaGrabberScript::RunGrabber(const QStringList &args,
         while (!item.isNull())
         {
             MetadataLookup *tmp = ParseMetadataItem(item, lookup, passseas);
-            tmp->SetInetref(QString("%1:%2").arg(m_command)
+            tmp->SetInetref(QString("%1_%2").arg(m_command)
                                             .arg(tmp->GetInetref()));
             list.append(tmp);
             // MetadataLookup is to be owned by the list

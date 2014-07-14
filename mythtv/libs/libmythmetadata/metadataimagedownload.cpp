@@ -403,7 +403,7 @@ QString getDownloadFilename(VideoArtworkType type, MetadataLookup *lookup,
     }
     else if (lookup->GetType() == kMetadataVideo ||
              lookup->GetType() == kMetadataRecording)
-        title = MetaGrabberScript::CleanedInetref(lookup->GetInetref());
+        title = lookup->GetInetref();
     else if (lookup->GetType() == kMetadataGame)
         title = QString("%1 (%2)").arg(lookup->GetTitle())
                     .arg(lookup->GetSystem());
