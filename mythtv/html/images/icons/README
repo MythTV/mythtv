@@ -1,0 +1,12 @@
+                               README
+                             UPnP Icons
+
+The following rules apply to the upnp_ icons which are used by the UPnP server.
+
+The small icon MUST be 48x48px
+The large icon MUST be 120x120px
+The icons MUST have a colour depth of 24bits.
+Both small and large icons MUST be available in JPG and PNG.
+
+If you move these icons then you must update the UPnP code to reflect their new
+location.

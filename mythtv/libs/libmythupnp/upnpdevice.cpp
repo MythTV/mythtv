@@ -15,6 +15,7 @@
 #include "mythdownloadmanager.h"
 #include "mythlogging.h"
 #include "mythversion.h"  // for MYTH_BINARY_VERSION
+#include "mythcorecontext.h"
 
 // MythDB
 #include "mythdb.h"
@@ -711,6 +712,53 @@ UPnpDevice::UPnpDevice() :
     m_securityPin(false),
     m_protocolVersion(MYTH_PROTO_VERSION)
 {
+
+// FIXME: UPnPDevice is created via the static initialisation of UPnPDeviceDesc
+//        in upnp.cpp ln 21. This means it's created before the core context is
+//        even intialised so we can't use settings, or any 'core' methods to
+//        help in populating the Device metadata. That is why the URLs below
+//        are relative, not absolute since at this stage we can't determine
+//        which IP or port to use!
+
+// NOTE: The icons are defined here and not in devicemaster.xml because they
+//       are also used for the MediaRenderer device and other possible future
+//       devices too. 
+
+    // Large PNG Icon
+    UPnpIcon *pngIconLrg = new UPnpIcon();
+    pngIconLrg->m_nDepth = 24;
+    pngIconLrg->m_nHeight = 120;
+    pngIconLrg->m_nWidth = 120;
+    pngIconLrg->m_sMimeType = "image/png";
+    pngIconLrg->m_sURL = "/images/icons/upnp_large_icon.png";
+    m_listIcons.append(pngIconLrg);
+
+    // Large JPG Icon
+    UPnpIcon *jpgIconLrg = new UPnpIcon();
+    jpgIconLrg->m_nDepth = 24;
+    jpgIconLrg->m_nHeight = 120;
+    jpgIconLrg->m_nWidth = 120;
+    jpgIconLrg->m_sMimeType = "image/jpg";
+    jpgIconLrg->m_sURL = "/images/icons/upnp_large_icon.jpg";
+    m_listIcons.append(jpgIconLrg);
+
+    // Small PNG Icon
+    UPnpIcon *pngIconSm = new UPnpIcon();
+    pngIconSm->m_nDepth = 24;
+    pngIconSm->m_nHeight = 48;
+    pngIconSm->m_nWidth = 48;
+    pngIconSm->m_sMimeType = "image/png";
+    pngIconSm->m_sURL = "/images/icons/upnp_small_icon.png";
+    m_listIcons.append(pngIconSm);
+
+    // Small JPG Icon
+    UPnpIcon *jpgIconSm = new UPnpIcon();
+    jpgIconSm->m_nDepth = 24;
+    jpgIconSm->m_nHeight = 48;
+    jpgIconSm->m_nWidth = 48;
+    jpgIconSm->m_sMimeType = "image/jpg";
+    jpgIconSm->m_sURL = "/images/icons/upnp_small_icon.jpg";
+    m_listIcons.append(jpgIconSm);
 }
 
 UPnpDevice::~UPnpDevice()
