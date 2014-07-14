@@ -17,6 +17,7 @@ git://source.ffmpeg.org/ffmpeg.git at SHA1 f9c87262 on August 12th, 2013 (jya) (
 git://source.ffmpeg.org/ffmpeg.git at SHA1 3d79041f on May 4th, 2014 (jya) (release/1.2 branch, release 1.2.6))
 git://source.ffmpeg.org/ffmpeg.git at n2.2.2-30-gacafd18 on May 30th, 2014 (jya) (release/2.2 branch, release 2.2.2))
 git://source.ffmpeg.org/ffmpeg.git at n2.2.3 on May 6th, 2014 (jya) (release/2.2 branch, release 2.2.3))
+git://source.ffmpeg.org/ffmpeg.git at n2.2.3 on July 14th, 2014 (jya) (release/2.2 branch, release 2.2.4))
 
 List of files modified from original FFmpeg:
 Makefile
