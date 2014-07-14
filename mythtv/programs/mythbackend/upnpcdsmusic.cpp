@@ -84,7 +84,7 @@ UPnpCDSRootInfo UPnpCDSMusic::g_RootNodes[] =
             "GROUP BY a.album_name "
             "ORDER BY a.album_name",
         "WHERE song.album_id=:KEY",
-        "album.album_name",
+        "song.track",
         "object.container",
         "object.container.album.musicAlbum" },
 
@@ -401,7 +401,7 @@ CDSObject* UPnpCDSMusic::CreateContainer(const QString& sId,
     CDSObject *pContainer = NULL;
     if (sClass == "object.container.person.musicArtist")
     {
-        pContainer = CDSObject::CreateMusicGenre( sId, sTitle, m_sExtensionId );
+        pContainer = CDSObject::CreateMusicArtist( sId, sTitle, m_sExtensionId );
     }
     else if (sClass == "object.container.album.musicAlbum")
     {
