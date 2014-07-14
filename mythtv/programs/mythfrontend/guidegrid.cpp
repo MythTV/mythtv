@@ -811,7 +811,7 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
                 editRecSchedule();
         }
         else if (action == "EDIT")
-            editSchedule();
+            EditScheduled();
         else if (action == "CUSTOMEDIT")
             customEdit();
         else if (action == "DELETE")
@@ -1744,7 +1744,7 @@ void GuideGrid::customEvent(QEvent *event)
             }
             else if (resulttext == tr("Edit Schedule"))
             {
-                editSchedule();
+                EditScheduled();
             }
             else if (resulttext == tr("Show Upcoming"))
             {
@@ -2367,19 +2367,6 @@ void GuideGrid::editRecSchedule()
         return;
 
     EditRecording(pginfo);
-}
-
-void GuideGrid::editSchedule()
-{
-    ProgramInfo *pginfo = m_programInfos[m_currentRow][m_currentCol];
-
-    if (!pginfo)
-        return;
-
-    if (pginfo->GetTitle() == kUnknownTitle)
-        return;
-
-    EditScheduled(pginfo);
 }
 
 void GuideGrid::customEdit()

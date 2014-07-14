@@ -40,6 +40,7 @@ class ScheduleCommon : public MythScreenType
   protected slots:
     virtual void ShowUpcoming(void) const;
     virtual void ShowUpcomingScheduled(void) const;
+    virtual void EditScheduled(void);
 
   private:
     bool IsFindApplicable(const RecordingInfo &recInfo) const;

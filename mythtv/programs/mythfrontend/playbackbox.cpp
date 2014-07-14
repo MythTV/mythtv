@@ -2967,7 +2967,7 @@ MythMenu* PlaybackBox::createRecordingMenu(void)
 
     MythMenu *menu = new MythMenu(title, this, "slotmenu");
 
-    menu->AddItem(tr("Edit Recording Schedule"), SLOT(doEditScheduled()));
+    menu->AddItem(tr("Edit Recording Schedule"), SLOT(EditScheduled()));
 
     menu->AddItem(tr("Allow this episode to re-record"), SLOT(doAllowRerecord()));
 
@@ -3291,13 +3291,6 @@ void PlaybackBox::askStop(void)
         push_onto_del(m_delList, *pginfo);
         ShowDeletePopup(kStopRecording);
     }
-}
-
-void PlaybackBox::doEditScheduled()
-{
-    ProgramInfo *pginfo = GetCurrentProgram();
-    if (pginfo)
-        EditScheduled(pginfo);
 }
 
 /**
@@ -3917,7 +3910,7 @@ bool PlaybackBox::keyPressEvent(QKeyEvent *event)
         else if (action == "CHANGEGROUPVIEW")
             showViewChanger();
         else if (action == "EDIT")
-            doEditScheduled();
+            EditScheduled();
         else if (m_titleList.size() > 1)
         {
             if (action == "DELETE")

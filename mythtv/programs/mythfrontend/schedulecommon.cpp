@@ -126,6 +126,14 @@ void ScheduleCommon::QuickRecord(ProgramInfo *pginfo)
 /**
 *  \brief Creates a dialog for editing the recording schedule
 */
+void ScheduleCommon::EditScheduled(void)
+{
+    EditScheduled(GetCurrentProgram());
+}
+
+/**
+*  \brief Creates a dialog for editing the recording schedule
+*/
 void ScheduleCommon::EditScheduled(ProgramInfo *pginfo)
 {
     if (!pginfo)

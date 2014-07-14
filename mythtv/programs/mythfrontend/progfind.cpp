@@ -187,7 +187,7 @@ bool ProgFinder::keyPressEvent(QKeyEvent *event)
         handled = true;
 
         if (action == "EDIT")
-            edit();
+            EditScheduled();
         else if (action == "CUSTOMEDIT")
             customEdit();
         else if (action == "UPCOMING")
@@ -439,21 +439,6 @@ void ProgFinder::getInfo(bool toggle)
 
         // TODO: When schedule editor is non-blocking, move
         selectShowData(curPick->GetTitle(), m_timesList->GetCurrentPos());
-    }
-}
-
-void ProgFinder::edit()
-{
-    if (GetFocusWidget() == m_timesList)
-    {
-        ProgramInfo *curPick = m_showData[m_timesList->GetCurrentPos()];
-
-        if (curPick)
-        {
-            EditScheduled(curPick);
-            // TODO: When schedule editor is non-blocking, move
-            selectShowData(curPick->GetTitle(), m_timesList->GetCurrentPos());
-        }
     }
 }
 

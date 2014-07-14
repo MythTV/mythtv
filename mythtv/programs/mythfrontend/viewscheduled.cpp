@@ -161,7 +161,7 @@ bool ViewScheduled::keyPressEvent(QKeyEvent *event)
         handled = true;
 
         if (action == "EDIT")
-            edit();
+            EditScheduled();
         else if (action == "CUSTOMEDIT")
             customEdit();
         else if (action == "DELETE")
@@ -527,20 +527,6 @@ void ViewScheduled::updateInfo(MythUIButtonListItem *item)
             ratingState->DisplayState(rating);
         }
     }
-}
-
-void ViewScheduled::edit()
-{
-    MythUIButtonListItem *item = m_schedulesList->GetItemCurrent();
-
-    if (!item)
-        return;
-
-    ProgramInfo *pginfo = item->GetData().value<ProgramInfo*>();
-    if (!pginfo)
-        return;
-
-    EditScheduled(pginfo);
 }
 
 void ViewScheduled::customEdit()

@@ -174,7 +174,6 @@ class PlaybackBox : public ScheduleCommon
 
     void askStop();
 
-    void doEditScheduled();
     void doAllowRerecord();
 
     void askDelete();

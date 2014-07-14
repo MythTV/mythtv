@@ -154,7 +154,6 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
 
     void quickRecord();
     void editRecSchedule();
-    void editSchedule();
     void customEdit();
     void deleteRule();
     void previous();

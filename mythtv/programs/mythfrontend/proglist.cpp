@@ -253,8 +253,7 @@ bool ProgLister::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "EDIT")
         {
-            if (GetCurrentProgram())
-                ScheduleCommon::EditScheduled(GetCurrentProgram());
+            EditScheduled();
         }
         else if (action == "DELETE")
             ShowDeleteItemMenu();
