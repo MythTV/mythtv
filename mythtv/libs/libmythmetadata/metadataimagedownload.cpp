@@ -216,8 +216,7 @@ void MetadataImageDownload::run()
                 bool exists = false;
                 bool onMaster = false;
                 QString resolvedFN;
-                if ((lookup->GetHost().toLower() == gCoreContext->GetHostName().toLower()) ||
-                    (gCoreContext->IsThisHost(lookup->GetHost())))
+                if (gCoreContext->IsThisHost(lookup->GetHost()))
                 {
                     StorageGroup sg;
                     resolvedFN = sg.FindFile(filename);
