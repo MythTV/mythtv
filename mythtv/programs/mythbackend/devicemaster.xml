@@ -1,36 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root xmlns="urn:schemas-upnp-org:device-1-0" xmlns:mythtv="mythtv.org">
-   <specVersion>
-      <major>1</major>
-      <minor>0</minor>
-   </specVersion>
-   <device>
-      <!-- UDN auto generated -->
-      <friendlyName>MythTV AV Media Server</friendlyName>
-      <deviceType>urn:schemas-upnp-org:device:MediaServer:1</deviceType>
-      <manufacturer>MythTV</manufacturer>
-      <manufacturerURL>http://www.mythtv.org/</manufacturerURL>
-      <modelName>MythTV AV Media Server</modelName>
-      <!-- uncomment to override defaults <modelNumber>0.20</modelNumber> -->
-      <modelDescription>MythTV AV Media Server</modelDescription>
-      <modelURL>http://www.mythtv.org/</modelURL>
-      <presentationURL>/</presentationURL>
-      <dlna:X_DLNADOC xmlns:dlna="urn:schemas-dlna-org:device-1-0">DMS-1.00</dlna:X_DLNADOC>
-      <!-- uncomment to override defaults <serialNumber>MYTHTV-UPNP-01</serialNumber> -->
-      <deviceList>
-         <device>
-          <!-- UDN auto generated -->
-          <friendlyName>MythTV Master Media Server</friendlyName>
-          <deviceType>urn:schemas-mythtv-org:device:MasterMediaServer:1</deviceType>
-          <manufacturer>MythTV</manufacturer>
-          <manufacturerURL>http://www.mythtv.org/</manufacturerURL>
-          <modelName>MythTV Master Media Server</modelName>
-          <!-- uncomment to override defaults <modelNumber>0.20</modelNumber> -->
-          <modelDescription>MythTV AV Media Server</modelDescription>
-	  <modelURL>http://www.mythtv.org/</modelURL>
-	  <presentationURL>/</presentationURL>
-          <!-- uncomment to override defaults <serialNumber>MYTHTV-UPNP-01</serialNumber> -->
-         </device>
-      </deviceList>
-   </device>
+    <specVersion>
+        <major>1</major>
+        <minor>0</minor>
+    </specVersion>
+    <device>
+        <!-- UDN auto generated -->
+        <friendlyName>MythTV AV Media Server</friendlyName>
+        <deviceType>urn:schemas-upnp-org:device:MediaServer:1</deviceType>
+        <manufacturer>MythTV</manufacturer>
+        <manufacturerURL>http://www.mythtv.org/</manufacturerURL>
+        <modelName>MythTV AV Media Server</modelName>
+        <!-- uncomment to override defaults <modelNumber>0.20</modelNumber> -->
+        <modelDescription>MythTV AV Media Server</modelDescription>
+        <modelURL>http://www.mythtv.org/</modelURL>
+        <presentationURL>/</presentationURL>
+        <dlna:X_DLNADOC xmlns:dlna="urn:schemas-dlna-org:device-1-0">DMS-1.00</dlna:X_DLNADOC>
+        <!-- uncomment to override defaults <serialNumber>MYTHTV-UPNP-01</serialNumber> -->
+        <deviceList>
+            <device>
+            <!-- UDN auto generated -->
+            <friendlyName>MythTV Master Media Server</friendlyName>
+            <deviceType>urn:schemas-mythtv-org:device:MasterMediaServer:1</deviceType>
+            <manufacturer>MythTV</manufacturer>
+            <manufacturerURL>http://www.mythtv.org/</manufacturerURL>
+            <modelName>MythTV Master Media Server</modelName>
+            <!-- uncomment to override defaults <modelNumber>0.20</modelNumber> -->
+            <modelDescription>MythTV AV Media Server</modelDescription>
+            <modelURL>http://www.mythtv.org/</modelURL>
+            <presentationURL>/</presentationURL>
+            <!-- uncomment to override defaults <serialNumber>MYTHTV-UPNP-01</serialNumber> -->
+            </device>
+        </deviceList>
+    </device>
 </root>
