@@ -644,7 +644,7 @@ bool MythCoreContext::IsThisHost(const QString &addr, const QString &host)
     QString thisip  = GetBackendServerIP4(host);
     QString thisip6 = GetBackendServerIP6(host);
 
-    return (!addrfix.isNull() && (addrstr == thisip) || (addrstr == thisip6));
+    return !addrfix.isNull() && ((addrstr == thisip) || (addrstr == thisip6));
 }
 
 bool MythCoreContext::IsFrontendOnly(void)
