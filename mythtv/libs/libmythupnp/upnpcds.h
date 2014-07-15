@@ -268,7 +268,7 @@ class UPNP_PUBLIC UPnpCDS : public Eventing
         // Implement UPnpServiceImpl methods that we can
 
         virtual QString GetServiceType      () { return "urn:schemas-upnp-org:service:ContentDirectory:1"; }
-        virtual QString GetServiceId        () { return "urn:upnp-org:serviceId:CDS_1-0"; }
+        virtual QString GetServiceId        () { return "urn:upnp-org:serviceId:ContentDirectory"; }
         virtual QString GetServiceControlURL() { return m_sControlUrl.mid( 1 ); }
         virtual QString GetServiceDescURL   () { return m_sControlUrl.mid( 1 ) + "/GetServDesc"; }
 
