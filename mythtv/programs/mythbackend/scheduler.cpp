@@ -1898,8 +1898,8 @@ void Scheduler::run(void)
                             "(s2n: %2 sr: %3 qr: %4 cs: %5)")
                     .arg(sched_sleep).arg(secs_to_next).arg(schedRunTime)
                     .arg(haveRequests).arg(checkSlaves));
-                reschedWait.wait(&schedLock, sched_sleep);
-                continue;
+                if (reschedWait.wait(&schedLock, sched_sleep))
+                    continue;
             }
         }
         else
