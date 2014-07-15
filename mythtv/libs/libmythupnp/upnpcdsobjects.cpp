@@ -867,11 +867,11 @@ CDSObject *CDSObject::CreateStorageSystem( QString sId, QString sTitle, QString 
 
     CreateContainer( sId, sTitle, sParentId, pObject );
 
-    pObject->AddProperty( new Property( "storageTotal"       , "upnp", true )); 
-    pObject->AddProperty( new Property( "storageUsed"        , "upnp", true )); 
-    pObject->AddProperty( new Property( "storageFree"        , "upnp", true )); 
-    pObject->AddProperty( new Property( "storageMaxPartition", "upnp", true )); 
-    pObject->AddProperty( new Property( "storageMedium"      , "upnp", true )); 
+    pObject->AddProperty( new Property( "storageTotal"       , "upnp", true, "-1"  ));
+    pObject->AddProperty( new Property( "storageUsed"        , "upnp", true, "-1"  ));
+    pObject->AddProperty( new Property( "storageFree"        , "upnp", true, "-1"  ));
+    pObject->AddProperty( new Property( "storageMaxPartition", "upnp", true, "-1"  ));
+    pObject->AddProperty( new Property( "storageMedium"      , "upnp", true, "HDD" ));
 
     return( pObject );
 }
@@ -888,10 +888,10 @@ CDSObject *CDSObject::CreateStorageVolume( QString sId, QString sTitle, QString 
 
     CreateContainer( sId, sTitle, sParentId, pObject );
 
-    pObject->AddProperty( new Property( "storageTotal" , "upnp", true ));
-    pObject->AddProperty( new Property( "storageUsed"  , "upnp", true ));
-    pObject->AddProperty( new Property( "storageFree"  , "upnp", true ));        
-    pObject->AddProperty( new Property( "storageMedium", "upnp", true ));        
+    pObject->AddProperty( new Property( "storageTotal" , "upnp", true, "-1"  ));
+    pObject->AddProperty( new Property( "storageUsed"  , "upnp", true, "-1"  ));
+    pObject->AddProperty( new Property( "storageFree"  , "upnp", true, "-1"  ));
+    pObject->AddProperty( new Property( "storageMedium", "upnp", true, "HDD" ));
 
     return( pObject );
 }
@@ -908,7 +908,7 @@ CDSObject *CDSObject::CreateStorageFolder( QString sId, QString sTitle, QString 
 
     CreateContainer( sId, sTitle, sParentId, pObject );
 
-    pObject->AddProperty( new Property( "storageUsed", "upnp", true ));
+    pObject->AddProperty( new Property( "storageUsed", "upnp", true, "-1" ));
 
     return( pObject );
 }
