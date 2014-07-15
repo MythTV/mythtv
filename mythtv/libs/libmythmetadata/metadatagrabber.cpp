@@ -169,8 +169,6 @@ MetaGrabberScript MetaGrabberScript::GetGrabber(GrabberType defaultType,
         return GetType(defaultType);
     }
 
-    MetaGrabberScript grabber;
-
     if (!lookup->GetInetref().isEmpty() &&
         lookup->GetInetref() != "00000000")
     {
