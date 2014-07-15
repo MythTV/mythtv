@@ -653,8 +653,10 @@ static int shutdown()
 
     if (dtWakeupTime.isValid())
     {
-        // dont't shutdown if we are within 15 mins of the next wakeup time
-        if (dtCurrent.secsTo(dtWakeupTime) > 15 * 60)
+        // dont't shutdown if we are within idleWait mins of the next wakeup time
+        int idleWaitForRecordingTime =
+                    gCoreContext->GetNumSetting("idleWaitForRecordingTime", 15);
+        if (dtCurrent.secsTo(dtWakeupTime) > idleWaitForRecordingTime * 60)
         {
             QString nvramCommand =
                 gCoreContext->GetSetting(
