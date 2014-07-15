@@ -1883,7 +1883,8 @@ void Scheduler::run(void)
         if (idleTimeoutSecs > 0)
             sched_sleep = min(sched_sleep, 15000);
         bool haveRequests = HaveQueuedRequests();
-        bool checkSlaves = lastSleepCheck.secsTo(curtime) >= 300;
+        int const kSleepCheck = 300;
+        bool checkSlaves = lastSleepCheck.secsTo(curtime) >= kSleepCheck;
 
         // If we're about to start a recording don't do any reschedules...
         // instead sleep for a bit
@@ -1897,8 +1898,8 @@ void Scheduler::run(void)
                             "(s2n: %2 sr: %3 qr: %4 cs: %5)")
                     .arg(sched_sleep).arg(secs_to_next).arg(schedRunTime)
                     .arg(haveRequests).arg(checkSlaves));
-                if (reschedWait.wait(&schedLock, sched_sleep))
-                    continue;
+                reschedWait.wait(&schedLock, sched_sleep);
+                continue;
             }
         }
         else
@@ -1949,7 +1950,7 @@ void Scheduler::run(void)
         }
 
         nextStartTime = MythDate::current().addDays(14);
-        nextWakeTime = lastSleepCheck.addSecs(300);
+        nextWakeTime = lastSleepCheck.addSecs(kSleepCheck);
 
         // Skip past recordings that are already history
         // (i.e. AddHistory() has been called setting oldrecstatus)
@@ -2004,6 +2005,12 @@ void Scheduler::run(void)
             HandleIdleShutdown(blockShutdown, idleSince, prerollseconds,
                                idleTimeoutSecs, idleWaitForRecordingTime,
                                statuschanged);
+            if (idleSince.isValid())
+            {
+                nextWakeTime = MythDate::current().addSecs(
+                    (idleSince.addSecs(idleTimeoutSecs - 10) <= curtime) ? 1 :
+                    (idleSince.addSecs(idleTimeoutSecs - 30) <= curtime) ? 5 : 10);
+            }
         }
 
         statuschanged = false;
@@ -2718,13 +2725,19 @@ void Scheduler::HandleIdleShutdown(
         }
 
         // If there are BLOCKING clients, then we're not idle
-        if (!(m_mainServer->isClientConnected(true)) && !recording)
+        bool blocking = m_mainServer->isClientConnected(true);
+        if (!blocking && !recording)
         {
             // have we received a RESET_IDLETIME message?
             resetIdleTime_lock.lock();
             if (resetIdleTime)
             {
                 // yes - so reset the idleSince time
+                if (idleSince.isValid())
+                {
+                    MythEvent me(QString("SHUTDOWN_COUNTDOWN -1"));
+                    gCoreContext->dispatch(me);
+                }
                 idleSince = QDateTime();
                 resetIdleTime = false;
             }
@@ -2732,7 +2745,8 @@ void Scheduler::HandleIdleShutdown(
 
             if (statuschanged || !idleSince.isValid())
             {
-                if (!idleSince.isValid())
+                bool wasValid = idleSince.isValid();
+                if (!wasValid)
                     idleSince = curtime;
 
                 RecIter idleIter = reclist.begin();
@@ -2747,9 +2761,9 @@ void Scheduler::HandleIdleShutdown(
                         prerollseconds) <
                         ((idleWaitForRecordingTime * 60) + idleTimeoutSecs))
                     {
-                        LOG(VB_GENERAL, LOG_NOTICE, "Blocking shutdown because "
-                                                    "a recording is due to "
-                                                    "start soon.");
+                        LOG(VB_IDLE, LOG_NOTICE, "Blocking shutdown because "
+                                                 "a recording is due to "
+                                                 "start soon.");
                         idleSince = QDateTime();
                     }
                 }
@@ -2766,11 +2780,21 @@ void Scheduler::HandleIdleShutdown(
                         (curtime.secsTo(guideRunTime) <
                         (idleWaitForRecordingTime * 60)))
                     {
-                        LOG(VB_GENERAL, LOG_NOTICE, "Blocking shutdown because "
-                                                    "mythfilldatabase is due to "
-                                                    "run soon.");
+                        LOG(VB_IDLE, LOG_NOTICE, "Blocking shutdown because "
+                                                 "mythfilldatabase is due to "
+                                                 "run soon.");
                         idleSince = QDateTime();
                     }
+                }
+
+                // Before starting countdown check shutdown is OK
+                if (idleSince.isValid())
+                    CheckShutdownServer(prerollseconds, idleSince, blockShutdown);
+
+                if (wasValid && !idleSince.isValid())
+                {
+                    MythEvent me(QString("SHUTDOWN_COUNTDOWN -1"));
+                    gCoreContext->dispatch(me);
                 }
             }
 
@@ -2795,19 +2819,23 @@ void Scheduler::HandleIdleShutdown(
                             m_isShuttingDown = false;
                         }
                     }
-                    else if (!m_isShuttingDown &&
-                             CheckShutdownServer(prerollseconds,
+                    else if (CheckShutdownServer(prerollseconds,
                                                  idleSince,
                                                  blockShutdown))
                     {
                         ShutdownServer(prerollseconds, idleSince);
+                    }
+                    else
+                    {
+                        MythEvent me(QString("SHUTDOWN_COUNTDOWN -1"));
+                        gCoreContext->dispatch(me);
                     }
                 }
                 else
                 {
                     int itime = idleSince.secsTo(curtime);
                     QString msg;
-                    if (itime == 1)
+                    if (itime <= 1)
                     {
                         msg = QString("I\'m idle now... shutdown will "
                                       "occur in %1 seconds.")
@@ -2817,7 +2845,7 @@ void Scheduler::HandleIdleShutdown(
                                      .arg(idleTimeoutSecs));
                         gCoreContext->dispatch(me);
                     }
-                    else if (itime % 10 == 0)
+                    else
                     {
                         msg = QString("%1 secs left to system shutdown!")
                             .arg(idleTimeoutSecs - itime);
@@ -2831,6 +2859,13 @@ void Scheduler::HandleIdleShutdown(
         }
         else
         {
+            if (blocking)
+                LOG(VB_IDLE, LOG_NOTICE, "Blocking shutdown because "
+                                         "of a connected client");
+            else if (recording)
+                LOG(VB_IDLE, LOG_NOTICE, "Blocking shutdown because "
+                                         "of an active encoder");
+
             // not idle, make the time invalid
             if (idleSince.isValid())
             {
@@ -2854,43 +2889,45 @@ bool Scheduler::CheckShutdownServer(int prerollseconds, QDateTime &idleSince,
     {
         uint state = myth_system(preSDWUCheckCommand);
 
-        if (state != GENERIC_EXIT_NOT_OK)
+        switch(state)
         {
-            retval = false;
-            switch(state)
-            {
-                case 0:
-                    LOG(VB_GENERAL, LOG_INFO,
-                        "CheckShutdownServer returned - OK to shutdown");
-                    retval = true;
-                    break;
-                case 1:
-                    LOG(VB_IDLE, LOG_NOTICE,
-                        "CheckShutdownServer returned - Not OK to shutdown");
-                    // just reset idle'ing on retval == 1
-                    idleSince = QDateTime();
-                    break;
-                case 2:
-                    LOG(VB_IDLE, LOG_NOTICE,
-                        "CheckShutdownServer returned - Not OK to shutdown, "
-                        "need reconnect");
-                    // reset shutdown status on retval = 2
-                    // (needs a clientconnection again,
-                    // before shutdown is executed)
-                    blockShutdown =
-                        gCoreContext->GetNumSetting("blockSDWUwithoutClient",
-                                                    1);
-                    idleSince = QDateTime();
-                    break;
+            case 0:
+                LOG(VB_IDLE, LOG_INFO,
+                    "CheckShutdownServer returned - OK to shutdown");
+                retval = true;
+                break;
+            case 1:
+                LOG(VB_IDLE, LOG_NOTICE,
+                    "CheckShutdownServer returned - Not OK to shutdown");
+                // just reset idle'ing on retval == 1
+                idleSince = QDateTime();
+                break;
+            case 2:
+                LOG(VB_IDLE, LOG_NOTICE,
+                    "CheckShutdownServer returned - Not OK to shutdown, "
+                    "need reconnect");
+                // reset shutdown status on retval = 2
+                // (needs a clientconnection again,
+                // before shutdown is executed)
+                blockShutdown =
+                    gCoreContext->GetNumSetting("blockSDWUwithoutClient",
+                                                1);
+                idleSince = QDateTime();
+                break;
 #if 0
-                case 3:
-                    //disable shutdown routine generally
-                    m_noAutoShutdown = true;
-                    break;
+            case 3:
+                //disable shutdown routine generally
+                m_noAutoShutdown = true;
+                break;
 #endif
-                default:
-                    break;
-            }
+            case GENERIC_EXIT_NOT_OK:
+                LOG(VB_GENERAL, LOG_NOTICE,
+                    "CheckShutdownServer returned - Not OK");
+                break;
+            default:
+                LOG(VB_GENERAL, LOG_NOTICE, QString(
+                    "CheckShutdownServer returned - Error %1").arg(state));
+                break;
         }
     }
     else
@@ -2956,7 +2993,7 @@ void Scheduler::ShutdownServer(int prerollseconds, QDateTime &idleSince)
 
         LOG(VB_GENERAL, LOG_NOTICE,
             QString("Running the command to set the next "
-                    "scheduled wakeup time :-\n\t\t\t\t\t\t") + setwakeup_cmd);
+                    "scheduled wakeup time :-\n\t\t\t\t") + setwakeup_cmd);
 
         // now run the command to set the wakeup time
         if (myth_system(setwakeup_cmd) != GENERIC_EXIT_OK)
@@ -2987,16 +3024,14 @@ void Scheduler::ShutdownServer(int prerollseconds, QDateTime &idleSince)
 
         LOG(VB_GENERAL, LOG_NOTICE,
             QString("Running the command to shutdown "
-                    "this computer :-\n\t\t\t\t\t\t") + halt_cmd);
+                    "this computer :-\n\t\t\t\t") + halt_cmd);
 
         // and now shutdown myself
         schedLock.unlock();
         uint res = myth_system(halt_cmd);
         schedLock.lock();
-        if (res == GENERIC_EXIT_OK)
-            return;
-
-        LOG(VB_GENERAL, LOG_ERR, "ServerHaltCommand failed, shutdown aborted");
+        if (res != GENERIC_EXIT_OK)
+            LOG(VB_GENERAL, LOG_ERR, "ServerHaltCommand failed, shutdown aborted");
     }
 
     // If we make it here then either the shutdown failed
