@@ -253,7 +253,6 @@ void IdleScreen::customEvent(QEvent* event)
     if ((MythEvent::Type)(event->type()) == MythEvent::MythEventMessage)
     {
         MythEvent *me = static_cast<MythEvent *>(event);
-        LOG(VB_GENERAL, LOG_INFO, me->Message());
 
         if (me->Message().startsWith("RECONNECT_"))
         {
