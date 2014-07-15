@@ -141,7 +141,7 @@
                         <filename>watermark/play.png</filename>
                     </imagetype>
                     <textarea name="status">
-                        <area>550,10,440,80</area>
+                        <area>550,10,600,80</area>
                         <font>basemedium</font>
                         <align>left,vcenter</align>
                         <value>Backend is idle</value>
