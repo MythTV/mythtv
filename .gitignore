@@ -35,3 +35,4 @@ release
 *.manifest
 bin
 *.ipch
+.directory
