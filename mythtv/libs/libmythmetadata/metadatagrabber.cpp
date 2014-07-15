@@ -173,7 +173,7 @@ MetaGrabberScript MetaGrabberScript::GetGrabber(GrabberType defaultType,
         lookup->GetInetref() != "00000000")
     {
         // inetref is defined, see if we have a pre-defined grabber
-        MetaGrabberScript grabber = lookup->GetInetref();
+        MetaGrabberScript grabber = FromInetref(lookup->GetInetref());
 
         if (grabber.IsValid())
         {
