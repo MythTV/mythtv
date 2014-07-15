@@ -423,6 +423,37 @@ ArtworkList MetadataLookup::GetArtwork(VideoArtworkType type) const
     return ret;
 }
 
+LookupType MetadataLookup::GetSubtype() const
+{
+    if (m_inetref.isEmpty() ||
+        m_inetref == MetaGrabberScript::CleanedInetref(m_inetref) ||
+        (m_subtype != kProbableMovie && m_subtype != kProbableTelevision &&
+         m_subtype != kProbableGenericTelevision))
+    {
+        // can't determine subtype from inetref
+        return m_subtype;
+    }
+
+    MetaGrabberScript grabber =
+        MetaGrabberScript::GetGrabber(m_subtype == kProbableMovie ?
+                                        kGrabberMovie : kGrabberTelevision,
+                                      this);
+
+    if (!grabber.IsValid())
+    {
+        return m_subtype;
+    }
+    switch (grabber.GetType())
+    {
+        case kGrabberMovie:
+            return kProbableMovie;
+        case kGrabberTelevision:
+            return kProbableTelevision;
+        default:
+            return m_subtype;
+    }
+}
+
 void MetadataLookup::toMap(InfoMap &metadataMap)
 {
     metadataMap["filename"] = m_filename;
