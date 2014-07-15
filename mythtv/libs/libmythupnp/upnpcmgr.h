@@ -64,7 +64,7 @@ class UPNP_PUBLIC UPnpCMGR : public Eventing
         // Implement UPnpServiceImpl methods that we can
 
         virtual QString GetServiceType      () { return "urn:schemas-upnp-org:service:ConnectionManager:1"; }
-        virtual QString GetServiceId        () { return "urn:upnp-org:serviceId:CMGR_1-0"; }
+        virtual QString GetServiceId        () { return "urn:upnp-org:serviceId:ConnectionManager"; }
         virtual QString GetServiceControlURL() { return m_sControlUrl.mid( 1 ); }
         virtual QString GetServiceDescURL   () { return m_sControlUrl.mid( 1 ) + "/GetServDesc"; }
 
