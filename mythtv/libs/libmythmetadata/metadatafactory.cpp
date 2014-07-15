@@ -313,7 +313,7 @@ void MetadataFactory::OnSingleResult(MetadataLookup *lookup)
             map.insert(kArtworkBanner, info);
         }
 
-        if (!lookup->GetType() == kMetadataRecording)
+        if (lookup->GetType() != kMetadataRecording)
         {
             ArtworkList screenshotlist = lookup->GetArtwork(kArtworkScreenshot);
             if (screenshotlist.size())
