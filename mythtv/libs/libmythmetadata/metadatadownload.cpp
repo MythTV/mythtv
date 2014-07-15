@@ -654,58 +654,36 @@ MetadataLookupList MetadataDownload::handleRecordingGeneric(MetadataLookup *look
     return list;
 }
 
-QString MetadataDownload::getMXMLPath(QString filename)
+static QString getNameWithExtension(const QString &filename, const QString &type)
 {
     QString ret;
-    QString xmlname;
+    QString newname;
     QUrl qurl(filename);
     QString ext = QFileInfo(qurl.path()).suffix();
-    xmlname = filename.left(filename.size() - ext.size()) + "mxml";
-    QUrl xurl(xmlname);
 
-    if (RemoteFile::isLocal(xmlname) ||
-        (xmlname.startsWith("myth://") &&
-         !gCoreContext->IsThisHost(qurl.host())))
+    if (ext.isEmpty())
     {
-        if (RemoteFile::Exists(xmlname))
-            ret = xmlname;
+        // no extension, assume it is a directory
+        newname = filename + "/" + QFileInfo(qurl.path()).fileName() + "." + type;
     }
     else
     {
-        StorageGroup sg;
-        QString fn = sg.FindFile(xurl.path());
-
-        if (!fn.isEmpty() && QFile::exists(fn))
-            ret = xmlname;
+        newname = filename.left(filename.size() - ext.size()) + type;
     }
+    QUrl xurl(newname);
+
+    if (RemoteFile::Exists(newname))
+        ret = newname;
 
     return ret;
 }
 
+QString MetadataDownload::getMXMLPath(QString filename)
+{
+    return getNameWithExtension(filename, "mxml");
+}
+
 QString MetadataDownload::getNFOPath(QString filename)
 {
-    QString ret;
-    QString nfoname;
-    QUrl qurl(filename);
-    QString ext = QFileInfo(qurl.path()).suffix();
-    nfoname = filename.left(filename.size() - ext.size()) + "nfo";
-    QUrl nurl(nfoname);
-
-    if (RemoteFile::isLocal(nfoname) ||
-        (nfoname.startsWith("myth://") &&
-         !gCoreContext->IsThisHost(qurl.host())))
-    {
-        if (RemoteFile::Exists(nfoname))
-            ret = nfoname;
-    }
-    else
-    {
-        StorageGroup sg;
-        QString fn = sg.FindFile(nurl.path());
-
-        if (!fn.isEmpty() && QFile::exists(fn))
-            ret = nfoname;
-    }
-
-    return ret;
+    return getNameWithExtension(filename, "nfo");
 }
