@@ -49,6 +49,10 @@ class UPnpCDSVideo : public UPnpCDSExtension
                                           bool                     bAddRef, 
                                           MSqlQuery               &query );
 
+        virtual CDSObject       *CreateContainer( const QString &sId,
+                                                  const QString &sTitle,
+                                                  const QString &sParentId,
+                                                  const QString &sClass );
     public:
 
         UPnpCDSVideo( ) : UPnpCDSExtension( "Videos", "Videos",

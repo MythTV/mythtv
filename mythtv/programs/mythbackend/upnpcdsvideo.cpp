@@ -625,3 +625,16 @@ void UPnpCDSVideo::AddItem( const UPnpCDSRequest    *pRequest,
 
     pRes->AddAttribute( "duration"  , sDur      );
 }
+
+CDSObject* UPnpCDSVideo::CreateContainer(const QString& sId, const QString& sTitle, const QString& sParentId, const QString& sClass)
+{
+    CDSObject *pContainer = NULL;
+    if (sClass == "object.container.person.movieGenre")
+    {
+        pContainer = CDSObject::CreateMovieGenre(sId, sTitle, m_sExtensionId );
+    }
+    else
+        pContainer = UPnpCDSExtension::CreateContainer(sId, sTitle, sParentId, sClass);
+
+    return pContainer;
+}
