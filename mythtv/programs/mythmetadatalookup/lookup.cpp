@@ -172,7 +172,7 @@ void LookerUpper::HandleAllArtwork(bool aggressive)
         if (type == kProbableMovie)
            maxartnum = 2;
 
-        if ((!aggressive && type == kProbableGenericTelevision) ||
+        if ((aggressive && type != kProbableGenericTelevision) ||
              pginfo->GetRecordingGroup() == "Deleted" ||
              pginfo->GetRecordingGroup() == "LiveTV")
             dolookup = false;
@@ -252,7 +252,7 @@ void LookerUpper::customEvent(QEvent *levent)
                     pginfo->GetSeriesID() == (list[p])->GetTMSref())
                 {
                     MetadataLookup *lookup = list[p];
-                    if (!lookup->GetSubtype() == kProbableGenericTelevision)
+                    if (lookup->GetSubtype() != kProbableGenericTelevision)
                         pginfo->SaveSeasonEpisode(lookup->GetSeason(), lookup->GetEpisode());
                     pginfo->SaveInetRef(lookup->GetInetref());
                     m_busyRecList.removeAll(pginfo);
@@ -281,7 +281,7 @@ void LookerUpper::customEvent(QEvent *levent)
             {
                 MetadataLookup *lookup = list[yearindex];
                 ProgramInfo *pginfo = qVariantValue<ProgramInfo *>(lookup->GetData());
-                if (!lookup->GetSubtype() == kProbableGenericTelevision)
+                if (lookup->GetSubtype() != kProbableGenericTelevision)
                     pginfo->SaveSeasonEpisode(lookup->GetSeason(), lookup->GetEpisode());
                 pginfo->SaveInetRef(lookup->GetInetref());
                 m_busyRecList.removeAll(pginfo);
@@ -338,7 +338,7 @@ void LookerUpper::customEvent(QEvent *levent)
         LOG(VB_GENERAL, LOG_DEBUG,
             QString("        User Rating: %1").arg(lookup->GetUserRating()));
 
-        if (!lookup->GetSubtype() == kProbableGenericTelevision)
+        if (lookup->GetSubtype() != kProbableGenericTelevision)
             pginfo->SaveSeasonEpisode(lookup->GetSeason(), lookup->GetEpisode());
         pginfo->SaveInetRef(lookup->GetInetref());
 
