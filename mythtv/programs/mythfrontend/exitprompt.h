@@ -17,5 +17,6 @@ class ExitPrompter : public QObject
     void quit(void);
     void halt(void);
     void reboot(void);
+    void standby(void);
     void handleExit(void);
 };

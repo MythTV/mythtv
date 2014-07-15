@@ -320,7 +320,9 @@ void MythThemedMenu::ShowMenu()
     if (QCoreApplication::applicationName() == MYTH_APPNAME_MYTHFRONTEND)
         m_menuPopup->AddButton(tr("Enter standby mode"), QVariant("standby"));
 
-    m_menuPopup->AddButton(tr("Exit application"), QVariant("exit"));
+    // don't show the exit application option if standby option is enabled
+    if (override_menu != 7)
+        m_menuPopup->AddButton(tr("Exit application"), QVariant("exit"));
 
     switch (override_menu)
     {
@@ -340,6 +342,7 @@ void MythThemedMenu::ShowMenu()
             m_menuPopup->AddButton(tr("Reboot"), QVariant("reboot"));
             break;
         case 0:
+        case 7:
         default:
             break;
     }

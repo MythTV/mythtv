@@ -153,6 +153,11 @@ void ExitPrompter::reboot()
         myth_system("sudo /sbin/reboot");
 }
 
+void ExitPrompter::standby()
+{
+    GetMythMainWindow()->IdleTimeout();
+}
+
 void ExitPrompter::handleExit()
 {
     // HACK IsFrontendOnly() triggers a popup if there is no BE connection.
@@ -170,6 +175,7 @@ void ExitPrompter::handleExit()
     bool allowExit     = false;
     bool allowReboot   = false;
     bool allowShutdown = false;
+    bool allowStandby  = false;
 
     switch (gCoreContext->GetNumSetting("OverrideExitMenu", 0))
     {
@@ -200,6 +206,9 @@ void ExitPrompter::handleExit()
             allowReboot   = true;
             allowShutdown = true;
             break;
+        case 7:
+            allowStandby = true;
+            break;
     }
 
     MythScreenStack *ss = GetMythMainWindow()->GetStack("popup stack");
@@ -220,6 +229,8 @@ void ExitPrompter::handleExit()
         dlg->AddButton(tr("Yes, Exit and Reboot"),   SLOT(reboot()));
     if (allowShutdown)
         dlg->AddButton(tr("Yes, Exit and Shutdown"), SLOT(halt()));
+    if (allowStandby)
+        dlg->AddButton(tr("Yes, Enter Standby Mode"), SLOT(standby()));
 
     // This is a hack so that the button clicks target the correct slot:
     dlg->SetReturnEvent(this, QString());

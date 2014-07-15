@@ -1870,6 +1870,7 @@ static HostComboBox *OverrideExitMenu()
     gc->addSelection(MainGeneralSettings::tr("Show shutdown"), "4");
     gc->addSelection(MainGeneralSettings::tr("Show reboot"), "5");
     gc->addSelection(MainGeneralSettings::tr("Show reboot and shutdown"), "6");
+    gc->addSelection(MainGeneralSettings::tr("Show standby"), "7");
 
     gc->setHelpText(
         MainGeneralSettings::tr("By default, only remote frontends are shown "
