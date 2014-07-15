@@ -1379,7 +1379,7 @@ CDSObject* UPnpCDSExtension::CreateContainer(const QString& sId,
 {
     CDSObject* pContainer = NULL;
 
-    if (sClass == "object.container.person")
+    if (sClass.startsWith("object.container.person"))
     {
         pContainer = CDSObject::CreatePerson( sId, sTitle, sParentId );
     }
@@ -1387,11 +1387,11 @@ CDSObject* UPnpCDSExtension::CreateContainer(const QString& sId,
     {
         pContainer = CDSObject::CreatePlaylistContainer( sId, sTitle, sParentId );
     }
-    else if (sClass == "object.container.album")
+    else if (sClass.startsWith("object.container.album"))
     {
         pContainer = CDSObject::CreateAlbum( sId, sTitle, sParentId );
     }
-    else if (sClass == "object.container.genre")
+    else if (sClass.startsWith("object.container.genre"))
     {
         pContainer = CDSObject::CreateGenre( sId, sTitle, sParentId );
     }
