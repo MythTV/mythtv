@@ -471,6 +471,11 @@ MetadataLookupList MetaGrabberScript::RunGrabber(const QStringList &args,
             MetadataLookup *tmp = ParseMetadataItem(item, lookup, passseas);
             tmp->SetInetref(QString("%1_%2").arg(m_command)
                                             .arg(tmp->GetInetref()));
+            if (!tmp->GetCollectionref().isEmpty())
+            {
+                tmp->SetCollectionref(QString("%1_%2").arg(m_command)
+                                .arg(tmp->GetCollectionref()));
+            }
             list.append(tmp);
             // MetadataLookup is to be owned by the list
             tmp->DecrRef();
