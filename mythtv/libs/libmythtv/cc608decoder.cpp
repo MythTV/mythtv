@@ -844,7 +844,7 @@ int CC608Decoder::NewRowCC(int mode, int len)
     lastrow[mode] = newrow[mode];
     newrow[mode] = 0;
 
-    int limit = (newattr[mode] ? newcol[mode] - 1 : newcol[mode]);
+    int limit = newcol[mode];
     for (int x = 0; x < limit; x++)
     {
         ccbuf[mode] += ' ';
