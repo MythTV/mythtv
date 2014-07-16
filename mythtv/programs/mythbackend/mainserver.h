@@ -35,21 +35,21 @@ class FileSystemInfo;
 class MetadataFactory;
 class FreeSpaceUpdater;
 
-class DeleteStruct 
+class DeleteStruct
 {
     friend class MainServer;
   public:
     DeleteStruct(MainServer *ms, QString filename, QString title,
-                 uint chanid, QDateTime recstartts, QDateTime recendts, 
-                 bool forceMetadataDelete) : 
-        m_ms(ms), m_filename(filename), m_title(title), 
-        m_chanid(chanid), m_recstartts(recstartts), 
+                 uint chanid, QDateTime recstartts, QDateTime recendts,
+                 bool forceMetadataDelete) :
+        m_ms(ms), m_filename(filename), m_title(title),
+        m_chanid(chanid), m_recstartts(recstartts),
         m_recendts(recendts),
         m_forceMetadataDelete(forceMetadataDelete), m_fd(-1), m_size(0)
     {
     }
 
-    DeleteStruct(MainServer *ms, QString filename, int fd, off_t size) : 
+    DeleteStruct(MainServer *ms, QString filename, int fd, off_t size) :
         m_ms(ms), m_filename(filename), m_chanid(0),
         m_forceMetadataDelete(false), m_fd(fd), m_size(size)
     {
@@ -71,7 +71,7 @@ class DeleteThread : public QRunnable, public DeleteStruct
 {
   public:
     DeleteThread(MainServer *ms, QString filename, QString title, uint chanid,
-                 QDateTime recstartts, QDateTime recendts, 
+                 QDateTime recstartts, QDateTime recendts,
                  bool forceMetadataDelete) :
                      DeleteStruct(ms, filename, title, chanid, recstartts,
                                   recendts, forceMetadataDelete)  {}
@@ -163,7 +163,7 @@ class MainServer : public QObject, public MythSocketCBs
     void HandleUndeleteRecording(QStringList &slist, PlaybackSock *pbs);
     void DoHandleUndeleteRecording(RecordingInfo &recinfo, PlaybackSock *pbs);
     void HandleForgetRecording(QStringList &slist, PlaybackSock *pbs);
-    void HandleRescheduleRecordings(const QStringList &request, 
+    void HandleRescheduleRecordings(const QStringList &request,
                                     PlaybackSock *pbs);
     void HandleGoToSleep(PlaybackSock *pbs);
     void HandleQueryFreeSpace(PlaybackSock *pbs, bool allBackends);
@@ -205,11 +205,11 @@ class MainServer : public QObject, public MythSocketCBs
     void HandleLockTuner(PlaybackSock *pbs, int cardid = -1);
     void HandleFreeTuner(int cardid, PlaybackSock *pbs);
     void HandleCutMapQuery(const QString &chanid, const QString &starttime,
-                           PlaybackSock *pbs, bool commbreak);
+                           PlaybackSock *pbs, bool commbreak, int offsettype = 0);
     void HandleCommBreakQuery(const QString &chanid, const QString &starttime,
-                              PlaybackSock *pbs);
+                              PlaybackSock *pbs, int offsettype = 0);
     void HandleCutlistQuery(const QString &chanid, const QString &starttime,
-                            PlaybackSock *pbs);
+                            PlaybackSock *pbs, int offsettype = 0);
     void HandleBookmarkQuery(const QString &chanid, const QString &starttime,
                              PlaybackSock *pbs);
     void HandleSetBookmark(QStringList &tokens, PlaybackSock *pbs);

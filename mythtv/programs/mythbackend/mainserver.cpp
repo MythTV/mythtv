@@ -781,17 +781,35 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     }
     else if (command == "QUERY_COMMBREAK")
     {
-        if (tokens.size() != 3)
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Bad QUERY_COMMBREAK");
-        else
+        if (tokens.size() == 3)
             HandleCommBreakQuery(tokens[1], tokens[2], pbs);
+        else if (tokens.size() == 4)
+        {
+            if (tokens[3] == "Position")
+                HandleCommBreakQuery(tokens[1], tokens[2], pbs, 1);
+            else if (tokens[3] == "Duration")
+                HandleCommBreakQuery(tokens[1], tokens[2], pbs, 2);
+            else
+                HandleCommBreakQuery(tokens[1], tokens[2], pbs);
+        }
+        else
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Bad QUERY_COMMBREAK");
     }
     else if (command == "QUERY_CUTLIST")
     {
-        if (tokens.size() != 3)
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Bad QUERY_CUTLIST");
-        else
+        if (tokens.size() == 3)
             HandleCutlistQuery(tokens[1], tokens[2], pbs);
+        else if (tokens.size() == 4)
+        {
+            if (tokens[3] == "Position")
+                HandleCutlistQuery(tokens[1], tokens[2], pbs, 1);
+            else if (tokens[3] == "Duration")
+                HandleCutlistQuery(tokens[1], tokens[2], pbs, 2);
+            else
+                HandleCutlistQuery(tokens[1], tokens[2], pbs);
+        }
+        else
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Bad QUERY_CUTLIST");
     }
     else if (command == "QUERY_BOOKMARK")
     {
@@ -5041,7 +5059,8 @@ bool MainServer::HandleDeleteFile(QString filename, QString storagegroup,
 // Helper function for the guts of HandleCommBreakQuery + HandleCutlistQuery
 void MainServer::HandleCutMapQuery(const QString &chanid,
                                    const QString &starttime,
-                                   PlaybackSock *pbs, bool commbreak)
+                                   PlaybackSock *pbs, bool commbreak,
+                                   int offsettype)
 {
     MythSocket *pbssock = NULL;
     if (pbs)
@@ -5064,10 +5083,36 @@ void MainServer::HandleCutMapQuery(const QString &chanid,
 
         for (it = markMap.begin(); it != markMap.end(); ++it)
         {
-            rowcnt++;
-            QString intstr = QString("%1").arg(*it);
-            retlist << intstr;
-            retlist << QString::number(it.key());
+            bool isend = ((*it) == MARK_CUT_END || (*it) == MARK_COMM_END) ? true : false;
+            if (offsettype == 0)
+            {
+                rowcnt++;
+                QString intstr = QString("%1").arg(*it);
+                retlist << intstr;
+                retlist << QString::number(it.key());
+            }
+            else if (offsettype == 1)
+            {
+                uint64_t offset;
+                if (pginfo.QueryKeyFramePosition(&offset, it.key(), isend))
+                {
+                  rowcnt++;
+                  QString intstr = QString("%1").arg(*it);
+                  retlist << intstr;
+                  retlist << QString::number(offset);
+                }
+            }
+            else if (offsettype == 2)
+            {
+                uint64_t offset;
+                if (pginfo.QueryKeyFrameDuration(&offset, it.key(), isend))
+                {
+                  rowcnt++;
+                  QString intstr = QString("%1").arg(*it);
+                  retlist << intstr;
+                  retlist << QString::number(offset);
+                }
+            }
         }
     }
 
@@ -5084,7 +5129,8 @@ void MainServer::HandleCutMapQuery(const QString &chanid,
 
 void MainServer::HandleCommBreakQuery(const QString &chanid,
                                       const QString &starttime,
-                                      PlaybackSock *pbs)
+                                      PlaybackSock *pbs,
+                                      int offsettype)
 {
 // Commercial break query
 // Format:  QUERY_COMMBREAK <chanid> <starttime>
@@ -5094,12 +5140,13 @@ void MainServer::HandleCommBreakQuery(const QString &chanid,
 // Return structure is [number of rows] followed by a triplet of values:
 //   each triplet : [type] [long portion 1] [long portion 2]
 // type is the value in the map, right now 4 = commbreak start, 5= end
-    return HandleCutMapQuery(chanid, starttime, pbs, true);
+    return HandleCutMapQuery(chanid, starttime, pbs, true, offsettype);
 }
 
 void MainServer::HandleCutlistQuery(const QString &chanid,
                                     const QString &starttime,
-                                    PlaybackSock *pbs)
+                                    PlaybackSock *pbs,
+                                    int offsettype)
 {
 // Cutlist query
 // Format:  QUERY_CUTLIST <chanid> <starttime>
@@ -5109,7 +5156,7 @@ void MainServer::HandleCutlistQuery(const QString &chanid,
 // Return structure is [number of rows] followed by a triplet of values:
 //   each triplet : [type] [long portion 1] [long portion 2]
 // type is the value in the map, right now 0 = commbreak start, 1 = end
-    return HandleCutMapQuery(chanid, starttime, pbs, false);
+    return HandleCutMapQuery(chanid, starttime, pbs, false, offsettype);
 }
 
 
