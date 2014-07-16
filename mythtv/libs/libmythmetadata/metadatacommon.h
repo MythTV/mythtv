@@ -273,7 +273,7 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
     // GETS
 
     MetadataType GetType() const { return m_type; };
-    LookupType GetSubtype() const;
+    LookupType GetSubtype() const { return m_subtype; };
     QVariant GetData() const { return m_data; };
     LookupStep GetStep() const { return m_step; };
     bool GetAutomatic() const { return m_automatic; };
