@@ -109,6 +109,15 @@ class TestIPTVRecorder: public QObject
                             "#EXTINF:0,001 - La 1\n"
                             "udp://239.0.0.76:8208\n");
 
+        /*
+         * SAT>IP style channel format from page 63 of
+         * http://www.satip.info/sites/satip/files/resource/satip_specification_version_1_2.pdf
+         */
+        QString rawdataSATIP ("#EXTM3U\n"
+                              "#EXTINF:0,10. ZDFinfokanal\n"
+                              "rtp://239.0.0.76:8200\n");
+
+
         fbox_chan_map_t chanmap;
 
         /* test plain old MPEG-2 TS over multicast playlist */
@@ -134,5 +143,11 @@ class TestIPTVRecorder: public QObject
         QVERIFY (chanmap["2"].m_tuning.IsValid ());
         QCOMPARE (chanmap["2"].m_name, QString ("France 2 (auto)"));
         QCOMPARE (chanmap["2"].m_tuning.GetDataURL().toString(), QString ("rtsp://mafreebox.freebox.fr/fbxtv_pub/stream?namespace=1&service=201"));
+
+        /* test playlist for SAT>IP with "#. name" instead of "# - name" */
+        chanmap = IPTVChannelFetcher::ParsePlaylist (rawdataSATIP, NULL);
+        QVERIFY (chanmap["10"].IsValid ());
+        QVERIFY (chanmap["10"].m_tuning.IsValid ());
+        QCOMPARE (chanmap["10"].m_name, QString ("ZDFinfokanal"));
     }
 };
