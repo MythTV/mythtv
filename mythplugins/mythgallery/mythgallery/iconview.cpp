@@ -103,6 +103,21 @@ void FileCopyThread::run()
 
 ///////////////////////////////////////////////////////////////////////////////
 
+ImportThread::ImportThread(const QString &cmd) :
+    MThread("import"), m_command(cmd)
+{
+}
+
+void ImportThread::run()
+{
+    RunProlog();
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Executing %1").arg(m_command));
+    myth_system(m_command);
+    RunEpilog();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 IconView::IconView(MythScreenStack *parent, const char *name,
                    const QString &galleryDir, MythMediaDevice *initialDevice)
         : MythScreenType(parent, name),
@@ -123,6 +138,7 @@ IconView::IconView(MythScreenStack *parent, const char *name,
     m_useOpenGL = gCoreContext->GetNumSetting("SlideshowUseOpenGL", 0);
     m_recurse = gCoreContext->GetNumSetting("GalleryRecursiveSlideshow", 0);
     m_paths = gCoreContext->GetSetting("GalleryImportDirs").split(":");
+    m_allowImportScripts = gCoreContext->GetNumSetting("GalleryAllowImportScripts", 0);
 
     QDir dir(m_galleryDir);
     if (!dir.exists() || !dir.isReadable())
@@ -1064,6 +1080,7 @@ void IconView::HandleSettings(void)
     m_useOpenGL   = gCoreContext->GetNumSetting("SlideshowUseOpenGL", 0);
     m_recurse     = gCoreContext->GetNumSetting("GalleryRecursiveSlideshow", 0);
     m_paths       = gCoreContext->GetSetting("GalleryImportDirs").split(":");
+    m_allowImportScripts = gCoreContext->GetNumSetting("GalleryAllowImportScripts", 0);
 
     // reload directory
     MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
@@ -1095,18 +1112,6 @@ void IconView::HandleImport(void)
     QFileInfo path;
     QDir importdir;
 
-#if 0
-    DialogBox *importDlg = new DialogBox(GetMythMainWindow(),
-                                         tr("Import pictures?"));
-
-    importDlg->AddButton(tr("No"));
-    importDlg->AddButton(tr("Yes"));
-    DialogCode code = importDlg->exec();
-    importDlg->deleteLater();
-    if (kDialogCodeButton1 != code)
-        return;
-#endif
-
     // Makes import directory samba/windows friendly (no colon)
     QString idirname = m_currDir + "/" +
         MythDate::current().toString("yyyy-MM-dd_hh-mm-ss");
@@ -1122,36 +1127,69 @@ void IconView::HandleImport(void)
         {
             ImportFromDir(*it, importdir.absolutePath());
         }
-#if 0
         else if (path.isFile() && path.isExecutable())
         {
-            // TODO this should not be enabled by default!!!
-            QString cmd = *it + " " + importdir.absolutePath();
-            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Executing %1").arg(cmd));
-            myth_system(cmd);
+            if (m_allowImportScripts)
+            {
+                QString cmd = *it + " " + importdir.absolutePath();
+
+                MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+                MythUIBusyDialog *busy =
+                        new MythUIBusyDialog(tr("Importing images from camera. Please wait..."),
+                                                popupStack,
+                                                "importbusydialog");
+
+                if (busy->Create())
+                {
+                    popupStack->AddScreen(busy, false);
+                }
+                else
+                {
+                    delete busy;
+                    busy = NULL;
+                }
+
+                ImportThread *import = new ImportThread(cmd);
+                import->start();
+
+                while (!import->isFinished())
+                {
+                    usleep(500);
+                    qApp->processEvents();
+                }
+
+                delete import;
+
+                if (busy)
+                    busy->Close();
+            }
+            else
+            {
+                ShowOkPopup(tr("Found an import script (%1) but running them has been disabled in the settings!")
+                               .arg(*it));
+                importdir.rmdir(importdir.absolutePath());
+                return;
+            }
         }
-#endif
         else
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("Could not read or execute %1").arg(*it));
+
+            ShowOkPopup(tr("Could not read or execute %1").arg(*it));
         }
     }
 
+    importdir.setFilter(QDir::Files | QDir::Readable | QDir::NoDotAndDotDot);
     importdir.refresh();
     if (importdir.count() == 0)
     {
-#if 0
-        DialogBox *nopicsDlg = new DialogBox(GetMythMainWindow(),
-                                             tr("Nothing found to import"));
-
-        nopicsDlg->AddButton(tr("OK"));
-        nopicsDlg->exec();
-        nopicsDlg->deleteLater();
-#endif
-
+        ShowOkPopup(tr("Nothing found to import"));
+        importdir.rmdir(importdir.absolutePath());
         return;
     }
+    else
+        ShowOkPopup(tr("Found %1 images").arg(importdir.count()));
 
     LoadDirectory(m_currDir);
 }

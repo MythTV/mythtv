@@ -115,6 +115,17 @@ static HostLineEdit *MythGalleryImportDirs()
     return gc;
 };
 
+static HostCheckBox *MythGalleryAllowImportScripts()
+{
+    HostCheckBox *gc = new HostCheckBox("GalleryAllowImportScripts");
+    gc->setLabel(GallerySettings::tr("Allow the import to run external scripts"));
+    gc->setValue(false);
+    gc->setHelpText(GallerySettings::tr("If set, you can use an external script to "
+                                        "import images from your camera. Only enable "
+                                        "this if you are sure your system is secure."));
+    return gc;
+};
+
 static HostCheckBox *MythGalleryAutoLoad()
 {
     HostCheckBox *gc = new HostCheckBox("GalleryAutoLoad");
@@ -319,6 +330,7 @@ GallerySettings::GallerySettings()
     general->addChild(MythGalleryThumbnailLocation());
     general->addChild(MythGallerySortOrder());
     general->addChild(MythGalleryImportDirs());
+    general->addChild(MythGalleryAllowImportScripts());
     general->addChild(MythGalleryAutoLoad());
     general->addChild(MythGalleryFilter());
     general->addChild(MythGalleryFilterType());

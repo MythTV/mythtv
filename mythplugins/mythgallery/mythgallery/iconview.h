@@ -146,6 +146,8 @@ class IconView : public MythScreenType
 
     QString             m_errorStr;
 
+    bool                m_allowImportScripts;
+
   protected slots:
     void reloadData();
 
@@ -197,6 +199,15 @@ private:
     QObject     *m_parent;
     QStringList  m_fileList;
     QMutex       m_mutex;
+};
+
+class ImportThread: public MThread
+{
+    public:
+        ImportThread(const QString &cmd);
+        virtual void run();
+    private:
+        QString m_command;
 };
 
 #endif /* ICONVIEW_H */
