@@ -261,6 +261,12 @@ void MusicPlayer::stop(bool stopAll)
         m_output->Reset();
     }
 
+    if (m_oneshotMetadata)
+    {
+        delete m_oneshotMetadata;
+        m_oneshotMetadata = NULL;
+    }
+
     m_isPlaying = false;
 
     if (stopAll && getDecoder())
