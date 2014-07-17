@@ -1066,19 +1066,20 @@ int VideoMetadata::UpdateHashedDBRecord(const QString &hash,
 QString VideoMetadata::VideoFileHash(const QString &file_name,
                            const QString &host)
 {
-    if (!host.isEmpty() && !gCoreContext->IsMasterHost(host))
-    {
-        QString url = generate_file_url("Videos", host, file_name);
-        return RemoteFile::GetFileHash(url);
-    }
-    else if (!host.isEmpty())
+    if (host.isEmpty())
+        return FileHash(file_name);
+
+    if (gCoreContext->IsMasterBackend() && gCoreContext->IsThisHost(host))
     {
         StorageGroup sgroup("Videos", host);
         QString fullname = sgroup.FindFile(file_name);
+
         return FileHash(fullname);
     }
-    else
-        return FileHash(file_name);
+
+    QString url = generate_file_url("Videos", host, file_name);
+
+    return RemoteFile::GetFileHash(url);
 }
 
 QString VideoMetadata::FilenameToMeta(const QString &file_name, int position)
