@@ -198,14 +198,9 @@ void MetadataImageDownload::run()
                                         "to file: %1").arg(finalfile));
                             errored = true;
                         }
-                        else
-                            downloaded.insert(type, info);
                     }
-
                     delete download;
                 }
-                else
-                    downloaded.insert(type, info);
             }
             else
             {
@@ -234,7 +229,6 @@ void MetadataImageDownload::run()
 
                 if (!exists || lookup->GetAllowOverwrites())
                 {
-
                     if (exists && !onMaster)
                     {
                         QFileInfo fi(finalfile);
@@ -295,8 +289,6 @@ void MetadataImageDownload::run()
                                             "to file: %1").arg(finalfile));
                                 errored = true;
                             }
-                            else
-                                downloaded.insert(type, info);
                         }
                     }
                     else
@@ -316,15 +308,17 @@ void MetadataImageDownload::run()
                                             "to file: %1").arg(finalfile));
                                 errored = true;
                             }
-                            else
-                                downloaded.insert(type, info);
                         }
                     }
 
                     delete download;
                 }
-                else
-                    downloaded.insert(type, info);
+            }
+            if (!errored)
+            {
+                // update future Artwork Map with what we've successfully
+                // retrieved (either downloaded or already existing
+                downloaded.insert(type, info);
             }
         }
         if (errored)
