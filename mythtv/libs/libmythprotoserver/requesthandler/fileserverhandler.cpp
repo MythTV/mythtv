@@ -665,7 +665,7 @@ bool FileServerHandler::HandleQueryFileHash(SocketHandler *socket,
 
     QString hash = "";
 
-    if (hostname == gCoreContext->GetHostName())
+    if (gCoreContext->IsThisHost(hostname))
     {
         // looking for file on me, return directly
         StorageGroup sgroup(storageGroup, gCoreContext->GetHostName());
