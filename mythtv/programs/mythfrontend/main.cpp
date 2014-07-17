@@ -1042,7 +1042,11 @@ static void TVMenuCallback(void *data, QString &selection)
         GetMythUI()->RemoveCurrentLocation();
 
         gCoreContext->ActivateSettingsCache(true);
+
+        // tell the backend the settings may have changed
         gCoreContext->SendMessage("CLEAR_SETTINGS_CACHE");
+        // tell the frontend the settings may have changed
+        gCoreContext->dispatch(MythEvent(QString("CLEAR_SETTINGS_CACHE")));
 
         if (sel == "settings general" ||
             sel == "settings generalrecpriorities")
