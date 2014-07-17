@@ -143,14 +143,16 @@ void MetadataImageDownload::run()
                 QString path = getLocalWritePath(lookup->GetType(), type);
                 QDir dirPath(path);
                 if (!dirPath.exists())
+                {
                     if (!dirPath.mkpath(path))
                     {
                         LOG(VB_GENERAL, LOG_ERR,
                             QString("Metadata Image Download: Unable to create "
                                     "path %1, aborting download.").arg(path));
                         errored = true;
-                        continue;
+                        break;
                     }
+                }
                 QString finalfile = path + "/" + filename;
                 QString oldurl = info.url;
                 info.url = finalfile;
@@ -179,7 +181,7 @@ void MetadataImageDownload::run()
                                     "an HTML redirect (filesize %2).")
                                 .arg(oldurl).arg(download.size()));
                         errored = true;
-                        continue;
+                        break;
                     }
 
                     if (dest_file.open(QIODevice::WriteOnly))
@@ -195,6 +197,7 @@ void MetadataImageDownload::run()
                                 QString("Image Download: Error Writing Image "
                                         "to file: %1").arg(finalfile));
                             errored = true;
+                            break;
                         }
                     }
                 }
@@ -251,7 +254,7 @@ void MetadataImageDownload::run()
                                     "(filesize %2).")
                                 .arg(oldurl).arg(download.size()));
                         errored = true;
-                        continue;
+                        break;
                     }
 
                     if (!onMaster)
@@ -266,21 +269,20 @@ void MetadataImageDownload::run()
                                         "Storage Group Exist?")
                                         .arg(finalfile));
                             errored = true;
+                            break;
                         }
-                        else
+                        off_t written = outFile.Write(download,
+                                                      download.size());
+                        if (written != download.size())
                         {
-                            off_t written = outFile.Write(download,
-                                                          download.size());
-                            if (written != download.size())
-                            {
-                                // File creation failed for some reason, delete it
-                                RemoteFile::DeleteFile(finalfile);
+                            // File creation failed for some reason, delete it
+                            RemoteFile::DeleteFile(finalfile);
 
-                                LOG(VB_GENERAL, LOG_ERR,
-                                    QString("Image Download: Error Writing Image "
-                                            "to file: %1").arg(finalfile));
-                                errored = true;
-                            }
+                            LOG(VB_GENERAL, LOG_ERR,
+                                QString("Image Download: Error Writing Image "
+                                        "to file: %1").arg(finalfile));
+                            errored = true;
+                            break;
                         }
                     }
                     else
@@ -299,6 +301,7 @@ void MetadataImageDownload::run()
                                     QString("Image Download: Error Writing Image "
                                             "to file: %1").arg(finalfile));
                                 errored = true;
+                                break;
                             }
                         }
                     }
