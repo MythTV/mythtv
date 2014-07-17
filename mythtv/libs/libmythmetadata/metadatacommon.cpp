@@ -75,6 +75,7 @@ MetadataLookup::MetadataLookup(void) :
     m_collectionref(),
     m_tmsref(),
     m_imdb(),
+    m_iscollection(false),
     m_people(),
     m_studios(),
     m_homepage(),
@@ -210,6 +211,7 @@ MetadataLookup::MetadataLookup(
     m_collectionref(collectionref),
     m_tmsref(tmsref),
     m_imdb(imdb),
+    m_iscollection(false),
     m_people(people),
     m_studios(studios),
     m_homepage(homepage),
@@ -303,7 +305,8 @@ MetadataLookup::MetadataLookup(
     m_releasedate(releasedate),
     m_lastupdated(lastupdated),
     m_runtime(runtime),
-    m_runtimesecs(runtimesecs)
+    m_runtimesecs(runtimesecs),
+    m_iscollection(false)
 {
     m_tracknum = 0;
     m_popularity = 0;
@@ -379,6 +382,7 @@ MetadataLookup::MetadataLookup(
     m_runtime(runtime),
     m_runtimesecs(runtimesecs),
     m_inetref(inetref),
+    m_iscollection(false),
     m_people(people),
     m_trailerURL(trailerURL),
     m_artwork(artwork),
