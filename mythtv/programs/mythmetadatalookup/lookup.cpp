@@ -364,7 +364,8 @@ void LookerUpper::customEvent(QEvent *levent)
         if (m_updateartwork)
         {
             ArtworkMap map = lookup->GetDownloads();
-            SetArtwork(lookup->GetInetref(), lookup->GetSeason(),
+            SetArtwork(lookup->GetInetref(),
+                       lookup->GetIsCollection() ? 0 : lookup->GetSeason(),
                        gCoreContext->GetMasterHostName(), map);
         }
 

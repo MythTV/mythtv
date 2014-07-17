@@ -291,7 +291,7 @@ void MetadataFactory::OnSingleResult(MetadataLookup *lookup)
         {
             ArtworkInfo info;
             int index = fanartlist.size();
-            int season = (int)lookup->GetSeason();
+            int season = lookup->GetIsCollection() ? 0 : (int)lookup->GetSeason();
             if (season > 0)
                 index = max(0, index-season);
             else
