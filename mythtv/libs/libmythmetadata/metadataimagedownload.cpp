@@ -167,29 +167,27 @@ void MetadataImageDownload::run()
                     LOG(VB_GENERAL, LOG_INFO,
                         QString("Metadata Image Download: %1 ->%2")
                          .arg(oldurl).arg(finalfile));
-                    QByteArray *download = new QByteArray();
-                    GetMythDownloadManager()->download(oldurl, download);
+                    QByteArray download;
+                    GetMythDownloadManager()->download(oldurl, &download);
 
                     QImage testImage;
-                    bool didLoad = testImage.loadFromData(*download);
+                    bool didLoad = testImage.loadFromData(download);
                     if (!didLoad)
                     {
                         LOG(VB_GENERAL, LOG_ERR,
                             QString("Tried to write %1, but it appears to be "
                                     "an HTML redirect (filesize %2).")
-                                .arg(oldurl).arg(download->size()));
-                        delete download;
-                        download = NULL;
+                                .arg(oldurl).arg(download.size()));
                         errored = true;
                         continue;
                     }
 
                     if (dest_file.open(QIODevice::WriteOnly))
                     {
-                        off_t size = dest_file.write(*download,
-                                                     download->size());
+                        off_t size = dest_file.write(download,
+                                                     download.size());
                         dest_file.close();
-                        if (size != download->size())
+                        if (size != download.size())
                         {
                             // File creation failed for some reason, delete it
                             RemoteFile::DeleteFile(finalfile);
@@ -199,7 +197,6 @@ void MetadataImageDownload::run()
                             errored = true;
                         }
                     }
-                    delete download;
                 }
             }
             else
@@ -242,45 +239,40 @@ void MetadataImageDownload::run()
                     LOG(VB_GENERAL, LOG_INFO,
                         QString("Metadata Image Download: %1 -> %2")
                             .arg(oldurl).arg(finalfile));
-                    QByteArray *download = new QByteArray();
-                    GetMythDownloadManager()->download(oldurl, download);
+                    QByteArray download;
+                    GetMythDownloadManager()->download(oldurl, &download);
 
                     QImage testImage;
-                    bool didLoad = testImage.loadFromData(*download);
+                    bool didLoad = testImage.loadFromData(download);
                     if (!didLoad)
                     {
                         LOG(VB_GENERAL, LOG_ERR,
                             QString("Tried to write %1, but it appears to be "
                                     "an HTML redirect or corrupt file "
                                     "(filesize %2).")
-                                .arg(oldurl).arg(download->size()));
-                        delete download;
-                        download = NULL;
+                                .arg(oldurl).arg(download.size()));
                         errored = true;
                         continue;
                     }
 
                     if (!onMaster)
                     {
-                        RemoteFile *outFile = new RemoteFile(finalfile, true);
-                        if (!outFile->isOpen())
+                        RemoteFile outFile(finalfile, true);
+
+                        if (!outFile.isOpen())
                         {
                             LOG(VB_GENERAL, LOG_ERR,
                                 QString("Image Download: Failed to open "
                                         "remote file (%1) for write.  Does "
                                         "Storage Group Exist?")
                                         .arg(finalfile));
-                            delete outFile;
-                            outFile = NULL;
                             errored = true;
                         }
                         else
                         {
-                            off_t written = outFile->Write(*download,
-                                                           download->size());
-                            delete outFile;
-                            outFile = NULL;
-                            if (written != download->size())
+                            off_t written = outFile.Write(download,
+                                                          download.size());
+                            if (written != download.size())
                             {
                                 // File creation failed for some reason, delete it
                                 RemoteFile::DeleteFile(finalfile);
@@ -297,10 +289,10 @@ void MetadataImageDownload::run()
                         QFile dest_file(resolvedFN);
                         if (dest_file.open(QIODevice::WriteOnly))
                         {
-                            off_t size = dest_file.write(*download,
-                                                         download->size());
+                            off_t size = dest_file.write(download,
+                                                         download.size());
                             dest_file.close();
-                            if (size != download->size())
+                            if (size != download.size())
                             {
                                 // File creation failed for some reason, delete it
                                 RemoteFile::DeleteFile(resolvedFN);
@@ -311,8 +303,6 @@ void MetadataImageDownload::run()
                             }
                         }
                     }
-
-                    delete download;
                 }
             }
             if (!errored)
