@@ -216,12 +216,13 @@ void MetadataImageDownload::run()
                 bool exists = false;
                 bool onMaster = false;
                 QString resolvedFN;
-                if ((lookup->GetHost().toLower() == gCoreContext->GetHostName().toLower()) ||
-                    (gCoreContext->IsThisHost(lookup->GetHost())))
+                if (gCoreContext->IsMasterBackend() &&
+                    ((lookup->GetHost().toLower() == gCoreContext->GetHostName().toLower()) ||
+                     gCoreContext->IsThisHost(lookup->GetHost())))
                 {
-                    StorageGroup sg;
+                    StorageGroup sg(getStorageGroupName(type), lookup->GetHost());
                     resolvedFN = sg.FindFile(filename);
-                    exists = QFile::exists(resolvedFN);
+                    exists = !resolvedFN.isEmpty() && QFile::exists(resolvedFN);
                     if (!exists)
                     {
                         resolvedFN = getLocalStorageGroupPath(type,
