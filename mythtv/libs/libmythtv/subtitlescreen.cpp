@@ -878,24 +878,28 @@ void FormattedTextSubtitle::Draw(void)
             // order of the children.  In particular, background
             // shapes should be added/drawn first, and text drawn on
             // top.
-            SubSimpleText *text =
-                new SubSimpleText((*chunk).text, *mythfont,
-                                  (*chunk).textRect,
-                                  Qt::AlignLeft|Qt::AlignTop,
-                                  /*m_subScreen*/NULL,
-                                  (*chunk).textName, CacheNum(),
-                                  m_start + m_duration);
-            textList += text;
-            MythUIShape *bgshape = m_subScreen->GetSubtitleFormat()->
-                GetBackground(/*m_subScreen*/NULL,
-                              (*chunk).bgShapeName,
-                              m_base, (*chunk).m_format,
-                              MythRect((*chunk).bgShapeRect), CacheNum(),
-                              m_start, m_duration);
-            if (bgshape)
-            {
-                bgshape->SetArea(MythRect((*chunk).bgShapeRect));
-                shapeList += bgshape;
+            if ((*chunk).textRect.width() > 0) {
+                SubSimpleText *text =
+                    new SubSimpleText((*chunk).text, *mythfont,
+                                      (*chunk).textRect,
+                                      Qt::AlignLeft|Qt::AlignTop,
+                                      /*m_subScreen*/NULL,
+                                      (*chunk).textName, CacheNum(),
+                                      m_start + m_duration);
+                textList += text;
+            }
+            if ((*chunk).bgShapeRect.width() > 0) {
+                MythUIShape *bgshape = m_subScreen->GetSubtitleFormat()->
+                    GetBackground(/*m_subScreen*/NULL,
+                                  (*chunk).bgShapeName,
+                                  m_base, (*chunk).m_format,
+                                  MythRect((*chunk).bgShapeRect), CacheNum(),
+                                  m_start, m_duration);
+                if (bgshape)
+                {
+                    bgshape->SetArea(MythRect((*chunk).bgShapeRect));
+                    shapeList += bgshape;
+                }
             }
         }
     }
