@@ -1426,6 +1426,7 @@ void MetadataOptions::PerformQuery()
 
     MetadataLookup *lookup = CreateLookup(kMetadataRecording);
 
+    lookup->SetAutomatic(false);
     m_metadataFactory->Lookup(lookup);
 }
 
@@ -1621,7 +1622,6 @@ MetadataLookup *MetadataOptions::CreateLookup(MetadataType mtype)
         lookup->SetSubtype(type);
     }
     lookup->SetAllowGeneric(true);
-    lookup->SetAutomatic(true);
     lookup->SetHandleImages(false);
     lookup->SetHost(gCoreContext->GetMasterHostName());
     lookup->SetTitle(m_recordingRule->m_title);
@@ -1644,6 +1644,7 @@ void MetadataOptions::FindNetArt(VideoArtworkType type)
 
     MetadataLookup *lookup = CreateLookup(kMetadataVideo);
 
+    lookup->SetAutomatic(true);
     lookup->SetData(qVariantFromValue<VideoArtworkType>(type));
     m_imageLookup->addLookup(lookup);
 }
