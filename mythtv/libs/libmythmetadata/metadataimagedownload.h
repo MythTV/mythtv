@@ -115,6 +115,7 @@ META_PUBLIC QString getDownloadFilename(VideoArtworkType type, MetadataLookup *l
 META_PUBLIC QString getLocalWritePath(MetadataType metadatatype, VideoArtworkType type);
 META_PUBLIC QString getStorageGroupURL(VideoArtworkType type, QString host);
 META_PUBLIC QString getLocalStorageGroupPath(VideoArtworkType type, QString host);
+META_PUBLIC QString getStorageGroupName(VideoArtworkType type);
 
 META_PUBLIC void cleanThumbnailCacheDir(void);
 

@@ -473,20 +473,9 @@ QString getLocalWritePath(MetadataType metadatatype, VideoArtworkType type)
 
 QString getStorageGroupURL(VideoArtworkType type, QString host)
 {
-    QString sgroup;
+    QString sgroup = getStorageGroupName(type);
     QString ip = gCoreContext->GetBackendServerIP(host);
     uint port = gCoreContext->GetBackendServerPort(host);
-
-    if (type == kArtworkCoverart)
-        sgroup = "Coverart";
-    else if (type == kArtworkFanart)
-        sgroup = "Fanart";
-    else if (type == kArtworkBanner)
-        sgroup = "Banners";
-    else if (type == kArtworkScreenshot)
-        sgroup = "Screenshots";
-    else
-        sgroup = "Default";
 
     return gCoreContext->GenMythURL(ip,port,"",sgroup);
 }
@@ -495,22 +484,28 @@ QString getLocalStorageGroupPath(VideoArtworkType type, QString host)
 {
     QString path;
 
-    StorageGroup sg;
-
-    if (type == kArtworkCoverart)
-        sg.Init("Coverart", host);
-    else if (type == kArtworkFanart)
-        sg.Init("Fanart", host);
-    else if (type == kArtworkBanner)
-        sg.Init("Banners", host);
-    else if (type == kArtworkScreenshot)
-        sg.Init("Screenshots", host);
-    else
-        sg.Init("Default", host);
+    StorageGroup sg(getStorageGroupName(type), host);
 
     path = sg.FindNextDirMostFree();
 
     return path;
+}
+
+QString getStorageGroupName(VideoArtworkType type)
+{
+    switch (type)
+    {
+        case kArtworkCoverart:
+            return "Coverart";
+        case kArtworkFanart:
+            return "Fanart";
+        case kArtworkBanner:
+            return "Banners";
+        case kArtworkScreenshot:
+            return "Screenshots";
+        default:
+            return "Default";
+    }
 }
 
 void cleanThumbnailCacheDir()
