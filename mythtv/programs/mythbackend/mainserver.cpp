@@ -3102,7 +3102,8 @@ void MainServer::HandleQueryFileHash(QStringList &slist, PlaybackSock *pbs)
 
     QString hash = "";
 
-    if (hostname == gCoreContext->GetHostName())
+    if (hostname == gCoreContext->GetHostName() ||
+        gCoreContext->IsThisHost(hostname))
     {
         StorageGroup sgroup(storageGroup, gCoreContext->GetHostName());
         QString fullname = sgroup.FindFile(filename);
