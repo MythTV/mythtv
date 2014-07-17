@@ -1143,7 +1143,7 @@ QString RemoteFile::FindFile(const QString& filename, const QString& host, const
         hostName = gCoreContext->GetMasterHostName();
 
     if (gCoreContext->IsMasterBackend() &&
-        hostName == gCoreContext->GetMasterHostName())
+        gCoreContext->IsThisHost(hostName))
     {
         StorageGroup sGroup(storageGroup, hostName);
         if (!sGroup.FindFile(filename).isEmpty())
