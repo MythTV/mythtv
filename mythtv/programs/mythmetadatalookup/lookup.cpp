@@ -172,7 +172,7 @@ void LookerUpper::HandleAllArtwork(bool aggressive)
         if (type == kProbableMovie)
            maxartnum = 2;
 
-        if ((aggressive && type != kProbableGenericTelevision) ||
+        if ((!aggressive && type == kProbableGenericTelevision) ||
              pginfo->GetRecordingGroup() == "Deleted" ||
              pginfo->GetRecordingGroup() == "LiveTV")
             dolookup = false;
