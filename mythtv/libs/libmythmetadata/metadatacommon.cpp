@@ -1177,22 +1177,29 @@ MetadataLookup* ParseMetadataItem(const QDomElement& item,
         season = lookup->GetSeason();
         episode = lookup->GetEpisode();
     }
-    else
+
+    if (lookup->GetPreferDVDOrdering())
     {
-        if (lookup->GetPreferDVDOrdering())
+        if (!season)
         {
             season = item.firstChildElement("dvdseason").text().toUInt();
+        }
+        if (!episode)
+        {
             episode = item.firstChildElement("dvdepisode").text().toUInt();
         }
-
-        if ((season == 0) && (episode == 0))
-        {
-            season = item.firstChildElement("season").text().toUInt();
-            episode = item.firstChildElement("episode").text().toUInt();
-        }
-        LOG(VB_GENERAL, LOG_INFO, QString("Result Found, Season %1 Episode %2")
-            .arg(season).arg(episode));
     }
+
+    if (!season)
+    {
+        season = item.firstChildElement("season").text().toUInt();
+    }
+    if (!episode)
+    {
+        episode = item.firstChildElement("episode").text().toUInt();
+    }
+    LOG(VB_GENERAL, LOG_INFO, QString("Result Found, Season %1 Episode %2")
+        .arg(season).arg(episode));
 
     return new MetadataLookup(lookup->GetType(), lookup->GetSubtype(),
         lookup->GetData(), lookup->GetStep(), lookup->GetAutomatic(),
