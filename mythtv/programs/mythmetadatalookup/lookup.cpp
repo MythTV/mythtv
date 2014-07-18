@@ -50,9 +50,10 @@ void LookerUpper::HandleSingleRecording(const uint chanid,
     }
 
     m_updaterules = updaterules;
+    m_updateartwork = true;
 
     m_busyRecList.append(pginfo);
-    m_metadataFactory->Lookup(pginfo, true, false, false);
+    m_metadataFactory->Lookup(pginfo, true, m_updateartwork, false);
 }
 
 void LookerUpper::HandleAllRecordings(bool updaterules)
