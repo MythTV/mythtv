@@ -512,7 +512,7 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
                     /* text is movie/<inetref> */
                     QString inetrefRaw(getFirstText(info));
                     if (inetrefRaw.startsWith(QString("movie/"))) {
-                        QString inetref(inetrefRaw.section('/',1,1).trimmed());
+                        QString inetref(QString ("tmdb3.py_") + inetrefRaw.section('/',1,1).trimmed());
                         pginfo->inetref = inetref;
                     }
                 }
@@ -522,8 +522,9 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
                     /* text is series/<inetref> */
                     QString inetrefRaw(getFirstText(info));
                     if (inetrefRaw.startsWith(QString("series/"))) {
-                        QString inetref(inetrefRaw.section('/',1,1).trimmed());
+                        QString inetref(QString ("ttvdb.py_") + inetrefRaw.section('/',1,1).trimmed());
                         pginfo->inetref = inetref;
+                        /* ProgInfo does not have a collectionref, so we don't set any */
                     }
                 }
             }
