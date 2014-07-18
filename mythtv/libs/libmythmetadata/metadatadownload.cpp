@@ -106,15 +106,17 @@ void MetadataDownload::run()
                 list = handleVideoUndetermined(lookup);
             }
 
-            if (list.isEmpty() &&
+            if ((list.isEmpty() ||
+                 (list.size() > 1 && !lookup->GetAutomatic())) &&
                 lookup->GetSubtype() == kProbableTelevision)
             {
-                list = handleMovie(lookup);
+                list.append(handleMovie(lookup));
             }
-            else if (list.isEmpty() &&
+            else if ((list.isEmpty() ||
+                      (list.size() > 1 && !lookup->GetAutomatic())) &&
                      lookup->GetSubtype() == kProbableMovie)
             {
-                list = handleTelevision(lookup);
+                list.append(handleTelevision(lookup));
             }
         }
         else if (lookup->GetType() == kMetadataGame)
