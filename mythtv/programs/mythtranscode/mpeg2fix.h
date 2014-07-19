@@ -45,21 +45,20 @@ class MPEG2frame
 {
   public:
     MPEG2frame(int size) :
-        pkt_memsize(size), isSequence(false), isGop(false),
+        isSequence(false), isGop(false),
         framePos(NULL), gopPos(NULL)
     {
-        pkt.data = (uint8_t *)malloc(size);
+        av_new_packet(&pkt, size);
     }
     ~MPEG2frame()
     {
-        free(pkt.data);
+        av_free_packet(&pkt);
     }
     void ensure_size(int size)
     {
-        if (pkt_memsize < size)
+        if (pkt.size < size)
         {
-            pkt.data = (uint8_t *)realloc(pkt.data, size);
-            pkt_memsize = size;
+            av_grow_packet(&pkt, size - pkt.size);
         }
     }
     void set_pkt(AVPacket *newpkt)
@@ -72,7 +71,6 @@ class MPEG2frame
     }
 
     AVPacket pkt;
-    int pkt_memsize;
     bool isSequence;
     bool isGop;
     uint8_t *framePos;
