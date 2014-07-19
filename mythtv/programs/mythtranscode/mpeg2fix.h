@@ -217,10 +217,14 @@ class MPEG2fixup
     }
     AVCodecContext *getCodecContext(int id)
     {
+        if (id >= inputFC->nb_streams)
+            return NULL;
         return inputFC->streams[id]->codec;
     }
     AVCodecParserContext *getCodecParserContext(int id)
     {
+        if (id >= inputFC->nb_streams)
+            return NULL;
         return inputFC->streams[id]->parser;
     }
 
