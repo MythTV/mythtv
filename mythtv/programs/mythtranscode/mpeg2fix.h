@@ -48,27 +48,27 @@ class MPEG2frame
         pkt_memsize(size), isSequence(false), isGop(false),
         framePos(NULL), gopPos(NULL)
     {
-        av_new_packet(&pkt, size);
+        pkt.data = (uint8_t *)malloc(size);
     }
     ~MPEG2frame()
     {
-        av_free_packet(&pkt);
+        free(pkt.data);
     }
     void ensure_size(int size)
     {
         if (pkt_memsize < size)
         {
-            av_grow_packet(&pkt, size - pkt_memsize);
+            pkt.data = (uint8_t *)realloc(pkt.data, size);
             pkt_memsize = size;
         }
     }
     void set_pkt(AVPacket *newpkt)
     {
-        if (av_copy_packet(&pkt, newpkt) < 0)
-        {
-            // copy failed, destination packet got freed
-            pkt_memsize = 0;
-        }
+        ensure_size(newpkt->size);
+        uint8_t *data = pkt.data;
+        pkt = *newpkt;
+        pkt.data = data;
+        memcpy(pkt.data, newpkt->data, newpkt->size);
     }
 
     AVPacket pkt;
