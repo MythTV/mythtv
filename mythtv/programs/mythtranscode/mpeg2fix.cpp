@@ -583,18 +583,21 @@ void MPEG2fixup::InitReplex()
     int mp2_count = 0, ac3_count = 0;
     for (FrameMap::Iterator it = aFrame.begin(); it != aFrame.end(); it++)
     {
-        int i = aud_map[it.key()];
+        int index = it.key();
+        if (index > inputFC->nb_streams)
+            continue;   // will never happen in practice
+        int i = aud_map[index];
         AVDictionaryEntry *metatag =
-            av_dict_get(inputFC->streams[it.key()]->metadata,
+            av_dict_get(inputFC->streams[index]->metadata,
                         "language", NULL, 0);
         char *lang = metatag ? metatag->value : (char *)"";
         ring_init(&rx.extrbuf[i], memsize / 5);
         ring_init(&rx.index_extrbuf[i], INDEX_BUF);
         rx.extframe[i].set = 1;
-        rx.extframe[i].bit_rate = getCodecContext(it.key())->bit_rate;
+        rx.extframe[i].bit_rate = getCodecContext(index)->bit_rate;
         rx.extframe[i].framesize = (*it)->first()->pkt.size;
         strncpy(rx.extframe[i].language, lang, 4);
-        switch(GetStreamType(it.key()))
+        switch(GetStreamType(index))
         {
             case AV_CODEC_ID_MP2:
             case AV_CODEC_ID_MP3:
@@ -2420,6 +2423,11 @@ int MPEG2fixup::Start()
 
             while (af->count())
             {
+                if (!CC || !CPC)
+                {
+                    framePool.enqueue(af->takeFirst());
+                    continue;
+                }
                 // What to do if the CC is corrupt?
                 // Just wait and hope it repairs itself
                 if (CC->sample_rate == 0 || !CPC || CPC->duration == 0)
