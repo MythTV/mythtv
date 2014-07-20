@@ -199,7 +199,7 @@ void DBEvent::AddPerson(DBPerson::Role role, const QString &name)
     if (!credits)
         credits = new DBCredits;
 
-    credits->push_back(DBPerson(role, name));
+    credits->push_back(DBPerson(role, name.simplified()));
 }
 
 void DBEvent::AddPerson(const QString &role, const QString &name)
@@ -207,7 +207,7 @@ void DBEvent::AddPerson(const QString &role, const QString &name)
     if (!credits)
         credits = new DBCredits;
 
-    credits->push_back(DBPerson(role, name));
+    credits->push_back(DBPerson(role, name.simplified()));
 }
 
 bool DBEvent::HasTimeConflict(const DBEvent &o) const
