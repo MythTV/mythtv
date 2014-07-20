@@ -430,8 +430,7 @@ bool RemoteFile::Exists(const QString &url, struct stat *fileinfo)
     QString sgroup   = qurl.userName();
     QString host     = qurl.host();
 
-    if (isLocal(url) || (gCoreContext->IsMasterBackend() &&
-        host == gCoreContext->GetMasterHostName()))
+    if (isLocal(url) || gCoreContext->IsThisBackend(host))
     {
        LOG(VB_FILE, LOG_INFO,
            QString("RemoteFile::Exists(): looking for local file: %1").arg(url));
