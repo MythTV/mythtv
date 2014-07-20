@@ -978,8 +978,8 @@ class ChannelTimeout : public SpinBoxSetting, public CaptureCardDBStorage
         setValue(value);
         setHelpText(QObject::tr(
                         "Maximum time (in milliseconds) MythTV waits for "
-                        "a channel lock.  For recordings, this value will "
-                        "be doubled."));
+                        "a channel lock.  For recordings, if this time is "
+                        "exceeded, the recording will be marked as failed."));
     };
 };
 

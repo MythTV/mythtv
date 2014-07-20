@@ -263,7 +263,9 @@ static QString construct_sort_title(
 static QString extract_main_state(const ProgramInfo &pginfo, const TV *player)
 {
     QString state("normal");
-    if (pginfo.GetRecordingStatus() == rsRecording)
+    if (pginfo.GetFilesize() == 0)
+        state = "error";
+    else if (pginfo.GetRecordingStatus() == rsRecording)
         state = "running";
 
     if (((pginfo.GetRecordingStatus() != rsRecording) &&
@@ -274,8 +276,11 @@ static QString extract_main_state(const ProgramInfo &pginfo, const TV *player)
         state = "disabled";
     }
 
-    if (state == "normal" && (pginfo.GetVideoProperties() & VID_DAMAGED))
+    if ((state == "normal" || state == "running") &&
+        pginfo.GetVideoProperties() & VID_DAMAGED)
+    {
         state = "warning";
+    }
 
     return state;
 }
@@ -284,7 +289,8 @@ static QString extract_job_state(const ProgramInfo &pginfo)
 {
     QString job = "default";
 
-    if (pginfo.GetRecordingStatus() == rsRecording)
+    if (pginfo.GetRecordingStatus() == rsRecording ||
+        pginfo.GetRecordingStatus() == rsFailing)
         job = "recording";
     else if (JobQueue::IsJobQueuedOrRunning(
                  JOB_TRANSCODE, pginfo.GetChanID(),

@@ -85,6 +85,7 @@ TVRec::TVRec(int capturecardnum)
     : recorder(NULL), channel(NULL), signalMonitor(NULL),
       scanner(NULL),
       signalMonitorCheckCnt(0),
+      reachedRecordingDeadline(false),
       // Various threads
       eventThread(new MThread("TVRecEvent", this)),
       recorderThread(NULL),
@@ -419,14 +420,15 @@ RecStatusType TVRec::StartRecording(ProgramInfo *pginfo)
     QMutexLocker lock(&stateChangeLock);
     QString msg("");
 
-    SetRecordingStatus(rsAborted, __LINE__);
+    if (m_recStatus != rsFailing)
+        SetRecordingStatus(rsAborted, __LINE__);
 
     // Flush out any pending state changes
     WaitForEventThreadSleep();
 
     // We need to do this check early so we don't cancel an overrecord
     // that we're trying to extend.
-    if (internalState != kState_WatchingLiveTV &&
+    if (internalState != kState_WatchingLiveTV && m_recStatus != rsFailing &&
         curRecording && curRecording->IsSameProgramWeakCheck(*rcinfo))
     {
         int post_roll_seconds  = curRecording->GetRecordingEndTime()
@@ -610,7 +612,8 @@ RecStatusType TVRec::StartRecording(ProgramInfo *pginfo)
         // Make sure scheduler is allowed to end this recording
         ClearFlags(kFlagCancelNextRecording);
 
-        SetRecordingStatus(rsTuning, __LINE__);
+        if (m_recStatus != rsFailing)
+            SetRecordingStatus(rsTuning, __LINE__);
         ChangeState(kState_RecordingOnly);
     }
     else if (!cancelNext && (GetState() == kState_WatchingLiveTV))
@@ -3878,17 +3881,35 @@ void TVRec::TuningFrequency(const TuningRequest &request)
             ClearFlags(kFlagWaitingForSignal);
             if (!antadj)
             {
+                QDateTime expire = MythDate::current();
+
                 SetFlags(kFlagWaitingForSignal);
                 if (curRecording)
                 {
+                    reachedRecordingDeadline = false;
+                    // If startRecordingDeadline is passed, this
+                    // recording is marked as failed, so the scheduler
+                    // can try another showing.
+                    startRecordingDeadline =
+                        expire.addMSecs(genOpt.channel_timeout);
+                    // Keep trying to record this showing (even if it
+                    // has been marked as failed) until the scheduled
+                    // end time.
                     signalMonitorDeadline =
                         curRecording->GetRecordingEndTime();
+
+                    LOG(VB_RECORD, LOG_DEBUG, LOC +
+                        QString("Start recording deadline: %1 "
+                                "Good signal deadline: %2")
+                        .arg(startRecordingDeadline.toLocalTime()
+                             .toString("hh:mm:ss.zzz"))
+                        .arg(signalMonitorDeadline.toLocalTime()
+                             .toString("hh:mm:ss.zzz")));
                 }
                 else
                 {
-                    QDateTime expire = MythDate::current();
                     signalMonitorDeadline =
-                        expire.addMSecs(genOpt.channel_timeout * 2);
+                        expire.addMSecs(genOpt.channel_timeout);
                 }
                 signalMonitorCheckCnt = 0;
             }
@@ -3928,15 +3949,34 @@ void TVRec::TuningFrequency(const TuningRequest &request)
  */
 MPEGStreamData *TVRec::TuningSignalCheck(void)
 {
-    RecStatusType newRecStatus = rsRecording;
+    RecStatusType newRecStatus;
+    bool          keep_trying  = false;
+
     if (signalMonitor->IsAllGood())
     {
-        LOG(VB_RECORD, LOG_INFO, LOC + "TuningSignalCheck: Have a good signal");
+        LOG(VB_RECORD, LOG_INFO, LOC + "TuningSignalCheck: Good signal");
+        if (curRecording && (MythDate::current() > startRecordingDeadline))
+        {
+            newRecStatus = rsFailing;
+            curRecording->SaveVideoProperties(VID_DAMAGED, VID_DAMAGED);
+
+            LOG(VB_GENERAL, LOG_WARNING, LOC +
+                QString("It took longer than %1 ms to get a signal lock. "
+                        "Keeping status of '%2'")
+                .arg(genOpt.channel_timeout)
+                .arg(toString(newRecStatus, kSingleRecord)));
+            LOG(VB_GENERAL, LOG_WARNING, LOC +
+                "See 'Tuning timeout' in mythtv-setup for this capturecard");
+        }
+        else
+        {
+            newRecStatus = rsRecording;
+        }
     }
     else if (signalMonitor->IsErrored() ||
              MythDate::current() > signalMonitorDeadline)
     {
-        LOG(VB_RECORD, LOG_ERR, LOC + "TuningSignalCheck: SignalMonitor " +
+        LOG(VB_GENERAL, LOG_ERR, LOC + "TuningSignalCheck: SignalMonitor " +
             (signalMonitor->IsErrored() ? "failed" : "timed out"));
 
         ClearFlags(kFlagNeedToStartRecorder);
@@ -3950,6 +3990,23 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
             eitScanStartTime = eitScanStartTime.addSecs(eitCrawlIdleStart +
                                   eit_start_rand(cardid, eitTransportTimeout));
         }
+    }
+    else if (curRecording && !reachedRecordingDeadline &&
+             MythDate::current() > startRecordingDeadline)
+    {
+        newRecStatus = rsFailing;
+        reachedRecordingDeadline = true;
+        keep_trying = true;
+
+        SendMythSystemRecEvent("REC_FAILING", curRecording);
+
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            QString("TuningSignalCheck: taking more than %1 ms to get a lock. "
+                    "marking this recording as '%2'.")
+            .arg(genOpt.channel_timeout)
+            .arg(toString(newRecStatus, kSingleRecord)));
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            "See 'Tuning timeout' in mythtv-setup for this capturecard");
     }
     else
     {
@@ -3979,6 +4036,9 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
                     .arg(curRecording->GetRecordingEndTime(MythDate::ISODate)));
         gCoreContext->dispatch(me);
     }
+
+    if (keep_trying)
+        return NULL;
 
     // grab useful data from DTV signal monitor before we kill it...
     MPEGStreamData *streamData = NULL;
