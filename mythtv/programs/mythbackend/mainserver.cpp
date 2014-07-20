@@ -490,7 +490,7 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     if (command == "MYTH_PROTO_VERSION")
     {
         if (tokens.size() < 2)
-            LOG(VB_GENERAL, LOG_CRIT, LOC + "Bad MYTH_PROTO_VERSION command");
+            SendErrorResponse(pbs, "Bad MYTH_PROTO_VERSION command");
         else
             HandleVersion(sock, tokens);
         return;
@@ -520,14 +520,14 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     if (command == "QUERY_FILETRANSFER")
     {
         if (tokens.size() != 2)
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Bad QUERY_FILETRANSFER");
+            SendErrorResponse(pbs, "Bad QUERY_FILETRANSFER");
         else
             HandleFileTransferQuery(listline, tokens, pbs);
     }
     else if (command == "QUERY_RECORDINGS")
     {
         if (tokens.size() != 2)
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Bad QUERY_RECORDINGS query");
+            SendErrorResponse(pbs, "Bad QUERY_RECORDINGS query");
         else
             HandleQueryRecordings(tokens[1], pbs);
     }
@@ -578,14 +578,14 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     else if (command == "QUERY_FILE_EXISTS")
     {
         if (listline.size() < 2)
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Bad QUERY_FILE_EXISTS command");
+            SendErrorResponse(pbs, "Bad QUERY_FILE_EXISTS command");
         else
             HandleQueryFileExists(listline, pbs);
     }
     else if (command == "QUERY_FILE_HASH")
     {
         if (listline.size() < 3)
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Bad QUERY_FILE_HASH command");
+            SendErrorResponse(pbs, "Bad QUERY_FILE_HASH command");
         else
             HandleQueryFileHash(listline, pbs);
     }
@@ -596,7 +596,7 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     else if (command == "DELETE_FILE")
     {
         if (listline.size() < 3)
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Bad DELETE_FILE command");
+            SendErrorResponse(pbs, "Bad DELETE_FILE command");
         else
             HandleDeleteFile(listline, pbs);
     }
@@ -684,7 +684,7 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     else if (command == "QUERY_RECORDER")
     {
         if (tokens.size() != 2)
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Bad QUERY_RECORDER");
+            SendErrorResponse(pbs, "Bad QUERY_RECORDER");
         else
             HandleRecorderQuery(listline, tokens, pbs);
     }
@@ -699,7 +699,7 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     else if (command == "SET_NEXT_LIVETV_DIR")
     {
         if (tokens.size() != 3)
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Bad SET_NEXT_LIVETV_DIR");
+            SendErrorResponse(pbs, "Bad SET_NEXT_LIVETV_DIR");
         else
             HandleSetNextLiveTVDir(tokens, pbs);
     }
@@ -710,7 +710,7 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     else if (command == "QUERY_REMOTEENCODER")
     {
         if (tokens.size() != 2)
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Bad QUERY_REMOTEENCODER");
+            SendErrorResponse(pbs, "Bad QUERY_REMOTEENCODER");
         else
             HandleRemoteEncoder(listline, tokens, pbs);
     }
@@ -759,12 +759,12 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
         else if (tokens.size() == 2)
             HandleLockTuner(pbs, tokens[1].toInt());
         else
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Bad LOCK_TUNER query");
+            SendErrorResponse(pbs, "Bad LOCK_TUNER query");
     }
     else if (command == "FREE_TUNER")
     {
         if (tokens.size() != 2)
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Bad FREE_TUNER query");
+            SendErrorResponse(pbs, "Bad FREE_TUNER query");
         else
             HandleFreeTuner(tokens[1].toInt(), pbs);
     }
@@ -775,49 +775,49 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     else if (command == "QUERY_IS_ACTIVE_BACKEND")
     {
         if (tokens.size() != 1)
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Bad QUERY_IS_ACTIVE_BACKEND");
+            SendErrorResponse(pbs, "Bad QUERY_IS_ACTIVE_BACKEND");
         else
             HandleIsActiveBackendQuery(listline, pbs);
     }
     else if (command == "QUERY_COMMBREAK")
     {
         if (tokens.size() != 3)
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Bad QUERY_COMMBREAK");
+            SendErrorResponse(pbs, "Bad QUERY_COMMBREAK");
         else
             HandleCommBreakQuery(tokens[1], tokens[2], pbs);
     }
     else if (command == "QUERY_CUTLIST")
     {
         if (tokens.size() != 3)
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Bad QUERY_CUTLIST");
+            SendErrorResponse(pbs, "Bad QUERY_CUTLIST");
         else
             HandleCutlistQuery(tokens[1], tokens[2], pbs);
     }
     else if (command == "QUERY_BOOKMARK")
     {
         if (tokens.size() != 3)
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Bad QUERY_BOOKMARK");
+            SendErrorResponse(pbs, "Bad QUERY_BOOKMARK");
         else
             HandleBookmarkQuery(tokens[1], tokens[2], pbs);
     }
     else if (command == "SET_BOOKMARK")
     {
         if (tokens.size() != 4)
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Bad SET_BOOKMARK");
+            SendErrorResponse(pbs, "Bad SET_BOOKMARK");
         else
             HandleSetBookmark(tokens, pbs);
     }
     else if (command == "QUERY_SETTING")
     {
         if (tokens.size() != 3)
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Bad QUERY_SETTING");
+            SendErrorResponse(pbs, "Bad QUERY_SETTING");
         else
             HandleSettingQuery(tokens, pbs);
     }
     else if (command == "SET_SETTING")
     {
         if (tokens.size() != 4)
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Bad SET_SETTING");
+            SendErrorResponse(pbs, "Bad SET_SETTING");
         else
             HandleSetSetting(tokens, pbs);
     }
@@ -832,77 +832,77 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     else if (command == "MUSIC_TAG_UPDATE_VOLATILE")
     {
         if (listline.size() != 6)
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Bad MUSIC_TAG_UPDATE_VOLATILE");
+            SendErrorResponse(pbs, "Bad MUSIC_TAG_UPDATE_VOLATILE");
         else
             HandleMusicTagUpdateVolatile(listline, pbs);
     }
     else if (command == "MUSIC_CALC_TRACK_LENGTH")
     {
         if (listline.size() != 3)
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Bad MUSIC_CALC_TRACK_LENGTH");
+            SendErrorResponse(pbs, "Bad MUSIC_CALC_TRACK_LENGTH");
         else
             HandleMusicCalcTrackLen(listline, pbs);
     }
     else if (command == "MUSIC_TAG_UPDATE_METADATA")
     {
         if (listline.size() != 3)
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Bad MUSIC_TAG_UPDATE_METADATA");
+            SendErrorResponse(pbs, "Bad MUSIC_TAG_UPDATE_METADATA");
         else
             HandleMusicTagUpdateMetadata(listline, pbs);
     }
     else if (command == "MUSIC_FIND_ALBUMART")
     {
         if (listline.size() != 4)
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Bad MUSIC_FIND_ALBUMART");
+            SendErrorResponse(pbs, "Bad MUSIC_FIND_ALBUMART");
         else
             HandleMusicFindAlbumArt(listline, pbs);
     }
     else if (command == "MUSIC_TAG_GETIMAGE")
     {
         if (listline.size() < 4)
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Bad MUSIC_TAG_GETIMAGE");
+            SendErrorResponse(pbs, "Bad MUSIC_TAG_GETIMAGE");
         else
             HandleMusicTagGetImage(listline, pbs);
     }
     else if (command == "MUSIC_TAG_ADDIMAGE")
     {
         if (listline.size() < 5)
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Bad MUSIC_TAG_ADDIMAGE");
+            SendErrorResponse(pbs, "Bad MUSIC_TAG_ADDIMAGE");
         else
             HandleMusicTagAddImage(listline, pbs);
     }
     else if (command == "MUSIC_TAG_REMOVEIMAGE")
     {
         if (listline.size() < 4)
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Bad MUSIC_TAG_REMOVEIMAGE");
+            SendErrorResponse(pbs, "Bad MUSIC_TAG_REMOVEIMAGE");
         else
             HandleMusicTagRemoveImage(listline, pbs);
     }
     else if (command == "MUSIC_TAG_CHANGEIMAGE")
     {
         if (listline.size() < 5)
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Bad MUSIC_TAG_CHANGEIMAGE");
+            SendErrorResponse(pbs, "Bad MUSIC_TAG_CHANGEIMAGE");
         else
             HandleMusicTagChangeImage(listline, pbs);
     }
     else if (command == "ALLOW_SHUTDOWN")
     {
         if (tokens.size() != 1)
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Bad ALLOW_SHUTDOWN");
+            SendErrorResponse(pbs, "Bad ALLOW_SHUTDOWN");
         else
             HandleBlockShutdown(false, pbs);
     }
     else if (command == "BLOCK_SHUTDOWN")
     {
         if (tokens.size() != 1)
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Bad BLOCK_SHUTDOWN");
+            SendErrorResponse(pbs, "Bad BLOCK_SHUTDOWN");
         else
             HandleBlockShutdown(true, pbs);
     }
     else if (command == "SHUTDOWN_NOW")
     {
         if (tokens.size() != 1)
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Bad SHUTDOWN_NOW query");
+            SendErrorResponse(pbs, "Bad SHUTDOWN_NOW query");
         else if (!ismaster)
         {
             QString halt_cmd;
@@ -916,8 +916,7 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
                 myth_system(halt_cmd);
             }
             else
-                LOG(VB_GENERAL, LOG_WARNING, LOC +
-                    "Received an empty SHUTDOWN_NOW query!");
+                SendErrorResponse(pbs, "Received an empty SHUTDOWN_NOW query!");
         }
     }
     else if (command == "BACKEND_MESSAGE")
@@ -933,8 +932,7 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
              (command == "DOWNLOAD_FILE_NOW"))
     {
         if (listline.size() != 4)
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("Bad %1 command").arg(command));
+            SendErrorResponse(pbs, QString("Bad %1 command").arg(command));
         else
             HandleDownloadFile(listline, pbs);
     }
@@ -1844,6 +1842,15 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
 void MainServer::HandleDone(MythSocket *socket)
 {
     socket->DisconnectFromHost();
+}
+
+void MainServer::SendErrorResponse(PlaybackSock *pbs, const QString &error)
+{
+    LOG(VB_GENERAL, LOG_ERR, LOC + error);
+
+    QStringList strList("ERROR");
+    strList << error;
+    SendResponse(pbs->getSocket(), strList);
 }
 
 void MainServer::SendResponse(MythSocket *socket, QStringList &commands)
