@@ -630,6 +630,11 @@ bool MythCoreContext::BackendIsRunning(void)
     return (res == GENERIC_EXIT_OK);
 }
 
+bool MythCoreContext::IsThisBackend(const QString &addr)
+{
+    return IsBackend() && IsThisHost(addr);
+}
+
 bool MythCoreContext::IsThisHost(const QString &addr)
 {
     return IsThisHost(addr, GetHostName());
