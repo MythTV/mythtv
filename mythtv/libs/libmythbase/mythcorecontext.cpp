@@ -1309,6 +1309,14 @@ bool MythCoreContext::SendReceiveStringList(
 
             ok = false;
         }
+        else if (strlist[0] == "UNKNOWN_COMMAND")
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Protocol query '%1' responded with the error 'UNKNOWN_COMMAND'")
+                        .arg(query_type));
+
+            ok = false;
+        }
     }
 
     return ok;
