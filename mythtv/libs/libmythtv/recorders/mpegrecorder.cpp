@@ -376,7 +376,8 @@ bool MpegRecorder::OpenMpegFileAsInput(void)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Can't open MPEG File '%1'")
                 .arg(videodevice) + ENO);
-
+        _error = LOC + QString("Can't open MPEG File '%1'")
+                 .arg(videodevice) + ENO;
         return false;
     }
     return true;
@@ -392,6 +393,7 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
     if (chanfd < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Can't open video device. " + ENO);
+        _error = LOC + "Can't open video device. " + ENO;
         return false;
     }
 
@@ -415,6 +417,7 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
     if (!(capabilities & V4L2_CAP_VIDEO_CAPTURE))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "V4L version 1, unsupported");
+        _error = LOC + "V4L version 1, unsupported";
         close(chanfd);
         chanfd = -1;
         return false;
@@ -447,6 +450,7 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
     if (readfd < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Can't open video device." + ENO);
+        _error = LOC + "Can't open video device." + ENO;
         close(chanfd);
         chanfd = -1;
         return false;
@@ -507,6 +511,7 @@ bool MpegRecorder::SetVideoCaptureFormat(int chanfd)
     if (ioctl(chanfd, VIDIOC_G_FMT, &vfmt) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Error getting format" + ENO);
+        _error = LOC + "Error getting format" + ENO;
         return false;
     }
 
@@ -516,6 +521,7 @@ bool MpegRecorder::SetVideoCaptureFormat(int chanfd)
     if (ioctl(chanfd, VIDIOC_S_FMT, &vfmt) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Error setting format" + ENO);
+        _error = LOC + "Error setting format" + ENO;
         return false;
     }
 
@@ -981,6 +987,10 @@ void MpegRecorder::run(void)
     int len;
     int remainder = 0;
 
+    bool      good_data = false;
+    bool      gap = false;
+    QDateTime gap_start;
+
     MythTimer elapsedTimer;
     float elapsed;
     long long bytesRead = 0;
@@ -1043,6 +1053,18 @@ void MpegRecorder::run(void)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC + "Device error detected");
 
+                if (good_data)
+                {
+                    if (gap)
+                    {
+                        /* Already processing a gap, which means
+                         * restarting the encoding didn't work! */
+                        SetRecordingStatus(rsFailing, __FILE__, __LINE__);
+                    }
+                    else
+                        gap = true;
+                }
+
                 RestartEncoding();
             }
             else if (_device_read_buffer->IsEOF() &&
@@ -1050,6 +1072,30 @@ void MpegRecorder::run(void)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC + "Device EOF detected");
                 _error = "Device EOF detected";
+            }
+            else
+            {
+                // If we have seen good data, but now have a gap, note it
+                if (good_data)
+                {
+                    if (gap)
+                    {
+                        QMutexLocker locker(&statisticsLock);
+                        QDateTime gap_end(MythDate::current());
+
+                        recordingGaps.push_back(RecordingGap
+                                                (gap_start, gap_end));
+                        LOG(VB_RECORD, LOG_DEBUG,
+                            LOC + QString("Inserted gap %1 dur %2")
+                            .arg(recordingGaps.back().toString())
+                            .arg(gap_start.secsTo(gap_end)));
+                        gap = false;
+                    }
+                    else
+                        gap_start = MythDate::current();
+                }
+                else
+                    good_data = true;
             }
         }
         else
@@ -1328,12 +1374,19 @@ bool MpegRecorder::StartEncoding(void)
             _wait_for_keyframe_option = true;
             _seen_sps = false;
 
-            // (at least) with the 3.10 kernel, the V4L2_ENC_CMD_START
-            // does not reliably start the data flow.  A read() seems
-            // to consistently work, though.
-            uint8_t dummy;
-            ssize_t len = read(readfd, &dummy, 0);
-            if (len < 0)
+            int idx;
+            for (idx=0; idx < 10; ++idx)
+            {
+                // (at least) with the 3.10 kernel, the V4L2_ENC_CMD_START
+                // does not reliably start the data flow.  A read() seems
+                // to work, though.
+                uint8_t dummy;
+                int len = read(readfd, &dummy, 0);
+                if (len == 0)
+                    break;
+                usleep(500);
+            }
+            if (idx == 10)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                     "StartEncoding: read from video device failed." + ENO);

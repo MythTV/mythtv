@@ -248,6 +248,8 @@ class MTV_PUBLIC RecorderBase : public QRunnable
     virtual bool PauseAndWait(int timeout = 100);
 
     virtual void ResetForNewFile(void) = 0;
+    virtual void SetRecordingStatus(RecStatusType status,
+                                    const QString& file, int line);
     virtual void ClearStatistics(void);
     virtual void FinishRecording(void) = 0;
     virtual void StartNewFile(void) { }
@@ -306,7 +308,7 @@ class MTV_PUBLIC RecorderBase : public QRunnable
     /// True while recording is actually being performed
     bool           recording;
     QWaitCondition recordingWait;
-    
+
 
     // For RingBuffer switching
     QMutex         nextRingBufferLock;

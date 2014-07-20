@@ -98,6 +98,9 @@ DTVRecorder::DTVRecorder(TVRec *rec) :
     memset(_stream_id,  0, sizeof(_stream_id));
     memset(_pid_status, 0, sizeof(_pid_status));
     memset(_continuity_counter, 0xff, sizeof(_continuity_counter));
+
+    _minimum_recording_quality =
+        gCoreContext->GetNumSetting("MinimumRecordingQuality", 95);
 }
 
 DTVRecorder::~DTVRecorder(void)
@@ -648,6 +651,15 @@ void DTVRecorder::HandleTimestamps(int stream_id, int64_t pts, int64_t dts)
         if (diff > gap_threshold)
         {
             QMutexLocker locker(&statisticsLock);
+
+            if (_ts_count[stream_id] > 15000 &&
+                ((1.0 - (static_cast<float>(recordingGaps.size()) /
+                         static_cast<float>(_ts_count[stream_id]))) * 100)
+                < _minimum_recording_quality)
+            {
+                SetRecordingStatus(rsFailing, __FILE__, __LINE__);
+            }
+
             recordingGaps.push_back(
                 RecordingGap(
                     ts_to_qdatetime(

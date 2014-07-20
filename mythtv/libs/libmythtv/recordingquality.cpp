@@ -82,6 +82,8 @@ void RecordingQuality::AddTSStatistics(
         m_overall_score = max(m_overall_score * 0.60, 0.0);
     else if (er >= 0.001)
         m_overall_score = max(m_overall_score * 0.80, 0.0);
+    else if (er >= 0.0001)
+        m_overall_score = max(m_overall_score * 0.90, 0.0);
 
     if (er >= 0.01)
         m_overall_score = min(m_overall_score, 0.5);

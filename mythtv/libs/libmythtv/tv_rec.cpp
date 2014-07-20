@@ -946,7 +946,7 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
                      .arg(curRec->GetCardID())
                      .arg(curRec->GetChanID())
                      .arg(curRec->GetScheduledStartTime(MythDate::ISODate))
-                     .arg(curRec->GetRecordingStatus())
+                     .arg(is_good ? curRec->GetRecordingStatus() : rsFailed)
                      .arg(curRec->GetRecordingEndTime(MythDate::ISODate)));
         gCoreContext->dispatch(me);
     }

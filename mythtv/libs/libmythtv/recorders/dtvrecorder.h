@@ -175,6 +175,7 @@ class DTVRecorder :
     vector<TSPacket> _scratch;
 
     // Statistics
+    int           _minimum_recording_quality;
     bool          _use_pts; // vs use dts
     uint64_t      _ts_count[256];
     int64_t       _ts_last[256];

@@ -371,6 +371,30 @@ void RecorderBase::CheckForRingBufferSwitch(void)
         tvrec->RingBufferChanged(ringBuffer, curRecording, recq);
 }
 
+void RecorderBase::SetRecordingStatus(RecStatusType status,
+                                      const QString& file, int line)
+{
+    if (curRecording)
+    {
+        LOG(VB_RECORD, LOG_INFO, QString("Modifying recording status to %1 "
+                                         "at %2:%3")
+            .arg(toString(status, kSingleRecord)).arg(file).arg(line));
+
+        curRecording->SetRecordingStatus(status);
+
+        if (status == rsFailing)
+            curRecording->SaveVideoProperties(VID_DAMAGED, VID_DAMAGED);
+
+        MythEvent me(QString("UPDATE_RECORDING_STATUS %1 %2 %3 %4 %5")
+                    .arg(curRecording->GetCardID())
+                    .arg(curRecording->GetChanID())
+                    .arg(curRecording->GetScheduledStartTime(MythDate::ISODate))
+                    .arg(status)
+                    .arg(curRecording->GetRecordingEndTime(MythDate::ISODate)));
+        gCoreContext->dispatch(me);
+    }
+}
+
 void RecorderBase::ClearStatistics(void)
 {
     QMutexLocker locker(&statisticsLock);
