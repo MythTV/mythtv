@@ -6,6 +6,8 @@
 //  Copyright (c) 2013 Bubblestuff Pty Ltd. All rights reserved.
 //
 
+// libmyth headers
+#include "mythlogging.h"
 #include "mythnotification.h"
 
 #include <QCoreApplication>
@@ -34,6 +36,52 @@ void MythNotification::SetId(int id)
         m_duration = -1;
     }
 }
+
+void MythNotification::ToStringList(void)
+{
+    m_extradata.clear();
+
+    m_extradata << QString::number(Type())
+                << QString::number(m_fullScreen)
+                << m_description
+                << QString::number(m_duration)
+                << m_style
+                << QString::number(m_visibility)
+                << QString::number(m_priority)
+                << m_metadata.value("minm")
+                << m_metadata.value("asar")
+                << m_metadata.value("asal")
+                << m_metadata.value("asfm");
+}
+
+bool MythNotification::FromStringList(void)
+{
+    if (m_extradata.size() != 11)
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("MythNotification::FromStringList called with %1 items, "
+                    "expecting 11. '%2'")
+            .arg(m_extradata.size()).arg(m_extradata.join(",")));
+        return false;
+    }
+
+    QStringList::const_iterator Istr = m_extradata.begin();
+
+    Type type     = static_cast<Type>((*Istr++).toInt());
+    m_fullScreen  = (*Istr++).toInt();
+    m_description = *Istr++;
+    m_duration    = (*Istr++).toInt();
+    m_style       = *Istr++;
+    m_visibility  = static_cast<VNMask>((*Istr++).toInt());
+    m_priority    = static_cast<Priority>((*Istr++).toInt());
+    m_metadata["minm"] = *Istr++;
+    m_metadata["asar"] = *Istr++;
+    m_metadata["asal"] = *Istr++;
+    m_metadata["asfm"] = *Istr++;
+
+    return true;
+}
+
 
 /**
  * stringFromSeconds:

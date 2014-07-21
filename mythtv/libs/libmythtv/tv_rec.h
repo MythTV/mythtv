@@ -139,6 +139,8 @@ typedef QMap<uint,PendingInfo> PendingMap;
 
 class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
 {
+    Q_DECLARE_TR_FUNCTIONS(TVRec)
+
     friend class TuningRequest;
     friend class TVRecRecordThread;
 

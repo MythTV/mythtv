@@ -3960,6 +3960,19 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
             newRecStatus = rsFailing;
             curRecording->SaveVideoProperties(VID_DAMAGED, VID_DAMAGED);
 
+            QString desc = tr("Good signal seen after %1 ms")
+                           .arg(genOpt.channel_timeout +
+                        startRecordingDeadline.msecsTo(MythDate::current()));
+            QString title = curRecording->GetTitle();
+            if (!curRecording->GetSubtitle().isEmpty())
+                title += " - " + curRecording->GetSubtitle();
+
+            MythNotification mn(MythNotification::Check, desc,
+                                "Recording", title,
+                                tr("See 'Tuning timeout' in mythtv-setup "
+                                   "for this capturecard."));
+            gCoreContext->SendEvent(MythEvent(mn));
+
             LOG(VB_GENERAL, LOG_WARNING, LOC +
                 QString("It took longer than %1 ms to get a signal lock. "
                         "Keeping status of '%2'")
@@ -3999,6 +4012,19 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
         keep_trying = true;
 
         SendMythSystemRecEvent("REC_FAILING", curRecording);
+
+        QString desc = tr("Taking more than %1 ms to get a lock.")
+                       .arg(genOpt.channel_timeout);
+        QString title = curRecording->GetTitle();
+        if (!curRecording->GetSubtitle().isEmpty())
+            title += " - " + curRecording->GetSubtitle();
+
+        MythNotification mn(MythNotification::Error, desc,
+                            "Recording", title,
+                            tr("See 'Tuning timeout' in mythtv-setup "
+                               "for this capturecard."));
+        mn.SetDuration(30);
+        gCoreContext->SendEvent(MythEvent(mn));
 
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             QString("TuningSignalCheck: taking more than %1 ms to get a lock. "

@@ -77,7 +77,7 @@ class MBASE_PUBLIC MythEvent : public QEvent
     static Type kDisableUDPListenerEventType;
     static Type kEnableUDPListenerEventType;
 
-  private:
+  protected:
     QString m_message;
     QStringList m_extradata;
 };

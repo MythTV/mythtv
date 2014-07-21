@@ -9828,6 +9828,21 @@ void TV::customEvent(QEvent *e)
         }
         ReturnPlayerLock(mctx);
     }
+
+    if (message == "NOTIFICATION")
+    {
+        if (!GetNotificationCenter())
+            return;
+
+        PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
+        OSD *osd = GetOSDLock(mctx);
+
+        MythNotification mn(*me);
+        MythNotificationCenter::GetInstance()->Queue(mn);
+
+        ReturnOSDLock(mctx, osd);
+        ReturnPlayerLock(mctx);
+    }
 }
 
 void TV::QuickRecord(PlayerContext *ctx)

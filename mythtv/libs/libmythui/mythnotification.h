@@ -32,20 +32,23 @@ public:
     static Type Busy;
 
     MythNotification(Type t, void *parent = NULL)
-        : MythEvent(t), m_id(-1), m_parent(parent), m_fullScreen(false),
+        : MythEvent(t, "NOTIFICATION"), m_id(-1),
+        m_parent(parent), m_fullScreen(false),
         m_duration(0), m_visibility(kAll), m_priority(kDefault)
     {
     }
 
     MythNotification(int id, void *parent)
-        : MythEvent(Update), m_id(id), m_parent(parent), m_fullScreen(false),
+        : MythEvent(Update, "NOTIFICATION"), m_id(id),
+        m_parent(parent), m_fullScreen(false),
         m_duration(0), m_visibility(kAll), m_priority(kDefault)
     {
     }
 
     MythNotification(const QString &title, const QString &author,
                      const QString &details = QString())
-        : MythEvent(New), m_id(-1), m_parent(NULL), m_fullScreen(false),
+        : MythEvent(New, "NOTIFICATION"), m_id(-1),
+        m_parent(NULL), m_fullScreen(false),
         m_description(title), m_duration(0), m_visibility(kAll),
         m_priority(kDefault)
     {
@@ -54,33 +57,43 @@ public:
         map["asar"] = author;
         map["asal"] = details;
         m_metadata = map;
+	ToStringList();
     }
 
     MythNotification(Type t, const QString &title, const QString &author,
-                     const QString &details = QString())
-        : MythEvent(t), m_id(-1), m_parent(NULL), m_fullScreen(false),
-        m_description(title), m_duration(0), m_visibility(kAll),
-        m_priority(kDefault)
+                     const QString &details = QString(),
+		     const QString &extra   = QString())
+        : MythEvent(t, "NOTIFICATION"), m_id(-1), m_parent(NULL),
+        m_fullScreen(false), m_description(title), m_duration(0),
+        m_visibility(kAll), m_priority(kDefault)
     {
         DMAP map;
         map["minm"] = title;
         map["asar"] = author;
         map["asal"] = details;
+	map["asfm"] = extra;
         m_metadata = map;
+	ToStringList();
     }
 
     MythNotification(Type t, const DMAP &metadata)
-        : MythEvent(t), m_id(-1), m_parent(NULL), m_fullScreen(false),
-        m_duration(0), m_metadata(metadata),
+        : MythEvent(t, "NOTIFICATION"), m_id(-1), m_parent(NULL),
+        m_fullScreen(false), m_duration(0), m_metadata(metadata),
         m_visibility(kAll), m_priority(kDefault)
     {
+	ToStringList();
+    }
+
+    MythNotification(const MythEvent &me) : MythEvent(me)
+    {
+	FromStringList();
     }
 
     virtual ~MythNotification()
     {
     }
 
-    virtual MythEvent *clone(void) const    { return new MythNotification(*this); }
+    virtual MythEvent *clone(void) const  { return new MythNotification(*this); }
 
     /** Priority enum
      * A notification can be given a priority. Display order of notification
@@ -133,43 +146,47 @@ public:
      * this request may not be fullfilled should the theme not handle full screen
      * notification
      */
-    void SetFullScreen(bool f)              { m_fullScreen = f; }
+    void SetFullScreen(bool f)             { m_fullScreen = f; ToStringList(); }
     /**
      * contains a short description of the notification
      */
-    void SetDescription(const QString &desc) { m_description = desc; }
+    void SetDescription(const QString &desc)
+                                      { m_description = desc; ToStringList();  }
     /**
      * metadata of the notification.
      * In DMAP format. DMAP can contains various information such as artist,
      * album name, author name, genre etc..
      */
-    void SetMetaData(const DMAP &data)      { m_metadata = data; }
+    void SetMetaData(const DMAP &data)   { m_metadata = data; ToStringList(); }
     /**
      * contains a duration during which the notification will be displayed for.
      * The duration is informative only as the MythNotificationCenter will
      * determine automatically how long a notification can be displayed for
      * and will depend on priority, visibility and other factors
      */
-    void SetDuration(int duration)          { m_duration = duration; };
+    void SetDuration(int duration)     { m_duration = duration; ToStringList(); }
     /**
      * contains an alternative notification style.
      * Should a style be defined, the Notification Center will attempt to load
      * an alternative theme and fall back to the default one if unsuccessful
      */
-    void SetStyle(const QString &style)     { m_style = style; }
+    void SetStyle(const QString &style)     { m_style = style; ToStringList(); }
     /**
      * define a bitmask of Visibility
      */
-    void SetVisibility(VNMask n)            { m_visibility = n; }
+    void SetVisibility(VNMask n)            { m_visibility = n; ToStringList(); }
     /**
      * For future use, not implemented at this stage
      */
-    void SetPriority(Priority n)              { m_priority = n; }
+    void SetPriority(Priority n)             { m_priority = n; ToStringList(); }
 
     /**
      * return Type object from type name
      */
     static Type TypeFromString(const QString &type);
+
+    void ToStringList(void);
+    bool FromStringList(void);
 
     // Getter
     int         GetId(void) const           { return m_id; }
@@ -191,6 +208,7 @@ protected:
         m_style(o.m_style),
         m_visibility(o.m_visibility),              m_priority(o.m_priority)
     {
+	ToStringList();
     }
 
 #ifndef _MSC_VER
