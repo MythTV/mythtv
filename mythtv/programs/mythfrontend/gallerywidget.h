@@ -4,15 +4,18 @@
 // Qt headers
 #include <QTimer>
 
-// MythTV headers
+// libmythui headers
 #include "mythscreentype.h"
 #include "mythdialogbox.h"
+#include "mythgenerictree.h"
+#include "mythuibuttonlist.h"
+
+// libmythmetadata headers
 #include "imagemetadata.h"
 
+// frontend headers
 #include "galleryviewhelper.h"
 #include "galleryfilehelper.h"
-
-
 
 class ImageLoadingThread : public QThread
 {

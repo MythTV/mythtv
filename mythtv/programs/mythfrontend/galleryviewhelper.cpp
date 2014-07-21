@@ -4,10 +4,17 @@
 // Qt headers
 #include <QFile>
 
-// MythTV headers
+// libmyth headers
 #include "mythcontext.h"
+
+// libmythbase headers
 #include "storagegroup.h"
+
+// libmythmetadata headers
 #include "imageutils.h"
+
+// libmythui headers
+#include "mythuibuttonlist.h"
 
 /** \fn     GalleryViewHelper::GalleryViewHelper(MythScreenType *)
  *  \brief  Constructor

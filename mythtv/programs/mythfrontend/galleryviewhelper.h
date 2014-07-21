@@ -7,19 +7,22 @@
 #include <QMap>
 #include <QThread>
 
-// MythTV headers
+// libmythui
 #include "mythgenerictree.h"
+#include "mythscreentype.h"
+
+// libmythmetadata
 #include "imagemetadata.h"
 
+// frontend
 #include "galleryfilehelper.h"
 #include "gallerydatabasehelper.h"
-
 
 class GalleryViewHelper : public QObject
 {
     Q_OBJECT
 
-public:
+  public:
     GalleryViewHelper(MythScreenType *);
     ~GalleryViewHelper();
 
@@ -47,7 +50,7 @@ public:
 
     GalleryFileHelper       *m_fileHelper;
 
-private:
+  private:
     void    SetNodeSelectionState(MythGenericTree *, int);
 
     MythScreenType          *m_parent;
@@ -62,14 +65,14 @@ class GallerySyncStatusThread : public QThread
 {
     Q_OBJECT
 
-public:
+  public:
     GallerySyncStatusThread();
     bool isSyncRunning();
 
-protected:
+  protected:
     void run();
 
-signals:
+  signals:
     void UpdateSyncProgress(int, int);
 };
 
