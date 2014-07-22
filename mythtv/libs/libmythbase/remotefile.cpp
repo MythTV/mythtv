@@ -552,6 +552,8 @@ QString RemoteFile::GetFileHash(const QString &url)
 
 bool RemoteFile::CopyFile (const QString& src, const QString& dst)
 {
+    LOG(VB_FILE, LOG_INFO, QString("RemoteFile::CopyFile: Copying file from '%1' to '%2'").arg(src).arg(dst));
+
     // sanity check
     if (src == dst)
     {
