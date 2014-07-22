@@ -39,8 +39,8 @@
  *       http://www.mythtv.org/wiki/Category:Myth_Protocol_Commands
  *       http://www.mythtv.org/wiki/Category:Myth_Protocol
  */
-#define MYTH_PROTO_VERSION "82"
-#define MYTH_PROTO_TOKEN "IdIdO"
+#define MYTH_PROTO_VERSION "83"
+#define MYTH_PROTO_TOKEN "BreakingGlass"
 
 /** \brief Increment this whenever the MythTV core database schema changes.
  *

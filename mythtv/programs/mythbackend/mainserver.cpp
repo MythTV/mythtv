@@ -582,6 +582,13 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
         else
             HandleQueryFileExists(listline, pbs);
     }
+    else if (command == "QUERY_FINDFILE")
+    {
+        if (listline.size() < 4)
+            SendErrorResponse(pbs, "Bad QUERY_FINDFILE command");
+        else
+            HandleQueryFindFile(listline, pbs);
+    }
     else if (command == "QUERY_FILE_HASH")
     {
         if (listline.size() < 3)
@@ -3568,6 +3575,206 @@ void MainServer::HandleSGGetFileList(QStringList &sList,
         strList << "EMPTY LIST";
 
     SendResponse(pbssock, strList);
+}
+
+void MainServer::HandleQueryFindFile(QStringList &slist, PlaybackSock *pbs)
+{
+//format: QUERY_FINDFILE <host> <storagegroup> <filename> <useregex (optional)> <allowfallback (optional)>
+
+    QString hostname = slist[1];
+    QString storageGroup = slist[2];
+    QString filename = slist[3];
+    bool allowFallback = true;
+    bool useRegex = false;
+    QStringList fileList;
+
+    if (hostname.isEmpty())
+        hostname = gCoreContext->GetHostName();
+
+    if (storageGroup.isEmpty())
+        storageGroup = "Default";
+
+    if (filename.isEmpty() || filename.contains("/../") ||
+        filename.startsWith("../"))
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("ERROR QueryFindFile, filename '%1' "
+                    "fails sanity checks").arg(filename));
+        fileList << "ERROR: Bad/Missing Filename";
+        SendResponse(pbs->getSocket(), fileList);
+        return;
+    }
+
+    if (slist.size() >= 5)
+        useRegex = (slist[4].toInt() > 0);
+
+    if (slist.size() >= 6)
+        allowFallback = (slist[5].toInt() > 0);
+
+    LOG(VB_FILE, LOG_INFO, LOC +
+        QString("Looking for file '%1' on host '%2' in group '%3' (useregex: %4, allowfallback: %5")
+        .arg(filename).arg(hostname).arg(storageGroup).arg(useRegex).arg(allowFallback));
+
+    // first check the given host
+    if (hostname == gCoreContext->GetHostName() || hostname == gCoreContext->GetBackendServerIP())
+    {
+        LOG(VB_FILE, LOG_INFO, LOC + QString("Checking local host '%1' for file").arg(hostname));
+
+        // check the local storage group
+        StorageGroup sgroup(storageGroup, gCoreContext->GetHostName(), false);
+
+        if (useRegex)
+        {
+            QFileInfo fi(filename);
+            QStringList files = sgroup.GetFileList('/' + fi.path());
+
+            LOG(VB_FILE, LOG_INFO, LOC + QString("Looking in dir '%1' for '%2'").arg(fi.path()).arg(fi.fileName()));
+
+            for (int x = 0; x < files.size(); x++)
+            {
+                LOG(VB_FILE, LOG_INFO, LOC + QString("Found '%1 - %2'").arg(x).arg(files[x]));
+            }
+
+            QStringList filteredFiles = files.filter(QRegExp(fi.fileName()));
+            for (int x = 0; x < filteredFiles.size(); x++)
+            {
+                fileList << gCoreContext->GenMythURL(gCoreContext->GetBackendServerIP(),
+                                                     gCoreContext->GetBackendServerPort(),
+                                                     fi.path() + '/' + filteredFiles[x],
+                                                     storageGroup);
+            }
+        }
+        else
+        {
+            if (!sgroup.FindFile(filename).isEmpty())
+            {
+                fileList << gCoreContext->GenMythURL(gCoreContext->GetBackendServerIP(),
+                                                     gCoreContext->GetBackendServerPort(),
+                                                     filename, storageGroup);
+            }
+        }
+    }
+    else
+    {
+        LOG(VB_FILE, LOG_INFO, LOC + QString("Checking remote host '%1' for file").arg(hostname));
+
+        // check the given slave hostname
+        PlaybackSock *slave = GetMediaServerByHostname(hostname);
+        if (slave)
+        {
+            QStringList slaveFiles = slave->GetFindFile(hostname, filename, storageGroup, useRegex);
+
+            if (!slaveFiles.isEmpty() && slaveFiles[0] != "NOT FOUND" && !slaveFiles[0].startsWith("ERROR: "))
+                fileList += slaveFiles;
+
+            slave->DecrRef();
+        }
+        else
+        {
+            LOG(VB_FILE, LOG_INFO, LOC + QString("Slave '%1' was unreachable").arg(hostname));
+            fileList << QString("ERROR: SLAVE UNREACHABLE: %1").arg(hostname);
+            SendResponse(pbs->getSocket(), fileList);
+            return;
+        }
+    }
+
+    // if we still haven't found it and this is the master and fallback is enabled
+    // check all other slaves that have a directory in the storagegroup
+    if (ismaster && fileList.isEmpty() && allowFallback)
+    {
+        // get a list of hosts
+        MSqlQuery query(MSqlQuery::InitCon());
+
+        QString sql = "SELECT DISTINCT hostname "
+                        "FROM storagegroup "
+                        "WHERE groupname = :GROUP "
+                        "AND hostname != :HOSTNAME";
+        query.prepare(sql);
+        query.bindValue(":GROUP", storageGroup);
+        query.bindValue(":HOSTNAME", hostname);
+
+        if (!query.exec() || !query.isActive())
+        {
+            MythDB::DBError(LOC + "FindFile() get host list", query);
+            fileList << "ERROR: failed to get host list";
+            SendResponse(pbs->getSocket(), fileList);
+            return;
+        }
+
+        while(query.next())
+        {
+            hostname = query.value(0).toString();
+
+            if (hostname == gCoreContext->GetMasterHostName())
+            {
+                StorageGroup sgroup(storageGroup, hostname);
+
+                if (useRegex)
+                {
+                    QFileInfo fi(filename);
+                    QStringList files = sgroup.GetFileList('/' + fi.path());
+
+                    LOG(VB_FILE, LOG_INFO, LOC + QString("Looking in dir '%1' for '%2'").arg(fi.path()).arg(fi.fileName()));
+
+                    for (int x = 0; x < files.size(); x++)
+                    {
+                        LOG(VB_FILE, LOG_INFO, LOC + QString("Found '%1 - %2'").arg(x).arg(files[x]));
+                    }
+
+                    QStringList filteredFiles = files.filter(QRegExp(fi.fileName()));
+
+                    for (int x = 0; x < filteredFiles.size(); x++)
+                    {
+                        fileList << gCoreContext->GenMythURL(gCoreContext->GetBackendServerIP(),
+                                                                gCoreContext->GetBackendServerPort(),
+                                                                fi.path() + '/' + filteredFiles[x],
+                                                                storageGroup);
+                    }
+                }
+                else
+                {
+                    QString fname = sgroup.FindFile(filename);
+                    if (!fname.isEmpty())
+                    {
+                        fileList << gCoreContext->GenMythURL(gCoreContext->GetMasterServerIP(),
+                                                        gCoreContext->GetMasterServerPort(),
+                                                        filename, storageGroup);
+                    }
+                }
+            }
+            else
+            {
+                // check the slave host
+                PlaybackSock *slave = GetMediaServerByHostname(hostname);
+                if (slave)
+                {
+                    QStringList slaveFiles = slave->GetFindFile(hostname, filename, storageGroup, useRegex);
+                    if (!slaveFiles.isEmpty() && slaveFiles[0] != "NOT FOUND" && !slaveFiles[0].startsWith("ERROR: "))
+                        fileList += slaveFiles;
+
+                    slave->DecrRef();
+                }
+            }
+
+            if (!fileList.isEmpty())
+                break;
+        }
+    }
+
+    if (fileList.isEmpty())
+    {
+        fileList << "NOT FOUND";
+        LOG(VB_FILE, LOG_INFO, LOC + QString("File was not found"));
+    }
+    else
+    {
+        for (int x = 0; x < fileList.size(); x++)
+        {
+            LOG(VB_FILE, LOG_INFO, LOC + QString("File %1 was found at: '%2'").arg(x).arg(fileList[0]));
+        }
+    }
+
+    SendResponse(pbs->getSocket(), fileList);
 }
 
 void MainServer::HandleSGFileQuery(QStringList &sList,

@@ -69,6 +69,8 @@ class PlaybackSock : public ReferenceCounter
     QStringList GetSGFileQuery(QString &host, QString &groupname,
                                QString &filename);
     QString GetFileHash(QString filename, QString storageGroup);
+    QStringList GetFindFile(const QString &host, const QString &filename,
+                            const QString &storageGroup, bool useRegex);
 
     QStringList GenPreviewPixmap(const QString     &token,
                                  const ProgramInfo *pginfo);
