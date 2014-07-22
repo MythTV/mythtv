@@ -63,6 +63,11 @@ class StreamHandler : protected MThread, public DeviceReaderCB
     bool IsRunning(void) const;
     bool HasError(void) const { return _error; }
 
+    /// Called with _listener_lock locked just after adding new output file.
+    virtual bool AddNamedOutputFile(const QString &filename);
+    /// Called with _listener_lock locked just before removing old output file.
+    virtual void RemoveNamedOutputFile(const QString &filename);
+
   protected:
     StreamHandler(const QString &device);
     ~StreamHandler();
@@ -95,10 +100,6 @@ class StreamHandler : protected MThread, public DeviceReaderCB
   protected:
     /// Write out a copy of the raw MPTS
     void WriteMPTS(unsigned char * buffer, uint len);
-    /// Called with _listener_lock locked just after adding new output file.
-    virtual bool AddNamedOutputFile(const QString &filename);
-    /// Called with _listener_lock locked just before removing old output file.
-    virtual void RemoveNamedOutputFile(const QString &filename);
     /// At minimum this sets _running_desired, this may also send
     /// signals to anything that might be blocking the run() loop.
     /// \note: The _start_stop_lock must be held when this is called.

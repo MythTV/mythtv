@@ -51,6 +51,9 @@ void HDHRRecorder::Close(void)
 
 void HDHRRecorder::StartNewFile(void)
 {
+    if (_record_mpts)
+        _stream_handler->AddNamedOutputFile(ringBuffer->GetFilename());
+
     // Make sure the first things in the file are a PAT & PMT
     HandleSingleProgramPAT(_stream_data->PATSingleProgram(), true);
     HandleSingleProgramPMT(_stream_data->PMTSingleProgram(), true);

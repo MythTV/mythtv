@@ -50,10 +50,14 @@ void ASIRecorder::SetOptionsFromProfile(RecordingProfile *profile,
     // we do not have a "recordingtype" in our profile.
     DTVRecorder::SetOption("videodevice", videodev);
     DTVRecorder::SetOption("tvformat", gCoreContext->GetSetting("TVFormat"));
+    SetIntOption(profile, "recordmpts");
 }
 
 void ASIRecorder::StartNewFile(void)
 {
+    if (_record_mpts)
+        m_stream_handler->AddNamedOutputFile(ringBuffer->GetFilename());
+
     // Make sure the first things in the file are a PAT & PMT
     HandleSingleProgramPAT(_stream_data->PATSingleProgram(), true);
     HandleSingleProgramPMT(_stream_data->PMTSingleProgram(), true);

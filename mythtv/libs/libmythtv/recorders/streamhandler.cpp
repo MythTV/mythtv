@@ -94,9 +94,6 @@ void StreamHandler::AddListener(MPEGStreamData *data,
         _stream_data_list[data] = output_file;
     }
 
-    if (!output_file.isEmpty())
-        AddNamedOutputFile(output_file);
-
     _listener_lock.unlock();
 
     Start();
@@ -410,6 +407,8 @@ bool StreamHandler::AddNamedOutputFile(const QString &file)
             _mpts_tfw = NULL;
             return false;
         }
+        LOG(VB_RECORD, LOG_INFO, LOC +
+            QString("Opened '%1'").arg(_mpts_base_file));
     }
     else
     {
@@ -426,8 +425,7 @@ bool StreamHandler::AddNamedOutputFile(const QString &file)
             LOG(VB_RECORD, LOG_INFO, LOC +
                 QString("linked '%1' to '%2'")
                 .arg(_mpts_base_file)
-                .arg(fn) +
-                ENO);
+                .arg(fn));
         }
     }
 
