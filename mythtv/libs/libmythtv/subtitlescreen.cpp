@@ -1985,38 +1985,44 @@ bool FormattedTextSubtitle::Draw(const QString &base,
             // Don't draw a background behind leading spaces.
             if (first)
                 bgrect.setLeft(bgrect.left() + x_adjust);
-            MythUIShape *bgshape =
-                parent->m_format->
-                GetBackground(parent,
-                              QString("subbg%1x%2@%3,%4")
-                              .arg(chunk_sz.width()).arg(height)
-                              .arg(x).arg(y),
-                              base, (*chunk).format);
-            bgshape->SetArea(MythRect(bgrect));
-            if (imageCache)
-                imageCache->append(bgshape);
-            if (duration > 0)
-                parent->RegisterExpiration(bgshape, start + duration);
-            result = true;
+            if (bgrect.width() > 0)
+            {
+                MythUIShape *bgshape =
+                    parent->m_format->
+                    GetBackground(parent,
+                                  QString("subbg%1x%2@%3,%4")
+                                  .arg(chunk_sz.width()).arg(height)
+                                  .arg(x).arg(y),
+                                  base, (*chunk).format);
+                bgshape->SetArea(MythRect(bgrect));
+                if (imageCache)
+                    imageCache->append(bgshape);
+                if (duration > 0)
+                    parent->RegisterExpiration(bgshape, start + duration);
+                result = true;
+            }
             // Shift to the right to account for leading spaces that
             // are removed by the MythUISimpleText constructor.  Also
             // add in padding at the end to avoid clipping.
             QRect rect(x + x_adjust, y,
                        chunk_sz.width() - x_adjust + rightPadding, height);
 
-            MythUISimpleText *text =
-                new MythUISimpleText((*chunk).text, *mythfont, rect,
-                                     Qt::AlignLeft, (MythUIType*)parent,
-                                     QString("subtxt%1x%2@%3,%4")
-                                     .arg(chunk_sz.width())
-                                     .arg(height)
-                                     .arg(x).arg(y));
-            bringToFront.append(text);
-            if (imageCache)
-                imageCache->append(text);
-            if (duration > 0)
-                parent->RegisterExpiration(text, start + duration);
-            result = true;
+            if (rect.width() > 0)
+            {
+                MythUISimpleText *text =
+                    new MythUISimpleText((*chunk).text, *mythfont, rect,
+                                         Qt::AlignLeft, (MythUIType*)parent,
+                                         QString("subtxt%1x%2@%3,%4")
+                                         .arg(chunk_sz.width())
+                                         .arg(height)
+                                         .arg(x).arg(y));
+                bringToFront.append(text);
+                if (imageCache)
+                    imageCache->append(text);
+                if (duration > 0)
+                    parent->RegisterExpiration(text, start + duration);
+                result = true;
+            }
 
             LOG(VB_VBI, LOG_INFO,
                 QString("Drawing chunk at (%1,%2): %3")
