@@ -5612,7 +5612,7 @@ void MainServer::HandleMusicTagUpdateVolatile(const QStringList &slist, Playback
 
     QString hostname = slist[1];
 
-    if (ismaster && hostname != gCoreContext->GetHostName())
+    if (ismaster && !gCoreContext->IsThisHost(hostname))
     {
         // forward the request to the slave BE
         PlaybackSock *slave = GetMediaServerByHostname(hostname);
@@ -5676,7 +5676,7 @@ void MainServer::HandleMusicCalcTrackLen(const QStringList &slist, PlaybackSock 
 
     QString hostname = slist[1];
 
-    if (ismaster && hostname != gCoreContext->GetHostName())
+    if (ismaster && !gCoreContext->IsThisHost(hostname))
     {
         // forward the request to the slave BE
         PlaybackSock *slave = GetMediaServerByHostname(hostname);
@@ -5738,7 +5738,7 @@ void MainServer::HandleMusicTagUpdateMetadata(const QStringList &slist, Playback
 
     QString hostname = slist[1];
 
-    if (ismaster && hostname != gCoreContext->GetHostName())
+    if (ismaster && !gCoreContext->IsThisHost(hostname))
     {
         // forward the request to the slave BE
         PlaybackSock *slave = GetMediaServerByHostname(hostname);
@@ -5828,7 +5828,7 @@ void MainServer::HandleMusicFindAlbumArt(const QStringList &slist, PlaybackSock 
 
     QString hostname = slist[1];
 
-    if (ismaster && hostname != gCoreContext->GetHostName())
+    if (ismaster && !gCoreContext->IsThisHost(hostname))
     {
         // forward the request to the slave BE
         PlaybackSock *slave = GetMediaServerByHostname(hostname);
@@ -5986,7 +5986,7 @@ void MainServer::HandleMusicTagGetImage(const QStringList &slist, PlaybackSock *
     QString songid = slist[2];
     QString imagetype = slist[3];
 
-    if (ismaster && hostname != gCoreContext->GetHostName())
+    if (ismaster && !gCoreContext->IsThisHost(hostname))
     {
         // forward the request to the slave BE
         PlaybackSock *slave = GetMediaServerByHostname(hostname);
@@ -6040,7 +6040,7 @@ void MainServer::HandleMusicTagChangeImage(const QStringList &slist, PlaybackSoc
 
     QString hostname = slist[1];
 
-    if (ismaster && hostname != gCoreContext->GetHostName())
+    if (ismaster && !gCoreContext->IsThisHost(hostname))
     {
         // forward the request to the slave BE
         PlaybackSock *slave = GetMediaServerByHostname(hostname);
@@ -6213,7 +6213,7 @@ void MainServer::HandleMusicTagAddImage(const QStringList& slist, PlaybackSock* 
 
     QString hostname = slist[1];
 
-    if (ismaster && hostname != gCoreContext->GetHostName())
+    if (ismaster && !gCoreContext->IsThisHost(hostname))
     {
         // forward the request to the slave BE
         PlaybackSock *slave = GetMediaServerByHostname(hostname);
@@ -6372,7 +6372,7 @@ void MainServer::HandleMusicTagRemoveImage(const QStringList& slist, PlaybackSoc
 
     QString hostname = slist[1];
 
-    if (ismaster && hostname != gCoreContext->GetHostName())
+    if (ismaster && !gCoreContext->IsThisHost(hostname))
     {
         // forward the request to the slave BE
         PlaybackSock *slave = GetMediaServerByHostname(hostname);
