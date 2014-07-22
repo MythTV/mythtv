@@ -1833,7 +1833,7 @@ bool TVRec::SetupDTVSignalMonitor(bool EITscan)
     QString recording_type = "all";
     RecordingInfo *rec = lastTuningRequest.program;
     RecordingProfile profile;
-    load_profile(genOpt.cardtype, tvchain, rec, profile);
+    recProfileName = load_profile(genOpt.cardtype, tvchain, rec, profile);
     const Setting *setting = profile.byName("recordingtype");
     if (setting)
         recording_type = setting->getValue();
@@ -4196,7 +4196,7 @@ void TVRec::TuningNewRecorder(MPEGStreamData *streamData)
     RecordingInfo *rec = lastTuningRequest.program;
 
     RecordingProfile profile;
-    QString profileName = load_profile(genOpt.cardtype, tvchain, rec, profile);
+    recProfileName = load_profile(genOpt.cardtype, tvchain, rec, profile);
 
     if (tvchain)
     {
@@ -4759,9 +4759,22 @@ RecordingInfo *TVRec::SwitchRecordingRingBuffer(const RecordingInfo &rcinfo)
         return NULL;
     }
 
+    RecordingInfo   *ri = new RecordingInfo(rcinfo);
+    RecordingProfile profile;
+
+    QString pn = load_profile(genOpt.cardtype, NULL, ri, profile);
+
+    if (pn != recProfileName)
+    {
+        LOG(VB_RECORD, LOG_ERR, LOC +
+            QString("SwitchRecordingRingBuffer() "
+                    "switch profile '%1' to '%2' -> false 2")
+            .arg(recProfileName).arg(pn));
+        return NULL;
+    }
+
     PreviewGeneratorQueue::GetPreviewImage(*curRecording, "");
 
-    RecordingInfo *ri = new RecordingInfo(rcinfo);
     ri->MarkAsInUse(true, kRecorderInUseID);
     StartedRecording(ri);
 
@@ -4774,7 +4787,7 @@ RecordingInfo *TVRec::SwitchRecordingRingBuffer(const RecordingInfo &rcinfo)
         FinishedRecording(ri, NULL);
         ri->MarkAsInUse(false, kRecorderInUseID);
         delete ri;
-        LOG(VB_RECORD, LOG_ERR, LOC + "SwitchRecordingRingBuffer() -> false 2");
+        LOG(VB_RECORD, LOG_ERR, LOC + "SwitchRecordingRingBuffer() -> false 3");
         return NULL;
     }
     else

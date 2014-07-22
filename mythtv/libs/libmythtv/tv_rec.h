@@ -363,6 +363,8 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     DVBDBOptions       dvbOpt;
     FireWireDBOptions  fwOpt;
 
+    QString            recProfileName;
+
     // State variables
     mutable QMutex setChannelLock;
     mutable QMutex stateChangeLock;
