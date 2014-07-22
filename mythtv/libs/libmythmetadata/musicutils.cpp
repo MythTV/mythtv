@@ -45,21 +45,18 @@ QString findIcon(const QString &type, const QString &name, bool ignoreCache)
         }
     }
 
-    QString cleanName = fixFilename(name);
-    QString file = QString("Icons/%1/%2").arg(type).arg(cleanName);
-    QStringList imageExtensions = QStringList() << ".jpg" << ".jpeg" << ".png" << ".gif";
-    QString filename;
+    QString cleanName = fixFilename(name) + '.';
+    cleanName = '^' + QRegExp::escape(cleanName);
+    QString file = QString("/Icons/%1/%2").arg(type).arg(cleanName);
+    QString imageExtensions = "(jpg|jpeg|png|gif)";
+    QStringList fileList;
 
-    // TODO also look on any slave BEs?
-    for (int x = 0; x < imageExtensions.count(); x++)
+    fileList = RemoteFile::FindFileList(file + imageExtensions, gCoreContext->GetMasterHostName(), "MusicArt", true, true);
+    if (!fileList.isEmpty())
     {
-        filename = RemoteFile::FindFile(file + imageExtensions[x], gCoreContext->GetMasterHostName(), "MusicArt");
-        if (!filename.isEmpty())
-        {
-            LOG(VB_FILE, LOG_INFO, QString("findicon: found at %1").arg(filename));
-            iconMap.insert(type + name, filename);
-            return filename;
-        }
+        LOG(VB_FILE, LOG_INFO, QString("findicon: found %1 icons using %2").arg(fileList.size()).arg(fileList[0]));
+        iconMap.insert(type + name, fileList[0]);
+        return fileList[0];
     }
 
     iconMap.insert(type + name, QString());
