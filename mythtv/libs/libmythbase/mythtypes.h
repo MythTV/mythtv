@@ -14,9 +14,4 @@
 
 typedef QHash<QString,QString> InfoMap;
 
-typedef struct TextProperties {
-    QString text;
-    QString state;
-} TextProperties;
-
 #endif /* defined(__MythTV__mythtypes__) */

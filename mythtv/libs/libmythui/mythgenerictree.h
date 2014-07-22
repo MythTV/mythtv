@@ -11,7 +11,8 @@
 #include <QHash>
 
 #include "mythuiexp.h"
-#include "mythtypes.h"
+
+#include "mythuibuttonlist.h"
 
 class SortableMythGenericTreeList;
 
@@ -108,10 +109,7 @@ class MUI_PUBLIC MythGenericTree
     // only changes m_subnodes.  resort it if you want the others to change
     void MoveItemUpDown(MythGenericTree *item, bool flag);
 
-  protected:
-    QMap<QString, TextProperties> GetAllText(void) const { return m_strings; }
-    InfoMap GetAllStates(void) const { return m_states; }
-    InfoMap GetAllImages() const { return m_imageFilenames; }
+    virtual MythUIButtonListItem *CreateListButton(MythUIButtonList *list);
 
   private:
     void reorderSubnodes(void);
@@ -132,8 +130,6 @@ class MUI_PUBLIC MythGenericTree
 
     bool m_selectable;
     bool m_visible;
-
-    friend class MythUIButtonTree;
 };
 
 Q_DECLARE_METATYPE(MythGenericTree*)

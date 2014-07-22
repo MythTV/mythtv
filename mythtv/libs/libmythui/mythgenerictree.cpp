@@ -501,6 +501,20 @@ void MythGenericTree::SetVisible(bool visible)
         m_parent->DecVisibleCount();
 }
 
+MythUIButtonListItem *MythGenericTree::CreateListButton(MythUIButtonList *list)
+{
+    MythUIButtonListItem *item = new MythUIButtonListItem(list, GetText());
+    item->SetData(qVariantFromValue(this));
+    item->SetTextFromMap(m_strings);
+    item->SetImageFromMap(m_imageFilenames);
+    item->SetStatesFromMap(m_states);
+
+    if (visibleChildCount() > 0)
+        item->setDrawArrow(true);
+
+    return item;
+}
+
 void MythGenericTree::SetText(const QString &text, const QString &name,
                               const QString &state)
 {

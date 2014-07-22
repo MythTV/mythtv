@@ -12,11 +12,14 @@
 #include "mythuigroup.h"
 #include "mythscreentype.h"
 
-#include "mythtypes.h"
-
 class MythUIButtonList;
 class MythUIScrollBar;
 class MythUIStateType;
+
+struct TextProperties {
+    QString text;
+    QString state;
+};
 
 class MUI_PUBLIC MythUIButtonListItem
 {
