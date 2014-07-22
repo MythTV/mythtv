@@ -738,7 +738,7 @@ UPnpDevice::UPnpDevice() :
     jpgIconLrg->m_nDepth = 24;
     jpgIconLrg->m_nHeight = 120;
     jpgIconLrg->m_nWidth = 120;
-    jpgIconLrg->m_sMimeType = "image/jpg";
+    jpgIconLrg->m_sMimeType = "image/jpeg";
     jpgIconLrg->m_sURL = "/images/icons/upnp_large_icon.jpg";
     m_listIcons.append(jpgIconLrg);
 
@@ -756,7 +756,7 @@ UPnpDevice::UPnpDevice() :
     jpgIconSm->m_nDepth = 24;
     jpgIconSm->m_nHeight = 48;
     jpgIconSm->m_nWidth = 48;
-    jpgIconSm->m_sMimeType = "image/jpg";
+    jpgIconSm->m_sMimeType = "image/jpeg";
     jpgIconSm->m_sURL = "/images/icons/upnp_small_icon.jpg";
     m_listIcons.append(jpgIconSm);
 }
