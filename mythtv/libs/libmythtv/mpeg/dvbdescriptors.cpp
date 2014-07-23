@@ -516,7 +516,7 @@ QString TeletextDescriptor::toString(void) const
         if (1 != StreamCount())
             str.append("\n ");
 
-        str.append(QString(" type(%1) mag(%2) page(%3) lang(%4)")
+        str.append(QString("     type(%1) mag(%2) page(%3) lang(%4)")
                    .arg(TeletextType(i))
                    .arg(TeletextMagazineNum(i), 0, 16)
                    .arg(TeletextPageNum(i), 2, 16, QChar('0'))
