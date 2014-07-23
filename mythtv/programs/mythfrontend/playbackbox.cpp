@@ -1150,10 +1150,11 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
     }
 
     iconMap.clear();
-    iconMap["dolby"]  = AUD_DOLBY;
-    iconMap["surround"]  = AUD_SURROUND;
-    iconMap["stereo"] = AUD_STEREO;
-    iconMap["mono"] = AUD_MONO;
+    // Add prefix to ensure iteration order in case 2 or more properties set
+    iconMap["1dolby"]  = AUD_DOLBY;
+    iconMap["2surround"]  = AUD_SURROUND;
+    iconMap["3stereo"] = AUD_STEREO;
+    iconMap["4mono"] = AUD_MONO;
 
     iconState = dynamic_cast<MythUIStateType *>(GetChild("audioprops"));
     bool haveIcon = false;
@@ -1163,7 +1164,7 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
         {
             if (pginfo->GetAudioProperties() & (*it))
             {
-                if (iconState->DisplayState(it.key()))
+                if (iconState->DisplayState(it.key().mid(1)))
                 {
                     haveIcon = true;
                     break;
