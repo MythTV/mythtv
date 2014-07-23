@@ -270,6 +270,7 @@ class MTV_PUBLIC MPEGDescriptor
 
   protected:
     const unsigned char *_data;
+    QString hexdump(void) const;
 };
 
 // a_52a.pdf p119, Table A1
