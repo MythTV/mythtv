@@ -487,12 +487,12 @@ QString MPEGDescriptor::toStringXML(uint level) const
 QString MPEGDescriptor::hexdump(void) const
 {
     QString str, hex, prt;
-    uint i;
+    uint i, ch;
     for (i=0; i<DescriptorLength(); i++)
     {
-        QChar ch(uint(_data[i+2]));
-        hex.append(QString(" %1").arg(ch.cell(), 2, 16, QChar('0')));
-        prt.append(QString("%1").arg(ch.isLetterOrNumber() ? ch : '.'));
+        ch = _data[i+2];
+        hex.append(QString(" %1").arg(ch, 2, 16, QChar('0')));
+        prt.append(QString("%1").arg(isalnum(ch) ? ch : '.'));
         if (((i+1) % 8) == 0)
             hex.append(" ");
         if (((i+1) % 16) == 0)
