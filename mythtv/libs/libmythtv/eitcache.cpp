@@ -274,14 +274,14 @@ void EITCache::WriteChannelToDB(QStringList &value_clauses, uint chanid)
                 updated++;
                 *it &= ~(uint64_t)0 >> 1; // mark as synced
             }
+            ++it;
         }
         else
         {
             // Event is too old; remove from eit cache in memory
-            eventMap->remove(it.key());
+            it = eventMap->erase(it);
             removed++;
         }
-        ++it;
     }
     unlock_channel(chanid, updated);
 
