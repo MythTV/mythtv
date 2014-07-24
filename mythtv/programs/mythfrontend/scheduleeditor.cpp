@@ -514,7 +514,8 @@ void ScheduleEditor::ShowSchedInfo()
             menuPopup->AddButton(tr("Program Details"));
         menuPopup->AddButton(tr("Upcoming Episodes"));
         menuPopup->AddButton(tr("Upcoming Recordings"));
-        menuPopup->AddButton(tr("Previously Recorded"));
+        if (m_recordingRule->m_type != kTemplateRecord)
+            menuPopup->AddButton(tr("Previously Recorded"));
 
         popupStack->AddScreen(menuPopup);
     }
@@ -600,7 +601,7 @@ void ScheduleEditor::customEvent(QEvent *event)
             else if (resulttext == tr("Upcoming Recordings"))
                 showUpcomingByRule();
             else if (resulttext == tr("Previously Recorded"))
-                showPrevious();
+                ShowPrevious();
         }
         else if (resultid == "newrecgroup")
         {
@@ -608,18 +609,6 @@ void ScheduleEditor::customEvent(QEvent *event)
             StoreOptMixin::SetRecGroup(groupID, resulttext);
         }
     }
-}
-
-void ScheduleEditor::showPrevious(void)
-{
-    if (m_recordingRule->m_type == kTemplateRecord)
-        return;
-
-    QString title;
-    if (m_recInfo)
-        title = m_recInfo->GetTitle();
-
-    ShowPrevious(m_recordingRule->m_recordID, title);
 }
 
 void ScheduleEditor::showUpcomingByRule(void)

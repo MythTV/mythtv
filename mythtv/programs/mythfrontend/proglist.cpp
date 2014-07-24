@@ -249,14 +249,12 @@ bool ProgLister::keyPressEvent(QKeyEvent *e)
         else if (action == "CUSTOMEDIT")
             EditCustom();
         else if (action == "EDIT")
-        {
             EditScheduled();
-        }
         else if (action == "DELETE")
             ShowDeleteItemMenu();
         else if (action == "UPCOMING" && m_type != plTitle)
             ShowUpcoming();
-        else if (action == "PREVRECORDED")
+        else if (action == "PREVRECORDED" && m_type != plPreviouslyRecorded)
             ShowPrevious();
         else if (action == "DETAILS" || action == "INFO")
             ShowDetails();
@@ -787,13 +785,6 @@ void ProgLister::ShowGuide(void)
         GuideGrid::RunProgramGuide(pi->GetChanID(), pi->GetChanNum(),
                                    pi->GetScheduledStartTime());
     }
-}
-
-void ProgLister::ShowPrevious(void)
-{
-    ProgramInfo *pi = GetCurrentProgram();
-    if (pi && m_type != plPreviouslyRecorded)
-        ScheduleCommon::ShowPrevious(pi);
 }
 
 void ProgLister::FillViewList(const QString &view)

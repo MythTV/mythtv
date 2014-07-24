@@ -147,7 +147,6 @@ class PlaybackBox : public ScheduleCommon
     void SwitchList(void);
 
     void ShowGroupPopup(void);
-    void previous();
     void StopSelected(void);
     void showMetadataEditor();
     void showGroupFilter();

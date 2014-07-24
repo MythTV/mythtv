@@ -818,7 +818,7 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
         else if (action == "UPCOMING")
             ShowUpcoming();
         else if (action == "PREVRECORDED")
-            previous();
+            ShowPrevious();
         else if (action == "DETAILS" || action == "INFO")
             ShowDetails();
         else if (action == ACTION_TOGGLERECORD)
@@ -1751,7 +1751,7 @@ void GuideGrid::customEvent(QEvent *event)
             }
             else if (resulttext == tr("Previously Recorded"))
             {
-                previous();
+                ShowPrevious();
             }
             else if (resulttext == tr("Custom Edit"))
             {
@@ -2397,19 +2397,6 @@ void GuideGrid::deleteRule()
         popupStack->AddScreen(okPopup);
     else
         delete okPopup;
-}
-
-void GuideGrid::previous()
-{
-    ProgramInfo *pginfo = m_programInfos[m_currentRow][m_currentCol];
-
-    if (!pginfo)
-        return;
-
-    if (pginfo->GetTitle() == kUnknownTitle)
-        return;
-
-    ShowPrevious(pginfo);
 }
 
 void GuideGrid::channelUpdate(void)

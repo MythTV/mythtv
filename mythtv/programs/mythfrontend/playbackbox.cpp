@@ -2301,13 +2301,6 @@ void PlaybackBox::deleteSelected(MythUIButtonListItem *item)
     }
 }
 
-void PlaybackBox::previous()
-{
-    ProgramInfo *pginfo = GetCurrentProgram();
-    if (pginfo)
-        ShowPrevious(pginfo);
-}
-
 ProgramInfo *PlaybackBox::GetCurrentProgram(void) const
 {
     ProgramInfo *pginfo = NULL;
@@ -3918,7 +3911,7 @@ bool PlaybackBox::keyPressEvent(QKeyEvent *event)
             else if (action == ACTION_VIEWSCHEDULED)
                 ShowUpcomingScheduled();
             else if (action == ACTION_PREVRECORDED)
-                previous();
+                ShowPrevious();
             else
                 handled = false;
         }

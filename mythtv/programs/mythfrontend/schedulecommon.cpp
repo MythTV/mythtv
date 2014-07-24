@@ -205,21 +205,15 @@ void ScheduleCommon::MakeOverride(RecordingInfo *recinfo)
 /**
 *  \brief Show the previous recordings for this recording rule
 */
-void ScheduleCommon::ShowPrevious(ProgramInfo *pginfo) const
+void ScheduleCommon::ShowPrevious(void) const
 {
+    ProgramInfo *pginfo = GetCurrentProgram();
     if (!pginfo)
         return;
 
-    ShowPrevious(pginfo->GetRecordingRuleID(), pginfo->GetTitle());
-}
-
-/**
-*  \brief Show the previous recordings for this recording rule
-*/
-void ScheduleCommon::ShowPrevious(uint recordid, const QString &title) const
-{
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    ProgLister *pl = new ProgLister(mainStack, recordid, title);
+    ProgLister *pl = new ProgLister(mainStack, pginfo->GetRecordingRuleID(),
+                                    pginfo->GetTitle());
     if (pl->Create())
         mainStack->AddScreen(pl);
     else

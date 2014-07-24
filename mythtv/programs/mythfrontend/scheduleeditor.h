@@ -158,7 +158,6 @@ class ScheduleEditor : public ScheduleCommon,
     void customEvent(QEvent *event);
 
     void showMenu(void);
-    void showPrevious(void);
     void showUpcomingByRule(void);
     void showUpcomingByTitle(void);
 

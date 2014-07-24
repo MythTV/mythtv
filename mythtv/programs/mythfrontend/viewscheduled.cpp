@@ -170,7 +170,7 @@ bool ViewScheduled::keyPressEvent(QKeyEvent *event)
         else if (action == "VIEWSCHEDULED")
             ShowUpcomingScheduled();
         else if (action == "PREVRECORDED")
-            previous();
+            ShowPrevious();
         else if (action == "DETAILS" || action == "INFO")
             ShowDetails();
         else if (action == "GUIDE")
@@ -578,20 +578,6 @@ void ViewScheduled::showGuide()
     GuideGrid::RunProgramGuide(startchanid, startchannel, starttime);
 }
 
-void ViewScheduled::previous()
-{
-    MythUIButtonListItem *item = m_schedulesList->GetItemCurrent();
-    if (!item)
-        return;
-
-    ProgramInfo *pginfo = item->GetData().value<ProgramInfo*>();
-
-    ShowPrevious(pginfo);
-
-    //FIXME:
-    //EmbedTVWindow();
-}
-
 void ViewScheduled::selected(MythUIButtonListItem *item)
 {
     if (!item)
@@ -720,7 +706,7 @@ void ViewScheduled::customEvent(QEvent *event)
             }
             else if (resulttext == tr("Previously Recorded"))
             {
-                previous();
+                ShowPrevious();
             }
             else if (resulttext == tr("Custom Edit"))
             {

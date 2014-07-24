@@ -61,7 +61,6 @@ class ProgLister : public ScheduleCommon
     void SetViewFromTime(QDateTime searchTime);
 
     void ShowGuide(void);
-    void ShowPrevious(void);
     void ShowDeleteRuleMenu(void);
     void ShowDeleteOldEpisodeMenu(void);
     void ShowChooseViewMenu(void);
