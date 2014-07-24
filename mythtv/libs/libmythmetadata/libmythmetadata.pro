@@ -47,8 +47,6 @@ INCLUDEPATH += ../../external/FFmpeg ../libmyth  ../../external/libmythbluray
 # for TagLib
 INCLUDEPATH += $${CONFIG_TAGLIB_INCLUDES}
 
-win32-msvc*:INCLUDEPATH += ../../platform/win32/msvc/external/taglib/taglib/Headers
-
 DEPENDPATH += ../../external/libsamplerate ../libmythsoundtouch
 DEPENDPATH += ../libmythfreesurround
 DEPENDPATH += ../ ../libmythui ../libmythbase

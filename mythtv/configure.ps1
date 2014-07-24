@@ -484,13 +484,14 @@ switch ($tools.Get_Item( 'tag.lib'))
 
         Remove-Item $basePath\bin\debug\tag.*   -ErrorAction SilentlyContinue
         Remove-Item $basePath\bin\release\tag.* -ErrorAction SilentlyContinue
+
     }
 
     Build
     {
         Write-Host "Building: taglib" -foregroundcolor cyan
 
-        if (!(Test-Path $basePath\platform\win32\msvc\external\taglib\taglib\*.lib ))
+        if (!(Test-Path $basePath\platform\win32\msvc\external\taglib\lib\*.lib ))
         {
             Remove-Item $basePath\platform\win32\msvc\external\taglib\CMakeCache.txt -ErrorAction SilentlyContinue
 
@@ -502,16 +503,17 @@ switch ($tools.Get_Item( 'tag.lib'))
                       "-DENABLE_STATIC=0";
                       "-DWITH_MP4=1";
                       "-DCMAKE_BUILD_TYPE=$BuildType";
-                      "-DCMAKE_CXX_FLAGS=""/FI algorithm""" )
+                      "-DCMAKE_CXX_FLAGS=""/FI algorithm""";
+                      "-DCMAKE_INSTALL_PREFIX=""$basePath\platform\win32\msvc\external\taglib""" )
 
             Run-Exe "$basePath\platform\win32\msvc\external\taglib" `
                     "nmake.exe"                                     `
-                    "tag"
+                    "tag install"
         }
 
         # -- Copy lib to shared folder
-        Copy-Item $basePath\platform\win32\msvc\external\taglib\taglib\*.lib   $DestDir
-        Copy-Item $basePath\platform\win32\msvc\external\taglib\taglib\*.dll   $DestDir
+        Copy-Item $basePath\platform\win32\msvc\external\taglib\lib\*.lib   $DestDir
+        Copy-Item $basePath\platform\win32\msvc\external\taglib\bin\*.dll   $DestDir
     }
 }
 
