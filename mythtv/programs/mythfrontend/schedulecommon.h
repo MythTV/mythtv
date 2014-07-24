@@ -28,7 +28,6 @@ class ScheduleCommon : public MythScreenType
     void EditRecording(ProgramInfo *pginfo);
     void EditScheduled(ProgramInfo *pginfo);
     void EditScheduled(RecordingInfo *recinfo);
-    void EditCustom(ProgramInfo *pginfo);
     void MakeOverride(RecordingInfo *recinfo);
 
     virtual void customEvent(QEvent*);
@@ -41,6 +40,7 @@ class ScheduleCommon : public MythScreenType
     virtual void ShowUpcoming(void) const;
     virtual void ShowUpcomingScheduled(void) const;
     virtual void EditScheduled(void);
+    virtual void EditCustom(void);
 
   private:
     bool IsFindApplicable(const RecordingInfo &recInfo) const;

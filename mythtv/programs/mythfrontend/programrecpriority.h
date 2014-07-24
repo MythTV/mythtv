@@ -91,7 +91,6 @@ class ProgramRecPriority : public ScheduleCommon
 
     void changeRecPriority(int howMuch);
     void saveRecPriority(void);
-    void customEdit();
     void newTemplate(QString category);
     void remove();
     void deactivate();

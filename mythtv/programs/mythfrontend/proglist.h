@@ -60,8 +60,6 @@ class ProgLister : public ScheduleCommon
     void SetViewFromList(QString item);
     void SetViewFromTime(QDateTime searchTime);
 
-    void EditCustom(void)    { ScheduleCommon::EditCustom(GetCurrentProgram());    }
-
     void ShowGuide(void);
     void ShowPrevious(void);
     void ShowDeleteRuleMenu(void);

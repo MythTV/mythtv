@@ -42,7 +42,6 @@
 
 //  Mythfrontend
 #include "playbackboxlistitem.h"
-#include "customedit.h"
 #include "proglist.h"
 
 #define LOC      QString("PlaybackBox: ")
@@ -2326,13 +2325,6 @@ ProgramInfo *PlaybackBox::GetCurrentProgram(void) const
     return pginfo;
 }
 
-void PlaybackBox::customEdit()
-{
-    ProgramInfo *pginfo = GetCurrentProgram();
-    if (pginfo)
-        EditCustom(pginfo);
-}
-
 void PlaybackBox::selected(MythUIButtonListItem *item)
 {
     if (!item)
@@ -2975,7 +2967,7 @@ MythMenu* PlaybackBox::createRecordingMenu(void)
 
     menu->AddItem(tr("Change Recording Metadata"), SLOT(showMetadataEditor()));
 
-    menu->AddItem(tr("Custom Edit"), SLOT(customEdit()));
+    menu->AddItem(tr("Custom Edit"), SLOT(EditCustom()));
 
     return menu;
 }
@@ -3920,7 +3912,7 @@ bool PlaybackBox::keyPressEvent(QKeyEvent *event)
             else if (action == "DETAILS" || action == "INFO")
                 ShowDetails();
             else if (action == "CUSTOMEDIT")
-                customEdit();
+                EditCustom();
             else if (action == "UPCOMING")
                 ShowUpcoming();
             else if (action == ACTION_VIEWSCHEDULED)

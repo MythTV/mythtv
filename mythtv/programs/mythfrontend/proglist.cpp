@@ -247,10 +247,7 @@ bool ProgLister::keyPressEvent(QKeyEvent *e)
         else if (action == "NEXTVIEW")
             SwitchToNextView();
         else if (action == "CUSTOMEDIT")
-        {
-            if (GetCurrentProgram())
-                ScheduleCommon::EditCustom(GetCurrentProgram());
-        }
+            EditCustom();
         else if (action == "EDIT")
         {
             EditScheduled();

@@ -22,7 +22,6 @@ using namespace std;
 #include "recordingrule.h"
 #include "tv_play.h"
 #include "tv_rec.h"
-#include "customedit.h"
 #include "mythdate.h"
 #include "remoteutil.h"
 #include "channelutil.h"
@@ -813,7 +812,7 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
         else if (action == "EDIT")
             EditScheduled();
         else if (action == "CUSTOMEDIT")
-            customEdit();
+            EditCustom();
         else if (action == "DELETE")
             deleteRule();
         else if (action == "UPCOMING")
@@ -1756,7 +1755,7 @@ void GuideGrid::customEvent(QEvent *event)
             }
             else if (resulttext == tr("Custom Edit"))
             {
-                customEdit();
+                EditCustom();
             }
             else if (resulttext == tr("Delete Rule"))
             {
@@ -2367,13 +2366,6 @@ void GuideGrid::editRecSchedule()
         return;
 
     EditRecording(pginfo);
-}
-
-void GuideGrid::customEdit()
-{
-    ProgramInfo *pginfo = m_programInfos[m_currentRow][m_currentCol];
-
-    EditCustom(pginfo);
 }
 
 void GuideGrid::deleteRule()

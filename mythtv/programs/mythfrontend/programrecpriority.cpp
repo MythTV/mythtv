@@ -27,7 +27,6 @@ using namespace std;
 #include "mythdialogbox.h"
 
 // mythfrontend
-#include "customedit.h"
 #include "proglist.h"
 #include "scheduleeditor.h"
 
@@ -597,7 +596,7 @@ bool ProgramRecPriority::keyPressEvent(QKeyEvent *event)
         else if (action == "CUSTOMEDIT")
         {
             saveRecPriority();
-            customEdit();
+            EditCustom();
         }
         else if (action == "DELETE")
         {
@@ -713,7 +712,7 @@ void ProgramRecPriority::customEvent(QEvent *event)
             else if (resulttext == tr("Custom Edit"))
             {
                 saveRecPriority();
-                customEdit();
+                EditCustom();
             }
             else if (resulttext == tr("Delete Rule"))
             {
@@ -990,18 +989,6 @@ void ProgramRecPriority::scheduleChanged(int recid)
     }
 
     countMatches();
-}
-
-void ProgramRecPriority::customEdit(void)
-{
-    MythUIButtonListItem *item = m_programList->GetItemCurrent();
-    if (!item)
-        return;
-
-    ProgramRecPriorityInfo *pgRecInfo =
-                        item->GetData().value<ProgramRecPriorityInfo*>();
-
-    EditCustom(pgRecInfo);
 }
 
 void ProgramRecPriority::remove(void)

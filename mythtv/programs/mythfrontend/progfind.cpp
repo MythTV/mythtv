@@ -24,7 +24,8 @@
 
 // mythfrontend
 #include "guidegrid.h"
-#include "customedit.h"
+#include "mythplayer.h"
+#include "mythplayer.h"
 #include "progfind.h"
 
 #define LOC      QString("ProgFinder: ")
@@ -189,7 +190,7 @@ bool ProgFinder::keyPressEvent(QKeyEvent *event)
         if (action == "EDIT")
             EditScheduled();
         else if (action == "CUSTOMEDIT")
-            customEdit();
+            EditCustom();
         else if (action == "UPCOMING")
             ShowUpcoming();
         else if (action == "PREVRECORDED")
@@ -317,7 +318,7 @@ void ProgFinder::customEvent(QEvent *event)
             }
             else if (resulttext == tr("Custom Edit"))
             {
-                customEdit();
+                EditCustom();
             }
             else if (resulttext == tr("Program Guide"))
             {
@@ -450,15 +451,6 @@ void ProgFinder::select()
         SetFocusWidget(m_showList);
     else if (GetFocusWidget() == m_showList)
         SetFocusWidget(m_timesList);
-}
-
-void ProgFinder::customEdit()
-{
-    if (GetFocusWidget() == m_timesList)
-    {
-        ProgramInfo *pginfo = m_showData[m_timesList->GetCurrentPos()];
-        EditCustom(pginfo);
-    }
 }
 
 void ProgFinder::previous()

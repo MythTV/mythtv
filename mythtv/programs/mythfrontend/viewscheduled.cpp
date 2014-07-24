@@ -3,7 +3,6 @@
 
 #include <QCoreApplication>
 
-#include "customedit.h"
 #include "recordinginfo.h"
 #include "tv_play.h"
 #include "recordingrule.h"
@@ -163,7 +162,7 @@ bool ViewScheduled::keyPressEvent(QKeyEvent *event)
         if (action == "EDIT")
             EditScheduled();
         else if (action == "CUSTOMEDIT")
-            customEdit();
+            EditCustom();
         else if (action == "DELETE")
             deleteRule();
         else if (action == "UPCOMING")
@@ -529,17 +528,6 @@ void ViewScheduled::updateInfo(MythUIButtonListItem *item)
     }
 }
 
-void ViewScheduled::customEdit()
-{
-    MythUIButtonListItem *item = m_schedulesList->GetItemCurrent();
-
-    if (!item)
-        return;
-
-    ProgramInfo *pginfo = item->GetData().value<ProgramInfo*>();
-    EditCustom(pginfo);
-}
-
 void ViewScheduled::deleteRule()
 {
     MythUIButtonListItem *item = m_schedulesList->GetItemCurrent();
@@ -736,7 +724,7 @@ void ViewScheduled::customEvent(QEvent *event)
             }
             else if (resulttext == tr("Custom Edit"))
             {
-                customEdit();
+                EditCustom();
             }
             else if (resulttext == tr("Delete Rule"))
             {

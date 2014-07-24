@@ -159,8 +159,9 @@ void ScheduleCommon::EditScheduled(RecordingInfo *recinfo)
 /**
 *  \brief Creates a dialog for creating a custom recording rule
 */
-void ScheduleCommon::EditCustom(ProgramInfo *pginfo)
+void ScheduleCommon::EditCustom(void)
 {
+    ProgramInfo *pginfo = GetCurrentProgram();
     if (!pginfo)
         return;
 
