@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // Program Name: xsd.cpp
 // Created     : Feb. 20, 2012
 //
@@ -8,11 +8,159 @@
 //                                          
 // Licensed under the GPL v2 or later, see COPYING for details                    
 //
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 
 #include "xsd.h"
 
 #include "servicehost.h"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool Xsd::GetEnumXSD( HTTPRequest *pRequest, QString sEnumName )
+{
+    if (sEnumName.isEmpty())
+        return false;
+
+    // ----------------------------------------------------------------------
+    // sEnumName needs to be in class.enum format
+    // ----------------------------------------------------------------------
+
+    if (sEnumName.count('.') != 1 )
+        return false;
+
+    QStringList lstTypeParts = sEnumName.split( '.' );
+
+    // ----------------------------------------------------------------------
+    // Create Parent object so we can get to its metaObject
+    // ----------------------------------------------------------------------
+
+    QString sParentFQN = "DTC::" + lstTypeParts[0];
+
+    int nParentId = QMetaType::type( sParentFQN.toUtf8() );
+
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+    QObject *pParentClass = (QObject *)QMetaType::construct( nParentId );
+#else
+    QObject *pParentClass = (QObject *)QMetaType::create( nParentId );
+#endif
+
+    const QMetaObject *pMetaObject = pParentClass->metaObject();
+
+    QMetaType::destroy( nParentId, pParentClass );
+
+    // ----------------------------------------------------------------------
+    // Now look up enum
+    // ----------------------------------------------------------------------
+
+    int nEnumIdx = pMetaObject->indexOfEnumerator( lstTypeParts[1].toUtf8() );
+
+    if (nEnumIdx < 0 )
+        return false;
+
+    QMetaEnum metaEnum = pMetaObject->enumerator( nEnumIdx );
+
+    // ----------------------------------------------------------------------
+    // render xsd for this enum
+    //
+    //    <xs:simpleType name="RecordingInfo.RecordingDupMethodEnum">
+    //        <xs:restriction base="xs:string">
+    //            <xs:enumeration value="kDupCheckNone">
+    //                <xs:annotation>
+    //                    <xs:appinfo>
+    //                        <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">1</EnumerationValue>
+    //                    </xs:appinfo>
+    //                </xs:annotation>
+    //            </xs:enumeration>
+    //            <xs:enumeration value="kDupCheckSub">
+    //                <xs:annotation>
+    //                    <xs:appinfo>
+    //                        <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">2</EnumerationValue>
+    //                    </xs:appinfo>
+    //                </xs:annotation>
+    //            </xs:enumeration>
+    //        </xs:restriction>
+    //    </xs:simpleType>
+    //
+    //    <xs:element name="RecordingInfo.RecordingDupMethodEnum" type="tns:RecordingInfo.RecordingDupMethodEnum" nillable="true"/>
+    // ----------------------------------------------------------------------
+
+    if (!pRequest->m_mapParams.contains( "raw" ))
+    {
+        appendChild( createProcessingInstruction( "xml-stylesheet",
+                        "type=\"text/xsl\" href=\"/xslt/enum.xslt\"" ));
+    }
+
+    // ----------------------------------------------------------------------
+    // Create xs:simpleType structure
+    // ----------------------------------------------------------------------
+    
+    QDomElement oTypeNode     = createElement( "xs:simpleType"  );
+    QDomElement oRestrictNode = createElement( "xs:restriction" );
+
+    oTypeNode    .setAttribute( "name", sEnumName   );
+    oRestrictNode.setAttribute( "base", "xs:string" );
+
+    oTypeNode.appendChild( oRestrictNode  );
+
+    for( int nIdx = 0; nIdx < metaEnum.keyCount(); nIdx++)
+    {
+        QDomElement oEnum = createElement( "xs:enumeration" );
+
+        oEnum.setAttribute( "value", metaEnum.key( nIdx ));
+
+        // ------------------------------------------------------------------
+        // Add appInfo to store numerical value & translated text
+        // ------------------------------------------------------------------
+
+        QDomElement oAnn      = createElement( "xs:annotation"    );
+        QDomElement oApp      = createElement( "xs:appinfo"       );
+        QDomElement oEnumVal  = createElement( "EnumerationValue" );
+        QDomElement oEnumDesc = createElement( "EnumerationDesc"  );
+
+        oEnum.appendChild( oAnn      );
+        oAnn .appendChild( oApp      );
+        oApp .appendChild( oEnumVal  );
+        oApp .appendChild( oEnumDesc );
+
+        oEnumVal .appendChild( createTextNode( QString::number( metaEnum.value( nIdx ))));
+        oEnumDesc.appendChild( createTextNode( QObject::tr( metaEnum.key( nIdx ), "Enums" )));
+
+        oRestrictNode.appendChild( oEnum );
+    }
+
+    // ----------------------------------------------------------------------
+
+    QDomElement oElementNode = createElement( "xs:element" );
+
+    oElementNode.setAttribute( "name"    , sEnumName );
+    oElementNode.setAttribute( "type"    , "tns:" + sEnumName );
+    oElementNode.setAttribute( "nillable", "true" );
+
+    // ----------------------------------------------------------------------
+    // 
+    // ----------------------------------------------------------------------
+
+    QDomElement oRoot = CreateSchemaRoot();
+
+    oRoot.appendChild( oTypeNode    );
+    oRoot.appendChild( oElementNode );
+
+    appendChild( oRoot );
+
+    // ----------------------------------------------------------------------
+    // Return xsd doc to caller
+    // ----------------------------------------------------------------------
+
+    QTextStream os( &(pRequest->m_response) );
+
+    pRequest->m_eResponseType   = ResponseTypeXML;
+
+    save( os, 0 );
+
+    return true;
+}
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -26,9 +174,9 @@ bool Xsd::GetXSD( HTTPRequest *pRequest, QString sTypeName )
     if (sTypeName.isEmpty())
         return false;
 
-    // ------------------------------------------------------------------
+    // ----------------------------------------------------------------------
     // Is this a special type name?
-    // ------------------------------------------------------------------
+    // ----------------------------------------------------------------------
     
     if (sTypeName.startsWith( "ArrayOf" ))
     {
@@ -42,15 +190,15 @@ bool Xsd::GetXSD( HTTPRequest *pRequest, QString sTypeName )
         sTypeName    = sTypeName.mid( 11 );
     }
 
-    // ------------------------------------------------------------------
+    // ----------------------------------------------------------------------
     // Check to see if one of the Qt Types we need to handle special
-    // ------------------------------------------------------------------
+    // ----------------------------------------------------------------------
 
     int id = QMetaType::type( sTypeName.toUtf8() );
 
-    // ------------------------------------------------------------------
+    // ----------------------------------------------------------------------
     // if a DataContract type, we need to prefix name with DTC::
-    // ------------------------------------------------------------------
+    // ----------------------------------------------------------------------
 
     if (id == 0)
     {
@@ -59,9 +207,9 @@ bool Xsd::GetXSD( HTTPRequest *pRequest, QString sTypeName )
         id = QMetaType::type( sFQN.toUtf8() );
     }
 
-    // ------------------------------------------------------------------
+    // ----------------------------------------------------------------------
     //
-    // ------------------------------------------------------------------
+    // ----------------------------------------------------------------------
 
     if (!(bIsArray || bIsMap) && ((id == -1) || (id < QMetaType::User)))
         return false;
@@ -118,18 +266,18 @@ bool Xsd::GetXSD( HTTPRequest *pRequest, QString sTypeName )
 //           targetNamespace="http://mythtv.org" 
 //           elementFormDefault="qualified" 
 //           attributeFormDefault="unqualified">
-//	<xs:include schemaLocation="<path to dependant schema"/>
-//	
-//	<xs:complexType name="<className>">
-//		<xs:annotation>
-//			<xs:documentation>Comment describing your root element</xs:documentation>
-//		</xs:annotation>
-//		<xs:sequence>
-//			<xs:element minOccurs="0" name="<propName>" type="<propType>"/>
-//			<xs:element minOccurs="0" name="<childName>" nillable="true" type="tns:<ChildType>"/>
-//		</xs:sequence>
-//	</xs:complexType>
-//	<xs:element name="<className>" nillable="true" type="tns:<className>"/>
+//    <xs:include schemaLocation="<path to dependant schema"/>
+//    
+//    <xs:complexType name="<className>">
+//        <xs:annotation>
+//            <xs:documentation>Comment describing your root element</xs:documentation>
+//        </xs:annotation>
+//        <xs:sequence>
+//            <xs:element minOccurs="0" name="<propName>" type="<propType>"/>
+//            <xs:element minOccurs="0" name="<childName>" nillable="true" type="tns:<ChildType>"/>
+//        </xs:sequence>
+//    </xs:complexType>
+//    <xs:element name="<className>" nillable="true" type="tns:<className>"/>
 //
 //</xs:schema>
 /////////////////////////////////////////////////////////////////////////////
@@ -141,7 +289,9 @@ bool Xsd::RenderXSD( HTTPRequest *pRequest, QObject *pClass )
     QString     sClassName = ConvertTypeToXSD( pMetaObject->className(), true);
     QDomElement oRoot      = CreateSchemaRoot();
 
-    QMap<QString, QString> typesToInclude;
+    struct TypeInfo { QString sAttrName; QString sContentType; };
+
+    QMap<QString, TypeInfo> typesToInclude;
 
     // ------------------------------------------------------------------
     // Create xs:complexType structure
@@ -160,7 +310,7 @@ bool Xsd::RenderXSD( HTTPRequest *pRequest, QObject *pClass )
     // Add all properties for this type
     //
     //  <xs:element minOccurs="0" name="<propName>" type="<propType>"/>
-    //	<xs:element minOccurs="0" name="<childName>" nillable="true" 
+    //    <xs:element minOccurs="0" name="<childName>" nillable="true" 
     //              type="tns:<ChildType>"/>
     // ------------------------------------------------------------------
     
@@ -185,6 +335,7 @@ bool Xsd::RenderXSD( HTTPRequest *pRequest, QObject *pClass )
             QDomElement oNode        = createElement( "xs:element" );
             QString     sType        = metaProperty.typeName();
             bool        bCustomType  = false;
+            QString        sCustomAttr  = "type";
             QString     sContentName = QString();
             QString     sContentType = QString();
 
@@ -232,7 +383,13 @@ bool Xsd::RenderXSD( HTTPRequest *pRequest, QObject *pClass )
             else if (sType == "QStringList") 
             { 
                 sType = "ArrayOfString"; 
-                bCustomType = true; 
+                bCustomType = true;
+            }
+            else if (metaProperty.isEnumType() || metaProperty.isFlagType() )
+            {
+                sCustomAttr = "enum";
+                sType       = sClassName + "." + sType;
+                bCustomType = true;
             }
 
             QString sNewPropName( metaProperty.name() );
@@ -241,9 +398,12 @@ bool Xsd::RenderXSD( HTTPRequest *pRequest, QObject *pClass )
                 oNode.setAttribute( "nillable" , true );   
 
             if (bCustomType)
-                typesToInclude.insert( sType, sContentType );
+            {
+                TypeInfo info = { sCustomAttr, sContentType };
+                typesToInclude.insert( sType, info );
+            }
     
-            oNode.setAttribute( "type"     , ((bCustomType) ? "tns:" : "xs:") +
+            oNode.setAttribute( "type"     , (bCustomType ? "tns:" : "xs:") +
                                        ConvertTypeToXSD( sType, bCustomType ));
 
             oNode.setAttribute( "name"     , sNewPropName );
@@ -256,7 +416,7 @@ bool Xsd::RenderXSD( HTTPRequest *pRequest, QObject *pClass )
     // ------------------------------------------------------------------
     // Create element for class
     //
-    //	   <xs:element name="<className>" nillable="true" type="tns:<className>"/>
+    //       <xs:element name="<className>" nillable="true" type="tns:<className>"/>
     // ------------------------------------------------------------------
 
     QDomElement oElementNode = createElement( "xs:element" );
@@ -276,13 +436,13 @@ bool Xsd::RenderXSD( HTTPRequest *pRequest, QObject *pClass )
         // ------------------------------------------------------------------
         // Create all needed includes
         //
-        //	<xs:include schemaLocation="<path to dependant schema"/>
+        //    <xs:include schemaLocation="<path to dependant schema"/>
         // ------------------------------------------------------------------
 
         QString sBaseUri = "http://" + pRequest->m_mapHeaders[ "host" ] + 
-                                       pRequest->m_sResourceUrl + "?type=";
+                                       pRequest->m_sResourceUrl;
 
-        QMap<QString, QString>::const_iterator it = typesToInclude.constBegin();
+        QMap<QString, TypeInfo >::const_iterator it = typesToInclude.constBegin();
         while( it != typesToInclude.constEnd())
         {
             QDomElement oIncNode = createElement( "xs:include" );
@@ -290,11 +450,17 @@ bool Xsd::RenderXSD( HTTPRequest *pRequest, QObject *pClass )
 
             sType.remove( "DTC::" );
 
-            if (it.value().isEmpty())
-                oIncNode.setAttribute( "schemaLocation", sBaseUri + sType );
-            else
-                oIncNode.setAttribute( "schemaLocation", sBaseUri + sType + "&name=" + it.value() );
-    
+            TypeInfo info = it.value();
+
+            QString sValue = QString( "%1?%2=%3" ).arg( sBaseUri       )
+                                                  .arg( info.sAttrName )
+                                                  .arg( sType          );
+
+            if (!info.sContentType.isEmpty())
+                sValue += "&name=" + info.sContentType;
+
+            oIncNode.setAttribute( "schemaLocation", sValue );
+
             oRoot.appendChild( oIncNode );
             ++it;
         }
@@ -321,17 +487,17 @@ bool Xsd::RenderXSD( HTTPRequest *pRequest, QObject *pClass )
 // ArrayOf<Type>
 // 
 //<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://mythtv.org" targetNamespace="http://mythtv.org" elementFormDefault="qualified" attributeFormDefault="unqualified">
-//	<xs:include schemaLocation="<type>.xsd"/>
-//	
-//	<xs:complexType name="ArrayOf<Type>">
-//		<xs:annotation>
-//			<xs:documentation>Comment describing your root element</xs:documentation>
-//		</xs:annotation>
-//		<xs:sequence>
-//			<xs:element minOccurs="0" maxOccurs="unbounded" name="<type>" nillable="true" type="tns:<Type>"/>
-//		</xs:sequence>
-//	</xs:complexType>
-//	<xs:element name="ArrayOf<Type>" nillable="true" type="tns:ArrayOf<Type>"/>
+//    <xs:include schemaLocation="<type>.xsd"/>
+//    
+//    <xs:complexType name="ArrayOf<Type>">
+//        <xs:annotation>
+//            <xs:documentation>Comment describing your root element</xs:documentation>
+//        </xs:annotation>
+//        <xs:sequence>
+//            <xs:element minOccurs="0" maxOccurs="unbounded" name="<type>" nillable="true" type="tns:<Type>"/>
+//        </xs:sequence>
+//    </xs:complexType>
+//    <xs:element name="ArrayOf<Type>" nillable="true" type="tns:ArrayOf<Type>"/>
 //
 //</xs:schema>
 //
@@ -423,8 +589,8 @@ bool Xsd::RenderArrayXSD( HTTPRequest   *pRequest,
 // MapOfString<Type>
 // 
 //<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://mythtv.org" targetNamespace="http://mythtv.org" elementFormDefault="qualified" attributeFormDefault="unqualified">
-//	<xs:include schemaLocation="<type>.xsd"/>
-//	
+//    <xs:include schemaLocation="<type>.xsd"/>
+//    
 //<xs:complexType name="MapOfString<Type>">
 //  <xs:annotation>
 //    <xs:appinfo>

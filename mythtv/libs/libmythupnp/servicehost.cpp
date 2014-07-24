@@ -323,7 +323,10 @@ bool ServiceHost::ProcessRequest( HTTPRequest *pRequest )
 
                     Xsd xsd;
 
-                    xsd.GetXSD( pRequest, pRequest->m_mapParams[ "type" ] );
+					if (pRequest->m_mapParams.contains( "type" ))
+						xsd.GetXSD( pRequest, pRequest->m_mapParams[ "type" ] );
+					else
+						xsd.GetEnumXSD( pRequest, pRequest->m_mapParams[ "enum" ] );
 
                     delete pService;
                 }

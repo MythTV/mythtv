@@ -15,6 +15,8 @@
 	border:0;
 }
 
+/* method */
+
 div.method{
 	color:#000000;
 	background-color:#F0F0F0;
@@ -56,6 +58,50 @@ div.method_props td {
 	color:#003399;
 }
 
+/* Enum */
+
+div.enum{
+	color:#000000;
+	background-color:#F0F0F0;
+	margin:0px;
+
+	padding-left:5px;
+	padding-bottom:5px;
+	
+	border:1px solid #d4d4d4;
+	width:99%;
+	clear:both;
+}
+
+div.enum_values
+{
+	background-color: #ffffff;
+	border: 1px solid #d4d4d4;
+	width: 99%;
+	/*
+	font-family: "Courier New";
+	*/
+}
+
+div.enum_values table {
+	margin:3px;
+	width:100%;
+	border-collapse:collapse;
+}
+
+div.enum_props td {
+	border-bottom: thin #F0F0F0 solid;
+}
+
+.enum_name {
+	font-size:medium;
+	font-weight:bolder;
+	padding: 3, 0, 3, 0;
+	margin: 3, 0, 3, 0;
+	color:#003399;
+}
+
+/* --- */
 
 .alignLeft {
 	float: left;
