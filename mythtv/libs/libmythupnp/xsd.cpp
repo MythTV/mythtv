@@ -282,14 +282,14 @@ bool Xsd::GetXSD( HTTPRequest *pRequest, QString sTypeName )
 //</xs:schema>
 /////////////////////////////////////////////////////////////////////////////
 
+typedef struct TypeInfo { QString sAttrName; QString sContentType; } TypeInfo;
+
 bool Xsd::RenderXSD( HTTPRequest *pRequest, QObject *pClass )
 {
     const QMetaObject *pMetaObject = pClass->metaObject();
 
     QString     sClassName = ConvertTypeToXSD( pMetaObject->className(), true);
     QDomElement oRoot      = CreateSchemaRoot();
-
-    struct TypeInfo { QString sAttrName; QString sContentType; };
 
     QMap<QString, TypeInfo> typesToInclude;
 
