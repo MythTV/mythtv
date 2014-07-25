@@ -108,8 +108,9 @@ void ScheduleCommon::ShowUpcomingScheduled(void) const
 /**
 *  \brief Create a kSingleRecord or bring up recording dialog.
 */
-void ScheduleCommon::QuickRecord(ProgramInfo *pginfo)
+void ScheduleCommon::QuickRecord(void)
 {
+    ProgramInfo *pginfo = GetCurrentProgram();
     if (!pginfo)
         return;
 

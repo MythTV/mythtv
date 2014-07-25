@@ -822,7 +822,7 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
         else if (action == "DETAILS" || action == "INFO")
             ShowDetails();
         else if (action == ACTION_TOGGLERECORD)
-            quickRecord();
+            QuickRecord();
         else if (action == ACTION_TOGGLEFAV)
         {
             if (m_changrpid == -1)
@@ -1691,7 +1691,7 @@ void GuideGrid::customEvent(QEvent *event)
         {
             if (resulttext == tr("Record This"))
             {
-                quickRecord();
+                QuickRecord();
             }
             else if (resulttext == tr("Change to Channel"))
             {
@@ -2338,21 +2338,6 @@ void GuideGrid::Close()
         GetScreenStack()->PopScreen(this, true);
 
     epgIsVisibleCond.wakeAll();
-}
-
-void GuideGrid::quickRecord()
-{
-    ProgramInfo *pginfo = m_programInfos[m_currentRow][m_currentCol];
-
-    if (!pginfo)
-        return;
-
-    if (pginfo->GetTitle() == kUnknownTitle)
-        return;
-
-    QuickRecord(pginfo);
-    LoadFromScheduler(m_recList);
-    fillProgramInfos();
 }
 
 void GuideGrid::editRecSchedule()

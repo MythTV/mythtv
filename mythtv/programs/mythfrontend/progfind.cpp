@@ -198,7 +198,7 @@ bool ProgFinder::keyPressEvent(QKeyEvent *event)
         else if (action == "DETAILS" || action == "INFO")
             ShowDetails();
         else if (action == "TOGGLERECORD")
-            quickRecord();
+            QuickRecord();
         else if (action == "GUIDE" || action == "4")
             showGuide();
         else if (action == "ESCAPE")
@@ -302,7 +302,7 @@ void ProgFinder::customEvent(QEvent *event)
             }
             else if (resulttext == tr("Toggle Record"))
             {
-                quickRecord();
+                QuickRecord();
             }
             else if (resulttext == tr("Program Details"))
             {
@@ -422,40 +422,17 @@ void ProgFinder::showGuide()
     }
 }
 
-void ProgFinder::getInfo(bool toggle)
+void ProgFinder::select()
 {
     if (GetFocusWidget() == m_timesList)
     {
         ProgramInfo *curPick = m_showData[m_timesList->GetCurrentPos()];
-
-        if (curPick)
-        {
-            if (toggle)
-                QuickRecord(curPick);
-            else
-                EditRecording(curPick);
-        }
-        else
-            return;
-
-        // TODO: When schedule editor is non-blocking, move
-        selectShowData(curPick->GetTitle(), m_timesList->GetCurrentPos());
+        EditRecording(curPick);
     }
-}
-
-void ProgFinder::select()
-{
-    if (GetFocusWidget() == m_timesList)
-        getInfo();
     else if (GetFocusWidget() == m_alphabetList && m_showList->GetCount())
         SetFocusWidget(m_showList);
     else if (GetFocusWidget() == m_showList)
         SetFocusWidget(m_timesList);
-}
-
-void ProgFinder::quickRecord()
-{
-    getInfo(true);
 }
 
 void ProgFinder::updateTimesList()

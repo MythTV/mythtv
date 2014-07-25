@@ -261,7 +261,7 @@ bool ProgLister::keyPressEvent(QKeyEvent *e)
         else if (action == "GUIDE")
             ShowGuide();
         else if (action == "TOGGLERECORD")
-            RecordSelected();
+            QuickRecord();
         else if (action == "1")
         {
             if (m_titleSort == true)
@@ -322,7 +322,7 @@ void ProgLister::ShowMenu(void)
     menu->AddItem(tr("Sort"), NULL, sortMenu);
 
     if (m_type != plPreviouslyRecorded)
-        menu->AddItem(tr("Record"), SLOT(RecordSelected()));
+        menu->AddItem(tr("Record"), SLOT(QuickRecord()));
 
     menu->AddItem(tr("Edit Schedule"),   SLOT(EditScheduled()));
     menu->AddItem(tr("Program Details"), SLOT(ShowDetails()));
@@ -616,13 +616,6 @@ ProgramInfo *ProgLister::GetCurrentProgram(void) const
     if (pos >= 0 && pos < (int) m_itemList.size())
         return m_itemList[pos];
     return NULL;
-}
-
-void ProgLister::RecordSelected(void)
-{
-    ProgramInfo *pi = GetCurrentProgram();
-    if (pi)
-        QuickRecord(pi);
 }
 
 void ProgLister::HandleClicked(void)

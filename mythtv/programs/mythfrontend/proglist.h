@@ -55,7 +55,6 @@ class ProgLister : public ScheduleCommon
 
     void DeleteOldEpisode(bool ok);
     void DeleteOldSeries(bool ok);
-    void RecordSelected(void);
 
     void SetViewFromList(QString item);
     void SetViewFromTime(QDateTime searchTime);

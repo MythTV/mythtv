@@ -39,11 +39,9 @@ class ProgFinder : public ScheduleCommon
 
     void showGuide();
     void select();
-    void quickRecord();
 
     void customEvent(QEvent *e);
     void updateInfo(void);
-    void getInfo(bool toggle = false);
 
   protected:
     typedef QMap<QString,QString> ShowName;
