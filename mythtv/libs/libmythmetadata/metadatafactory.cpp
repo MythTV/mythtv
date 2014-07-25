@@ -146,13 +146,8 @@ void MetadataFactory::Lookup(VideoMetadata *metadata, bool automatic,
     lookup->SetSeason(metadata->GetSeason());
     lookup->SetEpisode(metadata->GetEpisode());
     lookup->SetInetref(metadata->GetInetRef());
-    QString fntmp;
-    if (metadata->GetHost().isEmpty())
-        fntmp = metadata->GetFilename();
-    else
-        fntmp = generate_file_url("Videos", metadata->GetHost(),
-                                      metadata->GetFilename());
-    lookup->SetFilename(fntmp);
+    lookup->SetFilename(generate_file_url("Videos", metadata->GetHost(),
+                                      metadata->GetFilename()));
 
     if (m_lookupthread->isRunning())
         m_lookupthread->prependLookup(lookup);
