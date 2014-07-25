@@ -583,7 +583,9 @@ void MPEG2fixup::InitReplex()
     int mp2_count = 0, ac3_count = 0;
     for (FrameMap::Iterator it = aFrame.begin(); it != aFrame.end(); it++)
     {
-        int index = it.key();
+        if (it.key() < 0)
+            continue;   // will never happen in practice
+        uint index = it.key();
         if (index > inputFC->nb_streams)
             continue;   // will never happen in practice
         int i = aud_map[index];
