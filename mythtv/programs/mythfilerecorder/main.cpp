@@ -407,11 +407,16 @@ bool Commands::Run(const QString & filename, bool loopinput)
             if (ret > 0)
             {
                 len = read(0, &buf, 128 - 1);
-                buf[len] = 0;
-                if (len > 0 && buf[len - 1] == '\n')
-                    buf[len - 1] = 0;
-                cmd = QString(buf);
-                process_command(cmd);
+                if (len > 0)
+                {
+                    buf[len] = 0;
+                    if (buf[len - 1] == '\n')
+                        buf[len - 1] = 0;
+                    cmd = QString(buf);
+                    process_command(cmd);
+                }
+                else
+                    LOG(VB_GENERAL, LOG_ERR, LOC + "stdin read error.");
             }
             else if (ret < 0)
             {
