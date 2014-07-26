@@ -237,7 +237,8 @@ class MainServer : public QObject, public MythSocketCBs
     void HandleDownloadFile(const QStringList &command, PlaybackSock *pbs);
     void HandleSlaveDisconnectedEvent(const MythEvent &event);
 
-    void SendResponse(MythSocket *pbs, QStringList &commands);
+    void SendResponse(MythSocket *sock, QStringList &commands);
+    void SendErrorResponse(MythSocket *sock, const QString &error);
     void SendErrorResponse(PlaybackSock *pbs, const QString &error);
     void SendSlaveDisconnectedEvent(const QList<uint> &offlineEncoderIDs,
                                     bool needsReschedule);

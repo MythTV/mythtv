@@ -490,7 +490,7 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     if (command == "MYTH_PROTO_VERSION")
     {
         if (tokens.size() < 2)
-            SendErrorResponse(pbs, "Bad MYTH_PROTO_VERSION command");
+            SendErrorResponse(sock, "Bad MYTH_PROTO_VERSION command");
         else
             HandleVersion(sock, tokens);
         return;
@@ -1853,11 +1853,17 @@ void MainServer::HandleDone(MythSocket *socket)
 
 void MainServer::SendErrorResponse(PlaybackSock *pbs, const QString &error)
 {
+    SendErrorResponse(pbs->getSocket(), error);
+}
+
+void MainServer::SendErrorResponse(MythSocket* sock, const QString& error)
+{
     LOG(VB_GENERAL, LOG_ERR, LOC + error);
 
     QStringList strList("ERROR");
     strList << error;
-    SendResponse(pbs->getSocket(), strList);
+
+    SendResponse(sock, strList);
 }
 
 void MainServer::SendResponse(MythSocket *socket, QStringList &commands)
