@@ -3434,13 +3434,13 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
     // Attempt to fallback if the theme is missing certain states
     if (state == "disabled" && !button->GetState(state))
     {
-        LOG(VB_GENERAL, LOG_ERR, "Theme Error: Missing buttonlist state: disabled");
+        LOG(VB_GUI, LOG_WARNING, "Theme Error: Missing buttonlist state: disabled");
         state = "inactive";
     }
 
     if (state == "inactive" && !button->GetState(state))
     {
-        LOG(VB_GENERAL, LOG_ERR, "Theme Error: Missing buttonlist state: inactive");
+        LOG(VB_GUI, LOG_WARNING, "Theme Error: Missing buttonlist state: inactive");
         state = "active";
     }
     // End compatibility code
