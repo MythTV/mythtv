@@ -226,22 +226,6 @@ void ExternIO::Fork(void)
     int out[2] = {-1, -1};
     int err[2] = {-1, -1};
 
-    char *command = strdup(m_app.canonicalFilePath()
-                                 .toUtf8().constData());
-    char **arguments;
-    int    len;
-
-    // Copy QStringList to char**
-    arguments = new char*[m_args.size() + 1];
-    for (int i = 0; i < m_args.size(); ++i)
-    {
-        len = m_args[i].size() + 1;
-        arguments[i] = new char[len];
-        memcpy(arguments[i], m_args[i].toStdString().c_str(), len);
-    }
-    arguments[m_args.size()] = reinterpret_cast<char *>(0);
-
-
     if (pipe(in) < 0)
     {
         m_error = "pipe(in) failed: " + ENO;
@@ -285,18 +269,6 @@ void ExternIO::Fork(void)
         fcntl(m_appout, F_SETFL, O_NONBLOCK);
         fcntl(m_apperr, F_SETFL, O_NONBLOCK);
 
-        free(command);
-        if (arguments)
-        {
-            int i = 0;
-            while (arguments[i])
-            {
-                delete[] arguments[i];
-                ++i;
-            }
-            delete[] arguments;
-        }
-
         LOG(VB_RECORD, LOG_INFO, "Spawned");
         return;
     }
@@ -334,6 +306,21 @@ void ExternIO::Fork(void)
              << "setpgid() failed: "
              << strerror(errno) << endl;
     }
+
+    char *command = strdup(m_app.canonicalFilePath()
+                                 .toUtf8().constData());
+    char **arguments;
+    int    len;
+
+    // Copy QStringList to char**
+    arguments = new char*[m_args.size() + 1];
+    for (int i = 0; i < m_args.size(); ++i)
+    {
+        len = m_args[i].size() + 1;
+        arguments[i] = new char[len];
+        memcpy(arguments[i], m_args[i].toStdString().c_str(), len);
+    }
+    arguments[m_args.size()] = reinterpret_cast<char *>(0);
 
     /* run command */
     if (execv(command, arguments) < 0)
