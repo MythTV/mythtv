@@ -5455,7 +5455,7 @@ void RecMetadataEdit::customEvent(QEvent *levent)
 
         MetadataFactorySingleResult *mfsr = dynamic_cast<MetadataFactorySingleResult*>(levent);
 
-        if (!mfsr && !mfsr->result)
+        if (!mfsr || !mfsr->result)
             return;
 
         QueryComplete(mfsr->result);
