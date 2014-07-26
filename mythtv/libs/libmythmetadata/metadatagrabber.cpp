@@ -333,7 +333,7 @@ MetaGrabberScript::MetaGrabberScript(const QDomElement &dom) :
 }
 
 MetaGrabberScript::MetaGrabberScript(const QString &path) :
-    m_valid(false)
+    m_type(kGrabberInvalid), m_version(0.0), m_valid(false)
 {
     if (path.isEmpty())
         return;
