@@ -28,6 +28,7 @@ HEADERS += configuration.h
 HEADERS += soapclient.h mythxmlclient.h mmembuf.h upnpexp.h
 HEADERS += upnpserviceimpl.h
 HEADERS += servicehost.h wsdl.h htmlserver.h serverSideScripting.h xsd.h
+HEADERS += rtti.h
 
 HEADERS += serializers/serializer.h     serializers/xmlSerializer.h 
 HEADERS += serializers/jsonSerializer.h serializers/soapSerializer.h
@@ -45,6 +46,7 @@ SOURCES += configuration.cpp soapclient.cpp mythxmlclient.cpp mmembuf.cpp
 SOURCES += upnpserviceimpl.cpp
 SOURCES += htmlserver.cpp serverSideScripting.cpp
 SOURCES += servicehost.cpp wsdl.cpp upnpsubscription.cpp xsd.cpp
+SOURCES += rtti.cpp
 
 SOURCES += serializers/serializer.cpp     serializers/xmlSerializer.cpp
 SOURCES += serializers/jsonSerializer.cpp 
@@ -76,6 +78,7 @@ inc.files += eventing.h upnpcmgr.h upnptaskevent.h upnptaskcache.h ssdpcache.h
 inc.files += upnpimpl.h configuration.h
 inc.files += soapclient.h mythxmlclient.h mmembuf.h upnpsubscription.h
 inc.files += servicehost.h wsdl.h htmlserver.h serverSideScripting.h
+inc.files += xsd.h rtti.h
 
 inc.files += serializers/serializer.h     serializers/xmlSerializer.h 
 inc.files += serializers/jsonSerializer.h serializers/soapSerializer.h

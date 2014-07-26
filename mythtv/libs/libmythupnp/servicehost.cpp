@@ -16,6 +16,7 @@
 #include "servicehost.h"
 #include "wsdl.h"
 #include "xsd.h"
+#include "rtti.h"
 
 #define _MAX_PARAMS 256
 
@@ -333,6 +334,38 @@ bool ServiceHost::ProcessRequest( HTTPRequest *pRequest )
 
                 return true;
             }
+
+            // --------------------------------------------------------------
+            // rtti is an alternative to xsd.
+            // returns xml/json/etc... definitions of enums
+            // --------------------------------------------------------------
+
+            if (( pRequest->m_eType   == RequestTypeGet ) &&
+                ( pRequest->m_sMethod == "rtti"          ))
+            {
+                if ( pRequest->m_mapParams.count() > 0)
+                {
+                    pService =  qobject_cast<Service*>(m_oMetaObject.newInstance());
+
+                    QVariant vVal;
+                    Rtti     rtti;
+
+                    if (pRequest->m_mapParams.contains( "enum" ))
+                    {
+                        RttiEnumList *pList = rtti.GetEnumDetails( pRequest->m_mapParams[ "enum" ] );
+                        vVal = QVariant::fromValue< QObject* >( pList );
+                    }
+
+                    delete pService;
+
+                    return FormatResponse( pRequest, vVal );
+
+                }
+
+                return true;
+            }
+
+            // --------------------------------------------------------------
 
             if (( pRequest->m_eType   == RequestTypeGet ) &&
                 ( pRequest->m_sMethod == "version"         ))

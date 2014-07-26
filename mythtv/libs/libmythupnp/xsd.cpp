@@ -10,6 +10,8 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
+#include <QCoreApplication>
+
 #include "xsd.h"
 
 #include "servicehost.h"
@@ -124,8 +126,11 @@ bool Xsd::GetEnumXSD( HTTPRequest *pRequest, QString sEnumName )
         oApp .appendChild( oEnumVal  );
         oApp .appendChild( oEnumDesc );
 
+        QString sFQNKey = sEnumName + "." + metaEnum.key( nIdx );
+
         oEnumVal .appendChild( createTextNode( QString::number( metaEnum.value( nIdx ))));
-        oEnumDesc.appendChild( createTextNode( QObject::tr( metaEnum.key( nIdx ), "Enums" )));
+        oEnumDesc.appendChild( createTextNode( QCoreApplication::translate("Enums",
+                                                                           sFQNKey.toUtf8() )));
 
         oRestrictNode.appendChild( oEnum );
     }
