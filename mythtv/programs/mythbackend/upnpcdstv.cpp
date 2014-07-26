@@ -419,7 +419,7 @@ void UPnpCDSTv::AddItem( const UPnpCDSRequest    *pRequest,
         // FIXME: This should be set correctly for EIT data to SI_SERIESID and
         //        for known sources such as TMS to the correct identifier
         QString sIdType = "mythtv.org_XMLTV";
-        if (sProgramId.contains(sDefaultAuthority))
+        if (sSeriesId.contains(sDefaultAuthority))
             sIdType = "mythtv.org_EIT";
 
         pItem->SetPropValue( "seriesID", sSeriesId, sIdType );
