@@ -36,7 +36,6 @@ public:
         m_channels(0),
         m_sizeMax(0)
     { }
-    virtual ~Buffer() { }
 
     // Properties
     void SetMaxSamples(unsigned samples) { m_maxSamples = samples; }
