@@ -140,6 +140,7 @@ uint SoundTouch::getVersionId()
 // Sets the number of channels, 1 = mono, 2 = stereo
 void SoundTouch::setChannels(uint numChannels)
 {
+#if 0
 #ifdef MULTICHANNEL
     if (numChannels < 1 || numChannels > MULTICHANNEL)
 #else
@@ -148,6 +149,7 @@ void SoundTouch::setChannels(uint numChannels)
     {
         throw std::runtime_error("Illegal number of channels");
     }
+#endif
     channels = numChannels;
     pRateTransposer->setChannels(numChannels);
     pTDStretch->setChannels(numChannels);
