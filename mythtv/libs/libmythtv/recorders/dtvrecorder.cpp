@@ -652,14 +652,6 @@ void DTVRecorder::HandleTimestamps(int stream_id, int64_t pts, int64_t dts)
         {
             QMutexLocker locker(&statisticsLock);
 
-            if (_ts_count[stream_id] > 15000 &&
-                ((1.0 - (static_cast<float>(recordingGaps.size()) /
-                         static_cast<float>(_ts_count[stream_id]))) * 100)
-                < _minimum_recording_quality)
-            {
-                SetRecordingStatus(rsFailing, __FILE__, __LINE__);
-            }
-
             recordingGaps.push_back(
                 RecordingGap(
                     ts_to_qdatetime(
@@ -669,6 +661,19 @@ void DTVRecorder::HandleTimestamps(int stream_id, int64_t pts, int64_t dts)
                         ts, _ts_first[stream_id], _ts_first_dt[stream_id])));
             LOG(VB_RECORD, LOG_DEBUG, LOC + QString("Inserted gap %1 dur %2")
                 .arg(recordingGaps.back().toString()).arg(diff/90000.0));
+
+            if (curRecording && curRecording->GetRecordingStatus() != rsFailing)
+            {
+                RecordingQuality recq(curRecording, recordingGaps);
+                if (recq.IsDamaged())
+                {
+                    LOG(VB_GENERAL, LOG_INFO, LOC +
+                        QString("HandleTimestamps: too much damage, "
+                                "setting status to %1")
+                        .arg(toString(rsFailing, kSingleRecord)));
+                    SetRecordingStatus(rsFailing, __FILE__, __LINE__);
+                }
+            }
         }
     }
 

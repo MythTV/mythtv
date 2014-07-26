@@ -32,6 +32,8 @@ typedef QList<RecordingGap> RecordingGaps;
 class MTV_PUBLIC RecordingQuality
 {
   public:
+    RecordingQuality(const RecordingInfo *ri,
+                     const RecordingGaps &rg);
     RecordingQuality(
         const RecordingInfo*, const RecordingGaps&,
         const QDateTime &firstData, const QDateTime &latestData);
@@ -49,4 +51,3 @@ class MTV_PUBLIC RecordingQuality
 };
 
 #endif // _RECORDER_QUALITY_H_
-

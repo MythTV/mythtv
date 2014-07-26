@@ -12,6 +12,21 @@ static double score_gaps(const RecordingInfo&, const RecordingGaps&);
 static QDateTime get_start(const RecordingInfo&);
 static QDateTime get_end(const RecordingInfo&);
 
+RecordingQuality::RecordingQuality(const RecordingInfo *ri,
+                                   const RecordingGaps &rg)
+{
+    if (!ri)
+        return;
+
+    stable_sort(m_recording_gaps.begin(), m_recording_gaps.end());
+    merge_overlapping(m_recording_gaps);
+
+    m_overall_score = score_gaps(*ri, m_recording_gaps);
+
+    LOG(VB_RECORD, LOG_INFO,
+        QString("RecordingQuality() score(%3)").arg(m_overall_score));
+}
+
 RecordingQuality::RecordingQuality(
     const RecordingInfo *ri, const RecordingGaps &rg,
     const QDateTime &first, const QDateTime &latest) :
