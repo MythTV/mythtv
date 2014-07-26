@@ -7225,5 +7225,8 @@ echo "Configuring libsamplerate..."
 echo "Configuring minilzo..."
 (cd external/minilzo ; \
        ${qmakeconf} -o Makefile)
+echo "Configuring libmythsoundtouch..."
+(cd external/libmythsoundtouch ; \
+       ${qmakeconf} -o Makefile)
 
 test -n "$WARNINGS" && printf "\n$WARNINGS" || exit 0

@@ -41,23 +41,18 @@ SOURCES += imagemetadata.cpp imageutils.cpp imagescan.cpp imagescanthread.cpp
 SOURCES += imagethumbgenthread.cpp musicfilescanner.cpp metadatagrabber.cpp
 
 INCLUDEPATH += ../libmythbase ../libmythtv
-INCLUDEPATH += ../.. ../ ./ ../libmythupnp ../libmythui
+INCLUDEPATH += ../.. ../ ./ ../libmythui
 INCLUDEPATH += ../../external/FFmpeg ../libmyth  ../../external/libmythbluray
 
 # for TagLib
 INCLUDEPATH += $${CONFIG_TAGLIB_INCLUDES}
 
-DEPENDPATH += ../../external/libsamplerate ../libmythsoundtouch
-DEPENDPATH += ../libmythfreesurround
 DEPENDPATH += ../ ../libmythui ../libmythbase
-DEPENDPATH += ../libmythupnp ../libmythtv ../libmyth
+DEPENDPATH += ../libmythtv ../libmyth
 DEPENDPATH += ../../external/libmythbluray
 
-LIBS += -L../../external/libsamplerate   -lmythsamplerate-$${LIBVERSION}
-LIBS += -L../libmythsoundtouch   -lmythsoundtouch-$${LIBVERSION}
 LIBS += -L../libmythbase           -lmythbase-$${LIBVERSION}
 LIBS += -L../libmythui           -lmythui-$${LIBVERSION}
-LIBS += -L../libmythupnp         -lmythupnp-$${LIBVERSION}
 LIBS += -L../libmythservicecontracts -lmythservicecontracts-$${LIBVERSION}
 LIBS += -L../libmythfreesurround -lmythfreesurround-$${LIBVERSION}
 LIBS += -L../../external/FFmpeg/libavcodec -lmythavcodec

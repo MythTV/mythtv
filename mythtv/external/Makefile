@@ -1,6 +1,7 @@
 include ../config.mak
 
 SUBDIRS = FFmpeg qjson libmythbluray libmythdvdnav libsamplerate minilzo
+SUBDIRS += libmythsoundtouch
 ifeq ($(CONFIG_MYTHLOGSERVER),yes)
     SUBDIRS += zeromq nzmqt
 endif
@@ -67,3 +68,5 @@ libsamplerate-all libsamplerate-clean libsamplerate-distclean libsamplerate-inst
 minilzo-all minilzo-clean minilzo-distclean minilzo-install minilzo-uninstall:
 	${MAKE} -C minilzo ${@:minilzo-%=%}
 
+libmythsoundtouch-all libmythsoundtouch-clean libmythsoundtouch-distclean libmythsoundtouch-install libmythsoundtouch-uninstall:
+	${MAKE} -C libmythsoundtouch ${@:libmythsoundtouch-%=%}
