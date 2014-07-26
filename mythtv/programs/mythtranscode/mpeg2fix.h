@@ -13,8 +13,8 @@ extern "C"
 #include "libavformat/avformat.h"
 
 //replex
-#include "replex/ringbuffer.h"
-#include "replex/multiplex.h"
+#include "external/replex/ringbuffer.h"
+#include "external/replex/multiplex.h"
 
 //libmpeg2
 #include "config.h"

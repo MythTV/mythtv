@@ -22,14 +22,17 @@ macx: QMAKE_CFLAGS -= -O3 -O2 -O1 -Os
 SOURCES += main.cpp transcode.cpp mpeg2fix.cpp
 SOURCES += audioreencodebuffer.cpp cutter.cpp videodecodebuffer.cpp
 SOURCES += commandlineparser.cpp
-SOURCES += replex/element.c replex/mpg_common.c replex/multiplex.c \
-           replex/pes.c     replex/ringbuffer.c replex/ts.c
+SOURCES += external/replex/element.c external/replex/mpg_common.c
+SOURCES += external/replex/multiplex.c external/replex/pes.c
+SOURCES += external/replex/ringbuffer.c external/replex/ts.c
+
 HEADERS += mpeg2fix.h transcodedefs.h commandlineparser.h
 HEADERS += audioreencodebuffer.h cutter.h videodecodebuffer.h
-HEADERS += replex/element.h replex/mpg_common.h replex/multiplex.h \
-           replex/pes.h     replex/ringbuffer.h replex/ts.h
+HEADERS += external/replex/element.h external/replex/mpg_common.h
+HEADERS += external/replex/multiplex.h external/replex/pes.h
+HEADERS += external/replex/ringbuffer.h external/replex/ts.h
 
-DEPENDPATH += replex
+DEPENDPATH += external/replex
 DEPENDPATH += ../../libs/libavcodec
 DEPENDPATH += ../../libs/libavformat
 DEPENDPATH += ../../libs/libavutil
