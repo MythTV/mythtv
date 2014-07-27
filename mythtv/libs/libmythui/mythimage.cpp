@@ -329,7 +329,12 @@ bool MythImage::Load(const QString &filename)
         // a lot of noisy warnings on the backend and frontend, so to avoid
         // that first check it's there
         QUrl url(filename);
-        QString mythUrl = RemoteFile::FindFile(url.path(), url.host(), url.userName());
+        QString fname = url.path();
+
+        if (url.hasFragment())
+            fname += '#' + url.fragment();
+
+        QString mythUrl = RemoteFile::FindFile(fname, url.host(), url.userName());
         if (!mythUrl.isEmpty())
         {
             RemoteFile *rf = new RemoteFile(mythUrl, false, false, 0);
