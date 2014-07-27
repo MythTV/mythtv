@@ -160,7 +160,13 @@ void DecoderIOFactorySG::start(void)
     LOG(VB_PLAYBACK, LOG_INFO,
         QString("DecoderIOFactorySG: Opening Myth URL %1").arg(url));
     m_input = new MusicSGIODevice(url);
-    doConnectDecoder(m_handler->getUrl().path());
+
+    QString path = m_handler->getUrl().path();
+
+    if (m_handler->getUrl().hasFragment())
+        path += '#' + m_handler->getUrl().fragment();
+
+    doConnectDecoder(path);
 }
 
 /**********************************************************************/
