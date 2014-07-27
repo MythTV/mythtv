@@ -43,7 +43,6 @@ class ViewScheduled : public ScheduleCommon
     void ChangeGroup(MythUIButtonListItem *item);
     void showGuide();
     void deleteRule();
-    void selected(MythUIButtonListItem *);
     void updateInfo(MythUIButtonListItem *);
     void SwitchList(void);
     void Close(void);

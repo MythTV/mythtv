@@ -799,7 +799,7 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
                 if (pginfo && (pginfo->GetTitle() != kUnknownTitle) &&
                     ((secsTillStart / 60) >= m_selectRecThreshold))
                 {
-                    editRecSchedule();
+                    EditRecording();
                 }
                 else
                 {
@@ -807,7 +807,7 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
                 }
             }
             else
-                editRecSchedule();
+                EditRecording();
         }
         else if (action == "EDIT")
             EditScheduled();
@@ -1739,7 +1739,7 @@ void GuideGrid::customEvent(QEvent *event)
         {
             if (resulttext == tr("Edit Recording Status"))
             {
-                editRecSchedule();
+                EditRecording();
             }
             else if (resulttext == tr("Edit Schedule"))
             {
@@ -2338,19 +2338,6 @@ void GuideGrid::Close()
         GetScreenStack()->PopScreen(this, true);
 
     epgIsVisibleCond.wakeAll();
-}
-
-void GuideGrid::editRecSchedule()
-{
-    ProgramInfo *pginfo = m_programInfos[m_currentRow][m_currentCol];
-
-    if (!pginfo)
-        return;
-
-    if (pginfo->GetTitle() == kUnknownTitle)
-        return;
-
-    EditRecording(pginfo);
 }
 
 void GuideGrid::deleteRule()

@@ -51,7 +51,6 @@ class ProgLister : public ScheduleCommon
   protected slots:
     void HandleSelected(MythUIButtonListItem *item);
     void HandleVisible(MythUIButtonListItem *item);
-    void HandleClicked(void);
 
     void DeleteOldEpisode(bool ok);
     void DeleteOldSeries(bool ok);
@@ -63,6 +62,7 @@ class ProgLister : public ScheduleCommon
     void ShowDeleteRuleMenu(void);
     void ShowDeleteOldEpisodeMenu(void);
     void ShowChooseViewMenu(void);
+    void ShowOldRecordedMenu(void);
 
   private:
     void Load(void);
@@ -79,7 +79,6 @@ class ProgLister : public ScheduleCommon
     virtual void ShowMenu(void); // MythScreenType
     void ShowDeleteItemMenu(void);
     void ShowDeleteOldSeriesMenu(void);
-    void ShowOldRecordedMenu(void);
 
     void SwitchToPreviousView(void);
     void SwitchToNextView(void);

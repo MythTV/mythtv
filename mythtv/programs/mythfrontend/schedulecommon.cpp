@@ -115,7 +115,7 @@ void ScheduleCommon::QuickRecord(void)
         return;
 
     if (pginfo->GetRecordingRuleID())
-        EditRecording(pginfo);
+        EditRecording();
     else
     {
         RecordingInfo ri(*pginfo);
@@ -225,8 +225,9 @@ void ScheduleCommon::ShowPrevious(void) const
 *  \brief Creates a dialog for editing the recording status,
 *         blocking until user leaves dialog.
 */
-void ScheduleCommon::EditRecording(ProgramInfo *pginfo)
+void ScheduleCommon::EditRecording(void)
 {
+    ProgramInfo *pginfo = GetCurrentProgram();
     if (!pginfo)
         return;
 

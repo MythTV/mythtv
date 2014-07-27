@@ -85,7 +85,7 @@ bool ViewScheduled::Create()
     connect(m_schedulesList, SIGNAL(itemSelected(MythUIButtonListItem*)),
             SLOT(updateInfo(MythUIButtonListItem*)));
     connect(m_schedulesList, SIGNAL(itemClicked(MythUIButtonListItem*)),
-            SLOT(selected(MythUIButtonListItem*)));
+            SLOT(EditRecording()));
 
     m_schedulesList->SetLCDTitles(tr("Scheduled Recordings"),
                               "shortstarttimedate|channel|titlesubtitle|card");
@@ -576,18 +576,6 @@ void ViewScheduled::showGuide()
     uint startchanid = pginfo->GetChanID();
     QDateTime starttime = pginfo->GetScheduledStartTime();
     GuideGrid::RunProgramGuide(startchanid, startchannel, starttime);
-}
-
-void ViewScheduled::selected(MythUIButtonListItem *item)
-{
-    if (!item)
-        return;
-
-    ProgramInfo *pginfo = item->GetData().value<ProgramInfo*> ();
-    if (!pginfo)
-        return;
-
-    EditRecording(pginfo);
 }
 
 void ViewScheduled::setShowAll(bool all)

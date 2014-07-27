@@ -169,8 +169,12 @@ bool ProgLister::Create()
     connect(m_progList, SIGNAL(itemLoaded(MythUIButtonListItem*)),
             this,       SLOT(  HandleVisible(  MythUIButtonListItem*)));
 
-    connect(m_progList, SIGNAL(itemClicked(MythUIButtonListItem*)),
-            this,       SLOT(  HandleClicked()));
+    if (m_type == plPreviouslyRecorded)
+        connect(m_progList, SIGNAL(itemClicked(MythUIButtonListItem*)),
+                this,       SLOT(  ShowOldRecordedMenu()));
+    else
+        connect(m_progList, SIGNAL(itemClicked(MythUIButtonListItem*)),
+                this,       SLOT(  EditRecording()));
 
     m_progList->SetLCDTitles(tr("Program List"), "title|channel|shortstarttimedate");
     m_progList->SetSearchFields("titlesubtitle");
@@ -616,18 +620,6 @@ ProgramInfo *ProgLister::GetCurrentProgram(void) const
     if (pos >= 0 && pos < (int) m_itemList.size())
         return m_itemList[pos];
     return NULL;
-}
-
-void ProgLister::HandleClicked(void)
-{
-    ProgramInfo *pi = GetCurrentProgram();
-    if (pi)
-    {
-        if (m_type == plPreviouslyRecorded)
-            ShowOldRecordedMenu();
-        else
-            EditRecording(pi);
-    }
 }
 
 void ProgLister::ShowDeleteItemMenu(void)

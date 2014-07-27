@@ -425,10 +425,7 @@ void ProgFinder::showGuide()
 void ProgFinder::select()
 {
     if (GetFocusWidget() == m_timesList)
-    {
-        ProgramInfo *curPick = m_showData[m_timesList->GetCurrentPos()];
-        EditRecording(curPick);
-    }
+        EditRecording();
     else if (GetFocusWidget() == m_alphabetList && m_showList->GetCount())
         SetFocusWidget(m_showList);
     else if (GetFocusWidget() == m_showList)
