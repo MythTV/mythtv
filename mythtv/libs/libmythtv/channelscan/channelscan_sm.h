@@ -116,15 +116,15 @@ class ChannelScanSM : public MPEGStreamListener,
     bool ScanExistingTransports(uint sourceid, bool follow_nit);
 
     void SetAnalog(bool is_analog);
-    void SetSourceID(int _SourceID)   { sourceID                = _SourceID; }
-    void SetSignalTimeout(uint val)    { signalTimeout = val; }
-    void SetChannelTimeout(uint val)   { channelTimeout = val; }
-    void SetScanDTVTunerType(DTVTunerType t) { scanDTVTunerType = t; }
+    void SetSourceID(int _SourceID)   { m_sourceID                = _SourceID; }
+    void SetSignalTimeout(uint val)    { m_signalTimeout = val; }
+    void SetChannelTimeout(uint val)   { m_channelTimeout = val; }
+    void SetScanDTVTunerType(DTVTunerType t) { m_scanDTVTunerType = t; }
 
-    uint GetSignalTimeout(void)  const { return signalTimeout; }
-    uint GetChannelTimeout(void) const { return channelTimeout; }
+    uint GetSignalTimeout(void)  const { return m_signalTimeout; }
+    uint GetChannelTimeout(void) const { return m_channelTimeout; }
 
-    SignalMonitor    *GetSignalMonitor(void) { return signalMonitor; }
+    SignalMonitor    *GetSignalMonitor(void) { return m_signalMonitor; }
     DTVSignalMonitor *GetDTVSignalMonitor(void);
     DVBSignalMonitor *GetDVBSignalMonitor(void);
 
@@ -202,61 +202,61 @@ class ChannelScanSM : public MPEGStreamListener,
 
   private:
     // Set in constructor
-    ScanMonitor      *scan_monitor;
-    ChannelBase      *channel;
-    SignalMonitor    *signalMonitor;
-    int               sourceID;
-    uint              signalTimeout;
-    uint              channelTimeout;
-    uint              otherTableTimeout;
-    uint              otherTableTime;
-    bool              setOtherTables;
-    QString           inputname;
-    bool              m_test_decryption;
-    bool              extend_scan_list;
+    ScanMonitor      *m_scanMonitor;
+    ChannelBase      *m_channel;
+    SignalMonitor    *m_signalMonitor;
+    int               m_sourceID;
+    uint              m_signalTimeout;
+    uint              m_channelTimeout;
+    uint              m_otherTableTimeout;
+    uint              m_otherTableTime;
+    bool              m_setOtherTables;
+    QString           m_inputName;
+    bool              m_testDecryption;
+    bool              m_extendScanList;
 
     // Optional info
-    DTVTunerType      scanDTVTunerType;
+    DTVTunerType      m_scanDTVTunerType;
 
     /// The big lock
-    mutable QMutex    lock;
+    mutable QMutex    m_lock;
 
     // State
-    bool              scanning;
-    volatile bool     threadExit;
-    bool              waitingForTables;
-    QTime             timer;
+    bool              m_scanning;
+    volatile bool     m_threadExit;
+    bool              m_waitingForTables;
+    QTime             m_timer;
 
     // Transports List
-    int                         transportsScanned;
-    QSet<uint32_t>              ts_scanned;
-    QMap<uint32_t,DTVMultiplex> extend_transports;
-    transport_scan_items_t      scanTransports;
-    transport_scan_items_it_t   current;
-    transport_scan_items_it_t   nextIt;
-    bool                        currentTestingDecryption;
-    QMap<uint, uint>            currentEncryptionStatus;
-    QMap<uint, bool>            currentEncryptionStatusChecked;
-    QMap<uint64_t, QString>     defAuthorities;
+    int                         m_transportsScanned;
+    QSet<uint32_t>              m_tsScanned;
+    QMap<uint32_t,DTVMultiplex> m_extendTransports;
+    transport_scan_items_t      m_scanTransports;
+    transport_scan_items_it_t   m_current;
+    transport_scan_items_it_t   m_nextIt;
+    bool                        m_currentTestingDecryption;
+    QMap<uint, uint>            m_currentEncryptionStatus;
+    QMap<uint, bool>            m_currentEncryptionStatusChecked;
+    QMap<uint64_t, QString>     m_defAuthorities;
 
     /// Found Channel Info
-    ChannelList       channelList;
-    uint              channelsFound;
-    ScannedChannelInfo *currentInfo;
+    ChannelList       m_channelList;
+    uint              m_channelsFound;
+    ScannedChannelInfo *m_currentInfo;
 
     // Analog Info
-    AnalogSignalHandler *analogSignalHandler;
+    AnalogSignalHandler *m_analogSignalHandler;
 
     /// Scanner thread, runs ChannelScanSM::run()
-    MThread          *scannerThread;
+    MThread          *m_scannerThread;
     QMutex           m_mutex;
 };
 
 inline void ChannelScanSM::UpdateScanPercentCompleted(void)
 {
-    int tmp = (transportsScanned * 100) /
-              (scanTransports.size() + extend_transports.size());
-    scan_monitor->ScanPercentComplete(tmp);
+    int tmp = (m_transportsScanned * 100) /
+              (m_scanTransports.size() + m_extendTransports.size());
+    m_scanMonitor->ScanPercentComplete(tmp);
 }
 
 void AnalogSignalHandler::AllGood(void)
