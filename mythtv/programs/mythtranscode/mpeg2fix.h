@@ -46,7 +46,8 @@ class MPEG2frame
   public:
     MPEG2frame(int size) :
         isSequence(false), isGop(false),
-        framePos(NULL), gopPos(NULL)
+        framePos(NULL), gopPos(NULL),
+        mpeg2_seq(), mpeg2_gop(), mpeg2_pic()
     {
         av_new_packet(&pkt, size);
     }
