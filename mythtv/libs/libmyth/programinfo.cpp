@@ -747,14 +747,13 @@ ProgramInfo::ProgramInfo(
         if (IsSameChannel(s))
         {
             recstatus   = s.recstatus;
-            // We can stop looking at the scheduler list
-            // Aside from being more efficient, this avoids us accidentally
-            // overwriting values in the case where we have an override
-            // or channel specific rule for the same showing on a
-            // different channel
             break;
         }
 
+        if (s.recstatus == rsWillRecord ||
+            s.recstatus == rsRecording ||
+            s.recstatus == rsTuning ||
+            s.recstatus == rsFailing)
         recstatus = s.recstatus;
     }
 }
