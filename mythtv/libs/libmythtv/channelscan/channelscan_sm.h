@@ -205,7 +205,6 @@ class ChannelScanSM : public MPEGStreamListener,
     ScanMonitor      *scan_monitor;
     ChannelBase      *channel;
     SignalMonitor    *signalMonitor;
-    int               scantype;
     int               sourceID;
     uint              signalTimeout;
     uint              channelTimeout;
