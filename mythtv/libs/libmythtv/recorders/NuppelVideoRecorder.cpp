@@ -177,6 +177,8 @@ NuppelVideoRecorder::NuppelVideoRecorder(TVRec *rec, ChannelBase *channel) :
     hmjpg_vdecimation = 2;
     hmjpg_maxw = 640;
 
+    cleartimeonpause = false;
+
     videoFilterList = "";
     videoFilters = NULL;
     FiltMan = new FilterManager;
