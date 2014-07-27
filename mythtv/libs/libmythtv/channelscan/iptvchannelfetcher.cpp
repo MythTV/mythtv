@@ -157,7 +157,7 @@ void IPTVChannelFetcher::run(void)
             QString channum = it.key();
             QString name    = (*it).m_name;
             QString xmltvid = (*it).m_xmltvid.isEmpty() ? "" : (*it).m_xmltvid;
-            uint programnumber = (*it).m_programnumber;
+            uint programnumber = (*it).m_programNumber;
             //: %1 is the channel number, %2 is the channel name
             QString msg = tr("Channel #%1 : %2").arg(channum).arg(name);
 

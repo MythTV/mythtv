@@ -134,7 +134,7 @@ class TestIPTVRecorder: public QObject
         QVERIFY (chanmap["1"].m_tuning.IsValid ());
         QCOMPARE (chanmap["1"].m_name, QString ("SVT1 HD Mitt"));
         QCOMPARE (chanmap["1"].m_xmltvid, QString ("svt1hd.svt.se"));
-        QCOMPARE (chanmap["1"].m_programnumber, (uint) 1330);
+        QCOMPARE (chanmap["1"].m_programNumber, (uint) 1330);
         QCOMPARE (chanmap["1"].m_tuning.m_data_url.toString(), QString ("http://192.168.0.234:8001/1:0:19:532:6:22F1:EEEE0000:0:0:0:"));
 
         /* test playlist for FreeboxTV, last channel in playlist "wins" */
