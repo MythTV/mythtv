@@ -276,7 +276,7 @@ void CC708Reader::Reset(uint service_num)
 {
     CHECKENABLED;
     LOG(VB_VBI, LOG_INFO, LOC + QString("Reset(%1)").arg(service_num));
-    DeleteWindows(service_num, 0x7);
+    DeleteWindows(service_num, 0xff);
     DelayCancel(service_num);
 }
 
