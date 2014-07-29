@@ -50,12 +50,6 @@ SOURCES += mythplugin.cpp housekeeper.cpp
 SOURCES += mythsystemlegacy.cpp mythtypes.cpp
 SOURCES += threadedfilewriter.cpp mythsingledownload.cpp
 
-# This stuff is not Qt5 compatible..
-contains(QT_VERSION, ^4\\.[0-9]\\..*) {
-HEADERS += mcodecs.h
-SOURCES += mcodecs.cpp
-}
-
 unix {
     SOURCES += mythsystemunix.cpp
     HEADERS += mythsystemunix.h
@@ -70,7 +64,7 @@ mingw | win32-msvc* {
 inc.path = $${PREFIX}/include/mythtv/
 inc.files += mythdbcon.h mythdbparams.h mythbaseexp.h mythdb.h
 inc.files += compat.h mythversion.h mythconfig.h mythconfig.mak version.h
-inc.files += mythobservable.h mythevent.h mcodecs.h verbosedefs.h
+inc.files += mythobservable.h mythevent.h verbosedefs.h
 inc.files += mythtimer.h lcddevice.h exitcodes.h mythdirs.h mythstorage.h
 inc.files += mythsocket.h mythsocket_cb.h mythlogging.h
 inc.files += mythcorecontext.h mythsystem.h storagegroup.h loggingserver.h

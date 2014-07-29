@@ -16,7 +16,6 @@
 
 // mythtv
 #include <mythcorecontext.h>
-#include <mcodecs.h>
 #include <mythversion.h>
 #include <musicmetadata.h>
 
@@ -95,7 +94,7 @@ class ShoutCastRequest
         if (!url.userName().isEmpty() && !url.password().isEmpty()) 
         {
             QString authstring = url.userName() + ":" + url.password();
-            QString auth = QCodecs::base64Encode(authstring.toLocal8Bit());
+            QString auth = authstring.toLocal8Bit().toBase64();
 
             hdr += "Authorization: Basic " + auth + "\r\n";
         }
@@ -149,7 +148,7 @@ class IceCastRequest
         if (!url.userName().isEmpty() && !url.password().isEmpty()) 
         {
             QString authstring = url.userName() + ":" + url.password();
-            QString auth = QCodecs::base64Encode(authstring.toLocal8Bit());
+            QString auth = authstring.toLocal8Bit().toBase64();
 
             hdr += "Authorization: Basic " + auth + "\r\n";
         }
