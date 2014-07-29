@@ -712,7 +712,20 @@ MythNotificationScreen &MythNotificationScreen::operator=(const MythNotification
     m_priority      = s.m_priority;
     m_type          = s.m_type;
 
-    m_update = m_content; // so all fields are initialised regardless of notification type
+    m_update        = m_content; // so all fields are initialised regardless of notification type
+
+    m_artworkImage     = NULL;
+    m_titleText        = NULL;
+    m_originText       = NULL;
+    m_descriptionText  = NULL;
+    m_extraText        = NULL;
+    m_progresstextText = NULL;
+    m_progressBar      = NULL;
+    m_errorState       = NULL;
+    m_mediaState       = NULL;
+
+    m_timer            = new QTimer(this);
+    connect(m_timer, SIGNAL(timeout()), this, SLOT(ProcessTimer()));
 
     return *this;
 }
