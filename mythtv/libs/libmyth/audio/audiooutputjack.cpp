@@ -95,7 +95,7 @@ AudioOutputSettings* AudioOutputJACK::GetOutputSettings(bool /*digital*/)
     }
     // Count matching ports from 2nd port upwards
     i = 1;
-    while (matching_ports[i] && (i < JACK_CHANNELS_MAX))
+    while ((i < JACK_CHANNELS_MAX) && matching_ports[i])
     {
         settings->AddSupportedChannels(i+1);
         VBAUDIO(QString("Adding channels: %1").arg(i+1));
