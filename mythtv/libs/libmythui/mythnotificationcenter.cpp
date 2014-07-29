@@ -217,6 +217,9 @@ MythNotificationScreen::MythNotificationScreen(MythScreenStack *stack,
 
 MythNotificationScreen &MythNotificationScreen::operator=(const MythNotificationScreen &s)
 {
+    if (this == &s)
+        return *this;
+
     // check if anything have changed
     m_refresh = !(
                   m_id == s.m_id &&
