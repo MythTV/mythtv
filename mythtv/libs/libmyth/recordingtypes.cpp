@@ -40,7 +40,7 @@ QString toString(RecordingType rectype)
         case kDontRecord:
             return QObject::tr("Override Recording");
         case kTemplateRecord:
-            return QObject::tr("Template Recording");
+            return QObject::tr("Recording Template");
         default:
             return QObject::tr("Not Recording");
     }
@@ -115,7 +115,7 @@ RecordingType recTypeFromString(QString type)
     else if (type.toLower() == "record weekly" || type.toLower() == "weekly" ||
              type.toLower() == "find weekly" || type.toLower() == "findweekly")
         return kWeeklyRecord;
-    else if (type.toLower() == "template" || type.toLower() == "template")
+    else if (type.toLower() == "recording template" || type.toLower() == "template")
         return kTemplateRecord;
     else if (type.toLower() == "override recording" || type.toLower() == "override")
         return kOverrideRecord;
