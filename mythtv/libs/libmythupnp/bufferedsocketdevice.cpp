@@ -261,7 +261,7 @@ void BufferedSocketDevice::Flush()
         return;
 
     bool osBufferFull = false;
-    int  consumed     = 0;
+    //int  consumed     = 0;
 
     while ( !osBufferFull && ( m_nWriteSize > 0 ) && m_pSocket->isValid())
     {
@@ -308,8 +308,9 @@ void BufferedSocketDevice::Flush()
         if ( nwritten > 0 ) 
         {
             if ( ConsumeWriteBuf( nwritten ) )
-
-            consumed += nwritten;
+            {
+                //consumed += nwritten;
+            }
         }
 
         if ( nwritten < i )
