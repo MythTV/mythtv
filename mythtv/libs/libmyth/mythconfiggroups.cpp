@@ -119,6 +119,8 @@ QWidget *VerticalConfigurationGroup::configWidget(
     QWidget            *parent,
     const char         *widgetName)
 {
+    if (layout)
+        layout->deleteLater();
     layout = new QVBoxLayout();
     layout->setMargin(margin);
     layout->setSpacing((space<0) ? margin : space);
