@@ -1241,7 +1241,7 @@ void NuppelVideoRecorder::DoV4L1(void)
                                                PROT_READ|PROT_WRITE,
                                                MAP_SHARED,
                                                fd, 0);
-    if (buf <= 0)
+    if (buf == MAP_FAILED)
     {
         QString tmp = "mmap: " + ENO;
         KillChildren();
