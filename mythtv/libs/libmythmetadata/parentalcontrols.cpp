@@ -80,6 +80,7 @@ ParentalLevel &ParentalLevel::operator=(const ParentalLevel &rhs)
     if (&rhs != this)
     {
         m_level = rhs.m_level;
+        m_hitlimit = rhs.m_hitlimit;
     }
 
     return *this;
