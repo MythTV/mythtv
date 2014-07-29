@@ -290,13 +290,13 @@ bool MythWebPage::extension(Extension extension, const ExtensionOption *option,
 {
     if (extension == QWebPage::ErrorPageExtension)
     {
-        ErrorPageExtensionOption *erroroption;
-        erroroption = (ErrorPageExtensionOption *) option;
-        ErrorPageExtensionReturn *erroroutput;
-        erroroutput = (ErrorPageExtensionReturn *) output;
-
         if (!option || !output)
             return false;
+
+        const ErrorPageExtensionOption *erroroption
+                        = static_cast<const ErrorPageExtensionOption *>(option);
+        ErrorPageExtensionReturn *erroroutput = NULL;
+        erroroutput = static_cast<ErrorPageExtensionReturn *>(output);
 
         QString filename = "htmls/notfound.html";
 
