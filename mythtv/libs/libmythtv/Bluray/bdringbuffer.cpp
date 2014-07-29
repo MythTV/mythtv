@@ -1114,7 +1114,11 @@ void BDRingBuffer::ClearOverlays(void)
     QMutexLocker lock(&m_overlayLock);
 
     while (!m_overlayImages.isEmpty())
-        BDOverlay::DeleteOverlay(m_overlayImages.takeFirst());
+    {
+        BDOverlay *overlay = m_overlayImages.takeFirst();
+        delete overlay;
+        overlay = NULL;
+    }
 }
 
 BDOverlay* BDRingBuffer::GetOverlay(void)

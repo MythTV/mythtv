@@ -40,7 +40,9 @@ void BDOverlayScreen::DisplayBDOverlay(BDOverlay *overlay)
                 .arg(overlay->m_position.top())
                 .arg(overlay->m_plane)
                 .arg(overlay->m_pts));
-        BDOverlay::DeleteOverlay(overlay);
+
+        delete overlay;
+        overlay = NULL;
         return;
     }
 
@@ -124,5 +126,7 @@ void BDOverlayScreen::DisplayBDOverlay(BDOverlay *overlay)
     }
 
     SetRedraw();
-    BDOverlay::DeleteOverlay(overlay);
+
+    delete overlay;
+    overlay = NULL;
 }
