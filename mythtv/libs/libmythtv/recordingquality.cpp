@@ -14,6 +14,7 @@ static QDateTime get_end(const RecordingInfo&);
 
 RecordingQuality::RecordingQuality(const RecordingInfo *ri,
                                    const RecordingGaps &rg)
+                 : m_continuity_error_count(0), m_packet_count(0)
 {
     if (!ri)
         return;
