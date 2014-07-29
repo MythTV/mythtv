@@ -499,7 +499,6 @@ int main(int argc, char *argv[])
 
     if (scanImport)
     {
-        vector<ScanInfo> scans = LoadScanList();
         cout<<"*** SCAN IMPORT START ***"<<endl;
         {
             ScanDTVTransportList list = LoadScan(scanImport);
