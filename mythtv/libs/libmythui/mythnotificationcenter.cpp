@@ -214,6 +214,71 @@ MythNotificationScreen::MythNotificationScreen(MythScreenStack *stack,
     connect(m_timer, SIGNAL(timeout()), this, SLOT(ProcessTimer()));
 }
 
+
+MythNotificationScreen &MythNotificationScreen::operator=(const MythNotificationScreen &s)
+{
+    // check if anything have changed
+    m_refresh = !(
+                  m_id == s.m_id &&
+                  m_image == s.m_image &&
+                  m_imagePath == s.m_imagePath &&
+                  m_title == s.m_title &&
+                  m_origin == s.m_origin &&
+                  m_description == s.m_description &&
+                  m_extra == s.m_extra &&
+                  m_duration == s.m_duration &&
+                  m_progress == s.m_progress &&
+                  m_progresstext == s.m_progresstext &&
+                  m_content == s.m_content &&
+                  m_fullscreen == s.m_fullscreen &&
+                  m_expiry == s.m_expiry &&
+                  m_index == s.m_index &&
+                  m_style == s.m_style &&
+                  m_visibility == s.m_visibility &&
+                  m_priority == s.m_priority &&
+                  m_type == s.m_type
+                  );
+
+    m_id            = s.m_id;
+    m_image         = s.m_image;
+    m_imagePath     = s.m_imagePath;
+    m_title         = s.m_title;
+    m_origin        = s.m_origin;
+    m_description   = s.m_description;
+    m_extra         = s.m_extra;
+    m_duration      = s.m_duration;
+    m_progress      = s.m_progress;
+    m_progresstext  = s.m_progresstext;
+    m_content       = s.m_content;
+    m_fullscreen    = s.m_fullscreen;
+    m_expiry        = s.m_expiry;
+    m_index         = s.m_index;
+    m_style         = s.m_style;
+    m_visibility    = s.m_visibility;
+    m_priority      = s.m_priority;
+    m_type          = s.m_type;
+
+    m_update        = m_content; // so all fields are initialised regardless of notification type
+
+    m_added         = false;
+    m_created       = false;
+
+    m_artworkImage     = NULL;
+    m_titleText        = NULL;
+    m_originText       = NULL;
+    m_descriptionText  = NULL;
+    m_extraText        = NULL;
+    m_progresstextText = NULL;
+    m_progressBar      = NULL;
+    m_errorState       = NULL;
+    m_mediaState       = NULL;
+
+    m_timer            = new QTimer(this);
+    connect(m_timer, SIGNAL(timeout()), this, SLOT(ProcessTimer()));
+
+    return *this;
+}
+
 MythNotificationScreen::~MythNotificationScreen()
 {
     m_timer->stop();
@@ -667,67 +732,6 @@ void MythNotificationScreen::ProcessTimer(void)
     LOG(VB_GUI, LOG_DEBUG, LOC + "ProcessTimer()");
     // delete screen
     GetScreenStack()->PopScreen(this, true, true);
-}
-
-MythNotificationScreen &MythNotificationScreen::operator=(const MythNotificationScreen &s)
-{
-    // check if anything have changed
-    m_refresh = !(
-                  m_id == s.m_id &&
-                  m_image == s.m_image &&
-                  m_imagePath == s.m_imagePath &&
-                  m_title == s.m_title &&
-                  m_origin == s.m_origin &&
-                  m_description == s.m_description &&
-                  m_extra == s.m_extra &&
-                  m_duration == s.m_duration &&
-                  m_progress == s.m_progress &&
-                  m_progresstext == s.m_progresstext &&
-                  m_content == s.m_content &&
-                  m_fullscreen == s.m_fullscreen &&
-                  m_expiry == s.m_expiry &&
-                  m_index == s.m_index &&
-                  m_style == s.m_style &&
-                  m_visibility == s.m_visibility &&
-                  m_priority == s.m_priority &&
-                  m_type == s.m_type
-                  );
-
-    m_id            = s.m_id;
-    m_image         = s.m_image;
-    m_imagePath     = s.m_imagePath;
-    m_title         = s.m_title;
-    m_origin        = s.m_origin;
-    m_description   = s.m_description;
-    m_extra         = s.m_extra;
-    m_duration      = s.m_duration;
-    m_progress      = s.m_progress;
-    m_progresstext  = s.m_progresstext;
-    m_content       = s.m_content;
-    m_fullscreen    = s.m_fullscreen;
-    m_expiry        = s.m_expiry;
-    m_index         = s.m_index;
-    m_style         = s.m_style;
-    m_visibility    = s.m_visibility;
-    m_priority      = s.m_priority;
-    m_type          = s.m_type;
-
-    m_update        = m_content; // so all fields are initialised regardless of notification type
-
-    m_artworkImage     = NULL;
-    m_titleText        = NULL;
-    m_originText       = NULL;
-    m_descriptionText  = NULL;
-    m_extraText        = NULL;
-    m_progresstextText = NULL;
-    m_progressBar      = NULL;
-    m_errorState       = NULL;
-    m_mediaState       = NULL;
-
-    m_timer            = new QTimer(this);
-    connect(m_timer, SIGNAL(timeout()), this, SLOT(ProcessTimer()));
-
-    return *this;
 }
 
 void MythNotificationScreen::SetSingleShotTimer(int s, bool update)

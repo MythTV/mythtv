@@ -154,6 +154,8 @@ public:
                              MythNotification &notification);
     MythNotificationScreen(MythScreenStack *stack,
                              const MythNotificationScreen &screen);
+    
+    MythNotificationScreen &operator=(const MythNotificationScreen &s);
 
     virtual ~MythNotificationScreen();
 
@@ -189,8 +191,6 @@ public:
         kNoArtwork  = 1 << 4,
         kAll        = ~kNone,
     };
-
-    MythNotificationScreen &operator=(const MythNotificationScreen &s);
 
 signals:
     void ScreenDeleted();
