@@ -219,14 +219,13 @@ static inline void clear(VideoFrame *vf)
 
 static inline bool compatible(const VideoFrame *a, const VideoFrame *b)
 {
-    if (a->codec == b->codec &&
+    if (a && b && a->codec == b->codec &&
         (a->codec == FMT_YV12 || a->codec == FMT_NV12))
     {
-        return a && b &&
-            (a->codec      == b->codec)      &&
-            (a->width      == b->width)      &&
-            (a->height     == b->height)     &&
-            (a->size       == b->size);
+        return (a->codec      == b->codec)      &&
+               (a->width      == b->width)      &&
+               (a->height     == b->height)     &&
+               (a->size       == b->size);
     }
 
     return a && b &&
