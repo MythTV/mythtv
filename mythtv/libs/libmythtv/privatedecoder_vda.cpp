@@ -319,8 +319,8 @@ bool PrivateDecoderVDA::Init(const QString &decoder,
                              PlayerFlags flags,
                              AVCodecContext *avctx)
 {
-    if ((decoder != "vda") || (avctx->codec_id != AV_CODEC_ID_H264) ||
-        !(flags & kDecodeAllowEXT) || !avctx)
+    if ((decoder != "vda") || !avctx || (avctx->codec_id != AV_CODEC_ID_H264) ||
+        !(flags & kDecodeAllowEXT))
         return false;
 
     m_lib = VDALibrary::GetVDALibrary();
