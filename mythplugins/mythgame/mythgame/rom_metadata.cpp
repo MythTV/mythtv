@@ -50,7 +50,7 @@ static QString crcStr(uLong crc)
 QString crcinfo(QString romname, QString GameType, QString *key, RomDBMap *romDB)
 {
     // Get CRC of file
-    char block[32768];
+    char block[32768] = "";
     uLong crc = crc32(0, Z_NULL, 0);
     QString crcRes;
     char filename_inzip[256];
