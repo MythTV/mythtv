@@ -358,7 +358,8 @@ int64_t MPEG2fixup::udiff2x33(int64_t pts1, int64_t pts2)
 
     diff = pts1 - pts2;
 
-    if (diff < 0){
+    if (diff < 0)
+    {
         diff = MAX_PTS + diff;
     }
     return (diff % MAX_PTS);
@@ -721,14 +722,16 @@ int MPEG2fixup::AddFrame(MPEG2frame *f)
         FrameInfo(f);
     }
 
-    if (ring_write(rb, f->pkt.data, f->pkt.size)<0){
+    if (ring_write(rb, f->pkt.data, f->pkt.size)<0)
+    {
         pthread_mutex_unlock( &rx.mutex );
         LOG(VB_GENERAL, LOG_ERR,
             QString("Ring buffer overflow %1").arg(rb->size));
         return 1;
     }
 
-    if (ring_write(rbi, (uint8_t *)&iu, sizeof(index_unit))<0){
+    if (ring_write(rbi, (uint8_t *)&iu, sizeof(index_unit))<0)
+    {
         pthread_mutex_unlock( &rx.mutex );
         LOG(VB_GENERAL, LOG_ERR,
             QString("Ring buffer overflow %1").arg(rbi->size));
@@ -973,7 +976,8 @@ int MPEG2fixup::ProcessVideo(MPEG2frame *vf, mpeg2dec_t *dec)
                         info->gop->seconds, info->gop->pictures);
             msg += gop;
         }
-        if (info->current_picture) {
+        if (info->current_picture)
+        {
             int ct = info->current_picture->flags & PIC_MASK_CODING_TYPE;
             char coding_type = (ct == PIC_FLAG_CODING_TYPE_I) ? 'I' :
                                 ((ct == PIC_FLAG_CODING_TYPE_P) ? 'P' :
@@ -1048,7 +1052,8 @@ void MPEG2fixup::WriteYUV(QString filename, const mpeg2_info_t *info)
 {
     int fh = open(filename.toLocal8Bit().constData(),
                   O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
-    if (fh == -1) {
+    if (fh == -1)
+    {
         LOG(VB_GENERAL, LOG_ERR,
             QString("Couldn't open file %1: ").arg(filename) + ENO);
         return;
@@ -1086,7 +1091,8 @@ void MPEG2fixup::WriteData(QString filename, uint8_t *data, int size)
 {
     int fh = open(filename.toLocal8Bit().constData(),
                   O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
-    if (fh == -1) {
+    if (fh == -1)
+    {
         LOG(VB_GENERAL, LOG_ERR,
             QString("Couldn't open file %1: ").arg(filename) + ENO);
         return;
