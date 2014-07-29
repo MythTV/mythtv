@@ -334,8 +334,10 @@ void AudioOutputPulseAudio::SetVolumeChannel(int channel, int volume)
     volume_control.values[channel] =
         (float)volume / 100.0f * (float)PA_VOLUME_NORM;
 
-    volume = min(100, volume);
-    volume = max(0, volume);
+// FIXME: This code did nothing at all so has been commented out for now
+//        until it's decided whether it was ever required
+//     volume = min(100, volume);
+//     volume = max(0, volume);
 
     if (gCoreContext->GetSetting("MixerControl", "PCM").toLower() == "pcm")
     {
@@ -477,7 +479,7 @@ char *AudioOutputPulseAudio::ChooseHost(void)
     if (host && *host != 0)
         host++;
 
-    if ( !(!host || *host == 0 || strcmp(host,"default") == 0))
+    if (host && *host != 0 && strcmp(host,"default") != 0)
     {
         if ((pulse_host = new char[strlen(host) + 1]))
             strcpy(pulse_host, host);
@@ -487,7 +489,7 @@ char *AudioOutputPulseAudio::ChooseHost(void)
                     .arg(host).arg(strlen(host) + 1));
     }
 
-    if (!pulse_host && strcmp(host,"default") != 0)
+    if (!pulse_host && host && strcmp(host,"default") != 0)
     {
         char *env_pulse_host = getenv("PULSE_SERVER");
         if (env_pulse_host && (*env_pulse_host != '\0'))
