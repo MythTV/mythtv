@@ -84,7 +84,8 @@ class MUI_PUBLIC MythNotification : public MythEvent
         ToStringList();
     }
 
-    MythNotification(const MythEvent &me) : MythEvent(me), m_id(-1)
+    MythNotification(const MythEvent &me)
+        : MythEvent(me), m_id(-1), m_parent(NULL)
     {
         FromStringList();
     }
