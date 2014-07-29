@@ -1074,7 +1074,7 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
              redirectUrl(possibleRedirectUrl, dlInfo->m_redirectedTo);
     }
 
-    if(!dlInfo->m_redirectedTo.isEmpty())
+    if(reply && !dlInfo->m_redirectedTo.isEmpty())
     {
         LOG(VB_FILE, LOG_DEBUG, LOC +
             QString("downloadFinished(%1): Redirect: %2 -> %3")
