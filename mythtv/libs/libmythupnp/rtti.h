@@ -58,9 +58,9 @@ class RttiEnum : public QObject
         QString    Desc () const              { return m_Desc;  }
 
 
-        void    setKey  ( const QString val)  { m_Key   = val;  }
-        void    setValue( const int     val)  { m_Value = val;  }
-        void    setDesc ( const QString val)  { m_Desc  = val;  }
+        void    setKey  ( const QString &val)  { m_Key   = val;  }
+        void    setValue( const int      val)  { m_Value = val;  }
+        void    setDesc ( const QString &val)  { m_Desc  = val;  }
 
 
     public:
