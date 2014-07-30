@@ -452,7 +452,9 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags,
     }
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "-- process events 2 begin");
-    qApp->processEvents();
+    do
+        qApp->processEvents();
+    while (tv->isEmbedded);
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "-- process events 2 end");
 
     // check if the show has reached the end.
