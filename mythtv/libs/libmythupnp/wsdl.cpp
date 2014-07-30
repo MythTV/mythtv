@@ -265,18 +265,26 @@ bool Wsdl::GetWSDL( HTTPRequest *pRequest )
         //	<xs:import schemaLocation="<path to dependant schema" namespace="http://mythtv.org"/>
         // ------------------------------------------------------------------
 
-        QString sBaseUri = "http://" + pRequest->m_mapHeaders[ "host" ] + pRequest->m_sBaseUrl + "/xsd?type=";
+        QString sBaseUri = "http://" + pRequest->m_mapHeaders[ "host" ] + pRequest->m_sBaseUrl + "/xsd";
 
-        QMap<QString, bool>::const_iterator it = m_typesToInclude.constBegin();
+        QMap<QString, TypeInfo>::const_iterator it = m_typesToInclude.constBegin();
         while( it != m_typesToInclude.constEnd())
         {
             QDomElement oIncNode = createElement( "xs:import" );
             QString     sType    = it.key();
+            TypeInfo    info     = it.value();
 
             sType.remove( "DTC::" );
 
-            oIncNode.setAttribute( "schemaLocation", sBaseUri + sType );
-            oIncNode.setAttribute( "namespace", "http://mythtv.org" );
+            QString sValue = QString( "%1?%2=%3" ).arg( sBaseUri       )
+                                                  .arg( info.sAttrName )
+                                                  .arg( sType          );
+
+            if (!info.sContentType.isEmpty())
+                sValue += "&name=" + info.sContentType;
+
+            oIncNode.setAttribute( "schemaLocation", sValue );
+            oIncNode.setAttribute( "namespace"     , "http://mythtv.org" );
     
             oImportNode.appendChild( oIncNode );
             ++it;
@@ -415,8 +423,7 @@ QDomElement Wsdl::CreateMethodType( MethodInfo   &oInfo,
         {
             sPrefix = "tns:";
 
-
-            m_typesToInclude.insert( sType, true );
+            sType = AddTypeInfo( sType );
         }
 
         oNode.setAttribute( "type", sPrefix + sType );
@@ -433,12 +440,25 @@ QDomElement Wsdl::CreateMethodType( MethodInfo   &oInfo,
             QString sName      = paramNames[ nIdx ];
             QString sParamType = paramTypes[ nIdx ];
 
+            bool bCustomType = IsCustomType( sParamType );
+
+            sParamType = Xsd::ConvertTypeToXSD( sParamType, bCustomType );
+
+            QString sPrefix = "xs:";
+
+            if (bCustomType)
+            {
+                sPrefix = "tns:";
+
+                sParamType = AddTypeInfo( sParamType );
+            }
+
             QDomElement oNode = createElement( "xs:element" );
 
             oNode.setAttribute( "minOccurs", 0     );
             oNode.setAttribute( "name"     , sName );
             oNode.setAttribute( "nillable" , true  );   //-=>TODO: This may need to be determined by sParamType
-            oNode.setAttribute( "type"     , "xs:" + Xsd::ConvertTypeToXSD( sParamType ));
+            oNode.setAttribute( "type"     , sPrefix + sParamType );
 
             oSeqNode.appendChild( oNode );
         }
@@ -475,6 +495,30 @@ bool Wsdl::IsCustomType( QString &sTypeName )
         return false;
 
     return true;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QString Wsdl::AddTypeInfo( QString sType )
+{
+    QString sCustomAttr = "type";
+
+    // if sParamType contains "::", then assume it's a enum 
+    // (this needs to be looked at again for a better approach)
+
+    if (sType.contains( "::" ))
+    {
+        sType  = sType.replace( "::", "." );
+        sCustomAttr = "enum";
+    }
+
+    TypeInfo info = { sCustomAttr, QString() };
+
+    m_typesToInclude.insert( sType, info );
+
+    return sType;
 }
 
 /////////////////////////////////////////////////////////////////////////////

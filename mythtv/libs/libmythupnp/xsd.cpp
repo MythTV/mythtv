@@ -48,6 +48,9 @@ bool Xsd::GetEnumXSD( HTTPRequest *pRequest, QString sEnumName )
     QObject *pParentClass = (QObject *)QMetaType::create( nParentId );
 #endif
 
+    if (pParentClass == NULL)
+        return false;
+
     const QMetaObject *pMetaObject = pParentClass->metaObject();
 
     QMetaType::destroy( nParentId, pParentClass );
@@ -287,8 +290,6 @@ bool Xsd::GetXSD( HTTPRequest *pRequest, QString sTypeName )
 //</xs:schema>
 /////////////////////////////////////////////////////////////////////////////
 
-typedef struct TypeInfo { QString sAttrName; QString sContentType; } TypeInfo;
-
 bool Xsd::RenderXSD( HTTPRequest *pRequest, QObject *pClass )
 {
     const QMetaObject *pMetaObject = pClass->metaObject();
@@ -340,7 +341,7 @@ bool Xsd::RenderXSD( HTTPRequest *pRequest, QObject *pClass )
             QDomElement oNode        = createElement( "xs:element" );
             QString     sType        = metaProperty.typeName();
             bool        bCustomType  = false;
-            QString        sCustomAttr  = "type";
+            QString     sCustomAttr  = "type";
             QString     sContentName = QString();
             QString     sContentType = QString();
 
@@ -393,7 +394,16 @@ bool Xsd::RenderXSD( HTTPRequest *pRequest, QObject *pClass )
             else if (metaProperty.isEnumType() || metaProperty.isFlagType() )
             {
                 sCustomAttr = "enum";
-                sType       = sClassName + "." + sType;
+
+                sType.remove( "DTC::" );
+
+                // if sType still contains "::", then no need to prefix with sClassName 
+
+                if (sType.contains( "::" ))
+                    sType = sType.replace( "::", "." );
+                else
+                    sType = sClassName + "." + sType;
+
                 bCustomType = true;
             }
 

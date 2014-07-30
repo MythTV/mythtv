@@ -67,4 +67,8 @@ class UPNP_PUBLIC Xsd : public QDomDocument
 
 };
 
+//////////////////////////////////////////////////////////////////////////////
+
+typedef struct TypeInfo { QString sAttrName; QString sContentType; } TypeInfo;
+
 #endif

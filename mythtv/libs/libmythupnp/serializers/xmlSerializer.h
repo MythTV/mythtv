@@ -51,6 +51,11 @@ class UPNP_PUBLIC XmlSerializer : public Serializer
 
         void    RenderValue     ( const QString &sName, const QVariant     &vValue );
 
+        void    RenderEnum      ( const QString       &sName ,
+                                  const QVariant      &vValue,
+                                  const QMetaProperty *pMetaProp );
+
+
         void    RenderStringList( const QString &sName, const QStringList  &list );
         void    RenderList      ( const QString &sName, const QVariantList &list );
         void    RenderMap       ( const QString &sName, const QVariantMap  &map  );

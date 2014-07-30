@@ -23,6 +23,7 @@
 #include "upnp.h"
 
 #include "servicehost.h"
+#include "xsd.h"
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -36,7 +37,7 @@ class UPNP_PUBLIC Wsdl : public QDomDocument
 {
     protected:
         ServiceHost             *m_pServiceHost;
-        QMap<QString, bool>      m_typesToInclude;
+        QMap<QString, TypeInfo>  m_typesToInclude;
 
         QDomElement              m_oRoot;
         QDomElement              m_oTypes;
@@ -63,6 +64,8 @@ class UPNP_PUBLIC Wsdl : public QDomDocument
 
         QString     ReadClassInfo         ( const QMetaObject *pMeta, 
                                             const QString     &sKey );
+
+        QString     AddTypeInfo           ( QString            sType );
 
 
     public:

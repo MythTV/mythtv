@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // Program Name: xmlSerializer.cpp
 // Created     : Dec. 30, 2009
 //
@@ -119,8 +119,38 @@ void XmlSerializer::AddProperty( const QString       &sName,
                                  const QMetaProperty *pMetaProp )
 {
     m_pXmlWriter->writeStartElement( sName );
-    RenderValue( GetContentName( sName, pMetaParent, pMetaProp ), vValue );
+
+    if (pMetaProp->isEnumType() || pMetaProp->isFlagType())
+        RenderEnum ( sName, vValue, pMetaProp );
+    else
+        RenderValue( GetContentName( sName, pMetaParent, pMetaProp ), vValue );
+
     m_pXmlWriter->writeEndElement();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////////
+
+void XmlSerializer::RenderEnum( const QString       &sName ,
+                                const QVariant      &vValue,
+                                const QMetaProperty *pMetaProp )
+{
+    QString   sValue;
+    QMetaEnum metaEnum = pMetaProp->enumerator();
+
+    if (pMetaProp->isFlagType())
+        sValue = metaEnum.valueToKeys( vValue.toInt() );
+    else
+        sValue = metaEnum.valueToKey ( vValue.toInt() );
+
+    // If couldn't convert to enum name, return raw value
+
+    if (sValue.isEmpty())
+        sValue = vValue.toString();
+
+    m_pXmlWriter->writeCharacters( sValue );
+
 }
 
 //////////////////////////////////////////////////////////////////////////////

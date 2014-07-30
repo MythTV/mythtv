@@ -11,6 +11,8 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "service.h"
+#include <QMetaEnum>
+
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -82,6 +84,54 @@ void* Service::ConvertToParameterPtr( int            nTypeId,
         }
         case QMetaType::QTime       : *(( QTime          *)pParam) = QTime::fromString    ( sValue, Qt::ISODate ); break;
         case QMetaType::QDate       : *(( QDate          *)pParam) = QDate::fromString    ( sValue, Qt::ISODate ); break;
+
+        default:
+
+            // --------------------------------------------------------------
+            // Need to deal with Enums.  For now, assume any type that contains :: is an enum.
+            // --------------------------------------------------------------
+
+            int nLastIdx = sParamType.lastIndexOf( "::" );
+
+            if (nLastIdx == -1)
+                break;
+
+            QString sParentFQN = sParamType.mid( 0, nLastIdx );
+            QString sEnumName  = sParamType.mid( nLastIdx+2  );
+
+            // --------------------------------------------------------------
+            // Create Parent object so we can get to its metaObject
+            // --------------------------------------------------------------
+
+            int nParentId = QMetaType::type( sParentFQN.toUtf8() );
+
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+            QObject *pParentClass = (QObject *)QMetaType::construct( nParentId );
+#else
+            QObject *pParentClass = (QObject *)QMetaType::create( nParentId );
+#endif
+
+            if (pParentClass == NULL)
+                break;
+
+            const QMetaObject *pMetaObject = pParentClass->metaObject();
+
+            QMetaType::destroy( nParentId, pParentClass );
+
+            // --------------------------------------------------------------
+            // Now look up enum
+            // --------------------------------------------------------------
+
+            int nEnumIdx = pMetaObject->indexOfEnumerator( sEnumName.toUtf8());
+
+            if (nEnumIdx < 0 )
+                break;
+
+            QMetaEnum metaEnum = pMetaObject->enumerator( nEnumIdx );
+
+            *(( int *)pParam) = metaEnum.keyToValue( sValue.toUtf8() );
+
+            break;
     }
 
     return pParam;
