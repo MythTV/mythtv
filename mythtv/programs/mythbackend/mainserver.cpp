@@ -3622,7 +3622,7 @@ void MainServer::HandleQueryFindFile(QStringList &slist, PlaybackSock *pbs)
         .arg(filename).arg(hostname).arg(storageGroup).arg(useRegex).arg(allowFallback));
 
     // first check the given host
-    if (hostname == gCoreContext->GetHostName() || hostname == gCoreContext->GetBackendServerIP())
+    if (gCoreContext->IsThisHost(hostname))
     {
         LOG(VB_FILE, LOG_INFO, LOC + QString("Checking local host '%1' for file").arg(hostname));
 
