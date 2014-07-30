@@ -324,6 +324,7 @@ AudioOutputSettings AudioSetupWizard::UpdateCapabilities(bool restore, bool AC3)
         // if we support AC3 and/or LPCM
     settings.SetBestSupportedChannels(cur_speakers);
     settings.setFeature(bAC3, FEATURE_AC3);
+    settings.setFeature(bDTS, FEATURE_DTS);
     settings.setFeature(bLPCM && realmax_speakers > 2, FEATURE_LPCM);
 
     return settings;
