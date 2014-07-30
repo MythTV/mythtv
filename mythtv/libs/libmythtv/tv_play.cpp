@@ -9846,14 +9846,14 @@ void TV::customEvent(QEvent *e)
         DoSetPauseState(actx, saved_pause); // Restore pause states
         disableDrawUnusedRects = false;
 
-        qApp->processEvents();
-
         if (!weDisabledGUI)
         {
             weDisabledGUI = true;
             GetMythMainWindow()->PushDrawDisabled();
-            DrawUnusedRects();
         }
+
+        qApp->processEvents();
+        DrawUnusedRects();
 
         isEmbedded = false;
         ignoreKeyPresses = false;
