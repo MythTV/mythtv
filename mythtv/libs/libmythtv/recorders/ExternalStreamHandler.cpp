@@ -265,9 +265,13 @@ void ExternIO::Fork(void)
         m_appout = out[0];
         m_apperr = err[0];
 
-        fcntl(m_appin,  F_SETFL, O_NONBLOCK);
-        fcntl(m_appout, F_SETFL, O_NONBLOCK);
-        fcntl(m_apperr, F_SETFL, O_NONBLOCK);
+        bool error = false;
+        error = (fcntl(m_appin,  F_SETFL, O_NONBLOCK) == -1);
+        error = (fcntl(m_appout, F_SETFL, O_NONBLOCK) == -1);
+        error = (fcntl(m_apperr, F_SETFL, O_NONBLOCK) == -1);
+
+        if (error)
+            LOG(VB_GENERAL, LOG_WARNING, "ExternIO::Fork(): Failed to set O_NONBLOCK for FD: " + ENO);
 
         LOG(VB_RECORD, LOG_INFO, "Spawned");
         return;
