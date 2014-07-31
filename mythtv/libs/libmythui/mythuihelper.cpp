@@ -1597,24 +1597,26 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
             {
 
                 if (painter)
+                {
                     ret = painter->GetFormatImage();
 
-                // Load file from disk cache to memory cache
-                if (ret->Load(cachefilepath))
-                {
-                    // Add to ram cache, and skip saving to disk since that is
-                    // where we found this in the first place.
-                    CacheImage(label, ret, true);
-                }
-                else
-                {
-                    LOG(VB_GUI | VB_FILE, LOG_WARNING, LOC +
-                        QString("LoadCacheImage: Could not load :%1")
-                        .arg(cachefilepath));
+                    // Load file from disk cache to memory cache
+                    if (ret->Load(cachefilepath))
+                    {
+                        // Add to ram cache, and skip saving to disk since that is
+                        // where we found this in the first place.
+                        CacheImage(label, ret, true);
+                    }
+                    else
+                    {
+                        LOG(VB_GUI | VB_FILE, LOG_WARNING, LOC +
+                            QString("LoadCacheImage: Could not load :%1")
+                            .arg(cachefilepath));
 
-                    ret->SetIsInCache(false);
-                    ret->DecrRef();
-                    ret = NULL;
+                        ret->SetIsInCache(false);
+                        ret->DecrRef();
+                        ret = NULL;
+                    }
                 }
             }
         }
