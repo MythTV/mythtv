@@ -899,11 +899,18 @@ void MythSystemLegacyUnix::Fork(time_t timeout)
     int i;
     QStringList::const_iterator it;
 
-    for (i = 0, it = args.constBegin(); it != args.constEnd(); ++it)
+    if (cmdargs)
     {
-        cmdargs[i++] = strdup(it->toUtf8().constData());
+        for (i = 0, it = args.constBegin(); it != args.constEnd(); ++it)
+        {
+            cmdargs[i++] = strdup(it->toUtf8().constData());
+        }
+        cmdargs[i] = (char *)NULL;
     }
-    cmdargs[i] = NULL;
+    else
+        LOG(VB_GENERAL, LOG_CRIT, LOC_ERR +
+                        "Failed to allocate memory for cmdargs " +
+                        ENO);
 
     char *directory = NULL;
     QString dir = GetDirectory();
