@@ -611,8 +611,8 @@ void TeletextScreen::DrawMosaic(int x, int y, int code, int doubleheight)
     x *= m_colWidth;
     y *= m_rowHeight;
 
-    int dx = (int)round(m_colWidth / 2) + 1;
-    int dy = (int)round(m_rowHeight / 3) + 1;
+    int dx = (int)round((double)m_colWidth / 2) + 1;
+    int dy = (int)round((double)m_rowHeight / 3) + 1;
     dy = (doubleheight) ? (2 * dy) : dy;
 
     if (code & 0x10)
