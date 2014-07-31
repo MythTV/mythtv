@@ -542,6 +542,8 @@ bool ScheduleEditor::keyPressEvent(QKeyEvent *event)
             showMenu();
         else if (action == "INFO")
             ShowDetails();
+        else if (action == "GUIDE")
+            ShowGuide();
         else if (action == "UPCOMING")
             showUpcomingByTitle();
         else if (action == "PREVVIEW")

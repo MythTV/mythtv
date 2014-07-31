@@ -23,6 +23,7 @@
 #include "progdetails.h"
 #include "proglist.h"
 #include "customedit.h"
+#include "guidegrid.h"
 
 /**
 *  \brief Show the Program Details screen
@@ -103,6 +104,21 @@ void ScheduleCommon::ShowUpcomingScheduled(void) const
         mainStack->AddScreen(pl);
     else
         delete pl;
+}
+
+/**
+*  \brief Show the program guide
+*/
+void ScheduleCommon::ShowGuide(void) const
+{
+    ProgramInfo *pginfo = GetCurrentProgram();
+    if (!pginfo)
+        return;
+
+    QString startchannel = pginfo->GetChanNum();
+    uint startchanid = pginfo->GetChanID();
+    QDateTime starttime = pginfo->GetScheduledStartTime();
+    GuideGrid::RunProgramGuide(startchanid, startchannel, starttime);
 }
 
 /**

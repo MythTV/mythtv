@@ -3906,6 +3906,8 @@ bool PlaybackBox::keyPressEvent(QKeyEvent *event)
                 ShowDetails();
             else if (action == "CUSTOMEDIT")
                 EditCustom();
+            else if (action == "GUIDE")
+                ShowGuide();
             else if (action == "UPCOMING")
                 ShowUpcoming();
             else if (action == ACTION_VIEWSCHEDULED)

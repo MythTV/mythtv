@@ -38,6 +38,7 @@ class ScheduleCommon : public MythScreenType
     virtual void ShowPrevious(void) const;
     virtual void ShowUpcoming(void) const;
     virtual void ShowUpcomingScheduled(void) const;
+    virtual void ShowGuide(void) const;
     virtual void EditScheduled(void);
     virtual void EditCustom(void);
 

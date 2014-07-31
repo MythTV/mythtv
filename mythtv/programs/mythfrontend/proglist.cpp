@@ -762,16 +762,6 @@ void ProgLister::ShowOldRecordedMenu(void)
         delete menuPopup;
 }
 
-void ProgLister::ShowGuide(void)
-{
-    ProgramInfo *pi = GetCurrentProgram();
-    if (pi)
-    {
-        GuideGrid::RunProgramGuide(pi->GetChanID(), pi->GetChanNum(),
-                                   pi->GetScheduledStartTime());
-    }
-}
-
 void ProgLister::FillViewList(const QString &view)
 {
     m_viewList.clear();

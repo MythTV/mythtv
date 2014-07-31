@@ -200,7 +200,7 @@ bool ProgFinder::keyPressEvent(QKeyEvent *event)
         else if (action == "TOGGLERECORD")
             QuickRecord();
         else if (action == "GUIDE" || action == "4")
-            showGuide();
+            ShowGuide();
         else if (action == "ESCAPE")
         {
             // don't fade the screen if we are returning to the player
@@ -322,7 +322,7 @@ void ProgFinder::customEvent(QEvent *event)
             }
             else if (resulttext == tr("Program Guide"))
             {
-                showGuide();
+                ShowGuide();
             }
         }
         else if (resultid == "searchtext")
@@ -402,7 +402,7 @@ void ProgFinder::updateInfo(void)
     }
 }
 
-void ProgFinder::showGuide()
+void ProgFinder::ShowGuide() const
 {
     if (m_allowEPG)
     {

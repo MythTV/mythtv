@@ -37,7 +37,7 @@ class ProgFinder : public ScheduleCommon
     void timesListTakeFocus(void);
     void timesListLosingFocus(void);
 
-    void showGuide();
+    virtual void ShowGuide() const;
     void select();
 
     void customEvent(QEvent *e);

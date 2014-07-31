@@ -174,7 +174,7 @@ bool ViewScheduled::keyPressEvent(QKeyEvent *event)
         else if (action == "DETAILS" || action == "INFO")
             ShowDetails();
         else if (action == "GUIDE")
-            showGuide();
+            ShowGuide();
         else if (action == "1")
             setShowAll(true);
         else if (action == "2")
@@ -563,21 +563,6 @@ void ViewScheduled::deleteRule()
         delete okPopup;
 }
 
-void ViewScheduled::showGuide()
-{
-    MythUIButtonListItem *item = m_schedulesList->GetItemCurrent();
-
-    if (!item)
-        return;
-
-    ProgramInfo *pginfo = item->GetData().value<ProgramInfo*>();
-
-    QString startchannel = pginfo->GetChanNum();
-    uint startchanid = pginfo->GetChanID();
-    QDateTime starttime = pginfo->GetScheduledStartTime();
-    GuideGrid::RunProgramGuide(startchanid, startchannel, starttime);
-}
-
 void ViewScheduled::setShowAll(bool all)
 {
     m_showAll = all;
@@ -682,7 +667,7 @@ void ViewScheduled::customEvent(QEvent *event)
             }
             else if (resulttext == tr("Program Guide"))
             {
-                showGuide();
+                ShowGuide();
             }
             else if (resulttext == tr("Upcoming by title"))
             {
