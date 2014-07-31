@@ -558,10 +558,10 @@ AVStream* AVFormatWriter::AddVideoStream(void)
         av_opt_set_int(c, "8x8dct", 0, 0);
         av_opt_set_int(c, "weightb", 0, 0);
 
-        const char* preset = m_encodingPreset.toStdString().c_str();
-        av_opt_set(c->priv_data, "preset", preset, 0);
-        const char* tune = m_encodingTune.toStdString().c_str();
-        av_opt_set(c->priv_data, "tune", tune, 0);
+        av_opt_set(c->priv_data, "preset",
+                   m_encodingPreset.toLatin1().constData(), 0);
+        av_opt_set(c->priv_data, "tune",
+                   m_encodingTune.toLatin1().constData(), 0);
     }
 
     if(m_ctx->oformat->flags & AVFMT_GLOBALHEADER)
