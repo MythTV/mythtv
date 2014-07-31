@@ -668,6 +668,7 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
     {
         SeekReset(framesPlayed, seekDelta, false, true);
         m_parent->SetFramesPlayed(framesPlayed + 1);
+        getrawframes = oldrawstate;
         return true;
     }
 
@@ -688,6 +689,7 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("av_seek_frame(ic, -1, %1, 0) -- error").arg(ts));
+        getrawframes = oldrawstate;
         return false;
     }
 
