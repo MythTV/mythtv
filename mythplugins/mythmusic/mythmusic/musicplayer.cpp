@@ -164,7 +164,7 @@ MusicPlayer::~MusicPlayer()
         gCoreContext->SaveSetting("RepeatMode", "none");
 
     gCoreContext->SaveSetting("MusicAutoShowPlayer",
-                          (m_autoShowPlayer ? "1" : "1"));
+                          (m_autoShowPlayer ? "1" : "0"));
 }
 
 void MusicPlayer::addListener(QObject *listener)
