@@ -989,6 +989,7 @@ int Transcode::TranscodeFile(const QString &inputname,
             // the actual transcode, so stop here.
             unlink(outputname.toLocal8Bit().constData());
             SetPlayerContext(NULL);
+            delete hls;
             return REENCODE_OK;
         }
 
