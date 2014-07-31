@@ -988,7 +988,7 @@ DTC::RecRuleList* Dvr::GetRecordScheduleList( int nStartIndex,
     Scheduler::SchedSortColumn sortingColumn;
     if (Sort.toLower() == "lastrecorded")
         sortingColumn = Scheduler::kSortLastRecorded;
-    if (Sort.toLower() == "nextrecording")
+    else if (Sort.toLower() == "nextrecording")
         sortingColumn = Scheduler::kSortNextRecording;
     else if (Sort.toLower() == "title")
         sortingColumn = Scheduler::kSortTitle;
