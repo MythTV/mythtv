@@ -378,7 +378,6 @@ class PlaybackBox : public ScheduleCommon
     // Recording Group settings
     QString             m_groupDisplayName;
     QString             m_recGroup;
-    int                 m_recGroupID;
     QString             m_curGroupPassword;
     QString             m_newRecGroup;
     QString             m_watchGroupName;
