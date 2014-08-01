@@ -1698,7 +1698,7 @@ int main(int argc, char **argv)
     if (!cmdline.toBool("noupnp"))
     {
         g_pUPnp  = new MediaRenderer();
-        if (!g_pUPnp->initialized())
+        if (!g_pUPnp->isInitialized())
         {
             delete g_pUPnp;
             g_pUPnp = NULL;

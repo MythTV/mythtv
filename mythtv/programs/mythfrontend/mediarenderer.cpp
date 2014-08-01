@@ -212,16 +212,16 @@ MediaRenderer::MediaRenderer(): m_pUPnpCMGR(NULL)
 
     int nPort = g_pConfig->GetValue( "UPnP/MythFrontend/ServicePort", 6547 );
 
-    m_pHttpServer = new HttpServer();
+    HttpServer *pHttpServer = new HttpServer();
 
-    if (!m_pHttpServer)
+    if (!pHttpServer)
         return;
 
-    if (!m_pHttpServer->listen(nPort))
+    if (!pHttpServer->listen(nPort))
     {
         LOG(VB_GENERAL, LOG_ERR, "MediaRenderer::HttpServer Create Error");
-        delete m_pHttpServer;
-        m_pHttpServer = NULL;
+        delete pHttpServer;
+        pHttpServer = NULL;
         return;
     }
 
@@ -229,7 +229,7 @@ MediaRenderer::MediaRenderer(): m_pUPnpCMGR(NULL)
     // Initialize UPnp Stack
     // ----------------------------------------------------------------------
 
-    if (Initialize( nPort, m_pHttpServer ))
+    if (Initialize( nPort, pHttpServer ))
     {
         // ------------------------------------------------------------------
         // Create device Description

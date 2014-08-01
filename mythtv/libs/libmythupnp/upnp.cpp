@@ -99,6 +99,13 @@ bool UPnp::Initialize( QStringList &sIPAddrList, int nServicePort, HttpServer *p
 {
     LOG(VB_UPNP, LOG_DEBUG, "UPnp::Initialize - Begin");
 
+    if (m_pHttpServer)
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            "UPnp::Initialize - Already initialized, programmer error.");
+        return false;
+    }
+
     if (g_pConfig == NULL)
     {
         LOG(VB_GENERAL, LOG_ERR,

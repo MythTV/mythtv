@@ -28,10 +28,6 @@
 
 class MediaRenderer : public UPnp
 {
-    private:
-
-        HttpServer      *m_pHttpServer;
-
     protected:
 
         //UPnpControl     *m_pUPnpControl;  // Do not delete (auto deleted)
@@ -44,8 +40,6 @@ class MediaRenderer : public UPnp
         DeviceLocation *GetDefaultMaster();
         void            SetDefaultMaster( DeviceLocation *pDeviceLoc,
                                           const QString  &sPin );
-        bool initialized() { return (m_pHttpServer != NULL); }
-
 };
 
 #endif
