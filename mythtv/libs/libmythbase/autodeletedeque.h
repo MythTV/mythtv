@@ -77,7 +77,7 @@ template<typename T>
 T AutoDeleteDeque<T>::take(uint index)
 {
     iterator it = list.begin();
-    for (uint i = 0; i < index; i++, it++)
+    for (uint i = 0; i < index; i++, ++it)
     {
         if (it == list.end())
             return NULL;
