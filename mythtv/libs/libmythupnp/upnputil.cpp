@@ -224,3 +224,4 @@ QStringList GetSinkProtocolInfos()
 
     return protocolList;
 }
+

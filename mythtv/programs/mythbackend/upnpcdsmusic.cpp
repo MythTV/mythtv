@@ -372,7 +372,27 @@ void UPnpCDSMusic::AddItem( const UPnpCDSRequest    *pRequest,
     QFileInfo fInfo( sFileName );
 
     QString sMimeType = HTTPRequest::GetMimeType( fInfo.suffix() );
-    QString sProtocol = QString( "http-get:*:%1:DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=01500000000000000000000000000000" ).arg( sMimeType  );
+
+    QString sAdditionalInfo = "*";
+    if (sMimeType == "audio/mpeg")
+    {
+        sAdditionalInfo = "DLNA.ORG_PN=MP3X";
+    }
+    else if (sMimeType == "audio/x-ms-wma")
+    {
+        sAdditionalInfo = "DLNA.ORG_PN=WMAFULL";
+    }
+    else if (sMimeType == "audio/vnd.dolby.dd-raw")
+    {
+        sAdditionalInfo = "DLNA.ORG_PN=AC3";
+    }
+    else if (sMimeType == "audio/mp4")
+    {
+        sAdditionalInfo = "DLNA.ORG_PN=AAC_ISO_320";
+    }
+
+    QString sProtocol = QString( "http-get:*:%1::%2" ).arg( sMimeType )
+                                                      .arg( sAdditionalInfo );
     QUrl    resURI    = m_URIBase;
     resURI.setPath("Content/GetMusic");
     resURI.addQueryItem("Id", QString::number(nId));
