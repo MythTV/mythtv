@@ -337,12 +337,13 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
         return;
 
     uint descCompression = (eit->TableID() > 0x80) ? 2 : 1;
-    uint fix = fixup.value(eit->OriginalNetworkID() << 16);
+    uint fix = fixup.value((uint64_t)eit->OriginalNetworkID() << 16);
     fix |= fixup.value((((uint64_t)eit->TSID()) << 32) |
-                 (eit->OriginalNetworkID() << 16));
-    fix |= fixup.value((eit->OriginalNetworkID() << 16) | eit->ServiceID());
+                 ((uint64_t)eit->OriginalNetworkID() << 16));
+    fix |= fixup.value(((uint64_t)eit->OriginalNetworkID() << 16) |
+                 (uint64_t)eit->ServiceID());
     fix |= fixup.value((((uint64_t)eit->TSID()) << 32) |
-                 (uint64_t)(eit->OriginalNetworkID() << 16) |
+                 ((uint64_t)eit->OriginalNetworkID() << 16) |
                   (uint64_t)eit->ServiceID());
     fix |= EITFixUp::kFixGenericDVB;
 
