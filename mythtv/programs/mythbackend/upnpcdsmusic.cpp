@@ -391,7 +391,7 @@ void UPnpCDSMusic::AddItem( const UPnpCDSRequest    *pRequest,
         sAdditionalInfo = "DLNA.ORG_PN=AAC_ISO_320";
     }
 
-    QString sProtocol = QString( "http-get:*:%1::%2" ).arg( sMimeType )
+    QString sProtocol = QString( "http-get:*:%1:%2" ).arg( sMimeType )
                                                       .arg( sAdditionalInfo );
     QUrl    resURI    = m_URIBase;
     resURI.setPath("Content/GetMusic");
