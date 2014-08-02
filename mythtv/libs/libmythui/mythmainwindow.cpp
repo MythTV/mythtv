@@ -475,7 +475,7 @@ MythMainWindow::MythMainWindow(const bool useDB)
 
     d->joystickThread = NULL;
     d->joystickThread = new JoystickMenuThread(this);
-    if (!d->joystickThread->Init(joy_config_file))
+    if (d->joystickThread->Init(joy_config_file))
         d->joystickThread->start();
 #endif
 

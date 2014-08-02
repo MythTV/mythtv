@@ -83,12 +83,12 @@ class JoystickMenuThread : public MThread
   public:
     JoystickMenuThread(QObject *main_window);
     ~JoystickMenuThread();
-    int Init(QString &config_file);
+    bool Init(QString &config_file);
 
     void ButtonUp(int button);
     void AxisChange(int axis, int value);
     void EmitKey(QString code);
-    int  ReadConfig(QString config_file);
+    bool ReadConfig(QString config_file);
     void Stop(void) { m_bStop = true; }
 
   private:

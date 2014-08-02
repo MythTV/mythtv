@@ -30,6 +30,7 @@
 #include <QKeySequence>
 #include <QTextStream>
 #include <QStringList>
+#include <QFile>
 
 // C/C++ headers
 #include <cstdio>
@@ -77,20 +78,15 @@ JoystickMenuThread::~JoystickMenuThread()
 /**
  *  \brief Initialise the class variables with values from the config file
  */
-int JoystickMenuThread::Init(QString &config_file)
+bool JoystickMenuThread::Init(QString &config_file)
 {
     int rc;
 
     /*------------------------------------------------------------------------
     ** Read the config file
     **----------------------------------------------------------------------*/
-    rc = ReadConfig(config_file);
-    if (rc)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("Joystick disabled - Failed to read %1") .arg(config_file));
-        return(rc);
-    }
+    if (!ReadConfig(config_file))
+        return false;
 
     /*------------------------------------------------------------------------
     ** Open the joystick device, retrieve basic info
@@ -101,7 +97,7 @@ int JoystickMenuThread::Init(QString &config_file)
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Joystick disabled - Failed to open device %1")
                                                     .arg(m_devicename));
-        return -1;
+        return false;
     }
 
     rc = ioctl(m_fd, JSIOCGAXES, &m_axesCount);
@@ -109,7 +105,7 @@ int JoystickMenuThread::Init(QString &config_file)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             "Joystick disabled - ioctl JSIOCGAXES failed");
-        return(rc);
+        return false;
     }
 
     rc = ioctl(m_fd, JSIOCGBUTTONS, &m_buttonCount);
@@ -117,7 +113,7 @@ int JoystickMenuThread::Init(QString &config_file)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             "Joystick disabled - ioctl JSIOCGBUTTONS failed");
-        return(rc);
+        return false;
     }
 
     /*------------------------------------------------------------------------
@@ -132,7 +128,7 @@ int JoystickMenuThread::Init(QString &config_file)
     LOG(VB_GENERAL, LOG_INFO, LOC +
         QString("Initialization of %1 succeeded using config file %2")
                                         .arg(m_devicename) .arg(config_file));
-    return 0;
+    return true;
 }
 
 /**
@@ -148,13 +144,23 @@ int JoystickMenuThread::Init(QString &config_file)
  *                                  move that axis into the range and the
  *                                  keystring is sent
  */
-int JoystickMenuThread::ReadConfig(QString config_file)
+bool JoystickMenuThread::ReadConfig(QString config_file)
 {
     FILE *fp;
 
+    if (!QFile::exists(config_file))
+    {
+        LOG(VB_GENERAL, LOG_INFO, "No joystick configuration found, not enabling joystick control");
+        return false;
+    }
+
     fp = fopen(qPrintable(config_file), "r");
     if (!fp)
-        return(-1);
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Joystick disabled - Failed to open %1") .arg(config_file));
+        return false;
+    }
 
     QTextStream istream(fp);
     for (int line = 1; ! istream.atEnd(); line++)
@@ -180,13 +186,13 @@ int JoystickMenuThread::ReadConfig(QString config_file)
         else if (firstTok.startsWith("chord") && tokens.count() == 4)
             m_map.AddButton(tokens[2].toInt(), tokens[3], tokens[1].toInt());
         else
-            LOG(VB_GENERAL, LOG_ERR, LOC +
+            LOG(VB_GENERAL, LOG_WARNING, LOC +
                 QString("ReadConfig(%1) unrecognized or malformed line \"%2\" ")
                                         .arg(line) .arg(rawline));
     }
 
     fclose(fp);
-    return(0);
+    return true;
 }
 
 
