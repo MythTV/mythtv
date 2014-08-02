@@ -200,15 +200,7 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
 
         if (bIsMaster)
         {
-            QString sSourceProtocols = "http-get:*:image/gif:*,"
-                                       "http-get:*:image/jpeg:*,"
-                                       "http-get:*:image/png:*,"
-                                       "http-get:*:video/avi:*,"
-                                       "http-get:*:audio/mpeg:*,"
-                                       "http-get:*:audio/wav:*,"
-                                       "http-get:*:video/mpeg:*,"
-                                       "http-get:*:video/nupplevideo:*,"
-                                       "http-get:*:video/x-ms-wmv:*";
+            QString sSourceProtocols = GetSourceProtocolInfos().join(",");
 
             LOG(VB_UPNP, LOG_INFO, "MediaServer: Registering MS_MediaReceiverRegistrar Service.");
 

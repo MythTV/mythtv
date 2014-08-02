@@ -199,6 +199,7 @@ class UPNP_PUBLIC HTTPRequest
         QString         GetResponseProtocol () const;
 
         static QString  GetMimeType     ( const QString &sFileExtension );
+        static QStringList GetSupportedMimeTypes ();
         static QString  TestMimeType    ( const QString &sFileName );
         static long     GetParameters   ( QString  sParams, QStringMap &mapParams );
         static QString  Encode          ( const QString &sIn );

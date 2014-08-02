@@ -1025,6 +1025,22 @@ QString HTTPRequest::GetMimeType( const QString &sFileExtension )
 //
 /////////////////////////////////////////////////////////////////////////////
 
+QStringList HTTPRequest::GetSupportedMimeTypes()
+{
+    QStringList mimeTypes;
+
+    for (int i = 0; i < g_nMIMELength; i++)
+    {
+        mimeTypes.append( g_MIMETypes[i].pszType );
+    }
+
+    return mimeTypes;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 QString HTTPRequest::TestMimeType( const QString &sFileName )
 {
     QFileInfo info( sFileName );

@@ -17,6 +17,7 @@
 
 // Qt headers
 #include <QUuid>
+#include <QStringList>
 
 // MythTV headers
 #include "upnputil.h"
@@ -24,6 +25,7 @@
 #include "compat.h"
 #include "mythconfig.h" // for HAVE_GETIFADDRS
 #include "mythlogging.h"
+#include "httprequest.h"
 
 // POSIX headers 2, needs to be after compat.h for OS X
 #ifndef _WIN32
@@ -314,3 +316,44 @@ QByteArray gzipCompress( const QByteArray &data )
 
     return result;
 }
+
+/**
+ * \brief Return a QStringList containing the supported Source Protocols
+ *
+ * TODO Extend this to dynamically list all supported protocols (e.g. RTSP)
+ *      and any DLNA profile stuff that we can figure out
+ */
+QStringList GetSourceProtocolInfos()
+{
+    QStringList mimeTypes = HTTPRequest::GetSupportedMimeTypes();
+
+    QStringList protocolList;
+    QStringList::Iterator it;
+    for (it = mimeTypes.begin(); it < mimeTypes.end(); ++it)
+    {
+        protocolList << QString("http-get:*:%1:*").arg(*it);
+    }
+
+    return protocolList;
+}
+
+/**
+ * \brief Return a QStringList containing the supported Sink Protocols
+ *
+ * TODO Extend this to dynamically list all supported protocols (e.g. RTSP)
+ *      and any DLNA profile stuff that we can figure out
+ */
+QStringList GetSinkProtocolInfos()
+{
+    QStringList mimeTypes = HTTPRequest::GetSupportedMimeTypes();
+
+    QStringList protocolList;
+    QStringList::Iterator it;
+    for (it = mimeTypes.begin(); it < mimeTypes.end(); ++it)
+    {
+        protocolList << QString("http-get:*:%1:*").arg(*it);
+    }
+
+    return protocolList;
+}
+

@@ -258,15 +258,8 @@ MediaRenderer::MediaRenderer(): m_pUPnpCMGR(NULL)
         m_pHttpServer->RegisterExtension(
             new MythFrontendStatus(m_pHttpServer->GetSharePath()));
 
-        QString sSinkProtocols = "http-get:*:image/gif:*,"
-                                 "http-get:*:image/jpeg:*,"
-                                 "http-get:*:image/png:*,"
-                                 "http-get:*:video/avi:*,"
-                                 "http-get:*:audio/mpeg:*,"
-                                 "http-get:*:audio/wav:*,"
-                                 "http-get:*:video/mpeg:*,"
-                                 "http-get:*:video/nupplevideo:*,"
-                                 "http-get:*:video/x-ms-wmv:*";
+        QString sSinkProtocols = GetSinkProtocolInfos().join(",");
+
         // ------------------------------------------------------------------
         // Register the MythFEXML protocol...
         // ------------------------------------------------------------------

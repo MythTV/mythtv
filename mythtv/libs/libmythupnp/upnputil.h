@@ -16,6 +16,7 @@
 #include <QStringList>
 #include <QMap>
 
+#include "upnpexp.h"
 #include "compat.h"     // for suseconds_t
 
 /////////////////////////////////////////////////////////////////////////////
@@ -143,5 +144,8 @@ void AddMicroSecToTaskTime( TaskTime &t, suseconds_t uSecs );
 void AddSecondsToTaskTime ( TaskTime &t, long nSecs );
 
 QByteArray gzipCompress( const QByteArray &data );
+
+UPNP_PUBLIC QStringList GetSourceProtocolInfos ();
+UPNP_PUBLIC QStringList GetSinkProtocolInfos ();
 
 #endif
