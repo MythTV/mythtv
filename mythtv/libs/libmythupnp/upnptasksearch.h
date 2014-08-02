@@ -21,7 +21,7 @@
 #endif
 
 // Qt headers
-#include <QStringList>
+#include <QList>
 #include <QHostAddress>
 
 // MythTV headers
@@ -41,9 +41,9 @@ class UPnpSearchTask : public Task
 {
     protected: 
 
-        QStringList     m_addressList;
-        int             m_nServicePort;
-        int             m_nMaxAge;
+        QList<QHostAddress>     m_addressList;
+        int                     m_nServicePort;
+        int                     m_nMaxAge;
 
         QHostAddress    m_PeerAddress;
         int             m_nPeerPort;

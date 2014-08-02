@@ -36,17 +36,16 @@ UPNPSubscription::UPNPSubscription(const QString &share_path, int port)
   : HttpServerExtension("UPnPSubscriptionManager", share_path),
     m_subscriptionLock(QMutex::Recursive), m_callback(QString("NOTSET"))
 {
-    QString host;
+    QHostAddress addr;
     if (!UPnp::g_IPAddrList.isEmpty())
-        host = UPnp::g_IPAddrList.at(0);
+        addr = UPnp::g_IPAddrList.at(0);
 
+    QString host;
     // taken from MythCoreContext
-#if !defined(QT_NO_IPV6)
-    QHostAddress addr(host);
-    if ((addr.protocol() == QAbstractSocket::IPv6Protocol) ||
-        (host.contains(":")))
-        host = "[" + host + "]";
-#endif
+    if (addr.protocol() == QAbstractSocket::IPv6Protocol)
+        host = "[" + addr.toString() + "]";
+    else
+        host = addr.toString();
 
     m_callback = QString("http://%1:%2/Subscriptions/event?usn=")
          .arg(host).arg(QString::number(port));

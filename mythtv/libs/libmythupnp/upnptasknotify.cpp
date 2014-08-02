@@ -92,20 +92,20 @@ void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
     // Refresh IP Address List in case of changes
     // -------------------------------------------------------------------
 
-    QStringList addressList = UPnp::g_IPAddrList;
+    QList<QHostAddress> addressList = UPnp::g_IPAddrList;
 
-    for ( QStringList::Iterator it  = addressList.begin(); 
-                                it != addressList.end(); 
-                              ++it ) 
+    for ( QList<QHostAddress>::Iterator it  = addressList.begin();
+                                        it != addressList.end();
+                                        ++it )
     {
-        if ((*it).isEmpty())
+        if ((*it).toString().isEmpty())
         {
             LOG(VB_GENERAL, LOG_ERR,
                 "UPnpNotifyTask::SendNotifyMsg - NULL in address list");
             continue;
         }
 
-        QString ipaddress = *it;
+        QString ipaddress = (*it).toString();
 
         // If this looks like an IPv6 address, then enclose it in []'s
         if (ipaddress.contains(":"))

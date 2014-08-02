@@ -11,6 +11,7 @@
 #include <QTextStream>
 
 #include "upnpsubscription.h"
+#include "upnputil.h"
 #include "mediarenderer.h"
 #include "mythversion.h"
 #include "upnpscanner.h"
@@ -45,17 +46,9 @@ class MythFrontendStatus : public HttpServerExtension
 
         SSDPCacheEntries* cache = NULL;
         QString ipaddress = QString();
-/*      QStringList::const_iterator sit = UPnp::g_IPAddrList.begin();
-        for (; sit != UPnp::g_IPAddrList.end(); ++sit)
-        {
-            if (QHostAddress(*sit).protocol() == QAbstractSocket::IPv4Protocol)
-            {
-                ipaddress = *sit;
-                break;
-            }
-        }*/
+
         if (!UPnp::g_IPAddrList.isEmpty())
-            ipaddress = UPnp::g_IPAddrList.at(0);
+            ipaddress = UPnp::g_IPAddrList.at(0).toString();
 
         QString hostname   = gCoreContext->GetHostName();
         QDateTime qdtNow   = MythDate::current();

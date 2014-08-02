@@ -12,14 +12,15 @@
 
 #include "upnptaskcache.h"
 #include "mythlogging.h"
+#include "serverpool.h"
 #include "upnp.h"
 
 //////////////////////////////////////////////////////////////////////////////
 // Global/Class Static variables
 //////////////////////////////////////////////////////////////////////////////
 
-UPnpDeviceDesc   UPnp::g_UPnpDeviceDesc;
-QStringList      UPnp::g_IPAddrList;
+UPnpDeviceDesc      UPnp::g_UPnpDeviceDesc;
+QList<QHostAddress> UPnp::g_IPAddrList;
 
 Configuration   *UPnp::g_pConfig        = NULL;
 
@@ -84,10 +85,7 @@ Configuration *UPnp::GetConfiguration()
 
 bool UPnp::Initialize( int nServicePort, HttpServer *pHttpServer )
 {
-    QStringList sList;
-
-    GetIPAddressList( sList );
-
+    QList<QHostAddress> sList = ServerPool::DefaultListenIPv4();
     return Initialize( sList, nServicePort, pHttpServer );
 }
 
@@ -95,7 +93,7 @@ bool UPnp::Initialize( int nServicePort, HttpServer *pHttpServer )
 //
 //////////////////////////////////////////////////////////////////////////////
 
-bool UPnp::Initialize( QStringList &sIPAddrList, int nServicePort, HttpServer *pHttpServer )
+bool UPnp::Initialize( QList<QHostAddress> &sIPAddrList, int nServicePort, HttpServer *pHttpServer )
 {
     LOG(VB_UPNP, LOG_DEBUG, "UPnp::Initialize - Begin");
 

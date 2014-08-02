@@ -347,7 +347,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
 
         QString ipaddress = QString();
         if (!UPnp::g_IPAddrList.isEmpty())
-            ipaddress = UPnp::g_IPAddrList.at(0);
+            ipaddress = UPnp::g_IPAddrList.at(0).toString();
 
         EntryMap map;
         sbes->GetEntryMap(map);

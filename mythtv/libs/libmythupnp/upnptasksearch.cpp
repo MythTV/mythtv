@@ -98,15 +98,17 @@ void UPnpSearchTask::SendMsg( MSocketDevice  *pSocket,
                         .arg(m_PeerAddress.toString()) .arg(m_nPeerPort));
 #endif
 
-    for ( QStringList::Iterator it  = m_addressList.begin(); 
+    for ( QList<QHostAddress>::Iterator it  = m_addressList.begin();
                                 it != m_addressList.end(); 
                               ++it ) 
     {
-        QString ipaddress = *it;
+        QString ipaddress;
 
         // If this looks like an IPv6 address, then enclose it in []'s
-        if (ipaddress.contains(":"))
-            ipaddress = "[" + ipaddress + "]";
+        if ((*it).protocol() == QAbstractSocket::IPv6Protocol)
+            ipaddress = "[" + (*it).toString() + "]";
+        else
+            ipaddress = (*it).toString();
 
         QString sHeader = QString ( "HTTP/1.1 200 OK\r\n"
                                     "LOCATION: http://%1:%2/getDeviceDesc\r\n" )

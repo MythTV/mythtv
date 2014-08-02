@@ -103,8 +103,8 @@ class UPNP_PUBLIC UPnp
 
     public:
 
-        static UPnpDeviceDesc   g_UPnpDeviceDesc;
-        static QStringList      g_IPAddrList;
+        static UPnpDeviceDesc       g_UPnpDeviceDesc;
+        static QList<QHostAddress>  g_IPAddrList;
 
     public:
                  UPnp();
@@ -114,8 +114,9 @@ class UPNP_PUBLIC UPnp
         static Configuration* GetConfiguration();
 
         bool Initialize( int nServicePort, HttpServer *pHttpServer );
-        bool Initialize( QStringList &sIPAddrList, int nServicePort, HttpServer *pHttpServer );
-        
+        bool Initialize( QList<QHostAddress> &sIPAddrList, int nServicePort,
+                         HttpServer *pHttpServer );
+
         bool isInitialized() { return (m_pHttpServer != NULL); }
 
         virtual void Start();

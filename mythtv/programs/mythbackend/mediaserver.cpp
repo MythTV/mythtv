@@ -73,20 +73,17 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
 
     int     nPort     = g_pConfig->GetValue( "BackendStatusPort", 6544 );
 
-    if (!m_pHttpServer)
-    {
-        m_pHttpServer = new HttpServer();
-        m_pHttpServer->RegisterExtension(new HttpConfig());
-    }
+    HttpServer *pHttpServer = new HttpServer();
+    pHttpServer->RegisterExtension(new HttpConfig());
 
-    if (!m_pHttpServer->isListening())
+    if (!pHttpServer->isListening())
     {
-        m_pHttpServer->setProxy(QNetworkProxy::NoProxy);
-        if (!m_pHttpServer->listen(nPort))
+        pHttpServer->setProxy(QNetworkProxy::NoProxy);
+        if (!pHttpServer->listen(nPort))
         {
             LOG(VB_GENERAL, LOG_ERR, "MediaServer: HttpServer Create Error");
-            delete m_pHttpServer;
-            m_pHttpServer = NULL;
+            delete pHttpServer;
+            pHttpServer = NULL;
             return;
         }
     }
@@ -114,25 +111,17 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
 
     LOG(VB_UPNP, LOG_INFO, "MediaServer: Registering Http Server Extensions.");
 
-    m_pHttpServer->RegisterExtension( new InternetContent   ( m_sSharePath ));
+    pHttpServer->RegisterExtension( new InternetContent   ( m_sSharePath ));
 
-    m_pHttpServer->RegisterExtension( new MythServiceHost   ( m_sSharePath ));
-    m_pHttpServer->RegisterExtension( new GuideServiceHost  ( m_sSharePath ));
-    m_pHttpServer->RegisterExtension( new ContentServiceHost( m_sSharePath ));
-    m_pHttpServer->RegisterExtension( new DvrServiceHost    ( m_sSharePath ));
-    m_pHttpServer->RegisterExtension( new ChannelServiceHost( m_sSharePath ));
-    m_pHttpServer->RegisterExtension( new VideoServiceHost  ( m_sSharePath ));
-    m_pHttpServer->RegisterExtension( new CaptureServiceHost( m_sSharePath ));
-    m_pHttpServer->RegisterExtension( new ImageServiceHost  ( m_sSharePath ));
+    pHttpServer->RegisterExtension( new MythServiceHost   ( m_sSharePath ));
+    pHttpServer->RegisterExtension( new GuideServiceHost  ( m_sSharePath ));
+    pHttpServer->RegisterExtension( new ContentServiceHost( m_sSharePath ));
+    pHttpServer->RegisterExtension( new DvrServiceHost    ( m_sSharePath ));
+    pHttpServer->RegisterExtension( new ChannelServiceHost( m_sSharePath ));
+    pHttpServer->RegisterExtension( new VideoServiceHost  ( m_sSharePath ));
+    pHttpServer->RegisterExtension( new CaptureServiceHost( m_sSharePath ));
+    pHttpServer->RegisterExtension( new ImageServiceHost  ( m_sSharePath ));
 
-    QString sIP = g_pConfig->GetValue( "BackendServerIP"  , ""   );
-    if (sIP.isEmpty())
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            "MediaServer: No BackendServerIP Address defined - "
-            "Disabling UPnP");
-        return;
-    }
 
     // ------------------------------------------------------------------
     // Register Service Types with Scripting Engine
@@ -144,7 +133,7 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
     // ------------------------------------------------------------------
 
 
-     QScriptEngine* pEngine = m_pHttpServer->ScriptEngine();
+     QScriptEngine* pEngine = pHttpServer->ScriptEngine();
 
      pEngine->globalObject().setProperty("Myth"   ,
          pEngine->scriptValueFromQMetaObject< ScriptableMyth    >() );
@@ -165,14 +154,6 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
 
     // ------------------------------------------------------------------
 
-    if (sIP == "localhost" || sIP.startsWith("127."))
-    {
-        LOG(VB_GENERAL, LOG_NOTICE,
-            "MediaServer: Loopback address specified - " + sIP +
-            ". Disabling UPnP");
-        return;
-    }
-
     if (bDisableUPnp)
     {
         LOG(VB_GENERAL, LOG_NOTICE,
@@ -181,17 +162,20 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
         return;
     }
 
-    // ----------------------------------------------------------------------
-    // BackendServerIP is only one IP address at this time... Doing Split anyway
-    // ----------------------------------------------------------------------
-
-    QStringList sIPAddrList = sIP.split(';', QString::SkipEmptyParts);
+    QList<QHostAddress> IPAddrList = ServerPool::DefaultListen();
+    if (IPAddrList.isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            "MediaServer: No Listenable IP Addresses found - "
+            "Disabling UPnP");
+        return;
+    }
 
     // ----------------------------------------------------------------------
     // Initialize UPnp Stack
     // ----------------------------------------------------------------------
 
-    if (Initialize( sIPAddrList, nPort, m_pHttpServer ))
+    if (Initialize( IPAddrList, nPort, pHttpServer ))
     {
 
         // ------------------------------------------------------------------
@@ -248,13 +232,16 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
 
 #ifdef USING_LIBDNS_SD
         // advertise using Bonjour
-        m_bonjour = new BonjourRegister();
-        if (m_bonjour)
+        if (gCoreContext)
         {
-            QByteArray name("Mythbackend on ");
-            name.append(gCoreContext->GetHostName());
-            QByteArray txt(bIsMaster ? "\x06master" : "\x05slave");
-            m_bonjour->Register(nPort, "_mythbackend._tcp", name, txt);
+            m_bonjour = new BonjourRegister();
+            if (m_bonjour)
+            {
+                QByteArray name("Mythbackend on ");
+                name.append(gCoreContext->GetHostName());
+                QByteArray txt(bIsMaster ? "\x06master" : "\x05slave");
+                m_bonjour->Register(nPort, "_mythbackend._tcp", name, txt);
+            }
         }
 #endif
     }
