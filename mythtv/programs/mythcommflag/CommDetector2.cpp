@@ -658,7 +658,8 @@ bool CommDetector2::go(void)
                     QString("processFrame %1 of %2 (%3%) - %4 fps")
                         .arg(currentFrameNumber)
                         .arg(nframes)
-                        .arg((int)roundf(currentFrameNumber * 100.0 / nframes))
+                        .arg((nframes == 0) ? 0 : 
+                            (int)roundf(currentFrameNumber * 100.0 / nframes))
                         .arg((currentFrameNumber - lastLoggedFrame) * 1000 /
                             elapsed));
                 lastLoggedFrame = currentFrameNumber;
