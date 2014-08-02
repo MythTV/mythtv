@@ -52,7 +52,7 @@ MediaServer::MediaServer(void) :
     m_pUPnpCDS(NULL), m_pUPnpCMGR(NULL),
     m_sSharePath(GetShareDir())
 {
-    LOG(VB_UPNP, LOG_INFO, "MediaServer:ctor:Begin");
+    LOG(VB_UPNP, LOG_INFO, "MediaServer(): Begin");
 
     // ----------------------------------------------------------------------
     // Initialize Configuration class (Database for Servers)
@@ -64,12 +64,12 @@ MediaServer::MediaServer(void) :
     // Create mini HTTP Server
     // ----------------------------------------------------------------------
 
-    LOG(VB_UPNP, LOG_INFO, "MediaServer:ctor:End");
+    LOG(VB_UPNP, LOG_INFO, "MediaServer(): End");
 }
 
 void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
 {
-    LOG(VB_UPNP, LOG_INFO, "MediaServer:Init:Begin");
+    LOG(VB_UPNP, LOG_INFO, "MediaServer::Init(): Begin");
 
     int     nPort     = g_pConfig->GetValue( "BackendStatusPort", 6544 );
 
@@ -84,7 +84,7 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
         m_pHttpServer->setProxy(QNetworkProxy::NoProxy);
         if (!m_pHttpServer->listen(nPort))
         {
-            LOG(VB_GENERAL, LOG_ERR, "MediaServer::HttpServer Create Error");
+            LOG(VB_GENERAL, LOG_ERR, "MediaServer: HttpServer Create Error");
             delete m_pHttpServer;
             m_pHttpServer = NULL;
             return;
@@ -104,7 +104,7 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
     // ------------------------------------------------------------------
 
     LOG(VB_UPNP, LOG_INFO,
-        "MediaServer::Loading UPnp Description " + sFileName);
+        "MediaServer: Loading UPnp Description " + sFileName);
 
     g_UPnpDeviceDesc.Load( sFileName );
 
@@ -112,7 +112,7 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
     // Register Http Server Extensions...
     // ------------------------------------------------------------------
 
-    LOG(VB_UPNP, LOG_INFO, "MediaServer::Registering Http Server Extensions.");
+    LOG(VB_UPNP, LOG_INFO, "MediaServer: Registering Http Server Extensions.");
 
     m_pHttpServer->RegisterExtension( new InternetContent   ( m_sSharePath ));
 
@@ -129,7 +129,7 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
     if (sIP.isEmpty())
     {
         LOG(VB_GENERAL, LOG_ERR,
-            "MediaServer:: No BackendServerIP Address defined - "
+            "MediaServer: No BackendServerIP Address defined - "
             "Disabling UPnP");
         return;
     }
@@ -168,7 +168,7 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
     if (sIP == "localhost" || sIP.startsWith("127."))
     {
         LOG(VB_GENERAL, LOG_NOTICE,
-            "MediaServer:: Loopback address specified - " + sIP +
+            "MediaServer: Loopback address specified - " + sIP +
             ". Disabling UPnP");
         return;
     }
@@ -210,18 +210,18 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
                                        "http-get:*:video/nupplevideo:*,"
                                        "http-get:*:video/x-ms-wmv:*";
 
-            LOG(VB_UPNP, LOG_INFO, "MediaServer::Registering MSRR Service.");
+            LOG(VB_UPNP, LOG_INFO, "MediaServer: Registering MS_MediaReceiverRegistrar Service.");
 
             m_pHttpServer->RegisterExtension( new UPnpMSRR( RootDevice(),
                                                 m_sSharePath ) );
 
-            LOG(VB_UPNP, LOG_INFO, "MediaServer::Registering CMGR Service.");
+            LOG(VB_UPNP, LOG_INFO, "MediaServer: Registering ConnnectionManager Service.");
 
             m_pUPnpCMGR = new UPnpCMGR( RootDevice(),
                                         m_sSharePath, sSourceProtocols );
             m_pHttpServer->RegisterExtension( m_pUPnpCMGR );
 
-            LOG(VB_UPNP, LOG_INFO, "MediaServer::Registering CDS Service.");
+            LOG(VB_UPNP, LOG_INFO, "MediaServer: Registering ContentDirectory Service.");
 
             m_pUPnpCDS = new UPnpCDS ( RootDevice(), m_sSharePath );
             m_pHttpServer->RegisterExtension( m_pUPnpCDS );
@@ -231,17 +231,17 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
             // ----------------------------------------------------------------
 
             LOG(VB_UPNP, LOG_INFO,
-                "MediaServer::Registering UPnpCDSTv Extension");
+                "MediaServer: Registering UPnpCDSTv Extension");
 
             RegisterExtension(new UPnpCDSTv());
 
             LOG(VB_UPNP, LOG_INFO,
-                "MediaServer::Registering UPnpCDSMusic Extension");
+                "MediaServer: Registering UPnpCDSMusic Extension");
 
             RegisterExtension(new UPnpCDSMusic());
 
             LOG(VB_UPNP, LOG_INFO,
-                "MediaServer::Registering UPnpCDSVideo Extension");
+                "MediaServer: Registering UPnpCDSVideo Extension");
 
             RegisterExtension(new UPnpCDSVideo());
         }
@@ -267,7 +267,7 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
 #endif
     }
 
-    LOG(VB_UPNP, LOG_INFO, "MediaServer:Init:End");
+    LOG(VB_UPNP, LOG_INFO, "MediaServer::Init(): End");
 }
 
 //////////////////////////////////////////////////////////////////////////////
