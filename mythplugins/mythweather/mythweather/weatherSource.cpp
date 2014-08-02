@@ -439,7 +439,7 @@ void WeatherSource::startUpdate(bool forceUpdate)
         db.bindValue(":ID", getId());
         if (db.exec() && db.size() > 0)
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("%1 recently updated, skipping.")
+            LOG(VB_GENERAL, LOG_NOTICE, QString("%1 recently updated, skipping.")
                                         .arg(m_info->name));
 
             if (m_cachefile.isEmpty())
@@ -464,7 +464,7 @@ void WeatherSource::startUpdate(bool forceUpdate)
             }
             else
             {
-                LOG(VB_GENERAL, LOG_WARNING,
+                LOG(VB_GENERAL, LOG_NOTICE,
                     QString("No cachefile for %1, forcing update.")
                         .arg(m_info->name));
             }
