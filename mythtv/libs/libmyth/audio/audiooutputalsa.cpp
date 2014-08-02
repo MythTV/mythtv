@@ -238,8 +238,8 @@ bool AudioOutputALSA::IncPreallocBufferSize(int requested, int buffer_time)
     pfile.close();
     mfile.close();
 
-    VBERROR(QString("Try to manually increase audio buffer with: echo %1 "
-                    "| sudo tee %2").arg(size).arg(pf));
+    VBWARN(QString("Try to manually increase audio buffer with: echo %1 "
+                   "| sudo tee %2").arg(size).arg(pf));
     return false;
 }
 
@@ -779,7 +779,7 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
        If buffer_time is too small we could underrun - make 10% difference ok */
     if (buffer_time * 1.10f < (float)original_buffer_time)
     {
-        VBERROR(QString("Requested %1us got %2 buffer time")
+        VBWARN(QString("Requested %1us got %2 buffer time")
                 .arg(original_buffer_time).arg(buffer_time));
         // We need to increase preallocated buffer size in the driver
         if (canincrease && m_pbufsize < 0)
