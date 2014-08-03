@@ -264,6 +264,8 @@ bool ProgLister::keyPressEvent(QKeyEvent *e)
             ShowDetails();
         else if (action == "GUIDE")
             ShowGuide();
+        else if (action == ACTION_CHANNELSEARCH && m_type != plChannel)
+            ShowChannelSearch();
         else if (action == "TOGGLERECORD")
             QuickRecord();
         else if (action == "1")

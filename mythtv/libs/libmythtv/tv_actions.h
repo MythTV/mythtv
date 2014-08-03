@@ -26,6 +26,7 @@
 
 #define ACTION_GUIDE             "GUIDE"
 #define ACTION_FINDER            "FINDER"
+#define ACTION_CHANNELSEARCH     "CHANNELSEARCH"
 #define ACTION_TOGGLESLEEP       QString("TOGGLESLEEP")
 #define ACTION_PLAY              "PLAY"
 #define ACTION_VIEWSCHEDULED     "VIEWSCHEDULED"

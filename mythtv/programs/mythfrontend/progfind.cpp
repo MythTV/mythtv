@@ -201,6 +201,8 @@ bool ProgFinder::keyPressEvent(QKeyEvent *event)
             QuickRecord();
         else if (action == "GUIDE" || action == "4")
             ShowGuide();
+        else if (action == ACTION_CHANNELSEARCH)
+            ShowChannelSearch();
         else if (action == "ESCAPE")
         {
             // don't fade the screen if we are returning to the player
@@ -243,6 +245,7 @@ void ProgFinder::ShowMenu(void)
             menuPopup->AddButton(tr("Previously Recorded"));
             menuPopup->AddButton(tr("Custom Edit"));
             menuPopup->AddButton(tr("Program Guide"));
+            menuPopup->AddButton(tr("Channel Search"));
         }
 
         popupStack->AddScreen(menuPopup);
@@ -323,6 +326,10 @@ void ProgFinder::customEvent(QEvent *event)
             else if (resulttext == tr("Program Guide"))
             {
                 ShowGuide();
+            }
+            else if (resulttext == tr("Channel Search"))
+            {
+                ShowChannelSearch();
             }
         }
         else if (resultid == "searchtext")

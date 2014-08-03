@@ -175,6 +175,8 @@ bool ViewScheduled::keyPressEvent(QKeyEvent *event)
             ShowDetails();
         else if (action == "GUIDE")
             ShowGuide();
+        else if (action == ACTION_CHANNELSEARCH)
+            ShowChannelSearch();
         else if (action == "1")
             setShowAll(true);
         else if (action == "2")
@@ -218,6 +220,7 @@ void ViewScheduled::ShowMenu(void)
             menuPopup->AddButton(tr("Show All"));
         menuPopup->AddButton(tr("Program Details"));
         menuPopup->AddButton(tr("Program Guide"));
+        menuPopup->AddButton(tr("Channel Search"));
         menuPopup->AddButton(tr("Upcoming by title"));
         menuPopup->AddButton(tr("Upcoming scheduled"));
         menuPopup->AddButton(tr("Previously Recorded"));
@@ -668,6 +671,10 @@ void ViewScheduled::customEvent(QEvent *event)
             else if (resulttext == tr("Program Guide"))
             {
                 ShowGuide();
+            }
+            else if (resulttext == tr("Channel Search"))
+            {
+                ShowChannelSearch();
             }
             else if (resulttext == tr("Upcoming by title"))
             {

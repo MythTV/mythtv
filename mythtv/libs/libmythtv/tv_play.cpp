@@ -540,6 +540,8 @@ void TV::InitKeys(void)
             "Show the Program Guide"), "S");
     REG_KEY("TV Frontend", ACTION_FINDER, QT_TRANSLATE_NOOP("MythControls",
             "Show the Program Finder"), "#");
+    REG_KEY("TV Frontend", ACTION_CHANNELSEARCH, QT_TRANSLATE_NOOP("MythControls",
+            "Show the Channel Search"), "");
     REG_KEY("TV Frontend", "NEXTFAV", QT_TRANSLATE_NOOP("MythControls",
             "Cycle through channel groups and all channels in the "
             "program guide."), "/");

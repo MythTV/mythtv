@@ -780,6 +780,8 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
             toggleGuideListing();
         else if (action == ACTION_FINDER)
             showProgFinder();
+        else if (action == ACTION_CHANNELSEARCH)
+            ShowChannelSearch();
         else if (action == "MENU")
             ShowMenu();
         else if (action == "ESCAPE" || action == ACTION_GUIDE)
@@ -892,6 +894,8 @@ void GuideGrid::ShowMenu(void)
         menuPopup->AddButton(tr("Jump to Time"), NULL, true);
 
         menuPopup->AddButton(tr("Reverse Channel Order"));
+
+        menuPopup->AddButton(tr("Channel Search"));
 
         if (!m_changrplist.empty())
         {
@@ -1712,6 +1716,10 @@ void GuideGrid::customEvent(QEvent *event)
                 m_sortReverse = !m_sortReverse;
                 generateListings();
                 updateChannels();
+            }
+            else if (resulttext == tr("Channel Search"))
+            {
+                ShowChannelSearch();
             }
             else if (resulttext == tr("Add To Channel Group"))
             {

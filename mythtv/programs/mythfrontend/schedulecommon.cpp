@@ -107,6 +107,24 @@ void ScheduleCommon::ShowUpcomingScheduled(void) const
 }
 
 /**
+*  \brief Show the channel search
+*/
+void ScheduleCommon::ShowChannelSearch() const
+{
+    ProgramInfo *pginfo = GetCurrentProgram();
+    if (!pginfo)
+        return;
+
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    ProgLister *pl = new ProgLister(mainStack, plChannel,
+                                    QString::number(pginfo->GetChanID()), "");
+    if (pl->Create())
+        mainStack->AddScreen(pl);
+    else
+        delete pl;
+}
+
+/**
 *  \brief Show the program guide
 */
 void ScheduleCommon::ShowGuide(void) const
