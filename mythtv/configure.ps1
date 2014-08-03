@@ -799,7 +799,7 @@ switch ($tools.Get_Item( 'FFmpeg'))
 
         if ($VCVerStr -eq "Visual Studio 10")
         {
-            $vs2010inc = "$rootPath/platform/win32/msvc/include-2010"
+            $vs2010inc = "$rootPath/../platform/win32/msvc/include-2010"
             $ffmpegExtra = $ffmpegExtra + " -I$vs2010inc"
         }
 
