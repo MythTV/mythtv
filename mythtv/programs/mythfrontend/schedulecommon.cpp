@@ -117,7 +117,8 @@ void ScheduleCommon::ShowChannelSearch() const
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     ProgLister *pl = new ProgLister(mainStack, plChannel,
-                                    QString::number(pginfo->GetChanID()), "");
+                                    QString::number(pginfo->GetChanID()), "",
+                                    pginfo->GetScheduledStartTime());
     if (pl->Create())
         mainStack->AddScreen(pl);
     else

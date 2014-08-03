@@ -28,7 +28,8 @@ using namespace std;
 #define LOC_ERR  QString("ProgLister, Error: ")
 
 ProgLister::ProgLister(MythScreenStack *parent, ProgListType pltype,
-                       const QString &view, const QString &extraArg) :
+                       const QString &view, const QString &extraArg,
+                       const QDateTime selectedTime) :
     ScheduleCommon(parent, "ProgLister"),
     m_type(pltype),
     m_recid(0),
@@ -36,6 +37,7 @@ ProgLister::ProgLister(MythScreenStack *parent, ProgListType pltype,
     m_extraArg(extraArg),
     m_startTime(MythDate::current()),
     m_searchTime(m_startTime),
+    m_selectedTime(selectedTime),
     m_channelOrdering(gCoreContext->GetSetting("ChannelOrdering", "channum")),
 
     m_searchType(kNoSearch),
@@ -103,6 +105,7 @@ ProgLister::ProgLister(
     m_extraArg(),
     m_startTime(MythDate::current()),
     m_searchTime(m_startTime),
+    m_selectedTime(),
     m_channelOrdering(gCoreContext->GetSetting("ChannelOrdering", "channum")),
 
     m_searchType(kNoSearch),
@@ -1479,6 +1482,17 @@ void ProgLister::UpdateDisplay(const ProgramInfo *selected)
 
     if (selected)
         RestoreSelection(selected, offset);
+    else if (m_selectedTime.isValid())
+    {
+        int i;
+        for (i = 0; i < m_itemList.size(); ++i)
+        {
+            if (m_selectedTime <= m_itemList[i]->GetScheduledStartTime())
+                break;
+        }
+        m_progList->SetItemCurrent(i);
+        m_selectedTime = QDateTime();
+    }
 }
 
 void ProgLister::RestoreSelection(const ProgramInfo *selected,
