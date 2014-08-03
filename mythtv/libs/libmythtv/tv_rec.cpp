@@ -4164,15 +4164,33 @@ QString TVRec::LoadProfile(QString cardtype, void *tvchain,
     if (!tvchain && rec)
         profileName = rec->GetRecordingRule()->m_recProfile;
 
-    if (!profile.loadByType(profileName, cardtype))
+    QString profileRequested = profileName;
+
+    if (profile.loadByType(profileName, cardtype))
+    {
+        LOG(VB_RECORD, LOG_INFO, LOC +
+            QString("Using profile '%1' to record")
+                .arg(profileName));
+    }
+    else
     {
         profileName = "Default";
-        profile.loadByType(profileName, cardtype);
+        if (profile.loadByType(profileName, cardtype))
+        {
+            LOG(VB_RECORD, LOG_INFO, LOC +
+                QString("Profile '%1' not found, using "
+                        "fallback profile '%2' to record")
+                    .arg(profileRequested).arg(profileName));
+        }
+        else
+        {
+            LOG(VB_RECORD, LOG_ERR, LOC +
+                QString("Profile '%1' not found, and unable "
+                        "to load fallback profile '%2'.  Results "
+                        "may be unpredicable")
+                    .arg(profileRequested).arg(profileName));
+        }
     }
-
-    LOG(VB_RECORD, LOG_INFO, LOC +
-        QString("Using profile '%1' to record")
-            .arg(profileName));
 
     return profileName;
 }
