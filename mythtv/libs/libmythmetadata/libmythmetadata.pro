@@ -77,7 +77,7 @@ win32-msvc* {
 
     LIBS += -lws2_32
     LIBS += -ltag
-    INCLUDEPATH += $$SRC_PATH_BARE/platform/win32/msvc/external/taglib/include/taglib
+    INCLUDEPATH += $$SRC_PATH_BARE/../platform/win32/msvc/external/taglib/include/taglib
 }
 
 inc.path = $${PREFIX}/include/mythtv/metadata/
