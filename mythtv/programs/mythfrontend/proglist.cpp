@@ -336,6 +336,8 @@ void ProgLister::ShowMenu(void)
     menu->AddItem(tr("Edit Schedule"),   SLOT(EditScheduled()));
     menu->AddItem(tr("Program Details"), SLOT(ShowDetails()));
     menu->AddItem(tr("Program Guide"),   SLOT(ShowGuide()));
+    if (m_type != plChannel)
+        menu->AddItem(tr("Channel Search"),    SLOT(ShowChannelSearch()));
     if (m_type != plTitle)
         menu->AddItem(tr("Upcoming"),    SLOT(ShowUpcoming()));
     if (m_type != plPreviouslyRecorded)
