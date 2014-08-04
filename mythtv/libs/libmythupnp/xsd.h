@@ -55,16 +55,16 @@ class UPNP_PUBLIC Xsd : public QDomDocument
 
         QDomElement CreateComplexTypeNode( QMetaObject *pMetaObject );
 
-        bool        IsNillable           ( const QString &sType );
+        bool        IsNillable           ( const QString       &sType );
+        bool        IsEnum               ( const QMetaProperty &metaProperty,
+                                           const QString       &sType );
 
     public:
 
-
         bool GetXSD    ( HTTPRequest *pRequest, QString sTypeName );
-		bool GetEnumXSD( HTTPRequest *pRequest, QString sEnumName );
+        bool GetEnumXSD( HTTPRequest *pRequest, QString sEnumName );
 
         static QString ConvertTypeToXSD( const QString &sType, bool bCustomType = false );
-
 };
 
 //////////////////////////////////////////////////////////////////////////////

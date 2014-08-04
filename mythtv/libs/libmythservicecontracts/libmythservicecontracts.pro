@@ -22,7 +22,9 @@ HEADERS += services/channelServices.h services/videoServices.h
 HEADERS += services/captureServices.h
 HEADERS += services/frontendServices.h
 HEADERS += services/imageServices.h
+HEADERS += services/rttiServices.h
 
+HEADERS += datacontracts/enum.h                  datacontracts/enumItem.h
 HEADERS += datacontracts/connectionInfo.h        datacontracts/databaseInfo.h
 HEADERS += datacontracts/programAndChannel.h     datacontracts/programGuide.h
 HEADERS += datacontracts/recording.h             datacontracts/settingList.h
@@ -71,6 +73,7 @@ incServices.files += services/channelServices.h services/videoServices.h
 incServices.files += services/captureServices.h
 incServices.files += services/frontendServices.h
 incServices.files += services/imageServices.h
+incServices.files += services/rttiServices.h
 
 incDatacontracts.path = $${PREFIX}/include/mythtv/libmythservicecontracts/datacontracts/
 incDatacontracts.files  = datacontracts/connectionInfo.h      datacontracts/databaseInfo.h
@@ -97,6 +100,7 @@ incDatacontracts.files += datacontracts/channelGroupList.h    datacontracts/inpu
 incDatacontracts.files += datacontracts/inputList.h
 incDatacontracts.files += datacontracts/recRuleFilter.h       datacontracts/recRuleFilterList.h
 incDatacontracts.files += datacontracts/castMember.h          datacontracts/castMemberList.h
+incDatacontracts.files += datacontracts/enum.h                datacontracts/enumItem.h
 
 INSTALLS += inc incServices incDatacontracts
 

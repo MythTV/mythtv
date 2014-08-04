@@ -140,7 +140,7 @@ win32-msvc* {
 
     versionTarget.target  = version.h
     versionTarget.depends = FORCE
-    versionTarget.commands = powershell -noprofile -executionpolicy bypass -File ..\..\version.ps1 ..\..
+    versionTarget.commands = powershell -noprofile -executionpolicy bypass -File ../../version.ps1 ../..
 
     PRE_TARGETDEPS += version.h
     QMAKE_EXTRA_TARGETS += versionTarget

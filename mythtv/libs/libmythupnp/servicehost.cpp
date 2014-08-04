@@ -16,7 +16,7 @@
 #include "servicehost.h"
 #include "wsdl.h"
 #include "xsd.h"
-#include "rtti.h"
+//#include "services/rtti.h"
 
 #define _MAX_PARAMS 256
 
@@ -200,9 +200,15 @@ ServiceHost::ServiceHost(const QMetaObject &metaObject,
     m_oMetaObject = metaObject;
     m_sBaseUrl    = sBaseUrl;
 
-    // --------------------------------------------------------------
+    // ----------------------------------------------------------------------
+    // Create an instance of the service so custom types get registered.
+    // ----------------------------------------------------------------------
+
+    QObject *pService =  m_oMetaObject.newInstance();
+
+    // ----------------------------------------------------------------------
     // Read in all callable methods and cache information about them
-    // --------------------------------------------------------------
+    // ----------------------------------------------------------------------
 
     for (int nIdx = 0; nIdx < m_oMetaObject.methodCount(); nIdx++)
     {
@@ -217,14 +223,14 @@ ServiceHost::ServiceHost(const QMetaObject &metaObject,
             QString sName( method.methodSignature() );      
 #endif
 
-            // ------------------------------------------------------
+            // --------------------------------------------------------------
             // Ignore the following methods...
-            // ------------------------------------------------------
+            // --------------------------------------------------------------
 
             if (sName == "deleteLater()")
                 continue;
 
-            // ------------------------------------------------------
+            // --------------------------------------------------------------
 
             MethodInfo oInfo;
 
@@ -255,6 +261,11 @@ ServiceHost::ServiceHost(const QMetaObject &metaObject,
             m_Methods.insert( oInfo.m_sName, oInfo );
         }
     }
+
+    // ----------------------------------------------------------------------
+
+    if (pService != NULL)
+        delete pService;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -324,42 +335,12 @@ bool ServiceHost::ProcessRequest( HTTPRequest *pRequest )
 
                     Xsd xsd;
 
-					if (pRequest->m_mapParams.contains( "type" ))
-						xsd.GetXSD( pRequest, pRequest->m_mapParams[ "type" ] );
-					else
-						xsd.GetEnumXSD( pRequest, pRequest->m_mapParams[ "enum" ] );
+                    if (pRequest->m_mapParams.contains( "type" ))
+                        xsd.GetXSD( pRequest, pRequest->m_mapParams[ "type" ] );
+                    else
 
+                        xsd.GetEnumXSD( pRequest, pRequest->m_mapParams[ "enum" ] );
                     delete pService;
-                }
-
-                return true;
-            }
-
-            // --------------------------------------------------------------
-            // rtti is an alternative to xsd.
-            // returns xml/json/etc... definitions of enums
-            // --------------------------------------------------------------
-
-            if (( pRequest->m_eType   == RequestTypeGet ) &&
-                ( pRequest->m_sMethod == "rtti"          ))
-            {
-                if ( pRequest->m_mapParams.count() > 0)
-                {
-                    pService =  qobject_cast<Service*>(m_oMetaObject.newInstance());
-
-                    QVariant vVal;
-                    Rtti     rtti;
-
-                    if (pRequest->m_mapParams.contains( "enum" ))
-                    {
-                        RttiEnumList *pList = rtti.GetEnumDetails( pRequest->m_mapParams[ "enum" ] );
-                        vVal = QVariant::fromValue< QObject* >( pList );
-                    }
-
-                    delete pService;
-
-                    return FormatResponse( pRequest, vVal );
-
                 }
 
                 return true;

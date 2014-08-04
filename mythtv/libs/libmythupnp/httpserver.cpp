@@ -33,6 +33,8 @@
 #include "htmlserver.h"
 #include "mythversion.h"
 
+#include "serviceHosts/rttiServiceHost.h"
+
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -77,6 +79,22 @@ HttpServer::HttpServer(const QString &sApplicationPrefix) :
 
     // -=>TODO: Load Config XML
     // -=>TODO: Load & initialize - HttpServerExtensions
+
+    // ----------------------------------------------------------------------
+    // Enable Rtti Service for all instances of HttpServer
+    // and register with QtScript Engine.
+    // Rtti service is an alternative to using the xsd uri
+    // it returns xml/json/etc... definitions of types/enums 
+    // ----------------------------------------------------------------------
+
+    RegisterExtension( new RttiServiceHost( m_sSharePath ));
+
+    QScriptEngine *pEngine = ScriptEngine();
+
+    pEngine->globalObject().setProperty("Rtti",
+         pEngine->scriptValueFromQMetaObject< ScriptableRtti >() );
+
+
 }
 
 /////////////////////////////////////////////////////////////////////////////

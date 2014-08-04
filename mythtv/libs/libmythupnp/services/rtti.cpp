@@ -33,36 +33,39 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-Rtti::Rtti()
-{
-    RttiEnum::InitializeCustomTypes();
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-RttiEnumList* Rtti::GetEnumDetails ( const QString &sFQN )
+DTC::Enum* Rtti::GetEnum( const QString &sFQN )
 {
     if (sFQN.isEmpty())
         return NULL;
 
     // ----------------------------------------------------------------------
-    // sEnumName needs to be in class.enum format
+    // accept enum FQN in either class::enum or class.enum formats.
     // ----------------------------------------------------------------------
 
-    if (sFQN.count('.') != 1 )
+    QString sType( sFQN );
+
+    sType.replace( ".", "::" );
+
+    int nLastIdx = sType.lastIndexOf( "::" );
+
+    if (nLastIdx == -1)
         return NULL;
 
-    QStringList lstTypeParts = sFQN.split( '.' );
+    QString sParentFQN = sType.mid( 0, nLastIdx );
+    QString sEnumName  = sType.mid( nLastIdx+2  );
 
     // ----------------------------------------------------------------------
     // Create Parent object so we can get to its metaObject
     // ----------------------------------------------------------------------
 
-    QString sParentFQN = "DTC::" + lstTypeParts[0];
-
     int nParentId = QMetaType::type( sParentFQN.toUtf8() );
+
+    if ((nParentId == 0) && !sParentFQN.startsWith( "DTC::" ))
+    {
+        sParentFQN = "DTC::" + sParentFQN;
+        nParentId  = QMetaType::type( sParentFQN.toUtf8() );
+    }
+
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     QObject *pParentClass = (QObject *)QMetaType::construct( nParentId );
@@ -81,7 +84,7 @@ RttiEnumList* Rtti::GetEnumDetails ( const QString &sFQN )
     // Now look up enum
     // ----------------------------------------------------------------------
 
-    int nEnumIdx = pMetaObject->indexOfEnumerator( lstTypeParts[1].toUtf8() );
+    int nEnumIdx = pMetaObject->indexOfEnumerator( sEnumName.toUtf8() );
 
     if (nEnumIdx < 0 )
         return NULL;
@@ -92,7 +95,9 @@ RttiEnumList* Rtti::GetEnumDetails ( const QString &sFQN )
     //
     // ----------------------------------------------------------------------
 
-    RttiEnumList *pList = new RttiEnumList();
+    DTC::Enum *pEnum = new DTC::Enum();
+
+    pEnum->setType( sFQN );
 
     for( int nIdx = 0; nIdx < metaEnum.keyCount(); nIdx++)
     {
@@ -101,16 +106,21 @@ RttiEnumList* Rtti::GetEnumDetails ( const QString &sFQN )
 
         QString sFQNKey = sFQN + "." + sKey;
 
+        if (sFQNKey.startsWith( "DTC::" ))
+            sFQNKey.remove( 0, 5 );
+
+        sFQNKey.replace( "::", "." );
+
         QString sDesc  = QCoreApplication::translate( "Enums", 
                                                       sFQNKey.toUtf8());
 
-        RttiEnum *pRttiEnum = pList->AddNewRttiEnum();
+        DTC::EnumItem *pEnumItem = pEnum->AddNewEnum();
 
-        pRttiEnum->setKey  ( sKey   );
-        pRttiEnum->setValue( nValue );
-        pRttiEnum->setDesc ( sDesc  );
+        pEnumItem->setKey  ( sKey   );
+        pEnumItem->setValue( nValue );
+        pEnumItem->setDesc ( sDesc  );
 
     }
 
-    return pList;
+    return pEnum;
 }
