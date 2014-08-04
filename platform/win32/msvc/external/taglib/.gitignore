@@ -6,7 +6,11 @@ cmake_install.cmake
 cmake_uninstall.cmake
 taglib-config
 taglib_config.h
+Makefile
+config.h
+install_manifest.txt
+examples/Makefile
 examples/cmake_install.cmake
-taglib/Headers
 taglib/cmake_install.cmake
 taglib/tag.dll.resource.txt
+include/taglib/*
