@@ -209,12 +209,25 @@ void LanguageSelection::Save(void)
     MythUIButtonListItem *item = m_languageList->GetItemCurrent();
 
     if (!item)
+    {
         Close();
+        LOG(VB_GUI, LOG_ERR,
+                 "LanguageSelection::Save called without current languageList");
+        return;
+    }
 
     QString langCode = item->GetData().toString();
     gCoreContext->SaveSettingOnHost("Language", langCode, NULL);
 
     item = m_countryList->GetItemCurrent();
+
+    if (!item)
+    {
+        Close();
+        LOG(VB_GUI, LOG_ERR,
+                 "LanguageSelection::Save called without current countryList");
+        return;
+    }
 
     QString countryCode = item->GetData().toString();
     gCoreContext->SaveSettingOnHost("Country", countryCode, NULL);
