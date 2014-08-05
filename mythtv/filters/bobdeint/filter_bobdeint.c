@@ -74,13 +74,13 @@ int bobDeintFilter(VideoFilter *f, VideoFrame *frame, int field)
     if (filter->tmp_size < width) 
     {
         filter->tmp_ptr = (unsigned char *)realloc(
-            filter->tmp_ptr, width * sizeof(char));
+            filter->tmp_ptr, width * sizeof(unsigned char));
         filter->tmp_size = width;
     }
     if (filter->state_size < height) 
     {
         filter->line_state = (unsigned char *)realloc(
-            filter->line_state, height * sizeof(char));
+            filter->line_state, height * sizeof(unsigned char));
         filter->state_size = height;
     }
 
