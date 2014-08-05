@@ -1092,8 +1092,8 @@ int64_t AudioOutputBase::GetAudiotime(void)
               .arg(main_buffer+soundcard_buffer)
               .arg(samplerate).arg(obpf).arg(bytes_per_frame).arg(stretchfactor)
               .arg((main_buffer + soundcard_buffer) * eff_stretchfactor)
-              .arg(((main_buffer + soundcard_buffer) * eff_stretchfactor ) /
-                   (effdsp * obpf))
+              .arg((effdsp && obpf) ? ((main_buffer + soundcard_buffer) *
+                   eff_stretchfactor ) / (effdsp * obpf) : 0)
               );
 
     return audiotime;
