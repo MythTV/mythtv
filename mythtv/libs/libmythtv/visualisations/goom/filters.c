@@ -568,13 +568,13 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 			generatePrecalCoef ();
 			select_zoom_filter ();
 
-			freebrutS = (signed int *) calloc (resx * resy * 2 + 128, sizeof(unsigned int));
+			freebrutS = (signed int *) calloc (resx * resy * 2 + 128, sizeof(signed int));
 			brutS = (signed int *) ((1 + ((uintptr_t) (freebrutS)) / 128) * 128);
 
-			freebrutD = (signed int *) calloc (resx * resy * 2 + 128, sizeof(unsigned int));
+			freebrutD = (signed int *) calloc (resx * resy * 2 + 128, sizeof(signed int));
 			brutD = (signed int *) ((1 + ((uintptr_t) (freebrutD)) / 128) * 128);
 
-			freebrutT = (signed int *) calloc (resx * resy * 2 + 128, sizeof(unsigned int));
+			freebrutT = (signed int *) calloc (resx * resy * 2 + 128, sizeof(signed int));
 			brutT = (signed int *) ((1 + ((uintptr_t) (freebrutT)) / 128) * 128);
 
 			/** modif here by jeko : plus de multiplications **/
