@@ -3,6 +3,9 @@
 #ifndef MYTH_CONFIG_DIALOGS_H
 #define MYTH_CONFIG_DIALOGS_H
 
+// C++ headers
+#include <vector>
+
 // Qt headers
 #include <QObject>
 #include <QString>
@@ -62,10 +65,10 @@ class MPUBLIC ConfigurationDialog : public Storage
     virtual void Save(QString destination) { cfgGrp->Save(destination); }
 
   protected:
-    typedef vector<Configurable*> ChildList;
+    typedef std::vector<Configurable*> ChildList;
 
     ChildList           cfgChildren;
-    vector<QWidget*>    childwidget;
+    std::vector<QWidget*>    childwidget;
     MythDialog         *dialog;
     ConfigurationGroup *cfgGrp;
 };

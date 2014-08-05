@@ -1,5 +1,7 @@
 // C++ includes
-#include <iostream>
+#include <iostream> // for cerr, cout
+using std::cerr;
+using std::cout;
 
 // Qt headers
 #include <QHostAddress>

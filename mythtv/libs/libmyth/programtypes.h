@@ -17,7 +17,6 @@
 
 // C++ headers
 #include <deque>
-using namespace std;
 
 // Qt headers
 #include <QString>
@@ -115,7 +114,7 @@ typedef enum SkipTypes {
 } SkipType;
 
 MPUBLIC QString SkipTypeToString(int);
-MPUBLIC deque<int> GetPreferredSkipTypeCombinations(void);
+MPUBLIC std::deque<int> GetPreferredSkipTypeCombinations(void);
 
 typedef enum TranscodingStatuses {
     TRANSCODING_NOT_TRANSCODED = 0,

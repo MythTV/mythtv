@@ -1,12 +1,20 @@
-// C++ includes
-#include <iostream>
 
-// libmyth* headers
+// C++ includes
+#include <iostream> // for cout
+using std::cout;
+
+// libmythbase
 #include "exitcodes.h"
 #include "mythcorecontext.h"
 #include "mythlogging.h"
+
+// libmyth
 #include "remoteutil.h"
+
+// libmythtv
 #include "scheduledrecording.h"
+
+// libmythmetadata
 #include "videometadata.h"
 
 // local headers

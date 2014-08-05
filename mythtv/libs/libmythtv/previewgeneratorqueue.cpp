@@ -1,14 +1,26 @@
+
+#include "previewgeneratorqueue.h"
+
+// C++
+#include <algorithm>
+using std::max;
+
+// QT
 #include <QCoreApplication>
 #include <QFileInfo>
 
-#include "previewgeneratorqueue.h"
-#include "previewgenerator.h"
+// libmythbase
 #include "mythcorecontext.h"
-#include "mythcontext.h"
 #include "mythlogging.h"
-#include "remoteutil.h"
 #include "mythdirs.h"
 #include "mthread.h"
+
+// libmyth
+#include "mythcontext.h"
+#include "remoteutil.h"
+
+// libmythtv
+#include "previewgenerator.h"
 
 #define LOC QString("PreviewQueue: ")
 

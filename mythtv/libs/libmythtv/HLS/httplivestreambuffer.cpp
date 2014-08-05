@@ -22,18 +22,30 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+
+
+// QT
 #include <QObject>
 #include <QString>
 #include <QStringList>
 #include <QtAlgorithms>
 #include <QUrl>
 
+// C++
+#include <algorithm> // for min/max
+using std::max;
+using std::min;
+
+// Posix
 #include <sys/time.h> // for gettimeofday
 
+// libmythbase
 #include "mthread.h"
-#include "httplivestreambuffer.h"
 #include "mythdownloadmanager.h"
 #include "mythlogging.h"
+
+// libmythtv
+#include "httplivestreambuffer.h"
 
 #ifdef USING_LIBCRYPTO
 // encryption related stuff

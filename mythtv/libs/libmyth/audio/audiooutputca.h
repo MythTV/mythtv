@@ -3,8 +3,6 @@
 
 #include "audiooutputbase.h"
 
-using namespace std;
-
 #undef AUDBUFSIZE
 #define AUDBUFSIZE 512000
 

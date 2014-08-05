@@ -4,6 +4,8 @@
 #include "iso639.h"
 #include "mythcorecontext.h"
 
+using namespace std;
+
 QMap<int, QString>    _iso639_key_to_english_name;
 static QMap<int, int> _iso639_key2_to_key3;
 static QMap<int, int> _iso639_key3_to_canonical_key3;

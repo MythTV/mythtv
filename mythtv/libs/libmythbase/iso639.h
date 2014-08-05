@@ -3,7 +3,6 @@
 #define _ISO_639_2_H_
 
 #include <vector>
-using namespace std;
 
 #include <QString>
 #include <QStringList>
@@ -39,7 +38,7 @@ MBASE_PUBLIC  QString     iso639_str_toName(const unsigned char *iso639);
 MBASE_PUBLIC  QString     iso639_key_toName(int iso639_2);
 MBASE_PUBLIC  void        iso639_clear_language_list(void);
 MBASE_PUBLIC  QStringList iso639_get_language_list(void);
-MBASE_PUBLIC  vector<int> iso639_get_language_key_list(void);
+MBASE_PUBLIC  std::vector<int> iso639_get_language_key_list(void);
 MBASE_PUBLIC  int         iso639_key_to_canonical_key(int iso639_2);
 MBASE_PUBLIC  QString     iso639_str2_to_str3(const QString &str2);
 

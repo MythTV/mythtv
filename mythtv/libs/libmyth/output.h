@@ -12,7 +12,6 @@ class OutputListeners;
 class OutputEvent;
 
 #include <vector>
-using namespace std;
 
 #include <QMutex>
 #include <QList>
@@ -94,7 +93,7 @@ class MPUBLIC OutputEvent : public MythEvent
     int brate, freq, prec, chan;
 };
 
-typedef vector<MythTV::Visual*> Visuals;
+typedef std::vector<MythTV::Visual*> Visuals;
 
 class MPUBLIC OutputListeners : public MythObservable
 {

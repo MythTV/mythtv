@@ -9,6 +9,9 @@
 #include "mythexp.h"
 #include "mythstorage.h"
 
+// C++ headers
+#include <vector>
+
 #define MYTHCONFIG
 #include "settings.h"
 #undef MYTHCONFIG
@@ -56,7 +59,7 @@ class MPUBLIC ConfigurationGroup : public Setting, public Storage
     virtual ~ConfigurationGroup();
 
   protected:
-    typedef vector<Configurable*> childList;
+    typedef std::vector<Configurable*> childList;
     childList children;
     bool uselabel;
     bool useframe;
@@ -92,7 +95,7 @@ class MPUBLIC VerticalConfigurationGroup : public ConfigurationGroup
     virtual ~VerticalConfigurationGroup() { }
 
   private:
-    vector<QWidget*>    childwidget;
+    std::vector<QWidget*>    childwidget;
     QWidget            *widget;
     ConfigurationGroup *confgrp;
     QVBoxLayout        *layout;
@@ -176,7 +179,7 @@ class MPUBLIC StackedConfigurationGroup : public ConfigurationGroup
     virtual ~StackedConfigurationGroup();
 
   protected:
-    vector<QWidget*>    childwidget;
+    std::vector<QWidget*>    childwidget;
     QStackedWidget     *widget;
     ConfigurationGroup *confgrp;
     uint                top;

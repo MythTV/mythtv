@@ -6,13 +6,9 @@
 #include <QAbstractButton>
 #include <QObject>
 #include <QFrame>
-#include <QVector>
-#include <QList>
 
 #include "mythexp.h"
 #include "mythmainwindow.h"
-#include <vector>
-using namespace std;
 
 class MythMediaDevice;
 class MythLineEdit;

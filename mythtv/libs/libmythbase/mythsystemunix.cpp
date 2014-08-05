@@ -14,10 +14,11 @@
 #include <fcntl.h>
 #include <time.h>
 #include <signal.h>  // for kill()
-#include <string.h>
+#include <string.h> // for strerror()
 #include <sys/select.h>
 #include <sys/wait.h>
-#include <iostream>
+#include <iostream> // for cerr()
+using namespace std; // for most of the above
 
 // QT headers
 #include <QCoreApplication>

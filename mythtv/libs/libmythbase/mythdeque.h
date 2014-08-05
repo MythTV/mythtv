@@ -5,7 +5,7 @@
 
 #include <QString>
 #include <deque>
-using namespace std;
+using std::deque;
 
 template<typename T>
 inline T myth_deque_init(const T*) { return (T)(0); }

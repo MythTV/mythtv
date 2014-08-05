@@ -1,12 +1,25 @@
+
+#include "metadatafactory.h"
+
+// C++
+#include <algorithm>
+using std::max;
+
+// QT
 #include <QApplication>
 #include <QList>
 #include <QUrl>
 
-#include "mythcontext.h"
-#include "videoutils.h"
+// libmythbase
 #include "mythlogging.h"
 #include "compat.h"
+
+// libmyth
+#include "mythcontext.h"
 #include "remoteutil.h"
+
+// libmythmetadata
+#include "videoutils.h"
 
 // Needed to perform a lookup
 #include "metadatadownload.h"
@@ -21,7 +34,6 @@
 #include "programinfo.h"
 #include "recordingrule.h"
 
-#include "metadatafactory.h"
 
 QEvent::Type MetadataFactoryNoResult::kEventType =
     (QEvent::Type) QEvent::registerEventType();

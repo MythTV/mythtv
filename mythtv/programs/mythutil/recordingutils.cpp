@@ -1,5 +1,8 @@
+
 // C++ includes
-#include <iostream>
+#include <algorithm> // for max
+#include <iostream> // for cout, endl
+using namespace std;
 #include <sys/stat.h>
 
 // Qt

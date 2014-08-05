@@ -11,6 +11,8 @@
 #include "mythdirs.h"
 #include "cardutil.h"
 
+using std::vector;
+
 QString ChannelDBStorage::GetWhereClause(MSqlBindings &bindings) const
 {
     QString fieldTag = (":WHERE" + id.getField().toUpper());

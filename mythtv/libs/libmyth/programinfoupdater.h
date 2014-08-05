@@ -6,7 +6,6 @@
 
 // C++ headers
 #include <vector>
-using namespace std;
 
 // Qt headers
 #include <QWaitCondition>
@@ -68,7 +67,7 @@ class ProgramInfoUpdater : public QRunnable
     QMutex        lock;
     QWaitCondition moreWork; 
     bool          isRunning;
-    vector<PIKeyAction>    needsAddDelete;
+    std::vector<PIKeyAction>    needsAddDelete;
     QHash<PIKey,PIKeyData> needsUpdate;
 };
 

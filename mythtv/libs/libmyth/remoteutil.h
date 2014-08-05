@@ -7,7 +7,7 @@
 #include <QDateTime>
 
 #include <vector>
-using namespace std;
+using std::vector;
 
 #include "mythexp.h"
 

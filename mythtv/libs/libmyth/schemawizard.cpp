@@ -1,4 +1,6 @@
-#include <iostream>
+#include <iostream> // for cout
+using std::cout;
+
 #include <unistd.h>      // for isatty() on Windows
 
 #include "dialogbox.h"

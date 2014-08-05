@@ -2,7 +2,6 @@
 #define MYTHRSSMANAGER_H
 
 #include <vector>
-using namespace std;
 
 #include <QObject>
 #include <QMetaType>
@@ -23,7 +22,7 @@ class MPUBLIC RSSSite : public QObject
 
   public:
 
-    class List : public vector<RSSSite*>
+    class List : public std::vector<RSSSite*>
     {
       public:
         void clear(void)

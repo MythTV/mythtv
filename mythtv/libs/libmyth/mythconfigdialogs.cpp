@@ -1,5 +1,8 @@
 // -*- Mode: c++ -*-
 
+#include <vector>
+using std::vector;
+
 #include "mythconfigdialogs.h"
 #include "mythwizard.h"
 

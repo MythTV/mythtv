@@ -1,16 +1,16 @@
 // -*- Mode: c++ -*-
 
 // POSIX headers
-#include <sys/types.h>
-#include <unistd.h>
-
-// C headers
-#include <cstdlib>
+// FIXME What are these used for?
+// #include <sys/types.h>
+// #include <unistd.h>
 
 // C++ headers
-#include <iostream>
 #include <algorithm>
-using namespace std;
+using std::max;
+using std::min;
+#include <deque>
+using std::deque;
 
 // Qt headers
 #include <QRegExp>

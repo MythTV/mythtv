@@ -1,5 +1,9 @@
+
 // C++ includes
-#include <iostream>
+#include <iostream> // for cout
+using std::cout;
+
+// QT
 #include <QFile>
 #include <QTextStream>
 #include <QVector>

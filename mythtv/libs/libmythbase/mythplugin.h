@@ -5,9 +5,6 @@
 #include <QMap>
 #include <QHash>
 
-#include <vector>
-using namespace std;
-
 #include "mythbaseexp.h"
 
 class QSqlDatabase;

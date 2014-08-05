@@ -1,6 +1,9 @@
 
 #include "audioreencodebuffer.h"
 
+#include <algorithm> // for min/max
+using namespace std;
+
 extern "C" {
 #include "libavutil/mem.h"
 }

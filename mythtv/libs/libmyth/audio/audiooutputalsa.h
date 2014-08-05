@@ -9,8 +9,6 @@
 
 #include "audiooutputbase.h"
 
-using namespace std;
-
 class AudioOutputALSA : public AudioOutputBase
 {
   public:

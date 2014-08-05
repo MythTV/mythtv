@@ -24,8 +24,6 @@
 
 #include <vector>
 
-using namespace std;
-
 #include "mythexp.h"
 
 // These widgets follow these general navigation rules:

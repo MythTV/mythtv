@@ -887,7 +887,7 @@ bool LoadFromScheduler(AutoDeleteDeque<T> &destination)
 // could be factored out
 MPUBLIC bool GetNextRecordingList(QDateTime &nextRecordingStart,
                                   bool *hasConflicts = NULL,
-                                  vector<ProgramInfo> *list = NULL);
+                                  std::vector<ProgramInfo> *list = NULL);
 
 class QMutex;
 class MPUBLIC PMapDBReplacement

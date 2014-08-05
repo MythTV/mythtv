@@ -21,8 +21,6 @@ extern "C" {
 }
 #include "eldutils.h"
 
-using namespace std;
-
 typedef enum {
     FORMAT_NONE = 0,
     FORMAT_U8,
@@ -208,10 +206,10 @@ class MPUBLIC AudioOutputSettings
         bool m_has_eld;
         ELD  m_eld;
 
-        vector<int> m_sr, m_rates, m_channels;
-        vector<AudioFormat> m_sf, m_formats;
-        vector<int>::iterator m_sr_it;
-        vector<AudioFormat>::iterator m_sf_it;
+        std::vector<int> m_sr, m_rates, m_channels;
+        std::vector<AudioFormat> m_sf, m_formats;
+        std::vector<int>::iterator m_sr_it;
+        std::vector<AudioFormat>::iterator m_sf_it;
 };
 
 #endif // _AUDIO_OUTPUT_SETTINGS_H_

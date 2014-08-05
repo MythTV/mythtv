@@ -3,9 +3,6 @@
 #ifndef _ISO_3166_1_H_
 #define _ISO_3166_1_H_
 
-#include <vector>
-using namespace std;
-
 #include <QString>
 #include <QStringList>
 #include <QMap>

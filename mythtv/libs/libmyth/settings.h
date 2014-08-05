@@ -5,7 +5,6 @@
 
 // C++ headers
 #include <vector>
-using namespace std;
 
 // Qt headers
 #include <QObject>
@@ -303,7 +302,7 @@ class MPUBLIC SelectSetting : public Setting
     virtual bool ReplaceLabel(
         const QString &new_label, const QString &value);
 
-    typedef vector<QString> selectionList;
+    typedef std::vector<QString> selectionList;
     selectionList labels;
     selectionList values;
     unsigned current;
@@ -722,7 +721,7 @@ class MPUBLIC HostRefreshRateComboBox : public HostComboBox
     virtual void ChangeResolution(const QString &resolution);
 
   private:
-    static const vector<double> GetRefreshRates(const QString &resolution);
+    static const std::vector<double> GetRefreshRates(const QString &resolution);
 };
 
 class MPUBLIC HostTimeBox : public ComboBoxSetting, public HostDBStorage

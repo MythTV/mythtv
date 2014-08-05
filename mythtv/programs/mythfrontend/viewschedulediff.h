@@ -3,7 +3,6 @@
 
 // C++ headers
 #include <vector>
-using namespace std;
 
 // mythui
 #include "mythscreentype.h"
@@ -58,7 +57,7 @@ class ViewScheduleDiff : public MythScreenType
     MythUIText       *m_titleText;
     MythUIText       *m_noChangesText;
 
-    vector<class ProgramStruct> m_recList;
+    std::vector<class ProgramStruct> m_recList;
 
     int m_recordid; ///< recordid that differs from master (-1 = assume all)
 };

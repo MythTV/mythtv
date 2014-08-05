@@ -6,6 +6,8 @@
 #include "remoteutil.h"
 #include "compat.h"
 
+using std::vector;
+
 uint qHash(const PIKey &k)
 {
     return qHash(k.chanid) ^ qHash(k.recstartts.toTime_t());

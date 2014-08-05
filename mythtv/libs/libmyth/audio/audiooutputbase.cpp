@@ -2,6 +2,11 @@
 #include <cmath>
 #include <limits>
 
+// C++ headers
+#include <algorithm>
+
+using namespace std;
+
 // POSIX headers
 #include <unistd.h>
 #include <sys/time.h>

@@ -7,8 +7,9 @@
 #include "mythfontmanager.h"
 
 #include "mythdirs.h"
-#include "oldsettings.h"
 #include "mythuihelper.h"
+
+#include "oldsettings.h" // Deprecated
 
 class MythThemeBasePrivate
 {

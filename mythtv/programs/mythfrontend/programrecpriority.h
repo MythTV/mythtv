@@ -101,7 +101,7 @@ class ProgramRecPriority : public ScheduleCommon
     virtual ProgramInfo *GetCurrentProgram(void) const;
 
     QMap<int, ProgramRecPriorityInfo> m_programData;
-    vector<ProgramRecPriorityInfo*> m_sortedProgram;
+    std::vector<ProgramRecPriorityInfo*> m_sortedProgram;
     QMap<int, int> m_origRecPriorityData;
 
     void countMatches(void);

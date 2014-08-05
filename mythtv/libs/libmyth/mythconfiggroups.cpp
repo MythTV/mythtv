@@ -1,5 +1,7 @@
 #include <algorithm>
 
+using namespace std;
+
 #include <QStackedWidget>
 
 #include "mythconfiggroups.h"

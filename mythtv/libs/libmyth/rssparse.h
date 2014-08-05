@@ -2,7 +2,6 @@
 #define RSSPARSE_H
 
 #include <vector>
-using namespace std;
 
 #include <QString>
 #include <QStringList>
@@ -113,7 +112,7 @@ class MPUBLIC ResultItem
   public:
 
     typedef QList<ResultItem *> resultList;
-    typedef vector<ResultItem> List;
+    typedef std::vector<ResultItem> List;
 
     ResultItem(const QString& title, const QString& subtitle,
               const QString& desc, const QString& URL,

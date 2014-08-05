@@ -4,6 +4,9 @@
 // ANSI C
 #include <cstdlib>
 
+// C++
+#include <vector>
+
 // Qt
 #include <QString>
 
@@ -156,9 +159,9 @@ class MTV_PUBLIC ChannelOptionsRawTS: public VerticalConfigurationGroup
   private:
     const ChannelID &cid;
 
-    vector<TransLineEditSetting*> pids;
-    vector<TransComboBoxSetting*> sids;
-    vector<TransCheckBoxSetting*> pcrs;
+    std::vector<TransLineEditSetting*> pids;
+    std::vector<TransComboBoxSetting*> sids;
+    std::vector<TransCheckBoxSetting*> pcrs;
 
     static const uint kMaxPIDs = 10;
 };

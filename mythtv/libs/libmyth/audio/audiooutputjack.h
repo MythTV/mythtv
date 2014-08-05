@@ -9,8 +9,6 @@
 #include "audiooutputbase.h"
 #include "audiooutputsettings.h"
 
-using namespace std;
-
 //! maximum number of channels supported, avoids lots of mallocs
 #define JACK_CHANNELS_MIN 2
 #define JACK_CHANNELS_MAX 8

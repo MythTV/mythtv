@@ -18,6 +18,11 @@
 #include <sys/socket.h>
 #endif
 #include <unistd.h> // for usleep (and socket code on Q_OS_WIN)
+#include <algorithm> // for min/max
+using std::max;
+using std::min;
+#include <vector> // for vector
+using std::vector;
 
 // MythTV
 #include "mythsocket.h"

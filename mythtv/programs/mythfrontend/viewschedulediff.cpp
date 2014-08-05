@@ -17,6 +17,8 @@
 //mythfrontend
 #include "viewschedulediff.h"
 
+using namespace std;
+
 ViewScheduleDiff::ViewScheduleDiff(MythScreenStack *parent, QString altTable,
                                    int recordidDiff, QString title)
         : MythScreenType(parent, "ViewScheduleDiff"),

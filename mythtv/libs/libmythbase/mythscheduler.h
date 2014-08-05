@@ -3,7 +3,6 @@
 
 #include <algorithm>
 #include <deque>
-using namespace std;
 
 #include <QStringList>
 #include <QMap>
@@ -11,9 +10,9 @@ using namespace std;
 class ProgramInfo;
 class RecordingInfo;
 
-typedef deque<RecordingInfo*> RecList;
+typedef std::deque<RecordingInfo*> RecList;
 #define SORT_RECLIST(LIST, ORDER) \
-  do { stable_sort((LIST).begin(), (LIST).end(), ORDER); } while (0)
+  do { std::stable_sort((LIST).begin(), (LIST).end(), ORDER); } while (0)
 
 typedef RecList::const_iterator RecConstIter;
 typedef RecList::iterator RecIter;

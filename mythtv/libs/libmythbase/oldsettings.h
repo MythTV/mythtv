@@ -11,7 +11,6 @@
 #define OLDSETTINGS_H
 
 #include <map>
-using namespace std;
 
 #include <QString>
 #include <QPixmap>
@@ -51,7 +50,7 @@ public:
 private: // Private attributes
         /** main property-value mapping for strings */
         std::map<QString, QString> *m_pSettings;
-};
+} MDEPRECATED;
 
 void LoadSettingsFile(Settings *settings, QString filename);
 

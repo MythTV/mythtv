@@ -17,9 +17,15 @@
  * 02110-1301, USA.
  */
 
+#include "audiooutputpulse.h"
+
+// QT headers
 #include <QString>
 
-#include "audiooutputpulse.h"
+// C++ headers
+#include <algorithm>
+using std::max;
+using std::min;
 
 #define LOC     QString("PulseAudio: ")
 

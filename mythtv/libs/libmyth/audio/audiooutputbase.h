@@ -4,10 +4,6 @@
 // POSIX headers
 #include <sys/time.h> // for struct timeval
 
-// C++ headers
-#include <iostream>
-using namespace std;
-
 // Qt headers
 #include <QString>
 #include <QMutex>

@@ -3,9 +3,6 @@
 
 #include "audiooutputbase.h"
 
-using namespace std;
-
-
 class AudioOutputOSS : public AudioOutputBase
 {
   public:
