@@ -809,13 +809,26 @@ int cCiSession::SendData(int Tag, int Length, const uint8_t *Data)
   *p++ = (Tag >> 16) & 0xFF;
   *p++ = (Tag >>  8) & 0xFF;
   *p++ =  Tag        & 0xFF;
-  p = SetLength(p, Length);
-  if (p - buffer + Length < int(sizeof(buffer))) {
-     memcpy(p, Data, Length);
-     p += Length;
-     return tc->SendData(p - buffer, buffer);
-     }
-  esyslog("ERROR: CAM: data length (%d) exceeds buffer size", Length);
+  if (Length >= 0)
+  {
+    p = SetLength(p, Length);
+    if (p - buffer + Length < int(sizeof(buffer)))
+    {
+        if (Length != 0)
+        {
+            if (!Data)
+            {
+                esyslog("ERROR: CAM: Data pointer null");
+                return ERROR;
+            }
+            memcpy(p, Data, Length);
+            p += Length;
+        }
+        return tc->SendData(p - buffer, buffer);
+    }
+    esyslog("ERROR: CAM: data length (%d) exceeds buffer size", Length);
+  }
+  esyslog("ERROR: CAM: data length (%d) is negative", Length);
   return ERROR;
 }
 
