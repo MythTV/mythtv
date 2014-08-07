@@ -53,7 +53,7 @@ class ExternIO
 
 class ExternalStreamHandler : public StreamHandler
 {
-    enum constants {PACKET_SIZE = 188 * 1024};
+    enum constants {PACKET_SIZE = 188 * 32768};
 
   public:
     static ExternalStreamHandler *Get(const QString &devicename);
@@ -61,12 +61,13 @@ class ExternalStreamHandler : public StreamHandler
 
   public:
     ExternalStreamHandler(const QString & path);
-    ~ExternalStreamHandler(void) { Close(); }
+    ~ExternalStreamHandler(void) { CloseApp(); }
 
     virtual void run(void); // MThread
     virtual void PriorityEvent(int fd); // DeviceReaderCB
 
-    bool IsOpen(void) const { return (m_IO && m_isOpen); }
+    bool IsAppOpen(void);
+    bool IsTSOpen(void);
     bool HasTuner(void) const { return m_hasTuner; }
     bool HasPictureAttributes(void) const { return m_hasPictureAttributes; }
 
@@ -83,8 +84,7 @@ class ExternalStreamHandler : public StreamHandler
   private:
     int StreamingCount(void) const;
     bool OpenApp(void);
-    bool Open(void);
-    void Close(void);
+    void CloseApp(void);
 
     QMutex         m_IO_lock;
 #ifdef USE_MYTHSYSTEM_FOR_RECORDER_IO
@@ -95,7 +95,7 @@ class ExternalStreamHandler : public StreamHandler
     QStringList    m_args;
     QString        m_app;
     QString        m_error;
-    bool           m_isOpen;
+    bool           m_tsopen;
     int            m_io_errcnt;
     bool           m_poll_mode;
 

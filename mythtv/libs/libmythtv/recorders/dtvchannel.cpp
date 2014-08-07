@@ -339,7 +339,9 @@ bool DTVChannel::SetChannelByString(const QString &channum)
         }
         else
         {
-            ok = Tune(freqid, finetune);
+            // ExternalChannel justs wants the channum
+            ok = freqid.isEmpty() && finetune == 0 ?
+                 Tune(channum) : Tune(freqid, finetune);
         }
     }
 

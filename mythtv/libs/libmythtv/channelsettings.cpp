@@ -302,6 +302,40 @@ class XmltvID : public ComboBoxSetting, public ChannelDBStorage
     QString sourceName;
 };
 
+class ServiceID : public SpinBoxSetting, public ChannelDBStorage
+{
+  public:
+    ServiceID(const ChannelID &id)
+        : SpinBoxSetting(this, -1, 999, 1, true, "NULL"),
+          ChannelDBStorage(this, id, "serviceid")
+    {
+        setLabel(QCoreApplication::translate("(ChannelSettings)", "ServiceID"));
+
+        setHelpText(QCoreApplication::translate("(ChannelSettings)",
+                "Servide ID (Primary PID) of desired channel within the transport stream. "
+                "If there is only one channel, then setting this to zero will find it."));
+    }
+
+    void Load(void)
+    {
+        ChannelDBStorage::Load();
+
+        if (initval.isNull())
+        {
+            user->SetDBValue("-1");
+            initval = "-1";
+        }
+    }
+
+    QString getValue(void) const
+    {
+        if (settingValue.toInt() == -1)
+            return QString();
+        else
+            return settingValue;
+    }
+};
+
 class CommMethod : public ComboBoxSetting, public ChannelDBStorage
 {
   public:
@@ -453,11 +487,15 @@ ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID &id,
         new VerticalConfigurationGroup(false, true);
     VerticalConfigurationGroup *right =
         new VerticalConfigurationGroup(false, true);
-
+    HorizontalConfigurationGroup *subgroup1 =
+        new HorizontalConfigurationGroup(false,false,true,true);
 
     left->addChild(new Channum(id));
     left->addChild(new Callsign(id));
-    left->addChild(new Visible(id));
+
+    subgroup1->addChild(new Visible(id));
+    subgroup1->addChild(new ServiceID(id));
+    left->addChild(subgroup1);
 
     right->addChild(source);
     right->addChild(new ChannelTVFormat(id));

@@ -137,7 +137,7 @@ bool ExternalRecorder::Open(void)
     m_stream_handler = ExternalStreamHandler::Get(m_channel->GetDevice());
     if (m_stream_handler)
     {
-        if (m_stream_handler->IsOpen())
+        if (m_stream_handler->IsAppOpen())
             LOG(VB_RECORD, LOG_INFO, LOC + "Opened successfully");
         else
         {

@@ -6,6 +6,7 @@
 #include "mythlogging.h"
 #include "mpegtables.h"
 #include "ExternalChannel.h"
+#include "tv_rec.h"
 
 #define LOC  QString("ExternChan[%1](%2): ").arg(GetCardID()).arg(GetDevice())
 
@@ -28,7 +29,15 @@ bool ExternalChannel::Open(void)
         return false;
 
     if (IsOpen())
-        return true;
+    {
+        if (m_stream_handler->IsAppOpen())
+            return true;
+
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Valid stream handler, but app is not open!  Resetting."));
+        Close();
+    }
+
 
     if (!InitializeInputs())
         return false;
@@ -58,8 +67,10 @@ void ExternalChannel::Close()
     }
 }
 
-bool ExternalChannel::Tune(const DTVMultiplex &tuning, QString /*inputname*/)
+bool ExternalChannel::Tune(const QString &channum)
 {
+    LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Tune(%1)").arg(channum));
+
     if (!IsOpen())
     {
         LOG(VB_CHANNEL, LOG_ERR, LOC + "Tune failed, not open");
@@ -70,27 +81,21 @@ bool ExternalChannel::Tune(const DTVMultiplex &tuning, QString /*inputname*/)
         return true;
 
     QString result;
-    QString chan = QString("%1").arg(tuning.frequency);
 
-    LOG(VB_CHANNEL, LOG_INFO, LOC + "Tuning to " + chan);
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "Tuning to " + channum);
 
-    if (!m_stream_handler->ProcessCommand("TuneChannel " + chan, 5000, result))
-        return false;
-
-    if (result.startsWith("OK:Tuned"))
+    if (!m_stream_handler->ProcessCommand("TuneChannel " + channum, 5000, result))
     {
-        SetSIStandard(tuning.sistandard);
-        return true;
+        LOG(VB_CHANNEL, LOG_ERR, LOC + QString
+            ("Failed to Tune %1: %2").arg(channum).arg(result));
+        return false;
     }
 
-    LOG(VB_CHANNEL, LOG_ERR, LOC + QString
-        ("Failed to Tune %1: %2").arg(chan).arg(result));
-
-    return false;
+    return true;
 }
 
 bool ExternalChannel::EnterPowerSavingMode(void)
 {
-//    Close();
+    Close();
     return true;
 }

@@ -27,10 +27,8 @@ class ExternalChannel : public DTVChannel
 
     // ATSC/DVB scanning/tuning stuff
     using DTVChannel::Tune;
-    virtual bool Tune(const DTVMultiplex &tuning, QString inputname);
-    virtual bool Tune(const QString&, int)          { return true; }
-    virtual bool Tune(uint64_t, QString)            { return true; }
-
+    virtual bool Tune(const DTVMultiplex&, QString) { return true; }
+    virtual bool Tune(const QString &channum);
 
     virtual bool EnterPowerSavingMode(void);
 

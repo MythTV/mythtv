@@ -21,7 +21,8 @@ void SimpleDBStorage::Load(void)
     else if (query.next())
     {
         QString result = query.value(0).toString();
-        if (!result.isNull())
+        // a 'NULL' QVariant does not get converted to a 'NULL' QString
+        if (!query.value(0).isNull())
         {
             initval = result;
             user->SetDBValue(result);

@@ -9,6 +9,7 @@ QT += widgets
 
 TEMPLATE = app
 CONFIG += thread
+target.files = mythfilerecorder
 target.path = $${PREFIX}/bin
 INSTALLS = target
 
@@ -18,7 +19,7 @@ QMAKE_CLEAN += $(TARGET)
 HEADERS += mythfilerecorder.h
 HEADERS += commandlineparser.h
 
-SOURCES += main.cpp
+SOURCES += mythfilerecorder.cpp
 SOURCES += commandlineparser.cpp
 
 #The following line was inserted by qt3to4
