@@ -20,6 +20,8 @@
 #include "videoutils.h"
 #include "programinfo.h" // for format_season_and_episode
 
+using namespace std;
+
 struct SortData
 {
     SortData(const QString &title, const QString &filename, const QString &id) :
@@ -565,7 +567,7 @@ void VideoMetadataImp::fromDBRow(MSqlQuery &query)
     m_year = query.value(5).toInt();
     m_releasedate = query.value(6).toDate();
     m_userrating = (float)query.value(7).toDouble();
-    if (std::isnan(m_userrating) || m_userrating < 0)
+    if (isnan(m_userrating) || m_userrating < 0)
         m_userrating = 0.0;
     if (m_userrating > 10.0)
         m_userrating = 10.0;
@@ -644,7 +646,7 @@ void VideoMetadataImp::saveToDatabase()
         m_trailer = VIDEO_TRAILER_DEFAULT;
     if (m_inetref.isEmpty())
         m_inetref = VIDEO_INETREF_DEFAULT;
-    if (std::isnan(m_userrating))
+    if (isnan(m_userrating))
         m_userrating = 0.0;
     if (m_userrating < -10.0 || m_userrating > 10.0)
         m_userrating = 0.0;
