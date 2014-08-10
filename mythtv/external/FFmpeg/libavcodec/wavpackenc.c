@@ -30,17 +30,17 @@
 #include "wavpack.h"
 
 #define UPDATE_WEIGHT(weight, delta, source, result) \
-    if (source && result) { \
-        int32_t s = (int32_t) (source ^ result) >> 31; \
-        weight = (delta ^ s) + (weight - s); \
+    if ((source) && (result)) { \
+        int32_t s = (int32_t) ((source) ^ (result)) >> 31; \
+        weight = ((delta) ^ s) + ((weight) - s); \
     }
 
-#define APPLY_WEIGHT_F(weight, sample) (((((sample & 0xffff) * weight) >> 9) + \
-    (((sample & ~0xffff) >> 9) * weight) + 1) >> 1)
+#define APPLY_WEIGHT_F(weight, sample) ((((((sample) & 0xffff) * (weight)) >> 9) + \
+    ((((sample) & ~0xffff) >> 9) * (weight)) + 1) >> 1)
 
-#define APPLY_WEIGHT_I(weight, sample) ((weight * sample + 512) >> 10)
+#define APPLY_WEIGHT_I(weight, sample) (((weight) * (sample) + 512) >> 10)
 
-#define APPLY_WEIGHT(weight, sample) (sample != (short) sample ? \
+#define APPLY_WEIGHT(weight, sample) ((sample) != (short) (sample) ? \
     APPLY_WEIGHT_F(weight, sample) : APPLY_WEIGHT_I (weight, sample))
 
 #define CLEAR(destin) memset(&destin, 0, sizeof(destin));
@@ -638,7 +638,7 @@ static uint32_t log2sample(uint32_t v, int limit, uint32_t *result)
 
     if ((v += v >> 9) < (1 << 8)) {
         dbits = nbits_table[v];
-        *result += (dbits << 8) + wp_log2_table[(v << (9 - dbits)) & 0xff];
+        result += (dbits << 8) + wp_log2_table[(v << (9 - dbits)) & 0xff];
     } else {
         if (v < (1L << 16))
             dbits = nbits_table[v >> 8] + 8;
@@ -647,7 +647,7 @@ static uint32_t log2sample(uint32_t v, int limit, uint32_t *result)
         else
             dbits = nbits_table[v >> 24] + 24;
 
-        *result += dbits = (dbits << 8) + wp_log2_table[(v >> (dbits - 9)) & 0xff];
+        result += dbits = (dbits << 8) + wp_log2_table[(v >> (dbits - 9)) & 0xff];
 
         if (limit && dbits >= limit)
             return 1;

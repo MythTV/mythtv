@@ -27,6 +27,9 @@ LIBAVCODEC_$MAJOR {
                 ff_jpeg_fdct*;
                 ff_dnxhd_get_cid_table;
                 ff_dnxhd_cid_table;
+                ff_idctdsp_init;
+                ff_fdctdsp_init;
+                ff_pixblockdsp_init;
                 ff_ue_golomb_vlc_code;
                 ff_golomb_vlc_len;
                 ff_se_golomb_vlc_code;

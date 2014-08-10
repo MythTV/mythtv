@@ -138,7 +138,7 @@ enum var_name {
     VAR_VARS_NB
 };
 
-typedef struct {
+typedef struct SelectContext {
     const AVClass *class;
     char *expr_str;
     AVExpr *expr;
@@ -271,7 +271,7 @@ static double get_scene_score(AVFilterContext *ctx, AVFrame *frame)
 
         for (y = 0; y < frame->height - 8; y += 8) {
             for (x = 0; x < frame->width*3 - 8; x += 8) {
-                sad += select->c.sad[1](select, p1 + x, p2 + x,
+                sad += select->c.sad[1](NULL, p1 + x, p2 + x,
                                         linesize, 8);
                 nb_sad += 8 * 8;
             }
@@ -308,7 +308,6 @@ static void select_frame(AVFilterContext *ctx, AVFrame *frame)
     select->var_values[VAR_PTS] = TS2D(frame->pts);
     select->var_values[VAR_T  ] = TS2D(frame->pts) * av_q2d(inlink->time_base);
     select->var_values[VAR_POS] = av_frame_get_pkt_pos(frame) == -1 ? NAN : av_frame_get_pkt_pos(frame);
-    select->var_values[VAR_KEY] = frame->key_frame;
 
     switch (inlink->type) {
     case AVMEDIA_TYPE_AUDIO:
@@ -338,20 +337,21 @@ static void select_frame(AVFilterContext *ctx, AVFrame *frame)
            select->var_values[VAR_N],
            select->var_values[VAR_PTS],
            select->var_values[VAR_T],
-           frame->key_frame);
+           (int)select->var_values[VAR_KEY]);
 
     switch (inlink->type) {
     case AVMEDIA_TYPE_VIDEO:
         av_log(inlink->dst, AV_LOG_DEBUG, " interlace_type:%c pict_type:%c scene:%f",
-               (!frame->interlaced_frame) ? 'P' :
-               frame->top_field_first     ? 'T' : 'B',
-               av_get_picture_type_char(frame->pict_type),
+               select->var_values[VAR_INTERLACE_TYPE] == INTERLACE_TYPE_P ? 'P' :
+               select->var_values[VAR_INTERLACE_TYPE] == INTERLACE_TYPE_T ? 'T' :
+               select->var_values[VAR_INTERLACE_TYPE] == INTERLACE_TYPE_B ? 'B' : '?',
+               av_get_picture_type_char(select->var_values[VAR_PICT_TYPE]),
                select->var_values[VAR_SCENE]);
         break;
     case AVMEDIA_TYPE_AUDIO:
-        av_log(inlink->dst, AV_LOG_DEBUG, " samples_n:%d consumed_samples_n:%f",
-               frame->nb_samples,
-               select->var_values[VAR_CONSUMED_SAMPLES_N]);
+        av_log(inlink->dst, AV_LOG_DEBUG, " samples_n:%d consumed_samples_n:%d",
+               (int)select->var_values[VAR_SAMPLES_N],
+               (int)select->var_values[VAR_CONSUMED_SAMPLES_N]);
         break;
     }
 
