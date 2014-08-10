@@ -68,7 +68,7 @@ QFileInfo Content::GetFile( const QString &sStorageGroup,
     {
         QString sMsg ( "GetFile - FileName missing." );
 
-        LOG(VB_UPNP, LOG_ERR, sMsg);
+        //LOG(VB_UPNP, LOG_ERR, sMsg);
 
         throw sMsg;
     }
@@ -117,15 +117,15 @@ QFileInfo Content::GetImageFile( const QString &sStorageGroup,
     if (sGroup.isEmpty())
     {
         LOG(VB_UPNP, LOG_WARNING,
-            "GetFile - StorageGroup missing... using 'Default'");
+            "GetImageFile - StorageGroup missing... using 'Default'");
         sGroup = "Default";
     }
 
     if (sFileName.isEmpty())
     {
-        QString sMsg ( "GetFile - FileName missing." );
+        QString sMsg ( "GetImageFile - FileName missing." );
 
-        LOG(VB_UPNP, LOG_ERR, sMsg);
+        //LOG(VB_UPNP, LOG_WARNING, sMsg);
 
         throw sMsg;
     }
@@ -139,7 +139,7 @@ QFileInfo Content::GetImageFile( const QString &sStorageGroup,
 
     if (sFullFileName.isEmpty())
     {
-        LOG(VB_UPNP, LOG_ERR,
+        LOG(VB_UPNP, LOG_WARNING,
             QString("GetImageFile - Unable to find %1.").arg(sFileName));
 
         return QFileInfo();
@@ -149,19 +149,22 @@ QFileInfo Content::GetImageFile( const QString &sStorageGroup,
     // check to see if the file (still) exists
     // ----------------------------------------------------------------------
 
-    if ((nWidth == 0) && (nHeight == 0))
+    if (!QFile::exists( sFullFileName ))
     {
-        if (QFile::exists( sFullFileName ))
-        {
-            return QFileInfo( sFullFileName );
-        }
-
-        LOG(VB_UPNP, LOG_ERR,
+        LOG(VB_UPNP, LOG_WARNING,
             QString("GetImageFile - File Does not exist %1.").arg(sFullFileName));
-
         return QFileInfo();
     }
 
+    // ----------------------------------------------------------------------
+    // If no scaling is required return the file info
+    // ----------------------------------------------------------------------
+    if ((nWidth == 0) && (nHeight == 0))
+        return QFileInfo( sFullFileName );
+
+    // ----------------------------------------------------------------------
+    // Create a filename for the scaled copy
+    // ----------------------------------------------------------------------
     QString sNewFileName = QString( "%1.%2x%3.jpg" )
                               .arg( sFullFileName )
                               .arg( nWidth    )
@@ -180,9 +183,9 @@ QFileInfo Content::GetImageFile( const QString &sStorageGroup,
 
     float fAspect = 0.0;
 
-    QImage *pImage = new QImage( sFullFileName);
+    QImage *pImage = new QImage( sFullFileName );
 
-    if (!pImage)
+    if (!pImage || pImage->isNull())
         return QFileInfo();
 
     if (fAspect <= 0)
@@ -257,6 +260,9 @@ QFileInfo Content::GetRecordingArtwork ( const QString   &sType,
 {
     ArtworkMap map = GetArtwork(sInetref, nSeason);
 
+    if (map.isEmpty())
+        return QFileInfo();
+
     VideoArtworkType type = kArtworkCoverart;
     QString sgroup;
 
@@ -276,8 +282,14 @@ QFileInfo Content::GetRecordingArtwork ( const QString   &sType,
         type = kArtworkBanner;
     }
 
+    if (!map.contains(type))
+        return QFileInfo();
+
     QUrl url(map.value(type).url);
     QString sFileName = url.path();
+
+    if (sFileName.isEmpty())
+        return QFileInfo();
 
     return GetImageFile( sgroup, sFileName, nWidth, nHeight);
 }
@@ -359,6 +371,9 @@ QFileInfo Content::GetVideoArtwork( const QString &sType,
         return QFileInfo();
 
     QString sFileName = query.value(0).toString();
+
+    if (sFileName.isEmpty())
+        return QFileInfo();
 
     return GetImageFile( sgroup, sFileName, nWidth, nHeight );
 }

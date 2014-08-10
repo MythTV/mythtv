@@ -20,6 +20,7 @@
 
 #include "upnpexp.h"
 #include "httprequest.h"
+#include <referencecounter.h>
 
 class CDSObject;
 class QTextStream;
@@ -156,7 +157,7 @@ typedef QStringList FilterMap;
 
 //////////////////////////////////////////////////////////////////////////////
 
-class UPNP_PUBLIC CDSObject
+class UPNP_PUBLIC CDSObject : public ReferenceCounter
 {
     public:
         short           m_nUpdateId;
@@ -186,7 +187,8 @@ class UPNP_PUBLIC CDSObject
 
         Properties      m_properties;
         CDSObjects      m_children;
-        long            m_nChildCount;
+        uint32_t        m_nChildCount;
+        uint32_t        m_nChildContainerCount;
 
         Resources       m_resources;
 
@@ -201,6 +203,7 @@ class UPNP_PUBLIC CDSObject
         Property         *AddProperty( Property *pProp  );
         QList<Property*>  GetProperties( const QString &sName );
         CDSObject        *AddChild   ( CDSObject   *pChild );
+        CDSObjects        GetChildren( void ) { return m_children; }
 
         ContainerClass *AddSearchClass( ContainerClass *pClass );
         ContainerClass *AddCreateClass( ContainerClass *pClass );
@@ -208,11 +211,16 @@ class UPNP_PUBLIC CDSObject
         void          SetPropValue( const QString &sName, const QString &sValue,
                                     const QString &type = "" );
         QString       GetPropValue( const QString &sName ) const;
-        QString       toXml      ( FilterMap &filter ) const;
-        void          toXml      ( QTextStream &os, FilterMap &filter ) const;
+        QString       toXml      ( FilterMap &filter,
+                                   bool ignoreChildren = false ) const;
+        void          toXml      ( QTextStream &os, FilterMap &filter,
+                                   bool ignoreChildren = false ) const;
 
-        long          GetChildCount( void ) const;
-        void          SetChildCount( long nCount );
+        uint32_t      GetChildCount( void ) const;
+        void          SetChildCount( uint32_t nCount );
+
+        uint32_t      GetChildContainerCount( void ) const;
+        void          SetChildContainerCount( uint32_t nCount );
 
         Resource     *AddResource( QString sProtocol, QString sURI );
 

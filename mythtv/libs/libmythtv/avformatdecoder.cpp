@@ -1286,7 +1286,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     if (m_playbackinfo)
     {
         dur = m_playbackinfo->QueryTotalDuration();
-        dur /= 1000000;
+        dur /= 1000;
     }
 
     if (dur == 0)

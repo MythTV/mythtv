@@ -90,7 +90,7 @@ static MIMETypes g_MIMETypes[] =
     // Audio Mime Types:
     { "aac" , "audio/mp4"                  },
     { "ac3" , "audio/vnd.dolby.dd-raw"     }, // DLNA?
-    { "flac", "audio/x-flac"               }, // This could be audio/flac or application/flac
+    { "flac", "audio/x-flac"               }, // This may become audio/flac in the future
     { "m4a" , "audio/x-m4a"                },
     { "mid" , "audio/midi"                 },
     { "mka" , "audio/x-matroska"           },

@@ -71,8 +71,8 @@ class UPNP_PUBLIC UPnpCDSRequest
 
         QString           m_sContainerID;
         QString           m_sFilter;
-        short             m_nStartingIndex;
-        short             m_nRequestedCount;
+        uint16_t          m_nStartingIndex;
+        uint16_t          m_nRequestedCount;
         QString           m_sSortCriteria;
 
         // Browse specific properties
@@ -111,8 +111,8 @@ class UPNP_PUBLIC UPnpCDSExtensionResults
         UPnPResultCode          m_eErrorCode;
         QString                 m_sErrorDesc;
 
-        short                   m_nTotalMatches;
-        short                   m_nUpdateID;
+        uint16_t                m_nTotalMatches;
+        uint16_t                m_nUpdateID;
 
     public:
 
@@ -123,14 +123,14 @@ class UPNP_PUBLIC UPnpCDSExtensionResults
         }
         ~UPnpCDSExtensionResults()
         {
-            while (!m_List.empty())
+            while (!m_List.isEmpty())
             {
-                delete m_List.back();
-                m_List.pop_back();
+                m_List.takeLast()->DecrRef();
             }
         }
 
         void    Add         ( CDSObject *pObject );
+        void    Add         ( CDSObjects objects );
         QString GetResultXML(FilterMap &filter);
 };
 
@@ -147,7 +147,10 @@ typedef struct
     const char *childClass;
 
 } UPnpCDSRootInfo;
-         
+
+typedef QMap<QString, QString> IDTokenMap;
+typedef QPair<QString, QString> IDToken;
+
 class UPNP_PUBLIC UPnpCDSExtension
 {
     public:
@@ -160,68 +163,47 @@ class UPNP_PUBLIC UPnpCDSExtension
 
         QString RemoveToken ( const QString &sToken, const QString &sStr, int num );
 
-        virtual UPnpCDSExtensionResults *ProcessRoot     ( UPnpCDSRequest          *pRequest, 
-                                                           UPnpCDSExtensionResults *pResults,
-                                                           QStringList             &idPath );
-        virtual UPnpCDSExtensionResults *ProcessAll      ( UPnpCDSRequest          *pRequest, 
-                                                           UPnpCDSExtensionResults *pResults,
-                                                           QStringList             &idPath );
-        virtual UPnpCDSExtensionResults *ProcessItem     ( UPnpCDSRequest          *pRequest,
-                                                           UPnpCDSExtensionResults *pResults,
-                                                           QStringList             &idPath );
-        virtual UPnpCDSExtensionResults *ProcessKey      ( UPnpCDSRequest          *pRequest,
-                                                           UPnpCDSExtensionResults *pResults,
-                                                           QStringList             &idPath );
-        virtual UPnpCDSExtensionResults *ProcessContainer( UPnpCDSRequest          *pRequest,
-                                                           UPnpCDSExtensionResults *pResults,
-                                                           int                      nNodeIdx,
-                                                           QStringList             &idPath );
-
         // ------------------------------------------------------------------
-
-        virtual void             CreateItems     ( UPnpCDSRequest          *pRequest,
-                                                   UPnpCDSExtensionResults *pResults,
-                                                   int                      nNodeIdx,
-                                                   const QString           &sKey, 
-                                                   bool                     bAddRef );
 
         virtual bool IsBrowseRequestForUs  ( UPnpCDSRequest *pRequest );
         virtual bool IsSearchRequestForUs  ( UPnpCDSRequest *pRequest );
 
-        virtual int  GetDistinctCount      ( UPnpCDSRootInfo *pInfo );
-        virtual int  GetCount              ( const QString &sColumn, const QString &sKey );
-
         // ------------------------------------------------------------------
 
-        virtual UPnpCDSRootInfo *GetRootInfo   ( int nIdx) = 0;
-        virtual int              GetRootCount  ( )         = 0;
-        virtual QString          GetTableName  ( QString sColumn      ) = 0;
-        virtual QString          GetItemListSQL( QString sColumn = "" ) = 0;
-        virtual void             BuildItemQuery( MSqlQuery &query, const QStringMap &mapParams ) = 0;
+        virtual int  GetRootCount  ( ) { return m_pRoot->GetChildCount(); }
+        virtual int  GetRootContainerCount ( )
+                                { return m_pRoot->GetChildContainerCount(); }
 
-        virtual void       AddItem( const UPnpCDSRequest    *pRequest,
-                                    const QString           &sObjectId,
+        virtual void CreateRoot ( );
+
+        virtual bool LoadContainer ( const UPnpCDSRequest *pRequest,
+                                     UPnpCDSExtensionResults *pResults,
+                                     IDTokenMap tokens,
+                                     QString currentToken );
+        virtual bool LoadChildren ( const UPnpCDSRequest *pRequest,
                                     UPnpCDSExtensionResults *pResults,
-                                    bool                     bAddRef,
-                                    MSqlQuery               &query )  = 0;
+                                    IDTokenMap tokens,
+                                    QString currentToken );
 
-        virtual CDSObject *CreateContainer( const QString &sId,
-                                            const QString &sTitle,
-                                            const QString &sParentId,
-                                            const QString &sClass );
+        IDTokenMap TokenizeIDString ( const QString &Id ) const;
+        IDToken    GetCurrentToken  ( const QString &Id ) const;
+
+        CDSObject *m_pRoot;
 
     public:
 
         UPnpCDSExtension( QString sName, 
                           QString sExtensionId, 
-                          QString sClass )
+                          QString sClass ) : m_pRoot(NULL)
         {
             m_sName        = QObject::tr(sName.toLatin1().constData());
             m_sExtensionId = sExtensionId;
             m_sClass       = sClass;
         }
 
-        virtual ~UPnpCDSExtension() {}
+        virtual CDSObject *GetRoot ( );
+
+        virtual ~UPnpCDSExtension();
 
         virtual UPnpCDSExtensionResults *Browse( UPnpCDSRequest *pRequest );
         virtual UPnpCDSExtensionResults *Search( UPnpCDSRequest *pRequest );

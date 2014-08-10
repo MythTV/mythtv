@@ -15,7 +15,8 @@
         <modelDescription>MythTV AV Media Server</modelDescription>
         <modelURL>http://www.mythtv.org/</modelURL>
         <presentationURL>/</presentationURL>
-        <dlna:X_DLNADOC xmlns:dlna="urn:schemas-dlna-org:device-1-0">DMS-1.00</dlna:X_DLNADOC>
+        <dlna:X_DLNADOC xmlns:dlna="urn:schemas-dlna-org:device-1-0">DMS-1.51</dlna:X_DLNADOC>
+        <dlna:X_DLNACAP xmlns:dlna="urn:schemas-dlna-org:device-1-0"></dlna:X_DLNACAP>
         <!-- uncomment to override defaults <serialNumber>MYTHTV-UPNP-01</serialNumber> -->
         <deviceList>
             <device>

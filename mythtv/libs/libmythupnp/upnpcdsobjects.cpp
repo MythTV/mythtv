@@ -30,12 +30,13 @@ inline QString GetBool( bool bVal ) { return( (bVal) ? "1" : "0" ); }
 CDSObject::CDSObject( const QString &sId, 
                       const QString &sTitle, 
                       const QString &sParentId )
-    : m_nUpdateId(1), m_eType(OT_Container),
+    : ReferenceCounter("CDSObject", false),
+      m_nUpdateId(1), m_eType(OT_Container),
       m_sId(HTTPRequest::Encode(sId)),
       m_sParentId(HTTPRequest::Encode(sParentId)),
       m_sTitle(HTTPRequest::Encode(sTitle)),
       m_bRestricted(true), m_bSearchable(false),
-      m_sWriteStatus("PROTECTED"), m_nChildCount(-1)
+      m_sWriteStatus("PROTECTED"), m_nChildCount(0), m_nChildContainerCount(0)
 {
 }
 
@@ -47,19 +48,20 @@ CDSObject::~CDSObject()
 {
     while (!m_resources.empty())
     {
-        delete m_resources.back();
-        m_resources.pop_back();
+        delete m_resources.takeLast();
     }
 
     while (!m_children.empty())
     {
-        delete m_children.back();
-        m_children.pop_back();
+        m_children.takeLast()->DecrRef();
     }
 
     Properties::iterator it = m_properties.begin();
     for (; it != m_properties.end(); ++it)
+    {
         delete *it;
+        *it = NULL;
+    }
     m_properties.clear();
 }
 
@@ -124,12 +126,15 @@ void CDSObject::SetPropValue( const QString &sName, const QString &sValue,
         if ((*it)->m_bMultiValue)
             LOG(VB_UPNP, LOG_WARNING,
                 QString("SetPropValue(%1) called on property with bAllowMulti. "
-                        "Only the last inserted property will be updated."));
+                        "Only the last inserted property will be updated.").arg(sName));
         (*it)->SetValue(sValue);
 
         if (!sType.isEmpty())
             (*it)->AddAttribute( "type", sType );
     }
+    else
+        LOG(VB_UPNP, LOG_WARNING,
+                QString("SetPropValue(%1) called with non-existent property.").arg(sName));
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -158,26 +163,17 @@ QString CDSObject::GetPropValue(const QString &sName) const
 
 CDSObject *CDSObject::AddChild( CDSObject *pChild )
 {
-    if (pChild)
+    if (pChild && !m_children.contains(pChild))
     {
+        pChild->IncrRef();
+        m_nChildCount++;
+        if (pChild->m_eType == OT_Container)
+            m_nChildContainerCount++;
         pChild->m_sParentId = m_sId;
         m_children.append( pChild );
     }
 
     return( pChild );
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-long CDSObject::GetChildCount(void) const
-{
-    long nCount = m_children.count();
-    if ( nCount == 0)
-        return( m_nChildCount );
-    
-    return( nCount );
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -193,25 +189,63 @@ Resource *CDSObject::AddResource( QString sProtocol, QString sURI )
     return( pRes );
 }
 
-/////////////////////////////////////////////////////////////////////////////
-// Allows the caller to set child count without having to load children.
-/////////////////////////////////////////////////////////////////////////////
 
-void CDSObject::SetChildCount( long nCount )
+/**
+ * \brief Return the number of children in this container
+ */
+
+uint32_t CDSObject::GetChildCount(void) const
+{
+    uint32_t nCount = m_children.count();
+    if (nCount == 0)
+        return( m_nChildCount );
+
+    return( nCount );
+}
+
+/**
+ * \brief Allows the caller to set childCount without having to load children.
+ */
+
+void CDSObject::SetChildCount( uint32_t nCount )
 {
     m_nChildCount = nCount;
+}
+
+/**
+ * \brief Return the number of child containers in this container
+ *
+ * Per the UPnP Content Directory Service spec returning the number of
+ * containers lets the client determine the number of items by subtracting
+ * this value from the childCount
+ */
+
+uint32_t CDSObject::GetChildContainerCount(void) const
+{
+    return m_nChildContainerCount;
+}
+
+/**
+ * \brief Allows the caller to set childContainerCount without having to load
+ *        children.
+ */
+
+void CDSObject::SetChildContainerCount( uint32_t nCount )
+{
+    m_nChildContainerCount = nCount;
 }
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QString CDSObject::toXml( FilterMap &filter ) const
+QString CDSObject::toXml( FilterMap &filter,
+                          bool ignoreChildren ) const
 {
     QString     sXML;
     QTextStream os( &sXML, QIODevice::WriteOnly );
     os.setCodec(QTextCodec::codecForName("UTF-8"));
-    toXml(os, filter);
+    toXml(os, filter, ignoreChildren);
     os << flush;
     return( sXML );
 }
@@ -220,7 +254,8 @@ QString CDSObject::toXml( FilterMap &filter ) const
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void CDSObject::toXml(QTextStream &os, FilterMap &filter) const
+void CDSObject::toXml( QTextStream &os, FilterMap &filter,
+                       bool ignoreChildren ) const
 {
     QString sEndTag = "";
     bool    bFilter = true;
@@ -232,9 +267,13 @@ void CDSObject::toXml(QTextStream &os, FilterMap &filter) const
     {   
         case OT_Container:
         {
-            os << "<container id=\"" << m_sId << "\" parentID=\"" << m_sParentId
-               << "\" childCount=\"" << GetChildCount() << "\" restricted=\"" << GetBool( m_bRestricted )
-               << "\" searchable=\"" << GetBool( m_bSearchable ) << "\" >" << endl;
+            os << "<container id=\"" << m_sId
+               << "\" parentID=\"" << m_sParentId
+               << "\" childCount=\"" << GetChildCount()
+               << "\" childContainerCount=\"" << GetChildContainerCount()
+               << "\" restricted=\"" << GetBool( m_bRestricted )
+               << "\" searchable=\"" << GetBool( m_bSearchable )
+               << "\" >" << endl;
 
             sEndTag = "</container>";
 
@@ -242,8 +281,10 @@ void CDSObject::toXml(QTextStream &os, FilterMap &filter) const
         }
         case OT_Item:
         {
-            os << "<item id=\"" << m_sId << "\" parentID=\"" << m_sParentId
-               << "\" restricted=\"" << GetBool( m_bRestricted ) << "\" >" << endl;
+            os << "<item id=\"" << m_sId
+               << "\" parentID=\"" << m_sParentId
+               << "\" restricted=\"" << GetBool( m_bRestricted )
+               << "\" >" << endl;
 
             sEndTag = "</item>";
 
@@ -310,9 +351,12 @@ void CDSObject::toXml(QTextStream &os, FilterMap &filter) const
     // Output any children
     // ----------------------------------------------------------------------
 
-    CDSObjects::const_iterator cit = m_children.begin();
-    for (; cit != m_children.end(); ++cit)
-        (*cit)->toXml(os, filter);
+    if (!ignoreChildren)
+    {
+        CDSObjects::const_iterator cit = m_children.begin();
+        for (; cit != m_children.end(); ++cit)
+            (*cit)->toXml(os, filter);
+    }
 
     // ----------------------------------------------------------------------
     // Close Element Tag
@@ -336,6 +380,7 @@ CDSObject *CDSObject::CreateItem( QString sId, QString sTitle, QString sParentId
     }
 
     pObject->m_eType = OT_Item;
+    pObject->m_bSearchable = false; // UPnP - CDS B.1.5 @searchable
 
     pObject->AddProperty( new Property( "refID" ) );
 
@@ -353,11 +398,18 @@ CDSObject *CDSObject::CreateContainer( QString sId, QString sTitle, QString sPar
     }
 
     pObject->m_eType = OT_Container;
+    pObject->m_bSearchable = true; // DLNA requirement - 7.4.3.5.9
 
     pObject->AddProperty( new Property( "childCount"  ));                   
     pObject->AddProperty( new Property( "createClass" ));                   
     pObject->AddProperty( new Property( "searchClass" ));                   
-    pObject->AddProperty( new Property( "searchable"  ));                   
+    pObject->AddProperty( new Property( "searchable"  ));
+
+    pObject->AddProperty( new Property( "creator", "dc" ));
+    pObject->AddProperty( new Property( "date"   , "dc" ));
+
+    pObject->AddProperty( new Property( "longDescription", "upnp"   ));
+    pObject->AddProperty( new Property( "description"    , "dc"   ));
 
     return( pObject );
 }
@@ -382,6 +434,9 @@ CDSObject *CDSObject::CreateAudioItem( QString sId, QString sTitle, QString sPar
     pObject->AddProperty( new Property( "relation"        , "dc"   ));
     pObject->AddProperty( new Property( "rights"          , "dc"   ));
 
+    pObject->AddProperty( new Property( "creator"         , "dc" ));
+    pObject->AddProperty( new Property( "date"            , "dc" ));
+
     return( pObject );
 }
 
@@ -403,8 +458,6 @@ CDSObject *CDSObject::CreateMusicTrack( QString sId, QString sTitle, QString sPa
     pObject->AddProperty( new Property( "playlist"            , "upnp" ));
     pObject->AddProperty( new Property( "storageMedium"       , "upnp" ));
     pObject->AddProperty( new Property( "contributor"         , "dc"   ));
-    pObject->AddProperty( new Property( "creator"             , "dc"   ));
-    pObject->AddProperty( new Property( "date"                , "dc"   ));
 
     pObject->AddProperty( new Property( "playbackCount"       , "upnp" ));
     pObject->AddProperty( new Property( "lastPlaybackTime"    , "upnp" ));
@@ -424,7 +477,6 @@ CDSObject *CDSObject::CreateMusicTrack( QString sId, QString sTitle, QString sPa
     pObject->AddProperty( new Property( "playlist"            , "upnp" ));
     pObject->AddProperty( new Property( "storageMedium"       , "upnp" ));
     pObject->AddProperty( new Property( "contributor"         , "dc"   ));
-    pObject->AddProperty( new Property( "date"                , "dc"   ));
 #endif
 
     return( pObject );
@@ -466,7 +518,6 @@ CDSObject *CDSObject::CreateAudioBook( QString sId, QString sTitle, QString sPar
     pObject->AddProperty( new Property( "storageMedium", "upnp" ));
     pObject->AddProperty( new Property( "producer"     , "upnp" ));
     pObject->AddProperty( new Property( "contributor"  , "dc"   ));
-    pObject->AddProperty( new Property( "date"         , "dc"   ));
 
     return( pObject );
 }
@@ -498,10 +549,18 @@ CDSObject *CDSObject::CreateVideoItem( QString sId, QString sTitle, QString sPar
     pObject->AddProperty( new Property( "language"       , "dc"   ));
     pObject->AddProperty( new Property( "relation"       , "dc"   ));
 
+    pObject->AddProperty( new Property( "creator"        , "dc" ));
+    pObject->AddProperty( new Property( "date"           , "dc" ));
+
     pObject->AddProperty( new Property( "channelID"      , "upnp" ));
     pObject->AddProperty( new Property( "callSign"       , "upnp" ));
     pObject->AddProperty( new Property( "channelNr"      , "upnp" ));
+    pObject->AddProperty( new Property( "channelName"    , "upnp" ));
 
+    pObject->AddProperty( new Property( "scheduledStartTime", "upnp" ));
+    pObject->AddProperty( new Property( "scheduledEndTime"  , "upnp" ));
+    pObject->AddProperty( new Property( "scheduledDuration" , "upnp" ));
+    pObject->AddProperty( new Property( "srsRecordScheduleID" , "upnp" ));
     pObject->AddProperty( new Property( "recordedStartDateTime"   , "upnp" ));
     pObject->AddProperty( new Property( "recordedDuration"        , "upnp" ));
     pObject->AddProperty( new Property( "recordedDayOfWeek"       , "upnp" ));
@@ -510,12 +569,9 @@ CDSObject *CDSObject::CreateVideoItem( QString sId, QString sTitle, QString sPar
     pObject->AddProperty( new Property( "seriesID"       , "upnp" ));
 
     // Added for Microsoft Media Player Compatibility
-
-    pObject->AddProperty( new Property( "creator"        , "dc"   ));
     pObject->AddProperty( new Property( "artist"         , "upnp" ));
     pObject->AddProperty( new Property( "album"          , "upnp" ));
-    pObject->AddProperty( new Property( "date"           , "dc"   ));
-
+    //
 
     pObject->AddProperty( new Property( "albumArtURI", "upnp", false, "", true )); // TN
     pObject->AddProperty( new Property( "albumArtURI", "upnp", false, "", true )); // SM
@@ -538,9 +594,6 @@ CDSObject *CDSObject::CreateMovie( QString sId, QString sTitle, QString sParentI
 
     pObject->AddProperty( new Property( "storageMedium"     , "upnp" ));
     pObject->AddProperty( new Property( "DVDRegionCode"     , "upnp" ));
-    pObject->AddProperty( new Property( "channelName"       , "upnp" ));
-    pObject->AddProperty( new Property( "scheduledStartTime", "upnp" ));
-    pObject->AddProperty( new Property( "scheduledEndTime"  , "upnp" ));
 
     return( pObject );
 }
@@ -559,8 +612,6 @@ CDSObject *CDSObject::CreateVideoBroadcast( QString sId, QString sTitle, QString
 
     pObject->AddProperty( new Property( "icon"     , "upnp" ));
     pObject->AddProperty( new Property( "region"   , "upnp" ));
-    pObject->AddProperty( new Property( "channelNr", "upnp" ));
-    pObject->AddProperty( new Property( "callsign" , "upnp" ));
 
     return( pObject );
 }
@@ -580,11 +631,7 @@ CDSObject *CDSObject::CreateMusicVideoClip( QString sId, QString sTitle, QString
     pObject->AddProperty( new Property( "artist"            , "upnp" ));
     pObject->AddProperty( new Property( "storageMedium"     , "upnp" ));
     pObject->AddProperty( new Property( "album"             , "upnp" ));
-    pObject->AddProperty( new Property( "scheduledStartTime", "upnp" ));
-    pObject->AddProperty( new Property( "scheduledStopTime" , "upnp" ));
-    pObject->AddProperty( new Property( "director"          , "upnp" ));
     pObject->AddProperty( new Property( "contributor"       , "dc"   ));
-    pObject->AddProperty( new Property( "date"              , "dc"   ));
 
     return( pObject );
 }
@@ -606,8 +653,10 @@ CDSObject *CDSObject::CreateImageItem( QString sId, QString sTitle, QString sPar
     pObject->AddProperty( new Property( "rating"         , "upnp" ));
     pObject->AddProperty( new Property( "description"    , "dc"   )); 
     pObject->AddProperty( new Property( "publisher"      , "dc"   )); 
-    pObject->AddProperty( new Property( "date"           , "dc"   )); 
     pObject->AddProperty( new Property( "rights"         , "dc"   ));
+
+    pObject->AddProperty( new Property( "creator"        , "dc" ));
+    pObject->AddProperty( new Property( "date"           , "dc" ));
 
     return( pObject );
 }
@@ -646,7 +695,6 @@ CDSObject *CDSObject::CreatePlaylistItem ( QString sId, QString sTitle, QString 
     pObject->AddProperty( new Property( "longDescription", "upnp" ));
     pObject->AddProperty( new Property( "storageMedium"  , "upnp" ));
     pObject->AddProperty( new Property( "description"    , "dc"   ));
-    pObject->AddProperty( new Property( "date"           , "dc"   ));
     pObject->AddProperty( new Property( "language"       , "dc"   ));
 
     return( pObject );
@@ -672,7 +720,6 @@ CDSObject *CDSObject::CreateTextItem( QString sId, QString sTitle, QString sPare
     pObject->AddProperty( new Property( "description"    , "dc"   ));
     pObject->AddProperty( new Property( "publisher"      , "dc"   ));
     pObject->AddProperty( new Property( "contributor"    , "dc"   ));
-    pObject->AddProperty( new Property( "date"           , "dc"   ));
     pObject->AddProperty( new Property( "relation"       , "dc"   ));
     pObject->AddProperty( new Property( "language"       , "dc"   ));
     pObject->AddProperty( new Property( "rights"         , "dc"   ));
@@ -693,13 +740,16 @@ CDSObject *CDSObject::CreateAlbum( QString sId, QString sTitle, QString sParentI
     CreateContainer( sId, sTitle, sParentId, pObject );
 
     pObject->AddProperty( new Property( "storageMedium"  , "upnp" ));
-    pObject->AddProperty( new Property( "longDescription", "dc"   ));
-    pObject->AddProperty( new Property( "description"    , "dc"   ));
     pObject->AddProperty( new Property( "publisher"      , "dc"   ));
     pObject->AddProperty( new Property( "contributor"    , "dc"   ));
-    pObject->AddProperty( new Property( "date"           , "dc"   ));
     pObject->AddProperty( new Property( "relation"       , "dc"   ));
     pObject->AddProperty( new Property( "rights"         , "dc"   ));
+
+    // Artwork
+    pObject->AddProperty( new Property( "albumArtURI", "upnp", false, "", true)); // TN
+    pObject->AddProperty( new Property( "albumArtURI", "upnp", false, "", true)); // SM
+    pObject->AddProperty( new Property( "albumArtURI", "upnp", false, "", true)); // MED
+    pObject->AddProperty( new Property( "albumArtURI", "upnp", false, "", true)); // LRG
 
     return( pObject );
 }
@@ -719,14 +769,7 @@ CDSObject *CDSObject::CreateMusicAlbum( QString sId, QString sTitle, QString sPa
     pObject->AddProperty( new Property( "artist"     , "upnp" ));
     pObject->AddProperty( new Property( "genre"      , "upnp" ));
     pObject->AddProperty( new Property( "producer"   , "upnp" ));
-    pObject->AddProperty( new Property( "albumArtURI", "upnp" ));
     pObject->AddProperty( new Property( "toc"        , "upnp" ));
-
-    // Artwork
-    pObject->AddProperty( new Property( "albumArtURI", "upnp", false, "", true)); // TN
-    pObject->AddProperty( new Property( "albumArtURI", "upnp", false, "", true)); // SM
-    pObject->AddProperty( new Property( "albumArtURI", "upnp", false, "", true)); // MED
-    pObject->AddProperty( new Property( "albumArtURI", "upnp", false, "", true)); // LRG
 
     return( pObject );
 }
@@ -757,9 +800,6 @@ CDSObject *CDSObject::CreateGenre( QString sId, QString sTitle, QString sParentI
     }
 
     CreateContainer( sId, sTitle, sParentId, pObject );
-
-    pObject->AddProperty( new Property( "longDescription", "upnp" ));
-    pObject->AddProperty( new Property( "description"    , "dc"   ));
 
     return( pObject );
 }
@@ -808,12 +848,9 @@ CDSObject *CDSObject::CreatePlaylistContainer( QString sId, QString sTitle, QStr
 
     pObject->AddProperty( new Property( "artist"         , "upnp" ));
     pObject->AddProperty( new Property( "genre"          , "upnp" ));
-    pObject->AddProperty( new Property( "longDescription", "upnp" ));
     pObject->AddProperty( new Property( "producer"       , "upnp" ));
     pObject->AddProperty( new Property( "storageMedium"  , "upnp" ));
-    pObject->AddProperty( new Property( "description"    , "dc"   ));  
     pObject->AddProperty( new Property( "contributor"    , "dc"   ));  
-    pObject->AddProperty( new Property( "date"           , "dc"   ));  
     pObject->AddProperty( new Property( "language"       , "dc"   ));  
     pObject->AddProperty( new Property( "rights"         , "dc"   ));  
 
