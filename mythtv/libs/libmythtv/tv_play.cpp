@@ -7927,7 +7927,7 @@ void TV::ToggleOSD(PlayerContext *ctx, bool includeStatusOSD)
         osdInfo info;
         if (ctx->CalcPlayerSliderPosition(info))
         {
-            info.text["title"] = paused ? tr("Paused") : tr("Position");
+            info.text["title"] = (paused ? tr("Paused") : tr("Position")) + GetLiveTVIndex();
             UpdateOSDStatus(ctx, info, kOSDFunctionalType_Default,
                             paused ? kOSDTimeout_None : kOSDTimeout_Med);
             SetUpdateOSDPosition(true);
@@ -8047,7 +8047,7 @@ void TV::UpdateOSDSeekMessage(const PlayerContext *ctx,
     {
         int osdtype = (doSmartForward) ? kOSDFunctionalType_SmartForward :
             kOSDFunctionalType_Default;
-        info.text["title"] = mesg;
+        info.text["title"] = mesg + GetLiveTVIndex();
         UpdateOSDStatus(ctx, info, osdtype, timeout);
         SetUpdateOSDPosition(true);
     }
@@ -13576,6 +13576,18 @@ void TV::ReturnPlayerLock(const PlayerContext *&ctx) const
 {
     playerLock.unlock();
     ctx = NULL;
+}
+
+QString TV::GetLiveTVIndex(void) const
+{
+#ifdef DEBUG_LIVETV_TRANSITION
+    return (ctx->tvchain ?
+            QString(" (%1/%2)")
+                .arg(ctx->tvchain->GetCurPos())
+                .arg(ctx->tvchain->TotalSize()) : QString());
+#else
+    return QString();
+#endif
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

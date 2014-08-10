@@ -776,6 +776,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
 
     // for temp debugging only..
     int find_player_index(const PlayerContext*) const;
+    QString GetLiveTVIndex(void) const;
 
   private:
     // Configuration variables from database
