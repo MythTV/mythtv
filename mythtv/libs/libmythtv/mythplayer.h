@@ -816,11 +816,9 @@ class MTV_PUBLIC MythPlayer
     int        repeat_delay;
     int64_t    disp_timecode;
     bool       avsync_audiopaused;
-    int        avsync_holdoff;
 
     // Time Code stuff
-    int64_t    prev_audiotime; // audio timecode at last a/v sync
-    int64_t    prevtc;        ///< timecode if last VideoFrame shown
+    int        prevtc;        ///< 32 bit timecode if last VideoFrame shown
     int        prevrp;        ///< repeat_pict of last frame
     int64_t    tc_wrap[TCTYPESMAX];
     int64_t    tc_lastval[TCTYPESMAX];
