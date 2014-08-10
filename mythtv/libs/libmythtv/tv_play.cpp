@@ -7927,7 +7927,7 @@ void TV::ToggleOSD(PlayerContext *ctx, bool includeStatusOSD)
         osdInfo info;
         if (ctx->CalcPlayerSliderPosition(info))
         {
-            info.text["title"] = (paused ? tr("Paused") : tr("Position")) + GetLiveTVIndex();
+            info.text["title"] = (paused ? tr("Paused") : tr("Position")) + GetLiveTVIndex(ctx);
             UpdateOSDStatus(ctx, info, kOSDFunctionalType_Default,
                             paused ? kOSDTimeout_None : kOSDTimeout_Med);
             SetUpdateOSDPosition(true);
@@ -8047,7 +8047,7 @@ void TV::UpdateOSDSeekMessage(const PlayerContext *ctx,
     {
         int osdtype = (doSmartForward) ? kOSDFunctionalType_SmartForward :
             kOSDFunctionalType_Default;
-        info.text["title"] = mesg + GetLiveTVIndex();
+        info.text["title"] = mesg + GetLiveTVIndex(ctx);
         UpdateOSDStatus(ctx, info, osdtype, timeout);
         SetUpdateOSDPosition(true);
     }
@@ -13578,7 +13578,7 @@ void TV::ReturnPlayerLock(const PlayerContext *&ctx) const
     ctx = NULL;
 }
 
-QString TV::GetLiveTVIndex(void) const
+QString TV::GetLiveTVIndex(const PlayerContext *ctx) const
 {
 #ifdef DEBUG_LIVETV_TRANSITION
     return (ctx->tvchain ?
@@ -13586,6 +13586,7 @@ QString TV::GetLiveTVIndex(void) const
                 .arg(ctx->tvchain->GetCurPos())
                 .arg(ctx->tvchain->TotalSize()) : QString());
 #else
+    (void)ctx;
     return QString();
 #endif
 }
