@@ -50,9 +50,10 @@ void LookerUpper::HandleSingleRecording(const uint chanid,
     }
 
     m_updaterules = updaterules;
+    m_updateartwork = true;
 
     m_busyRecList.append(pginfo);
-    m_metadataFactory->Lookup(pginfo, true, false, false);
+    m_metadataFactory->Lookup(pginfo, true, m_updateartwork, false);
 }
 
 void LookerUpper::HandleAllRecordings(bool updaterules)
@@ -252,7 +253,7 @@ void LookerUpper::customEvent(QEvent *levent)
                     pginfo->GetSeriesID() == (list[p])->GetTMSref())
                 {
                     MetadataLookup *lookup = list[p];
-                    if (!lookup->GetSubtype() == kProbableGenericTelevision)
+                    if (lookup->GetSubtype() != kProbableGenericTelevision)
                         pginfo->SaveSeasonEpisode(lookup->GetSeason(), lookup->GetEpisode());
                     pginfo->SaveInetRef(lookup->GetInetref());
                     m_busyRecList.removeAll(pginfo);
@@ -281,7 +282,7 @@ void LookerUpper::customEvent(QEvent *levent)
             {
                 MetadataLookup *lookup = list[yearindex];
                 ProgramInfo *pginfo = qVariantValue<ProgramInfo *>(lookup->GetData());
-                if (!lookup->GetSubtype() == kProbableGenericTelevision)
+                if (lookup->GetSubtype() != kProbableGenericTelevision)
                     pginfo->SaveSeasonEpisode(lookup->GetSeason(), lookup->GetEpisode());
                 pginfo->SaveInetRef(lookup->GetInetref());
                 m_busyRecList.removeAll(pginfo);
@@ -338,7 +339,7 @@ void LookerUpper::customEvent(QEvent *levent)
         LOG(VB_GENERAL, LOG_DEBUG,
             QString("        User Rating: %1").arg(lookup->GetUserRating()));
 
-        if (!lookup->GetSubtype() == kProbableGenericTelevision)
+        if (lookup->GetSubtype() != kProbableGenericTelevision)
             pginfo->SaveSeasonEpisode(lookup->GetSeason(), lookup->GetEpisode());
         pginfo->SaveInetRef(lookup->GetInetref());
 
@@ -364,7 +365,8 @@ void LookerUpper::customEvent(QEvent *levent)
         if (m_updateartwork)
         {
             ArtworkMap map = lookup->GetDownloads();
-            SetArtwork(lookup->GetInetref(), lookup->GetSeason(),
+            SetArtwork(lookup->GetInetref(),
+                       lookup->GetIsCollection() ? 0 : lookup->GetSeason(),
                        gCoreContext->GetMasterHostName(), map);
         }
 

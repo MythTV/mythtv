@@ -1421,30 +1421,12 @@ void MetadataOptions::CreateBusyDialog(QString title)
 
 void MetadataOptions::PerformQuery()
 {
-    MetadataLookup *lookup = new MetadataLookup();
-
     CreateBusyDialog(tr("Trying to manually find this "
                         "recording online..."));
 
-    lookup->SetStep(kLookupSearch);
-    lookup->SetType(kMetadataRecording);
-    if ((m_recInfo && m_recInfo->GetCategoryType() == ProgramInfo::kCategoryMovie) ||
-        (m_seasonSpin->GetIntValue() == 0 &&
-         m_episodeSpin->GetIntValue() == 0))
-         lookup->SetSubtype(kProbableMovie);
-    else
-        lookup->SetSubtype(kProbableTelevision);
-    lookup->SetAllowGeneric(true);
-    lookup->SetAutomatic(false);
-    lookup->SetHandleImages(false);
-    lookup->SetHost(gCoreContext->GetMasterHostName());
-    lookup->SetTitle(m_recordingRule->m_title);
-    lookup->SetSubtitle(m_recordingRule->m_subtitle);
-    lookup->SetInetref(m_inetrefEdit->GetText());
-    lookup->SetCollectionref(m_inetrefEdit->GetText());
-    lookup->SetSeason(m_seasonSpin->GetIntValue());
-    lookup->SetEpisode(m_episodeSpin->GetIntValue());
+    MetadataLookup *lookup = CreateLookup(kMetadataRecording);
 
+    lookup->SetAutomatic(false);
     m_metadataFactory->Lookup(lookup);
 }
 
@@ -1614,28 +1596,33 @@ bool MetadataOptions::CanSetArtwork()
     return true;
 }
 
-void MetadataOptions::FindNetArt(VideoArtworkType type)
+MetadataLookup *MetadataOptions::CreateLookup(MetadataType mtype)
 {
-    if (!CanSetArtwork())
-        return;
-
     MetadataLookup *lookup = new MetadataLookup();
-
-    QString msg = tr("Searching for available artwork...");
-    CreateBusyDialog(msg);
-
     lookup->SetStep(kLookupSearch);
-    lookup->SetType(kMetadataVideo);
-    lookup->SetAutomatic(true);
-    lookup->SetHandleImages(false);
-    if ((m_recInfo && m_recInfo->GetCategoryType() == ProgramInfo::kCategoryMovie) ||
-        (m_seasonSpin->GetIntValue() == 0 &&
-         m_episodeSpin->GetIntValue() == 0))
-         lookup->SetSubtype(kProbableMovie);
+    lookup->SetType(mtype);
+    LookupType type = GuessLookupType(m_inetrefEdit->GetText());
+
+    if (type == kUnknownVideo)
+    {
+        if ((m_recInfo && m_recInfo->GetCategoryType() == ProgramInfo::kCategoryMovie) ||
+            (m_seasonSpin->GetIntValue() == 0 &&
+             m_episodeSpin->GetIntValue() == 0))
+        {
+            lookup->SetSubtype(kProbableMovie);
+        }
+        else
+        {
+            lookup->SetSubtype(kProbableTelevision);
+        }
+    }
     else
-        lookup->SetSubtype(kProbableTelevision);
+    {
+        // we could determine the type from the inetref
+        lookup->SetSubtype(type);
+    }
     lookup->SetAllowGeneric(true);
-    lookup->SetData(qVariantFromValue<VideoArtworkType>(type));
+    lookup->SetHandleImages(false);
     lookup->SetHost(gCoreContext->GetMasterHostName());
     lookup->SetTitle(m_recordingRule->m_title);
     lookup->SetSubtitle(m_recordingRule->m_subtitle);
@@ -1644,6 +1631,21 @@ void MetadataOptions::FindNetArt(VideoArtworkType type)
     lookup->SetSeason(m_seasonSpin->GetIntValue());
     lookup->SetEpisode(m_episodeSpin->GetIntValue());
 
+    return lookup;
+}
+
+void MetadataOptions::FindNetArt(VideoArtworkType type)
+{
+    if (!CanSetArtwork())
+        return;
+
+    QString msg = tr("Searching for available artwork...");
+    CreateBusyDialog(msg);
+
+    MetadataLookup *lookup = CreateLookup(kMetadataVideo);
+
+    lookup->SetAutomatic(true);
+    lookup->SetData(qVariantFromValue<VideoArtworkType>(type));
     m_imageLookup->addLookup(lookup);
 }
 

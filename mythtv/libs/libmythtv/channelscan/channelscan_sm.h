@@ -37,6 +37,7 @@
 #include <QPair>
 #include <QMap>
 #include <QSet>
+#include <QMutex>
 
 // MythTV includes
 #include "frequencytables.h"
@@ -248,6 +249,7 @@ class ChannelScanSM : public MPEGStreamListener,
 
     /// Scanner thread, runs ChannelScanSM::run()
     MThread          *scannerThread;
+    QMutex           m_mutex;
 };
 
 inline void ChannelScanSM::UpdateScanPercentCompleted(void)

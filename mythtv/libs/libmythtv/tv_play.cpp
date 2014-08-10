@@ -438,6 +438,7 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags,
             mctx->UnlockDeletePlayer(__FILE__, __LINE__);
         }
         tv->ReturnPlayerLock(mctx);
+        quitAll |= !playerError.isEmpty();
     }
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "StartTV -- process events 2 begin");
@@ -5854,7 +5855,8 @@ void TV::PxPToggleType(PlayerContext *mctx, bool wantPBP)
     if (wantPBP)
     {
         GetPlayer(mctx, 0)->SetPIPState(kPBPLeft);
-        GetPlayer(mctx, 1)->SetPIPState(kPBPRight);
+        if (player.size() > 1)
+            GetPlayer(mctx, 1)->SetPIPState(kPBPRight);
     }
     else
     {
@@ -7750,7 +7752,8 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
     if (ctx->prevChan.empty())
         ctx->PushPreviousChannel();
 
-    PauseAudioUntilBuffered(ctx);
+    if (ctx->player)
+        ctx->player->GetAudio()->Pause(true);
     PauseLiveTV(ctx);
 
     ctx->LockDeletePlayer(__FILE__, __LINE__);
@@ -7767,6 +7770,7 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
         ctx->player->GetAudio()->Reset();
 
     UnpauseLiveTV(ctx, chanid && GetQueuedChanID());
+    PauseAudioUntilBuffered(ctx);
 
     if (oldinputname != ctx->recorder->GetInput())
         UpdateOSDInput(ctx);
@@ -12911,7 +12915,7 @@ void TV::UnpauseLiveTV(PlayerContext *ctx, bool bQuietly /*=false*/)
     if (ctx->HasPlayer() && ctx->tvchain)
     {
         ctx->ReloadTVChain();
-        ctx->tvchain->JumpTo(-1, 1);
+        ctx->tvchain->SwitchTo(-1);
         ctx->LockDeletePlayer(__FILE__, __LINE__);
         if (ctx->player)
             ctx->player->Play(ctx->ts_normal, true, false);

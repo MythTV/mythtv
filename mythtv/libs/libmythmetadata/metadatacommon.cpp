@@ -75,6 +75,7 @@ MetadataLookup::MetadataLookup(void) :
     m_collectionref(),
     m_tmsref(),
     m_imdb(),
+    m_iscollection(false),
     m_people(),
     m_studios(),
     m_homepage(),
@@ -210,6 +211,7 @@ MetadataLookup::MetadataLookup(
     m_collectionref(collectionref),
     m_tmsref(tmsref),
     m_imdb(imdb),
+    m_iscollection(false),
     m_people(people),
     m_studios(studios),
     m_homepage(homepage),
@@ -303,7 +305,8 @@ MetadataLookup::MetadataLookup(
     m_releasedate(releasedate),
     m_lastupdated(lastupdated),
     m_runtime(runtime),
-    m_runtimesecs(runtimesecs)
+    m_runtimesecs(runtimesecs),
+    m_iscollection(false)
 {
     m_tracknum = 0;
     m_popularity = 0;
@@ -379,6 +382,7 @@ MetadataLookup::MetadataLookup(
     m_runtime(runtime),
     m_runtimesecs(runtimesecs),
     m_inetref(inetref),
+    m_iscollection(false),
     m_people(people),
     m_trailerURL(trailerURL),
     m_artwork(artwork),
@@ -421,37 +425,6 @@ ArtworkList MetadataLookup::GetArtwork(VideoArtworkType type) const
         ret.append(it.previous());
 
     return ret;
-}
-
-LookupType MetadataLookup::GetSubtype() const
-{
-    if (m_inetref.isEmpty() ||
-        m_inetref == MetaGrabberScript::CleanedInetref(m_inetref) ||
-        (m_subtype != kProbableMovie && m_subtype != kProbableTelevision &&
-         m_subtype != kProbableGenericTelevision))
-    {
-        // can't determine subtype from inetref
-        return m_subtype;
-    }
-
-    MetaGrabberScript grabber =
-        MetaGrabberScript::GetGrabber(m_subtype == kProbableMovie ?
-                                        kGrabberMovie : kGrabberTelevision,
-                                      this);
-
-    if (!grabber.IsValid())
-    {
-        return m_subtype;
-    }
-    switch (grabber.GetType())
-    {
-        case kGrabberMovie:
-            return kProbableMovie;
-        case kGrabberTelevision:
-            return kProbableTelevision;
-        default:
-            return m_subtype;
-    }
 }
 
 void MetadataLookup::toMap(InfoMap &metadataMap)
@@ -1190,22 +1163,29 @@ MetadataLookup* ParseMetadataItem(const QDomElement& item,
         season = lookup->GetSeason();
         episode = lookup->GetEpisode();
     }
-    else
+
+    if (lookup->GetPreferDVDOrdering())
     {
-        if (lookup->GetPreferDVDOrdering())
+        if (!season)
         {
             season = item.firstChildElement("dvdseason").text().toUInt();
+        }
+        if (!episode)
+        {
             episode = item.firstChildElement("dvdepisode").text().toUInt();
         }
-
-        if ((season == 0) && (episode == 0))
-        {
-            season = item.firstChildElement("season").text().toUInt();
-            episode = item.firstChildElement("episode").text().toUInt();
-        }
-        LOG(VB_GENERAL, LOG_INFO, QString("Result Found, Season %1 Episode %2")
-            .arg(season).arg(episode));
     }
+
+    if (!season)
+    {
+        season = item.firstChildElement("season").text().toUInt();
+    }
+    if (!episode)
+    {
+        episode = item.firstChildElement("episode").text().toUInt();
+    }
+    LOG(VB_GENERAL, LOG_INFO, QString("Result Found, Season %1 Episode %2")
+        .arg(season).arg(episode));
 
     return new MetadataLookup(lookup->GetType(), lookup->GetSubtype(),
         lookup->GetData(), lookup->GetStep(), lookup->GetAutomatic(),

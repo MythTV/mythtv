@@ -436,7 +436,15 @@ void DVBStreamData::ProcessSDT(uint tsid, const ServiceDescriptionTable *sdt)
 
     for (uint i = 0; i < sdt->ServiceCount(); i++)
     {
+        /*
+         * FIXME always signal EIT presence. We filter later. To many
+         * networks set these flags wrong.
+         * This allows the user to simply set useonairguide on a
+         * channel manually.
+         */
+#if 0
         if (sdt->HasEITSchedule(i) || sdt->HasEITPresentFollowing(i))
+#endif
             _dvb_has_eit[sdt->ServiceID(i)] = true;
     }
 

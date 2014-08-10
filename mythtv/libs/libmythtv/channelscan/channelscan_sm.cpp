@@ -36,6 +36,7 @@ using namespace std;
 
 // Qt includes
 #include <QObject>
+#include <QMutexLocker>
 
 // MythTV includes - General
 #include "channelscan_sm.h"
@@ -741,6 +742,8 @@ void ChannelScanSM::UpdateScanTransports(const NetworkInformationTable *nit)
 
 bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
 {
+    QMutexLocker locker(&m_mutex);
+
     if (current == scanTransports.end())
         return true;
 
@@ -1044,10 +1047,20 @@ static void update_info(ChannelInsertInfo &info,
                         const ServiceDescriptionTable *sdt, uint i,
                         const QMap<uint64_t, QString> &defAuthorities)
 {
-    // HACK beg -- special exception for this network
+    // HACK beg -- special exception for these networks
+    // this enables useonairguide by default for all matching channels
     //             (dbver == "1067")
-    bool force_guide_present = (sdt->OriginalNetworkID() == 70);
-    // HACK end -- special exception for this network
+    bool force_guide_present = (
+        // Telenor (NO)
+        (sdt->OriginalNetworkID() ==    70) ||
+#if 0 // #9592#comment:23 - meanwhile my provider changed his signaling
+        // Kabelplus (AT) formerly Kabelsignal, registered to NDS, see #9592
+        (sdt->OriginalNetworkID() ==   222) ||
+#endif
+        // ERT (GR) from the private temporary allocation, see #9592:comment:17
+        (sdt->OriginalNetworkID() == 65330)
+    );
+    // HACK end -- special exception for these networks
 
     // Figure out best service name and callsign...
     ServiceDescriptor *desc = sdt->GetServiceDescriptor(i);

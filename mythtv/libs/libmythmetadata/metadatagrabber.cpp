@@ -37,6 +37,17 @@ static QMap<QString, GrabberType> grabberTypeStrings;
 static bool initialized = false;
 static QMutex typeLock;
 
+static GrabberOpts GrabberOptsMaker (const QString &thepath, const QString &thesetting, const QString &thedefault)
+{
+    GrabberOpts opts;
+
+    opts.path = thepath;
+    opts.setting = thesetting;
+    opts.def = thedefault;
+
+    return opts;
+}
+
 void InitializeStaticMaps(void)
 {
     if (!initialized)
@@ -48,21 +59,21 @@ void InitializeStaticMaps(void)
             return;
 
         grabberTypes[kGrabberMovie] =
-                (GrabberOpts) { "%1metadata/Movie/",
+              GrabberOptsMaker ("%1metadata/Movie/",
                                 "MovieGrabber",
-                                "metadata/Movie/tmdb3.py"};
+                                "metadata/Movie/tmdb3.py" );
         grabberTypes[kGrabberTelevision] =
-                (GrabberOpts) { "%1metadata/Television/",
+             GrabberOptsMaker ( "%1metadata/Television/",
                                 "TelevisionGrabber",
-                                "metadata/Television/ttvdb.py" };
+                                "metadata/Television/ttvdb.py" );
         grabberTypes[kGrabberGame]       =
-                (GrabberOpts) { "%1metadata/Game/",
+             GrabberOptsMaker ( "%1metadata/Game/",
                                 "mythgame.MetadataGrabber",
-                                "metadata/Game/giantbomb.py" };
+                                "metadata/Game/giantbomb.py" );
         grabberTypes[kGrabberMusic]      =
-                (GrabberOpts) { "%1metadata/Music",
+             GrabberOptsMaker ( "%1metadata/Music",
                                 "",
-                                "" };
+                                "" );
 
         grabberTypeStrings["movie"]      = kGrabberMovie;
         grabberTypeStrings["television"] = kGrabberTelevision;

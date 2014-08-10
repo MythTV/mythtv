@@ -26,6 +26,7 @@
 #include "videoutils.h"
 
 #include "editvideometadata.h"
+#include "metadatafactory.h"
 
 static const QString _Location = QObject::tr("Metadata Editor");
 
@@ -682,13 +683,8 @@ void EditMetadataDialog::OnSearchListSelection(ArtworkInfo info, VideoArtworkTyp
 
     MetadataLookup *lookup = new MetadataLookup();
     lookup->SetType(kMetadataVideo);
-    if (m_workingMetadata->GetSeason() > 0 ||
-            m_workingMetadata->GetEpisode() > 0)
-        lookup->SetSubtype(kProbableTelevision);
-    else if (m_workingMetadata->GetSubtitle().isEmpty())
-        lookup->SetSubtype(kProbableMovie);
-    else
-        lookup->SetSubtype(kUnknownVideo);
+
+    lookup->SetSubtype(GuessLookupType(m_workingMetadata));
     lookup->SetHost(m_workingMetadata->GetHost());
     lookup->SetAutomatic(true);
     lookup->SetData(qVariantFromValue<VideoArtworkType>(type));

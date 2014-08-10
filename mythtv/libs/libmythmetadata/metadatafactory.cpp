@@ -135,12 +135,7 @@ void MetadataFactory::Lookup(VideoMetadata *metadata, bool automatic,
 
     lookup->SetStep(kLookupSearch);
     lookup->SetType(kMetadataVideo);
-    if (metadata->GetSeason() > 0 || metadata->GetEpisode() > 0)
-        lookup->SetSubtype(kProbableTelevision);
-    else if (metadata->GetSubtitle().isEmpty())
-        lookup->SetSubtype(kProbableMovie);
-    else
-        lookup->SetSubtype(kUnknownVideo);
+    lookup->SetSubtype(GuessLookupType(metadata));
     lookup->SetData(qVariantFromValue(metadata));
     lookup->SetAutomatic(automatic);
     lookup->SetHandleImages(getimages);
@@ -296,7 +291,7 @@ void MetadataFactory::OnSingleResult(MetadataLookup *lookup)
         {
             ArtworkInfo info;
             int index = fanartlist.size();
-            int season = (int)lookup->GetSeason();
+            int season = lookup->GetIsCollection() ? 0 : (int)lookup->GetSeason();
             if (season > 0)
                 index = max(0, index-season);
             else
@@ -627,7 +622,10 @@ void MetadataFactory::customEvent(QEvent *levent)
 
 LookupType GuessLookupType(ProgramInfo *pginfo)
 {
-    LookupType ret = kUnknownVideo;
+    LookupType ret = GuessLookupType(pginfo->GetInetRef());
+
+    if (ret != kUnknownVideo)
+        return ret;
 
     ProgramInfo::CategoryType catType = pginfo->GetCategoryType();
     if (catType == ProgramInfo::kCategoryNone)
@@ -672,7 +670,10 @@ LookupType GuessLookupType(ProgramInfo *pginfo)
 
 LookupType GuessLookupType(MetadataLookup *lookup)
 {
-    LookupType ret = kUnknownVideo;
+    LookupType ret = GuessLookupType(lookup->GetInetref());
+
+    if (ret != kUnknownVideo)
+        return ret;
 
     if (lookup->GetSeason() > 0 || lookup->GetEpisode() > 0 ||
         !lookup->GetSubtitle().isEmpty())
@@ -683,10 +684,28 @@ LookupType GuessLookupType(MetadataLookup *lookup)
     return ret;
 }
 
+LookupType GuessLookupType(VideoMetadata *metadata)
+{
+    LookupType ret = GuessLookupType(metadata->GetInetRef());
+
+    if (ret != kUnknownVideo)
+        return ret;
+
+    if (metadata->GetSeason() > 0 || metadata->GetEpisode() > 0 ||
+        !metadata->GetSubtitle().isEmpty())
+        ret = kProbableTelevision;
+    else
+        ret = kProbableMovie;
+
+    return ret;
+}
 
 LookupType GuessLookupType(RecordingRule *recrule)
 {
-    LookupType ret = kUnknownVideo;
+    LookupType ret = GuessLookupType(recrule->m_inetref);
+
+    if (ret != kUnknownVideo)
+        return ret;
 
     if (recrule->m_season > 0 || recrule->m_episode > 0 ||
         !recrule->m_subtitle.isEmpty())
@@ -697,3 +716,31 @@ LookupType GuessLookupType(RecordingRule *recrule)
     return ret;
 }
 
+LookupType GuessLookupType(const QString &inetref)
+{
+    if (inetref.isEmpty() || inetref == "00000000" ||
+        inetref == MetaGrabberScript::CleanedInetref(inetref))
+    {
+        // can't determine subtype from inetref
+        return kUnknownVideo;
+    }
+
+    // inetref is defined, see if we have a pre-defined grabber
+    MetaGrabberScript grabber =
+        MetaGrabberScript::FromInetref(inetref);
+
+    if (!grabber.IsValid())
+    {
+        return kUnknownVideo;
+    }
+
+    switch (grabber.GetType())
+    {
+        case kGrabberMovie:
+            return kProbableMovie;
+        case kGrabberTelevision:
+            return kProbableTelevision;
+        default:
+            return kUnknownVideo;
+    }
+}

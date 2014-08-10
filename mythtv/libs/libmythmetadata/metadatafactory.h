@@ -152,6 +152,8 @@ class META_PUBLIC MetadataFactory : public QObject
 
 META_PUBLIC LookupType GuessLookupType(ProgramInfo *pginfo);
 META_PUBLIC LookupType GuessLookupType(MetadataLookup *lookup);
+META_PUBLIC LookupType GuessLookupType(VideoMetadata *metadata);
 META_PUBLIC LookupType GuessLookupType(RecordingRule *recrule);
+META_PUBLIC LookupType GuessLookupType(const QString& inetref);
 
 #endif

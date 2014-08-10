@@ -11,6 +11,7 @@
 #include "mythsystemlegacy.h"
 #include "storagegroup.h"
 #include "metadatadownload.h"
+#include "metadatafactory.h"
 #include "mythmiscutil.h"
 #include "remotefile.h"
 #include "mythlogging.h"
@@ -92,44 +93,30 @@ void MetadataDownload::run()
         MetadataLookupList list;
 
         // Go go gadget Metadata Lookup
-        if (lookup->GetType() == kMetadataVideo)
+        if (lookup->GetType() == kMetadataVideo ||
+            lookup->GetType() == kMetadataRecording)
         {
             if (lookup->GetSubtype() == kProbableTelevision)
                 list = handleTelevision(lookup);
             else if (lookup->GetSubtype() == kProbableMovie)
                 list = handleMovie(lookup);
             else
+            {
+                // will try both movie and TV
                 list = handleVideoUndetermined(lookup);
+            }
 
-            if (list.isEmpty() &&
-                lookup->GetSubtype() == kUnknownVideo)
+            if ((list.isEmpty() ||
+                 (list.size() > 1 && !lookup->GetAutomatic())) &&
+                lookup->GetSubtype() == kProbableTelevision)
             {
-                list = handleMovie(lookup);
+                list.append(handleMovie(lookup));
             }
-        }
-        else if (lookup->GetType() == kMetadataRecording)
-        {
-            if (lookup->GetSubtype() == kProbableTelevision)
+            else if ((list.isEmpty() ||
+                      (list.size() > 1 && !lookup->GetAutomatic())) &&
+                     lookup->GetSubtype() == kProbableMovie)
             {
-                if (lookup->GetSeason() > 0 || lookup->GetEpisode() > 0)
-                    list = handleTelevision(lookup);
-                else
-                    list = handleVideoUndetermined(lookup);
-
-                if (list.isEmpty() && lookup->GetStep() != kLookupData)
-                    list = handleRecordingGeneric(lookup);
-            }
-            else if (lookup->GetSubtype() == kProbableMovie)
-            {
-                list = handleMovie(lookup);
-                if (lookup->GetInetref().isEmpty())
-                    list.append(handleRecordingGeneric(lookup));
-            }
-            else
-            {
-                list = handleVideoUndetermined(lookup);
-                if (lookup->GetInetref().isEmpty())
-                    list.append(handleRecordingGeneric(lookup));
+                list.append(handleTelevision(lookup));
             }
         }
         else if (lookup->GetType() == kMetadataGame)
@@ -147,6 +134,12 @@ void MetadataDownload::run()
 
                 newlookup->SetStep(kLookupData);
                 prependLookup(newlookup);
+                // Type may have changed
+                LookupType ret = GuessLookupType(newlookup);
+                if (ret != kUnknownVideo)
+                {
+                    newlookup->SetSubtype(ret);
+                }
                 continue;
             }
 
@@ -163,6 +156,12 @@ void MetadataDownload::run()
                     // bestlookup is owned by list, we need an extra reference
                     newlookup->IncrRef();
                     newlookup->SetStep(kLookupData);
+                    // Type may have changed
+                    LookupType ret = GuessLookupType(newlookup);
+                    if (ret != kUnknownVideo)
+                    {
+                        newlookup->SetSubtype(ret);
+                    }
                     prependLookup(newlookup);
                     continue;
                 }
@@ -467,6 +466,11 @@ MetadataLookupList MetadataDownload::handleGame(MetadataLookup *lookup)
 
     if (lookup->GetStep() == kLookupSearch)
     {
+        if (lookup->GetTitle().isEmpty())
+        {
+            // no point searching on nothing...
+            return list;
+        }
         // we're searching
         list = grabber.Search(lookup->GetTitle(), lookup);
     }
@@ -479,6 +483,14 @@ MetadataLookupList MetadataDownload::handleGame(MetadataLookup *lookup)
     return list;
 }
 
+/**
+ * handleMovie:
+ * attempt to find movie data via the following (in order)
+ * 1- Local MXML
+ * 2- Local NFO
+ * 3- By title
+ * 4- By inetref (if present)
+ */
 MetadataLookupList MetadataDownload::handleMovie(MetadataLookup *lookup)
 {
     MetadataLookupList list;
@@ -497,62 +509,99 @@ MetadataLookupList MetadataDownload::handleMovie(MetadataLookup *lookup)
     else if (!nfo.isEmpty())
         list = readNFO(nfo, lookup);
 
-    if (list.isEmpty())
+    if (!list.isEmpty())
+        return list;
+
+    MetaGrabberScript grabber =
+        MetaGrabberScript::GetGrabber(kGrabberMovie, lookup);
+
+    // initial search mode
+    if (!lookup->GetInetref().isEmpty() && lookup->GetInetref() != "00000000" &&
+        (lookup->GetStep() == kLookupSearch || lookup->GetStep() == kLookupData))
     {
-        // If the inetref is populated, even in kLookupSearch mode,
-        // become a kLookupData grab and use that.
-        if (lookup->GetStep() == kLookupSearch &&
-            (!lookup->GetInetref().isEmpty() &&
-             lookup->GetInetref() != "00000000"))
+        // with inetref
+        lookup->SetStep(kLookupData);
+        // we're just grabbing data
+        list = grabber.LookupData(lookup->GetInetref(), lookup);
+    }
+    else if (lookup->GetStep() == kLookupSearch)
+    {
+        if (lookup->GetTitle().isEmpty())
         {
-            lookup->SetStep(kLookupData);
+            // no point searching on nothing...
+            return list;
         }
-
-        MetaGrabberScript grabber =
-            MetaGrabberScript::GetGrabber(kGrabberMovie, lookup);
-
-        if (lookup->GetStep() == kLookupSearch)
-        {
-            list = grabber.Search(lookup->GetTitle(), lookup);
-        }
-        else if (lookup->GetStep() == kLookupData)
-        {
-            // we're just grabbing data
-            list = grabber.LookupData(lookup->GetInetref(), lookup);
-        }
+        list = grabber.Search(lookup->GetTitle(), lookup);
     }
 
     return list;
 }
 
+/**
+ * handleTelevision
+ * attempt to find television data via the following (in order)
+ * 1- By inetref with subtitle
+ * 2- By inetref with season and episode
+ * 3- By inetref
+ * 4- By title and subtitle
+ * 5- By title
+ */
 MetadataLookupList MetadataDownload::handleTelevision(MetadataLookup *lookup)
 {
     MetadataLookupList list;
     MetaGrabberScript grabber =
         MetaGrabberScript::GetGrabber(kGrabberTelevision, lookup);
+    bool searchcollection = false;
 
-    // there's some special logic going on with searches
-    if (lookup->GetStep() == kLookupSearch)
+    // initial search mode
+    if (!lookup->GetInetref().isEmpty() && lookup->GetInetref() != "00000000" &&
+        (lookup->GetStep() == kLookupSearch || lookup->GetStep() == kLookupData))
     {
-        // initial search mode
-        if (lookup->GetInetref().isEmpty() ||
-            lookup->GetInetref() == "00000000")
+        // with inetref
+        lookup->SetStep(kLookupData);
+        if (!lookup->GetSubtitle().isEmpty())
         {
-            // no inetref given, use the title
-            list = grabber.Search(lookup->GetTitle(), lookup);
+            list = grabber.SearchSubtitle(lookup->GetInetref(),
+                                          lookup->GetTitle() /* unused */,
+                                          lookup->GetSubtitle(), lookup, false);
         }
-        else
+
+        if (list.isEmpty() && lookup->GetSeason() && lookup->GetEpisode())
         {
-            lookup->SetStep(kLookupData);
             list = grabber.LookupData(lookup->GetInetref(), lookup->GetSeason(),
                                       lookup->GetEpisode(), lookup);
         }
+
+        if (list.isEmpty() && !lookup->GetCollectionref().isEmpty())
+        {
+            list = grabber.LookupCollection(lookup->GetCollectionref(), lookup);
+            searchcollection = true;
+        }
+        else if (list.isEmpty())
+        {
+            // We do not store CollectionRef in our database
+            // so try with the inetref, for all purposes with TVDB, they are
+            // always identical
+            list = grabber.LookupCollection(lookup->GetInetref(), lookup);
+            searchcollection = true;
+        }
     }
-    else if (lookup->GetStep() == kLookupData)
+    else if (lookup->GetStep() == kLookupSearch)
     {
-        // we have an inetref, pull data
-        list = grabber.LookupData(lookup->GetInetref(), lookup->GetSeason(),
-                                  lookup->GetEpisode(), lookup);
+        if (lookup->GetTitle().isEmpty())
+        {
+            // no point searching on nothing...
+            return list;
+        }
+        if (!lookup->GetSubtitle().isEmpty())
+        {
+            list = grabber.SearchSubtitle(lookup->GetTitle(),
+                                          lookup->GetSubtitle(), lookup, false);
+        }
+        if (list.isEmpty())
+        {
+            list = grabber.Search(lookup->GetTitle(), lookup);
+        }
     }
     else if (lookup->GetStep() == kLookupCollection)
     {
@@ -562,12 +611,23 @@ MetadataLookupList MetadataDownload::handleTelevision(MetadataLookup *lookup)
     // Collection Fallback
     // If the lookup allows generic metadata, and the specific
     // season and episode are not available, try for series metadata.
-    if (list.isEmpty() &&
-        lookup->GetAllowGeneric() &&
-        lookup->GetStep() == kLookupData)
+    if (!searchcollection && list.isEmpty() &&
+        !lookup->GetCollectionref().isEmpty() &&
+        lookup->GetAllowGeneric() && lookup->GetStep() == kLookupData)
     {
         lookup->SetStep(kLookupCollection);
         list = grabber.LookupCollection(lookup->GetCollectionref(), lookup);
+    }
+
+    if (!list.isEmpty())
+    {
+        // mark all results so that search collection is properly handled later
+        lookup->SetIsCollection(searchcollection);
+        for (MetadataLookupList::iterator it = list.begin();
+             it != list.end(); ++it)
+        {
+            (*it)->SetIsCollection(searchcollection);
+        }
     }
 
     return list;
@@ -579,24 +639,6 @@ MetadataLookupList MetadataDownload::handleVideoUndetermined(MetadataLookup *loo
 
     if (lookup->GetSubtype() != kProbableMovie &&
         !lookup->GetSubtitle().isEmpty())
-    {
-        MetaGrabberScript grabber =
-            MetaGrabberScript::GetGrabber(kGrabberTelevision, lookup);
-
-        if (lookup->GetInetref().isEmpty() || lookup->GetInetref() == "00000000")
-        {
-            list = grabber.SearchSubtitle(lookup->GetTitle(),
-                                          lookup->GetSubtitle(), lookup, false);
-        }
-        else
-        {
-            list = grabber.SearchSubtitle(lookup->GetInetref(),
-                                          lookup->GetTitle(),
-                                          lookup->GetSubtitle(), lookup, false);
-        }
-    }
-    if (lookup->GetSubtype() != kProbableMovie &&
-        (lookup->GetSeason() > 0 || lookup->GetEpisode() > 0))
     {
         list.append(handleTelevision(lookup));
     }
@@ -622,6 +664,12 @@ MetadataLookupList MetadataDownload::handleRecordingGeneric(MetadataLookup *look
     // hail mary to try to get at least *series* level info and art/inetref.
 
     MetadataLookupList list;
+
+    if (lookup->GetTitle().isEmpty())
+    {
+        // no point searching on nothing...
+        return list;
+    }
 
     // no inetref known, just pull the default grabber
     MetaGrabberScript grabber = MetaGrabberScript::GetType(kGrabberTelevision);

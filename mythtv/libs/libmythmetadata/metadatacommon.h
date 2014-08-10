@@ -260,6 +260,7 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
     void SetCollectionref(const QString &collectionref)
                              { m_collectionref = collectionref; };
     void SetTMSref(const QString &tmsref) { m_tmsref = tmsref; };
+    void SetIsCollection(bool collection) { m_iscollection = collection; };
     void SetPreferDVDOrdering(bool preferdvdorder)
                              { m_dvdorder = preferdvdorder; };
 
@@ -273,7 +274,7 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
     // GETS
 
     MetadataType GetType() const { return m_type; };
-    LookupType GetSubtype() const;
+    LookupType GetSubtype() const { return m_subtype; };
     QVariant GetData() const { return m_data; };
     LookupStep GetStep() const { return m_step; };
     bool GetAutomatic() const { return m_automatic; };
@@ -345,6 +346,7 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
     QString GetCollectionref() const { return m_collectionref; };
     QString GetIMDB() const { return m_imdb; };
     QString GetTMSref() const { return m_tmsref; };
+    bool    GetIsCollection() const { return m_iscollection; };
 
     // People
     QList<PersonInfo> GetPeople(PeopleType type) const;
@@ -430,6 +432,7 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
     QString m_collectionref;
     QString m_tmsref;
     QString m_imdb;
+    bool    m_iscollection;
 
     // People - Video
     const PeopleMap m_people;

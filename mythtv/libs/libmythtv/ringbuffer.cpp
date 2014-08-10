@@ -312,6 +312,12 @@ void RingBuffer::UpdateRawBitrate(uint raw_bitrate)
             QString("Bitrate too low - setting to 64Kb"));
         raw_bitrate = 64;
     }
+    else if (raw_bitrate > 100000)
+    {
+        LOG(VB_FILE, LOG_INFO, LOC +
+            QString("Bitrate too high - setting to 100Mb"));
+        raw_bitrate = 100000;
+    }
 
     rwlock.lockForWrite();
     rawbitrate = raw_bitrate;
@@ -407,6 +413,7 @@ void RingBuffer::CalcReadAheadThresh(void)
         }
         low_buffers = false;
         fill_min = ((fill_min / CHUNK) + 1) * CHUNK;
+        fill_min = min((uint)fill_min, bufferSize / 2);
     }
     else
     {

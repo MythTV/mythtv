@@ -221,7 +221,9 @@ MythPlayer::MythPlayer(PlayerFlags flags)
       refreshrate(0),
       lastsync(false),              repeat_delay(0),
       disp_timecode(0),             avsync_audiopaused(false),
+      avsync_holdoff(0),
       // Time Code stuff
+      prev_audiotime(0),
       prevtc(0),                    prevrp(0),
       // LiveTVChain stuff
       m_tv(NULL),                   isDummy(false),
@@ -372,6 +374,8 @@ bool MythPlayer::Pause(void)
     audio.Pause(true);
     PauseDecoder();
     PauseBuffer();
+    if (!decoderPaused)
+        PauseDecoder(); // Retry in case audio only stream
     allpaused = decoderPaused && videoPaused && bufferPaused;
     {
         if (FlagIsSet(kVideoIsNull) && decoder)
@@ -385,7 +389,7 @@ bool MythPlayer::Pause(void)
 
 bool MythPlayer::Play(float speed, bool normal, bool unpauseaudio)
 {
-    pauseLock.lock();
+    QMutexLocker locker(&pauseLock);
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
         QString("Play(%1, normal %2, unpause audio %3)")
             .arg(speed,5,'f',1).arg(normal).arg(unpauseaudio));
@@ -393,10 +397,10 @@ bool MythPlayer::Play(float speed, bool normal, bool unpauseaudio)
     if (deleteMap.IsEditing())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Ignoring Play(), in edit mode.");
-        pauseLock.unlock();
         return false;
     }
 
+    SetEof(kEofStateNone);
     UnpauseBuffer();
     UnpauseDecoder();
     if (unpauseaudio)
@@ -405,7 +409,6 @@ bool MythPlayer::Play(float speed, bool normal, bool unpauseaudio)
     allpaused = false;
     next_play_speed   = speed;
     next_normal_speed = normal;
-    pauseLock.unlock();
     return true;
 }
 
@@ -945,7 +948,7 @@ int MythPlayer::OpenFile(uint retries)
                 return -1;
             }
             LOG(VB_GENERAL, LOG_WARNING, LOC + "OpenFile() waiting on data");
-            usleep(50 * 1000);
+            usleep(150 * 1000);
         }
 
         player_ctx->LockPlayingInfo(__FILE__, __LINE__);
@@ -1767,6 +1770,11 @@ void MythPlayer::InitAVSync(void)
     videosync->Start();
 
     avsync_adjustment = 0;
+    avsync_avg = 0;
+    lastsync = false;
+    avsync_holdoff = 0;
+    prev_audiotime = 0;
+    prevtc = 0;
 
     repeat_delay = 0;
 
@@ -1800,12 +1808,10 @@ int64_t MythPlayer::AVSyncGetAudiotime(void)
     return currentaudiotime;
 }
 
-#define MAXDIVERGE  3.0f
-#define DIVERGELIMIT 30.0f
 void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
 {
     int repeat_pict  = 0;
-    int64_t timecode = audio.GetAudioTime();
+    int64_t timecode = 0;
 
     if (buffer)
     {
@@ -1814,7 +1820,6 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
         disp_timecode = buffer->disp_timecode;
     }
 
-    float diverge = 0.0f;
     int frameDelay = m_double_framerate ? frame_interval / 2 : frame_interval;
     int vsync_delay_clock = 0;
     //int64_t currentaudiotime = 0;
@@ -1827,20 +1832,11 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
         return;
     }
 
-    if (normal_speed)
-    {
-        diverge = (float)avsync_avg / (float)frame_interval;
-        diverge = max(diverge, -DIVERGELIMIT);
-        diverge = min(diverge, +DIVERGELIMIT);
-    }
-
     FrameScanType ps = m_scan;
     if (kScan_Detect == m_scan || kScan_Ignore == m_scan)
         ps = kScan_Progressive;
 
-    bool max_video_behind = diverge < -MAXDIVERGE;
     bool dropframe = false;
-    QString dbg;
 
     if (avsync_predictor_enabled)
     {
@@ -1853,35 +1849,20 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
         else
         {
             dropframe = true;
-            dbg = "A/V predict drop frame, ";
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                    "A/V predict drop frame, dropping frame to catch up.");
         }
     }
 
-    if (max_video_behind)
-    {
+    // If video is way behind of audio, adjust for it...
+    if (avsync_adjustment <= -frame_interval)
         dropframe = true;
-        // If video is way behind of audio, adjust for it...
-        dbg = QString("Video is %1 frames behind audio (too slow), ")
-            .arg(-diverge);
-    }
-
-    if (!dropframe && avsync_audiopaused)
-    {
-        avsync_audiopaused = false;
-        audio.Pause(false);
-    }
 
     if (dropframe)
     {
         // Reset A/V Sync
         lastsync = true;
         //currentaudiotime = AVSyncGetAudiotime();
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + dbg + "dropping frame to catch up.");
-        if (!audio.IsPaused() && max_video_behind)
-        {
-            audio.Pause(true);
-            avsync_audiopaused = true;
-        }
     }
     else if (!FlagIsSet(kVideoIsNull))
     {
@@ -1950,25 +1931,14 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
 
     avsync_adjustment = 0;
 
-    if (diverge > MAXDIVERGE)
-    {
-        // If audio is way behind of video, adjust for it...
-        // by cutting the frame rate in half for the length of this frame
-        avsync_adjustment = frame_interval;
-        lastsync = true;
-        LOG(VB_PLAYBACK, LOG_INFO, LOC +
-            QString("Video is %1 frames ahead of audio,\n"
-                    "\t\t\tdoubling video frame interval to slow down.")
-                .arg(diverge));
-    }
-
+    bool bOK = false;
     if (audio.HasAudioOut() && normal_speed)
     {
         // must be sampled here due to Show delays
         int64_t currentaudiotime = audio.GetAudioTime();
         LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC +
-            QString("A/V timecodes audio %1 video %2 frameinterval %3 "
-                    "avdel %4 avg %5 tcoffset %6 avp %7 avpen %8 avdc %9")
+            QString("A/V timecodes audio %1mS video %2mS frameinterval %3uS "
+                    "avdel %4mS avg %5uS tcoffset %6mS avp %7 avpen %8 avdc %9")
                 .arg(currentaudiotime)
                 .arg(timecode)
                 .arg(frame_interval)
@@ -1980,8 +1950,54 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
                 .arg(avsync_predictor_enabled)
                 .arg(vsync_delay_clock)
                  );
-        if (currentaudiotime != 0 && timecode != 0)
-        { // currentaudiotime == 0 after a seek
+
+        // Max acceptable difference in timecodes
+        int maxdiff = (10 * frame_interval) / 1000;
+
+        if (avsync_holdoff > 0)
+            --avsync_holdoff;
+        // currentaudiotime == 0 after a seek
+        else if (timecode == 0 || currentaudiotime == 0 || prevtc == 0)
+            avsync_holdoff = 1;
+        else if (abs(timecode - prevtc) > maxdiff)
+        {
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + QString(
+                    "Discontinuous video timecodes %1 -> %2")
+                .arg(prevtc)
+                .arg(timecode)
+            );
+            avsync_holdoff = 5;
+        }
+        else if (abs(currentaudiotime - prev_audiotime) > maxdiff)
+        {
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + QString(
+                    "Discontinuous audio timecodes %1 -> %2")
+                .arg(prev_audiotime)
+                .arg(currentaudiotime)
+            );
+            // This is most common after SwitchToProgram
+            int frames = (currentaudiotime - prev_audiotime) / ((frame_interval + 999) / 1000);
+            avsync_holdoff = min(max(frames, 10), 50);
+        }
+        else if (abs(timecode - currentaudiotime) > 4000)
+        {
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + QString(
+                    "Excessive A/V timecode difference: audio %1 video %2")
+                .arg(currentaudiotime)
+                .arg(timecode)
+            );
+            avsync_holdoff = 10;
+        }
+        else if (lastsync)
+        {
+            ResetAVSync();
+            lastsync = false;
+            bOK = true;
+        }
+        else
+        {
+            bOK = true;
+
             // The time at the start of this frame (ie, now) is given by
             // last->timecode
             if (prevtc != 0)
@@ -1994,8 +2010,8 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
                     prevrp == 0)
                 {
                     // wait an extra frame interval
-                    LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC +
-                        QString("A/V delay %1").arg(delta));
+                    LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                        QString("Dropped frame. A/V delay %1mS").arg(delta));
                     avsync_adjustment += frame_interval;
                     // If we're duplicating a frame, it may be because
                     // the container frame rate doesn't match the
@@ -2006,7 +2022,6 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
                         ++framesPlayedExtra;
                 }
             }
-            prevtc = timecode;
             prevrp = repeat_pict;
 
             // usec
@@ -2016,38 +2031,87 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
             // prevents major jitter when pts resets during dvd title
             if (avsync_delay > 2000000 && limit_delay)
                 avsync_delay = 90000;
-            avsync_avg = (avsync_delay + (avsync_avg * 3)) / 4;
+
+            // NB audio timecodes can diverge from video over periods < 10sec
+            // Not sure of cause but need a long moving average to avoid
+            // numerous advance/wait pairs
+            avsync_avg = (avsync_delay + (avsync_avg * 9)) / 10;
 
             int avsync_used = avsync_avg;
             if (labs(avsync_used) > labs(avsync_delay))
                 avsync_used = avsync_delay;
 
-            /* If the audio time codes and video diverge, shift
-               the video by one interlaced field (1/2 frame) */
-            if (!lastsync)
+            // If audio is way behind of video, adjust for it...
+            if (avsync_delay > 4 * frame_interval ||
+                avsync_used > 2 * frame_interval)
             {
-                if (avsync_used > refreshrate)
-                {
-                    avsync_adjustment += refreshrate;
-                }
-                else if (avsync_used < 0 - refreshrate)
-                {
-                    avsync_adjustment -= refreshrate;
-                }
+                LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                    QString("Video is %1 frames ahead of audio,\n"
+                            "\t\t\tdoubling video frame interval to slow down.")
+                        .arg(double(avsync_delay) / frame_interval,0,'f',2));
+                avsync_adjustment = frame_interval;
+                avsync_avg -= frame_interval;
+                avsync_holdoff = 2;
             }
-            else
-                lastsync = false;
+            // If the audio time codes and video diverge, shift
+            // the video by one interlaced field (1/2 frame)
+            else if (avsync_used >= refreshrate)
+            {
+                LOG(VB_PLAYBACK, LOG_INFO, LOC + QString(
+                        "Video leads audio by %1 frames - wait a sync interval")
+                    .arg(double(avsync_delay) / frame_interval,0,'f',2));
+                avsync_adjustment += refreshrate;
+                avsync_avg -= refreshrate;
+                avsync_holdoff = 2;
+            }
+            else if (!videoOutput->EnoughDecodedFrames())
+                ;
+            else if (vsync_delay_clock <= -frame_interval)
+            {
+                LOG(VB_PLAYBACK, LOG_INFO, LOC + QString(
+                        "Vsync delay exceeds a frame interval - drop a frame"));
+                avsync_adjustment = -frame_interval;
+                avsync_avg += frame_interval;
+                avsync_holdoff = 2;
+            }
+            else if (avsync_delay < -4 * frame_interval ||
+                      avsync_used < -2 * frame_interval)
+            {
+                LOG(VB_PLAYBACK, LOG_INFO, LOC + QString(
+                        "Video lags audio by %1 frames - drop a frame")
+                    .arg(double(-avsync_delay) / frame_interval,0,'f',2));
+                avsync_adjustment = -frame_interval;
+                avsync_avg += frame_interval;
+                avsync_holdoff = 2;
+            }
+            else if (avsync_used <= -refreshrate)
+            {
+                LOG(VB_PLAYBACK, LOG_INFO, LOC + QString(
+                        "Video lags audio by %1 frames - advance a sync interval")
+                    .arg(double(-avsync_delay) / frame_interval,0,'f',2));
+                avsync_adjustment = -refreshrate;
+                avsync_avg += refreshrate;
+                avsync_holdoff = 2;
+            }
         }
-        else
-        {
-            ResetAVSync();
-        }
+
+        prev_audiotime = currentaudiotime;
     }
     else
     {
         LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC +
             QString("A/V no sync proc ns:%1").arg(normal_speed));
     }
+
+    if (!bOK)
+    {
+        ResetAVSync();
+        avsync_avg = 0;
+        avsync_adjustment = 0;
+        lastsync = false;
+    }
+
+    prevtc = timecode;
 }
 
 void MythPlayer::RefreshPauseFrame(void)
@@ -2105,6 +2169,8 @@ void MythPlayer::SetBuffering(bool new_buffering)
     else if (buffering && !new_buffering)
     {
         buffering = false;
+        lastsync = true;
+        avsync_holdoff = 5;
     }
 }
 
@@ -2194,7 +2260,10 @@ void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
         videoOutput->DoneDisplayingFrame(videoOutput->GetLastShownFrame());
 
     // retrieve the next frame
-    videoOutput->StartDisplayingFrame();
+    bool const bDisplayFrame = videoOutput->ValidVideoFrames() > 0;
+    if (bDisplayFrame)
+        videoOutput->StartDisplayingFrame();
+
     VideoFrame *frame = videoOutput->GetLastShownFrame();
 
     // Check aspect ratio
@@ -2203,9 +2272,12 @@ void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
     // Player specific processing (dvd, bd, mheg etc)
     PreProcessNormalFrame();
 
-    // handle scan type changes
-    AutoDeint(frame);
-    detect_letter_box->SwitchTo(frame);
+    if (GetTrackCount(kTrackTypeVideo))
+    {
+        // handle scan type changes
+        AutoDeint(frame);
+        detect_letter_box->SwitchTo(frame);
+    }
 
     FrameScanType ps = m_scan;
     if (kScan_Detect == m_scan || kScan_Ignore == m_scan)
@@ -2219,7 +2291,9 @@ void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
 
     AVSync(frame, 0);
     // If PiP then keep this frame for MythPlayer::GetCurrentFrame
-    if (!player_ctx->IsPIP())
+    if (player_ctx->IsPIP())
+        return;
+    if (bDisplayFrame)
         videoOutput->DoneDisplayingFrame(frame);
 }
 
@@ -2229,10 +2303,12 @@ void MythPlayer::PreProcessNormalFrame(void)
     // handle Interactive TV
     if (GetInteractiveTV())
     {
-        osdLock.lock();
-        itvLock.lock();
+        QMutexLocker lk1(&osdLock);
+
         if (osd && videoOutput->GetOSDPainter())
         {
+            QMutexLocker lk2(&itvLock);
+
             InteractiveScreen *window =
                 (InteractiveScreen*)osd->GetWindow(OSD_WIN_INTERACT);
             if ((interactiveTV->ImageHasChanged() || !itvVisible) && window)
@@ -2241,8 +2317,6 @@ void MythPlayer::PreProcessNormalFrame(void)
                 itvVisible = true;
             }
         }
-        itvLock.unlock();
-        osdLock.unlock();
     }
 #endif // USING_MHEG
 }
@@ -2410,7 +2484,7 @@ bool MythPlayer::VideoLoop(void)
         DisplayPauseFrame();
     }
     else
-        DisplayNormalFrame();
+        DisplayNormalFrame(GetTrackCount(kTrackTypeVideo));
 
     if (FlagIsSet(kVideoIsNull) && decoder)
         decoder->UpdateFramesPlayed();
@@ -2540,7 +2614,10 @@ void MythPlayer::SwitchToProgram(void)
     ProgramInfo *pginfo = player_ctx->tvchain->GetSwitchProgram(
         discontinuity, newtype, newid);
     if (!pginfo)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "SwitchToProgram - No ProgramInfo");
         return;
+    }
 
     bool newIsDummy = player_ctx->tvchain->GetCardType(newid) == "DUMMY";
 
@@ -2638,6 +2715,10 @@ void MythPlayer::SwitchToProgram(void)
     }
 
     Play();
+
+    // Holdoff a/v sync while decoder and ringbuffer settle down
+    avsync_holdoff = 25;
+
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "SwitchToProgram - end");
 }
 
@@ -2675,7 +2756,10 @@ void MythPlayer::JumpToProgram(void)
     ProgramInfo *pginfo = player_ctx->tvchain->GetSwitchProgram(
         discontinuity, newtype, newid);
     if (!pginfo)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "JumpToProgram - No ProgramInfo");
         return;
+    }
 
     inJumpToProgramPause = true;
 
@@ -2683,7 +2767,6 @@ void MythPlayer::JumpToProgram(void)
     SetPlayingInfo(*pginfo);
 
     Pause();
-    ChangeSpeed();
     ResetCaptions();
     player_ctx->tvchain->SetProgram(*pginfo);
     player_ctx->buffer->Reset(true);
@@ -2793,6 +2876,12 @@ void MythPlayer::JumpToProgram(void)
         DoJumpToFrame(nextpos, kInaccuracyNone);
 
     player_ctx->SetPlayerChangingBuffers(false);
+
+    audio.Pause(true);
+
+    // Holdoff a/v sync while decoder and ringbuffer settle down
+    avsync_holdoff = 25;
+
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "JumpToProgram - end");
 }
 
@@ -2921,12 +3010,11 @@ void MythPlayer::EventLoop(void)
         JumpToProgram();
     }
     else if ((!allpaused || GetEof() != kEofStateNone) &&
-             player_ctx->tvchain &&
-             (decoder && !decoder->GetWaitForChange()))
+             decoder && !decoder->GetWaitForChange() &&
+             player_ctx->tvchain && player_ctx->tvchain->NeedsToSwitch())
     {
         // Switch to the next program in livetv
-        if (player_ctx->tvchain->NeedsToSwitch())
-            SwitchToProgram();
+        SwitchToProgram();
     }
 
     // Jump to the next program in livetv
@@ -3120,36 +3208,35 @@ void MythPlayer::AudioEnd(void)
 
 bool MythPlayer::PauseDecoder(void)
 {
-    decoderPauseLock.lock();
+    QMutexLocker locker(&decoderPauseLock);
     if (is_current_thread(decoderThread))
     {
+        pauseDecoder = false;
         decoderPaused = true;
         decoderThreadPause.wakeAll();
-        decoderPauseLock.unlock();
-        return decoderPaused;
+        return true;
     }
 
-    int tries = 0;
     pauseDecoder = true;
-    while (decoderThread && !killdecoder && (tries++ < 100) &&
-           !decoderThreadPause.wait(&decoderPauseLock, 100))
+    int tries = 0;
+    while (!decoderPaused && decoderThread && !killdecoder && (tries++ < 10) &&
+          !decoderThreadPause.wait(locker.mutex(), 100))
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Waited 100ms for decoder to pause");
     }
     pauseDecoder = false;
-    decoderPauseLock.unlock();
     return decoderPaused;
-}
+ }
 
 void MythPlayer::UnpauseDecoder(void)
 {
-    decoderPauseLock.lock();
+    QMutexLocker locker(&decoderPauseLock);
 
     if (is_current_thread(decoderThread))
     {
+        unpauseDecoder = false;
         decoderPaused = false;
         decoderThreadUnpause.wakeAll();
-        decoderPauseLock.unlock();
         return;
     }
 
@@ -3157,15 +3244,14 @@ void MythPlayer::UnpauseDecoder(void)
     {
         int tries = 0;
         unpauseDecoder = true;
-        while (decoderThread && !killdecoder && (tries++ < 100) &&
-              !decoderThreadUnpause.wait(&decoderPauseLock, 100))
+        while (decoderPaused && decoderThread && !killdecoder && (tries++ < 10) &&
+              !decoderThreadUnpause.wait(locker.mutex(), 100))
         {
             LOG(VB_GENERAL, LOG_WARNING, LOC +
                 "Waited 100ms for decoder to unpause");
         }
         unpauseDecoder = false;
     }
-    decoderPauseLock.unlock();
 }
 
 void MythPlayer::DecoderStart(bool start_paused)
@@ -3191,7 +3277,7 @@ void MythPlayer::DecoderEnd(void)
     SetPlaying(false);
     killdecoder = true;
     int tries = 0;
-    while (decoderThread && !decoderThread->wait(100) && (tries++ < 50))
+    while (decoderThread && !decoderThread->wait(100) && (tries++ < 20))
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             "Waited 100ms for decoder loop to stop");
 
@@ -3204,12 +3290,23 @@ void MythPlayer::DecoderEnd(void)
 
 void MythPlayer::DecoderPauseCheck(void)
 {
-    if (is_current_thread(decoderThread))
+    if (!is_current_thread(decoderThread))
+        return;
+
+    QMutexLocker locker(&decoderPauseLock);
+
+    if (pauseDecoder)
     {
-        if (pauseDecoder)
-            PauseDecoder();
-        if (unpauseDecoder)
-            UnpauseDecoder();
+        pauseDecoder = false;
+        decoderPaused = true;
+        decoderThreadPause.wakeAll();
+    }
+
+    if (unpauseDecoder)
+    {
+        unpauseDecoder = false;
+        decoderPaused = false;
+        decoderThreadUnpause.wakeAll();
     }
 }
 
@@ -3766,19 +3863,21 @@ long long MythPlayer::CalcMaxFFTime(long long ffframes, bool setjump) const
         if (behind < maxtime * 3)
             limitKeyRepeat = true;
     }
+    else if (IsPaused())
+    {
+        uint64_t lastFrame  = deleteMap.IsEmpty() ? totalFrames
+                                                 : deleteMap.GetLastFrame();
+        if (framesPlayed + ffframes >= lastFrame)
+            ret = lastFrame - 1 - framesPlayed;
+    }
     else
     {
-        if (totalFrames > 0)
-        {
-            float behind = secsWritten - secsPlayed;
-            if (behind < maxtime)
-                ret = 0;
-            else if (behind - ff <= maxtime * 2)
-            {
-                uint64_t ms = 1000 * (secsWritten - maxtime * 2);
-                ret = TranslatePositionMsToFrame(ms, true) - framesPlayed;
-            }
-        }
+        float secsMax = secsWritten - 2.f * maxtime;
+        if (secsMax <= 0.f)
+            ret = 0;
+        else if (secsMax < secsPlayed + ff)
+            ret = TranslatePositionMsToFrame(1000 * secsMax, true)
+                    - framesPlayed;
     }
 
     return ret;
@@ -4660,7 +4759,10 @@ bool MythPlayer::TranscodeGetNextFrame(
                 QString("Fast-Forwarding from %1 to %2")
                     .arg(lastDecodedFrameNumber).arg(jumpto));
             if (jumpto >= totalFrames)
+            {
+                SetEof(kEofStateDelayed);
                 return false;
+            }
 
             // For 0.25, move this to DoJumpToFrame(jumpto)
             WaitForSeek(jumpto, 0);

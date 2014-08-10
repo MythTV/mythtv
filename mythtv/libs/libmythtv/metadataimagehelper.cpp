@@ -11,6 +11,9 @@ ArtworkMap GetArtwork(QString inetref,
 {
     ArtworkMap map;
 
+    if (inetref.isEmpty())
+        return map;
+
     MSqlQuery query(MSqlQuery::InitCon());
 
     QString querystring = "SELECT host, coverart, fanart, banner "

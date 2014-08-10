@@ -383,6 +383,7 @@ class MetadataOptions : public SchedEditChild
     QStringList GetSupportedImageExtensionFilter();
 
     void HandleDownloadedImages(MetadataLookup *lookup);
+    MetadataLookup *CreateLookup(MetadataType mtype);
 
     bool CanSetArtwork(void);
 

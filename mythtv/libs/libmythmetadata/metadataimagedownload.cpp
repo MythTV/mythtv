@@ -377,7 +377,7 @@ QString getDownloadFilename(VideoArtworkType type, MetadataLookup *lookup,
     uint season = lookup->GetSeason();
     uint episode = lookup->GetEpisode();
     QString system = lookup->GetSystem();
-    if (season > 0 || episode > 0)
+    if (!lookup->GetIsCollection() && (season > 0 || episode > 0))
     {
         title = lookup->GetTitle();
         if (title.contains("/"))
