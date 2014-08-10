@@ -33,9 +33,10 @@ HEADERS += external/replex/multiplex.h external/replex/pes.h
 HEADERS += external/replex/ringbuffer.h external/replex/ts.h
 
 DEPENDPATH += external/replex
+DEPENDPATH += ../../libs/libswresample
+DEPENDPATH += ../../libs/libavutil
 DEPENDPATH += ../../libs/libavcodec
 DEPENDPATH += ../../libs/libavformat
-DEPENDPATH += ../../libs/libavutil
 DEPENDPATH += ../../libs/libmythtv/recorders
 DEPENDPATH += ../../external/minilzo
 

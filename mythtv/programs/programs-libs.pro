@@ -12,11 +12,11 @@ INCLUDEPATH += ../../libs/libmythservicecontracts
 INCLUDEPATH += ../../libs/libmythprotoserver
 
 LIBS += -L../../libs/libmyth -L../../libs/libmythtv
+LIBS += -L../../external/FFmpeg/libswresample
 LIBS += -L../../external/FFmpeg/libavutil
 LIBS += -L../../external/FFmpeg/libavcodec
 LIBS += -L../../external/FFmpeg/libavformat
 LIBS += -L../../external/FFmpeg/libswscale
-LIBS += -L../../external/FFmpeg/libswresample
 LIBS += -L../../libs/libmythbase
 LIBS += -L../../libs/libmythui
 LIBS += -L../../libs/libmythupnp
@@ -26,9 +26,9 @@ LIBS += -L../../libs/libmythprotoserver
 
 LIBS += -lmythswscale
 LIBS += -lmythavformat
-LIBS += -lmythavcodec
-LIBS += -lmythavutil
 LIBS += -lmythswresample
+LIBS += -lmythavutil
+LIBS += -lmythavcodec
 LIBS += -lmythtv-$$LIBVERSION
 LIBS += -lmythupnp-$$LIBVERSION
 LIBS += -lmythbase-$$LIBVERSION
@@ -50,6 +50,7 @@ win32 {
     POST_TARGETDEPS += ../../libs/libmythui/libmythui-$${MYTH_SHLIB_EXT}
     POST_TARGETDEPS += ../../libs/libmyth/libmyth-$${MYTH_SHLIB_EXT}
     POST_TARGETDEPS += ../../libs/libmythtv/libmythtv-$${MYTH_SHLIB_EXT}
+    POST_TARGETDEPS += ../../external/FFmpeg/libswresample/$$avLibName(swresample)
     POST_TARGETDEPS += ../../external/FFmpeg/libavutil/$$avLibName(avutil)
     POST_TARGETDEPS += ../../external/FFmpeg/libavcodec/$$avLibName(avcodec)
     POST_TARGETDEPS += ../../external/FFmpeg/libavformat/$$avLibName(avformat)

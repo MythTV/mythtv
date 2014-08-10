@@ -38,6 +38,7 @@ DEPENDPATH += ../libmythupnp ../libmythservicecontracts
 
 LIBS += -L../libmythbase -L../libmyth -L../libmythtv -L../libmythui
 LIBS += -L../libmythupnp -L../libmythservicecontracts
+LIBS += -L../../external/FFmpeg/libswresample -lmythswresample
 LIBS += -L../../external/FFmpeg/libavutil -L../../external/FFmpeg/libavcodec
 LIBS += -L../../external/FFmpeg/libavformat -L../../external/FFmpeg/libswscale
 LIBS += -lmythbase-$$LIBVERSION -lmyth-$$LIBVERSION -lmythui-$$LIBVERSION
