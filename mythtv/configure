@@ -7552,7 +7552,7 @@ echo "Configuring libmythsoundtouch..."
 
 test -n "$WARNINGS" && printf "\n$WARNINGS" || exit 0
 
-<<EOF
+<<MYTHEOF
 # build pkg-config files
 
 lib_version(){
@@ -7614,4 +7614,4 @@ pkgconfig_generate libpostproc   "FFmpeg postprocessing library"        "$LIBPOS
 pkgconfig_generate libavresample "Libav audio resampling library"       "$LIBAVRESAMPLE_VERSION" "$extralibs"
 pkgconfig_generate libswscale    "FFmpeg image rescaling library"       "$LIBSWSCALE_VERSION"    "$LIBM"
 pkgconfig_generate libswresample "FFmpeg audio resampling library"      "$LIBSWRESAMPLE_VERSION" "$LIBM"
-EOF
+MYTHEOF
