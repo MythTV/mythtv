@@ -85,7 +85,6 @@ class MTV_PUBLIC RingBuffer : protected MThread
     ///        or -1 if the query fails.
     long long GetRealFileSize(void) const;
     bool      IsNearEnd(double fps, uint vvf) const;
-    bool      IsReadyToRead() const;
     /// \brief Returns true if open for either reading or writing.
     virtual bool IsOpen(void) const = 0;
     virtual bool IsStreamed(void)       { return LiveMode(); }
