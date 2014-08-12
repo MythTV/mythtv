@@ -501,7 +501,7 @@ void ExternalStreamHandler::run(void)
 
         UpdateFiltersFromStreamData();
 
-        if (!xon)
+        if (!xon || m_poll_mode)
         {
             ProcessCommand(ready_cmd, 1000, result);
             if (result.startsWith("ERR"))
@@ -547,7 +547,8 @@ void ExternalStreamHandler::run(void)
                     ProcessCommand(QString("XOFF"), 50, result);
                     if (result.startsWith("ERR"))
                     {
-                        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Aborting: XOFF -> %2")
+                        LOG(VB_GENERAL, LOG_ERR, LOC +
+                            QString("Aborting: XOFF -> %2")
                             .arg(result));
                         _error = true;
                     }

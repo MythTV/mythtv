@@ -84,7 +84,8 @@ bool ExternalChannel::Tune(const QString &channum)
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Tuning to " + channum);
 
-    if (!m_stream_handler->ProcessCommand("TuneChannel " + channum, 5000, result))
+    if (!m_stream_handler->ProcessCommand("TuneChannel:" + channum, 5000,
+                                          result))
     {
         LOG(VB_CHANNEL, LOG_ERR, LOC + QString
             ("Failed to Tune %1: %2").arg(channum).arg(result));
