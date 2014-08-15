@@ -25,7 +25,7 @@ contains(INCLUDEPATH, /usr/local/include) {
 DEPENDPATH  += .
 DEPENDPATH  += ../libmyth ../libmyth/audio
 DEPENDPATH  += ../libmythbase
-DEPENDPATH  += ./mpeg ./channelscan ./visualisations
+DEPENDPATH  += ./mpeg ./channelscan ./visualisations ./mpeg/libaesdec ./mpeg/libcs378x
 DEPENDPATH  += ./recorders
 DEPENDPATH  += ./recorders/dvbdev
 DEPENDPATH  += ./recorders/rtp
@@ -200,6 +200,7 @@ HEADERS += mpeg/freesat_huffman.h   mpeg/freesat_tables.h
 HEADERS += mpeg/iso6937tables.h
 HEADERS += mpeg/tsstats.h           mpeg/streamlisteners.h
 HEADERS += mpeg/H264Parser.h
+HEADERS += mpeg/libaesdec/libaesdec.h mpeg/libcs378x/cs378x.h
 
 SOURCES += mpeg/tspacket.cpp        mpeg/pespacket.cpp
 SOURCES += mpeg/mpegtables.cpp      mpeg/atsctables.cpp
@@ -215,6 +216,7 @@ SOURCES += mpeg/atsc_huffman.cpp
 SOURCES += mpeg/freesat_huffman.cpp
 SOURCES += mpeg/iso6937tables.cpp
 SOURCES += mpeg/H264Parser.cpp
+SOURCES += mpeg/libaesdec/libaesdec.c mpeg/libcs378x/cs378x.c
 
 # Channels, and the multiplexes that transmit them
 HEADERS += frequencies.h            frequencytables.h
