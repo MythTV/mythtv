@@ -1056,7 +1056,7 @@ bool MPEGStreamData::ProcessTSPacket(const TSPacket& tspacket)
     TSPacket *tspacket_dec = NULL;
     if (tspacket.Scrambled() && (_gotcws == 1))
     {
-            tspacket_dec = DecryptPayload(_keys,tspacket);
+        tspacket_dec = DecryptPayload(_keys,tspacket);
     }
     const TSPacket& tspacket_new = (tspacket_dec) ? *tspacket_dec : tspacket;
 

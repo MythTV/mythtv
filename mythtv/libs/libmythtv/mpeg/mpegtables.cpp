@@ -575,8 +575,8 @@ bool ProgramMapTable::IsProgramEncrypted(void) const
         encryption_system[cad.PID()] = cad.SystemID();
         encrypted |= cad.SystemID();
 
-#if 1
-        LOG(VB_GENERAL, LOG_INFO, "DTVsm Program: " + cad.toString());
+#if 0
+        LOG(VB_GENERAL, LOG_INFO, "DTVsm: " + cad.toString());
 #endif
     }
 
@@ -601,8 +601,8 @@ bool ProgramMapTable::IsStreamEncrypted(uint i) const
         encryption_system[cad.PID()] = cad.SystemID();
         encrypted |= cad.SystemID();
 
-#if 1
-        LOG(VB_GENERAL, LOG_INFO, "DTVsm Stream: " + cad.toString());
+#if 0
+        LOG(VB_GENERAL, LOG_INFO, "DTVsm: " + cad.toString());
 #endif
     }
 
