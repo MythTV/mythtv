@@ -19,6 +19,11 @@ using namespace std;
 #include "atscstreamdata.h"
 #include "atsctables.h"
 
+#include <openssl/aes.h>
+#include "libaesdec/libaesdec.h"
+#include "libcs378x/cs378x.h"
+#include <sys/socket.h>
+
 //#define DEBUG_MPEG_RADIO // uncomment to strip video streams from TS stream
 #define LOC QString("MPEGStream[%1](0x%2): ").arg(_cardid).arg((intptr_t)this, QT_POINTER_SIZE, 16)
 
@@ -84,7 +89,7 @@ MPEGStreamData::MPEGStreamData(int desiredProgram, int cardnum,
       _pmt_single_program_num_video(1),
       _pmt_single_program_num_audio(0),
       _pat_single_program(NULL), _pmt_single_program(NULL),
-      _invalid_pat_seen(false), _invalid_pat_warning(false)
+      _invalid_pat_seen(false), _invalid_pat_warning(false), _client_sockfd(0), _gotcws(0)
 {
     memset(_si_time_offsets, 0, sizeof(_si_time_offsets));
 
@@ -632,7 +637,11 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable &pmt)
     {
         ConditionalAccessDescriptor cad(cdesc[i]);
         if (cad.IsValid())
+        {
             AddListeningPID(cad.PID());
+            _pid_ecm = cad.PID();
+            _caid_system = cad.SystemID();
+        }
     }
 
     _pids_audio.clear();
@@ -1041,46 +1050,94 @@ bool MPEGStreamData::ProcessTSPacket(const TSPacket& tspacket)
 {
     bool ok = !tspacket.TransportError();
 
-    if (IsEncryptionTestPID(tspacket.PID()))
-    {
-        ProcessEncryptedPacket(tspacket);
-    }
-
     if (!ok)
         return false;
 
-    if (tspacket.Scrambled())
-        return true;
+    TSPacket *tspacket_dec = NULL;
+    if (tspacket.Scrambled() && (_gotcws == 1))
+    {
+            tspacket_dec = DecryptPayload(_keys,tspacket);
+    }
+    const TSPacket& tspacket_new = (tspacket_dec) ? *tspacket_dec : tspacket;
 
-    if (IsVideoPID(tspacket.PID()))
+    if (IsEncryptionTestPID(tspacket_new.PID()))
+    {
+        ProcessEncryptedPacket(tspacket_new);
+    }
+
+
+    if (IsVideoPID(tspacket_new.PID()))
     {
         for (uint j = 0; j < _ts_av_listeners.size(); j++)
-            _ts_av_listeners[j]->ProcessVideoTSPacket(tspacket);
+            _ts_av_listeners[j]->ProcessVideoTSPacket(tspacket_new);
 
         return true;
     }
 
-    if (IsAudioPID(tspacket.PID()))
+    if (IsAudioPID(tspacket_new.PID()))
     {
         for (uint j = 0; j < _ts_av_listeners.size(); j++)
-            _ts_av_listeners[j]->ProcessAudioTSPacket(tspacket);
+            _ts_av_listeners[j]->ProcessAudioTSPacket(tspacket_new);
 
         return true;
     }
 
-    if (IsWritingPID(tspacket.PID()))
+    if (IsWritingPID(tspacket_new.PID()))
     {
         for (uint j = 0; j < _ts_writing_listeners.size(); j++)
-            _ts_writing_listeners[j]->ProcessTSPacket(tspacket);
+            _ts_writing_listeners[j]->ProcessTSPacket(tspacket_new);
     }
 
-    if (IsListeningPID(tspacket.PID()) && tspacket.HasPayload())
+
+    if (IsListeningPID(tspacket_new.PID()) && (tspacket_new.PID() == _pid_ecm))
     {
-        HandleTSTables(&tspacket);
+        ProcessECMPacket(tspacket_new);
+    }
+
+    if (IsListeningPID(tspacket_new.PID()) && tspacket_new.HasPayload())
+    {
+        HandleTSTables(&tspacket_new);
     }
 
     return true;
 }
+
+
+int MPEGStreamData::ProcessECMPacket(const TSPacket& tspacket)
+{
+    //Send payload to soft-cam for decryption
+    unsigned char payload[188];
+    memcpy(payload, tspacket.data(), 188);
+    uint channel = (payload[23] << 8) + payload[24];
+    if(!_client_sockfd)
+        _client_sockfd = cs378x_connect_client(SOCK_STREAM, "192.168.2.4", "15070"); // TODO move to config file
+
+    if (_last_table_id != payload[5] || _last_channel != channel)
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("ECM Received for channel %1, table %2").arg(channel).arg(payload[5],0,16)); 
+        _gotcws = 0;
+        _last_table_id=payload[5];
+        _last_channel=channel;
+        unsigned char cw[32];
+        if (cs378x_getcws(_client_sockfd, &payload[5], cw))
+        {
+            _gotcws = 1;
+            _keys=aes_get_key_struct();
+            aes_set_even_control_word(_keys,cw);
+            aes_set_odd_control_word(_keys,cw+16);
+        }
+    }
+    return 0;
+}
+
+TSPacket* MPEGStreamData::DecryptPayload(void *keys, const TSPacket& tspacket) const
+{
+    TSPacket *pkt = new TSPacket();
+    memcpy(pkt, &tspacket, TSPacket::kSize);
+    aes_decrypt_packet(keys,pkt->data());
+    return pkt;
+}
+
 
 int MPEGStreamData::ResyncStream(const unsigned char *buffer, int curr_pos,
                                  int len)
