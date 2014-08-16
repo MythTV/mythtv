@@ -5210,7 +5210,6 @@ bool AvFormatDecoder::SetupAudioStream(void)
     AVCodecContext *ctx = NULL;
     AudioInfo old_in    = audioIn;
     bool using_passthru = false;
-    int  orig_channels  = 2;
     int requested_channels;
 
     if ((currentTrack[kTrackTypeAudio] >= 0) && ic &&
@@ -5222,7 +5221,6 @@ bool AvFormatDecoder::SetupAudioStream(void)
         assert(curstream);
         assert(curstream->codec);
         ctx = curstream->codec;
-        orig_channels = selectedTrack[kTrackTypeAudio].orig_num_channels;
         AudioFormat fmt =
             AudioOutputSettings::AVSampleFormatToFormat(ctx->sample_fmt,
                                                         ctx->bits_per_raw_sample);
@@ -5263,7 +5261,7 @@ bool AvFormatDecoder::SetupAudioStream(void)
         }
 
         info = AudioInfo(ctx->codec_id, fmt, ctx->sample_rate,
-                         ctx->channels, using_passthru, orig_channels,
+                         requested_channels, using_passthru, ctx->channels,
                          ctx->codec_id == AV_CODEC_ID_DTS ? ctx->profile : 0);
     }
 
@@ -5287,7 +5285,7 @@ bool AvFormatDecoder::SetupAudioStream(void)
         QString("\n\t\t\tfrom %1 to %2")
             .arg(old_in.toString()).arg(audioOut.toString()));
 
-    m_audio->SetAudioParams(audioOut.format, orig_channels,
+    m_audio->SetAudioParams(audioOut.format, ctx->channels,
                             requested_channels,
                             audioOut.codec_id, audioOut.sample_rate,
                             audioOut.do_passthru, audioOut.codec_profile);
