@@ -4591,11 +4591,12 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                 // for passthru or codecs for which the decoder won't downmix
                 // let the decoder set the number of channels. For other codecs
                 // we downmix if necessary in audiooutputbase
-                ctx->request_channels = 0;
+                ctx->request_channel_layout = 0;
             }
             else // No passthru, the decoder will downmix
             {
-                ctx->request_channels = m_audio->GetMaxChannels();
+                ctx->request_channel_layout =
+                    av_get_default_channel_layout(m_audio->GetMaxChannels());
                 if (ctx->codec_id == AV_CODEC_ID_AC3)
                     ctx->channels = m_audio->GetMaxChannels();
             }
@@ -4669,12 +4670,15 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
             {
                 if (DecoderWillDownmix(ctx))
                 {
-                    ctx->request_channels = m_audio->GetMaxChannels();
+                    ctx->request_channel_layout =
+                        av_get_default_channel_layout(m_audio->GetMaxChannels());
                     if (ctx->codec_id == AV_CODEC_ID_AC3)
                         ctx->channels = m_audio->GetMaxChannels();
                 }
                 else
-                    ctx->request_channels = 0;
+                {
+                    ctx->request_channel_layout = 0;
+                }
 
                 ret = m_audio->DecodeAudio(ctx, audioSamples, data_size, &tmp_pkt);
                 decoded_size = data_size;
@@ -5207,6 +5211,7 @@ bool AvFormatDecoder::SetupAudioStream(void)
     AudioInfo old_in    = audioIn;
     bool using_passthru = false;
     int  orig_channels  = 2;
+    int requested_channels;
 
     if ((currentTrack[kTrackTypeAudio] >= 0) && ic &&
         (selectedTrack[kTrackTypeAudio].av_stream_index <=
@@ -5240,13 +5245,21 @@ bool AvFormatDecoder::SetupAudioStream(void)
 
         using_passthru = DoPassThrough(ctx, false);
 
-        ctx->request_channels = ctx->channels;
+        requested_channels = ctx->channels;
+        ctx->request_channel_layout =
+            av_get_default_channel_layout(requested_channels);
 
         if (!using_passthru &&
             ctx->channels > (int)m_audio->GetMaxChannels() &&
             DecoderWillDownmix(ctx))
         {
-            ctx->request_channels = m_audio->GetMaxChannels();
+            requested_channels = m_audio->GetMaxChannels();
+            ctx->request_channel_layout =
+                av_get_default_channel_layout(requested_channels);
+        }
+        else
+        {
+            ctx->request_channel_layout = 0;
         }
 
         info = AudioInfo(ctx->codec_id, fmt, ctx->sample_rate,
@@ -5275,7 +5288,7 @@ bool AvFormatDecoder::SetupAudioStream(void)
             .arg(old_in.toString()).arg(audioOut.toString()));
 
     m_audio->SetAudioParams(audioOut.format, orig_channels,
-                            ctx->request_channels,
+                            requested_channels,
                             audioOut.codec_id, audioOut.sample_rate,
                             audioOut.do_passthru, audioOut.codec_profile);
     m_audio->ReinitAudio();
