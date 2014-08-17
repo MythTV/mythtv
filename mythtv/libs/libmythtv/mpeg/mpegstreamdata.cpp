@@ -1056,7 +1056,7 @@ bool MPEGStreamData::ProcessTSPacket(const TSPacket& tspacket)
     TSPacket *tspacket_dec = NULL;
     if (tspacket.Scrambled() && (_gotcws == 1))
     {
-        tspacket_dec = DecryptPayload(_keys,tspacket);
+        tspacket_dec = DecryptPayload(tspacket);
     }
     const TSPacket& tspacket_new = (tspacket_dec) ? *tspacket_dec : tspacket;
 
@@ -1098,6 +1098,9 @@ bool MPEGStreamData::ProcessTSPacket(const TSPacket& tspacket)
     {
         HandleTSTables(&tspacket_new);
     }
+    
+    if (tspacket_dec)
+        delete tspacket_dec;
 
     return true;
 }
@@ -1130,11 +1133,11 @@ int MPEGStreamData::ProcessECMPacket(const TSPacket& tspacket)
     return 0;
 }
 
-TSPacket* MPEGStreamData::DecryptPayload(void *keys, const TSPacket& tspacket) const
+TSPacket* MPEGStreamData::DecryptPayload(const TSPacket& tspacket) const
 {
     TSPacket *pkt = new TSPacket();
     memcpy(pkt, &tspacket, TSPacket::kSize);
-    aes_decrypt_packet(keys,pkt->data());
+    aes_decrypt_packet(_keys,pkt->data());
     return pkt;
 }
 

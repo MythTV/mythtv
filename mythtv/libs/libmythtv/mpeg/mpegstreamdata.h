@@ -125,7 +125,7 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     virtual void HandleTSTables(const TSPacket* tspacket);
     virtual bool ProcessTSPacket(const TSPacket& tspacket);
     virtual int ProcessECMPacket(const TSPacket& tspacket);
-    virtual TSPacket* DecryptPayload(void *keys, const TSPacket& tspacket) const;
+    virtual TSPacket* DecryptPayload(const TSPacket& tspacket) const;
     virtual int  ProcessData(const unsigned char *buffer, int len);
     inline  void HandleAdaptationFieldControl(const TSPacket* tspacket);
 
@@ -361,13 +361,13 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     QString                   _sistandard;
 
     // Decryption variables
-    uint                _pid_ecm;
-    uint                _caid_system;    
-    void                 * _keys;
-    uint               _gotcws;
-    unsigned char      _last_table_id;
-    uint               _last_channel;
-    uint               _client_sockfd;
+    uint                      _pid_ecm;
+    uint                      _caid_system;    
+    void                     *_keys;
+    uint                      _gotcws;
+    unsigned char             _last_table_id;
+    uint                      _last_channel;
+    uint                      _client_sockfd;
 
     bool                      _have_CRC_bug;
 
