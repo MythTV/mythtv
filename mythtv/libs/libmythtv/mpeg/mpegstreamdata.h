@@ -19,7 +19,9 @@ using namespace std;
 #include "eitscanner.h"
 #include "mythtvexp.h"
 
+#ifdef USING_LIBCRYPTO
 #include <openssl/aes.h>
+#endif
 
 class EITHelper;
 class PSIPTable;
@@ -360,6 +362,7 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     int                       _cardid;
     QString                   _sistandard;
 
+#ifdef USING_LIBCRYPTO
     // Decryption variables
     uint                      _pid_ecm;
     uint                      _caid_system;    
@@ -368,6 +371,7 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     unsigned char             _last_table_id;
     uint                      _last_channel;
     uint                      _client_sockfd;
+#endif
 
     bool                      _have_CRC_bug;
 
