@@ -14,8 +14,6 @@ using namespace std;
 
 #include "streamhandler.h"
 
-// #define USE_MYTHSYSTEM_FOR_RECORDER_IO 1
-
 class DTVSignalMonitor;
 class ExternalChannel;
 
@@ -87,17 +85,14 @@ class ExternalStreamHandler : public StreamHandler
     void CloseApp(void);
 
     QMutex         m_IO_lock;
-#ifdef USE_MYTHSYSTEM_FOR_RECORDER_IO
-    MythSystem    *m_IO;
-#else
     ExternIO      *m_IO;
-#endif
     QStringList    m_args;
     QString        m_app;
     QString        m_error;
     bool           m_tsopen;
     int            m_io_errcnt;
     bool           m_poll_mode;
+    bool           m_notify;
 
     bool           m_hasTuner;
     bool           m_hasPictureAttributes;
