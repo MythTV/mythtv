@@ -1134,8 +1134,7 @@ int MPEGStreamData::ProcessECMPacket(const TSPacket& tspacket)
         {
             _gotcws = 1;
             _keys=aes_get_key_struct();
-            aes_set_even_control_word(_keys,cw);
-            aes_set_odd_control_word(_keys,cw+16);
+            aes_set_control_words(_keys,cw,cw+16);
         }
     }
     return 0;
