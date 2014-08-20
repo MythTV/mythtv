@@ -19,7 +19,7 @@ using namespace std;
 #include "eitscanner.h"
 #include "mythtvexp.h"
 
-#ifdef USING_LIBCRYPTO
+#ifdef USING_LIBAESDEC
 #include <openssl/aes.h>
 #endif
 
@@ -126,8 +126,10 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     virtual bool HandleTables(uint pid, const PSIPTable &psip);
     virtual void HandleTSTables(const TSPacket* tspacket);
     virtual bool ProcessTSPacket(const TSPacket& tspacket);
+#ifdef LIBAESDEC
     virtual int ProcessECMPacket(const TSPacket& tspacket);
     virtual TSPacket* DecryptPayload(const TSPacket& tspacket) const;
+#endif
     virtual int  ProcessData(const unsigned char *buffer, int len);
     inline  void HandleAdaptationFieldControl(const TSPacket* tspacket);
 
@@ -362,7 +364,7 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     int                       _cardid;
     QString                   _sistandard;
 
-#ifdef USING_LIBCRYPTO
+#ifdef USING_LIBAESDEC
     // Decryption variables
     uint                      _pid_ecm;
     uint                      _caid_system;    

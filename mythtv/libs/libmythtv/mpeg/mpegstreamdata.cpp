@@ -19,7 +19,7 @@ using namespace std;
 #include "atscstreamdata.h"
 #include "atsctables.h"
 
-#ifdef USING_LIBCRYPTO
+#ifdef USING_LIBAESDEC
 #include <openssl/aes.h>
 #include "libaesdec/libaesdec.h"
 #include "libcs378x/cs378x.h"
@@ -92,7 +92,7 @@ MPEGStreamData::MPEGStreamData(int desiredProgram, int cardnum,
       _pmt_single_program_num_audio(0),
       _pat_single_program(NULL), _pmt_single_program(NULL),
       _invalid_pat_seen(false), _invalid_pat_warning(false)
-#ifdef USING_LIBCRYPTO
+#ifdef USING_LIBAESDEC
       , _client_sockfd(0), _gotcws(0)
 #endif
 {
@@ -644,8 +644,10 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable &pmt)
         if (cad.IsValid())
         {
             AddListeningPID(cad.PID());
+#ifdef LIBAESDEC
             _pid_ecm = cad.PID();
             _caid_system = cad.SystemID();
+#endif
         }
     }
 
@@ -1059,10 +1061,10 @@ bool MPEGStreamData::ProcessTSPacket(const TSPacket& tspacket)
         return false;
 
     TSPacket *tspacket_dec = NULL;
-    if (tspacket.Scrambled() && (_gotcws == 1))
+    if (tspacket.Scrambled())
     {
-#ifdef USING_LIBCRYPTO
-        tspacket_dec = DecryptPayload(tspacket);
+#ifdef USING_LIBAESDEC
+        if (_gotcws == 1) tspacket_dec = DecryptPayload(tspacket);
 #endif
     }
     const TSPacket& tspacket_new = (tspacket_dec) ? *tspacket_dec : tspacket;
@@ -1095,7 +1097,7 @@ bool MPEGStreamData::ProcessTSPacket(const TSPacket& tspacket)
             _ts_writing_listeners[j]->ProcessTSPacket(tspacket_new);
     }
 
-#ifdef USING_LIBCRYPTO
+#ifdef USING_LIBAESDEC
     if (IsListeningPID(tspacket_new.PID()) && (tspacket_new.PID() == _pid_ecm))
     {
         ProcessECMPacket(tspacket_new);
@@ -1113,7 +1115,7 @@ bool MPEGStreamData::ProcessTSPacket(const TSPacket& tspacket)
     return true;
 }
 
-#ifdef USING_LIBCRYPTO
+#ifdef USING_LIBAESDEC
 int MPEGStreamData::ProcessECMPacket(const TSPacket& tspacket)
 {
     //Send payload to soft-cam for decryption

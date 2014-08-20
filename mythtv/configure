@@ -154,6 +154,7 @@ Advanced options (experts only):
   --perl-config-opts=OPTS  Additional options to pass when generating
                            Makefile.perl for building Perl bindings.
   --enable-mythlogserver   Enable mythlogserver logging daemon facility
+  --enable-libaesdec       Enable TS AES decryption
 
 External codec library options (used for mythffmpeg and streaming transcode):
   --enable-libmp3lame      enable MP3 encoding via libmp3lame [no]
@@ -2134,6 +2135,7 @@ MYTHTV_CONFIG_LIST='
     profiletype
     debugtype
     mythlogserver
+    libaesdec
 '
 
 MYTHTV_HAVE_LIST='
@@ -3154,6 +3156,7 @@ enable libfftw3
 enable taglib
 disable mythlogserver
 enable exiv2
+disable libaesdec
 
 # mythtv paths
 dvb_path_default="${sysroot}/usr/include"
@@ -7021,6 +7024,7 @@ if enabled frontend; then
 fi
 echo "libdns_sd (Bonjour)       ${libdns_sd-no}"
 echo "libcrypto                 ${libcrypto-no}"
+echo "libaesdec                 ${libaesdec-no}"
 echo "Frontend                  ${frontend-no}"
 echo "Backend                   ${backend-no}"
 echo "OpenGL ES 2.0             ${opengles-no}"
