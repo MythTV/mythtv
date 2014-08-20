@@ -121,7 +121,7 @@ int ExternIO::Read(QByteArray & buffer, int maxlen, int timeout)
 
     if (len < 0)
     {
-        m_error = "Failed to read from Extern Recorder: " + ENO;
+        m_error = "Failed to read from External Recorder: " + ENO;
         LOG(VB_RECORD, LOG_ERR, m_error);
         return 0;
     }
@@ -434,7 +434,7 @@ void ExternalStreamHandler::Return(ExternalStreamHandler * & ref)
 
 ExternalStreamHandler::ExternalStreamHandler(const QString & path) :
     StreamHandler(path), m_IO(0), m_tsopen(false), m_io_errcnt(0),
-    m_poll_mode(false), m_replay(true)
+    m_poll_mode(false), m_notify(false), m_replay(true)
 {
     setObjectName("ExternSH");
 
@@ -470,12 +470,14 @@ void ExternalStreamHandler::run(void)
     bool       xon = false;
     QByteArray buffer;
     uint       len, read_len;
+    uint       empty_cnt;
 
     RunProlog();
 
     LOG(VB_RECORD, LOG_INFO, LOC + "run(): begin");
 
     SetRunning(true, true, false);
+    m_notify = false;
 
     if (m_poll_mode)
         ready_cmd = "SendBytes";
@@ -489,13 +491,13 @@ void ExternalStreamHandler::run(void)
         {
             LOG(VB_RECORD, LOG_WARNING, LOC + QString("TS not open yet: %1")
                 .arg(m_error));
-            usleep(5000);
+            usleep(1000);
             continue;
         }
 
         if (StreamingCount() == 0)
         {
-            usleep(5000);
+            usleep(1000);
             continue;
         }
 
@@ -514,6 +516,20 @@ void ExternalStreamHandler::run(void)
                 xon = true;
         }
 
+        if (buffer.isEmpty())
+        {
+            if (++empty_cnt % 1000 == 0)
+            {
+                LOG(VB_GENERAL, LOG_ERR, LOC + "No data from external app");
+                m_notify = true;
+            }
+        }
+        else
+        {
+            empty_cnt = 0;
+            m_notify = false;
+        }
+
         while (buffer.size() > 188*50 ||
                (read_len = m_IO->Read(buffer, PACKET_SIZE, 100)) > 0)
         {
@@ -522,7 +538,7 @@ void ExternalStreamHandler::run(void)
                 m_error = m_IO->ErrorString();
                 _error = true;
                 LOG(VB_GENERAL, LOG_ERR, LOC +
-                    QString("Failed to read from Extern recorder: %1")
+                    QString("Failed to read from External Recorder: %1")
                     .arg(m_error));
                 break;
             }
@@ -569,7 +585,7 @@ void ExternalStreamHandler::run(void)
             if (m_replay)
             {
                 m_replay_buffer += buffer.left(len - remainder);
-                if (m_replay_buffer.size() > (5000 * PACKET_SIZE))
+                if (m_replay_buffer.size() > (50 * PACKET_SIZE))
                 {
                     m_replay_buffer.remove(0, len - remainder);
                     LOG(VB_RECORD, LOG_WARNING, LOC +
@@ -584,7 +600,14 @@ void ExternalStreamHandler::run(void)
                 buffer.clear();
         }
         if (!m_IO || m_IO->Error())
+        {
+            m_error = m_IO->ErrorString();
             _error = true;
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("Error from External Recorder: %1")
+                .arg(m_error));
+            break;
+        }
     }
     LOG(VB_RECORD, LOG_INFO, LOC + "run(): " + "shutdown");
 
@@ -607,12 +630,7 @@ bool ExternalStreamHandler::OpenApp(void)
             return true;
         }
 
-#ifdef USE_MYTHSYSTEM_FOR_RECORDER_IO
-        m_IO = new MythSystem(m_app, m_args,
-                          kMSRunShell|kMSStdIn|kMSStdOut|kMSStdErr|kMSBuffered);
-#else
         m_IO = new ExternIO(m_app, m_args);
-#endif
 
         if (m_IO == NULL)
         {
@@ -624,19 +642,17 @@ bool ExternalStreamHandler::OpenApp(void)
         {
             LOG(VB_RECORD, LOG_INFO, LOC + QString("Spawn '%1'").arg(_device));
             m_IO->Run();
-#ifndef USE_MYTHSYSTEM_FOR_RECORDER_IO
             if (m_IO->Error())
             {
                 m_error = m_IO->ErrorString();
                 _error = true;
                 LOG(VB_GENERAL, LOG_ERR,
-                    QString("Failed to start Extern recorder: %1")
+                    QString("Failed to start External Recorder: %1")
                     .arg(m_error));
                 delete m_IO;
                 m_IO = NULL;
                 return false;
             }
-#endif
         }
     }
 
@@ -753,7 +769,7 @@ bool ExternalStreamHandler::StartStreaming(bool flush_buffer)
 
     if (!IsAppOpen())
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "External recorder not started.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "External Recorder not started.");
         return false;
     }
 
@@ -843,7 +859,7 @@ bool ExternalStreamHandler::StopStreaming(void)
 
     if (!IsAppOpen())
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "External recorder not started.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "External Recorder not started.");
         return false;
     }
 
@@ -889,14 +905,9 @@ bool ExternalStreamHandler::ProcessCommand(const QString & cmd, uint timeout,
     QByteArray buf(cmd.toUtf8(), cmd.size());
     buf += '\n';
 
-#ifdef USE_MYTHSYSTEM_FOR_RECORDER_IO
-    m_IO->Write(buf);
-    buf = m_IO->ReadAllErr();
-    result = QString(buf);
-#else
     if (m_IO->Error())
     {
-        LOG(VB_GENERAL, LOG_ERR, "Extern recorder in bad state: " +
+        LOG(VB_GENERAL, LOG_ERR, "External Recorder in bad state: " +
             m_IO->ErrorString());
         return false;
     }
@@ -912,16 +923,15 @@ bool ExternalStreamHandler::ProcessCommand(const QString & cmd, uint timeout,
     {
         m_error = m_IO->ErrorString();
         _error = true;
-        LOG(VB_GENERAL, LOG_ERR, "Failed to read from Extern recorder: " +
+        LOG(VB_GENERAL, LOG_ERR, "Failed to read from External Recorder: " +
             m_error);
         return false;
     }
-#endif
 
     if (result.size() < 1)
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC +
-            QString("External recorder did not respond to '%1'").arg(cmd));
+            QString("External Recorder did not respond to '%1'").arg(cmd));
         if (++m_io_errcnt > 10)
             _error = true;
         return false;
@@ -929,9 +939,9 @@ bool ExternalStreamHandler::ProcessCommand(const QString & cmd, uint timeout,
     else
         m_io_errcnt = 0;
 
-    bool dbg = result.startsWith("OK") &&
-               (cmd.startsWith("SendBytes") || cmd.startsWith("XO"));
-    LOG(VB_RECORD, dbg ? LOG_DEBUG : LOG_INFO,
+    m_notify |= (!result.startsWith("OK") ||
+                 (!cmd.startsWith("SendBytes") && !cmd.startsWith("XO")));
+    LOG(VB_RECORD, m_notify ? LOG_INFO : LOG_DEBUG,
         LOC + QString("ProcessCommand('%1') = '%2'").arg(cmd).arg(result));
 
     return result.startsWith("OK");
@@ -941,14 +951,9 @@ void ExternalStreamHandler::PurgeBuffer(void)
 {
     if (m_IO)
     {
-#ifdef USE_MYTHSYSTEM_FOR_RECORDER_IO
-        m_IO->ReadAll();
-        m_IO->ReadAllErr();
-#else
         QByteArray buffer;
         m_IO->Read(buffer, PACKET_SIZE, 1);
         m_IO->GetStatus(1);
-#endif
     }
 }
 
