@@ -675,7 +675,7 @@ void RingBuffer::Start(void)
 
     MThread::start();
 
-    while (readaheadrunning && !reallyrunning)
+    while (!readaheadrunning && !reallyrunning)
         generalWait.wait(&rwlock);
 
     rwlock.unlock();
