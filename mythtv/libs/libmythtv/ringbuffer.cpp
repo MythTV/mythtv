@@ -1426,8 +1426,7 @@ int RingBuffer::ReadPriv(void *buf, int count, bool peek)
         return -1;
     }
 
-    if (!readInternalMode &&
-        (request_pause || stopreads || !readaheadrunning || (ignorereadpos>=0)))
+    if (request_pause || stopreads || !readaheadrunning || (ignorereadpos>=0))
     {
         rwlock.unlock();
         rwlock.lockForWrite();
