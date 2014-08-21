@@ -826,8 +826,15 @@ DTC::LiveStreamInfo *Content::AddLiveStream( const QString   &sStorageGroup,
     QString sFullFileName;
     if (sHostName.isEmpty() || sHostName == gCoreContext->GetHostName())
     {
-        StorageGroup storage( sGroup );
-        sFullFileName = storage.FindFile( sFileName );
+        if (sGroup == "None")
+        {
+            sFullFileName = sFileName;
+        }
+        else
+        {
+            StorageGroup storage( sGroup );
+            sFullFileName = storage.FindFile( sFileName );
+        }
 
         if (sFullFileName.isEmpty())
         {
@@ -1009,22 +1016,33 @@ DTC::LiveStreamInfo *Content::AddVideoLiveStream( int nId,
         return NULL;
     }
 
-    if ( metadata->GetHost().toLower() != gCoreContext->GetHostName().toLower())
+    QString sFileName;
+    QString sStorageGroup;
+    if (metadata->GetHost() == "")
     {
-        // We only handle requests for local resources
-
-        QString sMsg =
-            QString("AddVideoLiveStream: Wrong Host '%1' request from '%2'.")
-                          .arg( gCoreContext->GetHostName())
-                          .arg( metadata->GetHost() );
-
-        LOG(VB_UPNP, LOG_ERR, sMsg);
-
-        throw HttpRedirectException( metadata->GetHost() );
+        sStorageGroup = "None";
+        sFileName = metadata->GetFilename();
     }
+    else
+    {
+        if ( metadata->GetHost().toLower() != gCoreContext->GetHostName().toLower())
+        {
+            // For Videos storage group we only handle requests for local resources
 
-    StorageGroup sg("Videos", metadata->GetHost());
-    QString sFileName = sg.FindFile(metadata->GetFilename());
+            QString sMsg =
+                QString("AddVideoLiveStream: Wrong Host '%1' request from '%2'.")
+                              .arg( gCoreContext->GetHostName())
+                              .arg( metadata->GetHost() );
+
+            LOG(VB_UPNP, LOG_ERR, sMsg);
+
+            throw HttpRedirectException( metadata->GetHost() );
+        }
+
+        sStorageGroup = "Videos";
+        StorageGroup sg(sStorageGroup, metadata->GetHost());
+        sFileName = sg.FindFile(metadata->GetFilename());
+    }
 
     // ----------------------------------------------------------------------
     // check to see if the file exists
@@ -1036,7 +1054,7 @@ DTC::LiveStreamInfo *Content::AddVideoLiveStream( int nId,
         return NULL;
     }
 
-    return AddLiveStream( "Videos", metadata->GetFilename(),
+    return AddLiveStream( sStorageGroup, metadata->GetFilename(),
                           metadata->GetHost(), nMaxSegments, nWidth,
                           nHeight, nBitrate, nAudioBitrate, nSampleRate );
 }
