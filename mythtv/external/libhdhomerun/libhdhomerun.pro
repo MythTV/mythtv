@@ -15,6 +15,7 @@ unix {
     HEADERS += hdhomerun_os_posix.h
     SOURCES += hdhomerun_os_posix.c hdhomerun_sock_posix.c
     LIBS += -lpthread
+    QMAKE_CFLAGS += -fPIC
 
     !macx {
         LIBS += -lrt
