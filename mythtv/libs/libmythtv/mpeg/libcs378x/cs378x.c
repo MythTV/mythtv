@@ -15,15 +15,6 @@
 
 #include "cs378x.h"
 
-#define LOG_MODULE "cs378x"
-#define LOG_PARAM " "
-
-//#include "global.h"
-
-
-
-
-
 static unsigned long crc_table[256] = { 0x00000000L, 0x77073096L, 0xee0e612cL,
 		0x990951baL, 0x076dc419L, 0x706af48fL, 0xe963a535L, 0x9e6495a3L,
 		0x0edb8832L, 0x79dcb8a4L, 0xe0d5e91eL, 0x97d2d988L, 0x09b64c2bL,
@@ -82,7 +73,7 @@ static unsigned long crc_table[256] = { 0x00000000L, 0x77073096L, 0xee0e612cL,
 #define DO4(buf) DO2(buf); DO2(buf);
 #define DO8(buf) DO4(buf); DO4(buf);
 
-unsigned long crc32(unsigned long crc, const uint8_t *buf, unsigned int len) {
+static unsigned long crc32(unsigned long crc, const uint8_t *buf, unsigned int len) {
 	if (!buf)
 		return 0L;
 	crc = crc ^ 0xffffffffL;
@@ -98,18 +89,18 @@ unsigned long crc32(unsigned long crc, const uint8_t *buf, unsigned int len) {
 	return crc ^ 0xffffffffL;
 }
 
-int32_t boundary(int32_t exp, int32_t n) {
+static int32_t boundary(int32_t exp, int32_t n) {
 	return ((((n - 1) >> exp) + 1) << exp);
 }
 
-uint8_t *init_4b(uint32_t val, uint8_t *b) {
+static uint8_t *init_4b(uint32_t val, uint8_t *b) {
 	b[0] = (val >> 24) & 0xff;
 	b[1] = (val >> 16) & 0xff;
 	b[2] = (val >> 8) & 0xff;
 	b[3] = (val) & 0xff;
 	return b;
 }
-uint8_t *init_2b(uint32_t val, uint8_t *b) {
+static uint8_t *init_2b(uint32_t val, uint8_t *b) {
 	b[0] = (val >> 8) & 0xff;
 	b[1] = (val) & 0xff;
 	return b;
@@ -123,7 +114,7 @@ uint8_t *init_2b(uint32_t val, uint8_t *b) {
 #define FDWRITE_TIMEOUT 1500
 #define FDWRITE_RETRIES 7
 
-ssize_t safe_write(int fd, const void *buf, size_t len) {
+static ssize_t safe_write(int fd, const void *buf, size_t len) {
 	ssize_t written;
 	do {
 		written = write(fd, buf, len);
@@ -134,7 +125,7 @@ ssize_t safe_write(int fd, const void *buf, size_t len) {
 	return -1;
 }
 
-ssize_t fdwrite(int fd, char *buf, size_t buf_size) {
+static ssize_t fdwrite(int fd, char *buf, size_t buf_size) {
 	ssize_t wbytes = 0;
 	int intrs = 0;
 	int num_timeouts = 0;
@@ -156,8 +147,6 @@ ssize_t fdwrite(int fd, char *buf, size_t buf_size) {
 			if (num_timeouts++ <= FDWRITE_RETRIES) {
 				continue;
 			} else {
-				//if (io_report_errors)
-				//	log_perror("fdwrite() timeout", errno);
 				return wbytes > 0 ? wbytes : -1;
 			}
 		}
@@ -178,7 +167,8 @@ ssize_t fdwrite(int fd, char *buf, size_t buf_size) {
 	}
 	return 0;
 }
-ssize_t safe_read(int fd, void *buf, size_t len) {
+
+static ssize_t safe_read(int fd, void *buf, size_t len) {
 	ssize_t readen;
 	do {
 		readen = read(fd, buf, len);
@@ -188,7 +178,8 @@ ssize_t safe_read(int fd, void *buf, size_t len) {
 	} while (1);
 	return -1;
 }
-ssize_t fdread_ex(int fd, char *buf, size_t buf_size, int timeout, int retries,
+
+static ssize_t fdread_ex(int fd, char *buf, size_t buf_size, int timeout, int retries,
 		int waitfull) {
 	ssize_t rbytes = 0;
 	int intrs = 0;
@@ -211,7 +202,6 @@ ssize_t fdread_ex(int fd, char *buf, size_t buf_size, int timeout, int retries,
 				continue;
 			} else {
 				if (timeout) {
-//					log_error("fdread() timeout", errno);
 				 }
 				return rbytes > 0 ? rbytes : -1;
 			}
@@ -234,23 +224,23 @@ ssize_t fdread_ex(int fd, char *buf, size_t buf_size, int timeout, int retries,
 	return 0;
 }
 
-ssize_t fdread(int fd, char *buf, size_t buf_size) {
+static ssize_t fdread(int fd, char *buf, size_t buf_size) {
 	return fdread_ex(fd, buf, buf_size, FDREAD_TIMEOUT, FDREAD_RETRIES, 1);
 }
 
-void set_sock_nonblock(int sockfd) {
+static void set_sock_nonblock(int sockfd) {
 	int arg = fcntl(sockfd, F_GETFL, NULL);
 	arg |= O_NONBLOCK;
 	fcntl(sockfd, F_SETFL, arg);
 }
 
-void set_sock_block(int sockfd) {
+static void set_sock_block(int sockfd) {
 	int arg = fcntl(sockfd, F_GETFL, NULL);
 	arg &= (~O_NONBLOCK);
 	fcntl(sockfd, F_SETFL, arg);
 }
 
-char *my_inet_ntop(int family, struct sockaddr *addr, char *dest, int dest_len) {
+static char *my_inet_ntop(int family, struct sockaddr *addr, char *dest, int dest_len) {
 	struct sockaddr_in *addr_v4 = (struct sockaddr_in *) addr;
 	struct sockaddr_in6 *addr_v6 = (struct sockaddr_in6 *) addr;
 	switch (family) {
@@ -266,7 +256,7 @@ char *my_inet_ntop(int family, struct sockaddr *addr, char *dest, int dest_len) 
 		return dest;
 	}
 }
-int do_connect(int sockfd, const struct sockaddr *serv_addr, socklen_t addrlen,
+static int do_connect(int sockfd, const struct sockaddr *serv_addr, socklen_t addrlen,
 		int timeout) {
 	set_sock_nonblock(sockfd);
 	// Trying to connect with timeout
@@ -302,7 +292,7 @@ int do_connect(int sockfd, const struct sockaddr *serv_addr, socklen_t addrlen,
 }
 
 
-int cs378x_get_cw(int client_sockfd, AES_KEY aes_decrypt_key,
+static int cs378x_get_cw(int client_sockfd, AES_KEY aes_decrypt_key,
 		uint16_t *ca_id, uint16_t *idx, uint8_t *cw) {
 	unsigned char data[256];
 
@@ -314,13 +304,6 @@ int cs378x_get_cw(int client_sockfd, AES_KEY aes_decrypt_key,
 	if (r < 4)
 		return -1;
 
-	/*uint32_t auth_token = (((data[0] << 24) | (data[1] << 16) | (data[2] << 8)
-			| data[3]) & 0xffffffffL);
-	if (memcmp(data, dump, 4)) {
-		log_error("ERR | [%s] recv auth 0x%08x != camd_auth 0x%08x\n",
-				dump, auth_token, dump);
-	 }
-*/
 	READ:
 	for (i = 0; i < data_len; i += 16) { // Read and decrypt payload
 		fdread(client_sockfd, (char *) data + i, 16);
@@ -336,20 +319,14 @@ int cs378x_get_cw(int client_sockfd, AES_KEY aes_decrypt_key,
 		goto READ;
 
 	if (data[0] != 0x01) {
-	//	log_error("ERR | Unexpected server response on code word request (ret data[0] == 0x%02x /%s/)\n",
-	//	 data[0],
-	//	 data[0] == 0x08 ? "No card" :
-	//	 data[0] == 0x44 ? "No code word found" : "Unknown err");
 		return 0;
 	}
 
 	if (data_len < 48) {
-//		log_error("ERR | Code word packet len < 48 (%d)\n", data_len);
 		return 0;
 	}
 
 	if (data[1] < 16) {
-//		log_error("ERR | Code word len < 16 (%d)\n", data[1]);
 		return 0;
 	}
 
@@ -366,15 +343,14 @@ int cs378x_getcws(int client_sockfd, unsigned char * pkt, unsigned char * cw) {
 	unsigned char msgbuf[116];
 	char tbuf[256];
 	unsigned char dump[16];
-	char * user = "tvheadend"; // TODO move to config file
-	char * pass = "tvheadend"; // TODO move to config file
+	char * user = "mythtv"; // TODO move to config file
+	char * pass = "mythtv"; // TODO move to config file
 	unsigned int auth_token;
 
 	j = 0;
 	for (i = 0; i < 32; i++) {
 		j += sprintf(tbuf + j, "%02X", pkt[i]);
 	}
-//	log_info("Detected ECM packet, %s...", tbuf);
 
 	MD5((unsigned char*) pass, strlen(pass), dump);
 	AES_KEY aes_encrypt_key;
@@ -408,7 +384,6 @@ int cs378x_getcws(int client_sockfd, unsigned char * pkt, unsigned char * cw) {
 	for (i = 0; i < 32; i++) {
 		j += sprintf(tbuf + j, "%02X", msgbuf[i]);
 	}
-//	log_info("CW request: %s...", tbuf);
 
 	for (i = 4; i < 116; i += 16) // Encrypt payload
 		AES_encrypt(msgbuf + i, msgbuf + i, &aes_encrypt_key);
@@ -427,12 +402,10 @@ int cs378x_connect_client(int socktype, const char *hostname, const char *servic
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = socktype;
 
-//	log_info("CAM | Connecting to server %s port %s\n", hostname, service);
 
 	n = getaddrinfo(hostname, service, &hints, &res);
 
 	if (n < 0) {
-//		log_info("CAM | ERROR: getaddrinfo(%s): %s\n", hostname, gai_strerror(n));
 		return -1;
 	}
 
@@ -445,15 +418,12 @@ int cs378x_connect_client(int socktype, const char *hostname, const char *servic
 			my_inet_ntop(res->ai_family, res->ai_addr, str_addr,
 					sizeof(str_addr));
 			if (do_connect(sockfd, res->ai_addr, res->ai_addrlen, 1000) < 0) {
-				//log_info("CAM | Error connecting to server %s port %s (addr=%s) | %s\n",
-//					hostname, service, str_addr, strerror(errno));
 				close(sockfd);
 				sockfd = -1;
 			} else {
 				break; // connected
 			}
 		} else {
-			//log_info("CAM | Could not create socket: %s\n", strerror(errno));
 			sleep(1);
 			return -1;
 		}
@@ -465,9 +435,5 @@ int cs378x_connect_client(int socktype, const char *hostname, const char *servic
 		int flag = 1;
 		setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY, &flag, sizeof(int));
 	}
-
-	//log_info("CAM | Connected to server %s port %s (addr=%s fd=%d).\n",
-//			hostname, service, str_addr, sockfd);
-
 	return sockfd;
 }

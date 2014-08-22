@@ -126,7 +126,7 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     virtual bool HandleTables(uint pid, const PSIPTable &psip);
     virtual void HandleTSTables(const TSPacket* tspacket);
     virtual bool ProcessTSPacket(const TSPacket& tspacket);
-#ifdef LIBAESDEC
+#ifdef USING_LIBAESDEC
     virtual int ProcessECMPacket(const TSPacket& tspacket);
     virtual TSPacket* DecryptPayload(const TSPacket& tspacket) const;
 #endif

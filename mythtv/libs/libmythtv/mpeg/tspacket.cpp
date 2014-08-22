@@ -52,8 +52,5 @@ QString TSPacket::toString() const
                .arg(AdaptationFieldControl()));
     str.append(QString("      continuityCounter: %1\n")
                .arg(ContinuityCounter()));
-    str.append(QString("           First bytes : 0x%1 0x%2 0x%3 0x%4\n")
-               .arg(int(data()[4]),0,16).arg(int(data()[5]),0,16)
-               .arg(int(data()[6]),0,16).arg(int(data()[7]),0,16));
     return str;
 }

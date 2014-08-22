@@ -52,10 +52,12 @@ void aes_decrypt_packet(void *keys, unsigned char *packet)
 
     xc0 = pkt[3] & 0xc0;
     //skip clear pkt
-    if (xc0 == 0x00) return;
+    if (xc0 == 0x00) 
+        return;
     
     //skip reserved pkt
-    if (xc0 == 0x40) return;
+    if (xc0 == 0x40)
+        return;
     
     // encrypted
     if (xc0 == 0x80 || xc0 == 0xc0)
@@ -70,7 +72,8 @@ void aes_decrypt_packet(void *keys, unsigned char *packet)
             offset = 4 + pkt[4] + 1;
             len = 188 - offset;
             n = len >> 3;
-            if (n == 0) return;  
+            if (n == 0)
+                return;  
         } 
         else 
         {
@@ -78,10 +81,13 @@ void aes_decrypt_packet(void *keys, unsigned char *packet)
             offset = 4;
         }
     }
-    else return;
+    else 
+        return;
 
-    if (ev_od == 0) k = ((struct aes_keys_t *) keys)->even;
-    else k = ((struct aes_keys_t *) keys)->odd;
+    if (ev_od == 0) 
+        k = ((struct aes_keys_t *) keys)->even;
+    else 
+        k = ((struct aes_keys_t *) keys)->odd;
 
     // TODO room for improvement?
     for (i = offset; i <= (len - 16); i += 16) 
