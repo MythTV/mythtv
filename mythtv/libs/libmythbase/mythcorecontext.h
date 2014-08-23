@@ -97,13 +97,13 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     void SetBackend(bool backend);
     bool IsBackend(void) const;        ///< is this process a backend process
     bool IsFrontendOnly(void);   ///< is there a frontend, but no backend,
-                                 ///  running on this host
+                                 ///<  running on this host
     bool IsMasterHost(void);     ///< is this the same host as the master
-    bool IsMasterHost(const QString &host); //< is specified host the master
+    bool IsMasterHost(const QString &host); ///< is specified host the master
     bool IsMasterBackend(void);  ///< is this the actual MBE process
     bool BackendIsRunning(void); ///< a backend process is running on this host
 
-    bool IsThisBackend(const QString &addr);    /// it this address mapped to this backend host
+    bool IsThisBackend(const QString &addr);    ///< is this address mapped to this backend host
     bool IsThisHost(const QString &addr); ///< is this address mapped to this host
     bool IsThisHost(const QString &addr, const QString &host);
 
