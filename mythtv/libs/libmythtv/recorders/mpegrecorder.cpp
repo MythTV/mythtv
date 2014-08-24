@@ -1065,7 +1065,8 @@ void MpegRecorder::run(void)
                         gap = true;
                 }
 
-                RestartEncoding();
+                if (!RestartEncoding())
+                    SetRecordingStatus(rsFailing, __FILE__, __LINE__);
             }
             else if (_device_read_buffer->IsEOF() &&
                      IsRecordingRequested())
@@ -1316,7 +1317,7 @@ bool MpegRecorder::PauseAndWait(int timeout)
     return IsPaused(true);
 }
 
-void MpegRecorder::RestartEncoding(void)
+bool MpegRecorder::RestartEncoding(void)
 {
     LOG(VB_RECORD, LOG_INFO, LOC + "RestartEncoding");
 
@@ -1337,7 +1338,7 @@ void MpegRecorder::RestartEncoding(void)
     if (driver == "hdpvr") // HD-PVR will sometimes reset to defaults
         SetV4L2DeviceOptions(chanfd);
 
-    StartEncoding();
+    return StartEncoding();
 }
 
 bool MpegRecorder::StartEncoding(void)

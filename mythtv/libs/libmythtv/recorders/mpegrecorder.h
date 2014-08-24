@@ -64,7 +64,7 @@ class MpegRecorder : public V4LRecorder,
     uint GetFilteredAudioLayer(void) const;
     uint GetFilteredAudioBitRate(uint audio_layer) const;
 
-    void RestartEncoding(void);
+    bool RestartEncoding(void);
     bool StartEncoding(void);
     void StopEncoding(void);
 

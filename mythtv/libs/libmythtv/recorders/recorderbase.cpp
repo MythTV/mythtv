@@ -20,6 +20,7 @@ using namespace std;
 #include "ExternalRecorder.h"
 #include "hdhrchannel.h"
 #include "iptvchannel.h"
+#include "mythsystemevent.h"
 #include "mythlogging.h"
 #include "programinfo.h"
 #include "asichannel.h"
@@ -374,16 +375,20 @@ void RecorderBase::CheckForRingBufferSwitch(void)
 void RecorderBase::SetRecordingStatus(RecStatusType status,
                                       const QString& file, int line)
 {
-    if (curRecording)
+    if (curRecording && curRecording->GetRecordingStatus() != status)
     {
-        LOG(VB_RECORD, LOG_INFO, QString("Modifying recording status to %1 "
-                                         "at %2:%3")
+        LOG(VB_RECORD, LOG_INFO,
+            QString("Modifying recording status from %1 to %2 at %3:%4")
+            .arg(toString(curRecording->GetRecordingStatus(), kSingleRecord))
             .arg(toString(status, kSingleRecord)).arg(file).arg(line));
 
         curRecording->SetRecordingStatus(status);
 
         if (status == rsFailing)
+        {
             curRecording->SaveVideoProperties(VID_DAMAGED, VID_DAMAGED);
+            SendMythSystemRecEvent("REC_FAILING", curRecording);
+        }
 
         MythEvent me(QString("UPDATE_RECORDING_STATUS %1 %2 %3 %4 %5")
                     .arg(curRecording->GetCardID())
