@@ -69,7 +69,7 @@ class MpegRecorder : public V4LRecorder,
     void StopEncoding(void);
 
     void SetBitrate(int bitrate, int maxbitrate, const QString & reason);
-    void HandleResolutionChanges(void);
+    bool HandleResolutionChanges(void);
 
     virtual void FormatCC(uint code1, uint code2); // RecorderBase
 
