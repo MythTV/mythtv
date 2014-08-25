@@ -13,6 +13,7 @@ import Queue
 import lxml
 import lxml.html
 import os
+import stat
 
 BASEURL = 'http://mythtv.org/wiki'
 
@@ -161,6 +162,8 @@ class Script( object ):
         fd = open(path,'w')
         fd.write(self.code[name])
         fd.close()
+        st = os.stat(path)
+        os.chmod(path, st.st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
 
     def _toCache(self, title):
         self._cache[title] = OrdDict(())
