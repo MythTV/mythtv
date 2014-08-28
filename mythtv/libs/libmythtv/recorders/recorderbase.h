@@ -17,6 +17,11 @@
 #include "mythtimer.h"
 #include "mythtvexp.h"
 
+extern "C"
+{
+#include "libavcodec/avcodec.h" // for Video/Audio codec enums
+}
+
 class FireWireDBOptions;
 class GeneralDBOptions;
 class RecordingProfile;
@@ -251,7 +256,7 @@ class MTV_PUBLIC RecorderBase : public QRunnable
     virtual void SetRecordingStatus(RecStatusType status,
                                     const QString& file, int line);
     virtual void ClearStatistics(void);
-    virtual void FinishRecording(void) = 0;
+    virtual void FinishRecording(void);
     virtual void StartNewFile(void) { }
 
     /** \brief Set seektable type
@@ -282,6 +287,9 @@ class MTV_PUBLIC RecorderBase : public QRunnable
     RingBuffer    *ringBuffer;
     bool           weMadeBuffer;
 
+
+    AVCodecID      m_primaryVideoCodec;
+    AVCodecID      m_primaryAudioCodec;
     QString        videocodec;
     QString        videodevice;
 

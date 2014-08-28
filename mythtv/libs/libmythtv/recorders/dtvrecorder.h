@@ -10,6 +10,7 @@
 #define DTVRECORDER_H
 
 #include <vector>
+
 using namespace std;
 
 #include <QAtomicInt>
@@ -22,6 +23,7 @@ using namespace std;
 class MPEGStreamData;
 class TSPacket;
 class QTime;
+class StreamID;
 
 class DTVRecorder :
     public RecorderBase,

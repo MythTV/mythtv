@@ -43,7 +43,10 @@ const uint RecorderBase::kTimeOfLatestDataIntervalTarget = 5000;
 
 RecorderBase::RecorderBase(TVRec *rec)
     : tvrec(rec),               ringBuffer(NULL),
-      weMadeBuffer(true),       videocodec("rtjpeg"),
+      weMadeBuffer(true),
+      m_primaryVideoCodec(AV_CODEC_ID_NONE),
+      m_primaryAudioCodec(AV_CODEC_ID_NONE),
+      videocodec("rtjpeg"),
       ntsc(true),               ntsc_framerate(true),
       video_frame_rate(29.97),
       m_videoAspect(0),         m_videoHeight(0),
@@ -409,6 +412,25 @@ void RecorderBase::ClearStatistics(void)
     timeOfLatestDataCount.fetchAndStoreRelaxed(0);
     timeOfLatestDataPacketInterval.fetchAndStoreRelaxed(2000);
     recordingGaps.clear();
+}
+
+void RecorderBase::FinishRecording(void)
+{
+    if (curRecording)
+    {
+        if (m_primaryVideoCodec == AV_CODEC_ID_H264)
+            curRecording->SaveVideoProperties(VID_AVC, VID_AVC);
+
+        if (ringBuffer)
+            curRecording->SaveFilesize(ringBuffer->GetRealFileSize());
+        SavePositionMap(true);
+    }
+
+    LOG(VB_GENERAL, LOG_NOTICE, QString("Finished Recording: "
+                                        "Video Codec: %1 "
+                                        "Audio Codec: %2")
+                                        .arg(avcodec_get_name(m_primaryVideoCodec))
+                                        .arg(avcodec_get_name(m_primaryAudioCodec)));
 }
 
 RecordingQuality *RecorderBase::GetRecordingQuality(
