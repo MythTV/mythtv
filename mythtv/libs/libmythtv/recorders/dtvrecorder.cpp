@@ -29,9 +29,6 @@
 #include "tv_rec.h"
 #include "mythsystemevent.h"
 
-// For primary Audio/Video codec info
-#include "mythcodecid.h"
-
 extern "C" {
 #include "libavcodec/mpegvideo.h"
 }
