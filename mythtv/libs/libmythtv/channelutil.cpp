@@ -644,7 +644,7 @@ int ChannelUtil::GetBetterMplexID(int current_mplexid,
     {
         int qsize = query.size();
         query.prepare("UPDATE dtv_multiplex "
-                      "SET networkid = :NETWORK_ID,
+                      "SET networkid = :NETWORK_ID, "
                       "    transportid = :TRANSPORT_ID "
                       "WHERE mplexid = :MPLEX_ID");
 
@@ -1424,7 +1424,7 @@ int ChannelUtil::GetChanID(int mplexid,       int service_transport_id,
         // find based on mpeg program number and mplexid alone
     query.prepare("SELECT chanid FROM channel "
                   "WHERE sourceid = :SOURCEID AND "
-                  "serviceID = :SERVICEID AND
+                  "serviceID = :SERVICEID AND "
                   "mplexid = :MPLEXID");
 
     query.bindValue(":SOURCEID", source_id);
@@ -1862,9 +1862,9 @@ int ChannelUtil::GetServiceVersion(int mplexid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare(QString("SELECT serviceversion "
-                          "FROM dtv_multiplex "
-                          "WHERE mplexid = :MPLEXID");
+    query.prepare("SELECT serviceversion "
+                  "FROM dtv_multiplex "
+                  "WHERE mplexid = :MPLEXID");
 
     query.bindValue(":MPLEXID", mplexid);
 
