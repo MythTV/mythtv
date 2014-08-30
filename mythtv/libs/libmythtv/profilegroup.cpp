@@ -107,10 +107,8 @@ void ProfileGroup::fillSelections(SelectSetting* setting)
 QString ProfileGroup::getName(int group)
 {
     MSqlQuery result(MSqlQuery::InitCon());
-    QString querystr = QString("SELECT name from profilegroups WHERE id = %1")
-                            .arg(group);
-    result.prepare(querystr);
-
+    result.prepare("SELECT name from profilegroups WHERE id = :PROFILE_ID;");
+    result.bindValue(":PROFILE_ID", group);
     if (result.exec() && result.next())
     {
         return result.value(0).toString();
@@ -140,7 +138,7 @@ void ProfileGroup::getHostNames(QStringList *hostnames)
 
     result.prepare("SELECT DISTINCT hostname from capturecard");
 
-    if (result.exec() && result.isActive() && result.size() > 0)
+    if (result.exec())
     {
         while (result.next())
             hostnames->append(result.value(0).toString());
@@ -181,11 +179,12 @@ void ProfileGroupEditor::open(int id) {
             vector<int> found;
 
             MSqlQuery result(MSqlQuery::InitCon());
-            QString querystr = QString("SELECT name FROM recordingprofiles WHERE "
-                                    "profilegroup = %1").arg(profileID);
-            result.prepare(querystr);
+            result.prepare("SELECT name FROM recordingprofiles WHERE "
+                           "profilegroup = :PROFILE_ID");
 
-            if (result.exec() && result.isActive() && result.size() > 0)
+            result.bindValue(":PROFILE_ID", profileID);
+
+            if (result.exec())
             {
                 while (result.next())
                 {
@@ -280,9 +279,10 @@ void ProfileGroupEditor::callDelete(void)
     int id = listbox->getValue().toInt();
 
     MSqlQuery result(MSqlQuery::InitCon());
-    QString querystr = QString("SELECT id FROM profilegroups WHERE "
-                            "id = %1 AND is_default = 0;").arg(id);
-    result.prepare(querystr);
+    result.prepare("SELECT id FROM profilegroups WHERE "
+                   "id = :PROFILE_ID AND is_default = 0;");
+
+    result.bindValue(":PROFILE_ID", id);
 
     if (result.exec() && result.next())
     {
@@ -297,24 +297,24 @@ void ProfileGroupEditor::callDelete(void)
 
         if (kDialogCodeButton0 == value)
         {
-            querystr = QString("DELETE codecparams FROM codecparams, "
+            result.prepare("DELETE codecparams FROM codecparams, "
                             "recordingprofiles WHERE "
                             "codecparams.profile = recordingprofiles.id "
-                            "AND recordingprofiles.profilegroup = %1").arg(id);
-            result.prepare(querystr);
+                            "AND recordingprofiles.profilegroup = :PROFILE_ID;");
+            result.bindValue(":PROFILE_ID", id);
             if (!result.exec())
                 MythDB::DBError("ProfileGroupEditor::callDelete -- "
                                 "delete codecparams", result);
 
-            querystr = QString("DELETE FROM recordingprofiles WHERE "
-                            "profilegroup = %1").arg(id);
-            result.prepare(querystr);
+            result.prepare("DELETE FROM recordingprofiles WHERE "
+                           "profilegroup = :PROFILE_ID;");
+            result.bindValue(":PROFILE_ID", id);
             if (!result.exec())
                 MythDB::DBError("ProfileGroupEditor::callDelete -- "
                                 "delete recordingprofiles", result);
 
-            querystr = QString("DELETE FROM profilegroups WHERE id = %1;").arg(id);
-            result.prepare(querystr);
+            result.prepare("DELETE FROM profilegroups WHERE id = :PROFILE_ID;");
+            result.bindValue(":PROFILE_ID", id);
             if (!result.exec())
                 MythDB::DBError("ProfileGroupEditor::callDelete -- "
                                 "delete profilegroups", result);
