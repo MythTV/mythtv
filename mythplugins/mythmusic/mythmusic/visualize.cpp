@@ -697,10 +697,13 @@ bool Spectrum::process(VisualNode *node)
 
     for (i = 0; (int)i < rects.size(); i++, w += analyzerBarWidth)
     {
-        tmp = sq(real(lout[index])) + sq(real(lout[FFTW_N - index]));
+        // The 1D output is Hermitian symmetric (Yk = Yn-k) so Yn = Y0 etc.
+        // The dft_r2c_1d plan doesn't output these redundant values
+        // and furthermore they're not allocated in the ctor
+        tmp = 2 * sq(real(lout[index])); // + sq(real(lout[FFTW_N - index]));
         magL = (tmp > 1.) ? (log(tmp) - 22.0) * scaleFactor : 0.;
 
-        tmp = sq(real(rout[index])) + sq(real(rout[FFTW_N - index]));
+        tmp = 2 * sq(real(rout[index])); // + sq(real(rout[FFTW_N - index]));
         magR = (tmp > 1.) ? (log(tmp) - 22.0) * scaleFactor : 0.;
 
         if (magL > size.height() / 2)
