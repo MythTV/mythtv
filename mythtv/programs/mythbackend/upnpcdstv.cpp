@@ -516,7 +516,7 @@ void UPnpCDSTv::AddItem( const UPnpCDSRequest    *pRequest,
     query2.prepare( "SELECT data FROM recordedmarkup WHERE chanid=:CHANID AND "
                     "starttime=:STARTTIME AND type = 33" );
     query2.bindValue(":CHANID", (int)nChanid);
-    query2.bindValue(":STARTTIME", dtProgStart);
+    query2.bindValue(":STARTTIME", dtStartTime);
     if (query2.exec() && query2.next())
         uiDurMS = query2.value(0).toUInt();
 
