@@ -476,7 +476,7 @@ bool UPnpCDSVideo::LoadMovies(const UPnpCDSRequest* pRequest,
                               IDTokenMap tokens)
 {
     tokens["type"] = "MOVIE";
-    LoadGenres(pRequest, pResults, tokens);
+    //LoadGenres(pRequest, pResults, tokens);
     return LoadVideos(pRequest, pResults, tokens);
 }
 
