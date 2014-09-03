@@ -486,7 +486,7 @@ void DecoderHandler::createPlaylist(const QUrl &url)
         QString("File %1 has extension %2")
             .arg(QFileInfo(url.path()).fileName()).arg(extension));
 
-    if (extension == "pls" || extension == "m3u")
+    if (extension == "pls" || extension == "m3u" || extension == "asx")
     {
         if (url.scheme() == "file" || QFileInfo(url.toString()).isAbsolute())
             createPlaylistFromFile(url);

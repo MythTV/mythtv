@@ -4,10 +4,10 @@
 
   Update July 2010 updated for Qt4 (Paul Harrison)
   Update December 2012 updated to use QSettings for the pls parser
+  Update September 2014 add simple asx parser
 */
 
-// c
-//#include "iostream"
+// c++
 #include <string>
 
 // qt
@@ -17,6 +17,7 @@
 #include <QStringList>
 #include <QFileInfo>
 #include <QSettings>
+#include <QDomDocument>
 
 // mythtv
 #include <mythlogging.h>
@@ -46,6 +47,8 @@ int PlayListFile::parse(PlayListFile *pls, const QString &filename)
         result = PlayListFile::parsePLS(pls, filename);
     else if (extension == "m3u")
         result = PlayListFile::parseM3U(pls, filename);
+    else if (extension == "asx")
+        result = PlayListFile::parseASX(pls, filename);
 
     return result;
 }
@@ -113,6 +116,51 @@ int PlayListFile::parseM3U(PlayListFile *pls, const QString &filename)
         e->setLength(-1);
 
         pls->add(e);
+    }
+
+    return pls->size();
+}
+
+int PlayListFile::parseASX(PlayListFile *pls, const QString &filename)
+{
+    QDomDocument doc("mydocument");
+    QFile file(filename);
+    if (!file.open(QIODevice::ReadOnly))
+        return 0;
+
+    if (!doc.setContent(&file))
+    {
+        file.close();
+        return 0;
+    }
+    file.close();
+
+    QDomElement docElem = doc.documentElement();
+    QDomNodeList entryList = doc.elementsByTagName("Entry");
+    QString url;
+
+    for (int x = 0; x < (int) entryList.count(); x++)
+    {
+        QDomNode n = entryList.item(x);
+        QDomElement elem = n.toElement();
+        QDomNodeList refList = elem.elementsByTagName("ref");
+        for (int y = 0; y < (int) refList.count(); y++)
+        {
+            QDomNode n2 = refList.item(y);
+            QDomElement elem2 = n2.toElement();
+            if (!elem2.isNull())
+            {
+                url = elem2.attribute("href");
+
+                // add to the playlist
+                PlayListFileEntry *e = new PlayListFileEntry();
+                e->setFile(url.replace("mms://", "mmsh://"));
+                e->setTitle(url.replace("mms://", "mmsh://"));
+                e->setLength(-1);
+
+                pls->add(e);
+            }
+        }
     }
 
     return pls->size();
