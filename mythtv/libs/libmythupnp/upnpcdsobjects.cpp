@@ -294,7 +294,7 @@ void CDSObject::toXml( QTextStream &os, FilterMap &filter,
     {   
         case OT_Container:
         {
-            if (filter.contains("container#"))
+            if (bFilter && filter.contains("container#"))
                 bFilter = false;
 
             os << "<container id=\"" << m_sId
@@ -318,7 +318,7 @@ void CDSObject::toXml( QTextStream &os, FilterMap &filter,
         }
         case OT_Item:
         {
-            if (filter.contains("item#"))
+            if (bFilter && filter.contains("item#"))
                 bFilter = false;
 
             os << "<item id=\"" << m_sId
@@ -359,7 +359,7 @@ void CDSObject::toXml( QTextStream &os, FilterMap &filter,
                 FilterContains(filter, sName))
             {
                 bool filterAttributes = true;
-                if (filter.contains(QString("%1#").arg(sName)))
+                if (!bFilter || filter.contains(QString("%1#").arg(sName)))
                     filterAttributes = false;
 
                 os << "<"  << sName;
@@ -385,10 +385,10 @@ void CDSObject::toXml( QTextStream &os, FilterMap &filter,
     // Output any Res Elements
     // ----------------------------------------------------------------------
 
-    if (filter.contains("res"))
+    if (!bFilter || filter.contains("res"))
     {
         bool filterAttributes = true;
-        if (filter.contains("res#"))
+        if (!bFilter || filter.contains("res#"))
             filterAttributes = false;
         Resources::const_iterator rit = m_resources.begin();
         for (; rit != m_resources.end(); ++rit)
