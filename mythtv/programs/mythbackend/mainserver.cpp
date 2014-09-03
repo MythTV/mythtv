@@ -2251,7 +2251,8 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
         delete_file_immediately( sFileName, followLinks, true);
     }
 
-    DeleteRecordedFiles(ds);
+    // TODO This is the future when we populate the recordedfile table
+    // DeleteRecordedFiles(ds);
 
     DoDeleteInDB(ds);
 
