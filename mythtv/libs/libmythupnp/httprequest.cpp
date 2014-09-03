@@ -863,7 +863,7 @@ void HTTPRequest::FormatFileResponse( const QString &sFileName )
 {
     m_sFileName = sFileName;
 
-    if (QFile::exists( m_sFileName ))
+    if (!m_sFileName.isEmpty() && QFile::exists( m_sFileName ))
     {
 
         if (m_eResponseType == ResponseTypeUnknown)
@@ -876,7 +876,7 @@ void HTTPRequest::FormatFileResponse( const QString &sFileName )
         m_eResponseType   = ResponseTypeHTML;
         m_nResponseStatus = 404;
         LOG(VB_UPNP, LOG_INFO,
-            QString("HTTPRequest::FormatFileResponse(%1) - cannot find file")
+            QString("HTTPRequest::FormatFileResponse('%1') - cannot find file")
                 .arg(sFileName));
     }
 }
