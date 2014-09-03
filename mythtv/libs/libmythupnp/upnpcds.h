@@ -176,7 +176,7 @@ class UPNP_PUBLIC UPnpCDSExtension
 
         virtual void CreateRoot ( );
 
-        virtual bool LoadContainer ( const UPnpCDSRequest *pRequest,
+        virtual bool LoadMetadata ( const UPnpCDSRequest *pRequest,
                                      UPnpCDSExtensionResults *pResults,
                                      IDTokenMap tokens,
                                      QString currentToken );

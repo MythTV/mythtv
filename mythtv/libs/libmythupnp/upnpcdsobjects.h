@@ -204,6 +204,7 @@ class UPNP_PUBLIC CDSObject : public ReferenceCounter
         QList<Property*>  GetProperties( const QString &sName );
         CDSObject        *AddChild   ( CDSObject   *pChild );
         CDSObjects        GetChildren( void ) { return m_children; }
+        CDSObject        *GetChild   ( const QString &sID );
 
         ContainerClass *AddSearchClass( ContainerClass *pClass );
         ContainerClass *AddCreateClass( ContainerClass *pClass );

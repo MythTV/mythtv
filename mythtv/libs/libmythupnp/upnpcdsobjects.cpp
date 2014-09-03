@@ -180,6 +180,27 @@ CDSObject *CDSObject::AddChild( CDSObject *pChild )
 //
 /////////////////////////////////////////////////////////////////////////////
 
+CDSObject *CDSObject::GetChild( const QString &sID )
+{
+    CDSObject *pChild = NULL;
+    CDSObjects::iterator it;
+    for (it = m_children.begin(); it != m_children.end(); ++it)
+    {
+        pChild = *it;
+        if (!pChild)
+            continue;
+
+        if (pChild->m_sId == sID)
+            return pChild;
+    }
+
+    return NULL;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 Resource *CDSObject::AddResource( QString sProtocol, QString sURI )
 {
     Resource *pRes = new Resource( sProtocol, sURI );

@@ -327,7 +327,7 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
         request.m_nRequestedCount = UINT16_MAX;
     request.m_sSortCriteria     = pRequest->m_mapParams[ "sortcriteria"  ];
 
-#if 0
+
     LOG(VB_UPNP, LOG_DEBUG, QString("UPnpCDS::ProcessRequest \n"
                                     ": url            = %1 \n"
                                     ": Method         = %2 \n"
@@ -345,7 +345,6 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
                        .arg( request.m_nStartingIndex )
                        .arg( request.m_nRequestedCount)
                        .arg( request.m_sSortCriteria  ));
-#endif
 
     UPnPResultCode eErrorCode      = UPnPResult_CDS_NoSuchObject;
     QString        sErrorDesc      = "";
@@ -757,11 +756,11 @@ UPnpCDSExtensionResults *UPnpCDSExtension::Browse( UPnpCDSRequest *pRequest )
         {
             case CDS_BrowseMetadata:
             {
-                if (pRequest->m_nRequestedCount = 0)
+                if (pRequest->m_nRequestedCount == 0)
                     pRequest->m_nRequestedCount = 1; // This should be the case anyway, but enforce it just in case
 
                 LOG(VB_UPNP, LOG_DEBUG, "UPnpCDS::Browse: BrowseMetadata");
-                if (LoadContainer(pRequest, pResults, tokens, currentToken))
+                if (LoadMetadata(pRequest, pResults, tokens, currentToken))
                     return pResults;
             }
 
@@ -862,7 +861,7 @@ QString UPnpCDSExtension::RemoveToken( const QString &sToken,
  *  \return true if we could load the metadata
  *
  */
-bool UPnpCDSExtension::LoadContainer(const UPnpCDSRequest* pRequest,
+bool UPnpCDSExtension::LoadMetadata(const UPnpCDSRequest* pRequest,
                                      UPnpCDSExtensionResults* pResults,
                                      IDTokenMap tokens, QString currentToken)
 {

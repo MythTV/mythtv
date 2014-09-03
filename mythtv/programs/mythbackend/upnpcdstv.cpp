@@ -270,25 +270,64 @@ void UPnpCDSTv::CreateRoot()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool UPnpCDSTv::LoadContainer(const UPnpCDSRequest* pRequest,
+bool UPnpCDSTv::LoadMetadata(const UPnpCDSRequest* pRequest,
                               UPnpCDSExtensionResults* pResults,
                               IDTokenMap tokens, QString currentToken)
 {
     if (currentToken.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("UPnpCDSTV::LoadContainer: Final "
+        LOG(VB_GENERAL, LOG_ERR, QString("UPnpCDSTV::LoadMetadata: Final "
                                          "token missing from id: %1")
-                                        .arg(pRequest->m_sParentId));
+                                        .arg(pRequest->m_sObjectId));
         return false;
     }
 
-    if (currentToken == "recording")
+    // Root + 1
+    if (tokens[currentToken].isEmpty())
     {
-        LoadRecordings(pRequest, pResults, tokens);
+        CDSObject *container = m_pRoot->GetChild(pRequest->m_sObjectId);
+
+        if (container)
+        {
+            pResults->Add(container);
+            pResults->m_nTotalMatches = 1;
+        }
+        else
+            LOG(VB_GENERAL, LOG_ERR, QString("UPnpCDSTV::LoadMetadata: Requested "
+                                             "object cannot be found: %1")
+                                               .arg(pRequest->m_sObjectId));
+    }
+    else if (currentToken == "recording")
+    {
+        return LoadRecordings(pRequest, pResults, tokens);
+    }
+    else if (currentToken == "title")
+    {
+        return LoadTitles(pRequest, pResults, tokens);
+    }
+    else if (currentToken == "date")
+    {
+        return LoadDates(pRequest, pResults, tokens);
+    }
+    else if (currentToken == "genre")
+    {
+        return LoadGenres(pRequest, pResults, tokens);
+    }
+    else if (currentToken == "recgroup")
+    {
+        return LoadRecGroups(pRequest, pResults, tokens);
+    }
+    else if (currentToken == "channel")
+    {
+        return LoadChannels(pRequest, pResults, tokens);
+    }
+    else if (currentToken == "movie")
+    {
+        return LoadMovies(pRequest, pResults, tokens);
     }
     else
         LOG(VB_GENERAL, LOG_ERR,
-            QString("UPnpCDSTV::LoadContainer(): "
+            QString("UPnpCDSTV::LoadMetadata(): "
                     "Unhandled metadata request for '%1'.").arg(currentToken));
 
     return true;

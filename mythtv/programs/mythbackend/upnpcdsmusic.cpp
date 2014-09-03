@@ -249,19 +249,34 @@ bool UPnpCDSMusic::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool UPnpCDSMusic::LoadContainer(const UPnpCDSRequest* pRequest,
+bool UPnpCDSMusic::LoadMetadata(const UPnpCDSRequest* pRequest,
                                  UPnpCDSExtensionResults* pResults,
                                  IDTokenMap tokens, QString currentToken)
 {
     if (currentToken.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("UPnpCDSMusic::LoadContainer: Final "
+        LOG(VB_GENERAL, LOG_ERR, QString("UPnpCDSMusic::LoadMetadata: Final "
                                          "token missing from id: %1")
                                         .arg(pRequest->m_sParentId));
         return false;
     }
 
-    if (currentToken == "genre")
+    // Root + 1
+    if (tokens[currentToken].isEmpty())
+    {
+        CDSObject *container = m_pRoot->GetChild(pRequest->m_sObjectId);
+
+        if (container)
+        {
+            pResults->Add(container);
+            pResults->m_nTotalMatches = 1;
+        }
+        else
+            LOG(VB_GENERAL, LOG_ERR, QString("UPnpCDSMusic::LoadMetadata: Requested "
+                                             "object cannot be found: %1")
+                                               .arg(pRequest->m_sObjectId));
+    }
+    else if (currentToken == "genre")
     {
         // Genre is presently a top tier node, since it doesn't appear
         // below Artist/Album/etc we don't need to pass through
@@ -282,7 +297,7 @@ bool UPnpCDSMusic::LoadContainer(const UPnpCDSRequest* pRequest,
     }
     else
         LOG(VB_GENERAL, LOG_ERR,
-            QString("UPnpCDSMusic::LoadContainer(): "
+            QString("UPnpCDSMusic::LoadMetadata(): "
                     "Unhandled metadata request for '%1'.").arg(currentToken));
 
     return false;
@@ -330,7 +345,7 @@ bool UPnpCDSMusic::LoadChildren(const UPnpCDSRequest* pRequest,
     }
     else
         LOG(VB_GENERAL, LOG_ERR,
-            QString("UPnpCDSMusic::LoadContainer(): "
+            QString("UPnpCDSMusic::LoadChildren(): "
                     "Unhandled metadata request for '%1'.").arg(currentToken));
 
     return false;
@@ -561,7 +576,6 @@ bool UPnpCDSMusic::LoadArtists(const UPnpCDSRequest *pRequest,
                                                               sArtistName,
                                                               pRequest->m_sParentId,
                                                               NULL );
-        pContainer->SetPropValue("artist", sArtistName);
 // TODO: Add SetPropValues option for multi-value properties
 //         QStringList::Iterator it;
 //         for (it = sGenres.begin(); it != sGenres.end(); ++it)
