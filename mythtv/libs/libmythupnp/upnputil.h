@@ -49,41 +49,42 @@ class NameValue
   public:
     QString sName;
     QString sValue;
+    bool    bRequired;
 
     NameValues *pAttributes;
 
   public:
     NameValue() :
-        sName(), sValue(), pAttributes(NULL) { }
-    NameValue(const QString &name, const QString &value) :
-        sName(name), sValue(value), pAttributes(NULL) { }
-    NameValue(const QString &name, const char *value) :
-        sName(name), sValue(value), pAttributes(NULL) { }
-    NameValue(const QString &name, int value) :
-        sName(name), sValue(QString::number(value)), pAttributes(NULL) { }
-    NameValue(const QString &name, long value) :
-        sName(name), sValue(QString::number(value)), pAttributes(NULL) { }
-    NameValue(const QString &name, qlonglong value) :
-        sName(name), sValue(QString::number(value)), pAttributes(NULL) { }
-    NameValue(const QString &name, uint value) :
-        sName(name), sValue(QString::number(value)), pAttributes(NULL) { }
-    NameValue(const QString &name, ulong value) :
-        sName(name), sValue(QString::number(value)), pAttributes(NULL) { }
-    NameValue(const QString &name, qulonglong value) :
-        sName(name), sValue(QString::number(value)), pAttributes(NULL) { }
-    NameValue(const QString &name, bool value) :
-        sName(name), sValue((value) ? "1" : "0"), pAttributes(NULL) { }
+        sName(), sValue(), bRequired(false), pAttributes(NULL) { }
+    NameValue(const QString &name, const QString &value, bool required = false) :
+        sName(name), sValue(value), bRequired(required), pAttributes(NULL) { }
+    NameValue(const QString &name, const char *value, bool required = false) :
+        sName(name), sValue(value), bRequired(required), pAttributes(NULL) { }
+    NameValue(const QString &name, int value, bool required = false) :
+        sName(name), sValue(QString::number(value)), bRequired(required), pAttributes(NULL) { }
+    NameValue(const QString &name, long value, bool required = false) :
+        sName(name), sValue(QString::number(value)), bRequired(required), pAttributes(NULL) { }
+    NameValue(const QString &name, qlonglong value, bool required = false) :
+        sName(name), sValue(QString::number(value)), bRequired(required), pAttributes(NULL) { }
+    NameValue(const QString &name, uint value, bool required = false) :
+        sName(name), sValue(QString::number(value)), bRequired(required), pAttributes(NULL) { }
+    NameValue(const QString &name, ulong value, bool required = false) :
+        sName(name), sValue(QString::number(value)), bRequired(required), pAttributes(NULL) { }
+    NameValue(const QString &name, qulonglong value, bool required = false) :
+        sName(name), sValue(QString::number(value)), bRequired(required), pAttributes(NULL) { }
+    NameValue(const QString &name, bool value, bool required = false) :
+        sName(name), sValue((value) ? "1" : "0"), bRequired(required), pAttributes(NULL) { }
     inline NameValue(const NameValue &nv);
     inline NameValue& operator=(const NameValue &nv);
 
     inline ~NameValue();
 
-    inline void AddAttribute(const QString &name, const QString &value);
+    inline void AddAttribute(const QString &name, const QString &value, bool required);
 };
 class NameValues : public QList<NameValue> {};
 
 inline NameValue::NameValue(const NameValue &nv) :
-    sName(nv.sName), sValue(nv.sValue), pAttributes(NULL)
+    sName(nv.sName), sValue(nv.sValue), bRequired(nv.bRequired), pAttributes(NULL)
 {
     if (nv.pAttributes)
     {
@@ -99,6 +100,7 @@ inline NameValue& NameValue::operator=(const NameValue &nv)
 
     sName  = nv.sName;
     sValue = nv.sValue;
+    bRequired = nv.bRequired;
 
     if (nv.pAttributes)
     {
@@ -122,12 +124,13 @@ inline NameValue::~NameValue()
     }
 }
 
-inline void NameValue::AddAttribute(const QString &name, const QString &value)
+inline void NameValue::AddAttribute(const QString &name, const QString &value,
+                                    bool required)
 {
     if (!pAttributes)
         pAttributes = new NameValues();
 
-    pAttributes->push_back(NameValue(name, value));
+    pAttributes->push_back(NameValue(name, value, required));
 }
 
 //////////////////////////////////////////////////////////////////////////////

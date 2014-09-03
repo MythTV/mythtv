@@ -180,7 +180,8 @@ void UPnpDeviceDesc::_InternalLoad( QDomNode oNode, UPnpDevice *pCurDevice )
             for (int i = 0; i < attributes.size(); i++)
             {
                 node.AddAttribute(attributes.item(i).nodeName(),
-                                 attributes.item(i).nodeValue());
+                                  attributes.item(i).nodeValue(),
+                                  true); // TODO Check whether all attributes are in fact requires for the device xml
             }
             pCurDevice->m_lstExtra.push_back(node);
         }

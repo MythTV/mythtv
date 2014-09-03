@@ -348,11 +348,11 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
 
     UPnPResultCode eErrorCode      = UPnPResult_CDS_NoSuchObject;
     QString        sErrorDesc      = "";
-    uint16_t        nNumberReturned = 0;
-    uint16_t        nTotalMatches   = 0;
-    uint16_t        nUpdateID       = 0;
+    uint16_t       nNumberReturned = 0;
+    uint16_t       nTotalMatches   = 0;
+    uint16_t       nUpdateID       = 0;
     QString        sResultXML;
-    FilterMap filter =  (FilterMap) request.m_sFilter.split(',');
+    FilterMap filter =  static_cast<FilterMap>(request.m_sFilter.split(','));
 
     LOG(VB_UPNP, LOG_INFO,
         QString("UPnpCDS::HandleBrowse ObjectID=%1")
@@ -408,7 +408,6 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
                 {
                     UPnpCDSExtension *pExtension = m_extensions[i];
                     CDSObject* pExtensionRoot = pExtension->GetRoot();
-                    FilterMap filter;
                     sResultXML += pExtensionRoot->toXml(filter, true); // Ignore Children
                     nNumberReturned ++;
                 }
