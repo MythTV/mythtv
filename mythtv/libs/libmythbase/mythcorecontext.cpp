@@ -913,6 +913,14 @@ QString MythCoreContext::GetBackendServerIP(void)
  */
 QString MythCoreContext::GetBackendServerIP(const QString &host)
 {
+    if (!QHostAddress(host).isNull())
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("GetBackendServerIP(%1): Given "
+                                         "IP address instead of hostname "
+                                         "(ID)").arg(host));
+        return host;
+    }
+
     QString addr4, addr6;
 #if !defined(QT_NO_IPV6)
     if (!ServerPool::DefaultListenIPv6().isEmpty())
