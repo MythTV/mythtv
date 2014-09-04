@@ -289,6 +289,12 @@ MusicMetadata *MusicMetadata::createFromID(int trackid)
         mdata->m_filename = query.value(17).toString();
         mdata->m_hostname = query.value(18).toString();
 
+        if (!QHostAddress(mdata->m_hostname).isNull()) // A bug caused an IP to replace hostname, reset and it will fix itself
+        {
+            mdata->m_hostname = "";
+            mdata->saveHostname();
+        }
+
         return mdata;
     }
 
@@ -790,7 +796,7 @@ QString MusicMetadata::Filename(bool find)
     }
 
     // first check to see if the filename is complete
-    if (RemoteFile::Exists(m_filename))
+    if (QFile::exists(m_filename))
     {
         m_actualFilename = m_filename;
         return m_filename;
@@ -803,7 +809,8 @@ QString MusicMetadata::Filename(bool find)
         m_actualFilename = mythUrl;
 
         QUrl url(mythUrl);
-        if (url.host() != m_hostname)
+        if (url.host() != m_hostname &&
+            QHostAddress(url.host()).isNull()) // Check that it's not an IP address
         {
             m_hostname = url.host();
             saveHostname();
@@ -1100,7 +1107,7 @@ QString MusicMetadata::getAlbumArtFile(void)
                 if (albumart_image->embedded)
                 {
                     if (gCoreContext->IsMasterBackend() &&
-                        url.host() == gCoreContext->GetMasterServerIP())
+                        url.host() == gCoreContext->GetMasterHostName())
                     {
                         QStringList paramList;
                         paramList.append(QString("--songid='%1'").arg(ID()));

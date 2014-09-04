@@ -740,10 +740,9 @@ static int transUnlink(QString filename, ProgramInfo *pginfo)
     if (!pginfo->GetStorageGroup().isEmpty() &&
         !hostname.isEmpty())
     {
-        QString ip = gCoreContext->GetBackendServerIP(hostname);
         int port = gCoreContext->GetBackendServerPort(hostname);
         QString basename = filename.section('/', -1);
-        QString uri = gCoreContext->GenMythURL(ip, port, basename,
+        QString uri = gCoreContext->GenMythURL(hostname, port, basename,
                                                pginfo->GetStorageGroup());
 
         LOG(VB_GENERAL, LOG_NOTICE, QString("Requesting delete for file '%1'.")

@@ -1195,7 +1195,7 @@ QStringList RemoteFile::FindFileList(const QString& filename, const QString& hos
             QStringList filteredFiles = files.filter(QRegExp(fi.fileName()));
             for (int x = 0; x < filteredFiles.size(); x++)
             {
-                strList << gCoreContext->GenMythURL(gCoreContext->GetBackendServerIP(),
+                strList << gCoreContext->GenMythURL(gCoreContext->GetHostName(),
                                                     gCoreContext->GetBackendServerPort(),
                                                     fi.path() + '/' + filteredFiles[x],
                                                     storageGroup);
@@ -1204,7 +1204,7 @@ QStringList RemoteFile::FindFileList(const QString& filename, const QString& hos
         else
         {
             if (!sgroup.FindFile(filename).isEmpty())
-                strList << gCoreContext->GenMythURL(gCoreContext->GetBackendServerIP(hostName),
+                strList << gCoreContext->GenMythURL(hostName,
                                                     gCoreContext->GetBackendServerPort(hostName),
                                                     filename, storageGroup);
         }

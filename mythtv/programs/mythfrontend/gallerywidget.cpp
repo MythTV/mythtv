@@ -555,8 +555,8 @@ void GalleryWidget::LoadFile()
  */
 QString GalleryWidget::CreateImageUrl(QString &fileName)
 {
-    QString url = gCoreContext->GenMythURL(gCoreContext->GetSetting("MasterServerIP"),
-                                           gCoreContext->GetNumSetting("MasterServerPort"),
+    QString url = gCoreContext->GenMythURL(gCoreContext->GetMasterHostName(),
+                                           gCoreContext->GetMasterServerPort(),
                                            fileName,
                                            m_gvh->m_sgName);
 
