@@ -280,11 +280,30 @@ void CDSObject::toXml( QTextStream &os, FilterMap &filter,
 {
     QString sEndTag = "";
 
-    // NOTE Filter does the opposite of what you may expect, it doesn't contain
-    //      a list of what should be excluded but what should be included.
-    //
-    //      Certain required properties must always be included irrespective of
-    //      any filter.
+    /**
+     * NOTE FilterMap contains a list of what should be included, not what should
+     *      be excluded.
+     *
+     *      The client is expected either to indicate that everything should be
+     *      returned with an asterix, or to supply a comma seperated list of
+     *      the only the named properties and attributes.
+     *
+     *      @ - Attributes are denoted by format <element>@<attribute>
+     *
+     *      # - The use of a hash at the end of a name indicates that this
+     *          property and all it's children and attributes should be returned.
+     *
+     *      Inclusion of an attribute in the filter list implies the inclusion
+     *      of it's parent element and value.
+     *      e.g. filter="res@size" implies <res size="{size}">{url}</res>
+     *      However optional tags such as res@duration which are not named will
+     *      be omitted.
+     *
+     *      'Required' properties must always be included irrespective of
+     *      any filter!
+     *
+     *      See UPnP MediaServer, ContentDirectory Service Section 2.3.18, 2013
+     */
     bool    bFilter = true;
 
     if (filter.contains("*"))
