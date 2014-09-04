@@ -1214,7 +1214,7 @@ QStringList RemoteFile::FindFileList(const QString& filename, const QString& hos
     }
 
     // if we didn't find any files ask the master BE to find it
-    if (strList.isEmpty())
+    if (strList.isEmpty() && !gCoreContext->IsMasterBackend())
     {
         strList << "QUERY_FINDFILE" << hostName << storageGroup << filename
                 << (useRegex ? "1" : "0")
