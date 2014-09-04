@@ -441,7 +441,7 @@ bool RemoteFile::Exists(const QString &url, struct stat *fileinfo)
 
         if (url.startsWith("myth:"))
         {
-            StorageGroup sGroup(sgroup, host);
+            StorageGroup sGroup(sgroup, gCoreContext->GetHostName());
             fullFilePath = sGroup.FindFile(filename);
             if (!fullFilePath.isEmpty())
                 fileExists = true;
@@ -1173,6 +1173,9 @@ QStringList RemoteFile::FindFileList(const QString& filename, const QString& hos
     // if we are looking for the file on this host just search the local storage group first
     if (gCoreContext->IsThisBackend(hostName))
     {
+        // We could have made it this far with an IP when we really want
+        // a hostname
+        hostName = gCoreContext->GetHostName();
         StorageGroup sgroup(storageGroup, hostName);
 
         if (useRegex)
@@ -1193,17 +1196,17 @@ QStringList RemoteFile::FindFileList(const QString& filename, const QString& hos
             for (int x = 0; x < filteredFiles.size(); x++)
             {
                 strList << gCoreContext->GenMythURL(gCoreContext->GetBackendServerIP(),
-                                                     gCoreContext->GetBackendServerPort(),
-                                                     fi.path() + '/' + filteredFiles[x],
-                                                     storageGroup);
+                                                    gCoreContext->GetBackendServerPort(),
+                                                    fi.path() + '/' + filteredFiles[x],
+                                                    storageGroup);
             }
         }
         else
         {
             if (!sgroup.FindFile(filename).isEmpty())
                 strList << gCoreContext->GenMythURL(gCoreContext->GetBackendServerIP(hostName),
-                                                gCoreContext->GetBackendServerPort(hostName),
-                                                filename, storageGroup);
+                                                    gCoreContext->GetBackendServerPort(hostName),
+                                                    filename, storageGroup);
         }
 
         if (!strList.isEmpty() || !allowFallback)

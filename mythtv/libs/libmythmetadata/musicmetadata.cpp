@@ -790,7 +790,7 @@ QString MusicMetadata::Filename(bool find)
     }
 
     // first check to see if the filename is complete
-    if (QFile::exists(m_filename))
+    if (RemoteFile::Exists(m_filename))
     {
         m_actualFilename = m_filename;
         return m_filename;
@@ -1095,14 +1095,12 @@ QString MusicMetadata::getAlbumArtFile(void)
                 return QString("");
             }
 
-            QString sUrl = RemoteFile::FindFile(url.path(), url.host(), url.userName());
-
-            if (sUrl.isEmpty())
+            if (!RemoteFile::Exists(res))
             {
                 if (albumart_image->embedded)
                 {
                     if (gCoreContext->IsMasterBackend() &&
-                        url.host() == gCoreContext->GetMasterHostName())
+                        url.host() == gCoreContext->GetMasterServerIP())
                     {
                         QStringList paramList;
                         paramList.append(QString("--songid='%1'").arg(ID()));

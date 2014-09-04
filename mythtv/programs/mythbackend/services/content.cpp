@@ -394,6 +394,7 @@ QFileInfo Content::GetAlbumArt( int nTrackId, int nWidth, int nHeight )
         return QFileInfo();
 
     QString sFullFileName = metadata->getAlbumArtFile();
+    LOG(VB_GENERAL, LOG_DEBUG, QString("GetAlbumArt: %1").arg(sFullFileName));
 
     delete metadata;
 
