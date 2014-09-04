@@ -1786,6 +1786,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
     QMap<QString, QString> backendPortMap;
     QString ip   = gCoreContext->GetBackendServerIP();
     int port = gCoreContext->GetBackendServerPort();
+    QString host = gCoreContext->GetHostName();
 
     ProgramList::iterator it = destination.begin();
     for (it = destination.begin(); it != destination.end(); ++it)
@@ -1799,7 +1800,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
         if ((proginfo->GetHostname() == gCoreContext->GetHostName()) ||
             (!slave && masterBackendOverride))
         {
-            proginfo->SetPathname(gCoreContext->GenMythURL(ip,port,proginfo->GetBasename()));
+            proginfo->SetPathname(gCoreContext->GenMythURL(host,port,proginfo->GetBasename()));
             if (!proginfo->GetFilesize())
             {
                 QString tmpURL = GetPlaybackURL(proginfo);
@@ -1940,13 +1941,13 @@ void MainServer::HandleFillProgramInfo(QStringList &slist, PlaybackSock *pbs)
     if (pginfo.HasPathname())
     {
         QString lpath = GetPlaybackURL(&pginfo);
-        QString ip    = gCoreContext->GetBackendServerIP();
         int port  = gCoreContext->GetBackendServerPort();
+        QString host = gCoreContext->GetHostName();
 
         if (playbackhost == gCoreContext->GetHostName())
             pginfo.SetPathname(lpath);
         else
-            pginfo.SetPathname(gCoreContext->GenMythURL(ip,port,pginfo.GetBasename()));
+            pginfo.SetPathname(gCoreContext->GenMythURL(host,port,pginfo.GetBasename()));
 
         const QFileInfo info(lpath);
         pginfo.SetFilesize(info.size());
@@ -2140,8 +2141,7 @@ void MainServer::DeleteRecordedFiles(DeleteStruct *ds)
             StorageGroup sgroup(storagegroup);
             QString localFile = sgroup.FindFile(basename);
 
-            QString url = gCoreContext->GenMythURL(
-                                  gCoreContext->GetBackendServerIP(hostname),
+            QString url = gCoreContext->GenMythURL(hostname,
                                   gCoreContext->GetBackendServerPort(hostname),
                                   basename,
                                   storagegroup);

@@ -288,6 +288,12 @@ MusicMetadata *MusicMetadata::createFromID(int trackid)
         mdata->m_dateadded = query.value(16).toDateTime();
         mdata->m_filename = query.value(17).toString();
 
+        if (!QHostAddress(mdata->m_hostname).isNull()) // A bug caused an IP to replace hostname, reset and it will fix itself
+        {
+            mdata->m_hostname = "";
+            mdata->saveHostname();
+        }
+
         return mdata;
     }
 
@@ -736,7 +742,7 @@ QString MusicMetadata::Filename(bool find) const
 
     // maybe it's in our 'Music' storage group
     //FIXME: this is just looking on the master BE
-    QString filename = gCoreContext->GenMythURL(gCoreContext->GetSetting("MasterServerIP"),
+    QString filename = gCoreContext->GenMythURL(gCoreContext->gCoreContext->GetMasterHostName(),
                                                 gCoreContext->GetNumSetting("MasterServerPort"),
                                                 m_filename, "Music");
     if (RemoteFile::Exists(filename))

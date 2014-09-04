@@ -692,6 +692,13 @@ QString MythCoreContext::GenMythURL(QString host, int port, QString path, QStrin
     QString m_port;
 
     QHostAddress addr(host);
+    if (!addr.isNull())
+    {
+        LOG(VB_GENERAL, LOG_CRIT, QString("MythCoreContext::GenMythURL(%1/%2): Given "
+                                          "IP address instead of hostname "
+                                          "(ID). This is invalid.").arg(host).arg(path));
+    }
+
 
     if (!storageGroup.isEmpty())
         m_storageGroup = storageGroup + "@";
@@ -700,7 +707,7 @@ QString MythCoreContext::GenMythURL(QString host, int port, QString path, QStrin
 
 #if !defined(QT_NO_IPV6)
     // Basically if it appears to be an IPv6 IP surround the IP with [] otherwise don't bother
-    if (addr.protocol() == QAbstractSocket::IPv6Protocol)
+    if (!addr.isNull() && addr.protocol() == QAbstractSocket::IPv6Protocol)
         m_host = "[" + addr.toString().toLower() + "]";
 #endif
 
@@ -728,7 +735,7 @@ QString MythCoreContext::GenMythURL(QString host, int port, QString path, QStrin
 QString MythCoreContext::GetMasterHostPrefix(const QString &storageGroup,
                                              const QString &path)
 {
-    return GenMythURL(GetMasterServerIP(),
+    return GenMythURL(GetMasterHostName(),
                       GetMasterServerPort(),
                       path,
                       storageGroup);

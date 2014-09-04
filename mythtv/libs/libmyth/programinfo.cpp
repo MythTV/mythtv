@@ -2368,7 +2368,7 @@ QString ProgramInfo::GetPlaybackURL(
         (gCoreContext->GetNumSetting("MasterBackendOverride", 0)) &&
         (RemoteCheckFile(this, false)))
     {
-        tmpURL = gCoreContext->GenMythURL(gCoreContext->GetMasterServerIP(),
+        tmpURL = gCoreContext->GenMythURL(gCoreContext->GetMasterHostName(),
                                           gCoreContext->GetMasterServerPort(),
                                           basename);
 
@@ -2378,7 +2378,7 @@ QString ProgramInfo::GetPlaybackURL(
     }
 
     // Fallback to streaming from the backend the recording was created on
-    tmpURL = gCoreContext->GenMythURL(gCoreContext->GetBackendServerIP(hostname),
+    tmpURL = gCoreContext->GenMythURL(hostname,
                                       gCoreContext->GetBackendServerPort(hostname),
                                       basename);
 
