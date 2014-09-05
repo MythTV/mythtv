@@ -19,6 +19,7 @@ using namespace std;
 #include "upnpcds.h"
 #include "upnputil.h"
 #include "mythlogging.h"
+#include "mythversion.h"
 
 #define DIDL_LITE_BEGIN "<DIDL-Lite xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\" xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\">"
 #define DIDL_LITE_END   "</DIDL-Lite>";
@@ -83,8 +84,15 @@ UPnpCDS::UPnpCDS( UPnpDevice *pDevice, const QString &sSharePath )
     AddVariable( new StateVariable< QString        >( "TransferIDs"       , true ) );
     AddVariable( new StateVariable< QString        >( "ContainerUpdateIDs", true ) );
     AddVariable( new StateVariable< uint16_t >( "SystemUpdateID"    , true ) );
+    AddVariable( new StateVariable< QString  >( "ServiceResetToken" , true ) );
 
     SetValue< uint16_t >( "SystemUpdateID", 1 );
+    // ServiceResetToken must be unique (never repeat) and it must change when
+    // the backend restarts (all internal state is reset)
+    //
+    // The current date + time fits the criteria.
+    SetValue< QString  >( "ServiceResetToken",
+                          QDateTime::currentDateTimeUtc().toString(Qt::ISODate) );
 
     QString sUPnpDescPath = UPnp::GetConfiguration()->GetValue( "UPnP/DescXmlPath", sSharePath );
 
@@ -121,6 +129,8 @@ UPnpCDSMethod UPnpCDS::GetMethod( const QString &sURI )
     if (sURI == "GetSearchCapabilities" ) return CDSM_GetSearchCapabilities;
     if (sURI == "GetSortCapabilities"   ) return CDSM_GetSortCapabilities  ;
     if (sURI == "GetSystemUpdateID"     ) return CDSM_GetSystemUpdateID    ;
+    if (sURI == "GetFeatureList"        ) return CDSM_GetFeatureList       ;
+    if (sURI == "GetServiceResetToken"  ) return CDSM_GetServiceResetToken ;
 
     return(  CDSM_Unknown );
 }
@@ -210,6 +220,12 @@ bool UPnpCDS::ProcessRequest( HTTPRequest *pRequest )
                 break;
             case CDSM_GetSystemUpdateID     :
                 HandleGetSystemUpdateID( pRequest );
+                break;
+            case CDSM_GetFeatureList        :
+                HandleGetFeatureList( pRequest );
+                break;
+            case CDSM_GetServiceResetToken  :
+                HandleGetServiceResetToken( pRequest );
                 break;
             default:
                 UPnp::FormatErrorResponse( pRequest, UPnPResult_InvalidAction );
@@ -683,6 +699,39 @@ void UPnpCDS::HandleGetSystemUpdateID( HTTPRequest *pRequest )
     uint16_t nId = GetValue<uint16_t>("SystemUpdateID");
 
     list.push_back(NameValue("Id", nId));
+
+    pRequest->FormatActionResponse(list);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+void UPnpCDS::HandleGetFeatureList(HTTPRequest* pRequest)
+{
+    NameValues list;
+    LOG(VB_UPNP, LOG_INFO,
+        QString("UPnpCDS::ProcessRequest : %1 : %2")
+            .arg(pRequest->m_sBaseUrl) .arg(pRequest->m_sMethod));
+
+    QString sResults = m_features.toXML();
+
+    list.push_back(NameValue("FeatureList", sResults));
+
+    pRequest->FormatActionResponse(list);
+}
+
+void UPnpCDS::HandleGetServiceResetToken(HTTPRequest* pRequest)
+{
+    NameValues list;
+
+    LOG(VB_UPNP, LOG_INFO,
+        QString("UPnpCDS::ProcessRequest : %1 : %2")
+            .arg(pRequest->m_sBaseUrl) .arg(pRequest->m_sMethod));
+
+    QString sToken = GetValue<QString>("ServiceResetToken");
+
+    list.push_back(NameValue("ResetToken", sToken));
 
     pRequest->FormatActionResponse(list);
 }

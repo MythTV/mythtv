@@ -32,7 +32,9 @@ typedef enum
     CDSM_Search                 = 3,
     CDSM_GetSearchCapabilities  = 4,
     CDSM_GetSortCapabilities    = 5,
-    CDSM_GetSystemUpdateID      = 6
+    CDSM_GetSystemUpdateID      = 6,
+    CDSM_GetFeatureList         = 7,
+    CDSM_GetServiceResetToken   = 8
 
 } UPnpCDSMethod;
 
@@ -232,6 +234,8 @@ class UPNP_PUBLIC UPnpCDS : public Eventing
         QString                m_sServiceDescFileName;
         QString                m_sControlUrl;
 
+        UPnPFeatureList        m_features;
+
     private:
 
         UPnpCDSMethod       GetMethod              ( const QString &sURI  );
@@ -242,13 +246,15 @@ class UPNP_PUBLIC UPnpCDS : public Eventing
         void            HandleGetSearchCapabilities( HTTPRequest *pRequest );
         void            HandleGetSortCapabilities  ( HTTPRequest *pRequest );
         void            HandleGetSystemUpdateID    ( HTTPRequest *pRequest );
+        void            HandleGetFeatureList       ( HTTPRequest *pRequest );
+        void            HandleGetServiceResetToken ( HTTPRequest *pRequest );
         void            DetermineClient            ( HTTPRequest *pRequest, UPnpCDSRequest *pCDSRequest );
 
     protected:
 
         // Implement UPnpServiceImpl methods that we can
 
-        virtual QString GetServiceType      () { return "urn:schemas-upnp-org:service:ContentDirectory:1"; }
+        virtual QString GetServiceType      () { return "urn:schemas-upnp-org:service:ContentDirectory:4"; }
         virtual QString GetServiceId        () { return "urn:upnp-org:serviceId:ContentDirectory"; }
         virtual QString GetServiceControlURL() { return m_sControlUrl.mid( 1 ); }
         virtual QString GetServiceDescURL   () { return m_sControlUrl.mid( 1 ) + "/GetServDesc"; }

@@ -75,6 +75,16 @@
             </argument>
          </argumentList>
       </action>
+      <action>
+        <name>GetFeatureList</name>
+        <argumentList>
+          <argument>
+            <name>FeatureList</name>
+            <direction>out</direction>
+            <relatedStateVariable>FeatureList</relatedStateVariable>
+          </argument>
+        </argumentList>
+      </action>
    </actionList>
    <serviceStateTable>
       <stateVariable sendEvents="no">
@@ -126,6 +136,10 @@
       </stateVariable>
       <stateVariable sendEvents="yes">
          <name>CurrentConnectionIDs</name>
+         <dataType>string</dataType>
+      </stateVariable>
+      <stateVariable sendEvents="no">
+         <name>FeatureList</name>
          <dataType>string</dataType>
       </stateVariable>
    </serviceStateTable>

@@ -577,10 +577,11 @@ QString UPnpDeviceDesc::FormatValue( const QString &sName, int nValue )
 
 QString UPnpDeviceDesc::FindDeviceUDN( UPnpDevice *pDevice, QString sST )
 {
-    if (sST == pDevice->m_sDeviceType)
+    // Ignore device version, UPnP is backwards compatible
+    if (sST.section(':', 0, -2) == pDevice->m_sDeviceType.section(':', 0, -2))
         return pDevice->GetUDN();
 
-    if (sST == pDevice->GetUDN())
+    if (sST.section(':', 0, -2) == pDevice->GetUDN().section(':', 0, -2))
         return sST;
 
     // ----------------------------------------------------------------------
@@ -590,7 +591,8 @@ QString UPnpDeviceDesc::FindDeviceUDN( UPnpDevice *pDevice, QString sST )
     UPnpServiceList::const_iterator sit = pDevice->m_listServices.begin();
     for (; sit != pDevice->m_listServices.end(); ++sit)
     {
-        if (sST == (*sit)->m_sServiceType)
+        // Ignore the service version, UPnP is backwards compatible
+        if (sST.section(':', 0, -2) == (*sit)->m_sServiceType.section(':', 0, -2))
             return pDevice->GetUDN();
     }
 
@@ -625,7 +627,8 @@ UPnpDevice *UPnpDeviceDesc::FindDevice( const QString &sURI )
 UPnpDevice *UPnpDeviceDesc::FindDevice( UPnpDevice    *pDevice,
                                         const QString &sURI )
 {
-    if ( sURI == pDevice->m_sDeviceType )
+    // Ignore device version, UPnP is backwards compatible
+    if ( sURI.section(':', 0, -2) == pDevice->m_sDeviceType.section(':', 0, -2) )
         return pDevice;
 
     // ----------------------------------------------------------------------
@@ -827,7 +830,8 @@ UPnpService UPnpDevice::GetService(const QString &urn, bool *found) const
     UPnpServiceList::const_iterator it = m_listServices.begin();
     for (; it != m_listServices.end(); ++it)
     {
-        if ((*it)->m_sServiceType == urn)
+        // Ignore the service version
+        if ((*it)->m_sServiceType.section(':', 0, -2) == urn.section(':', 0, -2))
         {
             srv = **it;
             done = true;

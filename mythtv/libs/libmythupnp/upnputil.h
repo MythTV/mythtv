@@ -80,6 +80,7 @@ class NameValue
     inline ~NameValue();
 
     inline void AddAttribute(const QString &name, const QString &value, bool required);
+    inline QString toXML();
 };
 class NameValues : public QList<NameValue> {};
 
@@ -131,6 +132,22 @@ inline void NameValue::AddAttribute(const QString &name, const QString &value,
         pAttributes = new NameValues();
 
     pAttributes->push_back(NameValue(name, value, required));
+}
+
+
+inline QString NameValue::toXML()
+{
+    QString sAttributes;
+    QString attributeTemplate = " %1=\"%2\"";
+    QString xml = "<%1%2>%3</%1>";
+
+    NameValues::const_iterator it;
+    for (it = pAttributes->constBegin(); it != pAttributes->constEnd(); ++it)
+    {
+        sAttributes += attributeTemplate.arg((*it).sName).arg((*it).sValue);
+    }
+
+    return xml.arg(sName).arg(sAttributes).arg(sValue);
 }
 
 //////////////////////////////////////////////////////////////////////////////
