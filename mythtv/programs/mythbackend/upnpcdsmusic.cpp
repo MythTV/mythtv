@@ -89,6 +89,9 @@ void UPnpCDSMusic::CreateRoot()
     IDTokenMap tokens;
     // END HACK
 
+    if (m_pParent)
+        m_pParent->RegisterShortCut(UPnPCDSShortcuts::MUSIC, m_sExtensionId);
+
     // -----------------------------------------------------------------------
     // All Tracks
     // -----------------------------------------------------------------------
@@ -102,6 +105,9 @@ void UPnpCDSMusic::CreateRoot()
     pContainer->SetChildContainerCount(0);
     // END HACK
     m_pRoot->AddChild(pContainer);
+
+    if (m_pParent)
+        m_pParent->RegisterShortCut(UPnPCDSShortcuts::MUSIC_ALL, containerId.arg("Track"));
 
     // -----------------------------------------------------------------------
     // By Artist

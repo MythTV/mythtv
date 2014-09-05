@@ -158,6 +158,9 @@ void UPnpCDSTv::CreateRoot()
     IDTokenMap tokens;
     // END HACK
 
+    if (m_pParent)
+        m_pParent->RegisterShortCut(UPnPCDSShortcuts::VIDEOS_RECORDINGS, m_sExtensionId);
+
     // -----------------------------------------------------------------------
     // All Recordings
     // -----------------------------------------------------------------------

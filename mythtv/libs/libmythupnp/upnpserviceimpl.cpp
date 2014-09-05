@@ -21,19 +21,9 @@ void UPnpServiceImpl::RegisterService(UPnpDevice *pDevice)
 QString UPnPFeature::toXML()
 {
     QString xml;
-    xml = "<" + m_name;
-    NameValues::iterator ait;
-    for (ait = m_attributes.begin(); ait != m_attributes.end(); ++ait)
-    {
-        xml += QString(" %1=\"%2\"").arg((*ait).sName).arg((*ait).sValue);
-    }
-    xml += ">";
-    NameValues::iterator pit;
-    for (pit = m_properties.begin(); pit != m_properties.end(); ++pit)
-    {
-        xml += "    " + (*pit).toXML();
-    }
-    xml += "</" + m_name + ">";
+    xml = "<Feature name=\"" + m_name + "\" version=\"" + QString::number(m_version) + "\">\r\n";
+    xml += CreateXML();
+    xml += "</Feature>\r\n";
     return xml;
 }
 
@@ -59,7 +49,6 @@ void UPnPFeatureList::AddFeature(UPnPFeature *feature)
     m_features.append(feature);
 }
 
-
 QString UPnPFeatureList::toXML()
 {
     QString xml;
@@ -70,12 +59,12 @@ QString UPnPFeatureList::toXML()
     {
         xml += QString(" %1=\"%2\"").arg((*ait).sName).arg((*ait).sValue);
     }
-    xml += ">";
+    xml += ">\r\n";
     QList<UPnPFeature*>::iterator fit;
     for (fit = m_features.begin(); fit != m_features.end(); ++fit)
     {
         xml += "    " + (*fit)->toXML();
     }
-    xml += "</Features>";
+    xml += "</Features>\r\n";
     return xml;
 }

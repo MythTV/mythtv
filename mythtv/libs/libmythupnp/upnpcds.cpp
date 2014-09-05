@@ -86,7 +86,7 @@ UPnpCDS::UPnpCDS( UPnpDevice *pDevice, const QString &sSharePath )
     AddVariable( new StateVariable< uint16_t >( "SystemUpdateID"    , true ) );
     AddVariable( new StateVariable< QString  >( "ServiceResetToken" , true ) );
 
-    SetValue< uint16_t >( "SystemUpdateID", 1 );
+    SetValue< uint16_t >( "SystemUpdateID", 0 );
     // ServiceResetToken must be unique (never repeat) and it must change when
     // the backend restarts (all internal state is reset)
     //
@@ -99,6 +99,8 @@ UPnpCDS::UPnpCDS( UPnpDevice *pDevice, const QString &sSharePath )
     m_sServiceDescFileName = sUPnpDescPath + "CDS_scpd.xml";
     m_sControlUrl          = "/CDS_Control";
 
+    m_pShortCuts = new UPnPCDSShortcuts();
+    RegisterFeature(m_pShortCuts);
 
     // Add our Service Definition to the device.
 
@@ -153,8 +155,11 @@ UPnpCDSBrowseFlag UPnpCDS::GetBrowseFlag( const QString &sFlag )
 
 void UPnpCDS::RegisterExtension  ( UPnpCDSExtension *pExtension )
 {
-    if (pExtension != NULL )
+    if (pExtension)
+    {
         m_extensions.append( pExtension );
+        pExtension->m_pParent = this; // So the extension can register shortcuts and features
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -169,6 +174,25 @@ void UPnpCDS::UnregisterExtension( UPnpCDSExtension *pExtension )
         delete pExtension;
         pExtension = NULL;
     }
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+void UPnpCDS::RegisterShortCut(UPnPCDSShortcuts::ShortCutType type,
+                               const QString& objectID)
+{
+    m_pShortCuts->AddShortCut(type, objectID);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+void UPnpCDS::RegisterFeature(UPnPFeature* feature)
+{
+    m_features.AddFeature(feature); // m_features takes ownership
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1012,6 +1036,144 @@ CDSObject* UPnpCDSExtension::GetRoot()
         CreateRoot();
 
     return m_pRoot;
+}
+
+QString UPnPCDSShortcuts::CreateXML()
+{
+    QString xml;
+
+    xml = "<shortcutlist>\r\n";
+
+    QMap<ShortCutType, QString>::iterator it;
+    for (it = m_shortcuts.begin(); it != m_shortcuts.end(); ++it)
+    {
+        ShortCutType type = it.key();
+        QString objectID = *it;
+        xml += "<shortcut>\r\n";
+        xml += QString("<name>%1</name>\r\n").arg(TypeToName(type));
+        xml += QString("<objectID>%1</objectID>\r\n").arg(HTTPRequest::Encode(objectID));
+        xml += "</shortcut>\r\n";
+    }
+
+    xml += "</shortcutlist>\r\n";
+
+    return xml;
+}
+
+bool UPnPCDSShortcuts::AddShortCut(ShortCutType type,
+                                         const QString &objectID)
+{
+    if (!m_shortcuts.contains(type))
+        m_shortcuts.insert(type, objectID);
+
+    return false;
+}
+
+QString UPnPCDSShortcuts::TypeToName(ShortCutType type)
+{
+    QString str;
+
+    switch (type)
+    {
+       case MUSIC :
+          str = "MUSIC";
+          break;
+       case MUSIC_ALBUMS :
+          str = "MUSIC_ALBUMS";
+          break;
+       case MUSIC_ARTISTS :
+          str = "MUSIC_ARTISTS";
+          break;
+       case MUSIC_GENRES :
+          str = "MUSIC_GENRES";
+          break;
+       case MUSIC_PLAYLISTS :
+          str = "MUSIC_PLAYLISTS";
+          break;
+       case MUSIC_RECENTLY_ADDED :
+          str = "MUSIC_RECENTLY_ADDED";
+          break;
+       case MUSIC_LAST_PLAYED :
+          str = "MUSIC_LAST_PLAYED";
+          break;
+       case MUSIC_AUDIOBOOKS :
+          str = "MUSIC_AUDIOBOOKS";
+          break;
+       case MUSIC_STATIONS :
+          str = "MUSIC_STATIONS";
+          break;
+       case MUSIC_ALL :
+          str = "MUSIC_ALL";
+          break;
+       case MUSIC_FOLDER_STRUCTURE :
+          str = "MUSIC_FOLDER_STRUCTURE";
+          break;
+
+       case IMAGES :
+          str = "IMAGES";
+          break;
+       case IMAGES_YEARS :
+          str = "IMAGES_YEARS";
+          break;
+       case IMAGES_YEARS_MONTH :
+          str = "IMAGES_YEARS_MONTH";
+          break;
+       case IMAGES_ALBUM :
+          str = "IMAGES_ALBUM";
+          break;
+       case IMAGES_SLIDESHOWS :
+          str = "IMAGES_SLIDESHOWS";
+          break;
+       case IMAGES_RECENTLY_ADDED :
+          str = "IMAGES_RECENTLY_ADDED";
+          break;
+       case IMAGES_LAST_WATCHED :
+          str = "IMAGES_LAST_WATCHED";
+          break;
+       case IMAGES_ALL :
+          str = "IMAGES_ALL";
+          break;
+       case IMAGES_FOLDER_STRUCTURE :
+          str = "IMAGES_FOLDER_STRUCTURE";
+          break;
+
+       case VIDEOS :
+          str = "VIDEOS";
+          break;
+       case VIDEOS_GENRES :
+          str = "VIDEOS_GENRES";
+          break;
+       case VIDEOS_YEARS :
+          str = "VIDEOS_YEARS";
+          break;
+       case VIDEOS_YEARS_MONTH :
+          str = "VIDEOS_YEARS_MONTH";
+          break;
+       case VIDEOS_ALBUM :
+          str = "VIDEOS_ALBUM";
+          break;
+       case VIDEOS_RECENTLY_ADDED :
+          str = "VIDEOS_RECENTLY_ADDED";
+          break;
+       case VIDEOS_LAST_PLAYED :
+          str = "VIDEOS_LAST_PLAYED";
+          break;
+       case VIDEOS_RECORDINGS :
+          str = "VIDEOS_RECORDINGS";
+          break;
+       case VIDEOS_ALL :
+          str = "VIDEOS_ALL";
+          break;
+       case VIDEOS_FOLDER_STRUCTURE :
+          str = "VIDEOS_FOLDER_STRUCTURE";
+          break;
+
+       case FOLDER_STRUCTURE :
+          str = "VIDEOS_FOLDER_STRUCTURE";
+          break;
+    }
+
+    return str;
 }
 
 // vim:ts=4:sw=4:ai:et:si:sts=4

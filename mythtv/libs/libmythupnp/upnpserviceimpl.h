@@ -45,15 +45,16 @@ class UPNP_PUBLIC UPnpServiceImpl
 class UPNP_PUBLIC UPnPFeature
 {
   public:
-    UPnPFeature() {}
+    UPnPFeature(const QString &name, int version) :
+        m_name(name), m_version(version) {}
     virtual ~UPnPFeature() {}
 
     QString toXML();
+    virtual QString CreateXML() = 0;
 
   protected:
-    QString m_name;
-    NameValues m_attributes;
-    NameValues m_properties;
+    QString    m_name;
+    int        m_version;
 };
 
 class UPNP_PUBLIC UPnPFeatureList

@@ -15,6 +15,7 @@
 
 #include <QList>
 #include <QMap>
+#include <QString>
 #include <QObject>
 
 #include "upnp.h"
@@ -161,6 +162,8 @@ class UPNP_PUBLIC UPnpCDSExtension
         QString     m_sName;
         QString     m_sClass;
 
+        UPnpCDS   *m_pParent;
+
     protected:
 
         QString RemoveToken ( const QString &sToken, const QString &sStr, int num );
@@ -196,7 +199,7 @@ class UPNP_PUBLIC UPnpCDSExtension
 
         UPnpCDSExtension( QString sName, 
                           QString sExtensionId, 
-                          QString sClass ) : m_pRoot(NULL)
+                          QString sClass ) : m_pParent(NULL), m_pRoot(NULL)
         {
             m_sName        = QObject::tr(sName.toLatin1().constData());
             m_sExtensionId = sExtensionId;
@@ -219,6 +222,72 @@ typedef QList<UPnpCDSExtension*> UPnpCDSExtensionList;
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 //
+// UPnpContainerShortcuts Class Definition
+//
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+
+
+class UPNP_PUBLIC UPnPCDSShortcuts : public UPnPFeature
+{
+  public:
+    UPnPCDSShortcuts() : UPnPFeature("CONTAINER_SHORTCUTS", 1) { }
+
+    /**
+     * \brief Allowed values for the Container Shortcut feature
+     *
+     * ContentDirectory Service v4 2014
+     * Table E-13  allowedValueListfor the Shortcut Name element
+     */
+    enum ShortCutType
+    {
+        MUSIC,
+        MUSIC_ALBUMS,
+        MUSIC_ARTISTS,
+        MUSIC_GENRES,
+        MUSIC_PLAYLISTS,
+        MUSIC_RECENTLY_ADDED,
+        MUSIC_LAST_PLAYED,
+        MUSIC_AUDIOBOOKS,
+        MUSIC_STATIONS,
+        MUSIC_ALL,
+        MUSIC_FOLDER_STRUCTURE,
+
+        IMAGES,
+        IMAGES_YEARS,
+        IMAGES_YEARS_MONTH,
+        IMAGES_ALBUM,
+        IMAGES_SLIDESHOWS,
+        IMAGES_RECENTLY_ADDED,
+        IMAGES_LAST_WATCHED,
+        IMAGES_ALL,
+        IMAGES_FOLDER_STRUCTURE,
+
+        VIDEOS,
+        VIDEOS_GENRES,
+        VIDEOS_YEARS,
+        VIDEOS_YEARS_MONTH,
+        VIDEOS_ALBUM,
+        VIDEOS_RECENTLY_ADDED,
+        VIDEOS_LAST_PLAYED,
+        VIDEOS_RECORDINGS,
+        VIDEOS_ALL,
+        VIDEOS_FOLDER_STRUCTURE,
+
+        FOLDER_STRUCTURE
+    };
+
+    bool AddShortCut(ShortCutType type, const QString &objectID);
+    QString CreateXML();
+
+  private:
+    QString TypeToName(ShortCutType type);
+    QMap<ShortCutType, QString> m_shortcuts;
+};
+
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+//
 // UPnpCDS Class Definition
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -235,6 +304,7 @@ class UPNP_PUBLIC UPnpCDS : public Eventing
         QString                m_sControlUrl;
 
         UPnPFeatureList        m_features;
+        UPnPCDSShortcuts      *m_pShortCuts;
 
     private:
 
@@ -267,6 +337,10 @@ class UPNP_PUBLIC UPnpCDS : public Eventing
 
         void     RegisterExtension  ( UPnpCDSExtension *pExtension );
         void     UnregisterExtension( UPnpCDSExtension *pExtension );
+
+        void     RegisterShortCut   ( UPnPCDSShortcuts::ShortCutType type,
+                                      const QString &objectID );
+        void     RegisterFeature    ( UPnPFeature *feature );
 
         virtual QStringList GetBasePaths();
         
