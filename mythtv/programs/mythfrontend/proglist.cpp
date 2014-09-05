@@ -29,7 +29,7 @@ using namespace std;
 
 ProgLister::ProgLister(MythScreenStack *parent, ProgListType pltype,
                        const QString &view, const QString &extraArg,
-                       const QDateTime selectedTime) :
+                       const QDateTime &selectedTime) :
     ScheduleCommon(parent, "ProgLister"),
     m_type(pltype),
     m_recid(0),
