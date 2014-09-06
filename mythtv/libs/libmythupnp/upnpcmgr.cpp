@@ -95,7 +95,7 @@ UPnpCMGRMethod UPnpCMGR::GetMethod( const QString &sURI )
     if (sURI == "GetProtocolInfo"          ) return CMGRM_GetProtocolInfo         ;
     if (sURI == "GetCurrentConnectionInfo" ) return CMGRM_GetCurrentConnectionInfo;              
     if (sURI == "GetCurrentConnectionIDs"  ) return CMGRM_GetCurrentConnectionIDs ; 
-    if (sURI == "GetFeatureList"           ) return CMGRM_GetCurrentConnectionIDs ;
+    if (sURI == "GetFeatureList"           ) return CMGRM_GetFeatureList ;
 
     return CMGRM_Unknown;
 }
