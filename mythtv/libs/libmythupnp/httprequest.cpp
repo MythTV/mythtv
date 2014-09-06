@@ -821,7 +821,10 @@ void HTTPRequest::FormatActionResponse(const NameValues &args)
 
         stream << ">";
 
-        stream << Encode( (*nit).sValue );
+        if (m_bSOAPRequest)
+            stream << Encode( (*nit).sValue );
+        else
+            stream << (*nit).sValue;
 
         stream << "</" << (*nit).sName << ">\r\n";
     }
