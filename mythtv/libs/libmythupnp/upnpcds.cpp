@@ -158,7 +158,13 @@ void UPnpCDS::RegisterExtension  ( UPnpCDSExtension *pExtension )
     if (pExtension)
     {
         m_extensions.append( pExtension );
-        pExtension->m_pParent = this; // So the extension can register shortcuts and features
+
+        CDSShortCutList shortcuts = pExtension->GetShortCuts();
+        CDSShortCutList::iterator it;
+        for (it = shortcuts.begin(); it != shortcuts.end(); ++it)
+        {
+            RegisterShortCut(it.key(), it.value());
+        }
     }
 }
 
@@ -1038,6 +1044,10 @@ CDSObject* UPnpCDSExtension::GetRoot()
     return m_pRoot;
 }
 
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 QString UPnPCDSShortcuts::CreateXML()
 {
     QString xml;
@@ -1065,6 +1075,10 @@ bool UPnPCDSShortcuts::AddShortCut(ShortCutType type,
 {
     if (!m_shortcuts.contains(type))
         m_shortcuts.insert(type, objectID);
+    else
+        LOG(VB_GENERAL, LOG_ERR, QString("UPnPCDSShortcuts::AddShortCut(): "
+                                         "Attempted to register duplicate "
+                                         "shortcut").arg(TypeToName(type)));
 
     return false;
 }

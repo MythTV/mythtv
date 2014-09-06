@@ -62,6 +62,13 @@ UPnpCDSMusic::UPnpCDSMusic()
     m_URIBase.setScheme("http");
     m_URIBase.setHost(sServerIp);
     m_URIBase.setPort(sPort);
+
+    // ShortCuts
+    m_shortcuts.insert(UPnPCDSShortcuts::MUSIC, "Music");
+    m_shortcuts.insert(UPnPCDSShortcuts::MUSIC_ALL, "Music/Track");
+    m_shortcuts.insert(UPnPCDSShortcuts::MUSIC_ALBUMS, "Music/Album");
+    m_shortcuts.insert(UPnPCDSShortcuts::MUSIC_ARTISTS, "Music/Artist");
+    m_shortcuts.insert(UPnPCDSShortcuts::MUSIC_GENRES, "Music/Genre");
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -89,9 +96,6 @@ void UPnpCDSMusic::CreateRoot()
     IDTokenMap tokens;
     // END HACK
 
-    if (m_pParent)
-        m_pParent->RegisterShortCut(UPnPCDSShortcuts::MUSIC, m_sExtensionId);
-
     // -----------------------------------------------------------------------
     // All Tracks
     // -----------------------------------------------------------------------
@@ -105,9 +109,6 @@ void UPnpCDSMusic::CreateRoot()
     pContainer->SetChildContainerCount(0);
     // END HACK
     m_pRoot->AddChild(pContainer);
-
-    if (m_pParent)
-        m_pParent->RegisterShortCut(UPnPCDSShortcuts::MUSIC_ALL, containerId.arg("Track"));
 
     // -----------------------------------------------------------------------
     // By Artist

@@ -22,6 +22,22 @@
 #define LOC_WARN QString("UPnpCDSVideo, Warning: ")
 #define LOC_ERR QString("UPnpCDSVideo, Error: ")
 
+UPnpCDSVideo::UPnpCDSVideo()
+             : UPnpCDSExtension( "Videos", "Videos",
+                                 "object.item.videoItem" )
+{
+    QString sServerIp   = gCoreContext->GetBackendServerIP4();
+    int sPort           = gCoreContext->GetBackendStatusPort();
+    m_URIBase.setScheme("http");
+    m_URIBase.setHost(sServerIp);
+    m_URIBase.setPort(sPort);
+
+    // ShortCuts
+    m_shortcuts.insert(UPnPCDSShortcuts::VIDEOS, "Videos");
+    m_shortcuts.insert(UPnPCDSShortcuts::VIDEOS_ALL, "Videos/Video");
+    m_shortcuts.insert(UPnPCDSShortcuts::VIDEOS_GENRES, "Videos/Genre");
+}
+
 void UPnpCDSVideo::CreateRoot()
 {
     if (m_pRoot)
@@ -42,9 +58,6 @@ void UPnpCDSVideo::CreateRoot()
     UPnpCDSExtensionResults *pResult = new UPnpCDSExtensionResults();
     IDTokenMap tokens;
     // END HACK
-
-    if (m_pParent)
-        m_pParent->RegisterShortCut(UPnPCDSShortcuts::VIDEOS, m_sExtensionId);
 
     // -----------------------------------------------------------------------
     // All Videos

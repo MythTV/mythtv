@@ -135,6 +135,9 @@ UPnpCDSTv::UPnpCDSTv()
     m_URIBase.setScheme("http");
     m_URIBase.setHost(sServerIp);
     m_URIBase.setPort(sPort);
+
+    // ShortCuts
+    m_shortcuts.insert(UPnPCDSShortcuts::VIDEOS_RECORDINGS, "Recordings");
 }
 
 void UPnpCDSTv::CreateRoot()
@@ -157,9 +160,6 @@ void UPnpCDSTv::CreateRoot()
     UPnpCDSExtensionResults *pResult = new UPnpCDSExtensionResults();
     IDTokenMap tokens;
     // END HACK
-
-    if (m_pParent)
-        m_pParent->RegisterShortCut(UPnPCDSShortcuts::VIDEOS_RECORDINGS, m_sExtensionId);
 
     // -----------------------------------------------------------------------
     // All Recordings

@@ -139,86 +139,6 @@ class UPNP_PUBLIC UPnpCDSExtensionResults
 
 //////////////////////////////////////////////////////////////////////////////
 
-typedef struct
-{
-    const char *title;
-    const char *column;
-    const char *sql;
-    const char *where;
-    const char *orderColumn;
-    const char *containerClass;
-    const char *childClass;
-
-} UPnpCDSRootInfo;
-
-typedef QMap<QString, QString> IDTokenMap;
-typedef QPair<QString, QString> IDToken;
-
-class UPNP_PUBLIC UPnpCDSExtension
-{
-    public:
-
-        QString     m_sExtensionId;
-        QString     m_sName;
-        QString     m_sClass;
-
-        UPnpCDS   *m_pParent;
-
-    protected:
-
-        QString RemoveToken ( const QString &sToken, const QString &sStr, int num );
-
-        // ------------------------------------------------------------------
-
-        virtual bool IsBrowseRequestForUs  ( UPnpCDSRequest *pRequest );
-        virtual bool IsSearchRequestForUs  ( UPnpCDSRequest *pRequest );
-
-        // ------------------------------------------------------------------
-
-        virtual int  GetRootCount  ( ) { return m_pRoot->GetChildCount(); }
-        virtual int  GetRootContainerCount ( )
-                                { return m_pRoot->GetChildContainerCount(); }
-
-        virtual void CreateRoot ( );
-
-        virtual bool LoadMetadata ( const UPnpCDSRequest *pRequest,
-                                     UPnpCDSExtensionResults *pResults,
-                                     IDTokenMap tokens,
-                                     QString currentToken );
-        virtual bool LoadChildren ( const UPnpCDSRequest *pRequest,
-                                    UPnpCDSExtensionResults *pResults,
-                                    IDTokenMap tokens,
-                                    QString currentToken );
-
-        IDTokenMap TokenizeIDString ( const QString &Id ) const;
-        IDToken    GetCurrentToken  ( const QString &Id ) const;
-
-        CDSObject *m_pRoot;
-
-    public:
-
-        UPnpCDSExtension( QString sName, 
-                          QString sExtensionId, 
-                          QString sClass ) : m_pParent(NULL), m_pRoot(NULL)
-        {
-            m_sName        = QObject::tr(sName.toLatin1().constData());
-            m_sExtensionId = sExtensionId;
-            m_sClass       = sClass;
-        }
-
-        virtual CDSObject *GetRoot ( );
-
-        virtual ~UPnpCDSExtension();
-
-        virtual UPnpCDSExtensionResults *Browse( UPnpCDSRequest *pRequest );
-        virtual UPnpCDSExtensionResults *Search( UPnpCDSRequest *pRequest );
-
-        virtual QString GetSearchCapabilities() { return( "" ); }
-        virtual QString GetSortCapabilities  () { return( "" ); }
-};
-
-typedef QList<UPnpCDSExtension*> UPnpCDSExtensionList;
-
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -226,7 +146,6 @@ typedef QList<UPnpCDSExtension*> UPnpCDSExtensionList;
 //
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-
 
 class UPNP_PUBLIC UPnPCDSShortcuts : public UPnPFeature
 {
@@ -284,6 +203,79 @@ class UPNP_PUBLIC UPnPCDSShortcuts : public UPnPFeature
     QString TypeToName(ShortCutType type);
     QMap<ShortCutType, QString> m_shortcuts;
 };
+
+typedef QMap<UPnPCDSShortcuts::ShortCutType, QString> CDSShortCutList;
+
+//////////////////////////////////////////////////////////////////////////////
+
+typedef QMap<QString, QString> IDTokenMap;
+typedef QPair<QString, QString> IDToken;
+
+class UPNP_PUBLIC UPnpCDSExtension
+{
+    public:
+
+        QString     m_sExtensionId;
+        QString     m_sName;
+        QString     m_sClass;
+
+        CDSShortCutList m_shortcuts;
+
+    protected:
+
+        QString RemoveToken ( const QString &sToken, const QString &sStr, int num );
+
+        // ------------------------------------------------------------------
+
+        virtual bool IsBrowseRequestForUs  ( UPnpCDSRequest *pRequest );
+        virtual bool IsSearchRequestForUs  ( UPnpCDSRequest *pRequest );
+
+        // ------------------------------------------------------------------
+
+        virtual int  GetRootCount  ( ) { return m_pRoot->GetChildCount(); }
+        virtual int  GetRootContainerCount ( )
+                                { return m_pRoot->GetChildContainerCount(); }
+
+        virtual void CreateRoot ( );
+
+        virtual bool LoadMetadata ( const UPnpCDSRequest *pRequest,
+                                     UPnpCDSExtensionResults *pResults,
+                                     IDTokenMap tokens,
+                                     QString currentToken );
+        virtual bool LoadChildren ( const UPnpCDSRequest *pRequest,
+                                    UPnpCDSExtensionResults *pResults,
+                                    IDTokenMap tokens,
+                                    QString currentToken );
+
+        IDTokenMap TokenizeIDString ( const QString &Id ) const;
+        IDToken    GetCurrentToken  ( const QString &Id ) const;
+
+        CDSObject *m_pRoot;
+
+    public:
+
+        UPnpCDSExtension( QString sName, 
+                          QString sExtensionId, 
+                          QString sClass ) : m_pRoot(NULL)
+        {
+            m_sName        = QObject::tr(sName.toLatin1().constData());
+            m_sExtensionId = sExtensionId;
+            m_sClass       = sClass;
+        }
+
+        virtual CDSObject *GetRoot ( );
+
+        virtual ~UPnpCDSExtension();
+
+        virtual UPnpCDSExtensionResults *Browse( UPnpCDSRequest *pRequest );
+        virtual UPnpCDSExtensionResults *Search( UPnpCDSRequest *pRequest );
+
+        virtual QString         GetSearchCapabilities() { return( "" ); }
+        virtual QString         GetSortCapabilities  () { return( "" ); }
+        virtual CDSShortCutList GetShortCuts         () { return m_shortcuts; }
+};
+
+typedef QList<UPnpCDSExtension*> UPnpCDSExtensionList;
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
