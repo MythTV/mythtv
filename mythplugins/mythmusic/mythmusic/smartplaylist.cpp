@@ -748,7 +748,7 @@ void SmartPlaylistEditor::updateMatches(void)
 
     m_matchesText->SetText(QString::number(m_matchesCount));
 
-    m_playlistIsValid = (m_matchesCount > 0);
+    m_playlistIsValid = (m_criteriaRows.size() > 0);
     m_showResultsButton->SetEnabled((m_matchesCount > 0));
     titleChanged();
 }
