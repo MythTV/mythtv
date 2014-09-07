@@ -332,7 +332,7 @@ bool SmartPLCriteriaRow::saveToDatabase(int smartPlaylistID)
     query.bindValue(":FIELD", Field);
     query.bindValue(":OPERATOR", Operator);
     query.bindValue(":VALUE1", Value1);
-    query.bindValue(":VALUE2", Value2);
+    query.bindValue(":VALUE2", Value2.isNull() ? "" : Value2);
 
     if (!query.exec())
     {
