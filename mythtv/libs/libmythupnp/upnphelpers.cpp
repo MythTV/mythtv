@@ -169,8 +169,9 @@ QString ProtocolInfoString(UPNPProtocol::TransferProtocol protocol,
         // robust way of determing the correct profile.
 
         QString sBroadcastStandard = "";
-        // HACK This is just temporary until we start storing this information
-        // in the database for each file
+        // HACK This is just temporary until we start storing more video
+        // information in the database for each file and can determine this
+        // stuff 'properly'
         QString sCountryCode = gCoreContext->GetLocale()->GetCountryCode();
         if (sCountryCode == "us" || sCountryCode == "ca" ||
             sCountryCode == "mx")
@@ -182,12 +183,10 @@ QString ProtocolInfoString(UPNPProtocol::TransferProtocol protocol,
             else
                 sAdditionalInfoList << "DLNA.ORG_PN=MPEG_TS_SD_NA_ISO";
         }
-        else
+        else // Europe standard
         {
-            if (videoCodec == "H264")
+            if (videoCodec == "H264" || isHD)
                 sAdditionalInfoList << "DLNA.ORG_PN=AVC_TS_EU_ISO";
-            else if (isHD)
-                sAdditionalInfoList << "DLNA.ORG_PN=MPEG_TS_HD_EU_ISO";
             else
                 sAdditionalInfoList << "DLNA.ORG_PN=MPEG_TS_SD_EU_ISO";
         }
@@ -232,9 +231,10 @@ QString ProtocolInfoString(UPNPProtocol::TransferProtocol protocol,
         // Not presently used by MythTV
 
     //
-    // CI-Param
+    // CI-Param  - Optional, may be omitted if value is zero (0)
     //
-    sAdditionalInfoList << DLNA::ConversionIndicatorString(isTranscoded);
+    if (!isTranscoded)
+        sAdditionalInfoList << DLNA::ConversionIndicatorString(isTranscoded);
 
     //
     // Flags-Param
