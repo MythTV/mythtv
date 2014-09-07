@@ -100,10 +100,8 @@ import "/js/utility.js"
 
     function getRecordingDetailHTML()
     {
-        var startTime = myth.ParseISODateString(getArg("StartTime"));
-
         var dvr = new Dvr();
-        var program = dvr.GetRecorded(getArg("ChanID"), startTime);
+        var program = dvr.GetRecorded(getArg("recordedID"));
         return buildDetailHTML(program, "recording");
     }
 

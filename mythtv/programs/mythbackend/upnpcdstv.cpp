@@ -1211,8 +1211,7 @@ bool UPnpCDSTv::LoadRecordings(const UPnpCDSRequest* pRequest,
 
         QUrl    resURI    = URIBase;
         resURI.setPath("Content/GetRecording");
-        resURI.addQueryItem("ChanId", QString::number(nChanid));
-        resURI.addQueryItem("StartTime", dtStartTime.toString(Qt::ISODate));
+        resURI.addQueryItem("RecordedId", QString::number(nRecordedId));
 
         QString sProtocol = DLNA::ProtocolInfoString(UPNPProtocol::kHTTP,
                                                      sMimeType,
@@ -1237,8 +1236,7 @@ bool UPnpCDSTv::LoadRecordings(const UPnpCDSRequest* pRequest,
 
         QUrl previewURI = URIBase;
         previewURI.setPath("Content/GetPreviewImage");
-        previewURI.addQueryItem("ChanId", QString::number(nChanid));
-        previewURI.addQueryItem("StartTime", dtStartTime.toString(Qt::ISODate));
+        previewURI.addQueryItem("RecordedId", QString::number(nRecordedId));
         previewURI.addQueryItem("Width", "160");
         previewURI.addQueryItem("Format", "JPG");
         sProtocol = DLNA::ProtocolInfoString(UPNPProtocol::kHTTP, "image/jpeg",

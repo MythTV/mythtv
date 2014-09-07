@@ -57,7 +57,8 @@ class Content : public ContentServices
                                                   int Height);
 
         DTC::ArtworkInfoList*
-                            GetRecordingArtworkList( int              ChanId,
+                            GetRecordingArtworkList( int              RecordedId,
+                                                     int              ChanId,
                                                      const QDateTime &StartTime  );
 
         DTC::ArtworkInfoList*
@@ -69,14 +70,16 @@ class Content : public ContentServices
 
         QFileInfo           GetAlbumArt         ( int Id, int Width, int Height );
 
-        QFileInfo           GetPreviewImage     ( int              ChanId,
+        QFileInfo           GetPreviewImage     ( int              RecordedId,
+                                                  int              ChanId,
                                                   const QDateTime &StartTime,
                                                   int              Width,
                                                   int              Height,
                                                   int              SecsIn,
                                                   const QString   &Format);
 
-        QFileInfo           GetRecording        ( int              ChanId,
+        QFileInfo           GetRecording        ( int              RecordedId,
+                                                  int              ChanId,
                                                   const QDateTime &StartTime );
 
         QFileInfo           GetMusic            ( int Id );
@@ -106,7 +109,8 @@ class Content : public ContentServices
                                                           int              AudioBitrate,
                                                           int              SampleRate );
 
-        DTC::LiveStreamInfo     *AddRecordingLiveStream ( int              ChanId,
+        DTC::LiveStreamInfo     *AddRecordingLiveStream ( int              RecordedId,
+                                                          int              ChanId,
                                                           const QDateTime &StartTime,
                                                           int              MaxSegments,
                                                           int              Width,
@@ -158,10 +162,9 @@ class ScriptableContent : public QObject
         Q_INVOKABLE ScriptableContent( QObject *parent = 0 ) : QObject( parent ) {}
 
     public slots:
-        QObject* GetRecordingArtworkList(       int        ChanId,
-                                          const QDateTime &StartTime  )
+        QObject* GetRecordingArtworkList( int RecordedId )
         {
-            return m_obj.GetRecordingArtworkList( ChanId, StartTime );
+            return m_obj.GetRecordingArtworkList( RecordedId, 0, QDateTime() );
         }
 
         QObject* GetProgramArtworkList( const QString &Inetref,
@@ -192,8 +195,7 @@ class ScriptableContent : public QObject
                                        AudioBitrate, SampleRate);
         }
 
-        QObject* AddRecordingLiveStream ( int              ChanId,
-                                         const QDateTime &StartTime,
+        QObject* AddRecordingLiveStream (int              RecordedId,
                                          int              MaxSegments,
                                          int              Width,
                                          int              Height,
@@ -201,7 +203,8 @@ class ScriptableContent : public QObject
                                          int              AudioBitrate,
                                          int              SampleRate )
         {
-            return m_obj.AddRecordingLiveStream(ChanId, StartTime, MaxSegments,
+            return m_obj.AddRecordingLiveStream(RecordedId, 0, QDateTime(),
+                                                MaxSegments,
                                                 Width, Height, Bitrate,
                                                 AudioBitrate, SampleRate);
         }

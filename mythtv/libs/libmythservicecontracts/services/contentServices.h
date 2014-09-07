@@ -39,7 +39,7 @@
 class SERVICE_PUBLIC ContentServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.34" );
+    Q_CLASSINFO( "version"    , "2.0" );
     Q_CLASSINFO( "DownloadFile_Method",            "POST" )
     Q_CLASSINFO( "DeleteFile_Method",              "POST" )
     Q_CLASSINFO( "RenameFile_Method",              "POST" )
@@ -74,7 +74,8 @@ class SERVICE_PUBLIC ContentServices : public Service  //, public QScriptable ??
                                                           int Height ) = 0;
 
         virtual DTC::ArtworkInfoList*
-                                    GetRecordingArtworkList( int              ChanId,
+                                    GetRecordingArtworkList( int              RecordedId,
+                                                             int              ChanId,
                                                              const QDateTime &StartTime  ) = 0;
 
         virtual DTC::ArtworkInfoList*
@@ -88,14 +89,16 @@ class SERVICE_PUBLIC ContentServices : public Service  //, public QScriptable ??
 
         virtual QFileInfo           GetAlbumArt         ( int Id, int Width, int Height ) = 0;
 
-        virtual QFileInfo           GetPreviewImage     ( int              ChanId,
+        virtual QFileInfo           GetPreviewImage     ( int              RecordedId,
+                                                          int              ChanId,
                                                           const QDateTime &StartTime,
                                                           int              Width,    
                                                           int              Height,   
                                                           int              SecsIn,
                                                           const QString   &Format) = 0;
 
-        virtual QFileInfo           GetRecording        ( int              ChanId,
+        virtual QFileInfo           GetRecording        ( int              RecordedId,
+                                                          int              ChanId,
                                                           const QDateTime &StartTime ) = 0;
 
         virtual QFileInfo           GetMusic            ( int Id ) = 0;
@@ -124,7 +127,8 @@ class SERVICE_PUBLIC ContentServices : public Service  //, public QScriptable ??
                                                                   int              AudioBitrate,
                                                                   int              SampleRate ) = 0;
 
-        virtual DTC::LiveStreamInfo     *AddRecordingLiveStream ( int              ChanId,
+        virtual DTC::LiveStreamInfo     *AddRecordingLiveStream ( int              RecordedId,
+                                                                  int              ChanId,
                                                                   const QDateTime &StartTime,
                                                                   int              MaxSegments,
                                                                   int              Width,

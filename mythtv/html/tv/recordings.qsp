@@ -82,25 +82,25 @@ import "/tv/js/tvutil.qjs"
      side (harder to maintain/template) or keeping in together inline with the
      other related html, with as little non-html markup as possible -->
 <div id="optMenu" class="contextMenu" style="display:none;">
-    <div class="button normalMenu" onClick="deleteRecording(gChanID, gStartTime, false, false)">
+    <div class="button normalMenu" onClick="deleteRecording(gRecordedId, false, false)">
         <%=qsTr("Delete")%>
     </div>
-    <div class="button normalMenu" onClick="deleteRecording(gChanID, gStartTime, true, false)">
+    <div class="button normalMenu" onClick="deleteRecording(gRecordedId, true, false)">
         <%=qsTr("Delete and Re-Record")%>
     </div>
-    <div class="button deletedMenu" onClick="unDeleteRecording(gChanID, gStartTime)">
+    <div class="button deletedMenu" onClick="unDeleteRecording(gRecordedId)">
         <%=qsTr("Undelete")%>
     </div>
-    <div class="button deletedMenu" onClick="deleteRecording(gChanID, gStartTime, false, true)">
+    <div class="button deletedMenu" onClick="deleteRecording(gRecordedId, false, true)">
         <%=qsTr("Delete Forever")%>
     </div>
-    <div class="button recordingMenu" onClick="stopRecording(gChanID, gStartTime)">
+    <div class="button recordingMenu" onClick="stopRecording(gRecordedId)">
         <%=qsTr("Stop Recording")%>
     </div>
     <div class="button normalMenu" onClick="loadScheduler(gChanID, gStartTime)">
         <%=qsTr("Edit recording rule")%>
     </div>
-    <div class="button playMenu" onClick="playInBrowser(gChanID, gStartTime)">
+    <div class="button playMenu" onClick="playInBrowser(gRecordedId)">
         <%=qsTr("Play in Browser")%>
     </div>
 <%
@@ -109,7 +109,7 @@ import "/tv/js/tvutil.qjs"
     for (var nIdx = 0; nIdx < frontendList.length; nIdx++)
     {
 %>
-    <div class="button playMenu" onClick="playOnFrontend(gChanID, gStartTime, '<%=frontendList[nIdx].IP%>')">
+    <div class="button playMenu" onClick="playOnFrontend(gRecordedId, '<%=frontendList[nIdx].IP%>')">
         <%=qsTr("Play on Frontend")%> <%=frontendList[nIdx].Name%>
     </div>
 <%  } %>
@@ -216,18 +216,18 @@ for (var progIdx = 0; progIdx < programs.length; progIdx++)
     // RecStatusToClass() - /tv/js/tvutil.qjs
     var statusClass = RecStatusToClass(program.Recording.Status);
 %>
-    <div class="recordingRow" id="<%=programIdentifier%>_row">
+    <div class="recordingRow" id="<%=program.Recording.RecordedId%>_row">
         <div class="previewBox">
             <div class="previewImageBackground">
-                <img alt="Preview Image" height="67" class="previewImage" src="/Content/GetPreviewImage?ChanId=<%=program.Channel.ChanId%>&amp;StartTime=<%=program.Recording.StartTs.toISOString()%>&amp;height=67&amp;format=JPG" />
+                <img alt="Preview Image" height="67" class="previewImage" src="/Content/GetPreviewImage?RecordedId=<%=program.Recording.RecordedId%>&amp;height=67&amp;format=JPG" />
             </div>
             <div class="watchButtons">
-                <div class="watchButton watchRecordingLink"><a onClick="showMenu(this, 'playMenu');" data-chanid="<%=program.Channel.ChanId%>" data-recstarttime="<%=program.Recording.StartTs.toISOString()%>"><%=qsTr("Watch")%></a></div>
-                <div class="watchButton playlistLink"><a onClick="showMenu(this, 'playlistMenu');" data-chanid="<%=program.Channel.ChanId%>" data-recstarttime="<%=program.Recording.StartTs.toISOString()%>">+</a></div>
+                <div class="watchButton watchRecordingLink"><a onClick="showMenu(this, 'playMenu');" data-recordedid="<%=program.Recording.RecordedId%>" data-chanid="<%=program.Channel.ChanId%>" data-recstarttime="<%=program.Recording.StartTs.toISOString()%>"><%=qsTr("Watch")%></a></div>
+                <div class="watchButton playlistLink"><a onClick="showMenu(this, 'playlistMenu');" data-recordedid="<%=program.Recording.RecordedId%>" data-chanid="<%=program.Channel.ChanId%>" data-recstarttime="<%=program.Recording.StartTs.toISOString()%>">+</a></div>
             </div>
         </div>
         <div class="programBox">
-            <div class="programInnerBox <%=statusClass%>" id="<%=programIdentifier%>" data-chanid="<%=program.Channel.ChanId%>" data-recstarttime="<%=program.Recording.StartTs.toISOString()%>" data-starttime="<%=program.StartTime.toISOString()%>" onMouseOver="startDetailTimer(this, 'recording');" onMouseOut="hideDetail(this);" onClick="showMenu(this, '<%=menu%>');">
+            <div class="programInnerBox <%=statusClass%>" id="<%=programIdentifier%>" data-recordedid="<%=program.Recording.RecordedId%>" data-chanid="<%=program.Channel.ChanId%>" data-recstarttime="<%=program.Recording.StartTs.toISOString()%>" data-starttime="<%=program.StartTime.toISOString()%>" onMouseOver="startDetailTimer(this, 'recording');" onMouseOut="hideDetail(this);" onClick="showMenu(this, '<%=menu%>');">
                 <div class="programHeader">
                     <span class="programTitle"><%=escapeHTML(program.Title)%> <% if (isValidObject(program.Airdate) && program.Airdate.getFullYear() && program.CatType == "movie") {%>(<%=program.Airdate.getFullYear()%>)<%}%></span>
                     <span class="programStartTime"><%=myth.GetFormatDate(program.StartTime)%>, <%=myth.GetFormatTime(program.StartTime)%></span>

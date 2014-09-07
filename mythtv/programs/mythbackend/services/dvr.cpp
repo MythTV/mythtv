@@ -141,12 +141,19 @@ DTC::ProgramList* Dvr::GetRecordedList( bool           bDescending,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::Program* Dvr::GetRecorded(int chanid, const QDateTime &recstarttsRaw)
+DTC::Program* Dvr::GetRecorded(int RecordedId,
+                               int chanid, const QDateTime &recstarttsRaw)
 {
-    if (chanid <= 0 || !recstarttsRaw.isValid())
-        throw QString("Channel ID or StartTime appears invalid.");
+    if ((RecordedId <= 0) &&
+        (chanid <= 0 || !recstarttsRaw.isValid()))
+        throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
 
-    ProgramInfo pi(chanid, recstarttsRaw.toUTC());
+    // TODO Should use RecordingInfo
+    ProgramInfo pi;
+    if (RecordedId > 0)
+        pi = ProgramInfo(RecordedId);
+    else
+        pi = ProgramInfo(chanid, recstarttsRaw.toUTC());
 
     DTC::Program *pProgram = new DTC::Program();
     FillProgramInfo( pProgram, &pi, true );
@@ -158,20 +165,29 @@ DTC::Program* Dvr::GetRecorded(int chanid, const QDateTime &recstarttsRaw)
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool Dvr::RemoveRecorded(int chanid, const QDateTime &recstarttsRaw,
+bool Dvr::RemoveRecorded(int RecordedId,
+                         int chanid, const QDateTime &recstarttsRaw,
                          bool forceDelete, bool allowRerecord)
 {
-    return DeleteRecording(chanid, recstarttsRaw, forceDelete, allowRerecord);
+    return DeleteRecording(RecordedId, chanid, recstarttsRaw, forceDelete,
+                           allowRerecord);
 }
 
 
-bool Dvr::DeleteRecording(int chanid, const QDateTime &recstarttsRaw,
+bool Dvr::DeleteRecording(int RecordedId,
+                          int chanid, const QDateTime &recstarttsRaw,
                           bool forceDelete, bool allowRerecord)
 {
-    if (chanid <= 0 || !recstarttsRaw.isValid())
-        throw QString("Channel ID or StartTime appears invalid.");
+    if ((RecordedId <= 0) &&
+        (chanid <= 0 || !recstarttsRaw.isValid()))
+        throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
 
-    ProgramInfo pi(chanid, recstarttsRaw.toUTC());
+    // TODO Should use RecordingInfo
+    ProgramInfo pi;
+    if (RecordedId > 0)
+        pi = ProgramInfo(RecordedId);
+    else
+        pi = ProgramInfo(chanid, recstarttsRaw.toUTC());
 
     if (pi.GetChanID() && pi.HasPathname())
     {
@@ -193,12 +209,18 @@ bool Dvr::DeleteRecording(int chanid, const QDateTime &recstarttsRaw,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool Dvr::UnDeleteRecording(int chanid, const QDateTime &recstarttsRaw)
+bool Dvr::UnDeleteRecording(int RecordedId,
+                            int chanid, const QDateTime &recstarttsRaw)
 {
-    if (chanid <= 0 || !recstarttsRaw.isValid())
-        throw QString("Channel ID or StartTime appears invalid.");
+    if ((RecordedId <= 0) &&
+        (chanid <= 0 || !recstarttsRaw.isValid()))
+        throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
 
-    RecordingInfo ri(chanid, recstarttsRaw.toUTC());
+    RecordingInfo ri;
+    if (RecordedId > 0)
+        ri = RecordingInfo(RecordedId);
+    else
+        ri = RecordingInfo(chanid, recstarttsRaw.toUTC());
 
     if (ri.GetChanID() && ri.HasPathname())
     {
@@ -218,14 +240,22 @@ bool Dvr::UnDeleteRecording(int chanid, const QDateTime &recstarttsRaw)
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool Dvr::UpdateRecordedWatchedStatus ( int   chanid,
+bool Dvr::UpdateRecordedWatchedStatus ( int RecordedId,
+                                        int   chanid,
                                         const QDateTime &recstarttsRaw,
                                         bool  watched)
 {
-    if (chanid <= 0 || !recstarttsRaw.isValid())
-        return false;
+    if ((RecordedId <= 0) &&
+        (chanid <= 0 || !recstarttsRaw.isValid()))
+        throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
 
-    ProgramInfo pi(chanid, recstarttsRaw.toUTC());
+    // TODO Should use RecordingInfo
+    ProgramInfo pi;
+    if (RecordedId > 0)
+        pi = ProgramInfo(RecordedId);
+    else
+        pi = ProgramInfo(chanid, recstarttsRaw.toUTC());
+
     pi.SaveWatched(watched);
 
     return true;
