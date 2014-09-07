@@ -1013,6 +1013,9 @@ QString SmartPlaylistEditor::getOrderByClause(void)
 
 QString SmartPlaylistEditor::getWhereClause(void)
 {
+    if (m_criteriaRows.size() == 0)
+        return QString();
+
     bool bFirst = true;
     QString sql = "WHERE ";
 
