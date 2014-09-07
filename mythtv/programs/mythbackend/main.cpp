@@ -122,7 +122,7 @@ int main(int argc, char **argv)
     SignalHandler::Init(signallist);
     signal(SIGHUP, SIG_IGN);
 #endif
-   
+
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
     {
