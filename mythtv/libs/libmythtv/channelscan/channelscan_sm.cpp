@@ -1319,11 +1319,11 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
 
                 const unsigned char *desc =
                     MPEGDescriptor::Find(
-                        list, PrivateDescriptorID::dvb_uk_channel_list);
+                        list, PrivateDescriptorID::dvb_logical_channel_descriptor);
 
                 if (desc)
                 {
-                    UKChannelListDescriptor uklist(desc);
+                    DVBLogicalChannelDescriptor uklist(desc);
                     for (uint j = 0; j < uklist.ChannelCount(); j++)
                     {
                         ukChanNums[((qlonglong)info.orig_netid<<32) |
@@ -1335,7 +1335,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
         }
     }
 
-    // Get IPTV or UK channel numbers
+    // Get IPTV or DVB Logical channel numbers
     for (dbchan_it = pnum_to_dbchan.begin();
          dbchan_it != pnum_to_dbchan.end(); ++dbchan_it)
     {
@@ -1344,7 +1344,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
         if (!info.chan_num.isEmpty())
             continue;
 
-        if (iptv_channel.isEmpty()) // UK channel numbers
+        if (iptv_channel.isEmpty()) // DVB Logical channel numbers (LCN)
         {
             QMap<qlonglong, uint>::const_iterator it = ukChanNums.find
                        (((qlonglong)info.orig_netid<<32) | info.service_id);

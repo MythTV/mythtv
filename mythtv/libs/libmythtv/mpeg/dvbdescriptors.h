@@ -1979,11 +1979,19 @@ static QString coderate_inner(uint cr)
     }
 }
 
-class UKChannelListDescriptor : public MPEGDescriptor
+/**
+ *  \brief DVB Logical Channel Descriptor
+ *
+ * NIT descriptor ID 0x83 (Private Extension)
+ *
+ * Provides the Logical Channel Number (LCN) for each channel. This isn't used
+ * in all DVB Networks.
+ */
+class DVBLogicalChannelDescriptor : public MPEGDescriptor
 {
   public:
-    UKChannelListDescriptor(const unsigned char *data, int len = 300) :
-        MPEGDescriptor(data, len, PrivateDescriptorID::dvb_uk_channel_list) { }
+    DVBLogicalChannelDescriptor(const unsigned char *data, int len = 300) :
+        MPEGDescriptor(data, len, PrivateDescriptorID::dvb_logical_channel_descriptor) { }
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x83
     // descriptor_length        8   1.0

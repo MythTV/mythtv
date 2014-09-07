@@ -332,8 +332,8 @@ QString MPEGDescriptor::DescriptorTagString(void) const
 
     switch (DescriptorTag())
     {
-        case PrivateDescriptorID::dvb_uk_channel_list: /* 0x83 */
-            comma_list_append(str, "Possibly DVB UK Channel List");
+        case PrivateDescriptorID::dvb_logical_channel_descriptor: /* 0x83 */
+            comma_list_append(str, "Possibly DVB Logical Channel Descriptor");
             break;
         case PrivateDescriptorID::dish_event_rights: /* 0x87 */
             comma_list_append(str, "Possibly Dishnet Rights");
@@ -432,8 +432,8 @@ QString MPEGDescriptor::toString() const
     else if (DescriptorID::teletext == DescriptorTag())
         SET_STRING(TeletextDescriptor);
     /// POSSIBLY UNSAFE ! -- begin
-    else if (PrivateDescriptorID::dvb_uk_channel_list == DescriptorTag())
-        SET_STRING(UKChannelListDescriptor);
+    else if (PrivateDescriptorID::dvb_logical_channel_descriptor == DescriptorTag())
+        SET_STRING(DVBLogicalChannelDescriptor);
     /// POSSIBLY UNSAFE ! -- end
     else if (IsValid())
     {
