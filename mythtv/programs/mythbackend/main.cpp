@@ -122,7 +122,7 @@ int main(int argc, char **argv)
     SignalHandler::Init(signallist);
     signal(SIGHUP, SIG_IGN);
 #endif
-
+   
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
     {
@@ -138,7 +138,8 @@ int main(int argc, char **argv)
         cmdline.toBool("setverbose")    || cmdline.toBool("printsched") ||
         cmdline.toBool("testsched")     || cmdline.toBool("resched") ||
         cmdline.toBool("scanvideos")    || cmdline.toBool("clearcache") ||
-        cmdline.toBool("printexpire")   || cmdline.toBool("setloglevel"))
+        cmdline.toBool("printexpire")   || cmdline.toBool("setloglevel") ||
+        cmdline.toBool("bootstrap"))
     {
         gCoreContext->SetBackend(false);
         return handle_command(cmdline);
