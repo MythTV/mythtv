@@ -97,7 +97,7 @@ import "/tv/js/tvutil.qjs"
     <div class="button recordingMenu" onClick="stopRecording(gRecordedId)">
         <%=qsTr("Stop Recording")%>
     </div>
-    <div class="button normalMenu" onClick="loadScheduler(gChanID, gStartTime)">
+    <div class="button normalMenu" onClick="loadScheduler('recording', gChanID, gStartTime)">
         <%=qsTr("Edit recording rule")%>
     </div>
     <div class="button playMenu" onClick="playInBrowser(gRecordedId)">

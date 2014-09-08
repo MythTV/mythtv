@@ -75,7 +75,7 @@ import "/tv/js/tvutil.qjs"
     <div class="button normalMenu" onClick="deleteRecRule(gChanID, gStartTime)">
         <%=qsTr("Delete Recording Rule")%>
     </div>
-    <div class="button normalMenu" onClick="loadScheduler(gChanID, gStartTime)">
+    <div class="button normalMenu" onClick="loadScheduler('upcoming', gChanID, gStartTime)">
         <%=qsTr("Edit recording rule")%>
     </div>
 </div>

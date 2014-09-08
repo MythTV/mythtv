@@ -9,7 +9,7 @@ import "/tv/js/tvutil.qjs"
     var dvr = new Dvr();
     var guide = new Guide();
 
-    var startTime = Date();
+    var startTime = new Date();
     if (getArg("StartTime"))
         startTime = myth.ParseISODateString(getArg("StartTime"));
 
