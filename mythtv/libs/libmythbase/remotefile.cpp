@@ -32,6 +32,7 @@ using namespace std;
 #include "mythdate.h"
 #include "mythmiscutil.h"
 #include "threadedfilewriter.h"
+#include "storagegroup.h"
 
 #define MAX_FILE_CHECK 500  // in ms
 
