@@ -11,7 +11,7 @@
 <script src="/js/utility.js"></script> <!-- ECMA not JS -->
 <script src="/js/util.qjs"></script>
 <script src="/tv/js/common.js"></script>
-<script src="/tv/js/recordingrules.js"></script>
+<!-- <script src="/tv/js/recordingrules.js"></script> -->
 </head>
 <body>
 
