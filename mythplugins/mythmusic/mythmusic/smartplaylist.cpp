@@ -52,10 +52,8 @@ static SmartPLField SmartPLFields[] =
     { "Play Count",    "music_songs.numplays",           ftNumeric,  0,    9999, 0 },
     { "Compilation",   "music_albums.compilation",       ftBoolean,  0,    0,    0 },
     { "Comp. Artist",  "music_comp_artists.artist_name", ftString,   0,    0,    0 },
-    { "Last Play",     "FROM_DAYS(TO_DAYS(music_songs.lastplay))",
-                                                         ftDate,     0,    0,    0 },
-    { "Date Imported", "FROM_DAYS(TO_DAYS(music_songs.date_entered))",
-                                                         ftDate,     0,    0,    0 },
+    { "Last Play",     "music_songs.lastplay",           ftDate,     0,    0,    0 },
+    { "Date Imported", "music_songs.date_entered",       ftDate,     0,    0,    0 },
 };
 
 struct SmartPLOperator
@@ -334,7 +332,7 @@ bool SmartPLCriteriaRow::saveToDatabase(int smartPlaylistID)
     query.bindValue(":FIELD", Field);
     query.bindValue(":OPERATOR", Operator);
     query.bindValue(":VALUE1", Value1);
-    query.bindValue(":VALUE2", Value2);
+    query.bindValue(":VALUE2", Value2.isNull() ? "" : Value2);
 
     if (!query.exec())
     {
@@ -750,7 +748,7 @@ void SmartPlaylistEditor::updateMatches(void)
 
     m_matchesText->SetText(QString::number(m_matchesCount));
 
-    m_playlistIsValid = (m_matchesCount > 0);
+    m_playlistIsValid = (m_criteriaRows.size() > 0);
     m_showResultsButton->SetEnabled((m_matchesCount > 0));
     titleChanged();
 }
@@ -1015,6 +1013,9 @@ QString SmartPlaylistEditor::getOrderByClause(void)
 
 QString SmartPlaylistEditor::getWhereClause(void)
 {
+    if (m_criteriaRows.size() == 0)
+        return QString();
+
     bool bFirst = true;
     QString sql = "WHERE ";
 

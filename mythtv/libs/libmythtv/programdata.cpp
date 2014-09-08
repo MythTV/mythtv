@@ -28,6 +28,11 @@ static QString denullify(const QString &str)
     return str.isNull() ? "" : str;
 }
 
+static QVariant denullify(const QDateTime &dt)
+{
+    return dt.isNull() ? QVariant("0000-00-00 00:00:00") : QVariant(dt);
+}
+
 DBPerson::DBPerson(const DBPerson &other) :
     role(other.role), name(other.name)
 {
@@ -858,7 +863,7 @@ uint ProgInfo::InsertDB(MSqlQuery &query, uint chanid) const
     query.bindValue(":CATEGORY",    denullify(category));
     query.bindValue(":CATTYPE",     cattype);
     query.bindValue(":STARTTIME",   starttime);
-    query.bindValue(":ENDTIME",     endtime);
+    query.bindValue(":ENDTIME",     denullify(endtime));
     query.bindValue(":CC",
                     subtitleType & SUB_HARDHEAR ? true : false);
     query.bindValue(":STEREO",
@@ -998,25 +1003,9 @@ void ProgramData::FixProgramList(QList<ProgInfo*> &fixlist)
                 (*cur)->endts   = (*it)->startts;
                 (*cur)->endtime = (*it)->starttime;
             }
-            else
-            {
-                (*cur)->endtime = (*cur)->starttime;
-                if ((*cur)->endtime < QDateTime(
-                        (*cur)->endtime.date(), QTime(6, 0), Qt::UTC))
-                {
-                    (*cur)->endtime = QDateTime(
-                        (*cur)->endtime.date(), QTime(6, 0), Qt::UTC);
-                }
-                else
-                {
-                    (*cur)->endtime = QDateTime(
-                        (*cur)->endtime.date().addDays(1),
-                        QTime(0, 0), Qt::UTC);
-                }
-
-                (*cur)->endts =
-                    MythDate::toString((*cur)->endtime, MythDate::kFilename);
-            }
+            /* if its the last programme in the file then leave its
+               endtime as 0000-00-00 00:00:00 so we can find it easily in
+               fix_end_times() */
         }
 
         if (it == fixlist.end())
@@ -1153,7 +1142,7 @@ int ProgramData::fix_end_times(void)
     MSqlQuery query1(MSqlQuery::InitCon()), query2(MSqlQuery::InitCon());
 
     querystr = "SELECT chanid, starttime, endtime FROM program "
-               "WHERE (DATE_FORMAT(endtime,'%H%i') = '0000') "
+               "WHERE endtime = '0000-00-00 00:00:00' "
                "ORDER BY chanid, starttime;";
 
     if (!query1.exec(querystr))
@@ -1170,11 +1159,10 @@ int ProgramData::fix_end_times(void)
         endtime = query1.value(2).toString();
 
         querystr = QString("SELECT chanid, starttime, endtime FROM program "
-                           "WHERE starttime BETWEEN '%1 00:00:00'"
-                           "AND '%2 23:59:59' AND chanid = '%3' "
+                           "WHERE starttime > '%1' "
+                           "AND chanid = '%2' "
                            "ORDER BY starttime LIMIT 1;")
-                           .arg(endtime.left(10))
-                           .arg(endtime.left(10))
+                           .arg(starttime)
                            .arg(chanid);
 
         if (!query2.exec(querystr))
@@ -1188,10 +1176,9 @@ int ProgramData::fix_end_times(void)
         {
             count++;
             endtime = query2.value(1).toString();
-            querystr = QString("UPDATE program SET starttime = '%1', "
+            querystr = QString("UPDATE program SET "
                                "endtime = '%2' WHERE (chanid = '%3' AND "
                                "starttime = '%4');")
-                               .arg(starttime)
                                .arg(endtime)
                                .arg(chanid)
                                .arg(starttime);

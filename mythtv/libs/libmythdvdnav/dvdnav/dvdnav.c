@@ -203,7 +203,7 @@ int64_t dvdnav_convert_time(dvd_time_t *time) {
   int64_t result;
   int64_t frames;
 
-  result  = (time->hour    >> 4  ) * 10 * 60 * 60 * 90000;
+  result  = (time->hour    >> 4  ) * 10 * 60 * 60 * 90000ull;
   result += (time->hour    & 0x0f)      * 60 * 60 * 90000;
   result += (time->minute  >> 4  )      * 10 * 60 * 90000;
   result += (time->minute  & 0x0f)           * 60 * 90000;
