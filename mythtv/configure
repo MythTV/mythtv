@@ -1196,7 +1196,7 @@ check_class_headers_cpp(){
             i=$(expr $i + 1)
         done
         echo "return 0; }"
-    } | check_ld "cxx" "$@" && enable $funcs && enable_safe $headers
+    } | check_ld "cxx" "$@" && enable_safe $headers
 }
 
 check_cpp_condition(){
