@@ -1074,6 +1074,7 @@ DTC::RecRuleList* Dvr::GetRecordScheduleList( int nStartIndex,
 
 DTC::RecRule* Dvr::GetRecordSchedule( uint      nRecordId,
                                       QString   sTemplate,
+                                      int       nRecordedId,
                                       int       nChanId,
                                       QDateTime dStartTimeRaw,
                                       bool      bMakeOverride )
@@ -1092,8 +1093,17 @@ DTC::RecRule* Dvr::GetRecordSchedule( uint      nRecordId,
         if (!rule.LoadTemplate(sTemplate))
             throw QString("Template does not exist.");
     }
-    else if (nChanId > 0 && dStartTime.isValid())
+    else if (nRecordedId > 0) // Loads from the Recorded/Recorded Program Table
     {
+        // Despite the use of ProgramInfo, this only applies to Recordings.
+        ProgramInfo recInfo(nRecordedId);
+        if (!rule.LoadByProgram(&recInfo))
+            throw QString("Recording does not exist");
+    }
+    else if (nChanId > 0 && dStartTime.isValid()) // Loads from Program Table, should NOT be used with recordings
+    {
+        // Despite the use of RecordingInfo, this only applies to programs in the
+        // present or future, not to recordings? Confused yet?
         RecordingInfo::LoadStatus status;
         RecordingInfo info(nChanId, dStartTime, false, 0, &status);
         if (status != RecordingInfo::kFoundProgram)

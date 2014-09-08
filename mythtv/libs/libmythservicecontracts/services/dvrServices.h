@@ -44,7 +44,7 @@
 class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "6.0" );
+    Q_CLASSINFO( "version"    , "6.1" );
     Q_CLASSINFO( "RemoveRecorded_Method",                       "POST" )
     Q_CLASSINFO( "DeleteRecording_Method",                      "POST" )
     Q_CLASSINFO( "UnDeleteRecording",                           "POST" )
@@ -234,6 +234,7 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 
         virtual DTC::RecRule*      GetRecordSchedule     ( uint             RecordId,
                                                            QString          Template,
+                                                           int              RecordedId,
                                                            int              ChanId,
                                                            QDateTime        StartTime,
                                                            bool             MakeOverride ) = 0;

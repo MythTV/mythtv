@@ -22,7 +22,7 @@ function scheduleSimpleRecording(chanID, startTime, type)
 {
     var dvr = new Dvr();
 
-    var recRule = dvr.GetRecordSchedule(0, "", chanID, startTime, false);
+    var recRule = dvr.GetRecordSchedule(0, "", 0, chanID, startTime, false);
 
     // Prevent duplicate recording rules being created
     if (recRule.Id > 0 && recRule.Type == type)
@@ -87,7 +87,7 @@ function saveRecordingRule(recRuleId, chanId, startTime)
 {
     var dvr = new Dvr();
 
-    var recRule = dvr.GetRecordSchedule(recRuleId, "",
+    var recRule = dvr.GetRecordSchedule(recRuleId, "", 0,
                                         chanId,
                                         startTime,
                                         false);

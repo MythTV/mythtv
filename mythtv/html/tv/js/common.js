@@ -301,13 +301,35 @@ function loadScheduler(chanID, startTime)
         setErrorMessage("loadScheduler() called with invalid program ID: (" + chanID + "_" + startTime + ")");
         return;
     }
-    var recRuleID = layer.getAttribute("data-recordid");
-    if (isValidVar(layer.getAttribute("data-chanid")))
-        chanID = layer.getAttribute("data-chanid");
-    if (isValidVar(layer.getAttribute("data-starttime")))
-        startTime = layer.getAttribute("data-starttime");
 
-    loadContent('/tv/schedule.qsp?chanId=' + chanID + '&amp;startTime=' + startTime + '&amp;recRuleId=' + recRuleID);
+    // In order of preference:
+    //     "recordedid" will load metadata associated with the specific
+    //     selected recording which we want
+    //
+    //     "recordid" will load the rule associated with this id, metadata
+    //     associated with the first program against which the rule was created
+    //
+    //     "chanid & starttime" will load metadata associated with the relevant
+    //     program and the rule which currently matches this program in the scheduler
+    //     if there are multiple which apply, otherwise a new rule will be created?
+    if (isValidVar(layer.getAttribute("data-recordedid")))
+    {
+        var recordedID = layer.getAttribute("data-recordedid");
+        loadContent('/tv/schedule.qsp?RecordedId=' + recordedID);
+    }
+    else if (isValidVar(layer.getAttribute("data-recordid")))
+    {
+        var recRuleID = layer.getAttribute("data-recordid");
+        loadContent('/tv/schedule.qsp?RecRuleId=' + recRuleID);
+    }
+    else
+    {
+        // Ensure we use the program starttime, even if recording starttime
+        // was passed in
+        if (isValidVar(layer.getAttribute("data-starttime")))
+            startTime = layer.getAttribute("data-starttime");
+        loadContent('/tv/schedule.qsp?ChanId=' + chanID + '&amp;StartTime=' + startTime);
+    }
 }
 
 function checkRecordingStatus(chanID, startTime)

@@ -9,7 +9,7 @@ import "/tv/js/tvutil.qjs"
     var dvr = new Dvr();
     var guide = new Guide();
 
-    var startTime;
+    var startTime = Date();
     if (getArg("StartTime"))
         startTime = myth.ParseISODateString(getArg("StartTime"));
 
@@ -17,11 +17,15 @@ import "/tv/js/tvutil.qjs"
     if (getIntegerArg("ChanId"))
         chanId = getIntegerArg("ChanId");
 
+    var recordedId = 0;
+    if (getIntegerArg("RecordedId"))
+        recordedId = getIntegerArg("RecordedId");
+
     var recRuleId = 0;
     if (getIntegerArg("RecRuleId"))
         recRuleId = getIntegerArg("recRuleId");
 
-    var recRule = dvr.GetRecordSchedule(recRuleId, "", chanId, startTime, false);
+    var recRule = dvr.GetRecordSchedule(recRuleId, "", recordedId, chanId, startTime, false);
 
     if (chanId <= 0)
         chanId = recRule.ChanId;

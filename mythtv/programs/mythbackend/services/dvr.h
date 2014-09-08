@@ -200,6 +200,7 @@ class Dvr : public DvrServices
 
         DTC::RecRule*     GetRecordSchedule    ( uint             RecordId,
                                                  QString          Template,
+                                                 int              nRecordedId,
                                                  int              ChanId,
                                                  QDateTime        StartTime,
                                                  bool             MakeOverride );
@@ -414,12 +415,13 @@ class ScriptableDvr : public QObject
 
         QObject* GetRecordSchedule ( uint      RecordId,
                                      QString   Template,
+                                     int       RecordedId,
                                      int       ChanId,
                                      QDateTime StartTime,
                                      bool      MakeOverride )
         {
-            return m_obj.GetRecordSchedule( RecordId,  Template, ChanId,
-                                            StartTime, MakeOverride);
+            return m_obj.GetRecordSchedule( RecordId,  Template, RecordedId,
+                                            ChanId, StartTime, MakeOverride);
         }
 
         bool EnableRecordSchedule ( uint RecordId )
