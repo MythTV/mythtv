@@ -1065,7 +1065,8 @@ void MpegRecorder::run(void)
                         gap = true;
                 }
 
-                RestartEncoding();
+                if (!RestartEncoding())
+                    SetRecordingStatus(rsFailing, __FILE__, __LINE__);
             }
             else if (_device_read_buffer->IsEOF() &&
                      IsRecordingRequested())
@@ -1316,7 +1317,7 @@ bool MpegRecorder::PauseAndWait(int timeout)
     return IsPaused(true);
 }
 
-void MpegRecorder::RestartEncoding(void)
+bool MpegRecorder::RestartEncoding(void)
 {
     LOG(VB_RECORD, LOG_INFO, LOC + "RestartEncoding");
 
@@ -1337,19 +1338,12 @@ void MpegRecorder::RestartEncoding(void)
     if (driver == "hdpvr") // HD-PVR will sometimes reset to defaults
         SetV4L2DeviceOptions(chanfd);
 
-    StartEncoding();
+    return StartEncoding();
 }
 
 bool MpegRecorder::StartEncoding(void)
 {
     QMutexLocker locker(&start_stop_encoding_lock);
-
-    struct v4l2_encoder_cmd command;
-    memset(&command, 0, sizeof(struct v4l2_encoder_cmd));
-    command.cmd = V4L2_ENC_CMD_START;
-
-    if (driver == "hdpvr")
-        HandleResolutionChanges();
 
     LOG(VB_RECORD, LOG_INFO, LOC + "StartEncoding");
 
@@ -1365,48 +1359,67 @@ bool MpegRecorder::StartEncoding(void)
         }
     }
 
-    bool started = 0 == ioctl(readfd, VIDIOC_ENCODER_CMD, &command);
-    if (started)
+    bool good_res = true;
+    if (driver == "hdpvr")
     {
-        if (driver == "hdpvr")
-        {
-            m_h264_parser.Reset();
-            _wait_for_keyframe_option = true;
-            _seen_sps = false;
+        m_h264_parser.Reset();
+        _wait_for_keyframe_option = true;
+        _seen_sps = false;
+        good_res = HandleResolutionChanges();
+    }
 
-            int idx;
-            for (idx=0; idx < 10; ++idx)
-            {
-                // (at least) with the 3.10 kernel, the V4L2_ENC_CMD_START
-                // does not reliably start the data flow.  A read() seems
-                // to work, though.
-                uint8_t dummy;
-                int len = read(readfd, &dummy, 0);
-                if (len == 0)
-                    break;
-                usleep(500);
-            }
-            if (idx == 10)
+    // (at least) with the 3.10 kernel, the V4L2_ENC_CMD_START does
+    // not reliably start the data flow from a HD-PVR.  A read() seems
+    // to work, though.
+
+    int idx = 1;
+    for ( ; idx < 50; ++idx)
+    {
+        uint8_t dummy;
+        int len = read(readfd, &dummy, 0);
+        if (len == 0)
+            break;
+        if (idx == 20)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                "StartEncoding: read failing, re-opening device: " + ENO);
+            close(readfd);
+            usleep(2000);
+            readfd = open(videodevice.toLatin1().constData(),
+                          O_RDWR | O_NONBLOCK);
+            if (readfd < 0)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
-                    "StartEncoding: read from video device failed." + ENO);
+                    "StartEncoding: Can't open video device." + ENO);
                 _error = "Failed to start recording";
-                close(readfd);
-                readfd = -1;
                 return false;
             }
         }
-
-        LOG(VB_RECORD, LOG_INFO, LOC + "Encoding started");
+        else
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("StartEncoding: read failed, retry in %1 msec:")
+                .arg(100 * idx) + ENO);
+            usleep(100 * idx);
+        }
     }
-    else if (errno != ENOTTY && errno != EINVAL)
+    if (idx == 50)
     {
-        // Some drivers do not support this ioctl at all.  It is marked as
-        // "experimental" in the V4L2 API spec. These drivers return EINVAL
-        // in older kernels and ENOTTY in 3.1+
-
-        LOG(VB_GENERAL, LOG_WARNING, LOC + "StartEncoding failed" + ENO);
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "StartEncoding: read from video device failed." + ENO);
+        _error = "Failed to start recording";
+        close(readfd);
+        readfd = -1;
+        return false;
     }
+    if (idx > 0)
+    {
+        LOG(VB_RECORD, LOG_WARNING, LOC +
+            QString("%1 read attempts required to start encoding").arg(idx));
+    }
+
+    if (!good_res)   // Try again
+        good_res = HandleResolutionChanges();
 
     if (_device_read_buffer)
     {
@@ -1495,7 +1508,7 @@ void MpegRecorder::SetBitrate(int bitrate, int maxbitrate,
     set_ctrls(readfd, ext_ctrls);
 }
 
-void MpegRecorder::HandleResolutionChanges(void)
+bool MpegRecorder::HandleResolutionChanges(void)
 {
     LOG(VB_RECORD, LOG_INFO, LOC + "Checking Resolution");
     uint pix = 0;
@@ -1512,8 +1525,8 @@ void MpegRecorder::HandleResolutionChanges(void)
 
     if (!pix)
     {
-        LOG(VB_RECORD, LOG_INFO, LOC + "Giving up detecting resolution");
-        return; // nothing to do, we don't have a resolution yet
+        LOG(VB_RECORD, LOG_INFO, LOC + "Giving up detecting resolution: " + ENO);
+        return false; // nothing to do, we don't have a resolution yet
     }
 
     int old_max = maxbitrate, old_avg = bitrate;
@@ -1549,6 +1562,8 @@ void MpegRecorder::HandleResolutionChanges(void)
 
         SetBitrate(bitrate, maxbitrate, "New");
     }
+
+    return true;
 }
 
 void MpegRecorder::FormatCC(uint code1, uint code2)

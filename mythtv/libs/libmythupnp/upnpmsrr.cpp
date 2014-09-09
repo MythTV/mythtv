@@ -132,8 +132,8 @@ void UPnpMSRR::HandleIsAuthorized( HTTPRequest *pRequest )
 
     list.push_back(NameValue("Result", "1"));
 
-    list.back().AddAttribute("xmlns:dt", "urn:schemas-microsoft-com:datatypes");
-    list.back().AddAttribute("dt:dt",    "int");
+    list.back().AddAttribute("xmlns:dt", "urn:schemas-microsoft-com:datatypes", true);
+    list.back().AddAttribute("dt:dt",    "int", true);
 
     pRequest->FormatActionResponse(list);
 }
@@ -161,8 +161,8 @@ void UPnpMSRR::HandleIsValidated( HTTPRequest *pRequest )
 
     list.push_back(NameValue("Result", "1"));
 
-    list.back().AddAttribute("xmlns:dt", "urn:schemas-microsoft-com:datatypes");
-    list.back().AddAttribute( "dt:dt",   "int");
+    list.back().AddAttribute("xmlns:dt", "urn:schemas-microsoft-com:datatypes", true);
+    list.back().AddAttribute( "dt:dt",   "int", true);
 
     pRequest->FormatActionResponse(list);
 }

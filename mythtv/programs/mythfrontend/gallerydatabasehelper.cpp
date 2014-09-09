@@ -506,8 +506,8 @@ void GalleryDatabaseHelper::LoadDirectoryThumbnailValues(ImageMetadata *im)
                 .arg("/MythImage/")
                 .arg(query.value(0).toString());
 
-        thumbFileName = gCoreContext->GenMythURL(gCoreContext->GetSetting("MasterServerIP"),
-                                                 gCoreContext->GetNumSetting("MasterServerPort"),
+        thumbFileName = gCoreContext->GenMythURL(gCoreContext->GetMasterHostName(),
+                                                 gCoreContext->GetMasterServerPort(),
                                                  thumbFileName, "Temp");
 
         if (i >= im->m_thumbFileNameList->size())

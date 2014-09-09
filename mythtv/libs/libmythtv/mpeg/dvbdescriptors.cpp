@@ -571,7 +571,7 @@ QString TerrestrialDeliverySystemDescriptor::toString() const
     return str;
 }
 
-QString UKChannelListDescriptor::toString() const
+QString DVBLogicalChannelDescriptor::toString() const
 {
     QString ret = "UKChannelListDescriptor sid->chan_num: ";
     for (uint i = 0; i < ChannelCount(); i++)

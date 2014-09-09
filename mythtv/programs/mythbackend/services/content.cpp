@@ -68,7 +68,7 @@ QFileInfo Content::GetFile( const QString &sStorageGroup,
     {
         QString sMsg ( "GetFile - FileName missing." );
 
-        LOG(VB_UPNP, LOG_ERR, sMsg);
+        //LOG(VB_UPNP, LOG_ERR, sMsg);
 
         throw sMsg;
     }
@@ -108,24 +108,24 @@ QFileInfo Content::GetFile( const QString &sStorageGroup,
 /////////////////////////////////////////////////////////////////////////////
 
 QFileInfo Content::GetImageFile( const QString &sStorageGroup,
-                            const QString &sFileName,
-                            int nWidth,
-                            int nHeight)
+                                 const QString &sFileName,
+                                 int nWidth,
+                                 int nHeight)
 {
     QString sGroup = sStorageGroup;
 
     if (sGroup.isEmpty())
     {
         LOG(VB_UPNP, LOG_WARNING,
-            "GetFile - StorageGroup missing... using 'Default'");
+            "GetImageFile - StorageGroup missing... using 'Default'");
         sGroup = "Default";
     }
 
     if (sFileName.isEmpty())
     {
-        QString sMsg ( "GetFile - FileName missing." );
+        QString sMsg ( "GetImageFile - FileName missing." );
 
-        LOG(VB_UPNP, LOG_ERR, sMsg);
+        //LOG(VB_UPNP, LOG_WARNING, sMsg);
 
         throw sMsg;
     }
@@ -139,7 +139,7 @@ QFileInfo Content::GetImageFile( const QString &sStorageGroup,
 
     if (sFullFileName.isEmpty())
     {
-        LOG(VB_UPNP, LOG_ERR,
+        LOG(VB_UPNP, LOG_WARNING,
             QString("GetImageFile - Unable to find %1.").arg(sFileName));
 
         return QFileInfo();
@@ -149,19 +149,22 @@ QFileInfo Content::GetImageFile( const QString &sStorageGroup,
     // check to see if the file (still) exists
     // ----------------------------------------------------------------------
 
-    if ((nWidth == 0) && (nHeight == 0))
+    if (!QFile::exists( sFullFileName ))
     {
-        if (QFile::exists( sFullFileName ))
-        {
-            return QFileInfo( sFullFileName );
-        }
-
-        LOG(VB_UPNP, LOG_ERR,
+        LOG(VB_UPNP, LOG_WARNING,
             QString("GetImageFile - File Does not exist %1.").arg(sFullFileName));
-
         return QFileInfo();
     }
 
+    // ----------------------------------------------------------------------
+    // If no scaling is required return the file info
+    // ----------------------------------------------------------------------
+    if ((nWidth == 0) && (nHeight == 0))
+        return QFileInfo( sFullFileName );
+
+    // ----------------------------------------------------------------------
+    // Create a filename for the scaled copy
+    // ----------------------------------------------------------------------
     QString sNewFileName = QString( "%1.%2x%3.jpg" )
                               .arg( sFullFileName )
                               .arg( nWidth    )
@@ -180,9 +183,9 @@ QFileInfo Content::GetImageFile( const QString &sStorageGroup,
 
     float fAspect = 0.0;
 
-    QImage *pImage = new QImage( sFullFileName);
+    QImage *pImage = new QImage( sFullFileName );
 
-    if (!pImage)
+    if (!pImage || pImage->isNull())
         return QFileInfo();
 
     if (fAspect <= 0)
@@ -257,6 +260,9 @@ QFileInfo Content::GetRecordingArtwork ( const QString   &sType,
 {
     ArtworkMap map = GetArtwork(sInetref, nSeason);
 
+    if (map.isEmpty())
+        return QFileInfo();
+
     VideoArtworkType type = kArtworkCoverart;
     QString sgroup;
 
@@ -276,8 +282,14 @@ QFileInfo Content::GetRecordingArtwork ( const QString   &sType,
         type = kArtworkBanner;
     }
 
+    if (!map.contains(type))
+        return QFileInfo();
+
     QUrl url(map.value(type).url);
     QString sFileName = url.path();
+
+    if (sFileName.isEmpty())
+        return QFileInfo();
 
     return GetImageFile( sgroup, sFileName, nWidth, nHeight);
 }
@@ -286,15 +298,22 @@ QFileInfo Content::GetRecordingArtwork ( const QString   &sType,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::ArtworkInfoList* Content::GetRecordingArtworkList(
-    int chanid, const QDateTime &recstarttsRaw)
+DTC::ArtworkInfoList* Content::GetRecordingArtworkList( int        RecordedId,
+                                                        int        chanid,
+                                                        const QDateTime &recstarttsRaw)
 {
-    if (chanid <= 0 || !recstarttsRaw.isValid())
-        throw( QString("Channel ID or StartTime appears invalid."));
+    if ((RecordedId <= 0) &&
+        (chanid <= 0 || !recstarttsRaw.isValid()))
+        throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
 
-    ProgramInfo pInfo(chanid, recstarttsRaw.toUTC());
+    // TODO Should use RecordingInfo
+    ProgramInfo pginfo;
+    if (RecordedId > 0)
+        pginfo = ProgramInfo(RecordedId);
+    else
+        pginfo = ProgramInfo(chanid, recstarttsRaw.toUTC());
 
-    return GetProgramArtworkList(pInfo.GetInetRef(), pInfo.GetSeason());
+    return GetProgramArtworkList(pginfo.GetInetRef(), pginfo.GetSeason());
 }
 
 DTC::ArtworkInfoList* Content::GetProgramArtworkList( const QString &sInetref,
@@ -360,6 +379,9 @@ QFileInfo Content::GetVideoArtwork( const QString &sType,
 
     QString sFileName = query.value(0).toString();
 
+    if (sFileName.isEmpty())
+        return QFileInfo();
+
     return GetImageFile( sgroup, sFileName, nWidth, nHeight );
 }
 
@@ -379,6 +401,7 @@ QFileInfo Content::GetAlbumArt( int nTrackId, int nWidth, int nHeight )
         return QFileInfo();
 
     QString sFullFileName = metadata->getAlbumArtFile();
+    LOG(VB_GENERAL, LOG_DEBUG, QString("GetAlbumArt: %1").arg(sFullFileName));
 
     delete metadata;
 
@@ -462,22 +485,17 @@ QFileInfo Content::GetAlbumArt( int nTrackId, int nWidth, int nHeight )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QFileInfo Content::GetPreviewImage(        int        nChanId,
+QFileInfo Content::GetPreviewImage(        int        nRecordedId,
+                                           int        nChanId,
                                      const QDateTime &recstarttsRaw,
                                            int        nWidth,
                                            int        nHeight,
                                            int        nSecsIn,
                                      const QString   &sFormat )
 {
-    if (!recstarttsRaw.isValid())
-    {
-        QString sMsg = QString("GetPreviewImage: bad start time '%1'")
-            .arg(MythDate::toString(recstarttsRaw, MythDate::ISODate));
-
-        LOG(VB_GENERAL, LOG_ERR, sMsg);
-
-        throw sMsg;
-    }
+    if ((nRecordedId <= 0) &&
+        (nChanId <= 0 || !recstarttsRaw.isValid()))
+        throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
 
     if (!sFormat.isEmpty()
         && !QImageWriter::supportedImageFormats().contains(sFormat.toLower().toLocal8Bit()))
@@ -485,23 +503,22 @@ QFileInfo Content::GetPreviewImage(        int        nChanId,
         throw "GetPreviewImage: Specified 'Format' is not supported.";
     }
 
-    QString sImageFormat = sFormat;
-    if (sImageFormat.isEmpty())
-        sImageFormat = "PNG";
-
-    QDateTime recstartts = recstarttsRaw.toUTC();
-
     // ----------------------------------------------------------------------
     // Read Recording From Database
     // ----------------------------------------------------------------------
 
-    ProgramInfo pginfo( (uint)nChanId, recstartts);
+    // TODO Should use RecordingInfo
+    ProgramInfo pginfo;
+    if (nRecordedId > 0)
+        pginfo = ProgramInfo(nRecordedId);
+    else
+        pginfo = ProgramInfo(nChanId, recstarttsRaw.toUTC());
 
     if (!pginfo.GetChanID())
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("GetPreviewImage: No recording for '%1'")
-            .arg(ProgramInfo::MakeUniqueKey(nChanId, recstartts)));
+            .arg(nRecordedId));
         return QFileInfo();
     }
 
@@ -516,6 +533,10 @@ QFileInfo Content::GetPreviewImage(        int        nChanId,
 
         throw HttpRedirectException( pginfo.GetHostname() );
     }
+
+    QString sImageFormat = sFormat;
+    if (sImageFormat.isEmpty())
+        sImageFormat = "PNG";
 
     QString sFileName = GetPlaybackURL(&pginfo);
 
@@ -638,24 +659,29 @@ QFileInfo Content::GetPreviewImage(        int        nChanId,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QFileInfo Content::GetRecording( int              nChanId,
+QFileInfo Content::GetRecording( int              nRecordedId,
+                                 int              nChanId,
                                  const QDateTime &recstarttsRaw )
 {
-    if (!recstarttsRaw.isValid())
-        throw( "StartTime is invalid" );
+    if ((nRecordedId <= 0) &&
+        (nChanId <= 0 || !recstarttsRaw.isValid()))
+        throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
 
     // ------------------------------------------------------------------
     // Read Recording From Database
     // ------------------------------------------------------------------
 
-    QDateTime recstartts = recstarttsRaw.toUTC();
-
-    ProgramInfo pginfo((uint)nChanId, recstartts);
+    // TODO Should use RecordingInfo
+    ProgramInfo pginfo;
+    if (nRecordedId > 0)
+        pginfo = ProgramInfo(nRecordedId);
+    else
+        pginfo = ProgramInfo(nChanId, recstarttsRaw.toUTC());
 
     if (!pginfo.GetChanID())
     {
         LOG(VB_UPNP, LOG_ERR, QString("GetRecording - for '%1' failed")
-            .arg(ProgramInfo::MakeUniqueKey(nChanId, recstartts)));
+            .arg(nRecordedId));
 
         return QFileInfo();
     }
@@ -1062,6 +1088,7 @@ DTC::LiveStreamInfoList *Content::GetLiveStreamList( const QString   &FileName )
 /////////////////////////////////////////////////////////////////////////////
 
 DTC::LiveStreamInfo *Content::AddRecordingLiveStream(
+    int              nRecordedId,
     int              nChanId,
     const QDateTime &recstarttsRaw,
     int              nMaxSegments,
@@ -1071,22 +1098,26 @@ DTC::LiveStreamInfo *Content::AddRecordingLiveStream(
     int              nAudioBitrate,
     int              nSampleRate )
 {
-    if (!recstarttsRaw.isValid())
-        throw( "StartTime is invalid" );
+    if ((nRecordedId <= 0) &&
+        (nChanId <= 0 || !recstarttsRaw.isValid()))
+        throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
 
     // ------------------------------------------------------------------
     // Read Recording From Database
     // ------------------------------------------------------------------
 
-    QDateTime recstartts = recstarttsRaw.toUTC();
-
-    ProgramInfo pginfo((uint)nChanId, recstartts);
+    // TODO Should use RecordingInfo
+    ProgramInfo pginfo;
+    if (nRecordedId > 0)
+        pginfo = ProgramInfo(nRecordedId);
+    else
+        pginfo = ProgramInfo(nChanId, recstarttsRaw.toUTC());
 
     if (!pginfo.GetChanID())
     {
         LOG(VB_UPNP, LOG_ERR,
             QString("AddRecordingLiveStream - for %1, %2 failed")
-            .arg(ProgramInfo::MakeUniqueKey(nChanId, recstartts)));
+            .arg(QString::number(nRecordedId)));
         return NULL;
     }
 
@@ -1114,7 +1145,7 @@ DTC::LiveStreamInfo *Content::AddRecordingLiveStream(
     {
         LOG( VB_UPNP, LOG_ERR, QString("AddRecordingLiveStream - for %1, %2 failed")
                                     .arg( nChanId )
-                                    .arg( recstartts.toString() ));
+                                    .arg( recstarttsRaw.toUTC().toString() ));
         return NULL;
     }
 

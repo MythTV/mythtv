@@ -50,23 +50,28 @@ class Dvr : public DvrServices
                                                 const QString   &RecGroup,
                                                 const QString   &StorageGroup );
 
-        DTC::Program*     GetRecorded         ( int              ChanId,
+        DTC::Program*     GetRecorded         ( int              RecordedId,
+                                                int              ChanId,
                                                 const QDateTime &StartTime  );
 
-        bool              RemoveRecorded      ( int              ChanId,
+        bool              RemoveRecorded      ( int              RecordedId,
+                                                int              ChanId,
                                                 const QDateTime &StartTime,
                                                 bool             ForceDelete,
                                                 bool             AllowRerecord  );
 
-        bool              DeleteRecording     ( int              ChanId,
+        bool              DeleteRecording     ( int              RecordedId,
+                                                int              ChanId,
                                                 const QDateTime &StartTime,
                                                 bool             ForceDelete,
                                                 bool             AllowRerecord  );
 
-        bool              UnDeleteRecording   ( int              ChanId,
+        bool              UnDeleteRecording   ( int              RecordedId,
+                                                int              ChanId,
                                                 const QDateTime &StartTime );
 
-        bool              UpdateRecordedWatchedStatus ( int   ChanId,
+        bool              UpdateRecordedWatchedStatus ( int   RecordedId,
+                                                        int   ChanId,
                                                         const QDateTime &StartTime,
                                                         bool  Watched);
 
@@ -195,6 +200,7 @@ class Dvr : public DvrServices
 
         DTC::RecRule*     GetRecordSchedule    ( uint             RecordId,
                                                  QString          Template,
+                                                 int              nRecordedId,
                                                  int              ChanId,
                                                  QDateTime        StartTime,
                                                  bool             MakeOverride );
@@ -269,34 +275,30 @@ class ScriptableDvr : public QObject
                                           StorageGroup);
         }
 
-        QObject* GetRecorded         ( int              ChanId,
-                                       const QDateTime &StartTime  )
+        QObject* GetRecorded         ( int              RecordedId )
         {
-            return m_obj.GetRecorded( ChanId, StartTime );
+            return m_obj.GetRecorded( RecordedId, 0, QDateTime() );
         }
 
-        bool RemoveRecorded           ( int              ChanId,
-                                        const QDateTime &StartTime,
+        bool RemoveRecorded           ( int              RecordedId,
                                         bool             ForceDelete,
                                         bool             AllowRerecord )
         {
-            return m_obj.RemoveRecorded( ChanId, StartTime,
+            return m_obj.RemoveRecorded( RecordedId, 0, QDateTime(),
                                          ForceDelete, AllowRerecord);
         }
 
-        bool DeleteRecording          ( int              ChanId,
-                                        const QDateTime &StartTime,
+        bool DeleteRecording          ( int              RecordedId,
                                         bool             ForceDelete,
                                         bool             AllowRerecord  )
         {
-            return m_obj.DeleteRecording(ChanId, StartTime,
+            return m_obj.DeleteRecording(RecordedId, 0, QDateTime(),
                                          ForceDelete, AllowRerecord);
         }
 
-        bool UnDeleteRecording        ( int              ChanId,
-                                        const QDateTime &StartTime )
+        bool UnDeleteRecording        ( int              RecordedId )
         {
-            return m_obj.UnDeleteRecording(ChanId, StartTime);
+            return m_obj.UnDeleteRecording(RecordedId, 0, QDateTime());
         }
 
         QObject* GetConflictList    ( int              StartIndex,
@@ -413,12 +415,13 @@ class ScriptableDvr : public QObject
 
         QObject* GetRecordSchedule ( uint      RecordId,
                                      QString   Template,
+                                     int       RecordedId,
                                      int       ChanId,
                                      QDateTime StartTime,
                                      bool      MakeOverride )
         {
-            return m_obj.GetRecordSchedule( RecordId,  Template, ChanId,
-                                            StartTime, MakeOverride);
+            return m_obj.GetRecordSchedule( RecordId,  Template, RecordedId,
+                                            ChanId, StartTime, MakeOverride);
         }
 
         bool EnableRecordSchedule ( uint RecordId )

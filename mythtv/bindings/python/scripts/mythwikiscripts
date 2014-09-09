@@ -70,6 +70,10 @@ def saveScript(script):
 
         if len(inp):
             path = inp
+
+        dir = os.path.dirname(os.path.expanduser(path))
+        if not os.path.exists(dir):
+            os.makedirs(dir)
         script.saveScript(name, os.path.expanduser(path))
 
 if __name__ == '__main__':

@@ -20,6 +20,7 @@ using namespace std;
 #include "ExternalRecorder.h"
 #include "hdhrchannel.h"
 #include "iptvchannel.h"
+#include "mythsystemevent.h"
 #include "mythlogging.h"
 #include "programinfo.h"
 #include "asichannel.h"
@@ -42,7 +43,10 @@ const uint RecorderBase::kTimeOfLatestDataIntervalTarget = 5000;
 
 RecorderBase::RecorderBase(TVRec *rec)
     : tvrec(rec),               ringBuffer(NULL),
-      weMadeBuffer(true),       videocodec("rtjpeg"),
+      weMadeBuffer(true),
+      m_primaryVideoCodec(AV_CODEC_ID_NONE),
+      m_primaryAudioCodec(AV_CODEC_ID_NONE),
+      videocodec("rtjpeg"),
       ntsc(true),               ntsc_framerate(true),
       video_frame_rate(29.97),
       m_videoAspect(0),         m_videoHeight(0),
@@ -374,16 +378,20 @@ void RecorderBase::CheckForRingBufferSwitch(void)
 void RecorderBase::SetRecordingStatus(RecStatusType status,
                                       const QString& file, int line)
 {
-    if (curRecording)
+    if (curRecording && curRecording->GetRecordingStatus() != status)
     {
-        LOG(VB_RECORD, LOG_INFO, QString("Modifying recording status to %1 "
-                                         "at %2:%3")
+        LOG(VB_RECORD, LOG_INFO,
+            QString("Modifying recording status from %1 to %2 at %3:%4")
+            .arg(toString(curRecording->GetRecordingStatus(), kSingleRecord))
             .arg(toString(status, kSingleRecord)).arg(file).arg(line));
 
         curRecording->SetRecordingStatus(status);
 
         if (status == rsFailing)
+        {
             curRecording->SaveVideoProperties(VID_DAMAGED, VID_DAMAGED);
+            SendMythSystemRecEvent("REC_FAILING", curRecording);
+        }
 
         MythEvent me(QString("UPDATE_RECORDING_STATUS %1 %2 %3 %4 %5")
                     .arg(curRecording->GetCardID())
@@ -404,6 +412,25 @@ void RecorderBase::ClearStatistics(void)
     timeOfLatestDataCount.fetchAndStoreRelaxed(0);
     timeOfLatestDataPacketInterval.fetchAndStoreRelaxed(2000);
     recordingGaps.clear();
+}
+
+void RecorderBase::FinishRecording(void)
+{
+    if (curRecording)
+    {
+        if (m_primaryVideoCodec == AV_CODEC_ID_H264)
+            curRecording->SaveVideoProperties(VID_AVC, VID_AVC);
+
+        if (ringBuffer)
+            curRecording->SaveFilesize(ringBuffer->GetRealFileSize());
+        SavePositionMap(true);
+    }
+
+    LOG(VB_GENERAL, LOG_NOTICE, QString("Finished Recording: "
+                                        "Video Codec: %1 "
+                                        "Audio Codec: %2")
+                                        .arg(avcodec_get_name(m_primaryVideoCodec))
+                                        .arg(avcodec_get_name(m_primaryAudioCodec)));
 }
 
 RecordingQuality *RecorderBase::GetRecordingQuality(

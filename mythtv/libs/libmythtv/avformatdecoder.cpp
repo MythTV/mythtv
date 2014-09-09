@@ -1286,7 +1286,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     if (m_playbackinfo)
     {
         dur = m_playbackinfo->QueryTotalDuration();
-        dur /= 1000000;
+        dur /= 1000;
     }
 
     if (dur == 0)
@@ -3719,19 +3719,22 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
             .arg(mpa_pic->reordered_opaque).arg(pts).arg(temppts).arg(lastvpts)
             .arg((pts != temppts) ? " fixup" : ""));
 
-    picframe->interlaced_frame = mpa_pic->interlaced_frame;
-    picframe->top_field_first  = mpa_pic->top_field_first;
-    picframe->repeat_pict      = mpa_pic->repeat_pict;
-    picframe->disp_timecode    = NormalizeVideoTimecode(stream, temppts);
-    picframe->frameNumber      = framesPlayed;
-    picframe->aspect           = current_aspect;
-    picframe->dummy            = 0;
-    picframe->directrendering  = directrendering ? 1 : 0;
+    if (picframe)
+    {
+        picframe->interlaced_frame = mpa_pic->interlaced_frame;
+        picframe->top_field_first  = mpa_pic->top_field_first;
+        picframe->repeat_pict      = mpa_pic->repeat_pict;
+        picframe->disp_timecode    = NormalizeVideoTimecode(stream, temppts);
+        picframe->frameNumber      = framesPlayed;
+        picframe->aspect           = current_aspect;
+        picframe->dummy            = 0;
+        picframe->directrendering  = directrendering ? 1 : 0;
 
-    m_parent->ReleaseNextVideoFrame(picframe, temppts);
+        m_parent->ReleaseNextVideoFrame(picframe, temppts);
 
-    decoded_video_frame = picframe;
-    gotVideoFrame = 1;
+        decoded_video_frame = picframe;
+        gotVideoFrame = 1;
+    }
     framesPlayed++;
 
     lastvpts = temppts;

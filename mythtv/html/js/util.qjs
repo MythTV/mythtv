@@ -111,6 +111,7 @@ function clearDiv(divName) {
 var currentContentURL;
 var currentJsUrl;
 function loadContent(contentURL, jsURL) {
+    console.log("loadContent: URL(" + contentURL + ") JSURL(" + jsURL + ")");
     currentContentURL = contentURL;
     currentJsUrl = jsURL;
     loadDiv("content", contentURL, jsURL);

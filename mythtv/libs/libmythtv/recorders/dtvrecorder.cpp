@@ -167,12 +167,11 @@ void DTVRecorder::FinishRecording(void)
 
     if (curRecording)
     {
-        if (ringBuffer)
-            curRecording->SaveFilesize(ringBuffer->GetRealFileSize());
-        SavePositionMap(true);
-        curRecording->SaveTotalDuration((int64_t)(_total_duration * 1000));
-        curRecording->SaveTotalFrames(_frames_written_count);
+        SetDuration((int64_t)(_total_duration * 1000));
+        SetTotalFrames(_frames_written_count);
     }
+
+    RecorderBase::FinishRecording();
 }
 
 void DTVRecorder::ResetForNewFile(void)
@@ -1338,9 +1337,85 @@ void DTVRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt, bool insert)
         return;
     }
 
+    // We only want to do these checks once per recording
+    bool seenVideo = (m_primaryVideoCodec != AV_CODEC_ID_NONE);
+    bool seenAudio = (m_primaryAudioCodec != AV_CODEC_ID_NONE);
+    uint bestAudioCodec = 0;
     // collect stream types for H.264 (MPEG-4 AVC) keyframe detection
     for (uint i = 0; i < pmt->StreamCount(); ++i)
+    {
+        // We only care about the first identifiable video stream
+        if (!seenVideo && (m_primaryVideoCodec == AV_CODEC_ID_NONE) &&
+            StreamID::IsVideo(pmt->StreamType(i)))
+        {
+            seenVideo = true; // Ignore other video streams
+            switch (pmt->StreamType(i))
+            {
+                case StreamID::MPEG1Video:
+                    m_primaryVideoCodec = AV_CODEC_ID_MPEG1VIDEO;
+                    break;
+                case StreamID::MPEG2Video:
+                    m_primaryVideoCodec = AV_CODEC_ID_MPEG2VIDEO;
+                    break;
+                case StreamID::MPEG4Video:
+                    m_primaryVideoCodec = AV_CODEC_ID_MPEG4;
+                    break;
+                case StreamID::H264Video:
+                    m_primaryVideoCodec = AV_CODEC_ID_H264;
+                    break;
+                case StreamID::OpenCableVideo:
+                    m_primaryVideoCodec = AV_CODEC_ID_MPEG2VIDEO; // TODO Will it always be MPEG2?
+                    break;
+                case StreamID::VC1Video:
+                    m_primaryVideoCodec = AV_CODEC_ID_VC1;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        // We want the 'best' identifiable audio stream, where 'best' is
+        // subjective and no-one will likely agree.
+        // For now it's the 'best' codec, assuming mpeg stream types range
+        // from worst to best, which it does
+        if (!seenAudio && StreamID::IsAudio(pmt->StreamType(i)) &&
+            pmt->StreamType(i) > bestAudioCodec)
+        {
+            bestAudioCodec = pmt->StreamType(i);
+            switch (pmt->StreamType(i))
+            {
+                case StreamID::MPEG1Audio:
+                    m_primaryAudioCodec = AV_CODEC_ID_MP1;
+                    break;
+                case StreamID::MPEG2Audio:
+                    m_primaryAudioCodec = AV_CODEC_ID_MP2;
+                    break;
+                case StreamID::MPEG2AACAudio:
+                    m_primaryAudioCodec = AV_CODEC_ID_AAC;
+                    break;
+                case StreamID::MPEG2AudioAmd1:
+                    m_primaryAudioCodec = AV_CODEC_ID_AAC_LATM;
+                    break;
+                case StreamID::AC3Audio:
+                    m_primaryAudioCodec = AV_CODEC_ID_AC3;
+                    break;
+                case StreamID::EAC3Audio:
+                    m_primaryAudioCodec = AV_CODEC_ID_EAC3;
+                    break;
+                case StreamID::DTSAudio:
+                    m_primaryAudioCodec = AV_CODEC_ID_DTS;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+//         LOG(VB_GENERAL, LOG_DEBUG, QString("Recording(%1): Stream #%2: %3 ")
+//             .arg(curRecording ? QString::number(curRecording->GetRecordingID()) : "")
+//             .arg(i)
+//             .arg(StreamID::GetDescription(pmt->StreamType(i))));
         _stream_id[pmt->StreamPID(i)] = pmt->StreamType(i);
+    }
 
     if (!ringBuffer)
         return;

@@ -2846,11 +2846,8 @@ void NuppelVideoRecorder::FinishRecording(void)
 
     WriteSeekTable();
 
-    if (curRecording)
-    {
-        curRecording->SaveFilesize(ringBuffer->GetRealFileSize());
-        SavePositionMap(true);
-    }
+    RecorderBase::FinishRecording();
+    
     positionMapLock.lock();
     positionMap.clear();
     positionMapDelta.clear();

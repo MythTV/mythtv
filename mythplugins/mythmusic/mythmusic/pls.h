@@ -86,26 +86,33 @@ class PlayListFile
             delete m_entries.takeFirst();
     }
 
-    /** \brief Parse a pls or m3u playlist file.
+    /** \brief Parse a pls, m3u or asx playlist file.
         \param pls the \p PlaylistFile to add the entries to
         \param filename the playlist's filename
-        \returns the number of entries parsed 
+        \returns the number of entries parsed
     */
     static int parse(PlayListFile *pls, const QString &filename);
 
     /** \brief Parse a pls file.
         \param pls the \p PlaylistFile to add the entries to
         \param filename the playlist's filename
-        \returns the number of entries parsed 
+        \returns the number of entries parsed
     */
     static int parsePLS(PlayListFile *pls, const QString &filename);
 
     /** \brief Parse a m3u file.
         \param pls the \p PlaylistFile to add the entries to
         \param filename the playlist's filename
-        \returns the number of entries parsed 
+        \returns the number of entries parsed
     */
     static int parseM3U(PlayListFile *pls, const QString &filename);
+
+    /** \brief Parse a asx file.
+        \param pls the \p PlaylistFile to add the entries to
+        \param filename the playlist's filename
+        \returns the number of entries parsed
+    */
+    static int parseASX(PlayListFile *pls, const QString &filename);
 
   private:
     QList<PlayListFileEntry*> m_entries;

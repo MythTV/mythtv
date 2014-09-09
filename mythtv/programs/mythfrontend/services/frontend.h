@@ -33,7 +33,7 @@ class Frontend : public FrontendServices
     bool                 SendAction(const QString &Action,
                                     const QString &Value,
                                     uint Width, uint Height);
-    virtual bool         PlayRecording(int ChanId,
+    virtual bool         PlayRecording(int RecordedId, int ChanId,
                                        const QDateTime &StartTime);
     bool                 PlayVideo(const QString &Id, bool UseBookmark);
     QStringList          GetContextList(void);

@@ -20,6 +20,7 @@
 
 #include "upnpexp.h"
 #include "httprequest.h"
+#include <referencecounter.h>
 
 class CDSObject;
 class QTextStream;
@@ -152,11 +153,35 @@ class ContainerClass
 
 typedef QList<ContainerClass*> Classes;
 
+/**
+ * NOTE FilterMap contains a list of what should be included, not what should
+ *      be excluded.
+ *
+ *      The client is expected either to indicate that everything should be
+ *      returned with an asterix, or to supply a comma seperated list of
+ *      the only the named properties and attributes.
+ *
+ *      @ - Attributes are denoted by format <element>@<attribute>
+ *
+ *      # - The use of a hash at the end of a name indicates that this
+ *          property and all it's children and attributes should be returned.
+ *
+ *      Inclusion of an attribute in the filter list implies the inclusion
+ *      of it's parent element and value.
+ *      e.g. filter="res@size" implies <res size="{size}">{url}</res>
+ *      However optional tags such as res@duration which are not named will
+ *      be omitted.
+ *
+ *      'Required' properties must always be included irrespective of
+ *      any filter!
+ *
+ *      See UPnP MediaServer, ContentDirectory Service Section 2.3.18, 2013
+ */
 typedef QStringList FilterMap;
 
 //////////////////////////////////////////////////////////////////////////////
 
-class UPNP_PUBLIC CDSObject
+class UPNP_PUBLIC CDSObject : public ReferenceCounter
 {
     public:
         short           m_nUpdateId;
@@ -186,7 +211,8 @@ class UPNP_PUBLIC CDSObject
 
         Properties      m_properties;
         CDSObjects      m_children;
-        long            m_nChildCount;
+        uint32_t        m_nChildCount;
+        uint32_t        m_nChildContainerCount;
 
         Resources       m_resources;
 
@@ -201,6 +227,8 @@ class UPNP_PUBLIC CDSObject
         Property         *AddProperty( Property *pProp  );
         QList<Property*>  GetProperties( const QString &sName );
         CDSObject        *AddChild   ( CDSObject   *pChild );
+        CDSObjects        GetChildren( void ) { return m_children; }
+        CDSObject        *GetChild   ( const QString &sID );
 
         ContainerClass *AddSearchClass( ContainerClass *pClass );
         ContainerClass *AddCreateClass( ContainerClass *pClass );
@@ -208,11 +236,16 @@ class UPNP_PUBLIC CDSObject
         void          SetPropValue( const QString &sName, const QString &sValue,
                                     const QString &type = "" );
         QString       GetPropValue( const QString &sName ) const;
-        QString       toXml      ( FilterMap &filter ) const;
-        void          toXml      ( QTextStream &os, FilterMap &filter ) const;
+        QString       toXml      ( FilterMap &filter,
+                                   bool ignoreChildren = false ) const;
+        void          toXml      ( QTextStream &os, FilterMap &filter,
+                                   bool ignoreChildren = false ) const;
 
-        long          GetChildCount( void ) const;
-        void          SetChildCount( long nCount );
+        uint32_t      GetChildCount( void ) const;
+        void          SetChildCount( uint32_t nCount );
+
+        uint32_t      GetChildContainerCount( void ) const;
+        void          SetChildContainerCount( uint32_t nCount );
 
         Resource     *AddResource( QString sProtocol, QString sURI );
 
@@ -244,6 +277,9 @@ class UPNP_PUBLIC CDSObject
         static  CDSObject *CreateStorageSystem    ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL );
         static  CDSObject *CreateStorageVolume    ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL );
         static  CDSObject *CreateStorageFolder    ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL );
+
+    private:
+        bool FilterContains( const FilterMap &filter, const QString &name ) const;
 
 };
 

@@ -715,7 +715,8 @@ void EITFixUp::FixUK(DBEventEIT &event) const
     int position2;
     QString strFull;
 
-    bool isMovie = event.category.startsWith("Movie",Qt::CaseInsensitive);
+    bool isMovie = event.category.startsWith("Movie",Qt::CaseInsensitive) ||
+                   event.category.startsWith("Film",Qt::CaseInsensitive);
     // BBC three case (could add another record here ?)
     event.description = event.description.remove(m_ukThen);
     event.description = event.description.remove(m_ukNew);
@@ -803,7 +804,9 @@ void EITFixUp::FixUK(DBEventEIT &event) const
         }
     }
 
-    if (series)
+    if (isMovie)
+        event.categoryType = ProgramInfo::kCategoryMovie;
+    else if (series)
         event.categoryType = ProgramInfo::kCategorySeries;
 
     // Multi-part episodes, or films (e.g. ITV film split by news)

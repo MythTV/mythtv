@@ -325,6 +325,9 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     void SetRecordingStatus(
         RecStatusType new_status, int line, bool have_lock = false);
 
+    QString LoadProfile(QString ,void*, RecordingInfo*,
+                        RecordingProfile&);
+
     // Various components TVRec coordinates
     RecorderBase     *recorder;
     ChannelBase      *channel;

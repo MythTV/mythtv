@@ -22,7 +22,7 @@ function scheduleSimpleRecording(chanID, startTime, type)
 {
     var dvr = new Dvr();
 
-    var recRule = dvr.GetRecordSchedule(0, "", chanID, startTime, false);
+    var recRule = dvr.GetRecordSchedule(0, "", 0, chanID, startTime, false);
 
     // Prevent duplicate recording rules being created
     if (recRule.Id > 0 && recRule.Type == type)
@@ -69,25 +69,25 @@ function neverRecord(chanID, startTime)
     return chanID + "#" + startTime.toISOString();
 }
 
-function deleteRecording(chanID, startTime, allowReRecord, forceDelete)
+function deleteRecording(recordedId, startTime, allowReRecord, forceDelete)
 {
     var dvr = new Dvr();
-    dvr.DeleteRecording(chanID, startTime, forceDelete, allowReRecord);
-    return chanID + "#" + startTime.toISOString();
+    dvr.DeleteRecording(recordedId, forceDelete, allowReRecord);
+    return recordedId;
 }
 
-function unDeleteRecording(chanID, startTime)
+function unDeleteRecording(recordedId)
 {
     var dvr = new Dvr();
-    dvr.UnDeleteRecording(chanID, startTime);
-    return chanID + "#" + startTime.toISOString();
+    dvr.UnDeleteRecording(recordedId);
+    return recordedId;
 }
 
 function saveRecordingRule(recRuleId, chanId, startTime)
 {
     var dvr = new Dvr();
 
-    var recRule = dvr.GetRecordSchedule(recRuleId, "",
+    var recRule = dvr.GetRecordSchedule(recRuleId, "", 0,
                                         chanId,
                                         startTime,
                                         false);
@@ -195,14 +195,12 @@ switch (getArg("_action")) // _action to avoid conflicts with http form's "actio
         ret = neverRecord(getArg("ChanID"), validDate);
         break;
     case "deleteRecording":
-        var validDate = myth.ParseISODateString(getArg("StartTime"));
-        ret = deleteRecording(getArg("ChanID"), validDate,
-                                getArg("AllowRerecord") == 1,
-                                getArg("ForceDelete") == 1);
+        ret = deleteRecording(getArg("RecordedId"),
+                              getArg("AllowRerecord") == 1,
+                              getArg("ForceDelete") == 1);
         break;
     case "unDeleteRecording":
-        var validDate = myth.ParseISODateString(getArg("StartTime"));
-        ret = unDeleteRecording(getArg("ChanID"), validDate);
+        ret = unDeleteRecording(getArg("RecordedId"));
         break;
     case "saveRecordingRule":
         var validDate = myth.ParseISODateString(getArg("StartTime"));

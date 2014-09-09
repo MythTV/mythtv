@@ -14,6 +14,7 @@
 #define _UPNPIMPL_H_
 
 #include "upnpexp.h"
+#include "upnputil.h"
 
 #include <QString>
 
@@ -39,6 +40,36 @@ class UPNP_PUBLIC UPnpServiceImpl
     virtual QString GetServiceDescURL(void)    = 0;
     /// Provides the URL of the event portion of the service
     virtual QString GetServiceEventURL(void) { return QString(); }
+};
+
+class UPNP_PUBLIC UPnPFeature
+{
+  public:
+    UPnPFeature(const QString &name, int version) :
+        m_name(name), m_version(version) {}
+    virtual ~UPnPFeature() {}
+
+    QString toXML();
+    virtual QString CreateXML() = 0;
+
+  protected:
+    QString    m_name;
+    int        m_version;
+};
+
+class UPNP_PUBLIC UPnPFeatureList
+{
+  public:
+    UPnPFeatureList();
+   ~UPnPFeatureList();
+
+    void AddFeature( UPnPFeature *feature );
+    QString toXML();
+
+  private:
+    NameValues m_attributes;
+    QList<UPnPFeature*> m_features;
+
 };
 
 #endif /// _UPNPIMPL_H_

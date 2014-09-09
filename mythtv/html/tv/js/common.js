@@ -114,6 +114,7 @@ var selectedElement;
 // something better
 var gChanID = 0;
 var gStartTime = "";
+var gRecordedId = 0;
 function showMenu(parent, typeStr)
 {
     hideDetail(parent);
@@ -132,11 +133,16 @@ function showMenu(parent, typeStr)
     // the LOC or HTML
     // Old Way
     gChanID = parent.getAttribute("data-chanid");
+    if (isValidVar(parent.getAttribute("data-recordedid")))
+        gRecordedId = parent.getAttribute("data-recordedid");
+
     if (isValidVar(parent.getAttribute("data-recstarttime")))
         gStartTime = parent.getAttribute("data-recstarttime");
     else
         gStartTime = parent.getAttribute("data-starttime");
-    console.log("gChanId " + gChanID + " StartTime " + gStartTime);
+
+    // DEBUGGING
+    console.log("RecordedId " + gRecordedId + " ChanId " + gChanID + " StartTime " + gStartTime);
 
     // New Way
 //     $('#optMenu').data('chanID', parent.getAttribute("data-chanid"));
@@ -226,12 +232,20 @@ function showDetail(parentID, type)
     // recording ids. We need to rethink how this is done without increasing
     // the LOC or HTML
     // Old Way
-    chanId = parent.getAttribute("data-chanid");
-    if (isValidVar(parent.getAttribute("data-recstarttime")))
-        startTime = parent.getAttribute("data-recstarttime");
+    var recordedId;
+    var chanId;
+    var startTime;
+    if (isValidVar(parent.getAttribute("data-recordedId")))
+    {
+        recordedId = parent.getAttribute("data-recordedId");
+        console.log("Recorded ID " + recordedId);
+    }
     else
+    {
+        chanId = parent.getAttribute("data-chanid");
         startTime = parent.getAttribute("data-starttime");
-    console.log("Chan ID " + chanId + " StartTime " + startTime);
+        console.log("Chan ID " + chanId + " StartTime " + startTime);
+    }
 
     // New Way
 //     $('#optMenu').data('chanID', parent.getAttribute("data-chanid"));
@@ -240,11 +254,10 @@ function showDetail(parentID, type)
     // FIXME: We should be able to get a Program object back from
     // from the Services API that contains all the information available
     // whether it's a recording or not
-    var method = "getProgramDetailHTML";
+    var url = "/tv/ajax_backends/program_util.qsp?_action=getProgramDetailHTML&chanID=" + chanId + "&startTime=" + startTime;
     if (type == "recording")
-        method = "getRecordingDetailHTML";
+        url = "/tv/ajax_backends/program_util.qsp?_action=getRecordingDetailHTML&recordedID=" + recordedId;
 
-    var url = "/tv/ajax_backends/program_util.qsp?_action=" + method + "&chanID=" + chanId + "&startTime=" + startTime;
     var ajaxRequest = $.ajax( url )
                             .done(function()
                         {
@@ -279,7 +292,7 @@ function hideDetail(parent)
     toggleVisibility(layer, false);
 }
 
-function loadScheduler(chanID, startTime)
+function loadScheduler(type, chanID, startTime)
 {
     hideMenu("optMenu");
     var layer = document.getElementById(chanID + "_" + startTime);
@@ -288,12 +301,40 @@ function loadScheduler(chanID, startTime)
         setErrorMessage("loadScheduler() called with invalid program ID: (" + chanID + "_" + startTime + ")");
         return;
     }
-    var recRuleID = layer.getAttribute("data-recordid");
-    if (isValidVar(layer.getAttribute("data-chanid")))
-        chanID = layer.getAttribute("data-chanid");
+
+    // The order of preference for GetRecordSchedule is as follows:
+    //     "recordid" will load the rule associated with this id, metadata
+    //     associated with the first program against which the rule was created
+    //
+    //     "recordedid" will load metadata associated with the specific
+    //     selected recording which we want
+    //
+    //     "chanid & starttime" will load metadata associated with the relevant
+    //     program and the rule which currently matches this program in the scheduler
+    //     if there are multiple which apply, otherwise a new rule will be created?
+
+    // Ensure we use the program starttime, even if recording starttime
+    // was passed in
     if (isValidVar(layer.getAttribute("data-starttime")))
         startTime = layer.getAttribute("data-starttime");
-    loadContent('/tv/schedule.qsp?chanId=' + chanID + '&amp;startTime=' + startTime + '&amp;recRuleId=' + recRuleID);
+
+    if (type == "recording" &&
+        isValidVar(layer.getAttribute("data-recordedid")) &&
+        layer.getAttribute("data-recordedid") > 0)
+    {
+        var recordedID = layer.getAttribute("data-recordedid");
+        loadContent('/tv/schedule.qsp?RecordedId=' + recordedID + '&amp;ChanId=' + chanID + '&amp;StartTime=' + startTime);
+    }
+    else if (type == "upcoming")
+    {
+        var recRuleID = layer.getAttribute("data-recordid");
+        loadContent('/tv/schedule.qsp?ChanId=' + chanID + '&amp;StartTime=' + startTime);
+    }
+    else // type == "rule"
+    {
+        var recRuleID = layer.getAttribute("data-recordid");
+        loadContent('/tv/schedule.qsp?RecRuleId=' + recRuleID + '&amp;ChanId=' + chanID + '&amp;StartTime=' + startTime);
+    }
 }
 
 function checkRecordingStatus(chanID, startTime)

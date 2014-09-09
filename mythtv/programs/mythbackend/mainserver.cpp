@@ -1939,6 +1939,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
     QMap<QString, QString> backendPortMap;
     QString ip   = gCoreContext->GetBackendServerIP();
     int port = gCoreContext->GetBackendServerPort();
+    QString host = gCoreContext->GetHostName();
 
     ProgramList::iterator it = destination.begin();
     for (it = destination.begin(); it != destination.end(); ++it)
@@ -1952,7 +1953,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
         if ((proginfo->GetHostname() == gCoreContext->GetHostName()) ||
             (!slave && masterBackendOverride))
         {
-            proginfo->SetPathname(gCoreContext->GenMythURL(ip,port,proginfo->GetBasename()));
+            proginfo->SetPathname(gCoreContext->GenMythURL(host,port,proginfo->GetBasename()));
             if (!proginfo->GetFilesize())
             {
                 QString tmpURL = GetPlaybackURL(proginfo);
@@ -2093,13 +2094,13 @@ void MainServer::HandleFillProgramInfo(QStringList &slist, PlaybackSock *pbs)
     if (pginfo.HasPathname())
     {
         QString lpath = GetPlaybackURL(&pginfo);
-        QString ip    = gCoreContext->GetBackendServerIP();
         int port  = gCoreContext->GetBackendServerPort();
+        QString host = gCoreContext->GetHostName();
 
         if (playbackhost == gCoreContext->GetHostName())
             pginfo.SetPathname(lpath);
         else
-            pginfo.SetPathname(gCoreContext->GenMythURL(ip,port,pginfo.GetBasename()));
+            pginfo.SetPathname(gCoreContext->GenMythURL(host,port,pginfo.GetBasename()));
 
         const QFileInfo info(lpath);
         pginfo.SetFilesize(info.size());
@@ -2251,7 +2252,8 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
         delete_file_immediately( sFileName, followLinks, true);
     }
 
-    DeleteRecordedFiles(ds);
+    // TODO This is the future when we populate the recordedfile table
+    // DeleteRecordedFiles(ds);
 
     DoDeleteInDB(ds);
 
@@ -2302,8 +2304,7 @@ void MainServer::DeleteRecordedFiles(DeleteStruct *ds)
             StorageGroup sgroup(storagegroup);
             QString localFile = sgroup.FindFile(basename);
 
-            QString url = gCoreContext->GenMythURL(
-                                  gCoreContext->GetBackendServerIP(hostname),
+            QString url = gCoreContext->GenMythURL(hostname,
                                   gCoreContext->GetBackendServerPort(hostname),
                                   basename,
                                   storagegroup);
@@ -3594,6 +3595,11 @@ void MainServer::HandleQueryFindFile(QStringList &slist, PlaybackSock *pbs)
     bool useRegex = false;
     QStringList fileList;
 
+    if (!QHostAddress(hostname).isNull())
+        LOG(VB_GENERAL, LOG_ERR, QString("Mainserver: QUERY_FINDFILE called "
+                                         "with IP (%1) instead of hostname. "
+                                         "This is invalid.").arg(hostname));
+
     if (hostname.isEmpty())
         hostname = gCoreContext->GetHostName();
 
@@ -3624,7 +3630,7 @@ void MainServer::HandleQueryFindFile(QStringList &slist, PlaybackSock *pbs)
     // first check the given host
     if (gCoreContext->IsThisHost(hostname))
     {
-        LOG(VB_FILE, LOG_INFO, LOC + QString("Checking local host '%1' for file").arg(hostname));
+        LOG(VB_FILE, LOG_INFO, LOC + QString("Checking local host '%1' for file").arg(gCoreContext->GetHostName()));
 
         // check the local storage group
         StorageGroup sgroup(storageGroup, gCoreContext->GetHostName(), false);
@@ -3644,7 +3650,7 @@ void MainServer::HandleQueryFindFile(QStringList &slist, PlaybackSock *pbs)
             QStringList filteredFiles = files.filter(QRegExp(fi.fileName()));
             for (int x = 0; x < filteredFiles.size(); x++)
             {
-                fileList << gCoreContext->GenMythURL(gCoreContext->GetBackendServerIP(),
+                fileList << gCoreContext->GenMythURL(gCoreContext->GetHostName(),
                                                      gCoreContext->GetBackendServerPort(),
                                                      fi.path() + '/' + filteredFiles[x],
                                                      storageGroup);
@@ -3654,7 +3660,7 @@ void MainServer::HandleQueryFindFile(QStringList &slist, PlaybackSock *pbs)
         {
             if (!sgroup.FindFile(filename).isEmpty())
             {
-                fileList << gCoreContext->GenMythURL(gCoreContext->GetBackendServerIP(),
+                fileList << gCoreContext->GenMythURL(gCoreContext->GetHostName(),
                                                      gCoreContext->GetBackendServerPort(),
                                                      filename, storageGroup);
             }
@@ -3731,7 +3737,7 @@ void MainServer::HandleQueryFindFile(QStringList &slist, PlaybackSock *pbs)
 
                     for (int x = 0; x < filteredFiles.size(); x++)
                     {
-                        fileList << gCoreContext->GenMythURL(gCoreContext->GetBackendServerIP(),
+                        fileList << gCoreContext->GenMythURL(gCoreContext->GetHostName(),
                                                                 gCoreContext->GetBackendServerPort(),
                                                                 fi.path() + '/' + filteredFiles[x],
                                                                 storageGroup);
@@ -3742,7 +3748,7 @@ void MainServer::HandleQueryFindFile(QStringList &slist, PlaybackSock *pbs)
                     QString fname = sgroup.FindFile(filename);
                     if (!fname.isEmpty())
                     {
-                        fileList << gCoreContext->GenMythURL(gCoreContext->GetMasterServerIP(),
+                        fileList << gCoreContext->GenMythURL(gCoreContext->GetMasterHostName(),
                                                         gCoreContext->GetMasterServerPort(),
                                                         filename, storageGroup);
                     }

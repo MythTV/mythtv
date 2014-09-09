@@ -44,7 +44,7 @@
 class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "5.0" );
+    Q_CLASSINFO( "version"    , "6.1" );
     Q_CLASSINFO( "RemoveRecorded_Method",                       "POST" )
     Q_CLASSINFO( "DeleteRecording_Method",                      "POST" )
     Q_CLASSINFO( "UnDeleteRecording",                           "POST" )
@@ -84,23 +84,28 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
                                                            const QString   &RecGroup,
                                                            const QString   &StorageGroup ) = 0;
 
-        virtual DTC::Program*      GetRecorded           ( int              ChanId,
+        virtual DTC::Program*      GetRecorded           ( int              RecordedId,
+                                                           int              ChanId,
                                                            const QDateTime &StartTime  ) = 0;
 
-        virtual bool               RemoveRecorded        ( int              ChanId,
+        virtual bool               RemoveRecorded        ( int              RecordedId,
+                                                           int              ChanId,
                                                            const QDateTime &StartTime,
                                                            bool             ForceDelete,
                                                            bool             AllowRerecord ) = 0;
 
-        virtual bool               DeleteRecording       ( int              ChanId,
+        virtual bool               DeleteRecording       ( int              RecordedId,
+                                                           int              ChanId,
                                                            const QDateTime &StartTime,
                                                            bool             ForceDelete,
                                                            bool             AllowRerecord ) = 0;
 
-        virtual bool               UnDeleteRecording     ( int              ChanId,
+        virtual bool               UnDeleteRecording     ( int              RecordedId,
+                                                           int              ChanId,
                                                            const QDateTime &StartTime ) = 0;
 
-        virtual bool               UpdateRecordedWatchedStatus ( int   ChanId,
+        virtual bool               UpdateRecordedWatchedStatus ( int              RecordedId,
+                                                                 int   ChanId,
                                                                  const QDateTime &StartTime,
                                                                  bool  Watched) = 0;
 
@@ -229,6 +234,7 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 
         virtual DTC::RecRule*      GetRecordSchedule     ( uint             RecordId,
                                                            QString          Template,
+                                                           int              RecordedId,
                                                            int              ChanId,
                                                            QDateTime        StartTime,
                                                            bool             MakeOverride ) = 0;

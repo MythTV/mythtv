@@ -7176,7 +7176,7 @@ SLIB_INSTALL_NAME=${SLIB_INSTALL_NAME}
 SLIB_INSTALL_LINKS=${SLIB_INSTALL_LINKS}
 SLIB_INSTALL_EXTRA_LIB=${SLIB_INSTALL_EXTRA_LIB}
 SLIB_INSTALL_EXTRA_SHLIB=${SLIB_INSTALL_EXTRA_SHLIB}
-SAMPLES:=${samples:-\$(FATE_SAMPLES)}
+SAMPLES=$samples
 NOREDZONE_FLAGS=$noredzone_flags
 EOF
 
@@ -7618,4 +7618,8 @@ pkgconfig_generate libpostproc   "FFmpeg postprocessing library"        "$LIBPOS
 pkgconfig_generate libavresample "Libav audio resampling library"       "$LIBAVRESAMPLE_VERSION" "$extralibs"
 pkgconfig_generate libswscale    "FFmpeg image rescaling library"       "$LIBSWSCALE_VERSION"    "$LIBM"
 pkgconfig_generate libswresample "FFmpeg audio resampling library"      "$LIBSWRESAMPLE_VERSION" "$LIBM"
+<<<<<<< HEAD
 MYTHEOF 
+=======
+MYTHEOF
+>>>>>>> upstream/master

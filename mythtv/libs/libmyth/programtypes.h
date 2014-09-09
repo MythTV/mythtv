@@ -63,7 +63,7 @@ typedef enum {
     MARK_KEYFRAME      = 7,
     MARK_SCENE_CHANGE  = 8,
     MARK_GOP_BYFRAME   = 9,
-    MARK_ASPECT_1_1    = 10, //< deprecated, it is only 1:1 sample aspect ratio
+    MARK_ASPECT_1_1    = 10, ///< deprecated, it is only 1:1 sample aspect ratio
     MARK_ASPECT_4_3    = 11,
     MARK_ASPECT_16_9   = 12,
     MARK_ASPECT_2_21_1 = 13,

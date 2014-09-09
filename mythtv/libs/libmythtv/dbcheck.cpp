@@ -2744,6 +2744,26 @@ NULL
             return false;
     }
 
+    if (dbver == "1328")
+    {
+        const char *updates[] = {
+            "ALTER TABLE recordedfile "
+            "DROP KEY `chanid`, "
+            "DROP COLUMN `chanid`, "
+            "DROP COLUMN `starttime`;",
+            "ALTER TABLE recordedfile "
+            "ADD COLUMN recordedid int(10) unsigned NOT NULL, "
+            "ADD UNIQUE KEY `recordedid` (recordedid);",
+            "ALTER TABLE recordedfile "
+            "CHANGE audio_type audio_codec varchar(255) NOT NULL DEFAULT '';"
+            "ALTER TABLE recordedfile "
+            "CHANGE video_type video_codec varchar(255) NOT NULL DEFAULT '';",
+            NULL
+        };
+        if (!performActualUpdate(updates, "1329", dbver))
+            return false;
+    }
+
     return true;
 }
 

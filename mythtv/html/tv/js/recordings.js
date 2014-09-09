@@ -1,48 +1,46 @@
 
-function recordingDeleted(chanID, startTime, unDeleted)
+function recordingDeleted(recordedId, unDeleted)
 {
-    var id = chanID + "_" + startTime + "_row";
+    var id = recordedId + "_row";
+    console.log("Recording Deleted: " + id);
     $(jq(id)).hide('slide',{direction:'left'},1000);
 }
 
-function deleteRecording(chanID, recStartTime, allowRerecord, forceDelete)
+function deleteRecording(recordedId, allowRerecord, forceDelete)
 {
     hideMenu("optMenu");
     $("#wastebin").show();
 
     var reRecord = allowRerecord ? 1 : 0;
     var force = forceDelete ? 1 : 0;
-    var url = "/tv/ajax_backends/dvr_util.qsp?_action=deleteRecording&chanID=" + chanID + "&startTime=" + recStartTime +
+    var url = "/tv/ajax_backends/dvr_util.qsp?_action=deleteRecording&RecordedId=" + recordedId +
               "&allowRerecord=" + reRecord + "&forceDelete=" + force;
     var ajaxRequest = $.ajax( url )
                             .done(function()
                             {
-                                var response = ajaxRequest.responseText.split("#");
-                                recordingDeleted( response[0], response[1], false );
+                                recordingDeleted( ajaxRequest.responseText, false );
                             });
 }
 
-function unDeleteRecording(chanID, startTime)
+function unDeleteRecording(recordedId)
 {
     hideMenu("optMenu");
 
-    var url = "/tv/ajax_backends/dvr_util.qsp?_action=unDeleteRecording&chanID=" + chanID + "&startTime=" + recStartTime;
+    var url = "/tv/ajax_backends/dvr_util.qsp?_action=unDeleteRecording&RecordedId=" + recordedId;
     var ajaxRequest = $.ajax( url )
                             .done(function()
                             {
-                                var response = ajaxRequest.responseText.split("#");
-                                recordingDeleted( response[0], response[1], true );
+                                recordingDeleted( ajaxRequest.responseText, true );
                             });
 }
 
-function playInBrowser(chanID, recStartTime)
+function playInBrowser(recordedId)
 {
-    loadContent("/tv/tvplayer.qsp?ChanId=" + chanID + "&StartTime=" + recStartTime);
+    loadContent("/tv/tvplayer.qsp?RecordedId=" + recordedId);
 }
 
-function playOnFrontend(chanID, recStartTime, ip)
+function playOnFrontend(recordedId, ip)
 {
-    var surl = "http://" + ip + ":6547/Frontend/PlayRecording?ChanID=" + chanID +
-            "&StartTime=" + recStartTime;
+    var surl = "http://" + ip + ":6547/Frontend/PlayRecording?RecordedId=" + recordedId;
     $.ajax({ url: surl, type: 'POST' });
 }

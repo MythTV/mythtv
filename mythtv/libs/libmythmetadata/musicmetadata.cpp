@@ -289,6 +289,12 @@ MusicMetadata *MusicMetadata::createFromID(int trackid)
         mdata->m_filename = query.value(17).toString();
         mdata->m_hostname = query.value(18).toString();
 
+        if (!QHostAddress(mdata->m_hostname).isNull()) // A bug caused an IP to replace hostname, reset and it will fix itself
+        {
+            mdata->m_hostname = "";
+            mdata->saveHostname();
+        }
+
         return mdata;
     }
 
@@ -803,7 +809,8 @@ QString MusicMetadata::Filename(bool find)
         m_actualFilename = mythUrl;
 
         QUrl url(mythUrl);
-        if (url.host() != m_hostname)
+        if (url.host() != m_hostname &&
+            QHostAddress(url.host()).isNull()) // Check that it's not an IP address
         {
             m_hostname = url.host();
             saveHostname();
@@ -1095,9 +1102,7 @@ QString MusicMetadata::getAlbumArtFile(void)
                 return QString("");
             }
 
-            QString sUrl = RemoteFile::FindFile(url.path(), url.host(), url.userName());
-
-            if (sUrl.isEmpty())
+            if (!RemoteFile::Exists(res))
             {
                 if (albumart_image->embedded)
                 {

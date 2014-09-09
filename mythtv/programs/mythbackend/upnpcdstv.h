@@ -19,41 +19,69 @@
 
 class UPnpCDSTv : public UPnpCDSExtension
 {
-    private:
+    public:
 
-        static UPnpCDSRootInfo g_RootNodes[];
-        static int             g_nRootCount;
-
-        QStringMap             m_mapBackendIp;
-        QMap<QString, int>     m_mapBackendPort;
+        UPnpCDSTv();
+        virtual ~UPnpCDSTv() {}
 
     protected:
 
         virtual bool             IsBrowseRequestForUs( UPnpCDSRequest *pRequest );
         virtual bool             IsSearchRequestForUs( UPnpCDSRequest *pRequest );
 
-        virtual UPnpCDSRootInfo *GetRootInfo   (int nIdx);
-        virtual int              GetRootCount  ( );
-        virtual QString          GetTableName  ( QString sColumn );
-        virtual QString          GetItemListSQL( QString sColumn = "" );
+        virtual void             CreateRoot ( );
 
-        virtual void             BuildItemQuery( MSqlQuery        &query,
-                                                 const QStringMap &mapParams );
+        virtual bool             LoadMetadata( const UPnpCDSRequest *pRequest,
+                                                UPnpCDSExtensionResults *pResults,
+                                                IDTokenMap tokens,
+                                                QString currentToken );
+        virtual bool             LoadChildren( const UPnpCDSRequest *pRequest,
+                                               UPnpCDSExtensionResults *pResults,
+                                               IDTokenMap tokens,
+                                               QString currentToken );
 
-        virtual void             AddItem( const UPnpCDSRequest    *pRequest, 
-                                          const QString           &sObjectId,
-                                          UPnpCDSExtensionResults *pResults,
-                                          bool                     bAddRef,
-                                          MSqlQuery               &query );
+    private:
+        bool  LoadRecordings ( const UPnpCDSRequest *pRequest,
+                               UPnpCDSExtensionResults *pResults,
+                               IDTokenMap tokens );
+        bool  LoadTitles     ( const UPnpCDSRequest *pRequest,
+                               UPnpCDSExtensionResults *pResults,
+                               IDTokenMap tokens );
+        bool  LoadDates      ( const UPnpCDSRequest *pRequest,
+                               UPnpCDSExtensionResults *pResults,
+                               IDTokenMap tokens );
+        bool  LoadGenres     ( const UPnpCDSRequest *pRequest,
+                               UPnpCDSExtensionResults *pResults,
+                               IDTokenMap tokens );
+        bool  LoadChannels   ( const UPnpCDSRequest *pRequest,
+                               UPnpCDSExtensionResults *pResults,
+                               IDTokenMap tokens );
+        bool  LoadRecGroups  ( const UPnpCDSRequest *pRequest,
+                               UPnpCDSExtensionResults *pResults,
+                               IDTokenMap tokens );
+        bool  LoadMovies     ( const UPnpCDSRequest *pRequest,
+                               UPnpCDSExtensionResults *pResults,
+                               IDTokenMap tokens );
+//         bool  LoadSeasons    ( const UPnpCDSRequest *pRequest,
+//                                UPnpCDSExtensionResults *pResults,
+//                                IDTokenMap tokens );
+//         bool  LoadEpisodes   ( const UPnpCDSRequest *pRequest,
+//                                UPnpCDSExtensionResults *pResults,
+//                                IDTokenMap tokens );
 
-    public:
+        void PopulateArtworkURIS( CDSObject *pItem, const QString &sInetRef,
+                                  int nSeason, const QUrl &URIBase );
 
-        UPnpCDSTv( ) : UPnpCDSExtension( "Recordings", "RecTv",
-                                         "object.item.videoItem" )
-        {
-        }
+        // Common code helpers
+        QString BuildWhereClause( QStringList clauses,
+                                  IDTokenMap tokens );
+        void    BindValues ( MSqlQuery &query,
+                             IDTokenMap tokens );
 
-        virtual ~UPnpCDSTv() {}
+        QUrl                   m_URIBase;
+
+        QStringMap             m_mapBackendIp;
+        QMap<QString, int>     m_mapBackendPort;
 };
 
 #endif

@@ -64,12 +64,12 @@ class MpegRecorder : public V4LRecorder,
     uint GetFilteredAudioLayer(void) const;
     uint GetFilteredAudioBitRate(uint audio_layer) const;
 
-    void RestartEncoding(void);
+    bool RestartEncoding(void);
     bool StartEncoding(void);
     void StopEncoding(void);
 
     void SetBitrate(int bitrate, int maxbitrate, const QString & reason);
-    void HandleResolutionChanges(void);
+    bool HandleResolutionChanges(void);
 
     virtual void FormatCC(uint code1, uint code2); // RecorderBase
 

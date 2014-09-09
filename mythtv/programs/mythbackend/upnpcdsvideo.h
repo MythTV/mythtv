@@ -22,44 +22,62 @@ typedef QMap<int, QString> IntMap;
 
 class UPnpCDSVideo : public UPnpCDSExtension
 {
-    private:
+    public:
 
-        static UPnpCDSRootInfo g_RootNodes[];
-        static int             g_nRootCount;
-
-        QStringMap             m_mapBackendIp;
-        QMap<QString, int>     m_mapBackendPort;
+        UPnpCDSVideo( );
+        virtual ~UPnpCDSVideo() {}
 
     protected:
 
         virtual bool             IsBrowseRequestForUs( UPnpCDSRequest *pRequest );
         virtual bool             IsSearchRequestForUs( UPnpCDSRequest *pRequest );
 
-        virtual UPnpCDSRootInfo *GetRootInfo   (int nIdx);
-        virtual int              GetRootCount  ( );
-        virtual QString          GetTableName  ( QString sColumn );
-        virtual QString          GetItemListSQL( QString sColumn = "");
+        virtual void             CreateRoot ( );
 
-        virtual void             BuildItemQuery( MSqlQuery        &query, 
-                                                 const QStringMap &mapParams );
+        virtual bool             LoadMetadata( const UPnpCDSRequest *pRequest,
+                                                UPnpCDSExtensionResults *pResults,
+                                                IDTokenMap tokens,
+                                                QString currentToken );
+        virtual bool             LoadChildren( const UPnpCDSRequest *pRequest,
+                                               UPnpCDSExtensionResults *pResults,
+                                               IDTokenMap tokens,
+                                               QString currentToken );
+    private:
+        bool LoadSeries( const UPnpCDSRequest *pRequest,
+                     UPnpCDSExtensionResults *pResults,
+                     IDTokenMap tokens );
 
-        virtual void             AddItem( const UPnpCDSRequest    *pRequest, 
-                                          const QString           &sObjectId,
-                                          UPnpCDSExtensionResults *pResults,
-                                          bool                     bAddRef, 
-                                          MSqlQuery               &query );
+        bool LoadSeasons( const UPnpCDSRequest *pRequest,
+                          UPnpCDSExtensionResults *pResults,
+                          IDTokenMap tokens );
 
-        virtual CDSObject       *CreateContainer( const QString &sId,
-                                                  const QString &sTitle,
-                                                  const QString &sParentId,
-                                                  const QString &sClass );
-    public:
+        bool LoadMovies( const UPnpCDSRequest *pRequest,
+                         UPnpCDSExtensionResults *pResults,
+                         IDTokenMap tokens );
 
-        UPnpCDSVideo( ) : UPnpCDSExtension( "Videos", "Videos",
-                                            "object.item.videoItem" )
-        {
-        }
-        virtual ~UPnpCDSVideo() {}
+        bool LoadGenres( const UPnpCDSRequest *pRequest,
+                         UPnpCDSExtensionResults *pResults,
+                         IDTokenMap tokens );
+
+        bool LoadVideos( const UPnpCDSRequest *pRequest,
+                         UPnpCDSExtensionResults *pResults,
+                         IDTokenMap tokens );
+
+
+        void PopulateArtworkURIS( CDSObject *pItem, int nVideoId,
+                                  const QUrl &URIBase );
+
+        // Common code helpers
+        QString BuildWhereClause( QStringList clauses,
+                                  IDTokenMap tokens );
+        void    BindValues ( MSqlQuery &query,
+                             IDTokenMap tokens );
+
+        QStringMap             m_mapBackendIp;
+        QMap<QString, int>     m_mapBackendPort;
+
+        QUrl m_URIBase;
+
 };
 
 #endif

@@ -7,7 +7,7 @@
     <device>
         <!-- UDN auto generated -->
         <friendlyName>MythTV AV Media Server</friendlyName>
-        <deviceType>urn:schemas-upnp-org:device:MediaServer:1</deviceType>
+        <deviceType>urn:schemas-upnp-org:device:MediaServer:4</deviceType>
         <manufacturer>MythTV</manufacturer>
         <manufacturerURL>http://www.mythtv.org/</manufacturerURL>
         <modelName>MythTV AV Media Server</modelName>
@@ -15,7 +15,8 @@
         <modelDescription>MythTV AV Media Server</modelDescription>
         <modelURL>http://www.mythtv.org/</modelURL>
         <presentationURL>/</presentationURL>
-        <dlna:X_DLNADOC xmlns:dlna="urn:schemas-dlna-org:device-1-0">DMS-1.00</dlna:X_DLNADOC>
+        <dlna:X_DLNADOC xmlns:dlna="urn:schemas-dlna-org:device-1-0">DMS-1.51</dlna:X_DLNADOC>
+        <dlna:X_DLNACAP xmlns:dlna="urn:schemas-dlna-org:device-1-0"></dlna:X_DLNACAP>
         <!-- uncomment to override defaults <serialNumber>MYTHTV-UPNP-01</serialNumber> -->
         <deviceList>
             <device>

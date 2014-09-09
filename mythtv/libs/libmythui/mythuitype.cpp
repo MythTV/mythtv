@@ -1055,12 +1055,14 @@ void MythUIType::UpdateDependState(MythUIType *dependee, bool isDefault)
         }
     }
 
-    visible = m_dependsValue[0].second;
+    if (m_dependsValue.size() > 0)
+        visible = m_dependsValue[0].second;
     for (int i = 1; i <  m_dependsValue.size(); i++)
     {
         bool v = m_dependsValue[i].second;
 
-        if (m_dependOperator[i-1] == 1)
+        if (((i-1) < m_dependOperator.size()) &&
+            m_dependOperator[i-1] == 1)
         {
             // OR operator
             visible = visible && v;

@@ -44,7 +44,7 @@ class SERVICE_PUBLIC FrontendServices : public Service
     virtual bool                 SendAction(const QString &Action,
                                             const QString &Value,
                                             uint Width, uint Height) = 0;
-    virtual bool                 PlayRecording(int ChanId,
+    virtual bool                 PlayRecording(int RecordedId, int ChanId,
                                                const QDateTime &StartTime) = 0;
     virtual bool                 PlayVideo(const QString &Id,
                                            bool  UseBookmark) = 0;

@@ -113,7 +113,7 @@ class MTV_PUBLIC StreamID
         MPEG2Video     = 0x02, ///< ISO 13818-2 & ITU H.262 (aka MPEG-2)
         MPEG4Video     = 0x10, ///< ISO 14492-2 (aka MPEG-4)
         H264Video      = 0x1b, ///< ISO 14492-10 & ITU H.264 (aka MPEG-4-AVC)
-        OpenCableVideo = 0x80,
+        OpenCableVideo = 0x80, ///< Always MPEG-2??
         VC1Video       = 0xea, ///< SMPTE 421M video codec (aka VC1) in Blu-Ray
 
         // audio

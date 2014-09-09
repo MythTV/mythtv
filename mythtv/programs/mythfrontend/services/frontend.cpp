@@ -11,6 +11,7 @@
 #include "mythuihelper.h"
 #include "mythmainwindow.h"
 #include "tv_play.h"
+#include <recordinginfo.h>
 
 #include "videometadatalistmanager.h"
 #include "videometadata.h"
@@ -115,14 +116,20 @@ bool Frontend::SendAction(const QString &Action, const QString &Value,
     return true;
 }
 
-bool Frontend::PlayRecording(int ChanID, const QDateTime &StartTime)
+bool Frontend::PlayRecording(int RecordedId, int ChanId,
+                             const QDateTime &StartTime)
 {
     QDateTime starttime = StartTime;
 
-    if (!starttime.isValid() || ChanID <= 0)
+    if ((RecordedId <= 0) &&
+        (ChanId <= 0 || !StartTime.isValid()))
+        throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
+
+    if (RecordedId > 0)
     {
-        LOG(VB_GENERAL, LOG_WARNING, LOC + "Invalid parameters.");
-        return false;
+        RecordingInfo recInfo = RecordingInfo(RecordedId);
+        ChanId = recInfo.GetChanID();
+        starttime = recInfo.GetRecordingStartTime();
     }
 
     if (GetMythUI()->GetCurrentLocation().toLower() == "playback")
@@ -158,10 +165,10 @@ bool Frontend::PlayRecording(int ChanID, const QDateTime &StartTime)
     {
         LOG(VB_GENERAL, LOG_INFO, LOC +
             QString("PlayRecording, ChanID: %1 StartTime: %2")
-            .arg(ChanID).arg(starttime.toString(Qt::ISODate)));
+            .arg(ChanId).arg(starttime.toString(Qt::ISODate)));
 
         QString message = QString("NETWORK_CONTROL PLAY PROGRAM %1 %2 %3")
-            .arg(ChanID)
+            .arg(ChanId)
             .arg(starttime.toString("yyyyMMddhhmmss"))
             .arg("12345");
 

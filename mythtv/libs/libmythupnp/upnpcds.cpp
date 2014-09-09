@@ -12,12 +12,14 @@
 
 #include <cmath>
 #include <algorithm>
+#include <stdint.h>
 using namespace std;
 
 #include "upnp.h"
 #include "upnpcds.h"
 #include "upnputil.h"
 #include "mythlogging.h"
+#include "mythversion.h"
 
 #define DIDL_LITE_BEGIN "<DIDL-Lite xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\" xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\">"
 #define DIDL_LITE_END   "</DIDL-Lite>";
@@ -29,7 +31,24 @@ using namespace std;
 void UPnpCDSExtensionResults::Add( CDSObject *pObject )
 {
     if (pObject)
+    {
+        pObject->IncrRef();
         m_List.append( pObject );
+    }
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+void UPnpCDSExtensionResults::Add( CDSObjects objects )
+{
+    CDSObjects::iterator it;
+    for (it = objects.begin(); it != objects.end(); ++it)
+    {
+        (*it)->IncrRef();
+        m_List.append( *it );
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -54,25 +73,34 @@ QString UPnpCDSExtensionResults::GetResultXML(FilterMap &filter)
 UPnpCDS::UPnpCDS( UPnpDevice *pDevice, const QString &sSharePath )
   : Eventing( "UPnpCDS", "CDS_Event", sSharePath )
 {
-    m_root.m_eType      = OT_Container;
-    m_root.m_sId        = "0";
-    m_root.m_sParentId  = "-1";
-    m_root.m_sTitle     = "MythTV";
-    m_root.m_sClass     = "object.container";
-    m_root.m_bRestricted= true;
-    m_root.m_bSearchable= true;
+    m_root.m_eType       = OT_Container;
+    m_root.m_sId         = "0";
+    m_root.m_sParentId   = "-1";
+    m_root.m_sTitle      = "MythTV";
+    m_root.m_sClass      = "object.container";
+    m_root.m_bRestricted = true;
+    m_root.m_bSearchable = true;
 
     AddVariable( new StateVariable< QString        >( "TransferIDs"       , true ) );
     AddVariable( new StateVariable< QString        >( "ContainerUpdateIDs", true ) );
-    AddVariable( new StateVariable< unsigned short >( "SystemUpdateID"    , true ) );
+    AddVariable( new StateVariable< uint16_t >( "SystemUpdateID"    , true ) );
+    AddVariable( new StateVariable< QString  >( "ServiceResetToken" , true ) );
 
-    SetValue< unsigned short >( "SystemUpdateID", 1 );
+    SetValue< uint16_t >( "SystemUpdateID", 0 );
+    // ServiceResetToken must be unique (never repeat) and it must change when
+    // the backend restarts (all internal state is reset)
+    //
+    // The current date + time fits the criteria.
+    SetValue< QString  >( "ServiceResetToken",
+                          QDateTime::currentDateTimeUtc().toString(Qt::ISODate) );
 
     QString sUPnpDescPath = UPnp::GetConfiguration()->GetValue( "UPnP/DescXmlPath", sSharePath );
 
     m_sServiceDescFileName = sUPnpDescPath + "CDS_scpd.xml";
     m_sControlUrl          = "/CDS_Control";
 
+    m_pShortCuts = new UPnPCDSShortcuts();
+    RegisterFeature(m_pShortCuts);
 
     // Add our Service Definition to the device.
 
@@ -85,10 +113,9 @@ UPnpCDS::UPnpCDS( UPnpDevice *pDevice, const QString &sSharePath )
 
 UPnpCDS::~UPnpCDS()
 {
-    while (!m_extensions.empty())
+    while (!m_extensions.isEmpty())
     {
-        delete m_extensions.back();
-        m_extensions.pop_back();
+        delete m_extensions.takeLast();
     }
 }
 
@@ -104,6 +131,8 @@ UPnpCDSMethod UPnpCDS::GetMethod( const QString &sURI )
     if (sURI == "GetSearchCapabilities" ) return CDSM_GetSearchCapabilities;
     if (sURI == "GetSortCapabilities"   ) return CDSM_GetSortCapabilities  ;
     if (sURI == "GetSystemUpdateID"     ) return CDSM_GetSystemUpdateID    ;
+    if (sURI == "GetFeatureList"        ) return CDSM_GetFeatureList       ;
+    if (sURI == "GetServiceResetToken"  ) return CDSM_GetServiceResetToken ;
 
     return(  CDSM_Unknown );
 }
@@ -126,8 +155,17 @@ UPnpCDSBrowseFlag UPnpCDS::GetBrowseFlag( const QString &sFlag )
 
 void UPnpCDS::RegisterExtension  ( UPnpCDSExtension *pExtension )
 {
-    if (pExtension != NULL )
+    if (pExtension)
+    {
         m_extensions.append( pExtension );
+
+        CDSShortCutList shortcuts = pExtension->GetShortCuts();
+        CDSShortCutList::iterator it;
+        for (it = shortcuts.begin(); it != shortcuts.end(); ++it)
+        {
+            RegisterShortCut(it.key(), it.value());
+        }
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -138,9 +176,29 @@ void UPnpCDS::UnregisterExtension( UPnpCDSExtension *pExtension )
 {
     if (pExtension)
     {
-        delete pExtension;
         m_extensions.removeAll(pExtension);
+        delete pExtension;
+        pExtension = NULL;
     }
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+void UPnpCDS::RegisterShortCut(UPnPCDSShortcuts::ShortCutType type,
+                               const QString& objectID)
+{
+    m_pShortCuts->AddShortCut(type, objectID);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+void UPnpCDS::RegisterFeature(UPnPFeature* feature)
+{
+    m_features.AddFeature(feature); // m_features takes ownership
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -192,6 +250,12 @@ bool UPnpCDS::ProcessRequest( HTTPRequest *pRequest )
                 break;
             case CDSM_GetSystemUpdateID     :
                 HandleGetSystemUpdateID( pRequest );
+                break;
+            case CDSM_GetFeatureList        :
+                HandleGetFeatureList( pRequest );
+                break;
+            case CDSM_GetServiceResetToken  :
+                HandleGetServiceResetToken( pRequest );
                 break;
             default:
                 UPnp::FormatErrorResponse( pRequest, UPnPResult_InvalidAction );
@@ -297,18 +361,19 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
 
     DetermineClient( pRequest, &request );
     request.m_sObjectId         = pRequest->m_mapParams[ "objectid"      ];
-    request.m_sContainerID      = pRequest->m_mapParams[ "containerid"   ];
     request.m_sParentId         = "0";
     request.m_eBrowseFlag       =
         GetBrowseFlag( pRequest->m_mapParams[ "browseflag"    ] );
     request.m_sFilter           = pRequest->m_mapParams[ "filter"        ];
-    request.m_nStartingIndex    =
-        pRequest->m_mapParams[ "startingindex" ].toLong();
+    request.m_nStartingIndex    = Max(pRequest->m_mapParams[ "startingindex" ].toUShort(),
+                                      uint16_t(0));
     request.m_nRequestedCount   =
-        pRequest->m_mapParams[ "requestedcount"].toLong();
+        pRequest->m_mapParams[ "requestedcount"].toUShort();
+    if (request.m_nRequestedCount == 0)
+        request.m_nRequestedCount = UINT16_MAX;
     request.m_sSortCriteria     = pRequest->m_mapParams[ "sortcriteria"  ];
 
-#if 0
+
     LOG(VB_UPNP, LOG_DEBUG, QString("UPnpCDS::ProcessRequest \n"
                                     ": url            = %1 \n"
                                     ": Method         = %2 \n"
@@ -326,19 +391,18 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
                        .arg( request.m_nStartingIndex )
                        .arg( request.m_nRequestedCount)
                        .arg( request.m_sSortCriteria  ));
-#endif
 
     UPnPResultCode eErrorCode      = UPnPResult_CDS_NoSuchObject;
     QString        sErrorDesc      = "";
-    short          nNumberReturned = 0;
-    short          nTotalMatches   = 0;
-    short          nUpdateID       = 0;
+    uint16_t       nNumberReturned = 0;
+    uint16_t       nTotalMatches   = 0;
+    uint16_t       nUpdateID       = 0;
     QString        sResultXML;
-    FilterMap filter =  (FilterMap) request.m_sFilter.split(',');
+    FilterMap filter =  static_cast<FilterMap>(request.m_sFilter.split(','));
 
     LOG(VB_UPNP, LOG_INFO,
-        QString("UPnpCDS::HandleBrowse ObjectID=%1, ContainerId=%2")
-            .arg(request.m_sObjectId) .arg(request.m_sContainerID));
+        QString("UPnpCDS::HandleBrowse ObjectID=%1")
+            .arg(request.m_sObjectId));
 
     if (request.m_sObjectId == "0")
     {
@@ -360,6 +424,7 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
                 nUpdateID       = m_root.m_nUpdateId;
 
                 m_root.SetChildCount( m_extensions.count() );
+                m_root.SetChildContainerCount( m_extensions.count() );
 
                 sResultXML      = m_root.toXml(filter);
 
@@ -370,8 +435,6 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
             {
                 // Loop Through each extension and Build the Root Folders
 
-                // -=>TODO: Need to handle StartingIndex & RequestedCount
-
                 eErrorCode      = UPnPResult_Success;
                 nTotalMatches   = m_extensions.count();
                 nUpdateID       = m_root.m_nUpdateId;
@@ -379,18 +442,10 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
                 if (request.m_nRequestedCount == 0)
                     request.m_nRequestedCount = nTotalMatches;
 
-                short nStart = Max( request.m_nStartingIndex, short( 0 ));
-                short nCount = Min( nTotalMatches, request.m_nRequestedCount );
-
-                UPnpCDSRequest       childRequest;
+                uint16_t nStart = Max( request.m_nStartingIndex, uint16_t( 0 ));
+                uint16_t nCount = Min( nTotalMatches, request.m_nRequestedCount );
 
                 DetermineClient( pRequest, &request );
-                childRequest.m_sParentId         = "0";
-                childRequest.m_eBrowseFlag       = CDS_BrowseMetadata;
-                childRequest.m_sFilter           = "";
-                childRequest.m_nStartingIndex    = 0;
-                childRequest.m_nRequestedCount   = 1;
-                childRequest.m_sSortCriteria     = "";
 
                 for (uint i = nStart;
                      (i < (uint)m_extensions.size()) &&
@@ -398,20 +453,9 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
                      i++)
                 {
                     UPnpCDSExtension *pExtension = m_extensions[i];
-                    childRequest.m_sObjectId = pExtension->m_sExtensionId;
-
-                    pResult = pExtension->Browse( &childRequest );
-
-                    if (pResult != NULL)
-                    {
-                        if (pResult->m_eErrorCode == UPnPResult_Success)
-                        {
-                            sResultXML  += pResult->GetResultXML(filter);
-                            nNumberReturned ++;
-                        }
-
-                        delete pResult;
-                    }
+                    CDSObject* pExtensionRoot = pExtension->GetRoot();
+                    sResultXML += pExtensionRoot->toXml(filter, true); // Ignore Children
+                    nNumberReturned ++;
                 }
 
                 break;
@@ -449,6 +493,7 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
             }
 
             delete pResult;
+            pResult = NULL;
         }
     }
 
@@ -487,9 +532,9 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
 
     UPnPResultCode eErrorCode      = UPnPResult_InvalidAction;
     QString       sErrorDesc      = "";
-    short         nNumberReturned = 0;
-    short         nTotalMatches   = 0;
-    short         nUpdateID       = 0;
+    uint16_t         nNumberReturned = 0;
+    uint16_t         nTotalMatches   = 0;
+    uint16_t         nUpdateID       = 0;
     QString       sResultXML;
 
     DetermineClient( pRequest, &request );
@@ -591,6 +636,7 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
         }
 
         delete pResult;
+        pResult = NULL;
     }
 
 #if 0
@@ -616,9 +662,11 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
         UPnp::FormatErrorResponse( pRequest, eErrorCode, sErrorDesc );
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
+/**
+ *  \brief Return the list of supported search fields
+ *
+ *  Currently no searching is supported.
+ */
 
 void UPnpCDS::HandleGetSearchCapabilities( HTTPRequest *pRequest )
 {
@@ -630,16 +678,21 @@ void UPnpCDS::HandleGetSearchCapabilities( HTTPRequest *pRequest )
 
     // -=>TODO: Need to implement based on CDS Extension Capabilities
 
+//     list.push_back(
+//         NameValue("SearchCaps",
+//                   "dc:title,dc:creator,dc:date,upnp:class,res@size,"
+//                   "res@protocolInfo","@refID"));
     list.push_back(
-        NameValue("SearchCaps",
-                  "dc:title,dc:creator,dc:date,upnp:class,res@size"));
+        NameValue("SearchCaps","")); // We don't support any searching
 
     pRequest->FormatActionResponse(list);
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
+/**
+ *  \brief Return the list of supported sorting fields
+ *
+ *  Currently no sorting is supported.
+ */
 
 void UPnpCDS::HandleGetSortCapabilities( HTTPRequest *pRequest )
 {
@@ -651,9 +704,12 @@ void UPnpCDS::HandleGetSortCapabilities( HTTPRequest *pRequest )
 
     // -=>TODO: Need to implement based on CDS Extension Capabilities
 
+//     list.push_back(
+//         NameValue("SortCaps",
+//                   "dc:title,dc:creator,dc:date,upnp:class,res@size,"
+//                   "res@protocolInfo,@refID"));
     list.push_back(
-        NameValue("SortCaps",
-                  "dc:title,dc:creator,dc:date,upnp:class,res@size"));
+        NameValue("SortCaps","")); // We don't support any sorting
 
     pRequest->FormatActionResponse(list);
 }
@@ -670,14 +726,45 @@ void UPnpCDS::HandleGetSystemUpdateID( HTTPRequest *pRequest )
         QString("UPnpCDS::ProcessRequest : %1 : %2")
             .arg(pRequest->m_sBaseUrl) .arg(pRequest->m_sMethod));
 
-    unsigned short nId = GetValue<unsigned short>("SystemUpdateID");
+    uint16_t nId = GetValue<uint16_t>("SystemUpdateID");
 
     list.push_back(NameValue("Id", nId));
 
     pRequest->FormatActionResponse(list);
 }
 
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
 
+void UPnpCDS::HandleGetFeatureList(HTTPRequest* pRequest)
+{
+    NameValues list;
+    LOG(VB_UPNP, LOG_INFO,
+        QString("UPnpCDS::ProcessRequest : %1 : %2")
+            .arg(pRequest->m_sBaseUrl) .arg(pRequest->m_sMethod));
+
+    QString sResults = m_features.toXML();
+
+    list.push_back(NameValue("FeatureList", sResults));
+
+    pRequest->FormatActionResponse(list);
+}
+
+void UPnpCDS::HandleGetServiceResetToken(HTTPRequest* pRequest)
+{
+    NameValues list;
+
+    LOG(VB_UPNP, LOG_INFO,
+        QString("UPnpCDS::ProcessRequest : %1 : %2")
+            .arg(pRequest->m_sBaseUrl) .arg(pRequest->m_sMethod));
+
+    QString sToken = GetValue<QString>("ServiceResetToken");
+
+    list.push_back(NameValue("ResetToken", sToken));
+
+    pRequest->FormatActionResponse(list);
+}
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -687,6 +774,15 @@ void UPnpCDS::HandleGetSystemUpdateID( HTTPRequest *pRequest )
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
+UPnpCDSExtension::~UPnpCDSExtension()
+{
+    if (m_pRoot)
+    {
+        m_pRoot->DecrRef();
+        m_pRoot = NULL;
+    }
+}
+
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
@@ -695,6 +791,8 @@ bool UPnpCDSExtension::IsBrowseRequestForUs( UPnpCDSRequest *pRequest )
 {
     if (!pRequest->m_sObjectId.startsWith(m_sExtensionId, Qt::CaseSensitive))
         return false;
+
+    LOG(VB_UPNP, LOG_INFO, QString("%1: Browse request is for us.").arg(m_sExtensionId));
 
     return true;
 }
@@ -706,22 +804,21 @@ bool UPnpCDSExtension::IsBrowseRequestForUs( UPnpCDSRequest *pRequest )
 UPnpCDSExtensionResults *UPnpCDSExtension::Browse( UPnpCDSRequest *pRequest )
 {
     // -=>TODO: Need to add Filter & Sorting Support.
-    // -=>TODO: Need to add Sub-Folder/Category Support!!!!!
 
     if (!IsBrowseRequestForUs( pRequest ))
         return( NULL );
 
     // ----------------------------------------------------------------------
-    // Parse out request object's path
+    // Split the request ID into token key/value
+    //
+    //   Music/Artist=123/Album=15
+    //   Music/Genre=32/Artist=616/Album=13/Track=2632
     // ----------------------------------------------------------------------
+    IDTokenMap tokens = TokenizeIDString(pRequest->m_sObjectId);
+    QString currentToken = GetCurrentToken(pRequest->m_sObjectId).first;
 
-    QStringList idPath = pRequest->m_sObjectId.section('=',0,0)
-                             .split("/", QString::SkipEmptyParts);
-
-    QString key = pRequest->m_sObjectId.section('=',1);
-
-    if (idPath.isEmpty())
-        return( NULL );
+    LOG(VB_UPNP, LOG_DEBUG, QString("Browse (%1): Current Token '%2'")
+                                .arg(m_sExtensionId).arg(currentToken));
 
     // ----------------------------------------------------------------------
     // Process based on location in hierarchy
@@ -731,45 +828,34 @@ UPnpCDSExtensionResults *UPnpCDSExtension::Browse( UPnpCDSRequest *pRequest )
 
     if (pResults != NULL)
     {
-        if (!key.isEmpty())
-            idPath.last().append(QString("=%1").arg(key));
-        else
-        {
-            if (pRequest->m_sObjectId.contains("item"))
-            {
-                idPath.removeLast();
-                idPath = idPath.last().split(" ", QString::SkipEmptyParts);
-                idPath = idPath.first().split('?', QString::SkipEmptyParts);
+        pRequest->m_sParentId = pRequest->m_sObjectId;
 
-                if (idPath[0].startsWith(QString("Id")))
-                    idPath[0] = QString("item=%1")
-                                 .arg(idPath[0].right(idPath[0].length() - 2));
+        switch( pRequest->m_eBrowseFlag )
+        {
+            case CDS_BrowseMetadata:
+            {
+                if (pRequest->m_nRequestedCount == 0)
+                    pRequest->m_nRequestedCount = 1; // This should be the case anyway, but enforce it just in case
+
+                LOG(VB_UPNP, LOG_DEBUG, "UPnpCDS::Browse: BrowseMetadata");
+                if (LoadMetadata(pRequest, pResults, tokens, currentToken))
+                    return pResults;
+            }
+
+            case CDS_BrowseDirectChildren:
+            {
+                LOG(VB_UPNP, LOG_DEBUG, "UPnpCDS::Browse: BrowseDirectChildren");
+                if (LoadChildren(pRequest, pResults, tokens, currentToken))
+                    return pResults;
+            }
+
+            default:
+            {
+                pResults->m_eErrorCode = UPnPResult_CDS_NoSuchObject;
+                pResults->m_sErrorDesc = "";
             }
         }
 
-        QString sLast = idPath.last();
-
-        pRequest->m_sParentId = pRequest->m_sObjectId;
-
-        if (sLast == m_sExtensionId)
-            return ProcessRoot(pRequest, pResults, idPath);
-
-        if (sLast == "0")
-            return ProcessAll(pRequest, pResults, idPath);
-
-        if (sLast.startsWith(QString("key") , Qt::CaseSensitive))
-            return ProcessKey(pRequest, pResults, idPath);
-
-        if (sLast.startsWith(QString("item"), Qt::CaseSensitive))
-            return ProcessItem(pRequest, pResults, idPath);
-
-        int nNodeIdx = sLast.toInt();
-
-        if ((nNodeIdx > 0) && (nNodeIdx < GetRootCount()))
-            return ProcessContainer(pRequest, pResults, nNodeIdx, idPath);
-
-        pResults->m_eErrorCode = UPnPResult_CDS_NoSuchObject;
-        pResults->m_sErrorDesc = "";
     }
 
     return( pResults );
@@ -813,7 +899,7 @@ UPnpCDSExtensionResults *UPnpCDSExtension::Search( UPnpCDSRequest *pRequest )
 
     UPnpCDSExtensionResults *pResults = new UPnpCDSExtensionResults();
 
-    CreateItems( pRequest, pResults, 0, "", false );
+//    CreateItems( pRequest, pResults, 0, "", false );
 
     return pResults;
 }
@@ -840,577 +926,268 @@ QString UPnpCDSExtension::RemoveToken( const QString &sToken,
     return sResult;
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-UPnpCDSExtensionResults *
-    UPnpCDSExtension::ProcessRoot( UPnpCDSRequest          *pRequest,
-                                   UPnpCDSExtensionResults *pResults,
-                                   QStringList             &/*idPath*/ )
+/**
+ *  \brief Fetch just the metadata for the item identified in the request
+ *
+ *  This is the 'BrowseMetadata' request type.
+ *
+ *  The ID may refer to a container or an object.
+ *
+ *  \arg pRequest The request object to read the id from
+ *  \arg pResults The result object to write into
+ *
+ *  \return true if we could load the metadata
+ *
+ */
+bool UPnpCDSExtension::LoadMetadata(const UPnpCDSRequest* pRequest,
+                                     UPnpCDSExtensionResults* pResults,
+                                     IDTokenMap tokens, QString currentToken)
 {
-    pResults->m_nTotalMatches   = 0;
-    pResults->m_nUpdateID       = 1;
-
-    short nRootCount = GetRootCount();
-
-    switch( pRequest->m_eBrowseFlag )
-    {
-        case CDS_BrowseMetadata:
-        {
-            // --------------------------------------------------------------
-            // Return Root Object Only
-            // --------------------------------------------------------------
-
-            pResults->m_nTotalMatches   = 1;
-            pResults->m_nUpdateID       = 1;
-
-            CDSObject *pRoot = CreateContainer( m_sExtensionId, m_sName, "0", "");
-
-            pRoot->SetChildCount( nRootCount );
-
-            pResults->Add( pRoot );
-
-            break;
-        }
-
-        case CDS_BrowseDirectChildren:
-        {
-            LOG(VB_UPNP, LOG_DEBUG, "CDS_BrowseDirectChildren");
-            pResults->m_nUpdateID     = 1;
-            pResults->m_nTotalMatches = nRootCount ;
-
-            if ( pRequest->m_nRequestedCount == 0)
-                pRequest->m_nRequestedCount = nRootCount ;
-
-            short nStart = max(pRequest->m_nStartingIndex, short(0));
-            short nEnd   = min(nRootCount,
-                               short(nStart + pRequest->m_nRequestedCount));
-
-            if (nStart < nRootCount)
-            {
-                for (short nIdx = nStart; nIdx < nEnd; nIdx++)
-                {
-                    UPnpCDSRootInfo *pInfo = GetRootInfo( nIdx );
-                    if (pInfo != NULL)
-                    {
-                        QString sId = QString("%1/%2")
-                                          .arg(pRequest->m_sObjectId)
-                                          .arg(nIdx);
-
-                        CDSObject *pItem = CreateContainer( sId,
-                                                     QObject::tr( pInfo->title ), // FIXME: This translate call won't do anything
-                                                     m_sExtensionId,
-                                                     pInfo->containerClass );
-
-                        pItem->SetChildCount( GetDistinctCount( pInfo ) );
-
-                        pResults->Add( pItem );
-                    }
-                }
-            }
-        }
-
-        case CDS_BrowseUnknown:
-        default:
-            break;
-    }
-
-    return pResults;
+    return false;
 }
 
 
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-UPnpCDSExtensionResults *
-    UPnpCDSExtension::ProcessAll ( UPnpCDSRequest          *pRequest,
-                                   UPnpCDSExtensionResults *pResults,
-                                   QStringList             &/*idPath*/ )
+/**
+ *  \brief Fetch the children of the container identified in the request
+ *
+ *  This is the 'BrowseDirectChildren' request type.
+ *
+ *  The ID may only refer to a container.
+ *
+ *  \arg pRequest The request object to read the id from
+ *  \arg pResults The result object to write into
+ *
+ *  \return true if we could load the children
+ *
+ */
+bool UPnpCDSExtension::LoadChildren(const UPnpCDSRequest* pRequest,
+                                    UPnpCDSExtensionResults* pResults,
+                                    IDTokenMap tokens, QString currentToken)
 {
-    pResults->m_nTotalMatches   = 0;
-    pResults->m_nUpdateID       = 1;
+    return false;
+}
 
-    // ----------------------------------------------------------------------
-    //
-    // ----------------------------------------------------------------------
+/**
+ *  \brief Split the 'Id' String up into tokens for handling by each extension
+ *
+ *  Some example strings:
+ *
+ *      Recordings/RecGroup=3/Date=1380844800 (2013-10-04 in 'epoch' form)
+ *      Video/Genre=10
+ *      Music/Artist=123/Album=15
+ *      Music/Genre=32/Artist=616/Album=13/Track=2632
+ *
+ *  Special case where we only care about the last token:
+ *
+ *      Video/Directory=45/Directory=63/Directory=82
+ */
+IDTokenMap UPnpCDSExtension::TokenizeIDString(const QString& Id) const
+{
+    IDTokenMap tokenMap;
 
-    switch( pRequest->m_eBrowseFlag )
+    QStringList tokens = Id.split('/');
+
+    QStringList::iterator it;
+    for (it = tokens.begin() + 1; it < tokens.end(); ++it) // Skip the 'root' token
     {
-        case CDS_BrowseMetadata:
-        {
-            // --------------------------------------------------------------
-            // Return Container Object Only
-            // --------------------------------------------------------------
 
-            UPnpCDSRootInfo *pInfo = GetRootInfo( 0 );
+        QString key = (*it).section('=', 0, 0).toLower();
+        QString value = (*it).section('=', 1, 1);
 
-            if (pInfo != NULL)
-            {
-                pResults->m_nTotalMatches   = 1;
-                pResults->m_nUpdateID       = 1;
-
-                CDSObject *pItem =
-                    CreateContainer( pRequest->m_sObjectId,
-                                     QObject::tr( pInfo->title ),
-                                     m_sExtensionId,
-                                     pInfo->containerClass );
-
-                pItem->SetChildCount( GetDistinctCount( pInfo ) );
-
-                pResults->Add( pItem );
-            }
-
-            break;
-        }
-
-        case CDS_BrowseDirectChildren:
-        {
-            CreateItems( pRequest, pResults, 0, "", false );
-
-            break;
-        }
-
-        case CDS_BrowseUnknown:
-        default:
-            break;
+        tokenMap.insert(key, value);
+        LOG(VB_UPNP, LOG_DEBUG, QString("Token Key: %1 Value: %2").arg(key)
+                                                                  .arg(value));
     }
 
-    return pResults;
+    return tokenMap;
+}
+
+
+/**
+ *  \brief Split the 'Id' String up into tokens and return the last (current) token
+ *
+ *  Some example strings:
+ *
+ *      Recordings/RecGroup=3/Date=1380844800 (2013-10-04 in 'epoch' form)
+ *      Video/Genre=10
+ *      Music/Artist=123/Album=15
+ *      Music/Genre=32/Artist=616/Album=13/Track=2632
+ *
+ *  Special case where we only care about the last token:
+ *
+ *      Video/Directory=45/Directory=63/Directory=82
+ */
+IDToken UPnpCDSExtension::GetCurrentToken(const QString& Id) const
+{
+    QStringList tokens = Id.split('/');
+    QString current = tokens.last();
+    QString key = current.section('=', 0, 0).toLower();
+    QString value = current.section('=', 1, 1);
+
+    return IDToken(key, value);
+}
+
+
+void UPnpCDSExtension::CreateRoot()
+{
+    LOG(VB_GENERAL, LOG_CRIT, "UPnpCDSExtension::CreateRoot() called on base class");
+    m_pRoot = CDSObject::CreateContainer(m_sExtensionId,
+                                         m_sName,
+                                         "0");
+}
+
+CDSObject* UPnpCDSExtension::GetRoot()
+{
+    if (!m_pRoot)
+        CreateRoot();
+
+    return m_pRoot;
 }
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-UPnpCDSExtensionResults *
-    UPnpCDSExtension::ProcessItem(UPnpCDSRequest          *pRequest,
-                                  UPnpCDSExtensionResults *pResults,
-                                  QStringList             &idPath)
+QString UPnPCDSShortcuts::CreateXML()
 {
-    pResults->m_nTotalMatches   = 0;
-    pResults->m_nUpdateID       = 1;
+    QString xml;
 
-    // ----------------------------------------------------------------------
-    //
-    // ----------------------------------------------------------------------
-#if 0
-    LOG(VB_UPNP, LOG_INFO, QString("UPnpCDSExtension::ProcessItem : %1")
-                               .arg(idPath));
-#endif
-    switch( pRequest->m_eBrowseFlag )
+    xml = "<shortcutlist>\r\n";
+
+    QMap<ShortCutType, QString>::iterator it;
+    for (it = m_shortcuts.begin(); it != m_shortcuts.end(); ++it)
     {
-        case CDS_BrowseMetadata:
-        {
-            // --------------------------------------------------------------
-            // Return 1 Item
-            // --------------------------------------------------------------
-
-            QStringMap  mapParams;
-            QString     sParams = idPath.last().section( '?', 1, 1 );
-            sParams.replace("&amp;", "&");
-
-            HTTPRequest::GetParameters( sParams, mapParams );
-
-            MSqlQuery query(MSqlQuery::InitCon());
-
-            if (query.isConnected())
-            {
-                BuildItemQuery( query, mapParams );
-
-                if (query.exec() && query.next())
-                {
-                    pRequest->m_sObjectId =
-                        RemoveToken( "/", pRequest->m_sObjectId, 1 );
-
-                    AddItem( pRequest, pRequest->m_sObjectId, pResults, false,
-                             query );
-                    pResults->m_nTotalMatches = 1;
-                }
-            }
-            break;
-        }
-        case CDS_BrowseDirectChildren:
-        {
-            // Items don't have any children.
-            break;
-        }
-        case CDS_BrowseUnknown:
-            break;
+        ShortCutType type = it.key();
+        QString objectID = *it;
+        xml += "<shortcut>\r\n";
+        xml += QString("<name>%1</name>\r\n").arg(TypeToName(type));
+        xml += QString("<objectID>%1</objectID>\r\n").arg(HTTPRequest::Encode(objectID));
+        xml += "</shortcut>\r\n";
     }
 
-    return pResults;
+    xml += "</shortcutlist>\r\n";
+
+    return xml;
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-UPnpCDSExtensionResults *
-    UPnpCDSExtension::ProcessKey( UPnpCDSRequest          *pRequest,
-                                  UPnpCDSExtensionResults *pResults,
-                                  QStringList             &idPath )
+bool UPnPCDSShortcuts::AddShortCut(ShortCutType type,
+                                         const QString &objectID)
 {
-    pResults->m_nTotalMatches   = 0;
-    pResults->m_nUpdateID       = 1;
-
-    // ----------------------------------------------------------------------
-    //
-    // ----------------------------------------------------------------------
-
-    QString sKey = idPath.takeLast().section( '=', 1, 1 );
-    sKey = QUrl::fromPercentEncoding(sKey.toUtf8());
-
-    if (!sKey.isEmpty())
-    {
-        int nNodeIdx = idPath.takeLast().toInt();
-
-        switch( pRequest->m_eBrowseFlag )
-        {
-            case CDS_BrowseMetadata:
-            {
-                UPnpCDSRootInfo *pInfo = GetRootInfo( nNodeIdx );
-
-                if (pInfo == NULL)
-                    return pResults;
-
-                pRequest->m_sParentId =
-                    RemoveToken( "/", pRequest->m_sObjectId, 1 );
-
-                // ----------------------------------------------------------
-                // Since Key is not always the title, we need to lookup title.
-                // ----------------------------------------------------------
-
-                MSqlQuery query(MSqlQuery::InitCon());
-
-                if (query.isConnected())
-                {
-                    QString sSQL = QString(pInfo->sql) .arg(pInfo->where);
-
-                    // -=>TODO: There is a problem when called for an Item,
-                    //          instead of a container
-                    //          sKey = '<KeyName>/item?ChanId'
-                    //          which is incorrect.
-
-                    query.prepare  ( sSQL );
-                    query.bindValue( ":KEY", sKey );
-
-                    if (query.exec() && query.next())
-                    {
-                        // ----------------------------------------------
-                        // Return Container Object Only
-                        // ----------------------------------------------
-
-                        pResults->m_nTotalMatches   = 1;
-                        pResults->m_nUpdateID       = 1;
-
-                        CDSObject *pItem =
-                            CreateContainer( pRequest->m_sObjectId,
-                                             query.value(1).toString(),
-                                             pRequest->m_sParentId,
-                                             pInfo->childClass );
-
-                        pItem->SetChildCount( GetDistinctCount( pInfo ));
-
-                        pResults->Add( pItem );
-                    }
-                }
-                break;
-            }
-
-            case CDS_BrowseDirectChildren:
-            {
-                CreateItems( pRequest, pResults, nNodeIdx, sKey, true );
-
-                break;
-            }
-
-            case CDS_BrowseUnknown:
-                default:
-                break;
-        }
-    }
-
-    return pResults;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-UPnpCDSExtensionResults *
-    UPnpCDSExtension::ProcessContainer( UPnpCDSRequest          *pRequest,
-                                        UPnpCDSExtensionResults *pResults,
-                                        int                      nNodeIdx,
-                                        QStringList             &/*idPath*/ )
-{
-    pResults->m_nUpdateID     = 1;
-    pResults->m_nTotalMatches = 0;
-
-    UPnpCDSRootInfo *pInfo = GetRootInfo( nNodeIdx );
-
-    if (pInfo == NULL)
-        return pResults;
-
-    switch( pRequest->m_eBrowseFlag )
-    {
-        case CDS_BrowseMetadata:
-        {
-            // --------------------------------------------------------------
-            // Return Container Object Only
-            // --------------------------------------------------------------
-
-            pResults->m_nTotalMatches   = 1;
-            pResults->m_nUpdateID       = 1;
-
-            CDSObject *pItem = CreateContainer( pRequest->m_sObjectId,
-                                                QObject::tr( pInfo->title ),
-                                                m_sExtensionId,
-                                                pInfo->containerClass );
-
-            pItem->SetChildCount( GetDistinctCount( pInfo ));
-
-            pResults->Add( pItem );
-            break;
-        }
-
-        case CDS_BrowseDirectChildren:
-        {
-            pResults->m_nTotalMatches = GetDistinctCount( pInfo );
-            pResults->m_nUpdateID     = 1;
-
-            if (pRequest->m_nRequestedCount == 0)
-                pRequest->m_nRequestedCount = SHRT_MAX;
-
-            MSqlQuery query(MSqlQuery::InitCon());
-
-            if (query.isConnected())
-            {
-                // Remove where clause placeholder.
-                QString sSQL = pInfo->sql;
-
-                sSQL.remove( "%1" );
-                sSQL += QString( " LIMIT %2, %3" )
-                           .arg( pRequest->m_nStartingIndex  )
-                           .arg( pRequest->m_nRequestedCount );
-
-                query.prepare( sSQL );
-
-                if (query.exec())
-                {
-                    while(query.next())
-                    {
-                        QString sKey   = query.value(0).toString();
-                        QString sTitle = query.value(1).toString();
-                        long    nCount = query.value(2).toInt();
-
-                        if (sTitle.length() == 0)
-                            sTitle = "(undefined)";
-
-                        QString sId = QString( "%1/key=%2" )
-                                         .arg( pRequest->m_sParentId )
-                                         .arg( sKey );
-
-                        CDSObject *pRoot = CreateContainer(sId,
-                                                           sTitle,
-                                                           pRequest->m_sParentId,
-                                                           pInfo->childClass);
-
-                        pRoot->SetChildCount( nCount );
-
-                        pResults->Add( pRoot );
-                    }
-                }
-            }
-            break;
-        }
-
-        case CDS_BrowseUnknown:
-            break;
-    }
-
-    return pResults;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-int UPnpCDSExtension::GetDistinctCount( UPnpCDSRootInfo *pInfo )
-{
-    int nCount = 0;
-
-    if ((pInfo == NULL) || (pInfo->column == NULL))
-        return 0;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    if (query.isConnected())
-    {
-        // Note: Tried to use Bind, however it would not allow me to use it
-        //       for column & table names
-
-        QString sSQL;
-
-        if (strncmp( pInfo->column, "*", 1) == 0)
-        {
-            sSQL = QString( "SELECT count( %1 ) FROM %2" )
-                      .arg( pInfo->column )
-                      .arg( GetTableName( pInfo->column ));
-        }
-        else
-        {
-            sSQL = QString( "SELECT count( DISTINCT %1 ) FROM %2" )
-                      .arg( pInfo->column )
-                      .arg( GetTableName( pInfo->column ) );
-        }
-
-        query.prepare( sSQL );
-
-        if (query.exec() && query.next())
-        {
-            nCount = query.value(0).toInt();
-        }
-    }
-
-    return( nCount );
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-int UPnpCDSExtension::GetCount( const QString &sColumn, const QString &sKey )
-{
-    int nCount = 0;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    if (query.isConnected())
-    {
-        QString sSQL = QString("SELECT count( %1 ) FROM %2")
-                       .arg( sColumn ).arg( GetTableName( sColumn ) );
-
-        if ( sKey.length() )
-            sSQL += " WHERE " + sColumn + " = :KEY";
-
-        query.prepare( sSQL );
-        if ( sKey.length() )
-            query.bindValue( ":KEY", sKey );
-
-        if (query.exec() && query.next())
-        {
-            nCount = query.value(0).toInt();
-        }
-        LOG(VB_UPNP, LOG_DEBUG, "UPnpCDSExtension::GetCount() - " +
-                                sSQL + " = " + QString::number(nCount));
-    }
-
-    return( nCount );
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-void UPnpCDSExtension::CreateItems( UPnpCDSRequest          *pRequest,
-                                    UPnpCDSExtensionResults *pResults,
-                                    int                      nNodeIdx,
-                                    const QString           &sKey,
-                                    bool                     bAddRef )
-{
-    pResults->m_nTotalMatches = 0;
-    pResults->m_nUpdateID     = 1;
-
-    UPnpCDSRootInfo *pInfo = GetRootInfo( nNodeIdx );
-
-    if (pInfo == NULL)
-        return;
-
-    pResults->m_nTotalMatches = GetCount( pInfo->column, sKey );
-    pResults->m_nUpdateID     = 1;
-
-    if (pRequest->m_nRequestedCount == 0)
-        pRequest->m_nRequestedCount = SHRT_MAX;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    if (query.isConnected())
-    {
-        QString sWhere( "" );
-        QString sOrder( "" );
-
-        if ( sKey.length() > 0)
-        {
-           sWhere = QString( "WHERE %1=:KEY " )
-                       .arg( pInfo->column );
-        }
-
-        QString orderColumn( pInfo->orderColumn );
-        if (orderColumn.length() != 0) {
-            sOrder = QString( "ORDER BY %1 " )
-                       .arg( orderColumn );
-        }
-
-        QString sSQL = QString( "%1 %2 LIMIT %3, %4" )
-                          .arg( GetItemListSQL( pInfo->column )  )
-                          .arg( sWhere + sOrder )
-                          .arg( pRequest->m_nStartingIndex  )
-                          .arg( pRequest->m_nRequestedCount );
-
-        query.prepare  ( sSQL );
-        if ( sKey.length() )
-            query.bindValue(":KEY", sKey );
-
-        if (query.exec())
-        {
-            while(query.next())
-                AddItem( pRequest, pRequest->m_sObjectId, pResults, bAddRef,
-                         query );
-        }
-    }
-}
-
-CDSObject* UPnpCDSExtension::CreateContainer(const QString& sId,
-                                             const QString& sTitle,
-                                             const QString& sParentId,
-                                             const QString& sClass)
-{
-    CDSObject* pContainer = NULL;
-
-    if (sClass.startsWith("object.container.person"))
-    {
-        pContainer = CDSObject::CreatePerson( sId, sTitle, sParentId );
-    }
-    else if (sClass == "object.container.playlistContainer")
-    {
-        pContainer = CDSObject::CreatePlaylistContainer( sId, sTitle, sParentId );
-    }
-    else if (sClass.startsWith("object.container.album"))
-    {
-        pContainer = CDSObject::CreateAlbum( sId, sTitle, sParentId );
-    }
-    else if (sClass.startsWith("object.container.genre"))
-    {
-        pContainer = CDSObject::CreateGenre( sId, sTitle, sParentId );
-    }
-    else if (sClass == "object.container.storageSystem")
-    {
-        pContainer = CDSObject::CreateStorageSystem( sId, sTitle, sParentId );
-    }
-    else if (sClass == "object.container.storageVolume")
-    {
-        pContainer = CDSObject::CreateStorageVolume( sId, sTitle, sParentId );
-    }
-    else if (sClass == "object.container.storageFolder")
-    {
-        pContainer = CDSObject::CreateStorageFolder( sId, sTitle, sParentId );
-    }
+    if (!m_shortcuts.contains(type))
+        m_shortcuts.insert(type, objectID);
     else
-        pContainer = CDSObject::CreateContainer( sId, sTitle, sParentId );
+        LOG(VB_GENERAL, LOG_ERR, QString("UPnPCDSShortcuts::AddShortCut(): "
+                                         "Attempted to register duplicate "
+                                         "shortcut").arg(TypeToName(type)));
 
-    return pContainer;
+    return false;
+}
+
+QString UPnPCDSShortcuts::TypeToName(ShortCutType type)
+{
+    QString str;
+
+    switch (type)
+    {
+       case MUSIC :
+          str = "MUSIC";
+          break;
+       case MUSIC_ALBUMS :
+          str = "MUSIC_ALBUMS";
+          break;
+       case MUSIC_ARTISTS :
+          str = "MUSIC_ARTISTS";
+          break;
+       case MUSIC_GENRES :
+          str = "MUSIC_GENRES";
+          break;
+       case MUSIC_PLAYLISTS :
+          str = "MUSIC_PLAYLISTS";
+          break;
+       case MUSIC_RECENTLY_ADDED :
+          str = "MUSIC_RECENTLY_ADDED";
+          break;
+       case MUSIC_LAST_PLAYED :
+          str = "MUSIC_LAST_PLAYED";
+          break;
+       case MUSIC_AUDIOBOOKS :
+          str = "MUSIC_AUDIOBOOKS";
+          break;
+       case MUSIC_STATIONS :
+          str = "MUSIC_STATIONS";
+          break;
+       case MUSIC_ALL :
+          str = "MUSIC_ALL";
+          break;
+       case MUSIC_FOLDER_STRUCTURE :
+          str = "MUSIC_FOLDER_STRUCTURE";
+          break;
+
+       case IMAGES :
+          str = "IMAGES";
+          break;
+       case IMAGES_YEARS :
+          str = "IMAGES_YEARS";
+          break;
+       case IMAGES_YEARS_MONTH :
+          str = "IMAGES_YEARS_MONTH";
+          break;
+       case IMAGES_ALBUM :
+          str = "IMAGES_ALBUM";
+          break;
+       case IMAGES_SLIDESHOWS :
+          str = "IMAGES_SLIDESHOWS";
+          break;
+       case IMAGES_RECENTLY_ADDED :
+          str = "IMAGES_RECENTLY_ADDED";
+          break;
+       case IMAGES_LAST_WATCHED :
+          str = "IMAGES_LAST_WATCHED";
+          break;
+       case IMAGES_ALL :
+          str = "IMAGES_ALL";
+          break;
+       case IMAGES_FOLDER_STRUCTURE :
+          str = "IMAGES_FOLDER_STRUCTURE";
+          break;
+
+       case VIDEOS :
+          str = "VIDEOS";
+          break;
+       case VIDEOS_GENRES :
+          str = "VIDEOS_GENRES";
+          break;
+       case VIDEOS_YEARS :
+          str = "VIDEOS_YEARS";
+          break;
+       case VIDEOS_YEARS_MONTH :
+          str = "VIDEOS_YEARS_MONTH";
+          break;
+       case VIDEOS_ALBUM :
+          str = "VIDEOS_ALBUM";
+          break;
+       case VIDEOS_RECENTLY_ADDED :
+          str = "VIDEOS_RECENTLY_ADDED";
+          break;
+       case VIDEOS_LAST_PLAYED :
+          str = "VIDEOS_LAST_PLAYED";
+          break;
+       case VIDEOS_RECORDINGS :
+          str = "VIDEOS_RECORDINGS";
+          break;
+       case VIDEOS_ALL :
+          str = "VIDEOS_ALL";
+          break;
+       case VIDEOS_FOLDER_STRUCTURE :
+          str = "VIDEOS_FOLDER_STRUCTURE";
+          break;
+
+       case FOLDER_STRUCTURE :
+          str = "VIDEOS_FOLDER_STRUCTURE";
+          break;
+    }
+
+    return str;
 }
 
 // vim:ts=4:sw=4:ai:et:si:sts=4

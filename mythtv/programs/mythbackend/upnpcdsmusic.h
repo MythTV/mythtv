@@ -21,46 +21,52 @@
 class MSqlQuery;
 class UPnpCDSMusic : public UPnpCDSExtension
 {
-    private:
+    public:
 
-        static UPnpCDSRootInfo g_RootNodes[];
-        static int             g_nRootCount;
-        QUrl                   m_URIBase;
+        UPnpCDSMusic();
+        virtual ~UPnpCDSMusic() { };
 
     protected:
 
         virtual bool             IsBrowseRequestForUs( UPnpCDSRequest *pRequest );
         virtual bool             IsSearchRequestForUs( UPnpCDSRequest *pRequest );
 
-        virtual UPnpCDSRootInfo *GetRootInfo   (int nIdx);
-        virtual int              GetRootCount  ( );
-        virtual QString          GetTableName  ( QString sColumn );
-        virtual QString          GetItemListSQL( QString sColumn = "" );
+        virtual void             CreateRoot ( );
 
-        virtual void             BuildItemQuery( MSqlQuery        &query,
-                                                 const QStringMap &mapParams );
+        virtual bool             LoadMetadata( const UPnpCDSRequest *pRequest,
+                                                UPnpCDSExtensionResults *pResults,
+                                                IDTokenMap tokens,
+                                                QString currentToken );
+        virtual bool             LoadChildren( const UPnpCDSRequest *pRequest,
+                                               UPnpCDSExtensionResults *pResults,
+                                               IDTokenMap tokens,
+                                               QString currentToken );
 
-        virtual void             AddItem( const UPnpCDSRequest    *pRequest, 
-                                          const QString           &sObjectId,
-                                          UPnpCDSExtensionResults *pResults,
-                                          bool                     bAddRef,
-                                          MSqlQuery               &query );
+    private:
 
-        virtual CDSObject       *CreateContainer( const QString &sId,
-                                                  const QString &sTitle,
-                                                  const QString &sParentId,
-                                                  const QString &sClass );
+        QUrl             m_URIBase;
 
-        virtual void             PopulateAlbumContainer( CDSObject *pContainer,
-                                                         const QString &sId );
+        void             PopulateArtworkURIS( CDSObject *pItem,
+                                              int songID );
 
-        virtual void             PopulateArtworkURIS( CDSObject *pItem,
-                                                      int albumID );
+        bool             LoadArtists(const UPnpCDSRequest *pRequest,
+                                     UPnpCDSExtensionResults *pResults,
+                                     IDTokenMap tokens);
+        bool             LoadAlbums(const UPnpCDSRequest *pRequest,
+                                    UPnpCDSExtensionResults *pResults,
+                                    IDTokenMap tokens);
+        bool             LoadGenres(const UPnpCDSRequest *pRequest,
+                                    UPnpCDSExtensionResults *pResults,
+                                    IDTokenMap tokens);
+        bool             LoadTracks(const UPnpCDSRequest *pRequest,
+                                    UPnpCDSExtensionResults *pResults,
+                                    IDTokenMap tokens);
 
-    public:
-
-        UPnpCDSMusic();
-        virtual ~UPnpCDSMusic() {}
+        // Common code helpers
+        QString BuildWhereClause( QStringList clauses,
+                                  IDTokenMap tokens );
+        void    BindValues ( MSqlQuery &query,
+                             IDTokenMap tokens );
 };
 
 #endif

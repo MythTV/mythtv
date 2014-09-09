@@ -27,10 +27,12 @@ UPnpCMGR::UPnpCMGR ( UPnpDevice *pDevice,
     AddVariable( new StateVariable< QString >( "SourceProtocolInfo"  , true ) );
     AddVariable( new StateVariable< QString >( "SinkProtocolInfo"    , true ) );
     AddVariable( new StateVariable< QString >( "CurrentConnectionIDs", true ) );
+    AddVariable( new StateVariable< QString >( "FeatureList"         , true ) );
 
     SetValue< QString >( "CurrentConnectionIDs", "0" );
     SetValue< QString >( "SourceProtocolInfo"  , sSourceProtocols );
     SetValue< QString >( "SinkProtocolInfo"    , sSinkProtocols   );
+    SetValue< QString >( "FeatureList"         , "" );
 
     QString sUPnpDescPath = UPnp::GetConfiguration()->GetValue( "UPnP/DescXmlPath",
                                                                 m_sSharePath );
@@ -93,6 +95,7 @@ UPnpCMGRMethod UPnpCMGR::GetMethod( const QString &sURI )
     if (sURI == "GetProtocolInfo"          ) return CMGRM_GetProtocolInfo         ;
     if (sURI == "GetCurrentConnectionInfo" ) return CMGRM_GetCurrentConnectionInfo;              
     if (sURI == "GetCurrentConnectionIDs"  ) return CMGRM_GetCurrentConnectionIDs ; 
+    if (sURI == "GetFeatureList"           ) return CMGRM_GetFeatureList ;
 
     return CMGRM_Unknown;
 }
@@ -145,6 +148,9 @@ bool UPnpCMGR::ProcessRequest( HTTPRequest *pRequest )
             case CMGRM_GetCurrentConnectionIDs :
                 HandleGetCurrentConnectionIDs ( pRequest );
                 break;
+            case CMGRM_GetFeatureList :
+                HandleGetFeatureList( pRequest );
+                break;
             default:
                 UPnp::FormatErrorResponse( pRequest, UPnPResult_InvalidAction );
                 break;
@@ -188,13 +194,13 @@ void UPnpCMGR::HandleGetCurrentConnectionInfo( HTTPRequest *pRequest )
 
     NameValues list;
 
-    list.push_back(NameValue( "RcsID"                , "-1"             ));
-    list.push_back(NameValue( "AVTransportID"        , "-1"             ));
-    list.push_back(NameValue( "ProtocolInfo"         , "http-get:*:*:*" ));
-    list.push_back(NameValue( "PeerConnectionManager", "/"              ));
-    list.push_back(NameValue( "PeerConnectionID"     , "-1"             ));
-    list.push_back(NameValue( "Direction"            , "Output"         ));
-    list.push_back(NameValue( "Status"               , "Unknown"        ));
+    list.push_back(NameValue( "RcsID"                , "-1"             , true));
+    list.push_back(NameValue( "AVTransportID"        , "-1"             , true));
+    list.push_back(NameValue( "ProtocolInfo"         , "http-get:*:*:*" , true));
+    list.push_back(NameValue( "PeerConnectionManager", "/"              , true));
+    list.push_back(NameValue( "PeerConnectionID"     , "-1"             , true));
+    list.push_back(NameValue( "Direction"            , "Output"         , true));
+    list.push_back(NameValue( "Status"               , "Unknown"        , true));
     
     pRequest->FormatActionResponse(list);
 }
@@ -209,6 +215,17 @@ void UPnpCMGR::HandleGetCurrentConnectionIDs ( HTTPRequest *pRequest )
 
     list.push_back(
         NameValue("ConnectionIDs", GetValue<QString>("CurrentConnectionIDs")));
+
+    pRequest->FormatActionResponse(list);
+}
+
+void UPnpCMGR::HandleGetFeatureList(HTTPRequest* pRequest)
+{
+    NameValues list;
+
+    QString sResults = m_features.toXML();
+
+    list.push_back(NameValue("FeatureList", sResults));
 
     pRequest->FormatActionResponse(list);
 }

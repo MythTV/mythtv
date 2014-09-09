@@ -616,11 +616,13 @@ int ChannelUtil::GetBetterMplexID(int current_mplexid,
     int q_networkid = 0, q_transportid = 0;
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare(QString("SELECT networkid, transportid "
-                          "FROM dtv_multiplex "
-                          "WHERE mplexid = %1").arg(current_mplexid));
+    query.prepare("SELECT networkid, transportid "
+                  "FROM dtv_multiplex "
+                  "WHERE mplexid = :MPLEX_ID");
 
-    if (!query.exec() || !query.isActive())
+    query.bindValue(":MPLEX_ID", current_mplexid);
+
+    if (!query.exec())
         MythDB::DBError("Getting mplexid global search", query);
     else if (query.next())
     {
@@ -641,12 +643,16 @@ int ChannelUtil::GetBetterMplexID(int current_mplexid,
     if (!q_networkid && !q_transportid)
     {
         int qsize = query.size();
-        query.prepare(QString("UPDATE dtv_multiplex "
-                              "SET networkid = %1, transportid = %2 "
-                              "WHERE mplexid = %3")
-                      .arg(network_id).arg(transport_id).arg(current_mplexid));
+        query.prepare("UPDATE dtv_multiplex "
+                      "SET networkid = :NETWORK_ID, "
+                      "    transportid = :TRANSPORT_ID "
+                      "WHERE mplexid = :MPLEX_ID");
 
-        if (!query.exec() || !query.isActive())
+        query.bindValue(":NETWORK_ID", network_id);
+        query.bindValue(":TRANSPORT_ID", transport_id);
+        query.bindValue(":MPLEX_ID", current_mplexid);
+
+        if (!query.exec())
             MythDB::DBError("Getting mplexid global search", query);
 
         LOG(VB_CHANSCAN, LOG_INFO,
@@ -661,22 +667,25 @@ int ChannelUtil::GetBetterMplexID(int current_mplexid,
     {
         QString("SELECT a.mplexid "
                 "FROM dtv_multiplex a, dtv_multiplex b "
-                "WHERE a.networkid   = %1 AND "
-                "      a.transportid = %2 AND "
+                "WHERE a.networkid   = :NETWORK_ID AND "
+                "      a.transportid = :TRANSPORT_ID AND "
                 "      a.sourceid    = b.sourceid AND "
-                "      b.mplexid     = %3")
-        .arg(network_id).arg(transport_id).arg(current_mplexid),
+                "      b.mplexid     = :MPLEX_ID"),
 
         QString("SELECT mplexid "
                 "FROM dtv_multiplex "
-                "WHERE networkid = %1 AND "
-                "      transportid = %2")
-        .arg(network_id).arg(transport_id),
+                "WHERE networkid = :NETWORK_ID AND "
+                "      transportid = :TRANSPORT_ID"),
     };
 
     for (uint i=0; i<2; i++)
     {
         query.prepare(theQueries[i]);
+
+        query.bindValue(":NETWORK_ID", network_id);
+        query.bindValue(":TRANSPORT_ID", transport_id);
+        if (i == 0)
+            query.bindValue(":MPLEX_ID", current_mplexid);
 
         if (!query.exec() || !query.isActive())
             MythDB::DBError("Finding matching mplexid", query);
@@ -748,8 +757,9 @@ QString ChannelUtil::GetChannelStringField(int chan_id, const QString &field)
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(QString("SELECT %1 FROM channel "
-            "WHERE chanid=%2").arg(field).arg(chan_id));
-    if (!query.exec() || !query.isActive())
+                          "WHERE chanid = :CHANID").arg(field));
+    query.bindValue(":CHANID", chan_id);
+    if (!query.exec())
     {
         MythDB::DBError("Selecting channel/dtv_multiplex 1", query);
         return QString::null;
@@ -775,11 +785,11 @@ int ChannelUtil::GetSourceID(int db_mplexid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare(QString("SELECT sourceid "
-                          "FROM dtv_multiplex "
-                          "WHERE mplexid = %1").arg(db_mplexid));
-
-    if (!query.exec() || !query.isActive())
+    query.prepare("SELECT sourceid "
+                  "FROM dtv_multiplex "
+                  "WHERE mplexid = :MPLEXID");
+    query.bindValue(":MPLEXID", db_mplexid);
+    if (!query.exec())
     {
         MythDB::DBError("Selecting channel/dtv_multiplex", query);
         return -1;
@@ -865,11 +875,12 @@ bool ChannelUtil::GetCachedPids(uint chanid,
                                 pid_cache_t &pid_cache)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    QString thequery = QString("SELECT pid, tableid FROM pidcache "
-                               "WHERE chanid='%1'").arg(chanid);
-    query.prepare(thequery);
+    query.prepare("SELECT pid, tableid FROM pidcache "
+                  "WHERE chanid = :CHANID");
 
-    if (!query.exec() || !query.isActive())
+    query.bindValue(":CHANID", chanid);
+
+    if (!query.exec())
     {
         MythDB::DBError("GetCachedPids: fetching pids", query);
         return false;
@@ -1377,44 +1388,51 @@ int ChannelUtil::GetChanID(int mplexid,       int service_transport_id,
 
     int source_id = query.value(0).toInt();
 
-    QStringList qstr;
-
     // find a proper ATSC channel
-    qstr.push_back(
-        QString("SELECT chanid FROM channel,dtv_multiplex "
-                "WHERE channel.sourceid          = %1 AND "
-                "      atsc_major_chan           = %2 AND "
-                "      atsc_minor_chan           = %3 AND "
-                "      dtv_multiplex.transportid = %4 AND "
-                "      dtv_multiplex.mplexid     = %5 AND "
-                "      dtv_multiplex.sourceid    = channel.sourceid AND "
-                "      dtv_multiplex.mplexid     = channel.mplexid")
-        .arg(source_id).arg(major_channel).arg(minor_channel)
-        .arg(service_transport_id).arg(mplexid));
+    query.prepare("SELECT chanid FROM channel,dtv_multiplex "
+                  "WHERE channel.sourceid          = :SOURCEID AND "
+                  "      atsc_major_chan           = :MAJORCHAN AND "
+                  "      atsc_minor_chan           = :MINORCHAN AND "
+                  "      dtv_multiplex.transportid = :TRANSPORTID AND "
+                  "      dtv_multiplex.mplexid     = :MPLEXID AND "
+                  "      dtv_multiplex.sourceid    = channel.sourceid AND "
+                  "      dtv_multiplex.mplexid     = channel.mplexid");
+
+    query.bindValue(":SOURCEID", source_id);
+    query.bindValue(":MAJORCHAN", major_channel);
+    query.bindValue(":MINORCHAN", minor_channel);
+    query.bindValue(":TRANSPORTID", service_transport_id);
+    query.bindValue(":MPLEXID", mplexid);
+
+    if (query.exec() && query.next())
+        return query.value(0).toInt();
 
     // Find manually inserted/edited channels in order of scariness.
     // find renamed channel, where atsc is valid
-    qstr.push_back(
-        QString("SELECT chanid FROM channel "
-                "WHERE sourceid=%1 AND "
-                "atsc_major_chan=%2 AND "
-                "atsc_minor_chan=%3")
-        .arg(source_id).arg(major_channel).arg(minor_channel));
+    query.prepare("SELECT chanid FROM channel "
+                  "WHERE sourceid = :SOURCEID AND "
+                  "atsc_major_chan = :MAJORCHAN AND "
+                  "atsc_minor_chan = :MINORCHAN");
+
+    query.bindValue(":SOURCEID", source_id);
+    query.bindValue(":MAJORCHAN", major_channel);
+    query.bindValue(":MINORCHAN", minor_channel);
+
+    if (query.exec() && query.next())
+        return query.value(0).toInt();
 
         // find based on mpeg program number and mplexid alone
-    qstr.push_back(
-        QString("SELECT chanid FROM channel "
-                "WHERE sourceid=%1 AND serviceID=%2 AND mplexid=%3")
-        .arg(source_id).arg(program_number).arg(mplexid));
+    query.prepare("SELECT chanid FROM channel "
+                  "WHERE sourceid = :SOURCEID AND "
+                  "serviceID = :SERVICEID AND "
+                  "mplexid = :MPLEXID");
 
-    for (int i = 0; i < qstr.size(); i++)
-    {
-        query.prepare(qstr[i]);
-        if (!query.exec())
-            MythDB::DBError("Selecting channel/dtv_multiplex 3", query);
-        else if (query.next())
-            return query.value(0).toInt();
-    }
+    query.bindValue(":SOURCEID", source_id);
+    query.bindValue(":SERVICEID", program_number);
+    query.bindValue(":MPLEXID", mplexid);
+
+    if (query.exec() && query.next())
+        return query.value(0).toInt();
 
     return -1;
 }
@@ -1825,12 +1843,14 @@ bool ChannelUtil::SetServiceVersion(int mplexid, int version)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare(
-        QString("UPDATE dtv_multiplex "
-                "SET serviceversion = %1 "
-                "WHERE mplexid = %2").arg(version).arg(mplexid));
+    query.prepare("UPDATE dtv_multiplex "
+                  "SET serviceversion = :VERSION "
+                  "WHERE mplexid = :MPLEXID");
 
-    if (!query.exec() || !query.isActive())
+    query.bindValue(":VERSION", version);
+    query.bindValue(":MPLEXID", mplexid);
+
+    if (!query.exec())
     {
         MythDB::DBError("Selecting channel/dtv_multiplex", query);
         return false;
@@ -1842,11 +1862,13 @@ int ChannelUtil::GetServiceVersion(int mplexid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare(QString("SELECT serviceversion "
-                          "FROM dtv_multiplex "
-                          "WHERE mplexid = %1").arg(mplexid));
+    query.prepare("SELECT serviceversion "
+                  "FROM dtv_multiplex "
+                  "WHERE mplexid = :MPLEXID");
 
-    if (!query.exec() || !query.isActive())
+    query.bindValue(":MPLEXID", mplexid);
+
+    if (!query.exec())
     {
         MythDB::DBError("Selecting channel/dtv_multiplex", query);
         return false;

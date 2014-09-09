@@ -180,24 +180,24 @@ class PrivateDescriptorID
         // on these specific networks.
 
         // Private -- UK
-        dvb_uk_channel_list         = 0x83, /* implemented */
+        dvb_logical_channel_descriptor = 0x83, /* implemented */
 
         // Private -- Dish Network
-        dish_event_rights           = 0x87,
-        dish_event_mpaa             = 0x89, /* implemented */
-        dish_event_name             = 0x91, /* implemented */
-        dish_event_description      = 0x92, /* implemented */
-        dish_event_properties       = 0x94, /* implemented */
-        dish_event_vchip            = 0x95, /* implemented */
-        dish_event_tags             = 0x96, /* implemented */
+        dish_event_rights              = 0x87,
+        dish_event_mpaa                = 0x89, /* implemented */
+        dish_event_name                = 0x91, /* implemented */
+        dish_event_description         = 0x92, /* implemented */
+        dish_event_properties          = 0x94, /* implemented */
+        dish_event_vchip               = 0x95, /* implemented */
+        dish_event_tags                = 0x96, /* implemented */
 
         // Private -- CH UPC Cablecom
-        upc_event_episode_title     = 0xA7,
+        upc_event_episode_title        = 0xA7,
 
         // Private -- premiere.de
-        premiere_content_order        = 0xF0,
-        premiere_parental_information = 0xF1,
-        premiere_content_transmission = 0xF2,
+        premiere_content_order         = 0xF0,
+        premiere_parental_information  = 0xF1,
+        premiere_content_transmission  = 0xF2,
     };
 };
 

@@ -48,10 +48,9 @@ MTV_PUBLIC bool SetArtwork(const QString &inetref,
 inline QString generate_myth_url(
     const QString &storage_group, const QString &host, const QString &path)
 {
-    QString ip = gCoreContext->GetBackendServerIP(host);
     uint port = gCoreContext->GetBackendServerPort(host);
 
-    return gCoreContext->GenMythURL(ip,port,path,
+    return gCoreContext->GenMythURL(host, port, path,
                                     StorageGroup::GetGroupToUse(host, storage_group));
 
 }

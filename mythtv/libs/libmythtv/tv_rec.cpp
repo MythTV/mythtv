@@ -50,7 +50,6 @@ QMutex            TVRec::cardsLock;
 QMap<uint,TVRec*> TVRec::cards;
 
 static bool is_dishnet_eit(uint cardid);
-static QString load_profile(QString,void*,RecordingInfo*,RecordingProfile&);
 static int init_jobs(const RecordingInfo *rec, RecordingProfile &profile,
                      bool on_host, bool transcode_bfr_comm, bool on_line_comm);
 static void apply_broken_dvb_driver_crc_hack(ChannelBase*, MPEGStreamData*);
@@ -1833,7 +1832,7 @@ bool TVRec::SetupDTVSignalMonitor(bool EITscan)
     QString recording_type = "all";
     RecordingInfo *rec = lastTuningRequest.program;
     RecordingProfile profile;
-    recProfileName = load_profile(genOpt.cardtype, tvchain, rec, profile);
+    recProfileName = LoadProfile(genOpt.cardtype, tvchain, rec, profile);
     const Setting *setting = profile.byName("recordingtype");
     if (setting)
         recording_type = setting->getValue();
@@ -2626,7 +2625,7 @@ void TVRec::SpawnLiveTV(LiveTVChain *newchain, bool pip, QString startchan)
     tvchain->ReloadAll();
 
     QString hostprefix = gCoreContext->GenMythURL(
-                    gCoreContext->GetBackendServerIP(),
+                    gCoreContext->GetHostName(),
                     gCoreContext->GetBackendServerPort());
 
     tvchain->SetHostPrefix(hostprefix);
@@ -2772,7 +2771,7 @@ void TVRec::InitAutoRunJobs(RecordingInfo *rec, AutoRunInitType t,
         RecordingProfile profile;
         if (!recpro)
         {
-            load_profile(genOpt.cardtype, NULL, rec, profile);
+            LoadProfile(genOpt.cardtype, NULL, rec, profile);
             recpro = &profile;
         }
         autoRunJobs[rec->MakeUniqueKey()] =
@@ -4154,8 +4153,8 @@ static int init_jobs(const RecordingInfo *rec, RecordingProfile &profile,
     return jobs;
 }
 
-static QString load_profile(QString cardtype, void *tvchain,
-                            RecordingInfo *rec, RecordingProfile &profile)
+QString TVRec::LoadProfile(QString cardtype, void *tvchain,
+                           RecordingInfo *rec, RecordingProfile &profile)
 {
     // Determine the correct recording profile.
     // In LiveTV mode use "Live TV" profile, otherwise use the
@@ -4165,14 +4164,33 @@ static QString load_profile(QString cardtype, void *tvchain,
     if (!tvchain && rec)
         profileName = rec->GetRecordingRule()->m_recProfile;
 
-    if (!profile.loadByType(profileName, cardtype))
+    QString profileRequested = profileName;
+
+    if (profile.loadByType(profileName, cardtype))
+    {
+        LOG(VB_RECORD, LOG_INFO, LOC +
+            QString("Using profile '%1' to record")
+                .arg(profileName));
+    }
+    else
     {
         profileName = "Default";
-        profile.loadByType(profileName, cardtype);
+        if (profile.loadByType(profileName, cardtype))
+        {
+            LOG(VB_RECORD, LOG_INFO, LOC +
+                QString("Profile '%1' not found, using "
+                        "fallback profile '%2' to record")
+                    .arg(profileRequested).arg(profileName));
+        }
+        else
+        {
+            LOG(VB_RECORD, LOG_ERR, LOC +
+                QString("Profile '%1' not found, and unable "
+                        "to load fallback profile '%2'.  Results "
+                        "may be unpredicable")
+                    .arg(profileRequested).arg(profileName));
+        }
     }
-
-    LOG(VB_RECORD, LOG_INFO, QString("Using profile '%1' to record")
-            .arg(profileName));
 
     return profileName;
 }
@@ -4196,7 +4214,7 @@ void TVRec::TuningNewRecorder(MPEGStreamData *streamData)
     RecordingInfo *rec = lastTuningRequest.program;
 
     RecordingProfile profile;
-    recProfileName = load_profile(genOpt.cardtype, tvchain, rec, profile);
+    recProfileName = LoadProfile(genOpt.cardtype, tvchain, rec, profile);
 
     if (tvchain)
     {
@@ -4762,7 +4780,7 @@ RecordingInfo *TVRec::SwitchRecordingRingBuffer(const RecordingInfo &rcinfo)
     RecordingInfo   *ri = new RecordingInfo(rcinfo);
     RecordingProfile profile;
 
-    QString pn = load_profile(genOpt.cardtype, NULL, ri, profile);
+    QString pn = LoadProfile(genOpt.cardtype, NULL, ri, profile);
 
     if (pn != recProfileName)
     {

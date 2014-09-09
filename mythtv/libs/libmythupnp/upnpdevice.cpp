@@ -175,7 +175,15 @@ void UPnpDeviceDesc::_InternalLoad( QDomNode oNode, UPnpDevice *pCurDevice )
             // Not one of the expected element names... add to extra list.
             QString sValue = "";
             SetStrValue( e, sValue );
-            pCurDevice->m_lstExtra.push_back(NameValue(e.tagName(), sValue));
+            NameValue node = NameValue(e.tagName(), sValue);
+            QDomNamedNodeMap attributes =  e.attributes();
+            for (int i = 0; i < attributes.size(); i++)
+            {
+                node.AddAttribute(attributes.item(i).nodeName(),
+                                  attributes.item(i).nodeValue(),
+                                  true); // TODO Check whether all attributes are in fact requires for the device xml
+            }
+            pCurDevice->m_lstExtra.push_back(node);
         }
     }
 }
@@ -401,15 +409,16 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
     os << FormatValue( "manufacturer" , pDevice->m_sManufacturer    );
     os << FormatValue( "modelURL"     , pDevice->m_sModelURL        );
 
-    if ( bIsXbox360 )
-    {
-        os << FormatValue( "modelName"    ,
-                           "Windows Media Connect Compatible (MythTV)");
-    }
-    else
-    {
+    // HACK
+//     if ( bIsXbox360 )
+//     {
+//         os << FormatValue( "modelName"    ,
+//                            "Windows Media Connect Compatible (MythTV)");
+//     }
+//     else
+//     {
         os << FormatValue( "modelName"    , pDevice->m_sModelName       );
-    }
+//     }
 
     os << FormatValue( "manufacturerURL"  , pDevice->m_sManufacturerURL );
     os << FormatValue( "modelDescription" , pDevice->m_sModelDescription);
@@ -426,17 +435,7 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
     NameValues::const_iterator nit = pDevice->m_lstExtra.begin();
     for (; nit != pDevice->m_lstExtra.end(); ++nit)
     {
-        // -=>TODO: Hack to handle one element with attributes... need to
-        //          handle attributes in a more generic way.
-
-        if ((*nit).sName == "dlna:X_DLNADOC")
-        {
-            os << QString("<dlna:X_DLNADOC xmlns:dlna=\"urn:"
-                          "schemas-dlna-org:device-1-0\">%1"
-                          "</dlna:X_DLNADOC>\n" ).arg((*nit).sValue);
-        }
-        else
-            os << FormatValue( (*nit).sName, (*nit).sValue );
+        os << FormatValue( (*nit) );
     }
 
     // ----------------------------------------------------------------------
@@ -513,26 +512,41 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
     // Output any Embedded Devices
     // ----------------------------------------------------------------------
 
-    // -=>Note:  XBMC can't handle sub-devices, it's UserAgent is blank.
-#if 0
-    if (sUserAgent.length() > 0)
+    if (pDevice->m_listDevices.count() > 0)
     {
-        if (pDevice->m_listDevices.count() > 0)
-        {
-            os << "<deviceList>";
+        os << "<deviceList>";
 
-            for ( UPnpDevice *pEmbeddedDevice  = pDevice->m_listDevices.first();
-                              pEmbeddedDevice != NULL;
-                              pEmbeddedDevice  = pDevice->m_listDevices.next() )
-            {
-                OutputDevice( os, pEmbeddedDevice );
-            }
-            os << "</deviceList>";
+        UPnpDeviceList::iterator it;
+        for ( it = pDevice->m_listDevices.begin();
+              it != pDevice->m_listDevices.end();
+              ++it )
+        {
+            UPnpDevice *pEmbeddedDevice = (*it);
+            OutputDevice( os, pEmbeddedDevice );
         }
+        os << "</deviceList>";
     }
-#endif
     os << "</device>\n";
     os << flush;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QString UPnpDeviceDesc::FormatValue(const NameValue& node)
+{
+    QString sStr;
+
+    QString sAttributes;
+    NameValues::iterator it;
+    for (it = node.pAttributes->begin(); it != node.pAttributes->end(); ++it)
+    {
+        sAttributes += QString(" %1='%2'").arg((*it).sName).arg((*it).sValue);
+    }
+    sStr = QString("<%1%2>%3</%1>\n").arg(node.sName).arg(sAttributes).arg(node.sValue);
+
+    return( sStr );
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -563,10 +577,11 @@ QString UPnpDeviceDesc::FormatValue( const QString &sName, int nValue )
 
 QString UPnpDeviceDesc::FindDeviceUDN( UPnpDevice *pDevice, QString sST )
 {
-    if (sST == pDevice->m_sDeviceType)
+    // Ignore device version, UPnP is backwards compatible
+    if (sST.section(':', 0, -2) == pDevice->m_sDeviceType.section(':', 0, -2))
         return pDevice->GetUDN();
 
-    if (sST == pDevice->GetUDN())
+    if (sST.section(':', 0, -2) == pDevice->GetUDN().section(':', 0, -2))
         return sST;
 
     // ----------------------------------------------------------------------
@@ -576,7 +591,8 @@ QString UPnpDeviceDesc::FindDeviceUDN( UPnpDevice *pDevice, QString sST )
     UPnpServiceList::const_iterator sit = pDevice->m_listServices.begin();
     for (; sit != pDevice->m_listServices.end(); ++sit)
     {
-        if (sST == (*sit)->m_sServiceType)
+        // Ignore the service version, UPnP is backwards compatible
+        if (sST.section(':', 0, -2) == (*sit)->m_sServiceType.section(':', 0, -2))
             return pDevice->GetUDN();
     }
 
@@ -611,7 +627,8 @@ UPnpDevice *UPnpDeviceDesc::FindDevice( const QString &sURI )
 UPnpDevice *UPnpDeviceDesc::FindDevice( UPnpDevice    *pDevice,
                                         const QString &sURI )
 {
-    if ( sURI == pDevice->m_sDeviceType )
+    // Ignore device version, UPnP is backwards compatible
+    if ( sURI.section(':', 0, -2) == pDevice->m_sDeviceType.section(':', 0, -2) )
         return pDevice;
 
     // ----------------------------------------------------------------------
@@ -813,7 +830,8 @@ UPnpService UPnpDevice::GetService(const QString &urn, bool *found) const
     UPnpServiceList::const_iterator it = m_listServices.begin();
     for (; it != m_listServices.end(); ++it)
     {
-        if ((*it)->m_sServiceType == urn)
+        // Ignore the service version
+        if ((*it)->m_sServiceType.section(':', 0, -2) == urn.section(':', 0, -2))
         {
             srv = **it;
             done = true;

@@ -164,6 +164,7 @@ class UPNP_PUBLIC UPnpDeviceDesc
         void     SetNumValue ( const QDomNode &n, int     &nValue );
         void     SetBoolValue( const QDomNode &n, bool    &nValue );
 
+        QString  FormatValue ( const NameValue &node );
         QString  FormatValue ( const QString &sName, const QString &sValue );
         QString  FormatValue ( const QString &sName, int nValue );
 
