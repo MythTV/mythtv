@@ -337,14 +337,12 @@ static int cs378x_get_cw(int client_sockfd, AES_KEY aes_decrypt_key,
 	return 1;
 }
 
-int cs378x_getcws(int client_sockfd, unsigned char * pkt, unsigned char * cw) {
+int cs378x_getcws(int client_sockfd, unsigned char * pkt, unsigned char * cw, const char *user, const char *pass) {
 	int i, j;
 	uint16_t ca_id = 0, idx = 0;
 	unsigned char msgbuf[116];
 	char tbuf[256];
 	unsigned char dump[16];
-	char * user = "mythtv"; // TODO move to config file
-	char * pass = "mythtv"; // TODO move to config file
 	unsigned int auth_token;
 
 	j = 0;

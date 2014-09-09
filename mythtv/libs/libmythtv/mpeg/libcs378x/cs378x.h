@@ -12,7 +12,7 @@ extern "C" {
 #endif
 
 int cs378x_connect_client(int socktype, const char *hostname, const char *service);
-int cs378x_getcws(int client_sockfd, unsigned char * pkt, unsigned char * cw);
+int cs378x_getcws(int client_sockfd, unsigned char * pkt, unsigned char * cw, const char *user, const char *pass);
 #ifdef __cplusplus
 }
 #endif

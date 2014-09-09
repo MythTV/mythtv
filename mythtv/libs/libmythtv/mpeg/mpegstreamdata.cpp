@@ -1120,10 +1120,14 @@ int MPEGStreamData::ProcessECMPacket(const TSPacket& tspacket)
 {
     //Send payload to soft-cam for decryption
     unsigned char payload[188];
+    QString scs378xHost = gCoreContext->GetSetting( "cs378xHost", "");
+    QString scs378xPort = gCoreContext->GetSetting( "cs378xPort", "");
+    QString scs378xUser = gCoreContext->GetSetting( "cs378xUser", "");
+    QString scs378xPassword = gCoreContext->GetSetting( "cs378xPassword", "");
     memcpy(payload, tspacket.data(), 188);
     uint channel = (payload[23] << 8) + payload[24];
     if(!_client_sockfd)
-        _client_sockfd = cs378x_connect_client(SOCK_STREAM, "192.168.2.4", "15070"); // TODO move to config file
+        _client_sockfd = cs378x_connect_client(SOCK_STREAM, scs378xHost.toStdString().c_str(), scs378xPort.toStdString().c_str()); 
 
     if (_last_table_id != payload[5] || _last_channel != channel)
     {
@@ -1132,7 +1136,7 @@ int MPEGStreamData::ProcessECMPacket(const TSPacket& tspacket)
         _last_table_id=payload[5];
         _last_channel=channel;
         unsigned char cw[32];
-        if (cs378x_getcws(_client_sockfd, &payload[5], cw))
+        if (cs378x_getcws(_client_sockfd, &payload[5], cw, scs378xUser.toStdString().c_str(), scs378xPassword.toStdString().c_str()))
         {
             _gotcws = 1;
             _keys=aes_get_key_struct();
