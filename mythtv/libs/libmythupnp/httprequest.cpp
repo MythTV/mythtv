@@ -214,7 +214,9 @@ QString HTTPRequest::BuildHeader( long long nSize )
     QString sHeader;
     QString sContentType = (m_eResponseType == ResponseTypeOther) ?
                             m_sResponseTypeText : GetResponseType();
-
+    //-----------------------------------------------------------------------
+    // Headers describing the connection
+    //-----------------------------------------------------------------------
     sHeader = QString( "%1 %2\r\n"
                        "Date: %3\r\n"
                        "Server: %4\r\n" )
@@ -232,10 +234,21 @@ QString HTTPRequest::BuildHeader( long long nSize )
 
     sHeader += GetAdditionalHeaders();
 
-    sHeader += QString( "Content-Type: %2\r\n"
-                        "Content-Length: %3\r\n" )
-                        .arg( sContentType )
-                        .arg( nSize );
+    //-----------------------------------------------------------------------
+    // Headers describing the content
+    //-----------------------------------------------------------------------
+    sHeader += QString( "Content-Type: %1\r\n" ).arg( sContentType );
+
+    // Default to 'inline' but we should support 'attachment' when it would
+    // be appropriate i.e. not when streaming a file to a upnp player or browser
+    // that can support it natively
+    if (!m_sFileName.isEmpty())
+    {
+        QString filename = QFileInfo(m_sFileName).fileName(); // Strip any path
+        sHeader += QString( "Content-Disposition: inline; filename=\"%2\"\r\n" ).arg( filename );
+    }
+
+    sHeader += QString( "Content-Length: %3\r\n" ).arg( nSize );
 
     // ----------------------------------------------------------------------
     // Temp Hack to process DLNA header
@@ -247,6 +260,18 @@ QString HTTPRequest::BuildHeader( long long nSize )
                    "DLNA.ORG_FLAGS=01500000000000000000000000000000\r\n";
 
     // ----------------------------------------------------------------------
+
+    if (getenv("HTTPREQUEST_DEBUG"))
+    {
+        // Dump response header
+        QStringList respHeaders = sHeader.split("\r\n");
+        for ( QStringList::iterator it  = respHeaders.begin();
+                                    it != respHeaders.end();
+                                  ++it )
+        {
+            LOG(VB_GENERAL, LOG_DEBUG, QString("(Response Header) %1").arg(*it));
+        }
+    }
 
     sHeader += "\r\n";
 
@@ -488,16 +513,6 @@ qint64 HTTPRequest::SendResponseFile( QString sFileName )
     m_eResponseType     = ResponseTypeOther;
     m_sResponseTypeText = "text/plain";
 
-#if 0
-    // Dump request header
-    for ( QStringMap::iterator it  = m_mapHeaders.begin();
-                               it != m_mapHeaders.end();
-                             ++it )
-    {
-        LOG(VB_GENERAL, LOG_DEBUG, it.key() + ": " + *it);
-    }
-#endif
-
     // ----------------------------------------------------------------------
     // Make it so the header is sent with the data
     // ----------------------------------------------------------------------
@@ -706,47 +721,47 @@ qint64 HTTPRequest::SendFile( QFile &file, qint64 llStart, qint64 llBytes )
 {
     qint64 sent = 0;
 
-#ifndef __linux__
+// #ifndef __linux__
     sent = SendData( (QIODevice *)(&file), llStart, llBytes );
-#else
-    __off64_t  offset = llStart; 
-    int        fd     = file.handle( ); 
-  
-    if ( fd == -1 ) 
-    { 
-        LOG(VB_UPNP, LOG_INFO,
-            QString("SendResponseFile( %1 ) Error: %2 [%3]") 
-                .arg(file.fileName()) .arg(file.error()) 
-                .arg(strerror(file.error()))); 
-        sent = -1; 
-    } 
-    else 
-    { 
-        qint64     llSent = 0;
-
-        do 
-        { 
-            // SSIZE_MAX should work in kernels 2.6.16 and later. 
-            // The loop is needed in any case. 
-  
-            sent = sendfile64(getSocketHandle(), fd, &offset, 
-                              (size_t)MIN(llBytes, INT_MAX)); 
-  
-            if (sent >= 0)
-            {
-                llBytes -= sent; 
-                llSent  += sent;
-                LOG(VB_UPNP, LOG_INFO,
-                    QString("SendResponseFile : --- size = %1, "
-                            "offset = %2, sent = %3") 
-                        .arg(llBytes).arg(offset).arg(sent)); 
-            }
-        } 
-        while (( sent >= 0 ) && ( llBytes > 0 )); 
-
-        sent = llSent;
-    } 
-#endif
+// #else
+//     __off64_t  offset = llStart;
+//     int        fd     = file.handle( );
+//
+//     if ( fd == -1 )
+//     {
+//         LOG(VB_UPNP, LOG_INFO,
+//             QString("SendResponseFile( %1 ) Error: %2 [%3]")
+//                 .arg(file.fileName()) .arg(file.error())
+//                 .arg(strerror(file.error())));
+//         sent = -1;
+//     }
+//     else
+//     {
+//         qint64     llSent = 0;
+//
+//         do
+//         {
+//             // SSIZE_MAX should work in kernels 2.6.16 and later.
+//             // The loop is needed in any case.
+//
+//             sent = sendfile64(getSocketHandle(), fd, &offset,
+//                               (size_t)MIN(llBytes, INT_MAX));
+//
+//             if (sent >= 0)
+//             {
+//                 llBytes -= sent;
+//                 llSent  += sent;
+//                 LOG(VB_UPNP, LOG_INFO,
+//                     QString("SendResponseFile : --- size = %1, "
+//                             "offset = %2, sent = %3")
+//                         .arg(llBytes).arg(offset).arg(sent));
+//             }
+//         }
+//         while (( sent >= 0 ) && ( llBytes > 0 ));
+//
+//         sent = llSent;
+//     }
+// #endif
 
     return( sent );
 }
@@ -1252,11 +1267,6 @@ bool HTTPRequest::ParseRequest()
             return true;
         }
 
-        // Make sure there are a few default values
-
-        m_mapHeaders[ "content-length" ] = "0";
-        m_mapHeaders[ "content-type"   ] = "unknown";
-
         // Read Header
         bool    bDone = false;
         QString sLine = ReadLine( 2000 );
@@ -1270,17 +1280,9 @@ bool HTTPRequest::ParseRequest()
 
                 sValue.truncate( sValue.length() - 2 );
 
-                if (!sName.isEmpty() &&
-                    !sValue.isEmpty())
+                if (!sName.isEmpty() && !sValue.isEmpty())
                 {
                     m_mapHeaders.insert(sName.toLower(), sValue.trimmed());
-
-                    if (sName.contains( "dlna", Qt::CaseInsensitive ))
-                    {
-                        LOG(VB_UPNP, LOG_INFO,
-                           QString( "HTTPRequest::ParseRequest - Header: %1:%2")
-                               .arg(sName) .arg(sValue));
-                    }
                 }
 
                 sLine = ReadLine( 2000 );
@@ -1288,6 +1290,24 @@ bool HTTPRequest::ParseRequest()
             else
                 bDone = true;
         }
+
+        if (getenv("HTTPREQUEST_DEBUG"))
+        {
+            // Dump request header
+            for ( QStringMap::iterator it  = m_mapHeaders.begin();
+                                    it != m_mapHeaders.end();
+                                    ++it )
+            {
+                LOG(VB_GENERAL, LOG_DEBUG, QString("(Request Header) %1: %2")
+                                                .arg(it.key()).arg(*it));
+            }
+        }
+
+        // Make sure there are a few default values
+        if (!m_mapHeaders.contains("content-length"))
+            m_mapHeaders[ "content-length" ] = "0";
+        if (!m_mapHeaders.contains("content-type"))
+            m_mapHeaders[ "content-type"   ] = "unknown";
 
         // Check to see if we found the end of the header or we timed out.
 
