@@ -4688,8 +4688,6 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                 {
                     ctx->request_channel_layout =
                         av_get_default_channel_layout(m_audio->GetMaxChannels());
-                    if (ctx->codec_id == AV_CODEC_ID_AC3)
-                        ctx->channels = m_audio->GetMaxChannels();
                 }
                 else
                 {
