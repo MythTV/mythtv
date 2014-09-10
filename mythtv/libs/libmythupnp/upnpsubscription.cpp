@@ -8,12 +8,14 @@ removing any stale subscriptions, unsubsubscribing on exit and must re-implement
 QObject::customEvent to receive event notifications for subscribed services.
 */
 
+#include "upnpsubscription.h"
+
 #include <QTextCodec>
 
 #include "mythcorecontext.h"
 #include "mythlogging.h"
 #include "mythtypes.h"
-#include "upnpsubscription.h"
+#include "bufferedsocketdevice.h"
 
 // default requested time for subscription (actual is dictated by server)
 #define SUBSCRIPTION_TIME 1800
