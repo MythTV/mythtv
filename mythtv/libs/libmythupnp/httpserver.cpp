@@ -411,7 +411,7 @@ void HttpWorker::run(void)
 
     delete pRequest;
 
-    LOG(VB_UPNP, LOG_DEBUG, QString("HttpWorker(%1): Connection closed, %1 requests handled %2")
+    LOG(VB_UPNP, LOG_DEBUG, QString("HttpWorker(%1): Connection %1 closed, requests handled %2")
                                         .arg(pSocket->socketDescriptor())
                                         .arg(nRequestsHandled));
     pSocket->close();

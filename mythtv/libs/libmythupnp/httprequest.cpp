@@ -570,6 +570,7 @@ qint64 HTTPRequest::SendResponseFile( QString sFileName )
 
         // Required by some UPnP devices?
         m_mapRespHeaders[ "X-User-Agent"    ] = "redsonic";
+        m_mapRespHeaders[ "User-Agent"    ] = "redsonic";
 
         // ------------------------------------------------------------------
         //
