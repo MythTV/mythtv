@@ -49,6 +49,11 @@ QScriptValue formatStr(QScriptContext *context, QScriptEngine *interpreter)
 ServerSideScripting::ServerSideScripting()
 {
     Lock();
+
+#ifdef _WIN32
+    m_debugger.attachTo( &m_engine );
+#endif
+
     // ----------------------------------------------------------------------
     // Enable Translation functions
     // ----------------------------------------------------------------------

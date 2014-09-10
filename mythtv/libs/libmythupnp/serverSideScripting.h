@@ -25,6 +25,10 @@
 #include <QScriptEngine>
 #include <QScriptable>
 
+#ifdef _WIN32
+#include <QScriptEngineDebugger>
+#endif
+
 class ScriptInfo 
 {
   public:
@@ -43,6 +47,10 @@ class UPNP_PUBLIC ServerSideScripting
     public:
 
         QScriptEngine                   m_engine;
+
+#ifdef _WIN32
+        QScriptEngineDebugger           m_debugger;
+#endif
 
         ServerSideScripting();
        ~ServerSideScripting();

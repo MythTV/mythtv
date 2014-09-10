@@ -100,6 +100,14 @@ macx {
 
 QT += network xml sql script
 
+mingw | win32-msvc* {
+
+  # script debugger currently only enabled for WIN32 builds
+
+  QT += scripttools
+
+}
+
 use_hidesyms {
     QMAKE_CXXFLAGS += -fvisibility=hidden
 }
