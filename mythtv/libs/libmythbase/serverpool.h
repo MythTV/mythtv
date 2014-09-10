@@ -5,7 +5,7 @@
 #include <QHostAddress>
 #include <QNetworkProxy>
 #include <QTcpServer>
-#include <QTcpSocket>
+#include <QSslSocket>
 #include <QUdpSocket>
 #include <QStringList>
 
@@ -26,18 +26,34 @@
 
 class PrivUdpSocket;
 
-class PrivTcpServer : public QTcpServer
+typedef enum PoolServerTypes
+{
+    kTCPServer,
+    kUDPServer,
+    kSSLServer
+} PoolServerType;
+
+// Making a 'Priv' server public is a contradiction, it was this or passing
+// through the server type in the newConnection signal which would have required
+// modifying a lot more places to handle or ignore the info
+class MBASE_PUBLIC PrivTcpServer : public QTcpServer
 {
     Q_OBJECT
   public:
-    PrivTcpServer(QObject *parent = 0);
+    PrivTcpServer(QObject *parent = 0,
+                  PoolServerType type = kTCPServer);
    ~PrivTcpServer() {};
+
+   PoolServerType GetServerType(void) { return m_serverType; }
 
   signals:
     void newConnection(qt_socket_fd_t socket);
 
   protected:
-    void incomingConnection(qt_socket_fd_t socket);
+    virtual void incomingConnection(qt_socket_fd_t socket);
+
+  private:
+    PoolServerType m_serverType;
 };
 
 class MBASE_PUBLIC ServerPool : public QObject
@@ -56,9 +72,12 @@ class MBASE_PUBLIC ServerPool : public QObject
     static QList<QHostAddress> DefaultBroadcastIPv4(void);
 //    static QList<QHostAddress> DefaultBroadcastIPv6(void);
 
-    bool listen(QList<QHostAddress> addrs, quint16 port, bool requireall=true);
-    bool listen(QStringList addrs, quint16 port, bool requireall=true);
-    bool listen(quint16 port, bool requireall=true);
+    bool listen(QList<QHostAddress> addrs, quint16 port, bool requireall=true,
+                PoolServerType type = kTCPServer);
+    bool listen(QStringList addrs, quint16 port, bool requireall=true,
+                PoolServerType type = kTCPServer);
+    bool listen(quint16 port, bool requireall=true,
+                PoolServerType type = kTCPServer);
 
     bool bind(QList<QHostAddress> addrs, quint16 port, bool requireall=true);
     bool bind(QStringList addrs, quint16 port, bool requireall=true);
@@ -87,13 +106,12 @@ class MBASE_PUBLIC ServerPool : public QObject
     static int tryBindingPort(QUdpSocket *socket, int baseport,
                               int range = 1, bool *isipv6 = NULL);
 
-signals:
+  signals:
     void newConnection(QTcpSocket *);
     void newDatagram(QByteArray, QHostAddress, quint16);
 
   protected slots:
     virtual void newUdpDatagram(void);
-
     virtual void newTcpConnection(qt_socket_fd_t socket);
 
   private:

@@ -72,6 +72,7 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
     LOG(VB_UPNP, LOG_INFO, "MediaServer::Init(): Begin");
 
     int     nPort     = g_pConfig->GetValue( "BackendStatusPort", 6544 );
+    int     nSSLPort  = g_pConfig->GetValue( "BackendSSLPort",    6554 );
 
     HttpServer *pHttpServer = new HttpServer();
     pHttpServer->RegisterExtension(new HttpConfig());
@@ -79,11 +80,19 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
     if (!pHttpServer->isListening())
     {
         pHttpServer->setProxy(QNetworkProxy::NoProxy);
+        // HTTP
         if (!pHttpServer->listen(nPort))
         {
             LOG(VB_GENERAL, LOG_ERR, "MediaServer: HttpServer Create Error");
             delete pHttpServer;
             pHttpServer = NULL;
+            return;
+        }
+
+        // HTTPS (SSL)
+        if (!pHttpServer->listen(nSSLPort, true, kSSLServer))
+        {
+            LOG(VB_GENERAL, LOG_ERR, "MediaServer: HttpServer failed to create SSL server");
             return;
         }
     }

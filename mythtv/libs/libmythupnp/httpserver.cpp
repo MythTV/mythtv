@@ -32,6 +32,7 @@
 #include "mythlogging.h"
 #include "htmlserver.h"
 #include "mythversion.h"
+#include <mythcorecontext.h>
 
 #include "serviceHosts/rttiServiceHost.h"
 
@@ -102,7 +103,34 @@ HttpServer::HttpServer(const QString &sApplicationPrefix) :
     pEngine->globalObject().setProperty("Rtti",
          pEngine->scriptValueFromQMetaObject< ScriptableRtti >() );
 
-    connect(this, SIGNAL(newConnection(QTcpSocket*)), this, SLOT(newConnection(QTcpSocket*)));
+#ifndef QT_NO_OPENSSL
+    m_sslConfig = QSslConfiguration::defaultConfiguration();
+
+    QString hostKeyPath = gCoreContext->GetSetting("hostSSLKey", "");
+    QFile hostKeyFile(hostKeyPath);
+    if (!hostKeyFile.exists() || !hostKeyFile.open(QIODevice::ReadOnly))
+        LOG(VB_GENERAL, LOG_ERR, QString("HttpServer: Host key file (%1) does not exist").arg(hostKeyPath));
+    QByteArray rawHostKey = hostKeyFile.readAll();
+    m_sslHostKey = QSslKey(rawHostKey, QSsl::Rsa, QSsl::Pem, QSsl::PrivateKey);
+
+    if (m_sslHostKey.isNull())
+        LOG(VB_GENERAL, LOG_ERR, QString("HttpServer: Unable to load host key file (%1)").arg(hostKeyPath));
+
+    QString hostCertPath = gCoreContext->GetSetting("hostSSLCertificate", "");
+    QList<QSslCertificate> certList = QSslCertificate::fromPath(hostCertPath);
+    if (!certList.isEmpty())
+        m_sslHostCert = certList.first();
+
+    if (!m_sslHostCert.isValid())
+        LOG(VB_GENERAL, LOG_ERR, QString("HttpServer: Unable to load host cert file (%1)").arg(hostCertPath));
+    
+    QString caCertPath = gCoreContext->GetSetting("caSSLCertificate", "");
+    m_sslCACertList = QSslCertificate::fromPath(caCertPath);
+
+    if (m_sslCACertList.isEmpty())
+        LOG(VB_GENERAL, LOG_ERR, QString("HttpServer: Unable to load CA cert file (%1)").arg(hostCertPath));
+#endif
+
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -163,8 +191,14 @@ QScriptEngine* HttpServer::ScriptEngine()
 
 void HttpServer::newTcpConnection(qt_socket_fd_t socket)
 {
+    PoolServerType type = kTCPServer;
+    PrivTcpServer *server = dynamic_cast<PrivTcpServer *>(QObject::sender());
+    if (server)
+        type = server->GetServerType();
+
     m_threadPool.startReserved(
-        new HttpWorker(*this, socket),
+        new HttpWorker(*this, socket, type,
+                       m_sslConfig, m_sslHostKey, m_sslHostCert, m_sslCACertList),
         QString("HttpServer%1").arg(socket));
 }
 
@@ -277,8 +311,13 @@ void HttpServer::DelegateRequest(HTTPRequest *pRequest)
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
-HttpWorker::HttpWorker(HttpServer &httpServer, qt_socket_fd_t sock) :
-    m_httpServer(httpServer), m_socket(sock), m_socketTimeout(10000)
+HttpWorker::HttpWorker(HttpServer &httpServer, qt_socket_fd_t sock,
+                       PoolServerType type, QSslConfiguration sslConfig,
+                       QSslKey hostKey, QSslCertificate hostCert,
+                       QList<QSslCertificate> caCerts) :
+    m_httpServer(httpServer), m_socket(sock), m_socketTimeout(10000),
+    m_connectionType(type), m_sslConfig(sslConfig), m_sslHostKey(hostKey),
+    m_sslHostCert(hostCert), m_sslCACerts(caCerts)
 {
     LOG(VB_UPNP, LOG_DEBUG, QString("HttpWorker(%1): New connection")
                                         .arg(m_socket));
@@ -300,9 +339,51 @@ void HttpWorker::run(void)
     bool                    bTimeout   = false;
     bool                    bKeepAlive = true;
     HTTPRequest            *pRequest   = NULL;
-    QTcpSocket             *pSocket    = new QTcpSocket();
-    pSocket->setSocketDescriptor(m_socket);
-    int                     nRequestsHandled = 0; // Allow debugging of keep-alive and connection re-use
+    QTcpSocket             *pSocket;
+
+    if (m_connectionType == kSSLServer)
+    {
+#ifndef QT_NO_OPENSSL
+        QSslSocket *pSslSocket = new QSslSocket();
+        if (pSslSocket->setSocketDescriptor(m_socket))
+        {
+            pSslSocket->setSslConfiguration(m_sslConfig);
+            pSslSocket->setPrivateKey(m_sslHostKey);
+            pSslSocket->setLocalCertificate(m_sslHostCert);
+            pSslSocket->addCaCertificates(m_sslCACerts);
+            pSslSocket->startServerEncryption();
+            if (pSslSocket->waitForEncrypted(5000))
+            {
+                LOG(VB_UPNP, LOG_DEBUG, "SSL Handshake occurred, connection encrypted");
+            }
+            else
+            {
+                LOG(VB_UPNP, LOG_DEBUG, "SSL Handshake FAILED, connection terminated");
+                delete pSslSocket;
+                pSslSocket = NULL;
+            }
+        }
+        else
+        {
+            delete pSslSocket;
+            pSslSocket = NULL;
+        }
+
+        if (pSslSocket)
+            pSocket = dynamic_cast<QTcpSocket *>(pSslSocket);
+        else
+            return;
+#else
+        return;
+#endif
+    }
+    else // Plain old unencrypted socket
+    {
+        pSocket = new QTcpSocket();
+        pSocket->setSocketDescriptor(m_socket);
+    }
+
+    int nRequestsHandled = 0; // Allow debugging of keep-alive and connection re-use
 
     try
     {
@@ -415,7 +496,7 @@ void HttpWorker::run(void)
                                         .arg(pSocket->socketDescriptor())
                                         .arg(nRequestsHandled));
     pSocket->close();
-    pSocket->deleteLater();
+    delete pSocket;
     pSocket = NULL;
 
 #if 0

@@ -57,7 +57,8 @@ private:
     QNetworkAddressEntry m_host;
 };
 
-PrivTcpServer::PrivTcpServer(QObject *parent) : QTcpServer(parent)
+PrivTcpServer::PrivTcpServer(QObject *parent, PoolServerType type)
+              : QTcpServer(parent), m_serverType(type)
 {
 }
 
@@ -358,7 +359,7 @@ QList<QHostAddress> ServerPool::DefaultBroadcastIPv4(void)
 
 void ServerPool::close(void)
 {
-    QTcpServer *server;
+    PrivTcpServer *server;
     while (!m_tcpServers.isEmpty())
     {
         server = m_tcpServers.takeLast();
@@ -380,29 +381,33 @@ void ServerPool::close(void)
 }
 
 bool ServerPool::listen(QList<QHostAddress> addrs, quint16 port,
-                        bool requireall)
+                        bool requireall, PoolServerType servertype)
 {
     m_port = port;
     QList<QHostAddress>::const_iterator it;
 
     for (it = addrs.begin(); it != addrs.end(); ++it)
     {
-        PrivTcpServer *server = new PrivTcpServer(this);
+        PrivTcpServer *server = new PrivTcpServer(this, servertype);
+#if (QT_VERSION >= 0x050000)
+            connect(server, &PrivTcpServer::newConnection,
+                this,   &ServerPool::newTcpConnection);
+#else
+            connect(server, SIGNAL(newConnection(qt_socket_fd_t)),
+                this,   SLOT(newTcpConnection(qt_socket_fd_t)));
+#endif
+
         server->setProxy(m_proxy);
         server->setMaxPendingConnections(m_maxPendingConn);
 
-#if (QT_VERSION >= 0x050000)
-        connect(server, &PrivTcpServer::newConnection,
-                this,   &ServerPool::newTcpConnection);
-#else
-        connect(server, SIGNAL(newConnection(qt_socket_fd_t)),
-                this,   SLOT(newTcpConnection(qt_socket_fd_t)));
-#endif
         if (server->listen(*it, m_port))
         {
             LOG(VB_GENERAL, LOG_INFO, QString("Listening on TCP %1:%2")
                     .arg(PRETTYIP(it)).arg(port));
-            m_tcpServers.append(server);
+            if (servertype == kTCPServer)
+                m_tcpServers.append(server);
+            else
+
             if (m_port == 0)
                 m_port = server->serverPort();
         }
@@ -440,18 +445,20 @@ bool ServerPool::listen(QList<QHostAddress> addrs, quint16 port,
     return true;
 }
 
-bool ServerPool::listen(QStringList addrstr, quint16 port, bool requireall)
+bool ServerPool::listen(QStringList addrstr, quint16 port, bool requireall,
+                        PoolServerType servertype)
 {
     QList<QHostAddress> addrs;
     QStringList::const_iterator it;
     for (it = addrstr.begin(); it != addrstr.end(); ++it)
         addrs << QHostAddress(*it);
-    return listen(addrs, port, requireall);
+    return listen(addrs, port, requireall, servertype);
 }
 
-bool ServerPool::listen(quint16 port, bool requireall)
+bool ServerPool::listen(quint16 port, bool requireall,
+                        PoolServerType servertype)
 {
-    return listen(DefaultListen(), port, requireall);
+    return listen(DefaultListen(), port, requireall, servertype);
 }
 
 bool ServerPool::bind(QList<QHostAddress> addrs, quint16 port,
@@ -594,9 +601,19 @@ qint64 ServerPool::writeDatagram(const QByteArray &datagram,
 
 void ServerPool::newTcpConnection(qt_socket_fd_t socket)
 {
+    // Ignore connections from an SSL server for now, these are only handled
+    // by HttpServer which overrides newTcpConnection
+    PrivTcpServer *server = dynamic_cast<PrivTcpServer *>(QObject::sender());
+    if (!server || server->GetServerType() == kSSLServer)
+        return;
+
     QTcpSocket *qsock = new QTcpSocket(this);
-    qsock->setSocketDescriptor(socket);
-    emit newConnection(qsock);
+    if (qsock->setSocketDescriptor(socket))
+    {
+        emit newConnection(qsock);
+    }
+    else
+        delete qsock;
 }
 
 void ServerPool::newUdpDatagram(void)

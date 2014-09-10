@@ -29,6 +29,13 @@
 #include <QMutex>
 #include <QList>
 
+#ifndef QT_NO_OPENSSL
+#include <QSslConfiguration>
+#include <QSslError>
+#include <QSslSocket>
+#include <QSslKey>
+#endif
+
 // MythTV headers
 #include "mythqtcompat.h"
 #include "serverpool.h"
@@ -42,6 +49,9 @@ typedef struct timeval  TaskTime;
 class HttpWorkerThread;
 class QScriptEngine;
 class HttpServer;
+class QSslKey;
+class QSslCertificate;
+class QSslConfiguration;
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -99,6 +109,11 @@ class UPNP_PUBLIC HttpServer : public ServerPool
     static QMutex           s_platformLock;
     static QString          s_platform;
 
+    QSslConfiguration       m_sslConfig;
+    QSslKey                 m_sslHostKey;
+    QSslCertificate         m_sslHostCert;
+    QList<QSslCertificate>  m_sslCACertList;
+
   public:
     HttpServer(const QString &sApplicationPrefix = QString(""));
     virtual ~HttpServer();
@@ -143,7 +158,9 @@ class HttpWorker : public QRunnable
 {
   public:
 
-    HttpWorker(HttpServer &httpServer, qt_socket_fd_t sock);
+    HttpWorker(HttpServer &httpServer, qt_socket_fd_t sock, PoolServerType type,
+               QSslConfiguration sslConfig, QSslKey hostKey,
+               QSslCertificate hostCert, QList<QSslCertificate> caCert);
 
     virtual void run(void);
 
@@ -151,6 +168,12 @@ class HttpWorker : public QRunnable
     HttpServer &m_httpServer; 
     qt_socket_fd_t m_socket;
     int         m_socketTimeout;
+    PoolServerType m_connectionType;
+
+    QSslConfiguration       m_sslConfig;
+    QSslKey                 m_sslHostKey;
+    QSslCertificate         m_sslHostCert;
+    QList<QSslCertificate>  m_sslCACerts;
 };
 
 

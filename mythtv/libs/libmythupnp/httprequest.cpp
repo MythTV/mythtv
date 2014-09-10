@@ -1266,7 +1266,7 @@ bool HTTPRequest::ParseRequest()
         if (!m_mapHeaders.contains("content-length"))
             m_mapHeaders[ "content-length" ] = "0";
         if (!m_mapHeaders.contains("content-type"))
-            m_mapHeaders[ "content-type"   ] = "unknown";
+            m_mapHeaders[ "content-type"   ] = "application/octet-stream";
 
         // Check to see if we found the end of the header or we timed out.
 
