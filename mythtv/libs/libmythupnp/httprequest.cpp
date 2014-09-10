@@ -719,49 +719,7 @@ qint64 HTTPRequest::SendData( QIODevice *pDevice, qint64 llStart, qint64 llBytes
 
 qint64 HTTPRequest::SendFile( QFile &file, qint64 llStart, qint64 llBytes )
 {
-    qint64 sent = 0;
-
-// #ifndef __linux__
-    sent = SendData( (QIODevice *)(&file), llStart, llBytes );
-// #else
-//     __off64_t  offset = llStart;
-//     int        fd     = file.handle( );
-//
-//     if ( fd == -1 )
-//     {
-//         LOG(VB_UPNP, LOG_INFO,
-//             QString("SendResponseFile( %1 ) Error: %2 [%3]")
-//                 .arg(file.fileName()) .arg(file.error())
-//                 .arg(strerror(file.error())));
-//         sent = -1;
-//     }
-//     else
-//     {
-//         qint64     llSent = 0;
-//
-//         do
-//         {
-//             // SSIZE_MAX should work in kernels 2.6.16 and later.
-//             // The loop is needed in any case.
-//
-//             sent = sendfile64(getSocketHandle(), fd, &offset,
-//                               (size_t)MIN(llBytes, INT_MAX));
-//
-//             if (sent >= 0)
-//             {
-//                 llBytes -= sent;
-//                 llSent  += sent;
-//                 LOG(VB_UPNP, LOG_INFO,
-//                     QString("SendResponseFile : --- size = %1, "
-//                             "offset = %2, sent = %3")
-//                         .arg(llBytes).arg(offset).arg(sent));
-//             }
-//         }
-//         while (( sent >= 0 ) && ( llBytes > 0 ));
-//
-//         sent = llSent;
-//     }
-// #endif
+    qint64 sent = SendData( (QIODevice *)(&file), llStart, llBytes );
 
     return( sent );
 }
