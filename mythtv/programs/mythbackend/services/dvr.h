@@ -35,12 +35,12 @@ class Dvr : public DvrServices
     Q_OBJECT
 
     public:
-    
+
         Q_INVOKABLE Dvr( QObject *parent = 0 ) {}
 
     public:
 
-        DTC::ProgramList* GetExpiringList     ( int              StartIndex, 
+        DTC::ProgramList* GetExpiringList     ( int              StartIndex,
                                                 int              Count      );
 
         DTC::ProgramList* GetRecordedList     ( bool             Descending,
@@ -234,33 +234,41 @@ class Dvr : public DvrServices
 // QObject actually return QObject* (not the user class *).  If the user class pointer
 // is returned, the script engine treats it as a QVariant and doesn't create a
 // javascript prototype wrapper for it.
-// 
+//
 // This class allows us to keep the rich return types in the main API class while
 // offering the script engine a class it can work with.
-// 
+//
 // Only API Classes that return custom classes needs to implement these wrappers.
 //
 // We should continue to look for a cleaning solution to this problem.
 // --------------------------------------------------------------------------
 
+
 class ScriptableDvr : public QObject
 {
     Q_OBJECT
+
+    QScriptEngine *m_pEngine;
 
     private:
 
         Dvr    m_obj;
 
     public:
-    
-        Q_INVOKABLE ScriptableDvr( QObject *parent = 0 ) : QObject( parent ) {}
+
+        Q_INVOKABLE ScriptableDvr( QScriptEngine *pEngine, QObject *parent = 0 ) : QObject( parent )
+        {
+            m_pEngine = pEngine;
+        }
 
     public slots:
 
-        QObject* GetExpiringList      ( int              StartIndex, 
+        QObject* GetExpiringList     ( int              StartIndex,
                                        int              Count      )
         {
-            return m_obj.GetExpiringList( StartIndex, Count );
+            SCRIPT_CATCH_EXCEPTION( NULL,
+                return m_obj.GetExpiringList( StartIndex, Count );
+            )
         }
 
         QObject* GetRecordedList     ( bool             Descending,
@@ -270,42 +278,54 @@ class ScriptableDvr : public QObject
                                        const QString   &RecGroup,
                                        const QString   &StorageGroup)
         {
-            return m_obj.GetRecordedList( Descending, StartIndex, Count,
-                                          TitleRegEx, RecGroup,
-                                          StorageGroup);
+            SCRIPT_CATCH_EXCEPTION( NULL,
+                return m_obj.GetRecordedList( Descending, StartIndex, Count,
+                                              TitleRegEx, RecGroup,
+                                              StorageGroup);
+            )
         }
 
         QObject* GetRecorded         ( int              RecordedId )
         {
-            return m_obj.GetRecorded( RecordedId, 0, QDateTime() );
+            SCRIPT_CATCH_EXCEPTION( NULL,
+                return m_obj.GetRecorded( RecordedId, 0, QDateTime() );
+            )
         }
 
         bool RemoveRecorded           ( int              RecordedId,
                                         bool             ForceDelete,
                                         bool             AllowRerecord )
         {
-            return m_obj.RemoveRecorded( RecordedId, 0, QDateTime(),
-                                         ForceDelete, AllowRerecord);
+            SCRIPT_CATCH_EXCEPTION( false,
+                return m_obj.RemoveRecorded( RecordedId, 0, QDateTime(),
+                                             ForceDelete, AllowRerecord );
+            )
         }
 
         bool DeleteRecording          ( int              RecordedId,
                                         bool             ForceDelete,
                                         bool             AllowRerecord  )
         {
-            return m_obj.DeleteRecording(RecordedId, 0, QDateTime(),
-                                         ForceDelete, AllowRerecord);
+            SCRIPT_CATCH_EXCEPTION( false,
+                return m_obj.DeleteRecording(RecordedId, 0, QDateTime(),
+                                             ForceDelete, AllowRerecord);
+            )
         }
 
         bool UnDeleteRecording        ( int              RecordedId )
         {
-            return m_obj.UnDeleteRecording(RecordedId, 0, QDateTime());
+            SCRIPT_CATCH_EXCEPTION( false,
+                return m_obj.UnDeleteRecording(RecordedId, 0, QDateTime());
+            )
         }
 
         QObject* GetConflictList    ( int              StartIndex,
                                       int              Count,
                                       int              RecordId )
         {
-            return m_obj.GetConflictList( StartIndex, Count, RecordId );
+            SCRIPT_CATCH_EXCEPTION( NULL,
+                return m_obj.GetConflictList( StartIndex, Count, RecordId );
+            )
         }
 
         QObject* GetUpcomingList    ( int              StartIndex,
@@ -314,32 +334,32 @@ class ScriptableDvr : public QObject
                                       int              RecordId,
                                       int              RecStatus )
         {
-            return m_obj.GetUpcomingList( StartIndex, Count, ShowAll,
-                                          RecordId, RecStatus );
+            SCRIPT_CATCH_EXCEPTION( NULL,
+                return m_obj.GetUpcomingList( StartIndex, Count, ShowAll,
+                                              RecordId, RecStatus );
+            )
         }
 
-        QObject* GetEncoderList     () { return m_obj.GetEncoderList(); }
-
-        QObject* GetInputList       () { return m_obj.GetInputList();   }
-
-        QStringList GetRecGroupList        () { return m_obj.GetRecGroupList(); }
-
-        QStringList GetRecStorageGroupList () { return m_obj.GetRecStorageGroupList(); }
-
-        QStringList GetPlayGroupList       () { return m_obj.GetPlayGroupList(); }
-
-        QObject* GetRecRuleFilterList      () { return m_obj.GetRecRuleFilterList(); }
+        QObject*    GetEncoderList         () { SCRIPT_CATCH_EXCEPTION( NULL, return m_obj.GetEncoderList(); )}
+        QObject*    GetInputList           () { SCRIPT_CATCH_EXCEPTION( NULL, return m_obj.GetInputList();   )}
+        QStringList GetRecGroupList        () { SCRIPT_CATCH_EXCEPTION( QStringList(), return m_obj.GetRecGroupList();       )}
+        QStringList GetRecStorageGroupList () { SCRIPT_CATCH_EXCEPTION( QStringList(), return m_obj.GetRecStorageGroupList();)}
+        QStringList GetPlayGroupList       () { SCRIPT_CATCH_EXCEPTION( QStringList(), return m_obj.GetPlayGroupList();      )}
+        QObject*    GetRecRuleFilterList   () { SCRIPT_CATCH_EXCEPTION( NULL, return m_obj.GetRecRuleFilterList(); )}
 
         QStringList GetTitleList    ( const QString   &RecGroup )
         {
-            return m_obj.GetTitleList( RecGroup );
+            SCRIPT_CATCH_EXCEPTION( QStringList(),
+                return m_obj.GetTitleList( RecGroup );
+            )
         }
 
-        QObject* GetTitleInfoList   () { return m_obj.GetTitleInfoList(); }
+        QObject* GetTitleInfoList   () { SCRIPT_CATCH_EXCEPTION( NULL, return m_obj.GetTitleInfoList(); )}
 
         uint AddRecordSchedule ( DTC::RecRule *rule )
         {
-            return m_obj.AddRecordSchedule(
+            SCRIPT_CATCH_EXCEPTION( 0,
+                return m_obj.AddRecordSchedule(
                                     rule->Title(),          rule->SubTitle(),
                                     rule->Description(),    rule->Category(),
                                     rule->StartTime(),      rule->EndTime(),
@@ -361,14 +381,17 @@ class ScriptableDvr : public QObject
                                     rule->AutoUserJob1(),   rule->AutoUserJob2(),
                                     rule->AutoUserJob3(),   rule->AutoUserJob4(),
                                     rule->Transcoder());
+            )
         }
 
         bool UpdateRecordSchedule ( DTC::RecRule *rule )
         {
-            if (rule->Id() <= 0)
-                throw QString("Record ID cannot be <= zero");
+            SCRIPT_CATCH_EXCEPTION( false,
 
-            return m_obj.UpdateRecordSchedule(
+                if (rule->Id() <= 0)
+                    throw QString("Record ID cannot be <= zero");
+
+                return m_obj.UpdateRecordSchedule(
                                     static_cast<uint>(rule->Id()),
                                     rule->Title(),          rule->SubTitle(),
                                     rule->Description(),    rule->Category(),
@@ -391,18 +414,23 @@ class ScriptableDvr : public QObject
                                     rule->AutoUserJob1(),   rule->AutoUserJob2(),
                                     rule->AutoUserJob3(),   rule->AutoUserJob4(),
                                     rule->Transcoder());
+            )
         }
 
         bool RemoveRecordSchedule ( uint RecordId )
         {
-            return m_obj.RemoveRecordSchedule(RecordId);
+            SCRIPT_CATCH_EXCEPTION( false,
+                return m_obj.RemoveRecordSchedule(RecordId);
+            )
         }
 
         bool AddDontRecordSchedule( int              ChanId,
                                     const QDateTime &StartTime,
                                     bool             NeverRecord )
         {
-            return m_obj.AddDontRecordSchedule(ChanId, StartTime, NeverRecord);
+            SCRIPT_CATCH_EXCEPTION( false,
+                return m_obj.AddDontRecordSchedule(ChanId, StartTime, NeverRecord);
+            )
         }
 
         QObject* GetRecordScheduleList( int             StartIndex,
@@ -410,7 +438,9 @@ class ScriptableDvr : public QObject
                                         const QString  &Sort,
                                         bool            Descending  )
         {
-            return m_obj.GetRecordScheduleList(StartIndex, Count, Sort, Descending);
+            SCRIPT_CATCH_EXCEPTION( NULL,
+                return m_obj.GetRecordScheduleList(StartIndex, Count, Sort, Descending);
+            )
         }
 
         QObject* GetRecordSchedule ( uint      RecordId,
@@ -420,65 +450,87 @@ class ScriptableDvr : public QObject
                                      QDateTime StartTime,
                                      bool      MakeOverride )
         {
-            return m_obj.GetRecordSchedule( RecordId,  Template, RecordedId,
-                                            ChanId, StartTime, MakeOverride);
+            SCRIPT_CATCH_EXCEPTION( NULL,
+                return m_obj.GetRecordSchedule( RecordId,  Template, RecordedId,
+                                                ChanId, StartTime, MakeOverride);
+            )
         }
 
         bool EnableRecordSchedule ( uint RecordId )
         {
-            return m_obj.EnableRecordSchedule(RecordId);
+            SCRIPT_CATCH_EXCEPTION( false,
+                return m_obj.EnableRecordSchedule(RecordId);
+            )
         }
 
         bool DisableRecordSchedule( uint RecordId )
         {
-            return m_obj.DisableRecordSchedule(RecordId);
+            SCRIPT_CATCH_EXCEPTION( false,
+                return m_obj.DisableRecordSchedule(RecordId);
+            )
         }
 
         QString RecStatusToString( int RecStatus )
         {
-            return m_obj.RecStatusToString(RecStatus);
+            SCRIPT_CATCH_EXCEPTION( QString(),
+                return m_obj.RecStatusToString(RecStatus);
+            )
         }
 
         QString RecStatusToDescription( int RecStatus,
                                         int RecType,
                                         const QDateTime &StartTime )
         {
-            return m_obj.RecStatusToDescription(RecStatus,
-                                                RecType,
-                                                StartTime );
+            SCRIPT_CATCH_EXCEPTION( QString(),
+                return m_obj.RecStatusToDescription(RecStatus,
+                                                    RecType,
+                                                    StartTime );
+            )
         }
 
         QString RecTypeToString( QString RecType )
         {
-            return m_obj.RecTypeToString( RecType );
+            SCRIPT_CATCH_EXCEPTION( QString(),
+                return m_obj.RecTypeToString( RecType );
+            )
         }
 
         QString RecTypeToDescription( QString RecType )
         {
-            return m_obj.RecTypeToDescription( RecType );
+            SCRIPT_CATCH_EXCEPTION( QString(),
+                return m_obj.RecTypeToDescription( RecType );
+            )
         }
 
         QString DupMethodToString( QString DupMethod )
         {
-            return m_obj.DupMethodToString( DupMethod );
+            SCRIPT_CATCH_EXCEPTION( QString(),
+                return m_obj.DupMethodToString( DupMethod );
+            )
         }
 
         QString DupMethodToDescription( QString DupMethod )
         {
-            return m_obj.DupMethodToDescription( DupMethod );
+            SCRIPT_CATCH_EXCEPTION( QString(),
+                return m_obj.DupMethodToDescription( DupMethod );
+            )
         }
 
         QString DupInToString( QString DupIn )
         {
-            return m_obj.DupInToString( DupIn );
+            SCRIPT_CATCH_EXCEPTION( QString(),
+                return m_obj.DupInToString( DupIn );
+            )
         }
 
         QString DupInToDescription( QString DupIn )
         {
-            return m_obj.DupInToDescription( DupIn );
+            SCRIPT_CATCH_EXCEPTION( QString(),
+                return m_obj.DupInToDescription( DupIn );
+            )
         }
 };
 
-Q_SCRIPT_DECLARE_QMETAOBJECT( ScriptableDvr, QObject*);
+Q_SCRIPT_DECLARE_QMETAOBJECT_MYTHTV( ScriptableDvr, QObject*);
 
-#endif 
+#endif

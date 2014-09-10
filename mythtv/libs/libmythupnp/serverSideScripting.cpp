@@ -339,13 +339,28 @@ bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &
         args << m_engine.newQObject( &outStream );
         args << m_engine.toScriptValue(params);
 
-        pInfo->m_oFunc.call( QScriptValue(), args );
+        QScriptValue ret = pInfo->m_oFunc.call( QScriptValue(), args );
+
+        if (ret.isError())
+        {
+            QScriptValue lineNo = ret.property( "lineNumber" );
+
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Error calling QSP File: %1(%2) - %3")
+                    .arg(sFileName)
+                    .arg( lineNo.toInt32 () )
+                    .arg( ret   .toString() ));
+            Unlock();
+            return false;
+
+        }
 
         if (m_engine.hasUncaughtException())
         {
             LOG(VB_GENERAL, LOG_ERR,
-                QString("Error calling QSP File: %1 - %2")
+                QString("Error calling QSP File: %1(%2) - %3")
                     .arg(sFileName)
+                    .arg(m_engine.uncaughtExceptionLineNumber() )
                     .arg(m_engine.uncaughtException().toString()));
             Unlock();
             return false;
@@ -385,6 +400,7 @@ QString ServerSideScripting::CreateMethodFromFile( const QString &sFileName ) co
         QString sTransBuffer;
 
         sCode << "(function( os, ARGS ) {\n";
+        sCode << "try {\n";
 
         while( !stream.atEnd() )
         {
@@ -393,6 +409,7 @@ QString ServerSideScripting::CreateMethodFromFile( const QString &sFileName ) co
             bInCode = ProcessLine( sCode, sLine, bInCode, sTransBuffer );
         }
     
+        sCode << "} catch( err ) { return err; }\n";
         sCode << "})";
     }
     catch(...)
