@@ -4650,6 +4650,17 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
         avcodeclock->lock();
         data_size = 0;
 
+        // Check if the number of channels or sampling rate have changed
+        if (ctx->sample_rate != audioOut.sample_rate ||
+            ctx->channels    != audioOut.channels)
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC + "Audio stream changed");
+            currentTrack[kTrackTypeAudio] = -1;
+            selectedTrack[kTrackTypeAudio].av_stream_index = -1;
+            audIdx = -1;
+            AutoSelectAudioTrack();
+        }
+
         if (audioOut.do_passthru)
         {
             if (!already_decoded)
@@ -4660,7 +4671,9 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                     decoded_size = data_size;
                 }
                 else
+                {
                     decoded_size = -1;
+                }
             }
             memcpy(audioSamples, tmp_pkt.data, tmp_pkt.size);
             data_size = tmp_pkt.size;
@@ -4685,19 +4698,6 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
 
                 ret = m_audio->DecodeAudio(ctx, audioSamples, data_size, &tmp_pkt);
                 decoded_size = data_size;
-            }
-
-            // When decoding some audio streams the number of
-            // channels, etc isn't known until we try decoding it.
-            if (ctx->sample_rate != audioOut.sample_rate ||
-                ctx->channels    != audioOut.channels)
-            {
-                LOG(VB_GENERAL, LOG_INFO, LOC + "Audio stream changed");
-                currentTrack[kTrackTypeAudio] = -1;
-                selectedTrack[kTrackTypeAudio].av_stream_index = -1;
-                audIdx = -1;
-                AutoSelectAudioTrack();
-                data_size = 0;
             }
         }
         avcodeclock->unlock();
