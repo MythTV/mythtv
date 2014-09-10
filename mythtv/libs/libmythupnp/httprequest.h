@@ -17,12 +17,12 @@
 #include <QRegExp>
 #include <QBuffer>
 #include <QTextStream>
+#include <QTcpSocket>
 
 using namespace std;
 
 #include "upnpexp.h"
 #include "upnputil.h"
-#include "bufferedsocketdevice.h"
 #include "serializers/serializer.h"
 
 #define SOAP_ENVELOPE_BEGIN  "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" " \
@@ -186,8 +186,8 @@ class UPNP_PUBLIC HTTPRequest
         void            FormatFileResponse  ( const QString &sFileName );
         void            FormatRawResponse   ( const QString &sXML );
 
-        long            SendResponse    ( void );
-        long            SendResponseFile( QString sFileName );
+        qint64          SendResponse    ( void );
+        qint64          SendResponseFile( QString sFileName );
 
         QString         GetHeaderValue  ( const QString &sKey, QString sDefault );
 
@@ -208,22 +208,13 @@ class UPNP_PUBLIC HTTPRequest
 
         // ------------------------------------------------------------------
 
-        virtual qlonglong  BytesAvailable  () = 0;
-        virtual qulonglong WaitForMore     ( int msecs, bool *timeout = NULL ) = 0;
-        virtual bool    CanReadLine     () = 0;
-        virtual QString ReadLine        ( int msecs = 0 ) = 0;
-        virtual qlonglong  ReadBlock       ( char *pData, qulonglong nMaxLen, int msecs = 0 ) = 0;
-        virtual qlonglong  WriteBlock      ( const char *pData,
-                                          qulonglong nLen    ) = 0;
-        virtual qlonglong  WriteBlockDirect( const char *pData,
-                                          qulonglong nLen    ) = 0;
+        virtual QString ReadLine        ( int msecs ) = 0;
+        virtual qint64  ReadBlock       ( char *pData, qint64 nMaxLen, int msecs = 0 ) = 0;
+        virtual qint64  WriteBlock      ( const char *pData,
+                                          qint64 nLen    ) = 0;
         virtual QString GetHostAddress  () = 0;
         virtual QString GetPeerAddress  () = 0;
-        virtual void    Flush           () = 0;
-        virtual bool    IsValid         () = 0;
         virtual int     getSocketHandle () = 0;
-        virtual void    SetBlocking     ( bool bBlock ) = 0;
-        virtual bool    IsBlocking      () = 0;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -234,27 +225,19 @@ class BufferedSocketDeviceRequest : public HTTPRequest
 {
     public:    
 
-        BufferedSocketDevice    *m_pSocket;
+        QTcpSocket    *m_pSocket;
 
     public:
         
-                 BufferedSocketDeviceRequest( BufferedSocketDevice *pSocket );
+                 BufferedSocketDeviceRequest( QTcpSocket *pSocket );
         virtual ~BufferedSocketDeviceRequest() {};
 
-        virtual qlonglong  BytesAvailable  ();
-        virtual qulonglong WaitForMore     ( int msecs, bool *timeout = NULL );
-        virtual bool    CanReadLine     ();
-        virtual QString ReadLine        ( int msecs = 0 );
-        virtual qlonglong  ReadBlock       ( char *pData, qulonglong nMaxLen, int msecs = 0  );
-        virtual qlonglong  WriteBlock      ( const char *pData, qulonglong nLen    );
-        virtual qlonglong  WriteBlockDirect( const char *pData, qulonglong nLen    );
+        virtual QString ReadLine        ( int msecs );
+        virtual qint64  ReadBlock       ( char *pData, qint64 nMaxLen, int msecs = 0  );
+        virtual qint64  WriteBlock      ( const char *pData, qint64 nLen    );
         virtual QString GetHostAddress  ();
         virtual QString GetPeerAddress  ();
-        virtual void    Flush           () { m_pSocket->Flush(); }
-        virtual bool    IsValid         () {return( m_pSocket->IsValid() ); }
-        virtual int     getSocketHandle () {return( m_pSocket->socket() ); }
-        virtual void    SetBlocking     ( bool bBlock );
-        virtual bool    IsBlocking      ();
+        virtual int     getSocketHandle () {return( m_pSocket->socketDescriptor() ); }
 
 };
 

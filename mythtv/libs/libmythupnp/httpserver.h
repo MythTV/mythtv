@@ -84,6 +84,8 @@ typedef QList<QPointer<HttpServerExtension> > HttpServerExtensionList;
 
 class UPNP_PUBLIC HttpServer : public ServerPool
 {
+    Q_OBJECT
+
   protected:
     mutable QReadWriteLock  m_rwlock;
     HttpServerExtensionList m_extensions;
@@ -107,7 +109,10 @@ class UPNP_PUBLIC HttpServer : public ServerPool
 
     QScriptEngine *ScriptEngine(void);
 
+  protected slots:
     virtual void newTcpConnection(qt_socket_fd_t socket); // QTcpServer
+
+  public:
 
     QString GetSharePath(void) const
     { // never modified after creation, so no need to lock
