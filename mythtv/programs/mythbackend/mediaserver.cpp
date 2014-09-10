@@ -148,9 +148,9 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
      pEngine->globalObject().setProperty("Video"  ,
          pEngine->scriptValueFromQMetaObject< ScriptableVideo   >() );
      pEngine->globalObject().setProperty("Capture"  ,
-         pEngine->scriptValueFromQMetaObject< ScriptableCapture   >() );
+         pEngine->scriptValueFromQMetaObject< ScriptableCapture  >() );
      pEngine->globalObject().setProperty("Image"  ,
-         pEngine->scriptValueFromQMetaObject< Image             >() );
+         pEngine->scriptValueFromQMetaObject< ScriptableImage   >() );
 
     // ------------------------------------------------------------------
 

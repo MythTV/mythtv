@@ -123,54 +123,62 @@ class ScriptableCapture : public QObject
 
     private:
 
-        Capture    m_obj;
+        Capture        m_obj;
+        QScriptEngine *m_pEngine;
 
     public:
 
-        Q_INVOKABLE ScriptableCapture( QObject *parent = 0 ) : QObject( parent ) {}
+        Q_INVOKABLE ScriptableCapture( QScriptEngine *pEngine, QObject *parent = 0 ) : QObject( parent )
+        {
+            m_pEngine = pEngine;
+        }
 
     public slots:
 
         bool RemoveCaptureCard  ( int              Id         )
         {
-            return m_obj.RemoveCaptureCard( Id );
+            SCRIPT_CATCH_EXCEPTION( false,
+                return m_obj.RemoveCaptureCard( Id );
+            )
         }
 
-        bool                        AddCaptureCard     ( const QString    &VideoDevice,
-                                                         const QString    &AudioDevice,
-                                                         const QString    &VBIDevice,
-                                                         const QString    &CardType,
-                                                         const uint       AudioRateLimit,
-                                                         const QString    &HostName,
-                                                         const uint       DVBSWFilter,
-                                                         const uint       DVBSatType,
-                                                         bool             DVBWaitForSeqStart,
-                                                         bool             SkipBTAudio,
-                                                         bool             DVBOnDemand,
-                                                         const uint       DVBDiSEqCType,
-                                                         const uint       FirewireSpeed,
-                                                         const QString    &FirewireModel,
-                                                         const uint       FirewireConnection,
-                                                         const uint       SignalTimeout,
-                                                         const uint       ChannelTimeout,
-                                                         const uint       DVBTuningDelay,
-                                                         const uint       Contrast,
-                                                         const uint       Brightness,
-                                                         const uint       Colour,
-                                                         const uint       Hue,
-                                                         const uint       DiSEqCId,
-                                                         bool             DVBEITScan)
+        bool AddCaptureCard     ( const QString    &VideoDevice,
+                                  const QString    &AudioDevice,
+                                  const QString    &VBIDevice,
+                                  const QString    &CardType,
+                                  const uint       AudioRateLimit,
+                                  const QString    &HostName,
+                                  const uint       DVBSWFilter,
+                                  const uint       DVBSatType,
+                                  bool             DVBWaitForSeqStart,
+                                  bool             SkipBTAudio,
+                                  bool             DVBOnDemand,
+                                  const uint       DVBDiSEqCType,
+                                  const uint       FirewireSpeed,
+                                  const QString    &FirewireModel,
+                                  const uint       FirewireConnection,
+                                  const uint       SignalTimeout,
+                                  const uint       ChannelTimeout,
+                                  const uint       DVBTuningDelay,
+                                  const uint       Contrast,
+                                  const uint       Brightness,
+                                  const uint       Colour,
+                                  const uint       Hue,
+                                  const uint       DiSEqCId,
+                                  bool             DVBEITScan)
         {
-            return m_obj.AddCaptureCard( VideoDevice, AudioDevice, VBIDevice, CardType,
+            SCRIPT_CATCH_EXCEPTION( false,
+                return m_obj.AddCaptureCard( VideoDevice, AudioDevice, VBIDevice, CardType,
                                 AudioRateLimit, HostName, DVBSWFilter,
                                 DVBSatType, DVBWaitForSeqStart, SkipBTAudio, DVBOnDemand,
                                 DVBDiSEqCType, FirewireSpeed, FirewireModel, FirewireConnection,
                                 SignalTimeout, ChannelTimeout, DVBTuningDelay, Contrast, Brightness,
                                 Colour, Hue, DiSEqCId, DVBEITScan);
+            )
         }
 };
 
 
-Q_SCRIPT_DECLARE_QMETAOBJECT( ScriptableCapture, QObject*);
+Q_SCRIPT_DECLARE_QMETAOBJECT_MYTHTV( ScriptableCapture, QObject*);
 
 #endif

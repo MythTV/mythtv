@@ -156,27 +156,38 @@ class ScriptableContent : public QObject
     private:
 
         Content  m_obj;
+        QScriptEngine *m_pEngine;
 
     public:
 
-        Q_INVOKABLE ScriptableContent( QObject *parent = 0 ) : QObject( parent ) {}
+        Q_INVOKABLE ScriptableContent( QScriptEngine *pEngine, QObject *parent = 0 ) : QObject( parent )
+        {
+            m_pEngine = pEngine;
+        }
 
     public slots:
+
         QObject* GetRecordingArtworkList( int RecordedId )
         {
-            return m_obj.GetRecordingArtworkList( RecordedId, 0, QDateTime() );
+            SCRIPT_CATCH_EXCEPTION( NULL,
+                return m_obj.GetRecordingArtworkList( RecordedId, 0, QDateTime() );
+            )
         }
 
         QObject* GetProgramArtworkList( const QString &Inetref,
                                               int      Season  )
         {
-            return m_obj.GetProgramArtworkList( Inetref, Season );
+            SCRIPT_CATCH_EXCEPTION( NULL,
+                return m_obj.GetProgramArtworkList( Inetref, Season );
+            )
         }
 
         QString GetHash ( const QString   &StorageGroup,
                           const QString   &FileName )
         {
-            return m_obj.GetHash( StorageGroup, FileName );
+            SCRIPT_CATCH_EXCEPTION( QString(),
+                return m_obj.GetHash( StorageGroup, FileName );
+            )
         }
 
         // HTTP Live Streaming
@@ -190,9 +201,11 @@ class ScriptableContent : public QObject
                                  int              AudioBitrate,
                                  int              SampleRate )
         {
-            return m_obj.AddLiveStream(StorageGroup, FileName, HostName,
+            SCRIPT_CATCH_EXCEPTION( NULL,
+                return m_obj.AddLiveStream(StorageGroup, FileName, HostName,
                                        MaxSegments, Width, Height, Bitrate,
                                        AudioBitrate, SampleRate);
+            )
         }
 
         QObject* AddRecordingLiveStream (int              RecordedId,
@@ -203,10 +216,12 @@ class ScriptableContent : public QObject
                                          int              AudioBitrate,
                                          int              SampleRate )
         {
-            return m_obj.AddRecordingLiveStream(RecordedId, 0, QDateTime(),
+            SCRIPT_CATCH_EXCEPTION( NULL,
+                return m_obj.AddRecordingLiveStream(RecordedId, 0, QDateTime(),
                                                 MaxSegments,
                                                 Width, Height, Bitrate,
                                                 AudioBitrate, SampleRate);
+            )
         }
 
         QObject* AddVideoLiveStream( int              Id,
@@ -217,32 +232,42 @@ class ScriptableContent : public QObject
                                      int              AudioBitrate,
                                      int              SampleRate )
         {
-            return m_obj.AddVideoLiveStream(Id, MaxSegments, Width, Height,
+            SCRIPT_CATCH_EXCEPTION( NULL,
+                return m_obj.AddVideoLiveStream(Id, MaxSegments, Width, Height,
                                             Bitrate, AudioBitrate, SampleRate);
+            )
         }
 
         QObject* GetLiveStream( int Id )
         {
-            return m_obj.GetLiveStream( Id );
+            SCRIPT_CATCH_EXCEPTION( NULL,
+                return m_obj.GetLiveStream( Id );
+            )
         }
 
         QObject* GetLiveStreamList( const QString &FileName )
         {
-            return m_obj.GetLiveStreamList( FileName );
+            SCRIPT_CATCH_EXCEPTION( NULL,
+                return m_obj.GetLiveStreamList( FileName );
+            )
         }
 
         QObject* StopLiveStream( int Id )
         {
-            return m_obj.StopLiveStream(Id);
+            SCRIPT_CATCH_EXCEPTION( NULL,
+                return m_obj.StopLiveStream(Id);
+            )
         }
 
         bool RemoveLiveStream( int Id )
         {
-            return m_obj.RemoveLiveStream(Id);
+            SCRIPT_CATCH_EXCEPTION( false,
+                return m_obj.RemoveLiveStream(Id);
+            )
         }
 };
 
-Q_SCRIPT_DECLARE_QMETAOBJECT( ScriptableContent, QObject*);
+Q_SCRIPT_DECLARE_QMETAOBJECT_MYTHTV( ScriptableContent, QObject*);
 
 #endif
 

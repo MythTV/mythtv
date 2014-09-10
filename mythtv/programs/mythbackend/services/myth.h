@@ -159,65 +159,107 @@ class ScriptableMyth : public QObject
 
     private:
 
-        Myth    m_obj;
+        Myth           m_obj;
+        QScriptEngine *m_pEngine;
 
     public:
 
-        Q_INVOKABLE ScriptableMyth( QObject *parent = 0 ) : QObject( parent ) {}
+        Q_INVOKABLE ScriptableMyth( QScriptEngine *pEngine, QObject *parent = 0 ) : QObject( parent )
+        {
+            m_pEngine = pEngine;
+        }
 
     public slots:
 
         QObject* GetConnectionInfo  ( const QString   &Pin )
         {
-            return m_obj.GetConnectionInfo( Pin );
+            SCRIPT_CATCH_EXCEPTION( NULL,
+                return m_obj.GetConnectionInfo( Pin );
+            )
         }
 
-        QString     GetHostName() { return m_obj.GetHostName(); }
-        QStringList GetHosts   () { return m_obj.GetHosts();    }
-        QStringList GetKeys    () { return m_obj.GetKeys ();    }
+        QString     GetHostName()
+        {
+            SCRIPT_CATCH_EXCEPTION( QString(),
+                return m_obj.GetHostName();
+            )
+        }
+
+        QStringList GetHosts()
+        {
+            SCRIPT_CATCH_EXCEPTION( QStringList(),
+                return m_obj.GetHosts();
+            )
+        }
+
+        QStringList GetKeys()
+        {
+            SCRIPT_CATCH_EXCEPTION( QStringList(),
+                return m_obj.GetKeys();
+            )
+        }
 
         QObject* GetStorageGroupDirs ( const QString   &GroupName,
                                        const QString   &HostName )
         {
-            return m_obj.GetStorageGroupDirs( GroupName, HostName );
+            SCRIPT_CATCH_EXCEPTION( NULL,
+                return m_obj.GetStorageGroupDirs( GroupName, HostName );
+            )
         }
 
         bool AddStorageGroupDir ( const QString   &GroupName,
                                   const QString   &DirName,
                                   const QString   &HostName )
         {
-            return m_obj.AddStorageGroupDir( GroupName, DirName, HostName );
+            SCRIPT_CATCH_EXCEPTION( false,
+                return m_obj.AddStorageGroupDir( GroupName, DirName, HostName );
+            )
         }
 
         bool RemoveStorageGroupDir  ( const QString   &GroupName,
                                       const QString   &DirName,
                                       const QString   &HostName )
         {
-            return m_obj.RemoveStorageGroupDir( GroupName, DirName, HostName );
+            SCRIPT_CATCH_EXCEPTION( false,
+                return m_obj.RemoveStorageGroupDir( GroupName, DirName, HostName );
+            )
         }
 
-        QObject* GetTimeZone() { return m_obj.GetTimeZone( ); }
+        QObject* GetTimeZone()
+        {
+            SCRIPT_CATCH_EXCEPTION( NULL,
+                return m_obj.GetTimeZone( );
+            )
+        }
 
         QString   GetFormatDate( const QDateTime Date,
                                  bool            ShortDate = false )
         {
-            return m_obj.GetFormatDate( Date, ShortDate );
+            SCRIPT_CATCH_EXCEPTION( QString(),
+                return m_obj.GetFormatDate( Date, ShortDate );
+            )
         }
 
         QString   GetFormatDateTime( const QDateTime DateTime,
                                      bool            ShortDate = false )
         {
-            return m_obj.GetFormatDateTime( DateTime, ShortDate );
+            SCRIPT_CATCH_EXCEPTION( QString(),
+                return m_obj.GetFormatDateTime( DateTime, ShortDate );
+            )
         }
 
         QString   GetFormatTime( const QDateTime Time )
         {
-            return m_obj.GetFormatTime( Time );
+            SCRIPT_CATCH_EXCEPTION( QString(),
+                return m_obj.GetFormatTime( Time );
+            )
         }
 
         QDateTime ParseISODateString( const QString &DateTime )
         {
-            return m_obj.ParseISODateString(DateTime);
+            SCRIPT_CATCH_EXCEPTION( QDateTime(),
+                return m_obj.ParseISODateString(DateTime);
+            )
         }
 
         QObject* GetLogs( const QString   &HostName,
@@ -233,28 +275,36 @@ class ScriptableMyth : public QObject
                           const QString   &Level,
                           const QString   &MsgContains )
         {
-            return m_obj.GetLogs( HostName, Application, PID, TID, Thread,
+            SCRIPT_CATCH_EXCEPTION( NULL,
+                return m_obj.GetLogs( HostName, Application, PID, TID, Thread,
                                   Filename, Line, Function, FromTime, ToTime,
                                   Level, MsgContains );
+            )
         }
 
         QObject* GetFrontends( bool OnLine )
         {
-            return m_obj.GetFrontends( OnLine );
+            SCRIPT_CATCH_EXCEPTION( NULL,
+                return m_obj.GetFrontends( OnLine );
+            )
         }
 
         QObject* GetSetting ( const QString   &HostName,
                               const QString   &Key,
                               const QString   &Default )
         {
-            return m_obj.GetSetting( HostName, Key, Default );
+            SCRIPT_CATCH_EXCEPTION( NULL,
+                return m_obj.GetSetting( HostName, Key, Default );
+            )
         }
 
         bool PutSetting( const QString   &HostName,
                          const QString   &Key,
                          const QString   &Value   )
         {
-            return m_obj.PutSetting( HostName, Key, Value );
+            SCRIPT_CATCH_EXCEPTION( false,
+                return m_obj.PutSetting( HostName, Key, Value );
+            )
         }
 
         bool TestDBSettings( const QString &HostName,
@@ -263,8 +313,10 @@ class ScriptableMyth : public QObject
                              const QString &DBName,
                              int   dbPort)
         {
-            return m_obj.TestDBSettings( HostName, UserName, Password,
+            SCRIPT_CATCH_EXCEPTION( false,
+                return m_obj.TestDBSettings( HostName, UserName, Password,
                                          DBName, dbPort );
+            )
         }
 
         bool SendMessage( const QString &Message,
@@ -272,50 +324,61 @@ class ScriptableMyth : public QObject
                           int   udpPort,
                           int   Timeout)
         {
-            return m_obj.SendMessage( Message, Address, udpPort, Timeout );
+            SCRIPT_CATCH_EXCEPTION( false,
+                return m_obj.SendMessage( Message, Address, udpPort, Timeout );
+            )
         }
 
         bool BackupDatabase( void )
         {
-            return m_obj.BackupDatabase();
+            SCRIPT_CATCH_EXCEPTION( false,
+                return m_obj.BackupDatabase();
+            )
         }
 
         bool CheckDatabase( bool Repair )
         {
-            return m_obj.CheckDatabase( Repair );
+            SCRIPT_CATCH_EXCEPTION( false,
+                return m_obj.CheckDatabase( Repair );
+            )
         }
 
         bool ProfileSubmit( void )
         {
-            return m_obj.ProfileSubmit();
+            SCRIPT_CATCH_EXCEPTION( false,
+                return m_obj.ProfileSubmit();
+            )
         }
 
         bool ProfileDelete( void )
         {
-            return m_obj.ProfileDelete();
+            SCRIPT_CATCH_EXCEPTION( false,
+                return m_obj.ProfileDelete();
+            )
         }
 
         QString ProfileURL( void )
         {
-            return m_obj.ProfileURL();
+            SCRIPT_CATCH_EXCEPTION( QString(),
+                return m_obj.ProfileURL();
+            )
         }
 
         QString ProfileUpdated( void )
         {
-            return m_obj.ProfileUpdated();
+            SCRIPT_CATCH_EXCEPTION( QString(),
+                return m_obj.ProfileUpdated();
+            )
         }
 
         QString ProfileText( void )
         {
-            return m_obj.ProfileText();
+            SCRIPT_CATCH_EXCEPTION( QString(),
+                return m_obj.ProfileText();
+            )
         }
-
-
 };
 
-
-Q_SCRIPT_DECLARE_QMETAOBJECT( ScriptableMyth, QObject*);
-
-
+Q_SCRIPT_DECLARE_QMETAOBJECT_MYTHTV( ScriptableMyth, QObject*);
 
 #endif

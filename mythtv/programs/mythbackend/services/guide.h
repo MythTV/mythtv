@@ -104,11 +104,15 @@ class ScriptableGuide : public QObject
 
     private:
 
-        Guide    m_obj;
+        Guide          m_obj;
+        QScriptEngine *m_pEngine;
 
     public:
-    
-        Q_INVOKABLE ScriptableGuide( QObject *parent = 0 ) : QObject( parent ) {}
+
+        Q_INVOKABLE ScriptableGuide( QScriptEngine *pEngine, QObject *parent = 0 ) : QObject( parent )
+        {
+            m_pEngine = pEngine;
+        }
 
     public slots:
 
@@ -119,7 +123,10 @@ class ScriptableGuide : public QObject
                                   bool             Details,
                                   int              ChannelGroupId )
         {
-            return m_obj.GetProgramGuide( StartTime, EndTime, StartChanId, NumChannels, Details, ChannelGroupId );
+            SCRIPT_CATCH_EXCEPTION( NULL,
+                return m_obj.GetProgramGuide( StartTime, EndTime, StartChanId,
+                                        NumChannels, Details, ChannelGroupId );
+            )
         }
 
         QObject* GetProgramList(int              StartIndex,
@@ -136,40 +143,50 @@ class ScriptableGuide : public QObject
                                 const QString   &Sort,
                                 bool             Descending)
         {
-            return m_obj.GetProgramList( StartIndex, Count,
+            SCRIPT_CATCH_EXCEPTION( NULL,
+                return m_obj.GetProgramList( StartIndex, Count,
                                          StartTime, EndTime, ChanId,
                                          TitleFilter, CategoryFilter,
                                          PersonFilter, KeywordFilter,
                                          OnlyNew, Details,
                                          Sort, Descending );
+            )
         }
 
         QObject* GetProgramDetails( int ChanId, const QDateTime &StartTime )
         {
-            return m_obj.GetProgramDetails( ChanId, StartTime );
+            SCRIPT_CATCH_EXCEPTION( NULL,
+                return m_obj.GetProgramDetails( ChanId, StartTime );
+            )
         }
 
-        QFileInfo GetChannelIcon( int ChanId, int Width, int Height )
-        {
-            return m_obj.GetChannelIcon( ChanId, Width, Height );
-        }
+        //QFileInfo GetChannelIcon( int ChanId, int Width, int Height )
+        //{
+        //    return m_obj.GetChannelIcon( ChanId, Width, Height );
+        //}
 
         QObject* GetChannelGroupList( bool IncludeEmpty = false )
         {
-            return m_obj.GetChannelGroupList( IncludeEmpty );
+            SCRIPT_CATCH_EXCEPTION( NULL,
+                return m_obj.GetChannelGroupList( IncludeEmpty );
+            )
         }
 
         QStringList GetCategoryList( )
         {
-            return m_obj.GetCategoryList();
+            SCRIPT_CATCH_EXCEPTION( QStringList(),
+                return m_obj.GetCategoryList();
+            )
         }
 
         QStringList GetStoredSearches( QString Type )
         {
-            return m_obj.GetStoredSearches( Type );
+            SCRIPT_CATCH_EXCEPTION( QStringList(),
+                return m_obj.GetStoredSearches( Type );
+            )
         }
 };
 
-Q_SCRIPT_DECLARE_QMETAOBJECT( ScriptableGuide, QObject*);
+Q_SCRIPT_DECLARE_QMETAOBJECT_MYTHTV( ScriptableGuide, QObject*);
 
 #endif 

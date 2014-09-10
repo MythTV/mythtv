@@ -156,11 +156,15 @@ class ScriptableChannel : public QObject
 
     private:
 
-        Channel    m_obj;
+        Channel        m_obj;
+        QScriptEngine *m_pEngine;
 
     public:
 
-        Q_INVOKABLE ScriptableChannel( QObject *parent = 0 ) : QObject( parent ) {}
+        Q_INVOKABLE ScriptableChannel( QScriptEngine *pEngine, QObject *parent = 0 ) : QObject( parent )
+        {
+            m_pEngine = pEngine;
+        }
 
     public slots:
 
@@ -170,12 +174,16 @@ class ScriptableChannel : public QObject
                                        bool     OnlyVisible = false,
                                        bool     Details = false )
         {
-            return m_obj.GetChannelInfoList( SourceID, StartIndex, Count, OnlyVisible, Details );
+            SCRIPT_CATCH_EXCEPTION( NULL,
+                return m_obj.GetChannelInfoList( SourceID, StartIndex, Count, OnlyVisible, Details );
+            )
         }
 
         QObject* GetChannelInfo      ( int      ChanID     )
         {
-            return m_obj.GetChannelInfo( ChanID );
+            SCRIPT_CATCH_EXCEPTION( NULL,
+                return m_obj.GetChannelInfo( ChanID );
+            )
         }
 
         bool UpdateDBChannel     ( uint          MplexID,
@@ -195,11 +203,13 @@ class ScriptableChannel : public QObject
                                    const QString &XMLTVID,
                                    const QString &DefaultAuthority )
         {
-            return m_obj.UpdateDBChannel(MplexID, SourceID, ChannelID,
+            SCRIPT_CATCH_EXCEPTION( false,
+                return m_obj.UpdateDBChannel(MplexID, SourceID, ChannelID,
                                          CallSign, ChannelName, ChannelNumber,
                                          ServiceID, ATSCMajorChannel, ATSCMinorChannel,
                                          UseEIT, visible, FrequencyID, Icon, Format,
                                          XMLTVID, DefaultAuthority);
+            )
         }
 
         bool AddDBChannel        ( uint          MplexID,
@@ -219,26 +229,34 @@ class ScriptableChannel : public QObject
                                    const QString &XMLTVID,
                                    const QString &DefaultAuthority )
         {
-            return m_obj.AddDBChannel(MplexID, SourceID, ChannelID,
+            SCRIPT_CATCH_EXCEPTION( false,
+                return m_obj.AddDBChannel(MplexID, SourceID, ChannelID,
                                       CallSign, ChannelName, ChannelNumber,
                                       ServiceID, ATSCMajorChannel, ATSCMinorChannel,
                                       UseEIT, Visible, FrequencyID, Icon, Format,
                                       XMLTVID, DefaultAuthority);
+            )
         }
 
         bool RemoveDBChannel     ( uint          ChannelID )
         {
-            return m_obj.RemoveDBChannel(ChannelID);
+            SCRIPT_CATCH_EXCEPTION( false,
+                return m_obj.RemoveDBChannel(ChannelID);
+            )
         }
 
         QObject* GetVideoSourceList ( void )
         {
-            return m_obj.GetVideoSourceList();
+            SCRIPT_CATCH_EXCEPTION( NULL,
+                return m_obj.GetVideoSourceList();
+            )
         }
 
         QObject* GetVideoSource ( uint SourceID )
         {
-            return m_obj.GetVideoSource( SourceID );
+            SCRIPT_CATCH_EXCEPTION( NULL,
+                return m_obj.GetVideoSource( SourceID );
+            )
         }
 
         bool UpdateVideoSource ( uint          SourceID,
@@ -252,9 +270,11 @@ class ScriptableChannel : public QObject
                                  const QString &ConfigPath,
                                  int           NITId )
         {
-            return m_obj.UpdateVideoSource( SourceID, SourceName, Grabber,
+            SCRIPT_CATCH_EXCEPTION( false,
+                return m_obj.UpdateVideoSource( SourceID, SourceName, Grabber,
                                             UserId, FreqTable, LineupId, Password,
                                             UseEIT, ConfigPath, NITId );
+            )
         }
 
         bool AddVideoSource    ( const QString &SourceName,
@@ -267,35 +287,45 @@ class ScriptableChannel : public QObject
                                  const QString &ConfigPath,
                                  int           NITId )
         {
-            return m_obj.AddVideoSource( SourceName, Grabber, UserId,
+            SCRIPT_CATCH_EXCEPTION( false,
+                return m_obj.AddVideoSource( SourceName, Grabber, UserId,
                                          FreqTable, LineupId, Password,
                                          UseEIT, ConfigPath, NITId );
+            )
         }
 
         bool RemoveVideoSource ( uint SourceID )
         {
-            return m_obj.RemoveVideoSource( SourceID );
+            SCRIPT_CATCH_EXCEPTION( false,
+                return m_obj.RemoveVideoSource( SourceID );
+            )
         }
 
         QObject* GetVideoMultiplexList  ( int      SourceID,
                                           int      StartIndex,
                                           int      Count      )
         {
-            return m_obj.GetVideoMultiplexList( SourceID, StartIndex, Count );
+            SCRIPT_CATCH_EXCEPTION( NULL,
+                return m_obj.GetVideoMultiplexList( SourceID, StartIndex, Count );
+            )
         }
 
         QObject* GetVideoMultiplex  ( int      MplexID )
         {
-            return m_obj.GetVideoMultiplex( MplexID );
+            SCRIPT_CATCH_EXCEPTION( NULL,
+                return m_obj.GetVideoMultiplex( MplexID );
+            )
         }
 
         QStringList GetXMLTVIdList ( int SourceID )
         {
-            return m_obj.GetXMLTVIdList(SourceID);
+            SCRIPT_CATCH_EXCEPTION( QStringList(),
+                return m_obj.GetXMLTVIdList(SourceID);
+            )
         }
 };
 
 
-Q_SCRIPT_DECLARE_QMETAOBJECT( ScriptableChannel, QObject*);
+Q_SCRIPT_DECLARE_QMETAOBJECT_MYTHTV( ScriptableChannel, QObject*);
 
 #endif

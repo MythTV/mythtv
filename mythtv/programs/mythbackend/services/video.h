@@ -97,11 +97,15 @@ class ScriptableVideo : public QObject
 
     private:
 
-        Video    m_obj;
+        Video          m_obj;
+        QScriptEngine *m_pEngine;
 
     public:
 
-        Q_INVOKABLE ScriptableVideo( QObject *parent = 0 ) : QObject( parent ) {}
+        Q_INVOKABLE ScriptableVideo( QScriptEngine *pEngine, QObject *parent = 0 ) : QObject( parent )
+        {
+            m_pEngine = pEngine;
+        }
 
     public slots:
 
@@ -111,17 +115,24 @@ class ScriptableVideo : public QObject
                                      int              StartIndex,
                                      int              Count      )
         {
-            return m_obj.GetVideoList(Folder, Sort, Descending, StartIndex, Count );
+            SCRIPT_CATCH_EXCEPTION( NULL,
+                return m_obj.GetVideoList( Folder, Sort, Descending,
+                                           StartIndex, Count );
+            )
         }
 
-        QObject* GetVideo(       int              Id         )
+        QObject* GetVideo( int  Id )
         {
-            return m_obj.GetVideo( Id );
+            SCRIPT_CATCH_EXCEPTION( NULL,
+                return m_obj.GetVideo( Id );
+            )
         }
 
         QObject* GetVideoByFileName( const QString    &FileName  )
         {
-            return m_obj.GetVideoByFileName( FileName );
+            SCRIPT_CATCH_EXCEPTION( NULL,
+                return m_obj.GetVideoByFileName( FileName );
+            )
         }
 
         QObject* LookupVideo( const QString    &Title,
@@ -132,24 +143,29 @@ class ScriptableVideo : public QObject
                               const QString    &GrabberType,
                               bool             AllowGeneric )
         {
-            return m_obj.LookupVideo( Title, Subtitle, Inetref,
-                                      Season, Episode, GrabberType,
-                                      AllowGeneric );
+            SCRIPT_CATCH_EXCEPTION( NULL,
+                return m_obj.LookupVideo( Title, Subtitle, Inetref,
+                                          Season, Episode, GrabberType,
+                                          AllowGeneric );
+            )
         }
 
-        bool RemoveVideoFromDB(      int              Id         )
+        bool RemoveVideoFromDB( int Id )
         {
-            return m_obj.RemoveVideoFromDB( Id );
+            SCRIPT_CATCH_EXCEPTION( false,
+                return m_obj.RemoveVideoFromDB( Id );
+            )
         }
 
         bool AddVideo( const QString  &FileName,
                        const QString  &HostName  )
         {
-            return m_obj.AddVideo( FileName, HostName );
+            SCRIPT_CATCH_EXCEPTION( false,
+                return m_obj.AddVideo( FileName, HostName );
+            )
         }
 };
 
-
-Q_SCRIPT_DECLARE_QMETAOBJECT( ScriptableVideo, QObject*);
+Q_SCRIPT_DECLARE_QMETAOBJECT_MYTHTV( ScriptableVideo, QObject*);
 
 #endif

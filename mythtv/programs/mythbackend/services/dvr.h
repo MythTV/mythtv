@@ -248,11 +248,10 @@ class ScriptableDvr : public QObject
 {
     Q_OBJECT
 
-    QScriptEngine *m_pEngine;
-
     private:
 
-        Dvr    m_obj;
+        Dvr            m_obj;
+        QScriptEngine *m_pEngine;
 
     public:
 
@@ -340,21 +339,61 @@ class ScriptableDvr : public QObject
             )
         }
 
-        QObject*    GetEncoderList         () { SCRIPT_CATCH_EXCEPTION( NULL, return m_obj.GetEncoderList(); )}
-        QObject*    GetInputList           () { SCRIPT_CATCH_EXCEPTION( NULL, return m_obj.GetInputList();   )}
-        QStringList GetRecGroupList        () { SCRIPT_CATCH_EXCEPTION( QStringList(), return m_obj.GetRecGroupList();       )}
-        QStringList GetRecStorageGroupList () { SCRIPT_CATCH_EXCEPTION( QStringList(), return m_obj.GetRecStorageGroupList();)}
-        QStringList GetPlayGroupList       () { SCRIPT_CATCH_EXCEPTION( QStringList(), return m_obj.GetPlayGroupList();      )}
-        QObject*    GetRecRuleFilterList   () { SCRIPT_CATCH_EXCEPTION( NULL, return m_obj.GetRecRuleFilterList(); )}
+        QObject*    GetEncoderList()
+        {
+            SCRIPT_CATCH_EXCEPTION( NULL,
+                return m_obj.GetEncoderList();
+            )
+        }
 
-        QStringList GetTitleList    ( const QString   &RecGroup )
+        QObject*    GetInputList()
+        {
+            SCRIPT_CATCH_EXCEPTION( NULL,
+                return m_obj.GetInputList();
+            )
+        }
+
+        QStringList GetRecGroupList()
+        {
+            SCRIPT_CATCH_EXCEPTION( QStringList(),
+                return m_obj.GetRecGroupList();
+            )
+        }
+
+        QStringList GetRecStorageGroupList()
+        {
+            SCRIPT_CATCH_EXCEPTION( QStringList(),
+                return m_obj.GetRecStorageGroupList();
+            )
+        }
+
+        QStringList GetPlayGroupList()
+        {
+            SCRIPT_CATCH_EXCEPTION( QStringList(),
+                return m_obj.GetPlayGroupList();
+            )
+        }
+
+        QObject*    GetRecRuleFilterList()
+        {
+            SCRIPT_CATCH_EXCEPTION( NULL,
+                return m_obj.GetRecRuleFilterList();
+            )
+        }
+
+        QStringList GetTitleList( const QString   &RecGroup )
         {
             SCRIPT_CATCH_EXCEPTION( QStringList(),
                 return m_obj.GetTitleList( RecGroup );
             )
         }
 
-        QObject* GetTitleInfoList   () { SCRIPT_CATCH_EXCEPTION( NULL, return m_obj.GetTitleInfoList(); )}
+        QObject* GetTitleInfoList()
+        {
+            SCRIPT_CATCH_EXCEPTION( NULL,
+                return m_obj.GetTitleInfoList();
+            )
+        }
 
         uint AddRecordSchedule ( DTC::RecRule *rule )
         {
