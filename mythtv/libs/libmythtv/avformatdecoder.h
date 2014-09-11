@@ -147,6 +147,7 @@ class AvFormatDecoder : public DecoderBase
     void        *GetVideoCodecPrivate(void);
 
     virtual void SetDisablePassThrough(bool disable);
+    virtual void ForceSetupAudioStream(void);
     void AddTextData(unsigned char *buf, int len, int64_t timecode, char type);
 
     virtual QString GetTrackDesc(uint type, uint trackNo) const;

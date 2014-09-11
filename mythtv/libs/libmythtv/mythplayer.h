@@ -270,6 +270,8 @@ class MTV_PUBLIC MythPlayer
     DecoderBase *GetDecoder(void) { return decoder; }
     void *GetDecoderContext(unsigned char* buf, uint8_t*& id);
     virtual bool HasReachedEof(void) const;
+    void SetDisablePassThrough(bool disabled);
+    void ForceSetupAudioStream(void);
 
     // Preview Image stuff
     void SaveScreenshot(void);
@@ -832,6 +834,7 @@ class MTV_PUBLIC MythPlayer
 
   private:
     void syncWithAudioStretch();
+    bool disable_passthrough;
 };
 
 #endif

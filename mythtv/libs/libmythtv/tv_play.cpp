@@ -8920,6 +8920,8 @@ void TV::EnableUpmix(PlayerContext *ctx, bool enable, bool toggle)
         enabled = ctx->player->GetAudio()->EnableUpmix(false, true);
     else
         enabled = ctx->player->GetAudio()->EnableUpmix(enable);
+    // May have to disable digital passthrough
+    ctx->player->ForceSetupAudioStream();
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 
     if (!browsehelper->IsBrowsing())

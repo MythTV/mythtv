@@ -150,6 +150,8 @@ class DecoderBase
     virtual void SetLowBuffers(bool low) { lowbuffers = low; }
     /// Disables AC3/DTS pass through
     virtual void SetDisablePassThrough(bool disable) { (void)disable; }
+    // Reconfigure audio as necessary, following configuration change
+    virtual void ForceSetupAudioStream(void) { }
 
     virtual void SetWatchingRecording(bool mode);
     /// Demux, preprocess and possibly decode a frame of video/audio.

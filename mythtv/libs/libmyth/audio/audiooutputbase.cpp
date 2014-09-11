@@ -297,8 +297,8 @@ bool AudioOutputBase::CanPassthrough(int samplerate, int channels,
         return false;
     // Will passthrough if surround audio was defined. Amplifier will
     // do the downmix if required
-    ret &= max_channels >= 6 && channels > 2;
-    // Stereo content will always be decoded so it can later be upmixed
+    bool willupmix = max_channels >= 6 && (channels <= 2 && upmix_default);
+    ret &= !willupmix;
     // unless audio is configured for stereo. We can passthrough otherwise
     ret |= max_channels == 2;
 
@@ -414,13 +414,14 @@ bool AudioOutputBase::IsUpmixing(void)
 bool AudioOutputBase::ToggleUpmix(void)
 {
     // Can only upmix from mono/stereo to 6 ch
-    if (max_channels == 2 || source_channels > 2 || passthru)
+    if (max_channels == 2 || source_channels > 2)
         return false;
 
     upmix_default = !upmix_default;
 
     const AudioSettings settings(format, source_channels, codec,
-                                 source_samplerate, passthru);
+                                 source_samplerate,
+                                 upmix_default ? false : passthru);
     Reconfigure(settings);
     return IsUpmixing();
 }
@@ -430,7 +431,7 @@ bool AudioOutputBase::ToggleUpmix(void)
  */
 bool AudioOutputBase::CanUpmix(void)
 {
-    return !passthru && source_channels <= 2 && max_channels > 2;
+    return source_channels <= 2 && max_channels > 2;
 }
 
 /*

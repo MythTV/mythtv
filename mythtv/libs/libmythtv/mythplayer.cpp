@@ -228,7 +228,8 @@ MythPlayer::MythPlayer(PlayerFlags flags)
       // LiveTVChain stuff
       m_tv(NULL),                   isDummy(false),
       // Debugging variables
-      output_jmeter(new Jitterometer(LOC))
+      output_jmeter(new Jitterometer(LOC)),
+      disable_passthrough(false)
 {
     memset(&tc_lastval, 0, sizeof(tc_lastval));
     memset(&tc_wrap,    0, sizeof(tc_wrap));
@@ -5376,6 +5377,8 @@ void MythPlayer::SetDecoder(DecoderBase *dec)
         }
         decoder_change_lock.unlock();
     }
+    // reset passthrough override
+    disable_passthrough = false;
     syncWithAudioStretch();
     totalDecoderPause = false;
 }
@@ -5588,14 +5591,30 @@ void MythPlayer::syncWithAudioStretch()
     if (decoder && audio.HasAudioOut())
     {
         float stretch = audio.GetStretchFactor();
-        bool disable = (stretch < 0.99f) || (stretch > 1.01f);
+        disable_passthrough |= (stretch < 0.99f) || (stretch > 1.01f);
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("Stretch Factor %1, %2 passthru ")
             .arg(audio.GetStretchFactor())
-            .arg((disable) ? "disable" : "allow"));
-        decoder->SetDisablePassThrough(disable);
+            .arg((disable_passthrough) ? "disable" : "allow"));
+        SetDisablePassThrough(disable_passthrough);
     }
     return;
+}
+
+void MythPlayer::SetDisablePassThrough(bool disabled)
+{
+    if (decoder && audio.HasAudioOut())
+    {
+        decoder->SetDisablePassThrough(disable_passthrough || disabled);
+    }
+}
+
+void MythPlayer::ForceSetupAudioStream(void)
+{
+    if (decoder && audio.HasAudioOut())
+    {
+        decoder->ForceSetupAudioStream();
+    }
 }
 
 static unsigned dbg_ident(const MythPlayer *player)

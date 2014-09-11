@@ -5136,11 +5136,6 @@ void *AvFormatDecoder::GetVideoCodecPrivate(void)
 
 void AvFormatDecoder::SetDisablePassThrough(bool disable)
 {
-    // can only disable never re-enable as once
-    // timestretch is on its on for the session
-    if (disable_passthru)
-        return;
-
     if (selectedTrack[kTrackTypeAudio].av_stream_index < 0)
     {
         disable_passthru = disable;
@@ -5154,9 +5149,15 @@ void AvFormatDecoder::SetDisablePassThrough(bool disable)
         LOG(VB_AUDIO, LOG_INFO, LOC + msg + " pass through");
 
         // Force pass through state to be reanalyzed
-        QMutexLocker locker(avcodeclock);
-        SetupAudioStream();
+        ForceSetupAudioStream();
     }
+}
+
+void AvFormatDecoder::ForceSetupAudioStream(void)
+{
+    QMutexLocker locker(avcodeclock);
+
+    SetupAudioStream();
 }
 
 inline bool AvFormatDecoder::DecoderWillDownmix(const AVCodecContext *ctx)
