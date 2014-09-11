@@ -600,21 +600,27 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         SetupPassthrough(settings.codec, settings.codec_profile,
                          samplerate_tmp, channels_tmp);
         general_deps = samplerate == samplerate_tmp && channels == channels_tmp;
+        general_deps &= format == output_format && format == FORMAT_S16;
+    }
+    else
+    {
+        general_deps =
+            settings.format == format && lsource_channels == source_channels;
     }
 
     // Check if anything has changed
     general_deps &=
-        settings.format == format &&
         settings.samplerate  == source_samplerate &&
         settings.use_passthru == passthru &&
         lconfigured_channels == configured_channels &&
         lneeds_upmix == needs_upmix && lreenc == reenc &&
-        lsource_channels == source_channels &&
         lneeds_downmix == needs_downmix;
 
     if (general_deps && m_configure_succeeded)
     {
         VBAUDIO("Reconfigure(): No change -> exiting");
+        // if passthrough, source channels may have changed
+        source_channels = lsource_channels;
         return;
     }
 
