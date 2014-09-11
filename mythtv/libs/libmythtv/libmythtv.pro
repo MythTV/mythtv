@@ -294,6 +294,13 @@ SOURCES += HLS/m3u.cpp
 using_libcrypto:DEFINES += USING_LIBCRYPTO
 using_libcrypto:LIBS    += -lcrypto
 
+#LIBAESDEC TS AES decrypt
+using_libaesdec {
+HEADERS += mpeg/libaesdec/libaesdec.h mpeg/libcs378x/cs378x.h
+SOURCES += mpeg/libaesdec/libaesdec.c mpeg/libcs378x/cs378x.c
+DEPENDPATH += ./mpeg/libaesdec ./mpeg/libcs378x
+DEFINES += USING_LIBAESDEC
+}
 
 using_frontend {
     # Recording profile stuff

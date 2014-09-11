@@ -19,6 +19,10 @@ using namespace std;
 #include "eitscanner.h"
 #include "mythtvexp.h"
 
+#ifdef USING_LIBAESDEC
+#include <openssl/aes.h>
+#endif
+
 class EITHelper;
 class PSIPTable;
 class RingBuffer;
@@ -122,6 +126,10 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     virtual bool HandleTables(uint pid, const PSIPTable &psip);
     virtual void HandleTSTables(const TSPacket* tspacket);
     virtual bool ProcessTSPacket(const TSPacket& tspacket);
+#ifdef USING_LIBAESDEC
+    virtual int ProcessECMPacket(const TSPacket& tspacket);
+    virtual TSPacket* DecryptPayload(const TSPacket& tspacket) const;
+#endif
     virtual int  ProcessData(const unsigned char *buffer, int len);
     inline  void HandleAdaptationFieldControl(const TSPacket* tspacket);
 
@@ -355,6 +363,17 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
   protected:
     int                       _cardid;
     QString                   _sistandard;
+
+#ifdef USING_LIBAESDEC
+    // Decryption variables
+    uint                      _pid_ecm;
+    uint                      _caid_system;    
+    void                     *_keys;
+    uint                      _gotcws;
+    unsigned char             _last_table_id;
+    uint                      _last_channel;
+    uint                      _client_sockfd;
+#endif
 
     bool                      _have_CRC_bug;
 

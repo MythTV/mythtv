@@ -773,6 +773,43 @@ static GlobalLineEdit *MythFillDatabaseArgs()
     return be;
 }
 
+#ifdef USING_LIBAESDEC
+static GlobalLineEdit *cs378xHost()
+{
+    GlobalLineEdit *be = new GlobalLineEdit("cs378xHost");
+    be->setLabel(QObject::tr("cs378x host"));
+    be->setValue("");
+    be->setHelpText(QObject::tr("cs378x host, without port."));
+    return be;
+}
+
+static GlobalLineEdit *cs378xPort()
+{
+    GlobalLineEdit *be = new GlobalLineEdit("cs378xPort");
+    be->setLabel(QObject::tr("cs378x port"));
+    be->setValue("");
+    be->setHelpText(QObject::tr("cs378x port."));
+    return be;
+}
+
+static GlobalLineEdit *cs378xUser()
+{
+    GlobalLineEdit *be = new GlobalLineEdit("cs378xUser");
+    be->setLabel(QObject::tr("cs378x user"));
+    be->setValue("");
+    be->setHelpText(QObject::tr("cs378x user."));
+    return be;
+}
+static GlobalLineEdit *cs378xPassword()
+{
+    GlobalLineEdit *be = new GlobalLineEdit("cs378xPassword");
+    be->setLabel(QObject::tr("cs378x password"));
+    be->setValue("");
+    be->setHelpText(QObject::tr("cs378x password"));
+    return be;
+}
+#endif
+
 class MythFillSettings : public TriggeredConfigurationGroup
 {
   public:
@@ -958,6 +995,16 @@ BackendSettings::BackendSettings() {
     group7->addChild(UserJobDesc(4));
     group7->addChild(UserJob(4));
     addChild(group7);
+
+#ifdef USING_LIBAESDEC
+    VerticalConfigurationGroup* group8 = new VerticalConfigurationGroup(false);
+    group8->setLabel(QObject::tr("cs378x settings"));
+    group8->addChild(cs378xHost());
+    group8->addChild(cs378xPort());
+    group8->addChild(cs378xUser());
+    group8->addChild(cs378xPassword());
+    addChild(group8);
+#endif
 
     MythFillSettings *mythfill = new MythFillSettings();
     addChild(mythfill);
