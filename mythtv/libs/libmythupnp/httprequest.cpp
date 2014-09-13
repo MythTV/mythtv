@@ -1031,7 +1031,8 @@ QStringList HTTPRequest::GetSupportedMimeTypes()
 
     for (int i = 0; i < g_nMIMELength; i++)
     {
-        mimeTypes.append( g_MIMETypes[i].pszType );
+        if (!mimeTypes.contains( g_MIMETypes[i].pszType ))
+            mimeTypes.append( g_MIMETypes[i].pszType );
     }
 
     return mimeTypes;

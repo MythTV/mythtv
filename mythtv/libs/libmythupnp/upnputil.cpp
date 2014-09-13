@@ -22,6 +22,7 @@
 // MythTV headers
 #include "upnputil.h"
 #include "upnp.h"
+#include "upnphelpers.h"
 #include "compat.h"
 #include "mythconfig.h" // for HAVE_GETIFADDRS
 #include "mythlogging.h"
@@ -195,11 +196,39 @@ QStringList GetSourceProtocolInfos()
 {
     QStringList mimeTypes = HTTPRequest::GetSupportedMimeTypes();
 
+    QString protocolStr("http-get:*:%1:%2");
     QStringList protocolList;
     QStringList::Iterator it;
     for (it = mimeTypes.begin(); it < mimeTypes.end(); ++it)
     {
-        protocolList << QString("http-get:*:%1:*").arg(*it);
+        // HACK
+        QString flags = DLNA::FlagsString(DLNA::ktm_s | DLNA::ktm_b | DLNA::kv1_5_flag);
+        if (*it == "video/mpeg")
+        {
+            protocolList << protocolStr.arg(*it).arg("DLNA.ORG_PN=AVC_TS_NA_ISO;" + flags);
+            protocolList << protocolStr.arg(*it).arg("DLNA.ORG_PN=MPEG_TS_HD_NA_ISO;" + flags);
+            protocolList << protocolStr.arg(*it).arg("DLNA.ORG_PN=MPEG_TS_SD_NA_ISO;" + flags);
+            protocolList << protocolStr.arg(*it).arg("DLNA.ORG_PN=AVC_TS_EU_ISO;" + flags);
+            protocolList << protocolStr.arg(*it).arg("DLNA.ORG_PN=MPEG_TS_SD_EU_ISO;" + flags);
+        }
+        else if (*it == "audio/mpeg")
+        {
+            protocolList << protocolStr.arg(*it).arg("DLNA.ORG_PN=MP3X;" + flags);
+        }
+        else if (*it == "audio/mp4")
+        {
+            protocolList << protocolStr.arg(*it).arg("DLNA.ORG_PN=AAC_ISO_320;" + flags);
+        }
+        else if (*it == "audio/vnd.dolby.dd-raw")
+        {
+            protocolList << protocolStr.arg(*it).arg("DLNA.ORG_PN=AC3;" + flags);
+        }
+        else if (*it == "audio/x-ms-wma")
+        {
+            protocolList << protocolStr.arg(*it).arg("DLNA.ORG_PN=WMAFULL;" + flags);
+        }
+        else
+            protocolList << protocolStr.arg(*it).arg("*");
     }
 
     return protocolList;
