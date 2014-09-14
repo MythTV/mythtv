@@ -1041,7 +1041,7 @@ bool Scheduler::FindNextConflict(
     const RecList     &cardlist,
     const RecordingInfo *p,
     RecConstIter      &j,
-    int               openEnd) const
+    OpenEndType        openEnd) const
 {
     for ( ; j != cardlist.end(); ++j)
     {
@@ -1065,7 +1065,8 @@ bool Scheduler::FindNextConflict(
             continue;
         }
 
-        if (openEnd == 2 || (openEnd == 1 && p->GetChanID() != q->GetChanID()))
+        if (openEnd == openEndAlways || (openEnd == openEndDiffChannel &&
+                                         p->GetChanID() != q->GetChanID()))
         {
             if (p->GetRecordingEndTime() < q->GetRecordingStartTime() ||
                 p->GetRecordingStartTime() > q->GetRecordingEndTime())
@@ -1121,7 +1122,7 @@ bool Scheduler::FindNextConflict(
 
 const RecordingInfo *Scheduler::FindConflict(
     const RecordingInfo        *p,
-    int openend) const
+    OpenEndType openend) const
 {
     RecList &conflictlist = *conflictlistmap[p->GetInputID()];
     RecConstIter k = conflictlist.begin();
@@ -1318,7 +1319,8 @@ void Scheduler::SchedNewRecords(void)
     }
 
     livetvTime = MythDate::current().addSecs(3600);
-    int openEnd = gCoreContext->GetNumSetting("SchedOpenEnd", 0);
+    OpenEndType openEnd =
+        (OpenEndType)gCoreContext->GetNumSetting("SchedOpenEnd", 0);
 
     RecIter i = worklist.begin();
     while (i != worklist.end())

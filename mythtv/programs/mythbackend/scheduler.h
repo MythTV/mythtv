@@ -103,6 +103,12 @@ class Scheduler : public MThread, public MythScheduler
     virtual void run(void); // MThread
 
   private:
+    enum OpenEndType {
+        openEndNever = 0,
+        openEndDiffChannel = 1,
+        openEndAlways = 2
+    };
+
     QString recordTable;
     QString priorityTable;
 
@@ -131,8 +137,9 @@ class Scheduler : public MThread, public MythScheduler
 
     bool FindNextConflict(const RecList &cardlist,
                           const RecordingInfo *p, RecConstIter &iter,
-                          int openEnd = 0) const;
-    const RecordingInfo *FindConflict(const RecordingInfo *p, int openEnd = 0)
+                          OpenEndType openEnd = openEndNever) const;
+    const RecordingInfo *FindConflict(const RecordingInfo *p,
+                                      OpenEndType openEnd = openEndNever)
         const;
     void MarkOtherShowings(RecordingInfo *p);
     void MarkShowingsList(RecList &showinglist, RecordingInfo *p);
