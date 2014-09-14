@@ -36,7 +36,6 @@ import "/tv/js/tvutil.qjs"
 
     // Get Recording Group List
     var recGroupList = dvr.GetRecGroupList();
-    var showDeletedLink = (recGroupList.indexOf("Deleted") === -1) ? false : true;
 
     // Get Display Group List (Titles Only currently)
     var displayGroupList = dvr.GetTitleList(recGroup);
@@ -48,6 +47,9 @@ import "/tv/js/tvutil.qjs"
 
     var PAGEINTERVAL = 10;
     var recordingList = dvr.GetRecordedList( sortDescending, startIndex, PAGEINTERVAL, displayGroup, recGroup, "" );
+
+    var deletedList = dvr.GetRecordedList( false, 0, 1, "", "Deleted", "" );
+    var showDeletedLink = (deletedList.TotalAvailable > 0) ? true : false;
 
     var nextStartIndex = (startIndex + PAGEINTERVAL);
     if (nextStartIndex >= recordingList.TotalAvailable)
