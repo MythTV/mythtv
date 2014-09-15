@@ -94,7 +94,6 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
         if (!pHttpServer->listen(nSSLPort, true, kSSLServer))
         {
             LOG(VB_GENERAL, LOG_ERR, "MediaServer: HttpServer failed to create SSL server");
-            return;
         }
 #endif
     }
