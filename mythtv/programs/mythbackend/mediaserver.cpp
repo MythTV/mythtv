@@ -89,12 +89,14 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
             return;
         }
 
+#ifndef QT_NO_OPENSSL
         // HTTPS (SSL)
         if (!pHttpServer->listen(nSSLPort, true, kSSLServer))
         {
             LOG(VB_GENERAL, LOG_ERR, "MediaServer: HttpServer failed to create SSL server");
             return;
         }
+#endif
     }
 
     QString sFileName = g_pConfig->GetValue( "upnpDescXmlPath",
