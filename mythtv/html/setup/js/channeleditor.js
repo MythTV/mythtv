@@ -603,7 +603,7 @@ function searchChannelIcon() {
     }});
 
     iconBrowser.html("");
-    $.getJSON("http://services.mythtv.org/channel-icon/lookup?jsoncallback=?",
+    $.getJSON("https://services.mythtv.org/channel-icon/lookup?jsoncallback=?",
         { callsign: $("#channelDetailSettingCallSign").val() },
         function(data) {
             $.each(data.urls, function(i, url) {
@@ -611,7 +611,7 @@ function searchChannelIcon() {
             });
         });
 
-    $.getJSON("http://services.mythtv.org/channel-icon/lookup?jsoncallback=?",
+    $.getJSON("https://services.mythtv.org/channel-icon/lookup?jsoncallback=?",
         { xmltvid: $("#channelDetailSettingXMLTVID").val() },
         function(data) {
             $.each(data.urls, function(i, url) {
