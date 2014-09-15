@@ -130,7 +130,6 @@ HttpServer::HttpServer(const QString &sApplicationPrefix) :
     if (m_sslCACertList.isEmpty())
         LOG(VB_GENERAL, LOG_ERR, QString("HttpServer: Unable to load CA cert file (%1)").arg(hostCertPath));
 #endif
-
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -343,6 +342,7 @@ void HttpWorker::run(void)
 
     if (m_connectionType == kSSLServer)
     {
+
 #ifndef QT_NO_OPENSSL
         QSslSocket *pSslSocket = new QSslSocket();
         if (pSslSocket->setSocketDescriptor(m_socket))
@@ -387,8 +387,6 @@ void HttpWorker::run(void)
 
     try
     {
-
-
         while (m_httpServer.IsRunning() && bKeepAlive && pSocket &&
                pSocket->isValid() &&
                pSocket->state() != QAbstractSocket::ClosingState)
@@ -435,20 +433,6 @@ void HttpWorker::run(void)
                         pRequest->m_nResponseStatus = 501;
                         bKeepAlive = false;
                     }
-
-#if 0
-                    // Dump Request Header 
-                    if (!bKeepAlive )
-                    {
-                        for ( QStringMap::iterator it  = pRequest->m_mapHeaders.begin(); 
-                                                   it != pRequest->m_mapHeaders.end(); 
-                                                 ++it ) 
-                        {  
-                            LOG(VB_GENERAL, LOG_DEBUG, QString("%1: %2") 
-                                .arg(it.key()) .arg(it.data()));
-                        }
-                    }
-#endif
 
                     // -------------------------------------------------------
                     // Always MUST send a response.
