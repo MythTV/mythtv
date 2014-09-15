@@ -109,26 +109,30 @@ HttpServer::HttpServer(const QString &sApplicationPrefix) :
     QString hostKeyPath = gCoreContext->GetSetting("hostSSLKey", "");
     QFile hostKeyFile(hostKeyPath);
     if (!hostKeyFile.exists() || !hostKeyFile.open(QIODevice::ReadOnly))
+    {
         LOG(VB_GENERAL, LOG_ERR, QString("HttpServer: Host key file (%1) does not exist").arg(hostKeyPath));
-    QByteArray rawHostKey = hostKeyFile.readAll();
-    m_sslHostKey = QSslKey(rawHostKey, QSsl::Rsa, QSsl::Pem, QSsl::PrivateKey);
+    } else {
+        QByteArray rawHostKey = hostKeyFile.readAll();
+        m_sslHostKey = QSslKey(rawHostKey, QSsl::Rsa, QSsl::Pem, QSsl::PrivateKey);
+        if (m_sslHostKey.isNull())
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("HttpServer: Unable to load host key file (%1)").arg(hostKeyPath));
+        } else {
+            QString hostCertPath = gCoreContext->GetSetting("hostSSLCertificate", "");
+            QList<QSslCertificate> certList = QSslCertificate::fromPath(hostCertPath);
+            if (!certList.isEmpty())
+                m_sslHostCert = certList.first();
 
-    if (m_sslHostKey.isNull())
-        LOG(VB_GENERAL, LOG_ERR, QString("HttpServer: Unable to load host key file (%1)").arg(hostKeyPath));
+            if (!m_sslHostCert.isValid())
+                LOG(VB_GENERAL, LOG_ERR, QString("HttpServer: Unable to load host cert file (%1)").arg(hostCertPath));
+            
+            QString caCertPath = gCoreContext->GetSetting("caSSLCertificate", "");
+            m_sslCACertList = QSslCertificate::fromPath(caCertPath);
 
-    QString hostCertPath = gCoreContext->GetSetting("hostSSLCertificate", "");
-    QList<QSslCertificate> certList = QSslCertificate::fromPath(hostCertPath);
-    if (!certList.isEmpty())
-        m_sslHostCert = certList.first();
-
-    if (!m_sslHostCert.isValid())
-        LOG(VB_GENERAL, LOG_ERR, QString("HttpServer: Unable to load host cert file (%1)").arg(hostCertPath));
-    
-    QString caCertPath = gCoreContext->GetSetting("caSSLCertificate", "");
-    m_sslCACertList = QSslCertificate::fromPath(caCertPath);
-
-    if (m_sslCACertList.isEmpty())
-        LOG(VB_GENERAL, LOG_ERR, QString("HttpServer: Unable to load CA cert file (%1)").arg(hostCertPath));
+            if (m_sslCACertList.isEmpty())
+                LOG(VB_GENERAL, LOG_ERR, QString("HttpServer: Unable to load CA cert file (%1)").arg(hostCertPath));
+        }
+    }
 #endif
 }
 
