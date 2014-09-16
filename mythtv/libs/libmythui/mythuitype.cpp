@@ -1040,7 +1040,7 @@ void MythUIType::Refresh(void)
 
 void MythUIType::UpdateDependState(MythUIType *dependee, bool isDefault)
 {
-    bool visible;
+    bool visible = false;
 
     if (dependee)
     {
