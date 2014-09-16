@@ -840,6 +840,9 @@ UPnpCDSExtensionResults *UPnpCDSExtension::Browse( UPnpCDSRequest *pRequest )
                 LOG(VB_UPNP, LOG_DEBUG, "UPnpCDS::Browse: BrowseMetadata");
                 if (LoadMetadata(pRequest, pResults, tokens, currentToken))
                     return pResults;
+                else
+                    pResults->m_eErrorCode = UPnPResult_CDS_NoSuchObject;
+                break;
             }
 
             case CDS_BrowseDirectChildren:
@@ -847,6 +850,9 @@ UPnpCDSExtensionResults *UPnpCDSExtension::Browse( UPnpCDSRequest *pRequest )
                 LOG(VB_UPNP, LOG_DEBUG, "UPnpCDS::Browse: BrowseDirectChildren");
                 if (LoadChildren(pRequest, pResults, tokens, currentToken))
                     return pResults;
+                else
+                    pResults->m_eErrorCode = UPnPResult_CDS_NoSuchObject;
+                break;
             }
 
             default:
