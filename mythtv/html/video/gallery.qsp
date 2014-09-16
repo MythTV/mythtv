@@ -1,0 +1,146 @@
+<%
+"use strict";
+ //used for getArg
+import "/js/utility.js"
+import "/video/js/gallery.qjs"
+
+%>
+<link rel="stylesheet" type="text/css" href="/video/css/gallery.css">
+<script src="/video/js/gallery.js"></script>
+
+
+<div id="videoOverlay" class="videoOverlay">
+    <div id="videoDetailBox" class="videoDetailBox">
+
+    </div>
+</div>
+
+
+<div class="galleryList">
+
+    <%
+
+    //are we in a subfolder?  If so, lets get the foldername, so we can only get videos within our folder
+    var currentFolder="";
+    var currentFolderArray=[];
+    var displayedFolders=[];
+
+    if(getArg("CurrentFolder"))
+    {
+        currentFolder = getArg("CurrentFolder");
+        currentFolderArray = currentFolder.split("/");
+    }
+
+    var video = new Video();
+    var videoList = video.GetVideoList(currentFolder,"title",false, 0, 0);
+
+    if(!isRootPath(currentFolder))    //then we are in a sub directory and need to be able to go up a directory
+    {
+        var nextFolder = currentFolderArray.slice(0,-1).join("/");
+    %>
+
+        <div class="videoBox">
+            <div class="videoHeader">
+                <div class="videoTitle" onClick="javascript:loadContent('/video/gallery.qsp?CurrentFolder=<%=nextFolder %>')">
+                    <%= currentFolderArray.slice(-1)[0]%>
+                </div>
+            </div>
+
+            <div class="videoArtwork" onClick="javascript:loadContent('/video/gallery.qsp?CurrentFolder=<%=nextFolder %>')">
+                <img width=100 src="/video/images/mv_gallery_dir_up.png" />
+            </div>
+        </div>
+
+    <%
+    }
+
+    //foreach video
+    for (var listIdx = 0; listIdx < videoList.VideoMetadataInfos.length; listIdx++)
+    {
+        //does this video have artwork?
+        var thisVideo = videoList.VideoMetadataInfos[listIdx];
+        var artworkURL = getArtworkURL(thisVideo);
+        var filenameArray = thisVideo.FileName.split("/");
+
+
+        //is this is a video within the current folder and not another folder
+        if(filenameArray.length<=currentFolderArray.length+1)
+        {
+
+            //By default user the title as the title, if episode, show episode instead
+            var title = thisVideo.Title;
+
+            if(thisVideo.Episode!=0)
+            {
+                title = "Episode: " + thisVideo.Episode;
+            }
+
+    %>
+
+            <div class="videoBox">
+                <div class="videoHeader">
+                    <div class="videoTitle" onClick="showVideoDetail(<%=thisVideo.Id%>);">
+                        <%=title%>
+                    </div>
+                </div>
+
+                <div class="videoArtwork" onClick="showVideoDetail(<%=thisVideo.Id%>);">
+                    <img width=100 src="<%=artworkURL%>" />
+                </div>
+                <%
+                    //if there is a subtitle, show it
+                    if(thisVideo.SubTitle!="")
+                    {
+                %>
+                        <div class="videoSubTitle" onClick="showVideoDetail(<%=thisVideo.Id%>);">
+                            <%= thisVideo.SubTitle%>
+                        </div>
+                <%
+                    }
+                %>
+            </div>
+    <%
+        }
+        else  //this is just another folder, keep drilling down
+        {
+            var seperator="";       //we don't want a seperator if we are going to the root folder ("/") doesnt work for the service API
+            var nextFolder="";
+
+            if(!isRootPath(currentFolder))
+                seperator="/";
+
+            nextFolder=currentFolder+seperator+filenameArray[currentFolderArray.length];
+
+            if(!isFolderAlreadyDisplayed(nextFolder, displayedFolders))
+            {
+                displayedFolders.push(nextFolder);
+
+     %>
+                <div class="videoBox">
+                    <div class="videoHeader">
+                        <div class="videoTitle" onClick="javascript:loadContent('/video/gallery.qsp?CurrentFolder=<%=nextFolder %>')">
+                            <%=filenameArray[currentFolderArray.length]%>
+                        </div>
+                        <div class="videoFolder">
+                            <img src="/video/images/folder_icon.png" width=15 />
+                        </div>
+                    </div>
+
+                    <div class="videoArtwork" onClick="javascript:loadContent('/video/gallery.qsp?CurrentFolder=<%=nextFolder %>')"">
+                        <img width=100 src="<%=artworkURL%>" />
+                    </div>
+                </div>
+    <%
+            }
+        }
+    }
+    %>
+
+
+</div>
+
+
+
+
+
+

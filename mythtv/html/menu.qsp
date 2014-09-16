@@ -9,6 +9,11 @@
             <li><a class='menuitem' href='#' onClick="javascript:loadContent('/tv/recordingrules.qsp')"><%=qsTr("Recording Rules")%></a></li>
         </ul>
     </li>
+    <li><a href='#'><i18n>Video</i18n></a>
+        <ul class="acitem collapsible">
+            <li><a class='menuitem' href='#' onClick="javascript:loadContent('/video/gallery.qsp')"><%=qsTr("Video Gallery")%></a></li>
+        </ul>
+    </li>
     <li><a href='#'><i18n>Setup</i18n></a>
       <ul class="acitem collapsible">
         <li><a href='#' onClick="javascript:clearContent(); loadEditWindow('/setup/wizard.html', '/setup/js/wizard.js')"><i18n>Setup Wizard</i18n></a></li>
