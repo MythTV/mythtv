@@ -306,14 +306,14 @@ class ServiceID : public SpinBoxSetting, public ChannelDBStorage
 {
   public:
     ServiceID(const ChannelID &id)
-        : SpinBoxSetting(this, -1, 999, 1, true, "NULL"),
+        : SpinBoxSetting(this, -1, UINT16_MAX, 1, true, "NULL"),
           ChannelDBStorage(this, id, "serviceid")
     {
         setLabel(QCoreApplication::translate("(ChannelSettings)", "ServiceID"));
 
         setHelpText(QCoreApplication::translate("(ChannelSettings)",
-                "Servide ID (Primary PID) of desired channel within the transport stream. "
-                "If there is only one channel, then setting this to zero will find it."));
+                "Service ID (Program Number) of desired channel within the transport stream. "
+                "If there is only one channel, then setting this to anything will still find it."));
     }
 
     void Load(void)
