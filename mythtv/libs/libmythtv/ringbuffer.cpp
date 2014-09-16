@@ -1355,7 +1355,7 @@ int RingBuffer::ReadDirect(void *buf, int count, bool peek)
         if (peek)
         {
             // seek should always succeed since we were at this position
-            long long cur_pos;
+            long long cur_pos = -1;
             if (remotefile)
                 cur_pos = remotefile->Seek(old_pos, SEEK_SET);
             else if (fd2 >= 0)
