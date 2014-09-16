@@ -1,5 +1,6 @@
 #include <iostream> // for cout
 using std::cout;
+using std::endl;
 
 #include <unistd.h>      // for isatty() on Windows
 
