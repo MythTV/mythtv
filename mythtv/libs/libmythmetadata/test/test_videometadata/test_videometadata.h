@@ -21,6 +21,9 @@
 #include <QtTest/QtTest>
 
 #include <videometadata.h>
+#include <programinfo.h>
+#include <recordinginfo.h>
+#include <metadatafactory.h>
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 #define MSKIP(MSG) QSKIP(MSG, SkipSingle)
@@ -336,5 +339,22 @@ class Testvideometadata: public QObject
         QCOMPARE(subtitle, expectedSubtitle);
         QCOMPARE(season, expectedSeason);
         QCOMPARE(episode, expectedEpisode);
+    }
+
+    /* TODO move into own test folder */
+    void ProgramWithInetref ()
+    {
+        ProgramInfo proginfo = ProgramInfo ("", "", "Test Movie", "", "", 0, 0, "tmdb3.py_1234", 0, 0, "");
+        RecordingInfo recinfo = proginfo;
+        QCOMPARE (recinfo.GetInetRef(), QString("tmdb3.py_1234"));
+        QCOMPARE (GuessLookupType (&recinfo), kProbableMovie);
+
+        proginfo = ProgramInfo ("", "", "Test Series", "Test Episode", "", 1, 15, "ttvdb.py_1234", 0, 0, "");
+        recinfo = proginfo;
+        QCOMPARE (recinfo.GetInetRef(), QString("ttvdb.py_1234"));
+        QCOMPARE (GuessLookupType (&recinfo), kProbableTelevision);
+
+        //QCOMPARE (GuessLookupType (QString ("tmdb3.py_1234")), kProbableMovie);
+        //QCOMPARE (GuessLookupType (QString ("ttvdb.py_1234")), kProbableTelevision);
     }
 };

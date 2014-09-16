@@ -15,6 +15,9 @@ DEPENDPATH += . ../.. ../../../libmythbase ../../../libmythtv ../../../libmyth
 INCLUDEPATH += . ../.. ../../../libmythbase ../../../libmythtv ../../../libmyth
 LIBS += -L../../../libmythbase -lmythbase-$$LIBVERSION
 LIBS += -L../.. -lmythmetadata-$$LIBVERSION
+# libmyth and libmythtv for ProgramInfo and RecordingInfo
+LIBS += -L../../../libmyth -lmyth-$$LIBVERSION
+LIBS += -L../../../libmythtv -lmythtv-$$LIBVERSION
 
 contains(QMAKE_CXX, "g++") {
   QMAKE_CXXFLAGS += -O0 -fprofile-arcs -ftest-coverage
