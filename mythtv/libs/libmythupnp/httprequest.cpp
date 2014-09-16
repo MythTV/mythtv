@@ -77,12 +77,14 @@ static MIMETypes g_MIMETypes[] =
     { "xslt", "text/xml"                   },
     { "css" , "text/css"                   },
     // Application Mime Types
+    { "crt" , "application/x-x509-ca-cert" },
     { "doc" , "application/vnd.ms-word"    },
     { "gz"  , "application/x-tar"          },
     { "js"  , "application/javascript"     },
     { "m3u8", "application/x-mpegurl"      }, // HTTP Live Streaming
     { "ogx" , "application/ogg"            }, // http://wiki.xiph.org/index.php/MIME_Types_and_File_Extensions
     { "pdf" , "application/pdf"            },
+    { "pem" , "application/x-x509-ca-cert" },
     { "qjs" , "application/javascript"     },
     { "rm"  , "application/vnd.rn-realmedia" },
     { "swf" , "application/x-shockwave-flash" },
