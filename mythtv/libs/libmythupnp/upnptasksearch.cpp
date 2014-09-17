@@ -104,6 +104,12 @@ void UPnpSearchTask::SendMsg( MSocketDevice  *pSocket,
     {
         QString ipaddress;
 
+
+        // Avoid announcing the localhost address
+        if (*it == QHostAddress::LocalHost ||
+            *it == QHostAddress::LocalHostIPv6)
+            continue;
+
         // If this looks like an IPv6 address, then enclose it in []'s
         if ((*it).protocol() == QAbstractSocket::IPv6Protocol)
             ipaddress = "[" + (*it).toString() + "]";
