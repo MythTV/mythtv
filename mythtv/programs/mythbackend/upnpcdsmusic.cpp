@@ -460,11 +460,12 @@ bool UPnpCDSMusic::LoadAlbums(const UPnpCDSRequest *pRequest,
     QString sql = "SELECT SQL_CALC_FOUND_ROWS "
                   "a.album_id, a.album_name, t.artist_name, a.year, "
                   "a.compilation, s.song_id, g.genre, "
-                  "COUNT(a.album_id) "
+                  "COUNT(a.album_id), w.albumart_id "
                   "FROM music_albums a "
                   "LEFT JOIN music_artists t ON a.artist_id=t.artist_id "
                   "LEFT JOIN music_songs s ON a.album_id=s.album_id "
                   "LEFT JOIN music_genres g ON s.genre_id=g.genre_id "
+                  "LEFT JOIN music_albumart w ON s.song_id=w.song_id "
                   "%1 " // WHERE clauses
                   "GROUP BY a.album_id "
                   "ORDER BY a.album_name "
@@ -493,6 +494,7 @@ bool UPnpCDSMusic::LoadAlbums(const UPnpCDSRequest *pRequest,
         int nSongId = query.value(5).toInt(); // TODO: Allow artwork lookups by album ID
         QString sGenre = query.value(6).toString();
         int nTrackCount = query.value(7).toInt();
+        int nAlbumArtID = query.value(8).toInt();
 
         CDSObject* pContainer = CDSObject::CreateMusicAlbum( sId.arg(nAlbumID),
                                                              sAlbumName,
@@ -509,7 +511,9 @@ bool UPnpCDSMusic::LoadAlbums(const UPnpCDSRequest *pRequest,
         }
 
         // Artwork
-        PopulateArtworkURIS(pContainer, nSongId);
+
+        if (nAlbumArtID > 0)
+            PopulateArtworkURIS(pContainer, nSongId);
 
         pResults->Add(pContainer);
         pContainer->DecrRef();
@@ -707,11 +711,12 @@ bool UPnpCDSMusic::LoadTracks(const UPnpCDSRequest *pRequest,
                   "a.album_name, s.name, "
                   "g.genre, s.year, s.track, "
                   "s.description, s.filename, s.length, s.size, "
-                  "s.numplays, s.lastplay "
+                  "s.numplays, s.lastplay, w.albumart_id "
                   "FROM music_songs s "
                   "LEFT JOIN music_artists t ON t.artist_id = s.artist_id "
                   "LEFT JOIN music_albums a ON a.album_id = s.album_id "
                   "LEFT JOIN music_genres g ON  g.genre_id = s.genre_id "
+                  "LEFT JOIN music_albumart w ON s.song_id = w.song_id "
                   "%1 " // WHERE clauses
                   "GROUP BY s.song_id "
                   "ORDER BY t.artist_name, a.album_name, s.track "
@@ -746,6 +751,7 @@ bool UPnpCDSMusic::LoadTracks(const UPnpCDSRequest *pRequest,
 
         int            nPlaybackCount = query.value(11).toInt();
         QDateTime      lastPlayedTime = query.value(12).toDateTime();
+        int            nAlbumArtID    = query.value(13).toInt();
 
         CDSObject* pItem = CDSObject::CreateMusicTrack( sId.arg(nId),
                                                         sTitle,
@@ -779,7 +785,8 @@ bool UPnpCDSMusic::LoadTracks(const UPnpCDSRequest *pRequest,
         pItem->SetPropValue( "lastPlaybackTime"     , UPnPDateTime::DateTimeFormat(lastPlayedTime));
 
         // Artwork
-        PopulateArtworkURIS(pItem, nId);
+        if (nAlbumArtID > 0)
+            PopulateArtworkURIS(pItem, nId);
 
         // ----------------------------------------------------------------------
         // Add Music Resource Element based on File extension (HTTP)
