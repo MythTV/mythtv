@@ -1834,7 +1834,7 @@ QString BufferedSocketDeviceRequest::ReadLine( int msecs )
 {
     QString sLine;
 
-    if (m_pSocket)
+    if (m_pSocket && m_pSocket->isValid())
     {
         bool timeout = false;
         MythTimer timer;
@@ -1864,7 +1864,7 @@ QString BufferedSocketDeviceRequest::ReadLine( int msecs )
 qint64 BufferedSocketDeviceRequest::ReadBlock(char *pData, qint64 nMaxLen,
                                               int msecs)
 {
-    if (m_pSocket)
+    if (m_pSocket && m_pSocket->isValid())
     {
         if (msecs == 0)
             return( m_pSocket->read( pData, nMaxLen ));
@@ -1900,7 +1900,7 @@ qint64 BufferedSocketDeviceRequest::ReadBlock(char *pData, qint64 nMaxLen,
 qint64 BufferedSocketDeviceRequest::WriteBlock(const char *pData, qint64 nLen)
 {
     qint64 bytesWritten = -1;
-    if (m_pSocket)
+    if (m_pSocket && m_pSocket->isValid())
     {
         bytesWritten = m_pSocket->write( pData, nLen );
         m_pSocket->waitForBytesWritten();
