@@ -1486,7 +1486,7 @@ void ProgLister::UpdateDisplay(const ProgramInfo *selected)
         RestoreSelection(selected, offset);
     else if (m_selectedTime.isValid())
     {
-        int i;
+        uint i;
         for (i = 0; i < m_itemList.size(); ++i)
         {
             if (m_selectedTime <= m_itemList[i]->GetScheduledStartTime())
