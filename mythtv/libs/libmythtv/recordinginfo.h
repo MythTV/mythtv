@@ -6,6 +6,7 @@
 
 #include "mythtvexp.h"
 #include "programinfo.h"
+#include "recordingfile.h"
 
 class RecordingRule;
 
@@ -40,7 +41,8 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         mplexid(0),
         desiredrecstartts(),
         desiredrecendts(),
-        record(NULL) {}
+        record(NULL),
+        m_recordingFile(NULL) {}
     RecordingInfo(const RecordingInfo &other) :
         ProgramInfo(other),
         oldrecstatus(other.oldrecstatus),
@@ -50,7 +52,8 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         mplexid(other.mplexid),
         desiredrecstartts(other.desiredrecstartts),
         desiredrecendts(other.desiredrecendts),
-        record(NULL) {}
+        record(NULL),
+        m_recordingFile(NULL)  {}
     RecordingInfo(const ProgramInfo &other) :
         ProgramInfo(other),
         oldrecstatus(rsUnknown),
@@ -60,7 +63,8 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         mplexid(0),
         desiredrecstartts(startts),
         desiredrecendts(endts),
-        record(NULL) {}
+        record(NULL),
+        m_recordingFile(NULL)  {}
     RecordingInfo(uint _chanid, const QDateTime &_recstartts) :
         ProgramInfo(_chanid, _recstartts),
         oldrecstatus(rsUnknown),
@@ -70,7 +74,8 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         mplexid(0),
         desiredrecstartts(startts),
         desiredrecendts(endts),
-        record(NULL) {}
+        record(NULL),
+        m_recordingFile(NULL)  {}
     RecordingInfo(QStringList::const_iterator &it,
                   QStringList::const_iterator  end) :
         ProgramInfo(it, end),
@@ -81,7 +86,8 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         mplexid(0),
         desiredrecstartts(startts),
         desiredrecendts(endts),
-        record(NULL) {}
+        record(NULL),
+        m_recordingFile(NULL)  {}
     /// Create RecordingInfo from 'program'+'record'+'channel' tables,
     /// used in scheduler.cpp @ ~ 3296
     RecordingInfo(
@@ -275,6 +281,8 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
     static QString GetRecgroupString(uint recGroupID);
     static uint GetRecgroupID(const QString &recGroup);
 
+    RecordingFile *GetRecordingFile();
+
     RecStatusType oldrecstatus;
     RecStatusType savedrecstatus;
     bool future;
@@ -285,6 +293,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
 
   private:
     mutable class RecordingRule *record;
+    RecordingFile *m_recordingFile;
 
   protected:
     static bool InsertProgram(RecordingInfo *pg,

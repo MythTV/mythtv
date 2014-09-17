@@ -120,7 +120,8 @@ RecordingInfo::RecordingInfo(
     mplexid(_mplexid),
     desiredrecstartts(_startts),
     desiredrecendts(_endts),
-    record(NULL)
+    record(NULL),
+    m_recordingFile(NULL)
 {
     hostname = _hostname;
     storagegroup = _storagegroup;
@@ -220,7 +221,8 @@ RecordingInfo::RecordingInfo(
     mplexid(0),
     desiredrecstartts(_startts),
     desiredrecendts(_endts),
-    record(NULL)
+    record(NULL),
+    m_recordingFile(NULL)
 {
     recpriority = _recpriority;
 
@@ -255,7 +257,8 @@ RecordingInfo::RecordingInfo(
     mplexid(0),
     desiredrecstartts(),
     desiredrecendts(),
-    record(NULL)
+    record(NULL),
+    m_recordingFile(NULL)
 {
     ProgramList schedList;
     ProgramList progList;
@@ -408,6 +411,9 @@ void RecordingInfo::clone(const RecordingInfo &other,
         desiredrecstartts = other.desiredrecstartts;
         desiredrecendts = other.desiredrecendts;
     }
+
+    delete m_recordingFile;
+    m_recordingFile = NULL;
 }
 
 /// \brief Copies important fields from ProgramInfo
@@ -435,6 +441,9 @@ void RecordingInfo::clone(const ProgramInfo &other,
     mplexid        = 0;
     desiredrecstartts = QDateTime();
     desiredrecendts = QDateTime();
+
+    delete m_recordingFile;
+    m_recordingFile = NULL;
 }
 
 void RecordingInfo::clear(void)
@@ -451,6 +460,9 @@ void RecordingInfo::clear(void)
     mplexid = 0;
     desiredrecstartts = QDateTime();
     desiredrecendts = QDateTime();
+
+    delete m_recordingFile;
+    m_recordingFile = NULL;
 }
 
 
@@ -461,6 +473,9 @@ RecordingInfo::~RecordingInfo()
 {
     delete record;
     record = NULL;
+
+    delete m_recordingFile;
+    m_recordingFile = NULL;
 }
 
 /** \fn RecordingInfo::GetProgramRecordingStatus()
@@ -1563,6 +1578,18 @@ QString RecordingInfo::GetRecgroupString(uint recGroupID)
         return QString();
     }
     return query.value(0).toString();
+}
+
+RecordingFile* RecordingInfo::GetRecordingFile()
+{
+    if (!m_recordingFile)
+    {
+        m_recordingFile = new RecordingFile();
+        m_recordingFile->m_recordingId = recordedid;
+        m_recordingFile->Load();
+    }
+
+    return m_recordingFile;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
