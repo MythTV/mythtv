@@ -599,9 +599,9 @@ void ExternalStreamHandler::run(void)
             else
                 buffer.clear();
         }
-        if (!m_IO || m_IO->Error())
+        if (m_IO->Error())
         {
-            m_error = m_IO ? m_IO->ErrorString() : "I/O died";
+            m_error = m_IO->ErrorString();
             _error = true;
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("Error from External Recorder: %1")
