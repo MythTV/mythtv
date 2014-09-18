@@ -367,7 +367,7 @@ void UPnpCDSTv::AddItem( const UPnpCDSRequest    *pRequest,
     pItem->SetPropValue( "artist"        , "[Unknown Author]" );
     pItem->SetPropValue( "album"         , "[Unknown Series]" );
     pItem->SetPropValue( "actor"         , "[Unknown Author]" );
-    pItem->SetPropValue( "date"          , dtStartTime.toString(Qt::ISODate));
+    pItem->SetPropValue( "date"          , dtStartTime.toLocalTime().toString(Qt::ISODate));
 
     pResults->Add( pItem );
 

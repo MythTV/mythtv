@@ -358,7 +358,7 @@ void UPnpCDSVideo::AddItem( const UPnpCDSRequest    *pRequest,
     }
     QFileInfo fInfo( sFullFileName );
 
-    pItem->SetPropValue( "date", dtInsertDate.toString("yyyy-MM-dd"));
+    pItem->SetPropValue( "date", dtInsertDate.toLocalTime().toString(Qt::ISODate));
     pResults->Add( pItem );
 
     // ----------------------------------------------------------------------
