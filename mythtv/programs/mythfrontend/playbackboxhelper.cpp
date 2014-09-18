@@ -90,13 +90,14 @@ AvailableStatusType PBHEventHandler::CheckAvailability(const QStringList &slist)
         }
         else if (!evinfo.GetFilesize())
         {
-            evinfo.SetFilesize(evinfo.QueryFilesize());
-            if (!evinfo.GetFilesize())
-            {
+               // This query should be unnecessary if the ProgramInfo Updater is working
+//             evinfo.SetFilesize(evinfo.QueryFilesize());
+//             if (!evinfo.GetFilesize())
+//             {
                 availableStatus =
                     (evinfo.GetRecordingStatus() == rsRecording) ?
                     asNotYetAvailable : asZeroByte;
-            }
+//             }
         }
     }
 

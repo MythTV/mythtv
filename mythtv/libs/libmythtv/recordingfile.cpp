@@ -5,9 +5,11 @@
 #include "mythdb.h"
 
 RecordingFile::RecordingFile()
-              : m_recordingId(0), m_fileId(0), m_fileSize(0),
-                m_videoAspectRatio(0.0), m_videoFrameRate(0.0),
-                m_audioChannels(0), m_audioSampleRate(0.0), m_audioBitrate(0)
+              : m_recordingId(0), m_storageDeviceID(""), m_storageGroup(""),
+                m_fileId(0), m_fileName(""), m_fileSize(0),
+                m_videoCodec(""), m_videoAspectRatio(0.0), m_videoFrameRate(0.0),
+                m_audioCodec(""), m_audioChannels(0), m_audioSampleRate(0.0),
+                m_audioBitrate(0)
 {
 
 }
@@ -87,8 +89,8 @@ bool RecordingFile::Save()
                       "video_codec = :VIDEO_CODEC, "
                       "hostname = :STORAGE_DEVICE, "
                       "storagegroup = :STORAGE_GROUP, "
-                      "recordedid = :RECORDING_ID, "
-                      "WHERE id=:FILE_ID ");
+                      "recordedid = :RECORDING_ID "
+                      "WHERE id = :FILE_ID ");
         query.bindValue(":FILE_ID", m_fileId);
     }
     else
@@ -124,13 +126,16 @@ bool RecordingFile::Save()
     query.bindValue(":VIDEO_CODEC", m_videoCodec);
     query.bindValue(":STORAGE_DEVICE", m_storageDeviceID);
     query.bindValue(":STORAGE_GROUP", m_storageGroup);
-    query.bindValue(":RECORDEDID", m_recordingId);
+    query.bindValue(":RECORDING_ID", m_recordingId);
 
     if (!query.exec())
     {
         MythDB::DBError("RecordingFile::Save()", query);
         return false;
     }
+
+    if (m_fileId == 0)
+        m_fileId = query.lastInsertId().toUInt();
 
     return true;
 }

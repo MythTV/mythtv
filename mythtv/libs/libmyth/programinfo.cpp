@@ -2570,47 +2570,6 @@ QString ProgramInfo::GetPlaybackURL(
     return tmpURL;
 }
 
-/** \fn ProgramInfo::SaveFilesize(uint64_t)
- *  \brief Sets recording file size in database, and sets "filesize" field.
- */
-void ProgramInfo::SaveFilesize(uint64_t fsize)
-{
-    SetFilesize(fsize);
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        "UPDATE recorded "
-        "SET filesize = :FILESIZE "
-        "WHERE chanid    = :CHANID AND "
-        "      starttime = :STARTTIME");
-    query.bindValue(":FILESIZE",  (quint64)fsize);
-    query.bindValue(":CHANID",    chanid);
-    query.bindValue(":STARTTIME", recstartts);
-
-    if (!query.exec())
-        MythDB::DBError("File size update", query);
-
-    updater->insert(chanid, recstartts, kPIUpdateFileSize, fsize);
-}
-
-/// \brief Gets recording file size from database.
-uint64_t ProgramInfo::QueryFilesize(void) const
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    query.prepare(
-        "SELECT filesize "
-        "FROM recorded "
-        "WHERE chanid    = :CHANID AND "
-        "      starttime = :STARTTIME");
-    query.bindValue(":CHANID", chanid);
-    query.bindValue(":STARTTIME", recstartts);
-    if (query.exec() && query.next())
-        return query.value(0).toULongLong();
-
-    return filesize;
-}
-
 /** \brief Queries multiplex any recording would be made on, zero if unknown.
  */
 uint ProgramInfo::QueryMplexID(void) const
@@ -5809,5 +5768,71 @@ MPUBLIC QString format_season_and_episode(int seasEp, int digits)
 
     return seasEpNum;
 }
+
+// ---------------------------------------------------------------------------
+// DEPRECATED CODE FOLLOWS
+// ---------------------------------------------------------------------------
+
+void ProgramInfo::SetFilesize(uint64_t sz)
+{
+    LOG(VB_GENERAL, LOG_DEBUG, "FIXME: ProgramInfo::SetFilesize() called instead of RecordingInfo::SetFilesize()");
+    filesize     = sz;
+}
+
+
+/** \fn ProgramInfo::SaveFilesize(uint64_t)
+ *  \brief Sets recording file size in database, and sets "filesize" field.
+ */
+void ProgramInfo::SaveFilesize(uint64_t fsize)
+{
+    LOG(VB_GENERAL, LOG_DEBUG, "FIXME: ProgramInfo::SaveFilesize() called instead of RecordingInfo::SaveFilesize()");
+    SetFilesize(fsize);
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "UPDATE recorded "
+        "SET filesize = :FILESIZE "
+        "WHERE chanid    = :CHANID AND "
+        "      starttime = :STARTTIME");
+    query.bindValue(":FILESIZE",  (quint64)fsize);
+    query.bindValue(":CHANID",    chanid);
+    query.bindValue(":STARTTIME", recstartts);
+
+    if (!query.exec())
+        MythDB::DBError("File size update", query);
+
+    updater->insert(chanid, recstartts, kPIUpdateFileSize, fsize);
+}
+
+uint64_t ProgramInfo::GetFilesize(void) const
+{
+    LOG(VB_GENERAL, LOG_DEBUG, "FIXME: ProgramInfo::GetFilesize() called instead of RecordingInfo::GetFilesize()");
+    return filesize;
+}
+
+
+/// \brief Gets recording file size direct from the database.
+///
+/// In theory this should be redundant, the ProgramInfo updater should sync
+/// all instances on frontends and backends without the need
+/// for any one to go checking the database.
+// uint64_t ProgramInfo::QueryFilesize(void) const
+// {
+//     LOG(VB_GENERAL, LOG_DEBUG, "FIXME: ProgramInfo::QueryFilesize() called instead of RecordingInfo::GetFilesize()");
+//
+//     MSqlQuery query(MSqlQuery::InitCon());
+//
+//     query.prepare(
+//         "SELECT filesize "
+//         "FROM recorded "
+//         "WHERE chanid    = :CHANID AND "
+//         "      starttime = :STARTTIME");
+//     query.bindValue(":CHANID", chanid);
+//     query.bindValue(":STARTTIME", recstartts);
+//     if (query.exec() && query.next())
+//         return query.value(0).toULongLong();
+//
+//     return filesize;
+// }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

@@ -42,7 +42,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         desiredrecstartts(),
         desiredrecendts(),
         record(NULL),
-        m_recordingFile(NULL) {}
+        m_recordingFile(NULL) { LoadRecordingFile(); }
     RecordingInfo(const RecordingInfo &other) :
         ProgramInfo(other),
         oldrecstatus(other.oldrecstatus),
@@ -53,7 +53,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         desiredrecstartts(other.desiredrecstartts),
         desiredrecendts(other.desiredrecendts),
         record(NULL),
-        m_recordingFile(NULL)  {}
+        m_recordingFile(NULL)  { LoadRecordingFile(); }
     RecordingInfo(const ProgramInfo &other) :
         ProgramInfo(other),
         oldrecstatus(rsUnknown),
@@ -64,7 +64,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         desiredrecstartts(startts),
         desiredrecendts(endts),
         record(NULL),
-        m_recordingFile(NULL)  {}
+        m_recordingFile(NULL)  { LoadRecordingFile(); }
     RecordingInfo(uint _chanid, const QDateTime &_recstartts) :
         ProgramInfo(_chanid, _recstartts),
         oldrecstatus(rsUnknown),
@@ -75,7 +75,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         desiredrecstartts(startts),
         desiredrecendts(endts),
         record(NULL),
-        m_recordingFile(NULL)  {}
+        m_recordingFile(NULL)  { LoadRecordingFile(); }
     RecordingInfo(QStringList::const_iterator &it,
                   QStringList::const_iterator  end) :
         ProgramInfo(it, end),
@@ -87,7 +87,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         desiredrecstartts(startts),
         desiredrecendts(endts),
         record(NULL),
-        m_recordingFile(NULL)  {}
+        m_recordingFile(NULL)  { LoadRecordingFile(); }
     /// Create RecordingInfo from 'program'+'record'+'channel' tables,
     /// used in scheduler.cpp @ ~ 3296
     RecordingInfo(
@@ -231,6 +231,9 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
     // Serializers
     virtual void SubstituteMatches(QString &str);
 
+    void SetRecordingID(uint _recordedid) {  recordedid = _recordedid;
+                                             m_recordingFile->m_recordingId = _recordedid; }
+
     // Quick gets
     /// Creates a unique string that can be used to identify a
     /// scheduled recording.
@@ -281,7 +284,12 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
     static QString GetRecgroupString(uint recGroupID);
     static uint GetRecgroupID(const QString &recGroup);
 
-    RecordingFile *GetRecordingFile();
+    // File specific metdata
+    void LoadRecordingFile();
+    RecordingFile *GetRecordingFile() const { return m_recordingFile; }
+    void SaveFilesize(uint64_t fsize);   /// Will replace the one in ProgramInfo
+    void SetFilesize( uint64_t sz );     /// Will replace the one in ProgramInfo
+    uint64_t GetFilesize(void) const; /// Will replace the one in ProgramInfo
 
     RecStatusType oldrecstatus;
     RecStatusType savedrecstatus;

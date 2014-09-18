@@ -40,17 +40,18 @@ class DeleteStruct
     friend class MainServer;
   public:
     DeleteStruct(MainServer *ms, QString filename, QString title,
-                 uint chanid, QDateTime recstartts, QDateTime recendts, 
+                 uint chanid, QDateTime recstartts, QDateTime recendts,
+                 uint recordedId,
                  bool forceMetadataDelete) : 
         m_ms(ms), m_filename(filename), m_title(title), 
         m_chanid(chanid), m_recstartts(recstartts), 
-        m_recendts(recendts),
+        m_recendts(recendts), m_recordedid(recordedId),
         m_forceMetadataDelete(forceMetadataDelete), m_fd(-1), m_size(0)
     {
     }
 
     DeleteStruct(MainServer *ms, QString filename, int fd, off_t size) : 
-        m_ms(ms), m_filename(filename), m_chanid(0),
+        m_ms(ms), m_filename(filename), m_chanid(0), m_recordedid(0),
         m_forceMetadataDelete(false), m_fd(fd), m_size(size)
     {
     }
@@ -62,6 +63,7 @@ class DeleteStruct
     uint        m_chanid;
     QDateTime   m_recstartts;
     QDateTime   m_recendts;
+    uint        m_recordedid;
     bool        m_forceMetadataDelete;
     int         m_fd;
     off_t       m_size;
@@ -71,10 +73,10 @@ class DeleteThread : public QRunnable, public DeleteStruct
 {
   public:
     DeleteThread(MainServer *ms, QString filename, QString title, uint chanid,
-                 QDateTime recstartts, QDateTime recendts, 
+                 QDateTime recstartts, QDateTime recendts, uint recordingId,
                  bool forceMetadataDelete) :
                      DeleteStruct(ms, filename, title, chanid, recstartts,
-                                  recendts, forceMetadataDelete)  {}
+                                  recendts, recordingId, forceMetadataDelete)  {}
     void start(void)
         { MThreadPool::globalInstance()->startReserved(this, "DeleteThread"); }
     void run(void);

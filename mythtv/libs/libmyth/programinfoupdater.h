@@ -14,6 +14,9 @@
 #include <QMutex>
 #include <QHash>
 
+// Myth
+#include "mythexp.h"
+
 typedef enum PIAction {
     kPIAdd,
     kPIDelete,
@@ -21,7 +24,7 @@ typedef enum PIAction {
     kPIUpdateFileSize,
 } PIAction;
 
-class PIKey
+class MPUBLIC PIKey
 {
   public:
     PIKey(uint c, const QDateTime &r) : chanid(c), recstartts(r) {}
@@ -37,7 +40,7 @@ class PIKey
 };
 uint qHash(const PIKey &k);
 
-class PIKeyAction : public PIKey
+class MPUBLIC PIKeyAction : public PIKey
 {
   public:
     PIKeyAction(uint c, const QDateTime &r, PIAction a) :
@@ -46,7 +49,7 @@ class PIKeyAction : public PIKey
     PIAction action;
 };
 
-class PIKeyData
+class MPUBLIC PIKeyData
 {
   public:
     PIKeyData(PIAction a, uint64_t f) : action(a), filesize(f) { }
@@ -54,7 +57,7 @@ class PIKeyData
     uint64_t filesize;
 };
 
-class ProgramInfoUpdater : public QRunnable
+class MPUBLIC ProgramInfoUpdater : public QRunnable
 {
   public:
     ProgramInfoUpdater() : isRunning(false) { setAutoDelete(false); }

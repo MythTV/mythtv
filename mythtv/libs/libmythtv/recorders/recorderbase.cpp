@@ -421,15 +421,53 @@ void RecorderBase::FinishRecording(void)
         if (m_primaryVideoCodec == AV_CODEC_ID_H264)
             curRecording->SaveVideoProperties(VID_AVC, VID_AVC);
 
+        RecordingFile *recFile = curRecording->GetRecordingFile();
+
+        // Video
+        recFile->m_videoCodec = ff_codec_id_string(m_primaryVideoCodec);
+
+        switch (m_videoAspect)
+        {
+            case ASPECT_1_1 :
+                recFile->m_videoAspectRatio = 1.0;
+                break;
+            case ASPECT_4_3:
+                recFile->m_videoAspectRatio = 1.33333333333;
+                break;
+            case ASPECT_16_9:
+                recFile->m_videoAspectRatio = 1.77777777777;
+                break;
+            case ASPECT_2_21_1:
+                recFile->m_videoAspectRatio = 2.21;
+                break;
+            default:
+                recFile->m_videoAspectRatio = (double)m_videoAspect / 1000000.0;
+                break;
+        }
+
+        QSize resolution(m_videoWidth, m_videoHeight);
+        recFile->m_videoResolution = resolution;
+        recFile->m_videoFrameRate = GetFrameRate();
+
+        // Audio
+        recFile->m_audioCodec = ff_codec_id_string(m_primaryAudioCodec);
+
+        recFile->Save();
+
+        SavePositionMap(true, true); // Save Position Map only, not file size
+
         if (ringBuffer)
             curRecording->SaveFilesize(ringBuffer->GetRealFileSize());
-        SavePositionMap(true);
     }
 
     LOG(VB_GENERAL, LOG_NOTICE, QString("Finished Recording: "
-                                        "Video Codec: %1 "
+                                        "Video Codec: %1 (%2x%3 A/R: %4 %5fps) "
                                         "Audio Codec: %2")
                                         .arg(avcodec_get_name(m_primaryVideoCodec))
+                                        .arg(m_videoWidth)
+                                        .arg(m_videoHeight)
+                                        .arg(m_videoAspect)
+                                        .arg(GetFrameRate())
                                         .arg(avcodec_get_name(m_primaryAudioCodec)));
 }
 
@@ -519,7 +557,7 @@ bool RecorderBase::GetKeyframeDurations(
  *         position map.
  *  \param force If true this forces a DB sync.
  */
-void RecorderBase::SavePositionMap(bool force)
+void RecorderBase::SavePositionMap(bool force, bool finished)
 {
     bool needToSave = force;
     positionMapLock.lock();
@@ -560,7 +598,7 @@ void RecorderBase::SavePositionMap(bool force)
             positionMapLock.unlock();
         }
 
-        if (ringBuffer)
+        if (ringBuffer && !finished) // Finished Recording will update the final size for us
         {
             curRecording->SaveFilesize(ringBuffer->GetWritePosition());
         }

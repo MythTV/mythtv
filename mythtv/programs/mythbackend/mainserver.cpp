@@ -2129,7 +2129,8 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
 
     deletelock.lock();
 
-    QString logInfo = QString("chanid %1 at %2")
+    QString logInfo = QString("recording id %1 (chanid %2 at %3)")
+        .arg(ds->m_recordedid)
         .arg(ds->m_chanid)
         .arg(ds->m_recstartts.toString(Qt::ISODate));
 
@@ -2193,7 +2194,11 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
     off_t size = 0;
     bool errmsg = false;
 
-    /* Delete recording. */
+    //-----------------------------------------------------------------------
+    // TODO Move the following into DeleteRecordedFiles
+    //-----------------------------------------------------------------------
+
+    // Delete recording.
     if (slowDeletes)
     {
         // Since stat fails after unlinking on some filesystems,
@@ -2224,7 +2229,7 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
         return;
     }
 
-    /* Delete all preview thumbnails and srt subtitles. */
+    // Delete all preview thumbnails and srt subtitles.
 
     QFileInfo fInfo( ds->m_filename );
     QString nameFilter = fInfo.fileName() + "*.png";
@@ -2251,9 +2256,10 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
 
         delete_file_immediately( sFileName, followLinks, true);
     }
+    // -----------------------------------------------------------------------
 
-    // TODO This is the future when we populate the recordedfile table
-    // DeleteRecordedFiles(ds);
+    // TODO Have DeleteRecordedFiles do the deletion of all associated files
+    DeleteRecordedFiles(ds);
 
     DoDeleteInDB(ds);
 
@@ -2265,17 +2271,18 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
 
 void MainServer::DeleteRecordedFiles(DeleteStruct *ds)
 {
-    QString logInfo = QString("chanid %1 at %2")
-        .arg(ds->m_chanid).arg(ds->m_recstartts.toString(Qt::ISODate));
+    QString logInfo = QString("recording id %1 filename %2")
+        .arg(ds->m_recordedid).arg(ds->m_filename);
+
+    LOG(VB_GENERAL, LOG_NOTICE, "DeleteRecordedFiles - " + logInfo);
 
     MSqlQuery update(MSqlQuery::InitCon());
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT basename, hostname, storagegroup FROM recordedfile "
-                  "WHERE chanid = :CHANID AND starttime = :STARTTIME;");
-    query.bindValue(":CHANID", ds->m_chanid);
-    query.bindValue(":STARTTIME", ds->m_recstartts);
+                  "WHERE recordedid = :RECORDEDID;");
+    query.bindValue(":RECORDEDID", ds->m_recordedid);
 
-    if (!query.exec() || !query.isActive())
+    if (!query.exec() || !query.size())
     {
         MythDB::DBError("RecordedFiles deletion", query);
         LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -2293,41 +2300,39 @@ void MainServer::DeleteRecordedFiles(DeleteStruct *ds)
         storagegroup = query.value(2).toString();
         deleteInDB = false;
 
-        if (basename == ds->m_filename)
+        if (basename == QFileInfo(ds->m_filename).fileName())
             deleteInDB = true;
         else
         {
-            LOG(VB_FILE, LOG_INFO, LOC +
-                QString("DeleteRecordedFiles(%1), deleting '%2'")
-                    .arg(logInfo).arg(query.value(0).toString()));
-
-            StorageGroup sgroup(storagegroup);
-            QString localFile = sgroup.FindFile(basename);
-
-            QString url = gCoreContext->GenMythURL(hostname,
-                                  gCoreContext->GetBackendServerPort(hostname),
-                                  basename,
-                                  storagegroup);
-
-            if ((((hostname == gCoreContext->GetHostName()) ||
-                  (!localFile.isEmpty())) &&
-                 (HandleDeleteFile(basename, storagegroup))) ||
-                (((hostname != gCoreContext->GetHostName()) ||
-                  (localFile.isEmpty())) &&
-                 (RemoteFile::DeleteFile(url))))
-            {
-                deleteInDB = true;
-            }
+//             LOG(VB_FILE, LOG_INFO, LOC +
+//                 QString("DeleteRecordedFiles(%1), deleting '%2'")
+//                     .arg(logInfo).arg(query.value(0).toString()));
+//
+//             StorageGroup sgroup(storagegroup);
+//             QString localFile = sgroup.FindFile(basename);
+//
+//             QString url = gCoreContext->GenMythURL(hostname,
+//                                   gCoreContext->GetBackendServerPort(hostname),
+//                                   basename,
+//                                   storagegroup);
+//
+//             if ((((hostname == gCoreContext->GetHostName()) ||
+//                   (!localFile.isEmpty())) &&
+//                  (HandleDeleteFile(basename, storagegroup))) ||
+//                 (((hostname != gCoreContext->GetHostName()) ||
+//                   (localFile.isEmpty())) &&
+//                  (RemoteFile::DeleteFile(url))))
+//             {
+//                 deleteInDB = true;
+//             }
         }
 
         if (deleteInDB)
         {
             update.prepare("DELETE FROM recordedfile "
-                           "WHERE chanid = :CHANID "
-                               "AND starttime = :STARTTIME "
+                           "WHERE recordedid = :RECORDEDID "
                                "AND basename = :BASENAME ;");
-            update.bindValue(":CHANID", ds->m_chanid);
-            update.bindValue(":STARTTIME", ds->m_recstartts);
+            update.bindValue(":RECORDEDID", ds->m_recordedid);
             update.bindValue(":BASENAME", basename);
             if (!update.exec())
             {
@@ -2343,17 +2348,19 @@ void MainServer::DeleteRecordedFiles(DeleteStruct *ds)
 
 void MainServer::DoDeleteInDB(DeleteStruct *ds)
 {
-    QString logInfo = QString("chanid %1 at %2")
+    QString logInfo = QString("recording id %1 (chanid %2 at %3)")
+        .arg(ds->m_recordedid)
         .arg(ds->m_chanid).arg(ds->m_recstartts.toString(Qt::ISODate));
 
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("DELETE FROM recorded WHERE chanid = :CHANID AND "
-                  "title = :TITLE AND starttime = :STARTTIME;");
-    query.bindValue(":CHANID", ds->m_chanid);
-    query.bindValue(":TITLE", ds->m_title);
-    query.bindValue(":STARTTIME", ds->m_recstartts);
+    LOG(VB_GENERAL, LOG_NOTICE, "DoDeleteINDB - " + logInfo);
 
-    if (!query.exec() || !query.isActive())
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("DELETE FROM recorded WHERE recordedid = :RECORDEDID AND "
+                  "title = :TITLE;");
+    query.bindValue(":RECORDEDID", ds->m_recordedid);
+    query.bindValue(":TITLE", ds->m_title);
+
+    if (!query.exec() || !query.size())
     {
         MythDB::DBError("Recorded program deletion", query);
         LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -2730,7 +2737,12 @@ void MainServer::HandleDeleteRecording(QString &chanid, QString &starttime,
     QDateTime recstartts = MythDate::fromString(starttime);
     RecordingInfo recinfo(chanid.toUInt(), recstartts);
 
-    if (!recinfo.GetChanID())
+    if (!recinfo.GetRecordingID())
+    {
+        qDebug() << "HandleDeleteRecording(chanid, starttime) Empty Recording ID";
+    }
+
+    if (!recinfo.GetChanID()) // !recinfo.GetRecordingID()
     {
         MythSocket *pbssock = NULL;
         if (pbs)
@@ -2750,7 +2762,13 @@ void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs,
 {
     QStringList::const_iterator it = slist.begin() + 1;
     RecordingInfo recinfo(it, slist.end());
-    if (recinfo.GetChanID())
+
+    if (!recinfo.GetRecordingID())
+    {
+        qDebug() << "HandleDeleteRecording(QStringList) Empty Recording ID";
+    }
+
+    if (recinfo.GetChanID()) // !recinfo.GetRecordingID()
         DoHandleDeleteRecording(recinfo, pbs, forceMetadataDelete, false, false);
 }
 
@@ -2849,9 +2867,15 @@ void MainServer::DoHandleDeleteRecording(
     {
         recinfo.SaveDeletePendingFlag(true);
 
+        if (!recinfo.GetRecordingID())
+        {
+            qDebug() << "DoHandleDeleteRecording() Empty Recording ID";
+        }
+
         DeleteThread *deleteThread = new DeleteThread(this, filename,
             recinfo.GetTitle(), recinfo.GetChanID(),
             recinfo.GetRecordingStartTime(), recinfo.GetRecordingEndTime(),
+            recinfo.GetRecordingID(),
             forceMetadataDelete);
         deleteThread->start();
     }

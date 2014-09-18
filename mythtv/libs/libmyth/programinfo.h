@@ -414,7 +414,7 @@ class MPUBLIC ProgramInfo
     {
         return MythDate::toString(lastmodified, fmt);
     }
-    uint64_t GetFilesize(void)            const { return filesize;     }
+    virtual uint64_t GetFilesize(void)    const; // TODO Remove
     QString GetSeriesID(void)             const { return seriesid;     }
     QString GetProgramID(void)            const { return programid;    }
     QString GetInetRef(void)              const { return inetref;      }
@@ -501,7 +501,7 @@ class MPUBLIC ProgramInfo
     void SetPlaybackGroup( const QString &group)    { playgroup    = group; }
     void SetHostname(      const QString &host)     { hostname     = host;  }
     void SetStorageGroup(  const QString &group)    { storagegroup = group; }
-    void SetFilesize(      uint64_t       sz)       { filesize     = sz;    }
+    virtual void SetFilesize( uint64_t       sz); /// TODO Move to RecordingInfo
     void SetSeriesID(      const QString &id)       { seriesid     = id;    }
     void SetProgramID(     const QString &id)       { programid    = id;    }
     void SetCategory(      const QString &cat)      { category     = cat;   }
@@ -534,7 +534,7 @@ class MPUBLIC ProgramInfo
         programflags &= ~FL_IGNOREBOOKMARK;
         programflags |= (ignore) ? FL_IGNOREBOOKMARK : 0;
     }
-    void SetRecordingID(uint _recordedid) { recordedid = _recordedid; }
+    virtual void SetRecordingID(uint _recordedid) { recordedid = _recordedid; }
     void SetRecordingStatus(RecStatusType status) { recstatus = status; }
     void SetRecordingRuleType(RecordingType type) { rectype   = type;   }
     void SetPositionMapDBReplacement(PMapDBReplacement *pmap)
@@ -542,7 +542,7 @@ class MPUBLIC ProgramInfo
 
     // Slow DB gets
     QString     QueryBasename(void) const;
-    uint64_t    QueryFilesize(void) const;
+//  uint64_t    QueryFilesize(void) const; // TODO Remove
     uint        QueryMplexID(void) const;
     QDateTime   QueryBookmarkTimeStamp(void) const;
     uint64_t    QueryBookmark(void) const;
@@ -569,7 +569,7 @@ class MPUBLIC ProgramInfo
     bool        Reload(void);
 
     // Slow DB sets
-    void SaveFilesize(uint64_t fsize);
+    virtual void SaveFilesize(uint64_t fsize); /// TODO Move to RecordingInfo
     void SaveBookmark(uint64_t frame);
     void SaveDVDBookmark(const QStringList &fields) const;
     void SaveEditing(bool edit);

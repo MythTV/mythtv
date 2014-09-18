@@ -927,8 +927,7 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
     }
 
     // Generate a preview
-    uint64_t fsize = (curRec->GetFilesize() < 1000) ?
-        curRec->QueryFilesize() : curRec->GetFilesize();
+    uint64_t fsize = curRec->GetFilesize();
     if (curRec->IsLocal() && (fsize >= 1000) &&
         (curRec->GetRecordingStatus() == rsRecorded))
     {

@@ -170,6 +170,7 @@ const char *ff_codec_id_string(enum AVCodecID codec_id)
         case AV_CODEC_ID_XAN_DPCM:         return "XAN_DPCM";
         case AV_CODEC_ID_SOL_DPCM:         return "SOL_DPCM";
 
+        case AV_CODEC_ID_MP1:              return "MP1";
         case AV_CODEC_ID_MP2:              return "MP2";
         case AV_CODEC_ID_MP3:              return "MP3";
         case AV_CODEC_ID_AAC:              return "AAC";

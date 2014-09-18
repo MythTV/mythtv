@@ -38,13 +38,13 @@ class MTV_PUBLIC RecordingFile
 
     QString m_videoCodec; // ff_codec_id_string
     QSize m_videoResolution;
-    float m_videoAspectRatio;
-    float m_videoFrameRate;
+    double m_videoAspectRatio;
+    double m_videoFrameRate;
     //int   m_videoBitrate;
 
     QString m_audioCodec; // Main audio stream or best quality stream?
     int m_audioChannels;
-    float m_audioSampleRate;
+    double m_audioSampleRate;
     int m_audioBitrate;
 
 };

@@ -223,7 +223,7 @@ class MTV_PUBLIC RecorderBase : public QRunnable
 
     /** \brief Save the seektable to the DB
      */
-    void SavePositionMap(bool force = false);
+    void SavePositionMap(bool force = false, bool finished = false);
 
     enum AspectRatio {
         ASPECT_UNKNOWN       = 0x00,
@@ -297,7 +297,7 @@ class MTV_PUBLIC RecorderBase : public QRunnable
     bool           ntsc_framerate;
     double         video_frame_rate;
 
-    uint           m_videoAspect; // AspectRatio
+    uint           m_videoAspect; // AspectRatio (1 = 4:3, 2 = 16:9
 
     uint           m_videoHeight;
     uint           m_videoWidth;

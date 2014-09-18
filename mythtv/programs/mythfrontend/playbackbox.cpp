@@ -716,11 +716,12 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
             if (info)
             {
                 uint64_t filesize = info->GetFilesize();
-                if (filesize == 0 || info->GetRecordingStatus() == rsRecording)
-                {
-                    filesize = info->QueryFilesize();
-                    info->SetFilesize(filesize);
-                }
+// This query should be unnecessary if the ProgramInfo Updater is working
+//                 if (filesize == 0 || info->GetRecordingStatus() == rsRecording)
+//                 {
+//                     filesize = info->QueryFilesize();
+//                     info->SetFilesize(filesize);
+//                 }
                 groupSize += filesize;
             }
         }
