@@ -402,16 +402,16 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
 bool MPEGStreamData::CreatePATSingleProgram(
     const ProgramAssociationTable& pat)
 {
-    LOG(VB_RECORD, LOG_INFO, LOC + "CreatePATSingleProgram()");
-    LOG(VB_RECORD, LOG_INFO, LOC + "PAT in input stream");
-    LOG(VB_RECORD, LOG_INFO, LOC + pat.toString());
+    LOG(VB_RECORD, LOG_DEBUG, LOC + "CreatePATSingleProgram()");
+    LOG(VB_RECORD, LOG_DEBUG, LOC + "PAT in input stream");
+    LOG(VB_RECORD, LOG_DEBUG, LOC + pat.toString());
     if (_desired_program < 0)
     {
         LOG(VB_RECORD, LOG_ERR, LOC + "Desired program not set yet");
         return false;
     }
     _pid_pmt_single_program = pat.FindPID(_desired_program);
-    LOG(VB_RECORD, LOG_INFO, LOC + QString("desired_program(%1) pid(0x%2)").
+    LOG(VB_RECORD, LOG_DEBUG, LOC + QString("desired_program(%1) pid(0x%2)").
             arg(_desired_program).arg(_pid_pmt_single_program, 0, 16));
 
     if (!_pid_pmt_single_program)
@@ -452,10 +452,10 @@ bool MPEGStreamData::CreatePATSingleProgram(
 
     pat2->tsheader()->SetContinuityCounter(pat.tsheader()->ContinuityCounter());
 
-    LOG(VB_RECORD, LOG_INFO, LOC + QString("pmt_pid(0x%1)")
+    LOG(VB_RECORD, LOG_DEBUG, LOC + QString("pmt_pid(0x%1)")
             .arg(_pid_pmt_single_program, 0, 16));
-    LOG(VB_RECORD, LOG_INFO, LOC + "PAT for output stream");
-    LOG(VB_RECORD, LOG_INFO, LOC + pat2->toString());
+    LOG(VB_RECORD, LOG_DEBUG, LOC + "PAT for output stream");
+    LOG(VB_RECORD, LOG_DEBUG, LOC + pat2->toString());
 
     SetPATSingleProgram(pat2);
 
@@ -509,9 +509,9 @@ static desc_list_t extract_atsc_desc(const tvct_vec_t &tvct,
 
 bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable &pmt)
 {
-    LOG(VB_RECORD, LOG_INFO, LOC + "CreatePMTSingleProgram()");
-    LOG(VB_RECORD, LOG_INFO, LOC + "PMT in input stream");
-    LOG(VB_RECORD, LOG_INFO, LOC + pmt.toString());
+    LOG(VB_RECORD, LOG_DEBUG, LOC + "CreatePMTSingleProgram()");
+    LOG(VB_RECORD, LOG_DEBUG, LOC + "PMT in input stream");
+    LOG(VB_RECORD, LOG_DEBUG, LOC + pmt.toString());
 
     if (!PATSingleProgram())
     {
@@ -673,8 +673,8 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable &pmt)
     pmt2->tsheader()->SetContinuityCounter(cc_cnt);
     SetPMTSingleProgram(pmt2);
 
-    LOG(VB_RECORD, LOG_INFO, LOC + "PMT for output stream");
-    LOG(VB_RECORD, LOG_INFO, LOC + pmt2->toString());
+    LOG(VB_RECORD, LOG_DEBUG, LOC + "PMT for output stream");
+    LOG(VB_RECORD, LOG_DEBUG, LOC + pmt2->toString());
 
     return true;
 }
@@ -1970,7 +1970,7 @@ void MPEGStreamData::ProcessEncryptedPacket(const TSPacket& tspacket)
 
     info.status = status;
 
-    LOG(status != kEncDecrypted ? VB_GENERAL : VB_RECORD, LOG_INFO, LOC +
+    LOG(status != kEncDecrypted ? VB_GENERAL : VB_RECORD, LOG_DEBUG, LOC +
         QString("PID 0x%1 status: %2") .arg(pid,0,16).arg(toString(status)));
 
     uint_vec_t pnum_del_list;
@@ -2005,7 +2005,7 @@ void MPEGStreamData::ProcessEncryptedPacket(const TSPacket& tspacket)
         if (status == _encryption_pnum_to_status[pnums[i]])
             continue; // program encryption status unchanged
 
-        LOG(VB_RECORD, LOG_INFO, LOC + QString("Program %1 status: %2")
+        LOG(VB_RECORD, LOG_DEBUG, LOC + QString("Program %1 status: %2")
                 .arg(pnums[i]).arg(toString(status)));
 
         _encryption_pnum_to_status[pnums[i]] = status;

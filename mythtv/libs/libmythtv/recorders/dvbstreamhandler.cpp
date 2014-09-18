@@ -110,14 +110,14 @@ void DVBStreamHandler::SetRunningDesired(bool desired)
 void DVBStreamHandler::run(void)
 {
     RunProlog();
-    LOG(VB_RECORD, LOG_INFO, LOC + "run(): begin");
+    LOG(VB_RECORD, LOG_DEBUG, LOC + "run(): begin");
 
     if (!SupportsTSMonitoring() && _allow_section_reader)
         RunSR();
     else
         RunTS();
 
-    LOG(VB_RECORD, LOG_INFO, LOC + "run(): end");
+    LOG(VB_RECORD, LOG_DEBUG, LOC + "run(): end");
     RunEpilog();
 }
 
@@ -194,7 +194,7 @@ void DVBStreamHandler::RunTS(void)
         _drb = drb;
     }
 
-    LOG(VB_RECORD, LOG_INFO, LOC + "RunTS(): begin");
+    LOG(VB_RECORD, LOG_DEBUG, LOC + "RunTS(): begin");
 
     fd_set fd_select_set;
     FD_ZERO(        &fd_select_set);
@@ -272,7 +272,7 @@ void DVBStreamHandler::RunTS(void)
         if (remainder > 0 && (len > remainder)) // leftover bytes
             memmove(buffer, &(buffer[len - remainder]), remainder);
     }
-    LOG(VB_RECORD, LOG_INFO, LOC + "RunTS(): " + "shutdown");
+    LOG(VB_RECORD, LOG_DEBUG, LOC + "RunTS(): " + "shutdown");
 
     RemoveAllPIDFilters();
 
@@ -291,7 +291,7 @@ void DVBStreamHandler::RunTS(void)
     close(dvr_fd);
     delete[] buffer;
 
-    LOG(VB_RECORD, LOG_INFO, LOC + "RunTS(): " + "end");
+    LOG(VB_RECORD, LOG_DEBUG, LOC + "RunTS(): " + "end");
 
     SetRunning(false, _needs_buffering, false);
 }
@@ -314,7 +314,7 @@ void DVBStreamHandler::RunSR(void)
 
     SetRunning(true, _needs_buffering, true);
 
-    LOG(VB_RECORD, LOG_INFO, LOC + "RunSR(): begin");
+    LOG(VB_RECORD, LOG_DEBUG, LOC + "RunSR(): begin");
 
     while (_running_desired && !_error)
     {
@@ -348,7 +348,7 @@ void DVBStreamHandler::RunSR(void)
         if (!readSomething)
             usleep(3000);
     }
-    LOG(VB_RECORD, LOG_INFO, LOC + "RunSR(): " + "shutdown");
+    LOG(VB_RECORD, LOG_DEBUG, LOC + "RunSR(): " + "shutdown");
 
     RemoveAllPIDFilters();
 
@@ -356,7 +356,7 @@ void DVBStreamHandler::RunSR(void)
 
     SetRunning(false, _needs_buffering, true);
 
-    LOG(VB_RECORD, LOG_INFO, LOC + "RunSR(): " + "end");
+    LOG(VB_RECORD, LOG_DEBUG, LOC + "RunSR(): " + "end");
 }
 
 typedef vector<uint> pid_list_t;
@@ -606,7 +606,7 @@ bool DVBPIDInfo::Open(const QString &dvb_dev, bool use_section_reader)
     QString demux_fn = CardUtil::GetDeviceName(DVB_DEV_DEMUX, dvb_dev);
     QByteArray demux_ba = demux_fn.toLatin1();
 
-    LOG(VB_RECORD, LOG_INFO, LOC + QString("Opening filter for pid 0x%1")
+    LOG(VB_RECORD, LOG_DEBUG, LOC + QString("Opening filter for pid 0x%1")
             .arg(_pid, 0, 16));
 
     int mux_fd = open(demux_ba.constData(), O_RDWR | O_NONBLOCK);
@@ -700,7 +700,7 @@ bool DVBPIDInfo::Open(const QString &dvb_dev, bool use_section_reader)
 
 bool DVBPIDInfo::Close(const QString &dvb_dev)
 {
-    LOG(VB_RECORD, LOG_INFO, LOC +
+    LOG(VB_RECORD, LOG_DEBUG, LOC +
         QString("Closing filter for pid 0x%1").arg(_pid, 0, 16));
 
     if (!IsOpen())
@@ -740,7 +740,7 @@ int DVBRecorder::OpenFilterFd(uint pid, int pes_type, uint stream_type)
     // rounded up to the nearest page
     pid_buffer_size = ((pid_buffer_size + 4095) / 4096) * 4096;
 
-    LOG(VB_RECORD, LOG_INFO, LOC + QString("Adding pid 0x%1 size(%2)")
+    LOG(VB_RECORD, LOG_DEBUG, LOC + QString("Adding pid 0x%1 size(%2)")
             .arg(pid,0,16).arg(pid_buffer_size));
 
     // Open the demux device
