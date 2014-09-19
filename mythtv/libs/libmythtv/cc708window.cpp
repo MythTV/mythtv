@@ -185,6 +185,9 @@ void CC708Window::Resize(uint new_rows, uint new_columns)
     }
     if (new_rows > true_row_count || new_columns > true_column_count)
     {
+        new_rows = max(new_rows, true_row_count);
+        new_columns = max(new_columns, true_column_count);
+
         // Expand the array if the new size exceeds the current capacity
         // in either dimension.
         CC708Character *new_text =

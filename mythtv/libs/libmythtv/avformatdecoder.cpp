@@ -3731,11 +3731,11 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
         picframe->directrendering  = directrendering ? 1 : 0;
 
         m_parent->ReleaseNextVideoFrame(picframe, temppts);
-
-        decoded_video_frame = picframe;
-        gotVideoFrame = 1;
     }
-    framesPlayed++;
+
+    decoded_video_frame = picframe;
+    gotVideoFrame = 1;
+    ++framesPlayed;
 
     lastvpts = temppts;
     if (!firstvpts && firstvptsinuse)
