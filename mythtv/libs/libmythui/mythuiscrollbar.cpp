@@ -14,7 +14,7 @@ const int kDefaultPageStep = 10;
 MythUIScrollBar::MythUIScrollBar(MythUIType *parent, const QString &name)
     : MythUIType(parent, name),
       m_layout(LayoutVertical), m_pageStep(kDefaultPageStep),
-      m_sliderPosition(0), m_maximum(kDefaultMaxValue),
+      m_sliderPosition(0), m_maximum(0),
       m_hideDelay(0), m_timerId(0)
 {
 }
