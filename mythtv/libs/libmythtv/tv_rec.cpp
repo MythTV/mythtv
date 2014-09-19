@@ -4302,6 +4302,9 @@ void TVRec::TuningNewRecorder(MPEGStreamData *streamData)
         goto err_ret;
     }
 
+    if (rec)
+        recorder->SetRecording(rec);
+
     if (GetDTVRecorder() && streamData)
     {
         const Setting *setting = profile.byName("recordingtype");
@@ -4312,9 +4315,6 @@ void TVRec::TuningNewRecorder(MPEGStreamData *streamData)
 
     if (channel && genOpt.cardtype == "MJPEG")
         channel->Open(); // Needed because of NVR::MJPEGInit()
-
-    if (rec)
-        recorder->SetRecording(rec);
 
     // Setup for framebuffer capture devices..
     if (channel)

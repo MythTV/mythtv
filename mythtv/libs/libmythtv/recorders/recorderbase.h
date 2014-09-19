@@ -275,6 +275,14 @@ class MTV_PUBLIC RecorderBase : public QRunnable
      */
     void FrameRateChange(uint framerate, long long frame);
 
+    /** \brief Note a change in video codec
+     */
+    void VideoCodecChange(AVCodecID vCodec);
+
+    /** \brief Note a change in audio codec
+     */
+    void AudioCodecChange(AVCodecID aCodec);
+
     /** \brief Note the total duration in the recordedmark table
      */
     void SetDuration(uint64_t duration);

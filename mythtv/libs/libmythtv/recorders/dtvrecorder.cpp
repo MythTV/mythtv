@@ -1372,6 +1372,9 @@ void DTVRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt, bool insert)
                 default:
                     break;
             }
+
+            if (m_primaryVideoCodec != AV_CODEC_ID_NONE)
+                VideoCodecChange(m_primaryVideoCodec);
         }
 
         // We want the 'best' identifiable audio stream, where 'best' is
@@ -1408,6 +1411,9 @@ void DTVRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt, bool insert)
                 default:
                     break;
             }
+
+            if (m_primaryAudioCodec != AV_CODEC_ID_NONE)
+                AudioCodecChange(m_primaryAudioCodec);
         }
 
 //         LOG(VB_GENERAL, LOG_DEBUG, QString("Recording(%1): Stream #%2: %3 ")
