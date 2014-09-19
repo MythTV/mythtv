@@ -740,6 +740,8 @@ void EITFixUp::FixUK(DBEventEIT &event) const
         QStringList tmpCCitems = tmpCC.cap(0).remove("[").remove("]").split(",");
         if (tmpCCitems.contains("AD"))
             event.audioProps |= AUD_VISUALIMPAIR;
+        if (tmpCCitems.contains("HD"))
+            event.videoProps |= VID_HDTV;
         if (tmpCCitems.contains("S"))
             event.subtitleType |= SUB_NORMAL;
         if (tmpCCitems.contains("SL"))
