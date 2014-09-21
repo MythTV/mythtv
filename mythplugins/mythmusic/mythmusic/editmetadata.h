@@ -179,7 +179,6 @@ class EditAlbumartDialog : public EditMetadataCommon
     //  GUI stuff
     //
     MythUIButton      *m_metadataButton;
-    MythUIButton      *m_doneButton;
 
     MythUIImage       *m_coverartImage;
     MythUIButtonList  *m_coverartList;

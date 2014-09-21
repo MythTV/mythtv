@@ -878,9 +878,8 @@ void EditMetadataDialog::customEvent(QEvent *event)
 
 EditAlbumartDialog::EditAlbumartDialog(MythScreenStack *parent)
                   : EditMetadataCommon(parent, "EditAlbumartDialog"),
-    m_metadataButton(NULL),
-    m_doneButton(NULL),          m_coverartImage(NULL),
-    m_coverartList(NULL),        m_imagetypeText(NULL),
+    m_metadataButton(NULL), m_coverartImage(NULL),
+    m_coverartList(NULL), m_imagetypeText(NULL),
     m_imagefilenameText(NULL)
 {
     gCoreContext->addListener(this);
