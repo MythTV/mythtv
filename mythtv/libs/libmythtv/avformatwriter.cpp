@@ -75,7 +75,7 @@ AVFormatWriter::~AVFormatWriter()
         av_freep(&m_audioInPBuf);
 
     if (m_audPicture)
-        avcodec_free_frame(&m_audPicture);
+        av_frame_free(&m_audPicture);
 
     Cleanup();
 
@@ -691,7 +691,7 @@ bool AVFormatWriter::OpenAudio(void)
 
     m_audioFrameSize = c->frame_size; // number of *samples* per channel in an AVFrame
 
-    m_audPicture = avcodec_alloc_frame();
+    m_audPicture = av_frame_alloc();
     if (!m_audPicture)
     {
         LOG(VB_RECORD, LOG_ERR,
@@ -722,7 +722,7 @@ AVFrame* AVFormatWriter::AllocPicture(enum PixelFormat pix_fmt)
     unsigned char *picture_buf;
     int size;
 
-    picture = avcodec_alloc_frame();
+    picture = av_frame_alloc();
     if (!picture)
     {
         LOG(VB_RECORD, LOG_ERR,
