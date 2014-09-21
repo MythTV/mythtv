@@ -2,6 +2,7 @@
 // C++ includes
 #include <iostream> // for cout
 using std::cout;
+using std::endl;
 
 // libmythbase
 #include "exitcodes.h"
