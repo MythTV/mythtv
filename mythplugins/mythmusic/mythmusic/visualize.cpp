@@ -1140,10 +1140,7 @@ bool Piano::process_all_types(VisualNode *node, bool /*this_will_be_displayed*/)
             LOG(VB_GENERAL, LOG_DEBUG, QString("Piano : Already seen node offset=%1, returning without processing").arg(node->offset));
             return allZero; // Nothing to see here - the server can stop if it wants to
         }
-    }
 
-    if (node)
-    {
         //LOG(VB_GENERAL, LOG_DEBUG, QString("Piano : Processing node offset=%1, size=%2").arg(node->offset).arg(node->length));
         n = node->length;
 
@@ -1239,8 +1236,12 @@ bool Piano::process_all_types(VisualNode *node, bool /*this_will_be_displayed*/)
         }
     }
 
-    // All done now - record that we've done this offset
-    offset_processed = node->offset;
+    if (node)
+    {
+        // All done now - record that we've done this offset
+        offset_processed = node->offset;
+    }
+
     return allZero;
 }
 
