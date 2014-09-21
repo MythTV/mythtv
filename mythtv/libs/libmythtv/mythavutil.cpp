@@ -12,7 +12,7 @@ extern "C" {
 #include "libswscale/swscale.h"
 }
 
-AVPixelFormat FrameTypeToPixelFormat(VideoFrameType type)
+static AVPixelFormat FrameTypeToPixelFormat(VideoFrameType type)
 {
     switch (type)
     {
@@ -33,7 +33,7 @@ AVPixelFormat FrameTypeToPixelFormat(VideoFrameType type)
     }
 }
 
-VideoFrameType PixelFormatToFrameType(AVPixelFormat fmt)
+static VideoFrameType PixelFormatToFrameType(AVPixelFormat fmt)
 {
     switch (fmt)
     {
