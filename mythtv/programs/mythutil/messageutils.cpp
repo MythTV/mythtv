@@ -2,6 +2,7 @@
 #include <iostream> // for cerr, cout
 using std::cerr;
 using std::cout;
+using std::endl;
 
 // Qt headers
 #include <QHostAddress>
