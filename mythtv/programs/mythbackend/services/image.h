@@ -181,7 +181,7 @@ class ScriptableImage : public QObject
 
         QObject* GetSyncStatus( void )
         {
-            SCRIPT_CATCH_EXCEPTION( false,
+            SCRIPT_CATCH_EXCEPTION( NULL,
                 return m_obj.GetSyncStatus();
             )
         }
