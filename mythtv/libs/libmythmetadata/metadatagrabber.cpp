@@ -37,7 +37,7 @@ static QMap<QString, GrabberType> grabberTypeStrings;
 static bool initialized = false;
 static QMutex typeLock;
 
-GrabberOpts GrabberOptsMaker (QString thepath, QString thesetting, QString thedefault)
+static GrabberOpts GrabberOptsMaker(QString thepath, QString thesetting, QString thedefault)
 {
     GrabberOpts opts;
 
@@ -48,7 +48,7 @@ GrabberOpts GrabberOptsMaker (QString thepath, QString thesetting, QString thede
     return opts;
 }
 
-void InitializeStaticMaps(void)
+static void InitializeStaticMaps(void)
 {
     if (!initialized)
     {
