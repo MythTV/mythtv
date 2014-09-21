@@ -45,6 +45,8 @@ VorbisEncoder::VorbisEncoder(const QString &outfile, int qualitylevel,
 
     vorbis_info_init(&vi);
 
+    ogg_packet_clear(&op);
+
     float quality = 1.0;
     if (qualitylevel == 0)
         quality = 0.4;
