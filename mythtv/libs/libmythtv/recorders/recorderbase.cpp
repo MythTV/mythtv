@@ -465,7 +465,7 @@ void RecorderBase::FinishRecording(void)
 
     LOG(VB_GENERAL, LOG_NOTICE, QString("Finished Recording: "
                                         "Video Codec: %1 (%2x%3 A/R: %4 %5fps) "
-                                        "Audio Codec: %2")
+                                        "Audio Codec: %6")
                                         .arg(avcodec_get_name(m_primaryVideoCodec))
                                         .arg(m_videoWidth)
                                         .arg(m_videoHeight)

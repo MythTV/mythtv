@@ -110,7 +110,7 @@ namespace DLNA
 
 QString DLNAProfileName(const QString& mimeType, const QSize& resolution,
                         const double videoFrameRate, const QString& vidCodec,
-                        const QString& audioCodec, bool isTranscoded)
+                        const QString& audioCodec)
 {
     QString sProfileName;
     bool isHD = (resolution.height() >= 720);
@@ -260,7 +260,8 @@ QString ProtocolInfoString(UPNPProtocol::TransferProtocol protocol,
     //
     // PN-Param (Profile Name)
     //
-    QString sProfileName;
+    QString sProfileName = DLNAProfileName(mimeType, resolution, videoFrameRate,
+                                           videoCodec, audioCodec);
     if (!sProfileName.isEmpty())
         sAdditionalInfoList << QString("DLNA.ORG_PN=%1").arg(sProfileName);
 

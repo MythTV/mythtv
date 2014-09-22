@@ -962,7 +962,7 @@ bool UPnpCDSTv::LoadRecordings(const UPnpCDSRequest* pRequest,
                   "r.programid, r.seriesid, r.recordid, "
                   "c.default_authority, c.name, "
                   "r.recordedid, r.transcoded, p.videoprop+0, p.audioprop+0, "
-                  "f.video_codec, f.audio_codec, f.fps, f.width, f.height, "
+                  "f.video_codec, f.audio_codec, f.fps, f.width, f.height "
                   "FROM recorded r "
                   "LEFT JOIN channel c ON r.chanid=c.chanid "
                   "LEFT JOIN recordedprogram p ON p.chanid=r.chanid "

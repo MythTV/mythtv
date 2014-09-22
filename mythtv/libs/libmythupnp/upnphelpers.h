@@ -162,8 +162,7 @@ namespace DLNA
                                          const QSize &resolution = QSize(),
                                          const double videoFrameRate = 0.0,
                                          const QString &vidCodec = "",
-                                         const QString &audioCodec = "",
-                                         bool isTranscoded = false);
+                                         const QString &audioCodec = "");
 
     /**
      * \brief Create a properly formatted string for the 4th field of
