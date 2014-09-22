@@ -422,36 +422,40 @@ void RecorderBase::FinishRecording(void)
             curRecording->SaveVideoProperties(VID_AVC, VID_AVC);
 
         RecordingFile *recFile = curRecording->GetRecordingFile();
-
-        // Video
-        recFile->m_videoCodec = ff_codec_id_string(m_primaryVideoCodec);
-        switch (curRecording->QueryAverageAspectRatio())
+        if (recFile)
         {
-            case MARK_ASPECT_1_1 :
-                recFile->m_videoAspectRatio = 1.0;
-                break;
-            case MARK_ASPECT_4_3:
-                recFile->m_videoAspectRatio = 1.33333333333;
-                break;
-            case MARK_ASPECT_16_9:
-                recFile->m_videoAspectRatio = 1.77777777777;
-                break;
-            case MARK_ASPECT_2_21_1:
-                recFile->m_videoAspectRatio = 2.21;
-                break;
-            default:
-                recFile->m_videoAspectRatio = (double)m_videoAspect / 1000000.0;
-                break;
+            // Video
+            recFile->m_videoCodec = ff_codec_id_string(m_primaryVideoCodec);
+            switch (curRecording->QueryAverageAspectRatio())
+            {
+                case MARK_ASPECT_1_1 :
+                    recFile->m_videoAspectRatio = 1.0;
+                    break;
+                case MARK_ASPECT_4_3:
+                    recFile->m_videoAspectRatio = 1.33333333333;
+                    break;
+                case MARK_ASPECT_16_9:
+                    recFile->m_videoAspectRatio = 1.77777777777;
+                    break;
+                case MARK_ASPECT_2_21_1:
+                    recFile->m_videoAspectRatio = 2.21;
+                    break;
+                default:
+                    recFile->m_videoAspectRatio = (double)m_videoAspect / 1000000.0;
+                    break;
+            }
+            QSize resolution(curRecording->QueryAverageWidth(),
+                            curRecording->QueryAverageHeight());
+            recFile->m_videoResolution = resolution;
+            recFile->m_videoFrameRate = (double)curRecording->QueryAverageFrameRate() / 1000.0;
+
+            // Audio
+            recFile->m_audioCodec = ff_codec_id_string(m_primaryAudioCodec);
+
+            recFile->Save();
         }
-        QSize resolution(curRecording->QueryAverageWidth(),
-                         curRecording->QueryAverageHeight());
-        recFile->m_videoResolution = resolution;
-        recFile->m_videoFrameRate = (double)curRecording->QueryAverageFrameRate() / 1000.0;
-
-        // Audio
-        recFile->m_audioCodec = ff_codec_id_string(m_primaryAudioCodec);
-
-        recFile->Save();
+        else
+            LOG(VB_GENERAL, LOG_CRIT, "RecordingFile object is NULL. No video file metadata can be stored");
 
         SavePositionMap(true, true); // Save Position Map only, not file size
 
@@ -630,7 +634,8 @@ void RecorderBase::AspectChange(uint aspect, long long frame)
 
     // Populate the recordfile table as early as possible, the best
     // value will be determined when the recording completes.
-    if (curRecording->GetRecordingFile()->m_videoAspectRatio == 0.0)
+    if (curRecording && curRecording->GetRecordingFile() &&
+        curRecording->GetRecordingFile()->m_videoAspectRatio == 0.0)
     {
         RecordingFile *recFile = curRecording->GetRecordingFile();
         switch (m_videoAspect)
@@ -664,7 +669,8 @@ void RecorderBase::ResolutionChange(uint width, uint height, long long frame)
     {
         // Populate the recordfile table as early as possible, the best value
         // value will be determined when the recording completes.
-        if (curRecording->GetRecordingFile()->m_videoResolution.isNull())
+        if (curRecording && curRecording->GetRecordingFile() &&
+            curRecording->GetRecordingFile()->m_videoResolution.isNull())
         {
             curRecording->GetRecordingFile()->m_videoResolution = QSize(width, height);
             curRecording->GetRecordingFile()->Save();
@@ -690,7 +696,7 @@ void RecorderBase::FrameRateChange(uint framerate, long long frame)
 
 void RecorderBase::VideoCodecChange(AVCodecID vCodec)
 {
-    if (curRecording)
+    if (curRecording && curRecording->GetRecordingFile())
     {
         curRecording->GetRecordingFile()->m_videoCodec = ff_codec_id_string(vCodec);
         curRecording->GetRecordingFile()->Save();
@@ -699,7 +705,7 @@ void RecorderBase::VideoCodecChange(AVCodecID vCodec)
 
 void RecorderBase::AudioCodecChange(AVCodecID aCodec)
 {
-    if (curRecording)
+    if (curRecording && curRecording->GetRecordingFile())
     {
         curRecording->GetRecordingFile()->m_audioCodec = ff_codec_id_string(aCodec);
         curRecording->GetRecordingFile()->Save();

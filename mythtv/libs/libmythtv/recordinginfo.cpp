@@ -996,6 +996,8 @@ void RecordingInfo::StartedRecording(QString ext)
         MythDB::DBError("Copy program ratings on record", query);
 
     // File
+    if (!GetRecordingFile())
+        LoadRecordingFile();
     RecordingFile *recFile = GetRecordingFile();
     recFile->m_fileName = GetBasename();
     recFile->m_storageDeviceID = GetHostname();
@@ -1613,6 +1615,8 @@ void RecordingInfo::LoadRecordingFile()
 
 void RecordingInfo::SaveFilesize(uint64_t fsize)
 {
+    if (!GetRecordingFile())
+        LoadRecordingFile();
     GetRecordingFile()->m_fileSize = fsize;
     GetRecordingFile()->Save(); // Ideally this would be called just the once when all metadata is gathered
 
@@ -1623,6 +1627,8 @@ void RecordingInfo::SaveFilesize(uint64_t fsize)
 
 void RecordingInfo::SetFilesize(uint64_t fsize)
 {
+    if (!GetRecordingFile())
+        LoadRecordingFile();
     GetRecordingFile()->m_fileSize = fsize;
     updater->insert(chanid, recstartts, kPIUpdateFileSize, fsize);
     //ProgramInfo::SetFilesize(fsize);
@@ -1630,7 +1636,7 @@ void RecordingInfo::SetFilesize(uint64_t fsize)
 
 uint64_t RecordingInfo::GetFilesize(void) const
 {
-    if (GetRecordingFile()->m_fileSize > 0)
+    if (GetRecordingFile() && GetRecordingFile()->m_fileSize > 0)
         return GetRecordingFile()->m_fileSize;
 
     // Temporary fallback to reading from old storage location
