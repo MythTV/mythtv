@@ -961,12 +961,14 @@ bool UPnpCDSTv::LoadRecordings(const UPnpCDSRequest* pRequest,
                   "p.episode, p.totalepisodes, p.season, "
                   "r.programid, r.seriesid, r.recordid, "
                   "c.default_authority, c.name, "
-                  "r.recordedid, r.transcoded, p.videoprop+0, p.audioprop+0 "
+                  "r.recordedid, r.transcoded, p.videoprop+0, p.audioprop+0, "
+                  "f.video_codec, f.audio_codec, f.fps, f.width, f.height, "
                   "FROM recorded r "
                   "LEFT JOIN channel c ON r.chanid=c.chanid "
                   "LEFT JOIN recordedprogram p ON p.chanid=r.chanid "
                   "                            AND p.starttime=r.progstart "
                   "LEFT JOIN recgroups g ON r.recgroup=g.recgroup "
+                  "LEFT JOIN recordedfile f ON r.recordedid=f.recordedid "
                   "%1 " // WHERE clauses
                   "%2 " // ORDER BY
                   "LIMIT :OFFSET,:COUNT";
@@ -1028,6 +1030,12 @@ bool UPnpCDSTv::LoadRecordings(const UPnpCDSRequest* pRequest,
         bool           bTranscoded  = query.value(27).toBool();
         int            nVideoProps  = query.value(28).toInt();
         //int            nAudioProps  = query.value(29).toInt();
+
+        QString        sVideoCodec  = query.value(30).toString();
+        QString        sAudioCodec  = query.value(31).toString();
+        double         dVideoFrameRate = query.value(32).toDouble();
+        int            nVideoWidth  = query.value(33).toInt();
+        int            nVideoHeight = query.value(34).toInt();
 
         // ----------------------------------------------------------------------
         // Cache Host ip Address & Port
@@ -1178,21 +1186,16 @@ bool UPnpCDSTv::LoadRecordings(const UPnpCDSRequest* pRequest,
 //         if ( pRequest->m_eClient == CDS_ClientSonyDB )
 //             sMimeType = "video/avi";
 
-        int nVideoHeight = 0;
-        int nVideoWidth = 0;
         uint32_t nDurationMS = 0;
 
         // NOTE We intentionally don't use the chanid, recstarttime constructor
         // to avoid an unnecessary db query. At least until the time that we're
-        // creating a PI object throughout
-        ProgramInfo pgInfo = ProgramInfo();
-        pgInfo.SetChanID(nChanid);
-        pgInfo.SetRecordingStartTime(dtStartTime);
-
-        nVideoHeight = pgInfo.QueryAverageHeight();
-        nVideoWidth = pgInfo.QueryAverageWidth();
-        nDurationMS = pgInfo.QueryTotalDuration();
-
+        // creating a RI object throughout
+        RecordingInfo recInfo = RecordingInfo();
+        recInfo.SetChanID(nChanid);
+        recInfo.SetRecordingStartTime(dtStartTime);
+        // The actual duration may not match the scheduled duration
+        nDurationMS = recInfo.QueryTotalDuration();
         // Older recordings won't have their precise duration stored in
         // recordedmarkup
         if (nDurationMS == 0)
@@ -1206,8 +1209,8 @@ bool UPnpCDSTv::LoadRecordings(const UPnpCDSRequest* pRequest,
         pItem->SetPropValue( "recordedDuration", UPnPDateTime::DurationFormat(nDurationMS));
 
         QSize resolution = QSize(nVideoWidth, nVideoHeight);
-        QString sVideoCodec = (nVideoProps & VID_AVC) ? "H264" : "MPEG2";
-        QString sAudioCodec = ""; // TODO Implement
+        if (sVideoCodec.isEmpty())
+            sVideoCodec = (nVideoProps & VID_AVC) ? "H264" : "MPEG2VIDEO";
 
         QUrl    resURI    = URIBase;
         resURI.setPath("Content/GetRecording");
@@ -1216,6 +1219,7 @@ bool UPnpCDSTv::LoadRecordings(const UPnpCDSRequest* pRequest,
         QString sProtocol = DLNA::ProtocolInfoString(UPNPProtocol::kHTTP,
                                                      sMimeType,
                                                      resolution,
+                                                     dVideoFrameRate,
                                                      sVideoCodec,
                                                      sAudioCodec,
                                                      bTranscoded);

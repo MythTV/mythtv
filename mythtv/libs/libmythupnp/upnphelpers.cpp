@@ -108,9 +108,135 @@ QString resDurationFormat(uint32_t msec)
 namespace DLNA
 {
 
+QString DLNAProfileName(const QString& mimeType, const QSize& resolution,
+                        const double videoFrameRate, const QString& vidCodec,
+                        const QString& audioCodec, bool isTranscoded)
+{
+    QString sProfileName;
+    bool isHD = (resolution.height() >= 720);
+
+    if (mimeType == "audio/mpeg")
+    {
+        sProfileName = "MP3X";
+    }
+    else if (mimeType == "audio/x-ms-wma")
+    {
+        sProfileName = "WMAFULL";
+    }
+    else if (mimeType == "audio/vnd.dolby.dd-raw")
+    {
+        sProfileName = "AC3";
+    }
+    else if (mimeType == "audio/mp4")
+    {
+        sProfileName = "AAC_ISO_320";
+    }
+    else if (mimeType == "video/x-matroska")
+    {
+        // TODO: We need to know the video and audio codecs before we can serve
+        // up the correct profile.
+        //
+        // sAdditionalInfoList << "DLNA.ORG_PN=AVC_MKV_SOMETHING";
+        if (vidCodec == "H264")
+        {
+            // TODO We need to know the H264 profile used, for now we go with High Profile
+            //      as this covers all - devices supporting High Profile also support
+            //      Medium Profile
+            if (audioCodec == "AAC") // No HEAAC detection atm, it's a sub-profile of AAC
+            {
+                sProfileName = "AVC_MKV_HP_HD_AAC_MULT5";
+            }
+            else if (audioCodec == "AC3")
+            {
+                sProfileName = "AVC_MKV_HP_HD_AC3";
+            }
+            else if (audioCodec == "E-AC3") // Up to 35Mbps
+            {
+                sProfileName = "AVC_MKV_HP_HD_EAC3";
+            }
+            else if (audioCodec == "MP3")
+            {
+                sProfileName = "AVC_MKV_HP_HD_MPEG1_L3";
+            }
+            else if (audioCodec == "DTS") // Up to 55Mbps // No DTSE/DTSL detection atm, sub-profiles of DTS
+            {
+                sProfileName = "AVC_MKV_HP_HD_DTS";
+            }
+            else if (audioCodec == "MLP") // Up to 45Mbps
+            {
+                sProfileName = "AVC_MKV_HP_HD_MLP";
+            }
+        }
+    }
+    else if (mimeType == "video/mpeg")
+    {
+        // We currently only handle untranscoded files in TS containers
+        // adhering to Digital TV standards. This should cover 75% of recordings
+        // although not older recordings which were made from analogue sources.
+        //
+        // It's a starting point, and temporary until we can implement a more
+        // robust way of determing the correct profile.
+
+        QString sBroadcastStandard = "";
+        // HACK This is just temporary until we start storing more video
+        // information in the database for each file and can determine this
+        // stuff 'properly'
+        QString sCountryCode = gCoreContext->GetLocale()->GetCountryCode();
+        if (sCountryCode == "us" || sCountryCode == "ca" ||
+            sCountryCode == "mx") // North America (ATSC)
+        {
+            if (vidCodec == "H264")
+                sProfileName = "AVC_TS_NA_ISO";
+            else if (isHD) // && videoCodec == "MPEG2VIDEO"
+                sProfileName = "MPEG_TS_HD_NA_ISO";
+            else // if (videoCodec == "MPEG2VIDEO")
+                sProfileName = "MPEG_TS_SD_NA_ISO";
+            // Fall through
+        }
+        else // Europe standard (DVB)
+        {
+            if (vidCodec == "H264" || isHD) // All HD is AVC with DVB
+                sProfileName = "AVC_TS_EU_ISO";
+            else // if (videoCodec == "MPEG2VIDEO")
+                sProfileName = "MPEG_TS_SD_EU_ISO";
+            // Fall through
+        }
+    }
+    else if (mimeType == "image/jpeg")
+    {
+        if (resolution.width() <= 160 && resolution.height() <= 160)
+            sProfileName = "JPEG_TN";
+        else if (resolution.width() <= 640 && resolution.height() <= 480)
+            sProfileName = "JPEG_SM";
+        else if (resolution.width() <= 1024 && resolution.height() <= 768)
+            sProfileName = "JPEG_MED";
+        else if (resolution.width() <= 4096 && resolution.height() <= 4096)
+            sProfileName = "JPEG_LRG";
+    }
+    else if (mimeType == "image/png")
+    {
+        if (resolution.width() <= 160 && resolution.height() <= 160)
+            sProfileName = "PNG_TN";
+        else if (resolution.width() <= 4096 && resolution.height() <= 4096)
+            sProfileName = "PNG_LRG";
+    }
+    else if (mimeType == "image/gif")
+    {
+        if (resolution.width() <= 1600 && resolution.height() <= 1200)
+            sProfileName = "GIF_LRG";
+    }
+    else
+    {
+        // Not a DLNA supported profile?
+    }
+
+    return sProfileName;
+}
+
 // NOTE The order of the DLNA args is mandatory - 7.4.1.3.17 MM protocolInfo values: 4th field
 QString ProtocolInfoString(UPNPProtocol::TransferProtocol protocol,
                            const QString &mimeType, const QSize &resolution,
+                           double videoFrameRate,
                            const QString &videoCodec, const QString &audioCodec,
                            bool isTranscoded)
 {
@@ -134,90 +260,9 @@ QString ProtocolInfoString(UPNPProtocol::TransferProtocol protocol,
     //
     // PN-Param (Profile Name)
     //
-    bool isHD = (resolution.height() >= 720);
-
-    if (mimeType == "audio/mpeg")
-    {
-        sAdditionalInfoList << "DLNA.ORG_PN=MP3X";
-    }
-    else if (mimeType == "audio/x-ms-wma")
-    {
-        sAdditionalInfoList << "DLNA.ORG_PN=WMAFULL";
-    }
-    else if (mimeType == "audio/vnd.dolby.dd-raw")
-    {
-        sAdditionalInfoList << "DLNA.ORG_PN=AC3";
-    }
-    else if (mimeType == "audio/mp4")
-    {
-        sAdditionalInfoList << "DLNA.ORG_PN=AAC_ISO_320";
-    }
-    else if (mimeType == "video/x-matroska")
-    {
-        // TODO: We need to know the video and audio codecs before we can serve
-        // up the correct profile.
-        //
-        // sAdditionalInfoList << "DLNA.ORG_PN=AVC_MKV_SOMETHING";
-    }
-    else if (mimeType == "video/mpeg")
-    {
-        // We currently only handle untranscoded files in TS containers
-        // adhering to Digital TV standards. This should cover 75% of recordings
-        // although not older recordings which were made from analogue sources.
-        //
-        // It's a starting point, and temporary until we can implement a more
-        // robust way of determing the correct profile.
-
-        QString sBroadcastStandard = "";
-        // HACK This is just temporary until we start storing more video
-        // information in the database for each file and can determine this
-        // stuff 'properly'
-        QString sCountryCode = gCoreContext->GetLocale()->GetCountryCode();
-        if (sCountryCode == "us" || sCountryCode == "ca" ||
-            sCountryCode == "mx")
-        {
-            if (videoCodec == "H264")
-                sAdditionalInfoList << "DLNA.ORG_PN=AVC_TS_NA_ISO";
-            else if (isHD)
-                sAdditionalInfoList << "DLNA.ORG_PN=MPEG_TS_HD_NA_ISO";
-            else
-                sAdditionalInfoList << "DLNA.ORG_PN=MPEG_TS_SD_NA_ISO";
-        }
-        else // Europe standard
-        {
-            if (videoCodec == "H264" || isHD)
-                sAdditionalInfoList << "DLNA.ORG_PN=AVC_TS_EU_ISO";
-            else
-                sAdditionalInfoList << "DLNA.ORG_PN=MPEG_TS_SD_EU_ISO";
-        }
-    }
-    else if (mimeType == "image/jpeg")
-    {
-        if (resolution.width() <= 160 && resolution.height() <= 160)
-            sAdditionalInfoList << "DLNA.ORG_PN=JPEG_TN";
-        else if (resolution.width() <= 640 && resolution.height() <= 480)
-            sAdditionalInfoList << "DLNA.ORG_PN=JPEG_SM";
-        else if (resolution.width() <= 1024 && resolution.height() <= 768)
-            sAdditionalInfoList << "DLNA.ORG_PN=JPEG_MED";
-        else if (resolution.width() <= 4096 && resolution.height() <= 4096)
-            sAdditionalInfoList << "DLNA.ORG_PN=JPEG_LRG";
-    }
-    else if (mimeType == "image/png")
-    {
-        if (resolution.width() <= 160 && resolution.height() <= 160)
-            sAdditionalInfoList << "DLNA.ORG_PN=PNG_TN";
-        else if (resolution.width() <= 4096 && resolution.height() <= 4096)
-            sAdditionalInfoList << "DLNA.ORG_PN=PNG_LRG";
-    }
-    else if (mimeType == "image/gif")
-    {
-        if (resolution.width() <= 1600 && resolution.height() <= 1200)
-            sAdditionalInfoList << "DLNA.ORG_PN=GIF_LRG";
-    }
-    else
-    {
-        // Not a DLNA supported profile?
-    }
+    QString sProfileName;
+    if (!sProfileName.isEmpty())
+        sAdditionalInfoList << QString("DLNA.ORG_PN=%1").arg(sProfileName);
 
     //
     // OP-Param (Operation Parameters)
@@ -283,7 +328,7 @@ QString FlagsString(uint32_t flags)
     if ((flags & DLNA::ktm_s) && (flags & DLNA::ktm_i))
     {
         LOG(VB_GENERAL, LOG_ERR, "Programmer Error: 'Streaming' and 'Interactive' mode flags are mutally exclusive");
-        flags &= ~(DLNA::ktm_s | flags & DLNA::ktm_i);
+        flags &= ~(DLNA::ktm_s | DLNA::ktm_i);
     }
 
     // DLNA::kv1_5_flag must be set otherwise other flags are ignored

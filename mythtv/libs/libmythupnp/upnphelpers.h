@@ -158,10 +158,31 @@ namespace DLNA
      * The order of values in the string is mandatory, so using this helper
      * will ensure compliance
      */
-    UPNP_PUBLIC QString ProtocolInfoString(UPNPProtocol::TransferProtocol protocol,
-                               const QString &mimeType, const QSize &resolution = QSize(),
-                               const QString &vidCodec = "", const QString &audioCodec = "",
-                               bool isTranscoded = false);
+    UPNP_PUBLIC QString DLNAProfileName( const QString &mimeType,
+                                         const QSize &resolution = QSize(),
+                                         const double videoFrameRate = 0.0,
+                                         const QString &vidCodec = "",
+                                         const QString &audioCodec = "",
+                                         bool isTranscoded = false);
+
+    /**
+     * \brief Create a properly formatted string for the 4th field of
+     *        res@protocolInfo
+     *
+     * MM protocolInfo values: 4th field
+     *
+     * Section 7.4.1.3.17
+     *
+     * The order of values in the string is mandatory, so using this helper
+     * will ensure compliance
+     */
+    UPNP_PUBLIC QString ProtocolInfoString( UPNPProtocol::TransferProtocol protocol,
+                                            const QString &mimeType,
+                                            const QSize &resolution = QSize(),
+                                            const double videoFrameRate = 0.0,
+                                            const QString &vidCodec = "",
+                                            const QString &audioCodec = "",
+                                            bool isTranscoded = false);
 
     /**
      * DLNA FLAGS
