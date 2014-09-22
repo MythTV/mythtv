@@ -421,6 +421,7 @@ void RecordingInfo::clone(const RecordingInfo &other,
 
     delete m_recordingFile;
     m_recordingFile = NULL;
+    LoadRecordingFile();
 }
 
 /// \brief Copies important fields from ProgramInfo
@@ -451,6 +452,7 @@ void RecordingInfo::clone(const ProgramInfo &other,
 
     delete m_recordingFile;
     m_recordingFile = NULL;
+    LoadRecordingFile();
 }
 
 void RecordingInfo::clear(void)
