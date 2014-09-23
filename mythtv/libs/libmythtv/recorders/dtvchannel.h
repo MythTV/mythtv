@@ -55,7 +55,7 @@ class DTVChannel : public ChannelBase
     /// appropriately.
     ///
     /// Used by the ExternalRecorder.
-    virtual bool Tune(const QString &channum) { return false; }
+    virtual bool Tune(const QString &channum) { return true; }
     /// \brief Enters power saving mode if the card supports it
     virtual bool EnterPowerSavingMode(void)
     {
