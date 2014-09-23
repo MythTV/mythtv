@@ -43,7 +43,7 @@ EITFixUp::EITFixUp()
       m_ukSpaceStart("^ "),
       m_ukPart("\\s*\\(?\\s*(?:Part|Pt)\\s*(\\d{1,2})\\s*(?:of|/)\\s*(\\d{1,2})\\s*\\)?\\s*(?:\\.|:)?", Qt::CaseInsensitive),
       m_ukSeries("\\s*\\(?\\s*(?!Part|Pt)(?:Season|Series|S)?\\s*(\\d{1,2})(?:,|:)?\\s*(?:Episode|Ep)?\\s*(\\d{1,2})\\s*(?:of|/)\\s*(\\d{1,2})\\s*\\)?\\s*(?:\\.|:)?", Qt::CaseInsensitive),
-      m_ukCC("\\[(?:(AD|SL|S|W),?)+\\]"),
+      m_ukCC("\\[(?:(AD|SL|S|W|HD),?)+\\]"),
       m_ukYear("[\\[\\(]([\\d]{4})[\\)\\]]"),
       m_uk24ep("^\\d{1,2}:00[ap]m to \\d{1,2}:00[ap]m: "),
       m_ukStarring("(?:Western\\s)?[Ss]tarring ([\\w\\s\\-']+)[Aa]nd\\s([\\w\\s\\-']+)[\\.|,](?:\\s)*(\\d{4})?(?:\\.\\s)?"),
