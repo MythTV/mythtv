@@ -2643,12 +2643,12 @@ QSize MythMainWindow::NormSize(const QSize &size)
 
 int MythMainWindow::NormX(const int x)
 {
-    return (int)(x * d->wmult);
+    return (int)(qRound(x * d->wmult));
 }
 
 int MythMainWindow::NormY(const int y)
 {
-    return (int)(y * d->hmult);
+    return (int)(qRound(y * d->hmult));
 }
 
 void MythMainWindow::SetScalingFactors(float wmult, float hmult)
