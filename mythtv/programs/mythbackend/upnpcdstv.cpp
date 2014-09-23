@@ -1209,6 +1209,14 @@ bool UPnpCDSTv::LoadRecordings(const UPnpCDSRequest* pRequest,
         pItem->SetPropValue( "recordedDuration", UPnPDateTime::DurationFormat(nDurationMS));
 
         QSize resolution = QSize(nVideoWidth, nVideoHeight);
+        QString sContainer = "NUPPELVIDEO";
+        if (sMimeType == "video/mpeg")
+        {
+            if (bTranscoded) // Transcoded mpeg will be in a PS container
+                sContainer = "MPEG-2 PS";
+            else
+                sContainer = "MPEG-2 TS"; // 99% of recordings will be in MPEG-2 TS containers before transcoding
+        }
         if (sVideoCodec.isEmpty())
             sVideoCodec = (nVideoProps & VID_AVC) ? "H264" : "MPEG2VIDEO";
 
@@ -1220,6 +1228,7 @@ bool UPnpCDSTv::LoadRecordings(const UPnpCDSRequest* pRequest,
                                                      sMimeType,
                                                      resolution,
                                                      dVideoFrameRate,
+                                                     sContainer,
                                                      sVideoCodec,
                                                      sAudioCodec,
                                                      bTranscoded);

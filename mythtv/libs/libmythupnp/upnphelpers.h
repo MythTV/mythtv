@@ -161,6 +161,7 @@ namespace DLNA
     UPNP_PUBLIC QString DLNAProfileName( const QString &mimeType,
                                          const QSize &resolution = QSize(),
                                          const double videoFrameRate = 0.0,
+                                         const QString &container = "",
                                          const QString &vidCodec = "",
                                          const QString &audioCodec = "");
 
@@ -179,6 +180,7 @@ namespace DLNA
                                             const QString &mimeType,
                                             const QSize &resolution = QSize(),
                                             const double videoFrameRate = 0.0,
+                                            const QString &container = "",
                                             const QString &vidCodec = "",
                                             const QString &audioCodec = "",
                                             bool isTranscoded = false);

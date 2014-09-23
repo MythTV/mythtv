@@ -108,9 +108,9 @@ QString resDurationFormat(uint32_t msec)
 namespace DLNA
 {
 
-QString DLNAProfileName(const QString& mimeType, const QSize& resolution,
-                        const double videoFrameRate, const QString& vidCodec,
-                        const QString& audioCodec)
+QString DLNAProfileName(const QString &mimeType, const QSize &resolution,
+                        const double videoFrameRate, const QString &container,
+                        const QString &vidCodec, const QString &audioCodec)
 {
     QString sProfileName;
     bool isHD = (resolution.height() >= 720);
@@ -131,7 +131,7 @@ QString DLNAProfileName(const QString& mimeType, const QSize& resolution,
     {
         sProfileName = "AAC_ISO_320";
     }
-    else if (mimeType == "video/x-matroska")
+    else if (mimeType == "video/x-matroska" || container == "matroska")
     {
         // TODO: We need to know the video and audio codecs before we can serve
         // up the correct profile.
@@ -177,30 +177,52 @@ QString DLNAProfileName(const QString& mimeType, const QSize& resolution,
         // It's a starting point, and temporary until we can implement a more
         // robust way of determing the correct profile.
 
-        QString sBroadcastStandard = "";
+        //QString sBroadcastStandard = "";
         // HACK This is just temporary until we start storing more video
         // information in the database for each file and can determine this
         // stuff 'properly'
         QString sCountryCode = gCoreContext->GetLocale()->GetCountryCode();
-        if (sCountryCode == "us" || sCountryCode == "ca" ||
-            sCountryCode == "mx") // North America (ATSC)
+        bool isNorthAmerica = (sCountryCode == "us" || sCountryCode == "ca" ||
+                               sCountryCode == "mx"); // North America (NTSC/ATSC)
+
+        if (container == "MPEG-2 PS")
         {
-            if (vidCodec == "H264")
-                sProfileName = "AVC_TS_NA_ISO";
-            else if (isHD) // && videoCodec == "MPEG2VIDEO"
-                sProfileName = "MPEG_TS_HD_NA_ISO";
-            else // if (videoCodec == "MPEG2VIDEO")
-                sProfileName = "MPEG_TS_SD_NA_ISO";
-            // Fall through
+            if (isHD && audioCodec == "DTS")
+                sProfileName = "MPEG_PS_HD_DTS";
+            else if (isHD)
+            {
+                // Fallthough, no DLNA profiles
+            }
+            else if (audioCodec == "DTS")
+                sProfileName = "MPEG_PS_SD_DTS";
+            else
+            {
+                if (isNorthAmerica)
+                    sProfileName = "MPEG_PS_NTSC";
+                else
+                    sProfileName = "MPEG_PS_PAL";
+            }
         }
-        else // Europe standard (DVB)
+        else if (container == "MPEG-2 TS")
         {
-            if (vidCodec == "H264" || isHD) // All HD is AVC with DVB
-                sProfileName = "AVC_TS_EU_ISO";
-            else // if (videoCodec == "MPEG2VIDEO")
-                sProfileName = "MPEG_TS_SD_EU_ISO";
-            // Fall through
+            if (isNorthAmerica)
+            {
+                if (vidCodec == "H264")
+                    sProfileName = "AVC_TS_NA_ISO";
+                else if (isHD) // && videoCodec == "MPEG2VIDEO"
+                    sProfileName = "MPEG_TS_HD_NA_ISO";
+                else // if (videoCodec == "MPEG2VIDEO")
+                    sProfileName = "MPEG_TS_SD_NA_ISO";
+            }
+            else // Europe standard (DVB)
+            {
+                if (vidCodec == "H264" || isHD) // All HD is AVC with DVB
+                    sProfileName = "AVC_TS_EU_ISO";
+                else // if (videoCodec == "MPEG2VIDEO")
+                    sProfileName = "MPEG_TS_SD_EU_ISO";
+            }
         }
+        // Fall through
     }
     else if (mimeType == "image/jpeg")
     {
@@ -236,7 +258,7 @@ QString DLNAProfileName(const QString& mimeType, const QSize& resolution,
 // NOTE The order of the DLNA args is mandatory - 7.4.1.3.17 MM protocolInfo values: 4th field
 QString ProtocolInfoString(UPNPProtocol::TransferProtocol protocol,
                            const QString &mimeType, const QSize &resolution,
-                           double videoFrameRate,
+                           double videoFrameRate, const QString &container,
                            const QString &videoCodec, const QString &audioCodec,
                            bool isTranscoded)
 {
@@ -261,7 +283,7 @@ QString ProtocolInfoString(UPNPProtocol::TransferProtocol protocol,
     // PN-Param (Profile Name)
     //
     QString sProfileName = DLNAProfileName(mimeType, resolution, videoFrameRate,
-                                           videoCodec, audioCodec);
+                                           container, videoCodec, audioCodec);
     if (!sProfileName.isEmpty())
         sAdditionalInfoList << QString("DLNA.ORG_PN=%1").arg(sProfileName);
 
@@ -279,7 +301,7 @@ QString ProtocolInfoString(UPNPProtocol::TransferProtocol protocol,
     //
     // CI-Param  - Optional, may be omitted if value is zero (0)
     //
-    if (!isTranscoded)
+    if (isTranscoded)
         sAdditionalInfoList << DLNA::ConversionIndicatorString(isTranscoded);
 
     //
