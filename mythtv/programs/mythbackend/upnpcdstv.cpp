@@ -401,18 +401,17 @@ void UPnpCDSTv::AddItem( const UPnpCDSRequest    *pRequest,
         sMimeType = "video/avi";
     }
 
-
-    // DLNA string below is temp fix for ps3 seeking.
-    QString sProtocol = QString( "http-get:*:%1:DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=01500000000000000000000000000000" ).arg( sMimeType  );
-    QString sURI      = QString( "%1GetRecording%2").arg( sURIBase   )
-                                                    .arg( sURIParams );
-
-    // Sony BDPS370 requires a DLNA Profile Name
+    // NOTE: Sony BDPS370 requires a DLNA Profile Name
+    // NOTE: DLNA string below is temp fix for ps3 seeking.
     // FIXME: detection to determine the correct DLNA Profile Name
+    QString sFourthField = "*";
     if (sMimeType == "video/mpeg")
     {
-        sProtocol += ";DLNA.ORG_PN=MPEG_TS_SD_NA_ISO";
+        sFourthField = "DLNA.ORG_PN=MPEG_TS_SD_NA_ISO;DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=01500000000000000000000000000000";
     }
+    QString sProtocol = QString( "http-get:*:%1:%2" ).arg( sMimeType ).arg( sFourthField );
+    QString sURI      = QString( "%1GetRecording%2").arg( sURIBase   )
+                                                    .arg( sURIParams );
 
     Resource *pRes = pItem->AddResource( sProtocol, sURI );
 
