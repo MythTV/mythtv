@@ -65,7 +65,18 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         desiredrecendts(endts),
         record(NULL),
         m_recordingFile(NULL)  { LoadRecordingFile(); }
-    RecordingInfo(uint _chanid, const QDateTime &_recstartts) :
+    RecordingInfo(uint _recordedid) :
+        ProgramInfo(_recordedid),
+        oldrecstatus(rsUnknown),
+        savedrecstatus(rsUnknown),
+        future(false),
+        schedorder(0),
+        mplexid(0),
+        desiredrecstartts(startts),
+        desiredrecendts(endts),
+        record(NULL),
+        m_recordingFile(NULL)  { LoadRecordingFile(); }
+    RecordingInfo(uint _chanid, const QDateTime &_recstartts) : /// DEPRECATED
         ProgramInfo(_chanid, _recstartts),
         oldrecstatus(rsUnknown),
         savedrecstatus(rsUnknown),
