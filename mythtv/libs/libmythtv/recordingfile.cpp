@@ -29,7 +29,7 @@ bool RecordingFile::Load()
                   "hostname, storagegroup, id, basename, filesize, "
                   "video_codec, width, height, aspect, fps, "
                   "audio_codec, audio_channels, audio_sample_rate, "
-                  "audio_bits_per_sample "
+                  "audio_avg_bitrate "
                   "FROM recordedfile "
                   "WHERE recordedid = :RECORDEDID ");
     query.bindValue(":RECORDEDID", m_recordingId);
@@ -83,7 +83,7 @@ bool RecordingFile::Save()
                       "fps = :FRAMERATE, "
                       "aspect = :ASPECT_RATIO, "
                       "audio_sample_rate = :AUDIO_SAMPLERATE, "
-                      "audio_bits_per_sample = :AUDIO_BITRATE, "
+                      "audio_avg_bitrate = :AUDIO_BITRATE, "
                       "audio_channels = :AUDIO_CHANNELS, "
                       "audio_codec = :AUDIO_CODEC, "
                       "video_codec = :VIDEO_CODEC, "
@@ -104,7 +104,7 @@ bool RecordingFile::Save()
                       "fps = :FRAMERATE, "
                       "aspect = :ASPECT_RATIO, "
                       "audio_sample_rate = :AUDIO_SAMPLERATE, "
-                      "audio_bits_per_sample = :AUDIO_BITRATE, "
+                      "audio_avg_bitrate = :AUDIO_BITRATE, "
                       "audio_channels = :AUDIO_CHANNELS, "
                       "audio_codec = :AUDIO_CODEC, "
                       "video_codec = :VIDEO_CODEC, "

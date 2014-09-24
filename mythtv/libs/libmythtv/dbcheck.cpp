@@ -17,6 +17,7 @@ using namespace std;
 #include "compat.h"
 #include "recordingrule.h"
 #include "recordingprofile.h"
+#include "recordinginfo.h"
 
 // TODO convert all dates to UTC
 
@@ -2761,6 +2762,67 @@ NULL
             NULL
         };
         if (!performActualUpdate(updates, "1329", dbver))
+            return false;
+    }
+
+    if (dbver == "1329")
+    {
+        const char *updates[] = {
+            "ALTER TABLE recordedfile "
+            "DROP COLUMN audio_bits_per_sample ;", // Instead create two columns for avg and max bitrates
+            "ALTER TABLE recordedfile "
+            "ADD COLUMN container VARCHAR(255) NOT NULL DEFAULT '', "
+            "ADD COLUMN total_bitrate MEDIUMINT UNSIGNED NOT NULL DEFAULT 0, " // Kbps
+            "ADD COLUMN video_avg_bitrate MEDIUMINT UNSIGNED NOT NULL DEFAULT 0, " // Kbps
+            "ADD COLUMN video_max_bitrate MEDIUMINT UNSIGNED NOT NULL DEFAULT 0, " // Kbps
+            "ADD COLUMN audio_avg_bitrate MEDIUMINT UNSIGNED NOT NULL DEFAULT 0, " // Kbps
+            "ADD COLUMN audio_max_bitrate MEDIUMINT UNSIGNED NOT NULL DEFAULT 0 ;", // Kbps
+           NULL
+        };
+        if (!performActualUpdate(updates, "1330", dbver))
+            return false;
+    }
+
+    if (dbver == "1330")
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("SELECT recordedid FROM recorded");
+        query.exec();
+        while (query.next())
+        {
+            int recordingID = query.value(0).toInt();
+            RecordingInfo *recInfo = new RecordingInfo(recordingID);
+            RecordingFile *recFile = recInfo->GetRecordingFile();
+            recFile->m_fileName = recInfo->GetBasename();
+            recFile->m_fileSize = recInfo->GetFilesize();
+            recFile->m_storageGroup = recInfo->GetStorageGroup();
+            recFile->m_storageDeviceID = recInfo->GetHostname();
+            switch (recInfo->QueryAverageAspectRatio())
+            {
+                case MARK_ASPECT_1_1 :
+                    recFile->m_videoAspectRatio = 1.0;
+                    break;
+                case MARK_ASPECT_4_3:
+                    recFile->m_videoAspectRatio = 1.33333333333;
+                    break;
+                case MARK_ASPECT_16_9:
+                    recFile->m_videoAspectRatio = 1.77777777777;
+                    break;
+                case MARK_ASPECT_2_21_1:
+                    recFile->m_videoAspectRatio = 2.21;
+                    break;
+                default:
+                    break;
+            }
+            QSize resolution(recInfo->QueryAverageWidth(),
+                            recInfo->QueryAverageHeight());
+            recFile->m_videoResolution = resolution;
+            recFile->m_videoFrameRate = (double)recInfo->QueryAverageFrameRate() / 1000.0;
+            recFile->Save();
+            delete recInfo;
+        }
+
+        if (!UpdateDBVersionNumber("1331", dbver))
             return false;
     }
 
