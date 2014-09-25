@@ -105,7 +105,8 @@ DTC::ProgramList* Dvr::GetRecordedList( bool           bDescending,
     {
         ProgramInfo *pInfo = progList[ n ];
 
-        if ((!sTitleRegEx.isEmpty() && !pInfo->GetTitle().contains(rTitleRegEx)) ||
+        if (pInfo->IsDeletePending() ||
+            (!sTitleRegEx.isEmpty() && !pInfo->GetTitle().contains(rTitleRegEx)) ||
             (!sRecGroup.isEmpty() && sRecGroup != pInfo->GetRecordingGroup()) ||
             (!sStorageGroup.isEmpty() && sStorageGroup != pInfo->GetStorageGroup()))
             continue;
@@ -476,10 +477,13 @@ QStringList Dvr::GetTitleList(const QString& RecGroup)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    QString querystr = "SELECT DISTINCT title FROM recorded";
+    QString querystr = "SELECT DISTINCT title FROM recorded "
+                       "WHERE deletepending = 0";
 
     if (!RecGroup.isEmpty())
-        querystr += " WHERE recgroup = :RECGROUP";
+        querystr += " AND recgroup = :RECGROUP";
+    else
+        querystr += " AND recgroup != 'Deleted'";
 
     querystr += " ORDER BY title";
 
@@ -513,6 +517,7 @@ DTC::TitleInfoList* Dvr::GetTitleInfoList()
         "SELECT title, inetref, count(title) as count "
         "    FROM recorded "
         "    WHERE inetref <> '' "
+        "    AND deletepending = 0 "
         "    GROUP BY title, inetref "
         "    ORDER BY title");
 
