@@ -21,7 +21,7 @@ AnalogSignalMonitor::AnalogSignalMonitor(
     int db_cardnum, V4LChannel *_channel, uint64_t _flags) :
     SignalMonitor(db_cardnum, _channel, _flags),
     m_usingv4l2(false), m_version(0), m_width(0), m_stable_time(2000),
-    m_lock_cnt(0)
+    m_lock_cnt(0), m_log_idx(40)
 {
     int videofd = channel->GetFd();
     if (videofd >= 0)
@@ -145,7 +145,11 @@ bool AnalogSignalMonitor::handleHDPVR(int videofd)
     }
     else
     {
-        LOG(VB_RECORD, LOG_ERR, "hd-pvr waiting for valid resolution");
+        if (--m_log_idx == 0)
+        {
+            LOG(VB_RECORD, LOG_ERR, "hd-pvr waiting for valid resolution");
+            m_log_idx = 40;
+        }
         m_width = vfmt.fmt.pix.width;
         m_timer.stop();
         QMutexLocker locker(&statusLock);

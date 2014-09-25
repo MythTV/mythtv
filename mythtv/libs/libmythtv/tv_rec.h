@@ -156,16 +156,18 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
 
     void StopRecording(bool killFile = false);
     /// \brief Tells TVRec to finish the current recording as soon as possible.
-    void FinishRecording(void)  { SetFlags(kFlagFinishRecording); }
+    void FinishRecording(void)  { SetFlags(kFlagFinishRecording,
+                                           __FILE__, __LINE__); }
     /// \brief Tells TVRec that the frontend's TV class is ready for messages.
-    void FrontendReady(void)    { SetFlags(kFlagFrontendReady); }
+    void FrontendReady(void)    { SetFlags(kFlagFrontendReady,
+                                           __FILE__, __LINE__); }
     void CancelNextRecording(bool cancel);
     ProgramInfo *GetRecording(void);
 
     /// \brief Returns true if event loop has not been told to shut down
     bool IsRunning(void)  const { return HasFlags(kFlagRunMainLoop); }
     /// \brief Tells TVRec to stop event loop
-    void Stop(void)             { ClearFlags(kFlagRunMainLoop); }
+    void Stop(void) { ClearFlags(kFlagRunMainLoop, __FILE__, __LINE__); }
 
     TVState GetState(void) const;
     /// \brief Returns "state == kState_RecordingPreRecorded"
@@ -278,8 +280,8 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     DTVSignalMonitor *GetDTVSignalMonitor(void);
 
     bool HasFlags(uint f) const { return (stateFlags & f) == f; }
-    void SetFlags(uint f);
-    void ClearFlags(uint f);
+    void SetFlags(uint f, const QString & file, int line);
+    void ClearFlags(uint f, const QString & file, int line);
     static QString FlagToString(uint);
 
     void HandleTuning(void);
