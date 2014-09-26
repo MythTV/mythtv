@@ -47,9 +47,11 @@ typedef struct timeval  TaskTime;
 class HttpWorkerThread;
 class QScriptEngine;
 class HttpServer;
+#ifndef QT_NO_OPENSSL
 class QSslKey;
 class QSslCertificate;
 class QSslConfiguration;
+#endif
 
 typedef enum
 {
@@ -151,7 +153,9 @@ class UPNP_PUBLIC HttpServer : public ServerPool
     static QMutex           s_platformLock;
     static QString          s_platform;
 
+#ifndef QT_NO_OPENSSL
     QSslConfiguration       m_sslConfig;
+#endif
 
     const QString m_privateToken; // Private token; Used to salt digest auth nonce, changes on backend restart
 
@@ -181,8 +185,11 @@ class HttpWorker : public QRunnable
      * \param type       The type of connection - Plain TCP, SSL or other?
      * \param sslConfig  The SSL configuration (for SSL sockets)
      */
-    HttpWorker(HttpServer &httpServer, qt_socket_fd_t sock, PoolServerType type,
-               QSslConfiguration sslConfig);
+    HttpWorker(HttpServer &httpServer, qt_socket_fd_t sock, PoolServerType type
+#ifndef QT_NO_OPENSSL
+               , QSslConfiguration sslConfig
+#endif
+    );
 
     virtual void run(void);
 
@@ -192,7 +199,9 @@ class HttpWorker : public QRunnable
     int         m_socketTimeout;
     PoolServerType m_connectionType;
 
+#ifndef QT_NO_OPENSSL
     QSslConfiguration       m_sslConfig;
+#endif
 };
 
 
