@@ -1,36 +1,36 @@
 
-<div id="menu">
+<nav id="menu">
   <ul class="menu collapsible">
     <li><a href='#'><i18n>TV</i18n></a>
         <ul class="acitem collapsible">
-            <li><a class='menuitem' href='#' onClick="javascript:loadContent('/tv/guide.qsp')"><%=qsTr("Program Guide")%></a></li>
-            <li><a class='menuitem' href='#' onClick="javascript:loadContent('/tv/recordings.qsp')"><%=qsTr("Recordings")%></a></li>
-            <li><a class='menuitem' href='#' onClick="javascript:loadContent('/tv/upcoming.qsp')"><%=qsTr("Upcoming Recordings")%></a></li>
-            <li><a class='menuitem' href='#' onClick="javascript:loadContent('/tv/recordingrules.qsp')"><%=qsTr("Recording Rules")%></a></li>
+            <li><a class='menuitem' href='#' onClick="hideMainMenu();loadContent('/tv/guide.qsp')"><%=qsTr("Program Guide")%></a></li>
+            <li><a class='menuitem' href='#' onClick="hideMainMenu();loadContent('/tv/recordings.qsp')"><%=qsTr("Recordings")%></a></li>
+            <li><a class='menuitem' href='#' onClick="hideMainMenu();loadContent('/tv/upcoming.qsp')"><%=qsTr("Upcoming Recordings")%></a></li>
+            <li><a class='menuitem' href='#' onClick="hideMainMenu();loadContent('/tv/recordingrules.qsp')"><%=qsTr("Recording Rules")%></a></li>
         </ul>
     </li>
     <li><a href='#'><i18n>Video</i18n></a>
         <ul class="acitem collapsible">
-            <li><a class='menuitem' href='#' onClick="javascript:loadContent('/video/gallery.qsp')"><%=qsTr("Video Gallery")%></a></li>
+            <li><a class='menuitem' href='#' onClick="hideMainMenu();loadContent('/video/gallery.qsp')"><%=qsTr("Video Gallery")%></a></li>
         </ul>
     </li>
     <li><a href='#'><i18n>Setup</i18n></a>
       <ul class="acitem collapsible">
-        <li><a href='#' onClick="javascript:clearContent(); loadEditWindow('/setup/wizard.html', '/setup/js/wizard.js')"><i18n>Setup Wizard</i18n></a></li>
+        <li><a href='#' onClick="hideMainMenu(); clearContent(); loadEditWindow('/setup/wizard.html', '/setup/js/wizard.js')"><i18n>Setup Wizard</i18n></a></li>
         <li><a href='#'><i18n>Advanced Setup</i18n></a>
           <ul class="acitem collapsible">
-            <li><a href='#' onClick="javascript:loadSetupPage('database')"><i18n>Database</i18n></a></li>
-            <li><a href='#' onClick="javascript:loadSetupPage('general')"><i18n>General</i18n></a></li>
+            <li><a href='#' onClick="hideMainMenu();loadSetupPage('database')"><i18n>Database</i18n></a></li>
+            <li><a href='#' onClick="hideMainMenu();loadSetupPage('general')"><i18n>General</i18n></a></li>
             <li><a href='#'><i18n>Guide Data</i18n></a>
               <ul class="acitem collapsible">
-                <li><a href='#' onClick="javascript:loadSetupPage('guidedatasources')"><i18n>Data Sources</i18n></a></li>
-                <li><a href='#' onClick="javascript:loadSetupPage('channeleditor')"><i18n>Channel Editor</i18n></a></li>
+                <li><a href='#' onClick="hideMainMenu();loadSetupPage('guidedatasources')"><i18n>Data Sources</i18n></a></li>
+                <li><a href='#' onClick="hideMainMenu();loadSetupPage('channeleditor')"><i18n>Channel Editor</i18n></a></li>
               </ul>
             </li>
-            <li><a href='#' onClick="javascript:loadContent('/misc/placeholder.html')"><i18n>Recording Devices</i18n></a></li>
-            <li><a href='#' onClick="javascript:loadSetupPage('storagegroups')"><i18n>Storage Groups</i18n></a></li>
-            <li><a href='#' onClick="javascript:loadSetupPage('jobqueue')"><i18n>Job Queue</i18n></a></li>
-            <li><a href='#' onClick="javascript:loadSetupPage('systemevents')"><i18n>System Events</i18n></a></li>
+            <li><a href='#' onClick="hideMainMenu();loadContent('/misc/placeholder.html')"><i18n>Recording Devices</i18n></a></li>
+            <li><a href='#' onClick="hideMainMenu();loadSetupPage('storagegroups')"><i18n>Storage Groups</i18n></a></li>
+            <li><a href='#' onClick="hideMainMenu();loadSetupPage('jobqueue')"><i18n>Job Queue</i18n></a></li>
+            <li><a href='#' onClick="hideMainMenu();loadSetupPage('systemevents')"><i18n>System Events</i18n></a></li>
           </ul>
         </li>
 <%
@@ -43,24 +43,24 @@
 
     if (devMode)
     {
-        os.write("<li><a href='#' onClick=\"javascript:loadSetupContent('/setup/expert.html')\"><i18n>Expert/Dev Setup</i18n></a></li>");
+        os.write("<li><a href='#' onClick=\"hideMainMenu();loadSetupContent('/setup/expert.html')\"><i18n>Expert/Dev Setup</i18n></a></li>");
     }
 %>
-        <li><a href='#' onClick="javascript:loadSetupPage('password')"><i18n>Change Password</i18n></a></li>
+        <li><a href='#' onClick="hideMainMenu();loadSetupPage('password')"><i18n>Change Password</i18n></a></li>
       </ul>
     </li>
     <li><a href='#'><i18n>Information</i18n></a>
       <ul class="acitem collapsible">
-        <li><a class='menuitem' href='#' onClick="javascript:loadContent('/misc/overview.qsp')"><i18n>Overview</i18n></a></li>
-        <li><a class='menuitem' href='#' onClick="javascript:loadContent('/Status/GetStatusHTML')"><i18n>Backend Status</i18n></a></li>
-        <li><a class='menuitem' href='#' onClick="javascript:loadMiscPage('viewlogs')"><i18n>View Logs</i18n></a></li>
+        <li><a class='menuitem' href='#' onClick="hideMainMenu();loadContent('/misc/overview.qsp')"><i18n>Overview</i18n></a></li>
+        <li><a class='menuitem' href='#' onClick="hideMainMenu();loadContent('/Status/GetStatusHTML')"><i18n>Backend Status</i18n></a></li>
+        <li><a class='menuitem' href='#' onClick="hideMainMenu();loadMiscPage('viewlogs')"><i18n>View Logs</i18n></a></li>
       </ul>
     </li>
     <li><a href='#'><i18n>Utilities</i18n></a>
       <ul class="acitem collapsible">
-        <li><a class='menuitem' href='#' onClick="javascript:loadMiscPage('messagetab')"><i18n>Send a Message</i18n></a></li>
-        <li><a class='menuitem' href='#' onClick="javascript:loadMiscPage('databasetabs')"><i18n>Database Tools</i18n></a></li>
-        <li><a class='menuitem' href='#' onClick="javascript:loadMiscPage('hardwareprofile')"><i18n>Hardware Profile</i18n></a></li>
+        <li><a class='menuitem' href='#' onClick="hideMainMenu();loadMiscPage('messagetab')"><i18n>Send a Message</i18n></a></li>
+        <li><a class='menuitem' href='#' onClick="hideMainMenu();loadMiscPage('databasetabs')"><i18n>Database Tools</i18n></a></li>
+        <li><a class='menuitem' href='#' onClick="hideMainMenu();loadMiscPage('hardwareprofile')"><i18n>Hardware Profile</i18n></a></li>
       </ul>
     </li>
     <li><hr></li>
@@ -79,17 +79,16 @@
         </li>
         <li><a href='#'><i18n>Examples</i18n></a>
           <ul class="acitem">
-            <li><a href='#' onClick="loadContent('/samples/hlstest.qsp');"><i18n>HTTP Live Streaming</i18n></a></li>
+            <li><a href='#' onClick="hideMainMenu();loadContent('/samples/hlstest.qsp');"><i18n>HTTP Live Streaming</i18n></a></li>
           </ul>
         </li>
         <li><a href='#'><i18n>Server Side Scripting</i18n></a>
           <ul class="acitem">
-            <li><a href='#' onClick="javascript:loadContent('/samples/serverside.qsp', '/samples/js/samples.js')"><i18n>Overview</i18n></a></li>
-            <!-- <li><a href='#' onClick="javascript:loadContent('/samples/recorded.qsp', '/samples/js/samples.js')"><i18n>GetRecorded() Example</i18n></a></li> -->
+            <li><a href='#' onClick="hideMainMenu();loadContent('/samples/serverside.qsp', '/samples/js/samples.js')"><i18n>Overview</i18n></a></li>
 <%
     if (devMode)
     {
-        os.write("<li><a href='#' onClick=\"javascript:loadContent('/samples/storagegroups.qsp', '/samples/js/samples.js')\"><i18n>GetStorageGroups()</i18n></a></li>");
+        os.write("<li><a href='#' onClick=\"hideMainMenu();loadContent('/samples/storagegroups.qsp', '/samples/js/samples.js')\"><i18n>GetStorageGroups()</i18n></a></li>");
     }
 %>
           </ul>
@@ -98,11 +97,11 @@
     </li>
     <li><a href='#'><i18n>3rd Party Software</i18n></a>
       <ul class="acitem collapsible">
-        <li><a class='menuitem' href='#' onClick="javascript:loadContent('/3rdParty/jwplayer.qsp')"><i18n>JW Player&trade;</i18n></a></li>
+        <li><a class='menuitem' href='#' onClick="hideMainMenu();loadContent('/3rdParty/jwplayer.qsp')"><i18n>JW Player&trade;</i18n></a></li>
       </ul>
     </li>
   </ul>
   <br>
   <a class='menuitem' href='//www.mythtv.org'>www.mythtv.org</a>
-</div>
+</nav>
 

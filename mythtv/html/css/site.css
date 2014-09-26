@@ -184,8 +184,8 @@
     }
 
     #header {
-        background-color:       black;
-        background-image: linear-gradient(to bottom, #222222, #000000 60%);
+        background-color:   #000000;
+        background-image:   linear-gradient(to bottom, #222222, #000000 60%);
         position:           fixed;
         top:                0px;
         right:              0px;
@@ -194,6 +194,7 @@
         border-bottom:      4px solid #004570;
         z-index:            90;
     }
+
     #header_text {
         color:              #cdcccc;
         padding-left:       190px;
@@ -245,11 +246,13 @@
         left:               0px;
         width:              25px;
         height:             100%;
-        background-color:   #000000;
+        /* The radial gradient backgrounds had a significant impact on the performance of transition animations */
+/*        background-color:   #000000;
         background-image:   radial-gradient(circle, #151515 2px, transparent 2px),
                             radial-gradient(circle, #151515 2px, transparent 2px);
         background-size:    6px 6px;
-        background-position: 0 0, 3px 3px;
+        background-position: 0 0, 3px 3px;*/
+        background:         #000000 url(/3rdParty/jquery/jqueryUI/css/images/ui-bg_hexagon_10_000000_12x10.png) 50% 50% repeat;
         border-right:       2px #444444 solid;
 
         text-align:         center;
@@ -274,15 +277,40 @@
     #menu-bg {
         position:           fixed;
         top:                36px;
-        left:               0px;
         width:              187px;
         height:             100%;
-        background-color:   #000000;
+        /* The radial gradient backgrounds had a significant impact on the performance of transition animations */
+/*        background-color:   #000000;
         background-image:   radial-gradient(circle, #151515 2px, transparent 2px),
                             radial-gradient(circle, #151515 2px, transparent 2px);
         background-size:    6px 6px;
-        background-position: 0 0, 3px 3px;
+        background-position: 0 0, 3px 3px;*/
+        background:         #000000 url(/3rdParty/jquery/jqueryUI/css/images/ui-bg_hexagon_10_000000_12x10.png) 50% 50% repeat;
         z-index:            75;
+        transition:         left 300ms linear;
+    }
+
+    .menu-hidden {
+        left: -187px;
+    }
+
+/*    @media (max-width: 480px),(max-device-width: 480px) {
+        body {
+            width: 100%;
+        }
+
+        #menu-bg {
+            width: 100%;
+            font-size: 15pt;
+        }
+
+        .menu-hidden {
+            left: -100%;
+        }
+    }*/
+
+    .menu-visible {
+        left: 0px;
     }
 
     #menu a, a:visited {
@@ -292,8 +320,9 @@
     #menu {
         position:           relative;
         top:                54px;
-        left:               7px;
-        width:              173px;
+        /*left:               7px;*/
+        padding:            0px 0.5em;
+        width:              calc(100% - 1em);
         color:              #E4D6CD;
         text-align:         center;
         z-index:            15;
@@ -312,16 +341,15 @@
     }
 
     #menu li a {
-        height: 32px;
         voice-family: "\"}\""; 
         voice-family: inherit;
-        height: 24px;
+        height: 1.8em;
         text-decoration: none;
         background-color: #333333;
         border: 1px #444444 solid;
         color: #FFFFFF;
         background-image: linear-gradient(to bottom, #4A4A4A, #222222 60%);
-        padding: 8px 0 0 10px;
+        padding: 0.5em 0 0 1em; /* Top Right Bottom Left */
     }
 
     #menu li a:link, #menu li a:visited {

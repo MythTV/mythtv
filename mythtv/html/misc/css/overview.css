@@ -1,15 +1,18 @@
 
 .header
 {
-    width:660px;
+    width: calc(100% - 20px);
+    max-width: 660px;
     margin: 10px auto;
     color: #FFFFFF;
     padding: 20px;
-    background-color:   #000000;
+    /* The radial gradient backgrounds had a significant impact on the performance of animations */
+/*    background-color:   #000000;
     background-image:   radial-gradient(circle, #151515 2px, transparent 2px),
                         radial-gradient(circle, #151515 2px, transparent 2px);
     background-size:    6px 6px;
-    background-position: 0 0, 3px 3px;
+    background-position: 0 0, 3px 3px;*/
+    background: #000000 url(/3rdParty/jquery/jqueryUI/css/images/ui-bg_hexagon_10_000000_12x10.png) 50% 50% repeat;
     border: 1px solid #000000;
     border-right: 1px solid #353535;
     border-bottom: 1px solid #353535;
@@ -21,18 +24,21 @@
 .contentContainer
 {
     margin: 0 auto;
-    width: 680px;
+    width: 100%;
+    max-width: 680px;
     padding: 10px;
-    background-color:   #000000;
+    /* The radial gradient backgrounds had a significant impact on the performance of animations */
+/*    background-color:   #000000;
     background-image:   radial-gradient(circle, #151515 2px, transparent 2px),
                         radial-gradient(circle, #151515 2px, transparent 2px);
     background-size:    6px 6px;
-    background-position: 0 0, 3px 3px;
+    background-position: 0 0, 3px 3px;*/
+    background: #000000 url(/3rdParty/jquery/jqueryUI/css/images/ui-bg_hexagon_10_000000_12x10.png) 50% 50% repeat;
 }
 
 .content
 {
-    width: 660px;
+    width: calc(100% - 20px); /*Exclude parent padding*/
     padding: 10px;
     background-color: #000000;
     border-radius: 5px;

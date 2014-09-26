@@ -99,16 +99,30 @@ jQuery.fn.initMenu = function() {
 var showing = false;
 function hideMainMenu()
 {
-    if (showing)
-        return;
+    // CSS Transition Animations - Fast, smooth
+    if ($("#menu-bg").hasClass('menu-visible'))
+    {
+        $("#menu-bg").removeClass('menu-visible');
+        console.log("Hide Main Menu");
+    }
 
-//     $("#content").animate({left: '30px'}, {duration: 600, queue: false});
-    $("#menu-bg").hide('slide',{direction:'left'}, {duration: 700, queue: false});
+    // jQuery Animations - Very Slow, not smooth
+//     if (showing)
+//         return;
+//
+//     $("#menu-bg").hide('slide',{direction:'left'}, {duration: 700, queue: false});
 }
 
 function showMainMenu()
 {
-    showing = true;
-//     $("#content").animate({left: '190px'}, {duration:600, queue: false});
-    $("#menu-bg").show('slide',{direction:'left'}, {duration: 700, queue: false}, function () { showing = false; });
+    // CSS Transition Animations - Fast, smooth
+    if (!$("#menu-bg").hasClass('menu-visible'))
+    {
+        $("#menu-bg").addClass('menu-visible');
+        console.log("Show Main Menu");
+    }
+
+    // jQuery Animations - Very Slow, not smooth
+//     showing = true;
+//     $("#menu-bg").show('slide',{direction:'left'}, {duration: 700, queue: false}, function () { showing = false; });
 }
