@@ -718,7 +718,6 @@ QFileInfo Content::GetRecording( int              nRecordedId,
 
 QFileInfo Content::GetMusic( int nId )
 {
-    QString sBasePath = gCoreContext->GetSetting( "MusicLocation", "");
     QString sFileName;
 
     // ----------------------------------------------------------------------
@@ -746,20 +745,14 @@ QFileInfo Content::GetMusic( int nId )
 
         if (query.next())
         {
-            sFileName = QString( "%1/%2" )
-                           .arg( sBasePath )
-                           .arg( query.value(0).toString() );
+            sFileName = query.value(0).toString();
         }
     }
 
-    // ----------------------------------------------------------------------
-    // check to see if the file exists
-    // ----------------------------------------------------------------------
+    if (sFileName.isEmpty())
+        return QFileInfo();
 
-    if (!QFile::exists( sFileName ))
-        return GetFile( "Music", sFileName );
-
-    return QFileInfo();
+    return GetFile( "Music", sFileName );
 }
 
 /////////////////////////////////////////////////////////////////////////////
