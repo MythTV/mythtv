@@ -662,7 +662,7 @@ QString MythContextPrivate::TestDBconnection(void)
     // No need to ping myself
     if ((host == "localhost") ||
         (host == "127.0.0.1") ||
-        (host == gCoreContext->GetHostName()))
+        gCoreContext->IsThisHost(host))
         doPing = false;
 
     // If WOL is setup, the backend might be sleeping:
