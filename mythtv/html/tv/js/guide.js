@@ -39,7 +39,6 @@ function checkRecordingStatus(chanID, startTime)
 function reloadGuideContent()
 {
     loadTVContent(currentContentURL, "guideGrid", "dissolve", {"GuideOnly": "1"});  // currentContentURL is defined in util.qjs
-    fixGuideHeight();
 }
 
 function pageLeft()
@@ -57,9 +56,13 @@ function changePage(direction)
     var INTERVAL = 4; // 2 Hours, 30 Minute time periods
     var timeSelect = document.getElementById("guideStartTime");
     var timeIndex = timeSelect.selectedIndex;
+    // oldIndex lets us adjust the animation depending on whether we're moving
+    // backwards or forwards in time
     timeSelect.setAttribute('data-oldIndex', timeIndex);
     var dateSelect = document.getElementById("guideStartDate");
     var dateIndex = dateSelect.selectedIndex;
+    // oldIndex lets us adjust the animation depending on whether we're moving
+    // backwards or forwards in time
     dateSelect.setAttribute('data-oldIndex', dateIndex);
 
     if (direction == "left")
@@ -109,22 +112,20 @@ function changeGuideStartTime(selectBox)
 {
     var oldIndex = selectBox.getAttribute('data-oldIndex');
 
-    if (typeof oldIndex === "undefined")
+    if (typeof oldIndex === "undefined" || oldIndex == null)
         oldIndex = selectBox.defaultIndex;
 
-    var transition = (selectBox.selectedIndex > oldIndex) ? 'left' : 'right'
+    // oldIndex lets us adjust the animation depending on whether we're moving
+    // backwards or forwards in time
+    selectBox.setAttribute('data-oldIndex', selectBox.selectedIndex);
 
-    submitForm(selectBox.form, 'guideGrid', transition);
-    fixGuideHeight();
+    var transition = (selectBox.selectedIndex > oldIndex) ? 'left' : 'right';
+    console.log("New " + selectBox.selectedIndex + " Old " + oldIndex + " Transition " + transition);
+
+    submitForm(selectBox.form, 'guideGrid', transition);//     fixGuideHeight();
 }
 
 function submitGuideForm(context)
 {
     submitForm(context.form, 'guideGrid', 'dissolve');
-    fixGuideHeight();
-}
-
-function fixGuideHeight()
-{
-    $('.channels').height($(window).height() - $('.channels').offset().top - 15);
 }

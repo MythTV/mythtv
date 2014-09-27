@@ -218,3 +218,98 @@
     color: #990000;
 }
 
+.leftSlideOutTransition
+{
+    transition-property: opacity;
+    transition-duration: 600ms;
+    transition-timing-function: ease;
+/*    transform: translate3d(-150%, 0, 0);*/
+    transform: translate3d(0, 0, 0);
+/*    transform: scale(0.95,0.95);*/
+    opacity: 0.3;
+}
+
+.leftSlideInTransition
+{
+    transition-property: transform;
+    transition-duration: 500ms;
+    transition-timing-function: ease;
+    transform: translate3d(-100%, 0, 0);
+}
+
+.rightSlideInTransition
+{
+    transition-property: transform;
+    transition-duration: 500ms;
+    transition-timing-function: ease;
+    transform: translate3d(100%, 0, 0);
+/*    -webkit-animation: rightSlideIn 500ms;
+    animation: rightSlideIn 500ms;*/
+}
+
+@-webkit-keyframes rightSlideIn {
+    from {left: -100%}
+    to {left: auto}
+}@keyframes rightSlideIn {
+    from {left: -100%}
+    to {left: auto}
+}
+
+.rightSlideOutTransition
+{
+    transition-property: opacity;
+    transition-duration: 600ms;
+    transition-timing-function: ease;
+/*    transform: translate3d(-150%, 0, 0);*/
+    transform: translate3d(0, 0, 0);
+/*    transform: scale(0.95,0.95);*/
+    opacity: 0.3;
+}
+
+@-webkit-keyframes rightSlideOut {
+    from {left: auto}
+    to {left: 100%}
+}@keyframes rightSlideOut {
+    from {left: auto}
+    to {left: 100%}
+}
+
+.dissolveInTransitionStart
+{
+    opacity: 0;
+}
+
+.dissolveInTransition
+{
+/*    transition-property: opacity;
+    transition-duration: 2000ms;
+    transition-timing-function: ease;
+    transform: translate3d(0, 0, 0);*/
+    -webkit-animation: fadeIn 800ms;
+    animation: fadeIn 800ms;
+    opacity: 1;
+}
+
+@-webkit-keyframes fadeIn {
+    from {opacity: 0}
+    to {opacity: 1}
+}@keyframes fadeIn {
+    from {opacity: 0}
+    to {opacity: 1}
+}
+
+.dissolveOutTransition
+{
+    -webkit-animation: fadeOut 800ms;
+    animation: fadeOut 800ms;
+    opacity: 0;
+}
+
+@-webkit-keyframes fadeOut {
+    from {opacity: 1}
+    to {opacity: 0}
+}@keyframes fadeOut {
+    from {opacity: 1}
+    to {opacity: 0}
+}
+

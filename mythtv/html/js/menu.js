@@ -103,6 +103,7 @@ function hideMainMenu()
     if ($("#menu-bg").hasClass('menu-visible'))
     {
         $("#menu-bg").removeClass('menu-visible');
+        $("#menu-bg").addClass('menu-hidden');
         console.log("Hide Main Menu");
     }
 
@@ -118,6 +119,7 @@ function showMainMenu()
     // CSS Transition Animations - Fast, smooth
     if (!$("#menu-bg").hasClass('menu-visible'))
     {
+        $("#menu-bg").removeClass('menu-hidden');
         $("#menu-bg").addClass('menu-visible');
         console.log("Show Main Menu");
     }

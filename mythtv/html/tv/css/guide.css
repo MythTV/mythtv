@@ -75,7 +75,7 @@
        the scrollbar is displayed but the scrollbar isn't displayed for mobile
        browsers which causes it to be mis-aligned. Stuck on simple (non javascript)
        solution for this problem. */
-    margin-right: 15px;
+/*    margin-right: 15px;*/
 }
 
 .guideGrid .timeBarDate
@@ -125,8 +125,6 @@
     -ms-user-select: none;
     user-select: none;
     /* */
-    overflow-y: scroll;
-    height: 50px;
 }
 
 .guideGrid .channelRow

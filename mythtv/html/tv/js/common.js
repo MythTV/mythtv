@@ -461,9 +461,6 @@ function loadTVContent(url, targetDivID, transition, args)
         setErrorMessage("loadTVContent() target DIV doesn't exist: (" + targetDivID + ")");
         return;
     }
-    var newDiv = document.createElement('div');
-    newDiv.style = "left: 100%";
-    targetDiv.parentNode.insertBefore(newDiv, null);
 
     for (var key in args)
     {
@@ -486,12 +483,15 @@ function loadTVContent(url, targetDivID, transition, args)
         async: false
      }).responseText;
 
-    newDiv.innerHTML = html;
+    var newDiv = document.createElement('div');
+    newDiv.style = "left: 100%";
     newDiv.className = targetDiv.className;
+    newDiv.innerHTML = html;
+    targetDiv.parentNode.insertBefore(newDiv, null);
 
     // Need to assign the id to the new div
-    newDiv.id = targetDivID;
     targetDiv.id = "old" + targetDivID;
+    newDiv.id = targetDivID;
     switch (transition)
     {
         case 'left':
@@ -589,44 +589,78 @@ function postLoad()
     //loadJScroll();
 }
 
+// CSS (Native) transitions are faster than jQuery and preferred generally
 function leftSlideTransition(oldDivID, newDivID)
 {
     // Transition works much better with a fixed width, so temporarily set
     // the width based on the parent,
     $("#" + newDivID).css("width", $("#" + oldDivID).width());
+    // We want the new div to start off-screen to the right
     $("#" + newDivID).css("left", "100%");
-    $("#" + oldDivID).css("z-index", "-20");
-    $("#" + newDivID).css("z-index", "-10");
-    var oldLeft = $("#" + oldDivID).position().left;
-    $("#" + oldDivID).animate({opacity: "0.3"}, 800, function() {
-                   $("#" + oldDivID).remove(); postLoad(); });
-    $("#" + newDivID).animate({left: oldLeft}, 800, function() {
-                   $("#" + newDivID).css("width", '');
-                   $("#" + newDivID).css("z-index", "0"); });
+    $("#" + oldDivID).bind("transitionend", function() {
+        $("#" + oldDivID).remove();
+        postLoad();
+
+    });
+    $("#" + newDivID).bind("transitionend", function() {
+        $("#" + newDivID).removeClass("leftSlideInTransition");
+        $("#" + newDivID).css("left", 'auto');
+        $("#" + newDivID).css("width", null);
+    });
+    $("#" + newDivID).addClass("leftSlideInTransition");
+    $("#" + oldDivID).addClass("leftSlideOutTransition");
 }
 
+// CSS (Native) transitions are faster than jQuery and preferred generally
 function rightSlideTransition(oldDivID, newDivID)
 {
+    // HACK Transition works much better with a fixed width, so temporarily set
+    // the width based on the parent,
     $("#" + newDivID).css("width", $("#" + oldDivID).width());
-    $("#" + newDivID).css("left", "-100%");
-    $("#" + oldDivID).css("z-index", "-20");
-    $("#" + newDivID).css("z-index", "-10");
-    var oldLeft = $("#" + oldDivID).position().left;
-    $("#" + oldDivID).animate({opacity: "0.3"}, 800, function() {
-                   $("#" + oldDivID).remove(); postLoad(); });
-    $("#" + newDivID).animate({left: oldLeft}, 800, function() {
-                   $("#" + newDivID).css("width", '');
-                   $("#" + newDivID).css("z-index", "0"); });
+    // We want the new div to start off-screen to the left
+    //$("#" + newDivID).css("left", "-100%");
+    $("#" + newDivID).addClass("rightSlideInTransitionStart");
+    $("#" + oldDivID).bind("transitionend", function() {
+        $("#" + oldDivID).remove();
+        postLoad();
+
+    });
+    $("#" + newDivID).bind("transitionend", function() {
+        $("#" + newDivID).removeClass("rightSlideInTransitionStart");
+        $("#" + newDivID).removeClass("rightSlideInTransition");
+        //$("#" + newDivID).css("left", 'auto');
+        $("#" + newDivID).css("width", null);
+    });
+    $("#" + newDivID).addClass("rightSlideInTransition");
+    $("#" + oldDivID).addClass("rightSlideOutTransition");
 }
 
+// CSS (Native) transitions are faster than jQuery and preferred generally
 function dissolveTransition(oldDivID, newDivID)
 {
-    $("#" + newDivID).css("opacity", "0.0");
-    var oldLeft = $("#" + oldDivID).position().left;
-    $("#" + newDivID).css("left", oldLeft);
-    $("#" + oldDivID).animate({opacity: "0.0"}, 800, function() {
-                   $("#" + oldDivID).remove(); postLoad(); });
-    $("#" + newDivID).animate({opacity: "1.0"}, 800);
+    $("#" + newDivID).addClass("dissolveInTransitionStart");
+    $("#" + oldDivID).bind("animationend", function() {
+        $("#" + oldDivID).remove();
+        postLoad();
+    });
+    $("#" + newDivID).bind("animationend", function() {
+        $("#" + newDivID).removeClass("dissolveInTransitionStart");
+        $("#" + newDivID).removeClass("dissolveInTransition");
+    });
+
+    // Browser prefixes suck
+    $("#" + oldDivID).bind("webkitAnimationEnd", function() {
+        $("#" + oldDivID).remove();
+        postLoad();
+    });
+    $("#" + newDivID).bind("webkitAnimationEnd", function() {
+        $("#" + newDivID).removeClass("dissolveInTransitionStart");
+        $("#" + newDivID).removeClass("dissolveInTransition");
+    });
+    // End prefixed code
+
+    $("#" + newDivID).addClass("dissolveInTransition");
+    $("#" + oldDivID).addClass("dissolveOutTransition");
 }
 
 function handleKeyboardShortcutsTV(key) {
