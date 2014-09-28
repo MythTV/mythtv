@@ -205,6 +205,9 @@ QStringList GetSourceProtocolInfos()
         QString flags = DLNA::FlagsString(DLNA::ktm_s | DLNA::ktm_b | DLNA::kv1_5_flag);
         if (*it == "video/mpeg")
         {
+            protocolList << protocolStr.arg(*it).arg("DLNA.ORG_PN=MPEG_PS_PAL;" + flags);
+            protocolList << protocolStr.arg(*it).arg("DLNA.ORG_PN=MPEG_PS_NTSC;" + flags);
+            protocolList << protocolStr.arg(*it).arg("DLNA.ORG_PN=MPEG_PS_SD_DTS;" + flags);
             protocolList << protocolStr.arg(*it).arg("DLNA.ORG_PN=AVC_TS_NA_ISO;" + flags);
             protocolList << protocolStr.arg(*it).arg("DLNA.ORG_PN=MPEG_TS_HD_NA_ISO;" + flags);
             protocolList << protocolStr.arg(*it).arg("DLNA.ORG_PN=MPEG_TS_SD_NA_ISO;" + flags);
@@ -213,6 +216,7 @@ QStringList GetSourceProtocolInfos()
         }
         else if (*it == "audio/mpeg")
         {
+            protocolList << protocolStr.arg(*it).arg("DLNA.ORG_PN=MP3;" + flags); // Technically we don't actually serve these
             protocolList << protocolStr.arg(*it).arg("DLNA.ORG_PN=MP3X;" + flags);
         }
         else if (*it == "audio/mp4")
