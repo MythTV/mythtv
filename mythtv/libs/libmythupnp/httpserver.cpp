@@ -175,7 +175,7 @@ QString HttpServer::GetServerVersion(void)
 {
     QString mythVersion = MYTH_SOURCE_VERSION;
     mythVersion = mythVersion.right(mythVersion.length() - 1); // Trim off the leading 'v'
-    return QString("MythTV/%2 %1, UPnP/1.0").arg(HttpServer::GetPlatform())
+    return QString("MythTV/%2 %1 UPnP/1.0").arg(HttpServer::GetPlatform())
                                              .arg(mythVersion);
 }
 
