@@ -327,6 +327,15 @@ QString ProtocolInfoString(UPNPProtocol::TransferProtocol protocol,
     // If we have DLNA additional info and we have the mandatory PN param
     // then add it to the string. If the PN is missing then we must ignore the
     // rest
+    // 7.4.1.3.13.8 - "b) The pn-param (DLNA.ORG_PN) is the only required
+    //                    parameter for DLNA media format profiles."
+    //
+    // 7.4.1.3.17.1 -  4th_field = pn-param [op-param] [ps-param] [ci-param] [flags-param] [ *(other-param)]
+    //              - "b) This syntax prohibits the use of the "*" value for
+    //                    content that conforms to a DLNA media format profile.
+    //                    Content that does not conform to a DLNA media format
+    //                    profile can use the "*" value in the 4th field.
+
     if (!sAdditionalInfoList.isEmpty() &&
         sAdditionalInfoList.first().startsWith("DLNA.ORG_PN"))
         sAdditionalInfo = sAdditionalInfoList.join(";");

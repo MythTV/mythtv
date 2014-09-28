@@ -252,14 +252,39 @@ QString HTTPRequest::BuildHeader( long long nSize )
 
     sHeader += QString( "Content-Length: %3\r\n" ).arg( nSize );
 
-    // ----------------------------------------------------------------------
-    // Temp Hack to process DLNA header
-                             
-    QString sValue = GetHeaderValue( "getcontentfeatures.dlna.org", "0" );
+    // See DLNA  7.4.1.3.11.4.3 Tolerance to unavailable contentFeatures.dlna.org header
+    //
+    // It is better not to return this header, than to return it containing
+    // invalid or incomplete information. We are unable to currently determine
+    // this information at this stage, so do not return it. Only older devices
+    // look for it. Newer devices use the information provided in the UPnP
+    // response
 
-    if (sValue == "1")
-        sHeader += "contentFeatures.dlna.org: DLNA.ORG_OP=01;DLNA.ORG_CI=0;"
-                   "DLNA.ORG_FLAGS=01500000000000000000000000000000\r\n";
+//     QString sValue = GetHeaderValue( "getContentFeatures.dlna.org", "0" );
+//
+//     if (sValue == "1")
+//         sHeader += "contentFeatures.dlna.org: DLNA.ORG_OP=01;DLNA.ORG_CI=0;"
+//                    "DLNA.ORG_FLAGS=01500000000000000000000000000000\r\n";
+
+
+    // DLNA 7.5.4.3.2.33 MT transfer mode indication
+    QString sTransferMode = GetHeaderValue( "getTransferMode.dlna.org", "" );
+
+    if (sTransferMode.isEmpty())
+    {
+        if (m_sResponseTypeText.startsWith("video/") ||
+            m_sResponseTypeText.startsWith("audio/"))
+            sTransferMode = "Streaming";
+        else
+            sTransferMode = "Interactive";
+    }
+
+    if (sTransferMode == "Streaming")
+        sHeader += "transferMode.dlna.org: Streaming\r\n";
+    else if (sTransferMode == "Background")
+        sHeader += "transferMode.dlna.org: Background\r\n";
+    else if (sTransferMode == "Interactive")
+        sHeader += "transferMode.dlna.org: Interactive\r\n";
 
     // ----------------------------------------------------------------------
 
