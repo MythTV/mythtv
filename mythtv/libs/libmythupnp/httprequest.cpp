@@ -268,7 +268,7 @@ QString HTTPRequest::BuildHeader( long long nSize )
 
 
     // DLNA 7.5.4.3.2.33 MT transfer mode indication
-    QString sTransferMode = GetHeaderValue( "getTransferMode.dlna.org", "" );
+    QString sTransferMode = GetHeaderValue( "transferMode.dlna.org", "" );
 
     if (sTransferMode.isEmpty())
     {
