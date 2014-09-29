@@ -1936,7 +1936,7 @@
         <textarea name="nochanges" from="basetextarea">
             <area>0,110,800,70</area>
             <align>allcenter</align>
-            <value>You Haven't Scheduled Any Programs To Be Recorded</value>
+            <value>The recording schedule was not changed</value>
             <multiline>yes</multiline>
         </textarea>
 
