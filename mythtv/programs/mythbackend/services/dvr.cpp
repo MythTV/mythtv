@@ -565,6 +565,10 @@ DTC::ProgramList* Dvr::GetUpcomingList( int  nStartIndex,
     RecordingList::iterator it = tmpList.begin();
     for(; it < tmpList.end(); ++it)
     {
+        if (nRecordId > 0 &&
+            (*it)->GetRecordingRuleID() != static_cast<uint>(nRecordId))
+            continue;
+
         if ((nRecStatus != 0) &&
             ((*it)->GetRecordingStatus() != nRecStatus))
             continue;
