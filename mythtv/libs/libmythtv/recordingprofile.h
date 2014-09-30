@@ -161,6 +161,7 @@ class RecordingProfileEditor :
 
   public:
     RecordingProfileEditor(int id, QString profName);
+    virtual ~RecordingProfileEditor() {}
 
     virtual DialogCode exec(void);
     virtual DialogCode exec(bool /*saveOnExec*/, bool /*doLoad*/)
