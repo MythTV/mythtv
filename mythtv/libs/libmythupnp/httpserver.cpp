@@ -103,37 +103,7 @@ HttpServer::HttpServer(const QString &sApplicationPrefix) :
     pEngine->globalObject().setProperty("Rtti",
          pEngine->scriptValueFromQMetaObject< ScriptableRtti >() );
 
-#ifndef QT_NO_OPENSSL
-    m_sslConfig = QSslConfiguration::defaultConfiguration();
-
-    QString hostKeyPath = gCoreContext->GetSetting("hostSSLKey", "");
-    QFile hostKeyFile(hostKeyPath);
-    if (!hostKeyFile.exists() || !hostKeyFile.open(QIODevice::ReadOnly))
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("HttpServer: Host key file (%1) does not exist").arg(hostKeyPath));
-    } else {
-        QByteArray rawHostKey = hostKeyFile.readAll();
-        m_sslHostKey = QSslKey(rawHostKey, QSsl::Rsa, QSsl::Pem, QSsl::PrivateKey);
-        if (m_sslHostKey.isNull())
-        {
-            LOG(VB_GENERAL, LOG_ERR, QString("HttpServer: Unable to load host key file (%1)").arg(hostKeyPath));
-        } else {
-            QString hostCertPath = gCoreContext->GetSetting("hostSSLCertificate", "");
-            QList<QSslCertificate> certList = QSslCertificate::fromPath(hostCertPath);
-            if (!certList.isEmpty())
-                m_sslHostCert = certList.first();
-
-            if (!m_sslHostCert.isValid())
-                LOG(VB_GENERAL, LOG_ERR, QString("HttpServer: Unable to load host cert file (%1)").arg(hostCertPath));
-            
-            QString caCertPath = gCoreContext->GetSetting("caSSLCertificate", "");
-            m_sslCACertList = QSslCertificate::fromPath(caCertPath);
-
-            if (m_sslCACertList.isEmpty())
-                LOG(VB_GENERAL, LOG_ERR, QString("HttpServer: Unable to load CA cert file (%1)").arg(hostCertPath));
-        }
-    }
-#endif
+    LoadSSLConfig();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -155,6 +125,55 @@ HttpServer::~HttpServer()
 
     if (m_pHtmlServer != NULL)
         delete m_pHtmlServer;
+}
+
+void HttpServer::LoadSSLConfig()
+{
+    m_sslConfig = QSslConfiguration::defaultConfiguration();
+
+    QString hostKeyPath = gCoreContext->GetSetting("hostSSLKey", "");
+
+    if (hostKeyPath.isEmpty()) // No key, assume no SSL
+        return;
+
+    QFile hostKeyFile(hostKeyPath);
+    if (!hostKeyFile.exists() || !hostKeyFile.open(QIODevice::ReadOnly))
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("HttpServer: SSL Host key file (%1) does not exist or is not readable").arg(hostKeyPath));
+        return;
+    }
+
+    QByteArray rawHostKey = hostKeyFile.readAll();
+    QSslKey hostKey = QSslKey(rawHostKey, QSsl::Rsa, QSsl::Pem, QSsl::PrivateKey);
+    if (!hostKey.isNull())
+        m_sslConfig.setPrivateKey(hostKey);
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("HttpServer: Unable to load host key from file (%1)").arg(hostKeyPath));
+        return;
+    }
+
+    QString hostCertPath = gCoreContext->GetSetting("hostSSLCertificate", "");
+    QSslCertificate hostCert;
+    QList<QSslCertificate> certList = QSslCertificate::fromPath(hostCertPath);
+    if (!certList.isEmpty())
+        hostCert = certList.first();
+
+    if (hostCert.isValid())
+        m_sslConfig.setLocalCertificate(hostCert);
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("HttpServer: Unable to load host cert from file (%1)").arg(hostCertPath));
+        return;
+    }
+
+    QString caCertPath = gCoreContext->GetSetting("caSSLCertificate", "");
+    QList< QSslCertificate > CACertList = QSslCertificate::fromPath(caCertPath);
+
+    if (!CACertList.isEmpty())
+        m_sslConfig.setCaCertificates(CACertList);
+    else if (!caCertPath.isEmpty()) // Only warn if a path was actually configured, this isn't an error otherwise
+        LOG(VB_GENERAL, LOG_ERR, QString("HttpServer: Unable to load CA cert file (%1)").arg(caCertPath));
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -201,7 +220,7 @@ void HttpServer::newTcpConnection(qt_socket_fd_t socket)
 
     m_threadPool.startReserved(
         new HttpWorker(*this, socket, type,
-                       m_sslConfig, m_sslHostKey, m_sslHostCert, m_sslCACertList),
+                       m_sslConfig),
         QString("HttpServer%1").arg(socket));
 }
 
@@ -331,12 +350,10 @@ uint HttpServer::GetSocketTimeout(HTTPRequest* pRequest) const
 /////////////////////////////////////////////////////////////////////////////
 
 HttpWorker::HttpWorker(HttpServer &httpServer, qt_socket_fd_t sock,
-                       PoolServerType type, QSslConfiguration sslConfig,
-                       QSslKey hostKey, QSslCertificate hostCert,
-                       QList<QSslCertificate> caCerts) :
-    m_httpServer(httpServer), m_socket(sock), m_socketTimeout(5 * 1000),
-    m_connectionType(type), m_sslConfig(sslConfig), m_sslHostKey(hostKey),
-    m_sslHostCert(hostCert), m_sslCACerts(caCerts)
+                       PoolServerType type, QSslConfiguration sslConfig)
+           : m_httpServer(httpServer), m_socket(sock),
+             m_socketTimeout(5 * 1000), m_connectionType(type),
+             m_sslConfig(sslConfig)
 {
     LOG(VB_UPNP, LOG_DEBUG, QString("HttpWorker(%1): New connection")
                                         .arg(m_socket));
@@ -366,9 +383,9 @@ void HttpWorker::run(void)
         if (pSslSocket->setSocketDescriptor(m_socket))
         {
             pSslSocket->setSslConfiguration(m_sslConfig);
-            pSslSocket->setPrivateKey(m_sslHostKey);
-            pSslSocket->setLocalCertificate(m_sslHostCert);
-            pSslSocket->addCaCertificates(m_sslCACerts);
+            pSslSocket->setPrivateKey(m_sslConfig.privateKey());
+            pSslSocket->setLocalCertificate(m_sslConfig.localCertificate());
+            pSslSocket->addCaCertificates(m_sslConfig.caCertificates());
             pSslSocket->startServerEncryption();
             if (pSslSocket->waitForEncrypted(5000))
             {

@@ -29,12 +29,10 @@
 #include <QMutex>
 #include <QList>
 
-#ifndef QT_NO_OPENSSL
 #include <QSslConfiguration>
 #include <QSslError>
 #include <QSslSocket>
 #include <QSslKey>
-#endif
 
 // MythTV headers
 #include "mythqtcompat.h"
@@ -113,9 +111,6 @@ class UPNP_PUBLIC HttpServer : public ServerPool
     static QString          s_platform;
 
     QSslConfiguration       m_sslConfig;
-    QSslKey                 m_sslHostKey;
-    QSslCertificate         m_sslHostCert;
-    QList<QSslCertificate>  m_sslCACertList;
 
   public:
     HttpServer(const QString &sApplicationPrefix = QString(""));
@@ -130,6 +125,9 @@ class UPNP_PUBLIC HttpServer : public ServerPool
     uint GetSocketTimeout(HTTPRequest*) const;
 
     QScriptEngine *ScriptEngine(void);
+
+  private:
+     void LoadSSLConfig();
 
   protected slots:
     virtual void newTcpConnection(qt_socket_fd_t socket); // QTcpServer
@@ -173,8 +171,7 @@ class HttpWorker : public QRunnable
      * \param sslConfig  The SSL configuration (for SSL sockets)
      */
     HttpWorker(HttpServer &httpServer, qt_socket_fd_t sock, PoolServerType type,
-               QSslConfiguration sslConfig, QSslKey hostKey,
-               QSslCertificate hostCert, QList<QSslCertificate> caCert);
+               QSslConfiguration sslConfig);
 
     virtual void run(void);
 
@@ -185,9 +182,6 @@ class HttpWorker : public QRunnable
     PoolServerType m_connectionType;
 
     QSslConfiguration       m_sslConfig;
-    QSslKey                 m_sslHostKey;
-    QSslCertificate         m_sslHostCert;
-    QList<QSslCertificate>  m_sslCACerts;
 };
 
 
