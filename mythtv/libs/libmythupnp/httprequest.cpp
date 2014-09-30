@@ -178,7 +178,9 @@ HTTPRequest::HTTPRequest() : m_procReqLineExp ( "[ \r\n][ \r\n]*"  ),
                              m_bSOAPRequest   ( false ),
                              m_eResponseType  ( ResponseTypeUnknown),
                              m_nResponseStatus( 200 ),
-                             m_pPostProcess   ( NULL )
+                             m_pPostProcess   ( NULL ),
+                             m_bKeepAlive     ( true ),
+                             m_nKeepAliveTimeout ( 0 )
 {
     m_response.open( QIODevice::ReadWrite );
 }
@@ -211,7 +213,7 @@ RequestType HTTPRequest::SetRequestType( const QString &sType )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QString HTTPRequest::BuildHeader( long long nSize )
+QString HTTPRequest::BuildResponseHeader( long long nSize )
 {
     QString sHeader;
     QString sContentType = (m_eResponseType == ResponseTypeOther) ?
@@ -227,11 +229,12 @@ QString HTTPRequest::BuildHeader( long long nSize )
         .arg(HttpServer::GetServerVersion());
 
     sHeader += QString( "Connection: %1\r\n" )
-                        .arg( GetKeepAlive() ? "Keep-Alive" : "Close" );
-    if (GetKeepAlive())
+                        .arg( m_bKeepAlive ? "Keep-Alive" : "Close" );
+    if (m_bKeepAlive)
     {
-        int timeout = UPnp::GetConfiguration()->GetValue("HTTP/KeepAliveTimeoutSecs", 10);
-        sHeader += QString( "Keep-Alive: timeout=%1\r\n" ).arg(timeout);
+        if (m_nKeepAliveTimeout == 0) // Value wasn't passed in by the server, so go with the configured value
+            m_nKeepAliveTimeout = gCoreContext->GetNumSetting("HTTP/KeepAliveTimeoutSecs", 10);
+        sHeader += QString( "Keep-Alive: timeout=%1\r\n" ).arg(m_nKeepAliveTimeout);
     }
 
     sHeader += GetAdditionalHeaders();
@@ -481,7 +484,7 @@ qint64 HTTPRequest::SendResponse( void )
 
     nContentLen = pBuffer->buffer().length();
 
-    QString    rHeader = BuildHeader( nContentLen );
+    QString    rHeader = BuildResponseHeader( nContentLen );
 
     QByteArray sHeader = rHeader.toUtf8();
     nBytes  = WriteBlock( sHeader.constData(), sHeader.length() );
@@ -633,7 +636,7 @@ qint64 HTTPRequest::SendResponseFile( QString sFileName )
     // Write out Header.
     // ----------------------------------------------------------------------
 
-    QString    rHeader = BuildHeader( llSize );
+    QString    rHeader = BuildResponseHeader( llSize );
     QByteArray sHeader = rHeader.toUtf8();
     nBytes = WriteBlock( sHeader.constData(), sHeader.length() );
 
@@ -1195,17 +1198,21 @@ QString HTTPRequest::GetAdditionalHeaders( void )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool HTTPRequest::GetKeepAlive()
+bool HTTPRequest::ParseKeepAlive()
 {
+    // TODO: Think about whether we should use a longer timeout if the client
+    //       has explicitly specified 'Keep-alive'
+
+    // HTTP 1.1 ... server may assume keep-alive
     bool bKeepAlive = true;
 
     // if HTTP/1.0... must default to false
-
     if ((m_nMajor == 1) && (m_nMinor == 0))
         bKeepAlive = false;
 
-    // Read Connection Header...
-
+    // Read Connection Header to see whether the client has explicitly
+    // asked for the connection to be kept alive or closed after the response
+    // is sent
     QString sConnection = GetHeaderValue( "connection", "default" ).toLower();
 
     QStringList sValueList = sConnection.split(",");
@@ -1288,6 +1295,9 @@ bool HTTPRequest::ParseRequest()
                                                 .arg(it.key()).arg(*it));
             }
         }
+
+        // Parse out keep alive
+        m_bKeepAlive = ParseKeepAlive();
 
         // Make sure there are a few default values
         if (!m_mapHeaders.contains("content-length"))

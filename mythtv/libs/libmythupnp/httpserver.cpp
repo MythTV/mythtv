@@ -306,6 +306,22 @@ void HttpServer::DelegateRequest(HTTPRequest *pRequest)
     }
 }
 
+uint HttpServer::GetSocketTimeout(HTTPRequest* pRequest) const
+{
+    int timeout = -1;
+
+    m_rwlock.lockForRead();
+    QList< HttpServerExtension* > list = m_basePaths.values( pRequest->m_sBaseUrl );
+    if (!list.isEmpty())
+        timeout = list.first()->GetSocketTimeout();
+    m_rwlock.unlock();
+
+    if (timeout < 0)
+        timeout = gCoreContext->GetNumSetting("HTTP/KeepAliveTimeoutSecs", 10);
+
+    return timeout;
+}
+
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -318,14 +334,12 @@ HttpWorker::HttpWorker(HttpServer &httpServer, qt_socket_fd_t sock,
                        PoolServerType type, QSslConfiguration sslConfig,
                        QSslKey hostKey, QSslCertificate hostCert,
                        QList<QSslCertificate> caCerts) :
-    m_httpServer(httpServer), m_socket(sock), m_socketTimeout(10000),
+    m_httpServer(httpServer), m_socket(sock), m_socketTimeout(5 * 1000),
     m_connectionType(type), m_sslConfig(sslConfig), m_sslHostKey(hostKey),
     m_sslHostCert(hostCert), m_sslCACerts(caCerts)
 {
     LOG(VB_UPNP, LOG_DEBUG, QString("HttpWorker(%1): New connection")
                                         .arg(m_socket));
-    m_socketTimeout = 1000 *
-        UPnp::GetConfiguration()->GetValue("HTTP/KeepAliveTimeoutSecs", 10);
 }                  
 
 /////////////////////////////////////////////////////////////////////////////
@@ -397,7 +411,8 @@ void HttpWorker::run(void)
         {
             // We set a timeout on keep-alive connections to avoid blocking
             // new clients from connecting - Default at time of writing was
-            // 10 seconds
+            // 5 seconds for initial connection, then up to 10 seconds of idle
+            // time between each subsequent request on the same connection
             bTimeout = !(pSocket->waitForReadyRead(m_socketTimeout));
 
             if (bTimeout) // Either client closed the socket or we timed out waiting for new data
@@ -419,6 +434,11 @@ void HttpWorker::run(void)
                     if ( pRequest->ParseRequest() )
                     {
                         bKeepAlive = pRequest->GetKeepAlive();
+                        // The timeout is defined by the Server/Server Extension
+                        // but must appear in the response headers
+                        uint nTimeout = m_httpServer.GetSocketTimeout(pRequest); // Seconds
+                        pRequest->SetKeepAliveTimeout(nTimeout);
+                        m_socketTimeout = nTimeout * 1000; // Milliseconds
 
                         // ------------------------------------------------------
                         // Request Parsed... Pass on to Main HttpServer class to 

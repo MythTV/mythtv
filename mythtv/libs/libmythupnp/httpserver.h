@@ -69,17 +69,20 @@ class UPNP_PUBLIC HttpServerExtension : public QObject
 
         QString     m_sName;
         QString     m_sSharePath;
+        int         m_nSocketTimeout; // Extension may wish to adjust the default e.g. UPnP
         
     public:
 
         HttpServerExtension( const QString &sName, const  QString &sSharePath )
-           :m_sName( sName ), m_sSharePath( sSharePath ) {};
+           : m_sName( sName ), m_sSharePath( sSharePath ), m_nSocketTimeout(-1) {};
 
         virtual ~HttpServerExtension() {};
 
         virtual bool ProcessRequest(HTTPRequest *pRequest) = 0;
 
         virtual QStringList GetBasePaths() = 0;
+
+        virtual int GetSocketTimeout() const { return m_nSocketTimeout; }// -1 = Use config value
 };
 
 typedef QList<QPointer<HttpServerExtension> > HttpServerExtensionList;
@@ -121,6 +124,10 @@ class UPNP_PUBLIC HttpServer : public ServerPool
     void RegisterExtension(HttpServerExtension*);
     void UnregisterExtension(HttpServerExtension*);
     void DelegateRequest(HTTPRequest*);
+    /**
+     * \brief Get the idle socket timeout value for the relevant extension
+     */
+    uint GetSocketTimeout(HTTPRequest*) const;
 
     QScriptEngine *ScriptEngine(void);
 
@@ -158,6 +165,13 @@ class HttpWorker : public QRunnable
 {
   public:
 
+    /**
+     * \param httpServer The parent server of this request
+     * \param sock       The socket
+     * \param socketTimeout The time in seconds to wait after the connection goes idle before closing the socket
+     * \param type       The type of connection - Plain TCP, SSL or other?
+     * \param sslConfig  The SSL configuration (for SSL sockets)
+     */
     HttpWorker(HttpServer &httpServer, qt_socket_fd_t sock, PoolServerType type,
                QSslConfiguration sslConfig, QSslKey hostKey,
                QSslCertificate hostCert, QList<QSslCertificate> caCert);

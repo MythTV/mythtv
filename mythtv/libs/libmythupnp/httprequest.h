@@ -141,6 +141,11 @@ class UPNP_PUBLIC HTTPRequest
 
         IPostProcess       *m_pPostProcess;
 
+    private:
+
+        bool                m_bKeepAlive;
+        uint                m_nKeepAliveTimeout;
+
     protected:
 
         RequestType     SetRequestType      ( const QString &sType  );
@@ -162,7 +167,9 @@ class UPNP_PUBLIC HTTPRequest
                                               long long *pllStart, 
                                               long long *pllEnd   );
 
-        QString         BuildHeader         ( long long nSize );
+        bool            ParseKeepAlive      ( void );
+
+        QString         BuildResponseHeader ( long long nSize );
 
         qint64          SendData            ( QIODevice *pDevice, qint64 llStart, qint64 llBytes );
         qint64          SendFile            ( QFile &file, qint64 llStart, qint64 llBytes );
@@ -191,7 +198,7 @@ class UPNP_PUBLIC HTTPRequest
 
         QString         GetHeaderValue  ( const QString &sKey, QString sDefault );
 
-        bool            GetKeepAlive    ();
+        bool            GetKeepAlive () { return m_bKeepAlive; }
 
         Serializer *    GetSerializer   ();
 
@@ -205,6 +212,8 @@ class UPNP_PUBLIC HTTPRequest
         static QString  Encode          ( const QString &sIn );
         static QString  Decode          ( const QString &sIn );
         static QString  GetETagHash     ( const QByteArray &data );
+
+        void            SetKeepAliveTimeout ( int nTimeout ) { m_nKeepAliveTimeout = nTimeout; }
 
         // ------------------------------------------------------------------
 
