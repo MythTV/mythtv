@@ -424,7 +424,7 @@ void HttpWorker::run(void)
     {
         while (m_httpServer.IsRunning() && bKeepAlive && pSocket &&
                pSocket->isValid() &&
-               pSocket->state() != QAbstractSocket::ClosingState)
+               pSocket->state() == QAbstractSocket::ConnectedState)
         {
             // We set a timeout on keep-alive connections to avoid blocking
             // new clients from connecting - Default at time of writing was
