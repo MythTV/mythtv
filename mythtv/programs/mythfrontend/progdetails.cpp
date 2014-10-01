@@ -377,14 +377,21 @@ void ProgDetails::loadPage(void)
     }
     addItem("CATEGORY_TYPE", tr("Type", "category_type"), s);
 
-    QString episode;
-    if (m_progInfo.GetEpisodeTotal() > 0)
-        episode = tr("%1 of %2").arg(m_progInfo.GetEpisode()).arg(m_progInfo.GetEpisodeTotal());
-    else
-        episode = QString::number(m_progInfo.GetEpisode());
+    s.clear();
+    if (m_progInfo.GetEpisode() > 0)
+    {
+        if (m_progInfo.GetEpisodeTotal() > 0)
+            s = tr("%1 of %2").arg(m_progInfo.GetEpisode()).arg(m_progInfo.GetEpisodeTotal());
+        else
+            s = QString::number(m_progInfo.GetEpisode());
 
-    addItem("EPISODE", tr("Episode"), episode);
-    addItem("SEASON", tr("Season"), QString::number(m_progInfo.GetSeason()));
+    }
+    addItem("EPISODE", tr("Episode"), s);
+
+    s.clear();
+    if (m_progInfo.GetSeason() > 0)
+        s = QString::number(m_progInfo.GetSeason());
+    addItem("SEASON", tr("Season"), s);
 
     addItem("SYNDICATEDEPISODENUMBER", tr("Syndicated Episode Number"), syndicatedEpisodeNum);
 
