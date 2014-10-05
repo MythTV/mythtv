@@ -1089,7 +1089,8 @@ void MusicPlayer::restorePosition(void)
     {
         for (int x = 0; x < getCurrentPlaylist()->getTrackCount(); x++)
         {
-            if (getCurrentPlaylist()->getSongAt(x)->ID() == id)
+            if (getCurrentPlaylist()->getSongAt(x) &&
+                getCurrentPlaylist()->getSongAt(x)->ID() == id)
             {
                 m_currentTrack = x;
                 break;
