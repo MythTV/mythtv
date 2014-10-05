@@ -457,8 +457,40 @@ vector<VideoInfo *> *VideoSelector::getVideoListFromDB(void)
             info->plot = query.value(2).toString();
             info->size = 0; //query.value(3).toInt();
             QString host = query.value(11).toString();
-            info->filename = host.isEmpty() ? filename
-                : generate_file_url("Videos", host, filename);
+
+            // try to find the file locally
+            if (host.isEmpty())
+            {
+                // must already be a local filename?
+                info->filename = filename;
+            }
+            else
+            {
+                // if the file is on this host then we should be able to find it locally
+                if (host == gCoreContext->GetHostName())
+                {
+                    StorageGroup videoGroup("Videos", gCoreContext->GetHostName(), false);
+                    info->filename = videoGroup.FindFile(filename);
+
+                    // sanity check the file exists
+                    if (!QFile::exists(info->filename))
+                    {
+                        LOG(VB_GENERAL, LOG_ERR,
+                            QString("VideoSelector: Failed to find local file '%1'").arg(info->filename));
+                        info->filename.clear();
+                    }
+                }
+
+                if (info->filename.isEmpty())
+                {
+                    // file must not be local or doesn't exist
+                    info->filename = generate_file_url("Videos", host, filename);
+                }
+            }
+
+            LOG(VB_FILE, LOG_INFO,
+                QString("VideoSelector: found file '%1'").arg(info->filename));
+
             info->coverfile = query.value(5).toString();
             info->category = categoryMap[query.value(6).toInt()];
             info->parentalLevel = query.value(7).toInt();
@@ -466,11 +498,12 @@ vector<VideoInfo *> *VideoSelector::getVideoListFromDB(void)
                 info->category = "(None)";
             videoList->push_back(info);
         }
+
         return videoList;
     }
-    
-    
-    LOG(VB_GENERAL, LOG_ERR, "VideoSelector: Failed to get any video's");
+
+    LOG(VB_GENERAL, LOG_ERR, "VideoSelector: Failed to get any videos");
+
     return NULL;
 }
 
