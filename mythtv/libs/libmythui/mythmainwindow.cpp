@@ -537,14 +537,16 @@ MythMainWindow::MythMainWindow(const bool useDB)
 
     d->idleTime = gCoreContext->GetNumSetting("FrontendIdleTimeout",
                                               STANDBY_TIMEOUT);
-    if (d->idleTime <= 0)
-        d->idleTime = STANDBY_TIMEOUT;
+
+    if (d->idleTime < 0)
+        d->idleTime = 0;
 
     d->idleTimer = new QTimer(this);
     d->idleTimer->setSingleShot(false);
     d->idleTimer->setInterval(1000 * 60 * d->idleTime);
     connect(d->idleTimer, SIGNAL(timeout()), SLOT(IdleTimeout()));
-    d->idleTimer->start();
+    if (d->idleTime > 0)
+        d->idleTimer->start();
 }
 
 MythMainWindow::~MythMainWindow()
@@ -2518,20 +2520,25 @@ void MythMainWindow::customEvent(QEvent *ce)
             d->idleTime = gCoreContext->GetNumSetting("FrontendIdleTimeout",
                                                       STANDBY_TIMEOUT);
 
-            if (d->idleTime <= 0)
-                d->idleTime = STANDBY_TIMEOUT;
+            if (d->idleTime < 0)
+                d->idleTime = 0;
 
             bool isActive = d->idleTimer->isActive();
 
             if (isActive)
                 d->idleTimer->stop();
 
-            d->idleTimer->setInterval(1000 * 60 * d->idleTime);
+            if (d->idleTime > 0)
+            {
+                d->idleTimer->setInterval(1000 * 60 * d->idleTime);
 
-            if (isActive)
-                d->idleTimer->start();
+                //if (isActive)
+                    d->idleTimer->start();
 
-            LOG(VB_GENERAL, LOG_INFO, QString("Updating the frontend idle time to: %1 mins").arg(d->idleTime));
+                LOG(VB_GENERAL, LOG_INFO, QString("Updating the frontend idle time to: %1 mins").arg(d->idleTime));
+            }
+            else
+                LOG(VB_GENERAL, LOG_INFO, "Frontend idle timeout is disabled");
         }
         else if (message == "NOTIFICATION")
         {
