@@ -1173,7 +1173,9 @@ bool MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
         av_frame_unref(picture);
     }
 
-    pkt->data = (uint8_t *)av_malloc(outbuf_size);
+    //pkt->data = (uint8_t *)av_malloc(outbuf_size);
+    if (pkt->size < outbuf_size)
+        av_grow_packet(pkt, (outbuf_size - pkt->size));
 
     picture->data[0] = info->display_fbuf->buf[0];
     picture->data[1] = info->display_fbuf->buf[1];
@@ -1265,7 +1267,7 @@ bool MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
     // call will return no packet, then the second one will flush it.  In case
     // it becomes more pipelined, just loop until it creates a packet or errors
     // out.
-    while (!got_packet)
+    while (got_packet <= 0)
     {
         ret = avcodec_encode_video2(c, pkt, picture, &got_packet);
 
@@ -1287,11 +1289,16 @@ bool MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
     }
     int delta = FindMPEG2Header(pkt->data, pkt->size, 0x00);
     //  out_size=avcodec_encode_video(c, outbuf, outbuf_size, picture);
-    pkt->size -= delta; // a hack to get to the picture frame
+    // HACK: a hack to get to the picture frame
+    //pkt->size -= delta; // a hack to get to the picture frame
+    int newSize = pkt->size - delta;
     pkt->pts = savedPts; // restore the original pts
-    memmove(pkt->data, pkt->data + delta, pkt->size);
+    memmove(pkt->data, pkt->data + delta, newSize);
+    av_shrink_packet(pkt, newSize); // Shrink packet to it's new size
+    // End HACK
+
     SetRepeat(pkt->data, pkt->size, info->display_picture->nb_fields,
-               !!(info->display_picture->flags & PIC_FLAG_TOP_FIELD_FIRST));
+              !!(info->display_picture->flags & PIC_FLAG_TOP_FIELD_FIRST));
 
     avcodec_close(c);
     av_freep(&c);
@@ -1781,27 +1788,26 @@ int MPEG2fixup::ConvertToI(FrameList *orderedFrames, int headPos)
         if (GetFrameTypeT(spare) == 'I')
             continue;
         
-        pkt = spare->pkt;
+        //pkt = spare->pkt;
+        av_copy_packet(&pkt, &(spare->pkt));
         //pkt.data is a newly malloced area
 
-        {
-            QString fname;
+        QString fname;
 
 #ifdef SPEW_FILES
-            if (VERBOSE_LEVEL_CHECK(VB_PROCESS, LOG_ANY))
-                fname = QString("cnv%1").arg(ins_count++);
+        if (VERBOSE_LEVEL_CHECK(VB_PROCESS, LOG_ANY))
+            fname = QString("cnv%1").arg(ins_count++);
 #endif
 
-            if (BuildFrame(&pkt, fname))
-                return 1;
+        if (BuildFrame(&pkt, fname))
+            return 1;
 
-            LOG(VB_GENERAL, LOG_INFO,
-                QString("Converting frame #%1 from %2 to I %3")
-                    .arg(i).arg(GetFrameTypeT(spare)).arg(fname));
-        }
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("Converting frame #%1 from %2 to I %3")
+                .arg(i).arg(GetFrameTypeT(spare)).arg(fname));
 
         spare->set_pkt(&pkt);
-        av_free(pkt.data);
+        av_free_packet(&pkt);
         SetFrameNum(spare->pkt.data, GetFrameNum(spare));
         ProcessVideo(spare, header_decoder); //process this new frame
     }
@@ -1870,8 +1876,7 @@ int MPEG2fixup::InsertFrame(int frameNum, int64_t deltaPTS,
         deltaPTS -= ptsIncrement;
     }
 
-    av_free(pkt.data);
-
+    av_free_packet(&pkt);
     // update frame # for all later frames in this group
     index++;
     RenumberFrames(index, increment);
