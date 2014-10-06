@@ -736,7 +736,7 @@ QString MusicMetadata::Filename(bool find) const
 
     // maybe it's in our 'Music' storage group
     //FIXME: this is just looking on the master BE
-    QString filename = gCoreContext->GenMythURL(gCoreContext->GetSetting("MasterServerIP"),
+    QString filename = gCoreContext->GenMythURL(gCoreContext->GetMasterHostName(),
                                                 gCoreContext->GetNumSetting("MasterServerPort"),
                                                 m_filename, "Music");
     if (RemoteFile::Exists(filename))

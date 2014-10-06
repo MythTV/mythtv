@@ -829,8 +829,7 @@ bool FileServerHandler::HandleGetFileList(SocketHandler *socket,
                 "path = %3 wanthost = %4")
             .arg(groupname).arg(host).arg(path).arg(wantHost));
 
-    if ((host.toLower() == wantHost.toLower()) ||
-        gCoreContext->IsThisHost(wantHost))
+    if (gCoreContext->IsThisHost(wantHost))
     {
         StorageGroup sg(groupname, host);
         LOG(VB_FILE, LOG_INFO, "Getting local info");
@@ -896,8 +895,7 @@ bool FileServerHandler::HandleFileQuery(SocketHandler *socket,
     LOG(VB_FILE, LOG_DEBUG, QString("HandleSGFileQuery: myth://%1@%2/%3")
                              .arg(groupname).arg(wantHost).arg(filename));
 
-    if ((wantHost.toLower() == gCoreContext->GetHostName().toLower()) ||
-        gCoreContext->IsThisHost(wantHost))
+    if (gCoreContext->IsThisHost(wantHost))
     {
         // handle request locally
         LOG(VB_FILE, LOG_DEBUG, QString("Getting local info"));

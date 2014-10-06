@@ -32,6 +32,7 @@ using namespace std;
 #include "mythdate.h"
 #include "mythmiscutil.h"
 #include "threadedfilewriter.h"
+#include "storagegroup.h"
 
 #define MAX_FILE_CHECK 500  // in ms
 
@@ -80,7 +81,7 @@ RemoteFile::~RemoteFile()
 
 bool RemoteFile::isLocal(const QString &path)
 {
-    bool is_local =
+    bool is_local = !path.isEmpty() &&
         !path.startsWith("/dev") && !path.startsWith("myth:") &&
         (path.startsWith("/") || QFile::exists(path));
     return is_local;
@@ -413,36 +414,59 @@ bool RemoteFile::DeleteFile(const QString &url)
 
 bool RemoteFile::Exists(const QString &url)
 {
+    if (url.isEmpty())
+        return false;
+
     struct stat fileinfo;
     return Exists(url, &fileinfo);
 }
 
 bool RemoteFile::Exists(const QString &url, struct stat *fileinfo)
 {
-    if (isLocal(url))
-    {
-       LOG(VB_FILE, LOG_INFO,
-           QString("RemoteFile::Exists(): looking for local file: %1").arg(url));
-
-        QFileInfo info(url);
-        if (info.exists())
-        {
-            if (stat(url.toLocal8Bit().constData(), fileinfo) == -1)
-            {
-                LOG(VB_FILE, LOG_ERR,
-                    QString("RemoteFile::Exists(): failed to stat file: %1").arg(url) + ENO);
-            }
-        }
-
-        return info.exists() && info.isFile();
-    }
-
-    LOG(VB_FILE, LOG_INFO,
-        QString("RemoteFile::Exists(): looking for remote file: %1").arg(url));
+    if (url.isEmpty())
+        return false;
 
     QUrl qurl(url);
     QString filename = qurl.path();
     QString sgroup   = qurl.userName();
+    QString host     = qurl.host();
+
+    if (isLocal(url) || gCoreContext->IsThisBackend(host))
+    {
+       LOG(VB_FILE, LOG_INFO,
+           QString("RemoteFile::Exists(): looking for local file: %1").arg(url));
+
+        bool fileExists = false;
+        QString fullFilePath = "";
+
+        if (url.startsWith("myth:"))
+        {
+            StorageGroup sGroup(sgroup, host);
+            fullFilePath = sGroup.FindFile(filename);
+            if (!fullFilePath.isEmpty())
+                fileExists = true;
+        }
+        else
+        {
+            QFileInfo info(url);
+            fileExists = info.exists() && info.isFile();
+            fullFilePath = url;
+        }
+
+        if (fileExists)
+        {
+            if (stat(fullFilePath.toLocal8Bit().constData(), fileinfo) == -1)
+            {
+                LOG(VB_FILE, LOG_ERR,
+                    QString("RemoteFile::Exists(): failed to stat file: %1").arg(fullFilePath) + ENO);
+            }
+        }
+
+        return fileExists;
+    }
+
+    LOG(VB_FILE, LOG_INFO,
+        QString("RemoteFile::Exists(): looking for remote file: %1").arg(url));
 
     if (!qurl.fragment().isEmpty() || url.endsWith("#"))
         filename = filename + "#" + qurl.fragment();

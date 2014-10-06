@@ -212,8 +212,7 @@ void MetadataImageDownload::run()
                 bool onMaster = false;
                 QString resolvedFN;
                 if (gCoreContext->IsMasterBackend() &&
-                    ((lookup->GetHost().toLower() == gCoreContext->GetHostName().toLower()) ||
-                     gCoreContext->IsThisHost(lookup->GetHost())))
+                    gCoreContext->IsThisHost(lookup->GetHost()))
                 {
                     StorageGroup sg(getStorageGroupName(type), lookup->GetHost());
                     resolvedFN = sg.FindFile(filename);
@@ -462,10 +461,9 @@ QString getLocalWritePath(MetadataType metadatatype, VideoArtworkType type)
 QString getStorageGroupURL(VideoArtworkType type, QString host)
 {
     QString sgroup = getStorageGroupName(type);
-    QString ip = gCoreContext->GetBackendServerIP(host);
     uint port = gCoreContext->GetBackendServerPort(host);
 
-    return gCoreContext->GenMythURL(ip,port,"",sgroup);
+    return gCoreContext->GenMythURL(host, port, "", sgroup);
 }
 
 QString getLocalStorageGroupPath(VideoArtworkType type, QString host)

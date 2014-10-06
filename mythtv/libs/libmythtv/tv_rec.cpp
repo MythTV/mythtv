@@ -2615,7 +2615,7 @@ void TVRec::SpawnLiveTV(LiveTVChain *newchain, bool pip, QString startchan)
     tvchain->ReloadAll();
 
     QString hostprefix = gCoreContext->GenMythURL(
-                    gCoreContext->GetBackendServerIP(),
+                    gCoreContext->GetHostName(),
                     gCoreContext->GetBackendServerPort());
 
     tvchain->SetHostPrefix(hostprefix);

@@ -630,6 +630,11 @@ bool MythCoreContext::BackendIsRunning(void)
     return (res == GENERIC_EXIT_OK);
 }
 
+bool MythCoreContext::IsThisBackend(const QString &addr)
+{
+    return IsBackend() && IsThisHost(addr);
+}
+
 bool MythCoreContext::IsThisHost(const QString &addr)
 {
     return IsThisHost(addr, GetHostName());
@@ -637,14 +642,22 @@ bool MythCoreContext::IsThisHost(const QString &addr)
 
 bool MythCoreContext::IsThisHost(const QString &addr, const QString &host)
 {
+    if (addr.toLower() == host.toLower())
+        return true;
+
     QHostAddress addrfix(addr);
     addrfix.setScopeId(QString());
     QString addrstr = addrfix.toString();
+
+    if (addrfix.isNull())
+    {
+        addrstr = resolveAddress(addr);
+    }
+
     QString thisip  = GetBackendServerIP4(host);
     QString thisip6 = GetBackendServerIP6(host);
 
-    return (addrfix.protocol() == QAbstractSocket::IPv4Protocol && thisip == addrstr) ||
-           (addrfix.protocol() == QAbstractSocket::IPv6Protocol && thisip6 == addrstr);
+    return !addrstr.isEmpty() && ((addrstr == thisip) || (addrstr == thisip6));
 }
 
 bool MythCoreContext::IsFrontendOnly(void)
@@ -679,6 +692,13 @@ QString MythCoreContext::GenMythURL(QString host, int port, QString path, QStrin
     QString m_port;
 
     QHostAddress addr(host);
+    if (!addr.isNull())
+    {
+        LOG(VB_GENERAL, LOG_CRIT, QString("MythCoreContext::GenMythURL(%1/%2): Given "
+                                          "IP address instead of hostname "
+                                          "(ID). This is invalid.").arg(host).arg(path));
+    }
+
 
     if (!storageGroup.isEmpty())
         m_storageGroup = storageGroup + "@";
@@ -687,7 +707,7 @@ QString MythCoreContext::GenMythURL(QString host, int port, QString path, QStrin
 
 #if !defined(QT_NO_IPV6)
     // Basically if it appears to be an IPv6 IP surround the IP with [] otherwise don't bother
-    if (addr.protocol() == QAbstractSocket::IPv6Protocol)
+    if (!addr.isNull() && addr.protocol() == QAbstractSocket::IPv6Protocol)
         m_host = "[" + addr.toString().toLower() + "]";
 #endif
 
@@ -715,7 +735,7 @@ QString MythCoreContext::GenMythURL(QString host, int port, QString path, QStrin
 QString MythCoreContext::GetMasterHostPrefix(const QString &storageGroup,
                                              const QString &path)
 {
-    return GenMythURL(GetMasterServerIP(),
+    return GenMythURL(GetMasterHostName(),
                       GetMasterServerPort(),
                       path,
                       storageGroup);
@@ -913,6 +933,14 @@ QString MythCoreContext::GetBackendServerIP(void)
  */
 QString MythCoreContext::GetBackendServerIP(const QString &host)
 {
+    if (!QHostAddress(host).isNull())
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("GetBackendServerIP(%1): Given "
+                                         "IP address instead of hostname "
+                                         "(ID)").arg(host));
+        return host;
+    }
+
     QString addr4, addr6;
 #if !defined(QT_NO_IPV6)
     if (!ServerPool::DefaultListenIPv6().isEmpty())
