@@ -44,32 +44,10 @@ enum MPFListType {
 class MPEG2frame
 {
   public:
-    MPEG2frame(int size) :
-        isSequence(false), isGop(false),
-        framePos(NULL), gopPos(NULL),
-        mpeg2_seq(), mpeg2_gop(), mpeg2_pic()
-    {
-        av_new_packet(&pkt, size);
-    }
-    ~MPEG2frame()
-    {
-        av_free_packet(&pkt);
-    }
-    void ensure_size(int size)
-    {
-        if (pkt.size < size)
-        {
-            av_grow_packet(&pkt, size - pkt.size);
-        }
-    }
-    void set_pkt(AVPacket *newpkt)
-    {
-        ensure_size(newpkt->size);
-        uint8_t *data = pkt.data;
-        pkt = *newpkt;
-        pkt.data = data;
-        memcpy(pkt.data, newpkt->data, newpkt->size);
-    }
+    MPEG2frame(int size);
+    ~MPEG2frame();
+    void ensure_size(int size);
+    void set_pkt(AVPacket *newpkt);
 
     AVPacket pkt;
     bool isSequence;

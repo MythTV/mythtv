@@ -101,6 +101,34 @@ static QString PtsTime(int64_t pts)
                 (((unsigned int)(pts / 90.) % 3600000) % 60000) % 1000));
 }
 
+MPEG2frame::MPEG2frame(int size) :
+    isSequence(false), isGop(false),
+    framePos(NULL), gopPos(NULL),
+    mpeg2_seq(), mpeg2_gop(), mpeg2_pic()
+{
+    av_new_packet(&pkt, size);
+}
+
+MPEG2frame::~MPEG2frame()
+{
+    av_free_packet(&pkt);
+}
+
+void MPEG2frame::ensure_size(int size)
+{
+    if (pkt.size < size)
+    {
+        av_grow_packet(&pkt, size - pkt.size);
+    }
+}
+
+void MPEG2frame::set_pkt(AVPacket *newpkt)
+{
+    // TODO: Don't free + copy, attempt to re-use existing buffer
+    av_free_packet(&pkt);
+    av_copy_packet(&pkt, newpkt);
+}
+
 PTSOffsetQueue::PTSOffsetQueue(int vidid, QList<int> keys, int64_t initPTS)
 {
     QList<int>::iterator it;
