@@ -118,7 +118,13 @@ void MPEG2frame::ensure_size(int size)
 {
     if (pkt.size < size)
     {
-        av_grow_packet(&pkt, size - pkt.size);
+        int oldSize = pkt.size;
+        if ((av_grow_packet(&pkt, size - pkt.size) < 0) || pkt.size < size)
+            LOG(VB_GENERAL, LOG_CRIT, QString("MPEG2frame::ensure_size(): "
+                                              "Failed to grow packet size "
+                                              "from %1 to %2, result was %3")
+                                                .arg(oldSize).arg(size)
+                                                .arg(pkt.size));
     }
 }
 
@@ -890,10 +896,10 @@ void MPEG2fixup::AddSequence(MPEG2frame *frame1, MPEG2frame *frame2)
 
     int head_size = (frame2->framePos - frame2->pkt.data);
 
-    frame1->ensure_size(frame1->pkt.size + head_size);
-    memmove(frame1->pkt.data + head_size, frame1->pkt.data, frame1->pkt.size);
+    int oldPktSize = frame1->pkt.size;
+    frame1->ensure_size(frame1->pkt.size + head_size); // Changes pkt.size
+    memmove(frame1->pkt.data + head_size, frame1->pkt.data, oldPktSize);
     memcpy(frame1->pkt.data, frame2->pkt.data, head_size);
-    frame1->pkt.size += head_size;
     ProcessVideo(frame1, header_decoder);
 #if 0
     if (VERBOSE_LEVEL_CHECK(VB_PROCESS, LOG_ANY))
