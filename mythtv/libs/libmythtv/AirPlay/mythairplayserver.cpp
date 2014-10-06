@@ -35,7 +35,7 @@ QMutex*            MythAirplayServer::gMythAirplayServerMutex = new QMutex(QMute
 #define HTTP_STATUS_UNAUTHORIZED        401
 #define HTTP_STATUS_NOT_FOUND           404
 
-#define AIRPLAY_SERVER_VERSION_STR ""
+#define AIRPLAY_SERVER_VERSION_STR "115.2"
 #define SERVER_INFO  QString("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n"\
 "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\r\n"\
 "<plist version=\"1.0\">\r\n"\
@@ -49,7 +49,7 @@ QMutex*            MythAirplayServer::gMythAirplayServerMutex = new QMutex(QMute
 "<key>protovers</key>\r\n"\
 "<string>1.0</string>\r\n"\
 "<key>srcvers</key>\r\n"\
-"<string>115.2</string>\r\n"\
+"<string>"AIRPLAY_SERVER_VERSION_STR"</string>\r\n"\
 "</dict>\r\n"\
 "</plist>\r\n")
 
@@ -482,9 +482,9 @@ void MythAirplayServer::Start(void)
         txt.append(26); txt.append("deviceid="); txt.append(GetMacAddress());
         // supposed to be: 0: video, 1:Phone, 3: Volume Control, 4: HLS
         // 9: Audio, 10: ? (but important without it it fails) 11: Audio redundant
-        txt.append(13); txt.append("features=0x77");
+        txt.append(13); txt.append("features=0xF7");
         txt.append(14); txt.append("model=MythTV,1");
-        txt.append(13); txt.append("srcvers=115.2");
+        txt.append(13); txt.append("srcvers=" AIRPLAY_SERVER_VERSION_STR);
 
         if (!m_bonjour->Register(m_setupPort, type, name, txt))
         {
