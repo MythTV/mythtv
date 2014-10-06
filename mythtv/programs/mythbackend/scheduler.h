@@ -81,7 +81,7 @@ class Scheduler : public MThread, public MythScheduler
     void PrintList(bool onlyFutureRecordings = false)
         { PrintList(reclist, onlyFutureRecordings); };
     void PrintList(RecList &list, bool onlyFutureRecordings = false);
-    void PrintRec(const RecordingInfo *p, const char *prefix = NULL);
+    void PrintRec(const RecordingInfo *p, const QString prefix = "");
 
     void SetMainServer(MainServer *ms);
 
@@ -137,9 +137,12 @@ class Scheduler : public MThread, public MythScheduler
 
     bool FindNextConflict(const RecList &cardlist,
                           const RecordingInfo *p, RecConstIter &iter,
-                          OpenEndType openEnd = openEndNever) const;
+                          OpenEndType openEnd = openEndNever,
+                          uint *paffinity = NULL) const;
     const RecordingInfo *FindConflict(const RecordingInfo *p,
-                                      OpenEndType openEnd = openEndNever)
+                                      OpenEndType openEnd = openEndNever,
+                                      uint *affinity = NULL,
+                                      bool checkAll = false)
         const;
     void MarkOtherShowings(RecordingInfo *p);
     void MarkShowingsList(RecList &showinglist, RecordingInfo *p);
@@ -148,7 +151,10 @@ class Scheduler : public MThread, public MythScheduler
     bool TryAnotherShowing(RecordingInfo *p,  bool samePriority,
                            bool livetv = false);
     void SchedNewRecords(void);
-    void MoveHigherRecords(bool livetv = false);
+    void SchedNewFirstPass(RecIter &start, RecIter end,
+                           int recpriority, int recpriority2);
+    void SchedNewRetryPass(RecIter start, RecIter end,
+                           bool samePriority, bool livetv = false);
     void SchedLiveTV(void);
     void PruneRedundants(void);
     void UpdateNextRecord(void);
@@ -213,7 +219,7 @@ class Scheduler : public MThread, public MythScheduler
     QWaitCondition reschedWait;
     RecList reclist;
     RecList worklist;
-    RecList retrylist;
+    RecList livetvlist;
     vector<RecList *> conflictlists;
     QMap<uint, RecList *> conflictlistmap;
     QMap<uint, RecList> recordidlistmap;
@@ -251,6 +257,8 @@ class Scheduler : public MThread, public MythScheduler
 
     // Try to avoid LiveTV sessions until this time
     QDateTime livetvTime;
+
+    OpenEndType m_openEnd;
 
     // cache IsSameProgram()
     typedef pair<const RecordingInfo*,const RecordingInfo*> IsSameKey;

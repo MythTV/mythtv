@@ -69,7 +69,8 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
     resetIdleTime(false),
     m_isShuttingDown(false),
     error(0),
-    livetvTime(QDateTime())
+    livetvTime(QDateTime()),
+    m_openEnd(openEndNever)
 {
     char *debug = getenv("DEBUG_CONFLICTS");
     debugConflicts = (debug != NULL);
@@ -336,81 +337,41 @@ static bool comp_priority(RecordingInfo *a, RecordingInfo *b)
     if (a->GetRecordingPriority2() != b->GetRecordingPriority2())
         return a->GetRecordingPriority2() > b->GetRecordingPriority2();
 
-    QDateTime pasttime = MythDate::current().addSecs(-30);
-    int apast = (a->GetRecordingStartTime() < pasttime &&
-                 !a->IsReactivated());
-    int bpast = (b->GetRecordingStartTime() < pasttime &&
-                 !b->IsReactivated());
+    int atype = (a->GetRecordingRuleType() == kOverrideRecord ||
+                 a->GetRecordingRuleType() == kSingleRecord);
+    int btype = (b->GetRecordingRuleType() == kOverrideRecord ||
+                 b->GetRecordingRuleType() == kSingleRecord);
+    if (atype != btype)
+        return atype > btype;
 
+    QDateTime pasttime = MythDate::current().addSecs(-30);
+    int apast = (a->GetRecordingStartTime() < pasttime && !a->IsReactivated());
+    int bpast = (b->GetRecordingStartTime() < pasttime && !b->IsReactivated());
     if (apast != bpast)
         return apast < bpast;
 
-    int aprec = RecTypePrecedence(a->GetRecordingRuleType());
-    int bprec = RecTypePrecedence(b->GetRecordingRuleType());
-
-    if (aprec != bprec)
-        return aprec < bprec;
-
     if (a->GetRecordingStartTime() != b->GetRecordingStartTime())
-    {
-        if (apast)
-            return a->GetRecordingStartTime() > b->GetRecordingStartTime();
-        else
-            return a->GetRecordingStartTime() < b->GetRecordingStartTime();
-    }
+        return a->GetRecordingStartTime() < b->GetRecordingStartTime();
+
+    if (a->GetRecordingRuleID() != b->GetRecordingRuleID())
+        return a->GetRecordingRuleID() < b->GetRecordingRuleID();
+
+    if (a->GetTitle() != b->GetTitle())
+        return a->GetTitle() < b->GetTitle();
+
+    if (a->GetProgramID() != b->GetProgramID())
+        return a->GetProgramID() < b->GetProgramID();
+
+    if (a->GetSubtitle() != b->GetSubtitle())
+        return a->GetSubtitle() < b->GetSubtitle();
+
+    if (a->GetDescription() != b->GetDescription())
+        return a->GetDescription() < b->GetDescription();
 
     if (a->schedorder != b->schedorder)
         return a->schedorder < b->schedorder;
 
-    if (a->GetInputID() != b->GetInputID())
-        return a->GetInputID() < b->GetInputID();
-
-    return a->GetRecordingRuleID() < b->GetRecordingRuleID();
-}
-
-static bool comp_retry(RecordingInfo *a, RecordingInfo *b)
-{
-    int arec = (a->GetRecordingStatus() != rsRecording &&
-                a->GetRecordingStatus() != rsTuning &&
-                a->GetRecordingStatus() != rsFailing);
-    int brec = (b->GetRecordingStatus() != rsRecording &&
-                b->GetRecordingStatus() != rsTuning &&
-                b->GetRecordingStatus() != rsFailing);
-
-    if (arec != brec)
-        return arec < brec;
-
-    if (a->GetRecordingPriority() != b->GetRecordingPriority())
-        return a->GetRecordingPriority() > b->GetRecordingPriority();
-
-    if (a->GetRecordingPriority2() != b->GetRecordingPriority2())
-        return a->GetRecordingPriority2() > b->GetRecordingPriority2();
-
-    QDateTime pasttime = MythDate::current().addSecs(-30);
-    int apast = (a->GetRecordingStartTime() < pasttime &&
-                 !a->IsReactivated());
-    int bpast = (b->GetRecordingStartTime() < pasttime &&
-                 !b->IsReactivated());
-
-    if (apast != bpast)
-        return apast < bpast;
-
-    int aprec = RecTypePrecedence(a->GetRecordingRuleType());
-    int bprec = RecTypePrecedence(b->GetRecordingRuleType());
-
-    if (aprec != bprec)
-        return aprec < bprec;
-
-    if (a->GetRecordingStartTime() != b->GetRecordingStartTime())
-        return a->GetRecordingStartTime() > b->GetRecordingStartTime();
-
-    if (a->schedorder != b->schedorder)
-        return a->schedorder > b->schedorder;
-
-    if (a->GetInputID() != b->GetInputID())
-        return a->GetInputID() > b->GetInputID();
-
-    return a->GetRecordingRuleID() < b->GetRecordingRuleID();
+    return a->GetInputID() < b->GetInputID();
 }
 
 bool Scheduler::FillRecordList(void)
@@ -591,19 +552,15 @@ void Scheduler::PrintList(RecList &list, bool onlyFutureRecordings)
     LOG(VB_SCHEDULE, LOG_INFO, "---  print list end  ---");
 }
 
-void Scheduler::PrintRec(const RecordingInfo *p, const char *prefix)
+void Scheduler::PrintRec(const RecordingInfo *p, const QString prefix)
 {
     if (!VERBOSE_LEVEL_CHECK(VB_SCHEDULE, LOG_DEBUG))
         return;
 
-    QString outstr;
+    QString outstr = prefix;
 
-    if (prefix)
-        outstr = QString(prefix);
-
-    QString episode = p->toString(ProgramInfo::kTitleSubtitle, " - ", "");
-    episode = episode.leftJustified(34 - (prefix ? strlen(prefix) : 0),
-                                    ' ', true);
+    QString episode = p->toString(ProgramInfo::kTitleSubtitle, " - ", "")
+        .leftJustified(34 - prefix.length(), ' ', true);
 
     outstr += QString("%1 %2 %3 %4-%5  %6 %7 %8  ")
         .arg(episode)
@@ -1041,8 +998,10 @@ bool Scheduler::FindNextConflict(
     const RecList     &cardlist,
     const RecordingInfo *p,
     RecConstIter      &j,
-    OpenEndType        openEnd) const
+    OpenEndType        openEnd,
+    uint              *paffinity) const
 {
+    uint affinity = 0;
     for ( ; j != cardlist.end(); ++j)
     {
         const RecordingInfo *q = *j;
@@ -1065,24 +1024,34 @@ bool Scheduler::FindNextConflict(
             continue;
         }
 
-        if (openEnd == openEndAlways || (openEnd == openEndDiffChannel &&
-                                         p->GetChanID() != q->GetChanID()))
+        if (p->GetRecordingEndTime() < q->GetRecordingStartTime() ||
+            p->GetRecordingStartTime() > q->GetRecordingEndTime())
         {
-            if (p->GetRecordingEndTime() < q->GetRecordingStartTime() ||
-                p->GetRecordingStartTime() > q->GetRecordingEndTime())
-            {
-                if (debugConflicts)
-                    msg += "  no-overlap ";
-                continue;
-            }
+            if (debugConflicts)
+                msg += "  no-overlap ";
+            continue;
         }
-        else
+
+        if (p->GetRecordingEndTime() == q->GetRecordingStartTime() ||
+            p->GetRecordingStartTime() == q->GetRecordingEndTime())
         {
-            if (p->GetRecordingEndTime() <= q->GetRecordingStartTime() ||
-                p->GetRecordingStartTime() >= q->GetRecordingEndTime())
+            if (openEnd == openEndNever ||
+                (openEnd == openEndDiffChannel &&
+                 p->GetChanID() == q->GetChanID()) ||
+                (openEnd == openEndAlways &&
+                 p->GetCardID() != q->GetCardID() &&
+                 ((p->mplexid && p->mplexid == q->mplexid) ||
+                  (!p->mplexid && p->GetChanID() == q->GetChanID()))))
             {
                 if (debugConflicts)
                     msg += "  no-overlap ";
+                if ((m_openEnd == openEndDiffChannel &&
+                     p->GetChanID() == q->GetChanID()) ||
+                    (m_openEnd == openEndAlways &&
+                     p->GetCardID() != q->GetCardID() &&
+                     ((p->mplexid && p->mplexid == q->mplexid) ||
+                      (!p->mplexid && p->GetChanID() == q->GetChanID()))))
+                      ++affinity;
                 continue;
             }
         }
@@ -1101,33 +1070,46 @@ bool Scheduler::FindNextConflict(
 
         // if two inputs are in the same input group we have a conflict
         // unless the programs are on the same multiplex.
-        if (p->GetCardID() != q->GetCardID())
+        if (p->GetCardID() != q->GetCardID() &&
+            ((p->mplexid && p->mplexid == q->mplexid) ||
+             (!p->mplexid && p->GetChanID() == q->GetChanID())))
         {
-            if ((p->mplexid && p->mplexid == q->mplexid) ||
-                (!p->mplexid && p->GetChanID() == q->GetChanID()))
-                continue;
+            ++affinity;
+            continue;
         }
 
         if (debugConflicts)
             LOG(VB_SCHEDULE, LOG_INFO, "Found conflict");
 
+        if (paffinity)
+            *paffinity += affinity;
         return true;
     }
 
     if (debugConflicts)
         LOG(VB_SCHEDULE, LOG_INFO, "No conflict");
 
+    if (paffinity)
+        *paffinity += affinity;
     return false;
 }
 
 const RecordingInfo *Scheduler::FindConflict(
     const RecordingInfo        *p,
-    OpenEndType openend) const
+    OpenEndType openend,
+    uint *affinity,
+    bool checkAll) const
 {
     RecList &conflictlist = *conflictlistmap[p->GetInputID()];
     RecConstIter k = conflictlist.begin();
-    if (FindNextConflict(conflictlist, p, k, openend))
-        return *k;
+    if (FindNextConflict(conflictlist, p, k, openend, affinity))
+    {
+        RecordingInfo *firstConflict = *k;
+        while (checkAll &&
+               FindNextConflict(conflictlist, p, ++k, openend, affinity))
+            ;
+        return firstConflict;
+    }
 
     return NULL;
 }
@@ -1203,7 +1185,7 @@ void Scheduler::RestoreRecStatus(void)
 bool Scheduler::TryAnotherShowing(RecordingInfo *p, bool samePriority,
                                    bool livetv)
 {
-    PrintRec(p, "     >");
+    PrintRec(p, "    >");
 
     if (p->GetRecordingStatus() == rsRecording ||
         p->GetRecordingStatus() == rsTuning ||
@@ -1214,6 +1196,9 @@ bool Scheduler::TryAnotherShowing(RecordingInfo *p, bool samePriority,
 
     RecStatusType oldstatus = p->GetRecordingStatus();
     p->SetRecordingStatus(rsLaterShowing);
+
+    RecordingInfo *best = NULL;
+    uint bestaffinity = 0;
 
     RecIter j = showinglist->begin();
     for ( ; j != showinglist->end(); ++j)
@@ -1249,44 +1234,56 @@ bool Scheduler::TryAnotherShowing(RecordingInfo *p, bool samePriority,
                 continue;
         }
 
-        if (samePriority)
-            PrintRec(q, "     %");
-        else
-            PrintRec(q, "     $");
-
-        const RecordingInfo *conflict = FindConflict(q);
+        uint affinity = 0;
+        const RecordingInfo *conflict = FindConflict(q, openEndNever,
+                                                     &affinity, false);
         if (conflict)
         {
-            PrintRec(conflict, "        !");
+            PrintRec(q, "    #");
+            PrintRec(conflict, "      !");
             continue;
         }
 
         if (livetv)
         {
             // It is pointless to preempt another livetv session.
-            // (the retrylist contains dummy livetv pginfo's)
-            RecConstIter k = retrylist.begin();
-            if (FindNextConflict(retrylist, q, k))
+            // (the livetvlist contains dummy livetv pginfo's)
+            RecConstIter k = livetvlist.begin();
+            if (FindNextConflict(livetvlist, q, k))
             {
-                PrintRec(*k, "       L!");
+                PrintRec(q, "    #");
+                PrintRec(*k, "       !");
                 continue;
             }
+        }
 
+        PrintRec(q, QString("    %1:").arg(affinity));
+        if (!best || affinity > bestaffinity)
+        {
+            best = q;
+            bestaffinity = affinity;
+        }
+    }
+
+    if (best)
+    {
+        if (livetv)
+        {
             QString msg = QString(
                 "Moved \"%1\" on chanid: %2 from card: %3 to %4 at %5 "
                 "to avoid LiveTV conflict")
                 .arg(p->GetTitle()).arg(p->GetChanID())
-                .arg(p->GetCardID()).arg(q->GetCardID())
-                .arg(q->GetScheduledStartTime().toLocalTime().toString());
+                .arg(p->GetCardID()).arg(best->GetCardID())
+                .arg(best->GetScheduledStartTime().toLocalTime().toString());
             LOG(VB_GENERAL, LOG_INFO, msg);
         }
 
-        q->SetRecordingStatus(rsWillRecord);
-        MarkOtherShowings(q);
-        if (q->GetRecordingStartTime() < livetvTime)
-            livetvTime = q->GetRecordingStartTime();
-        PrintRec(p, "     -");
-        PrintRec(q, "     +");
+        best->SetRecordingStatus(rsWillRecord);
+        MarkOtherShowings(best);
+        if (best->GetRecordingStartTime() < livetvTime)
+            livetvTime = best->GetRecordingStartTime();
+        PrintRec(p, "    -");
+        PrintRec(best, "    +");
         return true;
     }
 
@@ -1301,7 +1298,9 @@ void Scheduler::SchedNewRecords(void)
         LOG(VB_SCHEDULE, LOG_DEBUG,
             "+ = schedule this showing to be recorded");
         LOG(VB_SCHEDULE, LOG_DEBUG,
-            "# = could not schedule this showing, retry later");
+            "n: = could schedule this showing with affinity");
+        LOG(VB_SCHEDULE, LOG_DEBUG,
+            "n# = could not schedule this showing, with affinity");
         LOG(VB_SCHEDULE, LOG_DEBUG,
             "! = conflict caused by this showing");
         LOG(VB_SCHEDULE, LOG_DEBUG,
@@ -1311,107 +1310,160 @@ void Scheduler::SchedNewRecords(void)
         LOG(VB_SCHEDULE, LOG_DEBUG,
             "> = try another showing for this program");
         LOG(VB_SCHEDULE, LOG_DEBUG,
-            "% = found another showing, same priority required");
-        LOG(VB_SCHEDULE, LOG_DEBUG,
-            "$ = found another showing, lower priority allowed");
-        LOG(VB_SCHEDULE, LOG_DEBUG,
             "- = unschedule a showing in favor of another one");
     }
 
     livetvTime = MythDate::current().addSecs(3600);
-    OpenEndType openEnd =
-        (OpenEndType)gCoreContext->GetNumSetting("SchedOpenEnd", 0);
+    m_openEnd =
+        (OpenEndType)gCoreContext->GetNumSetting("SchedOpenEnd", openEndNever);
 
     RecIter i = worklist.begin();
+
+    for ( ; i != worklist.end(); ++i)
+    {
+        if ((*i)->GetRecordingStatus() != rsRecording &&
+            (*i)->GetRecordingStatus() != rsTuning)
+            break;
+        MarkOtherShowings(*i);
+    }
+
     while (i != worklist.end())
     {
-        RecordingInfo *p = *i;
-        if (p->GetRecordingStatus() == rsRecording ||
-            p->GetRecordingStatus() == rsTuning)
-            MarkOtherShowings(p);
-        else if (p->GetRecordingStatus() == rsUnknown)
+        RecIter levelStart = i;
+        int recpriority = (*i)->GetRecordingPriority();
+
+        while (i != worklist.end())
         {
-            const RecordingInfo *conflict = FindConflict(p, openEnd);
-            if (!conflict)
+            if (i == worklist.end() ||
+                (*i)->GetRecordingPriority() != recpriority)
+                break;
+
+            RecIter sublevelStart = i;
+            int recpriority2 = (*i)->GetRecordingPriority2();
+            LOG(VB_SCHEDULE, LOG_DEBUG, QString("Trying priority %1/%2...")
+                .arg(recpriority).arg(recpriority2));
+            // First pass for anything in this priority sublevel.
+            SchedNewFirstPass(i, worklist.end(), recpriority, recpriority2);
+
+            LOG(VB_SCHEDULE, LOG_DEBUG, QString("Retrying priority %1/%2...")
+                .arg(recpriority).arg(recpriority2));
+            SchedNewRetryPass(sublevelStart, i, true);
+        }
+
+        // Retry pass for anything in this priority level.
+        LOG(VB_SCHEDULE, LOG_DEBUG, QString("Retrying priority %1/*...")
+            .arg(recpriority));
+        SchedNewRetryPass(levelStart, i, false);
+    }
+}
+
+// Perform the first pass for scheduling new recordings for programs
+// in the same priority sublevel.  For each program/starttime, choose
+// the first one with the highest affinity that doesn't conflict.
+void Scheduler::SchedNewFirstPass(RecIter &i, RecIter end,
+                                  int recpriority, int recpriority2)
+{
+    while (i != end)
+    {
+        // Find the next unscheduled program in this sublevel.
+        for ( ; i != end; ++i)
+        {
+            if ((*i)->GetRecordingPriority() != recpriority ||
+                (*i)->GetRecordingPriority2() != recpriority2 ||
+                (*i)->GetRecordingStatus() == rsUnknown)
+                break;
+        }
+
+        // Stop if we don't find another program to schedule.
+        if (i == end ||
+            (*i)->GetRecordingPriority() != recpriority ||
+            (*i)->GetRecordingPriority2() != recpriority2)
+            break;
+
+        RecordingInfo *first = *i;
+        RecordingInfo *best = NULL;
+        uint bestaffinity = 0;
+
+        // Try each showing of this program at this time.
+        for ( ; i != end; ++i)
+        {
+            if ((*i)->GetRecordingPriority() != recpriority ||
+                (*i)->GetRecordingPriority2() != recpriority2 ||
+                (*i)->GetRecordingStartTime() !=
+                first->GetRecordingStartTime() ||
+                (*i)->GetRecordingRuleID() !=
+                first->GetRecordingRuleID() ||
+                (*i)->GetTitle() != first->GetTitle() ||
+                (*i)->GetProgramID() != first->GetProgramID() ||
+                (*i)->GetSubtitle() != first->GetSubtitle() ||
+                (*i)->GetDescription() != first->GetDescription())
+                break;
+
+            // This shouldn't happen, but skip it just in case.
+            if ((*i)->GetRecordingStatus() != rsUnknown)
+                continue;
+
+            uint affinity = 0;
+            const RecordingInfo *conflict =
+                FindConflict(*i, m_openEnd, &affinity, true);
+            if (conflict)
             {
-                p->SetRecordingStatus(rsWillRecord);
-                MarkOtherShowings(p);
-                if (p->GetRecordingStartTime() < livetvTime)
-                    livetvTime = p->GetRecordingStartTime();
-                PrintRec(p, "  +");
+                PrintRec(*i, QString("  %1#").arg(affinity));
+                PrintRec(conflict, "    !");
             }
             else
             {
-                retrylist.push_back(p);
-                PrintRec(p, "  #");
-                PrintRec(conflict, "     !");
+                PrintRec(*i, QString("  %1:").arg(affinity));
+                if (!best || affinity > bestaffinity)
+                {
+                    best = *i;
+                    bestaffinity = affinity;
+                }
             }
         }
 
-        int lastpri = p->GetRecordingPriority();
-        ++i;
-        if (i == worklist.end() || lastpri != (*i)->GetRecordingPriority())
+        // Schedule the best one.
+        if (best)
         {
-            SORT_RECLIST(retrylist, comp_retry);
-            MoveHigherRecords();
-            retrylist.clear();
+            PrintRec(best, "  +");
+            best->SetRecordingStatus(rsWillRecord);
+            MarkOtherShowings(best);
+            if (best->GetRecordingStartTime() < livetvTime)
+                livetvTime = best->GetRecordingStartTime();
         }
     }
 }
 
-void Scheduler::MoveHigherRecords(bool livetv)
+// Perform the retry passes for scheduling new recordings.  For each
+// unscheduled program, try to move the conflicting programs to
+// another time or tuner using the given constraints.
+void Scheduler::SchedNewRetryPass(RecIter i, RecIter end,
+                                  bool samePriority, bool livetv)
 {
-    RecIter i = retrylist.begin();
-    for ( ; !livetv && i != retrylist.end(); ++i)
+    for ( ; i != end; ++i)
     {
         RecordingInfo *p = *i;
         if (p->GetRecordingStatus() != rsUnknown)
             continue;
 
-        PrintRec(p, "  /");
+        if (samePriority)
+            PrintRec(p, "  /");
+        else
+            PrintRec(p, "  ?");
 
-        BackupRecStatus();
-        p->SetRecordingStatus(rsWillRecord);
-        MarkOtherShowings(p);
-
-        RecList &conflictlist = *conflictlistmap[p->GetInputID()];
-        RecConstIter k = conflictlist.begin();
-        for ( ; FindNextConflict(conflictlist, p, k); ++k)
-        {
-            if (!TryAnotherShowing(*k, true))
-            {
-                RestoreRecStatus();
-                break;
-            }
-        }
-
-        if (p->GetRecordingStatus() == rsWillRecord)
-        {
-            if (p->GetRecordingStartTime() < livetvTime)
-                livetvTime = p->GetRecordingStartTime();
-            PrintRec(p, "  +");
-        }
-    }
-
-    i = retrylist.begin();
-    for ( ; i != retrylist.end(); ++i)
-    {
-        RecordingInfo *p = *i;
-        if (p->GetRecordingStatus() != rsUnknown)
-            continue;
-
-        PrintRec(p, "  ?");
-
+        // Assume we can successfully move all of the conflicts.
         BackupRecStatus();
         p->SetRecordingStatus(rsWillRecord);
         if (!livetv)
             MarkOtherShowings(p);
 
+        // Try to move each conflict.  Restore the old status if we
+        // can't.
         RecList &conflictlist = *conflictlistmap[p->GetInputID()];
         RecConstIter k = conflictlist.begin();
         for ( ; FindNextConflict(conflictlist, p, k); ++k)
         {
-            if (!TryAnotherShowing(*k, false, livetv))
+            if (!TryAnotherShowing(*k, samePriority, livetv))
             {
                 RestoreRecStatus();
                 break;
@@ -5196,19 +5248,19 @@ void Scheduler::SchedLiveTV(void)
         dummy->mplexid = dummy->QueryMplexID();
         dummy->SetRecordingStatus(rsUnknown);
 
-        retrylist.push_front(dummy);
+        livetvlist.push_front(dummy);
     }
 
-    if (retrylist.empty())
+    if (livetvlist.empty())
         return;
 
-    MoveHigherRecords(true);
+    SchedNewRetryPass(livetvlist.begin(), livetvlist.end(), true, true);
 
-    while (!retrylist.empty())
+    while (!livetvlist.empty())
     {
-        RecordingInfo *p = retrylist.back();
+        RecordingInfo *p = livetvlist.back();
         delete p;
-        retrylist.pop_back();
+        livetvlist.pop_back();
     }
 }
 
