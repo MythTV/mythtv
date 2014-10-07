@@ -68,6 +68,14 @@ bool MythNotification::FromStringList(void)
     QStringList::const_iterator Istr = m_extradata.begin();
 
     Type type     = static_cast<Type>((*Istr++).toInt());
+    if (type != Type())
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("MythNotification::FromStringList called with type '%1' "
+                    "in StringList, expected '%2' as set in constructor.")
+            .arg(type).arg(Type()));
+        return false;
+    }
     m_fullScreen  = (*Istr++).toInt();
     m_description = *Istr++;
     m_duration    = (*Istr++).toInt();
