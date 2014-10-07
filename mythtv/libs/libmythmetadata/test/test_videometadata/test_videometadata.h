@@ -344,6 +344,7 @@ class Testvideometadata: public QObject
     /* TODO move into own test folder */
     void ProgramWithInetref ()
     {
+        MSKIP ("Might connect to the database or call the installed metadata grabbers.");
         ProgramInfo proginfo = ProgramInfo ("", "", "Test Movie", "", "", 0, 0, "tmdb3.py_1234", 0, 0, "");
         RecordingInfo recinfo = proginfo;
         QCOMPARE (recinfo.GetInetRef(), QString("tmdb3.py_1234"));
