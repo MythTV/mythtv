@@ -1369,7 +1369,7 @@ void LogForwardThread::forwardMessage(LogMessage *msg)
         LoggingItem *item = LoggingItem::create(json);
 
         logClientCount.ref();
-        LOG(VB_GENERAL, LOG_INFO, QString("New Client: %1 (#%2)")
+        LOG(VB_FILE, LOG_DEBUG, QString("New Logging Client: ID: %1 (#%2)")
             .arg(clientId).arg(logClientCount.fetchAndAddOrdered(0)));
 
 #ifndef NOLOGSERVER

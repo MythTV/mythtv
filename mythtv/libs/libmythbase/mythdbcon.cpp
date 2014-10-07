@@ -11,6 +11,7 @@
 #include <QSqlField>
 #include <QSqlRecord>
 #include <QElapsedTimer>
+#include <QCoreApplication>
 
 // MythTV
 #include "compat.h"
@@ -73,13 +74,23 @@ MSqlDatabase::MSqlDatabase(const QString &name)
 {
     m_name = name;
     m_name.detach();
-    m_db = QSqlDatabase::addDatabase("QMYSQL", m_name);
-    LOG(VB_DATABASE, LOG_INFO, "Database connection created: " + m_name);
 
-    if (!m_db.isValid())
+    if (!QSqlDatabase::isDriverAvailable("QMYSQL"))
     {
-        LOG(VB_GENERAL, LOG_ERR, "Unable to init db connection.");
-        return;
+        LOG(VB_FLUSH, LOG_CRIT, "FATAL: Unable to load the QT mysql driver, is it installed?");
+        exit(GENERIC_EXIT_DB_ERROR); // Exits before we can process the log queue
+        //return;
+    }
+
+    m_db = QSqlDatabase::addDatabase("QMYSQL", m_name);
+    LOG(VB_DATABASE, LOG_INFO, "Database object created: " + m_name);
+
+    if (!m_db.isValid() || m_db.isOpenError())
+    {
+        LOG(VB_FLUSH, LOG_CRIT, MythDB::DBErrorMessage(m_db.lastError()));
+        LOG(VB_FLUSH, LOG_CRIT, QString("FATAL: Unable to create database object (%1), the installed QT driver may be invalid.").arg(m_name));
+        exit(GENERIC_EXIT_DB_ERROR); // Exits before we can process the log queue
+        //return;
     }
     m_lastDBKick = MythDate::current().addSecs(-60);
 }
@@ -93,7 +104,7 @@ MSqlDatabase::~MSqlDatabase()
                                 // removeDatabase() so that connections
                                 // and queries are cleaned up correctly
         QSqlDatabase::removeDatabase(m_name);
-        LOG(VB_DATABASE, LOG_INFO, "Database connection deleted: " + m_name);
+        LOG(VB_DATABASE, LOG_INFO, "Database object deleted: " + m_name);
     }
 }
 
@@ -177,7 +188,8 @@ bool MSqlDatabase::OpenDatabase(bool skipdb)
         if (connected)
         {
             LOG(VB_DATABASE, LOG_INFO,
-                    QString("Connected to database '%1' at host: %2")
+                    QString("[%1] Connected to database '%2' at host: %3")
+                            .arg(m_name)
                             .arg(m_db.databaseName()).arg(m_db.hostName()));
 
             InitSessionVars();
@@ -214,7 +226,7 @@ bool MSqlDatabase::OpenDatabase(bool skipdb)
     if (!connected)
     {
         GetMythDB()->SetHaveDBConnection(false);
-        LOG(VB_GENERAL, LOG_ERR, "Unable to connect to database!");
+        LOG(VB_GENERAL, LOG_ERR, QString("[%1] Unable to connect to database!").arg(m_name));
         LOG(VB_GENERAL, LOG_ERR, MythDB::DBErrorMessage(m_db.lastError()));
     }
 
