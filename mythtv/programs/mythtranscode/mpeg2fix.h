@@ -71,9 +71,9 @@ class PTSOffsetQueue
   public:
     PTSOffsetQueue(int vidid, QList<int> keys, int64_t initPTS);
     void SetNextPTS(int64_t newPTS, int64_t atPTS);
-    void SetNextPos(int64_t newPTS, AVPacket &pkt);
+    void SetNextPos(int64_t newPTS, AVPacket *pkt);
     int64_t Get(int idx, AVPacket *pkt);
-    int64_t UpdateOrigPTS(int idx, int64_t &origPTS, AVPacket &pkt);
+    int64_t UpdateOrigPTS(int idx, int64_t &origPTS, AVPacket *pkt);
   private:
     QMap<int, QList<poq_idx_t> > offset;
     QMap<int, QList<poq_idx_t> > orig;

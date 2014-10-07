@@ -193,19 +193,19 @@ void PTSOffsetQueue::SetNextPTS(int64_t newPTS, int64_t atPTS)
         offset[*it].push_back(idx);
 }
 
-void PTSOffsetQueue::SetNextPos(int64_t newPTS, AVPacket &pkt)
+void PTSOffsetQueue::SetNextPos(int64_t newPTS, AVPacket *pkt)
 {
     QList<int>::iterator it;
     int64_t delta = MPEG2fixup::diff2x33(newPTS, offset[vid_id].last().newPTS);
     poq_idx_t idx;
 
-    idx.pos_pts = pkt.pos;
-    idx.framenum = pkt.duration;
+    idx.pos_pts = pkt->pos;
+    idx.framenum = pkt->duration;
     idx.type = 1;
 
     LOG(VB_FRAME, LOG_INFO, QString("Offset %1 -> %2 (%3) at %4")
             .arg(PtsTime(offset[vid_id].last().newPTS))
-            .arg(PtsTime(newPTS)).arg(PtsTime(delta)).arg(pkt.pos));
+            .arg(PtsTime(newPTS)).arg(PtsTime(delta)).arg(pkt->pos));
     for (it = keyList.begin(); it != keyList.end(); ++it)
     {
         idx.newPTS = newPTS;
@@ -215,13 +215,13 @@ void PTSOffsetQueue::SetNextPos(int64_t newPTS, AVPacket &pkt)
     }
 }
 
-int64_t PTSOffsetQueue::UpdateOrigPTS(int idx, int64_t &origPTS, AVPacket &pkt)
+int64_t PTSOffsetQueue::UpdateOrigPTS(int idx, int64_t &origPTS, AVPacket *pkt)
 {
     int64_t delta = 0;
     QList<poq_idx_t> *dltaList = &orig[idx];
     while (dltaList->count() && 
-           (pkt.pos     >= dltaList->first().pos_pts ||
-            pkt.duration > dltaList->first().framenum))
+           (pkt->pos     >= dltaList->first().pos_pts ||
+            pkt->duration > dltaList->first().framenum))
     {
         if (dltaList->first().newPTS >= 0)
             ptsinc((uint64_t *)&origPTS, 300 * dltaList->first().newPTS);
@@ -1765,6 +1765,7 @@ int MPEG2fixup::ConvertToI(FrameList *orderedFrames, int headPos)
 {
     MPEG2frame *spare = NULL;
     AVPacket pkt;
+    av_init_packet(&pkt);
 #ifdef SPEW_FILES
     static int ins_count = 0;
 #endif
@@ -1822,6 +1823,7 @@ int MPEG2fixup::InsertFrame(int frameNum, int64_t deltaPTS,
 {
     MPEG2frame *spare = NULL;
     AVPacket pkt;
+    av_init_packet(&pkt);
     int increment = 0;
     int index = 0;
 #ifdef SPEW_FILES
@@ -1831,7 +1833,7 @@ int MPEG2fixup::InsertFrame(int frameNum, int64_t deltaPTS,
     if ((spare = DecodeToFrame(frameNum, 0)) == NULL)
         return -1;
 
-    pkt = spare->pkt;
+    av_copy_packet(&pkt, &spare->pkt);
     //pkt.data is a newly malloced area
 
     {
@@ -2036,13 +2038,14 @@ int MPEG2fixup::Start()
 
     AVPacket pkt, lastRealvPkt;
 
+    av_init_packet(&pkt);
+    av_init_packet(&lastRealvPkt);
+
     if (!InitAV(infile, format, 0))
         return GENERIC_EXIT_NOT_OK;
 
     if (!FindStart())
         return GENERIC_EXIT_NOT_OK;
-
-    av_init_packet(&pkt);
 
     ptsIncrement = vFrame.first()->mpeg2_seq.frame_period / 300;
 
@@ -2162,7 +2165,7 @@ int MPEG2fixup::Start()
                      it2 != Lreorder.end(); it2++)
                 {
                     MPEG2frame *curFrame = (*it2);
-                    poq.UpdateOrigPTS(vid_id, origvPTS, curFrame->pkt);
+                    poq.UpdateOrigPTS(vid_id, origvPTS, &curFrame->pkt);
                     InitialPTSFixup(curFrame, origvPTS, PTSdiscrep, 
                                     maxframes, true);
                 }
@@ -2308,7 +2311,10 @@ int MPEG2fixup::Start()
                 }
 
                 if (!Lreorder.isEmpty())
-                    lastRealvPkt = Lreorder.last()->pkt;
+                {
+                    av_free_packet(&lastRealvPkt);
+                    av_copy_packet(&lastRealvPkt, &Lreorder.last()->pkt);
+                }
 
                 if (markedFrame || !discard)
                 {
@@ -2450,7 +2456,7 @@ int MPEG2fixup::Start()
                 }
                 if (PTSdiscrep)
                     poq.SetNextPos(add2x33(poq.Get(vid_id, &lastRealvPkt),
-                                                   PTSdiscrep), lastRealvPkt);
+                                                   PTSdiscrep), &lastRealvPkt);
             }
 
             if (discard)
@@ -2497,7 +2503,7 @@ int MPEG2fixup::Start()
                          90000LL * (int64_t)CPC->duration / CC->sample_rate;
 
                 if (poq.UpdateOrigPTS(it.key(), origaPTS[it.key()],
-                                                  af->first()->pkt) < 0)
+                                                  &af->first()->pkt) < 0)
                 {
                     backwardsPTS = true;
                     af_dlta_cnt[it.key()] = 0;
