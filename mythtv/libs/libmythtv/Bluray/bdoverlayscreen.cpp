@@ -128,5 +128,4 @@ void BDOverlayScreen::DisplayBDOverlay(BDOverlay *overlay)
     SetRedraw();
 
     delete overlay;
-    overlay = NULL;
 }

@@ -143,7 +143,6 @@ void MythGenericTree::deleteNode(MythGenericTree *child)
 
     removeNode(child);
     delete child;
-    child = NULL;
 }
 
 MythGenericTree* MythGenericTree::findLeaf()

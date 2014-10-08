@@ -178,7 +178,6 @@ void UPnpCDS::UnregisterExtension( UPnpCDSExtension *pExtension )
     {
         m_extensions.removeAll(pExtension);
         delete pExtension;
-        pExtension = NULL;
     }
 }
 
