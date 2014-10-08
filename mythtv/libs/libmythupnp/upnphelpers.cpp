@@ -371,7 +371,7 @@ QString ProtocolInfoString(UPNPProtocol::TransferProtocol protocol,
                                           videoCodec, audioCodec,
                                           isTranscoded);
 
-    if (!protocolInfoFields.size() == 4)
+    if (protocolInfoFields.size() != 4)
         LOG(VB_GENERAL, LOG_CRIT, "DLNA::ProtocolInfoString() : Invalid number of fields in string");
 
     QString str = protocolInfoFields.join(":");
