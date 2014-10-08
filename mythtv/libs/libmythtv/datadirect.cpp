@@ -539,8 +539,8 @@ DataDirectProcessor::DataDirectProcessor(uint lp, QString user, QString pass) :
     m_userid(user),                   m_password(pass),
     m_tmpDir("/tmp"),                 m_cacheData(false),
     m_inputFilename(""),              m_tmpPostFile(QString::null),
-    m_tmpResultFile(QString::null),   m_cookieFile(QString::null),
-    m_cookieFileDT()
+    m_tmpResultFile(QString::null),   m_tmpDDPFile(QString::null),
+    m_cookieFile(QString::null),      m_cookieFileDT()
 {
     {
         QMutexLocker locker(&user_agent_lock);
@@ -576,6 +576,12 @@ DataDirectProcessor::~DataDirectProcessor()
     if (!m_tmpResultFile.isEmpty())
     {
         QByteArray tmp = m_tmpResultFile.toLatin1();
+        unlink(tmp.constData());
+    }
+
+    if (!m_tmpDDPFile.isEmpty())
+    {
+        QByteArray tmp = m_tmpDDPFile.toLatin1();
         unlink(tmp.constData());
     }
 
@@ -1006,8 +1012,16 @@ bool DataDirectProcessor::DDPost(QString    ddurl,        QString   &inputFile,
     postdata += "</SOAP-ENV:Body>\n";
     postdata += "</SOAP-ENV:Envelope>\n";
 
-    if (inputFile.isEmpty()) {
-        inputFile = QString("/tmp/mythtv_ddp_data");
+    if (inputFile.isEmpty())
+    {
+        bool ok;
+        inputFile = GetDDPFilename(ok);
+        if (!ok)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+            "Failure creating temp ddp file");
+            return false;
+        }
     }
 
     QHash<QByteArray, QByteArray> headers;
@@ -1839,6 +1853,18 @@ QString DataDirectProcessor::GetCookieFilename(bool &ok) const
                    false, m_cookieFile, ok);
     }
     return m_cookieFile;
+}
+
+QString DataDirectProcessor::GetDDPFilename(bool &ok) const
+{
+    ok = true;
+    if (m_tmpDDPFile.isEmpty())
+    {
+        CreateTemp(m_tmpDir + "/mythtv_ddp_XXXXXX",
+                   "Failed to create temp ddp file",
+                   false, m_tmpDDPFile, ok);
+    }
+    return m_tmpDDPFile;
 }
 
 void DataDirectProcessor::SetUserID(const QString &uid)
