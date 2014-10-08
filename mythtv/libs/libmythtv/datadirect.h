@@ -405,6 +405,7 @@ class MTV_PUBLIC DataDirectProcessor
                     bool directory, QString &filename, bool &ok) const;
 
     QString GetResultFilename(bool &ok) const;
+    QString GetDDPFilename(bool &ok) const;
     QString GetCookieFilename(bool &ok) const;
 
     void SetAll(const QString &lineupid, bool val);
@@ -442,6 +443,7 @@ class MTV_PUBLIC DataDirectProcessor
     RawLineupMap    m_rawLineups;
     mutable QString m_tmpPostFile;
     mutable QString m_tmpResultFile;
+    mutable QString m_tmpDDPFile;
     mutable QString m_cookieFile;
     QDateTime       m_cookieFileDT;
 
