@@ -703,9 +703,11 @@ void rgb32_to_yuv420p(unsigned char *lum, unsigned char *cb, unsigned char *cr,
 
             cb++;
             cr++;
-            p += 4; // we dereference p in the next iteration, so its not really unused
+#if 0 // no point in updating after the last pixel
+            p += 4;
             lum += -wrap + 2;
             alpha += -wrap + 2;
+#endif
        }
     }
 }
