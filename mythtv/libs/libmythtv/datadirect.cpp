@@ -1031,7 +1031,11 @@ bool DataDirectProcessor::DDPost(QString    ddurl,        QString   &inputFile,
         .arg( inputFile ));
 
     QFile file(inputFile);
-    file.open(QIODevice::WriteOnly);
+    if (!file.open(QIODevice::WriteOnly))
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to open temporary file: %1").arg(inputFile));
+        return false;
+    }
     file.write(uncompressed);
     file.close();
 
@@ -1091,7 +1095,11 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
         .arg(postdata.size()));
 
     QFile file(resultFilename);
-    file.open(QIODevice::WriteOnly);
+    if (!file.open(QIODevice::WriteOnly))
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to open result file: %1").arg(resultFilename));
+        return false;
+    }
     file.write(postdata);
     file.close();
 
@@ -1869,7 +1877,11 @@ bool DataDirectProcessor::Post(QString url, const PostList &list,
         return true;
 
     QFile file(documentFile);
-    file.open(QIODevice::WriteOnly);
+    if (!file.open(QIODevice::WriteOnly))
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to open document file: %1").arg(documentFile));
+        return false;
+    }
     file.write(postdata);
     file.close();
 
