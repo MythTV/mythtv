@@ -177,7 +177,7 @@ static inline void c_interp(unsigned dest[4], unsigned a, unsigned b,
 #define MYTH_PACKED
 #endif
 static inline unsigned c_pack2(uint8_t dest[],
-    unsigned v, unsigned u, unsigned y1, unsigned y2)
+    uint8_t v, uint8_t u, uint8_t y1, uint8_t y2)
 {
     struct pack
     {
