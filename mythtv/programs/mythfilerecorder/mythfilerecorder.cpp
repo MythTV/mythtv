@@ -142,8 +142,8 @@ void Streamer::SendBytes(void)
 }
 
 
-Commands::Commands(void) : m_run(true), m_eof(false), m_streamer(NULL),
-    m_timeout(10)
+Commands::Commands(void) : m_streamer(NULL), m_timeout(10), m_run(true),
+    m_eof(false)
 {
     setObjectName("Command");
 }
