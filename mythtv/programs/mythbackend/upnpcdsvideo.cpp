@@ -331,7 +331,7 @@ bool UPnpCDSVideo::LoadChildren(const UPnpCDSRequest* pRequest,
     }
     else if (currentToken == "season")
     {
-         if (tokens["season"].toInt() > 0)
+         if (!tokens["season"].isEmpty() && tokens["season"].toInt() >= 0) // Season 0 is valid
              return LoadVideos(pRequest, pResults, tokens);
          else
              return LoadSeasons(pRequest, pResults, tokens);
@@ -959,7 +959,7 @@ QString UPnpCDSVideo::BuildWhereClause(QStringList clauses, IDTokenMap tokens)
         clauses.append("v.intid=:VIDEO_ID");
     if (!tokens["series"].isEmpty())
         clauses.append("v.title=:TITLE");
-    if (tokens["season"].toInt() > 0)
+    if (!tokens["season"].isEmpty() && tokens["season"].toInt() >= 0) // Season 0 is valid
         clauses.append("v.season=:SEASON");
     if (!tokens["type"].isEmpty())
         clauses.append("v.contenttype=:TYPE");
@@ -982,7 +982,7 @@ void UPnpCDSVideo::BindValues(MSqlQuery& query, IDTokenMap tokens)
         query.bindValue(":VIDEO_ID", tokens["video"]);
     if (!tokens["series"].isEmpty())
         query.bindValue(":TITLE", tokens["series"]);
-    if (tokens["season"].toInt() > 0)
+    if (!tokens["season"].isEmpty() && tokens["season"].toInt() >= 0) // Season 0 is valid
         query.bindValue(":SEASON", tokens["season"]);
     if (!tokens["type"].isEmpty())
         query.bindValue(":TYPE", tokens["type"]);

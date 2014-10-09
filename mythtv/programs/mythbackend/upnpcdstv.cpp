@@ -932,8 +932,8 @@ bool UPnpCDSTv::LoadRecordings(const UPnpCDSRequest* pRequest,
                                IDTokenMap tokens)
 {
     QString sId = pRequest->m_sParentId;
-    if (GetCurrentToken(pRequest->m_sParentId).first != "recording")
-        sId.append("/recording");
+    if (GetCurrentToken(pRequest->m_sParentId).first != "Recording")
+        sId.append("/Recording");
     sId.append("=%1");
 
     uint16_t nCount = pRequest->m_nRequestedCount;
@@ -1111,7 +1111,7 @@ bool UPnpCDSTv::LoadRecordings(const UPnpCDSRequest* pRequest,
         else
             pItem->SetPropValue( "programTitle"  , sTitle);
 
-        if (   nEpisode > 0 || nSeason > 0) // There has got to be a better way
+        if ( nEpisode > 0 || nSeason > 0 ) // There has got to be a better way
         {
             pItem->SetPropValue( "episodeNumber" , QString::number(nEpisode));
             pItem->SetPropValue( "episodeCount"  , QString::number(nEpisodeTotal));
