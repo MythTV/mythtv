@@ -151,7 +151,7 @@ void ThemeChooser::Load(void)
     QString MythVersion = MYTH_SOURCE_PATH;
 
     // Treat devel branches as master
-    if (!MythVersion.startsWith("fixes/"))
+    if (!MythVersion.isEmpty() && !MythVersion.startsWith("fixes/"))
         MythVersion = "master";
 
     // FIXME: For now, treat git master the same as svn trunk
@@ -194,21 +194,30 @@ void ThemeChooser::Load(void)
     if (MythVersion == "trunk")
     {
         LoadVersion(MythVersion, themesSeen);
+        LOG(VB_GUI, LOG_INFO, QString("Loading themes for %1").arg(MythVersion));
     }
     else
     {
 
         MythVersion = MYTH_BINARY_VERSION; // Example: 0.25.20101017-1
         MythVersion.replace(QRegExp("\\.[0-9]{8,}.*"), "");
+        LOG(VB_GUI, LOG_INFO, QString("Loading themes for %1").arg(MythVersion));
         LoadVersion(MythVersion, themesSeen);
 
         // If a version of the theme for this tag exists, use it...
-        MythVersion = MYTH_SOURCE_VERSION;
-        // Strip off leading 'v' and trailing git version
-        // 0.27.1-1-gd49cfe4
-        int pos = MythVersion.indexOf('-');
-        MythVersion = MythVersion.mid(1, pos > 0 ? pos - 1 : pos);
-        LoadVersion(MythVersion, themesSeen);
+        QRegExp subexp("v[0-9]+.[0-9]+.([0-9]+)-*");
+        int pos = subexp.indexIn(MYTH_SOURCE_VERSION);
+        if (pos > -1)
+        {
+            QString subversion;
+            int idx = subexp.cap(1).toInt();
+            for ( ; idx > 0; --idx)
+            {
+                subversion = MythVersion + "." + QString::number(idx);
+                LOG(VB_GUI, LOG_INFO, QString("Loading themes for %1").arg(subversion));
+                LoadVersion(subversion, themesSeen);
+            }
+        }
     }
 
     ResetBusyPopup();
