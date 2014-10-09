@@ -268,15 +268,21 @@ bool UPnpCDSMusic::LoadMetadata(const UPnpCDSRequest* pRequest,
         return false;
     }
 
-    // Root + 1
+    // Root or Root + 1
     if (tokens[currentToken].isEmpty())
     {
-        CDSObject *container = m_pRoot->GetChild(pRequest->m_sObjectId);
+        CDSObject *container = NULL;
+
+        if (pRequest->m_sObjectId == m_sExtensionId)
+            container = GetRoot();
+        else
+            container = GetRoot()->GetChild(pRequest->m_sObjectId);
 
         if (container)
         {
             pResults->Add(container);
             pResults->m_nTotalMatches = 1;
+            return true;
         }
         else
             LOG(VB_GENERAL, LOG_ERR, QString("UPnpCDSMusic::LoadMetadata: Requested "
@@ -447,8 +453,7 @@ bool UPnpCDSMusic::LoadAlbums(const UPnpCDSRequest *pRequest,
                               UPnpCDSExtensionResults *pResults,
                               IDTokenMap tokens)
 {
-    QString sId = pRequest->m_sParentId;
-    sId.append("/Album=%1");
+    QString sRequestId = pRequest->m_sObjectId;
 
     uint16_t nCount = pRequest->m_nRequestedCount;
     uint16_t nOffset = pRequest->m_nStartingIndex;
@@ -496,7 +501,7 @@ bool UPnpCDSMusic::LoadAlbums(const UPnpCDSRequest *pRequest,
         int nTrackCount = query.value(7).toInt();
         int nAlbumArtID = query.value(8).toInt();
 
-        CDSObject* pContainer = CDSObject::CreateMusicAlbum( sId.arg(nAlbumID),
+        CDSObject* pContainer = CDSObject::CreateMusicAlbum( CreateIDString(sRequestId, "Album", nAlbumID),
                                                              sAlbumName,
                                                              pRequest->m_sParentId,
                                                              NULL );
@@ -540,8 +545,7 @@ bool UPnpCDSMusic::LoadArtists(const UPnpCDSRequest *pRequest,
                                UPnpCDSExtensionResults *pResults,
                                IDTokenMap tokens)
 {
-    QString sId = pRequest->m_sParentId;
-    sId.append("/Artist=%1");
+    QString sRequestId = pRequest->m_sObjectId;
 
     uint16_t nCount = pRequest->m_nRequestedCount;
     uint16_t nOffset = pRequest->m_nStartingIndex;
@@ -583,7 +587,7 @@ bool UPnpCDSMusic::LoadArtists(const UPnpCDSRequest *pRequest,
         QStringList sGenres = query.value(2).toString().split(',');
         int nAlbumCount = query.value(3).toInt();
 
-        CDSObject* pContainer = CDSObject::CreateMusicArtist( sId.arg(nArtistId),
+        CDSObject* pContainer = CDSObject::CreateMusicArtist( CreateIDString(sRequestId, "Artist", nArtistId),
                                                               sArtistName,
                                                               pRequest->m_sParentId,
                                                               NULL );
@@ -624,8 +628,7 @@ bool UPnpCDSMusic::LoadGenres(const UPnpCDSRequest *pRequest,
                               UPnpCDSExtensionResults *pResults,
                               IDTokenMap tokens )
 {
-    QString sId = pRequest->m_sParentId;
-    sId.append("/Genre=%1");
+    QString sRequestId = pRequest->m_sObjectId;
 
     uint16_t nCount = pRequest->m_nRequestedCount;
     uint16_t nOffset = pRequest->m_nStartingIndex;
@@ -663,7 +666,7 @@ bool UPnpCDSMusic::LoadGenres(const UPnpCDSRequest *pRequest,
         QString sGenreName = query.value(1).toString();
         int nArtistCount = query.value(2).toInt();
 
-        CDSObject* pContainer = CDSObject::CreateMusicGenre( sId.arg(nGenreId),
+        CDSObject* pContainer = CDSObject::CreateMusicGenre( CreateIDString(sRequestId, "Genre", nGenreId),
                                                              sGenreName,
                                                              pRequest->m_sParentId,
                                                              NULL );
@@ -697,8 +700,7 @@ bool UPnpCDSMusic::LoadTracks(const UPnpCDSRequest *pRequest,
                               UPnpCDSExtensionResults *pResults,
                               IDTokenMap tokens)
 {
-    QString sId = pRequest->m_sParentId;
-    sId.append("/Track=%1");
+    QString sRequestId = pRequest->m_sObjectId;
 
     uint16_t nCount = pRequest->m_nRequestedCount;
     uint16_t nOffset = pRequest->m_nStartingIndex;
@@ -753,7 +755,7 @@ bool UPnpCDSMusic::LoadTracks(const UPnpCDSRequest *pRequest,
         QDateTime      lastPlayedTime = query.value(12).toDateTime();
         int            nAlbumArtID    = query.value(13).toInt();
 
-        CDSObject* pItem = CDSObject::CreateMusicTrack( sId.arg(nId),
+        CDSObject* pItem = CDSObject::CreateMusicTrack( CreateIDString(sRequestId, "Track", nId),
                                                         sTitle,
                                                         pRequest->m_sParentId,
                                                         NULL );
