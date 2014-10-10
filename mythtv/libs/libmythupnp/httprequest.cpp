@@ -1941,7 +1941,6 @@ qint64 BufferedSocketDeviceRequest::WriteBlock(const char *pData, qint64 nLen)
         m_pSocket->state() == QAbstractSocket::ConnectedState)
     {
         bytesWritten = m_pSocket->write( pData, nLen );
-        m_pSocket->waitForBytesWritten();
     }
 
     return( bytesWritten );

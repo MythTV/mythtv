@@ -517,9 +517,26 @@ void HttpWorker::run(void)
 
     delete pRequest;
 
+    // Make sure any data in the buffer is flushed before the socket is closed
+    while (pSocket->isValid() &&
+           pSocket->state() == QAbstractSocket::ConnectedState &&
+           pSocket->bytesToWrite() > 0)
+    {
+        pSocket->waitForBytesWritten(10000);
+    }
+
+    if (pSocket->bytesToWrite() > 0)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, QString("WriteBlock(): "
+                                                "Failed to write %1 bytes to socket, socket state (%2)")
+                                            .arg(pSocket->bytesToWrite())
+                                            .arg(pSocket->state()));
+    }
+
     LOG(VB_UPNP, LOG_DEBUG, QString("HttpWorker(%1): Connection %1 closed, requests handled %2")
                                         .arg(pSocket->socketDescriptor())
                                         .arg(nRequestsHandled));
+
     pSocket->close();
     delete pSocket;
     pSocket = NULL;
