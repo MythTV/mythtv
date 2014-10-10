@@ -545,7 +545,7 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
     request.m_sContainerID      = pRequest->m_mapParams[ "containerid"   ];
     request.m_sFilter           = pRequest->m_mapParams[ "filter"        ];
     request.m_nStartingIndex    =
-        pRequest->m_mapParams[ "startingIndex" ].toLong();
+        pRequest->m_mapParams[ "startingindex" ].toLong();
     request.m_nRequestedCount   =
         pRequest->m_mapParams[ "requestedcount"].toLong();
     request.m_sSortCriteria     = pRequest->m_mapParams[ "sortcriteria"  ];
