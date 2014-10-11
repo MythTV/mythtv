@@ -522,18 +522,36 @@ void HttpWorker::run(void)
            pSocket->state() == QAbstractSocket::ConnectedState &&
            pSocket->bytesToWrite() > 0)
     {
-        pSocket->waitForBytesWritten(10000);
+        // If the client stops reading for longer than m_socketTimeout then
+        // stop waiting for them. We can't afford to leave the socket
+        // connected indefinately, it could be used by another client.
+        //
+        // NOTE: Some clients deliberately stall as a way of 'pausing' A/V
+        // streaming. We should create a new server extension or adjust the
+        // timeout according to the User-Agent, instead of increasing the
+        // standard timeout. However we should ALWAYS have a timeout.
+        if (!pSocket->waitForBytesWritten(m_socketTimeout))
+        {
+            LOG(VB_GENERAL, LOG_WARNING, QString("HttpWorker(%1): "
+                                         "Timed out waiting for client to read "
+                                         "from socket, waited %2 seconds")
+                                            .arg(m_socket)
+                                            .arg(m_socketTimeout / 1000));
+            break;
+        }
     }
 
     if (pSocket->bytesToWrite() > 0)
     {
-        LOG(VB_GENERAL, LOG_WARNING, QString("WriteBlock(): "
-                                                "Failed to write %1 bytes to socket, socket state (%2)")
+        LOG(VB_GENERAL, LOG_WARNING, QString("HttpWorker(%1): "
+                                                "Failed to write %2 bytes to socket, socket state (%3)")
+                                            .arg(m_socket)
                                             .arg(pSocket->bytesToWrite())
                                             .arg(pSocket->state()));
     }
 
-    LOG(VB_UPNP, LOG_DEBUG, QString("HttpWorker(%1): Connection %1 closed, requests handled %2")
+    LOG(VB_UPNP, LOG_DEBUG, QString("HttpWorker(%1): Connection %2 closed, requests handled %3")
+                                        .arg(m_socket)
                                         .arg(pSocket->socketDescriptor())
                                         .arg(nRequestsHandled));
 
