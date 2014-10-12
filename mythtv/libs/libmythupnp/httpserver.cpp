@@ -511,18 +511,28 @@ void HttpWorker::run(void)
     }
     catch(...)
     {
-        LOG(VB_GENERAL, LOG_ERR, 
+        LOG(VB_GENERAL, LOG_ERR,
             "HttpWorkerThread::ProcessWork - Unexpected Exception.");
     }
 
     delete pRequest;
 
+    if (pSocket->error() != QAbstractSocket::UnknownSocketError)
+    {
+        LOG(VB_UPNP, LOG_WARNING, QString("HttpWorker(%1): Error %2 (%3)")
+                                   .arg(m_socket)
+                                   .arg(pSocket->errorString())
+                                   .arg(pSocket->error()));
+    }
+
+    int writeTimeout = 5000; // 5 Seconds
     // Make sure any data in the buffer is flushed before the socket is closed
-    while (pSocket->isValid() &&
+    while (m_httpServer.IsRunning() &&
+           pSocket->isValid() &&
            pSocket->state() == QAbstractSocket::ConnectedState &&
            pSocket->bytesToWrite() > 0)
     {
-        // If the client stops reading for longer than m_socketTimeout then
+        // If the client stops reading for longer than 'writeTimeout' then
         // stop waiting for them. We can't afford to leave the socket
         // connected indefinately, it could be used by another client.
         //
@@ -530,24 +540,29 @@ void HttpWorker::run(void)
         // streaming. We should create a new server extension or adjust the
         // timeout according to the User-Agent, instead of increasing the
         // standard timeout. However we should ALWAYS have a timeout.
-        if (!pSocket->waitForBytesWritten(m_socketTimeout))
+        if (!pSocket->waitForBytesWritten(writeTimeout))
         {
             LOG(VB_GENERAL, LOG_WARNING, QString("HttpWorker(%1): "
-                                         "Timed out waiting for client to read "
-                                         "from socket, waited %2 seconds")
+                                         "Timed out waiting to write bytes to "
+                                         "the socket, waited %2 seconds")
                                             .arg(m_socket)
-                                            .arg(m_socketTimeout / 1000));
+                                            .arg(writeTimeout / 1000));
             break;
         }
+        LOG(VB_UPNP, LOG_DEBUG, QString("HttpWorker(%1): "
+                                        "Waiting for %1 bytes to be written "
+                                        "before closing the connection.")
+                                            .arg(pSocket->bytesToWrite()));
     }
 
     if (pSocket->bytesToWrite() > 0)
     {
-        LOG(VB_GENERAL, LOG_WARNING, QString("HttpWorker(%1): "
-                                                "Failed to write %2 bytes to socket, socket state (%3)")
+        LOG(VB_UPNP, LOG_WARNING, QString("HttpWorker(%1): "
+                                          "Failed to write %2 bytes to "
+                                          "socket, (%3)")
                                             .arg(m_socket)
                                             .arg(pSocket->bytesToWrite())
-                                            .arg(pSocket->state()));
+                                            .arg(pSocket->errorString()));
     }
 
     LOG(VB_UPNP, LOG_DEBUG, QString("HttpWorker(%1): Connection %2 closed, requests handled %3")
