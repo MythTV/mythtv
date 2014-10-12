@@ -533,8 +533,9 @@ void HttpWorker::run(void)
            pSocket->bytesToWrite() > 0)
     {
         LOG(VB_HTTP, LOG_DEBUG, QString("HttpWorker(%1): "
-                                        "Waiting for %1 bytes to be written "
+                                        "Waiting for %2 bytes to be written "
                                         "before closing the connection.")
+                                            .arg(m_socket)
                                             .arg(pSocket->bytesToWrite()));
 
         // If the client stops reading for longer than 'writeTimeout' then
