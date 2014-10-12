@@ -63,7 +63,7 @@ HttpServer::HttpServer(const QString &sApplicationPrefix) :
     setMaxPendingConnections(maxHttpWorkers);
     m_threadPool.setMaxThreadCount(maxHttpWorkers);
 
-    LOG(VB_UPNP, LOG_NOTICE, QString("HttpServer(): Max Thread Count %1")
+    LOG(VB_HTTP, LOG_NOTICE, QString("HttpServer(): Max Thread Count %1")
                                 .arg(m_threadPool.maxThreadCount()));
 
     // ----------------------------------------------------------------------
@@ -83,7 +83,7 @@ HttpServer::HttpServer(const QString &sApplicationPrefix) :
 #endif
     }
 
-    LOG(VB_UPNP, LOG_INFO, QString("HttpServer() - SharePath = %1")
+    LOG(VB_HTTP, LOG_INFO, QString("HttpServer() - SharePath = %1")
             .arg(m_sSharePath));
 
     // -=>TODO: Load Config XML
@@ -277,7 +277,7 @@ void HttpServer::DelegateRequest(HTTPRequest *pRequest)
 {
     bool bProcessed = false;
 
-    LOG(VB_UPNP, LOG_DEBUG, QString("m_sBaseUrl: %1").arg( pRequest->m_sBaseUrl ));
+    LOG(VB_HTTP, LOG_DEBUG, QString("m_sBaseUrl: %1").arg( pRequest->m_sBaseUrl ));
     m_rwlock.lockForRead();
 
     QList< HttpServerExtension* > list = m_basePaths.values( pRequest->m_sBaseUrl );
@@ -355,7 +355,7 @@ HttpWorker::HttpWorker(HttpServer &httpServer, qt_socket_fd_t sock,
              m_socketTimeout(5 * 1000), m_connectionType(type),
              m_sslConfig(sslConfig)
 {
-    LOG(VB_UPNP, LOG_DEBUG, QString("HttpWorker(%1): New connection")
+    LOG(VB_HTTP, LOG_INFO, QString("HttpWorker(%1): New connection")
                                         .arg(m_socket));
 }                  
 
@@ -366,7 +366,7 @@ HttpWorker::HttpWorker(HttpServer &httpServer, qt_socket_fd_t sock,
 void HttpWorker::run(void)
 {
 #if 0
-    LOG(VB_UPNP, LOG_DEBUG,
+    LOG(VB_HTTP, LOG_DEBUG,
         QString("HttpWorker::run() socket=%1 -- begin").arg(m_socket));
 #endif
 
@@ -389,11 +389,11 @@ void HttpWorker::run(void)
             pSslSocket->startServerEncryption();
             if (pSslSocket->waitForEncrypted(5000))
             {
-                LOG(VB_UPNP, LOG_DEBUG, "SSL Handshake occurred, connection encrypted");
+                LOG(VB_HTTP, LOG_INFO, "SSL Handshake occurred, connection encrypted");
             }
             else
             {
-                LOG(VB_UPNP, LOG_DEBUG, "SSL Handshake FAILED, connection terminated");
+                LOG(VB_HTTP, LOG_DEBUG, "SSL Handshake FAILED, connection terminated");
                 delete pSslSocket;
                 pSslSocket = NULL;
             }
@@ -469,7 +469,7 @@ void HttpWorker::run(void)
                     }
                     else
                     {
-                        LOG(VB_UPNP, LOG_ERR, "ParseRequest Failed.");
+                        LOG(VB_HTTP, LOG_ERR, "ParseRequest Failed.");
 
                         pRequest->m_nResponseStatus = 501;
                         bKeepAlive = false;
@@ -481,7 +481,7 @@ void HttpWorker::run(void)
                     if (pRequest->SendResponse() < 0)
                     {
                         bKeepAlive = false;
-                        LOG(VB_UPNP, LOG_ERR,
+                        LOG(VB_HTTP, LOG_ERR,
                             QString("socket(%1) - Error returned from "
                                     "SendResponse... Closing connection")
                                 .arg(pSocket->socketDescriptor()));
@@ -519,7 +519,7 @@ void HttpWorker::run(void)
 
     if (pSocket->error() != QAbstractSocket::UnknownSocketError)
     {
-        LOG(VB_UPNP, LOG_WARNING, QString("HttpWorker(%1): Error %2 (%3)")
+        LOG(VB_HTTP, LOG_WARNING, QString("HttpWorker(%1): Error %2 (%3)")
                                    .arg(m_socket)
                                    .arg(pSocket->errorString())
                                    .arg(pSocket->error()));
@@ -549,7 +549,7 @@ void HttpWorker::run(void)
                                             .arg(writeTimeout / 1000));
             break;
         }
-        LOG(VB_UPNP, LOG_DEBUG, QString("HttpWorker(%1): "
+        LOG(VB_HTTP, LOG_INFO, QString("HttpWorker(%1): "
                                         "Waiting for %1 bytes to be written "
                                         "before closing the connection.")
                                             .arg(pSocket->bytesToWrite()));
@@ -557,7 +557,7 @@ void HttpWorker::run(void)
 
     if (pSocket->bytesToWrite() > 0)
     {
-        LOG(VB_UPNP, LOG_WARNING, QString("HttpWorker(%1): "
+        LOG(VB_HTTP, LOG_WARNING, QString("HttpWorker(%1): "
                                           "Failed to write %2 bytes to "
                                           "socket, (%3)")
                                             .arg(m_socket)
@@ -565,7 +565,7 @@ void HttpWorker::run(void)
                                             .arg(pSocket->errorString()));
     }
 
-    LOG(VB_UPNP, LOG_DEBUG, QString("HttpWorker(%1): Connection %2 closed, requests handled %3")
+    LOG(VB_HTTP, LOG_INFO, QString("HttpWorker(%1): Connection %2 closed, requests handled %3")
                                         .arg(m_socket)
                                         .arg(pSocket->socketDescriptor())
                                         .arg(nRequestsHandled));
@@ -575,7 +575,7 @@ void HttpWorker::run(void)
     pSocket = NULL;
 
 #if 0
-    LOG(VB_UPNP, LOG_DEBUG, "HttpWorkerThread::run() -- end");
+    LOG(VB_HTTP, LOG_DEBUG, "HttpWorkerThread::run() -- end");
 #endif
 }
 
