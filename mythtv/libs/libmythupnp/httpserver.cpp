@@ -532,6 +532,11 @@ void HttpWorker::run(void)
            pSocket->state() == QAbstractSocket::ConnectedState &&
            pSocket->bytesToWrite() > 0)
     {
+        LOG(VB_HTTP, LOG_DEBUG, QString("HttpWorker(%1): "
+                                        "Waiting for %1 bytes to be written "
+                                        "before closing the connection.")
+                                            .arg(pSocket->bytesToWrite()));
+
         // If the client stops reading for longer than 'writeTimeout' then
         // stop waiting for them. We can't afford to leave the socket
         // connected indefinately, it could be used by another client.
@@ -549,10 +554,6 @@ void HttpWorker::run(void)
                                             .arg(writeTimeout / 1000));
             break;
         }
-        LOG(VB_HTTP, LOG_INFO, QString("HttpWorker(%1): "
-                                        "Waiting for %1 bytes to be written "
-                                        "before closing the connection.")
-                                            .arg(pSocket->bytesToWrite()));
     }
 
     if (pSocket->bytesToWrite() > 0)
