@@ -2532,7 +2532,7 @@ void MythMainWindow::customEvent(QEvent *ce)
             {
                 d->idleTimer->setInterval(1000 * 60 * d->idleTime);
 
-                //if (isActive)
+                if (isActive)
                     d->idleTimer->start();
 
                 LOG(VB_GENERAL, LOG_INFO, QString("Updating the frontend idle time to: %1 mins").arg(d->idleTime));
