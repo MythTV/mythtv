@@ -2711,7 +2711,8 @@ void MythMainWindow::HideMouseTimeout(void)
 
 void MythMainWindow::ResetIdleTimer(void)
 {
-    if (!d->idleTimer->isActive() ||
+    if (d->idleTime == 0 ||
+        !d->idleTimer->isActive() ||
         (d->standby && d->enteringStandby))
         return;
 
@@ -2723,6 +2724,10 @@ void MythMainWindow::ResetIdleTimer(void)
 
 void MythMainWindow::PauseIdleTimer(bool pause)
 {
+    // don't do anything if the idle timer is disabled
+    if (d->idleTime == 0)
+        return;
+
     if (pause)
     {
         LOG(VB_GENERAL, LOG_NOTICE, "Suspending idle timer");
