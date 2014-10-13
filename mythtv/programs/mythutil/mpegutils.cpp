@@ -157,12 +157,12 @@ static int pid_counter(const MythUtilCommandLineParser &cmdline)
         {
             offset = 0;
         }
-        LOG(VB_STDIO|VB_FLUSH, LOG_ANY,
+        LOG(VB_STDIO|VB_FLUSH, logLevel,
             QString("\r                                            \r"
                     "Processed %1 packets")
             .arg(total_count));
     }
-    LOG(VB_STDIO|VB_FLUSH, LOG_ANY, "\n");
+    LOG(VB_STDIO|VB_FLUSH, logLevel, "\n");
 
     delete[] buffer;
     delete srcRB;
@@ -274,18 +274,18 @@ static int pid_filter(const MythUtilCommandLineParser &cmdline)
         {
             offset = 0;
         }
-        LOG(VB_STDIO|VB_FLUSH, LOG_ANY,
+        LOG(VB_STDIO|VB_FLUSH, logLevel,
             QString("\r                                            \r"
                     "Processed %1 packets")
             .arg(total_count));
     }
-    LOG(VB_STDIO|VB_FLUSH, LOG_ANY, "\n");
+    LOG(VB_STDIO|VB_FLUSH, logLevel, "\n");
 
     delete[] buffer;
     delete srcRB;
     delete destRB;
 
-    LOG(VB_STDIO|VB_FLUSH, LOG_ANY, QString("Wrote %1 of %2 packets\n")
+    LOG(VB_STDIO|VB_FLUSH, logLevel, QString("Wrote %1 of %2 packets\n")
         .arg(write_count).arg(total_count));
 
     return GENERIC_EXIT_OK;
@@ -428,7 +428,7 @@ class PrintOutput
         }
         else
         {
-            LOG(VB_STDIO|VB_FLUSH, LOG_ANY, msg);
+            LOG(VB_STDIO|VB_FLUSH, logLevel, msg);
         }
     }
 
@@ -817,7 +817,7 @@ static int pid_printer(const MythUtilCommandLineParser &cmdline)
         offset = sd->ProcessData((const unsigned char*)buffer, len);
 
         totalBytes += len - offset;
-        LOG(VB_STDIO|VB_FLUSH, LOG_ANY,
+        LOG(VB_STDIO|VB_FLUSH, logLevel,
             QString("\r                                            \r"
                     "Processed %1 bytes")
             .arg(totalBytes));
@@ -828,13 +828,13 @@ static int pid_printer(const MythUtilCommandLineParser &cmdline)
         pmsl->Output(QString("</MPEGSections>"));
     }
 
-    LOG(VB_STDIO|VB_FLUSH, LOG_ANY, "\n");
+    LOG(VB_STDIO|VB_FLUSH, logLevel, "\n");
 
     if (ptsl->GetFirstPTS() >= 0)
     {
         QTime ot = QTime(0,0,0,0).addMSecs(ptsl->GetElapsedPTS()/90);
 
-        LOG(VB_STDIO|VB_FLUSH, LOG_ANY,
+        LOG(VB_STDIO|VB_FLUSH, logLevel,
             QString("First PTS %1, Last PTS %2, elapsed %3 %4\n")
             .arg(ptsl->GetFirstPTS()).arg(ptsl->GetLastPTS())
             .arg(ptsl->GetElapsedPTS())
