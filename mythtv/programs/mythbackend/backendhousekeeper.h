@@ -36,6 +36,8 @@ class ThemeUpdateTask : public DailyHouseKeeperTask
     bool DoRun(void);
     virtual void Terminate(void);
   private:
+    bool LoadVersion(const QString &version, int download_log_level);
+
     bool m_running;
     QString m_url;
 };

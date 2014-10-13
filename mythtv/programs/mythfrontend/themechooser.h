@@ -99,15 +99,15 @@ class ThemeUpdateChecker : public QObject
     Q_OBJECT
 
   public:
-    ThemeUpdateChecker();
-   ~ThemeUpdateChecker();
+    ThemeUpdateChecker(void);
+   ~ThemeUpdateChecker(void);
 
   protected slots:
     void checkForUpdate(void);
 
   private:
     QTimer    *m_updateTimer;
-    QString    m_mythVersion;
+    QStringList m_mythVersions;
     QString    m_infoPackage;
     QString    m_lastKnownThemeVersion;
     QString    m_currentVersion;

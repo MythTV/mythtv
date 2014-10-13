@@ -1140,8 +1140,8 @@ void VideoOutput::ShowPIP(VideoFrame  *frame,
                                img_out.linesize[1],
                                img_out.linesize[2] };
             int offsets[3] = { 0,
-                               img_out.data[1] - img_out.data[0],
-                               img_out.data[2] - img_out.data[0] };
+                               (int)(img_out.data[1] - img_out.data[0]),
+                               (int)(img_out.data[2] - img_out.data[0]) };
             pipw = pip_display_size.width();
             piph = pip_display_size.height();
 

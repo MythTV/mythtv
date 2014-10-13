@@ -334,7 +334,7 @@ PlaybackBoxHelper::PlaybackBoxHelper(QObject *listener) :
 
 PlaybackBoxHelper::~PlaybackBoxHelper()
 {
-    exit();
+    MThread::exit();
     wait();
 
     // delete the event handler

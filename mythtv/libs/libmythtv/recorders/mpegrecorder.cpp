@@ -1419,7 +1419,7 @@ bool MpegRecorder::StartEncoding(void)
     }
 
     if (!good_res)   // Try again
-        good_res = HandleResolutionChanges();
+        HandleResolutionChanges();
 
     if (_device_read_buffer)
     {

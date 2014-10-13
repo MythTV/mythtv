@@ -117,9 +117,9 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams )
         QThread *objectThread  = pService->thread();
 
         if (currentThread == objectThread)
-            LOG(VB_UPNP, LOG_DEBUG, "*** Threads are same ***");
+            LOG(VB_HTTP, LOG_DEBUG, "*** Threads are same ***");
         else
-            LOG(VB_UPNP, LOG_DEBUG, "*** Threads are Different!!! ***");
+            LOG(VB_HTTP, LOG_DEBUG, "*** Threads are Different!!! ***");
 #endif
 
         pService->qt_metacall( QMetaObject::InvokeMetaMethod, 
@@ -301,7 +301,7 @@ bool ServiceHost::ProcessRequest( HTTPRequest *pRequest )
             if (pRequest->m_sBaseUrl != m_sBaseUrl)
                 return false;
 
-            LOG(VB_UPNP, LOG_INFO,
+            LOG(VB_HTTP, LOG_INFO,
                 QString("ServiceHost::ProcessRequest: %1 : %2")
                     .arg(pRequest->m_sMethod) .arg(pRequest->m_sRawRequest));
 

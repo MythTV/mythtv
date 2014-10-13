@@ -134,7 +134,7 @@ class UPNP_PUBLIC UPnpCDSExtensionResults
 
         void    Add         ( CDSObject *pObject );
         void    Add         ( CDSObjects objects );
-        QString GetResultXML(FilterMap &filter);
+        QString GetResultXML(FilterMap &filter, bool ignoreChildren = false);
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -249,6 +249,13 @@ class UPNP_PUBLIC UPnpCDSExtension
 
         IDTokenMap TokenizeIDString ( const QString &Id ) const;
         IDToken    GetCurrentToken  ( const QString &Id ) const;
+
+        QString    CreateIDString   ( const QString &RequestId,
+                                      const QString &Name,
+                                      int Value );
+        QString    CreateIDString   ( const QString &RequestId,
+                                      const QString &Name,
+                                      const QString &Value );
 
         CDSObject *m_pRoot;
 

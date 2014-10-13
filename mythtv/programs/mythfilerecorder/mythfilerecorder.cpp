@@ -142,7 +142,8 @@ void Streamer::SendBytes(void)
 }
 
 
-Commands::Commands(void) : m_run(true), m_eof(false)
+Commands::Commands(void) : m_streamer(NULL), m_timeout(10), m_run(true),
+    m_eof(false)
 {
     setObjectName("Command");
 }
@@ -302,7 +303,6 @@ bool Commands::Run(const QString & filename, bool loopinput)
     polls[0].fd      = 0;
     polls[0].events  = POLLIN | POLLPRI;
     polls[0].revents = 0;
-    m_timeout = 10;
 
     m_fileName = filename;
 

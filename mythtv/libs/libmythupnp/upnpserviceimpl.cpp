@@ -29,13 +29,6 @@ QString UPnPFeature::toXML()
 
 UPnPFeatureList::UPnPFeatureList()
 {
-    m_attributes.append(NameValue( "xmlns",
-                                   "urn:schemas-upnp-org:av:cm-featureList" ));
-    m_attributes.append(NameValue( "xmlns:xsi",
-                                   "http://www.w3.org/2001/XMLSchema-instance" ));
-    m_attributes.append(NameValue( "xsi:schemaLocation",
-                                   "urn:schemas-upnp-org:av:cm-featureList "
-                                   "http://www.upnp.org/schemas/av/cm-featureList.xsd" ));
 }
 
 UPnPFeatureList::~UPnPFeatureList()
@@ -47,6 +40,11 @@ UPnPFeatureList::~UPnPFeatureList()
 void UPnPFeatureList::AddFeature(UPnPFeature *feature)
 {
     m_features.append(feature);
+}
+
+void UPnPFeatureList::AddAttribute(const NameValue& attribute)
+{
+    m_attributes.append(attribute); 
 }
 
 QString UPnPFeatureList::toXML()

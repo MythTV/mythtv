@@ -8473,11 +8473,14 @@ QSet<uint> TV::IsTunableOn(TV *tv,
         bool used_cache = false;
         if (use_cache)
         {
-            QMutexLocker locker(&tv->is_tunable_cache_lock);
-            if (tv->is_tunable_cache_inputs.contains(cardids[i]))
+            if (tv)
             {
-                inputs = tv->is_tunable_cache_inputs[cardids[i]];
-                used_cache = true;
+                QMutexLocker locker(&tv->is_tunable_cache_lock);
+                if (tv->is_tunable_cache_inputs.contains(cardids[i]))
+                {
+                    inputs = tv->is_tunable_cache_inputs[cardids[i]];
+                    used_cache = true;
+                }
             }
         }
 

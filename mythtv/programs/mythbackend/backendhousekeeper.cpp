@@ -364,22 +364,49 @@ void CleanupTask::CleanupProgramListings(void)
 
 bool ThemeUpdateTask::DoRun(void)
 {
+    bool    result = false;
     QString MythVersion = MYTH_SOURCE_PATH;
 
     // Treat devel branches as master
-    if (MythVersion.startsWith("devel/"))
-        MythVersion = "master";
-
-    // FIXME: For now, treat git master the same as svn trunk
-    if (MythVersion == "master")
+    if (!MythVersion.isEmpty() && !MythVersion.startsWith("fixes/"))
+    {
+        // FIXME: For now, treat git master the same as svn trunk
         MythVersion = "trunk";
 
-    if (MythVersion != "trunk")
+        result |= LoadVersion(MythVersion, LOG_ERR);
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("Loading themes for %1").arg(MythVersion));
+    }
+    else
     {
+
         MythVersion = MYTH_BINARY_VERSION; // Example: 0.25.20101017-1
         MythVersion.replace(QRegExp("\\.[0-9]{8,}.*"), "");
-    }
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("Loading themes for %1").arg(MythVersion));
+        result |= LoadVersion(MythVersion, LOG_ERR);
 
+        // If a version of the theme for this tag exists, use it...
+        QRegExp subexp("v[0-9]+.[0-9]+.([0-9]+)-*");
+        int pos = subexp.indexIn(MYTH_SOURCE_VERSION);
+        if (pos > -1)
+        {
+            QString subversion;
+            int idx = subexp.cap(1).toInt();
+            for ( ; idx > 0; --idx)
+            {
+                subversion = MythVersion + "." + QString::number(idx);
+                LOG(VB_GENERAL, LOG_INFO,
+                    QString("Loading themes for %1").arg(subversion));
+                result |= LoadVersion(subversion, LOG_INFO);
+            }
+        }
+    }
+    return result;
+}
+
+bool ThemeUpdateTask::LoadVersion(const QString &version, int download_log_level)
+{
     QString remoteThemesDir = GetConfDir();
     remoteThemesDir.append("/tmp/remotethemes");
 
@@ -397,8 +424,9 @@ bool ThemeUpdateTask::DoRun(void)
     remoteThemesFile.append("/themes.zip");
 
     m_url = QString("%1/%2/themes.zip")
-        .arg(gCoreContext->GetSetting("ThemeRepositoryURL",
-             "http://themes.mythtv.org/themes/repository")).arg(MythVersion);
+            .arg(gCoreContext->GetSetting("ThemeRepositoryURL",
+                          "http://themes.mythtv.org/themes/repository"))
+            .arg(version);
 
     m_running = true;
     bool result = GetMythDownloadManager()->download(m_url, remoteThemesFile);
@@ -406,8 +434,8 @@ bool ThemeUpdateTask::DoRun(void)
 
     if (!result)
     {
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("HouseKeeper: Error downloading %1"
+        LOG(VB_GENERAL, download_log_level,
+            QString("HouseKeeper: Failed to download %1"
                     "remote themes info package.").arg(m_url));
         return false;
     }

@@ -528,8 +528,8 @@ DataDirectProcessor::DataDirectProcessor(uint lp, QString user, QString pass) :
     m_userid(user),                   m_password(pass),
     m_tmpDir("/tmp"),                 m_cacheData(false),
     m_inputFilename(""),              m_tmpPostFile(QString::null),
-    m_tmpResultFile(QString::null),   m_cookieFile(QString::null),
-    m_cookieFileDT()
+    m_tmpResultFile(QString::null),   m_tmpDDPFile(QString::null),
+    m_cookieFile(QString::null),      m_cookieFileDT()
 {
     {
         QMutexLocker locker(&user_agent_lock);
@@ -544,7 +544,7 @@ DataDirectProcessor::DataDirectProcessor(uint lp, QString user, QString pass) :
         "/ztvws/ztvws_login/1,1059,TMS01-1,00.html");
     DataDirectURLs urls1(
         "Schedules Direct",
-        "http://webservices.schedulesdirect.tmsdatadirect.com"
+        "http://dd.schedulesdirect.org"
         "/schedulesdirect/tvlistings/xtvdService",
         "http://schedulesdirect.org",
         "/login/index.php");
@@ -565,6 +565,12 @@ DataDirectProcessor::~DataDirectProcessor()
     if (!m_tmpResultFile.isEmpty())
     {
         QByteArray tmp = m_tmpResultFile.toLatin1();
+        unlink(tmp.constData());
+    }
+
+    if (!m_tmpDDPFile.isEmpty())
+    {
+        QByteArray tmp = m_tmpDDPFile.toLatin1();
         unlink(tmp.constData());
     }
 
@@ -995,8 +1001,16 @@ bool DataDirectProcessor::DDPost(QString    ddurl,        QString   &inputFile,
     postdata += "</SOAP-ENV:Body>\n";
     postdata += "</SOAP-ENV:Envelope>\n";
 
-    if (inputFile.isEmpty()) {
-        inputFile = QDir::tempPath() + "/mythtv__ddp_data";
+    if (inputFile.isEmpty())
+    {
+        bool ok;
+        inputFile = GetDDPFilename(ok);
+        if (!ok)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+            "Failure creating temp ddp file");
+            return false;
+        }
     }
 
     QHash<QByteArray, QByteArray> headers;
@@ -1031,7 +1045,11 @@ bool DataDirectProcessor::DDPost(QString    ddurl,        QString   &inputFile,
         .arg( inputFile ));
 
     QFile file(inputFile);
-    file.open(QIODevice::WriteOnly);
+    if (!file.open(QIODevice::WriteOnly))
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to open temporary file: %1").arg(inputFile));
+        return false;
+    }
     file.write(uncompressed);
     file.close();
 
@@ -1091,7 +1109,11 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
         .arg(postdata.size()));
 
     QFile file(resultFilename);
-    file.open(QIODevice::WriteOnly);
+    if (!file.open(QIODevice::WriteOnly))
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to open result file: %1").arg(resultFilename));
+        return false;
+    }
     file.write(postdata);
     file.close();
 
@@ -1825,6 +1847,18 @@ QString DataDirectProcessor::GetCookieFilename(bool &ok) const
     return m_cookieFile;
 }
 
+QString DataDirectProcessor::GetDDPFilename(bool &ok) const
+{
+    ok = true;
+    if (m_tmpDDPFile.isEmpty())
+    {
+        CreateTemp(m_tmpDir + "/mythtv_ddp_XXXXXX",
+                   "Failed to create temp ddp file",
+                   false, m_tmpDDPFile, ok);
+    }
+    return m_tmpDDPFile;
+}
+
 void DataDirectProcessor::SetUserID(const QString &uid)
 {
     m_userid = uid;
@@ -1869,7 +1903,11 @@ bool DataDirectProcessor::Post(QString url, const PostList &list,
         return true;
 
     QFile file(documentFile);
-    file.open(QIODevice::WriteOnly);
+    if (!file.open(QIODevice::WriteOnly))
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to open document file: %1").arg(documentFile));
+        return false;
+    }
     file.write(postdata);
     file.close();
 

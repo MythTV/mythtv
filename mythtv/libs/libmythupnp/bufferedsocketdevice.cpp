@@ -654,7 +654,7 @@ QString BufferedSocketDevice::ReadLine( int msecs )
         while ( !CanReadLine() && !bTimeout )
         {
 #if 0
-            LOG(VB_UPNP, LOG_DEBUG, "Can't Read Line... Waiting for more." );
+            LOG(VB_HTTP, LOG_DEBUG, "Can't Read Line... Waiting for more." );
 #endif
 
             WaitForMore( msecs, &bTimeout );
@@ -662,7 +662,7 @@ QString BufferedSocketDevice::ReadLine( int msecs )
             if ( timer.elapsed() >= msecs ) 
             {
                 bTimeout = true;
-                LOG(VB_UPNP, LOG_INFO, "Exceeded Total Elapsed Wait Time." );
+                LOG(VB_HTTP, LOG_INFO, "Exceeded Total Elapsed Wait Time." );
             }
         }
             
