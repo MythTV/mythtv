@@ -544,7 +544,7 @@ DataDirectProcessor::DataDirectProcessor(uint lp, QString user, QString pass) :
         "/ztvws/ztvws_login/1,1059,TMS01-1,00.html");
     DataDirectURLs urls1(
         "Schedules Direct",
-        "http://webservices.schedulesdirect.tmsdatadirect.com"
+        "http://dd.schedulesdirect.org"
         "/schedulesdirect/tvlistings/xtvdService",
         "http://schedulesdirect.org",
         "/login/index.php");
