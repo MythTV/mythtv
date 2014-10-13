@@ -7752,8 +7752,7 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
     if (ctx->prevChan.empty())
         ctx->PushPreviousChannel();
 
-    if (ctx->player)
-        ctx->player->GetAudio()->Pause(true);
+    PauseAudioUntilBuffered(ctx);
     PauseLiveTV(ctx);
 
     ctx->LockDeletePlayer(__FILE__, __LINE__);
@@ -7770,7 +7769,6 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
         ctx->player->GetAudio()->Reset();
 
     UnpauseLiveTV(ctx, chanid && GetQueuedChanID());
-    PauseAudioUntilBuffered(ctx);
 
     if (oldinputname != ctx->recorder->GetInput())
         UpdateOSDInput(ctx);

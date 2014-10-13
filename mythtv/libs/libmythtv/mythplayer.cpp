@@ -387,7 +387,7 @@ bool MythPlayer::Pause(void)
 
 bool MythPlayer::Play(float speed, bool normal, bool unpauseaudio)
 {
-    QMutexLocker locker(&pauseLock);
+    pauseLock.lock();
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
         QString("Play(%1, normal %2, unpause audio %3)")
             .arg(speed,5,'f',1).arg(normal).arg(unpauseaudio));
@@ -395,6 +395,7 @@ bool MythPlayer::Play(float speed, bool normal, bool unpauseaudio)
     if (deleteMap.IsEditing())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Ignoring Play(), in edit mode.");
+        pauseLock.unlock();
         return false;
     }
 
@@ -407,6 +408,7 @@ bool MythPlayer::Play(float speed, bool normal, bool unpauseaudio)
     allpaused = false;
     next_play_speed   = speed;
     next_normal_speed = normal;
+    pauseLock.unlock();
     return true;
 }
 
@@ -946,7 +948,7 @@ int MythPlayer::OpenFile(uint retries)
                 return -1;
             }
             LOG(VB_GENERAL, LOG_WARNING, LOC + "OpenFile() waiting on data");
-            usleep(150 * 1000);
+            usleep(50 * 1000);
         }
 
         player_ctx->LockPlayingInfo(__FILE__, __LINE__);
@@ -2195,10 +2197,7 @@ void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
         videoOutput->DoneDisplayingFrame(videoOutput->GetLastShownFrame());
 
     // retrieve the next frame
-    bool const bDisplayFrame = videoOutput->ValidVideoFrames() > 0;
-    if (bDisplayFrame)
-        videoOutput->StartDisplayingFrame();
-
+    videoOutput->StartDisplayingFrame();
     VideoFrame *frame = videoOutput->GetLastShownFrame();
 
     // Check aspect ratio
@@ -2207,12 +2206,9 @@ void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
     // Player specific processing (dvd, bd, mheg etc)
     PreProcessNormalFrame();
 
-    if (GetTrackCount(kTrackTypeVideo))
-    {
-        // handle scan type changes
-        AutoDeint(frame);
-        detect_letter_box->SwitchTo(frame);
-    }
+    // handle scan type changes
+    AutoDeint(frame);
+    detect_letter_box->SwitchTo(frame);
 
     FrameScanType ps = m_scan;
     if (kScan_Detect == m_scan || kScan_Ignore == m_scan)
@@ -2226,9 +2222,7 @@ void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
 
     AVSync(frame, 0);
     // If PiP then keep this frame for MythPlayer::GetCurrentFrame
-    if (player_ctx->IsPIP())
-        return;
-    if (bDisplayFrame)
+    if (!player_ctx->IsPIP())
         videoOutput->DoneDisplayingFrame(frame);
 }
 
@@ -2238,12 +2232,10 @@ void MythPlayer::PreProcessNormalFrame(void)
     // handle Interactive TV
     if (GetInteractiveTV())
     {
-        QMutexLocker lk1(&osdLock);
-
+        osdLock.lock();
+        itvLock.lock();
         if (osd && videoOutput->GetOSDPainter())
         {
-            QMutexLocker lk2(&itvLock);
-
             InteractiveScreen *window =
                 (InteractiveScreen*)osd->GetWindow(OSD_WIN_INTERACT);
             if ((interactiveTV->ImageHasChanged() || !itvVisible) && window)
@@ -2252,6 +2244,8 @@ void MythPlayer::PreProcessNormalFrame(void)
                 itvVisible = true;
             }
         }
+        itvLock.unlock();
+        osdLock.unlock();
     }
 #endif // USING_MHEG
 }
@@ -2419,7 +2413,7 @@ bool MythPlayer::VideoLoop(void)
         DisplayPauseFrame();
     }
     else
-        DisplayNormalFrame(GetTrackCount(kTrackTypeVideo));
+        DisplayNormalFrame();
 
     if (FlagIsSet(kVideoIsNull) && decoder)
         decoder->UpdateFramesPlayed();
@@ -2549,10 +2543,7 @@ void MythPlayer::SwitchToProgram(void)
     ProgramInfo *pginfo = player_ctx->tvchain->GetSwitchProgram(
         discontinuity, newtype, newid);
     if (!pginfo)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "SwitchToProgram - No ProgramInfo");
         return;
-    }
 
     bool newIsDummy = player_ctx->tvchain->GetCardType(newid) == "DUMMY";
 
@@ -2687,10 +2678,7 @@ void MythPlayer::JumpToProgram(void)
     ProgramInfo *pginfo = player_ctx->tvchain->GetSwitchProgram(
         discontinuity, newtype, newid);
     if (!pginfo)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "JumpToProgram - No ProgramInfo");
         return;
-    }
 
     inJumpToProgramPause = true;
 
@@ -2698,6 +2686,7 @@ void MythPlayer::JumpToProgram(void)
     SetPlayingInfo(*pginfo);
 
     Pause();
+    ChangeSpeed();
     ResetCaptions();
     player_ctx->tvchain->SetProgram(*pginfo);
     player_ctx->buffer->Reset(true);
@@ -2935,11 +2924,12 @@ void MythPlayer::EventLoop(void)
         JumpToProgram();
     }
     else if ((!allpaused || GetEof() != kEofStateNone) &&
-             decoder && !decoder->GetWaitForChange() &&
-             player_ctx->tvchain && player_ctx->tvchain->NeedsToSwitch())
+             player_ctx->tvchain &&
+             (decoder && !decoder->GetWaitForChange()))
     {
         // Switch to the next program in livetv
-        SwitchToProgram();
+        if (player_ctx->tvchain->NeedsToSwitch())
+            SwitchToProgram();
     }
 
     // Jump to the next program in livetv
@@ -3133,35 +3123,36 @@ void MythPlayer::AudioEnd(void)
 
 bool MythPlayer::PauseDecoder(void)
 {
-    QMutexLocker locker(&decoderPauseLock);
+    decoderPauseLock.lock();
     if (is_current_thread(decoderThread))
     {
-        pauseDecoder = false;
         decoderPaused = true;
         decoderThreadPause.wakeAll();
-        return true;
+        decoderPauseLock.unlock();
+        return decoderPaused;
     }
 
-    pauseDecoder = true;
     int tries = 0;
-    while (!decoderPaused && decoderThread && !killdecoder && (tries++ < 10) &&
-          !decoderThreadPause.wait(locker.mutex(), 100))
+    pauseDecoder = true;
+    while (decoderThread && !killdecoder && (tries++ < 100) &&
+           !decoderThreadPause.wait(&decoderPauseLock, 100))
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Waited 100ms for decoder to pause");
     }
     pauseDecoder = false;
+    decoderPauseLock.unlock();
     return decoderPaused;
- }
+}
 
 void MythPlayer::UnpauseDecoder(void)
 {
-    QMutexLocker locker(&decoderPauseLock);
+    decoderPauseLock.lock();
 
     if (is_current_thread(decoderThread))
     {
-        unpauseDecoder = false;
         decoderPaused = false;
         decoderThreadUnpause.wakeAll();
+        decoderPauseLock.unlock();
         return;
     }
 
@@ -3169,14 +3160,15 @@ void MythPlayer::UnpauseDecoder(void)
     {
         int tries = 0;
         unpauseDecoder = true;
-        while (decoderPaused && decoderThread && !killdecoder && (tries++ < 10) &&
-              !decoderThreadUnpause.wait(locker.mutex(), 100))
+        while (decoderThread && !killdecoder && (tries++ < 100) &&
+              !decoderThreadUnpause.wait(&decoderPauseLock, 100))
         {
             LOG(VB_GENERAL, LOG_WARNING, LOC +
                 "Waited 100ms for decoder to unpause");
         }
         unpauseDecoder = false;
     }
+    decoderPauseLock.unlock();
 }
 
 void MythPlayer::DecoderStart(bool start_paused)
@@ -3202,7 +3194,7 @@ void MythPlayer::DecoderEnd(void)
     SetPlaying(false);
     killdecoder = true;
     int tries = 0;
-    while (decoderThread && !decoderThread->wait(100) && (tries++ < 20))
+    while (decoderThread && !decoderThread->wait(100) && (tries++ < 50))
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             "Waited 100ms for decoder loop to stop");
 
@@ -3215,23 +3207,12 @@ void MythPlayer::DecoderEnd(void)
 
 void MythPlayer::DecoderPauseCheck(void)
 {
-    if (!is_current_thread(decoderThread))
-        return;
-
-    QMutexLocker locker(&decoderPauseLock);
-
-    if (pauseDecoder)
+    if (is_current_thread(decoderThread))
     {
-        pauseDecoder = false;
-        decoderPaused = true;
-        decoderThreadPause.wakeAll();
-    }
-
-    if (unpauseDecoder)
-    {
-        unpauseDecoder = false;
-        decoderPaused = false;
-        decoderThreadUnpause.wakeAll();
+        if (pauseDecoder)
+            PauseDecoder();
+        if (unpauseDecoder)
+            UnpauseDecoder();
     }
 }
 
