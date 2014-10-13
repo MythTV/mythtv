@@ -64,6 +64,7 @@ class UPNP_PUBLIC UPnPFeatureList
    ~UPnPFeatureList();
 
     void AddFeature( UPnPFeature *feature );
+    void AddAttribute( const NameValue &attribute );
     QString toXML();
 
   private:

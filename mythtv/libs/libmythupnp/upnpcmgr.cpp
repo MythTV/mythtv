@@ -42,6 +42,16 @@ UPnpCMGR::UPnpCMGR ( UPnpDevice *pDevice,
     // Add our Service Definition to the device.
 
     RegisterService( pDevice );
+
+    // ConnectionManager uses a different schema definition for the FeatureList
+    // to the ContentDirectoryService
+    m_features.AddAttribute(NameValue( "xmlns",
+                                       "urn:schemas-upnp-org:av:cm-featureList" ));
+    m_features.AddAttribute(NameValue( "xmlns:xsi",
+                                       "http://www.w3.org/2001/XMLSchema-instance" ));
+    m_features.AddAttribute(NameValue( "xsi:schemaLocation",
+                                       "urn:schemas-upnp-org:av:cm-featureList "
+                                       "http://www.upnp.org/schemas/av/cm-featureList.xsd" ));
 }
 
 /////////////////////////////////////////////////////////////////////////////

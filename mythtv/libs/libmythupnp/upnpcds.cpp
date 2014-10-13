@@ -106,6 +106,16 @@ UPnpCDS::UPnpCDS( UPnpDevice *pDevice, const QString &sSharePath )
     // Add our Service Definition to the device.
 
     RegisterService( pDevice );
+
+    // ContentDirectoryService uses a different schema definition for the FeatureList
+    // to the ConnectionManager, although they appear to be identical
+    m_features.AddAttribute(NameValue( "xmlns",
+                                       "urn:schemas-upnp-org:av:avs" ));
+    m_features.AddAttribute(NameValue( "xmlns:xsi",
+                                       "http://www.w3.org/2001/XMLSchema-instance" ));
+    m_features.AddAttribute(NameValue( "xsi:schemaLocation",
+                                       "urn:schemas-upnp-org:av:avs "
+                                       "http://www.upnp.org/schemas/av/avs.xsd" ));
 }
 
 /////////////////////////////////////////////////////////////////////////////
