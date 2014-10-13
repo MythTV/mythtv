@@ -371,7 +371,66 @@ static bool comp_priority(RecordingInfo *a, RecordingInfo *b)
     if (a->schedorder != b->schedorder)
         return a->schedorder < b->schedorder;
 
-    return a->GetInputID() < b->GetInputID();
+    if (a->GetInputID() != b->GetInputID())
+        return a->GetInputID() < b->GetInputID();
+
+    return a->GetChanID() < b->GetChanID();
+}
+
+static bool comp_retry(RecordingInfo *a, RecordingInfo *b)
+{
+    int arec = (a->GetRecordingStatus() != rsRecording &&
+                a->GetRecordingStatus() != rsTuning);
+    int brec = (b->GetRecordingStatus() != rsRecording &&
+                b->GetRecordingStatus() != rsTuning);
+
+    if (arec != brec)
+        return arec < brec;
+
+    if (a->GetRecordingPriority() != b->GetRecordingPriority())
+        return a->GetRecordingPriority() > b->GetRecordingPriority();
+
+    if (a->GetRecordingPriority2() != b->GetRecordingPriority2())
+        return a->GetRecordingPriority2() > b->GetRecordingPriority2();
+
+    int atype = (a->GetRecordingRuleType() == kOverrideRecord ||
+                 a->GetRecordingRuleType() == kSingleRecord);
+    int btype = (b->GetRecordingRuleType() == kOverrideRecord ||
+                 b->GetRecordingRuleType() == kSingleRecord);
+    if (atype != btype)
+        return atype > btype;
+
+    QDateTime pasttime = MythDate::current().addSecs(-30);
+    int apast = (a->GetRecordingStartTime() < pasttime && !a->IsReactivated());
+    int bpast = (b->GetRecordingStartTime() < pasttime && !b->IsReactivated());
+    if (apast != bpast)
+        return apast < bpast;
+
+    if (a->GetRecordingStartTime() != b->GetRecordingStartTime())
+        return a->GetRecordingStartTime() > b->GetRecordingStartTime();
+
+    if (a->GetRecordingRuleID() != b->GetRecordingRuleID())
+        return a->GetRecordingRuleID() < b->GetRecordingRuleID();
+
+    if (a->GetTitle() != b->GetTitle())
+        return a->GetTitle() < b->GetTitle();
+
+    if (a->GetProgramID() != b->GetProgramID())
+        return a->GetProgramID() < b->GetProgramID();
+
+    if (a->GetSubtitle() != b->GetSubtitle())
+        return a->GetSubtitle() < b->GetSubtitle();
+
+    if (a->GetDescription() != b->GetDescription())
+        return a->GetDescription() < b->GetDescription();
+
+    if (a->schedorder != b->schedorder)
+        return a->schedorder > b->schedorder;
+
+    if (a->GetInputID() != b->GetInputID())
+        return a->GetInputID() > b->GetInputID();
+
+    return a->GetChanID() > b->GetChanID();
 }
 
 bool Scheduler::FillRecordList(void)
@@ -1440,7 +1499,16 @@ void Scheduler::SchedNewFirstPass(RecIter &i, RecIter end,
 void Scheduler::SchedNewRetryPass(RecIter i, RecIter end,
                                   bool samePriority, bool livetv)
 {
+    RecList retry_list;
     for ( ; i != end; ++i)
+    {
+        if ((*i)->GetRecordingStatus() == rsUnknown)
+            retry_list.push_back(*i);
+    }
+    SORT_RECLIST(retry_list, comp_retry);
+
+    i = retry_list.begin();
+    for ( ; i != retry_list.end(); ++i)
     {
         RecordingInfo *p = *i;
         if (p->GetRecordingStatus() != rsUnknown)
@@ -5254,7 +5322,7 @@ void Scheduler::SchedLiveTV(void)
     if (livetvlist.empty())
         return;
 
-    SchedNewRetryPass(livetvlist.begin(), livetvlist.end(), true, true);
+    SchedNewRetryPass(livetvlist.begin(), livetvlist.end(), false, true);
 
     while (!livetvlist.empty())
     {
