@@ -22,6 +22,10 @@
 
 // Qt headers
 #include <QScriptEngine>
+#include <QSslConfiguration>
+#include <QSslSocket>
+#include <QSslCipher>
+#include <QSslCertificate>
 
 // MythTV headers
 #include "httpserver.h"
@@ -131,7 +135,32 @@ void HttpServer::LoadSSLConfig()
 {
     m_sslConfig = QSslConfiguration::defaultConfiguration();
 
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+    m_sslConfig.setProtocol(QSsl::TlsV1_0 | QSsl::TlsV1_1 | QSsl::TlsV1_2);
+#else
     m_sslConfig.setProtocol(QSsl::TlsV1); // SSL v1, v2, v3 are insecure
+#endif
+    m_sslConfig.setSslOption(QSsl::SslOptionDisableLegacyRenegotiation, true); // Potential DoS multiplier
+    m_sslConfig.setSslOption(QSsl::SslOptionDisableCompression, true); // CRIME attack
+
+    QList<QSslCipher> availableCiphers = QSslSocket::supportedCiphers();
+    QList<QSslCipher> secureCiphers;
+    QList<QSslCipher>::iterator it;
+    for (it = availableCiphers.begin(); it != availableCiphers.end(); ++it)
+    {
+        // Remove weak ciphers from the cipher list
+        if ((*it).usedBits() < 128)
+            continue;
+
+        if ((*it).name().startsWith("RC4") || // Weak cipher
+            (*it).name().startsWith("EXP") || // Weak authentication
+            (*it).name().startsWith("ADH") || // No authentication
+            (*it).name().contains("NULL"))    // No encryption
+            continue;
+
+        secureCiphers.append(*it);
+    }
+    m_sslConfig.setCiphers(secureCiphers);
 
     QString hostKeyPath = gCoreContext->GetSetting("hostSSLKey", "");
 
@@ -392,10 +421,11 @@ void HttpWorker::run(void)
             if (pSslSocket->waitForEncrypted(5000))
             {
                 LOG(VB_HTTP, LOG_INFO, "SSL Handshake occurred, connection encrypted");
+                LOG(VB_HTTP, LOG_INFO, QString("Using %1 cipher").arg(pSslSocket->sessionCipher().name()));
             }
             else
             {
-                LOG(VB_HTTP, LOG_DEBUG, "SSL Handshake FAILED, connection terminated");
+                LOG(VB_HTTP, LOG_WARNING, "SSL Handshake FAILED, connection terminated");
                 delete pSslSocket;
                 pSslSocket = NULL;
             }
