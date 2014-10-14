@@ -190,7 +190,7 @@ void ThemeChooser::Load(void)
 
     if (MythVersion == "trunk")
     {
-        LoadVersion(MythVersion, themesSeen);
+        LoadVersion(MythVersion, themesSeen, true);
         LOG(VB_GUI, LOG_INFO, QString("Loading themes for %1").arg(MythVersion));
     }
     else
@@ -199,7 +199,7 @@ void ThemeChooser::Load(void)
         MythVersion = MYTH_BINARY_VERSION; // Example: 0.25.20101017-1
         MythVersion.replace(QRegExp("\\.[0-9]{8,}.*"), "");
         LOG(VB_GUI, LOG_INFO, QString("Loading themes for %1").arg(MythVersion));
-        LoadVersion(MythVersion, themesSeen);
+        LoadVersion(MythVersion, themesSeen, true);
 
         // If a version of the theme for this tag exists, use it...
         QRegExp subexp("v[0-9]+.[0-9]+.([0-9]+)-*");
@@ -212,7 +212,7 @@ void ThemeChooser::Load(void)
             {
                 subversion = MythVersion + "." + QString::number(idx);
                 LOG(VB_GUI, LOG_INFO, QString("Loading themes for %1").arg(subversion));
-                LoadVersion(subversion, themesSeen);
+                LoadVersion(subversion, themesSeen, false);
             }
         }
     }
@@ -223,7 +223,7 @@ void ThemeChooser::Load(void)
 }
 
 void ThemeChooser::LoadVersion(const QString &version,
-                               QStringList &themesSeen)
+                               QStringList &themesSeen, bool alert_user)
 {
     QString remoteThemesFile = GetConfDir();
     remoteThemesFile.append("/tmp/themes.zip");
@@ -260,6 +260,15 @@ void ThemeChooser::LoadVersion(const QString &version,
 
     if (m_refreshDownloadableThemes)
     {
+        QFile test(remoteThemesFile);
+        if (test.open(QIODevice::WriteOnly))
+            test.remove();
+        else
+        {
+            ShowOkPopup(tr("Unable to create '%1'").arg(remoteThemesFile));
+            return;
+        }
+
         SetBusyPopupMessage(tr("Refreshing Downloadable Themes Information"));
 
         QString url = themeSite;
@@ -267,9 +276,11 @@ void ThemeChooser::LoadVersion(const QString &version,
         QString destdir = GetMythUI()->GetThemeCacheDir();
         destdir.append("/themechooser");
         QString versiondir = QString("%1/%2").arg(destdir).arg(version);
-        removeThemeDir(versiondir);
+        if (!removeThemeDir(versiondir))
+            ShowOkPopup(tr("Unable to remove '%1'").arg(versiondir));
         QDir dir;
-        dir.mkpath(destdir);
+        if (!dir.mkpath(destdir))
+            ShowOkPopup(tr("Unable to create '%1'").arg(destdir));
         bool result = GetMythDownloadManager()->download(url, remoteThemesFile);
 
         LOG(VB_GUI, LOG_INFO, LOC +
@@ -286,12 +297,21 @@ void ThemeChooser::LoadVersion(const QString &version,
                                       downloadFailures);
 
             if (!result)
+            {
                 LOG(VB_GUI, LOG_ERR, LOC +
                     QString("Failed to download '%1'").arg(url));
+                if (alert_user)
+                    ShowOkPopup(tr("Failed to download '%1'").arg(url));
+            }
             else
+            {
                 LOG(VB_GUI, LOG_ERR, LOC +
                     QString("Failed to unzip '%1' to '%2'")
                     .arg(remoteThemesFile).arg(destdir));
+                if (alert_user)
+                    ShowOkPopup(tr("Failed to unzip '%1' to '%2'")
+                                   .arg(remoteThemesFile).arg(destdir));
+            }
         }
         else
             LOG(VB_GUI, LOG_INFO, LOC +
@@ -937,16 +957,16 @@ void ThemeChooser::removeTheme(void)
     ReloadInBackground();
 }
 
-void ThemeChooser::removeThemeDir(const QString &dirname)
+bool ThemeChooser::removeThemeDir(const QString &dirname)
 {
     if ((!dirname.startsWith(m_userThemeDir)) &&
         (!dirname.startsWith(GetMythUI()->GetThemeCacheDir())))
-        return;
+        return true;
 
     QDir dir(dirname);
 
     if (!dir.exists())
-        return;
+        return true;
 
     dir.setFilter(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
     QFileInfoList list = dir.entryInfoList();
@@ -958,15 +978,17 @@ void ThemeChooser::removeThemeDir(const QString &dirname)
         fi = &(*it++);
         if (fi->isFile() && !fi->isSymLink())
         {
-            QFile::remove(fi->absoluteFilePath());
+            if (!QFile::remove(fi->absoluteFilePath()))
+                return false;
         }
         else if (fi->isDir() && !fi->isSymLink())
         {
-            removeThemeDir(fi->absoluteFilePath());
+            if (!removeThemeDir(fi->absoluteFilePath()))
+                return false;
         }
     }
 
-    dir.rmdir(dirname);
+    return dir.rmdir(dirname);
 }
 
 //////////////////////////////////////////////////////////////////////////////
