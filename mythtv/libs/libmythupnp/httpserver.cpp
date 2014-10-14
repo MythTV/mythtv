@@ -131,6 +131,8 @@ void HttpServer::LoadSSLConfig()
 {
     m_sslConfig = QSslConfiguration::defaultConfiguration();
 
+    m_sslConfig.setProtocol(QSsl::TlsV1); // SSL v1, v2, v3 are insecure
+
     QString hostKeyPath = gCoreContext->GetSetting("hostSSLKey", "");
 
     if (hostKeyPath.isEmpty()) // No key, assume no SSL
