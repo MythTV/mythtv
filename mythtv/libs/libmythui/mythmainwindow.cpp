@@ -2711,7 +2711,10 @@ void MythMainWindow::HideMouseTimeout(void)
 
 void MythMainWindow::ResetIdleTimer(void)
 {
-    if (!d->idleTimer->isActive() ||
+    int idletimeout = gCoreContext->GetNumSetting("FrontendIdleTimeout",
+                                                   STANDBY_TIMEOUT);
+    if (idletimeout == 0 ||
+        !d->idleTimer->isActive() ||
         (d->standby && d->enteringStandby))
         return;
 
@@ -2723,6 +2726,12 @@ void MythMainWindow::ResetIdleTimer(void)
 
 void MythMainWindow::PauseIdleTimer(bool pause)
 {
+    // don't do anything if the idle timer is disabled
+    int idletimeout = gCoreContext->GetNumSetting("FrontendIdleTimeout",
+                                                   STANDBY_TIMEOUT);
+    if (idletimeout == 0)
+        return;
+
     if (pause)
     {
         LOG(VB_GENERAL, LOG_NOTICE, "Suspending idle timer");
