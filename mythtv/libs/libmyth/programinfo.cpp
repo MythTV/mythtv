@@ -5775,7 +5775,7 @@ MPUBLIC QString format_season_and_episode(int seasEp, int digits)
 
 void ProgramInfo::SetFilesize(uint64_t sz)
 {
-    LOG(VB_GENERAL, LOG_DEBUG, "FIXME: ProgramInfo::SetFilesize() called instead of RecordingInfo::SetFilesize()");
+    //LOG(VB_GENERAL, LOG_DEBUG, "FIXME: ProgramInfo::SetFilesize() called instead of RecordingInfo::SetFilesize()");
     filesize     = sz;
 }
 
@@ -5785,7 +5785,7 @@ void ProgramInfo::SetFilesize(uint64_t sz)
  */
 void ProgramInfo::SaveFilesize(uint64_t fsize)
 {
-    LOG(VB_GENERAL, LOG_DEBUG, "FIXME: ProgramInfo::SaveFilesize() called instead of RecordingInfo::SaveFilesize()");
+    //LOG(VB_GENERAL, LOG_DEBUG, "FIXME: ProgramInfo::SaveFilesize() called instead of RecordingInfo::SaveFilesize()");
     SetFilesize(fsize);
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -5806,7 +5806,7 @@ void ProgramInfo::SaveFilesize(uint64_t fsize)
 
 uint64_t ProgramInfo::GetFilesize(void) const
 {
-    LOG(VB_GENERAL, LOG_DEBUG, "FIXME: ProgramInfo::GetFilesize() called instead of RecordingInfo::GetFilesize()");
+    //LOG(VB_GENERAL, LOG_DEBUG, "FIXME: ProgramInfo::GetFilesize() called instead of RecordingInfo::GetFilesize()");
     return filesize;
 }
 
