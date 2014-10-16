@@ -142,7 +142,8 @@ UPnpCDSMethod UPnpCDS::GetMethod( const QString &sURI )
     if (sURI == "GetSearchCapabilities" ) return CDSM_GetSearchCapabilities;
     if (sURI == "GetSortCapabilities"   ) return CDSM_GetSortCapabilities  ;
     if (sURI == "GetSystemUpdateID"     ) return CDSM_GetSystemUpdateID    ;
-    if (sURI == "GetFeatureList"        ) return CDSM_GetFeatureList       ;
+    if (sURI == "X_GetFeatureList" ||     // HACK: Samsung
+        sURI == "GetFeatureList"        ) return CDSM_GetFeatureList       ;
     if (sURI == "GetServiceResetToken"  ) return CDSM_GetServiceResetToken ;
 
     return(  CDSM_Unknown );
