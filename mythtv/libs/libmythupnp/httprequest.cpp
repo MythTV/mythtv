@@ -289,8 +289,8 @@ QString HTTPRequest::BuildResponseHeader( long long nSize )
     else if (sTransferMode == "Interactive")
         sHeader += "transferMode.dlna.org: Interactive\r\n";
 
-    // HACK Temporary hack for Samsung TVs - Needs to be moved later
-    if (GetHeaderValue( "user-agent", "" ).contains("SEC_HHP_[TV]", Qt::CaseInsensitive))
+    // HACK Temporary hack for Samsung TVs - Needs to be moved later as it's not entirely DLNA compliant
+    if (!GetHeaderValue( "getcontentFeatures.dlna.org", "" ).isEmpty())
         sHeader += "contentFeatures.dlna.org: DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=01500000000000000000000000000000\r\n";
 
     // ----------------------------------------------------------------------
