@@ -533,8 +533,11 @@ DataDirectProcessor::DataDirectProcessor(uint lp, QString user, QString pass) :
 {
     {
         QMutexLocker locker(&user_agent_lock);
-        user_agent = QString("MythTV/%1.%2")
-            .arg(MYTH_BINARY_VERSION).arg(MYTH_SOURCE_VERSION);
+        QString mythVersion = MYTH_SOURCE_VERSION;
+        if (mythVersion.startsWith("v"))
+            mythVersion = mythVersion.right(mythVersion.length() - 1); // Trim off the leading 'v'
+        user_agent = QString("MythTV/%1")
+            .arg(mythVersion);
     }
 
     DataDirectURLs urls0(
