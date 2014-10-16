@@ -31,25 +31,27 @@ QEvent::Type DecoderEvent::Error =
     (QEvent::Type) QEvent::registerEventType();
 
 Decoder::Decoder(DecoderFactory *d, AudioOutput *o) :
-    MThread("MythMusicDecoder"), fctry(d), out(o)
+    MThread("MythMusicDecoder"), m_fctry(d), m_out(o)
 {
 }
 
 Decoder::~Decoder()
 {
-    fctry = 0;
-    out = 0;
+    m_fctry = 0;
+    m_out = 0;
 }
 
-QIODevice *Decoder::input(void)
+/*
+QString Decoder::getURL(void)
 {
-    return gPlayer->getDecoderHandler()->getIOFactory()->getInput();
+    return gPlayer->getDecoderHandler()->getUrl();
 }
+*/
 
 void Decoder::setOutput(AudioOutput *o)
 {
     lock();
-    out = o;
+    m_out = o;
     unlock();
 }
 

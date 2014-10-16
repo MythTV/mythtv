@@ -1530,7 +1530,7 @@ void MusicPlayer::decoderHandlerReady(void)
         return;
 
     LOG(VB_PLAYBACK, LOG_INFO, QString ("decoder handler is ready, decoding %1")
-            .arg(getDecoder()->getFilename()));
+            .arg(getDecoder()->getURL()));
 
 #ifdef HAVE_CDIO
     CdDecoder *cddecoder = dynamic_cast<CdDecoder*>(getDecoder());
@@ -1590,7 +1590,7 @@ void MusicPlayer::decoderHandlerReady(void)
     else
     {
         LOG(VB_PLAYBACK, LOG_ERR, QString("Cannot initialise decoder for %1")
-                .arg(getDecoder()->getFilename()));
+                .arg(getDecoder()->getURL()));
         return;
     }
 
