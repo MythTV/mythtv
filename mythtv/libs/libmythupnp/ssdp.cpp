@@ -314,6 +314,33 @@ void SSDP::run()
 
 void SSDP::ProcessData( MSocketDevice *pSocket )
 {
+    QHostAddress  peerAddress = pSocket->peerAddress();
+    quint16       peerPort    = pSocket->peerPort   ();
+
+    // Mitigate against SSDP Reflection DDOS attacks
+    // Disallow device discovery from non-local addresses
+    // Security Advisory (Akamai):
+    // https://www.prolexic.com/kcresources/prolexic-threat-advisories/prolexic-threat-advisory-ssdp-reflection-ddos-attacks/ssdp-reflection-attacks-cybersecurity-locked.html
+    // https://www.prolexic.com/knowledge-center-ddos-threat-advisory-ssdp-reflection-ddos-attacks.html
+    //
+    // TODO: We may want to restrict this to the same subnet as the server
+    //       for added security
+    if (((peerAddress.protocol() == QAbstractSocket::IPv4Protocol) &&
+            (!peerAddress.isInSubnet(QHostAddress("172.16.0.0"), 12) &&
+            !peerAddress.isInSubnet(QHostAddress("192.168.0.0"), 16) &&
+            !peerAddress.isInSubnet(QHostAddress("10.0.0.0"), 8))) ||
+        ((peerAddress.protocol() == QAbstractSocket::IPv6Protocol) &&
+            !peerAddress.isInSubnet(pSocket->address(), 64))) // default subnet size is assumed to be /64
+    {
+        LOG(VB_GENERAL, LOG_CRIT, QString("SSDP Request from WAN IP "
+                                            "address (%1). Possible SSDP "
+                                            "Reflection attempt. Ignoring as "
+                                            "security risk.")
+                                                .arg(peerAddress.toString()));
+        pSocket->readAll(); // Discard the data in the socket buffer
+        return;
+    }
+
     QByteArray buffer;
     long nBytes = 0;
     int retries = 0;
@@ -364,9 +391,6 @@ void SSDP::ProcessData( MSocketDevice *pSocket )
 
         if (buffer.isEmpty())
             continue;
-
-        QHostAddress  peerAddress = pSocket->peerAddress();
-        quint16       peerPort    = pSocket->peerPort   ();
 
         // ------------------------------------------------------------------
         QString     str          = QString(buffer.constData());
