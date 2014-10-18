@@ -15,6 +15,7 @@ class MythUIButtonListItem;
 class MythUIButtonList;
 class MythUIButton;
 class MythUITextEdit;
+class MythUISpinBox;
 class MythUIImage;
 class MythUIStateType;
 class MythMenu;
@@ -243,6 +244,44 @@ class MUI_PUBLIC MythTextInputDialog : public MythScreenType
     QString m_defaultValue;
     InputFilter m_filter;
     bool m_isPassword;
+    QObject *m_retObject;
+    QString m_id;
+
+  protected slots:
+    void sendResult();
+};
+
+
+/**
+ *  \class MythSpinBoxDialog
+ *
+ *  \brief Dialog prompting the user to enter a number using a spin box
+ *
+ *  Sends out a DialogCompletionEvent event and the haveResult() signal
+ *  containing the result when the user selects the Ok button.
+ */
+class MUI_PUBLIC MythSpinBoxDialog : public MythScreenType
+{
+    Q_OBJECT
+
+  public:
+    MythSpinBoxDialog(MythScreenStack *parent, const QString &message);
+
+    bool Create(void);
+    void SetReturnEvent(QObject *retobject, const QString &resultid);
+
+    void SetRange(int low, int high, int step, uint pageMultiple=5);
+    void AddSelection(QString label, int value);
+    void SetValue(const QString & value);
+    void SetValue(int value);
+
+  signals:
+     void haveResult(QString);
+
+  protected:
+    MythUISpinBox *m_spinBox;
+    QString m_message;
+    QString m_defaultValue;
     QObject *m_retObject;
     QString m_id;
 

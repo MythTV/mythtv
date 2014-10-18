@@ -21,6 +21,7 @@
 #include "mythuibuttonlist.h"
 #include "mythuibutton.h"
 #include "mythuistatetype.h"
+#include "mythuispinbox.h"
 
 QEvent::Type DialogCompletionEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
@@ -715,6 +716,105 @@ void MythTextInputDialog::sendResult()
     {
         DialogCompletionEvent *dce = new DialogCompletionEvent(m_id, 0,
                                                             inputString, "");
+        QCoreApplication::postEvent(m_retObject, dce);
+    }
+
+    Close();
+}
+
+/////////////////////////////////////////////////////////////////
+
+MythSpinBoxDialog::MythSpinBoxDialog(MythScreenStack *parent,
+                                     const QString &message)
+    : MythScreenType(parent, "mythspinboxpopup"),
+      m_spinBox(NULL),
+      m_message(message),
+      m_retObject(NULL),
+      m_id("")
+{
+}
+
+bool MythSpinBoxDialog::Create(void)
+{
+    if (!CopyWindowFromBase("MythSpinBoxDialog", this))
+        return false;
+
+    MythUIText *messageText = NULL;
+    MythUIButton *okButton = NULL;
+    MythUIButton *cancelButton = NULL;
+
+    bool err = false;
+    UIUtilE::Assign(this, m_spinBox, "input", &err);
+    UIUtilE::Assign(this, messageText, "message", &err);
+    UIUtilE::Assign(this, okButton, "ok", &err);
+    UIUtilW::Assign(this, cancelButton, "cancel");
+
+    if (err)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'MythSpinBoxDialog'");
+        return false;
+    }
+
+    if (cancelButton)
+        connect(cancelButton, SIGNAL(Clicked()), SLOT(Close()));
+    connect(okButton, SIGNAL(Clicked()), SLOT(sendResult()));
+
+    messageText->SetText(m_message);
+    BuildFocusList();
+
+    return true;
+}
+
+/**
+ * \copydoc MythUISpinBox::SetRange()
+ * Can be called only after MythSpinBoxDialog::Create() return successfully
+ */
+void MythSpinBoxDialog::SetRange(int low, int high, int step, uint pageMultiple)
+{
+    m_spinBox->SetRange(low, high, step, pageMultiple);
+}
+
+/**
+ *
+ */
+void MythSpinBoxDialog::AddSelection(QString label, int value)
+{
+    m_spinBox->AddSelection(value, label);
+}
+
+/**
+ * Can be called only after MythSpinBoxDialog::Create() return successfully
+ * The range need to be set before we can set the value
+ */
+void MythSpinBoxDialog::SetValue (const QString & value)
+{
+    m_spinBox->SetValue(value);
+}
+
+/**
+ * Can be called only after MythSpinBoxDialog::Create() return successfully
+ */
+void MythSpinBoxDialog::SetValue(int value)
+{
+    m_spinBox->SetValue(value);
+}
+
+void MythSpinBoxDialog::SetReturnEvent(QObject *retobject,
+                                       const QString &resultid)
+{
+    m_retObject = retobject;
+    m_id = resultid;
+}
+
+void MythSpinBoxDialog::sendResult()
+{
+    QString inputString = m_spinBox->GetValue();
+    emit haveResult(inputString);
+
+    if (m_retObject)
+    {
+        DialogCompletionEvent *dce = new DialogCompletionEvent(m_id, 0,
+                                                               inputString, "");
         QCoreApplication::postEvent(m_retObject, dce);
     }
 
