@@ -600,7 +600,7 @@ void MythPainter::ExpireImages(int64_t max)
 void MythPainter::SetMaximumCacheSizes(int hardware, int software)
 {
     m_MaxHardwareCacheSize = 1024 * 1024 * hardware;
-    m_MaxSoftwareCacheSize = 1024 * 1024 * software;
+    m_MaxSoftwareCacheSize = 1024 * 1024 * static_cast<int64_t>(software); // Cast to avoid overflow before assignment - Coverity
 
     bool err = false;
     if (m_MaxHardwareCacheSize < 0)
