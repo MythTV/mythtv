@@ -15,8 +15,8 @@ INSTALLS = target
 QMAKE_CLEAN += $(TARGET)
 
 # Input
-HEADERS += ../mytharchive/archiveutil.h ../mytharchive/remoteavformatcontext.h pxsup2dast.h
-SOURCES += main.cpp ../mytharchive/archiveutil.cpp pxsup2dast.c
+HEADERS += ../mytharchive/archiveutil.h ../mytharchive/remoteavformatcontext.h external/pxsup2dast.h
+SOURCES += main.cpp ../mytharchive/archiveutil.cpp external/pxsup2dast.c
 
 LIBS += -lmythswscale
 LIBS += -lmythavformat

@@ -70,7 +70,7 @@ using namespace std;
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
-#include "pxsup2dast.h"
+#include "external/pxsup2dast.h"
 }
 
 // mytharchive headers
