@@ -91,6 +91,9 @@ class MUI_PUBLIC MythUIButtonListItem
     bool checkable() const;
     void setCheckable(bool flag);
 
+    bool isEnabled() const;
+    void setEnabled(bool flag);
+
     CheckState state() const;
     void setChecked(CheckState state);
 
@@ -114,6 +117,7 @@ class MUI_PUBLIC MythUIButtonListItem
     QVariant        m_data;
     bool            m_showArrow;
     bool            m_isVisible;
+    bool            m_enabled;
 
     QMap<QString, TextProperties> m_strings;
     QMap<QString, MythImage*> m_images;
@@ -262,6 +266,9 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
     int PageDown(void);
 
     bool DoFind(bool doMove, bool searchForward);
+
+    void FindEnabledUp(MovementUnit unit);
+    void FindEnabledDown(MovementUnit unit);
 
     /* methods for subclasses to override */
     virtual void CalculateVisibleItems(void);
