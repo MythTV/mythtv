@@ -516,6 +516,7 @@ class ImageLoadThread : public QRunnable
 
                 return;
              }
+             delete frames;
         }
 
         MythImage *image = ImageLoader::LoadImage(m_painter,
