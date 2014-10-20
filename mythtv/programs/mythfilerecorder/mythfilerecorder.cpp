@@ -85,7 +85,11 @@ void Streamer::SendBytes(void)
 
     if (!m_file->atEnd())
     {
-        read_sz = m_blockSize;
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+        read_sz = m_blockSize.loadAcquire();
+#else
+        read_sz = (int)m_blockSize;
+#endif
         if (read_sz > m_bufferMax - m_buffer.size())
             read_sz = m_bufferMax - m_buffer.size();
         QByteArray buffer = m_file->read(read_sz);
@@ -118,7 +122,11 @@ void Streamer::SendBytes(void)
         QString("SendBytes -- Read %1 from file.  %2 bytes buffered")
         .arg(pkt_size).arg(buf_size));
 
-    write_len = m_blockSize;
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+    write_len = m_blockSize.loadAcquire();
+#else
+    write_len = (int)m_blockSize;
+#endif
     if (write_len > buf_size)
         write_len = buf_size;
     LOG(VB_RECORD, LOG_DEBUG, LOC +
@@ -220,7 +228,11 @@ bool Commands::process_command(QString & cmd)
         }
         else
         {
-            if (m_eof)
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+        if (m_eof.loadAcquire() != 0)
+#else
+        if (m_eof != 0)
+#endif
                 send_status("ERR:End of file");
             else
             {
