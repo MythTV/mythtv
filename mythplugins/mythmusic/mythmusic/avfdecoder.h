@@ -3,17 +3,19 @@
 
 #include <stdint.h>
 
+#include <QObject>
+
 #include "decoder.h"
 
 #include <audiooutputsettings.h>
+#include "remoteavformatcontext.h"
 
-extern "C" {
-#include <libavformat/avformat.h>
-#include <libavcodec/avcodec.h>
-}
+class QTimer;
 
-class avfDecoder : public Decoder
+class avfDecoder : public QObject, public Decoder
 {
+  Q_OBJECT
+
   public:
     avfDecoder(const QString &file, DecoderFactory *, AudioOutput *);
     virtual ~avfDecoder(void);
@@ -22,6 +24,9 @@ class avfDecoder : public Decoder
     double lengthInSeconds();
     void seek(double);
     void stop();
+
+  protected slots:
+    void checkMetatdata(void);
 
   private:
     void run();
@@ -40,11 +45,13 @@ class avfDecoder : public Decoder
     QString m_devicename;
 
     AVInputFormat *m_inputFormat;
-    AVFormatContext *m_inputContext;
+    RemoteAVFormatContext *m_inputContext;
     AVCodecContext *m_audioDec;
 
     bool m_inputIsFile;
-    AVIOContext *m_byteIOContext;
+
+    QTimer *m_mdataTimer;
+    QString m_lastMetadata;
 
     int m_errCode;
 };

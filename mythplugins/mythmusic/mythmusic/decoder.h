@@ -73,21 +73,19 @@ class Decoder : public MThread, public MythObservable
     virtual void seek(double) = 0;
     virtual void stop() = 0;
 
-    DecoderFactory *factory() const { return fctry; }
+    DecoderFactory *factory() const { return m_fctry; }
 
-    QIODevice *input(void);
-    AudioOutput *output() { return out; }
+    AudioOutput *output() { return m_out; }
     void setOutput(AudioOutput *);
-    void setFilename(const QString &newName) { filename = newName; }
+    void setURL(const QString &url) { m_url = url; }
 
-    virtual void lock(void) { return mtx.lock(); }
-    virtual void unlock(void) { return mtx.unlock(); }
-    virtual bool tryLock(void) { return mtx.tryLock(); }
-    //virtual bool locked(void) { return mtx.locked(); }
+    virtual void lock(void) { return m_mtx.lock(); }
+    virtual void unlock(void) { return m_mtx.unlock(); }
+    virtual bool tryLock(void) { return m_mtx.tryLock(); }
 
-    QWaitCondition *cond() { return &cnd; }
+    QWaitCondition *cond() { return &m_cnd; }
 
-    QString getFilename(void) const { return filename; }
+    QString getURL(void) const { return m_url; }
 
     // static methods
     static QStringList all();
@@ -97,18 +95,18 @@ class Decoder : public MThread, public MythObservable
 
   protected:
     Decoder(DecoderFactory *, AudioOutput *);
-    QMutex* getMutex(void) { return &mtx; }
+    QMutex* getMutex(void) { return &m_mtx; }
     void error(const QString &);
 
-    QString filename;
+    QString m_url;
 
   private:
-    DecoderFactory *fctry;
+    DecoderFactory *m_fctry;
 
-    AudioOutput *out;
+    AudioOutput *m_out;
 
-    QMutex mtx;
-    QWaitCondition cnd;
+    QMutex m_mtx;
+    QWaitCondition m_cnd;
 
 };
 

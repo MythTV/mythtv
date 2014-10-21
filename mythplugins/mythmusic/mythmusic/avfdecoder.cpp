@@ -22,6 +22,7 @@
 #include <QObject>
 #include <QIODevice>
 #include <QFile>
+#include <QTimer>
 
 // Myth headers
 #include <mythconfig.h>
@@ -43,67 +44,124 @@ using namespace std;
 #include "metaiomp4.h"
 #include "metaiowavpack.h"
 #include "decoderhandler.h"
+#include "musicplayer.h"
 
 extern "C" {
 #include "libavformat/avio.h"
+#include "libavutil/opt.h"
 }
 
-// size of the buffer used for streaming
-#define BUFFER_SIZE 65536
+/****************************************************************************/
 
-// streaming callbacks
-static int ReadFunc(void *opaque, uint8_t *buf, int buf_size)
+typedef QMap<QString,QString> ShoutCastMetaMap;
+
+class ShoutCastMetaParser
 {
-    QIODevice *io = (QIODevice*)opaque;
+  public:
+    ShoutCastMetaParser(void) :
+        m_meta_artist_pos(-1), m_meta_title_pos(-1), m_meta_album_pos(-1) { }
+    ~ShoutCastMetaParser(void) { }
 
-    buf_size = min(buf_size, (int) io->bytesAvailable());
-    return io->read((char*)buf, buf_size);
+    void setMetaFormat(const QString &metaformat);
+    ShoutCastMetaMap parseMeta(const QString &meta);
+
+  private:
+    QString m_meta_format;
+    int m_meta_artist_pos;
+    int m_meta_title_pos;
+    int m_meta_album_pos;
+};
+
+void ShoutCastMetaParser::setMetaFormat(const QString &metaformat)
+{
+/*
+  We support these metatags :
+  %a - artist
+  %t - track
+  %b - album
+  %r - random bytes
+ */
+    m_meta_format = metaformat;
+
+    m_meta_artist_pos = 0;
+    m_meta_title_pos = 0;
+    m_meta_album_pos = 0;
+
+    int assign_index = 1;
+    int pos = 0;
+
+    pos = m_meta_format.indexOf("%", pos);
+    while (pos >= 0)
+    {
+        pos++;
+        QChar ch = m_meta_format.at(pos);
+
+        if (ch == '%')
+        {
+            pos++;
+        }
+        else if (ch == 'r' || ch == 'a' || ch == 'b' || ch == 't')
+        {
+            if (ch == 'a')
+                m_meta_artist_pos = assign_index;
+
+            if (ch == 'b')
+                m_meta_album_pos = assign_index;
+
+            if (ch == 't')
+                m_meta_title_pos = assign_index;
+
+            assign_index++;
+        }
+        else
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("ShoutCastMetaParser: malformed metaformat '%1'")
+                    .arg(m_meta_format));
+
+        pos = m_meta_format.indexOf("%", pos);
+    }
+
+    m_meta_format.replace("%a", "(.*)");
+    m_meta_format.replace("%t", "(.*)");
+    m_meta_format.replace("%b", "(.*)");
+    m_meta_format.replace("%r", "(.*)");
+    m_meta_format.replace("%%", "%");
 }
 
-static int WriteFunc(void *opaque, uint8_t *buf, int buf_size)
+ShoutCastMetaMap ShoutCastMetaParser::parseMeta(const QString &mdata)
 {
-    (void)opaque;
-    (void)buf;
-    (void)buf_size;
-    // we don't support writing to the steam
-    return -1;
-}
+    ShoutCastMetaMap result;
+    int title_begin_pos = mdata.indexOf("StreamTitle='");
+    int title_end_pos;
 
-static int64_t SeekFunc(void *opaque, int64_t offset, int whence)
-{
-    QIODevice *io = (QIODevice*)opaque;
+    if (title_begin_pos >= 0)
+    {
+        title_begin_pos += 13;
+        title_end_pos = mdata.indexOf("';", title_begin_pos);
+        QString title = mdata.mid(title_begin_pos, title_end_pos - title_begin_pos);
+        QRegExp rx;
+        rx.setPattern(m_meta_format);
+        if (rx.indexIn(title) != -1)
+        {
+            LOG(VB_PLAYBACK, LOG_INFO, QString("ShoutCast: Meta     : '%1'")
+                    .arg(mdata));
+            LOG(VB_PLAYBACK, LOG_INFO,
+                QString("ShoutCast: Parsed as: '%1' by '%2'")
+                    .arg(rx.cap(m_meta_title_pos))
+                    .arg(rx.cap(m_meta_artist_pos)));
 
-    if (whence == AVSEEK_SIZE)
-    {
-        return io->size();
-    }
-    else if (whence == SEEK_SET)
-    {
-        if (offset <= io->size())
-            return io->seek(offset);
-        else
-            return -1;
-    }
-    else if (whence == SEEK_END)
-    {
-        int64_t newPos = io->size() + offset;
-        if (newPos >= 0 && newPos <= io->size())
-            return io->seek(newPos);
-        else
-            return -1;
-    }
-    else if (whence == SEEK_CUR)
-    {
-        int64_t newPos = io->pos() + offset;
-        if (newPos >= 0 && newPos < io->size())
-            return io->seek(newPos);
-        else
-            return -1;
-    }
-    else
-        return -1;
+            if (m_meta_title_pos > 0)
+                result["title"] = rx.cap(m_meta_title_pos);
 
-     return -1;
+            if (m_meta_artist_pos > 0)
+                result["artist"] = rx.cap(m_meta_artist_pos);
+
+            if (m_meta_album_pos > 0)
+                result["album"] = rx.cap(m_meta_album_pos);
+        }
+    }
+
+    return result;
 }
 
 static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
@@ -182,10 +240,10 @@ avfDecoder::avfDecoder(const QString &file, DecoderFactory *d, AudioOutput *o) :
     m_seekTime(-1.0),             m_devicename(""),
     m_inputFormat(NULL),          m_inputContext(NULL),
     m_audioDec(NULL),             m_inputIsFile(false),
-    m_byteIOContext(NULL),        m_errCode(0)
+    m_mdataTimer(NULL),           m_errCode(0)
 {
-    setObjectName("avfDecoder");
-    setFilename(file);
+    MThread::setObjectName("avfDecoder");
+    setURL(file);
 
     m_outputBuffer =
         (uint8_t *)av_malloc(AudioOutput::MAX_SIZE_BUFFER);
@@ -197,6 +255,9 @@ avfDecoder::avfDecoder(const QString &file, DecoderFactory *d, AudioOutput *o) :
 
 avfDecoder::~avfDecoder(void)
 {
+    if (m_mdataTimer)
+        delete m_mdataTimer;
+
     if (m_inited)
         deinit();
     if (m_outputBuffer)
@@ -233,88 +294,52 @@ bool avfDecoder::initialize()
 
     output()->PauseUntilBuffered();
 
-    m_inputIsFile = (dynamic_cast<QFile*>(input()) != NULL);
-
     if (m_inputContext)
-        avformat_free_context(m_inputContext);
+        delete m_inputContext;
 
-    m_inputContext = avformat_alloc_context();
+    m_inputContext = new RemoteAVFormatContext(getURL());
 
-    // open device
-    if (m_inputIsFile)
-    {
-        filename = ((QFile *)input())->fileName();
-        LOG(VB_PLAYBACK, LOG_INFO,
-            QString("avfDecoder: playing file %1").arg(filename));
-    }
-    else
-    {
-        // if the input is not a file then setup the buffer
-        // and iocontext to stream from it
-        bool isSG = dynamic_cast<MusicSGIODevice*>(input());
-        unsigned char *buffer =
-            (unsigned char*)av_malloc(BUFFER_SIZE + FF_INPUT_BUFFER_PADDING_SIZE);
-        m_byteIOContext = avio_alloc_context(buffer, BUFFER_SIZE, 0, input(),
-                                             &ReadFunc, &WriteFunc, &SeekFunc);
-
-        // we can only seek in files streamed using MusicSGIODevice
-        m_byteIOContext->seekable = isSG;
-
-        if (!isSG)
-        {
-            // probe the stream
-            filename = "stream";
-            AVProbeData probe_data;
-            probe_data.filename = filename.toLocal8Bit().constData();
-            probe_data.buf_size = min(BUFFER_SIZE, (int)input()->bytesAvailable());
-            probe_data.buf = buffer;
-            input()->peek((char*)probe_data.buf, probe_data.buf_size);
-            m_inputFormat = av_probe_input_format(&probe_data, 1);
-
-            if (!m_inputFormat)
-            {
-                error("Could not identify the stream type in "
-                      "avfDecoder::initialize");
-                deinit();
-                return false;
-            }
-
-            LOG(VB_PLAYBACK, LOG_INFO,
-                QString("avfDecoder: playing stream, format probed is: %1")
-                    .arg(m_inputFormat->long_name));
-        }
-    }
-
-    // open the media file
-    // this should populate the input context
-    int err;
-    if (m_inputIsFile)
-    {
-        err = avformat_open_input(&m_inputContext,
-                                  filename.toLocal8Bit().constData(),
-                                  m_inputFormat, NULL);
-    }
-    else
-    {
-        m_inputContext->pb = m_byteIOContext;
-        err = avformat_open_input(&m_inputContext, "decoder",
-                                  m_inputFormat, NULL);
-    }
-
-    if (err < 0)
+    if (!m_inputContext->getContext())
     {
         LOG(VB_GENERAL, LOG_ERR,
-            QString("Could not open file (%1)").arg(filename));
-        LOG(VB_GENERAL, LOG_ERR, QString("AV decoder. Error: %1").arg(err));
-        error(QString("Could not open file  (%1)").arg(filename) +
-              QString("\nAV decoder. Error: %1").arg(err));
+            QString("Could not open url (%1)").arg(m_url));
+        error(QString("Could not open url  (%1)").arg(m_url));
         deinit();
         return false;
     }
 
+    // if this is a ice/shoutcast or MMS stream start polling for metadata changes and buffer status
+    if (getURL().startsWith("http://") || getURL().startsWith("mmsh://"))
+    {
+        m_mdataTimer = new QTimer;
+        m_mdataTimer->setSingleShot(false);
+        connect(m_mdataTimer, SIGNAL(timeout()), this, SLOT(checkMetatdata()));
+
+        m_mdataTimer->start(500);
+
+        // we don't get metadata updates for MMS streams so grab the metadata from the headers
+        if (getURL().startsWith("mmsh://"))
+        {
+            AVDictionaryEntry *tag = NULL;
+            MusicMetadata mdata =  gPlayer->getDecoderHandler()->getMetadata();
+
+            tag = av_dict_get(m_inputContext->getContext()->metadata, "title", tag, AV_DICT_IGNORE_SUFFIX);
+            mdata.setTitle(tag->value);
+
+            tag = av_dict_get(m_inputContext->getContext()->metadata, "artist", tag, AV_DICT_IGNORE_SUFFIX);
+            mdata.setArtist(tag->value);
+
+            mdata.setAlbum("");
+            mdata.setLength(-1);
+
+            DecoderHandlerEvent ev(DecoderHandlerEvent::Meta, mdata);
+            dispatch(ev);
+        }
+    }
+
     // determine the stream format
     // this also populates information needed for metadata
-    if (avformat_find_stream_info(m_inputContext, NULL) < 0)
+    if (avformat_find_stream_info(m_inputContext->getContext(), NULL) < 0)
     {
         error("Could not determine the stream format.");
         deinit();
@@ -324,7 +349,7 @@ bool avfDecoder::initialize()
     // let FFmpeg finds the best audio stream (should only be one), also catter
     // should the file/stream not be an audio one
     AVCodec *codec;
-    int selTrack = av_find_best_stream(m_inputContext, AVMEDIA_TYPE_AUDIO,
+    int selTrack = av_find_best_stream(m_inputContext->getContext(), AVMEDIA_TYPE_AUDIO,
                                        -1, -1, &codec, 0);
 
     if (selTrack < 0)
@@ -335,10 +360,10 @@ bool avfDecoder::initialize()
     }
 
     // Store the audio codec of the stream
-    m_audioDec = m_inputContext->streams[selTrack]->codec;
+    m_audioDec = m_inputContext->getContext()->streams[selTrack]->codec;
 
     // Store the input format of the context
-    m_inputFormat = m_inputContext->iformat;
+    m_inputFormat = m_inputContext->getContext()->iformat;
 
     if (avcodec_open2(m_audioDec, codec, NULL) < 0)
     {
@@ -384,8 +409,11 @@ bool avfDecoder::initialize()
 
 void avfDecoder::seek(double pos)
 {
-    if (m_inputIsFile || (m_byteIOContext && m_byteIOContext->seekable))
+    if (m_inputContext->getContext() && m_inputContext->getContext()->pb &&
+        m_inputContext->getContext()->pb->seekable)
+    {
         m_seekTime = pos;
+    }
 }
 
 void avfDecoder::deinit()
@@ -396,25 +424,18 @@ void avfDecoder::deinit()
     setOutput(0);
 
     // Cleanup here
-    if (m_inputContext)
+    if (m_inputContext && m_inputContext->getContext())
     {
-        for (uint i = 0; i < m_inputContext->nb_streams; i++)
+        for (uint i = 0; i < m_inputContext->getContext()->nb_streams; i++)
         {
-            AVStream *st = m_inputContext->streams[i];
+            AVStream *st = m_inputContext->getContext()->streams[i];
             if (st->codec && st->codec->codec)
                 avcodec_close(st->codec);
         }
-        avformat_close_input(&m_inputContext);
     }
 
     m_audioDec = NULL;
     m_inputFormat = NULL;
-
-    if (m_byteIOContext)
-    {
-        av_freep(&m_byteIOContext->buffer);
-        av_freep(&m_byteIOContext);
-    }
 }
 
 void avfDecoder::run()
@@ -436,7 +457,7 @@ void avfDecoder::run()
         dispatch(e);
     }
 
-    av_read_play(m_inputContext);
+    av_read_play(m_inputContext->getContext());
 
     while (!m_finish && !m_userStop)
     {
@@ -446,7 +467,7 @@ void avfDecoder::run()
             LOG(VB_GENERAL, LOG_INFO, QString("avfdecoder.o: seek time %1")
                     .arg(m_seekTime));
 
-            if (av_seek_frame(m_inputContext, -1,
+            if (av_seek_frame(m_inputContext->getContext(), -1,
                               (int64_t)(m_seekTime * AV_TIME_BASE), 0) < 0)
                 LOG(VB_GENERAL, LOG_ERR, "Error seeking");
 
@@ -456,13 +477,13 @@ void avfDecoder::run()
         while (!m_finish && !m_userStop && m_seekTime <= 0.0)
         {
             // Read a packet from the input context
-            int res = av_read_frame(m_inputContext, &pkt);
+            int res = av_read_frame(m_inputContext->getContext(), &pkt);
             if (res < 0)
             {
                 if (res != AVERROR_EOF)
                 {
                     LOG(VB_GENERAL, LOG_ERR, QString("Read frame failed: %1").arg(res));
-                    LOG(VB_FILE, LOG_ERR, ("... for file '" + filename) + "'");
+                    LOG(VB_FILE, LOG_ERR, ("... for file '" + m_url) + "'");
                 }
 
                 m_finish = true;
@@ -536,6 +557,47 @@ void avfDecoder::run()
 
     deinit();
     RunEpilog();
+}
+
+void avfDecoder::checkMetatdata(void)
+{
+    uint8_t *mdata = NULL;
+
+    if (av_opt_get(m_inputContext->getContext(), "icy_metadata_packet", AV_OPT_SEARCH_CHILDREN, &mdata) >= 0)
+    {
+        QString s = QString::fromUtf8((const char*) mdata);
+
+        if (m_lastMetadata != s)
+        {
+            m_lastMetadata = s;
+
+            LOG(VB_PLAYBACK, LOG_INFO, QString("avfDecoder: shoutcast metadata changed - %1").arg(m_lastMetadata));
+
+            ShoutCastMetaParser parser;
+            parser.setMetaFormat(gPlayer->getDecoderHandler()->getMetadata().MetadataFormat());
+
+            ShoutCastMetaMap meta_map = parser.parseMeta(m_lastMetadata);
+
+            MusicMetadata mdata =  gPlayer->getDecoderHandler()->getMetadata();
+            mdata.setTitle(meta_map["title"]);
+            mdata.setArtist(meta_map["artist"]);
+            mdata.setAlbum(meta_map["album"]);
+            mdata.setLength(-1);
+
+            DecoderHandlerEvent ev(DecoderHandlerEvent::Meta, mdata);
+            dispatch(ev);
+        }
+
+        av_free(mdata);
+    }
+
+    if (m_inputContext->getContext()->pb)
+    {
+        int available = (int) (m_inputContext->getContext()->pb->buf_end - m_inputContext->getContext()->pb->buffer);
+        int maxSize = m_inputContext->getContext()->pb->buffer_size;
+        DecoderHandlerEvent ev(DecoderHandlerEvent::BufferStatus, available, maxSize);
+        dispatch(ev);
+    }
 }
 
 bool avfDecoderFactory::supports(const QString &source) const

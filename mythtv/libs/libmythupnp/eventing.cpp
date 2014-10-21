@@ -201,7 +201,7 @@ void Eventing::HandleSubscribe( HTTPRequest *pRequest )
 
     QString sCallBack = pRequest->GetHeaderValue( "CALLBACK", "" );
     QString sNT       = pRequest->GetHeaderValue( "NT"      , "" );
-    QString sTimeout  = pRequest->GetHeaderValue( "TIMOUT"  , "" );
+    QString sTimeout  = pRequest->GetHeaderValue( "TIMEOUT"  , "" );
     QString sSID      = pRequest->GetHeaderValue( "SID"     , "" );
 
     SubscriberInfo *pInfo = NULL;
@@ -211,7 +211,6 @@ void Eventing::HandleSubscribe( HTTPRequest *pRequest )
     // ----------------------------------------------------------------------
 
     // -=>TODO: Need to add support for more than one CallBack URL.
-    // -=>TODO: Need to handle Timeout header
 
     if ( sCallBack.length() != 0 )
     {
@@ -236,7 +235,16 @@ void Eventing::HandleSubscribe( HTTPRequest *pRequest )
 
         sCallBack = sCallBack.mid( 1, sCallBack.indexOf(">") - 1);
 
-        pInfo = new SubscriberInfo( sCallBack, m_nSubscriptionDuration );
+        int nDuration = m_nSubscriptionDuration;
+        if ( sTimeout.startsWith("Second-") )
+        {
+            bool ok = false;
+            int nValue = sTimeout.section("-", 1).toInt(&ok);
+            if (ok)
+                nDuration = nValue;
+        }
+
+        pInfo = new SubscriberInfo( sCallBack, nDuration );
 
         Subscribers::iterator it = m_Subscribers.find(pInfo->sUUID);
         if (it != m_Subscribers.end())

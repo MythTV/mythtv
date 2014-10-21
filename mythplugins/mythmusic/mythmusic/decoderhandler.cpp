@@ -21,7 +21,6 @@
 // mythmusic
 #include "decoderhandler.h"
 #include "decoder.h"
-#include "shoutcast.h"
 
 /**********************************************************************/
 
@@ -71,225 +70,9 @@ void DecoderHandlerEvent::getBufferStatus(int *available, int *maxSize) const
 
 /**********************************************************************/
 
-DecoderIOFactory::DecoderIOFactory(DecoderHandler *parent) 
-{
-    m_handler = parent;
-}
-
-DecoderIOFactory::~DecoderIOFactory(void)
-{
-}
-
-void DecoderIOFactory::doConnectDecoder(const QString &format)
-{
-    m_handler->doOperationStop();
-    m_handler->doConnectDecoder(m_handler->getUrl(), format);
-}
-
-Decoder *DecoderIOFactory::getDecoder(void)
-{
-    return m_handler->getDecoder();
-}
-
-void DecoderIOFactory::doFailed(const QString &message)
-{
-    m_handler->doOperationStop();
-    m_handler->doFailed(m_handler->getUrl(), message);
-}
-
-void DecoderIOFactory::doOperationStart(const QString &name)
-{
-    m_handler->doOperationStart(name);
-}
-
-void DecoderIOFactory::doOperationStop(void)
-{
-    m_handler->doOperationStop();
-}
-
-/**********************************************************************/
-
-DecoderIOFactoryFile::DecoderIOFactoryFile(DecoderHandler *parent)
-    : DecoderIOFactory(parent), m_input (NULL)
-{
-}
-
-DecoderIOFactoryFile::~DecoderIOFactoryFile(void)
-{
-    if (m_input)
-        delete m_input;
-}
-
-QIODevice* DecoderIOFactoryFile::getInput(void)
-{
-    return m_input;
-}
-
-void DecoderIOFactoryFile::start(void)
-{
-    QString sourcename = m_handler->getMetadata().Filename();
-
-    LOG(VB_PLAYBACK, LOG_INFO,
-        QString("DecoderIOFactory: Opening Local File %1").arg(sourcename));
-
-    m_input = new QFile(sourcename);
-    doConnectDecoder(m_handler->getUrl().toLocalFile());
-}
-
-/**********************************************************************/
-
-DecoderIOFactorySG::DecoderIOFactorySG(DecoderHandler *parent)
-    : DecoderIOFactory(parent), m_input(NULL)
-{
-}
-
-DecoderIOFactorySG::~DecoderIOFactorySG(void)
-{
-    if (m_input)
-        delete m_input;
-}
-
-QIODevice* DecoderIOFactorySG::getInput(void)
-{
-    return m_input;
-}
-
-void DecoderIOFactorySG::start(void)
-{
-    QString url = m_handler->getUrl().toString();
-    LOG(VB_PLAYBACK, LOG_INFO,
-        QString("DecoderIOFactorySG: Opening Myth URL %1").arg(url));
-    m_input = new MusicSGIODevice(url);
-
-    QString path = m_handler->getUrl().path();
-
-    if (m_handler->getUrl().hasFragment())
-        path += '#' + m_handler->getUrl().fragment();
-
-    doConnectDecoder(path);
-}
-
-/**********************************************************************/
-
-DecoderIOFactoryUrl::DecoderIOFactoryUrl(DecoderHandler *parent)
-    : DecoderIOFactory(parent), m_started(false),
-    m_accessManager(new QNetworkAccessManager(this)),
-    m_reply(NULL), m_input(new MusicIODevice()),
-    m_redirectCount(0), m_bytesWritten(0)
-
-{
-    connect(m_input, SIGNAL(freeSpaceAvailable()), SLOT(readyRead()));
-
-    m_input->open(QIODevice::ReadWrite);
-}
-
-DecoderIOFactoryUrl::~DecoderIOFactoryUrl(void)
-{
-    doClose();
-
-    m_accessManager->deleteLater();
-
-    if (m_input)
-        delete m_input;
-}
-
-QIODevice* DecoderIOFactoryUrl::getInput(void)
-{
-    return m_input;
-}
-
-void DecoderIOFactoryUrl::start(void)
-{
-    LOG(VB_PLAYBACK, LOG_INFO,
-        QString("DecoderIOFactory: Url %1").arg(m_handler->getUrl().toString()));
-
-    m_started = false;
-
-    doOperationStart(tr("Fetching remote file"));
-
-    m_reply = m_accessManager->get(QNetworkRequest(m_handler->getUrl()));
-
-    connect(m_reply, SIGNAL(readyRead()), this, SLOT(readyRead()));
-    connect(m_accessManager, SIGNAL(finished(QNetworkReply*)),
-            this, SLOT(replyFinished(QNetworkReply*)));
-}
-
-void DecoderIOFactoryUrl::stop(void)
-{
-    doClose();
-}
-
-void DecoderIOFactoryUrl::replyFinished(QNetworkReply *reply)
-{
-    if (reply->error() != QNetworkReply::NoError) 
-    {
-        doFailed("Cannot retrieve remote file.");
-        return;
-    }
-
-    QUrl possibleRedirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
-
-    if (!possibleRedirectUrl.isEmpty() && (m_redirectedURL != possibleRedirectUrl))
-    {
-        LOG(VB_PLAYBACK, LOG_INFO,
-            QString("DecoderIOFactory: Got redirected to %1")
-                .arg(possibleRedirectUrl.toString()));
-
-        m_redirectCount++;
-
-        if (m_redirectCount > MaxRedirects)
-        {
-            doFailed("Too many redirects");
-        }
-        else
-        {
-            m_handler->setUrl(possibleRedirectUrl);
-            m_redirectedURL = possibleRedirectUrl;
-            start();
-        }
-
-        return;
-    }
-
-    m_redirectedURL.clear();
-
-    if (!m_started)
-        doStart();
-}
-
-void DecoderIOFactoryUrl::readyRead(void)
-{
-    int available = DecoderIOFactory::DefaultBufferSize - m_input->bytesAvailable();
-    QByteArray data = m_reply->read(available);
-
-    m_bytesWritten += data.size();
-    m_input->writeData(data.data(), data.size());
-
-    if (!m_started && m_bytesWritten > DecoderIOFactory::DefaultPrebufferSize)
-    {
-        m_reply->setReadBufferSize(DecoderIOFactory::DefaultPrebufferSize);
-        doStart();
-    }
-}
-
-void DecoderIOFactoryUrl::doStart(void)
-{
-    doConnectDecoder(m_handler->getUrl().toString());
-    m_started = true;
-}
-
-void DecoderIOFactoryUrl::doClose(void)
-{
-    if (m_input && m_input->isOpen())
-        m_input->close();
-}
-
-/**********************************************************************/
-
 DecoderHandler::DecoderHandler(void) :
     m_state(STOPPED),
     m_playlist_pos(0),
-    m_io_factory(NULL),
     m_decoder(NULL),
     m_op(false),
     m_redirects(0)
@@ -387,14 +170,16 @@ bool DecoderHandler::next(void)
 
     LOG(VB_PLAYBACK, LOG_INFO, QString("Now playing '%1'").arg(m_url.toString()));
 
-    deleteIOFactory();
-    createIOFactory(m_url);
+    // we use the avfdecoder for everything except CD tracks
+    if (m_url.toString().endsWith(".cda"))
+        doConnectDecoder(m_url, ".cda");
+    else
+    {
+        // we don't know what format radio stations are so fake a format
+        // and hope avfdecoder can decode it
+        doConnectDecoder(m_url, ".mp3");
+    }
 
-    if (! haveIOFactory())
-        return false;
-
-    getIOFactory()->addListener(this);
-    getIOFactory()->start();
     m_state = ACTIVE;
 
     return true;
@@ -425,7 +210,6 @@ void DecoderHandler::stop(void)
         m_decoder = NULL;
     }
 
-    deleteIOFactory();
     doOperationStop();
 
     m_state = STOPPED;
@@ -569,7 +353,7 @@ void DecoderHandler::doConnectDecoder(const QUrl &url, const QString &format)
         }
     }
 
-    m_decoder->setFilename(url.toString());
+    m_decoder->setURL(url.toString());
 
     DecoderHandlerEvent ev(DecoderHandlerEvent::Ready);
     dispatch(ev);
@@ -598,218 +382,4 @@ void DecoderHandler::doOperationStop(void)
     m_op = false;
     DecoderHandlerEvent ev(DecoderHandlerEvent::OperationStop);
     dispatch(ev);
-}
-
-void DecoderHandler::createIOFactory(const QUrl &url)
-{
-    if (haveIOFactory())
-        deleteIOFactory();
-
-    if (url.scheme() == "myth")
-        m_io_factory = new DecoderIOFactorySG(this);
-    else if (m_meta.Format() == "cast")
-        m_io_factory = new DecoderIOFactoryShoutCast(this);
-    else if (url.scheme() == "http")
-        m_io_factory = new DecoderIOFactoryUrl(this);
-    else
-        m_io_factory = new DecoderIOFactoryFile(this);
-}
-
-void DecoderHandler::deleteIOFactory(void)
-{
-    if (!haveIOFactory())
-        return;
-
-    if (m_state == ACTIVE)
-        m_io_factory->stop();
-
-    m_io_factory->removeListener(this);
-    m_io_factory->disconnect();
-    m_io_factory->deleteLater();
-    m_io_factory = NULL;
-}
-
-/**********************************************************************/
-
-qint64 MusicBuffer::read(char *data, qint64 max, bool doRemove)
-{
-    QMutexLocker holder (&m_mutex);
-    const char *buffer_data = m_buffer.data();
-
-    if (max > m_buffer.size())
-        max = m_buffer.size();
-
-    memcpy(data, buffer_data, max);
-
-    if (doRemove)
-        m_buffer.remove(0, max);
-
-    return max;
-}
-
-qint64 MusicBuffer::read(QByteArray &data, qint64 max, bool doRemove)
-{
-    QMutexLocker holder (&m_mutex);
-    const char *buffer_data = m_buffer.data();
-
-    if (max > m_buffer.size())
-        max = m_buffer.size();
-
-    data.append(buffer_data, max);
-
-    if (doRemove)
-        m_buffer.remove(0, max);
-
-    return max;
-}
-
-void MusicBuffer::write(const char *data, uint sz)
-{
-    if (sz == 0)
-        return;
-
-    QMutexLocker holder(&m_mutex);
-    m_buffer.append(data, sz);
-}
-
-void MusicBuffer::write(QByteArray &array)
-{
-    if (array.size() == 0)
-        return;
-
-    QMutexLocker holder(&m_mutex);
-    m_buffer.append(array);
-}
-
-void MusicBuffer::remove(int index, int len)
-{
-    QMutexLocker holder(&m_mutex);
-    m_buffer.remove(index, len);
-}
-
-/**********************************************************************/
-
-MusicIODevice::MusicIODevice(void)
-{
-    m_buffer = new MusicBuffer;
-    setOpenMode(ReadWrite);
-}
-
-MusicIODevice::~MusicIODevice(void)
-{
-    delete m_buffer;
-}
-
-bool MusicIODevice::open(OpenMode)
-{
-    return true;
-}
-
-qint64 MusicIODevice::size(void) const
-{
-    return m_buffer->readBufAvail(); 
-}
-
-qint64 MusicIODevice::readData(char *data, qint64 maxlen)
-{
-    qint64 res = m_buffer->read(data, maxlen);
-    emit freeSpaceAvailable();
-    return res;
-}
-
-qint64 MusicIODevice::writeData(const char *data, qint64 sz)
-{
-    m_buffer->write(data, sz);
-    return sz;
-}
-
-qint64 MusicIODevice::bytesAvailable(void) const
-{
-    return m_buffer->readBufAvail();
-}
-
-int MusicIODevice::getch(void)
-{
-    assert(0);
-    return -1;
-}
-
-int MusicIODevice::putch(int)
-{
-    assert(0);
-    return -1;
-}
-
-int MusicIODevice::ungetch(int)
-{
-    assert(0);
-    return -1;
-}
-
-/**********************************************************************/
-
-MusicSGIODevice::MusicSGIODevice(const QString &url)
-{
-    m_remotefile = new RemoteFile(url);
-    setOpenMode(ReadWrite);
-}
-
-MusicSGIODevice::~MusicSGIODevice(void)
-{
-    delete m_remotefile;
-}
-
-bool MusicSGIODevice::open(OpenMode)
-{
-    return m_remotefile->isOpen();
-}
-
-bool MusicSGIODevice::seek(qint64 pos)
-{
-    long int newPos = -1;
-
-    if (m_remotefile)
-        newPos = m_remotefile->Seek(pos, 0);
-
-    return (newPos == pos);
-}
-
-qint64 MusicSGIODevice::size(void) const
-{
-    return m_remotefile->GetFileSize();
-}
-
-qint64 MusicSGIODevice::readData(char *data, qint64 maxlen)
-{
-    qint64 res = m_remotefile->Read(data, maxlen);
-    return res;
-}
-
-qint64 MusicSGIODevice::writeData(const char *data, qint64 sz)
-{
-    m_remotefile->Write(data, sz);
-    return sz;
-}
-
-qint64 MusicSGIODevice::bytesAvailable(void) const
-{
-    return m_remotefile->GetFileSize();
-}
-
-int MusicSGIODevice::getch(void)
-{
-    assert(0);
-    return -1;
-}
-
-int MusicSGIODevice::putch(int)
-{
-    assert(0);
-    return -1;
-}
-
-int MusicSGIODevice::ungetch(int)
-{
-    assert(0);
-    return -1;
 }

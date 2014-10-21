@@ -1221,6 +1221,12 @@ int Transcode::TranscodeFile(const QString &inputname,
                 SetPlayerContext(NULL);
                 if (videoBuffer)
                     videoBuffer->stop();
+                if (hls)
+                {
+                    hls->UpdateStatus(kHLSStatusErrored);
+                    hls->UpdateStatusMessage("Transcoding Errored");
+                    delete hls;
+                }
                 return REENCODE_ERROR;
             }
 
@@ -1415,6 +1421,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                         if (videoBuffer)
                             videoBuffer->stop();
                         delete ab;
+                        delete hls; // HLS isn't actually going to be running here
                         return REENCODE_ERROR;
                     }
                 }
@@ -1518,6 +1525,12 @@ int Transcode::TranscodeFile(const QString &inputname,
                     SetPlayerContext(NULL);
                     if (videoBuffer)
                         videoBuffer->stop();
+                    if (hls)
+                    {
+                        hls->UpdateStatus(kHLSStatusStopped);
+                        hls->UpdateStatusMessage("Transcoding Stopped");
+                        delete hls;
+                    }
                     return REENCODE_STOPPED;
                 }
 

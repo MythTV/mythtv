@@ -289,6 +289,10 @@ QString HTTPRequest::BuildResponseHeader( long long nSize )
     else if (sTransferMode == "Interactive")
         sHeader += "transferMode.dlna.org: Interactive\r\n";
 
+    // HACK Temporary hack for Samsung TVs - Needs to be moved later as it's not entirely DLNA compliant
+    if (!GetHeaderValue( "getcontentFeatures.dlna.org", "" ).isEmpty())
+        sHeader += "contentFeatures.dlna.org: DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=01500000000000000000000000000000\r\n";
+
     // ----------------------------------------------------------------------
 
     if (getenv("HTTPREQUEST_DEBUG"))
@@ -487,6 +491,7 @@ qint64 HTTPRequest::SendResponse( void )
     QString    rHeader = BuildResponseHeader( nContentLen );
 
     QByteArray sHeader = rHeader.toUtf8();
+    LOG(VB_HTTP, LOG_DEBUG, QString("Response header size: %1 bytes").arg(sHeader.length()));
     nBytes  = WriteBlock( sHeader.constData(), sHeader.length() );
 
     if (nBytes < sHeader.length())
@@ -613,9 +618,11 @@ qint64 HTTPRequest::SendResponseFile( QString sFileName )
             }
         }
 
-        // Required by some UPnP devices?
-        m_mapRespHeaders[ "X-User-Agent"    ] = "redsonic";
-        m_mapRespHeaders[ "User-Agent"    ] = "redsonic";
+        // HACK: D-Link DSM-320
+        // The following headers are only required by servers which don't support
+        // http keep alive. We do support it, so we don't need it. Keeping it in
+        // place to prevent someone re-adding it in future
+        //m_mapRespHeaders[ "X-User-Agent"    ] = "redsonic";
 
         // ------------------------------------------------------------------
         //
@@ -638,6 +645,7 @@ qint64 HTTPRequest::SendResponseFile( QString sFileName )
 
     QString    rHeader = BuildResponseHeader( llSize );
     QByteArray sHeader = rHeader.toUtf8();
+    LOG(VB_HTTP, LOG_DEBUG, QString("Response header size: %1 bytes").arg(sHeader.length()));
     nBytes = WriteBlock( sHeader.constData(), sHeader.length() );
 
     if (nBytes < sHeader.length())

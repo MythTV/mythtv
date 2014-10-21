@@ -109,7 +109,7 @@ CdDecoder::CdDecoder(const QString &file, DecoderFactory *d, AudioOutput *o) :
     m_end(CDIO_INVALID_LSN),
     m_curpos(CDIO_INVALID_LSN)
 {
-    setFilename(file);
+    setURL(file);
 }
 
 // virtual
@@ -177,7 +177,7 @@ bool CdDecoder::initialize()
     if (output())
         output()->PauseUntilBuffered();
 
-    m_tracknum = getFilename().section('.', 0, 0).toUInt();
+    m_tracknum = getURL().section('.', 0, 0).toUInt();
 
     QMutexLocker lock(&getCdioMutex());
 
@@ -562,11 +562,11 @@ MusicMetadata *CdDecoder::getMetadata()
     track_t tracknum = 0;
 
     if (-1 == m_settracknum)
-        tracknum = getFilename().toUInt();
+        tracknum = getURL().toUInt();
     else
     {
         tracknum = m_settracknum;
-        setFilename(QString("%1" CDEXT).arg(tracknum));
+        setURL(QString("%1" CDEXT).arg(tracknum));
     }
 
     QMutexLocker lock(&getCdioMutex());
@@ -768,7 +768,7 @@ MusicMetadata *CdDecoder::getMetadata()
     if (title.isEmpty())
         title = tr("Track %1").arg(tracknum);
 
-    MusicMetadata *m = new MusicMetadata(getFilename(), artist, compilation_artist,
+    MusicMetadata *m = new MusicMetadata(getURL(), artist, compilation_artist,
         album, title, genre, year, tracknum, length);
     if (m)
         m->setCompilation(isCompilation);
@@ -809,7 +809,7 @@ Decoder *CdDecoderFactory::create(const QString &file, AudioOutput *output, bool
     }
     else
     {
-        decoder->setFilename(file);
+        decoder->setURL(file);
         decoder->setOutput(output);
     }
 
