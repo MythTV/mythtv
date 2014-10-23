@@ -514,6 +514,7 @@ static void handleCDMedia(MythMediaDevice *cd)
         usleep(50000);
     }
 
+    // remove any existing CD tracks
     gMusicData->all_music->clearCDData();
     gMusicData->all_playlists->getActive()->removeAllCDTracks();
 
