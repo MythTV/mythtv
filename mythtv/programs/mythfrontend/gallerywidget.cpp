@@ -560,7 +560,7 @@ QString GalleryWidget::CreateImageUrl(QString &fileName)
                                            fileName,
                                            m_gvh->m_sgName);
 
-    LOG(VB_GENERAL, LOG_INFO, QString("Loading image from url '%1'").arg(url));
+    LOG(VB_FILE, LOG_INFO, QString("Loading image from url '%1'").arg(url));
 
     return url;
 }
