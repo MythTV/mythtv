@@ -507,12 +507,15 @@ static void handleCDMedia(MythMediaDevice *cd)
     if (!gMusicData->initialized)
         gMusicData->loadMusic();
 
-    // remove any existing CD tracks
-    if (gMusicData->all_music)
+    // wait for the music and playlists to load
+    while (!gMusicData->all_playlists->doneLoading() || !gMusicData->all_music->doneLoading())
     {
-        gMusicData->all_music->clearCDData();
-        gMusicData->all_playlists->getActive()->removeAllCDTracks();
+        qApp->processEvents();
+        usleep(50000);
     }
+
+    gMusicData->all_music->clearCDData();
+    gMusicData->all_playlists->getActive()->removeAllCDTracks();
 
     // find any new cd tracks
     CdDecoder *decoder = new CdDecoder("cda", NULL, NULL);
