@@ -451,6 +451,7 @@ void HttpWorker::run(void)
         pSocket->setSocketDescriptor(m_socket);
     }
 
+    pSocket->setSocketOption(QAbstractSocket::KeepAliveOption, QVariant(1));
     int nRequestsHandled = 0; // Allow debugging of keep-alive and connection re-use
 
     try
