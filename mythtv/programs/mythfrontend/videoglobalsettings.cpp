@@ -12,9 +12,9 @@
 namespace
 {
 // General Settings
-HostComboBox *VideoDefaultParentalLevel()
+HostComboBoxSetting *VideoDefaultParentalLevel()
 {
-    HostComboBox *gc = new HostComboBox("VideoDefaultParentalLevel");
+    HostComboBoxSetting *gc = new HostComboBoxSetting("VideoDefaultParentalLevel");
 
     gc->setLabel(VideoGeneralSettings::tr("Starting Parental Level"));
 
@@ -41,9 +41,9 @@ const char *password_clue =
                                               "numbers will make your life "
                                               "much easier.");
 
-HostLineEdit *VideoAdminPassword()
+HostTextEditSetting *VideoAdminPassword()
 {
-    HostLineEdit *gc = new HostLineEdit("VideoAdminPassword");
+    HostTextEditSetting *gc = new HostTextEditSetting("VideoAdminPassword");
 
     gc->setLabel(VideoGeneralSettings::tr("Parental Level 4 PIN"));
 
@@ -56,9 +56,9 @@ HostLineEdit *VideoAdminPassword()
     return gc;
 }
 
-HostLineEdit *VideoAdminPasswordThree()
+HostTextEditSetting *VideoAdminPasswordThree()
 {
-    HostLineEdit *gc = new HostLineEdit("VideoAdminPasswordThree");
+    HostTextEditSetting *gc = new HostTextEditSetting("VideoAdminPasswordThree");
 
     gc->setLabel(VideoGeneralSettings::tr("Parental Level 3 PIN"));
 
@@ -70,9 +70,9 @@ HostLineEdit *VideoAdminPasswordThree()
     return gc;
 }
 
-HostLineEdit *VideoAdminPasswordTwo()
+HostTextEditSetting *VideoAdminPasswordTwo()
 {
-    HostLineEdit *gc = new HostLineEdit("VideoAdminPasswordTwo");
+    HostTextEditSetting *gc = new HostTextEditSetting("VideoAdminPasswordTwo");
 
     gc->setLabel(VideoGeneralSettings::tr("Parental Level 2 PIN"));
 
@@ -84,9 +84,9 @@ HostLineEdit *VideoAdminPasswordTwo()
     return gc;
 }
 
-HostCheckBox *VideoAggressivePC()
+HostCheckBoxSetting *VideoAggressivePC()
 {
-    HostCheckBox *gc = new HostCheckBox("VideoAggressivePC");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("VideoAggressivePC");
 
     gc->setLabel(VideoGeneralSettings::tr("Aggressive Parental Control"));
     gc->setValue(false);
@@ -99,9 +99,9 @@ HostCheckBox *VideoAggressivePC()
     return gc;
 }
 
-HostLineEdit *VideoStartupDirectory()
+HostTextEditSetting *VideoStartupDirectory()
 {
-    HostLineEdit *gc = new HostLineEdit("VideoStartupDir");
+    HostTextEditSetting *gc = new HostTextEditSetting("VideoStartupDir");
 
     gc->setLabel(VideoGeneralSettings::tr("Directories that hold videos"));
 
@@ -115,9 +115,9 @@ HostLineEdit *VideoStartupDirectory()
     return gc;
 }
 
-HostLineEdit *VideoArtworkDirectory()
+HostTextEditSetting *VideoArtworkDirectory()
 {
-    HostLineEdit *gc = new HostLineEdit("VideoArtworkDir");
+    HostTextEditSetting *gc = new HostTextEditSetting("VideoArtworkDir");
 
     gc->setLabel(VideoGeneralSettings::tr("Directory that holds movie "
                                           "posters"));
@@ -131,9 +131,9 @@ HostLineEdit *VideoArtworkDirectory()
     return gc;
 }
 
-HostLineEdit *VideoScreenshotDirectory()
+HostTextEditSetting *VideoScreenshotDirectory()
 {
-    HostLineEdit *gc = new HostLineEdit("mythvideo.screenshotDir");
+    HostTextEditSetting *gc = new HostTextEditSetting("mythvideo.screenshotDir");
 
     gc->setLabel(VideoGeneralSettings::tr("Directory that holds movie "
                                           "screenshots"));
@@ -147,9 +147,9 @@ HostLineEdit *VideoScreenshotDirectory()
     return gc;
 }
 
-HostLineEdit *VideoBannerDirectory()
+HostTextEditSetting *VideoBannerDirectory()
 {
-    HostLineEdit *gc = new HostLineEdit("mythvideo.bannerDir");
+    HostTextEditSetting *gc = new HostTextEditSetting("mythvideo.bannerDir");
 
     gc->setLabel(VideoGeneralSettings::tr("Directory that holds movie/TV "
                                           "Banners"));
@@ -163,9 +163,9 @@ HostLineEdit *VideoBannerDirectory()
     return gc;
 }
 
-HostLineEdit *VideoFanartDirectory()
+HostTextEditSetting *VideoFanartDirectory()
 {
-    HostLineEdit *gc = new HostLineEdit("mythvideo.fanartDir");
+    HostTextEditSetting *gc = new HostTextEditSetting("mythvideo.fanartDir");
 
     gc->setLabel(VideoGeneralSettings::tr("Directory that holds movie fanart"));
 
@@ -178,9 +178,9 @@ HostLineEdit *VideoFanartDirectory()
     return gc;
 }
 
-HostLineEdit *TrailerDirectory()
+HostTextEditSetting *TrailerDirectory()
 {
-    HostLineEdit *gc = new HostLineEdit("mythvideo.TrailersDir");
+    HostTextEditSetting *gc = new HostTextEditSetting("mythvideo.TrailersDir");
 
     gc->setLabel(VideoGeneralSettings::tr("Directory that holds movie "
                                           "trailers"));
@@ -200,9 +200,9 @@ HostLineEdit *TrailerDirectory()
 
 // General Settings
 
-HostComboBox *SetOnInsertDVD()
+HostComboBoxSetting *SetOnInsertDVD()
 {
-    HostComboBox *gc = new HostComboBox("DVDOnInsertDVD");
+    HostComboBoxSetting *gc = new HostComboBoxSetting("DVDOnInsertDVD");
 
     gc->setLabel(VideoGeneralSettings::tr("On DVD insertion"));
 
@@ -217,9 +217,9 @@ HostComboBox *SetOnInsertDVD()
     return gc;
 }
 
-HostCheckBox *VideoTreeRemember()
+HostCheckBoxSetting *VideoTreeRemember()
 {
-    HostCheckBox *gc = new HostCheckBox("mythvideo.VideoTreeRemember");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("mythvideo.VideoTreeRemember");
 
     gc->setLabel(VideoGeneralSettings::tr("Video Tree remembers last selected "
                                           "position"));
@@ -273,114 +273,91 @@ struct VConfigPage : public ConfigPage
     VerticalConfigurationGroup *m_vc_page;
 };
 
-class RatingsToPL : public TriggeredConfigurationGroup
+HostCheckBoxSetting *RatingsToPL()
 {
-  public:
-    RatingsToPL() : TriggeredConfigurationGroup(false)
+    HostCheckBoxSetting *r2pl =
+        new HostCheckBoxSetting("mythvideo.ParentalLevelFromRating");
+
+    r2pl->setLabel(VideoGeneralSettings::tr("Enable automatic Parental "
+                                            "Level from rating"));
+    r2pl->setValue(false);
+
+    r2pl->setHelpText(VideoGeneralSettings::tr("If enabled, searches will "
+                                               "automatically set the "
+                                               "Parental Level to the one "
+                                               "matching the rating "
+                                               "below."));
+
+    typedef std::map<ParentalLevel::Level, QString> r2pl_map;
+
+    r2pl_map r2pl_defaults;
+
+    r2pl_defaults.insert(r2pl_map::value_type(ParentalLevel::plLowest,
+                                              VideoGeneralSettings::tr("G", "PL 1 default search string.")));
+    r2pl_defaults.insert(r2pl_map::value_type(ParentalLevel::plLow,
+                                              VideoGeneralSettings::tr("PG", "PL 2 default search string.")));
+    r2pl_defaults.insert(r2pl_map::value_type(ParentalLevel::plMedium,
+                                              VideoGeneralSettings::tr("PG-13", "PL3 default search "
+                                                                       "string.")));
+    r2pl_defaults.insert(r2pl_map::value_type(ParentalLevel::plHigh,
+                                              VideoGeneralSettings::tr("R:NC-17", "PL4 default search "
+                                                                       "string.")));
+
+    for (ParentalLevel pl(ParentalLevel::plLowest);
+         pl.GetLevel() <= ParentalLevel::plHigh && pl.good(); ++pl)
     {
-        HostCheckBox *r2pl =
-                new HostCheckBox("mythvideo.ParentalLevelFromRating");
+        HostTextEditSetting *hle = new HostTextEditSetting(QString("mythvideo.AutoR2PL%1")
+                                                           .arg(pl.GetLevel()));
 
-        r2pl->setLabel(VideoGeneralSettings::tr("Enable automatic Parental "
-                                                "Level from rating"));
-        r2pl->setValue(false);
+        hle->setLabel(VideoGeneralSettings::tr("Level %1")
+                      .arg(pl.GetLevel()));
 
-        r2pl->setHelpText(VideoGeneralSettings::tr("If enabled, searches will "
-                                                   "automatically set the "
-                                                   "Parental Level to the one "
-                                                   "matching the rating "
-                                                   "below."));
-        addChild(r2pl);
-        setTrigger(r2pl);
+        hle->setHelpText(VideoGeneralSettings::tr("Ratings containing "
+                                                  "these strings "
+                                                  "(separated by :) will "
+                                                  "be assigned to Parental "
+                                                  "Level %1.")
+                         .arg(pl.GetLevel()));
 
-        typedef std::map<ParentalLevel::Level, QString> r2pl_map;
+        r2pl_map::const_iterator def_setting =
+            r2pl_defaults.find(pl.GetLevel());
 
-        r2pl_map r2pl_defaults;
-
-        r2pl_defaults.insert(r2pl_map::value_type(ParentalLevel::plLowest,
-                VideoGeneralSettings::tr("G", "PL 1 default search string.")));
-        r2pl_defaults.insert(r2pl_map::value_type(ParentalLevel::plLow,
-                VideoGeneralSettings::tr("PG", "PL 2 default search string.")));
-        r2pl_defaults.insert(r2pl_map::value_type(ParentalLevel::plMedium,
-                VideoGeneralSettings::tr("PG-13", "PL3 default search "
-                                                  "string.")));
-        r2pl_defaults.insert(r2pl_map::value_type(ParentalLevel::plHigh,
-                VideoGeneralSettings::tr("R:NC-17", "PL4 default search "
-                                                    "string.")));
-
-        VerticalConfigurationGroup *vcg = new VerticalConfigurationGroup(true);
-
-        for (ParentalLevel pl(ParentalLevel::plLowest);
-             pl.GetLevel() <= ParentalLevel::plHigh && pl.good(); ++pl)
+        if (def_setting != r2pl_defaults.end())
         {
-            HostLineEdit *hle = new HostLineEdit(QString("mythvideo.AutoR2PL%1")
-                                                 .arg(pl.GetLevel()));
-
-            hle->setLabel(VideoGeneralSettings::tr("Level %1")
-                                                   .arg(pl.GetLevel()));
-
-            hle->setHelpText(VideoGeneralSettings::tr("Ratings containing "
-                                                      "these strings "
-                                                      "(separated by :) will "
-                                                      "be assigned to Parental "
-                                                      "Level %1.")
-                                                      .arg(pl.GetLevel()));
-
-            r2pl_map::const_iterator def_setting =
-                    r2pl_defaults.find(pl.GetLevel());
-
-            if (def_setting != r2pl_defaults.end())
-            {
-                hle->setValue(def_setting->second);
-            }
-
-            vcg->addChild(hle);
+            hle->setValue(def_setting->second);
         }
 
-        addTarget("0", new VerticalConfigurationGroup(true));
-        addTarget("1", vcg);
+        r2pl->addTargetedChild("1", hle);
     }
-};
+
+    return r2pl;
+}
 
 } // namespace
 
 VideoGeneralSettings::VideoGeneralSettings()
+    : GroupSetting()
 {
-    ConfigPage::PageList pages;
+    setLabel(tr("General Settings"));
 
-    VConfigPage page1(pages, false);
-    page1->addChild(VideoStartupDirectory());
-    page1->addChild(TrailerDirectory());
-    page1->addChild(VideoArtworkDirectory());
-    page1->addChild(VideoScreenshotDirectory());
-    page1->addChild(VideoBannerDirectory());
-    page1->addChild(VideoFanartDirectory());
+    addChild(VideoStartupDirectory());
+    addChild(TrailerDirectory());
+    addChild(VideoArtworkDirectory());
+    addChild(VideoScreenshotDirectory());
+    addChild(VideoBannerDirectory());
+    addChild(VideoFanartDirectory());
 
-    VConfigPage page2(pages, false);
-    page2->addChild(SetOnInsertDVD());
-    page2->addChild(VideoTreeRemember());
+    addChild(SetOnInsertDVD());
+    addChild(VideoTreeRemember());
 
-    // page 3
-    VerticalConfigurationGroup *pctrl =
-            new VerticalConfigurationGroup(true, false);
+    GroupSetting *pctrl = new GroupSetting();
     pctrl->setLabel(tr("Parental Control Settings"));
     pctrl->addChild(VideoDefaultParentalLevel());
     pctrl->addChild(VideoAdminPassword());
     pctrl->addChild(VideoAdminPasswordThree());
     pctrl->addChild(VideoAdminPasswordTwo());
     pctrl->addChild(VideoAggressivePC());
-    VConfigPage page3(pages, false);
-    page3->addChild(pctrl);
+    pctrl->addChild(RatingsToPL());
 
-    VConfigPage page4(pages, false);
-    page4->addChild(new RatingsToPL());
-
-    int page_num = 1;
-    for (ConfigPage::PageList::const_iterator p = pages.begin();
-         p != pages.end(); ++p, ++page_num)
-    {
-        (*p)->setLabel(tr("General Settings (%1/%2)").arg(page_num)
-                       .arg(pages.size()));
-        addChild(*p);
-    }
+    addChild(pctrl);
 }

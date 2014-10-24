@@ -6,7 +6,7 @@
 #include <QCoreApplication>
 
 #include "mythconfig.h"
-#include "settings.h"
+#include "standardsettings.h"
 #include "mythcontext.h"
 #include "videodisplayprofile.h"
 
@@ -14,7 +14,7 @@
 
 class QFileInfo;
 
-class PlaybackSettings : public ConfigurationWizard
+class PlaybackSettings : public GroupSetting
 {
     Q_DECLARE_TR_FUNCTIONS(PlaybackSettings)
 
@@ -22,12 +22,13 @@ class PlaybackSettings : public ConfigurationWizard
     PlaybackSettings();
 };
 
-class VideoModeSettings : public TriggeredConfigurationGroup
+class VideoModeSettings : public HostCheckBoxSetting
 {
     Q_OBJECT
 
   public:
-    VideoModeSettings();
+    VideoModeSettings(const char *c);
+    virtual void updateButton(MythUIButtonListItem *item);
 };
 
 class LcdSettings : public TriggeredConfigurationGroup
@@ -91,23 +92,23 @@ class MacDesktopSettings : public TriggeredConfigurationGroup
 };
 #endif
 
-class OSDSettings : virtual public ConfigurationWizard
+class OSDSettings: public GroupSetting
 {
     Q_DECLARE_TR_FUNCTIONS(OSDSettings)
-        
+
   public:
     OSDSettings();
 };
 
-class GeneralSettings : public ConfigurationWizard
+class GeneralSettings : public GroupSetting
 {
     Q_DECLARE_TR_FUNCTIONS(GeneralSettings)
-        
+
   public:
     GeneralSettings();
 };
 
-class EPGSettings : public ConfigurationWizard
+class EPGSettings : public GroupSetting
 {
     Q_DECLARE_TR_FUNCTIONS(EPGSettings)
 
@@ -115,23 +116,41 @@ class EPGSettings : public ConfigurationWizard
     EPGSettings();
 };
 
-class AppearanceSettings : public ConfigurationWizard
+class AppearanceSettings : public GroupSetting
 {
     Q_DECLARE_TR_FUNCTIONS(AppearanceSettings)
 
   public:
     AppearanceSettings();
+    virtual void applyChange();
 };
 
-class MainGeneralSettings : public ConfigurationWizard
+class HostRefreshRateComboBoxSetting : public HostComboBoxSetting
+{
+    Q_OBJECT
+
+  public:
+    HostRefreshRateComboBoxSetting(const QString &name) :
+        HostComboBoxSetting(name) { }
+    virtual ~HostRefreshRateComboBoxSetting() { }
+
+  public slots:
+    virtual void ChangeResolution(StandardSetting *);
+
+  private:
+    static const vector<double> GetRefreshRates(const QString &resolution);
+};
+
+class MainGeneralSettings : public GroupSetting
 {
     Q_DECLARE_TR_FUNCTIONS(MainGeneralSettings)
 
   public:
     MainGeneralSettings();
+    virtual void applyChange();
 };
 
-class GeneralRecPrioritiesSettings : public ConfigurationWizard
+class GeneralRecPrioritiesSettings : public GroupSetting
 {
     Q_DECLARE_TR_FUNCTIONS(GeneralRecPrioritiesSettings)
 
@@ -139,6 +158,7 @@ class GeneralRecPrioritiesSettings : public ConfigurationWizard
     GeneralRecPrioritiesSettings();
 };
 
+#if 0
 class PlaybackProfileItemConfig : public QObject, public ConfigurationWizard
 {
     Q_OBJECT
@@ -227,6 +247,51 @@ class PlaybackProfileConfigs : public TriggeredConfigurationGroup
   private:
     QStringList   profiles;
     HostComboBox *grouptrigger;
+};
+#endif
+
+class PlayBackGroupsSetting : public GroupSetting
+{
+    Q_OBJECT
+
+  public:
+    PlayBackGroupsSetting();
+    virtual void Load();
+    virtual void Open();
+
+  public slots:
+    //void newPlayBackGroup(StandardSetting *);
+    //void editPlayBackGroup(StandardSetting *);
+    //void RefreshList();
+
+  private:
+    ButtonStandardSetting *m_addGroupButton;
+};
+
+class ChannelGroupSetting : public GroupSetting
+{
+  public:
+    ChannelGroupSetting(const QString &groupName, int groupId);
+    virtual void Load();
+    virtual void Open();
+    virtual void Close();
+
+  private:
+    int m_groupId;
+    TransTextEditSetting       *m_groupName;
+    TransMythUICheckBoxSetting *m_markForDeletion;
+
+};
+
+class ChannelGroupsSetting : public GroupSetting
+{
+  public:
+    ChannelGroupsSetting();
+    virtual void Load();
+    virtual void Open();
+
+  private:
+    ButtonStandardSetting *m_addGroupButton;
 };
 
 #endif

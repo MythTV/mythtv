@@ -900,6 +900,28 @@
         </button>
     </window>
 
+    <window name="MythSpinBoxDialog">
+        <area>-1,-1,580,165</area>
+
+        <imagetype name="backimg">
+            <filename>mythprogressdialog-background.png</filename>
+        </imagetype>
+
+        <textarea name="message" from="basetextarea">
+            <area>20,20,540,30</area>
+            <align>allcenter</align>
+        </textarea>
+
+        <spinbox name="input" from="basespinbox">
+            <position>245,50</position>
+        </spinbox>
+
+        <button name="ok" from="basebutton">
+            <position>109,110</position>
+            <value>OK</value>
+        </button>
+    </window>
+
     <window name="MythSearchDialog">
         <area>-1,-1,500,500</area>
         <imagetype name="backimg">

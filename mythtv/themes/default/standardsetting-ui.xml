@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mythuitheme SYSTEM "http://www.mythtv.org/schema/mythuitheme.dtd">
+
+<!-- theme.xml for the MythCenter theme - by Jeroen Brosens -->
+<mythuitheme>
+    <window name="settingssetup">
+        <textarea name="title" from="basetextarea">
+            <area>30,15,100%-30,30</area>
+            <font>baselarge</font>
+            <align>hcenter</align>
+        </textarea>
+
+        <shape name="GroupHelpBackground"> 
+            <area>15,80,100%-15,80</area> 
+            <type>roundbox</type> 
+            <cornerradius>10</cornerradius>
+            <fill color="#FFFFFF" alpha="30" />
+        </shape>
+
+        <!-- optional, display the help for the current group of settings -->
+        <textarea name="grouphelp" from="basetextarea">
+            <area>30,90-120,100%-30,60</area>
+            <font>basesmall</font>
+            <align>lefthcenter</align>
+            <multiline>yes</multiline>
+        </textarea>
+
+        <buttonlist name="settingslist" from2="basebuttonlist">
+            <area>70,200,100%-70,100%-160</area>
+            <layout>vertical</layout>
+            <spacing>4</spacing>
+            <wrapstyle>selection</wrapstyle>
+            <arrange>stack</arrange>
+            <spacing>5</spacing>
+            <buttonarea>0,0,100%,97%</buttonarea>
+            <statetype name="buttonitem">
+                <area>0,0,100%,90</area>
+                <state name="active">
+                    <area>0,0,100%,30</area>
+                    <group name="labels">
+                        <area>0,0,50%-1,100%</area>
+                        <shape name="buttonbackground">
+                            <area>0,0,100%,100%</area>
+                            <fill style="gradient">
+                                <gradient start="#505050" end="#000000" alpha="200" direction="vertical"  />
+                            </fill>
+                        </shape>
+                        <textarea name="buttontext">
+                            <area>5,0,100%-10,100%</area>
+                            <font>basesmall</font>
+                            <cutdown>yes</cutdown>
+                            <align>left,vcenter</align>
+                        </textarea>
+                    </group>
+                    <group name="widgets">
+                        <area>50%+1,0,100%,100%</area>
+                        <shape name="buttonbackgroundselection">
+                            <area>0,0,100%,100%</area>
+                            <fill style="gradient">
+                                <gradient start="#505050" end="#000000" alpha="200" direction="vertical"  />
+                            </fill>
+                        </shape>
+
+                        <statetype name="widgettype">
+                            <area>0,0,100%-23,100%</area>
+                            <state name="standard">
+                                <area>0,0,100%,100%</area> 
+                            </state>
+                            <state name="group">
+                                <area>0,0,100%,100%</area> 
+                            </state>
+                            <state name="checkbox">
+                                <area>0,0,100%,100%</area> 
+                            </state>
+                            <state name="textedit">
+                                <area>0,0,100%,100%</area> 
+
+                                <!--imagetype name="texteditimage">
+                                    <filename>checked_high.png</filename>
+                                </imagetype-->
+                                <shape name="texteditshape"> 
+                                    <area>20,2,100%,26</area> 
+                                    <type>roundbox</type> 
+                                    <cornerradius>5</cornerradius>
+                                    <line color="#000000" alpha="255" width="1" />
+                                    <fill color="#FFFFFF" alpha="50" />
+                                </shape> 
+                            </state>
+                            <state name="filebrowser">
+                                <area>0,0,100%,100%</area> 
+                                <shape name="texteditshape"> 
+                                    <area>20,2,100%,26</area> 
+                                    <type>roundbox</type> 
+                                    <cornerradius>5</cornerradius>
+                                    <line color="#000000" alpha="255" width="1" />
+                                    <fill color="#FFFFFF" alpha="50" />
+                                </shape> 
+                                <imagetype name="filebrowserimage">
+                                    <area>100%,5,20,20</area>
+                                    <!-- todo find a good icon -->
+                                    <filename>shared/directory.png</filename>
+                                </imagetype>
+                            </state>
+                            <state name="spinbox">
+                                <area>0,0,100%,100%</area> 
+                                <imagetype name="spinboximage2">
+                                    <area>0,5,20,20</area>
+                                    <filename>lb-ltarrow-sel.png</filename>
+                                </imagetype>
+                                <shape name="texteditshape"> 
+                                    <area>20,2,100%,26</area> 
+                                    <type>roundbox</type> 
+                                    <cornerradius>5</cornerradius>
+                                    <line color="#000000" alpha="255" width="1" />
+                                    <fill color="#FFFFFF" alpha="50" />
+                                </shape> 
+                                <imagetype name="spinboximage">
+                                    <area>100%,5,20,20</area>
+                                    <filename>lb-rtarrow-sel.png</filename>
+                                </imagetype>
+                            </state>
+                            <state name="combobox">
+                                <area>0,0,100%,100%</area> 
+                                <shape name="texteditshape"> 
+                                    <area>20,2,100%,26</area> 
+                                    <type>roundbox</type> 
+                                    <cornerradius>5</cornerradius>
+                                    <line color="#000000" alpha="255" width="1" />
+                                    <fill color="#FFFFFF" alpha="50" />
+                                </shape> 
+                                <imagetype name="comboboximage">
+                                    <area>100%,5,20,20</area>
+                                    <filename>lb-dnarrow-sel.png</filename>
+                                </imagetype>
+
+                            </state>
+                            <state name="button">
+                                <area>0,0,100%,100%</area> 
+                                <imagetype name="comboboximage">
+                                    <area>100%-20,0,20,20</area>
+                                    <filename>button_selected_background.png</filename>
+                                </imagetype>
+                            </state>
+                        </statetype>
+                        <!-- we can not put more than one textarea with the same name
+                            The textarea can no be in a custom state 
+                            We can not put the textarea in a state from statetype neither
+                            Which mean we can not theme them differently according to the statetype
+                        -->
+                        <textarea name="value">
+                            <area>5,0,100%-46,30</area>
+                            <font>basesmall</font>
+                            <cutdown>yes</cutdown>
+                            <align>right,vcenter</align>
+                        </textarea>
+
+
+                    </group>
+                    <statetype name="buttoncheck">
+                        <position>100%-40,5</position>
+                        <state type="off">
+                            <imagetype name="checkoff">
+                                <filename>lb-check-empty.png</filename>
+                            </imagetype>
+                        </state>
+                        <state type="half">
+                            <imagetype name="checkhalf">
+                                <filename>lb-check-half.png</filename>
+                            </imagetype>
+                        </state>
+                        <state type="full">
+                            <imagetype name="checkfull">
+                                <filename>lb-check-full.png</filename>
+                            </imagetype>
+                        </state>
+                    </statetype>
+                    <imagetype name="buttonarrow">
+                        <position>100%-20,7</position>
+                        <filename>lb-arrow.png</filename>
+                    </imagetype>
+                </state>
+                <state name="selectedactive" from="active">
+                    <shape name="buttonbackgroundselection">
+                        <fill style="gradient">
+                            <gradient start="#52CA38" end="#349838" alpha="255" />
+                        </fill>
+                    </shape>
+                    <imagetype name="buttonarrow">
+                        <position>100%-20,7</position>
+                        <filename>lb-arrow.png</filename>
+                    </imagetype>
+                </state>
+                <state name="disabledactive" from="active">
+                    <shape name="buttonbackgroundselection">
+                        <fill style="gradient">
+                            <gradient start="#888888" end="#777777" alpha="255" />
+                        </fill>
+                    </shape>
+                </state>
+                <state name="disabledinactive" from="disabledactive">
+                </state>
+                <state name="selectedinactive" from="active">
+                </state>
+            </statetype>
+        </buttonlist>
+
+        <shape name="HelpBackground"> 
+            <area>15,100%-120,100%-15,100</area> 
+            <type>roundbox</type> 
+            <cornerradius>10</cornerradius>
+            <fill color="#000000" alpha="30" />
+        </shape> 
+
+        <!-- optional, display the help for the currently selected setting -->
+        <textarea name="selectedsettinghelp" from="basetextarea">
+            <area>30,100%-100,100%-30,60</area>
+            <font>basesmall</font>
+            <multiline>yes</multiline>
+        </textarea>
+    </window>
+</mythuitheme>

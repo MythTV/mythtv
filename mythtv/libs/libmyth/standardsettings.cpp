@@ -442,10 +442,6 @@ void MythUIComboBoxSetting::resultEdit(DialogCompletionEvent *dce)
 
 void MythUIComboBoxSetting::Load()
 {
-    if (m_rewrite)
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("MythUIComboBoxSetting::MythUIComboBoxSetting: need to "
-                    "implement rewrite for %1").arg(getLabel()));
     StandardSetting::Load();
 }
 
@@ -608,7 +604,7 @@ bool StandardSettingDialog::Create(void)
 
     if (error)
     {
-        LOG(VB_GENERAL, LOG_ERR, "error.");
+        LOG(VB_GENERAL, LOG_ERR, "Theme elements missing.");
         return false;
     }
 
