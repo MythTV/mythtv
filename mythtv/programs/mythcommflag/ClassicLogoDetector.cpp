@@ -244,9 +244,10 @@ bool ClassicLogoDetector::searchForLogo(MythPlayer* player)
 
             LOG(VB_COMMFLAG, LOG_INFO,
                 QString("Using Logo area: topleft (%1,%2), "
-                        "bottomright (%3,%4)")
+                        "bottomright (%3,%4), pixelsInMask (%5).")
                     .arg(logoMinX).arg(logoMinY)
-                    .arg(logoMaxX).arg(logoMaxY));
+                    .arg(logoMaxX).arg(logoMaxY)
+                    .arg(pixelsInMask));
         }
         else
         {

@@ -324,8 +324,19 @@ bool ClassicCommDetector::go()
 
     if (commDetectMethod & COMM_DETECT_LOGO)
     {
+        // Use a different border for logo detection.
+        // If we try to detect logos in letterboxed areas,
+        // chances are we won't detect the logo.
+        // Generally speaking, SD video is likely to be letter boxed
+        // and HD video is not likely to be letter boxed.
+        // To detect logos, try to exclude letterboxed area from SD video
+        // but exclude too much from HD video and you'll miss the logo.
+        // Using the same border for both with no scaling seems to be
+        // a good compromise.
+        int logoDetectBorder =
+            gCoreContext->GetNumSetting("CommDetectLogoBorder", 16);
         logoDetector = new ClassicLogoDetector(this, width, height,
-            commDetectBorder, horizSpacing, vertSpacing);
+            logoDetectBorder, horizSpacing, vertSpacing);
 
         requiredHeadStart += max(
             int64_t(0), int64_t(recordingStartedAt.secsTo(startedAt)));
