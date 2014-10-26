@@ -1280,10 +1280,11 @@ bool RingBuffer::WaitForReadsAllowed(void)
         }
         count++;
     }
-    if (t.elapsed() > 10000)
+    if (t.elapsed() >= timeout_ms)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
-            "Took more than 10 seconds to be allowed to read, aborting.");
+            QString("Took more than %1 seconds to be allowed to read, aborting.")
+            .arg(timeout_ms / 1000));
         return false;
     }
     return check;
