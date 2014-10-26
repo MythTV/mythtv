@@ -539,7 +539,7 @@ void GalleryDatabaseHelper::LoadFileThumbnailValues(ImageMetadata *im)
     if (im->m_type == kVideoFile)
         thumbFileName.append(".png");
 
-    thumbFileName = gCoreContext->GenMythURL(gCoreContext->GetSetting("MasterServerIP"),
+    thumbFileName = gCoreContext->GenMythURL(gCoreContext->GetMasterHostName(),
                                              gCoreContext->GetNumSetting("MasterServerPort"),
                                              thumbFileName, "Temp");
 

@@ -69,7 +69,8 @@ http://www.mythtv.org/mailman/listinfo/mythtv-dev
 A users list exists as well, subscribe at:
 http://www.mythtv.org/mailman/listinfo/mythtv-users
 
-A list that's restricted to the SVN commit messages is available at:
+A list that's restricted to the Git commit and Trac (bug tracking) messages is
+available at:
 http://www.mythtv.org/mailman/listinfo/mythtv-commits
 
 To contact the developer's for corporate sponsorship, contract work or similarly

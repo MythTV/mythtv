@@ -258,7 +258,7 @@
         </textarea>
 
         <textarea name="stationlabel" >
-            <area>164,106,250,50</area>
+            <area>50,106,364,50</area>
             <font>basemedium</font>
             <align>right,vcenter</align>
             <value>Station:</value>
@@ -273,7 +273,7 @@
         </button>
 
         <textarea name="channellabel" from="stationlabel">
-            <position>164,166</position>
+            <position>50,166</position>
             <value>Channel:</value>
         </textarea>
         <textedit name="channeledit" from="stationedit">
@@ -281,7 +281,7 @@
         </textedit>
 
         <textarea name="urllabel" from="stationlabel">
-            <position>164,226</position>
+            <position>50,226</position>
             <value>URL:</value>
         </textarea>
         <textedit name="urledit" from="stationedit">
@@ -289,7 +289,7 @@
         </textedit>
 
         <textarea name="logourllabel" from="stationlabel">
-            <position>164,286</position>
+            <position>50,286</position>
             <value>Logo URL:</value>
         </textarea>
         <textedit name="logourledit" from="urledit">
@@ -297,7 +297,7 @@
         </textedit>
 
         <textarea name="genrelabel" from="stationlabel">
-            <position>164,346</position>
+            <position>50,346</position>
             <value>Genres:</value>
         </textarea>
         <textedit name="genreedit" from="urledit">
@@ -305,7 +305,7 @@
         </textedit>
 
         <textarea name="formatlabel" from="stationlabel">
-            <position>164,406</position>
+            <position>50,406</position>
             <value>Metadata Format:</value>
         </textarea>
         <textedit name="formatedit" from="stationedit">

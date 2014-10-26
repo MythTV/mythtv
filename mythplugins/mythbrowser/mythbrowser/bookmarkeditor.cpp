@@ -40,15 +40,25 @@ BookmarkEditor::~BookmarkEditor()
 
 bool BookmarkEditor::Create()
 {
-    bool foundtheme = false;
-
-    // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("browser-ui.xml", "bookmarkeditor", this);
-
-    if (!foundtheme)
+    if (!LoadWindowFromXML("browser-ui.xml", "bookmarkeditor", this))
         return false;
 
-    m_titleText = dynamic_cast<MythUIText *> (GetChild("title"));
+    bool err = false;
+
+    UIUtilW::Assign(this, m_titleText, "title",  &err);
+    UIUtilE::Assign(this, m_categoryEdit, "category", &err);
+    UIUtilE::Assign(this, m_nameEdit, "name", &err);
+    UIUtilE::Assign(this, m_urlEdit, "url", &err);
+    UIUtilE::Assign(this, m_isHomepage, "homepage", &err);
+    UIUtilE::Assign(this, m_okButton, "ok", &err);
+    UIUtilE::Assign(this, m_cancelButton, "cancel", &err);
+    UIUtilE::Assign(this, m_findCategoryButton, "findcategory", &err);
+
+    if (err)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'bookmarkeditor'");
+        return false;
+    }
 
     if (m_titleText)
     {
@@ -56,23 +66,6 @@ bool BookmarkEditor::Create()
           m_titleText->SetText(tr("Edit Bookmark Details"));
       else
           m_titleText->SetText(tr("Enter Bookmark Details"));
-    }
-
-    m_categoryEdit = dynamic_cast<MythUITextEdit *> (GetChild("category"));
-    m_nameEdit = dynamic_cast<MythUITextEdit *> (GetChild("name"));
-    m_urlEdit = dynamic_cast<MythUITextEdit *> (GetChild("url"));
-    m_isHomepage = dynamic_cast<MythUICheckBox *> (GetChild("homepage"));
-
-    m_okButton = dynamic_cast<MythUIButton *> (GetChild("ok"));
-    m_cancelButton = dynamic_cast<MythUIButton *> (GetChild("cancel"));
-
-    m_findCategoryButton = dynamic_cast<MythUIButton *> (GetChild("findcategory"));
-
-    if (!m_categoryEdit || !m_nameEdit || !m_urlEdit || !m_isHomepage ||  !m_okButton
-        || !m_cancelButton || !m_findCategoryButton)
-    {
-        LOG(VB_GENERAL, LOG_ERR, "Theme is missing critical theme elements.");
-        return false;
     }
 
     connect(m_okButton, SIGNAL(Clicked()), this, SLOT(Save()));
