@@ -207,6 +207,7 @@ bool ExternalRecorder::StartStreaming(void)
     _wait_for_keyframe_option = true;
     _seen_sps = false;
 
+    LOG(VB_RECORD, LOG_INFO, LOC + "StartStreaming");
     if (m_stream_handler && m_stream_handler->StartStreaming(true))
         return true;
 

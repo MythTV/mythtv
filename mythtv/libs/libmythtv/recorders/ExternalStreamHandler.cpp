@@ -773,30 +773,30 @@ bool ExternalStreamHandler::StartStreaming(bool flush_buffer)
         return false;
     }
 
+    if (flush_buffer && m_replay)
+    {
+        /* If the input is not a 'broadcast' it may only one have
+         * copy of the SPS right at the beginning of the stream,
+         * so make sure we don't miss it!
+         */
+        QMutexLocker listen_lock(&_listener_lock);
+
+        if (!_stream_data_list.empty())
+        {
+            StreamDataList::const_iterator sit = _stream_data_list.begin();
+            for (; sit != _stream_data_list.end(); ++sit)
+                sit.key()->ProcessData(reinterpret_cast<const uint8_t *>
+                                       (m_replay_buffer.constData()),
+                                       m_replay_buffer.size());
+        }
+        LOG(VB_RECORD, LOG_INFO, LOC + QString("Replayed %1 bytes")
+            .arg(m_replay_buffer.size()));
+        m_replay_buffer.clear();
+        m_replay = false;
+    }
+
     if (StreamingCount() == 0)
     {
-        if (flush_buffer)
-        {
-            /* If the input is not a 'broadcast' it may only one have
-             * copy of the SPS right at the beginning of the stream,
-             * so make sure we don't miss it!
-             */
-            QMutexLocker listen_lock(&_listener_lock);
-
-            if (!_stream_data_list.empty())
-            {
-                StreamDataList::const_iterator sit = _stream_data_list.begin();
-                for (; sit != _stream_data_list.end(); ++sit)
-                    sit.key()->ProcessData(reinterpret_cast<const uint8_t *>
-                                           (m_replay_buffer.constData()),
-                                           m_replay_buffer.size());
-            }
-            LOG(VB_RECORD, LOG_INFO, LOC + QString("Replayed %1 bytes")
-                .arg(m_replay_buffer.size()));
-            m_replay_buffer.clear();
-            m_replay = false;
-        }
-
         if (!ProcessCommand("StartStreaming", 5000, result))
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + QString("StartStreaming failed: '%1'")
@@ -943,6 +943,7 @@ bool ExternalStreamHandler::ProcessCommand(const QString & cmd, uint timeout,
                  (!cmd.startsWith("SendBytes") && !cmd.startsWith("XO")));
     LOG(VB_RECORD, m_notify ? LOG_INFO : LOG_DEBUG,
         LOC + QString("ProcessCommand('%1') = '%2'").arg(cmd).arg(result));
+    m_notify = false;
 
     return result.startsWith("OK");
 }
