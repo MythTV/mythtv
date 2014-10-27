@@ -29,5 +29,8 @@ void MythFileRecorderCommandLineParser::LoadArguments(void)
     add(QStringList(QStringList() << "--noloop"),
         "noloop", false,
         "Don't loop input back to beginning on EOF.", "");
-}
 
+    add(QStringList(QStringList() << "--data-rate"),
+        "data_rate", 188*50000,
+        "Rate at which to read data from the file.", "");
+}

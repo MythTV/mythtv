@@ -9,6 +9,8 @@
 #include <unistd.h>
 #include <stdint.h>
 
+#include <mythdate.h>
+
 class Commands;
 
 class Streamer : public QObject
@@ -20,7 +22,8 @@ class Streamer : public QObject
     void SendBytes(void);
 
   public:
-    Streamer(Commands *parent, const QString &filename, bool loopinput);
+    Streamer(Commands *parent, const QString &filename, int data_rate,
+             bool loopinput);
     virtual ~Streamer(void);
     void BlockSize(int val) { m_blockSize = val; }
     bool IsOpen(void) const { return m_file; }
@@ -40,6 +43,11 @@ class Streamer : public QObject
     QByteArray  m_buffer;
     int     m_bufferMax;
     QAtomicInt  m_blockSize;
+
+    // Regulate data rate
+    uint      m_data_rate;  // bytes per second
+    QDateTime m_start_time; // When the first packet was processed
+    quint64   m_data_read;  // How many bytes have been sent
 };
 
 class Commands : public QObject
@@ -53,7 +61,7 @@ class Commands : public QObject
   public:
     Commands(void);
     virtual ~Commands(void);
-    bool Run(const QString & filename, bool loopinput);
+    bool Run(const QString & filename, int data_rate, bool loopinput);
     void setEoF(void) { m_eof = true; }
 
   protected:

@@ -9,7 +9,7 @@
 using namespace std;
 
 #include <QDir>
-#include <QApplication>
+#include <QCoreApplication>
 #include <QTime>
 #include <QThread>
 
@@ -25,12 +25,15 @@ using namespace std;
 #define VERSION "1.0.0"
 #define LOC QString("File(%1): ").arg(m_fileName)
 
-Streamer::Streamer(Commands *parent, const QString &fname, bool loopinput) :
+Streamer::Streamer(Commands *parent, const QString &fname,
+                   int data_rate, bool loopinput) :
     m_parent(parent), m_fileName(fname), m_file(NULL), m_loop(loopinput),
-    m_bufferMax(188 * 100000), m_blockSize(m_bufferMax / 4)
+    m_bufferMax(188 * 100000), m_blockSize(m_bufferMax / 4),
+    m_data_rate(data_rate), m_data_read(0)
 {
     setObjectName("Streamer");
     OpenFile();
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("Data Rate: %1").arg(m_data_rate));
 }
 
 Streamer::~Streamer(void)
@@ -90,27 +93,36 @@ void Streamer::SendBytes(void)
 #else
         read_sz = (int)m_blockSize;
 #endif
-        if (read_sz > m_bufferMax - m_buffer.size())
-            read_sz = m_bufferMax - m_buffer.size();
-        QByteArray buffer = m_file->read(read_sz);
+        if (!m_start_time.isValid())
+            m_start_time = MythDate::current();
+        int delta = m_start_time.secsTo(MythDate::current()) + 1;
+        int rate  = (delta * m_data_rate) - m_data_read;
 
-        pkt_size = buffer.size();
-        if (pkt_size > 0)
+        read_sz = min(rate, read_sz);
+        read_sz = min(m_bufferMax - m_buffer.size(), read_sz);
+
+        if (read_sz > 0)
         {
-            if (m_buffer.size() + pkt_size > m_bufferMax)
+            QByteArray buffer = m_file->read(read_sz);
+
+            pkt_size = buffer.size();
+            if (pkt_size > 0)
             {
-                // This should never happen
-                LOG(VB_RECORD, LOG_WARNING, LOC +
-                    QString("SendBytes -- Overflow: %1 > %2, "
-                            "dropping first %3 bytes.")
-                    .arg(m_buffer.size() + pkt_size)
-                    .arg(m_bufferMax).arg(pkt_size));
-                m_buffer.remove(0, pkt_size);
+                m_data_read += pkt_size;
+                if (m_buffer.size() + pkt_size > m_bufferMax)
+                {
+                    // This should never happen
+                    LOG(VB_RECORD, LOG_WARNING, LOC +
+                        QString("SendBytes -- Overflow: %1 > %2, "
+                                "dropping first %3 bytes.")
+                        .arg(m_buffer.size() + pkt_size)
+                        .arg(m_bufferMax).arg(pkt_size));
+                    m_buffer.remove(0, pkt_size);
+                }
+                m_buffer += buffer;
             }
-            m_buffer += buffer;
         }
     }
-
     if (m_buffer.isEmpty())
     {
         LOG(VB_RECORD, LOG_DEBUG, LOC + "SendBytes -- Buffer is empty.");
@@ -303,7 +315,7 @@ bool Commands::process_command(QString & cmd)
     return true;
 }
 
-bool Commands::Run(const QString & filename, bool loopinput)
+bool Commands::Run(const QString & filename, int data_rate, bool loopinput)
 {
     QString cmd;
 
@@ -318,7 +330,7 @@ bool Commands::Run(const QString & filename, bool loopinput)
 
     m_fileName = filename;
 
-    m_streamer = new Streamer(this, m_fileName, loopinput);
+    m_streamer = new Streamer(this, m_fileName, data_rate, loopinput);
     QThread *streamThread = new QThread(this);
 
     m_streamer->moveToThread(streamThread);
@@ -412,8 +424,9 @@ int main(int argc, char *argv[])
     }
 
     bool loopinput = !cmdline.toBool("noloop");
+    int  data_rate = cmdline.toInt("data_rate");
 
-    QApplication a(argc, argv);
+    QCoreApplication a(argc, argv);
     QCoreApplication::setApplicationName("mythfilerecorder");
 
     int retval;
@@ -427,7 +440,7 @@ int main(int argc, char *argv[])
         filename = cmdline.GetArgs()[0];
 
     Commands recorder;
-    recorder.Run(filename, loopinput);
+    recorder.Run(filename, data_rate, loopinput);
 
     return GENERIC_EXIT_OK;
 }
