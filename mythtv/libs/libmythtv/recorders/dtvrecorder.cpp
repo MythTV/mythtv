@@ -1460,6 +1460,11 @@ bool DTVRecorder::ProcessTSPacket(const TSPacket &tspacket)
         FindOtherKeyframes(&tspacket);
         _buffer_packets = false;
     }
+    else if (_stream_id[pid] == 0)
+    {
+        // Ignore this packet if the PID should be stripped
+        return true;
+    }
     else
     {
         // There are audio/video streams. Only write the packet
