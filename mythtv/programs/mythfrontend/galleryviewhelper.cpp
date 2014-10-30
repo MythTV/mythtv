@@ -401,7 +401,7 @@ void GalleryViewHelper::SetFileOrientation(int fileOrientation)
     }
     else
     {
-        im->SetOrientation(oldFileOrientation, false);
+        im->SetOrientation(oldFileOrientation, true);
 
         LOG(VB_GENERAL, LOG_ERR,
             QString("Could not write the angle %1 into the file %2. "
