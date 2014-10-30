@@ -499,8 +499,6 @@ void GalleryWidget::ShowFileDetails()
     // All widgets are visible, remember this
     m_infoVisible = true;
     SetFocusWidget(m_infoList);
-
-    delete im;
 }
 
 
