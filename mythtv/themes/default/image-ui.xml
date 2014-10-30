@@ -13,13 +13,13 @@
         </textarea>
 
         <textarea name="syncprogresstext" from="basetextarea">
-            <area>540,20,200,30</area>
+            <area>300,20,200,30</area>
             <align>center</align>
         </textarea>
 
         <!-- the shape where the imagelist is displayed -->
         <shape name="gallerybackground">
-            <area>25,60,1230,633</area>
+            <area>10,60,780,533</area>
             <type>roundbox</type>
             <fill color="#000000" alpha="130" />
             <line color="#AAAAAA" alpha="150" width="1" />
@@ -28,7 +28,7 @@
 
         <!-- shows the name of the folder or image -->
         <textarea name="title" from="basetextarea">
-            <area>45,70,900,30</area>
+            <area>45,70,500,30</area>
             <cutdown>yes</cutdown>
             <font>title</font>
             <align>left,vcenter</align>
@@ -36,29 +36,29 @@
 
         <!-- optional - shows current position in grid eg '1 of 123' -->
         <textarea name="position" from="basetextarea">
-            <area>1055,70,180,30</area>
+            <area>680,70,100,30</area>
             <align>right,vcenter</align>
         </textarea>
 
         <!-- shows path to current image -->
         <textarea name="breadcrumbs" from="basetextarea">
-            <area>45,100,900,30</area>
+            <area>45,100,600,30</area>
             <font>text_very_small</font>
             <cutdown>yes</cutdown>
         </textarea>
 
         <textarea name="thumbprogresstext" from="basetextarea">
-            <area>950,85,100,20</area>
+            <area>550,85,100,20</area>
             <align>right,vcenter</align>
         </textarea>
 
         <!-- the list that shows the images in the screen -->
         <buttonlist name="images">
-            <area>45,155,1170,535</area>
-            <buttonarea>0,0,1190,535</buttonarea>
+            <area>50,155,750,435</area>
+            <buttonarea>0,0,750,435</buttonarea>
             <wrapstyle>flowing</wrapstyle>
             <layout>grid</layout>
-            <spacing>7</spacing>
+            <spacing>17</spacing>
             <statetype name="buttonitem">
 
                 <state name="active">
@@ -364,7 +364,7 @@
             <!-- Show the arrow image that indicates that there are
                 more menu entries above the first visible menu -->
             <statetype name="upscrollarrow">
-                <position>1135,-50</position>
+                <position>690,-50</position>
                 <state type="off">
                     <imagetype name="upon">
                         <filename>lb-uparrow-reg.png</filename>
@@ -380,7 +380,7 @@
             <!-- Show the arrow image that indicates that there are
                 more menu entries below the last visible menu -->
             <statetype name="downscrollarrow">
-                <position>1160,-50</position>
+                <position>715,-50</position>
                 <state type="off">
                     <imagetype name="dnon">
                         <filename>lb-dnarrow-reg.png</filename>
@@ -423,7 +423,7 @@
 
         <!-- the shape where the imagelist is displayed -->
         <shape name="galleryconfig_background">
-            <area>160,170,960,460</area>
+            <area>40,70,740,460</area>
             <type>roundbox</type>
             <fill color="#000000" alpha="130" />
             <line color="#AAAAAA" alpha="150" width="1" />
@@ -431,63 +431,63 @@
         </shape>
 
         <textarea name="sortorder_label" from="basetextarea">
-            <area>180,240,540,40</area>
+            <area>80,90,440,40</area>
             <align>right,vcenter</align>
             <value>Sorting order of the shown images:</value>
         </textarea>
         <textarea name="slideshowtime_label" from="sortorder_label">
-            <position>180,290</position>
+            <position>40,140</position>
             <value>Time to display each image during a slideshow (ms):</value>
         </textarea>
         <textarea name="transitiontype_label" from="sortorder_label">
-            <position>180,340</position>
+            <position>80,190</position>
             <value>Type of transition between two images:</value>
         </textarea>
         <textarea name="transitiontime_label" from="sortorder_label">
-            <position>180,390</position>
+            <position>80,240</position>
             <value>Duration of an image transition (ms):</value>
         </textarea>
         <textarea name="showhiddenfiles_label" from="sortorder_label">
-            <position>180,440</position>
+            <position>80,290</position>
             <value>Show files that are marked as hidden:</value>
         </textarea>
         <textarea name="cleardatabase_label" from="sortorder_label">
-            <position>180,490</position>
+            <position>80,340</position>
             <value>Clear database contents (Resync required):</value>
         </textarea>
 
-        <buttonlist name="sortorder" from="baseselector">
-            <area>730,240,380,40</area>
+        <buttonlist name="sortorder" from="basewideselector">
+            <area>530,90,240,40</area>
         </buttonlist>
         <spinbox name="slideshowtime" from="basespinbox">
-            <position>730,290</position>
+            <position>530,140</position>
         </spinbox>
         <buttonlist name="transitiontype" from="baseselector">
-            <position>730,340</position>
+            <position>530,190</position>
         </buttonlist>
         <spinbox name="transitiontime" from="basespinbox">
-            <position>730,390</position>
+            <position>530,240</position>
         </spinbox>
         <checkbox name="showhiddenfiles" from="basecheckbox">
-            <position>730,445</position>
+            <position>530,295</position>
         </checkbox>
         <button name="cleardatabase" from="basebutton">
-            <area>730,490,140,40</area>
+            <area>530,340,140,40</area>
             <value>Clear</value>
         </button>
 
         <shape name="description_separator">
-            <area>180,550,920,1</area>
+            <area>80,450,640,1</area>
             <type>box</type>
             <line color="#AAAAAA" alpha="150" width="1" />
         </shape>
 
         <button name="save" from="basebutton">
-            <position>450,570</position>
+            <position>250,470</position>
             <value>Save</value>
         </button>
         <button name="cancel" from="basebutton">
-            <position>680,570</position>
+            <position>480,470</position>
             <value>Cancel</value>
         </button>
 
@@ -504,7 +504,7 @@
 
         <!-- the background behind the images (black) -->
         <shape name="background_shape">
-            <area>0,0,1280,720</area>
+            <area>0,0,800,600</area>
             <fill color="#000000" alpha="255" />
             <line color="#000000" alpha="255" />
             <type>roundbox</type>
@@ -514,14 +514,14 @@
         <!-- this is the image that shown in the foreground.
              when fading is enabled this image is faded out. -->
         <imagetype name="first_image">
-            <area>-2,-2,1284,724</area>
+            <area>-2,-2,804,604</area>
             <preserveaspect>yes</preserveaspect>
         </imagetype>
 
         <!-- this is the image that shown in the background
              when fading is enabled this image is faded in. -->
         <imagetype name="second_image">
-            <area>-2,-2,1284,724</area>
+            <area>-2,-2,804,604</area>
             <preserveaspect>yes</preserveaspect>
         </imagetype>
 
@@ -545,7 +545,7 @@
 
         <!-- This list shows all the file information -->
         <buttonlist name="infolist">
-            <area>315,180,650,348</area>
+            <area>115,180,450,348</area>
             <layout>vertical</layout>
             <spacing>5</spacing>
             <wrapstyle>selection</wrapstyle>
@@ -553,7 +553,7 @@
             <statetype name="buttonitem">
                 <state name="active">
                     <shape name="buttonbackground">
-                        <area>0,0,650,40</area>
+                        <area>0,0,450,40</area>
                         <fill style="gradient">
                             <gradient start="#505050" end="#000000" alpha="200" direction="vertical"  />
                         </fill>
@@ -568,7 +568,7 @@
                 <state name="inactive" from="active"/>
                 <state name="selectedactive" from="active">
                     <shape name="buttonbackground">
-                        <area>0,0,650,40</area>
+                        <area>0,0,450,40</area>
                         <fill style="gradient">
                             <gradient start="#52CA38" end="#349838" alpha="255" />
                         </fill>
@@ -576,7 +576,7 @@
                 </state>
                 <state name="selectedinactive" from="active">
                     <shape name="buttonbackground">
-                        <area>0,0,650,40</area>
+                        <area>0,0,450,40</area>
                         <fill style="gradient">
                             <gradient start="#52CA38" end="#349838" alpha="100" />
                         </fill>
