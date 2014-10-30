@@ -551,37 +551,42 @@ bool GallerySyncStatusThread::isSyncRunning()
  */
 void GallerySyncStatusThread::run()
 {
-    volatile bool exit = false;
+    bool syncDetected = false;
+
     GalleryFileHelper *fh = new GalleryFileHelper();
 
     // Internal counter that tracks how many
     // times we have been in the while loop
     int loopCounter = 0;
 
-    while (!exit)
+    while (true)
     {
         GallerySyncStatus status = fh->GetSyncStatus();
 
         LOG(VB_GENERAL, LOG_DEBUG,
-            QString("GallerySyncStatusThread: Sync status is running: %1, Syncing image '%2' of '%3'")
+            QString("GallerySyncStatusThread: Sync status is running: %1, "
+                    "Syncing image '%2' of '%3'")
             .arg(status.running).arg(status.current).arg(status.total));
 
-        // Only update the progress text
-        // if the sync is still running
+        // Update the progress text whilst the sync is running
         if (status.running)
-            emit UpdateSyncProgress(status.current, status.total);
-
-        // Try at least one time to get the sync
-        // status before checking for the exit condition
-        if (loopCounter >= 1)
         {
-            if (status.running == false)
-                exit = true;
+            syncDetected = true;
+            emit UpdateSyncProgress(status.current, status.total);
         }
+        // Check at least twice before quitting
+        else if (loopCounter >= 1)
+        {
+            // only refresh UI after syncs
+            if (syncDetected)
+                emit SyncComplete();
 
+            // die
+            break;
+        }
         // Wait some time before trying to get and update the status
         // This also avoids too many calls to the service api.
-        usleep(999999);
+        usleep(500000);
 
         ++loopCounter;
     }

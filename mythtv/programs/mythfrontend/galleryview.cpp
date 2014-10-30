@@ -46,7 +46,7 @@ GalleryView::GalleryView(MythScreenStack *parent, const char *name)
     connect(m_syncStatusThread,  SIGNAL(UpdateSyncProgress(int, int)),
             this,   SLOT(UpdateSyncProgress(int, int)));
 
-    connect(m_syncStatusThread,  SIGNAL(finished()),
+    connect(m_syncStatusThread,  SIGNAL(SyncComplete()),
             this,   SLOT(ResetSyncProgress()));
 
     // Start the sync status thread so that an already

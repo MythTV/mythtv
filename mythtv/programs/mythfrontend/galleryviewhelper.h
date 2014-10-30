@@ -74,6 +74,7 @@ class GallerySyncStatusThread : public QThread
 
   signals:
     void UpdateSyncProgress(int, int);
+    void SyncComplete();
 };
 
 #endif // GALLERYVIEWHANDLER_H
