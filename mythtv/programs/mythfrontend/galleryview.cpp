@@ -28,7 +28,6 @@ GalleryView::GalleryView(MythScreenStack *parent, const char *name)
       m_crumbsText(NULL),
       m_positionText(NULL),
       m_imageText(NULL),
-      m_selectedImage(NULL),
       m_syncProgressText(NULL),
       m_thumbProgressText(NULL)
 {
@@ -95,7 +94,6 @@ bool GalleryView::Create()
     UIUtilE::Assign(this, m_imageList,     "images", &err);
     UIUtilW::Assign(this, m_captionText,   "title");
     UIUtilW::Assign(this, m_imageText,     "noimages");
-    UIUtilW::Assign(this, m_selectedImage, "selectedimage");
     UIUtilW::Assign(this, m_positionText,  "position");
     UIUtilW::Assign(this, m_crumbsText,    "breadcrumbs");
 

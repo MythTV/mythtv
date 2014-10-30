@@ -107,7 +107,7 @@ private:
     MythUIText         *m_crumbsText;
     MythUIText         *m_positionText;
     MythUIText         *m_imageText;
-    MythUIImage        *m_selectedImage;
+    // TODO: Not implemented
 
     MythUIText         *m_syncProgressText;
     MythUIText         *m_thumbProgressText;
