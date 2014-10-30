@@ -44,7 +44,7 @@ private:
 
 private slots:
     void ItemSelected(MythUIButtonListItem *);
-    void UpdateImageItem(MythUIButtonListItem *);
+    void UpdateImageItem(MythUIButtonListItem *, bool = false);
     void UpdateText(MythUIButtonListItem *);
     void UpdateThumbnail(MythUIButtonListItem *,
                          ImageMetadata *,

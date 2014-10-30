@@ -9,7 +9,7 @@
 #include "galleryconfig.h"
 #include "gallerytypedefs.h"
 #include "imagescan.h"
-
+#include "mythuihelper.h"
 
 
 /** \fn     GalleryView::GalleryView(MythScreenStack *, const char *)
@@ -439,7 +439,7 @@ void GalleryView::UpdateImageList()
  *  \param  item The item that shall be updated
  *  \return void
  */
-void GalleryView::UpdateImageItem(MythUIButtonListItem *item)
+void GalleryView::UpdateImageItem(MythUIButtonListItem *item, bool recreateThumb)
 {
     if (!item)
         return;
@@ -514,8 +514,13 @@ void GalleryView::UpdateImageItem(MythUIButtonListItem *item)
     for (int i = 0; i < im->m_thumbFileIdList.size(); ++i)
         m_imageMap.insert(im->m_thumbFileIdList.at(i), item);
 
+    if (recreateThumb)
+        // remove cache image to force a reload
+        GetMythUI()->RemoveFromCacheByFile(
+                    im->m_thumbFileNameList->at(0));
+
     // set the thumbnail image
-    UpdateThumbnail(item, im);
+    UpdateThumbnail(item, im, recreateThumb);
 }
 
 
@@ -1115,7 +1120,7 @@ void GalleryView::FileRotateCW()
         return;
 
     m_galleryViewHelper->SetFileOrientation(kFileRotateCW);
-    UpdateImageItem(item);
+    UpdateImageItem(item, true);
 }
 
 
@@ -1132,7 +1137,7 @@ void GalleryView::FileRotateCCW()
         return;
 
     m_galleryViewHelper->SetFileOrientation(kFileRotateCCW);
-    UpdateImageItem(item);
+    UpdateImageItem(item, true);
 }
 
 
@@ -1149,7 +1154,7 @@ void GalleryView::FileFlipHorizontal()
         return;
 
     m_galleryViewHelper->SetFileOrientation(kFileFlipHorizontal);
-    UpdateImageItem(item);
+    UpdateImageItem(item, true);
 }
 
 
@@ -1166,7 +1171,7 @@ void GalleryView::FileFlipVertical()
         return;
 
     m_galleryViewHelper->SetFileOrientation(kFileFlipVertical);
-    UpdateImageItem(item);
+    UpdateImageItem(item, true);
 }
 
 

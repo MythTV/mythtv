@@ -2,12 +2,12 @@
 #include "gallerywidget.h"
 
 // Qt headers
-#include <QByteArray>
 #include <QXmlStreamReader>
 
 // MythTV headers
 #include "mythcontext.h"
 #include "mythmainwindow.h"
+#include "mythuihelper.h"
 
 ImageLoadingThread::ImageLoadingThread() :
     m_image(NULL),
@@ -537,6 +537,9 @@ void GalleryWidget::LoadFile()
             fileName = m_fileDataList->at(m_index)->m_thumbFileNameList->at(0);
 
         QString url = CreateImageUrl(fileName);
+
+        // remove cache image to force a reload
+        GetMythUI()->RemoveFromCacheByFile(fileName);
 
         // This thread will loads the image so the UI is not blocked.
         m_ilt->setImage(m_fileList->at(m_index),

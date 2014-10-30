@@ -51,17 +51,21 @@ bool Image::SetImageInfo( int id, const QString &tag,
     ImageUtils *iu = ImageUtils::getInstance();
     iu->LoadFileFromDB(im, id);
 
-    if (im->m_fileName.isEmpty())
+    QString sgName = IMAGE_STORAGE_GROUP;
+    StorageGroup sg = StorageGroup(sgName, gCoreContext->GetHostName());
+    QString imageFileName = sg.FindFile(im->m_fileName);
+
+    if (imageFileName.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_ERR, "SetImageInfo - File not found in DB.");
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("SetImageInfo - Image %1 not found in DB.").arg(id));
         delete im;
         return false;
     }
 
     // We got the file name from the ID, so use this method
     // which does the same but just on a filename basis.
-    bool ok;
-    ok = SetImageInfoByFileName( im->m_fileName, tag, value );
+    bool ok = SetImageInfoByFileName(imageFileName, tag, value);
 
     delete im;
     return ok;

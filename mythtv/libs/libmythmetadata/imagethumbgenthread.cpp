@@ -270,12 +270,8 @@ void ImageThumbGenThread::RecreateThumbnail(ImageMetadata *im)
         return;
 
     if (QFile::remove(im->m_thumbFileNameList->at(0)))
-    {
-        GetMythUI()->RemoveFromCacheByFile(
-                    im->m_thumbFileNameList->at(0));
 
         AddToThumbnailList(im);
-    }
 }
 
 
