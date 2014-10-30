@@ -33,7 +33,34 @@
 #include "imageutils.h"
 #include "image.h"
 
+QString Image::GetImage(int id, ImageMetadata* im, const QString &function)
+{
+    QString imageFileName = QString();
 
+    ImageUtils *iu = ImageUtils::getInstance();
+    iu->LoadFileFromDB(im, id);
+
+    if (im->m_fileName.isEmpty())
+
+        LOG(VB_GENERAL, LOG_ERR, QString("%1 - Image %2 not found in DB.")
+            .arg(function)
+            .arg(id));
+    else
+    {
+        QString sgName = IMAGE_STORAGE_GROUP;
+        StorageGroup sg = StorageGroup(sgName, gCoreContext->GetHostName());
+        imageFileName = sg.FindFile(im->m_fileName);
+
+        if (imageFileName.isEmpty())
+
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("%1 - Storage Group file %2 not found for image %3")
+                .arg(function)
+                .arg(im->m_fileName)
+                .arg(id));
+    }
+    return imageFileName;
+}
 
 /** \fn     Image::SetImageInfo( int id,
                                  const QString &tag,
@@ -118,23 +145,16 @@ bool Image::SetImageInfoByFileName( const QString &fileName,
 QString Image::GetImageInfo( int id, const QString &tag )
 {
     ImageMetadata *im = new ImageMetadata();
-    ImageUtils *iu = ImageUtils::getInstance();
-    iu->LoadFileFromDB(im, id);
+    QString fileName = GetImage(id, im, QString("GetImageInfo"));
+    delete im;
 
-    if (im->m_fileName.isEmpty())
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("GetImageInfo - Image %1 not found in DB").arg(id));
-        delete im;
+    if (fileName.isEmpty())
+
         return QString();
-    }
 
     // We got the file name from the ID, so use this method
     // which does the same but just on a filename basis.
-    QString value = GetImageInfoByFileName( im->m_fileName, tag );
-
-    delete im;
-    return value;
+    return GetImageInfoByFileName( fileName, tag );
 }
 
 
@@ -185,24 +205,16 @@ QString Image::GetImageInfoByFileName( const QString &fileName, const QString &t
 DTC::ImageMetadataInfoList* Image::GetImageInfoList( int id )
 {
     ImageMetadata *im = new ImageMetadata();
-    ImageUtils *iu = ImageUtils::getInstance();
-    iu->LoadFileFromDB(im, id);
+    QString fileName = GetImage(id, im, QString("GetImageInfoList"));
+    delete im;
 
-    if (im->m_fileName.isEmpty())
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("GetImageInfoList - Image %1 not found in DB").arg(id));
-        delete im;
+    if (fileName.isEmpty())
+
         return NULL;
-    }
 
     // We got the file name from the ID, so use this method
     // which does the same but just on a filename basis.
-    DTC::ImageMetadataInfoList *imInfoList;
-    imInfoList = GetImageInfoListByFileName(im->m_fileName);
-
-    delete im;
-    return imInfoList;
+    return GetImageInfoListByFileName(fileName);
 }
 
 

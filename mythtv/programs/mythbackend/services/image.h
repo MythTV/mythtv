@@ -24,7 +24,7 @@
 
 #include <QScriptEngine>
 #include "services/imageServices.h"
-
+#include "imagemetadata.h"
 
 
 class Image : public ImageServices
@@ -66,6 +66,9 @@ public:
     bool                        RecreateThumbnail  ( int   Id );
     bool                        SetThumbnailSize   ( int   Width,
                                                      int   Height);
+private:
+    QString GetImage(int, ImageMetadata *, const QString & );
+
 };
 
 // --------------------------------------------------------------------------
