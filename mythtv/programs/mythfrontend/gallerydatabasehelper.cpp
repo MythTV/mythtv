@@ -1,4 +1,5 @@
 // Qt headers
+#include <QDir>
 
 // MythTV headers
 #include "mythcontext.h"
@@ -434,9 +435,9 @@ void GalleryDatabaseHelper::RemoveData(ImageMetadata *im)
 void GalleryDatabaseHelper::LoadDirectoryValues(MSqlQuery &query, ImageMetadata *im)
 {
     im->m_id            = query.value(0).toInt();
-    im->m_fileName      = query.value(1).toString();
     im->m_name          = query.value(2).toString();
     im->m_path          = query.value(3).toString();
+    im->m_fileName      = QDir::cleanPath(QDir(im->m_path).filePath(im->m_name));
     im->m_parentId      = query.value(4).toInt();
     im->m_dirCount      = query.value(5).toInt();
     im->m_fileCount     = query.value(6).toInt();
@@ -459,9 +460,9 @@ void GalleryDatabaseHelper::LoadDirectoryValues(MSqlQuery &query, ImageMetadata 
 void GalleryDatabaseHelper::LoadFileValues(MSqlQuery &query, ImageMetadata *im)
 {
     im->m_id            = query.value(0).toInt();
-    im->m_fileName      = query.value(1).toString();
     im->m_name          = query.value(2).toString();
     im->m_path          = query.value(3).toString();
+    im->m_fileName      = QDir::cleanPath(QDir(im->m_path).filePath(im->m_name));
     im->m_parentId      = query.value(4).toInt();
     im->m_type          = query.value(5).toInt();
     im->m_modTime       = query.value(6).toInt();

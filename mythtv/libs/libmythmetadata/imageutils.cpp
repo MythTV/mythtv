@@ -372,9 +372,9 @@ bool ImageUtils::RemoveFileFromDB(int id)
 void ImageUtils::LoadDirectoryValues(MSqlQuery &query, ImageMetadata *dm)
 {
     dm->m_id            = query.value(0).toInt();
-    dm->m_fileName      = query.value(1).toString();
     dm->m_name          = query.value(2).toString();
     dm->m_path          = query.value(3).toString();
+    dm->m_fileName      = QDir::cleanPath(QDir(dm->m_path).filePath(dm->m_name));
     dm->m_parentId      = query.value(4).toInt();
     dm->m_dirCount      = query.value(5).toInt();
     dm->m_fileCount     = query.value(6).toInt();
@@ -397,9 +397,9 @@ void ImageUtils::LoadDirectoryValues(MSqlQuery &query, ImageMetadata *dm)
 void ImageUtils::LoadFileValues(MSqlQuery &query, ImageMetadata *dm)
 {
     dm->m_id            = query.value(0).toInt();
-    dm->m_fileName      = query.value(1).toString();
     dm->m_name          = query.value(2).toString();
     dm->m_path          = query.value(3).toString();
+    dm->m_fileName      = QDir::cleanPath(QDir(dm->m_path).filePath(dm->m_name));
     dm->m_parentId      = query.value(4).toInt();
     dm->m_type          = query.value(5).toInt();
     dm->m_modTime       = query.value(6).toInt();
@@ -456,14 +456,14 @@ void ImageUtils::LoadDirectoryData(QFileInfo &fileInfo,
                                    int parentId,
                                    const QString &baseDirectory)
 {
-    QDir baseDir(baseDirectory);
+    QDir dir(baseDirectory);
     data->m_parentId    = parentId;
-    data->m_fileName    = baseDir.relativeFilePath(fileInfo.absoluteFilePath());
+    data->m_fileName    = dir.relativeFilePath(fileInfo.absoluteFilePath());
     data->m_name        = fileInfo.fileName();
-    data->m_path        = baseDir.relativeFilePath(fileInfo.absoluteFilePath());
+    data->m_path        = dir.relativeFilePath(fileInfo.absolutePath());
     data->m_isHidden    = fileInfo.isHidden();
 
-    QDir dir(data->m_fileName);
+    dir.cd(data->m_fileName);
     data->m_dirCount = dir.entryList(QDir::Dirs |
                                      QDir::NoSymLinks |
                                      QDir::NoDotAndDotDot |
@@ -474,7 +474,6 @@ void ImageUtils::LoadDirectoryData(QFileInfo &fileInfo,
                                       QDir::NoDotAndDotDot |
                                       QDir::Readable).count();
 }
-
 
 
 /** \fn     ImageUtils::LoadFileData(QFileInfo &, DataMap *)
@@ -488,11 +487,9 @@ void ImageUtils::LoadFileData(QFileInfo &fileInfo,
                               const QString &baseDirectory)
 {
     QDir baseDir(baseDirectory);
-    data->m_fileName    = fileInfo.fileName();
+    data->m_fileName    = baseDir.relativeFilePath(fileInfo.absoluteFilePath());
     data->m_name        = fileInfo.fileName();
     data->m_path        = baseDir.relativeFilePath(fileInfo.absolutePath());
-    if (data->m_path.isNull()) // Hack because relativeFilePath will return a null instead of empty string
-        data->m_path = "";
     data->m_modTime     = fileInfo.lastModified().toTime_t();
     data->m_size        = fileInfo.size();
     data->m_isHidden    = fileInfo.isHidden();
