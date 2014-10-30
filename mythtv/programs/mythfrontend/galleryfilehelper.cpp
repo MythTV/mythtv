@@ -428,13 +428,13 @@ QByteArray GalleryFileHelper::SendRequest(QUrl &url,
         if (reply->error() == QNetworkReply::NoError)
         {
             LOG(VB_GENERAL, LOG_DEBUG,
-                QString("GalleryFileHelper SendRequest ok"));
+                QString("GalleryFileHelper SendRequest ok [%1]").arg(url.toString()));
             ba = reply->readAll();
         }
         else
         {
             LOG(VB_GENERAL, LOG_DEBUG,
-                QString("GalleryFileHelper SendRequest error: %1")
+                QString("GalleryFileHelper SendRequest error: %1 [%2]").arg(url.toString())
                 .arg(reply->errorString()));
         }
         reply->deleteLater();

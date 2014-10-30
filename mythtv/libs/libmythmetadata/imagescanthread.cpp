@@ -61,7 +61,7 @@ void ImageScanThread::run()
         return;
     }
 
-    LOG(VB_GENERAL, LOG_DEBUG, QString("Syncronization started"));
+    LOG(VB_GENERAL, LOG_DEBUG, "Syncronisation started");
 
     m_progressCount       = 0;
     m_progressTotalCount  = 0;
@@ -74,7 +74,7 @@ void ImageScanThread::run()
 
     QStringList paths = iu->GetStorageDirs();
 
-    // Get the total list of files and directories that will be synced.
+    // Get the total list of directories that will be synced.
     // This is only an additional information that the themer can show.
     for (int i = 0; i < paths.size(); ++i)
     {
@@ -116,6 +116,8 @@ void ImageScanThread::run()
     m_continue = false;
     m_progressCount       = 0;
     m_progressTotalCount  = 0;
+
+    LOG(VB_GENERAL, LOG_DEBUG, "Syncronisation complete");
 
     RunEpilog();
 }

@@ -115,7 +115,10 @@ void ImageThumbGenThread::CreateImageThumbnail(ImageMetadata *im)
 
     QImage image;
     if (!image.load(imageFileName))
+    {
+        LOG(VB_FILE, LOG_ERR, QString("Failed to create pic thumbnail for %1").arg(imageFileName));
         return;
+    }
 
     QMatrix matrix;
     switch (im->GetOrientation())
@@ -167,6 +170,7 @@ void ImageThumbGenThread::CreateImageThumbnail(ImageMetadata *im)
     // save the image in the thumbnail directory
     if (image.save(im->m_thumbFileNameList->at(0)))
     {
+        LOG(VB_FILE, LOG_DEBUG, QString("Created pic thumbnail for %1").arg(imageFileName));
         QString msg = "IMAGE_THUMB_CREATED %1";
         gCoreContext->SendMessage(msg.arg(im->m_id));
     }

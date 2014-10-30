@@ -119,7 +119,8 @@ QString Image::GetImageInfo( int id, const QString &tag )
 
     if (im->m_fileName.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_ERR, "GetImageInfo - File not found in DB.");
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("GetImageInfo - Image %1 not found in DB").arg(id));
         delete im;
         return QString();
     }
@@ -185,7 +186,8 @@ DTC::ImageMetadataInfoList* Image::GetImageInfoList( int id )
 
     if (im->m_fileName.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_ERR, "GetImageInfoList - File not found in DB");
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("GetImageInfoList - Image %1 not found in DB").arg(id));
         delete im;
         return NULL;
     }
@@ -288,21 +290,28 @@ bool Image::RemoveImage( int id )
 
     if (im->m_fileName.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_ERR, "RemoveImage - File not found");
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("RemoveImage - Image %1 not found in DB").arg(id));
         delete im;
         return false;
     }
 
     if (!QFile::exists( im->m_fileName ))
     {
-        LOG(VB_GENERAL, LOG_ERR, "RemoveImage - File does not exist.");
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("RemoveImage - File %1 not found for image %2")
+            .arg(im->m_fileName)
+            .arg(id));
         delete im;
         return false;
     }
 
     if (!QFile::remove( im->m_fileName ))
     {
-        LOG(VB_GENERAL, LOG_ERR, "RemoveImage - Could not delete file.");
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("RemoveImage - Could not delete file %1 for image %2")
+            .arg(im->m_fileName)
+            .arg(id));
         delete im;
         return false;
     }
@@ -426,7 +435,8 @@ bool Image::CreateThumbnail(int id)
 
     if (im->m_fileName.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_ERR, "QueueCreateThumbnail - File not found");
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("CreateThumbnail - Image %1 not found in DB").arg(id));
         delete im;
         return false;
     }
@@ -443,7 +453,8 @@ bool Image::RecreateThumbnail(int id)
 
     if (im->m_fileName.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_ERR, "QueueCreateThumbnail - File not found");
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("RecreateThumbnail - Image %1 not found in DB").arg(id));
         delete im;
         return false;
     }
