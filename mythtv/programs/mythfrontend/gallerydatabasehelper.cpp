@@ -469,7 +469,7 @@ void GalleryDatabaseHelper::LoadFileValues(MSqlQuery &query, ImageMetadata *im)
     im->m_extension     = query.value(8).toString();
     im->SetAngle(         query.value(9).toInt());
     im->m_date          = query.value(10).toInt();
-    im->SetZoom(          query.value(11).toInt());
+    im->SetZoom(          query.value(11).toInt(), true);
     im->m_isHidden      = query.value(12).toInt();
     im->SetOrientation(   query.value(13).toInt(), true);
 

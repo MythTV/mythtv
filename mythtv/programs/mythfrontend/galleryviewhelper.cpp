@@ -424,10 +424,10 @@ void GalleryViewHelper::SetFileZoom(int zoom)
         return;
 
     if (zoom == kFileZoomIn)
-        im->SetZoom(20);
+        im->SetZoom(20, false);
 
     if (zoom == kFileZoomOut)
-        im->SetZoom(-20);
+        im->SetZoom(-20, false);
 
     m_dbHelper->UpdateData(im);
 }

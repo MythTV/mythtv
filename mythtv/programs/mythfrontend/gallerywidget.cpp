@@ -32,7 +32,7 @@ void ImageLoadingThread::run()
     {
         m_image->SetFilename(m_url);
         m_image->SetOrientation(m_imageData->GetOrientation());
-        m_image->SetZoom(m_imageData->GetZoom() / 100);
+        m_image->SetZoom(static_cast<float>(m_imageData->GetZoom()) / 100);
         m_image->Load(false);
     }
 }

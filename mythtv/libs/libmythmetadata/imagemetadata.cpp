@@ -74,15 +74,21 @@ void ImageMetadata::SetAngle(int angle)
  *  \param  zoom The zoom value that shall be saved
  *  \return void
  */
-void ImageMetadata::SetZoom(int zoom)
+void ImageMetadata::SetZoom(int zoom, bool replace)
 {
+    if (replace)
+    {
+        m_zoom = zoom;
+        return;
+    }
+
     m_zoom += zoom;
 
     if (m_zoom > 300)
         m_zoom = 300;
 
-    if (m_zoom < 0)
-        m_zoom = 0;
+    if (m_zoom < 20)
+        m_zoom = 20;
 }
 
 

@@ -407,7 +407,7 @@ void ImageUtils::LoadFileValues(MSqlQuery &query, ImageMetadata *dm)
     dm->m_extension     = query.value(8).toString();
     dm->SetAngle(         query.value(9).toInt());
     dm->m_date          = query.value(10).toInt();
-    dm->SetZoom(          query.value(11).toInt());
+    dm->SetZoom(          query.value(11).toInt(), true);
     dm->m_isHidden      = query.value(12).toInt();
     dm->SetOrientation(   query.value(13).toInt(), true);
 

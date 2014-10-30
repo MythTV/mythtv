@@ -76,7 +76,7 @@ public:
     int         GetZoom()   const   { return m_zoom; }
     int         GetOrientation();
     void        SetAngle(int);
-    void        SetZoom(int);
+    void        SetZoom(int, bool);
     void        SetOrientation(int, bool);
 
     // Internal thumbnail information
