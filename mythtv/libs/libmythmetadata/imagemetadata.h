@@ -82,6 +82,7 @@ public:
     // Internal thumbnail information
     QString         m_thumbPath;
     QList<QString> *m_thumbFileNameList;
+    QList<int>      m_thumbFileIdList;
 
 private:
     int         m_zoom;

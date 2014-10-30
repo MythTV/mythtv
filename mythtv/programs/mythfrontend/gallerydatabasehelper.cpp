@@ -490,31 +490,32 @@ void GalleryDatabaseHelper::LoadDirectoryThumbnailValues(ImageMetadata *im)
     // Try to get four new thumbnail filenames
     // from the available images in this folder
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT CONCAT_WS('/', path, filename) FROM gallery_files "
+    query.prepare("SELECT file_id, CONCAT_WS('/', path, name) "
+                          "FROM gallery_files "
                           "WHERE path = :PATH "
-                          "AND type = '4' "
+                          "AND type = :TYPE "
                           "AND hidden = '0' LIMIT :LIMIT");
-    query.bindValue(":PATH", im->m_path);
+    query.bindValue(":PATH", im->m_fileName);
+    query.bindValue(":TYPE", kImageFile);
     query.bindValue(":LIMIT", kMaxFolderThumbnails);
 
     if (!query.exec())
         LOG(VB_GENERAL, LOG_ERR, MythDB::DBErrorMessage(query.lastError()));
 
     int i = 0;
-    while (query.next())
+    im->m_thumbFileIdList.clear();
+    while (query.next() && i < im->m_thumbFileNameList->size())
     {
         QString thumbFileName = QString("%1%2")
                 .arg("/MythImage/")
-                .arg(query.value(0).toString());
+                .arg(query.value(1).toString());
 
         thumbFileName = gCoreContext->GenMythURL(gCoreContext->GetMasterHostName(),
                                                  gCoreContext->GetMasterServerPort(),
                                                  thumbFileName, "Temp");
 
-        if (i >= im->m_thumbFileNameList->size())
-            break;
-
         im->m_thumbFileNameList->replace(i, thumbFileName);
+        im->m_thumbFileIdList.append(query.value(0).toInt());
         ++i;
     }
 }
@@ -528,7 +529,6 @@ void GalleryDatabaseHelper::LoadDirectoryThumbnailValues(ImageMetadata *im)
  */
 void GalleryDatabaseHelper::LoadFileThumbnailValues(ImageMetadata *im)
 {
-
 
     // Create the relative path and filename to the thumbnail image
     QString thumbFileName = QString("%1%2")
@@ -545,6 +545,7 @@ void GalleryDatabaseHelper::LoadFileThumbnailValues(ImageMetadata *im)
                                              thumbFileName, "Temp");
 
     im->m_thumbFileNameList->replace(0, thumbFileName);
+    im->m_thumbFileIdList.insert(0, im->m_id);
 }
 
 

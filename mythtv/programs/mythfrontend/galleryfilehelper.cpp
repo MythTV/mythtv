@@ -147,20 +147,29 @@ void GalleryFileHelper::StopThumbGen()
 }
 
 
-void GalleryFileHelper::AddToThumbnailList(ImageMetadata* im)
+void GalleryFileHelper::AddToThumbnailList(ImageMetadata* im, QSet<int> &done)
 {
     if (!im)
         return;
 
-    int id = im->m_id;
-    QUrl url(QString("http://%1:%2/Image/CreateThumbnail?Id=%3")
-             .arg(m_backendHost)
-             .arg(m_backendPort)
-             .arg(id));
+    // folders use multiple thumbnails
+    for (int i = 0; i < im->m_thumbFileIdList.size(); i++)
+    {
+        int imageId = im->m_thumbFileIdList.at(i);
 
-    SendRequest(url, QNetworkAccessManager::PostOperation);
+        if (!done.contains(imageId))
+        {
+            QUrl url(QString("http://%1:%2/Image/CreateThumbnail?Id=%3")
+                     .arg(m_backendHost)
+                     .arg(m_backendPort)
+                     .arg(imageId));
+
+            SendRequest(url, QNetworkAccessManager::PostOperation);
+
+            done.insert(imageId);
+        }
+    }
 }
-
 
 void GalleryFileHelper::RecreateThumbnail(ImageMetadata* im)
 {

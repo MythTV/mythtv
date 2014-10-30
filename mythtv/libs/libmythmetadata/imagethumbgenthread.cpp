@@ -70,15 +70,9 @@ void ImageThumbGenThread::run()
 
         if (im)
         {
-            if (im->m_type == kSubDirectory ||
-                im->m_type == kUpDirectory)
+            if (im->m_type == kImageFile)
             {
-                for (int i = 0; i < im->m_thumbFileNameList->size(); ++i)
-                    CreateImageThumbnail(im, i);
-            }
-            else if (im->m_type == kImageFile)
-            {
-                CreateImageThumbnail(im, 0);
+                CreateImageThumbnail(im);
             }
             else if (im->m_type == kVideoFile)
             {
@@ -108,9 +102,9 @@ void ImageThumbGenThread::run()
  *  \param  dataid The id of the thumbnail
  *  \return void
  */
-void ImageThumbGenThread::CreateImageThumbnail(ImageMetadata *im, int id)
+void ImageThumbGenThread::CreateImageThumbnail(ImageMetadata *im)
 {
-    if (QFile(im->m_thumbFileNameList->at(id)).exists())
+    if (QFile(im->m_thumbFileNameList->at(0)).exists())
         return;
 
     QDir dir;
@@ -118,16 +112,6 @@ void ImageThumbGenThread::CreateImageThumbnail(ImageMetadata *im, int id)
         dir.mkpath(im->m_thumbPath);
 
     QString imageFileName = m_storageGroup.FindFile(im->m_fileName);
-
-    // If a folder thumbnail shall be created we need to get
-    // the real filename from the thumbnail filename by removing
-    // the configuration directory and the MythImage path
-    if (im->m_type == kSubDirectory ||
-        im->m_type == kUpDirectory)
-    {
-        imageFileName = im->m_thumbFileNameList->at(id);
-        imageFileName = imageFileName.mid(GetConfDir().append("/MythImage/").count());
-    }
 
     QImage image;
     if (!image.load(imageFileName))
@@ -181,7 +165,7 @@ void ImageThumbGenThread::CreateImageThumbnail(ImageMetadata *im, int id)
     Resize(image);
 
     // save the image in the thumbnail directory
-    if (image.save(im->m_thumbFileNameList->at(id)))
+    if (image.save(im->m_thumbFileNameList->at(0)))
     {
         QString msg = "IMAGE_THUMB_CREATED %1";
         gCoreContext->SendMessage(msg.arg(im->m_id));

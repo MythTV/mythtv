@@ -37,7 +37,7 @@ class META_PUBLIC ImageThumbGenThread : public QThread
     void run();
 
   private:
-    void CreateImageThumbnail(ImageMetadata *, int);
+    void CreateImageThumbnail(ImageMetadata *);
     void CreateVideoThumbnail(ImageMetadata *);
 
     void Resize(QImage &);

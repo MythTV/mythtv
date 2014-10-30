@@ -33,7 +33,7 @@ class GalleryViewHelper : public QObject
 
     int     LoadData();
     void    LoadTreeData();
-    void    LoadTreeNodeData(QList<ImageMetadata *>*, MythGenericTree*);
+    void    LoadTreeNodeData(QList<ImageMetadata *>*, MythGenericTree*, QSet<int> &);
     void    UpdateAllData();
     void    RenameCurrentNode(QString &);
     void    DeleteCurrentNode();

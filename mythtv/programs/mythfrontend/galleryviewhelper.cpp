@@ -128,21 +128,24 @@ void GalleryViewHelper::LoadTreeData()
     // Clear the list so that it can be populated with new data.
     m_currentNode->deleteAllChildren();
 
-    // If the parent is a root directory
+    // Only create each thumbnail once
+    QSet<int> done;
+
+    // If the node has a parent (ie. not the top level)
     // then add a additional directory at the beginning of the list that
     // is of the type kUpDirectory so that the user can navigate one level up.
     if (id > 0)
     {
         m_dbHelper->LoadParentDirectory(dirList, id);
-        LoadTreeNodeData(dirList, m_currentNode);
+        LoadTreeNodeData(dirList, m_currentNode, done);
     }
 
     m_dbHelper->LoadDirectories(dirList, id);
-    LoadTreeNodeData(dirList, m_currentNode);
+    LoadTreeNodeData(dirList, m_currentNode, done);
 
     // Load all files with the specified sorting criterias
     m_dbHelper->LoadFiles(fileList, id);
-    LoadTreeNodeData(fileList, m_currentNode);
+    LoadTreeNodeData(fileList, m_currentNode, done);
 
     // Start generating thumbnails if required
     m_fileHelper->StartThumbGen();
@@ -161,7 +164,8 @@ void GalleryViewHelper::LoadTreeData()
  *  \return void
  */
 void GalleryViewHelper::LoadTreeNodeData(QList<ImageMetadata *> *list,
-                                       MythGenericTree *tree)
+                                       MythGenericTree *tree,
+                                         QSet<int> &done)
 {
     // Add all items in the list to the tree
     for (int i = 0; i < list->size(); ++i)
@@ -169,7 +173,7 @@ void GalleryViewHelper::LoadTreeNodeData(QList<ImageMetadata *> *list,
         ImageMetadata *im = list->at(i);
         if (im)
         {
-            m_fileHelper->AddToThumbnailList(im);
+            m_fileHelper->AddToThumbnailList(im, done);
 
             // Create a new tree node that will hold the data
             MythGenericTree *treeItem =

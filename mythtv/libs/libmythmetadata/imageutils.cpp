@@ -842,11 +842,12 @@ void ImageUtils::LoadDirectoryThumbnailValues(ImageMetadata *im)
     // Try to get four new thumbnail filenames
     // from the available images in this folder
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT CONCAT_WS('/', path, filename), path FROM gallery_files "
+    query.prepare("SELECT CONCAT_WS('/', path, name), path FROM gallery_files "
                           "WHERE path = :PATH "
-                          "AND type = '4' "
+                          "AND type = :TYPE "
                           "AND hidden = '0' LIMIT :LIMIT");
-    query.bindValue(":PATH", im->m_path);
+    query.bindValue(":PATH", im->m_fileName);
+    query.bindValue(":TYPE", kImageFile);
     query.bindValue(":LIMIT", kMaxFolderThumbnails);
 
     if (!query.exec())

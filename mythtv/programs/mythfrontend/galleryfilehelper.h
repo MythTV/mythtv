@@ -32,7 +32,7 @@ public:
     void        StopSyncImages();
     void        StartThumbGen();
     void        StopThumbGen();
-    void        AddToThumbnailList(ImageMetadata *);
+    void        AddToThumbnailList(ImageMetadata *, QSet<int> &);
     void        RecreateThumbnail(ImageMetadata *);
     void        SetThumbnailSize(int width, int height);
     bool        RemoveFile(ImageMetadata *);

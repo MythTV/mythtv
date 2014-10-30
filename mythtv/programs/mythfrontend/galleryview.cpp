@@ -227,13 +227,12 @@ void GalleryView::customEvent(QEvent *event)
             {
                 fileid = tokens[1].toUInt();
 
-                // FIXME: This sucks, must be a better way to do this
-                //
-                // get through the entire list of image items and find
-                // the fileid that matches the created thumbnail filename
-                for (int i = 0; i < m_imageList->GetCount(); i++)
+                // update all widgets using this image
+                QList<MythUIButtonListItem*> itemList = m_imageMap.values(fileid);
+
+                for (int i = 0; i < itemList.size(); ++i)
                 {
-                    MythUIButtonListItem *item = m_imageList->GetItemAt(i);
+                    MythUIButtonListItem *item = itemList.at(i);
                     if (!item)
                         continue;
 
@@ -241,11 +240,7 @@ void GalleryView::customEvent(QEvent *event)
                     if (!im)
                         continue;
 
-                    if (im->m_id == fileid)
-                    {
-                        UpdateThumbnail(item, true);
-                        break;
-                    }
+                    UpdateThumbnail(item, im, true);
                 }
             }
         }
@@ -336,6 +331,7 @@ void GalleryView::customEvent(QEvent *event)
 void GalleryView::ResetImageItems()
 {
     m_imageList->Reset();
+    m_imageMap.clear();
 
     if (m_positionText)
         m_positionText->Reset();
@@ -399,6 +395,7 @@ void GalleryView::LoadData()
 void GalleryView::UpdateImageList()
 {
     m_imageList->Reset();
+    m_imageMap.clear();
 
     // get all children from the the selected node
     MythGenericTree *selectedNode = m_galleryViewHelper->m_currentNode->getSelectedChild();
@@ -513,8 +510,12 @@ void GalleryView::UpdateImageItem(MythUIButtonListItem *item)
     if (item == m_imageList->GetItemCurrent())
         UpdateText(item);
 
+    // register widget as a user of its images
+    for (int i = 0; i < im->m_thumbFileIdList.size(); ++i)
+        m_imageMap.insert(im->m_thumbFileIdList.at(i), item);
+
     // set the thumbnail image
-    UpdateThumbnail(item);
+    UpdateThumbnail(item, im);
 }
 
 
@@ -524,75 +525,23 @@ void GalleryView::UpdateImageItem(MythUIButtonListItem *item)
  *  \param  item The item that shall be updated
  *  \return void
  */
-void GalleryView::UpdateThumbnail(MythUIButtonListItem *item, bool forceReload)
+void GalleryView::UpdateThumbnail(MythUIButtonListItem *item,
+                                  ImageMetadata *im,
+                                  bool forceReload)
 {
-    if (!item)
-        return;
-
-    ImageMetadata *im = GetImageMetadataFromButton(item);
-    if (!im)
-        return;
-
-    if (im->m_type == kUpDirectory || im->m_type == kSubDirectory)
+    if (item && im)
     {
-        for (int i = 0; i < im->m_thumbFileNameList->size(); ++i)
+        // directories show multiple thumbnails
+        if (im->m_type == kUpDirectory || im->m_type == kSubDirectory)
         {
-            item->SetImage(im->m_thumbFileNameList->at(i),
-                           QString("thumbimage%1").arg(i+1), forceReload);
+            for (int i = 0; i < im->m_thumbFileNameList->size(); ++i)
+                item->SetImage(im->m_thumbFileNameList->at(i),
+                               QString("thumbimage%1").arg(i+1), forceReload);
         }
-    }
-    else
-    {
-        item->SetImage(im->m_thumbFileNameList->at(0), "", forceReload);
+        else
+            item->SetImage(im->m_thumbFileNameList->at(0), "", forceReload);
     }
 }
-
-
-
-/** \fn     GalleryView::UpdateThumbnail(ImageMetadata *, int)
- *  \brief  Updates the thumbnail image of an image or
- *          folder which contains the given image metadata
- *  \param  item The item that shall be updated
- *  \param  id The thumbnail id that shall be used,
- *          there are 4 ids when the item is a folder
- *  \return void
- */
-void GalleryView::UpdateThumbnail(ImageMetadata *thumbImageMetadata, int id)
-{
-    // get through the entire list of image items and find
-    // the filename that matches the created thumbnail filename
-    for (int i = 0; i < m_imageList->GetCount(); i++)
-    {
-        MythUIButtonListItem *item = m_imageList->GetItemAt(i);
-        if (!item)
-            continue;
-
-        ImageMetadata *im = GetImageMetadataFromButton(item);
-        if (!im)
-            continue;
-
-        // Set the thumbnail image if the thumbnail
-        // image names at the given index are the same
-        if (thumbImageMetadata->m_thumbFileNameList->at(id).compare(
-                    im->m_thumbFileNameList->at(id)) == 0)
-        {
-            // Set the images for the four thumbnail image widgets in case
-            // the node is a folder. Otherwise set the buttonimage widget.
-            if (im->m_type == kUpDirectory ||
-                im->m_type == kSubDirectory)
-            {
-                item->SetImage(thumbImageMetadata->m_thumbFileNameList->at(id),
-                               QString("thumbimage%1").arg(id+1), true);
-            }
-            else
-            {
-                item->SetImage(thumbImageMetadata->m_thumbFileNameList->at(0), "", true);
-            }
-            break;
-        }
-    }
-}
-
 
 
 /** \fn     GalleryView::ResetThumbnailProgress()

@@ -2,7 +2,7 @@
 #define GALLERYVIEW_H
 
 // Qt headers
-#include <QStringList>
+#include <QMultiMap>
 
 // MythTV headers
 #include "mythscreentype.h"
@@ -17,8 +17,6 @@
 #include "galleryviewhelper.h"
 #include "gallerywidget.h"
 
-
-
 class GalleryView : public MythScreenType
 {
     Q_OBJECT
@@ -32,7 +30,6 @@ public:
 
 public slots:
     void LoadData();
-    void UpdateThumbnail(ImageMetadata *, int);
     void ResetThumbnailProgress();
     void UpdateThumbnailProgress(int, int);
 
@@ -49,7 +46,9 @@ private slots:
     void ItemSelected(MythUIButtonListItem *);
     void UpdateImageItem(MythUIButtonListItem *);
     void UpdateText(MythUIButtonListItem *);
-    void UpdateThumbnail(MythUIButtonListItem *, bool forceReload = false);
+    void UpdateThumbnail(MythUIButtonListItem *,
+                         ImageMetadata *,
+                         bool forceReload = false);
 
     void MenuMain();
     void MenuInformation();
@@ -103,6 +102,7 @@ private:
     MythScreenStack         *m_mainStack;
 
     MythUIButtonList   *m_imageList;
+    QMultiMap<int, MythUIButtonListItem*> m_imageMap;
     MythUIText         *m_captionText;
     MythUIText         *m_crumbsText;
     MythUIText         *m_positionText;
