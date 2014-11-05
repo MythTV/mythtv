@@ -61,31 +61,32 @@ MHInteractionChannel::EStatus MHInteractionChannel::status()
     return gCoreContext->GetNumSetting("EnableMHEGic", 1) ? kActive : kDisabled;
 }
 
-static inline bool isCached(const QString& csPath)
+static inline bool isCached(const QUrl& url)
 {
-    return NetStream::GetLastModified(csPath).isValid();
+    return NetStream::GetLastModified(url).isValid();
 }
 
 // Is a file ready to read?
 bool MHInteractionChannel::CheckFile(const QString& csPath, const QByteArray &cert)
 {
+    QUrl url(csPath);
     QMutexLocker locker(&m_mutex);
 
     // Is it complete?
-    if (m_finished.contains(csPath))
+    if (m_finished.contains(url))
         return true;
 
     // Is it pending?
-    if (m_pending.contains(csPath))
+    if (m_pending.contains(url))
         return false; // It's pending so unavailable
 
     // Is it in the cache?
-    if (isCached(csPath))
+    if (isCached(url))
         return true; // It's cached
 
     // Queue a request
     LOG(VB_MHEG, LOG_DEBUG, LOC + QString("CheckFile queue %1").arg(csPath));
-    QScopedPointer< NetStream > p(new NetStream(csPath, NetStream::kPreferCache, cert));
+    QScopedPointer< NetStream > p(new NetStream(url, NetStream::kPreferCache, cert));
     if (!p || !p->IsOpen())
     {
         LOG(VB_MHEG, LOG_WARNING, LOC + QString("CheckFile failed %1").arg(csPath) );
@@ -93,7 +94,7 @@ bool MHInteractionChannel::CheckFile(const QString& csPath, const QByteArray &ce
     }
 
     connect(p.data(), SIGNAL(Finished(QObject*)), this, SLOT(slotFinished(QObject*)) );
-    m_pending.insert(csPath, p.take());
+    m_pending.insert(url, p.take());
 
     return false; // It's now pending so unavailable
 }
@@ -103,14 +104,15 @@ MHInteractionChannel::EResult
 MHInteractionChannel::GetFile(const QString &csPath, QByteArray &data,
         const QByteArray &cert /*=QByteArray()*/)
 {
+    QUrl url(csPath);
     QMutexLocker locker(&m_mutex);
 
     // Is it pending?
-    if (m_pending.contains(csPath))
+    if (m_pending.contains(url))
         return kPending;
 
     // Is it complete?
-    QScopedPointer< NetStream > p(m_finished.take(csPath));
+    QScopedPointer< NetStream > p(m_finished.take(url));
     if (p)
     {
         if (p->GetError() == QNetworkReply::NoError)
@@ -125,13 +127,13 @@ MHInteractionChannel::GetFile(const QString &csPath, QByteArray &data,
     }
 
     // Is it in the cache?
-    if (isCached(csPath))
+    if (isCached(url))
     {
         LOG(VB_MHEG, LOG_DEBUG, LOC + QString("GetFile cache read %1").arg(csPath) );
 
         locker.unlock();
 
-        NetStream req(csPath, NetStream::kAlwaysCache);
+        NetStream req(url, NetStream::kAlwaysCache);
         if (req.WaitTillFinished(3000) && req.GetError() == QNetworkReply::NoError)
         {
             data = req.ReadAll();
@@ -148,7 +150,7 @@ MHInteractionChannel::GetFile(const QString &csPath, QByteArray &data,
 
     // Queue a download
     LOG(VB_MHEG, LOG_DEBUG, LOC + QString("GetFile queue %1").arg(csPath) );
-    p.reset(new NetStream(csPath, NetStream::kPreferCache, cert));
+    p.reset(new NetStream(url, NetStream::kPreferCache, cert));
     if (!p || !p->IsOpen())
     {
         LOG(VB_MHEG, LOG_WARNING, LOC + QString("GetFile failed %1").arg(csPath) );
@@ -156,7 +158,7 @@ MHInteractionChannel::GetFile(const QString &csPath, QByteArray &data,
     }
 
     connect(p.data(), SIGNAL(Finished(QObject*)), this, SLOT(slotFinished(QObject*)) );
-    m_pending.insert(csPath, p.take());
+    m_pending.insert(url, p.take());
 
     return kPending;
 }
@@ -168,11 +170,11 @@ void MHInteractionChannel::slotFinished(QObject *obj)
     if (!p)
         return;
 
-    QByteArray url = p->Url().toEncoded();
+    QUrl url = p->Url();
 
     if (p->GetError() == QNetworkReply::NoError)
     {
-        LOG(VB_MHEG, LOG_DEBUG, LOC + QString("Finished %1").arg(url.constData()) );
+        LOG(VB_MHEG, LOG_DEBUG, LOC + QString("Finished %1").arg(url.toString()) );
     }
     else
     {
@@ -183,9 +185,9 @@ void MHInteractionChannel::slotFinished(QObject *obj)
 
     QMutexLocker locker(&m_mutex);
 
-    if (m_pending.remove(url.constData()) < 1)
-        LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Finished %1 wasn't pending").arg(url.constData()) );
-    m_finished.insert(url.constData(), p);
+    if (m_pending.remove(url) < 1)
+        LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Finished %1 wasn't pending").arg(url.toString()) );
+    m_finished.insert(url, p);
 }
 
 /* End of file */

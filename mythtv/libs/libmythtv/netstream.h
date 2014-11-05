@@ -48,7 +48,7 @@ public:
     qlonglong GetSize() const;
 
     // Properties
-    QUrl Url() const { return m_request.url(); }
+    const QUrl &Url() const { return m_url; }
 
     // Synchronous interface
     bool WaitTillReady(unsigned long millisecs);
@@ -69,7 +69,7 @@ signals:
 
 public:
     // Time when a URI was last written to cache or invalid if not cached.
-    static QDateTime GetLastModified(const QString &url);
+    static QDateTime GetLastModified(const QUrl &url);
     // Is the network accessible
     static bool isAvailable();
 
@@ -91,6 +91,7 @@ private:
     bool Request(const QUrl &);
 
     const int m_id; // Unique request ID
+    const QUrl m_url;
 
     mutable QMutex m_mutex; // Protects r/w access to the following data
     QNetworkRequest m_request;
@@ -126,7 +127,7 @@ public:
     static inline QMutex* GetMutex() { return &manager().m_mutexNAM; }
 
     static bool isAvailable(); // is network usable
-    static QDateTime GetLastModified(const QString &url);
+    static QDateTime GetLastModified(const QUrl &url);
 
 signals:
      void requestStarted(int, QNetworkReply *);

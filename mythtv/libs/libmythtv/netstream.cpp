@@ -95,6 +95,7 @@ public:
 NetStream::NetStream(const QUrl &url, EMode mode /*= kPreferCache*/,
         const QByteArray &cert) :
     m_id(s_nRequest.fetchAndAddRelaxed(1)),
+    m_url(url),
     m_state(kClosed),
     m_pending(0),
     m_reply(0),
@@ -709,7 +710,7 @@ bool NetStream::isAvailable()
 
 // Time when URI was last written to cache or invalid if not cached.
 // static
-QDateTime NetStream::GetLastModified(const QString &url)
+QDateTime NetStream::GetLastModified(const QUrl &url)
 {
     return NAMThread::GetLastModified(url);
 }
@@ -919,7 +920,7 @@ bool NAMThread::isAvailable()
 
 // Time when URI was last written to cache or invalid if not cached.
 // static
-QDateTime NAMThread::GetLastModified(const QString &url)
+QDateTime NAMThread::GetLastModified(const QUrl &url)
 {
     NAMThread &m = manager();
 
@@ -932,11 +933,11 @@ QDateTime NAMThread::GetLastModified(const QString &url)
     if (!cache)
         return QDateTime(); // Invalid
 
-    QNetworkCacheMetaData meta = cache->metaData(QUrl(url));
+    QNetworkCacheMetaData meta = cache->metaData(url);
     if (!meta.isValid())
     {
         LOG(VB_FILE, LOG_DEBUG, LOC + QString("GetLastModified('%1') not in cache")
-            .arg(url));
+            .arg(url.toString()));
         return QDateTime(); // Invalid
     }
 
@@ -946,7 +947,7 @@ QDateTime NAMThread::GetLastModified(const QString &url)
     if (expire.isValid() && expire.toLocalTime() < now)
     {
         LOG(VB_FILE, LOG_INFO, LOC + QString("GetLastModified('%1') past expiration %2")
-            .arg(url).arg(expire.toString()));
+            .arg(url.toString()).arg(expire.toString()));
         return QDateTime(); // Invalid
     }
 
@@ -966,8 +967,9 @@ QDateTime NAMThread::GetLastModified(const QString &url)
             if (second == "no-cache" || second == "no-store")
             {
                 LOG(VB_FILE, LOG_INFO, LOC +
-                    QString("GetLastModified('%1') Cache-Control disabled").arg(url));
-                cache->remove(QUrl(url));
+                    QString("GetLastModified('%1') Cache-Control disabled")
+                        .arg(url.toString()) );
+                cache->remove(url);
                 return QDateTime(); // Invalid
             }
         }
@@ -987,7 +989,7 @@ QDateTime NAMThread::GetLastModified(const QString &url)
     }
 
     LOG(VB_FILE, LOG_DEBUG, LOC + QString("GetLastModified('%1') last modified %2")
-        .arg(url).arg(lastMod.toString()));
+        .arg(url.toString()).arg(lastMod.toString()));
     return lastMod;
 }
 

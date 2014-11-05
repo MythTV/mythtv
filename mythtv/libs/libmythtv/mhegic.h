@@ -6,6 +6,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QUrl>
 #include <QMutex>
 #include <QHash>
 
@@ -43,7 +44,7 @@ private slots:
 private:
     Q_DISABLE_COPY(MHInteractionChannel)
     mutable QMutex m_mutex;
-    typedef QHash< QString, NetStream* > map_t;
+    typedef QHash< QUrl, NetStream* > map_t;
     map_t m_pending; // Pending requests
     map_t m_finished; // Completed requests
 };
