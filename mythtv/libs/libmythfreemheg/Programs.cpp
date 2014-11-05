@@ -774,11 +774,18 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
             if (args.Size() == 1)
             {
                 MHOctetString result;
+#if 1
+                // BBC Freeview requires a recognized model name which is passed
+                // in a ?whoami=... http query to the interaction channel server.
+                // Otherwise the menu item for iPlayer is not shown
+                result.Copy("SNYPVR");
+#else
                 result.Copy(engine->MHEGEngineProviderIdString);
                 result.Append(" ");
                 result.Append(engine->GetContext()->GetReceiverId());
                 result.Append(" ");
                 result.Append(engine->GetContext()->GetDSMCCId());
+#endif
                 MHLOG(MHLogNotifications, "NOTE WhoAmI -> " + QString::fromUtf8((const char *)result.Bytes(), result.Size()) );
                 engine->FindObject(*(args.GetAt(0)->GetReference()))->SetVariableValue(result);
                 SetSuccessFlag(success, true, engine);
