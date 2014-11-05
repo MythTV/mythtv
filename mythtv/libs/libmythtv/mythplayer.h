@@ -756,7 +756,8 @@ class MTV_PUBLIC MythPlayer
     InteractiveTV *interactiveTV;
     bool       itvEnabled;
     QMutex     itvLock;
-    QString    m_newStream; // Guarded by itvLock
+    QMutex     streamLock;
+    QString    m_newStream; // Guarded by streamLock
 
     // OSD stuff
     OSD  *osd;
