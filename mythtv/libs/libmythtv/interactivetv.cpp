@@ -57,9 +57,9 @@ void InteractiveTV::ProcessDSMCCSection(
                                 carouselId, dataBroadcastId);
 }
 
-void InteractiveTV::Reinit(const QRect &display)
+void InteractiveTV::Reinit(const QRect &videoRect, const QRect &dispRect)
 {
-    m_context->Reinit(display);
+    m_context->Reinit(videoRect, dispRect);
 }
 
 bool InteractiveTV::OfferKey(QString key)

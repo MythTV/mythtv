@@ -750,8 +750,8 @@ QRect VideoOutWindow::GetVisibleOSDBounds(
     }
 
     // top left and bottom right corners respecting letterboxing
-    QPoint tl = QPoint((uint) ceil(max(-display_video_rect.left(),0)*dv_w),
-                       (uint) ceil(max(-display_video_rect.top(),0)*dv_h));
+    QPoint tl = QPoint(((uint) (max(-display_video_rect.left(),0)*dv_w)) & ~1,
+                       ((uint) (max(-display_video_rect.top(),0)*dv_h)) & ~1);
     QPoint br = QPoint(
         (uint) floor(video_disp_dim.width()  - (right_overflow * dv_w)),
         (uint) floor(video_disp_dim.height() - (lower_overflow * dv_h)));

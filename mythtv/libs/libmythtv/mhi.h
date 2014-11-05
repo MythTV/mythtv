@@ -60,7 +60,7 @@ class MHIContext : public MHContext, public QRunnable
     /// Update the display
     void UpdateOSD(InteractiveScreen *osdWindow, MythPainter *osdPainter);
     /// The display area has changed.
-    void Reinit(const QRect &display);
+    void Reinit(const QRect &videoRect, const QRect &dispRect);
 
     /// Stop the MHEG engine if it's running and waits until it has.
     void StopEngine(void);
@@ -149,6 +149,9 @@ class MHIContext : public MHContext, public QRunnable
     int ScaleX(int, bool roundup = false) const;
     int ScaleY(int, bool roundup = false) const;
     QRect Scale(const QRect &r) const;
+    int ScaleVideoX(int, bool roundup = false) const;
+    int ScaleVideoY(int, bool roundup = false) const;
+    QRect ScaleVideo(const QRect &r) const;
 
     FT_Face GetFontFace(void) { return m_face; }
     bool IsFaceLoaded(void) { return m_face_loaded; }

@@ -547,11 +547,11 @@ void MythPlayer::ReinitOSD(void)
         }
         QRect visible, total;
         float aspect, scaling;
+        videoOutput->GetOSDBounds(total, visible, aspect,
+                                  scaling, 1.0f);
         if (osd)
         {
             osd->SetPainter(videoOutput->GetOSDPainter());
-            videoOutput->GetOSDBounds(total, visible, aspect,
-                                      scaling, 1.0f);
             int stretch = (int)((aspect * 100) + 0.5f);
             if ((osd->Bounds() != visible) ||
                 (osd->GetFontStretch() != stretch))
@@ -567,8 +567,7 @@ void MythPlayer::ReinitOSD(void)
         if (GetInteractiveTV())
         {
             QMutexLocker locker(&itvLock);
-            total = videoOutput->GetMHEGBounds();
-            interactiveTV->Reinit(total);
+            interactiveTV->Reinit(total, visible);
             itvVisible = false;
         }
 #endif // USING_MHEG
@@ -2333,8 +2332,7 @@ void MythPlayer::VideoStart(void)
         if (GetInteractiveTV())
         {
             QMutexLocker locker(&itvLock);
-            total = videoOutput->GetMHEGBounds();
-            interactiveTV->Reinit(total);
+            interactiveTV->Reinit(total, visible);
         }
 #endif // USING_MHEG
 

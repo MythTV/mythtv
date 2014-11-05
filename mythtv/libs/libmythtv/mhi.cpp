@@ -609,11 +609,17 @@ bool MHIContext::OfferKey(QString key)
 }
 
 // Called from MythPlayer::VideoStart and MythPlayer::ReinitOSD
-void MHIContext::Reinit(const QRect &display)
+void MHIContext::Reinit(const QRect &videoRect, const QRect &dispRect)
 {
-    QMutexLocker locker(&m_display_lock);
-    m_videoDisplayRect = m_videoRect = QRect();
-    m_displayRect = display;
+    LOG(VB_MHEG, LOG_INFO,
+         QString("[mhi] Reinit video(y:%1 x:%2 w:%3 h:%4) vis(y:%5 x:%6 w:%7 h:%8)")
+        .arg(videoRect.y()).arg(videoRect.x())
+        .arg(videoRect.width()).arg(videoRect.height())
+        .arg(dispRect.y()).arg(dispRect.x())
+        .arg(dispRect.width()).arg(dispRect.height()));
+    m_videoDisplayRect = QRect();
+    m_videoRect = videoRect;
+    m_displayRect = dispRect;
 }
 
 void MHIContext::SetInputRegister(int num)
@@ -737,9 +743,26 @@ inline int MHIContext::ScaleY(int n, bool roundup) const
 
 inline QRect MHIContext::Scale(const QRect &r) const
 {
-    return QRect( m_displayRect.topLeft() +
+    return QRect( //m_displayRect.topLeft() +
         QPoint(ScaleX(r.x()), ScaleY(r.y())),
         QSize(ScaleX(r.width(), true), ScaleY(r.height(), true)) );
+}
+
+inline int MHIContext::ScaleVideoX(int n, bool roundup) const
+{
+    return (n * m_videoRect.width() + (roundup ? StdDisplayWidth - 1 : 0)) / StdDisplayWidth;
+}
+
+inline int MHIContext::ScaleVideoY(int n, bool roundup) const
+{
+    return (n * m_videoRect.height() + (roundup ? StdDisplayHeight - 1 : 0)) / StdDisplayHeight;
+}
+
+inline QRect MHIContext::ScaleVideo(const QRect &r) const
+{
+    return QRect( m_videoRect.topLeft() +
+        QPoint(ScaleVideoX(r.x()), ScaleVideoY(r.y())),
+        QSize(ScaleVideoX(r.width(), true), ScaleVideoY(r.height(), true)) );
 }
 
 void MHIContext::AddToDisplay(const QImage &image, const QRect &displayRect, bool bUnder /*=false*/)
@@ -791,14 +814,14 @@ void MHIContext::DrawVideo(const QRect &videoRect, const QRect &dispRect)
     // tell the video player to resize the video stream
     if (m_parent->GetNVP())
     {
-        QRect vidRect = Scale(videoRect);
-        vidRect.setWidth(Roundup(vidRect.width(), 2));
-        vidRect.setHeight(Roundup(vidRect.height(), 2));
-        if (m_videoRect != vidRect)
+        QRect vidRect;
+        if (videoRect != QRect(QPoint(0,0),QSize(StdDisplayWidth,StdDisplayHeight)))
         {
-            m_parent->GetNVP()->SetVideoResize(vidRect);
-            m_videoRect = vidRect;
+            vidRect = ScaleVideo(videoRect);
+            vidRect.setWidth(Roundup(vidRect.width(), 2));
+            vidRect.setHeight(Roundup(vidRect.height(), 2));
         }
+        m_parent->GetNVP()->SetVideoResize(vidRect);
     }
 
     m_videoDisplayRect = Scale(dispRect);
