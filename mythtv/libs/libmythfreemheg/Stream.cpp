@@ -379,7 +379,7 @@ void MHVideo::Initialise(MHParseNode *p, MHEngine *engine)
 
     if (pTerm)
     {
-        m_Termination = (enum Termination)pTerm->GetEnumValue();
+        m_Termination = (enum Termination)pTerm->GetArgN(0)->GetEnumValue();
     }
 }
 
