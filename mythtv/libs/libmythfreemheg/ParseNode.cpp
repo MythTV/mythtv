@@ -222,3 +222,39 @@ void MHParseNode::GetStringValue(MHOctetString &str)
     str.Copy(((MHPString *)this)->m_Value);
 }
 
+void MHParseNode::PrintMe(FILE *f)
+{
+    for (int i = 0; i < GetArgCount(); ++i)
+    {
+        if (i) fprintf(f, ", ");
+        MHParseNode* pn = GetArgN(i);
+        switch (pn->m_nNodeType)
+        {
+        case MHParseNode::PNTagged:
+            fprintf(f, "tagged { "); pn->PrintMe(f); fprintf(f, "}");
+            break;
+        case MHParseNode::PNBool:
+            fprintf(f, "bool %s", pn->GetBoolValue() ? "true" : "false");
+            break;
+        case MHParseNode::PNInt:
+            fprintf(f, "int %d", pn->GetIntValue());
+            break;
+        case MHParseNode::PNEnum:
+            fprintf(f, "enum %d", pn->GetEnumValue());
+            break;
+        case MHParseNode::PNString: {
+            MHOctetString str;
+            pn->GetStringValue(str);
+            fprintf(f, "string '%s'", str.Bytes());
+            break;
+        }
+        case MHParseNode::PNNull:
+            fprintf(f, "null");
+            break;
+        case MHParseNode::PNSeq:
+            fprintf(f, "seq { "); pn->PrintMe(f); fprintf(f, "}");
+            break;
+        }
+    }
+    fprintf(f, "\n");
+}

@@ -67,6 +67,8 @@ class MHParseNode
     bool GetBoolValue();
     // String
     void GetStringValue(MHOctetString &str);
+
+    void PrintMe(FILE *);
 };
 
 // Sequence of parse nodes.
