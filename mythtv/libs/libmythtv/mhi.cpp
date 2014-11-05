@@ -603,9 +603,7 @@ bool MHIContext::OfferKey(QString key)
     { QMutexLocker locker(&m_keyLock);
     m_keyQueue.enqueue(action);}
     m_engine_wait.wakeAll();
-    // Accept the key except 'exit' (16) in 'always available' (3) state.
-    // This allows re-use of Esc as TEXTEXIT for RC's with a single backup button
-    return action != 16 || m_keyProfile != 3;
+    return true;
 }
 
 // Called from MythPlayer::VideoStart and MythPlayer::ReinitOSD
@@ -1064,7 +1062,7 @@ void MHIContext::EndStream()
 // Callback from MythPlayer when a stream starts or stops
 bool MHIContext::StreamStarted(bool bStarted)
 {
-    if (!m_notify)
+    if (!m_engine || !m_notify)
         return false;
 
     LOG(VB_MHEG, LOG_INFO, QString("[mhi] Stream 0x%1 %2")
