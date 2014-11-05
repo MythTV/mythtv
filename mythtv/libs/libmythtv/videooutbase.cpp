@@ -841,7 +841,12 @@ QRect VideoOutput::GetVisibleOSDBounds(
     float dispPixelAdj = 1.0f;
     if (dvr2.height() && dvr2.width())
         dispPixelAdj = (GetDisplayAspect() * dvr2.height()) / dvr2.width();
-    visible_aspect = themeaspect / dispPixelAdj;
+
+    float ova = window.GetOverridenVideoAspect();
+    QRect vr = window.GetVideoRect();
+    float vs = vr.height() ? (float)vr.width() / vr.height() : 1.f;
+    visible_aspect = themeaspect * (ova ? vs / ova : 1.f) * dispPixelAdj;
+
     font_scaling   = 1.0f;
     return QRect(QPoint(0,0), dvr2);
 }
@@ -1247,6 +1252,9 @@ void VideoOutput::ResizeVideo(VideoFrame *frame)
                       frame->height, img_out.data, img_out.linesize);
     }
 
+    // Blanking the unused area can appear better but it costs CPU cycles
+    //clear(frame);
+
     int xoff = resize.left();
     int yoff = resize.top();
     int resw = resize.width();
@@ -1327,8 +1335,7 @@ void VideoOutput::ClearDummyFrame(VideoFrame *frame)
 void VideoOutput::SetVideoResize(const QRect &videoRect)
 {
     if (!videoRect.isValid()    ||
-         videoRect.width()  < 1 || videoRect.height() < 1 ||
-         videoRect.left()   < 0 || videoRect.top()    < 0)
+         videoRect.width()  < 1 || videoRect.height() < 1)
     {
         ShutdownVideoResize();
         vsz_desired_display_rect = QRect();

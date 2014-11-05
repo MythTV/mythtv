@@ -609,17 +609,29 @@ bool MHIContext::OfferKey(QString key)
 }
 
 // Called from MythPlayer::VideoStart and MythPlayer::ReinitOSD
-void MHIContext::Reinit(const QRect &videoRect, const QRect &dispRect)
+void MHIContext::Reinit(const QRect &videoRect, const QRect &dispRect, float aspect)
 {
     LOG(VB_MHEG, LOG_INFO,
-         QString("[mhi] Reinit video(y:%1 x:%2 w:%3 h:%4) vis(y:%5 x:%6 w:%7 h:%8)")
+         QString("[mhi] Reinit video(y:%1 x:%2 w:%3 h:%4) "
+            "vis(y:%5 x:%6 w:%7 h:%8) aspect=%9")
         .arg(videoRect.y()).arg(videoRect.x())
         .arg(videoRect.width()).arg(videoRect.height())
         .arg(dispRect.y()).arg(dispRect.x())
-        .arg(dispRect.width()).arg(dispRect.height()));
+        .arg(dispRect.width()).arg(dispRect.height()).arg(aspect));
     m_videoDisplayRect = QRect();
-    m_videoRect = videoRect;
-    m_displayRect = dispRect;
+
+    // MHEG presumes square pixels
+    enum { kNone, kHoriz, kBoth };
+    int mode = gCoreContext->GetNumSetting("MhegAspectCorrection", kNone);
+    double const vz = (mode == kBoth) ? min(1.15, 1. / sqrt(aspect)) : 1.;
+    double const hz = (mode > kNone) ? vz * aspect : 1.;
+
+    m_displayRect = QRect( int(dispRect.width() * (1 - hz) / 2),
+        int(dispRect.height() * (1 - vz) / 2),
+        int(dispRect.width() * hz), int(dispRect.height() * vz) );
+    m_videoRect = QRect( dispRect.x() + m_displayRect.x(),
+        dispRect.y() + int(dispRect.height() * (1 - hz) / 2),
+        int(dispRect.width() * hz), int(dispRect.height() * hz) );
 }
 
 void MHIContext::SetInputRegister(int num)
@@ -743,7 +755,7 @@ inline int MHIContext::ScaleY(int n, bool roundup) const
 
 inline QRect MHIContext::Scale(const QRect &r) const
 {
-    return QRect( //m_displayRect.topLeft() +
+    return QRect( m_displayRect.topLeft() +
         QPoint(ScaleX(r.x()), ScaleY(r.y())),
         QSize(ScaleX(r.width(), true), ScaleY(r.height(), true)) );
 }

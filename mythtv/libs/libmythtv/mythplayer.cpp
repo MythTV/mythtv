@@ -567,7 +567,7 @@ void MythPlayer::ReinitOSD(void)
         if (GetInteractiveTV())
         {
             QMutexLocker locker(&itvLock);
-            interactiveTV->Reinit(total, visible);
+            interactiveTV->Reinit(total, visible, aspect);
             itvVisible = false;
         }
 #endif // USING_MHEG
@@ -2332,7 +2332,7 @@ void MythPlayer::VideoStart(void)
         if (GetInteractiveTV())
         {
             QMutexLocker locker(&itvLock);
-            interactiveTV->Reinit(total, visible);
+            interactiveTV->Reinit(total, visible, aspect);
         }
 #endif // USING_MHEG
 

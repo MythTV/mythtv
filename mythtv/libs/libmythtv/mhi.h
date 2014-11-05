@@ -60,7 +60,7 @@ class MHIContext : public MHContext, public QRunnable
     /// Update the display
     void UpdateOSD(InteractiveScreen *osdWindow, MythPainter *osdPainter);
     /// The display area has changed.
-    void Reinit(const QRect &videoRect, const QRect &dispRect);
+    void Reinit(const QRect &videoRect, const QRect &dispRect, float aspect);
 
     /// Stop the MHEG engine if it's running and waits until it has.
     void StopEngine(void);
