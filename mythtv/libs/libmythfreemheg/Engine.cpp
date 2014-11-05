@@ -21,6 +21,7 @@
 
 #include <QStringList>
 #include <QRegExp>
+#include <QThread>
 
 #include "Engine.h"
 #include "ParseNode.h"
@@ -282,6 +283,7 @@ bool MHEngine::Launch(const MHObjectRef &target, bool fIsSpawn)
 
     if (target.m_GroupId.Size() == 0) return false; // No file name.
     QString csPath = GetPathName(target.m_GroupId); // Get path relative to root.
+    MHLOG(MHLogNotifications, "NOTE Launching " + csPath);
 
     // Check that the file exists before we commit to the transition.
     // This may block if we cannot be sure whether the object is present.
@@ -290,6 +292,7 @@ bool MHEngine::Launch(const MHObjectRef &target, bool fIsSpawn)
     {
         if (!m_fBooting)
             EngineEvent(2); // GroupIDRefError
+        MHLOG(MHLogWarning, "WARN Launch not found " + csPath);
         return false;
     }
 
@@ -364,6 +367,7 @@ bool MHEngine::Launch(const MHObjectRef &target, bool fIsSpawn)
         // Activate the application. ....
         CurrentApp()->Activation(this);
         m_fInTransition = false; // The transition is complete
+        MHLOG(MHLogNotifications, "NOTE Launch completed OK");
         return true;
     }
     catch (...)
