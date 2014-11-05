@@ -665,8 +665,13 @@ QList<QStringList> ImageUtils::GetAllExifValues(const QString &fileName)
                         values.append(QString::fromStdString(i->tagLabel()));
                         values.append(QString::fromStdString(i->value().toString()));
 
-                        // Add the exif information to the list
-                        valueList.append(values);
+                        LOG(VB_FILE, LOG_DEBUG, QString("%1 (Type %2)")
+                            .arg(values.join(" : "))
+                            .arg(i->typeName()));
+
+                        // Add the exif information to the list, ignoring empty labels
+                        if (!values.at(4).isEmpty())
+                            valueList.append(values);
                     }
                 }
             }
@@ -788,11 +793,12 @@ void ImageUtils::SetExifValue(const QString &fileName,
 
         if (image.get())
         {
-            Exiv2::ExifData exifData;
+            image->readMetadata();
+            Exiv2::ExifData &exifData = image->exifData();
+
             Exiv2::Exifdatum &datum = exifData[exifTag.toLocal8Bit().constData()];
             datum.setValue(value.toLocal8Bit().constData());
 
-            image->setExifData(exifData);
             image->writeMetadata();
 
             *ok = true;
