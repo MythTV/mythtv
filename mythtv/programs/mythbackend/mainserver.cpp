@@ -1935,7 +1935,6 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
         delete *mit;
 
     QStringList outputlist(QString::number(destination.size()));
-    QMap<QString, QString> backendIpMap;
     QMap<QString, QString> backendPortMap;
     QString ip   = gCoreContext->GetBackendServerIP();
     int port = gCoreContext->GetBackendServerPort();
@@ -2011,13 +2010,10 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                 ProgramInfo *p      = proginfo;
                 QString hostname    = p->GetHostname();
 
-                if (!backendIpMap.contains(hostname))
-                    backendIpMap[hostname] =
-                        gCoreContext->GetBackendServerIP(hostname);
                 if (!backendPortMap.contains(hostname))
-                    backendPortMap[hostname] =
-                        gCoreContext->GetBackendServerPort(hostname);
-                p->SetPathname(gCoreContext->GenMythURL(backendIpMap[hostname],
+                    backendPortMap[hostname] = gCoreContext->GetBackendServerPort(hostname);
+
+                p->SetPathname(gCoreContext->GenMythURL(hostname,
                                                         backendPortMap[hostname],
                                                         p->GetBasename()));
             }
