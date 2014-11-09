@@ -912,6 +912,7 @@ QString ProgramMapTable::toStringXML(uint indent_level) const
         .arg(ProgramNumber())
         .arg(indent_1)
         .arg(ProgramInfoLength())
+        .arg(StreamCount())
         .arg(PSIPTable::XMLValues(indent_level + 1));
 
     vector<const unsigned char*> gdesc =
