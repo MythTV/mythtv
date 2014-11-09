@@ -3,6 +3,8 @@
 
 #include <limits.h>
 
+#include <QTextDocument> // for escape (note escape misses &apos; TODO fix upstream)
+
 #include "sctedescriptors.h"
 #include "atscdescriptors.h"
 #include "dvbdescriptors.h"
@@ -476,7 +478,7 @@ QString MPEGDescriptor::toStringXML(uint level) const
 
     str += "\n" + indent_1 + "</Data>\n";
 
-    str += indent_1 + "<Decoded>" + toString() + "</Decoded>\n";
+    str += indent_1 + "<Decoded>" + Qt::escape (toString()) + "</Decoded>\n";
 
     str += indent_0 + "</Descriptor>";
 
