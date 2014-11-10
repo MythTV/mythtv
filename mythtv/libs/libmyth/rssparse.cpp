@@ -151,10 +151,10 @@ void ResultItem::toMap(InfoMap &metadataMap)
     {
         metadataMap["season"] = format_season_and_episode(m_season, 1);
         metadataMap["episode"] = format_season_and_episode(m_episode, 1);
-        metadataMap["s##e##"] = QString("s%1e%2")
+        metadataMap["s##e##"] = metadataMap["s00e00"] = QString("s%1e%2")
             .arg(format_season_and_episode(m_season, 2))
             .arg(format_season_and_episode(m_episode, 2));
-        metadataMap["##x##"] = QString("%1x%2")
+        metadataMap["##x##"] = metadataMap["00x00"] = QString("%1x%2")
             .arg(format_season_and_episode(m_season, 1))
             .arg(format_season_and_episode(m_episode, 2));
     }
@@ -162,8 +162,8 @@ void ResultItem::toMap(InfoMap &metadataMap)
     {
         metadataMap["season"] = QString();
         metadataMap["episode"] = QString();
-        metadataMap["s##e##"] = QString();
-        metadataMap["##x##"] = QString();
+        metadataMap["s##e##"] = metadataMap["s00e00"] = QString();
+        metadataMap["##x##"] = metadataMap["00x00"] = QString();
     }
 }
 
