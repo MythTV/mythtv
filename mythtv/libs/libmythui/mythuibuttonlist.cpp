@@ -1408,7 +1408,6 @@ void MythUIButtonList::CalculateButtonPositions(void)
 
     for (; button < (int)m_itemsVisible; button++)
         m_ButtonList[button]->SetVisible(false);
-
 }
 
 void MythUIButtonList::SanitizePosition(void)
@@ -1431,6 +1430,14 @@ void MythUIButtonList::CalculateArrowStates()
         return;
 
     m_needsUpdate = false;
+
+    // mark the visible buttons as invisible
+    QMap<int, MythUIButtonListItem*>::const_iterator i = m_ButtonToItem.constBegin();
+    while (i != m_ButtonToItem.constEnd())
+    {
+        i.value()->setVisible(false);
+        ++i;
+    }
 
     // set topitem, top position
     SanitizePosition();
@@ -3042,6 +3049,7 @@ MythUIButtonListItem::MythUIButtonListItem(MythUIButtonList *lbtype,
     m_state     = state;
     m_showArrow = showArrow;
     m_data      = 0;
+    m_isVisible = false;
 
     if (state >= NotChecked)
         m_checkable = true;
@@ -3066,6 +3074,7 @@ MythUIButtonListItem::MythUIButtonListItem(MythUIButtonList *lbtype,
     m_checkable = false;
     m_state     = CantCheck;
     m_showArrow = false;
+    m_isVisible = false;
 
     if (m_parent)
         m_parent->InsertItem(this, listPosition);
@@ -3101,7 +3110,7 @@ void MythUIButtonListItem::SetText(const QString &text, const QString &name,
     else
         m_text = text;
 
-    if (m_parent)
+    if (m_parent && m_isVisible)
         m_parent->Update();
 }
 
@@ -3119,7 +3128,7 @@ void MythUIButtonListItem::SetTextFromMap(const InfoMap &infoMap,
         ++map_it;
     }
 
-    if (m_parent)
+    if (m_parent && m_isVisible)
         m_parent->Update();
 }
 
@@ -3216,7 +3225,7 @@ void MythUIButtonListItem::SetFontState(const QString &state,
     else
         m_fontState = state;
 
-    if (m_parent)
+    if (m_parent && m_isVisible)
         m_parent->Update();
 }
 
@@ -3248,7 +3257,7 @@ void MythUIButtonListItem::SetImage(MythImage *image, const QString &name)
         m_image = image;
     }
 
-    if (m_parent)
+    if (m_parent && m_isVisible)
         m_parent->Update();
 }
 
@@ -3304,7 +3313,7 @@ void MythUIButtonListItem::SetImage(
         do_update = true;
     }
 
-    if (m_parent && do_update)
+    if (m_parent && do_update && m_isVisible)
         m_parent->Update();
 }
 
@@ -3341,7 +3350,7 @@ void MythUIButtonListItem::DisplayState(const QString &state,
         do_update = true;
     }
 
-    if (m_parent && do_update)
+    if (m_parent && do_update && m_isVisible)
         m_parent->Update();
 }
 
@@ -3373,7 +3382,7 @@ void MythUIButtonListItem::setChecked(MythUIButtonListItem::CheckState state)
 
     m_state = state;
 
-    if (m_parent)
+    if (m_parent && m_isVisible)
         m_parent->Update();
 }
 
@@ -3411,6 +3420,7 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
         return;
 
     m_parent->ItemVisible(this);
+    m_isVisible = true;
 
     QString state;
 
