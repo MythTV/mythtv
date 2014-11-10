@@ -194,7 +194,7 @@ void MythUIText::SetTextFromMap(const InfoMap &map)
     if (newText.isEmpty())
         newText = GetDefaultText();
 
-    QRegExp regexp("%(([^\\|%]+)?\\||\\|(.))?(\\w+)(\\|(.+))?%");
+    QRegExp regexp("%(([^\\|%]+)?\\||\\|(.))?(\\S+)(\\|(.+))?%");
     regexp.setMinimal(true);
 
     if (!newText.isEmpty() && newText.contains(regexp))
