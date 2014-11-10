@@ -60,7 +60,7 @@
         <color>#9999cc</color>
     </fontdef>
     <fontdef name="basesmall_normal_inactive" from="basesmall">
-        <color>#666666</color>
+        <color>#888888</color>
     </fontdef>
     <fontdef name="basesmall_warning_selected" from="basesmallbold">
         <color>#dddd44</color>
@@ -131,11 +131,6 @@
     </fontdef>
 
     <!-- Fonts for specific screens -->
-    <fontdef name="deleterecordings_filesize_font" from="basemedium">
-        <pixelsize>40</pixelsize>
-        <color>#bbbb33</color>
-        <weight>bold</weight>
-    </fontdef>
     <fontdef name="baseguide" from="basesmall">
         <pixelsize>20</pixelsize>
         <weight>normal</weight>
@@ -150,12 +145,12 @@
         <cornerradius>12</cornerradius>
     </shape>
 
-        <!-- Base definition of a shape used as a background on many popups -->
+    <!-- Base definition of a shape used as a background on many popups -->
     <shape name="basepopupbackground" from="basebackground">
         <fill style="gradient">
             <gradient direction="vertical" alpha="255">
                 <stop position="0" color="#111111" />
-                <stop position="50" color="#888888" />
+                <stop position="50" color="#666666" />
                 <stop position="100" color="#111111" />
             </gradient>
         </fill>
@@ -184,7 +179,7 @@
         <area>0,0,300,250</area>
         <layout>vertical</layout>
         <spacing>4</spacing>
-        <buttonarea>0,0,100%,100%-22</buttonarea>
+        <buttonarea>0,0,100%,97%</buttonarea>
         <statetype name="buttonitem">
             <area>0,0,100%,30</area>
             <state name="active">
@@ -227,14 +222,14 @@
             <state name="selectedactive" from="active">
                 <shape name="background">
                     <fill style="gradient">
-                        <gradient start="#52CA38" end="#349838" alpha="255" />
+                        <gradient start="#58f833" end="#4d6b30" alpha="200" />
                     </fill>
                 </shape>
             </state>
             <state name="selectedinactive" from="active">
                 <shape name="background">
                     <fill style="gradient">
-                        <gradient start="#52CA38" end="#349838" alpha="100" />
+                        <gradient start="#58f833" end="#4d6b30" alpha="130" />
                     </fill>
                 </shape>
                 <textarea name="buttontext">
@@ -243,7 +238,7 @@
             </state>
         </statetype>
         <statetype name="upscrollarrow">
-            <position>10,100%-20</position>
+            <position>10,96%</position>
             <state type="off">
                 <imagetype name="upon">
                     <filename>lb-uparrow-reg.png</filename>
@@ -256,7 +251,7 @@
             </state>
         </statetype>
         <statetype name="downscrollarrow">
-            <position>40,100%-20</position>
+            <position>40,96%</position>
             <state type="off">
                 <imagetype name="dnon">
                     <filename>lb-dnarrow-reg.png</filename>
@@ -472,6 +467,26 @@
         </statetype>
     </spinbox>
 
+    <!-- Base definition of a spinbox with centered strings -->
+    <spinbox name="base_centered_spinbox" from="basespinbox">
+        <area>0,0,90,40</area>
+        <layout>horizontal</layout>
+        <statetype name="buttonitem">
+            <state name="active">
+                <shape name="background" from="basewidgetshape" />
+                <textarea name="buttontext">
+                    <font>basesmall</font>
+                    <cutdown>no</cutdown>
+                    <align>allcenter</align>
+                </textarea>
+            </state>
+            <state name="selectedactive" from="active">
+                <shape name="background" from="baseselectedwidgetshape" />
+            </state>
+            <state name="selectedinactive" from="active" />
+        </statetype>
+    </spinbox>
+
     <!-- Base definition of a wide spinbox (room for strings) -->
     <spinbox name="basewidespinbox" from="basespinbox">
         <area>0,0,396,40</area>
@@ -527,9 +542,18 @@
         </statetype>
     </buttonlist>
 
+    <!-- Base definition of a list in medium 'selector' configuration -->
+    <buttonlist name="basemediumselector" from="baseselector">
+        <area>0,0,376,44</area>
+    </buttonlist>
+
     <!-- Base definition of a list in wide 'selector' configuration -->
     <buttonlist name="basewideselector" from="baseselector">
         <area>0,0,396,40</area>
+    </buttonlist>
+
+    <buttonlist name="baseverywideselector" from="baseselector">
+        <area>0,0,436,40</area>
     </buttonlist>
 
     <!-- Base definition of a textarea -->
@@ -703,7 +727,7 @@
 
         <textarea name="template" from="basetextarea">
             <area>420,144,310,28</area>
-            <align>right</align>
+            <align>left</align>
             <template>%Using |TEMPLATE| Template%</template>
         </textarea>
 
@@ -723,9 +747,9 @@
     <window name="MythPopupBox">
         <area>-1,-1,500,500</area>
 
-        <imagetype name="backimg">
-            <filename>mythdialogbox-background.png</filename>
-        </imagetype>
+        <shape name="backimg" from="basepopupbackground">
+            <area>0,0,100%,100%</area>
+        </shape>
 
         <textarea name="messagearea" from="basetextarea">
             <area>12,14,470,210</area>
@@ -814,10 +838,9 @@
 
     <window name="MythBusyDialog">
         <area>-1,-1,588,170</area>
-        <imagetype name="backimg">
-            <area>0,0,587,170</area>
-            <filename>mythprogressdialog-background.png</filename>
-        </imagetype>
+        <shape name="backimg" from="basepopupbackground">
+            <area>0,0,100%,100%</area>
+        </shape>
         <imagetype name="animation">
             <position>40,40</position>
             <filepattern low="0" high="24">busyimages/%1.png</filepattern>
@@ -832,10 +855,9 @@
 
     <window name="MythProgressDialog">
         <area>-1,-1,588,170</area>
-        <imagetype name="backimg">
-            <area>0,0,587,170</area>
-            <filename>mythprogressdialog-background.png</filename>
-        </imagetype>
+        <shape name="backimg" from="basepopupbackground">
+            <area>0,0,100%,100%</area>
+        </shape>
         <textarea name="message" from="basetextarea">
             <area>20,20,540,60</area>
             <multiline>yes</multiline>
@@ -853,10 +875,9 @@
 
     <window name="MythConfirmationDialog">
         <area>-1,-1,588,170</area>
-        <imagetype name="backimg">
-            <area>0,0,587,170</area>
-            <filename>mythprogressdialog-background.png</filename>
-        </imagetype>
+        <shape name="backimg" from="basepopupbackground">
+            <area>0,0,100%,100%</area>
+        </shape>
 
         <textarea name="message" from="basetextarea">
             <area>14,14,550,90</area>
@@ -878,10 +899,9 @@
 
     <window name="MythTextInputDialog">
         <area>-1,-1,588,170</area>
-        <imagetype name="backimg">
-            <area>0,0,587,170</area>
-            <filename>mythprogressdialog-background.png</filename>
-        </imagetype>
+        <shape name="backimg" from="basepopupbackground">
+            <area>0,0,100%,100%</area>
+        </shape>
 
         <textarea name="message" from="basetextarea">
             <area>20,20,540,30</area>
@@ -900,10 +920,9 @@
 
     <window name="MythSearchDialog">
         <area>-1,-1,500,500</area>
-        <imagetype name="backimg">
-            <area>0,0,500,500</area>
-            <filename>mythdialogbox-background.png</filename>
-        </imagetype>
+        <shape name="backimg" from="basepopupbackground">
+            <area>0,0,100%,100%</area>
+        </shape>
 
         <textarea name="title" from="basetextarea">
             <area>12,20,470,60</area>
@@ -949,11 +968,60 @@
 
     </window>
 
+        <!-- Popup search dialog used to search button lists -->
+    <window name="MythSearchListDialog">
+        <area>-1,-1,620,165</area>
+        <shape name="backimg" from="basepopupbackground">
+            <area>0,0,100%,100%</area>
+        </shape>
+
+        <textarea name="title" from="basetextarea">
+            <area>5,10,600,30</area>
+            <multiline>yes</multiline>
+            <align>allcenter</align>
+            <value>Search List</value>
+        </textarea>
+
+        <textedit name="searchedit" from="basetextedit">
+            <position>120,40</position>
+        </textedit>
+
+        <button name="prevbutton" from="basebutton">
+            <position>20,105</position>
+            <value>Previous</value>
+        </button>
+
+        <button name="nextbutton" from="basebutton">
+            <position>445,105</position>
+            <value>Next</value>
+        </button>
+
+        <statetype name="searchstate">
+            <area>210,120,200,30</area>
+            <state name="found">
+                <textarea name="statustext" from="basetextarea">
+                    <area>0,0,200,30</area>
+                    <align>allcenter</align>
+                    <font>basesmallgreen</font>
+                    <value>Found</value>
+                </textarea>
+            </state>
+            <state name="notfound">
+                <textarea name="statustext" from="basetextarea">
+                    <area>0,0,200,30</area>
+                    <align>allcenter</align>
+                    <font>basesmallred</font>
+                    <value>Not Found</value>
+                </textarea>
+            </state>
+        </statetype>
+    </window>
+
     <window name="MythFileBrowser">
         <area>-1,-1,730,510</area>
-        <imagetype name="backimg">
-            <filename>mythfilebrowser-background.png</filename>
-        </imagetype>
+        <shape name="backimg" from="basepopupbackground">
+            <area>0,0,100%,100%</area>
+        </shape>
 
         <textedit name="location" from="basetextedit">
             <position>40,14</position>
@@ -963,7 +1031,6 @@
             <area>4,70,500,440</area>
             <layout>grid</layout>
             <buttonarea>0,0,500,430</buttonarea>
-            <triggerevent context="Global" action="ESCAPE">LEFT</triggerevent>
             <statetype name="buttonitem">
                 <area>0,0,166,106</area>
                 <state name="active">
@@ -1049,10 +1116,9 @@
     <window name="MythTimeInputDialog">
         <area>-1,-1,588,170</area>
 
-        <imagetype name="box">
-            <area>0,0,587,170</area>
-            <filename>mythprogressdialog-background.png</filename>
-        </imagetype>
+        <shape name="backimg" from="basepopupbackground">
+            <area>0,0,100%,100%</area>
+        </shape>
 
         <textarea name="message" from="basetextarea">
             <area>10,8,560,50</area>
@@ -1099,17 +1165,9 @@
     </window>
 
     <window name="backgroundwindow">
-
         <imagetype name="backimg">
           <filename>ui/background.png</filename>
         </imagetype>
-<!--
-        <shape name="background">
-            <area>0,0,100%,100%</area>
-            <type>box</type>
-            <fill color="#484537" alpha="255" />
-        </shape>
--->
 
         <fontdef name="medium" face="Droid Sans">
             <color>#FFFFFF</color>
@@ -1118,9 +1176,9 @@
         </fontdef>
 
         <fontdef name="large" face="Liberation Sans">
-            <color>#FFFFFF</color>
-            <pixelsize>28</pixelsize>
-            <weight>bold</weight>
+             <color>#FFFFFF</color>
+             <pixelsize>28</pixelsize>
+             <weight>bold</weight>
         </fontdef>
 
         <fontdef name="clock" face="Liberation Sans">
@@ -1196,10 +1254,9 @@
     <window name="MythArtworkResults">
         <area>-1,-1,413,426</area>
 
-        <imagetype name="box">
-            <area>0,0,413,426</area>
-            <filename>mv_results_popup.png</filename>
-        </imagetype>
+        <shape name="backimg" from="basepopupbackground">
+            <area>0,0,100%,100%</area>
+        </shape>
 
         <buttonlist name="results">
             <area>20,22,363,378</area>

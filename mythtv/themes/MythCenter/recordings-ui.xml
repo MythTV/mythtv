@@ -125,14 +125,14 @@
             <area>15,85,220,240</area>
             <buttonarea>0,0,220,210</buttonarea>
             <spacing>0</spacing>
-            <wrapstyle>captive</wrapstyle>
+            <wrapstyle>selection</wrapstyle>
             <searchposition>-1,390</searchposition>
             <triggerevent context="Global" action="ESCAPE">LEFT</triggerevent>
             <statetype name="buttonitem">
                 <state name="active" >
                     <area>0,0,220,30</area>
                     <textarea name="buttontext">
-                        <area>3,0,100%-6,30</area>
+                        <area>3,0,100%,30</area>
                         <font>basesmall_normal</font>
                         <cutdown>yes</cutdown>
                         <align>left,vcenter</align>
@@ -143,7 +143,7 @@
                         <area>0,0,100%,30</area>
                     </shape>
                     <textarea name="buttontext">
-                        <area>3,0,100%-6,30</area>
+                        <area>3,0,100%,30</area>
                         <font>basesmall_normal</font>
                         <cutdown>yes</cutdown>
                         <align>left,vcenter</align>
@@ -154,7 +154,7 @@
                         <area>0,0,100%,30</area>
                     </shape>
                     <textarea name="buttontext">
-                        <area>3,0,100%-6,30</area>
+                        <area>3,0,100%,30</area>
                         <font>basesmall_normal_selected</font>
                         <cutdown>yes</cutdown>
                         <align>left,vcenter</align>
@@ -173,7 +173,7 @@
         <buttonlist name="recordings" from="basebuttonlist2">
             <area>250,85,535,240</area>
             <buttonarea>0,0,535,210</buttonarea>
-            <wrapstyle>captive</wrapstyle>
+            <wrapstyle>selection</wrapstyle>
             <spacing>0</spacing>
             <searchposition>-1,390</searchposition>
             <triggerevent context="Global" action="MENU">RIGHT</triggerevent>
@@ -210,15 +210,15 @@
                     <state name="marked"></state>
                 </statetype>
                     <textarea name="titlesubtitle" from="buttontext">
-                        <area>32,2,266,28</area>
+                        <area>32,0,336,30</area>
                         <align>vcenter</align>
                     </textarea>
                     <textarea name="shortstartdate" from="titlesubtitle">
-                        <area>280,2,130,28</area>
+                        <area>295,0,130,30</area>
                         <align>right,vcenter</align>
                     </textarea>
                     <textarea name="starttime" from="shortstartdate">
-                        <area>415,2,114,28</area>
+                        <area>415,0,114,30</area>
                         <align>right,vcenter</align>
                     </textarea>
                     <statetype name="watched">
@@ -250,7 +250,7 @@
                         <area>0,0,100%,30</area>
                     </shape>
                     <textarea name="titlesubtitle" from="buttontext">
-                        <area>32,2,266,28</area>
+                        <area>32,0,336,30</area>
                         <font>basesmall_normal_selected</font>
                         <font state="disabled">basesmall_disabled_selected</font>
                         <font state="error">basesmall_error_selected</font>
@@ -260,11 +260,11 @@
                         <align>vcenter</align>
                     </textarea>
                     <textarea name="shortstartdate" from="titlesubtitle">
-                        <area>280,2,130,28</area>
+                        <area>295,0,130,30</area>
                         <align>right,vcenter</align>
                     </textarea>
                     <textarea name="starttime" from="shortstartdate">
-                        <area>415,2,114,28</area>
+                        <area>415,0,114,30</area>
                         <align>right,vcenter</align>
                     </textarea>
                 </state>
@@ -279,26 +279,26 @@
 
         <imagetype name="autoexpire">
             <filename>autoexpire.png</filename>
-            <position>622,506</position>
+            <position>630,518</position>
         </imagetype>
 
         <imagetype name="commflagged">
             <filename>commflagged.png</filename>
-            <position>666,506</position>
+            <position>671,518</position>
         </imagetype>
 
         <imagetype name="bookmark">
             <filename>bookmark.png</filename>
-            <position>708,506</position>
+            <position>715,518</position>
         </imagetype>
 
         <imagetype name="cutlist">
             <filename>cutlist.png</filename>
-            <position>752,506</position>
+            <position>752,518</position>
         </imagetype>
 
         <statetype name="audioprops">
-            <position>622,540</position>
+            <position>629,551</position>
             <showempty>yes</showempty>
             <state name="stereo">
                 <imagetype name="stereo">
@@ -323,7 +323,7 @@
         </statetype>
 
         <statetype name="subtitletypes">
-            <position>663,542</position>
+            <position>669,551</position>
             <showempty>yes</showempty>
             <state name="cc">
                 <imagetype name="cc">
@@ -343,7 +343,7 @@
         </statetype>
 
         <statetype name="videoprops">
-            <position>701,543</position>
+            <position>705,551</position>
             <showempty>yes</showempty>
             <state name="hd1080">
                 <imagetype name="hd1080">
@@ -374,45 +374,46 @@
 
         <imagetype name="processing">
             <filename>processing.png</filename>
-            <position>752,543</position>
+            <position>752,551</position>
         </imagetype>
 
         <textarea name="title" from="basetextarea">
-            <area>20,340,560,40</area>
+            <area>18,340,572,40</area>
             <font>baselarge</font>
             <cutdown>yes</cutdown>
             <align>vcenter</align>
         </textarea>
 
         <textarea name="channel" from="basetextarea">
-            <area>20,385,160,30</area>
+            <area>18,385,160,30</area>
         </textarea>
 
         <textarea name="timedate" from="basetextarea">
-            <area>185,385,305,30</area>
-            <align>hcenter</align>
-            <template>%startdate%%| startyear%, %starttime% </template>
+            <area>175,385,415,30</area>
+            <align>right</align>
+            <!-- <template>%startdate%%| startyear%, %starttime% </template> -->
         </textarea>
 
         <textarea name="filesize_str" from="basetextarea">
-            <area>495,385,85,30</area>
-            <align>right</align>
+            <area>595,485,190,30</area>
+            <align>center</align>
         </textarea>
 
         <textarea name="description" from="basetextarea">
-            <area>20,425,560,160</area>
+            <area>18,425,572,160</area>
             <multiline>yes</multiline>
-            <cutdown>yes</cutdown>
+            <scroll direction="vertical" />
+            <cutdown>no</cutdown>
             <template>%"|SUBTITLE|" %%(|STARS|) %%DESCRIPTION%</template>
         </textarea>
 
         <imagetype name="preview" depends="!coverart">
-            <area>590,345,190,140</area>
+            <area>595,345,190,140</area>
             <preserveaspect>true</preserveaspect>
         </imagetype>
 
         <imagetype name="coverart" >
-            <area>590,345,190,140</area>
+            <area>595,345,190,140</area>
             <filename />
             <preserveaspect>true</preserveaspect>
         </imagetype>
@@ -449,9 +450,9 @@
 
     <window name="groupselector">
         <area>-1,-1,500,500</area>
-        <imagetype name="backimg">
-            <filename>mythdialogbox-background.png</filename>
-        </imagetype>
+        <shape name="backimg" from="basepopupbackground">
+            <area>0,0,100%,100%</area>
+        </shape>
 
         <textarea name="label" from="basetextarea">
             <area>12,4,470,104</area>
@@ -468,23 +469,23 @@
 
     <window name="changeview">
         <area>-1,-1,500,500</area>
-        <imagetype name="backimg">
-            <filename>mythdialogbox-background.png</filename>
-        </imagetype>
+        <shape name="backimg" from="basepopupbackground">
+            <area>0,0,100%,100%</area>
+        </shape>
 
         <textarea name="title" from="basetextarea">
-            <area>12,35,470,30</area>
+            <area>12,34,470,30</area>
             <align>allcenter</align>
             <font>basemedium</font>
             <value>Change View</value>
         </textarea>
 
         <checkbox name="titles" from="basecheckbox">
-            <position>90,100</position>
+            <position>90,90</position>
         </checkbox>
 
         <textarea name="titlelabel" from="basetextarea">
-            <area>140,100,300,30</area>
+            <area>140,90,300,30</area>
             <value>Show Titles</value>
         </textarea>
 
@@ -543,7 +544,7 @@
         </textarea>
 
         <button name="save" from="basebutton">
-            <position>315,435</position>
+            <position>314,434</position>
             <value>Save</value>
         </button>
     </window>
@@ -551,9 +552,9 @@
     <window name="passwordchanger">
         <area>-1,-1,500,500</area>
 
-        <imagetype name="backimg">
-            <filename>mythdialogbox-background.png</filename>
-        </imagetype>
+        <shape name="backimg" from="basepopupbackground">
+            <area>0,0,100%,100%</area>
+        </shape>
 
         <textarea name="label" from="basetextarea">
             <area>12,15,470,160</area>
@@ -589,10 +590,9 @@
     <window name="editmetadata">
         <area>-1,-1,780,580</area>
 
-        <imagetype name="backimg">
+        <shape name="backimg" from="basepopupbackground">
             <area>0,0,100%,100%</area>
-            <filename>mythdialogbox-background.png</filename>
-        </imagetype>
+        </shape>
 
         <textarea name="label" from="basetextarea">
             <area>20,0,100%-20,60</area>
@@ -640,13 +640,13 @@
         </spinbox>
 
         <textarea name="eplabel" from="basetextarea">
-            <area>258,255,90,30</area>
+            <area>258,255,185,30</area>
             <align>right,vcenter</align>
             <value>Episode:</value>
         </textarea>
 
         <spinbox name="episode" from="basespinbox">
-            <position>355,250</position>
+            <position>450,250</position>
         </spinbox>
 
         <textarea name="descriptionlabel" from="titlelabel">
@@ -668,10 +668,9 @@
     <window name="iconhelp">
         <area>-1,-1,700,500</area>
 
-        <imagetype name="backimg">
-            <area>0,0,700,500</area>
-            <filename>mythdialogbox-background.png</filename>
-        </imagetype>
+        <shape name="backimg" from="basepopupbackground">
+            <area>0,0,100%,100%</area>
+        </shape>
 
         <textarea name="title" from="basetextarea">
             <area>0,0,700,50</area>
@@ -690,7 +689,7 @@
                 <area>0,0,660,40</area>
                 <state name="active">
                     <statetype name="icons">
-                        <position>5,5</position>
+                        <position>4,4</position>
                         <state name="commflagged">
                             <imagetype name="statusimage">
                                 <filename>commflagged.png</filename>
@@ -802,7 +801,7 @@
                         -->
                     </statetype>
                     <textarea name="buttontext">
-                        <area>53,1,600,40</area>
+                        <area>52,0,600,40</area>
                         <multiline>yes</multiline>
                         <font>basesmall</font>
                         <align>vcenter</align>
@@ -813,13 +812,13 @@
                         <area>0,0,650,40</area>
                         <type>roundbox</type>
                         <line color="#999999" alpha="255" width="2" />
-                        <cornerradius>13</cornerradius>
+                        <cornerradius>12</cornerradius>
                     </shape>
                 </state>
                 <state name="selectedinactive" from="active" />
             </statetype>
             <statetype name="upscrollarrow">
-                <position>590,395</position>
+                <position>590,390</position>
                 <state type="off">
                     <imagetype name="upon">
                         <filename>lb-uparrow-reg.png</filename>
@@ -832,7 +831,7 @@
                 </state>
             </statetype>
             <statetype name="downscrollarrow">
-                <position>620,395</position>
+                <position>620,390</position>
                 <state type="off">
                     <imagetype name="dnon">
                         <filename>lb-dnarrow-reg.png</filename>
