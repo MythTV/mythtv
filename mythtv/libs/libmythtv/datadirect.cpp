@@ -1183,7 +1183,6 @@ bool DataDirectProcessor::GrabData(const QDateTime &pstartDate,
 
     if (m_cacheData)
     {
-        QByteArray userid = GetUserID().toLatin1();
         cache_dd_data = m_tmpDir +
             QString("/mythtv_dd_cache_%1_UTC_%2_to_%3")
             .arg(GetListingsProvider())
