@@ -1180,9 +1180,8 @@ bool DataDirectProcessor::GrabData(const QDateTime &pstartDate,
     {
         QByteArray userid = GetUserID().toLatin1();
         cache_dd_data = m_tmpDir +
-            QString("/mythtv_dd_cache_%1_%2_UTC_%3_to_%4")
+            QString("/mythtv_dd_cache_%1_UTC_%2_to_%3")
             .arg(GetListingsProvider())
-            .arg(userid.constData())
             .arg(MythDate::toString(pstartDate, MythDate::kFilename))
             .arg(MythDate::toString(pendDate, MythDate::kFilename));
 
