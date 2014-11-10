@@ -46,7 +46,7 @@ public:
     bool Create();
     bool keyPressEvent(QKeyEvent *);
     void customEvent(QEvent *);
-    void LoadFile();
+    void LoadFile(bool refresh = false);
     void ShowFileDetails();
 
 public slots:

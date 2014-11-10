@@ -20,11 +20,7 @@ class SERVICE_PUBLIC ImageServices : public Service
     Q_CLASSINFO( "RenameImage_Method",              "POST" )
     Q_CLASSINFO( "StartSync_Method",                "POST" )
     Q_CLASSINFO( "StopSync_Method",                 "POST" )
-    Q_CLASSINFO( "StartThumbnailGeneration_Method", "POST" )
-    Q_CLASSINFO( "StopThumbnailGeneration_Method",  "POST" )
     Q_CLASSINFO( "CreateThumbnail_Method",          "POST" )
-    Q_CLASSINFO( "RecreateThumbnail_Method",        "POST" )
-    Q_CLASSINFO( "SetThumbnailSize_Method",         "POST" )
 
     public:
 
@@ -67,12 +63,8 @@ class SERVICE_PUBLIC ImageServices : public Service
         virtual bool                        StopSync           ( void ) = 0;
         virtual DTC::ImageSyncInfo*         GetSyncStatus      ( void ) = 0;
 
-        virtual bool                        StartThumbnailGeneration ( void ) = 0;
-        virtual bool                        StopThumbnailGeneration  ( void ) = 0;
-        virtual bool                        CreateThumbnail    ( int   Id ) = 0;
-        virtual bool                        RecreateThumbnail  ( int   Id ) = 0;
-        virtual bool                        SetThumbnailSize   ( int   Width,
-                                                                 int   Height) = 0;
+        virtual bool                        CreateThumbnail    ( int  Id,
+                                                                 bool Recreate) = 0;
 };
 
 #endif

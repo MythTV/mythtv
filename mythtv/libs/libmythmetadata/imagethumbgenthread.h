@@ -22,8 +22,7 @@ class META_PUBLIC ImageThumbGenThread : public QThread
     void cancel();
     void Pause();
     void Resume();
-    void AddToThumbnailList(ImageMetadata *);
-    void RecreateThumbnail(ImageMetadata *);
+    void AddToThumbnailList(ImageMetadata *, bool);
     void SetThumbnailSize(int, int);
 
     int m_progressCount;
@@ -66,8 +65,7 @@ class META_PUBLIC ImageThumbGen
     void StopThumbGen();
     bool ThumbGenIsRunning();
 
-    bool AddToThumbnailList(ImageMetadata *);
-    bool RecreateThumbnail(ImageMetadata *);
+    bool AddToThumbnailList(ImageMetadata *, bool);
 
     bool SetThumbnailSize(int width, int height);
 

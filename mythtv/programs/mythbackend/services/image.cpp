@@ -456,45 +456,7 @@ DTC::ImageSyncInfo* Image::GetSyncStatus( void )
     return syncInfo;
 }
 
-/**
- *  \brief  Starts thumbnail generation thread for images
- *  \return bool True if the generation thread has started, otherwise false
- */
-bool Image::StartThumbnailGeneration(void )
-{
-    // Check that the required image tables exist to avoid
-    // syncing against non existent tables in the database.
-    if (gCoreContext->GetNumSetting("DBSchemaVer") < 1318)
-    {
-        LOG(VB_GENERAL, LOG_INFO,
-            "Thumbnail generation cannot start, the required database tables "
-            "are missing. "
-            "Please upgrade your database schema to at least 1318.");
-        return false;
-    }
-
-    ImageThumbGen *thumbGen = ImageThumbGen::getInstance();
-    if (!thumbGen->ThumbGenIsRunning())
-        thumbGen->StartThumbGen();
-
-    return thumbGen->ThumbGenIsRunning();
-}
-
-
-/**
- *  \brief  Stops the thumbnail generation if it's running
- *  \return bool True if the generation has stopped, otherwise false
- */
-bool Image::StopThumbnailGeneration(void )
-{
-    ImageThumbGen *thumbGen = ImageThumbGen::getInstance();
-    if (thumbGen->ThumbGenIsRunning())
-        thumbGen->StopThumbGen();
-
-    return !thumbGen->ThumbGenIsRunning();
-}
-
-bool Image::CreateThumbnail(int id)
+bool Image::CreateThumbnail(int id, bool recreate)
 {
     ImageMetadata *im = new ImageMetadata();
     ImageUtils *iu = ImageUtils::getInstance();
@@ -509,29 +471,5 @@ bool Image::CreateThumbnail(int id)
     }
 
     ImageThumbGen *thumbGen = ImageThumbGen::getInstance();
-    return thumbGen->AddToThumbnailList(im);
-}
-
-bool Image::RecreateThumbnail(int id)
-{
-    ImageMetadata *im = new ImageMetadata();
-    ImageUtils *iu = ImageUtils::getInstance();
-    iu->LoadFileFromDB(im, id);
-
-    if (im->m_fileName.isEmpty())
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("RecreateThumbnail - Image %1 not found in DB").arg(id));
-        delete im;
-        return false;
-    }
-
-    ImageThumbGen *thumbGen = ImageThumbGen::getInstance();
-    return thumbGen->RecreateThumbnail(im);
-}
-
-bool Image::SetThumbnailSize(int Width, int Height)
-{
-    ImageThumbGen *thumbGen = ImageThumbGen::getInstance();
-    return thumbGen->SetThumbnailSize(Width, Height);
+    return thumbGen->AddToThumbnailList(im, recreate);
 }

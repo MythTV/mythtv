@@ -3,24 +3,17 @@
 
 // MythTV headers
 #include "mythcontext.h"
-#include "mythdirs.h"
-
 #include "gallerydatabasehelper.h"
-
 
 
 GalleryDatabaseHelper::GalleryDatabaseHelper()
 {
-
 }
-
 
 
 GalleryDatabaseHelper::~GalleryDatabaseHelper()
 {
-
 }
-
 
 
 /** \fn     GalleryDatabaseHelper::LoadParentDirectory(QList<ImageMetadata *>* , int)
@@ -58,34 +51,6 @@ void GalleryDatabaseHelper::LoadParentDirectory(QList<ImageMetadata *>* dbList, 
 
 
 
-/** \fn     GalleryDatabaseHelper::LoadDirectories(QMap<QString, ImageMetadata *>*)
- *  \brief  Loads all directory information from the database
- *  \param  dbList The list where the results are stored
- *  \return void
- */
-void GalleryDatabaseHelper::LoadDirectories(QMap<QString, ImageMetadata *>* dbList)
-{
-    dbList->clear();
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT "
-                   "dir_id, filename, name, path, parent_id, "
-                   "dir_count, file_count, hidden "
-                   "FROM gallery_directories");
-
-    if (!query.exec())
-        LOG(VB_GENERAL, LOG_ERR, MythDB::DBErrorMessage(query.lastError()));
-
-    while (query.next())
-    {
-        ImageMetadata *im = new ImageMetadata();
-        LoadDirectoryValues(query, im);
-        dbList->insert(im->m_fileName, im);
-    }
-}
-
-
-
 /** \fn     GalleryDatabaseHelper::LoadDirectories(QList<ImageMetadata *>* , int)
  *  \brief  Loads all subdirectory information from the database for a given directory
  *  \param  dbList The list where the results are stored
@@ -118,36 +83,6 @@ void GalleryDatabaseHelper::LoadDirectories(QList<ImageMetadata *>* dbList, int 
         dbList->append(im);
     }
 }
-
-
-
-/** \fn     GalleryDatabaseHelper::LoadFiles(QMap<QString, ImageMetadata *>*)
- *  \brief  Loads all file information from the database
- *  \param  dbList The list where the results are stored
- *  \return void
- */
-void GalleryDatabaseHelper::LoadFiles(QMap<QString, ImageMetadata *>* dbList)
-{
-    dbList->clear();
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT "
-                    "file_id, CONCAT_WS('/', path, filename), name, path, dir_id, "
-                    "type, modtime, size, extension, "
-                    "angle, date, zoom, hidden, orientation "
-                    "FROM gallery_files");
-
-    if (!query.exec())
-        LOG(VB_GENERAL, LOG_ERR, MythDB::DBErrorMessage(query.lastError()));
-
-    while (query.next())
-    {
-        ImageMetadata *im = new ImageMetadata();
-        LoadFileValues(query, im);
-        dbList->insert(im->m_fileName, im);
-    }
-}
-
 
 
 
@@ -335,59 +270,6 @@ void GalleryDatabaseHelper::UpdateFile(ImageMetadata *im)
 
 
 
-/** \fn     GalleryDatabaseHelper::RemoveDirectory(ImageMetadata *)
- *  \brief  Deletes the information about a given directory in the database
- *  \param  im Information of the directory
- *  \return void
- */
-void GalleryDatabaseHelper::RemoveDirectory(ImageMetadata *im)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("DELETE from gallery_directories WHERE dir_id = :ID;");
-    query.bindValue(":ID", im->m_id);
-
-    if (!query.exec())
-        MythDB::DBError("Error removing, query: ", query);
-}
-
-
-
-/** \fn     GalleryDatabaseHelper::RemoveFile(ImageMetadata *)
- *  \brief  Deletes the information about a given file in the database
- *  \param  im Information of the directory
- *  \return void
- */
-void GalleryDatabaseHelper::RemoveFile(ImageMetadata *im)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("DELETE from gallery_files WHERE file_id = :ID;");
-    query.bindValue(":ID", im->m_id);
-
-    if (!query.exec())
-        MythDB::DBError("Error removing, query: ", query);
-}
-
-
-
-/** \fn     GalleryDatabaseHelper::InsertData(ImageMetadata *)
- *  \brief  Inserts either a new directory or file in the database
- *  \param  im Information of the given item
- *  \return void
- */
-void GalleryDatabaseHelper::InsertData(ImageMetadata *im)
-{
-    if (!im)
-        return;
-
-    if (im->m_type == kSubDirectory || im->m_type == kUpDirectory)
-        InsertDirectory(im);
-
-    if (im->m_type == kImageFile || im->m_type == kVideoFile)
-        InsertFile(im);
-}
-
-
-
 /** \fn     GalleryDatabaseHelper::UpdateData(ImageMetadata *)
  *  \brief  Updates either a directory or a file in the database
  *  \param  im Information of the given item
@@ -403,25 +285,6 @@ void GalleryDatabaseHelper::UpdateData(ImageMetadata *im)
 
     if (im->m_type == kImageFile || im->m_type == kVideoFile)
         UpdateFile(im);
-}
-
-
-
-/** \fn     GalleryDatabaseHelper::RemoveData(ImageMetadata *)
- *  \brief  Deletes either a directory or file from the database
- *  \param  im Information of the given item
- *  \return void
- */
-void GalleryDatabaseHelper::RemoveData(ImageMetadata *im)
-{
-    if (!im)
-        return;
-
-    if (im->m_type == kSubDirectory || im->m_type == kUpDirectory)
-        RemoveDirectory(im);
-
-    if (im->m_type == kImageFile || im->m_type == kVideoFile)
-        RemoveFile(im);
 }
 
 

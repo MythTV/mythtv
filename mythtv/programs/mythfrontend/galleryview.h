@@ -78,8 +78,6 @@ private slots:
     void FileInvertAll();
     void FileHide();
     void FileUnhide();
-    void FileDelete();
-    void FileDeleteSelected();
     void FileRenameInput();
     void FileRename(QString &);
 

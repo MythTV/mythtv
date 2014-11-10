@@ -2,22 +2,10 @@
 #include "galleryfilehelper.h"
 
 // Qt headers
-#include <QNetworkAccessManager>
-#include <QXmlStreamReader>
-#include <QNetworkReply>
-#include <QEventLoop>
-
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-#   include <QUrlQuery>
-#endif
+#include <QString>
 
 // MythTV headers
 #include "mythcontext.h"
-#include "storagegroup.h"
-#include "remoteutil.h"
-
-#include "gallerytypedefs.h"
-
 
 
 /** \fn     GalleryFileHelper::GalleryFileHelper()
@@ -26,12 +14,7 @@
  */
 GalleryFileHelper::GalleryFileHelper()
 {
-    m_backendHost   = gCoreContext->GetSetting("MasterServerIP","localhost");
-    m_backendPort   = gCoreContext->GetNumSetting("BackendStatusPort", 6544);
-
-    m_manager = new QNetworkAccessManager();
 }
-
 
 
 /** \fn     GalleryFileHelper::~GalleryFileHelper()
@@ -40,10 +23,7 @@ GalleryFileHelper::GalleryFileHelper()
  */
 GalleryFileHelper::~GalleryFileHelper()
 {
-    delete m_manager;
-    m_manager = NULL;
 }
-
 
 
 /** \fn     GalleryFileHelper::StartSyncImages()
@@ -52,13 +32,13 @@ GalleryFileHelper::~GalleryFileHelper()
  */
 void GalleryFileHelper::StartSyncImages()
 {
-    QUrl url(QString("http://%1:%2/Image/StartSync")
-             .arg(m_backendHost)
-             .arg(m_backendPort));
+    QStringList strList;
+    strList << "IMAGE_SCAN" << "START";
 
-    SendRequest(url, QNetworkAccessManager::PostOperation);
+    if (!gCoreContext->SendReceiveStringList(strList))
+
+        LOG(VB_GENERAL, LOG_ERR, "Sync start request failed");
 }
-
 
 
 /** \fn     GalleryFileHelper::StopSyncImages()
@@ -67,12 +47,14 @@ void GalleryFileHelper::StartSyncImages()
  */
 void GalleryFileHelper::StopSyncImages()
 {
-    QUrl url(QString("http://%1:%2/Image/StopSync")
-             .arg(m_backendHost)
-             .arg(m_backendPort));
+    QStringList strList;
+    strList << "IMAGE_SCAN" << "STOP";
 
-    SendRequest(url, QNetworkAccessManager::PostOperation);
+    if (!gCoreContext->SendReceiveStringList(strList))
+
+        LOG(VB_GENERAL, LOG_ERR, "Sync stop request failed");
 }
+
 
 /** \fn     GalleryFileHelper::GetSyncStatus()
  *  \brief  Reads the current image syncronization status
@@ -80,121 +62,43 @@ void GalleryFileHelper::StopSyncImages()
  */
 GallerySyncStatus GalleryFileHelper::GetSyncStatus()
 {
-    QUrl url(QString("http://%1:%2/Image/GetSyncStatus")
-             .arg(m_backendHost)
-             .arg(m_backendPort));
-
     GallerySyncStatus status;
     status.running = false;
     status.current = 0;
     status.total = 0;
 
-    QByteArray ba = SendRequest(url, QNetworkAccessManager::GetOperation);
-    if (ba.count() > 0)
+    QStringList strList;
+
+    strList << "IMAGE_GET_SCAN_STATUS";
+    bool ok = gCoreContext->SendReceiveStringList(strList);
+
+    // expect request status, sync-running status, number done, total number
+    if (ok && strList.size() == 4)
     {
-        bool ok;
-        QXmlStreamReader xml(ba);
-        while (!xml.atEnd())
-        {
-            xml.readNext();
-            if (xml.isStartElement())
-            {
-                if (xml.name() == "Running")
-                {
-                    QString value = xml.readElementText();
-                    if (value.compare("true") == 0)
-                        status.running = true;
-                }
-                else if (xml.name() == "Current")
-                    status.current = xml.readElementText().toInt(&ok);
-                else if (xml.name() == "Total")
-                    status.total = xml.readElementText().toInt(&ok);
-            }
-        }
+        status.running = strList[1].toInt(); // convert int to bool
+        status.current = strList[2].toInt();
+        status.total   = strList[3].toInt();
     }
 
     return status;
 }
 
 
-
-/**
- *  \brief  Starts the thumbnail generation thread on the backend
- *  \return void
- */
-void GalleryFileHelper::StartThumbGen()
+void GalleryFileHelper::AddToThumbnailList(ImageMetadata* im, bool recreate)
 {
-    QUrl url(QString("http://%1:%2/Image/StartThumbnailGeneration")
-             .arg(m_backendHost)
-             .arg(m_backendPort));
-
-    SendRequest(url, QNetworkAccessManager::PostOperation);
-}
-
-
-
-/**
- *  \brief  Stops the thumbnail generation thread on the backend
- *  \return void
- */
-void GalleryFileHelper::StopThumbGen()
-{
-    QUrl url(QString("http://%1:%2/Image/StopThumbnailGeneration")
-             .arg(m_backendHost)
-             .arg(m_backendPort));
-
-    SendRequest(url, QNetworkAccessManager::PostOperation);
-}
-
-
-void GalleryFileHelper::AddToThumbnailList(ImageMetadata* im, QSet<int> &done)
-{
-    if (!im)
+    if (!im || im->m_thumbFileIdList.size() == 0)
         return;
+
+    QStringList message;
+    message << "IMAGE_THUMBNAILS"
+            << QString::number(recreate);
 
     // folders use multiple thumbnails
     for (int i = 0; i < im->m_thumbFileIdList.size(); i++)
-    {
-        int imageId = im->m_thumbFileIdList.at(i);
 
-        if (!done.contains(imageId))
-        {
-            QUrl url(QString("http://%1:%2/Image/CreateThumbnail?Id=%3")
-                     .arg(m_backendHost)
-                     .arg(m_backendPort)
-                     .arg(imageId));
+        message << QString::number(im->m_thumbFileIdList.at(i));
 
-            SendRequest(url, QNetworkAccessManager::PostOperation);
-
-            done.insert(imageId);
-        }
-    }
-}
-
-void GalleryFileHelper::RecreateThumbnail(ImageMetadata* im)
-{
-    if (!im)
-        return;
-
-    int id = im->m_id;
-    QUrl url(QString("http://%1:%2/Image/RecreateThumbnail?Id=%3")
-             .arg(m_backendHost)
-             .arg(m_backendPort)
-             .arg(id));
-
-    SendRequest(url, QNetworkAccessManager::PostOperation);
-}
-
-
-void GalleryFileHelper::SetThumbnailSize(int width, int height)
-{
-    QUrl url(QString("http://%1:%2/Image/SetThumbnailSize?Width=%3&Height=%4")
-             .arg(m_backendHost)
-             .arg(m_backendPort)
-             .arg(width)
-             .arg(height));
-
-    SendRequest(url, QNetworkAccessManager::PostOperation);
+    gCoreContext->SendReceiveStringList(message, true);
 }
 
 
@@ -206,50 +110,13 @@ void GalleryFileHelper::SetThumbnailSize(int width, int height)
  */
 bool GalleryFileHelper::RenameFile(ImageMetadata *im, const QString &name)
 {
-    bool ok = false;
+    QStringList strlist;
+    strlist << "IMAGE_RENAME"
+            << QString::number(im->m_id)
+            << name;
 
-    QUrl url(QString("http://%1:%2/Image/RenameImage")
-             .arg(m_backendHost)
-             .arg(m_backendPort));
-
-#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
-    QUrl &urlQuery = url;
-#else
-    QUrlQuery urlQuery;
-#endif
-
-    urlQuery.addQueryItem("Id", QString::number(im->m_id));
-    urlQuery.addQueryItem("NewName", name);
-
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-    url.setQuery( urlQuery );
-#endif
-
-    QByteArray ba = SendRequest(url, QNetworkAccessManager::PostOperation);
-
-    if (ba.count() > 0)
-    {
-        QXmlStreamReader xml(ba);
-        while (!xml.atEnd())
-        {
-            xml.readNext();
-            if (xml.isStartElement() && xml.name() == "bool")
-            {
-                ok = xml.readElementText().compare("true") == 0;
-
-                LOG(VB_GENERAL, LOG_DEBUG,
-                    QString("RenameFile - Status: %1").arg(ok));
-
-                // The returned data from the service api has only one
-                // value, so we stop when we have hit the first bool string
-                break;
-            }
-        }
-    }
-
-    return ok;
+    return gCoreContext->SendReceiveStringList(strlist, true);
 }
-
 
 
 /** \fn     GalleryFileHelper::RemoveFile(ImageMetadata *)
@@ -259,49 +126,12 @@ bool GalleryFileHelper::RenameFile(ImageMetadata *im, const QString &name)
  */
 bool GalleryFileHelper::RemoveFile(ImageMetadata *im)
 {
-    bool ok = false;
+    QStringList strlist;
+    strlist << "IMAGE_DELETE"
+            << QString::number(im->m_id);
 
-    QUrl url(QString("http://%1:%2/Image/RemoveImage")
-             .arg(m_backendHost)
-             .arg(m_backendPort));
-
-#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
-    QUrl &urlQuery = url;
-#else
-    QUrlQuery urlQuery;
-#endif
-
-    urlQuery.addQueryItem("Id", QString::number(im->m_id));
-
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-    url.setQuery( urlQuery );
-#endif
-
-    QByteArray ba = SendRequest(url, QNetworkAccessManager::PostOperation);
-
-    if (ba.count() > 0)
-    {
-        QXmlStreamReader xml(ba);
-        while (!xml.atEnd())
-        {
-            xml.readNext();
-            if (xml.isStartElement() && xml.name() == "bool")
-            {
-                ok = xml.readElementText().compare("true") == 0;
-
-                LOG(VB_GENERAL, LOG_DEBUG,
-                    QString("RemoveFile - Status: %1").arg(ok));
-
-                // The returned data from the service api has only one
-                // value, so we stop when we have hit the first bool string
-                break;
-            }
-        }
-    }
-
-    return ok;
+    return gCoreContext->SendReceiveStringList(strlist, true);
 }
-
 
 
 /** \fn     GalleryFileHelper::SetImageOrientation(ImageMetadata *)
@@ -311,55 +141,14 @@ bool GalleryFileHelper::RemoveFile(ImageMetadata *im)
  */
 bool GalleryFileHelper::SetImageOrientation(ImageMetadata *im)
 {
-    // the orientation of the image.
-    // See http://jpegclub.org/exif_orientation.html for details
-    if (im->GetOrientation() < 1 || im->GetOrientation() > 8)
-        return false;
+    QStringList strlist;
+    strlist << "IMAGE_SET_EXIF"
+            << QString::number(im->m_id)
+            << "ORIENTATION"
+            << QString::number(im->GetOrientation());
 
-    bool ok = false;
-
-    QUrl url( QString("http://%1:%2/Image/SetImageInfo")
-             .arg(m_backendHost)
-             .arg(m_backendPort));
-
-#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
-    QUrl &urlQuery = url;
-#else
-    QUrlQuery urlQuery;
-#endif
-
-    urlQuery.addQueryItem("Id", QString::number(im->m_id));
-    urlQuery.addQueryItem("Tag", "Exif.Image.Orientation");
-    urlQuery.addQueryItem("Value", QString::number(im->GetOrientation()));
-
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-    url.setQuery( urlQuery );
-#endif
-
-    QByteArray ba = SendRequest(url, QNetworkAccessManager::PostOperation);
-    if (ba.count() > 0)
-    {
-        QXmlStreamReader xml(ba);
-        while (!xml.atEnd())
-        {
-            xml.readNext();
-            if (xml.isStartElement() && xml.name() == "bool")
-            {
-                ok = xml.readElementText().compare("true") == 0;
-
-                LOG(VB_GENERAL, LOG_DEBUG,
-                    QString("SetExifOrientation - Status: %1").arg(ok));
-
-                // The returned data from the service api has only one
-                // value, so we stop when we have hit the first bool string
-                break;
-            }
-        }
-    }
-
-    return ok;
+    return gCoreContext->SendReceiveStringList(strlist, true);
 }
-
 
 
 /** \fn     GalleryFileHelper::GetExifValues(ImageMetadata *)
@@ -368,77 +157,23 @@ bool GalleryFileHelper::SetImageOrientation(ImageMetadata *im)
  *  \param  im The image metadata object that contains all required information
  *  \return The returned XML data
  */
-QByteArray GalleryFileHelper::GetExifValues(ImageMetadata *im)
+QMap<QString, QString> GalleryFileHelper::GetExifValues(ImageMetadata *im)
 {
-    QUrl url(QString("http://%1:%2/Image/GetImageInfoList")
-             .arg(m_backendHost)
-             .arg(m_backendPort));
+    QStringList strlist;
+    strlist << "IMAGE_GET_EXIF"
+            << QString::number(im->m_id);
 
-#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
-    QUrl &urlQuery = url;
-#else
-    QUrlQuery urlQuery;
-#endif
+    QMap<QString, QString> properties;
 
-    urlQuery.addQueryItem("Id", QString::number(im->m_id));
-
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-    url.setQuery( urlQuery );
-#endif
-
-    return SendRequest(url, QNetworkAccessManager::GetOperation);
-}
-
-
-
-/** \fn     GalleryFileHelper::SendRequest(QUrl &url, QNetworkAccessManager::Operation type)
- *  \brief  Calls the url with the given data either via
-            a GET or POST and returns the retrieved data
- *  \param  url The url with all parameters that shall be called
- *  \param  type The type of the call, can be either GET or POST
- *  \return The returned XML data
- */
-QByteArray GalleryFileHelper::SendRequest(QUrl &url,
-                                          QNetworkAccessManager::Operation type)
-{
-    QByteArray ba;
-    QNetworkReply *reply = NULL;
-    QNetworkRequest request(url);
-
-    if (type == QNetworkAccessManager::GetOperation)
+    if (gCoreContext->SendReceiveStringList(strlist, true))
     {
-        reply = m_manager->get(request);
-    }
-    else if (type == QNetworkAccessManager::PostOperation)
-    {
-        request.setHeader(QNetworkRequest::ContentTypeHeader,
-                          "application/x-www-form-urlencoded");
-        reply = m_manager->post(request, QByteArray());
-    }
-
-    // Create a local event loop that blocks further processing
-    // until the finished signal is emitted from the network manager
-    QEventLoop loop;
-    QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
-    loop.exec();
-
-    // The network manager is done, continue
-    if (reply)
-    {
-        if (reply->error() == QNetworkReply::NoError)
+        // Each string contains a Label<seperator>Value
+        QString seperator = strlist[1];
+        for (int i = 2; i < strlist.size(); ++i)
         {
-            LOG(VB_GENERAL, LOG_DEBUG,
-                QString("GalleryFileHelper SendRequest ok [%1]").arg(url.toString()));
-            ba = reply->readAll();
+            QStringList parts = strlist[i].split(seperator);
+            properties.insert(parts[0], parts[1]);
         }
-        else
-        {
-            LOG(VB_GENERAL, LOG_DEBUG,
-                QString("GalleryFileHelper SendRequest error: %1 [%2]").arg(url.toString())
-                .arg(reply->errorString()));
-        }
-        reply->deleteLater();
     }
-
-    return ba;
+    return properties;
 }

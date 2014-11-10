@@ -62,12 +62,8 @@ public:
     bool                        StopSync           ( void );
     DTC::ImageSyncInfo*         GetSyncStatus      ( void );
 
-    bool                        StartThumbnailGeneration ( void );
-    bool                        StopThumbnailGeneration  ( void );
-    bool                        CreateThumbnail    ( int   Id );
-    bool                        RecreateThumbnail  ( int   Id );
-    bool                        SetThumbnailSize   ( int   Width,
-                                                     int   Height);
+    bool                        CreateThumbnail    ( int   Id,
+                                                     bool  Recreate);
 private:
     QString GetImage(int, ImageMetadata *, const QString & );
 
@@ -199,42 +195,12 @@ class ScriptableImage : public QObject
             )
         }
 
-        bool StartThumbnailGeneration ( void )
+        bool CreateThumbnail    ( int   Id, bool Recreate )
         {
             SCRIPT_CATCH_EXCEPTION( false,
-                return m_obj.StartThumbnailGeneration();
+                return m_obj.CreateThumbnail( Id, Recreate );
             )
         }
-
-        bool StopThumbnailGeneration  ( void )
-        {
-            SCRIPT_CATCH_EXCEPTION( false,
-                return m_obj.StopThumbnailGeneration();
-            )
-        }
-
-        bool CreateThumbnail    ( int   Id )
-        {
-            SCRIPT_CATCH_EXCEPTION( false,
-                return m_obj.CreateThumbnail( Id );
-            )
-        }
-
-        bool RecreateThumbnail  ( int   Id )
-        {
-            SCRIPT_CATCH_EXCEPTION( false,
-                return m_obj.RecreateThumbnail( Id );
-            )
-        }
-
-        bool SetThumbnailSize   ( int   Width,
-                                  int   Height)
-        {
-            SCRIPT_CATCH_EXCEPTION( false,
-                return m_obj.SetThumbnailSize( Width, Height );
-            )
-        }
-
 };
 
 Q_SCRIPT_DECLARE_QMETAOBJECT_MYTHTV( ScriptableImage, QObject*)

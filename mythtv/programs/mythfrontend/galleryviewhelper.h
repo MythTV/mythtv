@@ -33,7 +33,7 @@ class GalleryViewHelper : public QObject
 
     int     LoadData();
     void    LoadTreeData();
-    void    LoadTreeNodeData(QList<ImageMetadata *>*, MythGenericTree*, QSet<int> &);
+    void    LoadTreeNodeData(QList<ImageMetadata *>*, MythGenericTree*);
     void    UpdateAllData();
     void    RenameCurrentNode(QString &);
     void    DeleteCurrentNode();
@@ -42,7 +42,6 @@ class GalleryViewHelper : public QObject
     void    SetNodeVisibilityState(int);
     void    SetFileOrientation(int);
     void    SetFileZoom(int);
-    void    SetPreviewImageSize(MythUIButtonList *);
 
     ImageMetadata*  GetImageMetadataFromSelectedNode();
     ImageMetadata*  GetImageMetadataFromNode(MythGenericTree *);

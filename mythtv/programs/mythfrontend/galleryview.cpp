@@ -106,9 +106,6 @@ bool GalleryView::Create()
         return false;
     }
 
-    // set the size of the preview images (usually the thumbnails)
-    m_galleryViewHelper->SetPreviewImageSize(m_imageList);
-
     if (m_syncProgressText)
         m_syncProgressText->SetVisible(false);
 
@@ -252,71 +249,43 @@ void GalleryView::customEvent(QEvent *event)
         QString resultid  = dce->GetId();
         int     buttonnum = dce->GetResult();
 
-        // Confirm current file deletion
-        if (resultid == "confirmdelete")
+        if (resultid == "filerename")
         {
-            switch (buttonnum)
-            {
-            case 0 :
-                break;
-            case 1 :
-                FileDelete();
-                break;
-            }
+            QString newName = dce->GetResultText();
+            FileRename(newName);
         }
-
-        // Confirm all selected file deletion
-        if (resultid == "confirmdeleteselected")
+        else if (buttonnum == 1)
         {
-            switch (buttonnum)
+            // Confirm current file deletion
+            if (resultid == "confirmdelete")
             {
-            case 0 :
-                break;
-            case 1 :
-                FileDeleteSelected();
-                break;
+                m_galleryViewHelper->DeleteCurrentNode();
+                UpdateImageList();
             }
-        }
-
-        // Synchronize the database
-        if (resultid == "confirmstartsync")
-        {
-            switch (buttonnum)
+            // Confirm all selected file deletion
+            else if (resultid == "confirmdeleteselected")
             {
-            case 0 :
-                break;
-            case 1 :
+                m_galleryViewHelper->DeleteSelectedNodes();
+                UpdateImageList();
+            }
+            // Synchronize the database
+            else if (resultid == "confirmstartsync")
+            {
                 // Start the sync, the API call will
                 // check if a sync is running already
                 m_galleryViewHelper->m_fileHelper->StartSyncImages();
 
                 if (!m_syncStatusThread->isRunning())
                     m_syncStatusThread->start();
-
-                break;
             }
-        }
-
-        // Stop the database sync
-        if (resultid == "confirmstopsync")
-        {
-            switch (buttonnum)
+            // Stop the database sync
+            else if (resultid == "confirmstopsync" && buttonnum == 1)
             {
-            case 0 :
-                break;
-            case 1 :
                 if (m_syncStatusThread->isRunning())
                     m_syncStatusThread->quit();
 
                 m_galleryViewHelper->m_fileHelper->StopSyncImages();
-                break;
             }
-        }
-
-        if (resultid == "filerename")
-        {
-            QString newName = dce->GetResultText();
-            FileRename(newName);
         }
     }
 }
@@ -516,13 +485,11 @@ void GalleryView::UpdateImageItem(MythUIButtonListItem *item, bool recreateThumb
 
     if (recreateThumb)
         // remove cache image to force a reload
-        GetMythUI()->RemoveFromCacheByFile(
-                    im->m_thumbFileNameList->at(0));
+        GetMythUI()->RemoveFromCacheByFile(im->m_thumbFileNameList->at(0));
 
     // set the thumbnail image
     UpdateThumbnail(item, im, recreateThumb);
 }
-
 
 
 /** \fn     GalleryView::UpdateThumbnail(MythUIButtonListItem *)
@@ -1120,6 +1087,7 @@ void GalleryView::FileRotateCW()
         return;
 
     m_galleryViewHelper->SetFileOrientation(kFileRotateCW);
+
     UpdateImageItem(item, true);
 }
 
@@ -1137,6 +1105,7 @@ void GalleryView::FileRotateCCW()
         return;
 
     m_galleryViewHelper->SetFileOrientation(kFileRotateCCW);
+
     UpdateImageItem(item, true);
 }
 
@@ -1154,6 +1123,7 @@ void GalleryView::FileFlipHorizontal()
         return;
 
     m_galleryViewHelper->SetFileOrientation(kFileFlipHorizontal);
+
     UpdateImageItem(item, true);
 }
 
@@ -1171,6 +1141,7 @@ void GalleryView::FileFlipVertical()
         return;
 
     m_galleryViewHelper->SetFileOrientation(kFileFlipVertical);
+
     UpdateImageItem(item, true);
 }
 
@@ -1187,6 +1158,7 @@ void GalleryView::FileZoomIn()
         return;
 
     m_galleryViewHelper->SetFileZoom(kFileZoomIn);
+
     UpdateImageItem(item);
 }
 
@@ -1203,6 +1175,7 @@ void GalleryView::FileZoomOut()
         return;
 
     m_galleryViewHelper->SetFileZoom(kFileZoomOut);
+
     UpdateImageItem(item);
 }
 
@@ -1215,6 +1188,7 @@ void GalleryView::FileZoomOut()
 void GalleryView::FileHide()
 {
     m_galleryViewHelper->SetNodeVisibilityState(kNodeStateInvisible);
+
     UpdateImageList();
 }
 
@@ -1227,6 +1201,7 @@ void GalleryView::FileHide()
 void GalleryView::FileUnhide()
 {
     m_galleryViewHelper->SetNodeVisibilityState(kNodeStateVisible);
+
     UpdateImageList();
 }
 
@@ -1240,7 +1215,7 @@ void GalleryView::FileUnhide()
 void GalleryView::ConfirmFileDelete()
 {
     // Create a confirmation dialog to confirm the file deletion
-    // of the currently selected image. This is only a safety precausion.
+    // of the currently selected image. This is only a safety precaution.
     ImageMetadata *data = GetImageMetadataFromSelectedButton();
     if (!data)
         return;
@@ -1280,30 +1255,6 @@ void GalleryView::ConfirmFileDeleteSelected()
 
 
 
-/** \fn     GalleryView::FileDelete()
- *  \brief  Deletes a single file
- *  \return void
- */
-void GalleryView::FileDelete()
-{
-    m_galleryViewHelper->DeleteCurrentNode();
-    UpdateImageList();
-}
-
-
-
-/** \fn     GalleryView::FileDeleteSelected()
- *  \brief  Deletes all selected files
- *  \return void
- */
-void GalleryView::FileDeleteSelected()
-{
-    m_galleryViewHelper->DeleteSelectedNodes();
-    UpdateImageList();
-}
-
-
-
 /** \fn     GalleryView::FileRenameInput()
  *  \brief  Shows a popup where the user can enter a new filename
  *  \return void
@@ -1338,6 +1289,7 @@ void GalleryView::FileRenameInput()
 void GalleryView::FileRename(QString &newName)
 {
     m_galleryViewHelper->RenameCurrentNode(newName);
+
     UpdateImageList();
 }
 
