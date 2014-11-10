@@ -1271,16 +1271,17 @@ void VideoMetadata::toMap(InfoMap &metadataMap)
     {
         metadataMap["season"] = format_season_and_episode(GetSeason(), 1);
         metadataMap["episode"] = format_season_and_episode(GetEpisode(), 1);
-        metadataMap["s##e##"] = QString("s%1e%2")
+        metadataMap["s##e##"] = metadataMap["s00e00"] = QString("s%1e%2")
             .arg(format_season_and_episode(GetSeason(), 2))
             .arg(format_season_and_episode(GetEpisode(), 2));
-        metadataMap["##x##"] = QString("%1x%2")
+        metadataMap["##x##"] = metadataMap["00x00"] = QString("%1x%2")
             .arg(format_season_and_episode(GetSeason(), 1))
             .arg(format_season_and_episode(GetEpisode(), 2));
     }
     else
     {
         metadataMap["s##e##"] = metadataMap["##x##"] = QString();
+        metadataMap["s00e00"] = metadataMap["00x00"] = QString();
         metadataMap["season"] = metadataMap["episode"] = QString();
     }
 
