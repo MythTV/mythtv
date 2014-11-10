@@ -1173,7 +1173,7 @@ void DTVRecorder::FindPSKeyFrames(const uint8_t *buffer, uint len)
         if (hasKeyFrame)
         {
             _last_keyframe_seen = _frames_seen_count;
-            HandleKeyframe(_payload_buffer.size() - (bufptr - bufstart));
+            HandleKeyframe((int64_t)_payload_buffer.size() - (bufptr - bufstart));
         }
 
         if ((aspectRatio > 0) && (aspectRatio != m_videoAspect))
