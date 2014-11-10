@@ -7,6 +7,7 @@
 #include <QKeyEvent>
 #include <QDomDocument>
 #include <QFile>
+#include <QFileInfo>
 #include <QTextStream>
 
 // libmythui headers
@@ -509,6 +510,10 @@ void MythThemedMenu::parseThemeButton(QDomElement &element)
             {
                 addit = findDepends(getFirstText(info));
             }
+            else if (info.tagName() == "dependsexec")
+            {
+                addit = findDependsExec(getFirstText(info));
+            }
             else if (info.tagName() == "dependssetting")
             {
                 addit = GetMythDB()->GetNumSetting(getFirstText(info));
@@ -882,6 +887,14 @@ bool MythThemedMenu::findDepends(const QString &fileList)
             return true;
     }
 
+    return false;
+}
+
+bool MythThemedMenu::findDependsExec(const QString &filename)
+{
+    QFileInfo filename_info(filename);
+    if (filename_info.exists() && filename_info.isFile() && filename_info.isExecutable())
+        return true;
     return false;
 }
 
