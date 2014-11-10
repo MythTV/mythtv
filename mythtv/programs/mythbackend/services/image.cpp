@@ -71,31 +71,19 @@ QString Image::GetImage(int id, ImageMetadata* im, const QString &function)
  *  \param  value The new value
  *  \return bool True when saving was successful, otherwise false
  */
-bool Image::SetImageInfo( int id, const QString &tag,
-                          const QString &value )
+bool Image::SetImageInfo( int id, const QString &tag, const QString &value )
 {
     ImageMetadata *im = new ImageMetadata();
-    ImageUtils *iu = ImageUtils::getInstance();
-    iu->LoadFileFromDB(im, id);
+    QString fileName = GetImage(id, im, QString("SetImageInfo"));
+    delete im;
 
-    QString sgName = IMAGE_STORAGE_GROUP;
-    StorageGroup sg = StorageGroup(sgName, gCoreContext->GetHostName());
-    QString imageFileName = sg.FindFile(im->m_fileName);
+    if (fileName.isEmpty())
 
-    if (imageFileName.isEmpty())
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("SetImageInfo - Image %1 not found in DB.").arg(id));
-        delete im;
         return false;
-    }
 
     // We got the file name from the ID, so use this method
     // which does the same but just on a filename basis.
-    bool ok = SetImageInfoByFileName(imageFileName, tag, value);
-
-    delete im;
-    return ok;
+    return SetImageInfoByFileName(fileName, tag, value);
  }
 
 
@@ -301,43 +289,106 @@ bool Image::RemoveImageFromDB( int id )
 bool Image::RemoveImage( int id )
 {
     ImageMetadata *im = new ImageMetadata();
-    ImageUtils *iu = ImageUtils::getInstance();
-    iu->LoadFileFromDB(im, id);
+    QString fileName = GetImage(id, im, QString("RemoveImage"));
+    delete im;
 
-    if (im->m_fileName.isEmpty())
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("RemoveImage - Image %1 not found in DB").arg(id));
-        delete im;
+    if (fileName.isEmpty())
+
         return false;
-    }
 
-    if (!QFile::exists( im->m_fileName ))
+    if (!QFile::exists( fileName ))
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("RemoveImage - File %1 not found for image %2")
-            .arg(im->m_fileName)
+            .arg(fileName)
             .arg(id));
-        delete im;
-        return false;
     }
-
-    if (!QFile::remove( im->m_fileName ))
+    else if (!QFile::remove( fileName ))
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("RemoveImage - Could not delete file %1 for image %2")
-            .arg(im->m_fileName)
+            .arg(fileName)
             .arg(id));
-        delete im;
+    }
+    else
+    {
+        LOG(VB_FILE, LOG_DEBUG,
+            QString("RemoveImage - Deleted %1 for image %3")
+                    .arg(fileName)
+                    .arg(id));
+
+        // Remove the database entry if the file has been deleted.
+        return RemoveImageFromDB(id);
+    }
+    return false;
+}
+
+
+/** \fn     Image::RenameImage(int Id,
+ *                             const QString &sNewFile)
+ *  \brief  Renames the file to the new name.
+ *  \param  id The database id of the file
+ *  \param  sNewName  The new name of the file (only the name, no path)
+ *  \return bool True if renaming was successful, otherwise false
+ */
+bool Image::RenameImage( int id,
+                         const QString &newName)
+{
+    ImageMetadata *im = new ImageMetadata();
+    QString fileName = GetImage(id, im, QString("RenameImage"));
+    delete im;
+
+    if (fileName.isEmpty())
+
+        return false;
+
+    // Check if the file exists
+    if (!QFile::exists(fileName))
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("RenameImage - File %1 not found for image %2")
+            .arg(fileName)
+            .arg(id));
         return false;
     }
 
-    delete im;
+    // New name must not contain a path
+    if (newName.contains("/") || newName.contains("\\"))
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("RenameImage - New filename '%1' for image %2 must "
+                    "not contain a path")
+            .arg(newName)
+            .arg(id));
+        return false;
+    }
 
-    // Remove the database entry if the file has been deleted.
-    return RemoveImageFromDB(id);
+    // Rename the file
+    QFile file;
+    file.setFileName(fileName);
+    QFileInfo info = QFileInfo(file);
+    QDir::setCurrent(info.absolutePath());
+    bool done = file.rename(newName);
+
+    if (done)
+    {
+        LOG(VB_FILE, LOG_DEBUG,
+            QString("RenameImage - Renamed %1 to %2 for image %3")
+                    .arg(fileName)
+                    .arg(newName)
+                    .arg(id));
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("RenameImage - Renaming %1 to %2 failed for image %3")
+                    .arg(fileName)
+                    .arg(newName)
+                    .arg(id));
+    }
+
+    return done;
 }
-
 
 
 /** \fn     Image::StartSync(void)

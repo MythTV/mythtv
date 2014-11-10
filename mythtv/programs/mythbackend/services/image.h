@@ -55,6 +55,8 @@ public:
 
     bool                        RemoveImageFromDB  ( int   Id );
     bool                        RemoveImage        ( int   Id );
+    bool                        RenameImage        ( int   Id,
+                                                     const QString &NewName );
 
     bool                        StartSync          ( void );
     bool                        StopSync           ( void );
@@ -165,6 +167,14 @@ class ScriptableImage : public QObject
         {
             SCRIPT_CATCH_EXCEPTION( false,
                 return m_obj.RemoveImage( Id );
+            )
+        }
+
+        bool RenameImage( int   Id,
+                          const QString &NewName )
+        {
+            SCRIPT_CATCH_EXCEPTION( false,
+                return m_obj.RenameImage( Id, NewName );
             )
         }
 

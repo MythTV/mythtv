@@ -195,42 +195,20 @@ void GalleryViewHelper::LoadTreeNodeData(QList<ImageMetadata *> *list,
  */
 void GalleryViewHelper::RenameCurrentNode(QString &newName)
 {
-    bool fileExist = false;
+    ImageMetadata *im = GetImageMetadataFromSelectedNode();
+    if (!im)
+        return;
 
-    // Check if the file with the new name already exists in the current directory
-    QList<MythGenericTree *> *nodeTree = m_currentNode->getAllChildren();
-    for (int i = 0; i < nodeTree->size(); i++)
+    if (m_fileHelper->RenameFile(im, newName))
     {
-        ImageMetadata *im = nodeTree->at(i)->GetData().value<ImageMetadata *>();
-        if (im)
-        {
-            if (im->m_name.compare(newName) == 0)
-            {
-                fileExist = true;
-                break;
-            }
-        }
-    }
+        // replace the original filename with the
+        // new one in the pull path + filename variable
+        QString newFileName = im->m_fileName.replace(im->m_name, newName);
 
-    // The file with the given new name does not yet exist.
-    // Continue with the renaming of the file
-    if (!fileExist)
-    {
-        ImageMetadata *im = GetImageMetadataFromSelectedNode();
-        if (!im)
-            return;
+        im->m_fileName = newFileName;
+        im->m_name = newName;
 
-        if (m_fileHelper->RenameFile(im, newName))
-        {
-            // replace the original filename with the
-            // new one in the pull path + filename variable
-            QString newFileName = im->m_fileName.replace(im->m_name, newName);
-
-            im->m_fileName = newFileName;
-            im->m_name = newName;
-
-            m_dbHelper->UpdateData(im);
-        }
+        m_dbHelper->UpdateData(im);
     }
 }
 

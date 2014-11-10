@@ -208,7 +208,7 @@ bool GalleryFileHelper::RenameFile(ImageMetadata *im, const QString &name)
 {
     bool ok = false;
 
-    QUrl url(QString("http://%1:%2/Content/RenameFile")
+    QUrl url(QString("http://%1:%2/Image/RenameImage")
              .arg(m_backendHost)
              .arg(m_backendPort));
 
@@ -218,7 +218,7 @@ bool GalleryFileHelper::RenameFile(ImageMetadata *im, const QString &name)
     QUrlQuery urlQuery;
 #endif
 
-    urlQuery.addQueryItem("FileName", im->m_fileName);
+    urlQuery.addQueryItem("Id", QString::number(im->m_id));
     urlQuery.addQueryItem("NewName", name);
 
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
@@ -261,7 +261,7 @@ bool GalleryFileHelper::RemoveFile(ImageMetadata *im)
 {
     bool ok = false;
 
-    QUrl url(QString("http://%1:%2/Content/DeleteFile")
+    QUrl url(QString("http://%1:%2/Image/RemoveImage")
              .arg(m_backendHost)
              .arg(m_backendPort));
 
@@ -271,7 +271,7 @@ bool GalleryFileHelper::RemoveFile(ImageMetadata *im)
     QUrlQuery urlQuery;
 #endif
 
-    urlQuery.addQueryItem("FileName", im->m_fileName);
+    urlQuery.addQueryItem("Id", QString::number(im->m_id));
 
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
     url.setQuery( urlQuery );

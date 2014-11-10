@@ -17,6 +17,7 @@ class SERVICE_PUBLIC ImageServices : public Service
     Q_CLASSINFO( "SetImageInfo_Method",             "POST" )
     Q_CLASSINFO( "RemoveImageFromDB_Method",        "POST" )
     Q_CLASSINFO( "RemoveImage_Method",              "POST" )
+    Q_CLASSINFO( "RenameImage_Method",              "POST" )
     Q_CLASSINFO( "StartSync_Method",                "POST" )
     Q_CLASSINFO( "StopSync_Method",                 "POST" )
     Q_CLASSINFO( "StartThumbnailGeneration_Method", "POST" )
@@ -59,6 +60,8 @@ class SERVICE_PUBLIC ImageServices : public Service
 
         virtual bool                        RemoveImageFromDB  ( int   Id ) = 0;
         virtual bool                        RemoveImage        ( int   Id ) = 0;
+        virtual bool                        RenameImage        ( int Id,
+                                                                 const QString &NewName ) = 0;
 
         virtual bool                        StartSync          ( void ) = 0;
         virtual bool                        StopSync           ( void ) = 0;

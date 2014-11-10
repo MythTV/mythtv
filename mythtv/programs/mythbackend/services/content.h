@@ -91,13 +91,6 @@ class Content : public ContentServices
         bool                DownloadFile        ( const QString   &URL,
                                                   const QString   &StorageGroup );
 
-        bool                DeleteFile          ( const QString   &StorageGroup,
-                                                  const QString   &FileName );
-
-        bool                RenameFile          ( const QString   &StorageGroup,
-                                                  const QString   &FileName,
-                                                  const QString   &NewName );
-
         // HTTP Live Streaming
         DTC::LiveStreamInfo     *AddLiveStream          ( const QString   &StorageGroup,
                                                           const QString   &FileName,
