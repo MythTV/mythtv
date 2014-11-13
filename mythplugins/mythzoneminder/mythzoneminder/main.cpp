@@ -30,6 +30,7 @@
 #include "zmliveplayer.h"
 #include "zmevents.h"
 #include "zmclient.h"
+#include "zmminiplayer.h"
 
 using namespace std;
 
@@ -84,6 +85,19 @@ static void runZMEventView(void)
 
     if (events->Create())
         mainStack->AddScreen(events);
+}
+
+static void runZMMiniPlayer(void)
+{
+    if (!checkConnection())
+        return;
+
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    ZMMiniPlayer *miniPlayer = new ZMMiniPlayer(mainStack);
+
+    if (miniPlayer->Create())
+        mainStack->AddScreen(miniPlayer);
 }
 
 // these point to the the mainmenu callback if found
@@ -167,6 +181,8 @@ static void setupKeys(void)
         "", "", runZMLiveView);
     REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "ZoneMinder Events"),
         "", "", runZMEventView);
+    REG_JUMPEX(QT_TRANSLATE_NOOP("MythControls", "ZoneMinder Mini Live View"),
+        "", "", runZMMiniPlayer, false);
 }
 
 int mythplugin_init(const char *libversion)

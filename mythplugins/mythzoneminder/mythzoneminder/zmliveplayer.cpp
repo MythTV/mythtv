@@ -32,10 +32,11 @@
 
 const int FRAME_UPDATE_TIME = 1000 / 10;  // try to update the frame 10 times a second
 
-ZMLivePlayer::ZMLivePlayer(MythScreenStack *parent)
+ZMLivePlayer::ZMLivePlayer(MythScreenStack *parent, bool isMiniPlayer)
              :MythScreenType(parent, "zmliveview"),
               m_frameTimer(new QTimer(this)), m_paused(false), m_monitorLayout(1),
-              m_monitorCount(0), m_players(NULL), m_monitors(NULL)
+              m_monitorCount(0), m_players(NULL), m_monitors(NULL),
+              m_isMiniPlayer(isMiniPlayer)
 {
     GetMythUI()->DoDisableScreensaver();
 
@@ -47,19 +48,29 @@ ZMLivePlayer::ZMLivePlayer(MythScreenStack *parent)
 
 bool ZMLivePlayer::Create(void)
 {
-    bool foundtheme = false;
-
     // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("zoneminder-ui.xml", "zmliveplayer", this);
+    QString winName = m_isMiniPlayer ? "miniplayer" : "zmliveplayer";
 
-    if (!foundtheme)
+    if (!LoadWindowFromXML("zoneminder-ui.xml", winName, this))
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Cannot load screen '%1'").arg(winName));
         return false;
+    }
 
     if (!hideAll())
         return false;
 
-    if (!initMonitorLayout())
-        return false;
+    if (m_isMiniPlayer)
+    {
+        // we only support the single camera layout in the mini player
+        if (!initMonitorLayout(1))
+            return false;
+    }
+    else
+    {
+        if (!initMonitorLayout(gCoreContext->GetNumSetting("ZoneMinderLiveLayout", 1)))
+            return false;
+    }
 
     return true;
 }
@@ -83,36 +94,39 @@ bool ZMLivePlayer::hideAll(void)
         GetMythUIType("status1-1")->SetVisible(false);
         GetMythUIType("frame1-1")->SetVisible(false);
 
-        // two player layout
-        for (int x = 1; x < 3; x++)
+        if (!m_isMiniPlayer)
         {
-            GetMythUIType(QString("name2-%1").arg(x))->SetVisible(false);
-            GetMythUIType(QString("status2-%1").arg(x))->SetVisible(false);
-            GetMythUIType(QString("frame2-%1").arg(x))->SetVisible(false);
-        }
+            // two player layout
+            for (int x = 1; x < 3; x++)
+            {
+                GetMythUIType(QString("name2-%1").arg(x))->SetVisible(false);
+                GetMythUIType(QString("status2-%1").arg(x))->SetVisible(false);
+                GetMythUIType(QString("frame2-%1").arg(x))->SetVisible(false);
+            }
 
-        // four player layout
-        for (int x = 1; x < 5; x++)
-        {
-            GetMythUIType(QString("name3-%1").arg(x))->SetVisible(false);
-            GetMythUIType(QString("status3-%1").arg(x))->SetVisible(false);
-            GetMythUIType(QString("frame3-%1").arg(x))->SetVisible(false);
-        }
+            // four player layout
+            for (int x = 1; x < 5; x++)
+            {
+                GetMythUIType(QString("name3-%1").arg(x))->SetVisible(false);
+                GetMythUIType(QString("status3-%1").arg(x))->SetVisible(false);
+                GetMythUIType(QString("frame3-%1").arg(x))->SetVisible(false);
+            }
 
-        // six player layout
-        for (int x = 1; x < 7; x++)
-        {
-            GetMythUIType(QString("name4-%1").arg(x))->SetVisible(false);
-            GetMythUIType(QString("status4-%1").arg(x))->SetVisible(false);
-            GetMythUIType(QString("frame4-%1").arg(x))->SetVisible(false);
-        }
+            // six player layout
+            for (int x = 1; x < 7; x++)
+            {
+                GetMythUIType(QString("name4-%1").arg(x))->SetVisible(false);
+                GetMythUIType(QString("status4-%1").arg(x))->SetVisible(false);
+                GetMythUIType(QString("frame4-%1").arg(x))->SetVisible(false);
+            }
 
-        // eight player layout
-        for (int x = 1; x < 9; x++)
-        {
-            GetMythUIType(QString("name5-%1").arg(x))->SetVisible(false);
-            GetMythUIType(QString("status5-%1").arg(x))->SetVisible(false);
-            GetMythUIType(QString("frame5-%1").arg(x))->SetVisible(false);
+            // eight player layout
+            for (int x = 1; x < 9; x++)
+            {
+                GetMythUIType(QString("name5-%1").arg(x))->SetVisible(false);
+                GetMythUIType(QString("status5-%1").arg(x))->SetVisible(false);
+                GetMythUIType(QString("frame5-%1").arg(x))->SetVisible(false);
+            }
         }
     }
     catch (const QString &name)
@@ -126,7 +140,7 @@ bool ZMLivePlayer::hideAll(void)
     return true;
 }
 
-bool ZMLivePlayer::initMonitorLayout()
+bool ZMLivePlayer::initMonitorLayout(int layout)
 {
     // if we haven't got any monitors there's not much we can do so bail out!
     if (m_monitors->empty())
@@ -137,7 +151,7 @@ bool ZMLivePlayer::initMonitorLayout()
         return false;
     }
 
-    setMonitorLayout(gCoreContext->GetNumSetting("ZoneMinderLiveLayout", 1), true);
+    setMonitorLayout(layout, true);
     m_frameTimer->start(FRAME_UPDATE_TIME);
 
     return true;
@@ -202,7 +216,7 @@ bool ZMLivePlayer::keyPressEvent(QKeyEvent *event)
                 m_paused = true;
             }
         }
-        else if (action == "INFO")
+        else if (action == "INFO" && !m_isMiniPlayer)
         {
             m_monitorLayout++;
             if (m_monitorLayout > 5)

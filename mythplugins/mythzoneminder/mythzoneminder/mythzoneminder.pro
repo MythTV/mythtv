@@ -17,11 +17,10 @@ INCLUDEPATH += $${PREFIX}/include/mythtv/libmythui
 
 # Input
 HEADERS += zmconsole.h zmplayer.h zmevents.h zmliveplayer.h zmdefines.h
-HEADERS += zmsettings.h zmclient.h
+HEADERS += zmsettings.h zmclient.h zmminiplayer.h
 
 SOURCES += main.cpp zmconsole.cpp zmplayer.cpp zmevents.cpp zmliveplayer.cpp
-SOURCES += zmsettings.cpp zmclient.cpp
-
+SOURCES += zmsettings.cpp zmclient.cpp zmminiplayer.cpp
 
 QT += sql xml
 

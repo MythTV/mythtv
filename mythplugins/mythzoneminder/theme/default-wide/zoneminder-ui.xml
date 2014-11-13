@@ -1111,4 +1111,54 @@
 
     </window>
 
+    <window name="miniplayer">
+        <fontdef name="monitor" from="basesmall">
+            <color>#ffff00</color>
+            <size>16</size>
+        </fontdef>
+
+        <fontdef name="idle" from="basesmall">
+            <color>#ffff00</color>
+            <size>16</size>
+        </fontdef>
+
+        <fontdef name="alarm" from="basesmall">
+            <color>#ff0000</color>
+            <size>16</size>
+        </fontdef>
+
+        <fontdef name="alert" from="basesmall">
+            <color>#ffa500</color>
+            <size>16</size>
+        </fontdef>
+
+        <area>-1,5,396,340</area>
+
+        <shape name="background" from="basebackground">
+            <area>0,0,396,320</area>
+        </shape>
+
+        <textarea name="name1-1" from="basetextarea">
+            <area>10,5,230,30</area>
+            <font>monitor</font>
+            <value>Monitor 1</value>
+        </textarea>
+
+        <textarea name="status1-1" from="basetextarea">
+            <area>241,5,145,30</area>
+            <align>right</align>
+            <font>idle</font>
+            <font state="idle">idle</font>
+            <font state="alarm">alarm</font>
+            <font state="alert">alert</font>
+            <value></value>
+        </textarea>
+
+        <imagetype name="frame1-1">
+            <area>10,30,376,280</area>
+            <filename>mz_testcard.png</filename>
+        </imagetype>
+
+    </window>
+
 </mythuitheme>
