@@ -932,7 +932,7 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
     QString ConstellationString(void) const
     {
         static QString cs[] = { "qpsk", "qam_16", "qam_64", "qam_256" };
-        return (Constellation() <= kConstellationQAM64) ?
+        return (Constellation() <= kConstellationQAM256) ?
             cs[Constellation()] : "auto";
     }
     // hierarchy_information    3   7.2
