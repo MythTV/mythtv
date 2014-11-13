@@ -926,12 +926,13 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
         kConstellationQPSK  = 0x0,
         kConstellationQAM16 = 0x1,
         kConstellationQAM64 = 0x2,
+        kConstellationQAM256 = 0x3,
     };
     uint Constellation(void) const { return _data[7]>>6; }
     QString ConstellationString(void) const
     {
-        static QString cs[] = { "qpsk", "qam_16", "qam_64" };
-        return (Constellation() <= kConstellationQAM64) ?
+        static QString cs[] = { "qpsk", "qam_16", "qam_64", "qam_256" };
+        return (Constellation() <= kConstellationQAM256) ?
             cs[Constellation()] : "auto";
     }
     // hierarchy_information    3   7.2
