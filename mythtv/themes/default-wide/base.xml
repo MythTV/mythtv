@@ -77,7 +77,7 @@
     <shape name="basebackground">
         <area>0,0,10,10</area>
         <type>roundbox</type>
-        <fill color="#000000" alpha="120" />
+        <fill color="#333333" alpha="255" />
         <line color="#FFFFFF" alpha="255" width="2" />
         <cornerradius>12</cornerradius>
     </shape>
@@ -689,15 +689,6 @@
         </scrollbar>
     </webbrowser>
 
-    <!-- Base definition of a shape used as a background on many screens -->
-    <shape name="basebackground">
-        <area>0,0,10,10</area>
-        <type>roundbox</type>
-        <fill color="#000000" alpha="120" />
-        <line color="#FFFFFF" alpha="255" width="2" />
-        <cornerradius>12</cornerradius>
-    </shape>
-
     <!-- Popup Dialogue Box -->
     <window name="MythPopupBox">
         <area>-1,-1,500,500</area>
@@ -744,7 +735,6 @@
 
         <shape name="background" from="basebackground">
             <area>10,10,1260,700</area>
-            <fill color="#333333" alpha="255" />
         </shape>
 
         <textarea name="title" from="basetextarea">
