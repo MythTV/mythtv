@@ -702,16 +702,6 @@
         </scrollbar>
     </webbrowser>
 
-    <!-- Base definition of a shape used as a background on many screens -->
-    <shape name="basebackground">
-        <area>0,0,0,0</area>
-        <type>roundbox</type>
-        <fill color="#0c58a7" alpha="120" />
-        <line color="#FFFFFF" alpha="255" width="2" />
-        <cornerradius>12</cornerradius>
-    </shape>
-
-
     <!-- a program information group used on a few schedule editor screens -->
     <group name="baseprogramdetailsgroup">
         <area>0,0,1232,280</area>
