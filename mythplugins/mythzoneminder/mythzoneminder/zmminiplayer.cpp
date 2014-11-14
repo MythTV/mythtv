@@ -5,6 +5,7 @@
 
 // mythzoneminder
 #include "zmminiplayer.h"
+#include "zmclient.h"
 
 // the maximum image size we are ever likely to get from ZM
 #define MAX_IMAGE_SIZE  (2048*1536*3)
@@ -17,10 +18,13 @@ ZMMiniPlayer::ZMMiniPlayer(MythScreenStack *parent)
 {
     m_displayTimer->setSingleShot(true);
     connect(m_displayTimer, SIGNAL(timeout()), this, SLOT(timerTimeout()));
+
 }
 
 ZMMiniPlayer::~ZMMiniPlayer(void)
 {
+    gCoreContext->removeListener(this);
+
     // Timers are deleted by Qt
     m_displayTimer->disconnect();
     m_displayTimer = NULL;
@@ -31,6 +35,17 @@ ZMMiniPlayer::~ZMMiniPlayer(void)
 
 void ZMMiniPlayer::timerTimeout(void)
 {
+    // if we was triggered because of an alarm wait for the monitor to become idle
+    if (m_alarmMonitor != -1)
+    {
+        Monitor *mon = ZMClient::get()->getMonitorByID(m_alarmMonitor);
+        if (mon && (mon->state == ALARM || mon->state == ALERT))
+        {
+            m_displayTimer->start(10000);
+            return;
+        }
+    }
+
     Close();
 }
 
@@ -41,7 +56,48 @@ bool ZMMiniPlayer::Create(void)
 
     m_displayTimer->start(10000);
 
+    gCoreContext->addListener(this);
+
     return true;
+}
+
+void ZMMiniPlayer::customEvent (QEvent* event)
+{
+    if (event->type() == MythEvent::MythEventMessage)
+    {
+        MythEvent *me = dynamic_cast<MythEvent*>(event);
+
+        if (!me)
+            return;
+
+        if (me->Message().startsWith("ZONEMINDER_NOTIFICATION"))
+        {
+            QStringList list = me->Message().simplified().split(' ');
+
+            if (list.size() < 2)
+                return;
+
+            int monID = list[1].toInt();
+            if (monID != m_alarmMonitor)
+            {
+                m_frameTimer->stop();
+
+                Monitor *mon = ZMClient::get()->getMonitorAt(monID);
+
+                if (mon)
+                {
+                    m_players->at(0)->setMonitor(mon);
+                    m_players->at(0)->updateCamera();
+                }
+
+                m_frameTimer->start(FRAME_UPDATE_TIME);
+            }
+
+            m_displayTimer->start(10000);
+        }
+    }
+
+    QObject::customEvent(event);
 }
 
 bool ZMMiniPlayer::keyPressEvent(QKeyEvent *event)

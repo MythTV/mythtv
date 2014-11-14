@@ -31,10 +31,9 @@
 #include "zmevents.h"
 #include "zmclient.h"
 #include "zmminiplayer.h"
+#include "alarmnotifythread.h"
 
 using namespace std;
-
-
 
 static bool checkConnection(void)
 {
@@ -89,6 +88,9 @@ static void runZMEventView(void)
 
 static void runZMMiniPlayer(void)
 {
+    if (!ZMClient::get()->isMiniPlayerEnabled())
+        return;
+
     if (!checkConnection())
         return;
 
@@ -192,18 +194,20 @@ int mythplugin_init(const char *libversion)
                                     MYTH_BINARY_VERSION))
         return -1;
 
+    // setup a connection to the mythzmserver
+    if (!checkConnection())
+        return -1;
+
     setupKeys();
+
+    // create the alarm polling thread
+    AlarmNotifyThread::get()->start();
 
     return 0;
 }
 
 int mythplugin_run(void)
 {
-    // setup a connection to the mythzmserver
-    if (!ZMClient::setupZMClient())
-    {
-        return -1;
-    }
 
     return runMenu("zonemindermenu.xml");
 }
@@ -218,6 +222,8 @@ int mythplugin_config(void)
 
 void mythplugin_destroy(void)
 {
+    AlarmNotifyThread::get()->stop();
+    delete AlarmNotifyThread::get();
     delete ZMClient::get();
 }
 

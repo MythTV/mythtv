@@ -35,15 +35,15 @@ const int FRAME_UPDATE_TIME = 1000 / 10;  // try to update the frame 10 times a 
 ZMLivePlayer::ZMLivePlayer(MythScreenStack *parent, bool isMiniPlayer)
              :MythScreenType(parent, "zmliveview"),
               m_frameTimer(new QTimer(this)), m_paused(false), m_monitorLayout(1),
-              m_monitorCount(0), m_players(NULL), m_monitors(NULL),
-              m_isMiniPlayer(isMiniPlayer)
+              m_monitorCount(0), m_players(NULL), m_isMiniPlayer(isMiniPlayer),
+              m_alarmMonitor(-1)
 {
+    ZMClient::get()->setIsMiniPlayerEnabled(false);
+
     GetMythUI()->DoDisableScreensaver();
 
     connect(m_frameTimer, SIGNAL(timeout()), this,
             SLOT(updateFrame()));
-
-    getMonitorList();
 }
 
 bool ZMLivePlayer::Create(void)
@@ -143,7 +143,7 @@ bool ZMLivePlayer::hideAll(void)
 bool ZMLivePlayer::initMonitorLayout(int layout)
 {
     // if we haven't got any monitors there's not much we can do so bail out!
-    if (m_monitors->empty())
+    if (ZMClient::get()->getMonitorCount() == 0)
     {
         LOG(VB_GENERAL, LOG_ERR, "Cannot find any monitors. Bailing out!");
         ShowOkPopup(tr("Can't show live view.") + "\n" +
@@ -183,10 +183,9 @@ ZMLivePlayer::~ZMLivePlayer()
     else
         gCoreContext->SaveSetting("ZoneMinderLiveCameras", "");
 
-    if (m_monitors)
-        delete m_monitors;
-
     delete m_frameTimer;
+
+    ZMClient::get()->setIsMiniPlayerEnabled(true);
 }
 
 bool ZMLivePlayer::keyPressEvent(QKeyEvent *event)
@@ -248,10 +247,10 @@ void ZMLivePlayer::changePlayerMonitor(int playerNo)
     Monitor *mon;
 
     // find the old monitor ID in the list of available monitors
-    vector<Monitor*>::iterator i = m_monitors->begin();
-    for (; i != m_monitors->end(); ++i)
+    int pos;
+    for (pos = 0; pos < ZMClient::get()->getMonitorCount(); pos++)
     {
-        mon = *i;
+        mon = ZMClient::get()->getMonitorAt(pos);
         if (oldMonID == mon->id)
         {
             break;
@@ -259,14 +258,14 @@ void ZMLivePlayer::changePlayerMonitor(int playerNo)
     }
 
     // get the next monitor in the list
-    if (i != m_monitors->end())
-        ++i;
+    if (pos != ZMClient::get()->getMonitorCount())
+        pos++;
 
     // wrap around to the start if we've reached the end
-    if (i == m_monitors->end())
-        i = m_monitors->begin();
+    if (pos >= ZMClient::get()->getMonitorCount())
+        pos = 0;
 
-    mon = *i;
+    mon = ZMClient::get()->getMonitorAt(pos);
 
     m_players->at(playerNo - 1)->setMonitor(mon);
     m_players->at(playerNo - 1)->updateCamera();
@@ -276,10 +275,6 @@ void ZMLivePlayer::changePlayerMonitor(int playerNo)
 
 void ZMLivePlayer::updateFrame()
 {
-    class ZMClient *zm = ZMClient::get();
-    if (!zm)
-        return;
-
     static unsigned char buffer[MAX_IMAGE_SIZE];
     m_frameTimer->stop();
 
@@ -297,7 +292,7 @@ void ZMLivePlayer::updateFrame()
     for (int x = 0; x < monList.count(); x++)
     {
         QString status;
-        int frameSize = zm->getLiveFrame(monList[x], status, buffer, sizeof(buffer));
+        int frameSize = ZMClient::get()->getLiveFrame(monList[x], status, buffer, sizeof(buffer));
 
         if (frameSize > 0 && !status.startsWith("ERROR"))
         {
@@ -330,7 +325,13 @@ void ZMLivePlayer::stopPlayers()
 
 void ZMLivePlayer::setMonitorLayout(int layout, bool restore)
 {
-    QStringList monList = gCoreContext->GetSetting("ZoneMinderLiveCameras", "").split(",");
+    QStringList monList;
+
+    if (m_alarmMonitor != -1)
+        monList.append(QString::number(m_alarmMonitor));
+    else
+        monList = gCoreContext->GetSetting("ZoneMinderLiveCameras", "").split(",");
+
     m_monitorLayout = layout;
 
     if (m_players)
@@ -355,7 +356,7 @@ void ZMLivePlayer::setMonitorLayout(int layout, bool restore)
 
     hideAll();
 
-    uint monitorNo = 1;
+    int monitorNo = 1;
 
     for (int x = 1; x <= m_monitorCount; x++)
     {
@@ -369,20 +370,12 @@ void ZMLivePlayer::setMonitorLayout(int layout, bool restore)
                 int monID = s.toInt(); 
 
                 // try to find a monitor that matches the monID
-                vector<Monitor*>::iterator i = m_monitors->begin();
-                for (; i != m_monitors->end(); ++i)
-                {
-                    if ((*i)->id == monID)
-                    {
-                        monitor = *i;
-                        break;
-                    }
-                }
+                monitor = ZMClient::get()->getMonitorByID(monID);
             }
         }
 
         if (!monitor)
-            monitor = m_monitors->at(monitorNo - 1);
+            monitor = ZMClient::get()->getMonitorAt(monitorNo - 1);
 
         MythUIImage *frameImage = dynamic_cast<MythUIImage *> (GetChild(QString("frame%1-%2").arg(layout).arg(x)));
         MythUIText  *cameraText = dynamic_cast<MythUIText *> (GetChild(QString("name%1-%2").arg(layout).arg(x)));
@@ -395,22 +388,11 @@ void ZMLivePlayer::setMonitorLayout(int layout, bool restore)
         m_players->push_back(p);
 
         monitorNo++;
-        if (monitorNo > m_monitors->size())
+        if (monitorNo > ZMClient::get()->getMonitorCount())
             monitorNo = 1;
     }
 
     updateFrame();
-}
-
-void ZMLivePlayer::getMonitorList(void)
-{
-    if (!m_monitors)
-        m_monitors = new vector<Monitor *>;
-
-    m_monitors->clear();
-
-    if (class ZMClient *zm = ZMClient::get())
-        zm->getMonitorList(m_monitors);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////

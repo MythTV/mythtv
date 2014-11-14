@@ -21,13 +21,15 @@ class MPUBLIC ZMClient : public QObject
     ZMClient();
 
     static bool m_server_unavailable;
-    static class ZMClient *m_zmclient;
+    static ZMClient *m_zmclient;
 
   public:
     ~ZMClient();
 
-    static class ZMClient *get(void);
+    static ZMClient *get(void);
     static bool setupZMClient (void);
+
+    void customEvent(QEvent *event);
 
     // Used to actually connect to an ZM server
     bool connectToHost(const QString &hostname, unsigned int port);
@@ -40,7 +42,7 @@ class MPUBLIC ZMClient : public QObject
     void shutdown();
 
     void getServerStatus(QString &status, QString &cpuStat, QString &diskStat);
-    void getMonitorStatus(vector<Monitor*> *monitorList);
+    void updateMonitorStatus(void);
     void getEventList(const QString &monitorName, bool oldestFirst,
                       const QString &date, bool includeContinuous, vector<Event*> *eventList);
     void getEventFrame(Event *event, int frameNo, MythImage **image);
@@ -50,18 +52,33 @@ class MPUBLIC ZMClient : public QObject
     void deleteEvent(int eventID);
     void deleteEventList(vector<Event*> *eventList);
 
+    int  getMonitorCount(void);
+    Monitor* getMonitorAt(int pos);
+    Monitor* getMonitorByID(int monID);
+
     void getCameraList(QStringList &cameraList);
-    void getMonitorList(vector<Monitor*> *monitorList);
     void getEventDates(const QString &monitorName, bool oldestFirst, 
                        QStringList &dateList);
     void setMonitorFunction(const int monitorID, const QString &function, const int enabled);
+    bool updateAlarmStates(void);
+
+    bool isMiniPlayerEnabled(void) { return m_isMiniPlayerEnabled; }
+    void setIsMiniPlayerEnabled(bool enabled) { m_isMiniPlayerEnabled = enabled; }
+
+    void saveNotificationMonitors(void);
+    void showMiniPlayer(int monitorID);
 
   private slots:
     void restartConnection(void);  // Try to re-establish the connection to 
                                    // ZMServer every 10 seconds
   private:
+    void doGetMonitorList(void);
     bool readData(unsigned char *data, int dataSize);
     bool sendReceiveStringList(QStringList &strList);
+
+    QMutex              m_listLock;
+    QList<Monitor*>     m_monitorList;
+    QMap<int, Monitor*> m_monitorMap;
 
     MythSocket       *m_socket;
     QMutex            m_socketLock;
@@ -70,6 +87,7 @@ class MPUBLIC ZMClient : public QObject
     bool              m_bConnected;
     QTimer           *m_retryTimer;
     bool              m_zmclientReady;
+    bool              m_isMiniPlayerEnabled;
 };
 
 #endif

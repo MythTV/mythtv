@@ -21,6 +21,9 @@
 #include <QString>
 #include <QDateTime>
 
+// zm
+#include "../mythzmserver/zmserver.h"
+
 /// Event details
 class Event
 {
@@ -90,8 +93,9 @@ class Monitor
 {
   public:
     Monitor() :
-        id(0), enabled(0), events(0),
-        width(0), height(0), bytes_per_pixel(0)
+        id(0), enabled(false), events(0),
+        width(0), height(0), bytes_per_pixel(0),
+        showNotifications(false), state(IDLE)
     {
     }
 
@@ -101,7 +105,7 @@ class Monitor
     QString name;
     QString type;
     QString function;
-    int enabled;
+    bool enabled;
     QString device;
     QString zmcStatus;
     QString zmaStatus;
@@ -111,6 +115,11 @@ class Monitor
     int width;
     int height;
     int bytes_per_pixel;
+    // used by the alarm notiftications
+    bool showNotifications;
+    State state;
 };
+
+Q_DECLARE_METATYPE(Monitor *)
 
 #endif

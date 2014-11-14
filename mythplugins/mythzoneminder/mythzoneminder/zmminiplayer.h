@@ -17,6 +17,9 @@ class MPUBLIC ZMMiniPlayer : public ZMLivePlayer
 
     bool Create(void);
     bool keyPressEvent(QKeyEvent *);
+    void customEvent (QEvent* event);
+
+    void setAlarmMonitor(int monID) { m_alarmMonitor = monID; }
 
   public slots:
     void timerTimeout(void);

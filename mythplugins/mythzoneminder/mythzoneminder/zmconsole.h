@@ -48,6 +48,7 @@ class FunctionDialog : public MythScreenType
     MythUIText       *m_captionText;
     MythUIButtonList *m_functionList;
     MythUICheckBox   *m_enabledCheck;
+    MythUICheckBox   *m_notificationCheck;
     MythUIButton     *m_okButton;
 };
 
@@ -73,8 +74,6 @@ class ZMConsole : public MythScreenType
   private:
     void updateMonitorList();
     void setMonitorFunction(const QString &function, int enabled);
-
-    std::vector<Monitor *> *m_monitorList;
 
     MythUIButtonList  *m_monitor_list;
     MythUIText        *m_running_text;

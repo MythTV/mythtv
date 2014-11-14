@@ -48,6 +48,7 @@ bool FunctionDialog::Create()
     UIUtilE::Assign(this, m_captionText,  "caption_text", &err);
     UIUtilE::Assign(this, m_functionList, "function_list", &err);
     UIUtilE::Assign(this, m_enabledCheck, "enable_check", &err);
+    UIUtilE::Assign(this, m_notificationCheck, "notification_check", &err);
     UIUtilE::Assign(this, m_okButton,     "ok_button", &err);
 
     if (err)
@@ -67,14 +68,18 @@ bool FunctionDialog::Create()
 
     m_captionText->SetText(m_monitor->name);
 
-    m_okButton->SetText(tr("OK"));
-
     connect(m_okButton, SIGNAL(Clicked()), this, SLOT(setMonitorFunction()));
 
     if (m_monitor->enabled)
         m_enabledCheck->SetCheckState(MythUIStateType::Full);
     else
         m_enabledCheck->SetCheckState(MythUIStateType::Off);
+
+
+    if (m_monitor->showNotifications)
+        m_notificationCheck->SetCheckState(MythUIStateType::Full);
+    else
+        m_notificationCheck->SetCheckState(MythUIStateType::Off);
 
     BuildFocusList();
 
@@ -86,13 +91,17 @@ bool FunctionDialog::Create()
 void FunctionDialog::setMonitorFunction(void)
 {
     QString function = m_functionList->GetValue();
-    int enabled = (m_enabledCheck->GetCheckState() == MythUIStateType::Full);
+    bool enabled = (m_enabledCheck->GetCheckState() == MythUIStateType::Full);
+    bool showNotifications = (m_notificationCheck->GetCheckState() == MythUIStateType::Full);
 
     LOG(VB_GENERAL, LOG_INFO,
         "Monitor id : " + QString::number(m_monitor->id) +
         " function change " + m_monitor->function + " -> " + function +
-        ", enable value " + QString::number(m_monitor->enabled) + " -> " +
-        QString::number(enabled));
+        ", enable value " + QString::number(m_monitor->enabled) + " -> " + QString::number(enabled) +
+        ", notification value " + QString::number(m_monitor->showNotifications) + " -> " + QString::number(showNotifications));
+
+    m_monitor->showNotifications = showNotifications;
+    ZMClient::get()->saveNotificationMonitors();
 
     if ((m_monitor->function == function) && (m_monitor->enabled == enabled))
     {
@@ -103,8 +112,7 @@ void FunctionDialog::setMonitorFunction(void)
         return;
     }
 
-    if (class ZMClient *zm = ZMClient::get())
-        zm->setMonitorFunction(m_monitor->id, function, enabled);
+    ZMClient::get()->setMonitorFunction(m_monitor->id, function, enabled);
 
     emit haveResult(true);
 
@@ -115,7 +123,6 @@ void FunctionDialog::setMonitorFunction(void)
 
 ZMConsole::ZMConsole(MythScreenStack *parent)
           :MythScreenType(parent, "zmconsole"),
-           m_monitorList(NULL),
            m_monitor_list(NULL), m_running_text(NULL), m_status_text(NULL),
            m_time_text(NULL), m_date_text(NULL), m_load_text(NULL),
            m_disk_text(NULL), m_functionDialog(NULL),
@@ -134,9 +141,6 @@ ZMConsole::ZMConsole(MythScreenStack *parent)
 ZMConsole::~ZMConsole()
 {
     delete m_timeTimer;
-
-    if (m_monitorList)
-        delete m_monitorList;
 }
 
 bool ZMConsole::Create(void)
@@ -198,36 +202,26 @@ void ZMConsole::updateStatus()
 
 void ZMConsole::getDaemonStatus(void)
 {
-    if (class ZMClient *zm = ZMClient::get())
+    ZMClient::get()->getServerStatus(m_daemonStatus, m_cpuStat, m_diskStat);
+
+    if (m_daemonStatus.left(7) == "running")
     {
-        zm->getServerStatus(m_daemonStatus, m_cpuStat, m_diskStat);
-
-        if (m_daemonStatus.left(7) == "running")
-        {
-            m_status_text->SetFontState("running");
-            m_status_text->SetText(tr("Running"));
-        }
-        else
-        {
-            m_status_text->SetFontState("stopped");
-            m_status_text->SetText(tr("Stopped"));
-        }
-
-        m_load_text->SetText("Load: " + m_cpuStat);
-        m_disk_text->SetText("Disk: " + m_diskStat);
+        m_status_text->SetFontState("running");
+        m_status_text->SetText(tr("Running"));
     }
+    else
+    {
+        m_status_text->SetFontState("stopped");
+        m_status_text->SetText(tr("Stopped"));
+    }
+
+    m_load_text->SetText("Load: " + m_cpuStat);
+    m_disk_text->SetText("Disk: " + m_diskStat);
 }
 
 void ZMConsole::getMonitorStatus(void)
 {
-    if (!m_monitorList)
-        m_monitorList = new vector<Monitor*>;
-
-    if (class ZMClient *zm = ZMClient::get())
-    {
-        zm->getMonitorStatus(m_monitorList);
-        updateMonitorList();
-    }
+    updateMonitorList();
 }
 
 bool ZMConsole::keyPressEvent(QKeyEvent *event)
@@ -262,10 +256,7 @@ void ZMConsole::showEditFunctionPopup()
 {
     Monitor *currentMonitor = NULL;
 
-    int pos = m_monitor_list->GetCurrentPos();
-
-    if (pos >= 0 && pos < (int) m_monitorList->size())
-        currentMonitor = m_monitorList->at(pos);
+    currentMonitor = qVariantValue<Monitor*> (m_monitor_list->GetItemCurrent()->GetData());
 
     if (!currentMonitor)
         return;
@@ -282,19 +273,25 @@ void ZMConsole::showEditFunctionPopup()
 
 void ZMConsole::updateMonitorList()
 {
+    ZMClient::get()->updateMonitorStatus();
+
     int pos = m_monitor_list->GetCurrentPos();
     m_monitor_list->Reset();
 
-    for (uint x = 0; x < m_monitorList->size(); x++)
+    for (int x = 0; x < ZMClient::get()->getMonitorCount(); x++)
     {
-        Monitor *monitor = m_monitorList->at(x);
+        Monitor *monitor = ZMClient::get()->getMonitorAt(x);
 
-        MythUIButtonListItem *item = new MythUIButtonListItem(m_monitor_list,
+        if (monitor)
+        {
+            MythUIButtonListItem *item = new MythUIButtonListItem(m_monitor_list,
                 "", NULL, true, MythUIButtonListItem::NotChecked);
-        item->SetText(monitor->name, "name");
-        item->SetText(monitor->zmcStatus, "zmcstatus");
-        item->SetText(monitor->zmaStatus, "zmastatus");
-        item->SetText(QString("%1").arg(monitor->events), "eventcount");
+            item->SetData(qVariantFromValue(monitor));
+            item->SetText(monitor->name, "name");
+            item->SetText(monitor->zmcStatus, "zmcstatus");
+            item->SetText(monitor->zmaStatus, "zmastatus");
+            item->SetText(QString("%1").arg(monitor->events), "eventcount");
+        }
     }
 
     m_monitor_list->SetItemCurrent(pos);

@@ -89,9 +89,9 @@ class ZMLivePlayer : public MythScreenType
     int                   m_monitorCount;
 
     vector<Player *>     *m_players;
-    vector<Monitor *>    *m_monitors;
 
     bool                  m_isMiniPlayer;
+    int                   m_alarmMonitor;
 };
 
 #endif

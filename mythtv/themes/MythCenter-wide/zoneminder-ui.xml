@@ -30,13 +30,24 @@
         </checkbox>
 
         <textarea name="enable_text" from="basetextarea">
-            <area>130,270,200,30</area>
+            <area>130,270,250,30</area>
             <align>left,vcenter</align>
             <value>Enabled</value>
         </textarea>
 
+        <checkbox name="notification_check" from="basecheckbox">
+            <position>90,310</position>
+        </checkbox>
+
+        <textarea name="notification_text" from="basetextarea">
+            <area>130,310,250,30</area>
+            <align>left,vcenter</align>
+            <value>Show  Notifications</value>
+        </textarea>
+
         <button name="ok_button" from="basebutton">
-            <position>125,350</position>
+            <position>125,365</position>
+            <value>OK</value>
         </button>
     </window>
 
