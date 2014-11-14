@@ -1,0 +1,68 @@
+// Qt headers
+
+// MythTV headers
+#include <mythcontext.h>
+
+// MythZoneMinder headers
+#include "alarmnotifythread.h"
+#include "zmclient.h"
+#include "zmdefines.h"
+
+class AlarmNotifyThread *AlarmNotifyThread::m_alarmNotifyThread = NULL;
+
+class AlarmNotifyThread *AlarmNotifyThread::get(void)
+{
+    if (m_alarmNotifyThread == NULL)
+        m_alarmNotifyThread = new AlarmNotifyThread;
+    return m_alarmNotifyThread;
+}
+
+AlarmNotifyThread::AlarmNotifyThread(): MThread("AlarmNotifyThread")
+{
+    m_stop = false;
+}
+
+AlarmNotifyThread::~AlarmNotifyThread()
+{
+    stop();
+}
+
+void AlarmNotifyThread::stop (void)
+{
+    if (isRunning())
+    {
+        m_stop = true;
+        wait();
+    }
+}
+
+void AlarmNotifyThread::run()
+{
+    RunProlog();
+
+    while (!m_stop)
+    {
+        // get the alarm status for all monitors
+        ZMClient::get()->updateAlarmStates();
+
+        for (int x = 0; x < ZMClient::get()->getMonitorCount(); x++)
+        {
+            Monitor *mon = ZMClient::get()->getMonitorAt(x);
+
+            if (mon->state == ALERT || mon->state == ALARM)
+            {
+                // have notifications been turned on for this monitor?
+                if (mon->showNotifications)
+                {
+                    // we can't show a popup from the AlarmNotifyThread so send
+                    // a message to ZMClient to do it for us
+                    gCoreContext->dispatch(MythEvent(QString("ZONEMINDER_NOTIFICATION %1").arg(mon->id)));
+                }
+            }
+        }
+
+        usleep(1000000);
+    }
+
+    RunEpilog();
+}
