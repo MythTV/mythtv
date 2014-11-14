@@ -3,22 +3,16 @@
 <mythuitheme>
 
     <window name="functionpopup">
-        <fontdef name="title" from="basesmall">
-            <color>#ffff00</color>
-            <size>14</size>
-            <weight>bold</weight>
-        </fontdef>
-
-        <area>-1,-1,413,426</area>
+        <area>-1,-1,413,466</area>
 
         <imagetype name="backimg">
-            <area>0,0,413,426</area>
+            <area>0,0,413,466</area>
             <filename>mythdialogbox-background.png</filename>
         </imagetype>
 
         <textarea name="title" from="basetextarea">
             <area>20,20,360,40</area>
-            <font>title</font>
+            <font>baselarge</font>
             <align>hcenter,top</align>
             <value>Edit Monitor Function</value>
         </textarea>
@@ -42,8 +36,19 @@
             <value>Enabled</value>
         </textarea>
 
+        <checkbox name="notification_check" from="basecheckbox">
+            <position>90,310</position>
+        </checkbox>
+
+        <textarea name="notification_text" from="basetextarea">
+            <area>130,310,260,30</area>
+            <align>left,vcenter</align>
+            <value>Show  Notifications</value>
+        </textarea>
+
         <button name="ok_button" from="basebutton">
-            <position>125,350</position>
+            <position>125,390</position>
+            <value>OK</value>
         </button>
     </window>
 
