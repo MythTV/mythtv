@@ -91,7 +91,7 @@ class MUI_PUBLIC MythUIHelper
 
     void ThemeWidget(QWidget *widget);
 
-    QString FindThemeDir(const QString &themename);
+    QString FindThemeDir(const QString &themename, bool doFallback = true);
     QString FindMenuThemeDir(const QString &menuname);
     QString GetThemeDir(void);
     QString GetThemeName(void);

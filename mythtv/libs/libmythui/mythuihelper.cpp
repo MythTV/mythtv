@@ -145,6 +145,8 @@ public:
     MythUIHelper *parent;
 
     int m_fontStretch;
+
+    QStringList m_searchPaths;
 };
 
 int MythUIHelperPrivate::x_override = -1;
@@ -498,6 +500,7 @@ void MythUIHelper::LoadQtConfig(void)
     // Recalculate GUI dimensions
     d->StoreGUIsettings();
 
+    d->m_searchPaths.clear();
     d->m_themepathname = themedir + '/';
 
     themedir += "/qtlook.txt";
@@ -1015,7 +1018,7 @@ bool MythUIHelper::IsGeometryOverridden(void)
  *  \param themename The theme name.
  *  \return Path to theme or empty string.
  */
-QString MythUIHelper::FindThemeDir(const QString &themename)
+QString MythUIHelper::FindThemeDir(const QString &themename, bool doFallback)
 {
     QString testdir;
     QDir dir;
@@ -1038,6 +1041,9 @@ QString MythUIHelper::FindThemeDir(const QString &themename)
         LOG(VB_GENERAL, LOG_WARNING, LOC + QString("No theme dir: '%1'")
             .arg(dir.absolutePath()));
     }
+
+    if (!doFallback)
+        return QString();
 
     testdir = GetThemesParentDir() + DEFAULT_UI_THEME;
     dir.setPath(testdir);
@@ -1135,16 +1141,57 @@ QString MythUIHelper::GetThemeName(void)
 
 QStringList MythUIHelper::GetThemeSearchPath(void)
 {
-    QStringList searchpath;
+    if (!d->m_searchPaths.isEmpty())
+        return d->m_searchPaths;
 
-    searchpath.append(GetThemeDir());
+    // traverse up the theme inheritance list adding their location to the search path
+    QList<ThemeInfo> themeList = GetThemes(THEME_UI);
+    bool found = true;
+    QString themeName = d->m_themename;
+    QString baseName;
+
+    while (found && !themeName.isEmpty())
+    {
+        // find the ThemeInfo for this theme
+        found = false;
+        baseName = "";
+
+        for (int x = 0; x < themeList.count(); x++)
+        {
+            if (themeList.at(x).GetName() == themeName)
+            {
+                found = true;
+                baseName = themeList.at(x).GetBaseTheme();
+                break;
+            }
+        }
+
+        // try to find where the theme is installed
+        if (found)
+        {
+            QString themedir = FindThemeDir(themeName, false);
+            if (!themedir.isEmpty())
+            {
+                LOG(VB_GUI, LOG_INFO, LOC + QString("Adding path '%1' to theme search paths").arg(themedir));
+                d->m_searchPaths.append(themedir + '/');
+            }
+            else
+                LOG(VB_GENERAL, LOG_ERR, LOC + QString("Could not find ui theme location: %1").arg(themedir));
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("Could not find inherited theme: %1").arg(themeName));
+        }
+
+        themeName = baseName;
+    }
 
     if (d->m_isWide)
-        searchpath.append(GetThemesParentDir() + "default-wide/");
+        d->m_searchPaths.append(GetThemesParentDir() + "default-wide/");
 
-    searchpath.append(GetThemesParentDir() + "default/");
-    searchpath.append("/tmp/");
-    return searchpath;
+    d->m_searchPaths.append(GetThemesParentDir() + "default/");
+    d->m_searchPaths.append("/tmp/");
+    return d->m_searchPaths;
 }
 
 QList<ThemeInfo> MythUIHelper::GetThemes(ThemeType type)
