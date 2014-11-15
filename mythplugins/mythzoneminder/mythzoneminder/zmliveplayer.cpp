@@ -41,6 +41,7 @@ ZMLivePlayer::ZMLivePlayer(MythScreenStack *parent, bool isMiniPlayer)
     ZMClient::get()->setIsMiniPlayerEnabled(false);
 
     GetMythUI()->DoDisableScreensaver();
+    GetMythMainWindow()->PauseIdleTimer(true);
 
     connect(m_frameTimer, SIGNAL(timeout()), this,
             SLOT(updateFrame()));
@@ -162,6 +163,7 @@ ZMLivePlayer::~ZMLivePlayer()
     gCoreContext->SaveSetting("ZoneMinderLiveLayout", m_monitorLayout);
 
     GetMythUI()->DoRestoreScreensaver();
+    GetMythMainWindow()->PauseIdleTimer(false);
 
     if (m_players)
     {
