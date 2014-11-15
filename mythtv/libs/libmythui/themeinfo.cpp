@@ -99,6 +99,10 @@ bool ThemeInfo::parseThemeInfo()
             {
                 m_name = getFirstText(e);
             }
+            else if (e.tagName() == "basetheme")
+            {
+                m_baseTheme = getFirstText(e);
+            }
             else if (e.tagName() == "aspect")
             {
                 m_aspect = getFirstText(e);
@@ -243,6 +247,7 @@ void ThemeInfo::ToMap(InfoMap &infoMap) const
 {
     infoMap["description"] = m_description;
     infoMap["name"] = m_name;
+    infoMap["basetheme"] = m_baseTheme;
     infoMap["aspect"] = m_aspect;
     infoMap["resolution"] = QString("%1x%2").arg(m_baseres.width())
                                             .arg(m_baseres.height());

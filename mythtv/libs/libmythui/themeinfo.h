@@ -28,6 +28,7 @@ class MUI_PUBLIC ThemeInfo : public XMLParseBase
     QString GetAspect() const { return m_aspect; }
     const QSize   *GetBaseRes() const { return &m_baseres; }
     QString GetName() const { return m_name; }
+    QString GetBaseTheme() const { return m_baseTheme; }
     QString GetDescription() const { return m_description; }
     QString GetErrata() const { return m_errata; }
     QString GetPreviewPath() const { return m_previewpath; }
@@ -48,6 +49,7 @@ class MUI_PUBLIC ThemeInfo : public XMLParseBase
 
     QString   m_themeurl;
     QFileInfo m_theme;
+    QString   m_baseTheme;
     int       m_type;
     QString   m_aspect;
     QSize     m_baseres;
