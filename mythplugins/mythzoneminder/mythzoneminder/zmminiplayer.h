@@ -26,7 +26,6 @@ class MPUBLIC ZMMiniPlayer : public ZMLivePlayer
 
   private:
     QTimer *m_displayTimer;
-    QTimer *m_frameTimer;
 
     MythUIText  *m_monitorText;
     MythUIText  *m_statusText;
