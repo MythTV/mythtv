@@ -1291,8 +1291,10 @@ void MythUIHelper::ThemeWidget(QWidget *widget)
 
     if (!d->m_qtThemeSettings->GetSetting("BackgroundPixmap").isEmpty())
     {
-        QString pmapname = d->m_themepathname +
-                           d->m_qtThemeSettings->GetSetting("BackgroundPixmap");
+        QString pmapname = d->m_qtThemeSettings->GetSetting("BackgroundPixmap");
+        if (!FindThemeFile(pmapname))
+            LOG(VB_GENERAL, LOG_ERR, QString(LOC + "Failed to find '%1' in the theme search path")
+                .arg(d->m_qtThemeSettings->GetSetting("BackgroundPixmap")));
 
         bgpixmap = LoadScalePixmap(pmapname);
 
@@ -1305,8 +1307,11 @@ void MythUIHelper::ThemeWidget(QWidget *widget)
     else if (!d->m_qtThemeSettings
              ->GetSetting("TiledBackgroundPixmap").isEmpty())
     {
-        QString pmapname = d->m_themepathname +
-                           d->m_qtThemeSettings->GetSetting("TiledBackgroundPixmap");
+        QString pmapname = d->m_qtThemeSettings->GetSetting("TiledBackgroundPixmap");
+
+        if (!FindThemeFile(pmapname))
+            LOG(VB_GENERAL, LOG_ERR, QString(LOC + "Failed to find '%1' in the theme search path")
+                .arg(d->m_qtThemeSettings->GetSetting("TiledBackgroundPixmap")));
 
         int width, height;
         float wmult, hmult;
