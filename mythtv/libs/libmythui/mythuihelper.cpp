@@ -500,11 +500,14 @@ void MythUIHelper::LoadQtConfig(void)
     // Recalculate GUI dimensions
     d->StoreGUIsettings();
 
-    d->m_searchPaths.clear();
     d->m_themepathname = themedir + '/';
+    d->m_searchPaths.clear();
 
-    themedir += "/qtlook.txt";
-    d->m_qtThemeSettings->ReadSettings(themedir);
+    QString qtlook = "qtlook.txt";
+    if (!FindThemeFile(qtlook))
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to find any qtlook.txt in the theme search path");
+
+    d->m_qtThemeSettings->ReadSettings(qtlook);
     d->m_themeloaded = false;
 
     themename = GetMythDB()->GetSetting("MenuTheme", "defaultmenu");
