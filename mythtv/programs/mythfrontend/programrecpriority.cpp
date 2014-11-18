@@ -1485,7 +1485,10 @@ void ProgramRecPriority::UpdateList()
         QString channame = progInfo->channame;
         QString channum = progInfo->chanstr;
         QString callsign = progInfo->chansign;
-        if (!(progInfo->GetRecordingRule()->m_filter & 1024) &&
+        if (progInfo->recType != kSingleRecord &&
+            progInfo->recType != kOverrideRecord &&
+            progInfo->recType != kDontRecord &&
+            !(progInfo->GetRecordingRule()->m_filter & 1024) &&
             progInfo->GetRecordingRule()->m_searchType != kManualSearch)
         {
             channame = tr("Any");
@@ -1597,7 +1600,10 @@ void ProgramRecPriority::updateInfo(MythUIButtonListItem *item)
         QString channame = pgRecInfo->channame;
         QString channum = pgRecInfo->chanstr;
         QString callsign = pgRecInfo->chansign;
-        if (!(pgRecInfo->GetRecordingRule()->m_filter & 1024) &&
+        if (pgRecInfo->recType != kSingleRecord &&
+            pgRecInfo->recType != kOverrideRecord &&
+            pgRecInfo->recType != kDontRecord &&
+            !(pgRecInfo->GetRecordingRule()->m_filter & 1024) &&
             pgRecInfo->GetRecordingRule()->m_searchType != kManualSearch)
         {
             channame = tr("Any");
