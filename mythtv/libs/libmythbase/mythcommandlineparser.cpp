@@ -2434,7 +2434,6 @@ void MythCommandLineParser::addLogging(
             "existing system logging daemon, or --logpath to specify a "
             "dirctory for MythTV to write its logs to.", "0.25");
     add("--nologserver", "nologserver", false, "Disable all logging but console.", "")
-                ->SetBlocks(QStringList() << "logpath" << "syslog" << "enabledblog")
                 ->SetGroup("Logging");
 }
 
