@@ -1152,12 +1152,14 @@ QStringList MythUIHelper::GetThemeSearchPath(void)
     bool found = true;
     QString themeName = d->m_themename;
     QString baseName;
+    QString dirName;
 
     while (found && !themeName.isEmpty())
     {
         // find the ThemeInfo for this theme
         found = false;
         baseName = "";
+        dirName = "";
 
         for (int x = 0; x < themeList.count(); x++)
         {
@@ -1165,6 +1167,7 @@ QStringList MythUIHelper::GetThemeSearchPath(void)
             {
                 found = true;
                 baseName = themeList.at(x).GetBaseTheme();
+                dirName = themeList.at(x).GetDirectoryName();
                 break;
             }
         }
@@ -1172,7 +1175,7 @@ QStringList MythUIHelper::GetThemeSearchPath(void)
         // try to find where the theme is installed
         if (found)
         {
-            QString themedir = FindThemeDir(themeName, false);
+            QString themedir = FindThemeDir(dirName, false);
             if (!themedir.isEmpty())
             {
                 LOG(VB_GUI, LOG_INFO, LOC + QString("Adding path '%1' to theme search paths").arg(themedir));
