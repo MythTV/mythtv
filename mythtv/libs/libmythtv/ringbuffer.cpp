@@ -186,7 +186,11 @@ RingBuffer *RingBuffer::Create(
     if (!mythurl && lower.endsWith(".vob") && lfilename.contains("/VIDEO_TS/"))
     {
         LOG(VB_PLAYBACK, LOG_INFO, "DVD VOB at " + lfilename);
-        return new DVDStream(lfilename);
+        DVDStream *s = new DVDStream(lfilename);
+        if (s && s->IsOpen())
+            return s;
+
+        delete s;
     }
 
     return new FileRingBuffer(
