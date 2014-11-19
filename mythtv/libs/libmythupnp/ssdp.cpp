@@ -325,7 +325,8 @@ void SSDP::ProcessData( MSocketDevice *pSocket )
     //
     // TODO: We may want to restrict this to the same subnet as the server
     //       for added security
-    if (((peerAddress.protocol() == QAbstractSocket::IPv4Protocol) &&
+    if (!peerAddress.isNull() && (peerAddress != QHostAddress::Null) &&
+        ((peerAddress.protocol() == QAbstractSocket::IPv4Protocol) &&
             (!peerAddress.isInSubnet(QHostAddress("172.16.0.0"), 12) &&
             !peerAddress.isInSubnet(QHostAddress("192.168.0.0"), 16) &&
             !peerAddress.isInSubnet(QHostAddress("10.0.0.0"), 8))) ||
