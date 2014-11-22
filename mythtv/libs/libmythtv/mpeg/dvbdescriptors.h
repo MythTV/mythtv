@@ -79,6 +79,32 @@ class NetworkNameDescriptor : public MPEGDescriptor
     QString toString(void) const
         { return QString("NetworkNameDescriptor: ")+Name(); }
 };
+// UPC Cablecom
+class SubTitleUPCCablecomDescriptor : public MPEGDescriptor
+{
+  public:
+    SubTitleUPCCablecomDescriptor(const unsigned char *data, int len = 300) :
+         MPEGDescriptor(data, len, 0xa7) { }
+    //       Name             bits  loc  expected value
+    // descriptor_tag           8   0.0       0xa7
+    // descriptor_length        8   1.0
+    uint Count(void) const { return DescriptorLength(); }
+
+    // for (i=0; i<N; i++)
+    // {
+    //   country_code           3
+    //   unknown                1
+    //   subtitle              31
+
+    uint UPCCablecomDescriptorSubTitleLength(void) const 
+         { return _data[1] - 4; }
+    // for (i=0;i<N;I++) { char 8 }
+    QString SubTitleUPCCablecomCountryCode(void) const { return dvb_decode_text(_data + 2, 3); }
+    QString SubTitleUPCCablecomSubTitle(void) const
+    {
+         return dvb_decode_text(_data + 5, UPCCablecomDescriptorSubTitleLength()+1);
+    }
+};
 
 // DVB Bluebook A038 (Sept 2011) p 63
 class LinkageDescriptor : public MPEGDescriptor
