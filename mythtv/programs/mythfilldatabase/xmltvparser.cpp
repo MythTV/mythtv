@@ -374,12 +374,20 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
                 // In the case of uk_rt it's not unknown for a recommendation
                 // to be given to programmes which are 'so bad, you have to
                 // watch!'
+                //
+                // XMLTV uses zero based ratings and signals no rating by absence.
+                // A rating from 1 to 5 is encoded as 0/4 to 4/4.
+                // MythTV uses zero to signal no rating!
+                // The same rating is encoded as 0.2 to 1.0 with steps of 0.2, it
+                // is not encoded as 0.0 to 1.0 with steps of 0.25 because
+                // 0 signals no rating!
+                // See http://xmltv.cvs.sourceforge.net/viewvc/xmltv/xmltv/xmltv.dtd?revision=1.47&view=markup#l539
                 item = values.item(0).toElement();
                 if (!item.isNull())
                 {
                     stars = getFirstText(item);
-                    num = stars.section('/', 0, 0);
-                    den = stars.section('/', 1, 1);
+                    num = stars.section('/', 0, 0) + 1;
+                    den = stars.section('/', 1, 1) + 1;
                     if (0.0 < den.toFloat())
                         rating = num.toFloat()/den.toFloat();
                 }
