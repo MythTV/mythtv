@@ -33,6 +33,7 @@ class ExternIO
     QString ErrorString(void) const { return m_error; }
 
   private:
+    bool KillIfRunning(const QString & cmd);
     void Fork(void);
 
     QFileInfo   m_app;
