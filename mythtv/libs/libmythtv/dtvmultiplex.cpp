@@ -111,7 +111,8 @@ bool DTVMultiplex::IsEqual(DTVTunerType type, const DTVMultiplex &other,
             (modulation == other.modulation);
     }
 
-    if (DTVTunerType::kTunerTypeDVBT == type)
+    if ((DTVTunerType::kTunerTypeDVBT == type) ||
+        (DTVTunerType::kTunerTypeDVBT2 == type))
     {
         if (fuzzy)
             return
@@ -122,7 +123,8 @@ bool DTVMultiplex::IsEqual(DTVTunerType type, const DTVMultiplex &other,
                 modulation.IsCompatible(other.modulation)         &&
                 guard_interval.IsCompatible(other.guard_interval) &&
                 trans_mode.IsCompatible(other.trans_mode)         &&
-                hierarchy.IsCompatible(other.hierarchy);
+                hierarchy.IsCompatible(other.hierarchy)           &&
+                (mod_sys == other.mod_sys);
         return
             (inversion      == other.inversion)      &&
             (bandwidth      == other.bandwidth)      &&
@@ -131,7 +133,8 @@ bool DTVMultiplex::IsEqual(DTVTunerType type, const DTVMultiplex &other,
             (modulation     == other.modulation)     &&
             (guard_interval == other.guard_interval) &&
             (trans_mode     == other.trans_mode)     &&
-            (hierarchy      == other.hierarchy);
+            (hierarchy      == other.hierarchy)      &&
+            (mod_sys        == other.mod_sys);
     }
 
     if (DTVTunerType::kTunerTypeATSC == type)
@@ -295,6 +298,38 @@ bool DTVMultiplex::ParseDVB_S2(
     return ok;
 }
 
+bool DTVMultiplex::ParseDVB_T2(
+    const QString &_frequency,   const QString &_inversion,
+    const QString &_bandwidth,   const QString &_coderate_hp,
+    const QString &_coderate_lp, const QString &_modulation,
+    const QString &_trans_mode,  const QString &_guard_interval,
+    const QString &_hierarchy,   const QString &_mod_sys)
+{
+    bool ok = ParseDVB_T(_frequency, _inversion, _bandwidth,
+                         _coderate_hp, _coderate_lp, _modulation,
+                         _trans_mode, _guard_interval, _hierarchy);
+
+    if (!mod_sys.Parse(_mod_sys))
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Invalid T2 modulation system " +
+                QString("parameter '%1', aborting.").arg(_mod_sys));
+        return false;
+    }
+
+    if (mod_sys == DTVModulationSystem::kModulationSystem_UNDEFINED)
+        mod_sys = DTVModulationSystem::kModulationSystem_DVBT;
+
+    if ((DTVModulationSystem::kModulationSystem_DVBT  != mod_sys) &&
+        (DTVModulationSystem::kModulationSystem_DVBT2 != mod_sys))
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Unsupported T2 modulation system " +
+            QString("parameter '%1', aborting.").arg(_mod_sys));
+        return false;
+    }
+
+    return ok;
+}
+
 bool DTVMultiplex::ParseTuningParams(
     DTVTunerType type,
     QString _frequency,    QString _inversion,      QString _symbolrate,
@@ -326,6 +361,14 @@ bool DTVMultiplex::ParseTuningParams(
             _frequency,       _inversion,     _symbolrate,
             _fec,             _modulation,    _polarity,
             _mod_sys,         _rolloff);
+    }
+
+    if (DTVTunerType::kTunerTypeDVBT2 == type)
+    {
+        return ParseDVB_T2(
+            _frequency,       _inversion,       _bandwidth,    _hp_code_rate,
+            _lp_code_rate,    _ofdm_modulation, _trans_mode,   _guard_interval,
+            _hierarchy, _mod_sys);
     }
 
     if (DTVTunerType::kTunerTypeATSC == type)
@@ -396,17 +439,27 @@ bool DTVMultiplex::FillFromDeliverySystemDesc(DTVTunerType type,
     {
         case DescriptorID::terrestrial_delivery_system:
         {
-            if (type != DTVTunerType::kTunerTypeDVBT)
-                break;
-
             const TerrestrialDeliverySystemDescriptor cd(desc);
 
-            return ParseDVB_T(
-                QString::number(cd.FrequencyHz()), "a",
-                cd.BandwidthString(),               cd.CodeRateHPString(),
-                cd.CodeRateLPString(),              cd.ConstellationString(),
-                cd.TransmissionModeString(),        cd.GuardIntervalString(),
-                cd.HierarchyString());
+            if (type == DTVTunerType::kTunerTypeDVBT)
+            {
+                return ParseDVB_T(
+                    QString::number(cd.FrequencyHz()), "a",
+                    cd.BandwidthString(),               cd.CodeRateHPString(),
+                    cd.CodeRateLPString(),              cd.ConstellationString(),
+                    cd.TransmissionModeString(),        cd.GuardIntervalString(),
+                    cd.HierarchyString());
+            }
+
+            if (type == DTVTunerType::kTunerTypeDVBT2)
+            {
+                return ParseDVB_T2(
+                    QString::number(cd.FrequencyHz()), "a",
+                    cd.BandwidthString(),               cd.CodeRateHPString(),
+                    cd.CodeRateLPString(),              cd.ConstellationString(),
+                    cd.TransmissionModeString(),        cd.GuardIntervalString(),
+                    cd.HierarchyString(), "");
+            }
         }
         case DescriptorID::satellite_delivery_system:
         {
