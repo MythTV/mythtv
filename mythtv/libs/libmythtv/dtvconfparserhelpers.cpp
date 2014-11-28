@@ -42,6 +42,7 @@ const int DTVTunerType::kTunerTypeDVBS1   = 0x0000;
 const int DTVTunerType::kTunerTypeDVBS2   = 0x0020;
 const int DTVTunerType::kTunerTypeDVBC    = 0x0001;
 const int DTVTunerType::kTunerTypeDVBT    = 0x0002;
+const int DTVTunerType::kTunerTypeDVBT2   = 0x0022;
 const int DTVTunerType::kTunerTypeATSC    = 0x0003;
 const int DTVTunerType::kTunerTypeASI     = 0x1000;
 const int DTVTunerType::kTunerTypeOCUR    = 0x2000;
@@ -55,6 +56,7 @@ void DTVTunerType::initStr(void)
     QMutexLocker locker(&dtv_tt_canonical_str_lock);
     dtv_tt_canonical_str[kTunerTypeATSC]    = "ATSC";
     dtv_tt_canonical_str[kTunerTypeDVBT]    = "OFDM";
+    dtv_tt_canonical_str[kTunerTypeDVBT2]   = "DVB_T2";
     dtv_tt_canonical_str[kTunerTypeDVBC]    = "QAM";
     dtv_tt_canonical_str[kTunerTypeDVBS1]   = "QPSK";
     dtv_tt_canonical_str[kTunerTypeDVBS2]   = "DVB_S2";
@@ -77,6 +79,7 @@ const DTVParamHelperStruct DTVTunerType::parseTable[] =
     { "QPSK",    kTunerTypeDVBS1   },
     { "QAM",     kTunerTypeDVBC    },
     { "OFDM",    kTunerTypeDVBT    },
+    { "DVB_T2",  kTunerTypeDVBT2   },
     { "ATSC",    kTunerTypeATSC    },
     { "DVB_S2",  kTunerTypeDVBS2   },
     { "ASI",     kTunerTypeASI     },
@@ -448,6 +451,7 @@ const DTVParamHelperStruct DTVModulationSystem::confTable[] =
     { "SYS_DVBC_ANNEX_AC", kModulationSystem_DVBC_ANNEX_AC },
     { "SYS_DVBC_ANNEX_B",  kModulationSystem_DVBC_ANNEX_B  },
     { "SYS_DVBT",          kModulationSystem_DVBT          },
+    { "SYS_DVBT2",         kModulationSystem_DVBT2         },
     { "SYS_DSS",           kModulationSystem_DSS           },
     { "SYS_DVBS",          kModulationSystem_DVBS          },
     { "SYS_DVBS2",         kModulationSystem_DVBS2         },
@@ -476,6 +480,7 @@ const DTVParamHelperStruct DTVModulationSystem::parseTable[] =
     { "DVBC_AC",   kModulationSystem_DVBC_ANNEX_AC },
     { "DVBC_B",    kModulationSystem_DVBC_ANNEX_B  },
     { "DVBT",      kModulationSystem_DVBT          },
+    { "DVB-T2",    kModulationSystem_DVBT2         },
     { "DSS",       kModulationSystem_DSS           },
     { "DVB-S",     kModulationSystem_DVBS          },
     { "DVB-S2",    kModulationSystem_DVBS2         },
@@ -509,6 +514,7 @@ const char *DTVModulationSystem::dbStr[DTVModulationSystem::kDBStrCnt] =
     "DMBTH",     ///< kModulationSystem_DMBTH
     "CMMB",      ///< kModulationSystem_CMMB
     "DAB",       ///< kModulationSystem_DAB
+    "DVB-T2",    ///< kModulationSystem_DVBT2
 };
 
 const DTVParamHelperStruct DTVRollOff::confTable[] =
