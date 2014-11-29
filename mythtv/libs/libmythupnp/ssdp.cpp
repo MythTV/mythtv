@@ -325,22 +325,22 @@ void SSDP::ProcessData( MSocketDevice *pSocket )
     //
     // TODO: We may want to restrict this to the same subnet as the server
     //       for added security
-    if (!peerAddress.isNull() && (peerAddress != QHostAddress::Null) &&
-        ((peerAddress.protocol() == QAbstractSocket::IPv4Protocol) &&
-            (!peerAddress.isInSubnet(QHostAddress("172.16.0.0"), 12) &&
-            !peerAddress.isInSubnet(QHostAddress("192.168.0.0"), 16) &&
-            !peerAddress.isInSubnet(QHostAddress("10.0.0.0"), 8))) ||
-        ((peerAddress.protocol() == QAbstractSocket::IPv6Protocol) &&
-            !peerAddress.isInSubnet(pSocket->address(), 64))) // default subnet size is assumed to be /64
-    {
-        LOG(VB_GENERAL, LOG_CRIT, QString("SSDP Request from WAN IP "
-                                            "address (%1). Possible SSDP "
-                                            "Reflection attempt. Ignoring as "
-                                            "security risk.")
-                                                .arg(peerAddress.toString()));
-        pSocket->readAll(); // Discard the data in the socket buffer
-        return;
-    }
+//     if (!peerAddress.isNull() && (peerAddress != QHostAddress::Null) &&
+//         ((peerAddress.protocol() == QAbstractSocket::IPv4Protocol) &&
+//             (!peerAddress.isInSubnet(QHostAddress("172.16.0.0"), 12) &&
+//             !peerAddress.isInSubnet(QHostAddress("192.168.0.0"), 16) &&
+//             !peerAddress.isInSubnet(QHostAddress("10.0.0.0"), 8))) ||
+//         ((peerAddress.protocol() == QAbstractSocket::IPv6Protocol) &&
+//             !peerAddress.isInSubnet(pSocket->address(), 64))) // default subnet size is assumed to be /64
+//     {
+//         LOG(VB_GENERAL, LOG_CRIT, QString("SSDP Request from WAN IP "
+//                                             "address (%1). Possible SSDP "
+//                                             "Reflection attempt. Ignoring as "
+//                                             "security risk.")
+//                                                 .arg(peerAddress.toString()));
+//         pSocket->readAll(); // Discard the data in the socket buffer
+//         return;
+//     }
 
     QByteArray buffer;
     long nBytes = 0;
