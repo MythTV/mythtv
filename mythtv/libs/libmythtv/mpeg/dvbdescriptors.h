@@ -383,8 +383,9 @@ class ComponentDescriptor : public MPEGDescriptor
 
     bool IsVideo(void) const
     {
-        return 0x1 == StreamContent() ||
-               0x5 == StreamContent();
+        return 0x1 == StreamContent() || // MPEG-2
+               0x5 == StreamContent() || // H.264
+               0x9 == StreamContent();   // HEVC
     }
     bool IsAudio(void) const
     {
@@ -407,6 +408,8 @@ class ComponentDescriptor : public MPEGDescriptor
             return MPEG2Properties();
         if (0x5 == StreamContent())
             return VID_AVC | AVCProperties();
+        if (0x9 == StreamContent())
+            return /* VID_HEVC | */ HEVCProperties();
 
         return VID_UNKNOWN;
     }
@@ -442,6 +445,20 @@ class ComponentDescriptor : public MPEGDescriptor
             case 0x80: case 0x81:
             case 0x82: case 0x83:
                 return VID_WIDESCREEN | VID_HDTV | VID_3DTV;
+            default:
+                return VID_UNKNOWN;
+        }
+    }
+
+    unsigned char HEVCProperties(void) const
+    {
+        switch(ComponentType())
+        {
+            case 0x0: case 0x1:
+            case 0x2: case 0x3:
+                return VID_HDTV;
+            case 0x5:
+                return VID_HDTV; // | VID_UHDTV;
             default:
                 return VID_UNKNOWN;
         }
