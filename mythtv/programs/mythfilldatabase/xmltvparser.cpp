@@ -362,7 +362,8 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
             {
                 QDomNodeList values = info.elementsByTagName("value");
                 QDomElement item;
-                QString stars, num, den;
+                QString stars;
+                float num, den;
                 float rating = 0.0;
 
                 // Use the first rating to appear in the xml, this should be
@@ -386,10 +387,10 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
                 if (!item.isNull())
                 {
                     stars = getFirstText(item);
-                    num = stars.section('/', 0, 0) + 1;
-                    den = stars.section('/', 1, 1) + 1;
-                    if (0.0 < den.toFloat())
-                        rating = num.toFloat()/den.toFloat();
+                    num = stars.section('/', 0, 0).toFloat() + 1;
+                    den = stars.section('/', 1, 1).toFloat() + 1;
+                    if (0.0 < den)
+                        rating = num/den;
                 }
 
                 pginfo->stars = rating;
