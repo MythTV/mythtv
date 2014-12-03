@@ -435,6 +435,8 @@ QString MPEGDescriptor::toString() const
         SET_STRING(RevisionDetectionDescriptor);
     else if (DescriptorID::teletext == DescriptorTag())
         SET_STRING(TeletextDescriptor);
+    else if (DescriptorID::hevc_video == DescriptorTag())
+        SET_STRING(HEVCVideoDescriptor);
     /// POSSIBLY UNSAFE ! -- begin
     else if (PrivateDescriptorID::dvb_logical_channel_descriptor == DescriptorTag())
         SET_STRING(DVBLogicalChannelDescriptor);
@@ -625,4 +627,9 @@ QString AVCVideoDescriptor::toString() const
         .arg(ConstaintSet0()).arg(ConstaintSet1()).arg(ConstaintSet2())
         .arg(AVCCompatible()).arg(AVCStill()).arg(AVC24HourPicture())
         .arg(FramePackingSEINotPresentFlag());
+}
+
+QString HEVCVideoDescriptor::toString() const
+{
+    return QString("HEVC Video: ");
 }

@@ -66,6 +66,7 @@ class DescriptorID
         avc_timing_and_hrd          = 0x2A, /* partial */
         mpeg2_aac_audio             = 0x2B,
         flex_mux_timing             = 0x2C,
+        hevc_video                  = 0x38,
 
         // DVB
         network_name                = 0x40, /* implemented */
@@ -397,6 +398,46 @@ class AVCTimingAndHRDDescriptor : public MPEGDescriptor
     // temporal_poc_flag        1 (pict_info)?((90khz)?8.1:16.1):3.1
     // picture_to_display_conversion_flag 1 (pict_info)?((90khz)?8.2:16.2):3.2
     // reserved 5 bslbf
+};
+
+/// ISO 13818-1:2013/FDAM 3 (E) page 7
+class HEVCVideoDescriptor : public MPEGDescriptor
+{
+  public:
+    HEVCVideoDescriptor(const unsigned char *data, int len = 300) :
+        MPEGDescriptor(data, len, DescriptorID::avc_video) { }
+    //       Name                      bits  loc  expected value
+    // descriptor_tag                    8   0.0       0x38
+    // descriptor_length                 8   1.0
+
+    // the encoding of the following is specified in Rec. ITU-T H.265 | ISO/IEC 23008-2
+    // profile_space                     2   2.0
+    uint ProfileSpace(void)       const { return _data[2]&0xC0 >> 6; }
+    // tier_flag                         1   2.2
+    bool Tier(void)               const { return _data[2]&0x20; }
+    // profile_idc                       5   2.3
+    uint ProfileIDC(void)         const { return _data[2] >> 3; }
+    // profile_compatibility_indication 32   3.0
+    // progressive_source_flag           1   7.0
+    // interlaced_source_flag            1   7.1
+    // non_packed_constraint_flag        1   7.2
+    // frame_only_constraint_flag        1   7.3
+    // reserved_zero_44bits             44   7.4
+    // level_idc                         8  13.0
+
+    // temporal_layer_subset_flag        1  14.0
+    // HEVC_still_present_flag           1  14.1
+    // HEVC_24hr_picture_present_flag    1  14.2
+    // reserved                          5  14.3
+
+    // if temporal_layer_subset_flag == true and
+    // descriptor_length == 17 instead of 15 then
+    // reserved                          5  15.0
+    // temporal_id_min                   3  15.5
+    // reserved                          5  16.0
+    // temporal_id_max                   3  16.5
+
+    QString toString() const;
 };
 
 #endif // _MPEG_DESCRIPTORS_H_
