@@ -195,8 +195,8 @@ bool setupTVs(bool ismaster, bool &error)
                 }
                 else
                 {
-                    LOG(VB_GENERAL, LOG_ERR, "Problem with capture cards" +
-                            cidmsg + "failed init");
+                    LOG(VB_GENERAL, LOG_ERR, "Problem with capture cards. " +
+                            cidmsg + " failed init");
                     delete tv;
                 }
             }
