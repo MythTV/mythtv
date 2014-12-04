@@ -312,7 +312,10 @@ void MythDownloadManager::run(void)
             m_downloadQueue.pop_front();
 
             if (!dlInfo)
+            {
+                m_infoLock->unlock();
                 continue;
+            }
 
             QUrl qurl(dlInfo->m_url);
             if (m_downloadInfos.contains(qurl.toString()))
