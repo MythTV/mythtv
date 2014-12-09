@@ -21,6 +21,11 @@ contains(INCLUDEPATH, /usr/local/include) {
   POSTINC += /usr/local/include
   INCLUDEPATH -= /usr/local/include
 }
+contains(INCLUDEPATH, /usr/X11R6/include) {
+  POSTINC += /usr/X11R6/include
+  INCLUDEPATH -= /usr/X11R6/include
+}
+
 
 DEPENDPATH  += .
 DEPENDPATH  += ../libmyth ../libmyth/audio
@@ -46,7 +51,6 @@ DEPENDPATH  += ../libmythservicecontracts
 INCLUDEPATH += .. ../.. # for avlib headers
 INCLUDEPATH += ../../external/FFmpeg
 INCLUDEPATH += $$DEPENDPATH
-INCLUDEPATH += $$POSTINC
 
 !win32-msvc* {
     QMAKE_CXXFLAGS += $${FREETYPE_CFLAGS}
@@ -863,6 +867,8 @@ LIBS += $$EXTRA_LIBS $$QMAKE_LIBS_DYNLOAD
     using_hdhomerun: POST_TARGETDEPS += ../../external/libhdhomerun/libmythhdhomerun-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
     using_backend: POST_TARGETDEPS += ../../external/minilzo/libmythminilzo-$${MYTH_LIB_EXT}
 }
+
+INCLUDEPATH += $$POSTINC
 
 include ( ../libs-targetfix.pro )
 

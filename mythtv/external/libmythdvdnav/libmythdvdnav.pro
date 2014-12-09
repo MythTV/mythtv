@@ -11,6 +11,23 @@ INCLUDEPATH += ./dvdnav ./dvdread
 INCLUDEPATH += ../../libs/libmythbase
 INCLUDEPATH += ../../libs/libmythtv
 
+POSTINC =
+
+contains(INCLUDEPATH, /usr/include) {
+  POSTINC += /usr/include
+  INCLUDEPATH -= /usr/include
+}
+contains(INCLUDEPATH, /usr/local/include) {
+  POSTINC += /usr/local/include
+  INCLUDEPATH -= /usr/local/include
+}
+contains(INCLUDEPATH, /usr/X11R6/include) {
+  POSTINC += /usr/X11R6/include
+  INCLUDEPATH -= /usr/X11R6/include
+}
+
+INCLUDEPATH += $$POSTINC
+
 # for -ldl
 LIBS += $$EXTRA_LIBS
 
