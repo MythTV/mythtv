@@ -149,6 +149,8 @@ class MUI_PUBLIC MythUIImage : public MythUIType
     void SetCropRect(int x, int y, int width, int height);
     void SetCropRect(const MythRect &rect);
 
+    void FindRandomImage(void);
+
     QString m_Filename;
     QString m_OrigFilename;
 
@@ -168,6 +170,9 @@ class MUI_PUBLIC MythUIImage : public MythUIType
     ImageProperties m_imageProperties;
 
     int m_runningThreads;
+
+    bool m_showingRandomImage;
+    QString m_imageDirectory;
 
     MythUIImagePrivate *d;
 
