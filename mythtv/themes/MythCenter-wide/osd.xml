@@ -219,6 +219,11 @@
             <align>hcenter,vcenter</align>
             <value>%CHANNUM%</value>
         </textarea>
+        <textarea name="callsign">
+            <area>925,10,300,80</area>
+            <font>large</font>
+            <align>allcenter</align>
+        </textarea>
         <imagetype name="iconpath">
             <area>1015,10,125,80</area>
         </imagetype>
