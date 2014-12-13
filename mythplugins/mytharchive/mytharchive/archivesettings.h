@@ -9,10 +9,10 @@
 #include <QCoreApplication>
 
 // MythTV headers
-#include <settings.h>
+#include <standardsettings.h>
 
 
-class ArchiveSettings : public ConfigurationWizard
+class ArchiveSettings : public GroupSetting
 {
     Q_DECLARE_TR_FUNCTIONS(ArchiveSettings)
 
