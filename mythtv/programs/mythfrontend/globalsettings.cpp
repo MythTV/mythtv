@@ -4238,7 +4238,7 @@ PlaybackSettings::PlaybackSettings()
     general->addChild(LiveTVIdleTimeout());
 
 #if CONFIG_DEBUGTYPE
-    column1->addChild(FFmpegDemuxer());
+    general->addChild(FFmpegDemuxer());
 #endif
 
     general->addChild(new PlayBackScaling());
