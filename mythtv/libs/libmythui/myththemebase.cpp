@@ -55,8 +55,7 @@ void MythThemeBase::Reload(void)
     if (!XMLParseBase::CopyWindowFromBase("backgroundwindow",
                                           d->backgroundscreen))
     {
-        QString backgroundname = GetMythUI()->qtconfig()->GetSetting("BackgroundPixmap"
-);
+        QString backgroundname = GetMythUI()->qtconfig()->GetSetting("BackgroundPixmap");
         backgroundname = GetMythUI()->GetThemeDir() + backgroundname;
 
         d->backimg = new MythUIImage(backgroundname, d->backgroundscreen,
@@ -85,8 +84,7 @@ void MythThemeBase::Init(void)
     if (!XMLParseBase::CopyWindowFromBase("backgroundwindow",
                                           d->backgroundscreen))
     {
-        QString backgroundname = GetMythUI()->qtconfig()->GetSetting("BackgroundPixmap"
-);
+        QString backgroundname = GetMythUI()->qtconfig()->GetSetting("BackgroundPixmap");
         backgroundname = GetMythUI()->GetThemeDir() + backgroundname;
 
         d->backimg = new MythUIImage(backgroundname, d->backgroundscreen,
