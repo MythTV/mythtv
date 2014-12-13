@@ -36,9 +36,9 @@ const QString GetGameTypeExtensions(const QString &GameType)
 }
 
 // General Settings
-static HostLineEdit *GameAllTreeLevels()
+static HostTextEditSetting *GameAllTreeLevels()
 {
-    HostLineEdit *gc = new HostLineEdit("GameAllTreeLevels");
+    HostTextEditSetting *gc = new HostTextEditSetting("GameAllTreeLevels");
     gc->setLabel(MythGameGeneralSettings::tr("Game display order"));
     gc->setValue("system gamename");
     gc->setHelpText(MythGameGeneralSettings::tr("Order in which to sort the "
@@ -49,9 +49,9 @@ static HostLineEdit *GameAllTreeLevels()
     return gc;
 }
 
-static HostLineEdit *GameFavTreeLevels()
+static HostTextEditSetting *GameFavTreeLevels()
 {
-    HostLineEdit *gc = new HostLineEdit("GameFavTreeLevels");
+    HostTextEditSetting *gc = new HostTextEditSetting("GameFavTreeLevels");
     gc->setLabel(MythGameGeneralSettings::tr("Favorite display order"));
     gc->setValue("gamename");
     gc->setHelpText(MythGameGeneralSettings::tr("Order in which to sort the "
@@ -62,9 +62,9 @@ static HostLineEdit *GameFavTreeLevels()
     return gc;
 }
 
-static HostCheckBox *GameDeepScan()
+static HostCheckBoxSetting *GameDeepScan()
 {
-    HostCheckBox *gc = new HostCheckBox("GameDeepScan");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("GameDeepScan");
     gc->setLabel(MythGameGeneralSettings::tr("Indepth Game Scan"));
     gc->setHelpText(
         MythGameGeneralSettings::tr("Enabling this causes a game scan to "
@@ -76,9 +76,9 @@ static HostCheckBox *GameDeepScan()
     return gc;
 }
 
-static HostCheckBox *GameRemovalPrompt()
+static HostCheckBoxSetting *GameRemovalPrompt()
 {
-    HostCheckBox *gc = new HostCheckBox("GameRemovalPrompt");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("GameRemovalPrompt");
     gc->setLabel(MythGameGeneralSettings::tr("Prompt for removal of deleted ROM(s)"));
     gc->setHelpText(MythGameGeneralSettings::tr("This enables a prompt for "
                                                 "removing deleted ROMs from "
@@ -88,9 +88,9 @@ static HostCheckBox *GameRemovalPrompt()
     return gc;
 }
 
-static HostCheckBox *GameShowFileNames()
+static HostCheckBoxSetting *GameShowFileNames()
 {
-    HostCheckBox *gc = new HostCheckBox("GameShowFileNames");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("GameShowFileNames");
     gc->setLabel(MythGameGeneralSettings::tr("Display Files Names in Game "
                                              "Tree"));
     gc->setHelpText(MythGameGeneralSettings::tr("Enabling this causes the "
@@ -100,9 +100,9 @@ static HostCheckBox *GameShowFileNames()
     return gc;
 }
 
-static HostCheckBox *GameTreeView()
+static HostCheckBoxSetting *GameTreeView()
 {
-    HostCheckBox *gc = new HostCheckBox("GameTreeView");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("GameTreeView");
     gc->setLabel(MythGameGeneralSettings::tr("Hash filenames in display"));
     gc->setValue(0);
     gc->setHelpText(MythGameGeneralSettings::tr("Enable hashing of names in "
@@ -112,9 +112,9 @@ static HostCheckBox *GameTreeView()
     return gc;
 }
 
-static HostLineEdit *GetScreenshotDir()
+static HostTextEditSetting *GetScreenshotDir()
 {
-    HostLineEdit *gc = new HostLineEdit("mythgame.screenshotdir");
+    HostTextEditSetting *gc = new HostTextEditSetting("mythgame.screenshotdir");
     gc->setLabel(MythGameGeneralSettings::tr("Directory where Game Screenshots "
                                              "are stored"));
     gc->setValue(GetConfDir() + "/MythGame/Screenshots");
@@ -124,9 +124,9 @@ static HostLineEdit *GetScreenshotDir()
     return gc;
 }
 
-static HostLineEdit *GetFanartDir()
+static HostTextEditSetting *GetFanartDir()
 {
-    HostLineEdit *gc = new HostLineEdit("mythgame.fanartdir");
+    HostTextEditSetting *gc = new HostTextEditSetting("mythgame.fanartdir");
     gc->setLabel(MythGameGeneralSettings::tr("Directory where Game Fanart is "
                                              "stored"));
     gc->setValue(GetConfDir() + "/MythGame/Fanart");
@@ -136,9 +136,9 @@ static HostLineEdit *GetFanartDir()
     return gc;
 }
 
-static HostLineEdit *GetBoxartDir()
+static HostTextEditSetting *GetBoxartDir()
 {
-    HostLineEdit *gc = new HostLineEdit("mythgame.boxartdir");
+    HostTextEditSetting *gc = new HostTextEditSetting("mythgame.boxartdir");
     gc->setLabel(MythGameGeneralSettings::tr("Directory where Game Boxart is "
                                              "stored"));
     gc->setValue(GetConfDir() + "/MythGame/Boxart");
@@ -150,18 +150,16 @@ static HostLineEdit *GetBoxartDir()
 
 MythGameGeneralSettings::MythGameGeneralSettings()
 {
-    VerticalConfigurationGroup *general = new VerticalConfigurationGroup(false);
-    general->setLabel(tr("MythGame Settings -- General"));
-    general->addChild(GameAllTreeLevels());
-    general->addChild(GameFavTreeLevels());
-    general->addChild(GameDeepScan());
-    general->addChild(GameRemovalPrompt());
-    general->addChild(GameShowFileNames());
-    general->addChild(GameTreeView());
-    general->addChild(GetScreenshotDir());
-    general->addChild(GetFanartDir());
-    general->addChild(GetBoxartDir());
-    addChild(general);
+    setLabel(tr("MythGame Settings -- General"));
+    addChild(GameAllTreeLevels());
+    addChild(GameFavTreeLevels());
+    addChild(GameDeepScan());
+    addChild(GameRemovalPrompt());
+    addChild(GameShowFileNames());
+    addChild(GameTreeView());
+    addChild(GetScreenshotDir());
+    addChild(GetFanartDir());
+    addChild(GetBoxartDir());
 }
 
 // Player Settings
