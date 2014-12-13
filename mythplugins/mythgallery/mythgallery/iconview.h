@@ -88,6 +88,7 @@ class IconView : public MythScreenType
     void HandleDeleteCurrent(void);
     void HandleSlideShow(void);
     void HandleSettings(void);
+    void ReloadSettings(void);
     void HandleEject(void);
     void HandleImport(void);
     void HandleShowDevices(void);

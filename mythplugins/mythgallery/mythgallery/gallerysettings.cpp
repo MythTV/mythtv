@@ -12,9 +12,9 @@
 
 // General Settings
 
-static HostLineEdit *MythGalleryFilter()
+static HostTextEditSetting *MythGalleryFilter()
 {
-    HostLineEdit *gc = new HostLineEdit("GalleryFilterDirectory");
+    HostTextEditSetting *gc = new HostTextEditSetting("GalleryFilterDirectory");
     gc->setLabel(GallerySettings::tr("Directory filter"));
     gc->setValue("");
     gc->setHelpText(GallerySettings::tr("Enter directory names to be excluded "
@@ -23,9 +23,9 @@ static HostLineEdit *MythGalleryFilter()
     return gc;
 };
 
-static HostComboBox *MythGalleryFilterType()
+static HostComboBoxSetting *MythGalleryFilterType()
 {
-    HostComboBox *gc = new HostComboBox("GalleryFilterType");
+    HostComboBoxSetting *gc = new HostComboBoxSetting("GalleryFilterType");
     gc->setLabel(GallerySettings::tr("Type filter"));
     gc->addSelection(GallerySettings::tr("All"),
                      QString::number(kTypeFilterAll));
@@ -38,9 +38,9 @@ static HostComboBox *MythGalleryFilterType()
     return gc;
 };
 
-static HostLineEdit *MythGalleryDir()
+static HostFileBrowserSetting *MythGalleryDir()
 {
-    HostLineEdit *gc = new HostLineEdit("GalleryDir");
+    HostFileBrowserSetting *gc = new HostFileBrowserSetting("GalleryDir");
     gc->setLabel(GallerySettings::tr("Directory that holds images"));
 #ifdef Q_OS_MAC
     gc->setValue(QDir::homePath() + "/Pictures");
@@ -53,9 +53,9 @@ static HostLineEdit *MythGalleryDir()
     return gc;
 };
 
-static HostCheckBox *MythGalleryThumbnailLocation()
+static HostCheckBoxSetting *MythGalleryThumbnailLocation()
 {
-    HostCheckBox *gc = new HostCheckBox("GalleryThumbnailLocation");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("GalleryThumbnailLocation");
     gc->setLabel(GallerySettings::tr("Store thumbnails in image directory"));
     gc->setValue(true);
     gc->setHelpText(GallerySettings::tr("If set, thumbnails are stored in "
@@ -66,9 +66,9 @@ static HostCheckBox *MythGalleryThumbnailLocation()
     return gc;
 };
 
-static HostComboBox *MythGallerySortOrder()
+static HostComboBoxSetting *MythGallerySortOrder()
 {
-    HostComboBox *gc = new HostComboBox("GallerySortOrder");
+    HostComboBoxSetting *gc = new HostComboBoxSetting("GallerySortOrder");
     gc->setLabel(GallerySettings::tr("Sort order when browsing"));
     gc->addSelection(GallerySettings::tr("Unsorted"),
                      QString::number(kSortOrderUnsorted));
@@ -93,9 +93,9 @@ static HostComboBox *MythGallerySortOrder()
     return gc;
 };
 
-static HostSpinBox *MythGalleryOverlayCaption()
+static HostSpinBoxSetting *MythGalleryOverlayCaption()
 {
-    HostSpinBox *gc = new HostSpinBox("GalleryOverlayCaption", 0, 600, 1);
+    HostSpinBoxSetting *gc = new HostSpinBoxSetting("GalleryOverlayCaption", 0, 600, 1);
     gc->setLabel(GallerySettings::tr("Overlay caption"));
     gc->setValue(0);
     gc->setHelpText(GallerySettings::tr("This is the number of seconds to show "
@@ -103,9 +103,9 @@ static HostSpinBox *MythGalleryOverlayCaption()
     return gc;
 };
 
-static HostLineEdit *MythGalleryImportDirs()
+static HostTextEditSetting *MythGalleryImportDirs()
 {
-    HostLineEdit *gc = new HostLineEdit("GalleryImportDirs");
+    HostTextEditSetting *gc = new HostTextEditSetting("GalleryImportDirs");
     gc->setLabel(GallerySettings::tr("Paths to import images from"));
     gc->setValue("/mnt/cdrom:/mnt/camera");
     gc->setHelpText(GallerySettings::tr("This is a colon separated list of "
@@ -115,9 +115,9 @@ static HostLineEdit *MythGalleryImportDirs()
     return gc;
 };
 
-static HostCheckBox *MythGalleryAllowImportScripts()
+static HostCheckBoxSetting *MythGalleryAllowImportScripts()
 {
-    HostCheckBox *gc = new HostCheckBox("GalleryAllowImportScripts");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("GalleryAllowImportScripts");
     gc->setLabel(GallerySettings::tr("Allow the import to run external scripts"));
     gc->setValue(false);
     gc->setHelpText(GallerySettings::tr("If set, you can use an external script to "
@@ -126,9 +126,9 @@ static HostCheckBox *MythGalleryAllowImportScripts()
     return gc;
 };
 
-static HostCheckBox *MythGalleryAutoLoad()
+static HostCheckBoxSetting *MythGalleryAutoLoad()
 {
-    HostCheckBox *gc = new HostCheckBox("GalleryAutoLoad");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("GalleryAutoLoad");
     gc->setLabel(GallerySettings::tr("Automatically load MythGallery to "
                                      "display pictures"));
     gc->setValue(false);
@@ -139,21 +139,25 @@ static HostCheckBox *MythGalleryAutoLoad()
     return gc;
 }
 
+static HostComboBoxSetting *SlideShowTransitionMode()
+{
+    //use to be a checkbox
+    HostComboBoxSetting *gc = new HostComboBoxSetting("SlideshowUseOpenGL");
+    gc->setLabel(GallerySettings::tr("Transition mode"));
+    gc->setHelpText(GallerySettings::tr("Select which kind of slideshow "
+                                        "transition to use."));
+    gc->addSelection(GallerySettings::tr("Standard"), "0");
+#ifdef USING_OPENGL
+    gc->addSelection(GallerySettings::tr("OpenGL"), "1");
+#endif
+    return gc;
+}
+
 #ifdef USING_OPENGL
 
-static HostCheckBox *SlideshowUseOpenGL()
+static HostComboBoxSetting *SlideshowOpenGLTransition()
 {
-    HostCheckBox *gc = new HostCheckBox("SlideshowUseOpenGL");
-    gc->setLabel(GallerySettings::tr("Use OpenGL transitions"));
-    gc->setValue(false);
-    gc->setHelpText(GallerySettings::tr("Check this to enable OpenGL "
-                                        "based slideshow transitions"));
-    return gc;
-};
-
-static HostComboBox *SlideshowOpenGLTransition()
-{
-    HostComboBox *gc = new HostComboBox("SlideshowOpenGLTransition");
+    HostComboBoxSetting *gc = new HostComboBoxSetting("SlideshowOpenGLTransition");
     gc->setLabel(GallerySettings::tr("Type of OpenGL transition"));
 
     //: No OpenGL transition
@@ -187,9 +191,9 @@ static HostComboBox *SlideshowOpenGLTransition()
     return gc;
 };
 
-static HostSpinBox *SlideshowOpenGLTransitionLength()
+static HostSpinBoxSetting *SlideshowOpenGLTransitionLength()
 {
-    HostSpinBox *gc = new HostSpinBox(
+    HostSpinBoxSetting *gc = new HostSpinBoxSetting(
         "SlideshowOpenGLTransitionLength", 500, 120000, 500);
     gc->setLabel(GallerySettings::tr("Duration of OpenGL Transition "
                                      "(milliseconds)"));
@@ -199,9 +203,9 @@ static HostSpinBox *SlideshowOpenGLTransitionLength()
 
 #endif /* USING_OPENGL */
 
-static HostComboBox *SlideshowTransition()
+static HostComboBoxSetting *SlideshowTransition()
 {
-    HostComboBox *gc = new HostComboBox("SlideshowTransition");
+    HostComboBoxSetting *gc = new HostComboBoxSetting("SlideshowTransition");
     gc->setLabel(GallerySettings::tr("Type of transition"));
 
     gc->addSelection(GallerySettings::tr("none",
@@ -251,9 +255,9 @@ static HostComboBox *SlideshowTransition()
     return gc;
 };
 
-static HostComboBox *SlideshowBackground()
+static HostComboBoxSetting *SlideshowBackground()
 {
-    HostComboBox *gc = new HostComboBox("SlideshowBackground");
+    HostComboBoxSetting *gc = new HostComboBoxSetting("SlideshowBackground");
     gc->setLabel(GallerySettings::tr("Type of background"));
     // use names from /etc/X11/rgb.txt
     gc->addSelection(GallerySettings::tr("theme",
@@ -270,9 +274,9 @@ static HostComboBox *SlideshowBackground()
     return gc;
 };
 
-static HostSpinBox *SlideshowDelay()
+static HostSpinBoxSetting *SlideshowDelay()
 {
-    HostSpinBox *gc = new HostSpinBox("SlideshowDelay", 0, 86400, 1);
+    HostSpinBoxSetting *gc = new HostSpinBoxSetting("SlideshowDelay", 0, 86400, 1);
     gc->setLabel(GallerySettings::tr("Slideshow Delay"));
     gc->setValue(5);
     gc->setHelpText(GallerySettings::tr("This is the number of seconds to "
@@ -280,63 +284,41 @@ static HostSpinBox *SlideshowDelay()
     return gc;
 };
 
-static HostCheckBox *SlideshowRecursive()
+static HostCheckBoxSetting *SlideshowRecursive()
 {
-    HostCheckBox *gc = new HostCheckBox("GalleryRecursiveSlideshow");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("GalleryRecursiveSlideshow");
     gc->setLabel(GallerySettings::tr("Recurse into directories"));
     gc->setHelpText(GallerySettings::tr("Check this to let the slideshow "
                                         "recurse into sub-directories."));
     return gc;
 };
 
-class GalleryConfigurationGroup : public TriggeredConfigurationGroup
+GallerySettings::GallerySettings()
+    :GroupSetting()
 {
-  public:
-    GalleryConfigurationGroup() :
-        TriggeredConfigurationGroup(false, true, false, false)
-    {
-        setLabel(GallerySettings::tr("MythGallery Settings (Slideshow)"));
-        setUseLabel(false);
+    setLabel(GallerySettings::tr("MythGallery Settings (General)"));
+    addChild(MythGalleryDir());
+    addChild(MythGalleryThumbnailLocation());
+    addChild(MythGallerySortOrder());
+    addChild(MythGalleryImportDirs());
+    addChild(MythGalleryAllowImportScripts());
+    addChild(MythGalleryAutoLoad());
+    addChild(MythGalleryFilter());
+    addChild(MythGalleryFilterType());
+
+    HostComboBoxSetting* transitionMode = SlideShowTransitionMode();
+    addChild(transitionMode);
+    //no opengl
+    transitionMode->addTargetedChild("0", MythGalleryOverlayCaption());
+    transitionMode->addTargetedChild("0", SlideshowTransition());
+    transitionMode->addTargetedChild("0", SlideshowBackground());
 
 #ifdef USING_OPENGL
-        HostCheckBox* useOpenGL = SlideshowUseOpenGL();
-        addChild(useOpenGL);
-        setTrigger(useOpenGL);
-
-        ConfigurationGroup* openGLConfig = new VerticalConfigurationGroup(false);
-        openGLConfig->addChild(SlideshowOpenGLTransition());
-        openGLConfig->addChild(SlideshowOpenGLTransitionLength());
-        addTarget("1", openGLConfig);
+    transitionMode->addTargetedChild("1", SlideshowOpenGLTransition());
+    transitionMode->addTargetedChild("1", SlideshowOpenGLTransitionLength());
 #endif
 
-        ConfigurationGroup* regularConfig = new VerticalConfigurationGroup(false);
-        regularConfig->addChild(MythGalleryOverlayCaption());
-        regularConfig->addChild(SlideshowTransition());
-        regularConfig->addChild(SlideshowBackground());
-        addTarget("0", regularConfig);
-
-        addChild(SlideshowDelay());
-        addChild(SlideshowRecursive());
-    }
-
-};
-
-
-GallerySettings::GallerySettings()
-{
-    VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
-    general->setLabel(tr("MythGallery Settings (General)"));
-    general->addChild(MythGalleryDir());
-    general->addChild(MythGalleryThumbnailLocation());
-    general->addChild(MythGallerySortOrder());
-    general->addChild(MythGalleryImportDirs());
-    general->addChild(MythGalleryAllowImportScripts());
-    general->addChild(MythGalleryAutoLoad());
-    general->addChild(MythGalleryFilter());
-    general->addChild(MythGalleryFilterType());
-    addChild(general);
-
-    GalleryConfigurationGroup* config = new GalleryConfigurationGroup();
-    addChild(config);
+    addChild(SlideshowDelay());
+    addChild(SlideshowRecursive());
 }
 
