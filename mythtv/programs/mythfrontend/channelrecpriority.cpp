@@ -408,7 +408,8 @@ void ChannelRecPriority::updateInfo(MythUIButtonListItem *item)
         QString rectype;
         if (m_iconImage)
         {
-            m_iconImage->SetFilename(channelItem->icon);
+            QString iconUrl = gCoreContext->GetMasterHostPrefix("ChannelIcons", channelItem->icon);
+            m_iconImage->SetFilename(iconUrl);
             m_iconImage->Load();
         }
 
