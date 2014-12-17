@@ -20,8 +20,11 @@
 
 // STL headers
 #include <algorithm>
+#include <cmath>
+#include <cstdlib>
 
 // Qt headers
+#include <QDateTime>
 #include <QDir>
 #include <QMutex>
 #include <QMutexLocker>
@@ -38,6 +41,20 @@
 #include "imageview.h"
 #include "galleryutil.h"
 #include "thumbgenerator.h"
+
+// Tuning parameter for seasonal weights, between 0 and 1, where lower numbers
+// give greater weight to seasonal photos. The leading beta shape controls
+// dates that are approaching and the trailing beta shape controls dates that
+// just passed. When these are set to 0.175 and 0.31, respectively, about one
+// quarter of the photos are from the upcoming week in prior years and about one
+// quarter of the photos are from the preceding month in prior years.
+const double LEADING_BETA_SHAPE = 0.175;
+const double TRAILING_BETA_SHAPE = 0.31;
+// Photos without a timestamp will default to the mode of the beta distribution.
+const double DEFAULT_WEIGHT = std::pow(0.5, TRAILING_BETA_SHAPE - 1) *
+            std::pow(0.5, LEADING_BETA_SHAPE - 1);
+// The edges of the distribution get clipped to avoid a singularity.
+const qint64 BETA_CLIP = 60 * 60 * 24;
 
 class ImageView::LoadAlbumRunnable : public QRunnable {
     ImageView *m_parent;
@@ -76,7 +93,6 @@ ImageView::ImageView(const ThumbList &itemList,
       // Common slideshow variables
       m_slideshow_running(false),
       m_slideshow_sequencing(slideShow),
-      m_slideshow_sequencing_inc_order(sortorder),
       m_slideshow_frame_delay(2),
       m_slideshow_frame_delay_state(m_slideshow_frame_delay * 1000),
       m_slideshow_timer(NULL),
@@ -90,7 +106,7 @@ ImageView::ImageView(const ThumbList &itemList,
       m_loaderRunnable(NULL),
       m_listener(this),
       m_loaderThread(NULL),
-      m_slideshow_sequence(NULL),
+      m_slideshow_sequence(ComposeSlideshowSequence(slideShow)),
       m_finishedLoading(false)
 {
 
@@ -118,7 +134,7 @@ ImageView::ImageView(const ThumbList &itemList,
                                                  m_slideshow_sequencing);
         m_loaderThread = new MThread("LoadAlbum", m_loaderRunnable);
         QObject::connect(m_loaderThread->qthread(), SIGNAL(finished()),
-                &m_listener, SLOT(finishLoading()));
+                &m_listener, SLOT(FinishLoading()));
         m_loaderThread->start();
 
         // Wait for at least one image to be loaded.
@@ -138,7 +154,7 @@ ImageView::ImageView(const ThumbList &itemList,
         m_pos = m_itemList.indexOf(origItem);
 
     m_pos = (!origItem || (m_pos == -1)) ? 0 : m_pos;
-    m_pos = m_slideshow_sequence->index(m_pos);
+    m_slideshow_sequence->set(m_pos);
 
     // --------------------------------------------------------------------
 
@@ -187,6 +203,18 @@ ImageView::~ImageView()
     }
 
     *m_savedPos = m_pos;
+}
+
+SequenceBase *ImageView::ComposeSlideshowSequence(int slideshow_sequencing) {
+    switch (slideshow_sequencing)
+    {
+        case 2:
+            return new SequenceShuffle();
+        case 3:
+            return new SequenceWeighted();
+        default:
+            return new SequenceInc();
+    }
 }
 
 QString ImageView::GetRandomEffect(void) const
@@ -262,19 +290,16 @@ void ImageView::AddItems(const ThumbList &itemList)
 
     m_itemList.append(itemList);
 
-    if (m_slideshow_sequence)
-    {
-        delete m_slideshow_sequence;
-        m_slideshow_sequence = NULL;
-    }
+    m_slideshow_sequence->extend(itemList.size());
 
-    if (m_slideshow_sequencing > 1)
+    if (m_slideshow_sequencing == 3)
     {
-        m_slideshow_sequence = new SequenceShuffle(m_itemList.size());
-    }
-    else
-    {
-        m_slideshow_sequence = new SequenceInc(m_itemList.size());
+        for (int i = 0; i < itemList.size(); ++i)
+        {
+            ThumbItem *item = itemList.at(i);
+            double weight = GetSeasonalWeight(item);
+            static_cast<SequenceWeighted *>(m_slideshow_sequence)->add(weight);
+        }
     }
 
     if (!m_itemList.empty())
@@ -303,11 +328,56 @@ ThumbItem *ImageView::retreatItem()
     return m_itemList.at(m_pos);
 }
 
-void ImageView::finishLoading()
+void ImageView::FinishLoading()
 {
     QMutexLocker guard(&m_itemListLock);
     m_finishedLoading = true;
     m_imagesLoaded.wakeAll();
+}
+
+/**
+ * This method calculates a weight for the item based on how closely it was
+ * taken to the current time of year. This means that New Year's pictures will
+ * be displayed very frequently on every New Year's, and that anniversary
+ * pictures will be favored again every anniversary. The weights are chosen
+ * using a beta distribution with a tunable shape parameter.
+ */
+double ImageView::GetSeasonalWeight(ThumbItem *item) {
+    item->InitTimestamp();
+    if (item->HasTimestamp())
+    {
+        QDateTime timestamp = item->GetTimestamp();
+        QDateTime now = QDateTime::currentDateTime();
+        QDateTime curYearAnniversary = QDateTime(QDate(
+            now.date().year(),
+            timestamp.date().month(),
+            timestamp.date().day()),
+            timestamp.time());
+        bool isAnniversaryPast = curYearAnniversary < now;
+        QDateTime adjacentYearAnniversary = QDateTime(QDate(
+            now.date().year() + (isAnniversaryPast ? 1 : -1),
+            timestamp.date().month(),
+            timestamp.date().day()),
+            timestamp.time());
+        double range = std::abs(
+            curYearAnniversary.secsTo(adjacentYearAnniversary)) + BETA_CLIP;
+        // This calculation is not normalized, because that would require the
+        // beta function, which isn't part of the C++98 libraries. Weights
+        // that aren't normalized work just as well relative to each other.
+        double weight = std::pow(abs(now.secsTo(
+                isAnniversaryPast ? curYearAnniversary : adjacentYearAnniversary
+            ) + BETA_CLIP) / range,
+            TRAILING_BETA_SHAPE - 1) *
+            std::pow(abs(now.secsTo(
+                isAnniversaryPast ? adjacentYearAnniversary : curYearAnniversary
+            ) + BETA_CLIP) / range,
+            LEADING_BETA_SHAPE - 1);
+        return weight;
+    }
+    else
+    {
+        return DEFAULT_WEIGHT;
+    }
 }
 
 ImageView::LoadAlbumRunnable::LoadAlbumRunnable(
@@ -381,7 +451,7 @@ LoadAlbumListener::~LoadAlbumListener()
 {
 }
 
-void LoadAlbumListener::finishLoading() const
+void LoadAlbumListener::FinishLoading() const
 {
-    m_parent->finishLoading();
+    m_parent->FinishLoading();
 }

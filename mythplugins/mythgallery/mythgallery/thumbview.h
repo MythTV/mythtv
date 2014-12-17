@@ -4,6 +4,7 @@
 #define _THUMBVIEW_H_
 
 // Qt headers
+#include <QDateTime>
 #include <QString>
 #include <QList>
 #include <QHash>
@@ -29,6 +30,7 @@ class ThumbItem
     // commands
     bool Remove(void);
     void InitCaption(bool get_caption);
+    void InitTimestamp();
 
     // sets
     void SetRotationAngle(int angle);
@@ -36,6 +38,8 @@ class ThumbItem
         { m_name = name; m_name.detach(); }
     void SetCaption(const QString &caption)
         { m_caption = caption; m_caption.detach(); }
+    void SetTimestamp(const QDateTime &timestamp)
+        { m_timestamp = timestamp; }
     void SetPath(const QString &path, bool isDir)
         { m_path = path; m_path.detach(), m_isDir = isDir; }
     void SetImageFilename(const QString &filename)
@@ -49,6 +53,8 @@ class ThumbItem
     QString GetName(void)    const { return m_name;               }
     bool    HasCaption(void) const { return !m_caption.trimmed().isEmpty(); }
     QString GetCaption(void) const { return m_caption;            }
+    bool    HasTimestamp(void) const { return m_timestamp.isValid(); }
+    QDateTime GetTimestamp(void) const { return m_timestamp;      }
     QString GetImageFilename(void) const { return m_imageFilename; }
     QString GetPath(void)    const { return m_path;               }
     bool    IsDir(void)      const { return m_isDir;              }
@@ -62,6 +68,7 @@ class ThumbItem
   private:
     QString  m_name;
     QString  m_caption;
+    QDateTime m_timestamp;
     QString  m_path;
     QString  m_imageFilename;
     bool     m_isDir;

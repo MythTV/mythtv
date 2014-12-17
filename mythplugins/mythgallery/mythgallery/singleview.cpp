@@ -499,7 +499,7 @@ void SingleView::keyPressEvent(QKeyEvent *e)
             m_slideshow_running = wasRunning;
         }
         else if (action == "PLAY" || action == "SLIDESHOW" ||
-                 action == "RANDOMSHOW")
+                 action == "RANDOMSHOW" || action == "SEASONALSHOW")
         {
             m_source_loc = QPoint(0, 0);
             m_zoom = 1.0f;

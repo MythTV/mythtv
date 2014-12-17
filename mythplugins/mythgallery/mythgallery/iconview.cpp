@@ -45,6 +45,7 @@ using namespace std;
 #include <mythmediamonitor.h>
 
 // MythGallery headers
+#include "config.h"
 #include "galleryutil.h"
 #include "gallerysettings.h"
 #include "galleryfilter.h"
@@ -474,6 +475,8 @@ bool IconView::keyPressEvent(QKeyEvent *event)
                 HandleSlideShow();
             else if (action == "RANDOMSHOW")
                 HandleRandomShow();
+            else if (action == "SEASONALSHOW")
+                HandleSeasonalShow();
             else
                 handled = false;
         }
@@ -572,6 +575,13 @@ void IconView::HandleRandomShow(void)
     SetFocusWidget(m_imageList);
 }
 
+void IconView::HandleSeasonalShow(void)
+{
+    HandleImageSelect("SEASONALSHOW");
+
+    SetFocusWidget(m_imageList);
+}
+
 bool IconView::HandleImageSelect(const QString &action)
 {
     ThumbItem *thumbitem = GetCurrentThumb();
@@ -580,7 +590,8 @@ bool IconView::HandleImageSelect(const QString &action)
         return false;
 
     int slideShow = ((action == "PLAY" || action == "SLIDESHOW") ? 1 :
-                     (action == "RANDOMSHOW") ? 2 : 0);
+                     (action == "RANDOMSHOW") ? 2 :
+                     (action == "SEASONALSHOW" ? 3 : 0));
 
     int pos = m_imageList->GetCurrentPos();
 
@@ -795,16 +806,24 @@ void IconView::customEvent(QEvent *event)
                 case 1:
                     HandleRandomShow();
                     break;
+#ifdef EXIF_SUPPORT
                 case 2:
+                    HandleSeasonalShow();
                     break;
-                case 3:
+#define BUTTONNUM_OFFSET 1
+#else // !EXIF_SUPPORT
+#define BUTTONNUM_OFFSET 0
+#endif // !EXIF_SUPPORT
+                case 2 + BUTTONNUM_OFFSET:
                     break;
-                case 4:
+                case 3 + BUTTONNUM_OFFSET:
+                    break;
+                case 4 + BUTTONNUM_OFFSET:
                     HandleSubMenuFilter();
                     break;
-                case 5:
+                case 5 + BUTTONNUM_OFFSET:
                     break;
-                case 6:
+                case 6 + BUTTONNUM_OFFSET:
                     HandleSettings();
                     break;
             }
@@ -889,6 +908,9 @@ void IconView::HandleMainMenu(void)
 
     menu->AddItem(tr("SlideShow"));
     menu->AddItem(tr("Random"));
+#ifdef EXIF_SUPPORT
+    menu->AddItem(tr("Seasonal"));
+#endif // EXIF_SUPPORT
     menu->AddItem(tr("Meta Data Options"), NULL, CreateMetadataMenu());
     menu->AddItem(tr("Marking Options"), NULL, CreateMarkingMenu());
     menu->AddItem(tr("Filter / Sort..."));

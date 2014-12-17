@@ -20,6 +20,7 @@
 #ifndef GALLERYUTIL_H
 #define GALLERYUTIL_H
 
+#include <QDateTime>
 #include <QFileInfo>
 
 #include "iconview.h"
@@ -44,6 +45,7 @@ class GalleryUtil
     static long GetNaturalRotation(const QString &filePath);
 
     static QString GetCaption(const QString &filePath);
+    static QDateTime GetTimestamp(const QString &filePath);
 
     static bool LoadDirectory(ThumbList &itemList, const QString &dir,
                               const GalleryFilter& flt, bool recurse,

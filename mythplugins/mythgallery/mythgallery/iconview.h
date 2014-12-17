@@ -61,6 +61,7 @@ class IconView : public MythScreenType
     bool keyPressEvent(QKeyEvent *);
     void customEvent(QEvent*);
     void HandleRandomShow(void);
+    void HandleSeasonalShow(void);
 
     QString GetError(void) { return m_errorStr; }
 
