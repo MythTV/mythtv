@@ -745,6 +745,7 @@ bool MPEGStreamData::HandleTables(uint pid, const PSIPTable &psip)
         case TableID::SITscte:
         {
             SpliceInformationTable sit(psip);
+            sit.setSCTEPID(pid);
 
             _listener_lock.lock();
             for (uint i = 0; i < _mpeg_listeners.size(); i++)

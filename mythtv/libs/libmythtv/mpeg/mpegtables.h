@@ -1004,6 +1004,9 @@ class MTV_PUBLIC SpliceInformationTable : public PSIPTable
     }
     ~SpliceInformationTable() { ; }
 
+    void setSCTEPID(int ts_pid){scte_pid = ts_pid;}
+    int getSCTEPID(void) const {return scte_pid;}
+
     // ANCE/SCTE 35 2007
     //       Name             bits  loc  expected value
     // table_id                 8   0.0       0xFC
@@ -1160,6 +1163,7 @@ class MTV_PUBLIC SpliceInformationTable : public PSIPTable
     vector<const unsigned char*> _ptrs0;
     vector<const unsigned char*> _ptrs1;
     const unsigned char *_epilog;
+    int scte_pid;
 };
 
 /** \class AdaptationFieldControl

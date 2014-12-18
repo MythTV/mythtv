@@ -1402,9 +1402,10 @@ QString SpliceInformationTable::toString(int64_t first, int64_t last) const
         .arg(IsEncryptedPacket()?EncryptionAlgorithmString():"None")
         .arg(PTSAdjustment());
     str += IsEncryptedPacket() ? QString(" cw_index(%1)") : QString("");
-    str += QString(" command_len(%1) command_type(%2)")
+    str += QString(" command_len(%1) command_type(%2) scte_pid(0x%3)")
         .arg(SpliceCommandLength())
-        .arg(SpliceCommandTypeString());
+        .arg(SpliceCommandTypeString()
+        .arg(getSCTEPID(), 0, 16));
 
     if (IsEncryptedPacket())
         return str;
@@ -1469,13 +1470,14 @@ QString SpliceInformationTable::toStringXML(
 
     QString str = QString(
         "%1<SpliceInformationSection %2 encryption_algorithm=\"%3\" "
-        "pts_adjustment=\"%4\" code_word_index=\"%5\" command_type=\"%6\">\n")
+        "pts_adjustment=\"%4\" code_word_index=\"%5\" command_type=\"%6\" scte_pid=\"0x%7\" >\n")
         .arg(indent)
         .arg(cap_time)
         .arg(EncryptionAlgorithmString())
         .arg(PTSAdjustment())
         .arg(CodeWordIndex())
-        .arg(SpliceCommandTypeString());
+        .arg(SpliceCommandTypeString())
+        .arg(getSCTEPID(), 0 ,16);
 
     if (IsEncryptedPacket())
         return str + indent + "</SpliceInformationSection>";
