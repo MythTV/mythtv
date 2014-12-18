@@ -263,8 +263,8 @@ MythNotificationScreen &MythNotificationScreen::operator=(const MythNotification
 
     m_update        = m_content; // so all fields are initialised regardless of notification type
 
-    m_added         = false;
-    m_created       = false;
+    m_added         = s.m_added;
+    m_created       = s.m_created;
 
     m_artworkImage     = NULL;
     m_titleText        = NULL;
