@@ -95,6 +95,10 @@ NetworkControl::NetworkControl() :
     jumpMap["playbackbox"]           = "TV Recording Playback";
     jumpMap["pbb"]                   = "TV Recording Playback";
 
+    jumpMap["reloadtheme"]           = "Reload Theme";
+    jumpMap["showborders"]           = "Toggle Show Widget Borders";
+    jumpMap["shownames"]             = "Toggle Show Widget Names";
+
     keyMap["up"]                     = Qt::Key_Up;
     keyMap["down"]                   = Qt::Key_Down;
     keyMap["left"]                   = Qt::Key_Left;
@@ -289,6 +293,8 @@ void NetworkControl::processNetworkControlCommand(NetworkCommand *nc)
         result = processMessage(nc);
     else if (is_abbrev("notification", nc->getArg(0)))
         result = processNotification(nc);
+    else if (is_abbrev("theme", nc->getArg(0)))
+        result = processTheme(nc);
     else if ((nc->getArg(0).toLower() == "exit") || (nc->getArg(0).toLower() == "quit"))
         QCoreApplication::postEvent(this,
                                 new NetworkControlCloseEvent(nc->getClient()));
@@ -1044,6 +1050,35 @@ QString NetworkControl::processSet(NetworkCommand *nc)
                    .arg(nc->getArg(0));
 }
 
+QString NetworkControl::processTheme( NetworkCommand* nc)
+{
+    if (nc->getArgCount() == 1)
+        return QString("ERROR: See 'help %1' for usage information")
+                       .arg(nc->getArg(0));
+
+    if (nc->getArg(1) == "reload")
+    {
+        GetMythMainWindow()->JumpTo(jumpMap["reloadtheme"]);
+
+        return "OK";
+    }
+    else if (nc->getArg(1) == "showborders")
+    {
+        GetMythMainWindow()->JumpTo(jumpMap["showborders"]);
+
+        return "OK";
+    }
+    else if (nc->getArg(1) == "shownames")
+    {
+        GetMythMainWindow()->JumpTo(jumpMap["shownames"]);
+
+        return "OK";
+    }
+
+    return QString("ERROR: See 'help %1' for usage information")
+                   .arg(nc->getArg(0));
+}
+
 QString NetworkControl::processHelp(NetworkCommand *nc)
 {
     QString command, helpText;
@@ -1190,6 +1225,13 @@ QString NetworkControl::processHelp(NetworkCommand *nc)
         helpText +=
             "notification          - Displays a simple text message notification\r\n";
     }
+    else if (is_abbrev("theme", command))
+    {
+        helpText +=
+            "theme reload             - Reload the theme\r\n"
+            "theme showborders        - Toggle showing widget borders\r\n"
+            "theme shownames ON/OFF   - Toggle showing widget names\r\n";
+    }
 
     if (!helpText.isEmpty())
         return helpText;
@@ -1208,6 +1250,7 @@ QString NetworkControl::processHelp(NetworkCommand *nc)
         "screenshot         - Capture screenshot\r\n"
         "message            - Display a simple text message\r\n"
         "notification       - Display a simple text notification\r\n"
+        "theme              - Theme related commands\r\n"
         "exit               - Exit Network Control\r\n"
         "\r\n"
         "Type 'help COMMANDNAME' for help on any specific command.\r\n";
