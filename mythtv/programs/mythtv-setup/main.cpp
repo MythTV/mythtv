@@ -89,8 +89,15 @@ static void SetupMenuCallback(void* data, QString& selection)
 
     if (sel == "general")
     {
-        BackendSettings be;
-        be.exec();
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+        StandardSettingDialog *ssd =
+            new StandardSettingDialog(mainStack, "generalsettings",
+                                      new BackendSettings());
+
+        if (ssd->Create())
+            mainStack->AddScreen(ssd);
+        else
+            delete ssd;
     }
     else if (sel == "capture cards")
     {

@@ -151,6 +151,25 @@ class MPUBLIC HostTextEditSetting: public MythUITextEditSetting,
     using HostDBStorage::Save;
 };
 
+class MPUBLIC GlobalTextEditSetting: public MythUITextEditSetting,
+    public GlobalDBStorage
+{
+  public:
+    GlobalTextEditSetting(const QString &name) :
+        MythUITextEditSetting(this), GlobalDBStorage(this, name) { }
+
+    virtual void Load()
+    {
+        GlobalDBStorage::Load();
+        MythUITextEditSetting::Load();
+    }
+    virtual void Save()
+    {
+        GlobalDBStorage::Save();
+        MythUITextEditSetting::Save();
+    }
+    using GlobalDBStorage::Save;
+};
 
 /*******************************************************************************
 *                           Directory Setting                                  *
@@ -273,6 +292,30 @@ class MPUBLIC TransMythUIComboBoxSetting: public MythUIComboBoxSetting,
   public:
     TransMythUIComboBoxSetting() :
         MythUIComboBoxSetting(this), TransientStorage() { }
+};
+
+class MPUBLIC HostTimeBoxSetting : public HostComboBoxSetting
+{
+  public:
+    HostTimeBoxSetting(const QString &name,
+                       const QString &defaultTime = "00:00",
+                       const int interval = 1) :
+        HostComboBoxSetting(name, false)
+    {
+        int hour;
+        int minute;
+        QString timeStr;
+
+        for (hour = 0; hour < 24; hour++)
+        {
+            for (minute = 0; minute < 60; minute += interval)
+            {
+                timeStr = timeStr.sprintf("%02d:%02d", hour, minute);
+                addSelection(timeStr, timeStr,
+                             timeStr == defaultTime);
+            }
+        }
+    }
 };
 
 /*******************************************************************************

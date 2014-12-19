@@ -1,9 +1,9 @@
 #ifndef BACKENDSETTINGS_H
 #define BACKENDSETTINGS_H
 
-#include "settings.h"
+#include "standardsettings.h"
 
-class BackendSettings : public ConfigurationWizard
+class BackendSettings : public GroupSetting
 {
   public:
     BackendSettings();
