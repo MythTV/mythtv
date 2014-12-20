@@ -20,7 +20,6 @@ class MPUBLIC ZMClient : public QObject
   protected:
     ZMClient();
 
-    static bool m_server_unavailable;
     static ZMClient *m_zmclient;
 
   public:

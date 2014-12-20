@@ -41,12 +41,11 @@ ZMClient::ZMClient()
     gCoreContext->addListener(this);
 }
 
-bool  ZMClient::m_server_unavailable = false;
 ZMClient *ZMClient::m_zmclient = NULL;
 
 ZMClient *ZMClient::get(void)
 {
-    if (m_zmclient == NULL && m_server_unavailable == false)
+    if (!m_zmclient)
         m_zmclient = new ZMClient;
     return m_zmclient;
 }
@@ -56,24 +55,18 @@ bool ZMClient::setupZMClient(void)
     QString zmserver_host;
     int zmserver_port;
 
-    if (m_zmclient)
-    {
-        delete m_zmclient;
-        m_zmclient = NULL;
-        m_server_unavailable = false;
-    }
+    zmserver_host = gCoreContext->GetSetting("ZoneMinderServerIP", "");
+    zmserver_port = gCoreContext->GetNumSetting("ZoneMinderServerPort", -1);
 
-    zmserver_host = gCoreContext->GetSetting("ZoneMinderServerIP", "localhost");
-    zmserver_port = gCoreContext->GetNumSetting("ZoneMinderServerPort", 6548);
-
-    ZMClient *zmclient = ZMClient::get();
-    if (zmclient->connectToHost(zmserver_host, zmserver_port) == false)
+    // don't try to connect if we don't have a valid host or port
+    if (zmserver_host.isEmpty() || zmserver_port == -1)
     {
-        delete m_zmclient;
-        m_zmclient = NULL;
-        m_server_unavailable = false;
+        LOG(VB_GENERAL, LOG_INFO, "ZMClient: no valid IP or port found for mythzmserver");
         return false;
     }
+
+    if (!ZMClient::get()->connectToHost(zmserver_host, zmserver_port))
+        return false;
 
     return true;
 }
@@ -92,7 +85,7 @@ bool ZMClient::connectToHost(const QString &lhostname, unsigned int lport)
         ++count;
 
         LOG(VB_GENERAL, LOG_INFO,
-            QString("Connecting to zm server: %1:%2 (try %3 of 10)")
+            QString("Connecting to zm server: %1:%2 (try %3 of 2)")
                 .arg(m_hostname).arg(m_port).arg(count));
         if (m_socket)
         {
@@ -101,7 +94,7 @@ bool ZMClient::connectToHost(const QString &lhostname, unsigned int lport)
         }
 
         m_socket = new MythSocket();
-        //m_socket->setCallbacks(this);
+
         if (!m_socket->ConnectToHost(m_hostname, m_port))
         {
             m_socket->DecrRef();
@@ -113,14 +106,18 @@ bool ZMClient::connectToHost(const QString &lhostname, unsigned int lport)
             m_bConnected = true;
         }
 
-        usleep(500000);
+        usleep(1000000);
 
-    } while (count < 10 && !m_bConnected);
+    } while (count < 2 && !m_bConnected);
 
     if (!m_bConnected)
     {
-        ShowOkPopup(tr("Cannot connect to the mythzmserver - Is it running? "
-                       "Have you set the correct IP and port in the settings?"));
+        if (GetNotificationCenter())
+        {
+            ShowNotificationError("Can't connect to the mythzmserver" , "MythZoneMinder",
+                               tr("Is it running? "
+                                  "Have you set the correct IP and port in the settings?"));
+        }
     }
 
     // check the server uses the same protocol as us
@@ -129,9 +126,6 @@ bool ZMClient::connectToHost(const QString &lhostname, unsigned int lport)
         m_zmclientReady = false;
         m_bConnected = false;
     }
-
-    if (m_bConnected == false)
-        m_server_unavailable = true;
 
     if (m_bConnected)
         doGetMonitorList();
@@ -241,7 +235,6 @@ void ZMClient::restartConnection()
     // Reset the flag
     m_zmclientReady = false;
     m_bConnected = false;
-    m_server_unavailable = false;
 
     // Retry to connect. . .  Maybe the user restarted mythzmserver?
     connectToHost(m_hostname, m_port);
