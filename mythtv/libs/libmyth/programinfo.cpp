@@ -5147,16 +5147,6 @@ static bool FromProgramQuery(const QString &sql, const MSqlBindings &bindings,
 {
     count = 0;
 
-    if (sql.contains("OFFSET", Qt::CaseInsensitive))
-        LOG(VB_GENERAL, LOG_WARNING, "LoadFromProgram(): SQL contains OFFSET "
-                                     "clause, caller should be updated to use "
-                                     "start parameter instead");
-
-    if (sql.contains("LIMIT", Qt::CaseInsensitive))
-        LOG(VB_GENERAL, LOG_WARNING, "LoadFromProgram(): SQL contains LIMIT "
-                                     "clause, caller should be updated to use "
-                                     "limit parameter instead");
-
     QString columns = QString(
         "program.chanid, program.starttime, program.endtime, "
         "program.title, program.subtitle, program.description, "
@@ -5296,6 +5286,16 @@ bool LoadFromProgram( ProgramList &destination,
                       const uint &start, const uint &limit, uint &count)
 {
     destination.clear();
+
+    if (sql.contains(" OFFSET", Qt::CaseInsensitive))
+        LOG(VB_GENERAL, LOG_WARNING, "LoadFromProgram(): SQL contains OFFSET "
+                                     "clause, caller should be updated to use "
+                                     "start parameter instead");
+
+    if (sql.contains(" LIMIT", Qt::CaseInsensitive))
+        LOG(VB_GENERAL, LOG_WARNING, "LoadFromProgram(): SQL contains LIMIT "
+                                     "clause, caller should be updated to use "
+                                     "limit parameter instead");
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.setForwardOnly(true);
