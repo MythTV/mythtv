@@ -80,6 +80,8 @@ void ZMMiniPlayer::customEvent (QEvent* event)
             int monID = list[1].toInt();
             if (monID != m_alarmMonitor)
             {
+                m_alarmMonitor = monID;
+
                 m_frameTimer->stop();
 
                 Monitor *mon = ZMClient::get()->getMonitorAt(monID);

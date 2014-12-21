@@ -95,7 +95,8 @@ class Monitor
     Monitor() :
         id(0), enabled(false), events(0),
         width(0), height(0), bytes_per_pixel(0),
-        showNotifications(false), state(IDLE)
+        showNotifications(false), state(IDLE),
+        previousState(IDLE)
     {
     }
 
@@ -118,6 +119,7 @@ class Monitor
     // used by the alarm notiftications
     bool showNotifications;
     State state;
+    State previousState;
 };
 
 Q_DECLARE_METATYPE(Monitor *)
