@@ -790,7 +790,7 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
         }
 
 #if DVB_API_VERSION >=5
-        if (true || DTVTunerType::kTunerTypeDVBS2 == tunerType ||
+        if (DTVTunerType::kTunerTypeDVBS2 == tunerType ||
             DTVTunerType::kTunerTypeDVBT2 == tunerType)
         {
             struct dtv_property p_clear;
