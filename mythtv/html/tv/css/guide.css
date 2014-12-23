@@ -273,6 +273,12 @@
     vertical-align: middle;
 }
 
+.guideGrid .programAirDate
+{
+    color: #508ED8;
+    font-size: 0.8em;
+}
+
 .guideGrid .programBody
 {
     margin: 3px 5px 4px 5px;
@@ -292,6 +298,7 @@
 
 .guideGrid .programSubtitle
 {
+    color: #508ED8;
     position: relative;
     font-weight: bold;
     margin-right: 5px;
