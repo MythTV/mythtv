@@ -1,0 +1,8 @@
+/var/log/mythtv/optimize_mythdb.log {
+        daily
+        size=10M
+        rotate 7
+        notifempty
+        missingok
+        copytruncate
+}
