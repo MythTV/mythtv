@@ -10,9 +10,20 @@
 # @license   GPL
 #
 
+# Variables
+    our logFileName = "/var/log/mythtv/optimize_mythtdb.log";
+
 # Includes
     use DBI;
     use MythTV;
+    use IO::File;
+    use Carp;
+
+# Open log file
+    $logFileHandle = new IO::File ">> $logFileName";
+    if (!defined $logFileHandle) {
+        croak "Unable to open log file '$logFileName': $!";
+    }
 
 # Connect to mythbackend
     my $Myth = new MythTV({'connect' => 0});
@@ -22,15 +33,31 @@
 
 # Repair and optimize each table
     foreach $table ($dbh->tables) {
-        unless ($dbh->do("REPAIR TABLE $table")) {
-            print "Skipped:  $table\n";
+        $logFileHandle->print "$table: ";
+
+        if ($dbh->do("REPAIR TABLE $table")) {
+            $logFileHandle->print "repaired";
+        } else {
+            $logFileHandle->print "ERROR - unable to repair: $dbh->errstr\n";
             next;
-        };
+        }
+
         if ($dbh->do("OPTIMIZE TABLE $table")) {
-            print "Repaired/Optimized: $table\n";
+            $logFileHandle->print ", optimized";
+        } else {
+            $logFileHandle->print ", ERROR - unable to optimize: $dbh->errstr\n";
+            next;
         }
+
         if ($dbh->do("ANALYZE TABLE $table")) {
-            print "Analyzed: $table\n";
+            $logFileHandle->print ", analyzed";
+        } else {
+            $logFileHandle->print ", ERROR - unable to analyze: $dbh->errstr\n";
+            next;
         }
+        
+        print $logFileHandle->print"\n";
     }
 
+# Close log file
+    $logFileHandle->close;
