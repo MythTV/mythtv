@@ -349,6 +349,18 @@ class ScanModSys: public ComboBoxSetting, public TransientStorage
     };
 };
 
+class ScanDVBTModSys: public ComboBoxSetting, public TransientStorage
+{
+    public:
+    ScanDVBTModSys() : ComboBoxSetting(this)
+    {
+        setLabel(QObject::tr("Mod Sys"));
+        setHelpText(QObject::tr("Modulation system (Default: DVB-T)"));
+        addSelection("DVB-T");
+        addSelection("DVB-T2");
+    };
+};
+
 class ScanRollOff: public ComboBoxSetting, public TransientStorage
 {
     public:
