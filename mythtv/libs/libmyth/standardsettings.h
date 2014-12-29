@@ -39,7 +39,7 @@ class MPUBLIC StandardSetting : public QObject, public StorageUser
     QString getName(void) const { return m_name; }
     virtual StandardSetting * byName(const QString &name);
 
-/*    bool isVisible(void) const { return m_visible; };*/
+    bool isVisible(void) const { return m_visible; };
     bool isEnabled() const { return m_enabled; }
     bool haveChanged();
     StandardSetting *getParent() const {return m_parent;}

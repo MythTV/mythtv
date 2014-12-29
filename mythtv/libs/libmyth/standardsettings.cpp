@@ -88,6 +88,7 @@ bool StandardSetting::keyPressEvent(QKeyEvent *)
  */
 void StandardSetting::updateButton(MythUIButtonListItem *item)
 {
+    item->setVisible(m_visible);
     item->DisplayState("standard", "widgettype");
     item->setEnabled(isEnabled());
     item->SetText(m_label);
@@ -789,10 +790,13 @@ void StandardSettingDialog::updateSettings(StandardSetting * selectedSetting)
     MythUIButtonListItem *selectedItem = NULL;
     for (i = settings->constBegin(); i != settings->constEnd(); ++i)
     {
-        if (selectedSetting == (*i))
-            selectedItem = (*i)->createButton(m_buttonList);
-        else
-            (*i)->createButton(m_buttonList);
+        if ((*i)->isVisible())
+        {
+            if (selectedSetting == (*i))
+                selectedItem = (*i)->createButton(m_buttonList);
+            else
+                (*i)->createButton(m_buttonList);
+        }
     }
     if (selectedItem)
         m_buttonList->SetItemCurrent(selectedItem);
