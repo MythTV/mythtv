@@ -307,6 +307,8 @@ bool Channel::UpdateVideoSource( uint nSourceId,
                                  const QString &sConfigPath,
                                  int           nNITId )
 {
+    throw QString("Service temporarily disabled.");
+    
     bool bResult = false;
 
     bResult = SourceUtil::UpdateSource(nSourceId, sSourceName, sGrabber, sUserId, sFreqTable,
@@ -330,6 +332,8 @@ int  Channel::AddVideoSource( const QString &sSourceName,
                               const QString &sConfigPath,
                               int           nNITId )
 {
+    throw QString("Service temporarily disabled.");
+    
     int nResult = SourceUtil::CreateSource(sSourceName, sGrabber, sUserId, sFreqTable,
                                        sLineupId, sPassword, bUseEIT, sConfigPath,
                                        nNITId);
@@ -343,6 +347,8 @@ int  Channel::AddVideoSource( const QString &sSourceName,
 
 bool Channel::RemoveVideoSource( uint nSourceID )
 {
+    throw QString("Service temporarily disabled.");
+    
     bool bResult = false;
 
     bResult = SourceUtil::DeleteSource( nSourceID );
