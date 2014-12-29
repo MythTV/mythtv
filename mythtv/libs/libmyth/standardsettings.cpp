@@ -377,7 +377,10 @@ MythUIComboBoxSetting::~MythUIComboBoxSetting()
 void MythUIComboBoxSetting::setValue(int value)
 {
     if (value >= 0 && value < m_values.size())
+    {
         StandardSetting::setValue(m_values.at(value));
+        m_isSet = true;
+    }
 }
 
 int MythUIComboBoxSetting::getValueIndex(const QString &value) const
@@ -402,6 +405,7 @@ void MythUIComboBoxSetting::addSelection(const QString &label, QString value,
 
 void MythUIComboBoxSetting::clearSelections()
 {
+    m_isSet = false;
     m_labels.clear();
     m_values.clear();
 }
@@ -460,6 +464,7 @@ void MythUIComboBoxSetting::edit(MythScreenType * screen)
 void MythUIComboBoxSetting::setValue(const QString& newValue)
 {
     StandardSetting::setValue(newValue);
+    m_isSet = true;
 }
 
 void MythUIComboBoxSetting::resultEdit(DialogCompletionEvent *dce)
