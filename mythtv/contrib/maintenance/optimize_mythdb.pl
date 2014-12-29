@@ -11,7 +11,7 @@
 #
 
 # Variables
-    our logFileName = "/var/log/mythtv/optimize_mythtdb.log";
+    our logFileName = "/var/log/mythtv/optimize_mythdb.log";
 
 # Includes
     use DBI;
