@@ -135,6 +135,7 @@ void ChannelScanner::Scan(
     if ((ScanTypeSetting::FullScan_ATSC   == scantype) ||
         (ScanTypeSetting::FullScan_DVBC   == scantype) ||
         (ScanTypeSetting::FullScan_DVBT   == scantype) ||
+        (ScanTypeSetting::FullScan_DVBT2  == scantype) ||
         (ScanTypeSetting::FullScan_Analog == scantype))
     {
         LOG(VB_CHANSCAN, LOG_INFO, LOC + QString("ScanTransports(%1, %2, %3)")
@@ -155,6 +156,7 @@ void ChannelScanner::Scan(
             sourceid, freq_std, mod, tbl, tbl_start, tbl_end);
     }
     else if ((ScanTypeSetting::NITAddScan_DVBT  == scantype) ||
+             (ScanTypeSetting::NITAddScan_DVBT2 == scantype) ||
              (ScanTypeSetting::NITAddScan_DVBS  == scantype) ||
              (ScanTypeSetting::NITAddScan_DVBS2 == scantype) ||
              (ScanTypeSetting::NITAddScan_DVBC  == scantype))
@@ -261,7 +263,8 @@ DTVConfParser::return_t ChannelScanner::ImportDVBUtils(
     channels.clear();
 
     DTVConfParser::cardtype_t type = DTVConfParser::UNKNOWN;
-    type = (CardUtil::DVBT == cardtype) ? DTVConfParser::OFDM : type;
+    type = ((CardUtil::DVBT == cardtype) ||
+            (CardUtil::DVBT2 == cardtype)) ? DTVConfParser::OFDM : type;
     type = (CardUtil::QPSK == cardtype) ? DTVConfParser::QPSK : type;
     type = (CardUtil::DVBC == cardtype) ? DTVConfParser::QAM  : type;
     type = (CardUtil::DVBS2 == cardtype) ? DTVConfParser::DVBS2 : type;
@@ -441,8 +444,14 @@ void ChannelScanner::PreScanCommon(
         case ScanTypeSetting::FullScan_DVBT:
             sigmonScanner->SetScanDTVTunerType(DTVTunerType::kTunerTypeDVBT);
             break;
+        case ScanTypeSetting::FullScan_DVBT2:
+            sigmonScanner->SetScanDTVTunerType(DTVTunerType::kTunerTypeDVBT2);
+            break;
         case ScanTypeSetting::NITAddScan_DVBT:
             sigmonScanner->SetScanDTVTunerType(DTVTunerType::kTunerTypeDVBT);
+            break;
+        case ScanTypeSetting::NITAddScan_DVBT2:
+            sigmonScanner->SetScanDTVTunerType(DTVTunerType::kTunerTypeDVBT2);
             break;
         case ScanTypeSetting::NITAddScan_DVBS:
             sigmonScanner->SetScanDTVTunerType(DTVTunerType::kTunerTypeDVBS1);

@@ -49,6 +49,7 @@ class PaneAll;
 class PaneATSC;
 class PaneAnalog;
 class PaneDVBT;
+class PaneDVBT2;
 class PaneDVBC;
 class PaneDVBS;
 class PaneDVBS2;
@@ -69,9 +70,11 @@ class ScanTypeSetting : public ComboBoxSetting, public TransientStorage
         FullScan_ATSC,
         FullScan_DVBC,
         FullScan_DVBT,
+        FullScan_DVBT2,
         // Scans starting on one frequency that adds each transport
         // seen in the Network Information Tables to the scan.
         NITAddScan_DVBT,
+        NITAddScan_DVBT2,
         NITAddScan_DVBS,
         NITAddScan_DVBS2,
         NITAddScan_DVBC,
@@ -128,6 +131,7 @@ class ScanOptionalConfig : public TriggeredConfigurationGroup
     ScanCountry          *country;
     ScanNetwork          *network;
     PaneDVBT             *paneDVBT;
+    PaneDVBT2            *paneDVBT2;
     PaneDVBS             *paneDVBS;
     PaneDVBS2            *paneDVBS2;
     PaneATSC             *paneATSC;

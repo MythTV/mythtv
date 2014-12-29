@@ -479,7 +479,7 @@ const DTVParamHelperStruct DTVModulationSystem::parseTable[] =
     { "UNDEFINED", kModulationSystem_UNDEFINED     },
     { "DVBC_AC",   kModulationSystem_DVBC_ANNEX_AC },
     { "DVBC_B",    kModulationSystem_DVBC_ANNEX_B  },
-    { "DVBT",      kModulationSystem_DVBT          },
+    { "DVB-T",     kModulationSystem_DVBT          },
     { "DVB-T2",    kModulationSystem_DVBT2         },
     { "DSS",       kModulationSystem_DSS           },
     { "DVB-S",     kModulationSystem_DVBS          },
@@ -501,7 +501,7 @@ const char *DTVModulationSystem::dbStr[DTVModulationSystem::kDBStrCnt] =
     "UNDEFINED", ///< kModulationSystem_UNDEFINED
     "DVBCAC",    ///< kModulationSystem_DVBC_ANNEX_AC
     "DVBC_B",    ///< kModulationSystem_DVBC_ANNEX_B
-    "DVBT",      ///< kModulationSystem_DVBT
+    "DVB-T",     ///< kModulationSystem_DVBT
     "DSS",       ///< kModulationSystem_DSS
     "DVB-S",     ///< kModulationSystem_DVBS
     "DVB-S2",    ///< kModulationSystem_DVBS2
