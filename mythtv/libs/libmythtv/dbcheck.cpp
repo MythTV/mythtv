@@ -386,6 +386,39 @@ static bool UpdateDBVersionNumber(const QString &newnumber, QString &dbver)
     return true;
 }
 
+/** \fn performUpdateSeries(const char **)
+ *  \brief Runs a number of SQL commands.
+ *
+ *  \param updates  array of SQL commands to issue, terminated by a NULL string.
+ *  \return true on success, false on failure
+ */
+static bool performUpdateSeries(const char **updates)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    int counter = 0;
+    const char *thequery = updates[counter];
+
+    while (thequery != NULL)
+    {
+        if (strlen(thequery) && !query.exec(thequery))
+        {
+            QString msg =
+                QString("DB Error (Performing database upgrade): \n"
+                        "Query was: %1 \nError was: %2")
+                .arg(thequery)
+                .arg(MythDB::DBErrorMessage(query.lastError()));
+            LOG(VB_GENERAL, LOG_ERR, msg);
+            return false;
+        }
+
+        counter++;
+        thequery = updates[counter];
+    }
+
+    return true;
+}
+
 /** \fn performActualUpdate(const char **, const char*, QString&)
  *  \brief Runs a number of SQL commands, and updates the schema version.
  *
@@ -403,26 +436,8 @@ static bool performActualUpdate(
     LOG(VB_GENERAL, LOG_CRIT, QString("Upgrading to MythTV schema version ") +
             version);
 
-    int counter = 0;
-    const char *thequery = updates[counter];
-
-    while (thequery != NULL)
-    {
-        if (strlen(thequery) && !query.exec(thequery))
-        {
-            QString msg =
-                QString("DB Error (Performing database upgrade): \n"
-                        "Query was: %1 \nError was: %2 \nnew version: %3")
-                .arg(thequery)
-                .arg(MythDB::DBErrorMessage(query.lastError()))
-                .arg(version);
-            LOG(VB_GENERAL, LOG_ERR, msg);
-            return false;
-        }
-
-        counter++;
-        thequery = updates[counter];
-    }
+    if (!performUpdateSeries(updates))
+        return false;
 
     if (!UpdateDBVersionNumber(version, dbver))
         return false;
