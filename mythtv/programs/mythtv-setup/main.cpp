@@ -87,18 +87,39 @@ static void SetupMenuCallback(void* /* data */, QString& selection)
     }
     else if (sel == "capture cards")
     {
-        CaptureCardEditor cce;
-        cce.exec();
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+        StandardSettingDialog *ssd =
+            new StandardSettingDialog(mainStack, "capturecardeditor",
+                                      new CaptureCardEditor());
+
+        if (ssd->Create())
+            mainStack->AddScreen(ssd);
+        else
+            delete ssd;
     }
     else if (sel == "video sources")
     {
-        VideoSourceEditor vse;
-        vse.exec();
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+        StandardSettingDialog *ssd =
+            new StandardSettingDialog(mainStack, "videosourceeditor",
+                                      new VideoSourceEditor());
+
+        if (ssd->Create())
+            mainStack->AddScreen(ssd);
+        else
+            delete ssd;
     }
     else if (sel == "card inputs")
     {
-        CardInputEditor cie;
-        cie.exec();
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+        StandardSettingDialog *ssd =
+            new StandardSettingDialog(mainStack, "cardinputeditor",
+                                      new CardInputEditor());
+
+        if (ssd->Create())
+            mainStack->AddScreen(ssd);
+        else
+            delete ssd;
     }
     else if (sel == "recording profile")
     {
