@@ -1937,7 +1937,7 @@ void MPEG2fixup::ShowRangeMap(frm_dir_map_t *mapPtr, QString msg)
         int64_t start = 0;
         frm_dir_map_t::iterator it = mapPtr->begin();
         for (; it != mapPtr->end(); ++it)
-            if (*it == 0)
+            if (*it == MARK_CUT_END)
                 msg += QString("\n\t\t%1 - %2").arg(start).arg(it.key());
             else
                 start = it.key();
