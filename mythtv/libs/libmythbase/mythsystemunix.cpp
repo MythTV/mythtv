@@ -924,6 +924,7 @@ void MythSystemLegacyUnix::Fork(time_t timeout)
     if( timeout )
         m_timeout += time(NULL);
 
+    listLock.lock();
     pid_t child = fork();
 
     if (child < 0)
@@ -931,6 +932,7 @@ void MythSystemLegacyUnix::Fork(time_t timeout)
         /* Fork failed, still in parent */
         LOG(VB_SYSTEM, LOG_ERR, "fork() failed: " + ENO);
         SetStatus( GENERIC_EXIT_NOT_OK );
+        listLock.unlock();
     }
     else if( child > 0 )
     {
@@ -946,14 +948,23 @@ void MythSystemLegacyUnix::Fork(time_t timeout)
                         .arg(GetLogCmd()) .arg(timeout));
 
         /* close unused pipe ends */
-        CLOSE(p_stdin[0]);
-        CLOSE(p_stdout[1]);
-        CLOSE(p_stderr[1]);
+        close(p_stdin[0]);
+        close(p_stdout[1]);
+        close(p_stderr[1]);
 
         // store the rest
         m_stdpipe[0] = p_stdin[1];
         m_stdpipe[1] = p_stdout[0];
         m_stdpipe[2] = p_stderr[0];
+
+        if( manager == NULL )
+        {
+            manager = new MythSystemLegacyManager;
+            manager->start();
+        }
+        manager->append(this);
+
+        listLock.unlock();
     }
     else if (child == 0)
     {
@@ -1151,12 +1162,6 @@ void MythSystemLegacyUnix::Fork(time_t timeout)
 
 void MythSystemLegacyUnix::Manage(void)
 {
-    if( manager == NULL )
-    {
-        manager = new MythSystemLegacyManager;
-        manager->start();
-    }
-    manager->append(this);
 }
 
 void MythSystemLegacyUnix::JumpAbort(void)
