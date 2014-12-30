@@ -18,6 +18,7 @@ using namespace std;
 #include "recordingrule.h"
 #include "recordingprofile.h"
 #include "recordinginfo.h"
+#include "cardutil.h"
 
 // TODO convert all dates to UTC
 
@@ -2838,6 +2839,142 @@ NULL
         }
 
         if (!UpdateDBVersionNumber("1331", dbver))
+            return false;
+    }
+
+    if (dbver == "1331")
+    {
+        LOG(VB_GENERAL, LOG_CRIT, "Upgrading to MythTV schema version 1332");
+        MSqlQuery select(MSqlQuery::InitCon());
+        MSqlQuery update(MSqlQuery::InitCon());
+
+        // Find all second or higher inputs using the same card.
+        select.prepare("SELECT DISTINCT i1.cardid, i1.cardinputid "
+                       "FROM cardinput i1, cardinput i2 "
+                       "WHERE i1.cardid = i2.cardid AND "
+                       "       i1.cardinputid > i2.cardinputid "
+                       "ORDER BY i1.cardid, i1.cardinputid");
+        if (!select.exec())
+        {
+            MythDB::DBError("Unable to retrieve cardinputids.", select);
+            return false;
+        }
+
+        while (select.next())
+        {
+            int cardid = select.value(0).toInt();
+            int inputid = select.value(1).toInt();
+
+            // Create a new card for this input.
+            update.prepare("INSERT INTO capturecard "
+                           "     ( videodevice, audiodevice, vbidevice, "
+                           "       cardtype, defaultinput, audioratelimit, "
+                           "       hostname, dvb_swfilter, dvb_sat_type, "
+                           "       dvb_wait_for_seqstart, skipbtaudio, "
+                           "       dvb_on_demand, dvb_diseqc_type, "
+                           "       firewire_speed, firewire_model, "
+                           "       firewire_connection, signal_timeout, "
+                           "       channel_timeout, dvb_tuning_delay, "
+                           "       contrast, brightness, colour, hue, "
+                           "       diseqcid, dvb_eitscan ) "
+                           "SELECT videodevice, audiodevice, vbidevice, "
+                           "       cardtype, defaultinput, audioratelimit, "
+                           "       hostname, dvb_swfilter, dvb_sat_type, "
+                           "       dvb_wait_for_seqstart, skipbtaudio, "
+                           "       dvb_on_demand, dvb_diseqc_type, "
+                           "       firewire_speed, firewire_model, "
+                           "       firewire_connection, signal_timeout, "
+                           "       channel_timeout, dvb_tuning_delay, "
+                           "       contrast, brightness, colour, hue, "
+                           "       diseqcid, dvb_eitscan "
+                           "FROM capturecard c "
+                           "WHERE c.cardid = :CARDID");
+            update.bindValue(":CARDID", cardid);
+            if (!update.exec())
+            {
+                MythDB::DBError("Unable to insert new card.", update);
+                return false;
+            }
+            int newcardid = update.lastInsertId().toInt();
+
+            // Now attach the input to the new card.
+            update.prepare("UPDATE cardinput "
+                           "SET cardid = :NEWCARDID "
+                           "WHERE cardinputid = :INPUTID");
+            update.bindValue(":NEWCARDID", newcardid);
+            update.bindValue(":INPUTID", inputid);
+            if (!update.exec())
+            {
+                MythDB::DBError("Unable to update input.", update);
+                return false;
+            }
+        }
+
+        const char *updates[] = {
+            // Delete old, automatically created inputgroups.
+            "DELETE FROM inputgroup WHERE inputgroupname LIKE 'DVB_%'",
+            "DELETE FROM inputgroup WHERE inputgroupname LIKE 'CETON_%'",
+            "DELETE FROM inputgroup WHERE inputgroupname LIKE 'HDHOMERUN_%'",
+            // Increase the size of inputgroup.inputgroupname.
+            "ALTER TABLE inputgroup "
+            "    MODIFY COLUMN inputgroupname VARCHAR(48)",
+            // Rename remaining inputgroups to have 'user:' prefix.
+            "UPDATE inputgroup "
+            "    SET inputgroupname = CONCAT('user:', inputgroupname)",
+            // Change inputgroup.inputid to equal cardid.
+            "UPDATE inputgroup ig "
+            "    JOIN cardinput i ON ig.cardinputid = i.cardinputid "
+            "    SET ig.cardinputid = i.cardid",
+            // Change record.prefinput to equal cardid.
+            "UPDATE record r "
+            "    JOIN cardinput i ON r.prefinput = i.cardinputid "
+            "    SET r.prefinput = i.cardid",
+            // Change diseqc_config.cardinputid to equal cardid.
+            "UPDATE diseqc_config dc "
+            "    JOIN cardinput i ON dc.cardinputid = i.cardinputid "
+            "    SET dc.cardinputid = i.cardid",
+            // Change cardinput.cardinputid to equal cardid.  Do in
+            // multiple steps to avoid duplicate ids.
+            "SELECT MAX(cardid) INTO @maxcardid FROM capturecard",
+            "SELECT MAX(cardinputid) INTO @maxcardinputid FROM cardinput",
+            "UPDATE cardinput i "
+            "    SET i.cardinputid = i.cardid + @maxcardid + @maxcardinputid",
+            "UPDATE cardinput i "
+            "    SET i.cardinputid = i.cardid",
+            NULL
+        };
+
+        if (!performUpdateSeries(updates))
+            return false;
+
+        // Create an automatically generated inputgroup for each card.
+        select.prepare("SELECT cardid, hostname, videodevice "
+                       "FROM capturecard c "
+                       "ORDER BY c.cardid");
+        if (!select.exec())
+        {
+            MythDB::DBError("Unable to retrieve cardtids.", select);
+            return false;
+        }
+
+        while (select.next())
+        {
+            uint cardid = select.value(0).toUInt();
+            QString host = select.value(1).toString();
+            QString device = select.value(2).toString();
+            QString name = host + "|" + device;
+            uint groupid = CardUtil::CreateInputGroup(name);
+            if (!groupid)
+                return false;
+            if (!CardUtil::LinkInputGroup(cardid, groupid))
+                return false;
+        }
+
+        // Remove orphan and administrative inputgroup entries.
+        if (!CardUtil::UnlinkInputGroup(0, 0))
+            return false;
+
+        if (!UpdateDBVersionNumber("1332", dbver))
             return false;
     }
 

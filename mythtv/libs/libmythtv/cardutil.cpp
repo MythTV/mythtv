@@ -1507,23 +1507,36 @@ bool CardUtil::DeleteOrphanInputs(void)
 uint CardUtil::CreateInputGroup(const QString &name)
 {
     MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("SELECT inputgroupid FROM inputgroup "
+                  "WHERE inputgroupname = :GROUPNAME "
+                  "LIMIT 1");
+    query.bindValue(":GROUPNAME", name);
+    if (!query.exec())
+    {
+        MythDB::DBError("CreateNewInputGroup 0", query);
+        return 0;
+    }
+
+    if (query.next())
+        return query.value(0).toUInt();
+
     query.prepare("SELECT MAX(inputgroupid) FROM inputgroup");
     if (!query.exec())
     {
         MythDB::DBError("CreateNewInputGroup 1", query);
         return 0;
     }
+
     uint inputgroupid = (query.next()) ? query.value(0).toUInt() + 1 : 1;
 
     query.prepare(
         "INSERT INTO inputgroup "
         "       (cardinputid, inputgroupid, inputgroupname) "
         "VALUES (:INPUTID,    :GROUPID,     :GROUPNAME    ) ");
-
     query.bindValue(":INPUTID",   0);
     query.bindValue(":GROUPID",   inputgroupid);
     query.bindValue(":GROUPNAME", name);
-
     if (!query.exec())
     {
         MythDB::DBError("CreateNewInputGroup 2", query);
@@ -1619,7 +1632,7 @@ bool CardUtil::UnlinkInputGroup(uint inputid, uint inputgroupid)
         query.prepare(
             "DELETE FROM inputgroup "
             "WHERE cardinputid NOT IN "
-            "( SELECT cardinputid FROM cardinput )");
+            "( SELECT cardid FROM capturecard )");
     }
     else
     {
