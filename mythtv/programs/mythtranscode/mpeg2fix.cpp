@@ -1941,6 +1941,8 @@ void MPEG2fixup::ShowRangeMap(frm_dir_map_t *mapPtr, QString msg)
                 msg += QString("\n\t\t%1 - %2").arg(start).arg(it.key());
             else
                 start = it.key();
+        if (*(--it) == MARK_CUT_START)
+            msg += QString("\n\t\t%1 - end").arg(start);
         LOG(VB_PROCESS, LOG_INFO, msg);
     }
 }
