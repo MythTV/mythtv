@@ -5380,47 +5380,29 @@ bool Scheduler::WasStartedAutomatically()
 
 void Scheduler::CreateConflictLists(void)
 {
-    // For each input, build a set of inputs that it can conflict
-    // with, including itself.
-    QStringList queryStrs;
-    queryStrs <<
-        QString("SELECT ci1.cardinputid, ci2.cardinputid "
-                "FROM cardinput ci1, cardinput ci2 "
-                "WHERE ci1.cardid = ci2.cardid AND "
-                "      ci1.cardinputid <= ci2.cardinputid "
-                "ORDER BY ci1.cardinputid, ci2.cardinputid");
-    queryStrs <<
-        QString("SELECT DISTINCT ci1.cardinputid, ci2.cardinputid "
-                "FROM cardinput ci1, cardinput ci2, "
-                "     inputgroup ig1, inputgroup ig2 "
-                "WHERE ci1.cardinputid = ig1.cardinputid AND "
-                "      ci2.cardinputid = ig2.cardinputid AND"
-                "      ig1.inputgroupid = ig2.inputgroupid AND "
-                "      ci1.cardinputid < ci2.cardinputid "
-                "ORDER BY ci1.cardinputid, ci2.cardinputid");
-
+    // For each input, create a set containing all of the inputs
+    // (including itself) that are grouped with it.
     MSqlQuery query(MSqlQuery::InitCon());
     QMap<uint, QSet<uint> > inputSets;
-
-    // For each input, create a set containing all of the inputs
-    // (including itself) that are grouped with it.  Inputs can either
-    // be implicitly group by belonging to the same card or explicitly
-    // grouped by belonging to the same input group.
-    for (int i = 0; i < queryStrs.size(); ++i)
+    query.prepare("SELECT DISTINCT ci1.cardinputid, ci2.cardinputid "
+                  "FROM cardinput ci1, cardinput ci2, "
+                  "     inputgroup ig1, inputgroup ig2 "
+                  "WHERE ci1.cardinputid = ig1.cardinputid AND "
+                  "      ci2.cardinputid = ig2.cardinputid AND"
+                  "      ig1.inputgroupid = ig2.inputgroupid AND "
+                  "      ci1.cardinputid <= ci2.cardinputid "
+                  "ORDER BY ci1.cardinputid, ci2.cardinputid");
+    if (!query.exec())
     {
-        query.prepare(queryStrs[i]);
-        if (!query.exec())
-        {
-            MythDB::DBError(QString("BuildConflictLists%1").arg(i), query);
-            return;
-        }
-        while (query.next())
-        {
-            uint id0 = query.value(0).toUInt();
-            uint id1 = query.value(1).toUInt();
-            inputSets[id0].insert(id1);
-            inputSets[id1].insert(id0);
-        }
+        MythDB::DBError("BuildConflictLists", query);
+        return;
+    }
+    while (query.next())
+    {
+        uint id0 = query.value(0).toUInt();
+        uint id1 = query.value(1).toUInt();
+        inputSets[id0].insert(id1);
+        inputSets[id1].insert(id0);
     }
 
     QMap<uint, QSet<uint> >::iterator mit;
