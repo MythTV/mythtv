@@ -1175,6 +1175,93 @@ QString NetworkControl::processTheme( NetworkCommand* nc)
 
         return result;
     }
+    else if (nc->getArg(1) == "getarea")
+    {
+        if (nc->getArgCount() < 3)
+            return QString("ERROR: Missing widget name.");
+
+        QString widgetName = nc->getArg(2);
+        QStringList path = widgetName.split('/');
+
+        MythScreenStack *stack = GetMythMainWindow()->GetStack("popup stack");
+        MythScreenType *topScreen = stack->GetTopScreen();
+
+        if (!topScreen)
+        {
+            stack = GetMythMainWindow()->GetMainStack();
+            topScreen = stack->GetTopScreen();
+        }
+
+        if (!topScreen)
+            return QString("ERROR: no top screen found!");
+
+        MythUIType *currType = static_cast<MythUIType*>(topScreen);
+
+        while (path.count() > 1)
+        {
+            QString childName = path.takeFirst();
+            currType = currType->GetChild(childName);
+            if (!currType)
+                return QString("ERROR: Failed to find child '%1'").arg(childName);
+        }
+
+        MythUIType* type = currType->GetChild(path.first());
+        if (!type)
+            return QString("ERROR: widget '%1' not found!").arg(widgetName);
+
+        int x = type->GetFullArea().x();
+        int y = type->GetFullArea().y();
+        int w = type->GetFullArea().width();
+        int h = type->GetFullArea().height();
+        return QString("The area of '%1' is x:%2, y:%3, w:%4, h:%5")
+                       .arg(widgetName).arg(x).arg(y).arg(w).arg(h);
+    }
+    else if (nc->getArg(1) == "setarea")
+    {
+        if (nc->getArgCount() < 3)
+            return QString("ERROR: Missing widget name.");
+
+        if (nc->getArgCount() < 7)
+            return QString("ERROR: Missing X, Y, Width or Height.");
+
+        QString widgetName = nc->getArg(2);
+        QStringList path = widgetName.split('/');
+        int x = nc->getArg(3).toInt();
+        int y = nc->getArg(4).toInt();
+        int w = nc->getArg(5).toInt();
+        int h = nc->getArg(6).toInt();
+
+        MythScreenStack *stack = GetMythMainWindow()->GetStack("popup stack");
+        MythScreenType *topScreen = stack->GetTopScreen();
+
+        if (!topScreen)
+        {
+            stack = GetMythMainWindow()->GetMainStack();
+            topScreen = stack->GetTopScreen();
+        }
+
+        if (!topScreen)
+            return QString("ERROR: no top screen found!");
+
+                MythUIType *currType = static_cast<MythUIType*>(topScreen);
+
+        while (path.count() > 1)
+        {
+            QString childName = path.takeFirst();
+            currType = currType->GetChild(childName);
+            if (!currType)
+                return QString("ERROR: Failed to find child '%1'").arg(childName);
+        }
+
+        MythUIType* type = currType->GetChild(path.first());
+        if (!type)
+            return QString("ERROR: widget '%1' not found!").arg(widgetName);
+
+        type->SetArea(MythRect(x, y, w, h));
+
+        return QString("Changed area of '%1' to x:%2, y:%3, w:%4, h:%5")
+                       .arg(widgetName).arg(x).arg(y).arg(w).arg(h);
+    }
 
     return QString("ERROR: See 'help %1' for usage information")
                    .arg(nc->getArg(0));
@@ -1329,11 +1416,13 @@ QString NetworkControl::processHelp(NetworkCommand *nc)
     else if (is_abbrev("theme", command))
     {
         helpText +=
-            "theme getthemeinfo        - Display the name and location of the current theme\r\n"
-            "theme reload              - Reload the theme\r\n"
-            "theme showborders         - Toggle showing widget borders\r\n"
-            "theme shownames ON/OFF    - Toggle showing widget names\r\n"
-            "theme getwidgetnames PATH - Display the name and type of all the child widgets from PATH\r\n";
+            "theme getthemeinfo               - Display the name and location of the current theme\r\n"
+            "theme reload                     - Reload the theme\r\n"
+            "theme showborders                - Toggle showing widget borders\r\n"
+            "theme shownames ON/OFF           - Toggle showing widget names\r\n"
+            "theme getwidgetnames PATH        - Display the name and type of all the child widgets from PATH\r\n"
+            "theme getarea WIDGETNAME         - Get the position of widget WIDGET on the active screen\r\n"
+            "theme setarea WIDGETNAME X Y W H - Change the area of widget WIDGET to X Y W H on the active screen\r\n";
     }
 
     if (!helpText.isEmpty())
