@@ -24,6 +24,17 @@
 // libmythui
 #include "mythmainwindow.h"
 #include "mythuihelper.h"
+#include <mythuigroup.h>
+#include <mythuiclock.h>
+#include <mythuibuttontree.h>
+#include <mythuivideo.h>
+#include <mythuiguidegrid.h>
+#include <mythuicheckbox.h>
+#include <mythuispinbox.h>
+#include <mythuiwebbrowser.h>
+#include <mythuiprogressbar.h>
+#include <mythuiscrollbar.h>
+#include <mythuieditbar.h>
 
 #define LOC QString("NetworkControl: ")
 #define LOC_ERR QString("NetworkControl Error: ")
@@ -1050,6 +1061,48 @@ QString NetworkControl::processSet(NetworkCommand *nc)
                    .arg(nc->getArg(0));
 }
 
+QString NetworkControl::getWidgetType(MythUIType* type)
+{
+    if (dynamic_cast<MythUIText *>(type))
+        return "MythUIText";
+    else if (dynamic_cast<MythUITextEdit *>(type))
+        return "MythUITextEdit";
+    else if (dynamic_cast<MythUIGroup *>(type))
+        return "MythUIGroup";
+    else if (dynamic_cast<MythUIButton *>(type))
+        return "MythUIButton";
+    else if (dynamic_cast<MythUICheckBox *>(type))
+        return "MythUICheckBox";
+    else if (dynamic_cast<MythUIShape *>(type))
+        return "MythUIShape";
+    else if (dynamic_cast<MythUIButtonList *>(type))
+        return "MythUIButtonList";
+    else if (dynamic_cast<MythUIImage *>(type))
+        return "MythUIImage";
+    else if (dynamic_cast<MythUISpinBox *>(type))
+        return "MythUISpinBox";
+    else if (dynamic_cast<MythUIWebBrowser *>(type))
+        return "MythUIWebBrowser";
+    else if (dynamic_cast<MythUIClock *>(type))
+        return "MythUIClock";
+    else if (dynamic_cast<MythUIStateType *>(type))
+        return "MythUIStateType";
+    else if (dynamic_cast<MythUIProgressBar *>(type))
+        return "MythUIProgressBar";
+    else if (dynamic_cast<MythUIButtonTree *>(type))
+        return "MythUIButtonTree";
+    else if (dynamic_cast<MythUIScrollBar *>(type))
+        return "MythUIScrollBar";
+    else if (dynamic_cast<MythUIVideo *>(type))
+        return "MythUIVideo";
+    else if (dynamic_cast<MythUIGuideGrid *>(type))
+        return "MythUIGuideGrid";
+    else if (dynamic_cast<MythUIEditBar *>(type))
+        return "MythUIEditBar";
+
+    return "Unknown";
+}
+
 QString NetworkControl::processTheme( NetworkCommand* nc)
 {
     if (nc->getArgCount() == 1)
@@ -1079,6 +1132,48 @@ QString NetworkControl::processTheme( NetworkCommand* nc)
         GetMythMainWindow()->JumpTo(jumpMap["shownames"]);
 
         return "OK";
+    }
+    else if (nc->getArg(1) == "getwidgetnames")
+    {
+        QStringList path;
+
+        if (nc->getArgCount() >= 3)
+            path = nc->getArg(2).split('/');
+
+        MythScreenStack *stack = GetMythMainWindow()->GetStack("popup stack");
+        MythScreenType *topScreen = stack->GetTopScreen();
+
+        if (!topScreen)
+        {
+            stack = GetMythMainWindow()->GetMainStack();
+            topScreen = stack->GetTopScreen();
+        }
+
+        if (!topScreen)
+            return QString("ERROR: no top screen found!");
+
+        MythUIType *currType = static_cast<MythUIType*>(topScreen);
+
+        while (!path.isEmpty())
+        {
+            QString childName = path.takeFirst();
+            currType = currType->GetChild(childName);
+            if (!currType)
+                return QString("ERROR: Failed to find child '%1'").arg(childName);
+        }
+
+        QList<MythUIType*> *children = currType->GetAllChildren();
+        QString result;
+
+        for (int i = 0; i < children->count(); i++)
+        {
+            MythUIType *type = children->at(i);
+            QString widgetName = type->objectName();
+            QString widgetType = getWidgetType(type);
+            result += QString("%1 - %2\n\r").arg(widgetName, -20).arg(widgetType);
+        }
+
+        return result;
     }
 
     return QString("ERROR: See 'help %1' for usage information")
@@ -1234,10 +1329,11 @@ QString NetworkControl::processHelp(NetworkCommand *nc)
     else if (is_abbrev("theme", command))
     {
         helpText +=
-            "theme getthemeinfo       - Display the name and location of the current theme\r\n"
-            "theme reload             - Reload the theme\r\n"
-            "theme showborders        - Toggle showing widget borders\r\n"
-            "theme shownames ON/OFF   - Toggle showing widget names\r\n";
+            "theme getthemeinfo        - Display the name and location of the current theme\r\n"
+            "theme reload              - Reload the theme\r\n"
+            "theme showborders         - Toggle showing widget borders\r\n"
+            "theme shownames ON/OFF    - Toggle showing widget names\r\n"
+            "theme getwidgetnames PATH - Display the name and type of all the child widgets from PATH\r\n";
     }
 
     if (!helpText.isEmpty())
