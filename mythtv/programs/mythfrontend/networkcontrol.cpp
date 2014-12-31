@@ -1056,7 +1056,13 @@ QString NetworkControl::processTheme( NetworkCommand* nc)
         return QString("ERROR: See 'help %1' for usage information")
                        .arg(nc->getArg(0));
 
-    if (nc->getArg(1) == "reload")
+    if (nc->getArg(1) == "getthemeinfo")
+    {
+        QString themeName = GetMythUI()->GetThemeName();
+        QString themeDir = GetMythUI()->GetThemeDir();
+        return QString("%1 - %2").arg(themeName).arg(themeDir);
+    }
+    else if (nc->getArg(1) == "reload")
     {
         GetMythMainWindow()->JumpTo(jumpMap["reloadtheme"]);
 
@@ -1228,6 +1234,7 @@ QString NetworkControl::processHelp(NetworkCommand *nc)
     else if (is_abbrev("theme", command))
     {
         helpText +=
+            "theme getthemeinfo       - Display the name and location of the current theme\r\n"
             "theme reload             - Reload the theme\r\n"
             "theme showborders        - Toggle showing widget borders\r\n"
             "theme shownames ON/OFF   - Toggle showing widget names\r\n";
