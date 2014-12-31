@@ -157,10 +157,9 @@ static CardUtil::CARD_TYPES get_cardtype(uint sourceid)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT capturecard.cardid "
-        "FROM cardinput, capturecard "
-        "WHERE capturecard.cardid = cardinput.cardid AND "
-        "      cardinput.sourceid = :SOURCEID AND "
-        "    capturecard.hostname = :HOSTNAME");
+        "FROM  capturecard "
+        "WHERE capturecard.sourceid = :SOURCEID AND "
+        "      capturecard.hostname = :HOSTNAME");
     query.bindValue(":SOURCEID", sourceid);
     query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
 

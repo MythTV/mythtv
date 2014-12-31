@@ -199,9 +199,8 @@ bool CardUtil::IsCardTypePresent(const QString &rawtype, QString hostname)
     MSqlQuery query(MSqlQuery::InitCon());
     QString qstr =
         "SELECT count(cardtype) "
-        "FROM capturecard, cardinput "
-        "WHERE cardinput.cardid = capturecard.cardid AND "
-        "      capturecard.hostname = :HOSTNAME";
+        "FROM capturecard "
+        "WHERE capturecard.hostname = :HOSTNAME ";
 
     if (!rawtype.isEmpty())
         qstr += " AND capturecard.cardtype = :CARDTYPE";
@@ -577,8 +576,8 @@ QString get_on_inputid(const QString &to_get, uint inputid)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         QString("SELECT %1 ").arg(to_get) +
-        "FROM cardinput "
-        "WHERE cardinput.cardinputid = :INPUTID");
+        "FROM capturecard "
+        "WHERE capturecard.cardid = :INPUTID");
     query.bindValue(":INPUTID", inputid);
 
     if (!query.exec())
@@ -591,7 +590,7 @@ QString get_on_inputid(const QString &to_get, uint inputid)
 
 bool set_on_input(const QString &to_set, uint inputid, const QString &value)
 {
-    QString tmp = get_on_inputid("cardinput.cardinputid", inputid);
+    QString tmp = get_on_inputid("capturecard.cardid", inputid);
     if (tmp.isEmpty())
         return false;
 
@@ -602,8 +601,8 @@ bool set_on_input(const QString &to_set, uint inputid, const QString &value)
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
-        QString("UPDATE cardinput SET %1 = :VALUE ").arg(to_set) +
-        "WHERE cardinputid = :INPUTID");
+        QString("UPDATE capturecard SET %1 = :VALUE ").arg(to_set) +
+        "WHERE cardid = :INPUTID");
     query.bindValue(":INPUTID", input_cardinputid);
     query.bindValue(":VALUE",  value);
 
@@ -793,8 +792,8 @@ static bool clone_cardinputs(uint src_cardid, uint dst_cardid)
             "       tunechan,        startchan,       displayname,     "
             "       dishnet_eit,     recpriority,     quicktune,       "
             "       schedorder,      livetvorder                       "
-            "FROM cardinput "
-            "WHERE cardinputid = :INPUTID");
+            "FROM capturecard "
+            "WHERE cardid = :INPUTID");
         query.bindValue(":INPUTID", src_inputs[i]);
         if (!query.exec())
         {
@@ -826,7 +825,7 @@ static bool clone_cardinputs(uint src_cardid, uint dst_cardid)
 
             // copy data from src[i] to dst[match]
             query2.prepare(
-                "UPDATE cardinput "
+                "UPDATE capturecard "
                 "SET sourceid        = :V0, "
                 "    inputname       = :V1, "
                 "    externalcommand = :V2, "
@@ -838,7 +837,7 @@ static bool clone_cardinputs(uint src_cardid, uint dst_cardid)
                 "    quicktune       = :V8, "
                 "    schedorder      = :V9, "
                 "    livetvorder     = :V10 "
-                "WHERE cardinputid = :INPUTID");
+                "WHERE cardid = :INPUTID");
 
             for (uint j = 0; j < 11; j++)
             {
@@ -859,11 +858,9 @@ static bool clone_cardinputs(uint src_cardid, uint dst_cardid)
         else
         {
             // create new input for dst with data from src
-
             query2.prepare(
-                "INSERT cardinput "
-                "SET cardid          = :CARDID, "
-                "    sourceid        = :V0, "
+                "UPDATE capturecard "
+                "SET sourceid        = :V0, "
                 "    inputname       = :V1, "
                 "    externalcommand = :V2, "
                 "    tunechan        = :V3, "
@@ -873,14 +870,15 @@ static bool clone_cardinputs(uint src_cardid, uint dst_cardid)
                 "    recpriority     = :V7, "
                 "    quicktune       = :V8, "
                 "    schedorder      = :V9, "
-                "    livetvorder     = :V10 ");
+                "    livetvorder     = :V10 "
+                "WHERE cardid = :INPUTID");
 
-            query2.bindValue(":CARDID", dst_cardid);
             for (uint j = 0; j < 11; j++)
             {
                 query2.bindValue(QString(":V%1").arg(j),
                                  query.value(j).toString());
             }
+            query2.bindValue(":INPUTID", dst_cardid);
 
             if (!query2.exec())
             {
@@ -889,28 +887,7 @@ static bool clone_cardinputs(uint src_cardid, uint dst_cardid)
                 break;
             }
 
-            query2.prepare(
-                "SELECT cardinputid "
-                "FROM cardinput "
-                "WHERE cardid    = :CARDID AND "
-                "      inputname = :NAME");
-            query2.bindValue(":CARDID", dst_cardid);
-            query2.bindValue(":NAME", query.value(1).toString());
-            if (!query2.exec())
-            {
-                MythDB::DBError("clone_cardinput -- "
-                                     "insert, query inputid", query2);
-                ok = false;
-                break;
-            }
-            if (!query2.next())
-            {
-                LOG(VB_GENERAL, LOG_ERR, "clone_cardinput -- insert failed");
-                ok = false;
-                break;
-            }
-
-            dst_inputid = query2.value(0).toUInt();
+            dst_inputid = dst_cardid;
         }
 
         // copy input group linkages
@@ -1012,7 +989,7 @@ QString CardUtil::GetFirewireChangerNode(uint inputid)
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT changer_device "
-                  "FROM cardinput WHERE cardinputid = :INPUTID ");
+                  "FROM capturecard WHERE cardid = :INPUTID ");
     query.bindValue(":CARDID", inputid);
 
     if (query.exec() && query.next())
@@ -1029,7 +1006,7 @@ QString CardUtil::GetFirewireChangerModel(uint inputid)
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT changer_model "
-                  "FROM cardinput WHERE cardinputid = :INPUTID ");
+                  "FROM capturecard WHERE cardid = :INPUTID ");
     query.bindValue(":CARDID", inputid);
 
     if (query.exec() && query.next())
@@ -1046,7 +1023,7 @@ vector<uint> CardUtil::GetCardIDs(uint sourceid)
 
     query.prepare(
         "SELECT DISTINCT cardid "
-        "FROM cardinput "
+        "FROM capturecard "
         "WHERE sourceid = :SOURCEID");
     query.bindValue(":SOURCEID", sourceid);
 
@@ -1069,11 +1046,10 @@ int CardUtil::GetCardInputID(
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
-        "SELECT cardinputid, inputname "
-        "FROM channel, capturecard, cardinput "
-        "WHERE channel.channum      = :CHANNUM           AND "
-        "      channel.sourceid     = cardinput.sourceid AND "
-        "      cardinput.cardid     = capturecard.cardid AND "
+        "SELECT cardid, inputname "
+        "FROM channel, capturecard "
+        "WHERE channel.channum      = :CHANNUM             AND "
+        "      channel.sourceid     = capturecard.sourceid AND "
         "      capturecard.cardid   = :CARDID");
     query.bindValue(":CHANNUM", channum);
     query.bindValue(":CARDID", cardid);
@@ -1092,9 +1068,9 @@ int CardUtil::GetCardInputID(
 bool CardUtil::SetStartChannel(uint cardinputid, const QString &channum)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("UPDATE cardinput "
+    query.prepare("UPDATE capturecard "
                   "SET startchan = :CHANNUM "
-                  "WHERE cardinputid = :INPUTID");
+                  "WHERE cardid = :INPUTID");
     query.bindValue(":CHANNUM", channum);
     query.bindValue(":INPUTID", cardinputid);
 
@@ -1117,9 +1093,9 @@ QString CardUtil::GetStartInput(uint nCardID)
     QString str = QString::null;
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT inputname "
-                  "FROM cardinput "
-                  "WHERE cardinput.cardid = :CARDID "
-                  "ORDER BY livetvorder = 0, livetvorder, cardinputid "
+                  "FROM capturecard "
+                  "WHERE capturecard.cardid = :CARDID "
+                  "ORDER BY livetvorder = 0, livetvorder, cardid "
                   "LIMIT 1");
     query.bindValue(":CARDID", nCardID);
 
@@ -1139,7 +1115,7 @@ QStringList CardUtil::GetInputNames(uint cardid, uint sourceid)
     if (sourceid)
     {
         query.prepare("SELECT inputname "
-                      "FROM cardinput "
+                      "FROM capturecard "
                       "WHERE sourceid = :SOURCEID AND "
                       "      cardid   = :CARDID");
         query.bindValue(":SOURCEID", sourceid);
@@ -1147,7 +1123,7 @@ QStringList CardUtil::GetInputNames(uint cardid, uint sourceid)
     else
     {
         query.prepare("SELECT inputname "
-                      "FROM cardinput "
+                      "FROM capturecard "
                       "WHERE cardid   = :CARDID");
     }
     query.bindValue(":CARDID",   cardid);
@@ -1174,8 +1150,8 @@ bool CardUtil::GetInputInfo(InputInfo &input, vector<uint> *groupids)
     query.prepare("SELECT "
                   "inputname, sourceid, cardid, livetvorder, "
                   "schedorder, displayname, recpriority, quicktune "
-                  "FROM cardinput "
-                  "WHERE cardinputid = :INPUTID");
+                  "FROM capturecard "
+                  "WHERE cardid = :INPUTID");
     query.bindValue(":INPUTID", input.inputid);
 
     if (!query.exec())
@@ -1207,10 +1183,10 @@ QList<InputInfo> CardUtil::GetAllInputInfo()
     QList<InputInfo> infoInputList;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT cardinputid, "
+    query.prepare("SELECT cardid, "
                   "inputname, sourceid, cardid, livetvorder, "
                   "schedorder, displayname, recpriority, quicktune "
-                  "FROM cardinput");
+                  "FROM capturecard");
 
     if (!query.exec())
     {
@@ -1255,8 +1231,8 @@ QString CardUtil::GetStartingChannel(uint inputid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT startchan "
-                  "FROM cardinput "
-                  "WHERE cardinputid = :INPUTID");
+                  "FROM capturecard "
+                  "WHERE cardid = :INPUTID");
     query.bindValue(":INPUTID", inputid);
 
     if (!query.exec())
@@ -1274,8 +1250,8 @@ QString CardUtil::GetDisplayName(uint inputid)
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT displayname, cardid, inputname "
-                  "FROM cardinput "
-                  "WHERE cardinputid = :INPUTID");
+                  "FROM capturecard "
+                  "WHERE cardid = :INPUTID");
     query.bindValue(":INPUTID", inputid);
 
     if (!query.exec())
@@ -1295,8 +1271,8 @@ QString CardUtil::GetDisplayName(uint inputid)
 uint CardUtil::GetInputID(uint cardid, const QString &inputname)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT cardinputid "
-                  "FROM cardinput "
+    query.prepare("SELECT cardid "
+                  "FROM capturecard "
                   "WHERE inputname = :INPUTNAME AND "
                   "      cardid    = :CARDID");
     query.bindValue(":INPUTNAME", inputname);
@@ -1313,8 +1289,8 @@ uint CardUtil::GetInputID(uint cardid, const QString &inputname)
 uint CardUtil::GetInputID(uint cardid, uint sourceid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT cardinputid "
-                  "FROM cardinput "
+    query.prepare("SELECT cardid "
+                  "FROM capturecard "
                   "WHERE sourceid  = :SOURCEID AND "
                   "      cardid    = :CARDID");
     query.bindValue(":SOURCEID", sourceid);
@@ -1333,8 +1309,8 @@ uint CardUtil::GetSourceID(uint inputid)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT sourceid "
-        "FROM cardinput "
-        "WHERE cardinputid = :INPUTID");
+        "FROM capturecard "
+        "WHERE cardid = :INPUTID");
     query.bindValue(":INPUTID", inputid);
     if (!query.exec() || !query.isActive())
         MythDB::DBError("CardUtil::GetSourceID()", query);
@@ -1350,8 +1326,8 @@ vector<uint> CardUtil::GetAllInputIDs(void)
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
-        "SELECT cardinputid "
-        "FROM cardinput");
+        "SELECT cardid "
+        "FROM capturecard");
 
     if (!query.exec())
     {
@@ -1371,8 +1347,8 @@ vector<uint> CardUtil::GetInputIDs(uint cardid)
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
-        "SELECT cardinputid "
-        "FROM cardinput "
+        "SELECT cardid "
+        "FROM capturecard "
         "WHERE cardid = :CARDID");
 
     query.bindValue(":CARDID", cardid);
@@ -1408,13 +1384,21 @@ int CardUtil::CreateCardInput(const uint cardid,
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare(
-        "INSERT INTO cardinput "
-        "(cardid, sourceid, inputname, externalcommand, changer_device, "
-        "changer_model, tunechan, startchan, displayname, dishnet_eit, "
-        "recpriority, quicktune, schedorder, livetvorder) "
-        "VALUES (:CARDID, :SOURCEID, :INPUTNAME, :EXTERNALCOMMAND, "
-        ":CHANGERDEVICE, :CHANGERMODEL, :TUNECHAN, :STARTCHAN, :DISPLAYNAME, "
-        ":DISHNETEIT, :RECPRIORITY, :QUICKTUNE, :SCHEDORDER, :LIVETVORDER ) ");
+        "UPDATE capturecard "
+        "SET sourceid = :SOURCEID, "
+        "    inputname = :INPUTNAME, "
+        "    externalcommand = :EXTERNALCOMMAND, "
+        "    changer_device = :CHANGERDEVICE, "
+        "    changer_model = :CHANGERMODEL, "
+        "    tunechan = :TUNECHAN, "
+        "    startchan = :STARTCHAN, "
+        "    displayname = :DISPLAYNAME, "
+        "    dishnet_eit = :DISHNETEIT, "
+        "    recpriority = :RECPRIORITY, "
+        "    quicktune = :QUICKTUNE, "
+        "    schedorder = :SCHEDORDER, "
+        "    livetvorder = :LIVETVORDER "
+        "WHERE cardid = :CARDID");
 
     query.bindValue(":CARDID", cardid);
     query.bindValue(":SOURCEID", sourceid);
@@ -1437,28 +1421,28 @@ int CardUtil::CreateCardInput(const uint cardid,
         return -1;
     }
 
-    query.prepare("SELECT MAX(cardinputid) FROM cardinput");
-
-    if (!query.exec())
-    {
-        MythDB::DBError("CreateCardInput maxinput", query);
-        return -1;
-    }
-
-    int inputid = -1; /* must be int not uint because of return type. */
-
-    if (query.next())
-        inputid = query.value(0).toInt();
-
-    return inputid;
+    return cardid;
 }
 
 bool CardUtil::DeleteInput(uint inputid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
-        "DELETE FROM cardinput "
-        "WHERE cardinputid = :INPUTID");
+        "UPDATE capturecard "
+        "SET sourceid = 0, "
+        "    inputname = '', "
+        "    externalcommand = '', "
+        "    changer_device = '', "
+        "    changer_model = '', "
+        "    tunechan = '', "
+        "    startchan = '', "
+        "    displayname = '', "
+        "    dishnet_eit = 0, "
+        "    recpriority = 0, "
+        "    quicktune = 0, "
+        "    schedorder = 0, "
+        "    livetvorder = 0 "
+        "WHERE cardid = :INPUTID");
     query.bindValue(":INPUTID", inputid);
 
     if (!query.exec())
@@ -1467,41 +1451,22 @@ bool CardUtil::DeleteInput(uint inputid)
         return false;
     }
 
+    query.prepare("DELETE FROM inputgroup "
+                  "WHERE cardinputid = :INPUTID AND "
+                  "      inputgroupname LIKE 'user:%'");
+    query.bindValue(":INPUTID", inputid);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("DeleteInput2", query);
+        return false;
+    }
+
     return true;
 }
 
 bool CardUtil::DeleteOrphanInputs(void)
 {
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT cardinputid "
-                  "FROM cardinput "
-                  "LEFT JOIN capturecard "
-                  "ON (capturecard.cardid = cardinput.cardid) "
-                  "WHERE capturecard.cardid IS NULL");
-    if (!query.exec())
-    {
-        MythDB::DBError("DeleteOrphanInputs -- query disconnects", query);
-        return false;
-    }
-
-    bool ok = true;
-    while (query.next())
-    {
-        uint inputid = query.value(0).toUInt();
-        if (DeleteInput(inputid))
-        {
-            LOG(VB_GENERAL, LOG_NOTICE, QString("Removed orphan input %1")
-                     .arg(inputid));
-        }
-        else
-        {
-            ok = false;
-            LOG(VB_GENERAL, LOG_ERR, QString("Failed to remove orphan input %1")
-                     .arg(inputid));
-        }
-    }
-
-    return ok;
 }
 
 uint CardUtil::CreateInputGroup(const QString &name)
@@ -1712,9 +1677,9 @@ vector<uint> CardUtil::GetGroupCardIDs(uint inputgroupid)
 
     query.prepare(
         "SELECT DISTINCT cardid "
-        "FROM cardinput, inputgroup "
+        "FROM capturecard, inputgroup "
         "WHERE inputgroupid = :GROUPID AND "
-        "      cardinput.cardinputid = inputgroup.cardinputid "
+        "      capturecard.cardid = inputgroup.cardinputid "
         "ORDER BY cardid");
 
     query.bindValue(":GROUPID", inputgroupid);
@@ -1804,7 +1769,7 @@ uint CardUtil::GetQuickTuning(uint cardid, const QString &input_name)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT quicktune "
-        "FROM cardinput "
+        "FROM capturecard "
         "WHERE cardid    = :CARDID AND "
         "      inputname = :INPUTNAME");
     query.bindValue(":CARDID",    cardid);
@@ -1975,8 +1940,8 @@ InputNames CardUtil::GetConfiguredDVBInputs(uint cardid)
     InputNames list;
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
-        "SELECT cardinputid, inputname "
-        "FROM cardinput "
+        "SELECT cardid, inputname "
+        "FROM capturecard "
         "WHERE cardid = :CARDID");
     query.bindValue(":CARDID", cardid);
 
@@ -2352,7 +2317,6 @@ bool CardUtil::DeleteAllCards(void)
     return (query.exec("TRUNCATE TABLE inputgroup") &&
             query.exec("TRUNCATE TABLE diseqc_config") &&
             query.exec("TRUNCATE TABLE diseqc_tree") &&
-            query.exec("TRUNCATE TABLE cardinput") &&
             query.exec("TRUNCATE TABLE capturecard"));
 }
 
@@ -2384,7 +2348,7 @@ vector<uint> CardUtil::GetLiveTVCardList(void)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT DISTINCT cardid "
-        "FROM cardinput "
+        "FROM capturecard "
         "WHERE livetvorder <> 0 "
         "ORDER BY livetvorder");
 

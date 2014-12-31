@@ -1197,9 +1197,9 @@ static bool get_use_eit(uint cardid)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT SUM(useeit) "
-        "FROM videosource, cardinput "
-        "WHERE videosource.sourceid = cardinput.sourceid AND"
-        "      cardinput.cardid     = :CARDID");
+        "FROM videosource, capturecard "
+        "WHERE videosource.sourceid = capturecard.sourceid AND"
+        "      capturecard.cardid     = :CARDID");
     query.bindValue(":CARDID", cardid);
 
     if (!query.exec() || !query.isActive())
@@ -1217,9 +1217,9 @@ static bool is_dishnet_eit(uint cardid)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT SUM(dishnet_eit) "
-        "FROM videosource, cardinput "
-        "WHERE videosource.sourceid = cardinput.sourceid AND"
-        "      cardinput.cardid     = :CARDID");
+        "FROM videosource, capturecard "
+        "WHERE videosource.sourceid = capturecard.sourceid AND"
+        "      capturecard.cardid     = :CARDID");
     query.bindValue(":CARDID", cardid);
 
     if (!query.exec() || !query.isActive())
@@ -1691,8 +1691,8 @@ QString TVRec::GetStartChannel(uint cardid, const QString &startinput)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT startchan "
-        "FROM cardinput "
-        "WHERE cardinput.cardid   = :CARDID    AND "
+        "FROM capturecard "
+        "WHERE capturecard.cardid = :CARDID    AND "
         "      inputname          = :INPUTNAME");
     query.bindValue(":CARDID",    cardid);
     query.bindValue(":INPUTNAME", startinput);
@@ -1716,9 +1716,8 @@ QString TVRec::GetStartChannel(uint cardid, const QString &startinput)
     // get a valid channel on our current input.
     query.prepare(
         "SELECT channum "
-        "FROM capturecard, cardinput, channel "
-        "WHERE capturecard.cardid = cardinput.cardid   AND "
-        "      channel.sourceid   = cardinput.sourceid AND "
+        "FROM capturecard, channel "
+        "WHERE channel.sourceid   = capturecard.sourceid AND "
         "      capturecard.cardid = :CARDID AND "
         "      inputname          = :INPUTNAME");
     query.bindValue(":CARDID",    cardid);
@@ -1743,9 +1742,8 @@ QString TVRec::GetStartChannel(uint cardid, const QString &startinput)
     // widen search to any input.
     query.prepare(
         "SELECT channum, inputname "
-        "FROM capturecard, cardinput, channel "
-        "WHERE capturecard.cardid = cardinput.cardid   AND "
-        "      channel.sourceid   = cardinput.sourceid AND "
+        "FROM capturecard, channel "
+        "WHERE channel.sourceid   = capturecard.sourceid AND "
         "      capturecard.cardid = :CARDID");
     query.bindValue(":CARDID", cardid);
 
@@ -2169,13 +2167,13 @@ bool TVRec::ShouldSwitchToAnotherCard(QString chanid)
 
     query.prepare(
         "SELECT channel.channum "
-        "FROM channel,cardinput "
+        "FROM channel, capturecard "
         "WHERE ( channel.chanid = :CHANID OR             "
         "        ( channel.channum  = :CHANNUM AND       "
         "          channel.callsign = :CALLSIGN    )     "
         "      )                                     AND "
-        "      channel.sourceid = cardinput.sourceid AND "
-        "      cardinput.cardid = :CARDID");
+        "      channel.sourceid = capturecard.sourceid AND "
+        "      capturecard.cardid = :CARDID");
     query.bindValue(":CHANID", chanid);
     query.bindValue(":CHANNUM", channelname);
     query.bindValue(":CALLSIGN", callsign);
@@ -2194,14 +2192,14 @@ bool TVRec::ShouldSwitchToAnotherCard(QString chanid)
 
     // We didn't find it on the current card, so now we check other cards.
     query.prepare(
-        "SELECT channel.channum, cardinput.cardid "
-        "FROM channel,cardinput "
+        "SELECT channel.channum, capturecard.cardid "
+        "FROM channel, capturecard "
         "WHERE ( channel.chanid = :CHANID OR              "
         "        ( channel.channum  = :CHANNUM AND        "
         "          channel.callsign = :CALLSIGN    )      "
         "      )                                      AND "
-        "      channel.sourceid  = cardinput.sourceid AND "
-        "      cardinput.cardid != :CARDID");
+        "      channel.sourceid  = capturecard.sourceid AND "
+        "      capturecard.cardid != :CARDID");
     query.bindValue(":CHANID", chanid);
     query.bindValue(":CHANNUM", channelname);
     query.bindValue(":CALLSIGN", callsign);
@@ -2296,11 +2294,10 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
 
     MSqlQuery query(MSqlQuery::InitCon());
     QString basequery = QString(
-        "SELECT channel.chanid, channel.channum, cardinput.cardid "
-        "FROM channel, capturecard, cardinput "
+        "SELECT channel.chanid, channel.channum, capturecard.cardid "
+        "FROM channel, capturecard "
         "WHERE channel.channum LIKE '%1%'            AND "
-        "      channel.sourceid = cardinput.sourceid AND "
-        "      cardinput.cardid = capturecard.cardid");
+        "      channel.sourceid = capturecard.sourceid");
 
     QString cardquery[2] =
     {
@@ -2703,8 +2700,8 @@ static uint get_input_id(uint cardid, const QString &inputname)
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare(
-        "SELECT cardinputid "
-        "FROM cardinput "
+        "SELECT cardid "
+        "FROM capturecard "
         "WHERE cardid    = :CARDID AND "
         "      inputname = :INNAME");
 

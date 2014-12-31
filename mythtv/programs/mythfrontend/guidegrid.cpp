@@ -444,8 +444,8 @@ void GuideGrid::RunProgramGuide(uint chanid, const QString &channum,
 
     // If chanid/channum are unset, find the channel that would
     // naturally be selected when Live TV is started.  This depends on
-    // the available tuners, their cardinput.livetvorder values, and
-    // their cardinput.startchan values.
+    // the available tuners, their capturecard.livetvorder values, and
+    // their capturecard.startchan values.
     QString actualChannum = channum;
     if (chanid == 0 && actualChannum.isEmpty())
     {

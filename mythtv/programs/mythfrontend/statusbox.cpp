@@ -694,15 +694,15 @@ void StatusBox::doScheduleStatus()
             sourceText[query.value(0).toInt()] = query.value(1).toString();
     }
 
-    query.prepare("SELECT MAX(cardinputid) FROM cardinput");
+    query.prepare("SELECT MAX(cardid) FROM capturecard");
     if (query.exec())
     {
         if (query.next())
             maxInput = query.value(0).toInt();
     }
 
-    query.prepare("SELECT cardinputid,cardid,inputname,displayname "
-                  "FROM cardinput");
+    query.prepare("SELECT cardid,cardid,inputname,displayname "
+                  "FROM capturecard");
     if (query.exec())
     {
         while (query.next())

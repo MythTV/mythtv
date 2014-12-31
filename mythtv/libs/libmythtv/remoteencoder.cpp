@@ -527,10 +527,9 @@ uint RemoteEncoder::GetSignalLockTimeout(QString input)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT channel_timeout, cardtype "
-        "FROM cardinput, capturecard "
-        "WHERE cardinput.inputname = :INNAME AND "
-        "      cardinput.cardid    = :CARDID AND "
-        "      cardinput.cardid    = capturecard.cardid");
+        "FROM capturecard "
+        "WHERE capturecard.inputname = :INNAME AND "
+        "      capturecard.cardid    = :CARDID");
     query.bindValue(":INNAME", input);
     query.bindValue(":CARDID", cardid);
     if (!query.exec() || !query.isActive())

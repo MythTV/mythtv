@@ -76,13 +76,12 @@ void VideoSourceSelector::Load(void)
 
     QString querystr =
         "SELECT DISTINCT videosource.name, videosource.sourceid "
-        "FROM cardinput, videosource, capturecard";
+        "FROM capturecard, videosource";
 
     querystr += (must_have_mplexid) ? ", channel " : " ";
 
     querystr +=
-        "WHERE cardinput.sourceid   = videosource.sourceid AND "
-        "      cardinput.cardid     = capturecard.cardid   AND "
+        "WHERE capturecard.sourceid = videosource.sourceid AND "
         "      capturecard.hostname = :HOSTNAME ";
 
     if (!card_types.isEmpty())
@@ -694,10 +693,9 @@ bool VideoSourceEditor::cardTypesInclude(const int &sourceID,
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT count(cardtype)"
-                  " FROM cardinput,capturecard "
-                  " WHERE capturecard.cardid = cardinput.cardid "
-                  " AND cardinput.sourceid= :SOURCEID "
-                  " AND capturecard.cardtype= :CARDTYPE ;");
+                  " FROM capturecard "
+                  " WHERE capturecard.sourceid = :SOURCEID "
+                  " AND capturecard.cardtype = :CARDTYPE ;");
     query.bindValue(":SOURCEID", sourceID);
     query.bindValue(":CARDTYPE", thecardtype);
 
@@ -3262,7 +3260,7 @@ void CardInput::loadByID(int inputid)
 void CardInput::loadByInput(int _cardid, QString _inputname)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT cardinputid FROM cardinput "
+    query.prepare("SELECT cardid FROM capturecard "
                   "WHERE cardid = :CARDID AND inputname = :INPUTNAME");
     query.bindValue(":CARDID", _cardid);
     query.bindValue(":INPUTNAME", _inputname);
@@ -3285,11 +3283,7 @@ void CardInput::Save(void)
     if (sourceid->getValue() == "0")
     {
         // "None" is represented by the lack of a row
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("DELETE FROM cardinput WHERE cardinputid = :INPUTID");
-        query.bindValue(":INPUTID", getInputID());
-        if (!query.exec())
-            MythDB::DBError("CardInput::Save", query);
+        CardUtil::DeleteInput(getInputID());
     }
     else
     {

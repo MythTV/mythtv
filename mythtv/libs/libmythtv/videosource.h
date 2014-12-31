@@ -694,7 +694,7 @@ class CardInputDBStorage : public SimpleDBStorage
     CardInputDBStorage(StorageUser     *_user,
                        const CardInput &_parent,
                        QString          _name) :
-        SimpleDBStorage(_user, "cardinput", _name), m_parent(_parent)
+        SimpleDBStorage(_user, "capturecard", _name), m_parent(_parent)
     {
     }
 
@@ -827,7 +827,7 @@ class CardInput : public QObject, public ConfigurationWizard
     class ID: public AutoIncrementDBSetting
     {
       public:
-        ID() : AutoIncrementDBSetting("cardinput", "cardid")
+        ID() : AutoIncrementDBSetting("capturecard", "cardid")
         {
             setVisible(false);
             setName("CardInputID");

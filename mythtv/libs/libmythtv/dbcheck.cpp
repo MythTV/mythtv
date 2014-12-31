@@ -2978,6 +2978,46 @@ NULL
             return false;
     }
 
+    if (dbver == "1332")
+    {
+        const char *updates[] = {
+            // Move contents of cardinput to capturecard.
+            "ALTER TABLE capturecard "
+            "    ADD COLUMN inputname VARCHAR(32) NOT NULL DEFAULT '', "
+            "    ADD COLUMN sourceid INT(10) UNSIGNED NOT NULL DEFAULT 0, "
+            "    ADD COLUMN externalcommand VARCHAR(128), "
+            "    ADD COLUMN changer_device VARCHAR(128), "
+            "    ADD COLUMN changer_model VARCHAR(128), "
+            "    ADD COLUMN tunechan VARCHAR(10), "
+            "    ADD COLUMN startchan VARCHAR(10), "
+            "    ADD COLUMN displayname VARCHAR(64) NOT NULL DEFAULT '', "
+            "    ADD COLUMN dishnet_eit TINYINT(1) NOT NULL DEFAULT 0, "
+            "    ADD COLUMN recpriority INT(11) NOT NULL DEFAULT 0, "
+            "    ADD COLUMN quicktune TINYINT(4) NOT NULL DEFAULT 0, "
+            "    ADD COLUMN schedorder INT(10) UNSIGNED NOT NULL DEFAULT 0, "
+            "    ADD COLUMN livetvorder INT(10) UNSIGNED NOT NULL DEFAULT 0",
+            "UPDATE capturecard c "
+            "    JOIN cardinput i ON c.cardid = i.cardinputid "
+            "    SET c.inputname = i.inputname, "
+            "        c.sourceid = i.sourceid, "
+            "        c.externalcommand = i.externalcommand, "
+            "        c.changer_device = i.changer_device, "
+            "        c.changer_model = i.changer_model, "
+            "        c.tunechan = i.tunechan, "
+            "        c.startchan = i.startchan, "
+            "        c.displayname = i.displayname, "
+            "        c.dishnet_eit = i.dishnet_eit, "
+            "        c.recpriority = i.recpriority, "
+            "        c.quicktune = i.quicktune, "
+            "        c.schedorder = i.schedorder, "
+            "        c.livetvorder = i.livetvorder",
+            "TRUNCATE cardinput",
+            NULL
+        };
+        if (!performActualUpdate(updates, "1333", dbver))
+            return false;
+    }
+
     return true;
 }
 

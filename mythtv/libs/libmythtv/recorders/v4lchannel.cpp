@@ -514,11 +514,11 @@ QString V4LChannel::GetFormatForChannel(QString channum, QString inputname)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT tvformat "
-        "FROM channel, cardinput "
-        "WHERE channum            = :CHANNUM   AND "
-        "      inputname          = :INPUTNAME AND "
-        "      cardinput.cardid   = :CARDID    AND "
-        "      cardinput.sourceid = channel.sourceid");
+        "FROM channel, capturecard "
+        "WHERE channum              = :CHANNUM   AND "
+        "      inputname            = :INPUTNAME AND "
+        "      capturecard.cardid   = :CARDID    AND "
+        "      capturecard.sourceid = channel.sourceid");
     query.bindValue(":CHANNUM",   channum);
     query.bindValue(":INPUTNAME", inputname);
     query.bindValue(":CARDID",    GetCardID());

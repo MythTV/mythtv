@@ -197,10 +197,10 @@ bool Scheduler::VerifyCards(void)
     while (query.next())
     {
         subquery.prepare(
-            "SELECT cardinputid "
-            "FROM cardinput "
+            "SELECT cardid "
+            "FROM capturecard "
             "WHERE sourceid = :SOURCEID "
-            "ORDER BY cardinputid;");
+            "ORDER BY cardid;");
         subquery.bindValue(":SOURCEID", query.value(0).toUInt());
 
         if (!subquery.exec())
@@ -4087,11 +4087,11 @@ void Scheduler::AddNewRecords(void)
     int hhpriority      = gCoreContext->GetNumSetting("HardHearRecPriority", 0);
     int adpriority      = gCoreContext->GetNumSetting("AudioDescRecPriority", 0);
 
-    QString pwrpri = "channel.recpriority + cardinput.recpriority";
+    QString pwrpri = "channel.recpriority + capturecard.recpriority";
 
     if (prefinputpri)
         pwrpri += QString(" + "
-        "(cardinput.cardinputid = RECTABLE.prefinput) * %1").arg(prefinputpri);
+        "(capturecard.cardid = RECTABLE.prefinput) * %1").arg(prefinputpri);
 
     if (hdtvpriority)
         pwrpri += QString(" + (program.hdtv > 0 OR "
@@ -4163,7 +4163,7 @@ void Scheduler::AddNewRecords(void)
         "    minute AS recendts, "                                       //19
         "                                            p.previouslyshown, "//20
         "    RECTABLE.recgroup, RECTABLE.dupmethod,  c.commmethod,      "//21-23
-        "    capturecard.cardid, cardinput.cardinputid,p.seriesid,      "//24-26
+        "    capturecard.cardid, capturecard.cardid,p.seriesid,      "//24-26
         "    p.programid,       RECTABLE.inetref,    p.category_type,   "//27-29
         "    p.airdate,         p.stars,             p.originalairdate, "//30-32
         "    RECTABLE.inactive, RECTABLE.parentid,   recordmatch.findid, "//33-35
@@ -4171,7 +4171,7 @@ void Scheduler::AddNewRecords(void)
         "    oldrecstatus.reactivate, p.videoprop+0,     "//38-39
         "    p.subtitletypes+0, p.audioprop+0,   RECTABLE.storagegroup, "//40-42
         "    capturecard.hostname, recordmatch.oldrecstatus, NULL, "//43-45
-        "    oldrecstatus.future, cardinput.schedorder, " //46-47
+        "    oldrecstatus.future, capturecard.schedorder, " //46-47
         "    p.syndicatedepisodenumber, p.partnumber, p.parttotal, " //48-50
         "    c.mplexid, ") +                                         //51
         pwrpri + QString(
@@ -4183,8 +4183,7 @@ void Scheduler::AddNewRecords(void)
         "     recordmatch.manualid  = p.manualid ) "
         "INNER JOIN channel AS c "
         "ON ( c.chanid = p.chanid ) "
-        "INNER JOIN cardinput ON (c.sourceid = cardinput.sourceid) "
-        "INNER JOIN capturecard ON (capturecard.cardid = cardinput.cardid) "
+        "INNER JOIN capturecard ON (c.sourceid = capturecard.sourceid) "
         "LEFT JOIN oldrecorded as oldrecstatus "
         "ON ( oldrecstatus.station   = c.callsign  AND "
         "     oldrecstatus.starttime = p.starttime AND "
@@ -5384,14 +5383,14 @@ void Scheduler::CreateConflictLists(void)
     // (including itself) that are grouped with it.
     MSqlQuery query(MSqlQuery::InitCon());
     QMap<uint, QSet<uint> > inputSets;
-    query.prepare("SELECT DISTINCT ci1.cardinputid, ci2.cardinputid "
-                  "FROM cardinput ci1, cardinput ci2, "
+    query.prepare("SELECT DISTINCT ci1.cardid, ci2.cardid "
+                  "FROM capturecard ci1, capturecard ci2, "
                   "     inputgroup ig1, inputgroup ig2 "
-                  "WHERE ci1.cardinputid = ig1.cardinputid AND "
-                  "      ci2.cardinputid = ig2.cardinputid AND"
+                  "WHERE ci1.cardid = ig1.cardinputid AND "
+                  "      ci2.cardid = ig2.cardinputid AND"
                   "      ig1.inputgroupid = ig2.inputgroupid AND "
-                  "      ci1.cardinputid <= ci2.cardinputid "
-                  "ORDER BY ci1.cardinputid, ci2.cardinputid");
+                  "      ci1.cardid <= ci2.cardid "
+                  "ORDER BY ci1.cardid, ci2.cardid");
     if (!query.exec())
     {
         MythDB::DBError("BuildConflictLists", query);

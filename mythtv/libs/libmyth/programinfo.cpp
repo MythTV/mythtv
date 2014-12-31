@@ -4822,12 +4822,11 @@ bool ProgramInfo::QueryTuningInfo(QString &channum, QString &input) const
     input.clear();
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare("SELECT channel.channum, cardinput.inputname "
-                  "FROM channel, capturecard, cardinput "
-                  "WHERE channel.chanid     = :CHANID            AND "
-                  "      cardinput.cardid   = capturecard.cardid AND "
-                  "      cardinput.sourceid = :SOURCEID          AND "
-                  "      capturecard.cardid = :CARDID");
+    query.prepare("SELECT channel.channum, capturecard.inputname "
+                  "FROM channel, capturecard "
+                  "WHERE channel.chanid       = :CHANID            AND "
+                  "      capturecard.sourceid = :SOURCEID          AND "
+                  "      capturecard.cardid   = :CARDID");
     query.bindValue(":CHANID",   chanid);
     query.bindValue(":SOURCEID", sourceid);
     query.bindValue(":CARDID",   cardid);
@@ -4872,8 +4871,8 @@ QString ProgramInfo::QueryInputDisplayName(void) const
     {
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT displayname, cardid, inputname "
-                      "FROM cardinput "
-                      "WHERE cardinputid = :INPUTID");
+                      "FROM capturecard "
+                      "WHERE cardid = :INPUTID");
         query.bindValue(":INPUTID", inputid);
 
         if (!query.exec())

@@ -176,9 +176,8 @@ static QStringList get_cardtypes(uint sourceid)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT cardtype, inputname "
-        "FROM capturecard, cardinput "
-        "WHERE capturecard.cardid = cardinput.cardid AND "
-        "      cardinput.sourceid = :SOURCEID");
+        "FROM capturecard "
+        "WHERE capturecard.sourceid = :SOURCEID");
     query.bindValue(":SOURCEID", sourceid);
 
     if (!query.exec() || !query.isActive())
@@ -504,7 +503,7 @@ bool SourceUtil::DeleteSource(uint sourceid)
     }
 
     // Delete the inputs associated with the source
-    query.prepare("DELETE FROM cardinput "
+    query.prepare("SELECT cardid FROM capturecard "
                   "WHERE sourceid = :SOURCEID");
     query.bindValue(":SOURCEID", sourceid);
 
@@ -512,6 +511,10 @@ bool SourceUtil::DeleteSource(uint sourceid)
     {
         MythDB::DBError("Deleting cardinputs", query);
         return false;
+    }
+    while (query.next())
+    {
+        CardUtil::DeleteInput(query.value(0).toUInt());
     }
 
     // Delete the source itself
@@ -535,6 +538,19 @@ bool SourceUtil::DeleteSource(uint sourceid)
 bool SourceUtil::DeleteAllSources(void)
 {
     MSqlQuery query(MSqlQuery::InitCon());
+
+    // Delete all inputs
+    query.prepare("SELECT cardid FROM capturecard");
+    if (!query.exec() || !query.isActive())
+    {
+        MythDB::DBError("Deleting sources", query);
+        return false;
+    }
+    while (query.next())
+    {
+        CardUtil::DeleteInput(query.value(0).toUInt());
+    }
+
     return (query.exec("TRUNCATE TABLE channel") &&
             query.exec("TRUNCATE TABLE program") &&
             query.exec("TRUNCATE TABLE videosource") &&
@@ -542,11 +558,9 @@ bool SourceUtil::DeleteAllSources(void)
             query.exec("TRUNCATE TABLE programrating") &&
             query.exec("TRUNCATE TABLE programgenres") &&
             query.exec("TRUNCATE TABLE dtv_multiplex") &&
-            query.exec("TRUNCATE TABLE inputgroup") &&
             query.exec("TRUNCATE TABLE diseqc_config") &&
             query.exec("TRUNCATE TABLE diseqc_tree") &&
             query.exec("TRUNCATE TABLE eit_cache") &&
             query.exec("TRUNCATE TABLE channelgroup") &&
-            query.exec("TRUNCATE TABLE channelgroupnames") &&
-            query.exec("TRUNCATE TABLE cardinput"));
+            query.exec("TRUNCATE TABLE channelgroupnames"));
 }

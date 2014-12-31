@@ -942,11 +942,11 @@ bool ChannelBase::InitializeInputs(void)
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
-        "SELECT cardinputid, "
+        "SELECT cardid, "
         "       inputname,   startchan, "
         "       tunechan,    externalcommand, "
         "       sourceid,    livetvorder "
-        "FROM cardinput "
+        "FROM capturecard "
         "WHERE cardid = :CARDID");
     query.bindValue(":CARDID", cardid);
 
@@ -1053,9 +1053,9 @@ void ChannelBase::StoreInputChannels(const InputMap &inputs)
             continue;
 
         query.prepare(
-            "UPDATE cardinput "
+            "UPDATE capturecard "
             "SET startchan = :STARTCHAN "
-            "WHERE cardinputid = :CARDINPUTID");
+            "WHERE cardid = :CARDINPUTID");
         query.bindValue(":STARTCHAN",   (*it)->startChanNum);
         query.bindValue(":CARDINPUTID", it.key());
 
@@ -1088,13 +1088,12 @@ bool ChannelBase::CheckChannel(const QString &channum,
 
     query.prepare(
         "SELECT channel.chanid "
-        "FROM channel, capturecard, cardinput "
-        "WHERE channel.channum      = :CHANNUM           AND "
-        "      channel.sourceid     = cardinput.sourceid AND "
-        "      cardinput.inputname  = :INPUT             AND "
-        "      cardinput.cardid     = capturecard.cardid AND "
-        "      capturecard.cardid   = :CARDID            AND "
-        "      capturecard.hostname = :HOSTNAME");
+        "FROM channel, capturecard "
+        "WHERE channel.channum       = :CHANNUM             AND "
+        "      channel.sourceid      = capturecard.sourceid AND "
+        "      capturecard.inputname = :INPUT               AND "
+        "      capturecard.cardid    = :CARDID              AND "
+        "      capturecard.hostname  = :HOSTNAME");
     query.bindValue(":CHANNUM",  channum);
     query.bindValue(":INPUT",    channelinput);
     query.bindValue(":CARDID",   GetCardID());
@@ -1116,12 +1115,11 @@ bool ChannelBase::CheckChannel(const QString &channum,
 
     // We didn't find it on the current input let's widen the search
     query.prepare(
-        "SELECT channel.chanid, cardinput.inputname "
-        "FROM channel, capturecard, cardinput "
-        "WHERE channel.channum      = :CHANNUM           AND "
-        "      channel.sourceid     = cardinput.sourceid AND "
-        "      cardinput.cardid     = capturecard.cardid AND "
-        "      capturecard.cardid   = :CARDID            AND "
+        "SELECT channel.chanid, capturecard.inputname "
+        "FROM channel, capturecard "
+        "WHERE channel.channum      = :CHANNUM             AND "
+        "      channel.sourceid     = capturecard.sourceid AND "
+        "      capturecard.cardid   = :CARDID              AND "
         "      capturecard.hostname = :HOSTNAME");
     query.bindValue(":CHANNUM",  channum);
     query.bindValue(":CARDID",   GetCardID());
