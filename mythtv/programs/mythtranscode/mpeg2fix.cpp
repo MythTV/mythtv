@@ -261,7 +261,21 @@ MPEG2fixup::MPEG2fixup(const QString &inf, const QString &outf,
     discard = 0;
     if (deleteMap && deleteMap->count())
     {
-        delMap = *deleteMap;
+        /* convert MythTV cutlist to mpeg2fix cutlist */
+        frm_dir_map_t::iterator it = deleteMap->begin();
+        for (; it != deleteMap->end(); ++it)
+        {
+            uint64_t mark = it.key();
+            if (mark > 0)
+            {
+                if (it.value() == MARK_CUT_START)
+                    mark += 1; // +2 looks good, but keyframes are hit with +1
+                else
+                    mark += 1;
+            }
+            delMap.insert (mark, it.value());
+        }
+
         if (delMap.contains(0))
         {
             discard = 1;
