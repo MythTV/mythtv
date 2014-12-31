@@ -50,7 +50,7 @@ void AlarmNotifyThread::run()
             {
                 Monitor *mon = ZMClient::get()->getMonitorAt(x);
 
-                if (mon->previousState != mon->state && (mon->state == ALERT || mon->state == ALARM))
+                if (mon->previousState != mon->state && (mon->state == ALARM || (mon->state == ALERT && mon->previousState != ALARM)))
                 {
                     // have notifications been turned on for this monitor?
                     if (mon->showNotifications)
