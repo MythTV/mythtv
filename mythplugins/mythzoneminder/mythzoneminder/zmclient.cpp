@@ -946,12 +946,12 @@ void ZMClient::showMiniPlayer(int monitorID)
     if (!isMiniPlayerEnabled())
         return;
 
-    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    ZMMiniPlayer *miniPlayer = new ZMMiniPlayer(mainStack);
+    ZMMiniPlayer *miniPlayer = new ZMMiniPlayer(popupStack);
 
     miniPlayer->setAlarmMonitor(monitorID);
 
     if (miniPlayer->Create())
-        mainStack->AddScreen(miniPlayer);
+        popupStack->AddScreen(miniPlayer);
 }
