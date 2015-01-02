@@ -15,6 +15,7 @@
     use MythTV;
     use Carp;
     use Getopt::Long;
+    use Data::Dumper;
 
 # Variables
     my $logFileName = "/var/log/mythtv/optimize_mythdb.log";
@@ -22,20 +23,30 @@
     my $rc = 0;
     my %options;
     
+# Command line options
     GetOptions(
           \%options
         , "logfile=s"        # required string value
-        ) || croak "Invalid command line argument(s)";
+        );
 
-    if (exists($options{'logfile'}) {
+    if (exists($ARGV[0])) {
+	$Data::Dumper::Terse=1;
+        $Data::Dumper::Indent=0;
+        croak "Invalid command line argument(s): " . Dumper(\@ARGV);
+    }
+
+    if (exists($options{'logfile'})) {
         # --logfile was specified on the command line
         $logFileName = $options{'logfile'};
-    } else if (-t STDIN) {
+    } elsif (-t STDIN) {
         # being run from a terminal
         $logFileName = undef;
     }
-    if ($logFileName)
-        open(STDOUT, ">> $logFileName") || croak "Unable to open log file '$logFileName': $!";
+
+# Open log file if necessary
+    if ($logFileName) {
+        open(STDOUT, ">> $logFileName")
+            || croak "Unable to open log file '$logFileName': $!";
     }
     
 # Start a new session in the log file
