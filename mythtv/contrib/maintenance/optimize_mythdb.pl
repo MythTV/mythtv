@@ -10,20 +10,28 @@
 # @license   GPL
 #
 
-# Variables
-    our logFileName = "/var/log/mythtv/optimize_mythdb.log";
-
 # Includes
     use DBI;
     use MythTV;
-    use IO::File;
     use Carp;
+    use IO::File;
+
+# Variables
+    my $logFileName = "/var/log/mythtv/optimize_mythdb.log";
+    my $startTime = localtime;
+    my $rc = 0;
 
 # Open log file
-    $logFileHandle = new IO::File ">> $logFileName";
+    my $logFileHandle = new IO::File ">> $logFileName";
     if (!defined $logFileHandle) {
         croak "Unable to open log file '$logFileName': $!";
     }
+
+# Start a new session in the log file
+    $logFileHandle->print("\n");
+    $logFileHandle->print("\n");
+    $logFileHandle->print("---- optimize_mythdb.pl started $startTime ----\n");
+    $logFileHandle->print("\n");
 
 # Connect to mythbackend
     my $Myth = new MythTV({'connect' => 0});
@@ -33,31 +41,38 @@
 
 # Repair and optimize each table
     foreach $table ($dbh->tables) {
-        $logFileHandle->print "$table: ";
+
+        $logFileHandle->print("$table: ");
 
         if ($dbh->do("REPAIR TABLE $table")) {
-            $logFileHandle->print "repaired";
+            $logFileHandle->print("repaired");
         } else {
-            $logFileHandle->print "ERROR - unable to repair: $dbh->errstr\n";
+            $logFileHandle->print("ERROR - unable to repair: $dbh->errstr\n");
+            $rc = 1;
             next;
         }
 
         if ($dbh->do("OPTIMIZE TABLE $table")) {
-            $logFileHandle->print ", optimized";
+            $logFileHandle->print(", optimized");
         } else {
-            $logFileHandle->print ", ERROR - unable to optimize: $dbh->errstr\n";
+            $logFileHandle->print(", ERROR - unable to optimize: $dbh->errstr\n");
+            $rc = 1;
             next;
         }
 
         if ($dbh->do("ANALYZE TABLE $table")) {
-            $logFileHandle->print ", analyzed";
+            $logFileHandle->print(", analyzed");
         } else {
-            $logFileHandle->print ", ERROR - unable to analyze: $dbh->errstr\n";
+            $logFileHandle->print(", ERROR - unable to analyze: $dbh->errstr\n");
+            $rc = 1;
             next;
         }
         
-        print $logFileHandle->print"\n";
+        $logFileHandle->print("\n");
     }
 
 # Close log file
     $logFileHandle->close;
+
+# Exit
+    exit($rc);
