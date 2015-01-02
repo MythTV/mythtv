@@ -14,17 +14,30 @@
     use DBI;
     use MythTV;
     use Carp;
+    use Getopt::Long;
 
 # Variables
     my $logFileName = "/var/log/mythtv/optimize_mythdb.log";
     my $startTime = localtime;
     my $rc = 0;
+    my %options;
+    
+    GetOptions(
+          \%options
+        , "logfile=s"        # required string value
+        ) || croak "Invalid command line argument(s)";
 
-# If STDIN isn't a terminal, send output to a log file
-    if (! -t STDIN) {
+    if (exists($options{'logfile'}) {
+        # --logfile was specified on the command line
+        $logFileName = $options{'logfile'};
+    } else if (-t STDIN) {
+        # being run from a terminal
+        $logFileName = undef;
+    }
+    if ($logFileName)
         open(STDOUT, ">> $logFileName") || croak "Unable to open log file '$logFileName': $!";
     }
-
+    
 # Start a new session in the log file
     print("\n");
     print("\n");
