@@ -32,7 +32,7 @@
     if (exists($ARGV[0])) {
 	$Data::Dumper::Terse=1;
         $Data::Dumper::Indent=0;
-        croak "Invalid command line argument(s): " . Dumper(\@ARGV);
+        croak "ERROR - Invalid command line argument(s): " . Dumper(\@ARGV);
     }
 
     if (exists($options{'logfile'})) {
@@ -50,7 +50,7 @@
     }
     
 # Start a new session in the log file
-    print("\n");
+    print("\n";)
     print("\n");
     print("---- optimize_mythdb.pl started $startTime ----\n");
     print("\n");
