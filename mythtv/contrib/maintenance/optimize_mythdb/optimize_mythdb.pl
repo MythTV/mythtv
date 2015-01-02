@@ -59,7 +59,7 @@
     my $Myth = new MythTV({'connect' => 0});
 
 # Connect to the database
-    $dbh = $Myth->{'dbh'};
+    my $dbh = $Myth->{'dbh'};
 
 # Repair and optimize each table
     foreach $table ($dbh->tables) {
