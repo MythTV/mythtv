@@ -2,6 +2,7 @@
 
 #include <QDateTime>
 #include <QMutex>
+#include <QObject>
 
 #include "programtypes.h"
 #include "mythdate.h"
