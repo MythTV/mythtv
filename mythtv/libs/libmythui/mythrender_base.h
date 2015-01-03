@@ -6,6 +6,7 @@
 #include <QSize>
 
 #include "referencecounter.h"
+#include "mythuiexp.h"
 
 typedef enum
 {
