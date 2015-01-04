@@ -1421,7 +1421,7 @@ QString NetworkControl::processHelp(NetworkCommand *nc)
             "theme showborders                - Toggle showing widget borders\r\n"
             "theme shownames ON/OFF           - Toggle showing widget names\r\n"
             "theme getwidgetnames PATH        - Display the name and type of all the child widgets from PATH\r\n"
-            "theme getarea WIDGETNAME         - Get the position of widget WIDGET on the active screen\r\n"
+            "theme getarea WIDGETNAME         - Get the area of widget WIDGET on the active screen\r\n"
             "theme setarea WIDGETNAME X Y W H - Change the area of widget WIDGET to X Y W H on the active screen\r\n";
     }
 
