@@ -1226,10 +1226,10 @@ QString NetworkControl::processTheme( NetworkCommand* nc)
 
         QString widgetName = nc->getArg(2);
         QStringList path = widgetName.split('/');
-        int x = nc->getArg(3).toInt();
-        int y = nc->getArg(4).toInt();
-        int w = nc->getArg(5).toInt();
-        int h = nc->getArg(6).toInt();
+        QString x = nc->getArg(3);
+        QString y = nc->getArg(4);
+        QString w = nc->getArg(5);
+        QString h = nc->getArg(6);
 
         MythScreenStack *stack = GetMythMainWindow()->GetStack("popup stack");
         MythScreenType *topScreen = stack->GetTopScreen();
