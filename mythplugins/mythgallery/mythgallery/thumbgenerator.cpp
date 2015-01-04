@@ -242,14 +242,15 @@ void ThumbGenerator::loadDir(QImage& image, const QFileInfo& fi)
     QDir dir(fi.absoluteFilePath());
     dir.setFilter(QDir::Files);
 
+    QList<QByteArray> const fmts = QImageReader::supportedImageFormats();
+
     QFileInfoList list = dir.entryInfoList();
 
     for (QFileInfoList::const_iterator it = list.begin();
          it != list.end() && !m_cancel; ++it)
     {
         const QFileInfo *f = &(*it);
-        QImageReader testread(f->absoluteFilePath());
-        if (testread.canRead())
+        if (fmts.contains(f->completeSuffix().toLower().toLatin1()))
         {
             loadFile(image, *f);
             return;
