@@ -3,8 +3,6 @@
 
 <mythuitheme>
 
-    <baseres>1920x1080</baseres>
-
     <window name="notification">
         <area>-1,20,600,180</area>
         <!--
