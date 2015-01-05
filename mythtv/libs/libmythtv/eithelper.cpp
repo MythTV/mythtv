@@ -1028,6 +1028,8 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     fix[ 2057LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2061LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2063LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2064LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2066LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2068LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2301LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2302LL << 32 | 2U << 16] = EITFixUp::kFixUK;
@@ -1053,6 +1055,8 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     fix[ 2052LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2055LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2056LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2076LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2081LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2315LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2316LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     for (int i = 2402; i <= 2412; ++i)
