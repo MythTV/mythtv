@@ -226,7 +226,7 @@
                         <line color="#000000" alpha="0" width="1" />
                         <fill color="#000000" alpha="130" />
                     </shape>
--
+
                     <statetype name="buttonbackground">
                         <position>0,0</position>
                         <state name="subfolder">
@@ -340,7 +340,7 @@
                                 <area>181,121,58,58</area>
                                 <type>box</type>
                                 <line color="#000000" alpha="0" width="1" />
-                                <fill color="#000000" alpha="130" />v
+                                <fill color="#000000" alpha="130" />
                             </shape>
                             <imagetype name="icon">
                                 <area>183,124,52,52</area>
