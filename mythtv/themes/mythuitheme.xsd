@@ -34,6 +34,7 @@
                 <xs:element ref="editbar" />
                 <xs:element ref="group" />
                 <xs:element ref="video" />
+                <xs:element ref="scrollbar" />
             </xs:choice>
         </xs:sequence>
     </xs:group>
@@ -482,6 +483,10 @@
                             </xs:restriction>
                         </xs:simpleType>
                     </xs:attribute>
+                    <xs:attribute name="rate" type="xs:integer" />
+                    <xs:attribute name="returnrate" type="xs:integer" />
+                    <xs:attribute name="startdelay" type="xs:integer" />
+                    <xs:attribute name="returndelay" type="xs:integer" />
                 </xs:complexType>
             </xs:element>
             <xs:element name="value" type="text" minOccurs="0" maxOccurs="1" />
@@ -731,6 +736,7 @@
                 </xs:simpleType>
             </xs:element>
             <xs:element name="showarrow" type="boolean" minOccurs="0" maxOccurs="1" />
+            <xs:element name="showscrollbar" type="boolean" minOccurs="0" maxOccurs="1" />
             <xs:element name="buttonarea" type="area" minOccurs="0" maxOccurs="1" />
             <xs:element name="drawfrombottom" type="boolean" minOccurs="0" maxOccurs="1" />
             <xs:element name="searchposition" type="position" minOccurs="0" maxOccurs="1" />
@@ -939,6 +945,8 @@
                 </xs:element>
                 <xs:element name="userstylesheet" type="xs:string" minOccurs="0" maxOccurs="1" />
                 <xs:element name="updateinterval" type="xs:integer" minOccurs="0" maxOccurs="1" />
+                <xs:element name="browserarea" type="area" minOccurs="0" maxOccurs="1" />
+                <xs:element name="scrollduration" type="xs:integer" minOccurs="0" maxOccurs="1" />
                 <xs:group ref="widgets" />
             </xs:choice>
             <xs:attributeGroup ref="common_attributes" />
@@ -951,6 +959,26 @@
         <xs:complexType>
             <xs:choice minOccurs="0" maxOccurs="unbounded">
                 <xs:group ref="widget_common" />
+                <xs:group ref="widgets" />
+            </xs:choice>
+            <xs:attributeGroup ref="common_attributes" />
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Scrollbar Widget -->
+    <xs:element name="scrollbar">
+        <xs:complexType>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:group ref="widget_common" />
+                <xs:element name="layout" minOccurs="0" maxOccurs="1">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:enumeration value="horizontal" />
+                            <xs:enumeration value="vertical" />
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+                <xs:element name="hidedelay" type="xs:integer" minOccurs="0" maxOccurs="1" />
                 <xs:group ref="widgets" />
             </xs:choice>
             <xs:attributeGroup ref="common_attributes" />
