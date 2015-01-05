@@ -65,6 +65,8 @@ class CustomEdit : public MythScreenType
     MythUIButton *m_recordButton;
     MythUIButton *m_storeButton;
     MythUIButton *m_cancelButton;
+
+    const MythUIButtonListItem *m_currentRuleItem;
 };
 
 struct CustomRuleInfo {
