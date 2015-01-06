@@ -1877,6 +1877,7 @@ void GuideGrid::customEvent(QEvent *event)
 
         if (message == "SCHEDULE_CHANGE")
         {
+            GuideHelper::Wait(this);
             LoadFromScheduler(m_recList);
             fillProgramInfos();
         }
