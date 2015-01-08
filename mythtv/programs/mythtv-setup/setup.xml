@@ -6,13 +6,11 @@
      <action>GENERAL</action>
    </button>
 
-   <!--
    <button>
      <type>SETUP_CAPTURE_CARDS</type>
      <text>2. Capture cards</text>
      <action>CAPTURE CARDS</action>
      </button>
-   -->
 
     <button>
         <type>TV_SETTINGS_RECORDING_PROFILES</type>

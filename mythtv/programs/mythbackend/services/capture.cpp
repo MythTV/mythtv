@@ -194,8 +194,6 @@ DTC::CaptureCard* Capture::GetCaptureCard( int nCardId )
 
 bool Capture::RemoveCaptureCard( int nCardId )
 {
-    throw QString("Service temporarily disabled.");
-    
     if ( nCardId < 1 )
         throw( QString( "The Card ID is invalid."));
 
@@ -233,8 +231,6 @@ int Capture::AddCaptureCard     ( const QString    &sVideoDevice,
                                   const uint       nDiSEqCId,
                                   bool             bDVBEITScan)
 {
-    throw QString("Service temporarily disabled.");
-    
     if ( sVideoDevice.isEmpty() || sCardType.isEmpty() || sHostName.isEmpty() )
         throw( QString( "This API requires at least a video device node, a card type, "
                         "and a hostname." ));
@@ -257,8 +253,6 @@ bool Capture::UpdateCaptureCard  ( int              nCardId,
                                    const QString    &sSetting,
                                    const QString    &sValue )
 {
-    throw QString("Service temporarily disabled.");
-    
     if ( nCardId < 1 || sSetting.isEmpty() || sValue.isEmpty() )
         throw( QString( "Card ID, Setting Name, and Value are required." ));
 

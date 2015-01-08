@@ -325,7 +325,10 @@ class MTV_PUBLIC CardUtil
 
     // Input Groups
     static uint         CreateInputGroup(const QString &name);
-    static bool         CreateInputGroupIfNeeded(uint cardid);
+    static uint         CreateDeviceInputGroup(const QString &host,
+                                               const QString &device)
+        { return CreateInputGroup(host + '|' + device); }
+    static uint         GetDeviceInputGroup(uint cardid);
     static bool         LinkInputGroup(uint inputid, uint inputgroupid);
     static bool         UnlinkInputGroup(uint inputid, uint inputgroupid);
     static vector<uint> GetInputGroups(uint inputid);

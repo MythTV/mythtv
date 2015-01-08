@@ -1511,41 +1511,28 @@ uint CardUtil::CreateInputGroup(const QString &name)
     return inputgroupid;
 }
 
-bool CardUtil::CreateInputGroupIfNeeded(uint cardid)
+uint CardUtil::GetDeviceInputGroup(uint cardid)
 {
-    // Make sure the card's inputs are all in a single
-    // input group, create one if needed.
-    vector<uint> ingrps = CardUtil::GetSharedInputGroups(cardid);
-    vector<uint> inputs = CardUtil::GetInputIDs(cardid);
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT inputgroupid "
+        "FROM inputgroup "
+        "WHERE cardinputid = :INPUTID "
+        "      AND inputgroupname REGEXP '^[a-z_-]*\\\\|'");
+    query.bindValue(":INPUTID", cardid);
 
-    if (ingrps.empty() && !inputs.empty())
+    if (!query.exec())
     {
-        QString name = CardUtil::GetRawCardType(cardid) + "_" +
-            CardUtil::GetVideoDevice(cardid);
-        uint id = 0;
-        for (uint i = 0; !id && (i < 100); i++)
-        {
-            if (i)
-                name += QString(":%1").arg(i);
-            id = CardUtil::CreateInputGroup(name);
-        }
-        if (!id)
-        {
-            LOG(VB_GENERAL, LOG_ERR, "Failed to create input group");
-            return false;
-        }
-
-        bool ok = true;
-        for (uint i = 0; i < inputs.size(); i++)
-            ok &= CardUtil::LinkInputGroup(inputs[i], id);
-
-        if (!ok)
-            LOG(VB_GENERAL, LOG_ERR, "Failed to link to new input group");
-
-        return ok;
+        MythDB::DBError("CardUtil::GetDeviceInputGroup()", query);
+        return false;
     }
 
-    return true;
+    if (query.next())
+    {
+        return query.value(0).toUInt();
+    }
+
+    return 0;
 }
 
 bool CardUtil::LinkInputGroup(uint inputid, uint inputgroupid)
@@ -2235,7 +2222,11 @@ int CardUtil::CreateCaptureCard(const QString &videodevice,
     int cardid = -1;  /* must be int not uint because of return type. */
 
     if (query.next())
+    {
         cardid = query.value(0).toInt();
+        uint groupid = CardUtil::CreateDeviceInputGroup(hostname, videodevice);
+        CardUtil::LinkInputGroup(cardid, groupid);
+    }
 
     return cardid;
 }

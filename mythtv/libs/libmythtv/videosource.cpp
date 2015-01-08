@@ -2472,6 +2472,11 @@ void CaptureCard::loadByID(int cardid)
 void CaptureCard::Save(void)
 {
     uint init_cardid = getCardID();
+    QString init_type = CardUtil::GetRawCardType(init_cardid);
+    QString init_dev = CardUtil::GetVideoDevice(init_cardid);
+    vector<uint> cardids;
+    if (!init_dev.isEmpty())
+        cardids = CardUtil::GetCardIDs(init_dev, init_type);
 
     ////////
 
@@ -2481,51 +2486,55 @@ void CaptureCard::Save(void)
 
     uint cardid = getCardID();
     QString type = CardUtil::GetRawCardType(cardid);
+    QString dev = CardUtil::GetVideoDevice(cardid);
+    if (cardids.empty())
+        cardids.push_back(cardid);
+
+    if (dev != init_dev)
+    {
+        if (!init_dev.isEmpty())
+        {
+            uint init_groupid = CardUtil::GetDeviceInputGroup(init_cardid);
+            CardUtil::UnlinkInputGroup(init_cardid, init_groupid);
+        }
+        if (!dev.isEmpty())
+        {
+            uint groupid =
+                CardUtil::CreateDeviceInputGroup(gCoreContext->GetHostName(),
+                                                  dev);
+            CardUtil::LinkInputGroup(cardid, groupid);
+            CardUtil::UnlinkInputGroup(0, groupid);
+        }
+    }
+
     if (!CardUtil::IsTunerSharingCapable(type))
         return;
-
-    QString init_dev = CardUtil::GetVideoDevice(cardid);
-    if (init_dev.isEmpty())
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("Cannot clone card #%1 with empty videodevice")
-                .arg(cardid));
-        return;
-    }
-    vector<uint> cardids = CardUtil::GetCardIDs(init_dev, type);
 
     if (!instance_count)
     {
         instance_count = (init_cardid) ?
             max((size_t)1, cardids.size()) : kDefaultMultirecCount;
     }
-    uint cloneCount = instance_count - 1;
-
-    if (!init_cardid)
-        init_cardid = cardid;
 
     // Delete old clone cards as required.
-    for (uint i = cardids.size() - 1; (i > cloneCount) && !cardids.empty(); i--)
+    for (uint i = cardids.size() - 1;
+         (i > instance_count - 1) && !cardids.empty(); --i)
     {
         CardUtil::DeleteCard(cardids.back());
         cardids.pop_back();
     }
 
-    // Make sure clones & original all share an input group
-    if (cloneCount && !CardUtil::CreateInputGroupIfNeeded(cardid))
-        return;
-
     // Clone this config to existing clone cards.
     for (uint i = 0; i < cardids.size(); i++)
     {
-        if (cardids[i] != init_cardid)
-            CardUtil::CloneCard(init_cardid, cardids[i]);
+        if (cardids[i] != cardid)
+            CardUtil::CloneCard(cardid, cardids[i]);
     }
 
     // Create new clone cards as required.
-    for (uint i = cardids.size(); i < cloneCount + 1; i++)
+    for (uint i = cardids.size(); i < instance_count; i++)
     {
-        CardUtil::CloneCard(init_cardid, 0);
+        CardUtil::CloneCard(cardid, 0);
     }
 }
 
@@ -3297,7 +3306,7 @@ void CardInput::Save(void)
     if (CardUtil::IsTunerSharingCapable(type))
     {
         vector<uint> clones = CardUtil::GetCloneCardIDs(src_cardid);
-        if (clones.size() && CardUtil::CreateInputGroupIfNeeded(src_cardid))
+        if (clones.size())
         {
             for (uint i = 0; i < clones.size(); i++)
                 CardUtil::CloneCard(src_cardid, clones[i]);
