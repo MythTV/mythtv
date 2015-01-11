@@ -33,9 +33,9 @@ UPnpCDSVideo::UPnpCDSVideo()
     m_URIBase.setPort(sPort);
 
     // ShortCuts
-    m_shortcuts.insert(UPnPCDSShortcuts::VIDEOS, "Videos");
-    m_shortcuts.insert(UPnPCDSShortcuts::VIDEOS_ALL, "Videos/Video");
-    m_shortcuts.insert(UPnPCDSShortcuts::VIDEOS_GENRES, "Videos/Genre");
+    m_shortcuts.insert(UPnPShortcutFeature::VIDEOS, "Videos");
+    m_shortcuts.insert(UPnPShortcutFeature::VIDEOS_ALL, "Videos/Video");
+    m_shortcuts.insert(UPnPShortcutFeature::VIDEOS_GENRES, "Videos/Genre");
 }
 
 void UPnpCDSVideo::CreateRoot()

@@ -64,11 +64,11 @@ UPnpCDSMusic::UPnpCDSMusic()
     m_URIBase.setPort(sPort);
 
     // ShortCuts
-    m_shortcuts.insert(UPnPCDSShortcuts::MUSIC, "Music");
-    m_shortcuts.insert(UPnPCDSShortcuts::MUSIC_ALL, "Music/Track");
-    m_shortcuts.insert(UPnPCDSShortcuts::MUSIC_ALBUMS, "Music/Album");
-    m_shortcuts.insert(UPnPCDSShortcuts::MUSIC_ARTISTS, "Music/Artist");
-    m_shortcuts.insert(UPnPCDSShortcuts::MUSIC_GENRES, "Music/Genre");
+    m_shortcuts.insert(UPnPShortcutFeature::MUSIC, "Music");
+    m_shortcuts.insert(UPnPShortcutFeature::MUSIC_ALL, "Music/Track");
+    m_shortcuts.insert(UPnPShortcutFeature::MUSIC_ALBUMS, "Music/Album");
+    m_shortcuts.insert(UPnPShortcutFeature::MUSIC_ARTISTS, "Music/Artist");
+    m_shortcuts.insert(UPnPShortcutFeature::MUSIC_GENRES, "Music/Genre");
 }
 
 /////////////////////////////////////////////////////////////////////////////

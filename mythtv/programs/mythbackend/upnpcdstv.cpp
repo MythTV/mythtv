@@ -137,7 +137,7 @@ UPnpCDSTv::UPnpCDSTv()
     m_URIBase.setPort(sPort);
 
     // ShortCuts
-    m_shortcuts.insert(UPnPCDSShortcuts::VIDEOS_RECORDINGS, "Recordings");
+    m_shortcuts.insert(UPnPShortcutFeature::VIDEOS_RECORDINGS, "Recordings");
 }
 
 void UPnpCDSTv::CreateRoot()
