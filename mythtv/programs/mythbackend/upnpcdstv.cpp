@@ -528,7 +528,7 @@ bool UPnpCDSTv::LoadTitles(const UPnpCDSRequest* pRequest,
     uint16_t nCount = pRequest->m_nRequestedCount;
     uint16_t nOffset = pRequest->m_nStartingIndex;
 
-    // We must use a dedicated connection to get an acccurate value from
+    // We must use a dedicated connection to get an accurate value from
     // FOUND_ROWS()
     MSqlQuery query(MSqlQuery::InitCon(MSqlQuery::kDedicatedConnection));
 
@@ -615,7 +615,7 @@ bool UPnpCDSTv::LoadDates(const UPnpCDSRequest* pRequest,
     uint16_t nCount = pRequest->m_nRequestedCount;
     uint16_t nOffset = pRequest->m_nStartingIndex;
 
-    // We must use a dedicated connection to get an acccurate value from
+    // We must use a dedicated connection to get an accurate value from
     // FOUND_ROWS()
     MSqlQuery query(MSqlQuery::InitCon(MSqlQuery::kDedicatedConnection));
 
@@ -682,7 +682,7 @@ bool UPnpCDSTv::LoadGenres( const UPnpCDSRequest* pRequest,
     uint16_t nCount = pRequest->m_nRequestedCount;
     uint16_t nOffset = pRequest->m_nStartingIndex;
 
-    // We must use a dedicated connection to get an acccurate value from
+    // We must use a dedicated connection to get an accurate value from
     // FOUND_ROWS()
     MSqlQuery query(MSqlQuery::InitCon(MSqlQuery::kDedicatedConnection));
 
@@ -753,7 +753,7 @@ bool UPnpCDSTv::LoadRecGroups(const UPnpCDSRequest* pRequest,
     uint16_t nCount = pRequest->m_nRequestedCount;
     uint16_t nOffset = pRequest->m_nStartingIndex;
 
-    // We must use a dedicated connection to get an acccurate value from
+    // We must use a dedicated connection to get an accurate value from
     // FOUND_ROWS()
     MSqlQuery query(MSqlQuery::InitCon(MSqlQuery::kDedicatedConnection));
 
@@ -825,7 +825,7 @@ bool UPnpCDSTv::LoadChannels(const UPnpCDSRequest* pRequest,
     uint16_t nCount = pRequest->m_nRequestedCount;
     uint16_t nOffset = pRequest->m_nStartingIndex;
 
-    // We must use a dedicated connection to get an acccurate value from
+    // We must use a dedicated connection to get an accurate value from
     // FOUND_ROWS()
     MSqlQuery query(MSqlQuery::InitCon(MSqlQuery::kDedicatedConnection));
 
@@ -945,7 +945,7 @@ bool UPnpCDSTv::LoadRecordings(const UPnpCDSRequest* pRequest,
         nOffset = 0;
     }
 
-    // We must use a dedicated connection to get an acccurate value from
+    // We must use a dedicated connection to get an accurate value from
     // FOUND_ROWS()
     MSqlQuery query(MSqlQuery::InitCon(MSqlQuery::kDedicatedConnection));
 
@@ -973,6 +973,9 @@ bool UPnpCDSTv::LoadRecordings(const UPnpCDSRequest* pRequest,
 
 
     QString orderByString = "ORDER BY r.starttime DESC, r.title";
+
+    if (!tokens["title"].isEmpty())
+        orderByString = "ORDER BY p.season, p.episode, r.starttime ASC"; // In season/episode order, falling back to recorded order
 
     QStringList clauses;
     QString whereString = BuildWhereClause(clauses, tokens);
