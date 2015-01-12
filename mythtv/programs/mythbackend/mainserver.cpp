@@ -1066,6 +1066,9 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
 
 void MainServer::customEvent(QEvent *e)
 {
+    if (!e)
+        return;
+
     QStringList broadcast;
     QSet<QString> receivers;
 
