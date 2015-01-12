@@ -6220,7 +6220,6 @@ fi
 
 check_optflags(){
     check_cflags "$@"
-    check_cxxflags "$@"
     enabled lto && check_ldflags "$@"
 }
 
@@ -6228,7 +6227,6 @@ check_optflags(){
 if enabled lto; then
     test "$cc_type" != "$ld_type" && die "LTO requires same compiler and linker"
     check_cflags  -flto
-    check_cxxflags -flto
     check_ldflags -flto $cpuflags
     disable inline_asm_direct_symbol_refs
 fi
@@ -6474,22 +6472,15 @@ fi
 
 if [ -n "$optflags" ]; then
     add_cflags $optflags
-    add_cxxflags $optflags
 elif enabled small; then
     add_cflags $cflags_size
-    add_cxxflags $cflags_size
 elif enabled optimizations; then
     add_cflags $cflags_speed
-    add_cxxflags $cflags_speed
 else
     add_cflags $cflags_noopt
-    add_cxxflags $cflags_noopt
 fi
 check_cflags -fno-math-errno
-check_cxxflags -fno-math-errno
 check_cflags -fno-signed-zeros
-check_cxxflags -fno-signed-zeros
-
 check_cc -mno-red-zone <<EOF && noredzone_flags="-mno-red-zone"
 int x;
 EOF
