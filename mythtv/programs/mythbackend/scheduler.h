@@ -81,7 +81,7 @@ class Scheduler : public MThread, public MythScheduler
     void PrintList(bool onlyFutureRecordings = false)
         { PrintList(reclist, onlyFutureRecordings); };
     void PrintList(RecList &list, bool onlyFutureRecordings = false);
-    void PrintRec(const RecordingInfo *p, const QString prefix = "");
+    void PrintRec(const RecordingInfo *p, const QString &prefix = "");
 
     void SetMainServer(MainServer *ms);
 

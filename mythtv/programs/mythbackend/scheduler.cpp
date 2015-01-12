@@ -611,7 +611,7 @@ void Scheduler::PrintList(RecList &list, bool onlyFutureRecordings)
     LOG(VB_SCHEDULE, LOG_INFO, "---  print list end  ---");
 }
 
-void Scheduler::PrintRec(const RecordingInfo *p, const QString prefix)
+void Scheduler::PrintRec(const RecordingInfo *p, const QString &prefix)
 {
     if (!VERBOSE_LEVEL_CHECK(VB_SCHEDULE, LOG_DEBUG))
         return;
