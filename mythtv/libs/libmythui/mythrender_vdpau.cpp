@@ -1910,6 +1910,8 @@ void MythRenderVDPAU::ResetProcs(void)
     vdp_bitmap_surface_destroy = NULL;
     vdp_bitmap_surface_put_bits_native = NULL;
     vdp_preemption_callback_register = NULL;
+    vdp_get_api_version = NULL;
+    vdp_get_information_string = NULL;
 }
 
 void MythRenderVDPAU::DestroyPresentationQueue(void)
