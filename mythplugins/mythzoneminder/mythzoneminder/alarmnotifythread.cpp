@@ -63,7 +63,7 @@ void AlarmNotifyThread::run()
             }
         }
 
-        usleep(1000000);
+        usleep(999999);
     }
 
     RunEpilog();
