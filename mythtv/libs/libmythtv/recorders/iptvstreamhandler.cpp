@@ -28,24 +28,24 @@
 
 #define LOC QString("IPTVSH(%1): ").arg(_device)
 
-QMap<QString,IPTVStreamHandler*> IPTVStreamHandler::s_handlers;
-QMap<QString,uint>               IPTVStreamHandler::s_handlers_refcnt;
-QMutex                           IPTVStreamHandler::s_handlers_lock;
+QMap<QString,IPTVStreamHandler*> IPTVStreamHandler::s_iptvhandlers;
+QMap<QString,uint>               IPTVStreamHandler::s_iptvhandlers_refcnt;
+QMutex                           IPTVStreamHandler::s_iptvhandlers_lock;
 
 IPTVStreamHandler *IPTVStreamHandler::Get(const IPTVTuningData &tuning)
 {
-    QMutexLocker locker(&s_handlers_lock);
+    QMutexLocker locker(&s_iptvhandlers_lock);
 
     QString devkey = tuning.GetDeviceKey();
 
-    QMap<QString,IPTVStreamHandler*>::iterator it = s_handlers.find(devkey);
+    QMap<QString,IPTVStreamHandler*>::iterator it = s_iptvhandlers.find(devkey);
 
-    if (it == s_handlers.end())
+    if (it == s_iptvhandlers.end())
     {
         IPTVStreamHandler *newhandler = new IPTVStreamHandler(tuning);
         newhandler->Start();
-        s_handlers[devkey] = newhandler;
-        s_handlers_refcnt[devkey] = 1;
+        s_iptvhandlers[devkey] = newhandler;
+        s_iptvhandlers_refcnt[devkey] = 1;
 
         LOG(VB_RECORD, LOG_INFO,
             QString("IPTVSH: Creating new stream handler %1 for %2")
@@ -53,25 +53,25 @@ IPTVStreamHandler *IPTVStreamHandler::Get(const IPTVTuningData &tuning)
     }
     else
     {
-        s_handlers_refcnt[devkey]++;
-        uint rcount = s_handlers_refcnt[devkey];
+        s_iptvhandlers_refcnt[devkey]++;
+        uint rcount = s_iptvhandlers_refcnt[devkey];
         LOG(VB_RECORD, LOG_INFO,
             QString("IPTVSH: Using existing stream handler %1 for %2")
             .arg(devkey).arg(tuning.GetDeviceName()) +
             QString(" (%1 in use)").arg(rcount));
     }
 
-    return s_handlers[devkey];
+    return s_iptvhandlers[devkey];
 }
 
 void IPTVStreamHandler::Return(IPTVStreamHandler * & ref)
 {
-    QMutexLocker locker(&s_handlers_lock);
+    QMutexLocker locker(&s_iptvhandlers_lock);
 
     QString devname = ref->_device;
 
-    QMap<QString,uint>::iterator rit = s_handlers_refcnt.find(devname);
-    if (rit == s_handlers_refcnt.end())
+    QMap<QString,uint>::iterator rit = s_iptvhandlers_refcnt.find(devname);
+    if (rit == s_iptvhandlers_refcnt.end())
         return;
 
     LOG(VB_RECORD, LOG_INFO, QString("IPTVSH: Return(%1) has %2 handlers")
@@ -84,14 +84,14 @@ void IPTVStreamHandler::Return(IPTVStreamHandler * & ref)
         return;
     }
 
-    QMap<QString,IPTVStreamHandler*>::iterator it = s_handlers.find(devname);
-    if ((it != s_handlers.end()) && (*it == ref))
+    QMap<QString,IPTVStreamHandler*>::iterator it = s_iptvhandlers.find(devname);
+    if ((it != s_iptvhandlers.end()) && (*it == ref))
     {
         LOG(VB_RECORD, LOG_INFO, QString("IPTVSH: Closing handler for %1")
                            .arg(devname));
         ref->Stop();
         delete *it;
-        s_handlers.erase(it);
+        s_iptvhandlers.erase(it);
     }
     else
     {
@@ -100,7 +100,7 @@ void IPTVStreamHandler::Return(IPTVStreamHandler * & ref)
                 .arg(devname));
     }
 
-    s_handlers_refcnt.erase(rit);
+    s_iptvhandlers_refcnt.erase(rit);
     ref = NULL;
 }
 
