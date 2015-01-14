@@ -165,8 +165,8 @@ void ImportIconsWizard::enableControls(dialogState state, bool selectEnabled)
 void ImportIconsWizard::manualSearch()
 {
     QString str = m_manualEdit->GetText();
-    if (!search(escape_csv(str)))
-        m_statusText->SetText(tr("No matches found for %1") .arg(str));
+    if (!search(str))
+        m_statusText->SetText(tr("No matches found for \"%1\"").arg(str));
     else
         m_statusText->Reset();
 }
@@ -476,7 +476,7 @@ bool ImportIconsWizard::doLoad()
     m_nameText->SetText(tr("Choose icon for channel %1")
                         .arg((*m_missingIter).strName));
     m_manualEdit->SetText((*m_missingIter).strName);
-    if (!search((*m_missingIter).strNameCSV))
+    if (!search((*m_missingIter).strName))
         m_statusText->SetText(tr("No matches found for %1")
                               .arg((*m_missingIter).strName));
     else
