@@ -935,8 +935,8 @@ int HLSReader::DownloadSegmentData(MythSingleDownload& downloader,
     {
         if (!hls->DecodeData(downloader, hls->IVLoaded() ? hls->AESIV() : NULL,
                              segment.KeyPath(),
-                             buffer, segment.Sequence()));
-        return 0;
+                             buffer, segment.Sequence()))
+            return 0;
     }
 #endif
 
