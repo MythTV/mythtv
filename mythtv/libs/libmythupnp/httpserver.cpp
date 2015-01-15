@@ -57,7 +57,7 @@ QString  HttpServer::s_platform;
 
 HttpServer::HttpServer(const QString &sApplicationPrefix) :
     ServerPool(), m_sSharePath(GetShareDir()),
-    m_pHtmlServer(new HtmlServerExtension(m_sSharePath, sApplicationPrefix)),
+    m_pHtmlServer(new HtmlServerExtension(m_sSharePath + "html", sApplicationPrefix)),
     m_threadPool("HttpServerPool"), m_running(true)
 {
     // Number of connections processed concurrently

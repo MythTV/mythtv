@@ -28,19 +28,8 @@ HtmlServerExtension::HtmlServerExtension( const QString &sSharePath,
   : HttpServerExtension( "Html" , sSharePath),
     m_IndexFilename(sApplicationPrefix + "index")
 {
-    // Cache the canonical path for the share directory.
-
-    QDir dir( sSharePath + "/html" );
-
-    if (getenv("MYTHHTMLDIR"))
-    {
-        QString sTempSharePath = getenv("MYTHHTMLDIR");
-        if (!sTempSharePath.isEmpty())
-            dir.setPath( sTempSharePath );
-    }
-
-    m_sSharePath =  dir.canonicalPath();
-
+    LOG(VB_HTTP, LOG_INFO, QString("HtmlServerExtension() - SharePath = %1")
+            .arg(m_sSharePath));
     m_Scripting.SetResourceRootPath( m_sSharePath );
 }
 
