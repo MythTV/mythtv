@@ -19,13 +19,11 @@
         <action>RECORDING PROFILE</action>
     </button>
 
-    <!--
    <button>
      <type>SETUP_VIDEO_SOURCES</type>
      <text>4. Video sources</text>
      <action>VIDEO SOURCES</action>
      </button>
-    -->
 
    <button>
      <type>SETUP_INPUT_CONNECTIONS</type>

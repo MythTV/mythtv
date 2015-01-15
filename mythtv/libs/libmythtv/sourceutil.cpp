@@ -502,8 +502,9 @@ bool SourceUtil::DeleteSource(uint sourceid)
         return false;
     }
 
-    // Delete the inputs associated with the source
-    query.prepare("SELECT cardid FROM capturecard "
+    // Detach the inputs associated with the source
+    query.prepare("UPDATE capturecard "
+                  "SET sourceid = 0 "
                   "WHERE sourceid = :SOURCEID");
     query.bindValue(":SOURCEID", sourceid);
 
@@ -511,10 +512,6 @@ bool SourceUtil::DeleteSource(uint sourceid)
     {
         MythDB::DBError("Deleting cardinputs", query);
         return false;
-    }
-    while (query.next())
-    {
-        CardUtil::DeleteInput(query.value(0).toUInt());
     }
 
     // Delete the source itself
@@ -528,10 +525,6 @@ bool SourceUtil::DeleteSource(uint sourceid)
         return false;
     }
 
-    // Delete any orphaned inputs & unused input groups
-    CardUtil::DeleteOrphanInputs();
-    CardUtil::UnlinkInputGroup(0,0);
-
     return true;
 }
 
@@ -539,16 +532,13 @@ bool SourceUtil::DeleteAllSources(void)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    // Delete all inputs
-    query.prepare("SELECT cardid FROM capturecard");
+    // Detach all inputs from any source
+    query.prepare("UPDATE capturecard "
+                  "SET sourceid = 0");
     if (!query.exec() || !query.isActive())
     {
         MythDB::DBError("Deleting sources", query);
         return false;
-    }
-    while (query.next())
-    {
-        CardUtil::DeleteInput(query.value(0).toUInt());
     }
 
     return (query.exec("TRUNCATE TABLE channel") &&
