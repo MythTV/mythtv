@@ -24,14 +24,14 @@
      <type>SETUP_VIDEO_SOURCES</type>
      <text>4. Video sources</text>
      <action>VIDEO SOURCES</action>
-   </button>
+     </button>
+    -->
 
    <button>
      <type>SETUP_INPUT_CONNECTIONS</type>
      <text>5. Input connections</text>
      <action>CARD INPUTS</action>
    </button>
-     -->
 
    <button>
      <type>SETUP_CHANNEL_EDITOR</type>

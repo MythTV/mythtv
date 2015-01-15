@@ -835,7 +835,6 @@ class CardInput : public QObject, public ConfigurationWizard
     };
 
     ID              *id;
-    CardID          *cardid;
     InputName       *inputname;
     SourceID        *sourceid;
     StartingChannel *startchan;

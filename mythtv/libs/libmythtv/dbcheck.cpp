@@ -3018,6 +3018,20 @@ NULL
             return false;
     }
 
+    if (dbver == "1333")
+    {
+        const char *updates[] = {
+            // Fix default value of capturecard.inputname.
+            "ALTER TABLE capturecard "
+            "    MODIFY COLUMN inputname VARCHAR(32) NOT NULL DEFAULT 'None'",
+            "UPDATE capturecard c "
+            "    SET inputname = 'None' WHERE inputname = '' ",
+            NULL
+        };
+        if (!performActualUpdate(updates, "1334", dbver))
+            return false;
+    }
+
     return true;
 }
 

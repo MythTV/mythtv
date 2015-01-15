@@ -242,6 +242,7 @@ class MTV_PUBLIC CardUtil
 
     static vector<uint> GetCardIDs(QString videodevice = QString::null,
                                    QString rawtype     = QString::null,
+                                   QString inputname   = QString::null,
                                    QString hostname    = QString::null);
 
     static bool         IsCardTypePresent(const QString &rawtype,
@@ -349,15 +350,13 @@ class MTV_PUBLIC CardUtil
     static void         GetCardInputs(uint                cardid,
                                       const QString      &device,
                                       const QString      &cardtype,
-                                      QStringList        &inputLabels,
-                                      vector<CardInput*> &cardInputs);
+                                      QStringList        &inputs);
 
     // General info from OS
     static QStringList  ProbeVideoDevices(const QString &rawtype);
 
     // Other
     static bool         CloneCard(uint src_cardid, uint dst_cardid);
-    static vector<uint> GetCloneCardIDs(uint cardid);
     static QString      GetFirewireChangerNode(uint inputid);
     static QString      GetFirewireChangerModel(uint inputid);
 

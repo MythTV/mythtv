@@ -263,8 +263,6 @@ bool Capture::UpdateCaptureCard  ( int              nCardId,
 
 bool Capture::RemoveCardInput( int nCardInputId )
 {
-    throw QString("Service temporarily disabled.");
-    
     if ( nCardInputId < 1 )
         throw( QString( "The Input ID is invalid."));
 
@@ -289,9 +287,8 @@ int Capture::AddCardInput       ( const uint nCardId,
                                   const uint nSchedOrder,
                                   const uint nLiveTVOrder)
 {
-    throw QString("Service temporarily disabled.");
-    
-    if ( nCardId < 1 || nSourceId < 1 || sInputName.isEmpty() )
+    if ( nCardId < 1 || nSourceId < 1 ||
+         sInputName.isEmpty() || sInputName == "None" )
         throw( QString( "This API requires at least a card ID, a source ID, "
                         "and an input name." ));
 
@@ -308,8 +305,6 @@ bool Capture::UpdateCardInput    ( int              nCardInputId,
                                    const QString    &sSetting,
                                    const QString    &sValue )
 {
-    throw QString("Service temporarily disabled.");
-    
     if ( nCardInputId < 1 || sSetting.isEmpty() || sValue.isEmpty() )
         throw( QString( "Input ID, Setting Name, and Value are required." ));
 

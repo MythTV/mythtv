@@ -624,6 +624,7 @@ bool set_on_input(const QString &to_set, uint inputid, const QString &value)
  */
 vector<uint> CardUtil::GetCardIDs(QString videodevice,
                                   QString rawtype,
+                                  QString inputname,
                                   QString hostname)
 {
     vector<uint> list;
@@ -641,6 +642,7 @@ vector<uint> CardUtil::GetCardIDs(QString videodevice,
         "SELECT cardid "
         "FROM capturecard "
         "WHERE videodevice = :DEVICE AND "
+        "      inputname   = :INPUTNAME AND "
         "      hostname    = :HOSTNAME";
 
     if (!rawtype.isEmpty())
@@ -651,7 +653,10 @@ vector<uint> CardUtil::GetCardIDs(QString videodevice,
     query.prepare(qstr);
 
     if (!videodevice.isEmpty())
+    {
         query.bindValue(":DEVICE",   videodevice);
+        query.bindValue(":INPUTNAME", inputname);
+    }
 
     query.bindValue(":HOSTNAME", hostname);
 
@@ -720,7 +725,12 @@ static uint clone_capturecard(uint src_cardid, uint orig_dst_cardid)
         "SELECT videodevice,           cardtype,                         "
         "       hostname,              signal_timeout, channel_timeout,  "
         "       dvb_wait_for_seqstart, dvb_on_demand,  dvb_tuning_delay, "
-        "       dvb_diseqc_type,       diseqcid,       dvb_eitscan "
+        "       dvb_diseqc_type,       diseqcid,       dvb_eitscan,      "
+        "       inputname,             sourceid,       externalcommand,  "
+        "       changer_device,        changer_model,  tunechan,         "
+        "       startchan,             displayname,    dishnet_eit,      "
+        "       recpriority,           quicktune,      schedorder,       "
+        "       livetvorder "
         "FROM capturecard "
         "WHERE cardid = :CARDID");
     query.bindValue(":CARDID", src_cardid);
@@ -749,9 +759,22 @@ static uint clone_capturecard(uint src_cardid, uint orig_dst_cardid)
         "    dvb_tuning_delay      = :V7, "
         "    dvb_diseqc_type       = :V8, "
         "    diseqcid              = :V9,"
-        "    dvb_eitscan           = :V10 "
+        "    dvb_eitscan           = :V10, "
+        "    inputname             = :V11, "
+        "    sourceid              = :V12, "
+        "    externalcommand       = :V13, "
+        "    changer_device        = :V14, "
+        "    changer_model         = :V15, "
+        "    tunechan              = :V16, "
+        "    startchan             = :V17, "
+        "    displayname           = :V18, "
+        "    dishnet_eit           = :V19, "
+        "    recpriority           = :V20, "
+        "    quicktune             = :V21, "
+        "    schedorder            = :V22, "
+        "    livetvorder           = :V23  "
         "WHERE cardid = :CARDID");
-    for (uint i = 0; i < 11; i++)
+    for (uint i = 0; i < 24; i++)
         query2.bindValue(QString(":V%1").arg(i), query.value(i).toString());
     query2.bindValue(":CARDID", dst_cardid);
 
@@ -763,155 +786,20 @@ static uint clone_capturecard(uint src_cardid, uint orig_dst_cardid)
         return 0;
     }
 
+    // copy input group linkages
+    vector<uint> src_grps = CardUtil::GetInputGroups(src_cardid);
+    vector<uint> dst_grps = CardUtil::GetInputGroups(dst_cardid);
+    for (uint j = 0; j < dst_grps.size(); j++)
+        CardUtil::UnlinkInputGroup(dst_cardid, dst_grps[j]);
+    for (uint j = 0; j < src_grps.size(); j++)
+        CardUtil::LinkInputGroup(dst_cardid, src_grps[j]);
+
+    // clone diseqc_config (just points to the same diseqc_tree row)
+    DiSEqCDevSettings diseqc;
+    if (diseqc.Load(src_cardid))
+        diseqc.Store(dst_cardid);
+
     return dst_cardid;
-}
-
-static bool clone_cardinputs(uint src_cardid, uint dst_cardid)
-{
-    vector<uint> src_inputs = CardUtil::GetInputIDs(src_cardid);
-    vector<uint> dst_inputs = CardUtil::GetInputIDs(dst_cardid);
-    vector<QString> src_names;
-    vector<QString> dst_names;
-    QMap<uint,bool> dst_keep;
-
-    for (uint i = 0; i < src_inputs.size(); i++)
-        src_names.push_back(CardUtil::GetInputName(src_inputs[i]));
-
-    for (uint i = 0; i < dst_inputs.size(); i++)
-        dst_names.push_back(CardUtil::GetInputName(dst_inputs[i]));
-
-    bool ok = true;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    MSqlQuery query2(MSqlQuery::InitCon());
-
-    for (uint i = 0; i < src_inputs.size(); i++)
-    {
-        query.prepare(
-            "SELECT sourceid,        inputname,       externalcommand, "
-            "       tunechan,        startchan,       displayname,     "
-            "       dishnet_eit,     recpriority,     quicktune,       "
-            "       schedorder,      livetvorder                       "
-            "FROM capturecard "
-            "WHERE cardid = :INPUTID");
-        query.bindValue(":INPUTID", src_inputs[i]);
-        if (!query.exec())
-        {
-            MythDB::DBError("clone_cardinput -- get data", query);
-            ok = false;
-            break;
-        }
-        if (!query.next())
-        {
-            LOG(VB_GENERAL, LOG_ERR, "clone_cardinput -- get data 2");
-            ok = false;
-            break;
-        }
-
-        int match = -1;
-        for (uint j = 0; j < dst_inputs.size(); j++)
-        {
-            if (src_names[i] == dst_names[j])
-            {
-                match = (int) j;
-                break;
-            }
-        }
-
-        uint dst_inputid = 0;
-        if (match >= 0)
-        {
-            dst_keep[match] = true;
-
-            // copy data from src[i] to dst[match]
-            query2.prepare(
-                "UPDATE capturecard "
-                "SET sourceid        = :V0, "
-                "    inputname       = :V1, "
-                "    externalcommand = :V2, "
-                "    tunechan        = :V3, "
-                "    startchan       = :V4, "
-                "    displayname     = :V5, "
-                "    dishnet_eit     = :V6, "
-                "    recpriority     = :V7, "
-                "    quicktune       = :V8, "
-                "    schedorder      = :V9, "
-                "    livetvorder     = :V10 "
-                "WHERE cardid = :INPUTID");
-
-            for (uint j = 0; j < 11; j++)
-            {
-                query2.bindValue(QString(":V%1").arg(j),
-                                 query.value(j).toString());
-            }
-            query2.bindValue(":INPUTID", dst_inputs[match]);
-
-            if (!query2.exec())
-            {
-                MythDB::DBError("clone_cardinput -- update data", query2);
-                ok = false;
-                break;
-            }
-
-            dst_inputid = dst_inputs[match];
-        }
-        else
-        {
-            // create new input for dst with data from src
-            query2.prepare(
-                "UPDATE capturecard "
-                "SET sourceid        = :V0, "
-                "    inputname       = :V1, "
-                "    externalcommand = :V2, "
-                "    tunechan        = :V3, "
-                "    startchan       = :V4, "
-                "    displayname     = :V5, "
-                "    dishnet_eit     = :V6, "
-                "    recpriority     = :V7, "
-                "    quicktune       = :V8, "
-                "    schedorder      = :V9, "
-                "    livetvorder     = :V10 "
-                "WHERE cardid = :INPUTID");
-
-            for (uint j = 0; j < 11; j++)
-            {
-                query2.bindValue(QString(":V%1").arg(j),
-                                 query.value(j).toString());
-            }
-            query2.bindValue(":INPUTID", dst_cardid);
-
-            if (!query2.exec())
-            {
-                MythDB::DBError("clone_cardinput -- insert data", query2);
-                ok = false;
-                break;
-            }
-
-            dst_inputid = dst_cardid;
-        }
-
-        // copy input group linkages
-        vector<uint> src_grps = CardUtil::GetInputGroups(src_inputs[i]);
-        vector<uint> dst_grps = CardUtil::GetInputGroups(dst_inputid);
-        for (uint j = 0; j < dst_grps.size(); j++)
-            CardUtil::UnlinkInputGroup(dst_inputid, dst_grps[j]);
-        for (uint j = 0; j < src_grps.size(); j++)
-            CardUtil::LinkInputGroup(dst_inputid, src_grps[j]);
-
-        // clone diseqc_config (just points to the same diseqc_tree row)
-        DiSEqCDevSettings diseqc;
-        if (diseqc.Load(src_inputs[i]))
-            diseqc.Store(dst_inputid);
-    }
-
-    // delete extra inputs in dst
-    for (uint i = 0; i < dst_inputs.size(); i++)
-    {
-        if (!dst_keep[i])
-            ok &= CardUtil::DeleteInput(dst_inputs[i]);
-    }
-
-    return ok;
 }
 
 bool CardUtil::CloneCard(uint src_cardid, uint orig_dst_cardid)
@@ -924,63 +812,7 @@ bool CardUtil::CloneCard(uint src_cardid, uint orig_dst_cardid)
     if (!dst_cardid)
         return false;
 
-    if (!clone_cardinputs(src_cardid, dst_cardid) && !orig_dst_cardid)
-    {
-        DeleteCard(dst_cardid);
-        return false;
-    }
-
     return true;
-}
-
-vector<uint> CardUtil::GetCloneCardIDs(uint cardid)
-{
-    vector<uint> list;
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        "SELECT cardtype, videodevice, hostname "
-        "FROM capturecard "
-        "WHERE cardid = :CARDID");
-    query.bindValue(":CARDID",   cardid);
-
-    if (!query.exec())
-    {
-        MythDB::DBError("CardUtil::GetCloneCardIDs() 1", query);
-        return list;
-    }
-
-    if (!query.next())
-        return list;
-
-    QString rawtype     = query.value(0).toString();
-    QString videodevice = query.value(1).toString();
-    QString hostname    = query.value(2).toString();
-
-    if (!IsTunerSharingCapable(rawtype))
-        return list;
-
-    query.prepare(
-        "SELECT cardid "
-        "FROM capturecard "
-        "WHERE cardid      != :CARDID AND "
-        "      videodevice  = :DEVICE AND "
-        "      cardtype     = :TYPE   AND "
-        "      hostname     = :HOSTNAME");
-    query.bindValue(":CARDID",   cardid);
-    query.bindValue(":DEVICE",   videodevice);
-    query.bindValue(":TYPE",     rawtype);
-    query.bindValue(":HOSTNAME", hostname);
-
-    if (!query.exec())
-    {
-        MythDB::DBError("CardUtil::GetCloneCardIDs() 2", query);
-        return list;
-    }
-
-    while (query.next())
-        list.push_back(query.value(0).toUInt());
-
-    return list;
 }
 
 QString CardUtil::GetFirewireChangerNode(uint inputid)
@@ -1215,14 +1047,14 @@ QList<InputInfo> CardUtil::GetAllInputInfo()
 
 uint CardUtil::GetCardID(uint inputid)
 {
-    InputInfo info(QString::null, 0, inputid, 0, 0, 0, 0);
+    InputInfo info("None", 0, inputid, 0, 0, 0, 0);
     GetInputInfo(info);
     return info.cardid;
 }
 
 QString CardUtil::GetInputName(uint inputid)
 {
-    InputInfo info(QString::null, 0, inputid, 0, 0, 0, 0);
+    InputInfo info("None", 0, inputid, 0, 0, 0, 0);
     GetInputInfo(info);
     return info.name;
 }
@@ -1398,7 +1230,8 @@ int CardUtil::CreateCardInput(const uint cardid,
         "    quicktune = :QUICKTUNE, "
         "    schedorder = :SCHEDORDER, "
         "    livetvorder = :LIVETVORDER "
-        "WHERE cardid = :CARDID");
+        "WHERE cardid = :CARDID AND "
+        "      inputname = 'None'");
 
     query.bindValue(":CARDID", cardid);
     query.bindValue(":SOURCEID", sourceid);
@@ -1430,7 +1263,7 @@ bool CardUtil::DeleteInput(uint inputid)
     query.prepare(
         "UPDATE capturecard "
         "SET sourceid = 0, "
-        "    inputname = '', "
+        "    inputname = 'None', "
         "    externalcommand = '', "
         "    changer_device = '', "
         "    changer_model = '', "
@@ -1467,6 +1300,7 @@ bool CardUtil::DeleteInput(uint inputid)
 
 bool CardUtil::DeleteOrphanInputs(void)
 {
+    return true;
 }
 
 uint CardUtil::CreateInputGroup(const QString &name)
@@ -1929,7 +1763,8 @@ InputNames CardUtil::GetConfiguredDVBInputs(uint cardid)
     query.prepare(
         "SELECT cardid, inputname "
         "FROM capturecard "
-        "WHERE cardid = :CARDID");
+        "WHERE cardid = :CARDID "
+        "      AND inputname <> 'None'");
     query.bindValue(":CARDID", cardid);
 
     if (!query.exec() || !query.isActive())
@@ -2083,27 +1918,17 @@ void CardUtil::GetCardInputs(
     uint                cardid,
     const QString      &device,
     const QString      &cardtype,
-    QStringList        &inputLabels,
-    vector<CardInput*> &cardInputs)
+    QStringList        &inputs)
 {
-    QStringList inputs;
-
+    inputs.clear();
     if (IsSingleInputCard(cardtype))
-        inputs += "MPEG2TS";
-    else if ("DVB" != cardtype)
-        inputs += ProbeV4LVideoInputs(device);
-
-    QString dev_label = GetDeviceLabel(cardtype, device);
-
-    QStringList::iterator it = inputs.begin();
-    for (; it != inputs.end(); ++it)
     {
-        CardInput *cardinput = new CardInput(cardtype, false, cardid);
-        cardinput->loadByInput(cardid, (*it));
-        inputLabels.push_back(
-            dev_label + QString(" (%1) -> %2")
-            .arg(*it).arg(cardinput->getSourceName()));
-        cardInputs.push_back(cardinput);
+        inputs += "MPEG2TS";
+    }
+    else if ("DVB" != cardtype)
+    {
+        inputs += ProbeV4LVideoInputs(device);
+        QStringList::iterator it = inputs.begin();
     }
 
 #ifdef USING_DVB
@@ -2112,27 +1937,20 @@ void CardUtil::GetCardInputs(
         bool needs_conf = IsInNeedOfExternalInputConf(cardid);
         InputNames list = GetConfiguredDVBInputs(cardid);
         if (!needs_conf && list.empty())
-            list[0] = "DVBInput";
+        {
+            inputs += "DVBInput";
+        }
 
         InputNames::const_iterator it;
         for (it = list.begin(); it != list.end(); ++it)
         {
-            CardInput *cardinput = new CardInput(cardtype, false, cardid);
-            cardinput->loadByInput(cardid, *it);
-            inputLabels.push_back(
-                dev_label + QString(" (%1) -> %2")
-                .arg(*it).arg(cardinput->getSourceName()));
-            cardInputs.push_back(cardinput);
+            inputs += *it;
         }
 
         // plus add one "new" input
         if (needs_conf)
         {
-            CardInput *newcard = new CardInput(cardtype, true, cardid);
-            QString newname = QString("DVBInput #%1").arg(list.size() + 1);
-            newcard->loadByInput(cardid, newname);
-            inputLabels.push_back(dev_label + " " + QObject::tr("New Input"));
-            cardInputs.push_back(newcard);
+            inputs += QString("DVBInput #%1").arg(list.size() + 1);
         }
     }
 #endif // USING_DVB
