@@ -138,6 +138,34 @@ bool HtmlServerExtension::ProcessRequest( HTTPRequest *pRequest )
 
                     }
 
+                    // ----------------------------------------------------------------------
+                    // Force IE into 'standards' mode
+                    // ----------------------------------------------------------------------
+                    pRequest->SetResponseHeader( "X-UA-Compatible" , "IE=Edge");
+
+                    // ---------------------------------------------------------
+                    // SECURITY: Set Content Security Policy (no external content allowed)
+                    // This is an important safeguard. Third party content
+                    // should never be permitted. It compromises security,
+                    // privacy and violates the key principal that the WebFrontend
+                    // should work on an isolated network with no internet
+                    // access. Keep all content hosted locally!
+                    // ---------------------------------------------------------
+                    pRequest->SetResponseHeader("Content-Security-Policy",
+                                                // For now the following are disabled as we use xhr to trigger playback on frontends
+                                                // if we switch to triggering that through an internal request then these would be better
+                                                // enabled
+                                                //"default-src 'self'; "
+                                                //"connect-src 'self; "
+                                                "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " // FIXME: unsafe-inline should be phased out, replaced by nonce-{csp_nonce}
+                                                "style-src 'self' 'unsafe-inline'; "
+                                                "frame-src 'none'; "
+                                                "object-src 'self'; " // TODO: When we no longer require flash for some browsers, change this to 'none'
+                                                "media-src 'self'; "
+                                                "font-src 'self'; "
+                                                "image-src 'self'; "
+                                                "reflected-xss filter;");
+
                     // ------------------------------------------------------
                     // Return the file.
                     // ------------------------------------------------------

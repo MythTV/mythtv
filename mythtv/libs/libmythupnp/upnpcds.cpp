@@ -316,7 +316,7 @@ void UPnpCDS::DetermineClient( HTTPRequest *pRequest,
     {
         UPnpCDSClientException *except = &clientExceptions[i];
 
-        QString sHeaderValue = pRequest->GetHeaderValue(except->sHeaderKey, "");
+        QString sHeaderValue = pRequest->GetRequestHeader(except->sHeaderKey, "");
         int idx = sHeaderValue.indexOf(except->sHeaderValue);
         if (idx != -1)
         {

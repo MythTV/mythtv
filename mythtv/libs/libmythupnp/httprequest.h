@@ -152,8 +152,6 @@ class UPNP_PUBLIC HTTPRequest
         void            SetRequestProtocol  ( const QString &sLine  );
         ContentType     SetContentType      ( const QString &sType  );
 
-        void            SetServerHeaders    ( void );
-
         void            ProcessRequestLine  ( const QString &sLine  );
         bool            ProcessSOAPPayload  ( const QString &sSOAPAction );
         void            ExtractMethodFromURL( );
@@ -196,7 +194,10 @@ class UPNP_PUBLIC HTTPRequest
         qint64          SendResponse    ( void );
         qint64          SendResponseFile( QString sFileName );
 
-        QString         GetHeaderValue  ( const QString &sKey, QString sDefault );
+        void            SetResponseHeader ( const QString &sKey,
+                                            const QString &sValue );
+
+        QString         GetRequestHeader  ( const QString &sKey, QString sDefault );
 
         bool            GetKeepAlive () { return m_bKeepAlive; }
 

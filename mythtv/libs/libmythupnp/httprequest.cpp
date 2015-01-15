@@ -271,7 +271,7 @@ QString HTTPRequest::BuildResponseHeader( long long nSize )
 
 
     // DLNA 7.5.4.3.2.33 MT transfer mode indication
-    QString sTransferMode = GetHeaderValue( "transferMode.dlna.org", "" );
+    QString sTransferMode = GetRequestHeader( "transferMode.dlna.org", "" );
 
     if (sTransferMode.isEmpty())
     {
@@ -290,7 +290,7 @@ QString HTTPRequest::BuildResponseHeader( long long nSize )
         sHeader += "transferMode.dlna.org: Interactive\r\n";
 
     // HACK Temporary hack for Samsung TVs - Needs to be moved later as it's not entirely DLNA compliant
-    if (!GetHeaderValue( "getcontentFeatures.dlna.org", "" ).isEmpty())
+    if (!GetRequestHeader( "getcontentFeatures.dlna.org", "" ).isEmpty())
         sHeader += "contentFeatures.dlna.org: DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=01500000000000000000000000000000\r\n";
 
     // ----------------------------------------------------------------------
@@ -387,7 +387,7 @@ qint64 HTTPRequest::SendResponse( void )
     // Check for ETag match...
     // ----------------------------------------------------------------------
 
-    QString sETag = GetHeaderValue( "If-None-Match", "" );
+    QString sETag = GetRequestHeader( "If-None-Match", "" );
 
     if ( !sETag.isEmpty() && sETag == m_mapRespHeaders[ "ETag" ] )
     {
@@ -436,7 +436,7 @@ qint64 HTTPRequest::SendResponse( void )
     }
 
     // ----------------------------------------------------------------------
-    // NOTE: Access-Control-Allow-Origin Wildcard
+    // SECURITY: Access-Control-Allow-Origin Wildcard
     //
     // This is a REALLY bad idea, so bad in fact that I'm including it here but
     // commented out in the hope that anyone thinking of adding it in the future
@@ -455,32 +455,30 @@ qint64 HTTPRequest::SendResponse( void )
     // ----------------------------------------------------------------------
 
     // ----------------------------------------------------------------------
-    // Allow the WebFrontend on the Master backend and ONLY this machine
-    // to access resources on a frontend or slave web server
+    // SECURITY: Allow the WebFrontend on the Master backend and ONLY this
+    // machine to access resources on a frontend or slave web server
     //
     // http://www.w3.org/TR/cors/#introduction
     // ----------------------------------------------------------------------
     QString masterAddrPort = QString("%1:%2").arg(gCoreContext->GetMasterServerIP())
-                                            .arg(gCoreContext->GetMasterServerStatusPort());
+                                             .arg(gCoreContext->GetMasterServerStatusPort());
+    QString masterTLSAddrPort = QString("%1:%2").arg(gCoreContext->GetMasterServerIP())
+                                                .arg("6554"); // FIXME: This shouldn't be hardcoded
 
     QStringList allowedOrigins;
     allowedOrigins << QString("http://%1").arg(masterAddrPort);
-    allowedOrigins << QString("https://%2").arg(masterAddrPort);
+    allowedOrigins << QString("https://%2").arg(masterTLSAddrPort);
 
     if (!m_mapHeaders[ "origin" ].isEmpty())
     {
         if (allowedOrigins.contains(m_mapHeaders[ "origin" ]))
-            m_mapRespHeaders[ "Access-Control-Allow-Origin" ] = m_mapHeaders[ "origin" ];
+            SetResponseHeader( "Access-Control-Allow-Origin" ,
+                               m_mapHeaders[ "origin" ]);
         else
             LOG(VB_GENERAL, LOG_CRIT, QString("HTTPRequest: Cross-origin request "
                                               "received with origin (%1)")
                                                  .arg(m_mapHeaders[ "origin" ]));
     }
-
-    // ----------------------------------------------------------------------
-    // Force IE into 'standards' mode
-    // ----------------------------------------------------------------------
-    m_mapRespHeaders[ "X-UA-Compatible" ] = "IE=Edge";
 
     // ----------------------------------------------------------------------
     // Write out Header.
@@ -583,7 +581,7 @@ qint64 HTTPRequest::SendResponseFile( QString sFileName )
         // ------------------------------------------------------------------
 
         bool    bRange = false;
-        QString sRange = GetHeaderValue( "range", "" );
+        QString sRange = GetRequestHeader( "range", "" );
 
         if (!sRange.isEmpty())
         {
@@ -1174,7 +1172,7 @@ long HTTPRequest::GetParameters( QString sParams, QStringMap &mapParams  )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QString HTTPRequest::GetHeaderValue( const QString &sKey, QString sDefault )
+QString HTTPRequest::GetRequestHeader( const QString &sKey, QString sDefault )
 {
     QStringMap::iterator it = m_mapHeaders.find( sKey.toLower() );
 
@@ -1223,7 +1221,7 @@ bool HTTPRequest::ParseKeepAlive()
     // Read Connection Header to see whether the client has explicitly
     // asked for the connection to be kept alive or closed after the response
     // is sent
-    QString sConnection = GetHeaderValue( "connection", "default" ).toLower();
+    QString sConnection = GetRequestHeader( "connection", "default" ).toLower();
 
     QStringList sValueList = sConnection.split(",");
 
@@ -1381,7 +1379,7 @@ bool HTTPRequest::ParseRequest()
         }
 
         // Check to see if this is a SOAP encoded message
-        QString sSOAPAction = GetHeaderValue( "SOAPACTION", "" );
+        QString sSOAPAction = GetRequestHeader( "SOAPACTION", "" );
 
         if (!sSOAPAction.isEmpty())
             bSuccess = ProcessSOAPPayload( sSOAPAction );
@@ -1722,7 +1720,7 @@ Serializer *HTTPRequest::GetSerializer()
                                                        m_sNameSpace, m_sMethod);
     else
     {
-        QString sAccept = GetHeaderValue( "Accept", "*/*" );
+        QString sAccept = GetRequestHeader( "Accept", "*/*" );
         
         if (sAccept.contains( "application/json", Qt::CaseInsensitive ))    
             pSerializer = (Serializer *)new JSONSerializer(&m_response,
@@ -1852,6 +1850,11 @@ bool HTTPRequest::Authenticated()
         return false;
     
     return true;
+}
+
+void HTTPRequest::SetResponseHeader(const QString& sKey, const QString& sValue)
+{
+    m_mapRespHeaders[sKey] = sValue;
 }
 
 
