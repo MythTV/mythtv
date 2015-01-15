@@ -602,7 +602,7 @@ void HttpWorker::run(void)
                                             .arg(pSocket->errorString()));
     }
 
-    LOG(VB_HTTP, LOG_INFO, QString("HttpWorker(%1): Connection %2 closed, requests handled %3")
+    LOG(VB_HTTP, LOG_INFO, QString("HttpWorker(%1): Connection %2 closed. %3 requests were handled")
                                         .arg(m_socket)
                                         .arg(pSocket->socketDescriptor())
                                         .arg(nRequestsHandled));
