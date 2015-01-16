@@ -3032,6 +3032,21 @@ NULL
             return false;
     }
 
+    if (dbver == "1334")
+    {
+        const char *updates[] = {
+            // Change the default sched/livetvorder from 0 to 1.
+            "ALTER TABLE capturecard "
+            "    MODIFY COLUMN schedorder INT(10) UNSIGNED "
+            "        NOT NULL DEFAULT 1, "
+            "    MODIFY COLUMN livetvorder INT(10) UNSIGNED "
+            "        NOT NULL DEFAULT 1",
+            NULL
+        };
+        if (!performActualUpdate(updates, "1335", dbver))
+            return false;
+    }
+
     return true;
 }
 

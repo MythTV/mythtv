@@ -1273,8 +1273,8 @@ bool CardUtil::DeleteInput(uint inputid)
         "    dishnet_eit = 0, "
         "    recpriority = 0, "
         "    quicktune = 0, "
-        "    schedorder = 0, "
-        "    livetvorder = 0 "
+        "    schedorder = 1, "
+        "    livetvorder = 1 "
         "WHERE cardid = :INPUTID");
     query.bindValue(":INPUTID", inputid);
 
