@@ -2,6 +2,7 @@
 <head>
 <title><i18n>MythTV System Overview</i18n></title>
 <link rel="stylesheet" type="text/css" href="/misc/css/overview.css">
+<script type="text/javascript"  src="/misc/js/overview.js"></script>
 </head>
 <body>
 
@@ -112,9 +113,11 @@
                 <div class="frontendName">
                     <a href="//<%=frontendList[nIdx].IP%>:6547/"><%=frontendList[nIdx].Name%></a>
                 </div>
-                <div class="frontendStatus <%=statusClass%>">
+                <div class="frontendStatus <%=statusClass%>" id="frontendStatus-<%=frontendList[nIdx].Name%>">
                     <%=status%>
                 </div>
+                <script type="text/javascript">GetFrontendStatus('<%=frontendList[nIdx].Name%>',
+                                                                 '<%=frontendList[nIdx].IP%>:6547')</script>
             </div>
 <%
     }
