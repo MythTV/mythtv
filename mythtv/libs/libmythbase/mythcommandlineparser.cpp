@@ -2392,7 +2392,7 @@ void MythCommandLineParser::addLogging(
         defaultVerbosity,
         "Specify log filtering. Use '-v help' for level info.", "")
                 ->SetGroup("Logging");
-    add("-V", "verboseint", 0U, "",
+    add("-V", "verboseint", 0LL, "",
         "This option is intended for internal use only.\n"
         "This option takes an unsigned value corresponding "
         "to the bitwise log verbosity operator.")
@@ -2571,7 +2571,7 @@ int MythCommandLineParser::ConfigureLogging(QString mask, unsigned int progress)
             return err;
     }
     else if (toBool("verboseint"))
-        verboseMask = toUInt("verboseint");
+        verboseMask = toLongLong("verboseint");
 
     verboseMask |= VB_STDIO|VB_FLUSH;
 
