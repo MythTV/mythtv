@@ -55,9 +55,8 @@ QString  HttpServer::s_platform;
 //
 /////////////////////////////////////////////////////////////////////////////
 
-HttpServer::HttpServer(const QString &sApplicationPrefix) :
+HttpServer::HttpServer() :
     ServerPool(), m_sSharePath(GetShareDir()),
-    m_pHtmlServer(new HtmlServerExtension(m_sSharePath + "html", sApplicationPrefix)),
     m_threadPool("HttpServerPool"), m_running(true)
 {
     // Number of connections processed concurrently
@@ -102,11 +101,6 @@ HttpServer::HttpServer(const QString &sApplicationPrefix) :
 
     RegisterExtension( new RttiServiceHost( m_sSharePath ));
 
-    QScriptEngine *pEngine = ScriptEngine();
-
-    pEngine->globalObject().setProperty("Rtti",
-         pEngine->scriptValueFromQMetaObject< ScriptableRtti >() );
-
     LoadSSLConfig();
 }
 
@@ -126,9 +120,6 @@ HttpServer::~HttpServer()
     {
         delete m_extensions.takeFirst();
     }
-
-    if (m_pHtmlServer != NULL)
-        delete m_pHtmlServer;
 }
 
 void HttpServer::LoadSSLConfig()
@@ -234,15 +225,6 @@ QString HttpServer::GetServerVersion(void)
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QScriptEngine* HttpServer::ScriptEngine()
-{
-    return ((HtmlServerExtension *)m_pHtmlServer)->ScriptEngine();
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
 void HttpServer::newTcpConnection(qt_socket_fd_t socket)
 {
     PoolServerType type = kTCPServer;
@@ -328,7 +310,6 @@ void HttpServer::DelegateRequest(HTTPRequest *pRequest)
         }
     }
 
-#if 0
     HttpServerExtensionList::iterator it = m_extensions.begin();
 
     for (; (it != m_extensions.end()) && !bProcessed; ++it)
@@ -344,11 +325,10 @@ void HttpServer::DelegateRequest(HTTPRequest *pRequest)
                                              "pExtension->ProcessRequest()."));
         }
     }
-#endif
     m_rwlock.unlock();
 
-    if (!bProcessed)
-        bProcessed = m_pHtmlServer->ProcessRequest(pRequest);
+//     if (!bProcessed)
+//         bProcessed = m_pHtmlServer->ProcessRequest(pRequest);
 
     if (!bProcessed)
     {

@@ -12,6 +12,7 @@
 #include "httpconfig.h"
 #include "internetContent.h"
 #include "mythdirs.h"
+#include "htmlserver.h"
 
 #include "upnpcdstv.h"
 #include "upnpcdsmusic.h"
@@ -76,6 +77,11 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
 
     HttpServer *pHttpServer = new HttpServer();
     pHttpServer->RegisterExtension(new HttpConfig());
+
+    HtmlServerExtension *pHtmlServer = NULL;
+    pHtmlServer = new HtmlServerExtension(pHttpServer->GetSharePath() + "html",
+                                          "backend_");
+    pHttpServer->RegisterExtension(pHtmlServer);
 
     if (!pHttpServer->isListening())
     {
@@ -143,7 +149,7 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
     // ------------------------------------------------------------------
 
 
-     QScriptEngine* pEngine = pHttpServer->ScriptEngine();
+     QScriptEngine* pEngine = pHtmlServer->ScriptEngine();
 
      pEngine->globalObject().setProperty("Myth"   ,
          pEngine->scriptValueFromQMetaObject< ScriptableMyth    >() );

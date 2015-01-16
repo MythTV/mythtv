@@ -15,6 +15,8 @@
 #include "storagegroup.h"
 #include "httprequest.h"
 
+#include "serviceHosts/rttiServiceHost.h"
+
 #include <QFileInfo>
 #include <QDir>
 #include <QTextStream>
@@ -31,6 +33,15 @@ HtmlServerExtension::HtmlServerExtension( const QString &sSharePath,
     LOG(VB_HTTP, LOG_INFO, QString("HtmlServerExtension() - SharePath = %1")
             .arg(m_sSharePath));
     m_Scripting.SetResourceRootPath( m_sSharePath );
+    
+    // ----------------------------------------------------------------------
+    // Register Rtti with QtScript Engine.
+    // Rtti exposes internal enums complete with translations for use in scripts
+    // ----------------------------------------------------------------------
+
+    QScriptEngine *pEngine = ScriptEngine();
+    pEngine->globalObject().setProperty("Rtti",
+         pEngine->scriptValueFromQMetaObject< ScriptableRtti >() );
 }
 
 /////////////////////////////////////////////////////////////////////////////

@@ -18,6 +18,7 @@
 #include "mythfexml.h"
 #include "compat.h"
 #include "mythdate.h"
+#include "htmlserver.h"
 
 #include "serviceHosts/frontendServiceHost.h"
 
@@ -206,6 +207,10 @@ MediaRenderer::MediaRenderer(): m_pUPnpCMGR(NULL)
     int nPort = g_pConfig->GetValue( "UPnP/MythFrontend/ServicePort", 6547 );
 
     HttpServer *pHttpServer = new HttpServer();
+    HtmlServerExtension *pHtmlServer = NULL;
+    pHtmlServer= new HtmlServerExtension(pHttpServer->GetSharePath() + "html",
+                                         "frontend_");
+    pHttpServer->RegisterExtension(pHtmlServer);
 
     if (!pHttpServer)
         return;
