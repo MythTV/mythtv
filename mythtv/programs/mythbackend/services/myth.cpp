@@ -579,6 +579,9 @@ DTC::FrontendList *Myth::GetFrontends( bool OnLine )
         DTC::Frontend *pFrontend = pList->AddNewFrontend();
         pFrontend->setName((*it)->name);
         pFrontend->setIP((*it)->ip.toString());
+        int port = gCoreContext->GetNumSettingOnHost("FrontendStatusPort",
+                                                        (*it)->name, 6547);
+        pFrontend->setPort(port);
         pFrontend->setOnLine((*it)->connectionCount > 0);
     }
 
