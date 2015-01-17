@@ -52,8 +52,10 @@ static SmartPLField SmartPLFields[] =
     { "Play Count",    "music_songs.numplays",           ftNumeric,  0,    9999, 0 },
     { "Compilation",   "music_albums.compilation",       ftBoolean,  0,    0,    0 },
     { "Comp. Artist",  "music_comp_artists.artist_name", ftString,   0,    0,    0 },
-    { "Last Play",     "music_songs.lastplay",           ftDate,     0,    0,    0 },
-    { "Date Imported", "music_songs.date_entered",       ftDate,     0,    0,    0 },
+    { "Last Play",     "FROM_DAYS(TO_DAYS(music_songs.lastplay))",
+                                                         ftDate,     0,    0,    0 },
+    { "Date Imported", "FROM_DAYS(TO_DAYS(music_songs.date_entered))",
+                                                         ftDate,     0,    0,    0 },
 };
 
 struct SmartPLOperator
