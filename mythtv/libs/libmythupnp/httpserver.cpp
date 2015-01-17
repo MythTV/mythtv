@@ -186,7 +186,6 @@ void HttpServer::LoadSSLConfig()
 {
 #ifndef QT_NO_OPENSSL
     m_sslConfig = QSslConfiguration::defaultConfiguration();
-#endif
 
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
     m_sslConfig.setProtocol(QSsl::SecureProtocols); // Includes SSLv3 which is insecure, but can't be helped
@@ -214,6 +213,7 @@ void HttpServer::LoadSSLConfig()
         secureCiphers.append(*it);
     }
     m_sslConfig.setCiphers(secureCiphers);
+#endif
 
     QString hostKeyPath = gCoreContext->GetSetting("hostSSLKey", "");
 
