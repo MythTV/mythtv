@@ -76,12 +76,6 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
     int     nSSLPort  = g_pConfig->GetValue( "BackendSSLPort",    6554 );
 
     HttpServer *pHttpServer = new HttpServer();
-    pHttpServer->RegisterExtension(new HttpConfig());
-
-    HtmlServerExtension *pHtmlServer = NULL;
-    pHtmlServer = new HtmlServerExtension(pHttpServer->GetSharePath() + "html",
-                                          "backend_");
-    pHttpServer->RegisterExtension(pHtmlServer);
 
     if (!pHttpServer->isListening())
     {
@@ -127,6 +121,10 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
 
     LOG(VB_UPNP, LOG_INFO, "MediaServer: Registering Http Server Extensions.");
 
+    HtmlServerExtension *pHtmlServer;
+    pHtmlServer = new HtmlServerExtension(m_sSharePath + "html", "backend_");
+    pHttpServer->RegisterExtension( pHtmlServer );
+    pHttpServer->RegisterExtension( new HttpConfig() );
     pHttpServer->RegisterExtension( new InternetContent   ( m_sSharePath ));
 
     pHttpServer->RegisterExtension( new MythServiceHost   ( m_sSharePath ));
@@ -145,9 +143,8 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
     // -=>NOTE: We need to know the actual type at compile time for this
     //          to work, so it needs to be done here.  I'm still looking
     //          into ways that we may encapsulate this in the service
-    //          classes.
+    //          classes. - dblain
     // ------------------------------------------------------------------
-
 
      QScriptEngine* pEngine = pHtmlServer->ScriptEngine();
 

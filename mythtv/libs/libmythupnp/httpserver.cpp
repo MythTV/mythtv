@@ -246,6 +246,7 @@ void HttpServer::RegisterExtension( HttpServerExtension *pExtension )
 {
     if (pExtension != NULL )
     {
+        LOG(VB_HTTP, LOG_INFO, QString("HttpServer: Registering %1 extension").arg(pExtension->m_sName));
         m_rwlock.lockForWrite();
         m_extensions.append( pExtension );
 

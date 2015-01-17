@@ -1,16 +1,20 @@
+
   div.status {
     font:11px verdana, arial, helvetica, sans-serif;
     margin:20px;
   }
+
   h1.status {
     font-size:28px;
     font-weight:900;
     color:#ccc;
     letter-spacing:0.5em;
-    margin-bottom:30px;
+    margin: auto;
+    margin-bottom:20px;
     width:650px;
     text-align:center;
   }
+
   h2.status {
     font-size:18px;
     font-weight:800;
@@ -21,19 +25,23 @@
     margin-bottom:10px;
     margin-top:0px;
   }
+
   hr.status {
     display:none;
   }
+
   div.content {
-    width:650px;
-    border-top:1px solid #000;
-    border-right:1px solid #000;
-    border-bottom:1px solid #000;
-    border-left:10px solid #000;
+    width: 650px;
+    border-top:1px solid #000000;
+    border-right:1px solid #000000;
+    border-bottom:1px solid #000000;
+    border-left:10px solid #000000;
     padding:10px;
-    margin-bottom:30px;
-    -moz-border-radius:8px 0px 0px 8px;
+    border-radius:8px 0px 0px 8px;
+    margin: auto;
+    margin-bottom: 20px;
   }
+
   div.schedule a {
     display:block;
     color:#000;
@@ -42,9 +50,11 @@
     border:thin solid #fff;
     width:350px;
   }
+
   div.schedule a span {
     display:none;
   }
+
   div.schedule a:hover {
     background-color:#F4F4F4;
     border-top:thin solid #000;
@@ -52,6 +62,7 @@
     border-left:thin solid #000;
     cursor:default;
   }
+
   div.schedule a:hover span {
     display:block;
     position:absolute;
@@ -63,10 +74,62 @@
     padding:5px;
     border:thin dashed #000;
   }
-  div.loadstatus {
+
+  .statusInformation
+  {
+    background-color: #1A1A1A;
+    padding: 10px;
+    text-align: center;
+    margin: 5px;
+  }
+
+  .extraDetail
+  {
+/*    display: none;*/
+    border: 1px dashed #000000;
+    padding: 5px;
+    box-sizing: border-box;
+  }
+
+  .statesTable
+  {
+    display: table;
+    border-collapse: separate;
+    border-spacing: 2px;
+  }
+
+  .stateRow
+  {
+    display: table-row;
+  }
+
+  .stateRow DIV
+  {
+    display: table-cell;
+    color: #FFFFFF;
+    padding-left: 10px;
+    padding: 5px;
+    border: 1px;
+    box-sizing: border-box;
+  }
+
+  div.stateName
+  {
+    background-color: #1A1A1A;
+    font-weight: bold;
+  }
+
+  div.stateValue
+  {
+      background-color: #333333;
+  }
+
+  div.loadstatus
+  {
     width:325px;
     height:7em;
   }
+
   .jobfinished { color: #0000ff; }
   .jobaborted { color: #7f0000; }
   .joberrored { color: #ff0000; }
