@@ -11,7 +11,8 @@
 #include "mythuihelper.h"
 #include "mythmainwindow.h"
 #include "tv_play.h"
-#include <recordinginfo.h>
+#include "recordinginfo.h"
+#include "mythversion.h"
 
 #include "videometadatalistmanager.h"
 #include "videometadata.h"
@@ -28,6 +29,10 @@ DTC::FrontendStatus* Frontend::GetStatus(void)
 {
     DTC::FrontendStatus *status = new DTC::FrontendStatus();
     MythUIStateTracker::GetFreshState(status->State());
+
+    status->setName(gCoreContext->GetHostName());
+    status->setVersion(MYTH_SOURCE_VERSION);
+
     status->Process();
     return status;
 }
