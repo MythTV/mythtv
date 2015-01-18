@@ -45,9 +45,6 @@ ViewScheduled::ViewScheduled(MythScreenStack *parent, TV* player, bool showTV)
                m_defaultGroup(QDate()),
                m_maxcard(0),
                m_curcard(0),
-               m_inputref(),
-               m_maxinput(0),
-               m_curinput(0),
                m_player(player)
 {
     gCoreContext->addListener(this);
@@ -185,8 +182,6 @@ bool ViewScheduled::keyPressEvent(QKeyEvent *event)
             setShowAll(!m_showAll);
         else if (action == "VIEWCARD")
             viewCards();
-        else if (action == "VIEWINPUT")
-            viewInputs();
         else
             handled = false;
     }
@@ -227,7 +222,6 @@ void ViewScheduled::ShowMenu(void)
         menuPopup->AddButton(tr("Custom Edit"));
         menuPopup->AddButton(tr("Delete Rule"));
         menuPopup->AddButton(tr("Show Cards"));
-        menuPopup->AddButton(tr("Show Inputs"));
 
         popupStack->AddScreen(menuPopup);
     }
@@ -301,10 +295,6 @@ void ViewScheduled::LoadList(bool useExistingData)
             m_cardref[pginfo->GetCardID()]++;
             if (pginfo->GetCardID() > m_maxcard)
                 m_maxcard = pginfo->GetCardID();
-
-            m_inputref[pginfo->GetCardID()]++;
-            if (pginfo->GetCardID() > m_maxinput)
-                m_maxinput = pginfo->GetCardID();
 
             QDate date = pginfo->GetRecordingStartTime().toLocalTime().date();
             m_recgroupList[date].push_back(pginfo);
@@ -435,9 +425,7 @@ void ViewScheduled::FillList()
             state = "error";
         else if (recstatus == rsWillRecord)
         {
-            if ((m_curcard == 0 && m_curinput == 0) ||
-                pginfo->GetCardID() == m_curcard ||
-                pginfo->GetCardID() == m_curinput)
+            if (m_curcard == 0 || pginfo->GetCardID() == m_curcard)
             {
                 if (pginfo->GetRecordingPriority2() < 0)
                     state = "warning";
@@ -574,7 +562,6 @@ void ViewScheduled::setShowAll(bool all)
 
 void ViewScheduled::viewCards()
 {
-    m_curinput = 0;
     m_needFill = true;
 
     m_curcard++;
@@ -585,21 +572,6 @@ void ViewScheduled::viewCards()
         m_curcard++;
     }
     m_curcard = 0;
-}
-
-void ViewScheduled::viewInputs()
-{
-    m_curcard = 0;
-    m_needFill = true;
-
-    m_curinput++;
-    while (m_curinput <= m_maxinput)
-    {
-        if (m_inputref[m_curinput] > 0)
-            return;
-        m_curinput++;
-    }
-    m_curinput = 0;
 }
 
 void ViewScheduled::EmbedTVWindow(void)
@@ -699,10 +671,6 @@ void ViewScheduled::customEvent(QEvent *event)
             else if (resulttext == tr("Show Cards"))
             {
                 viewCards();
-            }
-            else if (resulttext == tr("Show Inputs"))
-            {
-                viewInputs();
             }
 
             if (m_needFill)

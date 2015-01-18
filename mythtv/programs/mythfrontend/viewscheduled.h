@@ -85,10 +85,6 @@ class ViewScheduled : public ScheduleCommon
     uint m_maxcard;
     uint m_curcard;
 
-    QMap<int, int> m_inputref;
-    uint m_maxinput;
-    uint m_curinput;
-
     TV *m_player;
 };
 
