@@ -1900,7 +1900,7 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
             }
 
             vector<uint> input_grps =
-                CardUtil::GetInputGroups((*it).info->GetInputID());
+                CardUtil::GetInputGroups((*it).info->GetCardID());
 
             for (uint i = 0; i < input_grps.size(); i++)
             {

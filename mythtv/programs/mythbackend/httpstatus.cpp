@@ -1621,7 +1621,7 @@ void HttpStatus::FillChannelInfo( QDomElement &channel,
             channel.setAttribute( "chanFilters",
                                   pInfo->GetChannelPlaybackFilters() );
             channel.setAttribute( "sourceId"   , pInfo->GetSourceID()    );
-            channel.setAttribute( "inputId"    , pInfo->GetInputID()     );
+            channel.setAttribute( "inputId"    , pInfo->GetCardID()      );
             channel.setAttribute( "commFree"   ,
                                   (pInfo->IsCommercialFree()) ? 1 : 0 );
         }

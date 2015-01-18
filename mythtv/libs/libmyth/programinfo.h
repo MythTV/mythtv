@@ -446,7 +446,6 @@ class MPUBLIC ProgramInfo
         { return (RecordingDupMethodType)dupmethod; }
 
     uint    GetSourceID(void)             const { return sourceid;     }
-    uint    GetInputID(void)              const { return cardid;       }
     uint    GetCardID(void)               const { return cardid;       }
 
     uint    GetFindID(void)               const { return findid;       }
@@ -510,7 +509,6 @@ class MPUBLIC ProgramInfo
     void SetRecordingPriority2(int priority)     { recpriority2 = priority; }
     void SetRecordingRuleID(uint id)                { recordid     = id;    }
     void SetSourceID(uint id)                       { sourceid     = id;    }
-    void SetInputID( uint id)                       { cardid       = id;    }
     void SetCardID(  uint id)                       { cardid       = id;    }
     void SetReactivated(bool reactivate)
     {

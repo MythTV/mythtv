@@ -251,8 +251,8 @@ static bool comp_overlap(RecordingInfo *a, RecordingInfo *b)
         return a->GetTitle() < b->GetTitle();
     if (a->GetChanID() != b->GetChanID())
         return a->GetChanID() < b->GetChanID();
-    if (a->GetInputID() != b->GetInputID())
-        return a->GetInputID() < b->GetInputID();
+    if (a->GetCardID() != b->GetCardID())
+        return a->GetCardID() < b->GetCardID();
 
     // In cases where two recording rules match the same showing, one
     // of them needs to take precedence.  Penalize any entry that
@@ -371,8 +371,8 @@ static bool comp_priority(RecordingInfo *a, RecordingInfo *b)
     if (a->schedorder != b->schedorder)
         return a->schedorder < b->schedorder;
 
-    if (a->GetInputID() != b->GetInputID())
-        return a->GetInputID() < b->GetInputID();
+    if (a->GetCardID() != b->GetCardID())
+        return a->GetCardID() < b->GetCardID();
 
     return a->GetChanID() < b->GetChanID();
 }
@@ -427,8 +427,8 @@ static bool comp_retry(RecordingInfo *a, RecordingInfo *b)
     if (a->schedorder != b->schedorder)
         return a->schedorder > b->schedorder;
 
-    if (a->GetInputID() != b->GetInputID())
-        return a->GetInputID() > b->GetInputID();
+    if (a->GetCardID() != b->GetCardID())
+        return a->GetCardID() > b->GetCardID();
 
     return a->GetChanID() > b->GetChanID();
 }
@@ -592,7 +592,7 @@ void Scheduler::PrintList(RecList &list, bool onlyFutureRecordings)
 
     LOG(VB_SCHEDULE, LOG_INFO, "--- print list start ---");
     LOG(VB_SCHEDULE, LOG_INFO, "Title - Subtitle                     Ch Station "
-                               "Day Start  End   S  C  I  T  N Pri");
+                               "Day Start  End   S  C  T  N Pri");
 
     RecIter i = list.begin();
     for ( ; i != list.end(); ++i)
@@ -621,15 +621,14 @@ void Scheduler::PrintRec(const RecordingInfo *p, const QString &prefix)
     QString episode = p->toString(ProgramInfo::kTitleSubtitle, " - ", "")
         .leftJustified(34 - prefix.length(), ' ', true);
 
-    outstr += QString("%1 %2 %3 %4-%5  %6 %7 %8  ")
+    outstr += QString("%1 %2 %3 %4-%5  %6 %7  ")
         .arg(episode)
         .arg(p->GetChanNum().rightJustified(5, ' '))
         .arg(p->GetChannelSchedulingID().leftJustified(7, ' ', true))
         .arg(p->GetRecordingStartTime().toLocalTime().toString("dd hh:mm"))
         .arg(p->GetRecordingEndTime().toLocalTime().toString("hh:mm"))
         .arg(p->GetSourceID())
-        .arg(QString::number(p->GetCardID()).rightJustified(2, ' '))
-        .arg(QString::number(p->GetInputID()).rightJustified(2, ' '));
+        .arg(QString::number(p->GetCardID()).rightJustified(2, ' '));
     outstr += QString("%1 %2 %3")
         .arg(toQChar(p->GetRecordingRuleType()))
         .arg(toString(p->GetRecordingStatus(), p->GetCardID()).rightJustified(2, ' '))
@@ -823,7 +822,7 @@ void Scheduler::SlaveConnected(RecordingList &slavelist)
         {
             RecordingInfo *rp = *ri;
 
-            if (sp->GetInputID() &&
+            if (sp->GetCardID() &&
                 sp->GetScheduledStartTime() == rp->GetScheduledStartTime() &&
                 sp->GetChannelSchedulingID().compare(
                     rp->GetChannelSchedulingID(), Qt::CaseInsensitive) == 0 &&
@@ -869,7 +868,7 @@ void Scheduler::SlaveConnected(RecordingList &slavelist)
             }
         }
 
-        if (sp->GetInputID() && !found)
+        if (sp->GetCardID() && !found)
         {
             sp->mplexid = sp->QueryMplexID();
             reclist.push_back(new RecordingInfo(*sp));
@@ -1007,10 +1006,10 @@ void Scheduler::BuildListMaps(void)
             p->GetRecordingStatus() == rsWillRecord ||
             p->GetRecordingStatus() == rsUnknown)
         {
-            RecList *conflictlist = conflictlistmap[p->GetInputID()];
+            RecList *conflictlist = conflictlistmap[p->GetCardID()];
             if (!conflictlist)
             {
-                ++badinputs[p->GetInputID()];
+                ++badinputs[p->GetCardID()];
                 continue;
             }
             conflictlist->push_back(p);
@@ -1076,7 +1075,7 @@ bool Scheduler::FindNextConflict(
             msg = QString("comparing with '%1' ").arg(q->GetTitle());
 
         if (p->GetCardID() != q->GetCardID() &&
-            !igrp.GetSharedInputGroup(p->GetInputID(), q->GetInputID()))
+            !igrp.GetSharedInputGroup(p->GetCardID(), q->GetCardID()))
         {
             if (debugConflicts)
                 msg += "  cardid== ";
@@ -1123,7 +1122,7 @@ bool Scheduler::FindNextConflict(
                         "mplexid's: %4, %5")
                      .arg(p->GetCardID()).arg(q->GetCardID())
                      .arg(igrp.GetSharedInputGroup(
-                              p->GetInputID(), q->GetInputID()))
+                              p->GetCardID(), q->GetCardID()))
                      .arg(p->mplexid).arg(q->mplexid));
         }
 
@@ -1159,7 +1158,7 @@ const RecordingInfo *Scheduler::FindConflict(
     uint *affinity,
     bool checkAll) const
 {
-    RecList &conflictlist = *conflictlistmap[p->GetInputID()];
+    RecList &conflictlist = *conflictlistmap[p->GetCardID()];
     RecConstIter k = conflictlist.begin();
     if (FindNextConflict(conflictlist, p, k, openend, affinity))
     {
@@ -1527,7 +1526,7 @@ void Scheduler::SchedNewRetryPass(RecIter i, RecIter end,
 
         // Try to move each conflict.  Restore the old status if we
         // can't.
-        RecList &conflictlist = *conflictlistmap[p->GetInputID()];
+        RecList &conflictlist = *conflictlistmap[p->GetCardID()];
         RecConstIter k = conflictlist.begin();
         for ( ; FindNextConflict(conflictlist, p, k); ++k)
         {
@@ -1593,10 +1592,7 @@ void Scheduler::PruneRedundants(void)
         }
 
         if (!Recording(p))
-        {
             p->SetCardID(0);
-            p->SetInputID(0);
-        }
 
         // Check for redundant against last non-deleted
         if (!lastp || lastp->GetRecordingRuleID() != p->GetRecordingRuleID() ||
@@ -1875,7 +1871,7 @@ bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
 
     // now check other cards in the same input group as the recording.
     InputInfo busy_input;
-    uint inputid = rcinfo->GetInputID();
+    uint inputid = rcinfo->GetCardID();
     vector<uint> cardids = CardUtil::GetConflictingCards(
         inputid, rcinfo->GetCardID());
     for (uint i = 0; i < cardids.size(); i++)
@@ -4321,7 +4317,7 @@ void Scheduler::AddNewRecords(void)
             RecordingInfo *r = *rec;
             if (p->IsSameTitleStartTimeAndChannel(*r))
             {
-                if (r->GetInputID() == p->GetInputID() &&
+                if (r->GetCardID() == p->GetCardID() &&
                     r->GetRecordingEndTime() != p->GetRecordingEndTime() &&
                     (r->GetRecordingRuleID() == p->GetRecordingRuleID() ||
                      p->GetRecordingRuleType() == kOverrideRecord))
@@ -5310,7 +5306,6 @@ void Scheduler::SchedLiveTV(void)
         if (schedTime.secsTo(dummy->GetRecordingEndTime()) < 1800)
             dummy->SetRecordingEndTime(schedTime.addSecs(1800));
         dummy->SetCardID(enc->GetCardID());
-        dummy->SetInputID(in.inputid);
         dummy->mplexid = dummy->QueryMplexID();
         dummy->SetRecordingStatus(rsUnknown);
 

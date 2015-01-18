@@ -302,9 +302,9 @@ void ViewScheduled::LoadList(bool useExistingData)
             if (pginfo->GetCardID() > m_maxcard)
                 m_maxcard = pginfo->GetCardID();
 
-            m_inputref[pginfo->GetInputID()]++;
-            if (pginfo->GetInputID() > m_maxinput)
-                m_maxinput = pginfo->GetInputID();
+            m_inputref[pginfo->GetCardID()]++;
+            if (pginfo->GetCardID() > m_maxinput)
+                m_maxinput = pginfo->GetCardID();
 
             QDate date = pginfo->GetRecordingStartTime().toLocalTime().date();
             m_recgroupList[date].push_back(pginfo);
@@ -437,7 +437,7 @@ void ViewScheduled::FillList()
         {
             if ((m_curcard == 0 && m_curinput == 0) ||
                 pginfo->GetCardID() == m_curcard ||
-                pginfo->GetInputID() == m_curinput)
+                pginfo->GetCardID() == m_curinput)
             {
                 if (pginfo->GetRecordingPriority2() < 0)
                     state = "warning";

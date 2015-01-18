@@ -290,7 +290,7 @@ void TVRec::RecordPending(const ProgramInfo *rcinfo, int secsleft,
     if (secsleft < 0)
     {
         LOG(VB_RECORD, LOG_INFO, LOC + "Pending recording revoked on " +
-            QString("inputid %1").arg(rcinfo->GetInputID()));
+            QString("cardid %1").arg(rcinfo->GetCardID()));
 
         PendingMap::iterator it = pendingRecordings.find(rcinfo->GetCardID());
         if (it != pendingRecordings.end())
@@ -302,7 +302,7 @@ void TVRec::RecordPending(const ProgramInfo *rcinfo, int secsleft,
     }
 
     LOG(VB_RECORD, LOG_INFO, LOC +
-        QString("RecordPending on inputid %1").arg(rcinfo->GetInputID()));
+        QString("RecordPending on cardid %1").arg(rcinfo->GetCardID()));
 
     PendingInfo pending;
     pending.info            = new ProgramInfo(*rcinfo);
@@ -319,7 +319,7 @@ void TVRec::RecordPending(const ProgramInfo *rcinfo, int secsleft,
 
     // We also need to check our input groups
     vector<uint> cardids = CardUtil::GetConflictingCards(
-        rcinfo->GetInputID(), cardid);
+        rcinfo->GetCardID(), cardid);
 
     pendingRecordings[rcinfo->GetCardID()].possibleConflicts = cardids;
 
@@ -505,7 +505,7 @@ RecStatusType TVRec::StartRecording(ProgramInfo *pginfo)
             if (is_busy)
             {
                 is_busy = (bool) igrp.GetSharedInputGroup(
-                    busy_input.inputid, rcinfo->GetInputID());
+                    busy_input.inputid, rcinfo->GetCardID());
             }
 
             if (is_busy && !sourceid)
@@ -2695,27 +2695,6 @@ void TVRec::CheckForRecGroupChange(void)
     }
 }
 
-static uint get_input_id(uint cardid, const QString &inputname)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    query.prepare(
-        "SELECT cardid "
-        "FROM capturecard "
-        "WHERE cardid    = :CARDID AND "
-        "      inputname = :INNAME");
-
-    query.bindValue(":CARDID", cardid);
-    query.bindValue(":INNAME", inputname);
-
-    if (!query.exec() || !query.isActive())
-        MythDB::DBError("get_input_id", query);
-    else if (query.next())
-        return query.value(0).toUInt();
-
-    return 0;
-}
-
 /** \fn TVRec::NotifySchedulerOfRecording(RecordingInfo*)
  *  \brief Tell scheduler about the recording.
  *
@@ -2733,7 +2712,6 @@ void TVRec::NotifySchedulerOfRecording(RecordingInfo *rec)
     // Notify scheduler of the recording.
     // + set up recording so it can be resumed
     rec->SetCardID(cardid);
-    rec->SetInputID(get_input_id(cardid, channel->GetCurrentInput()));
     rec->SetRecordingRuleType(rec->GetRecordingRule()->m_type);
 
     if (rec->GetRecordingRuleType() == kNotRecording)

@@ -739,7 +739,7 @@ void StatusBox::doScheduleStatus()
         if (recstatus == rsWillRecord || recstatus == rsRecording)
         {
             ++sourceMatch[s->GetSourceID()];
-            ++inputMatch[s->GetInputID()];
+            ++inputMatch[s->GetCardID()];
             if (s->GetRecordingPriority2() < 0)
                 ++lowerpriority;
             if (s->GetVideoProperties() & VID_HDTV)
