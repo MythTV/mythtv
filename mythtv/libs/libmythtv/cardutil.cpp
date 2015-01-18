@@ -1922,14 +1922,9 @@ void CardUtil::GetCardInputs(
 {
     inputs.clear();
     if (IsSingleInputCard(cardtype))
-    {
         inputs += "MPEG2TS";
-    }
     else if ("DVB" != cardtype)
-    {
         inputs += ProbeV4LVideoInputs(device);
-        QStringList::iterator it = inputs.begin();
-    }
 
 #ifdef USING_DVB
     if ("DVB" == cardtype)
