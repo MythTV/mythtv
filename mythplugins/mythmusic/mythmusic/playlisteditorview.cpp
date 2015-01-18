@@ -21,6 +21,7 @@
 #include "musiccommon.h"
 #include "playlisteditorview.h"
 #include "smartplaylist.h"
+#include "mainvisual.h"
 
 MusicGenericTree::MusicGenericTree(MusicGenericTree *parent,
                                    const QString &name, const QString &action,
@@ -492,18 +493,28 @@ bool PlaylistEditorView::keyPressEvent(QKeyEvent *event)
             MythUIButtonListItem *item = m_playlistTree->GetItemCurrent();
             if (item)
             {
-                 MythGenericTree *node = qVariantValue<MythGenericTree*> (item->GetData());
-                 MusicGenericTree *mnode = dynamic_cast<MusicGenericTree*>(node);
+                MythGenericTree *node = qVariantValue<MythGenericTree*> (item->GetData());
+                MusicGenericTree *mnode = dynamic_cast<MusicGenericTree*>(node);
 
-                 if (mnode)
-                 {
-                     updateSonglist(mnode);
+                if (mnode)
+                {
+                    updateSonglist(mnode);
 
-                     if (m_songList.count() > 0)
-                     {
-                         m_playlistOptions.playPLOption = PL_FIRST;
-                         m_playlistOptions.insertPLOption = PL_REPLACE;
-                         doUpdatePlaylist();
+                    if (m_songList.count() > 0)
+                    {
+                        m_playlistOptions.playPLOption = PL_FIRST;
+                        m_playlistOptions.insertPLOption = PL_REPLACE;
+
+                        stopVisualizer();
+
+                        doUpdatePlaylist();
+
+                        if (m_mainvisual)
+                        {
+                            m_mainvisual->mutex()->lock();
+                            m_mainvisual->prepare();
+                            m_mainvisual->mutex()->unlock();
+                        }
                      }
                      else
                      {
