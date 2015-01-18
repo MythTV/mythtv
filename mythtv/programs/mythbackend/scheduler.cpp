@@ -4163,7 +4163,7 @@ void Scheduler::AddNewRecords(void)
         "    minute AS recendts, "                                       //19
         "                                            p.previouslyshown, "//20
         "    RECTABLE.recgroup, RECTABLE.dupmethod,  c.commmethod,      "//21-23
-        "    capturecard.cardid, capturecard.cardid,p.seriesid,      "//24-26
+        "    capturecard.cardid, 0,                  p.seriesid,      "//24-26
         "    p.programid,       RECTABLE.inetref,    p.category_type,   "//27-29
         "    p.airdate,         p.stars,             p.originalairdate, "//30-32
         "    RECTABLE.inactive, RECTABLE.parentid,   recordmatch.findid, "//33-35
@@ -4289,7 +4289,6 @@ void Scheduler::AddNewRecords(void)
             RecordingDupMethodType(result.value(22).toInt()),//dupmethod
 
             result.value(1).toUInt(),//sourceid
-            result.value(25).toUInt(),//inputid
             result.value(24).toUInt(),//cardid
 
             result.value(35).toUInt(),//findid

@@ -96,7 +96,6 @@ RecordingInfo::RecordingInfo(
     RecordingDupMethodType _dupmethod,
 
     uint _sourceid,
-    uint _inputid,
     uint _cardid,
 
     uint _findid,
@@ -155,7 +154,6 @@ RecordingInfo::RecordingInfo(
     dupmethod = _dupmethod;
 
     sourceid = _sourceid;
-    inputid = _inputid;
     cardid = _cardid;
 
     findid = _findid;
