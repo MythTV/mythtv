@@ -78,7 +78,7 @@ class ScriptableFrontend : public QObject
         m_pEngine = pEngine;
     }
   public slots:
-    QObject* GetStatus(void) { SCRIPT_CATCH_EXCEPTION( false,
+    QObject* GetStatus(void) { SCRIPT_CATCH_EXCEPTION( NULL,
                                     return m_obj.GetStatus(); ) }
 };
 
