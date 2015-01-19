@@ -6,10 +6,14 @@
 //               Used for UPnp/AV implementation & status information
 //                                                                            
 // Copyright (c) 2005 David Blain <dblain@mythtv.org>
+//               2014 Stuart Morgan <smorgan@mythtv.org>
 //                                          
 // Licensed under the GPL v2 or later, see COPYING for details                    
 //
 //////////////////////////////////////////////////////////////////////////////
+
+// Own headers
+#include "httpserver.h"
 
 // ANSI C headers
 #include <cmath>
@@ -28,7 +32,6 @@
 #include <QSslCertificate>
 
 // MythTV headers
-#include "httpserver.h"
 #include "upnputil.h"
 #include "upnp.h" // only needed for Config... remove once config is moved.
 #include "compat.h"
@@ -36,7 +39,7 @@
 #include "mythlogging.h"
 #include "htmlserver.h"
 #include "mythversion.h"
-#include <mythcorecontext.h>
+#include "mythcorecontext.h"
 
 #include "serviceHosts/rttiServiceHost.h"
 
