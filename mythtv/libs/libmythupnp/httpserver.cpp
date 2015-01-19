@@ -396,9 +396,6 @@ void HttpWorker::run(void)
         if (pSslSocket->setSocketDescriptor(m_socket))
         {
             pSslSocket->setSslConfiguration(m_sslConfig);
-            pSslSocket->setPrivateKey(m_sslConfig.privateKey());
-            pSslSocket->setLocalCertificate(m_sslConfig.localCertificate());
-            pSslSocket->addCaCertificates(m_sslConfig.caCertificates());
             pSslSocket->startServerEncryption();
             if (pSslSocket->waitForEncrypted(5000))
             {
