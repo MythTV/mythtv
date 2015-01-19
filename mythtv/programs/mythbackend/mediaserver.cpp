@@ -13,6 +13,7 @@
 #include "internetContent.h"
 #include "mythdirs.h"
 #include "htmlserver.h"
+#include <websocket.h>
 
 #include "upnpcdstv.h"
 #include "upnpcdsmusic.h"
@@ -74,6 +75,7 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
 
     int     nPort     = g_pConfig->GetValue( "BackendStatusPort", 6544 );
     int     nSSLPort  = g_pConfig->GetValue( "BackendSSLPort",    6554 );
+    int     nWSPort   = g_pConfig->GetValue( "BackendWSPort",     6545 );
 
     HttpServer *pHttpServer = new HttpServer();
 
@@ -96,6 +98,16 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
             LOG(VB_GENERAL, LOG_ERR, "MediaServer: HttpServer failed to create SSL server");
         }
 #endif
+    }
+
+    WebSocketServer *pWebSocketServer = new WebSocketServer();
+
+    if (!pWebSocketServer->isListening())
+    {
+        if (!pWebSocketServer->listen(nWSPort))
+        {
+            LOG(VB_GENERAL, LOG_ERR, "MediaServer: WebSocketServer Create Error");
+        }
     }
 
     QString sFileName = g_pConfig->GetValue( "upnpDescXmlPath",
