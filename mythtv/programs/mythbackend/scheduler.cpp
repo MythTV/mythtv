@@ -822,7 +822,7 @@ void Scheduler::SlaveConnected(RecordingList &slavelist)
         {
             RecordingInfo *rp = *ri;
 
-            if (sp->GetCardID() &&
+            if (!sp->GetTitle().isEmpty() &&
                 sp->GetScheduledStartTime() == rp->GetScheduledStartTime() &&
                 sp->GetChannelSchedulingID().compare(
                     rp->GetChannelSchedulingID(), Qt::CaseInsensitive) == 0 &&
