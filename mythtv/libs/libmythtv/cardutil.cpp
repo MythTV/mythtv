@@ -1081,7 +1081,7 @@ QString CardUtil::GetDisplayName(uint inputid)
         return QString::null;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT displayname, cardid, inputname "
+    query.prepare("SELECT displayname, cardid, cardtype, inputname "
                   "FROM capturecard "
                   "WHERE cardid = :INPUTID");
     query.bindValue(":INPUTID", inputid);
@@ -1092,8 +1092,8 @@ QString CardUtil::GetDisplayName(uint inputid)
     {
         QString result = query.value(0).toString();
         if (result.isEmpty())
-            result = QString("%1: %2").arg(query.value(1).toInt())
-                                      .arg(query.value(2).toString());
+            result = QString("%1: %2/%3").arg(query.value(1).toInt())
+                .arg(query.value(2).toString()).arg(query.value(3).toString());
         return result;
     }
 
