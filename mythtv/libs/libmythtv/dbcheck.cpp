@@ -3047,6 +3047,27 @@ NULL
             return false;
     }
 
+    if (dbver == "1335")
+    {
+        const char *updates[] = {
+            // Fix custom record and custom priority references to
+            // cardinput and cardinputid.
+            "UPDATE record SET description = "
+            "    replace(description, 'cardinputid', 'cardid') "
+            "    WHERE search = 1",
+            "UPDATE record SET description = "
+            "    replace(description, 'cardinput', 'capturecard') "
+            "    WHERE search = 1",
+            "UPDATE powerpriority SET selectclause = "
+            "    replace(selectclause, 'cardinputid', 'cardid')",
+            "UPDATE powerpriority SET selectclause = "
+            "    replace(selectclause, 'cardinput', 'capturecard')",
+            NULL
+        };
+        if (!performActualUpdate(updates, "1336", dbver))
+            return false;
+    }
+
     return true;
 }
 
