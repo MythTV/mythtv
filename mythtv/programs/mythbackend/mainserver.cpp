@@ -7758,7 +7758,8 @@ void MainServer::connectionClosed(MythSocket *socket)
 
             // Since we may already be holding the scheduler lock
             // delay handling the disconnect until a little later. #9885
-            SendSlaveDisconnectedEvent(disconnectedSlaves, needsReschedule);
+            if (!disconnectedSlaves.isEmpty())
+                SendSlaveDisconnectedEvent(disconnectedSlaves, needsReschedule);
 
             return;
         }
