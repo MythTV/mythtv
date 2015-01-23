@@ -5,7 +5,7 @@
 <title>WebSocket Test</title>
 
 <script language="javascript" type="text/javascript">
-var wsUri = "ws://192.168.159.2:6545/";
+var wsUri = "ws://" + document.domain + ":6545/";
 var messageWindow;
 var websocket;
 var statusWindow;
@@ -32,22 +32,21 @@ function openWebSocket()
 
 function onOpen(evt)
 {
-    writeToScreen("> <span style=\"color: green;\">CONNECTED</span> <");
-    writeToStatus("<span style=\"color: green;\">CONNECTED</span>");
+    writeToScreen("> <span style='color: green;'>CONNECTED</span> <");
+    writeToStatus("<span style='color: green;'>CONNECTED</span>");
 }
 
 function onClose(evt)
 {
 
-    writeToScreen("> <span style=\"color: red;\">DISCONNECTED</span> " + evt.code + " " + evt.reason + " <");
+    writeToScreen("> <span style='color: red;'>DISCONNECTED</span> " + evt.code + " " + evt.reason + " <");
     messageWindow.insertBefore(document.createElement("hr"), messageWindow.firstChild);
-    writeToStatus("<span style=\"color: red;\">DISCONNECTED</span>");
+    writeToStatus("<span style='color: red;'>DISCONNECTED</span>");
 }
 
 function onMessage(evt)
 {
     writeToScreen('[' + Date.now() + ']: <span style="color: blue;">' + evt.data + '</span>');
-//    websocket.close();
 }
 
 function onError(evt)
