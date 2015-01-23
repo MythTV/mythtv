@@ -18,7 +18,7 @@ HLSRecSegment::HLSRecSegment(const HLSRecSegment& rhs)
 }
 
 HLSRecSegment::HLSRecSegment(int seq, int duration,
-                       const QString& title, const QString& uri)
+                       const QString& title, const QUrl& uri)
     : m_sequence(seq),
       m_duration(duration),
       m_bitrate(0),
@@ -29,7 +29,7 @@ HLSRecSegment::HLSRecSegment(int seq, int duration,
 }
 
 HLSRecSegment::HLSRecSegment(int seq, int duration, const QString& title,
-           const QString& uri, const QString& current_key_path)
+           const QUrl& uri, const QString& current_key_path)
     : m_sequence(seq),
       m_duration(duration),
       m_bitrate(0),
@@ -66,5 +66,5 @@ HLSRecSegment::~HLSRecSegment(void)
 QString HLSRecSegment::toString(void) const
 {
     return QString("[%1] '%2' @ '%3' for %4")
-        .arg(m_sequence).arg(m_title).arg(m_url).arg(m_duration);
+        .arg(m_sequence).arg(m_title).arg(m_url.toString()).arg(m_duration);
 }
