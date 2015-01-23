@@ -12,15 +12,8 @@
 #include <QThread>
 #include <QSslCipher>
 #include <QCryptographicHash>
-#include <QDebug>
-
-// STD headers
-#include <algorithm>
-#include <cmath>
-#include <unistd.h>
-
-using std::max;
-using std::pow;
+#include <QtCore>
+#include <QtGlobal>
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -32,7 +25,7 @@ WebSocketServer::WebSocketServer() :
 {
     setObjectName("WebSocketServer");
     // Number of connections processed concurrently
-    int maxThreads = max(QThread::idealThreadCount() * 2, 2); // idealThreadCount can return -1
+    int maxThreads = qMax(QThread::idealThreadCount() * 2, 2); // idealThreadCount can return -1
     // Don't allow more connections than we can process, it will simply cause
     // browsers to stall
     setMaxPendingConnections(maxThreads);
@@ -538,7 +531,7 @@ void WebSocketWorker::ProcessFrames(QTcpSocket *socket)
         LOG(VB_HTTP, LOG_DEBUG, QString("Total Payload Size: %1 Bytes").arg(QString::number( m_readFrame.payloadSize)));
 
         if (!m_fuzzTesting &&
-            frame.payloadSize > pow(2,20)) // Set 1MB limit on payload per frame
+            frame.payloadSize > qPow(2,20)) // Set 1MB limit on payload per frame
         {
             LOG(VB_GENERAL, LOG_ERR, "WebSocketWorker::ProcessFrames() - Frame payload larger than limit of 1MB");
             SendClose(kCloseTooLarge, "Frame payload larger than limit of 1MB");
@@ -546,7 +539,7 @@ void WebSocketWorker::ProcessFrames(QTcpSocket *socket)
         }
 
         if (!m_fuzzTesting &&
-            m_readFrame.payloadSize > pow(2,22)) // Set 4MB limit on total payload
+            m_readFrame.payloadSize > qPow(2,22)) // Set 4MB limit on total payload
         {
             LOG(VB_GENERAL, LOG_ERR, "WebSocketWorker::ProcessFrames() - Total payload larger than limit of 4MB");
             SendClose(kCloseTooLarge, "Total payload larger than limit of 4MB");
@@ -724,7 +717,7 @@ QByteArray WebSocketWorker::CreateFrame(WebSocketFrame::OpCode type,
 
     int payloadSize = payload.length();
 
-    if (payloadSize >= pow(2,64))
+    if (payloadSize >= qPow(2,64))
     {
         LOG(VB_GENERAL, LOG_ERR, "WebSocketWorker::CreateFrame() - Payload "
                               "exceeds the allowed size for a single frame");
