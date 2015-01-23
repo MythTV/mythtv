@@ -1836,8 +1836,8 @@ bool CardUtil::GetV4LInfo(
     memset(&capability, 0, sizeof(struct v4l2_capability));
     if (ioctl(videofd, VIDIOC_QUERYCAP, &capability) >= 0)
     {
-        card = QString::fromAscii((const char*)capability.card);
-        driver = QString::fromAscii((const char*)capability.driver);
+        card = QString::fromLatin1((const char*)capability.card);
+        driver = QString::fromLatin1((const char*)capability.driver);
         version = capability.version;
         capabilities = capability.capabilities;
     }
@@ -1846,7 +1846,7 @@ bool CardUtil::GetV4LInfo(
     {
         struct video_capability capability;
         if (ioctl(videofd, VIDIOCGCAP, &capability) >= 0)
-            card = QString::fromAscii((const char*)capability.name);
+            card = QString::fromLatin1((const char*)capability.name);
     }
 #endif // USING_V4L1
 #endif // USING_V4L2
