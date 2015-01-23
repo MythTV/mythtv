@@ -15,6 +15,9 @@
 
 #include <QDomDocument>
 #include <QUrl>
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+#include <QUrlQuery>
+#endif
 
 #include "compat.h"
 #include "upnpexp.h"
