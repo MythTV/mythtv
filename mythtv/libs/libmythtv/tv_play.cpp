@@ -8721,7 +8721,13 @@ void TV::DoEditSchedule(int editType)
     pause_active |= paused;
     vector<bool> do_pause;
     do_pause.insert(do_pause.begin(), true, player.size());
-    do_pause[find_player_index(actx)] = pause_active;
+    int actx_index = find_player_index(actx);
+    if (actx_index < 0)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "DoEditSchedule -- failed to find player index by context");
+        return;
+    }
+    do_pause[actx_index] = pause_active;
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
         QString("Pausing player: %1").arg(pause_active));
 
