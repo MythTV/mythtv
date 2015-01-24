@@ -13,12 +13,9 @@
 #include "mythlogging.h"
 #include "mythpainter.h"
 #include "mythimage.h"
+#include "compat.h"
 
-#ifdef __func__ /* only in C++11, not in old msvc */
 #define LOC QString("AOG::%1").arg(__func__)
-#else
-#define LOC QString("AOG: ")
-#endif
 
 const int kBufferMilliSecs = 500;
 
