@@ -6114,6 +6114,12 @@ void TV::PxPSwap(PlayerContext *mctx, PlayerContext *pipctx)
 
     int ctx_index = find_player_index(pipctx);
 
+    if (ctx_index < 0)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "PxPSwap -- failed to find player index by context");
+        return;
+    }
+
     vector<long long> pos = TeardownAllPlayers(mctx);
 
     swap(player[0],           player[ctx_index]);
