@@ -125,6 +125,10 @@
     #   define inline __inline
     #endif
 
+    #if !defined(__func__) // C99 & C++11
+    #   define __func__ __FUNCTION__
+    #endif
+
 #endif
 
 #ifdef _WIN32
