@@ -56,7 +56,7 @@ void ProgramInfoUpdater::run(void)
         // we don't need instant updates allow a few to queue up
         // if they come in quick succession, this allows multiple
         // updates to be consolidated into one update...
-        usleep(50 * 1000);
+        usleep(200 * 1000); // 200ms
 
         lock.lock();
 

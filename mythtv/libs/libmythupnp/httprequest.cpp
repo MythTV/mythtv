@@ -463,7 +463,7 @@ qint64 HTTPRequest::SendResponse( void )
     QString masterAddrPort = QString("%1:%2").arg(gCoreContext->GetMasterServerIP())
                                              .arg(gCoreContext->GetMasterServerStatusPort());
     QString masterTLSAddrPort = QString("%1:%2").arg(gCoreContext->GetMasterServerIP())
-                                                .arg("6554"); // FIXME: This shouldn't be hardcoded
+                                                .arg(gCoreContext->GetSetting( "BackendSSLPort", "6554" ));
 
     QStringList allowedOrigins;
     allowedOrigins << QString("http://%1").arg(masterAddrPort);

@@ -9,6 +9,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include <QTextStream>
+#include <QScriptEngine>
 
 #include "upnpsubscription.h"
 #include "upnputil.h"
@@ -18,164 +19,10 @@
 #include "mythfexml.h"
 #include "compat.h"
 #include "mythdate.h"
+#include "htmlserver.h"
 
 #include "serviceHosts/frontendServiceHost.h"
-
-class MythFrontendStatus : public HttpServerExtension
-{
-  public:
-    MythFrontendStatus(const QString &sSharePath)
-      : HttpServerExtension("MythFrontendStatus", sSharePath) { }
-
-    virtual QStringList GetBasePaths() { return QStringList( "/" ); }
-
-    virtual bool ProcessRequest(HTTPRequest *pRequest)
-    {
-        if (!pRequest)
-            return false;
-
-        if (pRequest->m_sBaseUrl != "/")
-            return false;
-
-        if (pRequest->m_sMethod == "getDeviceDesc")
-            return false;
-
-        pRequest->m_eResponseType = ResponseTypeHTML;
-        pRequest->m_mapRespHeaders["Cache-Control"] =
-            "no-cache=\"Ext\", max-age = 5000";
-
-        SSDPCacheEntries* cache = NULL;
-        QString ipaddress = QString();
-
-        if (!UPnp::g_IPAddrList.isEmpty())
-            ipaddress = UPnp::g_IPAddrList.at(0).toString();
-
-        QString hostname   = gCoreContext->GetHostName();
-        QDateTime qdtNow   = MythDate::current();
-        QString masterhost = gCoreContext->GetMasterHostName();
-        QString masterip   = gCoreContext->GetMasterServerIP();
-        int masterport = gCoreContext->GetMasterServerStatusPort();
-
-        QTextStream stream ( &pRequest->m_response );
-        stream.setCodec("UTF-8");
-
-        stream
-           << "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" "
-           << "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n"
-           << "<html xmlns=\"http://www.w3.org/1999/xhtml\""
-           << " xml:lang=\"en\" lang=\"en\">\r\n"
-           << "<head>\r\n"
-           << "  <meta http-equiv=\"Content-Type\""
-           << "content=\"text/html; charset=UTF-8\" />\r\n"
-           << "  <title>MythFrontend Status - "
-           << MythDate::toString(qdtNow, MythDate::kDateTimeShort) << " - "
-           << MYTH_BINARY_VERSION << "</title>\r\n"
-           << "  <link rel=\"stylesheet\" href=\"/css/site.css\"   type=\"text/css\">\r\n"
-           << "  <link rel=\"stylesheet\" href=\"/css/Status.css\" type=\"text/css\">\r\n"
-           << "</head>\r\n"
-           << "<body>\r\n\r\n"
-           << "  <h1 class=\"status\">MythFrontend Status</h1>\r\n";
-
-        // This frontend
-        stream
-           << "  <div class=\"content\">\r\n"
-           << "    <h2 class=\"status\">This Frontend</h2>\r\n"
-           << "Name : " << hostname << "<br />\r\n"
-           << "Version : " << MYTH_BINARY_VERSION << "\r\n"
-           << "  </div>\r\n";
-
-        // Other frontends
-
-        // This will not work with multiple frontends on the same machine (upnp
-        // setup will fail on a second frontend anyway) and the ip address
-        // filtering of the current frontend may not work in all situations
-
-        cache = SSDP::Find("urn:schemas-mythtv-org:service:MythFrontend:1");
-        if (cache)
-        {
-            stream
-               << "  <div class=\"content\">\r\n"
-               << "    <h2 class=\"status\">Other Frontends</h2>\r\n";
-
-            EntryMap map;
-            cache->GetEntryMap(map);
-            cache->DecrRef();
-            cache = NULL;
-
-            for (EntryMap::iterator it = map.begin(); it != map.end(); ++it)
-            {
-                QUrl url((*it)->m_sLocation);
-                if (url.host() != ipaddress)
-                {
-                    stream << "<br />" << url.host() << "&nbsp(<a href=\""
-                           << url.toString(QUrl::RemovePath)
-                           << "\">Status page</a>)\r\n";
-                }
-                (*it)->DecrRef();
-            }
-            stream << "  </div>\r\n";
-        }
-
-        // Master backend
-        stream
-           << "  <div class=\"content\">\r\n"
-           << "    <h2 class=\"status\">MythTV Backends</h2>\r\n"
-           << "Master: " << masterhost << "&nbsp(<a href=\"http://"
-           << masterip << ":" << masterport
-           << "\">Status page</a>)\r\n";
-
-        // Slave backends
-        cache = SSDP::Find("urn:schemas-mythtv-org:device:SlaveMediaServer:1");
-        if (cache)
-        {
-            EntryMap map;
-            cache->GetEntryMap(map);
-            cache->DecrRef();
-            cache = NULL;
-
-            for (EntryMap::iterator it = map.begin(); it != map.end(); ++it)
-            {
-                QUrl url((*it)->m_sLocation);
-                stream << "<br />" << "Slave: " << url.host()
-                       << "&nbsp(<a href=\""
-                       << url.toString(QUrl::RemovePath)
-                       << "\">Status page</a>)\r\n";
-                (*it)->DecrRef();
-            }
-        }
-
-        stream
-           << "  </div>\r\n";
-
-        stream
-           << "  <div class=\"content\">\r\n"
-           << "    <h2 class=\"status\">Services</h2>\r\n"
-           << "    <a href=\"MythFE/GetRemote\">Remote Control</a>\r\n"
-           << "  </div>\r\n";
-
-        double load[3];
-        if (getloadavg(load, 3) != -1)
-        {
-            stream
-               << "  <div class=\"content\">\r\n"
-               << "    <h2 class=\"status\">Machine Information</h2>\r\n"
-               << "    <div class=\"loadstatus\">\r\n"
-               << "      This machine's load average:"
-               << "\r\n      <ul>\r\n        <li>"
-               << "1 Minute: " << QString::number(load[0]) << "</li>\r\n"
-               << "        <li>5 Minutes: " << QString::number(load[1]) << "</li>\r\n"
-               << "        <li>15 Minutes: " << QString::number(load[2])
-               << "</li>\r\n      </ul>\r\n"
-               << "    </div>\r\n"
-               << "  </div>\r\n";
-        }
-
-        stream << "</body>\r\n</html>\r\n";
-        stream.flush();
-
-        return true;
-    }
-};
+#include "services/frontend.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -218,6 +65,30 @@ MediaRenderer::MediaRenderer(): m_pUPnpCMGR(NULL)
         return;
     }
 
+    // ------------------------------------------------------------------
+    // Register any HttpServerExtensions...
+    // ------------------------------------------------------------------
+
+    HtmlServerExtension *pHtmlServer = NULL;
+    pHtmlServer= new HtmlServerExtension(pHttpServer->GetSharePath() + "html",
+                                         "frontend_");
+    pHttpServer->RegisterExtension(pHtmlServer);
+    pHttpServer->RegisterExtension(new FrontendServiceHost(pHttpServer->GetSharePath()));
+
+    // ------------------------------------------------------------------
+    // Register Service Types with Scripting Engine
+    //
+    // -=>NOTE: We need to know the actual type at compile time for this
+    //          to work, so it needs to be done here.  I'm still looking
+    //          into ways that we may encapsulate this in the service
+    //          classes. - dblain
+    // ------------------------------------------------------------------
+
+    QScriptEngine* pEngine = pHtmlServer->ScriptEngine();
+
+    pEngine->globalObject().setProperty("Frontend"   ,
+        pEngine->scriptValueFromQMetaObject< ScriptableFrontend    >() );
+
     // ----------------------------------------------------------------------
     // Initialize UPnp Stack
     // ----------------------------------------------------------------------
@@ -242,26 +113,14 @@ MediaRenderer::MediaRenderer(): m_pUPnpCMGR(NULL)
         device.m_sUPC               = "";
         device.m_sPresentationURL   = "/";
 
-        // ------------------------------------------------------------------
-        // Register any HttpServerExtensions...
-        // ------------------------------------------------------------------
-
-        LOG(VB_UPNP, LOG_INFO,
-            "MediaRenderer: Registering MythFrontendStatus service.");
-        m_pHttpServer->RegisterExtension(
-            new MythFrontendStatus(m_pHttpServer->GetSharePath()));
-
         QString sSinkProtocols = GetSinkProtocolInfos().join(",");
 
         // ------------------------------------------------------------------
         // Register the MythFEXML protocol...
         // ------------------------------------------------------------------
-        LOG(VB_UPNP, LOG_INFO, "MediaRenderer: Registering MythFEXML Service.");
+        LOG(VB_UPNP, LOG_INFO, "MediaRenderer: Registering MythFEXML Extension.");
         m_pHttpServer->RegisterExtension(
             new MythFEXML(RootDevice(), m_pHttpServer->GetSharePath()));
-
-        LOG(VB_UPNP, LOG_INFO, "MediaRenderer: Registering Status Service.");
-        m_pHttpServer->RegisterExtension(new FrontendServiceHost(m_pHttpServer->GetSharePath()));
 
 #if 0
         LOG(VB_UPNP, LOG_INFO,

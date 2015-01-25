@@ -103,7 +103,6 @@ class UPNP_PUBLIC HttpServer : public ServerPool
     // This multimap does NOT take ownership of the HttpServerExtension*
     QMultiMap< QString, HttpServerExtension* >  m_basePaths;
     QString                 m_sSharePath;
-    HttpServerExtension    *m_pHtmlServer;
     MThreadPool             m_threadPool;
     bool                    m_running; // protected by m_rwlock
 
@@ -113,7 +112,7 @@ class UPNP_PUBLIC HttpServer : public ServerPool
     QSslConfiguration       m_sslConfig;
 
   public:
-    HttpServer(const QString &sApplicationPrefix = QString(""));
+    HttpServer();
     virtual ~HttpServer();
 
     void RegisterExtension(HttpServerExtension*);
@@ -123,8 +122,6 @@ class UPNP_PUBLIC HttpServer : public ServerPool
      * \brief Get the idle socket timeout value for the relevant extension
      */
     uint GetSocketTimeout(HTTPRequest*) const;
-
-    QScriptEngine *ScriptEngine(void);
 
   private:
      void LoadSSLConfig();

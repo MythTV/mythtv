@@ -108,16 +108,20 @@
             status = qsTr("Online");
             statusClass = "frontendOnline";
         }
+
+        var frontendIP = frontendList[nIdx].IP;
+        if (frontendIP.length > 15) // IPv6 Address
+            frontendIP = "[" + frontendIP + "]"; // Yay for stupid design of IPv6
 %>
             <div class="frontendRow">
                 <div class="frontendName">
-                    <a href="//<%=frontendList[nIdx].IP%>:6547/"><%=frontendList[nIdx].Name%></a>
+                    <a href="http://<%=frontendIP%>:<%=frontendList[nIdx].Port%>/"><%=frontendList[nIdx].Name%></a>
                 </div>
                 <div class="frontendStatus <%=statusClass%>" id="frontendStatus-<%=frontendList[nIdx].Name%>">
                     <%=status%>
                 </div>
                 <script type="text/javascript">GetFrontendStatus('<%=frontendList[nIdx].Name%>',
-                                                                 '<%=frontendList[nIdx].IP%>:6547')</script>
+                                                                 '<%=frontendIP%>:<%=frontendList[nIdx].Port%>')</script>
             </div>
 <%
     }

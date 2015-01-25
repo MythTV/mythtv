@@ -39,8 +39,11 @@ function playInBrowser(recordedId)
     loadContent("/tv/tvplayer.qsp?RecordedId=" + recordedId);
 }
 
-function playOnFrontend(recordedId, ip)
+function playOnFrontend(recordedId, ipaddress, port)
 {
-    var surl = "http://" + ip + ":6547/Frontend/PlayRecording?RecordedId=" + recordedId;
+    if (ipaddress.length > 15) // IPv6 Address
+        ipaddress = "[" + ipaddress + "]"; // Yay for stupid design of IPv6
+
+    var surl = "http://" + ipaddress + ":" + port + "/Frontend/PlayRecording?RecordedId=" + recordedId;
     $.ajax({ url: surl, type: 'POST' });
 }

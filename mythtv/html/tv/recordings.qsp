@@ -111,7 +111,7 @@ import "/tv/js/tvutil.qjs"
     for (var nIdx = 0; nIdx < frontendList.length; nIdx++)
     {
 %>
-    <div class="button playMenu" onClick="playOnFrontend(gRecordedId, '<%=frontendList[nIdx].IP%>')">
+    <div class="button playMenu" onClick="playOnFrontend(gRecordedId, '<%=frontendList[nIdx].IP%>', <%=frontendList[nIdx].Port%>)">
         <%=qsTr("Play on Frontend")%> <%=frontendList[nIdx].Name%>
     </div>
 <%  } %>

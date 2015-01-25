@@ -21,6 +21,7 @@
 #include "musiccommon.h"
 #include "playlisteditorview.h"
 #include "smartplaylist.h"
+#include "mainvisual.h"
 
 MusicGenericTree::MusicGenericTree(MusicGenericTree *parent,
                                    const QString &name, const QString &action,
@@ -492,18 +493,28 @@ bool PlaylistEditorView::keyPressEvent(QKeyEvent *event)
             MythUIButtonListItem *item = m_playlistTree->GetItemCurrent();
             if (item)
             {
-                 MythGenericTree *node = qVariantValue<MythGenericTree*> (item->GetData());
-                 MusicGenericTree *mnode = dynamic_cast<MusicGenericTree*>(node);
+                MythGenericTree *node = qVariantValue<MythGenericTree*> (item->GetData());
+                MusicGenericTree *mnode = dynamic_cast<MusicGenericTree*>(node);
 
-                 if (mnode)
-                 {
-                     updateSonglist(mnode);
+                if (mnode)
+                {
+                    updateSonglist(mnode);
 
-                     if (m_songList.count() > 0)
-                     {
-                         m_playlistOptions.playPLOption = PL_FIRST;
-                         m_playlistOptions.insertPLOption = PL_REPLACE;
-                         doUpdatePlaylist();
+                    if (m_songList.count() > 0)
+                    {
+                        m_playlistOptions.playPLOption = PL_FIRST;
+                        m_playlistOptions.insertPLOption = PL_REPLACE;
+
+                        stopVisualizer();
+
+                        doUpdatePlaylist();
+
+                        if (m_mainvisual)
+                        {
+                            m_mainvisual->mutex()->lock();
+                            m_mainvisual->prepare();
+                            m_mainvisual->mutex()->unlock();
+                        }
                      }
                      else
                      {
@@ -607,6 +618,10 @@ void PlaylistEditorView::updateSonglist(MusicGenericTree *node)
             }
         }
     }
+    else if (node->getAction() == "error")
+    {
+        // a smart playlist has returned no tracks etc.
+    }
     else
     {
         // fall back to getting the tracks from the MetadataPtrList
@@ -644,6 +659,9 @@ void PlaylistEditorView::ShowMenu(void)
                 menu = createPlaylistMenu();
             }
             else if (mnode->getAction() == "trackid")
+            {
+            }
+            else if (mnode->getAction() == "error")
             {
             }
             else
@@ -806,7 +824,7 @@ void PlaylistEditorView::treeItemClicked(MythUIButtonListItem *item)
     MythGenericTree *node = qVariantValue<MythGenericTree*> (item->GetData());
     MusicGenericTree *mnode = dynamic_cast<MusicGenericTree*>(node);
 
-    if (!mnode || !gPlayer->getCurrentPlaylist())
+    if (!mnode || !gPlayer->getCurrentPlaylist() || mnode->getAction() == "error")
         return;
 
     if (mnode->getAction() == "trackid")

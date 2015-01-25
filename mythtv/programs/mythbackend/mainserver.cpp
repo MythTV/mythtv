@@ -4396,6 +4396,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         else
         {
             ProgramInfo dummy;
+            dummy.SetCardID(enc->GetCardID());
             dummy.ToStringList(retlist);
         }
     }
@@ -4459,6 +4460,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         else
         {
             ProgramInfo dummy;
+            dummy.SetCardID(enc->GetCardID());
             dummy.ToStringList(retlist);
         }
     }
@@ -4873,6 +4875,7 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
         else
         {
             ProgramInfo dummy;
+            dummy.SetCardID(enc->GetCardID());
             dummy.ToStringList(retlist);
         }
     }
@@ -7755,7 +7758,8 @@ void MainServer::connectionClosed(MythSocket *socket)
 
             // Since we may already be holding the scheduler lock
             // delay handling the disconnect until a little later. #9885
-            SendSlaveDisconnectedEvent(disconnectedSlaves, needsReschedule);
+            if (!disconnectedSlaves.isEmpty())
+                SendSlaveDisconnectedEvent(disconnectedSlaves, needsReschedule);
 
             return;
         }
@@ -8107,6 +8111,7 @@ void MainServer::reconnectTimeout(void)
         else
         {
             ProgramInfo dummy;
+            dummy.SetCardID(elink->GetCardID());
             dummy.ToStringList(strlist);
         }
     }

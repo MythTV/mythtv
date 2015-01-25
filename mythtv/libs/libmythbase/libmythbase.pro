@@ -30,7 +30,7 @@ HEADERS += plist.h bswap.h signalhandling.h mythtimezone.h mythdate.h
 HEADERS += mythplugin.h mythpluginapi.h housekeeper.h
 HEADERS += ffmpeg-mmx.h
 HEADERS += mythsystemlegacy.h mythtypes.h
-HEADERS += threadedfilewriter.h mythsingledownload.h
+HEADERS += threadedfilewriter.h mythsingledownload.h codecutil.h
 
 SOURCES += mthread.cpp mthreadpool.cpp
 SOURCES += mythsocket.cpp
@@ -48,7 +48,7 @@ SOURCES += filesysteminfo.cpp hardwareprofile.cpp serverpool.cpp
 SOURCES += plist.cpp signalhandling.cpp mythtimezone.cpp mythdate.cpp
 SOURCES += mythplugin.cpp housekeeper.cpp
 SOURCES += mythsystemlegacy.cpp mythtypes.cpp
-SOURCES += threadedfilewriter.cpp mythsingledownload.cpp
+SOURCES += threadedfilewriter.cpp mythsingledownload.cpp codecutil.cpp
 
 unix {
     SOURCES += mythsystemunix.cpp

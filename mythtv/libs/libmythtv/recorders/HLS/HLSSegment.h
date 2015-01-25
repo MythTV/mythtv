@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 #include <QString>
+#include <QUrl>
 
 class HLSRecSegment
 {
@@ -13,9 +14,9 @@ class HLSRecSegment
     HLSRecSegment(void);
     HLSRecSegment(const HLSRecSegment& rhs);
     HLSRecSegment(int seq, int duration, const QString& title,
-		  const QString& uri);
+		  const QUrl& uri);
     HLSRecSegment(int seq, int duration, const QString& title,
-	       const QString& uri, const QString& current_key_path);
+	       const QUrl& uri, const QString& current_key_path);
     ~HLSRecSegment();
 
     HLSRecSegment& operator=(const HLSRecSegment& rhs);
@@ -24,7 +25,7 @@ class HLSRecSegment
 
     int64_t Sequence(void) const { return m_sequence; }
     QString Title(void)    const { return m_title; }
-    QString Url(void)      const { return m_url; }
+    QUrl    Url(void)      const { return m_url; }
     int     Duration(void) const { return m_duration; }
 
     QString toString(void) const;
@@ -44,7 +45,7 @@ class HLSRecSegment
     QString     m_title;     // human-readable informative title of
 			     // the media segment
 
-    QString     m_url;
+    QUrl        m_url;
 
 #ifdef USING_LIBCRYPTO
     QString     m_psz_key_path; // URL key path

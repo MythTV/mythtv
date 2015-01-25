@@ -1,1 +1,2 @@
-unzip.c/h and ioapi.c/h are from minizip, distributed together with gzip 1.2.8
+unzip.c/h and ioapi.c/h are from minizip, distributed together with zlib 1.2.8
+Find it at https://github.com/madler/zlib/tree/master/contrib/minizip

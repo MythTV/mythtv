@@ -6,10 +6,14 @@
 //               Used for UPnp/AV implementation & status information
 //                                                                            
 // Copyright (c) 2005 David Blain <dblain@mythtv.org>
+//               2014 Stuart Morgan <smorgan@mythtv.org>
 //                                          
 // Licensed under the GPL v2 or later, see COPYING for details                    
 //
 //////////////////////////////////////////////////////////////////////////////
+
+// Own headers
+#include "httpserver.h"
 
 // ANSI C headers
 #include <cmath>
@@ -28,7 +32,6 @@
 #include <QSslCertificate>
 
 // MythTV headers
-#include "httpserver.h"
 #include "upnputil.h"
 #include "upnp.h" // only needed for Config... remove once config is moved.
 #include "compat.h"
@@ -36,7 +39,7 @@
 #include "mythlogging.h"
 #include "htmlserver.h"
 #include "mythversion.h"
-#include <mythcorecontext.h>
+#include "mythcorecontext.h"
 
 #include "serviceHosts/rttiServiceHost.h"
 
@@ -55,9 +58,8 @@ QString  HttpServer::s_platform;
 //
 /////////////////////////////////////////////////////////////////////////////
 
-HttpServer::HttpServer(const QString &sApplicationPrefix) :
+HttpServer::HttpServer() :
     ServerPool(), m_sSharePath(GetShareDir()),
-    m_pHtmlServer(new HtmlServerExtension(m_sSharePath + "html", sApplicationPrefix)),
     m_threadPool("HttpServerPool"), m_running(true)
 {
     // Number of connections processed concurrently
@@ -102,11 +104,6 @@ HttpServer::HttpServer(const QString &sApplicationPrefix) :
 
     RegisterExtension( new RttiServiceHost( m_sSharePath ));
 
-    QScriptEngine *pEngine = ScriptEngine();
-
-    pEngine->globalObject().setProperty("Rtti",
-         pEngine->scriptValueFromQMetaObject< ScriptableRtti >() );
-
     LoadSSLConfig();
 }
 
@@ -126,9 +123,6 @@ HttpServer::~HttpServer()
     {
         delete m_extensions.takeFirst();
     }
-
-    if (m_pHtmlServer != NULL)
-        delete m_pHtmlServer;
 }
 
 void HttpServer::LoadSSLConfig()
@@ -234,15 +228,6 @@ QString HttpServer::GetServerVersion(void)
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QScriptEngine* HttpServer::ScriptEngine()
-{
-    return ((HtmlServerExtension *)m_pHtmlServer)->ScriptEngine();
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
 void HttpServer::newTcpConnection(qt_socket_fd_t socket)
 {
     PoolServerType type = kTCPServer;
@@ -264,6 +249,7 @@ void HttpServer::RegisterExtension( HttpServerExtension *pExtension )
 {
     if (pExtension != NULL )
     {
+        LOG(VB_HTTP, LOG_INFO, QString("HttpServer: Registering %1 extension").arg(pExtension->m_sName));
         m_rwlock.lockForWrite();
         m_extensions.append( pExtension );
 
@@ -328,7 +314,6 @@ void HttpServer::DelegateRequest(HTTPRequest *pRequest)
         }
     }
 
-#if 0
     HttpServerExtensionList::iterator it = m_extensions.begin();
 
     for (; (it != m_extensions.end()) && !bProcessed; ++it)
@@ -344,11 +329,10 @@ void HttpServer::DelegateRequest(HTTPRequest *pRequest)
                                              "pExtension->ProcessRequest()."));
         }
     }
-#endif
     m_rwlock.unlock();
 
-    if (!bProcessed)
-        bProcessed = m_pHtmlServer->ProcessRequest(pRequest);
+//     if (!bProcessed)
+//         bProcessed = m_pHtmlServer->ProcessRequest(pRequest);
 
     if (!bProcessed)
     {
@@ -415,9 +399,6 @@ void HttpWorker::run(void)
         if (pSslSocket->setSocketDescriptor(m_socket))
         {
             pSslSocket->setSslConfiguration(m_sslConfig);
-            pSslSocket->setPrivateKey(m_sslConfig.privateKey());
-            pSslSocket->setLocalCertificate(m_sslConfig.localCertificate());
-            pSslSocket->addCaCertificates(m_sslConfig.caCertificates());
             pSslSocket->startServerEncryption();
             if (pSslSocket->waitForEncrypted(5000))
             {
