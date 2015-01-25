@@ -1868,7 +1868,7 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
     uint conflict_count = askAllowPrograms.size();
 
     it = askAllowPrograms.begin();
-    if ((1 == askAllowPrograms.size()) && ((*it).info->GetCardID() == cardid))
+    if ((1 == askAllowPrograms.size()) && ((*it).info->GetInputID() == cardid))
     {
         (*it).is_in_same_input_group = (*it).is_conflicting = true;
     }
@@ -1885,7 +1885,7 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
         for (; it != askAllowPrograms.end(); ++it)
         {
             (*it).is_in_same_input_group =
-                (cardid == (*it).info->GetCardID());
+                (cardid == (*it).info->GetInputID());
 
             if ((*it).is_in_same_input_group)
                 continue;
@@ -1898,7 +1898,7 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
             }
 
             vector<uint> input_grps =
-                CardUtil::GetInputGroups((*it).info->GetCardID());
+                CardUtil::GetInputGroups((*it).info->GetInputID());
 
             for (uint i = 0; i < input_grps.size(); i++)
             {
@@ -1918,9 +1918,9 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
         {
             if (!(*it).is_in_same_input_group)
                 (*it).is_conflicting = false;
-            else if (cardid == (uint)(*it).info->GetCardID())
+            else if (cardid == (uint)(*it).info->GetInputID())
                 (*it).is_conflicting = true;
-            else if (!CardUtil::IsTunerShared(cardid, (*it).info->GetCardID()))
+            else if (!CardUtil::IsTunerShared(cardid, (*it).info->GetInputID()))
                 (*it).is_conflicting = true;
             else if ((busy_input.mplexid &&
                       (busy_input.mplexid  == (*it).info->QueryMplexID())) ||
@@ -1944,7 +1944,7 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
         // TODO take down mplexid and inform user of problem
         // on channel changes.
     }
-    else if (conflict_count == 1 && ((*it).info->GetCardID() == cardid))
+    else if (conflict_count == 1 && ((*it).info->GetInputID() == cardid))
     {
 #if 0
         LOG(VB_GENERAL, LOG_DEBUG, LOC + "UpdateOSDAskAllowDialog -- " +
@@ -2084,7 +2084,7 @@ void TV::HandleOSDAskAllow(PlayerContext *ctx, QString action)
         for (; it != askAllowPrograms.end(); ++it)
         {
             if ((*it).is_conflicting)
-                RemoteCancelNextRecording((*it).info->GetCardID(), true);
+                RemoteCancelNextRecording((*it).info->GetInputID(), true);
         }
     }
     else if (action == "WATCH")

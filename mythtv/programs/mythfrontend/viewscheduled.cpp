@@ -292,9 +292,9 @@ void ViewScheduled::LoadList(bool useExistingData)
               recstatus != rsRepeat &&
               recstatus != rsNeverRecord)))
         {
-            m_cardref[pginfo->GetCardID()]++;
-            if (pginfo->GetCardID() > m_maxcard)
-                m_maxcard = pginfo->GetCardID();
+            m_cardref[pginfo->GetInputID()]++;
+            if (pginfo->GetInputID() > m_maxcard)
+                m_maxcard = pginfo->GetInputID();
 
             QDate date = pginfo->GetRecordingStartTime().toLocalTime().date();
             m_recgroupList[date].push_back(pginfo);
@@ -425,7 +425,7 @@ void ViewScheduled::FillList()
             state = "error";
         else if (recstatus == rsWillRecord)
         {
-            if (m_curcard == 0 || pginfo->GetCardID() == m_curcard)
+            if (m_curcard == 0 || pginfo->GetInputID() == m_curcard)
             {
                 if (pginfo->GetRecordingPriority2() < 0)
                     state = "warning";

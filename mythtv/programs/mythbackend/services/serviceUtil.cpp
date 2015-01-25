@@ -134,10 +134,10 @@ void FillProgramInfo( DTC::Program *pProgram,
             pRecording->setRecType     ( pInfo->GetRecordingRuleType()    );
             pRecording->setDupInType   ( pInfo->GetDuplicateCheckSource() );
             pRecording->setDupMethod   ( pInfo->GetDuplicateCheckMethod() );
-            pRecording->setEncoderId   ( pInfo->GetCardID()               );
+            pRecording->setEncoderId   ( pInfo->GetInputID()              );
             if (pProgram->Channel())
             {
-                QString encoderName = CardUtil::GetDisplayName(pInfo->GetCardID(),
+                QString encoderName = CardUtil::GetDisplayName(pInfo->GetInputID(),
                                                                pProgram->Channel()->SourceId());
                 pRecording->setEncoderName( encoderName );
             }

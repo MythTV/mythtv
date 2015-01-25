@@ -1581,7 +1581,7 @@ void HttpStatus::FillProgramInfo(QDomDocument *pDoc,
             recording.setAttribute( "dupMethod"     ,
                                     pInfo->GetDuplicateCheckMethod() );
             recording.setAttribute( "encoderId"     ,
-                                    pInfo->GetCardID() );
+                                    pInfo->GetInputID() );
             const RecordingInfo ri(*pInfo);
             recording.setAttribute( "recProfile"    ,
                                     ri.GetProgramRecordingProfile());
@@ -1621,7 +1621,7 @@ void HttpStatus::FillChannelInfo( QDomElement &channel,
             channel.setAttribute( "chanFilters",
                                   pInfo->GetChannelPlaybackFilters() );
             channel.setAttribute( "sourceId"   , pInfo->GetSourceID()    );
-            channel.setAttribute( "inputId"    , pInfo->GetCardID()      );
+            channel.setAttribute( "inputId"    , pInfo->GetInputID()     );
             channel.setAttribute( "commFree"   ,
                                   (pInfo->IsCommercialFree()) ? 1 : 0 );
         }

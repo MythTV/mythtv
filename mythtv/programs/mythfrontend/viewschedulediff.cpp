@@ -272,7 +272,7 @@ void ViewScheduleDiff::fillList(void)
         }
 
         if (s.before && s.after &&
-            (s.before->GetCardID() == s.after->GetCardID()) &&
+            (s.before->GetInputID() == s.after->GetInputID()) &&
             (s.before->GetRecordingStatus() == s.after->GetRecordingStatus()))
         {
             continue;
@@ -306,14 +306,14 @@ void ViewScheduleDiff::updateUIList(void)
 
         if (s.before)
             item->SetText(toString(s.before->GetRecordingStatus(),
-                                   s.before->GetCardID()), "statusbefore",
+                                   s.before->GetInputID()), "statusbefore",
                           state);
         else
             item->SetText("-", "statusbefore");
 
         if (s.after)
             item->SetText(toString(s.after->GetRecordingStatus(),
-                                   s.after->GetCardID()), "statusafter",
+                                   s.after->GetInputID()), "statusafter",
                           state);
         else
             item->SetText("-", "statusafter");

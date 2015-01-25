@@ -262,7 +262,7 @@ ProgramInfo *TVRec::GetRecording(void)
     }
     else
         tmppginfo = new ProgramInfo();
-    tmppginfo->SetCardID(cardid);
+    tmppginfo->SetInputID(cardid);
 
     return tmppginfo;
 }
@@ -290,9 +290,9 @@ void TVRec::RecordPending(const ProgramInfo *rcinfo, int secsleft,
     if (secsleft < 0)
     {
         LOG(VB_RECORD, LOG_INFO, LOC + "Pending recording revoked on " +
-            QString("cardid %1").arg(rcinfo->GetCardID()));
+            QString("cardid %1").arg(rcinfo->GetInputID()));
 
-        PendingMap::iterator it = pendingRecordings.find(rcinfo->GetCardID());
+        PendingMap::iterator it = pendingRecordings.find(rcinfo->GetInputID());
         if (it != pendingRecordings.end())
         {
             (*it).ask = false;
@@ -302,7 +302,7 @@ void TVRec::RecordPending(const ProgramInfo *rcinfo, int secsleft,
     }
 
     LOG(VB_RECORD, LOG_INFO, LOC +
-        QString("RecordPending on cardid %1").arg(rcinfo->GetCardID()));
+        QString("RecordPending on cardid %1").arg(rcinfo->GetInputID()));
 
     PendingInfo pending;
     pending.info            = new ProgramInfo(*rcinfo);
@@ -311,17 +311,17 @@ void TVRec::RecordPending(const ProgramInfo *rcinfo, int secsleft,
     pending.ask             = true;
     pending.doNotAsk        = false;
 
-    pendingRecordings[rcinfo->GetCardID()] = pending;
+    pendingRecordings[rcinfo->GetInputID()] = pending;
 
     // If this isn't a recording for this instance to make, we are done
-    if (rcinfo->GetCardID() != cardid)
+    if (rcinfo->GetInputID() != cardid)
         return;
 
     // We also need to check our input groups
     vector<uint> cardids = CardUtil::GetConflictingCards(
-        rcinfo->GetCardID(), cardid);
+        rcinfo->GetInputID(), cardid);
 
-    pendingRecordings[rcinfo->GetCardID()].possibleConflicts = cardids;
+    pendingRecordings[rcinfo->GetInputID()].possibleConflicts = cardids;
 
     pendlock.unlock();
     statelock.unlock();
@@ -505,7 +505,7 @@ RecStatusType TVRec::StartRecording(ProgramInfo *pginfo)
             if (is_busy)
             {
                 is_busy = (bool) igrp.GetSharedInputGroup(
-                    busy_input.inputid, rcinfo->GetCardID());
+                    busy_input.inputid, rcinfo->GetInputID());
             }
 
             if (is_busy && !sourceid)
@@ -950,7 +950,7 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
             .arg(toString(is_good ? curRec->GetRecordingStatus()
                           : rsFailed, kSingleRecord)));
         MythEvent me(QString("UPDATE_RECORDING_STATUS %1 %2 %3 %4 %5")
-                     .arg(curRec->GetCardID())
+                     .arg(curRec->GetInputID())
                      .arg(curRec->GetChanID())
                      .arg(curRec->GetScheduledStartTime(MythDate::ISODate))
                      .arg(is_good ? curRec->GetRecordingStatus() : rsFailed)
@@ -1547,7 +1547,7 @@ void TVRec::HandlePendingRecordings(void)
         {
             LOG(VB_RECORD, LOG_INFO, LOC + "Deleting stale pending recording " +
                 QString("%1 '%2'")
-                    .arg((*it).info->GetCardID())
+                    .arg((*it).info->GetInputID())
                     .arg((*it).info->GetTitle()));
 
             delete (*it).info;
@@ -1560,7 +1560,7 @@ void TVRec::HandlePendingRecordings(void)
     it = pendingRecordings.begin();
     if ((1 == pendingRecordings.size()) &&
         (*it).ask &&
-        ((*it).info->GetCardID() == cardid) &&
+        ((*it).info->GetInputID() == cardid) &&
         (GetState() == kState_WatchingLiveTV))
     {
         CheckForRecGroupChange();
@@ -2711,7 +2711,7 @@ void TVRec::NotifySchedulerOfRecording(RecordingInfo *rec)
 
     // Notify scheduler of the recording.
     // + set up recording so it can be resumed
-    rec->SetCardID(cardid);
+    rec->SetInputID(cardid);
     rec->SetRecordingRuleType(rec->GetRecordingRule()->m_type);
 
     if (rec->GetRecordingRuleType() == kNotRecording)
@@ -2821,7 +2821,7 @@ void TVRec::SetLiveRecording(int recording)
     }
 
     MythEvent me(QString("UPDATE_RECORDING_STATUS %1 %2 %3 %4 %5")
-                 .arg(curRecording->GetCardID())
+                 .arg(curRecording->GetInputID())
                  .arg(curRecording->GetChanID())
                  .arg(curRecording->GetScheduledStartTime(MythDate::ISODate))
                  .arg(recstat)
@@ -4044,7 +4044,7 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
     {
         curRecording->SetRecordingStatus(newRecStatus);
         MythEvent me(QString("UPDATE_RECORDING_STATUS %1 %2 %3 %4 %5")
-                    .arg(curRecording->GetCardID())
+                    .arg(curRecording->GetInputID())
                     .arg(curRecording->GetChanID())
                     .arg(curRecording->GetScheduledStartTime(MythDate::ISODate))
                     .arg(newRecStatus)
@@ -4374,7 +4374,7 @@ void TVRec::TuningRestartRecorder(void)
         ProgramInfo *progInfo = tvchain->GetProgramAt(-1);
         RecordingInfo recinfo(*progInfo);
         delete progInfo;
-        recinfo.SetCardID(cardid);
+        recinfo.SetInputID(cardid);
         recorder->SetRecording(&recinfo);
     }
     recorder->Reset();
@@ -4582,7 +4582,7 @@ bool TVRec::GetProgramRingBufferForLiveTV(RecordingInfo **pginfo,
             chanid, MythDate::current(true), true, hoursMax);
     }
 
-    prog->SetCardID(cardid);
+    prog->SetInputID(cardid);
 
     if (prog->GetRecordingStartTime() == prog->GetRecordingEndTime())
     {
