@@ -324,7 +324,6 @@ static __inline struct tm *localtime_r(const time_t *timep, struct tm *result)
 #endif // _WIN32
 
 #include <sys/param.h>  // Defines BSD on FreeBSD, Mac OS X
-#include <sys/stat.h>   // S_IREAD/WRITE on MinGW, umask() on BSD
 
 #include "mythconfig.h"
 
@@ -340,6 +339,7 @@ static __inline struct tm *localtime_r(const time_t *timep, struct tm *result)
 #endif
 
 #if defined(_MSC_VER)
+#include <sys/stat.h>   // S_IREAD/WRITE on MinGW
 #  define S_IRUSR _S_IREAD
 #  ifndef lseek64
 #    define lseek64( f, o, w ) _lseeki64( f, o, w )
@@ -351,7 +351,9 @@ static __inline struct tm *localtime_r(const time_t *timep, struct tm *result)
 #    define ftello(stream) ftello64(stream)
 #endif
 
+#if defined(USING_MINGW)
 #include <stdio.h> /* for FILENAME_MAX */
+#endif
 
 #if defined(USING_MINGW) && defined(FILENAME_MAX) 
 #    include <errno.h>
