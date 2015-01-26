@@ -80,7 +80,7 @@ var overviewNS = new function() {
     {
         var wsClient = new WebSocketEventClient();
         wsClient.eventReceiver = function(event) { HandleMythEvent(event) };
-        wsClient.filters = ["SYSTEM_EVENT"];
+        wsClient.filters = ["CLIENT_DISCONNECTED", "CLIENT_CONNECTED"];
         globalWSHandler.AddListener(wsClient);
     };
 
@@ -93,20 +93,20 @@ var overviewNS = new function() {
     var HandleMythEvent = function(event)
     {
         var tokens = event.split(" ");
-        if (tokens.length <= 2)
+        if (!tokens.length)
             return;
-        if (tokens[1] == "CLIENT_DISCONNECTED")
+        if (tokens[0] == "CLIENT_DISCONNECTED")
         {
-            if (tokens.length < 4 || tokens[2] != "HOSTNAME")
+            if (tokens.length < 3 || tokens[1] != "HOSTNAME")
                 return;
-            var hostname = tokens[3];
+            var hostname = tokens[2];
             SetFrontendOffline(hostname);
         }
-        else if (tokens[1] == "CLIENT_CONNECTED")
+        else if (tokens[0] == "CLIENT_CONNECTED")
         {
-            if (tokens.length < 4 || tokens[2] != "HOSTNAME")
+            if (tokens.length < 3 || tokens[1] != "HOSTNAME")
                 return;
-            var hostname = tokens[3];
+            var hostname = tokens[2];
             SetFrontendOnline(hostname);
         }
     };

@@ -890,6 +890,9 @@ void WebSocketWorker::customEvent(QEvent* event)
         MythEvent *me = (MythEvent *)event;
         QString message = me->Message();
 
+        if (message.startsWith("SYSTEM_EVENT"))
+            message.remove(0, 13); // Strip SYSTEM_EVENT from the frontend, it's not useful
+
         SendText(message);
     }
 }
