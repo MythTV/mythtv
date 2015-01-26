@@ -159,11 +159,13 @@ bool HtmlServerExtension::ProcessRequest( HTTPRequest *pRequest )
                                                 //"connect-src 'self; "
                                                 "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " // FIXME: unsafe-inline should be phased out, replaced by nonce-{csp_nonce}
                                                 "style-src 'self' 'unsafe-inline'; "
-                                                "frame-src 'none'; "
+                                                "frame-src 'self'; "
                                                 "object-src 'self'; " // TODO: When we no longer require flash for some browsers, change this to 'none'
                                                 "media-src 'self'; "
                                                 "font-src 'self'; "
-                                                "image-src 'self'; "
+                                                "img-src 'self'; "
+                                                "form-action 'self'; "
+                                                "frame-ancestors 'self'; "
                                                 "reflected-xss filter;");
 
                     // ------------------------------------------------------
