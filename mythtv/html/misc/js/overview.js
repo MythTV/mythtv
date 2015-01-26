@@ -97,14 +97,14 @@ var overviewNS = new function() {
             return;
         if (tokens[1] == "CLIENT_DISCONNECTED")
         {
-            if (tokens[2] != "HOSTNAME")
+            if (tokens.length < 4 || tokens[2] != "HOSTNAME")
                 return;
             var hostname = tokens[3];
             SetFrontendOffline(hostname);
         }
         else if (tokens[1] == "CLIENT_CONNECTED")
         {
-            if (tokens[2] != "HOSTNAME")
+            if (tokens.length < 4 || tokens[2] != "HOSTNAME")
                 return;
             var hostname = tokens[3];
             SetFrontendOnline(hostname);
