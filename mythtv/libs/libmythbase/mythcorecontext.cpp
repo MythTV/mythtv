@@ -47,7 +47,7 @@ using namespace std;
 #include "mythdate.h"
 #include "mythplugin.h"
 
-#define LOC      QString("MythCoreContext: ").arg(__func__)
+#define LOC      QString("MythCoreContext::%1(): ").arg(__func__)
 
 MythCoreContext *gCoreContext = NULL;
 QMutex *avcodeclock = new QMutex(QMutex::Recursive);
