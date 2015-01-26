@@ -289,8 +289,7 @@ void ChannelInfo::LoadCardIds()
     {
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT capturecard.cardid FROM channel "
-            "JOIN cardinput   ON cardinput.sourceid = channel.sourceid "
-            "JOIN capturecard ON cardinput.cardid = capturecard.cardid "
+            "JOIN capturecard ON capturecard.sourceid = channel.sourceid "
             "WHERE chanid = :CHANID");
         query.bindValue(":CHANID", chanid);
 

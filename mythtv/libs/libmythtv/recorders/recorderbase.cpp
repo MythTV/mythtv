@@ -394,7 +394,7 @@ void RecorderBase::SetRecordingStatus(RecStatusType status,
         }
 
         MythEvent me(QString("UPDATE_RECORDING_STATUS %1 %2 %3 %4 %5")
-                    .arg(curRecording->GetCardID())
+                    .arg(curRecording->GetInputID())
                     .arg(curRecording->GetChanID())
                     .arg(curRecording->GetScheduledStartTime(MythDate::ISODate))
                     .arg(status)

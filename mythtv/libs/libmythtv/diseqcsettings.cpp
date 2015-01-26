@@ -1554,10 +1554,10 @@ bool convert_diseqc_db(void)
 
     MSqlQuery iquery(MSqlQuery::InitCon());
     iquery.prepare(
-        "SELECT cardinputid,    diseqc_port, diseqc_pos, "
+        "SELECT cardid, diseqc_port, diseqc_pos, "
         "       lnb_lof_switch, lnb_lof_hi,  lnb_lof_lo  "
-        "FROM cardinput "
-        "WHERE cardinput.cardid = :CARDID");
+        "FROM capturecard "
+        "WHERE capturecard.cardid = :CARDID");
 
     while (cquery.next())
     {

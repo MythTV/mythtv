@@ -155,11 +155,11 @@ class _Mythtv_data:
         return {'historical': data}
 
     def ProcessSource(self):
-        class CardInput( MythTV.database.DBData ): pass
+        class CaptureCard( MythTV.database.DBData ): pass
         class VideoSource( MythTV.database.DBData ): pass
 
         data = OrdDict()
-        usedsources = list(set([inp.sourceid for inp in CardInput.getAllEntries()]))
+        usedsources = list(set([inp.sourceid for inp in CaptureCard.getAllEntries()]))
         grabbers = list(set([VideoSource(id).xmltvgrabber for id in usedsources]))
         data.sourcecount = len(usedsources)
         data.grabbers = grabbers

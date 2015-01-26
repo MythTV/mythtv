@@ -164,7 +164,6 @@ ProgramInfo::ProgramInfo(void) :
 
     sourceid(0),
     inputid(0),
-    cardid(0),
 
     findid(0),
 
@@ -249,7 +248,6 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other) :
 
     sourceid(other.sourceid),
     inputid(other.inputid),
-    cardid(other.cardid),
 
     findid(other.findid),
     programflags(other.programflags),
@@ -432,7 +430,6 @@ ProgramInfo::ProgramInfo(
 
     sourceid(0),
     inputid(0),
-    cardid(0),
 
     findid(_findid),
 
@@ -552,7 +549,6 @@ ProgramInfo::ProgramInfo(
 
     sourceid(0),
     inputid(0),
-    cardid(0),
 
     findid(_findid),
 
@@ -681,7 +677,6 @@ ProgramInfo::ProgramInfo(
 
     sourceid(0),
     inputid(0),
-    cardid(0),
 
     findid(_findid),
 
@@ -735,7 +730,6 @@ ProgramInfo::ProgramInfo(
         recpriority = s.recpriority;
         recstartts  = s.recstartts;
         recendts    = s.recendts;
-        cardid      = s.cardid;
         inputid     = s.inputid;
         dupin       = s.dupin;
         dupmethod   = s.dupmethod;
@@ -837,7 +831,6 @@ ProgramInfo::ProgramInfo(
 
     sourceid(0),
     inputid(0),
-    cardid(0),
 
     findid(0),
 
@@ -1097,7 +1090,6 @@ void ProgramInfo::clone(const ProgramInfo &other,
 
     sourceid = other.sourceid;
     inputid = other.inputid;
-    cardid = other.cardid;
 
     findid = other.findid;
     programflags = other.programflags;
@@ -1207,7 +1199,6 @@ void ProgramInfo::clear(void)
 
     sourceid = 0;
     inputid = 0;
-    cardid = 0;
 
     findid = 0;
 
@@ -1336,7 +1327,7 @@ void ProgramInfo::ToStringList(QStringList &list) const
     INT_TO_LIST(findid);       // 16
     STR_TO_LIST(hostname);     // 17
     INT_TO_LIST(sourceid);     // 18
-    INT_TO_LIST(cardid);       // 19
+    INT_TO_LIST(inputid);      // 19 (formerly cardid)
     INT_TO_LIST(inputid);      // 20
     INT_TO_LIST(recpriority);  // 21
     INT_TO_LIST(recstatus);    // 22
@@ -1438,7 +1429,7 @@ bool ProgramInfo::FromStringList(QStringList::const_iterator &it,
     INT_FROM_LIST(findid);           // 16
     STR_FROM_LIST(hostname);         // 17
     INT_FROM_LIST(sourceid);         // 18
-    INT_FROM_LIST(cardid);           // 19
+    NEXT_STR();                      // 19 (formerly cardid)
     INT_FROM_LIST(inputid);          // 20
     INT_FROM_LIST(recpriority);      // 21
     ENUM_FROM_LIST(recstatus, RecStatusType); // 22
@@ -1683,7 +1674,7 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     }
     progMap["rectypestatus"] = tmp_rec;
 
-    progMap["card"] = ::toString(GetRecordingStatus(), cardid);
+    progMap["card"] = ::toString(GetRecordingStatus(), inputid);
     progMap["input"] = ::toString(GetRecordingStatus(), inputid);
     progMap["inputname"] = QueryInputDisplayName();
 
@@ -1945,7 +1936,6 @@ bool ProgramInfo::LoadProgramFromRecorded(
         parentid = 0;
         sourceid = 0;
         inputid = 0;
-        cardid = 0;
 
         // everything below this line (in context) is not serialized
         spread = startCol = -1;
@@ -4822,15 +4812,14 @@ bool ProgramInfo::QueryTuningInfo(QString &channum, QString &input) const
     input.clear();
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare("SELECT channel.channum, cardinput.inputname "
-                  "FROM channel, capturecard, cardinput "
-                  "WHERE channel.chanid     = :CHANID            AND "
-                  "      cardinput.cardid   = capturecard.cardid AND "
-                  "      cardinput.sourceid = :SOURCEID          AND "
-                  "      capturecard.cardid = :CARDID");
+    query.prepare("SELECT channel.channum, capturecard.inputname "
+                  "FROM channel, capturecard "
+                  "WHERE channel.chanid       = :CHANID            AND "
+                  "      capturecard.sourceid = :SOURCEID          AND "
+                  "      capturecard.cardid   = :INPUTID");
     query.bindValue(":CHANID",   chanid);
     query.bindValue(":SOURCEID", sourceid);
-    query.bindValue(":CARDID",   cardid);
+    query.bindValue(":INPUTID",  inputid);
 
     if (query.exec() && query.next())
     {
@@ -4872,8 +4861,8 @@ QString ProgramInfo::QueryInputDisplayName(void) const
     {
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT displayname, cardid, inputname "
-                      "FROM cardinput "
-                      "WHERE cardinputid = :INPUTID");
+                      "FROM capturecard "
+                      "WHERE cardid = :INPUTID");
         query.bindValue(":INPUTID", inputid);
 
         if (!query.exec())

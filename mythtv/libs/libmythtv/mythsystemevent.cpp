@@ -326,7 +326,7 @@ void SendMythSystemRecEvent(const QString &msg, const RecordingInfo *pginfo)
     {
         gCoreContext->SendSystemEvent(
             QString("%1 CARDID %2 CHANID %3 STARTTIME %4 RECSTATUS %5")
-            .arg(msg).arg(pginfo->GetCardID())
+            .arg(msg).arg(pginfo->GetInputID())
             .arg(pginfo->GetChanID())
             .arg(pginfo->GetRecordingStartTime(MythDate::ISODate))
             .arg(pginfo->GetRecordingStatus()));

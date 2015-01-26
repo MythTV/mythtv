@@ -1581,7 +1581,7 @@ void HttpStatus::FillProgramInfo(QDomDocument *pDoc,
             recording.setAttribute( "dupMethod"     ,
                                     pInfo->GetDuplicateCheckMethod() );
             recording.setAttribute( "encoderId"     ,
-                                    pInfo->GetCardID() );
+                                    pInfo->GetInputID() );
             const RecordingInfo ri(*pInfo);
             recording.setAttribute( "recProfile"    ,
                                     ri.GetProgramRecordingProfile());

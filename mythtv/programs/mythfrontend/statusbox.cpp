@@ -672,11 +672,11 @@ void StatusBox::doScheduleStatus()
     QMap<RecStatusType, QString> statusText;
     QMap<int, int> sourceMatch;
     QMap<int, QString> sourceText;
-    QMap<int, int> inputMatch;
-    QMap<int, QString> inputText;
+    QMap<int, int> cardMatch;
+    QMap<int, QString> cardText;
     QString tmpstr;
     int maxSource = 0;
-    int maxInput = 0;
+    int maxCard = 0;
     int lowerpriority = 0;
     int hdflag = 0;
 
@@ -694,25 +694,23 @@ void StatusBox::doScheduleStatus()
             sourceText[query.value(0).toInt()] = query.value(1).toString();
     }
 
-    query.prepare("SELECT MAX(cardinputid) FROM cardinput");
+    query.prepare("SELECT MAX(cardid) FROM capturecard");
     if (query.exec())
     {
         if (query.next())
-            maxInput = query.value(0).toInt();
+            maxCard = query.value(0).toInt();
     }
 
-    query.prepare("SELECT cardinputid,cardid,inputname,displayname "
-                  "FROM cardinput");
+    query.prepare("SELECT cardid,inputname,displayname "
+                  "FROM capturecard");
     if (query.exec())
     {
         while (query.next())
         {
-            if (!query.value(3).toString().isEmpty())
-                inputText[query.value(0).toInt()] = query.value(3).toString();
+            if (!query.value(2).toString().isEmpty())
+                cardText[query.value(0).toInt()] = query.value(2).toString();
             else
-                inputText[query.value(0).toInt()] = QString("%1: %2")
-                                              .arg(query.value(1).toInt())
-                                              .arg(query.value(2).toString());
+                cardText[query.value(0).toInt()] = query.value(1).toString();
         }
     }
 
@@ -739,7 +737,7 @@ void StatusBox::doScheduleStatus()
         if (recstatus == rsWillRecord || recstatus == rsRecording)
         {
             ++sourceMatch[s->GetSourceID()];
-            ++inputMatch[s->GetInputID()];
+            ++cardMatch[s->GetInputID()];
             if (s->GetRecordingPriority2() < 0)
                 ++lowerpriority;
             if (s->GetVideoProperties() & VID_HDTV)
@@ -789,13 +787,13 @@ void StatusBox::doScheduleStatus()
             AddLogLine(tmpstr, helpmsg);
         }
     }
-    for (i = 1; i <= maxInput; ++i)
+    for (i = 1; i <= maxCard; ++i)
     {
-        if (inputMatch[i] > 0)
+        if (cardMatch[i] > 0)
         {
             tmpstr = QString("%1 %2 %3 %4 \"%5\"")
-                             .arg(inputMatch[i]).arg(willrec)
-                             .arg(tr("on input")).arg(i).arg(inputText[i]);
+                             .arg(cardMatch[i]).arg(willrec)
+                             .arg(tr("on card")).arg(i).arg(cardText[i]);
             AddLogLine(tmpstr, helpmsg);
         }
     }

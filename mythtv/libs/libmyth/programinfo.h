@@ -447,7 +447,6 @@ class MPUBLIC ProgramInfo
 
     uint    GetSourceID(void)             const { return sourceid;     }
     uint    GetInputID(void)              const { return inputid;      }
-    uint    GetCardID(void)               const { return cardid;       }
 
     uint    GetFindID(void)               const { return findid;       }
 
@@ -510,8 +509,7 @@ class MPUBLIC ProgramInfo
     void SetRecordingPriority2(int priority)     { recpriority2 = priority; }
     void SetRecordingRuleID(uint id)                { recordid     = id;    }
     void SetSourceID(uint id)                       { sourceid     = id;    }
-    void SetInputID( uint id)                       { inputid      = id;    }
-    void SetCardID(  uint id)                       { cardid       = id;    }
+    void SetInputID(uint id)                        { inputid      = id;    }
     void SetReactivated(bool reactivate)
     {
         programflags &= ~FL_REACTIVATE;
@@ -735,7 +733,6 @@ class MPUBLIC ProgramInfo
 
     uint32_t sourceid;
     uint32_t inputid;
-    uint32_t cardid;
     uint32_t findid;
 
     uint32_t programflags;    ///< ProgramFlag

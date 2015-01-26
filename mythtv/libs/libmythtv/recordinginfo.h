@@ -153,7 +153,6 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         RecordingDupMethodType dupmethod,
 
         uint sourceid,
-        uint inputid,
         uint cardid,
 
         uint findid,
