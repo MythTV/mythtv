@@ -4396,7 +4396,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         else
         {
             ProgramInfo dummy;
-            dummy.SetCardID(enc->GetCardID());
+            dummy.SetInputID(enc->GetCardID());
             dummy.ToStringList(retlist);
         }
     }
@@ -4460,7 +4460,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         else
         {
             ProgramInfo dummy;
-            dummy.SetCardID(enc->GetCardID());
+            dummy.SetInputID(enc->GetCardID());
             dummy.ToStringList(retlist);
         }
     }
@@ -4875,7 +4875,7 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
         else
         {
             ProgramInfo dummy;
-            dummy.SetCardID(enc->GetCardID());
+            dummy.SetInputID(enc->GetCardID());
             dummy.ToStringList(retlist);
         }
     }
@@ -8111,7 +8111,7 @@ void MainServer::reconnectTimeout(void)
         else
         {
             ProgramInfo dummy;
-            dummy.SetCardID(elink->GetCardID());
+            dummy.SetInputID(elink->GetCardID());
             dummy.ToStringList(strlist);
         }
     }
