@@ -121,7 +121,7 @@
                 <div class="frontendStatus <%=statusClass%>" id="frontendStatus-<%=frontendList[nIdx].Name%>">
                     <%=status%>
                 </div>
-                <script type="text/javascript">overviewNS.GetFrontendStatus('<%=frontendList[nIdx].Name%>',
+                <script type="text/javascript">MythOverview.GetFrontendStatus('<%=frontendList[nIdx].Name%>',
                                                                  '<%=frontendIP%>:<%=frontendList[nIdx].Port%>')</script>
             </div>
 <%

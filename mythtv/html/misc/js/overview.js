@@ -1,9 +1,9 @@
 
 /*!
- * \namespace OverviewNS
+ * \namespace MythOverview
  * \brief Namespace for functions used in the 'Overview' page, overview.qsp
  */
-var overviewNS = new function() {
+var MythOverview = new function() {
 
     /*!
     * \fn Init
@@ -149,4 +149,4 @@ var overviewNS = new function() {
 
 };
 
-window.addEventListener("load", overviewNS.Init, false);
+window.addEventListener("load", MythOverview.Init, false);

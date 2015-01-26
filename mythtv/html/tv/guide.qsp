@@ -122,16 +122,16 @@ import "/tv/js/constants.js"
      side (harder to maintain/template) or keeping in together inline with the
      other related html, with as little non-html markup as possible -->
 <div id="optMenu" class="contextMenu" style="display:none;">
-    <div class="button scheduleMenu" onClick="recordProgram(gChanID, gStartTime, 'Single Record')">
+    <div class="button scheduleMenu" onClick="MythGuide.RecordProgram(gChanID, gStartTime, 'Single Record')">
         <%=qsTr("Record this showing")%>
     </div>
-    <div class="button scheduleMenu" onClick="recordProgram(gChanID, gStartTime, 'Record All')">
+    <div class="button scheduleMenu" onClick="MythGuide.RecordProgram(gChanID, gStartTime, 'Record All')">
         <%=qsTr("Record all showings")%>
     </div>
-    <div class="button scheduleMenu" onClick="recordProgram(gChanID, gStartTime, 'Record One')">
+    <div class="button scheduleMenu" onClick="MythGuide.RecordProgram(gChanID, gStartTime, 'Record One')">
         <%=qsTr("Record one showing")%>
     </div>
-    <div class="button scheduleMenu" onClick="recordProgram(gChanID, gStartTime, 'Record All (Channel)')">
+    <div class="button scheduleMenu" onClick="MythGuide.RecordProgram(gChanID, gStartTime, 'Record All (Channel)')">
         <%=qsTr("Record all showings (this channel)")%>
     </div>
     <div class="button delSchedMenu" onClick="dontRecord(gChanID, gStartTime)">
@@ -161,7 +161,7 @@ if (chanGroups.length)
 {
 %>
     <label for="ChannelGroup"><%=qsTr("Group")%>:
-    <select id="ChannelGroup" name="ChannelGroup" onChange="submitGuideForm(this)">
+    <select id="ChannelGroup" name="ChannelGroup" onChange="MythGuide.SubmitGuideForm(this.form)">
         <option label="<%=qsTr("All Channels")%>" value="0"><%=qsTr("All Channels")%></option>
 <%
     for (var grpIdx = 0; grpIdx < chanGroups.length; grpIdx++)
@@ -180,7 +180,7 @@ if (chanGroups.length)
 }
 %>
     <label for="guideStartDate"><%=qsTr("Date")%>:
-    <select id="guideStartDate" name="GuideDate" onChange="changeGuideStartTime(this)">
+    <select id="guideStartDate" name="GuideDate" onChange="MythGuide.ChangeGuideStartTime(this)">
 <%
     var startDay = new Date(now);
     startDay.setDate(now.getDate() - 14); // We keep old guide date for 14 days
@@ -197,7 +197,7 @@ if (chanGroups.length)
     </select>
     </label>
     <label for="guideStartTime"><%=qsTr("Time")%>:
-    <select id="guideStartTime" name="GuideTime" onChange="changeGuideStartTime(this)">
+    <select id="guideStartTime" name="GuideTime" onChange="MythGuide.ChangeGuideStartTime(this)">
 <%
     var startTime = new Date(guideStartTime);
     startTime.setHours(0);
@@ -224,11 +224,11 @@ if (chanGroups.length)
 <div id="guideGrid" class="guideGrid jscroll">
 <%} // End of the header %>
 
-    <div class="pageLeft" onClick="pageLeft();">
+    <div class="pageLeft" onClick="MythGuide.MovePage('left');">
         &lt;
     </div>
 
-    <div class="pageRight" onClick="pageRight();">
+    <div class="pageRight" onClick="MythGuide.MovePage('right');">
         &gt;
     </div>
 
