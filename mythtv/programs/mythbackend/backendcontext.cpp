@@ -38,6 +38,9 @@ void BackendContext::SetFrontendConnected(Frontend *frontend)
     if (!frontend || frontend->name.isEmpty())
         return;
 
+    gCoreContext->SendSystemEvent(
+                QString("CLIENT_CONNECTED HOSTNAME %1").arg(frontend->name));
+
     if (m_knownFrontends.contains(frontend->name))
     {
         Frontend *fe = m_knownFrontends.value(frontend->name);
@@ -61,8 +64,6 @@ void BackendContext::SetFrontendConnected(Frontend *frontend)
         return;
     }
 
-    gCoreContext->SendSystemEvent(
-                QString("CLIENT_CONNECTED HOSTNAME %1").arg(frontend->name));
     LOG(VB_GENERAL, LOG_INFO, QString("BackendContext: Frontend '%1' "
                                       "connected.").arg(frontend->name));
 
