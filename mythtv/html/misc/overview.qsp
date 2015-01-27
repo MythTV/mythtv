@@ -1,9 +1,13 @@
 <html>
 <head>
 <title><i18n>MythTV System Overview</i18n></title>
+<link rel="stylesheet" type="text/css" href="/css/site.css">
 <link rel="stylesheet" type="text/css" href="/misc/css/overview.css">
-<script type="text/javascript"  src="/misc/js/overview.js"></script>
+<script type="text/javascript"  src="/js/util.qjs"></script>
+<script type="text/javascript"  src="/3rdParty/jquery/jquery-2.0.3.min.js"></script>
+<script type="text/javascript"  src="/3rdParty/jquery/jqueryUI/js/jquery-ui-1.10.3.js"></script>
 <script type="text/javascript"  src="/3rdParty/jquery/galleria/galleria.js"></script>
+<script type="text/javascript"  src="/misc/js/overview.js"></script>
 </head>
 <body>
 

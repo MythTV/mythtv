@@ -71,11 +71,13 @@ import "/tv/js/tvutil.qjs"
 <link rel="stylesheet" type="text/css" href="/tv/css/category_colors.css">
 <script src="/js/utility.js"></script> <!-- ECMA not JS -->
 <script src="/js/util.qjs"></script>
+<script type="text/javascript" src="/3rdParty/jquery/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="/3rdParty/jquery/jqueryUI/js/jquery-ui-1.10.3.js"></script>
+<script src="/3rdParty/jquery/jqueryJScroll/jquery.jscroll.js"></script>
 <script src="/tv/js/common.js"></script>
 <script src="/tv/js/recordings.js"></script>
-<script src="/3rdParty/jquery/jqueryJScroll/jquery.jscroll.js"></script>
 </head>
-<body id="content">
+<body>
 
 <!-- Popup Option Menu -->
 <!-- To avoid the need to define multiple overlapping menus, we use JS+CSS as
@@ -84,16 +86,16 @@ import "/tv/js/tvutil.qjs"
      side (harder to maintain/template) or keeping in together inline with the
      other related html, with as little non-html markup as possible -->
 <div id="optMenu" class="contextMenu" style="display:none;">
-    <div class="button normalMenu" onClick="deleteRecording(gRecordedId, false, false)">
+    <div class="button normalMenu" onClick="MythRecordings.DeleteRecording(gRecordedId, false, false)">
         <%=qsTr("Delete")%>
     </div>
-    <div class="button normalMenu" onClick="deleteRecording(gRecordedId, true, false)">
+    <div class="button normalMenu" onClick="MythRecordings.DeleteRecording(gRecordedId, true, false)">
         <%=qsTr("Delete and Re-Record")%>
     </div>
     <div class="button deletedMenu" onClick="unDeleteRecording(gRecordedId)">
         <%=qsTr("Undelete")%>
     </div>
-    <div class="button deletedMenu" onClick="deleteRecording(gRecordedId, false, true)">
+    <div class="button deletedMenu" onClick="MythRecordings.DeleteRecording(gRecordedId, false, true)">
         <%=qsTr("Delete Forever")%>
     </div>
     <div class="button recordingMenu" onClick="stopRecording(gRecordedId)">
@@ -102,7 +104,7 @@ import "/tv/js/tvutil.qjs"
     <div class="button normalMenu" onClick="loadScheduler('recording', gChanID, gStartTime)">
         <%=qsTr("Edit recording rule")%>
     </div>
-    <div class="button playMenu" onClick="playInBrowser(gRecordedId)">
+    <div class="button playMenu" onClick="MythRecordings.PlayInBrowser(gRecordedId)">
         <%=qsTr("Play in Browser")%>
     </div>
 <%
@@ -111,7 +113,7 @@ import "/tv/js/tvutil.qjs"
     for (var nIdx = 0; nIdx < frontendList.length; nIdx++)
     {
 %>
-    <div class="button playMenu" onClick="playOnFrontend(gRecordedId, '<%=frontendList[nIdx].IP%>', <%=frontendList[nIdx].Port%>)">
+    <div class="button playMenu" onClick="MythRecordings.PlayOnFrontend(gRecordedId, '<%=frontendList[nIdx].IP%>', <%=frontendList[nIdx].Port%>)">
         <%=qsTr("Play on Frontend")%> <%=frontendList[nIdx].Name%>
     </div>
 <%  } %>

@@ -42,17 +42,22 @@
     color: rgba(255, 255, 255, 1.0);
 }
 
+#guide-container
+{
+    overflow: hidden;
+    clear: both;
+    width: 100%;
+}
+
 /* Guide Grid */
 .guideGrid
 {
-    /* BEGIN HACK Most modern browsers support calc, but some like Opera 12 on
-     * linux don't, so we have trust this will work for now */
-    width: 98%;
-    /* END HACK */
-
+    clear: both;
+    overflow:hidden;
     width: calc(100% - 15px); /* Need to subtract padding of parent */
     position: absolute;
     padding: 0px;
+    padding-bottom: 10px;
 }
 
 .guideGrid div

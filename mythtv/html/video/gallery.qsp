@@ -41,12 +41,12 @@ import "/video/js/gallery.qjs"
 
         <div class="videoBox">
             <div class="videoHeader">
-                <div class="videoTitle" onClick="javascript:loadContent('/video/gallery.qsp?CurrentFolder=<%=nextFolder %>')">
+                <div class="videoTitle" onClick="javascript:loadFrontendContent('/video/gallery.qsp?CurrentFolder=<%=nextFolder %>')">
                     <%= currentFolderArray.slice(-1)[0]%>
                 </div>
             </div>
 
-            <div class="videoArtwork" onClick="javascript:loadContent('/video/gallery.qsp?CurrentFolder=<%=nextFolder %>')">
+            <div class="videoArtwork" onClick="javascript:loadFrontendContent('/video/gallery.qsp?CurrentFolder=<%=nextFolder %>')">
                 <img width=100 src="/video/images/mv_gallery_dir_up.png" />
             </div>
         </div>
@@ -118,7 +118,7 @@ import "/video/js/gallery.qjs"
      %>
                 <div class="videoBox">
                     <div class="videoHeader">
-                        <div class="videoTitle" onClick="javascript:loadContent('/video/gallery.qsp?CurrentFolder=<%=nextFolder %>')">
+                        <div class="videoTitle" onClick="javascript:loadFrontendContent('/video/gallery.qsp?CurrentFolder=<%=nextFolder %>')">
                             <%=filenameArray[currentFolderArray.length]%>
                         </div>
                         <div class="videoFolder">
@@ -126,7 +126,7 @@ import "/video/js/gallery.qjs"
                         </div>
                     </div>
 
-                    <div class="videoArtwork" onClick="javascript:loadContent('/video/gallery.qsp?CurrentFolder=<%=nextFolder %>')"">
+                    <div class="videoArtwork" onClick="javascript:loadFrontendContent('/video/gallery.qsp?CurrentFolder=<%=nextFolder %>')"">
                         <img width=100 src="<%=artworkURL%>" />
                     </div>
                 </div>

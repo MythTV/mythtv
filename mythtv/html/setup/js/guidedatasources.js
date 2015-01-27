@@ -96,7 +96,7 @@ function editSelectedSource() {
         'title': 'Edit Channel',
         closeOnEscape: false,
         buttons: {
-           'Save': function() { saveChannelEdits(); },
+           'Save': function() { saveSourceEdits(); },
            'Cancel': function() { $(this).dialog('close'); }
     }});
 

@@ -1,7 +1,14 @@
 
-#content
+/*#content
 {
     padding: 10px;
+}*/
+
+BODY
+{
+    padding: 10px;
+    padding-bottom: 15px;
+    box-sizing: border-box;
 }
 
 .pageTitle

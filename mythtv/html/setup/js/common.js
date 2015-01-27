@@ -169,7 +169,7 @@ function validateSetting(key) {
     return true;
 }
 
-/* load the settings list when we load setup.js */
+/* load the settings list when we load common.js */
 getSettingsList();  /* load now to fix a race condition */
 /* load the XML we use to validate the new setting values */
 setTimeout(loadConfigXML, 10);
@@ -324,4 +324,3 @@ function saveFileBrowser() {
     else
         alert("No item selected.");
 }
-

@@ -94,22 +94,19 @@ function loadDiv(divName, contentURL, jsURL) {
 
 function setUIAttributes() {
     $( "input:button").button();
-// WTF? The following can be done natively in css with input:focus, this just
-// stomps all over any css overrides etc and should NOT be done
-//    $("input, textarea").addClass("idle");
-//    $("input, textarea").focus(function(){
-//            $(this).addClass("activeField").removeClass("idle");
-//    }).blur(function(){
-//            $(this).removeClass("activeField").addClass("idle");
-//    });
-}
-
-function clearDiv(divName) {
-    $("#" + divName).html("");
 }
 
 var currentContentURL;
 var currentJsUrl;
+
+function loadFrontendContent(contentURL) {
+    console.log("loadFrontendContent: URL(" + contentURL + ")");
+    currentContentURL = contentURL;
+    parent.document.getElementById("busyPopup").style.display = "block";
+    parent.document.getElementById("content").src = contentURL;
+    parent.document.getElementById("busyPopup").style.display = "none";
+}
+
 function loadContent(contentURL, jsURL) {
     console.log("loadContent: URL(" + contentURL + ") JSURL(" + jsURL + ")");
     currentContentURL = contentURL;
@@ -121,31 +118,55 @@ function reloadContent() {
     loadContent(currentContentURL, currentJsUrl);
 }
 
-function loadSetupContent(contentURL, jsURL) {
-    loadSetupJavascript();
-    loadContent(contentURL, jsURL);
-}
-
-function clearContent() {
-    clearDiv("content");
-}
-
 function loadSetupJavascript() {
     $.ajaxSetup({ async: false });
-    $.getScript("/setup/js/setup.js");
+    $.getScript("/setup/js/common.js");
     $.ajaxSetup({ async: true });
 }
 
 function loadSetupPage(pageName) {
-    loadSetupJavascript();
-    hideEditWindow();
-    loadContent("/setup/" + pageName + ".html",
-                "/setup/js/" + pageName + ".js");
+    // hideEditWindow();
+    var frame = document.getElementById("content");
+
+    var completeSetupLoad = function() {
+        var html = $.ajax({
+        url: "/setup/" + pageName + ".html",
+            async: false
+        }).responseText;
+
+        var script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.src = "/setup/js/" + pageName + ".js";
+
+        frame = document.getElementById("content");
+        frame.contentDocument.getElementById("content").innerHTML = html;
+        frame.contentDocument.head.appendChild(script);
+        frame.removeEventListener("load", completeSetupLoad);
+    };
+    frame.addEventListener("load", completeSetupLoad);
+    frame.src = "setup/setup_template.html";
 }
 
 function loadMiscPage(pageName) {
-    loadContent("/misc/" + pageName + ".html",
-                "/misc/js/" + pageName + ".js");
+    var frame = document.getElementById("content");
+
+    var completeMiscLoad = function() {
+        var html = $.ajax({
+        url: "/misc/" + pageName + ".html",
+            async: false
+        }).responseText;
+
+        var script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.src = "/misc/js/" + pageName + ".js";
+
+        frame = document.getElementById("content");
+        frame.contentDocument.getElementById("content").innerHTML = html;
+        frame.contentDocument.head.appendChild(script);
+        frame.removeEventListener("load", completeMiscLoad);
+    };
+    frame.addEventListener("load", completeMiscLoad);
+    frame.src = "misc/misc_template.html";
 }
 
 function loadEditWindow(contentURL, jsURL) {

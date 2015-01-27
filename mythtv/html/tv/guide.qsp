@@ -98,20 +98,18 @@ import "/tv/js/constants.js"
 
 <% if (!guideOnly) {%>
 <!DOCTYPE html>
-<html>
 <head>
-<meta charset="UTF-8">
 <title><%=qsTr("Program Guide")%> - <%=myth.GetFormatDate(guideStartTime)%>,
        <%=myth.GetFormatTime(guideStartTime)%> - <%=myth.GetFormatTime(guideEndTime)%></title>
 <link rel="stylesheet" type="text/css" href="/css/site.css">
 <link rel="stylesheet" type="text/css" href="/tv/css/guide.css">
 <link rel="stylesheet" type="text/css" href="/tv/css/common.css">
 <link rel="stylesheet" type="text/css" href="/tv/css/category_colors.css">
-<!-- <link rel="stylesheet" type="text/css" href="/3rdParty/jquery/slick/slick.css"> -->
-<script src="/js/utility.js"></script> <!-- ECMA not JS -->
-<script src="/js/util.qjs"></script>
-<script src="/tv/js/common.js"></script>
-<script src="/tv/js/guide.js"></script>
+<script type="text/javascript" src="/js/utility.js"></script> <!-- ECMA not JS -->
+<script type="text/javascript" src="/3rdParty/jquery/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="/tv/js/common.js"></script>
+<script type="text/javascript" src="/tv/js/guide.js"></script>
+<script type="text/javascript" src="/js/util.qjs"></script>
 </head>
 <body>
 
@@ -219,7 +217,7 @@ if (chanGroups.length)
     </form>
 </div>
 
-<div id="guide-container" style="overflow:hidden;clear:both;width:100%;">
+<div id="guide-container">
 
 <div id="guideGrid" class="guideGrid jscroll">
 <%} // End of the header %>
@@ -374,17 +372,5 @@ if (chanGroups.length)
 </div> <!-- End guideGrid -->
 </div> <!-- End guideGrid-container -->
 
-<!-- <script type="text/javascript">
-
-    window.onresize = function(event)
-    {
-        fixGuideHeight();
-    };
-
-    fixGuideHeight();
-
-</script> -->
-
 </body>
-</html>
 <%}%>

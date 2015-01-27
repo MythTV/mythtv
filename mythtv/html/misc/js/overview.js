@@ -14,8 +14,18 @@ var MythOverview = new function() {
     */
     this.Init = function()
     {
+        console.log("MythOverview Init");
         LoadGalleria();
         RegisterMythEventHandler();
+    };
+
+    /*!
+    * \fn Destructor
+    * \public
+    */
+    this.Destructor = function()
+    {
+        DeregisterMythEventHandler();
     };
 
     /*!
@@ -71,6 +81,13 @@ var MythOverview = new function() {
     };
 
     /*!
+     * \var wsClient
+     * \private
+     * WebSocketEventClient object
+     */
+    var wsClient = {};
+
+    /*!
     * \fn RegisterMythEventHandler
     * \private
     *
@@ -78,10 +95,22 @@ var MythOverview = new function() {
     */
     var RegisterMythEventHandler = function()
     {
-        var wsClient = new WebSocketEventClient();
+        wsClient = new parent.WebSocketEventClient();
         wsClient.eventReceiver = function(event) { HandleMythEvent(event) };
         wsClient.filters = ["CLIENT_DISCONNECTED", "CLIENT_CONNECTED"];
-        globalWSHandler.AddListener(wsClient);
+        parent.globalWSHandler.AddListener(wsClient);
+    };
+
+
+    /*!
+    * \fn DeregisterMythEventHandler
+    * \private
+    *
+    * Deregister a WebSocketEventClient with the global WebSocketEventHandler
+    */
+    var DeregisterMythEventHandler = function()
+    {
+        parent.globalWSHandler.RemoveListener(wsClient);
     };
 
     /*!
@@ -149,4 +178,5 @@ var MythOverview = new function() {
 
 };
 
-window.addEventListener("load", MythOverview.Init, false);
+window.addEventListener("load", MythOverview.Init);
+window.addEventListener("unload", MythOverview.Destructor);

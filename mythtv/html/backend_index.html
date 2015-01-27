@@ -4,24 +4,20 @@
 <meta charset="UTF-8">
 <!--<meta name="viewport"
   content="width=device-width, initial-scale=1.0, user-scalable=no">--> <!-- Not ready to go live yet -->
-<title>
-MythTV WebFrontend
-</title>
-<link rel="stylesheet"    href="/css/site.css"         type="text/css">
-<link rel="stylesheet"    href="/css/setup.css"        type="text/css">
-<link rel="stylesheet"    href="/3rdParty/jquery/jqueryUI/css/jquery-ui.css" type="text/css">
-<!-- These aren't needed on an intial load, they could be deferred? -->
-<link rel="stylesheet"    href="/3rdParty/jquery/jqueryFileTree/jqueryFileTree.css" type="text/css" media="screen">
-<link rel="stylesheet"    href="/3rdParty/jquery/jqueryMultiSelect/css/jquery.multiselect.css" type="text/css">
-<link rel="stylesheet"    href="/3rdParty/jquery/jqueryGrid/css/ui.jqgrid.css" type="text/css">
-<!-- End -->
-<link rel="icon"          href="/images/favicon.ico"   type="image/x-icon">
-<link rel="shortcut icon" href="/images/favicon.ico"   type="image/x-icon">
-<script type="text/javascript"  src="/js/websocket_events.js"></script>
-<script type="text/javascript"  src="/js/util.qjs"></script>
-<script type="text/javascript"  src="/3rdParty/jquery/jquery-2.0.3.js"></script>
-<script type="text/javascript"  src="/3rdParty/jquery/jqueryUI/js/jquery-ui-1.10.3.js"></script>
-<script type="text/javascript"  src="/js/menu.js"></script>
+<title>MythTV WebFrontend</title>
+<!-- CSS -->
+<link rel="stylesheet" type="text/css" href="/css/site.css">
+<link rel="stylesheet" type="text/css" href="/css/setup.css">
+<link rel="stylesheet" type="text/css" href="/3rdParty/jquery/jqueryUI/css/jquery-ui.css">
+<!-- Icons -->
+<link rel="icon"          type="image/x-icon" href="/images/favicon.ico">
+<link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico">
+<!-- Scripts -->
+<script type="text/javascript" src="/js/websocket_events.js"></script> <!-- Global websocket manager -->
+<script type="text/javascript" src="/js/util.qjs"></script>
+<script type="text/javascript" src="/3rdParty/jquery/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="/3rdParty/jquery/jqueryUI/js/jquery-ui-1.10.3.js"></script>
+<script type="text/javascript" src="/js/menu.js"></script>
 
 <script type="text/javascript">
 
@@ -31,7 +27,6 @@ $(document).ready(function() {
     loadDiv("menu-bg", "/menu.qsp");
     $('.menu').initMenu();
     showHostName();
-    loadContent('/misc/overview.qsp');
 });
 
 $(document).keyup(function(e) {
@@ -55,8 +50,10 @@ $(document).keyup(function(e) {
 <div id="menu-bg" class="menu-hidden"> <!-- onMouseOut="hideMainMenu()"> -->
 </div>
 
-<div id="content" onMouseOver="hideMainMenu()">
-</div>
+<iframe id="content" onMouseOver="hideMainMenu()" src="/misc/overview.qsp" seamless>
+</iframe>
+<!--<div id="content" onMouseOver="hideMainMenu()">
+</div>-->
 
 <div id='header_status' class="ui-state-highlight ui-corner-all" style="margin-top: 20px; padding: 0 .7em;"> 
     <p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
@@ -93,13 +90,6 @@ $(document).keyup(function(e) {
 
 <div id='debug' title='Debugging Popup'> <!-- Don't remove, used for developer debugging -->
 </div>
-
-<!-- Should the 'post-load' javascript be bundled? -->
-<script type="text/javascript"  src="/3rdParty/jquery/jqueryContextMenu/js/jquery.contextmenu.js"></script>
-<script type="text/javascript"  src="/3rdParty/jquery/jqueryMultiSelect/js/jquery.multiselect.js"></script>
-<script type="text/javascript"  src="/3rdParty/jquery/jqueryGrid/js/grid.locale-en.js"></script>
-<script type="text/javascript"  src="/3rdParty/jquery/jqueryGrid/js/jquery.jqGrid.js"></script>
-<script type="text/javascript"  src="/3rdParty/jquery/jqueryJScroll/jquery.jscroll.js"/></script>
 
 </body>
 </html>

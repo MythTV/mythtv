@@ -1,4 +1,9 @@
 
+BODY
+{
+    padding: 10px;
+}
+
 .header
 {
     width: calc(100% - 20px);
@@ -12,7 +17,7 @@
                         radial-gradient(circle, #151515 2px, transparent 2px);
     background-size:    6px 6px;
     background-position: 0 0, 3px 3px;*/
-    background: #000000 url(/3rdParty/jquery/jqueryUI/css/images/ui-bg_hexagon_10_000000_12x10.png) 50% 50% repeat;
+    background: #000000 url('/3rdParty/jquery/jqueryUI/css/images/ui-bg_hexagon_10_000000_12x10.png') 50% 50% repeat;
     border: 1px solid #000000;
     border-right: 1px solid #353535;
     border-bottom: 1px solid #353535;
@@ -33,7 +38,7 @@
                         radial-gradient(circle, #151515 2px, transparent 2px);
     background-size:    6px 6px;
     background-position: 0 0, 3px 3px;*/
-    background: #000000 url(/3rdParty/jquery/jqueryUI/css/images/ui-bg_hexagon_10_000000_12x10.png) 50% 50% repeat;
+    background: #000000 url('/3rdParty/jquery/jqueryUI/css/images/ui-bg_hexagon_10_000000_12x10.png') 50% 50% repeat;
 }
 
 .content

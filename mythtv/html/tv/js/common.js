@@ -323,37 +323,37 @@ function loadScheduler(type, chanID, startTime)
         layer.getAttribute("data-recordedid") > 0)
     {
         var recordedID = layer.getAttribute("data-recordedid");
-        loadContent('/tv/schedule.qsp?RecordedId=' + recordedID + '&amp;ChanId=' + chanID + '&amp;StartTime=' + startTime);
+        loadFrontendContent('/tv/schedule.qsp?RecordedId=' + recordedID + '&amp;ChanId=' + chanID + '&amp;StartTime=' + startTime);
     }
     else if (type == "upcoming")
     {
         var recRuleID = layer.getAttribute("data-recordid");
-        loadContent('/tv/schedule.qsp?ChanId=' + chanID + '&amp;StartTime=' + startTime);
+        loadFrontendContent('/tv/schedule.qsp?ChanId=' + chanID + '&amp;StartTime=' + startTime);
     }
     else // type == "rule"
     {
         var recRuleID = layer.getAttribute("data-recordid");
-        loadContent('/tv/schedule.qsp?RecRuleId=' + recRuleID + '&amp;ChanId=' + chanID + '&amp;StartTime=' + startTime);
+        loadFrontendContent('/tv/schedule.qsp?RecRuleId=' + recRuleID + '&amp;ChanId=' + chanID + '&amp;StartTime=' + startTime);
     }
 }
 
 function checkRecordingStatus(chanID, startTime)
 {
-    var url = "/tv/ajax_backends/dvr_util.qsp?_action=checkRecStatus&chanID=" + chanID + "&startTime=" + startTime;
-    var ajaxRequest = $.ajax( url ).done(function()
-                            {
-                                var response = ajaxRequest.responseText.trim().split("#");
-                                var id = response[0] + "_" + response[1];
-                                var layer = document.getElementById(id);
-                                toggleClass(layer, "programScheduling");
-                                // toggleClass(layer, response[2]);
-                                var popup = document.getElementById(id + "_schedpopup");
-                                toggleVisibility(popup);
-                                // HACK: Easiest way to ensure that everything
-                                //       on the page is correctly updated for now
-                                //       is to reload
-                                reloadTVContent();
-                            });
+//     var url = "/tv/ajax_backends/dvr_util.qsp?_action=checkRecStatus&chanID=" + chanID + "&startTime=" + startTime;
+//     var ajaxRequest = $.ajax( url ).done(function()
+//                             {
+//                                 var response = ajaxRequest.responseText.trim().split("#");
+//                                 var id = response[0] + "_" + response[1];
+//                                 var layer = document.getElementById(id);
+//                                 toggleClass(layer, "programScheduling");
+//                                 // toggleClass(layer, response[2]);
+//                                 var popup = document.getElementById(id + "_schedpopup");
+//                                 toggleVisibility(popup);
+//                                 // HACK: Easiest way to ensure that everything
+//                                 //       on the page is correctly updated for now
+//                                 //       is to reload
+//                                 reloadTVContent();
+//                             });
 }
 
 function recRuleChanged(chanID, startTime)
@@ -440,27 +440,7 @@ function neverRecord(chanID, startTime)
 
 function loadTVContent(url, targetDivID, transition, args)
 {
-    currentContentURL = url;   // currentContentURL is defined in util.qjs
-
-    if (!targetDivID)
-        targetDivID = "content";
-    if (!transition)
-        transition = "none"; // dissolve
-
-    if (transition === "none")
-    {
-        loadContent(url);
-        return;
-    }
-
-    $("#busyPopup").show();
-
-    var targetDiv = document.getElementById(targetDivID);
-    if (!isValidObject(targetDiv))
-    {
-        setErrorMessage("loadTVContent() target DIV doesn't exist: (" + targetDivID + ")");
-        return;
-    }
+    history.replaceState(history.state, '', url); // Update the page url in the browser
 
     for (var key in args)
     {
@@ -476,6 +456,26 @@ function loadTVContent(url, targetDivID, transition, args)
 
             url += key + "=" + args[key];
         }
+    }
+
+    if (!targetDivID)
+        targetDivID = "content";
+    if (!transition)
+        transition = "none"; // dissolve
+
+    if (transition === "none")
+    {
+        loadFrontendContent(url);
+        return;
+    }
+
+    parent.document.getElementById("busyPopup").style.display = "block";
+
+    var targetDiv = document.getElementById(targetDivID);
+    if (!isValidObject(targetDiv))
+    {
+        setErrorMessage("loadTVContent() target DIV doesn't exist: (" + targetDivID + ")");
+        return;
     }
 
     var html = $.ajax({
@@ -506,12 +506,12 @@ function loadTVContent(url, targetDivID, transition, args)
     }
     newDiv.id = targetDivID;
 
-    $("#busyPopup").hide();
+    parent.document.getElementById("busyPopup").style.display = "none";
 }
 
 function reloadTVContent()
 {
-    loadTVContent(currentContentURL);  // currentContentURL is defined in util.qjs
+    loadTVContent(window.location.href);
 }
 
 function formOnLoad(form)

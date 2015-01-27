@@ -18,6 +18,15 @@ var MythGuide = new function() {
     };
 
     /*!
+    * \fn Destructor
+    * \public
+    */
+    this.Destructor = function()
+    {
+        DeregisterMythEventHandler();
+    };
+
+    /*!
     * \fn RecordProgram
     * \public
     * \param int Channel ID
@@ -39,41 +48,6 @@ var MythGuide = new function() {
                                 {
                                     var response = ajaxRequest.responseText.split("#");
                                     recRuleChanged( response[0], response[1] );
-                                });
-    }
-
-   /*!
-    * \fn CheckRecordingStatus
-    * \public
-    * \param int Channel ID
-    * \param string Programme start time
-    * \brief Quick schedule
-    * \todo Code overlaps with a function of the same in common.js, could eliminate duplication?
-    *
-    * Create an instant schedule, with the given type for the programme
-    * indentified by the chanID and startTime combo.
-    */
-    this.CheckRecordingStatus = function (chanID, startTime)
-    {
-        var url = "/tv/ajax_backends/dvr_util.qsp?_action=checkRecStatus&chanID=" + chanID + "&startTime=" + startTime;
-        var ajaxRequest = $.ajax( url ).done(function()
-                                {
-                                    var response = ajaxRequest.responseText.split("#");
-                                    var id = response[0] + "_" + response[1];
-                                    var layer = document.getElementById(id);
-                                    if (!isValidObject(layer))
-                                    {
-                                        setErrorMessage("Guide::checkRecordingStatus() invalid program ID (" + id + ")");
-                                        return;
-                                    }
-                                    toggleClass(layer, "programScheduling");
-                                    // toggleClass(layer, response[2]);
-                                    var popup = document.getElementById(id + "_schedpopup");
-                                    toggleVisibility(popup);
-                                    // HACK: Easiest way to ensure that everything
-                                    //       on the page is correctly updated for now
-                                    //       is to reload
-                                    //ReloadGuideContent();
                                 });
     }
 
@@ -181,8 +155,16 @@ var MythGuide = new function() {
     */
     var ReloadGuideContent = function()
     {
-        loadTVContent(currentContentURL, "guideGrid", "dissolve", {"GuideOnly": "1"});  // currentContentURL is defined in util.qjs
+        console.log(window.location.href);
+        loadTVContent(window.location.href, "guideGrid", "dissolve", {"GuideOnly": "1"});
     }
+
+    /*!
+     * \var wsClient
+     * \private
+     * WebSocketEventClient object
+     */
+    var wsClient = {};
 
     /*!
     * \fn RegisterMythEventHandler
@@ -192,10 +174,21 @@ var MythGuide = new function() {
     */
     var RegisterMythEventHandler = function()
     {
-        var wsClient = new WebSocketEventClient();
+        wsClient = new parent.WebSocketEventClient();
         wsClient.eventReceiver = function(event) { HandleMythEvent(event) };
         wsClient.filters = ["SCHEDULE_CHANGE"];
-        globalWSHandler.AddListener(wsClient);
+        parent.globalWSHandler.AddListener(wsClient);
+    };
+
+    /*!
+    * \fn DeregisterMythEventHandler
+    * \private
+    *
+    * Deregister a WebSocketEventClient with the global WebSocketEventHandler
+    */
+    var DeregisterMythEventHandler = function()
+    {
+        parent.globalWSHandler.RemoveListener(wsClient);
     };
 
     /*!
@@ -219,4 +212,5 @@ var MythGuide = new function() {
     };
 };
 
-window.addEventListener("load", MythGuide.Init, false);
+window.addEventListener("load", MythGuide.Init);
+window.addEventListener("unload", MythGuide.Destructor);
