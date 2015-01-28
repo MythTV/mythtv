@@ -439,8 +439,8 @@ bool MythNotificationScreen::Create(void)
 
     if (m_mediaState && (m_update & kImage))
     {
-        m_mediaState->DisplayState(m_content & kNoArtwork ? "noartwork" : "ok");
-        LOG(VB_GUI, LOG_DEBUG, LOC + QString("Create: Set media state to %1").arg(m_content & kNoArtwork ? "noartwork" : "ok"));
+        m_mediaState->DisplayState((m_content & kNoArtwork) ? "noartwork" : "ok");
+        LOG(VB_GUI, LOG_DEBUG, LOC + QString("Create: Set media state to %1").arg((m_content & kNoArtwork) ? "noartwork" : "ok"));
     }
 
     // store original position
@@ -569,8 +569,8 @@ void MythNotificationScreen::Init(void)
 
     if (m_mediaState && (m_update & kImage))
     {
-        m_mediaState->DisplayState(m_update & kNoArtwork ? "noartwork" : "ok");
-        LOG(VB_GUI, LOG_DEBUG, LOC + QString("Init: Set media state to %1").arg(m_update & kNoArtwork ? "noartwork" : "ok"));
+        m_mediaState->DisplayState((m_update & kNoArtwork) ? "noartwork" : "ok");
+        LOG(VB_GUI, LOG_DEBUG, LOC + QString("Init: Set media state to %1").arg((m_update & kNoArtwork) ? "noartwork" : "ok"));
     }
 
     // No field will be refreshed the next time unless specified otherwise

@@ -679,17 +679,17 @@ uint DBEvent::UpdateDB(
     query.bindValue(":CATTYPE",     lcattype);
     query.bindValue(":STARTTIME",   starttime);
     query.bindValue(":ENDTIME",     endtime);
-    query.bindValue(":CC",          lsubtype & SUB_HARDHEAR ? true : false);
-    query.bindValue(":HASSUBTITLES",lsubtype & SUB_NORMAL   ? true : false);
-    query.bindValue(":STEREO",      laudio   & AUD_STEREO   ? true : false);
-    query.bindValue(":HDTV",        lvideo   & VID_HDTV     ? true : false);
+    query.bindValue(":CC",          (lsubtype & SUB_HARDHEAR) ? true : false);
+    query.bindValue(":HASSUBTITLES",(lsubtype & SUB_NORMAL)   ? true : false);
+    query.bindValue(":STEREO",      (laudio   & AUD_STEREO)   ? true : false);
+    query.bindValue(":HDTV",        (lvideo   & VID_HDTV)     ? true : false);
     query.bindValue(":SUBTYPE",     lsubtype);
     query.bindValue(":AUDIOPROP",   laudio);
     query.bindValue(":VIDEOPROP",   lvideo);
     query.bindValue(":PARTNO",      lpartnumber);
     query.bindValue(":PARTTOTAL",   lparttotal);
     query.bindValue(":SYNDICATENO", denullify(lsyndicatedepisodenumber));
-    query.bindValue(":AIRDATE",     lairdate?QString::number(lairdate):"0000");
+    query.bindValue(":AIRDATE",     lairdate ? QString::number(lairdate) : "0000");
     query.bindValue(":ORIGAIRDATE", loriginalairdate);
     query.bindValue(":LSOURCE",     llistingsource);
     query.bindValue(":SERIESID",    denullify(lseriesId));
@@ -919,10 +919,10 @@ uint DBEvent::InsertDB(MSqlQuery &query, uint chanid) const
     query.bindValue(":CATTYPE",     cattype);
     query.bindValue(":STARTTIME",   starttime);
     query.bindValue(":ENDTIME",     endtime);
-    query.bindValue(":CC",          subtitleType & SUB_HARDHEAR ? true : false);
-    query.bindValue(":STEREO",      audioProps   & AUD_STEREO   ? true : false);
-    query.bindValue(":HDTV",        videoProps   & VID_HDTV     ? true : false);
-    query.bindValue(":HASSUBTITLES",subtitleType & SUB_NORMAL   ? true : false);
+    query.bindValue(":CC",          (subtitleType & SUB_HARDHEAR) ? true : false);
+    query.bindValue(":STEREO",      (audioProps   & AUD_STEREO)   ? true : false);
+    query.bindValue(":HDTV",        (videoProps   & VID_HDTV)     ? true : false);
+    query.bindValue(":HASSUBTITLES",(subtitleType & SUB_NORMAL)   ? true : false);
     query.bindValue(":SUBTYPES",    subtitleType);
     query.bindValue(":AUDIOPROP",   audioProps);
     query.bindValue(":VIDEOPROP",   videoProps);
@@ -930,7 +930,7 @@ uint DBEvent::InsertDB(MSqlQuery &query, uint chanid) const
     query.bindValue(":PARTNUMBER",  partnumber);
     query.bindValue(":PARTTOTAL",   parttotal);
     query.bindValue(":SYNDICATENO", denullify(syndicatedepisodenumber));
-    query.bindValue(":AIRDATE",     airdate ? QString::number(airdate):"0000");
+    query.bindValue(":AIRDATE",     airdate ? QString::number(airdate) : "0000");
     query.bindValue(":ORIGAIRDATE", originalairdate);
     query.bindValue(":LSOURCE",     listingsource);
     query.bindValue(":SERIESID",    denullify(seriesId));
@@ -1052,13 +1052,13 @@ uint ProgInfo::InsertDB(MSqlQuery &query, uint chanid) const
     query.bindValue(":STARTTIME",   starttime);
     query.bindValue(":ENDTIME",     denullify(endtime));
     query.bindValue(":CC",
-                    subtitleType & SUB_HARDHEAR ? true : false);
+                    (subtitleType & SUB_HARDHEAR) ? true : false);
     query.bindValue(":STEREO",
-                    audioProps   & AUD_STEREO   ? true : false);
+                    (audioProps   & AUD_STEREO)   ? true : false);
     query.bindValue(":HDTV",
-                    videoProps   & VID_HDTV     ? true : false);
+                    (videoProps   & VID_HDTV)     ? true : false);
     query.bindValue(":HASSUBTITLES",
-                    subtitleType & SUB_NORMAL   ? true : false);
+                    (subtitleType & SUB_NORMAL)   ? true : false);
     query.bindValue(":SUBTYPES",    subtitleType);
     query.bindValue(":AUDIOPROP",   audioProps);
     query.bindValue(":VIDEOPROP",   videoProps);

@@ -314,7 +314,7 @@ static QString extract_commflag_state(const ProgramInfo &pginfo)
                               pginfo.GetRecordingStartTime()))
         return "queued";
 
-    return (pginfo.GetProgramFlags() & FL_COMMFLAG ? "yes" : "no");
+    return ((pginfo.GetProgramFlags() & FL_COMMFLAG) ? "yes" : "no");
 }
 
 
