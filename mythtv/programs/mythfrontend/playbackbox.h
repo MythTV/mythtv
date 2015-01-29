@@ -314,11 +314,10 @@ class PlaybackBox : public ScheduleCommon
                           bool force_preview_reload = true);
 
     void HandlePreviewEvent(const QStringList &list);
-    void HandleRecordingRemoveEvent(uint chanid, const QDateTime &recstartts);
+    void HandleRecordingRemoveEvent(uint recordedid);
     void HandleRecordingAddEvent(const ProgramInfo &evinfo);
     void HandleUpdateProgramInfoEvent(const ProgramInfo &evinfo);
-    void HandleUpdateProgramInfoFileSizeEvent(
-        uint chanid, const QDateTime &recstartts, uint64_t filesize);
+    void HandleUpdateProgramInfoFileSizeEvent(uint recordedid, uint64_t filesize);
 
     void ScheduleUpdateUIList(void);
     void ShowMenu(void);

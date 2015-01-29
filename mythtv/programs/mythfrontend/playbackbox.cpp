@@ -3950,13 +3950,9 @@ void PlaybackBox::customEvent(QEvent *event)
         if (message.startsWith("RECORDING_LIST_CHANGE"))
         {
             QStringList tokens = message.simplified().split(" ");
-            uint chanid = 0;
-            QDateTime recstartts;
-            if (tokens.size() >= 4)
-            {
-                chanid = tokens[2].toUInt();
-                recstartts = MythDate::fromString(tokens[3]);
-            }
+            uint recordedid = 0;
+            if (tokens.size() >= 3)
+                recordedid = tokens[2].toUInt();
 
             if ((tokens.size() >= 2) && tokens[1] == "UPDATE")
             {
@@ -3964,19 +3960,18 @@ void PlaybackBox::customEvent(QEvent *event)
                 if (evinfo.HasPathname() || evinfo.GetChanID())
                     HandleUpdateProgramInfoEvent(evinfo);
             }
-            else if (chanid && recstartts.isValid() && (tokens[1] == "ADD"))
+            else if (recordedid && (tokens[1] == "ADD"))
             {
-                ProgramInfo evinfo(chanid, recstartts);
+                ProgramInfo evinfo(recordedid);
                 if (evinfo.GetChanID())
                 {
                     evinfo.SetRecordingStatus(rsRecording);
                     HandleRecordingAddEvent(evinfo);
                 }
             }
-            else if (chanid && recstartts.isValid() && (tokens[1] == "DELETE"))
+            else if (recordedid && (tokens[1] == "DELETE"))
             {
-                if (chanid && recstartts.isValid())
-                    HandleRecordingRemoveEvent(chanid, recstartts);
+                HandleRecordingRemoveEvent(recordedid);
             }
             else
             {
@@ -4015,19 +4010,17 @@ void PlaybackBox::customEvent(QEvent *event)
         {
             QStringList tokens = message.simplified().split(" ");
             bool ok = false;
-            uint chanid = 0;
-            QDateTime recstartts;
+            uint recordedid = 0;
             uint64_t filesize = 0ULL;
-            if (tokens.size() >= 4)
+            if (tokens.size() >= 3)
             {
-                chanid     = tokens[1].toUInt();
-                recstartts = MythDate::fromString(tokens[2]);
-                filesize   = tokens[3].toLongLong(&ok);
+                recordedid = tokens[1].toUInt();
+                filesize   = tokens[2].toLongLong(&ok);
             }
-            if (chanid && recstartts.isValid() && ok)
+            if (recordedid && ok)
             {
-                HandleUpdateProgramInfoFileSizeEvent(
-                    chanid, recstartts, filesize);
+
+                HandleUpdateProgramInfoFileSizeEvent(recordedid, filesize);
             }
         }
         else if (message == "UPDATE_UI_LIST")
@@ -4261,14 +4254,15 @@ void PlaybackBox::customEvent(QEvent *event)
         ScheduleCommon::customEvent(event);
 }
 
-void PlaybackBox::HandleRecordingRemoveEvent(
-    uint chanid, const QDateTime &recstartts)
+void PlaybackBox::HandleRecordingRemoveEvent(uint recordedid)
 {
-    if (!m_programInfoCache.Remove(chanid, recstartts))
+    ProgramInfo evinfo(recordedid);
+    if (!m_programInfoCache.Remove(evinfo.GetChanID(),
+                                   evinfo.GetRecordingStartTime()))
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC +
-            QString("Failed to remove %1:%2, reloading list")
-                .arg(chanid).arg(recstartts.toString(Qt::ISODate)));
+            QString("Failed to remove %1, reloading list")
+                .arg(recordedid));
         m_programInfoCache.ScheduleLoad();
         return;
     }
@@ -4284,8 +4278,7 @@ void PlaybackBox::HandleRecordingRemoveEvent(
         ProgramList::iterator pit = (*git).begin();
         while (pit != (*git).end())
         {
-            if ((*pit)->GetChanID()             == chanid &&
-                (*pit)->GetRecordingStartTime() == recstartts)
+            if ((*pit)->GetRecordingID() == recordedid)
             {
                 if (!git.key().isEmpty() && git.key() == groupname)
                 {
@@ -4367,12 +4360,15 @@ void PlaybackBox::HandleUpdateProgramInfoEvent(const ProgramInfo &evinfo)
     ScheduleUpdateUIList();
 }
 
-void PlaybackBox::HandleUpdateProgramInfoFileSizeEvent(
-    uint chanid, const QDateTime &recstartts, uint64_t filesize)
+void PlaybackBox::HandleUpdateProgramInfoFileSizeEvent(uint recordedid,
+                                                       uint64_t filesize)
 {
-    m_programInfoCache.UpdateFileSize(chanid, recstartts, filesize);
+    ProgramInfo evinfo(recordedid);
+    m_programInfoCache.UpdateFileSize(evinfo.GetChanID(),
+                                      evinfo.GetRecordingStartTime(), filesize);
 
-    ProgramInfo *dst = FindProgramInUILists(chanid, recstartts);
+    ProgramInfo *dst = FindProgramInUILists(evinfo.GetChanID(),
+                                            evinfo.GetRecordingStartTime());
     if (dst)
         UpdateUIListItem(dst, false);
 }

@@ -24,29 +24,19 @@ typedef enum PIAction {
     kPIUpdateFileSize,
 } PIAction;
 
-class MPUBLIC PIKey
+class MPUBLIC PIKeyAction
 {
   public:
-    PIKey(uint c, const QDateTime &r) : chanid(c), recstartts(r) {}
+    PIKeyAction(uint recordedid, PIAction a) :
+        recordedid(recordedid), action(a) { }
 
-    uint      chanid;
-    QDateTime recstartts;
-
-    bool operator==(const PIKey &other) const
-    {
-        return (chanid     == other.chanid &&
-                recstartts == other.recstartts);
-    }
-};
-uint qHash(const PIKey &k);
-
-class MPUBLIC PIKeyAction : public PIKey
-{
-  public:
-    PIKeyAction(uint c, const QDateTime &r, PIAction a) :
-        PIKey(c, r), action(a) { }
-
+    uint recordedid;
     PIAction action;
+
+    bool operator==(const PIKeyAction &other) const
+    {
+        return (recordedid == other.recordedid);
+    }
 };
 
 class MPUBLIC PIKeyData
@@ -62,7 +52,7 @@ class MPUBLIC ProgramInfoUpdater : public QRunnable
   public:
     ProgramInfoUpdater() : isRunning(false) { setAutoDelete(false); }
 
-    void insert(uint     chanid, const QDateTime &recstartts,
+    void insert(uint     recordedid,
                 PIAction action, uint64_t         filesize = 0ULL);
     void run(void);
 
@@ -71,7 +61,7 @@ class MPUBLIC ProgramInfoUpdater : public QRunnable
     QWaitCondition moreWork; 
     bool          isRunning;
     std::vector<PIKeyAction>    needsAddDelete;
-    QHash<PIKey,PIKeyData> needsUpdate;
+    QHash<uint,PIKeyData> needsUpdate;
 };
 
 #endif // _PROGRAM_INFO_UPDATER_H_

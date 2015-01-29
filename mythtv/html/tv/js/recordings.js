@@ -136,7 +136,7 @@ var MythRecordings = new function() {
     {
         wsClient = new parent.WebSocketEventClient();
         wsClient.eventReceiver = function(event) { HandleMythEvent(event) };
-        wsClient.filters = ["MASTER_UPDATE_PROG_INFO", "RECORDING_LIST_CHANGE",
+        wsClient.filters = ["MASTER_UPDATE_REC_INFO", "RECORDING_LIST_CHANGE",
                             "UPDATE_FILE_SIZE"];
         parent.globalWSHandler.AddListener(wsClient);
     };
@@ -165,17 +165,19 @@ var MythRecordings = new function() {
             return;
         // TODO: Add some information to the event so we can decide whether
         // the current page needs reloading.
-        if (tokens[0] == "MASTER_UPDATE_PROG_INFO")
+        if (tokens[0] == "MASTER_UPDATE_REC_INFO")
         {
-            if (tokens.length < 3)
+            if (tokens.length < 2)
                 return;
-            var chanId = tokens[1];
-            var startTime = tokens[2];
+            var recordedId = tokens[1];
         }
         else if (tokens[0] == "RECORDING_LIST_CHANGE")
         {
-            if (tokens.length < 4)
+            if (tokens.length < 3)
                 return;
+            var type = tokens[1];
+            var recordedId = tokens[2];
+            
         }
     };
 };

@@ -1380,18 +1380,14 @@ void MainServer::customEvent(QEvent *e)
             return;
 
         MythEvent mod_me("");
-        if (me->Message().startsWith("MASTER_UPDATE_PROG_INFO"))
+        if (me->Message().startsWith("MASTER_UPDATE_REC_INFO"))
         {
             QStringList tokens = me->Message().simplified().split(" ");
-            uint chanid = 0;
-            QDateTime recstartts;
-            if (tokens.size() >= 3)
-            {
-                chanid     = tokens[1].toUInt();
-                recstartts = MythDate::fromString(tokens[2]);
-            }
+            uint recordedid = 0;
+            if (tokens.size() >= 2)
+                recordedid = tokens[1].toUInt();
 
-            ProgramInfo evinfo(chanid, recstartts);
+            ProgramInfo evinfo(recordedid);
             if (evinfo.GetChanID())
             {
                 QDateTime rectime = MythDate::current().addSecs(
@@ -2462,8 +2458,8 @@ void MainServer::DoDeleteInDB(DeleteStruct *ds)
     sleep(1);
 
     // Notify the frontend so it can requery for Free Space
-    QString msg = QString("RECORDING_LIST_CHANGE DELETE %1 %2")
-        .arg(ds->m_chanid).arg(ds->m_recstartts.toString(Qt::ISODate));
+    QString msg = QString("RECORDING_LIST_CHANGE DELETE %1")
+        .arg(ds->m_recordedid);
     gCoreContext->SendEvent(MythEvent(msg));
 
     // sleep a little to let frontends reload the recordings list

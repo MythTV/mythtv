@@ -2599,6 +2599,8 @@ void ProgramInfo::SaveBookmark(uint64_t frame)
         SaveMarkupMap(bookmarkmap);
     }
 
+    set_flag(programflags, FL_BOOKMARK, is_valid);
+
     if (IsRecording())
     {
         MSqlQuery query(MSqlQuery::InitCon());
@@ -2615,26 +2617,24 @@ void ProgramInfo::SaveBookmark(uint64_t frame)
 
         if (!query.exec())
             MythDB::DBError("bookmark flag update", query);
+
+        SendUpdateEvent();
     }
-
-    set_flag(programflags, FL_BOOKMARK, is_valid);
-
-    SendUpdateEvent();
 }
 
 void ProgramInfo::SendUpdateEvent(void)
 {
-    updater->insert(chanid, recstartts, kPIUpdate);
+    updater->insert(recordedid, kPIUpdate);
 }
 
 void ProgramInfo::SendAddedEvent(void) const
 {
-    updater->insert(chanid, recstartts, kPIAdd);
+    updater->insert(recordedid, kPIAdd);
 }
 
 void ProgramInfo::SendDeletedEvent(void) const
 {
-    updater->insert(chanid, recstartts, kPIDelete);
+    updater->insert(recordedid, kPIDelete);
 }
 
 /** \brief Queries Latest bookmark timestamp from the database.
@@ -2813,6 +2813,8 @@ void ProgramInfo::SaveWatched(bool watched)
             MythDB::DBError("Set watched flag", query);
         else
             UpdateLastDelete(watched);
+
+        SendUpdateEvent();
     }
     else if (IsVideoFile())
     {
@@ -2839,7 +2841,6 @@ void ProgramInfo::SaveWatched(bool watched)
     }
 
     set_flag(programflags, FL_WATCHED, watched);
-    SendUpdateEvent();
 }
 
 /** \brief Queries "recorded" table for its "editing" field
@@ -5790,7 +5791,7 @@ void ProgramInfo::SaveFilesize(uint64_t fsize)
     if (!query.exec())
         MythDB::DBError("File size update", query);
 
-    updater->insert(chanid, recstartts, kPIUpdateFileSize, fsize);
+    updater->insert(recordedid, kPIUpdateFileSize, fsize);
 }
 
 uint64_t ProgramInfo::GetFilesize(void) const
