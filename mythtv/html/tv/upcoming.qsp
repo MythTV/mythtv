@@ -213,7 +213,7 @@ for (var listIdx = 0; listIdx < programs.length; listIdx++)
 %>
 
 <% if (nextStartIndex) { %>
-<a class="jscroll-next" href="/tv/upcoming.qsp?ViewFilter=<%=filter%>&amp;Start=<%=nextStartIndex%>&amp;ListOnly=1" />
+<a class="jscroll-next" href="/tv/upcoming.qsp?ViewFilter=<%=filter%>&amp;Start=<%=nextStartIndex%>&amp;ListOnly=1"></a>
 <%}%>
 
 <% if (!listOnly) {%>

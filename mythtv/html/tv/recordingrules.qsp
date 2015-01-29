@@ -177,7 +177,7 @@ for (var listIdx = 0; listIdx < recRules.length; listIdx++)
 %>
 
 <% if (nextStartIndex) { %>
-<a class="jscroll-next" href="/tv/recordingrules.qsp?ViewFilter=<%=sort%>&amp;Order=<%=getArg("Order")%>&amp;Start=<%=nextStartIndex%>&amp;ListOnly=1" />
+<a class="jscroll-next" href="/tv/recordingrules.qsp?ViewFilter=<%=sort%>&amp;Order=<%=getArg("Order")%>&amp;Start=<%=nextStartIndex%>&amp;ListOnly=1"></a>
 <%}%>
 
 <% if (!listOnly) {%>

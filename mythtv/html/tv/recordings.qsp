@@ -125,7 +125,7 @@ import "/tv/js/tvutil.qjs"
 
 <!-- Wastebin - indicator of deleted recordings and link to deleted recording list -->
 <div id="wastebin" class="wastebin" <% if (!showDeletedLink) {%>style="display:none;"<%}%> onclick="loadTVContent('/tv/recordings.qsp?RecordingGroup=Deleted')">
-    <img src="/tv/images/wastebin.svg" height="32" />
+    <img src="/tv/images/wastebin.svg" height="32" alt="<%=qsTr("Wastebin")%>" />
 </div>
 
 <!-- Sort order, grouping etc -->
@@ -154,7 +154,7 @@ import "/tv/js/tvutil.qjs"
         <option label="Ascending" value="1" <%if (sortOrder == 1) {%>selected<%}%>>Ascending</option>
     </select>
     </label>
-    <label for="listDisplayOrder"><%=qsTr("Filter")%>:
+    <label for="listDisplayGroup"><%=qsTr("Filter")%>:
     <select id="listDisplayGroup" name="DisplayGroup" onChange="submitForm(this.form)">
 
         <option value="" <%if (displayGroup == displayGroupList[grpIdx]) {%>selected<%}%>>All</option>
@@ -268,7 +268,7 @@ for (var progIdx = 0; progIdx < programs.length; progIdx++)
 %>
 
 <% if (nextStartIndex) { %>
-<a class="jscroll-next" href="/tv/recordings.qsp?RecordingGroup=<%=recGroup%>&amp;DisplayGroup=<%=displayGroup%>&amp;SortAsc=<%=sortOrder%>&amp;Start=<%=nextStartIndex%>&amp;ListOnly=1" />
+<a class="jscroll-next" href="/tv/recordings.qsp?RecordingGroup=<%=recGroup%>&amp;DisplayGroup=<%=displayGroup%>&amp;SortAsc=<%=sortOrder%>&amp;Start=<%=nextStartIndex%>&amp;ListOnly=1"></a>
 <%}%>
 
 <% if (!listOnly) {%>
