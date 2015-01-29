@@ -12,7 +12,7 @@ function getArtworkURL(thisVideo)
         {
             if(thisArtwork.ArtworkInfos[artworkIdx].Type == "coverart")    //we have the cover art
             {
-                artworkURL = thisArtwork.ArtworkInfos[artworkIdx].URL + "&Width=200";
+                artworkURL = thisArtwork.ArtworkInfos[artworkIdx].URL + "&amp;Width=200";
             }
         }
     }

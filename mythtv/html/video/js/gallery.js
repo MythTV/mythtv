@@ -16,7 +16,7 @@ function showVideoDetail(videoId)
 {
     $("#videoOverlay").show();
 
-    $.get("video/gallery_detail.qsp?Id="+videoId)
+    $.get("/video/gallery_detail.qsp?Id="+videoId)
         .done(function(data) {
                  $("#videoDetailBox").html(data);
               });
