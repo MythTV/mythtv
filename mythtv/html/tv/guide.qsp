@@ -285,6 +285,7 @@ if (chanGroups.length)
 <%
         var programNum = 0;
         var cumulativeWidth = 0;
+        var previousEndtime = 0;
         for (var progIdx=0; progIdx < programList.length; progIdx++)
         {
             var program =  programList[progIdx];
@@ -292,6 +293,18 @@ if (chanGroups.length)
                 continue;
             if (program.StartTime >= (guideEndTime))
                 continue;
+
+            // This shouldn't happen, generally when it does it's because the
+            // services API supplied us overlapping programs. This needs to be
+            // fixed in the services API, or better yet at guide data insertion.
+            if (previousEndtime && (program.EndTime <= previousEndtime))
+                continue;
+            if (previousEndtime && (program.StartTime < previousEndtime))
+                program.StartTime = previousEndtime;
+
+            // Keep track of the programme end time, we may need to
+            // do some fixups on the data on the next programme
+            previousEndtime = program.EndTime;
 
             // To allow us to indicate in some way that the program continues
             // from an earlier time, or runs to a later time somewhere
@@ -317,11 +330,12 @@ if (chanGroups.length)
             // Due to rounding issues we can end up a percentage point or two over
             // this just trims the last width to prevent that happening.
             if (progIdx == (programList.length - 1))
-            {
                 width = (cumulativeWidth < 100.0) ? width + (100.0 - cumulativeWidth) : width;
-                width = (cumulativeWidth > 100.0) ? width - (cumulativeWidth - 100.0) : width;
-            }
+            width = (cumulativeWidth > 100.0) ? width - (cumulativeWidth - 100.0) : width;
             width = width.toFixed(3);
+
+            if (width < 0)
+                width = 0; // This should NEVER happen if the guide data is sane ...
 
             var categoryClass = "category_" + toCapitalCase(escapeHTML(program.Category).replace(/ /g, ''))
 
