@@ -106,7 +106,7 @@ import "/tv/js/tvutil.qjs"
 
 <div class="header">
     <div class="headerChannel">
-        <%if (channel.ChanId > 0) {%><img class="channelIcon" height="70" alt="<%=escapeHTML(channel.ChannelName)%> Icon" title="<%=escapeHTML(channel.ChannelName)%>" src="/Guide/GetChannelIcon?ChanId=<%=channel.ChanId%>&amp;Height=70" /><%}%>
+        <%if (channel.ChanId > 0 && channel.IconURL) {%><img class="channelIcon" height="70" alt="<%=escapeHTML(channel.ChannelName)%> Icon" title="<%=escapeHTML(channel.ChannelName)%>" src="<%=channel.IconURL%>&amp;Height=70" /><%}%>
         <!-- <%=escapeHTML(recRule.CallSign)%> -->
         <!-- <%=chanId%> <%=recRule.ChanId%> <%=channel.ChanId%> -->
     </div>
@@ -194,10 +194,13 @@ import "/tv/js/tvutil.qjs"
                         // RecStatusToClass() - /tv/js/tvutil.qjs
                         var statusClass = RecStatusToClass(showing.Recording.Status);
                         var programIdentifier = showing.Channel.ChanId + "_" + showing.StartTime.toISOString();
+                        var showingChannelIcon = "/tv/images/channel_icon.svg";
+                        if (showing.channel.IconURL)
+                            showingChannelIcon = showing.channel.IconURL + "&amp;Height=45";
                 %>
                         <div class="upcomingShowing">
                             <div class="channelIconBox">
-                                <img class="channelIcon" height="45" alt="<%=escapeHTML(showing.Channel.ChannelName)%> Icon" title="<%=escapeHTML(showing.Channel.ChanNum)%> <%=escapeHTML(showing.Channel.ChannelName)%>" src="/Guide/GetChannelIcon?ChanId=<%=showing.Channel.ChanId%>&amp;Height=45" />
+                                <img class="channelIcon" height="45" alt="<%=escapeHTML(showing.Channel.ChannelName)%> Icon" title="<%=escapeHTML(showing.Channel.ChanNum)%> <%=escapeHTML(showing.Channel.ChannelName)%>" src="<%=showingChannelIcon%>" />
                             </div>
                             <div class="programBox <%=statusClass%>" id="<%=programIdentifier%>" onMouseOver="startDetailTimer(this, 'program');" onMouseOut="hideDetail(this);">
                                 <div class="programHeader"><span class="programTitle"><%=showing.Title%></span><span class="programDateTime"><%=myth.GetFormatDate(showing.StartTime)%>, <%=myth.GetFormatTime(showing.StartTime)%> - <%=myth.GetFormatTime(showing.EndTime)%></span></div>
@@ -223,10 +226,13 @@ import "/tv/js/tvutil.qjs"
                         // RecStatusToClass() - /tv/js/tvutil.qjs
                         var statusClass = RecStatusToClass(conflict.Recording.Status);
                         var programIdentifier = conflict.Channel.ChanId + "_" + conflict.StartTime.toISOString();
+                        var conflictChannelIcon = "/tv/images/channel_icon.svg";
+                        if (conflict.channel.IconURL)
+                            conflictChannelIcon = conflict.channel.IconURL + "&amp;Height=45";
                 %>
                         <div class="upcomingConflict">
                             <div class="channelIconBox">
-                                <img class="channelIcon" height="45" alt="<%=escapeHTML(conflict.Channel.ChannelName)%> Icon" title="<%=escapeHTML(conflict.Channel.ChanNum)%> <%=escapeHTML(conflict.Channel.ChannelName)%>" src="/Guide/GetChannelIcon?ChanId=<%=conflict.Channel.ChanId%>&amp;Height=45" />
+                                <img class="channelIcon" height="45" alt="<%=escapeHTML(conflict.Channel.ChannelName)%> Icon" title="<%=escapeHTML(conflict.Channel.ChanNum)%> <%=escapeHTML(conflict.Channel.ChannelName)%>" src="<%=conflictChannelIcon%>" />
                             </div>
                             <div class="programBox <%=statusClass%>" id="<%=programIdentifier%>" onMouseOver="startDetailTimer(this, 'program');" onMouseOut="hideDetail(this);">
                                 <div class="programHeader"><span class="programTitle"><%=conflict.Title%></span><span class="programDateTime"><%=myth.GetFormatDate(conflict.StartTime)%>, <%=myth.GetFormatTime(conflict.StartTime)%> - <%=myth.GetFormatTime(conflict.EndTime)%></span></div>

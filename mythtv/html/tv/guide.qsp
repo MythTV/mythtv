@@ -273,11 +273,14 @@ if (chanGroups.length)
         if (!channel.Visible)
             continue;
         var programList = channel.Programs;
+        var channelIcon = "/tv/images/channel_icon.svg";
+        if (channel.IconURL)
+            channelIcon = channel.IconURL + "&amp;Height=57";
 %>
 
         <div class="channelRow">
             <div class="channelBox">
-                <img class="channelIcon" height="57" alt="<%=escapeHTML(channel.ChannelName)%> Icon" src="/Guide/GetChannelIcon?ChanId=<%=channel.ChanId%>&amp;Height=57" />
+                <img class="channelIcon" height="57" alt="<%=escapeHTML(channel.ChannelName)%> Icon" src="<%=channelIcon%>" />
                 <div class="channelText"><%=escapeHTML(channel.CallSign)%></div>
             </div>
             <div class="programsBox">
