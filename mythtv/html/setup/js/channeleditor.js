@@ -299,7 +299,7 @@ var MythChannelEditor = new function() {
     }
 
    /*!
-    * \fn ChannelIconLink
+    * \fn ResizeChannelIcon
     * \public
     */
     this.ResizeChannelIcon = function (id, maxWidth, maxHeight)
