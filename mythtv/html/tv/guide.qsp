@@ -280,7 +280,7 @@ if (chanGroups.length)
 
         <div class="channelRow">
             <div class="channelBox">
-                <img class="channelIcon" height="57" alt="<%=escapeHTML(channel.ChannelName)%> Icon" src="<%=channelIcon%>" />
+                <img class="channelIcon" height="57" alt="<%=escapeHTML(channel.ChannelName)%> Icon" src="<%=channelIcon%>" lazyload />
                 <div class="channelText"><%=escapeHTML(channel.CallSign)%></div>
             </div>
             <div class="programsBox">

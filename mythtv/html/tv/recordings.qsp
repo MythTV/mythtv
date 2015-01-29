@@ -223,7 +223,7 @@ for (var progIdx = 0; progIdx < programs.length; progIdx++)
     <div class="recordingRow" id="<%=program.Recording.RecordedId%>_row">
         <div class="previewBox">
             <div class="previewImageBackground">
-                <img alt="Preview Image" height="67" class="previewImage" src="/Content/GetPreviewImage?RecordedId=<%=program.Recording.RecordedId%>&amp;height=67&amp;format=JPG" />
+                <img alt="Preview Image" height="67" class="previewImage" src="/Content/GetPreviewImage?RecordedId=<%=program.Recording.RecordedId%>&amp;height=67&amp;format=JPG" lazyload />
             </div>
             <div class="watchButtons">
                 <div class="watchButton watchRecordingLink"><a onClick="showMenu(this, 'playMenu');" data-recordedid="<%=program.Recording.RecordedId%>" data-chanid="<%=program.Channel.ChanId%>" data-recstarttime="<%=program.Recording.StartTs.toISOString()%>"><%=qsTr("Watch")%></a></div>

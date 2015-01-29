@@ -85,7 +85,7 @@ import "/video/js/gallery.qjs"
                 </div>
 
                 <div class="videoArtwork" onClick="showVideoDetail(<%=thisVideo.Id%>);">
-                    <img width=100 src="<%=artworkURL%>" />
+                    <img width=100 src="<%=artworkURL%>" lazyload />
                 </div>
                 <%
                     //if there is a subtitle, show it
