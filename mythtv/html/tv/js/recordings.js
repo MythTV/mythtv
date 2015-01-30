@@ -207,15 +207,15 @@ var MythRecordings = new function() {
             var recordedId = tokens[2];
             if (type == "ADD")
             {
-                RecordingAdded(recordedId);
+                MythRecordings.RecordingAdded(recordedId);
             }
             else if (type == "DELETE")
             {
-                RecordingDeleted(recordedId);
+                MythRecordings.RecordingDeleted(recordedId);
             }
             else if (type == "UPDATE")
             {
-                RecordingUpdated(recordedId);
+                MythRecordings.RecordingUpdated(recordedId);
             }
         }
     };
