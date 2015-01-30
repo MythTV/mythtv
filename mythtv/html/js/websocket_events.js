@@ -13,6 +13,7 @@ window.addEventListener("DOMContentLoaded", InitWebSocketEventHandler);
  * \Class WebSocketEventClient
  */
 var WebSocketEventClient = function() {
+    this.name = "Unnamed";
     this.eventReceiver = {};
     this.statusReceiver = {};
     this.filters = new Array();
@@ -38,10 +39,12 @@ var WebSocketEventClient = function() {
  */
 var WebSocketEventHandler = function (uri) {
     this.uri = uri;
-    this.websocket = {};
+    this.websocket = null;
     this.listeners = new Array();
     this.filters = new Array();
     this.writeQueue = new Array();
+    this.reconnectTimerId = null;
+    this.isReconnecting = false;
     this.Open();
 };
 
@@ -52,7 +55,23 @@ var WebSocketEventHandler = function (uri) {
  * Handler for WebSocket open events
  */
 WebSocketEventHandler.prototype.OnOpen = function(wsEvent) {
-    this.ProcessWriteQueue();
+
+    if (this.isReconnecting)
+    {
+        console.log("WebSocketEventHandler: Socket Reconnected");
+        this.isReconnecting = false;
+        // Cancel the reconnect timer
+        window.clearInterval(this.reconnectTimerId);
+        this.reconnectTimerId = null;
+        // Resend the filters to the server
+        this.UpdateFilters();
+    }
+    else
+    {
+        console.log("WebSocketEventHandler: Socket Open");
+        // Process any writes which were made while we were still connecting
+        this.ProcessWriteQueue();
+    }
 }
 
 /*!
@@ -62,8 +81,25 @@ WebSocketEventHandler.prototype.OnOpen = function(wsEvent) {
  * Handler for WebSocket close events
  */
 WebSocketEventHandler.prototype.OnClose = function(wsEvent) {
-    if (wsEvent.code > WebSocket.CLOSE_GOING_AWAY)
+
+    // Reset the websocket var to allow for reconnection
+    this.websocket = null;
+    if (wsEvent.code > WebSocket.CLOSE_GOING_AWAY) // Only log non-standard close events
         console.log("WebSocketEventHandler: Close " + wsEvent.code + " " + wsEvent.reason);
+    else if (!this.isReconnecting)
+    {
+        console.log("WebSocketEventHandler: Connection Lost");
+        // Note: Don't try to reconnect if the server closed the connection
+        // with a code > 1001, it had a good reason and we might end up in
+        // a loop.
+
+        // Set a reconnecting flag, prevents us starting multiple timers among
+        // other things
+        this.isReconnecting = true;
+        // Enable reconnect timer - fires every 10 seconds
+        var _self = this;
+        this.reconnectTimerId = window.setInterval(function () { _self.Reconnect(); }, 10000);
+    }
 }
 
 /*!
@@ -90,7 +126,8 @@ WebSocketEventHandler.prototype.OnMessage = function(wsEvent) {
  * Handler for WebSocket message events
  */
 WebSocketEventHandler.prototype.OnError = function(wsEvent) {
-    console.log("WebSocketEventHandler: Error Occurred");
+    if (!this.isReconnecting)
+        console.log("WebSocketEventHandler: Error Occurred");
 }
 
 /*!
@@ -100,10 +137,16 @@ WebSocketEventHandler.prototype.OnError = function(wsEvent) {
  * Open the websocket connection
  */
 WebSocketEventHandler.prototype.Open = function() {
-    if (typeof(this.websocket) != undefined &&
-        (this.websocket.readyState == WebSocket.OPEN ||
-         this.websocket.readyState == WebSocket.CONNECTING))
-        return;
+    if (this.websocket && typeof this.websocket !== undefined &&
+        this.websocket !== null)
+    {
+        if (this.websocket.readyState == WebSocket.OPEN ||
+            this.websocket.readyState == WebSocket.CONNECTING)
+        {
+            console.log("WebSocketEventHandler: Open called on already open socket");
+            return;
+        }
+    }
 
     var _self = this;
     this.websocket = new WebSocket(this.uri);
@@ -121,6 +164,17 @@ WebSocketEventHandler.prototype.Open = function() {
  */
 WebSocketEventHandler.prototype.Close = function(code, message) {
     websocket.close(code, message);
+}
+
+/*!
+ * \fn void Reconnect
+ * \private
+ *
+ * Attempt reconnection
+ */
+WebSocketEventHandler.prototype.Reconnect = function(wsEvent) {
+    console.log("WebSocketEventHandler: Attempting reconnection");
+    this.Open();
 }
 
 /*!
@@ -145,9 +199,9 @@ WebSocketEventHandler.prototype.UpdateFilters = function() {
     }
 
     // DEBUG
-    for (n = 0; n < this.filters.length; n++) {
-        console.log(n + " : " + this.filters[n]);
-    }
+//     for (n = 0; n < this.filters.length; n++) {
+//         console.log(n + " : " + this.filters[n]);
+//     }
     var command = "WS_EVENT_SET_FILTER " + this.filters.join(' ');
     this.writeQueue.push(command); // Socket may not be connected yet so queue commands
     this.ProcessWriteQueue();
@@ -168,9 +222,12 @@ WebSocketEventHandler.prototype.ProcessWriteQueue = function(listener) {
     var command;
     for (i = 0; i < this.writeQueue.length; i++) {
         command = this.writeQueue[i];
-        console.log("WebSocketEventHandler: Send > " + command);
+        console.log("WebSocketEventHandler: Sending > " + command);
         this.websocket.send(command);
     }
+
+    // Clear Queue
+    this.writeQueue = new Array();
 }
 
 /*!
@@ -181,20 +238,20 @@ WebSocketEventHandler.prototype.ProcessWriteQueue = function(listener) {
  * Register a WebSocketEventClient object
  */
 WebSocketEventHandler.prototype.AddListener = function(listener) {
-    if (typeof(listener) != 'object' ||
+    if (typeof listener !== 'object' ||
         !listener.hasOwnProperty('eventReceiver'))
     {
-        console.log("WebSocketEventHandler.addListener: Invalid listener supplied");
+        console.log("WebSocketEventHandler: Invalid listener supplied");
         return;
     }
     if (this.listeners.indexOf(listener) != -1)
     {
-        console.log("WebSocketEventHandler.addListener: Duplicate listener, ignoring");
+        console.log("WebSocketEventHandler: Duplicate listener, ignoring");
         return;
     }
 
     this.listeners.push(listener);
-    console.log("WebSocketEventHandler.addListener: Added new listener");
+    console.log("WebSocketEventHandler: Added new listener (" + listener.name + ")");
 
     this.UpdateFilters();
 }
@@ -210,7 +267,7 @@ WebSocketEventHandler.prototype.RemoveListener = function(listener) {
     for (i = 0; i < this.listeners.length; i++) {
         if (this.listeners[i] == listener) {
             this.listeners.splice(i, 1);
-            console.log("WebSocketEventHandler: Removed listener");
+            console.log("WebSocketEventHandler: Removed listener (" + listener.name + ")");
             break;
         }
     }

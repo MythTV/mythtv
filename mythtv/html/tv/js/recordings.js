@@ -135,6 +135,7 @@ var MythRecordings = new function() {
     var RegisterMythEventHandler = function()
     {
         wsClient = new parent.WebSocketEventClient();
+        wsClient.name = "Recording List";
         wsClient.eventReceiver = function(event) { HandleMythEvent(event) };
         wsClient.filters = ["MASTER_UPDATE_REC_INFO", "RECORDING_LIST_CHANGE",
                             "UPDATE_FILE_SIZE"];
@@ -177,7 +178,7 @@ var MythRecordings = new function() {
                 return;
             var type = tokens[1];
             var recordedId = tokens[2];
-            
+
         }
     };
 };

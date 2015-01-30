@@ -142,7 +142,7 @@ function showMenu(parent, typeStr)
         gStartTime = parent.getAttribute("data-starttime");
 
     // DEBUGGING
-    console.log("RecordedId " + gRecordedId + " ChanId " + gChanID + " StartTime " + gStartTime);
+    //console.log("RecordedId " + gRecordedId + " ChanId " + gChanID + " StartTime " + gStartTime);
 
     // New Way
 //     $('#optMenu').data('chanID', parent.getAttribute("data-chanid"));
@@ -238,13 +238,13 @@ function showDetail(parentID, type)
     if (isValidVar(parent.getAttribute("data-recordedId")))
     {
         recordedId = parent.getAttribute("data-recordedId");
-        console.log("Recorded ID " + recordedId);
+        //console.log("Recorded ID " + recordedId);
     }
     else
     {
         chanId = parent.getAttribute("data-chanid");
         startTime = parent.getAttribute("data-starttime");
-        console.log("Chan ID " + chanId + " StartTime " + startTime);
+        //console.log("Chan ID " + chanId + " StartTime " + startTime);
     }
 
     // New Way

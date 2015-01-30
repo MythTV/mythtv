@@ -55,10 +55,9 @@ var MythOverview = new function() {
                     });
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
-                    console.log("Error: " + errorThrown);
+                    console.log("GetFrontendStatus Error: " + errorThrown);
                 },
                 complete: function() {
-                    console.log("Complete");
                 }});
     };
 
@@ -96,6 +95,7 @@ var MythOverview = new function() {
     var RegisterMythEventHandler = function()
     {
         wsClient = new parent.WebSocketEventClient();
+        wsClient.name = "Overview Frontend Status";
         wsClient.eventReceiver = function(event) { HandleMythEvent(event) };
         wsClient.filters = ["CLIENT_DISCONNECTED", "CLIENT_CONNECTED"];
         parent.globalWSHandler.AddListener(wsClient);

@@ -155,7 +155,6 @@ var MythGuide = new function() {
     */
     var ReloadGuideContent = function()
     {
-        console.log(window.location.href);
         loadTVContent(window.location.href, "guideGrid", "dissolve", {"GuideOnly": "1"});
     }
 
@@ -175,6 +174,7 @@ var MythGuide = new function() {
     var RegisterMythEventHandler = function()
     {
         wsClient = new parent.WebSocketEventClient();
+        wsClient.name = "Programme Guide";
         wsClient.eventReceiver = function(event) { HandleMythEvent(event) };
         wsClient.filters = ["SCHEDULE_CHANGE"];
         parent.globalWSHandler.AddListener(wsClient);
