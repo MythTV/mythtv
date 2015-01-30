@@ -87,6 +87,7 @@ import "/tv/js/tvutil.qjs"
 <link rel="stylesheet" type="text/css" href="/tv/css/common.css">
 <link rel="stylesheet" type="text/css" href="/tv/css/settings.css">
 <link rel="stylesheet" type="text/css" href="/tv/css/schedule.css">
+<script src="/js/utility.js"></script> <!-- ECMA not JS -->
 <script type="text/javascript" src="/3rdParty/jquery/jquery-2.0.3.min.js"></script>
 <script type="text/javascript" src="/3rdParty/jquery/jqueryUI/js/jquery-ui-1.10.3.js"></script>
 <script src="/tv/js/settings.js"></script>
@@ -207,7 +208,7 @@ import "/tv/js/tvutil.qjs"
                             <div class="channelIconBox">
                                 <img class="channelIcon" height="45" alt="<%=escapeHTML(showing.Channel.ChannelName)%> Icon" title="<%=escapeHTML(showing.Channel.ChanNum)%> <%=escapeHTML(showing.Channel.ChannelName)%>" src="<%=showingChannelIcon%>" lazyload />
                             </div>
-                            <div class="programBox <%=statusClass%>" id="<%=programIdentifier%>" onMouseOver="startDetailTimer(this, 'program');" onMouseOut="hideDetail(this);">
+                            <div class="programBox <%=statusClass%>" id="<%=programIdentifier%>" data-chanid="<%=showing.Channel.ChanId%>" data-starttime="<%=showing.StartTime.toISOString()%>" onMouseOver="startDetailTimer(this, 'program');" onMouseOut="hideDetail(this);">
                                 <div class="programHeader"><span class="programTitle"><%=showing.Title%></span><span class="programDateTime"><%=myth.GetFormatDate(showing.StartTime)%>, <%=myth.GetFormatTime(showing.StartTime)%> - <%=myth.GetFormatTime(showing.EndTime)%></span></div>
                                 <div class="programBody"><span class="programSubtitle"><%=showing.SubTitle%></span><span class="programRecordingStatus"><%=dvr.RecStatusToString(showing.Recording.Status)%></span></div>
                             </div>
@@ -239,7 +240,7 @@ import "/tv/js/tvutil.qjs"
                             <div class="channelIconBox">
                                 <img class="channelIcon" height="45" alt="<%=escapeHTML(conflict.Channel.ChannelName)%> Icon" title="<%=escapeHTML(conflict.Channel.ChanNum)%> <%=escapeHTML(conflict.Channel.ChannelName)%>" src="<%=conflictChannelIcon%>" lazyload />
                             </div>
-                            <div class="programBox <%=statusClass%>" id="<%=programIdentifier%>" onMouseOver="startDetailTimer(this, 'program');" onMouseOut="hideDetail(this);">
+                            <div class="programBox <%=statusClass%>" id="<%=programIdentifier%>" data-chanid="<%=conflict.Channel.ChanId%>" data-starttime="<%=conflict.StartTime.toISOString()%>" onMouseOver="startDetailTimer(this, 'program');" onMouseOut="hideDetail(this);">
                                 <div class="programHeader"><span class="programTitle"><%=conflict.Title%></span><span class="programDateTime"><%=myth.GetFormatDate(conflict.StartTime)%>, <%=myth.GetFormatTime(conflict.StartTime)%> - <%=myth.GetFormatTime(conflict.EndTime)%></span></div>
                                 <div class="programBody"><span class="programSubtitle"><%=conflict.SubTitle%></span><span class="programRecordingStatus"><%=dvr.RecStatusToString(conflict.Recording.Status)%></span></div>
                             </div>
