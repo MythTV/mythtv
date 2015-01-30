@@ -79,20 +79,22 @@
         </li>
         <li><a href='#'><i18n>Examples</i18n></a>
           <ul class="acitem">
-            <li><a href='#' onClick="hideMainMenu();loadContent('/samples/hlstest.qsp');"><i18n>HTTP Live Streaming</i18n></a></li>
+            <li><a href='#' onClick="hideMainMenu();loadFrontendContent('/samples/hlstest.qsp');"><i18n>HTTP Live Streaming</i18n></a></li>
           </ul>
         </li>
-        <li><a href='#'><i18n>Server Side Scripting</i18n></a>
-          <ul class="acitem">
-            <li><a href='#' onClick="hideMainMenu();loadContent('/samples/serverside.qsp', '/samples/js/samples.js')"><i18n>Overview</i18n></a></li>
 <%
     if (devMode)
     {
-        os.write("<li><a href='#' onClick=\"hideMainMenu();loadContent('/samples/storagegroups.qsp', '/samples/js/samples.js')\"><i18n>GetStorageGroups()</i18n></a></li>");
-    }
 %>
+        <li><a href='#'><i18n>Server Side Scripting</i18n></a>
+          <ul class="acitem">
+            <li><a href='#' onClick="hideMainMenu();loadContent('/samples/serverside.qsp', '/samples/js/samples.js')"><i18n>Overview</i18n></a></li>
+            <li><a href='#' onClick="hideMainMenu();loadContent('/samples/storagegroups.qsp', '/samples/js/samples.js')"><i18n>GetStorageGroups()</i18n></a></li>
           </ul>
         </li>
+<%
+    }
+%>
       </ul>
     </li>
     <li><a href='#'><i18n>3rd Party Software</i18n></a>
