@@ -72,7 +72,7 @@ var MythRecordings = new function() {
                                 });
     }
 
-    /*!
+   /*!
     * \fn RecordingDeleted
     * \param int The ID of the recording
     * \param bool True if the recording has been undeleted
@@ -83,10 +83,37 @@ var MythRecordings = new function() {
     */
     this.RecordingDeleted = function (recordedId, unDeleted)
     {
-        var id = recordedId + "_row";
         if (!unDeleted)
-            console.log("Recording Deleted: " + id);
+            console.log("Recording Deleted: " + recordedId);
+        var id = recordedId + "_row";
         $(jq(id)).hide('slide',{direction:'left'},1000);
+    }
+
+   /*!
+    * \fn RecordingAdded
+    * \param int The ID of the recording
+    * \public
+    *
+    * Recording has been added to the current view, either because it has
+    * just started or the recording group was changed
+    */
+    this.RecordingAdded = function (recordedId)
+    {
+        console.log("Recording Added: " + recordedId);
+        // STUB
+    }
+
+   /*!
+    * \fn RecordingUpdated
+    * \param int The ID of the recording
+    * \public
+    *
+    * Recording information has been updated
+    */
+    this.RecordingUpdated = function (recordedId)
+    {
+        console.log("Recording Updated: " + recordedId);
+        // STUB
     }
 
    /*!
@@ -178,7 +205,18 @@ var MythRecordings = new function() {
                 return;
             var type = tokens[1];
             var recordedId = tokens[2];
-
+            if (type == "ADD")
+            {
+                RecordingAdded(recordedId);
+            }
+            else if (type == "DELETE")
+            {
+                RecordingDeleted(recordedId);
+            }
+            else if (type == "UPDATE")
+            {
+                RecordingUpdated(recordedId);
+            }
         }
     };
 };
