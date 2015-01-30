@@ -107,7 +107,7 @@ package MythTV;
 # Note: as of July 21, 2010, this is actually a string, to account for proto
 # versions of the form "58a".  This will get used if protocol versions are 
 # changed on a fixes branch ongoing.
-    our $PROTO_VERSION = "83";
+    our $PROTO_VERSION = "84";
     our $PROTO_TOKEN = "CanaryCoalmine";
 
 # currentDatabaseVersion is defined in libmythtv in
