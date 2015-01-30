@@ -1112,7 +1112,7 @@ void TVRec::ChangeState(TVState nextState)
 void TVRec::TeardownRecorder(uint request_flags)
 {
     LOG(VB_RECORD, LOG_INFO, LOC + QString("TeardownRecorder(%1)")
-        .arg(request_flags & kFlagKillRec ? "kFlagKillRec" : ""));
+        .arg((request_flags & kFlagKillRec) ? "kFlagKillRec" : ""));
 
     pauseNotify = false;
     ispip = false;
