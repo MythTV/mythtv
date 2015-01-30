@@ -29,6 +29,11 @@ import "/tv/js/tvutil.qjs"
 
     if (chanId <= 0)
         chanId = recRule.ChanId;
+    if (recordedId > 0)
+    {
+        chanId = recRule.ChanId;
+        startTime = recRule.StartTime;
+    }
 
     var inputList = dvr.GetInputList().Inputs;
     var storageGroupList = dvr.GetRecStorageGroupList();
@@ -185,7 +190,7 @@ import "/tv/js/tvutil.qjs"
                 <%  if (upcomingShowings.length == 0)
                     {
                 %>
-                        <div><%=qsTr("No Conflicts")%></div>
+                        <div><%=qsTr("No Upcoming Showings")%></div>
                 <%  }
 
                     for (var listIdx = 0; listIdx < upcomingShowings.length; listIdx++)
@@ -195,8 +200,8 @@ import "/tv/js/tvutil.qjs"
                         var statusClass = RecStatusToClass(showing.Recording.Status);
                         var programIdentifier = showing.Channel.ChanId + "_" + showing.StartTime.toISOString();
                         var showingChannelIcon = "/tv/images/channel_icon.svg";
-                        if (showing.channel.IconURL)
-                            showingChannelIcon = showing.channel.IconURL + "&amp;Height=45";
+                        if (showing.Channel.IconURL)
+                            showingChannelIcon = showing.Channel.IconURL + "&amp;Height=45";
                 %>
                         <div class="upcomingShowing">
                             <div class="channelIconBox">
@@ -227,8 +232,8 @@ import "/tv/js/tvutil.qjs"
                         var statusClass = RecStatusToClass(conflict.Recording.Status);
                         var programIdentifier = conflict.Channel.ChanId + "_" + conflict.StartTime.toISOString();
                         var conflictChannelIcon = "/tv/images/channel_icon.svg";
-                        if (conflict.channel.IconURL)
-                            conflictChannelIcon = conflict.channel.IconURL + "&amp;Height=45";
+                        if (conflict.Channel.IconURL)
+                            conflictChannelIcon = conflict.Channel.IconURL + "&amp;Height=45";
                 %>
                         <div class="upcomingConflict">
                             <div class="channelIconBox">
