@@ -26,14 +26,14 @@
 
 #include <stdint.h>
 
-/////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-//
-// WebSocketServer Class Definition
-//
-/////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-
+/**
+ * \class WebSocketServer
+ *
+ * \brief The WebSocket server, which listens for connections
+ *
+ * When WebSocketServer receives a connection it hands it off to a new instance
+ * of WebSocketWorker which runs it it's own thread, WebSocketWorkerThread
+ */
 class UPNP_PUBLIC WebSocketServer : public ServerPool
 {
     Q_OBJECT
@@ -64,30 +64,12 @@ class UPNP_PUBLIC WebSocketServer : public ServerPool
      //void LoadSSLConfig();
 };
 
-/////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-//
-// WebSocketWorkerThread Class Definition
-//
-/////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
 
-class WebSocketWorkerThread : public QRunnable
-{
-  public:
-    WebSocketWorkerThread(WebSocketServer &webSocketServer, qt_socket_fd_t sock,
-                          PoolServerType type, QSslConfiguration sslConfig);
-    virtual ~WebSocketWorkerThread();
-
-    virtual void run(void);
-
-  private:
-    WebSocketServer  &m_webSocketServer;
-    qt_socket_fd_t    m_socketFD;
-    PoolServerType    m_connectionType;
-    QSslConfiguration m_sslConfig;
-};
-
+/**
+ * \class WebSocketFrame
+ *
+ * \brief A representation of a single WebSocket frame
+ */
 class WebSocketFrame
 {
   public:
@@ -136,6 +118,75 @@ class WebSocketFrame
     bool fragmented;
 };
 
+class WebSocketWorker;
+
+/**
+ * \class WebSocketExtension
+ *
+ * \brief Base class for extensions
+ *
+ * Extensions enable different features to be operate via a websocket
+ * connection without cluttering the general connection/parsing classes.
+ *
+ * Extensions can be registered and deregistered, so features can be enabled or
+ * disabled easily. A frontend might offer different services to a backend for
+ * example.
+ */
+class WebSocketExtension : public QObject
+{
+  Q_OBJECT
+
+  public:
+    WebSocketExtension() : QObject() { };
+    virtual ~WebSocketExtension() {};
+
+    virtual bool HandleTextFrame(const WebSocketFrame &frame) { return false; }
+    virtual bool HandleBinaryFrame(const WebSocketFrame &frame) { return false; }
+
+  signals:
+    void SendTextMessage(const QString &);
+    void SendBinaryMessage(const QByteArray &);
+};
+
+/**
+ * \class WebSocketWorkerThread
+ *
+ * \brief The thread in which WebSocketWorker does it's thing
+ */
+class WebSocketWorkerThread : public QRunnable
+{
+  public:
+    WebSocketWorkerThread(WebSocketServer &webSocketServer, qt_socket_fd_t sock,
+                          PoolServerType type, QSslConfiguration sslConfig);
+    virtual ~WebSocketWorkerThread();
+
+    virtual void run(void);
+
+  private:
+    WebSocketServer  &m_webSocketServer;
+    qt_socket_fd_t    m_socketFD;
+    PoolServerType    m_connectionType;
+    QSslConfiguration m_sslConfig;
+};
+
+/**
+ * \class WebSocketWorker
+ *
+ * \brief Performs all the protocol-level work for a single websocket connection
+ *
+ * The worker is created by WebSocketServer after a raw socket is opened. It
+ * runs in it's own thread, an instance of WebSocketServerThread.
+ *
+ * The worker parses the initial HTTP connection and upgrades the connection to
+ * use the WebSocket protocol. It manages the heartbeat, parses and validates
+ * frames, reconstitutes payloads from fragmented frames and handles other basic
+ * protocol level tasks.
+ *
+ * When complete data frames have been received, it checks whether any
+ * registered extensions wish to handle them. It is also responsible for
+ * creating properly formatted, valid frames and transmitting them to the
+ * client.
+ */
 class WebSocketWorker : public QObject
 {
     Q_OBJECT
@@ -182,6 +233,9 @@ class WebSocketWorker : public QObject
     void CloseConnection();
 
     void SendHeartBeat();
+    bool SendText(const QString &message);
+    bool SendText(const QByteArray &message);
+    bool SendBinary(const QByteArray &data);
 
   protected:
     bool ProcessHandshake(QTcpSocket *); /// Returns false if an error occurs
@@ -195,17 +249,15 @@ class WebSocketWorker : public QObject
     QByteArray CreateFrame(WebSocketFrame::OpCode type, const QByteArray &payload);
 
     bool SendFrame(const QByteArray &frame);
-    bool SendText(const QString &message);
-    bool SendText(const QByteArray &message);
-    bool SendBinary(const QByteArray &data);
     bool SendPing(const QByteArray &payload);
     bool SendPong(const QByteArray &payload);
     bool SendClose(ErrorCode errCode, const QString &message = QString());
 
-    void customEvent(QEvent *event);
-
     void SetupSocket();
     void CleanupSocket();
+
+    void RegisterExtension(WebSocketExtension *extension);
+    void DeregisterExtension(WebSocketExtension *extension);
 
     QEventLoop *m_eventLoop;
     WebSocketServer &m_webSocketServer;
@@ -224,6 +276,8 @@ class WebSocketWorker : public QObject
     QSslConfiguration       m_sslConfig;
 
     bool m_fuzzTesting;
+
+    QList<WebSocketExtension *> m_extensions;
 };
 
 #endif

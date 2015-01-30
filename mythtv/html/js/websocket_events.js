@@ -1,6 +1,6 @@
 
 // Initialise a global gWSHandler on load - there should only be one handler
-// per browser instance. One socket.
+// per browser instance. One socket with multiple 'listeners'
 var globalWSHandler = {};
 function InitWebSocketEventHandler()
 {
@@ -56,6 +56,9 @@ var WebSocketEventHandler = function (uri) {
  */
 WebSocketEventHandler.prototype.OnOpen = function(wsEvent) {
 
+    // Enable sending of events from server
+    this.writeQueue.push("WS_EVENT_ENABLE");
+
     if (this.isReconnecting)
     {
         console.log("WebSocketEventHandler: Socket Reconnected");
@@ -63,7 +66,7 @@ WebSocketEventHandler.prototype.OnOpen = function(wsEvent) {
         // Cancel the reconnect timer
         window.clearInterval(this.reconnectTimerId);
         this.reconnectTimerId = null;
-        // Resend the filters to the server
+        // Resend the filters to the server (calls ProcessWriteQueue)
         this.UpdateFilters();
     }
     else

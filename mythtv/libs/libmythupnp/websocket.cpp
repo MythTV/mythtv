@@ -7,6 +7,7 @@
 #include "mythcorecontext.h"
 #include "mythevent.h"
 #include "codecutil.h"
+#include "websocket_extensions/websocket_mythevent.h"
 
 // QT headers
 #include <QThread>
@@ -104,17 +105,27 @@ WebSocketWorker::WebSocketWorker(WebSocketServer& webSocketServer,
     LOG(VB_HTTP, LOG_INFO, QString("WebSocketWorker(%1): New connection")
                                         .arg(m_socketFD));
 
+    // For now, until it's refactored, register the only extension here
+    RegisterExtension(new WebSocketMythEvent());
+
     SetupSocket();
 
     m_isRunning = true;
-
-    gCoreContext->addListener(this);
 }
 
 WebSocketWorker::~WebSocketWorker()
 {
-    gCoreContext->removeListener(this);
     CleanupSocket();
+
+    // If extensions weren't deregistered then it's our responsibility to
+    // delete them
+    while (!m_extensions.isEmpty())
+    {
+        WebSocketExtension *extension = m_extensions.takeFirst();
+        extension->deleteLater();
+        extension = NULL;
+    }
+
     m_eventLoop->deleteLater();
     m_eventLoop = NULL;
 }
@@ -401,8 +412,8 @@ bool WebSocketWorker::ProcessHandshake(QTcpSocket *socket)
         return false;
     }
 
-    // If we're running the fuzz/unit tester then we need to disable the heartbeat
-    // and 'echo' text/binary frames back to the sender
+    // If we're running the Autobahn fuzz/unit tester then we need to disable
+    // the heartbeat and 'echo' text/binary frames back to the sender
     if (requestHeaders.contains("user-agent") &&
         requestHeaders["user-agent"].contains("AutobahnTestSuite"))
         m_fuzzTesting = true;
@@ -633,6 +644,7 @@ void WebSocketWorker::HandleDataFrame(const WebSocketFrame &frame)
 {
     if (frame.finalFrame)
     {
+        QList<WebSocketExtension*>::iterator it;
         switch (frame.opCode)
         {
             case WebSocketFrame::kOpTextFrame :
@@ -645,10 +657,22 @@ void WebSocketWorker::HandleDataFrame(const WebSocketFrame &frame)
                 // For Debugging and fuzz testing
                 if (m_fuzzTesting)
                     SendText(frame.payload);
+                it = m_extensions.begin();
+                for (; it != m_extensions.end(); ++it)
+                {
+                    if ((*it)->HandleTextFrame(frame))
+                        break;
+                }
                 break;
             case WebSocketFrame::kOpBinaryFrame :
                 if (m_fuzzTesting)
                     SendBinary(frame.payload);
+                it = m_extensions.begin();
+                for (; it != m_extensions.end(); ++it)
+                {
+                    if ((*it)->HandleBinaryFrame(frame))
+                        break;
+                }
                 break;
         }
         m_readFrame.reset();
@@ -883,16 +907,33 @@ void WebSocketWorker::SendHeartBeat()
     SendPing(QByteArray("HeartBeat"));
 }
 
-void WebSocketWorker::customEvent(QEvent* event)
+void WebSocketWorker::RegisterExtension(WebSocketExtension* extension)
 {
-    if ((MythEvent::Type)(event->type()) == MythEvent::MythEventMessage)
+    if (!extension)
+        return;
+
+    connect(extension, SIGNAL(SendTextMessage(const QString &)),
+            this, SLOT(SendText(const QString &)));
+    connect(extension, SIGNAL(SendBinaryMessage(const QByteArray &)),
+            this, SLOT(SendBinary(const QByteArray &)));
+
+    m_extensions.append(extension);
+}
+
+void WebSocketWorker::DeregisterExtension(WebSocketExtension* extension)
+{
+    if (!extension)
+        return;
+
+    QList<WebSocketExtension*>::iterator it = m_extensions.begin();
+    for (; it != m_extensions.end(); ++it)
     {
-        MythEvent *me = (MythEvent *)event;
-        QString message = me->Message();
-
-        if (message.startsWith("SYSTEM_EVENT"))
-            message.remove(0, 13); // Strip SYSTEM_EVENT from the frontend, it's not useful
-
-        SendText(message);
+        if ((*it) == extension)
+        {
+            it = m_extensions.erase(it);
+            break;
+        }
     }
 }
+
+

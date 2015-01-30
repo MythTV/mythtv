@@ -34,6 +34,8 @@ function onOpen(evt)
 {
     writeToScreen("> <span style='color: green;'>CONNECTED</span> <");
     writeToStatus("<span style='color: green;'>CONNECTED</span>");
+    doSend("WS_EVENT_ENABLE");
+    doSend("WS_EVENT_SET_FILTER ALL");
 }
 
 function onClose(evt)

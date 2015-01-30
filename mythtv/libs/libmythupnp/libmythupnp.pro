@@ -37,6 +37,8 @@ HEADERS += serializers/serializer.h     serializers/xmlSerializer.h
 HEADERS += serializers/jsonSerializer.h serializers/soapSerializer.h
 HEADERS += serializers/xmlplistSerializer.h
 
+HEADERS += websocket_extensions/*.h
+
 SOURCES += mmulticastsocketdevice.cpp
 SOURCES += msocketdevice.cpp
 unix:SOURCES += msocketdevice_unix.cpp
@@ -56,6 +58,8 @@ SOURCES += services/rtti.cpp
 SOURCES += serializers/serializer.cpp     serializers/xmlSerializer.cpp
 SOURCES += serializers/jsonSerializer.cpp 
 SOURCES += serializers/xmlplistSerializer.cpp
+
+SOURCES += websocket_extensions/*.cpp
 
 INCLUDEPATH += ../libmythbase ../libmythservicecontracts ..
 INCLUDEPATH += ./serializers
