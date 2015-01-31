@@ -8,13 +8,13 @@
 
 // C++ headers
 #include <vector>
-#include <map>
 using namespace std;
 
 // Qt headers
 #include <QWaitCondition>
 #include <QDateTime>
 #include <QMutex>
+#include <QHash>
 
 class ProgramInfoLoader;
 class ProgramInfo;
@@ -34,41 +34,26 @@ class ProgramInfoCache
     // All the following public methods must only be called from the UI Thread.
     void Refresh(void);
     void Add(const ProgramInfo&);
-    bool Remove(uint chanid, const QDateTime &recstartts);
+    bool Remove(uint recordingID);
     bool Update(const ProgramInfo&);
-    bool UpdateFileSize(uint chanid, const QDateTime &recstartts,
-                        uint64_t filesize);
-    QString GetRecGroup(uint chanid, const QDateTime &recstartts) const;
+    bool UpdateFileSize(uint recordingID, uint64_t filesize);
+    QString GetRecGroup(uint recordingID) const;
     void GetOrdered(vector<ProgramInfo*> &list, bool newest_first = false);
     /// \note This must only be called from the UI thread.
     bool empty(void) const { return m_cache.empty(); }
-    ProgramInfo *GetProgramInfo(uint chanid, const QDateTime &recstartts) const;
-    ProgramInfo *GetProgramInfo(const QString &piKey) const;
+    ProgramInfo *GetRecordingInfo(uint recordingID) const;
 
   private:
     void Load(const bool updateUI = true);
     void Clear(void);
 
   private:
-    class PICKey
-    {
-      public:
-        PICKey(uint c, const QDateTime &r) : chanid(c), recstartts(r) { }
-        uint      chanid;
-        QDateTime recstartts;
-    };
-
-    struct ltkey
-    {
-        bool operator()(const PICKey &a, const PICKey &b) const
-        {
-            if (a.recstartts == b.recstartts)
-                return a.chanid < b.chanid;
-            return (a.recstartts < b.recstartts);
-        }
-    };
-
-    typedef map<PICKey,ProgramInfo*,ltkey> Cache;
+    // NOTE: Hash would be faster for lookups and updates, but we need a sorted
+    // list for to rebuild the full list. Question is, which is done more?
+    // We could store a hash, but sort the vector in GetOrdered which might
+    // be a suitable compromise, fractionally slower initial load but faster
+    // scrolling and updates
+    typedef QHash<uint,ProgramInfo*> Cache;
 
     mutable QMutex          m_lock;
     Cache                   m_cache;

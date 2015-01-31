@@ -467,9 +467,8 @@ void StatusBox::customEvent(QEvent *event)
             // button 1 is "Delete Now"
             if ((buttonnum == 0) && rec->QueryIsDeleteCandidate())
             {
-                if (!RemoteDeleteRecording(
-                    rec->GetChanID(), rec->GetRecordingStartTime(),
-                    false, false))
+                if (!RemoteDeleteRecording(rec->GetRecordingID(),
+                                           false, false))
                 {
                     LOG(VB_GENERAL, LOG_ERR, QString("Failed to delete recording: %1").arg(rec->GetTitle()));
                     return;
@@ -480,8 +479,7 @@ void StatusBox::customEvent(QEvent *event)
             {
                 if ((rec)->GetRecordingGroup() == "Deleted")
                 {
-                    RemoteUndeleteRecording(
-                        rec->GetChanID(), rec->GetRecordingStartTime());
+                    RemoteUndeleteRecording(rec->GetRecordingID());
                 }
                 else
                 {

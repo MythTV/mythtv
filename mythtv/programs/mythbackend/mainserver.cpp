@@ -1096,7 +1096,7 @@ void MainServer::customEvent(QEvent *e)
             me->ExtraDataCount() >= 5)
         {
             bool ok = true;
-            QString pginfokey = me->ExtraData(0); // pginfo->MakeUniqueKey()
+            uint recordingID  = me->ExtraData(0).toUInt(); // pginfo->GetRecordingID()
             QString filename  = me->ExtraData(1); // outFileName
             QString msg       = me->ExtraData(2);
             QString datetime  = me->ExtraData(3);
@@ -1105,7 +1105,7 @@ void MainServer::customEvent(QEvent *e)
             {
                 LOG(VB_PLAYBACK, LOG_INFO, LOC +
                     QString("Preview Queued: '%1' '%2'")
-                        .arg(pginfokey).arg(filename));
+                        .arg(recordingID).arg(filename));
                 return;
             }
 
@@ -1116,7 +1116,7 @@ void MainServer::customEvent(QEvent *e)
             {
                 QByteArray data = file.readAll();
                 QStringList extra("OK");
-                extra.push_back(pginfokey);
+                extra.push_back(QString::number(recordingID));
                 extra.push_back(msg);
                 extra.push_back(datetime);
                 extra.push_back(QString::number(data.size()));

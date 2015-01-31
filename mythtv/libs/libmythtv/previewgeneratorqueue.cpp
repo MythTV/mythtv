@@ -158,11 +158,11 @@ bool PreviewGeneratorQueue::event(QEvent *e)
     else if (me->Message() == "PREVIEW_SUCCESS" ||
              me->Message() == "PREVIEW_FAILED")
     {
-        QString pginfokey = me->ExtraData(0); // pginfo->MakeUniqueKey()
-        QString filename  = me->ExtraData(1); // outFileName
-        QString msg       = me->ExtraData(2);
-        QString datetime  = me->ExtraData(3);
-        QString token     = me->ExtraData(4);
+        uint recordedingID = me->ExtraData(0).toUInt(); // pginfo->GetRecordingID()
+        QString filename   = me->ExtraData(1); // outFileName
+        QString msg        = me->ExtraData(2);
+        QString datetime   = me->ExtraData(3);
+        QString token      = me->ExtraData(4);
 
         {
             QMutexLocker locker(&m_lock);
@@ -200,7 +200,7 @@ bool PreviewGeneratorQueue::event(QEvent *e)
             }
 
             QStringList list;
-            list.push_back(pginfokey);
+            list.push_back(QString::number(recordedingID));
             list.push_back(filename);
             list.push_back(msg);
             list.push_back(datetime);
@@ -241,7 +241,7 @@ void PreviewGeneratorQueue::SendEvent(
     const QDateTime &dt)
 {
     QStringList list;
-    list.push_back(pginfo.MakeUniqueKey());
+    list.push_back(QString::number(pginfo.GetRecordingID()));
     list.push_back(fn);
     list.push_back(msg);
     list.push_back(dt.toUTC().toString(Qt::ISODate));

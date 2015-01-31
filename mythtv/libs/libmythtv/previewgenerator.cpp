@@ -184,7 +184,7 @@ bool PreviewGenerator::RunReal(void)
 
         QString message = (ok) ? "PREVIEW_SUCCESS" : "PREVIEW_FAILED";
         QStringList list;
-        list.push_back(m_programInfo.MakeUniqueKey());
+        list.push_back(QString::number(m_programInfo.GetRecordingID()));
         list.push_back(output_fn);
         list.push_back(msg);
         list.push_back(dt.isValid()?dt.toUTC().toString(Qt::ISODate):"");
@@ -328,7 +328,7 @@ bool PreviewGenerator::Run(void)
     if (m_listener)
     {
         QStringList list;
-        list.push_back(m_programInfo.MakeUniqueKey());
+        list.push_back(QString::number(m_programInfo.GetRecordingID()));
         list.push_back(output_fn);
         list.push_back(msg);
         list.push_back(dt.isValid()?dt.toUTC().toString(Qt::ISODate):"");

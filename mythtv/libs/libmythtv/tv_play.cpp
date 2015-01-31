@@ -461,8 +461,7 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags,
         if (deleterecording)
         {
             QStringList list;
-            list.push_back(QString::number(curProgram->GetChanID()));
-            list.push_back(curProgram->GetRecordingStartTime(MythDate::ISODate));
+            list.push_back(QString::number(curProgram->GetRecordingID()));
             list.push_back("0"); // do not force delete
             list.push_back(allowrerecord ? "1" : "0");
             MythEvent me("LOCAL_PBB_DELETE_RECORDINGS", list);
