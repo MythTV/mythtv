@@ -73,7 +73,11 @@ QString MasterGuideTable::toString(void) const
                        "      table_count(%2)\n")
                .arg(PSIPTable::toString())
                .arg(TableCount()));
-    for (uint i = 0; i < TableCount(); i++)
+
+    if (_ptrs.size() < TableCount())
+        LOG(VB_GENERAL, LOG_ERR, "MasterGuideTable::toString(): Table count mismatch");
+
+    for (uint i = 0; i < TableCount() && i < _ptrs.size(); i++)
     {
         str.append(QString("  Table #%1 ").arg(i, 2, 10));
         str.append(QString("pid(0x%1) ver(%2) ")
