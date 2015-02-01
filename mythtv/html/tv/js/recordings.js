@@ -100,7 +100,9 @@ var MythRecordings = new function() {
     this.RecordingAdded = function (recordedId)
     {
         console.log("Recording Added: " + recordedId);
-        // STUB
+        // Refresh the page, this isn't the ideal, but it's the easiest solution
+        // for now until we refactor a little
+        reloadTVContent();
     }
 
    /*!
