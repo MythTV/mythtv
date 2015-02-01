@@ -132,7 +132,10 @@ QString MasterGuideTable::toStringXML(uint indent_level) const
             .toStringXML(indent_level + 1) + "\n";
     }
 
-    for (uint i = 0; i < TableCount(); i++)
+    if (_ptrs.size() < TableCount())
+        LOG(VB_GENERAL, LOG_ERR, "MasterGuideTable::toStringXML(): Table count mismatch");
+
+    for (uint i = 0; i < TableCount() && i < _ptrs.size(); i++)
     {
         str += QString(
             "%1<Table pid=\"0x%2\" version=\"%3\""
