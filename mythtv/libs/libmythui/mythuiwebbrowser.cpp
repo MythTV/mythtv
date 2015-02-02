@@ -1160,7 +1160,7 @@ void MythUIWebBrowser::SetZoom(float zoom)
         return;
 
     if (zoom < 0.3)
-        zoom = 0.3;
+        zoom = 0.3f;
 
     if (zoom > 5.0)
         zoom = 5.0;
