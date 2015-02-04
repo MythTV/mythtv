@@ -83,6 +83,7 @@ class MythCoreContextPrivate : public QObject
     bool           m_WOLInProgress;
 
     bool m_backend;
+    bool m_frontend;
 
     MythDB *m_database;
 
@@ -122,6 +123,7 @@ MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
       m_serverSock(NULL), m_eventSock(NULL),
       m_WOLInProgress(false),
       m_backend(false),
+      m_frontend(false),
       m_database(GetMythDB()),
       m_UIThread(QThread::currentThread()),
       m_locale(NULL),
@@ -349,8 +351,9 @@ bool MythCoreContext::ConnectToMasterServer(bool blockingClient,
 
     if (!d->m_serverSock)
     {
+        QString type = IsFrontend() ? "Frontend" : (blockingClient ? "Playback" : "Monitor");
         QString ann = QString("ANN %1 %2 %3")
-            .arg(blockingClient ? "Playback" : "Monitor")
+            .arg(type)
             .arg(d->m_localHostname).arg(false);
         d->m_serverSock = ConnectCommandSocket(
             server, port, ann, &proto_mismatch);
@@ -589,7 +592,7 @@ bool MythCoreContext::IsBlockingClient(void) const
     return d->m_blockingClient;
 }
 
-void MythCoreContext::SetBackend(bool backend)
+void MythCoreContext::SetAsBackend(bool backend)
 {
     d->m_backend = backend;
 }
@@ -597,6 +600,16 @@ void MythCoreContext::SetBackend(bool backend)
 bool MythCoreContext::IsBackend(void) const
 {
     return d->m_backend;
+}
+
+bool MythCoreContext::SetAsFrontend(bool frontend)
+{
+    d->m_frontend = frontend;
+}
+
+bool MythCoreContext::IsFrontend(void) const
+{
+    return d->m_frontend;
 }
 
 bool MythCoreContext::IsMasterHost(void)

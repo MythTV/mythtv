@@ -47,6 +47,9 @@ class PlaybackSock : public ReferenceCounter
     bool getBlockShutdown(void) const { return blockshutdown; }
     void setBlockShutdown(bool value) { blockshutdown = value; }
 
+    bool IsFrontend(void) const { return m_frontend; }
+    void SetAsFrontend(void) { m_frontend = true; }
+
     // all backend<->backend stuff below here
     bool isSlaveBackend(void) const { return backend; }
     void setAsSlaveBackend(void) { backend = true; mediaserver = true; }
@@ -117,6 +120,7 @@ class PlaybackSock : public ReferenceCounter
     bool blockshutdown;
     bool backend;
     bool mediaserver;
+    bool m_frontend;
 
     QMutex sockLock;
 

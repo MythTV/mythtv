@@ -94,8 +94,10 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     QString GetFilePrefix(void);
 
     bool IsConnectedToMaster(void);
-    void SetBackend(bool backend);
+    void SetAsBackend(bool backend);
     bool IsBackend(void) const;        ///< is this process a backend process
+    bool SetAsFrontend(bool frontend);
+    bool IsFrontend(void) const;  ///< is this process a frontend process
     bool IsFrontendOnly(void);   ///< is there a frontend, but no backend,
                                  ///<  running on this host
     bool IsMasterHost(void);     ///< is this the same host as the master

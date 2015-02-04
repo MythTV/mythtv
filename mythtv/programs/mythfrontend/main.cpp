@@ -1683,6 +1683,7 @@ int main(int argc, char **argv)
         LOG(VB_GENERAL, LOG_ERR, "Failed to init MythContext, exiting.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
+    gCoreContext->SetAsFrontend(true);
 
     cmdline.ApplySettingsOverride();
 

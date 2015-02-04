@@ -140,11 +140,11 @@ int main(int argc, char **argv)
         cmdline.toBool("scanvideos")    || cmdline.toBool("clearcache") ||
         cmdline.toBool("printexpire")   || cmdline.toBool("setloglevel"))
     {
-        gCoreContext->SetBackend(false);
+        gCoreContext->SetAsBackend(false);
         return handle_command(cmdline);
     }
 
-    gCoreContext->SetBackend(true);
+    gCoreContext->SetAsBackend(true);
     retval = run_backend(cmdline);
     return retval;
 }

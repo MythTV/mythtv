@@ -1581,7 +1581,10 @@ void MainServer::HandleVersion(MythSocket *socket, const QStringList &slist)
 /**
  * \addtogroup myth_network_protocol
  * \par        ANN Playback \e host \e wantevents
- * Register \e host as a client, and prevent shutdown of the socket.
+ * Register \e host as a non-frontend client, and prevent shutdown of the socket.
+ *
+ * \par        ANN Frontend \e host \e wantevents
+ * Register \e host as a Frontend client, and allow shutdown of the socket when idle
  *
  * \par        ANN Monitor  \e host \e wantevents
  * Register \e host as a client, and allow shutdown of the socket
@@ -1628,7 +1631,8 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
     }
     sockListLock.unlock();
 
-    if (commands[1] == "Playback" || commands[1] == "Monitor")
+    if (commands[1] == "Playback" || commands[1] == "Monitor" ||
+        commands[1] == "Frontend")
     {
         if (commands.size() < 4)
         {
@@ -1652,26 +1656,31 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
                 .arg(commands[2]).arg(eventsMode));
         PlaybackSock *pbs = new PlaybackSock(this, socket, commands[2],
                                              eventsMode);
-        pbs->setBlockShutdown(commands[1] == "Playback");
+        pbs->setBlockShutdown((commands[1] == "Playback") ||
+                              (commands[1] == "Frontend"));
 
         sockListLock.lockForWrite();
         controlSocketList.remove(socket);
         playbackList.push_back(pbs);
         sockListLock.unlock();
 
-        Frontend *frontend = new Frontend();
-        frontend->name = commands[2];
-        // On a combined mbe/fe the frontend will connect using the localhost
-        // address, we need the external IP which happily will be the same as
-        // the backend's external IP
-        if (frontend->name == gCoreContext->GetMasterHostName())
-            frontend->ip = QHostAddress(gCoreContext->GetBackendServerIP());
-        else
-            frontend->ip = socket->GetPeerAddress();
-        if (gBackendContext)
-            gBackendContext->SetFrontendConnected(frontend);
-        else
-            delete frontend;
+        if (commands[1] == "Frontend")
+        {
+            pbs->SetAsFrontend();
+            Frontend *frontend = new Frontend();
+            frontend->name = commands[2];
+            // On a combined mbe/fe the frontend will connect using the localhost
+            // address, we need the external IP which happily will be the same as
+            // the backend's external IP
+            if (frontend->name == gCoreContext->GetMasterHostName())
+                frontend->ip = QHostAddress(gCoreContext->GetBackendServerIP());
+            else
+                frontend->ip = socket->GetPeerAddress();
+            if (gBackendContext)
+                gBackendContext->SetFrontendConnected(frontend);
+            else
+                delete frontend;
+        }
 
     }
     else if (commands[1] == "MediaServer")
@@ -7708,7 +7717,7 @@ void MainServer::connectionClosed(MythSocket *socket)
                     QString("SLAVE_DISCONNECTED HOSTNAME %1")
                             .arg(pbs->getHostname()));
             }
-            else if (ismaster)
+            else if (ismaster && pbs->IsFrontend())
             {
                 if (gBackendContext)
                     gBackendContext->SetFrontendDisconnected(pbs->getHostname());

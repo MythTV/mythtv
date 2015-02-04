@@ -224,7 +224,6 @@ int main(int argc, char **argv)
         LOG(VB_GENERAL, LOG_ERR, "Failed to init MythContext.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
-    gCoreContext->SetBackend(false); // TODO Required?
 
     int ret = preview_helper(
         cmdline.toUInt("chanid"), cmdline.toDateTime("starttime"),
