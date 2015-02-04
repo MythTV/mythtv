@@ -186,7 +186,7 @@ for (var listIdx = 0; listIdx < recRules.length; listIdx++)
 
 <% if (recRules.length > 0) {%>
 <script>
-    //loadJScroll();
+    loadJScroll();
 </script>
 <%}%>
 
