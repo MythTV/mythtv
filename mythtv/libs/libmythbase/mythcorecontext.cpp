@@ -602,7 +602,7 @@ bool MythCoreContext::IsBackend(void) const
     return d->m_backend;
 }
 
-bool MythCoreContext::SetAsFrontend(bool frontend)
+void MythCoreContext::SetAsFrontend(bool frontend)
 {
     d->m_frontend = frontend;
 }
