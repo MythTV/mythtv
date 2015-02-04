@@ -96,7 +96,7 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     bool IsConnectedToMaster(void);
     void SetAsBackend(bool backend);
     bool IsBackend(void) const;        ///< is this process a backend process
-    bool SetAsFrontend(bool frontend);
+    void SetAsFrontend(bool frontend);
     bool IsFrontend(void) const;  ///< is this process a frontend process
     bool IsFrontendOnly(void);   ///< is there a frontend, but no backend,
                                  ///<  running on this host
