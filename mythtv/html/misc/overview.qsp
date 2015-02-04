@@ -1,3 +1,9 @@
+<%
+"use strict";
+
+import "/js/utility.js"
+%>
+
 <html>
 <head>
 <title><i18n>MythTV System Overview</i18n></title>
@@ -17,6 +23,7 @@
 
     <div class="contentContainer" id="lasttencontent">
 <%
+
             var oDvr = new Dvr();
             var oMyth = new Myth();
             var list = oDvr.GetRecordedList( true, 0, 10, "", "", "" );
@@ -38,8 +45,10 @@
                 else
                     title = program.Title + " (" + program.SubTitle + ")";
 
+                title = escapeHTML(title);
+
                 var desc = formatStr('<i18n>%1<br>Recorded %2 at %3.</i18n>',
-                    program.Description, oMyth.GetFormatDate(program.StartTime),
+                    escapeHTML(program.Description), oMyth.GetFormatDate(program.StartTime),
                     oMyth.GetFormatTime(program.StartTime));
 %>
                 <img title="<%=title%>" alt="<%=desc%>" height="382" src="/Content/GetPreviewImage?RecordedId=<%=program.Recording.RecordedId%>&amp;Height=371&amp;Format=JPG"/>
@@ -68,18 +77,18 @@
                     case 1:
                         var recording = encoder.Recording;
                         statestring = formatStr('<i18n>Encoder %1 is currently watching "%2" on Live TV.</i18n>',
-                            encoder.Id, recording.Title);
+                            encoder.Id, escapeHTML(recording.Title));
                         break;
                     case 6:
                         var recording = encoder.Recording;
                         statestring = formatStr('<i18n>Encoder %1 is currently recording "%2."  This program is being viewed.</i18n>',
-                            encoder.Id, recording.Title);
+                            encoder.Id, escapeHTML(recording.Title));
                         break;
                     case 7:
                         var recording = encoder.Recording;
                         var endtime = oMyth.GetFormatTime(recording.EndTime);
                         statestring = formatStr('<i18n>Encoder %1 is currently recording "%2."  This recording will end at %3.</i18n>',
-                            encoder.Id, recording.Title, endtime);
+                            encoder.Id, escapeHTML(recording.Title), endtime);
                         break;
                     default:
                         statestring = formatStr('<i18n>Encoder %1 is currently idle.</i18n>',
