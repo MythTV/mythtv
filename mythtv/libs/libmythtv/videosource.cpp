@@ -2882,7 +2882,7 @@ void StartingChannel::SetSourceID(const QString &sourceid)
     if (channels.empty())
     {
         addSelection(tr("Please add channels to this source"),
-                     startChan.isEmpty() ? "" : startChan);
+                     startChan);
         return;
     }
 
