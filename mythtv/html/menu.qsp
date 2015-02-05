@@ -6,6 +6,7 @@
             <li><a class='menuitem' href='#' onClick="hideMainMenu();loadFrontendContent('/tv/guide.qsp')"><%=qsTr("Program Guide")%></a></li>
             <li><a class='menuitem' href='#' onClick="hideMainMenu();loadFrontendContent('/tv/recordings.qsp')"><%=qsTr("Recordings")%></a></li>
             <li><a class='menuitem' href='#' onClick="hideMainMenu();loadFrontendContent('/tv/upcoming.qsp')"><%=qsTr("Upcoming Recordings")%></a></li>
+            <li><a class='menuitem' href='#' onClick="hideMainMenu();loadFrontendContent('/tv/programsearch.qsp')"><%=qsTr("Program Search")%></a></li>
             <li><a class='menuitem' href='#' onClick="hideMainMenu();loadFrontendContent('/tv/recordingrules.qsp')"><%=qsTr("Recording Rules")%></a></li>
         </ul>
     </li>

@@ -4,6 +4,20 @@
     text-transform: capitalize;
 }
 
+form
+{
+    overflow: hidden;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+fieldset
+{
+    padding: 1em 1.4em;
+    border-width: 0px;
+}
+
 .programList
 {
     /* BEGIN HACK Most modern browsers support calc, but some like Opera 12 on

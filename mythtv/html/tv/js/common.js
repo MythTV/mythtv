@@ -586,7 +586,7 @@ function loadJScroll()
 
 function postLoad()
 {
-    //loadJScroll();
+    loadJScroll();
 }
 
 // CSS (Native) transitions are faster than jQuery and preferred generally
