@@ -29,6 +29,7 @@ PlaybackSock::PlaybackSock(
     ip = "";
     backend = false;
     mediaserver = false;
+    m_frontend = false;
 
     disconnected = false;
     blockshutdown = true;
