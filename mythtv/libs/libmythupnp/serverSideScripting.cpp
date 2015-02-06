@@ -287,8 +287,12 @@ bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &
         // ------------------------------------------------------------------
 
         QVariantMap serverVars;
+        //serverVars.insert("QUERY_STRING", QVariant())
+        serverVars.insert("REQUEST_METHOD", QVariant(pRequest->GetRequestType()));
+        serverVars.insert("SCRIPT_NAME", QVariant(sFileName));
         serverVars.insert("REMOTE_ADDR", QVariant(pRequest->GetPeerAddress()));
-        serverVars.insert("SERVER_ADDR", QVariant(pRequest->GetHostAddress()));
+        serverVars.insert("SERVER_NAME", QVariant(pRequest->GetHostName()));
+        serverVars.insert("SERVER_PORT", QVariant(pRequest->GetHostPort()));
         serverVars.insert("SERVER_PROTOCOL", QVariant(pRequest->GetRequestProtocol()));
         serverVars.insert("SERVER_SOFTWARE", QVariant(HttpServer::GetServerVersion()));
 

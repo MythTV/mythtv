@@ -54,6 +54,8 @@
 #define O_LARGEFILE 0
 #endif
 
+using namespace std;
+
 static MIMETypes g_MIMETypes[] =
 {
     // Image Mime Types
@@ -81,6 +83,7 @@ static MIMETypes g_MIMETypes[] =
     { "doc" , "application/vnd.ms-word"    },
     { "gz"  , "application/x-tar"          },
     { "js"  , "application/javascript"     },
+    { "m3u" , "application/x-mpegurl"      }, // HTTP Live Streaming
     { "m3u8", "application/x-mpegurl"      }, // HTTP Live Streaming
     { "ogx" , "application/ogg"            }, // http://wiki.xiph.org/index.php/MIME_Types_and_File_Extensions
     { "pdf" , "application/pdf"            },
@@ -105,6 +108,7 @@ static MIMETypes g_MIMETypes[] =
     // Video Mime Types
     { "3gp" , "video/3gpp"                 }, // Also audio/3gpp
     { "3g2" , "video/3gpp2"                }, // Also audio/3gpp2
+    { "asx" , "video/x-ms-asf"             },
     { "asf" , "video/x-ms-asf"             },
     { "avi" , "video/x-msvideo"            }, // Also video/avi
     { "m4v" , "video/mp4"                  },
@@ -1852,9 +1856,75 @@ bool HTTPRequest::Authenticated()
     return true;
 }
 
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 void HTTPRequest::SetResponseHeader(const QString& sKey, const QString& sValue)
 {
     m_mapRespHeaders[sKey] = sValue;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QString HTTPRequest::GetHostName()
+{
+    // TODO: This only deals with the HTTP 1.1 case, 1.0 should be rare but we
+    //       should probably still handle it
+
+    // RFC 3875 - The is the hostname or ip address in the client request, not
+    //            the name or ip we might otherwise know for this server
+    QString hostname = m_mapHeaders["host"];
+    if (!hostname.isEmpty())
+    {
+        // Strip the port
+        if (hostname.contains("]:")) // IPv6 port
+        {
+            return hostname.section("]:", 0 , 0);
+        }
+        else if (hostname.contains(":")) // IPv4 port
+        {
+            return hostname.section(":", 0 , 0);
+        }
+        else
+            return hostname;
+    }
+
+    return GetHostAddress();
+}
+
+
+QString HTTPRequest::GetRequestType( ) const
+{
+    QString type;
+    switch ( m_eType )
+    {
+        case RequestTypeGet :
+            type = "GET";
+            break;
+        case RequestTypeHead :
+            type = "HEAD";
+            break;
+        case RequestTypePost :
+            type = "POST";
+            break;
+        case RequestTypeMSearch:
+            type = "M-SEARCH";
+            break;
+        case RequestTypeSubscribe :
+            type = "SUBSCRIBE";
+            break;
+        case RequestTypeUnsubscribe :
+            type = "UNSUBSCRIBE";
+            break;
+        case RequestTypeNotify:
+            type = "NOTIFY";
+            break;
+    }
+
+    return type;
 }
 
 
@@ -1965,6 +2035,16 @@ QString BufferedSocketDeviceRequest::GetHostAddress()
 {
     return( m_pSocket->localAddress().toString() );
 }
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+quint16 BufferedSocketDeviceRequest::GetHostPort()
+{
+    return( m_pSocket->localPort() );
+}
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
