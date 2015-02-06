@@ -6614,7 +6614,6 @@ if enabled gxx; then
     check_cxxflags -Wno-switch
     check_cxxflags -Woverloaded-virtual
     check_cxxflags -funit-at-a-time
-    check_cxxflags -std=c++11
 elif enabled icpc; then
     # 177: function declared but never referenced (triggers on Q_OBJECT)
     # 192: icpc confused by Qt %0-%99 in strings
