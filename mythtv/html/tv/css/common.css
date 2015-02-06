@@ -225,6 +225,11 @@ BODY
     color: #990000;
 }
 
+.leftSlideInTransitionStart
+{
+    left: 100%;
+}
+
 .leftSlideOutTransition
 {
     transition-property: opacity;
@@ -242,6 +247,11 @@ BODY
     transition-duration: 500ms;
     transition-timing-function: ease;
     transform: translate3d(-100%, 0, 0);
+}
+
+.rightSlideInTransitionStart
+{
+    left: -100%;
 }
 
 .rightSlideInTransition

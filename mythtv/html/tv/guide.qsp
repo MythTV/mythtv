@@ -219,7 +219,7 @@ if (chanGroups.length)
 
 <div id="guide-container">
 
-<div id="guideGrid" class="guideGrid jscroll">
+<div id="guideGrid" class="guideGrid">
 <%} // End of the header %>
 
     <div class="pageLeft" onClick="MythGuide.MovePage('left');">

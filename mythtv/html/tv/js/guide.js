@@ -5,6 +5,8 @@
  */
 var MythGuide = new function() {
 
+    this.Loading = false;
+
     /*!
     * \fn Init
     * \public
@@ -59,6 +61,11 @@ var MythGuide = new function() {
     */
     this.MovePage = function (direction)
     {
+        if (this.Loading)
+            return;
+
+        this.Loading = true;
+
         var INTERVAL = 4; // 2 Hours, 30 Minute time periods
         var timeSelect = document.getElementById("guideStartTime");
         var timeIndex = timeSelect.selectedIndex;
@@ -112,6 +119,7 @@ var MythGuide = new function() {
             dateSelect.onchange();
         else
             timeSelect.onchange();
+        this.Loading = false;
     }
 
    /*!
@@ -132,7 +140,6 @@ var MythGuide = new function() {
         selectBox.setAttribute('data-oldIndex', selectBox.selectedIndex);
 
         var transition = (selectBox.selectedIndex > oldIndex) ? 'left' : 'right';
-        console.log("New " + selectBox.selectedIndex + " Old " + oldIndex + " Transition " + transition);
 
         submitForm(selectBox.form, 'guideGrid', transition);//     fixGuideHeight();
     }
@@ -155,7 +162,12 @@ var MythGuide = new function() {
     */
     var ReloadGuideContent = function()
     {
+        if (this.Loading)
+            return;
+
+        this.Loading = true;
         loadTVContent(window.location.href, "guideGrid", "dissolve", {"GuideOnly": "1"});
+        this.Loading = false;
     }
 
     /*!

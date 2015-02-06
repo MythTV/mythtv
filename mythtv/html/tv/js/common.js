@@ -484,7 +484,6 @@ function loadTVContent(url, targetDivID, transition, args)
      }).responseText;
 
     var newDiv = document.createElement('div');
-    newDiv.style = "left: 100%";
     newDiv.className = targetDiv.className;
     newDiv.innerHTML = html;
     targetDiv.parentNode.insertBefore(newDiv, null);
@@ -576,6 +575,9 @@ function scrollCallback()
 
 function loadJScroll()
 {
+    if (!document.querySelector(".jscroll"))
+        return;
+
     // Always have at least one window heights worth loaded off-screen
     $('.jscroll').jscroll({
     padding: $(window).height(),
@@ -595,16 +597,15 @@ function leftSlideTransition(oldDivID, newDivID)
     // Transition works much better with a fixed width, so temporarily set
     // the width based on the parent,
     $("#" + newDivID).css("width", $("#" + oldDivID).width());
-    // We want the new div to start off-screen to the right
-    $("#" + newDivID).css("left", "100%");
+    $("#" + newDivID).addClass("leftSlideInTransitionStart");
     $("#" + oldDivID).bind("transitionend", function() {
         $("#" + oldDivID).remove();
         postLoad();
 
     });
     $("#" + newDivID).bind("transitionend", function() {
+        $("#" + newDivID).removeClass("leftSlideInTransitionStart");
         $("#" + newDivID).removeClass("leftSlideInTransition");
-        $("#" + newDivID).css("left", 'auto');
         $("#" + newDivID).css("width", null);
     });
     $("#" + newDivID).addClass("leftSlideInTransition");
@@ -617,8 +618,6 @@ function rightSlideTransition(oldDivID, newDivID)
     // HACK Transition works much better with a fixed width, so temporarily set
     // the width based on the parent,
     $("#" + newDivID).css("width", $("#" + oldDivID).width());
-    // We want the new div to start off-screen to the left
-    //$("#" + newDivID).css("left", "-100%");
     $("#" + newDivID).addClass("rightSlideInTransitionStart");
     $("#" + oldDivID).bind("transitionend", function() {
         $("#" + oldDivID).remove();
@@ -628,7 +627,6 @@ function rightSlideTransition(oldDivID, newDivID)
     $("#" + newDivID).bind("transitionend", function() {
         $("#" + newDivID).removeClass("rightSlideInTransitionStart");
         $("#" + newDivID).removeClass("rightSlideInTransition");
-        //$("#" + newDivID).css("left", 'auto');
         $("#" + newDivID).css("width", null);
     });
     $("#" + newDivID).addClass("rightSlideInTransition");
