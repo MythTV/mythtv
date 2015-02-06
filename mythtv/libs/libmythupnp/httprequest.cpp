@@ -225,28 +225,26 @@ QString HTTPRequest::BuildResponseHeader( long long nSize )
     //-----------------------------------------------------------------------
     // Headers describing the connection
     //-----------------------------------------------------------------------
-    sHeader = QString( "%1 %2\r\n"
-                       "Date: %3\r\n"
-                       "Server: %4\r\n" )
-        .arg(GetResponseProtocol()).arg(GetResponseStatus())
-        .arg(MythDate::current().toString("d MMM yyyy hh:mm:ss"))
-        .arg(HttpServer::GetServerVersion());
 
-    sHeader += QString( "Connection: %1\r\n" )
-                        .arg( m_bKeepAlive ? "Keep-Alive" : "Close" );
+    // The protocol string
+    sHeader = QString( "%1 %2\r\n" ).arg(GetResponseProtocol())
+                                    .arg(GetResponseStatus());
+
+    SetResponseHeader("Date", MythDate::current().toString("d MMM yyyy hh:mm:ss"));
+    SetResponseHeader("Server", HttpServer::GetServerVersion());
+
+    SetResponseHeader("Connection", m_bKeepAlive ? "Keep-Alive" : "Close" );
     if (m_bKeepAlive)
     {
         if (m_nKeepAliveTimeout == 0) // Value wasn't passed in by the server, so go with the configured value
             m_nKeepAliveTimeout = gCoreContext->GetNumSetting("HTTP/KeepAliveTimeoutSecs", 10);
-        sHeader += QString( "Keep-Alive: timeout=%1\r\n" ).arg(m_nKeepAliveTimeout);
+        SetResponseHeader("Keep-Alive", QString("timeout=%1").arg(m_nKeepAliveTimeout));
     }
-
-    sHeader += GetAdditionalHeaders();
 
     //-----------------------------------------------------------------------
     // Headers describing the content
     //-----------------------------------------------------------------------
-    sHeader += QString( "Content-Type: %1\r\n" ).arg( sContentType );
+    SetResponseHeader("Content-Type", sContentType);
 
     // Default to 'inline' but we should support 'attachment' when it would
     // be appropriate i.e. not when streaming a file to a upnp player or browser
@@ -254,10 +252,10 @@ QString HTTPRequest::BuildResponseHeader( long long nSize )
     if (!m_sFileName.isEmpty())
     {
         QString filename = QFileInfo(m_sFileName).fileName(); // Strip any path
-        sHeader += QString( "Content-Disposition: inline; filename=\"%2\"\r\n" ).arg( filename );
+        SetResponseHeader("Content-Disposition", QString("inline; filename=\"%2\"").arg(filename));
     }
 
-    sHeader += QString( "Content-Length: %3\r\n" ).arg( nSize );
+    SetResponseHeader("Content-Length", QString::number(nSize));
 
     // See DLNA  7.4.1.3.11.4.3 Tolerance to unavailable contentFeatures.dlna.org header
     //
@@ -287,30 +285,29 @@ QString HTTPRequest::BuildResponseHeader( long long nSize )
     }
 
     if (sTransferMode == "Streaming")
-        sHeader += "transferMode.dlna.org: Streaming\r\n";
+        SetResponseHeader("transferMode.dlna.org", "Streaming");
     else if (sTransferMode == "Background")
-        sHeader += "transferMode.dlna.org: Background\r\n";
+        SetResponseHeader("transferMode.dlna.org", "Background");
     else if (sTransferMode == "Interactive")
-        sHeader += "transferMode.dlna.org: Interactive\r\n";
+        SetResponseHeader("transferMode.dlna.org", "Interactive");
 
     // HACK Temporary hack for Samsung TVs - Needs to be moved later as it's not entirely DLNA compliant
     if (!GetRequestHeader( "getcontentFeatures.dlna.org", "" ).isEmpty())
-        sHeader += "contentFeatures.dlna.org: DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=01500000000000000000000000000000\r\n";
+        SetResponseHeader("contentFeatures.dlna.org", "DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=01500000000000000000000000000000");
 
     // ----------------------------------------------------------------------
 
     if (getenv("HTTPREQUEST_DEBUG"))
     {
         // Dump response header
-        QStringList respHeaders = sHeader.split("\r\n");
-        for ( QStringList::iterator it  = respHeaders.begin();
-                                    it != respHeaders.end();
-                                  ++it )
+        QMap<QString, QString>::iterator it;
+        for ( it = m_mapRespHeaders.begin(); it != m_mapRespHeaders.end(); ++it )
         {
-            LOG(VB_HTTP, LOG_INFO, QString("(Response Header) %1").arg(*it));
+            LOG(VB_HTTP, LOG_INFO, QString("(Response Header) %1: %2").arg(it.key()).arg(it.value()));
         }
     }
 
+    sHeader += GetResponseHeaders();
     sHeader += "\r\n";
 
     return sHeader;
@@ -1191,7 +1188,7 @@ QString HTTPRequest::GetRequestHeader( const QString &sKey, QString sDefault )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QString HTTPRequest::GetAdditionalHeaders( void )
+QString HTTPRequest::GetResponseHeaders( void )
 {
     QString sHeader = m_szServerHeaders;
 
@@ -1860,8 +1857,12 @@ bool HTTPRequest::Authenticated()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void HTTPRequest::SetResponseHeader(const QString& sKey, const QString& sValue)
+void HTTPRequest::SetResponseHeader(const QString& sKey, const QString& sValue,
+                                    bool replace)
 {
+    if (!replace && m_mapRespHeaders.contains(sKey))
+        return;
+
     m_mapRespHeaders[sKey] = sValue;
 }
 

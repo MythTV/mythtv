@@ -156,7 +156,7 @@ class UPNP_PUBLIC HTTPRequest
 
         QString         GetResponseStatus   ( void );
         QString         GetResponseType     ( void );
-        QString         GetAdditionalHeaders( void );
+        QString         GetResponseHeaders  ( void );
 
         bool            ParseRange          ( QString sRange, 
                                               long long   llSize, 
@@ -193,7 +193,8 @@ class UPNP_PUBLIC HTTPRequest
         qint64          SendResponseFile( QString sFileName );
 
         void            SetResponseHeader ( const QString &sKey,
-                                            const QString &sValue );
+                                            const QString &sValue,
+                                            bool replace = false );
 
         QString         GetRequestHeader  ( const QString &sKey, QString sDefault );
 

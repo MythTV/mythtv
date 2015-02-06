@@ -14,6 +14,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QVariant>
+#include <QVariantMap>
 
 #include "serverSideScripting.h"
 #include "mythlogging.h"
@@ -330,6 +331,9 @@ bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &
                                             m_engine.toScriptValue(params));
         m_engine.globalObject().setProperty("RequestHeaders",
                                             m_engine.toScriptValue(requestHeaders));
+        QVariantMap respHeaderMap;
+        m_engine.globalObject().setProperty("ResponseHeaders",
+                                            m_engine.toScriptValue(respHeaderMap));
         m_engine.globalObject().setProperty("Server",
                                             m_engine.toScriptValue(serverVars));
 
@@ -378,6 +382,16 @@ bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &
 
         Unlock();
         return false;
+    }
+
+    // Apply any custom headers defined by the script
+    QVariantMap responseHeaders;
+    responseHeaders = m_engine.fromScriptValue< QVariantMap >
+                        (m_engine.globalObject().property("ResponseHeaders"));
+    QVariantMap::iterator it;
+    for (it = responseHeaders.begin(); it != responseHeaders.end(); ++it)
+    {
+        pRequest->SetResponseHeader(it.key(), it.value().toString(), true);
     }
 
     return true;
