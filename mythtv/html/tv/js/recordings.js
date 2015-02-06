@@ -148,6 +148,20 @@ var MythRecordings = new function() {
         $.ajax({ url: surl, type: 'POST' });
     }
 
+   /*!
+    * \fn GetStream
+    * \param int The ID of the recording
+    * \param string The stream (playlist) type
+    * \public
+    *
+    * Download a playlist file describing a url to this recording for playback
+    * in a third party client which understands such playlists
+    */
+    this.GetStream = function (recordedId, type)
+    {
+        window.location.href = "/tv/stream.qsp?MediaType=recording&MediaID=" + recordedId + "&PlaylistFormat=" + type;
+    }
+
     /*!
      * \var wsClient
      * \private

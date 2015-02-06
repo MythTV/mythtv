@@ -112,19 +112,3 @@ function toQueryString(obj)
   return str.join("&amp;");
 }
 
-function formatStr()
-{
-    if (arguments.length == 0)
-        return "";
-
-    if (arguments.length == 1)
-        return arguments[0];
-
-    var result = arguments[0];
-    for (var i = 1; i < arguments.length; i++) {
-        var regexp = '%' + i.toString();
-        result = result.replace(regexp, arguments[i]);
-    }
-    return result;
-}
-

@@ -1,0 +1,79 @@
+<%
+"use strict";
+
+import "/js/utility.js"
+import "/tv/js/constants.js"
+import "/tv/js/tvutil.qjs"
+
+    var playlistFormat = "";
+    if (getArg("PlaylistFormat"))
+        playlistFormat = getArg("PlaylistFormat");
+
+    var mediaType = "";
+    if (getArg("MediaType"))
+        mediaType = getArg("MediaType");
+
+    var mediaID = "";
+    if (getArg("MediaID"))
+        mediaID = getArg("MediaID");
+
+    var url = "";
+    var title = "";
+    var duration = "";
+    switch (mediaType)
+    {
+        case "recording":
+            var dvr = new Dvr();
+            var program = dvr.GetRecorded(mediaID);
+            title = program.Title;
+            duration = (program.Recording.EndTs - program.Recording.StartTs) / 1000;
+            url = formatStr("http://%1:%2/Content/GetRecording?RecordedId=%3", Server.SERVER_NAME, Server.SERVER_PORT, mediaID);
+            break;
+        case "video":
+            var video = new Video();
+            var videoMetadata = video.GetVideo(mediaID);
+            title = videoMetadata.Title;
+            duration = videoMetadata.Length;
+            url = "/Content/GetVideo?Id=" + mediaID;
+            break;
+        case "music":
+            var music = new Music();
+            var musicMetadata = music.GetTrack(mediaID);
+            title = musicMetadata.Artist + " - " + musicMetadata.Title;
+            url = "/Content/GetMusic?Id=" + mediaID;
+            break;
+    }
+
+    switch (playlistFormat)
+    {
+        case "m3u": // ASCII - Technically we cannot do ASCII, so fallthrough for now
+        case "m3u8": // UTF-8
+            this.ResponseHeaders["Content-Type"] = "application/x-mpegurl";
+            this.ResponseHeaders["Content-Disposition"] = formatStr("attachment; filename=%1.m3u8", mediaID);
+%>
+#EXTM3U
+
+#EXTINF:<%=duration%>, <%=title%>
+<%=url%>
+
+<%
+            break;
+        case "asx":
+            this.ResponseHeaders["Content-Type"] = "video/x-ms-asf";
+            this.ResponseHeaders["Content-Disposition"] = formatStr("attachment; filename=%1.asx", mediaID);
+            var durationStr = formatStr("%1:%2:%3", Math.floor(duration/3600), Math.floor(duration/60 % 60), duration % 60);
+%>
+<ASX VERSION="3.0">
+  <TITLE><%=title%></TITLE>
+
+  <ENTRY>
+    <TITLE><%=title%></TITLE>
+    <REF HREF="<%=url%>" />
+    <DURATION VALUE="<%=durationStr%>" />
+  </ENTRY>
+
+</ASX>
+<%
+            break;
+    }
+%>
