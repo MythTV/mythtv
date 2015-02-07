@@ -141,6 +141,18 @@ BODY
     display: none;
 }
 
+.contextMenu .button A
+{
+    color: #FFFFFF;
+    text-decoration: none;
+}
+
+.contextMenu .button A:visited
+{
+    color: #FFFFFF;
+    text-decoration: none;
+}
+
 .contextMenu .button:hover
 {
     background-color: #003147;

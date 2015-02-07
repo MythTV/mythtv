@@ -117,11 +117,10 @@ import "/tv/js/tvutil.qjs"
         <%=qsTr("Play on Frontend")%> <%=frontendList[nIdx].Name%>
     </div>
 <%  } %>
-    <div class="button playMenu" onClick="MythRecordings.GetStream(gRecordedId, 'm3u8')">
-        <%=qsTr("M3U8 Stream")%>
-    </div>
-    <div class="button playMenu" onClick="MythRecordings.GetStream(gRecordedId, 'asx')">
-        <%=qsTr("ASX Stream")%>
+    <div class="button playMenu">
+        <a href="#" onClick="MythRecordings.GetStream(gRecordedId, 'xspf')"><%=qsTr("XSPF")%></a> /
+        <a href="#" onClick="MythRecordings.GetStream(gRecordedId, 'm3u8')"><%=qsTr("M3U8")%></a> /
+        <a href="#" onClick="MythRecordings.GetStream(gRecordedId, 'asx')"><%=qsTr("ASX")%></a>
     </div>
 </div>
 
