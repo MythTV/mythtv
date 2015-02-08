@@ -61,16 +61,7 @@ extern "C" {
 #endif
 
 // QJson
-#ifdef _MSC_VER    
-    // This is needed to avoid creating a reparse point which git on windows doesn't like
-    #include "QJson/src/QObjectHelper"
-    #include "QJson/src/Serializer"
-    #include "QJson/src/Parser"
-#else
-    #include "QJson/QObjectHelper"
-    #include "QJson/Serializer"
-    #include "QJson/Parser"
-#endif
+#include "qjsonwrapper/Json.h"
 
 static QMutex                  logQueueMutex;
 static QQueue<LoggingItem *>   logQueue;
@@ -189,9 +180,8 @@ LoggingItem::~LoggingItem()
 
 QByteArray LoggingItem::toByteArray(void)
 {
-    QVariantMap variant = QJson::QObjectHelper::qobject2qvariant(this);
-    QJson::Serializer serializer;
-    QByteArray json = serializer.serialize(variant);
+    QVariantMap variant = QJsonWrapper::qobject2qvariant(this);
+    QByteArray json = QJsonWrapper::toJson(variant);
 
     //cout << json.constData() << endl;
 
@@ -747,11 +737,10 @@ LoggingItem *LoggingItem::create(const char *_file,
 LoggingItem *LoggingItem::create(QByteArray &buf)
 {
     // Deserialize buffer
-    QJson::Parser parser;
-    QVariant variant = parser.parse(buf);
+    QVariant variant = QJsonWrapper::parseJson(buf);
 
     LoggingItem *item = new LoggingItem;
-    QJson::QObjectHelper::qvariant2qobject(variant.toMap(), item);
+    QJsonWrapper::qvariant2qobject(variant.toMap(), item);
 
     return item;
 }
