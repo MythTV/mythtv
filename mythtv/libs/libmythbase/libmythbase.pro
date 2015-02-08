@@ -31,7 +31,7 @@ HEADERS += mythplugin.h mythpluginapi.h housekeeper.h
 HEADERS += ffmpeg-mmx.h
 HEADERS += mythsystemlegacy.h mythtypes.h
 HEADERS += threadedfilewriter.h mythsingledownload.h codecutil.h
-HEADERS += ../../external/qjsonwrapper/qjsonwrapper/QJson.h
+HEADERS += ../../external/qjsonwrapper/qjsonwrapper/Json.h
 
 SOURCES += mthread.cpp mthreadpool.cpp
 SOURCES += mythsocket.cpp
