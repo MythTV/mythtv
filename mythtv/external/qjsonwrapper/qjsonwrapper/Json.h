@@ -64,10 +64,9 @@ namespace QJsonWrapper
      * QVariantMap in your code than passing them here.
      *
      * @param variant The data to be serialised.
-     * @param ok Set to true if the conversion was successful, otherwise false.
      * @return After a successful serialisation the data of the QVariant represented as JSON.
      */
-    QByteArray toJson( const QVariant &variant, bool* ok = 0 );
+    QByteArray toJson ( const QVariant &variant );
 }
 
 #endif // QJSONWRAPPER_JSON_H

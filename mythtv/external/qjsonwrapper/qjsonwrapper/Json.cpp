@@ -115,7 +115,7 @@ parseJson( const QByteArray& jsonData, bool* ok )
 
 
 QByteArray
-toJson( const QVariant &variant, bool* ok )
+toJson( const QVariant &variant )
 {
 #if QT_VERSION >= QT_VERSION_CHECK( 5, 0, 0 )
     QVariant _variant = variant;
@@ -134,14 +134,10 @@ toJson( const QVariant &variant, bool* ok )
     }
 
     QJsonDocument doc = QJsonDocument::fromVariant( _variant );
-    if ( ok != NULL )
-    {
-        *ok = !doc.isNull();
-    }
     return doc.toJson();
 #else
     QJson::Serializer serializer;
-    return serializer.serialize( variant, ok );
+    return serializer.serialize( variant );
 #endif
 }
 
