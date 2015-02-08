@@ -90,7 +90,7 @@ import "/tv/js/tvutil.qjs"
                 asxTitle = title;
 %>
 <ASX VERSION="3.0">
-  <PARAM  NAME="Encoding"  VALUE="utf-8">
+  <PARAM NAME="Encoding" VALUE="utf-8" />
   <TITLE><%=playlistTitle%></TITLE>
 
   <ENTRY>
