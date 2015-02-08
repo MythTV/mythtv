@@ -87,6 +87,8 @@ inc2.files = $${inc.files}
 
 INSTALLS += inc inc2
 
+INCLUDEPATH += ../../external/qjsonwrapper/
+
 DEFINES += RUNPREFIX=\\\"$${RUNPREFIX}\\\"
 DEFINES += LIBDIRNAME=\\\"$${LIBDIRNAME}\\\"
 DEFINES += MBASE_API
