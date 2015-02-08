@@ -4865,6 +4865,20 @@ bool TV::ActivePostQHandleAction(PlayerContext *ctx, const QStringList &actions)
             ctx->player->GoToMenu("root");
         ctx->UnlockDeletePlayer(__FILE__, __LINE__);
     }
+    else if (has_action(ACTION_JUMPTODVDCHAPTERMENU, actions) && isdisc)
+    {
+        ctx->LockDeletePlayer(__FILE__, __LINE__);
+        if (ctx->player)
+            ctx->player->GoToMenu("chapter");
+        ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+    }
+    else if (has_action(ACTION_JUMPTODVDTITLEMENU, actions) && isdisc)
+    {
+        ctx->LockDeletePlayer(__FILE__, __LINE__);
+        if (ctx->player)
+            ctx->player->GoToMenu("title");
+        ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+    }
     else if (has_action(ACTION_JUMPTOPOPUPMENU, actions) && isdisc)
     {
         ctx->LockDeletePlayer(__FILE__, __LINE__);
