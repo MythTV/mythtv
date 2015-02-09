@@ -6265,9 +6265,8 @@ fi
 enabled dvb && check_cc -I"$dvb_path" <<EOF && enable fe_can_2g_modulation
 #include <linux/dvb/frontend.h>
 int main(void) {
-    #ifndef FE_CAN_2G_MODULATION
-        #error FE_CAN_2G_MODULATION not supported
-    #endif
+    if (FE_CAN_2G_MODULATION)
+        return 1;
     return 0;
 }
 EOF
