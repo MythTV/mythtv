@@ -429,10 +429,11 @@ QString CardUtil::ProbeDVBType(const QString &device)
     close(fd_frontend);
 
     DTVTunerType type(info.type);
-    LOG(VB_RECORD, LOG_INFO, "FE_CAN_2G_MODULATION");
+#if HAVE_FE_CAN_2G_MODULATION
     if (type == DTVTunerType::kTunerTypeDVBS1 &&
         (info.caps & FE_CAN_2G_MODULATION))
         type = DTVTunerType::kTunerTypeDVBS2;
+#endif // HAVE_FE_CAN_2G_MODULATION
     ret = (type.toString() != "UNKNOWN") ? type.toString().toUpper() : ret;
 #endif // USING_DVB
 

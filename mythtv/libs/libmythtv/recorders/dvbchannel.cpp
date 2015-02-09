@@ -254,12 +254,11 @@ bool DVBChannel::Open(DVBChannel *who)
 
     frontend_name       = info.name;
     tunerType           = info.type;
+#if HAVE_FE_CAN_2G_MODULATION
     if (tunerType == DTVTunerType::kTunerTypeDVBS1 &&
         (info.caps & FE_CAN_2G_MODULATION))
-    {
         tunerType = DTVTunerType::kTunerTypeDVBS2;
-        LOG(VB_RECORD, LOG_INFO, "FE_CAN_2G_MODULATION");
-    }
+#endif // HAVE_FE_CAN_2G_MODULATION
     capabilities        = info.caps;
     frequency_minimum   = info.frequency_min;
     frequency_maximum   = info.frequency_max;
@@ -267,8 +266,8 @@ bool DVBChannel::Open(DVBChannel *who)
     symbol_rate_maximum = info.symbol_rate_max;
 
     LOG(VB_RECORD, LOG_INFO, LOC +
-        QString("Using DVB card %1, with frontend '%2' of type %3.")
-            .arg(device).arg(frontend_name).arg(tunerType.toString()));
+        QString("Using DVB card %1, with frontend '%2'.")
+            .arg(device).arg(frontend_name));
 
     // Turn on the power to the LNB
     if (tunerType.IsDiSEqCSupported())
@@ -496,7 +495,9 @@ bool DVBChannel::CheckModulation(DTVModulation modulation) const
 
     return
         ((DTVModulation::kModulationQPSK    == m) && (c & FE_CAN_QPSK))     ||
+#if HAVE_FE_CAN_2G_MODULATION
         ((DTVModulation::kModulation8PSK    == m) && (c & FE_CAN_2G_MODULATION)) ||
+#endif //HAVE_FE_CAN_2G_MODULATION
         ((DTVModulation::kModulationQAM16   == m) && (c & FE_CAN_QAM_16))   ||
         ((DTVModulation::kModulationQAM32   == m) && (c & FE_CAN_QAM_32))   ||
         ((DTVModulation::kModulationQAM64   == m) && (c & FE_CAN_QAM_64))   ||
