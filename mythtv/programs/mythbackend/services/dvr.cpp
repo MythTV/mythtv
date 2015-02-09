@@ -1196,12 +1196,20 @@ QString Dvr::RecStatusToDescription(int RecStatus, int recType,
 
 QString Dvr::RecTypeToString(QString recType)
 {
+    bool ok;
+    RecordingType enumType = static_cast<RecordingType>(recType.toInt(&ok, 10));
+    if (ok)
+        return toString(enumType);
     // RecordingType type = static_cast<RecordingType>(recType);
     return toString(recTypeFromString(recType));
 }
 
 QString Dvr::RecTypeToDescription(QString recType)
 {
+    bool ok;
+    RecordingType enumType = static_cast<RecordingType>(recType.toInt(&ok, 10));
+    if (ok)
+        return toDescription(enumType);
     // RecordingType type = static_cast<RecordingType>(recType);
     return toDescription(recTypeFromString(recType));
 }
