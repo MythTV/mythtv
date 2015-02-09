@@ -45,6 +45,11 @@ function toCapitalCase(str)
 
 function escapeHTML(str)
 {
+    return escapeXML(str);
+}
+
+function escapeXML(str)
+{
     str = str.replace(/&/g, "&amp;")
                 .replace(/'/g, "&apos;")
                 .replace(/"/g, "&quot;")
