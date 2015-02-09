@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <title>WebSocket Test</title>
 
-<script language="javascript" type="text/javascript">
+<script type="text/javascript" nonce="<%=CSP_NONCE%>">
 var wsUri = "ws://" + document.domain + ":6545/";
 var messageWindow;
 var websocket;
@@ -82,7 +82,7 @@ function writeToScreen(message)
 
 window.addEventListener("load", init, false);
 </script>
-<style type="text/css">
+<style type="text/css" nonce="<%=CSP_NONCE%>">
 
 BODY
 {

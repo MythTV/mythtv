@@ -3,7 +3,7 @@
 <title><i18n>Sample Storage Group browser</i18n></title>
 </head>
 <body>
-<script language="JavaScript" type="text/javascript">
+<script type="text/javascript" nonce="<%=CSP_NONCE%>">
 
 function loadScript(url, callback){
 

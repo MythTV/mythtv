@@ -225,7 +225,7 @@ for (var listIdx = 0; listIdx < programs.length; listIdx++)
 </div> <!-- End upcomingList-container -->
 
 <% if (programs.length > 0) {%>
-<script>
+<script type="text/javascript" nonce="<%=CSP_NONCE%>">
     loadJScroll();
 </script>
 <%}%>

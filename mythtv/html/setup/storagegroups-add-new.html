@@ -7,7 +7,7 @@
 <input type='button' onClick='javascript:addNewStorageGroup()' value='Add Group' />
 <input type='button' onClick='javascript:cancelNewStorageGroup()' value='Cancel' />
 
-<script language="JavaScript" type="text/javascript">
+<script type="text/javascript" nonce="<%=CSP_NONCE%>">
     $("#sgNewHostCell").html("<select id='sgNewHost'>"
         + getHostsOptionList() + "</select>");
     setSettingInputValues("wizard-database");

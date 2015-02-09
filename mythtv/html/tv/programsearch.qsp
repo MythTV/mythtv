@@ -401,7 +401,7 @@ if (nextStartIndex > 0)
 </div> <!-- End programList -->
 </div> <!-- End programList-container -->
 
-<script>
+<script type="text/javascript" nonce="<%=CSP_NONCE%>">
     function disableFieldset( event, ui )
     {
         if (isValidObject(ui.panel))
@@ -422,7 +422,7 @@ if (nextStartIndex > 0)
 </script>
 
 <% if (programs.length > 0) {%>
-<script>
+<script type="text/javascript" nonce="<%=CSP_NONCE%>">
     loadJScroll();
 </script>
 <%}%>
@@ -430,7 +430,7 @@ if (nextStartIndex > 0)
 <%
     var pageLoadEndTime = new Date();
 %>
-<script>
+<script type="text/javascript" nonce="<%=CSP_NONCE%>">
     console.log("Page Load Time: <%=pageLoadEndTime.getTime() - pageLoadStartTime.getTime()%>ms, Program Load Time: <%=progLoadTimeEnd.getTime() - progLoadTimeStart.getTime()%>ms");
 </script>
 

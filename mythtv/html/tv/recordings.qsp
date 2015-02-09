@@ -280,7 +280,7 @@ for (var progIdx = 0; progIdx < programs.length; progIdx++)
 </div> <!-- End recordingList -->
 </div> <!-- End recordingList-container -->
 
-<script>
+<script type="text/javascript" nonce="<%=CSP_NONCE%>">
     loadJScroll();
 </script>
 

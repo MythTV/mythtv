@@ -20,6 +20,7 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QTextStream>
+#include <QUuid>
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -105,6 +106,14 @@ bool HtmlServerExtension::ProcessRequest( HTTPRequest *pRequest )
                         sResName = oInfo.symLinkTarget();
 
                     // ------------------------------------------------------
+                    // CSP Nonce
+                    // ------------------------------------------------------
+                    QByteArray cspNonce = QUuid::createUuid().toByteArray().toBase64();
+                    cspNonce = cspNonce.mid(1, cspNonce.length() - 2); // UUID, with braces removed
+                    QScriptValue qsFormatStr = m_Scripting.m_engine.newVariant(cspNonce);
+                    m_Scripting.m_engine.globalObject().setProperty("CSP_NONCE", qsFormatStr);
+
+                    // ------------------------------------------------------
                     // Is this a Qt Server Page (File contains script)...
                     // ------------------------------------------------------
 
@@ -126,18 +135,6 @@ bool HtmlServerExtension::ProcessRequest( HTTPRequest *pRequest )
                               sSuffix != "svgz") // svgz are pre-compressed
                         pRequest->m_eResponseType = ResponseTypeSVG;
 
-                    if ((sSuffix == "qsp") ||
-                        (sSuffix == "qxml") ||
-                        (sSuffix == "qjs" )) 
-                    {
-                        QTextStream stream( &pRequest->m_response );
-                        
-                        m_Scripting.EvaluatePage( &stream, sResName, pRequest);
-
-                        return true;
-
-                    }
-
                     // ----------------------------------------------------------------------
                     // Force IE into 'standards' mode
                     // ----------------------------------------------------------------------
@@ -151,22 +148,44 @@ bool HtmlServerExtension::ProcessRequest( HTTPRequest *pRequest )
                     // should work on an isolated network with no internet
                     // access. Keep all content hosted locally!
                     // ---------------------------------------------------------
+
+                    // For now the following are disabled as we use xhr to trigger playback on frontends
+                    // if we switch to triggering that through an internal request then these would be better
+                    // enabled
+                    //"default-src 'self'; "
+                    //"connect-src 'self' https://services.mythtv.org; "
+
+                    // FIXME: unsafe-inline should be phased out, replaced by nonce-{csp_nonce} but it requires
+                    //        all inline event handlers and style attributes to be removed ...
+                    QString cspPolicy = "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://services.mythtv.org; " // QString('nonce-%1').arg(QString(cspNonce))
+                                        "style-src 'self' 'unsafe-inline'; "
+                                        "frame-src 'self'; "
+                                        "object-src 'self'; " // TODO: When we no longer require flash for some browsers, change this to 'none'
+                                        "media-src 'self'; "
+                                        "font-src 'self'; "
+                                        "img-src 'self'; "
+                                        "form-action 'self'; "
+                                        "frame-ancestors 'self'; "
+                                        "reflected-xss filter;";
+
+                    // For standards compliant browsers
                     pRequest->SetResponseHeader("Content-Security-Policy",
-                                                // For now the following are disabled as we use xhr to trigger playback on frontends
-                                                // if we switch to triggering that through an internal request then these would be better
-                                                // enabled
-                                                //"default-src 'self'; "
-                                                //"connect-src 'self' https://services.mythtv.org; "
-                                                "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://services.mythtv.org; " // FIXME: unsafe-inline should be phased out, replaced by nonce-{csp_nonce}
-                                                "style-src 'self' 'unsafe-inline'; "
-                                                "frame-src 'self'; "
-                                                "object-src 'self'; " // TODO: When we no longer require flash for some browsers, change this to 'none'
-                                                "media-src 'self'; "
-                                                "font-src 'self'; "
-                                                "img-src 'self'; "
-                                                "form-action 'self'; "
-                                                "frame-ancestors 'self'; "
-                                                "reflected-xss filter;");
+                                                cspPolicy);
+                    // For Internet Explorer
+                    pRequest->SetResponseHeader("X-Content-Security-Policy",
+                                                cspPolicy);
+
+                    if ((sSuffix == "qsp") ||
+                        (sSuffix == "qxml") ||
+                        (sSuffix == "qjs" )) 
+                    {
+                        QTextStream stream( &pRequest->m_response );
+                        
+                        m_Scripting.EvaluatePage( &stream, sResName, pRequest);
+
+                        return true;
+
+                    }
 
                     // ------------------------------------------------------
                     // Return the file.

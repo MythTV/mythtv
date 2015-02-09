@@ -605,7 +605,7 @@ import "/tv/js/tvutil.qjs"
   </form>
 </div>
 
-<script>
+<script type="text/javascript" nonce="<%=CSP_NONCE%>">
     //$("#rule-DupMethod option[value='<%=recRule.DupMethod%>']").prop("selected", true);
     //$( "#rule-DupMethod" ).val("<%=recRule.DupMethod%>");
 
