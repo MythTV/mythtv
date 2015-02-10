@@ -245,6 +245,9 @@ class MTV_PUBLIC CardUtil
                                    QString inputname   = QString::null,
                                    QString hostname    = QString::null);
 
+    static uint         GetChildCardCount(uint cardid);
+    static vector<uint> GetChildCardIDs(uint cardid);
+
     static bool         IsCardTypePresent(const QString &rawtype,
                                           QString hostname = QString::null);
     static QStringList  GetCardTypes(void); // card types on ALL hosts
@@ -379,7 +382,7 @@ class MTV_PUBLIC CardUtil
     static bool         HasDVBCRCBug(const QString &device);
     static uint         GetMinSignalMonitoringDelay(const QString &device);
     static QString      GetDeviceName(dvb_dev_type_t, const QString &device);
-    static InputNames   GetConfiguredDVBInputs(uint cardid);
+    static InputNames   GetConfiguredDVBInputs(const QString &device);
 
     // V4L info
     static bool         hasV4L2(int videofd);

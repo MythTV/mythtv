@@ -3068,6 +3068,28 @@ NULL
             return false;
     }
 
+    if (dbver == "1336")
+    {
+        const char *updates[] = {
+            // Add a parentid columne to capturecard.
+            "ALTER TABLE capturecard "
+            "    ADD parentid INT UNSIGNED NOT NULL DEFAULT 0 AFTER cardid",
+            "UPDATE capturecard c, "
+            "       (SELECT min(cardid) cardid, hostname, videodevice, "
+            "               inputname "
+            "        FROM capturecard "
+            "        GROUP BY hostname, videodevice, inputname) mins "
+            "SET c.parentid = mins.cardid "
+            "WHERE c.hostname = mins.hostname and "
+            "      c.videodevice = mins.videodevice and "
+            "      c.inputname = mins.inputname and "
+            "      c.cardid <> mins.cardid",
+            NULL
+        };
+        if (!performActualUpdate(updates, "1337", dbver))
+            return false;
+    }
+
     return true;
 }
 

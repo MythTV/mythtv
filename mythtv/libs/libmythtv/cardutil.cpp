@@ -674,6 +674,58 @@ vector<uint> CardUtil::GetCardIDs(QString videodevice,
     return list;
 }
 
+uint CardUtil::GetChildCardCount(uint cardid)
+{
+    if (!cardid)
+        return 0;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    QString qstr =
+        "SELECT COUNT(*) "
+        "FROM capturecard "
+        "WHERE parentid = :CARDID";
+
+    query.prepare(qstr);
+    query.bindValue(":CARDID", cardid);
+
+    uint count = 0;
+
+    if (!query.exec())
+        MythDB::DBError("CardUtil::GetChildCardCount()", query);
+    else if (query.next())
+        count = query.value(0).toUInt();
+
+    return count;
+}
+
+vector<uint> CardUtil::GetChildCardIDs(uint cardid)
+{
+    vector<uint> list;
+
+    if (!cardid)
+        return list;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    QString qstr =
+        "SELECT cardid "
+        "FROM capturecard "
+        "WHERE parentid = :CARDID "
+        "ORDER BY cardid";
+
+    query.prepare(qstr);
+    query.bindValue(":CARDID", cardid);
+
+    if (!query.exec())
+        MythDB::DBError("CardUtil::GetChildCardIDs()", query);
+    else
+    {
+        while (query.next())
+            list.push_back(query.value(0).toUInt());
+    }
+
+    return list;
+}
+
 static uint clone_capturecard(uint src_cardid, uint orig_dst_cardid)
 {
     uint dst_cardid = orig_dst_cardid;
@@ -772,11 +824,13 @@ static uint clone_capturecard(uint src_cardid, uint orig_dst_cardid)
         "    recpriority           = :V20, "
         "    quicktune             = :V21, "
         "    schedorder            = :V22, "
-        "    livetvorder           = :V23  "
+        "    livetvorder           = :V23,  "
+        "    parentid              = :PARENTID "
         "WHERE cardid = :CARDID");
     for (uint i = 0; i < 24; i++)
         query2.bindValue(QString(":V%1").arg(i), query.value(i).toString());
     query2.bindValue(":CARDID", dst_cardid);
+    query2.bindValue(":PARENTID", src_cardid);
 
     if (!query2.exec())
     {
@@ -1756,16 +1810,19 @@ InputNames CardUtil::ProbeV4LAudioInputs(int videofd, bool &ok)
     return list;
 }
 
-InputNames CardUtil::GetConfiguredDVBInputs(uint cardid)
+InputNames CardUtil::GetConfiguredDVBInputs(const QString &device)
 {
     InputNames list;
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT cardid, inputname "
         "FROM capturecard "
-        "WHERE cardid = :CARDID "
+        "WHERE hostname = :HOSTNAME "
+        "      AND videodevice = :DEVICE "
+        "      AND parentid = 0 "
         "      AND inputname <> 'None'");
-    query.bindValue(":CARDID", cardid);
+    query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
+    query.bindValue(":DEVICE", device);
 
     if (!query.exec() || !query.isActive())
         MythDB::DBError("CardUtil::GetConfiguredDVBInputs", query);
@@ -1872,11 +1929,7 @@ QStringList CardUtil::ProbeDVBInputs(QString device)
     QStringList ret;
 
 #ifdef USING_DVB
-    uint cardid = CardUtil::GetFirstCardID(device);
-    if (!cardid)
-        return ret;
-
-    InputNames list = GetConfiguredDVBInputs(cardid);
+    InputNames list = GetConfiguredDVBInputs(device);
     InputNames::iterator it;
     for (it = list.begin(); it != list.end(); ++it)
     {
@@ -1930,22 +1983,24 @@ void CardUtil::GetCardInputs(
     if ("DVB" == cardtype)
     {
         bool needs_conf = IsInNeedOfExternalInputConf(cardid);
-        InputNames list = GetConfiguredDVBInputs(cardid);
+        InputNames list = GetConfiguredDVBInputs(device);
         if (!needs_conf && list.empty())
         {
             inputs += "DVBInput";
         }
 
+        // Always list the 1 through n+1 inputs
+        if (needs_conf)
+        {
+            for (uint i = 0; i <= list.size(); ++i)
+                inputs += QString("DVBInput #%1").arg(i+1);
+        }
+
+        // Always list the existing inputs
         InputNames::const_iterator it;
         for (it = list.begin(); it != list.end(); ++it)
         {
             inputs += *it;
-        }
-
-        // plus add one "new" input
-        if (needs_conf)
-        {
-            inputs += QString("DVBInput #%1").arg(list.size() + 1);
         }
     }
 #endif // USING_DVB
