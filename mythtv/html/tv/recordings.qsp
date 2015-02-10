@@ -273,7 +273,7 @@ for (var progIdx = 0; progIdx < programs.length; progIdx++)
 %>
 
 <% if (nextStartIndex) { %>
-<a class="jscroll-next" href="/tv/recordings.qsp?RecordingGroup=<%=recGroup%>&amp;DisplayGroup=<%=displayGroup%>&amp;SortAsc=<%=sortOrder%>&amp;Start=<%=nextStartIndex%>&amp;ListOnly=1"></a>
+<a class="jscroll-next" href="/tv/recordings.qsp?RecordingGroup=<%=encodeURIComponent(recGroup)%>&amp;DisplayGroup=<%=encodeURIComponent(displayGroup)%>&amp;SortAsc=<%=sortOrder%>&amp;Start=<%=nextStartIndex%>&amp;ListOnly=1"></a>
 <%}%>
 
 <% if (!listOnly) {%>
