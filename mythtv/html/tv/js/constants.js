@@ -57,6 +57,7 @@ INUSEOTHER     : 4194304
 
 // Recording Status
 var RecordingStatus = {
+FAILING           : -14,
 OTHERRECORDING    : -13,
 OTHERTUNING       : -12,
 MISSEDFUTURE      : -11,
@@ -84,6 +85,36 @@ INACTIVE          : 10,
 NEVERRECORD       : 11,
 OFFLINE           : 12,
 OTHERSHOWING      : 13
+};
+
+var RecordingStatusString = {
+"-14" : "Failing", // Deprecated
+"-13" : "Other Recording", // Deprecated
+"-12" : "Other Tuning",    // Deprecated
+"-11" : "Missed",
+"-10" : "Tuning",
+"-9"  : "Recorder Failed",
+"-8"  : "Tuner Busy",
+"-7"  : "Low Disk Space",
+"-6"  : "Manual Cancel",
+"-5"  : "Missed",
+"-4"  : "Aborted",
+"-3"  : "Recorded",
+"-2"  : "Recording",
+"-1"  : "Will Record",
+"0"   : "Unknown",
+"1"   : "Don't Record",
+"2"   : "Previously Recorded",
+"3"   : "Currently Recorded",
+"4"   : "Earlier Showing",
+"5"   : "Max Recordings",
+"6"   : "Not Listed",
+"7"   : "Conflicting",
+"8"   : "Later Showing",
+"9"   : "Repeat",
+"10"  : "Inactive",
+"11"  : "Never Record",
+"12"  : "Recorder Off-Line"
 };
 
 // Recording Schedule Types
