@@ -6379,7 +6379,7 @@ int main(void) {
                                        CEC_LIB_VERSION_MINOR < 7))
         #error libcec version to old
     #endif
-    return (long) LibCecInit;
+    return 1;
 }
 EOF
 fi
