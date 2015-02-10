@@ -968,6 +968,7 @@ class CetonDeviceID : public LabelSetting, public CaptureCardDBStorage
     void LoadedIP(const QString&);
     void LoadedCard(const QString&);
     void LoadedTuner(const QString&);
+    void LoadedInstances(int);
 
 
   public slots:
@@ -978,6 +979,7 @@ class CetonDeviceID : public LabelSetting, public CaptureCardDBStorage
     QString _ip;
     QString _card;
     QString _tuner;
+    const CaptureCard &_parent;
 };
 
 #endif

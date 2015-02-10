@@ -2020,7 +2020,7 @@ void CetonSetting::LoadValue(const QString &value)
 CetonDeviceID::CetonDeviceID(const CaptureCard &parent) :
     LabelSetting(this),
     CaptureCardDBStorage(this, parent, "videodevice"),
-    _ip(), _card(), _tuner()
+    _ip(), _card(), _tuner(), _parent(parent)
 {
     setLabel(tr("Device ID"));
     setHelpText(tr("Device ID of Ceton device"));
@@ -2059,6 +2059,8 @@ void CetonDeviceID::UpdateValues(void)
         emit LoadedIP(newstyle.cap(1));
         emit LoadedTuner(newstyle.cap(3));
     }
+    if (_parent.getCardID())
+        emit LoadedInstances((int)_parent.GetInstanceCount());
 }
 
 CetonConfigurationGroup::CetonConfigurationGroup(CaptureCard& a_parent) :
@@ -2092,6 +2094,8 @@ CetonConfigurationGroup::CetonConfigurationGroup(CaptureCard& a_parent) :
             ip,       SLOT(  LoadValue(const QString&)));
     connect(deviceid, SIGNAL(LoadedTuner(const QString&)),
             tuner,    SLOT(  LoadValue(const QString&)));
+    connect(deviceid, SIGNAL(LoadedInstances(int)),
+            instances, SLOT(  setValue(int)));
     connect(instances, SIGNAL(valueChanged(int)),
             &parent,   SLOT(  SetInstanceCount(int)));
 
@@ -2448,7 +2452,8 @@ void CaptureCard::loadByID(int cardid)
     Load();
 
     // Update instance count for cloned cards.
-    instance_count = CardUtil::GetChildCardCount(cardid) + 1;
+    if (cardid)
+        instance_count = CardUtil::GetChildCardCount(cardid) + 1;
 }
 
 void CaptureCard::Save(void)
