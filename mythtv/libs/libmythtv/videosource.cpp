@@ -3591,8 +3591,6 @@ void CardInputEditor::Load(void)
         if (inputname.isEmpty())
             inputname = QObject::tr("(None)");
 
-        bool sharable = CardUtil::IsTunerSharingCapable(cardtype.toUpper());
-
         CardInput *cardinput = new CardInput(cardtype, false, cardid);
         cardinput->loadByID(cardid);
         QString inputlabel = QString("%1 (%2) -> %3")
