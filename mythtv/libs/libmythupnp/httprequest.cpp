@@ -121,7 +121,7 @@ static MIMETypes g_MIMETypes[] =
     { "mkv" , "video/x-matroska"           }, // See http://matroska.org/technical/specs/notes.html#MIME (See NOTE 1)
     { "nuv" , "video/nupplevideo"          },
     { "ogv" , "video/ogg"                  }, // Defined: http://wiki.xiph.org/index.php/MIME_Types_and_File_Extensions
-    { "ts"  , "video/mp2t"                 }, // HTTP Live Streaming
+    { "ts"  , "video/mp2t"                 },
     { "vob" , "video/mpeg"                 },
     { "wmv" , "video/x-ms-wmv"             }
 };
@@ -1567,10 +1567,8 @@ bool HTTPRequest::ParseRange( QString sRange,
             return false;
     }
 
-#if 0
-    LOG(VB_GENERAL, LOG_DEBUG, QString("%1 Range Requested %2 - %3")
+    LOG(VB_HTTP, LOG_DEBUG, QString("%1 Range Requested %2 - %3")
         .arg(getSocketHandle()) .arg(*pllStart) .arg(*pllEnd));
-#endif
 
     return true;
 }

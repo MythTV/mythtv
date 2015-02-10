@@ -118,7 +118,7 @@ TVRec::TVRec(int capturecardnum)
       // tvchain
       tvchain(NULL),
       // RingBuffer info
-      ringBuffer(NULL), rbFileExt("mpg")
+      ringBuffer(NULL), rbFileExt("ts")
 {
     QMutexLocker locker(&cardsLock);
     cards[cardid] = this;

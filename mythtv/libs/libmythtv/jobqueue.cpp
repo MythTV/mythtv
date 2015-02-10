@@ -2028,6 +2028,7 @@ void JobQueue::DoTranscodeThread(int jobID)
                 ChangeJobStatus(jobID, JOB_FINISHED, tr("Finished."));
                 retry = false;
 
+                program_info->Reload(); // Refresh, the basename may have changed
                 filename = program_info->GetPlaybackURL(false, true);
                 QFileInfo st(filename);
 

@@ -890,13 +890,19 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
             newSize = st.size();
 
         QString cnf = filename;
-        if ((jobArgs == "RENAME_TO_NUV") &&
-            (filename.contains(QRegExp("mpg$"))))
+        if (filename.endsWith(".mpg") && jobArgs == "RENAME_TO_NUV")
         {
             QString newbase = pginfo->QueryBasename();
-
-            cnf.replace(QRegExp("mpg$"), "nuv");
-            newbase.replace(QRegExp("mpg$"), "nuv");
+            cnf.replace(".mpg", ".nuv");
+            newbase.replace(".mpg", ".nuv");
+            pginfo->SaveBasename(newbase);
+        }
+        else if (filename.endsWith(".ts"))
+        {
+            QString newbase = pginfo->QueryBasename();
+             // MPEG-TS to MPEG-PS
+            cnf.replace(".ts", ".mpg");
+            newbase.replace(".ts", ".mpg");
             pginfo->SaveBasename(newbase);
         }
 

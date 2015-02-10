@@ -2399,10 +2399,20 @@ bool ProgramInfo::SaveBasename(const QString &basename)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("UPDATE recorded "
                   "SET basename = :BASENAME "
-                  "WHERE chanid = :CHANID AND "
-                  "      starttime = :STARTTIME;");
-    query.bindValue(":CHANID", chanid);
-    query.bindValue(":STARTTIME", recstartts);
+                  "WHERE recordedid = :RECORDEDID;");
+    query.bindValue(":RECORDEDID", recordedid);
+    query.bindValue(":BASENAME", basename);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("SetRecordBasename", query);
+        return false;
+    }
+
+    query.prepare("UPDATE recordedfile "
+                  "SET basename = :BASENAME "
+                  "WHERE recordedid = :RECORDEDID;");
+    query.bindValue(":RECORDEDID", recordedid);
     query.bindValue(":BASENAME", basename);
 
     if (!query.exec())
@@ -2422,7 +2432,7 @@ bool ProgramInfo::SaveBasename(const QString &basename)
  *  If the base part of pathname is not empty this will return
  *  that value otherwise this queries the recorded table in the
  *  DB for the basename stored there for this ProgramInfo's
- *  chanid and recstartts.
+ *  recordedid
  */
 QString ProgramInfo::QueryBasename(void) const
 {
@@ -2433,11 +2443,9 @@ QString ProgramInfo::QueryBasename(void) const
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT basename "
-        "FROM recorded "
-        "WHERE chanid    = :CHANID AND "
-        "      starttime = :STARTTIME");
-    query.bindValue(":CHANID",    chanid);
-    query.bindValue(":STARTTIME", recstartts);
+        "FROM recordedfile "
+        "WHERE recordedid = :RECORDEDID;");
+    query.bindValue(":RECORDEDID", recordedid);
 
     if (!query.exec())
     {
@@ -2450,8 +2458,8 @@ QString ProgramInfo::QueryBasename(void) const
     else
     {
         LOG(VB_GENERAL, LOG_INFO,
-                 QString("QueryBasename found no entry for %1 @ %2")
-                     .arg(chanid).arg(recstartts.toString(Qt::ISODate)));
+                 QString("QueryBasename found no entry for recording ID %1")
+                     .arg(recordedid));
     }
 
     return QString();

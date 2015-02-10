@@ -1174,7 +1174,7 @@ ChannelBase *ChannelBase::CreateChannel(
     bool                      enter_power_save_mode,
     QString                  &rbFileExt)
 {
-    rbFileExt = "mpg";
+    rbFileExt = "ts";
 
     ChannelBase *channel = NULL;
     if (genOpt.cardtype == "DVB")
@@ -1203,8 +1203,9 @@ ChannelBase *ChannelBase::CreateChannel(
               genOpt.videodev.toLower().startsWith("file:")))
     {
         channel = new DummyChannel(tvrec);
+        rbFileExt = "mpg";
     }
-    else if (genOpt.cardtype == "FREEBOX")
+    else if (genOpt.cardtype == "FREEBOX") // IPTV
     {
 #ifdef USING_IPTV
         channel = new IPTVChannel(tvrec, genOpt.videodev);
@@ -1229,10 +1230,13 @@ ChannelBase *ChannelBase::CreateChannel(
 #endif
         if ((genOpt.cardtype != "MPEG") && (genOpt.cardtype != "HDPVR"))
             rbFileExt = "nuv";
+        else
+            rbFileExt = "mpg";
     }
     else if (genOpt.cardtype == "EXTERNAL")
     {
         channel = new ExternalChannel(tvrec, genOpt.videodev);
+        rbFileExt = "mpg";
     }
 
     if (!channel)
