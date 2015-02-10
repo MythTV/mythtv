@@ -123,11 +123,9 @@ QString toString(RecStatusType recstatus, uint id)
         case rsCancelled:
             ret = QObject::tr("c", "RecStatusChar rsCancelled");
             break;
+        case rsMissedFuture:
         case rsMissed:
             ret = QObject::tr("M", "RecStatusChar rsMissed");
-            break;
-        case rsMissedFuture:
-            ret = "M";
             break;
         case rsConflict:
             ret = QObject::tr("C", "RecStatusChar rsConflict");
@@ -198,10 +196,9 @@ QString toString(RecStatusType recstatus, RecordingType rectype)
             return QObject::tr("Max Recordings");
         case rsCancelled:
             return QObject::tr("Manual Cancel");
+        case rsMissedFuture:
         case rsMissed:
             return QObject::tr("Missed");
-        case rsMissedFuture:
-            return "Missed Future";
         case rsConflict:
             return QObject::tr("Conflicting");
         case rsLaterShowing:
