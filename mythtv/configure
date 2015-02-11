@@ -4960,6 +4960,7 @@ case $target_os in
         ! disabled joystick_menu && enable joystick_menu
         enable libudev
         enable libuuid
+        enable pic
         ;;
     irix*)
         target_os=irix
