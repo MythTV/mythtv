@@ -93,9 +93,10 @@ class CECAdapterPriv
 
         if ("auto" != base_dev)
         {
-            defaultHDMIPort = hdmi_port.toInt();
-            if (defaultHDMIPort < 1 || defaultHDMIPort > 4)
-                defaultHDMIPort = 1;
+            int base = base_dev.toInt();
+            if (base >= 0 && base < CECDEVICE_BROADCAST) {
+                configuration.baseDevice = (cec_logical_address)base;
+            }
         }
         if ("auto" != hdmi_port)
          {
