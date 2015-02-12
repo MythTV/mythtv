@@ -177,17 +177,16 @@ void TestMPEGTables::ContentIdentifierDescriptor_test(void)
     DVBContentIdentifierDescriptor descriptor(&eit_data[407]);
 
     QCOMPARE (descriptor.CRIDCount(),  (size_t) 2);
+    /* CRID with IMI appended, the separator and IMI are properly removed from the CRID
+     * see ETSI TS 102 323 V1.5.1 page 102
+     * The content identifier is composed of the CRID authority "eventis.nl",
+     * the separator "/",
+     * the CRID data "00000000-0000-1000-0604-0000000E0711",
+     * the separator "#", and
+     * the IMI "0010389900002017"
+     */
     QCOMPARE (descriptor.ContentId(),  QString("eventis.nl/00000000-0000-1000-0604-0000000E0711"));
-
-    /* FIXME hack to test the case of no hash in the CRID until we support more then one CRID per descriptor */
-    const unsigned char cid_data[] = {
-        0x76, 0x31, 0x04, 0x2f, 0x65, 0x76, 0x65, 0x6e,  0x74, 0x69, 0x73, 0x2e, 0x6e, 0x6c, 0x2f, 0x30,  /* vs.@eventis.nl/0 */
-        0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x2d,  0x30, 0x30, 0x30, 0x30, 0x2d, 0x31, 0x30, 0x30,  /* 0000000-0000-100 */
-        0x30, 0x2d, 0x30, 0x36, 0x30, 0x38, 0x2d, 0x30,  0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x33,  /* 0-0608-000000003 */
-        0x46, 0x39, 0x43                                                                                  /* F9C              */
-    };
-    DVBContentIdentifierDescriptor descriptor2(cid_data);
-    QCOMPARE (descriptor2.ContentId(), QString("eventis.nl/00000000-0000-1000-0608-000000003F9C"));
+    /* there is a second content_id in the same descriptor */
     QCOMPARE (descriptor.ContentId(1), QString("eventis.nl/00000000-0000-1000-0608-000000003F9C"));
 }
 
