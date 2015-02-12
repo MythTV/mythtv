@@ -619,8 +619,15 @@ int main(int argc, char *argv[])
                                           (fifosync || keyframesonly), jobID,
                                           fifodir, fifo_info, cleanCut, deleteMap,
                                           AudioTrackNo, passthru);
+
         if ((result == REENCODE_OK) && (jobID >= 0))
+        {
             JobQueue::ChangeJobArgs(jobID, "RENAME_TO_NUV");
+            RecordingInfo recInfo(pginfo->GetRecordingID());
+            RecordingFile *recFile = recInfo.GetRecordingFile();
+            recFile->m_containerFormat = formatNUV;
+            recFile->Save();
+        }
     }
 
     if (fifo_info)
@@ -685,6 +692,10 @@ int main(int argc, char *argv[])
                         UpdatePositionMap(posMap, durMap, outfile + QString(".map"),
                                           pginfo);
                 }
+                RecordingInfo recInfo(*pginfo);
+                RecordingFile *recFile = recInfo.GetRecordingFile();
+                recFile->m_containerFormat = formatMPEG2_PS;
+                recFile->Save();
             }
         }
         delete m2f;

@@ -16,6 +16,7 @@
 #include "programtypes.h" // for MarkTypes, frm_pos_map_t
 #include "mythtimer.h"
 #include "mythtvexp.h"
+#include "recordingfile.h"
 
 extern "C"
 {
@@ -295,7 +296,7 @@ class MTV_PUBLIC RecorderBase : public QRunnable
     RingBuffer    *ringBuffer;
     bool           weMadeBuffer;
 
-
+    AVContainer    m_containerFormat;
     AVCodecID      m_primaryVideoCodec;
     AVCodecID      m_primaryAudioCodec;
     QString        videocodec;

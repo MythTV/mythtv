@@ -44,6 +44,7 @@ const uint RecorderBase::kTimeOfLatestDataIntervalTarget = 5000;
 RecorderBase::RecorderBase(TVRec *rec)
     : tvrec(rec),               ringBuffer(NULL),
       weMadeBuffer(true),
+      m_containerFormat(formatUnknown),
       m_primaryVideoCodec(AV_CODEC_ID_NONE),
       m_primaryAudioCodec(AV_CODEC_ID_NONE),
       videocodec("rtjpeg"),
@@ -108,7 +109,15 @@ void RecorderBase::SetRecording(const RecordingInfo *pginfo)
 
     ProgramInfo *oldrec = curRecording;
     if (pginfo)
+    {
+        // NOTE: RecorderBase and TVRec do not share a single RecordingInfo
+        //       instance which may lead to the possibility that changes made
+        //       in the database by one are overwritten by the other
         curRecording = new RecordingInfo(*pginfo);
+        RecordingFile *recFile = curRecording->GetRecordingFile();
+        recFile->m_containerFormat = m_containerFormat;
+        recFile->Save();
+    }
     else
         curRecording = NULL;
 
@@ -424,6 +433,9 @@ void RecorderBase::FinishRecording(void)
         RecordingFile *recFile = curRecording->GetRecordingFile();
         if (recFile)
         {
+            // Container
+            recFile->m_containerFormat = m_containerFormat;
+
             // Video
             recFile->m_videoCodec = ff_codec_id_string(m_primaryVideoCodec);
             switch (curRecording->QueryAverageAspectRatio())
@@ -464,6 +476,7 @@ void RecorderBase::FinishRecording(void)
     }
 
     LOG(VB_GENERAL, LOG_NOTICE, QString("Finished Recording: "
+                                        "Container: %7 "
                                         "Video Codec: %1 (%2x%3 A/R: %4 %5fps) "
                                         "Audio Codec: %6")
                                         .arg(avcodec_get_name(m_primaryVideoCodec))
@@ -471,7 +484,8 @@ void RecorderBase::FinishRecording(void)
                                         .arg(m_videoHeight)
                                         .arg(m_videoAspect)
                                         .arg(GetFrameRate())
-                                        .arg(avcodec_get_name(m_primaryAudioCodec)));
+                                        .arg(avcodec_get_name(m_primaryAudioCodec))
+                                        .arg(RecordingFile::AVContainerToString(m_containerFormat)));
 }
 
 RecordingQuality *RecorderBase::GetRecordingQuality(

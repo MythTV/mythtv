@@ -298,7 +298,7 @@ ProgramInfo::ProgramInfo(uint _recordedid)
     }
     else
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
+        LOG(VB_GENERAL, LOG_CRIT, LOC +
             QString("Failed to find recorded entry for %1.")
             .arg(_recordedid));
         clear();
