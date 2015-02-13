@@ -246,6 +246,7 @@ QString HTTPRequest::BuildResponseHeader( long long nSize )
     //-----------------------------------------------------------------------
     // Headers describing the content
     //-----------------------------------------------------------------------
+    SetResponseHeader("Content-Language", gCoreContext->GetLanguageAndVariant().replace("_", "-"));
     SetResponseHeader("Content-Type", sContentType);
 
     // Default to 'inline' but we should support 'attachment' when it would
@@ -460,6 +461,8 @@ qint64 HTTPRequest::SendResponse( void )
     // ----------------------------------------------------------------------
     // SECURITY: Allow the WebFrontend on the Master backend and ONLY this
     // machine to access resources on a frontend or slave web server
+    //
+    // TODO: Add hostname:port combo as well as ip:port
     //
     // http://www.w3.org/TR/cors/#introduction
     // ----------------------------------------------------------------------
