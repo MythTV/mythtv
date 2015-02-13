@@ -610,6 +610,11 @@ qint64 HTTPRequest::SendResponseFile( QString sFileName )
             else
             {
                 m_nResponseStatus = 416;
+                // RFC 7233 - A server generating a 416 (Range Not Satisfiable)
+                // response to a byte-range request SHOULD send a Content-Range
+                // header field with an unsatisfied-range value
+                m_mapRespHeaders[ "Content-Range" ] = QString("bytes */%3")
+                                                              .arg( llSize );
                 llSize = 0;
                 LOG(VB_HTTP, LOG_INFO,
                     QString("HTTPRequest::SendResponseFile(%1) - "
