@@ -267,7 +267,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         return REENCODE_ERROR;
     }
     player_ctx->SetRingBuffer(rb);
-    player_ctx->SetPlayer(new MythPlayer(kVideoIsNull));
+    player_ctx->SetPlayer(new MythPlayer((PlayerFlags)(kVideoIsNull | kNoITV)));
     SetPlayerContext(player_ctx);
     GetPlayer()->SetPlayerInfo(NULL, NULL, GetPlayerContext());
     if (m_proginfo->GetRecordingEndTime() > curtime)
