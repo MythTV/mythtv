@@ -815,6 +815,12 @@ bool UPnpCDSVideo::LoadVideos(const UPnpCDSRequest* pRequest,
         resURI.setPath("Content/GetVideo");
         resURI.addQueryItem("Id", QString::number(nVidID));
 
+        // DLNA requires a mimetype of video/mpeg for TS files, it's not the
+        // correct mimetype, but then DLNA doesn't seem to care about such
+        // things
+        if (sMimeType == "video/mp2t")
+            sMimeType = "video/mpeg";
+
         QString sProtocol = DLNA::ProtocolInfoString(UPNPProtocol::kHTTP,
                                                      sMimeType);
 
