@@ -366,6 +366,8 @@ int main(int argc, char *argv[])
     {
         if (cmdline.toString("ostream") == "dvd")
             otype = REPLEX_DVD;
+        else if (cmdline.toString("ostream") == "ps")
+            otype = REPLEX_MPEG2;
         else if (cmdline.toString("ostream") == "ts")
             otype = REPLEX_TS_SD;
         else
@@ -694,7 +696,16 @@ int main(int argc, char *argv[])
                 }
                 RecordingInfo recInfo(*pginfo);
                 RecordingFile *recFile = recInfo.GetRecordingFile();
-                recFile->m_containerFormat = formatMPEG2_PS;
+                if (otype == REPLEX_DVD || otype == REPLEX_MPEG2 ||
+                    otype == REPLEX_HDTV)
+                {
+                    recFile->m_containerFormat = formatMPEG2_PS;
+                    JobQueue::ChangeJobArgs(jobID, "RENAME_TO_MPG");
+                }
+                else
+                {
+                    recFile->m_containerFormat = formatMPEG2_TS;
+                }
                 recFile->Save();
             }
         }
@@ -908,7 +919,8 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
             newbase.replace(".mpg", ".nuv");
             pginfo->SaveBasename(newbase);
         }
-        else if (filename.endsWith(".ts"))
+        else if (filename.endsWith(".ts") &&
+                 (jobArgs == "RENAME_TO_MPG"))
         {
             QString newbase = pginfo->QueryBasename();
              // MPEG-TS to MPEG-PS
