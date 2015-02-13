@@ -31,7 +31,8 @@ using namespace std;
 #include "HLS/httplivestream.h"
 
 static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
-                        frm_dir_map_t *deleteMap, int &resultCode);
+                        frm_dir_map_t *deleteMap, int &exitCode,
+                        int resultCode);
 
 static int glbl_jobID = -1;
 static QString recorderOptions = "";
@@ -747,8 +748,7 @@ int main(int argc, char *argv[])
         exitcode = result;
     }
 
-    if (jobID >= 0)
-        CompleteJob(jobID, pginfo, useCutlist, &deleteMap, exitcode);
+    CompleteJob(jobID, pginfo, useCutlist, &deleteMap, exitcode, result);
 
     transcode->deleteLater();
 
@@ -873,21 +873,25 @@ static void WaitToDelete(ProgramInfo *pginfo)
 }
 
 static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
-                 frm_dir_map_t *deleteMap, int &resultCode)
+                 frm_dir_map_t *deleteMap, int &exitCode, int resultCode)
 {
-    int status = JobQueue::GetJobStatus(jobID);
+    int status = JOB_UNKNOWN;
+    if (jobID >= 0)
+        status = JobQueue::GetJobStatus(jobID);
 
     if (!pginfo)
     {
-        JobQueue::ChangeJobStatus(jobID, JOB_ERRORED,
-            QObject::tr("Job errored, unable to find Program Info for job"));
+        if (jobID >= 0)
+            JobQueue::ChangeJobStatus(jobID, JOB_ERRORED,
+                QObject::tr("Job errored, unable to find Program Info for job"));
+        LOG(VB_GENERAL, LOG_CRIT, "MythTranscode: Cleanup errored, unable to find Program Info");
         return;
     }
 
     const QString filename = pginfo->GetPlaybackURL(false, true);
     const QByteArray fname = filename.toLocal8Bit();
 
-    if (status == JOB_STOPPING)
+    if (resultCode == REENCODE_OK)
     {
         WaitToDelete(pginfo);
 
@@ -897,7 +901,9 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
             ComputeNewBookmark(ReloadBookmark(pginfo), deleteMap);
         pginfo->SaveBookmark(previousBookmark);
 
-        const QString jobArgs = JobQueue::GetJobArgs(jobID);
+        QString jobArgs;
+        if (jobID >= 0)
+            jobArgs = JobQueue::GetJobArgs(jobID);
 
         const QString tmpfile = filename + ".tmp";
         const QByteArray atmpfile = tmpfile.toLocal8Bit();
@@ -912,21 +918,24 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
             newSize = st.size();
 
         QString cnf = filename;
-        if (filename.endsWith(".mpg") && jobArgs == "RENAME_TO_NUV")
+        if (jobID >= 0)
         {
-            QString newbase = pginfo->QueryBasename();
-            cnf.replace(".mpg", ".nuv");
-            newbase.replace(".mpg", ".nuv");
-            pginfo->SaveBasename(newbase);
-        }
-        else if (filename.endsWith(".ts") &&
-                 (jobArgs == "RENAME_TO_MPG"))
-        {
-            QString newbase = pginfo->QueryBasename();
-             // MPEG-TS to MPEG-PS
-            cnf.replace(".ts", ".mpg");
-            newbase.replace(".ts", ".mpg");
-            pginfo->SaveBasename(newbase);
+            if (filename.endsWith(".mpg") && jobArgs == "RENAME_TO_NUV")
+            {
+                QString newbase = pginfo->QueryBasename();
+                cnf.replace(".mpg", ".nuv");
+                newbase.replace(".mpg", ".nuv");
+                pginfo->SaveBasename(newbase);
+            }
+            else if (filename.endsWith(".ts") &&
+                    (jobArgs == "RENAME_TO_MPG"))
+            {
+                QString newbase = pginfo->QueryBasename();
+                // MPEG-TS to MPEG-PS
+                cnf.replace(".ts", ".mpg");
+                newbase.replace(".ts", ".mpg");
+                pginfo->SaveBasename(newbase);
+            }
         }
 
         const QString newfile = cnf;
@@ -991,69 +1000,58 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
             }
         }
 
-        // Delete previews if cutlist was applied.  They will be re-created as
-        // required.  This prevents the user from being stuck with a preview
-        // from a cut area and ensures that the "dimensioned" previews
-        // correspond to the new timeline
-        if (useCutlist)
-        {
-            QFileInfo fInfo(filename);
-            QString nameFilter = fInfo.fileName() + "*.png";
-            // QDir's nameFilter uses spaces or semicolons to separate globs,
-            // so replace them with the "match any character" wildcard
-            // since mythrename.pl may have included them in filenames
-            nameFilter.replace(QRegExp("( |;)"), "?");
-            QDir dir (fInfo.path(), nameFilter);
+        // Rename or delete all preview thumbnails.
+        //
+        // TODO: This cleanup should be moved to RecordingInfo, and triggered
+        //       when SaveBasename() is called
+        QFileInfo fInfo(filename);
+        QStringList nameFilters;
+        nameFilters.push_back(fInfo.fileName() + "*.png");
+        nameFilters.push_back(fInfo.fileName() + "*.jpg");
 
-            for (uint nIdx = 0; nIdx < dir.count(); nIdx++)
+        QDir dir (fInfo.path());
+        QFileInfoList previewFiles = dir.entryInfoList(nameFilters);
+
+        for (int nIdx = 0; nIdx < previewFiles.size(); nIdx++)
+        {
+            QFileInfo previewFile = previewFiles.at(nIdx);
+            QString oldFileName = previewFile.absoluteFilePath();
+
+            // Delete previews if cutlist was applied.  They will be re-created as
+            // required.  This prevents the user from being stuck with a preview
+            // from a cut area and ensures that the "dimensioned" previews
+            // correspond to the new timeline
+            if (useCutlist)
             {
                 // If unlink fails, keeping the old preview is not a problem.
                 // The RENAME_TO_NUV check below will attempt to rename the
                 // file, if required.
-                const QString oldfileop = QString("%1/%2")
-                    .arg(fInfo.path()).arg(dir[nIdx]);
-                const QByteArray aoldfileop = oldfileop.toLocal8Bit();
-                transUnlink(aoldfileop.constData(), pginfo);
+                if (transUnlink(oldFileName.toLocal8Bit().constData(), pginfo) != -1)
+                    continue;
             }
-        }
 
-        /* Rename all preview thumbnails. */
-        if (jobArgs == "RENAME_TO_NUV")
-        {
-            QFileInfo fInfo(filename);
-            QString nameFilter = fInfo.fileName() + "*.png";
-            // QDir's nameFilter uses spaces or semicolons to separate globs,
-            // so replace them with the "match any character" wildcard
-            // since mythrename.pl may have included them in filenames
-            nameFilter.replace(QRegExp("( |;)"), "?");
-
-            QDir dir (fInfo.path(), nameFilter);
-
-            for (uint nIdx = 0; nIdx < dir.count(); nIdx++)
+            if (jobArgs == "RENAME_TO_NUV" || jobArgs == "RENAME_TO_MPG")
             {
-                const QString oldfileprev = QString("%1/%2")
-                    .arg(fInfo.path()).arg(dir[nIdx]);
-                const QByteArray aoldfileprev = oldfileprev.toLocal8Bit();
+                QString newExtension = "mpg";
+                if (jobArgs == "RENAME_TO_NUV")
+                    newExtension = "nuv";
 
-                QString newfileprev = oldfileprev;
-                QRegExp re("mpg(\\..*)?\\.png$");
-                if (re.indexIn(newfileprev))
+                QString oldSuffix = previewFile.completeSuffix();
+
+                if (!oldSuffix.startsWith(newExtension))
                 {
-                    newfileprev.replace(
-                        re, QString("nuv%1.png").arg(re.cap(1)));
-                }
-                const QByteArray anewfileprev = newfileprev.toLocal8Bit();
+                    QString newSuffix = oldSuffix;
+                    QString oldExtension = oldSuffix.section(".", 0, 0);
+                    newSuffix.replace(oldExtension, newExtension);
 
-                QFile checkFile(oldfileprev);
+                    QString newFileName = oldFileName;
+                    newFileName.replace(oldSuffix, newSuffix);
 
-                if ((oldfileprev != newfileprev) && (checkFile.exists()))
-                {
-                    if(rename(aoldfileprev.constData(), 
-                              anewfileprev.constData()) == -1)
+                    if (!QFile::rename(oldFileName, newFileName))
                     {
                         LOG(VB_GENERAL, LOG_ERR,
                             QString("mythtranscode: Error renaming %1 to %2")
-                                    .arg(oldfileprev).arg(newfileprev) + ENO);
+                                    .arg(oldFileName).arg(newFileName));
                     }
                 }
             }
@@ -1110,9 +1108,11 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
         if (newSize)
             pginfo->SaveFilesize(newSize);
 
-        JobQueue::ChangeJobStatus(jobID, JOB_FINISHED);
-
-    } else {
+        if (jobID >= 0)
+            JobQueue::ChangeJobStatus(jobID, JOB_FINISHED);
+    }
+    else
+    {
         // Not a successful run, so remove the files we created
         QString filename_tmp = filename + ".tmp";
         QByteArray fname_tmp = filename_tmp.toLocal8Bit();
@@ -1123,14 +1123,17 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
         QByteArray fname_map = filename_map.toLocal8Bit();
         unlink(fname_map.constData());
 
-        if (status == JOB_ABORTING)                     // Stop command was sent
-            JobQueue::ChangeJobStatus(jobID, JOB_ABORTED,
-                                      QObject::tr("Job Aborted"));
-        else if (status != JOB_ERRORING)                // Recoverable error
-            resultCode = GENERIC_EXIT_RESTART;
-        else                                            // Unrecoverable error
-            JobQueue::ChangeJobStatus(jobID, JOB_ERRORED,
-                                      QObject::tr("Unrecoverable error"));
+        if (jobID >= 0)
+        {
+            if (status == JOB_ABORTING)                     // Stop command was sent
+                JobQueue::ChangeJobStatus(jobID, JOB_ABORTED,
+                                        QObject::tr("Job Aborted"));
+            else if (status != JOB_ERRORING)                // Recoverable error
+                exitCode = GENERIC_EXIT_RESTART;
+            else                                            // Unrecoverable error
+                JobQueue::ChangeJobStatus(jobID, JOB_ERRORED,
+                                        QObject::tr("Unrecoverable error"));
+        }
     }
 }
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
