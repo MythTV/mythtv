@@ -622,6 +622,19 @@ void MPEG2fixup::InitReplex()
     //   it also contains the start pos of the next frame
     // index_arbuf only uses, pts, framesize, length, start, (active, err)
 
+    if (vFrame.first()->mpeg2_seq.height >= 720)
+    {
+        LOG(VB_GENERAL, LOG_NOTICE, "MPEG2fixup::InitReplex(): High Definition input, increasing replex buffers");
+        if (rx.otype == REPLEX_MPEG2)
+            rx.otype = REPLEX_HDTV;
+        else if (rx.otype == REPLEX_TS_SD)
+            rx.otype = REPLEX_TS_HD;
+        else
+        {
+            LOG(VB_GENERAL, LOG_WARNING, "MPEG2fixup::InitReplex(): Using '--ostream=dvd' with HD video is an invalid combination");
+        }
+    }
+
     //this should support > 100 frames
     uint32_t memsize = vFrame.first()->mpeg2_seq.width *
                        vFrame.first()->mpeg2_seq.height * 10;
