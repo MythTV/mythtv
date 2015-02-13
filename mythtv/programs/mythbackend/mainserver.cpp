@@ -2326,31 +2326,28 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
         return;
     }
 
-    // Delete all preview thumbnails and srt subtitles.
-
+    // Delete all related files, though not the recording itself
+    // i.e. preview thumbnails, srt subtitles, orphaned transcode temporary
+    //      files
+    //
+    // TODO: Delete everything with this basename to catch stray
+    //       .tmp and .old files, and future proof it
     QFileInfo fInfo( ds->m_filename );
-    QString nameFilter = fInfo.fileName() + "*.png";
+    QStringList nameFilters;
+    nameFilters.push_back(fInfo.fileName() + "*.png");
+    nameFilters.push_back(fInfo.fileName() + "*.jpg");
+    nameFilters.push_back(fInfo.fileName() + ".tmp");
+    nameFilters.push_back(fInfo.fileName() + ".old");
+    nameFilters.push_back(fInfo.fileName() + ".map");
+    nameFilters.push_back(fInfo.fileName() + ".tmp.map");
+    nameFilters.push_back(fInfo.baseName() + ".srt");  // e.g. 1234_20150213165800.srt
 
-    // QDir's nameFilter uses spaces or semicolons to separate globs,
-    // so replace them with the "match any character" wildcard
-    // since mythrename.pl may have included them in filenames
-    nameFilter.replace(QRegExp("( |;)"), "?");
+    QDir dir (fInfo.path());
+    QFileInfoList miscFiles = dir.entryInfoList(nameFilters);
 
-    QStringList nameFilters(nameFilter);
-
-    nameFilter = fInfo.fileName();
-    nameFilter.replace(QRegExp("\\.mpg$"), ".srt");
-    nameFilters.append(nameFilter);
-
-    QDir      dir  ( fInfo.path() );
-    dir.setNameFilters(nameFilters);
-
-    for (uint nIdx = 0; nIdx < dir.count(); nIdx++)
+    for (int nIdx = 0; nIdx < miscFiles.size(); nIdx++)
     {
-        QString sFileName = QString( "%1/%2" )
-                               .arg( fInfo.path() )
-                               .arg( dir[ nIdx ] );
-
+        QString sFileName = miscFiles.at(nIdx).absoluteFilePath();
         delete_file_immediately( sFileName, followLinks, true);
     }
     // -----------------------------------------------------------------------
