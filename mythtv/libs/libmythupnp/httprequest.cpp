@@ -232,7 +232,7 @@ QString HTTPRequest::BuildResponseHeader( long long nSize )
     sHeader = QString( "%1 %2\r\n" ).arg(GetResponseProtocol())
                                     .arg(GetResponseStatus());
 
-    SetResponseHeader("Date", MythDate::current().toString("d MMM yyyy hh:mm:ss"));
+    SetResponseHeader("Date", MythDate::current().toString("ddd, d MMM yyyy hh:mm:ss").append(" GMT")); // RFC 822
     SetResponseHeader("Server", HttpServer::GetServerVersion());
 
     SetResponseHeader("Connection", m_bKeepAlive ? "Keep-Alive" : "Close" );
