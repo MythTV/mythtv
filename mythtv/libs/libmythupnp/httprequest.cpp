@@ -111,18 +111,20 @@ static MIMETypes g_MIMETypes[] =
     { "asx" , "video/x-ms-asf"             },
     { "asf" , "video/x-ms-asf"             },
     { "avi" , "video/x-msvideo"            }, // Also video/avi
+    { "m2p" , "video/mp2p"                 }, // RFC 3555
     { "m4v" , "video/mp4"                  },
-    { "mpeg", "video/mpeg"                 },
-    { "mpeg2","video/mpeg"                 },
-    { "mpg" , "video/mpeg"                 },
-    { "mpg2", "video/mpeg"                 },
+    { "mpeg", "video/mp2p"                 }, // RFC 3555
+    { "mpeg2","video/mp2p"                 }, // RFC 3555
+    { "mpg" , "video/mp2p"                 }, // RFC 3555
+    { "mpg2", "video/mp2p"                 }, // RFC 3555
     { "mov" , "video/quicktime"            },
     { "mp4" , "video/mp4"                  },
     { "mkv" , "video/x-matroska"           }, // See http://matroska.org/technical/specs/notes.html#MIME (See NOTE 1)
     { "nuv" , "video/nupplevideo"          },
     { "ogv" , "video/ogg"                  }, // Defined: http://wiki.xiph.org/index.php/MIME_Types_and_File_Extensions
-    { "ts"  , "video/mp2t"                 },
-    { "vob" , "video/mpeg"                 },
+    { "ps"  , "video/mp2p"                 }, // RFC 3555
+    { "ts"  , "video/mp2t"                 }, // RFC 3555
+    { "vob" , "video/mpeg"                 }, // Also video/dvd
     { "wmv" , "video/x-ms-wmv"             }
 };
 
@@ -1099,7 +1101,7 @@ QString HTTPRequest::TestMimeType( const QString &sFileName )
             LOG(VB_HTTP, LOG_DEBUG, sLOC + "file starts with " + sHex);
 
             if ( sHex == "000001ba44000400" )  // MPEG2 PS
-                sMIME = "video/mpeg";
+                sMIME = "video/mp2p";
 
             if ( head == "MythTVVi" )
             {

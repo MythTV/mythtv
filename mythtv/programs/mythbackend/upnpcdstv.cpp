@@ -1219,16 +1219,16 @@ bool UPnpCDSTv::LoadRecordings(const UPnpCDSRequest* pRequest,
         if (sContainer.isEmpty())
         {
             sContainer = "NUV";
-            if (sMimeType == "video/mpeg")
+            if (sMimeType == "video/mp2p")
             {
                 if (bTranscoded) // Transcoded mpeg will probably be in a PS container
                     sContainer = "MPEG2-PS";
-                else
+                else // For temporary backwards compatibility with old file naming
                     sContainer = "MPEG2-TS"; // 99% of recordings will be in MPEG-2 TS containers before transcoding
             }
             else if (sMimeType == "video/mp2t")
             {
-                sMimeType == "video/mpeg";
+                sMimeType == "video/mp2p";
                 sContainer = "MPEG2-TS";
             }
         }
@@ -1236,16 +1236,16 @@ bool UPnpCDSTv::LoadRecordings(const UPnpCDSRequest* pRequest,
         // missing from the database
         if (sVideoCodec.isEmpty())
         {
-            if (sMimeType == "video/mpeg" || sMimeType == "video/mp2t")
+            if (sMimeType == "video/mp2p" || sMimeType == "video/mp2t")
                 sVideoCodec = (nVideoProps & VID_AVC) ? "H264" : "MPEG2VIDEO";
             else if (sMimeType == "video/mp4")
                 sVideoCodec = "MPEG4";
         }
 
-        // DLNA requires a mimetype of video/mpeg for TS files, it's not the
+        // DLNA requires a mimetype of video/mp2p for TS files, it's not the
         // correct mimetype, but then DLNA doesn't seem to care about such
         // things
-        if (sMimeType == "video/mp2t")
+        if (sMimeType == "video/mp2t" || sMimeType == "video/mp2p")
             sMimeType = "video/mpeg";
 
         QUrl    resURI    = URIBase;
