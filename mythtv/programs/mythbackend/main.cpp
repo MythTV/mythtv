@@ -24,6 +24,7 @@
 #include "previewgenerator.h"
 #include "mythcorecontext.h"
 #include "mythsystemevent.h"
+#include "mythtranslation.h"
 #include "backendcontext.h"
 #include "main_helpers.h"
 #include "mythmiscutil.h"
@@ -129,6 +130,8 @@ int main(int argc, char **argv)
         LOG(VB_GENERAL, LOG_CRIT, "Failed to init MythContext.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
+
+    MythTranslation::load("mythfrontend");
 
     setHttpProxy();
 
