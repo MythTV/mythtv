@@ -256,7 +256,7 @@ QString HTTPRequest::BuildResponseHeader( long long nSize )
     {
         // TODO: Add support for utf8 encoding - RFC 5987
         QString filename = QFileInfo(m_sFileName).fileName(); // Strip any path
-        SetResponseHeader("Content-Disposition", QString("inline; filename=\"%2\"").arg(filename.toLatin1()));
+        SetResponseHeader("Content-Disposition", QString("inline; filename=\"%2\"").arg(QString(filename.toLatin1())));
     }
 
     SetResponseHeader("Content-Length", QString::number(nSize));
