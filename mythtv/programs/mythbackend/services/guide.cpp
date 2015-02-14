@@ -368,6 +368,8 @@ DTC::Program* Guide::GetProgramDetails( int              nChanId,
                                         const QDateTime &rawStartTime )
                                           
 {
+    if (!nChanId > 0)
+        throw( "Channel ID is invalid" );
     if (!rawStartTime.isValid())
         throw( "StartTime is invalid" );
 
