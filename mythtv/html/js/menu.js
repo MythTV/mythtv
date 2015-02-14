@@ -106,12 +106,6 @@ function hideMainMenu()
         $("#menu-bg").addClass('menu-hidden');
         console.log("Hide Main Menu");
     }
-
-    // jQuery Animations - Very Slow, not smooth
-//     if (showing)
-//         return;
-//
-//     $("#menu-bg").hide('slide',{direction:'left'}, {duration: 700, queue: false});
 }
 
 function showMainMenu()
@@ -123,8 +117,4 @@ function showMainMenu()
         $("#menu-bg").addClass('menu-visible');
         console.log("Show Main Menu");
     }
-
-    // jQuery Animations - Very Slow, not smooth
-//     showing = true;
-//     $("#menu-bg").show('slide',{direction:'left'}, {duration: 700, queue: false}, function () { showing = false; });
 }
