@@ -35,9 +35,9 @@ public:
 
 
 // Private but located in/shared with dvd_reader.c
-extern "C" int UDFReadBlocksRaw( dvd_reader_t *device, uint32_t lb_number,
-                             size_t block_count, unsigned char *data,
-                             int encrypted );
+extern "C" int InternalUDFReadBlocksRaw( dvd_reader_t *device, uint32_t lb_number,
+                                         size_t block_count, unsigned char *data,
+                                         int encrypted );
 
 
 // Roundup bytes to DVD blocks
@@ -175,7 +175,7 @@ int DVDStream::safe_read(void *data, uint size)
     if (b)
     {
         // Read the beginning unencrypted blocks
-        ret = UDFReadBlocksRaw(m_reader, m_pos, b, (unsigned char*)data, DVDINPUT_NOFLAGS);
+        ret = InternalUDFReadBlocksRaw(m_reader, m_pos, b, (unsigned char*)data, DVDINPUT_NOFLAGS);
         if (ret == -1)
         {
             LOG(VB_GENERAL, LOG_ERR, "DVDStream::safe_read DVDReadBlocks error");
@@ -203,7 +203,7 @@ int DVDStream::safe_read(void *data, uint size)
     }
 
     // Read the encrypted blocks
-    int ret2 = UDFReadBlocksRaw(m_reader, m_pos + m_start, b, (unsigned char*)data, flags);
+    int ret2 = InternalUDFReadBlocksRaw(m_reader, m_pos + m_start, b, (unsigned char*)data, flags);
     if (ret2 == -1)
     {
         LOG(VB_GENERAL, LOG_ERR, "DVDStream::safe_read DVDReadBlocks error");
@@ -219,7 +219,7 @@ int DVDStream::safe_read(void *data, uint size)
     if (lb > 0 && m_start == 0)
     {
         // Read the last unencrypted blocks
-        ret2 = UDFReadBlocksRaw(m_reader, m_pos, lb, (unsigned char*)data, DVDINPUT_NOFLAGS);
+        ret2 = InternalUDFReadBlocksRaw(m_reader, m_pos, lb, (unsigned char*)data, DVDINPUT_NOFLAGS);
         if (ret2 == -1)
         {
             LOG(VB_GENERAL, LOG_ERR, "DVDStream::safe_read DVDReadBlocks error");

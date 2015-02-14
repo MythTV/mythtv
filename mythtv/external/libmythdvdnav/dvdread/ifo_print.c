@@ -16,6 +16,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+#include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -29,7 +30,7 @@
 #include "dvdread/ifo_print.h"
 
 /* Put this in some other file / package?  It's used in nav_print too. */
-static void ifo_print_time(int level, dvd_time_t *dtime) {
+static void ifo_print_time(dvd_time_t *dtime) {
   const char *rate;
   assert((dtime->hour>>4) < 0xa && (dtime->hour&0xf) < 0xa);
   assert((dtime->minute>>4) < 0x7 && (dtime->minute&0xf) < 0xa);
@@ -60,7 +61,7 @@ static void ifo_print_time(int level, dvd_time_t *dtime) {
 }
 
 void dvdread_print_time(dvd_time_t *dtime) {
-  ifo_print_time(5, dtime);
+  ifo_print_time(dtime);
 }
 
 /* Put this in some other file / package?  It's used in nav_print too.
@@ -79,7 +80,7 @@ static void ifo_print_cmd(int row, vm_cmd_t *command) {
   printf("\n");
 }
 
-static void ifo_print_video_attributes(int level, video_attr_t *attr) {
+static void ifo_print_video_attributes(video_attr_t *attr) {
 
   /* The following test is shorter but not correct ISO C,
      memcmp(attr,my_friendly_zeros, sizeof(video_attr_t)) */
@@ -87,10 +88,9 @@ static void ifo_print_video_attributes(int level, video_attr_t *attr) {
      && attr->video_format == 0
      && attr->display_aspect_ratio == 0
      && attr->permitted_df == 0
-     && attr->unknown1 == 0
      && attr->line21_cc_1 == 0
      && attr->line21_cc_2 == 0
-     && attr->video_format == 0
+     && attr->unknown1 == 0
      && attr->letterboxed == 0
      && attr->film_mode == 0) {
     printf("-- Unspecified --");
@@ -148,9 +148,6 @@ static void ifo_print_video_attributes(int level, video_attr_t *attr) {
     printf("(please send a bug report), ");
   }
 
-  printf("U%x, ", attr->unknown1);
-  assert(!attr->unknown1);
-
   if(attr->line21_cc_1 || attr->line21_cc_2) {
     printf("NTSC CC ");
     if(attr->line21_cc_1)
@@ -186,13 +183,16 @@ static void ifo_print_video_attributes(int level, video_attr_t *attr) {
   }
 
   if(attr->film_mode) {
-    printf("film. ");
+    printf("film, ");
   } else {
-    printf("video. "); //camera
+    printf("video, "); //camera
   }
+
+  printf("Unknown1: %x", attr->unknown1);
+
 }
 
-static void ifo_print_audio_attributes(int level, audio_attr_t *attr) {
+static void ifo_print_audio_attributes(audio_attr_t *attr) {
 
   if(attr->audio_format == 0
      && attr->multichannel_extension == 0
@@ -200,9 +200,9 @@ static void ifo_print_audio_attributes(int level, audio_attr_t *attr) {
      && attr->application_mode == 0
      && attr->quantization == 0
      && attr->sample_frequency == 0
+     && attr->unknown1 == 0
      && attr->channels == 0
      && attr->lang_extension == 0
-     && attr->unknown1 == 0
      && attr->unknown3 == 0) {
     printf("-- Unspecified --");
     return;
@@ -267,7 +267,8 @@ static void ifo_print_audio_attributes(int level, audio_attr_t *attr) {
   switch(attr->lang_type) {
   case 0:
     // not specified
-    assert(attr->lang_code == 0 || attr->lang_code == 0xffff);
+    if(attr->lang_code != 0 && attr->lang_code != 0xffff)
+        printf("Lang_code 0x%x, please send a bug report!", attr->lang_code);
     break;
   case 1:
     printf("%c%c ", attr->lang_code>>8, attr->lang_code & 0xff);
@@ -342,16 +343,16 @@ static void ifo_print_audio_attributes(int level, audio_attr_t *attr) {
     printf("(please send a bug report) ");
   }
 
-  printf("%d ", attr->unknown1);
-  printf("%d ", attr->unknown3);
+  printf("Unknown1: %d ", attr->unknown1);
+  printf("Unknown3: %d ", attr->unknown3);
 }
 
-static void ifo_print_subp_attributes(int level, subp_attr_t *attr) {
+static void ifo_print_subp_attributes(subp_attr_t *attr) {
 
   if(attr->type == 0
-     && attr->lang_code == 0
      && attr->zero1 == 0
      && attr->zero2 == 0
+     && attr->lang_code == 0
      && attr->lang_extension== 0) {
     printf("-- Unspecified --");
     return;
@@ -525,20 +526,20 @@ static void ifoPrint_VMGI_MAT(vmgi_mat_t *vmgi_mat) {
   printf("Start sector of VMGM_VOBU_ADMAP: %08x\n",
          vmgi_mat->vmgm_vobu_admap);
   printf("Video attributes of VMGM_VOBS: ");
-  ifo_print_video_attributes(5, &vmgi_mat->vmgm_video_attr);
+  ifo_print_video_attributes(&vmgi_mat->vmgm_video_attr);
   printf("\n");
   printf("VMGM Number of Audio attributes: %i\n",
          vmgi_mat->nr_of_vmgm_audio_streams);
   if(vmgi_mat->nr_of_vmgm_audio_streams > 0) {
     printf("\tstream %i status: ", 1);
-    ifo_print_audio_attributes(5, &vmgi_mat->vmgm_audio_attr);
+    ifo_print_audio_attributes(&vmgi_mat->vmgm_audio_attr);
     printf("\n");
   }
   printf("VMGM Number of Sub-picture attributes: %i\n",
          vmgi_mat->nr_of_vmgm_subp_streams);
   if(vmgi_mat->nr_of_vmgm_subp_streams > 0) {
     printf("\tstream %2i status: ", 1);
-    ifo_print_subp_attributes(5, &vmgi_mat->vmgm_subp_attr);
+    ifo_print_subp_attributes(&vmgi_mat->vmgm_subp_attr);
     printf("\n");
   }
 }
@@ -567,14 +568,14 @@ static void ifoPrint_VTSI_MAT(vtsi_mat_t *vtsi_mat) {
   printf("Start sector of VTS_VOBU_ADMAP:  %08x\n", vtsi_mat->vts_vobu_admap);
 
   printf("Video attributes of VTSM_VOBS: ");
-  ifo_print_video_attributes(5, &vtsi_mat->vtsm_video_attr);
+  ifo_print_video_attributes(&vtsi_mat->vtsm_video_attr);
   printf("\n");
 
   printf("VTSM Number of Audio attributes: %i\n",
          vtsi_mat->nr_of_vtsm_audio_streams);
   if(vtsi_mat->nr_of_vtsm_audio_streams > 0) {
     printf("\tstream %i status: ", 1);
-    ifo_print_audio_attributes(5, &vtsi_mat->vtsm_audio_attr);
+    ifo_print_audio_attributes(&vtsi_mat->vtsm_audio_attr);
     printf("\n");
   }
 
@@ -582,19 +583,19 @@ static void ifoPrint_VTSI_MAT(vtsi_mat_t *vtsi_mat) {
          vtsi_mat->nr_of_vtsm_subp_streams);
   if(vtsi_mat->nr_of_vtsm_subp_streams > 0) {
     printf("\tstream %2i status: ", 1);
-    ifo_print_subp_attributes(5, &vtsi_mat->vtsm_subp_attr);
+    ifo_print_subp_attributes(&vtsi_mat->vtsm_subp_attr);
     printf("\n");
   }
 
   printf("Video attributes of VTS_VOBS: ");
-  ifo_print_video_attributes(5, &vtsi_mat->vts_video_attr);
+  ifo_print_video_attributes(&vtsi_mat->vts_video_attr);
   printf("\n");
 
   printf("VTS Number of Audio attributes: %i\n",
          vtsi_mat->nr_of_vts_audio_streams);
   for(i = 0; i < vtsi_mat->nr_of_vts_audio_streams; i++) {
     printf("\tstream %i status: ", i);
-    ifo_print_audio_attributes(5, &vtsi_mat->vts_audio_attr[i]);
+    ifo_print_audio_attributes(&vtsi_mat->vts_audio_attr[i]);
     printf("\n");
   }
 
@@ -602,7 +603,7 @@ static void ifoPrint_VTSI_MAT(vtsi_mat_t *vtsi_mat) {
          vtsi_mat->nr_of_vts_subp_streams);
   for(i = 0; i < vtsi_mat->nr_of_vts_subp_streams; i++) {
     printf("\tstream %2i status: ", i);
-    ifo_print_subp_attributes(5, &vtsi_mat->vts_subp_attr[i]);
+    ifo_print_subp_attributes(&vtsi_mat->vts_subp_attr[i]);
     printf("\n");
   }
 }
@@ -811,8 +812,8 @@ static void ifoPrint_TT_SRPT(tt_srpt_t *tt_srpt) {
     if (tt_srpt->title[i].pb_ty.jlc_exists_in_prepost_cmd) printf("\t\tJump/Link/Call exists in pre/post cmd\n");
     if (tt_srpt->title[i].pb_ty.jlc_exists_in_button_cmd) printf("\t\tJump/Link/Call exists in button cmd\n");
     if (tt_srpt->title[i].pb_ty.jlc_exists_in_tt_dom) printf("\t\tJump/Link/Call exists in tt_dom cmd\n");
-    printf("\t\tTitle or time play:%d\n", tt_srpt->title[i].pb_ty.title_or_time_play);
-    printf("\t\tChapter search or play:%d\n", tt_srpt->title[i].pb_ty.chapter_search_or_play);
+    printf("\t\tTitle or time play:%u\n", tt_srpt->title[i].pb_ty.title_or_time_play);
+    printf("\t\tChapter search or play:%u\n", tt_srpt->title[i].pb_ty.chapter_search_or_play);
 
     printf("\tParental ID field: %04x\n",
            tt_srpt->title[i].parental_id);
@@ -1027,31 +1028,31 @@ static void ifoPrint_VTS_ATTRIBUTES(vts_attributes_t *vts_attributes) {
   printf("VTS_CAT Application type: %08x\n", vts_attributes->vts_cat);
 
   printf("Video attributes of VTSM_VOBS: ");
-  ifo_print_video_attributes(5, &vts_attributes->vtsm_vobs_attr);
+  ifo_print_video_attributes(&vts_attributes->vtsm_vobs_attr);
   printf("\n");
   printf("Number of Audio streams: %i\n",
          vts_attributes->nr_of_vtsm_audio_streams);
   if(vts_attributes->nr_of_vtsm_audio_streams > 0) {
     printf("\tstream %i attributes: ", 1);
-    ifo_print_audio_attributes(5, &vts_attributes->vtsm_audio_attr);
+    ifo_print_audio_attributes(&vts_attributes->vtsm_audio_attr);
     printf("\n");
   }
   printf("Number of Subpicture streams: %i\n",
          vts_attributes->nr_of_vtsm_subp_streams);
   if(vts_attributes->nr_of_vtsm_subp_streams > 0) {
     printf("\tstream %2i attributes: ", 1);
-    ifo_print_subp_attributes(5, &vts_attributes->vtsm_subp_attr);
+    ifo_print_subp_attributes(&vts_attributes->vtsm_subp_attr);
     printf("\n");
   }
 
   printf("Video attributes of VTSTT_VOBS: ");
-  ifo_print_video_attributes(5, &vts_attributes->vtstt_vobs_video_attr);
+  ifo_print_video_attributes(&vts_attributes->vtstt_vobs_video_attr);
   printf("\n");
   printf("Number of Audio streams: %i\n",
          vts_attributes->nr_of_vtstt_audio_streams);
   for(i = 0; i < vts_attributes->nr_of_vtstt_audio_streams; i++) {
     printf("\tstream %i attributes: ", i);
-    ifo_print_audio_attributes(5, &vts_attributes->vtstt_audio_attr[i]);
+    ifo_print_audio_attributes(&vts_attributes->vtstt_audio_attr[i]);
     printf("\n");
   }
 
@@ -1059,7 +1060,7 @@ static void ifoPrint_VTS_ATTRIBUTES(vts_attributes_t *vts_attributes) {
          vts_attributes->nr_of_vtstt_subp_streams);
   for(i = 0; i < vts_attributes->nr_of_vtstt_subp_streams; i++) {
     printf("\tstream %2i attributes: ", i);
-    ifo_print_subp_attributes(5, &vts_attributes->vtstt_subp_attr[i]);
+    ifo_print_subp_attributes(&vts_attributes->vtstt_subp_attr[i]);
     printf("\n");
   }
 }
@@ -1189,7 +1190,7 @@ void ifo_print(dvd_reader_t *dvd, int title) {
     if(ifohandle->menu_vobu_admap) {
       ifoPrint_VOBU_ADMAP(ifohandle->menu_vobu_admap);
     } else {
-      printf("No Menu VOBU Address map present\n");
+      printf("No Menu VOBU address map present\n");
     }
 
     printf("\nCell Address table\n");

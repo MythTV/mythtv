@@ -43,7 +43,7 @@
 /**
  * The current version.
  */
-#define DVDREAD_VERSION 904
+#define DVDREAD_VERSION 50000
 
 /**
  * The length of one Logical Block of a DVD.
@@ -69,6 +69,14 @@ typedef struct dvd_reader_s dvd_reader_t;
  */
 typedef struct dvd_file_s dvd_file_t;
 
+struct dvd_reader_stream_cb
+{
+    int ( *pf_seek )  ( void *p_stream,  uint64_t i_pos);
+    int ( *pf_read )  ( void *p_stream, void* buffer, int i_read);
+    int ( *pf_readv ) ( void *p_stream, void *p_iovec, int i_blocks);
+};
+typedef struct dvd_reader_stream_cb dvd_reader_stream_cb;
+
 /**
  * Public type that is used to provide statistics on a handle.
  */
@@ -81,6 +89,8 @@ typedef struct {
 /**
  * Opens a block device of a DVD-ROM file, or an image file, or a directory
  * name for a mounted DVD or HD copy of a DVD.
+ * The second form of Open function (DVDOpenStream) can be used to
+ * provide custom stream_cb functions to access the DVD (see libdvdcss).
  *
  * If the given file is a block device, or is the mountpoint for a block
  * device, then that device is used for CSS authentication using libdvdcss.
@@ -96,11 +106,15 @@ typedef struct {
  *   path/vts_01_1.vob
  *
  * @param path Specifies the the device, file or directory to be used.
+ * @param stream is a private handle used by stream_cb
+ * @param stream_cb is a struct containing seek and read functions
  * @return If successful a a read handle is returned. Otherwise 0 is returned.
  *
  * dvd = DVDOpen(path);
+ * dvd = DVDOpenStream(stream, &stream_cb);
  */
 dvd_reader_t *DVDOpen( const char * );
+dvd_reader_t *DVDOpenStream( void *, dvd_reader_stream_cb * );
 
 /**
  * Closes and cleans up the DVD reader object.
