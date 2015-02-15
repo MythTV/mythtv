@@ -22,6 +22,8 @@
 #ifndef LIBDVDNAV_DECODER_H
 #define LIBDVDNAV_DECODER_H
 
+#include <sys/time.h>
+
 /* link command types */
 typedef enum {
   LinkNoLink  = 0,
@@ -93,7 +95,7 @@ typedef struct {
  * the link where to continue, the return value indicates if a jump
  * has been performed */
 int32_t vmEval_CMD(vm_cmd_t commands[], int32_t num_commands,
-	       registers_t *registers, link_t *return_values);
+               registers_t *registers, link_t *return_values);
 
 /* extracts some bits from the command */
 uint32_t vm_getbits(command_t* command, int32_t start, int32_t count);

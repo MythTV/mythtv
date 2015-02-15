@@ -30,11 +30,12 @@
 #include <limits.h>
 #include <string.h>  /* For memset */
 #include <sys/time.h>
-#include "dvdread/nav_types.h"
-#include "dvdread/ifo_types.h" /* vm_cmd_t */
+#include <assert.h>
+
+#include <dvdread/nav_types.h>
+#include <dvdread/ifo_types.h> /* vm_cmd_t */
 
 #include "dvdnav/dvdnav.h"
-#include "remap.h"
 #include "decoder.h"
 #include "vm.h"
 #include "vmcmd.h"
@@ -131,7 +132,7 @@ static uint16_t eval_reg_or_data(command_t* command, int32_t imm, int32_t start)
    lower four bits for the general purpose register number. */
 /* Evaluates gprm or data depending on bit, data is in byte n */
 static uint16_t eval_reg_or_data_2(command_t* command,
-				   int32_t imm, int32_t start) {
+                                   int32_t imm, int32_t start) {
   if(imm) /* immediate */
     return vm_getbits(command, (start - 1), 7);
   else
@@ -228,9 +229,9 @@ static int32_t eval_special_instruction(command_t* command, int32_t cond) {
       line = vm_getbits(command, 7, 8);
       level = vm_getbits(command, 11, 4);
       if(cond) {
-	/*  This always succeeds now, if we want real parental protection */
-	/*  we need to ask the user and have passwords and stuff. */
-	command->registers->SPRM[13] = level;
+        /*  This always succeeds now, if we want real parental protection */
+        /*  we need to ask the user and have passwords and stuff. */
+        command->registers->SPRM[13] = level;
       }
       return cond ? line : 0;
   }
@@ -262,26 +263,26 @@ static int32_t eval_link_instruction(command_t* command, int32_t cond, link_t *r
 
   switch(op) {
     case 1:
-	return eval_link_subins(command, cond, return_values);
+        return eval_link_subins(command, cond, return_values);
     case 4:
-	return_values->command = LinkPGCN;
-	return_values->data1   = vm_getbits(command, 14, 15);
-	return cond;
+        return_values->command = LinkPGCN;
+        return_values->data1   = vm_getbits(command, 14, 15);
+        return cond;
     case 5:
-	return_values->command = LinkPTTN;
-	return_values->data1 = vm_getbits(command, 9, 10);
-	return_values->data2 = vm_getbits(command, 15, 6);
-	return cond;
+        return_values->command = LinkPTTN;
+        return_values->data1 = vm_getbits(command, 9, 10);
+        return_values->data2 = vm_getbits(command, 15, 6);
+        return cond;
     case 6:
-	return_values->command = LinkPGN;
-	return_values->data1 = vm_getbits(command, 6, 7);
-	return_values->data2 = vm_getbits(command, 15, 6);
-	return cond;
+        return_values->command = LinkPGN;
+        return_values->data1 = vm_getbits(command, 6, 7);
+        return_values->data2 = vm_getbits(command, 15, 6);
+        return cond;
     case 7:
-	return_values->command = LinkCN;
-	return_values->data1 = vm_getbits(command, 7, 8);
-	return_values->data2 = vm_getbits(command, 15, 6);
-	return cond;
+        return_values->command = LinkCN;
+        return_values->data1 = vm_getbits(command, 7, 8);
+        return_values->data2 = vm_getbits(command, 15, 6);
+        return cond;
   }
   return 0;
 }
@@ -378,17 +379,17 @@ static int32_t eval_system_set(command_t* command, int32_t cond, link_t *return_
       data = eval_reg_or_data(command, vm_getbits(command, 60, 1), 47);
       data2 = vm_getbits(command, 23, 8); /*  ?? size */
       if(cond) {
-	command->registers->SPRM[9] = data; /*  time */
-	command->registers->SPRM[10] = data2; /*  pgcN */
+        command->registers->SPRM[9] = data; /*  time */
+        command->registers->SPRM[10] = data2; /*  pgcN */
       }
       break;
     case 3: /*  Mode: Counter / Register + Set */
       data = eval_reg_or_data(command, vm_getbits(command, 60, 1), 47);
       data2 = vm_getbits(command, 19, 4);
       if(vm_getbits(command, 23, 1)) {
-	command->registers->GPRM_mode[data2] |= 1; /* Set bit 0 */
+        command->registers->GPRM_mode[data2] |= 1; /* Set bit 0 */
       } else {
-	command->registers->GPRM_mode[data2] &= ~ 0x01; /* Reset bit 0 */
+        command->registers->GPRM_mode[data2] &= ~ 0x01; /* Reset bit 0 */
       }
       if(cond) {
         set_GPRM(command->registers, data2, data);
@@ -397,7 +398,7 @@ static int32_t eval_system_set(command_t* command, int32_t cond, link_t *return_
     case 6: /*  Set system reg 8 (Highlighted button) */
       data = eval_reg_or_data(command, vm_getbits(command, 60, 1), 31); /*  Not system reg!! */
       if(cond) {
-	command->registers->SPRM[8] = data;
+        command->registers->SPRM[8] = data;
       }
       break;
   }
@@ -516,8 +517,8 @@ static int32_t eval_command(uint8_t *bytes, registers_t* registers, link_t *retu
       cond = eval_if_version_1(&command);
       res = eval_special_instruction(&command, cond);
       if(res == -1) {
-	fprintf(MSG_OUT, "libdvdnav: Unknown Instruction!\n");
-	abort();
+        fprintf(MSG_OUT, "libdvdnav: Unknown Instruction!\n");
+        assert(0);
       }
       break;
     case 1: /*  Link/jump instructions */
@@ -529,29 +530,29 @@ static int32_t eval_command(uint8_t *bytes, registers_t* registers, link_t *retu
         res = eval_link_instruction(&command, cond, return_values);
       }
       if(res)
-	res = -1;
+        res = -1;
       break;
     case 2: /*  System set instructions */
       cond = eval_if_version_2(&command);
       res = eval_system_set(&command, cond, return_values);
       if(res)
-	res = -1;
+        res = -1;
       break;
     case 3: /*  Set instructions, either Compare or Link may be used */
       cond = eval_if_version_3(&command);
       eval_set_version_1(&command, cond);
       if(vm_getbits(&command, 51, 4)) {
-	res = eval_link_instruction(&command, cond, return_values);
+        res = eval_link_instruction(&command, cond, return_values);
       }
       if(res)
-	res = -1;
+        res = -1;
       break;
     case 4: /*  Set, Compare -> Link Sub-Instruction */
       eval_set_version_2(&command, /*True*/ 1);
       cond = eval_if_version_4(&command);
       res = eval_link_subins(&command, cond, return_values);
       if(res)
-	res = -1;
+        res = -1;
       break;
     case 5: /*  Compare -> (Set and Link Sub-Instruction) */
       /* FIXME: These are wrong. Need to be updated from vmcmd.c */
@@ -559,7 +560,7 @@ static int32_t eval_command(uint8_t *bytes, registers_t* registers, link_t *retu
       eval_set_version_2(&command, cond);
       res = eval_link_subins(&command, cond, return_values);
       if(res)
-	res = -1;
+        res = -1;
       break;
     case 6: /*  Compare -> Set, allways Link Sub-Instruction */
       /* FIXME: These are wrong. Need to be updated from vmcmd.c */
@@ -567,11 +568,10 @@ static int32_t eval_command(uint8_t *bytes, registers_t* registers, link_t *retu
       eval_set_version_2(&command, cond);
       res = eval_link_subins(&command, /*True*/ 1, return_values);
       if(res)
-	res = -1;
+        res = -1;
       break;
-    default: /* Unknown command */
-      fprintf(MSG_OUT, "libdvdnav: WARNING: Unknown Command=%x\n", vm_getbits(&command, 63, 3));
-      abort();
+    default: /* Unknown command type */
+      fprintf(MSG_OUT, "libdvdnav: WARNING: Unknown Command Type=%x\n", vm_getbits(&command, 63, 3));
   }
   /*  Check if there are bits not yet examined */
 
@@ -586,7 +586,7 @@ static int32_t eval_command(uint8_t *bytes, registers_t* registers, link_t *retu
 
 /* Evaluate a set of commands in the given register set (which is modified) */
 int32_t vmEval_CMD(vm_cmd_t commands[], int32_t num_commands,
-	       registers_t *registers, link_t *return_values) {
+               registers_t *registers, link_t *return_values) {
   int32_t i = 0;
   int32_t total = 0;
 
@@ -745,7 +745,7 @@ void vm_print_link(link_t value) {
     break;
   case JumpSS_VTSM:
     fprintf(MSG_OUT, "libdvdnav: %s vts %d title %d menu %d\n",
-	    cmd, value.data1, value.data2, value.data3);
+            cmd, value.data1, value.data2, value.data3);
     break;
   case CallSS_FP:
     fprintf(MSG_OUT, "libdvdnav: %s resume cell %d\n", cmd, value.data1);

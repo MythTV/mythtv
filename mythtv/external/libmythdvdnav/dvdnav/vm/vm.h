@@ -23,22 +23,13 @@
 #ifndef LIBDVDNAV_VM_H
 #define LIBDVDNAV_VM_H
 
-/* DOMAIN enum */
-
-typedef enum {
-  FP_DOMAIN   = 1,
-  VTS_DOMAIN  = 2,
-  VMGM_DOMAIN = 4,
-  VTSM_DOMAIN = 8
-} domain_t;
-
 /**
  * State: SPRM, GPRM, Domain, pgc, pgN, cellN, ?
  */
 typedef struct {
   registers_t registers;
 
-  domain_t  domain;
+  DVDDomain_t  domain;
   int       vtsN;         /* 0 is vmgm? */
   pgc_t    *pgc;          /* either this or 'int pgcN' is enough? */
   int       pgcN;         /* but provide pgcN for quick lookup */
@@ -58,7 +49,7 @@ typedef struct {
 typedef struct vm_position_s {
   int16_t  button;        /* Button highlighted */
   int32_t  vts;           /* vts number to use */
-  domain_t domain;        /* domain to use */
+  DVDDomain_t domain;     /* domain to use */
   int32_t  spu_channel;   /* spu channel to use */
   int32_t  angle_channel; /* angle channel to use */
   int32_t  audio_channel; /* audio channel to use */
@@ -83,7 +74,6 @@ typedef struct {
   int32_t       hop_channel;
   char          dvd_name[50];
   char          dvd_serial[15];
-  remap_t      *map;
   int           stopped;
 } vm_t;
 
@@ -124,7 +114,8 @@ dvd_reader_t *vm_get_dvd_reader(vm_t *vm);
 /* Basic Handling */
 int  vm_start(vm_t *vm);
 void vm_stop(vm_t *vm);
-int  vm_reset(vm_t *vm, const char *dvdroot);
+int  vm_reset(vm_t *vm, const char *dvdroot, void *stream,
+              dvdnav_stream_cb *stream_cb);
 
 /* copying and merging  - useful for try-running an operation */
 vm_t *vm_new_copy(vm_t *vm);
@@ -180,6 +171,8 @@ int vm_set_state(vm_t *vm, const char *state_str);
 /* Debug */
 void vm_position_print(vm_t *vm, vm_position_t *position);
 #endif
+
+int ifoOpenNewVTSI(vm_t *vm, dvd_reader_t *dvd, int vtsN);
 
 
 #endif /* LIBDVDNAV_VM_H */
