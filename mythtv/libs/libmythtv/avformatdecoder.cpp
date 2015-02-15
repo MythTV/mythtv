@@ -1084,7 +1084,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         if (fmt2)
         {
             fmt = fmt2;
-            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Using FFmpeg MPEG-TS demuxer (forced)");
+            LOG(VB_GENERAL, LOG_INFO, LOC + "Using FFmpeg MPEG-TS demuxer (forced)");
         }
     }
 
