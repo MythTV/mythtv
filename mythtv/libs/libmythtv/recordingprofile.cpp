@@ -1017,9 +1017,9 @@ class RecordFullTSStream : public ComboBoxSetting, public CodecParamStorage
 
         QString msg = QObject::tr(
             "If set, extra files will be created for each recording with "
-            "the name of the recording followed by '.ts' and a number. "
+            "the name of the recording followed by '.ts.raw'. "
             "These extra files represent the full contents of the transport "
-            "stream used to generate the recording.");
+            "stream used to generate the recording. (For debugging purposes)");
         setHelpText(msg);
 
         addSelection(QObject::tr("Yes"), "1");
