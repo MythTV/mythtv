@@ -1,7 +1,25 @@
 
+:disabled
+{
+    color: #666666;
+}
+
 fieldset
 {
     border: none;
+}
+
+fieldset.setting-fieldset
+{
+    border: 1px solid #999999;
+    margin-bottom: 20px;
+    padding: 10px;
+    padding-bottom: 0px;
+}
+
+fieldset.setting-fieldset:disabled
+{
+    border: 1px solid #333333;
 }
 
 .setting
@@ -104,3 +122,7 @@ input[type=range]::-webkit-slider-thumb:focus
     font-size: 0.8em;
 }
 
+input.setting-path
+{
+
+}

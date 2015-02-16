@@ -30,6 +30,14 @@ function getBoolArg(name)
     return Boolean(getIntegerArg(name));
 }
 
+function getArgArray()
+{
+    if (isValidObject(this.Parameters))
+        return this.Parameters;
+    else
+        return Array();
+}
+
 function getArgCount()
 {
     if (isValidObject(this.Parameters))

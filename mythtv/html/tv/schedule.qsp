@@ -85,12 +85,12 @@ import "/tv/js/tvutil.qjs"
 <link rel="stylesheet" type="text/css" href="/3rdParty/jquery/jqueryUI/css/jquery-ui.css">
 <link rel="stylesheet" type="text/css" href="/css/site.css">
 <link rel="stylesheet" type="text/css" href="/tv/css/common.css">
-<link rel="stylesheet" type="text/css" href="/tv/css/settings.css">
+<link rel="stylesheet" type="text/css" href="/css/settings.css">
 <link rel="stylesheet" type="text/css" href="/tv/css/schedule.css">
 <script src="/js/utility.js"></script> <!-- ECMA not JS -->
 <script type="text/javascript" src="/3rdParty/jquery/jquery-2.0.3.min.js"></script>
 <script type="text/javascript" src="/3rdParty/jquery/jqueryUI/js/jquery-ui-1.10.3.js"></script>
-<script src="/tv/js/settings.js"></script>
+<script src="/js/settings.js"></script>
 <script src="/tv/js/common.js"></script>
 <script src="/tv/js/schedule.js"></script>
 
@@ -276,7 +276,7 @@ import "/tv/js/tvutil.qjs"
         <div class="setting setting-range">
             <label for="rule-RecPriority"><%=qsTr("Priority")%>:</label>
             <span>-99</span>
-            <input type="range" name="RecPriority" id="rule-RecPriority" value="<%=recRule.RecPriority%>" min="-99" max="99" onmousemove="updateRangeValue(this)" onChange="updateRangeValue(this)" required>
+            <input type="range" name="RecPriority" id="rule-RecPriority" value="<%=recRule.RecPriority%>" min="-99" max="99" onmousemove="MythSettings.UpdateRangeValue(this)" onChange="MythSettings.UpdateRangeValue(this)" required>
             <span>99</span>
             <output name="RecPriority-Value" id="rule-RecPriority-Value" for="range"><%=recRule.RecPriority%></output>
         </div>
@@ -285,7 +285,7 @@ import "/tv/js/tvutil.qjs"
         <div class="setting setting-range">
             <label for="rule-StartOffset"><%=qsTr("Start Early/Late")%>:</label>
             <span>-240</span>
-            <input type="range" name="StartOffset" id="rule-StartOffset" value="<%=recRule.StartOffset%>" min="-240" max="240" onmousemove="updateRangeValue(this)" onChange="updateRangeValue(this)" required>
+            <input type="range" name="StartOffset" id="rule-StartOffset" value="<%=recRule.StartOffset%>" min="-240" max="240" onmousemove="MythSettings.UpdateRangeValue(this)" onChange="MythSettings.UpdateRangeValue(this)" required>
             <span>240</span>
             <output name="rangeValue" id="rule-StartOffset-Value" for="range"><%=recRule.StartOffset%></output> <%=qsTr("Minutes")%>
         </div>
@@ -294,7 +294,7 @@ import "/tv/js/tvutil.qjs"
         <div class="setting setting-range">
             <label for="rule-EndOffset"><%=qsTr("End Early/Late")%>:</label>
             <span>-240</span>
-            <input type="range" name="EndOffset" id="rule-EndOffset" value="<%=recRule.EndOffset%>" min="-240" max="240" onmousemove="updateRangeValue(this)" onChange="updateRangeValue(this)" required>
+            <input type="range" name="EndOffset" id="rule-EndOffset" value="<%=recRule.EndOffset%>" min="-240" max="240" onmousemove="MythSettings.UpdateRangeValue(this)" onChange="MythSettings.UpdateRangeValue(this)" required>
             <span>240</span>
             <output name="EndOffset-Value" id="rule-EndOffset-Value" for="range"><%=recRule.EndOffset%></output> <%=qsTr("Minutes")%>
         </div>
@@ -440,7 +440,7 @@ import "/tv/js/tvutil.qjs"
         <div class="setting setting-range">
             <label for="rule-MaxEpisodes"><%=qsTr("Episode Limit")%>:</label>
             <span>No Limit</span>
-            <input type="range" name="MaxEpisodes" id="rule-MaxEpisodes" value="<%=recRule.MaxEpisodes%>" min="0" max="50" onmousemove="updateRangeValue(this)" onChange="updateRangeValue(this)" required>
+            <input type="range" name="MaxEpisodes" id="rule-MaxEpisodes" value="<%=recRule.MaxEpisodes%>" min="0" max="50" onmousemove="MythSettings.UpdateRangeValue(this)" onChange="MythSettings.UpdateRangeValue(this)" required>
             <span>50</span>
             <output name="MaxEpisodes-Value" id="rule-MaxEpisodes-Value" for="range"><%=recRule.MaxEpisodes%></output> <%=qsTr("Episodes")%>
         </div>

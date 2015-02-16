@@ -17,6 +17,7 @@
     </li>
     <li><a href='#'><i18n>Setup</i18n></a>
       <ul class="acitem collapsible">
+        <li><a href='#' onClick="hideMainMenu(); loadFrontendContent('/setup/webfrontend-settings.qsp')"><%=qsTr("WebFrontend")%></a></li>
         <li><a href='#' onClick="hideMainMenu(); loadEditWindow('/setup/wizard.html', '/setup/js/wizard.js')"><i18n>Setup Wizard</i18n></a></li>
         <li><a href='#'><i18n>Advanced Setup</i18n></a>
           <ul class="acitem collapsible">

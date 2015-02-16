@@ -557,7 +557,11 @@ function saveFormData(formElement, callback)
         dataType: "text",
         success:function(data, textStatus, jqXHR)
         {
-            callback(data.trim());
+            if (data)
+            {
+                console.log("saveFormData response: " + data.trim());
+                callback(data.trim());
+            }
             $("#saveFormDataSuccess").show().delay(5000).fadeOut();
         },
         error: function(jqXHR, textStatus, errorThrown)
