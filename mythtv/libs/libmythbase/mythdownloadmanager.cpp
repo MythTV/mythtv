@@ -1094,6 +1094,11 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
         QUrl possibleRedirectUrl =
              reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
 
+        if (!possibleRedirectUrl.isEmpty() &&
+            possibleRedirectUrl.isValid() &&
+            possibleRedirectUrl.isRelative())  // Turn relative Url to absolute
+            possibleRedirectUrl = reply->url().resolved(possibleRedirectUrl);
+
         dlInfo->m_redirectedTo =
              redirectUrl(possibleRedirectUrl, dlInfo->m_redirectedTo);
     }
