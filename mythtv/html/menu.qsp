@@ -36,13 +36,8 @@
         </li>
 <%
     var myth = new Myth();
-    var sList = myth.GetSetting( '', 'EnableWebSetupDevMode', '');
-    var devMode = 0;
-
-    if (sList.Settings['EnableWebSetupDevMode'] == 1)
-        devMode = 1;
-
-    if (devMode)
+    var devMode = myth.GetSetting( '', 'EnableWebSetupDevMode', '0' );
+    if (devMode == 1)
     {
         os.write("<li><a href='#' onClick=\"hideMainMenu();loadSetupPage('expert')\"><i18n>Expert/Dev Setup</i18n></a></li>");
     }

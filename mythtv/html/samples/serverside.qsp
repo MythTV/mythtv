@@ -50,7 +50,7 @@ then calling the method:
 	List of Settings: 
 	<select id="Settings" onchange="GetSettingValue()">
 <%
-	var sList = myth.GetSetting( "", "", "");
+	var sList = myth.GetSettingList( "" );
 	
 	var keys = sList.Settings;
 
