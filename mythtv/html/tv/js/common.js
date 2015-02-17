@@ -339,7 +339,7 @@ function loadScheduler(type, chanID, startTime)
 
 function checkRecordingStatus(chanID, startTime)
 {
-//     var url = "/tv/ajax_backends/dvr_util.qsp?_action=checkRecStatus&chanID=" + chanID + "&startTime=" + startTime;
+//     var url = "/tv/ajax_backends/dvr_util.qsp?_action=checkRecStatus&ChanId=" + chanID + "&StartTime=" + startTime;
 //     var ajaxRequest = $.ajax( url ).done(function()
 //                             {
 //                                 var response = ajaxRequest.responseText.trim().split("#");
@@ -391,7 +391,7 @@ function deleteRecRule(chanID, startTime)
         return;
     }
     hideMenu("optMenu");
-    var url = "/tv/ajax_backends/dvr_util.qsp?_action=deleteRecRule&recRuleID=" + recRuleID + "&chanID=" + chanID + "&startTime=" + startTime;
+    var url = "/tv/ajax_backends/dvr_util.qsp?_action=deleteRecRule&recRuleID=" + recRuleID + "&ChanId=" + chanID + "&StartTime=" + startTime;
     var ajaxRequest = $.ajax( url )
                             .done(function()
                             {
@@ -410,7 +410,7 @@ function dontRecord(chanID, startTime)
     }
     var recRuleID = layer.getAttribute("data-recordid");
     hideMenu("optMenu");
-    var url = "/tv/ajax_backends/dvr_util.qsp?_action=dontRecord&chanID=" + chanID + "&startTime=" + startTime;
+    var url = "/tv/ajax_backends/dvr_util.qsp?_action=dontRecord&ChanId=" + chanID + "&StartTime=" + startTime;
     var ajaxRequest = $.ajax( url )
                             .done(function()
                             {
@@ -429,7 +429,7 @@ function neverRecord(chanID, startTime)
     }
     var recRuleID = layer.getAttribute("data-recordid");
     hideMenu("optMenu");
-    var url = "/tv/ajax_backends/dvr_util.qsp?_action=neverRecord&chanID=" + chanID + "&startTime=" + startTime;
+    var url = "/tv/ajax_backends/dvr_util.qsp?_action=neverRecord&ChanId=" + chanID + "&StartTime=" + startTime;
     var ajaxRequest = $.ajax( url )
                             .done(function()
                             {

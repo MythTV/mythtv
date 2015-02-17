@@ -1169,8 +1169,7 @@ long HTTPRequest::GetParameters( QString sParams, QStringMap &mapParams  )
                 sName  = QUrl::fromPercentEncoding(sName.toUtf8());
                 sValue = QUrl::fromPercentEncoding(sValue.toUtf8());
 
-                // Make Parameter Names all lower case
-                mapParams.insert( sName.trimmed().toLower(), sValue );
+                mapParams.insert( sName.trimmed(), sValue );
                 nCount++;
             }
         }
