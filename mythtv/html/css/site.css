@@ -49,9 +49,9 @@
         text-align: center;
     }
 
-    input:hover,
-    textarea:hover,
-    select:hover
+    input:enabled:hover,
+    textarea:enabled:hover,
+    select:enabled:hover
     {
         background-color: #003147;
         border-color: #0B93D5;
