@@ -389,12 +389,11 @@ while (listIdx < programs.length)
 if (nextStartIndex > 0)
 {
     var obj = this.Parameters;
+
     obj.Start = nextStartIndex;
-    obj.ChanId = ChanId;
     var queryString = toQueryString(obj);
 %>
-
-<a class="jscroll-next" href="/tv/programsearch.qsp?<%=encodeURIComponent(queryString)%>&amp;ListOnly=1" />
+<a class="jscroll-next" href="/tv/programsearch.qsp?<%=queryString%>&amp;ListOnly=1"></a>
 <%}%>
 
 <% if (!listOnly) {%>
