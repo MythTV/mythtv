@@ -748,7 +748,8 @@ int main(int argc, char *argv[])
         exitcode = result;
     }
 
-    CompleteJob(jobID, pginfo, useCutlist, &deleteMap, exitcode, result);
+    if (!cmdline.toBool("hls"))
+        CompleteJob(jobID, pginfo, useCutlist, &deleteMap, exitcode, result);
 
     transcode->deleteLater();
 
