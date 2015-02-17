@@ -96,7 +96,7 @@ var myth = new Myth();
         <label for="setting-EnableAnimations"><%=qsTr("Enable Animations")%>:</label>
         <span>No</span>
         <div class="setting-toggle-background">
-          <input type="range" name="setting[WebFrontend_enableAnimations]" id="setting-EnableAnimations" value="<%=myth.GetSetting("", "WebFrontend_enableAnimations", "1") ? "1" : "0"%>" min="0" max="1" required>
+          <input type="range" name="setting[WebFrontend_enableAnimations]" id="setting-EnableAnimations" value="<%=myth.GetSetting("", "WebFrontend_enableAnimations", "1") > 0 ? "1" : "0"%>" min="0" max="1" required>
         </div>
         <span>Yes</span>
       </div>
