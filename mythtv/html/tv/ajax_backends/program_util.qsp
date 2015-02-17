@@ -94,14 +94,14 @@ import "/js/utility.js"
         var startTime = myth.ParseISODateString(getArg("StartTime"));
 
         var guide = new Guide();
-        var program = guide.GetProgramDetails(getArg("ChanID"), startTime);
+        var program = guide.GetProgramDetails(getArg("ChanId"), startTime);
         return buildDetailHTML(program, "program");
     }
 
     function getRecordingDetailHTML()
     {
         var dvr = new Dvr();
-        var program = dvr.GetRecorded(getArg("recordedID"));
+        var program = dvr.GetRecorded(getArg("RecordedId"));
         return buildDetailHTML(program, "recording");
     }
 

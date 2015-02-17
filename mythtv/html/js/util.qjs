@@ -12,9 +12,22 @@ function showHostName() {
     $("#hostname").html(getHostName());
 }
 
-function getSetting(hostname, key, defValue)
-{
-    return myth.GetSetting(hostname, key, defValue);
+function getSetting(hostname, key, defValue) {
+    var result = "";
+
+    $.ajaxSetup({ async: false });
+    $.getJSON("/Myth/GetSetting",
+        { HostName: hostname, Key: key, Default: defValue },
+        function(data) {
+            result = data.String;
+        }).error(function(data) {
+            setErrorMessage("<i18n>Unable to retrieve setting.</i18n>");
+        });
+    $.ajaxSetup({ async: true });
+
+    console.log("getSetting(" + hostname + "," + key + "," + defValue + "):" + result);
+
+    return result;
 }
 
 function putSetting(hostname, key, value) {

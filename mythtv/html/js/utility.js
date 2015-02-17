@@ -10,8 +10,6 @@
 
 function getArg(name)
 {
-    name = name.toLowerCase();
-
     if (isValidObject(this.Parameters))
         return this.Parameters[name];
     else
