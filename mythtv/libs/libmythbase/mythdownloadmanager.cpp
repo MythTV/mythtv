@@ -1086,6 +1086,7 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
     if (!dlInfo)
         return;
 
+    int statusCode = -1;
     static const char dateFormat[] = "ddd, dd MMM yyyy hh:mm:ss 'GMT'";
     QNetworkReply *reply = dlInfo->m_reply;
 
@@ -1101,9 +1102,17 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
 
         dlInfo->m_redirectedTo =
              redirectUrl(possibleRedirectUrl, dlInfo->m_redirectedTo);
+
+        QVariant status =
+            reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
+        if (status.isValid())
+            statusCode = status.toInt();
     }
 
-    if(reply && !dlInfo->m_redirectedTo.isEmpty())
+    if(reply && !dlInfo->m_redirectedTo.isEmpty() &&
+       ((dlInfo->m_requestType != kRequestPost) ||
+       (statusCode == 301 || statusCode == 302 ||
+       statusCode == 303)))
     {
         LOG(VB_FILE, LOG_DEBUG, LOC +
             QString("downloadFinished(%1): Redirect: %2 -> %3")
@@ -1135,9 +1144,6 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
 
         switch (dlInfo->m_requestType)
         {
-            case kRequestPost :
-                dlInfo->m_reply = m_manager->post(request, *dlInfo->m_data);
-                break;
             case kRequestHead :
                 dlInfo->m_reply = m_manager->head(request);
                 break;
