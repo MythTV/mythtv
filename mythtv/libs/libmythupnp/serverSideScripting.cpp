@@ -152,7 +152,7 @@ ScriptInfo *ServerSideScripting::GetLoadedScript( const QString &sFileName )
 //////////////////////////////////////////////////////////////////////////////
 
 bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &sFileName,
-                                        HTTPRequest *pRequest)
+                                        HTTPRequest *pRequest, const QByteArray &cspToken)
 {
     try
     {
@@ -336,6 +336,9 @@ bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &
                                             m_engine.toScriptValue(respHeaderMap));
         m_engine.globalObject().setProperty("Server",
                                             m_engine.toScriptValue(serverVars));
+        QScriptValue qsCspToken = m_engine.toScriptValue(cspToken);
+        m_engine.globalObject().setProperty("CSP_NONCE", qsCspToken);
+
 
         // ------------------------------------------------------------------
         // Execute function to render output

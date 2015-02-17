@@ -110,8 +110,6 @@ bool HtmlServerExtension::ProcessRequest( HTTPRequest *pRequest )
                     // ------------------------------------------------------
                     QByteArray cspNonce = QUuid::createUuid().toByteArray().toBase64();
                     cspNonce = cspNonce.mid(1, cspNonce.length() - 2); // UUID, with braces removed
-                    QScriptValue qsFormatStr = m_Scripting.m_engine.newVariant(cspNonce);
-                    m_Scripting.m_engine.globalObject().setProperty("CSP_NONCE", qsFormatStr);
 
                     // ------------------------------------------------------
                     // Is this a Qt Server Page (File contains script)...
@@ -181,7 +179,7 @@ bool HtmlServerExtension::ProcessRequest( HTTPRequest *pRequest )
                     {
                         QTextStream stream( &pRequest->m_response );
                         
-                        m_Scripting.EvaluatePage( &stream, sResName, pRequest);
+                        m_Scripting.EvaluatePage( &stream, sResName, pRequest, cspNonce);
 
                         return true;
 
