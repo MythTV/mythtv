@@ -530,7 +530,7 @@ bool MythDownloadManager::download(QNetworkRequest *req, QByteArray *data)
     LOG(VB_FILE, LOG_DEBUG, LOC + QString("download('%1', '%2')")
             .arg(req->url().toString()).arg((long long)data));
     return processItem(req->url().toString(), req, QString(), data,
-                       kRequestGet, 
+                       kRequestGet,
                        (QNetworkRequest::AlwaysNetwork == req->attribute(
                         QNetworkRequest::CacheLoadControlAttribute,
                         QNetworkRequest::PreferNetwork).toInt()));
