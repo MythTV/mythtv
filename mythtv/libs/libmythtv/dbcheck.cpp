@@ -3090,6 +3090,25 @@ NULL
             return false;
     }
 
+    if (dbver == "1337")
+    {
+        const char *updates[] = {
+            // All next_record, last_record and last_delete to be NULL.
+            "ALTER TABLE record MODIFY next_record DATETIME NULL",
+            "UPDATE record SET next_record = NULL "
+            "    WHERE next_record = '0000-00-00 00:00:00'",
+            "ALTER TABLE record MODIFY last_record DATETIME NULL",
+            "UPDATE record SET last_record = NULL "
+            "    WHERE last_record = '0000-00-00 00:00:00'",
+            "ALTER TABLE record MODIFY last_delete DATETIME NULL",
+            "UPDATE record SET last_delete = NULL "
+            "    WHERE last_delete = '0000-00-00 00:00:00'",
+            NULL
+        };
+        if (!performActualUpdate(updates, "1338", dbver))
+            return false;
+    }
+
     return true;
 }
 

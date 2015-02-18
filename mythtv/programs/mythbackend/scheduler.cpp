@@ -1677,7 +1677,7 @@ void Scheduler::UpdateNextRecord(void)
             else if (next_record.isValid())
             {
                 subquery.prepare("UPDATE record "
-                                 "SET next_record = '0000-00-00 00:00:00' "
+                                 "SET next_record = NULL "
                                  "WHERE recordid = :RECORDID;");
                 subquery.bindValue(":RECORDID", recid);
                 if (!subquery.exec())
@@ -4555,7 +4555,7 @@ void Scheduler::GetAllScheduled(RecList &proglist, SchedSortColumn sortBy,
             // in rules that aren't matching recordings at the present time.
             // We still want them available in the list however since vanishing rules
             // violates the principle of least surprise
-            sortColumn = "record.next_record = '0000-00-00 00:00:00', record.next_record";
+            sortColumn = "record.next_record IS NULL, record.next_record";
             break;
         case kSortType:
             sortColumn = "record.type";
