@@ -1077,23 +1077,27 @@ void ThemeUpdateChecker::checkForUpdate(void)
             if (RemoteFile::Exists(infoXML))
             {
                 ThemeInfo *remoteTheme = new ThemeInfo(remoteThemeDir);
-                if (!remoteTheme)
+                if (!remoteTheme || remoteTheme->GetType() & THEME_UNKN)
                 {
                     LOG(VB_GENERAL, LOG_ERR,
                         QString("ThemeUpdateChecker::checkForUpdate(): "
                                 "Unable to create ThemeInfo for %1")
                         .arg(infoXML));
+                    delete remoteTheme;
+                    remoteTheme = NULL;
                     return;
                 }
 
                 if (!localTheme)
                 {
                     localTheme = new ThemeInfo(GetMythUI()->GetThemeDir());
-                    if (!localTheme)
+                    if (!localTheme || localTheme->GetType() & THEME_UNKN)
                     {
                         LOG(VB_GENERAL, LOG_ERR,
                             "ThemeUpdateChecker::checkForUpdate(): "
                             "Unable to create ThemeInfo for current theme");
+                        delete localTheme;
+                        localTheme = NULL;
                         return;
                     }
                     locMaj = localTheme->GetMajorVersion();
@@ -1104,6 +1108,7 @@ void ThemeUpdateChecker::checkForUpdate(void)
                 int rmtMin = remoteTheme->GetMinorVersion();
 
                 delete remoteTheme;
+                remoteTheme = NULL;
 
                 if ((rmtMaj > locMaj) ||
                     ((rmtMaj == locMaj) &&
