@@ -31,6 +31,7 @@
 #include <cerrno>
 // FOR DEBUGGING
 #include <iostream>
+#include <complex>
 
 #ifndef _WIN32
 #include <netinet/tcp.h>
@@ -1348,12 +1349,15 @@ bool HTTPRequest::ParseRequest()
             {
                 m_eResponseType   = ResponseTypeHTML;
                 m_nResponseStatus = 401;
-                m_mapRespHeaders["WWW-Authenticate"] = "Basic realm=\"MythTV\"";
-
                 m_response.write( Static401Error );
+                // Since this may not be the first attempt at authentication,
+                // Authenticated may have set the header with the appropriate
+                // stale attribute
+                SetResponseHeader("WWW-Authenticate", GetAuthenticationHeader(false));
 
                 return true;
             }
+
 
             m_bProtected = true;
         }
@@ -1819,6 +1823,216 @@ bool HTTPRequest::IsUrlProtected( const QString &sBaseUrl )
     return false;
 }
 
+QString HTTPRequest::GetAuthenticationHeader(bool isStale)
+{
+    QString authHeader;
+
+    // For now we support a single realm, that will change
+    QString realm = "MythTV";
+
+    // Always use digest authentication where supported, it may be available
+    // with HTTP 1.0 client as an extension, but we can't tell if that's the
+    // case. It's guaranteed to be available for HTTP 1.1+
+    if (m_nMajor >= 1 && m_nMinor > 0)
+    {
+        QString nonce = CalculateDigestNonce(MythDate::current_iso_string());
+        QString stale = isStale ? "true" : "false"; // FIXME
+        authHeader = QString("Digest realm=\"%1\",nonce=\"%2\","
+                             "qop=\"auth\",stale=\"%3\",algorithm=\"MD5\"")
+                        .arg(realm).arg(nonce).arg(stale);
+    }
+    else
+    {
+        authHeader = QString("Basic realm=\"%1\"").arg(realm);
+    }
+
+    return authHeader;
+}
+
+QString HTTPRequest::CalculateDigestNonce(const QString& timeStamp)
+{
+    QString uniqueID = QString("%1:%2").arg(timeStamp).arg(m_sPrivateToken);
+    QString hash = QCryptographicHash::hash( uniqueID.toLatin1(), QCryptographicHash::Sha1).toHex(); // TODO: Change to Sha2 with QT5?
+    QString nonce = QString("%1%2").arg(timeStamp).arg(hash); // Note: since this is going in a header it should avoid illegal chars
+    return nonce;
+}
+
+bool HTTPRequest::BasicAuthentication()
+{
+    QStringList oList = m_mapHeaders[ "authorization" ].split( ' ' );
+
+    if (m_nMajor == 1 && m_nMinor == 0) // We only support Basic auth for http 1.0 clients
+        return false;
+
+    QString sCredentials = QByteArray::fromBase64( oList[1].toUtf8() );
+
+    oList = sCredentials.split( ':' );
+
+    if (oList.count() < 2)
+        return false;
+
+    QString sUserName = UPnp::GetConfiguration()->GetValue( "HTTP/Protected/UserName", "admin" );
+
+
+    if (oList[0].compare( sUserName, Qt::CaseInsensitive ) != 0)
+        return false;
+
+    QString sPassword = UPnp::GetConfiguration()->GetValue( "HTTP/Protected/Password",
+                                 /* mythtv */ "8hDRxR1+E/n3/s3YUOhF+lUw7n4=" );
+
+    QString sPasswordHash = QCryptographicHash::hash( oList[1].toUtf8(),
+                                                      QCryptographicHash::Sha1 );
+
+    if (sPasswordHash == sPassword )
+        return true;
+
+    return false;
+}
+
+bool HTTPRequest::DigestAuthentication()
+{
+    QString realm = "MythTV"; // TODO Check which realm applies for the request path
+
+    QString authMethod = m_mapHeaders[ "authorization" ].section(' ', 0, 0).toLower();
+
+    if (authMethod != "digest")
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Invalid method in Authorization header");
+        return false;
+    }
+
+    QString parameterStr = m_mapHeaders[ "authorization" ].section(' ', 1);
+
+    QMap<QString, QString> paramMap;
+    QStringList paramList = parameterStr.split(',');
+    QStringList::iterator it;
+    for (it = paramList.begin(); it != paramList.end(); ++it)
+    {
+        QString key = (*it).section('=', 0, 0).toLower().trimmed();
+        // Since the value may contain '=' return everything after first occurence
+        QString value = (*it).section('=', 1).trimmed();
+        // Remove any quotes surrounding the value
+        value.remove("\"");
+        paramMap[key] = value;
+    }
+
+    if (paramMap.size() < 8)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Invalid number of parameters in Authorization header");
+        return false;
+    }
+
+    if (paramMap["nonce"].isEmpty()    || paramMap["username"].isEmpty() ||
+        paramMap["realm"].isEmpty()    || paramMap["uri"].isEmpty() ||
+        paramMap["response"].isEmpty() || paramMap["qop"].isEmpty() ||
+        paramMap["cnonce"].isEmpty()   || paramMap["nc"].isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Missing required parameters in Authorization header");
+        return false;
+    }
+
+    if (paramMap["uri"] != m_sResourceUrl)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Authorization URI doesn't match the "
+                                     "request URI");
+        m_nResponseStatus = 400; // Bad Request
+        return false;
+    }
+
+    if (paramMap["realm"] != realm)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Authorization realm doesn't match the "
+                                  "realm of the requested content");
+        return false;
+    }
+
+    QByteArray nonce = QByteArray(paramMap["nonce"].toLatin1());
+    if (nonce.length() < 20)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Authorization nonce is too short");
+        return false;
+    }
+
+    QString  nonceTimeStampStr = nonce.left(20); // ISO 8601 fixed length
+    if (nonce != CalculateDigestNonce(nonceTimeStampStr))
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Authorization nonce doesn't match reference");
+        LOG(VB_HTTP, LOG_DEBUG, QString("%1  vs  %2").arg(QString(nonce))
+                                                     .arg(QString(CalculateDigestNonce(nonceTimeStampStr))));
+        return false;
+    }
+
+    const int AUTH_TIMEOUT = 2 * 60; // 2 Minute timeout to login, to reduce replay attack window
+    QDateTime nonceTimeStamp = MythDate::fromString(nonceTimeStampStr);
+    if (!nonceTimeStamp.isValid())
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Authorization nonce timestamp is invalid.");
+        LOG(VB_HTTP, LOG_DEBUG, QString("Timestamp was '%1'").arg(nonceTimeStampStr));
+        return false;
+    }
+
+    if (nonceTimeStamp.secsTo(MythDate::current()) > AUTH_TIMEOUT)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Authorization nonce timestamp is invalid or too old.");
+        // Tell the client that the submitted nonce has expired at which
+        // point they may wish to try again with a fresh nonce instead of
+        // telling the user that their credentials were invalid
+        SetResponseHeader("WWW-Authenticate", GetAuthenticationHeader(true), true);
+        return false;
+    }
+
+//     if (!gCoreContext->IsValidUsername(paramMap["realm"], paramMap["username"]))
+//     {
+//         LOG(VB_GENERAL, LOG_WARNING, "Authorization attempt with invalid username");
+//         return false;
+//     }
+
+    QString sUserName = UPnp::GetConfiguration()->GetValue( "HTTP/Protected/UserName", "admin" );
+    if (paramMap["username"].compare( sUserName, Qt::CaseInsensitive ) != 0)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Authorization attempt with invalid username");
+        return false;
+    }
+
+    if (paramMap["response"].length() != 32)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Authorization response field is invalid length");
+        return false;
+    }
+
+    // If you're still reading this, well done, not far to go now
+
+    //QByteArray userDigest = gCoreContext->GetPasswordDigest(paramMap["realm"], sUserName);
+    QByteArray a1 = "bcd911b2ecb15ffbd6d8e6e744d60cf6";
+    QString methodDigest = QString("%1:%2").arg(GetRequestType()).arg(paramMap["uri"]);
+    QByteArray a2 = QCryptographicHash::hash(methodDigest.toLatin1(),
+                                          QCryptographicHash::Md5).toHex();
+
+    QString responseDigest = QString("%1:%2:%3:%4:%5:%6").arg(QString(a1))
+                                                        .arg(paramMap["nonce"])
+                                                        .arg(paramMap["nc"])
+                                                        .arg(paramMap["cnonce"])
+                                                        .arg(paramMap["qop"])
+                                                        .arg(QString(a2));
+    QByteArray kd = QCryptographicHash::hash(responseDigest.toLatin1(),
+                                          QCryptographicHash::Md5).toHex();
+
+    if (paramMap["response"].toLatin1() == kd)
+    {
+        LOG(VB_HTTP, LOG_NOTICE, "Valid Authorization received");
+        return true;
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Authorization attempt with invalid digest");
+        LOG(VB_HTTP, LOG_DEBUG, QString("Recieved hash was '%1', calculated hash was '%2'")
+                                .arg(paramMap["response"])
+                                .arg(QString(kd)));
+    }
+
+    return false;
+}
+
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
@@ -1830,35 +2044,12 @@ bool HTTPRequest::Authenticated()
     if (oList.count() < 2)
         return false;
 
-    if (oList[0].compare( "basic", Qt::CaseInsensitive ) != 0)
-        return false;
+    if (oList[0].compare( "basic", Qt::CaseInsensitive ) == 0)
+        return BasicAuthentication();
+    else if (oList[0].compare( "digest", Qt::CaseInsensitive ) == 0)
+        return DigestAuthentication();
 
-    QString sCredentials = QByteArray::fromBase64( oList[1].toUtf8() );
-    
-    oList = sCredentials.split( ':' );
-
-    if (oList.count() < 2)
-        return false;
-
-    QString sUserName = UPnp::GetConfiguration()->GetValue( "HTTP/Protected/UserName", "admin" );
-    
-
-    if (oList[0].compare( sUserName, Qt::CaseInsensitive ) != 0)
-        return false;
-
-    QString sPassword = UPnp::GetConfiguration()->GetValue( "HTTP/Protected/Password", 
-                                 /* mythtv */ "8hDRxR1+E/n3/s3YUOhF+lUw7n4=" );
-
-    QCryptographicHash crypto( QCryptographicHash::Sha1 );
-
-    crypto.addData( oList[1].toUtf8() );
-
-    QString sPasswordHash( crypto.result().toBase64() );
-
-    if (sPasswordHash != sPassword )
-        return false;
-    
-    return true;
+    return false;
 }
 
 /////////////////////////////////////////////////////////////////////////////

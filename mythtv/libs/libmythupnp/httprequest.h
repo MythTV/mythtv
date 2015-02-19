@@ -139,6 +139,8 @@ class UPNP_PUBLIC HTTPRequest
 
         IPostProcess       *m_pPostProcess;
 
+        QString             m_sPrivateToken;
+
     private:
 
         bool                m_bKeepAlive;
@@ -170,8 +172,14 @@ class UPNP_PUBLIC HTTPRequest
         qint64          SendData            ( QIODevice *pDevice, qint64 llStart, qint64 llBytes );
         qint64          SendFile            ( QFile &file, qint64 llStart, qint64 llBytes );
 
-        bool            IsUrlProtected      ( const QString &sBaseUrl );
+        bool            IsProtected         () const { return m_bProtected; }
         bool            Authenticated       ();
+
+        QString         GetAuthenticationHeader (bool isStale = false);
+        QString         CalculateDigestNonce ( const QString &timeStamp);
+
+        bool            BasicAuthentication ();
+        bool            DigestAuthentication ();
 
     public:
         
@@ -216,6 +224,8 @@ class UPNP_PUBLIC HTTPRequest
         static QString  GetETagHash     ( const QByteArray &data );
 
         void            SetKeepAliveTimeout ( int nTimeout ) { m_nKeepAliveTimeout = nTimeout; }
+
+        static bool     IsUrlProtected      ( const QString &sBaseUrl );
 
         // ------------------------------------------------------------------
 

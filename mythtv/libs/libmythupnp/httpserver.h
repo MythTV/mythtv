@@ -97,20 +97,6 @@ class UPNP_PUBLIC HttpServer : public ServerPool
 {
     Q_OBJECT
 
-  protected:
-    mutable QReadWriteLock  m_rwlock;
-    HttpServerExtensionList m_extensions;
-    // This multimap does NOT take ownership of the HttpServerExtension*
-    QMultiMap< QString, HttpServerExtension* >  m_basePaths;
-    QString                 m_sSharePath;
-    MThreadPool             m_threadPool;
-    bool                    m_running; // protected by m_rwlock
-
-    static QMutex           s_platformLock;
-    static QString          s_platform;
-
-    QSslConfiguration       m_sslConfig;
-
   public:
     HttpServer();
     virtual ~HttpServer();
@@ -122,14 +108,6 @@ class UPNP_PUBLIC HttpServer : public ServerPool
      * \brief Get the idle socket timeout value for the relevant extension
      */
     uint GetSocketTimeout(HTTPRequest*) const;
-
-  private:
-     void LoadSSLConfig();
-
-  protected slots:
-    virtual void newTcpConnection(qt_socket_fd_t socket); // QTcpServer
-
-  public:
 
     QString GetSharePath(void) const
     { // never modified after creation, so no need to lock
@@ -146,6 +124,28 @@ class UPNP_PUBLIC HttpServer : public ServerPool
 
     static QString GetPlatform(void);
     static QString GetServerVersion(void);
+
+  protected:
+    mutable QReadWriteLock  m_rwlock;
+    HttpServerExtensionList m_extensions;
+    // This multimap does NOT take ownership of the HttpServerExtension*
+    QMultiMap< QString, HttpServerExtension* >  m_basePaths;
+    QString                 m_sSharePath;
+    MThreadPool             m_threadPool;
+    bool                    m_running; // protected by m_rwlock
+
+    static QMutex           s_platformLock;
+    static QString          s_platform;
+
+    QSslConfiguration       m_sslConfig;
+
+    const QString m_privateToken; // Private token; Used to salt digest auth nonce, changes on backend restart
+
+  protected slots:
+    virtual void newTcpConnection(qt_socket_fd_t socket); // QTcpServer
+
+  private:
+    void LoadSSLConfig();
 };
 
 /////////////////////////////////////////////////////////////////////////////
