@@ -394,6 +394,7 @@ void HttpWorker::run(void)
     bool                    bKeepAlive = true;
     HTTPRequest            *pRequest   = NULL;
     QTcpSocket             *pSocket;
+    bool                    bEncrypted = false;
 
     if (m_connectionType == kSSLServer)
     {
@@ -408,6 +409,7 @@ void HttpWorker::run(void)
             {
                 LOG(VB_HTTP, LOG_INFO, "SSL Handshake occurred, connection encrypted");
                 LOG(VB_HTTP, LOG_INFO, QString("Using %1 cipher").arg(pSslSocket->sessionCipher().name()));
+                bEncrypted = true;
             }
             else
             {
@@ -467,6 +469,7 @@ void HttpWorker::run(void)
                 pRequest = new BufferedSocketDeviceRequest( pSocket );
                 if (pRequest != NULL)
                 {
+                    pRequest->m_bEncrypted = bEncrypted;
                     if ( pRequest->ParseRequest() )
                     {
                         bKeepAlive = pRequest->GetKeepAlive();

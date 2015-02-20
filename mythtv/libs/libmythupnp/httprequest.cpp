@@ -182,6 +182,7 @@ HTTPRequest::HTTPRequest() : m_procReqLineExp ( "[ \r\n][ \r\n]*"  ),
                              m_nMajor         (   0 ),
                              m_nMinor         (   0 ),
                              m_bProtected     ( false ),
+                             m_bEncrypted     ( false ),
                              m_bSOAPRequest   ( false ),
                              m_eResponseType  ( ResponseTypeUnknown),
                              m_nResponseStatus( 200 ),
@@ -233,7 +234,7 @@ QString HTTPRequest::BuildResponseHeader( long long nSize )
     sHeader = QString( "%1 %2\r\n" ).arg(GetResponseProtocol())
                                     .arg(GetResponseStatus());
 
-    SetResponseHeader("Date", MythDate::current().toString("ddd, d MMM yyyy hh:mm:ss").append(" GMT")); // RFC 822
+    SetResponseHeader("Date", MythDate::toString(MythDate::current(), MythDate::kRFC822)); // RFC 822
     SetResponseHeader("Server", HttpServer::GetServerVersion());
 
     SetResponseHeader("Connection", m_bKeepAlive ? "Keep-Alive" : "Close" );
@@ -1252,6 +1253,24 @@ bool HTTPRequest::ParseKeepAlive()
 //
 /////////////////////////////////////////////////////////////////////////////
 
+void HTTPRequest::ParseCookies(void)
+{
+    QStringList sCookieList = m_mapHeaders.values("cookie");
+
+    QStringList::iterator it;
+    for (it = sCookieList.begin(); it != sCookieList.end(); ++it)
+    {
+        QString key = (*it).section('=', 0, 0);
+        QString value = (*it).section('=', 1);
+
+        m_mapCookies.insert(key, value);
+    }
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 bool HTTPRequest::ParseRequest()
 {
     bool bSuccess = false;
@@ -1295,7 +1314,7 @@ bool HTTPRequest::ParseRequest()
 
                 if (!sName.isEmpty() && !sValue.isEmpty())
                 {
-                    m_mapHeaders.insert(sName.toLower(), sValue.trimmed());
+                    m_mapHeaders.insertMulti(sName.toLower(), sValue.trimmed());
                 }
 
                 sLine = ReadLine( 2000 );
@@ -1312,6 +1331,9 @@ bool HTTPRequest::ParseRequest()
             LOG(VB_HTTP, LOG_INFO, QString("(Request Header) %1: %2")
                                             .arg(it.key()).arg(*it));
         }
+
+        // Parse Cookies
+        ParseCookies();
 
         // Parse out keep alive
         m_bKeepAlive = ParseKeepAlive();
@@ -1859,38 +1881,57 @@ QString HTTPRequest::CalculateDigestNonce(const QString& timeStamp)
 
 bool HTTPRequest::BasicAuthentication()
 {
+    LOG(VB_HTTP, LOG_NOTICE, "Attempting HTTP Basic Authentication");
     QStringList oList = m_mapHeaders[ "authorization" ].split( ' ' );
 
     if (m_nMajor == 1 && m_nMinor == 0) // We only support Basic auth for http 1.0 clients
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Basic authentication is only allowed for HTTP 1.0");
         return false;
+    }
 
     QString sCredentials = QByteArray::fromBase64( oList[1].toUtf8() );
 
     oList = sCredentials.split( ':' );
 
     if (oList.count() < 2)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Authorization attempt with invalid number of tokens");
         return false;
+    }
 
-    QString sUserName = UPnp::GetConfiguration()->GetValue( "HTTP/Protected/UserName", "admin" );
+    QString sUsername = oList[0];
+    QString sPassword = oList[1];
 
-
-    if (oList[0].compare( sUserName, Qt::CaseInsensitive ) != 0)
+    MythSessionManager *sessionManager = gCoreContext->GetSessionManager();
+    if (!sessionManager->IsValidUser(sUsername))
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Authorization attempt with invalid username");
         return false;
+    }
 
-    QString sPassword = UPnp::GetConfiguration()->GetValue( "HTTP/Protected/Password",
-                                 /* mythtv */ "8hDRxR1+E/n3/s3YUOhF+lUw7n4=" );
+    QString client = QString("WebFrontend_%1").arg(GetPeerAddress());
+    MythUserSession session = sessionManager->LoginUser(sUsername, sPassword,
+                                                        client);
 
-    QString sPasswordHash = QCryptographicHash::hash( oList[1].toUtf8(),
-                                                      QCryptographicHash::Sha1 );
+    if (!session.IsValid())
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Authorization attempt with invalid password");
+        return false;
+    }
 
-    if (sPasswordHash == sPassword )
-        return true;
+    LOG(VB_HTTP, LOG_NOTICE, "Valid Authorization received");
+
+    if (IsEncrypted()) // Only set a session cookie for encrypted connections, not safe otherwise
+        SetCookie("sessionToken", session.GetSessionToken(),
+                    session.GetSessionExpires(), true);
 
     return false;
 }
 
 bool HTTPRequest::DigestAuthentication()
 {
+    LOG(VB_HTTP, LOG_NOTICE, "Attempting HTTP Digest Authentication");
     QString realm = "MythTV"; // TODO Check which realm applies for the request path
 
     QString authMethod = m_mapHeaders[ "authorization" ].section(' ', 0, 0).toLower();
@@ -1981,14 +2022,8 @@ bool HTTPRequest::DigestAuthentication()
         return false;
     }
 
-//     if (!gCoreContext->IsValidUsername(paramMap["realm"], paramMap["username"]))
-//     {
-//         LOG(VB_GENERAL, LOG_WARNING, "Authorization attempt with invalid username");
-//         return false;
-//     }
-
-    QString sUserName = UPnp::GetConfiguration()->GetValue( "HTTP/Protected/UserName", "admin" );
-    if (paramMap["username"].compare( sUserName, Qt::CaseInsensitive ) != 0)
+    MythSessionManager *sessionManager = gCoreContext->GetSessionManager();
+    if (!sessionManager->IsValidUser(paramMap["username"]))
     {
         LOG(VB_GENERAL, LOG_WARNING, "Authorization attempt with invalid username");
         return false;
@@ -2002,8 +2037,8 @@ bool HTTPRequest::DigestAuthentication()
 
     // If you're still reading this, well done, not far to go now
 
-    //QByteArray userDigest = gCoreContext->GetPasswordDigest(paramMap["realm"], sUserName);
-    QByteArray a1 = "bcd911b2ecb15ffbd6d8e6e744d60cf6";
+    QByteArray a1 = sessionManager->GetPasswordDigest(paramMap["username"]).toLatin1();
+    //QByteArray a1 = "bcd911b2ecb15ffbd6d8e6e744d60cf6";
     QString methodDigest = QString("%1:%2").arg(GetRequestType()).arg(paramMap["uri"]);
     QByteArray a2 = QCryptographicHash::hash(methodDigest.toLatin1(),
                                           QCryptographicHash::Md5).toHex();
@@ -2015,17 +2050,32 @@ bool HTTPRequest::DigestAuthentication()
                                                         .arg(paramMap["qop"])
                                                         .arg(QString(a2));
     QByteArray kd = QCryptographicHash::hash(responseDigest.toLatin1(),
-                                          QCryptographicHash::Md5).toHex();
+                                             QCryptographicHash::Md5).toHex();
 
     if (paramMap["response"].toLatin1() == kd)
     {
         LOG(VB_HTTP, LOG_NOTICE, "Valid Authorization received");
+        QString client = QString("WebFrontend_%1").arg(GetPeerAddress());
+        MythUserSession session = sessionManager->LoginUser(paramMap["username"],
+                                                            a1,
+                                                            client);
+        if (!session.IsValid())
+        {
+            LOG(VB_GENERAL, LOG_ERR, "Valid Authorization received, but we "
+                                     "failed to create a valid session");
+            return false;
+        }
+
+        if (IsEncrypted()) // Only set a session cookie for encrypted connections, not safe otherwise
+            SetCookie("sessionToken", session.GetSessionToken(),
+                      session.GetSessionExpires(), true);
+
         return true;
     }
     else
     {
-        LOG(VB_GENERAL, LOG_WARNING, "Authorization attempt with invalid digest");
-        LOG(VB_HTTP, LOG_DEBUG, QString("Recieved hash was '%1', calculated hash was '%2'")
+        LOG(VB_GENERAL, LOG_WARNING, "Authorization attempt with invalid password digest");
+        LOG(VB_HTTP, LOG_DEBUG, QString("Received hash was '%1', calculated hash was '%2'")
                                 .arg(paramMap["response"])
                                 .arg(QString(kd)));
     }
@@ -2039,6 +2089,17 @@ bool HTTPRequest::DigestAuthentication()
 
 bool HTTPRequest::Authenticated()
 {
+    // Allow session resumption for TLS connections
+    if (m_mapCookies.contains("sessionToken"))
+    {
+        QString sessionToken = m_mapCookies["sessionToken"];
+        MythSessionManager *sessionManager = gCoreContext->GetSessionManager();
+        MythUserSession session = sessionManager->GetSession(sessionToken);
+
+        if (session.IsValid())
+            return true;
+    }
+
     QStringList oList = m_mapHeaders[ "authorization" ].split( ' ' );
 
     if (oList.count() < 2)
@@ -2063,6 +2124,47 @@ void HTTPRequest::SetResponseHeader(const QString& sKey, const QString& sValue,
         return;
 
     m_mapRespHeaders[sKey] = sValue;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+void HTTPRequest::SetCookie(const QString &sKey, const QString &sValue,
+                            const QDateTime &expiryDate, bool secure)
+{
+    if (secure && !IsEncrypted())
+    {
+        LOG(VB_GENERAL, LOG_WARNING, QString("HTTPRequest::SetCookie(%1=%2): "
+                  "A secure cookie cannot be set on an unencrypted connection.")
+                    .arg(sKey).arg(sValue));
+        return;
+    }
+
+    QStringList cookieAttributes;
+
+    // Key=Value
+    cookieAttributes.append(QString("%1=%2").arg(sKey).arg(sValue));
+
+    // Domain - Most browsers have problems with a hostname, so it's better to omit this
+//     cookieAttributes.append(QString("Domain=%1").arg(GetHostName()));
+
+    // Path - Fix to root, no call for restricting to other paths yet
+    cookieAttributes.append("Path=/");
+
+    // Expires - Expiry date, always set one, just good practice
+    QString expires = MythDate::toString(expiryDate, MythDate::kRFC822); // RFC 822
+    cookieAttributes.append(QString("Expires=%1").arg(expires)); // Cookie Expiry date
+
+    // Secure - Only send this cookie over encrypted connections, it contains
+    // sensitive info SECURITY
+    if (secure)
+        cookieAttributes.append("Secure");
+
+    // HttpOnly - No cookie stealing javascript SECURITY
+    cookieAttributes.append("HttpOnly");
+
+    SetResponseHeader("Set-Cookie", cookieAttributes.join("; "));
 }
 
 /////////////////////////////////////////////////////////////////////////////

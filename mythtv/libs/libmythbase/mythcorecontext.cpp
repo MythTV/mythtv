@@ -109,6 +109,8 @@ class MythCoreContextPrivate : public QObject
 
     QMap<QString, QPair<int64_t, uint64_t> >  m_fileswritten;
     QMutex m_fileslock;
+
+    MythSessionManager *m_sessionManager;
 };
 
 MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
@@ -133,7 +135,8 @@ MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
       m_intvwanting(false),
       m_announcedProtocol(false),
       m_pluginmanager(NULL),
-      m_isexiting(false)
+      m_isexiting(false),
+      m_sessionManager(NULL)
 {
     MThread::ThreadSetup("CoreContext");
     srandom(MythDate::current().toTime_t() ^ QTime::currentTime().msec());
@@ -162,6 +165,8 @@ MythCoreContextPrivate::~MythCoreContextPrivate()
     }
 
     delete m_locale;
+
+    delete m_sessionManager;
 
     MThreadPool::ShutdownAllPools();
 
@@ -1880,6 +1885,14 @@ bool MythCoreContext::InWantingPlayback(void)
     d->m_playbackLock.unlock();
 
     return intvplayback;
+}
+
+MythSessionManager* MythCoreContext::GetSessionManager(void)
+{
+    if (!d->m_sessionManager)
+        d->m_sessionManager = new MythSessionManager();
+
+    return d->m_sessionManager;
 }
 
 bool MythCoreContext::TestPluginVersion(const QString &name,

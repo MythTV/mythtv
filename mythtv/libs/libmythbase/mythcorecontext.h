@@ -11,6 +11,7 @@
 #include "mythsocket_cb.h"
 #include "mythlogging.h"
 #include "mythlocale.h"
+#include "mythsession.h"
 
 #define MYTH_APPNAME_MYTHBACKEND "mythbackend"
 #define MYTH_APPNAME_MYTHJOBQUEUE "mythjobqueue"
@@ -203,6 +204,8 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     void WantingPlayback(QObject *sender);
     bool InWantingPlayback(void);
     void TVInWantingPlayback(bool b);
+
+    MythSessionManager *GetSessionManager(void);
 
     // Plugin related methods
     bool TestPluginVersion(const QString &name, const QString &libversion,

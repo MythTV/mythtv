@@ -18,6 +18,7 @@
 #include <QBuffer>
 #include <QTextStream>
 #include <QTcpSocket>
+#include <QDateTime>
 
 #include "upnpexp.h"
 #include "upnputil.h"
@@ -33,6 +34,7 @@
 // Typedefs / Defines
 /////////////////////////////////////////////////////////////////////////////
 
+// SECURITY: We intentionally want to ignore TRACE requests because of XST attacks
 typedef enum 
 {
     RequestTypeUnknown      = 0x0000,
@@ -113,6 +115,7 @@ class UPNP_PUBLIC HTTPRequest
 
         QStringMap          m_mapParams;
         QStringMap          m_mapHeaders;
+        QStringMap          m_mapCookies;
 
         QString             m_sPayload;
 
@@ -121,6 +124,7 @@ class UPNP_PUBLIC HTTPRequest
         int                 m_nMinor;
 
         bool                m_bProtected;
+        bool                m_bEncrypted;
 
         bool                m_bSOAPRequest;
         QString             m_sNameSpace;
@@ -167,12 +171,15 @@ class UPNP_PUBLIC HTTPRequest
 
         bool            ParseKeepAlive      ( void );
 
+        void            ParseCookies        ( void );
+
         QString         BuildResponseHeader ( long long nSize );
 
         qint64          SendData            ( QIODevice *pDevice, qint64 llStart, qint64 llBytes );
         qint64          SendFile            ( QFile &file, qint64 llStart, qint64 llBytes );
 
         bool            IsProtected         () const { return m_bProtected; }
+        bool            IsEncrypted         () const { return m_bEncrypted; }
         bool            Authenticated       ();
 
         QString         GetAuthenticationHeader (bool isStale = false);
@@ -203,6 +210,10 @@ class UPNP_PUBLIC HTTPRequest
         void            SetResponseHeader ( const QString &sKey,
                                             const QString &sValue,
                                             bool replace = false );
+
+        void            SetCookie ( const QString &sKey, const QString &sValue,
+                                    const QDateTime &dtExpires,
+                                    bool secure );
 
         QString         GetRequestHeader  ( const QString &sKey, QString sDefault );
 
