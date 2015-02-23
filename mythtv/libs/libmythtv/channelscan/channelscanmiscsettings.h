@@ -174,6 +174,7 @@ class ScanSymbolRateDVBS: public ComboBoxSetting, public TransientStorage
         addSelection("27500000", "27500000", true);
         addSelection("28000000");
         addSelection("28500000");
+        addSelection("29500000");
         addSelection("29900000");
     }
 };
