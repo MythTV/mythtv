@@ -64,7 +64,7 @@ QString  HttpServer::s_platform;
 HttpServer::HttpServer() :
     ServerPool(), m_sSharePath(GetShareDir()),
     m_threadPool("HttpServerPool"), m_running(true),
-    m_privateToken(QUuid::createUuid()) // Cryptographically random and sufficiently long enough to act as a secure token
+    m_privateToken(QUuid::createUuid().toString()) // Cryptographically random and sufficiently long enough to act as a secure token
 {
     // Number of connections processed concurrently
     int maxHttpWorkers = max(QThread::idealThreadCount() * 2, 2); // idealThreadCount can return -1
