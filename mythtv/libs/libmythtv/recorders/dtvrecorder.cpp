@@ -1365,6 +1365,9 @@ void DTVRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt, bool insert)
                 case StreamID::H264Video:
                     m_primaryVideoCodec = AV_CODEC_ID_H264;
                     break;
+                case StreamID::H265Video:
+                    m_primaryVideoCodec = AV_CODEC_ID_H265;
+                    break;
                 case StreamID::OpenCableVideo:
                     m_primaryVideoCodec = AV_CODEC_ID_MPEG2VIDEO; // TODO Will it always be MPEG2?
                     break;
