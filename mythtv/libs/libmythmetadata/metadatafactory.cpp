@@ -290,12 +290,10 @@ void MetadataFactory::OnSingleResult(MetadataLookup *lookup)
         if (fanartlist.size())
         {
             ArtworkInfo info;
-            int index = fanartlist.size();
+            int index = 0;
             int season = lookup->GetIsCollection() ? 0 : (int)lookup->GetSeason();
-            if (season > 0)
-                index = max(0, index-season);
-            else
-                index--;
+            if (season > 0 && season <= fanartlist.count())
+                index = season - 1;
             info.url = fanartlist.takeAt(index).url;
             map.insert(kArtworkFanart, info);
         }
