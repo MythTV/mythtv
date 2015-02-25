@@ -27,7 +27,7 @@ class MBASE_PUBLIC MythUserSession
     bool IsValid(void) const;
 
     const QString GetUserName(void) const { return m_name; }
-    const uint    GetUserId(void) const { return m_userId; }
+    uint  GetUserId(void) const { return m_userId; }
 
     const QString GetSessionToken(void) const { return m_sessionToken; }
     const QString GetSessionClient(void) const { return m_sessionClient; }
