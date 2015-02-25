@@ -391,12 +391,13 @@ function deleteRecRule(chanID, startTime)
         return;
     }
     hideMenu("optMenu");
-    var url = "/tv/ajax_backends/dvr_util.qsp?_action=deleteRecRule&recRuleID=" + recRuleID + "&ChanId=" + chanID + "&StartTime=" + startTime;
+    var url = "/tv/ajax_backends/dvr_util.qsp?_action=deleteRecRule&RecRuleId=" + recRuleID + "&ChanId=" + chanID + "&StartTime=" + startTime;
     var ajaxRequest = $.ajax( url )
                             .done(function()
                             {
                                 var response = ajaxRequest.responseText.trim().split("#");
                                 recRuleChanged( response[0], response[1] );
+                                reloadTVContent();
                             });
 }
 

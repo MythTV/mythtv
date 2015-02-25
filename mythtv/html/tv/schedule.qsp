@@ -23,7 +23,7 @@ import "/tv/js/tvutil.qjs"
 
     var recRuleId = 0;
     if (getIntegerArg("RecRuleId"))
-        recRuleId = getIntegerArg("recRuleId");
+        recRuleId = getIntegerArg("RecRuleId");
 
     var recRule = dvr.GetRecordSchedule(recRuleId, "", recordedId, chanId, startTime, false);
 
