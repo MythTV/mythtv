@@ -133,23 +133,40 @@ bool HtmlServerExtension::ProcessRequest( HTTPRequest *pRequest )
                               sSuffix != "svgz") // svgz are pre-compressed
                         pRequest->m_eResponseType = ResponseTypeSVG;
 
-                    // ----------------------------------------------------------------------
+                    // ---------------------------------------------------------
                     // Force IE into 'standards' mode
-                    // ----------------------------------------------------------------------
-                    pRequest->SetResponseHeader( "X-UA-Compatible" , "IE=Edge");
+                    // ---------------------------------------------------------
+                    pRequest->SetResponseHeader("X-UA-Compatible", "IE=Edge");
 
                     // ---------------------------------------------------------
-                    // SECURITY: Set Content Security Policy (no external content allowed)
+                    // SECURITY: Set X-Content-Type-Options to 'nosniff'
+                    //
+                    // IE only for now. Prevents browsers ignoring the
+                    // Content-Type header we supply and potentially executing
+                    // malicious script embedded in an image or css file.
+                    //
+                    // Yes, really, you need to explicitly disable this sort of
+                    // dangerous behaviour in 2015!
+                    // ---------------------------------------------------------
+                    pRequest->SetResponseHeader("X-Content-Type-Options",
+                                                "nosniff");
+
+                    // ---------------------------------------------------------
+                    // SECURITY: Set Content Security Policy
+                    //
+                    // *No external content allowed*
+                    //
                     // This is an important safeguard. Third party content
                     // should never be permitted. It compromises security,
-                    // privacy and violates the key principal that the WebFrontend
-                    // should work on an isolated network with no internet
-                    // access. Keep all content hosted locally!
+                    // privacy and violates the key principal that the
+                    // WebFrontend should work on an isolated network with no
+                    // internet access. Keep all content hosted locally!
                     // ---------------------------------------------------------
 
-                    // For now the following are disabled as we use xhr to trigger playback on frontends
-                    // if we switch to triggering that through an internal request then these would be better
-                    // enabled
+                    // For now the following are disabled as we use xhr to
+                    // trigger playback on frontends if we switch to triggering
+                    // that through an internal request then these would be
+                    // better enabled
                     //"default-src 'self'; "
                     //"connect-src 'self' https://services.mythtv.org; "
 
