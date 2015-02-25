@@ -960,6 +960,8 @@ const char *StreamID::toString(uint streamID)
         return "video-mpeg4";
     case StreamID::H264Video:
         return "video-h264";
+    case StreamID::H265Video:
+        return "video-h265";
     case StreamID::OpenCableVideo:
         return "video-opencable";
 
@@ -1029,6 +1031,8 @@ QString StreamID::GetDescription(uint stream_id)
             return "14492-2 MPEG-4 Video";
         case StreamID::H264Video:
             return "H.264 Video";
+        case StreamID::H265Video:
+            return "H.265 Video";
         case StreamID::OpenCableVideo:
             return "OpenCable Video";
         case StreamID::VC1Video:
