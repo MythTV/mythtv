@@ -81,7 +81,7 @@ inc.files += filesysteminfo.h hardwareprofile.h bonjourregister.h serverpool.h
 inc.files += plist.h bswap.h signalhandling.h ffmpeg-mmx.h mythdate.h
 inc.files += mythplugin.h mythpluginapi.h mythqtcompat.h
 inc.files += remotefile.h mythsystemlegacy.h mythtypes.h
-inc.files += threadedfilewriter.h mythsingledownload.h
+inc.files += threadedfilewriter.h mythsingledownload.h mythsession.h
 
 # Allow both #include <blah.h> and #include <libmythbase/blah.h>
 inc2.path  = $${PREFIX}/include/mythtv/libmythbase
