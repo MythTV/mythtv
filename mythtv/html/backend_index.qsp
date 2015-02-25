@@ -41,6 +41,16 @@ $(document).keyup(function(e) {
     <div id="header_logo">
         <a href="/"><img src="/images/mythtv.png" class="png" width="180" height="64" border="0" alt="MythTV"></a>
     </div>
+    <div id="header_login">
+<%if (Session.userid > 0) { %>
+        Logged in as <span id="session_username"><%=Session.username%></span>
+<%
+}
+else {
+%>
+        <!-- <a href="">Login</a> -->
+<%}%>
+    </div>
 </div>
 
 <div id="menu-tab" onMouseOver="showMainMenu()">

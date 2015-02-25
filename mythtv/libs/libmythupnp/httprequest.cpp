@@ -1363,6 +1363,17 @@ bool HTTPRequest::ParseRequest()
             return true;
         }
 
+        // Allow session resumption for TLS connections
+        if (m_mapCookies.contains("sessionToken"))
+        {
+            QString sessionToken = m_mapCookies["sessionToken"];
+            MythSessionManager *sessionManager = gCoreContext->GetSessionManager();
+            MythUserSession session = sessionManager->GetSession(sessionToken);
+
+            if (session.IsValid())
+                m_userSession = session;
+        }
+
         m_bProtected = false;
 
         if (IsUrlProtected( m_sBaseUrl ))
@@ -1845,6 +1856,10 @@ bool HTTPRequest::IsUrlProtected( const QString &sBaseUrl )
     return false;
 }
 
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 QString HTTPRequest::GetAuthenticationHeader(bool isStale)
 {
     QString authHeader;
@@ -1871,6 +1886,10 @@ QString HTTPRequest::GetAuthenticationHeader(bool isStale)
     return authHeader;
 }
 
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 QString HTTPRequest::CalculateDigestNonce(const QString& timeStamp)
 {
     QString uniqueID = QString("%1:%2").arg(timeStamp).arg(m_sPrivateToken);
@@ -1878,6 +1897,10 @@ QString HTTPRequest::CalculateDigestNonce(const QString& timeStamp)
     QString nonce = QString("%1%2").arg(timeStamp).arg(hash); // Note: since this is going in a header it should avoid illegal chars
     return nonce;
 }
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
 
 bool HTTPRequest::BasicAuthentication()
 {
@@ -1926,8 +1949,14 @@ bool HTTPRequest::BasicAuthentication()
         SetCookie("sessionToken", session.GetSessionToken(),
                     session.GetSessionExpires(), true);
 
+    m_userSession = session;
+
     return false;
 }
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
 
 bool HTTPRequest::DigestAuthentication()
 {
@@ -2070,6 +2099,8 @@ bool HTTPRequest::DigestAuthentication()
             SetCookie("sessionToken", session.GetSessionToken(),
                       session.GetSessionExpires(), true);
 
+        m_userSession = session;
+
         return true;
     }
     else
@@ -2089,16 +2120,9 @@ bool HTTPRequest::DigestAuthentication()
 
 bool HTTPRequest::Authenticated()
 {
-    // Allow session resumption for TLS connections
-    if (m_mapCookies.contains("sessionToken"))
-    {
-        QString sessionToken = m_mapCookies["sessionToken"];
-        MythSessionManager *sessionManager = gCoreContext->GetSessionManager();
-        MythUserSession session = sessionManager->GetSession(sessionToken);
-
-        if (session.IsValid())
-            return true;
-    }
+    // Check if the existing user has permission to access this resource
+    if (m_userSession.IsValid()) //m_userSession.CheckPermission())
+        return true;
 
     QStringList oList = m_mapHeaders[ "authorization" ].split( ' ' );
 

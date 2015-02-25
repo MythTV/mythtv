@@ -20,6 +20,8 @@
 #include <QTcpSocket>
 #include <QDateTime>
 
+#include "mythsession.h"
+
 #include "upnpexp.h"
 #include "upnputil.h"
 #include "serializers/serializer.h"
@@ -144,6 +146,7 @@ class UPNP_PUBLIC HTTPRequest
         IPostProcess       *m_pPostProcess;
 
         QString             m_sPrivateToken;
+        MythUserSession     m_userSession;
 
     private:
 

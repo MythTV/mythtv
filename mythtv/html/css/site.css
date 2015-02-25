@@ -225,6 +225,15 @@
         height:             36px;
     }
 
+    #header_login {
+        float: right;
+        margin-right: 10px;
+    }
+
+    #session_username {
+        font-weight: bold;
+    }
+
     #content {
         position:           absolute;
         top:                36px;
