@@ -61,6 +61,7 @@ const char *ff_codec_id_string(enum AVCodecID codec_id)
         case AV_CODEC_ID_HUFFYUV:          return "HUFFYUV";
         case AV_CODEC_ID_CYUV:             return "CYUV";
         case AV_CODEC_ID_H264:             return "H264";
+        case AV_CODEC_ID_H265:             return "H265";
         case AV_CODEC_ID_INDEO3:           return "INDEO3";
         case AV_CODEC_ID_VP3:              return "VP3";
         case AV_CODEC_ID_THEORA:           return "THEORA";
