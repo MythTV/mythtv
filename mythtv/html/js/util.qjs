@@ -312,3 +312,13 @@ function handleKeyPress(key) {
     if (currentContentURL == "/tv/guide.qsp")
         handleKeyboardShortcutsTV(key);
 }
+
+function logout()
+{
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.open("GET", "/setup/logout", true, "nouser", "nopass"); // Page doesn't exist
+    xmlhttp.setRequestHeader('X-Myth-Clear-Session', '1');
+    xmlhttp.send(null);
+    //xmlhttp.abort();
+    location.href = '/';
+}

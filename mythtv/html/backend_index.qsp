@@ -44,6 +44,7 @@ $(document).keyup(function(e) {
     <div id="header_login">
 <%if (Session.userid > 0) { %>
         Logged in as <span id="session_username"><%=Session.username%></span>
+        <span id="session_logout">[<a href="#" onClick="logout()">Logout</a>]</span>
 <%
 }
 else {

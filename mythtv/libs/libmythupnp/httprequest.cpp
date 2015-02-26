@@ -1363,6 +1363,13 @@ bool HTTPRequest::ParseRequest()
             return true;
         }
 
+        // Destroy session if requested
+        if (m_mapHeaders.contains("x-myth-clear-session"))
+        {
+            SetCookie("sessionToken", "", MythDate::current().addDays(-2), true);
+            m_mapCookies.remove("sessionToken");
+        }
+
         // Allow session resumption for TLS connections
         if (m_mapCookies.contains("sessionToken"))
         {
@@ -1926,6 +1933,9 @@ bool HTTPRequest::BasicAuthentication()
     QString sUsername = oList[0];
     QString sPassword = oList[1];
 
+    if (sUsername == "nouser") // Special logout username
+        return false;
+
     MythSessionManager *sessionManager = gCoreContext->GetSessionManager();
     if (!sessionManager->IsValidUser(sUsername))
     {
@@ -2000,6 +2010,9 @@ bool HTTPRequest::DigestAuthentication()
         LOG(VB_GENERAL, LOG_WARNING, "Missing required parameters in Authorization header");
         return false;
     }
+
+    if (paramMap["username"] == "nouser") // Special logout username
+        return false;
 
     if (paramMap["uri"] != m_sResourceUrl)
     {
