@@ -260,8 +260,13 @@ void ButtonStandardSetting::edit(MythScreenType *screen)
 *******************************************************************************/
 
 MythUITextEditSetting::MythUITextEditSetting(Storage *_storage):
-    StandardSetting(_storage)
+    StandardSetting(_storage), m_passwordEcho(false)
 {
+}
+
+void MythUITextEditSetting::SetPasswordEcho(bool b)
+{
+    m_passwordEcho = b;
 }
 
 void MythUITextEditSetting::edit(MythScreenType * screen)
@@ -272,8 +277,8 @@ void MythUITextEditSetting::edit(MythScreenType * screen)
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
     MythTextInputDialog *settingdialog =
-        new MythTextInputDialog(popupStack,
-                                getLabel(), FilterNone, false, m_settingValue);
+        new MythTextInputDialog(popupStack, getLabel(), FilterNone,
+                                m_passwordEcho, m_settingValue);
 
     if (settingdialog->Create())
     {

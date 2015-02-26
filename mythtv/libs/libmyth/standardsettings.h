@@ -122,9 +122,11 @@ class MPUBLIC MythUITextEditSetting : public StandardSetting
     virtual void resultEdit(DialogCompletionEvent *dce);
     virtual void edit(MythScreenType *screen);
     virtual void updateButton(MythUIButtonListItem *item);
+    void SetPasswordEcho(bool b);
 
   protected:
     MythUITextEditSetting(Storage *_storage);
+    bool m_passwordEcho;
 };
 
 
