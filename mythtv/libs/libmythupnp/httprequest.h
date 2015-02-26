@@ -70,7 +70,8 @@ typedef enum
     ResponseTypeText     =  5,
     ResponseTypeSVG      =  6,
     ResponseTypeFile     =  7,
-    ResponseTypeOther    =  8
+    ResponseTypeOther    =  8,
+    ResponseTypeHeader   =  9
 
 } ResponseType;
 
@@ -239,7 +240,7 @@ class UPNP_PUBLIC HTTPRequest
 
         void            SetKeepAliveTimeout ( int nTimeout ) { m_nKeepAliveTimeout = nTimeout; }
 
-        static bool     IsUrlProtected      ( const QString &sBaseUrl );
+        bool            IsUrlProtected      ( const QString &sBaseUrl );
 
         // ------------------------------------------------------------------
 

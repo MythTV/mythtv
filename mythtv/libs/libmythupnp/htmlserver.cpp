@@ -61,6 +61,19 @@ bool HtmlServerExtension::ProcessRequest( HTTPRequest *pRequest )
 {
     if (pRequest)
     {
+        if ((pRequest->m_eType != RequestTypeGet) &&
+            (pRequest->m_eType != RequestTypeHead) &&
+            (pRequest->m_eType != RequestTypePost))
+        {
+            pRequest->m_eResponseType = ResponseTypeHeader;
+            pRequest->m_nResponseStatus = 405; // Method not allowed
+            // Conservative list, we can't really know what methods we
+            // actually allow for an arbitrary resource without some sort of
+            // high maintenance database
+            pRequest->SetResponseHeader("Allow",  "GET, HEAD");
+            return true;
+        }
+
         if ( pRequest->m_sBaseUrl.startsWith("/") == false)
             return( false );
 
