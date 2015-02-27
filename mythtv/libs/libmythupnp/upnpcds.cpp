@@ -82,8 +82,8 @@ UPnpCDS::UPnpCDS( UPnpDevice *pDevice, const QString &sSharePath )
     m_root.m_bRestricted = true;
     m_root.m_bSearchable = true;
 
-    AddVariable( new StateVariable< QString        >( "TransferIDs"       , true ) );
-    AddVariable( new StateVariable< QString        >( "ContainerUpdateIDs", true ) );
+    AddVariable( new StateVariable< QString  >( "TransferIDs"       , true ) );
+    AddVariable( new StateVariable< QString  >( "ContainerUpdateIDs", true ) );
     AddVariable( new StateVariable< uint16_t >( "SystemUpdateID"    , true ) );
     AddVariable( new StateVariable< QString  >( "ServiceResetToken" , true ) );
 
