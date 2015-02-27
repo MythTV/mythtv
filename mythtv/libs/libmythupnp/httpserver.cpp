@@ -46,6 +46,55 @@
 
 using namespace std;
 
+
+/**
+ * \brief Handle an OPTIONS request
+ */
+bool HttpServerExtension::ProcessOptions(HTTPRequest* pRequest)
+{
+    pRequest->m_eResponseType   = ResponseTypeHeader;
+    pRequest->m_nResponseStatus = 405; // Method Not Available
+
+    QStringList allowedMethods;
+    if (m_nSupportedMethods & RequestTypeGet)
+        allowedMethods.append("GET");
+    if (m_nSupportedMethods & RequestTypeHead)
+        allowedMethods.append("HEAD");
+    if (m_nSupportedMethods & RequestTypePost)
+        allowedMethods.append("POST");
+//     if (m_nSupportedMethods & RequestTypePut)
+//         allowedMethods.append("PUT");
+//     if (m_nSupportedMethods & RequestTypeDelete)
+//         allowedMethods.append("DELETE");
+//     if (m_nSupportedMethods & RequestTypeConnect)
+//         allowedMethods.append("CONNECT");
+    if (m_nSupportedMethods & RequestTypeOptions)
+        allowedMethods.append("OPTIONS");
+//     if (m_nSupportedMethods & RequestTypeTrace)
+//         allowedMethods.append("TRACE");
+    if (m_nSupportedMethods & RequestTypeMSearch)
+        allowedMethods.append("M-SEARCH");
+    if (m_nSupportedMethods & RequestTypeSubscribe)
+        allowedMethods.append("SUBSCRIBE");
+    if (m_nSupportedMethods & RequestTypeUnsubscribe)
+        allowedMethods.append("UNSUBSCRIBE");
+    if (m_nSupportedMethods & RequestTypeNotify)
+        allowedMethods.append("NOTIFY");
+
+    if (!allowedMethods.isEmpty())
+    {
+        pRequest->SetResponseHeader("Allow", allowedMethods.join(", "));
+        return true;
+    }
+
+    LOG(VB_GENERAL, LOG_ERR, QString("HttpServerExtension::ProcessOptions(): "
+                                     "Error: No methods supported for "
+                                     "extension - %1").arg(m_sName));
+
+    return false;
+}
+
+
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -308,7 +357,10 @@ void HttpServer::DelegateRequest(HTTPRequest *pRequest)
     {
         try
         {
-            bProcessed = list[ nIdx ]->ProcessRequest(pRequest);
+            if (pRequest->m_eType == RequestTypeOptions)
+                bProcessed = list[ nIdx ]->ProcessOptions(pRequest);
+            else
+                bProcessed = list[ nIdx ]->ProcessRequest(pRequest);
         }
         catch(...)
         {
@@ -324,7 +376,10 @@ void HttpServer::DelegateRequest(HTTPRequest *pRequest)
     {
         try
         {
-            bProcessed = (*it)->ProcessRequest(pRequest);
+            if (pRequest->m_eType == RequestTypeOptions)
+                bProcessed = (*it)->ProcessOptions(pRequest);
+            else
+                bProcessed = (*it)->ProcessRequest(pRequest);
         }
         catch(...)
         {
@@ -443,8 +498,7 @@ void HttpWorker::run(void)
 
     try
     {
-        while (m_httpServer.IsRunning() && bKeepAlive && pSocket &&
-               pSocket->isValid() &&
+        while (m_httpServer.IsRunning() && bKeepAlive && pSocket->isValid() &&
                pSocket->state() == QAbstractSocket::ConnectedState)
         {
             // We set a timeout on keep-alive connections to avoid blocking

@@ -36,18 +36,25 @@
 // Typedefs / Defines
 /////////////////////////////////////////////////////////////////////////////
 
-// SECURITY: We intentionally want to ignore TRACE requests because of XST attacks
 typedef enum 
 {
     RequestTypeUnknown      = 0x0000,
+    // HTTP 1.1
     RequestTypeGet          = 0x0001,
     RequestTypeHead         = 0x0002,
     RequestTypePost         = 0x0004,
-    RequestTypeMSearch      = 0x0008,
-    RequestTypeSubscribe    = 0x0010,
-    RequestTypeUnsubscribe  = 0x0020,
-    RequestTypeNotify       = 0x0040,
-    RequestTypeResponse     = 0x0080
+//     RequestTypePut          = 0x0008,
+//     RequestTypeDelete       = 0x0010,
+//     RequestTypeConnect      = 0x0020,
+    RequestTypeOptions      = 0x0040,
+//     RequestTypeTrace        = 0x0080, // SECURITY: XST attack risk, shouldn't include cookies or other sensitive info
+    // UPnP
+    RequestTypeMSearch      = 0x0100,
+    RequestTypeSubscribe    = 0x0200,
+    RequestTypeUnsubscribe  = 0x0400,
+    RequestTypeNotify       = 0x0800,
+    // Not a request type
+    RequestTypeResponse     = 0x1000
 
 } RequestType;                
 
@@ -74,7 +81,6 @@ typedef enum
     ResponseTypeHeader   =  9
 
 } ResponseType;
-
 
 typedef struct
 {
@@ -162,7 +168,7 @@ class UPNP_PUBLIC HTTPRequest
 
         void            ProcessRequestLine  ( const QString &sLine  );
         bool            ProcessSOAPPayload  ( const QString &sSOAPAction );
-        void            ExtractMethodFromURL( );
+        void            ExtractMethodFromURL( ); // Service method, not HTTP method
 
         QString         GetResponseStatus   ( void );
         QString         GetResponseType     ( void );

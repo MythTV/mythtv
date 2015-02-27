@@ -51,6 +51,13 @@ class QSslKey;
 class QSslCertificate;
 class QSslConfiguration;
 
+typedef enum
+{
+    cpLocalNoAuth = 0x00,  // Can only be accessed locally, but no authentication is required
+    cpLocalAuth   = 0x01,  // Can only be accessed locally, authentication is required
+    cpRemoteAuth  = 0x02   // Can be accessed remotely, authentication is required
+} ContentProtection;
+
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -68,15 +75,22 @@ class UPNP_PUBLIC HttpServerExtension : public QObject
         QString     m_sName;
         QString     m_sSharePath;
         int         m_nSocketTimeout; // Extension may wish to adjust the default e.g. UPnP
+
+        uint        m_nSupportedMethods; // Bit flags - HTTP::RequestType
         
     public:
 
-        HttpServerExtension( const QString &sName, const  QString &sSharePath )
-           : m_sName( sName ), m_sSharePath( sSharePath ), m_nSocketTimeout(-1) {};
+        HttpServerExtension( const QString &sName, const  QString &sSharePath)
+           : m_sName( sName ), m_sSharePath( sSharePath ),
+             m_nSocketTimeout(-1),
+             m_nSupportedMethods((RequestTypeGet | RequestTypePost | // Defaults, extensions may extend the list
+                                  RequestTypeHead | RequestTypeOptions)) {};
 
         virtual ~HttpServerExtension() {};
 
         virtual bool ProcessRequest(HTTPRequest *pRequest) = 0;
+
+        virtual bool ProcessOptions(HTTPRequest *pRequest);
 
         virtual QStringList GetBasePaths() = 0;
 

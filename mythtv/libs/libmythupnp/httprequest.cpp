@@ -199,14 +199,17 @@ HTTPRequest::HTTPRequest() : m_procReqLineExp ( "[ \r\n][ \r\n]*"  ),
 
 RequestType HTTPRequest::SetRequestType( const QString &sType )
 {
+    // HTTP
     if (sType == "GET"        ) return( m_eType = RequestTypeGet         );
     if (sType == "HEAD"       ) return( m_eType = RequestTypeHead        );
     if (sType == "POST"       ) return( m_eType = RequestTypePost        );
-    if (sType == "M-SEARCH"   ) return( m_eType = RequestTypeMSearch     );
+    if (sType == "OPTIONS"    ) return( m_eType = RequestTypeOptions     );
 
+    // UPnP
+    if (sType == "M-SEARCH"   ) return( m_eType = RequestTypeMSearch     );
+    if (sType == "NOTIFY"     ) return( m_eType = RequestTypeNotify      );
     if (sType == "SUBSCRIBE"  ) return( m_eType = RequestTypeSubscribe   );
     if (sType == "UNSUBSCRIBE") return( m_eType = RequestTypeUnsubscribe );
-    if (sType == "NOTIFY"     ) return( m_eType = RequestTypeNotify      );
 
     if (sType.startsWith( QString("HTTP/") )) return( m_eType = RequestTypeResponse );
 
@@ -2276,17 +2279,20 @@ QString HTTPRequest::GetRequestType( ) const
         case RequestTypePost :
             type = "POST";
             break;
+        case RequestTypeOptions:
+            type = "OPTIONS";
+            break;
         case RequestTypeMSearch:
             type = "M-SEARCH";
+            break;
+        case RequestTypeNotify:
+            type = "NOTIFY";
             break;
         case RequestTypeSubscribe :
             type = "SUBSCRIBE";
             break;
         case RequestTypeUnsubscribe :
             type = "UNSUBSCRIBE";
-            break;
-        case RequestTypeNotify:
-            type = "NOTIFY";
             break;
     }
 

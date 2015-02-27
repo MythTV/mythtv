@@ -680,6 +680,7 @@ SSDPExtension::SSDPExtension( int nServicePort , const QString &sSharePath)
   : HttpServerExtension( "SSDP" , sSharePath),
     m_nServicePort(nServicePort)
 {
+    m_nSupportedMethods |= (RequestTypeMSearch | RequestTypeNotify);
     m_sUPnpDescPath = UPnp::GetConfiguration()->GetValue( "UPnP/DescXmlPath",
                                                  m_sSharePath );
 }
