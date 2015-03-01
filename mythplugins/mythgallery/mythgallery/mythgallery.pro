@@ -39,7 +39,7 @@ opengl {
 
 
 #The following line was inserted by qt3to4
-QT += network opengl sql xml
+QT += network opengl sql xml widgets
 
 DEFINES += MPLUGIN_API
 
