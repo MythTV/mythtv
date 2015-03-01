@@ -404,7 +404,7 @@ void NetSearch::PopulateResultList(ResultItem::resultList list)
 
 ResultItem* NetSearch::GetStreamItem()
 {
-    return qVariantValue<ResultItem *>(m_searchResultList->GetDataValue());
+    return m_searchResultList->GetDataValue().value<ResultItem*>();
 }
 
 void NetSearch::RunSearchEditor()
@@ -435,8 +435,7 @@ void NetSearch::DoListRefresh()
 
 void NetSearch::SlotItemChanged()
 {
-    ResultItem *item =
-              qVariantValue<ResultItem *>(m_searchResultList->GetDataValue());
+    ResultItem *item = m_searchResultList->GetDataValue().value<ResultItem*>();
 
     if (item && GetFocusWidget() == m_searchResultList)
     {
@@ -503,7 +502,7 @@ void NetSearch::customEvent(QEvent *event)
 
         QString title = data->title;
         QString file = data->url;
-        uint pos = qVariantValue<uint>(data->data);
+        uint pos = data->data.value<uint>();
 
         if (file.isEmpty() || !((uint)m_searchResultList->GetCount() >= pos))
             return;
