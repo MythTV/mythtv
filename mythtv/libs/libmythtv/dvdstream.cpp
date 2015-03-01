@@ -4,8 +4,10 @@
 #include "dvdstream.h"
 
 #include <stdio.h>
+#include <algorithm>
 
 #include <QMutexLocker>
+#include <QtGlobal>
 #include <QtAlgorithms>
 
 #include "dvdread/dvd_reader.h"
@@ -131,7 +133,7 @@ bool DVDStream::OpenFile(const QString &filename, uint /*retry_ms*/)
             }
         }
 
-        qSort( m_list);
+        std::sort(m_list.begin(), m_list.end());
 
         // Open the root menu so that CSS keys are generated now
         dvd_file_t *file = DVDOpenFile(m_reader, 0, DVD_READ_MENU_VOBS);
@@ -170,7 +172,7 @@ int DVDStream::safe_read(void *data, uint size)
     int ret = 0;
 
     // Are any blocks in the range encrypted?
-    list_t::const_iterator it = qBinaryFind(m_list, BlockRange(m_pos, lb, -1));
+    list_t::const_iterator it = qBinaryFind(m_list, BlockRange(m_pos, lb, -1)); // FIXME: qBinaryFind is deprecated
     uint32_t b = it == m_list.end() ? lb : m_pos < it->Start() ? it->Start() - m_pos : 0;
     if (b)
     {
