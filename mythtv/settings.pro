@@ -109,8 +109,6 @@ win32 {
         DEFINES += __STDC_FORMAT_MACROS
         DEFINES += __STDC_LIMIT_MACROS
 
-        #DEFINES += QT_DISABLE_DEPRECATED_BEFORE
-
         debug  :DEFINES += _DEBUG
         release:DEFINES += NDEBUG
 
