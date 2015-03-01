@@ -41,6 +41,7 @@
 #include "channelgroup.h"
 #include "inputinfo.h"
 #include "channelinfo.h"
+#include "recordinginfo.h"
 
 void FillProgramInfo( DTC::Program *pProgram,
                       ProgramInfo  *pInfo,
@@ -75,8 +76,8 @@ void FillInputInfo( DTC::Input *input, InputInfo inputInfo);
 void FillCastMemberList( DTC::CastMemberList *pCastMemberList,
                          ProgramInfo  *pInfo);
 
-void FillCutList( DTC::CutList* pCutList, ProgramInfo* pInfo, int marktype);
+void FillCutList( DTC::CutList* pCutList, RecordingInfo* rInfo, int marktype);
 
-void FillCommBreak( DTC::CutList* pCutList, ProgramInfo* pInfo, int marktype);
+void FillCommBreak( DTC::CutList* pCutList, RecordingInfo* rInfo, int marktype);
 
 #endif

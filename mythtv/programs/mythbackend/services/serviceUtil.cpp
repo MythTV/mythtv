@@ -523,14 +523,14 @@ void FillCastMemberList(DTC::CastMemberList* pCastMemberList,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void FillCutList(DTC::CutList* pCutList, ProgramInfo* pInfo, int marktype)
+void FillCutList(DTC::CutList* pCutList, RecordingInfo* rInfo, int marktype)
 {
     frm_dir_map_t markMap;
     frm_dir_map_t::const_iterator it;
 
-    if (pInfo && pInfo->GetChanID())
+    if (rInfo && rInfo->GetChanID())
     {
-        pInfo->QueryCutList(markMap);
+        rInfo->QueryCutList(markMap);
 
         for (it = markMap.begin(); it != markMap.end(); ++it)
         {
@@ -544,7 +544,7 @@ void FillCutList(DTC::CutList* pCutList, ProgramInfo* pInfo, int marktype)
             else if (marktype == 1)
             {
                 uint64_t offset;
-                if (pInfo->QueryKeyFramePosition(&offset, it.key(), isend))
+                if (rInfo->QueryKeyFramePosition(&offset, it.key(), isend))
                 {
                   DTC::Cutting *pCutting = pCutList->AddNewCutting();
                   pCutting->setMark(*it);
@@ -554,7 +554,7 @@ void FillCutList(DTC::CutList* pCutList, ProgramInfo* pInfo, int marktype)
             else if (marktype == 2)
             {
                 uint64_t offset;
-                if (pInfo->QueryKeyFrameDuration(&offset, it.key(), isend))
+                if (rInfo->QueryKeyFrameDuration(&offset, it.key(), isend))
                 {
                   DTC::Cutting *pCutting = pCutList->AddNewCutting();
                   pCutting->setMark(*it);
@@ -569,14 +569,14 @@ void FillCutList(DTC::CutList* pCutList, ProgramInfo* pInfo, int marktype)
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void FillCommBreak(DTC::CutList* pCutList, ProgramInfo* pInfo, int marktype)
+void FillCommBreak(DTC::CutList* pCutList, RecordingInfo* rInfo, int marktype)
 {
     frm_dir_map_t markMap;
     frm_dir_map_t::const_iterator it;
 
-    if (pInfo && pInfo->GetChanID())
+    if (rInfo && rInfo->GetChanID())
     {
-        pInfo->QueryCommBreakList(markMap);
+        rInfo->QueryCommBreakList(markMap);
 
         for (it = markMap.begin(); it != markMap.end(); ++it)
         {
@@ -590,7 +590,7 @@ void FillCommBreak(DTC::CutList* pCutList, ProgramInfo* pInfo, int marktype)
             else if (marktype == 1)
             {
                 uint64_t offset;
-                if (pInfo->QueryKeyFramePosition(&offset, it.key(), isend))
+                if (rInfo->QueryKeyFramePosition(&offset, it.key(), isend))
                 {
                   DTC::Cutting *pCutting = pCutList->AddNewCutting();
                   pCutting->setMark(*it);
@@ -600,7 +600,7 @@ void FillCommBreak(DTC::CutList* pCutList, ProgramInfo* pInfo, int marktype)
             else if (marktype == 2)
             {
                 uint64_t offset;
-                if (pInfo->QueryKeyFrameDuration(&offset, it.key(), isend))
+                if (rInfo->QueryKeyFrameDuration(&offset, it.key(), isend))
                 {
                   DTC::Cutting *pCutting = pCutList->AddNewCutting();
                   pCutting->setMark(*it);

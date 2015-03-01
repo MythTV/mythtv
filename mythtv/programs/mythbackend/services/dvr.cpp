@@ -276,11 +276,11 @@ DTC::CutList* Dvr::GetRecordedCutList ( int RecordedId,
         (chanid <= 0 || !recstarttsRaw.isValid()))
         throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
 
-    ProgramInfo pi;
+    RecordingInfo ri;
     if (RecordedId > 0)
-        pi = ProgramInfo(RecordedId);
+        ri = RecordingInfo(RecordedId);
     else
-        pi = ProgramInfo(chanid, recstarttsRaw.toUTC());
+        ri = RecordingInfo(chanid, recstarttsRaw.toUTC());
 
     DTC::CutList* pCutList = new DTC::CutList();
     if (offsettype == "Position")
@@ -290,7 +290,7 @@ DTC::CutList* Dvr::GetRecordedCutList ( int RecordedId,
     else
         marktype = 0;
 
-    FillCutList(pCutList, &pi, marktype);
+    FillCutList(pCutList, &ri, marktype);
 
     return pCutList;
 }
@@ -309,11 +309,11 @@ DTC::CutList* Dvr::GetRecordedCommBreak ( int RecordedId,
         (chanid <= 0 || !recstarttsRaw.isValid()))
         throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
 
-    ProgramInfo pi;
+    RecordingInfo ri;
     if (RecordedId > 0)
-        pi = ProgramInfo(RecordedId);
+        ri = RecordingInfo(RecordedId);
     else
-        pi = ProgramInfo(chanid, recstarttsRaw.toUTC());
+        ri = RecordingInfo(chanid, recstarttsRaw.toUTC());
 
     DTC::CutList* pCutList = new DTC::CutList();
     if (offsettype == "Position")
@@ -323,7 +323,7 @@ DTC::CutList* Dvr::GetRecordedCommBreak ( int RecordedId,
     else
         marktype = 0;
 
-    FillCommBreak(pCutList, &pi, marktype);
+    FillCommBreak(pCutList, &ri, marktype);
 
     return pCutList;
 }
