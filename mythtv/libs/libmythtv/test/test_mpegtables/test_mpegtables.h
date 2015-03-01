@@ -59,4 +59,8 @@ class TestMPEGTables: public QObject
      * custom descriptors
      */
     void PrivateUPCCablecomEpisodetitleDescriptor_test (void);
+
+    /** test for DVB-EIT style cast
+     */
+    void ItemList_test (void);
 };

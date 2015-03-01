@@ -230,4 +230,9 @@ void TestMPEGTables::PrivateUPCCablecomEpisodetitleDescriptor_test (void)
     QCOMPARE (descriptor.Text(), QString("Krank vor Liebe"));
 }
 
+void TestMPEGTables::ItemList_test (void)
+{
+
+}
+
 QTEST_APPLESS_MAIN(TestMPEGTables)
