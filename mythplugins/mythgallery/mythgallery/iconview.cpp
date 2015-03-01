@@ -400,7 +400,7 @@ void IconView::UpdateText(MythUIButtonListItem *item)
                                 .arg(m_imageList->IsEmpty() ? 0 : m_imageList->GetCurrentPos() + 1)
                                 .arg(m_imageList->GetCount()));
 
-    ThumbItem *thumbitem = qVariantValue<ThumbItem *>(item->GetData());
+    ThumbItem *thumbitem = item->GetData().value<ThumbItem *>();
     if (!thumbitem)
         return;
 
@@ -426,7 +426,7 @@ void IconView::UpdateImage(MythUIButtonListItem *item)
     if (!m_selectedImage)
         return;
 
-    ThumbItem *thumbitem = qVariantValue<ThumbItem *>(item->GetData());
+    ThumbItem *thumbitem = item->GetData().value<ThumbItem *>();
 
     QString selectedimage;
     if (thumbitem)
@@ -515,7 +515,7 @@ void IconView::HandleItemSelect(MythUIButtonListItem *item)
 {
     bool handled = false;
 
-    ThumbItem *thumbitem = qVariantValue<ThumbItem *>(item->GetData());
+    ThumbItem *thumbitem = item->GetData().value<ThumbItem *>();
 
     if (!thumbitem)
         return;
@@ -1551,7 +1551,7 @@ ThumbItem *IconView::GetCurrentThumb(void)
 {
     MythUIButtonListItem *item = m_imageList->GetItemCurrent();
     if (item)
-        return qVariantValue<ThumbItem *>(item->GetData());
+        return item->GetData().value<ThumbItem *>();
     return NULL;
 }
 

@@ -1384,7 +1384,7 @@ void Ripper::showEditMetadataDialog(MythUIButtonListItem *item)
     if (!item || m_tracks->isEmpty())
         return;
 
-    RipTrack *track = qVariantValue<RipTrack *>(item->GetData());
+    RipTrack *track = item->GetData().value<RipTrack *>();
 
     if (!track)
         return;
@@ -1507,7 +1507,7 @@ void Ripper::customEvent(QEvent* event)
         if (dce->GetId() == "conflictmenu")
         {
             int buttonNum = dce->GetResult();
-            RipTrack *track = qVariantValue<RipTrack *>(dce->GetData());
+            RipTrack *track = dce->GetData().value<RipTrack *>();
 
             switch (buttonNum)
             {

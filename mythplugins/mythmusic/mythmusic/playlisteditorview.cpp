@@ -493,7 +493,7 @@ bool PlaylistEditorView::keyPressEvent(QKeyEvent *event)
             MythUIButtonListItem *item = m_playlistTree->GetItemCurrent();
             if (item)
             {
-                MythGenericTree *node = qVariantValue<MythGenericTree*> (item->GetData());
+                MythGenericTree *node = item->GetData().value<MythGenericTree*>();
                 MusicGenericTree *mnode = dynamic_cast<MusicGenericTree*>(node);
 
                 if (mnode)
@@ -625,7 +625,7 @@ void PlaylistEditorView::updateSonglist(MusicGenericTree *node)
     else
     {
         // fall back to getting the tracks from the MetadataPtrList
-        MetadataPtrList *tracks = qVariantValue<MetadataPtrList*> (node->GetData());
+        MetadataPtrList *tracks = node->GetData().value<MetadataPtrList*>();
         for (int x = 0; x < tracks->count(); x++)
         {
             MusicMetadata *mdata = tracks->at(x);
@@ -821,7 +821,7 @@ void PlaylistEditorView::createRootNode(void )
 
 void PlaylistEditorView::treeItemClicked(MythUIButtonListItem *item)
 {
-    MythGenericTree *node = qVariantValue<MythGenericTree*> (item->GetData());
+    MythGenericTree *node = item->GetData().value<MythGenericTree*>();
     MusicGenericTree *mnode = dynamic_cast<MusicGenericTree*>(node);
 
     if (!mnode || !gPlayer->getCurrentPlaylist() || mnode->getAction() == "error")
@@ -849,7 +849,7 @@ void PlaylistEditorView::treeItemClicked(MythUIButtonListItem *item)
 
 void PlaylistEditorView::treeItemVisible(MythUIButtonListItem *item)
 {
-    MythGenericTree *node = qVariantValue<MythGenericTree*> (item->GetData());;
+    MythGenericTree *node = item->GetData().value<MythGenericTree*>();;
     MusicGenericTree *mnode = dynamic_cast<MusicGenericTree*>(node);
 
     if (!mnode)
@@ -870,7 +870,7 @@ void PlaylistEditorView::treeItemVisible(MythUIButtonListItem *item)
         else if (mnode->getAction() == "album")
         {
             // hunt for a coverart image for the album
-            MetadataPtrList *tracks = qVariantValue<MetadataPtrList*> (node->GetData());
+            MetadataPtrList *tracks = node->GetData().value<MetadataPtrList*>();
             for (int x = 0; x < tracks->count(); x++)
             {
                 MusicMetadata *mdata = tracks->at(x);
@@ -988,7 +988,7 @@ void PlaylistEditorView::treeNodeChanged(MythGenericTree *node)
 
 void PlaylistEditorView::filterTracks(MusicGenericTree *node)
 {
-    MetadataPtrList *tracks = qVariantValue<MetadataPtrList*> (node->GetData());
+    MetadataPtrList *tracks = node->GetData().value<MetadataPtrList*>();
 
     if (!tracks)
         return;
@@ -1363,7 +1363,7 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
 
             // only show the Comp. Artist if it differs from the Artist
             bool found = false;
-            MetadataPtrList *tracks = qVariantValue<MetadataPtrList*> (node->GetData());
+            MetadataPtrList *tracks = node->GetData().value<MetadataPtrList*>();
             for (int x = 0; x < tracks->count(); x++)
             {
                 MusicMetadata *mdata = tracks->at(x);

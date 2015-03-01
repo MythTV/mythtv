@@ -435,7 +435,7 @@ void EditMetadataDialog::ratingSpinChanged(MythUIButtonListItem *item)
 {
     if (item)
     {
-        int rating = qVariantValue<int>(item->GetData());
+        int rating = item->GetData().value<int>();
         m_metadata->setRating(rating);
 
         if (m_ratingState)
@@ -929,7 +929,7 @@ void EditAlbumartDialog::gridItemChanged(MythUIButtonListItem *item)
 
     if (m_coverartImage)
     {
-        AlbumArtImage *image = qVariantValue<AlbumArtImage*> (item->GetData());
+        AlbumArtImage *image = item->GetData().value<AlbumArtImage*>();
         if (image)
         {
             m_coverartImage->SetFilename(image->filename);
@@ -1086,7 +1086,7 @@ void EditAlbumartDialog::showMenu(void )
             MythUIButtonListItem *item = m_coverartList->GetItemCurrent();
             if (item)
             {
-                AlbumArtImage *image = qVariantValue<AlbumArtImage*> (item->GetData());
+                AlbumArtImage *image = item->GetData().value<AlbumArtImage*>();
                 if (image)
                 {
                     if (!image->embedded)
@@ -1141,7 +1141,7 @@ void EditAlbumartDialog::customEvent(QEvent *event)
                 {
                     AlbumArtImages *albumArt = m_metadata->getAlbumArtImages();
                     item->SetText(albumArt->getTypeName((ImageType) type));
-                    AlbumArtImage *image = qVariantValue<AlbumArtImage*> (item->GetData());
+                    AlbumArtImage *image = item->GetData().value<AlbumArtImage*>();
                     if (image)
                     {
                         QStringList strList("MUSIC_TAG_CHANGEIMAGE");
@@ -1272,7 +1272,7 @@ void EditAlbumartDialog::copySelectedImageToTag(void)
     MythUIButtonListItem *item = m_coverartList->GetItemCurrent();
     if (item)
     {
-        AlbumArtImage *image = qVariantValue<AlbumArtImage*> (item->GetData());
+        AlbumArtImage *image = item->GetData().value<AlbumArtImage*>();
         if (image)
             doCopyImageToTag(image);
     }
@@ -1283,7 +1283,7 @@ void EditAlbumartDialog::removeSelectedImageFromTag(void)
     MythUIButtonListItem *item = m_coverartList->GetItemCurrent();
     if (item)
     {
-        AlbumArtImage *image = qVariantValue<AlbumArtImage*> (item->GetData());
+        AlbumArtImage *image = item->GetData().value<AlbumArtImage*>();
         if (image)
         {
             QString msg = tr("Are you sure you want to permanently remove this image from the tag?");
@@ -1300,7 +1300,7 @@ void EditAlbumartDialog::doRemoveImageFromTag(bool doIt)
     MythUIButtonListItem *item = m_coverartList->GetItemCurrent();
     if (item)
     {
-        AlbumArtImage *image = qVariantValue<AlbumArtImage*> (item->GetData());
+        AlbumArtImage *image = item->GetData().value<AlbumArtImage*>();
         if (image)
         {
             // ask the backend to remove the image from the tracks tag
