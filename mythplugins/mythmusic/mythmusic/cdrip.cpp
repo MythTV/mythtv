@@ -132,7 +132,7 @@ void CDEjectorThread::run()
 static long int getSectorCount (QString &cddevice, int tracknum)
 {
 #ifdef HAVE_CDIO
-    QByteArray devname = cddevice.toAscii();
+    QByteArray devname = cddevice.toLatin1();
     cdrom_drive *device = cdda_identify(devname.constData(), 0, NULL);
 
     if (!device)
@@ -413,7 +413,7 @@ void CDRipperThread::run(void)
 int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
 {
 #ifdef HAVE_CDIO
-    QByteArray devname = cddevice.toAscii();
+    QByteArray devname = cddevice.toLatin1();
     cdrom_drive *device = cdda_identify(devname.constData(), 0, NULL);
 
     if (!device)
@@ -876,7 +876,7 @@ void Ripper::scanCD(void)
     {
     LOG(VB_MEDIA, LOG_INFO, QString("Ripper::%1 CD='%2'").
         arg(__func__).arg(m_CDdevice));
-    (void)cdio_close_tray(m_CDdevice.toAscii().constData(), NULL);
+    (void)cdio_close_tray(m_CDdevice.toLatin1().constData(), NULL);
     }
 #endif // HAVE_CDIO
 
@@ -1228,12 +1228,12 @@ void Ripper::ejectCD()
 #ifdef HAVE_CDIO
         LOG(VB_MEDIA, LOG_INFO, QString("Ripper::%1 '%2'").
             arg(__func__).arg(m_CDdevice));
-        (void)cdio_eject_media_drive(m_CDdevice.toAscii().constData());
+        (void)cdio_eject_media_drive(m_CDdevice.toLatin1().constData());
 #else
         MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
         if (mon)
         {
-            QByteArray devname = m_CDdevice.toAscii();
+            QByteArray devname = m_CDdevice.toLatin1();
             MythMediaDevice *pMedia = mon->GetMedia(devname.constData());
             if (pMedia && mon->ValidateAndLock(pMedia))
             {

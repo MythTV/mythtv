@@ -308,7 +308,7 @@ Cddb::Album& Cddb::Album::operator =(const QString& rhs)
 
     enum { kNorm, kToc } eState = kNorm;
 
-    QString cddb = QString::fromUtf8(rhs.toAscii().constData());
+    QString cddb = QString::fromUtf8(rhs.toLatin1().constData());
     while (!cddb.isEmpty())
     {
         // Lines should be of the form "FIELD=value\r\n"
