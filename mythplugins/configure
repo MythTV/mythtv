@@ -442,7 +442,7 @@ for opt do
       enable $DEPRECATED_PLUGIN_LIST $PLUGIN_LIST $CONFIG_LIST
   ;;
   --disable-all)
-      disable $DEPRECATED_PLUGIN_LIST $PLUGIN_LIST $CONFIG_LIST
+      disable $DEPRECATED_PLUGIN_LIST $PLUGIN_LIST
   ;;
   --enable-?*|--disable-?*)
   eval $(echo "$opt" | sed 's/--/action=/;s/-/ option=/;s/-/_/g')
