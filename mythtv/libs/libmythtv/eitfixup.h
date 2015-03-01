@@ -29,7 +29,6 @@ class EITFixUp
      static const int kMinMovieDuration = 75*60;
 
   public:
-    /** The flags in a bit field */
     enum FixUpType
     {
         kFixNone             =   0x0000,
@@ -58,11 +57,12 @@ class EITFixUp
         kFixAUNine           = 0x400000,
         kFixAUSeven          = 0x800000,
 
+
         // Early fixups
-        kEFixForceISO8859_1  = 0x1000000,
-        kEFixForceISO8859_2  = 0x2000000,
-        kEFixForceISO8859_9  = 0x3000000,
-        kEFixForceISO8859_15 = 0x4000000,
+        kEFixForceISO8859_1  =   0x2000,
+        kEFixForceISO8859_15 =   0x4000,
+        kEFixForceISO8859_9  =  0x80000,
+        kEFixForceISO8859_2  = 0x100000,
     };
 
     EITFixUp();
