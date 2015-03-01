@@ -332,7 +332,6 @@ Generic options:
   --libdir-name=LIBNAME    install/look for libs in PREFIX/LIBNAME [$libdir_name]
   --help                   print this message
   --enable-all             Enable all options
-  --enable-opengl          enable OpenGL (MythGallery) [$opengl]
   --previous               use previous configure parameters if possible
 
 MythArchive related options:
@@ -347,6 +346,7 @@ MythGallery related options:
   --enable-new-exif        use libexif > version 0.6.9 [$newexif]
   --enable-dcraw           use dcraw to view raw photos [$dcraw]
   --icc-profile=PROFILE    ICC profile for dcraw decoding [$icc]
+  --enable-opengl          enable OpenGL (MythGallery) [$opengl]
 
 MythGame related options:
   --enable-mythgame        build the mythgame plugin [$game]
@@ -354,6 +354,7 @@ MythGame related options:
 MythMusic related options:
   --enable-mythmusic       build the mythmusic plugin [$music]
   --enable-fftw            enable fftw visualizers [$fftw]
+  --enable-cdio            enable cd playback [$cdio]
 
 MythNetvision related options:
   --enable-mythnetvision   build the mythnetvision plugin [$netvision]
