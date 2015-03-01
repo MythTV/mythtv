@@ -193,18 +193,16 @@ void VideoSelector::toggleSelected(MythUIButtonListItem *item)
 {
     if (item->state() == MythUIButtonListItem::FullChecked)
     {
-        int index = m_selectedList.indexOf(
-                                qVariantValue<VideoInfo *>(item->GetData()));
+        int index = m_selectedList.indexOf(item->GetData().value<VideoInfo *>());
         if (index != -1)
             m_selectedList.takeAt(index);
         item->setChecked(MythUIButtonListItem::NotChecked);
     }
     else
     {
-        int index = m_selectedList.indexOf(
-                                qVariantValue<VideoInfo *>(item->GetData()));
+        int index = m_selectedList.indexOf(item->GetData().value<VideoInfo *>());
         if (index == -1)
-            m_selectedList.append(qVariantValue<VideoInfo *>(item->GetData()));
+            m_selectedList.append(item->GetData().value<VideoInfo *>());
 
         item->setChecked(MythUIButtonListItem::FullChecked);
     }
@@ -212,9 +210,7 @@ void VideoSelector::toggleSelected(MythUIButtonListItem *item)
 
 void VideoSelector::titleChanged(MythUIButtonListItem *item)
 {
-    VideoInfo *v;
-
-    v = qVariantValue<VideoInfo *>(item->GetData());
+    VideoInfo *v = item->GetData().value<VideoInfo *>();
 
     if (!v)
         return;

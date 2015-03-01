@@ -244,18 +244,16 @@ void RecordingSelector::toggleSelected(MythUIButtonListItem *item)
 {
     if (item->state() == MythUIButtonListItem:: FullChecked)
     {
-        int index = m_selectedList.indexOf(
-                                qVariantValue<ProgramInfo *>(item->GetData()));
+        int index = m_selectedList.indexOf(item->GetData().value<ProgramInfo *>());
         if (index != -1)
             m_selectedList.takeAt(index);
         item->setChecked(MythUIButtonListItem:: NotChecked);
     }
     else
     {
-        int index = m_selectedList.indexOf(
-                                qVariantValue<ProgramInfo *>(item->GetData()));
+        int index = m_selectedList.indexOf(item->GetData().value<ProgramInfo *>());
         if (index == -1)
-            m_selectedList.append(qVariantValue<ProgramInfo *>(item->GetData()));
+            m_selectedList.append(item->GetData().value<ProgramInfo *>());
 
         item->setChecked(MythUIButtonListItem::FullChecked);
     }
@@ -263,9 +261,7 @@ void RecordingSelector::toggleSelected(MythUIButtonListItem *item)
 
 void RecordingSelector::titleChanged(MythUIButtonListItem *item)
 {
-    ProgramInfo *p;
-
-    p = qVariantValue<ProgramInfo *>(item->GetData());
+    ProgramInfo *p = item->GetData().value<ProgramInfo *>();
 
     if (!p)
         return;

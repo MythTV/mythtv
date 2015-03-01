@@ -245,7 +245,7 @@ void ArchiveFileSelector::itemSelected(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    FileData *fileData = qVariantValue<FileData*>(item->GetData());
+    FileData *fileData = item->GetData().value<FileData*>();
     if (!fileData)
         return;
 

@@ -145,7 +145,7 @@ void FileSelector::itemClicked(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    FileData *fileData = qVariantValue<FileData*>(item->GetData());
+    FileData *fileData = item->GetData().value<FileData*>();
 
     if (fileData->directory)
     {
@@ -312,7 +312,7 @@ void FileSelector::OKPressed()
     else
     {
         MythUIButtonListItem *item = m_fileButtonList->GetItemCurrent();
-        FileData *fileData = qVariantValue<FileData*>(item->GetData());
+        FileData *fileData = item->GetData().value<FileData*>();
 
         if (m_selectorType == FSTYPE_DIRECTORY)
         {
