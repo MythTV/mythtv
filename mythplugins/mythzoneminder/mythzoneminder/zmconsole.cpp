@@ -256,7 +256,7 @@ void ZMConsole::showEditFunctionPopup()
 {
     Monitor *currentMonitor = NULL;
 
-    currentMonitor = qVariantValue<Monitor*> (m_monitor_list->GetItemCurrent()->GetData());
+    currentMonitor = m_monitor_list->GetItemCurrent()->GetData().value<Monitor*>();
 
     if (!currentMonitor)
         return;
