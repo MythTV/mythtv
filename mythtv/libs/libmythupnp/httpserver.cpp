@@ -237,8 +237,22 @@ void HttpServer::LoadSSLConfig()
     if (!certList.isEmpty())
         hostCert = certList.first();
 
-    if (hostCert.isValid())
+    if (!hostCert.isNull())
+    {
+        if (hostCert.effectiveDate() > QDateTime::currentDateTime())
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("HttpServer: Host certificate start date in future (%1)").arg(hostCertPath));
+            return;
+        }
+
+        if (hostCert.expiryDate() < QDateTime::currentDateTime())
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("HttpServer: Host certificate has expired (%1)").arg(hostCertPath));
+            return;
+        }
+
         m_sslConfig.setLocalCertificate(hostCert);
+    }
     else
     {
         LOG(VB_GENERAL, LOG_ERR, QString("HttpServer: Unable to load host cert from file (%1)").arg(hostCertPath));
