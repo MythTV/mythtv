@@ -163,9 +163,7 @@ void TestEITFixups::testUKFixups1()
     fixup.Fix(event1);
 
     PRINT_EVENT(event1);
-    QEXPECT_FAIL("", "", Continue);
     QCOMPARE(event1.episode,       3u);
-    QEXPECT_FAIL("", "", Continue);
     QCOMPARE(event1.totalepisodes, 5u);
 }
 
@@ -247,13 +245,11 @@ void TestEITFixups::testUKFixups5()
 
     fixup.Fix(event5);
     PRINT_EVENT(event5);
-    QEXPECT_FAIL("", "", Continue);
-    QCOMPARE(event5.partnumber,   (uint16_t)12u);
-    QEXPECT_FAIL("", "", Continue);
-    QCOMPARE(event5.parttotal,    (uint16_t)26u);
-    QCOMPARE(event5.subtitleType, (unsigned char)SUB_NORMAL);
-    QCOMPARE(event5.subtitle,     QString("Whirlwind"));
-    QCOMPARE(event5.description,  QString("Acclaimed documentary series about World War II. This episode focuses on the Allied bombing campaign which inflicted grievous damage upon Germany, both day and night."));
+    QCOMPARE(event5.episode,       12u);
+    QCOMPARE(event5.totalepisodes, 26u);
+    QCOMPARE(event5.subtitleType,  (unsigned char)SUB_NORMAL);
+    QCOMPARE(event5.subtitle,      QString("Whirlwind"));
+    QCOMPARE(event5.description,   QString("Acclaimed documentary series about World War II. This episode focuses on the Allied bombing campaign which inflicted grievous damage upon Germany, both day and night."));
 }
 
 void TestEITFixups::testUKFixups6()
@@ -295,9 +291,7 @@ void TestEITFixups::testUKFixups7()
 
     fixup.Fix(event7);
     PRINT_EVENT(event7);
-    QEXPECT_FAIL("", "", Continue);
     QCOMPARE(event7.episode,       2u);
-    QEXPECT_FAIL("", "", Continue);
     QCOMPARE(event7.totalepisodes, 3u);
     QCOMPARE(event7.subtitleType,  (unsigned char)SUB_NORMAL);
     QCOMPARE(event7.audioProps,    (unsigned char)(AUD_STEREO | AUD_VISUALIMPAIR));

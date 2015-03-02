@@ -42,7 +42,7 @@ EITFixUp::EITFixUp()
       m_ukSpaceColonStart("^[ |:]*"),
       m_ukSpaceStart("^ "),
       m_ukPart("\\s*\\(?\\s*(?:Part|Pt)\\s*(\\d{1,2})\\s*(?:of|/)\\s*(\\d{1,2})\\s*\\)?\\s*(?:\\.|:)?", Qt::CaseInsensitive),
-      m_ukSeries("\\s*\\(?\\s*(?!Part|Pt)(?:Season|Series|S)?\\s*(\\d{1,2})(?:,|:)?\\s*(?:Episode|Ep)?\\s*(\\d{1,2})\\s*((?:of|/)\\s*(\\d{1,2})\\s*)?\\)?\\s*(?:\\.|:)?", Qt::CaseInsensitive),
+      m_ukSeries("\\s*\\(?\\s*(?!Part|Pt)((?:Season|Series|S)\\s*(\\d{1,2})(?:,|:)?)?\\s*(?:Episode|Ep)?\\s*(\\d{1,2})\\s*((?:of|/)\\s*(\\d{1,2})\\s*)?\\)?\\s*(?:\\.|:)?", Qt::CaseInsensitive),
       m_ukCC("\\[(?:(AD|SL|S|W|HD),?)+\\]"),
       m_ukYear("[\\[\\(]([\\d]{4})[\\)\\]]"),
       m_uk24ep("^\\d{1,2}:00[ap]m to \\d{1,2}:00[ap]m: "),
@@ -769,21 +769,22 @@ void EITFixUp::FixUK(DBEventEIT &event) const
     QRegExp tmpSeries = m_ukSeries;
     if ((position1 = tmpSeries.indexIn(event.title)) != -1)
     {
-        if (!tmpSeries.cap(1).isEmpty())
+        if (!tmpSeries.cap(2).isEmpty())
         {
-            event.season = tmpSeries.cap(1).toUInt();
+            event.season = tmpSeries.cap(2).toUInt();
             series = true;
         }
 
-        if (tmpSeries.cap(3).isEmpty())
+        if (tmpSeries.cap(5).isEmpty())
         {
-            event.episode = tmpSeries.cap(2).toUInt();
+            event.episode = tmpSeries.cap(3).toUInt();
+            series = true;
         }
-        else if ((tmpSeries.cap(2).toUInt() <= tmpSeries.cap(4).toUInt())
-                 && tmpSeries.cap(4).toUInt() <= 50)
+        else if ((tmpSeries.cap(3).toUInt() <= tmpSeries.cap(5).toUInt())
+                 && tmpSeries.cap(5).toUInt() <= 50)
         {
-            event.episode = tmpSeries.cap(2).toUInt();
-            event.totalepisodes = tmpSeries.cap(4).toUInt();
+            event.episode = tmpSeries.cap(3).toUInt();
+            event.totalepisodes  = tmpSeries.cap(5).toUInt();
             series = true;
         }
 
@@ -794,21 +795,22 @@ void EITFixUp::FixUK(DBEventEIT &event) const
     }
     else if ((position1 = tmpSeries.indexIn(event.description)) != -1)
     {
-        if (!tmpSeries.cap(1).isEmpty())
+        if (!tmpSeries.cap(2).isEmpty())
         {
-            event.season = tmpSeries.cap(1).toUInt();
+            event.season = tmpSeries.cap(2).toUInt();
             series = true;
         }
 
-        if (tmpSeries.cap(3).isEmpty())
+        if (tmpSeries.cap(5).isEmpty())
         {
-            event.episode = tmpSeries.cap(2).toUInt();
+            event.episode = tmpSeries.cap(3).toUInt();
+            series = true;
         }
-        else if ((tmpSeries.cap(2).toUInt() <= tmpSeries.cap(4).toUInt())
-                 && tmpSeries.cap(4).toUInt() <= 50)
+        else if ((tmpSeries.cap(3).toUInt() <= tmpSeries.cap(5).toUInt())
+                 && tmpSeries.cap(5).toUInt() <= 50)
         {
-            event.episode = tmpSeries.cap(2).toUInt();
-            event.totalepisodes = tmpSeries.cap(4).toUInt();
+            event.episode = tmpSeries.cap(3).toUInt();
+            event.totalepisodes  = tmpSeries.cap(5).toUInt();
             series = true;
         }
 
