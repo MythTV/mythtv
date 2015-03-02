@@ -42,7 +42,7 @@ EITFixUp::EITFixUp()
       m_ukSpaceColonStart("^[ |:]*"),
       m_ukSpaceStart("^ "),
       m_ukPart("\\s*\\(?\\s*(?:Part|Pt)\\s*(\\d{1,2})\\s*(?:of|/)\\s*(\\d{1,2})\\s*\\)?\\s*(?:\\.|:)?", Qt::CaseInsensitive),
-      m_ukSeries("\\s*\\(?\\s*(?!Part|Pt)(?:Season|Series|S)?\\s*(\\d{1,2})(?:,|:)?\\s*(?:Episode|Ep)?\\s*(\\d{1,2})\\s*(?:of|/)\\s*(\\d{1,2})\\s*\\)?\\s*(?:\\.|:)?", Qt::CaseInsensitive),
+      m_ukSeries("\\s*\\(?\\s*(?!Part|Pt)(?:Season|Series|S)?\\s*(\\d{1,2})(?:,|:)?\\s*(?:Episode|Ep)?\\s*(\\d{1,2})\\s*((?:of|/)\\s*(\\d{1,2})\\s*)?\\)?\\s*(?:\\.|:)?", Qt::CaseInsensitive),
       m_ukCC("\\[(?:(AD|SL|S|W|HD),?)+\\]"),
       m_ukYear("[\\[\\(]([\\d]{4})[\\)\\]]"),
       m_uk24ep("^\\d{1,2}:00[ap]m to \\d{1,2}:00[ap]m: "),
@@ -768,11 +768,15 @@ void EITFixUp::FixUK(DBEventEIT &event) const
             series = true;
         }
 
-        if ((tmpSeries.cap(2).toUInt() <= tmpSeries.cap(3).toUInt())
-            && tmpSeries.cap(3).toUInt()<=50)
+        if (tmpSeries.cap(3).isEmpty())
         {
             event.episode = tmpSeries.cap(2).toUInt();
-            event.totalepisodes  = tmpSeries.cap(3).toUInt();
+        }
+        else if ((tmpSeries.cap(2).toUInt() <= tmpSeries.cap(4).toUInt())
+                 && tmpSeries.cap(4).toUInt() <= 50)
+        {
+            event.episode = tmpSeries.cap(2).toUInt();
+            event.totalepisodes = tmpSeries.cap(4).toUInt();
             series = true;
         }
 
@@ -789,11 +793,15 @@ void EITFixUp::FixUK(DBEventEIT &event) const
             series = true;
         }
 
-        if ((tmpSeries.cap(2).toUInt() <= tmpSeries.cap(3).toUInt())
-            && tmpSeries.cap(3).toUInt() <= 50)
+        if (tmpSeries.cap(3).isEmpty())
         {
             event.episode = tmpSeries.cap(2).toUInt();
-            event.totalepisodes  = tmpSeries.cap(3).toUInt();
+        }
+        else if ((tmpSeries.cap(2).toUInt() <= tmpSeries.cap(4).toUInt())
+                 && tmpSeries.cap(4).toUInt() <= 50)
+        {
+            event.episode = tmpSeries.cap(2).toUInt();
+            event.totalepisodes = tmpSeries.cap(4).toUInt();
             series = true;
         }
 
@@ -2092,8 +2100,8 @@ void EITFixUp::FixDK(DBEventEIT &event) const
         }
     }
     // Description search
-    // Season (Sæson [:digit:]+.) => episode = season episode number
-    // or year (- år [:digit:]+(\\)|:) ) => episode = total episode number
+    // Season (SÃ¦son [:digit:]+.) => episode = season episode number
+    // or year (- Ã¥r [:digit:]+(\\)|:) ) => episode = total episode number
     tmpRegEx = m_dkSeason1;
     position = event.description.indexOf(tmpRegEx);
     if (position != -1)
