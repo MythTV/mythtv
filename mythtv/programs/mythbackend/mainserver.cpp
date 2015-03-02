@@ -1347,7 +1347,7 @@ void MainServer::customEvent(QEvent *e)
             uint cardid = tokens[1].toUInt();
             uint chanid = tokens[2].toUInt();
             QDateTime startts = MythDate::fromString(tokens[3]);
-            RecStatusType recstatus = RecStatusType(tokens[4].toInt());
+            RecStatus::Type recstatus = RecStatus::Type(tokens[4].toInt());
             QDateTime recendts = MythDate::fromString(tokens[5]);
             m_sched->UpdateRecStatus(cardid, chanid, startts,
                                      recstatus, recendts);
@@ -2725,9 +2725,9 @@ void MainServer::HandleStopRecording(QStringList &slist, PlaybackSock *pbs)
             for( uint n = 0; n < schedList.size(); n++)
             {
                 ProgramInfo *pInfo = schedList[n];
-                if ((pInfo->GetRecordingStatus() == rsTuning ||
-                     pInfo->GetRecordingStatus() == rsFailing ||
-                     pInfo->GetRecordingStatus() == rsRecording)
+                if ((pInfo->GetRecordingStatus() == RecStatus::Tuning ||
+                     pInfo->GetRecordingStatus() == RecStatus::Failing ||
+                     pInfo->GetRecordingStatus() == RecStatus::Recording)
                     && recinfo.IsSameProgram(*pInfo))
                     recinfo.SetChanID(pInfo->GetChanID());
             }
@@ -2744,12 +2744,12 @@ void MainServer::DoHandleStopRecording(
         pbssock = pbs->getSocket();
 
     // FIXME!  We don't know what state the recorder is in at this
-    // time.  Simply set the recstatus to rsUnknown and let the
+    // time.  Simply set the recstatus to RecStatus::Unknown and let the
     // scheduler do the best it can with it.  The proper long term fix
     // is probably to have the recorder return the actual recstatus as
     // part of the stop recording response.  That's a more involved
     // change than I care to make during the 0.25 code freeze.
-    recinfo.SetRecordingStatus(rsUnknown);
+    recinfo.SetRecordingStatus(RecStatus::Unknown);
 
     if (ismaster && recinfo.GetHostname() != gCoreContext->GetHostName())
     {

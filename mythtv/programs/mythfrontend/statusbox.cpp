@@ -666,8 +666,8 @@ void StatusBox::doScheduleStatus()
         return;
     }
 
-    QMap<RecStatusType, int> statusMatch;
-    QMap<RecStatusType, QString> statusText;
+    QMap<RecStatus::Type, int> statusMatch;
+    QMap<RecStatus::Type, QString> statusText;
     QMap<int, int> sourceMatch;
     QMap<int, QString> sourceText;
     QMap<int, int> cardMatch;
@@ -722,17 +722,17 @@ void StatusBox::doScheduleStatus()
     for (; it != schedList.end(); ++it)
     {
         const ProgramInfo *s = *it;
-        const RecStatusType recstatus = s->GetRecordingStatus();
+        const RecStatus::Type recstatus = s->GetRecordingStatus();
 
         if (statusMatch[recstatus] < 1)
         {
-            statusText[recstatus] = toString(
+            statusText[recstatus] = RecStatus::toString(
                 recstatus, s->GetRecordingRuleType());
         }
 
         ++statusMatch[recstatus];
 
-        if (recstatus == rsWillRecord || recstatus == rsRecording)
+        if (recstatus == RecStatus::WillRecord || recstatus == RecStatus::Recording)
         {
             ++sourceMatch[s->GetSourceID()];
             ++cardMatch[s->GetInputID()];
@@ -752,15 +752,15 @@ void StatusBox::doScheduleStatus()
             AddLogLine(tmpstr, helpmsg, tmpstr, tmpstr, fstate);\
         }                                                       \
     } while (0)
-    ADD_STATUS_LOG_LINE(rsRecording, "");
-    ADD_STATUS_LOG_LINE(rsWillRecord, "");
-    ADD_STATUS_LOG_LINE(rsConflict, "error");
-    ADD_STATUS_LOG_LINE(rsTooManyRecordings, "warning");
-    ADD_STATUS_LOG_LINE(rsLowDiskSpace, "warning");
-    ADD_STATUS_LOG_LINE(rsLaterShowing, "warning");
-    ADD_STATUS_LOG_LINE(rsNotListed, "warning");
+    ADD_STATUS_LOG_LINE(RecStatus::Recording, "");
+    ADD_STATUS_LOG_LINE(RecStatus::WillRecord, "");
+    ADD_STATUS_LOG_LINE(RecStatus::Conflict, "error");
+    ADD_STATUS_LOG_LINE(RecStatus::TooManyRecordings, "warning");
+    ADD_STATUS_LOG_LINE(RecStatus::LowDiskSpace, "warning");
+    ADD_STATUS_LOG_LINE(RecStatus::LaterShowing, "warning");
+    ADD_STATUS_LOG_LINE(RecStatus::NotListed, "warning");
 
-    QString willrec = statusText[rsWillRecord];
+    QString willrec = statusText[RecStatus::WillRecord];
 
     if (lowerpriority > 0)
     {

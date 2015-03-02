@@ -59,7 +59,7 @@ class TestProgramInfo : public QObject
             (uint) 0, /* part number */
             (uint) 0, /* part total */
             QDate(), /* original air date */
-            rsUnknown, /* rec status */
+            RecStatus::Unknown, /* rec status */
             (uint) -1, /* record id */
             kNotRecording, /* rec type */
             (uint) -1, /* find id */

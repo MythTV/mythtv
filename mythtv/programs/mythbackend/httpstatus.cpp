@@ -276,7 +276,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
     RecConstIter itProg = recordingList.begin();
     for (; (itProg != recordingList.end()) && iNumRecordings < iNum; ++itProg)
     {
-        if (((*itProg)->GetRecordingStatus() <= rsWillRecord) &&
+        if (((*itProg)->GetRecordingStatus() <= RecStatus::WillRecord) &&
             ((*itProg)->GetRecordingStartTime() >=
              MythDate::current()))
         {
@@ -1552,7 +1552,7 @@ void HttpStatus::FillProgramInfo(QDomDocument *pDoc,
 
     // Build Recording Child Element
 
-    if ( pInfo->GetRecordingStatus() != rsUnknown )
+    if ( pInfo->GetRecordingStatus() != RecStatus::Unknown )
     {
         QDomElement recording = pDoc->createElement( "Recording" );
         program.appendChild( recording );

@@ -276,21 +276,21 @@ void ViewScheduled::LoadList(bool useExistingData)
     while (pit != m_recList.end())
     {
         ProgramInfo *pginfo = *pit;
-        const RecStatusType recstatus = pginfo->GetRecordingStatus();
+        const RecStatus::Type recstatus = pginfo->GetRecordingStatus();
         if ((pginfo->GetRecordingEndTime() >= now ||
              pginfo->GetScheduledEndTime() >= now ||
-             recstatus == rsRecording ||
-             recstatus == rsTuning ||
-             recstatus == rsFailing) &&
+             recstatus == RecStatus::Recording ||
+             recstatus == RecStatus::Tuning ||
+             recstatus == RecStatus::Failing) &&
             (m_showAll ||
-             (recstatus >= rsFailing &&
-              recstatus <= rsWillRecord) ||
-             recstatus == rsDontRecord ||
-             (recstatus == rsTooManyRecordings &&
+             (recstatus >= RecStatus::Failing &&
+              recstatus <= RecStatus::WillRecord) ||
+             recstatus == RecStatus::DontRecord ||
+             (recstatus == RecStatus::TooManyRecordings &&
               ++toomanycounts[pginfo->GetRecordingRuleID()] <= 1) ||
-             (recstatus > rsTooManyRecordings &&
-              recstatus != rsRepeat &&
-              recstatus != rsNeverRecord)))
+             (recstatus > RecStatus::TooManyRecordings &&
+              recstatus != RecStatus::Repeat &&
+              recstatus != RecStatus::NeverRecord)))
         {
             m_inputref[pginfo->GetInputID()]++;
             if (pginfo->GetInputID() > m_maxinput)
@@ -411,19 +411,19 @@ void ViewScheduled::FillList()
 
         QString state;
 
-        const RecStatusType recstatus = pginfo->GetRecordingStatus();
-        if (recstatus == rsRecording      ||
-            recstatus == rsTuning)
+        const RecStatus::Type recstatus = pginfo->GetRecordingStatus();
+        if (recstatus == RecStatus::Recording      ||
+            recstatus == RecStatus::Tuning)
             state = "running";
-        else if (recstatus == rsConflict  ||
-                 recstatus == rsOffLine   ||
-                 recstatus == rsTunerBusy ||
-                 recstatus == rsFailed    ||
-                 recstatus == rsFailing   ||
-                 recstatus == rsAborted   ||
-                 recstatus == rsMissed)
+        else if (recstatus == RecStatus::Conflict  ||
+                 recstatus == RecStatus::Offline   ||
+                 recstatus == RecStatus::TunerBusy ||
+                 recstatus == RecStatus::Failed    ||
+                 recstatus == RecStatus::Failing   ||
+                 recstatus == RecStatus::Aborted   ||
+                 recstatus == RecStatus::Missed)
             state = "error";
-        else if (recstatus == rsWillRecord)
+        else if (recstatus == RecStatus::WillRecord)
         {
             if (m_curinput == 0 || pginfo->GetInputID() == m_curinput)
             {
@@ -433,11 +433,11 @@ void ViewScheduled::FillList()
                     state = "normal";
             }
         }
-        else if (recstatus == rsRepeat ||
-                 recstatus == rsNeverRecord ||
-                 recstatus == rsDontRecord ||
-                 (recstatus != rsDontRecord &&
-                  recstatus <= rsEarlierShowing))
+        else if (recstatus == RecStatus::Repeat ||
+                 recstatus == RecStatus::NeverRecord ||
+                 recstatus == RecStatus::DontRecord ||
+                 (recstatus != RecStatus::DontRecord &&
+                  recstatus <= RecStatus::EarlierShowing))
             state = "disabled";
         else
             state = "warning";
@@ -467,7 +467,7 @@ void ViewScheduled::FillList()
             for (; it != plist.end(); ++it)
             {
                 ProgramInfo &p = **it;
-                if (p.GetRecordingStatus() == rsConflict)
+                if (p.GetRecordingStatus() == RecStatus::Conflict)
                 {
                     m_conflictDate = p.GetRecordingStartTime()
                         .toLocalTime().date();

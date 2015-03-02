@@ -264,10 +264,10 @@ static QString extract_main_state(const ProgramInfo &pginfo, const TV *player)
     QString state("normal");
     if (pginfo.GetFilesize() == 0)
         state = "error";
-    else if (pginfo.GetRecordingStatus() == rsRecording)
+    else if (pginfo.GetRecordingStatus() == RecStatus::Recording)
         state = "running";
 
-    if (((pginfo.GetRecordingStatus() != rsRecording) &&
+    if (((pginfo.GetRecordingStatus() != RecStatus::Recording) &&
          (pginfo.GetAvailableStatus() != asAvailable) &&
          (pginfo.GetAvailableStatus() != asNotYetAvailable)) ||
         (player && player->IsSameProgram(0, &pginfo)))
@@ -288,8 +288,8 @@ static QString extract_job_state(const ProgramInfo &pginfo)
 {
     QString job = "default";
 
-    if (pginfo.GetRecordingStatus() == rsRecording ||
-        pginfo.GetRecordingStatus() == rsFailing)
+    if (pginfo.GetRecordingStatus() == RecStatus::Recording ||
+        pginfo.GetRecordingStatus() == RecStatus::Failing)
         job = "recording";
     else if (JobQueue::IsJobQueuedOrRunning(
                  JOB_TRANSCODE, pginfo.GetChanID(),
@@ -713,7 +713,7 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
             {
                 uint64_t filesize = info->GetFilesize();
 // This query should be unnecessary if the ProgramInfo Updater is working
-//                 if (filesize == 0 || info->GetRecordingStatus() == rsRecording)
+//                 if (filesize == 0 || info->GetRecordingStatus() == RecStatus::Recording)
 //                 {
 //                     filesize = info->QueryFilesize();
 //                     info->SetFilesize(filesize);
@@ -3165,7 +3165,7 @@ void PlaybackBox::ShowActionPopup(const ProgramInfo &pginfo)
         }
     }
 
-    if (pginfo.GetRecordingStatus() == rsRecording &&
+    if (pginfo.GetRecordingStatus() == RecStatus::Recording &&
         (!(sameProgram &&
            (tvstate == kState_WatchingLiveTV ||
             tvstate == kState_WatchingRecording))))
@@ -3936,7 +3936,7 @@ void PlaybackBox::customEvent(QEvent *event)
                 ProgramInfo evinfo(recordingID);
                 if (evinfo.GetChanID())
                 {
-                    evinfo.SetRecordingStatus(rsRecording);
+                    evinfo.SetRecordingStatus(RecStatus::Recording);
                     HandleRecordingAddEvent(evinfo);
                 }
             }

@@ -1560,7 +1560,7 @@ static bool WasAutomaticStart(void)
                     ProgramList::const_iterator it = progList.begin();
                     for (; it != progList.end(); ++it)
                     {
-                        if (((*it)->GetRecordingStatus() == rsWillRecord) &&
+                        if (((*it)->GetRecordingStatus() == RecStatus::WillRecord) &&
                             ((*it)->GetHostname() == hostname) &&
                             (nextRecordingStart.isNull() ||
                              nextRecordingStart > (*it)->GetRecordingStartTime()))

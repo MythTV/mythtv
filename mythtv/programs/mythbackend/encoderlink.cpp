@@ -432,9 +432,9 @@ int EncoderLink::LockTuner()
  *          -1 if TVRec is busy doing something else, 0 otherwise.
  *  \sa RecordPending(const ProgramInfo*, int, bool), StopRecording()
  */
-RecStatusType EncoderLink::StartRecording(ProgramInfo *rec)
+RecStatus::Type EncoderLink::StartRecording(ProgramInfo *rec)
 {
-    RecStatusType retval = rsAborted;
+    RecStatus::Type retval = RecStatus::Aborted;
 
     endRecordingTime = rec->GetRecordingEndTime();
     startRecordingTime = rec->GetRecordingStartTime();
@@ -453,7 +453,7 @@ RecStatusType EncoderLink::StartRecording(ProgramInfo *rec)
                     "but the backend is not there anymore\n")
                 .arg(m_capturecardnum));
 
-    if (retval != rsRecording && retval != rsTuning && retval != rsFailing)
+    if (retval != RecStatus::Recording && retval != RecStatus::Tuning && retval != RecStatus::Failing)
     {
         endRecordingTime = MythDate::current().addDays(-2);
         startRecordingTime = endRecordingTime;
@@ -463,9 +463,9 @@ RecStatusType EncoderLink::StartRecording(ProgramInfo *rec)
     return retval;
 }
 
-RecStatusType EncoderLink::GetRecordingStatus(void)
+RecStatus::Type EncoderLink::GetRecordingStatus(void)
 {
-    RecStatusType retval = rsAborted;
+    RecStatus::Type retval = RecStatus::Aborted;
 
     if (local)
         retval = tv->GetRecordingStatus();
@@ -480,7 +480,7 @@ RecStatusType EncoderLink::GetRecordingStatus(void)
                     "but the backend is not there anymore\n")
                 .arg(m_capturecardnum));
 
-    if (retval != rsRecording && retval != rsTuning && retval != rsFailing)
+    if (retval != RecStatus::Recording && retval != RecStatus::Tuning && retval != RecStatus::Failing)
     {
         endRecordingTime = MythDate::current().addDays(-2);
         startRecordingTime = endRecordingTime;

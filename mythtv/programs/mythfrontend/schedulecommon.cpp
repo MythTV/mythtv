@@ -273,12 +273,12 @@ void ScheduleCommon::EditRecording(void)
     QString message = recinfo.toString(ProgramInfo::kTitleSubtitle, " - ");
 
     message += "\n\n";
-    message += toDescription(recinfo.GetRecordingStatus(),
+    message += RecStatus::toDescription(recinfo.GetRecordingStatus(),
                              recinfo.GetRecordingRuleType(),
                              recinfo.GetRecordingStartTime());
 
-    if (recinfo.GetRecordingStatus() == rsConflict ||
-        recinfo.GetRecordingStatus() == rsLaterShowing)
+    if (recinfo.GetRecordingStatus() == RecStatus::Conflict ||
+        recinfo.GetRecordingStatus() == RecStatus::LaterShowing)
     {
         vector<ProgramInfo *> *confList = RemoteGetConflictList(&recinfo);
 
@@ -323,7 +323,7 @@ void ScheduleCommon::EditRecording(void)
 
     QDateTime now = MythDate::current();
 
-    if (recinfo.GetRecordingStatus() == rsUnknown)
+    if (recinfo.GetRecordingStatus() == RecStatus::Unknown)
     {
         if (recinfo.GetRecordingEndTime() > now)
             menuPopup->AddButton(tr("Record this showing"),
@@ -345,9 +345,9 @@ void ScheduleCommon::EditRecording(void)
         menuPopup->AddButton(tr("Edit recording rule"),
                              qVariantFromValue(recinfo));
     }
-    else if (recinfo.GetRecordingStatus() == rsRecording ||
-             recinfo.GetRecordingStatus() == rsTuning    ||
-             recinfo.GetRecordingStatus() == rsFailing)
+    else if (recinfo.GetRecordingStatus() == RecStatus::Recording ||
+             recinfo.GetRecordingStatus() == RecStatus::Tuning    ||
+             recinfo.GetRecordingStatus() == RecStatus::Failing)
     {
         menuPopup->AddButton(tr("Stop this recording"),
                              qVariantFromValue(recinfo));
@@ -358,8 +358,8 @@ void ScheduleCommon::EditRecording(void)
     {
         if (recinfo.GetRecordingStartTime() < now &&
             recinfo.GetRecordingEndTime() > now &&
-            recinfo.GetRecordingStatus() != rsDontRecord &&
-            recinfo.GetRecordingStatus() != rsNotListed)
+            recinfo.GetRecordingStatus() != RecStatus::DontRecord &&
+            recinfo.GetRecordingStatus() != RecStatus::NotListed)
         {
             menuPopup->AddButton(tr("Restart this recording"),
                                  qVariantFromValue(recinfo));
@@ -368,21 +368,21 @@ void ScheduleCommon::EditRecording(void)
         if (recinfo.GetRecordingEndTime() > now &&
             recinfo.GetRecordingRuleType() != kSingleRecord &&
             recinfo.GetRecordingRuleType() != kOverrideRecord &&
-            (recinfo.GetRecordingStatus() == rsDontRecord ||
-             recinfo.GetRecordingStatus() == rsPreviousRecording ||
-             recinfo.GetRecordingStatus() == rsCurrentRecording ||
-             recinfo.GetRecordingStatus() == rsEarlierShowing ||
-             recinfo.GetRecordingStatus() == rsTooManyRecordings ||
-             recinfo.GetRecordingStatus() == rsLaterShowing ||
-             recinfo.GetRecordingStatus() == rsRepeat ||
-             recinfo.GetRecordingStatus() == rsInactive ||
-             recinfo.GetRecordingStatus() == rsNeverRecord))
+            (recinfo.GetRecordingStatus() == RecStatus::DontRecord ||
+             recinfo.GetRecordingStatus() == RecStatus::PreviousRecording ||
+             recinfo.GetRecordingStatus() == RecStatus::CurrentRecording ||
+             recinfo.GetRecordingStatus() == RecStatus::EarlierShowing ||
+             recinfo.GetRecordingStatus() == RecStatus::TooManyRecordings ||
+             recinfo.GetRecordingStatus() == RecStatus::LaterShowing ||
+             recinfo.GetRecordingStatus() == RecStatus::Repeat ||
+             recinfo.GetRecordingStatus() == RecStatus::Inactive ||
+             recinfo.GetRecordingStatus() == RecStatus::NeverRecord))
         {
             menuPopup->AddButton(tr("Record this showing"),
                                  qVariantFromValue(recinfo));
             if (recinfo.GetRecordingStartTime() > now &&
-                (recinfo.GetRecordingStatus() == rsPreviousRecording ||
-                 recinfo.GetRecordingStatus() == rsNeverRecord))
+                (recinfo.GetRecordingStatus() == RecStatus::PreviousRecording ||
+                 recinfo.GetRecordingStatus() == RecStatus::NeverRecord))
             {
                 menuPopup->AddButton(tr("Forget previous recording"),
                                      qVariantFromValue(recinfo));
@@ -391,16 +391,16 @@ void ScheduleCommon::EditRecording(void)
 
         if (recinfo.GetRecordingRuleType() != kSingleRecord &&
             recinfo.GetRecordingRuleType() != kDontRecord &&
-            (recinfo.GetRecordingStatus() == rsWillRecord ||
-             recinfo.GetRecordingStatus() == rsCurrentRecording ||
-             recinfo.GetRecordingStatus() == rsEarlierShowing ||
-             recinfo.GetRecordingStatus() == rsTooManyRecordings ||
-             recinfo.GetRecordingStatus() == rsConflict ||
-             recinfo.GetRecordingStatus() == rsLaterShowing ||
-             recinfo.GetRecordingStatus() == rsOffLine))
+            (recinfo.GetRecordingStatus() == RecStatus::WillRecord ||
+             recinfo.GetRecordingStatus() == RecStatus::CurrentRecording ||
+             recinfo.GetRecordingStatus() == RecStatus::EarlierShowing ||
+             recinfo.GetRecordingStatus() == RecStatus::TooManyRecordings ||
+             recinfo.GetRecordingStatus() == RecStatus::Conflict ||
+             recinfo.GetRecordingStatus() == RecStatus::LaterShowing ||
+             recinfo.GetRecordingStatus() == RecStatus::Offline))
         {
-            if (recinfo.GetRecordingStatus() == rsWillRecord ||
-                recinfo.GetRecordingStatus() == rsConflict)
+            if (recinfo.GetRecordingStatus() == RecStatus::WillRecord ||
+                recinfo.GetRecordingStatus() == RecStatus::Conflict)
                 menuPopup->AddButton(tr("Don't record this showing"),
                                      qVariantFromValue(recinfo));
 
@@ -439,7 +439,7 @@ void ScheduleCommon::EditRecording(void)
         else
         {
             if (recinfo.GetRecordingRuleType() != kSingleRecord &&
-                recinfo.GetRecordingStatus() != rsNotListed)
+                recinfo.GetRecordingStatus() != RecStatus::NotListed)
                 menuPopup->AddButton(tr("Add override rule"),
                                      qVariantFromValue(recinfo));
             menuPopup->AddButton(tr("Edit recording rule"),

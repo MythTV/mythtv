@@ -663,7 +663,7 @@ void DTVRecorder::HandleTimestamps(int stream_id, int64_t pts, int64_t dts)
             LOG(VB_RECORD, LOG_DEBUG, LOC + QString("Inserted gap %1 dur %2")
                 .arg(recordingGaps.back().toString()).arg(diff/90000.0));
 
-            if (curRecording && curRecording->GetRecordingStatus() != rsFailing)
+            if (curRecording && curRecording->GetRecordingStatus() != RecStatus::Failing)
             {
                 RecordingQuality recq(curRecording, recordingGaps);
                 if (recq.IsDamaged())
@@ -671,8 +671,8 @@ void DTVRecorder::HandleTimestamps(int stream_id, int64_t pts, int64_t dts)
                     LOG(VB_GENERAL, LOG_INFO, LOC +
                         QString("HandleTimestamps: too much damage, "
                                 "setting status to %1")
-                        .arg(toString(rsFailing, kSingleRecord)));
-                    SetRecordingStatus(rsFailing, __FILE__, __LINE__);
+                        .arg(RecStatus::toString(RecStatus::Failing, kSingleRecord)));
+                    SetRecordingStatus(RecStatus::Failing, __FILE__, __LINE__);
                 }
             }
         }

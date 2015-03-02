@@ -55,25 +55,25 @@ QString toString(MarkTypes type)
     return "unknown";
 }
 
-QString toUIState(RecStatusType recstatus)
+QString RecStatus::toUIState(RecStatus::Type recstatus)
 {
-    if (recstatus == rsRecorded     || recstatus == rsWillRecord)
+    if (recstatus == RecStatus::Recorded     || recstatus == RecStatus::WillRecord)
         return "normal";
 
-    if (recstatus == rsRecording    || recstatus == rsTuning)
+    if (recstatus == RecStatus::Recording    || recstatus == RecStatus::Tuning)
         return "running";
 
-    if (recstatus == rsConflict     || recstatus == rsOffLine      ||
-        recstatus == rsTunerBusy    || recstatus == rsFailed       ||
-        recstatus == rsAborted      || recstatus == rsMissed       ||
-        recstatus == rsFailing)
+    if (recstatus == RecStatus::Conflict     || recstatus == RecStatus::Offline      ||
+        recstatus == RecStatus::TunerBusy    || recstatus == RecStatus::Failed       ||
+        recstatus == RecStatus::Aborted      || recstatus == RecStatus::Missed       ||
+        recstatus == RecStatus::Failing)
     {
         return "error";
     }
 
-    if (recstatus == rsRepeat       ||
-        recstatus == rsNeverRecord  || recstatus == rsDontRecord   ||
-        (recstatus != rsDontRecord && recstatus <= rsEarlierShowing))
+    if (recstatus == RecStatus::Repeat       ||
+        recstatus == RecStatus::NeverRecord  || recstatus == RecStatus::DontRecord   ||
+        (recstatus != RecStatus::DontRecord && recstatus <= RecStatus::EarlierShowing))
     {
         return "disabled";
     }
@@ -82,82 +82,82 @@ QString toUIState(RecStatusType recstatus)
 }
 
 /// \brief Converts "recstatus" into a short (unreadable) string.
-QString toString(RecStatusType recstatus, uint id)
+QString RecStatus::toString(RecStatus::Type recstatus, uint id)
 {
     QString ret = "-";
     switch (recstatus)
     {
-        case rsAborted:
-            ret = QObject::tr("A", "RecStatusChar rsAborted");
+        case RecStatus::Aborted:
+            ret = QObject::tr("A", "RecStatusChar RecStatus::Aborted");
             break;
-        case rsRecorded:
-            ret = QObject::tr("R", "RecStatusChar rsRecorded");
+        case RecStatus::Recorded:
+            ret = QObject::tr("R", "RecStatusChar RecStatus::Recorded");
             break;
-        case rsRecording:
+        case RecStatus::Recording:
             ret = QString::number(id);
             break;
-        case rsTuning:
+        case RecStatus::Tuning:
             ret = QString::number(id);
             break;
-        case rsFailing:
+        case RecStatus::Failing:
             ret = QString::number(id);
             break;
-        case rsWillRecord:
+        case RecStatus::WillRecord:
             ret = QString::number(id);
             break;
-        case rsDontRecord:
-            ret = QObject::tr("X", "RecStatusChar rsDontRecord");
+        case RecStatus::DontRecord:
+            ret = QObject::tr("X", "RecStatusChar RecStatus::DontRecord");
             break;
-        case rsPreviousRecording:
-            ret = QObject::tr("P", "RecStatusChar rsPreviousRecording");
+        case RecStatus::PreviousRecording:
+            ret = QObject::tr("P", "RecStatusChar RecStatus::PreviousRecording");
             break;
-        case rsCurrentRecording:
-            ret = QObject::tr("R", "RecStatusChar rsCurrentRecording");
+        case RecStatus::CurrentRecording:
+            ret = QObject::tr("R", "RecStatusChar RecStatus::CurrentRecording");
             break;
-        case rsEarlierShowing:
-            ret = QObject::tr("E", "RecStatusChar rsEarlierShowing");
+        case RecStatus::EarlierShowing:
+            ret = QObject::tr("E", "RecStatusChar RecStatus::EarlierShowing");
             break;
-        case rsTooManyRecordings:
-            ret = QObject::tr("T", "RecStatusChar rsTooManyRecordings");
+        case RecStatus::TooManyRecordings:
+            ret = QObject::tr("T", "RecStatusChar RecStatus::TooManyRecordings");
             break;
-        case rsCancelled:
-            ret = QObject::tr("c", "RecStatusChar rsCancelled");
+        case RecStatus::Cancelled:
+            ret = QObject::tr("c", "RecStatusChar RecStatus::Cancelled");
             break;
-        case rsMissedFuture:
-        case rsMissed:
-            ret = QObject::tr("M", "RecStatusChar rsMissed");
+        case RecStatus::MissedFuture:
+        case RecStatus::Missed:
+            ret = QObject::tr("M", "RecStatusChar RecStatus::Missed");
             break;
-        case rsConflict:
-            ret = QObject::tr("C", "RecStatusChar rsConflict");
+        case RecStatus::Conflict:
+            ret = QObject::tr("C", "RecStatusChar RecStatus::Conflict");
             break;
-        case rsLaterShowing:
-            ret = QObject::tr("L", "RecStatusChar rsLaterShowing");
+        case RecStatus::LaterShowing:
+            ret = QObject::tr("L", "RecStatusChar RecStatus::LaterShowing");
             break;
-        case rsRepeat:
-            ret = QObject::tr("r", "RecStatusChar rsRepeat");
+        case RecStatus::Repeat:
+            ret = QObject::tr("r", "RecStatusChar RecStatus::Repeat");
             break;
-        case rsInactive:
-            ret = QObject::tr("x", "RecStatusChar rsInactive");
+        case RecStatus::Inactive:
+            ret = QObject::tr("x", "RecStatusChar RecStatus::Inactive");
             break;
-        case rsLowDiskSpace:
-            ret = QObject::tr("K", "RecStatusChar rsLowDiskSpace");
+        case RecStatus::LowDiskSpace:
+            ret = QObject::tr("K", "RecStatusChar RecStatus::LowDiskSpace");
             break;
-        case rsTunerBusy:
-            ret = QObject::tr("B", "RecStatusChar rsTunerBusy");
+        case RecStatus::TunerBusy:
+            ret = QObject::tr("B", "RecStatusChar RecStatus::TunerBusy");
             break;
-        case rsFailed:
-            ret = QObject::tr("f", "RecStatusChar rsFailed");
+        case RecStatus::Failed:
+            ret = QObject::tr("f", "RecStatusChar RecStatus::Failed");
             break;
-        case rsNotListed:
-            ret = QObject::tr("N", "RecStatusChar rsNotListed");
+        case RecStatus::NotListed:
+            ret = QObject::tr("N", "RecStatusChar RecStatus::NotListed");
             break;
-        case rsNeverRecord:
-            ret = QObject::tr("V", "RecStatusChar rsNeverRecord");
+        case RecStatus::NeverRecord:
+            ret = QObject::tr("V", "RecStatusChar RecStatus::NeverRecord");
             break;
-        case rsOffLine:
-            ret = QObject::tr("F", "RecStatusChar rsOffLine");
+        case RecStatus::Offline:
+            ret = QObject::tr("F", "RecStatusChar RecStatus::Offline");
             break;
-        case rsUnknown:
+        case RecStatus::Unknown:
             break;
     }
 
@@ -165,61 +165,61 @@ QString toString(RecStatusType recstatus, uint id)
 }
 
 /// \brief Converts "recstatus" into a human readable string
-QString toString(RecStatusType recstatus, RecordingType rectype)
+QString RecStatus::toString(RecStatus::Type recstatus, RecordingType rectype)
 {
-    if (recstatus == rsUnknown && rectype == kNotRecording)
+    if (recstatus == RecStatus::Unknown && rectype == kNotRecording)
         return QObject::tr("Not Recording");
 
     switch (recstatus)
     {
-        case rsAborted:
+        case RecStatus::Aborted:
             return QObject::tr("Aborted");
-        case rsRecorded:
+        case RecStatus::Recorded:
             return QObject::tr("Recorded");
-        case rsRecording:
+        case RecStatus::Recording:
             return QObject::tr("Recording");
-        case rsTuning:
+        case RecStatus::Tuning:
             return QObject::tr("Tuning");
-        case rsFailing:
+        case RecStatus::Failing:
             return QObject::tr("Failing");
-        case rsWillRecord:
+        case RecStatus::WillRecord:
             return QObject::tr("Will Record");
-        case rsDontRecord:
+        case RecStatus::DontRecord:
             return QObject::tr("Don't Record");
-        case rsPreviousRecording:
+        case RecStatus::PreviousRecording:
             return QObject::tr("Previously Recorded");
-        case rsCurrentRecording:
+        case RecStatus::CurrentRecording:
             return QObject::tr("Currently Recorded");
-        case rsEarlierShowing:
+        case RecStatus::EarlierShowing:
             return QObject::tr("Earlier Showing");
-        case rsTooManyRecordings:
+        case RecStatus::TooManyRecordings:
             return QObject::tr("Max Recordings");
-        case rsCancelled:
+        case RecStatus::Cancelled:
             return QObject::tr("Manual Cancel");
-        case rsMissedFuture:
-        case rsMissed:
+        case RecStatus::MissedFuture:
+        case RecStatus::Missed:
             return QObject::tr("Missed");
-        case rsConflict:
+        case RecStatus::Conflict:
             return QObject::tr("Conflicting");
-        case rsLaterShowing:
+        case RecStatus::LaterShowing:
             return QObject::tr("Later Showing");
-        case rsRepeat:
+        case RecStatus::Repeat:
             return QObject::tr("Repeat");
-        case rsInactive:
+        case RecStatus::Inactive:
             return QObject::tr("Inactive");
-        case rsLowDiskSpace:
+        case RecStatus::LowDiskSpace:
             return QObject::tr("Low Disk Space");
-        case rsTunerBusy:
+        case RecStatus::TunerBusy:
             return QObject::tr("Tuner Busy");
-        case rsFailed:
+        case RecStatus::Failed:
             return QObject::tr("Recorder Failed");
-        case rsNotListed:
+        case RecStatus::NotListed:
             return QObject::tr("Not Listed");
-        case rsNeverRecord:
+        case RecStatus::NeverRecord:
             return QObject::tr("Never Record");
-        case rsOffLine:
+        case RecStatus::Offline:
             return QObject::tr("Recorder Off-Line");
-        case rsUnknown:
+        case RecStatus::Unknown:
             return QObject::tr("Unknown");
     }
 
@@ -227,57 +227,57 @@ QString toString(RecStatusType recstatus, RecordingType rectype)
 }
 
 /// \brief Converts "recstatus" into a long human readable description.
-QString toDescription(RecStatusType recstatus, RecordingType rectype,
+QString RecStatus::toDescription(RecStatus::Type recstatus, RecordingType rectype,
                       const QDateTime &recstartts)
 {
-    if (recstatus == rsUnknown && rectype == kNotRecording)
+    if (recstatus == RecStatus::Unknown && rectype == kNotRecording)
         return QObject::tr("This showing is not scheduled to record");
 
     QString message;
     QDateTime now = MythDate::current();
 
-    if (recstatus <= rsWillRecord)
+    if (recstatus <= RecStatus::WillRecord)
     {
         switch (recstatus)
         {
-            case rsWillRecord:
+            case RecStatus::WillRecord:
                 message = QObject::tr("This showing will be recorded.");
                 break;
-            case rsRecording:
+            case RecStatus::Recording:
                 message = QObject::tr("This showing is being recorded.");
                 break;
-            case rsTuning:
+            case RecStatus::Tuning:
                 message = QObject::tr("The showing is being tuned.");
                 break;
-            case rsFailing:
+            case RecStatus::Failing:
                 message = QObject::tr("The showing is failing to record "
                                       "because of errors.");
                 break;
-            case rsRecorded:
+            case RecStatus::Recorded:
                 message = QObject::tr("This showing was recorded.");
                 break;
-            case rsAborted:
+            case RecStatus::Aborted:
                 message = QObject::tr("This showing was recorded but was "
                                       "aborted before completion.");
                 break;
-            case rsMissed:
-            case rsMissedFuture:
+            case RecStatus::Missed:
+            case RecStatus::MissedFuture:
                 message = QObject::tr("This showing was not recorded because "
                                       "the master backend was not running.");
                 break;
-            case rsCancelled:
+            case RecStatus::Cancelled:
                 message = QObject::tr("This showing was not recorded because "
                                       "it was manually cancelled.");
                 break;
-            case rsLowDiskSpace:
+            case RecStatus::LowDiskSpace:
                 message = QObject::tr("This showing was not recorded because "
                                       "there wasn't enough disk space.");
                 break;
-            case rsTunerBusy:
+            case RecStatus::TunerBusy:
                 message = QObject::tr("This showing was not recorded because "
                                       "the recorder was already in use.");
                 break;
-            case rsFailed:
+            case RecStatus::Failed:
                 message = QObject::tr("This showing was not recorded because "
                                       "the recorder failed.");
                 break;
@@ -296,49 +296,49 @@ QString toDescription(RecStatusType recstatus, RecordingType rectype,
 
     switch (recstatus)
     {
-        case rsDontRecord:
+        case RecStatus::DontRecord:
             message += QObject::tr("it was manually set to not record.");
             break;
-        case rsPreviousRecording:
+        case RecStatus::PreviousRecording:
             message += QObject::tr("this episode was previously recorded "
                                    "according to the duplicate policy chosen "
                                    "for this title.");
             break;
-        case rsCurrentRecording:
+        case RecStatus::CurrentRecording:
             message += QObject::tr("this episode was previously recorded and "
                                    "is still available in the list of "
                                    "recordings.");
             break;
-        case rsEarlierShowing:
+        case RecStatus::EarlierShowing:
             message += QObject::tr("this episode will be recorded at an "
                                    "earlier time instead.");
             break;
-        case rsTooManyRecordings:
+        case RecStatus::TooManyRecordings:
             message += QObject::tr("too many recordings of this program have "
                                    "already been recorded.");
             break;
-        case rsConflict:
+        case RecStatus::Conflict:
             message += QObject::tr("another program with a higher priority "
                                    "will be recorded.");
             break;
-        case rsLaterShowing:
+        case RecStatus::LaterShowing:
             message += QObject::tr("this episode will be recorded at a "
                                    "later time instead.");
             break;
-        case rsRepeat:
+        case RecStatus::Repeat:
             message += QObject::tr("this episode is a repeat.");
             break;
-        case rsInactive:
+        case RecStatus::Inactive:
             message += QObject::tr("this recording rule is inactive.");
             break;
-        case rsNotListed:
+        case RecStatus::NotListed:
             message += QObject::tr("this rule does not match any showings in "
                                    "the current program listings.");
             break;
-        case rsNeverRecord:
+        case RecStatus::NeverRecord:
             message += QObject::tr("it was marked to never be recorded.");
             break;
-        case rsOffLine:
+        case RecStatus::Offline:
             message += QObject::tr("the required recorder is off-line.");
             break;
         default:

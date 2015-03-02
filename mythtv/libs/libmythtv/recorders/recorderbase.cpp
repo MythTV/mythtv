@@ -384,19 +384,19 @@ void RecorderBase::CheckForRingBufferSwitch(void)
         tvrec->RingBufferChanged(ringBuffer, curRecording, recq);
 }
 
-void RecorderBase::SetRecordingStatus(RecStatusType status,
+void RecorderBase::SetRecordingStatus(RecStatus::Type status,
                                       const QString& file, int line)
 {
     if (curRecording && curRecording->GetRecordingStatus() != status)
     {
         LOG(VB_RECORD, LOG_INFO,
             QString("Modifying recording status from %1 to %2 at %3:%4")
-            .arg(toString(curRecording->GetRecordingStatus(), kSingleRecord))
-            .arg(toString(status, kSingleRecord)).arg(file).arg(line));
+            .arg(RecStatus::toString(curRecording->GetRecordingStatus(), kSingleRecord))
+            .arg(RecStatus::toString(status, kSingleRecord)).arg(file).arg(line));
 
         curRecording->SetRecordingStatus(status);
 
-        if (status == rsFailing)
+        if (status == RecStatus::Failing)
         {
             curRecording->SaveVideoProperties(VID_DAMAGED, VID_DAMAGED);
             SendMythSystemRecEvent("REC_FAILING", curRecording);

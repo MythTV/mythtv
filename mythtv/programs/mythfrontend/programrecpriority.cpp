@@ -941,7 +941,7 @@ void ProgramRecPriority::scheduleChanged(int recid)
         progInfo.recType = record.m_type;
         progInfo.sortTitle = record.m_title;
         progInfo.recstatus = record.m_isInactive ?
-            rsInactive : rsUnknown;
+            RecStatus::Inactive : RecStatus::Unknown;
         progInfo.profile = record.m_recProfile;
         progInfo.last_record = record.m_lastRecorded;
 
@@ -979,7 +979,7 @@ void ProgramRecPriority::scheduleChanged(int recid)
         m_origRecPriorityData[pgRecInfo->GetRecordingRuleID()] =
             pgRecInfo->GetRecordingPriority();
         // also set the active/inactive state
-        pgRecInfo->recstatus = inactive ? rsInactive : rsUnknown;
+        pgRecInfo->recstatus = inactive ? RecStatus::Inactive : RecStatus::Unknown;
 
         SortList();
     }
@@ -1081,7 +1081,7 @@ void ProgramRecPriority::deactivate(void)
                     QString("DeactivateRule %1 %2")
                     .arg(pgRecInfo->GetRecordingRuleID())
                     .arg(pgRecInfo->GetTitle()));
-                pgRecInfo->recstatus = inactive ? rsInactive : rsUnknown;
+                pgRecInfo->recstatus = inactive ? RecStatus::Inactive : RecStatus::Unknown;
                 item->DisplayState("disabled", "status");
             }
         }
@@ -1221,15 +1221,15 @@ void ProgramRecPriority::FillList(void)
                 progInfo->profile = profile;
 
                 if (inactive)
-                    progInfo->recstatus = rsInactive;
+                    progInfo->recstatus = RecStatus::Inactive;
                 else if (m_conMatch[progInfo->GetRecordingRuleID()] > 0)
-                    progInfo->recstatus = rsConflict;
+                    progInfo->recstatus = RecStatus::Conflict;
                 else if (m_nowMatch[progInfo->GetRecordingRuleID()] > 0)
-                    progInfo->recstatus = rsRecording;
+                    progInfo->recstatus = RecStatus::Recording;
                 else if (m_recMatch[progInfo->GetRecordingRuleID()] > 0)
-                    progInfo->recstatus = rsWillRecord;
+                    progInfo->recstatus = RecStatus::WillRecord;
                 else
-                    progInfo->recstatus = rsUnknown;
+                    progInfo->recstatus = RecStatus::Unknown;
             }
         } while (result.next());
     }
@@ -1248,16 +1248,16 @@ void ProgramRecPriority::countMatches()
     ProgramList::const_iterator it = schedList.begin();
     for (; it != schedList.end(); ++it)
     {
-        const RecStatusType recstatus = (**it).GetRecordingStatus();
+        const RecStatus::Type recstatus = (**it).GetRecordingStatus();
         const uint          recordid  = (**it).GetRecordingRuleID();
-        if ((**it).GetRecordingEndTime() > now && recstatus != rsNotListed)
+        if ((**it).GetRecordingEndTime() > now && recstatus != RecStatus::NotListed)
         {
             m_listMatch[recordid]++;
-            if (recstatus == rsConflict || recstatus == rsOffLine)
+            if (recstatus == RecStatus::Conflict || recstatus == RecStatus::Offline)
                 m_conMatch[recordid]++;
-            else if (recstatus == rsWillRecord)
+            else if (recstatus == RecStatus::WillRecord)
                 m_recMatch[recordid]++;
-            else if (recstatus == rsRecording)
+            else if (recstatus == RecStatus::Recording)
             {
                 m_nowMatch[recordid]++;
                 m_recMatch[recordid]++;
@@ -1358,7 +1358,7 @@ void ProgramRecPriority::UpdateList()
         QString state;
         if (progInfo->recType == kDontRecord ||
             (progInfo->recType != kTemplateRecord &&
-             progInfo->recstatus == rsInactive))
+             progInfo->recstatus == RecStatus::Inactive))
             state = "disabled";
         else if (m_conMatch[progInfo->GetRecordingRuleID()] > 0)
             state = "error";
@@ -1384,11 +1384,11 @@ void ProgramRecPriority::UpdateList()
         }
 
         QString matchInfo;
-        if (progInfo->GetRecordingStatus() == rsInactive)
+        if (progInfo->GetRecordingStatus() == RecStatus::Inactive)
         {
             matchInfo = QString("%1 %2")
                         .arg(m_listMatch[progInfo->GetRecordingRuleID()])
-                        .arg(toString(progInfo->GetRecordingStatus(),
+                        .arg(RecStatus::toString(progInfo->GetRecordingStatus(),
                                       progInfo->GetRecordingRuleType()));
         }
         else
@@ -1477,11 +1477,11 @@ void ProgramRecPriority::updateInfo(MythUIButtonListItem *item)
     }
 
     QString matchInfo;
-    if (pgRecInfo->GetRecordingStatus() == rsInactive)
+    if (pgRecInfo->GetRecordingStatus() == RecStatus::Inactive)
     {
         matchInfo = QString("%1 %2")
             .arg(m_listMatch[pgRecInfo->GetRecordingRuleID()])
-            .arg(toString(pgRecInfo->GetRecordingStatus(),
+            .arg(RecStatus::toString(pgRecInfo->GetRecordingStatus(),
                           pgRecInfo->GetRecordingRuleType()));
     }
     else

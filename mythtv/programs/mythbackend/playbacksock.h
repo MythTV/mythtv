@@ -10,7 +10,8 @@ using namespace std;
 #include <QSize>
 
 #include "referencecounter.h"
-#include "programinfo.h" // For RecStatusType
+#include "programinfo.h" // ProgramInfo
+#include "programtypes.h" // RecStatus::Type
 #include "inputinfo.h"
 
 class MythSocket;
@@ -93,9 +94,9 @@ class PlaybackSock : public ReferenceCounter
     long long GetMaxBitrate(int capturecardnum);
     ProgramInfo *GetRecording(uint cardid);
     bool EncoderIsRecording(int capturecardnum, const ProgramInfo *pginfo);
-    RecStatusType StartRecording(int capturecardnum,
+    RecStatus::Type StartRecording(int capturecardnum,
                                  ProgramInfo *pginfo);
-    RecStatusType GetRecordingStatus(int capturecardnum);
+    RecStatus::Type GetRecordingStatus(int capturecardnum);
     void RecordPending(int capturecardnum, const ProgramInfo *pginfo,
                        int secsleft, bool hasLater);
     int SetSignalMonitoringRate(int capturecardnum, int rate, int notifyFrontend);

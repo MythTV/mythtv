@@ -111,7 +111,7 @@ void FillProgramInfo( DTC::Program *pProgram,
 
     // Build Recording Child Element
 
-    if ( pInfo->GetRecordingStatus() != rsUnknown )
+    if ( pInfo->GetRecordingStatus() != RecStatus::Unknown )
     {
         pProgram->setSerializeRecording( true );
 

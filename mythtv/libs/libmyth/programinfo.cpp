@@ -173,8 +173,8 @@ ProgramInfo::ProgramInfo(void) :
     partnumber(0),
     parttotal(0),
 
-    recstatus(rsUnknown),
-    oldrecstatus(rsUnknown),
+    recstatus(RecStatus::Unknown),
+    oldrecstatus(RecStatus::Unknown),
     rectype(kNotRecording),
     dupin(kDupsInAll),
     dupmethod(kDupCheckSubThenDesc),
@@ -366,7 +366,7 @@ ProgramInfo::ProgramInfo(
     const QDate &_originalAirDate,
     const QDateTime &_lastmodified,
 
-    RecStatusType _recstatus,
+    RecStatus::Type _recstatus,
 
     uint _recordid,
 
@@ -442,7 +442,7 @@ ProgramInfo::ProgramInfo(
     parttotal(_parttotal),
 
     recstatus(_recstatus),
-    oldrecstatus(rsUnknown),
+    oldrecstatus(RecStatus::Unknown),
     rectype(kNotRecording),
     dupin(_dupin),
     dupmethod(_dupmethod),
@@ -490,7 +490,7 @@ ProgramInfo::ProgramInfo(
     const QDateTime &_recstartts,
     const QDateTime &_recendts,
 
-    RecStatusType _recstatus,
+    RecStatus::Type _recstatus,
 
     uint _recordid,
 
@@ -559,7 +559,7 @@ ProgramInfo::ProgramInfo(
     parttotal(0),
 
     recstatus(_recstatus),
-    oldrecstatus(rsUnknown),
+    oldrecstatus(RecStatus::Unknown),
     rectype(_rectype),
     dupin(0),
     dupmethod(0),
@@ -609,7 +609,7 @@ ProgramInfo::ProgramInfo(
     uint _parttotal,
 
     const QDate &_originalAirDate,
-    RecStatusType _recstatus,
+    RecStatus::Type _recstatus,
     uint _recordid,
     RecordingType _rectype,
     uint _findid,
@@ -689,7 +689,7 @@ ProgramInfo::ProgramInfo(
     parttotal(_parttotal),
 
     recstatus(_recstatus),
-    oldrecstatus(rsUnknown),
+    oldrecstatus(RecStatus::Unknown),
     rectype(_rectype),
     dupin(kDupsInAll),
     dupmethod(kDupCheckSubThenDesc),
@@ -744,10 +744,10 @@ ProgramInfo::ProgramInfo(
             break;
         }
 
-        if (s.recstatus == rsWillRecord ||
-            s.recstatus == rsRecording ||
-            s.recstatus == rsTuning ||
-            s.recstatus == rsFailing)
+        if (s.recstatus == RecStatus::WillRecord ||
+            s.recstatus == RecStatus::Recording ||
+            s.recstatus == RecStatus::Tuning ||
+            s.recstatus == RecStatus::Failing)
         recstatus = s.recstatus;
     }
 }
@@ -840,8 +840,8 @@ ProgramInfo::ProgramInfo(
     partnumber(0),
     parttotal(0),
 
-    recstatus(rsUnknown),
-    oldrecstatus(rsUnknown),
+    recstatus(RecStatus::Unknown),
+    oldrecstatus(RecStatus::Unknown),
     rectype(kNotRecording),
     dupin(kDupsInAll),
     dupmethod(kDupCheckSubThenDesc),
@@ -1183,8 +1183,8 @@ void ProgramInfo::clear(void)
     lastmodified = startts;
     lastInUseTime = startts.addSecs(-4 * 60 * 60);
 
-    recstatus = rsUnknown;
-    oldrecstatus = rsUnknown;
+    recstatus = RecStatus::Unknown;
+    oldrecstatus = RecStatus::Unknown;
 
     prefinput = 0;
     recpriority2 = 0;
@@ -1432,7 +1432,7 @@ bool ProgramInfo::FromStringList(QStringList::const_iterator &it,
     NEXT_STR();                      // 19 (formerly cardid)
     INT_FROM_LIST(inputid);          // 20
     INT_FROM_LIST(recpriority);      // 21
-    ENUM_FROM_LIST(recstatus, RecStatusType); // 22
+    ENUM_FROM_LIST(recstatus, RecStatus::Type); // 22
     INT_FROM_LIST(recordid);         // 23
 
     ENUM_FROM_LIST(rectype, RecordingType);            // 24
@@ -1650,8 +1650,8 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     QString tmp_rec = progMap["rectype"];
     if (GetRecordingRuleType() != kNotRecording)
     {
-        if (((recendts > timeNow) && (recstatus <= rsWillRecord)) ||
-            (recstatus == rsConflict) || (recstatus == rsLaterShowing))
+        if (((recendts > timeNow) && (recstatus <= RecStatus::WillRecord)) ||
+            (recstatus == RecStatus::Conflict) || (recstatus == RecStatus::LaterShowing))
         {
             tmp_rec += QString().sprintf(" %+d", recpriority);
             if (recpriority2)
@@ -1662,20 +1662,20 @@ void ProgramInfo::ToMap(InfoMap &progMap,
         {
             tmp_rec += " -- ";
         }
-        if (showrerecord && (GetRecordingStatus() == rsRecorded) &&
+        if (showrerecord && (GetRecordingStatus() == RecStatus::Recorded) &&
             !IsDuplicate())
         {
             tmp_rec += QObject::tr("Re-Record");
         }
         else
         {
-            tmp_rec += ::toString(GetRecordingStatus(), GetRecordingRuleType());
+            tmp_rec += RecStatus::toString(GetRecordingStatus(), GetRecordingRuleType());
         }
     }
     progMap["rectypestatus"] = tmp_rec;
 
-    progMap["card"] = ::toString(GetRecordingStatus(), inputid);
-    progMap["input"] = ::toString(GetRecordingStatus(), inputid);
+    progMap["card"] = RecStatus::toString(GetRecordingStatus(), inputid);
+    progMap["input"] = RecStatus::toString(GetRecordingStatus(), inputid);
     progMap["inputname"] = QueryInputDisplayName();
 
     progMap["recpriority"] = recpriority;
@@ -1697,9 +1697,9 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     progMap["videoproperties"] = GetVideoProperties();
     progMap["subtitleType"] = GetSubtitleType();
 
-    progMap["recstatus"] = ::toString(GetRecordingStatus(),
+    progMap["recstatus"] = RecStatus::toString(GetRecordingStatus(),
                                       GetRecordingRuleType());
-    progMap["recstatuslong"] = ::toDescription(GetRecordingStatus(),
+    progMap["recstatuslong"] = RecStatus::toDescription(GetRecordingStatus(),
                                                GetRecordingRuleType(),
                                                GetRecordingStartTime());
 
@@ -1930,7 +1930,7 @@ bool ProgramInfo::LoadProgramFromRecorded(
         catType = kCategoryNone;
         lastInUseTime = MythDate::current().addSecs(-4 * 60 * 60);
         rectype = kNotRecording;
-        oldrecstatus = rsUnknown;
+        oldrecstatus = RecStatus::Unknown;
         prefinput = 0;
         recpriority2 = 0;
         parentid = 0;
@@ -2016,7 +2016,7 @@ bool ProgramInfo::LoadProgramFromRecorded(
     lastmodified = MythDate::as_utc(query.value(28).toDateTime());
     /**///lastInUseTime;
 
-    recstatus    = rsRecorded;
+    recstatus    = RecStatus::Recorded;
     /**///oldrecstatus;
 
     /**///prefinput;
@@ -5333,7 +5333,7 @@ bool LoadFromProgram( ProgramList &destination,
                 query.value(27).toUInt(), // partnumber
                 query.value(28).toUInt(), // parttotal
                 query.value(17).toDate(), // originalAirDate
-                RecStatusType(query.value(21).toInt()), // recstatus
+                RecStatus::Type(query.value(21).toInt()), // recstatus
                 query.value(19).toUInt(), // recordid
                 RecordingType(query.value(20).toInt()), // rectype
                 query.value(22).toUInt(), // findid
@@ -5452,7 +5452,7 @@ bool LoadFromOldRecorded(
             MythDate::as_utc(query.value(1).toDateTime()),
             MythDate::as_utc(query.value(2).toDateTime()),
 
-            RecStatusType(query.value(17).toInt()),
+            RecStatus::Type(query.value(17).toInt()),
             query.value(18).toUInt(),
             RecordingType(query.value(16).toInt()),
             query.value(15).toUInt(),
@@ -5531,14 +5531,14 @@ bool LoadFromRecorded(
         if (hostname.isEmpty())
             hostname = gCoreContext->GetHostName();
 
-        RecStatusType recstatus = rsRecorded;
+        RecStatus::Type recstatus = RecStatus::Recorded;
         QDateTime recstartts = MythDate::as_utc(query.value(24).toDateTime());
 
         QString key = ProgramInfo::MakeUniqueKey(chanid, recstartts);
         if (MythDate::as_utc(query.value(25).toDateTime()) > rectime &&
             recMap.contains(key))
         {
-            recstatus = rsRecording;
+            recstatus = RecStatus::Recording;
         }
 
         bool save_not_commflagged = false;
@@ -5719,7 +5719,7 @@ bool GetNextRecordingList(QDateTime &nextRecordingStart,
     ProgramList::const_iterator it = progList.begin();
     for (; it != progList.end(); ++it)
     {
-        if (((*it)->GetRecordingStatus() == rsWillRecord) &&
+        if (((*it)->GetRecordingStatus() == RecStatus::WillRecord) &&
             (nextRecordingStart.isNull() ||
              nextRecordingStart > (*it)->GetRecordingStartTime()))
         {
@@ -5733,7 +5733,7 @@ bool GetNextRecordingList(QDateTime &nextRecordingStart,
     // save the details of the earliest recording(s)
     for (it = progList.begin(); it != progList.end(); ++it)
     {
-        if (((*it)->GetRecordingStatus()    == rsWillRecord) &&
+        if (((*it)->GetRecordingStatus()    == RecStatus::WillRecord) &&
             ((*it)->GetRecordingStartTime() == nextRecordingStart))
         {
             list->push_back(ProgramInfo(**it));

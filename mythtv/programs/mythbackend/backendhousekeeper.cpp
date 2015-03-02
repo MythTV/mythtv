@@ -356,7 +356,7 @@ void CleanupTask::CleanupProgramListings(void)
     query.prepare("DELETE FROM oldrecorded WHERE "
                   "recstatus <> :RECORDED AND duplicate = 0 AND "
                   "endtime < DATE_SUB(CURRENT_DATE, INTERVAL :CLEAN DAY);");
-    query.bindValue(":RECORDED", rsRecorded);
+    query.bindValue(":RECORDED", RecStatus::Recorded);
     query.bindValue(":CLEAN", offset);
     if (!query.exec())
         MythDB::DBError("HouseKeeper Cleaning Program Listings", query);

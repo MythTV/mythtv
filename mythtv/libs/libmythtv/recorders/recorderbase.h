@@ -254,7 +254,7 @@ class MTV_PUBLIC RecorderBase : public QRunnable
     virtual bool PauseAndWait(int timeout = 100);
 
     virtual void ResetForNewFile(void) = 0;
-    virtual void SetRecordingStatus(RecStatusType status,
+    virtual void SetRecordingStatus(RecStatus::Type status,
                                     const QString& file, int line);
     virtual void ClearStatistics(void);
     virtual void FinishRecording(void);

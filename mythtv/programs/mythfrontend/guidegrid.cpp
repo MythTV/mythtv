@@ -1630,10 +1630,10 @@ void GuideUpdateProgramRow::fillProgramRowInfosWith(int row, int chanNum,
             }
 
             int recStat;
-            if (pginfo->GetRecordingStatus() == rsConflict ||
-                pginfo->GetRecordingStatus() == rsOffLine)
+            if (pginfo->GetRecordingStatus() == RecStatus::Conflict ||
+                pginfo->GetRecordingStatus() == RecStatus::Offline)
                 recStat = 2;
-            else if (pginfo->GetRecordingStatus() <= rsWillRecord)
+            else if (pginfo->GetRecordingStatus() <= RecStatus::WillRecord)
                 recStat = 1;
             else
                 recStat = 0;

@@ -553,12 +553,12 @@ vector<ProgramInfo *> *RemoteGetCurrentlyRecordingList(void)
     ProgramInfo *p = NULL;
     vector<ProgramInfo *>::iterator it = info->begin();
     // make sure whatever RemoteGetRecordingList() returned
-    // only has rsRecording shows
+    // only has RecStatus::Recording shows
     for ( ; it != info->end(); ++it)
     {
         p = *it;
-        if (p->GetRecordingStatus() == rsRecording ||
-            (p->GetRecordingStatus() == rsRecorded &&
+        if (p->GetRecordingStatus() == RecStatus::Recording ||
+            (p->GetRecordingStatus() == RecStatus::Recorded &&
              p->GetRecordingGroup() == "LiveTV"))
         {
             reclist->push_back(new ProgramInfo(*p));

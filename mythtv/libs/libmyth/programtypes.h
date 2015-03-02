@@ -22,6 +22,7 @@
 #include <QString>
 #include <QMap>
 #include <QHash>
+#include <QtCore>
 
 // MythTV headers
 #include "mythexp.h" // for MPUBLIC
@@ -206,41 +207,50 @@ typedef enum SubtitleTypes {
 #define kSubtitlePropertyOffset (kAudioPropertyBits+kVideoPropertyBits)
 #define kSubtitlePropertyMask (0x0f<<kSubtitlePropertyOffset)
 
-typedef enum RecStatusTypes {
-    rsFailing = -14,
-    //rsOtherRecording = -13, (obsolete)
-    //rsOtherTuning = -12, (obsolete)
-    rsMissedFuture = -11,
-    rsTuning = -10,
-    rsFailed = -9,
-    rsTunerBusy = -8,
-    rsLowDiskSpace = -7,
-    rsCancelled = -6,
-    rsMissed = -5,
-    rsAborted = -4,
-    rsRecorded = -3,
-    rsRecording = -2,
-    rsWillRecord = -1,
-    rsUnknown = 0,
-    rsDontRecord = 1,
-    rsPreviousRecording = 2,
-    rsCurrentRecording = 3,
-    rsEarlierShowing = 4,
-    rsTooManyRecordings = 5,
-    rsNotListed = 6,
-    rsConflict = 7,
-    rsLaterShowing = 8,
-    rsRepeat = 9,
-    rsInactive = 10,
-    rsNeverRecord = 11,
-    rsOffLine = 12
-    //rsOtherShowing = 13 (obsolete)
-} RecStatusType; // note stored in int8_t in ProgramInfo
-MPUBLIC QString toUIState(RecStatusType);
-MPUBLIC QString toString(RecStatusType, uint id);
-MPUBLIC QString toString(RecStatusType, RecordingType type = kNotRecording);
-MPUBLIC QString toDescription(RecStatusType, RecordingType,
-                              const QDateTime &recstartts);
+class MPUBLIC RecStatus
+{
+  Q_GADGET
+
+  public:
+    Q_ENUMS(Type)
+
+    enum Type {
+        Failing = -14,
+        //OtherRecording = -13, (obsolete)
+        //OtherTuning = -12, (obsolete)
+        MissedFuture = -11,
+        Tuning = -10,
+        Failed = -9,
+        TunerBusy = -8,
+        LowDiskSpace = -7,
+        Cancelled = -6,
+        Missed = -5,
+        Aborted = -4,
+        Recorded = -3,
+        Recording = -2,
+        WillRecord = -1,
+        Unknown = 0,
+        DontRecord = 1,
+        PreviousRecording = 2,
+        CurrentRecording = 3,
+        EarlierShowing = 4,
+        TooManyRecordings = 5,
+        NotListed = 6,
+        Conflict = 7,
+        LaterShowing = 8,
+        Repeat = 9,
+        Inactive = 10,
+        NeverRecord = 11,
+        Offline = 12
+        //OtherShowing = 13 (obsolete)
+    }; // note stored in int8_t in ProgramInfo
+
+    static QString toUIState(Type);
+    static QString toString(Type, uint id);
+    static QString toString(Type, RecordingType type = kNotRecording);
+    static QString toDescription(Type, RecordingType,
+                                 const QDateTime &recstartts);
+};
 
 typedef enum AvailableStatusTypes {
     asAvailable = 0,

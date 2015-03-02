@@ -95,7 +95,7 @@ AvailableStatusType PBHEventHandler::CheckAvailability(const QStringList &slist)
 //             if (!evinfo.GetFilesize())
 //             {
                 availableStatus =
-                    (evinfo.GetRecordingStatus() == rsRecording) ?
+                    (evinfo.GetRecordingStatus() == RecStatus::Recording) ?
                     asNotYetAvailable : asZeroByte;
 //             }
         }

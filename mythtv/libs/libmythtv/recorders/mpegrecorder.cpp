@@ -1073,14 +1073,14 @@ void MpegRecorder::run(void)
                     {
                         /* Already processing a gap, which means
                          * restarting the encoding didn't work! */
-                        SetRecordingStatus(rsFailing, __FILE__, __LINE__);
+                        SetRecordingStatus(RecStatus::Failing, __FILE__, __LINE__);
                     }
                     else
                         gap = true;
                 }
 
                 if (!RestartEncoding())
-                    SetRecordingStatus(rsFailing, __FILE__, __LINE__);
+                    SetRecordingStatus(RecStatus::Failing, __FILE__, __LINE__);
             }
             else if (_device_read_buffer->IsEOF() &&
                      IsRecordingRequested())

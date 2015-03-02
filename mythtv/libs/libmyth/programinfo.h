@@ -132,7 +132,7 @@ class MPUBLIC ProgramInfo
                 const QDate &originalAirDate,
                 const QDateTime &lastmodified,
 
-                RecStatusType recstatus,
+                RecStatus::Type recstatus,
 
                 uint recordid,
 
@@ -168,7 +168,7 @@ class MPUBLIC ProgramInfo
                 const QDateTime &recstartts,
                 const QDateTime &recendts,
 
-                RecStatusType recstatus,
+                RecStatus::Type recstatus,
 
                 uint recordid,
 
@@ -205,7 +205,7 @@ class MPUBLIC ProgramInfo
                 uint partnumber,
                 uint parttotal,
                 const QDate &originalAirDate,
-                RecStatusType recstatus,
+                RecStatus::Type recstatus,
                 uint recordid,
                 RecordingType rectype,
                 uint findid,
@@ -427,10 +427,10 @@ class MPUBLIC ProgramInfo
         { return (int)(stars * range_max + 0.5f); }
 
     uint    GetRecordingID(void)              const { return recordedid; }
-    RecStatusType GetRecordingStatus(void)    const
-        { return (RecStatusType)recstatus; }
-    RecStatusType GetOldRecordingStatus(void) const
-        { return (RecStatusType)oldrecstatus; }
+    RecStatus::Type GetRecordingStatus(void)    const
+        { return (RecStatus::Type)recstatus; }
+    RecStatus::Type GetOldRecordingStatus(void) const
+        { return (RecStatus::Type)oldrecstatus; }
     uint    GetPreferedInputID(void)          const { return prefinput; }
     uint    GetRecordingRuleID(void)          const { return recordid;  }
     uint    GetParentRecordingRuleID(void)    const { return parentid;  }
@@ -533,7 +533,7 @@ class MPUBLIC ProgramInfo
         programflags |= (ignore) ? FL_IGNOREBOOKMARK : 0;
     }
     virtual void SetRecordingID(uint _recordedid) { recordedid = _recordedid; }
-    void SetRecordingStatus(RecStatusType status) { recstatus = status; }
+    void SetRecordingStatus(RecStatus::Type status) { recstatus = status; }
     void SetRecordingRuleType(RecordingType type) { rectype   = type;   }
     void SetPositionMapDBReplacement(PMapDBReplacement *pmap)
         { positionMapDBReplacement = pmap; }
