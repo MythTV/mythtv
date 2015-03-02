@@ -736,9 +736,14 @@ void EITFixUp::FixUK(DBEventEIT &event) const
     event.description = event.description.remove(m_ukAllNew);
 
     // Remove [AD,S] etc.
+    bool    ccMatched = false;
     QRegExp tmpCC = m_ukCC;
-    if ((position1 = tmpCC.indexIn(event.description)) != -1)
+    position1 = 0;
+    while ((position1 = tmpCC.indexIn(event.description, position1)) != -1)
     {
+        ccMatched = true;
+        position1 += tmpCC.matchedLength();
+
         QStringList tmpCCitems = tmpCC.cap(0).remove("[").remove("]").split(",");
         if (tmpCCitems.contains("AD"))
             event.audioProps |= AUD_VISUALIMPAIR;
@@ -750,8 +755,10 @@ void EITFixUp::FixUK(DBEventEIT &event) const
             event.subtitleType |= SUB_SIGNED;
         if (tmpCCitems.contains("W"))
             event.videoProps |= VID_WIDESCREEN;
-        event.description = event.description.remove(m_ukCC);
     }
+
+    if(ccMatched)
+        event.description = event.description.remove(m_ukCC);
 
     event.title       = event.title.trimmed();
     event.description = event.description.trimmed();

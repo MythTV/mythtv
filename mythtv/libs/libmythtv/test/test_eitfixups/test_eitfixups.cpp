@@ -299,9 +299,7 @@ void TestEITFixups::testUKFixups7()
     QCOMPARE(event7.episode,       2u);
     QEXPECT_FAIL("", "", Continue);
     QCOMPARE(event7.totalepisodes, 3u);
-    QEXPECT_FAIL("", "", Continue);
     QCOMPARE(event7.subtitleType,  (unsigned char)SUB_NORMAL);
-    QEXPECT_FAIL("", "", Continue);
     QCOMPARE(event7.audioProps,    (unsigned char)(AUD_STEREO | AUD_VISUALIMPAIR));
     QCOMPARE(event7.title,         QString("Suffragettes Forever!"));
     QCOMPARE(event7.subtitle,      QString("The Story of Women and Power"));
