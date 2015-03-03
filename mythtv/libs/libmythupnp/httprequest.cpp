@@ -1526,9 +1526,8 @@ void HTTPRequest::ProcessRequestLine( const QString &sLine )
 
         if (nCount > 1)
         {
-            //m_sBaseUrl = tokens[1].section( '?', 0, 0).trimmed();
-            m_sBaseUrl = (QUrl::fromPercentEncoding(tokens[1].toUtf8()))
-                              .section( '?', 0, 0).trimmed();
+            m_sRequestUrl = QUrl::fromPercentEncoding(tokens[1].toUtf8());
+            m_sBaseUrl = m_sRequestUrl.section( '?', 0, 0).trimmed();
 
             m_sResourceUrl = m_sBaseUrl; // Save complete url without parameters
 
@@ -2044,7 +2043,7 @@ bool HTTPRequest::DigestAuthentication()
     if (paramMap["username"] == "nouser") // Special logout username
         return false;
 
-    if (paramMap["uri"] != m_sResourceUrl)
+    if (paramMap["uri"] != m_sRequestUrl)
     {
         LOG(VB_GENERAL, LOG_WARNING, "Authorization URI doesn't match the "
                                      "request URI");
@@ -2086,7 +2085,7 @@ bool HTTPRequest::DigestAuthentication()
 
     if (nonceTimeStamp.secsTo(MythDate::current()) > AUTH_TIMEOUT)
     {
-        LOG(VB_GENERAL, LOG_WARNING, "Authorization nonce timestamp is invalid or too old.");
+        LOG(VB_HTTP, LOG_NOTICE, "Authorization nonce timestamp is invalid or too old.");
         // Tell the client that the submitted nonce has expired at which
         // point they may wish to try again with a fresh nonce instead of
         // telling the user that their credentials were invalid

@@ -116,10 +116,11 @@ class UPNP_PUBLIC HTTPRequest
         RequestType         m_eType;
         ContentType         m_eContentType;
 
-        QString             m_sRawRequest;
+        QString             m_sRawRequest; // e.g. GET /foo/bar.html HTTP/1.1
 
-        QString             m_sBaseUrl;
-        QString             m_sResourceUrl;
+        QString             m_sRequestUrl; // Raw request URL
+        QString             m_sBaseUrl; // Path section of URL, without parameters
+        QString             m_sResourceUrl; // Duplicate of Base URL!?
         QString             m_sMethod;
 
         QStringMap          m_mapParams;
