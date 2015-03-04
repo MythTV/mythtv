@@ -580,7 +580,6 @@ found_qmake=''
 for i in $CHECK_QMAKE; do
     if is_qmake5 $i; then
         found_qmake=$i
-        check_cxxflags -DQT_DISABLE_DEPRECATED_BEFORE
         break;
     elif is_qmake4 $i; then
         found_qmake=$i
