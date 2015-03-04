@@ -126,6 +126,7 @@ class EITFixUp
     const QRegExp m_ukThen;
     const QRegExp m_ukNew;
     const QRegExp m_ukNewTitle;
+    const QRegExp m_ukAlsoInHD;
     const QRegExp m_ukCEPQ;
     const QRegExp m_ukColonPeriod;
     const QRegExp m_ukDotSpaceStart;

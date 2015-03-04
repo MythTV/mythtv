@@ -35,6 +35,7 @@ EITFixUp::EITFixUp()
       m_ukThen("\\s*(Then|Followed by) 60 Seconds\\.", Qt::CaseInsensitive),
       m_ukNew("(New\\.|\\s*(Brand New|New)\\s*(Series|Episode)\\s*[:\\.\\-])",Qt::CaseInsensitive),
       m_ukNewTitle("^(Brand New|New:)\\s*",Qt::CaseInsensitive),
+      m_ukAlsoInHD("\\s*Also in HD\\.",Qt::CaseInsensitive),
       m_ukCEPQ("[:\\!\\.\\?]"),
       m_ukColonPeriod("[:\\.]"),
       m_ukDotSpaceStart("^\\. "),
@@ -734,6 +735,9 @@ void EITFixUp::FixUK(DBEventEIT &event) const
 
     // "All New To 4Music!
     event.description = event.description.remove(m_ukAllNew);
+
+    // Removal of 'Also in HD' text
+ 	event.description = event.description.remove(m_ukAlsoInHD);
 
     // Remove [AD,S] etc.
     bool    ccMatched = false;

@@ -38,4 +38,5 @@ class TestEITFixups : public QObject
     void testUKFixups5(void);
     void testUKFixups6(void);
     void testUKFixups7(void);
+    void testUKFixups8(void);
 };

@@ -300,5 +300,26 @@ void TestEITFixups::testUKFixups7()
     QCOMPARE(event7.description,   QString("2/3. Documentary series presented by Amanda Vickery. During Victoria's reign extraordinary women gradually changed the lives and opportunities of their sex."));
 }
 
+void TestEITFixups::testUKFixups8()
+{
+    EITFixUp fixup;
+
+    DBEventEIT event8(7302,
+                      "Brooklyn's Finest",
+                      "Three unconnected Brooklyn cops wind up at the same deadly location. Contains very strong language, sexual content and some violence.  Also in HD. [2009] [AD,S]",
+                      QDateTime::fromString("2015-02-28T23:55:00Z", Qt::ISODate),
+                      QDateTime::fromString("2015-03-01T02:00:00Z", Qt::ISODate),
+                      EITFixUp::kFixGenericDVB | EITFixUp::kFixUK,
+                      SUB_UNKNOWN,
+                      AUD_STEREO,
+                      VID_UNKNOWN);
+
+    fixup.Fix(event8);
+    PRINT_EVENT(event8);
+    QCOMPARE(event8.subtitleType, (unsigned char)SUB_NORMAL);
+    QCOMPARE(event8.audioProps,   (unsigned char)(AUD_STEREO | AUD_VISUALIMPAIR));
+    QCOMPARE(event8.description,  QString("Three unconnected Brooklyn cops wind up at the same deadly location. Contains very strong language, sexual content and some violence."));
+    QCOMPARE(event8.airdate,      (uint16_t)2009u);
+}
 
 QTEST_APPLESS_MAIN(TestEITFixups)
