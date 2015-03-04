@@ -5233,9 +5233,9 @@ is_qmake4(){
 
 # qmake-qt5 /usr/lib64/qt5/bin/qmake /usr/lib/x86_64-linux-gnu/qt5/bin/qmake
 if [ x"$qmake" = "xqmake" ]; then
-    CHECK_QMAKE="qmake-qt5 /usr/lib64/qt5/bin/qmake /usr/lib/x86_64-linux-gnu/qt5/bin/qmake $qmake"
+    CHECK_QMAKE="qmake-qt5 /usr/lib64/qt5/bin/qmake /usr/lib/x86_64-linux-gnu/qt5/bin/qmake $qmake qmake-qt4"
 else
-    CHECK_QMAKE="$qmake qmake-qt5 /usr/lib64/qt5/bin/qmake /usr/lib/x86_64-linux-gnu/qt5/bin/qmake" 
+    CHECK_QMAKE="$qmake qmake-qt5 /usr/lib64/qt5/bin/qmake /usr/lib/x86_64-linux-gnu/qt5/bin/qmake qmake-qt4" 
 fi
 # try to find a qt5 qmake to use
 found_qmake=''
