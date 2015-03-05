@@ -222,6 +222,7 @@ class MPUBLIC MythUIComboBoxSetting : public StandardSetting
   Q_OBJECT
   public:
     void setValue(int value);
+    int getValueIndex(const QString &value) const;
     virtual void resultEdit(DialogCompletionEvent *dce);
     virtual void edit(MythScreenType *screen);
     void addSelection(const QString &label, QString value = QString::null,
@@ -334,12 +335,14 @@ class MPUBLIC MythUISpinBoxSetting : public MythUIComboBoxSetting
 
   protected:
     MythUISpinBoxSetting(Storage *_storage, int min, int max, int step,
-                         bool allow_single_step);
+                         bool allow_single_step = false,
+                         const QString &special_value_text = QString());
   private:
     int m_min;
     int m_max;
     int m_step;
     bool m_allow_single_step;
+    QString m_special_value_text;
 };
 
 class MPUBLIC TransMythUISpinBoxSetting: public MythUISpinBoxSetting,
@@ -419,7 +422,7 @@ class MPUBLIC MythUICheckBoxSetting : public StandardSetting
     void valueChanged(bool);
 
   protected:
-    MythUICheckBoxSetting();
+    MythUICheckBoxSetting(Storage *_storage = NULL);
 
 };
 
@@ -495,7 +498,7 @@ class MPUBLIC ButtonStandardSetting : public StandardSetting,
     Q_OBJECT
 
   public:
-    ButtonStandardSetting(const QString &);
+    ButtonStandardSetting(const QString &label);
     virtual void Load(void)
     {
         StandardSetting::Load();

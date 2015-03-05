@@ -209,9 +209,10 @@ void GroupSetting::updateButton(MythUIButtonListItem *item)
 }
 
 
-ButtonStandardSetting::ButtonStandardSetting(const QString &):
+ButtonStandardSetting::ButtonStandardSetting(const QString &label):
     StandardSetting(this), TransientStorage()
 {
+    setLabel(label);
 }
 
 void ButtonStandardSetting::edit(MythScreenType *screen)
@@ -336,6 +337,11 @@ void MythUIComboBoxSetting::setValue(int value)
         StandardSetting::setValue(m_values.at(value));
 }
 
+int MythUIComboBoxSetting::getValueIndex(const QString &value) const
+{
+    return m_values.indexOf(value);
+}
+
 void MythUIComboBoxSetting::addSelection(const QString &label, QString value,
                                          bool select)
 {
@@ -449,12 +455,14 @@ void MythUIComboBoxSetting::Load()
                             SpinBox Setting
 *******************************************************************************/
 MythUISpinBoxSetting::MythUISpinBoxSetting(Storage *_storage, int min, int max,
-                                           int step, bool allow_single_step)
+                                           int step, bool allow_single_step,
+                                           const QString &special_value_text)
     : MythUIComboBoxSetting(_storage, false),
       m_min(min),
       m_max(max),
       m_step(step),
-      m_allow_single_step(allow_single_step)
+      m_allow_single_step(allow_single_step),
+      m_special_value_text(special_value_text)
 {
     //we default to 0 unless 0 is out of range
     if (m_min > 0 || m_max < 0)
@@ -470,7 +478,12 @@ void MythUISpinBoxSetting::updateButton(MythUIButtonListItem *item)
     if (indexValue >= 0)
         item->SetText(m_labels.value(indexValue), "value");
     else
-        item->SetText(m_settingValue, "value");
+    {
+        if (m_settingValue.toInt() == m_min && !m_special_value_text.isEmpty())
+            item->SetText(m_special_value_text, "value");
+        else
+            item->SetText(m_settingValue, "value");
+    }
     item->SetText(getHelpText(), "description");
     item->setDrawArrow(haveSubSettings());
 }
@@ -499,6 +512,8 @@ void MythUISpinBoxSetting::edit(MythScreenType * screen)
             QString value = m_values.at(i);
             settingdialog->AddSelection(m_labels.at(i), value.toInt());
         }
+        if (!m_special_value_text.isEmpty())
+            settingdialog->AddSelection(m_special_value_text, m_min);
         settingdialog->SetValue(m_settingValue);
         settingdialog->SetReturnEvent(screen, "editsetting");
         popupStack->AddScreen(settingdialog);
@@ -517,8 +532,8 @@ void MythUISpinBoxSetting::resultEdit(DialogCompletionEvent *dce)
                            MythUICheckBoxSetting
 *******************************************************************************/
 
-MythUICheckBoxSetting::MythUICheckBoxSetting():
-    StandardSetting(NULL)
+MythUICheckBoxSetting::MythUICheckBoxSetting(Storage *_storage):
+    StandardSetting(_storage)
 {
 }
 
