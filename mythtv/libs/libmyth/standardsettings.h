@@ -57,6 +57,7 @@ class MPUBLIC StandardSetting : public QObject, public StorageUser
 
     //subsettings
     virtual void addChild(StandardSetting *child);
+    virtual void removeChild(StandardSetting *child);
     virtual QList<StandardSetting *> *getSubSettings();
     virtual bool haveSubSettings();
     virtual void clearSettings();

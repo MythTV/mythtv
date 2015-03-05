@@ -70,6 +70,12 @@ void StandardSetting::addChild(StandardSetting *child)
     child->setParent(this);
 }
 
+void StandardSetting::removeChild(StandardSetting *child)
+{
+    m_children.removeAll(child);
+    emit settingsChanged(this);
+}
+
 bool StandardSetting::keyPressEvent(QKeyEvent *)
 {
     return false;
