@@ -1500,6 +1500,10 @@ check_foo_config(){
     return $err
 }
 
+non_standard_header(){
+    test x"$1" != "x/usr/include"
+}
+
 x86_mmx_cpus="pentium-mmx,pentium2,pentium3,pentium3m,pentium-m"
 x86_mmx_cpus="$x86_mmx_cpus,pentium4,pentium4m,prescott"
 x86_mmx_cpus="$x86_mmx_cpus,athlon,athlon-xp,athlon-tbird,athlon-4,athlon-mp,"
@@ -5137,7 +5141,6 @@ set_default $PATHS_LIST
 set_default nm
 
 set_default $MYTHTV_PATHS_LIST
-append CONFIG_INCLUDEPATH $sysinclude "${sysroot}${prefix}"
 
 append CCONFIG "$compile_type"
 if test x$compile_type = x"profile" ; then
@@ -7363,18 +7366,22 @@ if enabled appleremote; then
   append CONFIG_DEFINES "USING_APPLEREMOTE"
 fi
 
-if enabled dvb; then
+if enabled dvb && non_standard_header $dvb_path; then
   append CONFIG_INCLUDEPATH "$dvb_path"
 fi
 
 if enabled libcec; then
   append CONFIG_DEFINES "using_libcec"
-  append CONFIG_INCLUDEPATH "$libcec_path"
+  if non_standard_header $libcec_path; then
+    append CONFIG_INCLUDEPATH "$libcec_path"
+  fi
 fi
 
 if enabled libxml2; then
   if [ -d $libxml2_path ] ; then
-    append CONFIG_INCLUDEPATH "$libxml2_path"
+    if non_standard_header $libxml2_path; then
+      append CONFIG_INCLUDEPATH "$libxml2_path"
+    fi
     append CCONFIG "using_libxml2"
   fi
 fi
