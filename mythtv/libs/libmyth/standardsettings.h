@@ -35,6 +35,9 @@ class MPUBLIC StandardSetting : public QObject, public StorageUser
     virtual void setHelpText(const QString &str) { m_helptext = str; }
     QString getHelpText(void) const { return m_helptext; }
 
+    virtual void setName(const QString &str);
+    QString getName(void) const { return m_name; }
+    virtual StandardSetting * byName(const QString &name);
 
 /*    bool isVisible(void) const { return m_visible; };*/
     bool isEnabled() const { return m_enabled; }
@@ -94,6 +97,7 @@ class MPUBLIC StandardSetting : public QObject, public StorageUser
     bool m_enabled;
     QString m_label;
     QString m_helptext;
+    QString m_name;
     bool m_visible;
 
   private:
@@ -490,6 +494,7 @@ class MPUBLIC GroupSetting : public StandardSetting, public TransientStorage
     virtual void resultEdit(DialogCompletionEvent *) {}
     virtual void applyChange() {}
     virtual void updateButton(MythUIButtonListItem *item);
+    virtual StandardSetting* byName(const QString &name);
 };
 
 class MPUBLIC ButtonStandardSetting : public StandardSetting,

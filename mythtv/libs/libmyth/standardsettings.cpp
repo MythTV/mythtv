@@ -180,6 +180,18 @@ void StandardSetting::Save(void)
         (*i)->Save();
 }
 
+void StandardSetting::setName(const QString &name)
+{
+    m_name = name;
+    if (m_label.isEmpty())
+        setLabel(name);
+}
+
+StandardSetting* StandardSetting::byName(const QString &name)
+{
+    return (name == m_name) ? this : NULL;
+}
+
 /******************************************************************************
                             Group Setting
 *******************************************************************************/
@@ -208,6 +220,16 @@ void GroupSetting::updateButton(MythUIButtonListItem *item)
     item->setDrawArrow(haveSubSettings());
 }
 
+StandardSetting* GroupSetting::byName(const QString &name)
+{
+    foreach (StandardSetting *setting, *getSubSettings())
+    {
+        StandardSetting *s = setting->byName(name);
+        if (s)
+            return s;
+    }
+    return NULL;
+}
 
 ButtonStandardSetting::ButtonStandardSetting(const QString &label):
     StandardSetting(this), TransientStorage()
