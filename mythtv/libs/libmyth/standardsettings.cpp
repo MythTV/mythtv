@@ -166,6 +166,9 @@ void StandardSetting::Load(void)
 {
     m_haveChanged = false;
 
+    if (m_storage)
+        m_storage->Load();
+
     QList<StandardSetting *>::const_iterator i;
     for (i = m_children.constBegin(); i != m_children.constEnd(); ++i)
         (*i)->Load();
@@ -181,6 +184,9 @@ void StandardSetting::Load(void)
 void StandardSetting::Save(void)
 {
     m_haveChanged = false;
+
+    if (m_storage)
+        m_storage->Save();
 
     //we save only the relevant children
     QList<StandardSetting *> *children = getSubSettings();
@@ -207,8 +213,7 @@ StandardSetting* StandardSetting::byName(const QString &name)
 /******************************************************************************
                             Group Setting
 *******************************************************************************/
-GroupSetting::GroupSetting():
-    StandardSetting(this), TransientStorage()
+GroupSetting::GroupSetting()
 {
 }
 
@@ -243,8 +248,7 @@ StandardSetting* GroupSetting::byName(const QString &name)
     return NULL;
 }
 
-ButtonStandardSetting::ButtonStandardSetting(const QString &label):
-    StandardSetting(this), TransientStorage()
+ButtonStandardSetting::ButtonStandardSetting(const QString &label)
 {
     setLabel(label);
 }
@@ -483,11 +487,6 @@ void MythUIComboBoxSetting::resultEdit(DialogCompletionEvent *dce)
         else if (m_settingValue != dce->GetData().toString())
             StandardSetting::setValue(dce->GetData().toString());
     }
-}
-
-void MythUIComboBoxSetting::Load()
-{
-    StandardSetting::Load();
 }
 
 /******************************************************************************

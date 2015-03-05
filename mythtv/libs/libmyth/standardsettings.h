@@ -71,7 +71,7 @@ class MPUBLIC StandardSetting : public QObject, public StorageUser
     virtual void Open(void) {}
     virtual void Close(void) {}
 
-//    Storage *GetStorage(void) const { return m_storage; }
+    Storage *GetStorage(void) const { return m_storage; }
 
     void addTargetedChild(const QString &value, StandardSetting *setting);
 
@@ -92,7 +92,7 @@ class MPUBLIC StandardSetting : public QObject, public StorageUser
     void settingsChanged(StandardSetting *selectedSetting = NULL);
 
   protected:
-    StandardSetting(Storage *_storage);
+    StandardSetting(Storage *_storage = NULL);
     virtual ~StandardSetting();
     void setParent(StandardSetting *parent);
     QString m_settingValue;
@@ -125,58 +125,31 @@ class MPUBLIC MythUITextEditSetting : public StandardSetting
     void SetPasswordEcho(bool b);
 
   protected:
-    MythUITextEditSetting(Storage *_storage);
+    MythUITextEditSetting(Storage *_storage = NULL);
     bool m_passwordEcho;
 };
 
 
-class MPUBLIC TransTextEditSetting: public MythUITextEditSetting,
-    public TransientStorage
+class MPUBLIC TransTextEditSetting: public MythUITextEditSetting
 {
   public:
     TransTextEditSetting() :
-        MythUITextEditSetting(this), TransientStorage() { }
+        MythUITextEditSetting() { }
 };
 
 
-class MPUBLIC HostTextEditSetting: public MythUITextEditSetting,
-    public HostDBStorage
+class MPUBLIC HostTextEditSetting: public MythUITextEditSetting
 {
   public:
     HostTextEditSetting(const QString &name) :
-        MythUITextEditSetting(this), HostDBStorage(this, name) { }
-
-    virtual void Load()
-    {
-        HostDBStorage::Load();
-        MythUITextEditSetting::Load();
-    }
-    virtual void Save()
-    {
-        HostDBStorage::Save();
-        MythUITextEditSetting::Save();
-    }
-    using HostDBStorage::Save;
+        MythUITextEditSetting(new HostDBStorage(this, name)) { }
 };
 
-class MPUBLIC GlobalTextEditSetting: public MythUITextEditSetting,
-    public GlobalDBStorage
+class MPUBLIC GlobalTextEditSetting: public MythUITextEditSetting
 {
   public:
     GlobalTextEditSetting(const QString &name) :
-        MythUITextEditSetting(this), GlobalDBStorage(this, name) { }
-
-    virtual void Load()
-    {
-        GlobalDBStorage::Load();
-        MythUITextEditSetting::Load();
-    }
-    virtual void Save()
-    {
-        GlobalDBStorage::Save();
-        MythUITextEditSetting::Save();
-    }
-    using GlobalDBStorage::Save;
+        MythUITextEditSetting(new GlobalDBStorage(this, name)) { }
 };
 
 /*******************************************************************************
@@ -200,24 +173,11 @@ class MPUBLIC MythUIFileBrowserSetting : public StandardSetting
 };
 
 
-class MPUBLIC HostFileBrowserSetting: public MythUIFileBrowserSetting,
-    public HostDBStorage
+class MPUBLIC HostFileBrowserSetting: public MythUIFileBrowserSetting
 {
   public:
     HostFileBrowserSetting(const QString &name) :
-        MythUIFileBrowserSetting(this), HostDBStorage(this, name) { }
-
-    virtual void Load()
-    {
-        HostDBStorage::Load();
-        MythUIFileBrowserSetting::Load();
-    }
-    virtual void Save()
-    {
-        HostDBStorage::Save();
-        MythUIFileBrowserSetting::Save();
-    }
-    using HostDBStorage::Save;
+        MythUIFileBrowserSetting(new HostDBStorage(this, name)) { }
 };
 
 
@@ -237,13 +197,12 @@ class MPUBLIC MythUIComboBoxSetting : public StandardSetting
                       bool select = false);
     void clearSelections();
     virtual void updateButton(MythUIButtonListItem *item);
-    virtual void Load();
 
   public slots:
     void setValue(const QString&);
 
   protected:
-    MythUIComboBoxSetting(Storage *_storage, bool rw = false);
+    MythUIComboBoxSetting(Storage *_storage = NULL, bool rw = false);
     ~MythUIComboBoxSetting();
     QVector<QString> m_labels;
     QVector<QString> m_values;
@@ -254,53 +213,26 @@ class MPUBLIC MythUIComboBoxSetting : public StandardSetting
 
 };
 
-class MPUBLIC HostComboBoxSetting: public MythUIComboBoxSetting,
-    public HostDBStorage
+class MPUBLIC HostComboBoxSetting: public MythUIComboBoxSetting
 {
   public:
     HostComboBoxSetting(const QString &name, bool rw = false) :
-        MythUIComboBoxSetting(this, rw), HostDBStorage(this, name) { }
-
-    virtual void Load()
-    {
-        HostDBStorage::Load();
-        MythUIComboBoxSetting::Load();
-    }
-    virtual void Save()
-    {
-        HostDBStorage::Save();
-        MythUIComboBoxSetting::Save();
-    }
-    using HostDBStorage::Save;
+        MythUIComboBoxSetting(new HostDBStorage(this, name), rw) { }
 };
 
 
-class MPUBLIC GlobalComboBoxSetting: public MythUIComboBoxSetting,
-    public GlobalDBStorage
+class MPUBLIC GlobalComboBoxSetting: public MythUIComboBoxSetting
 {
   public:
     GlobalComboBoxSetting(const QString &name, bool rw = false) :
-        MythUIComboBoxSetting(this, rw), GlobalDBStorage(this, name) { }
-
-    virtual void Load()
-    {
-        GlobalDBStorage::Load();
-        MythUIComboBoxSetting::Load();
-    }
-    virtual void Save()
-    {
-        GlobalDBStorage::Save();
-        MythUIComboBoxSetting::Save();
-    }
-    using GlobalDBStorage::Save;
+        MythUIComboBoxSetting(new GlobalDBStorage(this, name), rw) { }
 };
 
-class MPUBLIC TransMythUIComboBoxSetting: public MythUIComboBoxSetting,
-    public TransientStorage
+class MPUBLIC TransMythUIComboBoxSetting: public MythUIComboBoxSetting
 {
   public:
     TransMythUIComboBoxSetting() :
-        MythUIComboBoxSetting(this), TransientStorage() { }
+        MythUIComboBoxSetting() { }
 };
 
 class MPUBLIC HostTimeBoxSetting : public HostComboBoxSetting
@@ -353,61 +285,33 @@ class MPUBLIC MythUISpinBoxSetting : public MythUIComboBoxSetting
     QString m_special_value_text;
 };
 
-class MPUBLIC TransMythUISpinBoxSetting: public MythUISpinBoxSetting,
-    public TransientStorage
+class MPUBLIC TransMythUISpinBoxSetting: public MythUISpinBoxSetting
 {
   public:
     TransMythUISpinBoxSetting(int min, int max, int step,
                               bool allow_single_step = false) :
-        MythUISpinBoxSetting(this, min, max, step, allow_single_step),
-        TransientStorage()
+        MythUISpinBoxSetting(NULL, min, max, step, allow_single_step)
     { }
 };
 
-class MPUBLIC HostSpinBoxSetting: public MythUISpinBoxSetting,
-    public HostDBStorage
+class MPUBLIC HostSpinBoxSetting: public MythUISpinBoxSetting
 {
   public:
     HostSpinBoxSetting(const QString &name, int min, int max, int step,
                        bool allow_single_step = false) :
-        MythUISpinBoxSetting(this, min, max, step, allow_single_step),
-        HostDBStorage(this, name)
+        MythUISpinBoxSetting(new HostDBStorage(this, name), min, max, step,
+                             allow_single_step)
     { }
-
-    virtual void Load()
-    {
-        HostDBStorage::Load();
-        MythUISpinBoxSetting::Load();
-    }
-    virtual void Save()
-    {
-        HostDBStorage::Save();
-        MythUISpinBoxSetting::Save();
-    }
-    using HostDBStorage::Save;
 };
 
-class MPUBLIC GlobalSpinBoxSetting: public MythUISpinBoxSetting,
-    public GlobalDBStorage
+class MPUBLIC GlobalSpinBoxSetting: public MythUISpinBoxSetting
 {
   public:
     GlobalSpinBoxSetting(const QString &name, int min, int max, int step,
                          bool allow_single_step = false) :
-        MythUISpinBoxSetting(this, min, max, step, allow_single_step),
-        GlobalDBStorage(this, name)
+        MythUISpinBoxSetting(new GlobalDBStorage(this, name), min, max, step,
+                             allow_single_step)
     { }
-
-    virtual void Load()
-    {
-        GlobalDBStorage::Load();
-        MythUISpinBoxSetting::Load();
-    }
-    virtual void Save()
-    {
-        GlobalDBStorage::Save();
-        MythUISpinBoxSetting::Save();
-    }
-    using GlobalDBStorage::Save;
 };
 
 /*******************************************************************************
@@ -435,65 +339,35 @@ class MPUBLIC MythUICheckBoxSetting : public StandardSetting
 
 };
 
-class MPUBLIC TransMythUICheckBoxSetting: public MythUICheckBoxSetting,
-    public TransientStorage
+class MPUBLIC TransMythUICheckBoxSetting: public MythUICheckBoxSetting
 {
   public:
     TransMythUICheckBoxSetting() :
-        MythUICheckBoxSetting(), TransientStorage() { }
+        MythUICheckBoxSetting() { }
 };
 
-class MPUBLIC HostCheckBoxSetting: public MythUICheckBoxSetting,
-    public HostDBStorage
+class MPUBLIC HostCheckBoxSetting: public MythUICheckBoxSetting
 {
   public:
     HostCheckBoxSetting(const QString &name) :
-        MythUICheckBoxSetting(), HostDBStorage(this, name) { }
-    virtual void Load()
-    {
-        HostDBStorage::Load();
-        MythUICheckBoxSetting::Load();
-    }
-    virtual void Save()
-    {
-        HostDBStorage::Save();
-        MythUICheckBoxSetting::Save();
-    }
-    using HostDBStorage::Save;
+        MythUICheckBoxSetting(new HostDBStorage(this, name)) { }
 };
 
-class MPUBLIC GlobalCheckBoxSetting: public MythUICheckBoxSetting,
-    public GlobalDBStorage
+class MPUBLIC GlobalCheckBoxSetting: public MythUICheckBoxSetting
 {
   public:
     GlobalCheckBoxSetting(const QString &name) :
-        MythUICheckBoxSetting(), GlobalDBStorage(this, name) { }
-
-    virtual void Load()
-    {
-        GlobalDBStorage::Load();
-        MythUICheckBoxSetting::Load();
-    }
-    virtual void Save()
-    {
-        GlobalDBStorage::Save();
-        MythUICheckBoxSetting::Save();
-    }
-    using GlobalDBStorage::Save;
+        MythUICheckBoxSetting(new GlobalDBStorage(this, name)) { }
 };
 
 /*******************************************************************************
 *                              Group Setting                                   *
 *******************************************************************************/
 
-class MPUBLIC GroupSetting : public StandardSetting, public TransientStorage
+class MPUBLIC GroupSetting : public StandardSetting
 {
   public:
     GroupSetting();
-
-    virtual void Load(void){StandardSetting::Load();};
-    virtual void Save(void){StandardSetting::Save();};
-    using TransientStorage::Save;
 
     virtual void edit(MythScreenType *screen);
     virtual void resultEdit(DialogCompletionEvent *) {}
@@ -502,22 +376,12 @@ class MPUBLIC GroupSetting : public StandardSetting, public TransientStorage
     virtual StandardSetting* byName(const QString &name);
 };
 
-class MPUBLIC ButtonStandardSetting : public StandardSetting,
-    public TransientStorage
+class MPUBLIC ButtonStandardSetting : public StandardSetting
 {
     Q_OBJECT
 
   public:
     ButtonStandardSetting(const QString &label);
-    virtual void Load(void)
-    {
-        StandardSetting::Load();
-    }
-    virtual void Save(void)
-    {
-        StandardSetting::Save();
-    }
-    using TransientStorage::Save;
 
     virtual void edit(MythScreenType *screen);
     virtual void resultEdit(DialogCompletionEvent *){};
