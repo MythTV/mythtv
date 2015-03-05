@@ -119,6 +119,19 @@ class MPUBLIC StandardSetting : public QObject, public StorageUser
     QMap<QString, QList<StandardSetting *> > m_targets;
 };
 
+class MPUBLIC AutoIncrementSetting : public StandardSetting
+{
+  public:
+    AutoIncrementSetting(QString _table, QString _column);
+
+    virtual void Save(void);
+    virtual void edit(MythScreenType * /*screen*/) { }
+    virtual void resultEdit(DialogCompletionEvent * /*dce*/) { }
+
+  private:
+    QString m_table;
+    QString m_column;
+};
 
 /*******************************************************************************
 *                           TextEdit Setting                                   *

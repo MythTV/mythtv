@@ -172,7 +172,7 @@ void Transcode::SetPlayerContext(PlayerContext *player_ctx)
 #if CONFIG_LIBMP3LAME
 static QString get_str_option(RecordingProfile *profile, const QString &name)
 {
-    const Setting *setting = profile->byName(name);
+    const StandardSetting *setting = profile->byName(name);
     if (setting)
         return setting->getValue();
 

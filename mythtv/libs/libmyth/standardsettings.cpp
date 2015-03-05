@@ -322,6 +322,58 @@ void ButtonStandardSetting::edit(MythScreenType *screen)
     emit clicked();
 }
 
+void AutoIncrementSetting::Save(void)
+{
+    if (getValue() == "0")
+    {
+        // Generate a new, unique ID
+        QString querystr = QString("INSERT INTO " + m_table +
+                                   " (" + m_column + ") VALUES (0);");
+
+        MSqlQuery query(MSqlQuery::InitCon());
+
+        if (!query.exec(querystr))
+        {
+            MythDB::DBError("inserting row", query);
+            return;
+        }
+        // XXX -- HACK BEGIN:
+        // lastInsertID fails with "QSqlQuery::value: not positioned on a valid
+        // record" if we get a invalid QVariant we workaround the problem by
+        // taking advantage of mysql always incrementing the auto increment
+        // pointer this breaks if someone modifies the auto increment pointer
+        //setValue(query.lastInsertId().toInt());
+
+        QVariant var = query.lastInsertId();
+
+        if (var.type())
+            setValue(var.toInt());
+        else
+        {
+            querystr = QString("SELECT MAX(" + m_column + ") FROM " +
+                               m_table + ";");
+            if (query.exec(querystr) && query.next())
+            {
+                int lii = query.value(0).toInt();
+                lii = lii ? lii : 1;
+                setValue(lii);
+            }
+            else
+                LOG(VB_GENERAL, LOG_EMERG,
+                    "Can't determine the Id of the last insert "
+                    "QSqlQuery.lastInsertId() failed, the workaround "
+                    "failed too!");
+        }
+        // XXX -- HACK END:
+    }
+}
+
+AutoIncrementSetting::AutoIncrementSetting(QString _table, QString _column) :
+    StandardSetting(),
+    m_table(_table), m_column(_column)
+{
+    setValue("0");
+}
 
 /******************************************************************************
                             Text Setting

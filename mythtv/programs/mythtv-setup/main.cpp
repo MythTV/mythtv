@@ -102,8 +102,15 @@ static void SetupMenuCallback(void* /* data */, QString& selection)
     }
     else if (sel == "recording profile")
     {
-        ProfileGroupEditor editor;
-        editor.exec();
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+        StandardSettingDialog *ssd =
+            new StandardSettingDialog(mainStack, "recordingprofileeditor",
+                                      new ProfileGroupEditor());
+
+        if (ssd->Create())
+            mainStack->AddScreen(ssd);
+        else
+            delete ssd;
     }
     else if (sel == "channel editor")
     {

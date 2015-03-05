@@ -6,6 +6,7 @@ using namespace std;
 
 #include "mthread.h"
 #include "settings.h"
+#include "standardsettings.h"
 #include "datadirect.h"
 
 class SignalTimeout;
@@ -365,6 +366,7 @@ class CardType : public ComboBoxSetting, public CaptureCardDBStorage
 {
 public:
     explicit CardType(const CaptureCard& parent);
+    static void fillSelections(MythUIComboBoxSetting* setting);
     static void fillSelections(SelectSetting* setting);
 };
 
@@ -712,6 +714,7 @@ public:
     void loadByID(int id);
 
     static void fillSelections(SelectSetting* setting);
+    static void fillSelections(MythUIComboBoxSetting* setting);
 
     void reload(void);
 

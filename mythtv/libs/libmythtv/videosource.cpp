@@ -2923,6 +2923,41 @@ void CaptureCard::fillSelections(SelectSetting *setting)
     }
 }
 
+void CaptureCard::fillSelections(MythUIComboBoxSetting *setting)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    QString qstr =
+        "SELECT cardid, videodevice, cardtype "
+        "FROM capturecard "
+        "WHERE hostname = :HOSTNAME "
+        "ORDER BY cardid";
+
+    query.prepare(qstr);
+    query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
+
+    if (!query.exec())
+    {
+        MythDB::DBError("CaptureCard::fillSelections", query);
+        return;
+    }
+
+    QMap<QString, uint> device_refs;
+    while (query.next())
+    {
+        uint    cardid      = query.value(0).toUInt();
+        QString videodevice = query.value(1).toString();
+        QString cardtype    = query.value(2).toString();
+
+        bool sharable = CardUtil::IsTunerSharingCapable(cardtype.toUpper());
+
+        if (sharable && (1 != ++device_refs[videodevice]))
+            continue;
+
+        QString label = CardUtil::GetDeviceLabel(cardtype, videodevice);
+        setting->addSelection(label, QString::number(cardid));
+    }
+}
+
 void CaptureCard::loadByID(int cardid)
 {
     id->setValue(cardid);
@@ -3016,6 +3051,65 @@ void CardType::fillSelections(SelectSetting* setting)
     setting->addSelection(
         QObject::tr("V@Box TV Gateway networked tuner"), "VBOX");
 #endif // USING_VBOX
+
+#ifdef USING_FIREWIRE
+    setting->addSelection(
+        QObject::tr("FireWire cable box"), "FIREWIRE");
+#endif // USING_FIREWIRE
+
+#ifdef USING_CETON
+    setting->addSelection(
+        QObject::tr("Ceton Cablecard tuner"), "CETON");
+#endif // USING_CETON
+
+#ifdef USING_IPTV
+    setting->addSelection(QObject::tr("IPTV recorder"), "FREEBOX");
+#endif // USING_IPTV
+
+#ifdef USING_V4L2
+# ifdef USING_IVTV
+    setting->addSelection(
+        QObject::tr("Analog to MPEG-2 encoder card (PVR-150/250/350, etc)"), "MPEG");
+# endif // USING_IVTV
+    setting->addSelection(
+        QObject::tr("Analog to MJPEG encoder card (Matrox G200, DC10, etc)"), "MJPEG");
+    setting->addSelection(
+        QObject::tr("Analog to MPEG-4 encoder (Plextor ConvertX USB, etc)"),
+        "GO7007");
+    setting->addSelection(
+        QObject::tr("Analog capture card"), "V4L");
+#endif // USING_V4L2
+
+#ifdef USING_ASI
+    setting->addSelection(QObject::tr("DVEO ASI recorder"), "ASI");
+#endif
+
+    setting->addSelection(QObject::tr("Import test recorder"), "IMPORT");
+    setting->addSelection(QObject::tr("Demo test recorder"),   "DEMO");
+#if !defined( USING_MINGW ) && !defined( _MSC_VER )
+    setting->addSelection(QObject::tr("External (black box) recorder"),
+                          "EXTERNAL");
+#endif
+}
+
+void CardType::fillSelections(MythUIComboBoxSetting* setting)
+{
+#ifdef USING_DVB
+    setting->addSelection(
+        QObject::tr("DVB-T/S/C, ATSC or ISDB-T tuner card"), "DVB");
+#endif // USING_DVB
+
+#ifdef USING_V4L2
+# ifdef USING_HDPVR
+    setting->addSelection(
+        QObject::tr("HD-PVR H.264 encoder"), "HDPVR");
+# endif // USING_HDPVR
+#endif // USING_V4L2
+
+#ifdef USING_HDHOMERUN
+    setting->addSelection(
+        QObject::tr("HDHomeRun networked tuner"), "HDHOMERUN");
+#endif // USING_HDHOMERUN
 
 #ifdef USING_FIREWIRE
     setting->addSelection(

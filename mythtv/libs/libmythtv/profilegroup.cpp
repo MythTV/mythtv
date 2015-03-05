@@ -44,16 +44,14 @@ ProfileGroup::ProfileGroup()
     addChild(id = new ID());
     addChild(is_default = new Is_default(*this));
 
-    ConfigurationGroup* profile = new VerticalConfigurationGroup(false);
-    profile->setLabel(tr("ProfileGroup"));
-    profile->addChild(name = new Name(*this));
+    setLabel(tr("ProfileGroup"));
+    addChild(name = new Name(*this));
     CardInfo *cardInfo = new CardInfo(*this);
-    profile->addChild(cardInfo);
+    addChild(cardInfo);
     CardType::fillSelections(cardInfo);
     host = new HostName(*this);
-    profile->addChild(host);
+    addChild(host);
     host->fillSelections();
-    addChild(profile);
 };
 
 void ProfileGroup::loadByID(int profileId) {
@@ -124,7 +122,7 @@ bool ProfileGroup::addMissingDynamicProfiles(void)
     return true;
 }
 
-void ProfileGroup::fillSelections(SelectSetting* setting)
+void ProfileGroup::fillSelections(GroupSetting* setting)
 {
     CardUtil::InputTypes cardtypes = CardUtil::GetInputTypes();
     QString     tid       = QString::null;
@@ -160,12 +158,27 @@ void ProfileGroup::fillSelections(SelectSetting* setting)
             if (!hostname.isEmpty())
                 name += QString(" (%1)").arg(result.value(2).toString());
 
-            setting->addSelection(name, id);
+            if (is_default)
+            {
+                setting->addChild(new RecordingProfileEditor(id.toInt(), name));
+            }
+            else
+            {
+                ProfileGroup *profileGroup = new ProfileGroup();
+                profileGroup->loadByID(id.toInt());
+                profileGroup->setLabel(name);
+                profileGroup->addChild(
+                    new RecordingProfileEditor(id.toInt(), tr("Profiles")));
+                setting->addChild(profileGroup);
+            }
         }
     }
 
     if (!tid.isEmpty())
-        setting->addSelection(tr("Transcoders"), tid);
+    {
+        setting->addChild(new RecordingProfileEditor(tid.toInt(),
+                                                     tr("Transcoders")));
+    }
 }
 
 QString ProfileGroup::getName(int group)
@@ -209,37 +222,46 @@ void ProfileGroup::getHostNames(QStringList *hostnames)
     }
 }
 
-void ProfileGroupEditor::open(int id) {
+void ProfileGroupEditor::Load(void)
+{
+    clearSettings();
+    ProfileGroup::addMissingDynamicProfiles();
+    ButtonStandardSetting *newProfile =
+        new ButtonStandardSetting(tr("(Create new profile group)"));
+    connect(newProfile, SIGNAL(clicked()), SLOT(ShowNewProfileDialog()));
+    addChild(newProfile);
+    ProfileGroup::fillSelections(this);
+    StandardSetting::Load();
+}
 
-    ProfileGroup* profilegroup = new ProfileGroup();
+void ProfileGroupEditor::ShowNewProfileDialog(void)
+{
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythTextInputDialog *settingdialog =
+        new MythTextInputDialog(popupStack, tr("New Profile Group Name"));
 
-    bool isdefault = false;
-    bool show_profiles = true;
-    bool newgroup = false;
-    int profileID;
-    QString pgName;
-
-    if (id != 0)
+    if (settingdialog->Create())
     {
-        profilegroup->loadByID(id);
-        pgName = profilegroup->getName();
-        if (profilegroup->isDefault())
-          isdefault = true;
+        connect(settingdialog, SIGNAL(haveResult(QString)),
+                SLOT(createNewProfile(QString)));
+        popupStack->AddScreen(settingdialog);
     }
     else
-    {
-        pgName = tr("New Profile Group Name");
-        profilegroup->setName(pgName);
-        newgroup = true;
-    }
+        delete settingdialog;
+}
 
-    if (! isdefault)
+void ProfileGroupEditor::CreateNewProfile(QString name)
+{
+    ProfileGroup* profilegroup = new ProfileGroup();
+
+    profilegroup->setName(name);
+    if (profilegroup->allowedGroupName())
     {
-        if (profilegroup->exec(false) == QDialog::Accepted &&
-            profilegroup->allowedGroupName())
+        profilegroup->setLabel(name);
+        if (!profilegroup->isDefault())
         {
             profilegroup->Save();
-            profileID = profilegroup->getProfileNum();
+            int profileID = profilegroup->getProfileNum();
             vector<int> found;
 
             MSqlQuery result(MSqlQuery::InitCon());
@@ -279,116 +301,82 @@ void ProfileGroupEditor::open(int id) {
                 }
             }
         }
-        else if (newgroup)
-            show_profiles = false;
-    }
 
-    if (show_profiles)
-    {
-        pgName = profilegroup->getName();
-        profileID = profilegroup->getProfileNum();
-        RecordingProfileEditor editor(profileID, pgName);
-        editor.exec();
+        addChild(profilegroup);
+        emit settingsChanged(this);
     }
-    delete profilegroup;
-};
-
-void ProfileGroupEditor::Load(void)
-{
-    listbox->clearSelections();
-    ProfileGroup::addMissingDynamicProfiles();
-    ProfileGroup::fillSelections(listbox);
-    listbox->addSelection(tr("(Create new profile group)"), "0");
+    else
+        delete profilegroup;
 }
 
-DialogCode ProfileGroupEditor::exec(void)
+bool ProfileGroup::keyPressEvent(QKeyEvent *e)
 {
-    DialogCode ret = kDialogCodeAccepted;
-    redraw = true;
+    QStringList actions;
 
-    while ((QDialog::Accepted == ret) || redraw)
+    if (GetMythMainWindow()->TranslateKeyPress("Global", e, actions))
+        return true;
+
+    foreach (const QString &action, actions)
     {
-        redraw = false;
-
-        Load();
-
-        dialog = new ConfigurationDialogWidget(GetMythMainWindow(),
-                                               "ProfileGroupEditor");
-
-        connect(dialog, SIGNAL(menuButtonPressed()), this, SLOT(callDelete()));
-
-        int   width = 0,    height = 0;
-        float wmult = 0.0f, hmult  = 0.0f;
-        GetMythUI()->GetScreenSettings(width, wmult, height, hmult);
-
-        QVBoxLayout *layout = new QVBoxLayout(dialog);
-        layout->setMargin((int)(20 * hmult));
-        layout->addWidget(listbox->configWidget(NULL, dialog));
-
-        dialog->Show();
-
-        ret = dialog->exec();
-
-        dialog->deleteLater();
-        dialog = NULL;
-
-        if (ret == QDialog::Accepted)
-            open(listbox->getValue().toInt());
-    }
-
-    return kDialogCodeRejected;
-}
-
-void ProfileGroupEditor::callDelete(void)
-{
-    int id = listbox->getValue().toInt();
-
-    MSqlQuery result(MSqlQuery::InitCon());
-    result.prepare("SELECT id FROM profilegroups WHERE "
-                   "id = :PROFILE_ID AND is_default = 0;");
-
-    result.bindValue(":PROFILE_ID", id);
-
-    if (result.exec() && result.next())
-    {
-        QString message = tr("Delete profile group:\n'%1'?")
-                              .arg(ProfileGroup::getName(id));
-
-        DialogCode value = MythPopupBox::Show2ButtonPopup(
-            GetMythMainWindow(),
-            "", message,
-            tr("Yes, delete group"),
-            tr("No, Don't delete group"), kDialogCodeButton1);
-
-        if (kDialogCodeButton0 == value)
+        if (action == "DELETE")
         {
-            result.prepare("DELETE codecparams FROM codecparams, "
-                            "recordingprofiles WHERE "
-                            "codecparams.profile = recordingprofiles.id "
-                            "AND recordingprofiles.profilegroup = :PROFILE_ID;");
-            result.bindValue(":PROFILE_ID", id);
-            if (!result.exec())
-                MythDB::DBError("ProfileGroupEditor::callDelete -- "
-                                "delete codecparams", result);
-
-            result.prepare("DELETE FROM recordingprofiles WHERE "
-                           "profilegroup = :PROFILE_ID;");
-            result.bindValue(":PROFILE_ID", id);
-            if (!result.exec())
-                MythDB::DBError("ProfileGroupEditor::callDelete -- "
-                                "delete recordingprofiles", result);
-
-            result.prepare("DELETE FROM profilegroups WHERE id = :PROFILE_ID;");
-            result.bindValue(":PROFILE_ID", id);
-            if (!result.exec())
-                MythDB::DBError("ProfileGroupEditor::callDelete -- "
-                                "delete profilegroups", result);
-
-            redraw = true;
-
-            if (dialog)
-                dialog->done(QDialog::Rejected);
+            CallDelete();
+            return true;
         }
     }
 
+    return false;
+}
+
+void ProfileGroup::CallDelete(void)
+{
+    if (!isDefault())
+    {
+        int id = getProfileNum();
+
+        QString message = tr("Delete profile group:\n'%1'?").arg(getName());
+
+        MythScreenStack *popupStack =
+            GetMythMainWindow()->GetStack("popup stack");
+
+        MythDialogBox* menu =
+            new MythDialogBox(message, popupStack, "deletemenu");
+
+        if (menu->Create())
+        {
+            menu->SetReturnEvent(this, "deletemenu");
+
+            auto deleteSlot = [id]() {
+                MSqlQuery query(MSqlQuery::InitCon());
+                query.prepare("DELETE codecparams FROM codecparams, "
+                              "recordingprofiles WHERE "
+                              "codecparams.profile = recordingprofiles.id "
+                              "AND recordingprofiles.profilegroup = :PROFILE_ID;");
+                query.bindValue(":PROFILE_ID", id);
+                if (!query.exec())
+                    MythDB::DBError("ProfileGroupEditor::CallDelete -- "
+                                    "delete codecparams", query);
+
+                query.prepare("DELETE FROM recordingprofiles WHERE "
+                              "profilegroup = :PROFILE_ID;");
+                query.bindValue(":PROFILE_ID", id);
+                if (!query.exec())
+                    MythDB::DBError("ProfileGroupEditor::CallDelete -- "
+                                    "delete recordingprofiles", query);
+
+                query.prepare("DELETE FROM profilegroups WHERE id = :PROFILE_ID;");
+                query.bindValue(":PROFILE_ID", id);
+                if (!query.exec())
+                    MythDB::DBError("ProfileGroupEditor::CallDelete -- "
+                                    "delete profilegroups", query);
+
+            };
+
+            menu->AddButton(tr("No, Don't delete group"));
+            menu->AddButton(tr("Yes, delete group"), deleteSlot);
+            popupStack->AddScreen(menu);
+        }
+        else
+            delete menu;
+    }
 }
