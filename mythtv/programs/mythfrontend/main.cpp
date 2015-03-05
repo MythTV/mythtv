@@ -981,8 +981,7 @@ static void TVMenuCallback(void *data, QString &selection)
     {
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
         StandardSettingDialog *ssd =
-            new StandardSettingDialog(mainStack, "playbacksettings",
-                                      new PlaybackSettings());
+            new PlaybackSettingsDialog(mainStack);
 
         if (ssd->Create())
         {

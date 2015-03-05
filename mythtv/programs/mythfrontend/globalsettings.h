@@ -14,12 +14,36 @@
 
 class QFileInfo;
 
+class PlaybackSettingsDialog : public StandardSettingDialog
+{
+    Q_OBJECT
+
+  public:
+    PlaybackSettingsDialog(MythScreenStack *stack);
+    void ShowMenu(void);
+
+  protected slots:
+    void ShowPlaybackProfileMenu(MythUIButtonListItem *item);
+    void DeleteProfileItem(void);
+    void MoveProfileItemDown(void);
+    void MoveProfileItemUp(void);
+};
+
 class PlaybackSettings : public GroupSetting
 {
-    Q_DECLARE_TR_FUNCTIONS(PlaybackSettings)
+    Q_OBJECT
 
   public:
     PlaybackSettings();
+    virtual void Load(void);
+
+  private slots:
+    void NewPlaybackProfileSlot(void);
+    void CreateNewPlaybackProfileSlot(const QString &name);
+
+  private:
+    ButtonStandardSetting *m_newPlaybackProfileButton;
+    MythUIComboBoxSetting *m_playbackProfiles;
 };
 
 class VideoModeSettings : public HostCheckBoxSetting
@@ -158,17 +182,23 @@ class GeneralRecPrioritiesSettings : public GroupSetting
     GeneralRecPrioritiesSettings();
 };
 
-#if 0
-class PlaybackProfileItemConfig : public QObject, public ConfigurationWizard
+class PlaybackProfileConfig;
+class PlaybackProfileItemConfig : public GroupSetting
 {
     Q_OBJECT
 
   public:
-    PlaybackProfileItemConfig(ProfileItem &_item);
+    PlaybackProfileItemConfig(PlaybackProfileConfig *parent, uint idx,
+                              ProfileItem &_item);
 
     virtual void Load(void);
     virtual void Save(void);
-    virtual void Save(QString /*destination*/) { Save(); }
+
+    bool keyPressEvent(QKeyEvent *);
+    uint GetIndex(void) const;
+    void ShowDeleteDialog(void);
+    void DecreasePriority(void);
+    void IncreasePriority(void);
 
   private slots:
     void decoderChanged(const QString &dec);
@@ -176,79 +206,60 @@ class PlaybackProfileItemConfig : public QObject, public ConfigurationWizard
     void orenderChanged(const QString &renderer);
     void deint0Changed(const QString &deint);
     void deint1Changed(const QString &deint);
+    void InitLabel(void);
+    void DoDeleteSlot(bool);
 
   private:
     ProfileItem          &item;
-    TransComboBoxSetting *cmp[2];
-    TransSpinBoxSetting  *width[2];
-    TransSpinBoxSetting  *height[2];
-    TransComboBoxSetting *decoder;
-    TransSpinBoxSetting  *max_cpus;
-    TransCheckBoxSetting *skiploop;
-    TransComboBoxSetting *vidrend;
-    TransComboBoxSetting *osdrend;
-    TransCheckBoxSetting *osdfade;
-    TransComboBoxSetting *deint0;
-    TransComboBoxSetting *deint1;
-    TransLineEditSetting *filters;
+    TransMythUIComboBoxSetting *cmp[2];
+    TransMythUISpinBoxSetting  *width[2];
+    TransMythUISpinBoxSetting  *height[2];
+    TransMythUIComboBoxSetting *decoder;
+    TransMythUISpinBoxSetting  *max_cpus;
+    TransMythUICheckBoxSetting *skiploop;
+    TransMythUIComboBoxSetting *vidrend;
+    TransMythUIComboBoxSetting *osdrend;
+    TransMythUICheckBoxSetting *osdfade;
+    TransMythUIComboBoxSetting *deint0;
+    TransMythUIComboBoxSetting *deint1;
+    TransTextEditSetting *filters;
+    PlaybackProfileConfig *parentConfig;
+    uint index;
 };
 
-class PlaybackProfileConfig : public VerticalConfigurationGroup
+class PlaybackProfileConfig : public GroupSetting
 {
     Q_OBJECT
 
   public:
-    PlaybackProfileConfig(const QString &profilename);
+    PlaybackProfileConfig(const QString &profilename, StandardSetting *parent);
     virtual ~PlaybackProfileConfig();
 
-    virtual void Load(void);
     virtual void Save(void);
-    virtual void Save(QString /*destination*/) { Save(); }
+
+    void DeleteProfileItem(PlaybackProfileItemConfig *profile);
 
     void swap(int indexA, int intexB);
 
   private slots:
-    void pressed(QString);
-    void priorityChanged(const QString &name, int);
+    void AddNewEntry(void);
 
   private:
-    void InitLabel(uint);
-    void InitUI(void);
+    void InitUI(StandardSetting *parent);
+    StandardSetting * InitProfileItem(uint, StandardSetting *);
 
   private:
+    void ReloadSettings(void);
     item_list_t items;
     item_list_t del_items;
     QString     profile_name;
-    bool        needs_save;
     uint        groupid;
 
-    VerticalConfigurationGroup  *last_main;
-    vector<TransLabelSetting*>   labels;
-    vector<TransButtonSetting*>  editProf;
-    vector<TransButtonSetting*>  delProf;
-    vector<TransSpinBoxSetting*> priority;
+    TransMythUICheckBoxSetting *m_markForDeletion;
+    ButtonStandardSetting* m_addNewEntry;
+    vector<PlaybackProfileItemConfig*> m_profiles;
+    vector<TransMythUISpinBoxSetting*> priority;
 };
-
-class PlaybackProfileConfigs : public TriggeredConfigurationGroup
-{
-    Q_OBJECT
-
-  public:
-    PlaybackProfileConfigs(const QString &str);
-    virtual ~PlaybackProfileConfigs();
-
-  private:
-    void InitUI(void);
-
-  private slots:
-    void btnPress(QString);
-    void triggerChanged(const QString&);
-
-  private:
-    QStringList   profiles;
-    HostComboBox *grouptrigger;
-};
-#endif
 
 class PlayBackGroupsSetting : public GroupSetting
 {

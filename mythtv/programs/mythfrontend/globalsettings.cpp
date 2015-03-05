@@ -624,51 +624,29 @@ static GroupSetting *CategoryOverTimeSettings()
     return vcg;
 }
 
-#if 0
-static QString trunc(const QString &str, int len)
+PlaybackProfileItemConfig::PlaybackProfileItemConfig(
+    PlaybackProfileConfig *parent, uint idx, ProfileItem &_item) :
+    item(_item), parentConfig(parent), index(idx)
 {
-    if (str.length() > len)
-        return str.mid(0, len - 5) + " . . . ";
-    return str;
-}
+    GroupSetting *row[2];
 
-static QString pad(const QString &str, int len)
-{
-    QString tmp = str;
-
-    while (tmp.length() + 4 < len)
-        tmp += "    ";
-
-    while (tmp.length() < len)
-        tmp += " ";
-
-    return tmp;
-}
-
-PlaybackProfileItemConfig::PlaybackProfileItemConfig(ProfileItem &_item) :
-    item(_item)
-{
-    setLabel(tr("Profile Item"));
-
-    HorizontalConfigurationGroup *row[2];
-
-    row[0]    = new HorizontalConfigurationGroup(false, false, true, true);
-    cmp[0]    = new TransComboBoxSetting();
-    width[0]  = new TransSpinBoxSetting(0, 1920, 64, true);
-    height[0] = new TransSpinBoxSetting(0, 1088, 64, true);
-    row[1]    = new HorizontalConfigurationGroup(false, false, true, true);
-    cmp[1]    = new TransComboBoxSetting();
-    width[1]  = new TransSpinBoxSetting(0, 1920, 64, true);
-    height[1] = new TransSpinBoxSetting(0, 1088, 64, true);
-    decoder   = new TransComboBoxSetting();
-    max_cpus  = new TransSpinBoxSetting(1, HAVE_THREADS ? 4 : 1, 1, true);
-    skiploop  = new TransCheckBoxSetting();
-    vidrend   = new TransComboBoxSetting();
-    osdrend   = new TransComboBoxSetting();
-    osdfade   = new TransCheckBoxSetting();
-    deint0    = new TransComboBoxSetting();
-    deint1    = new TransComboBoxSetting();
-    filters   = new TransLineEditSetting(true);
+    row[0]    = new GroupSetting();
+    cmp[0]    = new TransMythUIComboBoxSetting();
+    width[0]  = new TransMythUISpinBoxSetting(0, 1920, 64, true);
+    height[0] = new TransMythUISpinBoxSetting(0, 1088, 64, true);
+    row[1]    = new GroupSetting();
+    cmp[1]    = new TransMythUIComboBoxSetting();
+    width[1]  = new TransMythUISpinBoxSetting(0, 1920, 64, true);
+    height[1] = new TransMythUISpinBoxSetting(0, 1088, 64, true);
+    decoder   = new TransMythUIComboBoxSetting();
+    max_cpus  = new TransMythUISpinBoxSetting(1, HAVE_THREADS ? 4 : 1, 1, true);
+    skiploop  = new TransMythUICheckBoxSetting();
+    vidrend   = new TransMythUIComboBoxSetting();
+    osdrend   = new TransMythUIComboBoxSetting();
+    osdfade   = new TransMythUICheckBoxSetting();
+    deint0    = new TransMythUIComboBoxSetting();
+    deint1    = new TransMythUIComboBoxSetting();
+    filters   = new TransTextEditSetting();
 
     for (uint i = 0; i < 2; ++i)
     {
@@ -677,20 +655,14 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(ProfileItem &_item) :
             cmp[i]->addSelection(kCMP[j]);
 
         cmp[i]->setLabel(tr("Match criteria"));
-        width[i]->setName(QString("w%1").arg(i));
-        width[i]->setLabel(tr("W", "Width"));
-        height[i]->setName(QString("h%1").arg(i));
-        height[i]->setLabel(tr("H", "Height"));
+        width[i]->setLabel(tr("Width"));
+        height[i]->setLabel(tr("Height"));
 
+        row[i]->setLabel(tr("Match criteria"));
         row[i]->addChild(cmp[i]);
         row[i]->addChild(width[i]);
         row[i]->addChild(height[i]);
     }
-
-    HorizontalConfigurationGroup *vid_row =
-        new HorizontalConfigurationGroup(false, false, true, true);
-    HorizontalConfigurationGroup *osd_row =
-        new HorizontalConfigurationGroup(false, false, true, true);
 
     decoder->setLabel(tr("Decoder"));
     max_cpus->setLabel(tr("Max CPUs"));
@@ -723,30 +695,21 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(ProfileItem &_item) :
         tr("Uncheck this if the video studders while the OSD is "
            "fading away."));
 
-    vid_row->addChild(decoder);
-    vid_row->addChild(max_cpus);
-    vid_row->addChild(skiploop);
-    osd_row->addChild(vidrend);
-    osd_row->addChild(osdrend);
-    osd_row->addChild(osdfade);
+    addChild(row[0]);
+    addChild(row[1]);
+    addChild(decoder);
+    addChild(max_cpus);
+    addChild(skiploop);
+    addChild(vidrend);
+    addChild(osdrend);
+    addChild(osdfade);
 
-    VerticalConfigurationGroup *grp =
-        new VerticalConfigurationGroup(false, false, true, true);
-    grp->addChild(row[0]);
-    grp->addChild(row[1]);
-    grp->addChild(vid_row);
-    grp->addChild(osd_row);
-    addChild(grp);
-
-    VerticalConfigurationGroup *page2 =
-        new VerticalConfigurationGroup(false, false, true, true);
-    page2->addChild(deint0);
-    page2->addChild(deint1);
-    page2->addChild(filters);
-    addChild(page2);
+    addChild(deint0);
+    addChild(deint1);
+    addChild(filters);
 
     connect(decoder, SIGNAL(valueChanged(const QString&)),
-            this,    SLOT(decoderChanged(const QString&)));\
+            this,    SLOT(decoderChanged(const QString&)));
     connect(vidrend, SIGNAL(valueChanged(const QString&)),
             this,    SLOT(vrenderChanged(const QString&)));
     connect(osdrend, SIGNAL(valueChanged(const QString&)),
@@ -755,6 +718,21 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(ProfileItem &_item) :
             this,    SLOT(deint0Changed(const QString&)));
     connect(deint1, SIGNAL(valueChanged(const QString&)),
             this,    SLOT(deint1Changed(const QString&)));
+
+    for (uint i = 0; i < 2; ++i)
+    {
+        connect(cmp[i], SIGNAL(valueChanged(const QString&)),
+                SLOT(InitLabel()));
+        connect(height[i], SIGNAL(valueChanged(const QString&)),
+                SLOT(InitLabel()));
+        connect(width[i], SIGNAL(valueChanged(const QString&)),
+                SLOT(InitLabel()));
+    }
+}
+
+uint PlaybackProfileItemConfig::GetIndex(void) const
+{
+    return index;
 }
 
 void PlaybackProfileItemConfig::Load(void)
@@ -772,8 +750,8 @@ void PlaybackProfileItemConfig::Load(void)
             clist<<"0";
 
         cmp[i]->setValue(clist[0]);
-        width[i]->setValue(clist[1].toInt());
-        height[i]->setValue(clist[2].toInt());
+        width[i]->setValue(clist[1]);
+        height[i]->setValue(clist[2]);
     }
 
     QString pdecoder  = item.Get("pref_decoder");
@@ -792,6 +770,7 @@ void PlaybackProfileItemConfig::Load(void)
     QStringList decn = VideoDisplayProfile::GetDecoderNames();
     QStringList::const_iterator itr = decr.begin();
     QStringList::const_iterator itn = decn.begin();
+    decoder->clearSelections();
     for (; (itr != decr.end()) && (itn != decn.end()); ++itr, ++itn)
     {
         decoder->addSelection(*itn, *itr, (*itr == pdecoder));
@@ -799,7 +778,7 @@ void PlaybackProfileItemConfig::Load(void)
     }
     if (!found && !pdecoder.isEmpty())
     {
-        decoder->SelectSetting::addSelection(
+        decoder->addSelection(
             VideoDisplayProfile::GetDecoderName(pdecoder), pdecoder, true);
     }
     decoder->setHelpText(VideoDisplayProfile::GetDecoderHelp(pdecoder));
@@ -822,6 +801,8 @@ void PlaybackProfileItemConfig::Load(void)
         deint1->setValue(pdeint1);
     if (!pfilter.isEmpty())
         filters->setValue(pfilter);
+
+    GroupSetting::Load();
 }
 
 void PlaybackProfileItemConfig::Save(void)
@@ -908,6 +889,8 @@ void PlaybackProfileItemConfig::vrenderChanged(const QString &renderer)
 
     filters->setEnabled(VideoDisplayProfile::IsFilterAllowed(renderer));
     vidrend->setHelpText(VideoDisplayProfile::GetVideoRendererHelp(renderer));
+
+    InitLabel();
 }
 
 void PlaybackProfileItemConfig::orenderChanged(const QString &renderer)
@@ -929,132 +912,142 @@ void PlaybackProfileItemConfig::deint1Changed(const QString &deint)
         .arg(VideoDisplayProfile::GetDeinterlacerHelp(deint)));
 }
 
-PlaybackProfileConfig::PlaybackProfileConfig(const QString &profilename) :
-    VerticalConfigurationGroup(false, false, true, true),
-    profile_name(profilename), needs_save(false),
-    groupid(0), last_main(NULL)
+bool PlaybackProfileItemConfig::keyPressEvent(QKeyEvent *e)
 {
+    QStringList actions;
+
+    if (GetMythMainWindow()->TranslateKeyPress("Global", e, actions))
+        return true;
+
+    foreach (const QString &action, actions)
+    {
+        if (action == "DELETE")
+        {
+            ShowDeleteDialog();
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void PlaybackProfileItemConfig::ShowDeleteDialog()
+{
+    QString message = tr("Remove this profile item?");
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythConfirmationDialog *confirmDelete =
+        new MythConfirmationDialog(popupStack, message, true);
+
+    if (confirmDelete->Create())
+    {
+        connect(confirmDelete, SIGNAL(haveResult(bool)),
+                SLOT(DoDeleteSlot(bool)));
+        popupStack->AddScreen(confirmDelete);
+    }
+    else
+        delete confirmDelete;
+}
+
+void PlaybackProfileItemConfig::DoDeleteSlot(bool doDelete)
+{
+    if (doDelete)
+        parentConfig->DeleteProfileItem(this);
+}
+
+void PlaybackProfileItemConfig::DecreasePriority(void)
+{
+    parentConfig->swap(index, index + 1);
+}
+
+void PlaybackProfileItemConfig::IncreasePriority(void)
+{
+    parentConfig->swap(index, index - 1);
+}
+
+PlaybackProfileConfig::PlaybackProfileConfig(const QString &profilename,
+                                             StandardSetting *parent) :
+    profile_name(profilename),
+    groupid(0)
+{
+    setVisible(false);
     groupid = VideoDisplayProfile::GetProfileGroupID(
-        profilename, gCoreContext->GetHostName());
-
+        profile_name, gCoreContext->GetHostName());
     items = VideoDisplayProfile::LoadDB(groupid);
-
-    InitUI();
+    InitUI(parent);
 }
 
 PlaybackProfileConfig::~PlaybackProfileConfig()
 {
 }
 
-void PlaybackProfileConfig::InitLabel(uint i)
+void PlaybackProfileItemConfig::InitLabel(void)
 {
-    if (!labels[i])
-        return;
-
     QString andStr = tr("&", "and");
-    QString cmp0   = items[i].Get("pref_cmp0");
-    QString cmp1   = items[i].Get("pref_cmp1");
-    QString str    = tr("if rez") + ' ' + cmp0;
+    QString cmp0   = QString("%1 %2 %3").arg(cmp[0]->getValue())
+        .arg(width[0]->intValue())
+        .arg(height[0]->intValue());
+    QString cmp1   = QString("%1 %2 %3").arg(cmp[1]->getValue())
+        .arg(width[1]->intValue())
+        .arg(height[1]->intValue());
+    QString str    = PlaybackProfileConfig::tr("if rez") + ' ' + cmp0;
 
-    if (!cmp1.isEmpty())
+    if (!cmp[1]->getValue().isEmpty())
         str += " " + andStr + ' ' + cmp1;
 
     str += " -> ";
-    str += items[i].Get("pref_decoder");
+    str += decoder->getValue();
     str += " " + andStr + ' ';
-    str += items[i].Get("pref_videorenderer");
+    str += vidrend->getValue();
     str.replace("-blit", "");
     str.replace("ivtv " + andStr + " ivtv", "ivtv");
     str.replace("xvmc " + andStr + " xvmc", "xvmc");
     str.replace("xvmc", "XvMC");
     str.replace("xv", "XVideo");
 
-    labels[i]->setValue(pad(trunc(str, 48), 48));
+    setLabel(str);
 }
 
-void PlaybackProfileConfig::InitUI(void)
+void PlaybackProfileConfig::InitUI(StandardSetting *parent)
 {
-    VerticalConfigurationGroup *main =
-        new VerticalConfigurationGroup(false, false, true, true);
+    m_markForDeletion = new TransMythUICheckBoxSetting();
+    m_markForDeletion->setLabel(tr("Mark for deletion"));
+    m_addNewEntry = new ButtonStandardSetting(tr("Add New Entry"));
 
-    HorizontalConfigurationGroup *rows =
-        new HorizontalConfigurationGroup(false, false, true, true);
-    VerticalConfigurationGroup *column1 =
-        new VerticalConfigurationGroup(false, false, true, true);
-    VerticalConfigurationGroup *column2 =
-        new VerticalConfigurationGroup(false, false, true, true);
+    parent->addTargetedChild(profile_name, m_markForDeletion);
+    parent->addTargetedChild(profile_name, m_addNewEntry);
 
-    labels.resize(items.size());
+    connect(m_addNewEntry, SIGNAL(clicked()), SLOT(AddNewEntry()));
 
     for (uint i = 0; i < items.size(); ++i)
-    {
-        labels[i] = new TransLabelSetting();
-        InitLabel(i);
-        column1->addChild(labels[i]);
-    }
-
-    editProf.resize(items.size());
-    delProf.resize(items.size());
-    priority.resize(items.size());
-
-    for (uint i = 0; i < items.size(); ++i)
-    {
-        HorizontalConfigurationGroup *grp =
-            new HorizontalConfigurationGroup(false, false, true, true);
-
-        editProf[i] = new TransButtonSetting(QString("edit%1").arg(i));
-        delProf[i]  = new TransButtonSetting(QString("del%1").arg(i));
-        priority[i] = new TransSpinBoxSetting(1, items.size(), 1);
-        priority[i]->setName(QString("pri%1").arg(i));
-
-        editProf[i]->setLabel(QCoreApplication::translate("(Common)", "Edit"));
-        delProf[i]->setLabel(QCoreApplication::translate("(Common)", "Delete"));
-        priority[i]->setValue(i + 1);
-        items[i].Set("pref_priority", QString::number(i + 1));
-
-        grp->addChild(editProf[i]);
-        grp->addChild(delProf[i]);
-        grp->addChild(priority[i]);
-
-        connect(editProf[i], SIGNAL(pressed(QString)),
-                this,        SLOT  (pressed(QString)));
-        connect(delProf[i],  SIGNAL(pressed(QString)),
-                this,        SLOT  (pressed(QString)));
-        connect(priority[i], SIGNAL(valueChanged(   const QString&, int)),
-                this,        SLOT(  priorityChanged(const QString&, int)));
-
-        column2->addChild(grp);
-    }
-
-    rows->addChild(column1);
-    rows->addChild(column2);
-
-    TransButtonSetting *addEntry = new TransButtonSetting("addentry");
-    addEntry->setLabel(tr("Add New Entry"));
-
-    main->addChild(rows);
-    main->addChild(addEntry);
-
-    connect(addEntry, SIGNAL(pressed(QString)),
-            this,     SLOT  (pressed(QString)));
-
-    if (last_main)
-        replaceChild(last_main, main);
-    else
-        addChild(main);
-
-    last_main = main;
+        InitProfileItem(i, parent);
 }
 
-void PlaybackProfileConfig::Load(void)
+StandardSetting * PlaybackProfileConfig::InitProfileItem(
+    uint i, StandardSetting *parent)
 {
-    // Already loaded data in constructor...
+    PlaybackProfileItemConfig* ppic =
+        new PlaybackProfileItemConfig(this, i, items[i]);
+
+    items[i].Set("pref_priority", QString::number(i + 1));
+
+    parent->addTargetedChild(profile_name, ppic);
+    m_profiles.push_back(ppic);
+    return ppic;
 }
 
 void PlaybackProfileConfig::Save(void)
 {
-    if (!needs_save)
-        return; // nothing to do..
+    if (m_markForDeletion->boolValue())
+    {
+        VideoDisplayProfile::DeleteProfileGroup(profile_name,
+                                                gCoreContext->GetHostName());
+        return;
+    }
+
+    foreach (PlaybackProfileItemConfig *profile, m_profiles)
+    {
+        profile->Save();
+    }
 
     bool ok = VideoDisplayProfile::DeleteDB(groupid, del_items);
     if (!ok)
@@ -1073,121 +1066,84 @@ void PlaybackProfileConfig::Save(void)
     }
 }
 
-void PlaybackProfileConfig::pressed(QString cmd)
+void PlaybackProfileConfig::DeleteProfileItem(
+    PlaybackProfileItemConfig *profileToDelete)
 {
-    if (cmd.startsWith("edit"))
+    foreach (PlaybackProfileItemConfig *profile, m_profiles)
     {
-        uint i = cmd.mid(4).toUInt();
-        PlaybackProfileItemConfig itemcfg(items[i]);
-
-        if (itemcfg.exec() != kDialogCodeAccepted)
-        {
-            LOG(VB_GENERAL, LOG_ERR, QString("edit #%1").arg(i) + " rejected");
-        }
-        else
-        {
-            InitLabel(i);
-            needs_save = true;
-        }
-    }
-    else if (cmd.startsWith("del"))
-    {
-        uint i = cmd.mid(3).toUInt();
-        del_items.push_back(items[i]);
-        items.erase(items.begin() + i);
-
-        InitUI();
-        needs_save = true;
-    }
-    else if (cmd == "addentry")
-    {
-        ProfileItem item;
-        PlaybackProfileItemConfig itemcfg(item);
-
-        if (itemcfg.exec() != kDialogCodeAccepted)
-        {
-            LOG(VB_GENERAL, LOG_ERR, "addentry rejected");
-        }
-        else
-        {
-            items.push_back(item);
-            InitUI();
-            needs_save = true;
-        }
+        profile->Save();
     }
 
-    repaint();
+    uint i = profileToDelete->GetIndex();
+    del_items.push_back(items[i]);
+    items.erase(items.begin() + i);
+
+    ReloadSettings();
 }
 
-void PlaybackProfileConfig::priorityChanged(const QString &name, int val)
+void PlaybackProfileConfig::AddNewEntry(void)
 {
-    uint i = name.mid(3).toInt();
-    uint j = i;
-
-    priority[i]->SetRelayEnabled(false);
-
-    if (((int)items[i].GetPriority() < val) &&
-        (i + 1 < priority.size())           &&
-        ((int)items[i+1].GetPriority() == val))
+    foreach (PlaybackProfileItemConfig *profile, m_profiles)
     {
-        j++;
-        priority[j]->SetRelayEnabled(false);
-
-        swap(i, j);
-        priority[j]->setFocus();
-    }
-    else if (((int)items[i].GetPriority() > val) &&
-             (i > 0) &&
-             ((int)items[i-1].GetPriority() == val))
-    {
-        j--;
-        priority[j]->SetRelayEnabled(false);
-
-        swap(i, j);
-
-        priority[j]->setFocus();
-    }
-    else
-    {
-        priority[i]->setValue((int) items[i].GetPriority());
+        profile->Save();
     }
 
-    needs_save = true;
+    ProfileItem item;
 
-    repaint();
+    items.push_back(item);
 
-    priority[i]->SetRelayEnabled(true);
-    if (i != j)
-        priority[j]->SetRelayEnabled(true);
+    ReloadSettings();
+}
+
+void PlaybackProfileConfig::ReloadSettings(void)
+{
+    getParent()->removeTargetedChild(profile_name, m_markForDeletion);
+    getParent()->removeTargetedChild(profile_name, m_addNewEntry);
+
+    foreach (StandardSetting *setting, m_profiles)
+    {
+        getParent()->removeTargetedChild(profile_name, setting);
+    }
+    m_profiles.clear();
+
+    InitUI(getParent());
+
+    foreach (StandardSetting *setting, m_profiles)
+    {
+        setting->Load();
+    }
+
+    emit getParent()->settingsChanged();
+    setChanged(true);
 }
 
 void PlaybackProfileConfig::swap(int i, int j)
 {
-    int pri_i = items[i].GetPriority();
-    int pri_j = items[j].GetPriority();
+    foreach (PlaybackProfileItemConfig *profile, m_profiles)
+    {
+        profile->Save();
+    }
+
+    QString pri_i = QString::number(items[i].GetPriority());
+    QString pri_j = QString::number(items[j].GetPriority());
 
     ProfileItem item = items[j];
     items[j] = items[i];
     items[i] = item;
 
-    priority[i]->setValue(pri_i);
-    priority[j]->setValue(pri_j);
+    items[i].Set("pref_priority", pri_i);
+    items[j].Set("pref_priority", pri_j);
 
-    items[i].Set("pref_priority", QString::number(pri_i));
-    items[j].Set("pref_priority", QString::number(pri_j));
-
-    const QString label_i = labels[i]->getValue();
-    const QString label_j = labels[j]->getValue();
-    labels[i]->setValue(label_j);
-    labels[j]->setValue(label_i);
+    ReloadSettings();
 }
-#endif
 
 static HostComboBoxSetting * CurrentPlaybackProfile()
 {
-    HostComboBoxSetting *grouptrigger = new HostComboBoxSetting("DefaultVideoPlaybackProfile");
-    grouptrigger->setLabel(QCoreApplication::translate("PlaybackProfileConfigs",
-                                                       "Current Video Playback Profile"));
+    HostComboBoxSetting *grouptrigger =
+        new HostComboBoxSetting("DefaultVideoPlaybackProfile");
+    grouptrigger->setLabel(
+        QCoreApplication::translate("PlaybackProfileConfigs",
+                                    "Current Video Playback Profile"));
 
     QString host = gCoreContext->GetHostName();
     QStringList profiles = VideoDisplayProfile::GetProfiles(host);
@@ -1198,52 +1154,6 @@ static HostComboBoxSetting * CurrentPlaybackProfile()
     }
     if (profiles.empty())
         return grouptrigger;
-
-    if (!profiles.contains("Normal") &&
-        !profiles.contains("High Quality") &&
-        !profiles.contains("Slim"))
-    {
-        VideoDisplayProfile::CreateNewProfiles(host);
-        profiles = VideoDisplayProfile::GetProfiles(host);
-    }
-
-    if (!profiles.contains("VDPAU Normal") &&
-        !profiles.contains("VDPAU High Quality") &&
-        !profiles.contains("VDPAU Slim"))
-    {
-        VideoDisplayProfile::CreateVDPAUProfiles(host);
-        profiles = VideoDisplayProfile::GetProfiles(host);
-    }
-
-    QString profile = VideoDisplayProfile::GetDefaultProfileName(host);
-    if (!profiles.contains(profile))
-    {
-        profile = (profiles.contains("Normal")) ? "Normal" : profiles[0];
-        VideoDisplayProfile::SetDefaultProfileName(profile, host);
-    }
-
-    QStringList::const_iterator it;
-    for (it = profiles.begin(); it != profiles.end(); ++it)
-        grouptrigger->addSelection(ProgramInfo::i18n(*it), *it);
-    return grouptrigger;
-}
-
-#if 0
-PlaybackProfileConfigs::PlaybackProfileConfigs(const QString &str) :
-    TriggeredConfigurationGroup(false, true,  true, true,
-                                false, false, true, true), grouptrigger(NULL)
-{
-    setLabel(tr("Playback Profiles %1").arg(str));
-
-    QString host = gCoreContext->GetHostName();
-    QStringList profiles = VideoDisplayProfile::GetProfiles(host);
-    if (profiles.empty())
-    {
-        VideoDisplayProfile::CreateProfiles(host);
-        profiles = VideoDisplayProfile::GetProfiles(host);
-    }
-    if (profiles.empty())
-        return;
 
     if (!profiles.contains("Normal") &&
         !profiles.contains("High Quality") &&
@@ -1301,112 +1211,60 @@ PlaybackProfileConfigs::PlaybackProfileConfigs(const QString &str) :
         VideoDisplayProfile::SetDefaultProfileName(profile, host);
     }
 
-    grouptrigger = new HostComboBox("DefaultVideoPlaybackProfile");
-
-    grouptrigger->setLabel(tr("Current Video Playback Profile"));
-
     QStringList::const_iterator it;
     for (it = profiles.begin(); it != profiles.end(); ++it)
+    {
         grouptrigger->addSelection(ProgramInfo::i18n(*it), *it);
-
-    HorizontalConfigurationGroup *grp =
-        new HorizontalConfigurationGroup(false, false, true, true);
-    TransButtonSetting *addProf = new TransButtonSetting("add");
-    TransButtonSetting *delProf = new TransButtonSetting("del");
-
-    addProf->setLabel(tr("Add New"));
-    delProf->setLabel(QCoreApplication::translate("(Common)", "Delete"));
-
-    grp->addChild(grouptrigger);
-    grp->addChild(addProf);
-    grp->addChild(delProf);
-
-    addChild(grp);
-
-    setTrigger(grouptrigger);
-    for (it = profiles.begin(); it != profiles.end(); ++it)
-        addTarget(*it, new PlaybackProfileConfig(*it));
-    setSaveAll(true);
-
-    connect(addProf, SIGNAL(pressed( QString)),
-            this,    SLOT  (btnPress(QString)));
-    connect(delProf, SIGNAL(pressed( QString)),
-            this,    SLOT  (btnPress(QString)));
-}
-
-PlaybackProfileConfigs::~PlaybackProfileConfigs()
-{
-#if 0
-    LOG(VB_GENERAL, LOG_DEBUG, "~PlaybackProfileConfigs()");
-#endif
-}
-
-void PlaybackProfileConfigs::btnPress(QString cmd)
-{
-    if (cmd == "add")
-    {
-        QString name;
-
-        QString host = gCoreContext->GetHostName();
-        QStringList not_ok_list = VideoDisplayProfile::GetProfiles(host);
-
-        bool ok = true;
-        while (ok)
-        {
-            QString msg = tr("Enter Playback Group Name");
-
-            ok = MythPopupBox::showGetTextPopup(
-                GetMythMainWindow(), msg, msg, name);
-
-            if (!ok)
-                return;
-
-            if (not_ok_list.contains(name) || name.isEmpty())
-            {
-                msg = (name.isEmpty()) ?
-                    tr("Sorry, playback group\nname cannot be blank.") :
-                    tr("Sorry, playback group name\n"
-                       "'%1' is already being used.").arg(name);
-
-                MythPopupBox::showOkPopup(
-                    GetMythMainWindow(), QCoreApplication::translate("(Common)",
-                        "Error"), msg);
-
-                continue;
-            }
-
-            break;
-        }
-
-        VideoDisplayProfile::CreateProfileGroup(name, gCoreContext->GetHostName());
-        addTarget(name, new PlaybackProfileConfig(name));
-
-        if (grouptrigger)
-            grouptrigger->addSelection(name, name, true);
-    }
-    else if ((cmd == "del") && grouptrigger)
-    {
-        const QString name = grouptrigger->getSelectionLabel();
-        if (!name.isEmpty())
-        {
-            removeTarget(name);
-            VideoDisplayProfile::DeleteProfileGroup(
-                name, gCoreContext->GetHostName());
-            // This would be better done in TriggeredConfigurationGroup::removeTarget
-            // however, as removeTarget is used elsewhere, limit the changes to this
-            // case only
-            grouptrigger->setValue(grouptrigger->getSelectionLabel());
-        }
+        grouptrigger->addTargetedChild(*it,
+            new PlaybackProfileConfig(*it, grouptrigger));
     }
 
-    repaint();
+    return grouptrigger;
 }
 
-void PlaybackProfileConfigs::triggerChanged(const QString &trig)
+void PlaybackSettings::NewPlaybackProfileSlot()
 {
-    TriggeredConfigurationGroup::triggerChanged(trig);
+    QString msg = tr("Enter Playback Profile Name");
+
+    MythScreenStack *popupStack =
+        GetMythMainWindow()->GetStack("popup stack");
+
+    MythTextInputDialog *settingdialog =
+        new MythTextInputDialog(popupStack, msg);
+
+    if (settingdialog->Create())
+    {
+        connect(settingdialog, SIGNAL(haveResult(QString)),
+                SLOT(CreateNewPlaybackProfileSlot(const QString&)));
+        popupStack->AddScreen(settingdialog);
+    }
+    else
+        delete settingdialog;
 }
-#endif
+
+void PlaybackSettings::CreateNewPlaybackProfileSlot(const QString &name)
+{
+    QString host = gCoreContext->GetHostName();
+    QStringList not_ok_list = VideoDisplayProfile::GetProfiles(host);
+
+    if (not_ok_list.contains(name) || name.isEmpty())
+    {
+        QString msg = (name.isEmpty()) ?
+            tr("Sorry, playback group\nname cannot be blank.") :
+            tr("Sorry, playback group name\n"
+               "'%1' is already being used.").arg(name);
+
+        ShowOkPopup(msg);
+
+        return;
+    }
+
+    VideoDisplayProfile::CreateProfileGroup(name, gCoreContext->GetHostName());
+    m_playbackProfiles->addTargetedChild(name,
+        new PlaybackProfileConfig(name, m_playbackProfiles));
+
+    m_playbackProfiles->addSelection(name, name, true);
+}
 
 static HostComboBoxSetting *PlayBoxOrdering()
 {
@@ -4224,10 +4082,101 @@ void PlayBackScaling::childChanged(StandardSetting *)
     emit ShouldRedraw(this);
 }
 
+PlaybackSettingsDialog::PlaybackSettingsDialog(MythScreenStack *stack)
+    : StandardSettingDialog(stack, "playbacksettings", new PlaybackSettings())
+{
+}
+
+void PlaybackSettingsDialog::ShowMenu(void)
+{
+    MythUIButtonListItem *item = m_buttonList->GetItemCurrent();
+    if (item)
+    {
+        PlaybackProfileItemConfig *config =
+            item->GetData().value<PlaybackProfileItemConfig*>();
+        if (config)
+            ShowPlaybackProfileMenu(item);
+    }
+}
+
+
+void PlaybackSettingsDialog::ShowPlaybackProfileMenu(MythUIButtonListItem *item)
+{
+    MythMenu *menu = new MythMenu(tr("Playback Profile Menu"), this,
+                                  "mainmenu");
+
+    if (m_buttonList->GetItemPos(item) > 2)
+        menu->AddItem(tr("Move Up"), SLOT(MoveProfileItemUp()));
+    if (m_buttonList->GetItemPos(item) + 1 < m_buttonList->GetCount())
+        menu->AddItem(tr("Move Down"), SLOT(MoveProfileItemDown()));
+
+    menu->AddItem(tr("Delete"), SLOT(DeleteProfileItem()));
+
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+
+    MythDialogBox *menuPopup = new MythDialogBox(menu, popupStack,
+                                                 "menudialog");
+    menuPopup->SetReturnEvent(this, "mainmenu");
+
+    if (menuPopup->Create())
+        popupStack->AddScreen(menuPopup);
+    else
+        delete menuPopup;
+}
+
+void PlaybackSettingsDialog::MoveProfileItemDown(void)
+{
+    MythUIButtonListItem *item = m_buttonList->GetItemCurrent();
+    if (item)
+    {
+        PlaybackProfileItemConfig *config =
+            item->GetData().value<PlaybackProfileItemConfig*>();
+        if (config)
+        {
+            const int currentPos = m_buttonList->GetCurrentPos();
+
+            config->DecreasePriority();
+
+            m_buttonList->SetItemCurrent(currentPos + 1);
+        }
+    }
+}
+
+void PlaybackSettingsDialog::MoveProfileItemUp(void)
+{
+    MythUIButtonListItem *item = m_buttonList->GetItemCurrent();
+    if (item)
+    {
+        PlaybackProfileItemConfig *config =
+            item->GetData().value<PlaybackProfileItemConfig*>();
+        if (config)
+        {
+            const int currentPos = m_buttonList->GetCurrentPos();
+
+            config->IncreasePriority();
+
+            m_buttonList->SetItemCurrent(currentPos - 1);
+        }
+    }
+}
+
+void PlaybackSettingsDialog::DeleteProfileItem(void)
+{
+    PlaybackProfileItemConfig *config =
+        m_buttonList->GetDataValue().value<PlaybackProfileItemConfig*>();
+    if (config)
+        config->ShowDeleteDialog();
+}
+
 PlaybackSettings::PlaybackSettings()
+    : m_newPlaybackProfileButton(NULL),
+      m_playbackProfiles(NULL)
 {
     setLabel(tr("Playback settings"));
+}
 
+void PlaybackSettings::Load(void)
+{
     GroupSetting* general = new GroupSetting();
     general->setLabel(tr("General Playback"));
     general->addChild(RealtimePriority());
@@ -4254,7 +4203,14 @@ PlaybackSettings::PlaybackSettings()
     general->addChild(EndOfRecordingExitPrompt());
     addChild(general);
 
-    addChild(CurrentPlaybackProfile());
+    m_playbackProfiles = CurrentPlaybackProfile();
+    addChild(m_playbackProfiles);
+
+    m_newPlaybackProfileButton =
+        new ButtonStandardSetting(tr("Add a new playback profile"));
+    addChild(m_newPlaybackProfileButton);
+    connect(m_newPlaybackProfileButton, SIGNAL(clicked()),
+            SLOT(NewPlaybackProfileSlot()));
 
     GroupSetting* pbox = new GroupSetting();
     pbox->setLabel(tr("View Recordings"));
@@ -4302,7 +4258,7 @@ PlaybackSettings::PlaybackSettings()
     addChild(comms);
 
 #if CONFIG_DARWIN
-    GroupSetting* mac = new GroupSetting(false);
+    GroupSetting* mac = new GroupSetting();
     mac->setLabel(tr("Mac OS X Video Settings"));
     mac->addChild(MacGammaCorrect());
     mac->addChild(MacScaleUp());
@@ -4312,10 +4268,11 @@ PlaybackSettings::PlaybackSettings()
     mac->addChild(MacFloatEnabled());
     mac->addChild(MacDockEnabled());
     mac->addChild(MacDesktopEnabled());
-    mac->addChild(row);
 
     addChild(mac);
 #endif
+
+    GroupSetting::Load();
 }
 
 OSDSettings::OSDSettings()
