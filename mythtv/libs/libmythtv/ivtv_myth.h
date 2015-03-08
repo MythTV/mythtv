@@ -274,5 +274,7 @@ struct ivtv_sliced_data {
 #define VBI_TYPE_CC       0x4 // Closed Captions (line 21 NTSC, line 22 PAL)
 #define VBI_TYPE_WSS      0x5 // Wide Screen Signal (line 20 NTSC, line 23 PAL)
 #define VBI_TYPE_VPS      0x7 // Video Programming System (PAL) (line 16)
-
+#ifdef ANDROID
+#undef __u64
+#endif
 #endif /* _LINUX_IVTV_H */

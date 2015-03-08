@@ -4230,7 +4230,7 @@ test -n "$cross_prefix" && enable cross_compile
 
 if enabled cross_compile; then
     test -n "$arch" && test -n "$target_os" ||
-        die "Must specify target arch and OS when cross-compiling"
+        die "Must specify target arch/cpu and OS when cross-compiling"
 fi
 
 ar_default="${cross_prefix}${ar_default}"
@@ -6818,6 +6818,9 @@ if enabled taglib; then
         fi
         tagincludes="-I${tagprefix}/include"
         taglibs=`taglib-config --libs`
+        if test $target_os = android ; then
+            taglibs="$taglibs -lz -lm"
+        fi
     fi
 
     if test $taglib_minor -lt 7 || ! check_class_headers_cpp "taglib/fileref.h stdlib.h" TagLib::FileRef $tagincludes $taglibs -lstdc++; then
@@ -8259,6 +8262,16 @@ if enabled source_path_used; then
         libswscale/$arch
         tests
         tools
+        external/zeromq
+        external/nzmqt/src
+        external/libhdhomerun
+        external/libmythbluray
+        external/libmythdvdnav
+        external/libsamplerate
+        external/libudfread
+        external/minilzo
+        external/libmythsoundtouch
+        external/libXNVCtrl
     "
     FILES="
         Makefile
@@ -8273,6 +8286,16 @@ if enabled source_path_used; then
         libavutil/Makefile
         libpostproc/Makefile
         libswscale/Makefile
+        external/zeromq/Makefile
+        external/nzmqt/src/Makefile
+        external/libhdhomerun/Makefile
+        external/libmythbluray/Makefile
+        external/libmythdvdnav/Makefile
+        external/libsamplerate/Makefile
+        external/libudfread/Makefile
+        external/minilzo/Makefile
+        external/libmythsoundtouch/Makefile
+        external/libXNVCtrl/Makefile
     "
     map 'mkdir -p $v' $DIRS;
     map 'test -f "$source_path/$v" && $ln_s "$source_path/$v" $v' $FILES
@@ -8915,7 +8938,7 @@ echo "Configuring minilzo..."
 (cd external/minilzo ; \
        ${qmakeconf} -o Makefile)
 echo "Configuring libmythsoundtouch..."
-(cd external/libmythsoundtouch ; \
+(cd external/libmythsoundtouch ;
        ${qmakeconf} -o Makefile)
 if ! disabled x11 ; then
     echo "Configuring libXNVCtrl..."

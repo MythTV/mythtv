@@ -189,6 +189,10 @@ using_opengl {
     using_opengles {
         DEFINES += USING_OPENGLES
         HEADERS += mythrender_opengl2es.h
+        # For raspberry Pi Raspbian
+        exists(/opt/vc/lib/libbrcmEGL.so) {
+            LIBS += -L/opt/vc/include -lbrcmGLESv2 -lbrcmEGL
+        }
     }
     !using_opengles {
         SOURCES += mythrender_opengl1.cpp

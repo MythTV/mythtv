@@ -28,6 +28,11 @@ using std::min;
 #include "util-nvctrl.h"
 #endif
 
+#ifdef Q_OS_ANDROID
+#include <android/log.h>
+#include <QWindow>
+#endif
+
 static const GLuint kTextureOffset = 8 * sizeof(GLfloat);
 
 static inline int __glCheck__(const QString &loc, const char* fileName, int n)
