@@ -106,8 +106,10 @@ macx {
 }
 
 linux {
+    !android {
     SOURCES += mythcdrom-linux.cpp
     HEADERS += mythcdrom-linux.h
+    }
 }
 
 freebsd {

@@ -8,6 +8,11 @@
 #include "mythdirs.h"
 #include "mythlogging.h"
 
+#ifdef Q_OS_ANDROID
+#include <QStandardPaths>
+#include <sys/statfs.h>
+#endif
+
 static QString installprefix = QString::null;
 static QString appbindir = QString::null;
 static QString sharedir = QString::null;
@@ -81,6 +86,63 @@ void InitializeMythDirs(void)
 
     if (sharedir.length() == 0)
         sharedir = confdir;
+
+#elif defined(Q_OS_ANDROID)
+    if (installprefix.isEmpty())
+        installprefix = QDir( qApp->applicationDirPath() )
+                            .absolutePath();
+    QString extdir = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + "/Mythtv";
+    if (!QDir(extdir).exists())
+        QDir(extdir).mkdir(".");
+
+    if (confdir.isEmpty())
+        confdir = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation);
+
+#if 0
+    // TODO allow choice of base fs or the SD card for data
+    QStringList appLocs = QStandardPaths::standardLocations(QStandardPaths::AppDataLocation);
+    uint64_t maxFreeSpace = 0;
+    for(auto s : appLocs)
+    {
+        struct statfs statFs;
+        memset(&statFs, 0, sizeof(statFs));
+        int ret = statfs(s.toLocal8Bit().data(), &statFs);
+        if (ret == 0 && statFs.f_bavail >= maxFreeSpace)
+        {
+            maxFreeSpace = statFs.f_bavail;
+            confdir = s;
+        }
+        LOG(VB_GENERAL, LOG_NOTICE, QString(" appdatadir      = %1 (%2, %3, %4)")
+            .arg(s)
+            .arg(statFs.f_bavail)
+            .arg(statFs.f_bfree)
+            .arg(statFs.f_bsize));
+    }
+    QStringList cacheLocs = QStandardPaths::standardLocations(QStandardPaths::CacheLocation);
+    maxFreeSpace = 0;
+    for(auto s : cacheLocs)
+    {
+        struct statfs statFs;
+        memset(&statFs, 0, sizeof(statFs));
+        int ret = statfs(s.toLocal8Bit().data(), &statFs);
+        if (ret == 0 && statFs.f_bavail >= maxFreeSpace)
+        {
+            maxFreeSpace = statFs.f_bavail;
+            //confdir = s;
+        }
+        LOG(VB_GENERAL, LOG_NOTICE, QString(" cachedir      = %1 (%2, %3, %4)")
+                                            .arg(s)
+                                            .arg(statFs.f_bavail)
+                                            .arg(statFs.f_bfree)
+                                            .arg(statFs.f_bsize));
+    }
+#endif
+
+    appbindir = installprefix + "/";
+    sharedir  = "assets:/mythtv/";
+    libdir    = installprefix + "/";
+
+
 #else
 
     if (installprefix.length() == 0)
@@ -115,10 +177,17 @@ void InitializeMythDirs(void)
     if (confdir.length() == 0)
         confdir = QDir::homePath() + "/.mythtv";
 
+#if defined(Q_OS_ANDROID)
+    themedir        = sharedir + "themes/";
+    pluginsdir      = libdir;
+    translationsdir = sharedir + "i18n/";
+    filtersdir      = libdir;
+#else
     themedir        = sharedir + "themes/";
     pluginsdir      = libdir   + "plugins/";
     translationsdir = sharedir + "i18n/";
     filtersdir      = libdir   + "filters/";
+#endif
 
     LOG(VB_GENERAL, LOG_NOTICE, "Using runtime prefix = " + installprefix);
     LOG(VB_GENERAL, LOG_NOTICE, QString("Using configuration directory = %1")

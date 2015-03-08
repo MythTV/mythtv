@@ -1114,6 +1114,13 @@ bool OSD::DialogHandleKeypress(QKeyEvent *e)
     return m_Dialog->keyPressEvent(e);
 }
 
+bool OSD::DialogHandleGesture(MythGestureEvent *e)
+{
+    if (!m_Dialog)
+        return false;
+    return m_Dialog->gestureEvent(e);
+}
+
 void OSD::DialogQuit(void)
 {
     if (!m_Dialog)

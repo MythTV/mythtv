@@ -8,6 +8,9 @@
 #include <poll.h>
 #include <sys/ioctl.h>
 #endif
+#ifdef ANDROID
+#include <sys/wait.h>
+#endif
 
 // Qt headers
 #include <QString>

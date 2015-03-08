@@ -31,7 +31,7 @@
 MythCDROM* MythCDROM::get(QObject* par, const char* devicePath,
                           bool SuperMount, bool AllowEject)
 {
-#ifdef linux
+#if defined(linux) && !defined(Q_OS_ANDROID)
     return GetMythCDROMLinux(par, devicePath, SuperMount, AllowEject);
 #elif defined(__FreeBSD__)
     return GetMythCDROMFreeBSD(par, devicePath, SuperMount, AllowEject);

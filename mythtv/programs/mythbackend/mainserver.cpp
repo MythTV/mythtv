@@ -3209,6 +3209,9 @@ void MainServer::HandleQueryLoad(PlaybackSock *pbs)
 
     QStringList strlist;
 
+#ifdef Q_OS_ANDROID
+    strlist << "0" << "0" << "0";
+#else
     double loads[3];
     if (getloadavg(loads,3) == -1)
     {
@@ -3219,6 +3222,7 @@ void MainServer::HandleQueryLoad(PlaybackSock *pbs)
         strlist << QString::number(loads[0])
                 << QString::number(loads[1])
                 << QString::number(loads[2]);
+#endif
 
     SendResponse(pbssock, strlist);
 }

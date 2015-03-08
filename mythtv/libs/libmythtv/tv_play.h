@@ -372,7 +372,11 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     void PlaybackLoop(void);
 
     // Private event handling
-    bool ProcessKeypress(PlayerContext*, QKeyEvent *e);
+    bool ProcessKeypressOrGesture(PlayerContext*, QEvent *e);
+    bool TranslateKeyPressOrGesture(const QString &context, QEvent *e,
+                                    QStringList &actions, bool allowJumps = true);
+    bool TranslateGesture(const QString &context, MythGestureEvent *e,
+                          QStringList &actions);
     void ProcessNetworkControlCommand(PlayerContext *, const QString &command);
 
     bool HandleTrackAction(PlayerContext*, const QString &action);

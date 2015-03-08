@@ -85,14 +85,20 @@ MythRenderOpenGL* MythRenderOpenGL::Create(const QString &painter,
     if (setswapinterval)
         format.setSwapInterval(1);
 
+#if ANDROID
+    int openGLVersionFlags = QGLFormat::OpenGL_ES_Version_2_0;
+    LOG(VB_GENERAL, LOG_INFO, "opengl es2  forced for Android");
+#else
     // Check OpenGL version supported
     QGLWidget *dummy = new QGLWidget;
     dummy->makeCurrent();
     QGLFormat qglFormat = dummy->format();
+    int openGLVersionFlags = qglFormat.openGLVersionFlags();
     delete dummy;
+#endif
 
 #ifdef USING_OPENGLES
-    if (!(qglFormat.openGLVersionFlags() & QGLFormat::OpenGL_ES_Version_2_0))
+    if (!(openGLVersionFlags & QGLFormat::OpenGL_ES_Version_2_0))
     {
         LOG(VB_GENERAL, LOG_WARNING,
             "Using OpenGL ES 2.0 render, however OpenGL ES 2.0 "
@@ -102,7 +108,7 @@ MythRenderOpenGL* MythRenderOpenGL::Create(const QString &painter,
         return new MythRenderOpenGL2ES(format, device);
     return new MythRenderOpenGL2ES(format);
 #else
-    if ((qglFormat.openGLVersionFlags() & QGLFormat::OpenGL_Version_2_0) &&
+    if ((openGLVersionFlags & QGLFormat::OpenGL_Version_2_0) &&
         (painter.contains(OPENGL2_PAINTER) || painter.contains(AUTO_PAINTER) ||
          painter.isEmpty()))
     {
@@ -113,7 +119,7 @@ MythRenderOpenGL* MythRenderOpenGL::Create(const QString &painter,
         return new MythRenderOpenGL2(format);
     }
 
-    if (!(qglFormat.openGLVersionFlags() & QGLFormat::OpenGL_Version_1_2))
+    if (!(openGLVersionFlags & QGLFormat::OpenGL_Version_1_2))
     {
         LOG(VB_GENERAL, LOG_WARNING, "OpenGL 1.2 not supported, get new hardware!");
         return NULL;
@@ -1275,12 +1281,18 @@ void MythRenderOpenGL::GetCachedVBO(GLuint type, const QRect &area)
         m_vboExpiry.append(ref);
 
         m_glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        m_glBufferData(GL_ARRAY_BUFFER, kTextureOffset, NULL, GL_STREAM_DRAW);
-        void* target = m_glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-        if (target)
-            memcpy(target, vertices, kTextureOffset);
-        m_glUnmapBuffer(GL_ARRAY_BUFFER);
-
+        if (m_exts_used & kGLExtPBufObj)
+        {
+            m_glBufferData(GL_ARRAY_BUFFER, kTextureOffset, NULL, GL_STREAM_DRAW);
+            void* target = m_glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+            if (target)
+                memcpy(target, vertices, kTextureOffset);
+            m_glUnmapBuffer(GL_ARRAY_BUFFER);
+        }
+        else
+        {
+            m_glBufferData(GL_ARRAY_BUFFER, kTextureOffset, vertices, GL_STREAM_DRAW);
+        }
         ExpireVBOS(MAX_VERTEX_CACHE);
         return;
     }

@@ -1231,7 +1231,7 @@ void StatusBox::doMachineStatus()
     // weighted average loads
     line.append(".   " + tr("Load") + ": ");
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(Q_OS_ANDROID)
     line.append(tr("unknown") + " - getloadavg() " + tr("failed"));
 #else // if !_WIN32
     double loads[3];

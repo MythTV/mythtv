@@ -3,6 +3,7 @@ include ( ../../settings.pro )
 QT += network xml sql script
 contains(QT_VERSION, ^5\\.[0-9]\\..*) {
 QT += widgets
+android: QT += androidextras
 }
 
 TEMPLATE = lib
@@ -164,11 +165,18 @@ using_pulse {
 unix:!cygwin {
     SOURCES += mediamonitor-unix.cpp
     HEADERS += mediamonitor-unix.h
+    !android {
     contains(QT_VERSION, ^5\\.[0-9]\\..*) {
         using_qtdbus: QT += dbus
     } else {
         using_qtdbus: CONFIG += qdbus
     }
+    }
+}
+
+android {
+SOURCES += audio/audiooutputopensles.cpp
+HEADERS += audio/audiooutputopensles.h
 }
 
 linux:DEFINES += linux
@@ -241,3 +249,6 @@ use_hidesyms {
 include ( ../libs-targetfix.pro )
 
 LIBS += $$EXTRA_LIBS $$LATE_LIBS
+
+DISTFILES += \
+    Makefile

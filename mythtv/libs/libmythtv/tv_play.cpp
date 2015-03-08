@@ -1362,7 +1362,11 @@ TV::~TV(void)
     mwnd->setGeometry(saved_gui_bounds);
     mwnd->setFixedSize(saved_gui_bounds.size());
     mwnd->ResizePainterWindow(saved_gui_bounds.size());
+#ifdef Q_OS_ANDROID
+    mwnd->Show();
+#else
     mwnd->show();
+#endif
     if (!db_use_gui_size_for_tv)
         mwnd->move(saved_gui_bounds.topLeft());
 
@@ -3607,6 +3611,8 @@ bool TV::eventFilter(QObject *o, QEvent *e)
     // screen (e.g. GuideGrid, ProgramFinder)
     if (QEvent::KeyPress == e->type())
         return ignoreKeyPresses ? false : event(e);
+    if (MythGestureEvent::kEventType == e->type())
+        return ignoreKeyPresses ? false : event(e);
 
     if (e->type() == MythEvent::MythEventMessage ||
         e->type() == MythEvent::MythUserMessage  ||
@@ -3645,12 +3651,30 @@ bool TV::event(QEvent *e)
         return true;
     }
 
-    if (QEvent::KeyPress == e->type())
+    if (QEvent::KeyPress == e->type() ||
+        MythGestureEvent::kEventType == e->type())
     {
+#if DEBUG_ACTIONS
+        if (QEvent::KeyPress == e->type())
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("keypress: %1 '%2'")
+                    .arg(((QKeyEvent*)e)->key())
+                    .arg(((QKeyEvent*)e)->text()));
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("mythgesture: g:%1 pos:%2,%3 b:%4")
+                    .arg(((MythGestureEvent*)e)->gesture())
+                    .arg(((MythGestureEvent*)e)->GetPosition().x())
+                    .arg(((MythGestureEvent*)e)->GetPosition().y())
+                    .arg(((MythGestureEvent*)e)->GetButton())
+                    );
+        }
+#endif // DEBUG_ACTIONS
         bool handled = false;
         PlayerContext *actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
         if (actx->HasPlayer())
-            handled = ProcessKeypress(actx, (QKeyEvent *)e);
+            handled = ProcessKeypressOrGesture(actx, e);
         ReturnPlayerLock(actx);
         if (handled)
             return true;
@@ -3814,7 +3838,75 @@ static bool SysEventHandleAction(QKeyEvent *e, const QStringList &actions)
     return false;
 }
 
-bool TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
+bool TV::TranslateGesture(const QString &context,
+                          MythGestureEvent *e, QStringList &actions)
+{
+    if (context == "TV Playback")
+    {
+        // TODO make this configuable via a similar mechanism to
+        //      TranslateKeyPress
+        // possibly with configurable hot zones of various sizes in a theme
+        // TODO enhance gestures to support other non Click types too
+        if ((e->gesture() == MythGestureEvent::Click) &&
+            (e->GetButton() == MythGestureEvent::LeftButton))
+        {
+            // divide screen into 9 regions
+            QSize size = GetMythMainWindow()->size();
+            QPoint pos = e->GetPosition();
+            int region = 0;
+            int w3 = size.width() / 3;
+            if (pos.x() >= w3)
+                region++;
+            if (pos.x() >= w3 * 2)
+                region++;
+            int h3 = size.height() / 3;
+            if (pos.y() >= h3)
+                region += 3;
+            if (pos.y() >= h3 * 2)
+                region += 3;
+
+            // region is now 0..8
+            //  0 1 2
+            //  3 4 5
+            //  6 7 8
+            // should be inited in the constructor eventually
+            QStringList regionActionList =
+            {
+                /* 0 */ "PAUSE",
+                /* 1 */ "UP",
+                /* 2 */ "VOLUMEUP",
+                /* 3 */ "LEFT",
+                /* 4 */ "SELECT",
+                /* 5 */ "RIGHT",
+                /* 6 */ "ADJUSTSTRETCH",
+                /* 7 */ "DOWN",
+                /* 8 */ "VOLUMEDOWN",
+            };
+            actions.append(regionActionList[region]);
+        }
+        return false;
+    }
+    return false;
+}
+
+bool TV::TranslateKeyPressOrGesture(const QString &context,
+                                    QEvent *e, QStringList &actions,
+                                    bool allowJumps)
+{
+    if (QEvent::KeyPress == e->type())
+    {
+        return GetMythMainWindow()->TranslateKeyPress(
+                    context, (QKeyEvent*)e, actions, allowJumps);
+    }
+    if (MythGestureEvent::kEventType == e->type())
+    {
+        return TranslateGesture(context, (MythGestureEvent*)e, actions);
+    }
+
+    return false;
+}
+
+bool TV::ProcessKeypressOrGesture(PlayerContext *actx, QEvent *e)
 {
     bool ignoreKeys = actx->IsPlayerChangingBuffers();
 #if DEBUG_ACTIONS
@@ -3830,11 +3922,13 @@ bool TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
 
     QStringList actions;
     bool handled = false;
+    bool alreadyTranslatedPlayback = false;
 
     if (ignoreKeys)
     {
-        handled = GetMythMainWindow()->TranslateKeyPress(
+        handled = TranslateKeyPressOrGesture(
                   "TV Playback", e, actions);
+        alreadyTranslatedPlayback = true;
 
         if (handled || actions.isEmpty())
             return true;
@@ -3851,14 +3945,21 @@ bool TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
     OSD *osd = GetOSDLock(actx);
     if (osd && osd->DialogVisible())
     {
-        osd->DialogHandleKeypress(e);
+        if (QEvent::KeyPress == e->type())
+        {
+            osd->DialogHandleKeypress((QKeyEvent*)e);
+        }
+        if (MythGestureEvent::kEventType == e->type())
+        {
+            osd->DialogHandleGesture((MythGestureEvent*)e);
+        }
         handled = true;
     }
     ReturnOSDLock(actx, osd);
 
     if (editmode && !handled)
     {
-        handled |= GetMythMainWindow()->TranslateKeyPress(
+        handled |= TranslateKeyPressOrGesture(
                    "TV Editing", e, actions);
 
         if (!handled && actx->player)
@@ -3911,15 +4012,18 @@ bool TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
 
     // If text is already queued up, be more lax on what is ok.
     // This allows hex teletext entry and minor channel entry.
-    const QString txt = e->text();
-    if (HasQueuedInput() && (1 == txt.length()))
+    if (QEvent::KeyPress == e->type())
     {
-        bool ok = false;
-        txt.toInt(&ok, 16);
-        if (ok || txt=="_" || txt=="-" || txt=="#" || txt==".")
+        const QString txt = ((QKeyEvent*)e)->text();
+        if (HasQueuedInput() && (1 == txt.length()))
         {
-            AddKeyToInputQueue(actx, txt.at(0).toLatin1());
-            return true;
+            bool ok = false;
+            txt.toInt(&ok, 16);
+            if (ok || txt=="_" || txt=="-" || txt=="#" || txt==".")
+            {
+                AddKeyToInputQueue(actx, txt.at(0).toLatin1());
+                return true;
+            }
         }
     }
 
@@ -3928,7 +4032,7 @@ bool TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
     if (actx->player && (actx->player->GetCaptionMode() == kDisplayTeletextMenu))
     {
         QStringList tt_actions;
-        handled = GetMythMainWindow()->TranslateKeyPress(
+        handled = TranslateKeyPressOrGesture(
                   "Teletext Menu", e, tt_actions);
 
         if (!handled && !tt_actions.isEmpty())
@@ -3947,15 +4051,17 @@ bool TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
     // Interactive television
     if (actx->player && actx->player->GetInteractiveTV())
     {
-        QStringList itv_actions;
-        handled = GetMythMainWindow()->TranslateKeyPress(
-                  "TV Playback", e, itv_actions);
-
-        if (!handled && !itv_actions.isEmpty())
+        if (!alreadyTranslatedPlayback)
         {
-            for (int i = 0; i < itv_actions.size(); i++)
+            handled = TranslateKeyPressOrGesture(
+                      "TV Playback", e, actions);
+            alreadyTranslatedPlayback = true;
+        }
+        if (!handled && !actions.isEmpty())
+        {
+            for (int i = 0; i < actions.size(); i++)
             {
-                if (actx->player->ITVHandleAction(itv_actions[i]))
+                if (actx->player->ITVHandleAction(actions[i]))
                 {
                     actx->UnlockDeletePlayer(__FILE__, __LINE__);
                     return true;
@@ -3965,9 +4071,11 @@ bool TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
     }
     actx->UnlockDeletePlayer(__FILE__, __LINE__);
 
-    handled = GetMythMainWindow()->TranslateKeyPress(
-              "TV Playback", e, actions);
-
+    if (!alreadyTranslatedPlayback)
+    {
+        handled = TranslateKeyPressOrGesture(
+                  "TV Playback", e, actions);
+    }
     if (handled || actions.isEmpty())
         return true;
 
@@ -3976,7 +4084,10 @@ bool TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
     bool isDVD = actx->buffer && actx->buffer->IsDVD();
     bool isMenuOrStill = actx->buffer && actx->buffer->IsInDiscMenuOrStillFrame();
 
-    handled = handled || SysEventHandleAction(e, actions);
+    if (QEvent::KeyPress == e->type())
+    {
+        handled = handled || SysEventHandleAction((QKeyEvent*)e, actions);
+    }
     handled = handled || BrowseHandleAction(actx, actions);
     handled = handled || ManualZoomHandleAction(actx, actions);
     handled = handled || PictureAttributeHandleAction(actx, actions);
