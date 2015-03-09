@@ -260,8 +260,12 @@ avfDecoder::~avfDecoder(void)
 
     if (m_inited)
         deinit();
+
     if (m_outputBuffer)
         av_freep(&m_outputBuffer);
+
+    if (m_inputContext)
+        delete m_inputContext;
 }
 
 void avfDecoder::stop()
@@ -299,10 +303,8 @@ bool avfDecoder::initialize()
 
     m_inputContext = new RemoteAVFormatContext(getURL());
 
-    if (!m_inputContext->getContext())
+    if (!m_inputContext->isOpen())
     {
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("Could not open url (%1)").arg(m_url));
         error(QString("Could not open url  (%1)").arg(m_url));
         deinit();
         return false;
