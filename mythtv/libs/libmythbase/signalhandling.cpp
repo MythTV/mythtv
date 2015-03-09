@@ -170,7 +170,7 @@ void SignalHandler::SetHandlerPrivate(int signum, SigHandlerFunc handler)
         sa_handler_already_set = m_sigMap.contains(signum);
         if (m_sigMap.value(signum, NULL) && (handler != NULL))
         {
-            LOG(VB_GENERAL, LOG_WARNING, 
+            LOG(VB_GENERAL, LOG_WARNING,
                 QString("Warning %1 signal handler overridden")
                 .arg(signal_name));
         }

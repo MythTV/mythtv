@@ -55,7 +55,7 @@ class MythDeque : public deque<T>
                 return it;
         return deque<T>::end();
     }
-    
+
     /// \brief Removes any item from list. O(n).
     void remove(T const item)
     {

@@ -16,4 +16,3 @@ bool CodecUtil::isValidUTF8(const QByteArray& data)
 
     return true;
 }
-

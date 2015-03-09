@@ -6,4 +6,3 @@
 //
 
 #include "mythtypes.h"
-

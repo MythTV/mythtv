@@ -73,7 +73,7 @@ class MBASE_PUBLIC MDBManager
     QMutex m_lock;
     typedef QList<MSqlDatabase*> DBList;
     QHash<QThread*, DBList> m_pool; // protected by m_lock
-#if REUSE_CONNECTION 
+#if REUSE_CONNECTION
     QHash<QThread*, MSqlDatabase*> m_inuse; // protected by m_lock
     QHash<QThread*, int> m_inuse_count; // protected by m_lock
 #endif
@@ -167,7 +167,7 @@ class MBASE_PUBLIC MSqlQuery : private QSqlQuery
     /** \brief Return the id of the last inserted row
      *
      * Note: Currently, this function is only implemented in Qt4 (in QSqlQuery
-     * and QSqlResult) 
+     * and QSqlResult)
      * The current implementation will only work for a DBMS that supports
      * the function LAST_INSERT_ID() (i.e. MySQL), and will _not_ work
      * in SQLite.

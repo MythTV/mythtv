@@ -212,7 +212,7 @@ MythDBBackupStatus DBUtil::BackupDB(QString &filename, bool disableRotation)
 
     if (gCoreContext->GetNumSetting("DisableAutomaticBackup", 0))
     {
-        LOG(VB_GENERAL, LOG_CRIT, 
+        LOG(VB_GENERAL, LOG_CRIT,
             "Database backups disabled.  Skipping backup.");
         return kDB_Backup_Disabled;
     }
@@ -364,7 +364,7 @@ bool DBUtil::RepairTables(const QStringList &tables)
     bool result = true;
     if (!bad_tables.empty())
     {
-        LOG(VB_GENERAL, LOG_CRIT, 
+        LOG(VB_GENERAL, LOG_CRIT,
             QString("Unable to repair crashed table(s): %1")
                 .arg(bad_tables.join(", ")));
         result = false;
@@ -767,7 +767,7 @@ bool DBUtil::QueryDBMSVersion(void)
         query.prepare("SELECT VERSION();");
         if (!query.exec() || !query.next())
         {
-            LOG(VB_GENERAL, LOG_ERR, LOC + 
+            LOG(VB_GENERAL, LOG_ERR, LOC +
                 "Unable to determine MySQL version.");
             MythDB::DBError("DBUtil Querying DBMS version", query);
             dbmsVersion = QString::null;

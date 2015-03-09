@@ -45,17 +45,17 @@ MythMediaError MythCDROMFreeBSD::eject(bool open_close)
 MythMediaError MythCDROMFreeBSD::testMedia()
 {
     bool OpenedHere = false;
-    if (!isDeviceOpen()) 
+    if (!isDeviceOpen())
     {
-        if (!openDevice()) 
+        if (!openDevice())
         {
             if (errno == EBUSY)
             {
                 return isMounted() ? MEDIAERR_OK : MEDIAERR_FAILED;
-            } 
-            else 
-            { 
-                return MEDIAERR_FAILED; 
+            }
+            else
+            {
+                return MEDIAERR_FAILED;
             }
         }
         OpenedHere = true;
@@ -68,7 +68,7 @@ MythMediaError MythCDROMFreeBSD::testMedia()
     return MEDIAERR_OK;
 }
 
-MythMediaError MythCDROMFreeBSD::lock() 
+MythMediaError MythCDROMFreeBSD::lock()
 {
     MythMediaError ret = MythMediaDevice::lock();
     if (ret == MEDIAERR_OK)
@@ -77,10 +77,10 @@ MythMediaError MythCDROMFreeBSD::lock()
     return ret;
 }
 
-MythMediaError MythCDROMFreeBSD::unlock() 
+MythMediaError MythCDROMFreeBSD::unlock()
 {
-    if (isDeviceOpen() || openDevice()) 
-    { 
+    if (isDeviceOpen() || openDevice())
+    {
 #if 0
         LOG(VB_GENERAL, LOG_DEBUG, "Unlocking CDROM door");
 #endif

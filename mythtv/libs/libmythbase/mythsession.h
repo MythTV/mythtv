@@ -90,7 +90,7 @@ class MBASE_PUBLIC MythSessionManager
   public :
     MythSessionManager();
    ~MythSessionManager();
-   
+
     /**
      * \brief Check if the given user exists but not whether there is a valid
      *        session open for them!

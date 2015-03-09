@@ -1902,7 +1902,7 @@ bool MythCoreContext::TestPluginVersion(const QString &name,
     if (libversion == pluginversion)
         return true;
 
-    LOG(VB_GENERAL, LOG_EMERG, LOC + 
+    LOG(VB_GENERAL, LOG_EMERG, LOC +
              QString("Plugin %1 (%2) binary version does not "
                      "match libraries (%3)")
                  .arg(name).arg(pluginversion).arg(libversion));

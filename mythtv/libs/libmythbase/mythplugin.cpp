@@ -162,7 +162,7 @@ bool MythPluginManager::init_plugin(const QString &plugname)
     {
         delete m_dict[newname];
         m_dict.remove(newname);
-        LOG(VB_GENERAL, LOG_ERR, 
+        LOG(VB_GENERAL, LOG_ERR,
                  QString("Unable to initialize plugin '%1'.") .arg(plugname));
         return false;
     }
@@ -263,4 +263,3 @@ QStringList MythPluginManager::EnumeratePlugins(void)
         ret << (*it)->getName();
     return ret;
 }
-

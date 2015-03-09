@@ -50,8 +50,8 @@ extern "C" {
 #endif
 
 /* Define the external prototype */
-MBASE_PUBLIC void LogPrintLine( uint64_t mask, LogLevel_t level, 
-                                const char *file, int line, 
+MBASE_PUBLIC void LogPrintLine( uint64_t mask, LogLevel_t level,
+                                const char *file, int line,
                                 const char *function, int fromQString,
                                 const char *format, ... );
 
@@ -82,7 +82,7 @@ MBASE_PUBLIC int verboseArgParse(QString arg);
 /// Verbose helper function for ENO macro
 MBASE_PUBLIC QString logStrerror(int errnum);
 
-/// This can be appended to the LOG args with 
+/// This can be appended to the LOG args with
 /// "+".  Please do not use "<<".  It uses
 /// a thread safe version of strerror to produce the
 /// string representation of errno and puts it on the

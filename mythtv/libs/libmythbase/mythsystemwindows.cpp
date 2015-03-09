@@ -107,7 +107,7 @@ void MythSystemLegacyIOHandler::run(void)
                 m_pLock.unlock();
                 break;
             }
-            
+
             bool datafound = true;
             m_pLock.unlock();
 
@@ -309,7 +309,7 @@ void MythSystemLegacyManager::run(void)
         LOG(VB_SYSTEM, LOG_INFO,
                 QString("Managed child (Handle: %1) has exited! "
                         "command=%2, status=%3, result=%4")
-                .arg((long long)child) .arg(ms->GetLogCmd()) .arg(status) 
+                .arg((long long)child) .arg(ms->GetLogCmd()) .arg(status)
                 .arg(ms->GetStatus()));
 
         // loop through running processes for any that require action
@@ -358,7 +358,7 @@ void MythSystemLegacyManager::run(void)
 
         m_mapLock.unlock();
 
-        // hold off unlocking until all the way down here to 
+        // hold off unlocking until all the way down here to
         // give the buffer handling a chance to run before
         // being closed down by signal thread
         listLock.unlock();
@@ -386,7 +386,7 @@ void MythSystemLegacyManager::ChildListRebuild()
     if ( oldCount != m_childCount )
     {
         HANDLE *new_children;
-        new_children = (HANDLE *)realloc(m_children, 
+        new_children = (HANDLE *)realloc(m_children,
                                          m_childCount * sizeof(HANDLE));
         if (!new_children && m_childCount)
         {
@@ -597,7 +597,7 @@ void MythSystemLegacyWindows::Signal( int sig )
 #define MAX_BUFLEN 1024
 void MythSystemLegacyWindows::Fork(time_t timeout)
 {
-	BOOL bInherit = FALSE;
+    BOOL bInherit = FALSE;
 
     QString LOC_ERR = QString("myth_system('%1'): Error: ").arg(GetLogCmd());
 
@@ -607,30 +607,30 @@ void MythSystemLegacyWindows::Fork(time_t timeout)
     HANDLE p_stdout[2] = { NULL, NULL };
     HANDLE p_stderr[2] = { NULL, NULL };
 
-    SECURITY_ATTRIBUTES saAttr; 
+    SECURITY_ATTRIBUTES saAttr;
     STARTUPINFO si;
 
     ZeroMemory(&si, sizeof(STARTUPINFO));
     si.cb = sizeof(STARTUPINFO);
-        
-    // Set the bInheritHandle flag so pipe handles are inherited. 
-    saAttr.nLength = sizeof(SECURITY_ATTRIBUTES); 
-    saAttr.bInheritHandle = true; 
-    saAttr.lpSecurityDescriptor = NULL; 
+
+    // Set the bInheritHandle flag so pipe handles are inherited.
+    saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
+    saAttr.bInheritHandle = true;
+    saAttr.lpSecurityDescriptor = NULL;
 
     /* set up pipes */
     if( GetSetting("UseStdin") )
     {
-		bInherit = TRUE;
+        bInherit = TRUE;
 
-        if (!CreatePipe(&p_stdin[0], &p_stdin[1], &saAttr, 0)) 
+        if (!CreatePipe(&p_stdin[0], &p_stdin[1], &saAttr, 0))
         {
             LOG(VB_GENERAL, LOG_ERR, LOC_ERR + "stdin pipe() failed");
             SetStatus( GENERIC_EXIT_NOT_OK );
         }
         else
         {
-            // Ensure the write handle to the pipe for STDIN is not inherited. 
+            // Ensure the write handle to the pipe for STDIN is not inherited.
             if (!SetHandleInformation(p_stdin[1], HANDLE_FLAG_INHERIT, 0))
             {
                 LOG(VB_SYSTEM, LOG_ERR, LOC_ERR + "stdin inheritance error");
@@ -646,9 +646,9 @@ void MythSystemLegacyWindows::Fork(time_t timeout)
 
     if( GetSetting("UseStdout") )
     {
-		bInherit = TRUE;
+        bInherit = TRUE;
 
-        if (!CreatePipe(&p_stdout[0], &p_stdout[1], &saAttr, 0)) 
+        if (!CreatePipe(&p_stdout[0], &p_stdout[1], &saAttr, 0))
         {
             LOG(VB_SYSTEM, LOG_ERR, LOC_ERR + "stdout pipe() failed");
             SetStatus( GENERIC_EXIT_NOT_OK );
@@ -671,9 +671,9 @@ void MythSystemLegacyWindows::Fork(time_t timeout)
 
     if( GetSetting("UseStderr") )
     {
-		bInherit = TRUE;
+        bInherit = TRUE;
 
-        if (!CreatePipe(&p_stderr[0], &p_stderr[1], &saAttr, 0)) 
+        if (!CreatePipe(&p_stderr[0], &p_stderr[1], &saAttr, 0))
         {
             LOG(VB_SYSTEM, LOG_ERR, LOC_ERR + "stderr pipe() failed");
             SetStatus( GENERIC_EXIT_NOT_OK );
@@ -702,8 +702,8 @@ void MythSystemLegacyWindows::Fork(time_t timeout)
 
     SetCommand( cmd );
 
-	QString sCmd = GetCommand();
-    
+    QString sCmd = GetCommand();
+
     QString dir = GetDirectory();
 
     PROCESS_INFORMATION pi;
@@ -718,15 +718,15 @@ void MythSystemLegacyWindows::Fork(time_t timeout)
         pDir = (LPCWSTR)dir.utf16();
 
     bool success = CreateProcess( NULL,
-                    (LPWSTR)sCmd.utf16(),       // command line 
-                    NULL,          // process security attributes 
-                    NULL,          // primary thread security attributes 
-                    bInherit,      // handles are inherited
-                    0,             // creation flags 
-                    NULL,          // use parent's environment 
-                    pDir,          // use parent's current directory
-                   &si,            // STARTUPINFO pointer 
-                   &pi);           // receives PROCESS_INFORMATION 
+                          (LPWSTR)sCmd.utf16(),       // command line
+                          NULL,          // process security attributes
+                          NULL,          // primary thread security attributes
+                          bInherit,      // handles are inherited
+                          0,             // creation flags
+                          NULL,          // use parent's environment
+                          pDir,          // use parent's current directory
+                          &si,            // STARTUPINFO pointer
+                          &pi);           // receives PROCESS_INFORMATION
 
     if (!success)
     {
@@ -746,7 +746,7 @@ void MythSystemLegacyWindows::Fork(time_t timeout)
         LOG(VB_SYSTEM, LOG_INFO,
                 QString("Managed child (Handle: %1) has started! "
                         "%2%3 command=%4, timeout=%5")
-                    .arg((long long)m_child) 
+                    .arg((long long)m_child)
                     .arg(GetSetting("UseShell") ? "*" : "")
                     .arg(GetSetting("RunInBackground") ? "&" : "")
                     .arg(GetLogCmd()) .arg(timeout));

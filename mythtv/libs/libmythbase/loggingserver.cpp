@@ -233,7 +233,7 @@ bool FileLogger::logmsg(LoggingItem *item)
     }
 
     if( item->tid() )
-        snprintf( line, MAX_STRING_LENGTH, 
+        snprintf( line, MAX_STRING_LENGTH,
                   "%s %c [%d/%" PREFIX64 "d] %s %s:%d (%s) - %s\n",
                   timestamp, shortname, item->pid(), item->tid(),
                   item->rawThreadName(), item->rawFile(), item->line(),
@@ -286,7 +286,7 @@ bool FileLogger::setupZMQSocket(void)
 #ifndef _WIN32
 /// \brief SyslogLogger constructor
 /// \param facility Syslog facility to use in logging
-SyslogLogger::SyslogLogger() : 
+SyslogLogger::SyslogLogger() :
     LoggerBase(NULL), m_opened(false), m_zmqSock(NULL)
 {
     openlog(NULL, LOG_NDELAY, 0 );
@@ -1323,7 +1323,7 @@ void LogForwardThread::forwardMessage(LogMessage *msg)
     for (; it != msg->end(); ++it, i++)
     {
         QByteArray buf = *it;
-        cout << i << ":\t" << buf.size() << endl << "\t" 
+        cout << i << ":\t" << buf.size() << endl << "\t"
              << buf.toHex().constData() << endl << "\t"
              << buf.constData() << endl;
     }

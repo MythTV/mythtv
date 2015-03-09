@@ -51,4 +51,3 @@ class MBASE_PUBLIC MythLocale
 };
 
 #endif
-

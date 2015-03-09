@@ -59,7 +59,7 @@
     // Turn off the visual studio warnings (identifier was truncated)
     #pragma warning(disable:4786)
 
-    #ifdef restrict 
+    #ifdef restrict
     #undef restrict
     #endif
 
@@ -93,7 +93,7 @@
     #endif
 
     #define getpid()                _getpid()
-    #define ftruncate( fd, fsize )  _chsize( fd, fsize ) 
+    #define ftruncate( fd, fsize )  _chsize( fd, fsize )
 
     #ifndef S_ISCHR
     #   ifdef S_IFCHR
@@ -105,11 +105,11 @@
 
     #ifndef S_ISBLK
     #   define S_ISBLK(m) 0
-    #endif 
+    #endif
 
     #ifndef S_ISREG
     #   define S_ISREG(m) 1
-    #endif 
+    #endif
 
     #ifndef S_ISDIR
     #  ifdef S_IFDIR
@@ -117,7 +117,7 @@
     #   else
     #       define S_ISDIR(m) 0
     #   endif
-    #endif 
+    #endif
 
     typedef uint32_t   mode_t;
 
@@ -180,7 +180,7 @@
 
         return -1;
     }
-#endif 
+#endif
 
 #ifdef _WIN32
 #define lstat stat
@@ -269,7 +269,7 @@ static __inline struct tm *gmtime_r(const time_t *timep, struct tm *result)
     }
     return NULL;
 }
-#endif 
+#endif
 
 #if defined(_WIN32) && !defined(localtime_r)
 // FFmpeg libs already have a workaround, use it if the headers are included,
@@ -355,7 +355,7 @@ static __inline struct tm *localtime_r(const time_t *timep, struct tm *result)
 #include <stdio.h> /* for FILENAME_MAX */
 #endif
 
-#if defined(USING_MINGW) && defined(FILENAME_MAX) 
+#if defined(USING_MINGW) && defined(FILENAME_MAX)
 #    include <errno.h>
 #    include <dirent.h>
 #    include <string.h>

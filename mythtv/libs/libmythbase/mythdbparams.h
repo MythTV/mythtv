@@ -44,4 +44,3 @@ class MBASE_PUBLIC DatabaseParams
 };
 
 #endif
-

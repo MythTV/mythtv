@@ -268,14 +268,14 @@ int MythCDROMLinux::SCSIstatus()
 
     if (es->media_present)
     {
-        LOG(VB_MEDIA, LOG_DEBUG, LOC + 
+        LOG(VB_MEDIA, LOG_DEBUG, LOC +
             ":SCSIstatus() - ioctl said tray was open, "
             "but drive is actually closed with a disc");
         return CDS_DISC_OK;
     }
     else if (es->door_open)
     {
-        LOG(VB_MEDIA, LOG_DEBUG, LOC + 
+        LOG(VB_MEDIA, LOG_DEBUG, LOC +
             ":SCSIstatus() - tray is definitely open");
         return CDS_TRAY_OPEN;
     }
@@ -355,7 +355,7 @@ MythMediaError MythCDROMLinux::testMedia()
 
     if (Stat == -1)
     {
-        LOG(VB_MEDIA, LOG_DEBUG, LOC + 
+        LOG(VB_MEDIA, LOG_DEBUG, LOC +
             ":testMedia - Failed to get drive status of '" + m_DevicePath +
             "' : " + ENO);
         return MEDIAERR_FAILED;
@@ -376,7 +376,7 @@ MythMediaStatus MythCDROMLinux::checkMedia()
 
         if (!OpenedHere)
         {
-            LOG(VB_MEDIA, LOG_ERR, LOC + 
+            LOG(VB_MEDIA, LOG_ERR, LOC +
                 ":checkMedia() - cannot open device '" + m_DevicePath + "' : " +
                 ENO + "- returning UNKNOWN");
             m_MediaType = MEDIATYPE_UNKNOWN;
@@ -407,7 +407,7 @@ MythMediaStatus MythCDROMLinux::checkMedia()
             break;
         case CDS_NO_INFO:
         case CDS_DRIVE_NOT_READY:
-            LOG(VB_MEDIA, LOG_DEBUG, m_DevicePath + 
+            LOG(VB_MEDIA, LOG_DEBUG, m_DevicePath +
                                      " No info or drive not ready");
             m_MediaType = MEDIATYPE_UNKNOWN;
             return setStatus(MEDIASTAT_UNKNOWN, OpenedHere);
@@ -693,7 +693,7 @@ void MythCDROMLinux::setDeviceSpeed(const char *device, int speed)
 
     if ((fd = open(device, O_RDWR | O_NONBLOCK)) == -1)
     {
-        LOG(VB_MEDIA, LOG_ERR, LOC + 
+        LOG(VB_MEDIA, LOG_ERR, LOC +
             " Changing CD/DVD speed needs write access");
         return;
     }
@@ -727,7 +727,7 @@ void MythCDROMLinux::setDeviceSpeed(const char *device, int speed)
         {
             rate = 0;
             buffer[0] = 4;
-            LOG(VB_MEDIA, LOG_INFO, LOC + 
+            LOG(VB_MEDIA, LOG_INFO, LOC +
                 ":setDeviceSpeed() - Restored CD/DVD Speed");
             break;
         }
@@ -782,7 +782,7 @@ void MythCDROMLinux::setDeviceSpeed(const char *device, int speed)
         // while CDROM_SELECT_SPEED works...
         if (ioctl(fd, CDROM_SELECT_SPEED, speed) < 0)
         {
-            LOG(VB_MEDIA, LOG_ERR, LOC + 
+            LOG(VB_MEDIA, LOG_ERR, LOC +
                 " Limit CD/DVD CDROM_SELECT_SPEED Failed" + ENO);
         }
         LOG(VB_MEDIA, LOG_INFO, LOC +

@@ -23,4 +23,3 @@
  MBASE_PUBLIC  QString GetFontsDir(void);
 
 #endif
-

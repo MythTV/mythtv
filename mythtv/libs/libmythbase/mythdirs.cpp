@@ -188,4 +188,3 @@ QString GetFontsDir(void)
 {
     return GetShareDir() + "fonts/";
 }
-

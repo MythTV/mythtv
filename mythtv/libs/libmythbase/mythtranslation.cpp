@@ -166,4 +166,3 @@ QMap<QString, QString> MythTranslation::getLanguages(void)
 
     return langs;
 }
-

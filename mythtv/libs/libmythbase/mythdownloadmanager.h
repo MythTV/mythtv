@@ -158,4 +158,3 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
 #endif
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
-

@@ -35,7 +35,7 @@
 // and created run a Qt event loop, which MythSystemLegacy does not
 // require. A number of MythTV threads do not run an event loop
 // so this requirement is a bit onerous.
-// 
+//
 // MythSystemLegacy has grown a bit fat around the middle as functionality
 // has been added and as a core functionality class is due for a code
 // review and some cleanup.
@@ -135,7 +135,7 @@ class MBASE_PUBLIC MythSystemLegacy : public QObject
 
     // FIXME: Eliminate or make private, we don't allow any settings
     //        that can not be enumerated.
-    bool GetSetting(const char *setting) 
+    bool GetSetting(const char *setting)
     { return m_settings.value(QString(setting)); }
 
     // FIXME: We should not return a reference here

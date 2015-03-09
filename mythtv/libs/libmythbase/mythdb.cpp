@@ -775,7 +775,7 @@ void MythDB::OverrideSettingForSession(
     QString mk = key.toLower(), mk2 = d->m_localhostname + ' ' + mk, mv = value;
     if ("dbschemaver" == mk)
     {
-        LOG(VB_GENERAL, LOG_ERR, 
+        LOG(VB_GENERAL, LOG_ERR,
             QString("ERROR: Refusing to allow override for '%1'.").arg(key));
         return;
     }
