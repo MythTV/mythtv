@@ -17,8 +17,15 @@ extern "C" {
 
 // Helper for checking verbose mask & level outside of LOG macro
 #define VERBOSE_LEVEL_NONE        (verboseMask == 0)
+#ifdef __cplusplus
+#define VERBOSE_LEVEL_CHECK(_MASK_, _LEVEL_) \
+    (componentLogLevel.contains(_MASK_) ?                               \
+     (*(componentLogLevel.find(_MASK_)) >= _LEVEL_) :                   \
+     (((verboseMask & (_MASK_)) == (_MASK_)) && logLevel >= (_LEVEL_)))
+#else
 #define VERBOSE_LEVEL_CHECK(_MASK_, _LEVEL_) \
     (((verboseMask & (_MASK_)) == (_MASK_)) && logLevel >= (_LEVEL_))
+#endif
 
 #define VERBOSE please_use_LOG_instead_of_VERBOSE
 
@@ -59,6 +66,7 @@ extern MBASE_PUBLIC LogLevel_t logLevel;
 extern MBASE_PUBLIC uint64_t   verboseMask;
 
 #ifdef __cplusplus
+extern MBASE_PUBLIC ComponentLogLevelMap componentLogLevel;
 }
 
 extern MBASE_PUBLIC QStringList logPropagateArgList;

@@ -107,6 +107,7 @@ const char    *verboseDefaultStr = " general";
 
 uint64_t verboseMask = verboseDefaultInt;
 QString verboseString = QString(verboseDefaultStr);
+ComponentLogLevelMap componentLogLevel;
 
 uint64_t     userDefaultValueInt = verboseDefaultInt;
 QString      userDefaultValueStr = QString(verboseDefaultStr);
@@ -1155,6 +1156,7 @@ void verboseHelp(void)
 int verboseArgParse(QString arg)
 {
     QString option;
+    int     idx;
 
     if (!verboseInitialized)
         verboseInit();
@@ -1170,12 +1172,15 @@ int verboseArgParse(QString arg)
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
-    QStringList verboseOpts = arg.split(QRegExp("\\W+"));
+    QStringList verboseOpts = arg.split(QRegExp("[^\\w:]+",
+                                                Qt::CaseInsensitive,
+                                                QRegExp::RegExp2));
     for (QStringList::Iterator it = verboseOpts.begin();
          it != verboseOpts.end(); ++it )
     {
         option = (*it).toLower();
         bool reverseOption = false;
+        QString optionLevel;
 
         if (option != "none" && option.startsWith("no"))
         {
@@ -1212,6 +1217,12 @@ int verboseArgParse(QString arg)
         }
         else
         {
+            if ((idx = option.indexOf(':')) != -1)
+            {
+                optionLevel = option.mid(idx + 1);
+                option = option.left(idx);
+            }
+
             VerboseDef *item = verboseMap.value(option);
 
             if (item)
@@ -1236,6 +1247,13 @@ int verboseArgParse(QString arg)
                     {
                         verboseMask = item->mask;
                         verboseString = item->name;
+                    }
+
+                    if (!optionLevel.isEmpty())
+                    {
+                        LogLevel_t level = logLevelGet(optionLevel);
+                        if (level != LOG_UNKNOWN)
+                            componentLogLevel[item->mask] = level;
                     }
                 }
             }

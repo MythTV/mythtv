@@ -9,7 +9,7 @@
 #include <stdint.h>
 
 /// This file gets included in two different ways:
-/// 1) from mythlogging.h from nearly every file.  This will define the 
+/// 1) from mythlogging.h from nearly every file.  This will define the
 ///    VerboseMask enum
 /// 2) specifically (and a second include with _IMPLEMENT_VERBOSE defined) from
 ///    mythlogging.cpp.  This is done in verboseInit (in the middle of the
@@ -212,6 +212,7 @@ typedef struct {
     char        shortname;
 } LoglevelDef;
 typedef QMap<int, LoglevelDef *> LoglevelMap;
+typedef QMap<uint64_t, LogLevel_t> ComponentLogLevelMap;
 
 extern VerboseMap verboseMap;
 extern QMutex verboseMapMutex;
