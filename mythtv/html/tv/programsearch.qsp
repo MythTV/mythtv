@@ -98,7 +98,12 @@ import "/tv/js/tvutil.qjs"
 
     var matchString = qsTr("No Matches");
     if (programList.TotalAvailable)
-        matchString = formatStr(qsTr("%1-%2 of %3 Matches"), StartIndex+1, StartIndex + Count, programList.TotalAvailable);
+    {
+        var matchStart = StartIndex+1;
+        var matchTotal = programList.TotalAvailable;
+        var matchCount = ((StartIndex + Count) <= matchTotal) ? (StartIndex + Count) : matchTotal;
+        matchString = formatStr(qsTr("%1-%2 of %3 Matches"), matchStart, matchCount, matchTotal);
+    }
 %>
 
 <% if (!listOnly) {%>
