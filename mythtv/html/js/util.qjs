@@ -189,6 +189,7 @@ function setStatusMessage(message) {
 
 var lastErrorTimer;
 function setErrorMessage(message) {
+    console.log("ERROR: " + message);
     if (lastErrorTimer)
         clearTimeout(lastErrorTimer);
     $("#header_error_message").html(message);
@@ -321,4 +322,23 @@ function logout()
     xmlhttp.send(null);
     //xmlhttp.abort();
     location.href = '/';
+}
+
+function formArray(form)
+{
+    var formArray = new Array();
+    for (i = 0; i < form.elements.length; i++)
+    {
+        // NOTE: This is a workaround for what seems to be a DOM bug or flaw
+        // While all form elements of a disabled fieldset _should_ be also be
+        // disabled it appears that the DOM in Chrome, Firefox and perhaps other
+        // browsers isn't properly updated to reflect this.
+        var isFieldsetDisabled = $(form.elements[i]).closest("fieldset", form).prop("disabled");
+        if (!isFieldsetDisabled && form.elements[i].disabled == false)
+        {
+            formArray[form.elements[i].name] = form.elements[i].value;
+        }
+    }
+
+    return formArray;
 }

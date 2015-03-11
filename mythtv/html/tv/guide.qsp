@@ -5,7 +5,7 @@ import "/js/utility.js"
 import "/tv/js/constants.js"
 
     var guideOnly = 0;
-    if (getArg("GuideOnly"))
+    if (getArg("ListOnly"))
         guideOnly = 1;
 
     var channelGroup = 0; // All
@@ -212,7 +212,7 @@ if (chanGroups.length)
 %>
     </select>
     </label>
-    <input type="hidden" name="GuideOnly" value="1" />
+    <input type="hidden" name="ListOnly" value="1" />
     <input type="hidden" name="NumPages" id="NumPages" value="<%=numPages%>" />
     </form>
 </div>
@@ -382,7 +382,7 @@ if (chanGroups.length)
     </div>
 
 <% if (nextStartIndex) { %>
-<a class="jscroll-next" href="/tv/guide.qsp?ChannelGroup=<%=channelGroup%>&amp;StartTime=<%=guideStartTime.toISOString()%>&amp;Start=<%=nextStartIndex%>&amp;GuideOnly=1" />
+<a class="jscroll-next" href="/tv/guide.qsp?ChannelGroup=<%=channelGroup%>&amp;StartTime=<%=guideStartTime.toISOString()%>&amp;Start=<%=nextStartIndex%>&amp;ListOnly=1" />
 <%}%>
 
 <% if (!guideOnly) {%>

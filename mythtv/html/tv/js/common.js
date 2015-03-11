@@ -441,8 +441,7 @@ function neverRecord(chanID, startTime)
 
 function loadTVContent(url, targetDivID, transition, args)
 {
-    history.replaceState(history.state, '', url); // Update the page url in the browser
-
+    var historyUrl = url;
     for (var key in args)
     {
         // Check that this arg hasn't already been appended
@@ -451,21 +450,41 @@ function loadTVContent(url, targetDivID, transition, args)
         {
             // Check if any args presently exist
             if (url.indexOf("?") !== -1)
-                url += "&amp;";
+                url += "&";
             else
                 url += "?";
 
             url += key + "=" + args[key];
+
+            // If this page is reloaded from the history we want the whole
+            // page, not just the list part so we want to strip the 'ListOnly'
+            // argument
+            if (key !== "ListOnly")
+            {
+                if (historyUrl.indexOf("?") !== -1)
+                    historyUrl += "&";
+                else
+                    historyUrl += "?";
+
+                historyUrl += key + "=" + args[key];
+            }
         }
     }
+
+    console.log("Storing history: " + historyUrl);
+    // pushState might be more ideal except that it doesn't actually appear to
+    // work properly. Hitting 'back' with pushed states _for the same page_ doesn't
+    // actually load the old page state, it just reloads the present state.
+    //
+    // We can 'fix' this in future by altering the page 'src' based on the state
+    // object
+    history.pushState(args, '', historyUrl); // Update the page url in the browser
 
     if (!targetDivID)
         targetDivID = "content";
     if ((getSetting('', 'WebFrontend_enableAnimations', 1) == 0) ||
         !transition)
         transition = "none";
-
-    console.log("Transition: " + transition);
 
     if (targetDivID === "content" && transition === "none")
     {
@@ -475,17 +494,25 @@ function loadTVContent(url, targetDivID, transition, args)
 
     parent.document.getElementById("busyPopup").style.display = "block";
 
-    var targetDiv = document.getElementById(targetDivID);
+    var html = $.ajax({ url: url,
+                        dataType: "html",
+                        success:function(data, textStatus, jqXHR)
+                            {
+                                if (data)
+                                    setTVContent(targetDivID, data, transition);
+                            }
+                        });
+}
+
+function setTVContent(divID, html, transition)
+{
+    var targetDiv = document.getElementById(divID);
     if (!isValidObject(targetDiv))
     {
-        setErrorMessage("loadTVContent() target DIV doesn't exist: (" + targetDivID + ")");
+        setErrorMessage("loadTVContent() target DIV doesn't exist: (" + divID + ")");
+        parent.document.getElementById("busyPopup").style.display = "none";
         return;
     }
-
-    var html = $.ajax({
-      url: url,
-        async: false
-     }).responseText;
 
     var newDiv = document.createElement('div');
     newDiv.className = targetDiv.className;
@@ -493,8 +520,8 @@ function loadTVContent(url, targetDivID, transition, args)
     targetDiv.parentNode.insertBefore(newDiv, null);
 
     // Need to assign the id to the new div
-    targetDiv.id = "old" + targetDivID;
-    newDiv.id = targetDivID;
+    targetDiv.id = "old" + divID;
+    newDiv.id = divID;
     switch (transition)
     {
         case 'left':
@@ -511,14 +538,14 @@ function loadTVContent(url, targetDivID, transition, args)
             break;
 
     }
-    newDiv.id = targetDivID;
+    newDiv.id = divID;
 
     parent.document.getElementById("busyPopup").style.display = "none";
 }
 
 function reloadTVContent()
 {
-    loadTVContent(window.location.href);
+    loadFrontendContent(window.location.href);
 }
 
 function formOnLoad(form)
@@ -539,10 +566,11 @@ function submitForm(formElement, target, transition)
         setErrorMessage("submitForm() invalid form element");
         return;
     }
-    var queryString = $(formElement).serialize();
-    var url = formElement.action + "?" + queryString;
 
-    loadTVContent(url, target, transition);
+    var path = formElement.action;
+    var args = formArray(formElement);
+
+    loadTVContent(path, target, transition, args);
     return false;
 }
 
@@ -674,4 +702,17 @@ function dissolveTransition(oldDivID, newDivID)
 function handleKeyboardShortcutsTV(key) {
     if (key.keyCode == 27)
         hideMenu("optMenu");
+}
+
+window.onpopstate = function(event)
+{
+    // Only force load if this is a 'fake' history for which we have saved
+    // state. For 'normal' history navigation this isn't required.
+    // FIXME: Disable this check for now, since we need to start saving state
+    //        for 'default' pages before it works as intended
+    if (event) // && event.state)
+    {
+        // TODO: Do the load ourselves to allow animated transitions?
+        window.location = window.location; // Feels faster than location.reload(); ?
+    }
 }

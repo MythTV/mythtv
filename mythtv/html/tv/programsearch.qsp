@@ -405,12 +405,12 @@ if (nextStartIndex > 0)
     {
         if (isValidObject(ui.panel))
         {
-            ui.panel.removeAttr("disabled");
+            ui.panel.prop("disabled", false);
         }
         else
         {
-            ui.oldPanel.attr("disabled", "disabled");
-            ui.newPanel.removeAttr("disabled");
+            ui.oldPanel.prop("disabled", true);
+            ui.newPanel.prop("disabled", false);
         }
     }
 

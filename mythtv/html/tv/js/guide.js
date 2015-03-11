@@ -166,7 +166,7 @@ var MythGuide = new function() {
             return;
 
         this.Loading = true;
-        loadTVContent(window.location.href, "guideGrid", "dissolve", {"GuideOnly": "1"});
+        loadTVContent(window.location.href, "guideGrid", "dissolve", {"ListOnly": "1"});
         this.Loading = false;
     }
 
