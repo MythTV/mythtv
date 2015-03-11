@@ -676,6 +676,7 @@ void DeleteMap::CleanMap(void)
         int     lasttype  = MARK_UNSET;
         int64_t lastframe = -1;
         int64_t tempframe = -1;
+        QList<int64_t> deleteList;
         frm_dir_map_t::iterator it = m_deleteMap.begin();
         for ( ; it != m_deleteMap.end(); ++it)
         {
@@ -683,11 +684,11 @@ void DeleteMap::CleanMap(void)
             uint64_t thisframe = it.key();
             if (thisframe >= total)
             {
-                Delete(thisframe);
+                deleteList.append(thisframe);
             }
             else if (lasttype == thistype)
             {
-                Delete(thistype == MARK_CUT_END ? thisframe :
+                deleteList.append(thistype == MARK_CUT_END ? thisframe :
                                                   (uint64_t)lastframe);
                 clear = false;
                 break;
@@ -695,7 +696,7 @@ void DeleteMap::CleanMap(void)
             if (MARK_PLACEHOLDER == thistype)
             {
                 if (tempframe > 0)
-                    Delete(tempframe);
+                    deleteList.append(tempframe);
                 tempframe = thisframe;
             }
             else
@@ -704,6 +705,15 @@ void DeleteMap::CleanMap(void)
                 lastframe = thisframe;
             }
         }
+
+        // Delete the unwanted frame marks safely, and not while iterating over
+        // the map which would lead to a crash
+        QList<int64_t>::iterator dit = deleteList.begin();
+        for (; dit != deleteList.end(); ++dit)
+        {
+            Delete(*dit);
+        }
+        deleteList.clear();
     }
 }
 
