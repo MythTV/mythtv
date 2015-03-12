@@ -1627,6 +1627,9 @@ int main(int argc, char **argv)
     // accelerated Flash playback to work without causing mythfrontend to abort.
     QApplication::setAttribute(Qt::AA_X11InitThreads);
 #endif
+#if QT_VERSION >= 0x050300
+    QApplication::setSetuidAllowed(true);
+#endif
     new QApplication(argc, argv);
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHFRONTEND);
 
