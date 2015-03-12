@@ -8,10 +8,42 @@
 
 #include "programinfo.h" // for subtitle types and audio and video properties
 #include "dishdescriptors.h" // for dish_theme_type_to_string
+#include "mythlogging.h"
 
 /*------------------------------------------------------------------------
  * Event Fix Up Scripts - Turned on by entry in dtv_privatetype table
  *------------------------------------------------------------------------*/
+
+// Constituents of UK season regexp, decomposed for clarity
+
+// Matches Season 2, S 2 and "Series 2," etc but not "hits 2"
+// cap1 = season
+const QString season = "\\b(?:Season|Series|S)\\s*(\\d+)\\s*,?";
+
+// Matches Episode 3, Ep 3/4, Ep 3 of 4 etc but not "step 1"
+// cap1 = ep, cap2 = total
+const QString longEp = "\\b(?:Ep|Episode)\\s*(\\d+)\\s*(?:(?:/|of)\\s*(\\d*))?";
+
+// Matches S2 Ep 3/4, "Season 2, Ep 3 of 4", Episode 3 etc
+// cap1 = season, cap2 = ep, cap3 = total
+const QString longSeasEp = QString("\\(?(?:%1)?\\s*%2").arg(season, longEp);
+
+// Matches long seas/ep with surrounding parenthesis & trailing period
+// cap1 = season, cap2 = ep, cap3 = total
+const QString longContext = QString("\\(*%1\\s*\\)?\\s*\\.?").arg(longSeasEp);
+
+// Matches 3/4, 3 of 4
+// cap1 = ep, cap2 = total
+const QString shortEp = "(\\d+)\\s*(?:/|of)\\s*(\\d+)";
+
+// Matches short ep/total, ignoring Parts and idioms such as 9/11, 24/7 etc.
+// ie. x/y in parenthesis or has no leading or trailing text in the sentence.
+// cap0 may include previous/anchoring period
+// cap1 = shortEp with surrounding parenthesis & trailing period (to remove)
+// cap2 = ep, cap3 = total,
+const QString shortContext =
+        QString("(?:^|\\.)(\\s*\\(*\\s*%1[\\s)]*(?:[).:]|$))").arg(shortEp);
+
 
 EITFixUp::EITFixUp()
     : m_bellYear("[\\(]{1}[0-9]{4}[\\)]{1}"),
@@ -42,8 +74,11 @@ EITFixUp::EITFixUp()
       m_ukDotEnd("\\.$"),
       m_ukSpaceColonStart("^[ |:]*"),
       m_ukSpaceStart("^ "),
-      m_ukPart("\\s*\\(?\\s*(?:Part|Pt)\\s*(\\d{1,2})\\s*(?:of|/)\\s*(\\d{1,2})\\s*\\)?\\s*(?:\\.|:)?", Qt::CaseInsensitive),
-      m_ukSeries("\\s*\\(?\\s*(?!Part|Pt)((?:Season|Series|S)\\s*(\\d{1,2})(?:,|:)?)?\\s*(?:Episode|Ep)?\\s*(\\d{1,2})\\s*((?:of|/)\\s*(\\d{1,2})\\s*)?\\)?\\s*(?:\\.|:)?", Qt::CaseInsensitive),
+      m_ukPart("[-(\\:,.]\\s*(?:Part|Pt)\\s*(\\d+)\\s*(?:(?:of|/)\\s*(\\d+))?\\s*[-):,.]", Qt::CaseInsensitive),
+      // Prefer long format resorting to short format
+      // cap0 = long match to remove, cap1 = long season, cap2 = long ep, cap3 = long total,
+      // cap4 = short match to remove, cap5 = short ep, cap6 = short total
+      m_ukSeries("(?:" + longContext + "|" + shortContext + ")", Qt::CaseInsensitive),
       m_ukCC("\\[(?:(AD|SL|S|W|HD),?)+\\]"),
       m_ukYear("[\\[\\(]([\\d]{4})[\\)\\]]"),
       m_uk24ep("^\\d{1,2}:00[ap]m to \\d{1,2}:00[ap]m: "),
@@ -771,59 +806,58 @@ void EITFixUp::FixUK(DBEventEIT &event) const
     // Matching pattern "Season 2 Episode|Ep 3 of 14|3/14" etc
     bool    series  = false;
     QRegExp tmpSeries = m_ukSeries;
-    if ((position1 = tmpSeries.indexIn(event.title)) != -1)
+    if ((position1 = tmpSeries.indexIn(event.title)) != -1
+            || (position2 = tmpSeries.indexIn(event.description)) != -1)
     {
+        if (!tmpSeries.cap(1).isEmpty())
+        {
+            event.season = tmpSeries.cap(1).toUInt();
+            series = true;
+        }
+
         if (!tmpSeries.cap(2).isEmpty())
         {
-            event.season = tmpSeries.cap(2).toUInt();
+            event.episode = tmpSeries.cap(2).toUInt();
+            series = true;
+        }
+        else if (!tmpSeries.cap(5).isEmpty())
+        {
+            event.episode = tmpSeries.cap(5).toUInt();
             series = true;
         }
 
-        if (tmpSeries.cap(5).isEmpty())
+        if (!tmpSeries.cap(3).isEmpty())
         {
-            event.episode = tmpSeries.cap(3).toUInt();
+            event.totalepisodes = tmpSeries.cap(3).toUInt();
             series = true;
         }
-        else if ((tmpSeries.cap(3).toUInt() <= tmpSeries.cap(5).toUInt())
-                 && tmpSeries.cap(5).toUInt() <= 50)
+        else if (!tmpSeries.cap(6).isEmpty())
         {
-            event.episode = tmpSeries.cap(3).toUInt();
-            event.totalepisodes  = tmpSeries.cap(5).toUInt();
-            series = true;
-        }
-
-         // Remove from the title
-        if (series)
-            event.title = event.title.left(position1) +
-                event.title.mid(position1 + tmpSeries.cap(0).length());
-    }
-    else if ((position1 = tmpSeries.indexIn(event.description)) != -1)
-    {
-        if (!tmpSeries.cap(2).isEmpty())
-        {
-            event.season = tmpSeries.cap(2).toUInt();
+            event.totalepisodes = tmpSeries.cap(6).toUInt();
             series = true;
         }
 
-        if (tmpSeries.cap(5).isEmpty())
-        {
-            event.episode = tmpSeries.cap(3).toUInt();
-            series = true;
-        }
-        else if ((tmpSeries.cap(3).toUInt() <= tmpSeries.cap(5).toUInt())
-                 && tmpSeries.cap(5).toUInt() <= 50)
-        {
-            event.episode = tmpSeries.cap(3).toUInt();
-            event.totalepisodes  = tmpSeries.cap(5).toUInt();
-            series = true;
-        }
+        // Remove long or short match. Short text doesn't start at position2
+        int form = tmpSeries.cap(4).isEmpty() ? 0 : 4;
 
-        // Remove from the start of the description.
-        // Otherwise it ends up in the subtitle.
-        if (series && position1 == 0)
+        if (position1 != -1)
         {
-            event.description = event.description.left(position1) +
-                event.description.mid(position1 + tmpSeries.cap(0).length());
+            LOG(VB_EIT, LOG_INFO, QString("Extracted S%1E%2/%3 from title (%4) \"%5\"")
+                .arg(event.season).arg(event.episode).arg(event.totalepisodes)
+                .arg(event.title, event.description));
+
+            event.title.remove(tmpSeries.cap(form));
+        }
+        else
+        {
+            LOG(VB_EIT, LOG_INFO, QString("Extracted S%1E%2/%3 from description (%4) \"%5\"")
+                .arg(event.season).arg(event.episode).arg(event.totalepisodes)
+                .arg(event.title, event.description));
+
+            if (position2 == 0)
+     		    // Remove from the start of the description.
+		        // Otherwise it ends up in the subtitle.
+                event.description.remove(tmpSeries.cap(form));
         }
     }
 
@@ -833,36 +867,35 @@ void EITFixUp::FixUK(DBEventEIT &event) const
         event.categoryType = ProgramInfo::kCategorySeries;
 
     // Multi-part episodes, or films (e.g. ITV film split by news)
-    // Matching pattern "Part|Pt 1 of 2|1/2"
+    // Matches Part 1, Pt 1/2, Part 1 of 2 etc.
     QRegExp tmpPart = m_ukPart;
     if ((position1 = tmpPart.indexIn(event.title)) != -1)
     {
-        if ((tmpPart.cap(1).toUInt() <= tmpPart.cap(2).toUInt())
-            && tmpPart.cap(2).toUInt() <= 50)
-        {
-            event.partnumber = tmpPart.cap(1).toUInt();
-            event.parttotal  = tmpPart.cap(2).toUInt();
+        event.partnumber = tmpPart.cap(1).toUInt();
+        event.parttotal  = tmpPart.cap(2).toUInt();
 
-            // Remove from the title
-            event.title = event.title.left(position1) +
-                event.title.mid(position1 + tmpPart.cap(0).length());
-        }
+        LOG(VB_EIT, LOG_INFO, QString("Extracted Part %1/%2 from title (%3)")
+            .arg(event.partnumber).arg(event.parttotal).arg(event.title));
+
+        // Remove from the title
+        event.title = event.title.remove(tmpPart.cap(0));
     }
     else if ((position1 = tmpPart.indexIn(event.description)) != -1)
     {
-        if ((tmpPart.cap(1).toUInt() <= tmpPart.cap(2).toUInt())
-            && tmpPart.cap(2).toUInt() <= 50)
-        {
-            event.partnumber = tmpPart.cap(1).toUInt();
-            event.parttotal  = tmpPart.cap(2).toUInt();
+        event.partnumber = tmpPart.cap(1).toUInt();
+        event.parttotal  = tmpPart.cap(2).toUInt();
 
-            // Remove from the start of the description.
-            // Otherwise it ends up in the subtitle.
-            if (position1 == 0)
-            {
-                event.description = event.description.left(position1) +
-                    event.description.mid(position1 + tmpPart.cap(0).length());
-            }
+        LOG(VB_EIT, LOG_INFO, QString("Extracted Part %1/%2 from description (%3) \"%4\"")
+            .arg(event.partnumber).arg(event.parttotal)
+            .arg(event.title, event.description));
+
+        // Remove from the start of the description.
+        // Otherwise it ends up in the subtitle.
+        if (position1 == 0)
+        {
+            // Retain a single colon (subtitle separator) if we remove any
+            QString sub = tmpPart.cap(0).contains(":") ? ":" : "";
+            event.description = event.description.replace(tmpPart.cap(0), sub);
         }
     }
 

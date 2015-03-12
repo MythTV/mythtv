@@ -322,4 +322,25 @@ void TestEITFixups::testUKFixups8()
     QCOMPARE(event8.airdate,      (uint16_t)2009u);
 }
 
+void TestEITFixups::testUKFixups9()
+{
+    // Make sure numbers don't get misinterpreted as episode number or similar.
+    EITFixUp fixup;
+
+    DBEventEIT event9(9311,
+                      "Channel 4 News",
+                      "Includes sport and weather.",
+                      QDateTime::fromString("2015-02-28T19:40:00Z", Qt::ISODate),
+                      QDateTime::fromString("2015-02-28T20:00:00Z", Qt::ISODate),
+                      EITFixUp::kFixGenericDVB | EITFixUp::kFixUK,
+                      SUB_UNKNOWN,
+                      AUD_STEREO,
+                      VID_UNKNOWN);
+
+    fixup.Fix(event9);
+    PRINT_EVENT(event9);
+    QCOMPARE(event9.title,       QString("Channel 4 News"));
+    QCOMPARE(event9.description, QString("Includes sport and weather"));
+}
+
 QTEST_APPLESS_MAIN(TestEITFixups)
