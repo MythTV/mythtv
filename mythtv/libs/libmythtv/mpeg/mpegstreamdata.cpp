@@ -647,8 +647,8 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable &pmt)
     for (uint i = 0; i < audioPIDs.size(); i++)
         AddAudioPID(audioPIDs[i]);
 
-    if (!videoPIDs.empty())
-        _pid_video_single_program = videoPIDs[0];
+    _pids_writing.clear();
+    _pid_video_single_program = !videoPIDs.empty() ? videoPIDs[0] : 0xffffffff;
     for (uint i = 1; i < videoPIDs.size(); i++)
         AddWritingPID(videoPIDs[i]);
 
