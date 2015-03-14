@@ -58,7 +58,9 @@ class UPNP_PUBLIC WebSocketServer : public ServerPool
     MThreadPool             m_threadPool;
     bool                    m_running; // protected by m_rwlock
 
+#ifndef QT_NO_OPENSSL
     QSslConfiguration       m_sslConfig;
+#endif
 
   private:
      //void LoadSSLConfig();
@@ -157,7 +159,11 @@ class WebSocketWorkerThread : public QRunnable
 {
   public:
     WebSocketWorkerThread(WebSocketServer &webSocketServer, qt_socket_fd_t sock,
-                          PoolServerType type, QSslConfiguration sslConfig);
+                          PoolServerType type
+#ifndef QT_NO_OPENSSL
+                          , QSslConfiguration sslConfig
+#endif
+                        );
     virtual ~WebSocketWorkerThread();
 
     virtual void run(void);
@@ -166,7 +172,9 @@ class WebSocketWorkerThread : public QRunnable
     WebSocketServer  &m_webSocketServer;
     qt_socket_fd_t    m_socketFD;
     PoolServerType    m_connectionType;
+#ifndef QT_NO_OPENSSL
     QSslConfiguration m_sslConfig;
+#endif
 };
 
 /**
@@ -200,7 +208,11 @@ class WebSocketWorker : public QObject
      * \param tlsConfig  The TLS (ssl) configuration (for TLS sockets)
      */
     WebSocketWorker(WebSocketServer &webSocketServer, qt_socket_fd_t sock,
-                    PoolServerType type, QSslConfiguration sslConfig);
+                    PoolServerType type
+#ifndef QT_NO_OPENSSL
+                    , QSslConfiguration sslConfig
+#endif
+                    );
     virtual ~WebSocketWorker();
 
     void Exec();
@@ -273,7 +285,9 @@ class WebSocketWorker : public QObject
 
     QTimer *m_heartBeat;
 
+#ifndef QT_NO_OPENSSL
     QSslConfiguration       m_sslConfig;
+#endif
 
     bool m_fuzzTesting;
 
