@@ -637,10 +637,25 @@ uint DBEvent::UpdateDB(
     unsigned char laudio   = audioProps   | match.audioProps;
     unsigned char lvideo   = videoProps   | match.videoProps;
 
-    uint lpartnumber =
-        (!partnumber && match.partnumber) ? match.partnumber : partnumber;
-    uint lparttotal =
-        (!parttotal  && match.parttotal ) ? match.parttotal  : parttotal;
+    uint lseason = match.season;
+    uint lepisode = match.episode;
+    uint lepisodeTotal = match.totalepisodes;
+
+    if (season || episode || totalepisodes)
+    {
+        lseason = season;
+        lepisode = episode;
+        lepisodeTotal = totalepisodes;
+    }
+
+    uint lpartnumber = match.partnumber;
+    uint lparttotal = match.parttotal;
+
+    if (partnumber || parttotal)
+    {
+        lpartnumber = partnumber;
+        lparttotal  = parttotal;
+    }
 
     bool lpreviouslyshown = previouslyshown | match.previouslyshown;
 
@@ -661,6 +676,8 @@ uint DBEvent::UpdateDB(
         "    stereo         = :STEREO,    hdtv          = :HDTV, "
         "    subtitletypes  = :SUBTYPE, "
         "    audioprop      = :AUDIOPROP, videoprop     = :VIDEOPROP, "
+        "    season         = :SEASON,  "
+        "    episode        = :EPISODE,   totalepisodes = :TOTALEPS, "
         "    partnumber     = :PARTNO,    parttotal     = :PARTTOTAL, "
         "    syndicatedepisodenumber = :SYNDICATENO, "
         "    airdate        = :AIRDATE,   originalairdate=:ORIGAIRDATE, "
@@ -686,6 +703,9 @@ uint DBEvent::UpdateDB(
     query.bindValue(":SUBTYPE",     lsubtype);
     query.bindValue(":AUDIOPROP",   laudio);
     query.bindValue(":VIDEOPROP",   lvideo);
+    query.bindValue(":SEASON",      lseason);
+    query.bindValue(":EPISODE",     lepisode);
+    query.bindValue(":TOTALEPS",    lepisodeTotal);
     query.bindValue(":PARTNO",      lpartnumber);
     query.bindValue(":PARTTOTAL",   lparttotal);
     query.bindValue(":SYNDICATENO", denullify(lsyndicatedepisodenumber));
