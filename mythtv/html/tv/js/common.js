@@ -1,4 +1,64 @@
 
+/*!
+ * \namespace MythCommon
+ * \brief Namespace for common functions used in 'TV' pages
+ */
+var MythCommon = new function() {
+
+    /*!
+    * \fn Init
+    * \public
+    *
+    * Initialise, called by the window load event once the page has finished
+    * loading
+    */
+    this.Init = function()
+    {
+    };
+
+    /*!
+    * \fn Destructor
+    * \public
+    */
+    this.Destructor = function()
+    {
+    };
+
+    /*!
+    * \fn RecordProgram
+    * \public
+    * \param int Channel ID
+    * \param string Programme start time
+    * \param string Recording rule type
+    * \brief Quick schedule
+    *
+    * Create an instant schedule, with the given type for the programme
+    * indentified by the chanID and startTime combo.
+    *
+    * The schedule editor isn't displayed
+    */
+    this.RecordProgram = function (chanID, startTime, type)
+    {
+        hideMenu("optMenu");
+        var url = "/tv/ajax_backends/dvr_util.qsp?_action=simpleRecord&ChanId=" + chanID + "&StartTime=" + startTime + "&type=" + type;
+        var ajaxRequest = $.ajax( url )
+                                .done(function()
+                                {
+                                    var response = ajaxRequest.responseText.split("#");
+                                    recRuleChanged( response[0], response[1] );
+                                });
+    }
+
+};
+
+window.addEventListener("load", MythCommon.Init);
+window.addEventListener("unload", MythCommon.Destructor);
+
+// TODO: Move what's below into the MythCommon namespace, or elsewhere as
+//       appropriate
+//
+
+
 function jq(id) // F*%$ jQuery
 {
     return "#" + id.replace( /(:|\.|\[|\])/g, "\\$1" );

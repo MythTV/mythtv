@@ -120,16 +120,16 @@ import "/tv/js/constants.js"
      side (harder to maintain/template) or keeping in together inline with the
      other related html, with as little non-html markup as possible -->
 <div id="optMenu" class="contextMenu" style="display:none;">
-    <div class="button scheduleMenu" onClick="MythGuide.RecordProgram(gChanID, gStartTime, 'Single Record')">
+    <div class="button scheduleMenu" onClick="MythCommon.RecordProgram(gChanID, gStartTime, 'Single Record')">
         <%=qsTr("Record this showing")%>
     </div>
-    <div class="button scheduleMenu" onClick="MythGuide.RecordProgram(gChanID, gStartTime, 'Record All')">
+    <div class="button scheduleMenu" onClick="MythCommon.RecordProgram(gChanID, gStartTime, 'Record All')">
         <%=qsTr("Record all showings")%>
     </div>
-    <div class="button scheduleMenu" onClick="MythGuide.RecordProgram(gChanID, gStartTime, 'Record One')">
+    <div class="button scheduleMenu" onClick="MythCommon.RecordProgram(gChanID, gStartTime, 'Record One')">
         <%=qsTr("Record one showing")%>
     </div>
-    <div class="button scheduleMenu" onClick="MythGuide.RecordProgram(gChanID, gStartTime, 'Record All (Channel)')">
+    <div class="button scheduleMenu" onClick="MythCommon.RecordProgram(gChanID, gStartTime, 'Record All (Channel)')">
         <%=qsTr("Record all showings (this channel)")%>
     </div>
     <div class="button delSchedMenu" onClick="dontRecord(gChanID, gStartTime)">

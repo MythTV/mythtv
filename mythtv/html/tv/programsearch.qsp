@@ -136,13 +136,25 @@ import "/tv/js/tvutil.qjs"
      side (harder to maintain/template) or keeping in together inline with the
      other related html, with as little non-html markup as possible -->
 <div id="optMenu" class="contextMenu" style="display:none;">
-    <div class="button normalMenu" onClick="dontRecord(gChanID, gStartTime)">
+    <div class="button scheduleMenu" onClick="MythCommon.RecordProgram(gChanID, gStartTime, 'Single Record')">
+        <%=qsTr("Record this showing")%>
+    </div>
+    <div class="button scheduleMenu" onClick="MythCommon.RecordProgram(gChanID, gStartTime, 'Record All')">
+        <%=qsTr("Record all showings")%>
+    </div>
+    <div class="button scheduleMenu" onClick="MythCommon.RecordProgram(gChanID, gStartTime, 'Record One')">
+        <%=qsTr("Record one showing")%>
+    </div>
+    <div class="button scheduleMenu" onClick="MythCommon.RecordProgram(gChanID, gStartTime, 'Record All (Channel)')">
+        <%=qsTr("Record all showings (this channel)")%>
+    </div>
+    <div class="button delSchedMenu" onClick="dontRecord(gChanID, gStartTime)">
         <%=qsTr("Don't Record")%>
     </div>
-    <div class="button normalMenu" onClick="neverRecord(gChanID, gStartTime)">
+    <div class="button delSchedMenu" onClick="neverRecord(gChanID, gStartTime)">
         <%=qsTr("Never Record")%>
     </div>
-    <div class="button normalMenu" onClick="deleteRecRule(gChanID, gStartTime)">
+    <div class="button delSchedMenu" onClick="deleteRecRule(gChanID, gStartTime)">
         <%=qsTr("Delete Recording Rule")%>
     </div>
     <div class="button normalMenu" onClick="loadScheduler('upcoming', gChanID, gStartTime)">
@@ -317,7 +329,9 @@ while (listIdx < programs.length)
             break;
     }
 
-    var menu = "normalMenu";
+    var menu = "normalMenu scheduleMenu";
+    if (program.Recording.Status != 0)
+        menu = "normalMenu delSchedMenu";
 
     // RecStatusToClass() - /tv/js/tvutil.qjs
     var statusClass = RecStatusToClass(program.Recording.Status);
