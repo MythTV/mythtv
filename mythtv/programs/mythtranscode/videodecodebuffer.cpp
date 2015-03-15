@@ -3,6 +3,8 @@
 #include "mythplayer.h"
 #include "videooutbase.h"
 
+#include <unistd.h> // for sleep()
+
 VideoDecodeBuffer::VideoDecodeBuffer(MythPlayer *player, VideoOutput *videoout,
                                      bool cutlist, int size)
   : m_player(player),         m_videoOutput(videoout),

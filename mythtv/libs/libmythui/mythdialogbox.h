@@ -3,12 +3,12 @@
 
 #include <QDir>
 #include <QEvent>
+#include <QString>
+#include <QStringList>
 
 #include "mythscreentype.h"
 #include "mythuitextedit.h"
 
-class QString;
-class QStringList;
 class QTimer;
 
 class MythUIButtonListItem;

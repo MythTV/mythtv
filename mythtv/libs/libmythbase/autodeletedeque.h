@@ -3,7 +3,6 @@
 
 // C++ headers
 #include <deque>
-#include <algorithm>
 
 template<typename T>
 class AutoDeleteDeque

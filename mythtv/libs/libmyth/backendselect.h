@@ -5,7 +5,6 @@
 
 // libmythui
 #include "mythscreentype.h"
-#include "mythuibuttonlist.h"
 
 #include "configuration.h"
 #include "upnpdevice.h"

@@ -1,14 +1,12 @@
 #ifndef LCDDEVICE_H_
 #define LCDDEVICE_H_
 
-#include <iostream>
-
 #include <QObject>
 #include <QStringList>
-#include <QTimer>
-#include <QDateTime>
 #include <QMutex>
 #include <QList>
+
+class QTimer;
 
 #include "mythbaseexp.h"
 

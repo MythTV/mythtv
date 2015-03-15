@@ -31,6 +31,8 @@ using std::min;
 #include "mythdb.h"
 #include "compat.h"
 
+#include <unistd.h> // for getpid()
+
 #define LOC      QString("ProgramInfo(%1): ").arg(GetBasename())
 
 //#define DEBUG_IN_USE

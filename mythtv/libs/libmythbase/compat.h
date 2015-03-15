@@ -5,6 +5,8 @@
 #ifndef __COMPAT_H__
 #define __COMPAT_H__
 
+#    include <stdio.h>        // for snprintf(), used by inline dlerror()
+
 #ifdef _WIN32
 #    ifndef _MSC_VER
 #        define close wsock_close
@@ -36,19 +38,14 @@
 #    endif
 
 #    undef close
-#    include <stdio.h>        // for snprintf(), used by inline dlerror()
-#    include <unistd.h>       // for usleep()
 #else
 #    include <sys/time.h>     // Mac OS X needs this before sys/resource
 #    include <sys/resource.h> // for setpriority
 #    include <sys/socket.h>
 #    include <sys/wait.h>     // For WIFEXITED on Mac OS X
-#    include <stdio.h>        // for snprintf(), used by inline dlerror()
-#    include <unistd.h>       // for usleep()
 #endif
 
 #ifdef _WIN32
-#    include <unistd.h>       // for usleep()
 #    include <stdlib.h>       // for rand()
 #    include <time.h>
 #    include <sys/time.h>
@@ -349,10 +346,6 @@ static __inline struct tm *localtime_r(const time_t *timep, struct tm *result)
 #ifdef _WIN32
 #    define fseeko(stream, offset, whence) fseeko64(stream, offset, whence)
 #    define ftello(stream) ftello64(stream)
-#endif
-
-#if defined(USING_MINGW)
-#include <stdio.h> /* for FILENAME_MAX */
 #endif
 
 #if defined(USING_MINGW) && defined(FILENAME_MAX)

@@ -30,7 +30,8 @@
 #include <mythcontext.h>
 #include <mythlogging.h>
 #include <mthread.h>
-#include <compat.h>
+
+#include <unistd.h> // for usleep()
 
 // MythGallery headers
 #include "galleryfilter.h"

@@ -14,6 +14,8 @@
 #include "musicdata.h"
 #include "musicplayer.h"
 
+#include <unistd.h> // for usleep()
+
 // this is the global MusicData object shared thoughout MythMusic
 MusicData  *gMusicData = NULL;
 

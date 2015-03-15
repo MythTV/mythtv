@@ -1,7 +1,6 @@
 #ifndef _MYTH_SCHEDULER_H_
 #define _MYTH_SCHEDULER_H_
 
-#include <algorithm>
 #include <deque>
 
 #include <QStringList>

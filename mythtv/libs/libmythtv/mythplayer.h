@@ -17,8 +17,6 @@
 #include "videooutbase.h"
 #include "teletextreader.h"
 #include "subtitlereader.h"
-#include "tv_play.h"
-#include "yuv2rgb.h"
 #include "cc608reader.h"
 #include "cc608decoder.h"
 #include "cc708reader.h"
@@ -31,8 +29,6 @@
 #include "audiooutputgraph.h"
 
 #include "mythtvexp.h"
-
-#include "filter.h"
 
 using namespace std;
 

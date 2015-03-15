@@ -28,7 +28,6 @@ using namespace std;
 // MythTV
 #include "mythdeque.h"
 #include "tv.h"
-#include "mythdate.h"
 #include "channelinfo.h"
 #include "videoouttypes.h"
 #include "volumebase.h"

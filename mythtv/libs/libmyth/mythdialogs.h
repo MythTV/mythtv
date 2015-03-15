@@ -1,9 +1,7 @@
 #ifndef MYTHDIALOGS_H_
 #define MYTHDIALOGS_H_
 
-#include <QDomElement>
 #include <QDialog>
-#include <QAbstractButton>
 #include <QObject>
 #include <QFrame>
 
@@ -18,6 +16,7 @@ class MythLabel;
 struct fontProp;
 class QVBoxLayout;
 class QProgressBar;
+class QAbstractButton;
 
 typedef enum DialogCode
 {

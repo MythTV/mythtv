@@ -7,10 +7,7 @@
 #include <QTime>
 #include <QPointer>
 
-#include <stdlib.h>
 #include <stdint.h>
-#include <time.h>
-#include <unistd.h>
 
 #include "mythconfig.h"
 #include "mythbaseexp.h"  //  MBASE_PUBLIC , etc.

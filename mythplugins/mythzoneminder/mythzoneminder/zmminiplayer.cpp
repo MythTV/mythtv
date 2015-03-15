@@ -1,11 +1,15 @@
+
+#include "zmminiplayer.h"
+
 // mythtv
 #include <mythcontext.h>
 #include <lcddevice.h>
 #include <mythuiimage.h>
 
 // mythzoneminder
-#include "zmminiplayer.h"
 #include "zmclient.h"
+
+#include <QTimer>
 
 // the maximum image size we are ever likely to get from ZM
 #define MAX_IMAGE_SIZE  (2048*1536*3)

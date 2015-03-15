@@ -6,6 +6,7 @@
 #include "mythscreenstack.h"
 #include "mythnotificationcenter.h"
 #include "mythuiactions.h"
+#include "mythrect.h"
 
 class QEvent;
 
@@ -27,7 +28,6 @@ class MythPainterWindowQt;
 class MythPainterWindowVDPAU;
 class MythPainterWindowD3D9;
 class MythRender;
-class MythRect;
 
 class MUI_PUBLIC MythMainWindow : public QWidget
 {

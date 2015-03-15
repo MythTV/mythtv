@@ -17,7 +17,6 @@
 // MythTV headers
 #include "iptvstreamhandler.h"
 #include "mythmiscutil.h"
-#include "mythdate.h"
 
 class CetonStreamHandler;
 class CetonChannel;

@@ -34,6 +34,7 @@
 #include "autoexpire.h"
 #include "channelutil.h"
 #include "channelgroup.h"
+#include "storagegroup.h"
 
 #include "mythlogging.h"
 

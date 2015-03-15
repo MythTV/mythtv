@@ -25,6 +25,7 @@ using namespace std;
 #include <QEvent>
 #include <QFile>
 #include <QUrl>
+#include <QTimer>
 
 // MythTV plugin includes
 #include <mythcontext.h>

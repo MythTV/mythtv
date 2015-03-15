@@ -20,6 +20,7 @@
 #include "mythuibuttonlist.h"
 #include "mythuibutton.h"
 #include "mythmainwindow.h"
+#include "mythscreenstack.h"
 
 LanguageSelection::LanguageSelection(MythScreenStack *parent, bool exitOnFinish)
                  :MythScreenType(parent, "LanguageSelection"),

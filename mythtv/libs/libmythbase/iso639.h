@@ -4,9 +4,10 @@
 
 #include <vector>
 
-#include <QString>
-#include <QStringList>
 #include <QMap>
+#include <QString>
+
+class QStringList;
 
 #include "mythbaseexp.h"
 

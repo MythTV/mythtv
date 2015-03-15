@@ -13,8 +13,9 @@
 #include "mythuianimation.h"
 #include "mythrect.h"
 
+class MythPainter; // TODO: Should be an include but we first need to sort out the video scanner UI dependency mess
+
 class MythImage;
-class MythPainter;
 class MythGestureEvent;
 class FontMap;
 class MythFontProperties;

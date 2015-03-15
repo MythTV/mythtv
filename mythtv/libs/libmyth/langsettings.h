@@ -10,13 +10,13 @@
 
 // MythUI headers
 #include "mythscreentype.h"
-#include "mythscreenstack.h"
 
 class QEventLoop;
 class MythUIButtonList;
 class MythUIButtonListItem;
 class MythUIButton;
 class MythUIText;
+class MythScreenStack;
 
 class MPUBLIC LanguageSelection : public MythScreenType
 {

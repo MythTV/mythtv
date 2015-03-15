@@ -39,6 +39,8 @@ extern "C" {
 #include "libswscale/swscale.h"
 }
 
+#include <unistd.h> // for unlink()
+
 using namespace std;
 
 #define LOC QString("Transcode: ")

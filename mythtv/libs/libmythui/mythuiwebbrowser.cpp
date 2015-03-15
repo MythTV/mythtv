@@ -23,7 +23,6 @@
 #include "mythdialogbox.h"
 #include "mythprogressdialog.h"
 #include "mythuiscrollbar.h"
-#include "compat.h"
 
 // qt
 #include <QApplication>
@@ -36,6 +35,8 @@
 #include <QKeyEvent>
 #include <QDomDocument>
 #include <QNetworkCookieJar>
+
+#include <unistd.h> // for usleep()
 
 struct MimeType
 {

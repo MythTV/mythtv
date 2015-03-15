@@ -34,6 +34,8 @@
 #include "metaiowavpack.h"
 #include "musicutils.h"
 
+using namespace std;
+
 static QString thePrefix = "the ";
 
 bool operator==(MusicMetadata& a, MusicMetadata& b)

@@ -1,11 +1,11 @@
 #include <QObject>
 
-#include "mythuibuttonlist.h"
-#include "metadatacommon.h"
-#include "metadataimagedownload.h"
-#include "mythcorecontext.h"
-
 #include "mythmetaexp.h"
+#include "mythscreentype.h"
+#include "metadataimagehelper.h"
+
+class MythUIButtonList;
+class MetadataImageDownload;
 
 class META_PUBLIC ImageSearchResultsDialog : public MythScreenType
 {

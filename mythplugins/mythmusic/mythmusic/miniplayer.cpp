@@ -1,11 +1,15 @@
+
+#include "miniplayer.h"
+
 // mythtv
 #include <mythcontext.h>
 #include <lcddevice.h>
 
 // mythmusic
-#include "miniplayer.h"
 #include "musicplayer.h"
 #include "decoder.h"
+
+#include <QTimer>
 
 MiniPlayer::MiniPlayer(MythScreenStack *parent)
           : MusicCommon(parent, NULL, "music_miniplayer")

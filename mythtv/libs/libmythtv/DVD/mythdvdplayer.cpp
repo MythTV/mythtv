@@ -4,6 +4,8 @@
 #include "avformatdecoderdvd.h"
 #include "mythdvdplayer.h"
 
+#include <unistd.h> // for usleep()
+
 #define LOC      QString("DVDPlayer: ")
 
 MythDVDPlayer::MythDVDPlayer(PlayerFlags flags)

@@ -13,6 +13,7 @@
 #include "mythcorecontext.h"
 #include "recordinginfo.h"
 #include "tv.h"
+#include "tv_play.h"
 
 // MythUI
 #include "mythuitext.h"

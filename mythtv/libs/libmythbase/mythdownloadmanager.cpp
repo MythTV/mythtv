@@ -14,6 +14,8 @@
 
 #include "stdlib.h"
 
+#include <unistd.h> // for usleep()
+
 // libmythbase
 #include "compat.h"
 #include "mythcorecontext.h"

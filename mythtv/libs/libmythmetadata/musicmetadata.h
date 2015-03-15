@@ -2,10 +2,7 @@
 #define MUSICMETADATA_H_
 
 // C/C++
-#include <iostream>
 #include <stdint.h>
-
-using namespace std;
 
 // qt
 #include <QStringList>

@@ -1,12 +1,15 @@
 // -*- Mode: c++ -*-
 
-#include <vector>
-using std::vector;
 
 #include "mythconfigdialogs.h"
-#include "mythwizard.h"
 
+#include "mythwizard.h"
 #include "mythuihelper.h"
+#include "mythterminal.h"
+
+// C++ headers
+#include <vector>
+using std::vector;
 
 #include <QWidget>
 #include <QHBoxLayout>

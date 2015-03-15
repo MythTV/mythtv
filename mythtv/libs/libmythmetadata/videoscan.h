@@ -12,10 +12,7 @@
 
 #include "mythmetaexp.h"
 #include "mthread.h"
-
-class QStringList;
-
-class MythUIProgressDialog;
+#include "mythprogressdialog.h"
 
 class VideoMetadataListManager;
 

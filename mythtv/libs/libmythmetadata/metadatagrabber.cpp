@@ -13,6 +13,8 @@
 #include "exitcodes.h"
 #include "mythdate.h"
 #include "mythdirs.h"
+#include "mythlogging.h"
+#include "mythcorecontext.h"
 
 #define LOC QString("Metadata Grabber: ")
 #define kGrabberRefresh 60

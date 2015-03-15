@@ -12,7 +12,6 @@
 #include <unistd.h>
 
 #include "mythbaseexp.h"  //  MBASE_PUBLIC , etc.
-#include "mthread.h"
 
 #ifdef _WIN32
 // Quick fix to let this compile for Windows:  we have it disabled on the

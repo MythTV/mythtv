@@ -3,6 +3,7 @@
 #include "mythlogging.h"
 #include "mythuibutton.h"
 #include "mythuibuttonlist.h"
+#include "mythuishape.h"
 #include "mythuitext.h"
 #include "mythuitextedit.h"
 #include "rawsettingseditor.h"

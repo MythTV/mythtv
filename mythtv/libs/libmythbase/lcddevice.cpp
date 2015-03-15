@@ -13,6 +13,8 @@
 #include <fcntl.h>
 #include <errno.h>
 
+#include <unistd.h> // for usleep()
+
 // Qt headers
 #include <QApplication>
 #include <QRegExp>
@@ -20,6 +22,7 @@
 #include <QTextCodec>
 #include <QByteArray>
 #include <QTcpSocket>
+#include <QTimer>
 
 // MythTV headers
 #include "lcddevice.h"

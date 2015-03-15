@@ -12,6 +12,7 @@ using std::endl;
 #include "mythtimer.h"
 #include "mythlogging.h"
 #include "mythmainwindow.h"
+#include "mythprogressdialog.h"
 #include "mythuihelper.h"
 #include "mythmiscutil.h"
 #include "mythdb.h"

@@ -1,11 +1,15 @@
-#include <iostream>
-using namespace std;
+
+#include "mythcommflagplayer.h"
 
 #include <QRunnable>
 
-#include "mythcommflagplayer.h"
 #include "mthreadpool.h"
 #include "mythlogging.h"
+
+#include <unistd.h> // for usleep()
+#include <iostream> // for cout()
+
+using namespace std;
 
 class RebuildSaver : public QRunnable
 {

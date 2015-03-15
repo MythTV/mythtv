@@ -4,7 +4,8 @@
 #include "mythlogging.h"
 #include "mythcorecontext.h"
 #include "remoteutil.h"
-#include "compat.h"
+
+#include <unistd.h> // for usleep()
 
 using std::vector;
 

@@ -43,6 +43,7 @@ using namespace std;
 #include "programinfo.h"
 #include "mythcorecontext.h"
 #include "fifowriter.h"
+#include "filter.h"
 #include "filtermanager.h"
 #include "mythdate.h"
 #include "livetvchain.h"

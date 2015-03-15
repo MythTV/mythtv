@@ -5,6 +5,7 @@
 #include <QKeyEvent>
 #include <QRegExp>
 #include <QThread>
+#include <QDomDocument>
 
 // myth
 #include <mythcontext.h>

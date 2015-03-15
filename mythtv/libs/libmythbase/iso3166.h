@@ -4,7 +4,6 @@
 #define _ISO_3166_1_H_
 
 #include <QString>
-#include <QStringList>
 #include <QMap>
 
 #include "mythbaseexp.h"

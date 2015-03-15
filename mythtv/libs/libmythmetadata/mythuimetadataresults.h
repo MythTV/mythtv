@@ -1,14 +1,12 @@
 #ifndef MYTHUIMETADATARESULTS_H_
 #define MYTHUIMETADATARESULTS_H_
 
-#include "mythcorecontext.h"
 #include "mythuibuttonlist.h"
 
-#include "metadataimagedownload.h"
-#include "metadatadownload.h"
 #include "metadatacommon.h"
-
 #include "mythmetaexp.h"
+
+class MetadataImageDownload;
 
 class META_PUBLIC MetadataResultsDialog : public MythScreenType
 {

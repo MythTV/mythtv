@@ -20,13 +20,14 @@
 #include <cmath>
 #include <cstdarg>
 
+#include <unistd.h>       // for usleep()
+
 #include <queue>
 #include <algorithm>
 using namespace std;
 
 #ifdef _WIN32
 #include <winsock2.h>
-#include <unistd.h>
 #else
 #include <locale.h>
 #endif
