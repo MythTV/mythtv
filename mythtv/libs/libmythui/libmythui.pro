@@ -1,6 +1,6 @@
 include ( ../../settings.pro )
 
-QT += xml sql network
+QT += xml sql network opengl
 contains(QT_VERSION, ^4\\.[0-9]\\..*) {
 QT += webkit
 }
