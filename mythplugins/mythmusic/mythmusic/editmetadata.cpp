@@ -20,6 +20,7 @@
 #include <musicutils.h>
 #include <mythprogressdialog.h>
 #include <remotefile.h>
+#include <mthreadpool.h>
 
 // mythmusic
 #include "musicdata.h"

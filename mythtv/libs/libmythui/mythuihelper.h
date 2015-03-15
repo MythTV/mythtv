@@ -6,7 +6,6 @@
 #include <QFont>
 #include <QMutex>
 
-#include "mthreadpool.h"
 #include "mythuiexp.h"
 #include "themeinfo.h"
 
@@ -14,6 +13,7 @@
 #define FALLBACK_UI_THEME "MythCenter-wide"
 
 class MythUIHelperPrivate;
+class MThreadPool;
 class MythPainter;
 class MythImage;
 class QImage;

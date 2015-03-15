@@ -2,11 +2,12 @@
 #define MYTHPROGRESSBOX_H_
 
 #include <QEvent>
+#include <QMutex>
 
 #include "mythscreentype.h"
-#include "mythmainwindow.h"
-#include "mythuitext.h"
-#include "mythuiprogressbar.h"
+
+class MythUIText;
+class MythUIProgressBar;
 
 class MUI_PUBLIC ProgressUpdateEvent : public QEvent
 {

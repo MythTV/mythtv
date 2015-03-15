@@ -13,6 +13,8 @@
 #include "mythlogging.h"
 #include "mythlocale.h"
 #include "mythtranslation.h"
+#include "iso3166.h"
+#include "iso639.h"
 
 // libmythui
 #include "mythuibuttonlist.h"

@@ -20,6 +20,7 @@ using namespace std;
 #include <mythuibuttontree.h>
 #include <mythuicheckbox.h>
 #include <mythuivideo.h>
+#include <mythuitext.h>
 #include <audiooutput.h>
 #include <compat.h>
 #include <lcddevice.h>

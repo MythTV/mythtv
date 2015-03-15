@@ -4,10 +4,10 @@
 #include <QString>
 
 #include "mythuitype.h"
-#include "mythuistatetype.h"
-#include "mythuitext.h"
 
-#include "mythgesture.h"
+class MythUIStateType;
+class MythUIText;
+class MythGestureEvent;
 
 /** \class MythUIButton
  *

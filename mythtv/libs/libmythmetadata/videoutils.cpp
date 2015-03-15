@@ -1,17 +1,27 @@
+
+#include "videoutils.h"
+
 #include <QDir>
 #include <QCoreApplication>
 
-#include "mythcontext.h"
+// libmythbase
 #include "mythdirs.h"
-#include "mythmainwindow.h"
 #include "mythsystemlegacy.h"
+#include "storagegroup.h"
+
+// libmyth
+#include "mythcontext.h"
+
+// libmythui
+#include "mythmainwindow.h"
 #include "mythdialogbox.h"
 #include "mythuistatetype.h"
 #include "mythuiimage.h"
+#include "mythuitext.h"
+
+// libmythmetadata
 #include "globals.h"
 #include "videometadatalistmanager.h"
-#include "videoutils.h"
-#include "storagegroup.h"
 
 namespace
 {

@@ -31,6 +31,7 @@ using namespace std;
 #include "avformatdecoder.h"
 #include "subtitlescreen.h"
 #include "srtwriter.h"
+#include "iso639.h"
 
 
 const int OneSubtitle::kDefaultLength = 750; /* ms */

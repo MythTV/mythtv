@@ -23,9 +23,6 @@
 #ifndef MYTHSYSTEM_H_
 #define MYTHSYSTEM_H_
 
-// C headers
-#include <stdint.h>
-
 // Qt headers
 #include <QString>
 

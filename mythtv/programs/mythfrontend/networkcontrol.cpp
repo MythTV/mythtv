@@ -1,3 +1,6 @@
+
+#include "networkcontrol.h"
+
 #include <unistd.h>
 
 #include <QCoreApplication>
@@ -12,7 +15,6 @@
 #include "mythcorecontext.h"
 #include "mythmiscutil.h"
 #include "mythversion.h"
-#include "networkcontrol.h"
 #include "programinfo.h"
 #include "remoteutil.h"
 #include "previewgenerator.h"
@@ -24,17 +26,18 @@
 // libmythui
 #include "mythmainwindow.h"
 #include "mythuihelper.h"
-#include <mythuigroup.h>
-#include <mythuiclock.h>
-#include <mythuibuttontree.h>
-#include <mythuivideo.h>
-#include <mythuiguidegrid.h>
-#include <mythuicheckbox.h>
-#include <mythuispinbox.h>
-#include <mythuiwebbrowser.h>
-#include <mythuiprogressbar.h>
-#include <mythuiscrollbar.h>
-#include <mythuieditbar.h>
+#include "mythuigroup.h"
+#include "mythuiclock.h"
+#include "mythuibuttontree.h"
+#include "mythuivideo.h"
+#include "mythuiguidegrid.h"
+#include "mythuicheckbox.h"
+#include "mythuispinbox.h"
+#include "mythuiwebbrowser.h"
+#include "mythuiprogressbar.h"
+#include "mythuiscrollbar.h"
+#include "mythuieditbar.h"
+#include "mythuiimage.h"
 
 #define LOC QString("NetworkControl: ")
 #define LOC_ERR QString("NetworkControl Error: ")

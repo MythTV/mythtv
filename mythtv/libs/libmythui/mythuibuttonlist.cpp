@@ -20,6 +20,7 @@
 #include "mythuitextedit.h"
 #include "mythuigroup.h"
 #include "mythuiimage.h"
+#include "mythgesture.h"
 
 #define LOC     QString("MythUIButtonList(%1): ").arg(objectName())
 

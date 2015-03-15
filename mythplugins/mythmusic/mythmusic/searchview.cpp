@@ -8,6 +8,7 @@
 #include <mythdialogbox.h>
 #include <mythuitextedit.h>
 #include <mythuibuttonlist.h>
+#include <mythuitext.h>
 #include <mythdb.h>
 
 // mythmusic

@@ -15,6 +15,7 @@
 
 // MythUI
 #include "mythuitext.h"
+#include "mythuiimage.h"
 #include "mythuibutton.h"
 #include "mythuibuttonlist.h"
 #include "mythuitextedit.h"

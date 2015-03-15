@@ -10,6 +10,7 @@
 
 // Mythui Headers
 #include "mythmainwindow.h"
+#include "mythgesture.h"
 
 MythUIButtonTree::MythUIButtonTree(MythUIType *parent, const QString &name)
     : MythUIType(parent, name)

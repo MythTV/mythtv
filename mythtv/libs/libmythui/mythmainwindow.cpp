@@ -55,6 +55,9 @@ using namespace std;
 #include "mythudplistener.h"
 #include "mythrender_base.h"
 #include "mythuistatetracker.h"
+#include "mythuiactions.h"
+#include "mythrect.h"
+#include "mythuidefines.h"
 
 #ifdef USING_APPLEREMOTE
 #include "AppleRemoteListener.h"

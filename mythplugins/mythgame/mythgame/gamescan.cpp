@@ -5,6 +5,7 @@
 #include <QUrl>
 
 #include <mythcontext.h>
+#include <mythmainwindow.h>
 #include <mythscreenstack.h>
 #include <mythprogressdialog.h>
 #include <mythdialogbox.h>

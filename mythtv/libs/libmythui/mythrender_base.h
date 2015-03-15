@@ -7,6 +7,7 @@
 
 #include "referencecounter.h"
 #include "mythuiexp.h"
+#include "mythuidefines.h"
 
 typedef enum
 {

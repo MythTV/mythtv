@@ -14,6 +14,7 @@
 #include "channelutil.h"
 #include "importicons.h"
 #include "mythlogging.h"
+#include "mythuiimage.h"
 #include "mythuitext.h"
 #include "mythwizard.h"
 #include "scanwizard.h"

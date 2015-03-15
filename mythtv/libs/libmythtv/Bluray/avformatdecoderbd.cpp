@@ -2,6 +2,8 @@
 #include "mythbdplayer.h"
 #include "avformatdecoderbd.h"
 
+#include "iso639.h"
+
 #define LOC QString("AFD_BD: ")
 
 AvFormatDecoderBD::AvFormatDecoderBD(

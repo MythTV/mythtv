@@ -15,6 +15,8 @@
 #include <mythdialogbox.h>
 #include <mythmainwindow.h>
 #include <musicutils.h>
+#include <mthreadpool.h>
+#include <mythuihelper.h>
 
 // mythmusic
 #include "musicdata.h"

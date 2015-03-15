@@ -7,8 +7,6 @@
 #include <QLocale>
 
 // libmythbase
-#include "iso3166.h"
-#include "iso639.h"
 #include "mythbaseexp.h"
 
 class MBASE_PUBLIC MythLocale

@@ -29,6 +29,8 @@
 #include "mythscreenstack.h"
 #include "mythuistatetype.h"
 #include "mythuigroup.h"
+#include "mythuiimage.h"
+#include "mythuitext.h"
 
 #define LOC      QString("ThemeChooser: ")
 #define LOC_WARN QString("ThemeChooser, Warning: ")

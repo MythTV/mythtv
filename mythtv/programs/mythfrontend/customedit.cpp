@@ -15,6 +15,7 @@
 #include "mythuitextedit.h"
 #include "mythuibutton.h"
 #include "mythdialogbox.h"
+#include "mythuitext.h"
 
 // libmythtv
 #include "recordingrule.h"

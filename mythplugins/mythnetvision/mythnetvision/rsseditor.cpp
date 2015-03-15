@@ -10,6 +10,8 @@
 #include <mythuifilebrowser.h>
 #include <mythmainwindow.h>
 #include <mythdialogbox.h>
+#include <mythuiimage.h>
+#include <mythuitext.h>
 #include <mythdate.h>
 #include <mythcontext.h>
 #include <mythdbcon.h>

@@ -14,6 +14,7 @@
 #include "mythuibutton.h"
 #include "mythuicheckbox.h"
 #include "mythuispinbox.h"
+#include "mythuiimage.h"
 #include "mythuifilebrowser.h"
 #include "mythuiimageresults.h"
 #include "mythuihelper.h"

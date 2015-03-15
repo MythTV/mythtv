@@ -20,6 +20,7 @@
 #include "mythuibuttonlist.h"
 #include "mythuibutton.h"
 #include "mythuistatetype.h"
+#include "mythgesture.h"
 
 QEvent::Type DialogCompletionEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();

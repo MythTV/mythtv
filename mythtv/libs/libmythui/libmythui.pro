@@ -42,7 +42,7 @@ HEADERS += mythdisplay.h mythuivideo.h mythudplistener.h
 HEADERS += mythuiexp.h mythuisimpletext.h mythuistatetracker.h
 HEADERS += mythuianimation.h mythuiscrollbar.h
 HEADERS += mythnotificationcenter.h mythnotificationcenter_private.h
-HEADERS += mythuicomposite.h mythnotification.h
+HEADERS += mythuicomposite.h mythnotification.h mythuidefines.h
 
 SOURCES  = mythmainwindow.cpp mythpainter.cpp mythimage.cpp mythrect.cpp
 SOURCES += myththemebase.cpp  mythpainter_qimage.cpp mythpainter_yuva.cpp

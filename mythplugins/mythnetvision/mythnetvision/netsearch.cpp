@@ -20,6 +20,8 @@
 #include <metadata/videoutils.h>
 #include <rssparse.h>
 #include <mythcoreutil.h>
+#include <mythuitext.h>
+#include <mythuiimage.h>
 
 #include "netsearch.h"
 #include "netcommon.h"

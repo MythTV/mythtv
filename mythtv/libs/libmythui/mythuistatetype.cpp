@@ -6,6 +6,7 @@
 #include <QDomDocument>
 
 // MythUI headers
+#include "mythimage.h"
 #include "mythuiimage.h"
 #include "mythuigroup.h"
 #include "mythuitext.h"

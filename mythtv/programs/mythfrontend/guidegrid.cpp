@@ -13,23 +13,31 @@ using namespace std;
 #include <QKeyEvent>
 #include <QDateTime>
 
-// myth
+// mythbase
+#include "mythdate.h"
 #include "mythcorecontext.h"
 #include "mythdbcon.h"
 #include "mythlogging.h"
+
+// libmythtv
+#include "remoteutil.h"
+#include "channelutil.h"
+#include "cardutil.h"
+#include "tvremoteutil.h"
 #include "channelinfo.h"
 #include "programinfo.h"
 #include "recordingrule.h"
 #include "tv_play.h"
 #include "tv_rec.h"
-#include "mythdate.h"
-#include "remoteutil.h"
-#include "channelutil.h"
-#include "cardutil.h"
-#include "tvremoteutil.h"
+
+// libmythui
 #include "mythuibuttonlist.h"
 #include "mythuiguidegrid.h"
+#include "mythuistatetype.h"
 #include "mythdialogbox.h"
+#include "mythuiimage.h"
+#include "mythuitext.h"
+
 #include "progfind.h"
 
 QWaitCondition epgIsVisibleCond;

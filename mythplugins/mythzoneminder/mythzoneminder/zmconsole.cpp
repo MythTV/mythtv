@@ -24,6 +24,7 @@
 #include <mythcontext.h>
 #include <mythdbcon.h>
 #include <mythdate.h>
+#include <mythuitext.h>
 
 // zoneminder
 #include "zmconsole.h"

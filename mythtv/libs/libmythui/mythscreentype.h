@@ -5,6 +5,7 @@
 #include "mythuiutils.h"
 
 #include <QSemaphore>
+#include <QEvent>
 
 class ScreenLoadTask;
 class MythScreenStack;

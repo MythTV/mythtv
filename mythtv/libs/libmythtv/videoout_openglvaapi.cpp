@@ -1,6 +1,7 @@
 #include "videoout_openglvaapi.h"
 #include "vaapicontext.h"
 #include "mythmainwindow.h"
+#include "mythpainter.h"
 
 #define LOC QString("VidOutGLVAAPI: ")
 #define ERR QString("VidOutGLVAAPI Error: ")
