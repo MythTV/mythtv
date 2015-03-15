@@ -18,6 +18,7 @@
 #include "mythlogging.h"
 #include "DVD/mythdvdplayer.h"
 #include "Bluray/mythbdplayer.h"
+#include "channelutil.h"
 
 #define LOC QString("playCtx: ")
 

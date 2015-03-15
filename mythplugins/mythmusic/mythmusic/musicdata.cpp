@@ -8,6 +8,7 @@
 #include <musicmetadata.h>
 #include <musicfilescanner.h>
 #include <musicutils.h>
+#include <mthreadpool.h>
 
 // mythmusic
 #include "musicdata.h"

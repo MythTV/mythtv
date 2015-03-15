@@ -5,7 +5,6 @@
 #include <QFileInfo>
 #include <QString>
 #include <QStringList>
-#include <QTimer>
 #include <QDateTime>
 #include <QDate>
 #include <QTime>

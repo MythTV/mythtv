@@ -1,5 +1,12 @@
-#include "mythlogging.h"
+
 #include "mythuieditbar.h"
+
+// MythBase
+#include "mythlogging.h"
+
+// MythUI
+#include "mythuishape.h"
+#include "mythuiimage.h"
 
 MythUIEditBar::MythUIEditBar(MythUIType *parent, const QString &name)
     : MythUIType(parent, name), m_editPosition(0.0), m_total(1.0)

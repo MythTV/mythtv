@@ -20,7 +20,6 @@
 
 #include <QtTest/QtTest>
 
-#include "mythcorecontext.h"
 #include "programinfo.h"
 #include "programtypes.h"
 

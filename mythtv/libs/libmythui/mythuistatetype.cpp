@@ -8,6 +8,7 @@
 // MythUI headers
 #include "mythuiimage.h"
 #include "mythuigroup.h"
+#include "mythuitext.h"
 #include "mythpainter.h"
 #include "mythmainwindow.h"
 

@@ -2,8 +2,6 @@
 #define MYTHUI_PROGRESSBAR_H_
 
 #include "mythuitype.h"
-#include "mythuiimage.h"
-#include "mythuishape.h"
 
 /** \class MythUIProgressBar
  *

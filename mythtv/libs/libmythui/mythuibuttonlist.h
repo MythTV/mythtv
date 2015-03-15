@@ -7,14 +7,13 @@
 #include <QVariant>
 
 #include "mythuitype.h"
-#include "mythuiimage.h"
-#include "mythuitext.h"
-#include "mythuigroup.h"
 #include "mythscreentype.h"
+#include "mythimage.h"
 
 class MythUIButtonList;
 class MythUIScrollBar;
 class MythUIStateType;
+class MythUIGroup;
 
 struct TextProperties {
     QString text;

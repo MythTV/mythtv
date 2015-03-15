@@ -7,6 +7,9 @@
 #include "programtypes.h"
 #include "mythdate.h"
 
+#include <deque>
+using std::deque;
+
 const char *kPlayerInUseID           = "player";
 const char *kPIPPlayerInUseID        = "pipplayer";
 const char *kPBPPlayerInUseID        = "pbpplayer";
@@ -364,6 +367,59 @@ QString toString(AvailableStatusType status)
         case asDeleted:         return "Deleted";
     }
     return QString("Unknown(%1)").arg((int)status);
+}
+
+
+QString SkipTypeToString(int flags)
+{
+    if (COMM_DETECT_COMMFREE == flags)
+        return QObject::tr("Commercial Free");
+    if (COMM_DETECT_UNINIT == flags)
+        return QObject::tr("Use Global Setting");
+
+    QChar chr = '0';
+    QString ret = QString("0x%1").arg(flags,3,16,chr);
+    bool blank = COMM_DETECT_BLANK & flags;
+    bool scene = COMM_DETECT_SCENE & flags;
+    bool logo  = COMM_DETECT_LOGO  & flags;
+    bool exp   = COMM_DETECT_2     & flags;
+    bool prePst= COMM_DETECT_PREPOSTROLL & flags;
+
+    if (blank && scene && logo)
+        ret = QObject::tr("All Available Methods");
+    else if (blank && scene && !logo)
+        ret = QObject::tr("Blank Frame + Scene Change");
+    else if (blank && !scene && logo)
+        ret = QObject::tr("Blank Frame + Logo Detection");
+    else if (!blank && scene && logo)
+        ret = QObject::tr("Scene Change + Logo Detection");
+    else if (blank && !scene && !logo)
+        ret = QObject::tr("Blank Frame Detection");
+    else if (!blank && scene && !logo)
+        ret = QObject::tr("Scene Change Detection");
+    else if (!blank && !scene && logo)
+        ret = QObject::tr("Logo Detection");
+
+    if (exp)
+        ret = QObject::tr("Experimental") + ": " + ret;
+    else if(prePst)
+        ret = QObject::tr("Pre & Post Roll") + ": " + ret;
+
+    return ret;
+}
+
+deque<int> GetPreferredSkipTypeCombinations(void)
+{
+    deque<int> tmp;
+    tmp.push_back(COMM_DETECT_BLANK | COMM_DETECT_SCENE | COMM_DETECT_LOGO);
+    tmp.push_back(COMM_DETECT_BLANK);
+    tmp.push_back(COMM_DETECT_BLANK | COMM_DETECT_SCENE);
+    tmp.push_back(COMM_DETECT_SCENE);
+    tmp.push_back(COMM_DETECT_LOGO);
+    tmp.push_back(COMM_DETECT_2 | COMM_DETECT_BLANK | COMM_DETECT_LOGO);
+    tmp.push_back(COMM_DETECT_PREPOSTROLL | COMM_DETECT_BLANK |
+                  COMM_DETECT_SCENE);
+    return tmp;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

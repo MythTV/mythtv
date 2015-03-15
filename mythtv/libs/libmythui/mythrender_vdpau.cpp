@@ -1,3 +1,6 @@
+
+#include "mythrender_vdpau.h"
+
 #include "math.h"
 
 #include <QSize>
@@ -5,7 +8,7 @@
 #include "mthread.h"
 #include "mythlogging.h"
 #include "mythmainwindow.h"
-#include "mythrender_vdpau.h"
+#include "compat.h"
 
 // NB this may be API dependant
 #ifndef VDP_VIDEO_MIXER_FEATURE_HIGH_QUALITY_SCALING_L1

@@ -1,8 +1,17 @@
 #ifndef AUDIOPLAYER_H
 #define AUDIOPLAYER_H
 
-#include <stdint.h>
 #include "audiooutputsettings.h"
+#include "mythtvexp.h"
+#include "volumebase.h" // MuteState
+
+#include <QCoreApplication>
+#include <QMutex>
+
+#include <stdint.h>
+#include <vector>
+
+using std::vector;
 
 class  MythPlayer;
 class  AudioOutput;

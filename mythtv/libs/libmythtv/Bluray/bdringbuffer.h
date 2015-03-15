@@ -14,7 +14,6 @@
 #include "keys.h" // Likely to cause collisions?
 
 #include "ringbuffer.h"
-#include "mythdate.h"
 
 /** \class BDRingBufferPriv
  *  \brief RingBuffer class for Blu-rays

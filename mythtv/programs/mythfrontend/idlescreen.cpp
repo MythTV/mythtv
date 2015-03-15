@@ -8,6 +8,7 @@
 
 #include <mythuibuttonlist.h>
 #include <mythuistatetype.h>
+#include <mythuitext.h>
 #include <mythmainwindow.h>
 
 #include <programinfo.h>

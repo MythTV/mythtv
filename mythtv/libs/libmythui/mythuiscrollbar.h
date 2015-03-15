@@ -2,8 +2,6 @@
 #define MYTHUI_SCROLLBAR_H_
 
 #include "mythuitype.h"
-#include "mythuiimage.h"
-#include "mythuishape.h"
 
 /** \class MythUIScrollBar
  *

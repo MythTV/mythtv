@@ -7,6 +7,7 @@
 
 // Qt headers
 #include <QCoreApplication>
+#include <QDate>
 
 class MythUIButtonList;
 class MythUIButtonListItem;

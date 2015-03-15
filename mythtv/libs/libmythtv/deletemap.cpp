@@ -1,11 +1,14 @@
+
+#include "deletemap.h"
+
 #include <cmath>
 #include <stdint.h>
 
 #include "mythlogging.h"
 #include "mythcontext.h"
 #include "osd.h"
-#include "deletemap.h"
 #include "mythplayer.h"
+#include "programinfo.h"
 
 #define LOC     QString("DelMap: ")
 #define EDIT_CHECK do { \

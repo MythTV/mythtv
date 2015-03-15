@@ -9,10 +9,11 @@ using namespace std;
 #include "playercontext.h"
 #include "remoteencoder.h"
 #include "recordinginfo.h"
+#include "channelutil.h"
+#include "mythlogging.h"
 #include "mythplayer.h"
 #include "cardutil.h"
 #include "tv_play.h"
-#include "mythlogging.h"
 
 #define LOC      QString("BH: ")
 
