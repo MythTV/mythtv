@@ -17,6 +17,8 @@
 
 #include "mythmainwindow.h"
 
+#include <unistd.h> // for usleep()
+
 #define LOC QString("RAOP Conn: ")
 #define MAX_PACKET_SIZE  2048
 

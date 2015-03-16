@@ -8,6 +8,7 @@
 #include <QPointer>
 
 #include <stdint.h>
+#include <stdlib.h>
 
 #include "mythconfig.h"
 #include "mythbaseexp.h"  //  MBASE_PUBLIC , etc.
