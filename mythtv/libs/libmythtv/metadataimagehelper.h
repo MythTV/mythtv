@@ -2,6 +2,7 @@
 #define _METADATAIMAGEHELPER_H_
 
 #include <QObject>
+#include <QMultiMap>
 
 #include "mythtvexp.h"
 
