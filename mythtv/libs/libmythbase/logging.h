@@ -16,6 +16,7 @@
 #include "mythsignalingtimer.h"
 #include "mthread.h"
 #include "referencecounter.h"
+#include "compat.h"
 
 #undef NOLOGSERVER
 #if !CONFIG_MYTHLOGSERVER
