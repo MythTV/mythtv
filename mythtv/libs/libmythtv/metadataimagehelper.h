@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QMultiMap>
+#include <QMetaType>
 
 #include "mythtvexp.h"
 
