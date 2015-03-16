@@ -138,3 +138,23 @@ function toHHMMSS(seconds)
     return time;
 }
 
+// Truncate a string to the last whole word, appending an elipsis at the cut
+// point
+function truncateString(str, length)
+{
+    var newStr = str;
+
+    if (newStr.length > length)
+    {
+        newStr = newStr.substr(0,length);
+        var lastSpaceIdx = newStr.lastIndexOf(" ");
+        if (lastSpaceIdx > 1)
+            newStr = newStr.substr(0,lastSpaceIdx);
+        // &hellip; - ellipsis html entity, not used because it would be
+        // double encoded, and ironically it's actually more characters than
+        // the three full stops.
+        newStr += " ...";
+    }
+
+    return newStr;
+}

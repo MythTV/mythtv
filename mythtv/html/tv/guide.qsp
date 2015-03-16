@@ -352,6 +352,12 @@ if (chanGroups.length)
             // Used as a unique identifier and also to access the chanid
             // and starttime for the AJAX scheduling stuff
             var programIdentifier = channel.ChanId + "_" + program.StartTime.toISOString();
+
+            var programDescription = program.Description;
+
+             // Very rough system for deciding how much of the description to truncate (for loading speed, rather than display reasons)
+            var maxDescriptionLength = (width / 100 * 600);
+            programDescription = truncateString(program.Description, maxDescriptionLength);
 %>
                 <div class="programBox" style="width:<%=width%>%;">
                     <div class="programBoxInner <%=categoryClass%> <%=statusClass%> <%=startClass%> <%=endClass%>" id="<%=programIdentifier%>" data-recordid="<%=program.Recording.RecordId%>" data-chanid="<%=channel.ChanId%>" data-starttime="<%=program.StartTime.toISOString()%>" onMouseOver="startDetailTimer(this, 'program');" onMouseOut="hideDetail(this);" onClick="showMenu(this, '<%=menu%>');">
@@ -362,7 +368,7 @@ if (chanGroups.length)
                         </div>
                         <div class="programBody">
                             <span class="programSubtitle"><%=escapeHTML(program.SubTitle)%></span>
-                            <span class="programDescription"><%=escapeHTML(program.Description)%></span>
+                            <span class="programDescription"><%=escapeHTML(programDescription)%></span>
                         </div>
                         <div class="programSchedPopup" id="<%=programIdentifier%>_schedpopup">
                             <%=qsTr("Scheduling")%> ...
