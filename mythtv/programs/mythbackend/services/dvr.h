@@ -75,6 +75,9 @@ class Dvr : public DvrServices
                                                         const QDateTime &StartTime,
                                                         bool  Watched);
 
+        DTC::RecordedMarkupInfo* GetRecordedMarkupInfo    ( int              ChanId,
+                                                            const QDateTime &StartTime  );
+
         DTC::ProgramList* GetConflictList     ( int              StartIndex,
                                                 int              Count,
                                                 int              RecordId );
