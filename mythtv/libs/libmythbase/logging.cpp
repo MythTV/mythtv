@@ -1147,8 +1147,15 @@ void verboseHelp(void)
       "and override the default verbosity level.\n\n"
       "Additive options may also be subtracted from 'all' by\n"
       "prefixing them with 'no', so you may use '-v all,nodatabase'\n"
-      "to view all but database debug messages.\n\n"
-      "Some debug levels may not apply to this program.\n\n";
+      "to view all but database debug messages.\n\n";
+
+    cerr << "The 'global' loglevel is specified with --loglevel, but can be\n"
+         << "overridden on a component by component basis by appending "
+         << "':level'\n"
+         << "to the component.\n"
+         << "    For example: -v gui:debug,channel:notice,record\n\n";
+
+    cerr << "Some debug levels may not apply to this program.\n" << endl;
 }
 
 /// \brief  Parse the --verbose commandline argument and set the verbose level
