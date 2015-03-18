@@ -22,7 +22,7 @@ using namespace std;
 #include <QHash>                        // for QHash
 #include <QMap>                         // for QMap<>::iterator, etc
 #include <QThread>                      // for QThread, etc
-#include <QtNumeric>                    // for qIsNaN
+#include <QtCore/qnumeric.h>            // for qIsNaN
 
 // MythTV headers
 #include "mthread.h"
