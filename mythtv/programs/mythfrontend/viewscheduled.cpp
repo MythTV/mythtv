@@ -3,17 +3,30 @@
 
 #include <QCoreApplication>
 
-#include "recordinginfo.h"
-#include "tv_play.h"
-#include "recordingrule.h"
-#include "mythlogging.h"
+// libmythbase
+
 #include "mythcorecontext.h"
-#include "remoteutil.h"
+#include "mythlogging.h"
+
+// libmythui
+
 #include "mythuitext.h"
 #include "mythuistatetype.h"
 #include "mythuibuttonlist.h"
 #include "mythdialogbox.h"
 #include "mythmainwindow.h"
+
+// libmythtv
+
+#include "recordinginfo.h"
+#include "tv_play.h"
+#include "recordingrule.h"
+#include "remoteutil.h"
+#include "programtypes.h"               // for RecStatus, etc
+#include "recordingtypes.h"             // for toString
+#include "tv_actions.h"                 // for ACTION_CHANNELSEARCH
+
+// mythfrontend
 #include "guidegrid.h"
 
 void *ViewScheduled::RunViewScheduled(void *player, bool showTV)

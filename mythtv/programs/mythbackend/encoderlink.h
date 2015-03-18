@@ -1,18 +1,22 @@
 #ifndef ENCODERLINK_H_
 #define ENCODERLINK_H_
 
-#include <QString>
-#include <QMap>
-#include <QMutex>
+#include <QDateTime>                    // for QDateTime
+#include <QMutex>                       // for QMutex
+#include <QString>                      // for QString
 
-#include "tv.h"
-#include "programinfo.h"
-#include "inputinfo.h"
+#include <vector>                       // for vector
+
+#include "programtypes.h"               // for RecStatus, RecStatus::Type, etc
+#include "tv.h"                         // for SleepStatus, etc
+#include "videoouttypes.h"              // for PictureAttribute
 
 class TVRec;
-class MainServer;
 class PlaybackSock;
 class LiveTVChain;
+class InputInfo;
+class ProgramInfo;
+class QStringList;
 
 class EncoderLink
 {
@@ -110,7 +114,7 @@ class EncoderLink
     void PauseRecorder(void);
     void SetLiveRecording(int);
     void SetNextLiveTVDir(QString dir);
-    vector<InputInfo> GetFreeInputs(const vector<uint> &excluded_cards);
+    std::vector<InputInfo> GetFreeInputs(const std::vector<uint> &excluded_cards);
     QString GetInput(void) const;
     QString SetInput(QString);
     void ToggleChannelFavorite(QString);

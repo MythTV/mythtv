@@ -3,46 +3,46 @@
 
 // QT
 #include <QCoreApplication>
-#include <QWaitCondition>
 #include <QDateTime>
 #include <QLocale>
 #include <QTimer>
 #include <QMap>
 
 // MythTV
+#include "mythnotificationcenter.h"     // for ShowNotificationError, etc
+#include "mythuimetadataresults.h"
 #include "previewgeneratorqueue.h"
+#include "mythprogressdialog.h"
 #include "mythuiprogressbar.h"
 #include "mythuibuttonlist.h"
 #include "mythcorecontext.h"
-#include "mythsystemevent.h"
+#include "mythmainwindow.h"             // for GetMythMainWindow, etc
+#include "mythscreenstack.h"            // for MythScreenStack
 #include "mythuistatetype.h"
 #include "mythuicheckbox.h"
 #include "mythuitextedit.h"
+#include "recordingtypes.h"
+#include "mythuiactions.h"              // for ACTION_1
 #include "mythuispinbox.h"
 #include "mythdialogbox.h"
-#include "mythprogressdialog.h"
-#include "mythuimetadataresults.h"
 #include "recordinginfo.h"
 #include "recordingrule.h"
-#include "mythuihelper.h"
-#include "storagegroup.h"
+#include "programtypes.h"               // for AudioProps, SubtitleTypes, etc
 #include "mythuibutton.h"
 #include "mythlogging.h"
 #include "mythuiimage.h"
 #include "programinfo.h"
-#include "mythplayer.h"
 #include "mythuitext.h"
-#include "remoteutil.h"
+#include "tv_actions.h"                 // for ACTION_LISTRECORDEDEPISODES, etc
 #include "mythdbcon.h"
+#include "mythevent.h"                  // for MythEvent, etc
 #include "playgroup.h"
-#include "mythdirs.h"
 #include "mythdb.h"
 #include "mythdate.h"
 #include "tv.h"
 
 //  Mythfrontend
 #include "playbackboxlistitem.h"
-#include "proglist.h"
 
 #define LOC      QString("PlaybackBox: ")
 #define LOC_WARN QString("PlaybackBox Warning: ")

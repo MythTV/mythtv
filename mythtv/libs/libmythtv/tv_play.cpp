@@ -3,7 +3,6 @@
 
 #include <cstdlib>
 #include <cstdarg>
-#include <cstring>
 #include <cmath>
 #include <unistd.h>
 #include <stdint.h>
@@ -15,13 +14,14 @@ using namespace std;
 #include <QKeyEvent>
 #include <QRunnable>
 #include <QRegExp>
-#include <QTimer>
 #include <QEvent>
 #include <QFile>
-#include <QDir>
 #include <QDomDocument>
 #include <QDomElement>
 #include <QDomNode>
+#include <QEvent>
+#include <QKeyEvent>
+#include <QTimerEvent>
 
 #include "mythconfig.h"
 
@@ -32,7 +32,6 @@ using namespace std;
 #include "mythcorecontext.h"
 #include "mythlogging.h"
 #include "lcddevice.h"
-#include "mythmiscutil.h"
 #include "compat.h"
 #include "mythdirs.h"
 #include "mythmedia.h"
@@ -40,7 +39,6 @@ using namespace std;
 // libmyth
 #include "programinfo.h"
 #include "remoteutil.h"
-#include "audiooutput.h"
 
 // libmythui
 #include "mythuistatetracker.h"
@@ -50,19 +48,17 @@ using namespace std;
 #include "mythscreenstack.h"
 #include "mythscreentype.h"
 #include "DisplayRes.h"
+#include "mythuiactions.h"              // for ACTION_LEFT, ACTION_RIGHT, etc
 
 // libmythtv
 #include "DVD/dvdringbuffer.h"
 #include "Bluray/bdringbuffer.h"
-#include "tv_rec.h"
 #include "remoteencoder.h"
 #include "tvremoteutil.h"
 #include "mythplayer.h"
 #include "subtitlescreen.h"
 #include "DetectLetterbox.h"
-#include "vsync.h"
 #include "jobqueue.h"
-#include "previewgenerator.h"
 #include "livetvchain.h"
 #include "playgroup.h"
 #include "datadirect.h"
@@ -72,11 +68,14 @@ using namespace std;
 #include "tv_play_win.h"
 #include "recordinginfo.h"
 #include "signalmonitorvalue.h"
-#include "scheduledrecording.h"
 #include "recordingrule.h"
 #include "mythsystemevent.h"
 #include "videometadatautil.h"
 #include "tvbrowsehelper.h"
+#include "playercontext.h"              // for PlayerContext, osdInfo, etc
+#include "programtypes.h"
+#include "ringbuffer.h"                 // for RingBuffer, etc
+#include "tv_actions.h"                 // for ACTION_TOGGLESLEEP, etc
 
 #if ! HAVE_ROUND
 #define round(x) ((int) ((x) + 0.5))

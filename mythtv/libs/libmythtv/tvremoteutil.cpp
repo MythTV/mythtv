@@ -1,7 +1,5 @@
 #include <unistd.h>
 
-#include <QFile>
-
 #include "tvremoteutil.h"
 #include "cardutil.h"
 #include "inputinfo.h"

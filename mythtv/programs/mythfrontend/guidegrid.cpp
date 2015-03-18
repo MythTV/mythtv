@@ -2,9 +2,8 @@
 #include "guidegrid.h"
 
 // c/c++
-#include <math.h>
-#include <unistd.h>
-#include <iostream>
+#include <stdint.h>                     // for uint64_t
+#include <deque>                        // for _Deque_iterator, operator!=, etc
 #include <algorithm>
 using namespace std;
 
@@ -13,11 +12,17 @@ using namespace std;
 #include <QKeyEvent>
 #include <QDateTime>
 
-// mythbase
+// libmythbase
 #include "mythdate.h"
 #include "mythcorecontext.h"
 #include "mythdbcon.h"
 #include "mythlogging.h"
+#include "autodeletedeque.h"            // for AutoDeleteDeque, etc
+#include "mythevent.h"                  // for MythEvent, etc
+#include "mythtypes.h"                  // for InfoMap
+
+// libmyth
+#include "programtypes.h"               // for RecStatus, etc
 
 // libmythtv
 #include "remoteutil.h"
@@ -28,7 +33,9 @@ using namespace std;
 #include "programinfo.h"
 #include "recordingrule.h"
 #include "tv_play.h"
-#include "tv_rec.h"
+#include "tv.h"                         // for ::kState_WatchingLiveTV
+#include "tv_actions.h"                 // for ACTION_CHANNELSEARCH, etc
+#include "recordingtypes.h"             // for toString, etc
 
 // libmythui
 #include "mythuibuttonlist.h"
@@ -37,7 +44,14 @@ using namespace std;
 #include "mythdialogbox.h"
 #include "mythuiimage.h"
 #include "mythuitext.h"
+#include "mythmainwindow.h"             // for GetMythMainWindow, etc
+#include "mythrect.h"                   // for MythRect
+#include "mythscreenstack.h"            // for MythScreenStack
+#include "mythscreentype.h"             // for MythScreenType
+#include "mythuiactions.h"              // for ACTION_SELECT, ACTION_DOWN, etc
+#include "mythuiutils.h"                // for UIUtilW, UIUtilE
 
+// mythfrontend
 #include "progfind.h"
 
 QWaitCondition epgIsVisibleCond;

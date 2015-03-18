@@ -1,8 +1,9 @@
 #ifndef CUTTER_H
 #define CUTTER_H
 
-#include "deletemap.h"
-#include "programtypes.h"
+#include <stdint.h>                     // for int64_t
+#include "deletemap.h"                  // for DeleteMap
+#include "programtypes.h"               // for frm_dir_map_t
 
 // Cutter object is used in performing clean cutting. The
 // act of cutting is shared between the player and the

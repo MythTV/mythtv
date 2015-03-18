@@ -1,6 +1,12 @@
-#include "mythlogging.h"
 
 #include "cutter.h"
+
+#include <algorithm>                    // for min
+using namespace std;
+
+#include <QMap>                         // for QMap
+
+#include "mythlogging.h"
 
 void Cutter::SetCutList(frm_dir_map_t &deleteMap, PlayerContext *ctx)
 {

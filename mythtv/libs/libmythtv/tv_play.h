@@ -15,13 +15,11 @@ using namespace std;
 #include <QWaitCondition>
 #include <QStringList>
 #include <QDateTime>
-#include <QKeyEvent>
+#include <QTime>
 #include <QObject>
 #include <QRegExp>
 #include <QString>
-#include <QEvent>
 #include <QMutex>
-#include <QTime>
 #include <QMap>
 #include <QSet>
 
@@ -37,6 +35,9 @@ using namespace std;
 #include "osd.h"
 #include "decoderbase.h"
 
+class QEvent;
+class QKeyEvent;
+class QTimerEvent;
 class QDateTime;
 class QDomDocument;
 class QDomNode;

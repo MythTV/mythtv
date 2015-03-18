@@ -1,7 +1,11 @@
+
+#include "proglist.h"
+
 // C/C++
-#include <vector>
 #include <algorithm>
 #include <functional>
+#include <deque>                        // for _Deque_iterator, operator-, etc
+#include <iterator>                     // for reverse_iterator
 using namespace std;
 
 // Qt
@@ -20,10 +24,9 @@ using namespace std;
 #include "channelinfo.h"
 #include "channelutil.h"
 #include "mythuitext.h"
-#include "proglist.h"
+#include "tv_actions.h"                 // for ACTION_CHANNELSEARCH
 #include "mythdb.h"
 #include "mythdate.h"
-#include "guidegrid.h"
 
 #define LOC      QString("ProgLister: ")
 #define LOC_WARN QString("ProgLister, Warning: ")

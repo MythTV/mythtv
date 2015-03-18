@@ -1,19 +1,10 @@
 // POSIX headers
 #include <sys/types.h>
-#include <unistd.h>
 
 // C headers
 #include <cstdlib>
 
-// C++ headers
-#include <iostream>
-#include <algorithm>
-using namespace std;
-
 // Qt headers
-#include <QFileInfo>
-#include <QRegExp>
-#include <QFile>
 #include <QMap>
 
 // MythTV headers
@@ -23,15 +14,10 @@ using namespace std;
 #include "mythmiscutil.h"
 #include "mythdate.h"
 #include "mythcorecontext.h"
-#include "dialogbox.h"
-#include "remoteutil.h"
-#include <programinfoupdater.h>
-#include "tvremoteutil.h"
+#include "programinfoupdater.h"
 #include "jobqueue.h"
 #include "mythdb.h"
 #include "mythlogging.h"
-#include "previewgenerator.h"
-#include "channelutil.h"
 
 #define LOC      QString("RecordingInfo(%1): ").arg(GetBasename())
 

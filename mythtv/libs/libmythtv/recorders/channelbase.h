@@ -13,6 +13,7 @@
 #include "inputinfo.h"
 #include "mythsystemlegacy.h"
 #include "tv.h"
+#include "videoouttypes.h" // for PictureAttribute
 
 class FireWireDBOptions;
 class GeneralDBOptions;

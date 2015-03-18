@@ -1,5 +1,3 @@
-#include <algorithm>
-using namespace std;
 
 #include "mythcorecontext.h"
 
@@ -11,7 +9,6 @@ using namespace std;
 #include "recordinginfo.h"
 #include "channelutil.h"
 #include "mythlogging.h"
-#include "mythplayer.h"
 #include "cardutil.h"
 #include "tv_play.h"
 

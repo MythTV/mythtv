@@ -18,19 +18,16 @@ using namespace std;
 #include <QImage>
 #include <QList>
 #include <QRect>
-#include <QPoint>
 #include <QPair>
+#include <QMap>                         // for QMap
+#include <QRegion>                      // for QRegion
+#include <QSize>                        // for QSize
 
 // MythTV headers
 #include "mythconfig.h"
 #include "../libmythfreemheg/freemheg.h"
-#include "interactivetv.h"
-#include "dsmcc.h"
 #include "mhegic.h"
-#include "mythcontext.h"
-#include "mythdbcon.h"
 #include "mythdeque.h"
-#include "mthread.h"
 
 class MythPainter;
 class InteractiveScreen;
@@ -38,6 +35,11 @@ class DSMCCPacket;
 class MHIImageData;
 class MHIContext;
 class MythAVCopy;
+class Dsmcc;
+class InteractiveTV;
+class MHStream;
+class MThread;
+class QByteArray;
 
 /** \class MHIContext
  *  \brief Contains various utility functions for interactive television.

@@ -1,7 +1,3 @@
-#include <iostream>
-
-#include <QCursor>
-#include <QLayout>
 
 #include "recordingprofile.h"
 #include "cardutil.h"
@@ -9,6 +5,7 @@
 #include "mythdb.h"
 #include "mythlogging.h"
 #include "mythwizard.h"
+#include "mythwidgets.h" // for MythLineEdit
 
 QString RecordingProfileStorage::GetWhereClause(MSqlBindings &bindings) const
 {

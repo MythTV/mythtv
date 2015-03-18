@@ -8,6 +8,11 @@
 #include <QRunnable>
 #include <QString>
 #include <QMap>
+#include <QMutex>                       // for QMutex
+#include <QHash>                        // for QHash
+
+// C++ headers
+#include <vector>                       // for vector
 
 // MythTV headers
 #include "mythtimer.h"
@@ -18,6 +23,9 @@
 #include "recordinginfo.h"
 #include "tv.h"
 #include "signalmonitorlistener.h"
+#include "mythtvexp.h"                  // for MTV_PUBLIC
+#include "programtypes.h"               // for RecStatus, RecStatus::Type, etc
+#include "videoouttypes.h"              // for PictureAttribute
 
 #include "mythconfig.h"
 

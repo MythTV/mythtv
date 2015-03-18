@@ -3,10 +3,6 @@
 
 #include <QString>
 
-#include "videoouttypes.h"
-#include "mythuiactions.h"
-#include "tv_actions.h"
-
 class VBIMode
 {
   public:

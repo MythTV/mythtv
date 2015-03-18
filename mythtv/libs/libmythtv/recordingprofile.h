@@ -4,7 +4,6 @@
 #include "mythtvexp.h"
 #include "settings.h"
 #include "mythdbcon.h"
-#include "mythwidgets.h"
 
 const QString availProfiles[] =
       {"Default", "Live TV", "High Quality", "Low Quality", "" };

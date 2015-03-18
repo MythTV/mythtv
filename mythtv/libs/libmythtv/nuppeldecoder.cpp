@@ -3,27 +3,30 @@
 #include <cassert>
 #include <cstring>
 #include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
+#include <stdio.h>                      // for SEEK_SET, SEEK_CUR
 
 // C++ headers
 #include <algorithm>
-#include <iostream>
+#include <vector>                       // for vector
 using namespace std;
 
 // Qt headers
 #include <QMutex>
+#include <QMap>                         // for QMap<>::iterator, QMap
 
 // MythTV headers
 #include "mythconfig.h"
 #include "nuppeldecoder.h"
 #include "mythplayer.h"
-#include "remoteencoder.h"
 #include "mythlogging.h"
 #include "programinfo.h"
-#include "audiooutpututil.h"
 #include "mythavutil.h"
 #include "fourcc.h"
+#include "RTjpegN.h"
+#include "audiooutpututil.h"               // for RTjpeg, RTJ_YUV420
+#include "audiooutputsettings.h"        // for ::FORMAT_NONE, ::FORMAT_S16, etc
+#include "audioplayer.h"                // for AudioPlayer
+#include "cc608reader.h"                // for CC608Reader
 
 #include "minilzo.h"
 

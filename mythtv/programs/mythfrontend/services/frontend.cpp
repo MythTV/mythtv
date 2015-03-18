@@ -13,6 +13,8 @@
 #include "tv_play.h"
 #include "recordinginfo.h"
 #include "mythversion.h"
+#include "mythuiactions.h"              // for ACTION_HANDLEMEDIA, etc
+#include "tv_actions.h"                 // for ACTION_JUMPCHAPTER, etc
 
 #include "videometadatalistmanager.h"
 #include "videometadata.h"
