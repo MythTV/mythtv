@@ -30,7 +30,6 @@ class PlaybackSock : public ReferenceCounter
   public:
     PlaybackSock(MainServer *parent, MythSocket *lsock,
                  QString lhostname, PlaybackSockEventsMode eventsMode);
-    virtual ~PlaybackSock();
 
     void SetDisconnected(void) { disconnected = true; }
     bool IsDisconnected(void) const { return disconnected; }
@@ -106,6 +105,10 @@ class PlaybackSock : public ReferenceCounter
     QStringList ForwardRequest(const QStringList&);
 
     bool ReadStringList(QStringList &list);
+
+    // Enforce reference counting
+  protected:
+    virtual ~PlaybackSock();
 
   private:
     bool SendReceiveStringList(QStringList &strlist, uint min_reply_length = 0);

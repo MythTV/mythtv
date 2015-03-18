@@ -30,6 +30,7 @@ using namespace std;
 #include <QFile>
 #include <QDir>
 #include <QWaitCondition>
+#include <QWriteLocker>
 #include <QRegExp>
 #include <QEvent>
 #include <QUrl>
@@ -465,6 +466,8 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     PlaybackSock *pbs = GetPlaybackBySock(sock);
     if (pbs)
         pbs->IncrRef();
+
+    bool bIsControl = (pbs) ? false : controlSocketList.contains(sock);
     sockListLock.unlock();
 
     QStringList listline;
@@ -477,6 +480,11 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
             return;
         }
         pbs->DecrRef();
+    }
+    else if (!bIsControl)
+    {
+        // The socket has been disconnected
+        return;
     }
     else if (!sock->ReadStringList(listline) || listline.empty())
     {
@@ -1671,25 +1679,30 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             socket->WriteStringList(errlist);
             return;
         }
+
         // Monitor connections are same as Playback but they don't
         // block shutdowns. See the Scheduler event loop for more.
 
         PlaybackSockEventsMode eventsMode =
             (PlaybackSockEventsMode)commands[3].toInt();
-        LOG(VB_NETWORK, LOG_INFO, LOC + QString("MainServer::ANN %1")
-                                            .arg(commands[1]));
-        LOG(VB_NETWORK, LOG_INFO, LOC +
-            QString("adding: %1 as a client (events: %2)")
-                .arg(commands[2]).arg(eventsMode));
+
+        QWriteLocker lock(&sockListLock);
+        if (!controlSocketList.remove(socket))
+            return; // socket was disconnected
         PlaybackSock *pbs = new PlaybackSock(this, socket, commands[2],
                                              eventsMode);
+        playbackList.push_back(pbs);
+        lock.unlock();
+
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("MainServer::ANN %1")
+                                      .arg(commands[1]));
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("adding: %1(%2) as a client (events: %3)")
+                                      .arg(commands[2])
+                                      .arg(quintptr(socket),0,16)
+                                      .arg(eventsMode));
         pbs->setBlockShutdown((commands[1] == "Playback") ||
                               (commands[1] == "Frontend"));
-
-        sockListLock.lockForWrite();
-        controlSocketList.remove(socket);
-        playbackList.push_back(pbs);
-        sockListLock.unlock();
 
         if (commands[1] == "Frontend")
         {
@@ -1721,14 +1734,15 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             return;
         }
 
+        QWriteLocker lock(&sockListLock);
+        if (!controlSocketList.remove(socket))
+            return; // socket was disconnected
         PlaybackSock *pbs = new PlaybackSock(this, socket, commands[2],
                                               kPBSEvents_Normal);
         pbs->setAsMediaServer();
         pbs->setBlockShutdown(false);
-        sockListLock.lockForWrite();
-        controlSocketList.remove(socket);
         playbackList.push_back(pbs);
-        sockListLock.unlock();
+        lock.unlock();
 
         gCoreContext->SendSystemEvent(
             QString("CLIENT_CONNECTED HOSTNAME %1").arg(commands[2]));
@@ -1745,11 +1759,17 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             return;
         }
 
+        QWriteLocker lock(&sockListLock);
+        if (!controlSocketList.remove(socket))
+            return; // socket was disconnected
+        PlaybackSock *pbs = new PlaybackSock(this, socket, commands[2],
+                                             kPBSEvents_None);
+        playbackList.push_back(pbs);
+        lock.unlock();
+
         LOG(VB_GENERAL, LOG_INFO, LOC +
             QString("adding: %1 as a slave backend server")
                                .arg(commands[2]));
-        PlaybackSock *pbs = new PlaybackSock(this, socket, commands[2],
-                                             kPBSEvents_None);
         pbs->setAsSlaveBackend();
         pbs->setIP(commands[3]);
 
@@ -1792,11 +1812,6 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         gCoreContext->dispatch(me);
 
         pbs->setBlockShutdown(false);
-
-        sockListLock.lockForWrite();
-        controlSocketList.remove(socket);
-        playbackList.push_back(pbs);
-        sockListLock.unlock();
 
         autoexpireUpdateTimer->start(1000);
 
@@ -1922,11 +1937,19 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
                     return;
                 }
             }
+            QWriteLocker lock(&sockListLock);
+            if (!controlSocketList.remove(socket))
+                return; // socket was disconnected
             ft = new FileTransfer(filename, socket, writemode);
+            fileTransferList.push_back(ft);
         }
         else
         {
+            QWriteLocker lock(&sockListLock);
+            if (!controlSocketList.remove(socket))
+                return; // socket was disconnected
             ft = new FileTransfer(filename, socket, usereadahead, timeout_ms);
+            fileTransferList.push_back(ft);
         }
 
         if (!ft->isOpen())
@@ -1940,10 +1963,6 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             return;
         }
         ft->IncrRef();
-        sockListLock.lockForWrite();
-        controlSocketList.remove(socket);
-        fileTransferList.push_back(ft);
-        sockListLock.unlock();
 
         retlist << QString::number(socket->GetSocketDescriptor());
         retlist << QString::number(ft->GetFileSize());
@@ -7480,7 +7499,7 @@ void MainServer::deferredDeleteSlot(void)
     DeferredDeleteStruct dds = deferredDeleteList.front();
     while (dds.ts.secsTo(MythDate::current()) > 30)
     {
-        delete dds.sock;
+        dds.sock->DecrRef();
         deferredDeleteList.pop_front();
         if (deferredDeleteList.empty())
             return;
@@ -7601,6 +7620,10 @@ void MainServer::connectionClosed(MythSocket *socket)
                 }
             }
 
+            LOG(VB_GENERAL, LOG_INFO, QString("%1 sock(%2) '%3' disconnected")
+                .arg(pbs->getBlockShutdown() ? "Playback" : "Monitor")
+                .arg(quintptr(socket),0,16)
+                .arg(pbs->getHostname()) );
             pbs->SetDisconnected();
             playbackList.erase(it);
 
@@ -7627,6 +7650,8 @@ void MainServer::connectionClosed(MythSocket *socket)
         MythSocket *sock = (*ft)->getSocket();
         if (sock == socket)
         {
+            LOG(VB_GENERAL, LOG_INFO, QString("FileTransfer sock(%1) disconnected")
+                .arg(quintptr(socket),0,16) );
             (*ft)->DecrRef();
             fileTransferList.erase(ft);
             sockListLock.unlock();
@@ -7637,6 +7662,8 @@ void MainServer::connectionClosed(MythSocket *socket)
     QSet<MythSocket*>::iterator cs = controlSocketList.find(socket);
     if (cs != controlSocketList.end())
     {
+        LOG(VB_GENERAL, LOG_INFO, QString("Control sock(%1) disconnected")
+            .arg(quintptr(socket),0,16) );
         (*cs)->DecrRef();
         controlSocketList.erase(cs);
         sockListLock.unlock();
