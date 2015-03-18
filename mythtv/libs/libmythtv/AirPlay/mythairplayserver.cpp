@@ -19,6 +19,7 @@
 #include "plist.h"
 #include "tv_play.h"
 #include "mythmainwindow.h"
+#include "tv_actions.h"
 
 #include "bonjourregister.h"
 #include "mythairplayserver.h"
