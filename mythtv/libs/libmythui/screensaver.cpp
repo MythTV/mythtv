@@ -2,6 +2,10 @@
 #include "screensaver.h"
 #include "screensaver-null.h"
 
+#ifdef USING_DBUS
+#include "screensaver-dbus.h"
+#endif // USING_DBUS
+
 #ifdef USING_X11
 #include "screensaver-x11.h"
 #endif // USING_X11
@@ -20,7 +24,9 @@ ScreenSaverControl* ScreenSaverControl::get(void)
     if (!ScreenSaverSingleton)
     {
 
-#if defined(USING_X11)
+#if defined(USING_DBUS)
+        ScreenSaverSingleton = new ScreenSaverDBus();
+#elif defined(USING_X11)
         ScreenSaverSingleton = new ScreenSaverX11();
 #elif CONFIG_DARWIN
         ScreenSaverSingleton = new ScreenSaverOSX();
