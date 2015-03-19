@@ -112,6 +112,13 @@ using_x11 {
     POST_TARGETDEPS += ../libmythnvctrl/libmythnvctrl-$${MYTH_LIB_EXT}
 }
 
+using_qtdbus {
+    QT      += dbus
+    DEFINES += USING_DBUS
+    HEADERS += screensaver-dbus.h
+    SOURCES += screensaver-dbus.cpp
+}
+
 macx {
     HEADERS += screensaver-osx.h   DisplayResOSX.h   util-osx.h
     SOURCES += screensaver-osx.cpp DisplayResOSX.cpp util-osx.cpp
