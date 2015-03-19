@@ -21,6 +21,7 @@ using namespace std;
 
 // qt
 //#include <QKeyEvent>
+#include <QObject>
 
 // mythtv
 #include <mythscreentype.h>

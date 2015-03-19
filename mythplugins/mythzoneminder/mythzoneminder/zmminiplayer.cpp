@@ -5,6 +5,7 @@
 #include <mythcontext.h>
 #include <lcddevice.h>
 #include <mythuiimage.h>
+#include <mythmainwindow.h>
 
 // mythzoneminder
 #include "zmclient.h"
@@ -18,7 +19,8 @@ const int FRAME_UPDATE_TIME = 1000 / 10;  // try to update the frame 10 times a 
 
 ZMMiniPlayer::ZMMiniPlayer(MythScreenStack *parent)
           : ZMLivePlayer(parent, true),
-              m_displayTimer(new QTimer(this))
+              m_displayTimer(new QTimer(this)), m_monitorText(NULL),
+              m_statusText(NULL), m_image(NULL)
 {
     m_displayTimer->setSingleShot(true);
     connect(m_displayTimer, SIGNAL(timeout()), this, SLOT(timerTimeout()));
