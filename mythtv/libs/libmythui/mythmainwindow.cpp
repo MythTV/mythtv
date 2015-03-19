@@ -2126,7 +2126,10 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
             if (!d->gesture.recording())
             {
                 d->gesture.start();
-                d->gesture.record(dynamic_cast<QMouseEvent*>(e)->pos());
+                QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent*>(e);
+                if (!mouseEvent)
+                    return false;
+                d->gesture.record(mouseEvent->pos());
 
                 /* start a single shot timer */
                 d->gestureTimer->start(GESTURE_TIMEOUT);
