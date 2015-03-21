@@ -96,7 +96,7 @@ void InitializeMythDirs(void)
         QDir(extdir).mkdir(".");
 
     if (confdir.isEmpty())
-        confdir = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation);
+        confdir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
 
 #if 0
     // TODO allow choice of base fs or the SD card for data
