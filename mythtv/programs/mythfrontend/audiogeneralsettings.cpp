@@ -168,7 +168,7 @@ AudioConfigSettings::AudioConfigSettings() :
     connect(m_OutputDevice, SIGNAL(valueChanged(StandardSetting *)),
             this, SLOT(UpdateCapabilities()));
     connect(m_AC3PassThrough, SIGNAL(valueChanged(StandardSetting *)),
-            this, SLOT(UpdateCapabilitiesAC3(StandardSetting *)));
+            this, SLOT(UpdateCapabilitiesAC3()));
 
     connect(m_DTSPassThrough, SIGNAL(valueChanged(StandardSetting *)),
             this, SLOT(UpdateCapabilities()));
