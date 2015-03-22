@@ -10,6 +10,8 @@
 #include <mythuifilebrowser.h>
 #include <mythmainwindow.h>
 #include <mythdialogbox.h>
+#include <mythuiimage.h>
+#include <mythuitext.h>
 #include <mythdate.h>
 #include <mythcontext.h>
 #include <mythdbcon.h>
@@ -467,8 +469,7 @@ void RSSEditor::fillRSSButtonList()
 
 void RSSEditor::SlotItemChanged()
 {
-    RSSSite *site =
-        qVariantValue<RSSSite *>(m_sites->GetItemCurrent()->GetData());
+    RSSSite *site = m_sites->GetItemCurrent()->GetData().value<RSSSite*>();
 
     if (site)
     {
@@ -525,8 +526,7 @@ void RSSEditor::SlotEditSite()
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    RSSSite *site =
-        qVariantValue<RSSSite *>(m_sites->GetItemCurrent()->GetData());
+    RSSSite *site = m_sites->GetItemCurrent()->GetData().value<RSSSite*>();
 
     if (site)
     {
@@ -570,8 +570,7 @@ void RSSEditor::DoDeleteSite(bool remove)
     if (!remove)
         return;
 
-    RSSSite *site =
-        qVariantValue<RSSSite *>(m_sites->GetItemCurrent()->GetData());
+    RSSSite *site = m_sites->GetItemCurrent()->GetData().value<RSSSite*>();
 
     if (removeFromDB(site))
         ListChanged();

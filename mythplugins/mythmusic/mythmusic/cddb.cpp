@@ -308,7 +308,7 @@ Cddb::Album& Cddb::Album::operator =(const QString& rhs)
 
     enum { kNorm, kToc } eState = kNorm;
 
-    QString cddb = QString::fromUtf8(rhs.toAscii().constData());
+    QString cddb = QString::fromUtf8(rhs.toLatin1().constData());
     while (!cddb.isEmpty())
     {
         // Lines should be of the form "FIELD=value\r\n"
@@ -473,7 +473,7 @@ Cddb::Album::operator QString() const
 // search local database for discID
 bool Dbase::Search(Cddb::Matches& res, const Cddb::discid_t discID)
 {
-    res.matches.empty();
+    res.matches.clear();
     res.discID = discID;
 
     if (CacheGet(res, discID))

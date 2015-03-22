@@ -20,6 +20,8 @@
 #include "compat.h"
 #include "mythlogging.h"
 #include "mythuihelper.h"
+#include "mythuiactions.h"              // for ACTION_DOWN, ACTION_LEFT, etc
+#include "tv_actions.h"                 // for ACTION_CHANNELDOWN, etc
 
 #define LOC      QString("DVDRB: ")
 

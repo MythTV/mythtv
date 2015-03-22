@@ -10,6 +10,8 @@
 #include "mythlogging.h"
 #include "mythdb.h"
 #include "mythdirs.h"
+#include "iso3166.h"
+#include "iso639.h"
 
 MythLocale::MythLocale(QString localeName) :
     m_defaultsLoaded(false)

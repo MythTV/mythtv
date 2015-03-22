@@ -8,6 +8,7 @@
 #include "backendselect.h"
 #include "configuration.h"
 #include "mythxmlclient.h"
+#include "mythuibuttonlist.h"
 #include "mythuibutton.h"
 #include "mythlogging.h"
 #include "mythversion.h"

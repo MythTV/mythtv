@@ -38,6 +38,8 @@ UPNPSubscription::UPNPSubscription(const QString &share_path, int port)
   : HttpServerExtension("UPnPSubscriptionManager", share_path),
     m_subscriptionLock(QMutex::Recursive), m_callback(QString("NOTSET"))
 {
+    m_nSupportedMethods = (uint)RequestTypeNotify; // Only NOTIFY supported
+
     QHostAddress addr;
     if (!UPnp::g_IPAddrList.isEmpty())
         addr = UPnp::g_IPAddrList.at(0);
@@ -188,7 +190,7 @@ bool UPNPSubscription::ProcessRequest(HTTPRequest *pRequest)
 
     QString nt  = pRequest->m_mapHeaders["nt"];
     QString nts = pRequest->m_mapHeaders["nts"];
-    bool    no  = pRequest->m_sRawRequest.startsWith("NOTIFY");
+    bool    no  = (pRequest->m_eType == RequestTypeNotify);
 
     if (nt.isEmpty() || nts.isEmpty() || !no)
     {

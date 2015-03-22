@@ -134,7 +134,7 @@ int main(int argc, char *argv[])
 
     cmdline.ApplySettingsOverride();
 
-    gCoreContext->SetBackend(true); // blocks the event connection
+    gCoreContext->SetAsBackend(true); // blocks the event connection
     if (!gCoreContext->ConnectToMasterServer())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to connect to master server");

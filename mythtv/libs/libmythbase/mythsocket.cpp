@@ -223,7 +223,7 @@ void MythSocket::ConnectHandler(void)
     {
         LOG(VB_SOCKET, LOG_INFO, LOC + "Failed to set SO_RCVBUF" + ENO);
     }
-    
+
     if (m_callback)
     {
         LOG(VB_SOCKET, LOG_DEBUG, LOC +
@@ -292,7 +292,7 @@ void MythSocket::CallReadyReadHandler(void)
         m_callback->readyRead(this);
     }
 }
-    
+
 bool MythSocket::ConnectToHost(
     const QHostAddress &hadr, quint16 port)
 {
@@ -1043,4 +1043,3 @@ void MythSocket::ResetReal(void)
 
     m_dataAvailable.fetchAndStoreOrdered(0);
 }
-

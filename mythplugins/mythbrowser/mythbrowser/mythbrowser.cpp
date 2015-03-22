@@ -161,7 +161,7 @@ void MythBrowser::slotAddTab(const QString &url, bool doSwitch)
 {
     QString name = QString("browser%1").arg(m_browserList.size() + 1);
     WebPage *page = new WebPage(this, m_browserList[0]->getBrowser()->GetArea(),
-                                name.toAscii().constData());
+                                name.toLatin1().constData());
     m_browserList.append(page);
 
     QString newUrl = url;

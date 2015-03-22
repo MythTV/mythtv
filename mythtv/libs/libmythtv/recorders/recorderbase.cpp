@@ -44,6 +44,7 @@ const uint RecorderBase::kTimeOfLatestDataIntervalTarget = 5000;
 RecorderBase::RecorderBase(TVRec *rec)
     : tvrec(rec),               ringBuffer(NULL),
       weMadeBuffer(true),
+      m_containerFormat(formatUnknown),
       m_primaryVideoCodec(AV_CODEC_ID_NONE),
       m_primaryAudioCodec(AV_CODEC_ID_NONE),
       videocodec("rtjpeg"),
@@ -108,7 +109,15 @@ void RecorderBase::SetRecording(const RecordingInfo *pginfo)
 
     ProgramInfo *oldrec = curRecording;
     if (pginfo)
+    {
+        // NOTE: RecorderBase and TVRec do not share a single RecordingInfo
+        //       instance which may lead to the possibility that changes made
+        //       in the database by one are overwritten by the other
         curRecording = new RecordingInfo(*pginfo);
+        RecordingFile *recFile = curRecording->GetRecordingFile();
+        recFile->m_containerFormat = m_containerFormat;
+        recFile->Save();
+    }
     else
         curRecording = NULL;
 
@@ -375,26 +384,26 @@ void RecorderBase::CheckForRingBufferSwitch(void)
         tvrec->RingBufferChanged(ringBuffer, curRecording, recq);
 }
 
-void RecorderBase::SetRecordingStatus(RecStatusType status,
+void RecorderBase::SetRecordingStatus(RecStatus::Type status,
                                       const QString& file, int line)
 {
     if (curRecording && curRecording->GetRecordingStatus() != status)
     {
         LOG(VB_RECORD, LOG_INFO,
             QString("Modifying recording status from %1 to %2 at %3:%4")
-            .arg(toString(curRecording->GetRecordingStatus(), kSingleRecord))
-            .arg(toString(status, kSingleRecord)).arg(file).arg(line));
+            .arg(RecStatus::toString(curRecording->GetRecordingStatus(), kSingleRecord))
+            .arg(RecStatus::toString(status, kSingleRecord)).arg(file).arg(line));
 
         curRecording->SetRecordingStatus(status);
 
-        if (status == rsFailing)
+        if (status == RecStatus::Failing)
         {
             curRecording->SaveVideoProperties(VID_DAMAGED, VID_DAMAGED);
             SendMythSystemRecEvent("REC_FAILING", curRecording);
         }
 
         MythEvent me(QString("UPDATE_RECORDING_STATUS %1 %2 %3 %4 %5")
-                    .arg(curRecording->GetCardID())
+                    .arg(curRecording->GetInputID())
                     .arg(curRecording->GetChanID())
                     .arg(curRecording->GetScheduledStartTime(MythDate::ISODate))
                     .arg(status)
@@ -424,6 +433,9 @@ void RecorderBase::FinishRecording(void)
         RecordingFile *recFile = curRecording->GetRecordingFile();
         if (recFile)
         {
+            // Container
+            recFile->m_containerFormat = m_containerFormat;
+
             // Video
             recFile->m_videoCodec = ff_codec_id_string(m_primaryVideoCodec);
             switch (curRecording->QueryAverageAspectRatio())
@@ -464,6 +476,7 @@ void RecorderBase::FinishRecording(void)
     }
 
     LOG(VB_GENERAL, LOG_NOTICE, QString("Finished Recording: "
+                                        "Container: %7 "
                                         "Video Codec: %1 (%2x%3 A/R: %4 %5fps) "
                                         "Audio Codec: %6")
                                         .arg(avcodec_get_name(m_primaryVideoCodec))
@@ -471,7 +484,8 @@ void RecorderBase::FinishRecording(void)
                                         .arg(m_videoHeight)
                                         .arg(m_videoAspect)
                                         .arg(GetFrameRate())
-                                        .arg(avcodec_get_name(m_primaryAudioCodec)));
+                                        .arg(avcodec_get_name(m_primaryAudioCodec))
+                                        .arg(RecordingFile::AVContainerToString(m_containerFormat)));
 }
 
 RecordingQuality *RecorderBase::GetRecordingQuality(

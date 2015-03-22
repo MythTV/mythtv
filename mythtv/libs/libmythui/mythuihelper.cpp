@@ -19,24 +19,27 @@
 #include <QEventLoop>
 #include <QTimer>
 
+// mythbase headers
 #include "mythdirs.h"
 #include "mythlogging.h"
 #include "mythdownloadmanager.h"
 #include "oldsettings.h"
+#include "mythdb.h"
+#include "remotefile.h"
+#include "mythcorecontext.h"
+#include "storagegroup.h"
+#include "mythdate.h"
+#include "mthreadpool.h"
+
+// mythui headers
+#include "mythprogressdialog.h"
+#include "mythimage.h"
 #include "screensaver.h"
 #include "mythmainwindow.h"
-#include "mythdb.h"
 #include "themeinfo.h"
 #include "x11colors.h"
 #include "mythdisplay.h"
 #include "DisplayRes.h"
-#include "mythprogressdialog.h"
-#include "mythimage.h"
-#include "remotefile.h"
-#include "mythcorecontext.h"
-#include "mthreadpool.h"
-#include "storagegroup.h"
-#include "mythdate.h"
 
 #define LOC      QString("MythUIHelper: ")
 

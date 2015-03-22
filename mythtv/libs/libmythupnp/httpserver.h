@@ -51,6 +51,13 @@ class QSslKey;
 class QSslCertificate;
 class QSslConfiguration;
 
+typedef enum
+{
+    cpLocalNoAuth = 0x00,  // Can only be accessed locally, but no authentication is required
+    cpLocalAuth   = 0x01,  // Can only be accessed locally, authentication is required
+    cpRemoteAuth  = 0x02   // Can be accessed remotely, authentication is required
+} ContentProtection;
+
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -68,15 +75,22 @@ class UPNP_PUBLIC HttpServerExtension : public QObject
         QString     m_sName;
         QString     m_sSharePath;
         int         m_nSocketTimeout; // Extension may wish to adjust the default e.g. UPnP
+
+        uint        m_nSupportedMethods; // Bit flags - HTTP::RequestType
         
     public:
 
-        HttpServerExtension( const QString &sName, const  QString &sSharePath )
-           : m_sName( sName ), m_sSharePath( sSharePath ), m_nSocketTimeout(-1) {};
+        HttpServerExtension( const QString &sName, const  QString &sSharePath)
+           : m_sName( sName ), m_sSharePath( sSharePath ),
+             m_nSocketTimeout(-1),
+             m_nSupportedMethods((RequestTypeGet | RequestTypePost | // Defaults, extensions may extend the list
+                                  RequestTypeHead | RequestTypeOptions)) {};
 
         virtual ~HttpServerExtension() {};
 
         virtual bool ProcessRequest(HTTPRequest *pRequest) = 0;
+
+        virtual bool ProcessOptions(HTTPRequest *pRequest);
 
         virtual QStringList GetBasePaths() = 0;
 
@@ -97,23 +111,8 @@ class UPNP_PUBLIC HttpServer : public ServerPool
 {
     Q_OBJECT
 
-  protected:
-    mutable QReadWriteLock  m_rwlock;
-    HttpServerExtensionList m_extensions;
-    // This multimap does NOT take ownership of the HttpServerExtension*
-    QMultiMap< QString, HttpServerExtension* >  m_basePaths;
-    QString                 m_sSharePath;
-    HttpServerExtension    *m_pHtmlServer;
-    MThreadPool             m_threadPool;
-    bool                    m_running; // protected by m_rwlock
-
-    static QMutex           s_platformLock;
-    static QString          s_platform;
-
-    QSslConfiguration       m_sslConfig;
-
   public:
-    HttpServer(const QString &sApplicationPrefix = QString(""));
+    HttpServer();
     virtual ~HttpServer();
 
     void RegisterExtension(HttpServerExtension*);
@@ -123,16 +122,6 @@ class UPNP_PUBLIC HttpServer : public ServerPool
      * \brief Get the idle socket timeout value for the relevant extension
      */
     uint GetSocketTimeout(HTTPRequest*) const;
-
-    QScriptEngine *ScriptEngine(void);
-
-  private:
-     void LoadSSLConfig();
-
-  protected slots:
-    virtual void newTcpConnection(qt_socket_fd_t socket); // QTcpServer
-
-  public:
 
     QString GetSharePath(void) const
     { // never modified after creation, so no need to lock
@@ -149,6 +138,28 @@ class UPNP_PUBLIC HttpServer : public ServerPool
 
     static QString GetPlatform(void);
     static QString GetServerVersion(void);
+
+  protected:
+    mutable QReadWriteLock  m_rwlock;
+    HttpServerExtensionList m_extensions;
+    // This multimap does NOT take ownership of the HttpServerExtension*
+    QMultiMap< QString, HttpServerExtension* >  m_basePaths;
+    QString                 m_sSharePath;
+    MThreadPool             m_threadPool;
+    bool                    m_running; // protected by m_rwlock
+
+    static QMutex           s_platformLock;
+    static QString          s_platform;
+
+    QSslConfiguration       m_sslConfig;
+
+    const QString m_privateToken; // Private token; Used to salt digest auth nonce, changes on backend restart
+
+  protected slots:
+    virtual void newTcpConnection(qt_socket_fd_t socket); // QTcpServer
+
+  private:
+    void LoadSSLConfig();
 };
 
 /////////////////////////////////////////////////////////////////////////////

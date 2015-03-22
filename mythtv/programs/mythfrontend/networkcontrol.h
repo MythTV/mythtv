@@ -88,6 +88,7 @@ class NetworkControlCloseEvent : public QEvent
 };
 
 class NetworkControl;
+class MythUIType;
 
 class NetworkControl : public ServerPool, public QRunnable
 {
@@ -114,6 +115,7 @@ class NetworkControl : public ServerPool, public QRunnable
     QString processSet(NetworkCommand *nc);
     QString processMessage(NetworkCommand *nc);
     QString processNotification(NetworkCommand *nc);
+    QString processTheme(NetworkCommand *nc);
     QString processHelp(NetworkCommand *nc);
 
     void notifyDataAvailable(void);
@@ -128,6 +130,8 @@ class NetworkControl : public ServerPool, public QRunnable
     void processNetworkControlCommand(NetworkCommand *nc);
 
     void deleteClient(NetworkControlClient *ncc);
+
+    QString getWidgetType(MythUIType *type);
 
     QString prompt;
     bool gotAnswer;

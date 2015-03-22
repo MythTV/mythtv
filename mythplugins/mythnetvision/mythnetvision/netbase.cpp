@@ -7,6 +7,9 @@
 #include <mythcontext.h>
 #include <remotefile.h>
 #include <mythcoreutil.h>
+#include <mythscreenstack.h>
+#include <mythuihelper.h>
+#include <mythmainwindow.h>
 #include <mythprogressdialog.h>
 #include <metadata/metadataimagedownload.h>
 #include <metadata/videoutils.h>

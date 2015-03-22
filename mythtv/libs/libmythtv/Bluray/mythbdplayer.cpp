@@ -2,6 +2,8 @@
 #include "avformatdecoderbd.h"
 #include "mythbdplayer.h"
 
+#include <unistd.h> // for usleep()
+
 #define LOC     QString("BDPlayer: ")
 
 MythBDPlayer::MythBDPlayer(PlayerFlags flags)

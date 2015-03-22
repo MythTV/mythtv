@@ -287,7 +287,8 @@ int Capture::AddCardInput       ( const uint nCardId,
                                   const uint nSchedOrder,
                                   const uint nLiveTVOrder)
 {
-    if ( nCardId < 1 || nSourceId < 1 || sInputName.isEmpty() )
+    if ( nCardId < 1 || nSourceId < 1 ||
+         sInputName.isEmpty() || sInputName == "None" )
         throw( QString( "This API requires at least a card ID, a source ID, "
                         "and an input name." ));
 

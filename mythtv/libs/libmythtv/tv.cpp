@@ -1,9 +1,7 @@
-#include <algorithm>
-using namespace std;
 
 #include "tv.h"
-#include "tv_play.h"
-#include "tv_rec.h"
+
+#include <QObject>  // for QObject::tr()
 
 /**
  *  \brief Returns a human readable QString representing a TVState.

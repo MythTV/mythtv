@@ -43,7 +43,7 @@
 class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "4.0" );
+    Q_CLASSINFO( "version"    , "5.0" );
     Q_CLASSINFO( "AddStorageGroupDir_Method",    "POST" )
     Q_CLASSINFO( "RemoveStorageGroupDir_Method", "POST" )
     Q_CLASSINFO( "PutSetting_Method",            "POST" )
@@ -115,9 +115,11 @@ class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
 
         virtual DTC::FrontendList*  GetFrontends        ( bool OnLine ) = 0;
 
-        virtual DTC::SettingList*   GetSetting          ( const QString   &HostName,
+        virtual QString             GetSetting          ( const QString   &HostName,
                                                           const QString   &Key,
                                                           const QString   &Default ) = 0;
+
+        virtual DTC::SettingList*   GetSettingList      ( const QString   &HostName ) = 0;
 
         virtual bool                PutSetting          ( const QString   &HostName,
                                                           const QString   &Key,

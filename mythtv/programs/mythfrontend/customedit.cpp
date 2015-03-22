@@ -15,6 +15,7 @@
 #include "mythuitextedit.h"
 #include "mythuibutton.h"
 #include "mythdialogbox.h"
+#include "mythuitext.h"
 
 // libmythtv
 #include "recordingrule.h"
@@ -36,7 +37,8 @@ CustomEdit::CustomEdit(MythScreenStack *parent, ProgramInfo *pginfo)
                 m_testButton(NULL),
                 m_recordButton(NULL),
                 m_storeButton(NULL),
-                m_cancelButton(NULL)
+                m_cancelButton(NULL),
+                m_currentRuleItem(NULL)
 {
     if (pginfo)
         m_pginfo = new ProgramInfo(*pginfo);
@@ -585,8 +587,10 @@ void CustomEdit::loadClauses()
 
 void CustomEdit::ruleChanged(MythUIButtonListItem *item)
 {
-    if (!item)
+    if (!item || item == m_currentRuleItem)
         return;
+
+    m_currentRuleItem = item;
 
     CustomRuleInfo rule = item->GetData().value<CustomRuleInfo>();
 

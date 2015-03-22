@@ -262,7 +262,7 @@ void ZMEvents::eventVisible(MythUIButtonListItem *item)
     if (item->HasImage())
         return;
 
-    Event *event = qVariantValue<Event*> (item->GetData());
+    Event *event = item->GetData().value<Event*>();
 
     if (event)
     {

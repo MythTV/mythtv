@@ -1,7 +1,3 @@
-#include <iostream>
-
-#include <QCursor>
-#include <QLayout>
 
 #include "recordingprofile.h"
 #include "cardutil.h"
@@ -9,6 +5,7 @@
 #include "mythdb.h"
 #include "mythlogging.h"
 #include "mythwizard.h"
+#include "mythwidgets.h" // for MythLineEdit
 
 QString RecordingProfileStorage::GetWhereClause(MSqlBindings &bindings) const
 {
@@ -1017,9 +1014,9 @@ class RecordFullTSStream : public ComboBoxSetting, public CodecParamStorage
 
         QString msg = QObject::tr(
             "If set, extra files will be created for each recording with "
-            "the name of the recording followed by '.ts' and a number. "
+            "the name of the recording followed by '.ts.raw'. "
             "These extra files represent the full contents of the transport "
-            "stream used to generate the recording.");
+            "stream used to generate the recording. (For debugging purposes)");
         setHelpText(msg);
 
         addSelection(QObject::tr("Yes"), "1");

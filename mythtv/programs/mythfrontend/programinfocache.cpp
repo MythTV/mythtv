@@ -4,15 +4,17 @@
 // Distributed as part of MythTV under GPL version 2
 // (or at your option a later version)
 
-#include <QCoreApplication>
-#include <QRunnable>
-
 #include "programinfocache.h"
 #include "mthreadpool.h"
 #include "mythlogging.h"
 #include "programinfo.h"
 #include "remoteutil.h"
 #include "mythevent.h"
+
+#include <QCoreApplication>
+#include <QRunnable>
+
+#include <algorithm>
 
 typedef vector<ProgramInfo*> *VPI_ptr;
 static void free_vec(VPI_ptr &v)
@@ -130,8 +132,7 @@ void ProgramInfoCache::Refresh(void)
             if (!(*it)->GetChanID())
                 continue;
 
-            PICKey k((*it)->GetChanID(), (*it)->GetRecordingStartTime());
-            m_cache[k] = *it;
+            m_cache[(*it)->GetRecordingID()] = *it;
         }
         delete m_next_cache;
         m_next_cache = NULL;
@@ -146,9 +147,9 @@ void ProgramInfoCache::Refresh(void)
         nit = it;
         ++nit;
 
-        if (it->second->GetAvailableStatus() == asDeleted)
+        if ((*it)->GetAvailableStatus() == asDeleted)
         {
-            delete it->second;
+            delete (*it);
             m_cache.erase(it);
         }
     }
@@ -162,11 +163,10 @@ bool ProgramInfoCache::Update(const ProgramInfo &pginfo)
 {
     QMutexLocker locker(&m_lock);
 
-    Cache::iterator it = m_cache.find(
-        PICKey(pginfo.GetChanID(),pginfo.GetRecordingStartTime()));
+    Cache::iterator it = m_cache.find(pginfo.GetRecordingID());
 
     if (it != m_cache.end())
-        it->second->clone(pginfo, true);
+        (*it)->clone(pginfo, true);
 
     return it != m_cache.end();
 }
@@ -175,18 +175,17 @@ bool ProgramInfoCache::Update(const ProgramInfo &pginfo)
  *  \note This must only be called from the UI thread.
  *  \return True iff the ProgramInfo was in the cache and was updated.
  */
-bool ProgramInfoCache::UpdateFileSize(
-    uint chanid, const QDateTime &recstartts, uint64_t filesize)
+bool ProgramInfoCache::UpdateFileSize(uint recordingID, uint64_t filesize)
 {
     QMutexLocker locker(&m_lock);
 
-    Cache::iterator it = m_cache.find(PICKey(chanid,recstartts));
+    Cache::iterator it = m_cache.find(recordingID);
 
     if (it != m_cache.end())
     {
-        it->second->SetFilesize(filesize);
+        (*it)->SetFilesize(filesize);
         if (filesize)
-            it->second->SetAvailableStatus(asAvailable, "PIC::UpdateFileSize");
+            (*it)->SetAvailableStatus(asAvailable, "PIC::UpdateFileSize");
     }
 
     return it != m_cache.end();
@@ -195,16 +194,15 @@ bool ProgramInfoCache::UpdateFileSize(
 /** \brief Returns the ProgramInfo::recgroup or an empty string if not found.
  *  \note This must only be called from the UI thread.
  */
-QString ProgramInfoCache::GetRecGroup(
-    uint chanid, const QDateTime &recstartts) const
+QString ProgramInfoCache::GetRecGroup(uint recordingID) const
 {
     QMutexLocker locker(&m_lock);
 
-    Cache::const_iterator it = m_cache.find(PICKey(chanid,recstartts));
+    Cache::const_iterator it = m_cache.find(recordingID);
 
     QString recgroup;
     if (it != m_cache.end())
-        recgroup = it->second->GetRecordingGroup();
+        recgroup = (*it)->GetRecordingGroup();
 
     return recgroup;
 }
@@ -214,11 +212,10 @@ QString ProgramInfoCache::GetRecGroup(
  */
 void ProgramInfoCache::Add(const ProgramInfo &pginfo)
 {
-    if (!pginfo.GetChanID() || Update(pginfo))
+    if (!pginfo.GetRecordingID() || Update(pginfo))
         return;
 
-    PICKey key(pginfo.GetChanID(),pginfo.GetRecordingStartTime());
-    m_cache[key] = new ProgramInfo(pginfo);
+    m_cache[pginfo.GetRecordingID()] = new ProgramInfo(pginfo);
 }
 
 /** \brief Marks a ProgramInfo in the cache for deletion on the next
@@ -226,48 +223,50 @@ void ProgramInfoCache::Add(const ProgramInfo &pginfo)
  *  \note This must only be called from the UI thread.
  *  \return True iff the ProgramInfo was in the cache.
  */
-bool ProgramInfoCache::Remove(uint chanid, const QDateTime &recstartts)
+bool ProgramInfoCache::Remove(uint recordingID)
 {
-    Cache::iterator it = m_cache.find(PICKey(chanid,recstartts));
+    Cache::iterator it = m_cache.find(recordingID);
 
     if (it != m_cache.end())
-        it->second->SetAvailableStatus(asDeleted, "PIC::Remove");
+        (*it)->SetAvailableStatus(asDeleted, "PIC::Remove");
 
     return it != m_cache.end();
 }
 
+// Sorting functions for ProgramInfoCache::GetOrdered()
+bool PISort(const ProgramInfo *a, const ProgramInfo *b)
+{
+    if (a->GetRecordingStartTime() == b->GetRecordingStartTime())
+        return a->GetChanID() < b->GetChanID();
+    return (a->GetRecordingStartTime() < b->GetRecordingStartTime());
+}
+
+bool reversePISort(const ProgramInfo *a, const ProgramInfo *b)
+{
+    if (a->GetRecordingStartTime() == b->GetRecordingStartTime())
+        return a->GetChanID() > b->GetChanID();
+    return (a->GetRecordingStartTime() > b->GetRecordingStartTime());
+}
+
 void ProgramInfoCache::GetOrdered(vector<ProgramInfo*> &list, bool newest_first)
 {
+    for (Cache::iterator it = m_cache.begin(); it != m_cache.end(); ++it)
+            list.push_back(*it);
+
     if (newest_first)
-    {
-        Cache::reverse_iterator it = m_cache.rbegin();
-        for (; it != m_cache.rend(); ++it)
-            list.push_back(it->second);
-    }
+        std::sort(list.begin(), list.end(), reversePISort);
     else
-    {
-        for (Cache::iterator it = m_cache.begin(); it != m_cache.end(); ++it)
-            list.push_back(it->second);
-    }
+        std::sort(list.begin(), list.end(), PISort);
+
 }
 
-ProgramInfo *ProgramInfoCache::GetProgramInfo(
-    uint chanid, const QDateTime &recstartts) const
+ProgramInfo *ProgramInfoCache::GetRecordingInfo(uint recordingID) const
 {
-    Cache::const_iterator it = m_cache.find(PICKey(chanid,recstartts));
+    Cache::const_iterator it = m_cache.find(recordingID);
 
     if (it != m_cache.end())
-        return it->second;
+        return *it;
 
-    return NULL;
-}
-
-ProgramInfo *ProgramInfoCache::GetProgramInfo(const QString &piKey) const
-{
-    uint      chanid;
-    QDateTime recstartts;
-    if (ProgramInfo::ExtractKey(piKey, chanid, recstartts))
-        return GetProgramInfo(chanid, recstartts);
     return NULL;
 }
 
@@ -275,6 +274,6 @@ ProgramInfo *ProgramInfoCache::GetProgramInfo(const QString &piKey) const
 void ProgramInfoCache::Clear(void)
 {
     for (Cache::iterator it = m_cache.begin(); it != m_cache.end(); ++it)
-        delete it->second;
+        delete (*it);
     m_cache.clear();
 }

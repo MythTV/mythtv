@@ -36,7 +36,6 @@
 #include "dvdnav/dvdnav.h"
 #include <dvdread/nav_types.h>
 #include <dvdread/ifo_types.h>
-#include "remap.h"
 #include "vm/decoder.h"
 #include "vm/vm.h"
 #include "dvdnav_internal.h"
@@ -101,21 +100,18 @@ read_cache_t *dvdnav_read_cache_new(dvdnav_t* dvd_self) {
   read_cache_t *self;
   int i;
 
-  self = (read_cache_t *)malloc(sizeof(read_cache_t));
+  self = (read_cache_t *)calloc(1, sizeof(read_cache_t));
 
-  if(self) {
-    self->current = 0;
-    self->freeing = 0;
-    self->dvd_self = dvd_self;
-    self->last_sector = 0;
-    self->read_ahead_size = READ_AHEAD_SIZE_MIN;
-    self->read_ahead_incr = 0;
-    pthread_mutex_init(&self->lock, NULL);
-    dvdnav_read_cache_clear(self);
-    for (i = 0; i < READ_CACHE_CHUNKS; i++) {
-      self->chunk[i].cache_buffer = NULL;
-      self->chunk[i].usage_count = 0;
-    }
+  if(!self)
+    return NULL;
+
+  self->dvd_self = dvd_self;
+  self->read_ahead_size = READ_AHEAD_SIZE_MIN;
+  pthread_mutex_init(&self->lock, NULL);
+  dvdnav_read_cache_clear(self);
+  for (i = 0; i < READ_CACHE_CHUNKS; i++) {
+    self->chunk[i].cache_buffer = NULL;
+    self->chunk[i].usage_count = 0;
   }
 
   return self;
@@ -194,21 +190,21 @@ void dvdnav_pre_cache_blocks(read_cache_t *self, int sector, size_t block_count)
       /* we still haven't found a cache chunk, let's allocate a new one */
       for (i = 0; i < READ_CACHE_CHUNKS; i++)
         if (!self->chunk[i].cache_buffer) {
-	  use = i;
-	  break;
-	}
+          use = i;
+          break;
+        }
       if (use >= 0) {
         /* We start with a sensible figure for the first malloc of 500 blocks.
          * Some DVDs I have seen venture to 450 blocks.
          * This is so that fewer realloc's happen if at all.
          */
-	self->chunk[i].cache_buffer_base =
-	  malloc((block_count > 500 ? block_count : 500) * DVD_VIDEO_LB_LEN + ALIGNMENT);
-	self->chunk[i].cache_buffer =
-	  (uint8_t *)(((uintptr_t)self->chunk[i].cache_buffer_base & ~((uintptr_t)(ALIGNMENT - 1))) + ALIGNMENT);
-	self->chunk[i].cache_malloc_size = block_count > 500 ? block_count : 500;
-	dprintf("pre_cache DVD read malloc %d blocks\n",
-	  (block_count > 500 ? block_count : 500 ));
+        self->chunk[i].cache_buffer_base =
+          malloc((block_count > 500 ? block_count : 500) * DVD_VIDEO_LB_LEN + ALIGNMENT);
+        self->chunk[i].cache_buffer =
+          (uint8_t *)(((uintptr_t)self->chunk[i].cache_buffer_base & ~((uintptr_t)(ALIGNMENT - 1))) + ALIGNMENT);
+        self->chunk[i].cache_malloc_size = block_count > 500 ? block_count : 500;
+        dprintf("pre_cache DVD read malloc %d blocks\n",
+          (block_count > 500 ? block_count : 500 ));
       }
     }
   }
@@ -311,8 +307,9 @@ int dvdnav_read_cache_block(read_cache_t *self, int sector, size_t block_count, 
 
   } else {
 
-    if (self->dvd_self->use_read_ahead)
+    if (self->dvd_self->use_read_ahead) {
       dprintf("cache miss on sector %d\n", sector);
+    }
 
     res = DVDReadBlocks(self->dvd_self->file,
                         sector,

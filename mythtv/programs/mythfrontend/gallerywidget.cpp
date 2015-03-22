@@ -7,6 +7,8 @@
 #include "mythcontext.h"
 #include "mythmainwindow.h"
 #include "mythuihelper.h"
+#include "mythuiimage.h"
+#include "mythuitext.h"
 
 ImageLoadingThread::ImageLoadingThread() :
     m_image(NULL),

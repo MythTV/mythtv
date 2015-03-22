@@ -5,7 +5,6 @@
 #include "mythdialogbox.h"
 #include "mythuistatetype.h"
 #include "mythuibuttonlist.h"
-#include "xmlparsebase.h"
 
 class MythMainWindow;
 class MythThemedMenuState;

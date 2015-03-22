@@ -242,7 +242,11 @@ class MTV_PUBLIC CardUtil
 
     static vector<uint> GetCardIDs(QString videodevice = QString::null,
                                    QString rawtype     = QString::null,
+                                   QString inputname   = QString::null,
                                    QString hostname    = QString::null);
+
+    static uint         GetChildCardCount(uint cardid);
+    static vector<uint> GetChildCardIDs(uint cardid);
 
     static bool         IsCardTypePresent(const QString &rawtype,
                                           QString hostname = QString::null);
@@ -325,7 +329,10 @@ class MTV_PUBLIC CardUtil
 
     // Input Groups
     static uint         CreateInputGroup(const QString &name);
-    static bool         CreateInputGroupIfNeeded(uint cardid);
+    static uint         CreateDeviceInputGroup(const QString &host,
+                                               const QString &device)
+        { return CreateInputGroup(host + '|' + device); }
+    static uint         GetDeviceInputGroup(uint cardid);
     static bool         LinkInputGroup(uint inputid, uint inputgroupid);
     static bool         UnlinkInputGroup(uint inputid, uint inputgroupid);
     static vector<uint> GetInputGroups(uint inputid);
@@ -346,15 +353,13 @@ class MTV_PUBLIC CardUtil
     static void         GetCardInputs(uint                cardid,
                                       const QString      &device,
                                       const QString      &cardtype,
-                                      QStringList        &inputLabels,
-                                      vector<CardInput*> &cardInputs);
+                                      QStringList        &inputs);
 
     // General info from OS
     static QStringList  ProbeVideoDevices(const QString &rawtype);
 
     // Other
     static bool         CloneCard(uint src_cardid, uint dst_cardid);
-    static vector<uint> GetCloneCardIDs(uint cardid);
     static QString      GetFirewireChangerNode(uint inputid);
     static QString      GetFirewireChangerModel(uint inputid);
 
@@ -377,7 +382,7 @@ class MTV_PUBLIC CardUtil
     static bool         HasDVBCRCBug(const QString &device);
     static uint         GetMinSignalMonitoringDelay(const QString &device);
     static QString      GetDeviceName(dvb_dev_type_t, const QString &device);
-    static InputNames   GetConfiguredDVBInputs(uint cardid);
+    static InputNames   GetConfiguredDVBInputs(const QString &device);
 
     // V4L info
     static bool         hasV4L2(int videofd);

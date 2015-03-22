@@ -579,6 +579,9 @@ DTC::FrontendList *Myth::GetFrontends( bool OnLine )
         DTC::Frontend *pFrontend = pList->AddNewFrontend();
         pFrontend->setName((*it)->name);
         pFrontend->setIP((*it)->ip.toString());
+        int port = gCoreContext->GetNumSettingOnHost("FrontendStatusPort",
+                                                        (*it)->name, 6547);
+        pFrontend->setPort(port);
         pFrontend->setOnLine((*it)->connectionCount > 0);
     }
 
@@ -589,106 +592,71 @@ DTC::FrontendList *Myth::GetFrontends( bool OnLine )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::SettingList *Myth::GetSetting( const QString &sHostName,
-                                    const QString &sKey,
-                                    const QString &sDefault )
+QString Myth::GetSetting( const QString &sHostName,
+                          const QString &sKey,
+                          const QString &sDefault )
+{
+    if (sKey.isEmpty())
+        throw( QString("No setting name supplied") );
+
+    QString hostname = sHostName;
+    if (sHostName.isEmpty())
+        hostname = gCoreContext->GetHostName();
+
+    // ----------------------------------------------------------------------
+
+    return gCoreContext->GetSettingOnHost(sKey, hostname, sDefault);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+DTC::SettingList *Myth::GetSettingList(const QString &sHostName)
 {
 
     MSqlQuery query(MSqlQuery::InitCon());
 
     if (!query.isConnected())
     {
-        throw( QString("Database not open while trying to load setting: %1")
-                  .arg( sKey ));
+        throw( QString("Database not open while trying to load settings for host: %1")
+                  .arg( sHostName ));
     }
-
-    // ----------------------------------------------------------------------
 
     DTC::SettingList *pList = new DTC::SettingList();
 
     //pList->setObjectName( "Settings" );
     pList->setHostName  ( sHostName  );
 
-    // ----------------------------------------------------------------------
-    // Format Results
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------
+    // Looking to return all Setting for supplied hostname
+    // ------------------------------------------------------------------
 
-    if (!sKey.isEmpty())
+    if (sHostName.isEmpty())
     {
-        // ------------------------------------------------------------------
-        // Key Supplied, lookup just its value.
-        // ------------------------------------------------------------------
-
-        query.prepare("SELECT data, hostname FROM settings "
-                      "WHERE value = :KEY AND "
-                      "(hostname = :HOSTNAME OR hostname IS NULL) "
-                      "ORDER BY hostname DESC;" );
-
-        query.bindValue(":KEY"     , sKey      );
-        query.bindValue(":HOSTNAME", sHostName );
-
-        if (!query.exec())
-        {
-            // clean up unused object we created.
-
-            delete pList;
-
-            MythDB::DBError("MythAPI::GetSetting() w/key ", query);
-
-            throw( QString( "Database Error executing query." ));
-        }
-
-        if (query.next())
-        {
-            if ( (sHostName.isEmpty()) ||
-                 ((!sHostName.isEmpty()) &&
-                  (sHostName == query.value(1).toString())))
-            {
-                pList->setHostName( query.value(1).toString() );
-
-                pList->Settings().insert( sKey, query.value(0) );
-            }
-        }
+        query.prepare("SELECT value, data FROM settings "
+                        "WHERE (hostname IS NULL)" );
     }
     else
     {
-        // ------------------------------------------------------------------
-        // Looking to return all Setting for supplied hostname
-        // ------------------------------------------------------------------
+        query.prepare("SELECT value, data FROM settings "
+                        "WHERE (hostname = :HOSTNAME)" );
 
-        if (sHostName.isEmpty())
-        {
-            query.prepare("SELECT value, data FROM settings "
-                          "WHERE (hostname IS NULL)" );
-        }
-        else
-        {
-            query.prepare("SELECT value, data FROM settings "
-                          "WHERE (hostname = :HOSTNAME)" );
-
-            query.bindValue(":HOSTNAME", sHostName );
-        }
-
-        if (!query.exec())
-        {
-            // clean up unused object we created.
-
-            delete pList;
-
-            MythDB::DBError("MythAPI::GetSetting() w/o key ", query);
-            throw( QString( "Database Error executing query." ));
-        }
-
-        while (query.next())
-            pList->Settings().insert( query.value(0).toString(), query.value(1) );
+        query.bindValue(":HOSTNAME", sHostName );
     }
 
-    // ----------------------------------------------------------------------
-    // Not found, so return the supplied default value
-    // ----------------------------------------------------------------------
+    if (!query.exec())
+    {
+        // clean up unused object we created.
 
-    if (pList->Settings().count() == 0)
-        pList->Settings().insert( sKey, sDefault );
+        delete pList;
+
+        MythDB::DBError("MythAPI::GetSetting() w/o key ", query);
+        throw( QString( "Database Error executing query." ));
+    }
+
+    while (query.next())
+        pList->Settings().insert( query.value(0).toString(), query.value(1) );
 
     return pList;
 }

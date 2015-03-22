@@ -25,3 +25,15 @@ function changePassword() {
     }
 }
 
+$("#edit").dialog({
+    modal: true,
+    width: 850,
+    height: 500,
+    'title': 'Change Password',
+    closeOnEscape: false,
+    buttons: {
+       'Change Password': function() {changePassword()},
+       'Cancel': function() { $(this).dialog('close'); }
+    }
+});
+showEditWindow();

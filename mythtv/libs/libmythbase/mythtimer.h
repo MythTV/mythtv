@@ -6,7 +6,7 @@
 #include "mythbaseexp.h"
 
 /** A QElapsedTimer based timer to replace use of QTime as a timer.
- *  
+ *
  *  This class is not thread-safe.
  */
 
@@ -36,4 +36,3 @@ class MBASE_PUBLIC MythTimer
 };
 
 #endif
-

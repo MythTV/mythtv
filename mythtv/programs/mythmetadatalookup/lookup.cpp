@@ -1,3 +1,6 @@
+
+#include "lookup.h"
+
 #include <vector>
 
 #include <QList>
@@ -7,10 +10,9 @@
 #include "mythlogging.h"
 #include "jobqueue.h"
 #include "remoteutil.h"
+#include "mythcorecontext.h"
 
 #include "metadataimagehelper.h"
-
-#include "lookup.h"
 
 LookerUpper::LookerUpper() :
     m_busyRecList(QList<ProgramInfo*>()),

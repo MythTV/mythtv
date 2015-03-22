@@ -64,7 +64,7 @@ static CdIo_t * openCdio(const QString& name)
         cdio_log_set_handler(&logger);
     }
 
-    CdIo_t *cdio = cdio_open(name.toAscii(), DRIVER_DEVICE);
+    CdIo_t *cdio = cdio_open(name.toLatin1(), DRIVER_DEVICE);
     if (!cdio)
     {
         LOG(VB_MEDIA, LOG_INFO, QString("CdDecoder: cdio_open(%1) failed").

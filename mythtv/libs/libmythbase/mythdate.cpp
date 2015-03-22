@@ -92,6 +92,9 @@ QString toString(const QDateTime &raw_dt, uint format)
     if (format & MythDate::ISODate)
         return datetime.toString(Qt::ISODate);
 
+    if (format & MythDate::kRFC822) // RFC 822 - HTTP, Cookie etc
+        return datetime.toString("ddd, d MMM yyyy hh:mm:ss").append(" GMT"); // RFC 822
+
     if (format & kFilename)
         return datetime.toString("yyyyMMddhhmmss");
 

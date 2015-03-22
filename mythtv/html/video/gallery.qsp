@@ -5,16 +5,20 @@ import "/js/utility.js"
 import "/video/js/gallery.qjs"
 
 %>
+<head>
+<title><%=qsTr("Video Gallery")%></title>
+<link rel="stylesheet" type="text/css" href="/css/site.css">
 <link rel="stylesheet" type="text/css" href="/video/css/gallery.css">
-<script src="/video/js/gallery.js"></script>
-
+<script type="text/javascript" src="/3rdParty/jquery/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="/video/js/gallery.js"></script>
+</head>
+<body>
 
 <div id="videoOverlay" class="videoOverlay">
     <div id="videoDetailBox" class="videoDetailBox">
 
     </div>
 </div>
-
 
 <div class="galleryList">
 
@@ -39,14 +43,14 @@ import "/video/js/gallery.qjs"
         var nextFolder = currentFolderArray.slice(0,-1).join("/");
     %>
 
-        <div class="videoBox">
+        <div class="videoBox" onClick="javascript:parent.loadFrontendContent('/video/gallery.qsp?CurrentFolder=<%=nextFolder %>')">
             <div class="videoHeader">
-                <div class="videoTitle" onClick="javascript:loadContent('/video/gallery.qsp?CurrentFolder=<%=nextFolder %>')">
+                <div class="videoTitle">
                     <%= currentFolderArray.slice(-1)[0]%>
                 </div>
             </div>
 
-            <div class="videoArtwork" onClick="javascript:loadContent('/video/gallery.qsp?CurrentFolder=<%=nextFolder %>')">
+            <div class="videoArtwork">
                 <img width=100 src="/video/images/mv_gallery_dir_up.png" />
             </div>
         </div>
@@ -77,22 +81,22 @@ import "/video/js/gallery.qjs"
 
     %>
 
-            <div class="videoBox">
+            <div class="videoBox" onClick="showVideoDetail(<%=thisVideo.Id%>);">
                 <div class="videoHeader">
-                    <div class="videoTitle" onClick="showVideoDetail(<%=thisVideo.Id%>);">
+                    <div class="videoTitle">
                         <%=title%>
                     </div>
                 </div>
 
-                <div class="videoArtwork" onClick="showVideoDetail(<%=thisVideo.Id%>);">
-                    <img width=100 src="<%=artworkURL%>" />
+                <div class="videoArtwork">
+                    <img width=100 src="<%=artworkURL%>" lazyload />
                 </div>
                 <%
                     //if there is a subtitle, show it
                     if(thisVideo.SubTitle!="")
                     {
                 %>
-                        <div class="videoSubTitle" onClick="showVideoDetail(<%=thisVideo.Id%>);">
+                        <div class="videoSubTitle">
                             <%= thisVideo.SubTitle%>
                         </div>
                 <%
@@ -116,9 +120,9 @@ import "/video/js/gallery.qjs"
                 displayedFolders.push(nextFolder);
 
      %>
-                <div class="videoBox">
+                <div class="videoBox" onClick="javascript:parent.loadFrontendContent('/video/gallery.qsp?CurrentFolder=<%=nextFolder %>')">
                     <div class="videoHeader">
-                        <div class="videoTitle" onClick="javascript:loadContent('/video/gallery.qsp?CurrentFolder=<%=nextFolder %>')">
+                        <div class="videoTitle">
                             <%=filenameArray[currentFolderArray.length]%>
                         </div>
                         <div class="videoFolder">
@@ -126,7 +130,7 @@ import "/video/js/gallery.qjs"
                         </div>
                     </div>
 
-                    <div class="videoArtwork" onClick="javascript:loadContent('/video/gallery.qsp?CurrentFolder=<%=nextFolder %>')"">
+                    <div class="videoArtwork">
                         <img width=100 src="<%=artworkURL%>" />
                     </div>
                 </div>
@@ -138,9 +142,4 @@ import "/video/js/gallery.qjs"
 
 
 </div>
-
-
-
-
-
-
+</body>

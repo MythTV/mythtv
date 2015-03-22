@@ -8,7 +8,6 @@
 #include <QMap>
 
 #include "xmlparsebase.h"
-#include "mythmainwindow.h"
 
 class MUI_PUBLIC MythFontProperties: public XMLParseBase
 {

@@ -8,6 +8,7 @@ import "/tv/js/tvutil.qjs"
     var myth = new Myth();
     var dvr = new Dvr();
     var guide = new Guide();
+    var rtti = new Rtti();
 
     var startTime = new Date();
     if (getArg("StartTime"))
@@ -23,12 +24,17 @@ import "/tv/js/tvutil.qjs"
 
     var recRuleId = 0;
     if (getIntegerArg("RecRuleId"))
-        recRuleId = getIntegerArg("recRuleId");
+        recRuleId = getIntegerArg("RecRuleId");
 
     var recRule = dvr.GetRecordSchedule(recRuleId, "", recordedId, chanId, startTime, false);
 
     if (chanId <= 0)
         chanId = recRule.ChanId;
+    if (recordedId > 0)
+    {
+        chanId = recRule.ChanId;
+        startTime = recRule.StartTime;
+    }
 
     var inputList = dvr.GetInputList().Inputs;
     var storageGroupList = dvr.GetRecStorageGroupList();
@@ -77,10 +83,15 @@ import "/tv/js/tvutil.qjs"
     }
 
 %>
+<link rel="stylesheet" type="text/css" href="/3rdParty/jquery/jqueryUI/css/jquery-ui.css">
+<link rel="stylesheet" type="text/css" href="/css/site.css">
 <link rel="stylesheet" type="text/css" href="/tv/css/common.css">
-<link rel="stylesheet" type="text/css" href="/tv/css/settings.css">
+<link rel="stylesheet" type="text/css" href="/css/settings.css">
 <link rel="stylesheet" type="text/css" href="/tv/css/schedule.css">
-<script src="/tv/js/settings.js"></script>
+<script src="/js/utility.js"></script> <!-- ECMA not JS -->
+<script type="text/javascript" src="/3rdParty/jquery/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="/3rdParty/jquery/jqueryUI/js/jquery-ui-1.10.3.js"></script>
+<script src="/js/settings.js"></script>
 <script src="/tv/js/common.js"></script>
 <script src="/tv/js/schedule.js"></script>
 
@@ -102,7 +113,7 @@ import "/tv/js/tvutil.qjs"
 
 <div class="header">
     <div class="headerChannel">
-        <%if (channel.ChanId > 0) {%><img class="channelIcon" height="70" alt="<%=escapeHTML(channel.ChannelName)%> Icon" title="<%=escapeHTML(channel.ChannelName)%>" src="/Guide/GetChannelIcon?ChanId=<%=channel.ChanId%>&amp;Height=70" /><%}%>
+        <%if (channel.ChanId > 0 && channel.IconURL) {%><img class="channelIcon" height="70" alt="<%=escapeHTML(channel.ChannelName)%> Icon" title="<%=escapeHTML(channel.ChannelName)%>" src="<%=channel.IconURL%>&amp;Height=70" /><%}%>
         <!-- <%=escapeHTML(recRule.CallSign)%> -->
         <!-- <%=chanId%> <%=recRule.ChanId%> <%=channel.ChanId%> -->
     </div>
@@ -181,7 +192,7 @@ import "/tv/js/tvutil.qjs"
                 <%  if (upcomingShowings.length == 0)
                     {
                 %>
-                        <div><%=qsTr("No Conflicts")%></div>
+                        <div><%=qsTr("No Upcoming Showings")%></div>
                 <%  }
 
                     for (var listIdx = 0; listIdx < upcomingShowings.length; listIdx++)
@@ -189,13 +200,17 @@ import "/tv/js/tvutil.qjs"
                         showing = upcomingShowings[listIdx];
                         // RecStatusToClass() - /tv/js/tvutil.qjs
                         var statusClass = RecStatusToClass(showing.Recording.Status);
+                        //var statusClass = rtti.GetEnum( "RecStatus::Type" ).EnumItems[ showing.Recording.Status ].Value;
                         var programIdentifier = showing.Channel.ChanId + "_" + showing.StartTime.toISOString();
+                        var showingChannelIcon = "/tv/images/channel_icon.svg";
+                        if (showing.Channel.IconURL)
+                            showingChannelIcon = showing.Channel.IconURL + "&amp;Height=45";
                 %>
                         <div class="upcomingShowing">
                             <div class="channelIconBox">
-                                <img class="channelIcon" height="45" alt="<%=escapeHTML(showing.Channel.ChannelName)%> Icon" title="<%=escapeHTML(showing.Channel.ChanNum)%> <%=escapeHTML(showing.Channel.ChannelName)%>" src="/Guide/GetChannelIcon?ChanId=<%=showing.Channel.ChanId%>&amp;Height=45" />
+                                <img class="channelIcon" height="45" alt="<%=escapeHTML(showing.Channel.ChannelName)%> Icon" title="<%=escapeHTML(showing.Channel.ChanNum)%> <%=escapeHTML(showing.Channel.ChannelName)%>" src="<%=showingChannelIcon%>" lazyload />
                             </div>
-                            <div class="programBox <%=statusClass%>" id="<%=programIdentifier%>" onMouseOver="startDetailTimer(this, 'program');" onMouseOut="hideDetail(this);">
+                            <div class="programBox <%=statusClass%>" id="<%=programIdentifier%>" data-chanid="<%=showing.Channel.ChanId%>" data-starttime="<%=showing.StartTime.toISOString()%>" onMouseOver="startDetailTimer(this, 'program');" onMouseOut="hideDetail(this);">
                                 <div class="programHeader"><span class="programTitle"><%=showing.Title%></span><span class="programDateTime"><%=myth.GetFormatDate(showing.StartTime)%>, <%=myth.GetFormatTime(showing.StartTime)%> - <%=myth.GetFormatTime(showing.EndTime)%></span></div>
                                 <div class="programBody"><span class="programSubtitle"><%=showing.SubTitle%></span><span class="programRecordingStatus"><%=dvr.RecStatusToString(showing.Recording.Status)%></span></div>
                             </div>
@@ -219,12 +234,15 @@ import "/tv/js/tvutil.qjs"
                         // RecStatusToClass() - /tv/js/tvutil.qjs
                         var statusClass = RecStatusToClass(conflict.Recording.Status);
                         var programIdentifier = conflict.Channel.ChanId + "_" + conflict.StartTime.toISOString();
+                        var conflictChannelIcon = "/tv/images/channel_icon.svg";
+                        if (conflict.Channel.IconURL)
+                            conflictChannelIcon = conflict.Channel.IconURL + "&amp;Height=45";
                 %>
                         <div class="upcomingConflict">
                             <div class="channelIconBox">
-                                <img class="channelIcon" height="45" alt="<%=escapeHTML(conflict.Channel.ChannelName)%> Icon" title="<%=escapeHTML(conflict.Channel.ChanNum)%> <%=escapeHTML(conflict.Channel.ChannelName)%>" src="/Guide/GetChannelIcon?ChanId=<%=conflict.Channel.ChanId%>&amp;Height=45" />
+                                <img class="channelIcon" height="45" alt="<%=escapeHTML(conflict.Channel.ChannelName)%> Icon" title="<%=escapeHTML(conflict.Channel.ChanNum)%> <%=escapeHTML(conflict.Channel.ChannelName)%>" src="<%=conflictChannelIcon%>" lazyload />
                             </div>
-                            <div class="programBox <%=statusClass%>" id="<%=programIdentifier%>" onMouseOver="startDetailTimer(this, 'program');" onMouseOut="hideDetail(this);">
+                            <div class="programBox <%=statusClass%>" id="<%=programIdentifier%>" data-chanid="<%=conflict.Channel.ChanId%>" data-starttime="<%=conflict.StartTime.toISOString()%>" onMouseOver="startDetailTimer(this, 'program');" onMouseOut="hideDetail(this);">
                                 <div class="programHeader"><span class="programTitle"><%=conflict.Title%></span><span class="programDateTime"><%=myth.GetFormatDate(conflict.StartTime)%>, <%=myth.GetFormatTime(conflict.StartTime)%> - <%=myth.GetFormatTime(conflict.EndTime)%></span></div>
                                 <div class="programBody"><span class="programSubtitle"><%=conflict.SubTitle%></span><span class="programRecordingStatus"><%=dvr.RecStatusToString(conflict.Recording.Status)%></span></div>
                             </div>
@@ -260,7 +278,7 @@ import "/tv/js/tvutil.qjs"
         <div class="setting setting-range">
             <label for="rule-RecPriority"><%=qsTr("Priority")%>:</label>
             <span>-99</span>
-            <input type="range" name="RecPriority" id="rule-RecPriority" value="<%=recRule.RecPriority%>" min="-99" max="99" onmousemove="updateRangeValue(this)" onChange="updateRangeValue(this)" required>
+            <input type="range" name="RecPriority" id="rule-RecPriority" value="<%=recRule.RecPriority%>" min="-99" max="99" onmousemove="MythSettings.UpdateRangeValue(this)" onChange="MythSettings.UpdateRangeValue(this)" required>
             <span>99</span>
             <output name="RecPriority-Value" id="rule-RecPriority-Value" for="range"><%=recRule.RecPriority%></output>
         </div>
@@ -269,7 +287,7 @@ import "/tv/js/tvutil.qjs"
         <div class="setting setting-range">
             <label for="rule-StartOffset"><%=qsTr("Start Early/Late")%>:</label>
             <span>-240</span>
-            <input type="range" name="StartOffset" id="rule-StartOffset" value="<%=recRule.StartOffset%>" min="-240" max="240" onmousemove="updateRangeValue(this)" onChange="updateRangeValue(this)" required>
+            <input type="range" name="StartOffset" id="rule-StartOffset" value="<%=recRule.StartOffset%>" min="-240" max="240" onmousemove="MythSettings.UpdateRangeValue(this)" onChange="MythSettings.UpdateRangeValue(this)" required>
             <span>240</span>
             <output name="rangeValue" id="rule-StartOffset-Value" for="range"><%=recRule.StartOffset%></output> <%=qsTr("Minutes")%>
         </div>
@@ -278,7 +296,7 @@ import "/tv/js/tvutil.qjs"
         <div class="setting setting-range">
             <label for="rule-EndOffset"><%=qsTr("End Early/Late")%>:</label>
             <span>-240</span>
-            <input type="range" name="EndOffset" id="rule-EndOffset" value="<%=recRule.EndOffset%>" min="-240" max="240" onmousemove="updateRangeValue(this)" onChange="updateRangeValue(this)" required>
+            <input type="range" name="EndOffset" id="rule-EndOffset" value="<%=recRule.EndOffset%>" min="-240" max="240" onmousemove="MythSettings.UpdateRangeValue(this)" onChange="MythSettings.UpdateRangeValue(this)" required>
             <span>240</span>
             <output name="EndOffset-Value" id="rule-EndOffset-Value" for="range"><%=recRule.EndOffset%></output> <%=qsTr("Minutes")%>
         </div>
@@ -424,7 +442,7 @@ import "/tv/js/tvutil.qjs"
         <div class="setting setting-range">
             <label for="rule-MaxEpisodes"><%=qsTr("Episode Limit")%>:</label>
             <span>No Limit</span>
-            <input type="range" name="MaxEpisodes" id="rule-MaxEpisodes" value="<%=recRule.MaxEpisodes%>" min="0" max="50" onmousemove="updateRangeValue(this)" onChange="updateRangeValue(this)" required>
+            <input type="range" name="MaxEpisodes" id="rule-MaxEpisodes" value="<%=recRule.MaxEpisodes%>" min="0" max="50" onmousemove="MythSettings.UpdateRangeValue(this)" onChange="MythSettings.UpdateRangeValue(this)" required>
             <span>50</span>
             <output name="MaxEpisodes-Value" id="rule-MaxEpisodes-Value" for="range"><%=recRule.MaxEpisodes%></output> <%=qsTr("Episodes")%>
         </div>
@@ -589,7 +607,7 @@ import "/tv/js/tvutil.qjs"
   </form>
 </div>
 
-<script>
+<script type="text/javascript" nonce="<%=CSP_NONCE%>">
     //$("#rule-DupMethod option[value='<%=recRule.DupMethod%>']").prop("selected", true);
     //$( "#rule-DupMethod" ).val("<%=recRule.DupMethod%>");
 

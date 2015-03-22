@@ -137,7 +137,7 @@ UPnpCDSTv::UPnpCDSTv()
     m_URIBase.setPort(sPort);
 
     // ShortCuts
-    m_shortcuts.insert(UPnPCDSShortcuts::VIDEOS_RECORDINGS, "Recordings");
+    m_shortcuts.insert(UPnPShortcutFeature::VIDEOS_RECORDINGS, "Recordings");
 }
 
 void UPnpCDSTv::CreateRoot()
@@ -528,7 +528,7 @@ bool UPnpCDSTv::LoadTitles(const UPnpCDSRequest* pRequest,
     uint16_t nCount = pRequest->m_nRequestedCount;
     uint16_t nOffset = pRequest->m_nStartingIndex;
 
-    // We must use a dedicated connection to get an acccurate value from
+    // We must use a dedicated connection to get an accurate value from
     // FOUND_ROWS()
     MSqlQuery query(MSqlQuery::InitCon(MSqlQuery::kDedicatedConnection));
 
@@ -615,7 +615,7 @@ bool UPnpCDSTv::LoadDates(const UPnpCDSRequest* pRequest,
     uint16_t nCount = pRequest->m_nRequestedCount;
     uint16_t nOffset = pRequest->m_nStartingIndex;
 
-    // We must use a dedicated connection to get an acccurate value from
+    // We must use a dedicated connection to get an accurate value from
     // FOUND_ROWS()
     MSqlQuery query(MSqlQuery::InitCon(MSqlQuery::kDedicatedConnection));
 
@@ -682,7 +682,7 @@ bool UPnpCDSTv::LoadGenres( const UPnpCDSRequest* pRequest,
     uint16_t nCount = pRequest->m_nRequestedCount;
     uint16_t nOffset = pRequest->m_nStartingIndex;
 
-    // We must use a dedicated connection to get an acccurate value from
+    // We must use a dedicated connection to get an accurate value from
     // FOUND_ROWS()
     MSqlQuery query(MSqlQuery::InitCon(MSqlQuery::kDedicatedConnection));
 
@@ -753,7 +753,7 @@ bool UPnpCDSTv::LoadRecGroups(const UPnpCDSRequest* pRequest,
     uint16_t nCount = pRequest->m_nRequestedCount;
     uint16_t nOffset = pRequest->m_nStartingIndex;
 
-    // We must use a dedicated connection to get an acccurate value from
+    // We must use a dedicated connection to get an accurate value from
     // FOUND_ROWS()
     MSqlQuery query(MSqlQuery::InitCon(MSqlQuery::kDedicatedConnection));
 
@@ -825,7 +825,7 @@ bool UPnpCDSTv::LoadChannels(const UPnpCDSRequest* pRequest,
     uint16_t nCount = pRequest->m_nRequestedCount;
     uint16_t nOffset = pRequest->m_nStartingIndex;
 
-    // We must use a dedicated connection to get an acccurate value from
+    // We must use a dedicated connection to get an accurate value from
     // FOUND_ROWS()
     MSqlQuery query(MSqlQuery::InitCon(MSqlQuery::kDedicatedConnection));
 
@@ -945,7 +945,7 @@ bool UPnpCDSTv::LoadRecordings(const UPnpCDSRequest* pRequest,
         nOffset = 0;
     }
 
-    // We must use a dedicated connection to get an acccurate value from
+    // We must use a dedicated connection to get an accurate value from
     // FOUND_ROWS()
     MSqlQuery query(MSqlQuery::InitCon(MSqlQuery::kDedicatedConnection));
 
@@ -960,7 +960,8 @@ bool UPnpCDSTv::LoadRecordings(const UPnpCDSRequest* pRequest,
                   "r.programid, r.seriesid, r.recordid, "
                   "c.default_authority, c.name, "
                   "r.recordedid, r.transcoded, p.videoprop+0, p.audioprop+0, "
-                  "f.video_codec, f.audio_codec, f.fps, f.width, f.height "
+                  "f.video_codec, f.audio_codec, f.fps, f.width, f.height, "
+                  "f.container "
                   "FROM recorded r "
                   "LEFT JOIN channel c ON r.chanid=c.chanid "
                   "LEFT JOIN recordedprogram p ON p.chanid=r.chanid "
@@ -973,6 +974,9 @@ bool UPnpCDSTv::LoadRecordings(const UPnpCDSRequest* pRequest,
 
 
     QString orderByString = "ORDER BY r.starttime DESC, r.title";
+
+    if (!tokens["title"].isEmpty())
+        orderByString = "ORDER BY p.season, p.episode, r.starttime ASC"; // In season/episode order, falling back to recorded order
 
     QStringList clauses;
     QString whereString = BuildWhereClause(clauses, tokens);
@@ -1034,6 +1038,7 @@ bool UPnpCDSTv::LoadRecordings(const UPnpCDSRequest* pRequest,
         double         dVideoFrameRate = query.value(32).toDouble();
         int            nVideoWidth  = query.value(33).toInt();
         int            nVideoHeight = query.value(34).toInt();
+        QString        sContainer   = query.value(35).toString();
 
         // ----------------------------------------------------------------------
         // Cache Host ip Address & Port
@@ -1206,17 +1211,42 @@ bool UPnpCDSTv::LoadRecordings(const UPnpCDSRequest* pRequest,
 
         pItem->SetPropValue( "recordedDuration", UPnPDateTime::DurationFormat(nDurationMS));
 
+
         QSize resolution = QSize(nVideoWidth, nVideoHeight);
-        QString sContainer = "NUPPELVIDEO";
-        if (sMimeType == "video/mpeg")
+
+        // Attempt to guess the container if the information is missing from
+        // the database
+        if (sContainer.isEmpty())
         {
-            if (bTranscoded) // Transcoded mpeg will be in a PS container
-                sContainer = "MPEG-2 PS";
-            else
-                sContainer = "MPEG-2 TS"; // 99% of recordings will be in MPEG-2 TS containers before transcoding
+            sContainer = "NUV";
+            if (sMimeType == "video/mp2p")
+            {
+                if (bTranscoded) // Transcoded mpeg will probably be in a PS container
+                    sContainer = "MPEG2-PS";
+                else // For temporary backwards compatibility with old file naming
+                    sContainer = "MPEG2-TS"; // 99% of recordings will be in MPEG-2 TS containers before transcoding
+            }
+            else if (sMimeType == "video/mp2t")
+            {
+                sMimeType == "video/mp2p";
+                sContainer = "MPEG2-TS";
+            }
         }
+        // Make an educated guess at the video codec if the information is
+        // missing from the database
         if (sVideoCodec.isEmpty())
-            sVideoCodec = (nVideoProps & VID_AVC) ? "H264" : "MPEG2VIDEO";
+        {
+            if (sMimeType == "video/mp2p" || sMimeType == "video/mp2t")
+                sVideoCodec = (nVideoProps & VID_AVC) ? "H264" : "MPEG2VIDEO";
+            else if (sMimeType == "video/mp4")
+                sVideoCodec = "MPEG4";
+        }
+
+        // DLNA requires a mimetype of video/mp2p for TS files, it's not the
+        // correct mimetype, but then DLNA doesn't seem to care about such
+        // things
+        if (sMimeType == "video/mp2t" || sMimeType == "video/mp2p")
+            sMimeType = "video/mpeg";
 
         QUrl    resURI    = URIBase;
         resURI.setPath("Content/GetRecording");

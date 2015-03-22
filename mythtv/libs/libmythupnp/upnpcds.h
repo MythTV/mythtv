@@ -139,18 +139,14 @@ class UPNP_PUBLIC UPnpCDSExtensionResults
 
 //////////////////////////////////////////////////////////////////////////////
 
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-//
-// UPnpContainerShortcuts Class Definition
-//
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
+/**
+ * \brief Standard UPnP Shortcut feature
+ */
 
-class UPNP_PUBLIC UPnPCDSShortcuts : public UPnPFeature
+class UPNP_PUBLIC UPnPShortcutFeature : public UPnPFeature
 {
   public:
-    UPnPCDSShortcuts() : UPnPFeature("CONTAINER_SHORTCUTS", 1) { }
+    UPnPShortcutFeature() : UPnPFeature("CONTAINER_SHORTCUTS", 1) { }
 
     /**
      * \brief Allowed values for the Container Shortcut feature
@@ -204,7 +200,7 @@ class UPNP_PUBLIC UPnPCDSShortcuts : public UPnPFeature
     QMap<ShortCutType, QString> m_shortcuts;
 };
 
-typedef QMap<UPnPCDSShortcuts::ShortCutType, QString> CDSShortCutList;
+typedef QMap<UPnPShortcutFeature::ShortCutType, QString> CDSShortCutList;
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -303,7 +299,7 @@ class UPNP_PUBLIC UPnpCDS : public Eventing
         QString                m_sControlUrl;
 
         UPnPFeatureList        m_features;
-        UPnPCDSShortcuts      *m_pShortCuts;
+        UPnPShortcutFeature      *m_pShortCuts;
 
     private:
 
@@ -337,7 +333,7 @@ class UPNP_PUBLIC UPnpCDS : public Eventing
         void     RegisterExtension  ( UPnpCDSExtension *pExtension );
         void     UnregisterExtension( UPnpCDSExtension *pExtension );
 
-        void     RegisterShortCut   ( UPnPCDSShortcuts::ShortCutType type,
+        void     RegisterShortCut   ( UPnPShortcutFeature::ShortCutType type,
                                       const QString &objectID );
         void     RegisterFeature    ( UPnPFeature *feature );
 

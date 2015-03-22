@@ -26,7 +26,7 @@ import "/tv/js/tvutil.qjs"
     var dvr = new Dvr();
     var content = new Content();
 
-    var recordedID = getArg("RecordedID");
+    var recordedID = getArg("RecordedId");
 
     var program = dvr.GetRecorded(recordedID);
 
@@ -131,7 +131,7 @@ import "/tv/js/tvutil.qjs"
 
 </div>
 
-<script language="JavaScript" type="text/javascript" src="/js/fileutil.js"></script>
+<script type="text/javascript" src="/js/fileutil.js"></script>
 <%
     if (!useHTML5Video)
     {
@@ -143,8 +143,8 @@ import "/tv/js/tvutil.qjs"
         {
             jwpExists = 1;
 %>
-<script language="JavaScript" type="text/javascript" src="/StorageGroup/3rdParty/JW_Player/jwplayer.js"></script>
-<script language="JavaScript" type="text/javascript">
+<script type="text/javascript" src="/StorageGroup/3rdParty/JW_Player/jwplayer.js"></script>
+<script type="text/javascript" nonce="<%=CSP_NONCE%>">
 
     var playlist = "<%=streamInfo.RelativeURL%>";
     var width = <%=playerWidth%>; // Not the Video width, but the width of the embedded player

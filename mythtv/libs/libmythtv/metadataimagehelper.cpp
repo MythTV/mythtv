@@ -1,9 +1,21 @@
+
+#include "metadataimagehelper.h"
+
 #include <QUrl>
 
 #include "mythdirs.h"
 #include "mythdbcon.h"
+#include "mythcorecontext.h"
+#include "storagegroup.h"
 
-#include "metadataimagehelper.h"
+QString generate_myth_url(const QString &storage_group, const QString &host,
+                          const QString &path)
+{
+    uint port = gCoreContext->GetBackendServerPort(host);
+
+    return gCoreContext->GenMythURL(host, port, path,
+                                    StorageGroup::GetGroupToUse(host, storage_group));
+}
 
 ArtworkMap GetArtwork(QString inetref,
                       uint season,

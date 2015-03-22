@@ -33,9 +33,9 @@ UPnpCDSVideo::UPnpCDSVideo()
     m_URIBase.setPort(sPort);
 
     // ShortCuts
-    m_shortcuts.insert(UPnPCDSShortcuts::VIDEOS, "Videos");
-    m_shortcuts.insert(UPnPCDSShortcuts::VIDEOS_ALL, "Videos/Video");
-    m_shortcuts.insert(UPnPCDSShortcuts::VIDEOS_GENRES, "Videos/Genre");
+    m_shortcuts.insert(UPnPShortcutFeature::VIDEOS, "Videos");
+    m_shortcuts.insert(UPnPShortcutFeature::VIDEOS_ALL, "Videos/Video");
+    m_shortcuts.insert(UPnPShortcutFeature::VIDEOS_GENRES, "Videos/Genre");
 }
 
 void UPnpCDSVideo::CreateRoot()
@@ -814,6 +814,12 @@ bool UPnpCDSVideo::LoadVideos(const UPnpCDSRequest* pRequest,
         QUrl    resURI    = URIBase;
         resURI.setPath("Content/GetVideo");
         resURI.addQueryItem("Id", QString::number(nVidID));
+
+        // DLNA requires a mimetype of video/mp2p for TS files, it's not the
+        // correct mimetype, but then DLNA doesn't seem to care about such
+        // things
+        if (sMimeType == "video/mp2t" || sMimeType == "video/mp2p")
+            sMimeType = "video/mpeg";
 
         QString sProtocol = DLNA::ProtocolInfoString(UPNPProtocol::kHTTP,
                                                      sMimeType);

@@ -14,7 +14,6 @@ class QRegion;
 class QPoint;
 class QColor;
 
-#include "compat.h"
 #include "mythuiexp.h"
 
 #include <list>

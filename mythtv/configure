@@ -1500,6 +1500,10 @@ check_foo_config(){
     return $err
 }
 
+non_standard_header(){
+    test x"$1" != "x/usr/include"
+}
+
 x86_mmx_cpus="pentium-mmx,pentium2,pentium3,pentium3m,pentium-m"
 x86_mmx_cpus="$x86_mmx_cpus,pentium4,pentium4m,prescott"
 x86_mmx_cpus="$x86_mmx_cpus,athlon,athlon-xp,athlon-tbird,athlon-4,athlon-mp,"
@@ -4960,6 +4964,7 @@ case $target_os in
         ! disabled joystick_menu && enable joystick_menu
         enable libudev
         enable libuuid
+        enable pic
         ;;
     irix*)
         target_os=irix
@@ -5136,7 +5141,6 @@ set_default $PATHS_LIST
 set_default nm
 
 set_default $MYTHTV_PATHS_LIST
-append CONFIG_INCLUDEPATH $sysinclude "${sysroot}${prefix}"
 
 append CCONFIG "$compile_type"
 if test x$compile_type = x"profile" ; then
@@ -5230,17 +5234,28 @@ is_qmake4(){
     $1 --version 2>&1 | egrep -q -e "Qt version 4\.[8-9]\.[0-9]"
 }
 
-if is_qmake5 $qmake || is_qmake5 qmake-qt5; then
-    if is_qmake5 qmake-qt5; then
-        qmake=qmake-qt5
-    fi
-    check_cxxflags -DQT_DISABLE_DEPRECATED_BEFORE
-elif is_qmake4 $qmake || is_qmake4 qmake-qt4; then
-    if is_qmake4 qmake-qt4; then
-        qmake=qmake-qt4
-    fi
+# qmake-qt5 /usr/lib64/qt5/bin/qmake /usr/lib/x86_64-linux-gnu/qt5/bin/qmake
+if [ x"$qmake" = "xqmake" ]; then
+    CHECK_QMAKE="qmake-qt5 /usr/lib64/qt5/bin/qmake /usr/lib/x86_64-linux-gnu/qt5/bin/qmake $qmake qmake-qt4"
 else
+    CHECK_QMAKE="$qmake qmake-qt5 /usr/lib64/qt5/bin/qmake /usr/lib/x86_64-linux-gnu/qt5/bin/qmake qmake-qt4"
+fi
+# try to find a qt5 qmake to use
+found_qmake=''
+for i in $CHECK_QMAKE; do
+    if is_qmake5 $i; then
+        found_qmake=$i
+        check_cxxflags -DQT_DISABLE_DEPRECATED_BEFORE
+        break;
+    elif is_qmake4 $i; then
+        found_qmake=$i
+        break;
+    fi
+done
+if [ x"$found_qmake" = "x" ]; then
     die "qmake for Qt4.8 or newer not found.\nPlease specify the correct qmake with --qmake="
+else
+    qmake=$found_qmake
 fi
 
 if test x"$qmakespecs" != x; then
@@ -6265,7 +6280,7 @@ fi
 enabled dvb && check_cc -I"$dvb_path" <<EOF && enable fe_can_2g_modulation
 #include <linux/dvb/frontend.h>
 int main(void) {
-    if (FE_CAN_2G_MODULATION != 0x10000000)
+    if (FE_CAN_2G_MODULATION)
         return 1;
     return 0;
 }
@@ -6375,10 +6390,11 @@ using namespace std;
 using namespace CEC;
 #include <libcec/cecloader.h>
 int main(void) {
-    if (CEC_LIB_VERSION_MAJOR < 1 || (CEC_LIB_VERSION_MAJOR == 1 &&
-                                      CEC_LIB_VERSION_MINOR < 5))
-        return 0;
-    return (long) LibCecInit;
+    #if (CEC_LIB_VERSION_MAJOR < 1 || (CEC_LIB_VERSION_MAJOR == 1 && \
+                                       CEC_LIB_VERSION_MINOR < 7))
+        #error libcec version to old
+    #endif
+    return 1;
 }
 EOF
 fi
@@ -6399,8 +6415,9 @@ fi
 enabled libxml2 && check_cc -I"$libxml2_path" <<EOF && add_extralibs "-lxml2" || disable libxml2
 #include <libxml/xmlversion.h>
 int main(void) {
-    if (LIBXML_VERSION > 20600)
-        return 1;
+    #if (LIBXML_VERSION < 20600)
+        #error libxml2 version to old
+    #endif
     return 0;
 }
 EOF
@@ -7349,18 +7366,22 @@ if enabled appleremote; then
   append CONFIG_DEFINES "USING_APPLEREMOTE"
 fi
 
-if enabled dvb; then
+if enabled dvb && non_standard_header $dvb_path; then
   append CONFIG_INCLUDEPATH "$dvb_path"
 fi
 
 if enabled libcec; then
   append CONFIG_DEFINES "using_libcec"
-  append CONFIG_INCLUDEPATH "$libcec_path"
+  if non_standard_header $libcec_path; then
+    append CONFIG_INCLUDEPATH "$libcec_path"
+  fi
 fi
 
 if enabled libxml2; then
   if [ -d $libxml2_path ] ; then
-    append CONFIG_INCLUDEPATH "$libxml2_path"
+    if non_standard_header $libxml2_path; then
+      append CONFIG_INCLUDEPATH "$libxml2_path"
+    fi
     append CCONFIG "using_libxml2"
   fi
 fi

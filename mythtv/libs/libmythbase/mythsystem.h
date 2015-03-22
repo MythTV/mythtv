@@ -23,9 +23,6 @@
 #ifndef MYTHSYSTEM_H_
 #define MYTHSYSTEM_H_
 
-// C headers
-#include <stdint.h>
-
 // Qt headers
 #include <QString>
 
@@ -86,7 +83,7 @@ class MBASE_PUBLIC MythSystem
   public:
     /// Priorities that can be used for cpu and disk usage of child process
     typedef enum Priority {
-        kIdlePriority	= 0, ///< run only when no one else wants to
+        kIdlePriority   = 0, ///< run only when no one else wants to
         kLowestPriority,
         kLowPriority,
         kNormalPriority,   ///< run as a normal program

@@ -1,19 +1,10 @@
 // POSIX headers
 #include <sys/types.h>
-#include <unistd.h>
 
 // C headers
 #include <cstdlib>
 
-// C++ headers
-#include <iostream>
-#include <algorithm>
-using namespace std;
-
 // Qt headers
-#include <QFileInfo>
-#include <QRegExp>
-#include <QFile>
 #include <QMap>
 
 // MythTV headers
@@ -23,15 +14,10 @@ using namespace std;
 #include "mythmiscutil.h"
 #include "mythdate.h"
 #include "mythcorecontext.h"
-#include "dialogbox.h"
-#include "remoteutil.h"
-#include <programinfoupdater.h>
-#include "tvremoteutil.h"
+#include "programinfoupdater.h"
 #include "jobqueue.h"
 #include "mythdb.h"
 #include "mythlogging.h"
-#include "previewgenerator.h"
-#include "channelutil.h"
 
 #define LOC      QString("RecordingInfo(%1): ").arg(GetBasename())
 
@@ -86,7 +72,7 @@ RecordingInfo::RecordingInfo(
 
     bool _repeat,
 
-    RecStatusType _oldrecstatus,
+    RecStatus::Type _oldrecstatus,
     bool _reactivate,
 
     uint _recordid,
@@ -97,7 +83,6 @@ RecordingInfo::RecordingInfo(
 
     uint _sourceid,
     uint _inputid,
-    uint _cardid,
 
     uint _findid,
 
@@ -115,7 +100,7 @@ RecordingInfo::RecordingInfo(
         _startts, _endts, _recstartts, _recendts,
         _seriesid, _programid, _inetref),
     oldrecstatus(_oldrecstatus),
-    savedrecstatus(rsUnknown),
+    savedrecstatus(RecStatus::Unknown),
     future(_future),
     schedorder(_schedorder),
     mplexid(_mplexid),
@@ -156,7 +141,6 @@ RecordingInfo::RecordingInfo(
 
     sourceid = _sourceid;
     inputid = _inputid;
-    cardid = _cardid;
 
     findid = _findid;
 
@@ -201,7 +185,7 @@ RecordingInfo::RecordingInfo(
     const QDateTime &_recstartts,
     const QDateTime &_recendts,
 
-    RecStatusType _recstatus,
+    RecStatus::Type _recstatus,
 
     uint _recordid,
     RecordingType _rectype,
@@ -217,8 +201,8 @@ RecordingInfo::RecordingInfo(
         QString(), _recgroup, _playgroup,
         _startts, _endts, _recstartts, _recendts,
         _seriesid, _programid, _inetref),
-    oldrecstatus(rsUnknown),
-    savedrecstatus(rsUnknown),
+    oldrecstatus(RecStatus::Unknown),
+    savedrecstatus(RecStatus::Unknown),
     future(false),
     schedorder(0),
     mplexid(0),
@@ -255,8 +239,8 @@ RecordingInfo::RecordingInfo(
 RecordingInfo::RecordingInfo(
     uint _chanid, const QDateTime &desiredts,
     bool genUnknown, uint maxHours, LoadStatus *status) :
-    oldrecstatus(rsUnknown),
-    savedrecstatus(rsUnknown),
+    oldrecstatus(RecStatus::Unknown),
+    savedrecstatus(RecStatus::Unknown),
     future(false),
     schedorder(0),
     mplexid(0),
@@ -442,8 +426,8 @@ void RecordingInfo::clone(const ProgramInfo &other,
         record = NULL;
     }
 
-    oldrecstatus   = rsUnknown;
-    savedrecstatus = rsUnknown;
+    oldrecstatus   = RecStatus::Unknown;
+    savedrecstatus = RecStatus::Unknown;
     future         = false;
     schedorder     = 0;
     mplexid        = 0;
@@ -462,8 +446,8 @@ void RecordingInfo::clear(void)
     delete record;
     record = NULL;
 
-    oldrecstatus = rsUnknown;
-    savedrecstatus = rsUnknown;
+    oldrecstatus = RecStatus::Unknown;
+    savedrecstatus = RecStatus::Unknown;
     future = false;
     schedorder = 0;
     mplexid = 0;
@@ -871,11 +855,11 @@ void RecordingInfo::ApplyTranscoderProfileChange(const QString &profile) const
 
 /**
  *  \brief Set this program to never be recorded by inserting 'history' for
- *         it into the database with a status of rsNeverRecord
+ *         it into the database with a status of RecStatus::NeverRecord
  */
 void RecordingInfo::ApplyNeverRecord(void)
 {
-    SetRecordingStatus(rsNeverRecord);
+    SetRecordingStatus(RecStatus::NeverRecord);
     SetScheduledStartTime(MythDate::current());
     SetScheduledEndTime(GetRecordingStartTime());
     AddHistory(true, true);
@@ -1174,7 +1158,7 @@ void RecordingInfo::FinishedRecording(bool allowReRecord)
     GetProgramRecordingStatus();
     if (!allowReRecord)
     {
-        recstatus = rsRecorded;
+        recstatus = RecStatus::Recorded;
 
         uint starttime = recstartts.toTime_t();
         uint endtime   = recendts.toTime_t();
@@ -1242,9 +1226,9 @@ void RecordingInfo::ReactivateRecording(void)
  */
 void RecordingInfo::AddHistory(bool resched, bool forcedup, bool future)
 {
-    bool dup = (GetRecordingStatus() == rsRecorded || forcedup);
-    RecStatusType rs = (GetRecordingStatus() == rsCurrentRecording &&
-                        !future) ? rsPreviousRecording : GetRecordingStatus();
+    bool dup = (GetRecordingStatus() == RecStatus::Recorded || forcedup);
+    RecStatus::Type rs = (GetRecordingStatus() == RecStatus::CurrentRecording &&
+                        !future) ? RecStatus::PreviousRecording : GetRecordingStatus();
     LOG(VB_SCHEDULE, LOG_INFO, QString("AddHistory: %1/%2, %3, %4, %5/%6")
         .arg(int(rs)).arg(int(oldrecstatus)).arg(future).arg(dup)
         .arg(GetScheduledStartTime(MythDate::ISODate)).arg(GetTitle()));
@@ -1500,7 +1484,7 @@ void RecordingInfo::ForgetHistory(void)
     // Remove any never records which aren't need anymore.
     result.prepare("DELETE FROM oldrecorded "
                    "WHERE recstatus = :NEVER AND duplicate = 0");
-    result.bindValue(":NEVER", rsNeverRecord);
+    result.bindValue(":NEVER", RecStatus::NeverRecord);
 
     if (!result.exec())
         MythDB::DBError("forgetNeverHistory", result);
@@ -1620,7 +1604,7 @@ void RecordingInfo::SaveFilesize(uint64_t fsize)
     GetRecordingFile()->m_fileSize = fsize;
     GetRecordingFile()->Save(); // Ideally this would be called just the once when all metadata is gathered
 
-    updater->insert(chanid, recstartts, kPIUpdateFileSize, fsize);
+    updater->insert(recordedid, kPIUpdateFileSize, fsize);
 
     ProgramInfo::SaveFilesize(fsize); // Temporary
 }
@@ -1630,7 +1614,7 @@ void RecordingInfo::SetFilesize(uint64_t fsize)
     if (!GetRecordingFile())
         LoadRecordingFile();
     GetRecordingFile()->m_fileSize = fsize;
-    updater->insert(chanid, recstartts, kPIUpdateFileSize, fsize);
+    updater->insert(recordedid, kPIUpdateFileSize, fsize);
     //ProgramInfo::SetFilesize(fsize);
 }
 

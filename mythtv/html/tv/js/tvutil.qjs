@@ -2,7 +2,8 @@
 function RecStatusToClass(status)
 {
     var dvr = new Dvr();
-    var statusStr = dvr.RecStatusToString(status);
+    var statusStr = RecordingStatusString[status];
+//    var statusStr = dvr.RecStatusToRawString(status);
     var statusClass = "program" + statusStr.replace(/ /g, '');
 
     return statusClass;

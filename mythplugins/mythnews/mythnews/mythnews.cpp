@@ -229,12 +229,11 @@ void MythNews::updateInfoView(MythUIButtonListItem *selected)
     {
         article = m_articles[selected];
         if (m_sitesList->GetItemCurrent())
-            site = qVariantValue<NewsSite*>
-                (m_sitesList->GetItemCurrent()->GetData());
+            site = m_sitesList->GetItemCurrent()->GetData().value<NewsSite*>();
     }
     else
     {
-        site = qVariantValue<NewsSite*>(selected->GetData());
+        site = selected->GetData().value<NewsSite*>();
         if (m_articlesList->GetItemCurrent())
             article = m_articles[m_articlesList->GetItemCurrent()];
     }
@@ -523,7 +522,7 @@ void MythNews::processAndShowNews(NewsSite *site)
     if (!siteUIItem)
         return;
 
-    if (site != qVariantValue<NewsSite*>(siteUIItem->GetData()))
+    if (site != siteUIItem->GetData().value<NewsSite*>())
         return;
 
     QString currItem = m_articlesList->GetValue();
@@ -552,7 +551,7 @@ void MythNews::slotSiteSelected(MythUIButtonListItem *item)
     if (!item || item->GetData().isNull())
         return;
 
-    NewsSite *site = qVariantValue<NewsSite*>(item->GetData());
+    NewsSite *site = item->GetData().value<NewsSite*>();
     if (!site)
         return;
 
@@ -634,7 +633,7 @@ void MythNews::ShowEditDialog(bool edit)
         if (!siteListItem || siteListItem->GetData().isNull())
             return;
 
-        site = qVariantValue<NewsSite*>(siteListItem->GetData());
+        site = siteListItem->GetData().value<NewsSite*>();
     }
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
@@ -707,7 +706,7 @@ void MythNews::deleteNewsSite(void)
 
     if (siteUIItem && !siteUIItem->GetData().isNull())
     {
-        NewsSite *site = qVariantValue<NewsSite*>(siteUIItem->GetData());
+        NewsSite *site = siteUIItem->GetData().value<NewsSite*>();
         if (site)
         {
             removeFromDB(site->name());

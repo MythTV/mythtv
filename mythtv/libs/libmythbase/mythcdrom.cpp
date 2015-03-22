@@ -42,8 +42,8 @@ MythCDROM* MythCDROM::get(QObject* par, const char* devicePath,
 #endif
 }
 
-MythCDROM::MythCDROM(QObject* par, const char* DevicePath, bool SuperMount, 
-                     bool AllowEject) 
+MythCDROM::MythCDROM(QObject* par, const char* DevicePath, bool SuperMount,
+                     bool AllowEject)
          : MythMediaDevice(par, DevicePath, SuperMount, AllowEject)
 {
 }
@@ -76,7 +76,7 @@ void MythCDROM::onDeviceMounted()
     {
         LOG(VB_MEDIA, LOG_INFO, "Probable DVD detected.");
         m_MediaType = MEDIATYPE_DVD;
-        m_Status = MEDIASTAT_USEABLE; 
+        m_Status = MEDIASTAT_USEABLE;
     }
     else if (bd.exists())
     {
@@ -88,17 +88,17 @@ void MythCDROM::onDeviceMounted()
     {
         LOG(VB_MEDIA, LOG_INFO, "Probable Audio CD detected.");
         m_MediaType = MEDIATYPE_AUDIO;
-        m_Status = MEDIASTAT_USEABLE; 
+        m_Status = MEDIASTAT_USEABLE;
     }
     else if (vcd.exists() || svcd.exists())
     {
         LOG(VB_MEDIA, LOG_INFO, "Probable VCD/SVCD detected.");
         m_MediaType = MEDIATYPE_VCD;
-        m_Status = MEDIASTAT_USEABLE; 
+        m_Status = MEDIASTAT_USEABLE;
     }
     else if (bad_dvd.exists())
     {
-        LOG(VB_GENERAL, LOG_ERR, 
+        LOG(VB_GENERAL, LOG_ERR,
             "DVD incorrectly mounted? (ISO9660 instead of UDF)");
     }
     else
@@ -115,7 +115,7 @@ void MythCDROM::onDeviceMounted()
     if (MEDIATYPE_DATA == m_MediaType)
         MythMediaDevice::onDeviceMounted();
 
-    // Unlock the door, and if appropriate unmount the media, 
+    // Unlock the door, and if appropriate unmount the media,
     // so the user can press the manual eject button
     if (m_AllowEject)
     {
@@ -127,7 +127,7 @@ void MythCDROM::onDeviceMounted()
 
 void MythCDROM::setDeviceSpeed(const char *devicePath, int speed)
 {
-    LOG(VB_MEDIA, LOG_INFO, 
+    LOG(VB_MEDIA, LOG_INFO,
         QString("SetDeviceSpeed(%1,%2) - not implemented on this OS.")
         .arg(devicePath).arg(speed));
 }

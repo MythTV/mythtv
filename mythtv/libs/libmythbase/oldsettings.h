@@ -10,8 +10,6 @@
 #ifndef OLDSETTINGS_H
 #define OLDSETTINGS_H
 
-#include <map>
-
 #include <QString>
 #include <QPixmap>
 

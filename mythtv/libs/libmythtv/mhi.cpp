@@ -1,21 +1,42 @@
 #include "mhi.h"
 
-#include <unistd.h>
-
 #include <QRegion>
-#include <QBitArray>
 #include <QVector>
 #include <QUrl>
+#include <QPoint>                       // for QPoint
+#include <QRgb>                         // for QRgb
+#include <QVariant>                     // for QVariant
+#include <QByteArray>                   // for QByteArray
+#include <QStringList>                  // for QStringList
+#include <QTime>                        // for QTime
+#include <QHash>                        // for QHash
 
+#include <stdint.h>                     // for uint8_t
+#include <string.h>                     // for memcpy, memset
+
+#include <algorithm>                    // for min
+#include <cmath>                        // for round, sqrt
+#include <deque>                        // for _Deque_iterator, operator!=
+
+#include "dsmcc.h"                      // for Dsmcc
+#include "interactivetv.h"              // for InteractiveTV
 #include "interactivescreen.h"
 #include "mythpainter.h"
 #include "mythimage.h"
 #include "mythuiimage.h"
-#include "osd.h"
 #include "mythdirs.h"
 #include "mythlogging.h"
 #include "mythmainwindow.h"
 #include "mythavutil.h"
+#include "mthread.h"                    // for MThread
+#include "mythcorecontext.h"            // for MythCoreContext, etc
+#include "mythdb.h"                     // for MythDB
+#include "mythdbcon.h"                  // for MSqlQuery
+#include "mythevent.h"                  // for MythEvent
+#include "mythplayer.h"                 // for MythPlayer
+#include "mythrect.h"                   // for MythRect
+#include "mythuiactions.h"              // for ACTION_0, ACTION_1, etc
+#include "tv_actions.h"                 // for ACTION_MENUTEXT, etc
 
 static bool       ft_loaded = false;
 static FT_Library ft_library;

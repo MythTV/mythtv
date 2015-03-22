@@ -372,6 +372,3 @@ QString GetISO3166CountryName(const QString &iso3166Code)
 
     return gCountryMap[iso3166Code];
 }
-
-
-

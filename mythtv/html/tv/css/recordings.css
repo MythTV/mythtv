@@ -162,6 +162,12 @@
     font-weight: bold;
 }
 
+.recordingList .programAirDate
+{
+    color: #508ED8;
+    font-size: 0.8em;
+}
+
 .recordingList .programStartTime
 {
     width: 30%;
@@ -192,6 +198,7 @@
 
 .recordingList .programSubtitle
 {
+    color: #508ED8;
     position:relative;
     font-weight: bold;
     font-size: 1.0em;

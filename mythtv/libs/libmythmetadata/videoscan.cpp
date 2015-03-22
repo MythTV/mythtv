@@ -1,21 +1,31 @@
+
+#include "videoscan.h"
+
 #include <QImageReader>
 #include <QApplication>
 #include <QUrl>
 
+// libmythbase
+#include "mythevent.h"
+#include "mythlogging.h"
+#include "mythdate.h"
+
+// libmyth
 #include "mythcontext.h"
+#include "remoteutil.h"
+
+// libmythui
 #include "mythscreenstack.h"
 #include "mythprogressdialog.h"
 #include "mythdialogbox.h"
+#include "mythmainwindow.h"
+
+// libmythmetadata
+#include "videometadatalistmanager.h"
+#include "videoutils.h"
 #include "globals.h"
 #include "dbaccess.h"
 #include "dirscan.h"
-#include "videometadatalistmanager.h"
-#include "videoscan.h"
-#include "videoutils.h"
-#include "mythevent.h"
-#include "remoteutil.h"
-#include "mythlogging.h"
-#include "mythdate.h"
 
 QEvent::Type VideoScanChanges::kEventType =
     (QEvent::Type) QEvent::registerEventType();

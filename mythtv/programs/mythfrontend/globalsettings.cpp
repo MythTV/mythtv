@@ -36,6 +36,8 @@
 #include "themeinfo.h"
 #include "mythdirs.h"
 #include "mythuihelper.h"
+#include "mythuidefines.h"
+
 #ifdef USING_AIRPLAY
 #include "AirPlay/mythraopconnection.h"
 #endif

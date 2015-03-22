@@ -2,6 +2,7 @@
 #define __MythTV__mythuicomposite__
 
 #include "mythuitype.h"
+#include "mythtypes.h"
 
 class MUI_PUBLIC MythUIComposite : public MythUIType
 {

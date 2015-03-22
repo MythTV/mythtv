@@ -43,7 +43,7 @@ class PBHEventHandler : public QObject
     int m_checkAvailabilityTimerId;
     static const uint kUpdateFreeSpaceInterval;
     QMap<QString, QStringList> m_fileListCache;
-    QHash<QString, QStringList> m_checkAvailability;
+    QHash<uint, QStringList> m_checkAvailability;
 };
 
 const uint PBHEventHandler::kUpdateFreeSpaceInterval = 15000; // 15 seconds
@@ -60,8 +60,8 @@ AvailableStatusType PBHEventHandler::CheckAvailability(const QStringList &slist)
 
     {
         QMutexLocker locker(&m_pbh.m_lock);
-        QHash<QString, QStringList>::iterator it =
-            m_checkAvailability.find(evinfo.MakeUniqueKey());
+        QHash<uint, QStringList>::iterator it =
+            m_checkAvailability.find(evinfo.GetRecordingID());
         if (it != m_checkAvailability.end())
             m_checkAvailability.erase(it);
         if (m_checkAvailability.empty() && m_checkAvailabilityTimerId)
@@ -95,20 +95,20 @@ AvailableStatusType PBHEventHandler::CheckAvailability(const QStringList &slist)
 //             if (!evinfo.GetFilesize())
 //             {
                 availableStatus =
-                    (evinfo.GetRecordingStatus() == rsRecording) ?
+                    (evinfo.GetRecordingStatus() == RecStatus::Recording) ?
                     asNotYetAvailable : asZeroByte;
 //             }
         }
     }
 
     QStringList list;
-    list.push_back(evinfo.MakeUniqueKey());
+    list.push_back(QString::number(evinfo.GetRecordingID()));
     list.push_back(evinfo.GetPathname());
     MythEvent *e0 = new MythEvent("SET_PLAYBACK_URL", list);
     QCoreApplication::postEvent(m_pbh.m_listener, e0);
 
     list.clear();
-    list.push_back(evinfo.MakeUniqueKey());
+    list.push_back(QString::number(evinfo.GetRecordingID()));
     list.push_back(QString::number((int)*cats.begin()));
     list.push_back(QString::number((int)availableStatus));
     list.push_back(QString::number(evinfo.GetFilesize()));
@@ -143,7 +143,7 @@ bool PBHEventHandler::event(QEvent *e)
             QStringList slist;
             {
                 QMutexLocker locker(&m_pbh.m_lock);
-                QHash<QString, QStringList>::iterator it =
+                QHash<uint, QStringList>::iterator it =
                     m_checkAvailability.begin();
                 if (it != m_checkAvailability.end())
                     slist = *it;
@@ -174,18 +174,17 @@ bool PBHEventHandler::event(QEvent *e)
             QStringList successes;
             QStringList failures;
             QStringList list = me->ExtraDataList();
-            while (list.size() >= 4)
+            while (list.size() >= 3)
             {
-                uint      chanid        = list[0].toUInt();
-                QDateTime recstartts    = MythDate::fromString(list[1]);
-                bool      forceDelete   = list[2].toUInt();
-                bool      forgetHistory = list[3].toUInt();
+                uint      recordingID   = list[0].toUInt();
+                bool      forceDelete   = list[1].toUInt();
+                bool      forgetHistory = list[2].toUInt();
 
-                bool ok = RemoteDeleteRecording(
-                    chanid, recstartts, forceDelete, forgetHistory);
+                bool ok = RemoteDeleteRecording( recordingID, forceDelete,
+                                                 forgetHistory);
 
                 QStringList &res = (ok) ? successes : failures;
-                for (uint i = 0; i < 4; i++)
+                for (uint i = 0; i < 3; i++)
                 {
                     res.push_back(list.front());
                     list.pop_front();
@@ -209,12 +208,11 @@ bool PBHEventHandler::event(QEvent *e)
             QStringList successes;
             QStringList failures;
             QStringList list = me->ExtraDataList();
-            while (list.size() >= 2)
+            while (list.size() >= 1)
             {
-                uint      chanid        = list[0].toUInt();
-                QDateTime recstartts    = MythDate::fromString(list[1]);
+                uint recordingID = list[0].toUInt();
 
-                bool ok = RemoteUndeleteRecording(chanid, recstartts);
+                bool ok = RemoteUndeleteRecording(recordingID);
 
                 QStringList &res = (ok) ? successes : failures;
                 for (uint i = 0; i < 2; i++)
@@ -272,12 +270,12 @@ bool PBHEventHandler::event(QEvent *e)
         }
         else if (me->Message() == "LOCATE_ARTWORK")
         {
-            QString                inetref   = me->ExtraData(0);
-            uint                   season    = me->ExtraData(1).toUInt();
-            const VideoArtworkType type      = (VideoArtworkType)me->ExtraData(2).toInt();
+            QString                inetref    = me->ExtraData(0);
+            uint                   season     = me->ExtraData(1).toUInt();
+            const VideoArtworkType type       = (VideoArtworkType)me->ExtraData(2).toInt();
 #if 0 /* const ref for an unused variable doesn't make much sense either */
-            const QString          &pikey    = me->ExtraData(3);
-            const QString          &group    = me->ExtraData(4);
+            uint                   recordingID = me->ExtraData(3).toUInt();
+            const QString          &group     = me->ExtraData(4);
 #endif
             const QString          cacheKey = QString("%1:%2:%3")
                 .arg((int)type).arg(inetref).arg(season);
@@ -356,13 +354,11 @@ void PlaybackBoxHelper::StopRecording(const ProgramInfo &pginfo)
     QCoreApplication::postEvent(m_eventHandler, e);
 }
 
-void PlaybackBoxHelper::DeleteRecording(
-    uint chanid, const QDateTime &recstartts, bool forceDelete,
-    bool forgetHistory)
+void PlaybackBoxHelper::DeleteRecording( uint recordingID, bool forceDelete,
+                                         bool forgetHistory)
 {
     QStringList list;
-    list.push_back(QString::number(chanid));
-    list.push_back(recstartts.toString(Qt::ISODate));
+    list.push_back(QString::number(recordingID));
     list.push_back((forceDelete)    ? "1" : "0");
     list.push_back((forgetHistory)  ? "1" : "0");
     DeleteRecordings(list);
@@ -374,12 +370,10 @@ void PlaybackBoxHelper::DeleteRecordings(const QStringList &list)
     QCoreApplication::postEvent(m_eventHandler, e);
 }
 
-void PlaybackBoxHelper::UndeleteRecording(
-    uint chanid, const QDateTime &recstartts)
+void PlaybackBoxHelper::UndeleteRecording(uint recordingID)
 {
     QStringList list;
-    list.push_back(QString::number(chanid));
-    list.push_back(recstartts.toString(Qt::ISODate));
+    list.push_back(QString::number(recordingID));
     MythEvent *e = new MythEvent("UNDELETE_RECORDINGS", list);
     QCoreApplication::postEvent(m_eventHandler, e);
 }
@@ -418,14 +412,14 @@ void PlaybackBoxHelper::CheckAvailability(
 {
     QString catstr = QString::number((int)cat);
     QMutexLocker locker(&m_lock);
-    QHash<QString, QStringList>::iterator it =
-        m_eventHandler->m_checkAvailability.find(pginfo.MakeUniqueKey());
+    QHash<uint, QStringList>::iterator it =
+        m_eventHandler->m_checkAvailability.find(pginfo.GetRecordingID());
     if (it == m_eventHandler->m_checkAvailability.end())
     {
         QStringList list;
         pginfo.ToStringList(list);
         list += catstr;
-        m_eventHandler->m_checkAvailability[pginfo.MakeUniqueKey()] = list;
+        m_eventHandler->m_checkAvailability[pginfo.GetRecordingID()] = list;
     }
     else
     {
@@ -455,7 +449,7 @@ QString PlaybackBoxHelper::LocateArtwork(
     QStringList list(inetref);
     list.push_back(QString::number(season));
     list.push_back(QString::number(type));
-    list.push_back((pginfo)?pginfo->MakeUniqueKey():"");
+    list.push_back((pginfo)?QString::number(pginfo->GetRecordingID()):"");
     list.push_back(groupname);
     MythEvent *e = new MythEvent("LOCATE_ARTWORK", list);
     QCoreApplication::postEvent(m_eventHandler, e);

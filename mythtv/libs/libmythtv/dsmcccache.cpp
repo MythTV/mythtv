@@ -206,7 +206,7 @@ void DSMCCCache::CacheFileData(const DSMCCCacheReference &ref,
 void DSMCCCache::AddFileInfo(DSMCCCacheDir *pDir, const BiopBinding *pBB)
 {
     QString name;
-    name = QString::fromAscii(pBB->m_name.m_comps[0].m_id
+    name = QString::fromLatin1(pBB->m_name.m_comps[0].m_id
                   /*, pBB->m_name.m_comps[0].m_id_len*/);
 
     const DSMCCCacheReference *entry =
@@ -224,7 +224,7 @@ void DSMCCCache::AddDirInfo(DSMCCCacheDir *pDir, const BiopBinding *pBB)
 {
     // Is it already there?
     QString name;
-    name = QString::fromAscii(pBB->m_name.m_comps[0].m_id
+    name = QString::fromLatin1(pBB->m_name.m_comps[0].m_id
                   /*, pBB->m_name.m_comps[0].m_id_len*/);
     const DSMCCCacheReference *entry =
         pBB->m_ior.m_profile_body->GetReference();

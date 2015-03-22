@@ -31,38 +31,37 @@ class EITFixUp
   public:
     enum FixUpType
     {
-        kFixNone       = 0x0000,
+        kFixNone             =       0, // no bits set
 
         // Regular fixups
-        kFixGenericDVB = 0x0001,
-        kFixBell       = 0x0002,
-        kFixUK         = 0x0004,
-        kFixPBS        = 0x0008,
-        kFixComHem     = 0x0010,
-        kFixSubtitle   = 0x0020,
-        kFixAUStar     = 0x0040,
-        kFixMCA        = 0x0080,
-        kFixRTL        = 0x0100,
-        kFixFI         = 0x0200,
-        kFixPremiere   = 0x0400,
-        kFixHDTV       = 0x0800,
-        kFixNL         = 0x1000,
-        kFixCategory   = 0x8000,
-        kFixNO         = 0x10000,
-        kFixNRK_DVBT   = 0x20000,
-        kFixDish       = 0x40000,
-        kFixDK         = 0x80000,
-        kFixAUFreeview    = 0x100000,
-        kFixAUDescription = 0x200000,
-        kFixAUNine        = 0x400000,
-        kFixAUSeven       = 0x800000,
-
+        kFixGenericDVB       = 1 <<  0, // LSB set
+        kFixBell             = 1 <<  1,
+        kFixUK               = 1 <<  2,
+        kFixPBS              = 1 <<  3,
+        kFixComHem           = 1 <<  4,
+        kFixSubtitle         = 1 <<  5,
+        kFixAUStar           = 1 <<  6,
+        kFixMCA              = 1 <<  7,
+        kFixRTL              = 1 <<  8,
+        kFixFI               = 1 <<  9,
+        kFixPremiere         = 1 << 10,
+        kFixHDTV             = 1 << 11,
+        kFixNL               = 1 << 12,
+        kFixCategory         = 1 << 13,
+        kFixNO               = 1 << 14,
+        kFixNRK_DVBT         = 1 << 15,
+        kFixDish             = 1 << 16,
+        kFixDK               = 1 << 17,
+        kFixAUFreeview       = 1 << 18,
+        kFixAUDescription    = 1 << 19,
+        kFixAUNine           = 1 << 20,
+        kFixAUSeven          = 1 << 21,
 
         // Early fixups
-        kEFixForceISO8859_1  = 0x2000,
-        kEFixForceISO8859_15 = 0x4000,
-        kEFixForceISO8859_9  = 0x80000,
-        kEFixForceISO8859_2  = 0x100000,
+        kEFixForceISO8859_1  = 1 << 22,
+        kEFixForceISO8859_2  = 1 << 23,
+        kEFixForceISO8859_9  = 1 << 24,
+        kEFixForceISO8859_15 = 1 << 25,
     };
 
     EITFixUp();
@@ -127,6 +126,7 @@ class EITFixUp
     const QRegExp m_ukThen;
     const QRegExp m_ukNew;
     const QRegExp m_ukNewTitle;
+    const QRegExp m_ukAlsoInHD;
     const QRegExp m_ukCEPQ;
     const QRegExp m_ukColonPeriod;
     const QRegExp m_ukDotSpaceStart;

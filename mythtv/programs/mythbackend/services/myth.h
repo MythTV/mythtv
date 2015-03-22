@@ -84,9 +84,11 @@ class Myth : public MythServices
 
         DTC::FrontendList*  GetFrontends        ( bool OnLine );
 
-        DTC::SettingList*   GetSetting          ( const QString   &HostName,
+        QString             GetSetting          ( const QString   &HostName,
                                                   const QString   &Key,
                                                   const QString   &Default );
+
+        DTC::SettingList*   GetSettingList      ( const QString   &HostName );
 
         bool                PutSetting          ( const QString   &HostName,
                                                   const QString   &Key,
@@ -289,12 +291,19 @@ class ScriptableMyth : public QObject
             )
         }
 
-        QObject* GetSetting ( const QString   &HostName,
-                              const QString   &Key,
-                              const QString   &Default )
+        QString GetSetting ( const QString   &HostName,
+                             const QString   &Key,
+                             const QString   &Default )
+        {
+            SCRIPT_CATCH_EXCEPTION( QString(),
+                return m_obj.GetSetting( HostName, Key, Default );
+            )
+        }
+
+        QObject* GetSettingList ( const QString   &HostName )
         {
             SCRIPT_CATCH_EXCEPTION( NULL,
-                return m_obj.GetSetting( HostName, Key, Default );
+                return m_obj.GetSettingList( HostName );
             )
         }
 

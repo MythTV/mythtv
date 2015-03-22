@@ -31,6 +31,7 @@
 #include <cerrno>
 // FOR DEBUGGING
 #include <iostream>
+#include <complex>
 
 #ifndef _WIN32
 #include <netinet/tcp.h>
@@ -53,6 +54,8 @@
 #ifndef O_LARGEFILE
 #define O_LARGEFILE 0
 #endif
+
+using namespace std;
 
 static MIMETypes g_MIMETypes[] =
 {
@@ -81,6 +84,7 @@ static MIMETypes g_MIMETypes[] =
     { "doc" , "application/vnd.ms-word"    },
     { "gz"  , "application/x-tar"          },
     { "js"  , "application/javascript"     },
+    { "m3u" , "application/x-mpegurl"      }, // HTTP Live Streaming
     { "m3u8", "application/x-mpegurl"      }, // HTTP Live Streaming
     { "ogx" , "application/ogg"            }, // http://wiki.xiph.org/index.php/MIME_Types_and_File_Extensions
     { "pdf" , "application/pdf"            },
@@ -105,20 +109,23 @@ static MIMETypes g_MIMETypes[] =
     // Video Mime Types
     { "3gp" , "video/3gpp"                 }, // Also audio/3gpp
     { "3g2" , "video/3gpp2"                }, // Also audio/3gpp2
+    { "asx" , "video/x-ms-asf"             },
     { "asf" , "video/x-ms-asf"             },
     { "avi" , "video/x-msvideo"            }, // Also video/avi
+    { "m2p" , "video/mp2p"                 }, // RFC 3555
     { "m4v" , "video/mp4"                  },
-    { "mpeg", "video/mpeg"                 },
-    { "mpeg2","video/mpeg"                 },
-    { "mpg" , "video/mpeg"                 },
-    { "mpg2", "video/mpeg"                 },
+    { "mpeg", "video/mp2p"                 }, // RFC 3555
+    { "mpeg2","video/mp2p"                 }, // RFC 3555
+    { "mpg" , "video/mp2p"                 }, // RFC 3555
+    { "mpg2", "video/mp2p"                 }, // RFC 3555
     { "mov" , "video/quicktime"            },
     { "mp4" , "video/mp4"                  },
     { "mkv" , "video/x-matroska"           }, // See http://matroska.org/technical/specs/notes.html#MIME (See NOTE 1)
     { "nuv" , "video/nupplevideo"          },
     { "ogv" , "video/ogg"                  }, // Defined: http://wiki.xiph.org/index.php/MIME_Types_and_File_Extensions
-    { "ts"  , "video/mp2t"                 }, // HTTP Live Streaming
-    { "vob" , "video/mpeg"                 },
+    { "ps"  , "video/mp2p"                 }, // RFC 3555
+    { "ts"  , "video/mp2t"                 }, // RFC 3555
+    { "vob" , "video/mpeg"                 }, // Also video/dvd
     { "wmv" , "video/x-ms-wmv"             }
 };
 
@@ -175,6 +182,7 @@ HTTPRequest::HTTPRequest() : m_procReqLineExp ( "[ \r\n][ \r\n]*"  ),
                              m_nMajor         (   0 ),
                              m_nMinor         (   0 ),
                              m_bProtected     ( false ),
+                             m_bEncrypted     ( false ),
                              m_bSOAPRequest   ( false ),
                              m_eResponseType  ( ResponseTypeUnknown),
                              m_nResponseStatus( 200 ),
@@ -191,14 +199,17 @@ HTTPRequest::HTTPRequest() : m_procReqLineExp ( "[ \r\n][ \r\n]*"  ),
 
 RequestType HTTPRequest::SetRequestType( const QString &sType )
 {
+    // HTTP
     if (sType == "GET"        ) return( m_eType = RequestTypeGet         );
     if (sType == "HEAD"       ) return( m_eType = RequestTypeHead        );
     if (sType == "POST"       ) return( m_eType = RequestTypePost        );
-    if (sType == "M-SEARCH"   ) return( m_eType = RequestTypeMSearch     );
+    if (sType == "OPTIONS"    ) return( m_eType = RequestTypeOptions     );
 
+    // UPnP
+    if (sType == "M-SEARCH"   ) return( m_eType = RequestTypeMSearch     );
+    if (sType == "NOTIFY"     ) return( m_eType = RequestTypeNotify      );
     if (sType == "SUBSCRIBE"  ) return( m_eType = RequestTypeSubscribe   );
     if (sType == "UNSUBSCRIBE") return( m_eType = RequestTypeUnsubscribe );
-    if (sType == "NOTIFY"     ) return( m_eType = RequestTypeNotify      );
 
     if (sType.startsWith( QString("HTTP/") )) return( m_eType = RequestTypeResponse );
 
@@ -221,39 +232,39 @@ QString HTTPRequest::BuildResponseHeader( long long nSize )
     //-----------------------------------------------------------------------
     // Headers describing the connection
     //-----------------------------------------------------------------------
-    sHeader = QString( "%1 %2\r\n"
-                       "Date: %3\r\n"
-                       "Server: %4\r\n" )
-        .arg(GetResponseProtocol()).arg(GetResponseStatus())
-        .arg(MythDate::current().toString("d MMM yyyy hh:mm:ss"))
-        .arg(HttpServer::GetServerVersion());
 
-    sHeader += QString( "Connection: %1\r\n" )
-                        .arg( m_bKeepAlive ? "Keep-Alive" : "Close" );
+    // The protocol string
+    sHeader = QString( "%1 %2\r\n" ).arg(GetResponseProtocol())
+                                    .arg(GetResponseStatus());
+
+    SetResponseHeader("Date", MythDate::toString(MythDate::current(), MythDate::kRFC822)); // RFC 822
+    SetResponseHeader("Server", HttpServer::GetServerVersion());
+
+    SetResponseHeader("Connection", m_bKeepAlive ? "Keep-Alive" : "Close" );
     if (m_bKeepAlive)
     {
         if (m_nKeepAliveTimeout == 0) // Value wasn't passed in by the server, so go with the configured value
             m_nKeepAliveTimeout = gCoreContext->GetNumSetting("HTTP/KeepAliveTimeoutSecs", 10);
-        sHeader += QString( "Keep-Alive: timeout=%1\r\n" ).arg(m_nKeepAliveTimeout);
+        SetResponseHeader("Keep-Alive", QString("timeout=%1").arg(m_nKeepAliveTimeout));
     }
-
-    sHeader += GetAdditionalHeaders();
 
     //-----------------------------------------------------------------------
     // Headers describing the content
     //-----------------------------------------------------------------------
-    sHeader += QString( "Content-Type: %1\r\n" ).arg( sContentType );
+    SetResponseHeader("Content-Language", gCoreContext->GetLanguageAndVariant().replace("_", "-"));
+    SetResponseHeader("Content-Type", sContentType);
 
     // Default to 'inline' but we should support 'attachment' when it would
     // be appropriate i.e. not when streaming a file to a upnp player or browser
     // that can support it natively
     if (!m_sFileName.isEmpty())
     {
+        // TODO: Add support for utf8 encoding - RFC 5987
         QString filename = QFileInfo(m_sFileName).fileName(); // Strip any path
-        sHeader += QString( "Content-Disposition: inline; filename=\"%2\"\r\n" ).arg( filename );
+        SetResponseHeader("Content-Disposition", QString("inline; filename=\"%2\"").arg(QString(filename.toLatin1())));
     }
 
-    sHeader += QString( "Content-Length: %3\r\n" ).arg( nSize );
+    SetResponseHeader("Content-Length", QString::number(nSize));
 
     // See DLNA  7.4.1.3.11.4.3 Tolerance to unavailable contentFeatures.dlna.org header
     //
@@ -271,7 +282,7 @@ QString HTTPRequest::BuildResponseHeader( long long nSize )
 
 
     // DLNA 7.5.4.3.2.33 MT transfer mode indication
-    QString sTransferMode = GetHeaderValue( "transferMode.dlna.org", "" );
+    QString sTransferMode = GetRequestHeader( "transferMode.dlna.org", "" );
 
     if (sTransferMode.isEmpty())
     {
@@ -283,30 +294,29 @@ QString HTTPRequest::BuildResponseHeader( long long nSize )
     }
 
     if (sTransferMode == "Streaming")
-        sHeader += "transferMode.dlna.org: Streaming\r\n";
+        SetResponseHeader("transferMode.dlna.org", "Streaming");
     else if (sTransferMode == "Background")
-        sHeader += "transferMode.dlna.org: Background\r\n";
+        SetResponseHeader("transferMode.dlna.org", "Background");
     else if (sTransferMode == "Interactive")
-        sHeader += "transferMode.dlna.org: Interactive\r\n";
+        SetResponseHeader("transferMode.dlna.org", "Interactive");
 
     // HACK Temporary hack for Samsung TVs - Needs to be moved later as it's not entirely DLNA compliant
-    if (!GetHeaderValue( "getcontentFeatures.dlna.org", "" ).isEmpty())
-        sHeader += "contentFeatures.dlna.org: DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=01500000000000000000000000000000\r\n";
+    if (!GetRequestHeader( "getcontentFeatures.dlna.org", "" ).isEmpty())
+        SetResponseHeader("contentFeatures.dlna.org", "DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=01500000000000000000000000000000");
 
     // ----------------------------------------------------------------------
 
     if (getenv("HTTPREQUEST_DEBUG"))
     {
         // Dump response header
-        QStringList respHeaders = sHeader.split("\r\n");
-        for ( QStringList::iterator it  = respHeaders.begin();
-                                    it != respHeaders.end();
-                                  ++it )
+        QMap<QString, QString>::iterator it;
+        for ( it = m_mapRespHeaders.begin(); it != m_mapRespHeaders.end(); ++it )
         {
-            LOG(VB_HTTP, LOG_INFO, QString("(Response Header) %1").arg(*it));
+            LOG(VB_HTTP, LOG_INFO, QString("(Response Header) %1: %2").arg(it.key()).arg(it.value()));
         }
     }
 
+    sHeader += GetResponseHeaders();
     sHeader += "\r\n";
 
     return sHeader;
@@ -387,7 +397,7 @@ qint64 HTTPRequest::SendResponse( void )
     // Check for ETag match...
     // ----------------------------------------------------------------------
 
-    QString sETag = GetHeaderValue( "If-None-Match", "" );
+    QString sETag = GetRequestHeader( "If-None-Match", "" );
 
     if ( !sETag.isEmpty() && sETag == m_mapRespHeaders[ "ETag" ] )
     {
@@ -436,7 +446,7 @@ qint64 HTTPRequest::SendResponse( void )
     }
 
     // ----------------------------------------------------------------------
-    // NOTE: Access-Control-Allow-Origin Wildcard
+    // SECURITY: Access-Control-Allow-Origin Wildcard
     //
     // This is a REALLY bad idea, so bad in fact that I'm including it here but
     // commented out in the hope that anyone thinking of adding it in the future
@@ -455,32 +465,32 @@ qint64 HTTPRequest::SendResponse( void )
     // ----------------------------------------------------------------------
 
     // ----------------------------------------------------------------------
-    // Allow the WebFrontend on the Master backend and ONLY this machine
-    // to access resources on a frontend or slave web server
+    // SECURITY: Allow the WebFrontend on the Master backend and ONLY this
+    // machine to access resources on a frontend or slave web server
+    //
+    // TODO: Add hostname:port combo as well as ip:port
     //
     // http://www.w3.org/TR/cors/#introduction
     // ----------------------------------------------------------------------
     QString masterAddrPort = QString("%1:%2").arg(gCoreContext->GetMasterServerIP())
-                                            .arg(gCoreContext->GetMasterServerStatusPort());
+                                             .arg(gCoreContext->GetMasterServerStatusPort());
+    QString masterTLSAddrPort = QString("%1:%2").arg(gCoreContext->GetMasterServerIP())
+                                                .arg(gCoreContext->GetSetting( "BackendSSLPort", "6554" ));
 
     QStringList allowedOrigins;
     allowedOrigins << QString("http://%1").arg(masterAddrPort);
-    allowedOrigins << QString("https://%2").arg(masterAddrPort);
+    allowedOrigins << QString("https://%2").arg(masterTLSAddrPort);
 
     if (!m_mapHeaders[ "origin" ].isEmpty())
     {
         if (allowedOrigins.contains(m_mapHeaders[ "origin" ]))
-            m_mapRespHeaders[ "Access-Control-Allow-Origin" ] = m_mapHeaders[ "origin" ];
+            SetResponseHeader( "Access-Control-Allow-Origin" ,
+                               m_mapHeaders[ "origin" ]);
         else
             LOG(VB_GENERAL, LOG_CRIT, QString("HTTPRequest: Cross-origin request "
                                               "received with origin (%1)")
                                                  .arg(m_mapHeaders[ "origin" ]));
     }
-
-    // ----------------------------------------------------------------------
-    // Force IE into 'standards' mode
-    // ----------------------------------------------------------------------
-    m_mapRespHeaders[ "X-UA-Compatible" ] = "IE=Edge";
 
     // ----------------------------------------------------------------------
     // Write out Header.
@@ -504,7 +514,9 @@ qint64 HTTPRequest::SendResponse( void )
     // Write out Response buffer.
     // ----------------------------------------------------------------------
 
-    if (( m_eType != RequestTypeHead ) && ( nContentLen > 0 ))
+    if (( m_eType != RequestTypeHead ) &&
+        ( m_eResponseType != ResponseTypeHeader ) &&
+        ( nContentLen > 0 ))
     {
         qint64 bytesWritten = SendData( pBuffer, 0, nContentLen );
         //qint64 bytesWritten = WriteBlock( pBuffer->buffer(), pBuffer->buffer().length() );
@@ -583,7 +595,7 @@ qint64 HTTPRequest::SendResponseFile( QString sFileName )
         // ------------------------------------------------------------------
 
         bool    bRange = false;
-        QString sRange = GetHeaderValue( "range", "" );
+        QString sRange = GetRequestHeader( "range", "" );
 
         if (!sRange.isEmpty())
         {
@@ -609,6 +621,11 @@ qint64 HTTPRequest::SendResponseFile( QString sFileName )
             else
             {
                 m_nResponseStatus = 416;
+                // RFC 7233 - A server generating a 416 (Range Not Satisfiable)
+                // response to a byte-range request SHOULD send a Content-Range
+                // header field with an unsatisfied-range value
+                m_mapRespHeaders[ "Content-Range" ] = QString("bytes */%3")
+                                                              .arg( llSize );
                 llSize = 0;
                 LOG(VB_HTTP, LOG_INFO,
                     QString("HTTPRequest::SendResponseFile(%1) - "
@@ -728,6 +745,8 @@ qint64 HTTPRequest::SendData( QIODevice *pDevice, qint64 llStart, qint64 llBytes
     qint64 llBytesToRead    = 0;
     qint64 llBytesRead      = 0;
     qint64 llBytesWritten   = 0;
+
+    memset (aBuffer, 0, sizeof(aBuffer));
 
     while ((sent < llBytes) && !pDevice->atEnd())
     {
@@ -991,8 +1010,17 @@ QString HTTPRequest::GetResponseStatus( void )
         case 200:   return( "200 OK"                               );
         case 201:   return( "201 Created"                          );
         case 202:   return( "202 Accepted"                         );
+        case 204:   return( "204 No Content"                       );
+        case 205:   return( "205 Reset Content"                    );
         case 206:   return( "206 Partial Content"                  );
+        case 300:   return( "300 Multiple Choices"                 );
+        case 301:   return( "301 Moved Permanently"                );
+        case 302:   return( "302 Found"                            );
+        case 303:   return( "303 See Other"                        );
         case 304:   return( "304 Not Modified"                     );
+        case 305:   return( "305 Use Proxy"                        );
+        case 307:   return( "307 Temporary Redirect"               );
+        case 308:   return( "308 Permanent Redirect"               );
         case 400:   return( "400 Bad Request"                      );
         case 401:   return( "401 Unauthorized"                     );
         case 403:   return( "403 Forbidden"                        );
@@ -1000,12 +1028,18 @@ QString HTTPRequest::GetResponseStatus( void )
         case 405:   return( "405 Method Not Allowed"               );
         case 406:   return( "406 Not Acceptable"                   );
         case 408:   return( "408 Request Timeout"                  );
+        case 410:   return( "410 Gone"                             );
+        case 411:   return( "411 Length Required"                  );
         case 412:   return( "412 Precondition Failed"              );
         case 413:   return( "413 Request Entity Too Large"         );
         case 414:   return( "414 Request-URI Too Long"             );
         case 415:   return( "415 Unsupported Media Type"           );
         case 416:   return( "416 Requested Range Not Satisfiable"  );
         case 417:   return( "417 Expectation Failed"               );
+        // I'm a teapot
+        case 428:   return( "428 Precondition Required"            ); // RFC 6585
+        case 429:   return( "429 Too Many Requests"                ); // RFC 6585
+        case 431:   return( "431 Request Header Fields Too Large"  ); // RFC 6585
         case 500:   return( "500 Internal Server Error"            );
         case 501:   return( "501 Not Implemented"                  );
         case 502:   return( "502 Bad Gateway"                      );
@@ -1013,6 +1047,7 @@ QString HTTPRequest::GetResponseStatus( void )
         case 504:   return( "504 Gateway Timeout"                  );
         case 505:   return( "505 HTTP Version Not Supported"       );
         case 510:   return( "510 Not Extended"                     );
+        case 511:   return( "511 Network Authentication Required"  ); // RFC 6585
     }
 
     return( QString( "%1 Unknown" ).arg( m_nResponseStatus ));
@@ -1098,7 +1133,7 @@ QString HTTPRequest::TestMimeType( const QString &sFileName )
             LOG(VB_HTTP, LOG_DEBUG, sLOC + "file starts with " + sHex);
 
             if ( sHex == "000001ba44000400" )  // MPEG2 PS
-                sMIME = "video/mpeg";
+                sMIME = "video/mp2p";
 
             if ( head == "MythTVVi" )
             {
@@ -1157,8 +1192,7 @@ long HTTPRequest::GetParameters( QString sParams, QStringMap &mapParams  )
                 sName  = QUrl::fromPercentEncoding(sName.toUtf8());
                 sValue = QUrl::fromPercentEncoding(sValue.toUtf8());
 
-                // Make Parameter Names all lower case
-                mapParams.insert( sName.trimmed().toLower(), sValue );
+                mapParams.insert( sName.trimmed(), sValue );
                 nCount++;
             }
         }
@@ -1172,7 +1206,7 @@ long HTTPRequest::GetParameters( QString sParams, QStringMap &mapParams  )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QString HTTPRequest::GetHeaderValue( const QString &sKey, QString sDefault )
+QString HTTPRequest::GetRequestHeader( const QString &sKey, QString sDefault )
 {
     QStringMap::iterator it = m_mapHeaders.find( sKey.toLower() );
 
@@ -1187,7 +1221,7 @@ QString HTTPRequest::GetHeaderValue( const QString &sKey, QString sDefault )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QString HTTPRequest::GetAdditionalHeaders( void )
+QString HTTPRequest::GetResponseHeaders( void )
 {
     QString sHeader = m_szServerHeaders;
 
@@ -1221,7 +1255,7 @@ bool HTTPRequest::ParseKeepAlive()
     // Read Connection Header to see whether the client has explicitly
     // asked for the connection to be kept alive or closed after the response
     // is sent
-    QString sConnection = GetHeaderValue( "connection", "default" ).toLower();
+    QString sConnection = GetRequestHeader( "connection", "default" ).toLower();
 
     QStringList sValueList = sConnection.split(",");
 
@@ -1234,6 +1268,24 @@ bool HTTPRequest::ParseKeepAlive()
         bKeepAlive = true;
 
    return bKeepAlive;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+void HTTPRequest::ParseCookies(void)
+{
+    QStringList sCookieList = m_mapHeaders.values("cookie");
+
+    QStringList::iterator it;
+    for (it = sCookieList.begin(); it != sCookieList.end(); ++it)
+    {
+        QString key = (*it).section('=', 0, 0);
+        QString value = (*it).section('=', 1);
+
+        m_mapCookies.insert(key, value);
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1268,6 +1320,17 @@ bool HTTPRequest::ParseRequest()
             return true;
         }
 
+        if (m_eType == RequestTypeUnknown)
+        {
+            m_eResponseType   = ResponseTypeHeader;
+            m_nResponseStatus = 501; // Not Implemented
+            // Conservative list, we can't really know what methods we
+            // actually allow for an arbitrary resource without some sort of
+            // high maintenance database
+            SetResponseHeader("Allow",  "GET, HEAD");
+            return true;
+        }
+
         // Read Header
         bool    bDone = false;
         QString sLine = ReadLine( 2000 );
@@ -1283,7 +1346,7 @@ bool HTTPRequest::ParseRequest()
 
                 if (!sName.isEmpty() && !sValue.isEmpty())
                 {
-                    m_mapHeaders.insert(sName.toLower(), sValue.trimmed());
+                    m_mapHeaders.insertMulti(sName.toLower(), sValue.trimmed());
                 }
 
                 sLine = ReadLine( 2000 );
@@ -1300,6 +1363,9 @@ bool HTTPRequest::ParseRequest()
             LOG(VB_HTTP, LOG_INFO, QString("(Request Header) %1: %2")
                                             .arg(it.key()).arg(*it));
         }
+
+        // Parse Cookies
+        ParseCookies();
 
         // Parse out keep alive
         m_bKeepAlive = ParseKeepAlive();
@@ -1329,7 +1395,23 @@ bool HTTPRequest::ParseRequest()
             return true;
         }
 
-        m_bProtected = false;
+        // Destroy session if requested
+        if (m_mapHeaders.contains("x-myth-clear-session"))
+        {
+            SetCookie("sessionToken", "", MythDate::current().addDays(-2), true);
+            m_mapCookies.remove("sessionToken");
+        }
+
+        // Allow session resumption for TLS connections
+        if (m_mapCookies.contains("sessionToken"))
+        {
+            QString sessionToken = m_mapCookies["sessionToken"];
+            MythSessionManager *sessionManager = gCoreContext->GetSessionManager();
+            MythUserSession session = sessionManager->GetSession(sessionToken);
+
+            if (session.IsValid())
+                m_userSession = session;
+        }
 
         if (IsUrlProtected( m_sBaseUrl ))
         {
@@ -1337,12 +1419,15 @@ bool HTTPRequest::ParseRequest()
             {
                 m_eResponseType   = ResponseTypeHTML;
                 m_nResponseStatus = 401;
-                m_mapRespHeaders["WWW-Authenticate"] = "Basic realm=\"MythTV\"";
-
                 m_response.write( Static401Error );
+                // Since this may not be the first attempt at authentication,
+                // Authenticated may have set the header with the appropriate
+                // stale attribute
+                SetResponseHeader("WWW-Authenticate", GetAuthenticationHeader(false));
 
                 return true;
             }
+
 
             m_bProtected = true;
         }
@@ -1379,7 +1464,7 @@ bool HTTPRequest::ParseRequest()
         }
 
         // Check to see if this is a SOAP encoded message
-        QString sSOAPAction = GetHeaderValue( "SOAPACTION", "" );
+        QString sSOAPAction = GetRequestHeader( "SOAPACTION", "" );
 
         if (!sSOAPAction.isEmpty())
             bSuccess = ProcessSOAPPayload( sSOAPAction );
@@ -1441,9 +1526,8 @@ void HTTPRequest::ProcessRequestLine( const QString &sLine )
 
         if (nCount > 1)
         {
-            //m_sBaseUrl = tokens[1].section( '?', 0, 0).trimmed();
-            m_sBaseUrl = (QUrl::fromPercentEncoding(tokens[1].toUtf8()))
-                              .section( '?', 0, 0).trimmed();
+            m_sRequestUrl = QUrl::fromPercentEncoding(tokens[1].toUtf8());
+            m_sBaseUrl = m_sRequestUrl.section( '?', 0, 0).trimmed();
 
             m_sResourceUrl = m_sBaseUrl; // Save complete url without parameters
 
@@ -1566,10 +1650,8 @@ bool HTTPRequest::ParseRange( QString sRange,
             return false;
     }
 
-#if 0
-    LOG(VB_GENERAL, LOG_DEBUG, QString("%1 Range Requested %2 - %3")
+    LOG(VB_HTTP, LOG_DEBUG, QString("%1 Range Requested %2 - %3")
         .arg(getSocketHandle()) .arg(*pllStart) .arg(*pllEnd));
-#endif
 
     return true;
 }
@@ -1720,7 +1802,7 @@ Serializer *HTTPRequest::GetSerializer()
                                                        m_sNameSpace, m_sMethod);
     else
     {
-        QString sAccept = GetHeaderValue( "Accept", "*/*" );
+        QString sAccept = GetRequestHeader( "Accept", "*/*" );
         
         if (sAccept.contains( "application/json", Qt::CaseInsensitive ))    
             pSerializer = (Serializer *)new JSONSerializer(&m_response,
@@ -1814,42 +1896,406 @@ bool HTTPRequest::IsUrlProtected( const QString &sBaseUrl )
 //
 /////////////////////////////////////////////////////////////////////////////
 
+QString HTTPRequest::GetAuthenticationHeader(bool isStale)
+{
+    QString authHeader;
+
+    // For now we support a single realm, that will change
+    QString realm = "MythTV";
+
+    // Always use digest authentication where supported, it may be available
+    // with HTTP 1.0 client as an extension, but we can't tell if that's the
+    // case. It's guaranteed to be available for HTTP 1.1+
+    if (m_nMajor >= 1 && m_nMinor > 0)
+    {
+        QString nonce = CalculateDigestNonce(MythDate::current_iso_string());
+        QString stale = isStale ? "true" : "false"; // FIXME
+        authHeader = QString("Digest realm=\"%1\",nonce=\"%2\","
+                             "qop=\"auth\",stale=\"%3\",algorithm=\"MD5\"")
+                        .arg(realm).arg(nonce).arg(stale);
+    }
+    else
+    {
+        authHeader = QString("Basic realm=\"%1\"").arg(realm);
+    }
+
+    return authHeader;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QString HTTPRequest::CalculateDigestNonce(const QString& timeStamp)
+{
+    QString uniqueID = QString("%1:%2").arg(timeStamp).arg(m_sPrivateToken);
+    QString hash = QCryptographicHash::hash( uniqueID.toLatin1(), QCryptographicHash::Sha1).toHex(); // TODO: Change to Sha2 with QT5?
+    QString nonce = QString("%1%2").arg(timeStamp).arg(hash); // Note: since this is going in a header it should avoid illegal chars
+    return nonce;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool HTTPRequest::BasicAuthentication()
+{
+    LOG(VB_HTTP, LOG_NOTICE, "Attempting HTTP Basic Authentication");
+    QStringList oList = m_mapHeaders[ "authorization" ].split( ' ' );
+
+    if (m_nMajor == 1 && m_nMinor == 0) // We only support Basic auth for http 1.0 clients
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Basic authentication is only allowed for HTTP 1.0");
+        return false;
+    }
+
+    QString sCredentials = QByteArray::fromBase64( oList[1].toUtf8() );
+
+    oList = sCredentials.split( ':' );
+
+    if (oList.count() < 2)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Authorization attempt with invalid number of tokens");
+        return false;
+    }
+
+    QString sUsername = oList[0];
+    QString sPassword = oList[1];
+
+    if (sUsername == "nouser") // Special logout username
+        return false;
+
+    MythSessionManager *sessionManager = gCoreContext->GetSessionManager();
+    if (!sessionManager->IsValidUser(sUsername))
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Authorization attempt with invalid username");
+        return false;
+    }
+
+    QString client = QString("WebFrontend_%1").arg(GetPeerAddress());
+    MythUserSession session = sessionManager->LoginUser(sUsername, sPassword,
+                                                        client);
+
+    if (!session.IsValid())
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Authorization attempt with invalid password");
+        return false;
+    }
+
+    LOG(VB_HTTP, LOG_NOTICE, "Valid Authorization received");
+
+    if (IsEncrypted()) // Only set a session cookie for encrypted connections, not safe otherwise
+        SetCookie("sessionToken", session.GetSessionToken(),
+                    session.GetSessionExpires(), true);
+
+    m_userSession = session;
+
+    return false;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool HTTPRequest::DigestAuthentication()
+{
+    LOG(VB_HTTP, LOG_NOTICE, "Attempting HTTP Digest Authentication");
+    QString realm = "MythTV"; // TODO Check which realm applies for the request path
+
+    QString authMethod = m_mapHeaders[ "authorization" ].section(' ', 0, 0).toLower();
+
+    if (authMethod != "digest")
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Invalid method in Authorization header");
+        return false;
+    }
+
+    QString parameterStr = m_mapHeaders[ "authorization" ].section(' ', 1);
+
+    QMap<QString, QString> paramMap;
+    QStringList paramList = parameterStr.split(',');
+    QStringList::iterator it;
+    for (it = paramList.begin(); it != paramList.end(); ++it)
+    {
+        QString key = (*it).section('=', 0, 0).toLower().trimmed();
+        // Since the value may contain '=' return everything after first occurence
+        QString value = (*it).section('=', 1).trimmed();
+        // Remove any quotes surrounding the value
+        value.remove("\"");
+        paramMap[key] = value;
+    }
+
+    if (paramMap.size() < 8)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Invalid number of parameters in Authorization header");
+        return false;
+    }
+
+    if (paramMap["nonce"].isEmpty()    || paramMap["username"].isEmpty() ||
+        paramMap["realm"].isEmpty()    || paramMap["uri"].isEmpty() ||
+        paramMap["response"].isEmpty() || paramMap["qop"].isEmpty() ||
+        paramMap["cnonce"].isEmpty()   || paramMap["nc"].isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Missing required parameters in Authorization header");
+        return false;
+    }
+
+    if (paramMap["username"] == "nouser") // Special logout username
+        return false;
+
+    if (paramMap["uri"] != m_sRequestUrl)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Authorization URI doesn't match the "
+                                     "request URI");
+        m_nResponseStatus = 400; // Bad Request
+        return false;
+    }
+
+    if (paramMap["realm"] != realm)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Authorization realm doesn't match the "
+                                  "realm of the requested content");
+        return false;
+    }
+
+    QByteArray nonce = QByteArray(paramMap["nonce"].toLatin1());
+    if (nonce.length() < 20)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Authorization nonce is too short");
+        return false;
+    }
+
+    QString  nonceTimeStampStr = nonce.left(20); // ISO 8601 fixed length
+    if (nonce != CalculateDigestNonce(nonceTimeStampStr))
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Authorization nonce doesn't match reference");
+        LOG(VB_HTTP, LOG_DEBUG, QString("%1  vs  %2").arg(QString(nonce))
+                                                     .arg(QString(CalculateDigestNonce(nonceTimeStampStr))));
+        return false;
+    }
+
+    const int AUTH_TIMEOUT = 2 * 60; // 2 Minute timeout to login, to reduce replay attack window
+    QDateTime nonceTimeStamp = MythDate::fromString(nonceTimeStampStr);
+    if (!nonceTimeStamp.isValid())
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Authorization nonce timestamp is invalid.");
+        LOG(VB_HTTP, LOG_DEBUG, QString("Timestamp was '%1'").arg(nonceTimeStampStr));
+        return false;
+    }
+
+    if (nonceTimeStamp.secsTo(MythDate::current()) > AUTH_TIMEOUT)
+    {
+        LOG(VB_HTTP, LOG_NOTICE, "Authorization nonce timestamp is invalid or too old.");
+        // Tell the client that the submitted nonce has expired at which
+        // point they may wish to try again with a fresh nonce instead of
+        // telling the user that their credentials were invalid
+        SetResponseHeader("WWW-Authenticate", GetAuthenticationHeader(true), true);
+        return false;
+    }
+
+    MythSessionManager *sessionManager = gCoreContext->GetSessionManager();
+    if (!sessionManager->IsValidUser(paramMap["username"]))
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Authorization attempt with invalid username");
+        return false;
+    }
+
+    if (paramMap["response"].length() != 32)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Authorization response field is invalid length");
+        return false;
+    }
+
+    // If you're still reading this, well done, not far to go now
+
+    QByteArray a1 = sessionManager->GetPasswordDigest(paramMap["username"]).toLatin1();
+    //QByteArray a1 = "bcd911b2ecb15ffbd6d8e6e744d60cf6";
+    QString methodDigest = QString("%1:%2").arg(GetRequestType()).arg(paramMap["uri"]);
+    QByteArray a2 = QCryptographicHash::hash(methodDigest.toLatin1(),
+                                          QCryptographicHash::Md5).toHex();
+
+    QString responseDigest = QString("%1:%2:%3:%4:%5:%6").arg(QString(a1))
+                                                        .arg(paramMap["nonce"])
+                                                        .arg(paramMap["nc"])
+                                                        .arg(paramMap["cnonce"])
+                                                        .arg(paramMap["qop"])
+                                                        .arg(QString(a2));
+    QByteArray kd = QCryptographicHash::hash(responseDigest.toLatin1(),
+                                             QCryptographicHash::Md5).toHex();
+
+    if (paramMap["response"].toLatin1() == kd)
+    {
+        LOG(VB_HTTP, LOG_NOTICE, "Valid Authorization received");
+        QString client = QString("WebFrontend_%1").arg(GetPeerAddress());
+        MythUserSession session = sessionManager->LoginUser(paramMap["username"],
+                                                            a1,
+                                                            client);
+        if (!session.IsValid())
+        {
+            LOG(VB_GENERAL, LOG_ERR, "Valid Authorization received, but we "
+                                     "failed to create a valid session");
+            return false;
+        }
+
+        if (IsEncrypted()) // Only set a session cookie for encrypted connections, not safe otherwise
+            SetCookie("sessionToken", session.GetSessionToken(),
+                      session.GetSessionExpires(), true);
+
+        m_userSession = session;
+
+        return true;
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Authorization attempt with invalid password digest");
+        LOG(VB_HTTP, LOG_DEBUG, QString("Received hash was '%1', calculated hash was '%2'")
+                                .arg(paramMap["response"])
+                                .arg(QString(kd)));
+    }
+
+    return false;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 bool HTTPRequest::Authenticated()
 {
+    // Check if the existing user has permission to access this resource
+    if (m_userSession.IsValid()) //m_userSession.CheckPermission())
+        return true;
+
     QStringList oList = m_mapHeaders[ "authorization" ].split( ' ' );
 
     if (oList.count() < 2)
         return false;
 
-    if (oList[0].compare( "basic", Qt::CaseInsensitive ) != 0)
-        return false;
+    if (oList[0].compare( "basic", Qt::CaseInsensitive ) == 0)
+        return BasicAuthentication();
+    else if (oList[0].compare( "digest", Qt::CaseInsensitive ) == 0)
+        return DigestAuthentication();
 
-    QString sCredentials = QByteArray::fromBase64( oList[1].toUtf8() );
-    
-    oList = sCredentials.split( ':' );
+    return false;
+}
 
-    if (oList.count() < 2)
-        return false;
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
 
-    QString sUserName = UPnp::GetConfiguration()->GetValue( "HTTP/Protected/UserName", "admin" );
-    
+void HTTPRequest::SetResponseHeader(const QString& sKey, const QString& sValue,
+                                    bool replace)
+{
+    if (!replace && m_mapRespHeaders.contains(sKey))
+        return;
 
-    if (oList[0].compare( sUserName, Qt::CaseInsensitive ) != 0)
-        return false;
+    m_mapRespHeaders[sKey] = sValue;
+}
 
-    QString sPassword = UPnp::GetConfiguration()->GetValue( "HTTP/Protected/Password", 
-                                 /* mythtv */ "8hDRxR1+E/n3/s3YUOhF+lUw7n4=" );
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
 
-    QCryptographicHash crypto( QCryptographicHash::Sha1 );
+void HTTPRequest::SetCookie(const QString &sKey, const QString &sValue,
+                            const QDateTime &expiryDate, bool secure)
+{
+    if (secure && !IsEncrypted())
+    {
+        LOG(VB_GENERAL, LOG_WARNING, QString("HTTPRequest::SetCookie(%1=%2): "
+                  "A secure cookie cannot be set on an unencrypted connection.")
+                    .arg(sKey).arg(sValue));
+        return;
+    }
 
-    crypto.addData( oList[1].toUtf8() );
+    QStringList cookieAttributes;
 
-    QString sPasswordHash( crypto.result().toBase64() );
+    // Key=Value
+    cookieAttributes.append(QString("%1=%2").arg(sKey).arg(sValue));
 
-    if (sPasswordHash != sPassword )
-        return false;
-    
-    return true;
+    // Domain - Most browsers have problems with a hostname, so it's better to omit this
+//     cookieAttributes.append(QString("Domain=%1").arg(GetHostName()));
+
+    // Path - Fix to root, no call for restricting to other paths yet
+    cookieAttributes.append("Path=/");
+
+    // Expires - Expiry date, always set one, just good practice
+    QString expires = MythDate::toString(expiryDate, MythDate::kRFC822); // RFC 822
+    cookieAttributes.append(QString("Expires=%1").arg(expires)); // Cookie Expiry date
+
+    // Secure - Only send this cookie over encrypted connections, it contains
+    // sensitive info SECURITY
+    if (secure)
+        cookieAttributes.append("Secure");
+
+    // HttpOnly - No cookie stealing javascript SECURITY
+    cookieAttributes.append("HttpOnly");
+
+    SetResponseHeader("Set-Cookie", cookieAttributes.join("; "));
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QString HTTPRequest::GetHostName()
+{
+    // TODO: This only deals with the HTTP 1.1 case, 1.0 should be rare but we
+    //       should probably still handle it
+
+    // RFC 3875 - The is the hostname or ip address in the client request, not
+    //            the name or ip we might otherwise know for this server
+    QString hostname = m_mapHeaders["host"];
+    if (!hostname.isEmpty())
+    {
+        // Strip the port
+        if (hostname.contains("]:")) // IPv6 port
+        {
+            return hostname.section("]:", 0 , 0);
+        }
+        else if (hostname.contains(":")) // IPv4 port
+        {
+            return hostname.section(":", 0 , 0);
+        }
+        else
+            return hostname;
+    }
+
+    return GetHostAddress();
+}
+
+
+QString HTTPRequest::GetRequestType( ) const
+{
+    QString type;
+    switch ( m_eType )
+    {
+        case RequestTypeGet :
+            type = "GET";
+            break;
+        case RequestTypeHead :
+            type = "HEAD";
+            break;
+        case RequestTypePost :
+            type = "POST";
+            break;
+        case RequestTypeOptions:
+            type = "OPTIONS";
+            break;
+        case RequestTypeMSearch:
+            type = "M-SEARCH";
+            break;
+        case RequestTypeNotify:
+            type = "NOTIFY";
+            break;
+        case RequestTypeSubscribe :
+            type = "SUBSCRIBE";
+            break;
+        case RequestTypeUnsubscribe :
+            type = "UNSUBSCRIBE";
+            break;
+    }
+
+    return type;
 }
 
 
@@ -1960,6 +2406,16 @@ QString BufferedSocketDeviceRequest::GetHostAddress()
 {
     return( m_pSocket->localAddress().toString() );
 }
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+quint16 BufferedSocketDeviceRequest::GetHostPort()
+{
+    return( m_pSocket->localPort() );
+}
+
 
 /////////////////////////////////////////////////////////////////////////////
 //

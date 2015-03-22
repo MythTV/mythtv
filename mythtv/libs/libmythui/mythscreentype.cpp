@@ -16,6 +16,8 @@
 #include "mythuigroup.h"
 #include "mythuistatetype.h"
 #include "mythlogging.h"
+#include "mythgesture.h"
+#include "mythuitext.h"
 
 class SemaphoreLocker
 {

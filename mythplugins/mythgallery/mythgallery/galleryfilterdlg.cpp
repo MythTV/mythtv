@@ -15,6 +15,9 @@
  *
  * ============================================================ */
 
+// Own header
+#include "galleryfilterdlg.h"
+
 // Qt headers
 #include <QApplication>
 #include <QEvent>
@@ -28,8 +31,9 @@
 #include <mythlogging.h>
 #include <mthread.h>
 
+#include <unistd.h> // for usleep()
+
 // MythGallery headers
-#include "galleryfilterdlg.h"
 #include "galleryfilter.h"
 
 #define LOC QString("GalleryFilterDlg:")

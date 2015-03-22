@@ -68,7 +68,7 @@ void Streamer::CloseFile(void)
 
 void Streamer::SendBytes(void)
 {
-    int read_sz, pkt_size, buf_size, write_len, wrote;
+    int read_sz = 0, pkt_size = 0, buf_size = 0, write_len = 0, wrote = 0;
 
     LOG(VB_RECORD, LOG_DEBUG, LOC + "SendBytes -- start");
 

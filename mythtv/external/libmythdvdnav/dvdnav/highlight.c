@@ -31,7 +31,6 @@
 #include <sys/time.h>
 #include <dvdread/nav_types.h>
 #include "dvdnav/dvdnav.h"
-#include "remap.h"
 #include "vm/decoder.h"
 #include "vm/vm.h"
 #include "vm/vmcmd.h"
@@ -242,8 +241,13 @@ static btni_t *get_current_button(dvdnav_t *this, pci_t *pci) {
 }
 
 static dvdnav_status_t button_auto_action(dvdnav_t *this, pci_t *pci) {
-  if (get_current_button(this, pci)->auto_action_mode)
+  btni_t *button_ptr;
+  if ((button_ptr = get_current_button(this, pci)) == NULL)
+      return DVDNAV_STATUS_ERR;
+
+  if (button_ptr->auto_action_mode)
     return dvdnav_button_activate(this, pci);
+
   return DVDNAV_STATUS_OK;
 }
 
@@ -288,7 +292,7 @@ dvdnav_status_t dvdnav_left_button_select(dvdnav_t *this, pci_t *pci) {
 }
 
 dvdnav_status_t dvdnav_get_highlight_area(pci_t *nav_pci , int32_t button, int32_t mode,
-					  dvdnav_highlight_area_t *highlight) {
+                                          dvdnav_highlight_area_t *highlight) {
   btni_t *button_ptr;
 
 #ifdef BUTTON_TESTING
@@ -426,7 +430,11 @@ dvdnav_status_t dvdnav_button_activate(dvdnav_t *this, pci_t *pci) {
     return DVDNAV_STATUS_ERR;
   }
 
-  button_ptr = get_current_button(this, pci);
+  if ((button_ptr = get_current_button(this, pci)) == NULL) {
+    pthread_mutex_unlock(&this->vm_lock);
+    return DVDNAV_STATUS_ERR;
+  }
+
   /* Finally, make the VM execute the appropriate code and probably
    * schedule a jump */
 #ifdef BUTTON_TESTING
@@ -491,7 +499,7 @@ dvdnav_status_t dvdnav_button_select(dvdnav_t *this, pci_t *pci, int32_t button)
 }
 
 dvdnav_status_t dvdnav_button_select_and_activate(dvdnav_t *this, pci_t *pci,
-						  int32_t button) {
+                                                  int32_t button) {
   /* A trivial function */
   if(dvdnav_button_select(this, pci, button) != DVDNAV_STATUS_ERR)
     return dvdnav_button_activate(this, pci);

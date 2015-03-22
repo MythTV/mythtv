@@ -1084,7 +1084,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         if (fmt2)
         {
             fmt = fmt2;
-            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Using FFmpeg MPEG-TS demuxer (forced)");
+            LOG(VB_GENERAL, LOG_INFO, LOC + "Using FFmpeg MPEG-TS demuxer (forced)");
         }
     }
 
@@ -4584,9 +4584,6 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
         bool already_decoded = false;
         if (!ctx->channels)
         {
-            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Setting channels to %1")
-                    .arg(audioOut.channels));
-
             QMutexLocker locker(avcodeclock);
 
             if (DoPassThrough(ctx, false) || !DecoderWillDownmix(ctx))
@@ -4655,6 +4652,11 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
             ctx->channels    != audioOut.channels)
         {
             LOG(VB_GENERAL, LOG_INFO, LOC + "Audio stream changed");
+            if (ctx->channels != audioOut.channels)
+            {
+                LOG(VB_GENERAL, LOG_INFO, LOC + QString("Number of audio channels changed from %1 to %2")
+                    .arg(audioOut.channels).arg(ctx->channels));
+            }
             currentTrack[kTrackTypeAudio] = -1;
             selectedTrack[kTrackTypeAudio].av_stream_index = -1;
             audIdx = -1;

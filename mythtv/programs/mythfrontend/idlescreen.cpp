@@ -8,6 +8,7 @@
 
 #include <mythuibuttonlist.h>
 #include <mythuistatetype.h>
+#include <mythuitext.h>
 #include <mythmainwindow.h>
 
 #include <programinfo.h>
@@ -180,20 +181,20 @@ void IdleScreen::UpdateScreen(void)
             if (progInfo)
             {
                 MythUIButtonList *list = NULL;
-                const RecStatusType recstatus = progInfo->GetRecordingStatus();
+                const RecStatus::Type recstatus = progInfo->GetRecordingStatus();
 
                 switch(recstatus)
                 {
-                    case rsRecording:
-                    case rsTuning:
+                    case RecStatus::Recording:
+                    case RecStatus::Tuning:
                         list = m_currentRecordings;
                         break;
 
-                    case rsWillRecord:
+                    case RecStatus::WillRecord:
                         list = m_nextRecordings;
                         break;
 
-                    case rsConflict:
+                    case RecStatus::Conflict:
                         list = m_conflictingRecordings;
                         break;
 

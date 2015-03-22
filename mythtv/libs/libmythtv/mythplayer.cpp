@@ -6,75 +6,60 @@
 #include <stdint.h>
 #include <cstdio>
 #include <cstdlib>
-#include <cerrno>
-#include <ctime>
 
 // POSIX headers
 #include <unistd.h>
-#include <fcntl.h>
-#include <sched.h>
-#include <sys/time.h>
 #include <assert.h>
-#include <math.h>
+#include <cmath>                        // for fabs, ceil, round, signbit
 
 // C++ headers
 #include <algorithm>
-#include <iostream>
 using namespace std;
 
 // Qt headers
 #include <QCoreApplication>
-#include <QKeyEvent>
 #include <QDir>
-#include <QtCore/qnumeric.h>
+#include <QHash>                        // for QHash
+#include <QMap>                         // for QMap<>::iterator, etc
+#include <QThread>                      // for QThread, etc
+#include <QtCore/qnumeric.h>            // for qIsNaN
 
 // MythTV headers
 #include "mthread.h"
 #include "mythconfig.h"
-#include "mythdbcon.h"
-#include "dialogbox.h"
 #include "mythplayer.h"
 #include "DetectLetterbox.h"
 #include "audioplayer.h"
-#include "recordingprofile.h"
-#include "teletextscreen.h"
 #include "interactivescreen.h"
-#include "remoteutil.h"
 #include "programinfo.h"
 #include "mythcorecontext.h"
-#include "fifowriter.h"
 #include "filtermanager.h"
-#include "mythdate.h"
 #include "livetvchain.h"
 #include "decoderbase.h"
 #include "nuppeldecoder.h"
 #include "avformatdecoder.h"
 #include "dummydecoder.h"
-#include "jobqueue.h"
-#include "NuppelVideoRecorder.h"
 #include "tv_play.h"
 #include "interactivetv.h"
 #include "mythsystemevent.h"
-#include "mythpainter.h"
-#include "mythimage.h"
-#include "mythuiimage.h"
 #include "mythlogging.h"
 #include "mythmiscutil.h"
 #include "icringbuffer.h"
 #include "audiooutput.h"
 #include "cardutil.h"
 #include "mythavutil.h"
+#include "jitterometer.h"               // for Jitterometer
+#include "mythtimer.h"                  // for MythTimer
+#include "mythuiactions.h"              // for ACTION_LEFT, ACTION_RIGHT, etc
+#include "ringbuffer.h"                 // for RingBuffer, etc
+#include "tv_actions.h"                 // for ACTION_BIGJUMPFWD, etc
 
 extern "C" {
-#include "vbitext/vbi.h"
 #include "vsync.h"
 #include "libavcodec/avcodec.h"
-#include "libswscale/swscale.h"
 }
 
 #include "remoteencoder.h"
-
-#include "videoout_null.h"
 
 #if ! HAVE_ROUND
 #define round(x) ((int) ((x) + 0.5))

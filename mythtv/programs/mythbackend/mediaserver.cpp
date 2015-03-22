@@ -12,6 +12,8 @@
 #include "httpconfig.h"
 #include "internetContent.h"
 #include "mythdirs.h"
+#include "htmlserver.h"
+#include <websocket.h>
 
 #include "upnpcdstv.h"
 #include "upnpcdsmusic.h"
@@ -73,9 +75,9 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
 
     int     nPort     = g_pConfig->GetValue( "BackendStatusPort", 6544 );
     int     nSSLPort  = g_pConfig->GetValue( "BackendSSLPort",    6554 );
+    int     nWSPort   = g_pConfig->GetValue( "BackendWSPort",     6545 );
 
     HttpServer *pHttpServer = new HttpServer();
-    pHttpServer->RegisterExtension(new HttpConfig());
 
     if (!pHttpServer->isListening())
     {
@@ -96,6 +98,16 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
             LOG(VB_GENERAL, LOG_ERR, "MediaServer: HttpServer failed to create SSL server");
         }
 #endif
+    }
+
+    WebSocketServer *pWebSocketServer = new WebSocketServer();
+
+    if (!pWebSocketServer->isListening())
+    {
+        if (!pWebSocketServer->listen(nWSPort))
+        {
+            LOG(VB_GENERAL, LOG_ERR, "MediaServer: WebSocketServer Create Error");
+        }
     }
 
     QString sFileName = g_pConfig->GetValue( "upnpDescXmlPath",
@@ -121,6 +133,10 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
 
     LOG(VB_UPNP, LOG_INFO, "MediaServer: Registering Http Server Extensions.");
 
+    HtmlServerExtension *pHtmlServer;
+    pHtmlServer = new HtmlServerExtension(m_sSharePath + "html", "backend_");
+    pHttpServer->RegisterExtension( pHtmlServer );
+    pHttpServer->RegisterExtension( new HttpConfig() );
     pHttpServer->RegisterExtension( new InternetContent   ( m_sSharePath ));
 
     pHttpServer->RegisterExtension( new MythServiceHost   ( m_sSharePath ));
@@ -139,11 +155,10 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
     // -=>NOTE: We need to know the actual type at compile time for this
     //          to work, so it needs to be done here.  I'm still looking
     //          into ways that we may encapsulate this in the service
-    //          classes.
+    //          classes. - dblain
     // ------------------------------------------------------------------
 
-
-     QScriptEngine* pEngine = pHttpServer->ScriptEngine();
+     QScriptEngine* pEngine = pHtmlServer->ScriptEngine();
 
      pEngine->globalObject().setProperty("Myth"   ,
          pEngine->scriptValueFromQMetaObject< ScriptableMyth    >() );

@@ -1,3 +1,6 @@
+
+#include "mythuimetadataresults.h"
+
 #include "mythuiimage.h"
 #include "mythuitext.h"
 #include "mythuistatetype.h"
@@ -5,8 +8,10 @@
 #include "mythdialogbox.h"
 #include "mythdate.h"
 #include "mythdirs.h"
+#include "mythlogging.h"
 
-#include "mythuimetadataresults.h"
+#include "metadatadownload.h"
+#include "metadataimagedownload.h"
 
 MetadataResultsDialog::MetadataResultsDialog(
     MythScreenStack *lparent,

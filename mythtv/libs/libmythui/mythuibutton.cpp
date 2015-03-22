@@ -12,6 +12,9 @@
 // MythUI headers
 #include "mythmainwindow.h"
 #include "mythuigroup.h"
+#include "mythuistatetype.h"
+#include "mythuitext.h"
+#include "mythgesture.h"
 
 MythUIButton::MythUIButton(MythUIType *parent, const QString &name)
     : MythUIType(parent, name)

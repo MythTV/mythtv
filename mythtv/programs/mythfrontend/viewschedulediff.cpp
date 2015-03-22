@@ -104,12 +104,12 @@ void ViewScheduleDiff::showStatus(MythUIButtonListItem *item)
 
     QString message = pi->toString(ProgramInfo::kTitleSubtitle, " - ");
     message += "\n\n";
-    message += toDescription(pi->GetRecordingStatus(),
+    message += RecStatus::toDescription(pi->GetRecordingStatus(),
                              pi->GetRecordingRuleType(),
                              pi->GetRecordingStartTime());
 
-    if (pi->GetRecordingStatus() == rsConflict ||
-        pi->GetRecordingStatus() == rsLaterShowing)
+    if (pi->GetRecordingStatus() == RecStatus::Conflict ||
+        pi->GetRecordingStatus() == RecStatus::LaterShowing)
     {
         message += " " + QObject::tr("The following programs will be recorded "
                                      "instead:") + "\n\n";
@@ -121,8 +121,8 @@ void ViewScheduleDiff::showStatus(MythUIButtonListItem *item)
             if (pa->GetRecordingStartTime() >= pi->GetRecordingEndTime())
                 break;
             if (pa->GetRecordingEndTime() > pi->GetRecordingStartTime() &&
-                (pa->GetRecordingStatus() == rsWillRecord ||
-                 pa->GetRecordingStatus() == rsRecording))
+                (pa->GetRecordingStatus() == RecStatus::WillRecord ||
+                 pa->GetRecordingStatus() == RecStatus::Recording))
             {
                 message += QString("%1 - %2  %3\n")
                     .arg(pa->GetRecordingStartTime()
@@ -172,8 +172,8 @@ static int comp_recstart(const ProgramInfo *a, const ProgramInfo *b)
             return -1;
     }
     if (a->GetRecordingPriority() != b->GetRecordingPriority() &&
-        (a->GetRecordingStatus() == rsWillRecord ||
-         b->GetRecordingStatus() == rsWillRecord))
+        (a->GetRecordingStatus() == RecStatus::WillRecord ||
+         b->GetRecordingStatus() == RecStatus::WillRecord))
     {
         if (a->GetRecordingPriority() < b->GetRecordingPriority())
             return 1;
@@ -272,7 +272,7 @@ void ViewScheduleDiff::fillList(void)
         }
 
         if (s.before && s.after &&
-            (s.before->GetCardID() == s.after->GetCardID()) &&
+            (s.before->GetInputID() == s.after->GetInputID()) &&
             (s.before->GetRecordingStatus() == s.after->GetRecordingStatus()))
         {
             continue;
@@ -299,21 +299,21 @@ void ViewScheduleDiff::updateUIList(void)
         InfoMap infoMap;
         pginfo->ToMap(infoMap);
 
-        QString state = toUIState(pginfo->GetRecordingStatus());
+        QString state = RecStatus::toUIState(pginfo->GetRecordingStatus());
 
         item->DisplayState(state, "status");
         item->SetTextFromMap(infoMap, state);
 
         if (s.before)
-            item->SetText(toString(s.before->GetRecordingStatus(),
-                                   s.before->GetCardID()), "statusbefore",
+            item->SetText(RecStatus::toString(s.before->GetRecordingStatus(),
+                                   s.before->GetInputID()), "statusbefore",
                           state);
         else
             item->SetText("-", "statusbefore");
 
         if (s.after)
-            item->SetText(toString(s.after->GetRecordingStatus(),
-                                   s.after->GetCardID()), "statusafter",
+            item->SetText(RecStatus::toString(s.after->GetRecordingStatus(),
+                                   s.after->GetInputID()), "statusafter",
                           state);
         else
             item->SetText("-", "statusafter");

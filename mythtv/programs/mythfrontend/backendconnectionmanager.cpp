@@ -1,10 +1,12 @@
+
+#include "backendconnectionmanager.h"
+
 #include <QCoreApplication>
 #include <QRunnable>
 #include <QString>
 #include <QEvent>
 #include <QTimer>
 
-#include "backendconnectionmanager.h"
 #include "mythcorecontext.h"
 #include "mythdialogbox.h"
 #include "mythscreenstack.h"
@@ -13,6 +15,9 @@
 #include "mythlogging.h"
 #include "exitcodes.h"
 #include "mythtimezone.h"
+
+#include <unistd.h>
+
 using namespace MythTZ;
 
 class Reconnect : public QRunnable

@@ -261,7 +261,21 @@ MPEG2fixup::MPEG2fixup(const QString &inf, const QString &outf,
     discard = 0;
     if (deleteMap && deleteMap->count())
     {
-        delMap = *deleteMap;
+        /* convert MythTV cutlist to mpeg2fix cutlist */
+        frm_dir_map_t::iterator it = deleteMap->begin();
+        for (; it != deleteMap->end(); ++it)
+        {
+            uint64_t mark = it.key();
+            if (mark > 0)
+            {
+                if (it.value() == MARK_CUT_START)
+                    mark += 1; // +2 looks good, but keyframes are hit with +1
+                else
+                    mark += 1;
+            }
+            delMap.insert (mark, it.value());
+        }
+
         if (delMap.contains(0))
         {
             discard = 1;
@@ -607,6 +621,19 @@ void MPEG2fixup::InitReplex()
     // index_vrbuf contains index_units which describe a video frame
     //   it also contains the start pos of the next frame
     // index_arbuf only uses, pts, framesize, length, start, (active, err)
+
+    if (vFrame.first()->mpeg2_seq.height >= 720)
+    {
+        LOG(VB_GENERAL, LOG_NOTICE, "MPEG2fixup::InitReplex(): High Definition input, increasing replex buffers");
+        if (rx.otype == REPLEX_MPEG2)
+            rx.otype = REPLEX_HDTV;
+        else if (rx.otype == REPLEX_TS_SD)
+            rx.otype = REPLEX_TS_HD;
+        else
+        {
+            LOG(VB_GENERAL, LOG_WARNING, "MPEG2fixup::InitReplex(): Using '--ostream=dvd' with HD video is an invalid combination");
+        }
+    }
 
     //this should support > 100 frames
     uint32_t memsize = vFrame.first()->mpeg2_seq.width *
@@ -1937,10 +1964,12 @@ void MPEG2fixup::ShowRangeMap(frm_dir_map_t *mapPtr, QString msg)
         int64_t start = 0;
         frm_dir_map_t::iterator it = mapPtr->begin();
         for (; it != mapPtr->end(); ++it)
-            if (*it == 0)
+            if (*it == MARK_CUT_END)
                 msg += QString("\n\t\t%1 - %2").arg(start).arg(it.key());
             else
                 start = it.key();
+        if (*(--it) == MARK_CUT_START)
+            msg += QString("\n\t\t%1 - end").arg(start);
         LOG(VB_PROCESS, LOG_INFO, msg);
     }
 }

@@ -23,6 +23,7 @@ typedef enum Formats
     kDatabase      = 0x004000,      ///< Default UTC, database format
     kAutoYear      = 0x008000,      ///< Add year only if different from current year
     kScreenShotFilename = 0x010000,   ///< "yyyy-MM-ddThh-mm-ss.zzz"
+    kRFC822        = 0x020000,      ///< HTTP Date format
     kOverrideUTC   = 0x100000,      ///< Present date/time in UTC
     kOverrideLocal = 0x200000,      ///< Present date/time in localtime
 } Format;

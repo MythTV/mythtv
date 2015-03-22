@@ -8,12 +8,12 @@
 
 // Qt headers
 #include <QObject>
+#include <QDate>
+#include <QTime>
 
 // MythTV headers
 #include "mythexp.h"
 #include "mythwidgets.h"
-#include "mythdialogs.h"
-#include "mythdbcon.h"
 #include "mythstorage.h"
 
 class QWidget;
@@ -512,7 +512,6 @@ class MPUBLIC ChannelSetting : public SelectSetting
     virtual void fillSelections(void) { fillSelections(this); }
 };
 
-class QDate;
 class MPUBLIC DateSetting : public Setting
 {
     Q_OBJECT
@@ -529,7 +528,6 @@ class MPUBLIC DateSetting : public Setting
     void setValue(const QString &newValue);
 };
 
-class QTime;
 class MPUBLIC TimeSetting : public Setting
 {
     Q_OBJECT

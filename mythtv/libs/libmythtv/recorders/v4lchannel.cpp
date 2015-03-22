@@ -94,8 +94,8 @@ bool V4LChannel::Open(void)
     has_tuner      = !!(capabilities & V4L2_CAP_TUNER);
     has_sliced_vbi = !!(capabilities & V4L2_CAP_SLICED_VBI_CAPTURE);
 
-    if (driver_name == "bttv" || driver_name == "cx8800")
-        has_stream_io = false; // driver workaround, see #9825 & #10519
+    if (driver_name == "bttv" || driver_name == "cx8800" || driver_name == "cx88_blackbird")
+        has_stream_io = false; // driver workaround, see #9825, #10519 and #12336
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Device name '%1' driver '%2'.")
             .arg(device_name).arg(driver_name));
@@ -514,11 +514,11 @@ QString V4LChannel::GetFormatForChannel(QString channum, QString inputname)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT tvformat "
-        "FROM channel, cardinput "
-        "WHERE channum            = :CHANNUM   AND "
-        "      inputname          = :INPUTNAME AND "
-        "      cardinput.cardid   = :CARDID    AND "
-        "      cardinput.sourceid = channel.sourceid");
+        "FROM channel, capturecard "
+        "WHERE channum              = :CHANNUM   AND "
+        "      inputname            = :INPUTNAME AND "
+        "      capturecard.cardid   = :CARDID    AND "
+        "      capturecard.sourceid = channel.sourceid");
     query.bindValue(":CHANNUM",   channum);
     query.bindValue(":INPUTNAME", inputname);
     query.bindValue(":CARDID",    GetCardID());

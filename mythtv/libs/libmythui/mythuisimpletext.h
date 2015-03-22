@@ -4,9 +4,6 @@
 // QT headers
 #include <QColor>
 
-// Mythdb headers
-#include "mythstorage.h"
-
 // Mythui headers
 #include "mythuitype.h"
 #include "mythfontproperties.h"
@@ -27,8 +24,8 @@ class MUI_PUBLIC MythUISimpleText : public MythUIType
   public:
     MythUISimpleText(MythUIType *parent, const QString &name);
     MythUISimpleText(const QString &text, const MythFontProperties &font,
-		     const QRect &rect, Qt::Alignment align,
-		     MythUIType *parent, const QString &name);
+                     const QRect &rect, Qt::Alignment align,
+                     MythUIType *parent, const QString &name);
     ~MythUISimpleText();
 
   protected:

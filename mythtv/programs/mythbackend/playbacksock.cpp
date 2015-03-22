@@ -29,6 +29,7 @@ PlaybackSock::PlaybackSock(
     ip = "";
     backend = false;
     mediaserver = false;
+    m_frontend = false;
 
     disconnected = false;
     blockshutdown = true;
@@ -446,7 +447,7 @@ bool PlaybackSock::EncoderIsRecording(int capturecardnum,
     return false;
 }
 
-RecStatusType PlaybackSock::StartRecording(int capturecardnum,
+RecStatus::Type PlaybackSock::StartRecording(int capturecardnum,
                                            ProgramInfo *pginfo)
 {
     QStringList strlist(QString("QUERY_REMOTEENCODER %1").arg(capturecardnum));
@@ -458,13 +459,13 @@ RecStatusType PlaybackSock::StartRecording(int capturecardnum,
         pginfo->SetRecordingID(strlist[1].toUInt());
         pginfo->SetRecordingStartTime(
             MythDate::fromTime_t(strlist[2].toUInt()));
-        return RecStatusType(strlist[0].toInt());
+        return RecStatus::Type(strlist[0].toInt());
     }
 
-    return rsUnknown;
+    return RecStatus::Unknown;
 }
 
-RecStatusType PlaybackSock::GetRecordingStatus(int capturecardnum)
+RecStatus::Type PlaybackSock::GetRecordingStatus(int capturecardnum)
 {
     QStringList strlist(QString("QUERY_REMOTEENCODER %1").arg(capturecardnum));
     strlist << "GET_RECORDING_STATUS";
@@ -475,10 +476,10 @@ RecStatusType PlaybackSock::GetRecordingStatus(int capturecardnum)
             QString("QUERY_REMOTEENCODER %1").arg(capturecardnum) +
             " did not respond.");
 
-        return rsUnknown;
+        return RecStatus::Unknown;
     }
 
-    return RecStatusType(strlist[0].toInt());
+    return RecStatus::Type(strlist[0].toInt());
 }
 
 void PlaybackSock::RecordPending(int capturecardnum, const ProgramInfo *pginfo,

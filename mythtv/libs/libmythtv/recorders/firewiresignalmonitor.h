@@ -15,7 +15,6 @@ using namespace std;
 #include "dtvsignalmonitor.h"
 #include "firewiredevice.h"
 #include "mthread.h"
-#include "mythdate.h"
 
 class FirewireChannel;
 

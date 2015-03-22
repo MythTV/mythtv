@@ -1,5 +1,3 @@
-#include <unistd.h>
-#include <math.h>
 
 #include <algorithm>
 using namespace std;
@@ -7,8 +5,6 @@ using namespace std;
 #include "mythconfig.h"
 
 #include "mythplayer.h"
-#include "remoteencoder.h"
-#include "mythdbcon.h"
 #include "mythlogging.h"
 #include "decoderbase.h"
 #include "programinfo.h"

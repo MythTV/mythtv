@@ -55,7 +55,6 @@ class ViewScheduled : public ScheduleCommon
     void FillList(void);
     void LoadList(bool useExistingData = false);
     void setShowAll(bool all);
-    void viewCards(void);
     void viewInputs(void);
 
     void EmbedTVWindow(void);
@@ -80,10 +79,6 @@ class ViewScheduled : public ScheduleCommon
 
     QDate m_currentGroup;
     QDate m_defaultGroup;
-
-    QMap<int, int> m_cardref;
-    uint m_maxcard;
-    uint m_curcard;
 
     QMap<int, int> m_inputref;
     uint m_maxinput;

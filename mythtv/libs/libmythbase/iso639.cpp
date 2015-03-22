@@ -2,7 +2,10 @@
 // Copyright (c) 2003-2004, Daniel Thor Kristjansson
 
 #include "iso639.h"
+
 #include "mythcorecontext.h"
+
+#include <QStringList>
 
 using namespace std;
 

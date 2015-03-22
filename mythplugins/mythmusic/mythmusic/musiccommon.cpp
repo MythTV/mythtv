@@ -20,6 +20,7 @@ using namespace std;
 #include <mythuibuttontree.h>
 #include <mythuicheckbox.h>
 #include <mythuivideo.h>
+#include <mythuitext.h>
 #include <audiooutput.h>
 #include <compat.h>
 #include <lcddevice.h>
@@ -766,7 +767,7 @@ bool MusicCommon::keyPressEvent(QKeyEvent *e)
             {
                 if (m_currentPlaylist->GetItemCurrent())
                 {
-                    MusicMetadata *mdata = qVariantValue<MusicMetadata*> (m_currentPlaylist->GetItemCurrent()->GetData());
+                    MusicMetadata *mdata = m_currentPlaylist->GetItemCurrent()->GetData().value<MusicMetadata*>();
                     if (mdata)
                     {
                         if (action == "INFO")
@@ -789,7 +790,7 @@ bool MusicCommon::keyPressEvent(QKeyEvent *e)
             MythUIButtonListItem *item = m_currentPlaylist->GetItemCurrent();
             if (item)
             {
-                MusicMetadata *mdata = qVariantValue<MusicMetadata*> (item->GetData());
+                MusicMetadata *mdata = item->GetData().value<MusicMetadata*>();
                 if (mdata)
                     gPlayer->removeTrack(mdata->ID());
             }
@@ -1368,7 +1369,7 @@ void MusicCommon::customEvent(QEvent *event)
                 MythUIButtonListItem *item = m_currentPlaylist->GetItemCurrent();
                 if (item)
                 {
-                    MusicMetadata *mdata = qVariantValue<MusicMetadata*> (item->GetData());
+                    MusicMetadata *mdata = item->GetData().value<MusicMetadata*>();
                     if (mdata)
                         gPlayer->removeTrack(mdata->ID());
                 }
@@ -1610,7 +1611,7 @@ void MusicCommon::customEvent(QEvent *event)
             for (int x = 0; x < m_currentPlaylist->GetCount(); x++)
             {
                 MythUIButtonListItem *item = m_currentPlaylist->GetItemAt(x);
-                MusicMetadata *mdata = qVariantValue<MusicMetadata*> (item->GetData());
+                MusicMetadata *mdata = item->GetData().value<MusicMetadata*>();
                 if (mdata && mdata->ID() == (MusicMetadata::IdType) trackID)
                 {
                     m_currentPlaylist->RemoveItem(item);
@@ -1718,7 +1719,7 @@ void MusicCommon::customEvent(QEvent *event)
             for (int x = 0; x < m_currentPlaylist->GetCount(); x++)
             {
                 MythUIButtonListItem *item = m_currentPlaylist->GetItemAt(x);
-                MusicMetadata *mdata = qVariantValue<MusicMetadata*> (item->GetData());
+                MusicMetadata *mdata = item->GetData().value<MusicMetadata*>();
 
                 if (mdata && mdata->ID() == trackID)
                 {
@@ -1736,7 +1737,7 @@ void MusicCommon::customEvent(QEvent *event)
             for (int x = 0; x < m_playedTracksList->GetCount(); x++)
             {
                 MythUIButtonListItem *item = m_playedTracksList->GetItemAt(x);
-                MusicMetadata *mdata = qVariantValue<MusicMetadata*> (item->GetData());
+                MusicMetadata *mdata = item->GetData().value<MusicMetadata*>();
 
                 if (mdata && mdata->ID() == trackID)
                 {
@@ -1768,7 +1769,7 @@ void MusicCommon::customEvent(QEvent *event)
             for (int x = 0; x < m_currentPlaylist->GetCount(); x++)
             {
                 MythUIButtonListItem *item = m_currentPlaylist->GetItemAt(x);
-                MusicMetadata *mdata = qVariantValue<MusicMetadata*> (item->GetData());
+                MusicMetadata *mdata = item->GetData().value<MusicMetadata*>();
                 if (mdata && mdata->ID() == trackID)
                 {
                     // reload the albumart image if one has already been loaded for this track
@@ -1807,7 +1808,7 @@ void MusicCommon::customEvent(QEvent *event)
             for (int x = 0; x < m_currentPlaylist->GetCount(); x++)
             {
                 MythUIButtonListItem *item = m_currentPlaylist->GetItemAt(x);
-                MusicMetadata *mdata = qVariantValue<MusicMetadata*> (item->GetData());
+                MusicMetadata *mdata = item->GetData().value<MusicMetadata*>();
                 if (mdata && mdata->ID() == trackID)
                 {
                     item->SetFontState("disabled");
@@ -1969,7 +1970,7 @@ void MusicCommon::playlistItemVisible(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    MusicMetadata *mdata = qVariantValue<MusicMetadata*> (item->GetData());
+    MusicMetadata *mdata = item->GetData().value<MusicMetadata*>();
     if (mdata && item->GetText() == " ")
     {
         if (item->GetImageFilename().isEmpty())

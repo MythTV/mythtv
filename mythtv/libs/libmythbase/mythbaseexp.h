@@ -1,7 +1,7 @@
 #ifndef MYTHBASEEXP_H_
 #define MYTHBASEEXP_H_
 
-// This header is called from some non-QT projects, 
+// This header is called from some non-QT projects,
 // and if non C++ then Q_DECL_XXX never defined
 
 #if defined( QT_CORE_LIB ) && defined( __cplusplus )

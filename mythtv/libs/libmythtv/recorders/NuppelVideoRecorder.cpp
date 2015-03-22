@@ -85,7 +85,7 @@ void NVRAudioThread::run(void)
 
 NuppelVideoRecorder::NuppelVideoRecorder(TVRec *rec, ChannelBase *channel) :
     V4LRecorder(rec), audio_device(NULL),
-    write_thread(NULL), audio_thread(NULL)
+    write_thread(NULL), audio_thread(NULL), recording(false)
 {
     channelObj = channel;
 
@@ -113,6 +113,7 @@ NuppelVideoRecorder::NuppelVideoRecorder(TVRec *rec, ChannelBase *channel) :
     rtjc = NULL;
     strm = NULL;
     mp3buf = NULL;
+    mp3buf_size = 0;
 
     transcoding = false;
 
@@ -123,6 +124,7 @@ NuppelVideoRecorder::NuppelVideoRecorder(TVRec *rec, ChannelBase *channel) :
 
     act_audio_encode = 0;
     act_audio_buffer = 0;
+    act_audio_sample = 0;
     audio_buffer_count = 0;
     audio_buffer_size = 0;
 
@@ -140,8 +142,9 @@ NuppelVideoRecorder::NuppelVideoRecorder(TVRec *rec, ChannelBase *channel) :
     audiobytes = 0;
     audio_bits = 16;
     audio_channels = 2;
-    audio_samplerate = 44100;
     audio_bytes_per_sample = audio_channels * audio_bits / 8;
+    audio_samplerate = 44100;
+    effectivedsp = 0;
 
     picture_format = PIX_FMT_YUV420P;
     v4l2_pixelformat = 0;
@@ -197,6 +200,19 @@ NuppelVideoRecorder::NuppelVideoRecorder(TVRec *rec, ChannelBase *channel) :
     resetcapture = false;
 
     SetPositionMapType(MARK_KEYFRAME);
+
+    m_containerFormat = formatNUV;
+
+    stm = (struct timeval){0};
+    tzone = (struct timezone){0};
+
+    lastPositionMapPos = 0;
+    framesWritten = 0;
+    livetv = false;
+    last_block = 0;
+    firsttc = 0;
+    w_out = 0;
+    h_out = 0;
 }
 
 NuppelVideoRecorder::~NuppelVideoRecorder(void)

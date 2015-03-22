@@ -18,6 +18,7 @@ using namespace std;
 #include "recordingrule.h"
 #include "recordingprofile.h"
 #include "recordinginfo.h"
+#include "cardutil.h"
 
 // TODO convert all dates to UTC
 
@@ -386,6 +387,39 @@ static bool UpdateDBVersionNumber(const QString &newnumber, QString &dbver)
     return true;
 }
 
+/** \fn performUpdateSeries(const char **)
+ *  \brief Runs a number of SQL commands.
+ *
+ *  \param updates  array of SQL commands to issue, terminated by a NULL string.
+ *  \return true on success, false on failure
+ */
+static bool performUpdateSeries(const char **updates)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    int counter = 0;
+    const char *thequery = updates[counter];
+
+    while (thequery != NULL)
+    {
+        if (strlen(thequery) && !query.exec(thequery))
+        {
+            QString msg =
+                QString("DB Error (Performing database upgrade): \n"
+                        "Query was: %1 \nError was: %2")
+                .arg(thequery)
+                .arg(MythDB::DBErrorMessage(query.lastError()));
+            LOG(VB_GENERAL, LOG_ERR, msg);
+            return false;
+        }
+
+        counter++;
+        thequery = updates[counter];
+    }
+
+    return true;
+}
+
 /** \fn performActualUpdate(const char **, const char*, QString&)
  *  \brief Runs a number of SQL commands, and updates the schema version.
  *
@@ -403,26 +437,8 @@ static bool performActualUpdate(
     LOG(VB_GENERAL, LOG_CRIT, QString("Upgrading to MythTV schema version ") +
             version);
 
-    int counter = 0;
-    const char *thequery = updates[counter];
-
-    while (thequery != NULL)
-    {
-        if (strlen(thequery) && !query.exec(thequery))
-        {
-            QString msg =
-                QString("DB Error (Performing database upgrade): \n"
-                        "Query was: %1 \nError was: %2 \nnew version: %3")
-                .arg(thequery)
-                .arg(MythDB::DBErrorMessage(query.lastError()))
-                .arg(version);
-            LOG(VB_GENERAL, LOG_ERR, msg);
-            return false;
-        }
-
-        counter++;
-        thequery = updates[counter];
-    }
+    if (!performUpdateSeries(updates))
+        return false;
 
     if (!UpdateDBVersionNumber(version, dbver))
         return false;
@@ -2823,6 +2839,307 @@ NULL
         }
 
         if (!UpdateDBVersionNumber("1331", dbver))
+            return false;
+    }
+
+    if (dbver == "1331")
+    {
+        LOG(VB_GENERAL, LOG_CRIT, "Upgrading to MythTV schema version 1332");
+        MSqlQuery select(MSqlQuery::InitCon());
+        MSqlQuery update(MSqlQuery::InitCon());
+
+        // Find all second or higher inputs using the same card.
+        select.prepare("SELECT DISTINCT i1.cardid, i1.cardinputid "
+                       "FROM cardinput i1, cardinput i2 "
+                       "WHERE i1.cardid = i2.cardid AND "
+                       "       i1.cardinputid > i2.cardinputid "
+                       "ORDER BY i1.cardid, i1.cardinputid");
+        if (!select.exec())
+        {
+            MythDB::DBError("Unable to retrieve cardinputids.", select);
+            return false;
+        }
+
+        while (select.next())
+        {
+            int cardid = select.value(0).toInt();
+            int inputid = select.value(1).toInt();
+
+            // Create a new card for this input.
+            update.prepare("INSERT INTO capturecard "
+                           "     ( videodevice, audiodevice, vbidevice, "
+                           "       cardtype, defaultinput, audioratelimit, "
+                           "       hostname, dvb_swfilter, dvb_sat_type, "
+                           "       dvb_wait_for_seqstart, skipbtaudio, "
+                           "       dvb_on_demand, dvb_diseqc_type, "
+                           "       firewire_speed, firewire_model, "
+                           "       firewire_connection, signal_timeout, "
+                           "       channel_timeout, dvb_tuning_delay, "
+                           "       contrast, brightness, colour, hue, "
+                           "       diseqcid, dvb_eitscan ) "
+                           "SELECT videodevice, audiodevice, vbidevice, "
+                           "       cardtype, defaultinput, audioratelimit, "
+                           "       hostname, dvb_swfilter, dvb_sat_type, "
+                           "       dvb_wait_for_seqstart, skipbtaudio, "
+                           "       dvb_on_demand, dvb_diseqc_type, "
+                           "       firewire_speed, firewire_model, "
+                           "       firewire_connection, signal_timeout, "
+                           "       channel_timeout, dvb_tuning_delay, "
+                           "       contrast, brightness, colour, hue, "
+                           "       diseqcid, dvb_eitscan "
+                           "FROM capturecard c "
+                           "WHERE c.cardid = :CARDID");
+            update.bindValue(":CARDID", cardid);
+            if (!update.exec())
+            {
+                MythDB::DBError("Unable to insert new card.", update);
+                return false;
+            }
+            int newcardid = update.lastInsertId().toInt();
+
+            // Now attach the input to the new card.
+            update.prepare("UPDATE cardinput "
+                           "SET cardid = :NEWCARDID "
+                           "WHERE cardinputid = :INPUTID");
+            update.bindValue(":NEWCARDID", newcardid);
+            update.bindValue(":INPUTID", inputid);
+            if (!update.exec())
+            {
+                MythDB::DBError("Unable to update input.", update);
+                return false;
+            }
+        }
+
+        const char *updates[] = {
+            // Delete old, automatically created inputgroups.
+            "DELETE FROM inputgroup WHERE inputgroupname LIKE 'DVB_%'",
+            "DELETE FROM inputgroup WHERE inputgroupname LIKE 'CETON_%'",
+            "DELETE FROM inputgroup WHERE inputgroupname LIKE 'HDHOMERUN_%'",
+            // Increase the size of inputgroup.inputgroupname.
+            "ALTER TABLE inputgroup "
+            "    MODIFY COLUMN inputgroupname VARCHAR(48)",
+            // Rename remaining inputgroups to have 'user:' prefix.
+            "UPDATE inputgroup "
+            "    SET inputgroupname = CONCAT('user:', inputgroupname)",
+            // Change inputgroup.inputid to equal cardid.
+            "UPDATE inputgroup ig "
+            "    JOIN cardinput i ON ig.cardinputid = i.cardinputid "
+            "    SET ig.cardinputid = i.cardid",
+            // Change record.prefinput to equal cardid.
+            "UPDATE record r "
+            "    JOIN cardinput i ON r.prefinput = i.cardinputid "
+            "    SET r.prefinput = i.cardid",
+            // Change diseqc_config.cardinputid to equal cardid.
+            "UPDATE diseqc_config dc "
+            "    JOIN cardinput i ON dc.cardinputid = i.cardinputid "
+            "    SET dc.cardinputid = i.cardid",
+            // Change cardinput.cardinputid to equal cardid.  Do in
+            // multiple steps to avoid duplicate ids.
+            "SELECT MAX(cardid) INTO @maxcardid FROM capturecard",
+            "SELECT MAX(cardinputid) INTO @maxcardinputid FROM cardinput",
+            "UPDATE cardinput i "
+            "    SET i.cardinputid = i.cardid + @maxcardid + @maxcardinputid",
+            "UPDATE cardinput i "
+            "    SET i.cardinputid = i.cardid",
+            NULL
+        };
+
+        if (!performUpdateSeries(updates))
+            return false;
+
+        // Create an automatically generated inputgroup for each card.
+        select.prepare("SELECT cardid, hostname, videodevice "
+                       "FROM capturecard c "
+                       "ORDER BY c.cardid");
+        if (!select.exec())
+        {
+            MythDB::DBError("Unable to retrieve cardtids.", select);
+            return false;
+        }
+
+        while (select.next())
+        {
+            uint cardid = select.value(0).toUInt();
+            QString host = select.value(1).toString();
+            QString device = select.value(2).toString();
+            QString name = host + "|" + device;
+            uint groupid = CardUtil::CreateInputGroup(name);
+            if (!groupid)
+                return false;
+            if (!CardUtil::LinkInputGroup(cardid, groupid))
+                return false;
+        }
+
+        // Remove orphan and administrative inputgroup entries.
+        if (!CardUtil::UnlinkInputGroup(0, 0))
+            return false;
+
+        if (!UpdateDBVersionNumber("1332", dbver))
+            return false;
+    }
+
+    if (dbver == "1332")
+    {
+        const char *updates[] = {
+            // Move contents of cardinput to capturecard.
+            "ALTER TABLE capturecard "
+            "    ADD COLUMN inputname VARCHAR(32) NOT NULL DEFAULT '', "
+            "    ADD COLUMN sourceid INT(10) UNSIGNED NOT NULL DEFAULT 0, "
+            "    ADD COLUMN externalcommand VARCHAR(128), "
+            "    ADD COLUMN changer_device VARCHAR(128), "
+            "    ADD COLUMN changer_model VARCHAR(128), "
+            "    ADD COLUMN tunechan VARCHAR(10), "
+            "    ADD COLUMN startchan VARCHAR(10), "
+            "    ADD COLUMN displayname VARCHAR(64) NOT NULL DEFAULT '', "
+            "    ADD COLUMN dishnet_eit TINYINT(1) NOT NULL DEFAULT 0, "
+            "    ADD COLUMN recpriority INT(11) NOT NULL DEFAULT 0, "
+            "    ADD COLUMN quicktune TINYINT(4) NOT NULL DEFAULT 0, "
+            "    ADD COLUMN schedorder INT(10) UNSIGNED NOT NULL DEFAULT 0, "
+            "    ADD COLUMN livetvorder INT(10) UNSIGNED NOT NULL DEFAULT 0",
+            "UPDATE capturecard c "
+            "    JOIN cardinput i ON c.cardid = i.cardinputid "
+            "    SET c.inputname = i.inputname, "
+            "        c.sourceid = i.sourceid, "
+            "        c.externalcommand = i.externalcommand, "
+            "        c.changer_device = i.changer_device, "
+            "        c.changer_model = i.changer_model, "
+            "        c.tunechan = i.tunechan, "
+            "        c.startchan = i.startchan, "
+            "        c.displayname = i.displayname, "
+            "        c.dishnet_eit = i.dishnet_eit, "
+            "        c.recpriority = i.recpriority, "
+            "        c.quicktune = i.quicktune, "
+            "        c.schedorder = i.schedorder, "
+            "        c.livetvorder = i.livetvorder",
+            "TRUNCATE cardinput",
+            NULL
+        };
+        if (!performActualUpdate(updates, "1333", dbver))
+            return false;
+    }
+
+    if (dbver == "1333")
+    {
+        const char *updates[] = {
+            // Fix default value of capturecard.inputname.
+            "ALTER TABLE capturecard "
+            "    MODIFY COLUMN inputname VARCHAR(32) NOT NULL DEFAULT 'None'",
+            "UPDATE capturecard c "
+            "    SET inputname = 'None' WHERE inputname = '' ",
+            NULL
+        };
+        if (!performActualUpdate(updates, "1334", dbver))
+            return false;
+    }
+
+    if (dbver == "1334")
+    {
+        const char *updates[] = {
+            // Change the default sched/livetvorder from 0 to 1.
+            "ALTER TABLE capturecard "
+            "    MODIFY COLUMN schedorder INT(10) UNSIGNED "
+            "        NOT NULL DEFAULT 1, "
+            "    MODIFY COLUMN livetvorder INT(10) UNSIGNED "
+            "        NOT NULL DEFAULT 1",
+            NULL
+        };
+        if (!performActualUpdate(updates, "1335", dbver))
+            return false;
+    }
+
+    if (dbver == "1335")
+    {
+        const char *updates[] = {
+            // Fix custom record and custom priority references to
+            // cardinput and cardinputid.
+            "UPDATE record SET description = "
+            "    replace(description, 'cardinputid', 'cardid') "
+            "    WHERE search = 1",
+            "UPDATE record SET description = "
+            "    replace(description, 'cardinput', 'capturecard') "
+            "    WHERE search = 1",
+            "UPDATE powerpriority SET selectclause = "
+            "    replace(selectclause, 'cardinputid', 'cardid')",
+            "UPDATE powerpriority SET selectclause = "
+            "    replace(selectclause, 'cardinput', 'capturecard')",
+            NULL
+        };
+        if (!performActualUpdate(updates, "1336", dbver))
+            return false;
+    }
+
+    if (dbver == "1336")
+    {
+        const char *updates[] = {
+            // Add a parentid columne to capturecard.
+            "ALTER TABLE capturecard "
+            "    ADD parentid INT UNSIGNED NOT NULL DEFAULT 0 AFTER cardid",
+            "UPDATE capturecard c, "
+            "       (SELECT min(cardid) cardid, hostname, videodevice, "
+            "               inputname "
+            "        FROM capturecard "
+            "        GROUP BY hostname, videodevice, inputname) mins "
+            "SET c.parentid = mins.cardid "
+            "WHERE c.hostname = mins.hostname and "
+            "      c.videodevice = mins.videodevice and "
+            "      c.inputname = mins.inputname and "
+            "      c.cardid <> mins.cardid",
+            NULL
+        };
+        if (!performActualUpdate(updates, "1337", dbver))
+            return false;
+    }
+
+    if (dbver == "1337")
+    {
+        const char *updates[] = {
+            // All next_record, last_record and last_delete to be NULL.
+            "ALTER TABLE record MODIFY next_record DATETIME NULL",
+            "UPDATE record SET next_record = NULL "
+            "    WHERE next_record = '0000-00-00 00:00:00'",
+            "ALTER TABLE record MODIFY last_record DATETIME NULL",
+            "UPDATE record SET last_record = NULL "
+            "    WHERE last_record = '0000-00-00 00:00:00'",
+            "ALTER TABLE record MODIFY last_delete DATETIME NULL",
+            "UPDATE record SET last_delete = NULL "
+            "    WHERE last_delete = '0000-00-00 00:00:00'",
+            NULL
+        };
+        if (!performActualUpdate(updates, "1338", dbver))
+            return false;
+    }
+
+    if (dbver == "1338")
+    {
+        const char *updates[] = {
+            "CREATE TABLE users ("
+            " userid int(5) unsigned NOT NULL AUTO_INCREMENT,"
+            " username varchar(128) NOT NULL DEFAULT '',"
+            " password_digest varchar(32) NOT NULL DEFAULT '',"
+            " lastlogin datetime NOT NULL DEFAULT '0000-00-00 00:00:00',"
+            " PRIMARY KEY (userid),"
+            " KEY username (username)"
+            " ) ENGINE=MyISAM DEFAULT CHARSET=utf8;",
+            "CREATE TABLE user_permissions ("
+            " userid int(5) unsigned NOT NULL,"
+            " permission varchar(128) NOT NULL DEFAULT '',"
+            " PRIMARY KEY (userid)"
+            " ) ENGINE=MyISAM DEFAULT CHARSET=utf8;",
+            "CREATE TABLE user_sessions ("
+            " sessiontoken varchar(40) NOT NULL DEFAULT ''," // SHA1
+            " userid int(5) unsigned NOT NULL,"
+            " client varchar(128) NOT NULL, "
+            " created datetime NOT NULL,"
+            " lastactive datetime NOT NULL,"
+            " expires datetime NOT NULL,"
+            " PRIMARY KEY (sessionToken),"
+            " UNIQUE KEY userid_client (userid,client)"
+            " ) ENGINE=MyISAM DEFAULT CHARSET=utf8;",
+            "INSERT INTO users SET username='admin'," // Temporary default account
+            " password_digest='bcd911b2ecb15ffbd6d8e6e744d60cf6';",
+            NULL
+        };
+        if (!performActualUpdate(updates, "1339", dbver))
             return false;
     }
 

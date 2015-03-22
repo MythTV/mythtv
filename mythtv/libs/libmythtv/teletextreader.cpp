@@ -1,9 +1,12 @@
 #include "teletextreader.h"
-#include "mythlogging.h"
 
 #include <string.h>
+
 #include "vbilut.h"
 #include "tv.h"
+#include "mythuiactions.h" // for ACTION_0, ACTION_1, etc
+#include "tv_actions.h"    // for ACTION_MENUBLUE, etc
+#include "mythlogging.h"
 
 #define MAGAZINE(page) (page / 256)
 

@@ -824,8 +824,8 @@ int ChannelUtil::GetInputID(int source_id, int card_id)
     int input_id = -1;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT cardinputid"
-                  " FROM cardinput"
+    query.prepare("SELECT cardid"
+                  " FROM capturecard"
                   " WHERE sourceid = :SOURCEID"
                   " AND cardid = :CARDID");
     query.bindValue(":SOURCEID", source_id);
@@ -841,10 +841,9 @@ QStringList ChannelUtil::GetCardTypes(uint chanid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT cardtype "
-                  "FROM capturecard, cardinput, channel "
-                  "WHERE channel.chanid   = :CHANID            AND "
-                  "      channel.sourceid = cardinput.sourceid AND "
-                  "      cardinput.cardid = capturecard.cardid "
+                  "FROM capturecard, channel "
+                  "WHERE channel.chanid   = :CHANID              AND "
+                  "      channel.sourceid = capturecard.sourceid "
                   "GROUP BY cardtype");
     query.bindValue(":CHANID", chanid);
 
@@ -973,12 +972,11 @@ QString ChannelUtil::GetChannelValueStr(const QString &channel_field,
     query.prepare(
         QString(
             "SELECT channel.%1 "
-            "FROM channel, capturecard, cardinput "
-            "WHERE channel.channum      = :CHANNUM           AND "
-            "      channel.sourceid     = cardinput.sourceid AND "
-            "      cardinput.inputname  = :INPUT             AND "
-            "      cardinput.cardid     = capturecard.cardid AND "
-            "      capturecard.cardid   = :CARDID ")
+            "FROM channel, capturecard "
+            "WHERE channel.channum       = :CHANNUM             AND "
+            "      channel.sourceid      = capturecard.sourceid AND "
+            "      capturecard.inputname = :INPUT               AND "
+            "      capturecard.cardid    = :CARDID ")
         .arg(channel_field));
 
     query.bindValue(":CARDID",   cardid);
@@ -1086,12 +1084,12 @@ static QStringList get_valid_recorder_list(uint chanid)
     MSqlQuery query(MSqlQuery::InitCon());
     // We want to get the current source id for this recorder
     query.prepare(
-            "SELECT cardinput.cardid "
+            "SELECT capturecard.cardid "
             "FROM channel "
-            "LEFT JOIN cardinput ON channel.sourceid = cardinput.sourceid "
+            "LEFT JOIN capturecard ON channel.sourceid = capturecard.sourceid "
             "WHERE channel.chanid = :CHANID AND "
-            "      cardinput.livetvorder > 0 "
-            "ORDER BY cardinput.livetvorder, cardinput.cardinputid");
+            "      capturecard.livetvorder > 0 "
+            "ORDER BY capturecard.livetvorder, capturecard.cardid");
     query.bindValue(":CHANID", chanid);
 
     if (!query.exec() || !query.isActive())
@@ -1120,12 +1118,12 @@ static QStringList get_valid_recorder_list(const QString &channum)
     MSqlQuery query(MSqlQuery::InitCon());
     // We want to get the current source id for this recorder
     query.prepare(
-        "SELECT cardinput.cardid "
+        "SELECT capturecard.cardid "
         "FROM channel "
-        "LEFT JOIN cardinput ON channel.sourceid = cardinput.sourceid "
+        "LEFT JOIN capturecard ON channel.sourceid = capturecard.sourceid "
         "WHERE channel.channum = :CHANNUM AND "
-        "      cardinput.livetvorder > 0 "
-        "ORDER BY cardinput.livetvorder, cardinput.cardinputid");
+        "      capturecard.livetvorder > 0 "
+        "ORDER BY capturecard.livetvorder, capturecard.cardid");
     query.bindValue(":CHANNUM", channum);
 
     if (!query.exec() || !query.isActive())
@@ -2058,14 +2056,12 @@ ChannelInfoList ChannelUtil::GetChannelsInternal(
         "SELECT channum, callsign, channel.chanid, "
         "       atsc_major_chan, atsc_minor_chan, "
         "       name, icon, mplexid, visible, "
-        "       channel.sourceid, GROUP_CONCAT(DISTINCT cardinput.cardid),"
+        "       channel.sourceid, GROUP_CONCAT(DISTINCT capturecard.cardid), "
         "       GROUP_CONCAT(DISTINCT channelgroup.grpid), "
         "       xmltvid "
         "FROM channel "
-        "LEFT JOIN channelgroup ON channel.chanid     = channelgroup.chanid "
-        " %1  JOIN cardinput    ON cardinput.sourceid = channel.sourceid "
-        " %2  JOIN capturecard  ON cardinput.cardid   = capturecard.cardid ")
-        .arg((include_disconnected) ? "LEFT" : "")
+        "LEFT JOIN channelgroup ON channel.chanid       = channelgroup.chanid "
+        " %1  JOIN capturecard  ON capturecard.sourceid = channel.sourceid ")
         .arg((include_disconnected) ? "LEFT" : "");
 
     QString cond = " WHERE ";
@@ -2432,11 +2428,10 @@ ChannelInfoList ChannelUtil::LoadChannels(uint startIndex, uint count,
                   "default_authority, commmethod, tmoffset, iptvid, "
                   "channel.chanid, "
                   "GROUP_CONCAT(DISTINCT channelgroup.grpid), " // Creates a CSV list of channel groupids for this channel
-                  "GROUP_CONCAT(DISTINCT cardinput.cardid) " // Creates a CSV list of cardids for this channel
+                  "GROUP_CONCAT(DISTINCT capturecard.cardid) " // Creates a CSV list of cardids for this channel
                   "FROM channel "
                   "LEFT JOIN channelgroup ON channel.chanid = channelgroup.chanid "
-                  "LEFT JOIN cardinput    ON cardinput.sourceid = channel.sourceid "
-                  "LEFT JOIN capturecard  ON cardinput.cardid   = capturecard.cardid ";
+                  "LEFT JOIN capturecard  ON capturecard.sourceid = channel.sourceid ";
 
     QStringList cond;
     if (ignoreHidden)

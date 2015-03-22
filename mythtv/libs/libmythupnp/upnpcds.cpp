@@ -82,8 +82,8 @@ UPnpCDS::UPnpCDS( UPnpDevice *pDevice, const QString &sSharePath )
     m_root.m_bRestricted = true;
     m_root.m_bSearchable = true;
 
-    AddVariable( new StateVariable< QString        >( "TransferIDs"       , true ) );
-    AddVariable( new StateVariable< QString        >( "ContainerUpdateIDs", true ) );
+    AddVariable( new StateVariable< QString  >( "TransferIDs"       , true ) );
+    AddVariable( new StateVariable< QString  >( "ContainerUpdateIDs", true ) );
     AddVariable( new StateVariable< uint16_t >( "SystemUpdateID"    , true ) );
     AddVariable( new StateVariable< QString  >( "ServiceResetToken" , true ) );
 
@@ -100,7 +100,7 @@ UPnpCDS::UPnpCDS( UPnpDevice *pDevice, const QString &sSharePath )
     m_sServiceDescFileName = sUPnpDescPath + "CDS_scpd.xml";
     m_sControlUrl          = "/CDS_Control";
 
-    m_pShortCuts = new UPnPCDSShortcuts();
+    m_pShortCuts = new UPnPShortcutFeature();
     RegisterFeature(m_pShortCuts);
 
     // Add our Service Definition to the device.
@@ -197,7 +197,7 @@ void UPnpCDS::UnregisterExtension( UPnpCDSExtension *pExtension )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpCDS::RegisterShortCut(UPnPCDSShortcuts::ShortCutType type,
+void UPnpCDS::RegisterShortCut(UPnPShortcutFeature::ShortCutType type,
                                const QString& objectID)
 {
     m_pShortCuts->AddShortCut(type, objectID);
@@ -316,7 +316,7 @@ void UPnpCDS::DetermineClient( HTTPRequest *pRequest,
     {
         UPnpCDSClientException *except = &clientExceptions[i];
 
-        QString sHeaderValue = pRequest->GetHeaderValue(except->sHeaderKey, "");
+        QString sHeaderValue = pRequest->GetRequestHeader(except->sHeaderKey, "");
         int idx = sHeaderValue.indexOf(except->sHeaderValue);
         if (idx != -1)
         {
@@ -1098,7 +1098,7 @@ CDSObject* UPnpCDSExtension::GetRoot()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QString UPnPCDSShortcuts::CreateXML()
+QString UPnPShortcutFeature::CreateXML()
 {
     QString xml;
 
@@ -1120,7 +1120,7 @@ QString UPnPCDSShortcuts::CreateXML()
     return xml;
 }
 
-bool UPnPCDSShortcuts::AddShortCut(ShortCutType type,
+bool UPnPShortcutFeature::AddShortCut(ShortCutType type,
                                          const QString &objectID)
 {
     if (!m_shortcuts.contains(type))
@@ -1133,7 +1133,7 @@ bool UPnPCDSShortcuts::AddShortCut(ShortCutType type,
     return false;
 }
 
-QString UPnPCDSShortcuts::TypeToName(ShortCutType type)
+QString UPnPShortcutFeature::TypeToName(ShortCutType type)
 {
     QString str;
 

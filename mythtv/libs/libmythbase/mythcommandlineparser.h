@@ -128,7 +128,7 @@ class MBASE_PUBLIC MythCommandLineParser
     // bool with default
     CommandLineArg* add(QString arg, QString name, bool def,
                         QString help, QString longhelp)
-          { return add(QStringList(arg), name, QVariant::Bool,    
+          { return add(QStringList(arg), name, QVariant::Bool,
                        QVariant(def), help, longhelp); }
     // int
     CommandLineArg* add(QString arg, QString name, int def,
@@ -296,4 +296,3 @@ class MBASE_PUBLIC MythCommandLineParser
     bool                            m_overridesImported;
     bool                            m_verbose;
 };
-

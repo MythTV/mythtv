@@ -1,4 +1,4 @@
-#include <QImage>
+
 #include <QDir>
 #include <QCoreApplication>
 
@@ -7,6 +7,7 @@
 #include "bdnav/navigation.h"
 #include "bdnav/bdparse.h"
 #include "decoders/overlay.h"
+#include "keys.h"                       // for ::BD_VK_POPUP, ::BD_VK_0, etc
 
 #include "mythmainwindow.h"
 #include "mythevent.h"
@@ -17,8 +18,9 @@
 #include "mythlocale.h"
 #include "mythdirs.h"
 #include "bluray.h"
-#include "tv.h" // for actions
 #include "mythiowrapper.h"
+#include "mythuiactions.h"              // for ACTION_0, ACTION_1, etc
+#include "tv_actions.h"                 // for ACTION_CHANNELDOWN, etc
 
 #define LOC      QString("BDRingBuf: ")
 

@@ -108,7 +108,7 @@ TVRec::TVRec(int capturecardnum)
       triggerEventSleepLock(QMutex::NonRecursive),
       triggerEventSleepSignal(false),
       switchingBuffer(false),
-      m_recStatus(rsUnknown),
+      m_recStatus(RecStatus::Unknown),
       // Current recording info
       curRecording(NULL),
       overrecordseconds(0),
@@ -118,7 +118,7 @@ TVRec::TVRec(int capturecardnum)
       // tvchain
       tvchain(NULL),
       // RingBuffer info
-      ringBuffer(NULL), rbFileExt("mpg")
+      ringBuffer(NULL), rbFileExt("ts")
 {
     QMutexLocker locker(&cardsLock);
     cards[cardid] = this;
@@ -154,7 +154,7 @@ bool TVRec::Init(void)
     if (!GetDevices(cardid, genOpt, dvbOpt, fwOpt))
         return false;
 
-    SetRecordingStatus(rsUnknown, __LINE__);
+    SetRecordingStatus(RecStatus::Unknown, __LINE__);
 
     // configure the Channel instance
     QString startchannel = GetStartChannel(cardid,
@@ -258,11 +258,11 @@ ProgramInfo *TVRec::GetRecording(void)
     if (curRecording && !changeState)
     {
         tmppginfo = new ProgramInfo(*curRecording);
-        tmppginfo->SetRecordingStatus(rsRecording);
+        tmppginfo->SetRecordingStatus(RecStatus::Recording);
     }
     else
         tmppginfo = new ProgramInfo();
-    tmppginfo->SetCardID(cardid);
+    tmppginfo->SetInputID(cardid);
 
     return tmppginfo;
 }
@@ -290,9 +290,9 @@ void TVRec::RecordPending(const ProgramInfo *rcinfo, int secsleft,
     if (secsleft < 0)
     {
         LOG(VB_RECORD, LOG_INFO, LOC + "Pending recording revoked on " +
-            QString("inputid %1").arg(rcinfo->GetInputID()));
+            QString("cardid %1").arg(rcinfo->GetInputID()));
 
-        PendingMap::iterator it = pendingRecordings.find(rcinfo->GetCardID());
+        PendingMap::iterator it = pendingRecordings.find(rcinfo->GetInputID());
         if (it != pendingRecordings.end())
         {
             (*it).ask = false;
@@ -302,7 +302,7 @@ void TVRec::RecordPending(const ProgramInfo *rcinfo, int secsleft,
     }
 
     LOG(VB_RECORD, LOG_INFO, LOC +
-        QString("RecordPending on inputid %1").arg(rcinfo->GetInputID()));
+        QString("RecordPending on cardid %1").arg(rcinfo->GetInputID()));
 
     PendingInfo pending;
     pending.info            = new ProgramInfo(*rcinfo);
@@ -311,17 +311,17 @@ void TVRec::RecordPending(const ProgramInfo *rcinfo, int secsleft,
     pending.ask             = true;
     pending.doNotAsk        = false;
 
-    pendingRecordings[rcinfo->GetCardID()] = pending;
+    pendingRecordings[rcinfo->GetInputID()] = pending;
 
     // If this isn't a recording for this instance to make, we are done
-    if (rcinfo->GetCardID() != cardid)
+    if (rcinfo->GetInputID() != cardid)
         return;
 
     // We also need to check our input groups
     vector<uint> cardids = CardUtil::GetConflictingCards(
         rcinfo->GetInputID(), cardid);
 
-    pendingRecordings[rcinfo->GetCardID()].possibleConflicts = cardids;
+    pendingRecordings[rcinfo->GetInputID()].possibleConflicts = cardids;
 
     pendlock.unlock();
     statelock.unlock();
@@ -408,7 +408,7 @@ void TVRec::CancelNextRecording(bool cancel)
  *  \sa EncoderLink::StartRecording(ProgramInfo*)
  *      RecordPending(const ProgramInfo*, int, bool), StopRecording()
  */
-RecStatusType TVRec::StartRecording(ProgramInfo *pginfo)
+RecStatus::Type TVRec::StartRecording(ProgramInfo *pginfo)
 {
     RecordingInfo ri(*pginfo);
     ri.SetDesiredStartTime(ri.GetRecordingStartTime());
@@ -421,15 +421,15 @@ RecStatusType TVRec::StartRecording(ProgramInfo *pginfo)
     QMutexLocker lock(&stateChangeLock);
     QString msg("");
 
-    if (m_recStatus != rsFailing)
-        SetRecordingStatus(rsAborted, __LINE__);
+    if (m_recStatus != RecStatus::Failing)
+        SetRecordingStatus(RecStatus::Aborted, __LINE__);
 
     // Flush out any pending state changes
     WaitForEventThreadSleep();
 
     // We need to do this check early so we don't cancel an overrecord
     // that we're trying to extend.
-    if (internalState != kState_WatchingLiveTV && m_recStatus != rsFailing &&
+    if (internalState != kState_WatchingLiveTV && m_recStatus != RecStatus::Failing &&
         curRecording && curRecording->IsSameProgramWeakCheck(*rcinfo))
     {
         int post_roll_seconds  = curRecording->GetRecordingEndTime()
@@ -451,8 +451,8 @@ RecStatusType TVRec::StartRecording(ProgramInfo *pginfo)
 
         ClearFlags(kFlagCancelNextRecording, __FILE__, __LINE__);
 
-        SetRecordingStatus(rsRecording, __LINE__);
-        return rsRecording;
+        SetRecordingStatus(RecStatus::Recording, __LINE__);
+        return RecStatus::Recording;
     }
 
     bool cancelNext = false;
@@ -579,7 +579,7 @@ RecStatusType TVRec::StartRecording(ProgramInfo *pginfo)
             // Make sure scheduler is allowed to end this recording
             ClearFlags(kFlagCancelNextRecording, __FILE__, __LINE__);
 
-            SetRecordingStatus(rsRecording, __LINE__);
+            SetRecordingStatus(RecStatus::Recording, __LINE__);
         }
         else
         {
@@ -613,8 +613,8 @@ RecStatusType TVRec::StartRecording(ProgramInfo *pginfo)
         // Make sure scheduler is allowed to end this recording
         ClearFlags(kFlagCancelNextRecording, __FILE__, __LINE__);
 
-        if (m_recStatus != rsFailing)
-            SetRecordingStatus(rsTuning, __LINE__);
+        if (m_recStatus != RecStatus::Failing)
+            SetRecordingStatus(RecStatus::Tuning, __LINE__);
         else
             LOG(VB_RECORD, LOG_WARNING, LOC + "Still failing.");
         ChangeState(kState_RecordingOnly);
@@ -623,7 +623,7 @@ RecStatusType TVRec::StartRecording(ProgramInfo *pginfo)
     {
         SetPseudoLiveTVRecording(new RecordingInfo(*rcinfo));
         recordEndTime = GetRecordEndTime(rcinfo);
-        SetRecordingStatus(rsRecording, __LINE__);
+        SetRecordingStatus(RecStatus::Recording, __LINE__);
 
         // We want the frontend to change channel for recording
         // and disable the UI for channel change, PiP, etc.
@@ -644,13 +644,13 @@ RecStatusType TVRec::StartRecording(ProgramInfo *pginfo)
         if (cancelNext)
         {
             msg += "But a user has canceled this recording";
-            SetRecordingStatus(rsCancelled, __LINE__);
+            SetRecordingStatus(RecStatus::Cancelled, __LINE__);
         }
         else
         {
             msg += QString("But the current state is: %1")
                 .arg(StateToString(internalState));
-            SetRecordingStatus(rsTunerBusy, __LINE__);
+            SetRecordingStatus(RecStatus::TunerBusy, __LINE__);
         }
 
         if (curRecording && internalState == kState_RecordingOnly)
@@ -672,12 +672,12 @@ RecStatusType TVRec::StartRecording(ProgramInfo *pginfo)
 
         QMutexLocker locker(&pendingRecLock);
         if ((curRecording) &&
-            (curRecording->GetRecordingStatus() == rsFailed) &&
-            (m_recStatus == rsRecording ||
-             m_recStatus == rsTuning ||
-             m_recStatus == rsFailing))
+            (curRecording->GetRecordingStatus() == RecStatus::Failed) &&
+            (m_recStatus == RecStatus::Recording ||
+             m_recStatus == RecStatus::Tuning ||
+             m_recStatus == RecStatus::Failing))
         {
-            SetRecordingStatus(rsFailed, __LINE__, true);
+            SetRecordingStatus(RecStatus::Failed, __LINE__, true);
         }
         return m_recStatus;
     }
@@ -685,16 +685,16 @@ RecStatusType TVRec::StartRecording(ProgramInfo *pginfo)
     return GetRecordingStatus();
 }
 
-RecStatusType TVRec::GetRecordingStatus(void) const
+RecStatus::Type TVRec::GetRecordingStatus(void) const
 {
     QMutexLocker pendlock(&pendingRecLock);
     return m_recStatus;
 }
 
 void TVRec::SetRecordingStatus(
-    RecStatusType new_status, int line, bool have_lock)
+    RecStatus::Type new_status, int line, bool have_lock)
 {
-    RecStatusType old_status;
+    RecStatus::Type old_status;
     if (have_lock)
     {
         old_status = m_recStatus;
@@ -710,8 +710,8 @@ void TVRec::SetRecordingStatus(
 
     LOG(VB_RECORD, LOG_INFO, LOC +
         QString("SetRecordingStatus(%1->%2) on line %3")
-        .arg(toString(old_status, kSingleRecord))
-        .arg(toString(new_status, kSingleRecord))
+        .arg(RecStatus::toString(old_status, kSingleRecord))
+        .arg(RecStatus::toString(new_status, kSingleRecord))
         .arg(line));
 }
 
@@ -739,7 +739,7 @@ void TVRec::StopRecording(bool killFile)
         WaitForEventThreadSleep();
         ClearFlags(kFlagCancelNextRecording|kFlagKillRec, __FILE__, __LINE__);
 
-        SetRecordingStatus(rsUnknown, __LINE__);
+        SetRecordingStatus(RecStatus::Unknown, __LINE__);
     }
 }
 
@@ -851,14 +851,14 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
         recq = NULL;
     }
 
-    RecStatusTypes ors = curRec->GetRecordingStatus();
+    RecStatus::Type ors = curRec->GetRecordingStatus();
     // Set the final recording status
-    if (curRec->GetRecordingStatus() == rsRecording)
-        curRec->SetRecordingStatus(rsRecorded);
-    else if (curRec->GetRecordingStatus() != rsRecorded)
-        curRec->SetRecordingStatus(rsFailed);
+    if (curRec->GetRecordingStatus() == RecStatus::Recording)
+        curRec->SetRecordingStatus(RecStatus::Recorded);
+    else if (curRec->GetRecordingStatus() != RecStatus::Recorded)
+        curRec->SetRecordingStatus(RecStatus::Failed);
     curRec->SetRecordingEndTime(MythDate::current(true));
-    is_good &= (curRec->GetRecordingStatus() == rsRecorded);
+    is_good &= (curRec->GetRecordingStatus() == RecStatus::Recorded);
 
     // Figure out if this was already done for this recording
     bool was_finished = false;
@@ -893,8 +893,8 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
             .arg(is_good ? "Good" : "Bad")
             .arg(curRec->GetTitle())
             .arg(recgrp)
-            .arg(toString(ors, kSingleRecord))
-            .arg(toString(curRec->GetRecordingStatus(), kSingleRecord))
+            .arg(RecStatus::toString(ors, kSingleRecord))
+            .arg(RecStatus::toString(curRec->GetRecordingStatus(), kSingleRecord))
             .arg(HasFlags(kFlagDummyRecorderRunning)?"is_dummy":"not_dummy")
             .arg(was_finished?"already_finished":"finished_now"));
 
@@ -934,7 +934,7 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
     // Generate a preview
     uint64_t fsize = curRec->GetFilesize();
     if (curRec->IsLocal() && (fsize >= 1000) &&
-        (curRec->GetRecordingStatus() == rsRecorded))
+        (curRec->GetRecordingStatus() == RecStatus::Recorded))
     {
         PreviewGeneratorQueue::GetPreviewImage(*curRec, "");
     }
@@ -947,13 +947,13 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
     {
         LOG(VB_RECORD, LOG_INFO, LOC +
             QString("FinishedRecording -- UPDATE_RECORDING_STATUS: %1")
-            .arg(toString(is_good ? curRec->GetRecordingStatus()
-                          : rsFailed, kSingleRecord)));
+            .arg(RecStatus::toString(is_good ? curRec->GetRecordingStatus()
+                          : RecStatus::Failed, kSingleRecord)));
         MythEvent me(QString("UPDATE_RECORDING_STATUS %1 %2 %3 %4 %5")
-                     .arg(curRec->GetCardID())
+                     .arg(curRec->GetInputID())
                      .arg(curRec->GetChanID())
                      .arg(curRec->GetScheduledStartTime(MythDate::ISODate))
-                     .arg(is_good ? curRec->GetRecordingStatus() : rsFailed)
+                     .arg(is_good ? curRec->GetRecordingStatus() : RecStatus::Failed)
                      .arg(curRec->GetRecordingEndTime(MythDate::ISODate)));
         gCoreContext->dispatch(me);
     }
@@ -983,7 +983,7 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
     }
     LOG(VB_JOBQUEUE, LOG_INFO, QString("AutoRunJobs 0x%1").arg(*autoJob,0,16));
     if ((recgrp == "LiveTV") || (fsize < 1000) ||
-        (curRec->GetRecordingStatus() != rsRecorded) ||
+        (curRec->GetRecordingStatus() != RecStatus::Recorded) ||
         (curRec->GetRecordingStartTime().secsTo(
             MythDate::current()) < 120))
     {
@@ -1112,7 +1112,7 @@ void TVRec::ChangeState(TVState nextState)
 void TVRec::TeardownRecorder(uint request_flags)
 {
     LOG(VB_RECORD, LOG_INFO, LOC + QString("TeardownRecorder(%1)")
-        .arg(request_flags & kFlagKillRec ? "kFlagKillRec" : ""));
+        .arg((request_flags & kFlagKillRec) ? "kFlagKillRec" : ""));
 
     pauseNotify = false;
     ispip = false;
@@ -1148,7 +1148,7 @@ void TVRec::TeardownRecorder(uint request_flags)
     if (curRecording)
     {
         if (!!(request_flags & kFlagKillRec))
-            curRecording->SetRecordingStatus(rsFailed);
+            curRecording->SetRecordingStatus(RecStatus::Failed);
 
         FinishedRecording(curRecording, recq);
 
@@ -1197,9 +1197,9 @@ static bool get_use_eit(uint cardid)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT SUM(useeit) "
-        "FROM videosource, cardinput "
-        "WHERE videosource.sourceid = cardinput.sourceid AND"
-        "      cardinput.cardid     = :CARDID");
+        "FROM videosource, capturecard "
+        "WHERE videosource.sourceid = capturecard.sourceid AND"
+        "      capturecard.cardid     = :CARDID");
     query.bindValue(":CARDID", cardid);
 
     if (!query.exec() || !query.isActive())
@@ -1217,9 +1217,9 @@ static bool is_dishnet_eit(uint cardid)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT SUM(dishnet_eit) "
-        "FROM videosource, cardinput "
-        "WHERE videosource.sourceid = cardinput.sourceid AND"
-        "      cardinput.cardid     = :CARDID");
+        "FROM videosource, capturecard "
+        "WHERE videosource.sourceid = capturecard.sourceid AND"
+        "      capturecard.cardid     = :CARDID");
     query.bindValue(":CARDID", cardid);
 
     if (!query.exec() || !query.isActive())
@@ -1342,7 +1342,7 @@ void TVRec::run(void)
                 // Check for recorder errors
                 if (recorder->IsErrored())
                 {
-                    curRecording->SetRecordingStatus(rsFailed);
+                    curRecording->SetRecordingStatus(RecStatus::Failed);
 
                     if (GetState() == kState_WatchingLiveTV)
                     {
@@ -1547,7 +1547,7 @@ void TVRec::HandlePendingRecordings(void)
         {
             LOG(VB_RECORD, LOG_INFO, LOC + "Deleting stale pending recording " +
                 QString("%1 '%2'")
-                    .arg((*it).info->GetCardID())
+                    .arg((*it).info->GetInputID())
                     .arg((*it).info->GetTitle()));
 
             delete (*it).info;
@@ -1560,7 +1560,7 @@ void TVRec::HandlePendingRecordings(void)
     it = pendingRecordings.begin();
     if ((1 == pendingRecordings.size()) &&
         (*it).ask &&
-        ((*it).info->GetCardID() == cardid) &&
+        ((*it).info->GetInputID() == cardid) &&
         (GetState() == kState_WatchingLiveTV))
     {
         CheckForRecGroupChange();
@@ -1691,8 +1691,8 @@ QString TVRec::GetStartChannel(uint cardid, const QString &startinput)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT startchan "
-        "FROM cardinput "
-        "WHERE cardinput.cardid   = :CARDID    AND "
+        "FROM capturecard "
+        "WHERE capturecard.cardid = :CARDID    AND "
         "      inputname          = :INPUTNAME");
     query.bindValue(":CARDID",    cardid);
     query.bindValue(":INPUTNAME", startinput);
@@ -1716,9 +1716,8 @@ QString TVRec::GetStartChannel(uint cardid, const QString &startinput)
     // get a valid channel on our current input.
     query.prepare(
         "SELECT channum "
-        "FROM capturecard, cardinput, channel "
-        "WHERE capturecard.cardid = cardinput.cardid   AND "
-        "      channel.sourceid   = cardinput.sourceid AND "
+        "FROM capturecard, channel "
+        "WHERE channel.sourceid   = capturecard.sourceid AND "
         "      capturecard.cardid = :CARDID AND "
         "      inputname          = :INPUTNAME");
     query.bindValue(":CARDID",    cardid);
@@ -1743,9 +1742,8 @@ QString TVRec::GetStartChannel(uint cardid, const QString &startinput)
     // widen search to any input.
     query.prepare(
         "SELECT channum, inputname "
-        "FROM capturecard, cardinput, channel "
-        "WHERE capturecard.cardid = cardinput.cardid   AND "
-        "      channel.sourceid   = cardinput.sourceid AND "
+        "FROM capturecard, channel "
+        "WHERE channel.sourceid   = capturecard.sourceid AND "
         "      capturecard.cardid = :CARDID");
     query.bindValue(":CARDID", cardid);
 
@@ -2169,13 +2167,13 @@ bool TVRec::ShouldSwitchToAnotherCard(QString chanid)
 
     query.prepare(
         "SELECT channel.channum "
-        "FROM channel,cardinput "
+        "FROM channel, capturecard "
         "WHERE ( channel.chanid = :CHANID OR             "
         "        ( channel.channum  = :CHANNUM AND       "
         "          channel.callsign = :CALLSIGN    )     "
         "      )                                     AND "
-        "      channel.sourceid = cardinput.sourceid AND "
-        "      cardinput.cardid = :CARDID");
+        "      channel.sourceid = capturecard.sourceid AND "
+        "      capturecard.cardid = :CARDID");
     query.bindValue(":CHANID", chanid);
     query.bindValue(":CHANNUM", channelname);
     query.bindValue(":CALLSIGN", callsign);
@@ -2194,14 +2192,14 @@ bool TVRec::ShouldSwitchToAnotherCard(QString chanid)
 
     // We didn't find it on the current card, so now we check other cards.
     query.prepare(
-        "SELECT channel.channum, cardinput.cardid "
-        "FROM channel,cardinput "
+        "SELECT channel.channum, capturecard.cardid "
+        "FROM channel, capturecard "
         "WHERE ( channel.chanid = :CHANID OR              "
         "        ( channel.channum  = :CHANNUM AND        "
         "          channel.callsign = :CALLSIGN    )      "
         "      )                                      AND "
-        "      channel.sourceid  = cardinput.sourceid AND "
-        "      cardinput.cardid != :CARDID");
+        "      channel.sourceid  = capturecard.sourceid AND "
+        "      capturecard.cardid != :CARDID");
     query.bindValue(":CHANID", chanid);
     query.bindValue(":CHANNUM", channelname);
     query.bindValue(":CALLSIGN", callsign);
@@ -2296,11 +2294,10 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
 
     MSqlQuery query(MSqlQuery::InitCon());
     QString basequery = QString(
-        "SELECT channel.chanid, channel.channum, cardinput.cardid "
-        "FROM channel, capturecard, cardinput "
+        "SELECT channel.chanid, channel.channum, capturecard.cardid "
+        "FROM channel, capturecard "
         "WHERE channel.channum LIKE '%1%'            AND "
-        "      channel.sourceid = cardinput.sourceid AND "
-        "      cardinput.cardid = capturecard.cardid");
+        "      channel.sourceid = capturecard.sourceid");
 
     QString cardquery[2] =
     {
@@ -2698,27 +2695,6 @@ void TVRec::CheckForRecGroupChange(void)
     }
 }
 
-static uint get_input_id(uint cardid, const QString &inputname)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    query.prepare(
-        "SELECT cardinputid "
-        "FROM cardinput "
-        "WHERE cardid    = :CARDID AND "
-        "      inputname = :INNAME");
-
-    query.bindValue(":CARDID", cardid);
-    query.bindValue(":INNAME", inputname);
-
-    if (!query.exec() || !query.isActive())
-        MythDB::DBError("get_input_id", query);
-    else if (query.next())
-        return query.value(0).toUInt();
-
-    return 0;
-}
-
 /** \fn TVRec::NotifySchedulerOfRecording(RecordingInfo*)
  *  \brief Tell scheduler about the recording.
  *
@@ -2735,8 +2711,7 @@ void TVRec::NotifySchedulerOfRecording(RecordingInfo *rec)
 
     // Notify scheduler of the recording.
     // + set up recording so it can be resumed
-    rec->SetCardID(cardid);
-    rec->SetInputID(get_input_id(cardid, channel->GetCurrentInput()));
+    rec->SetInputID(cardid);
     rec->SetRecordingRuleType(rec->GetRecordingRule()->m_type);
 
     if (rec->GetRecordingRuleType() == kNotRecording)
@@ -2748,10 +2723,10 @@ void TVRec::NotifySchedulerOfRecording(RecordingInfo *rec)
     // + remove any end offset which would mismatch the live session
     rec->GetRecordingRule()->m_endOffset = 0;
 
-    // + save rsInactive recstatus to so that a reschedule call
+    // + save RecStatus::Inactive recstatus to so that a reschedule call
     //   doesn't start recording this on another card before we
     //   send the SCHEDULER_ADD_RECORDING message to the scheduler.
-    rec->SetRecordingStatus(rsInactive);
+    rec->SetRecordingStatus(RecStatus::Inactive);
     rec->AddHistory(false);
 
     // + save RecordingRule so that we get a recordid
@@ -2762,7 +2737,7 @@ void TVRec::NotifySchedulerOfRecording(RecordingInfo *rec)
     rec->ApplyRecordRecID();
 
     // + set proper recstatus (saved later)
-    rec->SetRecordingStatus(rsRecording);
+    rec->SetRecordingStatus(RecStatus::Recording);
 
     // + pass proginfo to scheduler and reschedule
     QStringList prog;
@@ -2807,8 +2782,8 @@ void TVRec::InitAutoRunJobs(RecordingInfo *rec, AutoRunInitType t,
  *   NOTE: Currently the 'recording' parameter is ignored and decisions
  *         are based on the recording group alone.
  *
- *  \param recording Set to 1 to mark as rsRecording, set to 0 to mark as
- *         rsCancelled, and set to -1 to base the decision of the recording
+ *  \param recording Set to 1 to mark as RecStatus::Recording, set to 0 to mark as
+ *         RecStatus::Cancelled, and set to -1 to base the decision of the recording
  *         group.
  */
 void TVRec::SetLiveRecording(int recording)
@@ -2819,7 +2794,7 @@ void TVRec::SetLiveRecording(int recording)
 
     (void) recording;
 
-    RecStatusType recstat = rsCancelled;
+    RecStatus::Type recstat = RecStatus::Cancelled;
     bool was_rec = pseudoLiveTVRecording;
     CheckForRecGroupChange();
     if (was_rec && !pseudoLiveTVRecording)
@@ -2846,7 +2821,7 @@ void TVRec::SetLiveRecording(int recording)
     }
 
     MythEvent me(QString("UPDATE_RECORDING_STATUS %1 %2 %3 %4 %5")
-                 .arg(curRecording->GetCardID())
+                 .arg(curRecording->GetInputID())
                  .arg(curRecording->GetChanID())
                  .arg(curRecording->GetScheduledStartTime(MythDate::ISODate))
                  .arg(recstat)
@@ -3431,7 +3406,7 @@ void TVRec::RingBufferChanged(
         recordEndTime = GetRecordEndTime(pginfo);
         curRecording = new RecordingInfo(*pginfo);
         curRecording->MarkAsInUse(true, kRecorderInUseID);
-        curRecording->SetRecordingStatus(rsRecording);
+        curRecording->SetRecordingStatus(RecStatus::Recording);
     }
 
     SetRingBuffer(rb);
@@ -3687,7 +3662,7 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
         }
 
         if (HasFlags(kFlagRecorderRunning) ||
-            (curRecording && curRecording->GetRecordingStatus() == rsFailed))
+            (curRecording && curRecording->GetRecordingStatus() == RecStatus::Failed))
         {
             stateChangeLock.unlock();
             TeardownRecorder(request.flags);
@@ -3811,7 +3786,7 @@ void TVRec::TuningFrequency(const TuningRequest &request)
         if (!(request.flags & kFlagLiveTV) || !(request.flags & kFlagEITScan))
         {
             if (curRecording)
-                curRecording->SetRecordingStatus(rsFailed);
+                curRecording->SetRecordingStatus(RecStatus::Failed);
 
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("Failed to set channel to %1. Reverting to kState_None")
@@ -3963,7 +3938,7 @@ void TVRec::TuningFrequency(const TuningRequest &request)
  */
 MPEGStreamData *TVRec::TuningSignalCheck(void)
 {
-    RecStatusType newRecStatus;
+    RecStatus::Type newRecStatus;
     bool          keep_trying  = false;
 
     if (signalMonitor->IsAllGood())
@@ -3971,7 +3946,7 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
         LOG(VB_RECORD, LOG_INFO, LOC + "TuningSignalCheck: Good signal");
         if (curRecording && (MythDate::current() > startRecordingDeadline))
         {
-            newRecStatus = rsFailing;
+            newRecStatus = RecStatus::Failing;
             curRecording->SaveVideoProperties(VID_DAMAGED, VID_DAMAGED);
 
             QString desc = tr("Good signal seen after %1 ms")
@@ -3991,13 +3966,13 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
                 QString("It took longer than %1 ms to get a signal lock. "
                         "Keeping status of '%2'")
                 .arg(genOpt.channel_timeout)
-                .arg(toString(newRecStatus, kSingleRecord)));
+                .arg(RecStatus::toString(newRecStatus, kSingleRecord)));
             LOG(VB_GENERAL, LOG_WARNING, LOC +
                 "See 'Tuning timeout' in mythtv-setup for this capturecard");
         }
         else
         {
-            newRecStatus = rsRecording;
+            newRecStatus = RecStatus::Recording;
         }
     }
     else if (signalMonitor->IsErrored() ||
@@ -4007,7 +3982,7 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
             (signalMonitor->IsErrored() ? "failed" : "timed out"));
 
         ClearFlags(kFlagNeedToStartRecorder, __FILE__, __LINE__);
-        newRecStatus = rsFailed;
+        newRecStatus = RecStatus::Failed;
 
         if (scanner && HasFlags(kFlagEITScannerRunning))
         {
@@ -4021,7 +3996,7 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
     else if (curRecording && !reachedRecordingDeadline &&
              MythDate::current() > startRecordingDeadline)
     {
-        newRecStatus = rsFailing;
+        newRecStatus = RecStatus::Failing;
         reachedRecordingDeadline = true;
         keep_trying = true;
 
@@ -4044,7 +4019,7 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
             QString("TuningSignalCheck: taking more than %1 ms to get a lock. "
                     "marking this recording as '%2'.")
             .arg(genOpt.channel_timeout)
-            .arg(toString(newRecStatus, kSingleRecord)));
+            .arg(RecStatus::toString(newRecStatus, kSingleRecord)));
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             "See 'Tuning timeout' in mythtv-setup for this capturecard");
     }
@@ -4069,7 +4044,7 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
     {
         curRecording->SetRecordingStatus(newRecStatus);
         MythEvent me(QString("UPDATE_RECORDING_STATUS %1 %2 %3 %4 %5")
-                    .arg(curRecording->GetCardID())
+                    .arg(curRecording->GetInputID())
                     .arg(curRecording->GetChanID())
                     .arg(curRecording->GetScheduledStartTime(MythDate::ISODate))
                     .arg(newRecStatus)
@@ -4399,7 +4374,7 @@ void TVRec::TuningRestartRecorder(void)
         ProgramInfo *progInfo = tvchain->GetProgramAt(-1);
         RecordingInfo recinfo(*progInfo);
         delete progInfo;
-        recinfo.SetCardID(cardid);
+        recinfo.SetInputID(cardid);
         recorder->SetRecording(&recinfo);
     }
     recorder->Reset();
@@ -4607,7 +4582,7 @@ bool TVRec::GetProgramRingBufferForLiveTV(RecordingInfo **pginfo,
             chanid, MythDate::current(true), true, hoursMax);
     }
 
-    prog->SetCardID(cardid);
+    prog->SetInputID(cardid);
 
     if (prog->GetRecordingStartTime() == prog->GetRecordingEndTime())
     {
@@ -4837,7 +4812,7 @@ RecordingInfo *TVRec::SwitchRecordingRingBuffer(const RecordingInfo &rcinfo)
     if (!rb->IsOpen())
     {
         delete rb;
-        ri->SetRecordingStatus(rsFailed);
+        ri->SetRecordingStatus(RecStatus::Failed);
         FinishedRecording(ri, NULL);
         ri->MarkAsInUse(false, kRecorderInUseID);
         delete ri;
@@ -4851,7 +4826,7 @@ RecordingInfo *TVRec::SwitchRecordingRingBuffer(const RecordingInfo &rcinfo)
         SetFlags(kFlagRingBufferReady, __FILE__, __LINE__);
         recordEndTime = GetRecordEndTime(ri);
         switchingBuffer = true;
-        ri->SetRecordingStatus(rsRecording);
+        ri->SetRecordingStatus(RecStatus::Recording);
         LOG(VB_RECORD, LOG_INFO, LOC + "SwitchRecordingRingBuffer -> done");
         return ri;
     }

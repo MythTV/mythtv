@@ -19,11 +19,13 @@ function getSetting(hostname, key, defValue) {
     $.getJSON("/Myth/GetSetting",
         { HostName: hostname, Key: key, Default: defValue },
         function(data) {
-            result = data.SettingList.Settings[key];
+            result = data.String;
         }).error(function(data) {
             setErrorMessage("<i18n>Unable to retrieve setting.</i18n>");
         });
     $.ajaxSetup({ async: true });
+
+    console.log("getSetting(" + hostname + "," + key + "," + defValue + "):" + result);
 
     return result;
 }
@@ -94,22 +96,19 @@ function loadDiv(divName, contentURL, jsURL) {
 
 function setUIAttributes() {
     $( "input:button").button();
-// WTF? The following can be done natively in css with input:focus, this just
-// stomps all over any css overrides etc and should NOT be done
-//    $("input, textarea").addClass("idle");
-//    $("input, textarea").focus(function(){
-//            $(this).addClass("activeField").removeClass("idle");
-//    }).blur(function(){
-//            $(this).removeClass("activeField").addClass("idle");
-//    });
-}
-
-function clearDiv(divName) {
-    $("#" + divName).html("");
 }
 
 var currentContentURL;
 var currentJsUrl;
+
+function loadFrontendContent(contentURL) {
+    console.log("loadFrontendContent: URL(" + contentURL + ")");
+    currentContentURL = contentURL;
+    parent.document.getElementById("busyPopup").style.display = "block";
+    parent.document.getElementById("content").src = contentURL;
+    parent.document.getElementById("busyPopup").style.display = "none";
+}
+
 function loadContent(contentURL, jsURL) {
     console.log("loadContent: URL(" + contentURL + ") JSURL(" + jsURL + ")");
     currentContentURL = contentURL;
@@ -121,31 +120,55 @@ function reloadContent() {
     loadContent(currentContentURL, currentJsUrl);
 }
 
-function loadSetupContent(contentURL, jsURL) {
-    loadSetupJavascript();
-    loadContent(contentURL, jsURL);
-}
-
-function clearContent() {
-    clearDiv("content");
-}
-
 function loadSetupJavascript() {
     $.ajaxSetup({ async: false });
-    $.getScript("/setup/js/setup.js");
+    $.getScript("/setup/js/common.js");
     $.ajaxSetup({ async: true });
 }
 
 function loadSetupPage(pageName) {
-    loadSetupJavascript();
-    hideEditWindow();
-    loadContent("/setup/" + pageName + ".html",
-                "/setup/js/" + pageName + ".js");
+    // hideEditWindow();
+    var frame = document.getElementById("content");
+
+    var completeSetupLoad = function() {
+        var html = $.ajax({
+        url: "/setup/" + pageName + ".html",
+            async: false
+        }).responseText;
+
+        var script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.src = "/setup/js/" + pageName + ".js";
+
+        frame = document.getElementById("content");
+        frame.contentDocument.getElementById("content").innerHTML = html;
+        frame.contentDocument.head.appendChild(script);
+        frame.removeEventListener("load", completeSetupLoad);
+    };
+    frame.addEventListener("load", completeSetupLoad);
+    frame.src = "setup/setup_template.html";
 }
 
 function loadMiscPage(pageName) {
-    loadContent("/misc/" + pageName + ".html",
-                "/misc/js/" + pageName + ".js");
+    var frame = document.getElementById("content");
+
+    var completeMiscLoad = function() {
+        var html = $.ajax({
+        url: "/misc/" + pageName + ".html",
+            async: false
+        }).responseText;
+
+        var script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.src = "/misc/js/" + pageName + ".js";
+
+        frame = document.getElementById("content");
+        frame.contentDocument.getElementById("content").innerHTML = html;
+        frame.contentDocument.head.appendChild(script);
+        frame.removeEventListener("load", completeMiscLoad);
+    };
+    frame.addEventListener("load", completeMiscLoad);
+    frame.src = "misc/misc_template.html";
 }
 
 function loadEditWindow(contentURL, jsURL) {
@@ -166,6 +189,7 @@ function setStatusMessage(message) {
 
 var lastErrorTimer;
 function setErrorMessage(message) {
+    console.log("ERROR: " + message);
     if (lastErrorTimer)
         clearTimeout(lastErrorTimer);
     $("#header_error_message").html(message);
@@ -288,4 +312,33 @@ function formatStr() {
 function handleKeyPress(key) {
     if (currentContentURL == "/tv/guide.qsp")
         handleKeyboardShortcutsTV(key);
+}
+
+function logout()
+{
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.open("GET", "/setup/logout", true, "nouser", "nopass"); // Page doesn't exist
+    xmlhttp.setRequestHeader('X-Myth-Clear-Session', '1');
+    xmlhttp.send(null);
+    //xmlhttp.abort();
+    location.href = '/';
+}
+
+function formArray(form)
+{
+    var formArray = new Array();
+    for (i = 0; i < form.elements.length; i++)
+    {
+        // NOTE: This is a workaround for what seems to be a DOM bug or flaw
+        // While all form elements of a disabled fieldset _should_ be also be
+        // disabled it appears that the DOM in Chrome, Firefox and perhaps other
+        // browsers isn't properly updated to reflect this.
+        var isFieldsetDisabled = $(form.elements[i]).closest("fieldset", form).prop("disabled");
+        if (!isFieldsetDisabled && form.elements[i].disabled == false)
+        {
+            formArray[form.elements[i].name] = form.elements[i].value;
+        }
+    }
+
+    return formArray;
 }

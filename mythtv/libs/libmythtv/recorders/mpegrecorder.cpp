@@ -230,6 +230,20 @@ void MpegRecorder::SetOption(const QString &opt, const QString &value)
         {
             if (QString(streamType[i]) == value)
             {
+                if (QString(streamType[i]) == "MPEG-2 TS")
+                {
+                     m_containerFormat = formatMPEG2_TS;
+                }
+                else if (QString(streamType[i]) == "MPEG-2 PS")
+                {
+                     m_containerFormat = formatMPEG2_PS;
+                }
+                else
+                {
+                    // TODO Expand AVContainer to include other types in
+                    //      streamType
+                    m_containerFormat = formatUnknown;
+                }
                 streamtype = i;
                 found = true;
                 break;
@@ -1059,14 +1073,14 @@ void MpegRecorder::run(void)
                     {
                         /* Already processing a gap, which means
                          * restarting the encoding didn't work! */
-                        SetRecordingStatus(rsFailing, __FILE__, __LINE__);
+                        SetRecordingStatus(RecStatus::Failing, __FILE__, __LINE__);
                     }
                     else
                         gap = true;
                 }
 
                 if (!RestartEncoding())
-                    SetRecordingStatus(rsFailing, __FILE__, __LINE__);
+                    SetRecordingStatus(RecStatus::Failing, __FILE__, __LINE__);
             }
             else if (_device_read_buffer->IsEOF() &&
                      IsRecordingRequested())

@@ -8,10 +8,13 @@
 #include <musicmetadata.h>
 #include <musicfilescanner.h>
 #include <musicutils.h>
+#include <mthreadpool.h>
 
 // mythmusic
 #include "musicdata.h"
 #include "musicplayer.h"
+
+#include <unistd.h> // for usleep()
 
 // this is the global MusicData object shared thoughout MythMusic
 MusicData  *gMusicData = NULL;

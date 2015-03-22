@@ -44,7 +44,7 @@ bool InputGroupMap::Build(void)
         }
     }
 
-    query.prepare("SELECT cardinputid, cardid from cardinput");
+    query.prepare("SELECT cardid, cardid from capturecard");
     if (!query.exec())
     {
         MythDB::DBError("InputGroupMap::Build 2", query);

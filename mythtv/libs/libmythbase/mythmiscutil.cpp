@@ -22,6 +22,7 @@ using namespace std;
 #ifdef linux
 #include <sys/vfs.h>
 #include <sys/sysinfo.h>
+#include <sys/stat.h> // for umask, chmod
 #endif
 
 #if CONFIG_DARWIN
@@ -31,6 +32,7 @@ using namespace std;
 #ifdef BSD
 #include <sys/mount.h>  // for struct statfs
 #include <sys/sysctl.h>
+#include <sys/stat.h> // for umask, chmod
 #endif
 
 // Qt headers

@@ -132,7 +132,7 @@ class MPUBLIC ProgramInfo
                 const QDate &originalAirDate,
                 const QDateTime &lastmodified,
 
-                RecStatusType recstatus,
+                RecStatus::Type recstatus,
 
                 uint recordid,
 
@@ -168,7 +168,7 @@ class MPUBLIC ProgramInfo
                 const QDateTime &recstartts,
                 const QDateTime &recendts,
 
-                RecStatusType recstatus,
+                RecStatus::Type recstatus,
 
                 uint recordid,
 
@@ -205,7 +205,7 @@ class MPUBLIC ProgramInfo
                 uint partnumber,
                 uint parttotal,
                 const QDate &originalAirDate,
-                RecStatusType recstatus,
+                RecStatus::Type recstatus,
                 uint recordid,
                 RecordingType rectype,
                 uint findid,
@@ -427,10 +427,10 @@ class MPUBLIC ProgramInfo
         { return (int)(stars * range_max + 0.5f); }
 
     uint    GetRecordingID(void)              const { return recordedid; }
-    RecStatusType GetRecordingStatus(void)    const
-        { return (RecStatusType)recstatus; }
-    RecStatusType GetOldRecordingStatus(void) const
-        { return (RecStatusType)oldrecstatus; }
+    RecStatus::Type GetRecordingStatus(void)    const
+        { return (RecStatus::Type)recstatus; }
+    RecStatus::Type GetOldRecordingStatus(void) const
+        { return (RecStatus::Type)oldrecstatus; }
     uint    GetPreferedInputID(void)          const { return prefinput; }
     uint    GetRecordingRuleID(void)          const { return recordid;  }
     uint    GetParentRecordingRuleID(void)    const { return parentid;  }
@@ -447,7 +447,6 @@ class MPUBLIC ProgramInfo
 
     uint    GetSourceID(void)             const { return sourceid;     }
     uint    GetInputID(void)              const { return inputid;      }
-    uint    GetCardID(void)               const { return cardid;       }
 
     uint    GetFindID(void)               const { return findid;       }
 
@@ -510,8 +509,7 @@ class MPUBLIC ProgramInfo
     void SetRecordingPriority2(int priority)     { recpriority2 = priority; }
     void SetRecordingRuleID(uint id)                { recordid     = id;    }
     void SetSourceID(uint id)                       { sourceid     = id;    }
-    void SetInputID( uint id)                       { inputid      = id;    }
-    void SetCardID(  uint id)                       { cardid       = id;    }
+    void SetInputID(uint id)                        { inputid      = id;    }
     void SetReactivated(bool reactivate)
     {
         programflags &= ~FL_REACTIVATE;
@@ -535,7 +533,7 @@ class MPUBLIC ProgramInfo
         programflags |= (ignore) ? FL_IGNOREBOOKMARK : 0;
     }
     virtual void SetRecordingID(uint _recordedid) { recordedid = _recordedid; }
-    void SetRecordingStatus(RecStatusType status) { recstatus = status; }
+    void SetRecordingStatus(RecStatus::Type status) { recstatus = status; }
     void SetRecordingRuleType(RecordingType type) { rectype   = type;   }
     void SetPositionMapDBReplacement(PMapDBReplacement *pmap)
         { positionMapDBReplacement = pmap; }
@@ -735,7 +733,6 @@ class MPUBLIC ProgramInfo
 
     uint32_t sourceid;
     uint32_t inputid;
-    uint32_t cardid;
     uint32_t findid;
 
     uint32_t programflags;    ///< ProgramFlag

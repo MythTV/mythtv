@@ -694,7 +694,7 @@ class CardInputDBStorage : public SimpleDBStorage
     CardInputDBStorage(StorageUser     *_user,
                        const CardInput &_parent,
                        QString          _name) :
-        SimpleDBStorage(_user, "cardinput", _name), m_parent(_parent)
+        SimpleDBStorage(_user, "capturecard", _name), m_parent(_parent)
     {
     }
 
@@ -827,7 +827,7 @@ class CardInput : public QObject, public ConfigurationWizard
     class ID: public AutoIncrementDBSetting
     {
       public:
-        ID() : AutoIncrementDBSetting("cardinput", "cardid")
+        ID() : AutoIncrementDBSetting("capturecard", "cardid")
         {
             setVisible(false);
             setName("CardInputID");
@@ -835,7 +835,6 @@ class CardInput : public QObject, public ConfigurationWizard
     };
 
     ID              *id;
-    CardID          *cardid;
     InputName       *inputname;
     SourceID        *sourceid;
     StartingChannel *startchan;
@@ -969,6 +968,7 @@ class CetonDeviceID : public LabelSetting, public CaptureCardDBStorage
     void LoadedIP(const QString&);
     void LoadedCard(const QString&);
     void LoadedTuner(const QString&);
+    void LoadedInstances(int);
 
 
   public slots:
@@ -979,6 +979,7 @@ class CetonDeviceID : public LabelSetting, public CaptureCardDBStorage
     QString _ip;
     QString _card;
     QString _tuner;
+    const CaptureCard &_parent;
 };
 
 #endif

@@ -601,12 +601,13 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable &pmt)
         // Filter out streams not used for basic television
         if (_recording_type == "tv" && !is_audio && !is_video &&
             !MPEGDescriptor::Find(desc, DescriptorID::teletext) &&
-            !MPEGDescriptor::Find(desc, DescriptorID::subtitling))
+            !MPEGDescriptor::Find(desc, DescriptorID::subtitling) &&
+            pid != pmt.PCRPID()) // We must not strip the PCR!
         {
             continue;
         }
 
-        if (!is_audio && !is_video)
+        if (!is_audio && !is_video) //NOTE: Anything which isn't audio or video is data
             dataPIDs.push_back(pid);
 
         pdesc.push_back(desc);

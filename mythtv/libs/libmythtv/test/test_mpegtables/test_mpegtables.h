@@ -42,7 +42,7 @@ class TestMPEGTables: public QObject
 
     void ContentIdentifierDescriptor_test(void);
 
-    /* test for coverity 1047220: Incorrect deallocator used:
+    /** test for coverity 1047220: Incorrect deallocator used:
      * Calling "PSIPTable::~PSIPTable()" frees "(&psip)->_fullbuffer"
      * using "free" but it should have been freed using "operator delete[]".
      *
@@ -51,10 +51,10 @@ class TestMPEGTables: public QObject
      */
     void clone_test(void);
 
-    /* test PrivateDataSpecifierDescriptor */
+    /** test PrivateDataSpecifierDescriptor */
     void PrivateDataSpecifierDescriptor_test (void);
 
-    /* test for https://code.mythtv.org/trac/ticket/12091
+    /** test for https://code.mythtv.org/trac/ticket/12091
      * UPC Cablecom switched from standard DVB key/value set to
      * custom descriptors
      */

@@ -20,7 +20,7 @@
 // MythDB
 #include "mythdb.h"
 
-#include <cerrno>
+#include <unistd.h> // for gethostname
 
 #include <QFile>
 #include <QTextStream>

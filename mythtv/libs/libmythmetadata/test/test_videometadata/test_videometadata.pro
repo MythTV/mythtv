@@ -12,12 +12,16 @@ QT += testlib
 TEMPLATE = app
 TARGET = test_videometadata
 DEPENDPATH += . ../.. ../../../libmythbase ../../../libmythtv ../../../libmyth
+DEPENDPATH += ../../../libmythui
 INCLUDEPATH += . ../.. ../../../libmythbase ../../../libmythtv ../../../libmyth
+INCLUDEPATH += ../../../libmythui
 LIBS += -L../../../libmythbase -lmythbase-$$LIBVERSION
 LIBS += -L../.. -lmythmetadata-$$LIBVERSION
 # libmyth and libmythtv for ProgramInfo and RecordingInfo
 LIBS += -L../../../libmyth -lmyth-$$LIBVERSION
 LIBS += -L../../../libmythtv -lmythtv-$$LIBVERSION
+# libmythui for MythUIProgressDialog
+LIBS += -L../../../libmythui -lmythui-$$LIBVERSION
 
 contains(QMAKE_CXX, "g++") {
   QMAKE_CXXFLAGS += -O0 -fprofile-arcs -ftest-coverage

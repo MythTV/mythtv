@@ -444,9 +444,12 @@ QFileInfo Content::GetAlbumArt( int nTrackId, int nWidth, int nHeight )
     // but still need to save as jpg if it's in another format
     if ((nWidth == 0) && (nHeight == 0))
     {
-        QFileInfo fi(sFullFileName);
-        if (fi.suffix().toLower() == "jpg")
-            return fi;
+        if (!sFullFileName.startsWith("myth://"))
+        {
+            QFileInfo fi(sFullFileName);
+            if (fi.suffix().toLower() == "jpg")
+                return fi;
+        }
     }
     else if (nWidth > img.width() && nHeight > img.height())
     {

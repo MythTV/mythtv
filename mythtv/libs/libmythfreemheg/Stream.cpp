@@ -438,7 +438,7 @@ void MHVideo::Display(MHEngine *engine)
     // m_nDecodeWidth/720 by m_nDecodeHeight/576.
     QRect videoRect = QRect(m_nPosX + m_nXDecodeOffset, m_nPosY + m_nYDecodeOffset,
                             m_nDecodeWidth, m_nDecodeHeight);
-    QRect displayRect = videoRect.intersect(QRect(m_nPosX, m_nPosY, m_nBoxWidth, m_nBoxHeight));
+    QRect displayRect = videoRect.intersected(QRect(m_nPosX, m_nPosY, m_nBoxWidth, m_nBoxHeight));
     engine->GetContext()->DrawVideo(videoRect, displayRect);
 }
 

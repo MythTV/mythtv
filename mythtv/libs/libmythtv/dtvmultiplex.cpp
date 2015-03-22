@@ -137,7 +137,7 @@ bool DTVMultiplex::IsEqual(DTVTunerType type, const DTVMultiplex &other,
     if (DTVTunerType::kTunerTypeATSC == type)
     {
         if (fuzzy)
-            modulation.IsCompatible(other.modulation);
+            return modulation.IsCompatible(other.modulation);
         return (modulation == other.modulation);
     }
 

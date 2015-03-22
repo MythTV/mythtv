@@ -10,8 +10,6 @@
 
 function getArg(name)
 {
-    name = name.toLowerCase();
-
     if (isValidObject(this.Parameters))
         return this.Parameters[name];
     else
@@ -30,6 +28,14 @@ function getBoolArg(name)
     return Boolean(getIntegerArg(name));
 }
 
+function getArgArray()
+{
+    if (isValidObject(this.Parameters))
+        return this.Parameters;
+    else
+        return Array();
+}
+
 function getArgCount()
 {
     if (isValidObject(this.Parameters))
@@ -44,6 +50,11 @@ function toCapitalCase(str)
 }
 
 function escapeHTML(str)
+{
+    return escapeXML(str);
+}
+
+function escapeXML(str)
 {
     str = str.replace(/&/g, "&amp;")
                 .replace(/'/g, "&apos;")
@@ -110,4 +121,40 @@ function toQueryString(obj)
     }
   }
   return str.join("&amp;");
+}
+
+// Credit to 'powtac' on StackOverflow
+function toHHMMSS(seconds)
+{
+    var sec_num = parseInt(seconds, 10); // don't forget the second param
+    var hours   = Math.floor(sec_num / 3600);
+    var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+    var seconds = sec_num - (hours * 3600) - (minutes * 60);
+
+    if (hours   < 10) {hours   = "0"+hours;}
+    if (minutes < 10) {minutes = "0"+minutes;}
+    if (seconds < 10) {seconds = "0"+seconds;}
+    var time    = hours+':'+minutes+':'+seconds;
+    return time;
+}
+
+// Truncate a string to the last whole word, appending an elipsis at the cut
+// point
+function truncateString(str, length)
+{
+    var newStr = str;
+
+    if (newStr.length > length)
+    {
+        newStr = newStr.substr(0,length);
+        var lastSpaceIdx = newStr.lastIndexOf(" ");
+        if (lastSpaceIdx > 1)
+            newStr = newStr.substr(0,lastSpaceIdx);
+        // &hellip; - ellipsis html entity, not used because it would be
+        // double encoded, and ironically it's actually more characters than
+        // the three full stops.
+        newStr += " ...";
+    }
+
+    return newStr;
 }

@@ -13,6 +13,8 @@
 #include <fcntl.h>
 #include <errno.h>
 
+#include <unistd.h> // for usleep()
+
 // Qt headers
 #include <QApplication>
 #include <QRegExp>
@@ -20,6 +22,7 @@
 #include <QTextCodec>
 #include <QByteArray>
 #include <QTcpSocket>
+#include <QTimer>
 
 // MythTV headers
 #include "lcddevice.h"
@@ -506,8 +509,8 @@ void LCD::setMusicProgress(const QString &time, float value)
         return;
 
     value = std::min(std::max(0.0f, value), 1.0f);
-    sendToServer("SET_MUSIC_PROGRESS " + quotedString(time) + ' ' + 
-            QString().setNum(value));    
+    sendToServer("SET_MUSIC_PROGRESS " + quotedString(time) + ' ' +
+            QString().setNum(value));
 }
 
 void LCD::setMusicShuffle(int shuffle)
@@ -753,7 +756,7 @@ bool LCD::startLCDServer(void)
 {
     QString command = GetAppBinDir() + "mythlcdserver";
     command += logPropagateArgs;
-    uint flags = kMSDontBlockInputDevs | kMSDontDisableDrawing | 
+    uint flags = kMSDontBlockInputDevs | kMSDontDisableDrawing |
                  kMSRunBackground;
 
     uint retval = myth_system(command, flags);

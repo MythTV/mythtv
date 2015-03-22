@@ -8,6 +8,7 @@
 #include "mythuibutton.h"
 #include "channelinfo.h"
 #include "channelutil.h"
+#include "mythuitext.h"
 #include "proglist.h"
 #include "mythdate.h"
 

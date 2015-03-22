@@ -107,15 +107,16 @@ bool RemoteCheckFile(const ProgramInfo *pginfo, bool checkSlaves)
     return true;
 }
 
-bool RemoteDeleteRecording(
-    uint chanid, const QDateTime &recstartts, bool forceMetadataDelete,
+bool RemoteDeleteRecording(uint recordingID, bool forceMetadataDelete,
     bool forgetHistory)
 {
+     // FIXME: Remove when DELETE_RECORDING has been updated to use recording id
+    ProgramInfo recInfo(recordingID);
     bool result = true;
     QString cmd =
         QString("DELETE_RECORDING %1 %2 %3 %4")
-        .arg(chanid)
-        .arg(recstartts.toString(Qt::ISODate))
+        .arg(QString::number(recInfo.GetChanID()))
+        .arg(recInfo.GetRecordingStartTime().toString(Qt::ISODate))
         .arg(forceMetadataDelete ? "FORCE" : "NO_FORCE")
         .arg(forgetHistory ? "FORGET" : "NO_FORGET");
     QStringList strlist(cmd);
@@ -129,14 +130,17 @@ bool RemoteDeleteRecording(
     {
         LOG(VB_GENERAL, LOG_ALERT,
                  QString("Failed to delete recording %1:%2")
-                     .arg(chanid).arg(recstartts.toString(Qt::ISODate)));
+                     .arg(recInfo.GetChanID())
+                     .arg(recInfo.GetRecordingStartTime().toString(Qt::ISODate)));
     }
 
     return result;
 }
 
-bool RemoteUndeleteRecording(uint chanid, const QDateTime &recstartts)
+bool RemoteUndeleteRecording(uint recordingID)
 {
+    // FIXME: Remove when UNDELETE_RECORDING has been updated to use recording id
+    ProgramInfo recInfo(recordingID);
     bool result = false;
 
 #if 0
@@ -145,8 +149,8 @@ bool RemoteUndeleteRecording(uint chanid, const QDateTime &recstartts)
 #endif
 
     QStringList strlist(QString("UNDELETE_RECORDING"));
-    strlist.push_back(QString::number(chanid));
-    strlist.push_back(recstartts.toString(Qt::ISODate));
+    strlist.push_back(QString::number(recInfo.GetChanID()));
+    strlist.push_back(recInfo.GetRecordingStartTime().toString(Qt::ISODate));
 
     gCoreContext->SendReceiveStringList(strlist);
 
@@ -549,12 +553,12 @@ vector<ProgramInfo *> *RemoteGetCurrentlyRecordingList(void)
     ProgramInfo *p = NULL;
     vector<ProgramInfo *>::iterator it = info->begin();
     // make sure whatever RemoteGetRecordingList() returned
-    // only has rsRecording shows
+    // only has RecStatus::Recording shows
     for ( ; it != info->end(); ++it)
     {
         p = *it;
-        if (p->GetRecordingStatus() == rsRecording ||
-            (p->GetRecordingStatus() == rsRecorded &&
+        if (p->GetRecordingStatus() == RecStatus::Recording ||
+            (p->GetRecordingStatus() == RecStatus::Recorded &&
              p->GetRecordingGroup() == "LiveTV"))
         {
             reclist->push_back(new ProgramInfo(*p));

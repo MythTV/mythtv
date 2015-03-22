@@ -18,6 +18,8 @@ using namespace std;
 #include <QReadWriteLock>
 #include <QString>
 #include <QMutex>
+#include <QList>                        // for QList
+#include <QMap>                         // for QMap
 
 // MythTV headers
 #include "dtvconfparserhelpers.h" // for DTVTunerType

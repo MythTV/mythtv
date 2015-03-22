@@ -61,7 +61,7 @@
  *  \ingroup housekeeper
  *  \brief Definition for a single task to be run by the HouseKeeper
  *
- *  This class contains instructions for tasks to be run periodically by the 
+ *  This class contains instructions for tasks to be run periodically by the
  *  housekeeper. Each task requires an indentification tag, and can be given
  *  a two options to control scope and startup behavior. Each child class
  *  should override at least two methods: DoCheckRun() and DoRun().
@@ -365,7 +365,7 @@ bool PeriodicHouseKeeperTask::DoCheckRun(QDateTime now)
 
     // calculate probability that task should not have yet run
     // it's backwards, but it makes the math simplier
-    float prob = 1.0 - ((float)(elapsed - m_windowElapsed.first) / 
+    float prob = 1.0 - ((float)(elapsed - m_windowElapsed.first) /
                     (float)(m_windowElapsed.second - m_windowElapsed.first));
     if (m_currentProb < prob)
         // more bad stuff
@@ -623,7 +623,7 @@ void HouseKeeper::RegisterTask(HouseKeeperTask *task)
     if (m_taskMap.contains(tag))
     {
         task->DecrRef();
-        LOG(VB_GENERAL, LOG_ERR, 
+        LOG(VB_GENERAL, LOG_ERR,
                 QString("HouseKeeperTask '%1' already registered. "
                         "Rejecting duplicate.").arg(tag));
     }
@@ -843,4 +843,3 @@ void HouseKeeper::customEvent(QEvent *e)
         }
     }
 }
-

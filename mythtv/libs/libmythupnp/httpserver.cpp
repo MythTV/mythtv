@@ -6,10 +6,14 @@
 //               Used for UPnp/AV implementation & status information
 //                                                                            
 // Copyright (c) 2005 David Blain <dblain@mythtv.org>
+//               2014 Stuart Morgan <smorgan@mythtv.org>
 //                                          
 // Licensed under the GPL v2 or later, see COPYING for details                    
 //
 //////////////////////////////////////////////////////////////////////////////
+
+// Own headers
+#include "httpserver.h"
 
 // ANSI C headers
 #include <cmath>
@@ -26,9 +30,9 @@
 #include <QSslSocket>
 #include <QSslCipher>
 #include <QSslCertificate>
+#include <QUuid>
 
 // MythTV headers
-#include "httpserver.h"
 #include "upnputil.h"
 #include "upnp.h" // only needed for Config... remove once config is moved.
 #include "compat.h"
@@ -36,9 +40,60 @@
 #include "mythlogging.h"
 #include "htmlserver.h"
 #include "mythversion.h"
-#include <mythcorecontext.h>
+#include "mythcorecontext.h"
 
 #include "serviceHosts/rttiServiceHost.h"
+
+using namespace std;
+
+
+/**
+ * \brief Handle an OPTIONS request
+ */
+bool HttpServerExtension::ProcessOptions(HTTPRequest* pRequest)
+{
+    pRequest->m_eResponseType   = ResponseTypeHeader;
+    pRequest->m_nResponseStatus = 405; // Method Not Available
+
+    QStringList allowedMethods;
+    if (m_nSupportedMethods & RequestTypeGet)
+        allowedMethods.append("GET");
+    if (m_nSupportedMethods & RequestTypeHead)
+        allowedMethods.append("HEAD");
+    if (m_nSupportedMethods & RequestTypePost)
+        allowedMethods.append("POST");
+//     if (m_nSupportedMethods & RequestTypePut)
+//         allowedMethods.append("PUT");
+//     if (m_nSupportedMethods & RequestTypeDelete)
+//         allowedMethods.append("DELETE");
+//     if (m_nSupportedMethods & RequestTypeConnect)
+//         allowedMethods.append("CONNECT");
+    if (m_nSupportedMethods & RequestTypeOptions)
+        allowedMethods.append("OPTIONS");
+//     if (m_nSupportedMethods & RequestTypeTrace)
+//         allowedMethods.append("TRACE");
+    if (m_nSupportedMethods & RequestTypeMSearch)
+        allowedMethods.append("M-SEARCH");
+    if (m_nSupportedMethods & RequestTypeSubscribe)
+        allowedMethods.append("SUBSCRIBE");
+    if (m_nSupportedMethods & RequestTypeUnsubscribe)
+        allowedMethods.append("UNSUBSCRIBE");
+    if (m_nSupportedMethods & RequestTypeNotify)
+        allowedMethods.append("NOTIFY");
+
+    if (!allowedMethods.isEmpty())
+    {
+        pRequest->SetResponseHeader("Allow", allowedMethods.join(", "));
+        return true;
+    }
+
+    LOG(VB_GENERAL, LOG_ERR, QString("HttpServerExtension::ProcessOptions(): "
+                                     "Error: No methods supported for "
+                                     "extension - %1").arg(m_sName));
+
+    return false;
+}
+
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -55,10 +110,10 @@ QString  HttpServer::s_platform;
 //
 /////////////////////////////////////////////////////////////////////////////
 
-HttpServer::HttpServer(const QString &sApplicationPrefix) :
+HttpServer::HttpServer() :
     ServerPool(), m_sSharePath(GetShareDir()),
-    m_pHtmlServer(new HtmlServerExtension(m_sSharePath, sApplicationPrefix)),
-    m_threadPool("HttpServerPool"), m_running(true)
+    m_threadPool("HttpServerPool"), m_running(true),
+    m_privateToken(QUuid::createUuid().toString()) // Cryptographically random and sufficiently long enough to act as a secure token
 {
     // Number of connections processed concurrently
     int maxHttpWorkers = max(QThread::idealThreadCount() * 2, 2); // idealThreadCount can return -1
@@ -102,11 +157,6 @@ HttpServer::HttpServer(const QString &sApplicationPrefix) :
 
     RegisterExtension( new RttiServiceHost( m_sSharePath ));
 
-    QScriptEngine *pEngine = ScriptEngine();
-
-    pEngine->globalObject().setProperty("Rtti",
-         pEngine->scriptValueFromQMetaObject< ScriptableRtti >() );
-
     LoadSSLConfig();
 }
 
@@ -126,9 +176,6 @@ HttpServer::~HttpServer()
     {
         delete m_extensions.takeFirst();
     }
-
-    if (m_pHtmlServer != NULL)
-        delete m_pHtmlServer;
 }
 
 void HttpServer::LoadSSLConfig()
@@ -190,8 +237,22 @@ void HttpServer::LoadSSLConfig()
     if (!certList.isEmpty())
         hostCert = certList.first();
 
-    if (hostCert.isValid())
+    if (!hostCert.isNull())
+    {
+        if (hostCert.effectiveDate() > QDateTime::currentDateTime())
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("HttpServer: Host certificate start date in future (%1)").arg(hostCertPath));
+            return;
+        }
+
+        if (hostCert.expiryDate() < QDateTime::currentDateTime())
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("HttpServer: Host certificate has expired (%1)").arg(hostCertPath));
+            return;
+        }
+
         m_sslConfig.setLocalCertificate(hostCert);
+    }
     else
     {
         LOG(VB_GENERAL, LOG_ERR, QString("HttpServer: Unable to load host cert from file (%1)").arg(hostCertPath));
@@ -234,15 +295,6 @@ QString HttpServer::GetServerVersion(void)
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QScriptEngine* HttpServer::ScriptEngine()
-{
-    return ((HtmlServerExtension *)m_pHtmlServer)->ScriptEngine();
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
 void HttpServer::newTcpConnection(qt_socket_fd_t socket)
 {
     PoolServerType type = kTCPServer;
@@ -264,6 +316,7 @@ void HttpServer::RegisterExtension( HttpServerExtension *pExtension )
 {
     if (pExtension != NULL )
     {
+        LOG(VB_HTTP, LOG_INFO, QString("HttpServer: Registering %1 extension").arg(pExtension->m_sName));
         m_rwlock.lockForWrite();
         m_extensions.append( pExtension );
 
@@ -318,7 +371,10 @@ void HttpServer::DelegateRequest(HTTPRequest *pRequest)
     {
         try
         {
-            bProcessed = list[ nIdx ]->ProcessRequest(pRequest);
+            if (pRequest->m_eType == RequestTypeOptions)
+                bProcessed = list[ nIdx ]->ProcessOptions(pRequest);
+            else
+                bProcessed = list[ nIdx ]->ProcessRequest(pRequest);
         }
         catch(...)
         {
@@ -328,14 +384,16 @@ void HttpServer::DelegateRequest(HTTPRequest *pRequest)
         }
     }
 
-#if 0
     HttpServerExtensionList::iterator it = m_extensions.begin();
 
     for (; (it != m_extensions.end()) && !bProcessed; ++it)
     {
         try
         {
-            bProcessed = (*it)->ProcessRequest(pRequest);
+            if (pRequest->m_eType == RequestTypeOptions)
+                bProcessed = (*it)->ProcessOptions(pRequest);
+            else
+                bProcessed = (*it)->ProcessRequest(pRequest);
         }
         catch(...)
         {
@@ -344,11 +402,10 @@ void HttpServer::DelegateRequest(HTTPRequest *pRequest)
                                              "pExtension->ProcessRequest()."));
         }
     }
-#endif
     m_rwlock.unlock();
 
-    if (!bProcessed)
-        bProcessed = m_pHtmlServer->ProcessRequest(pRequest);
+//     if (!bProcessed)
+//         bProcessed = m_pHtmlServer->ProcessRequest(pRequest);
 
     if (!bProcessed)
     {
@@ -406,6 +463,7 @@ void HttpWorker::run(void)
     bool                    bKeepAlive = true;
     HTTPRequest            *pRequest   = NULL;
     QTcpSocket             *pSocket;
+    bool                    bEncrypted = false;
 
     if (m_connectionType == kSSLServer)
     {
@@ -415,14 +473,12 @@ void HttpWorker::run(void)
         if (pSslSocket->setSocketDescriptor(m_socket))
         {
             pSslSocket->setSslConfiguration(m_sslConfig);
-            pSslSocket->setPrivateKey(m_sslConfig.privateKey());
-            pSslSocket->setLocalCertificate(m_sslConfig.localCertificate());
-            pSslSocket->addCaCertificates(m_sslConfig.caCertificates());
             pSslSocket->startServerEncryption();
             if (pSslSocket->waitForEncrypted(5000))
             {
                 LOG(VB_HTTP, LOG_INFO, "SSL Handshake occurred, connection encrypted");
                 LOG(VB_HTTP, LOG_INFO, QString("Using %1 cipher").arg(pSslSocket->sessionCipher().name()));
+                bEncrypted = true;
             }
             else
             {
@@ -456,8 +512,7 @@ void HttpWorker::run(void)
 
     try
     {
-        while (m_httpServer.IsRunning() && bKeepAlive && pSocket &&
-               pSocket->isValid() &&
+        while (m_httpServer.IsRunning() && bKeepAlive && pSocket->isValid() &&
                pSocket->state() == QAbstractSocket::ConnectedState)
         {
             // We set a timeout on keep-alive connections to avoid blocking
@@ -482,6 +537,7 @@ void HttpWorker::run(void)
                 pRequest = new BufferedSocketDeviceRequest( pSocket );
                 if (pRequest != NULL)
                 {
+                    pRequest->m_bEncrypted = bEncrypted;
                     if ( pRequest->ParseRequest() )
                     {
                         bKeepAlive = pRequest->GetKeepAlive();
@@ -496,7 +552,9 @@ void HttpWorker::run(void)
                         // delegate processing to HttpServerExtensions.
                         // ------------------------------------------------------
                         if ((pRequest->m_nResponseStatus != 400) &&
-                            (pRequest->m_nResponseStatus != 401))
+                            (pRequest->m_nResponseStatus != 401) &&
+                            (pRequest->m_nResponseStatus != 403) &&
+                            pRequest->m_eType != RequestTypeUnknown)
                             m_httpServer.DelegateRequest(pRequest);
 
                         nRequestsHandled++;
@@ -602,7 +660,7 @@ void HttpWorker::run(void)
                                             .arg(pSocket->errorString()));
     }
 
-    LOG(VB_HTTP, LOG_INFO, QString("HttpWorker(%1): Connection %2 closed, requests handled %3")
+    LOG(VB_HTTP, LOG_INFO, QString("HttpWorker(%1): Connection %2 closed. %3 requests were handled")
                                         .arg(m_socket)
                                         .arg(pSocket->socketDescriptor())
                                         .arg(nRequestsHandled));

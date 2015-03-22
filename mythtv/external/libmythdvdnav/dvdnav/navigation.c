@@ -29,7 +29,6 @@
 #include "dvdnav/dvdnav.h"
 #include <dvdread/nav_types.h>
 #include <dvdread/ifo_types.h>
-#include "remap.h"
 #include "vm/decoder.h"
 #include "vm/vm.h"
 #include "dvdnav_internal.h"
@@ -99,8 +98,8 @@ dvdnav_status_t dvdnav_current_title_info(dvdnav_t *this, int32_t *title, int32_
     pthread_mutex_unlock(&this->vm_lock);
     return DVDNAV_STATUS_ERR;
   }
-  if ( (this->vm->state.domain == VTSM_DOMAIN)
-      || (this->vm->state.domain == VMGM_DOMAIN) ) {
+  if ( (this->vm->state.domain == DVD_DOMAIN_VTSMenu)
+      || (this->vm->state.domain == DVD_DOMAIN_VMGM) ) {
     /* Get current Menu ID: into *part. */
     if(! vm_get_current_menu(this->vm, part)) {
       pthread_mutex_unlock(&this->vm_lock);
@@ -112,7 +111,7 @@ dvdnav_status_t dvdnav_current_title_info(dvdnav_t *this, int32_t *title, int32_
       return DVDNAV_STATUS_OK;
     }
   }
-  if (this->vm->state.domain == VTS_DOMAIN) {
+  if (this->vm->state.domain == DVD_DOMAIN_VTSTitle) {
     retval = vm_get_current_title_part(this->vm, title, part);
     pthread_mutex_unlock(&this->vm_lock);
     return retval ? DVDNAV_STATUS_OK : DVDNAV_STATUS_ERR;
@@ -142,8 +141,8 @@ dvdnav_status_t dvdnav_current_title_program(dvdnav_t *this, int32_t *title, int
     pthread_mutex_unlock(&this->vm_lock);
     return DVDNAV_STATUS_ERR;
   }
-  if ( (this->vm->state.domain == VTSM_DOMAIN)
-      || (this->vm->state.domain == VMGM_DOMAIN) ) {
+  if ( (this->vm->state.domain == DVD_DOMAIN_VTSMenu)
+      || (this->vm->state.domain == DVD_DOMAIN_VMGM) ) {
     /* Get current Menu ID: into *part. */
     if(! vm_get_current_menu(this->vm, &part)) {
       pthread_mutex_unlock(&this->vm_lock);
@@ -157,7 +156,7 @@ dvdnav_status_t dvdnav_current_title_program(dvdnav_t *this, int32_t *title, int
       return DVDNAV_STATUS_OK;
     }
   }
-  if (this->vm->state.domain == VTS_DOMAIN) {
+  if (this->vm->state.domain == DVD_DOMAIN_VTSTitle) {
     retval = vm_get_current_title_part(this->vm, title, &part);
     *pgcn = this->vm->state.pgcN;
     *pgn = this->vm->state.pgN;
@@ -245,7 +244,7 @@ dvdnav_status_t dvdnav_part_play(dvdnav_t *this, int32_t title, int32_t part) {
 }
 
 dvdnav_status_t dvdnav_part_play_auto_stop(dvdnav_t *this, int32_t title,
-					   int32_t part, int32_t parts_to_play) {
+                                           int32_t part, int32_t parts_to_play) {
   /* FIXME: Implement auto-stop */
  if (dvdnav_part_play(this, title, part) == DVDNAV_STATUS_OK)
    printerr("Not implemented yet.");
@@ -253,7 +252,7 @@ dvdnav_status_t dvdnav_part_play_auto_stop(dvdnav_t *this, int32_t title,
 }
 
 dvdnav_status_t dvdnav_time_play(dvdnav_t *this, int32_t title,
-				 uint64_t time) {
+                                 uint64_t time) {
   /* FIXME: Implement */
   printerr("Not implemented yet.");
   return DVDNAV_STATUS_ERR;
@@ -268,8 +267,7 @@ dvdnav_status_t dvdnav_stop(dvdnav_t *this) {
 
 dvdnav_status_t dvdnav_go_up(dvdnav_t *this) {
   /* A nice easy function... delegate to the VM */
-  int32_t retval;
-
+  int retval;
   pthread_mutex_lock(&this->vm_lock);
   retval = vm_jump_up(this->vm);
   pthread_mutex_unlock(&this->vm_lock);

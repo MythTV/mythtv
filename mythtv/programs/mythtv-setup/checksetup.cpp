@@ -182,7 +182,7 @@ bool checkChannelPresets(QStringList &probs)
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT cardid, startchan, sourceid, inputname"
-                  " FROM cardinput;");
+                  " FROM capturecard;");
 
     if (!query.exec() || !query.isActive())
     {

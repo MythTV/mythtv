@@ -328,7 +328,7 @@ void MythBurn::loadEncoderProfiles()
 void MythBurn::toggleUseCutlist(void)
 {
     MythUIButtonListItem *item = m_archiveButtonList->GetItemCurrent();
-    ArchiveItem *a = qVariantValue<ArchiveItem *>(item->GetData());
+    ArchiveItem *a = item->GetData().value<ArchiveItem *>();
 
     if (!a)
         return;
@@ -616,7 +616,7 @@ void MythBurn::createConfigFile(const QString &filename)
         if (!item)
             continue;
 
-        a = qVariantValue<ArchiveItem *>(item->GetData());
+        a = item->GetData().value<ArchiveItem *>();
         if (!a)
             continue;
 
@@ -759,7 +759,7 @@ void MythBurn::saveConfiguration(void)
         if (!item)
             continue;
 
-        a = qVariantValue<ArchiveItem *>(item->GetData());
+        a = item->GetData().value<ArchiveItem *>();
         if (!a)
             continue;
 
@@ -799,7 +799,7 @@ void MythBurn::showMenu()
         return;
 
     MythUIButtonListItem *item = m_archiveButtonList->GetItemCurrent();
-    ArchiveItem *curItem = qVariantValue<ArchiveItem *>(item->GetData());
+    ArchiveItem *curItem = item->GetData().value<ArchiveItem *>();
 
     if (!curItem)
         return;
@@ -833,7 +833,7 @@ void MythBurn::showMenu()
 void MythBurn::removeItem()
 {
     MythUIButtonListItem *item = m_archiveButtonList->GetItemCurrent();
-    ArchiveItem *curItem = qVariantValue<ArchiveItem *>(item->GetData());
+    ArchiveItem *curItem = item->GetData().value<ArchiveItem *>();
 
     if (!curItem)
         return;
@@ -846,7 +846,7 @@ void MythBurn::removeItem()
 void MythBurn::editDetails()
 {
     MythUIButtonListItem *item = m_archiveButtonList->GetItemCurrent();
-    ArchiveItem *curItem = qVariantValue<ArchiveItem *>(item->GetData());
+    ArchiveItem *curItem = item->GetData().value<ArchiveItem *>();
 
     if (!curItem)
         return;
@@ -865,7 +865,7 @@ void MythBurn::editDetails()
 void MythBurn::editThumbnails()
 {
     MythUIButtonListItem *item = m_archiveButtonList->GetItemCurrent();
-    ArchiveItem *curItem = qVariantValue<ArchiveItem *>(item->GetData());
+    ArchiveItem *curItem = item->GetData().value<ArchiveItem *>();
 
     if (!curItem)
         return;
@@ -894,7 +894,7 @@ void MythBurn::editorClosed(bool ok, ArchiveItem *item)
 void MythBurn::changeProfile()
 {
     MythUIButtonListItem *item = m_archiveButtonList->GetItemCurrent();
-    ArchiveItem *curItem = qVariantValue<ArchiveItem *>(item->GetData());
+    ArchiveItem *curItem = item->GetData().value<ArchiveItem *>();
 
     if (!curItem)
         return;
@@ -923,7 +923,7 @@ void MythBurn::profileChanged(int profileNo)
     if (!item)
         return;
 
-    ArchiveItem *archiveItem = qVariantValue<ArchiveItem *>(item->GetData());
+    ArchiveItem *archiveItem = item->GetData().value<ArchiveItem *>();
     if (!archiveItem)
         return;
 
@@ -1114,7 +1114,7 @@ void ProfileDialog::profileChanged(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    EncoderProfile *profile = qVariantValue<EncoderProfile *>(item->GetData());
+    EncoderProfile *profile = item->GetData().value<EncoderProfile *>();
     if (!profile)
         return;
 

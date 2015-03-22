@@ -11,6 +11,7 @@
 #include "mythsocket_cb.h"
 #include "mythlogging.h"
 #include "mythlocale.h"
+#include "mythsession.h"
 
 #define MYTH_APPNAME_MYTHBACKEND "mythbackend"
 #define MYTH_APPNAME_MYTHJOBQUEUE "mythjobqueue"
@@ -94,8 +95,10 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     QString GetFilePrefix(void);
 
     bool IsConnectedToMaster(void);
-    void SetBackend(bool backend);
+    void SetAsBackend(bool backend);
     bool IsBackend(void) const;        ///< is this process a backend process
+    void SetAsFrontend(bool frontend);
+    bool IsFrontend(void) const;  ///< is this process a frontend process
     bool IsFrontendOnly(void);   ///< is there a frontend, but no backend,
                                  ///<  running on this host
     bool IsMasterHost(void);     ///< is this the same host as the master
@@ -201,6 +204,8 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     void WantingPlayback(QObject *sender);
     bool InWantingPlayback(void);
     void TVInWantingPlayback(bool b);
+
+    MythSessionManager *GetSessionManager(void);
 
     // Plugin related methods
     bool TestPluginVersion(const QString &name, const QString &libversion,

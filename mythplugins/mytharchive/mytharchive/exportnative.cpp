@@ -220,7 +220,7 @@ void ExportNative::titleChanged(MythUIButtonListItem *item)
 {
     ArchiveItem *a;
 
-    a = qVariantValue<ArchiveItem *>(item->GetData());
+    a = item->GetData().value<ArchiveItem *>();
 
     if (!a)
         return;
@@ -403,7 +403,7 @@ void ExportNative::showMenu()
 void ExportNative::removeItem()
 {
     MythUIButtonListItem *item = m_archiveButtonList->GetItemCurrent();
-    ArchiveItem *curItem = qVariantValue<ArchiveItem *>(item->GetData());
+    ArchiveItem *curItem = item->GetData().value<ArchiveItem *>();
 
     if (!curItem)
         return;

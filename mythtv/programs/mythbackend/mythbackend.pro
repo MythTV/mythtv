@@ -3,6 +3,10 @@ include ( ../../version.pro )
 include ( ../programs-libs.pro )
 
 QT += network xml sql script
+mingw | win32-msvc* {
+   # script debugger currently only enabled for WIN32 builds
+   QT += scripttools
+}
 contains(QT_VERSION, ^5\\.[0-9]\\..*) {
 QT += widgets
 }
@@ -12,8 +16,6 @@ CONFIG += thread
 TARGET = mythbackend
 target.path = $${PREFIX}/bin
 INSTALLS = target
-
-DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000
 
 setting.path = $${PREFIX}/share/mythtv/
 setting.files += devicemaster.xml deviceslave.xml MXML_scpd.xml

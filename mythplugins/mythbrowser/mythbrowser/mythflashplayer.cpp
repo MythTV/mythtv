@@ -10,6 +10,7 @@
 #include <mythcontext.h>
 #include <mythmainwindow.h>
 #include <mythuiwebbrowser.h>
+#include <mythuihelper.h>
 #include <playgroup.h>
 
 // mythbrowser

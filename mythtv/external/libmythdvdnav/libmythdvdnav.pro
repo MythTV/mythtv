@@ -38,20 +38,21 @@ DEFINES += HAVE_AV_CONFIG_H
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # dvdnav
-HEADERS += dvdnav/dvdnav_internal.h dvdnav/read_cache.h dvdnav/remap.h \
+HEADERS += dvdnav/dvdnav_internal.h dvdnav/read_cache.h \
     dvdnav/vm/vm_serialize.h
-HEADERS += dvdnav/vm/decoder.h dvdnav/vm/vm.h dvdnav/vm/vmcmd.h
+HEADERS += dvdnav/vm/decoder.h dvdnav/vm/vm.h dvdnav/vm/vmcmd.h \
+    dvdnav/vm/getset.h dvdnav/vm/play.h
 
 SOURCES += dvdnav/dvdnav.c dvdnav/read_cache.c dvdnav/navigation.c \
-    dvdnav/vm/vm_serialize.c
+    dvdnav/vm/vm_serialize.c dvdnav/vm/getset.c dvdnav/vm/play.c \
+    dvdnav/vm/vmget.c
 SOURCES += dvdnav/highlight.c dvdnav/searching.c dvdnav/settings.c
-SOURCES += dvdnav/remap.c dvdnav/vm/decoder.c dvdnav/vm/vm.c
-SOURCES += dvdnav/vm/vmcmd.c
+SOURCES += dvdnav/vm/decoder.c dvdnav/vm/vm.c dvdnav/vm/vmcmd.c
 
 # dvdread
 HEADERS += dvdread/bswap.h dvdread/dvd_input.h dvdread/dvdread_internal.h
 HEADERS += dvdread/dvd_udf.h dvdread/md5.h
-HEADERS += dvdread/bitreader.h
+HEADERS += dvdread/bitreader.h dvdread/mythdvdreadexp.h
 
 SOURCES += dvdread/dvd_reader.c dvdread/nav_read.c dvdread/ifo_read.c
 SOURCES += dvdread/dvd_input.c dvdread/dvd_udf.c dvdread/md5.c

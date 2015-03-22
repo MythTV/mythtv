@@ -13,6 +13,8 @@
 // ANSI C headers
 #include <cstdlib>
 
+#include <unistd.h> // for usleep()
+
 // Qt headers
 #include <QStringList>
 #include <QUuid> 

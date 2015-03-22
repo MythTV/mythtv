@@ -20,6 +20,7 @@
 
 // libmythbase
 #include "mythlogging.h"
+#include "mthreadpool.h"
 
 // Mythui
 #include "mythpainter.h"

@@ -1,6 +1,7 @@
 // Qt headers
 #include <QHash>
 #include <QCoreApplication>
+#include <QStringList>
 
 #include "bdnav/meta_data.h"
 #include "bluraymetadata.h"

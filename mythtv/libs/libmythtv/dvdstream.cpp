@@ -4,8 +4,10 @@
 #include "dvdstream.h"
 
 #include <stdio.h>
+#include <algorithm>
 
 #include <QMutexLocker>
+#include <QtGlobal>
 #include <QtAlgorithms>
 
 #include "dvdread/dvd_reader.h"
@@ -35,9 +37,9 @@ public:
 
 
 // Private but located in/shared with dvd_reader.c
-extern "C" int UDFReadBlocksRaw( dvd_reader_t *device, uint32_t lb_number,
-                             size_t block_count, unsigned char *data,
-                             int encrypted );
+extern "C" int InternalUDFReadBlocksRaw( dvd_reader_t *device, uint32_t lb_number,
+                                         size_t block_count, unsigned char *data,
+                                         int encrypted );
 
 
 // Roundup bytes to DVD blocks
@@ -131,7 +133,7 @@ bool DVDStream::OpenFile(const QString &filename, uint /*retry_ms*/)
             }
         }
 
-        qSort( m_list);
+        std::sort(m_list.begin(), m_list.end());
 
         // Open the root menu so that CSS keys are generated now
         dvd_file_t *file = DVDOpenFile(m_reader, 0, DVD_READ_MENU_VOBS);
@@ -170,12 +172,12 @@ int DVDStream::safe_read(void *data, uint size)
     int ret = 0;
 
     // Are any blocks in the range encrypted?
-    list_t::const_iterator it = qBinaryFind(m_list, BlockRange(m_pos, lb, -1));
+    list_t::const_iterator it = qBinaryFind(m_list, BlockRange(m_pos, lb, -1)); // FIXME: qBinaryFind is deprecated
     uint32_t b = it == m_list.end() ? lb : m_pos < it->Start() ? it->Start() - m_pos : 0;
     if (b)
     {
         // Read the beginning unencrypted blocks
-        ret = UDFReadBlocksRaw(m_reader, m_pos, b, (unsigned char*)data, DVDINPUT_NOFLAGS);
+        ret = InternalUDFReadBlocksRaw(m_reader, m_pos, b, (unsigned char*)data, DVDINPUT_NOFLAGS);
         if (ret == -1)
         {
             LOG(VB_GENERAL, LOG_ERR, "DVDStream::safe_read DVDReadBlocks error");
@@ -203,7 +205,7 @@ int DVDStream::safe_read(void *data, uint size)
     }
 
     // Read the encrypted blocks
-    int ret2 = UDFReadBlocksRaw(m_reader, m_pos + m_start, b, (unsigned char*)data, flags);
+    int ret2 = InternalUDFReadBlocksRaw(m_reader, m_pos + m_start, b, (unsigned char*)data, flags);
     if (ret2 == -1)
     {
         LOG(VB_GENERAL, LOG_ERR, "DVDStream::safe_read DVDReadBlocks error");
@@ -219,7 +221,7 @@ int DVDStream::safe_read(void *data, uint size)
     if (lb > 0 && m_start == 0)
     {
         // Read the last unencrypted blocks
-        ret2 = UDFReadBlocksRaw(m_reader, m_pos, lb, (unsigned char*)data, DVDINPUT_NOFLAGS);
+        ret2 = InternalUDFReadBlocksRaw(m_reader, m_pos, lb, (unsigned char*)data, DVDINPUT_NOFLAGS);
         if (ret2 == -1)
         {
             LOG(VB_GENERAL, LOG_ERR, "DVDStream::safe_read DVDReadBlocks error");

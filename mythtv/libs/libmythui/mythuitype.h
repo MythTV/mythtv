@@ -12,18 +12,18 @@
 #include "xmlparsebase.h"
 #include "mythuianimation.h"
 #include "mythrect.h"
-#include "mythgesture.h"
-#include "mythmedia.h"
-#include "mythtypes.h"
+
+class MythPainter; // TODO: Should be an include but we first need to sort out the video scanner UI dependency mess
 
 class MythImage;
-class MythPainter;
 class MythGestureEvent;
 class FontMap;
 class MythFontProperties;
 
 class QEvent;
 class QKeyEvent;
+class MythGestureEvent;
+class MythMediaEvent;
 
 class MythUIText;
 class MythUIButton;
@@ -35,12 +35,6 @@ class MythUISpinBox;
 class MythUITextEdit;
 class MythUIProgressBar;
 class MythUIWebBrowser;
-
-#define QT_PAINTER      "qt"
-#define OPENGL_PAINTER  "opengl"
-#define OPENGL2_PAINTER "opengl2"
-#define AUTO_PAINTER    "auto"
-#define D3D9_PAINTER    "d3d9"
 
 /**
  * \defgroup MythUI MythTV User Interface Library

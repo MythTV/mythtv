@@ -467,9 +467,8 @@ void StatusBox::customEvent(QEvent *event)
             // button 1 is "Delete Now"
             if ((buttonnum == 0) && rec->QueryIsDeleteCandidate())
             {
-                if (!RemoteDeleteRecording(
-                    rec->GetChanID(), rec->GetRecordingStartTime(),
-                    false, false))
+                if (!RemoteDeleteRecording(rec->GetRecordingID(),
+                                           false, false))
                 {
                     LOG(VB_GENERAL, LOG_ERR, QString("Failed to delete recording: %1").arg(rec->GetTitle()));
                     return;
@@ -480,8 +479,7 @@ void StatusBox::customEvent(QEvent *event)
             {
                 if ((rec)->GetRecordingGroup() == "Deleted")
                 {
-                    RemoteUndeleteRecording(
-                        rec->GetChanID(), rec->GetRecordingStartTime());
+                    RemoteUndeleteRecording(rec->GetRecordingID());
                 }
                 else
                 {
@@ -668,15 +666,15 @@ void StatusBox::doScheduleStatus()
         return;
     }
 
-    QMap<RecStatusType, int> statusMatch;
-    QMap<RecStatusType, QString> statusText;
+    QMap<RecStatus::Type, int> statusMatch;
+    QMap<RecStatus::Type, QString> statusText;
     QMap<int, int> sourceMatch;
     QMap<int, QString> sourceText;
-    QMap<int, int> inputMatch;
-    QMap<int, QString> inputText;
+    QMap<int, int> cardMatch;
+    QMap<int, QString> cardText;
     QString tmpstr;
     int maxSource = 0;
-    int maxInput = 0;
+    int maxCard = 0;
     int lowerpriority = 0;
     int hdflag = 0;
 
@@ -694,25 +692,23 @@ void StatusBox::doScheduleStatus()
             sourceText[query.value(0).toInt()] = query.value(1).toString();
     }
 
-    query.prepare("SELECT MAX(cardinputid) FROM cardinput");
+    query.prepare("SELECT MAX(cardid) FROM capturecard");
     if (query.exec())
     {
         if (query.next())
-            maxInput = query.value(0).toInt();
+            maxCard = query.value(0).toInt();
     }
 
-    query.prepare("SELECT cardinputid,cardid,inputname,displayname "
-                  "FROM cardinput");
+    query.prepare("SELECT cardid,inputname,displayname "
+                  "FROM capturecard");
     if (query.exec())
     {
         while (query.next())
         {
-            if (!query.value(3).toString().isEmpty())
-                inputText[query.value(0).toInt()] = query.value(3).toString();
+            if (!query.value(2).toString().isEmpty())
+                cardText[query.value(0).toInt()] = query.value(2).toString();
             else
-                inputText[query.value(0).toInt()] = QString("%1: %2")
-                                              .arg(query.value(1).toInt())
-                                              .arg(query.value(2).toString());
+                cardText[query.value(0).toInt()] = query.value(1).toString();
         }
     }
 
@@ -726,20 +722,20 @@ void StatusBox::doScheduleStatus()
     for (; it != schedList.end(); ++it)
     {
         const ProgramInfo *s = *it;
-        const RecStatusType recstatus = s->GetRecordingStatus();
+        const RecStatus::Type recstatus = s->GetRecordingStatus();
 
         if (statusMatch[recstatus] < 1)
         {
-            statusText[recstatus] = toString(
+            statusText[recstatus] = RecStatus::toString(
                 recstatus, s->GetRecordingRuleType());
         }
 
         ++statusMatch[recstatus];
 
-        if (recstatus == rsWillRecord || recstatus == rsRecording)
+        if (recstatus == RecStatus::WillRecord || recstatus == RecStatus::Recording)
         {
             ++sourceMatch[s->GetSourceID()];
-            ++inputMatch[s->GetInputID()];
+            ++cardMatch[s->GetInputID()];
             if (s->GetRecordingPriority2() < 0)
                 ++lowerpriority;
             if (s->GetVideoProperties() & VID_HDTV)
@@ -756,15 +752,15 @@ void StatusBox::doScheduleStatus()
             AddLogLine(tmpstr, helpmsg, tmpstr, tmpstr, fstate);\
         }                                                       \
     } while (0)
-    ADD_STATUS_LOG_LINE(rsRecording, "");
-    ADD_STATUS_LOG_LINE(rsWillRecord, "");
-    ADD_STATUS_LOG_LINE(rsConflict, "error");
-    ADD_STATUS_LOG_LINE(rsTooManyRecordings, "warning");
-    ADD_STATUS_LOG_LINE(rsLowDiskSpace, "warning");
-    ADD_STATUS_LOG_LINE(rsLaterShowing, "warning");
-    ADD_STATUS_LOG_LINE(rsNotListed, "warning");
+    ADD_STATUS_LOG_LINE(RecStatus::Recording, "");
+    ADD_STATUS_LOG_LINE(RecStatus::WillRecord, "");
+    ADD_STATUS_LOG_LINE(RecStatus::Conflict, "error");
+    ADD_STATUS_LOG_LINE(RecStatus::TooManyRecordings, "warning");
+    ADD_STATUS_LOG_LINE(RecStatus::LowDiskSpace, "warning");
+    ADD_STATUS_LOG_LINE(RecStatus::LaterShowing, "warning");
+    ADD_STATUS_LOG_LINE(RecStatus::NotListed, "warning");
 
-    QString willrec = statusText[rsWillRecord];
+    QString willrec = statusText[RecStatus::WillRecord];
 
     if (lowerpriority > 0)
     {
@@ -789,13 +785,13 @@ void StatusBox::doScheduleStatus()
             AddLogLine(tmpstr, helpmsg);
         }
     }
-    for (i = 1; i <= maxInput; ++i)
+    for (i = 1; i <= maxCard; ++i)
     {
-        if (inputMatch[i] > 0)
+        if (cardMatch[i] > 0)
         {
             tmpstr = QString("%1 %2 %3 %4 \"%5\"")
-                             .arg(inputMatch[i]).arg(willrec)
-                             .arg(tr("on input")).arg(i).arg(inputText[i]);
+                             .arg(cardMatch[i]).arg(willrec)
+                             .arg(tr("on card")).arg(i).arg(cardText[i]);
             AddLogLine(tmpstr, helpmsg);
         }
     }

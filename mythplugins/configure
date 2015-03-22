@@ -332,7 +332,6 @@ Generic options:
   --libdir-name=LIBNAME    install/look for libs in PREFIX/LIBNAME [$libdir_name]
   --help                   print this message
   --enable-all             Enable all options
-  --enable-opengl          enable OpenGL (MythGallery) [$opengl]
   --previous               use previous configure parameters if possible
 
 MythArchive related options:
@@ -347,6 +346,7 @@ MythGallery related options:
   --enable-new-exif        use libexif > version 0.6.9 [$newexif]
   --enable-dcraw           use dcraw to view raw photos [$dcraw]
   --icc-profile=PROFILE    ICC profile for dcraw decoding [$icc]
+  --enable-opengl          enable OpenGL (MythGallery) [$opengl]
 
 MythGame related options:
   --enable-mythgame        build the mythgame plugin [$game]
@@ -354,6 +354,7 @@ MythGame related options:
 MythMusic related options:
   --enable-mythmusic       build the mythmusic plugin [$music]
   --enable-fftw            enable fftw visualizers [$fftw]
+  --enable-cdio            enable cd playback [$cdio]
 
 MythNetvision related options:
   --enable-mythnetvision   build the mythnetvision plugin [$netvision]
@@ -441,7 +442,7 @@ for opt do
       enable $DEPRECATED_PLUGIN_LIST $PLUGIN_LIST $CONFIG_LIST
   ;;
   --disable-all)
-      disable $DEPRECATED_PLUGIN_LIST $PLUGIN_LIST $CONFIG_LIST
+      disable $DEPRECATED_PLUGIN_LIST $PLUGIN_LIST
   ;;
   --enable-?*|--disable-?*)
   eval $(echo "$opt" | sed 's/--/action=/;s/-/ option=/;s/-/_/g')
@@ -568,16 +569,27 @@ OPENGLV=$(cat mythconfig.mak | grep -e "^CONFIG_OPENGL_VIDEO=yes")
 EXTRALIBS=$(cat mythconfig.mak | grep -e "^EXTRALIBS=")
 EXTRALIBS=${EXTRALIBS#EXTRALIBS=}
 
-if is_qmake5 $qmake || is_qmake5 qmake-qt5; then
-    if is_qmake5 qmake-qt5; then
-        qmake=qmake-qt5
-    fi
-elif is_qmake4 $qmake || is_qmake4 qmake-qt4; then
-    if is_qmake4 qmake-qt4; then
-        qmake=qmake-qt4
-    fi
+# qmake-qt5 /usr/lib64/qt5/bin/qmake /usr/lib/x86_64-linux-gnu/qt5/bin/qmake
+if [ x"$qmake" = "xqmake" ]; then
+    CHECK_QMAKE="qmake-qt5 /usr/lib64/qt5/bin/qmake /usr/lib/x86_64-linux-gnu/qt5/bin/qmake $qmake qmake-qt4"
 else
+    CHECK_QMAKE="$qmake qmake-qt5 /usr/lib64/qt5/bin/qmake /usr/lib/x86_64-linux-gnu/qt5/bin/qmake qmake-qt4"
+fi
+# try to find a qt5 qmake to use
+found_qmake=''
+for i in $CHECK_QMAKE; do
+    if is_qmake5 $i; then
+        found_qmake=$i
+        break;
+    elif is_qmake4 $i; then
+        found_qmake=$i
+        break;
+    fi
+done
+if [ x"$found_qmake" = "x" ]; then
     die "qmake for Qt4.8 or newer not found.\nPlease specify the correct qmake with --qmake="
+else
+    qmake=$found_qmake
 fi
 
 

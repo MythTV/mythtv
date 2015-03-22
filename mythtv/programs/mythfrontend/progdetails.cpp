@@ -524,14 +524,14 @@ void ProgDetails::loadPage(void)
     // Begin MythTV information not found in the listings info
 //    msg += "<br>";
     QDateTime statusDate;
-    if (m_progInfo.GetRecordingStatus() == rsWillRecord)
+    if (m_progInfo.GetRecordingStatus() == RecStatus::WillRecord)
         statusDate = m_progInfo.GetScheduledStartTime();
 
     RecordingType rectype = kSingleRecord; // avoid kNotRecording
-    RecStatusType recstatus = m_progInfo.GetRecordingStatus();
+    RecStatus::Type recstatus = m_progInfo.GetRecordingStatus();
 
-    if (recstatus == rsPreviousRecording || recstatus == rsNeverRecord ||
-        recstatus == rsUnknown)
+    if (recstatus == RecStatus::PreviousRecording || recstatus == RecStatus::NeverRecord ||
+        recstatus == RecStatus::Unknown)
     {
         query.prepare("SELECT recstatus, starttime "
                       "FROM oldrecorded WHERE duplicate > 0 AND "
@@ -552,23 +552,23 @@ void ProgDetails::loadPage(void)
         }
         else if (query.next())
         {
-            if (recstatus == rsUnknown)
-                recstatus = RecStatusType(query.value(0).toInt());
+            if (recstatus == RecStatus::Unknown)
+                recstatus = RecStatus::Type(query.value(0).toInt());
 
-            if (recstatus == rsPreviousRecording ||
-                recstatus == rsNeverRecord ||
-                recstatus == rsRecorded)
+            if (recstatus == RecStatus::PreviousRecording ||
+                recstatus == RecStatus::NeverRecord ||
+                recstatus == RecStatus::Recorded)
             {
                 statusDate = MythDate::as_utc(query.value(1).toDateTime());
             }
         }
     }
 
-    if (recstatus == rsUnknown)
+    if (recstatus == RecStatus::Unknown)
     {
         if (recorded)
         {
-            recstatus = rsRecorded;
+            recstatus = RecStatus::Recorded;
             statusDate = m_progInfo.GetScheduledStartTime();
         }
         else
@@ -578,7 +578,7 @@ void ProgDetails::loadPage(void)
         }
     }
 
-    s = toString(recstatus, rectype);
+    s = RecStatus::toString(recstatus, rectype);
 
     if (statusDate.isValid())
         s += " " + MythDate::toString(statusDate, MythDate::kDateFull | MythDate::kAddYear);

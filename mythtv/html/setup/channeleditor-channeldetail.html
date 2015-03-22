@@ -19,10 +19,10 @@
                 <td>Icon File:</td>
                 <td style="text-align:right;">
                     <input class="expert" id='channelDetailSettingIconURL' />
-                    <img id='channelDetailSettingIconPreview' src='/images/blank.gif' width=100 height=100 onLoad='resizeChannelIcon("channelDetailSettingIconPreview", 100, 100)' />
+                    <img id='channelDetailSettingIconPreview' src='/images/blank.gif' width=100 height=100 onLoad='MythChannelEditor.ResizeChannelIcon("channelDetailSettingIconPreview", 100, 100)' />
                     <div style='width: 300px' id='iconbuttons' style="float: right; text-align:right;">
-                        <input type=button onClick='javascript:searchChannelIcon()' value='Search Online'>
-                        <input type=button onClick='javascript:browseForNewChanIcon()' value='Browse...'>
+                        <input type=button onClick='javascript:MythChannelEditor.SearchChannelIcon()' value='Search Online'>
+                        <input type=button onClick='javascript:MythChannelEditor.BrowseForNewChanIcon()' value='Browse...'>
                     </div>
                 </td>
             </tr>

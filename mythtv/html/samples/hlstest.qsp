@@ -1,10 +1,15 @@
 <html>
 <head>
 <title><i18n>HTTP Live Stream Demo</i18n></title>
+<link rel="stylesheet" type="text/css" href="/css/site.css">
+<link rel="stylesheet" type="text/css" href="/css/setup.css">
+<script type="text/javascript" src="/js/util.qjs"></script>
+<script type="text/javascript" src="/3rdParty/jquery/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="/3rdParty/jquery/jqueryUI/js/jquery-ui-1.10.3.js"></script>
 </head>
 <body>
-<script language="JavaScript" type="text/javascript" src="/js/fileutil.js"></script>
-<!-- <script language="JavaScript" type="text/javascript" src="/3rdParty/jquery/jquery-2.0.3.js"></script> -->
+<script type="text/javascript" src="/js/fileutil.js"></script>
+<!-- <script type="text/javascript" src="/3rdParty/jquery/jquery-2.0.3.min.js"></script> -->
 <%
     var content = new Content();
     var jwpExists = 0;
@@ -15,7 +20,7 @@
     {
         jwpExists = 1;
 %>
-<script language="JavaScript" type="text/javascript" src="/StorageGroup/3rdParty/JW_Player/jwplayer.js"></script>
+<script type="text/javascript" src="/StorageGroup/3rdParty/JW_Player/jwplayer.js"></script>
 <%
     }
     else
@@ -28,7 +33,7 @@ to use this HLS test page</b><hr><br>
     }
 %>
 
-<script language="JavaScript" type="text/javascript">
+<script type="text/javascript" nonce="<%=CSP_NONCE%>">
 
 $(document).ready(function() {
     listLiveStreams();

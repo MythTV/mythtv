@@ -27,6 +27,8 @@
 #include <stdlib.h>
 #include <errno.h>
 
+using namespace std;
+
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -678,6 +680,7 @@ SSDPExtension::SSDPExtension( int nServicePort , const QString &sSharePath)
   : HttpServerExtension( "SSDP" , sSharePath),
     m_nServicePort(nServicePort)
 {
+    m_nSupportedMethods |= (RequestTypeMSearch | RequestTypeNotify);
     m_sUPnpDescPath = UPnp::GetConfiguration()->GetValue( "UPnP/DescXmlPath",
                                                  m_sSharePath );
 }
@@ -745,7 +748,7 @@ void SSDPExtension::GetDeviceDesc( HTTPRequest *pRequest )
 {
     pRequest->m_eResponseType = ResponseTypeXML;
 
-    QString sUserAgent = pRequest->GetHeaderValue( "User-Agent", "" );
+    QString sUserAgent = pRequest->GetRequestHeader( "User-Agent", "" );
 
     LOG(VB_UPNP, LOG_DEBUG, "SSDPExtension::GetDeviceDesc - " +
         QString( "Host=%1 Port=%2 UserAgent=%3" )

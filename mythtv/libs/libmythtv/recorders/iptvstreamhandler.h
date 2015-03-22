@@ -106,9 +106,9 @@ class IPTVStreamHandler : public StreamHandler
     QHostAddress m_rtcp_dest;
 
     // for implementing Get & Return
-    static QMutex                            s_handlers_lock;
-    static QMap<QString, IPTVStreamHandler*> s_handlers;
-    static QMap<QString, uint>               s_handlers_refcnt;
+    static QMutex                            s_iptvhandlers_lock;
+    static QMap<QString, IPTVStreamHandler*> s_iptvhandlers;
+    static QMap<QString, uint>               s_iptvhandlers_refcnt;
 
 private:
     void timerEvent(QTimerEvent*);

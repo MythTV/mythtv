@@ -7,8 +7,8 @@
 
 #define LIBCEC_ENABLED     QString("libCECEnabled")
 #define LIBCEC_DEVICE      QString("libCECDevice")
+#define LIBCEC_BASE        QString("libCECBase")
 #define LIBCEC_PORT        QString("libCECPort")
-#define LIBCEC_DEVICEID    QString("libCECDeviceID")
 #define POWEROFFTV_ALLOWED QString("PowerOffTVAllowed")
 #define POWEROFFTV_ONEXIT  QString("PowerOffTVOnExit")
 #define POWERONTV_ALLOWED  QString("PowerOnTVAllowed")
@@ -21,8 +21,6 @@ class CECAdapter : public QObject, public MThread
   Q_OBJECT
 
   public:
-    static QStringList GetDeviceList(void);
-
     CECAdapter();
     virtual ~CECAdapter();
     bool IsValid();

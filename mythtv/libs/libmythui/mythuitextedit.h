@@ -6,12 +6,13 @@
 
 #include "mythtimer.h"
 #include "mythuitype.h"
-#include "mythuitext.h"
-#include "mythuistatetype.h"
-#include "mythuiimage.h"
 #include "mythvirtualkeyboard.h"
+#include "mythstorage.h"
 
 class MythFontProperties;
+class MythUIStateType;
+class MythUIImage;
+class MythUIText;
 
 enum InputFilter
 {

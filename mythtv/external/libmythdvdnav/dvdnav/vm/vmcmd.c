@@ -34,7 +34,6 @@
 #include <dvdread/nav_types.h>
 #include <dvdread/ifo_types.h>
 #include "decoder.h"
-#include "remap.h"
 #include "vm.h"
 #include "vmcmd.h"
 #include "dvdnav_internal.h"
@@ -269,11 +268,11 @@ static void print_special_instruction(command_t* command) {
       break;
     case 3: /*  Parental level */
       fprintf(MSG_OUT, "SetTmpPML %" PRIu8 ", Goto %" PRIu8,
-	      vm_getbits(command, 11, 4), vm_getbits(command, 7, 8));
+              vm_getbits(command, 11, 4), vm_getbits(command, 7, 8));
       break;
     default:
       fprintf(MSG_OUT, "WARNING: Unknown special instruction (%i)",
-	      vm_getbits(command, 51, 4));
+              vm_getbits(command, 51, 4));
   }
 }
 
@@ -306,15 +305,15 @@ static void print_link_instruction(command_t* command, int optional) {
       break;
     case 5:
       fprintf(MSG_OUT, "LinkPTT %" PRIu16 " (button %" PRIu8 ")",
-	      vm_getbits(command, 9, 10), vm_getbits(command, 15, 6));
+              vm_getbits(command, 9, 10), vm_getbits(command, 15, 6));
       break;
     case 6:
       fprintf(MSG_OUT, "LinkPGN %" PRIu8 " (button %" PRIu8 ")",
-	      vm_getbits(command, 6, 7), vm_getbits(command, 15, 6));
+              vm_getbits(command, 6, 7), vm_getbits(command, 15, 6));
       break;
     case 7:
       fprintf(MSG_OUT, "LinkCN %" PRIu8 " (button %" PRIu8 ")",
-	      vm_getbits(command, 7, 8), vm_getbits(command, 15, 6));
+              vm_getbits(command, 7, 8), vm_getbits(command, 15, 6));
       break;
     default:
       fprintf(MSG_OUT, "WARNING: Unknown link instruction");
@@ -334,7 +333,7 @@ static void print_jump_instruction(command_t* command) {
       break;
     case 5:
       fprintf(MSG_OUT, "JumpVTS_PTT %" PRIu8 ":%" PRIu16,
-	      vm_getbits(command, 22, 7), vm_getbits(command, 41, 10));
+              vm_getbits(command, 22, 7), vm_getbits(command, 41, 10));
       break;
     case 6:
       switch(vm_getbits(command, 23, 2)) {
@@ -346,7 +345,7 @@ static void print_jump_instruction(command_t* command) {
           break;
         case 2:
           fprintf(MSG_OUT, "JumpSS VTSM (vts %" PRIu8 ", title %" PRIu8
-		  ", menu %" PRIu8 ")", vm_getbits(command, 30, 7), vm_getbits(command, 38, 7), vm_getbits(command, 19, 4));
+                  ", menu %" PRIu8 ")", vm_getbits(command, 30, 7), vm_getbits(command, 38, 7), vm_getbits(command, 19, 4));
           break;
         case 3:
           fprintf(MSG_OUT, "JumpSS VMGM (pgc %" PRIu8 ")", vm_getbits(command, 46, 15));
@@ -361,15 +360,15 @@ static void print_jump_instruction(command_t* command) {
           break;
         case 1:
           fprintf(MSG_OUT, "CallSS VMGM (menu %" PRIu8
-		  ", rsm_cell %" PRIu8 ")", vm_getbits(command, 19, 4), vm_getbits(command, 31, 8));
+                  ", rsm_cell %" PRIu8 ")", vm_getbits(command, 19, 4), vm_getbits(command, 31, 8));
           break;
         case 2:
           fprintf(MSG_OUT, "CallSS VTSM (menu %" PRIu8
-		  ", rsm_cell %" PRIu8 ")", vm_getbits(command, 19, 4), vm_getbits(command, 31, 8));
+                  ", rsm_cell %" PRIu8 ")", vm_getbits(command, 19, 4), vm_getbits(command, 31, 8));
           break;
         case 3:
           fprintf(MSG_OUT, "CallSS VMGM (pgc %" PRIu8 ", rsm_cell %" PRIu8 ")",
-		  vm_getbits(command, 46, 15), vm_getbits(command, 31, 8));
+                  vm_getbits(command, 46, 15), vm_getbits(command, 31, 8));
           break;
       }
       break;
@@ -405,9 +404,9 @@ static void print_system_set(command_t* command) {
     case 3: /*  Mode: Counter / Register + Set */
       fprintf(MSG_OUT, "SetMode ");
       if(vm_getbits(command, 23, 1))
-	fprintf(MSG_OUT, "Counter ");
+        fprintf(MSG_OUT, "Counter ");
       else
-	fprintf(MSG_OUT, "Register ");
+        fprintf(MSG_OUT, "Register ");
       print_g_reg(vm_getbits(command, 19, 4));
       print_set_op(0x1); /*  '=' */
       print_reg_or_data(command, vm_getbits(command, 60, 1), 47);
@@ -421,7 +420,7 @@ static void print_system_set(command_t* command) {
       break;
     default:
       fprintf(MSG_OUT, "WARNING: Unknown system set instruction (%i)",
-	      vm_getbits(command, 59, 4));
+              vm_getbits(command, 59, 4));
   }
 }
 

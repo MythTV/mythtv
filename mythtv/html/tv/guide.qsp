@@ -5,7 +5,7 @@ import "/js/utility.js"
 import "/tv/js/constants.js"
 
     var guideOnly = 0;
-    if (getArg("GuideOnly"))
+    if (getArg("ListOnly"))
         guideOnly = 1;
 
     var channelGroup = 0; // All
@@ -98,20 +98,18 @@ import "/tv/js/constants.js"
 
 <% if (!guideOnly) {%>
 <!DOCTYPE html>
-<html>
 <head>
-<meta charset="UTF-8">
 <title><%=qsTr("Program Guide")%> - <%=myth.GetFormatDate(guideStartTime)%>,
        <%=myth.GetFormatTime(guideStartTime)%> - <%=myth.GetFormatTime(guideEndTime)%></title>
 <link rel="stylesheet" type="text/css" href="/css/site.css">
 <link rel="stylesheet" type="text/css" href="/tv/css/guide.css">
 <link rel="stylesheet" type="text/css" href="/tv/css/common.css">
 <link rel="stylesheet" type="text/css" href="/tv/css/category_colors.css">
-<!-- <link rel="stylesheet" type="text/css" href="/3rdParty/jquery/slick/slick.css"> -->
-<script src="/js/utility.js"></script> <!-- ECMA not JS -->
-<script src="/js/util.qjs"></script>
-<script src="/tv/js/common.js"></script>
-<script src="/tv/js/guide.js"></script>
+<script type="text/javascript" src="/js/utility.js"></script> <!-- ECMA not JS -->
+<script type="text/javascript" src="/3rdParty/jquery/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="/tv/js/common.js"></script>
+<script type="text/javascript" src="/tv/js/guide.js"></script>
+<script type="text/javascript" src="/js/util.qjs"></script>
 </head>
 <body>
 
@@ -122,16 +120,16 @@ import "/tv/js/constants.js"
      side (harder to maintain/template) or keeping in together inline with the
      other related html, with as little non-html markup as possible -->
 <div id="optMenu" class="contextMenu" style="display:none;">
-    <div class="button scheduleMenu" onClick="recordProgram(gChanID, gStartTime, 'Single Record')">
+    <div class="button scheduleMenu" onClick="MythCommon.RecordProgram(gChanID, gStartTime, 'Single Record')">
         <%=qsTr("Record this showing")%>
     </div>
-    <div class="button scheduleMenu" onClick="recordProgram(gChanID, gStartTime, 'Record All')">
+    <div class="button scheduleMenu" onClick="MythCommon.RecordProgram(gChanID, gStartTime, 'Record All')">
         <%=qsTr("Record all showings")%>
     </div>
-    <div class="button scheduleMenu" onClick="recordProgram(gChanID, gStartTime, 'Record One')">
+    <div class="button scheduleMenu" onClick="MythCommon.RecordProgram(gChanID, gStartTime, 'Record One')">
         <%=qsTr("Record one showing")%>
     </div>
-    <div class="button scheduleMenu" onClick="recordProgram(gChanID, gStartTime, 'Record All (Channel)')">
+    <div class="button scheduleMenu" onClick="MythCommon.RecordProgram(gChanID, gStartTime, 'Record All (Channel)')">
         <%=qsTr("Record all showings (this channel)")%>
     </div>
     <div class="button delSchedMenu" onClick="dontRecord(gChanID, gStartTime)">
@@ -161,7 +159,7 @@ if (chanGroups.length)
 {
 %>
     <label for="ChannelGroup"><%=qsTr("Group")%>:
-    <select id="ChannelGroup" name="ChannelGroup" onChange="submitGuideForm(this)">
+    <select id="ChannelGroup" name="ChannelGroup" onChange="MythGuide.SubmitGuideForm(this.form)">
         <option label="<%=qsTr("All Channels")%>" value="0"><%=qsTr("All Channels")%></option>
 <%
     for (var grpIdx = 0; grpIdx < chanGroups.length; grpIdx++)
@@ -180,7 +178,7 @@ if (chanGroups.length)
 }
 %>
     <label for="guideStartDate"><%=qsTr("Date")%>:
-    <select id="guideStartDate" name="GuideDate" onChange="changeGuideStartTime(this)">
+    <select id="guideStartDate" name="GuideDate" onChange="MythGuide.ChangeGuideStartTime(this)">
 <%
     var startDay = new Date(now);
     startDay.setDate(now.getDate() - 14); // We keep old guide date for 14 days
@@ -197,7 +195,7 @@ if (chanGroups.length)
     </select>
     </label>
     <label for="guideStartTime"><%=qsTr("Time")%>:
-    <select id="guideStartTime" name="GuideTime" onChange="changeGuideStartTime(this)">
+    <select id="guideStartTime" name="GuideTime" onChange="MythGuide.ChangeGuideStartTime(this)">
 <%
     var startTime = new Date(guideStartTime);
     startTime.setHours(0);
@@ -214,21 +212,21 @@ if (chanGroups.length)
 %>
     </select>
     </label>
-    <input type="hidden" name="GuideOnly" value="1" />
+    <input type="hidden" name="ListOnly" value="1" />
     <input type="hidden" name="NumPages" id="NumPages" value="<%=numPages%>" />
     </form>
 </div>
 
-<div id="guide-container" style="overflow:hidden;clear:both;width:100%;">
+<div id="guide-container">
 
-<div id="guideGrid" class="guideGrid jscroll">
+<div id="guideGrid" class="guideGrid">
 <%} // End of the header %>
 
-    <div class="pageLeft" onClick="pageLeft();">
+    <div class="pageLeft" onClick="MythGuide.MovePage('left');">
         &lt;
     </div>
 
-    <div class="pageRight" onClick="pageRight();">
+    <div class="pageRight" onClick="MythGuide.MovePage('right');">
         &gt;
     </div>
 
@@ -275,11 +273,14 @@ if (chanGroups.length)
         if (!channel.Visible)
             continue;
         var programList = channel.Programs;
+        var channelIcon = "/tv/images/channel_icon.svg";
+        if (channel.IconURL)
+            channelIcon = channel.IconURL + "&amp;Height=57";
 %>
 
         <div class="channelRow">
             <div class="channelBox">
-                <img class="channelIcon" height="57" alt="<%=escapeHTML(channel.ChannelName)%> Icon" src="/Guide/GetChannelIcon?ChanId=<%=channel.ChanId%>&amp;Height=57" />
+                <img class="channelIcon" height="57" alt="<%=escapeHTML(channel.ChannelName)%> Icon" src="<%=channelIcon%>" lazyload />
                 <div class="channelText"><%=escapeHTML(channel.CallSign)%></div>
             </div>
             <div class="programsBox">
@@ -287,6 +288,7 @@ if (chanGroups.length)
 <%
         var programNum = 0;
         var cumulativeWidth = 0;
+        var previousEndtime = 0;
         for (var progIdx=0; progIdx < programList.length; progIdx++)
         {
             var program =  programList[progIdx];
@@ -294,6 +296,18 @@ if (chanGroups.length)
                 continue;
             if (program.StartTime >= (guideEndTime))
                 continue;
+
+            // This shouldn't happen, generally when it does it's because the
+            // services API supplied us overlapping programs. This needs to be
+            // fixed in the services API, or better yet at guide data insertion.
+            if (previousEndtime && (program.EndTime <= previousEndtime))
+                continue;
+            if (previousEndtime && (program.StartTime < previousEndtime))
+                program.StartTime = previousEndtime;
+
+            // Keep track of the programme end time, we may need to
+            // do some fixups on the data on the next programme
+            previousEndtime = program.EndTime;
 
             // To allow us to indicate in some way that the program continues
             // from an earlier time, or runs to a later time somewhere
@@ -319,11 +333,12 @@ if (chanGroups.length)
             // Due to rounding issues we can end up a percentage point or two over
             // this just trims the last width to prevent that happening.
             if (progIdx == (programList.length - 1))
-            {
                 width = (cumulativeWidth < 100.0) ? width + (100.0 - cumulativeWidth) : width;
-                width = (cumulativeWidth > 100.0) ? width - (cumulativeWidth - 100.0) : width;
-            }
+            width = (cumulativeWidth > 100.0) ? width - (cumulativeWidth - 100.0) : width;
             width = width.toFixed(3);
+
+            if (width < 0)
+                width = 0; // This should NEVER happen if the guide data is sane ...
 
             var categoryClass = "category_" + toCapitalCase(escapeHTML(program.Category).replace(/ /g, ''))
 
@@ -337,17 +352,23 @@ if (chanGroups.length)
             // Used as a unique identifier and also to access the chanid
             // and starttime for the AJAX scheduling stuff
             var programIdentifier = channel.ChanId + "_" + program.StartTime.toISOString();
+
+            var programDescription = program.Description;
+
+             // Very rough system for deciding how much of the description to truncate (for loading speed, rather than display reasons)
+            var maxDescriptionLength = (width / 100 * 600);
+            programDescription = truncateString(program.Description, maxDescriptionLength);
 %>
                 <div class="programBox" style="width:<%=width%>%;">
                     <div class="programBoxInner <%=categoryClass%> <%=statusClass%> <%=startClass%> <%=endClass%>" id="<%=programIdentifier%>" data-recordid="<%=program.Recording.RecordId%>" data-chanid="<%=channel.ChanId%>" data-starttime="<%=program.StartTime.toISOString()%>" onMouseOver="startDetailTimer(this, 'program');" onMouseOut="hideDetail(this);" onClick="showMenu(this, '<%=menu%>');">
                         <div class="programHeader">
                             <div class="programTitle">
-                                <% if (program.CatType == CategoryType.MOVIE) {%><img src="/tv/images/cat_movie.svg" width="18" height="13" alt="<%=qsTr("Movie")%>" title="<%=qsTr("Movie")%>" /><%}%> <%=escapeHTML(program.Title)%> <% if (isValidObject(program.Airdate) && program.Airdate.getFullYear() && program.CatType == "movie") {%>(<%=program.Airdate.getFullYear()%>)<%}%>
+                                <% if (program.CatType == CategoryType.MOVIE) {%><img src="/tv/images/cat_movie.svg" width="18" height="13" alt="<%=qsTr("Movie")%>" title="<%=qsTr("Movie")%>" /><%}%> <%=escapeHTML(program.Title)%> <% if (isValidObject(program.Airdate) && program.Airdate.getFullYear() && program.CatType == "movie") {%><span class="programAirDate">(<%=program.Airdate.getFullYear()%>)</span><%}%>
                             </div>
                         </div>
                         <div class="programBody">
                             <span class="programSubtitle"><%=escapeHTML(program.SubTitle)%></span>
-                            <span class="programDescription"><%=escapeHTML(program.Description)%></span>
+                            <span class="programDescription"><%=escapeHTML(programDescription)%></span>
                         </div>
                         <div class="programSchedPopup" id="<%=programIdentifier%>_schedpopup">
                             <%=qsTr("Scheduling")%> ...
@@ -367,24 +388,12 @@ if (chanGroups.length)
     </div>
 
 <% if (nextStartIndex) { %>
-<a class="jscroll-next" href="/tv/guide.qsp?ChannelGroup=<%=channelGroup%>&amp;StartTime=<%=guideStartTime.toISOString()%>&amp;Start=<%=nextStartIndex%>&amp;GuideOnly=1" />
+<a class="jscroll-next" href="/tv/guide.qsp?ChannelGroup=<%=channelGroup%>&amp;StartTime=<%=guideStartTime.toISOString()%>&amp;Start=<%=nextStartIndex%>&amp;ListOnly=1" />
 <%}%>
 
 <% if (!guideOnly) {%>
 </div> <!-- End guideGrid -->
 </div> <!-- End guideGrid-container -->
 
-<!-- <script type="text/javascript">
-
-    window.onresize = function(event)
-    {
-        fixGuideHeight();
-    };
-
-    fixGuideHeight();
-
-</script> -->
-
 </body>
-</html>
 <%}%>

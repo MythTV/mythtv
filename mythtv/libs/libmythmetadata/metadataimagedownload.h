@@ -3,6 +3,7 @@
 
 #include <QString>
 #include <QStringList>
+#include <QMutex>
 
 #include "mthread.h"
 #include "mythmetaexp.h"

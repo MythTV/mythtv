@@ -16,9 +16,8 @@
 // Qt headers
 #include <QCoreApplication>
 #include <QUrl>
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-#include <QHttp>
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+#include <QUrlQuery>
 #endif
 
 // MythTV headers
@@ -28,6 +27,7 @@
 #include "cetonchannel.h"
 #include "mythlogging.h"
 #include "cardutil.h"
+#include "mythdownloadmanager.h"
 
 #define LOC QString("CetonSH(%1): ").arg(_device)
 
@@ -335,7 +335,11 @@ bool CetonStreamHandler::TuneFrequency(
     _last_frequency = frequency;
     _last_modulation = modulation;
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     QUrl params;
+#else
+    QUrlQuery params;
+#endif
     params.addQueryItem("instance_id", QString::number(_tuner));
     params.addQueryItem("frequency", QString::number(frequency));
     params.addQueryItem("modulation",modulation_id);
@@ -375,7 +379,11 @@ bool CetonStreamHandler::TuneProgram(uint program)
 
     _last_program = program;
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     QUrl params;
+#else
+    QUrlQuery params;
+#endif
     params.addQueryItem("instance_id", QString::number(_tuner));
     params.addQueryItem("program", QString::number(program));
 
@@ -399,7 +407,11 @@ bool CetonStreamHandler::PerformTuneVChannel(const QString &vchannel)
     LOG(VB_RECORD, LOG_INFO, LOC + QString("PerformTuneVChannel(%1)")
         .arg(vchannel));
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     QUrl params;
+#else
+    QUrlQuery params;
+#endif
     params.addQueryItem("instance_id", QString::number(_tuner));
     params.addQueryItem("channel", vchannel);
 
@@ -480,7 +492,11 @@ QString CetonStreamHandler::GetVar(
     QString loc = LOC + QString("DoGetVar(%1,%2,%3,%4) - ")
         .arg(_ip_address).arg(_tuner).arg(section,variable);
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     QUrl params;
+#else
+    QUrlQuery params;
+#endif
     params.addQueryItem("i", QString::number(_tuner));
     params.addQueryItem("s", section);
     params.addQueryItem("v", variable);
@@ -512,7 +528,11 @@ QStringList CetonStreamHandler::GetProgramList()
     QString loc = LOC + QString("CetonHTTP: DoGetProgramList(%1,%2) - ")
         .arg(_ip_address).arg(_tuner);
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     QUrl params;
+#else
+    QUrlQuery params;
+#endif
     params.addQueryItem("i", QString::number(_tuner));
 
     QString response;
@@ -540,56 +560,80 @@ QStringList CetonStreamHandler::GetProgramList()
 }
 
 bool CetonStreamHandler::HttpRequest(
-    const QString &method, const QString &script, const QUrl &params,
+    const QString &method, const QString &script,
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+    const QUrl &params,
+#else
+    const QUrlQuery &params,
+#endif
     QString &response, uint &status_code) const
 {
+    QUrl url;
+    QNetworkRequest *request = new QNetworkRequest();
+    QByteArray data;
+    MythDownloadManager *manager = GetMythDownloadManager();
+
+    url.setScheme("http");
+    url.setHost(_ip_address);
+    url.setPath(script);
+
+    // Specify un-cached access to the device
+    // The next two lines are automagically added by Qt
+    // request->setRawHeader("Cache-Control", "no-cache");
+    // request->setRawHeader("Pragma", "no-cache");
+    request->setAttribute(QNetworkRequest::CacheLoadControlAttribute,
+                          QNetworkRequest::AlwaysNetwork);
+
+    if ("GET" == method)
+    {
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-    QHttp http;
-    http.setHost(_ip_address);
-
-    QByteArray request_params(params.encodedQuery());
-
-    if (method == "GET")
-    {
-        QString path = script + "?" + QString(request_params);
-        QHttpRequestHeader header(method, path);
-        header.setValue("Host", _ip_address);
-        http.request(header);
-    }
-    else
-    {
-        QHttpRequestHeader header(method, script);
-        header.setValue("Host", _ip_address);
-        header.setContentType("application/x-www-form-urlencoded");
-        http.request(header, request_params);
-    }
-
-    while (http.hasPendingRequests() || http.currentId())
-    {
-        usleep(5000);
-        qApp->processEvents();
-    }
-
-    if (http.error() != QHttp::NoError)
-    {
-        status_code = 0;
-        response = http.errorString();
-        return false;
-    }
-
-    QHttpResponseHeader resp_header = http.lastResponse();
-    if (!resp_header.isValid())
-    {
-        status_code = 0;
-        response = "Completed but response object was not valid";
-        return false;
-    }
-
-    status_code = resp_header.statusCode();
-    response = QString(http.readAll());
-    return true;
+        url.setEncodedQuery(params.encodedQuery());
 #else
-#warning CetonStreamHandler::HttpRequest() not yet ported to Qt5
-    return false;
+        url.setQuery(params);
 #endif
+        request->setUrl(url);
+        if (manager->download(request, &data))
+        {
+            response = QString(data);
+            status_code = 200;
+            return true;
+        }
+        else
+        {
+            response = "Download failed";
+            status_code = 500;
+            return false;
+        }
+    }
+    else if ("POST" == method)
+    {
+        request->setUrl(url);
+        request->setHeader(QNetworkRequest::ContentTypeHeader,
+                           "application/x-www-form-urlencoded");
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+        data = params.encodedQuery();
+#else
+        data = params.query(QUrl::FullyEncoded).toUtf8();
+#endif
+        // Next line automagically added by Qt
+        // request->setHeader(QNetworkRequest::ContentLengthHeader, data.size());
+        if (manager->post(request, &data))
+        {
+            response = QString(data);
+            status_code = 200;
+            return true;
+        }
+        else
+        {
+            response = "Download failed";
+            status_code = 500;
+            return false;
+        }
+    }
+
+    delete request;
+
+    response = "Unsupported HttpRequest method";
+    status_code = 500;
+    return false;
 }

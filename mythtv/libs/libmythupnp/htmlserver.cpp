@@ -15,9 +15,12 @@
 #include "storagegroup.h"
 #include "httprequest.h"
 
+#include "serviceHosts/rttiServiceHost.h"
+
 #include <QFileInfo>
 #include <QDir>
 #include <QTextStream>
+#include <QUuid>
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -28,20 +31,18 @@ HtmlServerExtension::HtmlServerExtension( const QString &sSharePath,
   : HttpServerExtension( "Html" , sSharePath),
     m_IndexFilename(sApplicationPrefix + "index")
 {
-    // Cache the canonical path for the share directory.
-
-    QDir dir( sSharePath + "/html" );
-
-    if (getenv("MYTHHTMLDIR"))
-    {
-        QString sTempSharePath = getenv("MYTHHTMLDIR");
-        if (!sTempSharePath.isEmpty())
-            dir.setPath( sTempSharePath );
-    }
-
-    m_sSharePath =  dir.canonicalPath();
-
+    LOG(VB_HTTP, LOG_INFO, QString("HtmlServerExtension() - SharePath = %1")
+            .arg(m_sSharePath));
     m_Scripting.SetResourceRootPath( m_sSharePath );
+    
+    // ----------------------------------------------------------------------
+    // Register Rtti with QtScript Engine.
+    // Rtti exposes internal enums complete with translations for use in scripts
+    // ----------------------------------------------------------------------
+
+    QScriptEngine *pEngine = ScriptEngine();
+    pEngine->globalObject().setProperty("Rtti",
+         pEngine->scriptValueFromQMetaObject< ScriptableRtti >() );
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -60,6 +61,19 @@ bool HtmlServerExtension::ProcessRequest( HTTPRequest *pRequest )
 {
     if (pRequest)
     {
+        if ((pRequest->m_eType != RequestTypeGet) &&
+            (pRequest->m_eType != RequestTypeHead) &&
+            (pRequest->m_eType != RequestTypePost))
+        {
+            pRequest->m_eResponseType = ResponseTypeHeader;
+            pRequest->m_nResponseStatus = 405; // Method not allowed
+            // Conservative list, we can't really know what methods we
+            // actually allow for an arbitrary resource without some sort of
+            // high maintenance database
+            pRequest->SetResponseHeader("Allow",  "GET, HEAD");
+            return true;
+        }
+
         if ( pRequest->m_sBaseUrl.startsWith("/") == false)
             return( false );
 
@@ -105,6 +119,12 @@ bool HtmlServerExtension::ProcessRequest( HTTPRequest *pRequest )
                         sResName = oInfo.symLinkTarget();
 
                     // ------------------------------------------------------
+                    // CSP Nonce
+                    // ------------------------------------------------------
+                    QByteArray cspNonce = QUuid::createUuid().toByteArray().toBase64();
+                    cspNonce = cspNonce.mid(1, cspNonce.length() - 2); // UUID, with braces removed
+
+                    // ------------------------------------------------------
                     // Is this a Qt Server Page (File contains script)...
                     // ------------------------------------------------------
 
@@ -126,13 +146,70 @@ bool HtmlServerExtension::ProcessRequest( HTTPRequest *pRequest )
                               sSuffix != "svgz") // svgz are pre-compressed
                         pRequest->m_eResponseType = ResponseTypeSVG;
 
+                    // ---------------------------------------------------------
+                    // Force IE into 'standards' mode
+                    // ---------------------------------------------------------
+                    pRequest->SetResponseHeader("X-UA-Compatible", "IE=Edge");
+
+                    // ---------------------------------------------------------
+                    // SECURITY: Set X-Content-Type-Options to 'nosniff'
+                    //
+                    // IE only for now. Prevents browsers ignoring the
+                    // Content-Type header we supply and potentially executing
+                    // malicious script embedded in an image or css file.
+                    //
+                    // Yes, really, you need to explicitly disable this sort of
+                    // dangerous behaviour in 2015!
+                    // ---------------------------------------------------------
+                    pRequest->SetResponseHeader("X-Content-Type-Options",
+                                                "nosniff");
+
+                    // ---------------------------------------------------------
+                    // SECURITY: Set Content Security Policy
+                    //
+                    // *No external content allowed*
+                    //
+                    // This is an important safeguard. Third party content
+                    // should never be permitted. It compromises security,
+                    // privacy and violates the key principal that the
+                    // WebFrontend should work on an isolated network with no
+                    // internet access. Keep all content hosted locally!
+                    // ---------------------------------------------------------
+
+                    // For now the following are disabled as we use xhr to
+                    // trigger playback on frontends if we switch to triggering
+                    // that through an internal request then these would be
+                    // better enabled
+                    //"default-src 'self'; "
+                    //"connect-src 'self' https://services.mythtv.org; "
+
+                    // FIXME: unsafe-inline should be phased out, replaced by nonce-{csp_nonce} but it requires
+                    //        all inline event handlers and style attributes to be removed ...
+                    QString cspPolicy = "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://services.mythtv.org; " // QString('nonce-%1').arg(QString(cspNonce))
+                                        "style-src 'self' 'unsafe-inline'; "
+                                        "frame-src 'self'; "
+                                        "object-src 'self'; " // TODO: When we no longer require flash for some browsers, change this to 'none'
+                                        "media-src 'self'; "
+                                        "font-src 'self'; "
+                                        "img-src 'self'; "
+                                        "form-action 'self'; "
+                                        "frame-ancestors 'self'; "
+                                        "reflected-xss filter;";
+
+                    // For standards compliant browsers
+                    pRequest->SetResponseHeader("Content-Security-Policy",
+                                                cspPolicy);
+                    // For Internet Explorer
+                    pRequest->SetResponseHeader("X-Content-Security-Policy",
+                                                cspPolicy);
+
                     if ((sSuffix == "qsp") ||
                         (sSuffix == "qxml") ||
                         (sSuffix == "qjs" )) 
                     {
                         QTextStream stream( &pRequest->m_response );
                         
-                        m_Scripting.EvaluatePage( &stream, sResName, pRequest);
+                        m_Scripting.EvaluatePage( &stream, sResName, pRequest, cspNonce);
 
                         return true;
 

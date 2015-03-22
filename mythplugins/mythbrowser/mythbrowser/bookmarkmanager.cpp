@@ -327,7 +327,7 @@ bool BookmarkManager::keyPressEvent(QKeyEvent *event)
 
             if (item)
             {
-                Bookmark *site = qVariantValue<Bookmark*>(item->GetData());
+                Bookmark *site = item->GetData().value<Bookmark*>();
 
                 if (item->state() == MythUIButtonListItem::NotChecked)
                 {
@@ -370,7 +370,7 @@ void BookmarkManager::slotBookmarkClicked(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    Bookmark *site = qVariantValue<Bookmark*>(item->GetData());
+    Bookmark *site = item->GetData().value<Bookmark*>();
     if (!site)
         return;
 
@@ -428,7 +428,7 @@ void BookmarkManager::ShowEditDialog(bool edit)
 
         if (item && item->GetData().isValid())
         {
-            site = qVariantValue<Bookmark*>(item->GetData());
+            site = item->GetData().value<Bookmark*>();
             m_savedBookmark = *site;
         }
         else
@@ -471,7 +471,7 @@ void BookmarkManager::ReloadBookmarks(void)
         item = m_bookmarkList->GetItemAt(x);
         if (item && item->GetData().isValid())
         {
-            Bookmark *site = qVariantValue<Bookmark*>(item->GetData());
+            Bookmark *site = item->GetData().value<Bookmark*>();
             if (site && (*site == m_savedBookmark))
             {
                 m_bookmarkList->SetItemCurrent(item);
@@ -499,7 +499,7 @@ void BookmarkManager::slotSetHomepage(void)
     MythUIButtonListItem *item = m_bookmarkList->GetItemCurrent();
     if (item && item->GetData().isValid())
     {
-        Bookmark *site = qVariantValue<Bookmark*>(item->GetData());
+        Bookmark *site = item->GetData().value<Bookmark*>();
         if (site)
             UpdateHomepageInDB(site);
     }
@@ -543,7 +543,7 @@ void BookmarkManager::slotDoDeleteCurrent(bool doDelete)
     if (item)
     {
         QString category = "";
-        Bookmark *site = qVariantValue<Bookmark*>(item->GetData());
+        Bookmark *site = item->GetData().value<Bookmark*>();
         if (site)
         {
             category = site->category;
@@ -616,7 +616,7 @@ void BookmarkManager::slotShowMarked(void)
     MythUIButtonListItem *item = m_bookmarkList->GetItemCurrent();
     if (item && item->GetData().isValid())
     {
-       Bookmark *site = qVariantValue<Bookmark*>(item->GetData());
+       Bookmark *site = item->GetData().value<Bookmark*>();
        m_savedBookmark = *site;
     }
 
@@ -679,7 +679,7 @@ void BookmarkManager::slotClearMarked(void)
         {
             item->setChecked(MythUIButtonListItem::NotChecked);
 
-            Bookmark *site = qVariantValue<Bookmark*>(item->GetData());
+            Bookmark *site = item->GetData().value<Bookmark*>();
             if (site)
                 site->selected = false;
         }

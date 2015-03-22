@@ -6,6 +6,8 @@
 #include "ssdp.h"
 #include "upnpscanner.h"
 
+#include <unistd.h> // for sleep()
+
 #define LOC QString("UPnPScan: ")
 #define ERR QString("UPnPScan error: ")
 

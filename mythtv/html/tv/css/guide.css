@@ -42,17 +42,22 @@
     color: rgba(255, 255, 255, 1.0);
 }
 
+#guide-container
+{
+    overflow: hidden;
+    clear: both;
+    width: 100%;
+}
+
 /* Guide Grid */
 .guideGrid
 {
-    /* BEGIN HACK Most modern browsers support calc, but some like Opera 12 on
-     * linux don't, so we have trust this will work for now */
-    width: 98%;
-    /* END HACK */
-
+    clear: both;
+    overflow:hidden;
     width: calc(100% - 15px); /* Need to subtract padding of parent */
     position: absolute;
     padding: 0px;
+    padding-bottom: 10px;
 }
 
 .guideGrid div
@@ -169,6 +174,7 @@
 .guideGrid .channelIcon
 {
     height: 57px;
+    max-width: 86px;
     margin-left: 4px;
     margin-bottom: 3px;
     overflow: hidden;
@@ -273,6 +279,12 @@
     vertical-align: middle;
 }
 
+.guideGrid .programAirDate
+{
+    color: #508ED8;
+    font-size: 0.8em;
+}
+
 .guideGrid .programBody
 {
     margin: 3px 5px 4px 5px;
@@ -292,6 +304,7 @@
 
 .guideGrid .programSubtitle
 {
+    color: #508ED8;
     position: relative;
     font-weight: bold;
     margin-right: 5px;

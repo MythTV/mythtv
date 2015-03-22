@@ -113,25 +113,54 @@ QString DLNAProfileName(const QString &mimeType, const QSize &resolution,
                         const QString &vidCodec, const QString &audioCodec)
 {
     QString sProfileName;
-    bool isHD = (resolution.height() >= 720);
+    bool isHD = (resolution.height() >= 720) || (resolution.width() > 720);
 
-    if (mimeType == "audio/mpeg")
+    //QString sBroadcastStandard = "";
+    // HACK This is just temporary until we start storing more video
+    // information in the database for each file and can determine this
+    // stuff 'properly'
+    QString sCountryCode = gCoreContext->GetLocale()->GetCountryCode();
+    bool isNorthAmerica = (sCountryCode == "us" || sCountryCode == "ca" ||
+                            sCountryCode == "mx"); // North America (NTSC/ATSC)
+
+    if (container == "MPEG2-PS")
     {
-        sProfileName = "MP3X";
+        if (isHD && audioCodec == "DTS")
+            sProfileName = "MPEG_PS_HD_DTS";
+        else if (isHD)
+        {
+            // Fallthough, no DLNA profiles
+        }
+        else if (audioCodec == "DTS")
+            sProfileName = "MPEG_PS_SD_DTS";
+        else
+        {
+            if (isNorthAmerica)
+                sProfileName = "MPEG_PS_NTSC";
+            else
+                sProfileName = "MPEG_PS_PAL";
+        }
     }
-    else if (mimeType == "audio/x-ms-wma")
+    else if (container == "MPEG2-TS")
     {
-        sProfileName = "WMAFULL";
+        if (isNorthAmerica)
+        {
+            if (vidCodec == "H264")
+                sProfileName = "AVC_TS_NA_ISO";
+            else if (isHD) // && videoCodec == "MPEG2VIDEO"
+                sProfileName = "MPEG_TS_HD_NA_ISO";
+            else // if (videoCodec == "MPEG2VIDEO")
+                sProfileName = "MPEG_TS_SD_NA_ISO";
+        }
+        else // Europe standard (DVB)
+        {
+            if (vidCodec == "H264" || isHD) // All HD is AVC with DVB
+                sProfileName = "AVC_TS_EU_ISO";
+            else // if (videoCodec == "MPEG2VIDEO")
+                sProfileName = "MPEG_TS_SD_EU_ISO";
+        }
     }
-    else if (mimeType == "audio/vnd.dolby.dd-raw")
-    {
-        sProfileName = "AC3";
-    }
-    else if (mimeType == "audio/mp4")
-    {
-        sProfileName = "AAC_ISO_320";
-    }
-    else if (mimeType == "video/x-matroska" || container == "matroska")
+    else if (mimeType == "video/x-matroska" || container == "MATROSKA")
     {
         // TODO: We need to know the video and audio codecs before we can serve
         // up the correct profile.
@@ -168,61 +197,21 @@ QString DLNAProfileName(const QString &mimeType, const QSize &resolution,
             }
         }
     }
-    else if (mimeType == "video/mpeg")
+    else if (mimeType == "audio/mpeg")
     {
-        // We currently only handle untranscoded files in TS containers
-        // adhering to Digital TV standards. This should cover 75% of recordings
-        // although not older recordings which were made from analogue sources.
-        //
-        // It's a starting point, and temporary until we can implement a more
-        // robust way of determing the correct profile.
-
-        //QString sBroadcastStandard = "";
-        // HACK This is just temporary until we start storing more video
-        // information in the database for each file and can determine this
-        // stuff 'properly'
-        QString sCountryCode = gCoreContext->GetLocale()->GetCountryCode();
-        bool isNorthAmerica = (sCountryCode == "us" || sCountryCode == "ca" ||
-                               sCountryCode == "mx"); // North America (NTSC/ATSC)
-
-        if (container == "MPEG-2 PS")
-        {
-            if (isHD && audioCodec == "DTS")
-                sProfileName = "MPEG_PS_HD_DTS";
-            else if (isHD)
-            {
-                // Fallthough, no DLNA profiles
-            }
-            else if (audioCodec == "DTS")
-                sProfileName = "MPEG_PS_SD_DTS";
-            else
-            {
-                if (isNorthAmerica)
-                    sProfileName = "MPEG_PS_NTSC";
-                else
-                    sProfileName = "MPEG_PS_PAL";
-            }
-        }
-        else if (container == "MPEG-2 TS")
-        {
-            if (isNorthAmerica)
-            {
-                if (vidCodec == "H264")
-                    sProfileName = "AVC_TS_NA_ISO";
-                else if (isHD) // && videoCodec == "MPEG2VIDEO"
-                    sProfileName = "MPEG_TS_HD_NA_ISO";
-                else // if (videoCodec == "MPEG2VIDEO")
-                    sProfileName = "MPEG_TS_SD_NA_ISO";
-            }
-            else // Europe standard (DVB)
-            {
-                if (vidCodec == "H264" || isHD) // All HD is AVC with DVB
-                    sProfileName = "AVC_TS_EU_ISO";
-                else // if (videoCodec == "MPEG2VIDEO")
-                    sProfileName = "MPEG_TS_SD_EU_ISO";
-            }
-        }
-        // Fall through
+        sProfileName = "MP3X";
+    }
+    else if (mimeType == "audio/x-ms-wma")
+    {
+        sProfileName = "WMAFULL";
+    }
+    else if (mimeType == "audio/vnd.dolby.dd-raw")
+    {
+        sProfileName = "AC3";
+    }
+    else if (mimeType == "audio/mp4")
+    {
+        sProfileName = "AAC_ISO_320";
     }
     else if (mimeType == "image/jpeg")
     {

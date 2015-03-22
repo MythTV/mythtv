@@ -173,7 +173,7 @@ void MythNewsConfig::toggleItem(MythUIButtonListItem *item)
     if (!item )
         return;
 
-    NewsSiteItem *site = qVariantValue<NewsSiteItem*>(item->GetData());
+    NewsSiteItem *site = item->GetData().value<NewsSiteItem*>();
     if (!site)
         return;
 
@@ -206,7 +206,7 @@ void MythNewsConfig::slotCategoryChanged(MythUIButtonListItem *item)
 
     m_siteList->Reset();
 
-    NewsCategory *cat = qVariantValue<NewsCategory*>(item->GetData());
+    NewsCategory *cat = item->GetData().value<NewsCategory*>();
     if (!cat)
         return;
 

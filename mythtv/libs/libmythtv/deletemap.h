@@ -3,10 +3,11 @@
 
 #include <QCoreApplication>
 
-#include "osd.h"
-#include "programinfo.h"
-#include "playercontext.h"
 #include "mythtvexp.h"
+#include "programtypes.h"               // for frm_dir_map_t, MarkTypes
+
+class OSD;
+class PlayerContext;
 
 typedef struct DeleteMapUndoEntry
 {

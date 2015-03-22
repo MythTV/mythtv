@@ -2,7 +2,7 @@
 #define ZMMINIPLAYER_H_
 
 #include <mythexp.h>
-#include <zmliveplayer.h>
+#include "zmliveplayer.h"
 
 class QTimer;
 class MythUIImage;

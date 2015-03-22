@@ -6,6 +6,19 @@
 
 #define LOC QString("%1: ").arg(m_curstream ? m_curstream->Url() : "HLSReader")
 
+/**
+ * Handles relative URLs without breaking URI encoded parameters by avoiding
+ * storing the decoded URL in a QString.
+ * It replaces M3U::RelativeURI("", M3U::DecodedURI(your segment URL here));
+ */
+static QUrl RelativeURI (const QString& baseString, const QString& uriString)
+{
+    QUrl base(baseString);
+    QUrl uri(QUrl::fromEncoded(uriString.toLatin1()));
+
+    return base.resolved(uri);
+}
+
 static uint64_t MDate(void)
 {
     timeval  t;
@@ -339,8 +352,7 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
                 else
                 {
                     StreamContainer::iterator Istream;
-                    QString url = M3U::RelativeURI(m_m3u8,
-                                                   M3U::DecodedURI(uri));
+                    QString url = RelativeURI(m_m3u8, uri).toString();
 
                     if ((Istream = m_streams.find(url)) == m_streams.end())
                     {
@@ -517,8 +529,7 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
                 {
                     new_segments.push_back
                         (HLSRecSegment(sequence_num, segment_duration, title,
-                                       M3U::RelativeURI(hls->Url(),
-                                                        M3U::DecodedURI(line))));
+                                       RelativeURI(hls->Url(), line)));
                 }
                 else
                     ++skipped;
@@ -935,8 +946,8 @@ int HLSReader::DownloadSegmentData(MythSingleDownload& downloader,
     {
         if (!hls->DecodeData(downloader, hls->IVLoaded() ? hls->AESIV() : NULL,
                              segment.KeyPath(),
-                             buffer, segment.Sequence()));
-        return 0;
+                             buffer, segment.Sequence()))
+            return 0;
     }
 #endif
 

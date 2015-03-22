@@ -107,7 +107,7 @@ class MBASE_PUBLIC ThreadedFileWriter
 
     bool m_warned;
     bool m_blocking;
-    bool m_registered;    
+    bool m_registered;
 };
 
 #endif

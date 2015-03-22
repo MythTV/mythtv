@@ -1,12 +1,10 @@
-// C++ headers
-#include <algorithm>
-using namespace std;
+
+#include "dtvchannel.h"
 
 // MythTV headers
 #include "mythdb.h"
 #include "tv_rec.h"
 #include "cardutil.h"
-#include "dtvchannel.h"
 #include "mpegtables.h"
 #include "mythlogging.h"
 

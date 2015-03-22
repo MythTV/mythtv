@@ -3,38 +3,37 @@
 
 #include <stdint.h>
 
-#include <sys/time.h>
-
-#include <QObject>
-#include <QEvent>
 #include <QCoreApplication>
+#include <QList>
+#include <QMutex>                       // for QMutex
+#include <QTime>                        // for QTime
+#include <QString>                      // for QString
+#include <QRect>                        // for QRect
+#include <QSize>                        // for QSize
+#include <QStringList>                  // for QStringList
+#include <QWaitCondition>               // for QWaitCondition
 
 #include "playercontext.h"
 #include "volumebase.h"
-#include "ringbuffer.h"
 #include "osd.h"
-#include "jitterometer.h"
 #include "videooutbase.h"
 #include "teletextreader.h"
 #include "subtitlereader.h"
-#include "tv_play.h"
-#include "yuv2rgb.h"
 #include "cc608reader.h"
-#include "cc608decoder.h"
 #include "cc708reader.h"
-#include "cc708decoder.h"
-#include "cc708window.h"
 #include "decoderbase.h"
 #include "deletemap.h"
 #include "commbreakmap.h"
 #include "audioplayer.h"
 #include "audiooutputgraph.h"
+#include "mthread.h"                    // for MThread
+#include "mythavutil.h"                 // for VideoFrame
+#include "mythtypes.h"                  // for InfoMap
+#include "programtypes.h"               // for frm_dir_map_t, etc
+#include "tv.h"                         // for CommSkipMode
+#include "videoouttypes.h"              // for FrameScanType, PIPLocation, etc
 
 #include "mythtvexp.h"
-
-#include "filter.h"
-
-using namespace std;
 
 class VideoOutput;
 class RemoteEncoder;
@@ -51,6 +50,10 @@ class InteractiveTV;
 class NSAutoreleasePool;
 class DetectLetterbox;
 class MythPlayer;
+class Jitterometer;
+class QThread;
+class QWidget;
+class RingBuffer;
 
 typedef  void (*StatusCallback)(int, void*);
 

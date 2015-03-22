@@ -39,9 +39,9 @@ class HLSStreamHandler : public IPTVStreamHandler
     bool           m_throttle;
 
     // for implementing Get & Return
-    static QMutex                            s_handlers_lock;
-    static QMap<QString, HLSStreamHandler*>  s_handlers;
-    static QMap<QString, uint>               s_handlers_refcnt;
+    static QMutex                            s_hlshandlers_lock;
+    static QMap<QString, HLSStreamHandler*>  s_hlshandlers;
+    static QMap<QString, uint>               s_hlshandlers_refcnt;
 };
 
 #endif // _HLSSTREAMHANDLER_H_

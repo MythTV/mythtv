@@ -3,7 +3,7 @@
 <title><i18n>Sample Storage Group browser</i18n></title>
 </head>
 <body>
-<script language="JavaScript" type="text/javascript">
+<script type="text/javascript" nonce="<%=CSP_NONCE%>">
 
 function loadScript(url, callback){
 
@@ -31,7 +31,7 @@ function loadScript(url, callback){
 function listFiles() {
 
     if (typeof jQuery == 'undefined') {  
-        loadScript("/3rdParty/jquery/jquery-2.0.3.js", realListFiles);
+        loadScript("/3rdParty/jquery/jquery-2.0.3.min.js", realListFiles);
     } else {
         realListFiles();
     }

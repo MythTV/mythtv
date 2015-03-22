@@ -6,6 +6,8 @@
 #include <QSize>
 
 #include "referencecounter.h"
+#include "mythuiexp.h"
+#include "mythuidefines.h"
 
 typedef enum
 {
@@ -17,7 +19,7 @@ typedef enum
     kRenderOpenGL2ES,
 } RenderType;
 
-class MythRender : public ReferenceCounter
+class MUI_PUBLIC MythRender : public ReferenceCounter
 {
   public:
     MythRender(RenderType type) :

@@ -1,21 +1,21 @@
 
 function GetSettingValue()
 {
-	var sKey = $("#Settings").val();
+    var sKey = $("#Settings").val();
 
     jQuery.getJSON(
         "/Myth/GetSetting",
         { "Key": sKey },
-        function( data ) 
+        function( data )
         {
-        	if (data.hasOwnProperty( 'd' ))
-        	  data = data.d;
-        	  
-        	
-           	$("#debug").html( inspect( data , 10 ) );
+            if (data.hasOwnProperty( 'd' ))
+              data = data.d;
 
 
-        	$("#SettingValue").val( data.SettingList.Settings[sKey] );
+            $("#debug").html( inspect( data , 10 ) );
+
+
+            $("#SettingValue").val( data );
         });
 }
 

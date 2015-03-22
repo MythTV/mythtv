@@ -51,11 +51,10 @@ void InputSelector::Load(void)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT capturecard.cardid, cardtype, videodevice, inputname "
-        "FROM capturecard, cardinput, videosource "
-        "WHERE cardinput.sourceid = videosource.sourceid AND "
-        "      hostname           = :HOSTNAME            AND "
-        "      cardinput.sourceid = :SOURCEID            AND "
-        "      cardinput.cardid   = capturecard.cardid");
+        "FROM capturecard, videosource "
+        "WHERE capturecard.sourceid = videosource.sourceid AND "
+        "      hostname             = :HOSTNAME            AND "
+        "      capturecard.sourceid = :SOURCEID");
 
     query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
     query.bindValue(":SOURCEID", sourceid);

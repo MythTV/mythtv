@@ -39,9 +39,17 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams )
 {
     HttpRedirectException exception;
     bool                  bExceptionThrown = false;
+    QStringMap            lowerParams;
 
     if (!pService)
         throw;
+
+     // Change params to lower case for case-insensitive comparison
+    QStringMap::const_iterator it = reqParams.begin();
+    for (; it != reqParams.end(); ++it)
+    {
+        lowerParams[it.key().toLower()] = *it;
+    }
 
     QList<QByteArray> paramNames = m_oMethod.parameterNames();
     QList<QByteArray> paramTypes = m_oMethod.parameterTypes();
@@ -86,7 +94,7 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams )
 
         for( int nIdx = 0; nIdx < paramNames.length(); nIdx++ )
         {
-            QString sValue     = reqParams[ paramNames[ nIdx ].toLower() ];
+            QString sValue     = lowerParams[ paramNames[ nIdx ].toLower() ];
             QString sParamType = paramTypes[ nIdx ];
 
             int     nId        = QMetaType::type( paramTypes[ nIdx ] );

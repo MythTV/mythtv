@@ -27,7 +27,11 @@ class LircKeycodeEvent : public QEvent
 
     static Type kEventType;
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     static const int kLIRCInvalidKeyCombo  = 0xFFFFFFFF;
+#else
+    static const unsigned kLIRCInvalidKeyCombo  = 0xFFFFFFFF;
+#endif
 
   private:
     Type                  m_keytype;

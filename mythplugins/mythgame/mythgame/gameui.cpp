@@ -242,7 +242,7 @@ void GameUI::nodeChanged(MythGenericTree* node)
     }
     else
     {
-        RomInfo *romInfo = qVariantValue<RomInfo *>(node->GetData());
+        RomInfo *romInfo = node->GetData().value<RomInfo *>();
         if (!romInfo)
             return;
         if (romInfo->Romname().isEmpty())
@@ -268,7 +268,7 @@ void GameUI::itemClicked(MythUIButtonListItem*)
     MythGenericTree *node = m_gameUITree->GetCurrentNode();
     if (isLeaf(node))
     {
-        RomInfo *romInfo = qVariantValue<RomInfo *>(node->GetData());
+        RomInfo *romInfo = node->GetData().value<RomInfo *>();
         if (!romInfo)
             return;
         if (romInfo->RomCount() == 1)
@@ -394,7 +394,7 @@ void GameUI::edit(void)
     MythGenericTree *node = m_gameUITree->GetCurrentNode();
     if (isLeaf(node))
     {
-        RomInfo *romInfo = qVariantValue<RomInfo *>(node->GetData());
+        RomInfo *romInfo = node->GetData().value<RomInfo *>();
 
         MythScreenStack *screenStack = GetScreenStack();
 
@@ -416,7 +416,7 @@ void GameUI::showInfo()
     MythGenericTree *node = m_gameUITree->GetCurrentNode();
     if (isLeaf(node))
     {
-        RomInfo *romInfo = qVariantValue<RomInfo *>(node->GetData());
+        RomInfo *romInfo = node->GetData().value<RomInfo *>();
         if (!romInfo)
             return;
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
@@ -449,7 +449,7 @@ void GameUI::showMenu()
         showMenuPopup->AddButton(tr("Scan For Changes"));
         if (isLeaf(node))
         {
-            RomInfo *romInfo = qVariantValue<RomInfo *>(node->GetData());
+            RomInfo *romInfo = node->GetData().value<RomInfo *>();
             if (romInfo)
             {
                 showMenuPopup->AddButton(tr("Show Information"));
@@ -505,7 +505,7 @@ void GameUI::toggleFavorite(void)
     MythGenericTree *node = m_gameUITree->GetCurrentNode();
     if (isLeaf(node))
     {
-        RomInfo *romInfo = qVariantValue<RomInfo *>(node->GetData());
+        RomInfo *romInfo = node->GetData().value<RomInfo *>();
         romInfo->setFavorite(true);
         updateChangedNode(node, romInfo);
     }
@@ -549,17 +549,17 @@ void GameUI::customEvent(QEvent *event)
             if (!resulttext.isEmpty() && resulttext != tr("Cancel"))
             {
                 MythGenericTree *node = m_gameUITree->GetCurrentNode();
-                RomInfo *romInfo = qVariantValue<RomInfo *>(node->GetData());
+                RomInfo *romInfo = node->GetData().value<RomInfo *>();
                 GameHandler::Launchgame(romInfo, resulttext);
             }
         }
         else if (resultid == "editMetadata")
         {
             MythGenericTree *node = m_gameUITree->GetCurrentNode();
-            RomInfo *oldRomInfo = qVariantValue<RomInfo *>(node->GetData());
+            RomInfo *oldRomInfo = node->GetData().value<RomInfo *>();
             delete oldRomInfo;
 
-            RomInfo *romInfo = qVariantValue<RomInfo *>(dce->GetData());
+            RomInfo *romInfo = dce->GetData().value<RomInfo *>();
             node->SetData(qVariantFromValue(romInfo));
             node->SetText(romInfo->Gamename());
 
@@ -619,10 +619,10 @@ void GameUI::customEvent(QEvent *event)
         if (lul.size())
         {
             MetadataLookup *lookup = lul[0];
-            MythGenericTree *node = qVariantValue<MythGenericTree *>(lookup->GetData());
+            MythGenericTree *node = lookup->GetData().value<MythGenericTree *>();
             if (node)
             {
-                RomInfo *metadata = qVariantValue<RomInfo *>(node->GetData());
+                RomInfo *metadata = node->GetData().value<RomInfo *>();
                 if (metadata)
                 {
                 }
@@ -658,7 +658,7 @@ QString GameUI::getFillSql(MythGenericTree *node) const
     QString childLevel = getChildLevelString(node);
     QString filter = getFilter(node);
     bool childIsLeaf = childDepth == getLevelsOnThisBranch(node) + 1;
-    RomInfo *romInfo = qVariantValue<RomInfo *>(node->GetData());
+    RomInfo *romInfo = node->GetData().value<RomInfo *>();
 
     QString columns;
     QString conj = "where ";
@@ -778,7 +778,7 @@ QString GameUI::getChildLevelString(MythGenericTree *node) const
     while (node->getInt() != 1)
         node = node->getParent();
 
-    GameTreeInfo *gi = qVariantValue<GameTreeInfo *>(node->GetData());
+    GameTreeInfo *gi = node->GetData().value<GameTreeInfo *>();
     return gi->getLevel(this_level - 1);
 }
 
@@ -786,7 +786,7 @@ QString GameUI::getFilter(MythGenericTree *node) const
 {
     while (node->getInt() != 1)
         node = node->getParent();
-    GameTreeInfo *gi = qVariantValue<GameTreeInfo *>(node->GetData());
+    GameTreeInfo *gi = node->GetData().value<GameTreeInfo *>();
     return gi->getFilter();
 }
 
@@ -795,7 +795,7 @@ int GameUI::getLevelsOnThisBranch(MythGenericTree *node) const
     while (node->getInt() != 1)
         node = node->getParent();
 
-    GameTreeInfo *gi = qVariantValue<GameTreeInfo *>(node->GetData());
+    GameTreeInfo *gi = node->GetData().value<GameTreeInfo *>();
     return gi->getDepth();
 }
 
@@ -807,7 +807,7 @@ bool GameUI::isLeaf(MythGenericTree *node) const
 void GameUI::fillNode(MythGenericTree *node)
 {
     QString layername = node->GetText();
-    RomInfo *romInfo = qVariantValue<RomInfo *>(node->GetData());
+    RomInfo *romInfo = node->GetData().value<RomInfo *>();
 
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -853,7 +853,7 @@ void GameUI::fillNode(MythGenericTree *node)
                 if (node->getInt() > 1)
                 {
                     RomInfo *currentRomInfo;
-                    currentRomInfo = qVariantValue<RomInfo *>(node->GetData());
+                    currentRomInfo = node->GetData().value<RomInfo *>();
                     newRomInfo = new RomInfo(*currentRomInfo);
                 }
                 else
@@ -912,7 +912,7 @@ void GameUI::gameSearch(MythGenericTree *node,
     if (!node)
         return;
 
-    RomInfo *metadata = qVariantValue<RomInfo *>(node->GetData());
+    RomInfo *metadata = node->GetData().value<RomInfo *>();
 
     if (!metadata)
         return;
@@ -978,12 +978,12 @@ void GameUI::OnGameSearchDone(MetadataLookup *lookup)
     if (!lookup)
        return;
 
-    MythGenericTree *node = qVariantValue<MythGenericTree *>(lookup->GetData());
+    MythGenericTree *node = lookup->GetData().value<MythGenericTree *>();
 
     if (!node)
         return;
 
-    RomInfo *metadata = qVariantValue<RomInfo *>(node->GetData());
+    RomInfo *metadata = node->GetData().value<RomInfo *>();
 
     if (!metadata)
         return;
@@ -1027,7 +1027,7 @@ void GameUI::StartGameImageSet(MythGenericTree *node, QStringList coverart,
     if (!node)
         return;
 
-    RomInfo *metadata = qVariantValue<RomInfo *>(node->GetData());
+    RomInfo *metadata = node->GetData().value<RomInfo *>();
 
     if (!metadata)
         return;
@@ -1075,12 +1075,12 @@ void GameUI::handleDownloadedImages(MetadataLookup *lookup)
     if (!lookup)
         return;
 
-    MythGenericTree *node = qVariantValue<MythGenericTree *>(lookup->GetData());
+    MythGenericTree *node = lookup->GetData().value<MythGenericTree *>();
 
     if (!node)
         return;
 
-    RomInfo *metadata = qVariantValue<RomInfo *>(node->GetData());
+    RomInfo *metadata = node->GetData().value<RomInfo *>();
 
     if (!metadata)
         return;

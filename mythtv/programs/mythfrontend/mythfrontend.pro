@@ -3,6 +3,10 @@ include ( ../../version.pro )
 include ( ../programs-libs.pro )
 
 QT += network xml sql script
+mingw | win32-msvc* {
+   # script debugger currently only enabled for WIN32 builds
+   QT += scripttools
+}
 contains(QT_VERSION, ^4\\.[0-9]\\..*) {
 QT += webkit
 using_qtdbus: CONFIG += qdbus

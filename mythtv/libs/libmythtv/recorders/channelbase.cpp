@@ -868,17 +868,20 @@ uint ChannelBase::GetScriptStatus(bool holding_lock)
 /// \note m_system_lock must be held when this is called
 void ChannelBase::HandleScriptEnd(bool ok)
 {
-    LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Channel change script %1")
-        .arg((ok) ? "succeeded" : "failed"));
-
     if (ok)
     {
+        LOG(VB_CHANNEL, LOG_INFO, LOC + "Channel change script succeeded.");
+
         InputMap::const_iterator it = m_inputs.find(m_currentInputID);
         if (it != m_inputs.end())
         {
             // Set this as the future start channel for this source
             (*it)->startChanNum = m_curchannelname;
         }
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Channel change script failed.");
     }
 }
 
@@ -942,11 +945,11 @@ bool ChannelBase::InitializeInputs(void)
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
-        "SELECT cardinputid, "
+        "SELECT cardid, "
         "       inputname,   startchan, "
         "       tunechan,    externalcommand, "
         "       sourceid,    livetvorder "
-        "FROM cardinput "
+        "FROM capturecard "
         "WHERE cardid = :CARDID");
     query.bindValue(":CARDID", cardid);
 
@@ -1053,9 +1056,9 @@ void ChannelBase::StoreInputChannels(const InputMap &inputs)
             continue;
 
         query.prepare(
-            "UPDATE cardinput "
+            "UPDATE capturecard "
             "SET startchan = :STARTCHAN "
-            "WHERE cardinputid = :CARDINPUTID");
+            "WHERE cardid = :CARDINPUTID");
         query.bindValue(":STARTCHAN",   (*it)->startChanNum);
         query.bindValue(":CARDINPUTID", it.key());
 
@@ -1088,13 +1091,12 @@ bool ChannelBase::CheckChannel(const QString &channum,
 
     query.prepare(
         "SELECT channel.chanid "
-        "FROM channel, capturecard, cardinput "
-        "WHERE channel.channum      = :CHANNUM           AND "
-        "      channel.sourceid     = cardinput.sourceid AND "
-        "      cardinput.inputname  = :INPUT             AND "
-        "      cardinput.cardid     = capturecard.cardid AND "
-        "      capturecard.cardid   = :CARDID            AND "
-        "      capturecard.hostname = :HOSTNAME");
+        "FROM channel, capturecard "
+        "WHERE channel.channum       = :CHANNUM             AND "
+        "      channel.sourceid      = capturecard.sourceid AND "
+        "      capturecard.inputname = :INPUT               AND "
+        "      capturecard.cardid    = :CARDID              AND "
+        "      capturecard.hostname  = :HOSTNAME");
     query.bindValue(":CHANNUM",  channum);
     query.bindValue(":INPUT",    channelinput);
     query.bindValue(":CARDID",   GetCardID());
@@ -1116,12 +1118,11 @@ bool ChannelBase::CheckChannel(const QString &channum,
 
     // We didn't find it on the current input let's widen the search
     query.prepare(
-        "SELECT channel.chanid, cardinput.inputname "
-        "FROM channel, capturecard, cardinput "
-        "WHERE channel.channum      = :CHANNUM           AND "
-        "      channel.sourceid     = cardinput.sourceid AND "
-        "      cardinput.cardid     = capturecard.cardid AND "
-        "      capturecard.cardid   = :CARDID            AND "
+        "SELECT channel.chanid, capturecard.inputname "
+        "FROM channel, capturecard "
+        "WHERE channel.channum      = :CHANNUM             AND "
+        "      channel.sourceid     = capturecard.sourceid AND "
+        "      capturecard.cardid   = :CARDID              AND "
         "      capturecard.hostname = :HOSTNAME");
     query.bindValue(":CHANNUM",  channum);
     query.bindValue(":CARDID",   GetCardID());
@@ -1173,7 +1174,7 @@ ChannelBase *ChannelBase::CreateChannel(
     bool                      enter_power_save_mode,
     QString                  &rbFileExt)
 {
-    rbFileExt = "mpg";
+    rbFileExt = "ts";
 
     ChannelBase *channel = NULL;
     if (genOpt.cardtype == "DVB")
@@ -1202,8 +1203,9 @@ ChannelBase *ChannelBase::CreateChannel(
               genOpt.videodev.toLower().startsWith("file:")))
     {
         channel = new DummyChannel(tvrec);
+        rbFileExt = "mpg";
     }
-    else if (genOpt.cardtype == "FREEBOX")
+    else if (genOpt.cardtype == "FREEBOX") // IPTV
     {
 #ifdef USING_IPTV
         channel = new IPTVChannel(tvrec, genOpt.videodev);
@@ -1228,10 +1230,13 @@ ChannelBase *ChannelBase::CreateChannel(
 #endif
         if ((genOpt.cardtype != "MPEG") && (genOpt.cardtype != "HDPVR"))
             rbFileExt = "nuv";
+        else
+            rbFileExt = "mpg";
     }
     else if (genOpt.cardtype == "EXTERNAL")
     {
         channel = new ExternalChannel(tvrec, genOpt.videodev);
+        rbFileExt = "mpg";
     }
 
     if (!channel)

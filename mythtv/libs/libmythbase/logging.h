@@ -7,10 +7,8 @@
 #include <QTime>
 #include <QPointer>
 
-#include <stdlib.h>
 #include <stdint.h>
-#include <time.h>
-#include <unistd.h>
+#include <stdlib.h>
 
 #include "mythconfig.h"
 #include "mythbaseexp.h"  //  MBASE_PUBLIC , etc.
@@ -18,6 +16,7 @@
 #include "mythsignalingtimer.h"
 #include "mthread.h"
 #include "referencecounter.h"
+#include "compat.h"
 
 #undef NOLOGSERVER
 #if !CONFIG_MYTHLOGSERVER

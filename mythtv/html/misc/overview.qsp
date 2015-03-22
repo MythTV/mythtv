@@ -1,7 +1,19 @@
+<%
+"use strict";
+
+import "/js/utility.js"
+%>
+
 <html>
 <head>
 <title><i18n>MythTV System Overview</i18n></title>
+<link rel="stylesheet" type="text/css" href="/css/site.css">
 <link rel="stylesheet" type="text/css" href="/misc/css/overview.css">
+<script type="text/javascript"  src="/js/util.qjs"></script>
+<script type="text/javascript"  src="/3rdParty/jquery/jquery-2.0.3.min.js"></script>
+<script type="text/javascript"  src="/3rdParty/jquery/jqueryUI/js/jquery-ui-1.10.3.js"></script>
+<script type="text/javascript"  src="/3rdParty/jquery/galleria/galleria.js"></script>
+<script type="text/javascript"  src="/misc/js/overview.js"></script>
 </head>
 <body>
 
@@ -11,6 +23,7 @@
 
     <div class="contentContainer" id="lasttencontent">
 <%
+
             var oDvr = new Dvr();
             var oMyth = new Myth();
             var list = oDvr.GetRecordedList( true, 0, 10, "", "", "" );
@@ -32,8 +45,10 @@
                 else
                     title = program.Title + " (" + program.SubTitle + ")";
 
+                title = escapeHTML(title);
+
                 var desc = formatStr('<i18n>%1<br>Recorded %2 at %3.</i18n>',
-                    program.Description, oMyth.GetFormatDate(program.StartTime),
+                    escapeHTML(program.Description), oMyth.GetFormatDate(program.StartTime),
                     oMyth.GetFormatTime(program.StartTime));
 %>
                 <img title="<%=title%>" alt="<%=desc%>" height="382" src="/Content/GetPreviewImage?RecordedId=<%=program.Recording.RecordedId%>&amp;Height=371&amp;Format=JPG"/>
@@ -62,18 +77,18 @@
                     case 1:
                         var recording = encoder.Recording;
                         statestring = formatStr('<i18n>Encoder %1 is currently watching "%2" on Live TV.</i18n>',
-                            encoder.Id, recording.Title);
+                            encoder.Id, escapeHTML(recording.Title));
                         break;
                     case 6:
                         var recording = encoder.Recording;
                         statestring = formatStr('<i18n>Encoder %1 is currently recording "%2."  This program is being viewed.</i18n>',
-                            encoder.Id, recording.Title);
+                            encoder.Id, escapeHTML(recording.Title));
                         break;
                     case 7:
                         var recording = encoder.Recording;
                         var endtime = oMyth.GetFormatTime(recording.EndTime);
                         statestring = formatStr('<i18n>Encoder %1 is currently recording "%2."  This recording will end at %3.</i18n>',
-                            encoder.Id, recording.Title, endtime);
+                            encoder.Id, escapeHTML(recording.Title), endtime);
                         break;
                     default:
                         statestring = formatStr('<i18n>Encoder %1 is currently idle.</i18n>',
@@ -107,14 +122,20 @@
             status = qsTr("Online");
             statusClass = "frontendOnline";
         }
+
+        var frontendIP = frontendList[nIdx].IP;
+        if (frontendIP.length > 15) // IPv6 Address
+            frontendIP = "[" + frontendIP + "]"; // Yay for stupid design of IPv6
 %>
-            <div class="frontendRow">
+            <div class="frontendRow" id="frontendRow-<%=frontendList[nIdx].Name%>">
                 <div class="frontendName">
-                    <a href="//<%=frontendList[nIdx].IP%>:6547/"><%=frontendList[nIdx].Name%></a>
+                    <a href="http://<%=frontendIP%>:<%=frontendList[nIdx].Port%>/"><%=frontendList[nIdx].Name%></a>
                 </div>
-                <div class="frontendStatus <%=statusClass%>">
+                <div class="frontendStatus <%=statusClass%>" id="frontendStatus-<%=frontendList[nIdx].Name%>">
                     <%=status%>
                 </div>
+                <script type="text/javascript" nonce="<%=CSP_NONCE%>">MythOverview.GetFrontendStatus('<%=frontendList[nIdx].Name%>',
+                                                                 '<%=frontendIP%>:<%=frontendList[nIdx].Port%>')</script>
             </div>
 <%
     }
@@ -124,18 +145,3 @@
 
 </body>
 </html>
-
-<script src="/3rdParty/jquery/galleria/galleria.js"></script>
-
-<script type="text/javascript">
-    $(document).ready(function($){
-        Galleria.loadTheme('/3rdParty/jquery/galleria/themes/classic/galleria.classic.min.js');
-        $("#lasttencontent").galleria({
-            width: 680,
-            height: 440,
-            autoplay: 7000,
-            imageCrop: true,
-            showInfo: true
-        });
-    });
-</script>

@@ -35,6 +35,7 @@ using namespace std;
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <stdlib.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -61,16 +62,7 @@ extern "C" {
 #endif
 
 // QJson
-#ifdef _MSC_VER    
-    // This is needed to avoid creating a reparse point which git on windows doesn't like
-    #include "QJson/src/QObjectHelper"
-    #include "QJson/src/Serializer"
-    #include "QJson/src/Parser"
-#else
-    #include "QJson/QObjectHelper"
-    #include "QJson/Serializer"
-    #include "QJson/Parser"
-#endif
+#include "qjsonwrapper/Json.h"
 
 static QMutex                  logQueueMutex;
 static QQueue<LoggingItem *>   logQueue;
@@ -116,6 +108,7 @@ const char    *verboseDefaultStr = " general";
 
 uint64_t verboseMask = verboseDefaultInt;
 QString verboseString = QString(verboseDefaultStr);
+ComponentLogLevelMap componentLogLevel;
 
 uint64_t     userDefaultValueInt = verboseDefaultInt;
 QString      userDefaultValueStr = QString(verboseDefaultStr);
@@ -189,9 +182,8 @@ LoggingItem::~LoggingItem()
 
 QByteArray LoggingItem::toByteArray(void)
 {
-    QVariantMap variant = QJson::QObjectHelper::qobject2qvariant(this);
-    QJson::Serializer serializer;
-    QByteArray json = serializer.serialize(variant);
+    QVariantMap variant = QJsonWrapper::qobject2qvariant(this);
+    QByteArray json = QJsonWrapper::toJson(variant);
 
     //cout << json.constData() << endl;
 
@@ -377,7 +369,7 @@ void LoggerThread::run(void)
                 LOG(VB_GENERAL, LOG_INFO, "Added logging to mythlogserver locally");
 
             loggingGetTimeStamp(&m_epoch, NULL);
-            
+
             m_heartbeatTimer = new MythSignalingTimer(this, SLOT(checkHeartBeat()));
             m_heartbeatTimer->start(1000);
         }
@@ -466,7 +458,7 @@ void LoggerThread::initialTimeout(void)
 
     if (m_initialWaiting)
     {
-        // Got no response from mythlogserver, let's assume it's dead and 
+        // Got no response from mythlogserver, let's assume it's dead and
         // start it up
         launchLogServer();
     }
@@ -550,7 +542,7 @@ void LoggerThread::messageReceived(const QList<QByteArray> &msg)
 }
 
 
-/// \brief  Handles each LoggingItem, generally by handing it off to 
+/// \brief  Handles each LoggingItem, generally by handing it off to
 ///         mythlogserver via ZeroMQ.  There is a special case for
 ///         thread registration and deregistration which are also included in
 ///         the logging queue to keep the thread names in sync with the log
@@ -573,7 +565,7 @@ void LoggerThread::handleItem(LoggingItem *item)
         if (debugRegistration)
         {
             snprintf(item->m_message, LOGLINE_MAX,
-                     "Thread 0x%" PREFIX64 "X (%" PREFIX64 
+                     "Thread 0x%" PREFIX64 "X (%" PREFIX64
                      "d) registered as \'%s\'",
                      (long long unsigned int)item->m_threadId,
                      (long long int)item->m_tid,
@@ -599,7 +591,7 @@ void LoggerThread::handleItem(LoggingItem *item)
             if (debugRegistration)
             {
                 snprintf(item->m_message, LOGLINE_MAX,
-                         "Thread 0x%" PREFIX64 "X (%" PREFIX64 
+                         "Thread 0x%" PREFIX64 "X (%" PREFIX64
                          "d) deregistered as \'%s\'",
                          (long long unsigned int)item->m_threadId,
                          (long long int)tid,
@@ -657,7 +649,7 @@ bool LoggerThread::logConsole(LoggingItem *item)
         struct tm tm;
         localtime_r(&epoch, &tm);
 
-        strftime( timestamp, TIMESTAMP_MAX-8, "%Y-%m-%d %H:%M:%S", 
+        strftime( timestamp, TIMESTAMP_MAX-8, "%Y-%m-%d %H:%M:%S",
                   (const struct tm *)&tm );
         snprintf( usPart, 9, ".%06d", (int)(item->m_usec) );
         strcat( timestamp, usPart );
@@ -747,11 +739,10 @@ LoggingItem *LoggingItem::create(const char *_file,
 LoggingItem *LoggingItem::create(QByteArray &buf)
 {
     // Deserialize buffer
-    QJson::Parser parser;
-    QVariant variant = parser.parse(buf);
+    QVariant variant = QJsonWrapper::parseJson(buf);
 
     LoggingItem *item = new LoggingItem;
-    QJson::QObjectHelper::qvariant2qobject(variant.toMap(), item);
+    QJsonWrapper::qvariant2qobject(variant.toMap(), item);
 
     return item;
 }
@@ -801,8 +792,8 @@ void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
     QMutexLocker qLock(&logQueueMutex);
 
 #if defined( _MSC_VER ) && defined( _DEBUG )
-	OutputDebugStringA( item->m_message );
-	OutputDebugStringA( "\n" );
+        OutputDebugStringA( item->m_message );
+        OutputDebugStringA( "\n" );
 #endif
 
     logQueue.enqueue(item);
@@ -974,7 +965,7 @@ void loggingRegisterThread(const QString &name)
     }
 }
 
-/// \brief  Deregister the current thread's name.  This is triggered by the 
+/// \brief  Deregister the current thread's name.  This is triggered by the
 ///         RunEpilog() call in each thread.
 void loggingDeregisterThread(void)
 {
@@ -1119,12 +1110,12 @@ void verboseInit(void)
 #undef VERBOSEDEFS_H_
 #define _IMPLEMENT_VERBOSE
 #include "verbosedefs.h"
-    
+
     verboseInitialized = true;
 }
 
 
-/// \brief Outputs the Verbose levels and their descriptions 
+/// \brief Outputs the Verbose levels and their descriptions
 ///        (for --verbose help)
 void verboseHelp(void)
 {
@@ -1142,7 +1133,7 @@ void verboseHelp(void)
         QString name = QString("  %1").arg(item->name, -15, ' ');
         if (item->helpText.isEmpty())
             continue;
-        cerr << name.toLocal8Bit().constData() << " - " << 
+        cerr << name.toLocal8Bit().constData() << " - " <<
                 item->helpText.toLocal8Bit().constData() << endl;
     }
 
@@ -1156,8 +1147,15 @@ void verboseHelp(void)
       "and override the default verbosity level.\n\n"
       "Additive options may also be subtracted from 'all' by\n"
       "prefixing them with 'no', so you may use '-v all,nodatabase'\n"
-      "to view all but database debug messages.\n\n"
-      "Some debug levels may not apply to this program.\n\n";
+      "to view all but database debug messages.\n\n";
+
+    cerr << "The 'global' loglevel is specified with --loglevel, but can be\n"
+         << "overridden on a component by component basis by appending "
+         << "':level'\n"
+         << "to the component.\n"
+         << "    For example: -v gui:debug,channel:notice,record\n\n";
+
+    cerr << "Some debug levels may not apply to this program.\n" << endl;
 }
 
 /// \brief  Parse the --verbose commandline argument and set the verbose level
@@ -1166,6 +1164,7 @@ void verboseHelp(void)
 int verboseArgParse(QString arg)
 {
     QString option;
+    int     idx;
 
     if (!verboseInitialized)
         verboseInit();
@@ -1181,12 +1180,15 @@ int verboseArgParse(QString arg)
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
-    QStringList verboseOpts = arg.split(QRegExp("\\W+"));
+    QStringList verboseOpts = arg.split(QRegExp("[^\\w:]+",
+                                                Qt::CaseInsensitive,
+                                                QRegExp::RegExp2));
     for (QStringList::Iterator it = verboseOpts.begin();
          it != verboseOpts.end(); ++it )
     {
         option = (*it).toLower();
         bool reverseOption = false;
+        QString optionLevel;
 
         if (option != "none" && option.startsWith("no"))
         {
@@ -1221,8 +1223,14 @@ int verboseArgParse(QString arg)
                 verboseString = QString(verboseDefaultStr);
             }
         }
-        else 
+        else
         {
+            if ((idx = option.indexOf(':')) != -1)
+            {
+                optionLevel = option.mid(idx + 1);
+                option = option.left(idx);
+            }
+
             VerboseDef *item = verboseMap.value(option);
 
             if (item)
@@ -1248,11 +1256,18 @@ int verboseArgParse(QString arg)
                         verboseMask = item->mask;
                         verboseString = item->name;
                     }
+
+                    if (!optionLevel.isEmpty())
+                    {
+                        LogLevel_t level = logLevelGet(optionLevel);
+                        if (level != LOG_UNKNOWN)
+                            componentLogLevel[item->mask] = level;
+                    }
                 }
             }
             else
             {
-                cerr << "Unknown argument for -v/--verbose: " << 
+                cerr << "Unknown argument for -v/--verbose: " <<
                         option.toLocal8Bit().constData() << endl;;
                 return GENERIC_EXIT_INVALID_CMDLINE;
             }

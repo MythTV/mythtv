@@ -24,6 +24,7 @@
 #include "mythuibuttonlist.h"
 #include "mythuibutton.h"
 #include "mythuitext.h"
+#include "mythuiimage.h"
 #include "mythuistatetype.h"
 #include "mythuispinbox.h"
 #include "mythuicheckbox.h"

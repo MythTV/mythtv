@@ -34,8 +34,8 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
 {
   public:
     RecordingInfo(void) : 
-        oldrecstatus(rsUnknown),
-        savedrecstatus(rsUnknown),
+        oldrecstatus(RecStatus::Unknown),
+        savedrecstatus(RecStatus::Unknown),
         future(false),
         schedorder(0),
         mplexid(0),
@@ -56,8 +56,8 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         m_recordingFile(NULL)  { LoadRecordingFile(); }
     RecordingInfo(const ProgramInfo &other) :
         ProgramInfo(other),
-        oldrecstatus(rsUnknown),
-        savedrecstatus(rsUnknown),
+        oldrecstatus(RecStatus::Unknown),
+        savedrecstatus(RecStatus::Unknown),
         future(false),
         schedorder(0),
         mplexid(0),
@@ -67,8 +67,8 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         m_recordingFile(NULL)  { LoadRecordingFile(); }
     RecordingInfo(uint _recordedid) :
         ProgramInfo(_recordedid),
-        oldrecstatus(rsUnknown),
-        savedrecstatus(rsUnknown),
+        oldrecstatus(RecStatus::Unknown),
+        savedrecstatus(RecStatus::Unknown),
         future(false),
         schedorder(0),
         mplexid(0),
@@ -78,8 +78,8 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         m_recordingFile(NULL)  { LoadRecordingFile(); }
     RecordingInfo(uint _chanid, const QDateTime &_recstartts) : /// DEPRECATED
         ProgramInfo(_chanid, _recstartts),
-        oldrecstatus(rsUnknown),
-        savedrecstatus(rsUnknown),
+        oldrecstatus(RecStatus::Unknown),
+        savedrecstatus(RecStatus::Unknown),
         future(false),
         schedorder(0),
         mplexid(0),
@@ -90,8 +90,8 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
     RecordingInfo(QStringList::const_iterator &it,
                   QStringList::const_iterator  end) :
         ProgramInfo(it, end),
-        oldrecstatus(rsUnknown),
-        savedrecstatus(rsUnknown),
+        oldrecstatus(RecStatus::Unknown),
+        savedrecstatus(RecStatus::Unknown),
         future(false),
         schedorder(0),
         mplexid(0),
@@ -143,7 +143,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
 
         bool repeat,
 
-        RecStatusType oldrecstatus,
+        RecStatus::Type oldrecstatus,
         bool reactivate,
 
         uint recordid,
@@ -153,7 +153,6 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         RecordingDupMethodType dupmethod,
 
         uint sourceid,
-        uint inputid,
         uint cardid,
 
         uint findid,
@@ -195,7 +194,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         const QDateTime &recstartts,
         const QDateTime &recendts,
 
-        RecStatusType recstatus,
+        RecStatus::Type recstatus,
 
         uint recordid,
         RecordingType rectype,
@@ -302,8 +301,8 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
     void SetFilesize( uint64_t sz );     /// Will replace the one in ProgramInfo
     uint64_t GetFilesize(void) const; /// Will replace the one in ProgramInfo
 
-    RecStatusType oldrecstatus;
-    RecStatusType savedrecstatus;
+    RecStatus::Type oldrecstatus;
+    RecStatus::Type savedrecstatus;
     bool future;
     int schedorder;
     uint mplexid; // Only valid within the scheduler

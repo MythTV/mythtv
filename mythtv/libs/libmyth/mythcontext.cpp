@@ -42,8 +42,9 @@ using namespace std;
 
 #include "mythplugin.h"
 
+#include <unistd.h> // for usleep(), gethostname
+
 #ifdef _WIN32
-#include <unistd.h>
 #include "compat.h"
 #endif
 

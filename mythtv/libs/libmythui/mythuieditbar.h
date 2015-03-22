@@ -2,8 +2,9 @@
 #define MYTHUI_EDITBAR_H_
 
 #include "mythuitype.h"
-#include "mythuiimage.h"
-#include "mythuishape.h"
+
+class MythUIImage;
+class MythUIShape;
 
 /** \class MythUIEditBar
  *

@@ -80,16 +80,8 @@ import "/tv/js/tvutil.qjs"
     var programList = Array();
     var programs = Array();
 
-    // Default to showing the programs for the first channel if no arguments
-    // were supplied.
-    if (getArgCount() <= 0 && Channels.length > 0)
-    {
-        ChanId = Channels[0].ChanId;
-    }
-
-    // If no arguments were supplied and no channels exist (new system), then
-    // show the 'no matches' message
-    if (ChanId > 0 || getArgCount() > 0)
+    // If no arguments were supplied then show the 'no matches' message
+    if (getArgCount() > 0)
     {
         programList = guide.GetProgramList(StartIndex, Count,
                                            StartTime, EndTime, ChanId,
@@ -104,22 +96,38 @@ import "/tv/js/tvutil.qjs"
     if (nextStartIndex >= programList.TotalAvailable)
         nextStartIndex = 0;
 
-
+    var matchString = qsTr("No Matches");
+    if (programList.TotalAvailable)
+    {
+        var matchStart = StartIndex+1;
+        var matchTotal = programList.TotalAvailable;
+        var matchCount = ((StartIndex + Count) <= matchTotal) ? (StartIndex + Count) : matchTotal;
+        matchString = formatStr(qsTr("%1-%2 of %3 Matches"), matchStart, matchCount, matchTotal);
+    }
 %>
 
 <% if (!listOnly) {%>
 <!DOCTYPE html>
 <html>
 <head>
+<link rel="stylesheet" type="text/css" href="/3rdParty/jquery/jqueryUI/css/jquery-ui.css">
 <link rel="stylesheet" type="text/css" href="/css/site.css">
-<link rel="stylesheet" type="text/css" href="/tv/css/searchlists.css">
+<link rel="stylesheet" type="text/css" href="/tv/css/programsearch.css">
 <link rel="stylesheet" type="text/css" href="/tv/css/common.css">
 <link rel="stylesheet" type="text/css" href="/tv/css/category_colors.css">
+<script type="text/javascript" src="/3rdParty/jquery/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="/3rdParty/jquery/jqueryUI/js/jquery-ui-1.10.3.js"></script>
+<script src="/3rdParty/jquery/jqueryJScroll/jquery.jscroll.js"></script>
 <script src="/js/utility.js"></script> <!-- ECMA not JS -->
 <script src="/js/util.qjs"></script>
 <script src="/tv/js/common.js"></script>
+<script src="/tv/js/programsearch.js"></script>
 </head>
 <body>
+
+<div style="border:1px #CC0000 solid;background-color: rgba(102, 0, 0, 0.7);padding:7px;margin:5px;text-align:center;">
+    This feature is in beta and is missing some functionality. Please report any bugs you encounter ...
+</div>
 
 <!-- Popup Option Menu -->
 <!-- To avoid the need to define multiple overlapping menus, we use JS+CSS as
@@ -128,13 +136,25 @@ import "/tv/js/tvutil.qjs"
      side (harder to maintain/template) or keeping in together inline with the
      other related html, with as little non-html markup as possible -->
 <div id="optMenu" class="contextMenu" style="display:none;">
-    <div class="button normalMenu" onClick="dontRecord(gChanID, gStartTime)">
+    <div class="button scheduleMenu" onClick="MythCommon.RecordProgram(gChanID, gStartTime, 'Single Record')">
+        <%=qsTr("Record this showing")%>
+    </div>
+    <div class="button scheduleMenu" onClick="MythCommon.RecordProgram(gChanID, gStartTime, 'Record All')">
+        <%=qsTr("Record all showings")%>
+    </div>
+    <div class="button scheduleMenu" onClick="MythCommon.RecordProgram(gChanID, gStartTime, 'Record One')">
+        <%=qsTr("Record one showing")%>
+    </div>
+    <div class="button scheduleMenu" onClick="MythCommon.RecordProgram(gChanID, gStartTime, 'Record All (Channel)')">
+        <%=qsTr("Record all showings (this channel)")%>
+    </div>
+    <div class="button delSchedMenu" onClick="dontRecord(gChanID, gStartTime)">
         <%=qsTr("Don't Record")%>
     </div>
-    <div class="button normalMenu" onClick="neverRecord(gChanID, gStartTime)">
+    <div class="button delSchedMenu" onClick="neverRecord(gChanID, gStartTime)">
         <%=qsTr("Never Record")%>
     </div>
-    <div class="button normalMenu" onClick="deleteRecRule(gChanID, gStartTime)">
+    <div class="button delSchedMenu" onClick="deleteRecRule(gChanID, gStartTime)">
         <%=qsTr("Delete Recording Rule")%>
     </div>
     <div class="button normalMenu" onClick="loadScheduler('upcoming', gChanID, gStartTime)">
@@ -149,16 +169,33 @@ import "/tv/js/tvutil.qjs"
 <!-- Filter Options -->
 <div id="filterType">
     <ul>
+        <li><a href="#titleFilterGroup"><%=qsTr("Title")%></a></li>
         <li><a href="#channelFilterGroup"><%=qsTr("Channel")%></a></li>
         <li><a href="#personFilterGroup"><%=qsTr("People")%></a></li>
         <li><a href="#categoryFilterGroup"><%=qsTr("Category")%></a></li>
-        <li><a href="#titleFilterGroup"><%=qsTr("Title")%></a></li>
         <li><a href="#keywordFilterGroup"><%=qsTr("Keyword")%></a></li>
     </ul>
-    <form action="/tv/searchlists.qsp">
+    <form>
+    <fieldset id="titleFilterGroup" disabled>
+        <label for="TitleFilter"><%=qsTr("Title")%>:
+            <input type="text" list="titleList" id="TitleFilter" name="TitleFilter" onChange="MythProgramSearch.SubmitFilterForm(this.form);">
+            <datalist id="titleList">
+            <%
+                StoredSearches = guide.GetStoredSearches("title");
+                for (var listIdx = 0; listIdx < StoredSearches.length; listIdx++)
+                {
+            %>
+                <option <% if (TitleFilter == StoredSearches[listIdx]) {%>selected<%}%>><%=StoredSearches[listIdx]%></option>
+            <%
+                }
+            %>
+            </datalist>
+        </label>
+        <input type="button" id="TitleSearch" name="TitleSearch" value="<%=qsTr("Search")%>" onClick="MythProgramSearch.SubmitFilterForm(this.form);" />
+    </fieldset>
     <fieldset id="channelFilterGroup" disabled>
         <label for="ChanId"><%=qsTr("Channel")%>:
-            <select id="ChanId" name="ChanId" onChange="submitForm(this.form)">
+            <select id="ChanId" name="ChanId" onChange="MythProgramSearch.SubmitFilterForm(this.form);">
                 <!-- <option value="0"><%=qsTr("All")%></option> -->
             <%
                 for (var listIdx = 0; listIdx < Channels.length; listIdx++)
@@ -170,10 +207,11 @@ import "/tv/js/tvutil.qjs"
             %>
             </select>
         </label>
+        <input type="button" id="ChannelSearch" name="ChannelSearch" value="<%=qsTr("Search")%>" onClick="MythProgramSearch.SubmitFilterForm(this.form);" />
     </fieldset>
     <fieldset id="personFilterGroup" disabled>
         <label for="PersonFilter"><%=qsTr("Person")%>:
-            <input type="text" list="peopleList" id="PersonFilter" name="PersonFilter" onChange="submitForm(this.form)">
+            <input type="text" list="peopleList" id="PersonFilter" name="PersonFilter" onChange="MythProgramSearch.SubmitFilterForm(this.form);">
             <datalist id="peopleList">
             <%
                 var StoredSearches = guide.GetStoredSearches("people");
@@ -186,10 +224,11 @@ import "/tv/js/tvutil.qjs"
             %>
             </datalist>
         </label>
+        <input type="button" id="PersonSearch" name="PersonSearch" value="<%=qsTr("Search")%>" onClick="MythProgramSearch.SubmitFilterForm(this.form);" />
     </fieldset>
     <fieldset id="categoryFilterGroup" disabled>
         <label for="CategoryFilter"><%=qsTr("Category")%>:
-            <select id="CategoryFilter" name="CategoryFilter" onChange="submitForm(this.form)">
+            <select id="CategoryFilter" name="CategoryFilter" onChange="MythProgramSearch.SubmitFilterForm(this.form);">
             <%
                 var Categories = guide.GetCategoryList();
                 for (var listIdx = 0; listIdx < Categories.length; listIdx++)
@@ -200,27 +239,12 @@ import "/tv/js/tvutil.qjs"
                 }
             %>
             </select>
-        </label>
-    </fieldset>
-    <fieldset id="titleFilterGroup" disabled>
-        <label for="TitleFilter"><%=qsTr("Title")%>:
-            <input type="text" list="titleList" id="TitleFilter" name="TitleFilter" onChange="submitForm(this.form)">
-            <datalist id="titleList">
-            <%
-                StoredSearches = guide.GetStoredSearches("title");
-                for (var listIdx = 0; listIdx < StoredSearches.length; listIdx++)
-                {
-            %>
-                <option <% if (TitleFilter == StoredSearches[listIdx]) {%>selected<%}%>><%=StoredSearches[listIdx]%></option>
-            <%
-                }
-            %>
-            </select>
+            <input type="button" id="CategorySearch" name="CategorySearch" value="<%=qsTr("Search")%>" onClick="MythProgramSearch.SubmitFilterForm(this.form);" />
         </label>
     </fieldset>
     <fieldset id="keywordFilterGroup" disabled>
         <label for="KeywordFilter"><%=qsTr("Keyword")%>:
-            <input type="text" list="keywordList"  id="KeywordFilter" name="KeywordFilter" onChange="submitForm(this.form)">
+            <input type="text" list="keywordList"  id="KeywordFilter" name="KeywordFilter" onChange="MythProgramSearch.SubmitFilterForm(this.form);">
             <datalist id="keywordList">
             <%
                 StoredSearches = guide.GetStoredSearches("keyword");
@@ -231,17 +255,21 @@ import "/tv/js/tvutil.qjs"
             <%
                 }
             %>
+            </datalist>
+        </label>
+        <input type="button" id="KeywordSearch" name="KeywordSearch" value="<%=qsTr("Search")%>" onClick="MythProgramSearch.SubmitFilterForm(this.form);" />
+    </fieldset>
+    <fieldset id="optionGroup">
+        <label for="Sort"><%=qsTr("Sort")%>:
+            <select id="Sort" name="Sort" onChange="MythProgramSearch.SubmitFilterForm(this.form);">
+                <option value="starttime" <% if (Sort == "starttime") {%>selected<%}%>><%=qsTr("Start Time")%></option>
+                <option value="channel" <% if (Sort == "channel") {%>selected<%}%>><%=qsTr("Channel")%></option>
+                <option value="title" <% if (Sort == "title") {%>selected<%}%>><%=qsTr("Title")%></option>
+                <option value="duration" <% if (Sort == "duration") {%>selected<%}%>><%=qsTr("Duration")%></option>
             </select>
         </label>
+        <input type="hidden" name="ListOnly" value="1" />
     </fieldset>
-    <label for="Sort"><%=qsTr("Sort")%>:
-    <select id="Sort" name="Sort" onChange="submitForm(this.form)">
-        <option value="starttime" <% if (Sort == "starttime") {%>selected<%}%>><%=qsTr("Start Time")%></option>
-        <option value="channel" <% if (Sort == "channel") {%>selected<%}%>><%=qsTr("Channel")%></option>
-        <option value="title" <% if (Sort == "title") {%>selected<%}%>><%=qsTr("Title")%></option>
-        <option value="duration" <% if (Sort == "duration") {%>selected<%}%>><%=qsTr("Duration")%></option>
-    </select>
-    </label>
     </form>
 </div>
 
@@ -251,7 +279,7 @@ import "/tv/js/tvutil.qjs"
 <%} // End of the header %>
  
 <div class="topBar">
-    <%=programList.TotalAvailable%> Matches
+    <%=matchString%>
 </div>
 
 <%
@@ -301,7 +329,9 @@ while (listIdx < programs.length)
             break;
     }
 
-    var menu = "normalMenu";
+    var menu = "normalMenu scheduleMenu";
+    if (program.Recording.Status != 0)
+        menu = "normalMenu delSchedMenu";
 
     // RecStatusToClass() - /tv/js/tvutil.qjs
     var statusClass = RecStatusToClass(program.Recording.Status);
@@ -378,29 +408,28 @@ while (listIdx < programs.length)
 if (nextStartIndex > 0)
 {
     var obj = this.Parameters;
+
     obj.Start = nextStartIndex;
-    obj.ChanId = ChanId;
     var queryString = toQueryString(obj);
 %>
-
-<a class="jscroll-next" href="/tv/searchlists.qsp?<%=queryString%>&amp;ListOnly=1" />
+<a class="jscroll-next" href="/tv/programsearch.qsp?<%=queryString%>&amp;ListOnly=1"></a>
 <%}%>
 
 <% if (!listOnly) {%>
 </div> <!-- End programList -->
 </div> <!-- End programList-container -->
 
-<script>
+<script type="text/javascript" nonce="<%=CSP_NONCE%>">
     function disableFieldset( event, ui )
     {
         if (isValidObject(ui.panel))
         {
-            ui.panel.removeAttr("disabled");
+            ui.panel.prop("disabled", false);
         }
         else
         {
-            ui.oldPanel.attr("disabled", "disabled");
-            ui.newPanel.removeAttr("disabled");
+            ui.oldPanel.prop("disabled", true);
+            ui.newPanel.prop("disabled", false);
         }
     }
 
@@ -411,7 +440,7 @@ if (nextStartIndex > 0)
 </script>
 
 <% if (programs.length > 0) {%>
-<script>
+<script type="text/javascript" nonce="<%=CSP_NONCE%>">
     loadJScroll();
 </script>
 <%}%>
@@ -419,7 +448,7 @@ if (nextStartIndex > 0)
 <%
     var pageLoadEndTime = new Date();
 %>
-<script>
+<script type="text/javascript" nonce="<%=CSP_NONCE%>">
     console.log("Page Load Time: <%=pageLoadEndTime.getTime() - pageLoadStartTime.getTime()%>ms, Program Load Time: <%=progLoadTimeEnd.getTime() - progLoadTimeStart.getTime()%>ms");
 </script>
 

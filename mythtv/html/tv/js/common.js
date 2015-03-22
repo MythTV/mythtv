@@ -1,4 +1,64 @@
 
+/*!
+ * \namespace MythCommon
+ * \brief Namespace for common functions used in 'TV' pages
+ */
+var MythCommon = new function() {
+
+    /*!
+    * \fn Init
+    * \public
+    *
+    * Initialise, called by the window load event once the page has finished
+    * loading
+    */
+    this.Init = function()
+    {
+    };
+
+    /*!
+    * \fn Destructor
+    * \public
+    */
+    this.Destructor = function()
+    {
+    };
+
+    /*!
+    * \fn RecordProgram
+    * \public
+    * \param int Channel ID
+    * \param string Programme start time
+    * \param string Recording rule type
+    * \brief Quick schedule
+    *
+    * Create an instant schedule, with the given type for the programme
+    * indentified by the chanID and startTime combo.
+    *
+    * The schedule editor isn't displayed
+    */
+    this.RecordProgram = function (chanID, startTime, type)
+    {
+        hideMenu("optMenu");
+        var url = "/tv/ajax_backends/dvr_util.qsp?_action=simpleRecord&ChanId=" + chanID + "&StartTime=" + startTime + "&type=" + type;
+        var ajaxRequest = $.ajax( url )
+                                .done(function()
+                                {
+                                    var response = ajaxRequest.responseText.split("#");
+                                    recRuleChanged( response[0], response[1] );
+                                });
+    }
+
+};
+
+window.addEventListener("load", MythCommon.Init);
+window.addEventListener("unload", MythCommon.Destructor);
+
+// TODO: Move what's below into the MythCommon namespace, or elsewhere as
+//       appropriate
+//
+
+
 function jq(id) // F*%$ jQuery
 {
     return "#" + id.replace( /(:|\.|\[|\])/g, "\\$1" );
@@ -142,7 +202,7 @@ function showMenu(parent, typeStr)
         gStartTime = parent.getAttribute("data-starttime");
 
     // DEBUGGING
-    console.log("RecordedId " + gRecordedId + " ChanId " + gChanID + " StartTime " + gStartTime);
+    //console.log("RecordedId " + gRecordedId + " ChanId " + gChanID + " StartTime " + gStartTime);
 
     // New Way
 //     $('#optMenu').data('chanID', parent.getAttribute("data-chanid"));
@@ -238,13 +298,13 @@ function showDetail(parentID, type)
     if (isValidVar(parent.getAttribute("data-recordedId")))
     {
         recordedId = parent.getAttribute("data-recordedId");
-        console.log("Recorded ID " + recordedId);
+        //console.log("Recorded ID " + recordedId);
     }
     else
     {
         chanId = parent.getAttribute("data-chanid");
         startTime = parent.getAttribute("data-starttime");
-        console.log("Chan ID " + chanId + " StartTime " + startTime);
+        //console.log("Chan ID " + chanId + " StartTime " + startTime);
     }
 
     // New Way
@@ -254,9 +314,9 @@ function showDetail(parentID, type)
     // FIXME: We should be able to get a Program object back from
     // from the Services API that contains all the information available
     // whether it's a recording or not
-    var url = "/tv/ajax_backends/program_util.qsp?_action=getProgramDetailHTML&chanID=" + chanId + "&startTime=" + startTime;
+    var url = "/tv/ajax_backends/program_util.qsp?_action=getProgramDetailHTML&ChanId=" + chanId + "&StartTime=" + startTime;
     if (type == "recording")
-        url = "/tv/ajax_backends/program_util.qsp?_action=getRecordingDetailHTML&recordedID=" + recordedId;
+        url = "/tv/ajax_backends/program_util.qsp?_action=getRecordingDetailHTML&RecordedId=" + recordedId;
 
     var ajaxRequest = $.ajax( url )
                             .done(function()
@@ -323,37 +383,37 @@ function loadScheduler(type, chanID, startTime)
         layer.getAttribute("data-recordedid") > 0)
     {
         var recordedID = layer.getAttribute("data-recordedid");
-        loadContent('/tv/schedule.qsp?RecordedId=' + recordedID + '&amp;ChanId=' + chanID + '&amp;StartTime=' + startTime);
+        loadFrontendContent('/tv/schedule.qsp?RecordedId=' + recordedID + '&amp;ChanId=' + chanID + '&amp;StartTime=' + startTime);
     }
     else if (type == "upcoming")
     {
         var recRuleID = layer.getAttribute("data-recordid");
-        loadContent('/tv/schedule.qsp?ChanId=' + chanID + '&amp;StartTime=' + startTime);
+        loadFrontendContent('/tv/schedule.qsp?ChanId=' + chanID + '&amp;StartTime=' + startTime);
     }
     else // type == "rule"
     {
         var recRuleID = layer.getAttribute("data-recordid");
-        loadContent('/tv/schedule.qsp?RecRuleId=' + recRuleID + '&amp;ChanId=' + chanID + '&amp;StartTime=' + startTime);
+        loadFrontendContent('/tv/schedule.qsp?RecRuleId=' + recRuleID + '&amp;ChanId=' + chanID + '&amp;StartTime=' + startTime);
     }
 }
 
 function checkRecordingStatus(chanID, startTime)
 {
-    var url = "/tv/ajax_backends/dvr_util.qsp?_action=checkRecStatus&chanID=" + chanID + "&startTime=" + startTime;
-    var ajaxRequest = $.ajax( url ).done(function()
-                            {
-                                var response = ajaxRequest.responseText.trim().split("#");
-                                var id = response[0] + "_" + response[1];
-                                var layer = document.getElementById(id);
-                                toggleClass(layer, "programScheduling");
-                                // toggleClass(layer, response[2]);
-                                var popup = document.getElementById(id + "_schedpopup");
-                                toggleVisibility(popup);
-                                // HACK: Easiest way to ensure that everything
-                                //       on the page is correctly updated for now
-                                //       is to reload
-                                reloadTVContent();
-                            });
+//     var url = "/tv/ajax_backends/dvr_util.qsp?_action=checkRecStatus&ChanId=" + chanID + "&StartTime=" + startTime;
+//     var ajaxRequest = $.ajax( url ).done(function()
+//                             {
+//                                 var response = ajaxRequest.responseText.trim().split("#");
+//                                 var id = response[0] + "_" + response[1];
+//                                 var layer = document.getElementById(id);
+//                                 toggleClass(layer, "programScheduling");
+//                                 // toggleClass(layer, response[2]);
+//                                 var popup = document.getElementById(id + "_schedpopup");
+//                                 toggleVisibility(popup);
+//                                 // HACK: Easiest way to ensure that everything
+//                                 //       on the page is correctly updated for now
+//                                 //       is to reload
+//                                 reloadTVContent();
+//                             });
 }
 
 function recRuleChanged(chanID, startTime)
@@ -391,12 +451,13 @@ function deleteRecRule(chanID, startTime)
         return;
     }
     hideMenu("optMenu");
-    var url = "/tv/ajax_backends/dvr_util.qsp?_action=deleteRecRule&recRuleID=" + recRuleID + "&chanID=" + chanID + "&startTime=" + startTime;
+    var url = "/tv/ajax_backends/dvr_util.qsp?_action=deleteRecRule&RecRuleId=" + recRuleID + "&ChanId=" + chanID + "&StartTime=" + startTime;
     var ajaxRequest = $.ajax( url )
                             .done(function()
                             {
                                 var response = ajaxRequest.responseText.trim().split("#");
                                 recRuleChanged( response[0], response[1] );
+                                reloadTVContent();
                             });
 }
 
@@ -410,7 +471,7 @@ function dontRecord(chanID, startTime)
     }
     var recRuleID = layer.getAttribute("data-recordid");
     hideMenu("optMenu");
-    var url = "/tv/ajax_backends/dvr_util.qsp?_action=dontRecord&chanID=" + chanID + "&startTime=" + startTime;
+    var url = "/tv/ajax_backends/dvr_util.qsp?_action=dontRecord&ChanId=" + chanID + "&StartTime=" + startTime;
     var ajaxRequest = $.ajax( url )
                             .done(function()
                             {
@@ -429,7 +490,7 @@ function neverRecord(chanID, startTime)
     }
     var recRuleID = layer.getAttribute("data-recordid");
     hideMenu("optMenu");
-    var url = "/tv/ajax_backends/dvr_util.qsp?_action=neverRecord&chanID=" + chanID + "&startTime=" + startTime;
+    var url = "/tv/ajax_backends/dvr_util.qsp?_action=neverRecord&ChanId=" + chanID + "&StartTime=" + startTime;
     var ajaxRequest = $.ajax( url )
                             .done(function()
                             {
@@ -440,28 +501,7 @@ function neverRecord(chanID, startTime)
 
 function loadTVContent(url, targetDivID, transition, args)
 {
-    currentContentURL = url;   // currentContentURL is defined in util.qjs
-
-    if (!targetDivID)
-        targetDivID = "content";
-    if (!transition)
-        transition = "none"; // dissolve
-
-    if (transition === "none")
-    {
-        loadContent(url);
-        return;
-    }
-
-    $("#busyPopup").show();
-
-    var targetDiv = document.getElementById(targetDivID);
-    if (!isValidObject(targetDiv))
-    {
-        setErrorMessage("loadTVContent() target DIV doesn't exist: (" + targetDivID + ")");
-        return;
-    }
-
+    var historyUrl = url;
     for (var key in args)
     {
         // Check that this arg hasn't already been appended
@@ -470,28 +510,78 @@ function loadTVContent(url, targetDivID, transition, args)
         {
             // Check if any args presently exist
             if (url.indexOf("?") !== -1)
-                url += "&amp;";
+                url += "&";
             else
                 url += "?";
 
             url += key + "=" + args[key];
+
+            // If this page is reloaded from the history we want the whole
+            // page, not just the list part so we want to strip the 'ListOnly'
+            // argument
+            if (key !== "ListOnly")
+            {
+                if (historyUrl.indexOf("?") !== -1)
+                    historyUrl += "&";
+                else
+                    historyUrl += "?";
+
+                historyUrl += key + "=" + args[key];
+            }
         }
     }
 
-    var html = $.ajax({
-      url: url,
-        async: false
-     }).responseText;
+    console.log("Storing history: " + historyUrl);
+    // pushState might be more ideal except that it doesn't actually appear to
+    // work properly. Hitting 'back' with pushed states _for the same page_ doesn't
+    // actually load the old page state, it just reloads the present state.
+    //
+    // We can 'fix' this in future by altering the page 'src' based on the state
+    // object
+    history.pushState(args, '', historyUrl); // Update the page url in the browser
+
+    if (!targetDivID)
+        targetDivID = "content";
+    if ((getSetting('', 'WebFrontend_enableAnimations', 1) == 0) ||
+        !transition)
+        transition = "none";
+
+    if (targetDivID === "content" && transition === "none")
+    {
+        loadFrontendContent(url);
+        return;
+    }
+
+    parent.document.getElementById("busyPopup").style.display = "block";
+
+    var html = $.ajax({ url: url,
+                        dataType: "html",
+                        success:function(data, textStatus, jqXHR)
+                            {
+                                if (data)
+                                    setTVContent(targetDivID, data, transition);
+                            }
+                        });
+}
+
+function setTVContent(divID, html, transition)
+{
+    var targetDiv = document.getElementById(divID);
+    if (!isValidObject(targetDiv))
+    {
+        setErrorMessage("loadTVContent() target DIV doesn't exist: (" + divID + ")");
+        parent.document.getElementById("busyPopup").style.display = "none";
+        return;
+    }
 
     var newDiv = document.createElement('div');
-    newDiv.style = "left: 100%";
     newDiv.className = targetDiv.className;
     newDiv.innerHTML = html;
     targetDiv.parentNode.insertBefore(newDiv, null);
 
     // Need to assign the id to the new div
-    targetDiv.id = "old" + targetDivID;
-    newDiv.id = targetDivID;
+    targetDiv.id = "old" + divID;
+    newDiv.id = divID;
     switch (transition)
     {
         case 'left':
@@ -503,15 +593,19 @@ function loadTVContent(url, targetDivID, transition, args)
         case 'dissolve':
             dissolveTransition(targetDiv.id, newDiv.id);
             break;
-    }
-    newDiv.id = targetDivID;
+        case 'none':
+            postLoad(targetDiv.id, newDiv.id);
+            break;
 
-    $("#busyPopup").hide();
+    }
+    newDiv.id = divID;
+
+    parent.document.getElementById("busyPopup").style.display = "none";
 }
 
 function reloadTVContent()
 {
-    loadTVContent(currentContentURL);  // currentContentURL is defined in util.qjs
+    loadFrontendContent(window.location.href);
 }
 
 function formOnLoad(form)
@@ -532,10 +626,11 @@ function submitForm(formElement, target, transition)
         setErrorMessage("submitForm() invalid form element");
         return;
     }
-    var queryString = $(formElement).serialize();
-    var url = formElement.action + "?" + queryString;
 
-    loadTVContent(url, target, transition);
+    var path = formElement.action;
+    var args = formArray(formElement);
+
+    loadTVContent(path, target, transition, args);
     return false;
 }
 
@@ -558,7 +653,11 @@ function saveFormData(formElement, callback)
         dataType: "text",
         success:function(data, textStatus, jqXHR)
         {
-            callback(data.trim());
+            if (data)
+            {
+                console.log("saveFormData response: " + data.trim());
+                callback(data.trim());
+            }
             $("#saveFormDataSuccess").show().delay(5000).fadeOut();
         },
         error: function(jqXHR, textStatus, errorThrown)
@@ -576,6 +675,9 @@ function scrollCallback()
 
 function loadJScroll()
 {
+    if (!document.querySelector(".jscroll"))
+        return;
+
     // Always have at least one window heights worth loaded off-screen
     $('.jscroll').jscroll({
     padding: $(window).height(),
@@ -584,9 +686,10 @@ function loadJScroll()
     });
 }
 
-function postLoad()
+function postLoad(oldDivID, newDivID)
 {
-    //loadJScroll();
+    $("#" + oldDivID).remove();
+    loadJScroll();
 }
 
 // CSS (Native) transitions are faster than jQuery and preferred generally
@@ -595,16 +698,14 @@ function leftSlideTransition(oldDivID, newDivID)
     // Transition works much better with a fixed width, so temporarily set
     // the width based on the parent,
     $("#" + newDivID).css("width", $("#" + oldDivID).width());
-    // We want the new div to start off-screen to the right
-    $("#" + newDivID).css("left", "100%");
+    $("#" + newDivID).addClass("leftSlideInTransitionStart");
     $("#" + oldDivID).bind("transitionend", function() {
-        $("#" + oldDivID).remove();
-        postLoad();
+        postLoad(oldDivID, newDivID);
 
     });
     $("#" + newDivID).bind("transitionend", function() {
+        $("#" + newDivID).removeClass("leftSlideInTransitionStart");
         $("#" + newDivID).removeClass("leftSlideInTransition");
-        $("#" + newDivID).css("left", 'auto');
         $("#" + newDivID).css("width", null);
     });
     $("#" + newDivID).addClass("leftSlideInTransition");
@@ -617,18 +718,14 @@ function rightSlideTransition(oldDivID, newDivID)
     // HACK Transition works much better with a fixed width, so temporarily set
     // the width based on the parent,
     $("#" + newDivID).css("width", $("#" + oldDivID).width());
-    // We want the new div to start off-screen to the left
-    //$("#" + newDivID).css("left", "-100%");
     $("#" + newDivID).addClass("rightSlideInTransitionStart");
     $("#" + oldDivID).bind("transitionend", function() {
-        $("#" + oldDivID).remove();
-        postLoad();
+        postLoad(oldDivID, newDivID);
 
     });
     $("#" + newDivID).bind("transitionend", function() {
         $("#" + newDivID).removeClass("rightSlideInTransitionStart");
         $("#" + newDivID).removeClass("rightSlideInTransition");
-        //$("#" + newDivID).css("left", 'auto');
         $("#" + newDivID).css("width", null);
     });
     $("#" + newDivID).addClass("rightSlideInTransition");
@@ -650,8 +747,7 @@ function dissolveTransition(oldDivID, newDivID)
 
     // Browser prefixes suck
     $("#" + oldDivID).bind("webkitAnimationEnd", function() {
-        $("#" + oldDivID).remove();
-        postLoad();
+        postLoad(oldDivID, newDivID);
     });
     $("#" + newDivID).bind("webkitAnimationEnd", function() {
         $("#" + newDivID).removeClass("dissolveInTransitionStart");
@@ -666,4 +762,17 @@ function dissolveTransition(oldDivID, newDivID)
 function handleKeyboardShortcutsTV(key) {
     if (key.keyCode == 27)
         hideMenu("optMenu");
+}
+
+window.onpopstate = function(event)
+{
+    // Only force load if this is a 'fake' history for which we have saved
+    // state. For 'normal' history navigation this isn't required.
+    // FIXME: Disable this check for now, since we need to start saving state
+    //        for 'default' pages before it works as intended
+    if (event) // && event.state)
+    {
+        // TODO: Do the load ourselves to allow animated transitions?
+        window.location = window.location; // Feels faster than location.reload(); ?
+    }
 }

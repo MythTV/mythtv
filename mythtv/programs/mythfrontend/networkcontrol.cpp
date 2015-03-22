@@ -1,3 +1,6 @@
+
+#include "networkcontrol.h"
+
 #include <unistd.h>
 
 #include <QCoreApplication>
@@ -12,7 +15,6 @@
 #include "mythcorecontext.h"
 #include "mythmiscutil.h"
 #include "mythversion.h"
-#include "networkcontrol.h"
 #include "programinfo.h"
 #include "remoteutil.h"
 #include "previewgenerator.h"
@@ -24,6 +26,21 @@
 // libmythui
 #include "mythmainwindow.h"
 #include "mythuihelper.h"
+#include "mythuigroup.h"
+#include "mythuiclock.h"
+#include "mythuishape.h"
+#include "mythuibutton.h"
+#include "mythuitextedit.h"
+#include "mythuibuttontree.h"
+#include "mythuivideo.h"
+#include "mythuiguidegrid.h"
+#include "mythuicheckbox.h"
+#include "mythuispinbox.h"
+#include "mythuiwebbrowser.h"
+#include "mythuiprogressbar.h"
+#include "mythuiscrollbar.h"
+#include "mythuieditbar.h"
+#include "mythuiimage.h"
 
 #define LOC QString("NetworkControl: ")
 #define LOC_ERR QString("NetworkControl Error: ")
@@ -94,6 +111,10 @@ NetworkControl::NetworkControl() :
     jumpMap["statusbox"]             = "Status Screen";
     jumpMap["playbackbox"]           = "TV Recording Playback";
     jumpMap["pbb"]                   = "TV Recording Playback";
+
+    jumpMap["reloadtheme"]           = "Reload Theme";
+    jumpMap["showborders"]           = "Toggle Show Widget Borders";
+    jumpMap["shownames"]             = "Toggle Show Widget Names";
 
     keyMap["up"]                     = Qt::Key_Up;
     keyMap["down"]                   = Qt::Key_Down;
@@ -289,6 +310,8 @@ void NetworkControl::processNetworkControlCommand(NetworkCommand *nc)
         result = processMessage(nc);
     else if (is_abbrev("notification", nc->getArg(0)))
         result = processNotification(nc);
+    else if (is_abbrev("theme", nc->getArg(0)))
+        result = processTheme(nc);
     else if ((nc->getArg(0).toLower() == "exit") || (nc->getArg(0).toLower() == "quit"))
         QCoreApplication::postEvent(this,
                                 new NetworkControlCloseEvent(nc->getClient()));
@@ -1044,6 +1067,212 @@ QString NetworkControl::processSet(NetworkCommand *nc)
                    .arg(nc->getArg(0));
 }
 
+QString NetworkControl::getWidgetType(MythUIType* type)
+{
+    if (dynamic_cast<MythUIText *>(type))
+        return "MythUIText";
+    else if (dynamic_cast<MythUITextEdit *>(type))
+        return "MythUITextEdit";
+    else if (dynamic_cast<MythUIGroup *>(type))
+        return "MythUIGroup";
+    else if (dynamic_cast<MythUIButton *>(type))
+        return "MythUIButton";
+    else if (dynamic_cast<MythUICheckBox *>(type))
+        return "MythUICheckBox";
+    else if (dynamic_cast<MythUIShape *>(type))
+        return "MythUIShape";
+    else if (dynamic_cast<MythUIButtonList *>(type))
+        return "MythUIButtonList";
+    else if (dynamic_cast<MythUIImage *>(type))
+        return "MythUIImage";
+    else if (dynamic_cast<MythUISpinBox *>(type))
+        return "MythUISpinBox";
+    else if (dynamic_cast<MythUIWebBrowser *>(type))
+        return "MythUIWebBrowser";
+    else if (dynamic_cast<MythUIClock *>(type))
+        return "MythUIClock";
+    else if (dynamic_cast<MythUIStateType *>(type))
+        return "MythUIStateType";
+    else if (dynamic_cast<MythUIProgressBar *>(type))
+        return "MythUIProgressBar";
+    else if (dynamic_cast<MythUIButtonTree *>(type))
+        return "MythUIButtonTree";
+    else if (dynamic_cast<MythUIScrollBar *>(type))
+        return "MythUIScrollBar";
+    else if (dynamic_cast<MythUIVideo *>(type))
+        return "MythUIVideo";
+    else if (dynamic_cast<MythUIGuideGrid *>(type))
+        return "MythUIGuideGrid";
+    else if (dynamic_cast<MythUIEditBar *>(type))
+        return "MythUIEditBar";
+
+    return "Unknown";
+}
+
+QString NetworkControl::processTheme( NetworkCommand* nc)
+{
+    if (nc->getArgCount() == 1)
+        return QString("ERROR: See 'help %1' for usage information")
+                       .arg(nc->getArg(0));
+
+    if (nc->getArg(1) == "getthemeinfo")
+    {
+        QString themeName = GetMythUI()->GetThemeName();
+        QString themeDir = GetMythUI()->GetThemeDir();
+        return QString("%1 - %2").arg(themeName).arg(themeDir);
+    }
+    else if (nc->getArg(1) == "reload")
+    {
+        GetMythMainWindow()->JumpTo(jumpMap["reloadtheme"]);
+
+        return "OK";
+    }
+    else if (nc->getArg(1) == "showborders")
+    {
+        GetMythMainWindow()->JumpTo(jumpMap["showborders"]);
+
+        return "OK";
+    }
+    else if (nc->getArg(1) == "shownames")
+    {
+        GetMythMainWindow()->JumpTo(jumpMap["shownames"]);
+
+        return "OK";
+    }
+    else if (nc->getArg(1) == "getwidgetnames")
+    {
+        QStringList path;
+
+        if (nc->getArgCount() >= 3)
+            path = nc->getArg(2).split('/');
+
+        MythScreenStack *stack = GetMythMainWindow()->GetStack("popup stack");
+        MythScreenType *topScreen = stack->GetTopScreen();
+
+        if (!topScreen)
+        {
+            stack = GetMythMainWindow()->GetMainStack();
+            topScreen = stack->GetTopScreen();
+        }
+
+        if (!topScreen)
+            return QString("ERROR: no top screen found!");
+
+        MythUIType *currType = static_cast<MythUIType*>(topScreen);
+
+        while (!path.isEmpty())
+        {
+            QString childName = path.takeFirst();
+            currType = currType->GetChild(childName);
+            if (!currType)
+                return QString("ERROR: Failed to find child '%1'").arg(childName);
+        }
+
+        QList<MythUIType*> *children = currType->GetAllChildren();
+        QString result;
+
+        for (int i = 0; i < children->count(); i++)
+        {
+            MythUIType *type = children->at(i);
+            QString widgetName = type->objectName();
+            QString widgetType = getWidgetType(type);
+            result += QString("%1 - %2\n\r").arg(widgetName, -20).arg(widgetType);
+        }
+
+        return result;
+    }
+    else if (nc->getArg(1) == "getarea")
+    {
+        if (nc->getArgCount() < 3)
+            return QString("ERROR: Missing widget name.");
+
+        QString widgetName = nc->getArg(2);
+        QStringList path = widgetName.split('/');
+
+        MythScreenStack *stack = GetMythMainWindow()->GetStack("popup stack");
+        MythScreenType *topScreen = stack->GetTopScreen();
+
+        if (!topScreen)
+        {
+            stack = GetMythMainWindow()->GetMainStack();
+            topScreen = stack->GetTopScreen();
+        }
+
+        if (!topScreen)
+            return QString("ERROR: no top screen found!");
+
+        MythUIType *currType = static_cast<MythUIType*>(topScreen);
+
+        while (path.count() > 1)
+        {
+            QString childName = path.takeFirst();
+            currType = currType->GetChild(childName);
+            if (!currType)
+                return QString("ERROR: Failed to find child '%1'").arg(childName);
+        }
+
+        MythUIType* type = currType->GetChild(path.first());
+        if (!type)
+            return QString("ERROR: widget '%1' not found!").arg(widgetName);
+
+        int x = type->GetFullArea().x();
+        int y = type->GetFullArea().y();
+        int w = type->GetFullArea().width();
+        int h = type->GetFullArea().height();
+        return QString("The area of '%1' is x:%2, y:%3, w:%4, h:%5")
+                       .arg(widgetName).arg(x).arg(y).arg(w).arg(h);
+    }
+    else if (nc->getArg(1) == "setarea")
+    {
+        if (nc->getArgCount() < 3)
+            return QString("ERROR: Missing widget name.");
+
+        if (nc->getArgCount() < 7)
+            return QString("ERROR: Missing X, Y, Width or Height.");
+
+        QString widgetName = nc->getArg(2);
+        QStringList path = widgetName.split('/');
+        QString x = nc->getArg(3);
+        QString y = nc->getArg(4);
+        QString w = nc->getArg(5);
+        QString h = nc->getArg(6);
+
+        MythScreenStack *stack = GetMythMainWindow()->GetStack("popup stack");
+        MythScreenType *topScreen = stack->GetTopScreen();
+
+        if (!topScreen)
+        {
+            stack = GetMythMainWindow()->GetMainStack();
+            topScreen = stack->GetTopScreen();
+        }
+
+        if (!topScreen)
+            return QString("ERROR: no top screen found!");
+
+                MythUIType *currType = static_cast<MythUIType*>(topScreen);
+
+        while (path.count() > 1)
+        {
+            QString childName = path.takeFirst();
+            currType = currType->GetChild(childName);
+            if (!currType)
+                return QString("ERROR: Failed to find child '%1'").arg(childName);
+        }
+
+        MythUIType* type = currType->GetChild(path.first());
+        if (!type)
+            return QString("ERROR: widget '%1' not found!").arg(widgetName);
+
+        type->SetArea(MythRect(x, y, w, h));
+
+        return QString("Changed area of '%1' to x:%2, y:%3, w:%4, h:%5")
+                       .arg(widgetName).arg(x).arg(y).arg(w).arg(h);
+    }
+
+    return QString("ERROR: See 'help %1' for usage information")
+                   .arg(nc->getArg(0));
+}
+
 QString NetworkControl::processHelp(NetworkCommand *nc)
 {
     QString command, helpText;
@@ -1190,6 +1419,17 @@ QString NetworkControl::processHelp(NetworkCommand *nc)
         helpText +=
             "notification          - Displays a simple text message notification\r\n";
     }
+    else if (is_abbrev("theme", command))
+    {
+        helpText +=
+            "theme getthemeinfo               - Display the name and location of the current theme\r\n"
+            "theme reload                     - Reload the theme\r\n"
+            "theme showborders                - Toggle showing widget borders\r\n"
+            "theme shownames ON/OFF           - Toggle showing widget names\r\n"
+            "theme getwidgetnames PATH        - Display the name and type of all the child widgets from PATH\r\n"
+            "theme getarea WIDGETNAME         - Get the area of widget WIDGET on the active screen\r\n"
+            "theme setarea WIDGETNAME X Y W H - Change the area of widget WIDGET to X Y W H on the active screen\r\n";
+    }
 
     if (!helpText.isEmpty())
         return helpText;
@@ -1208,6 +1448,7 @@ QString NetworkControl::processHelp(NetworkCommand *nc)
         "screenshot         - Capture screenshot\r\n"
         "message            - Display a simple text message\r\n"
         "notification       - Display a simple text notification\r\n"
+        "theme              - Theme related commands\r\n"
         "exit               - Exit Network Control\r\n"
         "\r\n"
         "Type 'help COMMANDNAME' for help on any specific command.\r\n";

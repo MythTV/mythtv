@@ -7,8 +7,9 @@
 #include <QKeyEvent>
 #include <QDomDocument>
 
-// Mythdb headers
+// Mythbase headers
 #include "mythlogging.h"
+#include "mythmedia.h"
 
 // MythUI headers
 #include "mythgesture.h"
@@ -24,6 +25,8 @@
 #include "mythuitextedit.h"
 #include "mythuiprogressbar.h"
 #include "mythuispinbox.h"
+#include "mythuigroup.h"
+#include "mythgesture.h"
 
 MythUIType::MythUIType(QObject *parent, const QString &name)
     : QObject(parent)

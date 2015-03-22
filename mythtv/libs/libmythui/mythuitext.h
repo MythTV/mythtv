@@ -5,12 +5,13 @@
 #include <QTextLayout>
 #include <QColor>
 
-// Mythdb headers
+// Mythbase headers
 #include "mythstorage.h"
+#include "mythtypes.h"
 
 // Mythui headers
 #include "mythuitype.h"
-#include "mythmainwindow.h"
+#include "mythmainwindow.h" // for MythMainWindow::drawRefresh
 
 class MythFontProperties;
 
@@ -90,14 +91,14 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     void ShiftCanvas(int x, int y);
 
     bool Layout(QString & paragraph, QTextLayout *layout, bool final,
-		bool & overflow, qreal width, qreal & height, bool force,
-		qreal & last_line_width, QRectF & min_rect, int & num_lines);
+                bool & overflow, qreal width, qreal & height, bool force,
+                qreal & last_line_width, QRectF & min_rect, int & num_lines);
     bool LayoutParagraphs(const QStringList & paragraphs,
-			  const QTextOption & textoption,
-			  qreal width, qreal & height, QRectF & min_rect,
-			  qreal & last_line_width, int & num_lines, bool final);
+                          const QTextOption & textoption,
+                          qreal width, qreal & height, QRectF & min_rect,
+                          qreal & last_line_width, int & num_lines, bool final);
     bool GetNarrowWidth(const QStringList & paragraphs,
-			const QTextOption & textoption, qreal & width);
+                        const QTextOption & textoption, qreal & width);
     void FillCutMessage(void);
 
     int m_Justification;

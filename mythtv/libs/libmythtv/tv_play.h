@@ -15,23 +15,18 @@ using namespace std;
 #include <QWaitCondition>
 #include <QStringList>
 #include <QDateTime>
-#include <QKeyEvent>
+#include <QTime>
 #include <QObject>
 #include <QRegExp>
 #include <QString>
-#include <QEvent>
 #include <QMutex>
-#include <QTime>
 #include <QMap>
 #include <QSet>
 
 // MythTV
 #include "mythdeque.h"
 #include "tv.h"
-#include "mythdate.h"
-#include "programinfo.h"
 #include "channelinfo.h"
-#include "channelutil.h"
 #include "videoouttypes.h"
 #include "volumebase.h"
 #include "inputinfo.h"
@@ -40,6 +35,9 @@ using namespace std;
 #include "osd.h"
 #include "decoderbase.h"
 
+class QEvent;
+class QKeyEvent;
+class QTimerEvent;
 class QDateTime;
 class QDomDocument;
 class QDomNode;

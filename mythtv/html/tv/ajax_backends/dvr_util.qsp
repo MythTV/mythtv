@@ -176,23 +176,23 @@ switch (getArg("_action")) // _action to avoid conflicts with http form's "actio
 {
     case "simpleRecord":
         var validDate = myth.ParseISODateString(getArg("StartTime"));
-        ret = scheduleSimpleRecording(getArg("ChanID"), validDate, getArg("Type"));
+        ret = scheduleSimpleRecording(getArg("ChanId"), validDate, getArg("Type"));
         break;
     case "checkRecStatus":
         var validDate = myth.ParseISODateString(getArg("StartTime"));
-        ret = checkRecordingStatus(getArg("ChanID"), validDate);
+        ret = checkRecordingStatus(getArg("ChanId"), validDate);
         break;
     case "deleteRecRule":
         var validDate = myth.ParseISODateString(getArg("StartTime"));
-        ret = deleteRecRule(getArg("RecRuleId"), getArg("ChanID"), validDate);
+        ret = deleteRecRule(getArg("RecRuleId"), getArg("ChanId"), validDate);
         break;
     case "dontRecord":
         var validDate = myth.ParseISODateString(getArg("StartTime"));
-        ret = dontRecord(getArg("ChanID"), validDate);
+        ret = dontRecord(getArg("ChanId"), validDate);
         break;
     case "neverRecord":
         var validDate = myth.ParseISODateString(getArg("StartTime"));
-        ret = neverRecord(getArg("ChanID"), validDate);
+        ret = neverRecord(getArg("ChanId"), validDate);
         break;
     case "deleteRecording":
         ret = deleteRecording(getArg("RecordedId"),
@@ -204,7 +204,7 @@ switch (getArg("_action")) // _action to avoid conflicts with http form's "actio
         break;
     case "saveRecordingRule":
         var validDate = myth.ParseISODateString(getArg("StartTime"));
-        ret = saveRecordingRule(getArg("id"), getArg("ChanID"), validDate);
+        ret = saveRecordingRule(getArg("id"), getArg("ChanId"), validDate);
         break;
     default:
         break;

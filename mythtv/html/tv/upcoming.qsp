@@ -54,8 +54,11 @@ import "/tv/js/tvutil.qjs"
 <link rel="stylesheet" type="text/css" href="/tv/css/category_colors.css">
 <script src="/js/utility.js"></script> <!-- ECMA not JS -->
 <script src="/js/util.qjs"></script>
+<script type="text/javascript" src="/3rdParty/jquery/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="/3rdParty/jquery/jqueryUI/js/jquery-ui-1.10.3.js"></script>
+<script type="text/javascript"  src="/3rdParty/jquery/jqueryJScroll/jquery.jscroll.js"></script>
 <script src="/tv/js/common.js"></script>
-<!-- <script src="/tv/js/upcoming.js"></script> -->
+<script src="/tv/js/upcoming.js"></script>
 </head>
 <body>
 
@@ -147,6 +150,10 @@ for (var listIdx = 0; listIdx < programs.length; listIdx++)
 
     var date = myth.GetFormatDate(program.StartTime);
 
+    var channelIcon = "/tv/images/channel_icon.svg";
+    if (channel.IconURL)
+        channelIcon = channel.IconURL + "&amp;Height=57";
+
     if (date != prevDate)
     {
         prevDate = date;
@@ -159,7 +166,7 @@ for (var listIdx = 0; listIdx < programs.length; listIdx++)
 %>
     <div class="programRow" id="<%=programIdentifier%>_row">
         <div class="channelBox">
-            <img class="channelIcon" height="57" alt="<%=escapeHTML(channel.ChannelName)%> Icon" src="/Guide/GetChannelIcon?ChanId=<%=channel.ChanId%>&amp;Height=57" />
+            <img class="channelIcon" height="57" alt="<%=escapeHTML(channel.ChannelName)%> Icon" src="<%=channelIcon%>&amp;Height=57" lazyload />
             <div class="channelText"><%=escapeHTML(channel.CallSign)%></div>
         </div>
         <div class="programBox">
@@ -210,7 +217,7 @@ for (var listIdx = 0; listIdx < programs.length; listIdx++)
 %>
 
 <% if (nextStartIndex) { %>
-<a class="jscroll-next" href="/tv/upcoming.qsp?ViewFilter=<%=filter%>&amp;Start=<%=nextStartIndex%>&amp;ListOnly=1" />
+<a class="jscroll-next" href="/tv/upcoming.qsp?ViewFilter=<%=filter%>&amp;Start=<%=nextStartIndex%>&amp;ListOnly=1"></a>
 <%}%>
 
 <% if (!listOnly) {%>
@@ -218,7 +225,7 @@ for (var listIdx = 0; listIdx < programs.length; listIdx++)
 </div> <!-- End upcomingList-container -->
 
 <% if (programs.length > 0) {%>
-<script>
+<script type="text/javascript" nonce="<%=CSP_NONCE%>">
     loadJScroll();
 </script>
 <%}%>

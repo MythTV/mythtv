@@ -67,6 +67,18 @@
 #define B2N_32(x) x = be32toh(x)
 #define B2N_64(x) x = be64toh(x)
 
+#elif defined(__QNXNTO__)
+#include <gulliver.h>
+#define B2N_16(x) x = ENDIAN_RET16(x)
+#define B2N_32(x) x = ENDIAN_RET32(x)
+#define B2N_64(x) x = ENDIAN_RET64(x)
+
+#elif defined(__DragonFly__)
+#include <sys/endian.h>
+#define B2N_16(x) x = bswap16(x)
+#define B2N_32(x) x = bswap32(x)
+#define B2N_64(x) x = bswap64(x)
+
 /* This is a slow but portable implementation, it has multiple evaluation
  * problems so beware.
  * Old FreeBSD's and Solaris don't have <byteswap.h> or any other such
@@ -97,7 +109,7 @@
 /* If there isn't a header provided with your system with this functionality
  * add the relevant || define( ) to the portable implementation above.
  */
-#error "You need to add endian swap macros for you're system"
+#error "You need to add endian swap macros for your system"
 
 #endif
 

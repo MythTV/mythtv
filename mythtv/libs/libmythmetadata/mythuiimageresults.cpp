@@ -1,10 +1,15 @@
+
+#include "mythuiimageresults.h"
+
 #include <QFile>
 #include <QDir>
 
 #include "mythdirs.h"
 #include "mythdate.h"
 
-#include "mythuiimageresults.h"
+#include "mythuibuttonlist.h"
+#include "metadataimagedownload.h"
+#include "mythcorecontext.h"
 
 ImageSearchResultsDialog::ImageSearchResultsDialog(
     MythScreenStack *lparent,

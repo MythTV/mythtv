@@ -557,7 +557,7 @@ void ThreadedFileWriter::DiskLoop(void)
         {
             gCoreContext->RegisterFileForWrite(filename, total_written);
             m_registered = true;
-            lastRegisterTimer.restart(); 
+            lastRegisterTimer.restart();
         }
 
         buf->lastUsed = MythDate::current();

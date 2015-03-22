@@ -8,6 +8,11 @@
 #include <QRunnable>
 #include <QString>
 #include <QMap>
+#include <QMutex>                       // for QMutex
+#include <QHash>                        // for QHash
+
+// C++ headers
+#include <vector>                       // for vector
 
 // MythTV headers
 #include "mythtimer.h"
@@ -18,6 +23,9 @@
 #include "recordinginfo.h"
 #include "tv.h"
 #include "signalmonitorlistener.h"
+#include "mythtvexp.h"                  // for MTV_PUBLIC
+#include "programtypes.h"               // for RecStatus, RecStatus::Type, etc
+#include "videoouttypes.h"              // for PictureAttribute
 
 #include "mythconfig.h"
 
@@ -151,8 +159,8 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     bool Init(void);
 
     void RecordPending(const ProgramInfo *rcinfo, int secsleft, bool hasLater);
-    RecStatusType StartRecording(ProgramInfo *rcinfo);
-    RecStatusType GetRecordingStatus(void) const;
+    RecStatus::Type StartRecording(ProgramInfo *rcinfo);
+    RecStatus::Type GetRecordingStatus(void) const;
 
     void StopRecording(bool killFile = false);
     /// \brief Tells TVRec to finish the current recording as soon as possible.
@@ -325,7 +333,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
                          RecordingProfile *, int line);
 
     void SetRecordingStatus(
-        RecStatusType new_status, int line, bool have_lock = false);
+        RecStatus::Type new_status, int line, bool have_lock = false);
 
     QString LoadProfile(QString ,void*, RecordingInfo*,
                         RecordingProfile&);
@@ -389,7 +397,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     QWaitCondition triggerEventSleepWait;
     bool           triggerEventSleepSignal;
     volatile bool  switchingBuffer;
-    RecStatusType  m_recStatus;
+    RecStatus::Type  m_recStatus;
 
     // Current recording info
     RecordingInfo *curRecording;

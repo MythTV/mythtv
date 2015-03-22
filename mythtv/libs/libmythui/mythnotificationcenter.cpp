@@ -263,8 +263,8 @@ MythNotificationScreen &MythNotificationScreen::operator=(const MythNotification
 
     m_update        = m_content; // so all fields are initialised regardless of notification type
 
-    m_added         = false;
-    m_created       = false;
+    m_added         = s.m_added;
+    m_created       = s.m_created;
 
     m_artworkImage     = NULL;
     m_titleText        = NULL;
@@ -439,8 +439,8 @@ bool MythNotificationScreen::Create(void)
 
     if (m_mediaState && (m_update & kImage))
     {
-        m_mediaState->DisplayState(m_content & kNoArtwork ? "noartwork" : "ok");
-        LOG(VB_GUI, LOG_DEBUG, LOC + QString("Create: Set media state to %1").arg(m_content & kNoArtwork ? "noartwork" : "ok"));
+        m_mediaState->DisplayState((m_content & kNoArtwork) ? "noartwork" : "ok");
+        LOG(VB_GUI, LOG_DEBUG, LOC + QString("Create: Set media state to %1").arg((m_content & kNoArtwork) ? "noartwork" : "ok"));
     }
 
     // store original position
@@ -569,8 +569,8 @@ void MythNotificationScreen::Init(void)
 
     if (m_mediaState && (m_update & kImage))
     {
-        m_mediaState->DisplayState(m_update & kNoArtwork ? "noartwork" : "ok");
-        LOG(VB_GUI, LOG_DEBUG, LOC + QString("Init: Set media state to %1").arg(m_update & kNoArtwork ? "noartwork" : "ok"));
+        m_mediaState->DisplayState((m_update & kNoArtwork) ? "noartwork" : "ok");
+        LOG(VB_GUI, LOG_DEBUG, LOC + QString("Init: Set media state to %1").arg((m_update & kNoArtwork) ? "noartwork" : "ok"));
     }
 
     // No field will be refreshed the next time unless specified otherwise

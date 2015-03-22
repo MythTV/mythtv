@@ -10,7 +10,8 @@ using namespace std;
 #include <QSize>
 
 #include "referencecounter.h"
-#include "programinfo.h" // For RecStatusType
+#include "programinfo.h" // ProgramInfo
+#include "programtypes.h" // RecStatus::Type
 #include "inputinfo.h"
 
 class MythSocket;
@@ -46,6 +47,9 @@ class PlaybackSock : public ReferenceCounter
 
     bool getBlockShutdown(void) const { return blockshutdown; }
     void setBlockShutdown(bool value) { blockshutdown = value; }
+
+    bool IsFrontend(void) const { return m_frontend; }
+    void SetAsFrontend(void) { m_frontend = true; }
 
     // all backend<->backend stuff below here
     bool isSlaveBackend(void) const { return backend; }
@@ -90,9 +94,9 @@ class PlaybackSock : public ReferenceCounter
     long long GetMaxBitrate(int capturecardnum);
     ProgramInfo *GetRecording(uint cardid);
     bool EncoderIsRecording(int capturecardnum, const ProgramInfo *pginfo);
-    RecStatusType StartRecording(int capturecardnum,
+    RecStatus::Type StartRecording(int capturecardnum,
                                  ProgramInfo *pginfo);
-    RecStatusType GetRecordingStatus(int capturecardnum);
+    RecStatus::Type GetRecordingStatus(int capturecardnum);
     void RecordPending(int capturecardnum, const ProgramInfo *pginfo,
                        int secsleft, bool hasLater);
     int SetSignalMonitoringRate(int capturecardnum, int rate, int notifyFrontend);
@@ -117,6 +121,7 @@ class PlaybackSock : public ReferenceCounter
     bool blockshutdown;
     bool backend;
     bool mediaserver;
+    bool m_frontend;
 
     QMutex sockLock;
 

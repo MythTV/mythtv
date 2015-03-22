@@ -24,9 +24,7 @@
 # define GET_SOCKET_ERROR    errno
 #endif
 
-#if CONFIG_DARWIN
-#include <unistd.h>
-#endif
+#include <unistd.h> // for usleep()
 
 // Qt headers
 #include <QStringList>

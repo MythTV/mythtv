@@ -3,17 +3,30 @@
 
 #include <QCoreApplication>
 
-#include "recordinginfo.h"
-#include "tv_play.h"
-#include "recordingrule.h"
-#include "mythlogging.h"
+// libmythbase
+
 #include "mythcorecontext.h"
-#include "remoteutil.h"
+#include "mythlogging.h"
+
+// libmythui
+
 #include "mythuitext.h"
 #include "mythuistatetype.h"
 #include "mythuibuttonlist.h"
 #include "mythdialogbox.h"
 #include "mythmainwindow.h"
+
+// libmythtv
+
+#include "recordinginfo.h"
+#include "tv_play.h"
+#include "recordingrule.h"
+#include "remoteutil.h"
+#include "programtypes.h"               // for RecStatus, etc
+#include "recordingtypes.h"             // for toString
+#include "tv_actions.h"                 // for ACTION_CHANNELSEARCH
+
+// mythfrontend
 #include "guidegrid.h"
 
 void *ViewScheduled::RunViewScheduled(void *player, bool showTV)
@@ -43,9 +56,6 @@ ViewScheduled::ViewScheduled(MythScreenStack *parent, TV* player, bool showTV)
                m_listPos(0),
                m_currentGroup(QDate()),
                m_defaultGroup(QDate()),
-               m_maxcard(0),
-               m_curcard(0),
-               m_inputref(),
                m_maxinput(0),
                m_curinput(0),
                m_player(player)
@@ -183,8 +193,6 @@ bool ViewScheduled::keyPressEvent(QKeyEvent *event)
             setShowAll(false);
         else if (action == "PREVVIEW" || action == "NEXTVIEW")
             setShowAll(!m_showAll);
-        else if (action == "VIEWCARD")
-            viewCards();
         else if (action == "VIEWINPUT")
             viewInputs();
         else
@@ -226,7 +234,6 @@ void ViewScheduled::ShowMenu(void)
         menuPopup->AddButton(tr("Previously Recorded"));
         menuPopup->AddButton(tr("Custom Edit"));
         menuPopup->AddButton(tr("Delete Rule"));
-        menuPopup->AddButton(tr("Show Cards"));
         menuPopup->AddButton(tr("Show Inputs"));
 
         popupStack->AddScreen(menuPopup);
@@ -282,26 +289,22 @@ void ViewScheduled::LoadList(bool useExistingData)
     while (pit != m_recList.end())
     {
         ProgramInfo *pginfo = *pit;
-        const RecStatusType recstatus = pginfo->GetRecordingStatus();
+        const RecStatus::Type recstatus = pginfo->GetRecordingStatus();
         if ((pginfo->GetRecordingEndTime() >= now ||
              pginfo->GetScheduledEndTime() >= now ||
-             recstatus == rsRecording ||
-             recstatus == rsTuning ||
-             recstatus == rsFailing) &&
+             recstatus == RecStatus::Recording ||
+             recstatus == RecStatus::Tuning ||
+             recstatus == RecStatus::Failing) &&
             (m_showAll ||
-             (recstatus >= rsFailing &&
-              recstatus <= rsWillRecord) ||
-             recstatus == rsDontRecord ||
-             (recstatus == rsTooManyRecordings &&
+             (recstatus >= RecStatus::Failing &&
+              recstatus <= RecStatus::WillRecord) ||
+             recstatus == RecStatus::DontRecord ||
+             (recstatus == RecStatus::TooManyRecordings &&
               ++toomanycounts[pginfo->GetRecordingRuleID()] <= 1) ||
-             (recstatus > rsTooManyRecordings &&
-              recstatus != rsRepeat &&
-              recstatus != rsNeverRecord)))
+             (recstatus > RecStatus::TooManyRecordings &&
+              recstatus != RecStatus::Repeat &&
+              recstatus != RecStatus::NeverRecord)))
         {
-            m_cardref[pginfo->GetCardID()]++;
-            if (pginfo->GetCardID() > m_maxcard)
-                m_maxcard = pginfo->GetCardID();
-
             m_inputref[pginfo->GetInputID()]++;
             if (pginfo->GetInputID() > m_maxinput)
                 m_maxinput = pginfo->GetInputID();
@@ -421,23 +424,21 @@ void ViewScheduled::FillList()
 
         QString state;
 
-        const RecStatusType recstatus = pginfo->GetRecordingStatus();
-        if (recstatus == rsRecording      ||
-            recstatus == rsTuning)
+        const RecStatus::Type recstatus = pginfo->GetRecordingStatus();
+        if (recstatus == RecStatus::Recording      ||
+            recstatus == RecStatus::Tuning)
             state = "running";
-        else if (recstatus == rsConflict  ||
-                 recstatus == rsOffLine   ||
-                 recstatus == rsTunerBusy ||
-                 recstatus == rsFailed    ||
-                 recstatus == rsFailing   ||
-                 recstatus == rsAborted   ||
-                 recstatus == rsMissed)
+        else if (recstatus == RecStatus::Conflict  ||
+                 recstatus == RecStatus::Offline   ||
+                 recstatus == RecStatus::TunerBusy ||
+                 recstatus == RecStatus::Failed    ||
+                 recstatus == RecStatus::Failing   ||
+                 recstatus == RecStatus::Aborted   ||
+                 recstatus == RecStatus::Missed)
             state = "error";
-        else if (recstatus == rsWillRecord)
+        else if (recstatus == RecStatus::WillRecord)
         {
-            if ((m_curcard == 0 && m_curinput == 0) ||
-                pginfo->GetCardID() == m_curcard ||
-                pginfo->GetInputID() == m_curinput)
+            if (m_curinput == 0 || pginfo->GetInputID() == m_curinput)
             {
                 if (pginfo->GetRecordingPriority2() < 0)
                     state = "warning";
@@ -445,11 +446,11 @@ void ViewScheduled::FillList()
                     state = "normal";
             }
         }
-        else if (recstatus == rsRepeat ||
-                 recstatus == rsNeverRecord ||
-                 recstatus == rsDontRecord ||
-                 (recstatus != rsDontRecord &&
-                  recstatus <= rsEarlierShowing))
+        else if (recstatus == RecStatus::Repeat ||
+                 recstatus == RecStatus::NeverRecord ||
+                 recstatus == RecStatus::DontRecord ||
+                 (recstatus != RecStatus::DontRecord &&
+                  recstatus <= RecStatus::EarlierShowing))
             state = "disabled";
         else
             state = "warning";
@@ -479,7 +480,7 @@ void ViewScheduled::FillList()
             for (; it != plist.end(); ++it)
             {
                 ProgramInfo &p = **it;
-                if (p.GetRecordingStatus() == rsConflict)
+                if (p.GetRecordingStatus() == RecStatus::Conflict)
                 {
                     m_conflictDate = p.GetRecordingStartTime()
                         .toLocalTime().date();
@@ -572,24 +573,8 @@ void ViewScheduled::setShowAll(bool all)
     m_needFill = true;
 }
 
-void ViewScheduled::viewCards()
-{
-    m_curinput = 0;
-    m_needFill = true;
-
-    m_curcard++;
-    while (m_curcard <= m_maxcard)
-    {
-        if (m_cardref[m_curcard] > 0)
-            return;
-        m_curcard++;
-    }
-    m_curcard = 0;
-}
-
 void ViewScheduled::viewInputs()
 {
-    m_curcard = 0;
     m_needFill = true;
 
     m_curinput++;
@@ -695,10 +680,6 @@ void ViewScheduled::customEvent(QEvent *event)
             else if (resulttext == tr("Delete Rule"))
             {
                 deleteRule();
-            }
-            else if (resulttext == tr("Show Cards"))
-            {
-                viewCards();
             }
             else if (resulttext == tr("Show Inputs"))
             {

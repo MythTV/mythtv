@@ -1,5 +1,3 @@
-#include <algorithm>
-using namespace std;
 
 #include "mythcorecontext.h"
 
@@ -9,10 +7,10 @@ using namespace std;
 #include "playercontext.h"
 #include "remoteencoder.h"
 #include "recordinginfo.h"
-#include "mythplayer.h"
+#include "channelutil.h"
+#include "mythlogging.h"
 #include "cardutil.h"
 #include "tv_play.h"
-#include "mythlogging.h"
 
 #define LOC      QString("BH: ")
 

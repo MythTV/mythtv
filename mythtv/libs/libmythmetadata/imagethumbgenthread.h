@@ -4,6 +4,7 @@
 // Qt headers
 #include <QThread>
 #include <QMutex>
+#include <QWaitCondition>
 
 // MythTV headers
 #include "mythuibuttontree.h"

@@ -1,10 +1,15 @@
+
 #include "dvdringbuffer.h"
 #include "mythdvdplayer.h"
 #include "avformatdecoderdvd.h"
 
+#include "iso639.h"
+
 extern "C" {
 #include "libavcodec/avcodec.h"
 }
+
+#include <unistd.h> // for usleep()
 
 #define LOC QString("AFD_DVD: ")
 #define INVALID_LBA 0xbfffffff

@@ -312,7 +312,12 @@ void JoystickMenuThread::EmitKey(QString code)
         QCoreApplication::postEvent(m_mainWindow, new JoystickKeycodeEvent(code,
                                 keycode, true));
 
-    for (unsigned int i = 0; i < a.count(); i++)
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+    unsigned int i;
+#else
+    int i;
+#endif
+    for (i = 0; i < a.count(); i++)
     {
         keycode = a[i];
 

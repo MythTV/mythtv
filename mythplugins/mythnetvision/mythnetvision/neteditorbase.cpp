@@ -224,7 +224,7 @@ void NetEditorBase::ToggleItem(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    GrabberScript *script = qVariantValue<GrabberScript *>(item->GetData());
+    GrabberScript *script = item->GetData().value<GrabberScript*>();
 
     if (!script)
         return;

@@ -6,8 +6,10 @@
 #include <QDomDocument>
 
 // MythUI headers
+#include "mythimage.h"
 #include "mythuiimage.h"
 #include "mythuigroup.h"
+#include "mythuitext.h"
 #include "mythpainter.h"
 #include "mythmainwindow.h"
 

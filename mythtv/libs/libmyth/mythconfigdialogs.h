@@ -3,21 +3,15 @@
 #ifndef MYTH_CONFIG_DIALOGS_H
 #define MYTH_CONFIG_DIALOGS_H
 
-// C++ headers
-#include <vector>
-
 // Qt headers
 #include <QObject>
 #include <QString>
 
 // MythTV headers
 #include "mythexp.h"
-#include "mythwidgets.h"
 #include "mythdialogs.h"
-#include "mythdbcon.h"
 #include "mythstorage.h"
 #include "mythconfiggroups.h"
-#include "mythterminal.h"
 
 class MPUBLIC ConfigurationDialogWidget : public MythDialog
 {

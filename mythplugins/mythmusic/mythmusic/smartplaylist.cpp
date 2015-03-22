@@ -52,8 +52,10 @@ static SmartPLField SmartPLFields[] =
     { "Play Count",    "music_songs.numplays",           ftNumeric,  0,    9999, 0 },
     { "Compilation",   "music_albums.compilation",       ftBoolean,  0,    0,    0 },
     { "Comp. Artist",  "music_comp_artists.artist_name", ftString,   0,    0,    0 },
-    { "Last Play",     "music_songs.lastplay",           ftDate,     0,    0,    0 },
-    { "Date Imported", "music_songs.date_entered",       ftDate,     0,    0,    0 },
+    { "Last Play",     "FROM_DAYS(TO_DAYS(music_songs.lastplay))",
+                                                         ftDate,     0,    0,    0 },
+    { "Date Imported", "FROM_DAYS(TO_DAYS(music_songs.date_entered))",
+                                                         ftDate,     0,    0,    0 },
 };
 
 struct SmartPLOperator
@@ -111,7 +113,7 @@ QString formattedFieldValue(const QVariant &value)
         field.setValue(value);
 
     MSqlQuery query(MSqlQuery::InitCon());
-    QString result = QString::fromUtf8(query.driver()->formatValue(field).toAscii().data());
+    QString result = QString::fromUtf8(query.driver()->formatValue(field).toLatin1().data());
     return result;
 }
 
@@ -549,7 +551,7 @@ void SmartPlaylistEditor::editCriteria(void)
     if (!item)
         return;
 
-    SmartPLCriteriaRow *row = qVariantValue<SmartPLCriteriaRow*> (item->GetData());
+    SmartPLCriteriaRow *row = item->GetData().value<SmartPLCriteriaRow*>();
 
     if (!row)
         return;
@@ -588,7 +590,7 @@ void SmartPlaylistEditor::doDeleteCriteria(bool doit)
         if (!item)
             return;
 
-        SmartPLCriteriaRow *row = qVariantValue<SmartPLCriteriaRow*> (item->GetData());
+        SmartPLCriteriaRow *row = item->GetData().value<SmartPLCriteriaRow*>();
 
         if (!row)
             return;
@@ -656,7 +658,7 @@ void SmartPlaylistEditor::criteriaChanged()
         if (!item)
             return;
 
-        SmartPLCriteriaRow *row = qVariantValue<SmartPLCriteriaRow*> (item->GetData());
+        SmartPLCriteriaRow *row = item->GetData().value<SmartPLCriteriaRow*>();
 
         if (!row)
             return;
@@ -1756,7 +1758,7 @@ void SmartPLResultViewer::trackVisible(MythUIButtonListItem *item)
 
     if (item->GetImageFilename().isEmpty())
     {
-        MusicMetadata *mdata = qVariantValue<MusicMetadata*> (item->GetData());
+        MusicMetadata *mdata = item->GetData().value<MusicMetadata *>();
         if (mdata)
         {
             QString artFile = mdata->getAlbumArtFile();
@@ -1784,7 +1786,7 @@ void SmartPLResultViewer::showTrackInfo(void)
     if (!item)
         return;
 
-    MusicMetadata *mdata = qVariantValue<MusicMetadata*> (item->GetData());
+    MusicMetadata *mdata = item->GetData().value<MusicMetadata *>();
     if (!mdata)
         return;
 

@@ -133,7 +133,7 @@ NativeArchive::NativeArchive(void)
         LOG(VB_GENERAL, LOG_ERR, "NativeArchive: Failed to create lock file");
 
     QString pid = QString("%1").arg(getpid());
-    file.write(pid.toAscii());
+    file.write(pid.toLatin1());
     file.close();
 }
 

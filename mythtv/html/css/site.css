@@ -1,6 +1,6 @@
 /* Styles shared by all sections */
 
-    html, body {
+    body {
         font: normal 13px Verdana, Geneva, sans-serif;
         color:            white;
         background-color: #88a1bb;
@@ -9,6 +9,7 @@
         padding:          0px;
         max-width:        100%;
         overflow-x:       hidden;
+        box-sizing:       border-box; /* Most logical application of padding */
     }
     h1 {
         font: 4em normal Georgia, 'Times New Roman', Times, serif;
@@ -48,9 +49,9 @@
         text-align: center;
     }
 
-    input:hover,
-    textarea:hover,
-    select:hover
+    input:enabled:hover,
+    textarea:enabled:hover,
+    select:enabled:hover
     {
         background-color: #003147;
         border-color: #0B93D5;
@@ -224,12 +225,46 @@
         height:             36px;
     }
 
+    #header_login {
+        float: right;
+        margin-right: 10px;
+        margin-top: 9px;
+    }
+
+    #session_username {
+        font-weight: bold;
+    }
+
+    #session_logout {
+        font-size: 0.9em;
+        color: #FFFFFF;
+    }
+
+    #session_logout A {
+        text-decoration: none;
+        color: #FFFFFF;
+    }
+
+    #session_logout A:hover {
+        text-decoration: underline;
+        color: #FFFFFF;
+    }
+
+    #session_logout A:visited {
+        color: #FFFFFF;
+    }
+
     #content {
         position:           absolute;
         top:                36px;
         right:              0px;
-        left:               30px;
-        padding:            10px;
+        left:               27px;
+        width:              calc(100% - 27px); /* left */
+        height:             calc(100% - 36px); /* top */
+        background-color:   transparent;
+        border:             0px none transparent;
+        padding:            0px;
+        box-sizing:         border-box;
     }
 
     #hostname {

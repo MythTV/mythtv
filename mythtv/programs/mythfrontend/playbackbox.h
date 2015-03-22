@@ -286,12 +286,10 @@ class PlaybackBox : public ScheduleCommon
     void processNetworkControlCommand(const QString &command);
 
     ProgramInfo *FindProgramInUILists(const ProgramInfo&);
-    ProgramInfo *FindProgramInUILists(const QString &key);
-    ProgramInfo *FindProgramInUILists(
-        uint chanid, const QDateTime &recstartts,
-        QString recgroup = "NotLiveTV");
+    ProgramInfo *FindProgramInUILists(uint recordingID,
+                                      QString recgroup = "NotLiveTV");
 
-    void RemoveProgram(uint chanid, const QDateTime &recstartts,
+    void RemoveProgram(uint recordingID,
                        bool forgetHistory, bool forceMetadataDelete);
     void ShowDeletePopup(DeletePopupType);
     void ShowAvailabilityPopup(const ProgramInfo&);
@@ -314,11 +312,10 @@ class PlaybackBox : public ScheduleCommon
                           bool force_preview_reload = true);
 
     void HandlePreviewEvent(const QStringList &list);
-    void HandleRecordingRemoveEvent(uint chanid, const QDateTime &recstartts);
+    void HandleRecordingRemoveEvent(uint recordingID);
     void HandleRecordingAddEvent(const ProgramInfo &evinfo);
     void HandleUpdateProgramInfoEvent(const ProgramInfo &evinfo);
-    void HandleUpdateProgramInfoFileSizeEvent(
-        uint chanid, const QDateTime &recstartts, uint64_t filesize);
+    void HandleUpdateProgramInfoFileSizeEvent(uint recordingID, uint64_t filesize);
 
     void ScheduleUpdateUIList(void);
     void ShowMenu(void);
@@ -402,15 +399,15 @@ class PlaybackBox : public ScheduleCommon
     int                 m_recGroupIdx;
 
     // Other state
-    /// Program[s] currently selected for deletion
+    /// Recording[s] currently selected for deletion
     QStringList m_delList;
     /// Group currently selected
     QString m_currentGroup;
 
     // Play List support
-    QStringList         m_playList;   ///< list of selected items "play list"
+    QList<uint>         m_playList;   ///< list of selected items "play list"
     bool                m_op_on_playlist;
-    QStringList         m_playListPlay; ///< list of items being played.
+    QList<uint>         m_playListPlay; ///< list of items being played.
 
     ProgramInfoCache    m_programInfoCache;
 

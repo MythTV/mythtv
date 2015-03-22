@@ -21,11 +21,10 @@ MPUBLIC
 bool RemoteGetMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM);
 MPUBLIC bool RemoteCheckFile(
     const ProgramInfo *pginfo, bool checkSlaves = true);
-MPUBLIC bool RemoteDeleteRecording(
-    uint chanid, const QDateTime &recstartts, bool forceMetadataDelete,
-    bool forgetHistory);
+MPUBLIC bool RemoteDeleteRecording( uint recordingID, bool forceMetadataDelete,
+                                    bool forgetHistory);
 MPUBLIC
-bool RemoteUndeleteRecording(uint chanid, const QDateTime &recstartts);
+bool RemoteUndeleteRecording(uint recordingID);
 MPUBLIC
 void RemoteGetAllScheduledRecordings(vector<ProgramInfo *> &scheduledlist);
 MPUBLIC

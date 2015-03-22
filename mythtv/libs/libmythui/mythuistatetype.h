@@ -5,7 +5,8 @@
 #include <QMap>
 
 #include "mythuicomposite.h"
-#include "mythimage.h"
+
+class MythImage;
 
 /** \class MythUIStateType
  *

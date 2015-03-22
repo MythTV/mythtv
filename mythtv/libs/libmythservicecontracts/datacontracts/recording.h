@@ -27,7 +27,7 @@ class SERVICE_PUBLIC RecordingInfo : public QObject
     Q_CLASSINFO( "version", "1.02" );
 
     Q_PROPERTY( uint                    RecordedId READ RecordedId WRITE setRecordedId    )
-    Q_PROPERTY( int                     Status     READ Status     WRITE setStatus    )
+    Q_PROPERTY( RecStatus::Type         Status     READ Status     WRITE setStatus    )
     Q_PROPERTY( int                     Priority   READ Priority   WRITE setPriority  )
     Q_PROPERTY( QDateTime               StartTs    READ StartTs    WRITE setStartTs   )
     Q_PROPERTY( QDateTime               EndTs      READ EndTs      WRITE setEndTs     )
@@ -43,17 +43,8 @@ class SERVICE_PUBLIC RecordingInfo : public QObject
     Q_PROPERTY( QString                 EncoderName  READ EncoderName  WRITE setEncoderName  DESIGNABLE SerializeDetails )
     Q_PROPERTY( QString                 Profile      READ Profile      WRITE setProfile      DESIGNABLE SerializeDetails )
 
-    /*
-    Not using since Q_ENUMS seem to require the enum be defined in this class
-
-    Q_ENUMS( RecStatusType          )
-    Q_ENUMS( RecordingType          )
-    Q_ENUMS( RecordingDupInType     )
-    Q_ENUMS( RecordingDupMethodType )
-    */
-
     PROPERTYIMP     ( uint                   , RecordedId  )
-    PROPERTYIMP_ENUM( RecStatusType          , Status      )
+    PROPERTYIMP_ENUM( RecStatus::Type        , Status      )
     PROPERTYIMP     ( int                    , Priority    )
     PROPERTYIMP     ( QDateTime              , StartTs     )
     PROPERTYIMP     ( QDateTime              , EndTs       )
@@ -79,16 +70,16 @@ class SERVICE_PUBLIC RecordingInfo : public QObject
     public:
 
         RecordingInfo(QObject *parent = 0) 
-            : QObject           ( parent          ),
-              m_RecordedId      ( 0               ),
-              m_Status          ( rsUnknown       ),
-              m_Priority        ( 0               ),
-              m_RecordId        ( 0               ),
-              m_RecType         ( kNotRecording   ),
-              m_DupInType       ( kDupsInRecorded ),
-              m_DupMethod       ( kDupCheckNone   ),
-              m_EncoderId       ( 0               ),
-              m_SerializeDetails( true            ) 
+            : QObject           ( parent             ),
+              m_RecordedId      ( 0                  ),
+              m_Status          ( RecStatus::Unknown ),
+              m_Priority        ( 0                  ),
+              m_RecordId        ( 0                  ),
+              m_RecType         ( kNotRecording      ),
+              m_DupInType       ( kDupsInRecorded    ),
+              m_DupMethod       ( kDupCheckNone      ),
+              m_EncoderId       ( 0                  ),
+              m_SerializeDetails( true               )
         {
         }
         

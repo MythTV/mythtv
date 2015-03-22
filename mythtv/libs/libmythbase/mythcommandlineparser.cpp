@@ -300,7 +300,7 @@ QString CommandLineArg::GetHelpString(int off, QString group, bool force) const
     wrapList(hlist, termwidth-off);
     if (!m_parents.isEmpty())
         msg << "  ";
-    msg << GetKeywordString().leftJustified(off, ' ') 
+    msg << GetKeywordString().leftJustified(off, ' ')
         << hlist[0] << endl;
 
     // print remaining lines with necessary padding
@@ -1503,7 +1503,7 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
                      << "' but unassociated arguments have not been enabled"
                      << endl;
                 SetValue("showhelp", "");
-                return false;        
+                return false;
             }
 
             m_namedArgs["_args"]->Set("", val);
@@ -1544,7 +1544,7 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
             else
             {
                 // arbitrary not allowed, fault out
-                cerr << "Unhandled option given on command line:" << endl 
+                cerr << "Unhandled option given on command line:" << endl
                      << "    " << opt.toLocal8Bit().constData() << endl;
                 SetValue("showhelp", "");
                 return false;
@@ -1605,7 +1605,7 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
             cerr << "value: " << argdef->m_stored.toString().toLocal8Bit().constData()
                  << endl;
     }
- 
+
     QMap<QString, CommandLineArg*>::const_iterator it;
 
     if (m_verbose)
@@ -1661,7 +1661,7 @@ bool MythCommandLineParser::ReconcileLinks(void)
 {
     if (m_verbose)
         cerr << "Reconciling links for option interdependencies." << endl;
- 
+
     QMap<QString,CommandLineArg*>::iterator args_it;
     for (args_it = m_namedArgs.begin(); args_it != m_namedArgs.end(); ++args_it)
     {
@@ -2284,12 +2284,12 @@ void MythCommandLineParser::addVersion(void)
 void MythCommandLineParser::addWindowed(void)
 {
     add(QStringList( QStringList() << "-nw" << "--no-windowed" ),
-            "notwindowed", false, 
+            "notwindowed", false,
             "Prevent application from running in a window.", "")
         ->SetBlocks("windowed")
         ->SetGroup("User Interface");
 
-    add(QStringList( QStringList() << "-w" << "--windowed" ), "windowed", 
+    add(QStringList( QStringList() << "-w" << "--windowed" ), "windowed",
             false, "Force application to run in a window.", "")
         ->SetGroup("User Interface");
 }
@@ -2331,7 +2331,7 @@ void MythCommandLineParser::addSettingsOverride(void)
             "options defined as one or more key=value pairs\n"
             "Multiple can be defined by multiple uses of the "
             "-O option.");
-    add("--override-settings-file", "overridesettingsfile", "", 
+    add("--override-settings-file", "overridesettingsfile", "",
             "Define a file of key=value pairs to be "
             "loaded for setting overrides.", "");
 }
@@ -2408,14 +2408,14 @@ void MythCommandLineParser::addLogging(
     add(QStringList( QStringList() << "-q" << "--quiet"), "quiet", 0,
         "Don't log to the console (-q).  Don't log anywhere (-q -q)", "")
                 ->SetGroup("Logging");
-    add("--loglevel", "loglevel", logLevelStr, 
+    add("--loglevel", "loglevel", logLevelStr,
         QString(
             "Set the logging level.  All log messages at lower levels will be "
             "discarded.\n"
             "In descending order: emerg, alert, crit, err, warning, notice, "
             "info, debug\ndefaults to ") + logLevelStr, "")
                 ->SetGroup("Logging");
-    add("--syslog", "syslog", "none", 
+    add("--syslog", "syslog", "none",
         "Set the syslog logging facility.\nSet to \"none\" to disable, "
         "defaults to none.", "")
                 ->SetGroup("Logging");
@@ -2487,7 +2487,7 @@ QString MythCommandLineParser::GetLogFilePath(void)
         LOG(VB_GENERAL, LOG_ERR,
             QString("%1 is not a directory, disabling logfiles")
             .arg(logfile));
-	return QString();
+        return QString();
     }
 
     logdir  = finfo.filePath();
@@ -2525,7 +2525,7 @@ LogLevel_t MythCommandLineParser::GetLogLevel(void)
     if (level == LOG_UNKNOWN)
         cerr << "Unknown log level: " << setting.toLocal8Bit().constData() <<
                 endl;
-     
+
     return level;
 }
 

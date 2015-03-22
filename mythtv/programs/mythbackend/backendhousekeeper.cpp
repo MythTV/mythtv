@@ -356,7 +356,7 @@ void CleanupTask::CleanupProgramListings(void)
     query.prepare("DELETE FROM oldrecorded WHERE "
                   "recstatus <> :RECORDED AND duplicate = 0 AND "
                   "endtime < DATE_SUB(CURRENT_DATE, INTERVAL :CLEAN DAY);");
-    query.bindValue(":RECORDED", rsRecorded);
+    query.bindValue(":RECORDED", RecStatus::Recorded);
     query.bindValue(":CLEAN", offset);
     if (!query.exec())
         MythDB::DBError("HouseKeeper Cleaning Program Listings", query);
@@ -414,7 +414,7 @@ bool ThemeUpdateTask::LoadVersion(const QString &version, int download_log_level
     if (!dir.exists() && !dir.mkpath(remoteThemesDir))
     {
         LOG(VB_GENERAL, LOG_ERR,
-            QString("HouseKeeper: Error creating %1"
+            QString("HouseKeeper: Error creating %1 "
                     "directory for remote themes info cache.")
                 .arg(remoteThemesDir));
         return false;
@@ -435,7 +435,7 @@ bool ThemeUpdateTask::LoadVersion(const QString &version, int download_log_level
     if (!result)
     {
         LOG(VB_GENERAL, download_log_level,
-            QString("HouseKeeper: Failed to download %1"
+            QString("HouseKeeper: Failed to download %1 "
                     "remote themes info package.").arg(m_url));
         return false;
     }
@@ -443,7 +443,7 @@ bool ThemeUpdateTask::LoadVersion(const QString &version, int download_log_level
     if (!extractZIP(remoteThemesFile, remoteThemesDir))
     {
         LOG(VB_GENERAL, LOG_ERR,
-            QString("HouseKeeper: Error extracting %1"
+            QString("HouseKeeper: Error extracting %1 "
                     "remote themes info package.").arg(remoteThemesFile));
         QFile::remove(remoteThemesFile);
         return false;

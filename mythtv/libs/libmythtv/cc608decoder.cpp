@@ -190,7 +190,10 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
         mode = field << 2 |
             (txtmode[field*2 + ccmode[field]] << 1) |
             ccmode[field];
-        len = ccbuf[mode].length();
+        if (mode >= 0)
+            len = ccbuf[mode].length();
+        else
+            len = 0;
     }
     else
     {

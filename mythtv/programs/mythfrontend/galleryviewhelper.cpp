@@ -15,6 +15,7 @@
 
 // libmythui headers
 #include "mythuibuttonlist.h"
+#include "mythuihelper.h"
 
 /** \fn     GalleryViewHelper::GalleryViewHelper(MythScreenType *)
  *  \brief  Constructor

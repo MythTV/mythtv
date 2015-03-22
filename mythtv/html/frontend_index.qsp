@@ -1,0 +1,115 @@
+<%
+"use strict";
+
+import "/js/utility.js"
+
+    var frontend = new Frontend();
+    var status = frontend.GetStatus();
+%>
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <title>MythFrontend Status</title>
+  <link rel="stylesheet" href="/css/site.css"   type="text/css">
+  <link rel="stylesheet" href="/css/Status.css" type="text/css">
+  <script type="text/javascript"  src="/3rdParty/jquery/jquery-2.0.3.min.js"></script>
+<!--  <script type="text/javascript"  src="/js/util.qjs"></script>-->
+</head>
+<body>
+
+<div id="header">
+    <div id="header_logo">
+        <a href="/"><img src="/images/mythtv.png" class="png" width="180" height="64" border="0" alt="MythTV"></a>
+    </div>
+</div>
+
+<div id="content">
+
+  <h1 class="status">MythFrontend Status</h1>
+  <div class="content">
+    <h2 class="status">This Frontend</h2>
+    Name : <%=status.Name%><br />
+    Version : <%=status.Version%>
+  </div>
+<!--  <div class="content">
+    <h2 class="status">MythTV Backends</h2>
+Master: scafell&nbsp(<a href="http://192.168.159.2:6544">Status page</a>)
+  </div>-->
+  <div class="content">
+    <h2 class="status">Services</h2>
+    <a href="MythFE/GetRemote">Remote Control</a>
+  </div>
+  <div class="content">
+    <h2 class="status">Machine Information</h2>
+
+<%
+    // This is temporary.
+    // It will be replaced in the services API with a state enum supplied with
+    // the translated string
+    var statusString = qsTr("Unknown");
+    if (status.State['state'] == "WatchingPreRecorded")
+    {
+        statusString = qsTr("Watching Recording");
+    }
+    else if (status.State['state'] == "WatchingLiveTV")
+    {
+        statusString = qsTr("Watching Live TV");
+    }
+    else if (status.State['state'] == "WatchingVideo")
+    {
+        statusString = qsTr("Watching Video");
+    }
+    else if (status.State['state'] == "WatchingBD")
+    {
+        statusString = qsTr("Watching Blu-ray Disc");
+    }
+    else if (status.State['state'] == "WatchingDVD")
+    {
+        statusString = qsTr("Watching DVD");
+    }
+    else if (status.State['state'] == "idle")
+    {
+        statusString = qsTr("Idle");
+    }
+%>
+
+    <div class="statusInformation">
+        The current frontend status is: <%=statusString%>
+    </div>
+
+<!--    <a onClick="toggleShowDiv('statusDetail')">[+] More</a>-->
+    <div class="extraDetail" id="statusDetail">
+      <div class="statesTable">
+
+<%
+    for(var state in status.State)
+    {
+        if (!status.State[state].length) // Skip empty fields
+            continue;
+%>
+        <div class="stateRow">
+            <div class="stateName"><%=state%></div>
+            <div class="stateValue"><%=status.State[state]%></div>
+        </div>
+<%
+    }
+%>
+      </div>
+    </div>
+<!--    <div class="loadstatus">
+      This machine's load average:
+      <ul>
+        <li>1 Minute: 3.64</li>
+        <li>5 Minutes: 3.47</li>
+        <li>15 Minutes: 3.06</li>
+      </ul>
+    </div>-->
+  </div>
+
+</div>
+</body>
+</html>
+

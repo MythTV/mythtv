@@ -8,6 +8,7 @@
 
 // libmythbase headers
 #include "mythlogging.h"
+#include "compat.h"
 
 // libmythui headers
 #include "mythfontproperties.h"

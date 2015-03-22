@@ -6,6 +6,9 @@
 // Myth headers
 #include "mythlogging.h"
 
+// QT headers
+#include <algorithm>
+
 class SortableMythGenericTreeList : public QList<MythGenericTree*>
 {
   public:
@@ -42,10 +45,10 @@ class SortableMythGenericTreeList : public QList<MythGenericTree*>
         switch (m_sortType)
         {
             case SORT_STRING:
-                qSort(begin(), end(), sortByString);
+                std::sort(begin(), end(), sortByString);
                 break;
             case SORT_SELECTABLE:
-                qSort(begin(), end(), sortBySelectable);
+                std::sort(begin(), end(), sortBySelectable);
                 break;
         }
     }

@@ -19,7 +19,8 @@ class RemoteAVFormatContext
 {
   public:
     RemoteAVFormatContext(const QString &filename = "") :
-        m_inputFC(NULL), m_inputIsRemote(false), m_rf(NULL), m_byteIOContext(NULL), m_buffer(NULL)
+        m_inputFC(NULL), m_inputIsRemote(false), m_isOpen(false),
+        m_rf(NULL), m_byteIOContext(NULL), m_buffer(NULL)
     { if (!filename.isEmpty()) Open(filename); }
 
     ~RemoteAVFormatContext()
@@ -33,6 +34,7 @@ class RemoteAVFormatContext
 
     bool Open(const QString &filename)
     {
+        LOG(VB_PLAYBACK, LOG_ERR,  QString("RemoteAVFormatContext::Open: Opening %1").arg(filename));
         if (isOpen())
             return false;
 
@@ -51,7 +53,7 @@ class RemoteAVFormatContext
             if (!m_rf->isOpen())
                 return false;
 
-            const int BUFFER_SIZE = 0x8000;
+            const int BUFFER_SIZE = 0x10000;
             if (!m_buffer)
             {
                 m_buffer = (unsigned char*)av_malloc(BUFFER_SIZE + FF_INPUT_BUFFER_PADDING_SIZE);
@@ -71,7 +73,14 @@ class RemoteAVFormatContext
 
             AVInputFormat *fmt = av_probe_input_format(&probe_data, 1);
             if (!fmt)
+            {
+                LOG(VB_GENERAL, LOG_ERR,  QString("RemoteAVFormatContext::Open: Failed to probe file: %1").arg(filename));
                 return false;
+            }
+            else
+            {
+                LOG(VB_PLAYBACK, LOG_INFO,  QString("RemoteAVFormatContext::Open: probed file as %1").arg(fmt->name));
+            }
 
             m_rf->Seek(0, SEEK_SET);
 
@@ -79,7 +88,10 @@ class RemoteAVFormatContext
 
             int ret = avformat_open_input(&m_inputFC, "stream", fmt, NULL);
             if (ret)
+            {
+                LOG(VB_GENERAL, LOG_ERR,  QString("RemoteAVFormatContext::Open: Failed to open input: %1").arg(filename));
                 return false;
+            }
         }
         else
         {
@@ -91,10 +103,14 @@ class RemoteAVFormatContext
 
             int ret = avformat_open_input(&m_inputFC,  qPrintable(filename), NULL, &options);
             if (ret)
+            {
+                LOG(VB_GENERAL, LOG_ERR,  QString("RemoteAVFormatContext::Open: Failed to open input: %1").arg(filename));
                 return false;
+            }
         }
 
-        return true;
+        m_isOpen = true;
+        return m_isOpen;
     }
 
     void Close()
@@ -110,15 +126,11 @@ class RemoteAVFormatContext
             delete m_rf;
             m_rf = NULL;
         }
+
+        m_isOpen = false;
     }
 
-    bool isOpen() const
-    {
-        if (m_inputIsRemote)
-            return (m_inputFC != NULL && m_rf != NULL && m_rf->isOpen());
-        else
-            return (m_inputFC != NULL);
-    }
+    bool isOpen() const { return m_isOpen; }
 
     operator AVFormatContext * () const { return m_inputFC; }
     //operator AVFormatContext & () const { return m_inputFC; }
@@ -145,6 +157,7 @@ class RemoteAVFormatContext
   private:
     AVFormatContext *m_inputFC;
     bool m_inputIsRemote;
+    bool m_isOpen;
     RemoteFile *m_rf;
     AVIOContext *m_byteIOContext;
     unsigned char *m_buffer;

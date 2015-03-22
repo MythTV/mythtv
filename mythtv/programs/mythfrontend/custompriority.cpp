@@ -160,9 +160,7 @@ void CustomPriority::loadExampleRules()
 {
     QMap<QString, QString> examples;
     examples.insert(tr("Modify priority for an input (Input priority)"),
-                    "cardinput.cardinputid = 1");
-    examples.insert(tr("Modify priority for all inputs on a card"),
-                    "cardinput.cardid = 2");
+                    "capturecard.cardid = 1");
     examples.insert(tr("Modify priority for every card on a host"),
                     "capturecard.hostname = 'mythbox'");
     examples.insert(tr("Only one specific channel ID (Channel priority)"),
@@ -177,7 +175,7 @@ void CustomPriority::loadExampleRules()
                     QString("channel.commmethod = %1 ")
                         .arg(COMM_DETECT_COMMFREE));
     examples.insert(tr("Modify priority for a station on an input"),
-                    "channel.callsign = 'ESPN' AND cardinput.cardinputid = 2");
+                    "channel.callsign = 'ESPN' AND capturecard.cardid = 2");
     examples.insert(tr("Priority for all matching titles"),
                     "program.title LIKE 'CSI: %' ");
     examples.insert(tr("Only shows marked as HDTV"),
@@ -224,7 +222,7 @@ void CustomPriority::loadExampleRules()
                     "AND program.category = 'Sports event' "
                     "AND capturecard.hostname = 'mythbox' ");
     examples.insert(tr("Avoid poor signal quality (complete example)"),
-                    "cardinput.cardinputid = 1 AND "
+                    "capturecard.cardid = 1 AND "
                     "channel.channum IN (3, 5, 39, 66) ");
 
     QMapIterator<QString, QString> it(examples);
@@ -353,7 +351,7 @@ bool CustomPriority::checkSyntax(void)
     else
     {
         QString qstr = QString("SELECT (%1) FROM (recordmatch, record, "
-                               "program, channel, cardinput, capturecard, "
+                               "program, channel, capturecard, "
                                "oldrecorded) WHERE NULL").arg(desc);
         while (1)
         {

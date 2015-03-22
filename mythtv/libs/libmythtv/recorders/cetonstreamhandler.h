@@ -17,11 +17,14 @@
 // MythTV headers
 #include "iptvstreamhandler.h"
 #include "mythmiscutil.h"
-#include "mythdate.h"
 
 class CetonStreamHandler;
 class CetonChannel;
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 class QUrl;
+#else
+class QUrlQuery;
+#endif
 
 class CetonStreamHandler : public IPTVStreamHandler
 {
@@ -58,7 +61,11 @@ class CetonStreamHandler : public IPTVStreamHandler
     QString GetVar(const QString &section, const QString &variable) const;
     QStringList GetProgramList();
     bool HttpRequest(const QString &method, const QString &script,
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
                      const QUrl &params,
+#else
+                     const QUrlQuery &params,
+#endif
                      QString &response, uint &status_code) const;
 
 

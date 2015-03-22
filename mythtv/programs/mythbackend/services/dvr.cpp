@@ -573,9 +573,9 @@ DTC::ProgramList* Dvr::GetUpcomingList( int  nStartIndex,
             ((*it)->GetRecordingStatus() != nRecStatus))
             continue;
 
-        if (!bShowAll && ((((*it)->GetRecordingStatus() >= rsFailing) &&
-                           ((*it)->GetRecordingStatus() <= rsWillRecord)) ||
-                          ((*it)->GetRecordingStatus() == rsConflict)) &&
+        if (!bShowAll && ((((*it)->GetRecordingStatus() >= RecStatus::Failing) &&
+                           ((*it)->GetRecordingStatus() <= RecStatus::WillRecord)) ||
+                          ((*it)->GetRecordingStatus() == RecStatus::Conflict)) &&
             ((*it)->GetRecordingEndTime() > MythDate::current()))
         {
             recordingList.push_back(new RecordingInfo(**it));
@@ -639,7 +639,11 @@ DTC::ProgramList* Dvr::GetConflictList( int  nStartIndex,
     RecordingList::iterator it = tmpList.begin();
     for(; it < tmpList.end(); ++it)
     {
-        if (((*it)->GetRecordingStatus() == rsConflict) &&
+        if (nRecordId > 0 &&
+            (*it)->GetRecordingRuleID() != static_cast<uint>(nRecordId))
+            continue;
+
+        if (((*it)->GetRecordingStatus() == RecStatus::Conflict) &&
             ((*it)->GetRecordingStartTime() >= MythDate::current()))
         {
             recordingList.push_back(new RecordingInfo(**it));
@@ -1176,8 +1180,8 @@ bool Dvr::DisableRecordSchedule( uint nRecordId )
 
 QString Dvr::RecStatusToString(int RecStatus)
 {
-    RecStatusType type = static_cast<RecStatusType>(RecStatus);
-    return toString(type);
+    RecStatus::Type type = static_cast<RecStatus::Type>(RecStatus);
+    return RecStatus::toString(type);
 }
 
 QString Dvr::RecStatusToDescription(int RecStatus, int recType,
@@ -1185,19 +1189,27 @@ QString Dvr::RecStatusToDescription(int RecStatus, int recType,
 {
     //if (!StartTime.isValid())
     //    throw QString("StartTime appears invalid.");
-    RecStatusType rsType = static_cast<RecStatusType>(RecStatus);
+    RecStatus::Type rsType = static_cast<RecStatus::Type>(RecStatus);
     RecordingType recordingType = static_cast<RecordingType>(recType);
-    return toDescription(rsType, recordingType, StartTime);
+    return RecStatus::toDescription(rsType, recordingType, StartTime);
 }
 
 QString Dvr::RecTypeToString(QString recType)
 {
+    bool ok;
+    RecordingType enumType = static_cast<RecordingType>(recType.toInt(&ok, 10));
+    if (ok)
+        return toString(enumType);
     // RecordingType type = static_cast<RecordingType>(recType);
     return toString(recTypeFromString(recType));
 }
 
 QString Dvr::RecTypeToDescription(QString recType)
 {
+    bool ok;
+    RecordingType enumType = static_cast<RecordingType>(recType.toInt(&ok, 10));
+    if (ok)
+        return toDescription(enumType);
     // RecordingType type = static_cast<RecordingType>(recType);
     return toDescription(recTypeFromString(recType));
 }

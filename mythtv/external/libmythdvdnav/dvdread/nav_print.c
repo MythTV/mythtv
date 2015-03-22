@@ -23,6 +23,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+#include "config.h"
 #include <stdio.h>
 #include <inttypes.h>
 
@@ -36,7 +37,6 @@ static void navPrint_PCI_GI(pci_gi_t *pci_gi) {
   printf("pci_gi:\n");
   printf("nv_pck_lbn    0x%08x\n", pci_gi->nv_pck_lbn);
   printf("vobu_cat      0x%04x\n", pci_gi->vobu_cat);
-  printf("vobu_uop_ctl  0x%08x\n", *(uint32_t*)&pci_gi->vobu_uop_ctl);
   printf("vobu_s_ptm    0x%08x\n", pci_gi->vobu_s_ptm);
   printf("vobu_e_ptm    0x%08x\n", pci_gi->vobu_e_ptm);
   printf("vobu_se_e_ptm 0x%08x\n", pci_gi->vobu_se_e_ptm);
@@ -82,7 +82,7 @@ static void navPrint_HL_GI(hl_gi_t *hl_gi, int *btngr_ns, int *btn_ns) {
   printf("btn_se_e_ptm  0x%08x\n", hl_gi->btn_se_e_ptm);
 
   *btngr_ns = hl_gi->btngr_ns;
-  printf("btngr_ns      %d\n",  hl_gi->btngr_ns);
+  printf("btngr_ns      %u\n",  hl_gi->btngr_ns);
   printf("btngr%d_dsp_ty    0x%02x\n", 1, hl_gi->btngr1_dsp_ty);
   printf("btngr%d_dsp_ty    0x%02x\n", 2, hl_gi->btngr2_dsp_ty);
   printf("btngr%d_dsp_ty    0x%02x\n", 3, hl_gi->btngr3_dsp_ty);
@@ -128,15 +128,15 @@ static void navPrint_BTNIT(btni_t *btni_table, int btngr_ns, int btn_ns) {
         btni_t *btni = &btni_table[(36 / btngr_ns) * i + j];
 
         printf("group %d btni %d:  ", i+1, j+1);
-        printf("btn_coln %d, auto_action_mode %d\n",
+        printf("btn_coln %u, auto_action_mode %u\n",
                btni->btn_coln, btni->auto_action_mode);
-        printf("coords   (%d, %d) .. (%d, %d)\n",
+        printf("coords   (%u, %u) .. (%u, %u)\n",
                btni->x_start, btni->y_start, btni->x_end, btni->y_end);
 
-        printf("up %d, ", btni->up);
-        printf("down %d, ", btni->down);
-        printf("left %d, ", btni->left);
-        printf("right %d\n", btni->right);
+        printf("up %u, ", btni->up);
+        printf("down %u, ", btni->down);
+        printf("left %u, ", btni->left);
+        printf("right %u\n", btni->right);
 
         /* ifoPrint_COMMAND(&btni->cmd); */
         printf("\n");

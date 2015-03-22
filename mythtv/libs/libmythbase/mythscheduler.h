@@ -1,7 +1,6 @@
 #ifndef _MYTH_SCHEDULER_H_
 #define _MYTH_SCHEDULER_H_
 
-#include <algorithm>
 #include <deque>
 
 #include <QStringList>
@@ -29,8 +28,8 @@ class MythScheduler
     // the list, followed by ProgramInfo's serialized
     // to string lists.
     virtual void GetAllPending(QStringList &strList) const = 0;
-    // Returns all the pending recording with a rsRecording, rsTuning
-    // or rsFailing status (i.e. currently attempting to record.)
+    // Returns all the pending recording with a RecStatus::Recording, RecStatus::Tuning
+    // or RecStatus::Failing status (i.e. currently attempting to record.)
     virtual QMap<QString,ProgramInfo*> GetRecording(void) const = 0;
 };
 

@@ -76,13 +76,12 @@ void VideoSourceSelector::Load(void)
 
     QString querystr =
         "SELECT DISTINCT videosource.name, videosource.sourceid "
-        "FROM cardinput, videosource, capturecard";
+        "FROM capturecard, videosource";
 
     querystr += (must_have_mplexid) ? ", channel " : " ";
 
     querystr +=
-        "WHERE cardinput.sourceid   = videosource.sourceid AND "
-        "      cardinput.cardid     = capturecard.cardid   AND "
+        "WHERE capturecard.sourceid = videosource.sourceid AND "
         "      capturecard.hostname = :HOSTNAME ";
 
     if (!card_types.isEmpty())
@@ -694,10 +693,9 @@ bool VideoSourceEditor::cardTypesInclude(const int &sourceID,
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT count(cardtype)"
-                  " FROM cardinput,capturecard "
-                  " WHERE capturecard.cardid = cardinput.cardid "
-                  " AND cardinput.sourceid= :SOURCEID "
-                  " AND capturecard.cardtype= :CARDTYPE ;");
+                  " FROM capturecard "
+                  " WHERE capturecard.sourceid = :SOURCEID "
+                  " AND capturecard.cardtype = :CARDTYPE ;");
     query.bindValue(":SOURCEID", sourceID);
     query.bindValue(":CARDTYPE", thecardtype);
 
@@ -1162,6 +1160,7 @@ class DVBTuningDelay : public SpinBoxSetting, public CaptureCardDBStorage
         CaptureCardDBStorage(this, parent, "dvb_tuning_delay")
     {
         setLabel(QObject::tr("DVB tuning delay (ms)"));
+        setValue(true);
         setHelpText(
             QObject::tr("Some Linux DVB drivers, in particular for the "
                         "Hauppauge Nova-T, require that we slow down "
@@ -2022,7 +2021,7 @@ void CetonSetting::LoadValue(const QString &value)
 CetonDeviceID::CetonDeviceID(const CaptureCard &parent) :
     LabelSetting(this),
     CaptureCardDBStorage(this, parent, "videodevice"),
-    _ip(), _card(), _tuner()
+    _ip(), _card(), _tuner(), _parent(parent)
 {
     setLabel(tr("Device ID"));
     setHelpText(tr("Device ID of Ceton device"));
@@ -2061,6 +2060,8 @@ void CetonDeviceID::UpdateValues(void)
         emit LoadedIP(newstyle.cap(1));
         emit LoadedTuner(newstyle.cap(3));
     }
+    if (_parent.getCardID())
+        emit LoadedInstances((int)_parent.GetInstanceCount());
 }
 
 CetonConfigurationGroup::CetonConfigurationGroup(CaptureCard& a_parent) :
@@ -2094,6 +2095,8 @@ CetonConfigurationGroup::CetonConfigurationGroup(CaptureCard& a_parent) :
             ip,       SLOT(  LoadValue(const QString&)));
     connect(deviceid, SIGNAL(LoadedTuner(const QString&)),
             tuner,    SLOT(  LoadValue(const QString&)));
+    connect(deviceid, SIGNAL(LoadedInstances(int)),
+            instances, SLOT(  setValue(int)));
     connect(instances, SIGNAL(valueChanged(int)),
             &parent,   SLOT(  SetInstanceCount(int)));
 
@@ -2422,7 +2425,7 @@ void CaptureCard::fillSelections(SelectSetting *setting)
     QString qstr =
         "SELECT cardid, videodevice, cardtype "
         "FROM capturecard "
-        "WHERE hostname = :HOSTNAME "
+        "WHERE hostname = :HOSTNAME AND parentid = 0 "
         "ORDER BY cardid";
 
     query.prepare(qstr);
@@ -2434,18 +2437,11 @@ void CaptureCard::fillSelections(SelectSetting *setting)
         return;
     }
 
-    QMap<QString, uint> device_refs;
     while (query.next())
     {
         uint    cardid      = query.value(0).toUInt();
         QString videodevice = query.value(1).toString();
         QString cardtype    = query.value(2).toString();
-
-        bool sharable = CardUtil::IsTunerSharingCapable(cardtype.toUpper());
-
-        if (sharable && (1 != ++device_refs[videodevice]))
-            continue;
-
         QString label = CardUtil::GetDeviceLabel(cardtype, videodevice);
         setting->addSelection(label, QString::number(cardid));
     }
@@ -2457,23 +2453,17 @@ void CaptureCard::loadByID(int cardid)
     Load();
 
     // Update instance count for cloned cards.
-    uint new_cnt = 0;
-    if (cardid > 0)
-    {
-        QString type = CardUtil::GetRawCardType(cardid);
-        if (CardUtil::IsTunerSharingCapable(type))
-        {
-            QString dev = CardUtil::GetVideoDevice(cardid);
-            vector<uint> cardids = CardUtil::GetCardIDs(dev, type);
-            new_cnt = cardids.size();
-        }
-    }
-    instance_count = new_cnt;
+    if (cardid)
+        instance_count = CardUtil::GetChildCardCount(cardid) + 1;
 }
 
 void CaptureCard::Save(void)
 {
     uint init_cardid = getCardID();
+    QString init_type = CardUtil::GetRawCardType(init_cardid);
+    QString init_dev = CardUtil::GetVideoDevice(init_cardid);
+    QString init_input = CardUtil::GetInputName(init_cardid);
+    vector<uint> cardids = CardUtil::GetChildCardIDs(init_cardid);
 
     ////////
 
@@ -2483,51 +2473,52 @@ void CaptureCard::Save(void)
 
     uint cardid = getCardID();
     QString type = CardUtil::GetRawCardType(cardid);
+    QString dev = CardUtil::GetVideoDevice(cardid);
+
+    if (dev != init_dev)
+    {
+        if (!init_dev.isEmpty())
+        {
+            uint init_groupid = CardUtil::GetDeviceInputGroup(init_cardid);
+            CardUtil::UnlinkInputGroup(init_cardid, init_groupid);
+        }
+        if (!dev.isEmpty())
+        {
+            uint groupid =
+                CardUtil::CreateDeviceInputGroup(gCoreContext->GetHostName(),
+                                                  dev);
+            CardUtil::LinkInputGroup(cardid, groupid);
+            CardUtil::UnlinkInputGroup(0, groupid);
+        }
+    }
+
     if (!CardUtil::IsTunerSharingCapable(type))
         return;
-
-    QString init_dev = CardUtil::GetVideoDevice(cardid);
-    if (init_dev.isEmpty())
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("Cannot clone card #%1 with empty videodevice")
-                .arg(cardid));
-        return;
-    }
-    vector<uint> cardids = CardUtil::GetCardIDs(init_dev, type);
 
     if (!instance_count)
     {
         instance_count = (init_cardid) ?
-            max((size_t)1, cardids.size()) : kDefaultMultirecCount;
+            max((size_t)1, cardids.size() + 1) : kDefaultMultirecCount;
     }
-    uint cloneCount = instance_count - 1;
-
-    if (!init_cardid)
-        init_cardid = cardid;
 
     // Delete old clone cards as required.
-    for (uint i = cardids.size() - 1; (i > cloneCount) && !cardids.empty(); i--)
+    for (uint i = cardids.size() + 1;
+         (i > instance_count) && !cardids.empty(); --i)
     {
         CardUtil::DeleteCard(cardids.back());
         cardids.pop_back();
     }
 
-    // Make sure clones & original all share an input group
-    if (cloneCount && !CardUtil::CreateInputGroupIfNeeded(cardid))
-        return;
-
     // Clone this config to existing clone cards.
-    for (uint i = 0; i < cardids.size(); i++)
+    for (uint i = 0; i < cardids.size(); ++i)
     {
-        if (cardids[i] != init_cardid)
-            CardUtil::CloneCard(init_cardid, cardids[i]);
+        CardUtil::CloneCard(cardid, cardids[i]);
     }
 
     // Create new clone cards as required.
-    for (uint i = cardids.size(); i < cloneCount + 1; i++)
+    for (uint i = cardids.size() + 1; i < instance_count; i++)
     {
-        CardUtil::CloneCard(init_cardid, 0);
+        CardUtil::CloneCard(cardid, 0);
     }
 }
 
@@ -2609,13 +2600,14 @@ void CardType::fillSelections(SelectSetting* setting)
 #endif
 }
 
-class CardID : public SelectLabelSetting, public CardInputDBStorage
+class InputName : public ComboBoxSetting, public CardInputDBStorage
 {
   public:
-    CardID(const CardInput &parent) :
-        SelectLabelSetting(this), CardInputDBStorage(this, parent, "cardid")
+    InputName(const CardInput &parent) :
+        ComboBoxSetting(this), CardInputDBStorage(this, parent, "inputname")
     {
-        setLabel(QObject::tr("Capture device"));
+        setLabel(QObject::tr("Input name"));
+        addSelection(QObject::tr("(None)"), "None");
     };
 
     virtual void Load(void)
@@ -2625,7 +2617,18 @@ class CardID : public SelectLabelSetting, public CardInputDBStorage
     };
 
     void fillSelections() {
-        CaptureCard::fillSelections(this);
+        clearSelections();
+        addSelection(QObject::tr("(None)"), "None");
+        uint cardid = getInputID();
+        QString type = CardUtil::GetRawCardType(cardid);
+        QString device = CardUtil::GetVideoDevice(cardid);
+        QStringList inputs;
+        CardUtil::GetCardInputs(cardid, device, type, inputs);
+        while (!inputs.isEmpty())
+        {
+            addSelection(inputs.front());
+            inputs.pop_front();
+        }
     };
 };
 
@@ -2665,16 +2668,6 @@ class SourceID : public ComboBoxSetting, public CardInputDBStorage
         clearSelections();
         addSelection(QObject::tr("(None)"), "0");
         VideoSource::fillSelections(this);
-    };
-};
-
-class InputName : public LabelSetting, public CardInputDBStorage
-{
-  public:
-    InputName(const CardInput &parent) :
-        LabelSetting(this), CardInputDBStorage(this, parent, "inputname")
-    {
-        setLabel(QObject::tr("Input"));
     };
 };
 
@@ -2739,6 +2732,7 @@ void InputGroup::Load(void)
     query.prepare(
         "SELECT cardinputid, inputgroupid, inputgroupname "
         "FROM inputgroup "
+        "WHERE inputgroupname LIKE 'user:%' "
         "ORDER BY inputgroupid, cardinputid, inputgroupname");
 
     if (!query.exec())
@@ -2757,7 +2751,7 @@ void InputGroup::Load(void)
 
             if (grpcnt[groupid] == 1)
             {
-                names.push_back(query.value(2).toString());
+                names.push_back(query.value(2).toString().mid(5, -1));
                 grpid.push_back(groupid);
             }
         }
@@ -2870,7 +2864,7 @@ void StartingChannel::SetSourceID(const QString &sourceid)
     if (channels.empty())
     {
         addSelection(tr("Please add channels to this source"),
-                     startChan.isEmpty() ? "" : startChan);
+                     startChan.isEmpty() ? "0" : startChan);
         return;
     }
 
@@ -2965,7 +2959,6 @@ class DishNetEIT : public CheckBoxSetting, public CardInputDBStorage
 CardInput::CardInput(const QString & cardtype,
                      bool isNewInput, int _cardid) :
     id(new ID()),
-    cardid(new CardID(*this)),
     inputname(new InputName(*this)),
     sourceid(new SourceID(*this)),
     startchan(new StartingChannel(*this)),
@@ -2988,7 +2981,6 @@ CardInput::CardInput(const QString & cardtype,
 
     basic->setLabel(QObject::tr("Connect source to input"));
 
-    basic->addChild(cardid);
     basic->addChild(inputname);
     basic->addChild(new InputDisplayName(*this));
     basic->addChild(sourceid);
@@ -3073,7 +3065,7 @@ CardInput::~CardInput()
 
 void CardInput::SetSourceID(const QString &sourceid)
 {
-    uint cid = cardid->getValue().toUInt();
+    uint cid = id->getValue().toUInt();
     QString raw_card_type = CardUtil::GetRawCardType(cid);
     bool enable = (sourceid.toInt() > 0);
     scan->setEnabled(enable && !raw_card_type.isEmpty() &&
@@ -3101,18 +3093,18 @@ void CardInput::CreateNewInputGroup(void)
             GetMythMainWindow(), tr("Create Input Group"),
             tr("Enter new group name"), tmp_name);
 
-        new_name = tmp_name;
-
         if (!ok)
             return;
 
-        if (new_name.isEmpty())
+        if (tmp_name.isEmpty())
         {
             MythPopupBox::showOkPopup(
                 GetMythMainWindow(), tr("Error"),
                 tr("Sorry, this Input Group name cannot be blank."));
             continue;
         }
+
+        new_name = QString("user:") + tmp_name;
 
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare(
@@ -3158,7 +3150,7 @@ void CardInput::CreateNewInputGroup(void)
 void CardInput::channelScanner(void)
 {
     uint srcid = sourceid->getValue().toUInt();
-    uint crdid = cardid->getValue().toUInt();
+    uint crdid = id->getValue().toUInt();
     QString in = inputname->getValue();
 
 #ifdef USING_BACKEND
@@ -3195,7 +3187,7 @@ void CardInput::channelScanner(void)
 void CardInput::sourceFetch(void)
 {
     uint srcid = sourceid->getValue().toUInt();
-    uint crdid = cardid->getValue().toUInt();
+    uint crdid = id->getValue().toUInt();
 
     uint num_channels_before = SourceUtil::GetChannelCount(srcid);
 
@@ -3229,9 +3221,9 @@ void CardInput::sourceFetch(void)
 
 QString CardInputDBStorage::GetWhereClause(MSqlBindings &bindings) const
 {
-    QString cardinputidTag(":WHERECARDINPUTID");
+    QString cardinputidTag(":WHERECARDID");
 
-    QString query("cardinputid = " + cardinputidTag);
+    QString query("cardid = " + cardinputidTag);
 
     bindings.insert(cardinputidTag, m_parent.getInputID());
 
@@ -3240,10 +3232,10 @@ QString CardInputDBStorage::GetWhereClause(MSqlBindings &bindings) const
 
 QString CardInputDBStorage::GetSetClause(MSqlBindings &bindings) const
 {
-    QString cardinputidTag(":SETCARDINPUTID");
+    QString cardinputidTag(":SETCARDID");
     QString colTag(":SET" + GetColumnName().toUpper());
 
-    QString query("cardinputid = " + cardinputidTag + ", " +
+    QString query("cardid = " + cardinputidTag + ", " +
             GetColumnName() + " = " + colTag);
 
     bindings.insert(cardinputidTag, m_parent.getInputID());
@@ -3262,7 +3254,7 @@ void CardInput::loadByID(int inputid)
 void CardInput::loadByInput(int _cardid, QString _inputname)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT cardinputid FROM cardinput "
+    query.prepare("SELECT cardid FROM capturecard "
                   "WHERE cardid = :CARDID AND inputname = :INPUTNAME");
     query.bindValue(":CARDID", _cardid);
     query.bindValue(":INPUTNAME", _inputname);
@@ -3271,43 +3263,22 @@ void CardInput::loadByInput(int _cardid, QString _inputname)
     {
         loadByID(query.value(0).toInt());
     }
-    else
-    { // create new input connection
-        Load();
-        cardid->setValue(QString::number(_cardid));
-        inputname->setValue(_inputname);
-    }
 }
 
 void CardInput::Save(void)
 {
-
-    if (sourceid->getValue() == "0")
-    {
-        // "None" is represented by the lack of a row
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("DELETE FROM cardinput WHERE cardinputid = :INPUTID");
-        query.bindValue(":INPUTID", getInputID());
-        if (!query.exec())
-            MythDB::DBError("CardInput::Save", query);
-    }
-    else
-    {
-        ConfigurationWizard::Save();
-        externalInputSettings->Store(getInputID());
-    }
+    uint src_cardid = id->getValue().toUInt();
+    QString init_input = CardUtil::GetInputName(src_cardid);
+    ConfigurationWizard::Save();
+    externalInputSettings->Store(getInputID());
 
     // Handle any cloning we may need to do
-    uint src_cardid = cardid->getValue().toUInt();
     QString type = CardUtil::GetRawCardType(src_cardid);
     if (CardUtil::IsTunerSharingCapable(type))
     {
-        vector<uint> clones = CardUtil::GetCloneCardIDs(src_cardid);
-        if (clones.size() && CardUtil::CreateInputGroupIfNeeded(src_cardid))
-        {
-            for (uint i = 0; i < clones.size(); i++)
-                CardUtil::CloneCard(src_cardid, clones[i]);
-        }
+        vector<uint> clones = CardUtil::GetChildCardIDs(src_cardid);
+        for (uint i = 0; i < clones.size(); i++)
+            CardUtil::CloneCard(src_cardid, clones[i]);
     }
 
     // Delete any orphaned inputs
@@ -3597,9 +3568,10 @@ void CardInputEditor::Load(void)
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
-        "SELECT cardid, videodevice, cardtype "
+        "SELECT cardid, videodevice, cardtype, inputname "
         "FROM capturecard "
         "WHERE hostname = :HOSTNAME "
+        "      AND parentid = 0 "
         "ORDER BY cardid");
     query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
 
@@ -3616,23 +3588,17 @@ void CardInputEditor::Load(void)
         uint    cardid      = query.value(0).toUInt();
         QString videodevice = query.value(1).toString();
         QString cardtype    = query.value(2).toString();
+        QString inputname   = query.value(3).toString();
+        if (inputname.isEmpty())
+            inputname = QObject::tr("(None)");
 
-        bool sharable = CardUtil::IsTunerSharingCapable(cardtype.toUpper());
-
-        if (sharable && (1 != ++device_refs[videodevice]))
-            continue;
-
-        QStringList        inputLabels;
-        vector<CardInput*> cardInputs;
-
-        CardUtil::GetCardInputs(cardid, videodevice, cardtype,
-                                inputLabels, cardInputs);
-
-        for (int i = 0; i < inputLabels.size(); i++, j++)
-        {
-            cardinputs.push_back(cardInputs[i]);
-            listbox->addSelection(inputLabels[i], QString::number(j));
-        }
+        CardInput *cardinput = new CardInput(cardtype, false, cardid);
+        cardinput->loadByID(cardid);
+        QString inputlabel = QString("%1 (%2) -> %3")
+            .arg(CardUtil::GetDeviceLabel(cardtype, videodevice))
+            .arg(inputname).arg(cardinput->getSourceName());
+        cardinputs.push_back(cardinput);
+        listbox->addSelection(inputlabel, QString::number(j++));
     }
 }
 

@@ -2,10 +2,10 @@
 #define MYTHSCREEN_TYPE_H_
 
 #include "mythuicomposite.h"
-#include "mythuitext.h"
 #include "mythuiutils.h"
 
 #include <QSemaphore>
+#include <QEvent>
 
 class ScreenLoadTask;
 class MythScreenStack;

@@ -21,12 +21,12 @@ class MythPlugin : public QLibrary
     MythPlugin(const QString &, const QString &);
     virtual ~MythPlugin();
 
-    // This method will call the mythplugin_init() function of the library. 
+    // This method will call the mythplugin_init() function of the library.
     int init(const char *libversion);
 
     // This method will call the mythplugin_run() function of the library.
     int run(void);
- 
+
     // This method will call the mythplugin_config() function of the library.
     int config(void);
 
@@ -56,10 +56,10 @@ class MythPlugin : public QLibrary
 // this should only be instantiated through MythContext.
 class MBASE_PUBLIC MythPluginManager
 {
-  public:   
+  public:
     MythPluginManager();
    ~MythPluginManager();
-   
+
     bool init_plugin(const QString &plugname);
     bool run_plugin(const QString &plugname);
     bool config_plugin(const QString &plugname);
@@ -69,12 +69,11 @@ class MBASE_PUBLIC MythPluginManager
 
     QStringList EnumeratePlugins(void);
     void DestroyAllPlugins();
-     
+
   private:
     QHash<QString,MythPlugin*> m_dict;
-   
+
     QMap<QString, MythPlugin *> moduleMap;
 };
 
 #endif
-

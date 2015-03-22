@@ -10,7 +10,8 @@
 #include "mythlogging.h"
 
 // MythUI
-
+#include "mythuishape.h"
+#include "mythuiimage.h"
 
 MythUIProgressBar::MythUIProgressBar(MythUIType *parent, const QString &name)
     : MythUIType(parent, name),

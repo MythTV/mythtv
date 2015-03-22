@@ -2,7 +2,10 @@ CONFIG += $$CCONFIG
 
 LIBVERSION = 0.28
 
-INCLUDEPATH += $${SYSROOT}$${PREFIX}/include
+MY_INSTALL_INCLUDE = $${SYSROOT}$${PREFIX}/include
+!contains(MY_INSTALL_INCLUDE, /usr/include$) {
+    INCLUDEPATH += $${SYSROOT}$${PREFIX}/include
+}
 
 LIBS *= -L$${SYSROOT}$${PREFIX}/$${LIBDIRNAME}
 

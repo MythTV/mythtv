@@ -5,6 +5,7 @@
 #include <QKeyEvent>
 #include <QRegExp>
 #include <QThread>
+#include <QDomDocument>
 
 // myth
 #include <mythcontext.h>
@@ -239,7 +240,7 @@ void StreamView::customEvent(QEvent *event)
                     for (int x = 0; x < m_streamList->GetCount(); x++)
                     {
                         MythUIButtonListItem *item = m_streamList->GetItemAt(x);
-                        MusicMetadata *mdata = qVariantValue<MusicMetadata*> (item->GetData());
+                        MusicMetadata *mdata = item->GetData().value<MusicMetadata *>();
                         if (mdata && mdata->LogoUrl() == url)
                             item->SetImage(filename);
                     }
@@ -372,7 +373,7 @@ void StreamView::editStream(void)
     MythUIButtonListItem *item = m_streamList->GetItemCurrent();
     if (item)
     {
-        MusicMetadata *mdata = qVariantValue<MusicMetadata*> (item->GetData());
+        MusicMetadata *mdata = item->GetData().value<MusicMetadata *>();
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
         MythScreenType *screen = new EditStreamMetadata(mainStack, this, mdata);
 
@@ -388,7 +389,7 @@ void StreamView::removeStream(void)
     MythUIButtonListItem *item = m_streamList->GetItemCurrent();
     if (item)
     {
-        MusicMetadata *mdata = qVariantValue<MusicMetadata*> (item->GetData());
+        MusicMetadata *mdata = item->GetData().value<MusicMetadata *>();
 
         if (mdata)
             ShowOkPopup(tr("Are you sure you want to delete this Stream?\n"
@@ -406,7 +407,7 @@ void StreamView::doRemoveStream(bool ok)
     MythUIButtonListItem *item = m_streamList->GetItemCurrent();
     if (item)
     {
-        MusicMetadata *mdata = qVariantValue<MusicMetadata*> (item->GetData());
+        MusicMetadata *mdata = item->GetData().value<MusicMetadata *>();
 
         if (mdata)
             deleteStream(mdata);
@@ -489,7 +490,7 @@ void  StreamView::streamItemVisible(MythUIButtonListItem *item)
     if (!item->GetText("imageloaded").isEmpty())
         return;
 
-    MusicMetadata *mdata = qVariantValue<MusicMetadata*> (item->GetData());
+    MusicMetadata *mdata = item->GetData().value<MusicMetadata *>();
     if (mdata)
     {
         if (!mdata->LogoUrl().isEmpty())
@@ -523,7 +524,7 @@ void StreamView::addStream(MusicMetadata *mdata)
     for (int x = 0; x < m_streamList->GetCount(); x++)
     {
         MythUIButtonListItem *item = m_streamList->GetItemAt(x);
-        MusicMetadata *itemsdata = qVariantValue<MusicMetadata*> (item->GetData());
+        MusicMetadata *itemsdata = item->GetData().value<MusicMetadata *>();
         if (itemsdata)
         {
             if (url == itemsdata->Url())
@@ -578,7 +579,7 @@ void StreamView::updateStream(MusicMetadata *mdata)
         for (int x = 0; x < m_playedTracksList->GetCount(); x++)
         {
             MythUIButtonListItem *item = m_playedTracksList->GetItemAt(x);
-            MusicMetadata *playedmdata = qVariantValue<MusicMetadata*> (item->GetData());
+            MusicMetadata *playedmdata = item->GetData().value<MusicMetadata *>();
 
             if (playedmdata && playedmdata->ID() == id)
             {
@@ -596,7 +597,7 @@ void StreamView::updateStream(MusicMetadata *mdata)
     for (int x = 0; x < m_streamList->GetCount(); x++)
     {
         MythUIButtonListItem *item = m_streamList->GetItemAt(x);
-        MusicMetadata *itemsdata = qVariantValue<MusicMetadata*> (item->GetData());
+        MusicMetadata *itemsdata = item->GetData().value<MusicMetadata *>();
         if (itemsdata)
         {
             if (mdata->ID() == itemsdata->ID())
@@ -789,7 +790,7 @@ void SearchStream::streamClicked(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    MusicMetadata *mdata = qVariantValue<MusicMetadata*> (item->GetData());
+    MusicMetadata *mdata = item->GetData().value<MusicMetadata *>();
     if (mdata)
         m_parent->changeStreamMetadata(mdata);
 
@@ -801,7 +802,7 @@ void SearchStream::streamVisible(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    MusicMetadata *mdata = qVariantValue<MusicMetadata*> (item->GetData());
+    MusicMetadata *mdata = item->GetData().value<MusicMetadata *>();
     if (mdata)
     {
         if (item->GetText("dummy") == " ")

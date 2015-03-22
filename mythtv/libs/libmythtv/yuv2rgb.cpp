@@ -701,9 +701,9 @@ void rgb32_to_yuv420p(unsigned char *lum, unsigned char *cb, unsigned char *cr,
                     FIX(0.08131) * b1 + ONE_HALF - 1) >> SCALEBITS) +
                     128;
 
+#if 0 // no point in updating after the last pixel
             cb++;
             cr++;
-#if 0 // no point in updating after the last pixel
             p += 4;
             lum += -wrap + 2;
             alpha += -wrap + 2;

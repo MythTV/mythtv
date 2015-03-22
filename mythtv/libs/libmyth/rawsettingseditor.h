@@ -8,15 +8,12 @@
 #include "mythexp.h"
 #include "mythscreentype.h"
 
-#include "mythuibutton.h"
-#include "mythuishape.h"
-#include "mythuitextedit.h"
-
 class MythUIButtonList;
 class MythUIButtonListItem;
 class MythUIText;
 class MythUITextEdit;
 class MythUIButton;
+class MythUIShape;
 
 /** \class RawSettingsEditor
  *  \brief An editor screen that allows manipulation of raw settings values

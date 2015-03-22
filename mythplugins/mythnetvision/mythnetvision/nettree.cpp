@@ -15,6 +15,10 @@
 #include <netgrabbermanager.h>
 #include <mythcoreutil.h>
 #include <metadata/videoutils.h>
+#include <mythuiimage.h>
+#include <mythuitext.h>
+#include <mythscreenstack.h>
+#include <mythmainwindow.h>
 
 // mythnetvision
 #include "treeeditor.h"
@@ -216,8 +220,8 @@ void NetTree::UpdateItem(MythUIButtonListItem *item)
     if (!node)
         return;
 
-    RSSSite *site = qVariantValue<RSSSite *>(node->GetData());
-    ResultItem *video = qVariantValue<ResultItem *>(node->GetData());
+    RSSSite *site = node->GetData().value<RSSSite *>();
+    ResultItem *video = node->GetData().value<ResultItem *>();
 
     int nodeInt = node->getInt();
 
@@ -408,7 +412,7 @@ void NetTree::ShowMenu(void)
         MythGenericTree *node = m_siteMap->GetCurrentNode();
 
         if (node)
-            item = qVariantValue<ResultItem *>(node->GetData());
+            item = node->GetData().value<ResultItem *>();
     }
     else
     {
@@ -416,7 +420,7 @@ void NetTree::ShowMenu(void)
             GetNodePtrFromButton(m_siteButtonList->GetItemCurrent());
 
         if (node)
-            item = qVariantValue<ResultItem *>(node->GetData());
+            item = node->GetData().value<ResultItem *>();
     }
 
     if (item)
@@ -648,15 +652,14 @@ ResultItem* NetTree::GetStreamItem()
     ResultItem *item = NULL;
 
     if (m_type == DLG_TREE)
-        item =
-            qVariantValue<ResultItem *>(m_siteMap->GetCurrentNode()->GetData());
+        item = m_siteMap->GetCurrentNode()->GetData().value<ResultItem *>();
     else
     {
         MythGenericTree *node =
             GetNodePtrFromButton(m_siteButtonList->GetItemCurrent());
 
         if (node)
-            item = qVariantValue<ResultItem *>(node->GetData());
+            item = node->GetData().value<ResultItem *>();
     }
     return item;
 }
@@ -814,9 +817,8 @@ void NetTree::SlotItemChanged()
 
     if (m_type == DLG_TREE)
     {
-        item =
-            qVariantValue<ResultItem *>(m_siteMap->GetCurrentNode()->GetData());
-        site = qVariantValue<RSSSite *>(m_siteMap->GetCurrentNode()->GetData());
+        item = m_siteMap->GetCurrentNode()->GetData().value<ResultItem *>();
+        site = m_siteMap->GetCurrentNode()->GetData().value<RSSSite *>();
     }
     else
     {
@@ -826,8 +828,8 @@ void NetTree::SlotItemChanged()
         if (!node)
             return;
 
-        item = qVariantValue<ResultItem *>(node->GetData());
-        site = qVariantValue<RSSSite *>(node->GetData());
+        item = node->GetData().value<ResultItem *>();
+        site = node->GetData().value<RSSSite *>();
     }
 
     if (item)
@@ -945,7 +947,7 @@ void NetTree::customEvent(QEvent *event)
 
         QString title = data->title;
         QString file = data->url;
-        uint pos = qVariantValue<uint>(data->data);
+        uint pos = data->data.value<uint>();
 
         if (file.isEmpty())
             return;

@@ -1,11 +1,16 @@
+
+#include "zmminiplayer.h"
+
 // mythtv
 #include <mythcontext.h>
 #include <lcddevice.h>
 #include <mythuiimage.h>
+#include <mythmainwindow.h>
 
 // mythzoneminder
-#include "zmminiplayer.h"
 #include "zmclient.h"
+
+#include <QTimer>
 
 // the maximum image size we are ever likely to get from ZM
 #define MAX_IMAGE_SIZE  (2048*1536*3)
@@ -14,7 +19,8 @@ const int FRAME_UPDATE_TIME = 1000 / 10;  // try to update the frame 10 times a 
 
 ZMMiniPlayer::ZMMiniPlayer(MythScreenStack *parent)
           : ZMLivePlayer(parent, true),
-              m_displayTimer(new QTimer(this))
+              m_displayTimer(new QTimer(this)), m_monitorText(NULL),
+              m_statusText(NULL), m_image(NULL)
 {
     m_displayTimer->setSingleShot(true);
     connect(m_displayTimer, SIGNAL(timeout()), this, SLOT(timerTimeout()));
@@ -80,6 +86,8 @@ void ZMMiniPlayer::customEvent (QEvent* event)
             int monID = list[1].toInt();
             if (monID != m_alarmMonitor)
             {
+                m_alarmMonitor = monID;
+
                 m_frameTimer->stop();
 
                 Monitor *mon = ZMClient::get()->getMonitorAt(monID);

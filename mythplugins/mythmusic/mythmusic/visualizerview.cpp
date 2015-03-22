@@ -12,6 +12,8 @@
 #include <mythuibuttonlist.h>
 #include <mythuiwebbrowser.h>
 #include <mythuitext.h>
+#include <mythuiimage.h>
+#include <mythuistatetype.h>
 #include <mythuiutils.h>
 #include <mythdialogbox.h>
 

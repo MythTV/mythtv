@@ -86,14 +86,7 @@ void InitializeMythDirs(void)
     if (installprefix.length() == 0)
         installprefix = QString(RUNPREFIX);
 
-  #if CONFIG_DARWIN
-    // Work around bug in OS X where applicationDirPath() can crash
-    // (if binary is not in a bundle, and is daemon()ized)
-
-    QDir prefixDir = QFileInfo(qApp->argv()[0]).dir();
-  #else
     QDir prefixDir = qApp->applicationDirPath();
-  #endif
 
     if (QDir(installprefix).isRelative())
     {
@@ -188,4 +181,3 @@ QString GetFontsDir(void)
 {
     return GetShareDir() + "fonts/";
 }
-

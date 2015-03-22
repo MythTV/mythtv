@@ -17,8 +17,15 @@ extern "C" {
 
 // Helper for checking verbose mask & level outside of LOG macro
 #define VERBOSE_LEVEL_NONE        (verboseMask == 0)
+#ifdef __cplusplus
+#define VERBOSE_LEVEL_CHECK(_MASK_, _LEVEL_) \
+    (componentLogLevel.contains(_MASK_) ?                               \
+     (*(componentLogLevel.find(_MASK_)) >= _LEVEL_) :                   \
+     (((verboseMask & (_MASK_)) == (_MASK_)) && logLevel >= (_LEVEL_)))
+#else
 #define VERBOSE_LEVEL_CHECK(_MASK_, _LEVEL_) \
     (((verboseMask & (_MASK_)) == (_MASK_)) && logLevel >= (_LEVEL_))
+#endif
 
 #define VERBOSE please_use_LOG_instead_of_VERBOSE
 
@@ -50,8 +57,8 @@ extern "C" {
 #endif
 
 /* Define the external prototype */
-MBASE_PUBLIC void LogPrintLine( uint64_t mask, LogLevel_t level, 
-                                const char *file, int line, 
+MBASE_PUBLIC void LogPrintLine( uint64_t mask, LogLevel_t level,
+                                const char *file, int line,
                                 const char *function, int fromQString,
                                 const char *format, ... );
 
@@ -59,6 +66,7 @@ extern MBASE_PUBLIC LogLevel_t logLevel;
 extern MBASE_PUBLIC uint64_t   verboseMask;
 
 #ifdef __cplusplus
+extern MBASE_PUBLIC ComponentLogLevelMap componentLogLevel;
 }
 
 extern MBASE_PUBLIC QStringList logPropagateArgList;
@@ -82,7 +90,7 @@ MBASE_PUBLIC int verboseArgParse(QString arg);
 /// Verbose helper function for ENO macro
 MBASE_PUBLIC QString logStrerror(int errnum);
 
-/// This can be appended to the LOG args with 
+/// This can be appended to the LOG args with
 /// "+".  Please do not use "<<".  It uses
 /// a thread safe version of strerror to produce the
 /// string representation of errno and puts it on the

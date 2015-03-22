@@ -62,7 +62,7 @@ class UPNP_PUBLIC ServerSideScripting
                                      QScriptEngine::FunctionSignature  pFunction);
 
         bool EvaluatePage( QTextStream *pOutStream, const QString &sFileName,
-                           HTTPRequest *pRequest);
+                           HTTPRequest *pRequest, const QByteArray &cspToken);
 
     protected:
 

@@ -3,20 +3,22 @@
   <ul class="menu collapsible">
     <li><a href='#'><i18n>TV</i18n></a>
         <ul class="acitem collapsible">
-            <li><a class='menuitem' href='#' onClick="hideMainMenu();loadContent('/tv/guide.qsp')"><%=qsTr("Program Guide")%></a></li>
-            <li><a class='menuitem' href='#' onClick="hideMainMenu();loadContent('/tv/recordings.qsp')"><%=qsTr("Recordings")%></a></li>
-            <li><a class='menuitem' href='#' onClick="hideMainMenu();loadContent('/tv/upcoming.qsp')"><%=qsTr("Upcoming Recordings")%></a></li>
-            <li><a class='menuitem' href='#' onClick="hideMainMenu();loadContent('/tv/recordingrules.qsp')"><%=qsTr("Recording Rules")%></a></li>
+            <li><a class='menuitem' href='#' onClick="hideMainMenu();loadFrontendContent('/tv/guide.qsp')"><%=qsTr("Program Guide")%></a></li>
+            <li><a class='menuitem' href='#' onClick="hideMainMenu();loadFrontendContent('/tv/recordings.qsp')"><%=qsTr("Recordings")%></a></li>
+            <li><a class='menuitem' href='#' onClick="hideMainMenu();loadFrontendContent('/tv/upcoming.qsp')"><%=qsTr("Upcoming Recordings")%></a></li>
+            <li><a class='menuitem' href='#' onClick="hideMainMenu();loadFrontendContent('/tv/programsearch.qsp')"><%=qsTr("Program Search")%></a></li>
+            <li><a class='menuitem' href='#' onClick="hideMainMenu();loadFrontendContent('/tv/recordingrules.qsp')"><%=qsTr("Recording Rules")%></a></li>
         </ul>
     </li>
     <li><a href='#'><i18n>Video</i18n></a>
         <ul class="acitem collapsible">
-            <li><a class='menuitem' href='#' onClick="hideMainMenu();loadContent('/video/gallery.qsp')"><%=qsTr("Video Gallery")%></a></li>
+            <li><a class='menuitem' href='#' onClick="hideMainMenu();loadFrontendContent('/video/gallery.qsp')"><%=qsTr("Video Gallery")%></a></li>
         </ul>
     </li>
     <li><a href='#'><i18n>Setup</i18n></a>
       <ul class="acitem collapsible">
-        <li><a href='#' onClick="hideMainMenu(); clearContent(); loadEditWindow('/setup/wizard.html', '/setup/js/wizard.js')"><i18n>Setup Wizard</i18n></a></li>
+        <li><a href='#' onClick="hideMainMenu(); loadFrontendContent('/setup/webfrontend-settings.qsp')"><%=qsTr("WebFrontend")%></a></li>
+        <li><a href='#' onClick="hideMainMenu(); loadEditWindow('/setup/wizard.html', '/setup/js/wizard.js')"><i18n>Setup Wizard</i18n></a></li>
         <li><a href='#'><i18n>Advanced Setup</i18n></a>
           <ul class="acitem collapsible">
             <li><a href='#' onClick="hideMainMenu();loadSetupPage('database')"><i18n>Database</i18n></a></li>
@@ -35,23 +37,18 @@
         </li>
 <%
     var myth = new Myth();
-    var sList = myth.GetSetting( '', 'EnableWebSetupDevMode', '');
-    var devMode = 0;
-
-    if (sList.Settings['EnableWebSetupDevMode'] == 1)
-        devMode = 1;
-
-    if (devMode)
+    var devMode = myth.GetSetting( '', 'EnableWebSetupDevMode', '0' );
+    if (devMode == 1)
     {
-        os.write("<li><a href='#' onClick=\"hideMainMenu();loadSetupContent('/setup/expert.html')\"><i18n>Expert/Dev Setup</i18n></a></li>");
+        os.write("<li><a href='#' onClick=\"hideMainMenu();loadSetupPage('expert')\"><i18n>Expert/Dev Setup</i18n></a></li>");
     }
 %>
-        <li><a href='#' onClick="hideMainMenu();loadSetupPage('password')"><i18n>Change Password</i18n></a></li>
+        <li><a href='#' onClick="hideMainMenu();loadEditWindow('/setup/password.html', '/setup/js/password.js')"><i18n>Change Password</i18n></a></li>
       </ul>
     </li>
     <li><a href='#'><i18n>Information</i18n></a>
       <ul class="acitem collapsible">
-        <li><a class='menuitem' href='#' onClick="hideMainMenu();loadContent('/misc/overview.qsp')"><i18n>Overview</i18n></a></li>
+        <li><a class='menuitem' href='#' onClick="hideMainMenu();loadFrontendContent('/misc/overview.qsp')"><i18n>Overview</i18n></a></li>
         <li><a class='menuitem' href='#' onClick="hideMainMenu();loadContent('/Status/GetStatusHTML')"><i18n>Backend Status</i18n></a></li>
         <li><a class='menuitem' href='#' onClick="hideMainMenu();loadMiscPage('viewlogs')"><i18n>View Logs</i18n></a></li>
       </ul>
@@ -79,20 +76,22 @@
         </li>
         <li><a href='#'><i18n>Examples</i18n></a>
           <ul class="acitem">
-            <li><a href='#' onClick="hideMainMenu();loadContent('/samples/hlstest.qsp');"><i18n>HTTP Live Streaming</i18n></a></li>
+            <li><a href='#' onClick="hideMainMenu();loadFrontendContent('/samples/hlstest.qsp');"><i18n>HTTP Live Streaming</i18n></a></li>
           </ul>
         </li>
-        <li><a href='#'><i18n>Server Side Scripting</i18n></a>
-          <ul class="acitem">
-            <li><a href='#' onClick="hideMainMenu();loadContent('/samples/serverside.qsp', '/samples/js/samples.js')"><i18n>Overview</i18n></a></li>
 <%
     if (devMode)
     {
-        os.write("<li><a href='#' onClick=\"hideMainMenu();loadContent('/samples/storagegroups.qsp', '/samples/js/samples.js')\"><i18n>GetStorageGroups()</i18n></a></li>");
-    }
 %>
+        <li><a href='#'><i18n>Server Side Scripting</i18n></a>
+          <ul class="acitem">
+            <li><a href='#' onClick="hideMainMenu();loadContent('/samples/serverside.qsp', '/samples/js/samples.js')"><i18n>Overview</i18n></a></li>
+            <li><a href='#' onClick="hideMainMenu();loadContent('/samples/storagegroups.qsp', '/samples/js/samples.js')"><i18n>GetStorageGroups()</i18n></a></li>
           </ul>
         </li>
+<%
+    }
+%>
       </ul>
     </li>
     <li><a href='#'><i18n>3rd Party Software</i18n></a>

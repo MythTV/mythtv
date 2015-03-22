@@ -44,9 +44,8 @@ static void get_atsc_stuff(QString channum, int sourceid, int freqid,
     MSqlQuery query(MSqlQuery::DDCon());
     query.prepare(
         "SELECT cardtype "
-        "FROM capturecard, cardinput "
-        "WHERE cardinput.cardid = capturecard.cardid AND "
-        "      sourceid         = :SOURCEID");
+        "FROM capturecard "
+        "WHERE sourceid         = :SOURCEID");
     query.bindValue(":SOURCEID", sourceid);
 
     if (query.exec() && query.isActive() && query.next() &&

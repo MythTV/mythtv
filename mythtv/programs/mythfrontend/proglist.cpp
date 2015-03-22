@@ -1,7 +1,11 @@
+
+#include "proglist.h"
+
 // C/C++
-#include <vector>
 #include <algorithm>
 #include <functional>
+#include <deque>                        // for _Deque_iterator, operator-, etc
+#include <iterator>                     // for reverse_iterator
 using namespace std;
 
 // Qt
@@ -12,16 +16,17 @@ using namespace std;
 // MythTV
 #include "scheduledrecording.h"
 #include "mythuibuttonlist.h"
+#include "mythuistatetype.h"
 #include "mythcorecontext.h"
 #include "mythdialogbox.h"
 #include "recordinginfo.h"
 #include "recordingrule.h"
 #include "channelinfo.h"
 #include "channelutil.h"
-#include "proglist.h"
+#include "mythuitext.h"
+#include "tv_actions.h"                 // for ACTION_CHANNELSEARCH
 #include "mythdb.h"
 #include "mythdate.h"
-#include "guidegrid.h"
 
 #define LOC      QString("ProgLister: ")
 #define LOC_WARN QString("ProgLister, Warning: ")
@@ -1058,14 +1063,14 @@ class plTitleSort : public plCompare
         if (a->GetRecordingStatus() == b->GetRecordingStatus())
             return a->GetScheduledStartTime() < b->GetScheduledStartTime();
 
-        if (a->GetRecordingStatus() == rsRecording)
+        if (a->GetRecordingStatus() == RecStatus::Recording)
             return true;
-        if (b->GetRecordingStatus() == rsRecording)
+        if (b->GetRecordingStatus() == RecStatus::Recording)
             return false;
 
-        if (a->GetRecordingStatus() == rsWillRecord)
+        if (a->GetRecordingStatus() == RecStatus::WillRecord)
             return true;
-        if (b->GetRecordingStatus() == rsWillRecord)
+        if (b->GetRecordingStatus() == RecStatus::WillRecord)
             return false;
 
         return a->GetScheduledStartTime() < b->GetScheduledStartTime();
@@ -1534,7 +1539,7 @@ void ProgLister::HandleVisible(MythUIButtonListItem *item)
         InfoMap infoMap;
         pginfo->ToMap(infoMap);
 
-        QString state = toUIState(pginfo->GetRecordingStatus());
+        QString state = RecStatus::toUIState(pginfo->GetRecordingStatus());
         if ((state == "warning") && (plPreviouslyRecorded == m_type))
             state = "disabled";
 

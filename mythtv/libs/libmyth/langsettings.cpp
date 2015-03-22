@@ -13,11 +13,14 @@
 #include "mythlogging.h"
 #include "mythlocale.h"
 #include "mythtranslation.h"
+#include "iso3166.h"
+#include "iso639.h"
 
 // libmythui
 #include "mythuibuttonlist.h"
 #include "mythuibutton.h"
 #include "mythmainwindow.h"
+#include "mythscreenstack.h"
 
 LanguageSelection::LanguageSelection(MythScreenStack *parent, bool exitOnFinish)
                  :MythScreenType(parent, "LanguageSelection"),

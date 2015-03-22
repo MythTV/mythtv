@@ -1,7 +1,14 @@
 
-#content
+/*#content
 {
     padding: 10px;
+}*/
+
+BODY
+{
+    padding: 10px;
+    padding-bottom: 15px;
+    box-sizing: border-box;
 }
 
 .pageTitle
@@ -134,6 +141,18 @@
     display: none;
 }
 
+.contextMenu .button A
+{
+    color: #FFFFFF;
+    text-decoration: none;
+}
+
+.contextMenu .button A:visited
+{
+    color: #FFFFFF;
+    text-decoration: none;
+}
+
 .contextMenu .button:hover
 {
     background-color: #003147;
@@ -218,6 +237,11 @@
     color: #990000;
 }
 
+.leftSlideInTransitionStart
+{
+    left: 100%;
+}
+
 .leftSlideOutTransition
 {
     transition-property: opacity;
@@ -235,6 +259,11 @@
     transition-duration: 500ms;
     transition-timing-function: ease;
     transform: translate3d(-100%, 0, 0);
+}
+
+.rightSlideInTransitionStart
+{
+    left: -100%;
 }
 
 .rightSlideInTransition

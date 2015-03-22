@@ -249,15 +249,12 @@ event_map_t * EITCache::LoadChannel(uint chanid)
     return eventMap;
 }
 
-void EITCache::WriteChannelToDB(QStringList &value_clauses, uint chanid)
+bool EITCache::WriteChannelToDB(QStringList &value_clauses, uint chanid)
 {
     event_map_t * eventMap = channelMap[chanid];
 
     if (!eventMap)
-    {
-        channelMap.remove(chanid);
-        return;
-    }
+        return false;
 
     uint size    = eventMap->size();
     uint updated = 0;
@@ -294,6 +291,8 @@ void EITCache::WriteChannelToDB(QStringList &value_clauses, uint chanid)
                                       "for channel %3 from cache.")
                 .arg(removed).arg(size).arg(chanid));
     pruneCnt += removed;
+
+    return true;
 }
 
 void EITCache::WriteToDB(void)
@@ -304,8 +303,10 @@ void EITCache::WriteToDB(void)
     key_map_t::iterator it = channelMap.begin();
     while (it != channelMap.end())
     {
-        WriteChannelToDB(value_clauses, it.key());
-        ++it;
+        if (!WriteChannelToDB(value_clauses, it.key()))
+            it = channelMap.erase(it);
+        else
+            ++it;
     }
 
     if(value_clauses.isEmpty())

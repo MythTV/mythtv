@@ -4,6 +4,7 @@
 #include <QCoreApplication>
 #include <QDomDocument>
 #include <QFontInfo>
+#include <QFontDatabase>
 #include <QRect>
 
 #include "mythlogging.h"
@@ -11,7 +12,7 @@
 
 #include "mythuihelper.h"
 #include "mythmainwindow.h"
-#include "xmlparsebase.h"
+#include "mythuitype.h"
 
 #define LOC      QString("MythFontProperties: ")
 
@@ -143,6 +144,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(
 {
     // Crappy, but cached.  Move to GlobalFontMap?
 
+    static bool show_available = true;
     bool fromBase = false;
     MythFontProperties *newFont = new MythFontProperties();
     newFont->Freeze();
@@ -402,6 +404,39 @@ MythFontProperties *MythFontProperties::ParseFromXml(
         VERBOSE_XML(VB_GENERAL, LOG_ERR, filename, element,
                     QString("Failed to load '%1', got '%2' instead")
             .arg(newFont->m_face.family()).arg(fi.family()));
+
+        if (show_available)
+        {
+            LOG(VB_GUI, LOG_DEBUG, "Available fonts:");
+
+            QFontDatabase database;
+
+            foreach (const QString &family, database.families())
+            {
+                QStringList family_styles;
+
+                family_styles << family + "::";
+                foreach (const QString &style, database.styles(family))
+                {
+                    family_styles << style + ":";
+
+                    QString sizes;
+                    bool    tic = false;
+                    foreach (int points, database.smoothSizes(family, style))
+                    {
+                        if (tic)
+                            sizes += ",";
+                        tic = true;
+                        sizes += QString::number(points);
+                    }
+                    sizes += "; ";
+
+                    family_styles << sizes.trimmed();
+                }
+                LOG(VB_GUI, LOG_DEBUG, family_styles.join(" "));
+            }
+            show_available = false;
+        }
     }
     else
     {

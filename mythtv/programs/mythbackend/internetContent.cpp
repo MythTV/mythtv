@@ -25,10 +25,6 @@
 #include "rssparse.h"
 #include "netgrabbermanager.h"
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-#include "netutils.h"
-#endif
-
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
@@ -119,9 +115,9 @@ void InternetContent::GetInternetSearch( HTTPRequest *pRequest )
 {
     pRequest->m_eResponseType   = ResponseTypeHTML;
 
-    QString grabber =  pRequest->m_mapParams[ "grabber" ];
-    QString query   =  pRequest->m_mapParams[ "query" ];
-    QString page    =  pRequest->m_mapParams[ "page" ];
+    QString grabber =  pRequest->m_mapParams[ "Grabber" ];
+    QString query   =  pRequest->m_mapParams[ "Query" ];
+    QString page    =  pRequest->m_mapParams[ "Page" ];
 
     if (grabber.isEmpty() || query.isEmpty() || page.isEmpty())
         return;
@@ -142,7 +138,6 @@ void InternetContent::GetInternetSearch( HTTPRequest *pRequest )
                 "Command: %1 -p %2 -S '%3'")
             .arg(command).arg(pagenum).arg(query));
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     Search *search = new Search();
     QEventLoop loop;
 
@@ -165,13 +160,6 @@ void InternetContent::GetInternetSearch( HTTPRequest *pRequest )
         return;
 
     pRequest->FormatRawResponse( ret.toString() );
-#else
-# ifndef _MSC_VER
-#  warning InternetContent::GetInternetSearch() not yet ported to Qt5
-# else
-#  pragma message ( "InternetContent::GetInternetSearch() not yet ported to Qt5" )
-# endif
-#endif
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -216,7 +204,7 @@ void InternetContent::GetInternetContent( HTTPRequest *pRequest )
 {
     pRequest->m_eResponseType   = ResponseTypeHTML;
 
-    QString grabber =  pRequest->m_mapParams[ "grabber" ];
+    QString grabber =  pRequest->m_mapParams[ "Grabber" ];
 
     if (grabber.isEmpty())
         return;

@@ -1,5 +1,10 @@
 /*
- * This file is part of libdvdnav, a DVD navigation library.
+ * Copyright (C) 2000, 2001 Håkan Hjort
+ * Copyright (C) 2001 Rich Wareham <richwareham@users.sourceforge.net>
+ *               2002-2004 the dvdnav project
+ *
+ * This file is part of libdvdnav, a DVD navigation library. It is modified
+ * from a file originally part of the Ogle DVD player.
  *
  * libdvdnav is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,16 +21,11 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef LIBDVDNAV_REMAP_H
-#define LIBDVDNAV_REMAP_H
-typedef struct block_s block_t;
+/* Play */
+link_t play_PGC(vm_t *vm);
+link_t play_PGC_PG(vm_t *vm, int pgN);
+link_t play_PGC_post(vm_t *vm);
+link_t play_PG(vm_t *vm);
+link_t play_Cell(vm_t *vm);
+link_t play_Cell_post(vm_t *vm);
 
-typedef struct remap_s remap_t;
-
-remap_t* remap_loadmap( char *title);
-
-unsigned long remap_block(
-	remap_t *map, int domain, int title, int program,
-	unsigned long cblock, unsigned long offset);
-
-#endif /* LIBDVDNAV_REMAP_H */

@@ -502,7 +502,7 @@ const char* MythMediaDevice::MediaTypeString()
 
 const char* MythMediaDevice::MediaTypeString(MythMediaType type)
 {
-    // MythMediaType is currently a bitmask.  This code will only output the 
+    // MythMediaType is currently a bitmask.  This code will only output the
     // first matched type.
 
     if (type == MEDIATYPE_UNKNOWN)
@@ -528,4 +528,3 @@ const char* MythMediaDevice::MediaTypeString(MythMediaType type)
 
     return "MEDIATYPE_UNKNOWN";
 }
-

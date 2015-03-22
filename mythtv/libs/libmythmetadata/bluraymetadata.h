@@ -6,9 +6,10 @@
 #include <QString>
 
 #include "mythtypes.h"
-#include "mythimage.h"
 #include "mythmetaexp.h"
 #include "bluray.h"
+
+class QStringList;
 
 typedef QList< QPair < uint,QString > > BlurayTitles;
 

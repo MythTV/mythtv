@@ -154,26 +154,17 @@ bool FirewireRecorder::ProcessTSPacket(const TSPacket &tspacket)
     if (tspacket.HasAdaptationField())
         GetStreamData()->HandleAdaptationFieldControl(&tspacket);
 
-    if (tspacket.HasPayload())
-    {
-        const unsigned int lpid = tspacket.PID();
+    if (GetStreamData()->IsVideoPID(tspacket.PID()))
+        return ProcessVideoTSPacket(tspacket);
 
-        // Pass or reject packets based on PID, and parse info from them
-        if (lpid == GetStreamData()->VideoPIDSingleProgram())
-        {
-            _buffer_packets = !FindMPEG2Keyframes(&tspacket);
-            BufferedWrite(tspacket);
-        }
-        else if (GetStreamData()->IsAudioPID(lpid))
-        {
-            _buffer_packets = !FindAudioKeyframes(&tspacket);
-            BufferedWrite(tspacket);
-        }
-        else if (GetStreamData()->IsListeningPID(lpid))
-            GetStreamData()->HandleTSTables(&tspacket);
-        else if (GetStreamData()->IsWritingPID(lpid))
-            BufferedWrite(tspacket);
-    }
+    if (GetStreamData()->IsAudioPID(tspacket.PID()))
+        return ProcessAudioTSPacket(tspacket);
+
+    if (GetStreamData()->IsWritingPID(tspacket.PID()))
+        BufferedWrite(tspacket);
+
+    if (GetStreamData()->IsListeningPID(tspacket.PID()) && tspacket.HasPayload())
+        GetStreamData()->HandleTSTables(&tspacket);
 
     return true;
 }

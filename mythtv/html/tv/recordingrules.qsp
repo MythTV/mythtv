@@ -54,6 +54,9 @@ import "/tv/js/tvutil.qjs"
 <link rel="stylesheet" type="text/css" href="/tv/css/category_colors.css">
 <script src="/js/utility.js"></script> <!-- ECMA not JS -->
 <script src="/js/util.qjs"></script>
+<script type="text/javascript" src="/3rdParty/jquery/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="/3rdParty/jquery/jqueryUI/js/jquery-ui-1.10.3.js"></script>
+<script src="/3rdParty/jquery/jqueryJScroll/jquery.jscroll.js"></script>
 <script src="/tv/js/common.js"></script>
 <!-- <script src="/tv/js/recordingrules.js"></script> -->
 </head>
@@ -174,7 +177,7 @@ for (var listIdx = 0; listIdx < recRules.length; listIdx++)
 %>
 
 <% if (nextStartIndex) { %>
-<a class="jscroll-next" href="/tv/recordingrules.qsp?ViewFilter=<%=sort%>&amp;Order=<%=getArg("Order")%>&amp;Start=<%=nextStartIndex%>&amp;ListOnly=1" />
+<a class="jscroll-next" href="/tv/recordingrules.qsp?ViewFilter=<%=sort%>&amp;Order=<%=getArg("Order")%>&amp;Start=<%=nextStartIndex%>&amp;ListOnly=1"></a>
 <%}%>
 
 <% if (!listOnly) {%>
@@ -182,7 +185,7 @@ for (var listIdx = 0; listIdx < recRules.length; listIdx++)
 </div> <!-- End recordingrulesList-container -->
 
 <% if (recRules.length > 0) {%>
-<script>
+<script type="text/javascript" nonce="<%=CSP_NONCE%>">
     loadJScroll();
 </script>
 <%}%>

@@ -16,24 +16,24 @@
 #define TS_SIZE     188
 #define BUFFER_SIZE (512 * TS_SIZE)
 
-QMap<QString,HLSStreamHandler*>  HLSStreamHandler::s_handlers;
-QMap<QString,uint>               HLSStreamHandler::s_handlers_refcnt;
-QMutex                           HLSStreamHandler::s_handlers_lock;
+QMap<QString,HLSStreamHandler*>  HLSStreamHandler::s_hlshandlers;
+QMap<QString,uint>               HLSStreamHandler::s_hlshandlers_refcnt;
+QMutex                           HLSStreamHandler::s_hlshandlers_lock;
 
 HLSStreamHandler* HLSStreamHandler::Get(const IPTVTuningData& tuning)
 {
-    QMutexLocker locker(&s_handlers_lock);
+    QMutexLocker locker(&s_hlshandlers_lock);
 
     QString devkey = tuning.GetDeviceKey();
 
-    QMap<QString,HLSStreamHandler*>::iterator it = s_handlers.find(devkey);
+    QMap<QString,HLSStreamHandler*>::iterator it = s_hlshandlers.find(devkey);
 
-    if (it == s_handlers.end())
+    if (it == s_hlshandlers.end())
     {
         HLSStreamHandler* newhandler = new HLSStreamHandler(tuning);
         newhandler->Start();
-        s_handlers[devkey] = newhandler;
-        s_handlers_refcnt[devkey] = 1;
+        s_hlshandlers[devkey] = newhandler;
+        s_hlshandlers_refcnt[devkey] = 1;
 
         LOG(VB_RECORD, LOG_INFO,
             QString("HLSSH: Creating new stream handler %1 for %2")
@@ -41,25 +41,25 @@ HLSStreamHandler* HLSStreamHandler::Get(const IPTVTuningData& tuning)
     }
     else
     {
-        s_handlers_refcnt[devkey]++;
-        uint rcount = s_handlers_refcnt[devkey];
+        s_hlshandlers_refcnt[devkey]++;
+        uint rcount = s_hlshandlers_refcnt[devkey];
         LOG(VB_RECORD, LOG_INFO,
             QString("HLSSH: Using existing stream handler %1 for %2")
             .arg(devkey).arg(tuning.GetDeviceName()) +
             QString(" (%1 in use)").arg(rcount));
     }
 
-    return s_handlers[devkey];
+    return s_hlshandlers[devkey];
 }
 
 void HLSStreamHandler::Return(HLSStreamHandler* & ref)
 {
-    QMutexLocker locker(&s_handlers_lock);
+    QMutexLocker locker(&s_hlshandlers_lock);
 
     QString devname = ref->_device;
 
-    QMap<QString,uint>::iterator rit = s_handlers_refcnt.find(devname);
-    if (rit == s_handlers_refcnt.end())
+    QMap<QString,uint>::iterator rit = s_hlshandlers_refcnt.find(devname);
+    if (rit == s_hlshandlers_refcnt.end())
         return;
 
     LOG(VB_RECORD, LOG_INFO, QString("HLSSH: Return(%1) has %2 handlers")
@@ -72,8 +72,8 @@ void HLSStreamHandler::Return(HLSStreamHandler* & ref)
         return;
     }
 
-    QMap<QString,HLSStreamHandler*>::iterator it = s_handlers.find(devname);
-    if ((it != s_handlers.end()) && (*it == ref))
+    QMap<QString,HLSStreamHandler*>::iterator it = s_hlshandlers.find(devname);
+    if ((it != s_hlshandlers.end()) && (*it == ref))
     {
         LOG(VB_RECORD, LOG_INFO, QString("HLSSH: Closing handler for %1")
                            .arg(devname));
@@ -81,7 +81,7 @@ void HLSStreamHandler::Return(HLSStreamHandler* & ref)
         LOG(VB_RECORD, LOG_DEBUG, QString("HLSSH: handler for %1 stopped")
             .arg(devname));
         delete *it;
-        s_handlers.erase(it);
+        s_hlshandlers.erase(it);
     }
     else
     {
@@ -90,7 +90,7 @@ void HLSStreamHandler::Return(HLSStreamHandler* & ref)
                 .arg(devname));
     }
 
-    s_handlers_refcnt.erase(rit);
+    s_hlshandlers_refcnt.erase(rit);
     ref = NULL;
 }
 

@@ -12,10 +12,9 @@
 #include <unistd.h>
 
 #include "mythbaseexp.h"  //  MBASE_PUBLIC , etc.
-#include "mthread.h"
 
 #ifdef _WIN32
-// Quick fix to let this compile for Windows:  we have it disabled on the 
+// Quick fix to let this compile for Windows:  we have it disabled on the
 // calling side for Windows anyways, IIRC.
 typedef void siginfo_t;
 #endif

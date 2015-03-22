@@ -69,6 +69,7 @@ Eventing::Eventing(const QString &sExtensionName,
     m_pInitializeSubscriber(NULL)
 {
     m_sEventMethodName.detach();
+    m_nSupportedMethods |= (RequestTypeSubscribe | RequestTypeUnsubscribe);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -199,10 +200,10 @@ void Eventing::HandleSubscribe( HTTPRequest *pRequest )
     pRequest->m_eResponseType   = ResponseTypeXML;
     pRequest->m_nResponseStatus = 412;
 
-    QString sCallBack = pRequest->GetHeaderValue( "CALLBACK", "" );
-    QString sNT       = pRequest->GetHeaderValue( "NT"      , "" );
-    QString sTimeout  = pRequest->GetHeaderValue( "TIMEOUT"  , "" );
-    QString sSID      = pRequest->GetHeaderValue( "SID"     , "" );
+    QString sCallBack = pRequest->GetRequestHeader( "CALLBACK", "" );
+    QString sNT       = pRequest->GetRequestHeader( "NT"      , "" );
+    QString sTimeout  = pRequest->GetRequestHeader( "TIMEOUT"  , "" );
+    QString sSID      = pRequest->GetRequestHeader( "SID"     , "" );
 
     SubscriberInfo *pInfo = NULL;
 
@@ -298,9 +299,9 @@ void Eventing::HandleUnsubscribe( HTTPRequest *pRequest )
     pRequest->m_eResponseType   = ResponseTypeXML;
     pRequest->m_nResponseStatus = 412;
 
-    QString sCallBack = pRequest->GetHeaderValue( "CALLBACK", "" );
-    QString sNT       = pRequest->GetHeaderValue( "NT"      , "" );
-    QString sSID      = pRequest->GetHeaderValue( "SID"     , "" );
+    QString sCallBack = pRequest->GetRequestHeader( "CALLBACK", "" );
+    QString sNT       = pRequest->GetRequestHeader( "NT"      , "" );
+    QString sSID      = pRequest->GetRequestHeader( "SID"     , "" );
 
     if ((sCallBack.length() != 0) || (sNT.length() != 0))     
     {

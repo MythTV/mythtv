@@ -58,7 +58,7 @@ class Scheduler : public MThread, public MythScheduler
 
     void UpdateRecStatus(RecordingInfo *pginfo);
     void UpdateRecStatus(uint cardid, uint chanid,
-                         const QDateTime &startts, RecStatusType recstatus,
+                         const QDateTime &startts, RecStatus::Type recstatus,
                          const QDateTime &recendts);
     // Returns a list of all pending recordings and returns
     // true iff there are conflicts
@@ -81,7 +81,7 @@ class Scheduler : public MThread, public MythScheduler
     void PrintList(bool onlyFutureRecordings = false)
         { PrintList(reclist, onlyFutureRecordings); };
     void PrintList(RecList &list, bool onlyFutureRecordings = false);
-    void PrintRec(const RecordingInfo *p, const QString prefix = "");
+    void PrintRec(const RecordingInfo *p, const QString &prefix = "");
 
     void SetMainServer(MainServer *ms);
 
@@ -95,7 +95,7 @@ class Scheduler : public MThread, public MythScheduler
 
     bool WasStartedAutomatically();
 
-    RecStatusType GetRecStatus(const ProgramInfo &pginfo);
+    RecStatus::Type GetRecStatus(const ProgramInfo &pginfo);
 
     int GetError(void) const { return error; }
 
@@ -190,7 +190,7 @@ class Scheduler : public MThread, public MythScheduler
                          QDateTime &nextStartTime, QDateTime &nextWakeTime,
                          int prerollseconds);
     void HandleRecordingStatusChange(
-        RecordingInfo &ri, RecStatusTypes recStatus, const QString &details);
+        RecordingInfo &ri, RecStatus::Type recStatus, const QString &details);
     void HandleIdleShutdown(
         bool &blockShutdown, QDateTime &idleSince, int prerollseconds,
         int idleTimeoutSecs, int idleWaitForRecordingTime,

@@ -31,6 +31,7 @@ using namespace std;
 #include "avformatdecoder.h"
 #include "subtitlescreen.h"
 #include "srtwriter.h"
+#include "iso639.h"
 
 
 const int OneSubtitle::kDefaultLength = 750; /* ms */
@@ -694,12 +695,13 @@ void MythCCExtractorPlayer::IngestDVBSubtitles(void)
                 }
             }
             painter.end();
-            (*subit).reader->FreeAVSubtitle(subtitle);
 
             OneSubtitle sub;
             sub.start_time = subtitle.start_display_time;
             sub.length =
                 subtitle.end_display_time - subtitle.start_display_time;
+
+            (*subit).reader->FreeAVSubtitle(subtitle);
 
             if (min_x < max_x && min_y < max_y)
             {

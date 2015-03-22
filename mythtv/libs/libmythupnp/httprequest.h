@@ -18,8 +18,9 @@
 #include <QBuffer>
 #include <QTextStream>
 #include <QTcpSocket>
+#include <QDateTime>
 
-using namespace std;
+#include "mythsession.h"
 
 #include "upnpexp.h"
 #include "upnputil.h"
@@ -38,14 +39,22 @@ using namespace std;
 typedef enum 
 {
     RequestTypeUnknown      = 0x0000,
+    // HTTP 1.1
     RequestTypeGet          = 0x0001,
     RequestTypeHead         = 0x0002,
     RequestTypePost         = 0x0004,
-    RequestTypeMSearch      = 0x0008,
-    RequestTypeSubscribe    = 0x0010,
-    RequestTypeUnsubscribe  = 0x0020,
-    RequestTypeNotify       = 0x0040,
-    RequestTypeResponse     = 0x0080
+//     RequestTypePut          = 0x0008,
+//     RequestTypeDelete       = 0x0010,
+//     RequestTypeConnect      = 0x0020,
+    RequestTypeOptions      = 0x0040,
+//     RequestTypeTrace        = 0x0080, // SECURITY: XST attack risk, shouldn't include cookies or other sensitive info
+    // UPnP
+    RequestTypeMSearch      = 0x0100,
+    RequestTypeSubscribe    = 0x0200,
+    RequestTypeUnsubscribe  = 0x0400,
+    RequestTypeNotify       = 0x0800,
+    // Not a request type
+    RequestTypeResponse     = 0x1000
 
 } RequestType;                
 
@@ -68,10 +77,10 @@ typedef enum
     ResponseTypeText     =  5,
     ResponseTypeSVG      =  6,
     ResponseTypeFile     =  7,
-    ResponseTypeOther    =  8
+    ResponseTypeOther    =  8,
+    ResponseTypeHeader   =  9
 
 } ResponseType;
-
 
 typedef struct
 {
@@ -107,14 +116,16 @@ class UPNP_PUBLIC HTTPRequest
         RequestType         m_eType;
         ContentType         m_eContentType;
 
-        QString             m_sRawRequest;
+        QString             m_sRawRequest; // e.g. GET /foo/bar.html HTTP/1.1
 
-        QString             m_sBaseUrl;
-        QString             m_sResourceUrl;
+        QString             m_sRequestUrl; // Raw request URL
+        QString             m_sBaseUrl; // Path section of URL, without parameters
+        QString             m_sResourceUrl; // Duplicate of Base URL!?
         QString             m_sMethod;
 
         QStringMap          m_mapParams;
         QStringMap          m_mapHeaders;
+        QStringMap          m_mapCookies;
 
         QString             m_sPayload;
 
@@ -123,6 +134,7 @@ class UPNP_PUBLIC HTTPRequest
         int                 m_nMinor;
 
         bool                m_bProtected;
+        bool                m_bEncrypted;
 
         bool                m_bSOAPRequest;
         QString             m_sNameSpace;
@@ -141,6 +153,9 @@ class UPNP_PUBLIC HTTPRequest
 
         IPostProcess       *m_pPostProcess;
 
+        QString             m_sPrivateToken;
+        MythUserSession     m_userSession;
+
     private:
 
         bool                m_bKeepAlive;
@@ -152,15 +167,13 @@ class UPNP_PUBLIC HTTPRequest
         void            SetRequestProtocol  ( const QString &sLine  );
         ContentType     SetContentType      ( const QString &sType  );
 
-        void            SetServerHeaders    ( void );
-
         void            ProcessRequestLine  ( const QString &sLine  );
         bool            ProcessSOAPPayload  ( const QString &sSOAPAction );
-        void            ExtractMethodFromURL( );
+        void            ExtractMethodFromURL( ); // Service method, not HTTP method
 
         QString         GetResponseStatus   ( void );
         QString         GetResponseType     ( void );
-        QString         GetAdditionalHeaders( void );
+        QString         GetResponseHeaders  ( void );
 
         bool            ParseRange          ( QString sRange, 
                                               long long   llSize, 
@@ -169,13 +182,22 @@ class UPNP_PUBLIC HTTPRequest
 
         bool            ParseKeepAlive      ( void );
 
+        void            ParseCookies        ( void );
+
         QString         BuildResponseHeader ( long long nSize );
 
         qint64          SendData            ( QIODevice *pDevice, qint64 llStart, qint64 llBytes );
         qint64          SendFile            ( QFile &file, qint64 llStart, qint64 llBytes );
 
-        bool            IsUrlProtected      ( const QString &sBaseUrl );
+        bool            IsProtected         () const { return m_bProtected; }
+        bool            IsEncrypted         () const { return m_bEncrypted; }
         bool            Authenticated       ();
+
+        QString         GetAuthenticationHeader (bool isStale = false);
+        QString         CalculateDigestNonce ( const QString &timeStamp);
+
+        bool            BasicAuthentication ();
+        bool            DigestAuthentication ();
 
     public:
         
@@ -196,7 +218,15 @@ class UPNP_PUBLIC HTTPRequest
         qint64          SendResponse    ( void );
         qint64          SendResponseFile( QString sFileName );
 
-        QString         GetHeaderValue  ( const QString &sKey, QString sDefault );
+        void            SetResponseHeader ( const QString &sKey,
+                                            const QString &sValue,
+                                            bool replace = false );
+
+        void            SetCookie ( const QString &sKey, const QString &sValue,
+                                    const QDateTime &dtExpires,
+                                    bool secure );
+
+        QString         GetRequestHeader  ( const QString &sKey, QString sDefault );
 
         bool            GetKeepAlive () { return m_bKeepAlive; }
 
@@ -204,6 +234,8 @@ class UPNP_PUBLIC HTTPRequest
 
         QString         GetRequestProtocol  () const;
         QString         GetResponseProtocol () const;
+
+        QString         GetRequestType () const;
 
         static QString  GetMimeType     ( const QString &sFileExtension );
         static QStringList GetSupportedMimeTypes ();
@@ -215,15 +247,19 @@ class UPNP_PUBLIC HTTPRequest
 
         void            SetKeepAliveTimeout ( int nTimeout ) { m_nKeepAliveTimeout = nTimeout; }
 
+        bool            IsUrlProtected      ( const QString &sBaseUrl );
+
         // ------------------------------------------------------------------
 
         virtual QString ReadLine        ( int msecs ) = 0;
         virtual qint64  ReadBlock       ( char *pData, qint64 nMaxLen, int msecs = 0 ) = 0;
         virtual qint64  WriteBlock      ( const char *pData,
                                           qint64 nLen    ) = 0;
-        virtual QString GetHostAddress  () = 0;
-        virtual QString GetPeerAddress  () = 0;
-        virtual int     getSocketHandle () = 0;
+        virtual QString  GetHostName     ();  // RFC 3875 - The name in the client request
+        virtual QString  GetHostAddress  () = 0;
+        virtual quint16  GetHostPort     () = 0;
+        virtual QString  GetPeerAddress  () = 0;
+        virtual int      getSocketHandle () = 0;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -241,12 +277,13 @@ class BufferedSocketDeviceRequest : public HTTPRequest
                  BufferedSocketDeviceRequest( QTcpSocket *pSocket );
         virtual ~BufferedSocketDeviceRequest() {};
 
-        virtual QString ReadLine        ( int msecs );
-        virtual qint64  ReadBlock       ( char *pData, qint64 nMaxLen, int msecs = 0  );
-        virtual qint64  WriteBlock      ( const char *pData, qint64 nLen    );
-        virtual QString GetHostAddress  ();
-        virtual QString GetPeerAddress  ();
-        virtual int     getSocketHandle () {return( m_pSocket->socketDescriptor() ); }
+        virtual QString  ReadLine        ( int msecs );
+        virtual qint64   ReadBlock       ( char *pData, qint64 nMaxLen, int msecs = 0  );
+        virtual qint64   WriteBlock      ( const char *pData, qint64 nLen    );
+        virtual QString  GetHostAddress  ();
+        virtual quint16  GetHostPort     ();
+        virtual QString  GetPeerAddress  ();
+        virtual int      getSocketHandle () {return( m_pSocket->socketDescriptor() ); }
 
 };
 

@@ -11,12 +11,12 @@
 
         <shape name="blackout">
             <type>box</type>
-            <fill style="solid" color="black"></fill>
+            <fill style="solid" color="#000000"></fill>
         </shape>
 
         <imagetype name="preview">
             <filename>preview.png</filename>
-            <preserveaspect>FALSE</preserveaspect>
+            <preserveaspect>false</preserveaspect>
         </imagetype>
 
         <textarea name="part">

@@ -3,10 +3,10 @@
 
 #include <QWidget>
 
-#include "mythuiactions.h"
-#include "mythuitype.h"
 #include "mythscreenstack.h"
 #include "mythnotificationcenter.h"
+#include "mythuiactions.h"
+#include "mythrect.h"
 
 class QEvent;
 

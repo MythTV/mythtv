@@ -19,6 +19,7 @@
 #include "plist.h"
 #include "tv_play.h"
 #include "mythmainwindow.h"
+#include "tv_actions.h"
 
 #include "bonjourregister.h"
 #include "mythairplayserver.h"
@@ -49,7 +50,7 @@ QMutex*            MythAirplayServer::gMythAirplayServerMutex = new QMutex(QMute
 "<key>protovers</key>\r\n"\
 "<string>1.0</string>\r\n"\
 "<key>srcvers</key>\r\n"\
-"<string>"AIRPLAY_SERVER_VERSION_STR"</string>\r\n"\
+"<string>" AIRPLAY_SERVER_VERSION_STR "</string>\r\n"\
 "</dict>\r\n"\
 "</plist>\r\n")
 

@@ -15,6 +15,7 @@ using namespace std;
 #include <QPaintEvent>
 #include <QPainter>
 #include <QProgressBar>
+#include <QAbstractButton>
 
 #ifdef QWS
 #include <qwindowsystem_qws.h>
@@ -28,6 +29,7 @@ using namespace std;
 #include "mythuihelper.h"
 #include "mythlogging.h"
 #include "mythcorecontext.h"
+#include "mythmainwindow.h"
 
 #ifdef _WIN32
 #undef LoadImage

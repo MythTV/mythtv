@@ -19,6 +19,7 @@ using namespace std;
 #include "channelutil.h"
 #include "mythuiguidegrid.h"
 #include "mthreadpool.h"
+#include "tv_play.h"
 
 // mythfrontend
 #include "schedulecommon.h"
@@ -26,7 +27,6 @@ using namespace std;
 using namespace std;
 
 class ProgramInfo;
-class TV;
 class QTimer;
 class MythUIButtonList;
 class MythUIGuideGrid;

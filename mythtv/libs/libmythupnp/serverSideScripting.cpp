@@ -14,9 +14,11 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QVariant>
+#include <QVariantMap>
 
 #include "serverSideScripting.h"
 #include "mythlogging.h"
+#include <mythsession.h>
 #include "httpserver.h"
 
 QScriptValue formatStr(QScriptContext *context, QScriptEngine *interpreter);
@@ -151,7 +153,7 @@ ScriptInfo *ServerSideScripting::GetLoadedScript( const QString &sFileName )
 //////////////////////////////////////////////////////////////////////////////
 
 bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &sFileName,
-                                        HTTPRequest *pRequest)
+                                        HTTPRequest *pRequest, const QByteArray &cspToken)
 {
     try
     {
@@ -282,13 +284,36 @@ bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &
         }
 
         // ------------------------------------------------------------------
+        // Build array of cookies
+        // ------------------------------------------------------------------
+
+        QStringMap mapCookies = pRequest->m_mapCookies;
+
+        QVariantMap requestCookies;
+        for (it = mapCookies.begin(); it != mapCookies.end(); ++it)
+        {
+            QString key = it.key();
+            key = key.replace('-', '_'); // May be other valid chars in a request header that we need to replace
+            QVariant value = QVariant(it.value());
+
+            if (!validChars.exactMatch(key)) // Discard anything that isn't valid for now
+                continue;
+
+            requestCookies.insert(key, value);
+        }
+
+        // ------------------------------------------------------------------
         // Build array of information from the server e.g. client IP
         // See RFC 3875 - The Common Gateway Interface
         // ------------------------------------------------------------------
 
         QVariantMap serverVars;
+        //serverVars.insert("QUERY_STRING", QVariant())
+        serverVars.insert("REQUEST_METHOD", QVariant(pRequest->GetRequestType()));
+        serverVars.insert("SCRIPT_NAME", QVariant(sFileName));
         serverVars.insert("REMOTE_ADDR", QVariant(pRequest->GetPeerAddress()));
-        serverVars.insert("SERVER_ADDR", QVariant(pRequest->GetHostAddress()));
+        serverVars.insert("SERVER_NAME", QVariant(pRequest->GetHostName()));
+        serverVars.insert("SERVER_PORT", QVariant(pRequest->GetHostPort()));
         serverVars.insert("SERVER_PROTOCOL", QVariant(pRequest->GetRequestProtocol()));
         serverVars.insert("SERVER_SOFTWARE", QVariant(HttpServer::GetServerVersion()));
 
@@ -318,6 +343,23 @@ bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &
         }
 
         // ------------------------------------------------------------------
+        // User Session information
+        //
+        // SECURITY
+        // The session token and password digest are considered sensitive on
+        // unencrypted connections and therefore must never be included in the
+        // HTML. An intercepted session token or password digest can be used
+        // to login or hijack an existing session.
+        // ------------------------------------------------------------------
+        MythUserSession session = pRequest->m_userSession;
+        QVariantMap sessionVars;
+        sessionVars.insert("username", session.GetUserName());
+        sessionVars.insert("userid", session.GetUserId());
+        sessionVars.insert("created", session.GetSessionCreated());
+        sessionVars.insert("lastactive", session.GetSessionLastActive());
+        sessionVars.insert("expires", session.GetSessionExpires());
+
+        // ------------------------------------------------------------------
         // Add the arrays (objects) we've just created to the global scope
         // They may be accessed as 'Server.REMOTE_ADDR'
         // ------------------------------------------------------------------
@@ -326,8 +368,16 @@ bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &
                                             m_engine.toScriptValue(params));
         m_engine.globalObject().setProperty("RequestHeaders",
                                             m_engine.toScriptValue(requestHeaders));
+        QVariantMap respHeaderMap;
+        m_engine.globalObject().setProperty("ResponseHeaders",
+                                            m_engine.toScriptValue(respHeaderMap));
         m_engine.globalObject().setProperty("Server",
                                             m_engine.toScriptValue(serverVars));
+        m_engine.globalObject().setProperty("Session",
+                                            m_engine.toScriptValue(sessionVars));
+        QScriptValue qsCspToken = m_engine.toScriptValue(cspToken);
+        m_engine.globalObject().setProperty("CSP_NONCE", qsCspToken);
+
 
         // ------------------------------------------------------------------
         // Execute function to render output
@@ -374,6 +424,16 @@ bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &
 
         Unlock();
         return false;
+    }
+
+    // Apply any custom headers defined by the script
+    QVariantMap responseHeaders;
+    responseHeaders = m_engine.fromScriptValue< QVariantMap >
+                        (m_engine.globalObject().property("ResponseHeaders"));
+    QVariantMap::iterator it;
+    for (it = responseHeaders.begin(); it != responseHeaders.end(); ++it)
+    {
+        pRequest->SetResponseHeader(it.key(), it.value().toString(), true);
     }
 
     return true;

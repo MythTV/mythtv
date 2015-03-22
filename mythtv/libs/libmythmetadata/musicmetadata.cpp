@@ -1,3 +1,6 @@
+
+#include "musicmetadata.h"
+
 // qt
 #include <QApplication>
 #include <QRegExp>
@@ -6,21 +9,22 @@
 #include <QScopedPointer>
 
 // mythtv
-#include <mythcontext.h>
-#include <mythwidgets.h>
-#include <mythdate.h>
-#include <mythdb.h>
-#include <mythdirs.h>
-#include <mythprogressdialog.h>
-#include <mythdownloadmanager.h>
-#include <mythlogging.h>
-#include <mythdate.h>
-#include <remotefile.h>
-#include <storagegroup.h>
-#include <mythsystem.h>
+#include "mythcontext.h"
+#include "mythdate.h"
+#include "mythdb.h"
+#include "mythdirs.h"
+#include "mythdownloadmanager.h"
+#include "mythlogging.h"
+#include "mythdate.h"
+#include "remotefile.h"
+#include "storagegroup.h"
+#include "mythsystem.h"
+
+// libmythui
+#include "mythprogressdialog.h"
+#include "mythmainwindow.h"
 
 // libmythmetadata
-#include "musicmetadata.h"
 #include "metaio.h"
 #include "metaioid3.h"
 #include "metaiomp4.h"
@@ -29,6 +33,8 @@
 #include "metaioflacvorbis.h"
 #include "metaiowavpack.h"
 #include "musicutils.h"
+
+using namespace std;
 
 static QString thePrefix = "the ";
 

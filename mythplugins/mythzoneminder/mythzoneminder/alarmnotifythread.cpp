@@ -43,25 +43,27 @@ void AlarmNotifyThread::run()
     while (!m_stop)
     {
         // get the alarm status for all monitors
-        ZMClient::get()->updateAlarmStates();
-
-        for (int x = 0; x < ZMClient::get()->getMonitorCount(); x++)
+        if (ZMClient::get()->connected() && ZMClient::get()->updateAlarmStates())
         {
-            Monitor *mon = ZMClient::get()->getMonitorAt(x);
-
-            if (mon->state == ALERT || mon->state == ALARM)
+            // at least one monitor changed state
+            for (int x = 0; x < ZMClient::get()->getMonitorCount(); x++)
             {
-                // have notifications been turned on for this monitor?
-                if (mon->showNotifications)
+                Monitor *mon = ZMClient::get()->getMonitorAt(x);
+
+                if (mon->previousState != mon->state && (mon->state == ALARM || (mon->state == ALERT && mon->previousState != ALARM)))
                 {
-                    // we can't show a popup from the AlarmNotifyThread so send
-                    // a message to ZMClient to do it for us
-                    gCoreContext->dispatch(MythEvent(QString("ZONEMINDER_NOTIFICATION %1").arg(mon->id)));
+                    // have notifications been turned on for this monitor?
+                    if (mon->showNotifications)
+                    {
+                        // we can't show a popup from the AlarmNotifyThread so send
+                        // a message to ZMClient to do it for us
+                        gCoreContext->dispatch(MythEvent(QString("ZONEMINDER_NOTIFICATION %1").arg(mon->id)));
+                    }
                 }
             }
         }
 
-        usleep(1000000);
+        usleep(999999);
     }
 
     RunEpilog();

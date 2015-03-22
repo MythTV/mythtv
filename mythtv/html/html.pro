@@ -10,9 +10,9 @@ win32:QMAKE_COPY_DIR = sh ./cpsimple
 win32-msvc*:QMAKE_COPY_DIR = 
 
 html.path = $${PREFIX}/share/mythtv/html/
-html.files = index.html overview.html menu.qsp
+html.files = frontend_index.qsp backend_index.qsp overview.html menu.qsp robots.txt
 html.files += css images js misc setup samples tv
-html.files += 3rdParty xslt video
+html.files += 3rdParty xslt video debug
 
 INSTALLS += html
 

@@ -7,8 +7,8 @@
 
 #include "mythexp.h"
 #include "dbutil.h"
-#include "mythmainwindow.h"
-#include "mythprogressdialog.h"
+
+class MythUIBusyDialog;
 
 /// Return values from PromptForUpgrade()
 enum MythSchemaUpgrade

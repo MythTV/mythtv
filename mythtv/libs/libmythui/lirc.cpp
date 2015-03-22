@@ -375,7 +375,13 @@ void LIRC::Process(const QByteArray &data)
         }
 
         vector<LircKeycodeEvent*> keyReleases;
-        for (unsigned int i = 0; i < a.count(); i++)
+
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+        unsigned int i;
+#else
+        int i;
+#endif
+        for (i = 0; i < a.count(); i++)
         {
             int keycode = a[i];
             Qt::KeyboardModifiers mod = Qt::NoModifier;

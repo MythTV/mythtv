@@ -1,32 +1,32 @@
+
+#include "progfind.h"
+
 // Qt
 #include <QDateTime>
 #include <QCoreApplication>
 #include <QStringList>
-#include <QRegExp>
-#include <QKeyEvent>
 #include <QEvent>
+#include <QList>                        // for QList
+#include <QRect>                        // for QRect
 
 // MythTV
 #include "mythdb.h"
 #include "mythdbcon.h"
-#include "mythdirs.h"
 #include "mythcorecontext.h"
-#include "recordinginfo.h"
-#include "tv.h"
+#include "programtypes.h"               // for RecStatus
+#include "tv_play.h"
+#include "tv_actions.h"                 // for ACTION_CHANNELSEARCH
 
 // MythUI
 #include "mythuitext.h"
 #include "mythuibuttonlist.h"
 #include "mythuibutton.h"
-#include "mythuihelper.h"
 #include "mythscreenstack.h"
 #include "mythmainwindow.h"
+#include "mythuiutils.h"                // for UIUtilE, UIUtilW
 
 // mythfrontend
 #include "guidegrid.h"
-#include "mythplayer.h"
-#include "mythplayer.h"
-#include "progfind.h"
 
 #define LOC      QString("ProgFinder: ")
 #define LOC_ERR  QString("ProgFinder, Error: ")
@@ -461,7 +461,7 @@ void ProgFinder::updateTimesList()
             m_showData[i]->ToMap(infoMap);
             item->SetTextFromMap(infoMap);
 
-            QString state = toUIState(m_showData[i]->GetRecordingStatus());
+            QString state = RecStatus::toUIState(m_showData[i]->GetRecordingStatus());
             item->SetText(itemText, "buttontext", state);
             item->DisplayState(state, "status");
         }

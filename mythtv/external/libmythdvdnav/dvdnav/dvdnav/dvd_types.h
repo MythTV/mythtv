@@ -26,6 +26,8 @@
 #ifndef LIBDVDNAV_DVD_TYPES_H
 #define LIBDVDNAV_DVD_TYPES_H
 
+#include <stdint.h>
+
 /*
  * DVD Menu ID
  * (see dvdnav_menu_call())
@@ -42,6 +44,13 @@ typedef enum {
   DVD_MENU_Part       = 7
 } DVDMenuID_t;
 
+/* Domain */
+typedef enum {
+  DVD_DOMAIN_FirstPlay = 1,  /* First Play Domain */
+  DVD_DOMAIN_VTSTitle  = 2,  /* Video Title Set Domain */
+  DVD_DOMAIN_VMGM      = 4,  /* Video Manager Domain */
+  DVD_DOMAIN_VTSMenu   = 8   /* Video Title Set Menu Domain */
+} DVDDomain_t;
 
 /*
  * Structure containing info on highlight areas
@@ -49,13 +58,25 @@ typedef enum {
  */
 typedef struct {
   uint32_t palette;     /* The CLUT entries for the highlight palette
-			   (4-bits per entry -> 4 entries) */
+                           (4-bits per entry -> 4 entries) */
   uint16_t sx,sy,ex,ey; /* The start/end x,y positions */
   uint32_t pts;         /* Highlight PTS to match with SPU */
 
   /* button number for the SPU decoder/overlaying engine */
   uint32_t buttonN;
 } dvdnav_highlight_area_t;
+
+/* The audio format */
+typedef enum {
+  DVD_AUDIO_FORMAT_AC3        = 0,
+  DVD_AUDIO_FORMAT_UNKNOWN_1  = 1,
+  DVD_AUDIO_FORMAT_MPEG       = 2,
+  DVD_AUDIO_FORMAT_MPEG2_EXT  = 3,
+  DVD_AUDIO_FORMAT_LPCM       = 4,
+  DVD_AUDIO_FORMAT_UNKNOWN_5  = 5,
+  DVD_AUDIO_FORMAT_DTS        = 6,
+  DVD_AUDIO_FORMAT_SDDS       = 7
+} DVDAudioFormat_t;
 
 /*
  * Button groups to identify the correct highlight areas
@@ -72,15 +93,6 @@ typedef enum {
 /* the following types are currently unused */
 
 #if 0
-
-/* Domain */
-typedef enum {
-  DVD_DOMAIN_FirstPlay,  /* First Play Domain */
-  DVD_DOMAIN_VMG,        /* Video Manager Domain */
-  DVD_DOMAIN_VTSMenu,    /* Video Title Set Menu Domain */
-  DVD_DOMAIN_VTSTitle,   /* Video Title Set Domain */
-  DVD_DOMAIN_Stop        /* Stop Domain */
-} DVDDomain_t;
 
 /* User operation permissions */
 typedef enum {
@@ -168,19 +180,6 @@ typedef enum {
   DVD_AUDIO_APP_MODE_Surround = 2,
   DVD_AUDIO_APP_MODE_Other    = 3
 } DVDAudioAppMode_t;
-
-/* The audio format */
-typedef enum {
-  DVD_AUDIO_FORMAT_AC3       = 0,
-  DVD_AUDIO_FORMAT_MPEG1     = 1,
-  DVD_AUDIO_FORMAT_MPEG1_DRC = 2,
-  DVD_AUDIO_FORMAT_MPEG2     = 3,
-  DVD_AUDIO_FORMAT_MPEG2_DRC = 4,
-  DVD_AUDIO_FORMAT_LPCM      = 5,
-  DVD_AUDIO_FORMAT_DTS       = 6,
-  DVD_AUDIO_FORMAT_SDDS      = 7,
-  DVD_AUDIO_FORMAT_Other     = 8
-} DVDAudioFormat_t;
 
 /* Audio language extension */
 typedef enum {

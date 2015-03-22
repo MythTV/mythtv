@@ -55,6 +55,9 @@ using namespace std;
 #include "mythudplistener.h"
 #include "mythrender_base.h"
 #include "mythuistatetracker.h"
+#include "mythuiactions.h"
+#include "mythrect.h"
+#include "mythuidefines.h"
 
 #ifdef USING_APPLEREMOTE
 #include "AppleRemoteListener.h"
@@ -2123,7 +2126,10 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
             if (!d->gesture.recording())
             {
                 d->gesture.start();
-                d->gesture.record(dynamic_cast<QMouseEvent*>(e)->pos());
+                QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent*>(e);
+                if (!mouseEvent)
+                    return false;
+                d->gesture.record(mouseEvent->pos());
 
                 /* start a single shot timer */
                 d->gestureTimer->start(GESTURE_TIMEOUT);
