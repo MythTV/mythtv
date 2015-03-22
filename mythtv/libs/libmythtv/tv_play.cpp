@@ -3850,39 +3850,57 @@ bool TV::TranslateGesture(const QString &context,
         if ((e->gesture() == MythGestureEvent::Click) &&
             (e->GetButton() == MythGestureEvent::LeftButton))
         {
-            // divide screen into 9 regions
+            // divide screen into 12 regions
             QSize size = GetMythMainWindow()->size();
             QPoint pos = e->GetPosition();
             int region = 0;
-            int w3 = size.width() / 3;
-            if (pos.x() >= w3)
-                region++;
-            if (pos.x() >= w3 * 2)
-                region++;
+            const int widthDivider = 4;
+            int w4 = size.width() / widthDivider;
+            region = pos.x() / w4;
             int h3 = size.height() / 3;
-            if (pos.y() >= h3)
-                region += 3;
-            if (pos.y() >= h3 * 2)
-                region += 3;
+            region += (pos.y() / h3) * widthDivider;
 
-            // region is now 0..8
-            //  0 1 2
-            //  3 4 5
-            //  6 7 8
+            // region is now 0..11
+            //  0  1  2  3
+            //  4  5  6  7
+            //  8  9  10 11
             // should be inited in the constructor eventually
+#if 1
+            QList<QKeyEvent> regionKeyList =
+            {
+                /*  0 */ {QEvent::None, Qt::Key_P, Qt::NoModifier},
+                /*  1 */ {QEvent::None, Qt::Key_Up, Qt::NoModifier},
+                /*  2 */ {QEvent::None, Qt::Key_Z, Qt::NoModifier},
+                /*  3 */ {QEvent::None, Qt::Key_BracketLeft, Qt::NoModifier},
+                /*  4 */ {QEvent::None, Qt::Key_Left, Qt::NoModifier},
+                /*  5 */ {QEvent::None, Qt::Key_Return, Qt::NoModifier},
+                /*  6 */ {QEvent::None, Qt::Key_Return, Qt::NoModifier},
+                /*  7 */ {QEvent::None, Qt::Key_Right, Qt::NoModifier},
+                /*  8 */ {QEvent::None, Qt::Key_A, Qt::NoModifier},
+                /*  9 */ {QEvent::None, Qt::Key_Down, Qt::NoModifier},
+                /* 10 */ {QEvent::None, Qt::Key_Q, Qt::NoModifier},
+                /* 11 */ {QEvent::None, Qt::Key_BracketRight, Qt::NoModifier},
+            };
+            return GetMythMainWindow()->TranslateKeyPress(
+                    context, &(regionKeyList[region]), actions, true);
+#else
             QStringList regionActionList =
             {
                 /* 0 */ "PAUSE",
-                /* 1 */ "UP",
-                /* 2 */ "VOLUMEUP",
-                /* 3 */ "LEFT",
-                /* 4 */ "SELECT",
-                /* 5 */ "RIGHT",
-                /* 6 */ "ADJUSTSTRETCH",
-                /* 7 */ "DOWN",
-                /* 8 */ "VOLUMEDOWN",
+                /* 1 */ "CHANNELUP",
+                /* 2 */ "SKIPCOMMERCIAL",
+                /* 3 */ "VOLUMEUP",
+                /* 4 */ "SEEKRWND",
+                /* 5 */ "SELECT",
+                /* 6 */ "SELECT",
+                /* 7 */ "SEEKFFWD",
+                /* 8 */ "ADJUSTSTRETCH",
+                /* 9 */ "CHANNELDOWN",
+                /* 10 */ "SKIPCOMMBACK",
+                /* 11 */ "VOLUMEDOWN",
             };
             actions.append(regionActionList[region]);
+#endif
         }
         return false;
     }
