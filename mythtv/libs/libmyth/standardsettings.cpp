@@ -1,5 +1,7 @@
 #include "standardsettings.h"
+#include <QApplication>
 #include <QCoreApplication>
+#include <QThread>
 
 #include <mythcontext.h>
 #include <mythmainwindow.h>
@@ -208,6 +210,22 @@ void StandardSetting::setName(const QString &name)
 StandardSetting* StandardSetting::byName(const QString &name)
 {
     return (name == m_name) ? this : NULL;
+}
+
+void StandardSetting::MoveToThread(QThread *thread)
+{
+    moveToThread(thread);
+
+    QList<StandardSetting *>::const_iterator i;
+    for (i = m_children.constBegin(); i != m_children.constEnd(); ++i)
+        (*i)->MoveToThread(thread);
+
+    QMap<QString, QList<StandardSetting *> >::const_iterator iMap;
+    for (iMap = m_targets.constBegin(); iMap != m_targets.constEnd(); ++iMap)
+    {
+        for (i = (*iMap).constBegin(); i != (*iMap).constEnd(); ++i)
+            (*i)->MoveToThread(thread);
+    }
 }
 
 /******************************************************************************
@@ -740,7 +758,10 @@ void StandardSettingDialog::customEvent(QEvent *event)
 void StandardSettingDialog::Load(void)
 {
     if (m_settingsTree)
+    {
         m_settingsTree->Load();
+        m_settingsTree->MoveToThread(QApplication::instance()->thread());
+    }
 }
 
 void StandardSettingDialog::Init(void)

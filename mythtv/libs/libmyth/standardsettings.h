@@ -78,6 +78,8 @@ class MPUBLIC StandardSetting : public QObject, public StorageUser
     //not sure I want to do that yet
     virtual bool keyPressEvent(QKeyEvent *);
 
+    void MoveToThread(QThread *thread);
+
   public slots:
     virtual void setEnabled(bool enabled);
     void setVisible(bool visible) { m_visible = visible; }
