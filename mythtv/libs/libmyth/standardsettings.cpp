@@ -132,8 +132,8 @@ void StandardSetting::setValue(int newValue)
 
 void StandardSetting::setValue(const QString &newValue)
 {
+    m_haveChanged = m_settingValue != newValue;
     m_settingValue = newValue;
-    m_haveChanged = true;
     emit valueChanged(newValue);
     emit valueChanged(this);
     emit ShouldRedraw(this);
@@ -166,10 +166,10 @@ bool StandardSetting::haveChanged()
 
 void StandardSetting::Load(void)
 {
-    m_haveChanged = false;
-
     if (m_storage)
         m_storage->Load();
+
+    m_haveChanged = false;
 
     QList<StandardSetting *>::const_iterator i;
     for (i = m_children.constBegin(); i != m_children.constEnd(); ++i)
