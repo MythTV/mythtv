@@ -116,6 +116,11 @@ void StandardSetting::clearSettings()
     m_children.clear();
 }
 
+void StandardSetting::setValue(int newValue)
+{
+    setValue(QString::number(newValue));
+}
+
 void StandardSetting::setValue(const QString &newValue)
 {
     m_settingValue = newValue;

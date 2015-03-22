@@ -81,6 +81,7 @@ class MPUBLIC StandardSetting : public QObject, public StorageUser
     virtual void setEnabled(bool enabled);
     void setVisible(bool visible) { m_visible = visible; }
     virtual void setValue(const QString &newValue);
+    virtual void setValue(int newValue);
     virtual void childChanged(StandardSetting *) {}
 
   signals:
@@ -420,6 +421,7 @@ class MPUBLIC MythUICheckBoxSetting : public StandardSetting
     virtual void updateButton(MythUIButtonListItem *item);
     virtual void setValue(const QString&);
     virtual void setValue(bool value);
+    using StandardSetting::setValue;
     bool boolValue();
 
   signals:
