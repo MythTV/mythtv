@@ -406,6 +406,12 @@ int MythUIComboBoxSetting::getValueIndex(const QString &value) const
     return m_values.indexOf(value);
 }
 
+QString MythUIComboBoxSetting::getValueLabel() const
+{
+    int index = getValueIndex(getValue());
+    return (index >= 0) ? m_labels.at(index) : QString("");
+}
+
 void MythUIComboBoxSetting::addSelection(const QString &label, QString value,
                                          bool select)
 {
@@ -509,6 +515,23 @@ void MythUIComboBoxSetting::resultEdit(DialogCompletionEvent *dce)
         }
         else if (m_settingValue != dce->GetData().toString())
             StandardSetting::setValue(dce->GetData().toString());
+    }
+}
+
+void MythUIComboBoxSetting::fillSelectionsFromDir(const QDir &dir, bool absPath)
+{
+    QFileInfoList il = dir.entryInfoList();
+
+    for (QFileInfoList::Iterator it = il.begin();
+                                 it != il.end();
+                               ++it )
+    {
+        QFileInfo &fi = *it;
+
+        if (absPath)
+            addSelection( fi.absoluteFilePath() );
+        else
+            addSelection( fi.fileName() );
     }
 }
 

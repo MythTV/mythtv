@@ -193,11 +193,13 @@ class MPUBLIC MythUIComboBoxSetting : public StandardSetting
   public:
     void setValue(int value);
     int getValueIndex(const QString &value) const;
+    QString getValueLabel(void) const;
     virtual void resultEdit(DialogCompletionEvent *dce);
     virtual void edit(MythScreenType *screen);
     void addSelection(const QString &label, QString value = QString::null,
                       bool select = false);
     void clearSelections();
+    void fillSelectionsFromDir(const QDir &dir, bool absPath = true);
     virtual void updateButton(MythUIButtonListItem *item);
 
   public slots:
