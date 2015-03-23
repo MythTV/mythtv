@@ -76,11 +76,11 @@ VAProfile preferredProfile(MythCodecID codec)
 class VAAPIDisplay : ReferenceCounter
 {
   protected:
-    VAAPIDisplay(VAAPIDisplayType display_type, MythRenderOpenGL *render) :
+    VAAPIDisplay(VAAPIDisplayType display_type) :
         ReferenceCounter("VAAPIDisplay"),
         m_va_disp_type(display_type),
         m_va_disp(NULL), m_x_disp(NULL),
-        m_driver(), m_render(render) { }
+        m_driver() { }
   public:
    ~VAAPIDisplay()
     {
@@ -107,25 +107,22 @@ class VAAPIDisplay : ReferenceCounter
 
         if (m_va_disp_type == kVADisplayGLX)
         {
-            if (!m_render)
+            MythMainWindow *mw = GetMythMainWindow();
+            if (!mw)
+                return false;
+            MythRenderOpenGL *gl =
+                static_cast<MythRenderOpenGL*>(mw->GetRenderDevice());
+            if (!gl)
             {
-                MythMainWindow *mw = GetMythMainWindow();
-                if (!mw)
-                    return false;
-                m_render =
-                    dynamic_cast<MythRenderOpenGL*>(mw->GetRenderDevice());
-                if (!m_render || m_render->Type() != kRenderOpenGL1)
-                {
-                    LOG(VB_PLAYBACK, LOG_ERR, LOC +
-                        QString("Failed to get OpenGL context - you must use the "
-                                "OpenGL 1.0 UI painter for VAAPI GLX support."));
-                    return false;
-                }
+                LOG(VB_PLAYBACK, LOG_ERR, LOC +
+                    QString("Failed to get OpenGL context - you must use the "
+                            "OpenGL UI painter for VAAPI GLX support."));
+                return false;
             }
 
-            m_render->makeCurrent();
+            gl->makeCurrent();
             Display *display = glXGetCurrentDisplay();
-            m_render->doneCurrent();
+            gl->doneCurrent();
 
             m_va_disp = vaGetDisplayGLX(display);
         }
@@ -187,12 +184,11 @@ class VAAPIDisplay : ReferenceCounter
         return ret;
     }
 
-    static VAAPIDisplay *GetDisplay(VAAPIDisplayType display_type, bool noreuse,
-                                    MythRenderOpenGL *render)
+    static VAAPIDisplay *GetDisplay(VAAPIDisplayType display_type, bool noreuse)
     {
         if (noreuse)
         {
-            VAAPIDisplay *tmp = new VAAPIDisplay(display_type, render);
+            VAAPIDisplay *tmp = new VAAPIDisplay(display_type);
             if (tmp->Create())
             {
                 return tmp;
@@ -215,7 +211,7 @@ class VAAPIDisplay : ReferenceCounter
             return s_VAAPIDisplay;
         }
 
-        s_VAAPIDisplay = new VAAPIDisplay(display_type, render);
+        s_VAAPIDisplay = new VAAPIDisplay(display_type);
         if (s_VAAPIDisplay->Create())
             return s_VAAPIDisplay;
 
@@ -229,7 +225,6 @@ class VAAPIDisplay : ReferenceCounter
     void                *m_va_disp;
     MythXDisplay        *m_x_disp;
     QString              m_driver;
-    MythRenderOpenGL    *m_render;
 };
 
 QMutex VAAPIDisplay::s_VAAPIDisplayLock(QMutex::Recursive);
@@ -316,8 +311,7 @@ VAAPIContext::~VAAPIContext()
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "Deleted context");
 }
 
-bool VAAPIContext::CreateDisplay(QSize size, bool noreuse,
-                                 MythRenderOpenGL *render)
+bool VAAPIContext::CreateDisplay(QSize size, bool noreuse)
 {
     m_size = size;
     if (!m_copy)
@@ -330,7 +324,7 @@ bool VAAPIContext::CreateDisplay(QSize size, bool noreuse,
     }
 
     bool ok = true;
-    m_display = VAAPIDisplay::GetDisplay(m_dispType, noreuse, render);
+    m_display = VAAPIDisplay::GetDisplay(m_dispType, noreuse);
     CREATE_CHECK(!m_size.isEmpty(), "Invalid size");
     CREATE_CHECK(m_display != NULL, "Invalid display");
     CREATE_CHECK(InitDisplay(),     "Invalid VADisplay");
