@@ -35,18 +35,21 @@ VAProfile preferredProfile(MythCodecID codec);
 
 QString profileToString(VAProfile profile)
 {
-    if (VAProfileMPEG2Simple == profile)         return "MPEG2Simple";
-    if (VAProfileMPEG2Main == profile)           return "MPEG2Main";
-    if (VAProfileMPEG4Simple == profile)         return "MPEG4Simple";
-    if (VAProfileMPEG4AdvancedSimple == profile) return "MPEG4AdvSimple";
-    if (VAProfileMPEG4Main == profile)           return "MPEG4Main";
-    if (VAProfileH264Baseline == profile)        return "H264Base";
-    if (VAProfileH264Main == profile)            return "H264Main";
-    if (VAProfileH264High == profile)            return "H264High";
-    if (VAProfileVC1Simple == profile)           return "VC1Simple";
-    if (VAProfileVC1Main == profile)             return "VC1Main";
-    if (VAProfileVC1Advanced == profile)         return "VC1Advanced";
-    if (VAProfileH263Baseline == profile)        return "H263Base";
+    if (VAProfileMPEG2Simple == profile)                return "MPEG2Simple";
+    if (VAProfileMPEG2Main == profile)                  return "MPEG2Main";
+    if (VAProfileMPEG4Simple == profile)                return "MPEG4Simple";
+    if (VAProfileMPEG4AdvancedSimple == profile)        return "MPEG4AdvSimple";
+    if (VAProfileMPEG4Main == profile)                  return "MPEG4Main";
+    if (VAProfileH264Baseline == profile)               return "H264Base";
+    if (VAProfileH264ConstrainedBaseline == profile)    return "H264ConstrainedBase";
+    if (VAProfileH264Main == profile)                   return "H264Main";
+    if (VAProfileH264High == profile)                   return "H264High";
+    if (VAProfileH264StereoHigh == profile)             return "H264StereoHigh";
+    if (VAProfileVC1Simple == profile)                  return "VC1Simple";
+    if (VAProfileVC1Main == profile)                    return "VC1Main";
+    if (VAProfileVC1Advanced == profile)                return "VC1Advanced";
+    if (VAProfileH263Baseline == profile)               return "H263Base";
+    if (VAProfileNone == profile)                       return "None";
     return "Unknown";
 }
 
@@ -58,6 +61,7 @@ QString entryToString(VAEntrypoint entry)
     if (VAEntrypointMoComp == entry)     return "MC (UNSUPPORTED) ";
     if (VAEntrypointDeblocking == entry) return "Deblock (UNSUPPORTED) ";
     if (VAEntrypointEncSlice == entry)   return "EncSlice (UNSUPPORTED) ";
+    if (VAEntrypointVideoProc == entry)  return "VideoProc (UNSUPPORTED) ";
     return "Unknown";
 }
 
