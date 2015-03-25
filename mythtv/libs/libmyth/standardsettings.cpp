@@ -113,6 +113,16 @@ void StandardSetting::addTargetedChild(const QString &value,
     setting->setParent(this);
 }
 
+void StandardSetting::removeTargetedChild(const QString &value,
+                                          StandardSetting *child)
+{
+    if (m_targets.contains(value))
+    {
+        m_targets[value].removeAll(child);
+        delete child;
+    }
+}
+
 void StandardSetting::clearTargetedSettings(const QString &value)
 {
     if (m_targets.contains(value))

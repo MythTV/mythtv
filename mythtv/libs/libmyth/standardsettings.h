@@ -75,6 +75,7 @@ class MPUBLIC StandardSetting : public QObject, public StorageUser
     Storage *GetStorage(void) const { return m_storage; }
 
     void addTargetedChild(const QString &value, StandardSetting *setting);
+    void removeTargetedChild(const QString &value, StandardSetting *child);
 
     //not sure I want to do that yet
     virtual bool keyPressEvent(QKeyEvent *);
