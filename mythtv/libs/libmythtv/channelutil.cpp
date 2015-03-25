@@ -819,24 +819,6 @@ uint ChannelUtil::GetSourceIDForChannel(uint chanid)
     return 0;
 }
 
-int ChannelUtil::GetInputID(int source_id, int card_id)
-{
-    int input_id = -1;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT cardid"
-                  " FROM capturecard"
-                  " WHERE sourceid = :SOURCEID"
-                  " AND cardid = :CARDID");
-    query.bindValue(":SOURCEID", source_id);
-    query.bindValue(":CARDID", card_id);
-
-    if (query.exec() && query.isActive() && query.next())
-        input_id = query.value(0).toInt();
-
-    return input_id;
-}
-
 QStringList ChannelUtil::GetCardTypes(uint chanid)
 {
     MSqlQuery query(MSqlQuery::InitCon());

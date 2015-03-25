@@ -284,7 +284,6 @@ class MTV_PUBLIC ChannelUtil
     static int     GetTimeOffset(int chanid);
     static int     GetSourceID(int mplexid);
     static uint    GetSourceIDForChannel(uint chanid);
-    static int     GetInputID(int sourceid, int cardid);
 
     static QStringList GetCardTypes(uint chandid);
 
