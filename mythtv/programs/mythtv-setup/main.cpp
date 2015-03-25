@@ -132,8 +132,15 @@ static void SetupMenuCallback(void* data, QString& selection)
     }
     else if (sel == "storage groups")
     {
-        StorageGroupListEditor sge;
-        sge.exec();
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+        StandardSettingDialog *ssd =
+            new StandardSettingDialog(mainStack, "storagegroupeditor",
+                                      new StorageGroupListEditor());
+
+        if (ssd->Create())
+            mainStack->AddScreen(ssd);
+        else
+            delete ssd;
     }
     else if (sel == "systemeventeditor")
     {
