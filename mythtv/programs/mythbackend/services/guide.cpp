@@ -76,6 +76,7 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &rawStartTime ,
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare( "SELECT chanid FROM channel WHERE (chanid >= :STARTCHANID )"
+                   " AND visible != 0"
                    " ORDER BY chanid LIMIT :NUMCHAN" );
 
     query.bindValue(":STARTCHANID", nStartChanId );
@@ -107,7 +108,7 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &rawStartTime ,
     else
         sSQL = "WHERE ";
 
-    sSQL +=     "visible != 0 "
+    sSQL +=     "channel.visible != 0 "
                 "AND program.chanid >= :StartChanId "
                 "AND program.chanid <= :EndChanId "
                 "AND program.endtime >= :StartDate "
