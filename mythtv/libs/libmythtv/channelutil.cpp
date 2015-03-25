@@ -2387,12 +2387,6 @@ uint ChannelUtil::GetNextChannel(
     return it->chanid;
 }
 
-/**
- * \brief Load channels from database into a list of ChannelInfo objects
- *
- * \note This replaces all previous methods e.g. GetChannels() and
- *       GetAllChannels() in channelutil.h
- */
 ChannelInfoList ChannelUtil::LoadChannels(uint startIndex, uint count,
                                           ChannelUtil::OrderBy orderBy,
                                           bool ignoreHidden, uint sourceID,

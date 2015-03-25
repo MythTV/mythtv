@@ -137,8 +137,7 @@ void FillProgramInfo( DTC::Program *pProgram,
             pRecording->setEncoderId   ( pInfo->GetInputID()              );
             if (pProgram->Channel())
             {
-                QString encoderName = CardUtil::GetDisplayName(pInfo->GetInputID(),
-                                                               pProgram->Channel()->SourceId());
+                QString encoderName = CardUtil::GetDisplayName(pInfo->GetInputID());
                 pRecording->setEncoderName( encoderName );
             }
 

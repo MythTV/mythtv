@@ -1172,24 +1172,6 @@ uint CardUtil::GetInputID(uint cardid, const QString &inputname)
     return 0;
 }
 
-uint CardUtil::GetInputID(uint cardid, uint sourceid)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT cardid "
-                  "FROM capturecard "
-                  "WHERE sourceid  = :SOURCEID AND "
-                  "      cardid    = :CARDID");
-    query.bindValue(":SOURCEID", sourceid);
-    query.bindValue(":CARDID",    cardid);
-
-    if (!query.exec())
-        MythDB::DBError("CardUtil::GetInputID(uint,uint)", query);
-    else if (query.next())
-        return query.value(0).toUInt();
-
-    return 0;
-}
-
 uint CardUtil::GetSourceID(uint inputid)
 {
     MSqlQuery query(MSqlQuery::InitCon());

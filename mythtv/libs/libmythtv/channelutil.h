@@ -195,15 +195,21 @@ class MTV_PUBLIC ChannelUtil
         kChanOrderByName
     };
 
-    // There is no grouping option by design and here's why.
-    //
-    // Grouping with a ChannelInfo object is largely self-defeating, 99% of the
-    // information in the remaining result won't apply to the other 'grouped'
-    // channels. Therefore GroupBy should be used when you only care about
-    // Name, Number and Callsign. Loading a complete ChannelInfo object,
-    // including card/input info is therefore an actual waste of
-    // processor cycles and memory, so we may yet introduce a parent class for
-    // ChannelInfo called BasicChannelInfo or similar with it's own Load function
+    /**
+     *  \brief Load channels from database into a list of ChannelInfo objects
+     *
+     *  \note This replaces all previous methods e.g. GetChannels() and
+     *        GetAllChannels() in channelutil.h
+     *
+     *  \note There is no grouping option by design and here's why. Grouping
+     * with a ChannelInfo object is largely self-defeating, 99% of the
+     * information in the remaining result won't apply to the other 'grouped'
+     * channels. Therefore GroupBy should be used when you only care about
+     * Name, Number and Callsign. Loading a complete ChannelInfo object,
+     * including card/input info is therefore an actual waste of
+     * processor cycles and memory, so we may yet introduce a parent class for
+     * ChannelInfo called BasicChannelInfo or similar with it's own Load function
+    */
     static ChannelInfoList LoadChannels(uint startIndex = 0, uint count = 0,
                                         OrderBy orderBy = kChanOrderByChanNum,
                                         bool ignoreHidden = true,

@@ -73,20 +73,29 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &rawStartTime ,
 
     int nEndChanId = nStartChanId;
 
-    MSqlQuery query(MSqlQuery::InitCon());
+    ChannelInfoList chanList = ChannelUtil::LoadChannels();
 
-    query.prepare( "SELECT chanid FROM channel WHERE (chanid >= :STARTCHANID )"
-                   " AND visible != 0"
-                   " ORDER BY chanid LIMIT :NUMCHAN" );
+//     MSqlQuery query(MSqlQuery::InitCon());
+//
+//     query.prepare( "SELECT chanid FROM channel WHERE (chanid >= :STARTCHANID )"
+//                    " AND visible != 0"
+//                    " ORDER BY chanid LIMIT :NUMCHAN" );
+//
+//     query.bindValue(":STARTCHANID", nStartChanId );
+//     query.bindValue(":NUMCHAN"    , nNumChannels );
+//
+//     if (!query.exec())
+//         MythDB::DBError("Select ChanId", query);
+//
+//     query.first();  nStartChanId = query.value(0).toInt();
+//     query.last();   nEndChanId   = query.value(0).toInt();
 
-    query.bindValue(":STARTCHANID", nStartChanId );
-    query.bindValue(":NUMCHAN"    , nNumChannels );
-
-    if (!query.exec())
-        MythDB::DBError("Select ChanId", query);
-
-    query.first();  nStartChanId = query.value(0).toInt();
-    query.last();   nEndChanId   = query.value(0).toInt();
+    if (!chanList.empty())
+    {
+        if (nStartChanId == 0)
+            nStartChanId = chanList.front().chanid;
+        nEndChanId = chanList.back().chanid;
+    }
 
     // ----------------------------------------------------------------------
     // Build SQL statement for Program Listing
@@ -150,6 +159,8 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &rawStartTime ,
     QString           sCurCallsign;
     uint              nSkipChanId = 0;
 
+    ChannelInfoList::iterator chan_it = chanList.begin();
+
     for( uint n = 0; n < progList.size(); n++)
     {
         ProgramInfo *pInfo = progList[ n ];
@@ -173,7 +184,20 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &rawStartTime ,
 
             pChannel = pGuide->AddNewChannel();
 
-            FillChannelInfo( pChannel, pInfo->GetChanID(), bDetails );
+            // Find the channel in our cached list of ChannelInfo objects
+            while (chan_it != chanList.end() &&
+                   (*chan_it).chanid != nCurChanId)
+            {
+                ++chan_it;
+            }
+
+            if (chan_it != chanList.end())
+                FillChannelInfo( pChannel, (*chan_it), bDetails );
+            else
+                LOG(VB_GENERAL, LOG_ERR, QString("Guide::GetProgramGuide() - "
+                                                 "No matching channel for "
+                                                 "chanid %1")
+                                                    .arg(nCurChanId));
 
             sCurCallsign = pChannel->CallSign();
         }
