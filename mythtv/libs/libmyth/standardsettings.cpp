@@ -18,6 +18,7 @@ void MythUIButtonListItemSetting::ShouldUpdate(StandardSetting *setting)
 }
 
 StandardSetting::StandardSetting(Storage *_storage) :
+    m_settingValue(""),
     m_enabled(true), m_label(""), m_helptext(""), m_visible(true),
     m_haveChanged(false),
     m_storage(_storage),
@@ -56,6 +57,12 @@ void StandardSetting::setEnabled(bool b)
 {
     m_enabled = b;
     emit ShouldRedraw(this);
+}
+
+void StandardSetting::setVisible(bool visible)
+{
+    m_visible = visible;
+    emit settingsChanged(this);
 }
 
 void StandardSetting::setParent(StandardSetting *parent)
@@ -106,6 +113,18 @@ void StandardSetting::addTargetedChild(const QString &value,
     setting->setParent(this);
 }
 
+void StandardSetting::clearTargetedSettings(const QString &value)
+{
+    if (m_targets.contains(value))
+    {
+        foreach(StandardSetting *setting, m_targets[value])
+        {
+            delete setting;
+        }
+        m_targets[value].clear();
+    }
+}
+
 QList<StandardSetting *> *StandardSetting::getSubSettings()
 {
     if (m_targets.contains(m_settingValue) &&
@@ -147,6 +166,8 @@ bool StandardSetting::haveChanged()
 {
     if (m_haveChanged)
     {
+        LOG(VB_GENERAL, LOG_DEBUG,
+            QString("Setting %1 changed").arg(getLabel()));
         return true;
     }
 
@@ -162,6 +183,11 @@ bool StandardSetting::haveChanged()
         haveChanged = (*i)->haveChanged();
 
     return haveChanged;
+}
+
+void StandardSetting::setChanged(bool changed)
+{
+    m_haveChanged = changed;
 }
 
 void StandardSetting::Load(void)

@@ -61,6 +61,7 @@ class MPUBLIC StandardSetting : public QObject, public StorageUser
     virtual QList<StandardSetting *> *getSubSettings();
     virtual bool haveSubSettings();
     virtual void clearSettings();
+    void clearTargetedSettings(const QString &value);
 
     virtual void edit(MythScreenType *screen) = 0;
     virtual void resultEdit(DialogCompletionEvent *dce) = 0;
@@ -82,7 +83,7 @@ class MPUBLIC StandardSetting : public QObject, public StorageUser
 
   public slots:
     virtual void setEnabled(bool enabled);
-    void setVisible(bool visible) { m_visible = visible; }
+    void setVisible(bool visible);
     virtual void setValue(const QString &newValue);
     virtual void setValue(int newValue);
     virtual void childChanged(StandardSetting *) {}
@@ -97,6 +98,7 @@ class MPUBLIC StandardSetting : public QObject, public StorageUser
     StandardSetting(Storage *_storage = NULL);
     virtual ~StandardSetting();
     void setParent(StandardSetting *parent);
+    void setChanged(bool changed);
     QString m_settingValue;
     bool m_enabled;
     QString m_label;
