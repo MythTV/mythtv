@@ -140,7 +140,6 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &rawStartTime ,
     // Get all Pending Scheduled Programs
     // ----------------------------------------------------------------------
 
-    LOG(VB_GENERAL, LOG_NOTICE, "Guide::GetProgramGuide() - GetAllPending");
     // NOTE: Fetching this information directly from the schedule is
     //       significantly faster than using ProgramInfo::LoadFromScheduler()
     Scheduler *scheduler = dynamic_cast<Scheduler*>(gCoreContext->GetScheduler());
