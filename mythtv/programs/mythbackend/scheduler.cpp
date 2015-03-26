@@ -1732,6 +1732,23 @@ bool Scheduler::GetAllPending(RecList &retList) const
     return hasconflicts;
 }
 
+bool Scheduler::GetAllPending(ProgramList &retList) const
+{
+    QMutexLocker lockit(&schedLock);
+
+    bool hasconflicts = false;
+
+    RecConstIter it = reclist.begin();
+    for (; it != reclist.end(); ++it)
+    {
+        if ((*it)->GetRecordingStatus() == RecStatus::Conflict)
+            hasconflicts = true;
+        retList.push_back(new ProgramInfo(**it));
+    }
+
+    return hasconflicts;
+}
+
 QMap<QString,ProgramInfo*> Scheduler::GetRecording(void) const
 {
     QMutexLocker lockit(&schedLock);
