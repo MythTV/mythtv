@@ -47,10 +47,10 @@ extern Scheduler   *sched;
 
 DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &rawStartTime ,
                                            const QDateTime &rawEndTime   ,
-                                           int              nStartChanId,
-                                           int              nNumChannels,
                                            bool             bDetails,
-                                           int              nChannelGroupId )
+                                           int              nChannelGroupId,
+                                           int              nStartIndex,
+                                           int              nCount)
 {     
     if (!rawStartTime.isValid())
         throw( "StartTime is invalid" );
@@ -64,77 +64,48 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &rawStartTime ,
     if (dtEndTime < dtStartTime)
         throw( "EndTime is before StartTime");
 
-    if (nNumChannels == 0)
-        nNumChannels = SHRT_MAX;
+    if (nStartIndex <= 0)
+        nStartIndex = 0;
+
+    if (nCount <= 0)
+        nCount = 20000;
 
     // ----------------------------------------------------------------------
-    // Find the ending channel Id
+    // Load the channel list
     // ----------------------------------------------------------------------
 
-    int nEndChanId = nStartChanId;
-
-    ChannelInfoList chanList = ChannelUtil::LoadChannels();
-
-//     MSqlQuery query(MSqlQuery::InitCon());
-//
-//     query.prepare( "SELECT chanid FROM channel WHERE (chanid >= :STARTCHANID )"
-//                    " AND visible != 0"
-//                    " ORDER BY chanid LIMIT :NUMCHAN" );
-//
-//     query.bindValue(":STARTCHANID", nStartChanId );
-//     query.bindValue(":NUMCHAN"    , nNumChannels );
-//
-//     if (!query.exec())
-//         MythDB::DBError("Select ChanId", query);
-//
-//     query.first();  nStartChanId = query.value(0).toInt();
-//     query.last();   nEndChanId   = query.value(0).toInt();
-
-    if (!chanList.empty())
-    {
-        if (nStartChanId == 0)
-            nStartChanId = chanList.front().chanid;
-        nEndChanId = chanList.back().chanid;
-    }
+    uint nTotalAvailable = 0;
+    ChannelInfoList chanList = ChannelUtil::LoadChannels(nStartIndex, nCount,
+                                                         nTotalAvailable, true,
+                                                         ChannelUtil::kChanOrderByChanNum,
+                                                         ChannelUtil::kChanGroupByCallsign,
+                                                         0,
+                                                         nChannelGroupId);
 
     // ----------------------------------------------------------------------
     // Build SQL statement for Program Listing
     // ----------------------------------------------------------------------
 
-    ProgramList  progList;
     ProgramList  schedList;
     MSqlBindings bindings;
 
     // lpad is to allow natural sorting of numbers
-    QString      sSQL;
-
-    if (nChannelGroupId > 0)
-    {
-        sSQL = "LEFT JOIN channelgroup ON program.chanid = channelgroup.chanid "
-                         "WHERE channelgroup.grpid = :CHANGRPID AND ";
-        bindings[":CHANGRPID"  ] = nChannelGroupId;
-    }
-    else
-        sSQL = "WHERE ";
+    QString      sSQL = "WHERE ";
 
     sSQL +=     "channel.visible != 0 "
-                "AND program.chanid >= :StartChanId "
-                "AND program.chanid <= :EndChanId "
-                "AND program.endtime >= :StartDate "
-                "AND program.starttime <= :EndDate "
-                "AND program.starttime >= :StartDateLimit "
+                "AND program.chanid = :CHANID "
+                "AND program.endtime >= :STARTDATE "
+                "AND program.starttime < :ENDDATE "
+                "AND program.starttime >= :STARTDATELIMIT "
                 "AND program.manualid = 0 " // Exclude programmes created purely for 'manual' recording schedules
                 "ORDER BY LPAD(CAST(channum AS UNSIGNED), 10, 0), "
                 "         LPAD(channum,  10, 0),             "
                 "         callsign,                          "
                 "         LPAD(program.chanid, 10, 0),       "
                 "         program.starttime ";
-
-    bindings[":StartChanId"   ] = nStartChanId;
-    bindings[":EndChanId"     ] = nEndChanId;
-    bindings[":StartDate"     ] = dtStartTime;
-    bindings[":StartDateLimit"] = dtStartTime.addDays(-1);
-    bindings[":EndDate"       ] = dtEndTime;
+    bindings[":STARTDATE"     ] = dtStartTime;
+    bindings[":STARTDATELIMIT"] = dtStartTime.addDays(-1);
+    bindings[":ENDDATE"       ] = dtEndTime;
 
     // ----------------------------------------------------------------------
     // Get all Pending Scheduled Programs
@@ -145,10 +116,6 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &rawStartTime ,
     Scheduler *scheduler = dynamic_cast<Scheduler*>(gCoreContext->GetScheduler());
     if (scheduler)
         scheduler->GetAllPending(schedList);
-
-    // ----------------------------------------------------------------------
-
-    LoadFromProgram( progList, sSQL, bindings, schedList );
 
     // ----------------------------------------------------------------------
     // Build Response
@@ -162,65 +129,77 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &rawStartTime ,
     QString           sCurCallsign;
     uint              nSkipChanId = 0;
 
-    ChannelInfoList::iterator chan_it = chanList.begin();
+        // Very hacky this ... will suffice as a temporary solution, trying it out
+    // as a faster alternative to fetching the programs with one query per
+    // channel
+    //
+    // A sub-query might be less hacky, but it wouldn't re-use existing code
+    // which increases the maintenance burden
 
-    for( uint n = 0; n < progList.size(); n++)
+    QStringList chanIdList;
+    ChannelInfoList::iterator chan_it;
+    for (chan_it = chanList.begin(); chan_it != chanList.end(); ++chan_it)
     {
-        ProgramInfo *pInfo = progList[ n ];
-
-        if ( nSkipChanId == pInfo->GetChanID())
-            continue;
-
-        if ( nCurChanId != pInfo->GetChanID() )
+        ProgramList  progList;
+        bindings[":CHANID"] = (*chan_it).chanid;
+        LoadFromProgram( progList, sSQL, bindings, schedList );
+        for( uint n = 0; n < progList.size(); n++)
         {
-            nChanCount++;
+            ProgramInfo *pInfo = progList[ n ];
 
-            nCurChanId = pInfo->GetChanID();
-
-            // Filter out channels with the same callsign, keeping just the
-            // first seen
-            if (sCurCallsign == pInfo->GetChannelSchedulingID())
-            {
-                nSkipChanId = pInfo->GetChanID();
+            if ( nSkipChanId == pInfo->GetChanID())
                 continue;
-            }
 
-            pChannel = pGuide->AddNewChannel();
-
-            // Find the channel in our cached list of ChannelInfo objects
-            while (chan_it != chanList.end() &&
-                   (*chan_it).chanid != nCurChanId)
+            if ( nCurChanId != pInfo->GetChanID() )
             {
-                ++chan_it;
+                nChanCount++;
+
+                nCurChanId = pInfo->GetChanID();
+
+                // Filter out channels with the same callsign, keeping just the
+                // first seen
+                if (sCurCallsign == pInfo->GetChannelSchedulingID())
+                {
+                    nSkipChanId = pInfo->GetChanID();
+                    continue;
+                }
+
+                pChannel = pGuide->AddNewChannel();
+
+                // Find the channel in our cached list of ChannelInfo objects
+                while (chan_it != chanList.end() &&
+                    (*chan_it).chanid != nCurChanId)
+                {
+                    ++chan_it;
+                }
+
+                if (chan_it != chanList.end())
+                    FillChannelInfo( pChannel, (*chan_it), bDetails );
+                else
+                    LOG(VB_GENERAL, LOG_ERR, QString("Guide::GetProgramGuide() - "
+                                                    "No matching channel for "
+                                                    "chanid %1")
+                                                        .arg(nCurChanId));
+
+                sCurCallsign = pChannel->CallSign();
             }
 
-            if (chan_it != chanList.end())
-                FillChannelInfo( pChannel, (*chan_it), bDetails );
-            else
-                LOG(VB_GENERAL, LOG_ERR, QString("Guide::GetProgramGuide() - "
-                                                 "No matching channel for "
-                                                 "chanid %1")
-                                                    .arg(nCurChanId));
+            DTC::Program *pProgram = pChannel->AddNewProgram();
 
-            sCurCallsign = pChannel->CallSign();
+            FillProgramInfo( pProgram, pInfo, false, bDetails, false ); // No cast info
         }
-        
-        DTC::Program *pProgram = pChannel->AddNewProgram();
-
-        FillProgramInfo( pProgram, pInfo, false, bDetails, false ); // No cast info
     }
 
     // ----------------------------------------------------------------------
 
     pGuide->setStartTime    ( dtStartTime   );
     pGuide->setEndTime      ( dtEndTime     );
-    pGuide->setStartChanId  ( nStartChanId  );
-    pGuide->setEndChanId    ( nEndChanId    );
-    pGuide->setNumOfChannels( nChanCount    );
     pGuide->setDetails      ( bDetails      );
     
-    pGuide->setCount        ( progList.size());
-    pGuide->setAsOf         ( MythDate::current() );
+    pGuide->setStartIndex    ( nStartIndex     );
+    pGuide->setCount         ( chanList.size() );
+    pGuide->setTotalAvailable( nTotalAvailable );
+    pGuide->setAsOf          ( MythDate::current() );
     
     pGuide->setVersion      ( MYTH_BINARY_VERSION );
     pGuide->setProtoVer     ( MYTH_PROTO_VERSION  );

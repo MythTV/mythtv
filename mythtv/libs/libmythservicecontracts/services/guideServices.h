@@ -60,10 +60,10 @@ class SERVICE_PUBLIC GuideServices : public Service  //, public QScriptable ???
 
         virtual DTC::ProgramGuide*  GetProgramGuide     ( const QDateTime &StartTime  ,
                                                           const QDateTime &EndTime    ,
-                                                          int              StartChanId,
-                                                          int              NumChannels,
                                                           bool             Details,
-                                                          int              ChannelGroupId) = 0;
+                                                          int              ChannelGroupId,
+                                                          int              StartIndex,
+                                                          int              Count) = 0;
 
         virtual DTC::ProgramList*   GetProgramList      ( int              StartIndex,
                                                           int              Count,

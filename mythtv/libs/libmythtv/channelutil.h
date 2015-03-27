@@ -195,6 +195,12 @@ class MTV_PUBLIC ChannelUtil
         kChanOrderByName
     };
 
+    enum GroupBy
+    {
+        kChanGroupByCallsign,
+        kChanGroupByChanid // Because of the nature of the query we always need to group
+    };
+
     /**
      *  \brief Load channels from database into a list of ChannelInfo objects
      *
@@ -210,9 +216,11 @@ class MTV_PUBLIC ChannelUtil
      * processor cycles and memory, so we may yet introduce a parent class for
      * ChannelInfo called BasicChannelInfo or similar with it's own Load function
     */
-    static ChannelInfoList LoadChannels(uint startIndex = 0, uint count = 0,
-                                        OrderBy orderBy = kChanOrderByChanNum,
+    static ChannelInfoList LoadChannels(uint startIndex, uint count,
+                                        uint &totalAvailable,
                                         bool ignoreHidden = true,
+                                        OrderBy orderBy = kChanOrderByChanNum,
+                                        GroupBy groupBy = kChanGroupByChanid,
                                         uint sourceID = 0,
                                         uint channelGroupID = 0 );
 

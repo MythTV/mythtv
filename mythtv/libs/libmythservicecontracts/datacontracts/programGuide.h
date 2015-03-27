@@ -45,12 +45,11 @@ class SERVICE_PUBLIC ProgramGuide : public QObject
 
     Q_PROPERTY( QDateTime     StartTime      READ StartTime      WRITE setStartTime      )
     Q_PROPERTY( QDateTime     EndTime        READ EndTime        WRITE setEndTime        )
-    Q_PROPERTY( int           StartChanId    READ StartChanId    WRITE setStartChanId    )
-    Q_PROPERTY( int           EndChanId      READ EndChanId      WRITE setEndChanId      )
-    Q_PROPERTY( int           NumOfChannels  READ NumOfChannels  WRITE setNumOfChannels  )
-                                                                         
     Q_PROPERTY( bool          Details        READ Details        WRITE setDetails        )
+
+    Q_PROPERTY( int           StartIndex     READ StartIndex     WRITE setStartIndex     )
     Q_PROPERTY( int           Count          READ Count          WRITE setCount          )
+    Q_PROPERTY( int           TotalAvailable READ TotalAvailable WRITE setTotalAvailable )
     Q_PROPERTY( QDateTime     AsOf           READ AsOf           WRITE setAsOf           )
     Q_PROPERTY( QString       Version        READ Version        WRITE setVersion        )
     Q_PROPERTY( QString       ProtoVer       READ ProtoVer       WRITE setProtoVer       )
@@ -59,12 +58,11 @@ class SERVICE_PUBLIC ProgramGuide : public QObject
 
     PROPERTYIMP       ( QDateTime   , StartTime     )
     PROPERTYIMP       ( QDateTime   , EndTime       )
-    PROPERTYIMP       ( int         , StartChanId   )
-    PROPERTYIMP       ( int         , EndChanId     )
-    PROPERTYIMP       ( int         , NumOfChannels )
-                                                      
     PROPERTYIMP       ( bool        , Details       )
+
+    PROPERTYIMP       ( int         , StartIndex    )
     PROPERTYIMP       ( int         , Count         )
+    PROPERTYIMP       ( int         , TotalAvailable)
     PROPERTYIMP       ( QDateTime   , AsOf          )
     PROPERTYIMP       ( QString     , Version       )
     PROPERTYIMP       ( QString     , ProtoVer      )
@@ -79,11 +77,10 @@ class SERVICE_PUBLIC ProgramGuide : public QObject
 
         ProgramGuide(QObject *parent = 0) 
             : QObject           ( parent ),
-              m_StartChanId     ( 0      ),     
-              m_EndChanId       ( 0      ),
-              m_NumOfChannels   ( 0      ),
               m_Details         ( false  ),
-              m_Count           ( 0      )  
+              m_StartIndex      ( 0      ),
+              m_Count           ( 0      ),
+              m_TotalAvailable  ( 0      )
         {
         }
         
@@ -94,16 +91,15 @@ class SERVICE_PUBLIC ProgramGuide : public QObject
 
         void Copy( const ProgramGuide &src )
         {                                       
-            m_StartTime    = src.m_StartTime    ;
-            m_EndTime      = src.m_EndTime      ;
-            m_StartChanId  = src.m_StartChanId  ;
-            m_EndChanId    = src.m_EndChanId    ;
-            m_NumOfChannels= src.m_NumOfChannels;
-            m_Details      = src.m_Details      ;
-            m_Count        = src.m_Count        ;
-            m_AsOf         = src.m_AsOf         ;
-            m_Version      = src.m_Version      ;
-            m_ProtoVer     = src.m_ProtoVer     ;
+            m_StartTime      = src.m_StartTime      ;
+            m_EndTime        = src.m_EndTime        ;
+            m_Details        = src.m_Details        ;
+            m_StartIndex     = src.m_StartIndex     ;
+            m_Count          = src.m_Count          ;
+            m_TotalAvailable = src.m_TotalAvailable ;
+            m_AsOf           = src.m_AsOf           ;
+            m_Version        = src.m_Version        ;
+            m_ProtoVer       = src.m_ProtoVer       ;
         
             CopyListContents< ChannelInfo >( this, m_Channels, src.m_Channels );
         }
