@@ -2518,48 +2518,101 @@ bool MythUIButtonList::gestureEvent(MythGestureEvent *event)
 {
     bool handled = false;
 
-    if (event->gesture() == MythGestureEvent::Click)
+    switch (event->gesture())
     {
-        // We want the relative position of the click
-        QPoint position = event->GetPosition() -
-                          m_Parent->GetArea().topLeft();
-
-        MythUIType *type = GetChildAt(position, false, false);
-
-        if (!type)
-            return false;
-
-        MythUIStateType *object = dynamic_cast<MythUIStateType *>(type);
-
-        if (object)
-        {
-            handled = true;
-            QString name = object->objectName();
-
-            if (name == "upscrollarrow")
+        case MythGestureEvent::Click:
             {
-                MoveUp(MovePage);
-            }
-            else if (name == "downscrollarrow")
-            {
-                MoveDown(MovePage);
-            }
-            else if (name.startsWith("buttonlist button"))
-            {
-                int pos = name.section(' ', 2, 2).toInt();
-                MythUIButtonListItem *item = m_ButtonToItem[pos];
+                // We want the relative position of the click
+                QPoint position = event->GetPosition() -
+                                m_Parent->GetArea().topLeft();
 
-                if (item)
+                MythUIType *type = GetChildAt(position, false, false);
+
+                if (!type)
+                    return false;
+
+                MythUIStateType *object = dynamic_cast<MythUIStateType *>(type);
+
+                if (object)
                 {
-                    if (item == GetItemCurrent())
-                        emit itemClicked(item);
+                    handled = true;
+                    QString name = object->objectName();
+
+                    if (name == "upscrollarrow")
+                    {
+                        MoveUp(MovePage);
+                    }
+                    else if (name == "downscrollarrow")
+                    {
+                        MoveDown(MovePage);
+                    }
+                    else if (name.startsWith("buttonlist button"))
+                    {
+                        int pos = name.section(' ', 2, 2).toInt();
+                        MythUIButtonListItem *item = m_ButtonToItem[pos];
+
+                        if (item)
+                        {
+                            if (item == GetItemCurrent())
+                                emit itemClicked(item);
+                            else
+                                SetItemCurrent(item);
+                        }
+                    }
                     else
-                        SetItemCurrent(item);
+                        handled = false;
                 }
             }
-            else
-                handled = false;
-        }
+            break;
+
+        case MythGestureEvent::Up:
+            if ((m_layout == LayoutVertical) || (m_layout == LayoutGrid))
+                handled = MoveUp(MovePage);
+            break;
+            
+        case MythGestureEvent::UpLeft:
+        case MythGestureEvent::UpRight:
+            if ((m_layout == LayoutVertical) || (m_layout == LayoutGrid))
+                handled = MoveUp(MoveRow);
+            break;
+            
+        case MythGestureEvent::Down:
+            if ((m_layout == LayoutVertical) || (m_layout == LayoutGrid))
+                handled = MoveDown(MovePage);
+            break;
+            
+        case MythGestureEvent::DownLeft:
+        case MythGestureEvent::DownRight:
+            if ((m_layout == LayoutVertical) || (m_layout == LayoutGrid))
+                handled = MoveDown(MoveRow);
+            break;
+            
+        case MythGestureEvent::Right:
+            if (m_layout == LayoutHorizontal)
+                handled = MoveDown(MoveItem);
+            else if (m_layout == LayoutGrid)
+            {
+                if (m_scrollStyle == ScrollFree)
+                    handled = MoveDown(MoveColumn);
+                else
+                    handled = MoveDown(MoveItem);
+            }
+            break;
+            
+        case MythGestureEvent::Left:
+            if (m_layout == LayoutHorizontal)
+                handled = MoveUp(MoveItem);
+            else if (m_layout == LayoutGrid)
+            {
+                if (m_scrollStyle == ScrollFree)
+                    handled = MoveUp(MoveColumn);
+                else
+                    handled = MoveUp(MoveItem);
+            }
+            break;
+            
+        default:
+            break;
     }
 
     return handled;
