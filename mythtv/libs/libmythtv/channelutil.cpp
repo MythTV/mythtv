@@ -819,24 +819,6 @@ uint ChannelUtil::GetSourceIDForChannel(uint chanid)
     return 0;
 }
 
-int ChannelUtil::GetInputID(int source_id, int card_id)
-{
-    int input_id = -1;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT cardid"
-                  " FROM capturecard"
-                  " WHERE sourceid = :SOURCEID"
-                  " AND cardid = :CARDID");
-    query.bindValue(":SOURCEID", source_id);
-    query.bindValue(":CARDID", card_id);
-
-    if (query.exec() && query.isActive() && query.next())
-        input_id = query.value(0).toInt();
-
-    return input_id;
-}
-
 QStringList ChannelUtil::GetCardTypes(uint chanid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -2405,21 +2387,18 @@ uint ChannelUtil::GetNextChannel(
     return it->chanid;
 }
 
-/**
- * \brief Load channels from database into a list of ChannelInfo objects
- *
- * \note This replaces all previous methods e.g. GetChannels() and
- *       GetAllChannels() in channelutil.h
- */
 ChannelInfoList ChannelUtil::LoadChannels(uint startIndex, uint count,
+                                          uint &totalAvailable,
+                                          bool ignoreHidden,
                                           ChannelUtil::OrderBy orderBy,
-                                          bool ignoreHidden, uint sourceID,
+                                          ChannelUtil::GroupBy groupBy,
+                                          uint sourceID,
                                           uint channelGroupID)
 {
     ChannelInfoList channelList;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    QString sql = "SELECT channum, freqid, channel.sourceid, "
+    QString sql = "SELECT %1 channum, freqid, channel.sourceid, "
                   "callsign, name, icon, finetune, videofilters, xmltvid, "
                   "channel.recpriority, channel.contrast, channel.brightness, "
                   "channel.colour, channel.hue, tvformat, "
@@ -2446,15 +2425,18 @@ ChannelInfoList ChannelUtil::LoadChannels(uint startIndex, uint count,
     if (!cond.isEmpty())
         sql += QString("WHERE %1").arg(cond.join("AND "));
 
-    sql += "GROUP BY channel.chanid ";
+    if (groupBy == kChanGroupByCallsign)
+        sql += "GROUP BY channel.callsign ";
+    else
+        sql += "GROUP BY channel.chanid "; // We must always group for this query
 
-    if (orderBy & kChanOrderByName)
+    if (orderBy == kChanOrderByName)
         sql += "ORDER BY channel.name ";
     else // kChanOrderByChanNum
     {
         // Natural sorting including subchannels e.g. 2_4, 1.3
         sql += "ORDER BY LPAD(CAST(channel.channum AS UNSIGNED), 10, 0), "
-               "         LPAD(channel.channum,  10, 0)";
+               "         LPAD(channel.channum,  10, 0) ";
     }
 
     if (count > 0)
@@ -2462,6 +2444,12 @@ ChannelInfoList ChannelUtil::LoadChannels(uint startIndex, uint count,
 
     if (startIndex > 0)
         sql += "OFFSET :STARTINDEX ";
+
+
+    if (startIndex > 0 || count > 0)
+        sql = sql.arg("SQL_CALC_FOUND_ROWS");
+    else
+        sql = sql.arg(""); // remove place holder
 
     query.prepare(sql);
 
@@ -2478,7 +2466,7 @@ ChannelInfoList ChannelUtil::LoadChannels(uint startIndex, uint count,
         query.bindValue(":LIMIT", count);
 
     if (startIndex > 0)
-        query.bindValue(":LIMIT", startIndex);
+        query.bindValue(":STARTINDEX", startIndex);
 
     if (!query.exec())
     {
@@ -2530,6 +2518,12 @@ ChannelInfoList ChannelUtil::LoadChannels(uint startIndex, uint count,
 
         channelList.push_back(channelInfo);
     }
+
+    if ((startIndex > 0 || count > 0) &&
+        query.exec("SELECT FOUND_ROWS()") && query.next())
+        totalAvailable = query.value(0).toUInt();
+    else
+        totalAvailable = query.size();
 
     return channelList;
 }

@@ -52,7 +52,6 @@ class OpenGLFilter
  */
 
 /**
- * \fn OpenGLVideo::OpenGLVideo()
  *  Create a new OpenGLVideo instance that must be initialised
  *  with a call to OpenGLVideo::Init()
  */
@@ -97,15 +96,11 @@ void OpenGLVideo::Teardown(void)
 }
 
 /**
- *  \fn OpenGLVideo::Init(MythRenderOpenGL *glcontext, bool colour_control,
-                       QSize videoDim, QRect displayVisibleRect,
-                       QRect displayVideoRect, QRect videoRect,
-                       bool viewport_control, QString options, bool osd)
  *  \param glcontext          the MythRenderOpenGL object responsible for lower
  *   levelwindow and OpenGL context integration
- *  \param colour_control     if true, manipulation of video attributes
- *   (colour, contrast etc) will be enabled
+ *  \param colourspace        the colourspace management object
  *  \param videoDim           the size of the video source
+ *  \param videoDispDim       the size of the display
  *  \param displayVisibleRect the bounding rectangle of the OpenGL window
  *  \param displayVideoRect   the bounding rectangle for the area to display
  *   the video frame
@@ -310,7 +305,6 @@ void OpenGLVideo::CheckResize(bool deinterlacing, bool allow)
 }
 
 /**
- * \fn OpenGLVideo::OptimiseFilters(void)
  *  Ensure the current chain of OpenGLFilters is logically correct
  *  and has the resources required to complete rendering.
  */
@@ -374,7 +368,6 @@ bool OpenGLVideo::OptimiseFilters(void)
 }
 
 /**
- * \fn OpenGLVideo::SetFiltering(void)
  *  Set the OpenGL texture mapping functions to optimise speed and quality.
  */
 
@@ -410,7 +403,6 @@ void OpenGLVideo::SetFiltering(void)
 }
 
 /**
- * \fn OpenGLVideo::AddFilter(OpenGLFilterType filter)
  *  Add a new filter stage and create any additional resources needed.
  */
 
@@ -547,7 +539,6 @@ void OpenGLVideo::TearDownDeinterlacer(void)
 }
 
 /**
- * \fn OpenGLVideo::AddDeinterlacer(const QString &deinterlacer)
  *  Extends the functionality of the basic YUV->RGB filter stage to include
  *  deinterlacing (combining the stages is significantly more efficient than
  *  2 separate stages). Create 2 deinterlacing fragment programs, 1 for each
@@ -636,8 +627,6 @@ bool OpenGLVideo::AddDeinterlacer(const QString &deinterlacer)
 }
 
 /**
- * \fn OpenGLVideo::AddFragmentProgram(OpenGLFilterType name,
-                                       QString deint, FrameScanType field)
  *  Create the correct fragment program for the given filter type
  */
 
@@ -666,8 +655,6 @@ uint OpenGLVideo::AddFragmentProgram(OpenGLFilterType name,
 }
 
 /**
- * \fn OpenGLVideo::AddFrameBuffer(uint &framebuffer,
-                                   uint &texture, QSize vid_size)
  *  Add a FrameBuffer object of the correct size to the given texture.
  */
 
@@ -705,7 +692,6 @@ void OpenGLVideo::SetViewPort(const QSize &viewPortSize)
 }
 
 /**
- * \fn OpenGLVideo::CreateVideoTexture(QSize size, QSize &tex_size)
  *  Create and initialise an OpenGL texture suitable for a YV12 video frame
  *  of the given size.
  */
@@ -779,7 +765,6 @@ void OpenGLVideo::SetInputUpdated(void)
 }
 
 /**
- * \fn OpenGLVideo::UpdateInputFrame(const VideoFrame *frame, bool soft_bob)
  *  Update the current input texture using the data from the given YV12 video
  *  frame. If the required hardware support is not available, fall back to
  *  software YUV->RGB conversion.
@@ -849,9 +834,6 @@ void OpenGLVideo::SetSoftwareDeinterlacer(const QString &filter)
 }
 
 /**
- * \fn OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
-                                 bool softwareDeinterlacing,
-                                 long long frame, bool draw_border)
  *  Render the contents of the current input texture to the framebuffer
  *  using the currently enabled filters.
  *  \param topfieldfirst        the frame is interlaced and top_field_first

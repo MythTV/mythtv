@@ -552,26 +552,29 @@ DTC::ProgramList* Dvr::GetUpcomingList( int  nStartIndex,
                                         int  nRecordId,
                                         int  nRecStatus )
 {
-    RecordingList  recordingList;
-    RecordingList  tmpList;
-    bool hasConflicts;
+    RecordingList  recordingList; // Auto-delete deque
+    RecList  tmpList; // Standard deque, objects must be deleted
 
     if (nRecordId <= 0)
         nRecordId = -1;
 
-    LoadFromScheduler(tmpList, hasConflicts, "", nRecordId);
+    // NOTE: Fetching this information directly from the schedule is
+    //       significantly faster than using ProgramInfo::LoadFromScheduler()
+    Scheduler *scheduler = dynamic_cast<Scheduler*>(gCoreContext->GetScheduler());
+    if (scheduler)
+        scheduler->GetAllPending(tmpList, nRecordId);
 
     // Sort the upcoming into only those which will record
-    RecordingList::iterator it = tmpList.begin();
+    RecList::iterator it = tmpList.begin();
     for(; it < tmpList.end(); ++it)
     {
-        if (nRecordId > 0 &&
-            (*it)->GetRecordingRuleID() != static_cast<uint>(nRecordId))
-            continue;
-
         if ((nRecStatus != 0) &&
             ((*it)->GetRecordingStatus() != nRecStatus))
+        {
+            delete *it;
+            *it = NULL;
             continue;
+        }
 
         if (!bShowAll && ((((*it)->GetRecordingStatus() >= RecStatus::Failing) &&
                            ((*it)->GetRecordingStatus() <= RecStatus::WillRecord)) ||
@@ -585,6 +588,9 @@ DTC::ProgramList* Dvr::GetUpcomingList( int  nStartIndex,
         {
             recordingList.push_back(new RecordingInfo(**it));
         }
+
+        delete *it;
+        *it = NULL;
     }
 
     // ----------------------------------------------------------------------
@@ -626,28 +632,29 @@ DTC::ProgramList* Dvr::GetConflictList( int  nStartIndex,
                                         int  nCount,
                                         int  nRecordId       )
 {
-    RecordingList  recordingList;
-    RecordingList  tmpList;
-    bool hasConflicts;
+    RecordingList  recordingList; // Auto-delete deque
+    RecList  tmpList; // Standard deque, objects must be deleted
 
     if (nRecordId <= 0)
         nRecordId = -1;
 
-    LoadFromScheduler(tmpList, hasConflicts, "", nRecordId);
+    // NOTE: Fetching this information directly from the schedule is
+    //       significantly faster than using ProgramInfo::LoadFromScheduler()
+    Scheduler *scheduler = dynamic_cast<Scheduler*>(gCoreContext->GetScheduler());
+    if (scheduler)
+        scheduler->GetAllPending(tmpList, nRecordId);
 
     // Sort the upcoming into only those which are conflicts
-    RecordingList::iterator it = tmpList.begin();
+    RecList::iterator it = tmpList.begin();
     for(; it < tmpList.end(); ++it)
     {
-        if (nRecordId > 0 &&
-            (*it)->GetRecordingRuleID() != static_cast<uint>(nRecordId))
-            continue;
-
         if (((*it)->GetRecordingStatus() == RecStatus::Conflict) &&
             ((*it)->GetRecordingStartTime() >= MythDate::current()))
         {
             recordingList.push_back(new RecordingInfo(**it));
         }
+        delete *it;
+        *it = NULL;
     }
 
     // ----------------------------------------------------------------------
