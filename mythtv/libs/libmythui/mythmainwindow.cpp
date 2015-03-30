@@ -2927,7 +2927,7 @@ void MythMainWindow::ResetIdleTimer(void)
     if (d->standby)
         ExitStandby(false);
 
-    d->idleTimer->start();
+    QMetaObject::invokeMethod(d->idleTimer, "start");
 }
 
 void MythMainWindow::PauseIdleTimer(bool pause)
@@ -2942,12 +2942,12 @@ void MythMainWindow::PauseIdleTimer(bool pause)
     if (pause)
     {
         LOG(VB_GENERAL, LOG_NOTICE, "Suspending idle timer");
-        d->idleTimer->stop();
+        QMetaObject::invokeMethod(d->idleTimer, "stop");
     }
     else
     {
         LOG(VB_GENERAL, LOG_NOTICE, "Resuming idle timer");
-        d->idleTimer->start();
+        QMetaObject::invokeMethod(d->idleTimer, "start");
     }
 
     // ResetIdleTimer();
@@ -3030,9 +3030,9 @@ void MythMainWindow::ExitStandby(bool manual)
 void MythMainWindow::DisableIdleTimer(bool disableIdle)
 {
     if ((d->disableIdle = disableIdle))
-        d->idleTimer->stop();
+        QMetaObject::invokeMethod(d->idleTimer, "stop");
     else
-        d->idleTimer->start();
+        QMetaObject::invokeMethod(d->idleTimer, "start");
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
