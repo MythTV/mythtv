@@ -5173,7 +5173,7 @@ static bool FromProgramQuery(const QString &sql, const MSqlBindings &bindings,
     // limit of 20000.
     if (limit > 0)
         querystr += QString("LIMIT %1 ").arg(limit);
-    else if (!querystr.contains("LIMIT"))
+    else if (!querystr.contains(" LIMIT "))
         querystr += " LIMIT 20000 "; // For performance reasons we have to have an upper limit
 
     MSqlBindings::const_iterator it;
