@@ -770,7 +770,6 @@ void SSDPExtension::GetDeviceDesc( HTTPRequest *pRequest )
 void SSDPExtension::GetFile( HTTPRequest *pRequest, QString sFileName )
 {
     pRequest->m_eResponseType   = ResponseTypeHTML;
-    pRequest->m_nResponseStatus = 404;
 
     pRequest->m_sFileName = m_sUPnpDescPath + sFileName;
 
@@ -783,10 +782,12 @@ void SSDPExtension::GetFile( HTTPRequest *pRequest, QString sFileName )
         pRequest->m_eResponseType   = ResponseTypeFile;
         pRequest->m_nResponseStatus = 200;
         pRequest->m_mapRespHeaders[ "Cache-Control" ]
-            = "no-cache=\"Ext\", max-age = 5000";
+            = "no-cache=\"Ext\", max-age = 7200"; // 2 hours
     }
     else
     {
+        pRequest->m_nResponseStatus = 404;
+        pRequest->m_response.write( pRequest->GetResponsePage() );
         LOG(VB_UPNP, LOG_ERR,
             QString("SSDPExtension::GetFile( %1 ) - Not Found")
                 .arg(pRequest->m_sFileName));

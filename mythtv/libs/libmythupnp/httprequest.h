@@ -232,6 +232,8 @@ class UPNP_PUBLIC HTTPRequest
 
         Serializer *    GetSerializer   ();
 
+        QByteArray      GetResponsePage     ( void ); // Static response e.g. 400, 404, 501
+
         QString         GetRequestProtocol  () const;
         QString         GetResponseProtocol () const;
 

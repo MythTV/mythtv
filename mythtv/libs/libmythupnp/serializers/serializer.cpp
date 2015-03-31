@@ -22,10 +22,9 @@
 void Serializer::AddHeaders( QStringMap &headers )
 {
     headers[ "Cache-Control" ] = "no-cache=\"Ext\", "
-                                 "max-age = 5000";
+                                 "max-age = 7200"; // 2 hours
     
     headers[ "ETag" ] = "\"" + m_hash.result().toHex() + "\"";
-
 }
 
 //////////////////////////////////////////////////////////////////////////////
