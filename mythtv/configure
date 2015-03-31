@@ -5230,15 +5230,11 @@ is_qmake5(){
     $1 --version 2>&1 | egrep -q -e "Qt version 5\.[0-9]\.[0-9]"
 }
 
-is_qmake4(){
-    $1 --version 2>&1 | egrep -q -e "Qt version 4\.[8-9]\.[0-9]"
-}
-
 # qmake-qt5 /usr/lib64/qt5/bin/qmake /usr/lib/x86_64-linux-gnu/qt5/bin/qmake
 if [ x"$qmake" = "xqmake" ]; then
-    CHECK_QMAKE="qmake-qt5 /usr/lib64/qt5/bin/qmake /usr/lib/x86_64-linux-gnu/qt5/bin/qmake $qmake qmake-qt4"
+    CHECK_QMAKE="qmake-qt5 /usr/lib64/qt5/bin/qmake /usr/lib/x86_64-linux-gnu/qt5/bin/qmake $qmake"
 else
-    CHECK_QMAKE="$qmake qmake-qt5 /usr/lib64/qt5/bin/qmake /usr/lib/x86_64-linux-gnu/qt5/bin/qmake qmake-qt4"
+    CHECK_QMAKE="$qmake qmake-qt5 /usr/lib64/qt5/bin/qmake /usr/lib/x86_64-linux-gnu/qt5/bin/qmake"
 fi
 # try to find a qt5 qmake to use
 found_qmake=''
@@ -5247,13 +5243,10 @@ for i in $CHECK_QMAKE; do
         found_qmake=$i
         check_cxxflags -DQT_DISABLE_DEPRECATED_BEFORE
         break;
-    elif is_qmake4 $i; then
-        found_qmake=$i
-        break;
     fi
 done
 if [ x"$found_qmake" = "x" ]; then
-    die "qmake for Qt4.8 or newer not found.\nPlease specify the correct qmake with --qmake="
+    die "qmake for Qt5.2 or newer not found.\nPlease specify the correct qmake with --qmake="
 else
     qmake=$found_qmake
 fi
