@@ -594,6 +594,7 @@ void MythConfirmationDialog::sendResult(bool ok)
         DialogCompletionEvent *dce = new DialogCompletionEvent(m_id, res, "",
                                                                m_resultData);
         QCoreApplication::postEvent(m_retObject, dce);
+        m_retObject = NULL;
     }
 
     Close();
