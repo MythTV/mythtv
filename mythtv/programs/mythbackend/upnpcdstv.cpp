@@ -1249,16 +1249,15 @@ bool UPnpCDSTv::LoadRecordings(const UPnpCDSRequest* pRequest,
             sMimeType = "video/mpeg";
 
         QUrl    resURI    = URIBase;
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
         QUrlQuery resQuery;
-#endif
-        resURI.setPath("Content/GetRecording");
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+        resURI.setPath("/Content/GetRecording");
         resQuery.addQueryItem("RecordedId", QString::number(nRecordedId));
         resURI.setQuery(resQuery);
-#else
-        resURI.addQueryItem("RecordedId", QString::number(nRecordedId));
-#endif
+
+        if (!resURI.isValid())
+            qDebug() << "URI is NOT valid! " << resURI.toString();
+        else
+            qDebug() << "URI is valid";
 
         QString sProtocol = DLNA::ProtocolInfoString(UPNPProtocol::kHTTP,
                                                      sMimeType,
@@ -1287,7 +1286,7 @@ bool UPnpCDSTv::LoadRecordings(const UPnpCDSRequest* pRequest,
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
         QUrlQuery previewQuery;
 #endif
-        previewURI.setPath("Content/GetPreviewImage");
+        previewURI.setPath("/Content/GetPreviewImage");
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
         previewQuery.addQueryItem("RecordedId", QString::number(nRecordedId));
         previewQuery.addQueryItem("Width", "160");
@@ -1338,7 +1337,7 @@ void UPnpCDSTv::PopulateArtworkURIS(CDSObject* pItem, const QString &sInetRef,
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
     QUrlQuery artQuery;
 #endif
-    artURI.setPath("Content/GetRecordingArtwork");
+    artURI.setPath("/Content/GetRecordingArtwork");
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
     artQuery.addQueryItem("Inetref", sInetRef);
     artQuery.addQueryItem("Season", QString::number(nSeason));

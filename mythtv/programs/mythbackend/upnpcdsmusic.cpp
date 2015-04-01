@@ -374,7 +374,7 @@ void UPnpCDSMusic::PopulateArtworkURIS(CDSObject* pItem, int nSongID)
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
     QUrlQuery artQuery;
 #endif
-    artURI.setPath("Content/GetAlbumArt");
+    artURI.setPath("/Content/GetAlbumArt");
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
     artQuery.addQueryItem("Id", QString::number(nSongID));
     artURI.setQuery(artQuery);
@@ -829,7 +829,7 @@ bool UPnpCDSMusic::LoadTracks(const UPnpCDSRequest *pRequest,
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
         QUrlQuery resQuery;
 #endif
-        resURI.setPath("Content/GetMusic");
+        resURI.setPath("/Content/GetMusic");
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
         resQuery.addQueryItem("Id", QString::number(nId));
         resURI.setQuery(resQuery);

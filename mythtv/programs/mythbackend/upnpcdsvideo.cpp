@@ -815,7 +815,7 @@ bool UPnpCDSVideo::LoadVideos(const UPnpCDSRequest* pRequest,
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
         QUrlQuery resQuery;
 #endif
-        resURI.setPath("Content/GetVideo");
+        resURI.setPath("/Content/GetVideo");
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
         resQuery.addQueryItem("Id", QString::number(nVidID));
         resURI.setQuery(resQuery);
@@ -868,7 +868,7 @@ void UPnpCDSVideo::PopulateArtworkURIS(CDSObject* pItem, int nVidID,
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
     QUrlQuery artQuery;
 #endif
-    artURI.setPath("Content/GetVideoArtwork");
+    artURI.setPath("/Content/GetVideoArtwork");
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
     artQuery.addQueryItem("Id", QString::number(nVidID));
     artURI.setQuery(artQuery);
