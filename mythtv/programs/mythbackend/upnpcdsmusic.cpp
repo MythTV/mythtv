@@ -885,7 +885,7 @@ void UPnpCDSMusic::BindValues( MSqlQuery &query,
     if (tokens["track"].toInt() > 0)
         query.bindValue(":TRACK_ID", tokens["track"]);
     if (tokens["album"].toInt() > 0)
-        query.bindValue(":ABLUM_ID", tokens["album"]);
+        query.bindValue(":ALBUM_ID", tokens["album"]);
     if (tokens["artist"].toInt() > 0)
         query.bindValue(":ARTIST_ID", tokens["artist"]);
     if (tokens["genre"].toInt() > 0)
