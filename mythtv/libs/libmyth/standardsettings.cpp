@@ -764,8 +764,6 @@ void StandardSettingDialog::settingSelected(MythUIButtonListItem *item)
     if (setting && m_selectedSettingHelp)
     {
         m_selectedSettingHelp->SetText(setting->getHelpText());
-        if (m_selectedSettingHelp->GetText().isEmpty())
-            m_selectedSettingHelp->SetText("This setting need a description");
     }
 }
 
@@ -850,13 +848,9 @@ void StandardSettingDialog::setCurrentGroupSetting(
     m_currentGroupSetting->Open();
 
     m_title->SetText(m_currentGroupSetting->getLabel());
-    if (m_title->GetText().isEmpty())
-        m_title->SetText("This group need a title");
     if (m_groupHelp)
     {
         m_groupHelp->SetText(m_currentGroupSetting->getHelpText());
-        if (m_groupHelp->GetText().isEmpty())
-            m_groupHelp->SetText("This group need a description");
     }
     updateSettings(selectedSetting);
     connect(m_currentGroupSetting,
