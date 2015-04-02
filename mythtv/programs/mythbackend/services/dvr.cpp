@@ -266,6 +266,84 @@ bool Dvr::UpdateRecordedWatchedStatus ( int RecordedId,
 //
 /////////////////////////////////////////////////////////////////////////////
 
+DTC::RecordedMarkupInfo* Dvr::GetRecordedMarkupInfo    ( int              ChanId,
+                                                            const QDateTime &StartTime  )
+{
+    if (ChanId <= 0 || !StartTime.isValid())
+        throw QString("Channel ID or StartTime appears invalid.");
+
+	MSqlQuery query(MSqlQuery::InitCon());
+
+	if (!query.isConnected())
+	    throw( QString("Database not open while trying to get "
+	 	                "Recording Markups."));
+    query.prepare("SELECT chanid, starttime, mark, type, data "
+  	              " FROM recordedmarkup "
+                  " WHERE chanid = :CHANID AND starttime = :STARTTIME "
+                  " ORDER BY mark, type");
+
+    query.bindValue( ":CHANID",     ChanId    );
+    query.bindValue( ":STARTTIME",  StartTime );
+
+    if (!query.exec())
+	{
+	    MythDB::DBError("MythAPI::GetRecordingMarkups()", query);
+        throw( QString( "Database Error executing query." ));
+    }
+
+    // ----------------------------------------------------------------------
+    // return the results of the query
+    // ----------------------------------------------------------------------
+
+    DTC::RecordedMarkupInfo *pRecordedMarkup = new DTC::RecordedMarkupInfo();
+
+    DTC::RecordedMarkupItem *pItem  = NULL;
+	while (query.next())
+	{
+        QDateTime dateTime = MythDate::as_utc(query.value(1).toDateTime());
+        pRecordedMarkup->setChannelId    ( query.value(0).toInt()       );
+        pRecordedMarkup->setStartTime    ( dateTime    );
+
+        switch(query.value(3).toInt())
+        {
+            case MARK_COMM_START:
+            	pItem = pRecordedMarkup->AddNewMarkupItem();
+            	pItem->setType(QString("COMMSKIP"));
+            	pItem->setStart(query.value(2).toInt());
+                break;
+            case MARK_COMM_END:
+            	if(pItem != NULL)
+            		pItem->setEnd(query.value(2).toInt());
+            	pItem = NULL;
+                break;
+            case MARK_TOTAL_FRAMES:
+            	pRecordedMarkup->setTotalFrames(query.value(4).toInt());
+                break;
+            case MARK_DURATION_MS:
+            	pRecordedMarkup->setDurationMs(query.value(4).toInt());
+                break;
+            case MARK_VIDEO_RATE:
+            	pRecordedMarkup->setVideoRate(query.value(4).toInt());
+                break;
+            case MARK_VIDEO_WIDTH:
+            	pRecordedMarkup->setVideoWidth(query.value(4).toInt());
+                break;
+            case MARK_VIDEO_HEIGHT:
+            	pRecordedMarkup->setVideoHeight(query.value(4).toInt());
+                break;
+            case MARK_BOOKMARK:
+                pRecordedMarkup->setBookmark(query.value(2).toInt());
+            default:
+            	break;
+        }
+	}
+	return pRecordedMarkup;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 DTC::ProgramList* Dvr::GetExpiringList( int nStartIndex, 
                                         int nCount      )
 {

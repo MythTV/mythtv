@@ -24,6 +24,7 @@
 #include "datacontracts/titleInfoList.h"
 #include "datacontracts/input.h"
 #include "datacontracts/inputList.h"
+#include "datacontracts/recordedMarkupInfo.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -44,7 +45,7 @@
 class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "6.1" );
+    Q_CLASSINFO( "version"    , "6.2" );
     Q_CLASSINFO( "RemoveRecorded_Method",                       "POST" )
     Q_CLASSINFO( "DeleteRecording_Method",                      "POST" )
     Q_CLASSINFO( "UnDeleteRecording",                           "POST" )
@@ -70,6 +71,7 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
             DTC::RecRuleList::InitializeCustomTypes();
             DTC::TitleInfoList::InitializeCustomTypes();
             DTC::RecRuleFilterList::InitializeCustomTypes();
+	    DTC::RecordedMarkupInfo::InitializeCustomTypes();
         }
 
     public slots:
@@ -108,6 +110,9 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
                                                                  int   ChanId,
                                                                  const QDateTime &StartTime,
                                                                  bool  Watched) = 0;
+
+        virtual DTC::RecordedMarkupInfo* GetRecordedMarkupInfo    ( int              ChanId,
+                                                                 const QDateTime &StartTime  ) = 0;
 
         virtual DTC::ProgramList*  GetConflictList       ( int              StartIndex,
                                                            int              Count,

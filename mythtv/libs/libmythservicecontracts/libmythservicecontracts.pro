@@ -53,6 +53,7 @@ HEADERS += datacontracts/inputList.h
 HEADERS += datacontracts/recRuleFilter.h         datacontracts/recRuleFilterList.h
 HEADERS += datacontracts/castMember.h            datacontracts/castMemberList.h
 HEADERS += datacontracts/frontend.h              datacontracts/frontendList.h
+HEADERS += datacontracts/recordedMarkupInfo.h    datacontracts/recordedMarkupItem.h
 
 SOURCES += service.cpp
 
@@ -101,6 +102,7 @@ incDatacontracts.files += datacontracts/inputList.h
 incDatacontracts.files += datacontracts/recRuleFilter.h       datacontracts/recRuleFilterList.h
 incDatacontracts.files += datacontracts/castMember.h          datacontracts/castMemberList.h
 incDatacontracts.files += datacontracts/enum.h                datacontracts/enumItem.h
+incDatacontracts.files += datacontracts/recordedMarkupInfo.h    datacontracts/recordedMarkupItem.h
 
 INSTALLS += inc incServices incDatacontracts
 
