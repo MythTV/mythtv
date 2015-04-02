@@ -18,6 +18,10 @@ class QColor;
 
 #include <list>
 
+#ifdef _MSC_VER
+#  include <stdint.h>	// int64_t
+#endif
+
 class MythFontProperties;
 class MythImage;
 class UIEffects;

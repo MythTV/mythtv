@@ -28,6 +28,10 @@
 #include "mythuihelper.h"
 #include "mythscreentype.h"
 
+#ifdef _MSC_VER
+#  include "compat.h"   // random
+#endif
+
 class ImageLoadThread;
 
 #define LOC      QString("MythUIImage(0x%1): ").arg((uint64_t)this,0,16)

@@ -1,5 +1,6 @@
 #include <set>
 #include <map>
+#include <functional>   //not2
 
 #include <QApplication>
 #include <QTimer>
