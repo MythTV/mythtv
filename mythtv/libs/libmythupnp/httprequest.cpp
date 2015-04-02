@@ -1605,7 +1605,7 @@ bool HTTPRequest::ParseRange( QString sRange,
     if (parts.count() != 2)
         return false;
 
-    if (parts[0].isNull() && parts[1].isNull())
+    if (parts[0].isEmpty() && parts[1].isEmpty())
         return false;
 
     // ----------------------------------------------------------------------
@@ -1613,7 +1613,7 @@ bool HTTPRequest::ParseRange( QString sRange,
     // ----------------------------------------------------------------------
 
     bool conv_ok;
-    if (parts[0].isNull())
+    if (parts[0].isEmpty())
     {
         // ------------------------------------------------------------------
         // Does it match "-####"
@@ -1625,7 +1625,7 @@ bool HTTPRequest::ParseRange( QString sRange,
         *pllStart = llSize - llValue;
         *pllEnd   = llSize - 1;
     }
-    else if (parts[1].isNull())
+    else if (parts[1].isEmpty())
     {
         // ------------------------------------------------------------------
         // Does it match "####-"
