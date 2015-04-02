@@ -266,7 +266,73 @@ bool Dvr::UpdateRecordedWatchedStatus ( int RecordedId,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::ProgramList* Dvr::GetExpiringList( int nStartIndex, 
+DTC::CutList* Dvr::GetRecordedCutList ( int RecordedId,
+                                        int chanid,
+                                        const QDateTime &recstarttsRaw,
+                                        const QString &offsettype )
+{
+    int marktype;
+    if ((RecordedId <= 0) &&
+        (chanid <= 0 || !recstarttsRaw.isValid()))
+        throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
+
+    RecordingInfo ri;
+    if (RecordedId > 0)
+        ri = RecordingInfo(RecordedId);
+    else
+        ri = RecordingInfo(chanid, recstarttsRaw.toUTC());
+
+    DTC::CutList* pCutList = new DTC::CutList();
+    if (offsettype == "Position")
+        marktype = 1;
+    else if (offsettype == "Duration")
+        marktype = 2;
+    else
+        marktype = 0;
+
+    FillCutList(pCutList, &ri, marktype);
+
+    return pCutList;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+DTC::CutList* Dvr::GetRecordedCommBreak ( int RecordedId,
+                                          int chanid,
+                                          const QDateTime &recstarttsRaw,
+                                          const QString &offsettype )
+{
+    int marktype;
+    if ((RecordedId <= 0) &&
+        (chanid <= 0 || !recstarttsRaw.isValid()))
+        throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
+
+    RecordingInfo ri;
+    if (RecordedId > 0)
+        ri = RecordingInfo(RecordedId);
+    else
+        ri = RecordingInfo(chanid, recstarttsRaw.toUTC());
+
+    DTC::CutList* pCutList = new DTC::CutList();
+    if (offsettype == "Position")
+        marktype = 1;
+    else if (offsettype == "Duration")
+        marktype = 2;
+    else
+        marktype = 0;
+
+    FillCommBreak(pCutList, &ri, marktype);
+
+    return pCutList;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+DTC::ProgramList* Dvr::GetExpiringList( int nStartIndex,
                                         int nCount      )
 {
     pginfolist_t  infoList;
