@@ -1129,12 +1129,19 @@ void TV::InitFromDB(void)
     kv["VbiFormat"]                = "";
     kv["DecodeVBIFormat"]          = "";
 
+    // these need exactly 12 items, comma cant be used as it is the delimiter
+    kv["PlaybackScreenPressKeyMap"]     = "P,Up,Z,],Left,Return,Return,Right,A,Down,Q,[";
+    kv["LiveTVScreenPressKeyMap"]     = "P,Up,Z,S,Left,Return,Return,Right,A,Down,Q,F";
+
     int ff_rew_def[8] = { 3, 5, 10, 20, 30, 60, 120, 180 };
     for (uint i = 0; i < sizeof(ff_rew_def)/sizeof(ff_rew_def[0]); i++)
         kv[QString("FFRewSpeed%1").arg(i)] = QString::number(ff_rew_def[i]);
 
     MythDB::getMythDB()->GetSettings(kv);
 
+    screenPressKeyMapPlayback = ConvertScreenPressKeyMap(kv["PlaybackScreenPressKeyMap"]);
+    screenPressKeyMapLiveTV = ConvertScreenPressKeyMap(kv["LiveTVScreenPressKeyMap"]);
+    
     QString db_channel_ordering;
     uint    db_browse_max_forward;
 
@@ -3838,8 +3845,37 @@ static bool SysEventHandleAction(QKeyEvent *e, const QStringList &actions)
     return false;
 }
 
-bool TV::TranslateGesture(const QString &context,
-                          MythGestureEvent *e, QStringList &actions)
+QList<QKeyEvent> TV::ConvertScreenPressKeyMap(const QString &keyList)
+{
+    QList<QKeyEvent> keyPressList;
+    int i;
+    QStringList stringKeyList = keyList.split(',');
+    for(QString s : stringKeyList)
+    {
+        QKeySequence keySequence(s);
+        for(i = 0; i < keySequence.count(); i++)
+        {
+            unsigned int keynum = keySequence[i];
+            QKeyEvent keyEvent{QEvent::None, 
+                               (int)(keynum & ~Qt::KeyboardModifierMask),
+                               (Qt::KeyboardModifiers)(keynum & Qt::KeyboardModifierMask)};
+            keyPressList.append(keyEvent);
+        }
+    }
+    if (stringKeyList.count() < screenPressRegionCount)
+    {
+        // add default remainders
+        for(; i < screenPressRegionCount; i++)
+        {
+            QKeyEvent keyEvent{QEvent::None, Qt::Key_Escape, Qt::NoModifier};
+            keyPressList.append(keyEvent);
+        }
+    }
+    return keyPressList;
+}
+
+bool TV::TranslateGesture(const QString &context, MythGestureEvent *e, 
+                          QStringList &actions, bool isLiveTV)
 {
     if (context == "TV Playback")
     {
@@ -3860,12 +3896,12 @@ bool TV::TranslateGesture(const QString &context,
             int h3 = size.height() / 3;
             region += (pos.y() / h3) * widthDivider;
 
+#if 0            
             // region is now 0..11
             //  0  1  2  3
             //  4  5  6  7
             //  8  9  10 11
             // should be inited in the constructor eventually
-#if 1
             QList<QKeyEvent> regionKeyList =
             {
                 /*  0 */ {QEvent::None, Qt::Key_P, Qt::NoModifier},
@@ -3881,26 +3917,17 @@ bool TV::TranslateGesture(const QString &context,
                 /* 10 */ {QEvent::None, Qt::Key_Q, Qt::NoModifier},
                 /* 11 */ {QEvent::None, Qt::Key_BracketRight, Qt::NoModifier},
             };
-            return GetMythMainWindow()->TranslateKeyPress(
-                    context, &(regionKeyList[region]), actions, true);
-#else
-            QStringList regionActionList =
-            {
-                /* 0 */ "PAUSE",
-                /* 1 */ "CHANNELUP",
-                /* 2 */ "SKIPCOMMERCIAL",
-                /* 3 */ "VOLUMEUP",
-                /* 4 */ "SEEKRWND",
-                /* 5 */ "SELECT",
-                /* 6 */ "SELECT",
-                /* 7 */ "SEEKFFWD",
-                /* 8 */ "ADJUSTSTRETCH",
-                /* 9 */ "CHANNELDOWN",
-                /* 10 */ "SKIPCOMMBACK",
-                /* 11 */ "VOLUMEDOWN",
-            };
-            actions.append(regionActionList[region]);
 #endif
+            if (isLiveTV)
+            {
+                return GetMythMainWindow()->TranslateKeyPress(
+                        context, &(screenPressKeyMapLiveTV[region]), actions, true);
+            }
+            else
+            {
+                return GetMythMainWindow()->TranslateKeyPress(
+                        context, &(screenPressKeyMapPlayback[region]), actions, true);
+            }
         }
         return false;
     }
@@ -3909,7 +3936,7 @@ bool TV::TranslateGesture(const QString &context,
 
 bool TV::TranslateKeyPressOrGesture(const QString &context,
                                     QEvent *e, QStringList &actions,
-                                    bool allowJumps)
+                                    bool isLiveTV, bool allowJumps)
 {
     if (QEvent::KeyPress == e->type())
     {
@@ -3918,7 +3945,7 @@ bool TV::TranslateKeyPressOrGesture(const QString &context,
     }
     if (MythGestureEvent::kEventType == e->type())
     {
-        return TranslateGesture(context, (MythGestureEvent*)e, actions);
+        return TranslateGesture(context, (MythGestureEvent*)e, actions, isLiveTV);
     }
 
     return false;
@@ -3942,10 +3969,12 @@ bool TV::ProcessKeypressOrGesture(PlayerContext *actx, QEvent *e)
     bool handled = false;
     bool alreadyTranslatedPlayback = false;
 
+    TVState state = GetState(actx);
+    bool isLiveTV = StateIsLiveTV(state);
+    
     if (ignoreKeys)
     {
-        handled = TranslateKeyPressOrGesture(
-                  "TV Playback", e, actions);
+        handled = TranslateKeyPressOrGesture("TV Playback", e, actions, isLiveTV);
         alreadyTranslatedPlayback = true;
 
         if (handled || actions.isEmpty())
@@ -3978,7 +4007,7 @@ bool TV::ProcessKeypressOrGesture(PlayerContext *actx, QEvent *e)
     if (editmode && !handled)
     {
         handled |= TranslateKeyPressOrGesture(
-                   "TV Editing", e, actions);
+                   "TV Editing", e, actions, isLiveTV);
 
         if (!handled && actx->player)
         {
@@ -4051,7 +4080,7 @@ bool TV::ProcessKeypressOrGesture(PlayerContext *actx, QEvent *e)
     {
         QStringList tt_actions;
         handled = TranslateKeyPressOrGesture(
-                  "Teletext Menu", e, tt_actions);
+                  "Teletext Menu", e, tt_actions, isLiveTV);
 
         if (!handled && !tt_actions.isEmpty())
         {
@@ -4072,7 +4101,7 @@ bool TV::ProcessKeypressOrGesture(PlayerContext *actx, QEvent *e)
         if (!alreadyTranslatedPlayback)
         {
             handled = TranslateKeyPressOrGesture(
-                      "TV Playback", e, actions);
+                      "TV Playback", e, actions, isLiveTV);
             alreadyTranslatedPlayback = true;
         }
         if (!handled && !actions.isEmpty())
@@ -4092,7 +4121,7 @@ bool TV::ProcessKeypressOrGesture(PlayerContext *actx, QEvent *e)
     if (!alreadyTranslatedPlayback)
     {
         handled = TranslateKeyPressOrGesture(
-                  "TV Playback", e, actions);
+                  "TV Playback", e, actions, isLiveTV);
     }
     if (handled || actions.isEmpty())
         return true;
