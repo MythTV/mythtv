@@ -13,6 +13,12 @@
 #include <QDesktopWidget>
 #endif
 
+#ifdef Q_OS_ANDROID
+#include <QtAndroidExtras>
+#include <mythlogging.h>
+#define LOC      QString("DispInfo: ")
+#endif
+
 #define VALID_RATE(rate) (rate > 20.0 && rate < 200.0)
 
 static float fix_rate(int video_rate)
@@ -107,6 +113,31 @@ DisplayInfo MythDisplay::GetDisplayInfo(int video_rate)
     ret.res  = disp->GetDisplaySize();
     ret.size = disp->GetDisplayDimensions();
     delete disp;
+#elif defined(Q_OS_ANDROID)
+    QAndroidJniObject activity = QtAndroid::androidActivity();
+    QAndroidJniObject windowManager =  activity.callObjectMethod("getWindowManager", "()Landroid/view/WindowManager;");
+    QAndroidJniObject display =  windowManager.callObjectMethod("getDefaultDisplay", "()Landroid/view/Display;");
+    QAndroidJniObject displayMetrics("android/util/DisplayMetrics");
+    display.callMethod<void>("getMetrics", "(Landroid/util/DisplayMetrics;)V", displayMetrics.object());
+    float xdpi = displayMetrics.getField<jfloat>("xdpi");
+    float ydpi = displayMetrics.getField<jfloat>("ydpi");
+    float rate = display.callMethod<jfloat>("getRefreshRate");
+    int height = display.callMethod<jint>("getHeight");
+    int width = display.callMethod<jint>("getWidth");
+    LOG(VB_GENERAL, LOG_INFO, LOC +
+        QString("rate:%1 h:%2 w:%3 xdpi:%4 ydpi:%5")
+        .arg(rate).arg(height).arg(width)
+        .arg(xdpi).arg(ydpi)
+        );
+
+    if (VALID_RATE(rate))
+        ret.rate = 1000000.0f / rate;
+    else
+        ret.rate = fix_rate(video_rate);
+    ret.res = QSize((uint)width, (uint)height);
+    ret.size = QSize((uint)width, (uint)height);
+    if (xdpi > 0 && ydpi > 0)
+        ret.size = QSize((uint)width/xdpi*25.4, (uint)height/ydpi*25.4);
 #endif
     return ret;
 }
