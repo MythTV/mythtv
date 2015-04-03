@@ -15,7 +15,7 @@
 #include <QString>
 
 #include "serviceexp.h" 
-#include "datacontracthelper.h"   
+#include "datacontracthelper.h"
 #include "programtypes.h"
 
 namespace DTC
@@ -24,31 +24,41 @@ namespace DTC
 class SERVICE_PUBLIC RecordingInfo : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version", "1.02" );
+    Q_CLASSINFO( "version", "1.3" );
 
-    Q_PROPERTY( uint                    RecordedId READ RecordedId WRITE setRecordedId    )
-    Q_PROPERTY( RecStatus::Type         Status     READ Status     WRITE setStatus    )
-    Q_PROPERTY( int                     Priority   READ Priority   WRITE setPriority  )
-    Q_PROPERTY( QDateTime               StartTs    READ StartTs    WRITE setStartTs   )
-    Q_PROPERTY( QDateTime               EndTs      READ EndTs      WRITE setEndTs     )
-                                                   
-    Q_PROPERTY( int                     RecordId     READ RecordId     WRITE setRecordId     DESIGNABLE SerializeDetails )
-    Q_PROPERTY( QString                 RecGroup     READ RecGroup     WRITE setRecGroup     DESIGNABLE SerializeDetails )
-    Q_PROPERTY( QString                 PlayGroup    READ PlayGroup    WRITE setPlayGroup    DESIGNABLE SerializeDetails )
-    Q_PROPERTY( QString                 StorageGroup READ StorageGroup WRITE setStorageGroup DESIGNABLE SerializeDetails )
-    Q_PROPERTY( int                     RecType      READ RecType      WRITE setRecType      DESIGNABLE SerializeDetails )
-    Q_PROPERTY( int                     DupInType    READ DupInType    WRITE setDupInType    DESIGNABLE SerializeDetails )
-    Q_PROPERTY( int                     DupMethod    READ DupMethod    WRITE setDupMethod    DESIGNABLE SerializeDetails )
-    Q_PROPERTY( int                     EncoderId    READ EncoderId    WRITE setEncoderId    DESIGNABLE SerializeDetails )
-    Q_PROPERTY( QString                 EncoderName  READ EncoderName  WRITE setEncoderName  DESIGNABLE SerializeDetails )
-    Q_PROPERTY( QString                 Profile      READ Profile      WRITE setProfile      DESIGNABLE SerializeDetails )
+    Q_PROPERTY( uint             RecordedId   READ RecordedId   WRITE setRecordedId )
+    Q_PROPERTY( RecStatus::Type  Status       READ Status       WRITE setStatus     )
+    Q_PROPERTY( int              Priority     READ Priority     WRITE setPriority   )
+    Q_PROPERTY( QDateTime        StartTs      READ StartTs      WRITE setStartTs    )
+    Q_PROPERTY( QDateTime        EndTs        READ EndTs        WRITE setEndTs      )
+
+    Q_PROPERTY( qlonglong        FileSize     READ FileSize     WRITE setFileSize     DESIGNABLE SerializeDetails ) // v1.3
+    Q_PROPERTY( QString          FileName     READ FileName     WRITE setFileName     DESIGNABLE SerializeDetails ) // v1.3
+    Q_PROPERTY( QString          HostName     READ HostName     WRITE setHostName     DESIGNABLE SerializeDetails ) // v1.3
+    Q_PROPERTY( QDateTime        LastModified READ LastModified WRITE setLastModified DESIGNABLE SerializeDetails ) // v1.3
+
+    Q_PROPERTY( int              RecordId     READ RecordId     WRITE setRecordId     DESIGNABLE SerializeDetails )
+    Q_PROPERTY( QString          RecGroup     READ RecGroup     WRITE setRecGroup     DESIGNABLE SerializeDetails )
+    Q_PROPERTY( QString          PlayGroup    READ PlayGroup    WRITE setPlayGroup    DESIGNABLE SerializeDetails )
+    Q_PROPERTY( QString          StorageGroup READ StorageGroup WRITE setStorageGroup DESIGNABLE SerializeDetails )
+    Q_PROPERTY( int              RecType      READ RecType      WRITE setRecType      DESIGNABLE SerializeDetails )
+    Q_PROPERTY( int              DupInType    READ DupInType    WRITE setDupInType    DESIGNABLE SerializeDetails )
+    Q_PROPERTY( int              DupMethod    READ DupMethod    WRITE setDupMethod    DESIGNABLE SerializeDetails )
+    Q_PROPERTY( int              EncoderId    READ EncoderId    WRITE setEncoderId    DESIGNABLE SerializeDetails )
+    Q_PROPERTY( QString          EncoderName  READ EncoderName  WRITE setEncoderName  DESIGNABLE SerializeDetails )
+    Q_PROPERTY( QString          Profile      READ Profile      WRITE setProfile      DESIGNABLE SerializeDetails )
 
     PROPERTYIMP     ( uint                   , RecordedId  )
     PROPERTYIMP_ENUM( RecStatus::Type        , Status      )
     PROPERTYIMP     ( int                    , Priority    )
     PROPERTYIMP     ( QDateTime              , StartTs     )
     PROPERTYIMP     ( QDateTime              , EndTs       )
-                                                 
+
+    PROPERTYIMP     ( qlonglong              , FileSize    ) // v1.3
+    PROPERTYIMP     ( QString                , FileName    ) // v1.3
+    PROPERTYIMP     ( QString                , HostName    ) // v1.3
+    PROPERTYIMP     ( QDateTime              , LastModified) // v1.3
+
     PROPERTYIMP     ( int                    , RecordId    )
     PROPERTYIMP     ( QString                , RecGroup    )
     PROPERTYIMP     ( QString                , StorageGroup)
@@ -74,6 +84,7 @@ class SERVICE_PUBLIC RecordingInfo : public QObject
               m_RecordedId      ( 0                  ),
               m_Status          ( RecStatus::Unknown ),
               m_Priority        ( 0                  ),
+              m_FileSize        ( 0                  ),
               m_RecordId        ( 0                  ),
               m_RecType         ( kNotRecording      ),
               m_DupInType       ( kDupsInRecorded    ),
@@ -82,8 +93,8 @@ class SERVICE_PUBLIC RecordingInfo : public QObject
               m_SerializeDetails( true               )
         {
         }
-        
-        RecordingInfo( const RecordingInfo &src ) 
+
+        RecordingInfo( const RecordingInfo &src )
         {
             Copy( src );
         }
@@ -95,6 +106,10 @@ class SERVICE_PUBLIC RecordingInfo : public QObject
             m_Priority        = src.m_Priority         ;
             m_StartTs         = src.m_StartTs          ;
             m_EndTs           = src.m_EndTs            ;
+            m_FileSize        = src.m_FileSize         ;
+            m_FileName        = src.m_FileName         ;
+            m_HostName        = src.m_HostName         ;
+            m_LastModified    = src.m_LastModified     ;
             m_RecordId        = src.m_RecordId         ;
             m_RecGroup        = src.m_RecGroup         ;
             m_StorageGroup    = src.m_StorageGroup     ;
