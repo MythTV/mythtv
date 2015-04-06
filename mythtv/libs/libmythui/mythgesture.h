@@ -66,6 +66,10 @@ class MBASE_PUBLIC MythGestureEvent : public QEvent
         LeftThenDown,
         RightThenUp,
         RightThenDown,
+        RightThenLeft,
+        LeftThenRight,
+        UpThenDown,
+        DownThenUp,
 
         /* A click */
         Click,
