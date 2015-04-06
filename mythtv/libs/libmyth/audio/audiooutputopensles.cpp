@@ -15,8 +15,10 @@ using namespace std;
 
 #define OPENSLES_BUFFERS 10  /* maximum number of buffers */
 #define OPENSLES_BUFLEN  8   /* ms */
-
-//const uint AudioOutputOpenSLES::kPacketCnt = 4;
+//#define POSITIONUPDATEPERIOD 1000
+//#define POSITIONUPDATEPERIOD 25000
+#define POSITIONUPDATEPERIOD 40
+//#define POSITIONUPDATEPERIOD 200000
 
 #define CHECK_OPENSL_ERROR(msg)                \
     if (result != SL_RESULT_SUCCESS) \
@@ -55,13 +57,29 @@ int GetNativeOutputSampleRate(void);
 
 int GetNativeOutputSampleRate(void)
 {
+#if 1    
     QAndroidJniEnvironment jniEnv;
     jclass cls = jniEnv->FindClass("android/media/AudioTrack");
     jmethodID method = jniEnv->GetStaticMethodID (cls, "getNativeOutputSampleRate", "(I)I");
     int sample_rate = jniEnv->CallStaticIntMethod (cls, method, 3); // AudioManager.STREAM_MUSIC
     return sample_rate;
+#else    
+    //AudioManager.getProperty(PROPERTY_OUTPUT_SAMPLE_RATE)
+    return QAndroidJniObject::CallStaticMethodInt("android/media/AudioTrack", "getNativeOutputSampleRate", "(I)I", 3);
+#endif
 }
 
+#if 0
+int GetNativeOutputFramesPerBuffer(void)
+{
+    QAndroidJniObject activity = QtAndroid::androidActivity();
+    //Context.getSystemService(Context.AUDIO_SERVICE)
+    QAndroidJniObject audioManager = activity.CallObjectMethod("getSystemService", "", );
+    jstring sValue = audioManager.CallMethod<jstring>("getProperty", PROPERTY_OUTPUT_FRAMES_PER_BUFFER);
+    // getNativeOutputFramesPerBuffer
+    return QAndroidJniObject::CallStaticMethodInt("android/media/AudioManager", "getProperty", "(I)I", 3);
+}
+#endif
 
 bool AudioOutputOpenSLES::AudioOutputOpenSLES::CreateEngine()
 {
@@ -232,19 +250,35 @@ bool AudioOutputOpenSLES::StartPlayer()
     bufWriteIndex = 0;
     bufWriteBase = 0;
 
-    /* Buffers which arrive after pts - AOUT_MIN_PREPARE_TIME will be trashed
-       to avoid too heavy resampling */
-    SetPositionUpdatePeriod(playerPlay, 25000);
+
+    // we want 16bit signed data native endian.
+    //fmt->i_format              = VLC_CODEC_S16N;
+    //fmt->i_physical_channels   = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
+
+/* Buffers which arrive after pts - AOUT_MIN_PREPARE_TIME will be trashed
+    to avoid too heavy resampling */
+    //SetPositionUpdatePeriod(playerPlay, 25000);
+    //SetPositionUpdatePeriod(playerPlay, 40);
+    SetPositionUpdatePeriod(playerPlay, POSITIONUPDATEPERIOD);
 
     return true;
 }
 
 bool AudioOutputOpenSLES::Stop()
 {
+    SLresult       result;
     if (playerObject)
     {
+        // set the player's state to playing
+        result = SetPlayState(playerPlay, SL_PLAYSTATE_STOPPED);
+        CHECK_OPENSL_ERROR("Failed to switch to not playing state");
         Destroy(playerObject);
         playerObject = nullptr;
+    }
+    if (buf)
+    {
+        free(buf);
+        buf = nullptr;
     }
     return true;
 }
@@ -315,8 +349,9 @@ AudioOutputSettings* AudioOutputOpenSLES::GetOutputSettings(bool /*digital*/)
     settings->AddSupportedFormat(FORMAT_S16);
     // settings->AddSupportedFormat(FORMAT_S24);
     // settings->AddSupportedFormat(FORMAT_S32);
-    // 32-bit floating point (AC3) is not supported on all platforms.
-    // settings->AddSupportedFormat(FORMAT_FLT);
+#if 0 // 32-bit floating point (AC3) is not supported on all platforms.
+    settings->AddSupportedFormat(FORMAT_FLT);
+#endif
 
     // Guess that we can do up to 2
     settings->AddSupportedChannels(2);
@@ -477,7 +512,7 @@ void AudioOutputOpenSLES::SetVolumeChannel(int channel, int volume)
     // Volume is 0-100
     // android expects 0-1.0 before conversion
     // Convert UI volume to linear factor (cube) in log
-    float vol = volume / 10.f;
+    float vol = volume / 100.f;
 
     int mb;
     if (volume == 0)
@@ -497,13 +532,13 @@ void AudioOutputOpenSLES::SetVolumeChannel(int channel, int volume)
     SLresult r = SetVolumeLevel(volumeItf, mb);
     if (r == SL_RESULT_SUCCESS)
     {
-        VBERROR(QString("SetVolume(%1) %2(%3) : %4")
-                .arg(channel).arg(volume).arg(mb).arg(r));
+        VBAUDIO(QString("SetVolume(%1) %2(%3)")
+                .arg(channel).arg(volume).arg(mb));
     }
     else
     {
-        VBAUDIO(QString("SetVolume(%1) %2(%3)")
-                .arg(channel).arg(volume).arg(mb));
+        VBERROR(QString("SetVolume(%1) %2(%3) : %4")
+                .arg(channel).arg(volume).arg(mb).arg(r));
     }
 
 }
