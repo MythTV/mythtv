@@ -3896,28 +3896,6 @@ bool TV::TranslateGesture(const QString &context, MythGestureEvent *e,
             int h3 = size.height() / 3;
             region += (pos.y() / h3) * widthDivider;
 
-#if 0            
-            // region is now 0..11
-            //  0  1  2  3
-            //  4  5  6  7
-            //  8  9  10 11
-            // should be inited in the constructor eventually
-            QList<QKeyEvent> regionKeyList =
-            {
-                /*  0 */ {QEvent::None, Qt::Key_P, Qt::NoModifier},
-                /*  1 */ {QEvent::None, Qt::Key_Up, Qt::NoModifier},
-                /*  2 */ {QEvent::None, Qt::Key_Z, Qt::NoModifier},
-                /*  3 */ {QEvent::None, Qt::Key_BracketLeft, Qt::NoModifier},
-                /*  4 */ {QEvent::None, Qt::Key_Left, Qt::NoModifier},
-                /*  5 */ {QEvent::None, Qt::Key_Return, Qt::NoModifier},
-                /*  6 */ {QEvent::None, Qt::Key_Return, Qt::NoModifier},
-                /*  7 */ {QEvent::None, Qt::Key_Right, Qt::NoModifier},
-                /*  8 */ {QEvent::None, Qt::Key_A, Qt::NoModifier},
-                /*  9 */ {QEvent::None, Qt::Key_Down, Qt::NoModifier},
-                /* 10 */ {QEvent::None, Qt::Key_Q, Qt::NoModifier},
-                /* 11 */ {QEvent::None, Qt::Key_BracketRight, Qt::NoModifier},
-            };
-#endif
             if (isLiveTV)
             {
                 return GetMythMainWindow()->TranslateKeyPress(
