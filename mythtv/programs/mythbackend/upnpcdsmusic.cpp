@@ -11,6 +11,8 @@
 #include <climits>
 
 #include <QFileInfo>
+#include <QUrl>
+#include <QUrlQuery>
 
 #include "storagegroup.h"
 #include "upnpcdsmusic.h"
@@ -371,8 +373,10 @@ bool UPnpCDSMusic::LoadChildren(const UPnpCDSRequest* pRequest,
 void UPnpCDSMusic::PopulateArtworkURIS(CDSObject* pItem, int nSongID)
 {
     QUrl artURI = m_URIBase;
-    artURI.setPath("Content/GetAlbumArt");
-    artURI.addQueryItem("Id", QString::number(nSongID));
+    artURI.setPath("/Content/GetAlbumArt");
+    QUrlQuery artQuery;
+    artQuery.addQueryItem("Id", QString::number(nSongID));
+    artURI.setQuery(artQuery);
 
     QList<Property*> propList = pItem->GetProperties("albumArtURI");
     if (propList.size() >= 4)
@@ -392,8 +396,10 @@ void UPnpCDSMusic::PopulateArtworkURIS(CDSObject* pItem, int nSongID)
         {
             // Must be no more than 1024x768
             QUrl mediumURI = artURI;
-            mediumURI.addQueryItem("Width", "1024");
-            mediumURI.addQueryItem("Height", "768");
+            QUrlQuery mediumQuery(mediumURI.query());
+            mediumQuery.addQueryItem("Width", "1024");
+            mediumQuery.addQueryItem("Height", "768");
+            mediumURI.setQuery(mediumQuery);
             pProp->SetValue(mediumURI.toEncoded());
             pProp->AddAttribute("dlna:profileID", "JPEG_MED");
             pProp->AddAttribute("xmlns:dlna", "urn:schemas-dlna-org:metadata-1-0");
@@ -406,8 +412,10 @@ void UPnpCDSMusic::PopulateArtworkURIS(CDSObject* pItem, int nSongID)
             // At least one albumArtURI must be a ThumbNail (TN) no larger
             // than 160x160, and it must also be a jpeg
             QUrl thumbURI = artURI;
-            thumbURI.addQueryItem("Width", "160");
-            thumbURI.addQueryItem("Height", "160");
+            QUrlQuery thumbQuery(thumbURI.query());
+            thumbQuery.addQueryItem("Width", "160");
+            thumbQuery.addQueryItem("Height", "160");
+            thumbURI.setQuery(thumbQuery);
             pProp->SetValue(thumbURI.toEncoded());
             pProp->AddAttribute("dlna:profileID", "JPEG_TN");
             pProp->AddAttribute("xmlns:dlna", "urn:schemas-dlna-org:metadata-1-0");
@@ -419,8 +427,10 @@ void UPnpCDSMusic::PopulateArtworkURIS(CDSObject* pItem, int nSongID)
         {
             // Must be no more than 640x480
             QUrl smallURI = artURI;
-            smallURI.addQueryItem("Width", "640");
-            smallURI.addQueryItem("Height", "480");
+            QUrlQuery smallQuery(smallURI.query());
+            smallQuery.addQueryItem("Width", "640");
+            smallQuery.addQueryItem("Height", "480");
+            smallURI.setQuery(smallQuery);
             pProp->SetValue(smallURI.toEncoded());
             pProp->AddAttribute("dlna:profileID", "JPEG_SM");
             pProp->AddAttribute("xmlns:dlna", "urn:schemas-dlna-org:metadata-1-0");
@@ -797,8 +807,10 @@ bool UPnpCDSMusic::LoadTracks(const UPnpCDSRequest *pRequest,
         QFileInfo fInfo( sFileName );
 
         QUrl    resURI    = m_URIBase;
-        resURI.setPath("Content/GetMusic");
-        resURI.addQueryItem("Id", QString::number(nId));
+        QUrlQuery resQuery;
+        resURI.setPath("/Content/GetMusic");
+        resQuery.addQueryItem("Id", QString::number(nId));
+        resURI.setQuery(resQuery);
 
         QString sMimeType = HTTPRequest::GetMimeType( fInfo.suffix() );
 
@@ -873,7 +885,7 @@ void UPnpCDSMusic::BindValues( MSqlQuery &query,
     if (tokens["track"].toInt() > 0)
         query.bindValue(":TRACK_ID", tokens["track"]);
     if (tokens["album"].toInt() > 0)
-        query.bindValue(":ABLUM_ID", tokens["album"]);
+        query.bindValue(":ALBUM_ID", tokens["album"]);
     if (tokens["artist"].toInt() > 0)
         query.bindValue(":ARTIST_ID", tokens["artist"]);
     if (tokens["genre"].toInt() > 0)

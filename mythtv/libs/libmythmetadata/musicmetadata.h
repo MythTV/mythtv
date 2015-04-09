@@ -93,6 +93,8 @@ class META_PUBLIC MusicMetadata
                    m_year(lyear),
                    m_tracknum(ltracknum),
                    m_trackCount(0),
+                   m_discnum(0),
+                   m_disccount(0),
                    m_length(llength),
                    m_rating(lrating),
                    m_directoryid(-1),
@@ -184,6 +186,12 @@ class META_PUBLIC MusicMetadata
 
     int Length() const { return m_length; }
     void setLength(int llength) { m_length = llength; }
+
+    int DiscNumber() const {return m_discnum;}
+    void setDiscNumber(int discnum) { m_discnum = discnum; }
+
+    int DiscCount() const {return m_disccount;}
+    void setDiscCount(int disccount) { m_disccount = disccount; }
 
     int Playcount() const { return m_playcount; }
     void setPlaycount(int lplaycount) { m_playcount = lplaycount; }
@@ -293,6 +301,8 @@ class META_PUBLIC MusicMetadata
     int m_year;
     int m_tracknum;
     int m_trackCount;
+    int m_discnum;
+    int m_disccount;
     int m_length;
     int m_rating;
     int m_directoryid;

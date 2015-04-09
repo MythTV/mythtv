@@ -66,6 +66,8 @@ MusicMetadata::MusicMetadata(int lid, QString lstation, QString lchannel, QStrin
             m_year(0),
             m_tracknum(0),
             m_trackCount(0),
+            m_discnum(0),
+            m_disccount(0),
             m_length(0),
             m_rating(0),
             m_directoryid(-1),
@@ -115,6 +117,8 @@ MusicMetadata& MusicMetadata::operator=(const MusicMetadata &rhs)
     m_year = rhs.m_year;
     m_tracknum = rhs.m_tracknum;
     m_trackCount = rhs.m_trackCount;
+    m_discnum = rhs.m_discnum;
+    m_disccount = rhs.m_disccount;
     m_length = rhs.m_length;
     m_rating = rhs.m_rating;
     m_lastplay = rhs.m_lastplay;
@@ -155,6 +159,8 @@ bool MusicMetadata::compare(MusicMetadata *mdata) const
         m_year == mdata->m_year &&
         m_tracknum == mdata->m_tracknum &&
         m_trackCount == mdata->m_trackCount &&
+        m_discnum == mdata->m_discnum &&
+        m_disccount == mdata->m_disccount &&
         //m_length == mdata->m_length &&
         m_rating == mdata->m_rating &&
         m_lastplay == mdata->m_lastplay &&
@@ -261,6 +267,7 @@ MusicMetadata *MusicMetadata::createFromID(int trackid)
     "music_songs.song_id, music_songs.rating, music_songs.numplays, "
     "music_songs.lastplay, music_albums.compilation, music_songs.format, "
     "music_songs.track_count, music_songs.size, music_songs.date_entered, "
+    "music_songs.disc_number, music_songs.disc_count, "
     "CONCAT_WS('/', music_directories.path, music_songs.filename) AS filename, "
     "music_songs.hostname "
     "FROM music_songs "
@@ -292,8 +299,10 @@ MusicMetadata *MusicMetadata::createFromID(int trackid)
         mdata->m_trackCount = query.value(14).toInt();
         mdata->m_fileSize = (quint64)query.value(15).toULongLong();
         mdata->m_dateadded = query.value(16).toDateTime();
-        mdata->m_filename = query.value(17).toString();
-        mdata->m_hostname = query.value(18).toString();
+        mdata->m_discnum = query.value(17).toInt();
+        mdata->m_disccount = query.value(18).toInt();
+        mdata->m_filename = query.value(19).toString();
+        mdata->m_hostname = query.value(20).toString();
 
         if (!QHostAddress(mdata->m_hostname).isNull()) // A bug caused an IP to replace hostname, reset and it will fix itself
         {
@@ -547,13 +556,15 @@ void MusicMetadata::dumpToDatabase()
                    " artist_id, album_id,    name,         genre_id,"
                    " year,      track,       length,       filename,"
                    " rating,    format,      date_entered, date_modified,"
-                   " numplays,  track_count, size,         hostname) "
+                   " numplays,  track_count, disc_number,  disc_count,"
+                   " size,      hostname) "
                    "VALUES ( "
                    " :DIRECTORY, "
                    " :ARTIST,   :ALBUM,      :TITLE,       :GENRE,"
                    " :YEAR,     :TRACKNUM,   :LENGTH,      :FILENAME,"
                    " :RATING,   :FORMAT,     :DATE_ADD,    :DATE_MOD,"
-                   " :PLAYCOUNT,:TRACKCOUNT, :SIZE,        :HOSTNAME );";
+                   " :PLAYCOUNT,:TRACKCOUNT, :DISC_NUMBER, :DISC_COUNT,"
+                   " :SIZE,     :HOSTNAME );";
     }
     else
     {
@@ -572,6 +583,8 @@ void MusicMetadata::dumpToDatabase()
                    ", date_modified = :DATE_MOD "
                    ", numplays = :PLAYCOUNT "
                    ", track_count = :TRACKCOUNT "
+                   ", disc_number = :DISC_NUMBER "
+                   ", disc_count = :DISC_COUNT "
                    ", size = :SIZE "
                    ", hostname = :HOSTNAME "
                    "WHERE song_id= :ID ;";
@@ -604,6 +617,8 @@ void MusicMetadata::dumpToDatabase()
         query.bindValue(":ID", m_id);
 
     query.bindValue(":TRACKCOUNT", m_trackCount);
+    query.bindValue(":DISC_NUMBER", m_discnum);
+    query.bindValue(":DISC_COUNT",m_disccount);
     query.bindValue(":SIZE", (quint64)m_fileSize);
     query.bindValue(":HOSTNAME", m_hostname);
 
@@ -866,6 +881,10 @@ void MusicMetadata::setField(const QString &field, const QString &data)
         m_tracknum = data.toInt();
     else if (field == "trackcount")
         m_trackCount = data.toInt();
+    else if (field == "discnum")
+        m_discnum = data.toInt();
+    else if (field == "disccount")
+        m_disccount = data.toInt();
     else if (field == "length")
         m_length = data.toInt();
     else if (field == "compilation")
@@ -912,6 +931,8 @@ void MusicMetadata::toMap(InfoMap &metadataMap, const QString &prefix)
     metadataMap[prefix + "formattitle"] = FormatTitle();
     metadataMap[prefix + "tracknum"] = (m_tracknum > 0 ? QString("%1").arg(m_tracknum) : "");
     metadataMap[prefix + "trackcount"] = (m_trackCount > 0 ? QString("%1").arg(m_trackCount) : "");
+    metadataMap[prefix + "discnum"] = (m_discnum > 0 ? QString("%1").arg(m_discnum) : "");
+    metadataMap[prefix + "disccount"] = (m_disccount > 0 ? QString("%1").arg(m_disccount) : "");
     metadataMap[prefix + "genre"] = m_genre;
     metadataMap[prefix + "year"] = (m_year > 0 ? QString("%1").arg(m_year) : "");
 
@@ -1299,7 +1320,7 @@ void AllMusic::resync()
                      "CONCAT_WS('/', music_directories.path, music_songs.filename) AS filename, "
                      "music_songs.rating, music_songs.numplays, music_songs.lastplay, music_songs.date_entered, "
                      "music_albums.compilation, music_songs.format, music_songs.track_count, "
-                     "music_songs.size, music_songs.hostname "
+                     "music_songs.size, music_songs.hostname, music_songs.disc_number, music_songs.disc_count "
                      "FROM music_songs "
                      "LEFT JOIN music_directories ON music_songs.directory_id=music_directories.directory_id "
                      "LEFT JOIN music_artists ON music_songs.artist_id=music_artists.artist_id "
@@ -1350,6 +1371,8 @@ void AllMusic::resync()
             dbMeta->setTrackCount(query.value(19).toInt());
             dbMeta->setFileSize((quint64)query.value(20).toULongLong());
             dbMeta->setHostname(query.value(21).toString());
+            dbMeta->setDiscNumber(query.value(22).toInt());
+            dbMeta->setDiscCount(query.value(23).toInt());
 
             if (!music_map.contains(id))
             {

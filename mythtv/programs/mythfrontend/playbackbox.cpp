@@ -41,6 +41,10 @@
 #include "mythdate.h"
 #include "tv.h"
 
+#ifdef _MSC_VER
+#  include "compat.h"                   // for random
+#endif
+
 //  Mythfrontend
 #include "playbackboxlistitem.h"
 

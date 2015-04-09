@@ -266,7 +266,73 @@ bool Dvr::UpdateRecordedWatchedStatus ( int RecordedId,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::ProgramList* Dvr::GetExpiringList( int nStartIndex, 
+DTC::CutList* Dvr::GetRecordedCutList ( int RecordedId,
+                                        int chanid,
+                                        const QDateTime &recstarttsRaw,
+                                        const QString &offsettype )
+{
+    int marktype;
+    if ((RecordedId <= 0) &&
+        (chanid <= 0 || !recstarttsRaw.isValid()))
+        throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
+
+    RecordingInfo ri;
+    if (RecordedId > 0)
+        ri = RecordingInfo(RecordedId);
+    else
+        ri = RecordingInfo(chanid, recstarttsRaw.toUTC());
+
+    DTC::CutList* pCutList = new DTC::CutList();
+    if (offsettype == "Position")
+        marktype = 1;
+    else if (offsettype == "Duration")
+        marktype = 2;
+    else
+        marktype = 0;
+
+    FillCutList(pCutList, &ri, marktype);
+
+    return pCutList;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+DTC::CutList* Dvr::GetRecordedCommBreak ( int RecordedId,
+                                          int chanid,
+                                          const QDateTime &recstarttsRaw,
+                                          const QString &offsettype )
+{
+    int marktype;
+    if ((RecordedId <= 0) &&
+        (chanid <= 0 || !recstarttsRaw.isValid()))
+        throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
+
+    RecordingInfo ri;
+    if (RecordedId > 0)
+        ri = RecordingInfo(RecordedId);
+    else
+        ri = RecordingInfo(chanid, recstarttsRaw.toUTC());
+
+    DTC::CutList* pCutList = new DTC::CutList();
+    if (offsettype == "Position")
+        marktype = 1;
+    else if (offsettype == "Duration")
+        marktype = 2;
+    else
+        marktype = 0;
+
+    FillCommBreak(pCutList, &ri, marktype);
+
+    return pCutList;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+DTC::ProgramList* Dvr::GetExpiringList( int nStartIndex,
                                         int nCount      )
 {
     pginfolist_t  infoList;
@@ -552,26 +618,29 @@ DTC::ProgramList* Dvr::GetUpcomingList( int  nStartIndex,
                                         int  nRecordId,
                                         int  nRecStatus )
 {
-    RecordingList  recordingList;
-    RecordingList  tmpList;
-    bool hasConflicts;
+    RecordingList  recordingList; // Auto-delete deque
+    RecList  tmpList; // Standard deque, objects must be deleted
 
     if (nRecordId <= 0)
         nRecordId = -1;
 
-    LoadFromScheduler(tmpList, hasConflicts, "", nRecordId);
+    // NOTE: Fetching this information directly from the schedule is
+    //       significantly faster than using ProgramInfo::LoadFromScheduler()
+    Scheduler *scheduler = dynamic_cast<Scheduler*>(gCoreContext->GetScheduler());
+    if (scheduler)
+        scheduler->GetAllPending(tmpList, nRecordId);
 
     // Sort the upcoming into only those which will record
-    RecordingList::iterator it = tmpList.begin();
+    RecList::iterator it = tmpList.begin();
     for(; it < tmpList.end(); ++it)
     {
-        if (nRecordId > 0 &&
-            (*it)->GetRecordingRuleID() != static_cast<uint>(nRecordId))
-            continue;
-
         if ((nRecStatus != 0) &&
             ((*it)->GetRecordingStatus() != nRecStatus))
+        {
+            delete *it;
+            *it = NULL;
             continue;
+        }
 
         if (!bShowAll && ((((*it)->GetRecordingStatus() >= RecStatus::Failing) &&
                            ((*it)->GetRecordingStatus() <= RecStatus::WillRecord)) ||
@@ -585,6 +654,9 @@ DTC::ProgramList* Dvr::GetUpcomingList( int  nStartIndex,
         {
             recordingList.push_back(new RecordingInfo(**it));
         }
+
+        delete *it;
+        *it = NULL;
     }
 
     // ----------------------------------------------------------------------
@@ -626,28 +698,29 @@ DTC::ProgramList* Dvr::GetConflictList( int  nStartIndex,
                                         int  nCount,
                                         int  nRecordId       )
 {
-    RecordingList  recordingList;
-    RecordingList  tmpList;
-    bool hasConflicts;
+    RecordingList  recordingList; // Auto-delete deque
+    RecList  tmpList; // Standard deque, objects must be deleted
 
     if (nRecordId <= 0)
         nRecordId = -1;
 
-    LoadFromScheduler(tmpList, hasConflicts, "", nRecordId);
+    // NOTE: Fetching this information directly from the schedule is
+    //       significantly faster than using ProgramInfo::LoadFromScheduler()
+    Scheduler *scheduler = dynamic_cast<Scheduler*>(gCoreContext->GetScheduler());
+    if (scheduler)
+        scheduler->GetAllPending(tmpList, nRecordId);
 
     // Sort the upcoming into only those which are conflicts
-    RecordingList::iterator it = tmpList.begin();
+    RecList::iterator it = tmpList.begin();
     for(; it < tmpList.end(); ++it)
     {
-        if (nRecordId > 0 &&
-            (*it)->GetRecordingRuleID() != static_cast<uint>(nRecordId))
-            continue;
-
         if (((*it)->GetRecordingStatus() == RecStatus::Conflict) &&
             ((*it)->GetRecordingStartTime() >= MythDate::current()))
         {
             recordingList.push_back(new RecordingInfo(**it));
         }
+        delete *it;
+        *it = NULL;
     }
 
     // ----------------------------------------------------------------------

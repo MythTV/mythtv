@@ -62,7 +62,8 @@ class Scheduler : public MThread, public MythScheduler
                          const QDateTime &recendts);
     // Returns a list of all pending recordings and returns
     // true iff there are conflicts
-    bool GetAllPending(RecList &retList) const;
+    bool GetAllPending(RecList &retList, int recRuleId = 0) const;
+    bool GetAllPending(ProgramList &retList, int recRuleId = 0) const;
     virtual void GetAllPending(QStringList &strList) const;
     virtual QMap<QString,ProgramInfo*> GetRecording(void) const;
 

@@ -7752,7 +7752,7 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
 
         uint new_cardid = testrec->GetRecorderNumber();
         uint sourceid = ChannelUtil::GetSourceIDForChannel(chanid);
-        uint inputid = CardUtil::GetInputID(new_cardid, sourceid);
+        uint inputid = new_cardid;
 
         // found the card on a different recorder.
         delete testrec;
@@ -8084,7 +8084,7 @@ void TV::UpdateOSDInput(const PlayerContext *ctx, QString inputname)
     if (inputname.isEmpty())
         inputname = ctx->tvchain->GetInputName(-1);
 
-    QString displayName = CardUtil::GetDisplayName(cardid, inputname);
+    QString displayName = CardUtil::GetDisplayName(cardid);
     // If a display name doesn't exist use cardid and inputname
     if (displayName.isEmpty())
         displayName = QString("%1: %2").arg(cardid).arg(inputname);
