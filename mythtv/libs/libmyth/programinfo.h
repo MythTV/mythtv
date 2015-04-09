@@ -613,6 +613,10 @@ class MPUBLIC ProgramInfo
                          int64_t min_frm = -1, int64_t max_frm = -1) const;
     void SavePositionMapDelta(frm_pos_map_t &, MarkTypes type) const;
 
+    // Get position/duration for keyframe
+    bool QueryKeyFramePosition(uint64_t *, uint64_t keyframe, bool backwards) const;
+    bool QueryKeyFrameDuration(uint64_t *, uint64_t keyframe, bool backwards) const;
+
     // Get/set all markup
     struct MarkupEntry
     {

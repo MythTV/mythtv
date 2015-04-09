@@ -1117,12 +1117,12 @@ class MythXML( XMLConnection ):
     def getHosts(self):
         """Returns a list of unique hostnames found in the settings table."""
         return self._request('Myth/GetHosts')\
-                                        .readJSON()['StringList']['Values']
+                                        .readJSON()['StringList']
 
     def getKeys(self):
         """Returns a list of unique keys found in the settings table."""
         return self._request('Myth/GetKeys')\
-                                        .readJSON()['StringList']['Values']
+                                        .readJSON()['StringList']
 
     def getSetting(self, key, hostname=None, default=None):
         """Retrieves a setting from the backend."""

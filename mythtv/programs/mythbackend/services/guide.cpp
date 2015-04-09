@@ -92,17 +92,12 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &rawStartTime ,
     // lpad is to allow natural sorting of numbers
     QString      sSQL = "WHERE ";
 
-    sSQL +=     "channel.visible != 0 "
-                "AND program.chanid = :CHANID "
+    sSQL +=     "program.chanid = :CHANID "
                 "AND program.endtime >= :STARTDATE "
                 "AND program.starttime < :ENDDATE "
                 "AND program.starttime >= :STARTDATELIMIT "
                 "AND program.manualid = 0 " // Exclude programmes created purely for 'manual' recording schedules
-                "ORDER BY LPAD(CAST(channum AS UNSIGNED), 10, 0), "
-                "         LPAD(channum,  10, 0),             "
-                "         callsign,                          "
-                "         LPAD(program.chanid, 10, 0),       "
-                "         program.starttime ";
+                "ORDER BY program.starttime ";
     bindings[":STARTDATE"     ] = dtStartTime;
     bindings[":STARTDATELIMIT"] = dtStartTime.addDays(-1);
     bindings[":ENDDATE"       ] = dtEndTime;
@@ -123,70 +118,25 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &rawStartTime ,
 
     DTC::ProgramGuide *pGuide = new DTC::ProgramGuide();
 
-    int               nChanCount = 0;
-    uint              nCurChanId = 0;
-    DTC::ChannelInfo *pChannel   = NULL;
-    QString           sCurCallsign;
-    uint              nSkipChanId = 0;
-
-        // Very hacky this ... will suffice as a temporary solution, trying it out
-    // as a faster alternative to fetching the programs with one query per
-    // channel
-    //
-    // A sub-query might be less hacky, but it wouldn't re-use existing code
-    // which increases the maintenance burden
-
-    QStringList chanIdList;
     ChannelInfoList::iterator chan_it;
     for (chan_it = chanList.begin(); chan_it != chanList.end(); ++chan_it)
     {
+        // Create ChannelInfo Object
+        DTC::ChannelInfo *pChannel   = NULL;
+        pChannel = pGuide->AddNewChannel();
+        FillChannelInfo( pChannel, (*chan_it), bDetails );
+
+        // Load the list of programmes for this channel
         ProgramList  progList;
         bindings[":CHANID"] = (*chan_it).chanid;
         LoadFromProgram( progList, sSQL, bindings, schedList );
-        for( uint n = 0; n < progList.size(); n++)
+
+        // Create Program objects and add them to the channel object
+        ProgramList::iterator progIt;
+        for( progIt = progList.begin(); progIt != progList.end(); ++progIt)
         {
-            ProgramInfo *pInfo = progList[ n ];
-
-            if ( nSkipChanId == pInfo->GetChanID())
-                continue;
-
-            if ( nCurChanId != pInfo->GetChanID() )
-            {
-                nChanCount++;
-
-                nCurChanId = pInfo->GetChanID();
-
-                // Filter out channels with the same callsign, keeping just the
-                // first seen
-                if (sCurCallsign == pInfo->GetChannelSchedulingID())
-                {
-                    nSkipChanId = pInfo->GetChanID();
-                    continue;
-                }
-
-                pChannel = pGuide->AddNewChannel();
-
-                // Find the channel in our cached list of ChannelInfo objects
-                while (chan_it != chanList.end() &&
-                    (*chan_it).chanid != nCurChanId)
-                {
-                    ++chan_it;
-                }
-
-                if (chan_it != chanList.end())
-                    FillChannelInfo( pChannel, (*chan_it), bDetails );
-                else
-                    LOG(VB_GENERAL, LOG_ERR, QString("Guide::GetProgramGuide() - "
-                                                    "No matching channel for "
-                                                    "chanid %1")
-                                                        .arg(nCurChanId));
-
-                sCurCallsign = pChannel->CallSign();
-            }
-
             DTC::Program *pProgram = pChannel->AddNewProgram();
-
-            FillProgramInfo( pProgram, pInfo, false, bDetails, false ); // No cast info
+            FillProgramInfo( pProgram, *progIt, false, bDetails, false ); // No cast info
         }
     }
 

@@ -375,6 +375,21 @@ MusicMetadata *MetaIOID3::read(const QString &filename)
         metadata->setLastPlay(QDateTime::fromString(lastPlayStr, Qt::ISODate));
     }
 
+    // Part of a set
+    if (!tag->frameListMap()["TPOS"].isEmpty())
+    {
+        QString pos = TStringToQString(
+                        tag->frameListMap()["TPOS"].front()->toString()).trimmed();
+
+        int discNumber = pos.section('/', 0, 0).toInt();
+        int discCount  = pos.section('/', -1).toInt();
+
+        if (discNumber > 0)
+            metadata->setDiscNumber(discNumber);
+        if (discCount > 0)
+            metadata->setDiscCount(discCount);
+    }
+
     return metadata;
 }
 

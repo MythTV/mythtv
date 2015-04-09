@@ -456,7 +456,7 @@ bool OpenGLVideo::AddFilter(OpenGLFilterType filter)
             success = false;
     }
 
-    if (success && (filter != kGLFilterNone) && (filter != kGLFilterResize))
+    if (success && (filter != kGLFilterNone))
     {
         program = AddFragmentProgram(filter);
         if (!program)
@@ -1011,7 +1011,7 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
 
         // enable fragment program and set any environment variables
         GLuint program = 0;
-        if ((type != kGLFilterNone) && (type != kGLFilterResize))
+        if ((type != kGLFilterNone))
         {
             GLuint prog_ref = 0;
 
@@ -1546,6 +1546,16 @@ static const QString BicubicShader =
 "    gl_FragColor = mix(tex00, tex10, parmx.z);\n"
 "}\n";
 
+static const QString DefaultFragmentShader =
+"GLSL_DEFINES"
+"uniform GLSL_SAMPLER s_texture0;\n"
+"varying vec2 v_texcoord0;\n"
+"void main(void)\n"
+"{\n"
+"    vec4 color   = GLSL_TEXTURE(s_texture0, v_texcoord0);\n"
+"    gl_FragColor = vec4(color.xyz, 1.0);\n"
+"}\n";
+
 void OpenGLVideo::GetProgramStrings(QString &vertex, QString &fragment,
                                     OpenGLFilterType filter,
                                     QString deint, FrameScanType field)
@@ -1572,7 +1582,9 @@ void OpenGLVideo::GetProgramStrings(QString &vertex, QString &fragment,
             break;
         }
         case kGLFilterNone:
+            break;
         case kGLFilterResize:
+            fragment = DefaultFragmentShader;
             break;
         case kGLFilterBicubic:
             fragment = BicubicShader;

@@ -31,6 +31,9 @@
 
 #include <QStringList>
 #include <QUrl>
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+#include <QUrlQuery>
+#endif
 #if HAVE_GETTIMEOFDAY == 0
 #include <sys/timeb.h>
 #endif
@@ -868,14 +871,24 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
 
                 // Variable name/value pairs
                 int i = 1;
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+                QUrlQuery q;
+#endif
                 for (; i + 2 < args.Size(); i += 2)
                 {
                     GetString(args.GetAt(i), string, engine);
                     QString name = QString::fromUtf8((const char *)string.Bytes(), string.Size());
                     MHUnion un;
                     un.GetValueFrom(*(args.GetAt(i+1)), engine);
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+                    q.addQueryItem(name, un.Printable());
+#else
                     url.addQueryItem(name, un.Printable());
+#endif
                 }
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+                url.setQuery(q);
+#endif
 
                 MHLOG(MHLogNotifications, QString("NOTE ReturnData %1")
                     .arg(url.toEncoded().constData()) );

@@ -18,6 +18,7 @@
 #include <QStringList>
 #include <QCryptographicHash>
 #include <QDateTime>
+#include <Qt>
 
 #include "mythconfig.h"
 #if !( CONFIG_DARWIN || CONFIG_CYGWIN || defined(__FreeBSD__) || defined(_WIN32))
@@ -135,34 +136,14 @@ static MIMETypes g_MIMETypes[] =
 // See http://matroska.org/technical/specs/notes.html#MIME
 // If you can't please everyone, may as well be correct as you piss some off
 
-static const char *Static400Error =
+static QString StaticPage =
     "<!DOCTYPE html>"
     "<HTML>"
       "<HEAD>"
-        "<TITLE>Error 400</TITLE>"
+        "<TITLE>Error %1</TITLE>"
         "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=ISO-8859-1\">"
       "</HEAD>"
-      "<BODY><H1>400 Bad Request.</H1></BODY>"
-    "</HTML>";
-
-static const char *Static401Error =
-    "<!DOCTYPE html>"
-    "<HTML>"
-      "<HEAD>"
-        "<TITLE>Error 401</TITLE>"
-        "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=ISO-8859-1\">"
-      "</HEAD>"
-      "<BODY><H1>401 Unauthorized.</H1></BODY>"
-    "</HTML>";
-
-static const char *Static505Error =
-    "<!DOCTYPE html>"
-    "<HTML>"
-      "<HEAD>"
-        "<TITLE>Error 505</TITLE>"
-        "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=ISO-8859-1\">"
-      "</HEAD>"
-      "<BODY><H1>505 HTTP Version Not Supported.</H1></BODY>"
+      "<BODY><H1>%2.</H1></BODY>"
     "</HTML>";
 
 static const int g_nMIMELength = sizeof( g_MIMETypes) / sizeof( MIMETypes );
@@ -249,60 +230,64 @@ QString HTTPRequest::BuildResponseHeader( long long nSize )
     }
 
     //-----------------------------------------------------------------------
-    // Headers describing the content
+    // Entity Headers - Describe the content and allowed methods
+    // RFC 2616 Section 7.1
     //-----------------------------------------------------------------------
-    SetResponseHeader("Content-Language", gCoreContext->GetLanguageAndVariant().replace("_", "-"));
-    SetResponseHeader("Content-Type", sContentType);
-
-    // Default to 'inline' but we should support 'attachment' when it would
-    // be appropriate i.e. not when streaming a file to a upnp player or browser
-    // that can support it natively
-    if (!m_sFileName.isEmpty())
+    if (m_eResponseType != ResponseTypeHeader) // No entity headers
     {
-        // TODO: Add support for utf8 encoding - RFC 5987
-        QString filename = QFileInfo(m_sFileName).fileName(); // Strip any path
-        SetResponseHeader("Content-Disposition", QString("inline; filename=\"%2\"").arg(QString(filename.toLatin1())));
-    }
+        SetResponseHeader("Content-Language", gCoreContext->GetLanguageAndVariant().replace("_", "-"));
+        SetResponseHeader("Content-Type", sContentType);
 
-    SetResponseHeader("Content-Length", QString::number(nSize));
+        // Default to 'inline' but we should support 'attachment' when it would
+        // be appropriate i.e. not when streaming a file to a upnp player or browser
+        // that can support it natively
+        if (!m_sFileName.isEmpty())
+        {
+            // TODO: Add support for utf8 encoding - RFC 5987
+            QString filename = QFileInfo(m_sFileName).fileName(); // Strip any path
+            SetResponseHeader("Content-Disposition", QString("inline; filename=\"%2\"").arg(QString(filename.toLatin1())));
+        }
 
-    // See DLNA  7.4.1.3.11.4.3 Tolerance to unavailable contentFeatures.dlna.org header
-    //
-    // It is better not to return this header, than to return it containing
-    // invalid or incomplete information. We are unable to currently determine
-    // this information at this stage, so do not return it. Only older devices
-    // look for it. Newer devices use the information provided in the UPnP
-    // response
+        SetResponseHeader("Content-Length", QString::number(nSize));
 
-//     QString sValue = GetHeaderValue( "getContentFeatures.dlna.org", "0" );
+        // See DLNA  7.4.1.3.11.4.3 Tolerance to unavailable contentFeatures.dlna.org header
+        //
+        // It is better not to return this header, than to return it containing
+        // invalid or incomplete information. We are unable to currently determine
+        // this information at this stage, so do not return it. Only older devices
+        // look for it. Newer devices use the information provided in the UPnP
+        // response
+
+//         QString sValue = GetHeaderValue( "getContentFeatures.dlna.org", "0" );
 //
-//     if (sValue == "1")
-//         sHeader += "contentFeatures.dlna.org: DLNA.ORG_OP=01;DLNA.ORG_CI=0;"
-//                    "DLNA.ORG_FLAGS=01500000000000000000000000000000\r\n";
+//         if (sValue == "1")
+//             sHeader += "contentFeatures.dlna.org: DLNA.ORG_OP=01;DLNA.ORG_CI=0;"
+//                     "DLNA.ORG_FLAGS=01500000000000000000000000000000\r\n";
 
 
-    // DLNA 7.5.4.3.2.33 MT transfer mode indication
-    QString sTransferMode = GetRequestHeader( "transferMode.dlna.org", "" );
+        // DLNA 7.5.4.3.2.33 MT transfer mode indication
+        QString sTransferMode = GetRequestHeader( "transferMode.dlna.org", "" );
 
-    if (sTransferMode.isEmpty())
-    {
-        if (m_sResponseTypeText.startsWith("video/") ||
-            m_sResponseTypeText.startsWith("audio/"))
-            sTransferMode = "Streaming";
-        else
-            sTransferMode = "Interactive";
+        if (sTransferMode.isEmpty())
+        {
+            if (m_sResponseTypeText.startsWith("video/") ||
+                m_sResponseTypeText.startsWith("audio/"))
+                sTransferMode = "Streaming";
+            else
+                sTransferMode = "Interactive";
+        }
+
+        if (sTransferMode == "Streaming")
+            SetResponseHeader("transferMode.dlna.org", "Streaming");
+        else if (sTransferMode == "Background")
+            SetResponseHeader("transferMode.dlna.org", "Background");
+        else if (sTransferMode == "Interactive")
+            SetResponseHeader("transferMode.dlna.org", "Interactive");
+
+        // HACK Temporary hack for Samsung TVs - Needs to be moved later as it's not entirely DLNA compliant
+        if (!GetRequestHeader( "getcontentFeatures.dlna.org", "" ).isEmpty())
+            SetResponseHeader("contentFeatures.dlna.org", "DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=01500000000000000000000000000000");
     }
-
-    if (sTransferMode == "Streaming")
-        SetResponseHeader("transferMode.dlna.org", "Streaming");
-    else if (sTransferMode == "Background")
-        SetResponseHeader("transferMode.dlna.org", "Background");
-    else if (sTransferMode == "Interactive")
-        SetResponseHeader("transferMode.dlna.org", "Interactive");
-
-    // HACK Temporary hack for Samsung TVs - Needs to be moved later as it's not entirely DLNA compliant
-    if (!GetRequestHeader( "getcontentFeatures.dlna.org", "" ).isEmpty())
-        SetResponseHeader("contentFeatures.dlna.org", "DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=01500000000000000000000000000000");
 
     // ----------------------------------------------------------------------
 
@@ -369,6 +354,7 @@ qint64 HTTPRequest::SendResponse( void )
                     .arg(GetResponseStatus()) .arg(GetPeerAddress()));
             return( SendResponseFile( m_sFileName ));
         case ResponseTypeOther:
+        case ResponseTypeHeader:
         default:
             break;
     }
@@ -393,6 +379,8 @@ qint64 HTTPRequest::SendResponse( void )
 //     }
 #endif
 
+
+
     // ----------------------------------------------------------------------
     // Check for ETag match...
     // ----------------------------------------------------------------------
@@ -406,6 +394,7 @@ qint64 HTTPRequest::SendResponse( void )
                 .arg(sETag));
 
         m_nResponseStatus = 304;
+        m_eResponseType = ResponseTypeHeader; // No entity headers
 
         // no content can be returned.
         m_response.buffer().clear();
@@ -440,7 +429,7 @@ qint64 HTTPRequest::SendResponse( void )
         {
             pBuffer = &compBuffer;
 
-            m_mapRespHeaders[ "Content-Encoding" ] = "gzip";
+            SetResponseHeader( "Content-Encoding", "gzip" );
             LOG(VB_HTTP, LOG_DEBUG, QString("Reponse Compressed Content Length: %1").arg(compBuffer.buffer().length()));
         }
     }
@@ -515,7 +504,6 @@ qint64 HTTPRequest::SendResponse( void )
     // ----------------------------------------------------------------------
 
     if (( m_eType != RequestTypeHead ) &&
-        ( m_eResponseType != ResponseTypeHeader ) &&
         ( nContentLen > 0 ))
     {
         qint64 bytesWritten = SendData( pBuffer, 0, nContentLen );
@@ -652,6 +640,7 @@ qint64 HTTPRequest::SendResponseFile( QString sFileName )
             QString("HTTPRequest::SendResponseFile(%1) - cannot find file!")
                 .arg(sFileName));
         m_nResponseStatus = 404;
+        m_response.write( GetResponsePage() );
     }
 
     // -=>TODO: Should set "Content-Length: *" if file is still recording
@@ -917,19 +906,33 @@ void HTTPRequest::FormatRawResponse(const QString &sXML)
 void HTTPRequest::FormatFileResponse( const QString &sFileName )
 {
     m_sFileName = sFileName;
+    QFileInfo file(m_sFileName);
 
-    if (!m_sFileName.isEmpty() && QFile::exists( m_sFileName ))
+    if (!m_sFileName.isEmpty() && file.exists())
     {
-
-        if (m_eResponseType == ResponseTypeUnknown)
-            m_eResponseType               = ResponseTypeFile;
-        m_nResponseStatus                 = 200;
-        m_mapRespHeaders["Cache-Control"] = "no-cache=\"Ext\", max-age = 5000";
+        QDateTime ims = QDateTime::fromString(GetRequestHeader("if-modified-since", ""), Qt::RFC2822Date);
+        ims.setTimeSpec(Qt::OffsetFromUTC);
+        if (ims.isValid() && ims <= file.lastModified()) // Strong validator
+        {
+            m_eResponseType = ResponseTypeHeader;
+            m_nResponseStatus = 304; // Not Modified
+        }
+        else
+        {
+            if (m_eResponseType == ResponseTypeUnknown)
+                m_eResponseType = ResponseTypeFile;
+            m_nResponseStatus   = 200; // OK
+            SetResponseHeader("Last-Modified", MythDate::toString(file.lastModified(),
+                                                                  (MythDate::kOverrideUTC |
+                                                                   MythDate::kRFC822))); // RFC 822
+            SetResponseHeader("Cache-Control", "no-cache=\"Ext\", max-age = 7200"); // 2 Hours
+        }
     }
     else
     {
         m_eResponseType   = ResponseTypeHTML;
-        m_nResponseStatus = 404;
+        m_nResponseStatus = 404; // Resource not found
+        m_response.write( GetResponsePage() );
         LOG(VB_HTTP, LOG_INFO,
             QString("HTTPRequest::FormatFileResponse('%1') - cannot find file")
                 .arg(sFileName));
@@ -1051,6 +1054,15 @@ QString HTTPRequest::GetResponseStatus( void )
     }
 
     return( QString( "%1 Unknown" ).arg( m_nResponseStatus ));
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QByteArray HTTPRequest::GetResponsePage( void )
+{
+    return StaticPage.arg(QString::number(m_nResponseStatus)).arg(GetResponseStatus()).toUtf8();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1314,20 +1326,20 @@ bool HTTPRequest::ParseRequest()
         {
             m_eResponseType   = ResponseTypeHTML;
             m_nResponseStatus = 505;
-
-            m_response.write( Static505Error );
+            m_response.write( GetResponsePage() );
 
             return true;
         }
 
         if (m_eType == RequestTypeUnknown)
         {
-            m_eResponseType   = ResponseTypeHeader;
+            m_eResponseType   = ResponseTypeHTML;
             m_nResponseStatus = 501; // Not Implemented
             // Conservative list, we can't really know what methods we
             // actually allow for an arbitrary resource without some sort of
             // high maintenance database
             SetResponseHeader("Allow",  "GET, HEAD");
+            m_response.write( GetResponsePage() );
             return true;
         }
 
@@ -1370,14 +1382,7 @@ bool HTTPRequest::ParseRequest()
         // Parse out keep alive
         m_bKeepAlive = ParseKeepAlive();
 
-        // Make sure there are a few default values
-        if (!m_mapHeaders.contains("content-length"))
-            m_mapHeaders[ "content-length" ] = "0";
-        if (!m_mapHeaders.contains("content-type"))
-            m_mapHeaders[ "content-type"   ] = "application/octet-stream";
-
         // Check to see if we found the end of the header or we timed out.
-
         if (!bDone)
         {
             LOG(VB_GENERAL, LOG_INFO, "Timeout waiting for request header." );
@@ -1389,8 +1394,7 @@ bool HTTPRequest::ParseRequest()
         {
             m_eResponseType   = ResponseTypeHTML;
             m_nResponseStatus = 400;
-
-            m_response.write( Static400Error );
+            m_response.write( GetResponsePage() );
 
             return true;
         }
@@ -1419,7 +1423,7 @@ bool HTTPRequest::ParseRequest()
             {
                 m_eResponseType   = ResponseTypeHTML;
                 m_nResponseStatus = 401;
-                m_response.write( Static401Error );
+                m_response.write( GetResponsePage() );
                 // Since this may not be the first attempt at authentication,
                 // Authenticated may have set the header with the appropriate
                 // stale attribute
@@ -1427,7 +1431,6 @@ bool HTTPRequest::ParseRequest()
 
                 return true;
             }
-
 
             m_bProtected = true;
         }
@@ -1602,7 +1605,7 @@ bool HTTPRequest::ParseRange( QString sRange,
     if (parts.count() != 2)
         return false;
 
-    if (parts[0].isNull() && parts[1].isNull())
+    if (parts[0].isEmpty() && parts[1].isEmpty())
         return false;
 
     // ----------------------------------------------------------------------
@@ -1610,7 +1613,7 @@ bool HTTPRequest::ParseRange( QString sRange,
     // ----------------------------------------------------------------------
 
     bool conv_ok;
-    if (parts[0].isNull())
+    if (parts[0].isEmpty())
     {
         // ------------------------------------------------------------------
         // Does it match "-####"
@@ -1622,7 +1625,7 @@ bool HTTPRequest::ParseRange( QString sRange,
         *pllStart = llSize - llValue;
         *pllEnd   = llSize - 1;
     }
-    else if (parts[1].isNull())
+    else if (parts[1].isEmpty())
     {
         // ------------------------------------------------------------------
         // Does it match "####-"

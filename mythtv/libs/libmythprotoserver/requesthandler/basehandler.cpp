@@ -86,6 +86,7 @@ bool BaseRequestHandler::HandleQueryLoad(SocketHandler *sock)
 {
     QStringList strlist;
 
+#ifndef _WIN32
     double loads[3];
     if (getloadavg(loads,3) == -1)
     {
@@ -96,6 +97,10 @@ bool BaseRequestHandler::HandleQueryLoad(SocketHandler *sock)
         strlist << QString::number(loads[0])
                 << QString::number(loads[1])
                 << QString::number(loads[2]);
+#else
+	strlist << "ERROR";
+	strlist << "getloadavg() not supported on Windows";
+#endif
 
     sock->WriteStringList(strlist);
     return true;

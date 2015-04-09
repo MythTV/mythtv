@@ -1787,9 +1787,9 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             return;
         }
 
-        LOG(VB_GENERAL, LOG_INFO, LOC +
+        LOG(VB_NETWORK, LOG_INFO, LOC +
             "MainServer::HandleAnnounce FileTransfer");
-        LOG(VB_GENERAL, LOG_INFO, LOC +
+        LOG(VB_NETWORK, LOG_INFO, LOC +
             QString("adding: %1 as a remote file transfer") .arg(commands[2]));
         QStringList::const_iterator it = slist.begin();
         QUrl qurl = *(++it);

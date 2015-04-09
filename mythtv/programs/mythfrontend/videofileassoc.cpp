@@ -2,6 +2,7 @@
 #include <vector>
 #include <iterator>
 #include <map>
+#include <functional>   //mem_fun
 
 #include "mythlogging.h"
 #include "mythmainwindow.h"

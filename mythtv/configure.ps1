@@ -550,7 +550,7 @@ switch ($tools.Get_Item( 'libexpat.lib'))
             {
                 # -- Upgrade solution to verion of visual studios being used
 
-                # & vcupgrade $basePath\..\platform\win32\msvc\external\expat\lib\expat.dspj
+                # & vcupgrade $basePath\..\platform\win32\msvc\external\expat\lib\expat.dsp
 
                 Run-Exe "$basePath\..\platform\win32\msvc\external\expat\lib\" `
                         "vcupgrade.exe"                                     `

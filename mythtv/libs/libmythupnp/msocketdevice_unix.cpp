@@ -983,8 +983,28 @@ qint64 MSocketDevice::waitForMore(int msecs, bool *timeout) const
 */
 qint64 MSocketDevice::readData(char *data, qint64 maxlen)
 {
+#if !defined(QT_NO_IPV6)
+
+    struct sockaddr_storage aa;
+#else
+
+    struct sockaddr_in aa;
+#endif
+
     if (maxlen == 0)
+    {
+        // Cannot short circuit on zero bytes for datagram because zero-
+        // byte datagrams are a real thing and if you don't issue a read
+        // then select() will keep falling through
+        if (t == Datagram)
+        {
+            QT_SOCKLEN_T sz;
+            sz = sizeof(aa);
+            ::recvfrom(fd, data, 0, 0, (struct sockaddr *) & aa, &sz);
+            qt_socket_getportaddr((struct sockaddr *)&aa, &pp, &pa);
+        }
         return 0;
+    }
 
     if (data == 0)
     {
@@ -1022,13 +1042,6 @@ qint64 MSocketDevice::readData(char *data, qint64 maxlen)
     {
         if (t == Datagram)
         {
-#if !defined(QT_NO_IPV6)
-
-            struct sockaddr_storage aa;
-#else
-
-            struct sockaddr_in aa;
-#endif
             memset(&aa, 0, sizeof(aa));
             QT_SOCKLEN_T sz;
             sz = sizeof(aa);

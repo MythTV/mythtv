@@ -28,6 +28,10 @@
 #include "mythuigroup.h"
 #include "mythgesture.h"
 
+#ifdef _MSC_VER
+#  include "compat.h"   // random
+#endif
+
 MythUIType::MythUIType(QObject *parent, const QString &name)
     : QObject(parent)
 {

@@ -163,6 +163,8 @@ mingw :DEFINES += USING_MINGW
 mingw | win32-msvc*{
     HEADERS += mythpainter_d3d9.h   mythrender_d3d9.h
     SOURCES += mythpainter_d3d9.cpp mythrender_d3d9.cpp
+    DEFINES += NODRAWTEXT
+
     using_dxva2: DEFINES += USING_DXVA2
 }
 

@@ -11,7 +11,11 @@
 // POSIX headers
 #include <limits.h>
 #include <stdint.h>
+
+// Qt headers
 #include <QSize>
+#include <QUrl>
+#include <QUrlQuery>
 
 // MythTV headers
 #include "upnpcdstv.h"
@@ -1249,8 +1253,10 @@ bool UPnpCDSTv::LoadRecordings(const UPnpCDSRequest* pRequest,
             sMimeType = "video/mpeg";
 
         QUrl    resURI    = URIBase;
-        resURI.setPath("Content/GetRecording");
-        resURI.addQueryItem("RecordedId", QString::number(nRecordedId));
+        QUrlQuery resQuery;
+        resURI.setPath("/Content/GetRecording");
+        resQuery.addQueryItem("RecordedId", QString::number(nRecordedId));
+        resURI.setQuery(resQuery);
 
         QString sProtocol = DLNA::ProtocolInfoString(UPNPProtocol::kHTTP,
                                                      sMimeType,
@@ -1276,10 +1282,13 @@ bool UPnpCDSTv::LoadRecordings(const UPnpCDSRequest* pRequest,
         // ----------------------------------------------------------------------
 
         QUrl previewURI = URIBase;
-        previewURI.setPath("Content/GetPreviewImage");
-        previewURI.addQueryItem("RecordedId", QString::number(nRecordedId));
-        previewURI.addQueryItem("Width", "160");
-        previewURI.addQueryItem("Format", "JPG");
+        QUrlQuery previewQuery;
+        previewURI.setPath("/Content/GetPreviewImage");
+        previewQuery.addQueryItem("RecordedId", QString::number(nRecordedId));
+        previewQuery.addQueryItem("Width", "160");
+        previewQuery.addQueryItem("Format", "JPG");
+        previewURI.setQuery(previewQuery);
+
         sProtocol = DLNA::ProtocolInfoString(UPNPProtocol::kHTTP, "image/jpeg",
                                              QSize(160, 160));
         pItem->AddResource( sProtocol, previewURI.toEncoded());
@@ -1317,9 +1326,11 @@ void UPnpCDSTv::PopulateArtworkURIS(CDSObject* pItem, const QString &sInetRef,
                                     int nSeason, const QUrl& URIBase)
 {
     QUrl artURI = URIBase;
-    artURI.setPath("Content/GetRecordingArtwork");
-    artURI.addQueryItem("Inetref", sInetRef);
-    artURI.addQueryItem("Season", QString::number(nSeason));
+    artURI.setPath("/Content/GetRecordingArtwork");
+    QUrlQuery artQuery(artURI.query());
+    artQuery.addQueryItem("Inetref", sInetRef);
+    artQuery.addQueryItem("Season", QString::number(nSeason));
+    artURI.setQuery(artQuery);
 
     // Prefer JPEG over PNG here, although PNG is allowed JPEG probably
     // has wider device support and crucially the filesizes are smaller
@@ -1334,29 +1345,37 @@ void UPnpCDSTv::PopulateArtworkURIS(CDSObject* pItem, const QString &sInetRef,
     // At least one albumArtURI must be a ThumbNail (TN) no larger
     // than 160x160, and it must also be a jpeg
     QUrl thumbURI = artURI;
-    thumbURI.addQueryItem("Type", "screenshot");
-    thumbURI.addQueryItem("Width", "160");
-    thumbURI.addQueryItem("Height", "160");
+    QUrlQuery thumbQuery(thumbURI.query());
+    thumbQuery.addQueryItem("Type", "screenshot");
+    thumbQuery.addQueryItem("Width", "160");
+    thumbQuery.addQueryItem("Height", "160");
+    thumbURI.setQuery(thumbQuery);
 
     // Small
     // Must be no more than 640x480
     QUrl smallURI = artURI;
-    smallURI.addQueryItem("Type", "coverart");
-    smallURI.addQueryItem("Width", "640");
-    smallURI.addQueryItem("Height", "480");
+    QUrlQuery smallQuery(smallURI.query());
+    smallQuery.addQueryItem("Type", "coverart");
+    smallQuery.addQueryItem("Width", "640");
+    smallQuery.addQueryItem("Height", "480");
+    smallURI.setQuery(smallQuery);
 
     // Medium
     // Must be no more than 1024x768
     QUrl mediumURI = artURI;
-    mediumURI.addQueryItem("Type", "coverart");
-    mediumURI.addQueryItem("Width", "1024");
-    mediumURI.addQueryItem("Height", "768");
+    QUrlQuery mediumQuery(mediumURI.query());
+    mediumQuery.addQueryItem("Type", "coverart");
+    mediumQuery.addQueryItem("Width", "1024");
+    mediumQuery.addQueryItem("Height", "768");
+    mediumURI.setQuery(mediumQuery);
 
     // Large
     // Must be no more than 4096x4096 - for our purposes, just return
     // a fullsize image
     QUrl largeURI = artURI;
-    largeURI.addQueryItem("Type", "fanart");
+    QUrlQuery largeQuery(largeURI.query());
+    largeQuery.addQueryItem("Type", "fanart");
+    largeURI.setQuery(largeQuery);
 
     QList<Property*> propList = pItem->GetProperties("albumArtURI");
     if (propList.size() >= 4)
