@@ -49,7 +49,7 @@ QString profileToString(VAProfile profile)
     if (VAProfileVC1Advanced == profile)                return "VC1Advanced";
     if (VAProfileH263Baseline == profile)               return "H263Base";
     if (VAProfileNone == profile)                       return "None";
-#if VA_CHECK_VERSION(0,35,0) // must be 0.36.0 minimum
+#if VA_CHECK_VERSION(0,36,0)
     if (VAProfileH264StereoHigh == profile)             return "H264StereoHigh";
 #endif
     return "Unknown";
