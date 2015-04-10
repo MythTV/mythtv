@@ -1483,25 +1483,20 @@ void ProgramRecPriority::UpdateList()
         item->SetText(tempTime, "lastrecordedtime", state);
 
         QString channame = progInfo->channame;
-        if ((progInfo->recType == kAllRecord) ||
-            (progInfo->recType == kOneRecord) ||
-            (progInfo->recType == kDailyRecord) ||
-            (progInfo->recType == kWeeklyRecord))
-            channame = tr("Any");
-        item->SetText(channame, "channel", state);
         QString channum = progInfo->chanstr;
-        if ((progInfo->recType == kAllRecord) ||
-            (progInfo->recType == kOneRecord) ||
-            (progInfo->recType == kDailyRecord) ||
-            (progInfo->recType == kWeeklyRecord))
-            channum = tr("Any");
-        item->SetText(channum, "channum", state);
         QString callsign = progInfo->chansign;
-        if ((progInfo->recType == kAllRecord) ||
-            (progInfo->recType == kOneRecord) ||
-            (progInfo->recType == kDailyRecord) ||
-            (progInfo->recType == kWeeklyRecord))
+        if (progInfo->recType != kSingleRecord &&
+            progInfo->recType != kOverrideRecord &&
+            progInfo->recType != kDontRecord &&
+            !(progInfo->GetRecordingRule()->m_filter & 1024) &&
+            progInfo->GetRecordingRule()->m_searchType != kManualSearch)
+        {
+            channame = tr("Any");
+            channum = tr("Any");
             callsign = tr("Any");
+        }
+        item->SetText(channame, "channel", state);
+        item->SetText(channum, "channum", state);
         item->SetText(callsign, "callsign", state);
 
         QString profile = progInfo->profile;
@@ -1600,37 +1595,27 @@ void ProgramRecPriority::updateInfo(MythUIButtonListItem *item)
         m_lastRecordedTimeText->SetText(tempTime);
     }
 
-    if (m_channameText)
+    if (m_channameText || m_channumText || m_callsignText)
     {
         QString channame = pgRecInfo->channame;
-        if ((pgRecInfo->rectype == kAllRecord) ||
-            (pgRecInfo->rectype == kOneRecord) ||
-            (pgRecInfo->rectype == kDailyRecord) ||
-            (pgRecInfo->rectype == kWeeklyRecord))
-            channame = tr("Any");
-        m_channameText->SetText(channame);
-    }
-
-    if (m_channumText)
-    {
         QString channum = pgRecInfo->chanstr;
-        if ((pgRecInfo->rectype == kAllRecord) ||
-            (pgRecInfo->rectype == kOneRecord) ||
-            (pgRecInfo->rectype == kDailyRecord) ||
-            (pgRecInfo->rectype == kWeeklyRecord))
-            channum = tr("Any");
-        m_channumText->SetText(channum);
-    }
-
-    if (m_callsignText)
-    {
         QString callsign = pgRecInfo->chansign;
-        if ((pgRecInfo->rectype == kAllRecord) ||
-            (pgRecInfo->rectype == kOneRecord) ||
-            (pgRecInfo->rectype == kDailyRecord) ||
-            (pgRecInfo->rectype == kWeeklyRecord))
+        if (pgRecInfo->recType != kSingleRecord &&
+            pgRecInfo->recType != kOverrideRecord &&
+            pgRecInfo->recType != kDontRecord &&
+            !(pgRecInfo->GetRecordingRule()->m_filter & 1024) &&
+            pgRecInfo->GetRecordingRule()->m_searchType != kManualSearch)
+        {
+            channame = tr("Any");
+            channum = tr("Any");
             callsign = tr("Any");
-        m_callsignText->SetText(callsign);
+        }
+        if (m_channameText)
+            m_channameText->SetText(channame);
+        if (m_channumText)
+            m_channumText->SetText(channum);
+        if (m_callsignText)
+            m_callsignText->SetText(callsign);
     }
 
     if (m_recProfileText)

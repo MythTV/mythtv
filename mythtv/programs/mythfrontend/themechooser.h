@@ -55,7 +55,8 @@ class ThemeChooser : public MythScreenType
     void themeChanged(void);
 
   private:
-    void LoadVersion(const QString &version, QStringList &themesSeen);
+    void LoadVersion(const QString &version, QStringList &themesSeen,
+                     bool alert_user);
 
     enum DownloadState
     {
@@ -68,7 +69,7 @@ class ThemeChooser : public MythScreenType
     ThemeInfo *loadThemeInfo(QFileInfo &theme);
     void showPopupMenu(void);
     void updateProgressBar(int bytesReceived, int bytesTotal);
-    void removeThemeDir(const QString &dirname);
+    bool removeThemeDir(const QString &dirname);
 
     MythUIButtonList *m_themes;
     MythUIImage      *m_preview;
@@ -99,15 +100,15 @@ class ThemeUpdateChecker : public QObject
     Q_OBJECT
 
   public:
-    ThemeUpdateChecker();
-   ~ThemeUpdateChecker();
+    ThemeUpdateChecker(void);
+   ~ThemeUpdateChecker(void);
 
   protected slots:
     void checkForUpdate(void);
 
   private:
     QTimer    *m_updateTimer;
-    QString    m_mythVersion;
+    QStringList m_mythVersions;
     QString    m_infoPackage;
     QString    m_lastKnownThemeVersion;
     QString    m_currentVersion;

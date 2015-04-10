@@ -4468,15 +4468,15 @@ is_qmake4(){
     $1 --version 2>&1 | egrep -q -e "Qt version 4\.[8-9]\.[0-9]"
 }
 
-if is_qmake5 $qmake || is_qmake5 qmake-qt5; then
+if is_qmake4 $qmake || is_qmake4 qmake-qt4; then
+    if is_qmake4 qmake-qt4; then
+        qmake=qmake-qt4
+    fi
+elif is_qmake5 $qmake || is_qmake5 qmake-qt5; then
     if is_qmake5 qmake-qt5; then
         qmake=qmake-qt5
     fi
     check_cxxflags -DQT_DISABLE_DEPRECATED_BEFORE
-elif is_qmake4 $qmake || is_qmake4 qmake-qt4; then
-    if is_qmake4 qmake-qt4; then
-        qmake=qmake-qt4
-    fi
 else
     die "qmake for Qt4.8 or newer not found.\nPlease specify the correct qmake with --qmake="
 fi

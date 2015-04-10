@@ -1202,7 +1202,7 @@ class MythXML( XMLConnection ):
         if height: args['Height'] = height
         if secsin: args['SecsIn'] = secsin
 
-        return self._result('Content/GetPreviewImage', **args).read()
+        return self._request('Content/GetPreviewImage', **args).read()
 
 class MythMusic( MusicSchema, DBCache ):
     """

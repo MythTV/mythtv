@@ -84,6 +84,7 @@ class MTV_PUBLIC RecordingProfile : public QObject, public ConfigurationWizard
   public:
     // initializers
     RecordingProfile(QString profName = QString());
+    virtual ~RecordingProfile() {}
     virtual void loadByID(int id);
     virtual bool loadByType(const QString &name, const QString &cardtype);
     virtual bool loadByGroup(const QString &name, const QString &group);
@@ -139,6 +140,7 @@ class RecordingProfileEditor :
 
   public:
     RecordingProfileEditor(int id, QString profName);
+    virtual ~RecordingProfileEditor() {}
 
     virtual DialogCode exec(void);
     virtual DialogCode exec(bool /*saveOnExec*/, bool /*doLoad*/)

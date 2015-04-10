@@ -566,16 +566,48 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
                     // The CRID is a URI.  It could contain UTF8 sequences encoded
                     // as %XX but there's no advantage in decoding them.
                     // The BBC currently uses private types 0x31 and 0x32.
+                    // IDs from the authority eventis.nl are not fit for our scheduler
                     if (desc.ContentType(k) == 0x01 || desc.ContentType(k) == 0x31)
-                        programId = desc.ContentId(k);
+                    {
+                        if (!desc.ContentId(k).startsWith ("eventis.nl/"))
+                        {
+                            programId = desc.ContentId(k);
+                        }
+                    }
                     else if (desc.ContentType(k) == 0x02 || desc.ContentType(k) == 0x32)
                     {
-                        seriesId = desc.ContentId(k);
+                        if (!desc.ContentId(k).startsWith ("eventis.nl/"))
+                        {
+                            seriesId = desc.ContentId(k);
+                        }
                         category_type = ProgramInfo::kCategorySeries;
                     }
                 }
             }
         }
+
+        /* if we don't have a subtitle, try to parse one from private descriptors */
+        if (subtitle.isEmpty()) {
+            bool isUPC = false;
+            /* is this event carrying UPC private data? */
+            desc_list_t private_data_specifiers = MPEGDescriptor::FindAll(list, DescriptorID::private_data_specifier);
+            for (uint j = 0; j < private_data_specifiers.size(); j++) {
+                PrivateDataSpecifierDescriptor desc(private_data_specifiers[j]);
+                if (desc.PrivateDataSpecifier() == PrivateDataSpecifierID::UPC1) {
+                    isUPC = true;
+                }
+            }
+
+            if (isUPC) {
+                desc_list_t subtitles = MPEGDescriptor::FindAll(list, PrivateDescriptorID::upc_event_episode_title);
+                for (uint j = 0; j < subtitles.size(); j++) {
+                    PrivateUPCCablecomEpisodeTitleDescriptor desc(subtitles[j]);
+
+                    subtitle = desc.Text();
+                }
+            }
+        }
+
 
         QDateTime starttime = eit->StartTimeUTC(i);
         // fix starttime only if the duration is a multiple of a minute

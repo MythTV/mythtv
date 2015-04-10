@@ -926,12 +926,13 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
         kConstellationQPSK  = 0x0,
         kConstellationQAM16 = 0x1,
         kConstellationQAM64 = 0x2,
+        kConstellationQAM256 = 0x3,
     };
     uint Constellation(void) const { return _data[7]>>6; }
     QString ConstellationString(void) const
     {
-        static QString cs[] = { "qpsk", "qam_16", "qam_64" };
-        return (Constellation() <= kConstellationQAM64) ?
+        static QString cs[] = { "qpsk", "qam_16", "qam_64", "qam_256" };
+        return (Constellation() <= kConstellationQAM256) ?
             cs[Constellation()] : "auto";
     }
     // hierarchy_information    3   7.2
@@ -1357,6 +1358,10 @@ class PrivateDataSpecifierDescriptor : public MPEGDescriptor
     // descriptor_length        8   1.0
 
     // private_data_specifier  32   2.0
+    uint32_t PrivateDataSpecifier (void) const
+    {
+        return (_data[2] << 24 | _data[3] << 16 | _data[4] << 8 | _data[5]);
+    }
 };
 
 // DVB Bluebook A038 (Sept 2011) p 79
@@ -2067,6 +2072,47 @@ class DefaultAuthorityDescriptor : public MPEGDescriptor
     {
         return QString("DefaultAuthorityDescriptor: Authority(%1)")
             .arg(DefaultAuthority());
+    }
+};
+
+/*
+ * private UPC Cablecom (Austria) episode descriptor for Horizon middleware
+ */
+class PrivateUPCCablecomEpisodeTitleDescriptor : public MPEGDescriptor
+{
+    public:
+     PrivateUPCCablecomEpisodeTitleDescriptor(const unsigned char *data, int len = 300) :
+         MPEGDescriptor(data, len, PrivateDescriptorID::upc_event_episode_title) { }
+    //       Name             bits  loc  expected value
+    // descriptor_tag           8   0.0       0xa7
+    // descriptor_length        8   1.0
+
+    // ISO_639_language_code   24   2.0
+    int LanguageKey(void) const
+    {
+        return iso639_str3_to_key(&_data[2]);
+    }
+    QString LanguageString(void) const
+    {
+        return iso639_key_to_str3(LanguageKey());
+    }
+    int CanonicalLanguageKey(void) const
+    {
+        return iso639_key_to_canonical_key(LanguageKey());
+    }
+    QString CanonicalLanguageString(void) const
+    {
+        return iso639_key_to_str3(CanonicalLanguageKey());
+    }
+
+    uint TextLength(void) const
+    {
+        return _data[1] - 3;
+    }
+
+    QString Text(void) const
+    {
+        return dvb_decode_text(&_data[5], TextLength());
     }
 };
 

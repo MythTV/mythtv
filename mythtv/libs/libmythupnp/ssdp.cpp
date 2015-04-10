@@ -291,14 +291,19 @@ void SSDP::run()
 
         int count;
         count = select(nMaxSocket + 1, &read_set, NULL, NULL, &timeout);
+
         for (int nIdx = 0; count && nIdx < (int)NumberOfSockets; nIdx++ )
         {
-            if (m_Sockets[nIdx] != NULL && m_Sockets[nIdx]->socket() >= 0 &&
-                FD_ISSET(m_Sockets[nIdx]->socket(), &read_set))
+            bool cond1 = m_Sockets[nIdx] != NULL;
+            bool cond2 = cond1 && m_Sockets[nIdx]->socket() >= 0;
+            bool cond3 = cond2 && FD_ISSET(m_Sockets[nIdx]->socket(), &read_set);
+
+            if (cond3)
             {
 #if 0
                 LOG(VB_GENERAL, LOG_DEBUG, QString("FD_ISSET( %1 )").arg(nIdx));
 #endif
+
                 ProcessData(m_Sockets[nIdx]);
                 count--;
             }
@@ -315,10 +320,20 @@ void SSDP::run()
 void SSDP::ProcessData( MSocketDevice *pSocket )
 {
     QByteArray buffer;
-    long nBytes = 0;
+    long nBytes = pSocket->bytesAvailable();
     int retries = 0;
+    // Note: this function MUST do a read even if someone sends a zero byte UDP message
+    // Otherwise the select() will continue to signal data ready, so to prevent using 100%
+    // CPU, we need to call a recv function to make select() block again
+    bool didDoRead = 0;
 
-    while ((nBytes = pSocket->bytesAvailable()) > 0)
+    // UDP message of zero length? OK, "recv" it and move on
+    if (nBytes == 0)
+    {
+        LOG(VB_UPNP, LOG_WARNING, QString("SSDP: Received 0 byte UDP message"));
+    }
+
+    while ((nBytes = pSocket->bytesAvailable()) > 0 || (nBytes == 0 && !didDoRead))
     {
         buffer.resize(nBytes);
 
@@ -326,6 +341,7 @@ void SSDP::ProcessData( MSocketDevice *pSocket )
         do
         {
             long ret = pSocket->readBlock( buffer.data() + nRead, nBytes - nRead );
+            didDoRead = 1;
             if (ret < 0)
             {
                 if (errno == EAGAIN || errno == EWOULDBLOCK)
@@ -349,7 +365,7 @@ void SSDP::ProcessData( MSocketDevice *pSocket )
 
             nRead += ret;
 
-            if (0 == ret)
+            if (0 == ret && nBytes != 0)
             {
                 LOG(VB_SOCKET, LOG_WARNING,
                     QString("%1 bytes reported available, "
@@ -367,7 +383,7 @@ void SSDP::ProcessData( MSocketDevice *pSocket )
 
         QHostAddress  peerAddress = pSocket->peerAddress();
         quint16       peerPort    = pSocket->peerPort   ();
-
+        
         // ------------------------------------------------------------------
         QString     str          = QString(buffer.constData());
         QStringList lines        = str.split("\r\n", QString::SkipEmptyParts);

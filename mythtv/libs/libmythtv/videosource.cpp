@@ -1144,6 +1144,7 @@ class DVBTuningDelay : public SpinBoxSetting, public CaptureCardDBStorage
         CaptureCardDBStorage(this, parent, "dvb_tuning_delay")
     {
         setLabel(QObject::tr("DVB tuning delay (ms)"));
+        setValue(true);
         setHelpText(
             QObject::tr("Some Linux DVB drivers, in particular for the "
                         "Hauppauge Nova-T, require that we slow down "
