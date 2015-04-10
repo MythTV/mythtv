@@ -31,6 +31,9 @@
 #include <algorithm>
 #include <iterator>
 #include <vector>
+#if defined _MSC_VER || defined __MINGW32__
+#  include "compat.h"                   // for random
+#endif
 
 const size_t MAX_HISTORY_SIZE = 1024;
 

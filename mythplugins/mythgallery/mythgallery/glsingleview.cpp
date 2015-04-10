@@ -41,6 +41,9 @@ using namespace std;
 #include <mythdate.h>
 #include <mythuihelper.h>
 #include "mythlogging.h"
+#if defined _MSC_VER || defined __MINGW32__
+#  include "compat.h"                   // for random
+#endif
 
 // MythGallery headers
 #include "galleryutil.h"
