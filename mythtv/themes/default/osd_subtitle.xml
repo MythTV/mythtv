@@ -31,6 +31,7 @@
         <shape name="black_background" from="provider">
           <type>box</type>
           <fill color="#000000" alpha="255" />
+          <line color="#000000" alpha="255" width="0" />
         </shape>
 
 
