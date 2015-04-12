@@ -53,7 +53,11 @@ using namespace std;
 bool HttpServerExtension::ProcessOptions(HTTPRequest* pRequest)
 {
     pRequest->m_eResponseType   = ResponseTypeHeader;
-    pRequest->m_nResponseStatus = 405; // Method Not Available
+    pRequest->m_nResponseStatus = 200; // OK
+    // RFC 2616 Sect. 9.2 - If no response body is included, the response
+    //                      MUST include a Content-Length field with a
+    //                      field-value of "0".
+    pRequest->SetResponseHeader("Content-Length", "0");
 
     QStringList allowedMethods;
     if (m_nSupportedMethods & RequestTypeGet)
@@ -410,7 +414,8 @@ void HttpServer::DelegateRequest(HTTPRequest *pRequest)
     if (!bProcessed)
     {
         pRequest->m_eResponseType   = ResponseTypeHTML;
-        pRequest->m_nResponseStatus = 404; 
+        pRequest->m_nResponseStatus = 404;
+        pRequest->m_response.write( pRequest->GetResponsePage() );
     }
 }
 
@@ -564,6 +569,7 @@ void HttpWorker::run(void)
                         LOG(VB_HTTP, LOG_ERR, "ParseRequest Failed.");
 
                         pRequest->m_nResponseStatus = 501;
+                        pRequest->m_response.write( pRequest->GetResponsePage() );
                         bKeepAlive = false;
                     }
 

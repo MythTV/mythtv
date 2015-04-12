@@ -1016,6 +1016,14 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
                     key.prepend(QString::number(mdata->Track()) + " - ");
                     if (mdata->Track() < 10)
                         key.prepend("0");
+
+                    // Add the disc number if this is a multi-disc album
+                    if (mdata->DiscNumber() > 0)
+                    {
+                        key.prepend(QString::number(mdata->DiscNumber()) + "/");
+                        if (mdata->DiscNumber() < 10)
+                            key.prepend("0");
+                    }
                 }
                 map.insertMulti(key, mdata->ID());
             }

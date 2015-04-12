@@ -35,6 +35,7 @@
 #include "videoutils.h"
 #include "metadataimagehelper.h"
 #include "cardutil.h"
+#include "datacontracts/cutList.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -137,8 +138,7 @@ void FillProgramInfo( DTC::Program *pProgram,
             pRecording->setEncoderId   ( pInfo->GetInputID()              );
             if (pProgram->Channel())
             {
-                QString encoderName = CardUtil::GetDisplayName(pInfo->GetInputID(),
-                                                               pProgram->Channel()->SourceId());
+                QString encoderName = CardUtil::GetDisplayName(pInfo->GetInputID());
                 pRecording->setEncoderName( encoderName );
             }
 
@@ -516,4 +516,96 @@ void FillCastMemberList(DTC::CastMemberList* pCastMemberList,
 
     //pCastMemberList->setCount(query.size());
     //pCastMemberList->setTotalAvailable(query.size());
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+void FillCutList(DTC::CutList* pCutList, RecordingInfo* rInfo, int marktype)
+{
+    frm_dir_map_t markMap;
+    frm_dir_map_t::const_iterator it;
+
+    if (rInfo && rInfo->GetChanID())
+    {
+        rInfo->QueryCutList(markMap);
+
+        for (it = markMap.begin(); it != markMap.end(); ++it)
+        {
+            bool isend = ((*it) == MARK_CUT_END || (*it) == MARK_COMM_END) ? true : false;
+            if (marktype == 0)
+            {
+                DTC::Cutting *pCutting = pCutList->AddNewCutting();
+                pCutting->setMark(*it);
+                pCutting->setOffset(it.key());
+            }
+            else if (marktype == 1)
+            {
+                uint64_t offset;
+                if (rInfo->QueryKeyFramePosition(&offset, it.key(), isend))
+                {
+                  DTC::Cutting *pCutting = pCutList->AddNewCutting();
+                  pCutting->setMark(*it);
+                  pCutting->setOffset(offset);
+                }
+            }
+            else if (marktype == 2)
+            {
+                uint64_t offset;
+                if (rInfo->QueryKeyFrameDuration(&offset, it.key(), isend))
+                {
+                  DTC::Cutting *pCutting = pCutList->AddNewCutting();
+                  pCutting->setMark(*it);
+                  pCutting->setOffset(offset);
+                }
+            }
+        }
+    }
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+void FillCommBreak(DTC::CutList* pCutList, RecordingInfo* rInfo, int marktype)
+{
+    frm_dir_map_t markMap;
+    frm_dir_map_t::const_iterator it;
+
+    if (rInfo && rInfo->GetChanID())
+    {
+        rInfo->QueryCommBreakList(markMap);
+
+        for (it = markMap.begin(); it != markMap.end(); ++it)
+        {
+            bool isend = ((*it) == MARK_CUT_END || (*it) == MARK_COMM_END) ? true : false;
+            if (marktype == 0)
+            {
+                DTC::Cutting *pCutting = pCutList->AddNewCutting();
+                pCutting->setMark(*it);
+                pCutting->setOffset(it.key());
+            }
+            else if (marktype == 1)
+            {
+                uint64_t offset;
+                if (rInfo->QueryKeyFramePosition(&offset, it.key(), isend))
+                {
+                  DTC::Cutting *pCutting = pCutList->AddNewCutting();
+                  pCutting->setMark(*it);
+                  pCutting->setOffset(offset);
+                }
+            }
+            else if (marktype == 2)
+            {
+                uint64_t offset;
+                if (rInfo->QueryKeyFrameDuration(&offset, it.key(), isend))
+                {
+                  DTC::Cutting *pCutting = pCutList->AddNewCutting();
+                  pCutting->setMark(*it);
+                  pCutting->setOffset(offset);
+                }
+            }
+        }
+    }
 }

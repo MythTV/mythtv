@@ -4017,7 +4017,7 @@ void MythPlayer::ClearAfterSeek(bool clearvideobuffers)
     // nothing except to call ResetCaptions() to erase any captions
     // currently on-screen.  The key is that the erasing is done in
     // the UI thread, not the decoder thread.
-    EnableSubtitles(GetCaptionsEnabled());
+    EnableSubtitles(textDesired);
     deleteMap.TrackerReset(framesPlayed);
     commBreakMap.SetTracker(framesPlayed);
     commBreakMap.ResetLastSkip();

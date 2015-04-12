@@ -48,9 +48,6 @@ class VideoOutputOpenGLVAAPI : public VideoOutputOpenGL
                                              bool no_acceleration,
                                              PixelFormat &pix_fmt);
 
-  protected:
-    virtual bool SetupContext(void);
-
   private:
     VAAPIContext *m_ctx;
     void         *m_pauseBuffer;

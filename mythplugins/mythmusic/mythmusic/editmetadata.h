@@ -118,6 +118,7 @@ class EditMetadataDialog : public EditMetadataCommon
 
     MythUISpinBox     *m_yearSpin;
     MythUISpinBox     *m_trackSpin;
+    MythUISpinBox     *m_discSpin;
     MythUISpinBox     *m_ratingSpin;
 
     MythUIStateType   *m_ratingState;

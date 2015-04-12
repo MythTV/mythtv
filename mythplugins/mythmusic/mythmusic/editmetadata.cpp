@@ -145,6 +145,10 @@ void EditMetadataCommon::updateMetadata()
     if (spin)
         m_metadata->setTrack(spin->GetIntValue());
 
+    spin = dynamic_cast<MythUISpinBox *>(GetChild("discnumspin"));
+    if (spin)
+        m_metadata->setDiscNumber(spin->GetIntValue());
+
     spin = dynamic_cast<MythUISpinBox *>(GetChild("ratingspin"));
     if (spin)
         m_metadata->setRating(spin->GetIntValue());
@@ -257,6 +261,7 @@ bool EditMetadataCommon::hasMetadataChanged(void)
     changed |= (m_metadata->Genre() != m_sourceMetadata->Genre());
     changed |= (m_metadata->Year() != m_sourceMetadata->Year());
     changed |= (m_metadata->Track() != m_sourceMetadata->Track());
+    changed |= (m_metadata->DiscNumber() != m_sourceMetadata->DiscNumber());
     changed |= (m_metadata->Compilation() != m_sourceMetadata->Compilation());
     changed |= (m_metadata->Rating() != m_sourceMetadata->Rating());
 
@@ -292,13 +297,14 @@ EditMetadataDialog::EditMetadataDialog(MythScreenStack *parent, MusicMetadata *s
     m_artistEdit(NULL),             m_compArtistEdit(NULL),
     m_albumEdit(NULL),              m_titleEdit(NULL),
     m_genreEdit(NULL),              m_yearSpin(NULL),
-    m_trackSpin(NULL),              m_ratingSpin(NULL),
-    m_ratingState(NULL),            m_incRatingButton(NULL),
-    m_decRatingButton(NULL),        m_searchArtistButton(NULL),
-    m_searchCompArtistButton(NULL), m_searchAlbumButton(NULL),
-    m_searchGenreButton(NULL),      m_artistIcon(NULL),
-    m_albumIcon(NULL),              m_genreIcon(NULL),
-    m_compilationCheck(NULL),       m_albumartButton(NULL)
+    m_trackSpin(NULL),              m_discSpin(NULL),
+    m_ratingSpin(NULL),             m_ratingState(NULL),
+    m_incRatingButton(NULL),        m_decRatingButton(NULL),
+    m_searchArtistButton(NULL),     m_searchCompArtistButton(NULL),
+    m_searchAlbumButton(NULL),      m_searchGenreButton(NULL),
+    m_artistIcon(NULL),             m_albumIcon(NULL),
+    m_genreIcon(NULL),              m_compilationCheck(NULL),
+    m_albumartButton(NULL)
 {
     gCoreContext->addListener(this);
 }
@@ -308,13 +314,14 @@ EditMetadataDialog::EditMetadataDialog(MythScreenStack *parent)
     m_artistEdit(NULL),             m_compArtistEdit(NULL),
     m_albumEdit(NULL),              m_titleEdit(NULL),
     m_genreEdit(NULL),              m_yearSpin(NULL),
-    m_trackSpin(NULL),              m_ratingSpin(NULL),
-    m_ratingState(NULL),            m_incRatingButton(NULL),
-    m_decRatingButton(NULL),        m_searchArtistButton(NULL),
-    m_searchCompArtistButton(NULL), m_searchAlbumButton(NULL),
-    m_searchGenreButton(NULL),      m_artistIcon(NULL),
-    m_albumIcon(NULL),              m_genreIcon(NULL),
-    m_compilationCheck(NULL),       m_albumartButton(NULL)
+    m_trackSpin(NULL),              m_discSpin(NULL),
+    m_ratingSpin(NULL),             m_ratingState(NULL),
+    m_incRatingButton(NULL),        m_decRatingButton(NULL),
+    m_searchArtistButton(NULL),     m_searchCompArtistButton(NULL),
+    m_searchAlbumButton(NULL),      m_searchGenreButton(NULL),
+    m_artistIcon(NULL),             m_albumIcon(NULL),
+    m_genreIcon(NULL),              m_compilationCheck(NULL),
+    m_albumartButton(NULL)
 {
     gCoreContext->addListener(this);
 }
@@ -339,6 +346,7 @@ bool EditMetadataDialog::Create(void)
 
     UIUtilE::Assign(this, m_yearSpin,       "yearspin",       &err);
     UIUtilE::Assign(this, m_trackSpin,      "tracknumspin",   &err);
+    UIUtilW::Assign(this, m_discSpin,       "discnumspin",    &err);
 
     UIUtilE::Assign(this, m_searchArtistButton,     "searchartistbutton",     &err);
     UIUtilE::Assign(this, m_searchCompArtistButton, "searchcompartistbutton", &err);
@@ -368,6 +376,9 @@ bool EditMetadataDialog::Create(void)
     m_yearSpin->SetRange(QDate::currentDate().year(), 1000, 1);
     m_yearSpin->AddSelection(0, "None");
     m_trackSpin->SetRange(0, 999, 1);
+
+    if (m_discSpin)
+        m_discSpin->SetRange(0, 999, 1);
 
     if (m_ratingSpin)
     {
@@ -412,6 +423,9 @@ void EditMetadataDialog::fillWidgets()
     m_yearSpin->SetValue(m_metadata->Year());
     m_trackSpin->SetValue(m_metadata->Track());
     m_compilationCheck->SetCheckState(m_metadata->Compilation());
+
+    if (m_discSpin)
+        m_discSpin->SetValue(m_metadata->DiscNumber());
 
     updateRating();
 

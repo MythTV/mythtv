@@ -50,10 +50,10 @@ class Guide : public GuideServices
         
         DTC::ProgramGuide*  GetProgramGuide     ( const QDateTime &StartTime  ,
                                                   const QDateTime &EndTime    ,
-                                                  int              StartChanId,
-                                                  int              NumChannels,
                                                   bool             Details,
-                                                  int              ChannelGroupId );
+                                                  int              ChannelGroupId,
+                                                  int              StartIndex,
+                                                  int              Count);
 
         DTC::ProgramList*   GetProgramList      ( int              StartIndex,
                                                   int              Count,
@@ -118,14 +118,14 @@ class ScriptableGuide : public QObject
 
         QObject* GetProgramGuide( const QDateTime &StartTime  ,
                                   const QDateTime &EndTime    ,
-                                  int              StartChanId,
-                                  int              NumChannels,
                                   bool             Details,
-                                  int              ChannelGroupId )
+                                  int              ChannelGroupId,
+                                  int              StartIndex,
+                                  int              Count )
         {
             SCRIPT_CATCH_EXCEPTION( NULL,
-                return m_obj.GetProgramGuide( StartTime, EndTime, StartChanId,
-                                        NumChannels, Details, ChannelGroupId );
+                return m_obj.GetProgramGuide( StartTime, EndTime, Details,
+                                              ChannelGroupId, StartIndex, Count );
             )
         }
 

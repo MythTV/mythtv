@@ -2388,7 +2388,7 @@ MythMenu* MusicCommon::createPlaylistOptionsMenu(void)
 
 void MusicCommon::allTracks()
 {
-   m_whereClause = "ORDER BY music_artists.artist_name, album_name, track";
+   m_whereClause = "ORDER BY music_artists.artist_name, album_name, disc_number, track";
    showPlaylistOptionsMenu();
 }
 
@@ -2418,7 +2418,7 @@ void MusicCommon::byArtist(void)
 
     QString value = formattedFieldValue(mdata->Artist().toUtf8().constData());
     m_whereClause = "WHERE music_artists.artist_name = " + value +
-                    " ORDER BY album_name, track";
+                    " ORDER BY album_name, disc_number, track";
 
     showPlaylistOptionsMenu();
 }
@@ -2431,7 +2431,7 @@ void MusicCommon::byAlbum(void)
 
     QString value = formattedFieldValue(mdata->Album().toUtf8().constData());
     m_whereClause = "WHERE album_name = " + value +
-                    " ORDER BY track";
+                    " ORDER BY disc_number, track";
 
     showPlaylistOptionsMenu();
 }
@@ -2444,7 +2444,7 @@ void MusicCommon::byGenre(void)
 
     QString value = formattedFieldValue(mdata->Genre().toUtf8().constData());
     m_whereClause = "WHERE genre = " + value +
-                    " ORDER BY music_artists.artist_name, album_name, track";
+                    " ORDER BY music_artists.artist_name, album_name, disc_number, track";
 
     showPlaylistOptionsMenu();
 }
@@ -2457,7 +2457,7 @@ void MusicCommon::byYear(void)
 
     QString value = formattedFieldValue(mdata->Year());
     m_whereClause = "WHERE music_songs.year = " + value +
-                    " ORDER BY music_artists.artist_name, album_name, track";
+                    " ORDER BY music_artists.artist_name, album_name, disc_number, track";
 
     showPlaylistOptionsMenu();
 }
@@ -2470,7 +2470,7 @@ void MusicCommon::byTitle(void)
 
     QString value = formattedFieldValue(mdata->Title().toUtf8().constData());
     m_whereClause = "WHERE music_songs.name = " + value +
-                    " ORDER BY music_artists.artist_name, album_name, track";
+                    " ORDER BY music_artists.artist_name, album_name, disc_number, track";
 
     showPlaylistOptionsMenu();
 }

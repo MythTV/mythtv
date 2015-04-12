@@ -121,7 +121,9 @@ public:
 
     inline qint64 readBlock(char *data, quint64 maxlen)
     {
-        return qint64(read(data, qint64(maxlen)));
+        // read() does not correctly handle zero-byte udp packets
+        // so call readData() directly which does
+        return maxlen ? qint64(read(data, qint64(maxlen))) : qint64(readData(data, qint64(maxlen)));
     }
 
     virtual quint16  port() const;

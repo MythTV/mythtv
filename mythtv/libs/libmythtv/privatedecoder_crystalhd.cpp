@@ -1,6 +1,7 @@
 #include "privatedecoder_crystalhd.h"
 #include "mythlogging.h"
 #include "fourcc.h"
+#include "unistd.h"
 
 #define LOC  QString("CrystalHD: ")
 #define ERR  QString("CrystalHD Err: ")

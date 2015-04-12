@@ -55,8 +55,11 @@ DTC::ChannelInfoList* Channel::GetChannelInfoList( uint nSourceID,
 {
     ChannelInfoList chanList;
 
-    chanList = ChannelUtil::LoadChannels( 0, 0, ChannelUtil::kChanOrderByChanNum,
-                                         bOnlyVisible, nSourceID ); //, nChanGroupID
+    uint nTotalAvailable = 0;
+    chanList = ChannelUtil::LoadChannels( 0, 0, nTotalAvailable, bOnlyVisible,
+                                          ChannelUtil::kChanOrderByChanNum,
+                                          ChannelUtil::kChanGroupByChanid,
+                                          nSourceID ); //, nChanGroupID
 
     // ----------------------------------------------------------------------
     // Build Response
@@ -64,16 +67,17 @@ DTC::ChannelInfoList* Channel::GetChannelInfoList( uint nSourceID,
 
     DTC::ChannelInfoList *pChannelInfos = new DTC::ChannelInfoList();
 
-    uint nTotalAvailable = static_cast<uint>(chanList.size());
+    //uint nTotalAvailable = static_cast<uint>(chanList.size());
     nStartIndex   = min( nStartIndex, nTotalAvailable );
     nCount        = (nCount > 0) ? min( nCount, nTotalAvailable ) : nTotalAvailable;
     int nEndIndex = min((nStartIndex + nCount), nTotalAvailable );
 
-    for( int n = nStartIndex; n < nEndIndex; n++)
+    ChannelInfoList::iterator chanIt;
+    for( chanIt = chanList.begin(); chanIt != chanList.end(); ++chanIt)
     {
         DTC::ChannelInfo *pChannelInfo = pChannelInfos->AddNewChannelInfo();
 
-        ChannelInfo channelInfo = chanList.at(n);
+        ChannelInfo channelInfo = (*chanIt);
 
         if (!FillChannelInfo(pChannelInfo, channelInfo, bDetails))
             throw( QString("Channel ID appears invalid."));

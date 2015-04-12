@@ -18,6 +18,10 @@
 #include "referencecounter.h"
 #include "compat.h"
 
+#ifdef _MSC_VER
+#  include <unistd.h>	// pid_t
+#endif
+
 #undef NOLOGSERVER
 #if !CONFIG_MYTHLOGSERVER
 #define NOLOGSERVER

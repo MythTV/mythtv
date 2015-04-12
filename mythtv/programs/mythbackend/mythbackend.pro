@@ -6,6 +6,9 @@ QT += network xml sql script
 mingw | win32-msvc* {
    # script debugger currently only enabled for WIN32 builds
    QT += scripttools
+
+   # need the following for QUrl::addQueryItem
+   DEFINES += QT_DISABLE_DEPRECATED_BEFORE
 }
 contains(QT_VERSION, ^5\\.[0-9]\\..*) {
 QT += widgets

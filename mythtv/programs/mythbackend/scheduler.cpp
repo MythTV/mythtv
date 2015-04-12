@@ -1715,7 +1715,7 @@ void Scheduler::getConflicting(RecordingInfo *pginfo, RecList *retlist)
     }
 }
 
-bool Scheduler::GetAllPending(RecList &retList) const
+bool Scheduler::GetAllPending(RecList &retList, int recRuleId) const
 {
     QMutexLocker lockit(&schedLock);
 
@@ -1724,9 +1724,33 @@ bool Scheduler::GetAllPending(RecList &retList) const
     RecConstIter it = reclist.begin();
     for (; it != reclist.end(); ++it)
     {
+        if (recRuleId > 0 &&
+            (*it)->GetRecordingRuleID() != static_cast<uint>(recRuleId))
+            continue;
         if ((*it)->GetRecordingStatus() == RecStatus::Conflict)
             hasconflicts = true;
         retList.push_back(new RecordingInfo(**it));
+    }
+
+    return hasconflicts;
+}
+
+bool Scheduler::GetAllPending(ProgramList &retList, int recRuleId) const
+{
+    QMutexLocker lockit(&schedLock);
+
+    bool hasconflicts = false;
+
+    RecConstIter it = reclist.begin();
+    for (; it != reclist.end(); ++it)
+    {
+        if (recRuleId > 0 &&
+            (*it)->GetRecordingRuleID() != static_cast<uint>(recRuleId))
+            continue;
+
+        if ((*it)->GetRecordingStatus() == RecStatus::Conflict)
+            hasconflicts = true;
+        retList.push_back(new ProgramInfo(**it));
     }
 
     return hasconflicts;
