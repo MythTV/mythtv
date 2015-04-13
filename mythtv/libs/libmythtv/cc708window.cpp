@@ -593,8 +593,22 @@ void CC708Window::DecrPenLocation(void)
 
 void CC708Window::SetPenLocation(uint row, uint column)
 {
-    Scroll(row, column);
-    LimitPenLocation();
+  //Clear current row in case we are reseting Pen Location.
+  LOG(VB_VBI,
+      LOG_DEBUG,
+      QString("SetPenLocation nr %1 nc %2 rc %3 cc %4 tr %5 tc %6").arg(row).arg(
+          column).arg(row_count).arg(column_count).arg(true_row_count).arg(
+          true_column_count));
+  if(k708DirBottomToTop == scroll_dir && 0 == row && text)
+  {
+    for ( uint i = 0; i < true_column_count; i++ )
+    {
+      text [ ( row * true_column_count ) + i].character = QChar(' ');
+      text [ ( row * true_column_count ) + i].attr = pen.attr;
+    }
+  }
+  Scroll(row, column);
+  LimitPenLocation();
 }
 
 void CC708Window::LimitPenLocation(void)
