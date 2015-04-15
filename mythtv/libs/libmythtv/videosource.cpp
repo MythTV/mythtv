@@ -2451,7 +2451,7 @@ V4LConfigurationGroup::V4LConfigurationGroup(CaptureCard& a_parent) :
     parent(a_parent),
     cardinfo(new TransLabelSetting()),  vbidev(new VBIDevice(parent))
 {
-    QString drv = "(?!ivtv|hdpvr|(saa7164(.*)))";
+    QString drv = "(?!ivtv|hdpvr|(saa7164(.*))).*";
     VideoDevice *device = new VideoDevice(parent, 0, 15, QString::null, drv);
     HorizontalConfigurationGroup *audgrp =
         new HorizontalConfigurationGroup(false, false, true, true);
