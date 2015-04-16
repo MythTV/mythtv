@@ -825,7 +825,7 @@ VideoListDeathDelay::VideoListDeathDelay(VideoDialog::VideoListPtr toSave) :
     QObject(qApp)
 {
     m_d = new VideoListDeathDelayPrivate(toSave);
-    QTimer::singleShot(3000, this, SLOT(OnTimeUp()));
+    QTimer::singleShot(kDelayTimeMS, this, SLOT(OnTimeUp()));
 }
 
 VideoListDeathDelay::~VideoListDeathDelay()

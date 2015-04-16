@@ -658,6 +658,9 @@ static void RunVideoScreen(VideoDialog::DialogType type, bool fromJump = false)
         if (!saved.isNull())
         {
             video_list = saved->GetSaved();
+            LOG(VB_GENERAL, LOG_INFO,
+                QString("Reusing saved video list because MythVideo was resumed"
+                        " within %1ms").arg(VideoListDeathDelay::kDelayTimeMS));
         }
     }
 
