@@ -48,7 +48,9 @@ QString profileToString(VAProfile profile)
     if (VAProfileVC1Main == profile)                    return "VC1Main";
     if (VAProfileVC1Advanced == profile)                return "VC1Advanced";
     if (VAProfileH263Baseline == profile)               return "H263Base";
+#if VA_CHECK_VERSION(0,34,0)
     if (VAProfileNone == profile)                       return "None";
+#endif
 #if VA_CHECK_VERSION(0,36,0)
     if (VAProfileH264StereoHigh == profile)             return "H264StereoHigh";
 #endif
@@ -63,7 +65,9 @@ QString entryToString(VAEntrypoint entry)
     if (VAEntrypointMoComp == entry)     return "MC (UNSUPPORTED) ";
     if (VAEntrypointDeblocking == entry) return "Deblock (UNSUPPORTED) ";
     if (VAEntrypointEncSlice == entry)   return "EncSlice (UNSUPPORTED) ";
+#if VA_CHECK_VERSION(0,34,0)
     if (VAEntrypointVideoProc == entry)  return "VideoProc (UNSUPPORTED) ";
+#endif
     return "Unknown";
 }
 
