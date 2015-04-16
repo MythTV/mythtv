@@ -556,7 +556,7 @@ bool PlaybackBox::Create()
     connect(m_recordingList, SIGNAL(itemSelected(MythUIButtonListItem*)),
             SLOT(ItemSelected(MythUIButtonListItem*)));
     connect(m_recordingList, SIGNAL(itemClicked(MythUIButtonListItem*)),
-            SLOT(PlayFromBookmark(MythUIButtonListItem*)));
+            SLOT(PlayFromBookmarkOrProgStart(MythUIButtonListItem*)));
     connect(m_recordingList, SIGNAL(itemVisible(MythUIButtonListItem*)),
             SLOT(ItemVisible(MythUIButtonListItem*)));
     connect(m_recordingList, SIGNAL(itemLoaded(MythUIButtonListItem*)),
@@ -2197,6 +2197,25 @@ void PlaybackBox::playSelectedPlaylist(bool _random)
         this, new MythEvent("PLAY_PLAYLIST"));
 }
 
+void PlaybackBox::PlayFromBookmarkOrProgStart(MythUIButtonListItem *item)
+{
+    if (!item)
+        item = m_recordingList->GetItemCurrent();
+
+    if (!item)
+        return;
+
+    ProgramInfo *pginfo = item->GetData().value<ProgramInfo *>();
+
+    const bool ignoreBookmark = false;
+    const bool ignoreProgStart = false;
+    const bool ignoreLastPlayPos = true;
+    const bool underNetworkControl = false;
+    if (pginfo)
+        PlayX(*pginfo, ignoreBookmark, ignoreProgStart, ignoreLastPlayPos,
+              underNetworkControl);
+}
+
 void PlaybackBox::PlayFromBookmark(MythUIButtonListItem *item)
 {
     if (!item)
@@ -2207,8 +2226,13 @@ void PlaybackBox::PlayFromBookmark(MythUIButtonListItem *item)
 
     ProgramInfo *pginfo = item->GetData().value<ProgramInfo *>();
 
+    const bool ignoreBookmark = false;
+    const bool ignoreProgStart = true;
+    const bool ignoreLastPlayPos = true;
+    const bool underNetworkControl = false;
     if (pginfo)
-        PlayX(*pginfo, false, false);
+        PlayX(*pginfo, ignoreBookmark, ignoreProgStart, ignoreLastPlayPos,
+              underNetworkControl);
 }
 
 void PlaybackBox::PlayFromBeginning(MythUIButtonListItem *item)
@@ -2221,17 +2245,44 @@ void PlaybackBox::PlayFromBeginning(MythUIButtonListItem *item)
 
     ProgramInfo *pginfo = item->GetData().value<ProgramInfo *>();
 
+    const bool ignoreBookmark = true;
+    const bool ignoreProgStart = true;
+    const bool ignoreLastPlayPos = true;
+    const bool underNetworkControl = false;
     if (pginfo)
-        PlayX(*pginfo, true, false);
+        PlayX(*pginfo, ignoreBookmark, ignoreProgStart, ignoreLastPlayPos,
+              underNetworkControl);
+}
+
+void PlaybackBox::PlayFromLastPlayPos(MythUIButtonListItem *item)
+{
+    if (!item)
+        item = m_recordingList->GetItemCurrent();
+
+    if (!item)
+        return;
+
+    ProgramInfo *pginfo = item->GetData().value<ProgramInfo *>();
+
+    const bool ignoreBookmark = true;
+    const bool ignoreProgStart = true;
+    const bool ignoreLastPlayPos = false;
+    const bool underNetworkControl = false;
+    if (pginfo)
+        PlayX(*pginfo, ignoreBookmark, ignoreProgStart, ignoreLastPlayPos,
+              underNetworkControl);
 }
 
 void PlaybackBox::PlayX(const ProgramInfo &pginfo,
                         bool ignoreBookmark,
+                        bool ignoreProgStart,
+                        bool ignoreLastPlayPos,
                         bool underNetworkControl)
 {
     if (!m_player)
     {
-        Play(pginfo, false, ignoreBookmark, underNetworkControl);
+        Play(pginfo, false, ignoreBookmark, ignoreProgStart, ignoreLastPlayPos,
+             underNetworkControl);
         return;
     }
 
@@ -2242,6 +2293,7 @@ void PlaybackBox::PlayX(const ProgramInfo &pginfo,
             ignoreBookmark ? "1" : "0");
         m_player_selected_new_show.push_back(
             underNetworkControl ? "1" : "0");
+        // XXX add anything for ignoreProgStart and ignoreLastPlayPos?
     }
     Close();
 }
@@ -2324,7 +2376,7 @@ void PlaybackBox::selected(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    PlayFromBookmark(item);
+    PlayFromBookmarkOrProgStart(item);
 }
 
 void PlaybackBox::popupClosed(QString which, int result)
@@ -2412,7 +2464,8 @@ void PlaybackBox::ShowGroupPopup()
 
 bool PlaybackBox::Play(
     const ProgramInfo &rec,
-    bool inPlaylist, bool ignoreBookmark, bool underNetworkControl)
+    bool inPlaylist, bool ignoreBookmark, bool ignoreProgStart,
+    bool ignoreLastPlayPos, bool underNetworkControl)
 {
     bool playCompleted = false;
 
@@ -2444,6 +2497,8 @@ bool PlaybackBox::Play(
     uint flags =
         (inPlaylist          ? kStartTVInPlayList       : kStartTVNoFlags) |
         (underNetworkControl ? kStartTVByNetworkCommand : kStartTVNoFlags) |
+        (ignoreLastPlayPos   ? kStartTVIgnoreLastPlayPos: kStartTVNoFlags) |
+        (ignoreProgStart     ? kStartTVIgnoreProgStart  : kStartTVNoFlags) |
         (ignoreBookmark      ? kStartTVIgnoreBookmark   : kStartTVNoFlags);
 
     playCompleted = TV::StartTV(&tvrec, flags);
@@ -2912,8 +2967,12 @@ MythMenu* PlaybackBox::createPlayFromMenu()
 
     MythMenu *menu = new MythMenu(title, this, "slotmenu");
 
-    menu->AddItem(tr("Play from bookmark"),  SLOT(PlayFromBookmark()));
+    if (pginfo->IsBookmarkSet())
+        menu->AddItem(tr("Play from bookmark"), SLOT(PlayFromBookmark()));
     menu->AddItem(tr("Play from beginning"), SLOT(PlayFromBeginning()));
+    if (pginfo->QueryLastPlayPos())
+        menu->AddItem(tr("Play from last played position"),
+                      SLOT(PlayFromLastPlayPos()));
 
     return menu;
 }
@@ -3149,10 +3208,11 @@ void PlaybackBox::ShowActionPopup(const ProgramInfo &pginfo)
 
     if (!sameProgram)
     {
-        if (pginfo.IsBookmarkSet())
+        if (pginfo.IsBookmarkSet() || pginfo.QueryLastPlayPos())
             m_popupMenu->AddItem(tr("Play from..."), NULL, createPlayFromMenu());
         else
-            m_popupMenu->AddItem(tr("Play"), SLOT(PlayFromBookmark()));
+            m_popupMenu->AddItem(tr("Play"),
+                                 SLOT(PlayFromBookmarkOrProgStart()));
     }
 
     if (!m_player)
@@ -3743,8 +3803,12 @@ void PlaybackBox::processNetworkControlCommand(const QString &command)
 
                 pginfo.SetPathname(pginfo.GetPlaybackURL());
 
-                bool ignoreBookmark = (tokens[1] == "PLAY");
-                PlayX(pginfo, ignoreBookmark, true);
+                const bool ignoreBookmark = (tokens[1] == "PLAY");
+                const bool ignoreProgStart = true;
+                const bool ignoreLastPlayPos = true;
+                const bool underNetworkControl = true;
+                PlayX(pginfo, ignoreBookmark, ignoreProgStart,
+                      ignoreLastPlayPos, underNetworkControl);
             }
             else
             {
@@ -3877,7 +3941,7 @@ bool PlaybackBox::keyPressEvent(QKeyEvent *event)
             if (action == "DELETE")
                 deleteSelected(m_recordingList->GetItemCurrent());
             else if (action == ACTION_PLAYBACK)
-                PlayFromBookmark();
+                PlayFromBookmarkOrProgStart();
             else if (action == "DETAILS" || action == "INFO")
                 ShowDetails();
             else if (action == "CUSTOMEDIT")
@@ -4154,7 +4218,13 @@ void PlaybackBox::customEvent(QEvent *event)
                 else if (pginfo)
                 {
                     playnext = false;
-                    Play(*pginfo, kCheckForPlaylistAction == cat, false, false);
+                    const bool ignoreBookmark = false;
+                    const bool ignoreProgStart = false;
+                    const bool ignoreLastPlayPos = true;
+                    const bool underNetworkControl = false;
+                    Play(*pginfo, kCheckForPlaylistAction == cat,
+                         ignoreBookmark, ignoreProgStart, ignoreLastPlayPos,
+                         underNetworkControl);
                 }
             }
 
@@ -4183,8 +4253,13 @@ void PlaybackBox::customEvent(QEvent *event)
             }
 
             ProgramInfo *pginfo = FindProgramInUILists(recordingID);
+            const bool ignoreBookmark = false;
+            const bool ignoreProgStart = true;
+            const bool ignoreLastPlayPos = true;
+            const bool underNetworkControl = false;
             if (pginfo)
-                Play(*pginfo, true, false, false);
+                Play(*pginfo, true, ignoreBookmark, ignoreProgStart,
+                     ignoreLastPlayPos, underNetworkControl);
         }
         else if ((message == "SET_PLAYBACK_URL") && (me->ExtraDataCount() == 2))
         {
