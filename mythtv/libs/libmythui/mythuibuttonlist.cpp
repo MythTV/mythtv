@@ -1440,7 +1440,8 @@ void MythUIButtonList::CalculateArrowStates()
     QMap<int, MythUIButtonListItem*>::const_iterator i = m_ButtonToItem.constBegin();
     while (i != m_ButtonToItem.constEnd())
     {
-        i.value()->setVisible(false);
+        if (i.value())
+            i.value()->setVisible(false);
         ++i;
     }
 
@@ -1526,6 +1527,17 @@ void MythUIButtonList::RemoveItem(MythUIButtonListItem *item)
 
     if (curIndex == -1)
         return;
+
+    QMap<int, MythUIButtonListItem*>::iterator it = m_ButtonToItem.begin();
+    while (it != m_ButtonToItem.end())
+    {
+        if (it.value() == item)
+        {
+            m_ButtonToItem.erase(it);
+            break;
+        }
+        ++it;
+    }
 
     if (curIndex == m_topPosition &&
         m_topPosition > 0 &&
