@@ -32,6 +32,7 @@ class WelcomeDialog : public MythScreenType
 
   protected slots:
     void startFrontendClick(void);
+    void startFrontend(void);
     void updateAll(void);
     void updateStatus(void);
     void updateScreen(void);
@@ -45,7 +46,6 @@ class WelcomeDialog : public MythScreenType
     bool updateScheduledList(void);
 
   private:
-    void startFrontend(void);
     void updateStatusMessage(void);
     bool checkConnectionToServer(void);
     void checkAutoStart(void);
