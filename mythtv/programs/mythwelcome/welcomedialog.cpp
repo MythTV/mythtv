@@ -8,7 +8,6 @@
 #include <QCoreApplication>
 #include <QKeyEvent>
 #include <QEvent>
-#include <QtConcurrent/QtConcurrentRun>
 
 // myth
 #include "exitcodes.h"
@@ -105,14 +104,11 @@ bool WelcomeDialog::Create(void)
 
 void WelcomeDialog::startFrontend(void)
 {
-    // this makes sure the button appears to click properly
-    usleep(500 * 1000);
-
     QString startFECmd = gCoreContext->GetSetting("MythWelcomeStartFECmd",
                          m_appBinDir + "mythfrontend");
 
-    myth_system(startFECmd, kMSDisableUDPListener);
-
+    myth_system(startFECmd, kMSDisableUDPListener | kMSProcessEvents);
+    updateAll();
     m_frontendIsRunning = false;
 }
 
@@ -123,7 +119,8 @@ void WelcomeDialog::startFrontendClick(void)
 
     m_frontendIsRunning = true;
 
-    QtConcurrent::run(this, &WelcomeDialog::startFrontend);
+    // this makes sure the button appears to click properly
+    QTimer::singleShot(500, this, SLOT(startFrontend()));
 }
 
 void WelcomeDialog::checkAutoStart(void)
