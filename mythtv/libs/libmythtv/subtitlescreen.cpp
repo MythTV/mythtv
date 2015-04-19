@@ -394,7 +394,9 @@ void SubtitleFormat::CreateProviderDefault(const QString &family,
     else if (family == kSubFamilyText)
     {
         font->GetFace()->setFamily("Droid Sans");
-        bg->SetFillBrush(QBrush(Qt::black));
+        QBrush brush(Qt::black);
+        bg->SetFillBrush(brush);
+        bg->SetLinePen(QPen(brush, 0));
     }
     else if (family == kSubFamilyTeletext)
     {
