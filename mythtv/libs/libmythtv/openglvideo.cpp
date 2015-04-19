@@ -469,7 +469,9 @@ bool OpenGLVideo::AddFilter(OpenGLFilterType filter)
             success = false;
     }
 
-    if (success && (filter != kGLFilterNone))
+    if (success &&
+        (((filter != kGLFilterNone) && (filter != kGLFilterResize)) ||
+         ((gl_features & kGLSL) && (filter == kGLFilterResize))))
     {
         program = AddFragmentProgram(filter);
         if (!program)
@@ -1040,7 +1042,8 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
 
         // enable fragment program and set any environment variables
         GLuint program = 0;
-        if ((type != kGLFilterNone))
+        if (((type != kGLFilterNone) && (type != kGLFilterResize)) ||
+            ((gl_features & kGLSL) && (type == kGLFilterResize)))
         {
             GLuint prog_ref = 0;
 
