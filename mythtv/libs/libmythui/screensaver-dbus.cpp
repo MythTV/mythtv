@@ -88,7 +88,7 @@ class ScreenSaverDBusPrivate
             }
         }
     }
-    void UnInhibit()
+    void UnInhibit(void)
     {
         if (m_interface->isValid())
         {
