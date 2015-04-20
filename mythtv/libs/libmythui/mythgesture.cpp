@@ -100,7 +100,7 @@ MythGesture::~MythGesture()
 void MythGesture::adjustExtremes(int x, int y)
 {
     min_x = std::min(min_x, x);
-    max_x = std::max(max_y, x);
+    max_x = std::max(max_x, x);
     min_y = std::min(min_y, y);
     max_y = std::max(max_y, y);
 }
@@ -331,6 +331,7 @@ bool MythGesture::record(const QPoint & p)
 
 
 static const char *gesturename[] = {
+    "Unknown",
     "Up",
     "Down",
     "Left",
