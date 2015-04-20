@@ -931,6 +931,11 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
             curRec->GetRecordingStartTime().addSecs(60));
     }
 
+    // HACK Temporary hack, ensure we've loaded the recording file info, do it now
+    //      so that it contains the final filesize information
+    if (!curRec->GetRecordingFile())
+        curRec->LoadRecordingFile();
+
     // Generate a preview
     uint64_t fsize = curRec->GetFilesize();
     if (curRec->IsLocal() && (fsize >= 1000) &&
