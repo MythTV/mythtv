@@ -2,6 +2,7 @@
 #define MYTH_SCREENSAVER_DBUS_H
 
 #include "screensaver.h"
+#include "QDBusConnection"
 
 class ScreenSaverDBus : public ScreenSaverControl
 {
@@ -15,7 +16,9 @@ class ScreenSaverDBus : public ScreenSaverControl
 
     bool Asleep(void);
   protected:
+    QDBusConnection m_bus;
     class ScreenSaverDBusPrivate *d;
+    QList<ScreenSaverDBusPrivate *> m_dbusPrivateInterfaces;
 };
 
 #endif // MYTH_SCREENSAVER_DBUS_H

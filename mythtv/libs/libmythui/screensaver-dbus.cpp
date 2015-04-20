@@ -9,30 +9,56 @@
 
 #define LOC                 QString("ScreenSaverDBus: ")
 
+const char m_app[]         = "MythTV";
+const char m_reason[]      = "Watching TV";
+const char m_dbusInhibit[] = "Inhibit";
+
+#define NUM_DBUS_METHODS 4
+// Thanks to vlc for the set of dbus services to use.
+const char m_dbusService[][40] = {
+    "org.freedesktop.ScreenSaver", /**< KDE >= 4 and GNOME >= 3.10 */
+    "org.freedesktop.PowerManagement.Inhibit", /**< KDE and GNOME <= 2.26 */
+    "org.mate.SessionManager", /**< >= 1.0 */
+    "org.gnome.SessionManager", /**< GNOME 2.26..3.4 */
+};
+
+const char m_dbusPath[][33] = {
+    "/ScreenSaver",
+    "/org/freedesktop/PowerManagement",
+    "/org/mate/SessionManager",
+    "/org/gnome/SessionManager",
+};
+
+// Service name is also the interface name in all cases
+
+const char m_dbusUnInhibit[][10] = {
+    "UnInhibit",
+    "UnInhibit",
+    "Uninhibit",
+    "Uninhibit",
+};
+
 class ScreenSaverDBusPrivate
 {
     friend class    ScreenSaverDBus;
 
-  private:
-    const QString   m_app           = "MythTV";
-    const QString   m_reason        = "Watching TV";
-    const QString   m_dbusService   = "org.freedesktop.ScreenSaver";
-    const QString   m_dbusPath      = "/ScreenSaver";
-    const QString   m_dbusInterface = "org.freedesktop.ScreenSaver";
-    const QString   m_dbusInhibit   = "Inhibit";
-    const QString   m_dbusUnInhibit = "UnInhibit";
-
   public:
-    ScreenSaverDBusPrivate() :
+    ScreenSaverDBusPrivate(QString dbusService, QString dbusPath, QString dbusInterface, QDBusConnection *bus) :
         m_inhibited(false),
         m_cookie(0),
-        m_bus(QDBusConnection::sessionBus()),
-        m_interface(new QDBusInterface(m_dbusService, m_dbusPath , m_dbusInterface , m_bus))
+        m_bus(bus),
+        m_interface(new QDBusInterface(dbusService, dbusPath , dbusInterface, *m_bus)),
+        m_unInhibit(""),
+        m_serviceUsed(dbusService)
     {
         if (!m_interface->isValid())
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Could not connect to dbus: " +
                 m_interface->lastError().message());
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC + "Created for DBus service: " + dbusService);
         }
     }
     ~ScreenSaverDBusPrivate()
@@ -52,8 +78,8 @@ class ScreenSaverDBusPrivate
                 m_cookie = reply.toUInt();
                 m_inhibited = true;
                 LOG(VB_GENERAL, LOG_INFO, LOC +
-                    QString("Successfully inhibited screensaver. cookie %1. nom nom")
-                    .arg(m_cookie));
+                    QString("Successfully inhibited screensaver via %1. cookie %2. nom nom")
+                    .arg(m_serviceUsed).arg(m_cookie));
             }
             else // msg.type() == QDBusMessage::ErrorMessage
             {
@@ -62,54 +88,85 @@ class ScreenSaverDBusPrivate
             }
         }
     }
-    void UnInhibit(void)
+    void UnInhibit()
     {
         if (m_interface->isValid())
         {
             // Don't block waiting for the reply, there isn't one
-            // method void org.freedesktop.ScreenSaver.UnInhibit(uint cookie)
-            m_interface->call(QDBus::NoBlock, m_dbusUnInhibit , m_cookie);
-            m_cookie = 0;
-            m_inhibited = false;
-            LOG(VB_GENERAL, LOG_INFO, LOC + "Screensaver uninhibited");
+            // method void org.freedesktop.ScreenSaver.UnInhibit(uint cookie) (or equivalent)
+            if (m_cookie != 0) {
+                m_interface->call(QDBus::NoBlock, m_unInhibit , m_cookie);
+                m_cookie = 0;
+                m_inhibited = false;
+                LOG(VB_GENERAL, LOG_INFO, LOC + QString("Screensaver uninhibited via %1")
+                    .arg(m_serviceUsed));
+            }
         }
     }
+    void SetUnInhibit(QString method) { m_unInhibit = method; }
 
   protected:
     bool            m_inhibited;
     uint32_t        m_cookie;
-    QDBusConnection m_bus;
+    QDBusConnection *m_bus;
     QDBusInterface  *m_interface;
+  private:
+    QString         m_unInhibit;
+    QString         m_serviceUsed;
 };
 
 ScreenSaverDBus::ScreenSaverDBus() :
-    d(new ScreenSaverDBusPrivate)
+    m_bus(QDBusConnection::sessionBus()),
+    d(NULL),
+    m_dbusPrivateInterfaces(QList<ScreenSaverDBusPrivate *>())
 {
+    // service, path, interface, bus - note that interface = service, hence it is used twice
+    for (uint i=0; i < NUM_DBUS_METHODS; i++) {
+        ScreenSaverDBusPrivate *ssdbp =
+            new ScreenSaverDBusPrivate(m_dbusService[i], m_dbusPath[i], m_dbusService[i], &m_bus);
+        ssdbp->SetUnInhibit(m_dbusUnInhibit[i]);
+        m_dbusPrivateInterfaces.push_back(ssdbp);
+    }
 }
 
 ScreenSaverDBus::~ScreenSaverDBus()
 {
-    // Uninhibit the screensaver first
-    Restore();
-    delete d;
+    ScreenSaverDBus::Restore();
+    while (!m_dbusPrivateInterfaces.isEmpty()) {
+        ScreenSaverDBusPrivate *ssdbp = m_dbusPrivateInterfaces.takeLast();
+        delete ssdbp;
+    }
 }
 
 void ScreenSaverDBus::Disable(void)
 {
-    d->Inhibit();
+    QList<ScreenSaverDBusPrivate *>::iterator i;
+    for (i = m_dbusPrivateInterfaces.begin(); i != m_dbusPrivateInterfaces.end(); ++i) {
+        (*i)->Inhibit();
+    }
 }
 
 void ScreenSaverDBus::Restore(void)
 {
-    d->UnInhibit();
+    QList<ScreenSaverDBusPrivate *>::iterator i;
+    for (i = m_dbusPrivateInterfaces.begin(); i != m_dbusPrivateInterfaces.end(); ++i) {
+        (*i)->UnInhibit();
+    }
 }
 
 void ScreenSaverDBus::Reset(void)
 {
-    d->UnInhibit();
+    Restore();
 }
 
 bool ScreenSaverDBus::Asleep(void)
 {
-    return !(d->m_inhibited);
+    QList<ScreenSaverDBusPrivate *>::iterator i;
+    for (i = m_dbusPrivateInterfaces.begin(); i != m_dbusPrivateInterfaces.end(); ++i) {
+        if((*i)->m_inhibited) {
+            return false;
+        }
+    }
+    return true;
+    //return !(d->m_inhibited);
 }
