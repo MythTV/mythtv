@@ -2695,6 +2695,40 @@ uint64_t ProgramInfo::QueryBookmark(uint chanid, const QDateTime &recstartts)
     return (bookmarkmap.isEmpty()) ? 0 : bookmarkmap.begin().key();
 }
 
+/** \brief Gets any progstart position in database,
+ *         unless the ignore progstart flag is set.
+ *
+ *  \return Progstart position in frames if the query is executed
+ *          and succeeds, zero otherwise.
+ */
+uint64_t ProgramInfo::QueryProgStart(void) const
+{
+    if (programflags & FL_IGNOREPROGSTART)
+        return 0;
+
+    frm_dir_map_t bookmarkmap;
+    QueryMarkupMap(bookmarkmap, MARK_UTIL_PROGSTART);
+
+    return (bookmarkmap.isEmpty()) ? 0 : bookmarkmap.begin().key();
+}
+
+/** \brief Gets any lastplaypos position in database,
+ *         unless the ignore lastplaypos flag is set.
+ *
+ *  \return LastPlayPos position in frames if the query is executed
+ *          and succeeds, zero otherwise.
+ */
+uint64_t ProgramInfo::QueryLastPlayPos(void) const
+{
+    if (programflags & FL_IGNORELASTPLAYPOS)
+        return 0;
+
+    frm_dir_map_t bookmarkmap;
+    QueryMarkupMap(bookmarkmap, MARK_UTIL_LASTPLAYPOS);
+
+    return (bookmarkmap.isEmpty()) ? 0 : bookmarkmap.begin().key();
+}
+
 /** \brief Queries "dvdbookmark" table for bookmarking DVD serial
  *         number. Deletes old dvd bookmarks if "delbookmark" is set.
  *

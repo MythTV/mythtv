@@ -74,6 +74,8 @@ typedef enum {
     MARK_VIDEO_RATE    = 32,
     MARK_DURATION_MS   = 33,
     MARK_TOTAL_FRAMES  = 34,
+    MARK_UTIL_PROGSTART = 40,
+    MARK_UTIL_LASTPLAYPOS = 41,
 } MarkTypes;
 MPUBLIC QString toString(MarkTypes type);
 
@@ -145,11 +147,13 @@ typedef enum FlagMask {
     FL_DUPLICATE      = 0x00002000,
     FL_REACTIVATE     = 0x00004000,
     FL_IGNOREBOOKMARK = 0x00008000,
+    FL_IGNOREPROGSTART   = 0x00010000,
+    FL_IGNORELASTPLAYPOS = 0x00020000,
     // if you move the type mask please edit {Set,Get}ProgramInfoType()
-    FL_TYPEMASK       = 0x000F0000,
-    FL_INUSERECORDING = 0x00100000,
-    FL_INUSEPLAYING   = 0x00200000,
-    FL_INUSEOTHER     = 0x00400000,
+    FL_TYPEMASK       = 0x00F00000,
+    FL_INUSERECORDING = 0x01000000,
+    FL_INUSEPLAYING   = 0x02000000,
+    FL_INUSEOTHER     = 0x04000000,
 } ProgramFlag;
 
 typedef enum ProgramInfoType {

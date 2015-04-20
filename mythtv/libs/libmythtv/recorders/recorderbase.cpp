@@ -56,7 +56,8 @@ RecorderBase::RecorderBase(TVRec *rec)
       request_pause(false),     paused(false),
       request_recording(false), recording(false),
       nextRingBuffer(NULL),     nextRecording(NULL),
-      positionMapType(MARK_GOP_BYFRAME)
+      positionMapType(MARK_GOP_BYFRAME),
+      estimatedProgStartMS(0), lastSavedKeyframe(0), lastSavedDuration(0)
 {
     ClearStatistics();
     QMutexLocker locker(avcodeclock);
@@ -114,6 +115,12 @@ void RecorderBase::SetRecording(const RecordingInfo *pginfo)
         //       instance which may lead to the possibility that changes made
         //       in the database by one are overwritten by the other
         curRecording = new RecordingInfo(*pginfo);
+        // Compute an estimate of the actual progstart delay for setting the
+        // MARK_UTIL_PROGSTART mark.  We can't reliably use
+        // curRecording->GetRecordingStartTime() because the scheduler rounds it
+        // to the nearest minute, so we use the current time instead.
+        estimatedProgStartMS =
+            MythDate::current().msecsTo(curRecording->GetScheduledStartTime());
         RecordingFile *recFile = curRecording->GetRecordingFile();
         recFile->m_containerFormat = m_containerFormat;
         recFile->Save();
@@ -579,15 +586,15 @@ void RecorderBase::SavePositionMap(bool force, bool finished)
     bool needToSave = force;
     positionMapLock.lock();
 
-    uint delta_size = positionMapDelta.size();
+    bool has_delta = !positionMapDelta.empty();
     // set pm_elapsed to a fake large value if the timer hasn't yet started
     uint pm_elapsed = (positionMapTimer.isRunning()) ?
         positionMapTimer.elapsed() : ~0;
     // save on every 1.5 seconds if in the first few frames of a recording
     needToSave |= (positionMap.size() < 30) &&
-        (delta_size >= 1) && (pm_elapsed >= 1500);
+        has_delta && (pm_elapsed >= 1500);
     // save every 10 seconds later on
-    needToSave |= (delta_size >= 1) && (pm_elapsed >= 10000);
+    needToSave |= has_delta && (pm_elapsed >= 10000);
     // Assume that durationMapDelta is the same size as
     // positionMapDelta and implicitly use the same logic about when
     // to same durationMapDelta.
@@ -595,7 +602,7 @@ void RecorderBase::SavePositionMap(bool force, bool finished)
     if (curRecording && needToSave)
     {
         positionMapTimer.start();
-        if (delta_size)
+        if (has_delta)
         {
             // copy the delta map because most times we are called it will be in
             // another thread and we don't want to lock the main recorder thread
@@ -609,6 +616,8 @@ void RecorderBase::SavePositionMap(bool force, bool finished)
             curRecording->SavePositionMapDelta(deltaCopy, positionMapType);
             curRecording->SavePositionMapDelta(durationDeltaCopy,
                                                MARK_DURATION_MS);
+
+            TryWriteProgStartMark(durationDeltaCopy);
         }
         else
         {
@@ -624,6 +633,81 @@ void RecorderBase::SavePositionMap(bool force, bool finished)
     {
         positionMapLock.unlock();
     }
+}
+
+void RecorderBase::TryWriteProgStartMark(const frm_pos_map_t &durationDeltaCopy)
+{
+    // Note: all log strings contain "progstart mark" for searching.
+    if (estimatedProgStartMS <= 0)
+    {
+        // Do nothing because no progstart mark is needed.
+        LOG(VB_RECORD, LOG_DEBUG,
+            QString("No progstart mark needed because delta=%1")
+            .arg(estimatedProgStartMS));
+        return;
+    }
+    frm_pos_map_t::const_iterator last_it = durationDeltaCopy.end();
+    --last_it;
+    long long bookmarkFrame = 0;
+    LOG(VB_RECORD, LOG_DEBUG,
+        QString("durationDeltaCopy.begin() = (%1,%2)")
+        .arg(durationDeltaCopy.begin().key())
+        .arg(durationDeltaCopy.begin().value()));
+    if (estimatedProgStartMS > *last_it)
+    {
+        // Do nothing because we haven't reached recstartts yet.
+        LOG(VB_RECORD, LOG_DEBUG,
+            QString("No progstart mark yet because estimatedProgStartMS=%1 "
+                    "and *last_it=%2")
+            .arg(estimatedProgStartMS).arg(*last_it));
+    }
+    else if (lastSavedDuration <= estimatedProgStartMS &&
+             estimatedProgStartMS < *durationDeltaCopy.begin())
+    {
+        // Set progstart mark @ lastSavedKeyframe
+        LOG(VB_RECORD, LOG_DEBUG,
+            QString("Set progstart mark=%1 because %2<=%3<%4")
+            .arg(lastSavedKeyframe).arg(lastSavedDuration)
+            .arg(estimatedProgStartMS).arg(*durationDeltaCopy.begin()));
+        bookmarkFrame = lastSavedKeyframe;
+    }
+    else if (*durationDeltaCopy.begin() <= estimatedProgStartMS &&
+             estimatedProgStartMS < *last_it)
+    {
+        frm_pos_map_t::const_iterator upper_it = durationDeltaCopy.begin();
+        for (; upper_it != durationDeltaCopy.end(); ++upper_it)
+        {
+            if (*upper_it > estimatedProgStartMS)
+            {
+                --upper_it;
+                // Set progstart mark @ upper_it.key()
+                LOG(VB_RECORD, LOG_DEBUG,
+                    QString("Set progstart mark=%1 because "
+                            "estimatedProgStartMS=%2 and upper_it.value()=%3")
+                    .arg(upper_it.key()).arg(estimatedProgStartMS)
+                    .arg(upper_it.value()));
+                bookmarkFrame = upper_it.key();
+                break;
+            }
+        }
+    }
+    else
+    {
+        // do nothing
+        LOG(VB_RECORD, LOG_DEBUG, "No progstart mark due to fallthrough");
+    }
+    if (bookmarkFrame)
+    {
+        frm_dir_map_t progStartMap;
+        progStartMap[bookmarkFrame] = MARK_UTIL_PROGSTART;
+        curRecording->SaveMarkupMap(progStartMap, MARK_UTIL_PROGSTART);
+    }
+    lastSavedKeyframe = last_it.key();
+    lastSavedDuration = last_it.value();
+    LOG(VB_RECORD, LOG_DEBUG,
+        QString("Setting lastSavedKeyframe=%1 lastSavedDuration=%2 "
+                "for progstart mark calculations")
+        .arg(lastSavedKeyframe).arg(lastSavedDuration));
 }
 
 void RecorderBase::AspectChange(uint aspect, long long frame)

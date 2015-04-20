@@ -1374,6 +1374,7 @@ void MythPlayer::DisableCaptions(uint mode, bool osd_msg)
 
     QMutexLocker locker(&osdLock);
 
+    textDesired = false;
     QString msg = "";
     if (kDisplayNUVTeletextCaptions & mode)
         msg += tr("TXT CAP");
@@ -1410,7 +1411,8 @@ void MythPlayer::DisableCaptions(uint mode, bool osd_msg)
 void MythPlayer::EnableCaptions(uint mode, bool osd_msg)
 {
     QMutexLocker locker(&osdLock);
-    QString msg;
+    textDesired = true;
+    QString msg = "";
     if ((kDisplayCC608 & mode) || (kDisplayCC708 & mode) ||
         (kDisplayAVSubtitle & mode) || kDisplayRawTextSubtitle & mode)
     {
@@ -2879,7 +2881,14 @@ void MythPlayer::EventStart(void)
     player_ctx->LockPlayingInfo(__FILE__, __LINE__);
     {
         if (player_ctx->playingInfo)
+        {
+            // When initial playback gets underway, we override the ProgramInfo
+            // flags such that future calls to GetBookmark() will consider only
+            // an actual bookmark and not progstart or lastplaypos information.
             player_ctx->playingInfo->SetIgnoreBookmark(false);
+            player_ctx->playingInfo->SetIgnoreProgStart(true);
+            player_ctx->playingInfo->SetIgnoreLastPlayPos(true);
+        }
     }
     player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
     commBreakMap.LoadMap(player_ctx, framesPlayed);
@@ -3610,7 +3619,13 @@ uint64_t MythPlayer::GetBookmark(void)
     {
         player_ctx->LockPlayingInfo(__FILE__, __LINE__);
         if (player_ctx->playingInfo)
+        {
             bookmark = player_ctx->playingInfo->QueryBookmark();
+            if (bookmark == 0)
+                bookmark = player_ctx->playingInfo->QueryProgStart();
+            if (bookmark == 0)
+                bookmark = player_ctx->playingInfo->QueryLastPlayPos();
+        }
         player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
     }
 
@@ -4017,7 +4032,7 @@ void MythPlayer::ClearAfterSeek(bool clearvideobuffers)
     // nothing except to call ResetCaptions() to erase any captions
     // currently on-screen.  The key is that the erasing is done in
     // the UI thread, not the decoder thread.
-    EnableSubtitles(GetCaptionsEnabled());
+    EnableSubtitles(textDesired);
     deleteMap.TrackerReset(framesPlayed);
     commBreakMap.SetTracker(framesPlayed);
     commBreakMap.ResetLastSkip();

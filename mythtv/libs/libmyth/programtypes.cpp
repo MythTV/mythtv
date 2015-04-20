@@ -53,6 +53,8 @@ QString toString(MarkTypes type)
         case MARK_VIDEO_RATE:   return "VIDEO_RATE";
         case MARK_DURATION_MS:  return "DURATION_MS";
         case MARK_TOTAL_FRAMES: return "TOTAL_FRAMES";
+        case MARK_UTIL_PROGSTART: return "UTIL_PROGSTART";
+        case MARK_UTIL_LASTPLAYPOS: return "UTIL_LASTPLAYPOS";
     }
 
     return "unknown";

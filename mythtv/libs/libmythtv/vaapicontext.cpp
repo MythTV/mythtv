@@ -44,12 +44,14 @@ QString profileToString(VAProfile profile)
     if (VAProfileH264ConstrainedBaseline == profile)    return "H264ConstrainedBase";
     if (VAProfileH264Main == profile)                   return "H264Main";
     if (VAProfileH264High == profile)                   return "H264High";
-    if (VAProfileH264StereoHigh == profile)             return "H264StereoHigh";
     if (VAProfileVC1Simple == profile)                  return "VC1Simple";
     if (VAProfileVC1Main == profile)                    return "VC1Main";
     if (VAProfileVC1Advanced == profile)                return "VC1Advanced";
     if (VAProfileH263Baseline == profile)               return "H263Base";
     if (VAProfileNone == profile)                       return "None";
+#if VA_CHECK_VERSION(0,36,0)
+    if (VAProfileH264StereoHigh == profile)             return "H264StereoHigh";
+#endif
     return "Unknown";
 }
 

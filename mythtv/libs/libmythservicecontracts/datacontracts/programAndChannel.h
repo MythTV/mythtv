@@ -141,6 +141,7 @@ class SERVICE_PUBLIC Program : public QObject
     Q_OBJECT
     Q_CLASSINFO( "version"    , "1.11" );
     Q_CLASSINFO( "defaultProp", "Description" );
+    Q_CLASSINFO( "deprecated" , "FileSize,FileName,HostName");
 
     Q_PROPERTY( QDateTime   StartTime    READ StartTime    WRITE setStartTime )
     Q_PROPERTY( QDateTime   EndTime      READ EndTime      WRITE setEndTime   )
@@ -156,17 +157,22 @@ class SERVICE_PUBLIC Program : public QObject
     Q_PROPERTY( QString     SeriesId      READ SeriesId      WRITE setSeriesId      DESIGNABLE SerializeDetails )
     Q_PROPERTY( QString     ProgramId     READ ProgramId     WRITE setProgramId     DESIGNABLE SerializeDetails )
     Q_PROPERTY( double      Stars         READ Stars         WRITE setStars         DESIGNABLE SerializeDetails )
-    Q_PROPERTY( qlonglong   FileSize      READ FileSize      WRITE setFileSize      DESIGNABLE SerializeDetails )
     Q_PROPERTY( QDateTime   LastModified  READ LastModified  WRITE setLastModified  DESIGNABLE SerializeDetails )
     Q_PROPERTY( int         ProgramFlags  READ ProgramFlags  WRITE setProgramFlags  DESIGNABLE SerializeDetails )
-    Q_PROPERTY( QString     FileName      READ FileName      WRITE setFileName      DESIGNABLE SerializeDetails )
-    Q_PROPERTY( QString     HostName      READ HostName      WRITE setHostName      DESIGNABLE SerializeDetails )
     Q_PROPERTY( QDate       Airdate       READ Airdate       WRITE setAirdate       DESIGNABLE SerializeDetails )
     Q_PROPERTY( QString     Description   READ Description   WRITE setDescription   DESIGNABLE SerializeDetails )
     Q_PROPERTY( QString     Inetref       READ Inetref       WRITE setInetref       DESIGNABLE SerializeDetails )
     Q_PROPERTY( int         Season        READ Season        WRITE setSeason        DESIGNABLE SerializeDetails )
     Q_PROPERTY( int         Episode       READ Episode       WRITE setEpisode       DESIGNABLE SerializeDetails )
     Q_PROPERTY( int         TotalEpisodes READ TotalEpisodes WRITE setTotalEpisodes DESIGNABLE SerializeDetails )
+
+    // ----
+    // DEPRECATED
+    // These don't belong here, they are Recording only metadata
+    Q_PROPERTY( qlonglong   FileSize      READ FileSize      WRITE setFileSize      DESIGNABLE SerializeDetails )
+    Q_PROPERTY( QString     FileName      READ FileName      WRITE setFileName      DESIGNABLE SerializeDetails )
+    Q_PROPERTY( QString     HostName      READ HostName      WRITE setHostName      DESIGNABLE SerializeDetails )
+    // ----
 
     Q_PROPERTY( QObject*    Channel      READ Channel   DESIGNABLE SerializeChannel )
     Q_PROPERTY( QObject*    Recording    READ Recording DESIGNABLE SerializeRecording )
@@ -184,20 +190,25 @@ class SERVICE_PUBLIC Program : public QObject
     PROPERTYIMP    ( QString     , SeriesId     )
     PROPERTYIMP    ( QString     , ProgramId    )
     PROPERTYIMP    ( double      , Stars        )
-    PROPERTYIMP    ( qlonglong   , FileSize     )
     PROPERTYIMP    ( QDateTime   , LastModified )
     PROPERTYIMP    ( int         , ProgramFlags )
     PROPERTYIMP    ( int         , VideoProps   )
     PROPERTYIMP    ( int         , AudioProps   )
     PROPERTYIMP    ( int         , SubProps     )
-    PROPERTYIMP    ( QString     , FileName     )
-    PROPERTYIMP    ( QString     , HostName     )
     PROPERTYIMP    ( QDate       , Airdate      )
     PROPERTYIMP    ( QString     , Description  )
     PROPERTYIMP    ( QString     , Inetref      )
     PROPERTYIMP    ( int         , Season       )
     PROPERTYIMP    ( int         , Episode      )
     PROPERTYIMP    ( int         , TotalEpisodes)
+
+    // ----
+    // DEPRECATED
+    // These don't belong here, they are Recording only metadata
+    PROPERTYIMP    ( qlonglong   , FileSize     )
+    PROPERTYIMP    ( QString     , FileName     )
+    PROPERTYIMP    ( QString     , HostName     )
+    // ----
 
     PROPERTYIMP_PTR( ChannelInfo    , Channel     )
     PROPERTYIMP_PTR( RecordingInfo  , Recording   )
@@ -221,7 +232,6 @@ class SERVICE_PUBLIC Program : public QObject
             : QObject               ( parent ),
               m_Repeat              ( false  ),
               m_Stars               ( 0      ),
-              m_FileSize            ( 0      ),
               m_ProgramFlags        ( 0      ),
               m_VideoProps          ( 0      ),
               m_AudioProps          ( 0      ),
@@ -229,6 +239,7 @@ class SERVICE_PUBLIC Program : public QObject
               m_Season              ( 0      ),
               m_Episode             ( 0      ),
               m_TotalEpisodes       ( 0      ),
+              m_FileSize            ( 0      ), // DEPRECATED
               m_Channel             ( NULL   ),
               m_Recording           ( NULL   ),
               m_Artwork             ( NULL   ),
@@ -240,7 +251,7 @@ class SERVICE_PUBLIC Program : public QObject
               m_SerializeCast       ( true   )
         {
         }
-        
+
         Program( const Program &src )
         {
             Copy( src );
@@ -258,20 +269,22 @@ class SERVICE_PUBLIC Program : public QObject
             m_SeriesId          = src.m_SeriesId;
             m_ProgramId         = src.m_ProgramId;
             m_Stars             = src.m_Stars;
-            m_FileSize          = src.m_FileSize;
             m_LastModified      = src.m_LastModified;
             m_ProgramFlags      = src.m_ProgramFlags;
             m_VideoProps        = src.m_VideoProps;
             m_AudioProps        = src.m_AudioProps;
             m_SubProps          = src.m_SubProps;
-            m_FileName          = src.m_FileName;
-            m_HostName          = src.m_HostName;
             m_Airdate           = src.m_Airdate;
             m_Description       = src.m_Description;
             m_Inetref           = src.m_Inetref;
             m_Season            = src.m_Season;
             m_Episode           = src.m_Episode;
             m_TotalEpisodes     = src.m_TotalEpisodes;
+            // DEPRECATED
+            m_FileSize          = src.m_FileSize;
+            m_FileName          = src.m_FileName;
+            m_HostName          = src.m_HostName;
+            // ----
             m_SerializeDetails  = src.m_SerializeDetails;
             m_SerializeChannel  = src.m_SerializeChannel;    
             m_SerializeRecording= src.m_SerializeRecording;  

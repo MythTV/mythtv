@@ -543,7 +543,7 @@ void MusicPlayer::nextAuto(void)
     }
 
     // if we don't already have a gui attached show the miniplayer if configured to do so
-    if (m_isAutoplay && m_canShowPlayer && m_autoShowPlayer)
+    if (m_isAutoplay && m_canShowPlayer && m_autoShowPlayer && m_isPlaying)
     {
         MythScreenStack *popupStack =
                             GetMythMainWindow()->GetStack("popup stack");

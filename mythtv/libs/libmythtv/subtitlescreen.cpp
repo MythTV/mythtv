@@ -373,7 +373,9 @@ void SubtitleFormat::CreateProviderDefault(const QString &family,
     if (family == kSubFamily608)
     {
         font->GetFace()->setFamily("FreeMono");
-        bg->SetFillBrush(QBrush(Qt::black));
+        QBrush brush(Qt::black);
+        bg->SetFillBrush(brush);
+        bg->SetLinePen(QPen(brush, 0));
     }
     else if (family == kSubFamily708)
     {
@@ -392,7 +394,9 @@ void SubtitleFormat::CreateProviderDefault(const QString &family,
     else if (family == kSubFamilyText)
     {
         font->GetFace()->setFamily("Droid Sans");
-        bg->SetFillBrush(QBrush(Qt::black));
+        QBrush brush(Qt::black);
+        bg->SetFillBrush(brush);
+        bg->SetLinePen(QPen(brush, 0));
     }
     else if (family == kSubFamilyTeletext)
     {
@@ -597,7 +601,9 @@ SubtitleFormat::GetBackground(MythUIType *parent, const QString &name,
     {
         if (IsUnlocked(prefix, kSubAttrBGfill))
         {
-            result->SetFillBrush(QBrush(attr.GetBGColor()));
+            QBrush brush(attr.GetBGColor());
+            result->SetFillBrush(brush);
+            result->SetLinePen(QPen(brush, 0));
         }
     }
     else if (family == kSubFamilyTeletext)

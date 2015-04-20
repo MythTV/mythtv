@@ -115,6 +115,8 @@ enum {
     kStartTVInPlayList       = 0x02,
     kStartTVByNetworkCommand = 0x04,
     kStartTVIgnoreBookmark   = 0x08,
+    kStartTVIgnoreProgStart  = 0x10,
+    kStartTVIgnoreLastPlayPos= 0x20,
 };
 
 class AskProgramInfo
@@ -409,6 +411,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     bool HandlePxPTimerEvent(void);
     bool HandleLCDTimerEvent(void);
     void HandleLCDVolumeTimerEvent(void);
+    void HandleSaveLastPlayPosEvent();
 
     // Commands used by frontend UI screens (PlaybackBox, GuideGrid etc)
     void EditSchedule(const PlayerContext*,
@@ -979,6 +982,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     volatile int         speedChangeTimerId;
     volatile int         errorRecoveryTimerId;
     mutable volatile int exitPlayerTimerId;
+    volatile int         saveLastPlayPosTimerId;
     TimerContextMap      stateChangeTimerId;
     TimerContextMap      signalMonitorTimerId;
 
@@ -1095,6 +1099,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     static const uint kErrorRecoveryCheckFrequency;
     static const uint kEndOfRecPromptCheckFrequency;
     static const uint kEndOfPlaybackFirstCheckTimer;
+    static const uint kSaveLastPlayPosTimeout;
 };
 
 #endif

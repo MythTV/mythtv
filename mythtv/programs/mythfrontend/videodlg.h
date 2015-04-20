@@ -222,6 +222,10 @@ class VideoListDeathDelay : public QObject
     ~VideoListDeathDelay();
 
     VideoDialog::VideoListPtr GetSaved();
+    // When exiting MythVideo, we delay destroying the data for kDelayTimeMS
+    // milliseconds, and reuse the data (possibly avoiding a rescan) if the user
+    // restarts MythVideo within that time period.
+    static const int kDelayTimeMS = 3000;
 
   private slots:
     void OnTimeUp();

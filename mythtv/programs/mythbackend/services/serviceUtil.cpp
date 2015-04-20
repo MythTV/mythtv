@@ -68,11 +68,15 @@ void FillProgramInfo( DTC::Program *pProgram,
         pProgram->setSeriesId    ( pInfo->GetSeriesID()         );
         pProgram->setProgramId   ( pInfo->GetProgramID()        );
         pProgram->setStars       ( pInfo->GetStars()            );
-        pProgram->setFileSize    ( pInfo->GetFilesize()         );
         pProgram->setLastModified( pInfo->GetLastModifiedTime() );
         pProgram->setProgramFlags( pInfo->GetProgramFlags()     );
+
+        // ----
+        // DEPRECATED - See RecordingInfo instead
         pProgram->setFileName    ( pInfo->GetPathname()         );
+        pProgram->setFileSize    ( pInfo->GetFilesize()         );
         pProgram->setHostName    ( pInfo->GetHostname()         );
+        // ----
 
         if (pInfo->GetOriginalAirDate().isValid())
             pProgram->setAirdate( pInfo->GetOriginalAirDate() );
@@ -118,32 +122,38 @@ void FillProgramInfo( DTC::Program *pProgram,
 
         DTC::RecordingInfo *pRecording = pProgram->Recording();
 
-        pRecording->setRecordedId ( pInfo->GetRecordingID()     );
-        pRecording->setStatus  ( pInfo->GetRecordingStatus()    );
-        pRecording->setPriority( pInfo->GetRecordingPriority()  );
-        pRecording->setStartTs ( pInfo->GetRecordingStartTime() );
-        pRecording->setEndTs   ( pInfo->GetRecordingEndTime()   );
+        const RecordingInfo pRecInfo(*pInfo);
+
+        pRecording->setRecordedId ( pRecInfo.GetRecordingID()     );
+        pRecording->setStatus  ( pRecInfo.GetRecordingStatus()    );
+        pRecording->setPriority( pRecInfo.GetRecordingPriority()  );
+        pRecording->setStartTs ( pRecInfo.GetRecordingStartTime() );
+        pRecording->setEndTs   ( pRecInfo.GetRecordingEndTime()   );
 
         pRecording->setSerializeDetails( bDetails );
 
         if (bDetails)
         {
-            pRecording->setRecordId    ( pInfo->GetRecordingRuleID()      );
-            pRecording->setRecGroup    ( pInfo->GetRecordingGroup()       );
-            pRecording->setPlayGroup   ( pInfo->GetPlaybackGroup()        );
-            pRecording->setStorageGroup( pInfo->GetStorageGroup()         );
-            pRecording->setRecType     ( pInfo->GetRecordingRuleType()    );
-            pRecording->setDupInType   ( pInfo->GetDuplicateCheckSource() );
-            pRecording->setDupMethod   ( pInfo->GetDuplicateCheckMethod() );
-            pRecording->setEncoderId   ( pInfo->GetInputID()              );
+            pRecording->setFileName    ( pRecInfo.GetPathname() );
+            pRecording->setFileSize    ( pRecInfo.GetFilesize() );
+            pRecording->setHostName    ( pRecInfo.GetHostname() );
+            pRecording->setLastModified( pRecInfo.GetLastModifiedTime() );
+
+            pRecording->setRecordId    ( pRecInfo.GetRecordingRuleID()      );
+            pRecording->setRecGroup    ( pRecInfo.GetRecordingGroup()       );
+            pRecording->setPlayGroup   ( pRecInfo.GetPlaybackGroup()        );
+            pRecording->setStorageGroup( pRecInfo.GetStorageGroup()         );
+            pRecording->setRecType     ( pRecInfo.GetRecordingRuleType()    );
+            pRecording->setDupInType   ( pRecInfo.GetDuplicateCheckSource() );
+            pRecording->setDupMethod   ( pRecInfo.GetDuplicateCheckMethod() );
+            pRecording->setEncoderId   ( pRecInfo.GetInputID()              );
             if (pProgram->Channel())
             {
-                QString encoderName = CardUtil::GetDisplayName(pInfo->GetInputID());
+                QString encoderName = CardUtil::GetDisplayName(pRecInfo.GetInputID());
                 pRecording->setEncoderName( encoderName );
             }
 
-            const RecordingInfo ri(*pInfo);
-            pRecording->setProfile( ri.GetProgramRecordingProfile() );
+            pRecording->setProfile( pRecInfo.GetProgramRecordingProfile() );
         }
     }
 

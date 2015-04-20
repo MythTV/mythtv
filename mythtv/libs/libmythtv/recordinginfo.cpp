@@ -1615,7 +1615,9 @@ void RecordingInfo::SetFilesize(uint64_t fsize)
         LoadRecordingFile();
     GetRecordingFile()->m_fileSize = fsize;
     updater->insert(recordedid, kPIUpdateFileSize, fsize);
-    //ProgramInfo::SetFilesize(fsize);
+
+    // Make sure the old storage location is updated for now
+    ProgramInfo::SetFilesize(fsize);
 }
 
 uint64_t RecordingInfo::GetFilesize(void) const

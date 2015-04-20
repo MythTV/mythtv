@@ -137,6 +137,7 @@ const uint TV::kEndOfPlaybackFirstCheckTimer = 60000;
 #else
 const uint TV::kEndOfPlaybackFirstCheckTimer = 5000;
 #endif
+const uint TV::kSaveLastPlayPosTimeout       = 30000;
 
 /**
  * \brief stores last program info. maintains info so long as
@@ -341,6 +342,8 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags,
     {
         curProgram = new ProgramInfo(*tvrec);
         curProgram->SetIgnoreBookmark(flags & kStartTVIgnoreBookmark);
+        curProgram->SetIgnoreProgStart(flags & kStartTVIgnoreProgStart);
+        curProgram->SetIgnoreLastPlayPos(flags & kStartTVIgnoreLastPlayPos);
     }
 
     GetMythMainWindow()->PauseIdleTimer(true);
@@ -1064,7 +1067,8 @@ TV::TV(void)
       endOfPlaybackTimerId(0),      embedCheckTimerId(0),
       endOfRecPromptTimerId(0),     videoExitDialogTimerId(0),
       pseudoChangeChanTimerId(0),   speedChangeTimerId(0),
-      errorRecoveryTimerId(0),      exitPlayerTimerId(0)
+      errorRecoveryTimerId(0),      exitPlayerTimerId(0),
+      saveLastPlayPosTimerId(0)
 {
     LOG(VB_GENERAL, LOG_INFO, LOC + "Creating TV object");
     ctorTime.start();
@@ -1326,6 +1330,7 @@ bool TV::Init(bool createWindow)
     errorRecoveryTimerId = StartTimer(kErrorRecoveryCheckFrequency, __LINE__);
     lcdTimerId           = StartTimer(1, __LINE__);
     speedChangeTimerId   = StartTimer(kSpeedChangeCheckFrequency, __LINE__);
+    saveLastPlayPosTimerId = StartTimer(kSaveLastPlayPosTimeout, __LINE__);
 
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "-- end");
     return true;
@@ -2777,6 +2782,8 @@ void TV::timerEvent(QTimerEvent *te)
         HandleSpeedChangeTimerEvent();
     else if (timer_id == pipChangeTimerId)
         HandlePxPTimerEvent();
+    else if (timer_id == saveLastPlayPosTimerId)
+        HandleSaveLastPlayPosEvent();
     else
         handled = false;
 
@@ -3321,10 +3328,18 @@ void TV::PrepareToExitPlayer(PlayerContext *ctx, int line, BookmarkAction bookma
             // Don't consider ourselves at the end if the recording is
             // in-progress.
             at_end &= !StateIsRecording(GetState(ctx));
+            bool clear_lastplaypos = true;
             if (at_end && allow_clear_at_end)
                 SetBookmark(ctx, true);
-            if (!at_end && allow_set_before_end)
+            else if (!at_end && allow_set_before_end)
                 SetBookmark(ctx, false);
+            else
+                clear_lastplaypos = false;
+            // If we are setting a bookmark upon exit (or equivalently clearing
+            // it due to exiting at the end), we clean up the unnecessary
+            // lastplaypos mark.
+            if (clear_lastplaypos && ctx->playingInfo)
+                ctx->playingInfo->ClearMarkupMap(MARK_UTIL_LASTPLAYPOS);
         }
         if (db_auto_set_watched)
             ctx->player->SetWatched();
@@ -13381,6 +13396,53 @@ bool TV::HandleOSDVideoExit(PlayerContext *ctx, QString action)
     }
 
     return hide;
+}
+
+void TV::HandleSaveLastPlayPosEvent(void)
+{
+    // Helper class to save the latest playback position (in a background thread
+    // to avoid playback glitches).  The ctor makes a copy of the ProgramInfo
+    // struct to avoid race conditions if playback ends and deletes objects
+    // before or while the background thread runs.
+    class PositionSaver : public QRunnable
+    {
+    public:
+        PositionSaver(const ProgramInfo &pginfo, uint64_t frame) :
+            m_pginfo(pginfo), m_frame(frame) {}
+        virtual void run(void)
+        {
+            LOG(VB_PLAYBACK, LOG_DEBUG,
+                QString("PositionSaver frame=%1").arg(m_frame));
+            frm_dir_map_t lastPlayPosMap;
+            lastPlayPosMap[m_frame] = MARK_UTIL_LASTPLAYPOS;
+            m_pginfo.ClearMarkupMap(MARK_UTIL_LASTPLAYPOS);
+            m_pginfo.SaveMarkupMap(lastPlayPosMap, MARK_UTIL_LASTPLAYPOS);
+        }
+    private:
+        const ProgramInfo m_pginfo;
+        const uint64_t m_frame;
+    };
+
+    PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
+    for (uint i = 0; mctx && i < player.size(); ++i)
+    {
+        PlayerContext *ctx = GetPlayer(mctx, i);
+        ctx->LockDeletePlayer(__FILE__, __LINE__);
+        bool playing = ctx->player && !ctx->player->IsPaused();
+        if (playing) // Don't bother saving lastplaypos while paused
+        {
+            uint64_t framesPlayed = ctx->player->GetFramesPlayed();
+            MThreadPool::globalInstance()->
+                start(new PositionSaver(*ctx->playingInfo, framesPlayed),
+                      "PositionSaver");
+        }
+        ReturnPlayerLock(ctx);
+    }
+    ReturnPlayerLock(mctx);
+
+    QMutexLocker locker(&timerIdLock);
+    KillTimer(saveLastPlayPosTimerId);
+    saveLastPlayPosTimerId = StartTimer(kSaveLastPlayPosTimeout, __LINE__);
 }
 
 void TV::SetLastProgram(const ProgramInfo *rcinfo)
