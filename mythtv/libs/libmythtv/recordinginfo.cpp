@@ -1622,6 +1622,9 @@ void RecordingInfo::SetFilesize(uint64_t fsize)
 
 uint64_t RecordingInfo::GetFilesize(void) const
 {
+    if (!GetRecordingFile())
+        LoadRecordingFile();
+
     if (GetRecordingFile() && GetRecordingFile()->m_fileSize > 0)
         return GetRecordingFile()->m_fileSize;
 
