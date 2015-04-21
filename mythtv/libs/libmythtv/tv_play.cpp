@@ -3328,16 +3328,18 @@ void TV::PrepareToExitPlayer(PlayerContext *ctx, int line, BookmarkAction bookma
             // Don't consider ourselves at the end if the recording is
             // in-progress.
             at_end &= !StateIsRecording(GetState(ctx));
-            bool clear_lastplaypos = true;
+            bool clear_lastplaypos = false;
             if (at_end && allow_clear_at_end)
+            {
                 SetBookmark(ctx, true);
+                // Tidy up the lastplaypos mark only when we clear the
+                // bookmark due to exiting at the end.
+                clear_lastplaypos = true;
+            }
             else if (!at_end && allow_set_before_end)
+            {
                 SetBookmark(ctx, false);
-            else
-                clear_lastplaypos = false;
-            // If we are setting a bookmark upon exit (or equivalently clearing
-            // it due to exiting at the end), we clean up the unnecessary
-            // lastplaypos mark.
+            }
             if (clear_lastplaypos && ctx->playingInfo)
                 ctx->playingInfo->ClearMarkupMap(MARK_UTIL_LASTPLAYPOS);
         }
