@@ -168,5 +168,4 @@ bool ScreenSaverDBus::Asleep(void)
         }
     }
     return true;
-    //return !(d->m_inhibited);
 }
