@@ -64,6 +64,7 @@ extern "C" {
 #include "RTjpegN.h"
 
 #include "programinfo.h"
+#include "mythsystemevent.h"
 
 #define LOC QString("NVR(%1): ").arg(videodevice)
 
@@ -3075,6 +3076,9 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
         WriteFrameheader(&frameheader);
         ringBuffer->Write(out, out_len);
     }
+
+    if (framesWritten == 0)
+        SendMythSystemRecEvent("REC_STARTED_WRITING", curRecording);
 
     frameofgop++;
     framesWritten++;
