@@ -145,6 +145,11 @@ void FirewireRecorder::AddData(const unsigned char *data, uint len)
 
 bool FirewireRecorder::ProcessTSPacket(const TSPacket &tspacket)
 {
+    const uint pid = tspacket.PID();
+
+    if (pid == 0x1fff) // Stuffing
+        return true;
+
     if (tspacket.TransportError())
         return true;
 
