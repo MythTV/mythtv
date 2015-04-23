@@ -1,11 +1,11 @@
 #include "org_videolan_Libbluray.h"
 
-#include "bdj/bdj.h"
-#include "bdj/bdj_private.h"
-#include "bdj/bdj_util.h"
-#include "bdj/bdjo_parser.h"
-#include "register.h"
-#include "bluray.h"
+#include "libbluray/bdj/bdj.h"
+#include "libbluray/bdj/bdj_private.h"
+#include "libbluray/bdj/bdj_util.h"
+#include "libbluray/bdj/bdjo_parser.h"
+#include "libbluray/register.h"
+#include "libbluray/bluray.h"
 
 #include "util/strutl.h"
 #include "util/macro.h"

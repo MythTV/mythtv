@@ -27,7 +27,7 @@
 #include "util/macro.h"
 #include "util/strutl.h"
 #include "meta_parse.h"
-#include "register.h"
+#include "libbluray/register.h"
 
 #include <stdlib.h>
 #include <string.h>

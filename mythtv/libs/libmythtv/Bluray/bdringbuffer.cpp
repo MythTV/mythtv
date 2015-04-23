@@ -2,12 +2,12 @@
 #include <QDir>
 #include <QCoreApplication>
 
-#include "bdnav/mpls_parse.h"
-#include "bdnav/meta_parse.h"
-#include "bdnav/navigation.h"
-#include "bdnav/bdparse.h"
-#include "decoders/overlay.h"
-#include "keys.h"                       // for ::BD_VK_POPUP, ::BD_VK_0, etc
+#include "libbluray/bdnav/mpls_parse.h"
+#include "libbluray/bdnav/meta_parse.h"
+#include "libbluray/bdnav/navigation.h"
+#include "libbluray/bdnav/bdparse.h"
+#include "libbluray/decoders/overlay.h"
+#include "libbluray/keys.h"              // for ::BD_VK_POPUP, ::BD_VK_0, etc
 
 #include "mythmainwindow.h"
 #include "mythevent.h"
@@ -17,7 +17,7 @@
 #include "mythcorecontext.h"
 #include "mythlocale.h"
 #include "mythdirs.h"
-#include "bluray.h"
+#include "libbluray/bluray.h"
 #include "mythiowrapper.h"
 #include "mythuiactions.h"              // for ACTION_0, ACTION_1, etc
 #include "tv_actions.h"                 // for ACTION_CHANNELDOWN, etc

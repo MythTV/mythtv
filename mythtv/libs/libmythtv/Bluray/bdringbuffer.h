@@ -10,7 +10,7 @@
 #include <QCoreApplication>
 
 // external/libmythbluray
-#include "bluray.h"
+#include "libbluray/bluray.h"
 
 #include "ringbuffer.h"
 

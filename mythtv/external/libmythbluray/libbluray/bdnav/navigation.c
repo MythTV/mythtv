@@ -25,7 +25,7 @@
 #include "util/logging.h"
 #include "util/strutl.h"
 #include "file/file.h"
-#include "bluray.h"
+#include "libbluray/bluray.h"
 #include "mpls_parse.h"
 #include "navigation.h"
 

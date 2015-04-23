@@ -7,7 +7,7 @@
 
 #include "mythtypes.h"
 #include "mythmetaexp.h"
-#include "bluray.h"
+#include "libbluray/bluray.h"
 
 class QStringList;
 

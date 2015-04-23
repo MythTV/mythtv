@@ -27,11 +27,11 @@
 #include "bdjo_parser.h"
 #include "bdj_util.h"
 #include "common.h"
-#include "register.h"
+#include "libbluray/register.h"
 #include "file/dl.h"
 #include "util/strutl.h"
 #include "util/macro.h"
-#include "bdnav/bdid_parse.h"
+#include "libbluray/bdnav/bdid_parse.h"
 
 #include <jni.h>
 #include <stdlib.h>

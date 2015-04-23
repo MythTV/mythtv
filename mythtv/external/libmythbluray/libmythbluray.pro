@@ -8,7 +8,7 @@ CONFIG -= qt
 target.path = $${LIBDIR}
 
 INCLUDEPATH += . ../../
-INCLUDEPATH += ./bdnav
+INCLUDEPATH += ./libbluray/bdnav
 INCLUDEPATH += ../../libs/libmythbase
 INCLUDEPATH += ../../libs/libmythtv
 
@@ -33,27 +33,34 @@ DEFINES += HAVE_LIBXML2
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # bdnav
-HEADERS += bluray.h register.h 
-HEADERS += bdnav/bdid_parse.h bdnav/bdparse.h bdnav/clpi_data.h bdnav/clpi_parse.h bdnav/extdata_parse.h bdnav/index_parse.h
-HEADERS += bdnav/meta_data.h bdnav/meta_parse.h bdnav/mpls_parse.h bdnav/navigation.h bdnav/sound_parse.h bdnav/uo_mask_table.h
-HEADERS += decoders/graphics_controller.h decoders/graphics_processor.h decoders/ig.h decoders/ig_decode.h decoders/m2ts_demux.h
-HEADERS += decoders/overlay.h decoders/pes_buffer.h decoders/pg.h decoders/pg_decode.h
+HEADERS += libbluray/bluray.h libbluray/register.h 
+HEADERS += libbluray/bdnav/bdid_parse.h libbluray/bdnav/bdparse.h libbluray/bdnav/clpi_data.h
+HEADERS += libbluray/bdnav/clpi_parse.h libbluray/bdnav/extdata_parse.h libbluray/bdnav/index_parse.h
+HEADERS += libbluray/bdnav/meta_data.h libbluray/bdnav/meta_parse.h libbluray/bdnav/mpls_parse.h
+HEADERS += libbluray/bdnav/navigation.h libbluray/bdnav/sound_parse.h libbluray/bdnav/uo_mask_table.h
+HEADERS += libbluray/decoders/graphics_controller.h libbluray/decoders/graphics_processor.h
+HEADERS += libbluray/decoders/ig.h libbluray/decoders/ig_decode.h libbluray/decoders/m2ts_demux.h
+HEADERS += libbluray/decoders/overlay.h libbluray/decoders/pes_buffer.h libbluray/decoders/pg.h
+HEADERS += libbluray/decoders/pg_decode.h
 HEADERS += file/dl.h file/file.h file/filesystem.h file/file_mythiowrapper.h
-HEADERS += hdmv/hdmv_insn.h hdmv/hdmv_vm.h hdmv/mobj_parse.h util/attributes.h util/bits.h util/logging.h util/log_control.h
+HEADERS += libbluray/hdmv/hdmv_insn.h libbluray/hdmv/hdmv_vm.h libbluray/hdmv/mobj_parse.h
+HEADERS += util/attributes.h util/bits.h util/logging.h util/log_control.h
 HEADERS += util/macro.h util/mutex.h util/strutl.h
 
-SOURCES += bluray.c register.c 
-SOURCES += bdnav/bdid_parse.c bdnav/clpi_parse.c bdnav/extdata_parse.c bdnav/index_parse.c bdnav/meta_parse.c bdnav/mpls_parse.c
-SOURCES += bdnav/navigation.c bdnav/sound_parse.c
-SOURCES += decoders/graphics_controller.c decoders/graphics_processor.c decoders/ig_decode.c decoders/m2ts_demux.c 
-SOURCES += decoders/pes_buffer.c decoders/pg_decode.c
+SOURCES += libbluray/bluray.c libbluray/register.c 
+SOURCES += libbluray/bdnav/bdid_parse.c libbluray/bdnav/clpi_parse.c libbluray/bdnav/extdata_parse.c
+SOURCES += libbluray/bdnav/index_parse.c libbluray/bdnav/meta_parse.c libbluray/bdnav/mpls_parse.c
+SOURCES += libbluray/bdnav/navigation.c libbluray/bdnav/sound_parse.c
+SOURCES += libbluray/decoders/graphics_controller.c libbluray/decoders/graphics_processor.c
+SOURCES += libbluray/decoders/ig_decode.c libbluray/decoders/m2ts_demux.c 
+SOURCES += libbluray/decoders/pes_buffer.c libbluray/decoders/pg_decode.c
 SOURCES += file/dir_mythiowrapper.c file/dir_posix.c file/dl_posix.c file/filesystem.c
 SOURCES += file/file_mythiowrapper.c file/file_posix.c
-SOURCES += hdmv/hdmv_vm.c hdmv/mobj_parse.c hdmv/mobj_print.c
+SOURCES += libbluray/hdmv/hdmv_vm.c libbluray/hdmv/mobj_parse.c libbluray/hdmv/mobj_print.c
 SOURCES += util/bits.c util/logging.c util/strutl.c
 
 inc_bdnav.path = $${PREFIX}/include/mythtv/bluray
-inc_bdnav.files = bluray.h bdnav/*.h hdmv/*.h file/*.h util/*.h
+inc_bdnav.files = bluray.h libbluray/bdnav/*.h libbluray/hdmv/*.h file/*.h util/*.h
 
 INSTALLS += inc_bdnav
 
@@ -61,10 +68,11 @@ mingw:DEFINES += STDC_HEADERS
 
 using_bdjava {
 
-HEADERS += bdj/bdj.h bdj/bdjo_parser.h bdj/bdj_private.h bdj/bdj_util.h bdj/common.h
-SOURCES += bdj/bdj.c bdj/bdjo_parser.c bdj/bdj_util.c 
+HEADERS += libbluray/bdj/bdj.h libbluray/bdj/bdjo_parser.h libbluray/bdj/bdj_private.h
+HEADERS += libbluray/bdj/bdj_util.h libbluray/bdj/common.h
+SOURCES += libbluray/bdj/bdj.c libbluray/bdj/bdjo_parser.c libbluray/bdj/bdj_util.c 
 
-QMAKE_POST_LINK=/$${ANTBIN} -f bdj/build.xml; /$${ANTBIN} -f bdj/build.xml clean
+QMAKE_POST_LINK=/$${ANTBIN} -f libbluray/bdj/build.xml; /$${ANTBIN} -f libbluray/bdj/build.xml clean
 
 installjar.path = $${PREFIX}/share/mythtv/jars
 installjar.files = libmythbluray.jar
