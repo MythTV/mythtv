@@ -1377,7 +1377,7 @@ void MythPlayer::DisableCaptions(uint mode, bool osd_msg)
 
     QMutexLocker locker(&osdLock);
 
-    textDesired = false;
+    textDesired = textDisplayMode & kDisplayAllTextCaptions;
     QString msg = "";
     if (kDisplayNUVTeletextCaptions & mode)
         msg += tr("TXT CAP");
@@ -1414,7 +1414,7 @@ void MythPlayer::DisableCaptions(uint mode, bool osd_msg)
 void MythPlayer::EnableCaptions(uint mode, bool osd_msg)
 {
     QMutexLocker locker(&osdLock);
-    textDesired = true;
+    textDesired = mode & kDisplayAllTextCaptions;
     QString msg = "";
     if ((kDisplayCC608 & mode) || (kDisplayCC708 & mode) ||
         (kDisplayAVSubtitle & mode) || kDisplayRawTextSubtitle & mode)
