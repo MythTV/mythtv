@@ -614,7 +614,7 @@ bool PreviewGenerator::LocalPreviewRun(void)
 {
     m_programInfo.MarkAsInUse(true, kPreviewGeneratorInUseID);
     m_programInfo.SetIgnoreProgStart(true);
-    m_programInfo.SetIgnoreLastPlayPos(true);
+    m_programInfo.SetAllowLastPlayPos(false);
 
     float aspect = 0;
     int   width, height, sz;

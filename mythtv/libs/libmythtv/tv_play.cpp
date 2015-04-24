@@ -343,7 +343,7 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags,
         curProgram = new ProgramInfo(*tvrec);
         curProgram->SetIgnoreBookmark(flags & kStartTVIgnoreBookmark);
         curProgram->SetIgnoreProgStart(flags & kStartTVIgnoreProgStart);
-        curProgram->SetIgnoreLastPlayPos(flags & kStartTVIgnoreLastPlayPos);
+        curProgram->SetAllowLastPlayPos(flags & kStartTVAllowLastPlayPos);
     }
 
     GetMythMainWindow()->PauseIdleTimer(true);

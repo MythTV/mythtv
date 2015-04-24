@@ -116,7 +116,7 @@ enum {
     kStartTVByNetworkCommand = 0x04,
     kStartTVIgnoreBookmark   = 0x08,
     kStartTVIgnoreProgStart  = 0x10,
-    kStartTVIgnoreLastPlayPos= 0x20,
+    kStartTVAllowLastPlayPos = 0x20,
 };
 
 class AskProgramInfo

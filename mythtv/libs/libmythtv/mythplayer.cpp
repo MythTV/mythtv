@@ -2887,7 +2887,7 @@ void MythPlayer::EventStart(void)
             // an actual bookmark and not progstart or lastplaypos information.
             player_ctx->playingInfo->SetIgnoreBookmark(false);
             player_ctx->playingInfo->SetIgnoreProgStart(true);
-            player_ctx->playingInfo->SetIgnoreLastPlayPos(true);
+            player_ctx->playingInfo->SetAllowLastPlayPos(false);
         }
     }
     player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);

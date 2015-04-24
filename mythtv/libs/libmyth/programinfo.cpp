@@ -2720,7 +2720,7 @@ uint64_t ProgramInfo::QueryProgStart(void) const
  */
 uint64_t ProgramInfo::QueryLastPlayPos(void) const
 {
-    if (programflags & FL_IGNORELASTPLAYPOS)
+    if (!(programflags & FL_ALLOWLASTPLAYPOS))
         return 0;
 
     frm_dir_map_t bookmarkmap;

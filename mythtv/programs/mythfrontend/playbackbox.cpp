@@ -2497,7 +2497,7 @@ bool PlaybackBox::Play(
     uint flags =
         (inPlaylist          ? kStartTVInPlayList       : kStartTVNoFlags) |
         (underNetworkControl ? kStartTVByNetworkCommand : kStartTVNoFlags) |
-        (ignoreLastPlayPos   ? kStartTVIgnoreLastPlayPos: kStartTVNoFlags) |
+        (!ignoreLastPlayPos  ? kStartTVAllowLastPlayPos : kStartTVNoFlags) |
         (ignoreProgStart     ? kStartTVIgnoreProgStart  : kStartTVNoFlags) |
         (ignoreBookmark      ? kStartTVIgnoreBookmark   : kStartTVNoFlags);
 
