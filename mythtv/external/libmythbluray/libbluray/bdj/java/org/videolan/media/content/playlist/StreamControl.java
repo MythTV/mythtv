@@ -51,9 +51,9 @@ public abstract class StreamControl implements Control {
 
     protected String languageFromInteger(int value) {
         char[] language = new char[3];
-        language[0] = (char)(value >> 16);
-        language[1] = (char)(value >> 8);
-        language[2] = (char)value;
+        language[0] = (char)((value >> 16) & 0xff);
+        language[1] = (char)((value >> 8)  & 0xff);
+        language[2] = (char)(value         & 0xff);
         return String.valueOf(language);
     }
 

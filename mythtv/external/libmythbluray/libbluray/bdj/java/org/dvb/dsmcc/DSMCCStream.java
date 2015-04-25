@@ -19,24 +19,28 @@
 package org.dvb.dsmcc;
 
 import java.io.IOException;
+import java.io.Serializable;
 import org.davic.net.Locator;
 
-public class DSMCCStream {
+public class DSMCCStream implements Serializable {
     public DSMCCStream(DSMCCObject aDSMCCObject) throws NotLoadedException,
             IllegalObjectTypeException
     {
+        org.videolan.Logger.unimplemented(DSMCCStream.class.getName(), "");
         throw new Error("Not implemented");
     }
 
     public DSMCCStream(String path) throws IOException,
             IllegalObjectTypeException
     {
+        org.videolan.Logger.unimplemented(DSMCCStream.class.getName(), "");
         throw new Error("Not implemented");
     }
 
     public DSMCCStream(String path, String name) throws IOException,
             IllegalObjectTypeException
     {
+        org.videolan.Logger.unimplemented(DSMCCStream.class.getName(), "");
         throw new Error("Not implemented");
     }
 
@@ -89,4 +93,6 @@ public class DSMCCStream {
     {
         throw new Error("Not implemented");
     }
+
+    private static final long serialVersionUID = 1L;
 }

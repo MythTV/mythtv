@@ -35,7 +35,8 @@ public final class AppsControlPermission extends BasicPermission {
 
     public String getActions()
     {
-        return actions;
+        // actions should be always null
+        return null;
     }
 
     public boolean implies(Permission perm)
@@ -45,29 +46,13 @@ public final class AppsControlPermission extends BasicPermission {
 
     public boolean equals(Object obj)
     {
-        if (this == obj)
-            return true;
-        if (!super.equals(obj))
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        AppsControlPermission other = (AppsControlPermission) obj;
-        if (actions == null) {
-            if (other.actions != null)
-                return false;
-        } else if (!actions.equals(other.actions))
-            return false;
-        return true;
+        return obj instanceof AppsControlPermission;
     }
 
     public int hashCode()
     {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + ((actions == null) ? 0 : actions.hashCode());
-        return result;
+        return getClass().hashCode();
     }
 
-    private String actions;
     private static final long serialVersionUID = 4003360685455291075L;
 }

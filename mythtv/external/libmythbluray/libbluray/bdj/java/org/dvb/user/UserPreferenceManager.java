@@ -37,7 +37,9 @@ public class UserPreferenceManager {
 
     public void read(Preference p) {
         SecurityManager sm = System.getSecurityManager();
-        sm.checkPermission(new UserPreferencePermission("read"));
+        if (sm != null) {
+            sm.checkPermission(new UserPreferencePermission("read"));
+        }
         p.removeAll();
         String name = p.getName();
         Iterator it = preferences.iterator();
@@ -52,7 +54,9 @@ public class UserPreferenceManager {
 
     public void read(Preference p, Facility facility) {
         SecurityManager sm = System.getSecurityManager();
-        sm.checkPermission(new UserPreferencePermission("read"));
+        if (sm != null) {
+            sm.checkPermission(new UserPreferencePermission("read"));
+        }
         p.removeAll();
         String name = p.getName();
         if (name.equals(facility.getPreference())) {
@@ -79,7 +83,9 @@ public class UserPreferenceManager {
         if (!GeneralPreference.isGeneralPreference(name))
             throw new UnsupportedPreferenceException();
         SecurityManager sm = System.getSecurityManager();
-        sm.checkPermission(new UserPreferencePermission("write"));
+        if (sm != null) {
+            sm.checkPermission(new UserPreferencePermission("write"));
+        }
         Iterator it = preferences.iterator();
         while (it.hasNext()) {
             Preference preference = (Preference)it.next();

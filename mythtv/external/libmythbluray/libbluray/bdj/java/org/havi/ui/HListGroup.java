@@ -27,17 +27,17 @@ import org.havi.ui.event.HItemEvent;
 public class HListGroup extends HVisible implements HItemValue {
     public HListGroup()
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
     }
 
     public HListGroup(HListElement[] items)
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
     }
 
     public HListGroup(HListElement[] items, int x, int y, int width, int height)
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
     }
 
     public void setLook(HLook hlook) throws HInvalidLookException
@@ -47,12 +47,14 @@ public class HListGroup extends HVisible implements HItemValue {
 
     public static void setDefaultLook(HListGroupLook look)
     {
-        throw new Error("Not implemented");
+        DefaultLook = look;
     }
 
     public static HListGroupLook getDefaultLook()
     {
-        throw new Error("Not implemented");
+        if (DefaultLook == null)
+            org.videolan.Logger.unimplemented("", "getDefaultLook");
+        return DefaultLook;
     }
 
     public HListElement[] getListContent()
@@ -297,6 +299,8 @@ public class HListGroup extends HVisible implements HItemValue {
     public static final int DEFAULT_LABEL_HEIGHT = -2;
     public static final int DEFAULT_ICON_WIDTH = -3;
     public static final int DEFAULT_ICON_HEIGHT = -4;
+
+    private static HListGroupLook DefaultLook = null;
 
     private static final long serialVersionUID = 6012900970046475431L;
 }

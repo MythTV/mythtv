@@ -1,6 +1,7 @@
 /*
  * This file is part of libbluray
  * Copyright (C) 2010  William Hahne
+ * Copyright (C) 2013  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,6 +23,10 @@ package org.havi.ui;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Dimension;
+import java.util.Hashtable;
+import java.util.Map;
+
+import org.videolan.Logger;
 
 public class HVisible extends HComponent implements HState {
     public HVisible()
@@ -38,181 +43,313 @@ public class HVisible extends HComponent implements HState {
     {
         super(x, y, width, height);
         hLook = hlook;
+        TextLayoutManager = new HDefaultTextLayoutManager();
+
+        content = new Object[LAST_STATE - FIRST_STATE + 1];
     }
 
     public boolean isFocusTraversable()
     {
-        throw new Error("Not implemented");
+        if (this instanceof HNavigable || this instanceof HSelectionInputPreferred) {
+            return true;
+        }
+        return false;
     }
 
     public void paint(Graphics g)
     {
-        throw new Error("Not implemented");
+        if (hLook != null)
+            hLook.showLook(g, this, InteractionState);
     }
 
     public void update(Graphics g)
     {
-        throw new Error("Not implemented");
+        g.setColor(getBackground());
+        paint(g);
     }
 
     public void setTextContent(String string, int state)
     {
-        throw new Error("Not implemented");
+        setContentImpl(string, state, TEXT_CONTENT_CHANGE);
     }
 
     public void setGraphicContent(Image image, int state)
     {
-        throw new Error("Not implemented");
+        setContentImpl(image, state, GRAPHIC_CONTENT_CHANGE);
     }
 
     public void setAnimateContent(Image[] imageArray, int state)
     {
-        throw new Error("Not implemented");
+        setContentImpl(imageArray, state, ANIMATE_CONTENT_CHANGE);
     }
 
     public void setContent(Object object, int state)
     {
-        throw new Error("Not implemented");
+        setContentImpl(object, state, CONTENT_CHANGE);
+    }
+
+    private void setContentImpl(Object object, int state, int hint)
+    {
+        int states = LAST_STATE - FIRST_STATE + 1;
+
+        Object[] oldData = new Object[states + 1];
+        oldData[0] = new Integer(state);
+        for (int i = 0; i < states; i++) {
+            oldData[(i + 1)] = content[i];
+        }
+
+        if (state == ALL_STATES) {
+            for (int i = 0; i < states; i++)
+                content[i] = object;
+        } else {
+            if (state < FIRST_STATE || state > LAST_STATE) {
+                logger.info("state out of range in getContext()");
+                throw new IllegalArgumentException("state out of range");
+            }
+            content[state - FIRST_STATE] = object;
+        }
+
+        visibleChanged(hint, oldData);
+    }
+
+    private void visibleChanged(int hint, Object data) {
+        if (hLook == null) {
+            return;
+        }
+        HChangeData[] changeData = null;
+        if (data != null) {
+            changeData = new HChangeData[1];
+            changeData[0] = new HChangeData(hint, data);
+        }
+        hLook.widgetChanged(this, changeData);
     }
 
     public String getTextContent(int state)
     {
-        throw new Error("Not implemented");
+        return (String)getContent(state);
     }
 
     public Image getGraphicContent(int state)
     {
-        throw new Error("Not implemented");
+        return (Image)getContent(state);
     }
 
     public Image[] getAnimateContent(int state)
     {
-        throw new Error("Not implemented");
+        return (Image[])getContent(state);
     }
 
     public Object getContent(int state)
     {
-        throw new Error("Not implemented");
+        if (state == ALL_STATES) {
+            logger.info("ALL_STATES not supported in getContent()");
+            throw new IllegalArgumentException("ALL_STATES not supported in getContent()");
+        }
+
+        if (state < FIRST_STATE || state > LAST_STATE) {
+            logger.info("state out of range in getContent()");
+            throw new IllegalArgumentException("state out of range");
+        }
+
+        return content[state - FIRST_STATE];
     }
 
     public void setLook(HLook hlook) throws HInvalidLookException
     {
-        throw new Error("Not implemented");
+        hLook = hlook;
     }
 
     public HLook getLook()
     {
-        throw new Error("Not implemented");
+        return hLook;
     }
 
     public Dimension getPreferredSize()
     {
-        throw new Error("Not implemented");
+        if (hLook != null) {
+            return hLook.getPreferredSize(this);
+        }
+        return getSize();
     }
 
     public Dimension getMaximumSize()
     {
-        throw new Error("Not implemented");
+        if (hLook != null) {
+            return hLook.getMaximumSize(this);
+        }
+        return getSize();
     }
 
     public Dimension getMinimumSize()
     {
-        throw new Error("Not implemented");
+        if (hLook != null) {
+            return hLook.getMinimumSize(this);
+        }
+        return getSize();
+    }
+
+    public void requestFocus() {
+        super.requestFocus();
+
+        if (isFocusTraversable())
+            setInteractionState(InteractionState | FOCUSED_STATE_BIT);
     }
 
     protected void setInteractionState(int state)
     {
-        throw new Error("Not implemented");
+        if (InteractionState == state)
+            return;
+
+        Integer oldState = new Integer(InteractionState);
+        InteractionState = state;
+        visibleChanged(STATE_CHANGE, oldState);
     }
 
     public int getInteractionState()
     {
-        throw new Error("Not implemented");
+        return InteractionState;
     }
 
     public void setTextLayoutManager(HTextLayoutManager manager)
     {
-        throw new Error("Not implemented");
+        TextLayoutManager = manager;
     }
 
     public HTextLayoutManager getTextLayoutManager()
     {
-        throw new Error("Not implemented");
+        return TextLayoutManager;
     }
 
     public int getBackgroundMode()
     {
-        throw new Error("Not implemented");
+        return BackgroundMode;
     }
 
     public void setBackgroundMode(int mode)
     {
-        throw new Error("Not implemented");
+        if (mode != BACKGROUND_FILL && mode != NO_BACKGROUND_FILL) {
+            logger.info("mode out of range in setBackgroundMode()");
+            throw new IllegalArgumentException("Unknown background fill mode");
+        }
+        BackgroundMode = mode;
     }
 
     public boolean isOpaque()
     {
-        throw new Error("Not implemented");
+        if (hLook == null) {
+            return false;
+        }
+        return hLook.isOpaque(this);
     }
 
     public void setDefaultSize(Dimension defaultSize)
     {
-        throw new Error("Not implemented");
+        this.defaultSize = defaultSize;
     }
 
     public Dimension getDefaultSize()
     {
-        throw new Error("Not implemented");
+        return defaultSize;
     }
 
     public Object getLookData(Object key)
     {
-        throw new Error("Not implemented");
+        if (lookData == null || !lookData.containsKey(key)) {
+            return null;
+        }
+        return lookData.get(key);
     }
 
     public void setLookData(Object key, Object data)
     {
-        throw new Error("Not implemented");
+        if (lookData == null) {
+            lookData = new Hashtable();
+        }
+
+        if (lookData.containsKey(key)) {
+            lookData.remove(key);
+        }
+
+        if (data == null) {
+            return;
+        }
+
+        lookData.put(key, data);
     }
 
     public void setHorizontalAlignment(int halign)
     {
-        throw new Error("Not implemented");
+        if (halign != HALIGN_LEFT && halign != HALIGN_CENTER &&
+            halign != HALIGN_RIGHT && halign != HALIGN_JUSTIFY) {
+            logger.info("align out of range in setHorizontalAlignment()");
+            throw new IllegalArgumentException("Unknown halign");
+        }
+
+        this.halign = halign;
+        visibleChanged(UNKNOWN_CHANGE, new Integer(UNKNOWN_CHANGE));
     }
 
     public void setVerticalAlignment(int valign)
     {
-        throw new Error("Not implemented");
+        if (valign != VALIGN_TOP && valign != VALIGN_CENTER &&
+            valign != VALIGN_BOTTOM && valign != VALIGN_JUSTIFY) {
+            logger.info("align out of range in setVerticalAlignment()");
+            throw new IllegalArgumentException("Unknown valign");
+        }
+
+        this.valign = valign;
+        visibleChanged(UNKNOWN_CHANGE, new Integer(UNKNOWN_CHANGE));
     }
 
     public int getHorizontalAlignment()
     {
-        throw new Error("Not implemented");
+        return halign;
     }
 
     public int getVerticalAlignment()
     {
-        throw new Error("Not implemented");
+        return valign;
     }
 
     public void setResizeMode(int resize)
     {
-        throw new Error("Not implemented");
+        if (resize != RESIZE_NONE && resize != RESIZE_PRESERVE_ASPECT &&
+            resize != RESIZE_ARBITRARY) {
+            logger.info("resize out of range in setResizeMode()");
+            throw new IllegalArgumentException("Unknown resize mode");
+        }
+
+        resizeMode = resize;
+        visibleChanged(UNKNOWN_CHANGE, new Integer(UNKNOWN_CHANGE));
     }
 
     public int getResizeMode()
     {
-        throw new Error("Not implemented");
+        return resizeMode;
     }
 
     public void setEnabled(boolean b)
     {
         super.setEnabled(b);
+        if (b) {
+            setInteractionState(InteractionState & (~DISABLED_STATE_BIT));
+        } else {
+            setInteractionState(InteractionState | DISABLED_STATE_BIT);
+        }
     }
 
     public void setBordersEnabled(boolean enable)
     {
-        BordersEnabled = enable;
+        if (enable == BordersEnabled)
+            return;
+
+        if ((hLook instanceof HAnimateLook) ||
+            (hLook instanceof HGraphicLook) ||
+            (hLook instanceof HTextLook)) {
+            Boolean oldMode = new Boolean(BordersEnabled);
+            BordersEnabled = enable;
+            visibleChanged(BORDER_CHANGE, oldMode);
+        }
     }
 
     public boolean getBordersEnabled()
@@ -268,13 +405,21 @@ public class HVisible extends HComponent implements HState {
 
     public static final int NO_DEFAULT_WIDTH = -1;
     public static final int NO_DEFAULT_HEIGHT = -1;
-    public static final Dimension NO_DEFAULT_SIZE = new Dimension(
-            NO_DEFAULT_WIDTH, NO_DEFAULT_HEIGHT);
+    public static final Dimension NO_DEFAULT_SIZE = new Dimension(NO_DEFAULT_WIDTH, NO_DEFAULT_HEIGHT);
 
     private static final long serialVersionUID = -2076075723286676347L;
 
     private HLook hLook;
+    private Map lookData;
     private int BackgroundMode = NO_BACKGROUND_FILL;
     private boolean BordersEnabled = true;
     private int InteractionState = 0;
+    private int halign = HALIGN_LEFT;
+    private int valign = VALIGN_TOP;
+    private int resizeMode = RESIZE_NONE;
+    private HTextLayoutManager TextLayoutManager = null;
+    private Object content[];
+    private Dimension defaultSize = NO_DEFAULT_SIZE;
+
+    private static final Logger logger = Logger.getLogger(HVisible.class.getName());
 }

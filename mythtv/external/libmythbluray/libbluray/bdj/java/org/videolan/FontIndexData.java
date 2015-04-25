@@ -59,5 +59,5 @@ public class FontIndexData {
     protected String filename;
     protected int minSize;
     protected int maxSize;
-    protected int style;
+    protected int style = -1; /* optional */
 }

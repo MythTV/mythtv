@@ -23,13 +23,15 @@
 
 #include "filesystem.h"
 
-#include <util/attributes.h>
+#include "util/attributes.h"
 
-#include <stdint.h>
-
-//#ifdef __LINUX__
-#define DIR_SEP "/"
-//#endif
+#ifdef _WIN32
+# define DIR_SEP "\\"
+# define DIR_SEP_CHAR '\\'
+#else
+# define DIR_SEP "/"
+# define DIR_SEP_CHAR '/'
+#endif
 
 /*
  * file access
@@ -38,14 +40,16 @@
 #define file_close(X) X->close(X)
 #define file_seek(X,Y,Z) X->seek(X,Y,Z)
 #define file_tell(X) X->tell(X)
-#define file_eof(X) X->eof(X)
+//#define file_eof(X) X->eof(X)
 #define file_stat(X,Y) X->stat(X,Y)
-#define file_read(X,Y,Z) X->read(X,Y,Z)
-#define file_write(X,Y,Z) X->write(X,Y,Z)
+#define file_read(X,Y,Z) (size_t)X->read(X,Y,Z)
+//#define file_write(X,Y,Z) (size_t)X->write(X,Y,Z)
+BD_PRIVATE int64_t file_size(BD_FILE_H *fp);
 
 BD_PRIVATE extern BD_FILE_H* (*file_open)(const char* filename, const char *mode);
 
 BD_PRIVATE BD_FILE_OPEN file_open_default(void);
+
 
 /*
  * directory access
@@ -55,5 +59,16 @@ BD_PRIVATE BD_FILE_OPEN file_open_default(void);
 #define dir_read(X,Y) X->read(X,Y)
 
 BD_PRIVATE extern BD_DIR_H* (*dir_open)(const char* dirname);
+
+BD_PRIVATE BD_DIR_OPEN dir_open_default(void);
+
+/*
+ * local filesystem
+ */
+
+BD_PRIVATE int file_unlink(const char *file);
+BD_PRIVATE int file_path_exists(const char *path);
+BD_PRIVATE int file_mkdir(const char *dir);
+BD_PRIVATE int file_mkdirs(const char *path);
 
 #endif /* FILE_H_ */

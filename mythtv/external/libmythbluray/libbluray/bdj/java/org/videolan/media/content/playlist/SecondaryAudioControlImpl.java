@@ -45,7 +45,6 @@ public class SecondaryAudioControlImpl extends StreamControl implements Secondar
     }
 
     protected void setStreamNumber(int num) {
-        int psr = Libbluray.readPSR(Libbluray.PSR_SECONDARY_AUDIO_VIDEO);
-        Libbluray.writePSR(Libbluray.PSR_SECONDARY_AUDIO_VIDEO, (psr & 0xFFFFFF00) | num);
+        Libbluray.writePSR(Libbluray.PSR_SECONDARY_AUDIO_VIDEO, num, 0x000000ff);
     }
 }

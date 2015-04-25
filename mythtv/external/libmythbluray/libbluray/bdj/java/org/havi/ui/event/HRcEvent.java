@@ -23,7 +23,6 @@ import java.awt.Component;
 import java.awt.event.KeyEvent;
 
 public class HRcEvent extends KeyEvent {
-    @Deprecated
     public HRcEvent(Component source, int id, long when, int modifiers,
             int keyCode)
     {
@@ -36,7 +35,6 @@ public class HRcEvent extends KeyEvent {
         super(source, id, when, modifiers, keyCode, keyChar);
     }
 
-    @Deprecated
     public static final int RC_FIRST = 400;
     public static final int VK_COLORED_KEY_0 = 403;
     public static final int VK_COLORED_KEY_1 = VK_COLORED_KEY_0 + 1;
@@ -96,7 +94,6 @@ public class HRcEvent extends KeyEvent {
     public static final int VK_GUIDE = VK_INFO + 1;
     public static final int VK_TELETEXT = VK_GUIDE + 1;
     public static final int VK_SUBTITLE = VK_TELETEXT + 1;
-    @Deprecated
     public static final int RC_LAST = VK_SUBTITLE;
 
     private static final long serialVersionUID = 2427692646491162046L;

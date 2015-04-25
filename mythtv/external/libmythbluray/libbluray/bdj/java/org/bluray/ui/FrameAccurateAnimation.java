@@ -1,6 +1,7 @@
 /*
  * This file is part of libbluray
  * Copyright (C) 2010  William Hahne
+ * Copyright (C) 2012  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,97 +23,170 @@ package org.bluray.ui;
 import java.awt.Component;
 import java.awt.Graphics;
 
+import org.videolan.BDJXletContext;
+import org.videolan.Logger;
+
 public abstract class FrameAccurateAnimation extends Component {
+
     public static final float getDefaultFrameRate()
     {
-        throw new Error("Not implemented");
+        return defaultRate;
     }
 
     public static boolean setDefaultFrameRate(float framerate)
     {
-        throw new Error("Not implemented");
+        if (framerate != FRAME_RATE_23_976 &&
+            framerate != FRAME_RATE_24 &&
+            framerate != FRAME_RATE_25 &&
+            framerate != FRAME_RATE_29_97 &&
+            framerate != FRAME_RATE_50 &&
+            framerate != FRAME_RATE_59_94) {
+
+            return false;
+        }
+
+        defaultRate = framerate;
+        return true;
     }
 
     public FrameAccurateAnimation()
     {
-        throw new Error("Not implemented");
+        logger.unimplemented("FrameAccurateAnimation");
+    }
+
+    public FrameAccurateAnimation(AnimationParameters params)
+    {
+        context = BDJXletContext.getCurrentContext();
+        if (context != null) {
+            context.addFAA(this);
+        } else {
+            logger.error("FrameAccurateAnimation created from wrong thread: " + Logger.dumpStack());
+        }
+
+        this.params = new AnimationParameters(params);
     }
 
     public synchronized void destroy()
     {
-        throw new Error("Not implemented");
+        if (context != null) {
+            context.removeFAA(this);
+            context = null;
+        }
+
+        destroyImpl();
     }
 
     public long getCompletedFrameCount()
     {
-        throw new Error("Not implemented");
+        logger.unimplemented("getCompletedFrameCount");
+        return 0;
     }
 
     public float getFrameRate()
     {
-        throw new Error("Not implemented");
+        logger.unimplemented("getFrameRate");
+        // TODO: rate of background video. if none, defaultRate.
+        return getDefaultFrameRate();
     }
 
     public Graphics getGraphics()
     {
-        throw new Error("Not implemented");
+        logger.unimplemented("getGraphics");
+        return super.getGraphics();
     }
 
     public int[] getRepeatCounts()
     {
-        throw new Error("Not implemented");
+        int[] repeatCount = null;
+        if (params != null && params.repeatCount != null) {
+            repeatCount = (int[])params.repeatCount.clone();
+        }
+        return repeatCount;
     }
 
     public int getThreadPriority()
     {
-        throw new Error("Not implemented");
+        return params.threadPriority;
     }
 
     public synchronized boolean isAnimated()
     {
-        throw new Error("Not implemented");
+        return running;
     }
 
     public void paint(Graphics g)
     {
-        throw new Error("Not implemented");
+        // should be implemented in derived classes
+        logger.unimplemented("paint");
     }
 
     public synchronized void resetStartStopTime(
             FrameAccurateAnimationTimer newTimer)
     {
-        throw new Error("Not implemented");
+        params.faaTimer = new FrameAccurateAnimationTimer(newTimer);
+        logger.unimplemented("resetStartStopTime");
     }
 
     public void setBounds(int x, int y, int width, int height)
     {
-        throw new Error("Not implemented");
+        super.setBounds(x, y, width, height);
     }
 
     public void setLocation(int x, int y)
     {
-        throw new Error("Not implemented");
+        super.setLocation(x, y);
     }
 
     public void setThreadPriority(int p)
     {
-        throw new Error("Not implemented");
+        params.threadPriority = p;
+    }
+
+    protected void startImpl() {
+        // should be implemented in derived classes
+        logger.unimplemented("startImpl");
+    }
+
+    protected void stopImpl() {
+        // should be implemented in derived classes
+        logger.unimplemented("stopImpl");
+    }
+
+    protected void destroyImpl() {
+        // should be implemented in derived classes
+        logger.unimplemented("destroyImpl");
     }
 
     public synchronized void start()
     {
-        throw new Error("Not implemented");
+        if (!running) {
+            running = true;
+            // TODO: compare timer against video
+
+            if (params.faaTimer != null) {
+                logger.unimplemented("start(faaTimer)");
+            }
+
+            startImpl();
+        }
     }
 
     public synchronized void stop()
     {
-        throw new Error("Not implemented");
+        if (running) {
+            running = false;
+            stopImpl();
+        }
     }
 
     public String toString()
     {
         return "FrameAccurateAnimation";
     }
+
+    private BDJXletContext context;
+    protected boolean running;
+    protected AnimationParameters params;
 
     public static final float FRAME_RATE_23_976 = 23.976F;
     public static final float FRAME_RATE_24 = 24.0F;
@@ -122,4 +196,8 @@ public abstract class FrameAccurateAnimation extends Component {
     public static final float FRAME_RATE_59_94 = 59.939999F;
 
     private static final long serialVersionUID = 76982966057159330L;
+
+    private static float defaultRate = FRAME_RATE_25;
+
+    private static final Logger logger = Logger.getLogger(FrameAccurateAnimation.class.getName());
 }

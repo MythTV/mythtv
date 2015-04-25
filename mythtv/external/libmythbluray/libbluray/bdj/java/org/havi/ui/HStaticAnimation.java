@@ -25,19 +25,19 @@ public class HStaticAnimation extends HVisible implements HNoInputPreferred,
         HAnimateEffect {
     public HStaticAnimation()
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HStaticAnimation.class.getName(), "");
     }
 
     public HStaticAnimation(Image[] imagesNormal, int delay, int playMode,
             int repeatCount, int x, int y, int width, int height)
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HStaticAnimation.class.getName(), "");
     }
 
     public HStaticAnimation(Image[] imagesNormal, int delay, int playMode,
             int repeatCount)
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HStaticAnimation.class.getName(), "");
     }
 
     public void setLook(HLook hlook) throws HInvalidLookException
@@ -47,12 +47,14 @@ public class HStaticAnimation extends HVisible implements HNoInputPreferred,
 
     public static void setDefaultLook(HAnimateLook hlook)
     {
-        throw new Error("Not implemented");
+        DefaultLook = hlook;
     }
 
     public static HAnimateLook getDefaultLook()
     {
-        throw new Error("Not implemented");
+        if (DefaultLook == null)
+            org.videolan.Logger.unimplemented("", "getDefaultLook");
+        return DefaultLook;
     }
 
     public void start()
@@ -109,6 +111,8 @@ public class HStaticAnimation extends HVisible implements HNoInputPreferred,
     {
         throw new Error("Not implemented");
     }
+
+    private static HAnimateLook DefaultLook = null;
 
     private static final long serialVersionUID = -7320112528206101937L;
 }

@@ -28,7 +28,7 @@ int bdmv_parse_extension_data(BITSTREAM *bits,
                               int (*handler)(BITSTREAM*, int, int, void*),
                               void *handle)
 {
-    off_t length;
+    int64_t length;
     int num_entries, n;
 
     if (start_address < 1) return 0;
@@ -47,10 +47,10 @@ int bdmv_parse_extension_data(BITSTREAM *bits,
     for (n = 0; n < num_entries; n++) {
         uint16_t id1       = bs_read(bits, 16);
         uint16_t id2       = bs_read(bits, 16);
-        off_t    ext_start = bs_read(bits, 32);
-        off_t    ext_len   = bs_read(bits, 32);
+        int64_t  ext_start = bs_read(bits, 32);
+        int64_t  ext_len   = bs_read(bits, 32);
 
-        off_t    saved_pos = bs_pos(bits) >> 3;
+        int64_t  saved_pos = bs_pos(bits) >> 3;
 
         if (ext_start + start_address + ext_len > bits->end) return 0;
 

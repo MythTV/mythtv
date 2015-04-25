@@ -50,7 +50,7 @@ public abstract class DVBClassLoader extends java.security.SecureClassLoader {
         loader = new DVBURLClassLoader(urls, parent);
     }
 
-    public Class<?> findClass(String name) throws ClassNotFoundException {
+    public Class findClass(String name) throws ClassNotFoundException {
         return loader.findClass(name);
     }
 

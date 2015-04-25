@@ -26,6 +26,7 @@ public class DSMCCStreamEvent extends DSMCCStream {
             throws NotLoadedException, IllegalObjectTypeException
     {
         super(aDSMCCObject);
+        org.videolan.Logger.unimplemented(DSMCCStreamEvent.class.getName(), "");
         throw new Error("Not implemented");
     }
 
@@ -33,6 +34,7 @@ public class DSMCCStreamEvent extends DSMCCStream {
             IllegalObjectTypeException
     {
         super(path);
+        org.videolan.Logger.unimplemented(DSMCCStreamEvent.class.getName(), "");
         throw new Error("Not implemented");
     }
 
@@ -40,6 +42,7 @@ public class DSMCCStreamEvent extends DSMCCStream {
             IllegalObjectTypeException
     {
         super(path, name);
+        org.videolan.Logger.unimplemented(DSMCCStreamEvent.class.getName(), "");
         throw new Error("Not implemented");
     }
 
@@ -66,4 +69,5 @@ public class DSMCCStreamEvent extends DSMCCStream {
         throw new Error("Not implemented");
     }
 
+    private static final long serialVersionUID = 1L;
 }

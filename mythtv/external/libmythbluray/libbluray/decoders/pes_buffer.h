@@ -20,7 +20,7 @@
 #if !defined(_PES_BUFFER_H_)
 #define _PES_BUFFER_H_
 
-#include <util/attributes.h>
+#include "util/attributes.h"
 
 #include <stdint.h>
 
@@ -38,10 +38,12 @@ struct pes_buffer_s {
 };
 
 
-BD_PRIVATE PES_BUFFER *pes_buffer_alloc(int size) BD_ATTR_MALLOC;
+BD_PRIVATE PES_BUFFER *pes_buffer_alloc(void) BD_ATTR_MALLOC;
 BD_PRIVATE void        pes_buffer_free(PES_BUFFER **); // free list of buffers
 
 BD_PRIVATE void        pes_buffer_append(PES_BUFFER **head, PES_BUFFER *buf); // append buf to list
 BD_PRIVATE void        pes_buffer_remove(PES_BUFFER **head, PES_BUFFER *buf); // remove buf from list and free it
+
+BD_PRIVATE void        pes_buffer_next(PES_BUFFER **head); // free first buffer and advance head to next buffer
 
 #endif // _PES_BUFFER_H_

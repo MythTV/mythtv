@@ -22,6 +22,8 @@ package org.dvb.application;
 import java.util.LinkedList;
 import java.util.Enumeration;
 import org.videolan.BDJAppsDatabase;
+import org.videolan.BDJListeners;
+import org.videolan.Logger;
 
 public class AppsDatabase {
     static public AppsDatabase getAppsDatabase() {
@@ -29,60 +31,42 @@ public class AppsDatabase {
     }
 
     public int size() {
-        throw new Error("Not implemented");
+        logger.unimplemented("size");
+        return 0;
     }
 
-    public Enumeration<?> getAppIDs(AppsDatabaseFilter filter) {
-        throw new Error("Not implemented");
+    public Enumeration getAppIDs(AppsDatabaseFilter filter) {
+        logger.unimplemented("getAppIDs");
+        return null;
     }
 
-    public Enumeration<?> getAppAttributes(AppsDatabaseFilter filter) {
-        throw new Error("Not implemented");
+    public Enumeration getAppAttributes(AppsDatabaseFilter filter) {
+        logger.unimplemented("getAppAttributes");
+        return null;
     }
 
     public AppAttributes getAppAttributes(AppID key) {
-        throw new Error("Not implemented");
+        logger.unimplemented("getAppAttributes");
+        return null;
     }
 
     public AppProxy getAppProxy(AppID key) {
-        throw new Error("Not implemented");
+        logger.unimplemented("getAppProxy");
+        return null;
     }
 
     public void addListener(AppsDatabaseEventListener listener) {
-        synchronized(listeners) {
-            listeners.add(listener);
-        }
+        listeners.add(listener);
     }
 
     public void removeListener(AppsDatabaseEventListener listener) {
-        synchronized(listeners) {
-            listeners.remove(listener);
-        }
+        listeners.remove(listener);
     }
 
     protected void notifyListeners(int id, AppID appid) {
-        LinkedList<AppsDatabaseEventListener> list;
-        synchronized(listeners) {
-            list = (LinkedList<AppsDatabaseEventListener>)listeners.clone();
-        }
-        AppsDatabaseEvent event = new AppsDatabaseEvent(id, appid, this);
-        for (int i = 0; i < list.size(); i++) {
-            switch (id) {
-            case AppsDatabaseEvent.APP_ADDED:
-                ((AppsDatabaseEventListener)list.get(i)).entryAdded(event);
-                break;
-            case AppsDatabaseEvent.APP_CHANGED:
-                ((AppsDatabaseEventListener)list.get(i)).entryChanged(event);
-                break;
-            case AppsDatabaseEvent.APP_DELETED:
-                ((AppsDatabaseEventListener)list.get(i)).entryRemoved(event);
-                break;
-            case AppsDatabaseEvent.NEW_DATABASE:
-                ((AppsDatabaseEventListener)list.get(i)).newDatabase(event);
-                break;
-            }
-        }
+        listeners.putCallback(new AppsDatabaseEvent(id, appid, this));
     }
 
-    private LinkedList<AppsDatabaseEventListener> listeners = new LinkedList<AppsDatabaseEventListener>();
+    private BDJListeners listeners = new BDJListeners();
+    private static final Logger logger = Logger.getLogger(AppsDatabase.class.getName());
 }

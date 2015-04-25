@@ -31,16 +31,13 @@ public class ProgramScheduleEvent extends SIChangeEvent {
 
     public ProgramSchedule getProgramSchedule()
     {
-        return schedule;
+        return (ProgramSchedule)getSource();
     }
 
     public ProgramEvent getProgramEvent()
     {
-        return event;
+        return (ProgramEvent)getSIElement();
     }
-    
+
     private static final long serialVersionUID = 5317004528244521709L;
-    protected ProgramSchedule schedule;
-    protected SIChangeType type;
-    protected ProgramEvent event;
 }

@@ -3,11 +3,11 @@ package javax.media;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.media.protocol.DataSource;
 import javax.media.protocol.URLDataSource;
+
+import org.videolan.Logger;
 
 /**
  * This file is a stripped down version of the Manager class from FMJ (fmj-sf.net)
@@ -25,60 +25,51 @@ public final class Manager {
             throws IOException, NoPlayerException
     {
         final String protocol = sourceLocator.getProtocol();
-        final Vector<?> dataSourceList = getDataSourceList(protocol);
-        for (int i = 0; i < dataSourceList.size(); ++i)
-        {
+        final Vector dataSourceList = getDataSourceList(protocol);
+        for (int i = 0; i < dataSourceList.size(); ++i) {
             String dataSourceClassName = (String) dataSourceList.get(i);
-            try
-            {
-                final Class<?> dataSourceClass = Class.forName(dataSourceClassName);
+            try {
+                final Class dataSourceClass = Class.forName(dataSourceClassName);
                 final DataSource dataSource = (DataSource) dataSourceClass.newInstance();
                 dataSource.setLocator(sourceLocator);
                 dataSource.connect();
                 return createPlayer(dataSource);
-                
+
                 // TODO: JMF seems to disconnect data sources in this method, based on this stack trace:
 //              java.lang.NullPointerException
 //              at com.sun.media.protocol.rtp.DataSource.disconnect(DataSource.java:207)
 //              at javax.media.Manager.createPlayer(Manager.java:425)
 //              at net.sf.fmj.ui.application.ContainerPlayer.createNewPlayer(ContainerPlayer.java:357)
             }
-            catch (NoPlayerException e)
-            {   // no need to log, will be logged by call to createPlayer.
+            catch (NoPlayerException e) {
+                // no need to log, will be logged by call to createPlayer.
                 continue;
             }
-            catch (ClassNotFoundException e)
-            {
-                logger.warning("createPlayer: "  + e);    // no need for call stack
-                continue;
-            }           
-            catch (IOException e)
-            {
-                logger.log(Level.WARNING, ""  + e, e);
+            catch (ClassNotFoundException e) {
+                logger.warning("createPlayer: " + e);    // no need for call stack
                 continue;
             }
-            catch (NoClassDefFoundError e)
-            {
-                logger.log(Level.WARNING, ""  + e, e);
+            catch (IOException e) {
+                logger.warning(""  + e);
                 continue;
             }
-            catch (Exception e)
-            {
-                logger.log(Level.WARNING, ""  + e, e);
+            catch (NoClassDefFoundError e) {
+                logger.warning(""  + e);
                 continue;
             }
-
-                
+            catch (Exception e) {
+                logger.warning(""  + e);
+                continue;
+            }
         }
-        
+
         // if none found, try URLDataSource:
         final URL url;
-        try
-        {
+        try {
             url = sourceLocator.getURL();
         }
-        catch (Exception e)
-        {   logger.log(Level.WARNING, ""  + e, e);
+        catch (Exception e) {
+            logger.warning("" + e);
             throw new NoPlayerException();
         }
         final URLDataSource dataSource = new URLDataSource(url);
@@ -107,52 +98,41 @@ public final class Manager {
             throws IOException, NoDataSourceException
     {
         final String protocol = sourceLocator.getProtocol();
-        final Vector<?> dataSourceList = getDataSourceList(protocol);
-        for (int i = 0; i < dataSourceList.size(); ++i)
-        {
+        final Vector dataSourceList = getDataSourceList(protocol);
+        for (int i = 0; i < dataSourceList.size(); ++i) {
             String dataSourceClassName = (String) dataSourceList.get(i);
-            try
-            {
-                final Class<?> dataSourceClass = Class.forName(dataSourceClassName);
+            try {
+                final Class dataSourceClass = Class.forName(dataSourceClassName);
                 final DataSource dataSource = (DataSource) dataSourceClass.newInstance();
                 dataSource.setLocator(sourceLocator);
                 dataSource.connect();
                 return dataSource;
-                
-                
             }
-            catch (ClassNotFoundException e)
-            {
+            catch (ClassNotFoundException e) {
                 logger.warning("createDataSource: "  + e);    // no need for call stack
                 continue;
             }
-            catch (IOException e)
-            {
-                logger.log(Level.WARNING, ""  + e, e);
+            catch (IOException e) {
+                logger.warning("" + e);
                 continue;
             }
-            catch (NoClassDefFoundError e)
-            {
-                logger.log(Level.WARNING, ""  + e, e);
+            catch (NoClassDefFoundError e) {
+                logger.warning("" + e);
                 continue;
             }
-            catch (Exception e)
-            {
-                logger.log(Level.WARNING, ""  + e, e);
+            catch (Exception e) {
+                logger.warning("" + e);
                 continue;
             }
-
-                
         }
-        
+
         // if none found, try URLDataSource:
         final URL url;
-        try
-        {
+        try {
             url = sourceLocator.getURL();
         }
-        catch (Exception e)
-        {   logger.log(Level.WARNING, ""  + e, e);
+        catch (Exception e) {
+            logger.warning("" + e);
             throw new NoDataSourceException();
         }
         final URLDataSource dataSource = new URLDataSource(url);
@@ -165,77 +145,74 @@ public final class Manager {
         return systemTimeBase;
     }
 
-    public static Vector<?> getDataSourceList(String protocolName)
+    public static Vector getDataSourceList(String protocolName)
     {
         return getClassList(protocolName, PackageManager.getProtocolPrefixList(), "protocol", "DataSource");
     }
 
-    public static Vector<?> getHandlerClassList(String contentName)
+    public static Vector getHandlerClassList(String contentName)
     {
         return getClassList(toPackageFriendly(contentName), PackageManager.getContentPrefixList(), "content", "Handler");
     }
-    
+
     private static Player createPlayer(DataSource source, String contentType)
         throws IOException, NoPlayerException
     {
-        final Vector<?> handlerClassList = getHandlerClassList(contentType);
-        for (int i = 0; i < handlerClassList.size(); ++i)
-        {
+        final Vector handlerClassList = getHandlerClassList(contentType);
+        for (int i = 0; i < handlerClassList.size(); ++i) {
             final String handlerClassName = (String) handlerClassList.get(i);
-            
-            try
-            {
+
+            try {
                 System.out.println(handlerClassName);
-                final Class<?> handlerClass = Class.forName(handlerClassName);
-                if (!Player.class.isAssignableFrom(handlerClass) && 
-                    !MediaProxy.class.isAssignableFrom(handlerClass))
-                        continue;   // skip any classes that will not be matched below.
+                final Class handlerClass = Class.forName(handlerClassName);
+                if (!Player.class.isAssignableFrom(handlerClass) &&
+                    !MediaProxy.class.isAssignableFrom(handlerClass)) {
+                    continue;   // skip any classes that will not be matched below.
+                }
                 final MediaHandler handler = (MediaHandler) handlerClass.newInstance();
                 handler.setSource(source);
-                if (handler instanceof Player)
-                {   return (Player) handler;
-                }
-                else if (handler instanceof MediaProxy)
-                {
+
+                if (handler instanceof Player) {
+                    return (Player) handler;
+                } else if (handler instanceof MediaProxy) {
                     final MediaProxy mediaProxy = (MediaProxy) handler;
                     return createPlayer(mediaProxy.getDataSource());
                 }
             }
-            catch (ClassNotFoundException e)
-            {
-                logger.warning("createPlayer: "  + e);    // no need for call stack
-                continue;
-            }           
-            catch (IncompatibleSourceException e)
-            {
-                logger.warning("createPlayer(" + source + ", " + contentType + "): "  + e);   // no need for call stack
+            catch (ClassNotFoundException e) {
+                // no need for call stack
+                logger.warning("createPlayer: "  + e);
                 continue;
             }
-            catch (IOException e)
-            {
-                logger.log(Level.WARNING, ""  + e, e);
+            catch (IncompatibleSourceException e) {
+                // no need for call stack
+                logger.warning("createPlayer(" + source + ", " + contentType + "): "  + e);
                 continue;
             }
-            catch (NoPlayerException e)
-            {   // no need to log, will be logged by call to createPlayer.
+            catch (IOException e) {
+                logger.warning("" + e);
                 continue;
             }
-            catch (NoClassDefFoundError e)
-            {
-                logger.log(Level.WARNING, ""  + e, e);
+            catch (NoPlayerException e) {
+                // no need to log, will be logged by call to createPlayer.
                 continue;
             }
-            catch (Exception e)
-            {
-                logger.log(Level.WARNING, ""  + e, e);
+            catch (NoClassDefFoundError e) {
+                logger.warning("" + e);
+                continue;
+            }
+            catch (Exception e) {
+                logger.warning("" + e);
                 continue;
             }
         }
+        logger.error("No player found for " + contentType + " / " + source.getLocator());
         throw new NoPlayerException("No player found for " + source.getLocator());
     }
-    
+
     private static char toPackageFriendly(char c)
-    {   if (c >= 'a' && c <= 'z')
+    {
+        if (c >= 'a' && c <= 'z')
             return c;
         else if (c >= 'A' && c <= 'Z')
             return c;
@@ -245,37 +222,34 @@ public final class Manager {
             return c;
         else if (c == '/')
             return '.';
-        else 
+        else
             return '_';
     }
-    
+
     private static String toPackageFriendly(String contentName)
     {
         final StringBuffer b = new StringBuffer();
-        for (int i = 0; i < contentName.length(); ++i)
-        {   
+        for (int i = 0; i < contentName.length(); ++i) {
             final char c = contentName.charAt(i);
             b.append(toPackageFriendly(c));
         }
         return b.toString();
     }
-    
-    public static Vector<String> getClassList(String contentName, Vector<?> packages, String component2, String className)
+
+    public static Vector getClassList(String contentName, Vector packages, String component2, String className)
     {
-        
-        final Vector<String> result = new Vector<String>();
+        final Vector result = new Vector();
         //result.add("media." + component2 + "." + contentName + "." + className);
-        
-        for (int i = 0; i < packages.size(); ++i)
-        {
+
+        for (int i = 0; i < packages.size(); ++i) {
             result.add(((String) packages.get(i)) + ".media." + component2 + "." + contentName + "." + className);
         }
-        
+
         return result;
     }
 
     public static final String UNKNOWN_CONTENT_NAME = "unknown";
-    
+
     private static final TimeBase systemTimeBase = new SystemTimeBase();
     private static final Logger logger = Logger.getLogger(Manager.class.getName());
 }

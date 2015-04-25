@@ -1,6 +1,7 @@
 /*
  * This file is part of libbluray
  * Copyright (C) 2010  William Hahne
+ * Copyright (C) 2014  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,51 +20,80 @@
 
 package org.bluray.vfs;
 
+import org.videolan.BUMFAsset;
+import org.videolan.BUMFParser;
+import org.videolan.Logger;
+
 public class VFSManager {
+
+    private static VFSManager instance = null;
+
     public static VFSManager getInstance() throws SecurityException,
             UnsupportedOperationException
     {
-        throw new Error("Not implemented");
+        if (instance == null) {
+            instance = new VFSManager();
+        }
+
+        return instance;
     }
 
     protected VFSManager()
     {
-
+        state = STABLE;
     }
 
     public boolean disableClip(String streamfile)
     {
-        throw new Error("Not implemented");
+        logger.unimplemented("disableClip");
+        return true;
     }
 
     public boolean enableClip(String streamfile)
     {
-        throw new Error("Not implemented");
+        logger.unimplemented("enableClip");
+        return true;
     }
 
     public String[] getDisabledClipIDs()
     {
-        throw new Error("Not implemented");
+        logger.unimplemented("getDisabledClipIDs");
+        return new String[]{};
     }
 
     public int getState()
     {
-        throw new Error("Not implemented");
+        return state;
     }
 
     public boolean isEnabledClip(String clipID)
     {
-        throw new Error("Not implemented");
+        logger.unimplemented("isEnabledClip");
+        return true;
     }
 
     public void requestUpdating(String manifestfile, String signaturefile,
             boolean initBackupRegs) throws PreparingFailedException
     {
-        throw new Error("Not implemented");
+        state = PREPARING;
+
+        BUMFAsset[] assets = BUMFParser.parse(manifestfile);
+        if (assets == null) {
+            state = STABLE;
+            throw new PreparingFailedException();
+        }
+
+        logger.unimplemented("requestUpdating(" + manifestfile + ")");
+        state = STABLE;
+        throw new PreparingFailedException();
     }
+
+    private int state;
 
     public static final int STABLE = 1;
     public static final int PREPARING = 2;
     public static final int PREPARED = 3;
     public static final int UPDATING = 4;
+
+    private static final Logger logger = Logger.getLogger(VFSManager.class.getName());
 }

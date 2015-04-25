@@ -25,7 +25,7 @@ import java.awt.Insets;
 public class HMultilineEntryLook extends HSinglelineEntryLook {
     public HMultilineEntryLook()
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HMultilineEntryLook.class.getName(), "");
     }
 
     public void fillBackground(java.awt.Graphics g, HVisible visible, int state)

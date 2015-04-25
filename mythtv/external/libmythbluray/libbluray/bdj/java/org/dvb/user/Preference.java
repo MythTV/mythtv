@@ -20,7 +20,7 @@
 package org.dvb.user;
 
 import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.Vector;
 
 public class Preference {
     protected Preference() {
@@ -40,8 +40,10 @@ public class Preference {
     }
 
     public void add(String value) {
-        values.remove(value);
-        values.add(value);
+        synchronized (values) {
+            values.remove(value);
+            values.add(value);
+        }
     }
 
     public void add(String value[]) {
@@ -50,24 +52,32 @@ public class Preference {
     }
 
     public void add(int position, String value) {
-        values.remove(value);
-        if (position < 0)
-            position = 0;
-        else if (position > values.size())
-            position = values.size();
-        values.add(position, value);
+        synchronized (values) {
+            values.remove(value);
+            if (position < 0)
+                position = 0;
+            else if (position > values.size())
+                position = values.size();
+            values.add(position, value);
+        }
     }
 
     public String[] getFavourites() {
-        if (values.isEmpty())
-            return new String[0];
-        return (String[])values.toArray();
+        synchronized (values) {
+            if (values.isEmpty())
+                return new String[0];
+            String[] result = new String[values.size()];
+            values.copyInto(result);
+            return result;
+        }
     }
 
     public String getMostFavourite() {
-        if (values.isEmpty())
-            return null;
-        return (String)values.get(0);
+        synchronized (values) {
+            if (values.isEmpty())
+                return null;
+            return (String)values.get(0);
+        }
     }
 
     public String getName() {
@@ -75,24 +85,31 @@ public class Preference {
     }
 
     public int getPosition(String value) {
-        return values.indexOf(value);
+        synchronized (values) {
+            return values.indexOf(value);
+        }
     }
 
     public boolean hasValue() {
-        return !values.isEmpty();
+        synchronized (values) {
+            return !values.isEmpty();
+        }
     }
 
     public void remove(String value) {
-        values.remove(value);
+        synchronized (values) {
+            values.remove(value);
+        }
     }
 
     public void removeAll() {
-        values.clear();
+        synchronized (values) {
+            values.clear();
+        }
     }
 
     public void setMostFavourite(String value) {
-        values.remove(value);
-        values.addFirst(value);
+        add(0, value);
     }
 
     public String toString() {
@@ -108,5 +125,5 @@ public class Preference {
     }
 
     private String name;
-    private LinkedList values = new LinkedList();
+    private Vector values = new Vector();
 }

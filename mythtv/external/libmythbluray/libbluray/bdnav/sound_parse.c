@@ -17,11 +17,14 @@
  * <http://www.gnu.org/licenses/>.
  */
 
+#include "sound_parse.h"
+
+#include "disc/disc.h"
+
 #include "file/file.h"
 #include "util/bits.h"
 #include "util/logging.h"
 #include "util/macro.h"
-#include "sound_parse.h"
 
 #include <stdlib.h>
 
@@ -120,10 +123,9 @@ void sound_free(SOUND_DATA **p)
     }
 }
 
-SOUND_DATA *sound_parse(const char *file_name)
+static SOUND_DATA *_sound_parse(BD_FILE_H *fp)
 {
     BITSTREAM     bs;
-    BD_FILE_H    *fp;
     SOUND_DATA   *data = NULL;
     uint16_t      num_sounds;
     uint32_t      data_len;
@@ -131,16 +133,10 @@ SOUND_DATA *sound_parse(const char *file_name)
     uint32_t      data_start, extension_data_start;
     uint32_t     *data_offsets = NULL;
 
-    fp = file_open(file_name, "rb");
-    if (!fp) {
-      BD_DEBUG(DBG_NAV | DBG_CRIT, "error opening %s\n", file_name);
-      return NULL;
-    }
-
     bs_init(&bs, fp);
 
     if (!_bclk_parse_header(&bs, &data_start, &extension_data_start)) {
-        BD_DEBUG(DBG_NAV | DBG_CRIT, "%s: invalid header\n", file_name);
+        BD_DEBUG(DBG_NAV | DBG_CRIT, "invalid header\n");
         goto error;
     }
 
@@ -151,7 +147,7 @@ SOUND_DATA *sound_parse(const char *file_name)
     num_sounds = bs_read(&bs, 8);
 
     if (data_len < 1) {
-        BD_DEBUG(DBG_NAV | DBG_CRIT, "%s: empty database\n", file_name);
+        BD_DEBUG(DBG_NAV | DBG_CRIT, "empty database\n");
         goto error;
     }
 
@@ -164,7 +160,7 @@ SOUND_DATA *sound_parse(const char *file_name)
 
     for (i = 0; i < data->num_sounds; i++) {
         if (!_sound_parse_index(&bs, data_offsets + i, &data->sounds[i])) {
-            BD_DEBUG(DBG_NAV | DBG_CRIT, "%s: error parsing sound %d attribues\n", file_name, i);
+            BD_DEBUG(DBG_NAV | DBG_CRIT, "error parsing sound %d attribues\n", i);
             goto error;
         }
     }
@@ -176,19 +172,33 @@ SOUND_DATA *sound_parse(const char *file_name)
         bs_seek_byte(&bs, data_start + data_offsets[i]);
 
         if (!_sound_read_samples(&bs, &data->sounds[i])) {
-            BD_DEBUG(DBG_NAV | DBG_CRIT, "%s: error reading samples for sound %d\n", file_name, i);
+            BD_DEBUG(DBG_NAV | DBG_CRIT, "error reading samples for sound %d\n", i);
             goto error;
         }
     }
 
     X_FREE(data_offsets);
-    file_close(fp);
-
     return data;
 
  error:
     sound_free(&data);
     X_FREE(data_offsets);
-    file_close(fp);
     return NULL;
+}
+
+SOUND_DATA *sound_get(BD_DISC *disc)
+{
+    BD_FILE_H  *fp;
+    SOUND_DATA *p;
+
+    /* there's no no backup copy for sound.bdmv */
+
+    fp = disc_open_path(disc, "BDMV" DIR_SEP "AUXDATA" DIR_SEP "sound.bdmv");
+    if (!fp) {
+        return NULL;
+    }
+
+    p = _sound_parse(fp);
+    file_close(fp);
+    return p;
 }

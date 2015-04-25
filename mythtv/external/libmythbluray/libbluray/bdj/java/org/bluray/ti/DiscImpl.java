@@ -20,10 +20,22 @@ package org.bluray.ti;
 
 public class DiscImpl implements Disc {
     DiscImpl(String id) {
-        this.id = id;
+        /* strip leading zeros */
+        int i;
+        for (i = 0; i < id.length(); i++) {
+            if (id.charAt(i) != '0')
+                break;
+        }
+        this.id = id.substring(i);
+        if (this.id.length() < 1) {
+            this.id = id;
+            org.videolan.Logger.getLogger("DiscImpl").error("Invalid Disc ID " + this.id);
+        }
     }
 
     public String getId() {
+        /* Returns the 128-bit identifier of this disc (from id.bdmv), without leading zeros.
+           Each character in the String represents 4 bits. */
         return id;
     }
 

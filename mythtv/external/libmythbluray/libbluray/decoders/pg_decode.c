@@ -1,6 +1,6 @@
 /*
  * This file is part of libbluray
- * Copyright (C) 2010  hpi1
+ * Copyright (C) 2010  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,6 +19,7 @@
 
 #include "pg_decode.h"
 
+#include "util/refcnt.h"
 #include "util/macro.h"
 #include "util/logging.h"
 #include "util/bits.h"
@@ -26,6 +27,9 @@
 #include <string.h>
 #include <stdlib.h>
 
+/*
+ *
+ */
 
 void pg_decode_video_descriptor(BITBUFFER *bb, BD_PG_VIDEO_DESCRIPTOR *p)
 {
@@ -78,6 +82,16 @@ void pg_decode_composition_object(BITBUFFER *bb, BD_PG_COMPOSITION_OBJECT *p)
     }
 }
 
+void pg_decode_palette_entry(BITBUFFER *bb, BD_PG_PALETTE_ENTRY *entry)
+{
+    uint8_t entry_id = bb_read(bb, 8);
+
+    entry[entry_id].Y  = bb_read(bb, 8);
+    entry[entry_id].Cr = bb_read(bb, 8);
+    entry[entry_id].Cb = bb_read(bb, 8);
+    entry[entry_id].T  = bb_read(bb, 8);
+}
+
 /*
  * segments
  */
@@ -88,12 +102,7 @@ int pg_decode_palette_update(BITBUFFER *bb, BD_PG_PALETTE *p)
     p->version = bb_read(bb, 8);
 
     while (!bb_eof(bb)) {
-        uint8_t entry_id = bb_read(bb, 8);
-
-        p->entry[entry_id].Y  = bb_read(bb, 8);
-        p->entry[entry_id].Cr = bb_read(bb, 8);
-        p->entry[entry_id].Cb = bb_read(bb, 8);
-        p->entry[entry_id].T  = bb_read(bb, 8);
+        pg_decode_palette_entry(bb, p->entry);
     }
 
     return 1;
@@ -108,6 +117,7 @@ int pg_decode_palette(BITBUFFER *bb, BD_PG_PALETTE *p)
 
 static int _decode_rle(BITBUFFER *bb, BD_PG_OBJECT *p)
 {
+    BD_PG_RLE_ELEM *tmp;
     int pixels_left = p->width * p->height;
     int num_rle     = 0;
     int rle_size    = p->width * p->height / 4;
@@ -115,12 +125,12 @@ static int _decode_rle(BITBUFFER *bb, BD_PG_OBJECT *p)
     if (rle_size < 1)
         rle_size = 1;
 
-    p->img = realloc(p->img, rle_size * sizeof(BD_PG_RLE_ELEM));
-    if (!p->img) {
-        BD_DEBUG(DBG_DECODE | DBG_CRIT, "pg_decode_object(): relloc(%zu) failed\n",
-                 rle_size * sizeof(BD_PG_RLE_ELEM));
+    tmp = refcnt_realloc(p->img, rle_size * sizeof(BD_PG_RLE_ELEM));
+    if (!tmp) {
+        BD_DEBUG(DBG_DECODE | DBG_CRIT, "pg_decode_object(): realloc failed\n");
         return 0;
     }
+    p->img = tmp;
 
     while (!bb_eof(bb)) {
         uint32_t len   = 1;
@@ -155,15 +165,13 @@ static int _decode_rle(BITBUFFER *bb, BD_PG_OBJECT *p)
 
         num_rle++;
         if (num_rle >= rle_size) {
-            void *tmp = p->img;
             rle_size *= 2;
-            p->img = realloc(p->img, rle_size * sizeof(BD_PG_RLE_ELEM));
-            if (!p->img) {
-                BD_DEBUG(DBG_DECODE | DBG_CRIT, "pg_decode_object(): relloc(%zu) failed\n",
-                         rle_size * sizeof(BD_PG_RLE_ELEM));
-                X_FREE(tmp);
+            tmp = refcnt_realloc(p->img, rle_size * sizeof(BD_PG_RLE_ELEM));
+            if (!tmp) {
+                BD_DEBUG(DBG_DECODE | DBG_CRIT, "pg_decode_object(): realloc failed\n");
                 return 0;
             }
+            p->img = tmp;
         }
     }
 
@@ -226,6 +234,10 @@ int pg_decode_composition(BITBUFFER *bb, BD_PG_COMPOSITION *p)
 
     p->num_composition_objects = bb_read(bb, 8);
     p->composition_object      = calloc(p->num_composition_objects, sizeof(BD_PG_COMPOSITION_OBJECT));
+    if (!p->composition_object) {
+        BD_DEBUG(DBG_DECODE | DBG_CRIT, "out of memory\n");
+        return 0;
+    }
 
     for (ii = 0; ii < p->num_composition_objects; ii++) {
         pg_decode_composition_object(bb, &p->composition_object[ii]);
@@ -240,6 +252,10 @@ int pg_decode_windows(BITBUFFER *bb, BD_PG_WINDOWS *p)
 
     p->num_windows = bb_read(bb, 8);
     p->window = calloc(p->num_windows, sizeof(BD_PG_WINDOW));
+    if (!p->window) {
+        BD_DEBUG(DBG_DECODE | DBG_CRIT, "out of memory\n");
+        return 0;
+    }
 
     for (ii = 0; ii < p->num_windows; ii++) {
         pg_decode_window(bb, &p->window[ii]);
@@ -255,14 +271,8 @@ int pg_decode_windows(BITBUFFER *bb, BD_PG_WINDOWS *p)
 void pg_clean_object(BD_PG_OBJECT *p)
 {
     if (p) {
-        X_FREE(p->img);
-    }
-}
-
-void pg_clean_composition(BD_PG_COMPOSITION *p)
-{
-    if (p) {
-        X_FREE(p->composition_object);
+        bd_refcnt_dec(p->img);
+        p->img = NULL;
     }
 }
 
@@ -273,18 +283,10 @@ void pg_clean_windows(BD_PG_WINDOWS *p)
     }
 }
 
-void pg_free_palette(BD_PG_PALETTE **p)
+static void pg_clean_composition(BD_PG_COMPOSITION *p)
 {
-    if (p && *p) {
-        X_FREE(*p);
-    }
-}
-
-void pg_free_object(BD_PG_OBJECT **p)
-{
-    if (p && *p) {
-        pg_clean_object(*p);
-        X_FREE(*p);
+    if (p) {
+        X_FREE(p->composition_object);
     }
 }
 
@@ -292,14 +294,6 @@ void pg_free_composition(BD_PG_COMPOSITION **p)
 {
     if (p && *p) {
         pg_clean_composition(*p);
-        X_FREE(*p);
-    }
-}
-
-void pg_free_windows(BD_PG_WINDOWS **p)
-{
-    if (p && *p) {
-        pg_clean_windows(*p);
         X_FREE(*p);
     }
 }

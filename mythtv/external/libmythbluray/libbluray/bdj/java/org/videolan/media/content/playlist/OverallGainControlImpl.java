@@ -1,6 +1,7 @@
 /*
  * This file is part of libbluray
  * Copyright (C) 2010  William Hahne
+ * Copyright (C) 2015  Petri Hintukainen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,44 +21,19 @@
 package org.videolan.media.content.playlist;
 
 import java.awt.Component;
-import javax.media.GainChangeListener;
 import org.bluray.media.OverallGainControl;
 
-public class OverallGainControlImpl implements OverallGainControl {
-    public void setMute(boolean mute) {
-        // TODO Not implemented
+import org.videolan.media.content.BDHandler;
+
+public class OverallGainControlImpl extends GainControlImpl implements OverallGainControl {
+    public OverallGainControlImpl(BDHandler player) {
+        this.player = player;
     }
 
-    public boolean getMute() {
-        return false; // TODO Not implemented
+    protected void setGain(boolean mute, float level) {
+        player.setGain(BDHandler.GAIN_OVERALL, mute, level);
+        super.valueChanged();
     }
 
-    public float setDB(float gain) {
-        return 0;  // TODO Not implemented
-    }
-
-    public float getDB() {
-        return 0;  // TODO Not implemented
-    }
-
-    public float setLevel(float level) {
-        return 0;
-    }
-
-    public float getLevel() {
-        return 0;  // TODO Not implemented
-    }
-
-    public void addGainChangeListener(GainChangeListener listener) {
-        // TODO Not implemented
-    }
-
-    public void removeGainChangeListener(GainChangeListener listener) {
-        // TODO Not implemented
-    }
-
-    public Component getControlComponent() {
-        return null;
-    }
-
+    private BDHandler player;
 }

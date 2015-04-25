@@ -19,10 +19,11 @@
 
 package org.videolan;
 
+import java.io.File;
+import java.io.InputStream;
 import java.io.InvalidObjectException;
 import java.util.Enumeration;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.videolan.Logger;
 
 import org.bluray.net.BDLocator;
 import org.bluray.ti.TitleImpl;
@@ -33,76 +34,97 @@ import org.dvb.application.CurrentServiceFilter;
 
 import javax.media.Manager;
 import javax.tv.locator.Locator;
-import javax.tv.service.SIManager;
 
 import org.videolan.bdjo.AppEntry;
 import org.videolan.bdjo.Bdjo;
 import org.videolan.bdjo.GraphicsResolution;
 import org.videolan.bdjo.PlayListTable;
+import org.videolan.bdjo.TerminalInfo;
+import org.videolan.media.content.PlayerManager;
 
 public class BDJLoader {
-    public static boolean load(int title) {
-        return load(title, true, null);
+
+    /* called by org.dvb.ui.FontFactory */
+    public static File addFont(InputStream is) {
+        VFSCache localCache = vfsCache;
+        if (localCache != null) {
+            return localCache.addFont(is);
+        }
+        return null;
     }
 
-    public static boolean load(int title, boolean restart, BDJLoaderCallback callback) {
-        try {
-            BDLocator locator = new BDLocator(null, title, -1);
-            return load((TitleImpl)(SIManager.createInstance().getService(locator)), restart, callback);
-        } catch (Throwable e) {
-            e.printStackTrace();
-            return false;
+    /* called by org.dvb.ui.FontFactory */
+    public static File addFont(String fontFile) {
+        VFSCache localCache = vfsCache;
+        if (localCache != null) {
+            return localCache.addFont(fontFile);
+        }
+        return null;
+    }
+
+    /* called by BDJSecurityManager */
+    protected static void accessFile(String file) {
+        VFSCache localCache = vfsCache;
+        if (localCache != null) {
+            localCache.accessFile(file);
         }
     }
 
-    public static boolean load(Locator locator, boolean restart, BDJLoaderCallback callback) {
-        try {
-            return load((TitleImpl)(SIManager.createInstance().getService(locator)), restart, callback);
-        } catch (Throwable e) {
-            e.printStackTrace();
-            return false;
+    public static String getCachedFile(String path) {
+        VFSCache localCache = vfsCache;
+        if (localCache != null) {
+            return localCache.map(path);
         }
+        return path;
     }
 
     public static boolean load(TitleImpl title, boolean restart, BDJLoaderCallback callback) {
+        // This method should be called only from ServiceContextFactory
+
         if (title == null)
             return false;
         synchronized (BDJLoader.class) {
             if (queue == null)
-                queue = new BDJActionQueue();
+                queue = new BDJActionQueue(null, "BDJLoader");
         }
         queue.put(new BDJLoaderAction(title, restart, callback));
         return true;
     }
 
-    public static boolean unload() {
-        return unload(null);
-    }
-
     public static boolean unload(BDJLoaderCallback callback) {
+        // This method should be called only from ServiceContextFactory
+
         synchronized (BDJLoader.class) {
             if (queue == null)
-                queue = new BDJActionQueue();
+                queue = new BDJActionQueue(null, "BDJLoader");
         }
         queue.put(new BDJLoaderAction(null, false, callback));
         return true;
     }
 
-    public static void shutdown() {
-        unload();
+    protected static void shutdown() {
         try {
-            queue.finalize();
+            if (queue != null) {
+                queue.shutdown();
+            }
         } catch (Throwable e) {
-            e.printStackTrace();
+            logger.error("shutdown() failed: " + e + "\n" + Logger.dumpStack(e));
         }
+        queue = null;
+        vfsCache = null;
     }
 
     private static boolean loadN(TitleImpl title, boolean restart) {
+
+        if (vfsCache == null) {
+            vfsCache = VFSCache.createInstance();
+        }
+
         TitleInfo ti = title.getTitleInfo();
         if (!ti.isBdj()) {
-            logger.log(Level.INFO, "Not BD-J title - requesting HDMV title start");
+            logger.info("Not BD-J title - requesting HDMV title start");
             unloadN();
-            return Libbluray.selectTitle(title);
+            return Libbluray.selectHdmvTitle(title.getTitleNum());
         }
 
         try {
@@ -111,6 +133,11 @@ public class BDJLoader {
             if (bdjo == null)
                 throw new InvalidObjectException("bdjo not loaded");
             AppEntry[] appTable = bdjo.getAppTable();
+
+            // initialize AppCaches
+            if (vfsCache != null) {
+                vfsCache.add(bdjo.getAppCaches());
+            }
 
             // reuse appProxys
             BDJAppProxy[] proxys = new BDJAppProxy[appTable.length];
@@ -123,34 +150,54 @@ public class BDJLoader {
                 for (int i = 0; i < appTable.length; i++) {
                     if (id.equals(appTable[i].getIdentifier()) &&
                         entry.getInitialClass().equals(appTable[i].getInitialClass())) {
-                        if (restart && appTable[i].getIsServiceBound())
+                        if (restart && appTable[i].getIsServiceBound()) {
+                            logger.info("Stopping xlet " + appTable[i].getInitialClass() + " (for restart)");
                             proxy.stop(true);
-                        proxy.getXletContext().update(appTable[i], bdjo.getAppCaches());
-                        proxys[i] = proxy;
-                        proxy = null;
+                        } else {
+                            logger.info("Keeping xlet " + appTable[i].getInitialClass());
+                            proxy.getXletContext().update(appTable[i], bdjo.getAppCaches());
+                            proxys[i] = proxy;
+                            proxy = null;
+                        }
                         break;
                     }
                 }
-                if (proxy != null)
+                if (proxy != null) {
+                    logger.info("Terminating xlet " + (entry == null ? "?" : entry.getInitialClass()));
                     proxy.release();
+                }
             }
 
             // start bdj window
-            GUIManager gui = GUIManager.getInstance();
-            GraphicsResolution res = bdjo.getTerminalInfo().getResolution();
+            GUIManager gui = GUIManager.createInstance();
+            TerminalInfo terminfo = bdjo.getTerminalInfo();
+            GraphicsResolution res = terminfo.getResolution();
+            gui.setDefaultFont(terminfo.getDefaultFont());
+            gui.setResizable(true);
             gui.setSize(res.getWidth(), res.getHeight());
             gui.setVisible(true);
+
+            Libbluray.setUOMask(terminfo.getMenuCallMask(), terminfo.getTitleSearchMask());
+            Libbluray.setKeyInterest(bdjo.getKeyInterestTable());
 
             // initialize appProxys
             for (int i = 0; i < appTable.length; i++) {
                 if (proxys[i] == null) {
-                    proxys[i] = new BDJAppProxy(
+                    proxys[i] = BDJAppProxy.newInstance(
                                                 new BDJXletContext(
                                                                    appTable[i],
                                                                    bdjo.getAppCaches(),
                                                                    gui));
+                    /* log startup class, startup parameters and jar file */
+                    String[] params = appTable[i].getParams();
+                    String p = "";
+                    if (params != null && params.length > 0) {
+                        p = "(" + StrUtil.Join(params, ",") + ")";
+                    }
+                    logger.info("Loaded class: " + appTable[i].getInitialClass() + p + " from " + appTable[i].getBasePath() + ".jar");
+                } else {
+                    logger.info("Reused class: " + appTable[i].getInitialClass() +     " from " + appTable[i].getBasePath() + ".jar");
                 }
-                logger.log(Level.INFO, "Loaded class: " + appTable[i].getInitialClass());
             }
 
             // change psr
@@ -162,21 +209,23 @@ public class BDJLoader {
             // now run all the xlets
             for (int i = 0; i < appTable.length; i++) {
                 int code = appTable[i].getControlCode();
-                if (code == AppEntry.AUTOSTART)
+                if (code == AppEntry.AUTOSTART) {
+                    logger.info("Autostart xlet " + i + ": " + appTable[i].getInitialClass());
                     proxys[i].start();
-                else if (code == AppEntry.PRESENT)
-                    proxys[i].resume();
-                else {
-                    proxys[i].pause();
+                } else if (code == AppEntry.PRESENT) {
+                    logger.info("Init xlet " + i + ": " + appTable[i].getInitialClass());
+                    proxys[i].init();
+                } else {
+                    logger.info("Unsupported xlet code (" +code+") xlet " + i + ": " + appTable[i].getInitialClass());
                 }
             }
 
-            logger.log(Level.INFO, "Finished initializing and starting xlets.");
+            logger.info("Finished initializing and starting xlets.");
 
             // auto start playlist
             PlayListTable plt = bdjo.getAccessiblePlaylists();
             if ((plt != null) && (plt.isAutostartFirst())) {
-                logger.log(Level.INFO, "Auto-starting playlist");
+                logger.info("Auto-starting playlist");
                 String[] pl = plt.getPlayLists();
                 if (pl.length > 0)
                     Manager.createPlayer(new MediaLocator(new BDLocator("bd://PLAYLIST:" + pl[0]))).start();
@@ -185,7 +234,7 @@ public class BDJLoader {
             return true;
 
         } catch (Throwable e) {
-            e.printStackTrace();
+            logger.error("loadN() failed: " + e + "\n" + Logger.dumpStack(e));
             unloadN();
             return false;
         }
@@ -193,17 +242,35 @@ public class BDJLoader {
 
     private static boolean unloadN() {
         try {
+            try {
+                GUIManager.getInstance().setVisible(false);
+            } catch (Error e) {
+            }
+
             AppsDatabase db = AppsDatabase.getAppsDatabase();
+
+            /* stop xlets first */
             Enumeration ids = db.getAppIDs(new CurrentServiceFilter());
+            while (ids.hasMoreElements()) {
+                AppID id = (AppID)ids.nextElement();
+                BDJAppProxy proxy = (BDJAppProxy)db.getAppProxy(id);
+                proxy.stop(true);
+            }
+
+            ids = db.getAppIDs(new CurrentServiceFilter());
             while (ids.hasMoreElements()) {
                 AppID id = (AppID)ids.nextElement();
                 BDJAppProxy proxy = (BDJAppProxy)db.getAppProxy(id);
                 proxy.release();
             }
+
             ((BDJAppsDatabase)db).newDatabase(null, null);
+
+            PlayerManager.getInstance().releaseAllPlayers(true);
+
             return true;
         } catch (Throwable e) {
-            e.printStackTrace();
+            logger.error("unloadN() failed: " + e + "\n" + Logger.dumpStack(e));
             return false;
         }
     }
@@ -233,4 +300,5 @@ public class BDJLoader {
     private static final Logger logger = Logger.getLogger(BDJLoader.class.getName());
 
     private static BDJActionQueue queue = null;
+    private static VFSCache       vfsCache = null;
 }

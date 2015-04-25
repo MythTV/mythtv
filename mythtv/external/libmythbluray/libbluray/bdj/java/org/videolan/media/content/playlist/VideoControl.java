@@ -37,10 +37,10 @@ public abstract class VideoControl extends StreamControl implements VideoPresent
     protected HScreenRectangle getNormalizedRectangle(Dimension dimension, Rectangle rectangle) {
         if ((dimension.width == 0) || (dimension.height == 0))
             return new HScreenRectangle(0, 0, 0, 0);
-        float x = rectangle.x / dimension.width;
-        float y = rectangle.y / dimension.height;
-        float w = rectangle.width / dimension.width;
-        float h = rectangle.height / dimension.height;
+        float x = (float)rectangle.x / dimension.width;
+        float y = (float)rectangle.y / dimension.height;
+        float w = (float)rectangle.width / dimension.width;
+        float h = (float)rectangle.height / dimension.height;
         return new HScreenRectangle(x, y, w, h);
     }
 
@@ -74,6 +74,7 @@ public abstract class VideoControl extends StreamControl implements VideoPresent
     }
 
     protected void setVideoArea(HScreenRectangle rectangle) {
+        org.videolan.Logger.unimplemented("VideoControl", "setVideoArea");
         dstArea = rectangle;
         // TODO
     }
@@ -119,10 +120,11 @@ public abstract class VideoControl extends StreamControl implements VideoPresent
         if ((vd.width == 0) || (vd.height == 0))
             return new Rectangle(0, 0);
         srcArea = getRectangleOnScreen(getNormalizedRectangle(vd, clipRect));
-        //TODO
-        throw new Error("Not implemented"); // TODO implement
 
-        //return getRectangle(vd, srcArea);
+        //TODO
+        org.videolan.Logger.unimplemented("VideoControl", "setClipRegion");
+
+        return getRectangle(vd, srcArea);
     }
 
     public float[] supportsArbitraryHorizontalScaling() {
@@ -134,11 +136,13 @@ public abstract class VideoControl extends StreamControl implements VideoPresent
     }
 
     public float[] getHorizontalScalingFactors() {
-        throw new Error("Not implemented"); // TODO implement
+        org.videolan.Logger.unimplemented("VideoControl", "getHorizontalScalingFactors");
+        return null;
     }
 
     public float[] getVerticalScalingFactors() {
-        throw new Error("Not implemented"); // TODO implement
+        org.videolan.Logger.unimplemented("VideoControl", "getVerticalScalingFactors");
+        return null;
     }
 
     public byte getPositioningCapability() {
@@ -146,7 +150,8 @@ public abstract class VideoControl extends StreamControl implements VideoPresent
     }
 
     public Component getControlComponent() {
-        throw new Error("Not implemented"); // TODO implement
+        org.videolan.Logger.unimplemented("VideoControl", "getControlComponent");
+        return null;
     }
 
     private int plane = 0;

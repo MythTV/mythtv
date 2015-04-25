@@ -25,6 +25,8 @@ import java.util.LinkedList;
 import javax.media.Control;
 import javax.tv.locator.InvalidLocatorException;
 import javax.tv.locator.Locator;
+import javax.tv.media.MediaSelectFailedEvent;
+import javax.tv.media.MediaSelectSucceededEvent;
 import javax.tv.media.MediaSelectListener;
 import javax.tv.service.selection.InsufficientResourcesException;
 import javax.tv.service.selection.InvalidServiceComponentException;
@@ -32,6 +34,8 @@ import javax.tv.service.selection.InvalidServiceComponentException;
 import org.bluray.media.AsynchronousPiPControl;
 import org.bluray.net.BDLocator;
 import org.dvb.media.DVBMediaSelectControl;
+import org.videolan.BDJListeners;
+import org.videolan.Logger;
 import org.videolan.PlaylistInfo;
 import org.videolan.TIClip;
 
@@ -55,7 +59,8 @@ public class DVBMediaSelectControlImpl implements DVBMediaSelectControl{
         try {
             control.selectStreamNumber(locator.getSecondaryVideoStreamNumber());
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("" + e + "\n" + Logger.dumpStack(e));
+            postMediaSelectFailedEvent(new Locator[] { component });
         }
     }
 
@@ -71,7 +76,12 @@ public class DVBMediaSelectControlImpl implements DVBMediaSelectControl{
             player.getControl("org.bluray.media.AsynchronousPiPControl");
         if (control.getCurrentStreamNumber() != locator.getSecondaryVideoStreamNumber())
             throw new InvalidLocatorException(component);
-        control.stop();
+        try {
+            control.stop();
+        } catch (Exception e) {
+            System.err.println("" + e + "\n" + Logger.dumpStack(e));
+            postMediaSelectFailedEvent(new Locator[] { component });
+        }
     }
 
     public void select(Locator component)
@@ -90,6 +100,7 @@ public class DVBMediaSelectControlImpl implements DVBMediaSelectControl{
         try {
             ((StreamControl)control).selectStreamNumber(stream);
         } catch (Exception e) {
+            postMediaSelectFailedEvent(new Locator[] { component });
             throw new InvalidLocatorException(component);
         }
     }
@@ -125,20 +136,25 @@ public class DVBMediaSelectControlImpl implements DVBMediaSelectControl{
         try {
             ((StreamControl)fromControl).selectStreamNumber(toStream);
         } catch (Exception e) {
+            postMediaSelectFailedEvent(new Locator[] { toComponent });
             throw new InvalidLocatorException(toComponent);
         }
     }
 
     public void addMediaSelectListener(MediaSelectListener listener) {
-        synchronized(listeners) {
-            listeners.add(listener);
-        }
+        listeners.add(listener);
     }
 
     public void removeMediaSelectListener(MediaSelectListener listener) {
-        synchronized(listeners) {
-            listeners.remove(listener);
-        }
+        listeners.remove(listener);
+    }
+
+    private void postMediaSelectFailedEvent(Locator[] selection) {
+        listeners.putCallback(new MediaSelectFailedEvent(player, selection));
+    }
+
+    protected void postMediaSelectSucceededEvent(Locator[] selection) {
+        listeners.putCallback(new MediaSelectSucceededEvent(player, selection));
     }
 
     public Locator[] getCurrentSelection() {
@@ -216,7 +232,7 @@ public class DVBMediaSelectControlImpl implements DVBMediaSelectControl{
         BDLocator bdLocator = (BDLocator)locator;
         if (bdLocator.getComponentTagsCount() != 1)
             return false;
-        if (bdLocator.getPlayListId() != pi.getPlaylist())
+        if (bdLocator.getPlayListId() != -1 && bdLocator.getPlayListId() != pi.getPlaylist())
             return false;
         TIClip ci = player. getCurrentClipInfo();
         if (ci == null)
@@ -252,6 +268,6 @@ public class DVBMediaSelectControlImpl implements DVBMediaSelectControl{
         return null;
     }
 
-    private LinkedList listeners = new LinkedList();
+    private BDJListeners listeners = new BDJListeners();
     private Handler player;
 }

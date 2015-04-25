@@ -166,5 +166,7 @@ public abstract class HScreenConfigTemplate {
         { 720, 480, 16, 9 },
         { 720, 576, 4, 3 },
         { 720, 576, 16, 9 },
+
+        { 960, 540, 16, 9 },
     };
 }

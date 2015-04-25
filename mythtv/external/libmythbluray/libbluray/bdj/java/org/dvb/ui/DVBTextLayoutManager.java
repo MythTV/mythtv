@@ -25,124 +25,145 @@ import org.havi.ui.HVisible;
 
 public class DVBTextLayoutManager implements org.havi.ui.HTextLayoutManager {
 
-    public void render(String markedUpString, java.awt.Graphics g, HVisible v,
-            java.awt.Insets insets)
+    public void render(String markedUpString, java.awt.Graphics g, HVisible v, Insets insets)
     {
-        throw new Error("Not implemented");
+        /* this class is defined in GEM specifications */
+        logger.unimplemented("render(" + markedUpString + ")");
     }
 
     public DVBTextLayoutManager()
     {
-        throw new Error("Not implemented");
+        this(HORIZONTAL_START_ALIGN, VERTICAL_START_ALIGN, LINE_ORIENTATION_HORIZONTAL, START_CORNER_UPPER_LEFT, true,
+             /* linespace = (point size of the default font for HVisible) + 7 */ 12 + 7,
+             0, 56);
     }
 
     public DVBTextLayoutManager(int horizontalAlign, int verticalAlign,
             int lineOrientation, int startCorner, boolean wrap, int linespace,
             int letterspace, int horizontalTabSpace)
     {
-        throw new Error("Not implemented");
+        this.horizontalAlign = horizontalAlign;
+        this.verticalAlign = verticalAlign;
+        this.lineOrientation = lineOrientation;
+        this.startCorner = startCorner;
+        this.wrap = wrap;
+        this.linespace = linespace;
+        this.letterspace = letterspace;
+        this.horizontalTabSpace = horizontalTabSpace;
     }
 
     public void setHorizontalAlign(int horizontalAlign)
     {
-        throw new Error("Not implemented");
+        this.horizontalAlign = horizontalAlign;
     }
 
     public void setVerticalAlign(int verticalAlign)
     {
-        throw new Error("Not implemented");
+        this.verticalAlign = verticalAlign;
     }
 
     public void setLineOrientation(int lineOrientation)
     {
-        throw new Error("Not implemented");
+        this.lineOrientation = lineOrientation;
     }
 
     public void setStartCorner(int startCorner)
     {
-        throw new Error("Not implemented");
+        this.startCorner = startCorner;
     }
 
     public void setTextWrapping(boolean wrap)
     {
-        throw new Error("Not implemented");
+        this.wrap = wrap;
     }
 
     public void setLineSpace(int lineSpace)
     {
-        throw new Error("Not implemented");
+        this.linespace = lineSpace;
     }
 
     public void setLetterSpace(int letterSpace)
     {
-        throw new Error("Not implemented");
+        this.letterspace = letterSpace;
     }
 
     public void setHorizontalTabSpacing(int horizontalTabSpace)
     {
-        throw new Error("Not implemented");
+        this.horizontalTabSpace = horizontalTabSpace;
     }
 
     public int getHorizontalAlign()
     {
-        return HORIZONTAL_START_ALIGN;
+        return horizontalAlign;
     }
 
     public int getVerticalAlign()
     {
-        throw new Error("Not implemented");
+        return verticalAlign;
     }
 
     public int getLineOrientation()
     {
-        throw new Error("Not implemented");
+        return lineOrientation;
     }
 
     public int getStartCorner()
     {
-        throw new Error("Not implemented");
+        return startCorner;
     }
 
     public boolean getTextWrapping()
     {
-        throw new Error("Not implemented");
+        return wrap;
     }
 
     public int getLineSpace()
     {
-        throw new Error("Not implemented");
+        return linespace;
     }
 
     public int getLetterSpace()
     {
-        throw new Error("Not implemented");
+        return letterspace;
     }
 
     public int getHorizontalTabSpacing()
     {
-        throw new Error("Not implemented");
+        return horizontalTabSpace;
     }
 
     public void setInsets(Insets insets)
     {
-        throw new Error("Not implemented");
+        this.insets = insets;
     }
 
     public Insets getInsets()
     {
-        throw new Error("Not implemented");
+        return this.insets;
     }
 
     public void addTextOverflowListener(TextOverflowListener listener)
     {
-        throw new Error("Not implemented");
+        logger.unimplemented("addTextOverflowListener");
     }
 
     public void removeTextOverflowListener(TextOverflowListener listener)
     {
-        throw new Error("Not implemented");
+        logger.unimplemented("removeTextOverflowListener");
     }
-    
+
+    private int horizontalAlign;
+    private int verticalAlign;
+    private int lineOrientation;
+    private int startCorner;
+    private boolean wrap;
+    private int linespace;
+    private int letterspace;
+    private int horizontalTabSpace;
+    private Insets insets = new Insets(0, 0, 0, 0);
+
+    private static final org.videolan.Logger logger = org.videolan.Logger.getLogger(DVBTextLayoutManager.class.getName());
+
     public static final int HORIZONTAL_START_ALIGN = 1;
     public static final int HORIZONTAL_END_ALIGN = 2;
     public static final int HORIZONTAL_CENTER = 3;

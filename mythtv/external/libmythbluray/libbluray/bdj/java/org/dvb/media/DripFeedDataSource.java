@@ -39,6 +39,7 @@ public class DripFeedDataSource extends DataSource {
     }
 
     public void feed(byte[] clip_part) {
+        org.videolan.Logger.unimplemented(DripFeedDataSource.class.getName(), "feed");
         throw new Error("Not implemented");
     }
 
@@ -47,30 +48,37 @@ public class DripFeedDataSource extends DataSource {
     }
 
     public void connect() throws IOException {
+        org.videolan.Logger.unimplemented(DripFeedDataSource.class.getName(), "connect");
         throw new Error("Not implemented");
     }
 
     public void disconnect() {
+        org.videolan.Logger.unimplemented(DripFeedDataSource.class.getName(), "disconnect");
         throw new Error("Not implemented");
     }
 
     public void start() throws IOException {
+        org.videolan.Logger.unimplemented(DripFeedDataSource.class.getName(), "start");
         throw new Error("Not implemented");
     }
 
     public void stop() throws IOException {
+        org.videolan.Logger.unimplemented(DripFeedDataSource.class.getName(), "stop");
         throw new Error("Not implemented");
     }
 
     public Time getDuration() {
+        org.videolan.Logger.unimplemented(DripFeedDataSource.class.getName(), "getDuration");
         throw new Error("Not implemented");
     }
 
     public Object[] getControls() {
+        org.videolan.Logger.unimplemented(DripFeedDataSource.class.getName(), "getControls");
         throw new Error("Not implemented");
     }
 
     public Object getControl(String controlType) {
+        org.videolan.Logger.unimplemented(DripFeedDataSource.class.getName(), "getControls");
         throw new Error("Not implemented");
     }
 

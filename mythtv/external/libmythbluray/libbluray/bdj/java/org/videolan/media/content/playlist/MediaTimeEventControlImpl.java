@@ -31,11 +31,11 @@ public class MediaTimeEventControlImpl implements MediaTimeEventControl {
     }
 
     public void notifyWhen(MediaTimeEventListener listener, long mediaTime, int id) {
-        throw new Error("Not implemented"); // TODO implement
+        org.videolan.Logger.unimplemented("MediaTimeEventControlImpl", "notifyWhen");
     }
 
     public void notifyWhen(MediaTimeEventListener listener, long mediaTime) {
-        throw new Error("Not implemented"); // TODO implement
+        org.videolan.Logger.unimplemented("MediaTimeEventControlImpl", "notifyWhen");
     }
 
 }

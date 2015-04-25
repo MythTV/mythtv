@@ -1,6 +1,7 @@
 /*
  * This file is part of libbluray
  * Copyright (C) 2009-2010  John Stebbins
+ * Copyright (C) 2012  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,11 +18,16 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#include "util/macro.h"
+#include "mpls_parse.h"
+
+#include "extdata_parse.h"
+
+#include "disc/disc.h"
+
 #include "file/file.h"
 #include "util/bits.h"
-#include "extdata_parse.h"
-#include "mpls_parse.h"
+#include "util/logging.h"
+#include "util/macro.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -29,8 +35,6 @@
 #define MPLS_SIG1  ('M' << 24 | 'P' << 16 | 'L' << 8 | 'S')
 #define MPLS_SIG2A ('0' << 24 | '2' << 16 | '0' << 8 | '0')
 #define MPLS_SIG2B ('0' << 24 | '1' << 16 | '0' << 8 | '0')
-
-static int mpls_verbose = 0;
 
 static void
 _human_readable_sig(char *sig, uint32_t s1, uint32_t s2)
@@ -52,6 +56,8 @@ mpls_parse_uo(uint8_t *buf, BD_UO_MASK *uo)
     BITBUFFER bb;
     bb_init(&bb, buf, 8);
 
+    memset(uo, 0, sizeof(BD_UO_MASK));
+
     uo->menu_call                       = bb_read(&bb, 1);
     uo->title_search                    = bb_read(&bb, 1);
     uo->chapter_search                  = bb_read(&bb, 1);
@@ -62,7 +68,7 @@ mpls_parse_uo(uint8_t *buf, BD_UO_MASK *uo)
     uo->stop                            = bb_read(&bb, 1);
     uo->pause_on                        = bb_read(&bb, 1);
     uo->pause_off                       = bb_read(&bb, 1);
-    uo->still                           = bb_read(&bb, 1);
+    uo->still_off                       = bb_read(&bb, 1);
     uo->forward                         = bb_read(&bb, 1);
     uo->backward                        = bb_read(&bb, 1);
     uo->resume                          = bb_read(&bb, 1);
@@ -101,14 +107,18 @@ _parse_uo(BITSTREAM *bits, BD_UO_MASK *uo)
 static int
 _parse_appinfo(BITSTREAM *bits, MPLS_AI *ai)
 {
-    int len;
-    int pos;
+    int64_t pos, len;
 
     if (!bs_is_align(bits, 0x07)) {
-        fprintf(stderr, "_parse_appinfo: alignment error\n");
+        BD_DEBUG(DBG_NAV | DBG_CRIT, "_parse_appinfo: alignment error\n");
     }
     pos = bs_pos(bits) >> 3;
     len = bs_read(bits, 32);
+
+    if (bs_avail(bits) < len * 8) {
+        BD_DEBUG(DBG_NAV | DBG_CRIT, "_parse_appinfo: unexpected end of file\n");
+        return 0;
+    }
 
     // Reserved
     bs_skip(bits, 8);
@@ -132,6 +142,11 @@ _parse_appinfo(BITSTREAM *bits, MPLS_AI *ai)
 static int
 _parse_header(BITSTREAM *bits, MPLS_PL *pl)
 {
+    if (bs_avail(bits) < 5 * 32 + 160) {
+        BD_DEBUG(DBG_NAV | DBG_CRIT, "_parse_header: unexpected end of file\n");
+        return 0;
+    }
+
     pl->type_indicator  = bs_read(bits, 32);
     pl->type_indicator2 = bs_read(bits, 32);
     if (pl->type_indicator != MPLS_SIG1 || 
@@ -143,7 +158,7 @@ _parse_header(BITSTREAM *bits, MPLS_PL *pl)
 
         _human_readable_sig(sig, pl->type_indicator, pl->type_indicator2);
         _human_readable_sig(expect, MPLS_SIG1, MPLS_SIG2A);
-        fprintf(stderr, "failed signature match, expected (%s) got (%s)\n", 
+        BD_DEBUG(DBG_NAV | DBG_CRIT, "failed signature match, expected (%s) got (%s)\n",
                 expect, sig);
         return 0;
     }
@@ -162,10 +177,10 @@ static int
 _parse_stream(BITSTREAM *bits, MPLS_STREAM *s)
 {
     int len;
-    int pos;
+    int64_t pos;
 
     if (!bs_is_align(bits, 0x07)) {
-        fprintf(stderr, "_parse_stream: Stream alignment error\n");
+        BD_DEBUG(DBG_NAV | DBG_CRIT, "_parse_stream: Stream alignment error\n");
     }
     len = bs_read(bits, 8);
     pos = bs_pos(bits) >> 3;
@@ -189,7 +204,7 @@ _parse_stream(BITSTREAM *bits, MPLS_STREAM *s)
             break;
 
         default:
-            fprintf(stderr, "unrecognized stream type %02x\n", s->stream_type);
+            BD_DEBUG(DBG_NAV | DBG_CRIT, "unrecognized stream type %02x\n", s->stream_type);
             break;
     };
 
@@ -222,21 +237,21 @@ _parse_stream(BITSTREAM *bits, MPLS_STREAM *s)
         case 0xa2:
             s->format = bs_read(bits, 4);
             s->rate   = bs_read(bits, 4);
-            bs_read_bytes(bits, s->lang, 3);
+            bs_read_string(bits, s->lang, 3);
             break;
 
         case 0x90:
         case 0x91:
-            bs_read_bytes(bits, s->lang, 3);
+            bs_read_string(bits, s->lang, 3);
             break;
 
         case 0x92:
             s->char_code = bs_read(bits, 8);
-            bs_read_bytes(bits, s->lang, 3);
+            bs_read_string(bits, s->lang, 3);
             break;
 
         default:
-            fprintf(stderr, "unrecognized coding type %02x\n", s->coding_type);
+            BD_DEBUG(DBG_NAV | DBG_CRIT, "unrecognized coding type %02x\n", s->coding_type);
             break;
     };
     s->lang[3] = '\0';
@@ -249,12 +264,12 @@ static int
 _parse_stn(BITSTREAM *bits, MPLS_STN *stn)
 {
     int len;
-    int pos;
+    int64_t pos;
     MPLS_STREAM    *ss;
     int ii,jj;
 
     if (!bs_is_align(bits, 0x07)) {
-        fprintf(stderr, "_parse_stream: Stream alignment error\n");
+        BD_DEBUG(DBG_NAV | DBG_CRIT, "_parse_stream: Stream alignment error\n");
     }
     // Skip STN len
     len = bs_read(bits, 16);
@@ -281,7 +296,7 @@ _parse_stn(BITSTREAM *bits, MPLS_STN *stn)
         for (ii = 0; ii < stn->num_video; ii++) {
             if (!_parse_stream(bits, &ss[ii])) {
                 X_FREE(ss);
-                fprintf(stderr, "error parsing video entry\n");
+                BD_DEBUG(DBG_NAV | DBG_CRIT, "error parsing video entry\n");
                 return 0;
             }
         }
@@ -296,7 +311,7 @@ _parse_stn(BITSTREAM *bits, MPLS_STN *stn)
 
             if (!_parse_stream(bits, &ss[ii])) {
                 X_FREE(ss);
-                fprintf(stderr, "error parsing audio entry\n");
+                BD_DEBUG(DBG_NAV | DBG_CRIT, "error parsing audio entry\n");
                 return 0;
             }
         }
@@ -310,7 +325,7 @@ _parse_stn(BITSTREAM *bits, MPLS_STN *stn)
         for (ii = 0; ii < (stn->num_pg + stn->num_pip_pg); ii++) {
             if (!_parse_stream(bits, &ss[ii])) {
                 X_FREE(ss);
-                fprintf(stderr, "error parsing pg/pip-pg entry\n");
+                BD_DEBUG(DBG_NAV | DBG_CRIT, "error parsing pg/pip-pg entry\n");
                 return 0;
             }
         }
@@ -324,7 +339,7 @@ _parse_stn(BITSTREAM *bits, MPLS_STN *stn)
         for (ii = 0; ii < stn->num_ig; ii++) {
             if (!_parse_stream(bits, &ss[ii])) {
                 X_FREE(ss);
-                fprintf(stderr, "error parsing ig entry\n");
+                BD_DEBUG(DBG_NAV | DBG_CRIT, "error parsing ig entry\n");
                 return 0;
             }
         }
@@ -338,7 +353,7 @@ _parse_stn(BITSTREAM *bits, MPLS_STN *stn)
         for (ii = 0; ii < stn->num_secondary_audio; ii++) {
             if (!_parse_stream(bits, &ss[ii])) {
                 X_FREE(ss);
-                fprintf(stderr, "error parsing secondary audio entry\n");
+                BD_DEBUG(DBG_NAV | DBG_CRIT, "error parsing secondary audio entry\n");
                 return 0;
             }
             // Read Secondary Audio Extra Attributes
@@ -364,7 +379,7 @@ _parse_stn(BITSTREAM *bits, MPLS_STN *stn)
         for (ii = 0; ii < stn->num_secondary_video; ii++) {
             if (!_parse_stream(bits, &ss[ii])) {
                 X_FREE(ss);
-                fprintf(stderr, "error parsing secondary video entry\n");
+                BD_DEBUG(DBG_NAV | DBG_CRIT, "error parsing secondary video entry\n");
                 return 0;
             }
             // Read Secondary Video Extra Attributes
@@ -422,12 +437,12 @@ static int
 _parse_playitem(BITSTREAM *bits, MPLS_PI *pi)
 {
     int len, ii;
-    int pos;
+    int64_t pos;
     char clip_id[6], codec_id[5];
     uint8_t stc_id;
 
     if (!bs_is_align(bits, 0x07)) {
-        fprintf(stderr, "_parse_playitem: Stream alignment error\n");
+        BD_DEBUG(DBG_NAV | DBG_CRIT, "_parse_playitem: Stream alignment error\n");
     }
 
     // PlayItem Length
@@ -435,13 +450,11 @@ _parse_playitem(BITSTREAM *bits, MPLS_PI *pi)
     pos = bs_pos(bits) >> 3;
 
     // Primary Clip identifer
-    bs_read_bytes(bits, (uint8_t*)clip_id, 5);
-    clip_id[5] = '\0';
+    bs_read_string(bits, clip_id, 5);
 
-    bs_read_bytes(bits, (uint8_t*)codec_id, 4);
-    codec_id[4] = '\0';
+    bs_read_string(bits, codec_id, 4);
     if (memcmp(codec_id, "M2TS", 4) != 0) {
-        fprintf(stderr, "Incorrect CodecIdentifier (%s)\n", codec_id);
+        BD_DEBUG(DBG_NAV | DBG_CRIT, "Incorrect CodecIdentifier (%s)\n", codec_id);
     }
 
     // Skip reserved 11 bits
@@ -454,7 +467,7 @@ _parse_playitem(BITSTREAM *bits, MPLS_PI *pi)
         pi->connection_condition != 0x05 &&
         pi->connection_condition != 0x06) {
 
-        fprintf(stderr, "Unexpected connection condition %02x\n", 
+        BD_DEBUG(DBG_NAV | DBG_CRIT, "Unexpected connection condition %02x\n",
                 pi->connection_condition);
     }
 
@@ -487,13 +500,11 @@ _parse_playitem(BITSTREAM *bits, MPLS_PI *pi)
     strcpy(pi->clip[0].codec_id, codec_id);
     pi->clip[0].stc_id = stc_id;
     for (ii = 1; ii < pi->angle_count; ii++) {
-        bs_read_bytes(bits, (uint8_t*)pi->clip[ii].clip_id, 5);
-        pi->clip[ii].clip_id[5] = '\0';
+        bs_read_string(bits, pi->clip[ii].clip_id, 5);
 
-        bs_read_bytes(bits, (uint8_t*)pi->clip[ii].codec_id, 4);
-        pi->clip[ii].codec_id[4] = '\0';
+        bs_read_string(bits, pi->clip[ii].codec_id, 4);
         if (memcmp(pi->clip[ii].codec_id, "M2TS", 4) != 0) {
-            fprintf(stderr, "Incorrect CodecIdentifier (%s)\n", pi->clip[ii].codec_id);
+            BD_DEBUG(DBG_NAV | DBG_CRIT, "Incorrect CodecIdentifier (%s)\n", pi->clip[ii].codec_id);
         }
         pi->clip[ii].stc_id   = bs_read(bits, 8);
     }
@@ -516,12 +527,12 @@ static int
 _parse_subplayitem(BITSTREAM *bits, MPLS_SUB_PI *spi)
 {
     int len, ii;
-    int pos;
+    int64_t pos;
     char clip_id[6], codec_id[5];
     uint8_t stc_id;
 
     if (!bs_is_align(bits, 0x07)) {
-        fprintf(stderr, "_parse_subplayitem: alignment error\n");
+        BD_DEBUG(DBG_NAV | DBG_CRIT, "_parse_subplayitem: alignment error\n");
     }
 
     // PlayItem Length
@@ -529,13 +540,11 @@ _parse_subplayitem(BITSTREAM *bits, MPLS_SUB_PI *spi)
     pos = bs_pos(bits) >> 3;
 
     // Primary Clip identifer
-    bs_read_bytes(bits, (uint8_t*)clip_id, 5);
-    clip_id[5] = '\0';
+    bs_read_string(bits, clip_id, 5);
 
-    bs_read_bytes(bits, (uint8_t*)codec_id, 4);
-    codec_id[4] = '\0';
+    bs_read_string(bits, codec_id, 4);
     if (memcmp(codec_id, "M2TS", 4) != 0) {
-        fprintf(stderr, "Incorrect CodecIdentifier (%s)\n", codec_id);
+        BD_DEBUG(DBG_NAV | DBG_CRIT, "Incorrect CodecIdentifier (%s)\n", codec_id);
     }
 
     bs_skip(bits, 27);
@@ -546,7 +555,7 @@ _parse_subplayitem(BITSTREAM *bits, MPLS_SUB_PI *spi)
         spi->connection_condition != 0x05 &&
         spi->connection_condition != 0x06) {
 
-        fprintf(stderr, "Unexpected connection condition %02x\n", 
+        BD_DEBUG(DBG_NAV | DBG_CRIT, "Unexpected connection condition %02x\n",
                 spi->connection_condition);
     }
     spi->is_multi_clip     = bs_read(bits, 1);
@@ -568,13 +577,11 @@ _parse_subplayitem(BITSTREAM *bits, MPLS_SUB_PI *spi)
     spi->clip[0].stc_id = stc_id;
     for (ii = 1; ii < spi->clip_count; ii++) {
         // Primary Clip identifer
-        bs_read_bytes(bits, (uint8_t*)spi->clip[ii].clip_id, 5);
-        spi->clip[ii].clip_id[5] = '\0';
+        bs_read_string(bits, spi->clip[ii].clip_id, 5);
 
-        bs_read_bytes(bits, (uint8_t*)spi->clip[ii].codec_id, 4);
-        spi->clip[ii].codec_id[4] = '\0';
+        bs_read_string(bits, spi->clip[ii].codec_id, 4);
         if (memcmp(spi->clip[ii].codec_id, "M2TS", 4) != 0) {
-            fprintf(stderr, "Incorrect CodecIdentifier (%s)\n", spi->clip[ii].codec_id);
+            BD_DEBUG(DBG_NAV | DBG_CRIT, "Incorrect CodecIdentifier (%s)\n", spi->clip[ii].codec_id);
         }
         spi->clip[ii].stc_id = bs_read(bits, 8);
     }
@@ -595,11 +602,11 @@ static int
 _parse_subpath(BITSTREAM *bits, MPLS_SUB *sp)
 {
     int len, ii;
-    int pos;
+    int64_t pos;
     MPLS_SUB_PI *spi = NULL;
 
     if (!bs_is_align(bits, 0x07)) {
-        fprintf(stderr, "_parse_subpath: alignment error\n");
+        BD_DEBUG(DBG_NAV | DBG_CRIT, "_parse_subpath: alignment error\n");
     }
 
     // PlayItem Length
@@ -617,7 +624,7 @@ _parse_subpath(BITSTREAM *bits, MPLS_SUB *sp)
     for (ii = 0; ii < sp->sub_playitem_count; ii++) {
         if (!_parse_subplayitem(bits, &spi[ii])) {
             X_FREE(spi);
-            fprintf(stderr, "error parsing sub play item\n");
+            BD_DEBUG(DBG_NAV | DBG_CRIT, "error parsing sub play item\n");
             return 0;
         }
     }
@@ -642,12 +649,19 @@ _clean_subpath(MPLS_SUB *sp)
 static int
 _parse_playlistmark(BITSTREAM *bits, MPLS_PL *pl)
 {
+    int64_t len;
     int ii;
     MPLS_PLM *plm = NULL;
 
     bs_seek_byte(bits, pl->mark_pos);
-    // Skip the length field, I don't use it
-    bs_skip(bits, 32);
+    // length field
+    len = bs_read(bits, 32);
+
+    if (bs_avail(bits) < len * 8) {
+        BD_DEBUG(DBG_NAV | DBG_CRIT, "_parse_playlistmark: unexpected end of file\n");
+        return 0;
+    }
+
     // Then get the number of marks
     pl->mark_count = bs_read(bits, 16);
 
@@ -667,13 +681,20 @@ _parse_playlistmark(BITSTREAM *bits, MPLS_PL *pl)
 static int
 _parse_playlist(BITSTREAM *bits, MPLS_PL *pl)
 {
+    int64_t len;
     int ii;
     MPLS_PI *pi = NULL;
     MPLS_SUB *sub_path = NULL;
 
     bs_seek_byte(bits, pl->list_pos);
-    // Skip playlist length
-    bs_skip(bits, 32);
+    // playlist length
+    len = bs_read(bits, 32);
+
+    if (bs_avail(bits) < len * 8) {
+        BD_DEBUG(DBG_NAV | DBG_CRIT, "_parse_playlist: unexpected end of file\n");
+        return 0;
+    }
+
     // Skip reserved bytes
     bs_skip(bits, 16);
 
@@ -684,7 +705,7 @@ _parse_playlist(BITSTREAM *bits, MPLS_PL *pl)
     for (ii = 0; ii < pl->list_count; ii++) {
         if (!_parse_playitem(bits, &pi[ii])) {
             X_FREE(pi);
-            fprintf(stderr, "error parsing play list item\n");
+            BD_DEBUG(DBG_NAV | DBG_CRIT, "error parsing play list item\n");
             return 0;
         }
     }
@@ -696,7 +717,7 @@ _parse_playlist(BITSTREAM *bits, MPLS_PL *pl)
         if (!_parse_subpath(bits, &sub_path[ii]))
         {
             X_FREE(sub_path);
-            fprintf(stderr, "error parsing subpath\n");
+            BD_DEBUG(DBG_NAV | DBG_CRIT, "error parsing subpath\n");
             return 0;
         }
     }
@@ -742,6 +763,94 @@ mpls_free(MPLS_PL *pl)
 }
 
 static int
+_parse_pip_data(BITSTREAM *bits, MPLS_PIP_METADATA *block)
+{
+    MPLS_PIP_DATA *data;
+    unsigned ii;
+
+    uint16_t entries = bs_read(bits, 16);
+    if (entries < 1) {
+        return 1;
+    }
+
+    data = calloc(entries, sizeof(MPLS_PIP_DATA));
+    for (ii = 0; ii < entries; ii++) {
+
+        data[ii].time = bs_read(bits, 32);
+        data[ii].xpos = bs_read(bits, 12);
+        data[ii].ypos = bs_read(bits, 12);
+        data[ii].scale_factor = bs_read(bits, 4);
+        bs_skip(bits, 4);
+    }
+
+    block->data_count = entries;
+    block->data = data;
+
+    return 1;
+}
+
+static int
+_parse_pip_metadata_block(BITSTREAM *bits, uint32_t start_address, MPLS_PIP_METADATA *data)
+{
+    uint32_t data_address;
+    int result;
+    int64_t pos;
+
+    data->clip_ref            = bs_read(bits, 16);
+    data->secondary_video_ref = bs_read(bits, 8);
+    bs_skip(bits, 8);
+    data->timeline_type       = bs_read(bits, 4);
+    data->luma_key_flag       = bs_read(bits, 1);
+    data->trick_play_flag     = bs_read(bits, 1);
+    bs_skip(bits, 10);
+    if (data->luma_key_flag) {
+        bs_skip(bits, 8);
+        data->upper_limit_luma_key = bs_read(bits, 8);
+    } else {
+        bs_skip(bits, 16);
+    }
+    bs_skip(bits, 16);
+
+    data_address = bs_read(bits, 32);
+
+    pos = bs_pos(bits) / 8;
+    bs_seek_byte(bits, start_address + data_address);
+    result = _parse_pip_data(bits, data);
+    bs_seek_byte(bits, pos);
+
+    return result;
+}
+
+static int
+_parse_pip_metadata_extension(BITSTREAM *bits, MPLS_PL *pl)
+{
+    MPLS_PIP_METADATA *data;
+    int ii;
+
+    uint32_t start_address = (uint32_t)bs_pos(bits) / 8;
+    uint32_t len           = bs_read(bits, 32);
+    int      entries       = bs_read(bits, 16);
+
+    if (len < 1 || entries < 1) {
+        return 0;
+    }
+
+    data = calloc(entries, sizeof(MPLS_PIP_METADATA));
+    for (ii = 0; ii < entries; ii++) {
+      if (!_parse_pip_metadata_block(bits, start_address, data)) {
+            X_FREE(data);
+            BD_DEBUG(DBG_NAV | DBG_CRIT, "error parsing pip metadata extension\n");
+            return 0;
+        }
+    }
+
+    pl->ext_pip_data_count = entries;
+    pl->ext_pip_data       = data;
+
+    return 1;
+}
+
+static int
 _parse_subpath_extension(BITSTREAM *bits, MPLS_PL *pl)
 {
     MPLS_SUB *sub_path;
@@ -758,7 +867,7 @@ _parse_subpath_extension(BITSTREAM *bits, MPLS_PL *pl)
     for (ii = 0; ii < sub_count; ii++) {
         if (!_parse_subpath(bits, &sub_path[ii])) {
             X_FREE(sub_path);
-            fprintf(stderr, "error parsing extension subpath\n");
+            BD_DEBUG(DBG_NAV | DBG_CRIT, "error parsing extension subpath\n");
             return 0;
         }
     }
@@ -773,53 +882,55 @@ _parse_mpls_extension(BITSTREAM *bits, int id1, int id2, void *handle)
 {
     MPLS_PL *pl = (MPLS_PL*)handle;
 
+    if (id1 == 1) {
+        if (id2 == 1) {
+            // PiP metadata extension
+            return _parse_pip_metadata_extension(bits, pl);
+        }
+    }
+
     if (id1 == 2) {
+        if (id2 == 1) {
+            return 0;
+        }
         if (id2 == 2) {
             // SubPath entries extension
             return _parse_subpath_extension(bits, pl);
         }
     }
 
+    BD_DEBUG(DBG_NAV | DBG_CRIT, "_parse_mpls_extension(): unhandled extension %d.%d\n", id1, id2);
+
     return 0;
 }
 
 static MPLS_PL*
-_mpls_parse(const char *path, int verbose)
+_mpls_parse(BD_FILE_H *fp)
 {
     BITSTREAM  bits;
-    BD_FILE_H *fp;
     MPLS_PL   *pl = NULL;
-
-    mpls_verbose = verbose;
 
     pl = calloc(1, sizeof(MPLS_PL));
     if (pl == NULL) {
-        return NULL;
-    }
-
-    fp = file_open(path, "rb");
-    if (fp == NULL) {
-        fprintf(stderr, "Failed to open %s\n", path);
-        X_FREE(pl);
+        BD_DEBUG(DBG_CRIT, "out of memory\n");
         return NULL;
     }
 
     bs_init(&bits, fp);
+
     if (!_parse_header(&bits, pl)) {
-        file_close(fp);
         _clean_playlist(pl);
         return NULL;
     }
     if (!_parse_playlist(&bits, pl)) {
-        file_close(fp);
         _clean_playlist(pl);
         return NULL;
     }
     if (!_parse_playlistmark(&bits, pl)) {
-        file_close(fp);
         _clean_playlist(pl);
         return NULL;
     }
+
     if (pl->ext_pos > 0) {
         bdmv_parse_extension_data(&bits,
                                   pl->ext_pos,
@@ -827,28 +938,53 @@ _mpls_parse(const char *path, int verbose)
                                   pl);
     }
 
+    return pl;
+}
+
+MPLS_PL*
+mpls_parse(const char *path)
+{
+    MPLS_PL   *pl;
+    BD_FILE_H *fp;
+
+    fp = file_open(path, "rb");
+    if (!fp) {
+        BD_DEBUG(DBG_NAV | DBG_CRIT, "Failed to open %s\n", path);
+        return NULL;
+    }
+
+    pl = _mpls_parse(fp);
+    file_close(fp);
+    return pl;
+}
+
+static MPLS_PL*
+_mpls_get(BD_DISC *disc, const char *dir, const char *file)
+{
+    MPLS_PL   *pl;
+    BD_FILE_H *fp;
+
+    fp = disc_open_file(disc, dir, file);
+    if (!fp) {
+        return NULL;
+    }
+
+    pl = _mpls_parse(fp);
     file_close(fp);
     return pl;
 }
 
 MPLS_PL*
-mpls_parse(const char *path, int verbose)
+mpls_get(BD_DISC *disc, const char *file)
 {
-    MPLS_PL *pl = _mpls_parse(path, verbose);
+    MPLS_PL *pl;
 
-    /* if failed, try backup file */
-    if (!pl) {
-        size_t len   = strlen(path);
-        char *backup = malloc(len + 8);
-
-        strncpy(backup, path, len - 19);
-        strcpy(backup + len - 19, "BACKUP/");
-        strcpy(backup + len - 19 + 7, path + len - 19);
-
-        pl = _mpls_parse(backup, verbose);
-
-        X_FREE(backup);
+    pl = _mpls_get(disc, "BDMV" DIR_SEP "PLAYLIST", file);
+    if (pl) {
+        return pl;
     }
 
+    /* if failed, try backup file */
+    pl = _mpls_get(disc, "BDMV" DIR_SEP "BACKUP" DIR_SEP "PLAYLIST", file);
     return pl;
 }

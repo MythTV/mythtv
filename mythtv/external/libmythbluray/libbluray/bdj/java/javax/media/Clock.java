@@ -47,5 +47,5 @@ public interface Clock {
 
     public float setRate(float factor);
 
-    public static final Time RESET = null;
+    public static final Time RESET = new Time(Long.MAX_VALUE);
 }

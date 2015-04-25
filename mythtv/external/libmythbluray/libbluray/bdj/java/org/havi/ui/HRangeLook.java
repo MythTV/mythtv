@@ -27,7 +27,7 @@ import java.awt.Dimension;
 public class HRangeLook implements HExtendedLook, HAdjustableLook {
     public HRangeLook()
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HRangeLook.class.getName(), "");
     }
 
     public void fillBackground(Graphics g, HVisible visible, int state)

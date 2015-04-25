@@ -29,9 +29,8 @@ public abstract class AsynchronousLoadingEvent extends EventObject {
 
     public Object getSource()
     {
-        return source;
+        return super.getSource();
     }
 
-    private DSMCCObject source;
     private static final long serialVersionUID = -688613909871281279L;
 }

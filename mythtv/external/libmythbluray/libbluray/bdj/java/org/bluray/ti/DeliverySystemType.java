@@ -19,12 +19,11 @@
 
 package org.bluray.ti;
 
-public class DeliverySystemType extends
-        javax.tv.service.navigation.DeliverySystemType {
+public class DeliverySystemType extends javax.tv.service.navigation.DeliverySystemType {
+
     protected DeliverySystemType(String name) {
         super(name);
     }
 
-    public static final DeliverySystemType BD_ROM = new DeliverySystemType(
-            "BD_ROM");
+    public static final DeliverySystemType BD_ROM = new DeliverySystemType("BD_ROM");
 }

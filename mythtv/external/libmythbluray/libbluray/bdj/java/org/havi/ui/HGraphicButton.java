@@ -29,39 +29,41 @@ import org.havi.ui.event.HFocusListener;
 public class HGraphicButton extends HIcon implements HActionable {
     public HGraphicButton()
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HGraphicButton.class.getName(), "");
     }
 
     public HGraphicButton(Image image, int x, int y, int width, int height)
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HGraphicButton.class.getName(), "");
     }
 
     public HGraphicButton(Image imageNormal, Image imageFocused,
             Image imageActioned, int x, int y, int width, int height)
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HGraphicButton.class.getName(), "");
     }
 
     public HGraphicButton(Image image)
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HGraphicButton.class.getName(), "");
     }
 
     public HGraphicButton(Image imageNormal, Image imageFocused,
             Image imageActioned)
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HGraphicButton.class.getName(), "");
     }
 
     public static void setDefaultLook(HGraphicLook hlook)
     {
-        throw new Error("Not implemented");
+        DefaultLook = hlook;
     }
 
     public static HGraphicLook getDefaultLook()
     {
-        throw new Error("Not implemented");
+        if (DefaultLook == null)
+            org.videolan.Logger.unimplemented("", "getDefaultLook");
+        return DefaultLook;
     }
 
     public void setMove(int keyCode, HNavigable target)
@@ -159,6 +161,8 @@ public class HGraphicButton extends HIcon implements HActionable {
     {
         throw new Error("Not implemented");
     }
+
+    private static HGraphicLook DefaultLook = null;
 
     private static final long serialVersionUID = 5167775411684840800L;
 }

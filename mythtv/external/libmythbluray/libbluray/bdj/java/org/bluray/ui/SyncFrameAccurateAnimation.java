@@ -1,6 +1,7 @@
 /*
  * This file is part of libbluray
  * Copyright (C) 2010  William Hahne
+ * Copyright (C) 2012  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -25,47 +26,84 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import javax.media.Time;
 
+import org.videolan.Logger;
+
 public class SyncFrameAccurateAnimation extends FrameAccurateAnimation {
     public static SyncFrameAccurateAnimation getInstance(Dimension size,
             int numFrames, AnimationParameters params)
             throws NullPointerException, IllegalArgumentException
     {
-        throw new Error("Not implemented");
+        if (size == null || params == null)
+            throw new NullPointerException();
+        if (numFrames < 1)
+            throw new IllegalArgumentException();
+
+        if ((params.scaleFactor != 1) && (params.scaleFactor != 2)) {
+            throw new IllegalArgumentException();
+        }
+
+        if (params.repeatCount != null) {
+            if (numFrames != params.repeatCount.length) {
+                throw new IllegalArgumentException();
+            }
+
+            for (int i = 0; i < params.repeatCount.length; i++) {
+                if (params.repeatCount[i] < 0) {
+                    throw new IllegalArgumentException();
+                }
+            }
+        }
+
+        return new SyncFrameAccurateAnimation(size, numFrames, params);
+    }
+
+    private SyncFrameAccurateAnimation(Dimension size,
+            int numFrames, AnimationParameters params)
+    {
+        super(params);
+        logger.unimplemented("SyncFrameAccurateAnimation");
     }
 
     public boolean finishDrawing(long frameNumber)
             throws IllegalArgumentException
     {
-        throw new Error("Not implemented");
+        logger.unimplemented("finishDrawing");
+        return true;
     }
 
     public boolean finishDrawing(long frameNumber, Rectangle[] updateArea)
             throws IllegalArgumentException
     {
-        throw new Error("Not implemented");
+        logger.unimplemented("finishDrawing");
+        return true;
     }
 
     public Time getAnimationFrameTime(long animationFrame)
             throws IllegalStateException
     {
-        throw new Error("Not implemented");
+        logger.unimplemented("getAnimationFrameTime");
+        return new Time(40000000);
     }
 
     public void paint(Graphics graphics)
     {
-        throw new Error("Not implemented");
+        logger.unimplemented("paint");
     }
 
     public void setBounds(int x, int y, int width, int height)
     {
-        throw new Error("Not implemented");
+        logger.unimplemented("setBounds");
+        super.setBounds(x, y, width, height);
     }
 
     public Graphics2D startDrawing(long frameNumber)
             throws IllegalArgumentException
     {
-        throw new Error("Not implemented");
+        logger.unimplemented("startDrawing");
+        return null;
     }
 
     private static final long serialVersionUID = -1340138671201204543L;
+
+    private static final Logger logger = Logger.getLogger(SyncFrameAccurateAnimation.class.getName());
 }

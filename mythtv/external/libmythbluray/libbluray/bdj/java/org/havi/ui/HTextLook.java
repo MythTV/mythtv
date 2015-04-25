@@ -1,6 +1,7 @@
 /*
  * This file is part of libbluray
  * Copyright (C) 2010  William Hahne
+ * Copyright (C) 2013  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,64 +20,105 @@
 
 package org.havi.ui;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Dimension;
 import java.awt.Insets;
 
+import org.videolan.Logger;
+
 public class HTextLook implements HExtendedLook {
+
     public HTextLook()
     {
-        throw new Error("Not implemented");
     }
 
     public void fillBackground(Graphics g, HVisible visible, int state)
     {
-        throw new Error("Not implemented");
+        if (visible.getBackgroundMode() == HVisible.BACKGROUND_FILL) {
+            Color color = visible.getBackground();
+            Dimension dimension = visible.getSize();
+            g.setColor(color);
+            g.fillRect(0, 0, dimension.width, dimension.height);
+        }
     }
 
     public void renderBorders(Graphics g, HVisible visible, int state)
     {
-        throw new Error("Not implemented");
+        Insets insets = getInsets(visible);
+        Color fg = visible.getForeground();
+        Dimension dimension = visible.getSize();
+
+        if (fg != null) {
+            g.setColor(fg);
+            g.fillRect(0, 0, dimension.width, insets.top);
+            g.fillRect(dimension.width - insets.right, 0, insets.right, dimension.height);
+            g.fillRect(0, dimension.height - insets.bottom, dimension.width, insets.bottom);
+            g.fillRect(0, 0, insets.left, dimension.height);
+        }
     }
 
     public void renderVisible(Graphics g, HVisible visible, int state)
     {
-        throw new Error("Not implemented");
+        String text = visible.getTextContent(state);
+        Insets insets = getInsets(visible);
+        if (text == null) {
+            return;
+        }
+        logger.unimplemented("renderVisible[text=" + text + "]");
     }
 
     public void showLook(Graphics g, HVisible visible, int state)
     {
-        throw new Error("Not implemented");
+        fillBackground(g, visible, state);
+        renderVisible(g, visible, state);
+        renderBorders(g, visible, state);
     }
 
     public void widgetChanged(HVisible visible, HChangeData[] changes)
     {
-        throw new Error("Not implemented");
+        visible.repaint();
     }
 
     public Dimension getMinimumSize(HVisible hvisible)
     {
-        throw new Error("Not implemented");
+        logger.unimplemented("getMinimumSize");
+        return null;
     }
 
     public Dimension getPreferredSize(HVisible hvisible)
     {
-        throw new Error("Not implemented");
+        logger.unimplemented("getPreferredSize");
+        return null;
     }
 
     public Dimension getMaximumSize(HVisible hvisible)
     {
-        throw new Error("Not implemented");
+        logger.unimplemented("getMAximumSize");
+        return null;
     }
 
     public boolean isOpaque(HVisible visible)
     {
-        throw new Error("Not implemented");
+        if (visible.getBackgroundMode() != 1) {
+            return false;
+        }
+
+        Color bg = visible.getBackground();
+        if ((bg == null) || (bg.getAlpha() < 255)) {
+            return false;
+        }
+
+        return true;
     }
 
-    public Insets getInsets(HVisible hvisible)
+    public Insets getInsets(HVisible visible)
     {
-        throw new Error("Not implemented");
+        if (!visible.getBordersEnabled()) {
+            return new Insets(0, 0, 0, 0);
+        }
+        return new Insets(2, 2, 2, 2);
     }
 
+    private static final Logger logger = Logger.getLogger(HTextLook.class.getName());
 }

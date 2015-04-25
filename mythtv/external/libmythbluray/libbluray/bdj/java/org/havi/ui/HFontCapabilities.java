@@ -24,17 +24,19 @@ import java.awt.Font;
 public class HFontCapabilities {
     protected HFontCapabilities()
     {
-
+        org.videolan.Logger.unimplemented(null, "HFontCapabilities");
     }
 
     public static int[] getSupportedCharacterRanges(Font font)
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented("HFontCapabilities", "getSupportedCharacterRanges");
+        return null;
     }
 
     public static boolean isCharAvailable(Font font, char c)
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented("HFontCapabilities", "isCharAvailable");
+        return true;
     }
 
     public static final int BASIC_LATIN = 1;

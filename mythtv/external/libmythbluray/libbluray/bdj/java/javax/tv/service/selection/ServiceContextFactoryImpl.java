@@ -37,6 +37,10 @@ public class ServiceContextFactoryImpl extends ServiceContextFactory {
         return instance;
     }
 
+    public static void shutdown() {
+        instance = null;
+    }
+
     public ServiceContext createServiceContext()
             throws InsufficientResourcesException, SecurityException
     {

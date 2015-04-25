@@ -91,10 +91,10 @@ public class HEventGroup {
         int[] arr = new int[keys.size()];
 
         for (int i = 0; i < keys.size(); i++)
-            arr[i] = keys.get(i).intValue();
+            arr[i] = ((Integer)keys.get(i)).intValue();
 
         return arr;
     }
 
-    private LinkedList<Integer> keys;
+    private LinkedList keys = new LinkedList();
 }

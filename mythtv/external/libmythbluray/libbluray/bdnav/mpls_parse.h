@@ -1,6 +1,7 @@
 /*
  * This file is part of libbluray
  * Copyright (C) 2009-2010  John Stebbins
+ * Copyright (C) 2012       Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,7 +23,7 @@
 
 #include "uo_mask_table.h"
 
-#include <util/attributes.h>
+#include "util/attributes.h"
 
 #include <stdint.h>
 
@@ -39,7 +40,7 @@ typedef struct
     uint8_t         format;
     uint8_t         rate;
     uint8_t         char_code;
-    uint8_t         lang[4];
+    char            lang[4];
     // Secondary audio specific fields
     uint8_t         sa_num_primary_audio_ref;
     uint8_t        *sa_primary_audio_ref;
@@ -131,7 +132,26 @@ typedef struct
     MPLS_SUB_PI     *sub_play_item;
 } MPLS_SUB;
 
-typedef struct
+typedef struct {
+    uint32_t        time;
+    uint16_t        xpos;
+    uint16_t        ypos;
+    uint8_t         scale_factor;
+} MPLS_PIP_DATA;
+
+typedef struct {
+    uint16_t        clip_ref;
+    uint8_t         secondary_video_ref;
+    uint8_t         timeline_type;
+    uint8_t         luma_key_flag;
+    uint8_t         upper_limit_luma_key;
+    uint8_t         trick_play_flag;
+
+    uint16_t        data_count;
+    MPLS_PIP_DATA   *data;
+} MPLS_PIP_METADATA;
+
+typedef struct mpls_pl
 {
     uint32_t        type_indicator;
     uint32_t        type_indicator2;
@@ -149,10 +169,18 @@ typedef struct
     // extension data (profile 5, version 2.4)
     uint16_t        ext_sub_count;
     MPLS_SUB       *ext_sub_path;  // sub path entries extension
+
+    // extension data (Picture-In-Picture metadata)
+    uint16_t           ext_pip_data_count;
+    MPLS_PIP_METADATA *ext_pip_data;  // pip metadata extension
+
 } MPLS_PL;
 
 
-BD_PRIVATE MPLS_PL* mpls_parse(const char *path, int verbose);
+struct bd_disc;
+
+BD_PRIVATE MPLS_PL* mpls_parse(const char *path) BD_ATTR_MALLOC;
+BD_PRIVATE MPLS_PL* mpls_get(struct bd_disc *disc, const char *file);
 BD_PRIVATE void mpls_free(MPLS_PL *pl);
 
 BD_PRIVATE int  mpls_parse_uo(uint8_t *buf, BD_UO_MASK *uo);

@@ -3,7 +3,7 @@
 #include <QCoreApplication>
 
 #include "libbluray/bdnav/mpls_parse.h"
-#include "libbluray/bdnav/meta_parse.h"
+#include "libbluray/bdnav/meta_data.h"
 #include "libbluray/bdnav/navigation.h"
 #include "libbluray/bdnav/bdparse.h"
 #include "libbluray/decoders/overlay.h"

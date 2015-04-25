@@ -38,6 +38,7 @@ public class FileAttributes {
 
     public Date getExpirationDate()
     {
+        org.videolan.Logger.unimplemented(FileAttributes.class.getName(), "getExpirationDate");
         return null;
     }
 
@@ -69,6 +70,7 @@ public class FileAttributes {
     public static void setFileAttributes(FileAttributes p, File f)
             throws IOException
     {
+        org.videolan.Logger.unimplemented(FileAttributes.class.getName(), "setFileAttributes");
         // not implemented
     }
 

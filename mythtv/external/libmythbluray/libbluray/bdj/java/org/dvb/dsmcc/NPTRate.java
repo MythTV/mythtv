@@ -19,7 +19,9 @@
 
 package org.dvb.dsmcc;
 
-public class NPTRate {
+import java.io.Serializable;
+
+public class NPTRate implements Serializable {
 
     // should only be called internally
     public NPTRate(int numerator, int denominator)
@@ -40,4 +42,6 @@ public class NPTRate {
 
     private int numerator;
     private int denominator;
+
+    private static final long serialVersionUID = 1L;
 }

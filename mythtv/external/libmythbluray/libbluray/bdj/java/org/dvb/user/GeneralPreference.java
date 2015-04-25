@@ -33,5 +33,9 @@ public final class GeneralPreference extends Preference {
         return false;
     }
 
-    private static final String[] GENERAL_PREFERENCES = { "User Language", "Parental Rating", "User Name", "User Address", "User @", "Country Code", "Default Font Size" };
+    private static final String[] GENERAL_PREFERENCES = {
+        // DVB GEM
+        "User Language", "Parental Rating", "User Name", "User Address", "User @", "Country Code", "Default Font Size",
+        // BD-ROM
+        "User Language Audio", "User Language Subtitles" };
 }

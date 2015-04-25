@@ -27,64 +27,30 @@
 #include "util/logging.h"
 #include "util/strutl.h"
 
-#if defined(_WIN32)
-#   include <windows.h>
-#elif defined(HAVE_DLFCN_H)
+#if defined(HAVE_DLFCN_H)
 #   include <dlfcn.h>
 #elif defined(HAVE_SYS_DL_H)
 #   include <sys/dl.h>
 #endif
 
-#if defined(_WIN32)
-static const char *dlerror(char *buf, int buf_size)
-{
-    DWORD error_code = GetLastError();
-    wchar_t wbuf[256];
+#include <string.h>
 
-    if (FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS |
-                       FORMAT_MESSAGE_MAX_WIDTH_MASK,
-                       NULL, error_code, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                       wbuf, sizeof(wbuf)/sizeof(wbuf[0]), NULL)) {
-        WideCharToMultiByte(CP_UTF8, 0, wbuf, -1, buf, buf_size, NULL, NULL);
-    } else {
-#ifdef _MSC_VER
-        _snprintf(buf, buf_size, "error %d", (int)error_code);
-#else
-        snprintf(buf, buf_size, "error %d", (int)error_code);
-#endif
-    }
-
-    return buf;
-}
-#endif /* _WIN32 */
-
-static void   *_dl_dlopen  ( const char* path )
+static void *_dl_dlopen(const char *path)
 {
     void *result;
 
     BD_DEBUG(DBG_FILE, "searching for library '%s' ...\n", path);
 
-#if defined(_WIN32)
-    wchar_t wname[MAX_PATH];
-    MultiByteToWideChar(CP_UTF8, 0, path, -1, wname, MAX_PATH);
-    result = LoadLibraryW(wname);
-
-    if (!result) {
-        char buf[128];
-        BD_DEBUG(DBG_FILE, "can't open library '%s': %s\n", path, dlerror(buf, sizeof(buf)));
-    }
-#else
     result = dlopen(path, RTLD_LAZY);
 
     if (!result) {
         BD_DEBUG(DBG_FILE, "can't open library '%s': %s\n", path, dlerror());
     }
-#endif
 
     return result;
 }
 
-void   *dl_dlopen  ( const char* path, const char *version )
+void *dl_dlopen(const char *path, const char *version)
 {
     char *name;
     void *dll;
@@ -103,10 +69,6 @@ void   *dl_dlopen  ( const char* path, const char *version )
                                          "@executable_path/lib/", "@executable_path/../lib/",
                                          "@executable_path/../Resources/", "@rpath/", NULL};
     version = NULL;
-#elif defined(_WIN32)
-    static const char ext[] = ".dll";
-    static const char *search_paths[] = {"", NULL};
-    version = NULL;
 #else
     static const char ext[] = ".so";
     static const char *search_paths[] = {"", NULL};
@@ -119,7 +81,7 @@ void   *dl_dlopen  ( const char* path, const char *version )
             name = str_printf("%s%s%s", search_paths[i], path, ext);
         }
 
-        fprintf (stderr, "Attempting to open %s\n", name);
+        BD_DEBUG(DBG_FILE, "Attempting to open %s\n", name);
 
         dll = _dl_dlopen (name);
         X_FREE(name);
@@ -131,32 +93,32 @@ void   *dl_dlopen  ( const char* path, const char *version )
     return NULL;
 }
 
-void   *dl_dlsym   ( void* handle, const char* symbol )
+void *dl_dlsym(void *handle, const char *symbol)
 {
-#if defined(_WIN32)
-    void *result = (void *)GetProcAddress((HMODULE)handle, symbol);
-
-    if (!result) {
-        char buf[128];
-        BD_DEBUG(DBG_FILE | DBG_CRIT, "GetProcAddress(%p, '%s') failed: %s\n", handle, symbol, dlerror(buf, sizeof(buf)));
-    }
-#else
     void *result = dlsym(handle, symbol);
 
     if (!result) {
-        BD_DEBUG(DBG_FILE | DBG_CRIT, "dlsym(%p, '%s') failed: %s\n", handle, symbol, dlerror());
+        BD_DEBUG(DBG_FILE, "dlsym(%p, '%s') failed: %s\n", handle, symbol, dlerror());
     }
-#endif
 
     return result;
 }
 
-int     dl_dlclose ( void* handle )
+int dl_dlclose(void *handle)
 {
-#if defined(_WIN32)
-    FreeLibrary((HMODULE)handle);
-    return 0;
-#else
     return dlclose(handle);
-#endif
+}
+
+const char *dl_get_path(void)
+{
+    static char *lib_path    = NULL;
+    static int   initialized = 0;
+
+    if (!initialized) {
+        initialized = 1;
+
+        BD_DEBUG(DBG_FILE, "Can't determine libbluray.so install path\n");
+    }
+
+    return lib_path;
 }

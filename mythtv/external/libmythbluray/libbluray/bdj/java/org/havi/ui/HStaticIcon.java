@@ -20,37 +20,45 @@
 package org.havi.ui;
 
 import java.awt.Image;
+import org.videolan.BDJXletContext;
 
 public class HStaticIcon extends HVisible implements HNoInputPreferred {
     public HStaticIcon()
     {
-        throw new Error("Not implemented");
+        super(getDefaultLook());
     }
 
     public HStaticIcon(Image imageNormal, int x, int y, int width, int height)
     {
-        throw new Error("Not implemented");
+        super(getDefaultLook(), x, y, width, height);
+        setGraphicContent(imageNormal, NORMAL_STATE);
     }
 
     public HStaticIcon(Image imageNormal)
     {
-        throw new Error("Not implemented");
+        super(getDefaultLook());
+        setGraphicContent(imageNormal, NORMAL_STATE);
     }
 
     public void setLook(HLook hlook) throws HInvalidLookException
     {
-        throw new Error("Not implemented");
+        if ((hlook != null) && !(hlook instanceof HGraphicLook)) {
+            throw new HInvalidLookException();
+        }
+        super.setLook(hlook);
     }
 
     public static void setDefaultLook(HGraphicLook hlook)
     {
-        throw new Error("Not implemented");
+        BDJXletContext.setXletDefaultLook(PROPERTY_LOOK,hlook);
     }
 
     public static HGraphicLook getDefaultLook()
     {
-        throw new Error("Not implemented");
+        return (HGraphicLook) BDJXletContext.getXletDefaultLook(PROPERTY_LOOK,DEFAULT_LOOK);
     }
 
+    private static final String PROPERTY_LOOK = "HStaticIcon";
+    static final Class DEFAULT_LOOK = HGraphicLook.class;
     private static final long serialVersionUID = 2015589998794748072L;
 }

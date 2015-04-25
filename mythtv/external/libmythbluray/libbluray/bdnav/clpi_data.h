@@ -1,6 +1,7 @@
 /*
  * This file is part of libbluray
  * Copyright (C) 2009-2010  John Stebbins
+ * Copyright (C) 2012-2013  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -47,15 +48,24 @@ typedef struct
 typedef struct
 {
     uint8_t           validity;
-    uint8_t           format_id[5];
+    char              format_id[5];
 } CLPI_TS_TYPE;
 
 typedef struct
 {
     uint32_t          delta;
-    uint8_t           file_id[6];
-    uint8_t           file_code[5];
+    char              file_id[6];
+    char              file_code[5];
 } CLPI_ATC_DELTA;
+
+typedef struct {
+    char              file_id[6];
+} CLPI_FONT;
+
+typedef struct {
+    uint8_t           font_count;
+    CLPI_FONT        *font;
+} CLPI_FONT_INFO;
 
 typedef struct
 {
@@ -67,6 +77,10 @@ typedef struct
     CLPI_TS_TYPE      ts_type_info;
     uint8_t           atc_delta_count;
     CLPI_ATC_DELTA   *atc_delta;
+
+    /* breaks ABI if added here ...
+    CLPI_FONT_INFO    font_info;
+    */
 } CLPI_CLIP_INFO;
 
 typedef struct
@@ -78,7 +92,7 @@ typedef struct
     uint8_t           aspect;
     uint8_t           oc_flag;
     uint8_t           char_code;
-    uint8_t           lang[4];
+    char              lang[4];
 } CLPI_PROG_STREAM;
 
 typedef struct
@@ -156,6 +170,8 @@ typedef struct clpi_cl {
     CLPI_PROG_INFO    program_ss;
     CLPI_CPI          cpi_ss;
 
+    /* Text subtitle stream font files */
+    CLPI_FONT_INFO    font_info;
 } CLPI_CL;
 
 #endif // _CLPI_DATA_H_

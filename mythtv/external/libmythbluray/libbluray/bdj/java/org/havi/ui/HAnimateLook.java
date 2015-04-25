@@ -25,7 +25,7 @@ import java.awt.Dimension;
 public class HAnimateLook implements HExtendedLook {
     public HAnimateLook()
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HAnimateLook.class.getName(), "");
     }
 
     public void fillBackground(Graphics g, HVisible visible, int state)

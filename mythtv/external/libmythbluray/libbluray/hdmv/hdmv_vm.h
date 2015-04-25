@@ -20,7 +20,7 @@
 #if !defined(_HDMV_VM_H_)
 #define _HDMV_VM_H_
 
-#include <util/attributes.h>
+#include "util/attributes.h"
 
 #include <stdint.h>
 
@@ -33,6 +33,10 @@ typedef enum {
     HDMV_EVENT_END,            /* end of program (movie object) */
     HDMV_EVENT_IG_END,         /* end of program (interactive) */
 
+    /*
+     * playback control
+     */
+
     HDMV_EVENT_TITLE,          /* play title (from disc index) */
     HDMV_EVENT_PLAY_PL,        /* select playlist */
     HDMV_EVENT_PLAY_PI,        /* seek to playitem */
@@ -41,6 +45,9 @@ typedef enum {
 
     HDMV_EVENT_STILL,          /* param: boolean */
 
+    /*
+     * -> graphics controller
+     */
     HDMV_EVENT_SET_BUTTON_PAGE,
     HDMV_EVENT_ENABLE_BUTTON,
     HDMV_EVENT_DISABLE_BUTTON,
@@ -58,7 +65,7 @@ typedef struct hdmv_vm_event_s {
  */
 
 struct bd_registers_s;
-struct indx_root_s;
+struct bd_disc;
 
 /*
  *
@@ -66,10 +73,11 @@ struct indx_root_s;
 
 typedef struct hdmv_vm_s HDMV_VM;
 
-BD_PRIVATE HDMV_VM *hdmv_vm_init(const char *disc_root, struct bd_registers_s *regs, struct indx_root_s *indx);
+BD_PRIVATE HDMV_VM *hdmv_vm_init(struct bd_disc *disc, struct bd_registers_s *regs,
+                                 unsigned num_titles, unsigned first_play_available, unsigned top_menu_available);
 BD_PRIVATE void     hdmv_vm_free(HDMV_VM **p);
 
-BD_PRIVATE int      hdmv_vm_select_object(HDMV_VM *p, int object);
+BD_PRIVATE int      hdmv_vm_select_object(HDMV_VM *p, uint32_t object);
 BD_PRIVATE int      hdmv_vm_set_object(HDMV_VM *p, int num_nav_cmds, void *nav_cmds);
 BD_PRIVATE int      hdmv_vm_run(HDMV_VM *p, HDMV_EVENT *ev);
 BD_PRIVATE int      hdmv_vm_get_event(HDMV_VM *p, HDMV_EVENT *ev);
@@ -110,5 +118,16 @@ BD_PRIVATE int      hdmv_vm_suspend_pl(HDMV_VM *p);
  * @return 0 on success, -1 if error
  */
 BD_PRIVATE int      hdmv_vm_resume(HDMV_VM *p);
+
+
+/*
+ * save / restore VM state
+ */
+
+/* VM state size */
+#define HDMV_STATE_SIZE 10  /* * sizeof(uint32_t) */
+
+BD_PRIVATE int hdmv_vm_save_state(HDMV_VM *p, uint32_t *s);
+BD_PRIVATE void hdmv_vm_restore_state(HDMV_VM *p, const uint32_t *s);
 
 #endif // _HDMV_VM_H_

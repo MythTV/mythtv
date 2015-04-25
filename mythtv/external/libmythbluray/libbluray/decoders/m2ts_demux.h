@@ -20,7 +20,7 @@
 #if !defined(_M2TS_DEMUX_H_)
 #define _M2TS_DEMUX_H_
 
-#include <util/attributes.h>
+#include "util/attributes.h"
 
 #include <stdint.h>
 

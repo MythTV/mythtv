@@ -1,6 +1,7 @@
 /*
  * This file is part of libbluray
  * Copyright (C) 2010  William Hahne
+ * Copyright (C) 2013  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,78 +21,112 @@
 package org.havi.ui;
 
 public class HFlatEffectMatte implements HMatte, HAnimateEffect {
+
+    private int delay = 1;
+    private boolean isAnimated = false;
+    private float[] matteData = null;
+    private int mode = PLAY_REPEATING;
+    private int position = 0;
+    private int repeatCount = -1;
+
     public HFlatEffectMatte()
     {
-        throw new Error("Not implemented");
     }
 
     public HFlatEffectMatte(float[] data)
     {
-        throw new Error("Not implemented");
+        this();
+        setMatteData(data);
     }
 
     public void setMatteData(float[] data)
     {
-        throw new Error("Not implemented");
+        if (data == null) {
+            matteData = null;
+            return;
+        }
+        if (data.length == 0) {
+            org.videolan.Logger.getLogger("HFlatEffectMatte").error("setMatteData: empty data");
+            throw new IllegalArgumentException("empty data");
+        }
+        matteData = data;
     }
 
     public float[] getMatteData()
     {
-        throw new Error("Not implemented");
+        return matteData;
     }
 
     public void start()
     {
-        throw new Error("Not implemented");
+        isAnimated = true;
     }
 
     public void stop()
     {
-        throw new Error("Not implemented");
+        isAnimated = false;
     }
 
     public boolean isAnimated()
     {
-        throw new Error("Not implemented");
+        return isAnimated;
     }
 
     public void setPosition(int position)
     {
-        throw new Error("Not implemented");
+        if (matteData == null)
+            return;
+        if (position < 0)
+            position = 0;
+        if (position >= matteData.length) {
+            position = matteData.length - 1;
+        }
+        this.position = position;
     }
 
     public int getPosition()
     {
-        throw new Error("Not implemented");
+        return position;
     }
 
     public void setRepeatCount(int count)
     {
-        throw new Error("Not implemented");
+        if (count <= 0 && count != -1) {
+            org.videolan.Logger.getLogger("HImageEffectMatte").error("setRepeatCount(): invalid count");
+            throw new IllegalArgumentException("setRepeatCount(): invalid count");
+        }
+
+        repeatCount = count;
     }
 
     public int getRepeatCount()
     {
-        throw new Error("Not implemented");
+        return repeatCount;
     }
 
     public void setDelay(int count)
     {
-        throw new Error("Not implemented");
+        if (count < 1)
+            count = 1;
+        delay = count;
     }
 
     public int getDelay()
     {
-        throw new Error("Not implemented");
+        return delay;
     }
 
     public void setPlayMode(int mode)
     {
-        throw new Error("Not implemented");
+        if (mode != PLAY_REPEATING && mode != PLAY_ALTERNATING) {
+            org.videolan.Logger.getLogger("HFlatEffectMatte").error("setPlayMode(): invalid mode");
+            throw new IllegalArgumentException("setPlayMode(): invalid mode");
+        }
+        this.mode = mode;
     }
 
     public int getPlayMode()
     {
-        throw new Error("Not implemented");
+        return mode;
     }
 }

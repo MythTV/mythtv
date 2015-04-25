@@ -17,14 +17,17 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#include "meta_data.h"
-
 #if !defined(_META_PARSE_H_)
 #define _META_PARSE_H_
 
-BD_PRIVATE META_ROOT* meta_parse(const char *device_path);
-BD_PRIVATE void       meta_free(META_ROOT **index);
-BD_PRIVATE const META_DL* meta_get(const META_ROOT *meta_root, const char *language_code);
+#include "util/attributes.h"
+
+struct bd_disc;
+struct meta_root;
+
+BD_PRIVATE struct meta_root *     meta_parse(struct bd_disc *disc) BD_ATTR_MALLOC;
+BD_PRIVATE void                   meta_free (struct meta_root **index);
+BD_PRIVATE const struct meta_dl * meta_get  (const struct meta_root *meta_root, const char *language_code);
 
 #endif // _META_PARSE_H_
 

@@ -20,16 +20,18 @@
 package org.videolan.media.content.playlist;
 
 import java.util.EventObject;
-import java.util.LinkedList;
 
 import org.bluray.media.StreamNotAvailableException;
 import org.bluray.media.SubtitleStyleNotAvailableException;
 import org.bluray.media.SubtitlingControl;
 import org.bluray.media.TextSubtitleNotAvailableException;
 import org.bluray.ti.CodingType;
+import org.dvb.media.SubtitleAvailableEvent;
 import org.dvb.media.SubtitleListener;
-import org.videolan.BDJAction;
-import org.videolan.BDJActionManager;
+import org.dvb.media.SubtitleNotAvailableEvent;
+import org.dvb.media.SubtitleNotSelectedEvent;
+import org.dvb.media.SubtitleSelectedEvent;
+import org.videolan.BDJListeners;
 import org.videolan.Libbluray;
 import org.videolan.StreamInfo;
 import org.videolan.TIClip;
@@ -55,8 +57,7 @@ public class SubtitlingControlImpl extends StreamControl implements SubtitlingCo
     }
 
     protected void setStreamNumber(int num) {
-        int psr = Libbluray.readPSR(Libbluray.PSR_PG_STREAM);
-        Libbluray.writePSR(Libbluray.PSR_PG_STREAM, (psr & 0xFFFFF000) | num);
+        Libbluray.writePSR(Libbluray.PSR_PG_STREAM, num, 0x00000fff);
     }
 
     public boolean isSubtitlingOn() {
@@ -64,14 +65,8 @@ public class SubtitlingControlImpl extends StreamControl implements SubtitlingCo
     }
 
     public boolean setSubtitling(boolean mode) {
-        int psr = Libbluray.readPSR(Libbluray.PSR_PG_STREAM);
-        boolean oldMode = (psr & 0x80000000) != 0;
-        if (mode != oldMode) {
-            if (mode)
-                Libbluray.writePSR(Libbluray.PSR_PG_STREAM, psr | 0x80000000);
-            else
-                Libbluray.writePSR(Libbluray.PSR_PG_STREAM, psr & ~0x80000000);
-        }
+        boolean oldMode = (Libbluray.readPSR(Libbluray.PSR_PG_STREAM) & 0x80000000) != 0;
+        Libbluray.writePSR(Libbluray.PSR_PG_STREAM, mode ? 0x80000000 : 0, 0x80000000);
         return oldMode;
     }
 
@@ -84,14 +79,8 @@ public class SubtitlingControlImpl extends StreamControl implements SubtitlingCo
     }
 
     public boolean setPipSubtitleMode(boolean mode) {
-        int psr = Libbluray.readPSR(Libbluray.PSR_PG_STREAM);
-        boolean oldMode = (psr & 0x40000000) != 0;
-        if (mode != oldMode) {
-            if (mode)
-                Libbluray.writePSR(Libbluray.PSR_PG_STREAM, psr | 0x40000000);
-            else
-                Libbluray.writePSR(Libbluray.PSR_PG_STREAM, psr & ~0x40000000);
-        }
+        boolean oldMode = (Libbluray.readPSR(Libbluray.PSR_PG_STREAM) & 0x40000000) != 0;
+        Libbluray.writePSR(Libbluray.PSR_PG_STREAM, mode ? 0x40000000 : 0, 0x40000000);
         return oldMode;
     }
 
@@ -125,42 +114,29 @@ public class SubtitlingControlImpl extends StreamControl implements SubtitlingCo
     }
 
     public void addSubtitleListener(SubtitleListener listener) {
-        synchronized(listeners) {
-            listeners.add(listener);
-        }
+        listeners.add(listener);
     }
 
     public void removeSubtitleListener(SubtitleListener listener) {
-        synchronized(listeners) {
-            listeners.remove(listener);
-        }
+        listeners.remove(listener);
     }
 
     protected void onSubtitleChange(int param) {
-        synchronized (listeners) {
-            if (!listeners.isEmpty())
-                BDJActionManager.getInstance().putCallback(
-                        new SubtitleCallback(this));
+        if ((param & 0x80000000) != 0) {
+            listeners.putCallback(new SubtitleSelectedEvent(this));
+        } else {
+            listeners.putCallback(new SubtitleNotSelectedEvent(this));
         }
     }
 
-    private class SubtitleCallback extends BDJAction {
-        private SubtitleCallback(SubtitlingControlImpl control) {
-            this.control = control;
+    protected void onSubtitleAvailable(boolean param) {
+        if (param) {
+            listeners.putCallback(new SubtitleAvailableEvent(this));
+        } else {
+            listeners.putCallback(new SubtitleNotAvailableEvent(this));
         }
-
-        protected void doAction() {
-            LinkedList list;
-            synchronized (control.listeners) {
-                list = (LinkedList)control.listeners.clone();
-            }
-            EventObject event = new EventObject(control);
-            for (int i = 0; i < list.size(); i++)
-                ((SubtitleListener)list.get(i)).subtitleStatusChanged(event);
-        }
-
-        private SubtitlingControlImpl control;
     }
 
-    private LinkedList<SubtitleListener> listeners = new LinkedList<SubtitleListener>();
+
+    private BDJListeners listeners = new BDJListeners();
 }

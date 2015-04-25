@@ -20,14 +20,12 @@
 package org.videolan.media.content.playlist;
 
 import java.awt.Component;
-import java.util.LinkedList;
 
 import org.bluray.media.AngleChangeEvent;
 import org.bluray.media.AngleChangeListener;
 import org.bluray.media.AngleControl;
 import org.bluray.media.InvalidAngleException;
-import org.videolan.BDJAction;
-import org.videolan.BDJActionManager;
+import org.videolan.BDJListeners;
 import org.videolan.Libbluray;
 import org.videolan.PlaylistInfo;
 
@@ -52,7 +50,7 @@ public class AngleControlImpl implements AngleControl {
     }
 
     public void selectDefaultAngle() {
-        Libbluray.selectAngle(0);
+        Libbluray.selectAngle(1);
     }
 
     public void selectAngle(int angle) throws InvalidAngleException {
@@ -69,33 +67,9 @@ public class AngleControlImpl implements AngleControl {
     }
 
     protected void onAngleChange(int angle) {
-        synchronized (listeners) {
-            if (!listeners.isEmpty())
-                BDJActionManager.getInstance().putCallback(
-                        new AngleCallback(this, angle));
-        }
+        listeners.putCallback(new AngleChangeEvent(this, angle));
     }
 
-    private class AngleCallback extends BDJAction {
-        private AngleCallback(AngleControlImpl control, int angle) {
-            this.control = control;
-            this.angle = angle;
-        }
-
-        protected void doAction() {
-            LinkedList list;
-            synchronized (control.listeners) {
-                list = (LinkedList)control.listeners.clone();
-            }
-            AngleChangeEvent event = new AngleChangeEvent(control, angle);
-            for (int i = 0; i < list.size(); i++)
-                ((AngleChangeListener)list.get(i)).angleChange(event);
-        }
-
-        private AngleControlImpl control;
-        private int angle;
-    }
-
-    private LinkedList listeners = new LinkedList();
+    private BDJListeners listeners = new BDJListeners();
     private Handler player;
 }

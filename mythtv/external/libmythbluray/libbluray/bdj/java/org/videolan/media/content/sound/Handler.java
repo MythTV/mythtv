@@ -18,9 +18,7 @@
 
 package org.videolan.media.content.sound;
 
-import java.awt.Component;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import javax.media.ClockStartedError;
 import javax.media.ClockStoppedException;
@@ -37,166 +35,58 @@ import javax.media.Time;
 import javax.media.TimeBase;
 import javax.media.protocol.DataSource;
 
+import org.bluray.net.BDLocator;
+
 //import org.videolan.media.content.playlist.MediaTimePositionControlImpl;
 import org.videolan.media.content.playlist.OverallGainControlImpl;
 import org.videolan.media.content.playlist.PanningControlImpl;
 
-public class Handler implements Player {
+import org.videolan.media.content.BDHandler;
+
+import org.videolan.BDJListeners;
+
+public class Handler extends BDHandler {
     public Handler() {
         controls = new Control[3];
         controls[0] = new MediaTimePositionControlImpl(this);
-        controls[1] = new OverallGainControlImpl();
-        controls[2] = new PanningControlImpl();
+        controls[1] = new OverallGainControlImpl(this);
+        controls[2] = new PanningControlImpl(this);
     }
 
     public void setSource(DataSource source) throws IOException, IncompatibleSourceException {
         this.source = new org.videolan.media.protocol.dripfeed.DataSource(source.getLocator());
         if (source.getLocator() == null)
             throw new IncompatibleSourceException();
-    }
 
-    public int getState() {
-        synchronized (this) {
-            return state;
-        }
-    }
-
-    public int getTargetState() {
-        synchronized (this) {
-            return targetState;
-        }
-    }
-
-    public Time getStartLatency() {
-        return null;
-    }
-
-    public Control[] getControls() {
-        return controls;
-    }
-
-    public Control getControl(String forName) {
-        try {
-            Class cls = Class.forName(forName);
-            for (int i = 0; i < controls.length; i++) {
-                if (cls.isInstance(controls[i]))
-                    return controls[i];
+            try {
+                locator = new BDLocator(source.getLocator().toExternalForm());
+            } catch (org.davic.net.InvalidLocatorException e) {
+                throw new IncompatibleSourceException();
             }
-            return null;
-        } catch (ClassNotFoundException e) {
-            return null;
-        }
-    }
-
-    public void addControllerListener(ControllerListener listener) {
-        synchronized (listeners) {
-            listeners.add(listener);
-        }
-    }
-
-    public void removeControllerListener(ControllerListener listener) {
-        synchronized (listeners) {
-            listeners.remove(listener);
-        }
-    }
-
-    public void setTimeBase(TimeBase master)
-        throws IncompatibleTimeBaseException {
-        throw new IncompatibleTimeBaseException();
-    }
-
-    public void realize() {
-        // TODO Auto-generated method stub
-    }
-
-    public void prefetch() {
-        // TODO Auto-generated method stub
-    }
-
-    public void start() {
-        // TODO Auto-generated method stub
-    }
-
-    public void syncStart(Time at) {
-        // TODO Auto-generated method stub
-    }
-
-    public void deallocate() {
-        // TODO Auto-generated method stub
-    }
-
-    public void close() {
-        // TODO Auto-generated method stub
-    }
-
-    public void stop() {
-        // TODO Auto-generated method stub
-    }
-
-    public void setStopTime(Time stopTime) {
-    }
-
-    public Time getStopTime() {
-        return null;
-    }
-
-    public void setMediaTime(Time now) {
-    }
-
-    public Time getMediaTime() {
-        return new Time(0);
-    }
-
-    public long getMediaNanoseconds() {
-        return 0;
-    }
-
-    public Time getSyncTime() {
-        return null;
-    }
-
-    public TimeBase getTimeBase() {
-        return null;
-    }
-
-    public Time mapToTimeBase(Time t) throws ClockStoppedException {
-        return null;
-    }
-
-    public float getRate() {
-        return 1.0f;
-    }
-
-    public float setRate(float factor) {
-        return 1.0f;
-    }
-
-    public Component getVisualComponent() {
-        return null;
-    }
-
-    public GainControl getGainControl() {
-        return null;
-    }
-
-    public Component getControlPanelComponent() {
-        return null;
-    }
-
-    public void addController(Controller newController)
-        throws IncompatibleTimeBaseException {
-    }
-
-    public void removeController(Controller oldController) {
     }
 
     public Time getDuration() {
-        return null;
+        org.videolan.Logger.unimplemented("Handler", "getDuration");
+        long duration = 1; // pi.getDuration() ;
+        return new Time(duration * TO_SECONDS);
     }
 
-    protected int state = Unrealized;
-    protected int targetState = Unrealized;
-    protected Control[] controls = null;
+    protected ControllerErrorEvent doPrefetch() {
+        return super.doPrefetch();
+    }
+
+    protected ControllerErrorEvent doStart(Time at) {
+        return super.doStart(at);
+    }
+
+    protected ControllerErrorEvent doStop() {
+        return super.doStop();
+    }
+
+    protected BDLocator getLocator() {
+        return locator;
+    }
+
+    private BDLocator locator;
     private org.videolan.media.protocol.dripfeed.DataSource source = null;
-    private ArrayList listeners = new ArrayList();
 }

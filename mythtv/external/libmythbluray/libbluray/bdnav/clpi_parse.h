@@ -25,9 +25,12 @@
 
 #include <stdint.h>
 
+struct bd_disc;
+
 BD_PRIVATE uint32_t clpi_lookup_spn(const CLPI_CL *cl, uint32_t timestamp, int before, uint8_t stc_id);
 BD_PRIVATE uint32_t clpi_access_point(const CLPI_CL *cl, uint32_t pkt, int next, int angle_change, uint32_t *time);
-BD_PRIVATE CLPI_CL* clpi_parse(const char *path, int verbose);
+BD_PRIVATE CLPI_CL* clpi_parse(const char *path) BD_ATTR_MALLOC;
+BD_PRIVATE CLPI_CL* clpi_get(struct bd_disc *disc, const char *file);
 BD_PRIVATE CLPI_CL* clpi_copy(const CLPI_CL* src_cl);
 BD_PRIVATE void clpi_free(CLPI_CL *cl);
 

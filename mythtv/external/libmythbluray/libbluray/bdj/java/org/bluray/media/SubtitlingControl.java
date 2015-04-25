@@ -34,7 +34,6 @@ public abstract interface SubtitlingControl extends SubtitlingEventControl {
     public abstract void selectStreamNumber(int num)
             throws StreamNotAvailableException;
 
-    @Deprecated
     public abstract void selectSubtitle(int subtitle)
             throws StreamNotAvailableException;
 

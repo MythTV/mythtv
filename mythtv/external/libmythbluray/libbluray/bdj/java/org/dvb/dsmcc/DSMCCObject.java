@@ -24,23 +24,26 @@ import java.io.InterruptedIOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.cert.X509Certificate;
-import java.util.logging.Logger;
+
+import org.videolan.Logger;
 
 public class DSMCCObject extends File {
     public DSMCCObject(String path)
     {
         super(path);
+        org.videolan.Logger.unimplemented(DSMCCObject.class.getName(), "");
     }
 
     public DSMCCObject(String path, String name)
     {
         super(path, name);
-
+        org.videolan.Logger.unimplemented(DSMCCObject.class.getName(), "");
     }
 
     public DSMCCObject(DSMCCObject dir, String name)
     {
         super(dir.getPath(), name);
+        org.videolan.Logger.unimplemented(DSMCCObject.class.getName(), "");
     }
 
     public boolean isLoaded()
@@ -96,11 +99,13 @@ public class DSMCCObject extends File {
 
     public static boolean prefetch(String path, byte priority)
     {
+        org.videolan.Logger.unimplemented(DSMCCObject.class.getName(), "prefetch");
         return false;
     }
 
     public static boolean prefetch(DSMCCObject dir, String path, byte priority)
     {
+        org.videolan.Logger.unimplemented(DSMCCObject.class.getName(), "prefetch");
         return false;
     }
 
@@ -108,7 +113,7 @@ public class DSMCCObject extends File {
     {
         if (loaded)
             throw new NotLoadedException();
-        
+
         loaded = false;
     }
 
@@ -127,12 +132,14 @@ public class DSMCCObject extends File {
     public void addObjectChangeEventListener(ObjectChangeEventListener listener)
             throws InsufficientResourcesException
     {
+        org.videolan.Logger.unimplemented(DSMCCObject.class.getName(), "addObjectChangeEventListener");
         throw new Error("Not implemented"); // NOTE: probably unnecessary
     }
 
     public void removeObjectChangeEventListener(
             ObjectChangeEventListener listener)
     {
+        org.videolan.Logger.unimplemented(DSMCCObject.class.getName(), "removeObjectChangeEventListener");
         throw new Error("Not implemented"); // NOTE: probably unnecessary
     }
 
@@ -141,17 +148,19 @@ public class DSMCCObject extends File {
     {
         if (!super.exists())
             throw new InvalidPathNameException();
-        
+
         listener.receiveEvent(new SuccessEvent(this));
     }
 
     public void setRetrievalMode(int retrieval_mode)
     {
+        org.videolan.Logger.unimplemented(DSMCCObject.class.getName(), "setRetrievalMode");
         throw new Error("Not implemented");
     }
 
     public X509Certificate[][] getSigners()
     {
+        org.videolan.Logger.unimplemented(DSMCCObject.class.getName(), "getSigners");
         throw new Error("Not implemented");
     }
 
@@ -161,6 +170,7 @@ public class DSMCCObject extends File {
             InvalidPathNameException, NotEntitledException,
             ServiceXFRException, InsufficientResourcesException
     {
+        org.videolan.Logger.unimplemented(DSMCCObject.class.getName(), "getSigners");
         throw new Error("Not implemented");
     }
 

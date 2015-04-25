@@ -45,6 +45,8 @@ public final class ReadPermission extends Permission implements Serializable {
 
     public boolean equals(Object obj)
     {
+        if (obj == null)
+            return false;
         if (this == obj)
             return true;
         if (getClass() != obj.getClass())

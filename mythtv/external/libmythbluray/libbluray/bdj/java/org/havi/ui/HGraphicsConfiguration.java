@@ -77,18 +77,22 @@ public class HGraphicsConfiguration extends HScreenConfiguration {
     }
 
     public Color getPunchThroughToBackgroundColor(int percentage) {
+        org.videolan.Logger.unimplemented("HGraphicsConfigTemplate", "");
         throw new Error("Not implemented");
     }
 
     public Color getPunchThroughToBackgroundColor(int percentage, HVideoDevice hvd) {
+        org.videolan.Logger.unimplemented("HGraphicsConfigTemplate", "");
         throw new Error("Not implemented");
     }
 
     public Color getPunchThroughToBackgroundColor(Color color, int percentage) {
+        org.videolan.Logger.unimplemented("HGraphicsConfigTemplate", "");
         throw new Error("Not implemented");
     }
 
     public Color getPunchThroughToBackgroundColor(Color color, int percentage, HVideoDevice v) {
+        org.videolan.Logger.unimplemented("HGraphicsConfigTemplate", "");
         throw new Error("Not implemented");
     }
 

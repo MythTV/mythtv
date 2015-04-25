@@ -1,6 +1,6 @@
 /*
  * This file is part of libbluray
- * Copyright (C) 2010  hpi1
+ * Copyright (C) 2010  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,6 +21,7 @@
 
 #include "pg_decode.h"           // pg_decode_*()
 #include "../hdmv/mobj_parse.h"  // mobj_parse_cmd()
+#include "../hdmv/mobj_data.h"   // MOBJ_CMD
 #include "../bdnav/mpls_parse.h" // mpls_parse_uo()
 
 #include "util/macro.h"
@@ -31,7 +32,7 @@
 #include <stdlib.h>
 
 
-static void _decode_button(BITBUFFER *bb, BD_IG_BUTTON *p)
+static int _decode_button(BITBUFFER *bb, BD_IG_BUTTON *p)
 {
     unsigned ii;
 
@@ -66,6 +67,10 @@ static void _decode_button(BITBUFFER *bb, BD_IG_BUTTON *p)
 
     p->num_nav_cmds = bb_read(bb, 16);
     p->nav_cmds     = calloc(p->num_nav_cmds, sizeof(MOBJ_CMD));
+    if (!p->nav_cmds) {
+        BD_DEBUG(DBG_DECODE | DBG_CRIT, "out of memory\n");
+        return 0;
+    }
 
     for (ii = 0; ii < p->num_nav_cmds; ii++) {
         uint8_t buf[12];
@@ -73,6 +78,8 @@ static void _decode_button(BITBUFFER *bb, BD_IG_BUTTON *p)
 
         mobj_parse_cmd(buf, &p->nav_cmds[ii]);
     }
+
+    return 1;
 }
 
 static void _clean_button(BD_IG_BUTTON *p)
@@ -80,7 +87,7 @@ static void _clean_button(BD_IG_BUTTON *p)
     X_FREE(p->nav_cmds);
 }
 
-static void _decode_bog(BITBUFFER *bb, BD_IG_BOG *p)
+static int _decode_bog(BITBUFFER *bb, BD_IG_BOG *p)
 {
     unsigned ii;
 
@@ -88,23 +95,34 @@ static void _decode_bog(BITBUFFER *bb, BD_IG_BOG *p)
 
     p->num_buttons = bb_read(bb, 8);
     p->button      = calloc(p->num_buttons, sizeof(BD_IG_BUTTON));
+    if (!p->button) {
+        BD_DEBUG(DBG_DECODE | DBG_CRIT, "out of memory\n");
+        return 0;
+    }
 
     for (ii = 0; ii < p->num_buttons; ii++) {
-        _decode_button(bb, &p->button[ii]);
+        if (!_decode_button(bb, &p->button[ii])) {
+            return 0;
+        }
     }
+
+    return 1;
 }
 
 static void _clean_bog(BD_IG_BOG *p)
 {
     unsigned ii;
 
-    for (ii = 0; ii < p->num_buttons; ii++) {
-        _clean_button(&p->button[ii]);
+    if (p->button) {
+        for (ii = 0; ii < p->num_buttons; ii++) {
+            _clean_button(&p->button[ii]);
+        }
     }
+
     X_FREE(p->button);
 }
 
-static void _decode_effect(BITBUFFER *bb, BD_IG_EFFECT *p)
+static int _decode_effect(BITBUFFER *bb, BD_IG_EFFECT *p)
 {
     unsigned ii;
 
@@ -113,10 +131,16 @@ static void _decode_effect(BITBUFFER *bb, BD_IG_EFFECT *p)
 
     p->num_composition_objects = bb_read(bb, 8);
     p->composition_object      = calloc(p->num_composition_objects, sizeof(BD_PG_COMPOSITION_OBJECT));
+    if (!p->composition_object) {
+        BD_DEBUG(DBG_DECODE | DBG_CRIT, "out of memory\n");
+        return 0;
+    }
 
     for (ii = 0; ii < p->num_composition_objects; ii++) {
         pg_decode_composition_object(bb, &p->composition_object[ii]);
     }
+
+    return 1;
 }
 
 static void _clean_effect(BD_IG_EFFECT *p)
@@ -124,12 +148,16 @@ static void _clean_effect(BD_IG_EFFECT *p)
     X_FREE(p->composition_object);
 }
 
-static void _decode_effect_sequence(BITBUFFER *bb, BD_IG_EFFECT_SEQUENCE *p)
+static int _decode_effect_sequence(BITBUFFER *bb, BD_IG_EFFECT_SEQUENCE *p)
 {
     unsigned ii;
 
     p->num_windows = bb_read(bb, 8);
     p->window      = calloc(p->num_windows, sizeof(BD_PG_WINDOW));
+    if (!p->window) {
+        BD_DEBUG(DBG_DECODE | DBG_CRIT, "out of memory\n");
+        return 0;
+    }
 
     for (ii = 0; ii < p->num_windows; ii++) {
         pg_decode_window(bb, &p->window[ii]);
@@ -137,19 +165,30 @@ static void _decode_effect_sequence(BITBUFFER *bb, BD_IG_EFFECT_SEQUENCE *p)
 
     p->num_effects = bb_read(bb, 8);
     p->effect      = calloc(p->num_effects, sizeof(BD_IG_EFFECT));
+    if (!p->effect) {
+        BD_DEBUG(DBG_DECODE | DBG_CRIT, "out of memory\n");
+        return 0;
+    }
 
     for (ii = 0; ii < p->num_effects; ii++) {
-        _decode_effect(bb, &p->effect[ii]);
+        if (!_decode_effect(bb, &p->effect[ii])) {
+            return 0;
+        }
     }
+
+    return 1;
 }
 
 static void _clean_effect_sequence(BD_IG_EFFECT_SEQUENCE *p)
 {
     unsigned ii;
 
-    for (ii = 0; ii < p->num_effects; ii++) {
-        _clean_effect(&p->effect[ii]);
+    if (p->effect) {
+        for (ii = 0; ii < p->num_effects; ii++) {
+            _clean_effect(&p->effect[ii]);
+        }
     }
+
     X_FREE(p->effect);
 
     X_FREE(p->window);
@@ -164,7 +203,7 @@ static int _decode_uo_mask_table(BITBUFFER *bb, BD_UO_MASK *p)
     return mpls_parse_uo(buf, p);
 }
 
-static void _decode_page(BITBUFFER *bb, BD_IG_PAGE *p)
+static int _decode_page(BITBUFFER *bb, BD_IG_PAGE *p)
 {
     unsigned ii;
 
@@ -173,8 +212,12 @@ static void _decode_page(BITBUFFER *bb, BD_IG_PAGE *p)
 
     _decode_uo_mask_table(bb, &p->uo_mask_table);
 
-    _decode_effect_sequence(bb, &p->in_effects);
-    _decode_effect_sequence(bb, &p->out_effects);
+    if (!_decode_effect_sequence(bb, &p->in_effects)) {
+        return 0;
+    }
+    if (!_decode_effect_sequence(bb, &p->out_effects)) {
+        return 0;
+    }
 
     p->animation_frame_rate_code       = bb_read(bb, 8);
     p->default_selected_button_id_ref  = bb_read(bb, 16);
@@ -183,10 +226,18 @@ static void _decode_page(BITBUFFER *bb, BD_IG_PAGE *p)
 
     p->num_bogs = bb_read(bb, 8);
     p->bog      = calloc(p->num_bogs, sizeof(BD_IG_BOG));
+    if (!p->bog) {
+        BD_DEBUG(DBG_DECODE | DBG_CRIT, "out of memory\n");
+        return 0;
+    }
 
     for (ii = 0; ii < p->num_bogs; ii++) {
-        _decode_bog(bb, &p->bog[ii]);
+        if (!_decode_bog(bb, &p->bog[ii])) {
+            return 0;
+        }
     }
+
+    return 1;
 }
 
 static void _clean_page(BD_IG_PAGE *p)
@@ -196,13 +247,16 @@ static void _clean_page(BD_IG_PAGE *p)
     _clean_effect_sequence(&p->in_effects);
     _clean_effect_sequence(&p->out_effects);
 
-    for (ii = 0; ii < p->num_bogs; ii++) {
-        _clean_bog(&p->bog[ii]);
+    if (p->bog) {
+        for (ii = 0; ii < p->num_bogs; ii++) {
+          _clean_bog(&p->bog[ii]);
+        }
     }
+
     X_FREE(p->bog);
 }
 
-static inline uint64_t bb_read_u64(BITBUFFER *bb, int i_count)
+static uint64_t bb_read_u64(BITBUFFER *bb, int i_count)
 {
     uint64_t result = 0;
     if (i_count > 32) {
@@ -239,9 +293,15 @@ static int _decode_interactive_composition(BITBUFFER *bb, BD_IG_INTERACTIVE_COMP
 
     p->num_pages = bb_read(bb, 8);
     p->page      = calloc(p->num_pages, sizeof(BD_IG_PAGE));
+    if (!p->page) {
+        BD_DEBUG(DBG_DECODE | DBG_CRIT, "out of memory\n");
+        return 0;
+    }
 
     for (ii = 0; ii < p->num_pages; ii++) {
-        _decode_page(bb, &p->page[ii]);
+        if (!_decode_page(bb, &p->page[ii])) {
+            return 0;
+        }
     }
 
   return 1;
@@ -251,9 +311,12 @@ static void _clean_interactive_composition(BD_IG_INTERACTIVE_COMPOSITION *p)
 {
     unsigned ii;
 
-    for (ii = 0; ii < p->num_pages; ii++) {
-        _clean_page(&p->page[ii]);
+    if (p->page) {
+        for (ii = 0; ii < p->num_pages; ii++) {
+            _clean_page(&p->page[ii]);
+        }
     }
+
     X_FREE(p->page);
 }
 
@@ -283,11 +346,6 @@ int ig_decode_interactive(BITBUFFER *bb, BD_IG_INTERACTIVE *p)
     }
 
     return _decode_interactive_composition(bb, &p->interactive_composition);
-}
-
-void ig_clean_interactive(BD_IG_INTERACTIVE *p)
-{
-    _clean_interactive_composition(&p->interactive_composition);
 }
 
 void ig_free_interactive(BD_IG_INTERACTIVE **p)

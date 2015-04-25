@@ -1865,6 +1865,7 @@ HEADERS_LIST="
     dlfcn_h
     dxva_h
     ES2_gl_h
+    fcntl_h
     gsm_h
     io_h
     mach_mach_time_h
@@ -5700,6 +5701,7 @@ check_header direct.h
 check_header dlfcn.h
 check_header dxva.h
 check_header dxva2api.h -D_WIN32_WINNT=0x0600
+check_header fcntl.h
 check_header io.h
 check_header libcrystalhd/libcrystalhd_if.h
 check_header mach/mach_time.h

@@ -26,6 +26,5 @@ public class TitleInformationType extends ServiceInformationType {
         super(name);
     }
 
-    public static final TitleInformationType BD_ROM = new TitleInformationType(
-            "BD_ROM");
+    public static final TitleInformationType BD_ROM = new TitleInformationType("BD_ROM");
 }

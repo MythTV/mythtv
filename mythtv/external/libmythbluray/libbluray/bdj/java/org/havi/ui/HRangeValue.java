@@ -27,28 +27,30 @@ import org.havi.ui.event.HFocusListener;
 public class HRangeValue extends HRange implements HAdjustmentValue {
     public HRangeValue()
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HRangeValue.class.getName(), "");
     }
 
     public HRangeValue(int orientation, int minimum, int maximum, int value,
             int x, int y, int width, int height)
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HRangeValue.class.getName(), "");
     }
 
     public HRangeValue(int orientation, int minimum, int maximum, int value)
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HRangeValue.class.getName(), "");
     }
 
     public static void setDefaultLook(HRangeLook look)
     {
-        throw new Error("Not implemented");
+        DefaultLook = look;
     }
 
     public static HRangeLook getDefaultLook()
     {
-        throw new Error("Not implemented");
+        if (DefaultLook == null)
+            org.videolan.Logger.unimplemented("", "getDefaultLook");
+        return DefaultLook;
     }
 
     public void setMove(int keyCode, HNavigable target)
@@ -166,6 +168,8 @@ public class HRangeValue extends HRange implements HAdjustmentValue {
     {
         throw new Error("Not implemented");
     }
+
+    private static HRangeLook DefaultLook = null;
 
     private static final long serialVersionUID = -7809155734787063596L;
 }

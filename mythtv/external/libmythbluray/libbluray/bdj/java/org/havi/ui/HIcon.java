@@ -27,33 +27,35 @@ import org.havi.ui.event.HFocusListener;
 public class HIcon extends HStaticIcon implements HNavigable {
     public HIcon()
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HIcon.class.getName(), "");
     }
 
     public HIcon(Image image)
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HIcon.class.getName(), "");
     }
 
     public HIcon(Image image, int x, int y, int width, int height)
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HIcon.class.getName(), "");
     }
 
     public HIcon(Image imageNormal, Image imageFocus, int x, int y, int width,
             int height)
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HIcon.class.getName(), "");
     }
 
     public static void setDefaultLook(HGraphicLook hlook)
     {
-        throw new Error("Not implemented");
+        DefaultLook = hlook;
     }
 
     public static HGraphicLook getDefaultLook()
     {
-        throw new Error("Not implemented");
+        if (DefaultLook == null)
+            org.videolan.Logger.unimplemented("", "getDefaultLook");
+        return DefaultLook;
     }
 
     public void setMove(int keyCode, HNavigable target)
@@ -116,6 +118,8 @@ public class HIcon extends HStaticIcon implements HNavigable {
     {
         throw new Error("Not implemented");
     }
+
+    private static HGraphicLook DefaultLook = null;
 
     private static final long serialVersionUID = 2006124827619610922L;
 }

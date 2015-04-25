@@ -42,7 +42,7 @@ public interface Controller extends Clock, Duration {
 
     public void removeControllerListener(ControllerListener listener);
 
-    public static final Time LATENCY_UNKNOWN = null;
+    public static final Time LATENCY_UNKNOWN = new Time(Long.MAX_VALUE);
 
     public static final int Unrealized = 100;
     public static final int Realizing = 200;

@@ -30,15 +30,19 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.havi.ui.event.HEventGroup;
 import org.videolan.BDJXletContext;
 import org.videolan.GUIManager;
+import java.awt.BDToolkit;
+
 
 public class HScene extends Container implements HComponentOrdering {
     protected HScene() {
         context = BDJXletContext.getCurrentContext();
+        BDToolkit.addComponent(this);
     }
 
     public BDJXletContext getXletContext() {
@@ -73,105 +77,115 @@ public class HScene extends Container implements HComponentOrdering {
     }
 
     public boolean isDoubleBuffered() {
-        return true;// not implemented
+        return false;
     }
 
     public boolean isOpaque() {
-        return false;// not implemented
+        return false;
+    }
+
+    public int getComponentZOrder(Component component) {
+        for (int i = 0; i < getComponentCount(); i++)
+            if (getComponent(i) == component)
+                return i;
+        return -1;
+    }
+
+    public /*boolean*/void setComponentZOrder(Component component, int index) {
+        if (index < 0)
+            return;//return false;
+        int i = getComponentZOrder(component);
+        if (i < 0)
+            return;//return false;
+        if (i == index)
+            return;//return true;
+        remove(component);
+        if (i > index)
+            add(component, index);
+        else
+            add(component, index - 1);
+        //return true;
     }
 
     public Component addBefore(Component component, Component behind) {
-        int index = super.getComponentZOrder(behind);
-
-        // the behind component must already be in the Container
-        if (index == -1)
+        int index = getComponentZOrder(behind);
+        if (index < 0)
             return null;
 
         return super.add(component, index);
     }
 
     public Component addAfter(Component component, Component front) {
-        int index = super.getComponentZOrder(front);
-
-        // the front component must already be in the Container
-        if (index == -1)
+        int index = getComponentZOrder(front);
+        if (index < 0)
             return null;
 
         return super.add(component, index + 1);
     }
 
     public boolean popToFront(Component component) {
-        if (super.getComponentZOrder(component) == -1)
+        if (getComponentZOrder(component) < 0)
             return false;
-
-        super.setComponentZOrder(component, 0);
-
+        /*return */setComponentZOrder(component, 0);
         return true;
     }
 
     public boolean pushToBack(Component component) {
-        if (super.getComponentZOrder(component) == -1)
+        if (getComponentZOrder(component) < 0)
             return false;
-
-        super.setComponentZOrder(component, super.getComponentCount());
-
+        /*return */setComponentZOrder(component, getComponentCount());
         return true;
     }
 
     public boolean pop(Component component) {
-        int index = super.getComponentZOrder(component);
-        if (index == -1)
+        int index = getComponentZOrder(component);
+        if (index < 0)
             return false;
         if (index == 0)
             return true; // already at the front
 
-        super.setComponentZOrder(component, index - 1);
+        /*return */setComponentZOrder(component, index - 1);
         return true;
     }
 
     public boolean push(Component component) {
-        int index = super.getComponentZOrder(component);
-        if (index == -1)
+        int index = getComponentZOrder(component);
+        if (index < 0)
             return false;
-        if (index == super.getComponentCount())
+
+        if (index == getComponentCount())
             return true; // already at the back
 
-        super.setComponentZOrder(component, index + 1);
+        /*return */setComponentZOrder(component, index + 1);
         return true;
     }
 
     public boolean popInFrontOf(Component move, Component behind) {
-        int index = super.getComponentZOrder(behind);
+        int index = getComponentZOrder(behind);
 
         // the behind component must already be in the Container
-        if (index == -1 || super.getComponentZOrder(move) == -1)
+        if (index < 0 || getComponentZOrder(move) < 0)
             return false;
 
-        super.setComponentZOrder(move, index);
+        /*return */setComponentZOrder(move, getComponentZOrder(behind));
         return true;
     }
 
     public boolean pushBehind(Component move, Component front) {
-        int index = super.getComponentZOrder(front);
-
-        // the behind component must already be in the Container
-        if (index == -1 || super.getComponentZOrder(move) == -1)
+        int index = getComponentZOrder(front);
+        if (index < 0 || getComponentZOrder(move) < 0)
             return false;
 
-        super.setComponentZOrder(move, index + 1);
+        /*return */setComponentZOrder(move, index + 1);
         return true;
     }
 
     public void addWindowListener(WindowListener listener) {
-        synchronized (windowListener) {
-            windowListener = HEventMulticaster.add(windowListener, listener);
-        }
+        windowListener = HEventMulticaster.add(windowListener, listener);
     }
 
     public void removeWindowListener(WindowListener listener) {
-        synchronized (windowListener) {
-            windowListener = HEventMulticaster.remove(windowListener, listener);
-        }
+        windowListener = HEventMulticaster.remove(windowListener, listener);
     }
 
     protected void processWindowEvent(WindowEvent event) {
@@ -215,44 +229,73 @@ public class HScene extends Container implements HComponentOrdering {
         if (!active)
             return null;
 
-        for (Component comp : super.getComponents()) {
-            if (comp.hasFocus())
-                return comp;
+        Component[] comps = getComponents();
+        for (int i = 0; i < comps.length; i++) {
+            if (comps[i].hasFocus())
+                return comps[i];
         }
 
         return null;
     }
 
-    public void show() {
-        setVisible(true);
+    public synchronized void dispose() {
+        if (null != BDJXletContext.getCurrentContext())
+            HSceneFactory.getInstance().dispose(this);
     }
 
-    public void dispose() {
-        // not implemented
+    protected void disposeImpl()
+    {
+        // called by HSceneFactory
+        try {
+            removeAll();
+
+            Graphics g = GUIManager.getInstance().getGraphics();
+            if (g != null) {
+                Rectangle r = getBounds();
+                g.clearRect(r.x, r.y, r.width, r.height);
+                g.dispose();
+            }
+            if (image != null) {
+                image.flush();
+            }
+            if (shortcuts != null) {
+                shortcuts.clear();
+            }
+        } finally {
+            image = null;
+            eventGroup = null;
+            shortcuts = null;
+            windowListener = null;
+            context = null;
+        }
     }
 
     public boolean addShortcut(int keyCode, HActionable act) {
         // make sure component is in HScene
         boolean hasComp = false;
-        for (Component comp : getComponents()) {
-            if (comp == act)
+
+        Component[] comps = getComponents();
+        for (int i = 0; i < comps.length; i++) {
+            if (comps[i] == act) {
                 hasComp = true;
+                break;
+            }
         }
 
         if (!hasComp)
             return false;
 
-        shortcuts.put(keyCode, act);
+        shortcuts.put(new Integer(keyCode), act);
 
         return true;
     }
 
     public void removeShortcut(int keyCode) {
-        shortcuts.remove(keyCode);
+        shortcuts.remove(new Integer(keyCode));
     }
 
     public HActionable getShortcutComponent(int keyCode) {
-        return shortcuts.get(keyCode);
+        return (HActionable)shortcuts.get(new Integer(keyCode));
     }
 
     public void enableShortcuts(boolean enable) {
@@ -264,22 +307,23 @@ public class HScene extends Container implements HComponentOrdering {
     }
 
     public int getShortcutKeycode(HActionable comp) {
-        for (Integer key : shortcuts.keySet()) {
-            HActionable action = shortcuts.get(key);
-
+        Iterator iterator = shortcuts.keySet().iterator();
+        Integer key;
+        while ((key = (Integer)iterator.next()) != null) {
+            HActionable action = (HActionable)shortcuts.get(key);
             if (action == comp)
-                return key;
+                return key.intValue();
         }
 
         return KeyEvent.VK_UNDEFINED;
     }
 
     public int[] getAllShortcutKeycodes() {
-        Integer[] src = (Integer[]) shortcuts.keySet().toArray();
+        Object[] src = shortcuts.keySet().toArray();
         int[] dest = new int[src.length];
 
         for (int i = 0; i < src.length; i++)
-            dest[i] = src[i];
+            dest[i] = ((Integer)src[i]).intValue();
 
         return dest;
     }
@@ -332,11 +376,15 @@ public class HScene extends Container implements HComponentOrdering {
     }
 
     public void setVisible(boolean visible) {
-        this.visible = visible;
+        super.setVisible(visible);
+        if (visible) {
+            for (int i = 0; i < GUIManager.getInstance().getComponentCount(); i++) {
+                    Component c = GUIManager.getInstance().getComponent(i);
+                    if (c != this)
+                        c.setVisible(false);
     }
-
-    public boolean isVisible() {
-        return visible;
+        }
+        GUIManager.getInstance().setVisible(visible);
     }
 
     public int getBackgroundMode() {
@@ -372,15 +420,13 @@ public class HScene extends Container implements HComponentOrdering {
     public static final int NO_BACKGROUND_FILL = 0;
     public static final int BACKGROUND_FILL = 1;
 
-    private boolean visible = true;
     private boolean active = false;
     private int backgroundMode = NO_BACKGROUND_FILL;
     private Image image = null;
     private int imageMode = IMAGE_NONE;
     private WindowListener windowListener = null;
     private HEventGroup eventGroup = null;
-    private Map<Integer, HActionable> shortcuts = Collections
-            .synchronizedMap(new HashMap<Integer, HActionable>());
+    private Map shortcuts = Collections.synchronizedMap(new HashMap());
     private boolean shortcutsEnabled = true;
     private BDJXletContext context;
 

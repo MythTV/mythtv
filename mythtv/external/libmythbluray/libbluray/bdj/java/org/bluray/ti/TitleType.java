@@ -27,10 +27,8 @@ public class TitleType extends ServiceType {
         super(name);
     }
 
-    public static final TitleType BDJ_INTERACTIVE = new TitleType(
-            "BDJ_INTERACTIVE");
-    public static final TitleType BDJ_MOVIE = new TitleType("BDJ_MOVIE");
-    public static final TitleType HDMV_INTERACTIVE = new TitleType(
-            "HDMV_INTERACTIVE");
-    public static final TitleType HDMV_MOVIE = new TitleType("HDMV_MOVIE");
+    public static final TitleType BDJ_INTERACTIVE  = new TitleType("BDJ_INTERACTIVE");
+    public static final TitleType BDJ_MOVIE        = new TitleType("BDJ_MOVIE");
+    public static final TitleType HDMV_INTERACTIVE = new TitleType("HDMV_INTERACTIVE");
+    public static final TitleType HDMV_MOVIE       = new TitleType("HDMV_MOVIE");
 }

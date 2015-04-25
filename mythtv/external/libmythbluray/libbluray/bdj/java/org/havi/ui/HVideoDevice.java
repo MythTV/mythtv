@@ -69,11 +69,13 @@ public class HVideoDevice extends HScreenDevice {
     }
 
     public Object getVideoSource() throws SecurityException, HPermissionDeniedException {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HVideoDevice.class.getName(), "getVideoSource");
+        throw new HPermissionDeniedException();
     }
 
     public Object getVideoController() throws SecurityException, HPermissionDeniedException {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HVideoDevice.class.getName(), "getVideoController");
+        throw new HPermissionDeniedException();
     }
 
     public static final HVideoConfiguration NOT_CONTRIBUTING = null;

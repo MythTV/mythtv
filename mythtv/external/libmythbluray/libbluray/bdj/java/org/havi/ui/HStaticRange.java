@@ -23,18 +23,18 @@ public class HStaticRange extends HVisible implements HNoInputPreferred,
         HOrientable {
     public HStaticRange()
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HStaticRange.class.getName(), "");
     }
 
     public HStaticRange(int orientation, int minimum, int maximum, int value,
             int x, int y, int width, int height)
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HStaticRange.class.getName(), "");
     }
 
     public HStaticRange(int orientation, int minimum, int maximum, int value)
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HStaticRange.class.getName(), "");
     }
 
     public void setLook(HLook hlook) throws HInvalidLookException
@@ -44,12 +44,14 @@ public class HStaticRange extends HVisible implements HNoInputPreferred,
 
     public static void setDefaultLook(HRangeLook look)
     {
-        throw new Error("Not implemented");
+        DefaultLook = look;
     }
 
     public static HRangeLook getDefaultLook()
     {
-        throw new Error("Not implemented");
+        if (DefaultLook == null)
+            org.videolan.Logger.unimplemented("", "getDefaultLook");
+        return DefaultLook;
     }
 
     public int getOrientation()
@@ -114,6 +116,8 @@ public class HStaticRange extends HVisible implements HNoInputPreferred,
 
     public final static int SLIDER_BEHAVIOR = 0;
     public final static int SCROLLBAR_BEHAVIOR = 1;
+
+    private static HRangeLook DefaultLook = null;
 
     private static final long serialVersionUID = 3871722305722412744L;
 }

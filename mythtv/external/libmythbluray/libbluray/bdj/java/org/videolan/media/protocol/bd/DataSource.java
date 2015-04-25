@@ -33,7 +33,8 @@ public class DataSource extends javax.media.protocol.DataSource {
     }
 
     public Time getDuration() {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(DataSource.class.getName(), "getDuration");
+        return null;
     }
 
     public String getContentType() {

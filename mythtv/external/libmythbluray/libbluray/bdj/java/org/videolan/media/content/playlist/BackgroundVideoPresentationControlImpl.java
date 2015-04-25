@@ -122,7 +122,7 @@ public class BackgroundVideoPresentationControlImpl extends VideoControl
                     sr.x = 0;
                     sr.width = 0;
                 }
-                }
+            }
             if (sr.y < 0)
                 sr.y = 0;
             if ((sr.y + sr.height) > vd.height) {

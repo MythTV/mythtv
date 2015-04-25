@@ -31,28 +31,28 @@ import org.havi.ui.event.HTextListener;
 public class HSinglelineEntry extends HVisible implements HTextValue {
     public HSinglelineEntry()
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HSinglelineEntry.class.getName(), "");
     }
 
     public HSinglelineEntry(String text, int x, int y, int width, int height,
             int maxChars, Font font, Color color)
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HSinglelineEntry.class.getName(), "");
     }
 
     public HSinglelineEntry(int x, int y, int width, int height, int maxChars)
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HSinglelineEntry.class.getName(), "");
     }
 
     public HSinglelineEntry(String text, int maxChars, Font font, Color color)
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HSinglelineEntry.class.getName(), "");
     }
 
     public HSinglelineEntry(int maxChars)
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HSinglelineEntry.class.getName(), "");
     }
 
     public void setTextContent(String string, int state)
@@ -102,12 +102,14 @@ public class HSinglelineEntry extends HVisible implements HTextValue {
 
     public static void setDefaultLook(HSinglelineEntryLook look)
     {
-        throw new Error("Not implemented");
+        DefaultLook = look;
     }
 
     public static HSinglelineEntryLook getDefaultLook()
     {
-        throw new Error("Not implemented");
+        if (DefaultLook == null)
+            org.videolan.Logger.unimplemented("", "getDefaultLook");
+        return DefaultLook;
     }
 
     public void setLook(HLook hlook) throws HInvalidLookException
@@ -260,6 +262,8 @@ public class HSinglelineEntry extends HVisible implements HTextValue {
     {
         throw new Error("Not implemented");
     }
+
+    private static HSinglelineEntryLook DefaultLook = null;
 
     private static final long serialVersionUID = 7577783421311076636L;
 }

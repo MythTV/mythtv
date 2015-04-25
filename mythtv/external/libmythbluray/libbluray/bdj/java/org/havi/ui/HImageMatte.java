@@ -1,6 +1,7 @@
 /*
  * This file is part of libbluray
  * Copyright (C) 2010  William Hahne
+ * Copyright (C) 2013  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -23,33 +24,35 @@ import java.awt.Image;
 import java.awt.Point;
 
 public class HImageMatte implements HMatte {
+    private Image data = null;
+    private Point offset = new Point(0, 0);
+
     public HImageMatte()
     {
-        throw new Error("Not implemented");
     }
 
     public HImageMatte(Image data)
     {
-        throw new Error("Not implemented");
+        this.data = data;
     }
 
     public void setMatteData(Image data)
     {
-        throw new Error("Not implemented");
+        this.data = data;
     }
 
     public Image getMatteData()
     {
-        throw new Error("Not implemented");
+        return this.data;
     }
 
     public void setOffset(Point p)
     {
-        throw new Error("Not implemented");
+        this.offset = p;
     }
 
     public Point getOffset()
     {
-        throw new Error("Not implemented");
+        return this.offset;
     }
 }

@@ -19,20 +19,18 @@
 package org.videolan;
 
 public class TitleInfo {
-    public TitleInfo(int title, int objType, int playbackType, String bdjoName, int hdmvOID) {
+    public TitleInfo(int title, int objType, int playbackType, int idRef) {
         this.title = title;
         this.objType = objType;
         this.playbackType = playbackType;
-        this.bdjoName = bdjoName;
-        this.hdmvOID = hdmvOID;
+        if (objType == OBJ_TYPE_BDJ)
+            this.bdjoName = (new java.text.DecimalFormat("00000")).format(idRef);
+        else
+            this.hdmvOID = idRef;
     }
 
     public int getTitleNum() {
         return title;
-    }
-
-    public int getObjType() {
-        return objType;
     }
 
     public int getPlaybackType() {
@@ -58,8 +56,8 @@ public class TitleInfo {
     private int title;
     private int objType;
     private int playbackType;
-    private String bdjoName;
-    private int hdmvOID;
+    private String bdjoName = null;
+    private int hdmvOID = -1;
 
     public static final int OBJ_TYPE_HDMV = 1;
     public static final int OBJ_TYPE_BDJ = 2;

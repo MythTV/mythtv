@@ -54,6 +54,11 @@ typedef enum {
     /* Translated to BD_VK_ENTER if mouse is over valid button */
     BD_VK_MOUSE_ACTIVATE = 17,
 
+    BD_VK_RED       = 403,
+    BD_VK_GREEN     = 404,
+    BD_VL_YELLOW    = 405,
+    BD_VK_BLUE      = 406,
+
 } bd_vk_key_e;
 
 #endif // _BD_KEYS_H_

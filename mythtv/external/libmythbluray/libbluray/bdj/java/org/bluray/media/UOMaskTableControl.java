@@ -47,7 +47,6 @@ public abstract interface UOMaskTableControl extends Control {
     public static final int SELECT_BUTTON_MASK_INDEX = 18;
     public static final int ACTIVATE_BUTTON_MASK_INDEX = 19;
     public static final int SELECT_AND_ACTIVATE_MASK_INDEX = 20;
-    @Deprecated
     public static final int AUDIO_CHANGE_MASK_INDEX = 21;
     public static final int PRIMARY_AUDIO_CHANGE_MASK_INDEX = 21;
     public static final int ANGLE_CHANGE_MASK_INDEX = 23;

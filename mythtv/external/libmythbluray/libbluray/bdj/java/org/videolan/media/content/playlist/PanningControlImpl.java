@@ -1,6 +1,7 @@
 /*
  * This file is part of libbluray
  * Copyright (C) 2010  William Hahne
+ * Copyright (C) 2015  Petri Hintukainen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,41 +22,66 @@ package org.videolan.media.content.playlist;
 
 import java.awt.Component;
 
+import org.bluray.media.PanningChangeEvent;
 import org.bluray.media.PanningChangeListener;
 import org.bluray.media.PanningControl;
 
-// TODO Figure out why the hell this is needed
+import org.videolan.BDJListeners;
+import org.videolan.media.content.BDHandler;
+
+/*
+  set audio source location in 2D space
+*/
 public class PanningControlImpl implements PanningControl {
+    public PanningControlImpl(BDHandler player) {
+        this.player = player;
+    }
+
     public Component getControlComponent() {
         return null;
     }
 
     public void addPanningChangeListener(PanningChangeListener listener) {
-        // TODO Not implemented
+        listeners.add(listener);
     }
 
     public void removePanningChangeListener(PanningChangeListener listener) {
-        // TODO Not implemented
+        listeners.remove(listener);
     }
 
     public float getLeftRight() {
-        return 0;  // TODO Not implemented
+        return balance;
     }
 
     public float getFrontRear() {
-        return 0;  // TODO Not implemented
+        return fading;
     }
 
     public void setLeftRight(float balance) {
-        // TODO Not implemented
+        setPosition(balance, this.fading);
     }
 
-    public void setFrontRear(float fade) {
-        // TODO Not implemented
+    public void setFrontRear(float panning) {
+        setPosition(this.balance, panning);
     }
 
     public void setPosition(float x, float y) {
-        // TODO Not implemented
+        this.balance = clip(x);
+        this.fading = clip(y);
+
+        player.setPanning(balance, fading);
+
+        listeners.putCallback(new PanningChangeEvent(this, this.balance, this.fading));
     }
 
+    private float clip(float val) {
+        if (val != val) /* NaN */
+            return 0.0f;
+        return Math.min(-1.0f, Math.max(1.0f, val));
+    }
+
+    private BDHandler player;
+    private BDJListeners listeners = new BDJListeners();
+    private float fading = 0.0f;
+    private float balance = 0.0f;
 }

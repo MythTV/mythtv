@@ -1,6 +1,6 @@
 /*
  * This file is part of libbluray
- * Copyright (C) 2010  hpi1
+ * Copyright (C) 2010  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -25,7 +25,7 @@
 
 #include <stdint.h>
 
-struct bd_mobj_cmd_s;
+struct mobj_cmd;
 
 /*
  *
@@ -64,7 +64,7 @@ typedef struct bd_ig_button_s {
 
     /* navigation commands */
     uint16_t      num_nav_cmds;
-    struct bd_mobj_cmd_s *nav_cmds;
+    struct mobj_cmd *nav_cmds;
 
 } BD_IG_BUTTON;
 

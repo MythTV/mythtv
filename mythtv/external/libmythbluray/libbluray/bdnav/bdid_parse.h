@@ -20,7 +20,7 @@
 #if !defined(_BDID_PARSE_H_)
 #define _BDID_PARSE_H_
 
-#include <util/attributes.h>
+#include "util/attributes.h"
 
 #include <stdint.h>
 
@@ -30,7 +30,9 @@ typedef struct bdid_s {
 } BDID_DATA;
 
 
-BD_PRIVATE BDID_DATA* bdid_parse(const char *path); /* parse id.bdmv */
+struct bd_disc;
+
+BD_PRIVATE BDID_DATA* bdid_get(struct bd_disc *disc); /* parse id.bdmv */
 BD_PRIVATE void       bdid_free(BDID_DATA **p);
 
 #endif // _BDID_PARSE_H_

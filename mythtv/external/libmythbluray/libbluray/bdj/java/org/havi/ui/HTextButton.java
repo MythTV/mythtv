@@ -29,40 +29,42 @@ import org.havi.ui.event.HFocusListener;
 public class HTextButton extends HText implements HActionable {
     public HTextButton()
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HTextButton.class.getName(), "");
     }
 
     public HTextButton(String text, int x, int y, int width, int height)
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HTextButton.class.getName(), "");
     }
 
     public HTextButton(String text, int x, int y, int width, int height,
             Font font, Color foreground, Color background,
             HTextLayoutManager tlm)
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HTextButton.class.getName(), "");
     }
 
     public HTextButton(String text)
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HTextButton.class.getName(), "");
     }
 
     public HTextButton(String text, Font font, Color foreground,
             Color background, HTextLayoutManager tlm)
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HTextButton.class.getName(), "");
     }
 
     public static void setDefaultLook(HTextLook hlook)
     {
-        throw new Error("Not implemented");
+        DefaultLook = hlook;
     }
 
     public static HTextLook getDefaultLook()
     {
-        throw new Error("Not implemented");
+        if (DefaultLook == null)
+            org.videolan.Logger.unimplemented("", "getDefaultLook");
+        return DefaultLook;
     }
 
     public void setMove(int keyCode, HNavigable target)
@@ -160,6 +162,8 @@ public class HTextButton extends HText implements HActionable {
     {
         throw new Error("Not implemented");
     }
+
+    private static HTextLook DefaultLook = null;
 
     private static final long serialVersionUID = 7563558661769889160L;
 }

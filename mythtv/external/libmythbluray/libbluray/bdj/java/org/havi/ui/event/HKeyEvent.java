@@ -28,7 +28,6 @@ public class HKeyEvent extends HRcEvent {
         super(source, id, when, modifiers, keyCode, keyChar);
     }
 
-    @Deprecated
     public HKeyEvent(Component source, int id, long when, int modifiers,
             int keyCode)
     {

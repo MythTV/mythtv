@@ -1,6 +1,7 @@
 /*
  * This file is part of libbluray
  * Copyright (C) 2010  William Hahne
+ * Copyright (C) 2012  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -23,12 +24,15 @@ import java.awt.Component;
 
 import org.bluray.media.UOMaskTableControl;
 import org.bluray.media.UOMaskTableListener;
+import org.bluray.media.UOMaskTableChangedEvent;
+import org.bluray.media.UOMaskedEvent;
+
+import org.videolan.BDJListeners;
+import org.videolan.Libbluray;
 import org.videolan.PlaylistInfo;
 
-// TODO: don't know what this is for
 public class UOMaskTableControlImpl implements UOMaskTableControl {
     protected UOMaskTableControlImpl(Handler player) {
-        this.player = player;
     }
 
     public Component getControlComponent() {
@@ -36,22 +40,33 @@ public class UOMaskTableControlImpl implements UOMaskTableControl {
     }
 
     public void addUOMaskTableEventListener(UOMaskTableListener listener) {
-        throw new Error("Not implemented"); // TODO: Not implemented
+        listeners.add(listener);
     }
 
     public void removeUOMaskTableEventListener(UOMaskTableListener listener) {
-        throw new Error("Not implemented"); // TODO: Not implemented
+        listeners.remove(listener);
     }
 
     public boolean[] getMaskedUOTable() {
-        PlaylistInfo pi = player.getPlaylistInfo();
-        if (pi == null)
-                return new boolean[0];
+        long mask = Libbluray.getUOMask();
         boolean[] table = new boolean[64];
-        for (int i = 0; i < 64; i++)
+        for (int i = 0; i < table.length; i++)
+            if (0L != (mask & 1L << i))
+                table[i] = true;
+            else
                 table[i] = false;
+
         return table;
     }
 
-    private Handler player;
+    protected void onUOMasked(int position) {
+        listeners.putCallback(new UOMaskedEvent(this, position));
+    }
+
+    protected void onPlayItemReach(int param) {
+        // TODO: check if masked UO table actually changed
+        listeners.putCallback(new UOMaskTableChangedEvent(this));
+    }
+
+    private BDJListeners listeners = new BDJListeners();
 }

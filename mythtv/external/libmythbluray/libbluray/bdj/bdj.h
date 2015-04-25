@@ -20,9 +20,7 @@
 #ifndef BDJ_H_
 #define BDJ_H_
 
-#include "common.h"
-
-#include <util/attributes.h>
+#include "util/attributes.h"
 
 typedef enum {
     BDJ_EVENT_NONE = 0,
@@ -30,23 +28,38 @@ typedef enum {
     BDJ_EVENT_PLAYITEM,
     BDJ_EVENT_ANGLE,
     BDJ_EVENT_SUBTITLE,
-    BDJ_EVENT_PIP,
     BDJ_EVENT_END_OF_PLAYLIST,
     BDJ_EVENT_PTS,
     BDJ_EVENT_VK_KEY,
+    BDJ_EVENT_MARK,
+    BDJ_EVENT_PSR102,
+    BDJ_EVENT_PLAYLIST,
+
+    BDJ_EVENT_START, /* param: title number */
+    BDJ_EVENT_STOP,
+
+    BDJ_EVENT_RATE,
+    BDJ_EVENT_AUDIO_STREAM,
+    BDJ_EVENT_SECONDARY_STREAM,
+    BDJ_EVENT_UO_MASKED,
 } BDJ_EVENT;
+
+typedef struct {
+    char *persistent_root;
+    char *cache_root;
+
+    char *classpath;
+} BDJ_STORAGE;
 
 typedef struct bdjava_s BDJAVA;
 
 struct bluray;
-struct bd_registers_s;
-struct indx_root_s;
 
 BD_PRIVATE BDJAVA* bdj_open(const char *path, struct bluray *bd,
-                            struct bd_registers_s *registers, struct indx_root_s *index);
-BD_PRIVATE int  bdj_start(BDJAVA *bdjava, unsigned title);
-BD_PRIVATE int  bdj_stop(BDJAVA *bdjava);
+                            const char *bdj_disc_id, BDJ_STORAGE *storage);
 BD_PRIVATE void bdj_close(BDJAVA *bdjava);
-BD_PRIVATE void bdj_process_event(BDJAVA *bdjava, unsigned ev, unsigned param);
+BD_PRIVATE int  bdj_process_event(BDJAVA *bdjava, unsigned ev, unsigned param);
+
+BD_PRIVATE int  bdj_jvm_available(BDJ_STORAGE *storage); /* 0: no. 1: only jvm. 2: jvm + libbluray.jar. */
 
 #endif

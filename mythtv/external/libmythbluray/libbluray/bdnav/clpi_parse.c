@@ -1,6 +1,7 @@
 /*
  * This file is part of libbluray
  * Copyright (C) 2009-2010  John Stebbins
+ * Copyright (C) 2012-2013  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,11 +18,16 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#include "util/macro.h"
+#include "clpi_parse.h"
+
+#include "extdata_parse.h"
+
+#include "disc/disc.h"
+
 #include "file/file.h"
 #include "util/bits.h"
-#include "extdata_parse.h"
-#include "clpi_parse.h"
+#include "util/macro.h"
+#include "util/logging.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -29,8 +35,6 @@
 #define CLPI_SIG1  ('H' << 24 | 'D' << 16 | 'M' << 8 | 'V')
 #define CLPI_SIG2A ('0' << 24 | '2' << 16 | '0' << 8 | '0')
 #define CLPI_SIG2B ('0' << 24 | '1' << 16 | '0' << 8 | '0')
-
-static int clpi_verbose = 0;
 
 static void
 _human_readable_sig(char *sig, uint32_t s1, uint32_t s2)
@@ -49,10 +53,11 @@ _human_readable_sig(char *sig, uint32_t s1, uint32_t s2)
 static int
 _parse_stream_attr(BITSTREAM *bits, CLPI_PROG_STREAM *ss)
 {
-    int len, pos;
+    int64_t pos;
+    int len;
 
     if (!bs_is_align(bits, 0x07)) {
-        fprintf(stderr, "_parse_stream_attr: Stream alignment error\n");
+        BD_DEBUG(DBG_NAV | DBG_CRIT, "_parse_stream_attr(): Stream alignment error\n");
     }
 
     len = bs_read(bits, 8);
@@ -87,22 +92,22 @@ _parse_stream_attr(BITSTREAM *bits, CLPI_PROG_STREAM *ss)
         case 0xa2:
             ss->format = bs_read(bits, 4);
             ss->rate   = bs_read(bits, 4);
-            bs_read_bytes(bits, ss->lang, 3);
+            bs_read_string(bits, ss->lang, 3);
             break;
 
         case 0x90:
         case 0x91:
         case 0xa0:
-            bs_read_bytes(bits, ss->lang, 3);
+            bs_read_string(bits, ss->lang, 3);
             break;
 
         case 0x92:
             ss->char_code = bs_read(bits, 8);
-            bs_read_bytes(bits, ss->lang, 3);
+            bs_read_string(bits, ss->lang, 3);
             break;
 
         default:
-            fprintf(stderr, "stream attr: unrecognized coding type %02x\n", ss->coding_type);
+            BD_DEBUG(DBG_NAV | DBG_CRIT, "_parse_stream_attr(): unrecognized coding type %02x\n", ss->coding_type);
             break;
     };
     ss->lang[3] = '\0';
@@ -127,7 +132,7 @@ _parse_header(BITSTREAM *bits, CLPI_CL *cl)
 
         _human_readable_sig(sig, cl->type_indicator, cl->type_indicator2);
         _human_readable_sig(expect, CLPI_SIG1, CLPI_SIG2A);
-        fprintf(stderr, "failed signature match expected (%s) got (%s)\n", 
+        BD_DEBUG(DBG_NAV | DBG_CRIT, "failed signature match expected (%s) got (%s)\n",
                 expect, sig);
         return 0;
     }
@@ -142,7 +147,8 @@ _parse_header(BITSTREAM *bits, CLPI_CL *cl)
 static int
 _parse_clipinfo(BITSTREAM *bits, CLPI_CL *cl)
 {
-    int len, pos;
+    int64_t pos;
+    int len;
     int ii;
 
     bs_seek_byte(bits, 40);
@@ -166,8 +172,7 @@ _parse_clipinfo(BITSTREAM *bits, CLPI_CL *cl)
     pos = bs_pos(bits) >> 3;
     if (len) {
         cl->clip.ts_type_info.validity = bs_read(bits, 8);
-        bs_read_bytes(bits, cl->clip.ts_type_info.format_id, 4);
-        cl->clip.ts_type_info.format_id[4] = '\0';
+        bs_read_string(bits, cl->clip.ts_type_info.format_id, 4);
         // Seek past the stuff we don't know anything about
         bs_seek_byte(bits, pos + len);
     }
@@ -179,13 +184,25 @@ _parse_clipinfo(BITSTREAM *bits, CLPI_CL *cl)
             malloc(cl->clip.atc_delta_count * sizeof(CLPI_ATC_DELTA));
         for (ii = 0; ii < cl->clip.atc_delta_count; ii++) {
             cl->clip.atc_delta[ii].delta = bs_read(bits, 32);
-            bs_read_bytes(bits, cl->clip.atc_delta[ii].file_id, 5);
-            cl->clip.atc_delta[ii].file_id[5] = '\0';
-            bs_read_bytes(bits, cl->clip.atc_delta[ii].file_code, 4);
-            cl->clip.atc_delta[ii].file_code[4] = '\0';
+            bs_read_string(bits, cl->clip.atc_delta[ii].file_id, 5);
+            bs_read_string(bits, cl->clip.atc_delta[ii].file_code, 4);
             bs_skip(bits, 8);
         }
     }
+
+    // font info
+    if (cl->clip.application_type == 6 /* Sub TS for a sub-path of Text subtitle */) {
+        bs_skip(bits, 8);
+        cl->font_info.font_count = bs_read(bits, 8);
+        if (cl->font_info.font_count) {
+            cl->font_info.font = malloc(cl->font_info.font_count * sizeof(CLPI_FONT));
+            for (ii = 0; ii < cl->font_info.font_count; ii++) {
+                bs_read_string(bits, cl->font_info.font[ii].file_id, 5);
+                bs_skip(bits, 8);
+            }
+        }
+    }
+
     return 1;
 }
 
@@ -307,7 +324,7 @@ _parse_cpi(BITSTREAM *bits, CLPI_CPI *cpi)
 
     bs_skip(bits, 12);
     cpi->type = bs_read(bits, 4);
-    ep_map_pos = bs_pos(bits) >> 3;
+    ep_map_pos = (uint32_t)(bs_pos(bits) >> 3);
 
     // EP Map starts here
     bs_skip(bits, 8);
@@ -569,6 +586,14 @@ static int _parse_clpi_extension(BITSTREAM *bits, int id1, int id2, void *handle
 {
     CLPI_CL *cl = (CLPI_CL*)handle;
 
+    if (id1 == 1) {
+        if (id2 == 2) {
+            // LPCM down mix coefficient
+            //_parse_lpcm_down_mix_coeff(bits, &cl->lpcm_down_mix_coeff);
+            return 0;
+        }
+    }
+
     if (id1 == 2) {
         if (id2 == 4) {
             // Extent start point
@@ -584,6 +609,7 @@ static int _parse_clpi_extension(BITSTREAM *bits, int id1, int id2, void *handle
         }
     }
 
+    BD_DEBUG(DBG_NAV | DBG_CRIT, "_parse_clpi_extension(): unhandled extension %d.%d\n", id1, id2);
     return 0;
 }
 
@@ -644,33 +670,25 @@ clpi_free(CLPI_CL *cl)
     _clean_program(&cl->program_ss);
     _clean_cpi(&cl->cpi_ss);
 
+    X_FREE(cl->font_info.font);
+
     X_FREE(cl);
 }
 
 static CLPI_CL*
-_clpi_parse(const char *path, int verbose)
+_clpi_parse(BD_FILE_H *fp)
 {
     BITSTREAM  bits;
-    BD_FILE_H *fp;
     CLPI_CL   *cl;
-
-    clpi_verbose = verbose;
 
     cl = calloc(1, sizeof(CLPI_CL));
     if (cl == NULL) {
-        return NULL;
-    }
-
-    fp = file_open(path, "rb");
-    if (fp == NULL) {
-        fprintf(stderr, "Failed to open %s\n", path);
-        X_FREE(cl);
+        BD_DEBUG(DBG_CRIT, "out of memory\n");
         return NULL;
     }
 
     bs_init(&bits, fp);
     if (!_parse_header(&bits, cl)) {
-        file_close(fp);
         clpi_free(cl);
         return NULL;
     }
@@ -683,48 +701,70 @@ _clpi_parse(const char *path, int verbose)
     }
 
     if (!_parse_clipinfo(&bits, cl)) {
-        file_close(fp);
         clpi_free(cl);
         return NULL;
     }
     if (!_parse_sequence(&bits, cl)) {
-        file_close(fp);
         clpi_free(cl);
         return NULL;
     }
     if (!_parse_program_info(&bits, cl)) {
-        file_close(fp);
         clpi_free(cl);
         return NULL;
     }
     if (!_parse_cpi_info(&bits, cl)) {
-        file_close(fp);
         clpi_free(cl);
         return NULL;
     }
+
+    return cl;
+}
+
+CLPI_CL*
+clpi_parse(const char *path)
+{
+    BD_FILE_H *fp;
+    CLPI_CL   *cl;
+
+    fp = file_open(path, "rb");
+    if (!fp) {
+        BD_DEBUG(DBG_NAV | DBG_CRIT, "Failed to open %s\n", path);
+        return NULL;
+    }
+
+    cl = _clpi_parse(fp);
+    file_close(fp);
+    return cl;
+}
+
+static CLPI_CL*
+_clpi_get(BD_DISC *disc, const char *dir, const char *file)
+{
+    BD_FILE_H *fp;
+    CLPI_CL   *cl;
+
+    fp = disc_open_file(disc, dir, file);
+    if (!fp) {
+        return NULL;
+    }
+
+    cl = _clpi_parse(fp);
     file_close(fp);
     return cl;
 }
 
 CLPI_CL*
-clpi_parse(const char *path, int verbose)
+clpi_get(BD_DISC *disc, const char *file)
 {
-    CLPI_CL *cl = _clpi_parse(path, verbose);
+    CLPI_CL *cl;
 
-    /* if failed, try backup file */
-    if (!cl) {
-        size_t len   = strlen(path);
-        char *backup = malloc(len + 8);
-
-        strncpy(backup, path, len - 18);
-        strcpy(backup + len - 18, "BACKUP/");
-        strcpy(backup + len - 18 + 7, path + len - 18);
-
-        cl = _clpi_parse(backup, verbose);
-
-        X_FREE(backup);
+    cl = _clpi_get(disc, "BDMV" DIR_SEP "CLIPINF", file);
+    if (cl) {
+        return cl;
     }
 
+    /* if failed, try backup file */
+    cl = _clpi_get(disc, "BDMV" DIR_SEP "BACKUP" DIR_SEP "CLIPINF", file);
     return cl;
 }
 
@@ -736,7 +776,6 @@ clpi_copy(const CLPI_CL* src_cl)
 
     if (src_cl) {
         dest_cl = (CLPI_CL*) calloc(1, sizeof(CLPI_CL));
-
         dest_cl->clip.clip_stream_type = src_cl->clip.clip_stream_type;
         dest_cl->clip.application_type = src_cl->clip.application_type;
         dest_cl->clip.is_atc_delta = src_cl->clip.is_atc_delta;
@@ -808,6 +847,12 @@ clpi_copy(const CLPI_CL* src_cl)
                 dest_cl->cpi.entry[ii].fine[jj].pts_ep = src_cl->cpi.entry[ii].fine[jj].pts_ep;
                 dest_cl->cpi.entry[ii].fine[jj].spn_ep = src_cl->cpi.entry[ii].fine[jj].spn_ep;
             }
+        }
+
+        dest_cl->font_info.font_count = src_cl->font_info.font_count;
+        if (dest_cl->font_info.font_count) {
+            dest_cl->font_info.font = malloc(dest_cl->font_info.font_count * sizeof(CLPI_FONT));
+            memcpy(dest_cl->font_info.font, src_cl->font_info.font, dest_cl->font_info.font_count * sizeof(CLPI_FONT));
         }
     }
 

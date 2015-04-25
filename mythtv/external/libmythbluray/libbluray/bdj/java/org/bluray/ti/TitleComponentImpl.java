@@ -1,3 +1,22 @@
+/*
+ * This file is part of libbluray
+ * Copyright (C) 2010-2015 VideoLAN
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
+
 package org.bluray.ti;
 
 import java.util.Date;
@@ -12,9 +31,10 @@ import org.davic.net.InvalidLocatorException;
 import org.videolan.StreamInfo;
 
 public class TitleComponentImpl implements TitleComponent {
-    protected TitleComponentImpl(int stn, StreamInfo stream, StreamType type, boolean primary, int playlistId, int playitemId, Title service)
+    protected TitleComponentImpl(int stream_number, StreamInfo stream, StreamType type, boolean primary,
+                                 int playlistId, int playitemId, Title service)
     {
-        this.stn = stn;
+        this.stream_number = stream_number;
         this.stream = stream;
         this.type = type;
         this.primary = primary;
@@ -46,21 +66,23 @@ public class TitleComponentImpl implements TitleComponent {
         String str;
 
         str = "bd://" + ((TitleImpl)service).getTitleNum() +
-                  ".PLAYLIST:" + playlistId +
-                  ".ITEM:" + playitemId;
+            ".PLAYLIST:" + playlistId +
+            ".ITEM:" + playitemId;
 
         if (type.equals(StreamType.AUDIO) && primary)
-            str += ".A1:" + stn;
+            str += ".A1:" + stream_number;
         else if (type.equals(StreamType.VIDEO) && primary)
-            str += ".V1:" + stn;
+            str += ".V1:" + stream_number;
         else if (type.equals(StreamType.AUDIO) && !primary)
-            str += ".A2:" + stn;
+            str += ".A2:" + stream_number;
         else if (type.equals(StreamType.VIDEO) && !primary)
-            str += ".V2:" + stn;
+            str += ".V2:" + stream_number;
         else if (type.equals(StreamType.SUBTITLES) && primary)
-            str += ".P:" + stn;
-        else
+            str += ".P:" + stream_number;
+        else {
+            System.err.println("Unknown StreamType " + type);
             return null;
+        }
 
         try {
             return new BDLocator(str);
@@ -74,7 +96,8 @@ public class TitleComponentImpl implements TitleComponent {
     }
 
     public Date getUpdateTime() {
-        throw new Error("Not implemented"); // TODO implement
+        org.videolan.Logger.unimplemented(TitleComponentImpl.class.getName(), "getUpdateTime");
+        return null;
     }
 
     public CodingType getCodingType() {
@@ -82,14 +105,14 @@ public class TitleComponentImpl implements TitleComponent {
     }
 
     public int getStreamNumber() {
-        return stn;
+        return stream_number;
     }
 
     public int getSubPathId() {
         return stream.getSubPathId();
     }
 
-    int stn;
+    int stream_number;
     StreamInfo stream;
     StreamType type;
     boolean primary;

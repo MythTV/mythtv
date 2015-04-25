@@ -20,7 +20,6 @@
 package org.videolan.media.content.playlist;
 
 import java.awt.Dimension;
-import java.util.LinkedList;
 
 import javax.media.Time;
 
@@ -31,8 +30,7 @@ import org.bluray.media.PiPStatusListener;
 import org.bluray.media.StreamNotAvailableException;
 import org.havi.ui.HScreenRectangle;
 
-import org.videolan.BDJAction;
-import org.videolan.BDJActionManager;
+import org.videolan.BDJListeners;
 import org.videolan.Libbluray;
 import org.videolan.StreamInfo;
 import org.videolan.TIClip;
@@ -50,8 +48,7 @@ public class PiPControlImpl extends VideoControl implements PiPControl, Asynchro
     }
 
     protected void setStreamNumber(int num) {
-        int psr = Libbluray.readPSR(Libbluray.PSR_SECONDARY_AUDIO_VIDEO)& 0xFFFF00FF;
-        Libbluray.writePSR(Libbluray.PSR_SECONDARY_AUDIO_VIDEO, psr | (num << 8));
+        Libbluray.writePSR(Libbluray.PSR_SECONDARY_AUDIO_VIDEO, num << 8, 0x0000ff00);
     }
 
     public int getCurrentStreamNumber() {
@@ -59,10 +56,7 @@ public class PiPControlImpl extends VideoControl implements PiPControl, Asynchro
     }
 
     public void setDisplay(boolean value) {
-        int psr = Libbluray.readPSR(Libbluray.PSR_SECONDARY_AUDIO_VIDEO) & 0x7FFFFFFF;
-        if (value)
-            psr |= 0x80000000;
-        Libbluray.writePSR(Libbluray.PSR_SECONDARY_AUDIO_VIDEO, psr);
+        Libbluray.writePSR(Libbluray.PSR_SECONDARY_AUDIO_VIDEO, value ? 0x80000000 : 0, 0x80000000);
     }
 
     public boolean getDisplay() {
@@ -85,68 +79,43 @@ public class PiPControlImpl extends VideoControl implements PiPControl, Asynchro
     }
 
     public boolean getIsSyncedDuringTrickPlay() {
-        throw new Error("Not implemented"); // TODO implement
+        org.videolan.Logger.unimplemented("PiPControlImpl", "getIsSyncedDuringTrickPlay");
+        return false;
     }
 
-    protected void onPiPChange(int param) {
-        synchronized (listeners) {
-            if (!listeners.isEmpty())
-                BDJActionManager.getInstance().putCallback(
-                                                           new PiPCallback(this, param > 0));
-        }
+    protected void onPiPStatusChange(boolean enable) {
+        listeners.putCallback(new PiPStatusEvent(enable, this));
     }
 
     public void addPiPStatusListener(PiPStatusListener listener) {
-        synchronized(listeners) {
-            listeners.add(listener);
-        }
+        listeners.add(listener);
     }
 
     public void removePiPStatusListener(PiPStatusListener listener) {
-        synchronized(listeners) {
-            listeners.remove(listener);
-        }
-    }
-
-    private class PiPCallback extends BDJAction {
-        private PiPCallback(PiPControlImpl control, boolean available) {
-            this.control = control;
-            this.available = available;
-        }
-
-        protected void doAction() {
-            LinkedList list;
-            synchronized (control.listeners) {
-                list = (LinkedList)control.listeners.clone();
-            }
-            PiPStatusEvent event = new PiPStatusEvent(available, control);
-            for (int i = 0; i < list.size(); i++)
-                ((PiPStatusListener)list.get(i)).piPStatusChange(event);
-        }
-
-        private PiPControlImpl control;
-        private boolean available;
+        listeners.remove(listener);
     }
 
     public void start() {
-        throw new Error("Not implemented"); // TODO implement
+        org.videolan.Logger.unimplemented("PiPControlImpl", "start");
     }
 
     public void stop() {
-        throw new Error("Not implemented"); // TODO implement
+        org.videolan.Logger.unimplemented("PiPControlImpl", "stop");
     }
 
     public void pause() {
-        throw new Error("Not implemented"); // TODO implement
+        org.videolan.Logger.unimplemented("PiPControlImpl", "pause");
     }
 
     public boolean resume() {
-        throw new Error("Not implemented"); // TODO implement
+        org.videolan.Logger.unimplemented("PiPControlImpl", "resume");
+        return true;
     }
 
     public Time getElapsedTime() {
-        throw new Error("Not implemented"); // TODO implement
+        org.videolan.Logger.unimplemented("PiPControlImpl", "getElapsedTime");
+        return null;
     }
 
-    private LinkedList listeners = new LinkedList();
+    private BDJListeners listeners = new BDJListeners();
 }

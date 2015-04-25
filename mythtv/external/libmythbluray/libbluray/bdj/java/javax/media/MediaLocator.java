@@ -19,10 +19,11 @@
 
 package javax.media;
 
+import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class MediaLocator
+public class MediaLocator implements Serializable
 {
     public MediaLocator(URL url) { 
         this(url.toExternalForm());
@@ -58,4 +59,6 @@ public class MediaLocator
     
     private String protocol = "";
     private String remainder = "";
+
+    private static final long serialVersionUID = 1L;
 }

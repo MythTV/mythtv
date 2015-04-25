@@ -1,6 +1,7 @@
 /*
  * This file is part of libbluray
  * Copyright (C) 2010  William Hahne
+ * Copyright (C) 2013  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -25,128 +26,162 @@ import java.awt.Font;
 import org.havi.ui.event.HFocusEvent;
 import org.havi.ui.event.HFocusListener;
 
+import org.videolan.Logger;
+
 public class HText extends HStaticText implements HNavigable {
     public HText()
     {
-        throw new Error("Not implemented");
+        this(null);
     }
 
     public HText(String text)
     {
-        throw new Error("Not implemented");
+        this(text, text, 0, 0, 0, 0);
     }
 
     public HText(String textNormal, String textFocus)
     {
-        throw new Error("Not implemented");
+        this(textNormal, textFocus, 0, 0, 0, 0);
     }
 
     public HText(String text, int x, int y, int width, int height)
     {
-        throw new Error("Not implemented");
+        this(text, text, x, y, width, height);
     }
 
     public HText(String textNormal, String textFocus, int x, int y, int width,
             int height)
     {
-        throw new Error("Not implemented");
+        super(textNormal, x, y, width, height);
+        try {
+            setLook(getDefaultLook());
+        } catch (HInvalidLookException e) {
+            logger.error("failed setting default look");
+        }
+
+        if (textFocus != null) {
+            super.setTextContent(textFocus, FOCUSED_STATE);
+            super.setTextContent(textFocus, ACTIONED_FOCUSED_STATE);
+            super.setTextContent(textFocus, DISABLED_FOCUSED_STATE);
+            super.setTextContent(textFocus, DISABLED_ACTIONED_FOCUSED_STATE);
+        }
     }
 
     public HText(String text, Font font, Color foreground, Color background,
             HTextLayoutManager tlm)
     {
-        throw new Error("Not implemented");
+        this(text, text, 0, 0, 0, 0, font, foreground, background, tlm);
     }
 
     public HText(String textNormal, String textFocus, Font font,
             Color foreground, Color background, HTextLayoutManager tlm)
     {
-        throw new Error("Not implemented");
+        this(textNormal, textFocus, 0, 0, 0, 0, font, foreground, background, tlm);
     }
 
     public HText(String text, int x, int y, int width, int height, Font font,
             Color foreground, Color background, HTextLayoutManager tlm)
     {
-        throw new Error("Not implemented");
+        this(text, text, x, y, width, height, font, foreground, background, tlm);
     }
 
     public HText(String textNormal, String textFocus, int x, int y, int width,
             int height, Font font, Color foreground, Color background,
             HTextLayoutManager tlm)
     {
-        throw new Error("Not implemented");
+        this(textNormal, textFocus, x, y, width, height);
+        setFont(font);
+        setForeground(foreground);
+        setBackground(background);
+        setTextLayoutManager(tlm);
     }
 
     public static void setDefaultLook(HTextLook look)
     {
-        throw new Error("Not implemented");
+        DefaultLook = look;
     }
 
     public static HTextLook getDefaultLook()
     {
-        throw new Error("Not implemented");
+        if (DefaultLook == null)
+            DefaultLook = new HTextLook();
+        return DefaultLook;
     }
 
     public void setMove(int keyCode, HNavigable target)
     {
-        throw new Error("Not implemented");
+        logger.unimplemented("setMove");
     }
 
     public HNavigable getMove(int keyCode)
     {
-        throw new Error("Not implemented");
+        logger.unimplemented("getMove");
+        return this;
+    }
+
+    public boolean isFocusable()
+    {
+        return true;
     }
 
     public void setFocusTraversal(HNavigable up, HNavigable down,
             HNavigable left, HNavigable right)
     {
-        throw new Error("Not implemented");
+        logger.unimplemented("setFocusTraversal");
     }
 
     public boolean isSelected()
     {
-        throw new Error("Not implemented");
+        logger.unimplemented("isSelected");
+        return false;
     }
 
     public void setGainFocusSound(HSound sound)
     {
-        throw new Error("Not implemented");
+        logger.unimplemented("setGainFocusSound");
     }
 
     public void setLoseFocusSound(HSound sound)
     {
-        throw new Error("Not implemented");
+        logger.unimplemented("setLoseFocusSound");
     }
 
     public HSound getGainFocusSound()
     {
-        throw new Error("Not implemented");
+        logger.unimplemented("getGainFocusSound");
+        return null;
     }
 
     public HSound getLoseFocusSound()
     {
-        throw new Error("Not implemented");
+        logger.unimplemented("getLoseFocusSound");
+        return null;
     }
 
     public void addHFocusListener(HFocusListener l)
     {
-        throw new Error("Not implemented");
+        logger.unimplemented("addHFocusListener");
     }
 
     public void removeHFocusListener(HFocusListener l)
     {
-        throw new Error("Not implemented");
+        logger.unimplemented("removeHFocusListener");
     }
 
     public int[] getNavigationKeys()
     {
-        throw new Error("Not implemented");
+        logger.unimplemented("getNavigationKeys");
+        return null;
     }
 
     public void processHFocusEvent(HFocusEvent evt)
     {
-        throw new Error("Not implemented");
+        logger.unimplemented("processHFocusEvent");
     }
 
+    private static HTextLook DefaultLook = null;
+
     private static final long serialVersionUID = -8178609258303529066L;
+
+    private static final Logger logger = Logger.getLogger(HText.class.getName());
 }

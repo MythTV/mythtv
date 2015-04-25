@@ -32,6 +32,7 @@ public class DataSource extends DripFeedDataSource {
     }
 
     public void feed(byte[] clip_part) {
+        org.videolan.Logger.unimplemented(DataSource.class.getName(), "feed");
         throw new Error("Not implemented");
     }
 }

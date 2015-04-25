@@ -24,24 +24,27 @@ import org.havi.ui.event.HScreenLocationModifiedListener;
 public class HVideoComponent extends HComponent {
     protected HVideoComponent()
     {
-
+        org.videolan.Logger.unimplemented(HVideoComponent.class.getName(), "");
     }
 
     public HVideoDevice getVideoDevice()
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HVideoComponent.class.getName(), "getVideoDevice");
+        return new HVideoDevice();
     }
 
     public void addOnScreenLocationModifiedListener(
             HScreenLocationModifiedListener slml)
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HVideoComponent.class.getName(),
+                                          "addOnScreenLocationModifiedListener");
     }
 
     public void removeOnScreenLocationModifiedListener(
             HScreenLocationModifiedListener slml)
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HVideoComponent.class.getName(),
+                                          "removeOnScreenLocationModifiedListener");
     }
 
     private static final long serialVersionUID = -2729982569604493491L;

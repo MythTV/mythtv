@@ -1,6 +1,6 @@
 /*
  * This file is part of libbluray
- * Copyright (C) 2010  hpi1
+ * Copyright (C) 2010-2013  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,9 +20,11 @@
 #if !defined(_GRAPHICS_PROCESSOR_H_)
 #define _GRAPHICS_PROCESSOR_H_
 
+#include "pg.h"
 #include "ig.h"
+#include "textst.h"
 
-#include <util/attributes.h>
+#include "util/attributes.h"
 
 #include <stdint.h>
 
@@ -41,14 +43,20 @@ typedef struct {
     unsigned      num_palette;
     unsigned      num_object;
     unsigned      num_window;
+    unsigned      num_dialog;    /* number of decoded dialog segments */
+    unsigned      total_dialog;  /* total dialog segments in stream */
 
     BD_PG_PALETTE *palette;
     BD_PG_OBJECT  *object;
     BD_PG_WINDOW  *window;
+    BD_TEXTST_DIALOG_PRESENTATION *dialog;
 
     /* only one of the following segments can be present */
     BD_IG_INTERACTIVE   *ics;
     BD_PG_COMPOSITION   *pcs;
+    BD_TEXTST_DIALOG_STYLE *style;
+
+    uint8_t decoding; /* internal flag: PCS/ICS decoded, but no end of presentation seen yet */
 
 } PG_DISPLAY_SET;
 
@@ -60,25 +68,6 @@ BD_PRIVATE void pg_display_set_free(PG_DISPLAY_SET **s);
 
 BD_PRIVATE GRAPHICS_PROCESSOR *graphics_processor_init(void);
 BD_PRIVATE void                graphics_processor_free(GRAPHICS_PROCESSOR **p);
-
-/**
- *
- *  Decode data from MPEG-PES input stream
- *
- *  Only segments where DTS <= STC are decoded.
- *  If STC < 0, all segments are immediately decoded to display set.
- *
- *  All decoded PES packets are removed from buffer.
- *
- * @param s  display set
- * @param buf  data to decode
- * @param stc  current playback time
- * @return 1 if display set was completed, 0 otherwise
- */
-BD_PRIVATE int
-graphics_processor_decode_pes(PG_DISPLAY_SET **s,
-                              struct pes_buffer_s **buf,
-                              int64_t stc);
 
 /**
  *

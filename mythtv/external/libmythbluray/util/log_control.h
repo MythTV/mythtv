@@ -46,6 +46,7 @@ enum debug_mask_enum {
     DBG_STREAM     = 0x04000,
     DBG_GC         = 0x08000, /* graphics controller */
     DBG_DECODE     = 0x10000, /* PG / IG decoders, m2ts demuxer */
+    DBG_JNI        = 0x20000, /* JNI calls */
 };
 
 typedef enum debug_mask_enum debug_mask_t;
@@ -62,7 +63,7 @@ void bd_set_debug_mask(uint32_t mask);
 uint32_t bd_get_debug_mask(void);
 
 #ifdef __cplusplus
-};
+}
 #endif
 
 #endif /* BD_LOG_CONTROL_H_ */

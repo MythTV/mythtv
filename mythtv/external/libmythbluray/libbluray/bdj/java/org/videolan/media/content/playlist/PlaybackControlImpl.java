@@ -20,14 +20,13 @@
 package org.videolan.media.content.playlist;
 
 import java.awt.Component;
-import java.util.LinkedList;
 
 import org.bluray.media.PlaybackControl;
 import org.bluray.media.PlaybackListener;
 import org.bluray.media.PlaybackMarkEvent;
 import org.bluray.media.PlaybackPlayItemEvent;
+import org.videolan.BDJListeners;
 import org.videolan.BDJAction;
-import org.videolan.BDJActionManager;
 import org.videolan.PlaylistInfo;
 import org.videolan.TIMark;
 
@@ -41,15 +40,11 @@ public class PlaybackControlImpl implements PlaybackControl {
     }
 
     public void addPlaybackControlListener(PlaybackListener listener) {
-        synchronized(listeners) {
-            listeners.add(listener);
-        }
+        listeners.add(listener);
     }
 
     public void removePlaybackControlListener(PlaybackListener listener) {
-        synchronized(listeners) {
-            listeners.remove(listener);
-        }
+        listeners.remove(listener);
     }
 
     public void skipToMark(int mark) throws IllegalArgumentException {
@@ -121,42 +116,34 @@ public class PlaybackControlImpl implements PlaybackControl {
         }
     }
 
+    protected void onMarkReach(int mark) {
+        if (mark < 0) {
+            return;
+        }
+        PlaylistInfo pi = player.getPlaylistInfo();
+        if (pi == null) {
+            return;
+        }
+        TIMark[] marks = pi.getMarks();
+        if (marks == null) {
+            return;
+        }
+        if (mark >= marks.length) {
+            return;
+        }
+
+        notifyListeners(new PlaybackMarkEvent(this, mark));
+    }
+
     protected void onPlayItemReach(int param) {
         notifyListeners(new PlaybackPlayItemEvent(this, param));
     }
 
     private void notifyListeners(Object event) {
-        synchronized (listeners) {
-            if (!listeners.isEmpty())
-                BDJActionManager.getInstance().putCallback(
-                        new PlayeBackCallback(this, event));
-        }
+        listeners.putCallback(event);
     }
 
-    private class PlayeBackCallback extends BDJAction {
-        private PlayeBackCallback(PlaybackControlImpl control, Object event) {
-            this.control = control;
-            this.event = event;
-        }
 
-        protected void doAction() {
-            LinkedList list;
-            synchronized (control.listeners) {
-                list = (LinkedList)control.listeners.clone();
-            }
-            if (event instanceof PlaybackMarkEvent) {
-                for (int i = 0; i < list.size(); i++)
-                    ((PlaybackListener)list.get(i)).markReached((PlaybackMarkEvent)event);
-            } else if (event instanceof PlaybackPlayItemEvent) {
-                for (int i = 0; i < list.size(); i++)
-                    ((PlaybackListener)list.get(i)).playItemReached((PlaybackPlayItemEvent)event);
-            }
-        }
-
-        private PlaybackControlImpl control;
-        private Object event;
-    }
-
-    private LinkedList listeners = new LinkedList();
+    private BDJListeners listeners = new BDJListeners();
     private Handler player;
 }

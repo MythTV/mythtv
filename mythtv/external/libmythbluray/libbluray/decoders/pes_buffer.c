@@ -24,14 +24,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-PES_BUFFER *pes_buffer_alloc(int size)
+PES_BUFFER *pes_buffer_alloc(void)
 {
     PES_BUFFER *p = calloc(1, sizeof(*p));
-
-    if (p) {
-        p->size = size;
-        p->buf = malloc(size);
-    }
 
     return p;
 }
@@ -92,5 +87,15 @@ void pes_buffer_remove(PES_BUFFER **head, PES_BUFFER *p)
                 pes_buffer_free(&p);
             }
         }
+    }
+}
+
+void pes_buffer_next(PES_BUFFER **head)
+{
+    if (head && *head) {
+        PES_BUFFER *p = *head;
+        *head = (*head)->next;
+        p->next = NULL;
+        pes_buffer_free(&p);
     }
 }

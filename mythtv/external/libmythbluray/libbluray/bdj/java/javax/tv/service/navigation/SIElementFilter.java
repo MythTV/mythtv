@@ -54,7 +54,8 @@ public final class SIElementFilter extends ServiceFilter
         
         // if we still don't have a response just cancel the request
         if (!requestor.getResponse()) {
-            req.cancel();
+            if (req != null)
+                req.cancel();
         }
         
         if (requestor.getResult() == null)

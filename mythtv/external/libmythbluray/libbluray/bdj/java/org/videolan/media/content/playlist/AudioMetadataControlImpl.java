@@ -30,11 +30,12 @@ public class AudioMetadataControlImpl implements AudioMetadataControl {
     }
 
     public boolean isMetaDataProcessingOn() {
-        throw new Error("Not implemented"); // TODO implement
+        org.videolan.Logger.unimplemented("AudioMetadataControlImpl", "");
+        return false;
     }
 
     public void setMetaDataProcessingOn(boolean value) {
-        throw new Error("Not implemented"); // TODO implement
+        org.videolan.Logger.unimplemented("AudioMetadataControlImpl", "");
     }
 
 }

@@ -19,7 +19,9 @@
 
 package javax.media;
 
-public class Time {
+import java.io.Serializable;
+
+public class Time implements Serializable {
     public static final long ONE_SECOND = 1000000000L;
     protected long nanoseconds;
 
@@ -47,4 +49,6 @@ public class Time {
     {
         return nanoseconds / (double) ONE_SECOND;
     }
+
+    private static final long serialVersionUID = 1L;
 }

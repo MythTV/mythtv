@@ -19,7 +19,9 @@
 
 package org.dvb.application;
 
-public class AppID {
+import java.io.Serializable;
+
+public class AppID implements Serializable {
     public AppID(int oid, int aid)
     {
         this.oid = oid;
@@ -68,4 +70,6 @@ public class AppID {
 
     int oid;
     int aid;
+
+    private static final long serialVersionUID = 1;
 }

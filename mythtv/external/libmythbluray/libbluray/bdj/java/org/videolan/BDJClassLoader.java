@@ -20,9 +20,14 @@
 package org.videolan;
 
 import java.net.MalformedURLException;
+
+import java.io.File;
+import java.io.InputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Enumeration;
 
 import javax.tv.xlet.Xlet;
 
@@ -69,14 +74,16 @@ public class BDJClassLoader extends URLClassLoader {
         if (protocol == null)
             return null;
         url = protocol +
-            System.getProperty("bluray.vfs.root") +
-            "/BDMV/JAR/" + url + path.substring(5);
+            BDJLoader.getCachedFile(System.getProperty("bluray.vfs.root") + File.separator +
+                                    "BDMV" + File.separator +
+                                    "JAR" + File.separator +
+                                    url) + path.substring(5);
         //if (!url.endsWith("/"))
         //    url += "/";
         try {
             return new URL(url);
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            System.err.println("" + e + "\n" + Logger.dumpStack(e));
             return null;
         }
     }
@@ -108,6 +115,45 @@ public class BDJClassLoader extends URLClassLoader {
         for (int i = 0; i < classPath.size(); i++)
             addURL((URL)classPath.get(i));
         this.xletClass = xletClass;
+    }
+
+    public Class loadClass(String name) throws java.lang.ClassNotFoundException {
+        /* hook FileSystem in java.io.File */
+        if (name.equals("java.io.File")) {
+            Class c = super.loadClass(name);
+            if (c != null) {
+                java.io.BDFileSystem.init(c);
+            }
+            return c;
+        }
+        return super.loadClass(name);
+    }
+
+    public URL getResource(String name) {
+        name = name.replace('\\', '/');
+        return super.getResource(name);
+    }
+
+    /* final in J2ME
+    public Enumeration getResources(String name) throws IOException {
+        name = name.replace('\\', '/');
+        return super.getResources(name);
+    }
+    */
+
+    public URL findResource(String name) {
+        name = name.replace('\\', '/');
+        return super.findResource(name);
+    }
+
+    public Enumeration findResources(String name) throws IOException {
+        name = name.replace('\\', '/');
+        return super.findResources(name);
+    }
+
+    public InputStream getResourceAsStream(String name) {
+        name = name.replace('\\', '/');
+        return super.getResourceAsStream(name);
     }
 
     private String xletClass;

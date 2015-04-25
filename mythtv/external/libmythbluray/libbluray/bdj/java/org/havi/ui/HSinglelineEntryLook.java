@@ -26,6 +26,7 @@ import java.awt.Insets;
 public class HSinglelineEntryLook implements HExtendedLook {
     public HSinglelineEntryLook()
     {
+        org.videolan.Logger.unimplemented(HSinglelineEntryLook.class.getName(), "");
     }
 
     public void fillBackground(Graphics g, HVisible visible, int state)

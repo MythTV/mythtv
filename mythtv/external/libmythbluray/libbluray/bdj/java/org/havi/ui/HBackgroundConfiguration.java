@@ -46,8 +46,10 @@ public class HBackgroundConfiguration extends HScreenConfiguration {
 
     public void setColor(Color color)
             throws HPermissionDeniedException, HConfigurationException {
-        if (color.getAlpha() < 255)
-            throw new HConfigurationException();
+        if (color.getAlpha() < 255) {
+            org.videolan.Logger.unimplemented("HBackgroundConfiguration", "setColor(alpha<255)");
+            //throw new HConfigurationException();
+        }
         this.color = color;
     }
 

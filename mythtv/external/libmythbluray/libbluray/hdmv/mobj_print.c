@@ -17,9 +17,9 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#include "util/macro.h"
+#include "mobj_print.h"
 
-#include "mobj_parse.h"
+#include "mobj_data.h"
 #include "hdmv_insn.h"
 
 #include <stdio.h>
@@ -87,6 +87,72 @@ static const char * const psr_info[128] = {
     "/* RO: PSR59: Characteristic text caps */",
     "/* RO: PSR60: Characteristic text caps */",
     "/* RO: PSR61: Characteristic text caps */",
+    /* PSR62 */ NULL,
+    /* PSR63 */ NULL,
+    /* PSR64 */ NULL,
+    /* PSR65 */ NULL,
+    /* PSR66 */ NULL,
+    /* PSR67 */ NULL,
+    /* PSR68 */ NULL,
+    /* PSR69 */ NULL,
+    /* PSR70 */ NULL,
+    /* PSR71 */ NULL,
+    /* PSR72 */ NULL,
+    /* PSR73 */ NULL,
+    /* PSR74 */ NULL,
+    /* PSR75 */ NULL,
+    /* PSR76 */ NULL,
+    /* PSR77 */ NULL,
+    /* PSR78 */ NULL,
+    /* PSR79 */ NULL,
+    /* PSR80 */ NULL,
+    /* PSR81 */ NULL,
+    /* PSR82 */ NULL,
+    /* PSR83 */ NULL,
+    /* PSR84 */ NULL,
+    /* PSR85 */ NULL,
+    /* PSR86 */ NULL,
+    /* PSR87 */ NULL,
+    /* PSR88 */ NULL,
+    /* PSR89 */ NULL,
+    /* PSR90 */ NULL,
+    /* PSR91 */ NULL,
+    /* PSR92 */ NULL,
+    /* PSR93 */ NULL,
+    /* PSR94 */ NULL,
+    /* PSR95 */ NULL,
+    /* PSR96 */ NULL,
+    /* PSR97 */ NULL,
+    /* PSR98 */ NULL,
+    /* PSR99 */ NULL,
+    /* PSR100 */ NULL,
+    /* PSR101 */ NULL,
+    "/*     PSR102: BD+ receive */",
+    "/*     PSR103: BD+ send */",
+    "/*     PSR104: BD+ shared */",
+    /* PSR105 */ NULL,
+    /* PSR106 */ NULL,
+    /* PSR107 */ NULL,
+    /* PSR108 */ NULL,
+    /* PSR109 */ NULL,
+    /* PSR110 */ NULL,
+    /* PSR111 */ NULL,
+    /* PSR112 */ NULL,
+    /* PSR113 */ NULL,
+    /* PSR114 */ NULL,
+    /* PSR115 */ NULL,
+    /* PSR116 */ NULL,
+    /* PSR117 */ NULL,
+    /* PSR118 */ NULL,
+    /* PSR119 */ NULL,
+    /* PSR120 */ NULL,
+    /* PSR121 */ NULL,
+    /* PSR122 */ NULL,
+    /* PSR123 */ NULL,
+    /* PSR124 */ NULL,
+    /* PSR125 */ NULL,
+    /* PSR126 */ NULL,
+    /* PSR127 */ NULL,
 };
 
 static const char * const insn_groups[4] = {
@@ -138,6 +204,11 @@ static const char * const insn_opt_setsys[32] = {
     "STILL_OFF",
     "SET_OUTPUT_MODE",
     "SET_STREAM_SS",
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    "[SETSYSTEM_0x10]",
 };
 
 static const char * const insn_opt_cmp[16] = {
@@ -214,9 +285,9 @@ static int _sprint_operands(char *buf, MOBJ_CMD *cmd)
         buf += sprintf(buf, "       \t      ");
     }
 
-    if (psr1 >= 0)
+    if (psr1 >= 0 && psr1 < 128 && psr_info[psr1])
         buf += sprintf(buf, " %s", psr_info[psr1]);
-    if (psr2 >= 0 && psr2 != psr1)
+    if (psr2 >= 0 && psr2 < 128 && psr2 != psr1 && psr_info[psr2])
         buf += sprintf(buf, " %s", psr_info[psr2]);
 
     return buf - start;
@@ -237,12 +308,22 @@ static int _sprint_operands_hex(char *buf, MOBJ_CMD *cmd)
     return buf - start;
 }
 
+static uint32_t _cmd_to_u32(HDMV_INSN *insn)
+{
+    union {
+        HDMV_INSN insn;
+        uint8_t u8[4];
+    } tmp;
+    tmp.insn = *insn;
+    return (tmp.u8[0] << 24) | (tmp.u8[1] << 16) | (tmp.u8[2] << 8) | tmp.u8[3];
+}
+
 int mobj_sprint_cmd(char *buf, MOBJ_CMD *cmd)
 {
     char *start = buf;
     HDMV_INSN *insn = &cmd->insn;
 
-    buf += sprintf(buf, "%08x %08x,%08x  ", MKINT_BE32((uint8_t*)&cmd->insn), cmd->dst, cmd->src);
+    buf += sprintf(buf, "%08x %08x,%08x  ", _cmd_to_u32(&cmd->insn), cmd->dst, cmd->src);
 
     switch(insn->grp) {
         case INSN_GROUP_BRANCH:
@@ -298,8 +379,15 @@ int mobj_sprint_cmd(char *buf, MOBJ_CMD *cmd)
                     break;
             case SET_SETSYSTEM:
                 if (insn_opt_setsys[insn->set_opt]) {
+
                     buf += sprintf(buf, "%-10s ", insn_opt_setsys[insn->set_opt]);
-                    buf += _sprint_operands_hex(buf, cmd);
+                    if (insn->set_opt == INSN_SET_STREAM ||
+                        insn->set_opt == INSN_SET_SEC_STREAM ||
+                        insn->set_opt == INSN_SET_BUTTON_PAGE) {
+                        buf += _sprint_operands_hex(buf, cmd);
+                    } else {
+                        buf += _sprint_operands(buf, cmd);
+                    }
                 } else {
                     buf += sprintf(buf, "[unknown SETSYSTEM option in opcode 0x%08x] ", *(uint32_t*)insn);
                 }

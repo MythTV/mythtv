@@ -1,6 +1,6 @@
 /*
  * This file is part of libbluray
- * Copyright (C) 2010  hpi1
+ * Copyright (C) 2010-2014  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,6 +18,9 @@
  */
 
 #include "register.h"
+
+#include "player_settings.h"
+
 #include "util/attributes.h"
 #include "util/macro.h"
 #include "util/logging.h"
@@ -25,9 +28,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-
-#define BD_PSR_COUNT 128
-#define BD_GPR_COUNT 4096
 
 /*
  * Initial values for player status/setting registers (5.8.2).
@@ -51,13 +51,24 @@ static const uint32_t bd_psr_init[BD_PSR_COUNT] = {
     0xff,        /*     PSR12: User style number */
     0xff,        /* PS: PSR13: User age */
     0xffff,      /*     PSR14: Secondary audio stream number and secondary video stream number */
-    0xffff,      /* PS: PSR15: player capability for audio */
+                 /* PS: PSR15: player capability for audio */
+    BLURAY_ACAP_LPCM_48_96_SURROUND |
+    BLURAY_ACAP_LPCM_192_SURROUND   |
+    BLURAY_ACAP_DDPLUS_SURROUND     |
+    BLURAY_ACAP_DDPLUS_DEP_SURROUND |
+    BLURAY_ACAP_DTSHD_CORE_SURROUND |
+    BLURAY_ACAP_DTSHD_EXT_SURROUND  |
+    BLURAY_ACAP_DD_SURROUND         |
+    BLURAY_ACAP_MLP_SURROUND,
+
     0xffffff,    /* PS: PSR16: Language code for audio */
     0xffffff,    /* PS: PSR17: Language code for PG and Text subtitles */
     0xffffff,    /* PS: PSR18: Menu description language code */
     0xffff,      /* PS: PSR19: Country code */
-    0x07,        /* PS: PSR20: Region code */ /* 1 - A, 2 - B, 4 - C */
-    0,           /* PS: PSR21: Output mode preference */
+                 /* PS: PSR20: Region code */ /* 1 - A, 2 - B, 4 - C */
+    BLURAY_REGION_B,
+                 /* PS: PSR21: Output mode preference */
+    BLURAY_OUTPUT_PREFER_2D,
     0,           /*     PSR22: Stereoscopic status */
     0,           /* PS: PSR23: Display capability */
     0,           /* PS: PSR24: 3D capability */
@@ -65,10 +76,13 @@ static const uint32_t bd_psr_init[BD_PSR_COUNT] = {
     0,           /*     PSR26 */
     0,           /*     PSR27 */
     0,           /*     PSR28 */
-    0x03,        /* PS: PSR29: player capability for video */
+                 /* PS: PSR29: player capability for video */
+    BLURAY_VCAP_SECONDARY_HD |
+    BLURAY_VCAP_25Hz_50Hz,
+
     0x1ffff,     /* PS: PSR30: player capability for text subtitle */
-    0x030200,    /* PS: PSR31: Player profile and version */
-                 /*            BD-RO Profile 2 version 2.0 */
+                 /* PS: PSR31: Player profile and version */
+    BLURAY_PLAYER_PROFILE_2_v2_0,
     0,           /*     PSR32 */
     0,           /*     PSR33 */
     0,           /*     PSR34 */
@@ -165,9 +179,11 @@ BD_REGISTERS *bd_registers_init(void)
 {
     BD_REGISTERS *p = calloc(1, sizeof(BD_REGISTERS));
 
-    memcpy(p->psr, bd_psr_init, sizeof(bd_psr_init));
+    if (p) {
+        memcpy(p->psr, bd_psr_init, sizeof(bd_psr_init));
 
-    bd_mutex_init(&p->mutex);
+        bd_mutex_init(&p->mutex);
+    }
 
     return p;
 }
@@ -204,6 +220,7 @@ void bd_psr_unlock(BD_REGISTERS *p)
 void bd_psr_register_cb  (BD_REGISTERS *p, void (*callback)(void*,BD_PSR_EVENT*), void *cb_handle)
 {
     /* no duplicates ! */
+    PSR_CB_DATA *cb;
     unsigned i;
 
     bd_psr_lock(p);
@@ -216,11 +233,15 @@ void bd_psr_register_cb  (BD_REGISTERS *p, void (*callback)(void*,BD_PSR_EVENT*)
         }
     }
 
-    p->num_cb++;
-    p->cb = realloc(p->cb, p->num_cb * sizeof(PSR_CB_DATA));
-
-    p->cb[p->num_cb - 1].cb     = callback;
-    p->cb[p->num_cb - 1].handle = cb_handle;
+    cb = realloc(p->cb, (p->num_cb + 1) * sizeof(PSR_CB_DATA));
+    if (cb) {
+        p->cb = cb;
+        p->cb[p->num_cb].cb     = callback;
+        p->cb[p->num_cb].handle = cb_handle;
+        p->num_cb++;
+    } else {
+        BD_DEBUG(DBG_BLURAY|DBG_CRIT, "bd_psr_register_cb(): realloc failed\n");
+    }
 
     bd_psr_unlock(p);
 }
@@ -233,8 +254,8 @@ void bd_psr_unregister_cb(BD_REGISTERS *p, void (*callback)(void*,BD_PSR_EVENT*)
 
     while (i < p->num_cb) {
         if (p->cb[i].handle == cb_handle && p->cb[i].cb == callback) {
-            if (--p->num_cb) {
-                memmove(p->cb + i, p->cb + i + 1, sizeof(PSR_CB_DATA) * p->num_cb);
+            if (--p->num_cb && i < p->num_cb) {
+                memmove(p->cb + i, p->cb + i + 1, sizeof(PSR_CB_DATA) * (p->num_cb - i));
                 continue;
             }
         }
@@ -339,7 +360,7 @@ void bd_psr_restore_state(BD_REGISTERS *p)
 
 int bd_gpr_write(BD_REGISTERS *p, int reg, uint32_t val)
 {
-    if (reg < 0 || reg > BD_GPR_COUNT) {
+    if (reg < 0 || reg >= BD_GPR_COUNT) {
         BD_DEBUG(DBG_BLURAY, "bd_gpr_write(%d): invalid register\n", reg);
         return -1;
     }
@@ -350,9 +371,9 @@ int bd_gpr_write(BD_REGISTERS *p, int reg, uint32_t val)
 
 uint32_t bd_gpr_read(BD_REGISTERS *p, int reg)
 {
-    if (reg < 0 || reg > BD_GPR_COUNT) {
+    if (reg < 0 || reg >= BD_GPR_COUNT) {
         BD_DEBUG(DBG_BLURAY, "bd_gpr_read(%d): invalid register\n", reg);
-        return -1;
+        return 0;
     }
 
     return p->gpr[reg];
@@ -366,7 +387,7 @@ uint32_t bd_psr_read(BD_REGISTERS *p, int reg)
 {
     uint32_t val;
 
-    if (reg < 0 || reg > BD_PSR_COUNT) {
+    if (reg < 0 || reg >= BD_PSR_COUNT) {
         BD_DEBUG(DBG_BLURAY, "bd_psr_read(%d): invalid register\n", reg);
         return -1;
     }
@@ -382,7 +403,7 @@ uint32_t bd_psr_read(BD_REGISTERS *p, int reg)
 
 int bd_psr_setting_write(BD_REGISTERS *p, int reg, uint32_t val)
 {
-    if (reg < 0 || reg > BD_PSR_COUNT) {
+    if (reg < 0 || reg >= BD_PSR_COUNT) {
         BD_DEBUG(DBG_BLURAY, "bd_psr_write(%d, %d): invalid register\n", reg, val);
         return -1;
     }
@@ -436,3 +457,72 @@ int bd_psr_write(BD_REGISTERS *p, int reg, uint32_t val)
   return bd_psr_setting_write(p, reg, val);
 }
 
+int bd_psr_write_bits(BD_REGISTERS *p, int reg, uint32_t val, uint32_t mask)
+{
+    int result;
+
+    if (mask == 0xffffffff) {
+        return bd_psr_write(p, reg, val);
+    }
+
+    bd_psr_lock(p);
+
+    uint32_t psr_value = bd_psr_read(p, reg);
+    psr_value = (psr_value & (~mask)) | (val & mask);
+    result = bd_psr_write(p, reg, psr_value);
+
+    bd_psr_unlock(p);
+
+    return result;
+}
+
+/*
+ * save / restore registers between playback sessions
+ */
+
+void registers_save(BD_REGISTERS *p, uint32_t *psr, uint32_t *gpr)
+{
+    bd_psr_lock(p);
+
+    memcpy(gpr, p->gpr, sizeof(p->gpr));
+    memcpy(psr, p->psr, sizeof(p->psr));
+
+    bd_psr_unlock(p);
+}
+
+void registers_restore(BD_REGISTERS *p, const uint32_t *psr, const uint32_t *gpr)
+{
+    uint32_t new_psr[13];
+
+    bd_psr_lock(p);
+
+    memcpy(p->gpr, gpr, sizeof(p->gpr));
+    memcpy(p->psr, psr, sizeof(p->psr));
+
+    memcpy(new_psr, p->psr, sizeof(new_psr[0]) * 13);
+
+    /* generate restore events */
+    if (p->num_cb) {
+        BD_PSR_EVENT ev;
+        unsigned     i, j;
+
+        ev.ev_type = BD_PSR_RESTORE;
+        ev.old_val = 0; /* not used with BD_PSR_RESTORE */
+
+        for (i = 4; i < 13; i++) {
+            if (i != PSR_NAV_TIMER) {
+
+                p->psr[i] = new_psr[i];
+
+                ev.psr_idx = i;
+                ev.new_val = new_psr[i];
+
+                for (j = 0; j < p->num_cb; j++) {
+                    p->cb[j].cb(p->cb[j].handle, &ev);
+                }
+            }
+        }
+    }
+
+    bd_psr_unlock(p);
+}

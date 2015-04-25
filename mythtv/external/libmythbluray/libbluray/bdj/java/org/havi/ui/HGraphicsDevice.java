@@ -19,6 +19,11 @@
 
 package org.havi.ui;
 
+import java.awt.Dimension;
+
+import org.videolan.GUIManager;
+import org.videolan.Logger;
+
 public class HGraphicsDevice extends HScreenDevice {
     protected HGraphicsDevice() {
         int length = HScreenConfigTemplate.defaultConfig.length;
@@ -65,10 +70,41 @@ public class HGraphicsDevice extends HScreenDevice {
     public boolean setGraphicsConfiguration(HGraphicsConfiguration hgc)
             throws SecurityException, HPermissionDeniedException,
             HConfigurationException {
+
+        logger.unimplemented("setGraphicsConfiguration");
+
+        GUIManager mgr = GUIManager.getInstance();
+        Dimension d = hgc.getPixelResolution();
+        int curWidth = mgr.getWidth();
+        int curHeight = mgr.getHeight();
+
+        if (curWidth != d.width || curHeight != d.height) {
+            logger.info("Request to switch graphics resolution from " + curWidth + "x" + curHeight +
+                        " to " + d.width + "x" + d.height);
+
+            if (mgr.isVisible()) {
+                mgr.setVisible(false);
+                mgr.setBounds(0, 0, d.width, d.height);
+                mgr.setVisible(true);
+            } else {
+                mgr.setBounds(0, 0, d.width, d.height);
+            }
+
+            curWidth = mgr.getWidth();
+            curHeight = mgr.getHeight();
+            if (curWidth != d.width || curHeight != d.height) {
+                logger.error("Request to switch graphics resolution from " + curWidth + "x" + curHeight +
+                            " to " + d.width + "x" + d.height + " FAILED");
+                return false;
+            }
+        }
+
         this.hgc = hgc;
         return true;
     }
 
     private HGraphicsConfiguration[] hgcArray;
     private HGraphicsConfiguration hgc;
+
+    private static final Logger logger = Logger.getLogger(HGraphicsDevice.class.getName());
 }

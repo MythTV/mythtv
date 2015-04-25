@@ -40,6 +40,11 @@ public class HScreenRectangle {
         this.height = height;
     }
 
+    public String toString()
+    {
+        return "HScreenRectangle[" + x + "," + y + " " + width + "x" + height + "]";
+    }
+
     public float x;
     public float y;
     public float width;

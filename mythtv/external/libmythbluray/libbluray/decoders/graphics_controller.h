@@ -1,6 +1,6 @@
 /*
  * This file is part of libbluray
- * Copyright (C) 2010  hpi1
+ * Copyright (C) 2010-2012  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,9 +20,12 @@
 #if !defined(_GRAPHICS_CONTROLLER_H_)
 #define _GRAPHICS_CONTROLLER_H_
 
-#include <util/attributes.h>
+#include "util/attributes.h"
+
+#include "libbluray/bdnav/uo_mask_table.h"
 
 #include <stdint.h>
+#include <stddef.h> /* size_t */
 
 /*
  *
@@ -56,12 +59,21 @@ typedef enum {
     GC_CTRL_POPUP,           /* param: on/off */
     GC_CTRL_IG_END,          /* execution of IG object is complete */
 
+    /* PG */
+    GC_CTRL_PG_UPDATE,       /* render decoded PG composition */
+    GC_CTRL_PG_RESET,        /* reset PG composition state */
+
+    /* TextST */
+    GC_CTRL_PG_CHARCODE,
+    GC_CTRL_STYLE_SELECT,    /* select next TextST user style */
+
 } gc_ctrl_e;
 
 
 #define GC_STATUS_NONE      0
 #define GC_STATUS_POPUP     1  /* popup menu loaded */
 #define GC_STATUS_MENU_OPEN 2  /* menu open */
+#define GC_STATUS_ANIMATE   4  /* animation or effect running */
 
 typedef struct {
     /* HDMV navigation command sequence */
@@ -73,6 +85,12 @@ typedef struct {
 
     /* graphics status (none, menu, popup) */
     uint32_t status; /* bit mask */
+
+    /* */
+    uint32_t wakeup_time;
+
+    BD_UO_MASK page_uo_mask;
+
 } GC_NAV_CMDS;
 
 /*
@@ -108,5 +126,12 @@ BD_PRIVATE int                  gc_run(GRAPHICS_CONTROLLER *p,
                                        /* in */  gc_ctrl_e msg, uint32_t param,
                                        /* out */ GC_NAV_CMDS *cmds);
 
+
+/*
+ * Add TextST font
+ */
+
+BD_PRIVATE int                  gc_add_font(GRAPHICS_CONTROLLER *p,
+                                            void *data, size_t size);
 
 #endif // _GRAPHICS_CONTROLLER_H_

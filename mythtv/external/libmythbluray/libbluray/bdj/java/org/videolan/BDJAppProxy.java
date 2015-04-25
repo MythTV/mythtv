@@ -23,20 +23,38 @@ import org.dvb.application.AppStateChangeEvent;
 import org.dvb.application.AppStateChangeEventListener;
 import org.dvb.application.DVBJProxy;
 
+import java.awt.EventQueue;
+
 import java.io.File;
 import java.util.LinkedList;
 import javax.tv.xlet.Xlet;
 
-public class BDJAppProxy implements DVBJProxy, Runnable {
-    public BDJAppProxy(BDJXletContext context) {
-        this.context = context;
-        state = NOT_LOADED;
-        threadGroup = new BDJThreadGroup((String)context.getXletProperty("dvb.org.id") + "." +
-                                         (String)context.getXletProperty("dvb.app.id"),
-                                         context);
-        thread = new Thread(threadGroup, this);
+class BDJAppProxy implements DVBJProxy, Runnable {
+    protected static BDJAppProxy newInstance(BDJXletContext context) {
+        BDJAppProxy proxy = new BDJAppProxy(context);
+        /* do not create and start thread in constructor.
+           if constructor fails (exception), thread is left running without BDJAppProxy ... */
+        proxy.startThread();
+        return proxy;
+    }
+
+    private void startThread() {
+        thread = new Thread(context.getThreadGroup(), this, "BDJAppProxy");
         thread.setDaemon(true);
         thread.start();
+
+        /* wait until thread has been started and event queue is initialized.
+         * We want event dispatcher thread to be inside xlet thread group
+         * -> event queue must be created from thread running inside applet thread group.
+         */
+        while (context.getEventQueue() == null) {
+            Thread.yield();
+        }
+    }
+
+    private BDJAppProxy(BDJXletContext context) {
+        this.context = context;
+        state = NOT_LOADED;
     }
 
     public int getState() {
@@ -115,15 +133,6 @@ public class BDJAppProxy implements DVBJProxy, Runnable {
         }
     }
 
-    protected void syncStop() {
-        AppCommand cmd = new AppCommand(AppCommand.CMD_STOP, new Boolean(true));
-        synchronized(cmds) {
-            cmds.addLast(cmd);
-            cmds.notifyAll();
-        }
-        cmd.waitDone();
-    }
-
     protected void release() {
         AppCommand cmd = new AppCommand(AppCommand.CMD_STOP, new Boolean(true));
         synchronized(cmds) {
@@ -131,10 +140,19 @@ public class BDJAppProxy implements DVBJProxy, Runnable {
             cmds.addLast(null);
             cmds.notifyAll();
         }
-        try {
-            thread.join();
-        } catch (InterruptedException e) {
 
+        if (!cmd.waitDone(5000)) {
+            logger.error("release(): STOP timeout, killing Xlet " + context.getThreadGroup().getName());
+        }
+
+        final String persistentOrg = System.getProperty("dvb.persistent.root") + File.separator +
+            (String)context.getXletProperty("dvb.org.id") + File.separator;
+        final String persistentApp = persistentOrg + (String)context.getXletProperty("dvb.app.id");
+
+        context.release();
+
+        if (new File(persistentApp).delete()) {
+            new File(persistentOrg).delete();
         }
     }
 
@@ -160,7 +178,7 @@ public class BDJAppProxy implements DVBJProxy, Runnable {
                 (AppID)context.getXletProperty("org.dvb.application.appid"),
                 fromState, toState, this, hasFailed);
         for (int i = 0; i < list.size(); i++)
-            ((AppStateChangeEventListener)listeners.get(i)).stateChange(event);
+            ((AppStateChangeEventListener)list.get(i)).stateChange(event);
     }
 
     protected BDJXletContext getXletContext() {
@@ -174,7 +192,7 @@ public class BDJAppProxy implements DVBJProxy, Runnable {
                 state = LOADED;
                 return true;
             } catch (Throwable e) {
-                e.printStackTrace();
+                logger.error("doLoad() failed: " + e + "\n" + Logger.dumpStack(e));
                 state = INVALID;
             }
         }
@@ -194,7 +212,7 @@ public class BDJAppProxy implements DVBJProxy, Runnable {
                 state = PAUSED;
                 return true;
             } catch (Throwable e) {
-                e.printStackTrace();
+                logger.error("doInit() failed: " + e + "\n" + Logger.dumpStack(e));
                 state = INVALID;
             }
         }
@@ -212,7 +230,7 @@ public class BDJAppProxy implements DVBJProxy, Runnable {
                 state = STARTED;
                 return true;
             } catch (Throwable e) {
-                e.printStackTrace();
+                logger.error("doStart() failed: " + e + "\n" + Logger.dumpStack(e));
                 state = INVALID;
             }
         }
@@ -225,18 +243,12 @@ public class BDJAppProxy implements DVBJProxy, Runnable {
         if ((state != NOT_LOADED) && (state != LOADED)) {
             try {
                 xlet.destroyXlet(force);
-                for (int i = 0; (i < 50) && (threadGroup.activeCount() > 1); i++)
-                    Thread.sleep(20L);
-                String persistent = System.getProperty("dvb.persistent.root") + File.separator +
-                    (String)context.getXletProperty("dvb.org.id") + File.separator +
-                    (String)context.getXletProperty("dvb.app.id");
-                if (new File(persistent).delete()) {
-                    persistent = System.getProperty("dvb.persistent.root") + File.separator +
-                        (String)context.getXletProperty("dvb.org.id");
-                    new File(persistent).delete();
-                }
+
+                context.closeSockets();
+                context.getThreadGroup().waitForShutdown(1000, 1 + context.numEventQueueThreads());
+
             } catch (Throwable e) {
-                e.printStackTrace();
+                logger.error("doStop() failed: " + e + "\n" + Logger.dumpStack(e));
                 state = INVALID;
                 return false;
             }
@@ -253,7 +265,7 @@ public class BDJAppProxy implements DVBJProxy, Runnable {
                 state = PAUSED;
                 return true;
             } catch (Throwable e) {
-                e.printStackTrace();
+                logger.error("doPause() failed: " + e + "\n" + Logger.dumpStack(e));
                 state = INVALID;
             }
         }
@@ -267,7 +279,7 @@ public class BDJAppProxy implements DVBJProxy, Runnable {
                 state = STARTED;
                 return true;
             } catch (Throwable e) {
-                e.printStackTrace();
+                logger.error("doResume() failed: " + e + "\n" + Logger.dumpStack(e));
                 state = INVALID;
             }
         }
@@ -275,6 +287,9 @@ public class BDJAppProxy implements DVBJProxy, Runnable {
     }
 
     public void run() {
+        if (context.getEventQueue() == null)
+            context.setEventQueue(new EventQueue());
+
         for (;;) {
             AppCommand cmd;
             synchronized(cmds) {
@@ -343,8 +358,8 @@ public class BDJAppProxy implements DVBJProxy, Runnable {
     private int state;
     private LinkedList listeners = new LinkedList();
     private LinkedList cmds = new LinkedList();
-    private BDJThreadGroup threadGroup;
     private Thread thread;
+    private static final Logger logger = Logger.getLogger(BDJAppProxy.class.getName());
 
     private class AppCommand {
         public AppCommand(int cmd, Object arg) {
@@ -360,16 +375,21 @@ public class BDJAppProxy implements DVBJProxy, Runnable {
             return arg;
         }
 
-        public void waitDone() {
+        public boolean waitDone(int timeoutMs) {
             synchronized(this) {
                 while (!done) {
                     try {
-                        this.wait();
+                        if (timeoutMs < 1) {
+                            this.wait();
+                        } else {
+                            this.wait(timeoutMs);
+                            break;
+                        }
                     } catch (InterruptedException e) {
-
                     }
                 }
             }
+            return done;
         }
 
         public void release() {

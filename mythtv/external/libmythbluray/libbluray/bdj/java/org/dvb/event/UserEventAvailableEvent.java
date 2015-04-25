@@ -29,9 +29,8 @@ public class UserEventAvailableEvent extends ResourceStatusEvent {
 
     public Object getSource()
     {
-        return source;
+        return super.getSource();
     }
 
-    private Object source;
     private static final long serialVersionUID = 1747902573730814730L;
 }

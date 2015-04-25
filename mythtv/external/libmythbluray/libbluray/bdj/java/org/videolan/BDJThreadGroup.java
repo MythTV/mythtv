@@ -1,6 +1,7 @@
 /*
  * This file is part of libbluray
  * Copyright (C) 2010  William Hahne
+ * Copyright (C) 2013  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,6 +27,24 @@ public class BDJThreadGroup extends ThreadGroup {
         this.context = context;
     }
 
+    public void uncaughtException(Thread t, Throwable e) {
+
+        String stack = "";
+        if (e != null) {
+            StackTraceElement elems[] = e.getStackTrace();
+            if (elems != null) {
+                for (int i = 0; i < elems.length; i++)
+                    stack += "\n\t" + elems[i].toString();
+            }
+        }
+
+        if (e instanceof ThreadDeath) {
+            logger.error("Thread " + t + " killed" + stack);
+        } else {
+            logger.error("Unhandled exception in thread " + t + ": " + e + stack);
+        }
+    }
+
     public BDJXletContext getContext() {
         return context;
     }
@@ -34,5 +53,68 @@ public class BDJThreadGroup extends ThreadGroup {
         this.context = context;
     }
 
+    public boolean waitForShutdown(int timeout, int maxThreads) {
+
+        if (parentOf(Thread.currentThread().getThreadGroup()) && maxThreads < 1) {
+            logger.error("Current Thread is contained within ThreadGroup to be disposed.");
+            throw new IllegalThreadStateException("Current Thread is contained within ThreadGroup to be disposed.");
+        }
+
+        long startTime = System.currentTimeMillis();
+        long endTime = startTime + timeout;
+        while ((activeCount() > maxThreads) &&
+               (System.currentTimeMillis() < endTime)) {
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) { }
+        }
+
+        boolean result = (activeCount() <= maxThreads);
+        if (!result) {
+            logger.error("waitForShutdown timeout (have " + activeCount() + " threads, expected " + maxThreads + ")");
+        }
+        return result;
+    }
+
+    protected void stopAll(int timeout) {
+
+        interrupt();
+        waitForShutdown(timeout, 0);
+
+        if (activeCount() > 0) {
+            logger.error("stopAll(): killing threads");
+            dumpThreads();
+
+            PortingHelper.stopThreadGroup(this);
+            waitForShutdown(500, 0);
+        }
+
+        try {
+            destroy();
+        } catch (IllegalThreadStateException e) {
+            logger.error("ThreadGroup destroy failed: " + e);
+        }
+
+        context = null;
+    }
+
+    public void dumpThreads() {
+        logger.info("Active threads in " + this + ":");
+        Thread[] threads = new Thread[activeCount() + 1];
+        while (enumerate( threads, true ) == threads.length) {
+            threads = new Thread[threads.length * 2];
+        }
+        for (int i = 0; i < threads.length; i++) {
+            if (threads[i] == null)
+                continue;
+            logger.info("    " + threads[i]);
+            /* no getState() in J2ME
+            logger.info("   state " + threads[i].getState().toString());
+            */
+            logger.info("    at " + PortingHelper.dumpStack(threads[i]));
+        }
+    }
+
     private BDJXletContext context;
+    private static final Logger logger = Logger.getLogger(BDJThreadGroup.class.getName());
 }

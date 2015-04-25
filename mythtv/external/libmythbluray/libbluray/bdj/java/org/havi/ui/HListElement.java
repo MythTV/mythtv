@@ -24,12 +24,12 @@ import java.awt.Image;
 public class HListElement {
     public HListElement(String label)
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HListElement.class.getName(), "");
     }
 
     public HListElement(Image icon, String label)
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HListElement.class.getName(), "");
     }
 
     public String getLabel()

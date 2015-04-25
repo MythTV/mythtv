@@ -29,17 +29,21 @@ public class HSceneTemplate extends Object {
     }
 
     public void setPreference(int preference, Object object, int priority) {
-        preferenceMap.put(preference, object);
-        priorityMap.put(preference, priority);
+        preferenceMap.put(new Integer(preference), object);
+        priorityMap.put(new Integer(preference), new Integer(priority));
     }
 
     public Object getPreferenceObject(int preference) {
-        return preferenceMap.get(preference);
+        return preferenceMap.get(new Integer(preference));
     }
 
     public int getPreferencePriority(int preference) {
-        Integer priority = priorityMap.get(preference);
-        if (priority == null || priority < 0 || priority > 3)
+        Object prio = priorityMap.get(new Integer(preference));
+        if (prio == null)
+            return UNNECESSARY;
+
+        int priority = ((Integer)prio).intValue();
+        if (priority < 0 || priority > 3)
             return UNNECESSARY;
         else
             return priority;
@@ -58,8 +62,6 @@ public class HSceneTemplate extends Object {
     public static final int SCENE_SCREEN_DIMENSION = 0x04;
     public static final int SCENE_SCREEN_LOCATION = 0x08;
 
-    private Map<Integer, Object> preferenceMap = Collections
-            .synchronizedMap(new HashMap<Integer, Object>());
-    private Map<Integer, Integer> priorityMap = Collections
-            .synchronizedMap(new HashMap<Integer, Integer>());
+    private Map preferenceMap = Collections.synchronizedMap(new HashMap());
+    private Map priorityMap = Collections.synchronizedMap(new HashMap());
 }

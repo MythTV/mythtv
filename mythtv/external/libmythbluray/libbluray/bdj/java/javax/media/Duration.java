@@ -22,6 +22,6 @@ package javax.media;
 public interface Duration {
     public Time getDuration();
 
-    public static final Time DURATION_UNBOUNDED = null;
-    public static final Time DURATION_UNKNOWN = null;
+    public static final Time DURATION_UNBOUNDED = new Time(Long.MAX_VALUE);
+    public static final Time DURATION_UNKNOWN = new Time(Long.MAX_VALUE - 1);
 }

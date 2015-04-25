@@ -30,9 +30,24 @@ public class AnimationParameters {
                ", threadPriority=" + threadPriority + "]";
     }
 
+    public AnimationParameters() {
+    }
+
+    AnimationParameters(AnimationParameters p) {
+        if (p.faaTimer != null) {
+            faaTimer = new FrameAccurateAnimationTimer(p.faaTimer);
+        }
+        lockedToVideo = p.lockedToVideo;
+        if (p.repeatCount != null) {
+            repeatCount = (int[])p.repeatCount.clone();
+        }
+        scaleFactor = p.scaleFactor;
+        threadPriority = p.threadPriority;
+    }
+
     public FrameAccurateAnimationTimer faaTimer = null;
-    public boolean lockedToVideo = false;
-    public int[] repeatCount = null;
-    public int scaleFactor = 1;
+    public boolean lockedToVideo = false;  /* frame rate locked to video frame rate */
+    public int[] repeatCount = null;       /* repeat each frame repeatCount times */
+    public int scaleFactor = 1;            /* scale factor when painting */
     public int threadPriority = 5;
 }

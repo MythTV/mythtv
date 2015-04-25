@@ -27,7 +27,7 @@ import java.awt.Graphics;
 public class HListGroupLook implements HExtendedLook, HAdjustableLook {
     public HListGroupLook()
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HListGroupLook.class.getName(), "");
     }
 
     public void showLook(Graphics g, HVisible visible, int state)

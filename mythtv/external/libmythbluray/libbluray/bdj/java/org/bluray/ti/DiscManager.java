@@ -19,6 +19,8 @@
 
 package org.bluray.ti;
 
+import java.util.LinkedList;
+
 public class DiscManager {
     public static synchronized DiscManager getDiscManager() {
         if (instance == null)
@@ -27,7 +29,7 @@ public class DiscManager {
     }
 
     public void expectNextDisc(String[] discIds) {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(DiscManager.class.getName(), "expectNextDisc");
     }
 
     public Disc getCurrentDisc() {
@@ -35,17 +37,22 @@ public class DiscManager {
     }
 
     public void addDiscStatusEventListener(DiscStatusListener listener) {
-        throw new Error("Not implemented");
+        synchronized(listeners) {
+            listeners.add(listener);
+        }
     }
 
     public void removeDiscStatusEventListener(DiscStatusListener listener) {
-        throw new Error("Not implemented");
+        synchronized(listeners) {
+            listeners.remove(listener);
+        }
     }
 
     public void setCurrentDisc(String id) {
         disc = new DiscImpl(id);
     }
 
+    private LinkedList listeners = new LinkedList();
     private static DiscManager instance;
     private DiscImpl disc = null;
 }

@@ -26,40 +26,42 @@ import org.havi.ui.event.HFocusListener;
 public class HAnimation extends HStaticAnimation implements HNavigable {
     public HAnimation()
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HAnimation.class.getName(), "");
     }
 
     public HAnimation(Image[] images, int delay, int playMode, int repeatCount,
             int x, int y, int width, int height)
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HAnimation.class.getName(), "");
     }
 
     public HAnimation(Image[] imagesNormal, Image[] imagesFocused, int delay,
             int playMode, int repeatCount, int x, int y, int width, int height)
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HAnimation.class.getName(), "");
     }
 
     public HAnimation(Image[] images, int delay, int playMode, int repeatCount)
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HAnimation.class.getName(), "");
     }
 
     public HAnimation(Image[] imagesNormal, Image[] imagesFocused, int delay,
             int playMode, int repeatCount)
     {
-        throw new Error("Not implemented");
+        org.videolan.Logger.unimplemented(HAnimation.class.getName(), "");
     }
 
     public static void setDefaultLook(HAnimateLook hlook)
     {
-        throw new Error("Not implemented");
+        DefaultLook = hlook;
     }
 
     public static HAnimateLook getDefaultLook()
     {
-        throw new Error("Not implemented");
+        if (DefaultLook == null)
+            org.videolan.Logger.unimplemented("", "getDefaultLook");
+        return DefaultLook;
     }
 
     public void setMove(int keyCode, HNavigable target)
@@ -122,6 +124,8 @@ public class HAnimation extends HStaticAnimation implements HNavigable {
     {
         throw new Error("Not implemented");
     }
+
+    private static HAnimateLook DefaultLook = null;
 
     private static final long serialVersionUID = 4460392782940525395L;
 }

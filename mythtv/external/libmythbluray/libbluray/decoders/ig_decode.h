@@ -1,6 +1,6 @@
 /*
  * This file is part of libbluray
- * Copyright (C) 2010  hpi1
+ * Copyright (C) 2010  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,8 +22,8 @@
 
 #include "ig.h"
 
-#include <util/attributes.h>
-#include <util/bits.h>
+#include "util/attributes.h"
+#include "util/bits.h"
 
 #include <stdint.h>
 
@@ -33,7 +33,6 @@
 
 BD_PRIVATE int  ig_decode_interactive(BITBUFFER *bb, BD_IG_INTERACTIVE *p);
 
-BD_PRIVATE void ig_clean_interactive(BD_IG_INTERACTIVE *p);
 BD_PRIVATE void ig_free_interactive(BD_IG_INTERACTIVE **p);
 
 

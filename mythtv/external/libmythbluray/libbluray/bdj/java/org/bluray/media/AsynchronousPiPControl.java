@@ -26,10 +26,8 @@ public abstract interface AsynchronousPiPControl extends PiPControl {
 
     public abstract void stop();
 
-    @Deprecated
     public abstract void pause();
 
-    @Deprecated
     public abstract boolean resume();
 
     public abstract Time getElapsedTime();

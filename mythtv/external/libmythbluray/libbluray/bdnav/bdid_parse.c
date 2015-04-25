@@ -17,14 +17,17 @@
  * <http://www.gnu.org/licenses/>.
  */
 
+#include "bdid_parse.h"
+
+#include "disc/disc.h"
+
 #include "file/file.h"
 #include "util/bits.h"
 #include "util/logging.h"
 #include "util/macro.h"
-#include "bdid_parse.h"
+#include "util/strutl.h"
 
 #include <stdlib.h>
-#include <string.h>
 
 #define BDID_SIG1  ('B' << 24 | 'D' << 16 | 'I' << 8 | 'D')
 #define BDID_SIG2A ('0' << 24 | '2' << 16 | '0' << 8 | '0')
@@ -52,26 +55,19 @@ static int _parse_header(BITSTREAM *bs, uint32_t *data_start, uint32_t *extensio
     return 1;
 }
 
-static BDID_DATA *_bdid_parse(const char *file_name)
+static BDID_DATA *_bdid_parse(BD_FILE_H *fp)
 {
     BITSTREAM  bs;
-    BD_FILE_H *fp;
     BDID_DATA *bdid = NULL;
 
     uint32_t   data_start, extension_data_start;
     uint8_t    tmp[16];
 
-    fp = file_open(file_name, "rb");
-    if (!fp) {
-        BD_DEBUG(DBG_NAV | DBG_CRIT, "bdid_parse(): error opening %s\n", file_name);
-        return NULL;
-    }
-
     bs_init(&bs, fp);
 
     if (!_parse_header(&bs, &data_start, &extension_data_start)) {
         BD_DEBUG(DBG_NAV | DBG_CRIT, "id.bdmv: invalid header\n");
-        goto error;
+        return NULL;
     }
 
     bdid = calloc(1, sizeof(BDID_DATA));
@@ -79,35 +75,38 @@ static BDID_DATA *_bdid_parse(const char *file_name)
     bs_seek_byte(&bs, 40);
 
     bs_read_bytes(&bs, tmp, 4);
-    print_hex(bdid->org_id, tmp, 4);
+    str_print_hex(bdid->org_id, tmp, 4);
 
     bs_read_bytes(&bs, tmp, 16);
-    print_hex(bdid->disc_id, tmp, 16);
+    str_print_hex(bdid->disc_id, tmp, 16);
 
-    file_close(fp);
     return bdid;
-
- error:
-    X_FREE(bdid);
-    file_close(fp);
-    return NULL;
 }
 
-BDID_DATA *bdid_parse(const char *file_name)
+static BDID_DATA *_bdid_get(BD_DISC *disc, const char *path)
 {
-    BDID_DATA *bdid = _bdid_parse(file_name);
+    BD_FILE_H *fp;
+    BDID_DATA *bdid;
+
+    fp = disc_open_path(disc, path);
+    if (!fp) {
+        return NULL;
+    }
+
+    bdid = _bdid_parse(fp);
+    file_close(fp);
+    return bdid;
+}
+
+BDID_DATA *bdid_get(BD_DISC *disc)
+{
+    BDID_DATA *bdid;
+
+    bdid = _bdid_get(disc, "CERTIFICATE" DIR_SEP "id.bdmv");
 
     /* if failed, try backup file */
     if (!bdid) {
-        size_t len   = strlen(file_name);
-        char *backup = malloc(len + 8);
-
-        strcpy(backup, file_name);
-        strcpy(backup + len - 7, "BACKUP/id.bdmv");
-
-        bdid = _bdid_parse(backup);
-
-        X_FREE(backup);
+        bdid = _bdid_get(disc, "CERTIFICATE" DIR_SEP "BACKUP" DIR_SEP "id.bdmv");
     }
 
     return bdid;

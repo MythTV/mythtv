@@ -21,110 +21,156 @@ package org.havi.ui;
 
 import java.awt.Image;
 
+import org.videolan.BDJXletContext;
+
 public class HToggleButton extends HGraphicButton implements HSwitchable {
     public HToggleButton()
     {
-        throw new Error("Not implemented");
+        super();
+        iniz();
     }
 
     public HToggleButton(Image image, int x, int y, int width, int height)
     {
-        throw new Error("Not implemented");
+        super(image, x, y, width, height);
+        iniz();
     }
 
     public HToggleButton(Image image)
     {
-        throw new Error("Not implemented");
+        super(image);
+        iniz();
     }
 
     public HToggleButton(Image image, int x, int y, int width, int height,
             boolean state)
     {
-        throw new Error("Not implemented");
+        this(image, x, y, width, height);
+        setSwitchableState(state);
     }
 
     public HToggleButton(Image imageNormal, Image imageFocused,
             Image imageActioned, Image imageNormalActioned, int x, int y,
             int width, int height, boolean state)
     {
-        throw new Error("Not implemented");
+        super(imageNormal, imageFocused, imageActioned, x, y, width, height);
+        setGraphicContent(imageNormalActioned, ACTIONED_STATE);
+        setSwitchableState(state);
+        iniz();
     }
 
     public HToggleButton(Image imageNormal, Image imageFocused,
             Image imageActioned, Image imageNormalActioned, boolean state)
     {
-        throw new Error("Not implemented");
+        super(imageNormal, imageFocused, imageActioned);
+        setGraphicContent(imageNormalActioned, ACTIONED_STATE);
+        setSwitchableState(state);
+        iniz();
     }
 
     public HToggleButton(Image image, int x, int y, int width, int height,
             boolean state, HToggleGroup group)
     {
-        throw new Error("Not implemented");
+        this(image, x, y, width, height, state);
+        setToggleGroup(group);
     }
 
     public HToggleButton(Image image, boolean state, HToggleGroup group)
     {
-        throw new Error("Not implemented");
+        this(image);
+        setSwitchableState(state);
+        setToggleGroup(group);
     }
 
     public HToggleButton(Image imageNormal, Image imageFocused,
             Image imageActioned, Image imageNormalActioned, int x, int y,
             int width, int height, boolean state, HToggleGroup group)
     {
-        throw new Error("Not implemented");
+        this(imageNormal, imageFocused, imageActioned, imageNormalActioned, x, y, width, height, state);
+        setToggleGroup(group);
     }
 
     public HToggleButton(Image imageNormal, Image imageFocused,
             Image imageActioned, Image imageNormalActioned, boolean state,
             HToggleGroup group)
     {
-        throw new Error("Not implemented");
+        this(imageNormal, imageFocused, imageActioned, imageNormalActioned, state);
+        setToggleGroup(group);
+    }
+
+    private void iniz()
+    {
+        try {
+            setLook(getDefaultLook());
+        } catch (HInvalidLookException ignored) {
+        }
     }
 
     public void setToggleGroup(HToggleGroup group)
     {
-        throw new Error("Not implemented");
+        HToggleGroup oldGroup = toggleGroup;
+
+        // Remove ourselves if already a member of a group
+        if (oldGroup != null) {
+            // If it is the same, don't do anything.
+            if (oldGroup == group)
+                return;
+
+            // Remove ourselves
+            oldGroup.remove(this);
+        }
+
+        // Assign the new toggle group
+        toggleGroup = group;
+        if (group != null) {
+            group.add(this);
+        }
     }
 
     public HToggleGroup getToggleGroup()
     {
-        throw new Error("Not implemented");
+        return toggleGroup;
     }
 
     public void removeToggleGroup()
     {
-        throw new Error("Not implemented");
+        setToggleGroup(null);
     }
 
     public static void setDefaultLook(HGraphicLook hlook)
     {
-        throw new Error("Not implemented");
+        BDJXletContext.setXletDefaultLook(PROPERTY_LOOK, hlook);
     }
 
     public static HGraphicLook getDefaultLook()
     {
-        throw new Error("Not implemented");
+        return (HGraphicLook) BDJXletContext.getXletDefaultLook(PROPERTY_LOOK, DEFAULT_LOOK);
     }
 
     public boolean getSwitchableState()
     {
-        throw new Error("Not implemented");
+        return (getInteractionState() & ACTIONED_STATE_BIT) != 0;
     }
 
     public void setSwitchableState(boolean state)
     {
-        throw new Error("Not implemented");
+        int old = getInteractionState();
+        setInteractionState(state ? (old | ACTIONED_STATE_BIT) : (old & ~ACTIONED_STATE_BIT));
     }
 
     public void setUnsetActionSound(HSound sound)
     {
-        throw new Error("Not implemented");
+        unsetActionSound = sound;
     }
 
     public HSound getUnsetActionSound()
     {
-        throw new Error("Not implemented");
+        return unsetActionSound;
     }
+
+    private static final String PROPERTY_LOOK = "HToggleButton";
+    private HToggleGroup toggleGroup = null;
+    private HSound unsetActionSound = null;
 
     private static final long serialVersionUID = 2602166176018744707L;
 }

@@ -1,6 +1,6 @@
 /*
  * This file is part of libbluray
- * Copyright (C) 2010  hpi1
+ * Copyright (C) 2010-2014  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,9 +20,13 @@
 #if !defined(_BD_REGISTER_H_)
 #define _BD_REGISTER_H_
 
-#include <util/attributes.h>
+#include "util/attributes.h"
 
 #include <stdint.h>
+
+
+#define BD_PSR_COUNT 128
+#define BD_GPR_COUNT 4096
 
 /*
  * Player Status Registers
@@ -67,8 +71,6 @@ typedef enum {
     PSR_BACKUP_PSR12     = 44,
     /* 48-61: caps for characteristic text subtitle */
 } bd_psr_idx;
-
-#define DEFAULT_LANGUAGE  "eng"
 
 
 typedef struct bd_registers_s BD_REGISTERS;
@@ -142,6 +144,22 @@ uint32_t bd_psr_read(BD_REGISTERS *, int reg);
  * @return 0 on success, -1 on error (invalid register number)
  */
 int bd_psr_write(BD_REGISTERS *, int reg, uint32_t val);
+
+/**
+ *
+ *  Atomically change bits in player status register.
+ *
+ *  Replace selected bits of player status register.
+ *  New value for PSR is (CURRENT_PSR_VALUE & ~mask) | (val & mask)
+ *  Writing to player setting registers will fail.
+ *
+ * @param registers  BD_REGISTERS object
+ * @param reg  register number
+ * @param val  new value for register
+ * @param mask  bit mask. bits to be written are set to 1.
+ * @return 0 on success, -1 on error (invalid register number)
+ */
+int bd_psr_write_bits(BD_REGISTERS *, int reg, uint32_t val, uint32_t mask);
 
 /**
  *
@@ -245,5 +263,14 @@ void bd_psr_register_cb(BD_REGISTERS *, void (*callback)(void*,BD_PSR_EVENT*), v
  */
 void bd_psr_unregister_cb(BD_REGISTERS *, void (*callback)(void*,BD_PSR_EVENT*), void *cb_handle);
 
+
+/*
+ * save / restore registers between playback sessions
+ *
+ * When state is restored, restore events will be generated and playback state is restored.
+ */
+
+BD_PRIVATE void registers_save(BD_REGISTERS *p, uint32_t *psr, uint32_t *gpr);
+BD_PRIVATE void registers_restore(BD_REGISTERS *p, const uint32_t *psr, const uint32_t *gpr);
 
 #endif /* _BD_REGISTER_H_ */

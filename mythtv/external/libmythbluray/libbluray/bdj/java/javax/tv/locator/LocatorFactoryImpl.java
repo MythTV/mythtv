@@ -40,6 +40,7 @@ public class LocatorFactoryImpl extends LocatorFactory {
     public Locator[] transformLocator(Locator source)
             throws InvalidLocatorException
     {
+        org.videolan.Logger.unimplemented(LocatorFactoryImpl.class.getName(), "transformLocator");
         throw new Error("Not implemented.");
     }
 
