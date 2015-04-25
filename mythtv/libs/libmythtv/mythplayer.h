@@ -82,7 +82,6 @@ enum
     kDisplayAllCaptions         = 0x0FF,
     kDisplayTeletextMenu        = 0x100,
     kDisplayAllTextCaptions     = ~kDisplayDVDButton &
-                                  ~kDisplayAVSubtitle &
                                    kDisplayAllCaptions,
 };
 
