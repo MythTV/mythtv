@@ -408,6 +408,8 @@ bool MythPlayer::Play(float speed, bool normal, bool unpauseaudio)
     SetEof(kEofStateNone);
     UnpauseBuffer();
     UnpauseDecoder();
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Give some time (%1ms) to the decoder to fill the buffers.").arg(12*frame_interval));
+    usleep(12*frame_interval);
     if (unpauseaudio)
         audio.Pause(false);
     UnpauseVideo();
