@@ -95,6 +95,8 @@ package MythTV::Program;
         $self->{'categorytype'}      = $_[48]; # category type (enum)
 
         $self->{'recordedid'}        = $_[49]; # recordedid
+        $self->{'inputname'}         = $_[50]; # input display name
+        $self->{'bookmarkupdate'}    = $_[51]; # bookmark last update time
 
     # Load the channel data
         if ($self->{'chanid'}) {
@@ -193,8 +195,10 @@ package MythTV::Program;
                     $self->{'year'}           , # 45 production year
                     $self->{'partnumber'}     , # 46 part number
                     $self->{'parttotal'}      , # 47 part total
-                    $self->{'categorytype'}   , # 48 part total
-                    $self->{'recordedid'}     , # 49 part total
+                    $self->{'categorytype'}   , # 48 category type (enum)
+                    $self->{'recordedid'}     , # 49 recordedid
+                    $self->{'inputname'}      , # 50 input display name
+                    $self->{'bookmarkupdate'} , # 51 bookmark last update time
                     ''                          # trailing separator
                    );
     }

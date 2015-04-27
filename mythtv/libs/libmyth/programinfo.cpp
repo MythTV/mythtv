@@ -45,6 +45,19 @@ ProgramInfoUpdater *ProgramInfo::updater;
 int dummy = pginfo_init_statics();
 bool ProgramInfo::usingProgIDAuth = true;
 
+// kUnknownInputName is a placeholder for when ProgramInfo::inputname is
+// unknown, in which case ProgramInfo::ToMap() will call the expensive
+// QueryInputDisplayName() to approximate it.  The inputname value is always
+// known when the ProgramInfo is created from a query on the recorded table, and
+// unknown when created from a query on a different table like oldrecorded or
+// program, or from a non-copy/assignment constructor.
+//
+// We try to pick a short string that a user is unlikely to use as an input
+// display name.  If it does collide with a user choice, the results will still
+// be correct, but there will be extra calls to QueryInputDisplayName().
+const static QString kUnknownInputName = "~";
+const static uint kInvalidDateTime = QDateTime().toTime_t();
+
 
 const QString ProgramInfo::kFromRecordedQuery =
     "SELECT r.title,            r.subtitle,     r.description,     "// 0-2
@@ -65,7 +78,8 @@ const QString ProgramInfo::kFromRecordedQuery =
     "       r.findid,           rec.dupin,      rec.dupmethod,     "//45-47
     "       p.syndicatedepisodenumber, p.partnumber, p.parttotal,  "//48-50
     "       p.season,           p.episode,      p.totalepisodes,   "//51-53
-    "       p.category_type,    r.recordedid                       "//54-55
+    "       p.category_type,    r.recordedid,   r.inputname,       "//54-56
+    "       r.bookmarkupdate                                       "//57-57
     "FROM recorded AS r "
     "LEFT JOIN channel AS c "
     "ON (r.chanid    = c.chanid) "
@@ -179,6 +193,8 @@ ProgramInfo::ProgramInfo(void) :
     dupmethod(kDupCheckSubThenDesc),
 
     recordedid(0),
+    inputname(kUnknownInputName),
+    bookmarkupdate(),
 
     // everything below this line is not serialized
     availableStatus(asAvailable),
@@ -262,6 +278,8 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other) :
     dupmethod(other.dupmethod),
 
     recordedid(other.recordedid),
+    inputname(other.inputname),
+    bookmarkupdate(other.bookmarkupdate),
 
     // everything below this line is not serialized
     availableStatus(other.availableStatus),
@@ -377,7 +395,9 @@ ProgramInfo::ProgramInfo(
     uint _programflags,
     uint _audioproperties,
     uint _videoproperties,
-    uint _subtitleType) :
+    uint _subtitleType,
+    const QString &_inputname,
+    const QDateTime &_bookmarkupdate) :
     title(_title),
     subtitle(_subtitle),
     description(_description),
@@ -447,6 +467,8 @@ ProgramInfo::ProgramInfo(
     dupmethod(_dupmethod),
 
     recordedid(_recordedid),
+    inputname(_inputname),
+    bookmarkupdate(_bookmarkupdate),
 
     // everything below this line is not serialized
     availableStatus(asAvailable),
@@ -564,6 +586,8 @@ ProgramInfo::ProgramInfo(
     dupmethod(0),
 
     recordedid(0),
+    inputname(kUnknownInputName),
+    bookmarkupdate(),
 
     // everything below this line is not serialized
     availableStatus(asAvailable),
@@ -694,6 +718,8 @@ ProgramInfo::ProgramInfo(
     dupmethod(kDupCheckSubThenDesc),
 
     recordedid(0),
+    inputname(kUnknownInputName),
+    bookmarkupdate(),
 
     // everything below this line is not serialized
     availableStatus(asAvailable),
@@ -846,6 +872,8 @@ ProgramInfo::ProgramInfo(
     dupmethod(kDupCheckSubThenDesc),
 
     recordedid(0),
+    inputname(kUnknownInputName),
+    bookmarkupdate(),
 
     // everything below this line is not serialized
     availableStatus(asAvailable),
@@ -1086,6 +1114,8 @@ void ProgramInfo::clone(const ProgramInfo &other,
     dupmethod = other.dupmethod;
 
     recordedid = other.recordedid;
+    inputname = other.inputname;
+    bookmarkupdate = other.bookmarkupdate;
 
     sourceid = other.sourceid;
     inputid = other.inputid;
@@ -1128,6 +1158,7 @@ void ProgramInfo::clone(const ProgramInfo &other,
 
     sortTitle.detach();
     inUseForWhat.detach();
+    inputname.detach();
 }
 
 void ProgramInfo::clear(void)
@@ -1195,6 +1226,8 @@ void ProgramInfo::clear(void)
     dupmethod = kDupCheckSubThenDesc;
 
     recordedid = 0;
+    inputname = kUnknownInputName;
+    bookmarkupdate = QDateTime();
 
     sourceid = 0;
     inputid = 0;
@@ -1360,7 +1393,9 @@ void ProgramInfo::ToStringList(QStringList &list) const
     INT_TO_LIST(parttotal);    // 47
     INT_TO_LIST(catType);      // 48
 
-    INT_TO_LIST(recordedid);   //49
+    INT_TO_LIST(recordedid);          // 49
+    STR_TO_LIST(inputname);           // 50
+    DATETIME_TO_LIST(bookmarkupdate); // 51
 /* do not forget to update the NUMPROGRAMLINES defines! */
 }
 
@@ -1378,7 +1413,10 @@ void ProgramInfo::ToStringList(QStringList &list) const
 #define ENUM_FROM_LIST(x, y) do { NEXT_STR(); (x) = ((y)ts.toInt()); } while (0)
 
 #define DATETIME_FROM_LIST(x) \
-    do { NEXT_STR(); x = MythDate::fromTime_t(ts.toUInt()); } while (0)
+    do { NEXT_STR();                                                    \
+         x = (ts.toUInt() == kInvalidDateTime ?                         \
+              QDateTime() : MythDate::fromTime_t(ts.toUInt()));         \
+    } while (0)
 #define DATE_FROM_LIST(x) \
     do { NEXT_STR(); (x) = ((ts.isEmpty()) || (ts == "0000-00-00")) ? \
                          QDate() : QDate::fromString(ts, Qt::ISODate); \
@@ -1466,7 +1504,9 @@ bool ProgramInfo::FromStringList(QStringList::const_iterator &it,
     INT_FROM_LIST(parttotal);         // 47
     ENUM_FROM_LIST(catType, CategoryType); // 48
 
-    INT_FROM_LIST(recordedid);        // 49
+    INT_FROM_LIST(recordedid);          // 49
+    STR_FROM_LIST(inputname);           // 50
+    DATETIME_FROM_LIST(bookmarkupdate); // 51
 
     if (!origChanid || !origRecstartts.isValid() ||
         (origChanid != chanid) || (origRecstartts != recstartts))
@@ -1675,7 +1715,9 @@ void ProgramInfo::ToMap(InfoMap &progMap,
 
     progMap["card"] = RecStatus::toString(GetRecordingStatus(), inputid);
     progMap["input"] = RecStatus::toString(GetRecordingStatus(), inputid);
-    progMap["inputname"] = QueryInputDisplayName();
+    progMap["inputname"] = (inputname == kUnknownInputName ?
+                            QueryInputDisplayName() : inputname);
+    // Don't add bookmarkupdate to progMap, for now.
 
     progMap["recpriority"] = recpriority;
     progMap["recpriority2"] = recpriority2;
@@ -2034,6 +2076,8 @@ bool ProgramInfo::LoadProgramFromRecorded(
     dupmethod    = RecordingDupMethodType(query.value(47).toInt());
 
     recordedid   = query.value(55).toUInt();
+    inputname    = query.value(56).toString();
+    bookmarkupdate = MythDate::as_utc(query.value(57).toDateTime());
 
     // ancillary data -- begin
     programflags = FL_NONE;
@@ -5843,7 +5887,10 @@ bool LoadFromRecorded(
                 flags,
                 query.value(42).toUInt(), // audioproperties
                 query.value(43).toUInt(), // videoproperties
-                query.value(44).toUInt())); // subtitleType
+                query.value(44).toUInt(), // subtitleType
+                query.value(56).toString(), // inputname
+                MythDate::as_utc(query.value(57)
+                                 .toDateTime()))); // bookmarkupdate
 
         if (save_not_commflagged)
             destination.back()->SaveCommFlagged(COMM_FLAG_NOT_FLAGGED);

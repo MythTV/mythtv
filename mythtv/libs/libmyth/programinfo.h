@@ -19,18 +19,11 @@
 #include "mythdate.h"
 #include "mythtypes.h"
 
-/* If NUMPROGRAMLINES gets updated following files need
-   updates and code changes:
-   mythweb/modules/tv/classes/Program.php (layout)
-   mythtv/bindings/perl/MythTV.pm (version number)
-   mythtv/bindings/perl/MythTV/Program.pm (layout)
-   mythtv/bindings/php/MythBackend.php (version number)
-   mythtv/bindings/php/MythTVProgram.php (layout)
-   mythtv/bindings/php/MythTVRecording.php (layout)
-   mythtv/bindings/python/MythTV/static.py (version number)
-   mythtv/bindings/python/MythTV/mythproto.py (layout)
+/* If NUMPROGRAMLINES gets updated, then MYTH_PROTO_VERSION and MYTH_PROTO_TOKEN
+   in mythversion.h need to be bumped, and also follow the instructions in
+   myth_version.h about other changes needed when the network protocol changes.
 */
-#define NUMPROGRAMLINES 50
+#define NUMPROGRAMLINES 52
 
 class ProgramInfo;
 typedef AutoDeleteDeque<ProgramInfo*> ProgramList;
@@ -144,7 +137,9 @@ class MPUBLIC ProgramInfo
                 uint programflags,
                 uint audioproperties,
                 uint videoproperties,
-                uint subtitleType);
+                uint subtitleType,
+                const QString &inputname,
+                const QDateTime &bookmarkupdate);
 
     /// Constructs a ProgramInfo from data in 'oldrecorded' table
     ProgramInfo(const QString &title,
@@ -453,6 +448,7 @@ class MPUBLIC ProgramInfo
     uint32_t GetProgramFlags(void)        const { return programflags; }
     ProgramInfoType GetProgramInfoType(void) const
         { return (ProgramInfoType)((programflags & FL_TYPEMASK) >> 20); }
+    QDateTime GetBookmarkUpdate(void) const { return bookmarkupdate; }
     bool IsGeneric(void) const;
     bool IsInUsePlaying(void)   const { return programflags & FL_INUSEPLAYING;}
     bool IsCommercialFree(void) const { return programflags & FL_CHANCOMMFREE;}
@@ -769,6 +765,8 @@ class MPUBLIC ProgramInfo
     uint8_t dupmethod;
 
     uint    recordedid;
+    QString inputname;
+    QDateTime bookmarkupdate;
 
 // everything below this line is not serialized
     uint8_t availableStatus; // only used for playbackbox.cpp
