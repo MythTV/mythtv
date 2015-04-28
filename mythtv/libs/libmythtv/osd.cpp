@@ -665,8 +665,10 @@ bool OSD::DrawDirect(MythPainter* painter, QSize size, bool repaint)
     QList<MythScreenType*>::iterator it2 = notifications.begin();
     while (it2 != notifications.end())
     {
-        if (!GetNotificationCenter()->ScreenCreated(*it2))
+        if (!nc->ScreenCreated(*it2))
         {
+            LOG(VB_GUI, LOG_DEBUG, LOC + "Creating OSD Notification");
+
             if (!m_UIScaleOverride)
             {
                 OverrideUIScale(false);
