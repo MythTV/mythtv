@@ -1064,7 +1064,7 @@ int JobQueue::GetRunningJobID(uint chanid, const QDateTime &recstartts)
 
 bool JobQueue::IsJobStatusQueued(int status)
 {
-    return (status & JOB_QUEUED);
+    return (status == JOB_QUEUED);
 }
 
 bool JobQueue::IsJobStatusRunning(int status)

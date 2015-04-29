@@ -454,7 +454,7 @@ class PlaybackBox : public ScheduleCommon
     class PbbJobQueue
     {
     public:
-        PbbJobQueue() {}
+        PbbJobQueue() { Update(); }
         bool IsJobQueued(int jobType, uint chanid,
                          const QDateTime &recstartts);
         bool IsJobRunning(int jobType, uint chanid,

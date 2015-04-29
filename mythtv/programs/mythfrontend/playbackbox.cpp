@@ -5567,8 +5567,9 @@ bool PlaybackBox::PbbJobQueue::IsJobQueued(int jobType, uint chanid,
                                            const QDateTime &recstartts)
 {
     Update();
-    MapType::const_iterator iter = m_jobs.find(qMakePair(chanid, recstartts));
-    for (; iter != m_jobs.end(); ++iter)
+    QList<JobQueueEntry> values = m_jobs.values(qMakePair(chanid, recstartts));
+    QList<JobQueueEntry>::const_iterator iter, end = values.end();
+    for (iter = values.begin(); iter != end; ++iter)
     {
         if (iter->type == jobType)
             return JobQueue::IsJobStatusQueued(iter->status);
@@ -5580,8 +5581,9 @@ bool PlaybackBox::PbbJobQueue::IsJobRunning(int jobType, uint chanid,
                                             const QDateTime &recstartts)
 {
     Update();
-    MapType::const_iterator iter = m_jobs.find(qMakePair(chanid, recstartts));
-    for (; iter != m_jobs.end(); ++iter)
+    QList<JobQueueEntry> values = m_jobs.values(qMakePair(chanid, recstartts));
+    QList<JobQueueEntry>::const_iterator iter, end = values.end();
+    for (iter = values.begin(); iter != end; ++iter)
     {
         if (iter->type == jobType)
             return JobQueue::IsJobStatusRunning(iter->status);
