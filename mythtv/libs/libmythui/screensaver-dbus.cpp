@@ -164,8 +164,8 @@ bool ScreenSaverDBus::Asleep(void)
     QList<ScreenSaverDBusPrivate *>::iterator i;
     for (i = m_dbusPrivateInterfaces.begin(); i != m_dbusPrivateInterfaces.end(); ++i) {
         if((*i)->m_inhibited) {
-            return false;
+            return true;
         }
     }
-    return true;
+    return false;
 }
