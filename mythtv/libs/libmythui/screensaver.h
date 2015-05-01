@@ -2,6 +2,7 @@
 #define MYTH_SCREENSAVER_H
 
 #include <QEvent>
+#include <QList>
 
 class ScreenSaverEvent : public QEvent
 {
@@ -48,6 +49,8 @@ class ScreenSaverControl
     void Restore(void);
     void Reset(void);
     bool Asleep(void);
+  private:
+    QList<ScreenSaver *> m_screenSavers;
 };
 
 #endif // MYTH_SCREENSAVER_H
