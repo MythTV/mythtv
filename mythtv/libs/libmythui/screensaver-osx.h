@@ -3,7 +3,7 @@
 
 #include "screensaver.h"
 
-class ScreenSaverOSX : public ScreenSaverControl
+class ScreenSaverOSX : public ScreenSaver
 {
 public:
     ScreenSaverOSX();

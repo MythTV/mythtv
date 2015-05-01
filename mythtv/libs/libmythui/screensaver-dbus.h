@@ -4,7 +4,7 @@
 #include "screensaver.h"
 #include "QDBusConnection"
 
-class ScreenSaverDBus : public ScreenSaverControl
+class ScreenSaverDBus : public ScreenSaver
 {
   public:
     ScreenSaverDBus();

@@ -17,13 +17,12 @@
 QEvent::Type ScreenSaverEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
-ScreenSaverControl* ScreenSaverSingleton = NULL;
+ScreenSaver* ScreenSaverSingleton = NULL;
 
-ScreenSaverControl* ScreenSaverControl::get(void)
+ScreenSaverControl::ScreenSaverControl()
 {
     if (!ScreenSaverSingleton)
     {
-
 #if defined(USING_DBUS)
         ScreenSaverSingleton = new ScreenSaverDBus();
 #elif defined(USING_X11)
@@ -36,4 +35,24 @@ ScreenSaverControl* ScreenSaverControl::get(void)
     }
     
     return ScreenSaverSingleton;
+}
+
+ScreenSaverControl::~ScreenSaverControl() {
+    delete ScreenSaverSingleton;
+}
+
+void ScreenSaverControl::Disable(void) {
+    ScreenSaverSingleton->Disable();
+}
+
+void ScreenSaverControl::Restore(void) {
+    ScreenSaverSingleton->Restore();
+}
+
+void ScreenSaverControl::Reset(void) {
+    ScreenSaverSingleton->Reset();
+}
+
+bool ScreenSaverControl::Asleep(void) {
+    return ScreenSaverSingleton->Asleep();
 }
