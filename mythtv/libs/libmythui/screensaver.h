@@ -24,20 +24,30 @@ protected:
     ScreenSaverEventKind sset;
 };
 
-class ScreenSaverControl
+/// Base Class for screensavers
+class ScreenSaver
 {
   public:
-    // creates one of the concrete subsclasses
-    static ScreenSaverControl* get(void);
-
-    ScreenSaverControl() { };
-    virtual ~ScreenSaverControl() { };
+    ScreenSaver() { };
+    virtual ~ScreenSaver() { };
 
     virtual void Disable(void) = 0;
     virtual void Restore(void) = 0;
     virtual void Reset(void) = 0;
-
     virtual bool Asleep(void) = 0;
+};
+
+/// Controls all instances of the screensaver
+class ScreenSaverControl
+{
+  public:
+    ScreenSaverControl();
+    ~ScreenSaverControl();
+
+    void Disable(void);
+    void Restore(void);
+    void Reset(void);
+    bool Asleep(void);
 };
 
 #endif // MYTH_SCREENSAVER_H

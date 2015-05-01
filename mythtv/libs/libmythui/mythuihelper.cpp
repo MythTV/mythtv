@@ -202,7 +202,7 @@ MythUIHelperPrivate::~MythUIHelperPrivate()
 
 void MythUIHelperPrivate::Init(void)
 {
-    screensaver = ScreenSaverControl::get();
+    screensaver = new ScreenSaverControl();
     GetScreenBounds();
     StoreGUIsettings();
     screenSetup = true;

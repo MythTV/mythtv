@@ -5,7 +5,7 @@
 
 #include "screensaver.h"
 
-class ScreenSaverX11 : public QObject, public ScreenSaverControl
+class ScreenSaverX11 : public QObject, public ScreenSaver
 {
     Q_OBJECT
 
