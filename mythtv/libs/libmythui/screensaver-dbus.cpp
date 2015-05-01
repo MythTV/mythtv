@@ -83,7 +83,7 @@ class ScreenSaverDBusPrivate
             }
             else // msg.type() == QDBusMessage::ErrorMessage
             {
-                LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to disable screensaver: " +
+                LOG(VB_GENERAL, LOG_WARNING, LOC + "Failed to disable screensaver: " +
                     msg.errorMessage());
             }
         }
