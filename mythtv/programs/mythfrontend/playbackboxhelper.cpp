@@ -215,11 +215,8 @@ bool PBHEventHandler::event(QEvent *e)
                 bool ok = RemoteUndeleteRecording(recordingID);
 
                 QStringList &res = (ok) ? successes : failures;
-                for (uint i = 0; i < 2; i++)
-                {
-                    res.push_back(list.front());
-                    list.pop_front();
-                }
+
+                res.push_back(recordingID);
             }
             if (!successes.empty())
             {
