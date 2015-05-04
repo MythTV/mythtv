@@ -1377,6 +1377,7 @@ void MythPlayer::DisableCaptions(uint mode, bool osd_msg)
 
     QMutexLocker locker(&osdLock);
 
+    textDesired = textDisplayMode & kDisplayAllTextCaptions;
     QString msg = "";
     if (kDisplayNUVTeletextCaptions & mode)
         msg += tr("TXT CAP");
@@ -1413,7 +1414,8 @@ void MythPlayer::DisableCaptions(uint mode, bool osd_msg)
 void MythPlayer::EnableCaptions(uint mode, bool osd_msg)
 {
     QMutexLocker locker(&osdLock);
-    QString msg;
+    textDesired = mode & kDisplayAllTextCaptions;
+    QString msg = "";
     if ((kDisplayCC608 & mode) || (kDisplayCC708 & mode) ||
         (kDisplayAVSubtitle & mode) || kDisplayRawTextSubtitle & mode)
     {
@@ -1510,8 +1512,8 @@ void MythPlayer::SetCaptionsEnabled(bool enable, bool osd_msg)
         {
             EnableCaptions(mode, osd_msg);
         }
-        ResetCaptions();
     }
+    ResetCaptions();
 }
 
 bool MythPlayer::GetCaptionsEnabled(void)
@@ -3975,7 +3977,11 @@ void MythPlayer::ClearAfterSeek(bool clearvideobuffers)
     tc_wrap[TC_AUDIO] = savedAudioTimecodeOffset;
 
     audio.Reset();
-    ResetCaptions();
+    // Reenable (or re-disable) subtitles, which ultimately does
+    // nothing except to call ResetCaptions() to erase any captions
+    // currently on-screen.  The key is that the erasing is done in
+    // the UI thread, not the decoder thread.
+    EnableSubtitles(textDesired);
     deleteMap.TrackerReset(framesPlayed);
     commBreakMap.SetTracker(framesPlayed);
     commBreakMap.ResetLastSkip();

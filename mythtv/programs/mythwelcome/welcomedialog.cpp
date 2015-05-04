@@ -107,7 +107,7 @@ void WelcomeDialog::startFrontend(void)
     QString startFECmd = gCoreContext->GetSetting("MythWelcomeStartFECmd",
                          m_installDir + "/bin/mythfrontend");
 
-    myth_system(startFECmd, kMSDisableUDPListener);
+    myth_system(startFECmd, kMSDisableUDPListener | kMSProcessEvents);
     updateAll();
     m_frontendIsRunning = false;
 }

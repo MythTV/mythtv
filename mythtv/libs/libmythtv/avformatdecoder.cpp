@@ -410,7 +410,7 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
       video_codec_id(kCodec_NONE),
       maxkeyframedist(-1),
       // Closed Caption & Teletext decoders
-      ignore_scte(false),
+      ignore_scte(0),
       invert_scte_field(0),
       last_scte_field(0),
       ccd608(new CC608Decoder(parent->GetCC608Reader())),
@@ -3676,17 +3676,31 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
 {
     AVCodecContext *context = stream->codec;
 
+    // We need to mediate between ATSC and SCTE data when both are present.  If
+    // both are present, we generally want to prefer ATSC.  However, there may
+    // be large sections of the recording where ATSC is used and other sections
+    // where SCTE is used.  In that case, we want to allow a natural transition
+    // from ATSC back to SCTE.  We do this by allowing 10 consecutive SCTE
+    // frames, without an intervening ATSC frame, to cause a switch back to
+    // considering SCTE frames.  The number 10 is somewhat arbitrarily chosen.
+
     uint cc_len = (uint) max(mpa_pic->scte_cc_len,0);
     uint8_t *cc_buf = mpa_pic->scte_cc_buf;
     bool scte = true;
 
+    // If we saw SCTE, then decrement a nonzero ignore_scte count.
+    if (cc_len > 0 && ignore_scte)
+        --ignore_scte;
+
     // If both ATSC and SCTE caption data are available, prefer ATSC
     if ((mpa_pic->atsc_cc_len > 0) || ignore_scte)
     {
-        ignore_scte = true;
         cc_len = (uint) max(mpa_pic->atsc_cc_len, 0);
         cc_buf = mpa_pic->atsc_cc_buf;
         scte = false;
+        // If we explicitly saw ATSC, then reset ignore_scte count.
+        if (cc_len > 0)
+            ignore_scte = 10;
     }
 
     // Decode CEA-608 and CEA-708 captions

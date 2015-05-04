@@ -187,6 +187,7 @@ NetworkControl::NetworkControl() :
     keyMap["f23"]                    = Qt::Key_F23;
     keyMap["f24"]                    = Qt::Key_F24;
 
+    keyTextMap[Qt::Key_Space]           = " ";
     keyTextMap[Qt::Key_Plus]            = "+";
     keyTextMap[Qt::Key_Comma]           = ",";
     keyTextMap[Qt::Key_Minus]           = "-";
