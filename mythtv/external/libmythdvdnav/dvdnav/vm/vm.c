@@ -174,7 +174,7 @@ static int dvd_read_name(char *name, char *serial, const char *device) {
     goto fail;
   }
 
-  close(fd);
+  mythfile_close(fd);
   fd = -1;
   if (read_size != DVD_VIDEO_LB_LEN) {
     fprintf(MSG_OUT, "libdvdnav: Can't read name block. Probably not a DVD-ROM device.\n");
@@ -217,7 +217,7 @@ static int dvd_read_name(char *name, char *serial, const char *device) {
 
 fail:
   if (fd >= 0)
-    close(fd);
+    mythfile_close(fd);
 
   return 0;
 }
