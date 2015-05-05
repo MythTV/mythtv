@@ -53,6 +53,11 @@ SOURCES += dvdnav/vm/decoder.c dvdnav/vm/vm.c dvdnav/vm/vmcmd.c
 HEADERS += dvdread/bswap.h dvdread/dvd_input.h dvdread/dvdread_internal.h
 HEADERS += dvdread/dvd_udf.h dvdread/md5.h
 HEADERS += dvdread/bitreader.h dvdread/mythdvdreadexp.h
+HEADERS += dvdread/dvdread/bitreader.h dvdread/dvdread/dvd_reader.h
+HEADERS += dvdread/dvdread/dvd_udf.h dvdread/dvdread/ifo_print.h
+HEADERS += dvdread/dvdread/ifo_read.h dvdread/dvdread/ifo_types.h
+HEADERS += dvdread/dvdread/nav_print.h dvdread/dvdread/nav_read.h
+HEADERS += dvdread/dvdread/nav_types.h
 
 SOURCES += dvdread/dvd_reader.c dvdread/nav_read.c dvdread/ifo_read.c
 SOURCES += dvdread/dvd_input.c dvdread/dvd_udf.c dvdread/md5.c
