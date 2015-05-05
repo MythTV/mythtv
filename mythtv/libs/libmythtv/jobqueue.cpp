@@ -1062,16 +1062,21 @@ int JobQueue::GetRunningJobID(uint chanid, const QDateTime &recstartts)
     return 0;
 }
 
+bool JobQueue::IsJobStatusQueued(int status)
+{
+    return (status == JOB_QUEUED);
+}
+
+bool JobQueue::IsJobStatusRunning(int status)
+{
+    return ((status != JOB_UNKNOWN) && (status != JOB_QUEUED) &&
+            (!(status & JOB_DONE)));
+}
+
 bool JobQueue::IsJobRunning(int jobType,
                             uint chanid, const QDateTime &recstartts)
 {
-    int tmpStatus = GetJobStatus(jobType, chanid, recstartts);
-
-    if ((tmpStatus != JOB_UNKNOWN) && (tmpStatus != JOB_QUEUED) &&
-        (!(tmpStatus & JOB_DONE)))
-        return true;
-
-    return false;
+    return IsJobStatusRunning(GetJobStatus(jobType, chanid, recstartts));
 }
 
 bool JobQueue::IsJobRunning(int jobType, const ProgramInfo &pginfo)
@@ -1094,12 +1099,7 @@ bool JobQueue::IsJobQueuedOrRunning(
 bool JobQueue::IsJobQueued(
     int jobType, uint chanid, const QDateTime &recstartts)
 {
-    int tmpStatus = GetJobStatus(jobType, chanid, recstartts);
-
-    if (tmpStatus & JOB_QUEUED)
-        return true;
-
-    return false;
+    return IsJobStatusQueued(GetJobStatus(jobType, chanid, recstartts));
 }
 
 QString JobQueue::JobText(int jobType)

@@ -280,17 +280,17 @@ static QString extract_main_state(const ProgramInfo &pginfo, const TV *player)
     return state;
 }
 
-static QString extract_job_state(const ProgramInfo &pginfo)
+QString PlaybackBox::extract_job_state(const ProgramInfo &pginfo)
 {
     QString job = "default";
 
     if (pginfo.GetRecordingStatus() == rsRecording)
         job = "recording";
-    else if (JobQueue::IsJobQueuedOrRunning(
+    else if (m_jobQueue.IsJobQueuedOrRunning(
                  JOB_TRANSCODE, pginfo.GetChanID(),
                  pginfo.GetRecordingStartTime()))
         job = "transcoding";
-    else if (JobQueue::IsJobQueuedOrRunning(
+    else if (m_jobQueue.IsJobQueuedOrRunning(
                  JOB_COMMFLAG,  pginfo.GetChanID(),
                  pginfo.GetRecordingStartTime()))
         job = "commflagging";
@@ -298,15 +298,16 @@ static QString extract_job_state(const ProgramInfo &pginfo)
     return job;
 }
 
-static QString extract_commflag_state(const ProgramInfo &pginfo)
+QString PlaybackBox::extract_commflag_state(const ProgramInfo &pginfo)
 {
     QString job = "default";
 
     // commflagged can be yes, no or processing
-    if (JobQueue::IsJobRunning(JOB_COMMFLAG, pginfo))
+    if (m_jobQueue.IsJobRunning(JOB_COMMFLAG, pginfo.GetChanID(),
+                                pginfo.GetRecordingStartTime()))
         return "running";
-    if (JobQueue::IsJobQueued(JOB_COMMFLAG, pginfo.GetChanID(),
-                              pginfo.GetRecordingStartTime()))
+    if (m_jobQueue.IsJobQueued(JOB_COMMFLAG, pginfo.GetChanID(),
+                               pginfo.GetRecordingStartTime()))
         return "queued";
 
     return (pginfo.GetProgramFlags() & FL_COMMFLAG ? "yes" : "no");
@@ -5533,6 +5534,59 @@ void HelpPopup::addItem(const QString &state, const QString &text)
 {
     MythUIButtonListItem *item = new MythUIButtonListItem(m_iconList, text);
     item->DisplayState(state, "icons");
+}
+
+void PlaybackBox::PbbJobQueue::Update()
+{
+    QDateTime now = QDateTime::currentDateTime();
+    if (!m_lastUpdated.isValid() ||
+        m_lastUpdated.msecsTo(now) >= kInvalidateTimeMs)
+    {
+        QMap<int, JobQueueEntry> jobs;
+        JobQueue::GetJobsInQueue(jobs, JOB_LIST_ALL);
+        m_jobs.clear();
+        for (int i = 0; i < jobs.size(); ++i)
+        {
+            JobQueueEntry &entry = jobs[i];
+            m_jobs.insert(qMakePair(entry.chanid, entry.recstartts), entry);
+        }
+        m_lastUpdated = now;
+    }
+}
+
+bool PlaybackBox::PbbJobQueue::IsJobQueued(int jobType, uint chanid,
+                                           const QDateTime &recstartts)
+{
+    Update();
+    QList<JobQueueEntry> values = m_jobs.values(qMakePair(chanid, recstartts));
+    QList<JobQueueEntry>::const_iterator iter, end = values.end();
+    for (iter = values.begin(); iter != end; ++iter)
+    {
+        if (iter->type == jobType)
+            return JobQueue::IsJobStatusQueued(iter->status);
+    }
+    return false;
+}
+
+bool PlaybackBox::PbbJobQueue::IsJobRunning(int jobType, uint chanid,
+                                            const QDateTime &recstartts)
+{
+    Update();
+    QList<JobQueueEntry> values = m_jobs.values(qMakePair(chanid, recstartts));
+    QList<JobQueueEntry>::const_iterator iter, end = values.end();
+    for (iter = values.begin(); iter != end; ++iter)
+    {
+        if (iter->type == jobType)
+            return JobQueue::IsJobStatusRunning(iter->status);
+    }
+    return false;
+}
+
+bool PlaybackBox::PbbJobQueue::IsJobQueuedOrRunning(int jobType, uint chanid,
+                                                    const QDateTime &recstartts)
+{
+    return IsJobQueued(jobType, chanid, recstartts) ||
+        IsJobRunning(jobType, chanid, recstartts);
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
