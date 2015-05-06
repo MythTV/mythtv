@@ -1311,13 +1311,6 @@ static QString extract_cc608(QString &text, int &color,
     else
     {
         result = text.left(nextControl);
-        // Print the space character before handling the next control
-        // character, otherwise the space character will be lost due
-        // to the text.trimmed() operation in the MythUISimpleText
-        // constructor, combined with the left-justification of
-        // captions.
-        if (text[nextControl] < (0x7000 + 0x10))
-            result += " ";
         text = text.mid(nextControl);
     }
 
