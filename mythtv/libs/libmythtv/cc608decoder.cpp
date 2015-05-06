@@ -331,6 +331,7 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
                                     .arg(b2, 2, 16));
                             // Encode as 0x7000 through 0x700f for the
                             // 16 possible values of b2.
+                            ccbuf[mode] += ' ';
                             ccbuf[mode] += QChar(0x7000 + (b2 & 0xf));
                             len = ccbuf[mode].length();
                             col[mode]++;
@@ -698,7 +699,7 @@ QString CC608Decoder::ToASCII(const QString &cc608str, bool suppress_unknown)
                 if (cpu >= 0x7000 && cpu < 0x7000 + 0x30)
                 {
                     if (!suppress_unknown)
-                        ret += QString("[%1]").arg(cpu - 0x7000, 2, 16);
+                        ret += QString("[%1]").arg(cpu, 2, 16);
                 }
                 else if (cpu <= 0x80)
                     ret += QString(cp.toLatin1());
@@ -864,7 +865,6 @@ int CC608Decoder::NewRowCC(int mode, int len)
     {
         ccbuf[mode] += QChar(newattr[mode] + 0x7000);
         len++;
-        col[mode]++;
     }
 
     newcol[mode] = 0;
