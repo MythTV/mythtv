@@ -54,6 +54,16 @@
         <fontdef name="teletext" face="FreeMono" from="provider">
         </fontdef>
 
+	<!--
+	    This allows overriding the alpha (transparency) value of
+	    non-transparent subtitles.  Note that the parser requires
+	    some color to be specified here, but it will be ignored
+	    and the provider's value will be used instead.
+	   -->
+        <shape   name="teletext" from="provider">
+          <fill color="#000000" alpha="255" />
+        </shape>
+
 
         <!--
             CEA-608 closed captions.  These also apply to CEA-608 VBI

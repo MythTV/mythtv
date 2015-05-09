@@ -141,6 +141,7 @@ public:
                             const MythRect &area,
                             int whichImageCache,
                             int start, int duration);
+    int GetBackgroundAlpha(const QString &family);
     static QString MakePrefix(const QString &family,
                               const CC708CharacterAttribute &attr);
 private:
@@ -401,6 +402,11 @@ void SubtitleFormat::CreateProviderDefault(const QString &family,
     else if (family == kSubFamilyTeletext)
     {
         font->GetFace()->setFamily("FreeMono");
+        // Set up a background with default alpha=100% so that the theme can
+        // override the background alpha.
+        QBrush brush(Qt::black);
+        bg->SetFillBrush(brush);
+        bg->SetLinePen(QPen(brush, 0));
     }
     font->GetFace()->setPixelSize(10);
 
@@ -617,6 +623,16 @@ SubtitleFormat::GetBackground(MythUIType *parent, const QString &name,
         .arg(result->m_fillBrush.style())
         .arg(srtColorString(result->m_fillBrush.color())));
     return result;
+}
+
+int SubtitleFormat::GetBackgroundAlpha(const QString &family)
+{
+    // This is a "temporary" hack for allowing teletextscreen.cpp to get the
+    // background alpha value from osd_subtitle.xml.
+    CC708CharacterAttribute attr(false, false, false, Qt::white);
+    SubShape *bgShape = GetBackground(NULL, "dummyName", family, attr,
+                                      MythRect(), -1, 0, -1);
+    return bgShape->m_fillBrush.color().alpha();
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -1668,6 +1684,12 @@ QString SubtitleScreen::GetTeletextFontName(void)
         format.GetFont(kSubFamilyTeletext, attr,
                        /*pixelsize*/20, /*zoom*/100, /*stretch*/100);
     return mythfont->face().family();
+}
+
+int SubtitleScreen::GetTeletextBackgroundAlpha(void)
+{
+    SubtitleFormat format;
+    return format.GetBackgroundAlpha(kSubFamilyTeletext);
 }
 
 bool SubtitleScreen::Create(void)

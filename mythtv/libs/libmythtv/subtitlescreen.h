@@ -197,9 +197,10 @@ public:
     MythFontProperties* GetFont(const CC708CharacterAttribute &attr) const;
     void SetFontSize(int pixelSize) { m_fontSize = pixelSize; }
 
-    // Temporary method until teletextscreen.cpp is refactored into
+    // Temporary methods until teletextscreen.cpp is refactored into
     // subtitlescreen.cpp
     static QString GetTeletextFontName(void);
+    static int GetTeletextBackgroundAlpha(void);
 
     // MythScreenType methods
     virtual bool Create(void);

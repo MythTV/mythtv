@@ -26,6 +26,7 @@ const int    TeletextScreen::kTeletextColumns = 40;
 const int    TeletextScreen::kTeletextRows    = 26;
 
 static MythFontProperties* gTTFont;
+static int gTTBackgroundAlpha;
 
 static QChar cvt_char(char ch, int lang)
 {
@@ -322,7 +323,8 @@ void TeletextScreen::SetBackgroundColor(int ttcolor)
             .arg(TTColorToString(ttcolor)));
 
     m_bgColor = ttcolortoqcolor(ttcolor);
-    m_bgColor.setAlpha((ttcolor & kTTColorTransparent) ? 0x00 : 0xff);
+    m_bgColor.setAlpha((ttcolor & kTTColorTransparent) ?
+                       0x00 : gTTBackgroundAlpha);
 }
 
 void TeletextScreen::DrawLine(const uint8_t *page, uint row, int lang)
@@ -709,6 +711,8 @@ bool TeletextScreen::InitialiseFont()
     }
     else
         return false;
+
+    gTTBackgroundAlpha = SubtitleScreen::GetTeletextBackgroundAlpha();
 
     initialised = true;
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Loaded main subtitle font '%1'")
