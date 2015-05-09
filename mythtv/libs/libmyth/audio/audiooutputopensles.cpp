@@ -14,7 +14,7 @@ using namespace std;
 #define LOC QString("AOSLES: ")
 
 #define OPENSLES_BUFFERS 10  /* maximum number of buffers */
-#define OPENSLES_BUFLEN  8   /* ms */
+#define OPENSLES_BUFLEN  10  /* ms */
 //#define POSITIONUPDATEPERIOD 1000
 //#define POSITIONUPDATEPERIOD 25000
 #define POSITIONUPDATEPERIOD 40
@@ -371,7 +371,7 @@ bool AudioOutputOpenSLES::OpenDevice(void)
         return false;
     }
 
-    // fragments are 8ms worth of samples
+    // fragments are 10ms worth of samples
     fragment_size = OPENSLES_BUFLEN * output_bytes_per_frame * samplerate / 1000;
     // OpenSLES buffer holds 10 fragments = 80ms worth of samples
     soundcard_buffer_size = OPENSLES_BUFFERS * fragment_size;
