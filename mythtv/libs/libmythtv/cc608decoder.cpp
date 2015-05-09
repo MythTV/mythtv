@@ -66,15 +66,15 @@ CC608Decoder::CC608Decoder(CC608Input *ccr)
     // fill translation table
     for (uint i = 0; i < 128; i++)
         stdchar[i] = QChar(i);
-    stdchar[42]  = 'á';
-    stdchar[92]  = 'é';
-    stdchar[94]  = 'í';
-    stdchar[95]  = 'ó';
-    stdchar[96]  = 'ú';
-    stdchar[123] = 'ç';
-    stdchar[124] = '÷';
-    stdchar[125] = 'Ñ';
-    stdchar[126] = 'ñ';
+    stdchar[42]  = QLatin1Char('á');
+    stdchar[92]  = QLatin1Char('é');
+    stdchar[94]  = QLatin1Char('í');
+    stdchar[95]  = QLatin1Char('ó');
+    stdchar[96]  = QLatin1Char('ú');
+    stdchar[123] = QLatin1Char('ç');
+    stdchar[124] = QLatin1Char('÷');
+    stdchar[125] = QLatin1Char('Ñ');
+    stdchar[126] = QLatin1Char('ñ');
     stdchar[127] = 0x2588; /* full block */
 
     // VPS data (MS Windows doesn't like bzero())

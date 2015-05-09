@@ -27,7 +27,7 @@ const int    TeletextScreen::kTeletextRows    = 26;
 
 static MythFontProperties* gTTFont;
 
-static char cvt_char(char ch, int lang)
+static QChar cvt_char(char ch, int lang)
 {
     int c = 0;
     for (int j = 0; j < 14; j++)
@@ -36,7 +36,7 @@ static char cvt_char(char ch, int lang)
         if (c == lang_chars[0][j])
             ch = lang_chars[lang + 1][j];
     }
-    return ch;
+    return QLatin1Char(ch);
 }
 
 TeletextScreen::TeletextScreen(MythPlayer *player, const char * name,
@@ -524,7 +524,7 @@ void TeletextScreen::DrawLine(const uint8_t *page, uint row, int lang)
                 }
                 else
                 {
-                    char c2 = cvt_char(ch, lang);
+                    QChar c2 = cvt_char(ch, lang);
                     DrawCharacter(x, row, c2, doubleheight);
                 }
             }
