@@ -1,5 +1,8 @@
 // Qt
 #include <QTimer>
+#ifdef ANDROID
+#include <QCoreApplication>
+#endif
 
 // MythTV
 #include "mythmainwindow.h"
@@ -79,7 +82,7 @@ bool TvPlayWindow::gestureEvent(MythGestureEvent *event)
                     {
                         LOG(VB_GENERAL, LOG_NOTICE, "TV Play Window L Click");
 						// send it on like the others to be handled by TV
-						QCoreApplication::postEvent(GetMythMainWindow(), new MythGestureEvent(*event));
+                        QCoreApplication::postEvent(GetMythMainWindow(), new MythGestureEvent(*event));
                         handled = true;
                     }
                     break;
