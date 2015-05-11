@@ -145,7 +145,7 @@ static BD_FILE_H *file_open_linux(const char* filename, const char *cmode)
 #endif
 
     if (strncmp(filename, "myth://", 7) == 0)
-        return file_open_mythiowrapper(filename, flags);
+        return file_open_mythiowrapper(filename, cmode);
 
     if ((fd = open(filename, flags, mode)) < 0) {
         BD_DEBUG(DBG_FILE, "Error opening file %s\n", filename);
