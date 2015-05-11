@@ -5811,7 +5811,11 @@ if enabled taglib; then
             echo "Can't find taglib-config. Assuming 1.7 or later."
             taglib_minor="7"
         fi
-        tagprefix=${sysroot}`taglib-config --prefix`
+        if test $target_os = android ; then
+            tagprefix=`taglib-config --prefix`
+        else
+            tagprefix=${sysroot}`taglib-config --prefix`
+        fi
         tagincludes="-I${tagprefix}/include"
         taglibs=`taglib-config --libs`
     fi
