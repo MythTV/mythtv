@@ -1537,7 +1537,8 @@ bool MythCoreContext::CheckProtoVersion(MythSocket *socket, uint timeout_ms,
         return false;
 
     QStringList strlist(QString("MYTH_PROTO_VERSION %1 %2")
-                        .arg(MYTH_PROTO_VERSION).arg(MYTH_PROTO_TOKEN));
+                        .arg(MYTH_PROTO_VERSION)
+                        .arg(QString::fromUtf8(MYTH_PROTO_TOKEN)));
     socket->WriteStringList(strlist);
 
     if (!socket->ReadStringList(strlist, timeout_ms) || strlist.empty())
@@ -1554,7 +1555,7 @@ bool MythCoreContext::CheckProtoVersion(MythSocket *socket, uint timeout_ms,
         LOG(VB_GENERAL, LOG_CRIT, LOC + QString("Protocol version or token mismatch "
                                           "(frontend=%1/%2,backend=%3/\?\?)\n")
                                       .arg(MYTH_PROTO_VERSION)
-                                      .arg(MYTH_PROTO_TOKEN)
+                                      .arg(QString::fromUtf8(MYTH_PROTO_TOKEN))
                                       .arg(strlist[1]));
 
         if (error_dialog_desired && d->m_GUIcontext)
@@ -1571,8 +1572,10 @@ bool MythCoreContext::CheckProtoVersion(MythSocket *socket, uint timeout_ms,
         if (!d->m_announcedProtocol)
         {
             d->m_announcedProtocol = true;
-            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Using protocol version %1")
-                                              .arg(MYTH_PROTO_VERSION));
+            LOG(VB_GENERAL, LOG_INFO, LOC +
+                            QString("Using protocol version %1 %2")
+                                .arg(MYTH_PROTO_VERSION)
+                                .arg(QString::fromUtf8(MYTH_PROTO_TOKEN)));
         }
 
         return true;

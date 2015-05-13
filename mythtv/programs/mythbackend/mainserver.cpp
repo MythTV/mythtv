@@ -1597,7 +1597,7 @@ void MainServer::HandleVersion(MythSocket *socket, const QStringList &slist)
     }
 
     QString token = slist[2];
-    if (token != MYTH_PROTO_TOKEN)
+    if (token != QString::fromUtf8(MYTH_PROTO_TOKEN))
     {
         LOG(VB_GENERAL, LOG_CRIT, LOC +
             QString("MainServer::HandleVersion - Client sent incorrect "

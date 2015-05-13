@@ -362,7 +362,7 @@ void MythSocketManager::HandleVersion(MythSocket *socket,
     }
 
     QString token = slist[2];
-    if (token != MYTH_PROTO_TOKEN)
+    if (token != QString::fromUtf8(MYTH_PROTO_TOKEN))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Client sent incorrect protocol token \"%1\" for "
