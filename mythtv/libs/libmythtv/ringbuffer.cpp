@@ -32,6 +32,7 @@
 #include "DVD/dvdringbuffer.h"
 #include "Bluray/bdringbuffer.h"
 #include "HLS/httplivestreambuffer.h"
+#include "mythcdrom.h"
 
 // about one second at 35mbit
 #define BUFFER_SIZE_MINIMUM 4 * 1024 * 1024
@@ -125,7 +126,24 @@ RingBuffer *RingBuffer::Create(
     bool mythurl = lower.startsWith("myth://");
     bool bdurl   = lower.startsWith("bd:");
     bool dvdurl  = lower.startsWith("dvd:");
-    bool dvdext  = lower.endsWith(".img") || lower.endsWith(".iso");
+    bool imgext  = lower.endsWith(".img") || lower.endsWith(".iso");
+
+    if (imgext)
+    {
+        switch (MythCDROM::inspectImage(lfilename))
+        {
+            case MythCDROM::kBluray:
+                bdurl = true;
+                break;
+
+            case MythCDROM::kDVD:
+                dvdurl = true;
+                break;
+
+            default:
+                break;
+        }
+    }
 
     if (httpurl || iptvurl)
     {
@@ -155,7 +173,7 @@ RingBuffer *RingBuffer::Create(
             bddir  = true;
     }
 
-    if (!stream_only && (dvdurl || dvddir || dvdext))
+    if (!stream_only && (dvdurl || dvddir))
     {
         if (lfilename.startsWith("dvd:"))        // URI "dvd:" + path
             lfilename.remove(0,4);              // e.g. "dvd:/dev/dvd"
@@ -178,9 +196,9 @@ RingBuffer *RingBuffer::Create(
         return new BDRingBuffer(lfilename);
     }
 
-    if (!mythurl && dvdext)
+    if (!mythurl && imgext && lfilename.startsWith("dvd:"))
     {
-        LOG(VB_PLAYBACK, LOG_INFO, "ISO image at " + lfilename);
+        LOG(VB_PLAYBACK, LOG_INFO, "DVD image at " + lfilename);
         return new DVDStream(lfilename);
     }
     if (!mythurl && lower.endsWith(".vob") && lfilename.contains("/VIDEO_TS/"))

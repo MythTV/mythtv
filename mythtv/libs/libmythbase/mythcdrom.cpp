@@ -3,6 +3,9 @@
 
 #include "mythcdrom.h"
 #include "mythconfig.h"
+#include "remotefile.h"
+#include "libudfread/blockinput.h"
+#include "libudfread/udfread.h"
 #ifdef linux
 #include "mythcdrom-linux.h"
 #elif defined(__FreeBSD__)
@@ -130,4 +133,103 @@ void MythCDROM::setDeviceSpeed(const char *devicePath, int speed)
     LOG(VB_MEDIA, LOG_INFO,
         QString("SetDeviceSpeed(%1,%2) - not implemented on this OS.")
         .arg(devicePath).arg(speed));
+}
+
+typedef struct
+{
+    udfread_block_input input;  /* This *must* be the first entry in the struct */
+    RemoteFile*         file;
+} blockInput_t;
+
+static int _def_close(udfread_block_input *p_gen)
+{
+    blockInput_t *p = (blockInput_t *)p_gen;
+    int result = -1;
+
+    if (p && p->file)
+    {
+        delete p->file;
+        p->file = NULL;
+        result = 0;
+    }
+
+    return result;
+}
+
+static uint32_t _def_size(udfread_block_input *p_gen)
+{
+    blockInput_t *p = (blockInput_t *)p_gen;
+
+    return (uint32_t)(p->file->GetRealFileSize() / UDF_BLOCK_SIZE);
+}
+
+static int _def_read(udfread_block_input *p_gen, uint32_t lba, void *buf, uint32_t nblocks, int flags)
+{
+    (void)flags;
+    blockInput_t *p = (blockInput_t *)p_gen;
+
+    p->file->Seek(lba * UDF_BLOCK_SIZE, SEEK_SET);
+    return(p->file->Read(buf, nblocks * UDF_BLOCK_SIZE) / UDF_BLOCK_SIZE);
+}
+
+MythCDROM::ImageType MythCDROM::inspectImage(const QString &path)
+{
+    ImageType imageType = kUnknown;
+
+    if (path.startsWith("bd:"))
+        imageType = kBluray;
+    else if (path.startsWith("dvd:"))
+        imageType = kDVD;
+    else
+    {
+        blockInput_t blockInput;
+
+        blockInput.file = new RemoteFile(path);
+        blockInput.input.close = _def_close;
+        blockInput.input.read = _def_read;
+        blockInput.input.size = _def_size;
+
+        if (blockInput.file->isOpen())
+        {
+            udfread *udf = udfread_init();
+            if (udfread_open_input(udf, &blockInput.input) == 0)
+            {
+                UDFDIR *dir = udfread_opendir(udf, "/BDMV");
+
+                if (dir)
+                {
+                    LOG(VB_MEDIA, LOG_INFO, QString("Found Bluray at %1").arg(path));
+                    imageType = kBluray;
+                }
+                else
+                {
+                    dir = udfread_opendir(udf, "/VIDEO_TS");
+
+                    if (dir)
+                    {
+                        LOG(VB_MEDIA, LOG_INFO, QString("Found DVD at %1").arg(path));
+                        imageType = kDVD;
+                    }
+                    else
+                    {
+                        LOG(VB_MEDIA, LOG_ERR, QString("inspectImage - unknown"));
+                    }
+                }
+
+                if (dir)
+                {
+                    udfread_closedir(dir);
+                }
+
+                udfread_close(udf);
+            }
+        }
+        else
+        {
+            LOG(VB_MEDIA, LOG_ERR, QString("inspectImage - unable to open \"%1\"").arg(path));
+            delete blockInput.file;
+        }
+    }
+
+    return imageType;
 }

@@ -14,6 +14,8 @@ INCLUDEPATH += ./libudfread
 INCLUDEPATH += ../../libs/libmythbase
 INCLUDEPATH += ../../libs/libmythtv
 
+DEFINES += ENABLE_UDF
+
 win32-msvc* {
     CONFIG += qt
     DEFINES += HAVE_CONFIG_H DLOPEN_CRYPTO_LIBS HAVE_PTHREAD_H

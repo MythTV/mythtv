@@ -23,6 +23,15 @@ class MBASE_PUBLIC MythCDROM : public MythMediaDevice
     static MythCDROM* get(QObject* par, const char* devicePath,
                                   bool SuperMount, bool AllowEject);
 
+    typedef enum
+    {
+        kUnknown,
+        kBluray,
+        kDVD
+    }ImageType;
+
+    static ImageType inspectImage(const QString& path);
+
   protected:
     virtual void onDeviceMounted();
 };

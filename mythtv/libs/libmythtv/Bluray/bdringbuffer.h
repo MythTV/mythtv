@@ -142,6 +142,8 @@ class MTV_PUBLIC BDRingBuffer : public RingBuffer
     uint64_t           m_currentTitleAngleCount;
     uint64_t           m_currentTime;
 
+    int                m_imgHandle;
+
     int                m_currentAngle;
     int                m_currentTitle;
     int                m_currentPlaylist;

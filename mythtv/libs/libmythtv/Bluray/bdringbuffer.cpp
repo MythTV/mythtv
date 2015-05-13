@@ -1,3 +1,4 @@
+#include <fcntl.h>
 
 #include <QDir>
 #include <QCoreApplication>
@@ -9,6 +10,7 @@
 #include "libbluray/decoders/overlay.h"
 #include "libbluray/keys.h"              // for ::BD_VK_POPUP, ::BD_VK_0, etc
 
+#include "mythcdrom.h"
 #include "mythmainwindow.h"
 #include "mythevent.h"
 #include "iso639.h"
@@ -38,11 +40,18 @@ static void file_opened_callback(void* bdr)
         obj->ProgressUpdate();
 }
 
+static int _img_read(void *handle, void *buf, int lba, int num_blocks)
+{
+    mythfile_seek(*((int*)handle), lba * 2048, SEEK_SET);
+    return(mythfile_read(*((int*)handle), buf, num_blocks * 2048) / 2048);
+}
+
 BDRingBuffer::BDRingBuffer(const QString &lfilename)
   : RingBuffer(kRingBuffer_BD),
     bdnav(NULL), m_isHDMVNavigation(false), m_tryHDMVNavigation(false),
     m_topMenuSupported(false), m_firstPlaySupported(false),
-    m_numTitles(0), m_titleChanged(false), m_playerWait(false),
+    m_numTitles(0), m_imgHandle(-1),
+    m_titleChanged(false), m_playerWait(false),
     m_ignorePlayerWait(true),
     m_stillTime(0), m_stillMode(BLURAY_STILL_NONE),
     m_infoLock(QMutex::Recursive), m_mainThread(NULL)
@@ -77,6 +86,12 @@ void BDRingBuffer::close(void)
 
         bd_close(bdnav);
         bdnav = NULL;
+    }
+
+    if (m_imgHandle > 0)
+    {
+        mythfile_close(m_imgHandle);
+        m_imgHandle = -1;
     }
 
     ClearOverlays();
@@ -296,7 +311,26 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     QByteArray keyarray = keyfile.toLatin1();
     const char *keyfilepath = keyarray.data();
 
-    bdnav = bd_open(filename.toLocal8Bit().data(), keyfilepath);
+    if (filename.startsWith("myth:") && MythCDROM::inspectImage(filename) != MythCDROM::kUnknown)
+    {
+        // Use streaming for remote images.
+        // Streaming encrypted images causes a SIGSEGV in aacs code when
+        // using the makemkv libraries due to the missing "device" name.
+        // Since a local device (which is likely to be encrypted) can be
+        // opened directly, only use streaming for remote images, which
+        // presumably won't be encrypted.
+        m_imgHandle = mythfile_open(filename.toLocal8Bit().data(), O_RDONLY);
+
+        if (m_imgHandle > 0)
+        {
+            bdnav = bd_init();
+
+            if (bdnav)
+                bd_open_stream(bdnav, &m_imgHandle, _img_read);
+        }
+    }
+    else
+        bdnav = bd_open(filename.toLocal8Bit().data(), keyfilepath);
 
     if (!bdnav)
     {

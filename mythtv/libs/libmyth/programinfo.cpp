@@ -30,6 +30,7 @@ using std::min;
 #include "remoteutil.h"
 #include "mythdb.h"
 #include "compat.h"
+#include "mythcdrom.h"
 
 #include <unistd.h> // for getpid()
 
@@ -94,6 +95,38 @@ static void set_flag(uint32_t &flags, int flag_to_set, bool is_set)
     flags &= ~flag_to_set;
     if (is_set)
         flags |= flag_to_set;
+}
+
+static QString determineURLType(const QString& url)
+{
+    QString result = url;
+
+    if (!url.startsWith("dvd:") && !url.startsWith("bd:"))
+    {
+        if(url.endsWith(".img", Qt::CaseInsensitive) ||
+           url.endsWith(".iso", Qt::CaseInsensitive))
+        {
+            switch (MythCDROM::inspectImage(url))
+            {
+                case MythCDROM::kBluray:
+                    result = "bd:" + url;
+                    break;
+
+                case MythCDROM::kDVD:
+                    result = "dvd:" + url;
+                    break;
+            }
+        }
+        else
+        {
+            if (QDir(url + "/BDMV").exists())
+                result = "bd:" + url;
+            else if (QDir(url + "/VIDEO_TS").exists())
+                result = "dvd:" + url;
+        }
+    }
+
+    return result;
 }
 
 QString myth_category_type_to_string(ProgramInfo::CategoryType category_type)
@@ -957,17 +990,9 @@ ProgramInfo::ProgramInfo(const QString &_pathname,
     endts      = startts.addSecs(_length_in_minutes * 60);
 
     QString pn = _pathname;
-    if ((!_pathname.startsWith("myth://")) &&
-        (_pathname.endsWith(".iso", Qt::CaseInsensitive) ||
-         _pathname.endsWith(".img", Qt::CaseInsensitive) ||
-         QDir(_pathname + "/VIDEO_TS").exists()))
-    {
-        pn = QString("dvd:%1").arg(_pathname);
-    }
-    else if (QDir(_pathname+"/BDMV").exists())
-    {
-        pn = QString("bd:%1").arg(_pathname);
-    }
+    if (!_pathname.startsWith("myth://"))
+        pn = determineURLType(_pathname);
+
     SetPathname(pn);
 }
 
@@ -2380,17 +2405,13 @@ static ProgramInfoType discover_program_info_type(
         pit = kProgramInfoTypeVideoStreamingRTSP;
     else
     {
-        if (fn_lower.startsWith("dvd:") ||
-            fn_lower.endsWith(".iso") ||
-            fn_lower.endsWith(".img") ||
-            ((pathname.startsWith("/")) &&
-             QDir(pathname + "/VIDEO_TS").exists()))
+        fn_lower = determineURLType(pathname);
+
+        if (fn_lower.startsWith("dvd:"))
         {
             pit = kProgramInfoTypeVideoDVD;
         }
-        else if (fn_lower.startsWith("bd:") ||
-                 ((pathname.startsWith("/")) &&
-                  QDir(pathname + "/BDMV").exists()))
+        else if (fn_lower.startsWith("bd:"))
         {
             pit = kProgramInfoTypeVideoBD;
         }

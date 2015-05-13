@@ -25,6 +25,7 @@ using namespace std;
 #include "referencecounter.h"
 #include "mythmiscutil.h"
 #include "mythconfig.h"
+#include "mythcdrom.h"
 #include "mythsystemlegacy.h"
 #include "tv.h"
 #include "proglist.h"
@@ -710,7 +711,7 @@ static void playDisc()
             gCoreContext->GetSetting("BluRayMountpoint", "/media/cdrom");
     QDir bdtest(bluray_mountpoint + "/BDMV");
 
-    if (bdtest.exists())
+    if (bdtest.exists() || MythCDROM::inspectImage(bluray_mountpoint) == MythCDROM::kBluray)
         isBD = true;
 
     if (isBD)
