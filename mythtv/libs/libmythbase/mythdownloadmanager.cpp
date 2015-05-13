@@ -278,6 +278,8 @@ void MythDownloadManager::run(void)
             updateCookieJar();
         }
         m_infoLock->lock();
+        LOG(VB_FILE, LOG_DEBUG, LOC + QString("items downloading %1").arg(m_downloadInfos.count()));
+        LOG(VB_FILE, LOG_DEBUG, LOC + QString("items queued %1").arg(m_downloadQueue.count()));
         downloading = !m_downloadInfos.isEmpty();
         itemsInCancellationQueue = !m_cancellationQueue.isEmpty();
         m_infoLock->unlock();
@@ -299,9 +301,15 @@ void MythDownloadManager::run(void)
             m_queueWaitLock.lock();
 
             if (downloading)
+            {
+                LOG(VB_FILE, LOG_DEBUG, LOC + QString("waiting 200ms"));
                 m_queueWaitCond.wait(&m_queueWaitLock, 200);
+            }
             else
+            {
+                LOG(VB_FILE, LOG_DEBUG, LOC + QString("waiting for more items to download"));
                 m_queueWaitCond.wait(&m_queueWaitLock);
+            }
 
             m_queueWaitLock.unlock();
         }
