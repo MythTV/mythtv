@@ -18,10 +18,6 @@
 #include "mythlogging.h"
 #include "mythdate.h"
 
-#ifdef USING_LIBUDF
-#include <cdio/udf.h>
-#endif
-
 #define LOC     QString("MythCDROMLinux:")
 
 // On a mixed-mode disc (audio+data), set this to 0 to mount the data portion:
@@ -499,24 +495,13 @@ MythMediaStatus MythCDROMLinux::checkMedia()
 
                 LOG(VB_MEDIA, LOG_INFO,
                     QString("Volume ID: %1").arg(m_VolumeID));
-#ifdef USING_LIBUDF
-                // Check for a DVD/BD disk by reading the UDF root dir.
-                // This allows DVD's to play immediately upon insertion without
-                // calling mount, which either needs pmount or changes to fstab.
-                udf_t *pUdf = udf_open(m_DevicePath.toLatin1());
-                if (NULL != pUdf)
                 {
-                    udf_dirent_t *pUdfRoot = udf_get_root(pUdf, true, 0);
-                    if (NULL != pUdfRoot)
-                    {
-                        if (NULL != udf_fopen(pUdfRoot, "VIDEO_TS"))
-                            m_MediaType = MEDIATYPE_DVD;
-                        else if (NULL != udf_fopen(pUdfRoot, "BDMV"))
-                            m_MediaType = MEDIATYPE_BD;
-
-                        udf_dirent_free(pUdfRoot);
-                    }
-                    udf_close(pUdf);
+                    MythCDROM::ImageType imageType = MythCDROM::inspectImage(m_DevicePath);
+                    if( imageType == MythCDROM::kBluray )
+                        m_MediaType = MEDIATYPE_BD;
+                    else
+                    if( imageType == MythCDROM::kDVD )
+                        m_MediaType = MEDIATYPE_DVD;
 
                     if (MEDIATYPE_DATA != m_MediaType)
                     {
@@ -525,7 +510,7 @@ MythMediaStatus MythCDROMLinux::checkMedia()
                         return setStatus(MEDIASTAT_USEABLE, OpenedHere);
                     }
                 }
-#endif
+
                 // the base class's onDeviceMounted will do fine
                 // grained detection of the type of data on this disc
                 if (isMounted())

@@ -2119,7 +2119,6 @@ MYTHTV_CONFIG_LIST='
     libfftw3
     libmpeg2external
     libxml2
-    libudf
     lirc
     mheg
     opengl
@@ -3139,7 +3138,6 @@ enable libcec
 enable libcrypto
 enable libdns_sd
 enable libxml2
-enable libudf
 enable lirc
 enable mheg
 enable mythtranscode
@@ -6422,11 +6420,6 @@ if enabled taglib; then
     taglib_libs=`taglib-config --libs`
 fi
 
-enabled libudf && check_cc <<EOF || disable libudf
-#include <cdio/udf.h>
-int main(void){ return UDF_BLOCKSIZE > 0 ? 0 : 1; }
-EOF
-
 enabled x11 && check_lib X11/Xlib.h XQueryExtension -lX11 || disable x11
 enabled xrandr && check_lib X11/extensions/Xrandr.h XRRSelectInput -lXrandr || disable xrandr
 enabled xv && check_lib X11/extensions/Xv.h XvPutStill -lXv || disable xv
@@ -7386,10 +7379,6 @@ fi
 if enabled taglib; then
     echo "CONFIG_TAGLIB_INCLUDES=$taglib_include" >> $TMPMAK
     echo "CONFIG_TAGLIB_LIBS=$taglib_libs" >> $TMPMAK
-fi
-
-if enabled libudf; then
-  append CCONFIG "using_libudf"
 fi
 
 if enabled x11; then
