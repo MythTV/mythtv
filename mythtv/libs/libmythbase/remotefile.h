@@ -93,7 +93,7 @@ class MBASE_PUBLIC RemoteFile
 
     QStringList     possibleauxfiles;
     QStringList     auxfiles;
-    QFile          *localFile;
+    int             localFile;
     ThreadedFileWriter *fileWriter;
 };
 
