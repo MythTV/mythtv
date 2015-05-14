@@ -87,7 +87,7 @@ MythRenderOpenGL* MythRenderOpenGL::Create(const QString &painter,
 
 #if ANDROID
     int openGLVersionFlags = QGLFormat::OpenGL_ES_Version_2_0;
-    LOG(VB_GENERAL, LOG_INFO, "opengl es2  forced for Android");
+    LOG(VB_GENERAL, LOG_INFO, "OpenGL ES2 forced for Android");
 #else
     // Check OpenGL version supported
     QGLWidget *dummy = new QGLWidget;
@@ -987,6 +987,8 @@ bool MythRenderOpenGL::InitFeatures(void)
                 .arg(m_max_units));
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Direct rendering: %1")
                 .arg((this->format().directRendering()) ? "Yes" : "No"));
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Extensions Supported: %1")
+                .arg(m_exts_supported, 0, 16));
     }
 
     m_exts_used = m_exts_supported;
@@ -1056,6 +1058,15 @@ uint MythRenderOpenGL::CreatePBO(uint tex)
         return 0;
 
     m_glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+    if (glCheck())
+    {
+        // looks like we dont support PBOs so dont bother doing the rest
+        // and stop using it in the future
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Pixel Buffer Objects unusable, disabling");
+        m_exts_supported &= ~kGLExtPBufObj;
+        m_exts_used &= ~kGLExtPBufObj;
+        return 0;
+    }
     glTexImage2D(m_textures[tex].m_type, 0, m_textures[tex].m_internal_fmt,
                  m_textures[tex].m_size.width(),
                  m_textures[tex].m_size.height(), 0,

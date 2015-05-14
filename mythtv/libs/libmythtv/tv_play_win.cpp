@@ -81,7 +81,7 @@ bool TvPlayWindow::gestureEvent(MythGestureEvent *event)
                 case MythGestureEvent::LeftButton :
                     {
                         LOG(VB_GENERAL, LOG_NOTICE, "TV Play Window L Click");
-						// send it on like the others to be handled by TV
+                        // send it on like the others to be handled by TV
                         QCoreApplication::postEvent(GetMythMainWindow(), new MythGestureEvent(*event));
                         handled = true;
                     }
