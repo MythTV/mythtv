@@ -27,12 +27,12 @@
     </target>
     <target name="dist" depends="compile"
             description="generate the distribution" >
-        <jar jarfile="${dist}/libbluray-${version}.jar" basedir="${build}" />
+        <jar jarfile="${dist}/libmythbluray-${version}.jar" basedir="${build}" />
     </target>
 
     <target name="clean"
             description="clean up" >
         <delete dir="${build}"/>
-        <delete dir="${dist}/libbluray-${version}.jar"/>
+        <delete dir="${dist}/libmythbluray-${version}.jar"/>
     </target>
 </project>

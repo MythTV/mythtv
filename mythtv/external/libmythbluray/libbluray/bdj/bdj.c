@@ -47,9 +47,9 @@
 #endif
 
 #ifdef HAVE_BDJ_J2ME
-#define BDJ_JARFILE "libbluray-j2me-" VERSION ".jar"
+#define BDJ_JARFILE "libmythbluray-j2me-" VERSION ".jar"
 #else
-#define BDJ_JARFILE "libbluray-j2se-" VERSION ".jar"
+#define BDJ_JARFILE "libmythbluray-j2se-" VERSION ".jar"
 #endif
 
 struct bdjava_s {

@@ -121,7 +121,7 @@ using_bdjava {
     SOURCES += libbluray/bdj/native/org_videolan_Libbluray.c libbluray/bdj/native/org_videolan_Logger.c
     SOURCES += libbluray/bdj/native/register_native.c libbluray/bdj/native/util.c
 
-    bdjava.target = libbluray/bdj/.libs/libbluray-$${BDJ_TYPE}-"$$bluray_version".jar
+    bdjava.target = libbluray/bdj/.libs/libmythbluray-$${BDJ_TYPE}-"$$bluray_version".jar
     bdjava.depends = libbluray/bdj/build.xml
     bdjava.commands = $${ANTBIN} -f $$bdjava.depends -Dbuild=\'build\' -Ddist=\'.libs\' -Dsrc_awt=:java-$${BDJ_TYPE} -Dversion='$${BDJ_TYPE}-$$bluray_version'
 
