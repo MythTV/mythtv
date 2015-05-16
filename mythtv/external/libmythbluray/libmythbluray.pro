@@ -16,6 +16,14 @@ INCLUDEPATH += ../../libs/libmythtv
 
 DEFINES += ENABLE_UDF
 
+bluray_major = 0
+bluray_minor = 8
+bluray_micro = 0
+
+DEFINES += BLURAY_VERSION_MAJOR=$$bluray_major
+DEFINES += BLURAY_VERSION_MINOR=$$bluray_minor
+DEFINES += BLURAY_VERSION_MICRO=$$bluray_micro
+
 win32-msvc* {
     CONFIG += qt
     DEFINES += HAVE_CONFIG_H DLOPEN_CRYPTO_LIBS HAVE_PTHREAD_H
@@ -37,7 +45,8 @@ DEFINES += HAVE_LIBXML2
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # bdnav
-HEADERS += libbluray/bluray.h libbluray/bluray_internal.h libbluray/player_settings.h libbluray/register.h 
+HEADERS += libbluray/bluray.h libbluray/bluray_internal.h libbluray/bluray-version.h
+HEADERS += libbluray/player_settings.h libbluray/register.h
 HEADERS += libbluray/bdnav/bdid_parse.h libbluray/bdnav/bdparse.h libbluray/bdnav/clpi_data.h
 HEADERS += libbluray/bdnav/clpi_parse.h libbluray/bdnav/extdata_parse.h libbluray/bdnav/index_parse.h
 HEADERS += libbluray/bdnav/meta_data.h libbluray/bdnav/meta_parse.h libbluray/bdnav/mpls_parse.h

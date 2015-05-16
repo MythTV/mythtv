@@ -25,10 +25,6 @@
      ((minor) *   100) +                         \
      ((micro) *     1))
 
-#define BLURAY_VERSION_MAJOR 0
-#define BLURAY_VERSION_MINOR 8
-#define BLURAY_VERSION_MICRO 0
-
 #define BLURAY_VERSION_STRING "@BLURAY_VERSION_MAJOR@.@BLURAY_VERSION_MINOR@.@BLURAY_VERSION_MICRO@"
 
 #define BLURAY_VERSION \
