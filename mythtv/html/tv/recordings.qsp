@@ -122,6 +122,9 @@ import "/tv/js/tvutil.qjs"
         <a href="#" onClick="MythRecordings.GetStream(gRecordedId, 'm3u8')"><%=qsTr("M3U8")%></a> /
         <a href="#" onClick="MythRecordings.GetStream(gRecordedId, 'asx')"><%=qsTr("ASX")%></a>
     </div>
+    <div class="button playMenu">
+        <a href="#" onClick="MythRecordings.Download(gRecordedId)"><%=qsTr("Download")%></a>
+    </div>
 </div>
 
 <!-- Popup Program Details Box -->
