@@ -287,6 +287,12 @@ JNIEXPORT jint JNICALL Java_org_videolan_Libbluray_selectAngleN(JNIEnv * env,
     return bd_select_angle(bd, angle - 1);
 }
 
+JNIEXPORT jint JNICALL Java_org_videolan_Libbluray_soundEffectN(JNIEnv * env,
+        jclass cls, jlong np, jint id) {
+    BLURAY* bd = (BLURAY*)(intptr_t)np;
+    return bd_bdj_sound_effect(bd, id);
+}
+
 JNIEXPORT jlong JNICALL Java_org_videolan_Libbluray_tellTimeN(JNIEnv * env,
         jclass cls, jlong np) {
     BLURAY* bd = (BLURAY*)(intptr_t)np;
@@ -661,6 +667,11 @@ Java_org_videolan_Libbluray_methods[] =
         CC("selectAngleN"),
         CC("(JI)I"),
         VC(Java_org_videolan_Libbluray_selectAngleN),
+    },
+    {
+        CC("soundEffectN"),
+        CC("(JI)I"),
+        VC(Java_org_videolan_Libbluray_soundEffectN),
     },
     {
         CC("tellTimeN"),

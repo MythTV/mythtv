@@ -182,6 +182,14 @@ JNIEXPORT jint JNICALL Java_org_videolan_Libbluray_selectAngleN
 
 /*
  * Class:     org_videolan_Libbluray
+ * Method:    soundEffectN
+ * Signature: (JI)I
+ */
+JNIEXPORT jint JNICALL Java_org_videolan_Libbluray_soundEffectN
+  (JNIEnv *, jclass, jlong, jint);
+
+/*
+ * Class:     org_videolan_Libbluray
  * Method:    tellTimeN
  * Signature: (J)J
  */

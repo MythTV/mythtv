@@ -62,6 +62,11 @@ void *dl_dlopen(const char *path, const char *version)
     void *result;
 
     name = str_printf("%s.dll", path);
+    if (!name) {
+        BD_DEBUG(DBG_FILE | DBG_CRIT, "out of memory\n");
+        return NULL;
+    }
+
     MultiByteToWideChar(CP_UTF8, 0, name, -1, wname, MAX_PATH);
     X_FREE(name);
 

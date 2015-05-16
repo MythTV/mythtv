@@ -18,7 +18,7 @@ DEFINES += ENABLE_UDF
 
 bluray_major = 0
 bluray_minor = 8
-bluray_micro = 0
+bluray_micro = 1
 bluray_version = $$bluray_major"."$$bluray_minor"."$$bluray_micro
 
 DEFINES += BLURAY_VERSION_MAJOR=$$bluray_major
@@ -27,7 +27,7 @@ DEFINES += BLURAY_VERSION_MICRO=$$bluray_micro
 
 win32-msvc* {
     CONFIG += qt
-    DEFINES += HAVE_CONFIG_H DLOPEN_CRYPTO_LIBS HAVE_PTHREAD_H
+    DEFINES += HAVE_CONFIG_H DLOrcPEN_CRYPTO_LIBS HAVE_PTHREAD_H
 
     # needed for vcxproj
     QMAKE_CXXFLAGS += /TP "/FI compat.h"

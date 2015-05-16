@@ -74,6 +74,7 @@ enum bd_select_rate_reason {
 BD_PRIVATE int      bd_play_playlist_at(struct bluray *bd, int playlist, int playitem, int playmark, int64_t time);
 BD_PRIVATE void     bd_select_rate(struct bluray *bd, float rate, int reason);
 BD_PRIVATE int      bd_bdj_seek(struct bluray *bd, int playitem, int playmark, int64_t time);
+BD_PRIVATE int      bd_bdj_sound_effect(struct bluray *bd, int id);
 
 /*
  * BD-J overlay

@@ -65,7 +65,7 @@ public class Copy {
                 }
                 System.err.println("deepCopy: failed to resolve class " + desc.getName());
                 throw e;
-            } catch (Throwable t) {
+            } catch (Exception t) {
                 System.err.println("deepCopy: failed to resolve class " + desc.getName() + ": " + t);
                 return null;
             }

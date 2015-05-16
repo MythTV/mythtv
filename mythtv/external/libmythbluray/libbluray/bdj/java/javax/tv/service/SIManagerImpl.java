@@ -53,14 +53,14 @@ public class SIManagerImpl extends SIManager {
         for (int i = 0; i <= ntitles; i++) {
             try {
                 list.add(new TitleImpl(i));
-            } catch (Throwable t) {
+            } catch (Exception t) {
                 org.videolan.Logger.getLogger("SIManagerImpl").error("Failed initializing title " + i + ": " + t);
             }
         }
 
         try {
             list.add(new TitleImpl(65535));
-        } catch (Throwable t) {
+        } catch (Exception t) {
             org.videolan.Logger.getLogger("SIManagerImpl").error("Failed initializing title FirstPlay: " + t);
         }
 

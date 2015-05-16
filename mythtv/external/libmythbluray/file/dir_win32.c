@@ -75,6 +75,9 @@ static BD_DIR_H *_dir_open_win32(const char* dirname)
     BD_DIR_H *dir = calloc(1, sizeof(BD_DIR_H));
 
     BD_DEBUG(DBG_DIR, "Opening WIN32 dir %s... (%p)\n", dirname, (void*)dir);
+    if (!dir) {
+        return NULL;
+    }
     dir->close = _dir_close_win32;
     dir->read = _dir_read_win32;
 

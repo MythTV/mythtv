@@ -44,6 +44,7 @@ import org.videolan.media.content.playlist.PanningControlImpl;
 import org.videolan.media.content.BDHandler;
 
 import org.videolan.BDJListeners;
+import org.videolan.Libbluray;
 
 public class Handler extends BDHandler {
     public Handler() {
@@ -76,7 +77,23 @@ public class Handler extends BDHandler {
     }
 
     protected ControllerErrorEvent doStart(Time at) {
-        return super.doStart(at);
+
+        ControllerErrorEvent err = super.doStart(at);
+        if (err != null) {
+            return err;
+        }
+
+        if (!locator.isSoundItem()) {
+            System.err.println("no sound effect in " + locator);
+        } else {
+            int id = locator.getSoundId();
+            Libbluray.soundEffect(id);
+
+            // Trigger end of media event
+            // XXX should use some other event name ...
+            statusEvent(Libbluray.BDJ_EVENT_END_OF_PLAYLIST, id);
+        }
+        return null;
     }
 
     protected ControllerErrorEvent doStop() {

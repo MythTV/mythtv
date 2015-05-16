@@ -656,6 +656,8 @@ static void _free_dir(struct udf_dir **pp)
             free(p->files);
         }
 
+        free(p);
+
         *pp = NULL;
     }
 }

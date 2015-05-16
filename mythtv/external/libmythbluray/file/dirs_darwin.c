@@ -73,23 +73,10 @@ char *file_get_cache_home(void)
 
 const char *file_get_config_system(const char *dir)
 {
-    static char *dirs = NULL; // "dir1\0dir2\0...\0dirN\0\0"
-
-    if (!dirs) {
-        dirs = str_printf("%s%c%c", SYSTEM_CFG_DIR, 0, 0);
-    }
-
     if (!dir) {
         // first call
-        dir = dirs;
-    } else {
-        // next call
-        dir += strlen(dir) + 1;
-        if (!*dir) {
-            // end of list
-            dir = NULL;
-        }
+        return SYSTEM_CFG_DIR;
     }
 
-    return dir;
+    return NULL;
 }

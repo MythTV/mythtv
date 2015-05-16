@@ -1461,7 +1461,10 @@ BLURAY *bd_open(const char *device_path, const char *keyfile_path)
         return NULL;
     }
 
-    bd_open_disc(bd, device_path, keyfile_path);
+    if (!bd_open_disc(bd, device_path, keyfile_path)) {
+        bd_close(bd);
+        return NULL;
+    }
 
     return bd;
 }
@@ -2357,6 +2360,20 @@ int bd_play_playlist_at(BLURAY *bd, int playlist, int playitem, int playmark, in
 
     return result;
 }
+
+int bd_bdj_sound_effect(BLURAY *bd, int id)
+{
+    if (bd->sound_effects && id >= bd->sound_effects->num_sounds) {
+        return -1;
+    }
+    if (id < 0 || id > 0xff) {
+        return -1;
+    }
+
+    _queue_event(bd, BD_EVENT_SOUND_EFFECT, id);
+    return 0;
+}
+
 #endif /* USING_BDJAVA */
 
 // Select a title for playback

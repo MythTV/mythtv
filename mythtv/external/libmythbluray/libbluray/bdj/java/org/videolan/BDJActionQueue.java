@@ -50,7 +50,7 @@ public class BDJActionQueue implements Runnable {
         watchdog.shutdown();
         try {
             thread.join();
-        } catch (Throwable t) {
+        } catch (InterruptedException t) {
             logger.error("Error joining thread: " + t);
         }
     }
@@ -75,6 +75,9 @@ public class BDJActionQueue implements Runnable {
                 ((BDJAction)action).process();
 
                 watchdog.endAction();
+            } catch (ThreadDeath d) {
+                System.err.println("action failed: " + d + "\n");
+                throw d;
             } catch (Throwable e) {
                 System.err.println("action failed: " + e + "\n" + Logger.dumpStack(e));
             }

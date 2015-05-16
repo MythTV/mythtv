@@ -17,6 +17,10 @@
  * <http://www.gnu.org/licenses/>.
  */
 
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include "register_native.h"
 
 #include "util/logging.h"

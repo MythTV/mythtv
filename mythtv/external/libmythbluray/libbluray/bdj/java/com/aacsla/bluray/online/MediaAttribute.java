@@ -30,6 +30,7 @@ public class MediaAttribute {
         byte pmsn[] = Libbluray.getAacsData(Libbluray.AACS_MEDIA_PMSN);
         if (pmsn == null) {
             logger.warning("getPMSN() failed");
+            return new byte[16];
         }
         return pmsn;
     }
@@ -38,6 +39,7 @@ public class MediaAttribute {
         byte vid[] = Libbluray.getAacsData(Libbluray.AACS_MEDIA_VID);
         if (vid == null) {
             logger.warning("getVolumeID() failed");
+            return new byte[16];
         }
         return vid;
     }

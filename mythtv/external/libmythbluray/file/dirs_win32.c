@@ -32,7 +32,6 @@
 #include <windows.h>
 #include <shlobj.h>
 #include <limits.h>
-#include <direct.h>
 
 
 char *win32_get_font_dir(const char *font_file)
@@ -45,9 +44,11 @@ char *win32_get_font_dir(const char *font_file)
 
     int   len  = WideCharToMultiByte (CP_UTF8, 0, wdir, -1, NULL, 0, NULL, NULL);
     char *path = malloc(len + strlen(font_file) + 2);
-    WideCharToMultiByte(CP_UTF8, 0, wdir, -1, path, len, NULL, NULL);
-    path[len - 1] = '\\';
-    strcpy(path + len, font_file);
+    if (path) {
+        WideCharToMultiByte(CP_UTF8, 0, wdir, -1, path, len, NULL, NULL);
+        path[len - 1] = '\\';
+        strcpy(path + len, font_file);
+    }
     return path;
 }
 
@@ -65,7 +66,9 @@ char *file_get_data_home(void)
                                  NULL, SHGFP_TYPE_CURRENT, wdir)) {
         int len = WideCharToMultiByte (CP_UTF8, 0, wdir, -1, NULL, 0, NULL, NULL);
         char *appdir = malloc(len);
-        WideCharToMultiByte (CP_UTF8, 0, wdir, -1, appdir, len, NULL, NULL);
+        if (appdir) {
+            WideCharToMultiByte (CP_UTF8, 0, wdir, -1, appdir, len, NULL, NULL);
+        }
         return appdir;
     }
 
@@ -94,7 +97,9 @@ const char *file_get_config_system(const char *dir)
                     NULL, SHGFP_TYPE_CURRENT, wdir)) {
             int len = WideCharToMultiByte (CP_UTF8, 0, wdir, -1, NULL, 0, NULL, NULL);
             appdir = malloc(len);
-            WideCharToMultiByte (CP_UTF8, 0, wdir, -1, appdir, len, NULL, NULL);
+            if (appdir) {
+                WideCharToMultiByte (CP_UTF8, 0, wdir, -1, appdir, len, NULL, NULL);
+            }
             return appdir;
         } else {
             BD_DEBUG(DBG_FILE, "Can't find common configuration directory !\n");

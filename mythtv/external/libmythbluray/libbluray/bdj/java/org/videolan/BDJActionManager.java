@@ -38,7 +38,7 @@ public class BDJActionManager {
     protected static void shutdown() {
         try {
             instance.commandQueue.shutdown();
-        } catch (Throwable t) {
+        } catch (Exception t) {
         } finally {
             running = false;
         }

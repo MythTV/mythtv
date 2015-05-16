@@ -26,7 +26,6 @@ extern "C" {
 #endif
 
 #include <stdint.h>
-#include <sys/types.h>
 
 /*
  * file access
@@ -36,13 +35,12 @@ typedef struct bd_file_s BD_FILE_H;
 struct bd_file_s
 {
     void* internal;
-    void (*close)(BD_FILE_H *file);
-    int64_t (*seek)(BD_FILE_H *file, int64_t offset, int32_t origin);
-    int64_t (*tell)(BD_FILE_H *file);
-    int (*eof)(BD_FILE_H *file);
-    int (*stat)(BD_FILE_H *file, struct stat *buf);
-    int64_t (*read)(BD_FILE_H *file, uint8_t *buf, int64_t size);
-    int64_t (*write)(BD_FILE_H *file, const uint8_t *buf, int64_t size);
+    void    (*close) (BD_FILE_H *file);
+    int64_t (*seek)  (BD_FILE_H *file, int64_t offset, int32_t origin);
+    int64_t (*tell)  (BD_FILE_H *file);
+    int     (*eof)   (BD_FILE_H *file);
+    int64_t (*read)  (BD_FILE_H *file, uint8_t *buf, int64_t size);
+    int64_t (*write) (BD_FILE_H *file, const uint8_t *buf, int64_t size);
 };
 
 /*

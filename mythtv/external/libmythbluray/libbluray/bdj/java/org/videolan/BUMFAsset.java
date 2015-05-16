@@ -25,11 +25,11 @@ public class BUMFAsset {
         this.budaFile = budaFile;
     }
 
-    String getVpFile() {
+    public String getVpFile() {
         return vpFile;
     }
 
-    String getBudaFile() {
+    public String getBudaFile() {
         return budaFile;
     }
 

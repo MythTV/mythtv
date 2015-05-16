@@ -73,7 +73,7 @@ public class MountManager {
                 }
             }
 
-            String path = System.getProperty("bluray.vfs.root") + "/BDMV/JAR/" + jarStr + ".jar";
+            String path = BDJLoader.getCachedFile(System.getProperty("bluray.vfs.root") + relJarDir + jarStr + ".jar");
 
             JarFile jar = null;
             try {
@@ -232,6 +232,7 @@ public class MountManager {
         return BDJUtil.makeFiveDigitStr(jarId);
     }
 
+    private static final String relJarDir = new String(File.separator + "BDMV" + File.separator + "JAR" + File.separator);
     private static Map mountPoints = new HashMap();
     private static final Logger logger = Logger.getLogger(MountManager.class.getName());
 

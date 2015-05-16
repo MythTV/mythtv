@@ -18,6 +18,10 @@
  * <http://www.gnu.org/licenses/>.
  */
 
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include "bdjo_parse.h"
 
 #include "bdjo_data.h"
@@ -287,7 +291,7 @@ static int _parse_app_params(BITSTREAM *bs, BDJO_APP *p)
     p->num_param = _count_app_strings(bs, data_length, 0, "params");
 
     if (p->num_param) {
-        p->param = calloc(p->num_param, sizeof(BDJO_APP_NAME));
+        p->param = calloc(p->num_param, sizeof(BDJO_APP_PARAM));
         if (!p->param) {
             BD_DEBUG(DBG_BDJ | DBG_CRIT, "Out of memory\n");
             return -1;

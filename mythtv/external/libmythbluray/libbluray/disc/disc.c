@@ -471,19 +471,19 @@ int disc_cache_bdrom_file(BD_DISC *p, const char *rel_path, const char *cache_pa
 
 BD_FILE_H *disc_open_stream(BD_DISC *disc, const char *file)
 {
-  BD_FILE_H *fp = disc_open_file(disc, "BDMV" DIR_SEP "STREAM", file);
-  if (!fp) {
-      return NULL;
-  }
+    BD_FILE_H *fp = disc_open_file(disc, "BDMV" DIR_SEP "STREAM", file);
+    if (!fp) {
+        return NULL;
+    }
 
-  if (disc->dec) {
-      BD_FILE_H *st = dec_open_stream(disc->dec, fp, atoi(file));
-      if (st) {
-          return st;
-      }
-  }
+    if (disc->dec) {
+        BD_FILE_H *st = dec_open_stream(disc->dec, fp, atoi(file));
+        if (st) {
+            return st;
+        }
+    }
 
-  return fp;
+    return fp;
 }
 
 const uint8_t *disc_get_data(BD_DISC *disc, int type)
@@ -516,10 +516,7 @@ void disc_event(BD_DISC *disc, uint32_t event, uint32_t param)
  * This is used when AACS disc ID is not available
  */
 
-static uint64_t _rotl64(uint64_t k, int n)
-{
-    return (k << n) | (k >> (64 - n));
-}
+#define ROTL64(k, n)  (((k) << (n)) | ((k) >> (64 - (n))))
 
 static uint64_t _fmix64(uint64_t k)
 {
@@ -548,13 +545,13 @@ static void _murmurhash3_128(const uint8_t *in, size_t len, void *out)
         memcpy(&k1, in + i,     sizeof(uint64_t));
         memcpy(&k2, in + i + 8, sizeof(uint64_t));
 
-        k1 *= c1; k1 = _rotl64(k1, 31); k1 *= c2; h[0] ^= k1;
+        k1 *= c1; k1 = ROTL64(k1, 31); k1 *= c2; h[0] ^= k1;
 
-        h[0] = _rotl64(h[0], 27); h[0] += h[1]; h[0] = h[0] * 5 + 0x52dce729;
+        h[0] = ROTL64(h[0], 27); h[0] += h[1]; h[0] = h[0] * 5 + 0x52dce729;
 
-        k2 *= c2; k2 = _rotl64(k2, 33); k2 *= c1; h[1] ^= k2;
+        k2 *= c2; k2 = ROTL64(k2, 33); k2 *= c1; h[1] ^= k2;
 
-        h[1] = _rotl64(h[1], 31); h[1] += h[0]; h[1] = h[1] * 5 + 0x38495ab5;
+        h[1] = ROTL64(h[1], 31); h[1] += h[0]; h[1] = h[1] * 5 + 0x38495ab5;
     }
 
     h[0] ^= len;

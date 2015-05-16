@@ -90,7 +90,7 @@ public abstract class BDFileSystem extends FileSystem {
             } else {
                 filesystem.set(null, new BDFileSystemImpl(fs));
             }
-        } catch (Throwable t) {
+        } catch (Exception t) {
             System.err.print("Hooking FileSystem class failed: " + t);
         }
     }

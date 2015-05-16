@@ -101,7 +101,7 @@ public class HSceneFactory extends Object {
             return;
         }
         if (defaultHScene == null) {
-            logger.error("no HScene created");
+            //logger.error("no HScene created");
             return;
         }
 

@@ -95,28 +95,40 @@ static int64_t _file_write(BD_FILE_H *file, const uint8_t *buf, int64_t size)
 
 static BD_FILE_H *_file_open(const char* filename, const char *mode)
 {
-    FILE *fp = NULL;
-
+    BD_FILE_H *file;
+    FILE *fp;
     wchar_t wfilename[MAX_PATH], wmode[8];
-    if (MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, filename, -1, wfilename, MAX_PATH) &&
-        MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, mode, -1, wmode, 8) &&
-        (fp = _wfopen(wfilename, wmode))) {
 
-        BD_FILE_H *file = calloc(1, sizeof(BD_FILE_H));
-        file->internal = fp;
-        file->close    = _file_close;
-        file->seek     = _file_seek;
-        file->read     = _file_read;
-        file->write    = _file_write;
-        file->tell     = _file_tell;
-        //file->eof      = _file_eof;
+    if (!MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, filename, -1, wfilename, MAX_PATH) ||
+        !MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, mode, -1, wmode, 8)) {
 
-        BD_DEBUG(DBG_FILE, "Opened WIN32 file %s (%p)\n", filename, (void*)file);
-        return file;
+        BD_DEBUG(DBG_FILE, "Error opening file %s\n", filename);
+        return NULL;
     }
 
-    BD_DEBUG(DBG_FILE, "Error opening file %s\n", filename);
-    return NULL;
+    fp = _wfopen(wfilename, wmode);
+    if (!fp) {
+        BD_DEBUG(DBG_FILE, "Error opening file %s\n", filename);
+        return NULL;
+    }
+
+    file = calloc(1, sizeof(BD_FILE_H));
+    if (!file) {
+        BD_DEBUG(DBG_FILE | DBG_CRIT, "Error opening file %s (out of memory)\n", filename);
+        fclose(fp);
+        return NULL;
+    }
+
+    file->internal = fp;
+    file->close    = _file_close;
+    file->seek     = _file_seek;
+    file->read     = _file_read;
+    file->write    = _file_write;
+    file->tell     = _file_tell;
+    //file->eof      = _file_eof;
+
+    BD_DEBUG(DBG_FILE, "Opened WIN32 file %s (%p)\n", filename, (void*)file);
+    return file;
 }
 
 BD_FILE_H* (*file_open)(const char* filename, const char *mode) = _file_open;

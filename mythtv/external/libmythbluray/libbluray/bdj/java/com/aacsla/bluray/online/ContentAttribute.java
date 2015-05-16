@@ -37,14 +37,14 @@ public class ContentAttribute {
             if (is.read(bytes, 0, 6) != 6)
                 return null;
             return bytes;
-        } catch (Throwable e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         } finally {
             if (is != null) {
                 try {
                     is.close();
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }

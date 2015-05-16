@@ -362,6 +362,10 @@ public class Libbluray {
         return selectAngleN(nativePointer, angle) == 1 ? true : false;
     }
 
+    public static int soundEffect(int id) {
+        return soundEffectN(nativePointer, id);
+    }
+
     public static int getCurrentAngle() {
         return readPSR(PSR_ANGLE_NUMBER);
     }
@@ -470,7 +474,7 @@ public class Libbluray {
     }
 
     /* called only from native code */
-    private static boolean processEvent(int event, int param) {
+    private static boolean processEventImpl(int event, int param) {
         boolean result = true;
         int key = 0;
 
@@ -548,6 +552,15 @@ public class Libbluray {
         return result;
     }
 
+    private static boolean processEvent(int event, int param) {
+        try {
+            return processEventImpl(event, param);
+        } catch (Throwable e) {
+            System.err.println("processEvent() failed: " + e + "\n" + Logger.dumpStack(e));
+            return false;
+        }
+    }
+
     public  static final int BDJ_EVENT_CHAPTER                  = 1;
     public  static final int BDJ_EVENT_PLAYITEM                 = 2;
     public  static final int BDJ_EVENT_ANGLE                    = 3;
@@ -614,6 +627,7 @@ public class Libbluray {
     private static native int selectPlaylistN(long np, int playlist, int playitem, int playmark, long time);
     private static native int selectTitleN(long np, int title);
     private static native int selectAngleN(long np, int angle);
+    private static native int soundEffectN(long np, int id);
     private static native long getUOMaskN(long np);
     private static native void setUOMaskN(long np, boolean menuCallMask, boolean titleSearchMask);
     private static native void setKeyInterestN(long np, int mask);

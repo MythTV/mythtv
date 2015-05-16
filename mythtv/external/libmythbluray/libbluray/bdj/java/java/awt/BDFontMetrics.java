@@ -282,7 +282,12 @@ public class BDFontMetrics extends sun.font.FontDesignMetrics {
      * Return the width of the specified string in this Font.
      */
     public synchronized int stringWidth(String string) {
-        return stringWidthN(ftFace, string);
+        /* Allow only one call at time.
+         * (calling this function from multiple threads caused crashes in freetype)
+         */
+        synchronized (BDFontMetrics.class) {
+            return stringWidthN(ftFace, string);
+        }
     }
 
     /**

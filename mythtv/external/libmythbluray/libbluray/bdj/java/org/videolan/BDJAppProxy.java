@@ -78,11 +78,7 @@ class BDJAppProxy implements DVBJProxy, Runnable {
     }
 
     public void start() {
-        AppCommand cmd = new AppCommand(AppCommand.CMD_START, null);
-        synchronized(cmds) {
-            cmds.addLast(cmd);
-            cmds.notifyAll();
-        }
+        start(null);
     }
 
     public void start(String[] args) {

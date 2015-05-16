@@ -84,7 +84,7 @@ public class BDJHelper {
                     eq.postEvent(event);
                     return true;
                 }
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 org.videolan.Logger.getLogger("BDJHelper").error("postKeyEvent failed: " + e);
             }
         } else {
