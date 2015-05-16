@@ -154,6 +154,7 @@ Advanced options (experts only):
   --perl-config-opts=OPTS  Additional options to pass when generating
                            Makefile.perl for building Perl bindings.
   --enable-mythlogserver   Enable mythlogserver logging daemon facility
+  --enable-bdjava          Enable BD-J support for Blu-ray discs
 
 External codec library options (used for mythffmpeg and streaming transcode):
   --enable-libmp3lame      enable MP3 encoding via libmp3lame [no]
@@ -409,6 +410,8 @@ Toolchain options:
   --extra-version=STRING   version string suffix []
   --optflags=OPTFLAGS      override optimization-related compiler flags
   --build-suffix=SUFFIX    library name suffix []
+  --bdj-type=TYPE          Specify the type of BD-J implementation (j2se,
+                           j2me) [$bdj_type]
   --enable-pic             build position-independent code
   --enable-thumb           compile for Thumb instruction set
   --enable-lto             use link-time optimization
@@ -2097,6 +2100,7 @@ CONFIG_EXTRA="
 
 MYTHTV_CONFIG_LIST='
     backend
+    bdjava
     bindings_perl
     bindings_python
     bindings_php
@@ -2171,6 +2175,7 @@ MYTHTV_LIST='
 
 USING_LIST='
     appleremote
+    bdjava
     bindings_perl
     bindings_python
     bindings_php
@@ -2228,6 +2233,8 @@ MYTHTV_CMDLINE_SET='
     qmakespecs
     samples
     source_path
+    bdj_type
+    JDK_HOME
 '
 
 CMDLINE_SET="
@@ -3034,6 +3041,9 @@ distcc="yes"
 qmake_default="qmake"
 qmakespecs_default=""
 python_default="python"
+
+#Bluray
+bdj_type="j2se"
 
 # machine
 arch_default=$(uname -m)
@@ -5806,6 +5816,23 @@ fi
 # Attempt to use libudev for mediamonitor
 enabled libudev && check_lib2 libudev.h udev_new -ludev || disable libudev
 
+# libmythbluray
+antbin=""
+if enabled bdjava; then
+    enabled x86_64 && java_arch=amd64
+    enabled x86_32 && java_arch=i386
+    enabled arm    && java_arch=arm
+
+    antbin=`which ant`
+    if test x"$antbin" = x"" ; then
+        die "ERROR: BD-J requires ANT, but ant was not found. Please install it."
+    fi
+
+    if test "$bdj_type" = "j2me"; then
+        enable bdj_j2me
+    fi
+fi
+
 disabled  zlib || check_lib   zlib.h      zlibVersion -lz   || disable  zlib
 disabled bzlib || check_lib2 bzlib.h BZ2_bzlibVersion -lbz2 || disable bzlib
 
@@ -7032,6 +7059,8 @@ echo "Frontend                  ${frontend-no}"
 echo "Backend                   ${backend-no}"
 echo "OpenGL ES 2.0             ${opengles-no}"
 echo "mythlogserver             ${mythlogserver-no}"
+echo "BD-J (Bluray java)        ${bdjava-no}"
+echo "BD-J type                 ${bdj_type}"
 echo
 
 echo "# Bindings"
@@ -7181,6 +7210,10 @@ SLIB_INSTALL_EXTRA_LIB=${SLIB_INSTALL_EXTRA_LIB}
 SLIB_INSTALL_EXTRA_SHLIB=${SLIB_INSTALL_EXTRA_SHLIB}
 SAMPLES=$samples
 NOREDZONE_FLAGS=$noredzone_flags
+ANTBIN=$antbin
+BDJ_TYPE=$bdj_type
+JDK_HOME=$JDK_HOME
+JAVA_ARCH=$java_arch
 EOF
 
 get_version(){
@@ -7250,7 +7283,13 @@ cat > $TMPH <<EOF
 #define ASMALIGN(ZEROBITS) ".p2align " #ZEROBITS "\\n\\t"
 #define SIZEOF_INT $_sizeof_int
 #define SIZEOF_LONG $_sizeof_long
+#define JDK_HOME "$JDK_HOME"
+#define JAVA_ARCH "$java_arch"
 EOF
+
+# Code only checks whether HAVE_BDJ_J2ME is defined, not what value
+# it has been defined as so we mustn't define it if we don't have it.
+enabled bdj_j2me && echo "#define HAVE_BDJ_J2ME 1" >>$TMPH
 
 test -n "$assert_level" &&
     echo "#define ASSERT_LEVEL $assert_level" >>$TMPH
