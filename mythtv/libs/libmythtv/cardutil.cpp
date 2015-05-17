@@ -1081,24 +1081,6 @@ QString CardUtil::GetDisplayName(uint inputid)
     return QString::null;
 }
 
-uint CardUtil::GetInputID(uint cardid, const QString &inputname)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT cardid "
-                  "FROM capturecard "
-                  "WHERE inputname = :INPUTNAME AND "
-                  "      cardid    = :CARDID");
-    query.bindValue(":INPUTNAME", inputname);
-    query.bindValue(":CARDID",    cardid);
-
-    if (!query.exec())
-        MythDB::DBError("CardUtil::GetInputID(uint,QString)", query);
-    else if (query.next())
-        return query.value(0).toUInt();
-
-    return 0;
-}
-
 uint CardUtil::GetSourceID(uint inputid)
 {
     MSqlQuery query(MSqlQuery::InitCon());

@@ -310,7 +310,6 @@ class MTV_PUBLIC CardUtil
     static QString      GetStartingChannel(uint inputid);
     static QString      GetDisplayName(uint inputid);
     static vector<uint> GetAllInputIDs(void);
-    static uint         GetInputID(uint cardid, const QString &inputname);
     static uint         GetSourceID(uint inputid);
     static bool         DeleteOrphanInputs(void);
 

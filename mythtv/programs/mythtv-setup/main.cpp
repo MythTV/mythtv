@@ -454,7 +454,7 @@ int main(int argc, char *argv[])
         QString mod      = scanTableName.mid(
             firstBreak+1, secondBreak-firstBreak-1).toLower();
         QString tbl      = scanTableName.mid(secondBreak+1).toLower();
-        uint    inputid  = CardUtil::GetInputID(scanCardId, scanInputName);
+        uint    inputid  = scanCardId;
         uint    sourceid = CardUtil::GetSourceID(inputid);
         QMap<QString,QString> startChan;
         {
