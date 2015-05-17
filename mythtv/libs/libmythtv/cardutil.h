@@ -312,13 +312,6 @@ class MTV_PUBLIC CardUtil
     static vector<uint> GetAllInputIDs(void);
     static uint         GetSourceID(uint inputid);
 
-    static bool         SetInputValue(const QString &col, uint iid,
-                                 int val)
-        { return set_on_input(col, iid, QString::number(val)); }
-    static bool         SetInputValue(const QString &col, uint iid,
-                                 const QString &val)
-        { return set_on_input(col, iid, val); }
-
     // Input Groups
     static uint         CreateInputGroup(const QString &name);
     static uint         CreateDeviceInputGroup(const QString &host,
