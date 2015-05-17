@@ -7672,21 +7672,11 @@ static uint get_chanid(const PlayerContext *ctx,
         if (chanid)
             return chanid;
     }
-    // try to find channel on all inputs
-    vector<uint> inputs = CardUtil::GetInputIDs(cardid);
-    for (vector<uint>::const_iterator it = inputs.begin();
-         it != inputs.end(); ++it)
-    {
-        uint sourceid = CardUtil::GetSourceID(*it);
-        if (cur_sourceid == sourceid)
-            continue; // already tested above
-        if (sourceid)
-        {
-            chanid = max(ChannelUtil::GetChanID(sourceid, channum), 0);
-            if (chanid)
-                return chanid;
-        }
-    }
+    // try to find channel on specified input
+
+    uint sourceid = CardUtil::GetSourceID(cardid);
+    if (cur_sourceid != sourceid && sourceid)
+        chanid = max(ChannelUtil::GetChanID(sourceid, channum), 0);
     return chanid;
 }
 
@@ -11884,20 +11874,6 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
                 for (uint i = 0; i < inputs.size(); i++)
                     if (!sources.contains(inputs[i].sourceid))
                         sources[inputs[i].sourceid] = inputs[i];
-            }
-            // Get other sources available on this card
-            vector<uint> currentinputs = CardUtil::GetInputIDs(cardid);
-            if (!currentinputs.empty())
-            {
-                for (uint i = 0; i < currentinputs.size(); i++)
-                {
-                    InputInfo info;
-                    info.inputid = currentinputs[i];
-                    if (CardUtil::GetInputInfo(info))
-                        if (!sources.contains(info.sourceid) &&
-                            info.livetvorder)
-                            sources[info.sourceid] = info;
-                }
             }
             // delete current source from list
             sources.remove(sourceid);

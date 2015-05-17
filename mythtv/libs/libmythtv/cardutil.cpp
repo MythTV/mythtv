@@ -1136,30 +1136,6 @@ vector<uint> CardUtil::GetAllInputIDs(void)
     return list;
 }
 
-vector<uint> CardUtil::GetInputIDs(uint cardid)
-{
-    vector<uint> list;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        "SELECT cardid "
-        "FROM capturecard "
-        "WHERE cardid = :CARDID");
-
-    query.bindValue(":CARDID", cardid);
-
-    if (!query.exec())
-    {
-        MythDB::DBError("CardUtil::GetInputIDs(uint)", query);
-        return list;
-    }
-
-    while (query.next())
-        list.push_back(query.value(0).toUInt());
-
-    return list;
-}
-
 int CardUtil::CreateCardInput(const uint cardid,
                               const uint sourceid,
                               const QString &inputname,
@@ -1433,9 +1409,8 @@ vector<uint> CardUtil::GetSharedInputGroups(uint cardid)
 {
     vector<uint> list;
 
-    vector<uint> inputs = GetInputIDs(cardid);
-    if (inputs.empty())
-        return list;
+    vector<uint> inputs;
+    inputs.push_back(cardid);
 
     list = GetInputGroups(inputs[0]);
     for (uint i = 1; (i < inputs.size()) && !list.empty(); i++)
@@ -2051,10 +2026,8 @@ bool CardUtil::DeleteCard(uint cardid)
             return false;
     }
 
-    // delete inputs
-    vector<uint> inputs = CardUtil::GetInputIDs(cardid);
-    for (uint i = 0; i < inputs.size(); i++)
-        ok &= CardUtil::DeleteInput(inputs[i]);
+    // delete input
+    ok &= CardUtil::DeleteInput(cardid);
 
     if (!ok)
         return false;
