@@ -141,7 +141,6 @@ class ChannelBase
         uint &chanid_restrtiction) const;
     virtual bool IsExternalChannelChangeSupported(void) { return false; }
 
-    int GetStartInput(uint cardid);
     void ClearInputMap(void);
 
     static void StoreInputChannels(const InputMap&);

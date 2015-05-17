@@ -395,13 +395,11 @@ int main(int argc, char *argv[])
     {
         bool okCardID = scanCardId;
 
-        QStringList inputnames = CardUtil::GetInputNames(scanCardId);
-        okCardID &= !inputnames.empty();
-
         if (scanInputName.isEmpty())
-            scanInputName = CardUtil::GetStartInput(scanCardId);
+            scanInputName = CardUtil::GetInputName(scanCardId);
 
-        bool okInputName = inputnames.contains(scanInputName);
+        bool okInputName = (scanInputName == CardUtil::GetInputName(scanCardId)
+                            && scanInputName != "None");
 
         doScan = (okCardID && okInputName);
 
@@ -432,11 +430,9 @@ int main(int argc, char *argv[])
         {
             cerr << "You must enter a valid input to scan this card."
                  << endl;
-            cerr << "Valid inputs: " << endl;
-            for (int i = 0; i < inputnames.size(); i++)
-            {
-                cerr << inputnames[i].toLatin1().constData() << endl;
-            }
+            cerr << "Valid input: "
+                 << CardUtil::GetInputName(scanCardId).toLatin1().constData()
+                 << endl;
             return GENERIC_EXIT_INVALID_CMDLINE;
         }
     }

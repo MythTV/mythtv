@@ -7157,8 +7157,8 @@ void TV::SwitchCards(PlayerContext *ctx,
             if (chanid && channum.isEmpty())
                 channum = ChannelUtil::GetChanNum(chanid);
 
-            cardinputid = CardUtil::GetCardInputID(
-                cardid, channum, inputname);
+            cardinputid = cardid;
+            inputname = CardUtil::GetInputName(cardinputid);
         }
 
         if (cardid && cardinputid>0 && !inputname.isEmpty())

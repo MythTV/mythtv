@@ -1013,9 +1013,7 @@ int MythPlayer::OpenFile(uint retries)
         {
             int cardid = player_ctx->recorder->GetRecorderNumber();
             QString channum = player_ctx->playingInfo->GetChanNum();
-            QString inputname;
-            int cardinputid = CardUtil::GetCardInputID(cardid, channum, inputname);
-            CardUtil::SetStartChannel(cardinputid, channum);
+            CardUtil::SetStartChannel(cardid, channum);
         }
     }
 

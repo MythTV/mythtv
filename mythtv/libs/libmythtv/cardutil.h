@@ -278,8 +278,6 @@ class MTV_PUBLIC CardUtil
                                  uint sid, const QString &val)
         { return set_on_source(col, cid, sid, val); }
 
-    static int          GetCardInputID(uint cardid, const QString &channum,
-                                       QString &inputname);
     static bool         SetStartChannel(uint cardinputid,
                                         const QString &channum);
 
@@ -305,8 +303,6 @@ class MTV_PUBLIC CardUtil
     // Other input functions
 
     static vector<uint> GetCardIDs(uint sourceid);
-    static QString      GetStartInput(uint cardid);
-    static QStringList  GetInputNames(uint cardid, uint sourceid = 0);
     static bool         GetInputInfo(InputInfo &info,
                                      vector<uint> *groupids = NULL);
     static QList<InputInfo> GetAllInputInfo();

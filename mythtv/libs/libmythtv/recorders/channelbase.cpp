@@ -996,7 +996,7 @@ bool ChannelBase::InitializeInputs(void)
     }
     ChannelUtil::SortChannels(m_allchannels, order, true);
 
-    m_currentInputID = GetStartInput(cardid);
+    m_currentInputID = cardid;
 
     // In case that initial input is not set
     if (m_currentInputID == -1)
@@ -1065,15 +1065,6 @@ void ChannelBase::StoreInputChannels(const InputMap &inputs)
         if (!query.exec() || !query.isActive())
             MythDB::DBError("StoreInputChannels", query);
     }
-}
-
-/** \fn ChannelBase::GetStartInput(uint)
- *  \brief Gets the default input for the cardid
- *  \param cardid ChannelBase::GetCardID()
- */
-int ChannelBase::GetStartInput(uint cardid)
-{
-    return GetInputByName(CardUtil::GetStartInput(cardid));
 }
 
 bool ChannelBase::CheckChannel(const QString &channum,
@@ -1268,7 +1259,7 @@ ChannelBase *ChannelBase::CreateChannel(
         return NULL;
     }
 
-    QString input = CardUtil::GetStartInput(tvrec->GetCaptureCardNum());
+    QString input = CardUtil::GetInputName(tvrec->GetCaptureCardNum());
     QString channum = startchannel;
     channel->Init(input, channum, true);
 

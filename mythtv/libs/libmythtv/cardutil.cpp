@@ -943,30 +943,6 @@ vector<uint> CardUtil::GetCardIDs(uint sourceid)
     return list;
 }
 
-int CardUtil::GetCardInputID(
-    uint cardid, const QString &channum, QString &inputname)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        "SELECT cardid, inputname "
-        "FROM channel, capturecard "
-        "WHERE channel.channum      = :CHANNUM             AND "
-        "      channel.sourceid     = capturecard.sourceid AND "
-        "      capturecard.cardid   = :CARDID");
-    query.bindValue(":CHANNUM", channum);
-    query.bindValue(":CARDID", cardid);
-
-    if (!query.exec() || !query.isActive())
-        MythDB::DBError("get_cardinputid", query);
-    else if (query.next())
-    {
-        inputname = query.value(1).toString();
-        return query.value(0).toInt();
-    }
-
-    return -1;
-}
-
 bool CardUtil::SetStartChannel(uint cardinputid, const QString &channum)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -983,64 +959,6 @@ bool CardUtil::SetStartChannel(uint cardinputid, const QString &channum)
     }
 
     return true;
-}
-
-/** \fn CardUtil::GetStartInput(uint)
- *  \brief Returns the start input for the card
- *  \param nCardID card id to check
- *  \return the start input
- */
-QString CardUtil::GetStartInput(uint nCardID)
-{
-    QString str = QString::null;
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT inputname "
-                  "FROM capturecard "
-                  "WHERE capturecard.cardid = :CARDID "
-                  "ORDER BY livetvorder = 0, livetvorder, cardid "
-                  "LIMIT 1");
-    query.bindValue(":CARDID", nCardID);
-
-    if (!query.exec() || !query.isActive())
-        MythDB::DBError("CardUtil::GetStartInput()", query);
-    else if (query.next())
-        str = query.value(0).toString();
-
-    return str;
-}
-
-QStringList CardUtil::GetInputNames(uint cardid, uint sourceid)
-{
-    QStringList list;
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    if (sourceid)
-    {
-        query.prepare("SELECT inputname "
-                      "FROM capturecard "
-                      "WHERE sourceid = :SOURCEID AND "
-                      "      cardid   = :CARDID");
-        query.bindValue(":SOURCEID", sourceid);
-    }
-    else
-    {
-        query.prepare("SELECT inputname "
-                      "FROM capturecard "
-                      "WHERE cardid   = :CARDID");
-    }
-    query.bindValue(":CARDID",   cardid);
-
-    if (!query.exec())
-    {
-        MythDB::DBError("CardUtil::GetInputNames()", query);
-    }
-    else
-    {
-        while (query.next())
-            list.append( query.value(0).toString() );
-    }
-
-    return list;
 }
 
 bool CardUtil::GetInputInfo(InputInfo &input, vector<uint> *groupids)

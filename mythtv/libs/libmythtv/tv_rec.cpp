@@ -158,8 +158,7 @@ bool TVRec::Init(void)
     SetRecordingStatus(RecStatus::Unknown, __LINE__);
 
     // configure the Channel instance
-    QString startchannel = GetStartChannel(cardid,
-                                           CardUtil::GetStartInput(cardid));
+    QString startchannel = GetStartChannel(cardid);
     if (!CreateChannel(startchannel, true))
         return false;
 
@@ -1687,22 +1686,20 @@ bool TVRec::GetDevices(uint cardid,
     return true;
 }
 
-QString TVRec::GetStartChannel(uint cardid, const QString &startinput)
+QString TVRec::GetStartChannel(uint cardid)
 {
     QString startchan = QString::null;
 
-    LOG(VB_RECORD, LOG_INFO, LOC + QString("GetStartChannel(%1, '%2')")
-        .arg(cardid).arg(startinput));
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("GetStartChannel(%1)")
+        .arg(cardid));
 
     // Get last tuned channel from database, to use as starting channel
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT startchan "
         "FROM capturecard "
-        "WHERE capturecard.cardid = :CARDID    AND "
-        "      inputname          = :INPUTNAME");
+        "WHERE capturecard.cardid = :CARDID");
     query.bindValue(":CARDID",    cardid);
-    query.bindValue(":INPUTNAME", startinput);
 
     if (!query.exec() || !query.isActive())
     {
@@ -1725,10 +1722,8 @@ QString TVRec::GetStartChannel(uint cardid, const QString &startinput)
         "SELECT channum "
         "FROM capturecard, channel "
         "WHERE channel.sourceid   = capturecard.sourceid AND "
-        "      capturecard.cardid = :CARDID AND "
-        "      inputname          = :INPUTNAME");
+        "      capturecard.cardid = :CARDID");
     query.bindValue(":CARDID",    cardid);
-    query.bindValue(":INPUTNAME", startinput);
 
     if (!query.exec() || !query.isActive())
     {
@@ -3440,8 +3435,8 @@ QString TVRec::TuningGetChanNum(const TuningRequest &request,
             channum = LiveTVStartChannel;
         else
         {
-            input   = CardUtil::GetStartInput(cardid);
-            channum = GetStartChannel(cardid, input);
+            input   = CardUtil::GetInputName(cardid);
+            channum = GetStartChannel(cardid);
         }
     }
     if (request.flags & kFlagLiveTV)
@@ -3610,7 +3605,7 @@ uint TVRec::TuningCheckForHWChange(const TuningRequest &request,
     if (curCardID != newCardID || !CardUtil::IsChannelReusable(genOpt.cardtype))
     {
         if (channum.isEmpty())
-            channum = GetStartChannel(newCardID, inputname);
+            channum = GetStartChannel(newCardID);
         return newCardID;
     }
 
