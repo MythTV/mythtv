@@ -3634,8 +3634,6 @@ void CardInput::Save(void)
             CardUtil::CloneCard(src_cardid, clones[i]);
     }
 
-    // Delete any orphaned inputs
-    CardUtil::DeleteOrphanInputs();
     // Delete any unused input groups
     CardUtil::UnlinkInputGroup(0,0);
 }

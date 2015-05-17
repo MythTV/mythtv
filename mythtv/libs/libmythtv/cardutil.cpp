@@ -1219,11 +1219,6 @@ bool CardUtil::DeleteInput(uint inputid)
     return true;
 }
 
-bool CardUtil::DeleteOrphanInputs(void)
-{
-    return true;
-}
-
 uint CardUtil::CreateInputGroup(const QString &name)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -2003,8 +1998,7 @@ bool CardUtil::DeleteCard(uint cardid)
 
     if (ok)
     {
-        // delete any orphaned inputs & unused input groups
-        DeleteOrphanInputs();
+        // delete any unused input groups
         UnlinkInputGroup(0,0);
     }
 
