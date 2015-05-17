@@ -334,10 +334,10 @@ class MTV_PUBLIC CardUtil
                                          QString cardtype = QString::null);
     static QStringList  ProbeAudioInputs(QString device,
                                          QString cardtype = QString::null);
-    static void         GetCardInputs(uint                cardid,
-                                      const QString      &device,
-                                      const QString      &cardtype,
-                                      QStringList        &inputs);
+    static void         GetDeviceInputNames(uint                cardid,
+                                            const QString      &device,
+                                            const QString      &cardtype,
+                                            QStringList        &inputs);
 
     // General info from OS
     static QStringList  ProbeVideoDevices(const QString &rawtype);

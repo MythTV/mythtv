@@ -2976,7 +2976,7 @@ class InputName : public ComboBoxSetting, public CardInputDBStorage
         QString type = CardUtil::GetRawCardType(cardid);
         QString device = CardUtil::GetVideoDevice(cardid);
         QStringList inputs;
-        CardUtil::GetCardInputs(cardid, device, type, inputs);
+        CardUtil::GetDeviceInputNames(cardid, device, type, inputs);
         while (!inputs.isEmpty())
         {
             addSelection(inputs.front());

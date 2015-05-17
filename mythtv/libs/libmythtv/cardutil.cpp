@@ -1805,7 +1805,7 @@ QString CardUtil::GetDeviceLabel(uint cardid)
     return "[ UNKNOWN ]";
 }
 
-void CardUtil::GetCardInputs(
+void CardUtil::GetDeviceInputNames(
     uint                cardid,
     const QString      &device,
     const QString      &cardtype,
