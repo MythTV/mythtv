@@ -7095,7 +7095,7 @@ void TV::SwitchInputs(PlayerContext *ctx, uint inputid)
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Input %1").arg(inputid));
 
-    if ((uint)ctx->GetCardID() == CardUtil::GetCardID(inputid))
+    if ((uint)ctx->GetCardID() == inputid)
     {
         ToggleInputs(ctx, inputid);
     }
@@ -7118,14 +7118,10 @@ void TV::SwitchCards(PlayerContext *ctx,
         return;
     }
 
-    uint input_cardid = 0;
     QStringList reclist;
     if (inputid)
     {
-        // If we are switching to a specific input..
-        input_cardid = CardUtil::GetCardID(inputid);
-        if (input_cardid)
-            reclist.push_back(QString::number(input_cardid));
+        reclist.push_back(QString::number(inputid));
     }
     else if (chanid || !channum.isEmpty())
     {

@@ -1033,13 +1033,6 @@ QList<InputInfo> CardUtil::GetAllInputInfo()
     return infoInputList;
 }
 
-uint CardUtil::GetCardID(uint inputid)
-{
-    InputInfo info("None", 0, inputid, 0, 0, 0, 0);
-    GetInputInfo(info);
-    return info.cardid;
-}
-
 QString CardUtil::GetInputName(uint inputid)
 {
     InputInfo info("None", 0, inputid, 0, 0, 0, 0);

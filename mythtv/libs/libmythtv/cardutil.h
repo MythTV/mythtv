@@ -306,7 +306,6 @@ class MTV_PUBLIC CardUtil
     static bool         GetInputInfo(InputInfo &info,
                                      vector<uint> *groupids = NULL);
     static QList<InputInfo> GetAllInputInfo();
-    static uint         GetCardID(uint inputid);
     static QString      GetInputName(uint inputid);
     static QString      GetStartingChannel(uint inputid);
     static QString      GetDisplayName(uint inputid);
