@@ -24,6 +24,7 @@ bluray_version = $$bluray_major"."$$bluray_minor"."$$bluray_micro
 DEFINES += BLURAY_VERSION_MAJOR=$$bluray_major
 DEFINES += BLURAY_VERSION_MINOR=$$bluray_minor
 DEFINES += BLURAY_VERSION_MICRO=$$bluray_micro
+DEFINES += BLURAY_VERSION_STRING=\\\"$$bluray_version\\\"
 
 win32-msvc* {
     CONFIG += qt
