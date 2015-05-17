@@ -330,7 +330,6 @@ class MTV_PUBLIC CardUtil
     static bool         LinkInputGroup(uint inputid, uint inputgroupid);
     static bool         UnlinkInputGroup(uint inputid, uint inputgroupid);
     static vector<uint> GetInputGroups(uint inputid);
-    static vector<uint> GetSharedInputGroups(uint cardid);
     static vector<uint> GetGroupCardIDs(uint inputgroupid);
     static vector<uint> GetConflictingCards(uint inputid, uint exclude_cardid);
 

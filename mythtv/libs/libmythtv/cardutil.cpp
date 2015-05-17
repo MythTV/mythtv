@@ -1405,29 +1405,6 @@ vector<uint> CardUtil::GetInputGroups(uint inputid)
     return list;
 }
 
-vector<uint> CardUtil::GetSharedInputGroups(uint cardid)
-{
-    vector<uint> list;
-
-    vector<uint> inputs;
-    inputs.push_back(cardid);
-
-    list = GetInputGroups(inputs[0]);
-    for (uint i = 1; (i < inputs.size()) && !list.empty(); i++)
-    {
-        vector<uint> curlist = GetInputGroups(inputs[i]);
-        vector<uint> newlist;
-        for (uint j = 0; j < list.size(); j++)
-        {
-            if (find(curlist.begin(), curlist.end(), list[j]) != curlist.end())
-                newlist.push_back(list[j]);
-        }
-        list = newlist;
-    }
-
-    return list;
-}
-
 vector<uint> CardUtil::GetGroupCardIDs(uint inputgroupid)
 {
     vector<uint> list;
