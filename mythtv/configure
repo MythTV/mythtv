@@ -2180,6 +2180,8 @@ USING_LIST='
     bindings_python
     bindings_php
     darwin_da
+    fontconfig
+    freetype2
     mythtranscode
     dxva2
     opengl
@@ -5831,6 +5833,9 @@ if enabled bdjava; then
     if test "$bdj_type" = "j2me"; then
         enable bdj_j2me
     fi
+
+    # Probably makes little sense to try to process Bluray menus without fontconfig
+    enable fontconfig
 fi
 
 disabled  zlib || check_lib   zlib.h      zlibVersion -lz   || disable  zlib

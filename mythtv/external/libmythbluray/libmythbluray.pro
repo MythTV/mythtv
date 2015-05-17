@@ -101,6 +101,8 @@ mingw:DEFINES += STDC_HEADERS
 
 using_bdjava {
     DEFINES += USING_BDJAVA VERSION=\\\"$$bluray_version\\\"
+    using_freetype2:DEFINES += HAVE_FT2
+    using_fontconfig:DEFINES += HAVE_FONTCONFIG
 
     macx:javaos = darwin
     win32:javaos = win32
