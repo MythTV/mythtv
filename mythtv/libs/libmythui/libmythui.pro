@@ -134,6 +134,11 @@ macx {
     }
 }
 
+android {
+    HEADERS += screensaver-android.h
+    SOURCES += screensaver-android.cpp
+}
+
 using_joystick_menu {
     DEFINES += USE_JOYSTICK_MENU
     HEADERS += jsmenu.h jsmenuevent.h
