@@ -1,0 +1,8 @@
+/var/log/mythtv/optimize_mythdb.log {
+        daily
+        rotate 7
+        notifempty
+        missingok
+	compress
+	delaycompress
+}
