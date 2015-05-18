@@ -81,6 +81,30 @@ static inline void stereo16_from_stereopcm16(register short *l,
 }
 
 
+static inline void stereo16_from_stereopcm32(register short *l,
+                         register short *r,
+                         register int *s,
+                         long cnt)
+{
+    while (cnt--) {
+  *l++ = (short)(*s++ >> 16);
+  *r++ = (short)(*s++ >> 16);
+    }
+}
+
+
+static inline void stereo16_from_stereopcmfloat(register short *l,
+                         register short *r,
+                         register float *s,
+                         long cnt)
+{
+    while (cnt--) {
+  *l++ = (short)(*s++ * 32767.0f);
+  *r++ = (short)(*s++ * 32767.0f);
+    }
+}
+
+
 static inline void mono16_from_monopcm8(register short *l,
 					register uchar *c,
 					long cnt)
@@ -131,6 +155,25 @@ static inline void mono16_from_monopcm16(register short *l,
 	}
     }
 }
+
+
+static inline void mono16_from_monopcm32(register short *l,
+                         register int *s,
+                         long cnt)
+{
+    while (cnt--)
+  *l++ = (short)(*s++ >> 16);
+}
+
+
+static inline void mono16_from_monopcmfloat(register short *l,
+                         register float *s,
+                         long cnt)
+{
+    while (cnt--)
+  *l++ = (short)(*s++ * 32767.0f);
+}
+
 
 #if FFTW3_SUPPORT
 static inline void fast_short_set(register short *p,
