@@ -544,7 +544,7 @@ bool CardUtil::IsDVBCardType(const QString &card_type)
         (ct == "OFDM") || (ct == "ATSC") || (ct == "DVB_S2");
 }
 
-QString get_on_cardid(const QString &to_get, uint cardid)
+QString get_on_card(const QString &to_get, uint cardid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
@@ -561,10 +561,30 @@ QString get_on_cardid(const QString &to_get, uint cardid)
     return QString::null;
 }
 
+bool set_on_card(const QString &to_set, uint cardid, const QString &value)
+{
+    QString tmp = get_on_card("capturecard.cardid", cardid);
+    if (tmp.isEmpty())
+        return false;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        QString("UPDATE capturecard SET %1 = :VALUE ").arg(to_set) +
+        "WHERE cardid = :CARDID");
+    query.bindValue(":CARDID", cardid);
+    query.bindValue(":VALUE",  value);
+
+    if (query.exec())
+        return true;
+
+    MythDB::DBError("CardUtil::set_on_card", query);
+    return false;
+}
+
 bool set_on_source(const QString &to_set, uint cardid, uint sourceid,
                    const QString &value)
 {
-    QString tmp = get_on_cardid("capturecard.cardid", cardid);
+    QString tmp = get_on_card("capturecard.cardid", cardid);
     if (tmp.isEmpty())
         return false;
 
@@ -584,48 +604,6 @@ bool set_on_source(const QString &to_set, uint cardid, uint sourceid,
         return true;
 
     MythDB::DBError("CardUtil::set_on_source", query);
-    return false;
-}
-
-QString get_on_inputid(const QString &to_get, uint inputid)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        QString("SELECT %1 ").arg(to_get) +
-        "FROM capturecard "
-        "WHERE capturecard.cardid = :INPUTID");
-    query.bindValue(":INPUTID", inputid);
-
-    if (!query.exec())
-        MythDB::DBError("CardUtil::get_on_inputid", query);
-    else if (query.next())
-        return query.value(0).toString();
-
-    return QString::null;
-}
-
-bool set_on_input(const QString &to_set, uint inputid, const QString &value)
-{
-    QString tmp = get_on_inputid("capturecard.cardid", inputid);
-    if (tmp.isEmpty())
-        return false;
-
-    bool ok;
-    uint input_cardinputid = tmp.toUInt(&ok);
-    if (!ok)
-        return false;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        QString("UPDATE capturecard SET %1 = :VALUE ").arg(to_set) +
-        "WHERE cardid = :INPUTID");
-    query.bindValue(":INPUTID", input_cardinputid);
-    query.bindValue(":VALUE",  value);
-
-    if (query.exec())
-        return true;
-
-    MythDB::DBError("CardUtil::set_on_input", query);
     return false;
 }
 

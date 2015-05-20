@@ -22,13 +22,11 @@ class InputInfo;
 class CardInput;
 typedef QMap<int,QString> InputNames;
 
-MTV_PUBLIC QString get_on_cardid(const QString&, uint);
+MTV_PUBLIC QString get_on_card(const QString&, uint);
+
+MTV_PUBLIC bool set_on_card(const QString&, uint, const QString&);
 
 MTV_PUBLIC bool set_on_source(const QString&, uint, uint, const QString&);
-
-MTV_PUBLIC QString get_on_inputid(const QString&, uint);
-
-MTV_PUBLIC bool set_on_input(const QString&, uint, const QString&);
 
 typedef enum
 {
@@ -261,16 +259,16 @@ class MTV_PUBLIC CardUtil
                                         QString hostname = QString::null);
 
     static QString      GetRawCardType(uint cardid)
-        { return get_on_cardid("cardtype", cardid).toUpper(); }
+        { return get_on_card("cardtype", cardid).toUpper(); }
     static QString      GetVideoDevice(uint cardid)
-        { return get_on_cardid("videodevice", cardid); }
+        { return get_on_card("videodevice", cardid); }
     static QString      GetAudioDevice(uint cardid)
-        { return get_on_cardid("audiodevice", cardid); }
+        { return get_on_card("audiodevice", cardid); }
     static QString      GetVBIDevice(uint cardid)
-        { return get_on_cardid("vbidevice", cardid); }
+        { return get_on_card("vbidevice", cardid); }
 
     static int          GetValueInt(const QString &col, uint cid)
-        { return get_on_cardid(col, cid).toInt(); }
+        { return get_on_card(col, cid).toInt(); }
     static bool         SetValue(const QString &col, uint cid,
                                  uint sid, int val)
         { return set_on_source(col, cid, sid, QString::number(val)); }
