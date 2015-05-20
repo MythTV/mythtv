@@ -11,6 +11,7 @@
 #include <QTextStream>
 #include <QNetworkProxy>
 #include <QMutexLocker>
+#include <QUrl>
 
 #include "stdlib.h"
 
@@ -27,7 +28,6 @@
 
 #include "mythdownloadmanager.h"
 #include "mythlogging.h"
-#include <QUrl>
 
 using namespace std;
 
@@ -325,8 +325,7 @@ void MythDownloadManager::run(void)
                 continue;
             }
 
-            QUrl qurl(dlInfo->m_url);
-            if (m_downloadInfos.contains(qurl.toString()))
+            if (m_downloadInfos.contains(dlInfo->m_url))
             {
                 // Push request to the end of the queue to let others process.
                 // If this is the only item in the queue, force the loop to
@@ -346,7 +345,7 @@ void MythDownloadManager::run(void)
                 downloadQNetworkRequest(dlInfo);
             }
 
-            m_downloadInfos[qurl.toString()] = dlInfo;
+            m_downloadInfos[dlInfo->m_url] = dlInfo;
         }
         m_infoLock->unlock();
     }
