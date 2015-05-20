@@ -1221,9 +1221,15 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
         // else we downloaded via QNetworkAccessManager
         // AND the caller is handling the reply
 
-        m_downloadInfos.remove(dlInfo->m_url);
+        m_infoLock->lock();
+        if (!m_downloadInfos.remove(dlInfo->m_url))
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("ERROR download finished but failed to remove url: %1")
+                        .arg(dlInfo->m_url));
+
         if (reply)
             m_downloadReplies.remove(reply);
+        m_infoLock->unlock();
 
         dlInfo->SetDone(true);
 
