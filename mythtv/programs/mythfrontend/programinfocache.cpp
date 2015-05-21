@@ -233,19 +233,22 @@ bool ProgramInfoCache::Remove(uint recordingID)
     return it != m_cache.end();
 }
 
-// Sorting functions for ProgramInfoCache::GetOrdered()
-bool PISort(const ProgramInfo *a, const ProgramInfo *b)
-{
-    if (a->GetRecordingStartTime() == b->GetRecordingStartTime())
-        return a->GetChanID() < b->GetChanID();
-    return (a->GetRecordingStartTime() < b->GetRecordingStartTime());
-}
+// two helper functions that are used only in this file
+namespace {
+    // Sorting functions for ProgramInfoCache::GetOrdered()
+    bool PISort(const ProgramInfo *a, const ProgramInfo *b)
+    {
+        if (a->GetRecordingStartTime() == b->GetRecordingStartTime())
+            return a->GetChanID() < b->GetChanID();
+        return (a->GetRecordingStartTime() < b->GetRecordingStartTime());
+    }
 
-bool reversePISort(const ProgramInfo *a, const ProgramInfo *b)
-{
-    if (a->GetRecordingStartTime() == b->GetRecordingStartTime())
-        return a->GetChanID() > b->GetChanID();
-    return (a->GetRecordingStartTime() > b->GetRecordingStartTime());
+    bool reversePISort(const ProgramInfo *a, const ProgramInfo *b)
+    {
+        if (a->GetRecordingStartTime() == b->GetRecordingStartTime())
+            return a->GetChanID() > b->GetChanID();
+        return (a->GetRecordingStartTime() > b->GetRecordingStartTime());
+    }
 }
 
 void ProgramInfoCache::GetOrdered(vector<ProgramInfo*> &list, bool newest_first)
