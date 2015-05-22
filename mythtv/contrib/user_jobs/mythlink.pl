@@ -110,6 +110,9 @@ options:
     \%T   = Title (show name)
     \%S   = Subtitle (episode name)
     \%R   = Description
+    \%ss  = Season (leading zero)
+    \%ep  = Episode (leading zero)
+    \%in  = Internet reference number
     \%C   = Category
     \%U   = RecGroup
     \%hn  = Hostname of the machine where the file resides
