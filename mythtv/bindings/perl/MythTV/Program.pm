@@ -336,7 +336,7 @@ package MythTV::Program;
         $season = "0$season" if ($season && $season < 10);
         $episode = ($self->{'episode'} or '');
         $episode = "0$episode" if ($episode && $episode < 10);
-        $inetref = ($self->{'intetref'} or '');
+        $inetref = ($self->{'inetref'} or '');
 
     # Build a list of name format options
         my %fields;
