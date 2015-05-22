@@ -136,7 +136,7 @@ udfread_block_input *block_input_new(const char *path)
     }
 
 #ifdef _WIN32
-    p->fd = open(path, O_RDONLY | O_BINARY);
+    p->fd = _open(path, _O_RDONLY | _O_BINARY);
 #else
     p->fd = open(path, O_RDONLY);
 #endif
