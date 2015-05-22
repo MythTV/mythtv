@@ -2549,7 +2549,7 @@ bool MythUIButtonList::gestureEvent(MythGestureEvent *event)
                     else if (name.startsWith("buttonlist button"))
                     {
                         int pos = name.section(' ', 2, 2).toInt();
-                        MythUIButtonListItem *item = m_ButtonToItem[pos];
+                        MythUIButtonListItem *item = m_ButtonToItem.value(pos);
 
                         if (item)
                         {
