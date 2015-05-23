@@ -3618,13 +3618,14 @@ uint64_t MythPlayer::GetBookmark(void)
     else
     {
         player_ctx->LockPlayingInfo(__FILE__, __LINE__);
-        if (player_ctx->playingInfo)
+        if (const ProgramInfo *pi = player_ctx->playingInfo)
         {
-            bookmark = player_ctx->playingInfo->QueryBookmark();
+            bookmark = pi->QueryBookmark();
+            // Disable progstart if the program has a cutlist.
+            if (bookmark == 0 && !pi->HasCutlist())
+                bookmark = pi->QueryProgStart();
             if (bookmark == 0)
-                bookmark = player_ctx->playingInfo->QueryProgStart();
-            if (bookmark == 0)
-                bookmark = player_ctx->playingInfo->QueryLastPlayPos();
+                bookmark = pi->QueryLastPlayPos();
         }
         player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
     }
