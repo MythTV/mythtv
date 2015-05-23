@@ -28,7 +28,7 @@ DEFINES += BLURAY_VERSION_STRING=\\\"$$bluray_version\\\"
 
 win32-msvc* {
     CONFIG += qt
-    DEFINES += HAVE_CONFIG_H DLOrcPEN_CRYPTO_LIBS HAVE_PTHREAD_H
+    DEFINES += HAVE_CONFIG_H DLOPEN_CRYPTO_LIBS HAVE_PTHREAD_H
 
     # needed for vcxproj
     QMAKE_CXXFLAGS += /TP "/FI compat.h"
