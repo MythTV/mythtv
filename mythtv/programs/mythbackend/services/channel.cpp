@@ -408,7 +408,7 @@ int Channel::FetchChannelsFromSource( const uint nSourceId,
 
     int nResult = 0;
 
-    QString cardtype = CardUtil::GetRawCardType(nCardId);
+    QString cardtype = CardUtil::GetRawInputType(nCardId);
 
     if (!CardUtil::IsUnscanable(cardtype) &&
         !CardUtil::IsEncoder(cardtype))

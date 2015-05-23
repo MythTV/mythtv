@@ -406,7 +406,7 @@ int main(int argc, char *argv[])
         if (!okCardID)
         {
             cerr << "You must enter a valid cardid to scan." << endl;
-            vector<uint> cardids = CardUtil::GetCardIDs();
+            vector<uint> cardids = CardUtil::GetInputIDs();
             if (cardids.empty())
             {
                 cerr << "But no cards have been defined on this host"
@@ -418,7 +418,7 @@ int main(int argc, char *argv[])
             {
                 fprintf(stderr, "%5u: %s %s\n",
                         cardids[i],
-                        CardUtil::GetRawCardType(cardids[i])
+                        CardUtil::GetRawInputType(cardids[i])
                         .toLatin1().constData(),
                         CardUtil::GetVideoDevice(cardids[i])
                         .toLatin1().constData());

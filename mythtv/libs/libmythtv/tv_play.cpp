@@ -8496,7 +8496,7 @@ QSet<uint> TV::IsTunableOn(TV *tv,
 
     uint sourceid = ChannelUtil::GetSourceIDForChannel(chanid);
     vector<uint> connected   = RemoteRequestFreeRecorderList(excluded_cards);
-    vector<uint> interesting = CardUtil::GetCardIDs(sourceid);
+    vector<uint> interesting = CardUtil::GetInputIDs(sourceid);
 
     // filter disconnected cards
     vector<uint> cardids = excluded_cards;

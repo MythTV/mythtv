@@ -192,10 +192,10 @@ static CardUtil::CARD_TYPES get_cardtype(uint sourceid)
     for (; it != cardids.end(); ++it)
     {
         CardUtil::CARD_TYPES nType = CardUtil::ERROR_PROBE;
-        QString cardtype = CardUtil::GetRawCardType(*it);
+        QString cardtype = CardUtil::GetRawInputType(*it);
         if (cardtype == "DVB")
             cardtype = CardUtil::ProbeSubTypeName(*it);
-        nType = CardUtil::toCardType(cardtype);
+        nType = CardUtil::toInputType(cardtype);
 
         if ((CardUtil::ERROR_OPEN    == nType) ||
             (CardUtil::ERROR_UNKNOWN == nType) ||

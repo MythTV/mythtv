@@ -328,11 +328,11 @@ bool SourceUtil::IsUnscanable(uint sourceid)
 bool SourceUtil::IsCableCardPresent(uint sourceid)
 {
     bool ccpresent = false;
-    vector<uint> cards = CardUtil::GetCardIDs(sourceid);
+    vector<uint> cards = CardUtil::GetInputIDs(sourceid);
     vector<uint>::iterator it = cards.begin();
     for (; it != cards.end(); ++it)
     {
-        if (CardUtil::IsCableCardPresent(*it, CardUtil::GetRawCardType(*it)))
+        if (CardUtil::IsCableCardPresent(*it, CardUtil::GetRawInputType(*it)))
             ccpresent = true;
     }
 

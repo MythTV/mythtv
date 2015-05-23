@@ -63,7 +63,7 @@ void ProfileGroup::loadByID(int profileId) {
 
 void ProfileGroup::fillSelections(SelectSetting* setting)
 {
-    QStringList cardtypes = CardUtil::GetCardTypes();
+    QStringList cardtypes = CardUtil::GetInputTypes();
     QString     tid       = QString::null;
 
     MSqlQuery result(MSqlQuery::InitCon());

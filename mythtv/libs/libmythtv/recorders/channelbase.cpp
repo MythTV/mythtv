@@ -428,7 +428,7 @@ static bool is_input_group_busy(
         return false;
 
     vector<InputInfo> conflicts;
-    vector<uint> cardids = CardUtil::GetGroupCardIDs(groupid);
+    vector<uint> cardids = CardUtil::GetGroupInputIDs(groupid);
     for (uint i = 0; i < cardids.size(); i++)
     {
         if (find(excluded_cardids.begin(),
@@ -899,7 +899,7 @@ uint ChannelBase::GetCardID(void) const
     if (GetDevice().isEmpty())
         return 0;
 
-    return CardUtil::GetFirstCardID(GetDevice());
+    return CardUtil::GetFirstInputID(GetDevice());
 }
 
 int ChannelBase::GetChanID() const

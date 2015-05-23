@@ -96,7 +96,7 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
     }
 
 #ifdef USING_DVB
-    if (CardUtil::IsDVBCardType(cardtype))
+    if (CardUtil::IsDVBInputType(cardtype))
     {
         DVBChannel *dvbc = dynamic_cast<DVBChannel*>(channel);
         if (dvbc)
