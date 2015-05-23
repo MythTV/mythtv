@@ -26,8 +26,6 @@ MTV_PUBLIC QString get_on_input(const QString&, uint);
 
 MTV_PUBLIC bool set_on_input(const QString&, uint, const QString&);
 
-MTV_PUBLIC bool set_on_source(const QString&, uint, uint, const QString&);
-
 typedef enum
 {
     DVB_DEV_FRONTEND = 1,

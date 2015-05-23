@@ -581,23 +581,6 @@ bool set_on_input(const QString &to_set, uint inputid, const QString &value)
     return false;
 }
 
-bool set_on_source(const QString &to_set, uint inputid, uint sourceid,
-                   const QString &value)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        QString("UPDATE capturecard SET %1 = :VALUE ").arg(to_set) +
-        "WHERE cardid = :INPUTID");
-    query.bindValue(":INPUTID", inputid);
-    query.bindValue(":VALUE",  value);
-
-    if (query.exec())
-        return true;
-
-    MythDB::DBError("CardUtil::set_on_source", query);
-    return false;
-}
-
 /**
  *  \brief Returns all cardids of cards that uses the specified
  *         videodevice if specified, and optionally rawtype and a non-local
