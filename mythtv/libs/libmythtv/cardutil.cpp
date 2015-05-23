@@ -1974,7 +1974,7 @@ void CardUtil::GetCardInputs(
         // Always list the 1 through n+1 inputs
         if (needs_conf)
         {
-            for (uint i = 0; i <= list.size(); ++i)
+            for (int i = 0; i <= list.size(); ++i)
                 inputs += QString("DVBInput #%1").arg(i+1);
         }
 
