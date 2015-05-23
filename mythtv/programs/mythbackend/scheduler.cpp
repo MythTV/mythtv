@@ -1889,28 +1889,27 @@ bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
         return true;
 
     EncoderLink *rctv = (*m_tvList)[rcinfo->GetInputID()];
-    // first check the card we will be recording on...
+    // first check the input we will be recording on...
     if (rctv->IsBusyRecording())
         return true;
 
-    // now check other cards in the same input group as the recording.
+    // now check other inputs in the same input group as the recording.
     InputInfo busy_input;
     uint inputid = rcinfo->GetInputID();
-    vector<uint> cardids = CardUtil::GetConflictingCards(
-        inputid, rcinfo->GetInputID());
-    for (uint i = 0; i < cardids.size(); i++)
+    vector<uint> inputids = CardUtil::GetConflictingInputs(inputid);
+    for (uint i = 0; i < inputids.size(); i++)
     {
-        if (!m_tvList->contains(cardids[i]))
+        if (!m_tvList->contains(inputids[i]))
         {
 #if 0
             LOG(VB_SCHEDULE, LOG_ERR, LOC +
-                QString("IsBusyRecording() -> true, rctv(NULL) for card %2")
-                    .arg(cardids[i]));
+                QString("IsBusyRecording() -> true, rctv(NULL) for input %2")
+                    .arg(inputids[i]));
 #endif
             return true;
         }
 
-        rctv = (*m_tvList)[cardids[i]];
+        rctv = (*m_tvList)[inputids[i]];
         if (rctv->IsBusy(&busy_input, -1) &&
             (busy_input.mplexid == 0 ||
              busy_input.mplexid == 32767 ||

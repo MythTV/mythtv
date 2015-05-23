@@ -320,7 +320,7 @@ class MTV_PUBLIC CardUtil
     static bool         UnlinkInputGroup(uint inputid, uint inputgroupid);
     static vector<uint> GetInputGroups(uint inputid);
     static vector<uint> GetGroupCardIDs(uint inputgroupid);
-    static vector<uint> GetConflictingCards(uint inputid, uint exclude_cardid);
+    static vector<uint> GetConflictingInputs(uint inputid);
 
     static QString      GetDeviceLabel(const QString &cardtype,
                                        const QString &videodevice);

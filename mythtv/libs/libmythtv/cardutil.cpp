@@ -1387,36 +1387,33 @@ vector<uint> CardUtil::GetGroupCardIDs(uint inputgroupid)
     return list;
 }
 
-vector<uint> CardUtil::GetConflictingCards(uint inputid, uint exclude_cardid)
+vector<uint> CardUtil::GetConflictingInputs(uint inputid)
 {
+    vector<uint> inputids;
     vector<uint> inputgroupids = CardUtil::GetInputGroups(inputid);
 
     for (uint i = 0; i < inputgroupids.size(); i++)
     {
         LOG(VB_RECORD, LOG_INFO, LOC + QString("  Group ID %1")
                                      .arg(inputgroupids[i]));
-    }
 
-    vector<uint> cardids;
-    for (uint i = 0; i < inputgroupids.size(); i++)
-    {
         vector<uint> tmp = CardUtil::GetGroupCardIDs(inputgroupids[i]);
         for (uint j = 0; j < tmp.size(); j++)
         {
-            if (tmp[j] == exclude_cardid)
+            if (tmp[j] == inputid)
                 continue;
-
-            if (find(cardids.begin(), cardids.end(), tmp[j]) != cardids.end())
+            if (find(inputids.begin(), inputids.end(), tmp[j])
+                != inputids.end())
                 continue;
-
-            cardids.push_back(tmp[j]);
+            inputids.push_back(tmp[j]);
         }
     }
 
-    for (uint i = 0; i < cardids.size(); i++)
-        LOG(VB_RECORD, LOG_INFO, LOC + QString("  Card ID %1").arg(cardids[i]));
+    for (uint i = 0; i < inputids.size(); i++)
+        LOG(VB_RECORD, LOG_INFO,
+            LOC + QString("  Input ID %1").arg(inputids[i]));
 
-    return cardids;
+    return inputids;
 }
 
 bool CardUtil::GetTimeouts(uint cardid,

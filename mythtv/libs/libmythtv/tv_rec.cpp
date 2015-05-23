@@ -290,7 +290,7 @@ void TVRec::RecordPending(const ProgramInfo *rcinfo, int secsleft,
     if (secsleft < 0)
     {
         LOG(VB_RECORD, LOG_INFO, LOC + "Pending recording revoked on " +
-            QString("cardid %1").arg(rcinfo->GetInputID()));
+            QString("inputid %1").arg(rcinfo->GetInputID()));
 
         PendingMap::iterator it = pendingRecordings.find(rcinfo->GetInputID());
         if (it != pendingRecordings.end())
@@ -302,7 +302,7 @@ void TVRec::RecordPending(const ProgramInfo *rcinfo, int secsleft,
     }
 
     LOG(VB_RECORD, LOG_INFO, LOC +
-        QString("RecordPending on cardid %1").arg(rcinfo->GetInputID()));
+        QString("RecordPending on inputid %1").arg(rcinfo->GetInputID()));
 
     PendingInfo pending;
     pending.info            = new ProgramInfo(*rcinfo);
@@ -318,15 +318,15 @@ void TVRec::RecordPending(const ProgramInfo *rcinfo, int secsleft,
         return;
 
     // We also need to check our input groups
-    vector<uint> cardids = CardUtil::GetConflictingCards(
-        rcinfo->GetInputID(), cardid);
+    vector<uint> inputids = CardUtil::GetConflictingInputs(
+        rcinfo->GetInputID());
 
-    pendingRecordings[rcinfo->GetInputID()].possibleConflicts = cardids;
+    pendingRecordings[rcinfo->GetInputID()].possibleConflicts = inputids;
 
     pendlock.unlock();
     statelock.unlock();
-    for (uint i = 0; i < cardids.size(); i++)
-        RemoteRecordPending(cardids[i], rcinfo, secsleft, hasLater);
+    for (uint i = 0; i < inputids.size(); i++)
+        RemoteRecordPending(inputids[i], rcinfo, secsleft, hasLater);
     statelock.relock();
     pendlock.relock();
 }
