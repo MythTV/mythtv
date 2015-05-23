@@ -1550,7 +1550,7 @@ int RingBuffer::ReadPriv(void *buf, int count, bool peek)
     LOG(VB_FILE, LOG_DEBUG, LOC + loc_desc + " -- copying data");
 
     int rpos;
-    if (rbrpos + readOffset > bufferSize)
+    if (rbrpos + readOffset > (int) bufferSize)
     {
         rpos = (rbrpos + readOffset) - bufferSize;
     }
