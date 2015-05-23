@@ -217,13 +217,29 @@ QString GetFiltersDir(void) { return filtersdir; }
 #if CONFIG_DARWIN
 static const QString kPluginLibPrefix = "lib";
 static const QString kPluginLibSuffix = ".dylib";
+static const QString kFilterLibPrefix = "lib";
+static const QString kFilterLibSuffix = ".dylib";
 #elif _WIN32
 static const QString kPluginLibPrefix = "lib";
 static const QString kPluginLibSuffix = ".dll";
+static const QString kFilterLibPrefix = "lib";
+static const QString kFilterLibSuffix = ".dll";
+#elif ANDROID
+static const QString kPluginLibPrefix = "libmythplugin";
+static const QString kPluginLibSuffix = ".so";
+static const QString kFilterLibPrefix = "libmythfilter";
+static const QString kFilterLibSuffix = ".so";
 #else
 static const QString kPluginLibPrefix = "lib";
 static const QString kPluginLibSuffix = ".so";
+static const QString kFilterLibPrefix = "lib";
+static const QString kFilterLibSuffix = ".so";
 #endif
+
+QString GetFiltersNameFilter(void)
+{
+    return kFilterLibPrefix + '*' + kFilterLibSuffix;
+}
 
 QString GetPluginsNameFilter(void)
 {

@@ -68,6 +68,8 @@ FilterManager::FilterManager()
     QDir FiltDir(GetFiltersDir());
 
     FiltDir.setFilter(QDir::Files | QDir::Readable);
+    QString filter = GetFiltersNameFilter();
+    FiltDir.setNameFilters(QStringList(filter));
     if (FiltDir.exists())
     {
         QStringList LibList = FiltDir.entryList();
