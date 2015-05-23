@@ -7768,7 +7768,6 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
         }
 
         uint new_cardid = testrec->GetRecorderNumber();
-        uint sourceid = ChannelUtil::GetSourceIDForChannel(chanid);
         uint inputid = new_cardid;
 
         // found the card on a different recorder.
