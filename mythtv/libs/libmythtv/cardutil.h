@@ -268,11 +268,11 @@ class MTV_PUBLIC CardUtil
     static int          GetValueInt(const QString &col, uint inputid)
         { return get_on_input(col, inputid).toInt(); }
     static bool         SetValue(const QString &col, uint inputid,
-                                 uint sid, int val)
-        { return set_on_source(col, inputid, sid, QString::number(val)); }
+                                 int val)
+        { return set_on_input(col, inputid, QString::number(val)); }
     static bool         SetValue(const QString &col, uint inputid,
-                                 uint sid, const QString &val)
-        { return set_on_source(col, inputid, sid, val); }
+                                 const QString &val)
+        { return set_on_input(col, inputid, val); }
 
     static bool         SetStartChannel(uint inputid,
                                         const QString &channum);

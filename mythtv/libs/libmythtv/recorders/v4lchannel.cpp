@@ -915,8 +915,7 @@ int V4LChannel::ChangePictureAttribute(
         int tmp = new_value - old_value + adj_value;
         tmp = (tmp < 0)      ? tmp + 0x10000 : tmp;
         tmp = (tmp > 0xffff) ? tmp - 0x10000 : tmp;
-        CardUtil::SetValue(db_col_name, GetCardID(),
-                           GetCurrentSourceID(), tmp);
+        CardUtil::SetValue(db_col_name, GetCardID(), tmp);
     }
 
     return new_value;
