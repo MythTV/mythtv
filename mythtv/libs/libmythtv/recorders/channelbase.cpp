@@ -552,12 +552,12 @@ bool ChannelBase::IsInputAvailable(
     return res;
 }
 
-/** \fn ChannelBase::GetFreeInputs(const vector<uint>&) const
+/** \fn ChannelBase::GetFreeInputs(uint) const
  *  \brief Returns the recorders available inputs.
  *
  *   This filters out the connected inputs that belong to an input
- *   group which is busy. Recorders in the excluded cardids will
- *   not be considered busy for the sake of determining free inputs.
+ *   group which is busy.  The excluded input recorder will not be
+ *   considered busy for the sake of determining free inputs.
  *
  */
 vector<InputInfo> ChannelBase::GetFreeInputs(uint excluded_input) const
