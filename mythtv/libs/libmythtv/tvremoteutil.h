@@ -46,7 +46,6 @@ MTV_PUBLIC vector<uint>
 RemoteRequestFreeInputList(uint excluded_input);
 MTV_PUBLIC vector<InputInfo> RemoteRequestFreeInputList(
     uint cardid, uint excluded_input);
-MTV_PUBLIC InputInfo RemoteRequestBusyInputID(uint cardid);
 MTV_PUBLIC bool RemoteIsBusy(uint cardid, InputInfo &busy_input);
 
 MTV_PUBLIC bool RemoteGetRecordingStatus(

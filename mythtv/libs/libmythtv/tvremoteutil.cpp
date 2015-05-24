@@ -308,27 +308,6 @@ vector<InputInfo> RemoteRequestFreeInputList(
     return list;
 }
 
-InputInfo RemoteRequestBusyInputID(uint cardid)
-{
-    InputInfo blank;
-
-    QStringList strlist(QString("QUERY_RECORDER %1").arg(cardid));
-    strlist << "GET_BUSY_INPUT";
-
-    if (!gCoreContext->SendReceiveStringList(strlist))
-        return blank;
-
-    QStringList::const_iterator it = strlist.begin();
-    if ((it == strlist.end()) || (*it == "EMPTY_LIST"))
-        return blank;
-
-    InputInfo info;
-    if (info.FromStringList(it, strlist.end()))
-        return info;
-
-    return blank;
-}
-
 bool RemoteIsBusy(uint cardid, InputInfo &busy_input)
 {
 #if 0
