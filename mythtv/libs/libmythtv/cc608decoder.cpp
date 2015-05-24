@@ -120,25 +120,34 @@ static const int rowdata[] =
 
 static const QChar specialchar[] =
 {
-    '®', '°', '½', '¿', 0x2122 /* TM */, '¢', '£', 0x266A /* 1/8 note */,
-    'à', ' ', 'è', 'â', 'ê', 'î', 'ô', 'û'
+    QLatin1Char('®'), QLatin1Char('°'), QLatin1Char('½'), QLatin1Char('¿'),
+    0x2122 /* TM */,  QLatin1Char('¢'), QLatin1Char('£'), 0x266A /* 1/8 note */,
+    QLatin1Char('à'), QLatin1Char(' '), QLatin1Char('è'), QLatin1Char('â'),
+    QLatin1Char('ê'), QLatin1Char('î'), QLatin1Char('ô'), QLatin1Char('û')
 };
 
 static const QChar extendedchar2[] =
 {
-    'Á', 'É', 'Ó', 'Ú', 'Ü', 'ü', '`', '¡',
-    '*', '\'', 0x2014 /* dash */, '©',
-    0x2120 /* SM */, '·', 0x201C, 0x201D /* double quotes */,
-    'À', 'Â', 'Ç', 'È', 'Ê', 'Ë', 'ë', 'Î',
-    'Ï', 'ï', 'Ô', 'Ù', 'ù', 'Û', '«', '»'
+    QLatin1Char('Á'), QLatin1Char('É'),  QLatin1Char('Ó'), QLatin1Char('Ú'),
+    QLatin1Char('Ü'), QLatin1Char('ü'),  QLatin1Char('`'), QLatin1Char('¡'),
+    QLatin1Char('*'), QLatin1Char('\''), 0x2014 /* dash */, QLatin1Char('©'),
+    0x2120 /* SM */,  QLatin1Char('·'),  0x201C, 0x201D /* double quotes */,
+    QLatin1Char('À'), QLatin1Char('Â'),  QLatin1Char('Ç'), QLatin1Char('È'),
+    QLatin1Char('Ê'), QLatin1Char('Ë'),  QLatin1Char('ë'), QLatin1Char('Î'),
+    QLatin1Char('Ï'), QLatin1Char('ï'),  QLatin1Char('Ô'), QLatin1Char('Ù'),
+    QLatin1Char('ù'), QLatin1Char('Û'),  QLatin1Char('«'), QLatin1Char('»')
 };
 
 static const QChar extendedchar3[] =
 {
-    'Ã', 'ã', 'Í', 'Ì', 'ì', 'Ò', 'ò', 'Õ',
-    'õ', '{', '}', '\\', '^', '_', '¦', '~',
-    'Ä', 'ä', 'Ö', 'ö', 'ß', '¥', '¤', '|',
-    'Å', 'å', 'Ø', 'ø', 0x250C, 0x2510, 0x2514, 0x2518 /* box drawing */
+    QLatin1Char('Ã'), QLatin1Char('ã'), QLatin1Char('Í'), QLatin1Char('Ì'),
+    QLatin1Char('ì'), QLatin1Char('Ò'), QLatin1Char('ò'), QLatin1Char('Õ'),
+    QLatin1Char('õ'), QLatin1Char('{'), QLatin1Char('}'), QLatin1Char('\\'),
+    QLatin1Char('^'), QLatin1Char('_'), QLatin1Char('¦'), QLatin1Char('~'),
+    QLatin1Char('Ä'), QLatin1Char('ä'), QLatin1Char('Ö'), QLatin1Char('ö'),
+    QLatin1Char('ß'), QLatin1Char('¥'), QLatin1Char('¤'), QLatin1Char('|'),
+    QLatin1Char('Å'), QLatin1Char('å'), QLatin1Char('Ø'), QLatin1Char('ø'),
+    0x250C, 0x2510, 0x2514, 0x2518 /* box drawing */
 };
 
 void CC608Decoder::FormatCCField(int tc, int field, int data)
