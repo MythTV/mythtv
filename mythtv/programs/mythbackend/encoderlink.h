@@ -114,7 +114,7 @@ class EncoderLink
     void PauseRecorder(void);
     void SetLiveRecording(int);
     void SetNextLiveTVDir(QString dir);
-    std::vector<InputInfo> GetFreeInputs(const std::vector<uint> &excluded_cards);
+    std::vector<InputInfo> GetFreeInputs(uint excluded_input);
     QString GetInput(void) const;
     QString SetInput(QString);
     void ToggleChannelFavorite(QString);

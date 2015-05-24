@@ -3001,12 +3001,11 @@ int TVRec::ChangePictureAttribute(PictureAdjustType type,
  *   not be considered busy for the sake of determining free inputs.
  *
  */
-vector<InputInfo> TVRec::GetFreeInputs(
-    const vector<uint> &excluded_cardids) const
+vector<InputInfo> TVRec::GetFreeInputs(uint excluded_input) const
 {
     vector<InputInfo> list;
     if (channel)
-        list = channel->GetFreeInputs(excluded_cardids);
+        list = channel->GetFreeInputs(excluded_input);
     return list;
 }
 

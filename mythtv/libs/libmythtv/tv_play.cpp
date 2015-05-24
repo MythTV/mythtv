@@ -2297,9 +2297,7 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
             if (reclist.size())
             {
                 RemoteEncoder *testrec = NULL;
-                vector<uint> excluded_cardids;
-                testrec = RemoteRequestFreeRecorderFromList(reclist,
-                                                            excluded_cardids);
+                testrec = RemoteRequestFreeRecorderFromList(reclist, 0);
                 if (testrec && testrec->IsValidRecorder())
                 {
                     ctx->SetRecorder(testrec);
@@ -7013,9 +7011,7 @@ void TV::SwitchSource(PlayerContext *ctx, uint source_direction)
 {
     QMap<uint,InputInfo> sources;
     uint         cardid  = ctx->GetCardID();
-    vector<uint> excluded_cardids;
-    excluded_cardids.push_back(cardid);
-    vector<uint> cardids = RemoteRequestFreeRecorderList(excluded_cardids);
+    vector<uint> cardids = RemoteRequestFreeRecorderList(cardid);
     stable_sort(cardids.begin(), cardids.end());
 
     InfoMap info;
@@ -7025,8 +7021,7 @@ void TV::SwitchSource(PlayerContext *ctx, uint source_direction)
     vector<uint>::const_iterator it = cardids.begin();
     for (; it != cardids.end(); ++it)
     {
-        vector<InputInfo> inputs = RemoteRequestFreeInputList(
-            *it, excluded_cardids);
+        vector<InputInfo> inputs = RemoteRequestFreeInputList(*it, cardid);
 
         if (inputs.empty())
             continue;
@@ -7131,11 +7126,7 @@ void TV::SwitchCards(PlayerContext *ctx,
     }
 
     if (!reclist.empty())
-    {
-        vector<uint> excluded_cardids;
-        excluded_cardids.push_back(ctx->GetCardID());
-        testrec = RemoteRequestFreeRecorderFromList(reclist, excluded_cardids);
-    }
+        testrec = RemoteRequestFreeRecorderFromList(reclist, ctx->GetCardID());
 
     if (testrec && testrec->IsValidRecorder())
     {
@@ -7305,10 +7296,7 @@ void TV::ToggleInputs(PlayerContext *ctx, uint inputid)
     QString inputname = curinputname;
 
     uint cardid = ctx->GetCardID();
-    vector<uint> excluded_cardids;
-    excluded_cardids.push_back(cardid);
-    vector<InputInfo> inputs = RemoteRequestFreeInputList(
-        cardid, excluded_cardids);
+    vector<InputInfo> inputs = RemoteRequestFreeInputList(cardid, cardid);
 
     vector<InputInfo>::const_iterator it = inputs.end();
 
@@ -7767,9 +7755,7 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
     if (reclist.size())
     {
         RemoteEncoder *testrec = NULL;
-        vector<uint> excluded_cardids;
-        excluded_cardids.push_back(ctx->GetCardID());
-        testrec = RemoteRequestFreeRecorderFromList(reclist, excluded_cardids);
+        testrec = RemoteRequestFreeRecorderFromList(reclist, ctx->GetCardID());
         if (!testrec || !testrec->IsValidRecorder())
         {
             ClearInputQueues(ctx, true);
@@ -8490,16 +8476,18 @@ QSet<uint> TV::IsTunableOn(TV *tv,
     uint mplexid = ChannelUtil::GetMplexID(chanid);
     mplexid = (32767 == mplexid) ? 0 : mplexid;
 
-    vector<uint> excluded_cards;
+    uint excluded_input = 0;
     if (ctx && ctx->recorder && ctx->pseudoLiveTVState == kPseudoNormalLiveTV)
-        excluded_cards.push_back(ctx->GetCardID());
+        excluded_input = ctx->GetCardID();
 
     uint sourceid = ChannelUtil::GetSourceIDForChannel(chanid);
-    vector<uint> connected   = RemoteRequestFreeRecorderList(excluded_cards);
+    vector<uint> connected   = RemoteRequestFreeRecorderList(excluded_input);
     vector<uint> interesting = CardUtil::GetInputIDs(sourceid);
 
     // filter disconnected cards
-    vector<uint> cardids = excluded_cards;
+    vector<uint> cardids;
+    if (excluded_input)
+        cardids.push_back(excluded_input);
     for (uint i = 0; i < connected.size(); i++)
     {
         for (uint j = 0; j < interesting.size(); j++)
@@ -8541,7 +8529,7 @@ QSet<uint> TV::IsTunableOn(TV *tv,
 
         if (!used_cache)
         {
-            inputs = RemoteRequestFreeInputList(cardids[i], excluded_cards);
+            inputs = RemoteRequestFreeInputList(cardids[i], excluded_input);
             if (tv)
             {
                 QMutexLocker locker(&tv->is_tunable_cache_lock);
@@ -11808,9 +11796,7 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
         {
             vector<uint> cardids = CardUtil::GetLiveTVCardList();
             uint cardid  = ctx->GetCardID();
-            vector<uint> excluded_cardids;
             stable_sort(cardids.begin(), cardids.end());
-            excluded_cardids.push_back(cardid);
             vector<uint>::const_iterator it = cardids.begin();
             InfoMap info;
             ctx->recorder->GetChannelInfo(info);
@@ -11818,7 +11804,7 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
             for (; it != cardids.end(); ++it)
             {
                 vector<InputInfo> inputs =
-                    RemoteRequestFreeInputList(*it, excluded_cardids);
+                    RemoteRequestFreeInputList(*it, cardid);
 
                 for (uint i = 0; i < inputs.size(); i++)
                 {
@@ -11854,11 +11840,9 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
             QMap<uint,InputInfo> sources;
             vector<uint> cardids;
             uint cardid = 0;
-            vector<uint> excluded_cardids;
             uint sourceid = 0;
             cardids = CardUtil::GetLiveTVCardList();
             cardid  = ctx->GetCardID();
-            excluded_cardids.push_back(cardid);
             InfoMap info;
             ctx->recorder->GetChannelInfo(info);
             sourceid = info["sourceid"].toUInt();
@@ -11867,7 +11851,7 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
             for (; it != cardids.end(); ++it)
             {
                 vector<InputInfo> inputs =
-                    RemoteRequestFreeInputList(*it, excluded_cardids);
+                    RemoteRequestFreeInputList(*it, cardid);
                 if (inputs.empty())
                     continue;
 

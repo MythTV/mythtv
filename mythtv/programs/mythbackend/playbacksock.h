@@ -102,7 +102,7 @@ class PlaybackSock : public ReferenceCounter
     int SetSignalMonitoringRate(int capturecardnum, int rate, int notifyFrontend);
     void SetNextLiveTVDir(int capturecardnum, QString dir);
     vector<InputInfo> GetFreeInputs(int capturecardnum,
-                                    const vector<uint> &excluded_cardids);
+                                    uint excluded_input);
     void CancelNextRecording(int capturecardnum, bool cancel);
 
     QStringList ForwardRequest(const QStringList&);

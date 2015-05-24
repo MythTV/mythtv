@@ -412,7 +412,7 @@ bool ChannelBase::SwitchToInput(int newInputNum, bool setstarting)
 static bool is_input_group_busy(
     uint                       inputid,
     uint                       groupid,
-    const vector<uint>        &excluded_cardids,
+    uint                      excluded_input,
     QMap<uint,bool>           &busygrp,
     QMap<uint,bool>           &busyrec,
     QMap<uint,InputInfo>      &busyin,
@@ -431,11 +431,8 @@ static bool is_input_group_busy(
     vector<uint> cardids = CardUtil::GetGroupInputIDs(groupid);
     for (uint i = 0; i < cardids.size(); i++)
     {
-        if (find(excluded_cardids.begin(),
-                 excluded_cardids.end(), cardids[i]) != excluded_cardids.end())
-        {
+        if (excluded_input == cardids[i])
             continue;
-        }
 
         InputInfo info;
         QMap<uint,bool>::const_iterator it = busyrec.find(cardids[i]);
@@ -502,7 +499,7 @@ static bool is_input_group_busy(
 static bool is_input_busy(
     uint                       inputid,
     const vector<uint>        &groupids,
-    const vector<uint>        &excluded_cardids,
+    uint                      excluded_input,
     QMap<uint,bool>           &busygrp,
     QMap<uint,bool>           &busyrec,
     QMap<uint,InputInfo>      &busyin,
@@ -513,7 +510,7 @@ static bool is_input_busy(
     for (uint i = 0; i < groupids.size() && !is_busy; i++)
     {
         is_busy |= is_input_group_busy(
-            inputid, groupids[i], excluded_cardids,
+            inputid, groupids[i], excluded_input,
             busygrp, busyrec, busyin, mplexid_restriction, chanid_restriction);
     }
     return is_busy;
@@ -544,15 +541,12 @@ bool ChannelBase::IsInputAvailable(
         }
     }
 
-    vector<uint> excluded_cardids;
-    excluded_cardids.push_back(cid);
-
     mplexid_restriction = 0;
     chanid_restriction = 0;
 
     vector<uint> groupids = CardUtil::GetInputGroups(inputid);
 
-    bool res = !is_input_busy(inputid, groupids, excluded_cardids,
+    bool res = !is_input_busy(inputid, groupids, cid,
                           busygrp, busyrec, busyin, mplexid_restriction,
                           chanid_restriction);
     return res;
@@ -566,8 +560,7 @@ bool ChannelBase::IsInputAvailable(
  *   not be considered busy for the sake of determining free inputs.
  *
  */
-vector<InputInfo> ChannelBase::GetFreeInputs(
-    const vector<uint> &excluded_cardids) const
+vector<InputInfo> ChannelBase::GetFreeInputs(uint excluded_input) const
 {
     vector<InputInfo> new_list;
 
@@ -596,12 +589,8 @@ vector<InputInfo> ChannelBase::GetFreeInputs(
     }
 
     // If we're busy and not excluded, all inputs are busy
-    if (busyrec[cid] &&
-        (find(excluded_cardids.begin(), excluded_cardids.end(),
-              cid) == excluded_cardids.end()))
-    {
+    if (busyrec[cid] && cid != excluded_input)
         return new_list;
-    }
 
     QStringList::const_iterator it;
     for (it = list.begin(); it != list.end(); ++it)
@@ -614,7 +603,7 @@ vector<InputInfo> ChannelBase::GetFreeInputs(
             continue;
 
         bool is_busy_grp = is_input_busy(
-            info.inputid, groupids, excluded_cardids,
+            info.inputid, groupids, excluded_input,
             busygrp, busyrec, busyin, info.mplexid, info.chanid);
 
         if (!is_busy_grp && info.livetvorder)

@@ -143,7 +143,7 @@ RemoteEncoder *RemoteRequestNextFreeRecorder(int curr)
 }
 
 static void
-RemoteRequestFreeRecorderInputList(const vector<uint> &excluded_cardids,
+RemoteRequestFreeRecorderInputList(uint excluded_input,
                                    vector<uint> &cardids,
                                    vector<uint> &inputids)
 {
@@ -165,7 +165,7 @@ RemoteRequestFreeRecorderInputList(const vector<uint> &excluded_cardids,
     for (uint i = 0; i < cards.size(); i++)
     {
         vector<InputInfo> inputs =
-            RemoteRequestFreeInputList(cards[i], excluded_cardids);
+            RemoteRequestFreeInputList(cards[i], excluded_input);
         for (uint j = 0; j < inputs.size(); j++)
         {
             if (find(cardids.begin(),
@@ -187,22 +187,22 @@ RemoteRequestFreeRecorderInputList(const vector<uint> &excluded_cardids,
 /**
  * Given a list of recorder numbers, return the first available.
  */
-vector<uint> RemoteRequestFreeRecorderList(const vector<uint> &excluded_cardids)
+vector<uint> RemoteRequestFreeRecorderList(uint excluded_input)
 {
     vector<uint> cardids, inputids;
-    RemoteRequestFreeRecorderInputList(excluded_cardids, cardids, inputids);
+    RemoteRequestFreeRecorderInputList(excluded_input, cardids, inputids);
     return cardids;
 }
 
-vector<uint> RemoteRequestFreeInputList(const vector<uint> &excluded_cardids)
+vector<uint> RemoteRequestFreeInputList(uint excluded_input)
 {
     vector<uint> cardids, inputids;
-    RemoteRequestFreeRecorderInputList(excluded_cardids, cardids, inputids);
+    RemoteRequestFreeRecorderInputList(excluded_input, cardids, inputids);
     return inputids;
 }
 
 RemoteEncoder *RemoteRequestFreeRecorderFromList
-(const QStringList &qualifiedRecorders, const vector<uint> &excluded_cardids)
+(const QStringList &qualifiedRecorders, uint excluded_input)
 {
 #if 0
     QStringList strlist( "GET_FREE_RECORDER_LIST" );
@@ -226,7 +226,7 @@ RemoteEncoder *RemoteRequestFreeRecorderFromList
     return NULL;
 #endif
     vector<uint> freeRecorders =
-        RemoteRequestFreeRecorderList(excluded_cardids);
+        RemoteRequestFreeRecorderList(excluded_input);
     for (QStringList::const_iterator recIter = qualifiedRecorders.begin();
          recIter != qualifiedRecorders.end(); ++recIter)
     {
@@ -282,14 +282,13 @@ RemoteEncoder *RemoteGetExistingRecorder(int recordernum)
 }
 
 vector<InputInfo> RemoteRequestFreeInputList(
-    uint cardid, const vector<uint> &excluded_cardids)
+    uint cardid, uint excluded_input)
 {
     vector<InputInfo> list;
 
     QStringList strlist(QString("QUERY_RECORDER %1").arg(cardid));
     strlist << "GET_FREE_INPUTS";
-    for (uint i = 0; i < excluded_cardids.size(); i++)
-        strlist << QString::number(excluded_cardids[i]);
+    strlist << QString::number(excluded_input);
 
     if (!gCoreContext->SendReceiveStringList(strlist))
         return list;

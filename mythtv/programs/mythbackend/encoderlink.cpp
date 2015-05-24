@@ -773,17 +773,16 @@ void EncoderLink::SetNextLiveTVDir(QString dir)
  *
  *  \sa TVRec::GetFreeInputs(const vector<uint>&) const
  */
-vector<InputInfo> EncoderLink::GetFreeInputs(
-    const vector<uint> &excluded_cardids)
+vector<InputInfo> EncoderLink::GetFreeInputs(uint excluded_input)
 {
     vector<InputInfo> list;
 
     if (local)
-        list = tv->GetFreeInputs(excluded_cardids);
+        list = tv->GetFreeInputs(excluded_input);
     else if (HasSockAndIncrRef())
     {
         ReferenceLocker rlocker(sock);
-        list = sock->GetFreeInputs(m_capturecardnum, excluded_cardids);
+        list = sock->GetFreeInputs(m_capturecardnum, excluded_input);
     }
 
     return list;
