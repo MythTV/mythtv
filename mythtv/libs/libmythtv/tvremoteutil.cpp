@@ -170,9 +170,9 @@ RemoteRequestFreeRecorderInputList(uint excluded_input,
         {
             if (find(cardids.begin(),
                      cardids.end(),
-                     inputs[j].cardid) == cardids.end())
+                     inputs[j].inputid) == cardids.end())
             {
-                cardids.push_back(inputs[j].cardid);
+                cardids.push_back(inputs[j].inputid);
                 inputids.push_back(inputs[j].inputid);
             }
         }

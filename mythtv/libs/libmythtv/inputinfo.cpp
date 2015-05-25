@@ -5,12 +5,11 @@
 
 InputInfo::InputInfo(
     const QString &_name,
-    uint _sourceid, uint _inputid, uint _cardid, uint _mplexid, uint _chanid,
+    uint _sourceid, uint _inputid, uint _mplexid, uint _chanid,
     uint _livetvorder) :
     name(_name),
     sourceid(_sourceid),
     inputid(_inputid),
-    cardid(_cardid),
     mplexid(_mplexid),
     chanid(_chanid),
     recPriority(0),
@@ -41,7 +40,7 @@ bool InputInfo::FromStringList(QStringList::const_iterator &it,
 
     sourceid = (*it).toUInt(); NEXT();
     inputid  = (*it).toUInt(); NEXT();
-    cardid   = (*it).toUInt(); NEXT();
+    NEXT(); // obsolete cardid
     mplexid  = (*it).toUInt(); NEXT();
     livetvorder = (*it).toUInt(); NEXT();
 
@@ -64,7 +63,7 @@ void InputInfo::ToStringList(QStringList &list) const
     list.push_back(name.isEmpty() ? "<EMPTY>" : name);
     list.push_back(QString::number(sourceid));
     list.push_back(QString::number(inputid));
-    list.push_back(QString::number(cardid));
+    list.push_back(QString::number(inputid)); // obsolete cardid
     list.push_back(QString::number(mplexid));
     list.push_back(QString::number(livetvorder));
     list.push_back(displayName.isEmpty() ? "<EMPTY>" : displayName);

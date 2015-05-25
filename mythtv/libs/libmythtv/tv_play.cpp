@@ -7030,8 +7030,8 @@ void TV::SwitchSource(PlayerContext *ctx, uint source_direction)
         {
             // prefer the current card's input in sources list
             if ((sources.find(inputs[i].sourceid) == sources.end()) ||
-                ((cardid == inputs[i].cardid) &&
-                 (cardid != sources[inputs[i].sourceid].cardid)))
+                ((cardid == inputs[i].inputid) &&
+                 (cardid != sources[inputs[i].sourceid].inputid)))
             {
                 sources[inputs[i].sourceid] = inputs[i];
             }
@@ -11809,7 +11809,7 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
                 for (uint i = 0; i < inputs.size(); i++)
                 {
                     // don't add current input to list
-                    if ((inputs[i].cardid   == cardid) &&
+                    if ((inputs[i].inputid   == cardid) &&
                         (inputs[i].sourceid == sourceid))
                     {
                         continue;

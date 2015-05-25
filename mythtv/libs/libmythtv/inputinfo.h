@@ -13,18 +13,17 @@ class MTV_PUBLIC InputInfo
 {
   public:
     InputInfo() : name(QString::null),
-                  sourceid(0), inputid(0), cardid(0), mplexid(0),
+                  sourceid(0), inputid(0), mplexid(0),
                   chanid(0), recPriority(0), scheduleOrder(0),
                   livetvorder(0), quickTune(false) {}
     InputInfo(const QString &name,
-              uint sourceid, uint inputid, uint cardid, uint mplexid, 
+              uint sourceid, uint inputid, uint mplexid,
               uint chanid, uint livetvorder);
 
     InputInfo(const InputInfo &other) :
         name(other.name),
         sourceid(other.sourceid),
         inputid(other.inputid),
-        cardid(other.cardid),
         mplexid(other.mplexid),
         chanid(other.chanid),
         displayName(other.displayName),
@@ -42,7 +41,6 @@ class MTV_PUBLIC InputInfo
         name.detach();
         sourceid = other.sourceid;
         inputid  = other.inputid;
-        cardid   = other.cardid;
         mplexid  = other.mplexid;
         chanid   = other.chanid;
         displayName = other.displayName;
@@ -72,7 +70,6 @@ class MTV_PUBLIC InputInfo
     QString name;     ///< input name
     uint    sourceid; ///< associated channel listings source
     uint    inputid;  ///< unique key in DB for this input
-    uint    cardid;   ///< card id associated with input
     uint    mplexid;  ///< mplexid restriction if applicable
     uint    chanid;   ///< chanid restriction if applicable
     QString displayName;
@@ -91,11 +88,11 @@ class MTV_PUBLIC ChannelInputInfo : public InputInfo
         inputNumV4L(-1), videoModeV4L2(0) {}
     ChannelInputInfo(QString _name,            QString _startChanNum,
                      QString _tuneToChannel,   QString _externalChanger,
-                     uint    _sourceid,        uint    _cardid,
+                     uint    _sourceid,
                      uint    _inputid,         uint    _mplexid,
                      uint    _livetvorder,
                      const ChannelInfoList &_channels) :
-        InputInfo(_name, _sourceid, _inputid, _cardid, _mplexid, 0,
+        InputInfo(_name, _sourceid, _inputid, _mplexid, 0,
                   _livetvorder),
         startChanNum(_startChanNum),
         tuneToChannel(_tuneToChannel),  externalChanger(_externalChanger),

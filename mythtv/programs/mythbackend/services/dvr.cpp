@@ -412,7 +412,7 @@ DTC::EncoderList* Dvr::GetEncoderList()
             for (; it < inputInfoList.end(); ++it)
             {
                 InputInfo inputInfo = *it;
-                if (inputInfo.cardid == static_cast<uint>(elink->GetCardID()))
+                if (inputInfo.inputid == static_cast<uint>(elink->GetCardID()))
                 {
                     DTC::Input *input = pEncoder->AddNewInput();
                     FillInputInfo(input, inputInfo);

@@ -4218,7 +4218,7 @@ void MainServer::HandleGetFreeRecorderList(PlaybackSock *pbs)
     QMap<int, bool> cardidused;
     for (uint i = 0; i < allinputs.size(); ++i)
     {
-        uint cardid = allinputs[i].cardid;
+        uint cardid = allinputs[i].inputid;
         if (!cardidused[cardid])
         {
             strlist << QString::number(cardid);

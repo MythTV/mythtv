@@ -617,7 +617,7 @@ uint ChannelBase::GetInputCardID(int inputNum) const
 {
     InputMap::const_iterator it = m_inputs.find(inputNum);
     if (it != m_inputs.end())
-        return (*it)->cardid;
+        return (*it)->inputid;
     return 0;
 }
 
@@ -968,7 +968,7 @@ bool ChannelBase::InitializeInputs(void)
         m_inputs[query.value(0).toUInt()] = new ChannelInputInfo(
             query.value(1).toString(), query.value(2).toString(),
             query.value(3).toString(), query.value(4).toString(),
-            sourceid,                  cardid,
+            sourceid,
             query.value(0).toUInt(),   query.value(5).toUInt(),
             0,                         channels);
 
@@ -996,9 +996,9 @@ bool ChannelBase::InitializeInputs(void)
     for (it = m_inputs.begin(); it != m_inputs.end(); ++it)
     {
         LOG(VB_CHANNEL, LOG_INFO, LOC +
-            QString("Input #%1: '%2' schan(%3) sourceid(%4) ccid(%5)")
+            QString("Input #%1: '%2' schan(%3) sourceid(%4)")
             .arg(it.key()).arg((*it)->name).arg((*it)->startChanNum)
-            .arg((*it)->sourceid).arg((*it)->cardid));
+            .arg((*it)->sourceid));
     }
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Current Input #%1: '%2'")
         .arg(GetCurrentInputNum()).arg(GetCurrentInput()));
