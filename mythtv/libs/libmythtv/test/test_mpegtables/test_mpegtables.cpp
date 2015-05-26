@@ -232,7 +232,17 @@ void TestMPEGTables::PrivateUPCCablecomEpisodetitleDescriptor_test (void)
 
 void TestMPEGTables::ItemList_test (void)
 {
+    ShortEventDescriptor descriptor(&eit_data_0000[26]);
+    QVERIFY  (descriptor.IsValid());
+    QCOMPARE (descriptor.DescriptorTag(), (unsigned int) DescriptorID::short_event);
+    QCOMPARE (descriptor.size(), (unsigned int) 194);
+    QCOMPARE (descriptor.LanguageString(), QString("ger"));
+    QVERIFY  (descriptor.Text().startsWith(QString("Krimiserie. ")));
 
+    ExtendedEventDescriptor descriptor2(&eit_data_0000[26+descriptor.size()]);
+    QCOMPARE (descriptor2.DescriptorTag(), (unsigned int) DescriptorID::extended_event);
+    /* tests for items start here */
+    QCOMPARE (descriptor2.LengthOfItems(), (uint) 139);
 }
 
 QTEST_APPLESS_MAIN(TestMPEGTables)

@@ -29,6 +29,9 @@
 #define MSKIP(MSG) QSKIP(MSG)
 #endif
 
+/* test data */
+extern unsigned char eit_data_0000[];
+
 class TestMPEGTables: public QObject
 {
     Q_OBJECT
