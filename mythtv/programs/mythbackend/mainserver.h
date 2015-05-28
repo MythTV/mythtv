@@ -181,6 +181,7 @@ class MainServer : public QObject, public MythSocketCBs
     void HandleGetExpiringRecordings(PlaybackSock *pbs);
     void HandleSGGetFileList(QStringList &sList, PlaybackSock *pbs);
     void HandleSGFileQuery(QStringList &sList, PlaybackSock *pbs);
+    void HandleGetFreeInputInfo(PlaybackSock *pbs, uint excluded_input);
     void HandleGetNextFreeRecorder(QStringList &slist, PlaybackSock *pbs);
     void HandleGetFreeRecorder(PlaybackSock *pbs);
     void HandleGetFreeRecorderCount(PlaybackSock *pbs);

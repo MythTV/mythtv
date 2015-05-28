@@ -77,6 +77,7 @@ using namespace std;
 #include "imagescanner.h"
 #include "imagethumbs.h"
 #include "imagehandlers.h"
+#include "cardutil.h"
 
 // mythbackend headers
 #include "backendcontext.h"
@@ -674,6 +675,13 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     else if (command == "QUERY_SG_FILEQUERY")
     {
         HandleSGFileQuery(listline, pbs);
+    }
+    else if (command == "GET_FREE_INPUT_INFO")
+    {
+        if (tokens.size() != 2)
+            SendErrorResponse(pbs, "Bad GET_FREE_INPUT_INFO");
+        else
+            HandleGetFreeInputInfo(pbs, tokens[1].toUInt());
     }
     else if (command == "GET_FREE_RECORDER")
     {
@@ -4191,7 +4199,114 @@ void MainServer::HandleGetFreeRecorderCount(PlaybackSock *pbs)
 
 static bool comp_livetvorder(const InputInfo &a, const InputInfo &b)
 {
-    return a.livetvorder < b.livetvorder;
+    if (a.livetvorder != b.livetvorder)
+        return a.livetvorder < b.livetvorder;
+    return a.inputid < b.inputid;
+}
+
+void MainServer::HandleGetFreeInputInfo(PlaybackSock *pbs,
+                                        uint excluded_input)
+{
+    LOG(VB_CHANNEL, LOG_INFO,
+        LOC + QString("Excluding input %1")
+        .arg(excluded_input));
+
+    MythSocket *pbssock = pbs->getSocket();
+    vector<InputInfo> busyinputs;
+    vector<InputInfo> freeinputs;
+    QMap<uint, QSet<uint> > groupids;
+
+    // Lopp over each encoder and divide the inputs into busy and free
+    // lists.
+    QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
+    for (; iter != encoderList->end(); ++iter)
+    {
+        EncoderLink *elink = *iter;
+        InputInfo info;
+        info.inputid = elink->GetCardID();
+
+        if (!elink->IsConnected() || elink->IsTunerLocked())
+        {
+            LOG(VB_CHANNEL, LOG_INFO,
+                LOC + QString("Input %1 is locked or not connected")
+                .arg(info.inputid));
+            continue;
+        }
+
+        vector<uint> infogroups;
+        CardUtil::GetInputInfo(info, &infogroups);
+        for (uint i = 0; i < infogroups.size(); ++i)
+            groupids[info.inputid].insert(infogroups[i]);
+
+        InputInfo busyinfo;
+        if (info.inputid != excluded_input && elink->IsBusy(&busyinfo))
+        {
+            LOG(VB_CHANNEL, LOG_DEBUG,
+                LOC + QString("Input %1 is busy on %2/%3")
+                .arg(info.inputid).arg(busyinfo.chanid).arg(busyinfo.mplexid));
+            info.chanid = busyinfo.chanid;
+            info.mplexid = busyinfo.mplexid;
+            busyinputs.push_back(info);
+        }
+        else if (info.livetvorder)
+        {
+            LOG(VB_CHANNEL, LOG_DEBUG,
+                LOC + QString("Input %1 is free")
+                .arg(info.inputid));
+            freeinputs.push_back(info);
+        }
+    }
+
+    // Loop over each busy input and restrict or delete any free
+    // inputs that are in the same group.
+    vector<InputInfo>::iterator busyiter = busyinputs.begin();
+    for (; busyiter != busyinputs.end(); ++busyiter)
+    {
+        InputInfo &busyinfo = *busyiter;
+
+        vector<InputInfo>::iterator freeiter = freeinputs.begin();
+        while (freeiter != freeinputs.end())
+        {
+            InputInfo &freeinfo = *freeiter;
+
+            if ((groupids[busyinfo.inputid] & groupids[freeinfo.inputid])
+                .isEmpty())
+            {
+                ++freeiter;
+                continue;
+            }
+
+            if (busyinfo.sourceid == freeinfo.sourceid)
+            {
+                LOG(VB_CHANNEL, LOG_DEBUG,
+                    LOC + QString("Input %1 is limited to %2/%3 by input %4")
+                    .arg(freeinfo.inputid).arg(busyinfo.chanid)
+                    .arg(busyinfo.mplexid).arg(busyinfo.inputid));
+                freeinfo.chanid = busyinfo.chanid;
+                freeinfo.mplexid = busyinfo.mplexid;
+                ++freeiter;
+                continue;
+            }
+
+            LOG(VB_CHANNEL, LOG_DEBUG,
+                LOC + QString("Input %1 is unavailable by input %2")
+                .arg(freeinfo.inputid).arg(busyinfo.inputid));
+            freeiter = freeinputs.erase(freeiter);
+        }
+    }
+
+    // Return the results in livetvorder.
+    stable_sort(freeinputs.begin(), freeinputs.end(), comp_livetvorder);
+    QStringList strlist;
+    for (uint i = 0; i < freeinputs.size(); ++i)
+    {
+        LOG(VB_CHANNEL, LOG_INFO,
+            LOC + QString("Input %1 is available on %2/%3")
+            .arg(freeinputs[i].inputid).arg(freeinputs[i].chanid)
+            .arg(freeinputs[i].mplexid));
+        freeinputs[i].ToStringList(strlist);
+    }
+    SendResponse(pbssock, strlist);
 }
 
 void MainServer::HandleGetFreeRecorderList(PlaybackSock *pbs)

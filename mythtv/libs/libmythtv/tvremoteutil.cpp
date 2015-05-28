@@ -127,185 +127,232 @@ void RemoteCancelNextRecording(uint cardid, bool cancel)
     gCoreContext->SendReceiveStringList(strlist);
 }
 
-RemoteEncoder *RemoteRequestNextFreeRecorder(int curr)
+vector<InputInfo> RemoteRequestFreeInputInfo(uint excluded_input)
 {
-    QStringList strlist( "GET_NEXT_FREE_RECORDER" );
-    strlist << QString("%1").arg(curr);
+    LOG(VB_CHANNEL, LOG_INFO,
+        QString("RemoteRequestFreeInputInfo exluding input %1")
+        .arg(excluded_input));
 
-    if (!gCoreContext->SendReceiveStringList(strlist, true))
-        return NULL;
+    vector<InputInfo> inputs;
 
-    int num = strlist[0].toInt();
-    QString hostname = strlist[1];
-    int port = strlist[2].toInt();
-
-    return new RemoteEncoder(num, hostname, port);
-}
-
-static void
-RemoteRequestFreeRecorderInputList(uint excluded_input,
-                                   vector<uint> &cardids,
-                                   vector<uint> &inputids)
-{
-#if 0
-    vector<uint> list;
-
-    QStringList strlist("GET_FREE_RECORDER_LIST");
-
-    if (!gCoreContext->SendReceiveStringList(strlist, true))
-        return list;
+    QStringList strlist(QString("GET_FREE_INPUT_INFO %1")
+                        .arg(excluded_input));
+    if (!gCoreContext->SendReceiveStringList(strlist))
+        return inputs;
 
     QStringList::const_iterator it = strlist.begin();
-    for (; it != strlist.end(); ++it)
-        list.push_back((*it).toUInt());
-
-    return list;
-#endif
-    vector<uint> cards = CardUtil::GetLiveTVCardList();
-    for (uint i = 0; i < cards.size(); i++)
+    while (it != strlist.end())
     {
-        vector<InputInfo> inputs =
-            RemoteRequestFreeInputList(cards[i], excluded_input);
-        for (uint j = 0; j < inputs.size(); j++)
-        {
-            if (find(cardids.begin(),
-                     cardids.end(),
-                     inputs[j].inputid) == cardids.end())
-            {
-                cardids.push_back(inputs[j].inputid);
-                inputids.push_back(inputs[j].inputid);
-            }
-        }
+        InputInfo info;
+        if (!info.FromStringList(it, strlist.end()))
+            break;
+        inputs.push_back(info);
+        LOG(VB_CHANNEL, LOG_INFO,
+            QString("RemoteRequestFreeInputInfo got input %1 (%2/%3)")
+            .arg(info.inputid).arg(info.chanid).arg(info.mplexid));
     }
-    QString msg("RemoteRequestFreeRecorderInputList returned {");
-    for (uint k = 0; k < cardids.size(); k++)
-        msg += QString(" %1:%2").arg(cardids[k]).arg(inputids[k]);
-    msg += "}";
-    LOG(VB_CHANNEL, LOG_INFO, msg);
+
+    LOG(VB_CHANNEL, LOG_INFO,
+        QString("RemoteRequestFreeInputInfo got %1 inputs")
+        .arg(inputs.size()));
+    return inputs;
 }
 
-/**
- * Given a list of recorder numbers, return the first available.
- */
+RemoteEncoder *RemoteRequestNextFreeRecorder(int inputid)
+{
+    LOG(VB_CHANNEL, LOG_INFO,
+        QString("RemoteRequestNextFreeRecorder after input %1)")
+        .arg(inputid));
+
+    vector<InputInfo> inputs =
+        RemoteRequestFreeInputInfo(0);
+
+    if (inputs.empty())
+    {
+        LOG(VB_CHANNEL, LOG_INFO,
+            QString("RemoteRequestNextFreeRecorder got no input (after input %1)")
+            .arg(inputid));
+        return NULL;
+    }
+
+    uint i;
+    for (i = 0; i < inputs.size(); ++i)
+        if (inputs[i].inputid == (uint)inputid)
+            break;
+
+    if (i < inputs.size())
+        i = ((i + 1) % inputs.size());
+    else
+        i = 0;
+
+    LOG(VB_CHANNEL, LOG_INFO,
+        QString("RemoteRequestNextFreeRecorder got input %1")
+        .arg(inputs[i].inputid));
+
+    return RemoteGetExistingRecorder(inputs[i].inputid);
+}
+
 vector<uint> RemoteRequestFreeRecorderList(uint excluded_input)
 {
-    vector<uint> cardids, inputids;
-    RemoteRequestFreeRecorderInputList(excluded_input, cardids, inputids);
+    LOG(VB_CHANNEL, LOG_INFO,
+        QString("RemoteRequestFreeRecorderList excluding input %1")
+        .arg(excluded_input));
+
+    vector<InputInfo> inputs =
+        RemoteRequestFreeInputInfo(excluded_input);
+
+    vector<uint> cardids;
+    for (uint j = 0; j < inputs.size(); j++)
+        cardids.push_back(inputs[j].inputid);
+
+    LOG(VB_CHANNEL, LOG_INFO,
+        QString("RemoteRequestFreeRecorderList got inputs"));
     return cardids;
 }
 
 vector<uint> RemoteRequestFreeInputList(uint excluded_input)
 {
-    vector<uint> cardids, inputids;
-    RemoteRequestFreeRecorderInputList(excluded_input, cardids, inputids);
+    LOG(VB_CHANNEL, LOG_INFO,
+        QString("RemoteRequestFreeInputList excluding input %1")
+        .arg(excluded_input));
+
+    vector<InputInfo> inputs =
+        RemoteRequestFreeInputInfo(excluded_input);
+
+    vector<uint> inputids;
+    for (uint j = 0; j < inputs.size(); j++)
+        inputids.push_back(inputs[j].inputid);
+
+    LOG(VB_CHANNEL, LOG_INFO,
+        QString("RemoteRequestFreeInputList got inputs"));
     return inputids;
 }
 
 RemoteEncoder *RemoteRequestFreeRecorderFromList
 (const QStringList &qualifiedRecorders, uint excluded_input)
 {
-#if 0
-    QStringList strlist( "GET_FREE_RECORDER_LIST" );
+    LOG(VB_CHANNEL, LOG_INFO,
+        QString("RemoteRequestFreeRecorderFromList excluding input %1")
+        .arg(excluded_input));
 
-    if (!gCoreContext->SendReceiveStringList(strlist, true))
-        return NULL;
+    vector<InputInfo> inputs =
+        RemoteRequestFreeInputInfo(excluded_input);
 
     for (QStringList::const_iterator recIter = qualifiedRecorders.begin();
          recIter != qualifiedRecorders.end(); ++recIter)
     {
-        if (!strlist.contains(*recIter))
+        uint inputid = (*recIter).toUInt();
+        for (uint i = 0; i < inputs.size(); ++i)
         {
-            // did not find it in the free recorder list. We
-            // move on to check the next recorder
-            continue;
+            if (inputs[i].inputid == inputid)
+            {
+                LOG(VB_CHANNEL, LOG_INFO,
+                    QString("RemoteRequestFreeRecorderFromList got input %1")
+                    .arg(inputid));
+                return RemoteGetExistingRecorder(inputid);
+            }
         }
-        // at this point we found a free recorder that fulfills our request
-        return RemoteGetExistingRecorder((*recIter).toInt());
     }
-    // didn't find anything. just return NULL.
-    return NULL;
-#endif
-    vector<uint> freeRecorders =
-        RemoteRequestFreeRecorderList(excluded_input);
-    for (QStringList::const_iterator recIter = qualifiedRecorders.begin();
-         recIter != qualifiedRecorders.end(); ++recIter)
-    {
-        if (find(freeRecorders.begin(),
-                 freeRecorders.end(),
-                 (*recIter).toUInt()) != freeRecorders.end())
-            return RemoteGetExistingRecorder((*recIter).toInt());
-    }
+
+    LOG(VB_CHANNEL, LOG_INFO,
+        QString("RemoteRequestFreeRecorderFromList got no input"));
     return NULL;
 }
 
 RemoteEncoder *RemoteRequestRecorder(void)
 {
-    QStringList strlist( "GET_FREE_RECORDER" );
+    LOG(VB_CHANNEL, LOG_INFO,
+        QString("RemoteRequestRecorder entered"));
 
-    if (!gCoreContext->SendReceiveStringList(strlist, true))
+    vector<InputInfo> inputs =
+        RemoteRequestFreeInputInfo(0);
+
+    if (inputs.empty())
+    {
+        LOG(VB_CHANNEL, LOG_INFO,
+            QString("RemoteRequestRecorder got no input"));
         return NULL;
+    }
 
-    int num = strlist[0].toInt();
-    QString hostname = strlist[1];
-    int port = strlist[2].toInt();
-
-    return new RemoteEncoder(num, hostname, port);
+    LOG(VB_CHANNEL, LOG_INFO,
+        QString("RemoteRequestRecorder got input %1")
+        .arg(inputs[0].inputid));
+    return RemoteGetExistingRecorder(inputs[0].inputid);
 }
 
 RemoteEncoder *RemoteGetExistingRecorder(const ProgramInfo *pginfo)
 {
+    LOG(VB_CHANNEL, LOG_INFO,
+        QString("RemoteGetExistingRecorder program %1")
+        .arg(pginfo->GetTitle()));
+
     QStringList strlist( "GET_RECORDER_NUM" );
     pginfo->ToStringList(strlist);
 
     if (!gCoreContext->SendReceiveStringList(strlist))
+    {
+        LOG(VB_CHANNEL, LOG_INFO,
+            QString("RemoteGetExistingRecorder got no input"));
         return NULL;
+    }
 
     int num = strlist[0].toInt();
     QString hostname = strlist[1];
     int port = strlist[2].toInt();
 
+    LOG(VB_CHANNEL, LOG_INFO,
+        QString("RemoteGetExistingRecorder got input %1").arg(num));
     return new RemoteEncoder(num, hostname, port);
 }
 
 RemoteEncoder *RemoteGetExistingRecorder(int recordernum)
 {
+    LOG(VB_CHANNEL, LOG_INFO,
+        QString("RemoteGetExistingRecorder input %1")
+        .arg(recordernum));
+
     QStringList strlist( "GET_RECORDER_FROM_NUM" );
     strlist << QString("%1").arg(recordernum);
 
     if (!gCoreContext->SendReceiveStringList(strlist))
+    {
+        LOG(VB_CHANNEL, LOG_INFO,
+            QString("RemoteGetExistingRecorder got no input"));
         return NULL;
+    }
 
     QString hostname = strlist[0];
     int port = strlist[1].toInt();
 
+    LOG(VB_CHANNEL, LOG_INFO,
+        QString("RemoteGetExistingRecorder got input %1")
+        .arg(recordernum));
     return new RemoteEncoder(recordernum, hostname, port);
 }
 
 vector<InputInfo> RemoteRequestFreeInputList(
     uint cardid, uint excluded_input)
 {
-    vector<InputInfo> list;
+    LOG(VB_CHANNEL, LOG_INFO,
+        QString("RemoteRequestFreeInputList input %1 excluding input %2")
+        .arg(cardid).arg(excluded_input));
 
-    QStringList strlist(QString("QUERY_RECORDER %1").arg(cardid));
-    strlist << "GET_FREE_INPUTS";
-    strlist << QString::number(excluded_input);
+    vector<InputInfo> inputs =
+        RemoteRequestFreeInputInfo(excluded_input);
 
-    if (!gCoreContext->SendReceiveStringList(strlist))
-        return list;
-
-    QStringList::const_iterator it = strlist.begin();
-    if ((it == strlist.end()) || (*it == "EMPTY_LIST"))
-        return list;
-
-    while (it != strlist.end())
+    vector<InputInfo>::iterator it = inputs.begin();
+    while (it != inputs.end())
     {
-        InputInfo info;
-        if (!info.FromStringList(it, strlist.end()))
-            break;
-        list.push_back(info);
+        if ((*it).inputid == cardid)
+            ++it;
+        else
+            it = inputs.erase(it);
     }
 
-    return list;
+    LOG(VB_CHANNEL, LOG_INFO,
+        QString("RemoteRequestFreeInputList got %1 inputs")
+        .arg(inputs.size()));
+    return inputs;
 }
 
 bool RemoteIsBusy(uint cardid, InputInfo &busy_input)
