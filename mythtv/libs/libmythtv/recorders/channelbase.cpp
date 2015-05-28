@@ -552,67 +552,6 @@ bool ChannelBase::IsInputAvailable(
     return res;
 }
 
-/** \fn ChannelBase::GetFreeInputs(uint) const
- *  \brief Returns the recorders available inputs.
- *
- *   This filters out the connected inputs that belong to an input
- *   group which is busy.  The excluded input recorder will not be
- *   considered busy for the sake of determining free inputs.
- *
- */
-vector<InputInfo> ChannelBase::GetFreeInputs(uint excluded_input) const
-{
-    vector<InputInfo> new_list;
-
-    QStringList list = GetConnectedInputs();
-    if (list.empty())
-        return new_list;
-
-    // Check each input to make sure it doesn't belong to an
-    // input group which is attached to a busy recorder.
-    QMap<uint,bool>           busygrp;
-    QMap<uint,bool>           busyrec;
-    QMap<uint,InputInfo>      busyin;
-
-
-    uint cid = GetCardID();
-    // Cache our busy input if applicable
-    if (m_pParent)
-    {
-        InputInfo info;
-        busyrec[cid] = m_pParent->IsBusy(&info);
-        if (busyrec[cid])
-        {
-            busyin[cid] = info;
-            info.chanid = GetChanID();
-        }
-    }
-
-    // If we're busy and not excluded, all inputs are busy
-    if (busyrec[cid] && cid != excluded_input)
-        return new_list;
-
-    QStringList::const_iterator it;
-    for (it = list.begin(); it != list.end(); ++it)
-    {
-        InputInfo info;
-        vector<uint> groupids;
-        info.inputid = GetInputByName(*it);
-
-        if (!CardUtil::GetInputInfo(info, &groupids))
-            continue;
-
-        bool is_busy_grp = is_input_busy(
-            info.inputid, groupids, excluded_input,
-            busygrp, busyrec, busyin, info.mplexid, info.chanid);
-
-        if (!is_busy_grp && info.livetvorder)
-            new_list.push_back(info);
-    }
-
-    return new_list;
-}
-
 uint ChannelBase::GetInputCardID(int inputNum) const
 {
     InputMap::const_iterator it = m_inputs.find(inputNum);

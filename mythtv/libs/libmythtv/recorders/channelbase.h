@@ -83,7 +83,6 @@ class ChannelBase
     virtual uint GetInputCardID(int inputNum) const;
     virtual ChannelInfoList GetChannels(int inputNum) const;
     virtual ChannelInfoList GetChannels(const QString &inputname) const;
-    virtual vector<InputInfo> GetFreeInputs(uint excluded_input) const;
     virtual QStringList GetConnectedInputs(void) const;
 
     /// \brief Returns true iff commercial detection is not required

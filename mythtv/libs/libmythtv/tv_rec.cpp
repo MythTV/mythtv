@@ -2993,22 +2993,6 @@ int TVRec::ChangePictureAttribute(PictureAdjustType type,
     return (ret < 0) ? -1 : ret / 655;
 }
 
-/** \fn TVRec::GetFreeInputs(const vector<uint>&) const
- *  \brief Returns the recorder's available inputs.
- *
- *   This filters out the connected inputs that belong to an input
- *   group which is busy. Recorders in the excluded cardids will
- *   not be considered busy for the sake of determining free inputs.
- *
- */
-vector<InputInfo> TVRec::GetFreeInputs(uint excluded_input) const
-{
-    vector<InputInfo> list;
-    if (channel)
-        list = channel->GetFreeInputs(excluded_input);
-    return list;
-}
-
 /** \fn TVRec::GetInput(void) const
  *  \brief Returns current input.
  */

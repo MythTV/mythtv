@@ -768,26 +768,6 @@ void EncoderLink::SetNextLiveTVDir(QString dir)
     }
 }
 
-/** \fn EncoderLink::GetFreeInputs(const vector<uint>&) const
- *  \brief Returns TVRec's recorders connected inputs.
- *
- *  \sa TVRec::GetFreeInputs(const vector<uint>&) const
- */
-vector<InputInfo> EncoderLink::GetFreeInputs(uint excluded_input)
-{
-    vector<InputInfo> list;
-
-    if (local)
-        list = tv->GetFreeInputs(excluded_input);
-    else if (HasSockAndIncrRef())
-    {
-        ReferenceLocker rlocker(sock);
-        list = sock->GetFreeInputs(m_capturecardnum, excluded_input);
-    }
-
-    return list;
-}
-
 /** \fn EncoderLink::GetInput(void) const
  *  \brief Returns TVRec's recorders current input.
  *         <b>This only works on local recorders.</b>

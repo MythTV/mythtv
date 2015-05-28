@@ -101,8 +101,6 @@ class PlaybackSock : public ReferenceCounter
                        int secsleft, bool hasLater);
     int SetSignalMonitoringRate(int capturecardnum, int rate, int notifyFrontend);
     void SetNextLiveTVDir(int capturecardnum, QString dir);
-    vector<InputInfo> GetFreeInputs(int capturecardnum,
-                                    uint excluded_input);
     void CancelNextRecording(int capturecardnum, bool cancel);
 
     QStringList ForwardRequest(const QStringList&);

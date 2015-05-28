@@ -204,7 +204,6 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
 
     void SetLiveRecording(int recording);
 
-    vector<InputInfo> GetFreeInputs(uint excluded_input) const;
     QString     GetInput(void) const;
     uint        GetSourceID(void) const;
     QString     SetInput(QString input, uint requestType = kFlagDetect);
