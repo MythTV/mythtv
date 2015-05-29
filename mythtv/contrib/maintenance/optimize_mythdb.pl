@@ -34,3 +34,16 @@
         }
     }
 
+# Defragement seek table
+    if ($dbh->do("ALTER TABLE `recordedseek` ORDER BY chanid, starttime, type")) {
+        print "Defragmented: recordedseek\n";
+    }
+# Defragement program table
+    if ($dbh->do("ALTER TABLE `program` ORDER BY starttime, chanid")) {
+        print "Defragmented: program\n";
+    }
+# Defragement video seek table
+    if ($dbh->do("ALTER TABLE `filemarkup` ORDER BY filename")) {
+        print "Defragmented: filemarkup\n";
+    }
+
