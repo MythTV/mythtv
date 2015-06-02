@@ -158,6 +158,18 @@ vector<InputInfo> RemoteRequestFreeInputInfo(uint excluded_input)
     return inputs;
 }
 
+int RemoteGetFreeRecorderCount(void)
+{
+    LOG(VB_CHANNEL, LOG_INFO, QString("RemoteGetFreeRecorderCount"));
+
+    vector<InputInfo> inputs =
+        RemoteRequestFreeInputInfo(0);
+
+    LOG(VB_CHANNEL, LOG_INFO, QString("RemoteGetFreeRecorderCount got %1")
+        .arg(inputs.size()));
+    return inputs.size();
+}
+
 RemoteEncoder *RemoteRequestNextFreeRecorder(int inputid)
 {
     LOG(VB_CHANNEL, LOG_INFO,

@@ -36,6 +36,7 @@ MTV_PUBLIC void RemoteStopRecording(const ProgramInfo *pginfo);
 MTV_PUBLIC void RemoteCancelNextRecording(uint cardid, bool cancel);
 vector<InputInfo>
 RemoteRequestFreeInputInfo(uint excluded_input);
+MTV_PUBLIC int RemoteGetFreeRecorderCount(void);
 MTV_PUBLIC RemoteEncoder *RemoteRequestRecorder(void);
 MTV_PUBLIC RemoteEncoder *RemoteRequestNextFreeRecorder(int curr);
 MTV_PUBLIC RemoteEncoder *RemoteRequestFreeRecorderFromList

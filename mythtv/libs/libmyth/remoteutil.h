@@ -39,7 +39,6 @@ MPUBLIC bool RemoteFillProgramInfo(
     ProgramInfo &pginfo, const QString &playbackhostname);
 MPUBLIC QStringList RemoteRecordings(void);
 MPUBLIC int RemoteGetRecordingMask(void);
-MPUBLIC int RemoteGetFreeRecorderCount(void);
 
 MPUBLIC int RemoteCheckForRecording(const ProgramInfo *pginfo);
 MPUBLIC int RemoteGetRecordingStatus(const ProgramInfo *pginfo, int overrecsecs,
