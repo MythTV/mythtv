@@ -1044,7 +1044,7 @@ bool RecordingInfo::InsertProgram(RecordingInfo *pg,
         "    stars,     previouslyshown,              originalairdate,  "
         "    findid,    transcoder,  playgroup,       recpriority,      "
         "    basename,  progstart,   progend,         profile,          "
-        "    duplicate, storagegroup, inputname) "
+        "    duplicate, storagegroup, inputname,      recgroupid) "
         "VALUES"
         "  (:CHANID,   :STARTS,     :ENDS,           :TITLE,            "
         "   :SUBTITLE, :DESC,       :SEASON,         :EPISODE,          "
@@ -1053,7 +1053,7 @@ bool RecordingInfo::InsertProgram(RecordingInfo *pg,
         "   :STARS,    :REPEAT,                      :ORIGAIRDATE,      "
         "   :FINDID,   :TRANSCODER, :PLAYGROUP,      :RECPRIORITY,      "
         "   :BASENAME, :PROGSTART,  :PROGEND,        :PROFILE,          "
-        "   0,         :STORGROUP,  :INPUTNAME) "
+        "   0,         :STORGROUP,  :INPUTNAME,      :RECGROUPID) "
         );
 
     if (pg->rectype == kOverrideRecord)
@@ -1093,6 +1093,7 @@ bool RecordingInfo::InsertProgram(RecordingInfo *pg,
     query.bindValue(":PROGEND",     pg->endts);
     query.bindValue(":PROFILE",     null_to_empty(rule->m_recProfile));
     query.bindValue(":INPUTNAME",   inputname);
+    query.bindValue(":RECGROUP",    GetRecgroupID(pg->recgroup));
 
     bool ok = query.exec() && (query.numRowsAffected() > 0);
     if (ok)
