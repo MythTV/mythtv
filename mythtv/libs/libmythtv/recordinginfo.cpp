@@ -995,6 +995,7 @@ bool RecordingInfo::InsertProgram(RecordingInfo *pg,
                                   const RecordingRule *rule)
 {
     QString inputname = pg->QueryInputDisplayName();
+    int recgroupid = GetRecgroupID(pg->recgroup);
 
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -1093,7 +1094,7 @@ bool RecordingInfo::InsertProgram(RecordingInfo *pg,
     query.bindValue(":PROGEND",     pg->endts);
     query.bindValue(":PROFILE",     null_to_empty(rule->m_recProfile));
     query.bindValue(":INPUTNAME",   inputname);
-    query.bindValue(":RECGROUP",    GetRecgroupID(pg->recgroup));
+    query.bindValue(":RECGROUPID",  recgroupid);
 
     bool ok = query.exec() && (query.numRowsAffected() > 0);
     if (ok)
