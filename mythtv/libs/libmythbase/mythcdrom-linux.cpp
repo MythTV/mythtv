@@ -497,9 +497,11 @@ MythMediaStatus MythCDROMLinux::checkMedia()
                     QString("Volume ID: %1").arg(m_VolumeID));
                 {
                     MythCDROM::ImageType imageType = MythCDROM::inspectImage(m_DevicePath);
+/*
                     if( imageType == MythCDROM::kBluray )
                         m_MediaType = MEDIATYPE_BD;
                     else
+*/
                     if( imageType == MythCDROM::kDVD )
                         m_MediaType = MEDIATYPE_DVD;
 
