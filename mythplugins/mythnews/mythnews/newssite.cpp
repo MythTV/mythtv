@@ -379,6 +379,11 @@ void NewsSite::parseRSS(QDomDocument domDoc)
                     }
                 }
             }
+            else
+            {
+                // fix broken feeds (like RT) that don't add the enclosure type
+                enclosure = QString::null;
+            }
         }
 
         //////////////////////////////////////////////////////////////
