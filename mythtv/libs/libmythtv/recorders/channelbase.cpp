@@ -274,44 +274,6 @@ uint ChannelBase::GetNextChannel(const QString &channum, ChannelChangeDirection 
     return GetNextChannel(chanid, direction);
 }
 
-int ChannelBase::GetNextInputNum(void) const
-{
-    // Exit early if inputs don't exist..
-    if (m_inputs.isEmpty())
-        return -1;
-
-    // Find current input
-    InputMap::const_iterator it;
-    it = m_inputs.find(m_currentInputID);
-
-    // If we can't find the current input, start at
-    // the beginning and don't increment initially.
-    bool skip_incr = false;
-    if (it == m_inputs.end())
-    {
-        it = m_inputs.begin();
-        skip_incr = true;
-    }
-
-    // Find the next _connected_ input.
-    int i = 0;
-    for (; i < 100; i++)
-    {
-        if (!skip_incr)
-        {
-            ++it;
-            it = (it == m_inputs.end()) ? m_inputs.begin() : it;
-        }
-        skip_incr = false;
-
-        if ((*it)->sourceid)
-            break;
-    }
-
-    // if we found anything, including current cap channel return it
-    return (i<100) ? (int)it.key() : -1;
-}
-
 /** \fn ChannelBase::GetConnectedInputs(void) const
  *  \brief Returns names of connected inputs
  */
@@ -928,7 +890,7 @@ bool ChannelBase::InitializeInputs(void)
 
     // In case that initial input is not set
     if (m_currentInputID == -1)
-        m_currentInputID = GetNextInputNum();
+        m_currentInputID = (*m_inputs.begin())->inputid;
 
     // print em
     InputMap::const_iterator it;

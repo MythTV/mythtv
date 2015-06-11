@@ -3033,42 +3033,9 @@ QString TVRec::SetInput(QString input, uint requestType)
         return QString::null;
     }
 
-    input = (input == "SwitchToNextInput") ? channel->GetNextInput() : input;
-
-    if (input == channel->GetCurrentInput())
-    {
-        LOG(VB_RECORD, LOG_INFO, LOC + "SetInput(" + origIn + ":" + input +
-                ") -- end  nothing to do");
-        return input;
-    }
-
-    QString name = channel->GetNextInputStartChan();
-
-    // Detect tuning request type if needed
-    if (requestType & kFlagDetect)
-    {
-        WaitForEventThreadSleep();
-        requestType = lastTuningRequest.flags & (kFlagRec | kFlagNoRec);
-    }
-
-    // Clear the RingBuffer reset flag, in case we wait for a reset below
-    ClearFlags(kFlagRingBufferReady, __FILE__, __LINE__);
-
-    // Actually add the tuning request to the queue, and
-    // then wait for it to start tuning
-    tuningRequests.enqueue(TuningRequest(requestType, name, input));
-    WaitForEventThreadSleep();
-
-    // If we are using a recorder, wait for a RingBuffer reset
-    if (requestType & kFlagRec)
-    {
-        while (!HasFlags(kFlagRingBufferReady))
-            WaitForEventThreadSleep();
-    }
-    LOG(VB_RECORD, LOG_INFO, LOC +
-        "SetInput(" + origIn + ":" + input + ") -- end");
-
-    return GetInput();
+    LOG(VB_RECORD, LOG_INFO, LOC + "SetInput(" + origIn + ":" + input +
+        ") -- end  nothing to do");
+    return input;
 }
 
 /** \fn TVRec::SetChannel(QString,uint)

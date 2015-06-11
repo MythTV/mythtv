@@ -295,7 +295,7 @@ void V4LChannel::SetFormat(const QString &format)
 
     int inputNum = m_currentInputID;
     if (m_currentInputID < 0)
-        inputNum = GetNextInputNum();
+        inputNum = (*m_inputs.begin())->inputid;
 
     QString fmt = format;
     if ((fmt == "Default") || format.isEmpty())
