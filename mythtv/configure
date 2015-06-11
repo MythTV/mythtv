@@ -7594,6 +7594,9 @@ echo "Configuring libmythdvdnav..."
 echo "Configuring libsamplerate..."
 (cd external/libsamplerate ; \
        ${qmakeconf} -o Makefile)
+echo "Configuring libudfread..."
+(cd external/libudfread ; \
+       ${qmakeconf} -o Makefile)
 echo "Configuring minilzo..."
 (cd external/minilzo ; \
        ${qmakeconf} -o Makefile)

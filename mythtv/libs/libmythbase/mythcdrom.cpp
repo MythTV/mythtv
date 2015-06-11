@@ -4,8 +4,8 @@
 #include "mythcdrom.h"
 #include "mythconfig.h"
 #include "remotefile.h"
-#include "libudfread/blockinput.h"
-#include "libudfread/udfread.h"
+#include "blockinput.h"
+#include "udfread.h"
 #ifdef linux
 #include "mythcdrom-linux.h"
 #elif defined(__FreeBSD__)

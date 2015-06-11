@@ -10,9 +10,11 @@ target.path = $${LIBDIR}
 INCLUDEPATH += . ../../
 INCLUDEPATH += ./libbluray
 INCLUDEPATH += ./libbluray/bdnav
-INCLUDEPATH += ./libudfread
+INCLUDEPATH += ../libudfread
 INCLUDEPATH += ../../libs/libmythbase
 INCLUDEPATH += ../../libs/libmythtv
+
+DEPENDPATH += ../libudfread
 
 DEFINES += ENABLE_UDF
 
@@ -66,9 +68,6 @@ HEADERS += libbluray/hdmv/hdmv_insn.h libbluray/hdmv/hdmv_vm.h libbluray/hdmv/mo
 HEADERS += file/dirs.h file/dl.h file/file.h file/filesystem.h file/file_mythiowrapper.h file/mount.h
 HEADERS += util/array.h util/attributes.h util/bits.h util/logging.h util/log_control.h
 HEADERS += util/macro.h util/mutex.h util/refcnt.h util/strutl.h util/time.h
-
-HEADERS += libudfread/blockinput.h libudfread/default_blockinput.h libudfread/ecma167.h libudfread/udfread.h
-SOURCES += libudfread/default_blockinput.c libudfread/ecma167.c libudfread/udfread.c libudfread/udfread-version.c
 
 SOURCES += libbluray/bluray.c libbluray/register.c 
 SOURCES += libbluray/bdnav/bdid_parse.c libbluray/bdnav/clpi_parse.c libbluray/bdnav/extdata_parse.c

@@ -89,8 +89,8 @@ inc2.files = $${inc.files}
 
 INSTALLS += inc inc2
 
-INCLUDEPATH += ../../external/qjsonwrapper/ ../../external/libmythbluray
-DEPENDPATH  +=  ../../external/libmythbluray
+INCLUDEPATH += ../../external/qjsonwrapper/ ../../external/libudfread
+DEPENDPATH  +=  ../../external/libudfread
 
 DEFINES += RUNPREFIX=\\\"$${RUNPREFIX}\\\"
 DEFINES += LIBDIRNAME=\\\"$${LIBDIRNAME}\\\"
@@ -156,5 +156,5 @@ QT += widgets
 
 include ( ../libs-targetfix.pro )
 
-LIBS += -L../../external/libmythbluray -lmythbluray-$$LIBVERSION
+LIBS += -L../../external/libudfread -lmythudfread-$$LIBVERSION
 LIBS += $$EXTRA_LIBS $$LATE_LIBS

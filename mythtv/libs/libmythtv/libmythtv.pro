@@ -290,6 +290,10 @@ using_frontend {
 LIBS += -L../../external/libmythbluray
 LIBS += -lmythbluray-$$LIBVERSION
 
+DEPENDPATH += ../../external/libudfread
+LIBS += -L../../external/libudfread
+LIBS += -lmythudfread-$$LIBVERSION
+
 #HLS stuff
 HEADERS += HLS/httplivestream.h
 SOURCES += HLS/httplivestream.cpp
