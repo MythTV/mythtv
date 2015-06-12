@@ -10,10 +10,10 @@ INCLUDEPATH += . ../../
 
 win32-msvc* {
     # needed for vcxproj
-    QMAKE_CXXFLAGS += "/FI compat.h"
+    QMAKE_CXXFLAGS += "/FI ../../libs/libmythbase/compat.h"
 
     # needed for nmake
-    QMAKE_CFLAGS   += "/FI compat.h"
+    QMAKE_CFLAGS   += "/FI ../../libs/libmythbase/compat.h"
 }
 
 QMAKE_CLEAN += $(TARGET)
