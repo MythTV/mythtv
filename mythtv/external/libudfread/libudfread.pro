@@ -8,6 +8,14 @@ target.path = $${LIBDIR}
 
 INCLUDEPATH += . ../../
 
+win32-msvc* {
+    # needed for vcxproj
+    QMAKE_CXXFLAGS += "/FI compat.h"
+
+    # needed for nmake
+    QMAKE_CFLAGS   += "/FI compat.h"
+}
+
 QMAKE_CLEAN += $(TARGET)
 
 HEADERS += blockinput.h default_blockinput.h ecma167.h udfread.h
