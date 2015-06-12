@@ -33,10 +33,10 @@ win32-msvc* {
     DEFINES += HAVE_CONFIG_H DLOPEN_CRYPTO_LIBS HAVE_PTHREAD_H
 
     # needed for vcxproj
-    QMAKE_CXXFLAGS += "/FI compat.h"
+    QMAKE_CXXFLAGS += /TP "/FI compat.h"
 
     # needed for nmake
-    QMAKE_CFLAGS   += "/FI compat.h"
+    QMAKE_CFLAGS   += /TP "/FI compat.h"
 
 } else {
     DEFINES += HAVE_CONFIG_H DLOPEN_CRYPTO_LIBS HAVE_PTHREAD_H HAVE_DIRENT_H HAVE_STRINGS_H
