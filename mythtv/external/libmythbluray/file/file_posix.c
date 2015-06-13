@@ -24,7 +24,6 @@
 #endif
 
 #include "file.h"
-#include "file_mythiowrapper.h"
 #include "util/macro.h"
 #include "util/logging.h"
 
@@ -139,9 +138,6 @@ static BD_FILE_H *_file_open(const char* filename, const char *cmode)
 #ifdef O_BINARY
     flags |= O_BINARY;
 #endif
-
-    if (strncmp(filename, "myth://", 7) == 0)
-        return file_open_mythiowrapper(filename, cmode);
 
     if ((fd = open(filename, flags, mode)) < 0) {
         BD_DEBUG(DBG_FILE, "Error opening file %s\n", filename);

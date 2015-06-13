@@ -65,7 +65,7 @@ HEADERS += libbluray/decoders/textst_decode.h libbluray/decoders/textst_render.h
 HEADERS += libbluray/disc/aacs.h libbluray/disc/bdplus.h libbluray/disc/dec.h libbluray/disc/disc.h
 HEADERS += libbluray/disc/enc_info.h libbluray/disc/udf_fs.h
 HEADERS += libbluray/hdmv/hdmv_insn.h libbluray/hdmv/hdmv_vm.h libbluray/hdmv/mobj_parse.h
-HEADERS += file/dirs.h file/dl.h file/file.h file/filesystem.h file/file_mythiowrapper.h file/mount.h
+HEADERS += file/dirs.h file/dl.h file/file.h file/filesystem.h file/mount.h
 HEADERS += util/array.h util/attributes.h util/bits.h util/logging.h util/log_control.h
 HEADERS += util/macro.h util/mutex.h util/refcnt.h util/strutl.h util/time.h
 
@@ -79,7 +79,7 @@ SOURCES += libbluray/decoders/pes_buffer.c libbluray/decoders/pg_decode.c
 SOURCES += libbluray/decoders/rle.c libbluray/decoders/textst_decode.c libbluray/decoders/textst_render.c
 SOURCES += libbluray/disc/aacs.c libbluray/disc/bdplus.c libbluray/disc/dec.c libbluray/disc/disc.c
 SOURCES += libbluray/disc/udf_fs.c
-SOURCES += file/dir_mythiowrapper.c file/file.c file/filesystem.c file/file_mythiowrapper.c 
+SOURCES += file/file.c file/filesystem.c
 SOURCES += libbluray/hdmv/hdmv_vm.c libbluray/hdmv/mobj_parse.c libbluray/hdmv/mobj_print.c
 SOURCES += util/array.c util/bits.c util/logging.c util/mutex.c util/refcnt.c util/strutl.c util/time.c
 

@@ -15,6 +15,7 @@
 #include "mythmainwindow.h"
 #include "mythevent.h"
 #include "iso639.h"
+#include "bdiowrapper.h"
 #include "bdringbuffer.h"
 #include "mythlogging.h"
 #include "mythcorecontext.h"
@@ -302,6 +303,9 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     // Make sure log messages from the Bluray library appear in our logs
     bd_set_debug_handler(bd_logger);
     bd_set_debug_mask(DBG_CRIT | DBG_NAV | DBG_BLURAY);
+
+    // Use our own wrappers for file and directory access
+    redirectBDIO();
 
     // Ask mythiowrapper to update this object on file open progress. Opening
     // a bluray disc can involve opening several hundred files which can take
