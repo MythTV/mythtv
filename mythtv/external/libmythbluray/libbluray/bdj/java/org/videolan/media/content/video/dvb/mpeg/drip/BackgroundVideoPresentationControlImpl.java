@@ -100,23 +100,23 @@ public class BackgroundVideoPresentationControlImpl extends VideoControl
         Rectangle sr = size.getSource();
         if (sr.x < 0)
             sr.x = 0;
-            if ((sr.x + sr.width) > vd.width) {
-                sr.width = vd.width - sr.x;
-                if (sr.width <= 0) {
-                    sr.x = 0;
-                    sr.width = 0;
-                }
+        if ((sr.x + sr.width) > vd.width) {
+            sr.width = vd.width - sr.x;
+            if (sr.width <= 0) {
+                sr.x = 0;
+                sr.width = 0;
             }
-            if (sr.y < 0)
+        }
+        if (sr.y < 0)
+            sr.y = 0;
+        if ((sr.y + sr.height) > vd.height) {
+            sr.height = vd.height - sr.y;
+            if (sr.height <= 0) {
                 sr.y = 0;
-            if ((sr.y + sr.height) > vd.height) {
-                sr.height = vd.height - sr.y;
-                if (sr.height <= 0) {
-                    sr.y = 0;
-                    sr.height = 0;
-                }
+                sr.height = 0;
             }
-            Rectangle dr = size.getDestination();
-            return new AWTVideoSize(sr, dr);
+        }
+        Rectangle dr = size.getDestination();
+        return new AWTVideoSize(sr, dr);
     }
 }

@@ -24,6 +24,8 @@ import java.awt.BDFontMetrics;
 import java.awt.BDToolkit;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 
 import javax.media.PackageManager;
@@ -228,6 +230,7 @@ public class Libbluray {
         }
         nativePointer = 0;
         titleInfos = null;
+        bdjoFiles = null;
     }
 
     /*
@@ -296,6 +299,10 @@ public class Libbluray {
      * Disc data
      */
 
+    /* cache parsed .bdjo files */
+    private static Map bdjoFiles = null;
+    private static Object bdjoFilesLock = new Object();
+
     public static byte[] getAacsData(int type) {
         return getAacsDataN(nativePointer, type);
     }
@@ -305,7 +312,23 @@ public class Libbluray {
     }
 
     public static Bdjo getBdjo(String name) {
-        return getBdjoN(nativePointer, name + ".bdjo");
+        Bdjo bdjo;
+        synchronized (bdjoFilesLock) {
+            if (bdjoFiles == null) {
+                bdjoFiles = new HashMap();
+            } else {
+                bdjo = (Bdjo)bdjoFiles.get(name);
+                if (bdjo != null) {
+                    return bdjo;
+                }
+            }
+
+            bdjo = getBdjoN(nativePointer, name + ".bdjo");
+            if (bdjo != null) {
+                bdjoFiles.put(name, bdjo);
+            }
+            return bdjo;
+         }
     }
 
     public static String[] listBdFiles(String path, boolean onlyBdRom) {

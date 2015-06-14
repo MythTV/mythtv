@@ -384,8 +384,8 @@ class BDJAppProxy implements DVBJProxy, Runnable {
                     } catch (InterruptedException e) {
                     }
                 }
+                return done;
             }
-            return done;
         }
 
         public void release() {

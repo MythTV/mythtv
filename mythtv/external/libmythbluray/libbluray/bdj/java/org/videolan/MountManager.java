@@ -274,8 +274,8 @@ public class MountManager {
             return classFiles;
         }
 
-        public boolean setClassFiles() {
-            return classFiles == true;
+        public void setClassFiles() {
+            classFiles = true;
         }
 
         private File dir;

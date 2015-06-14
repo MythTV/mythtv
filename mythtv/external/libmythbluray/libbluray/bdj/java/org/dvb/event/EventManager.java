@@ -40,8 +40,8 @@ public class EventManager implements ResourceServer {
         synchronized (EventManager.class) {
             if (instance == null)
                 instance = new EventManager();
+            return instance;
         }
-        return instance;
     }
 
     public static void shutdown() {
@@ -254,7 +254,7 @@ public class EventManager implements ResourceServer {
         return false;
     }
 
-    private class UserEventItem {
+    private static class UserEventItem {
         public UserEventItem(BDJXletContext context, UserEventListener listener,
                              ResourceClient client, UserEventRepository userEvents) {
             this.context = context;
@@ -272,7 +272,7 @@ public class EventManager implements ResourceServer {
         public UserEventRepository userEvents;
     }
 
-    private class UserEventAction extends BDJAction {
+    private static class UserEventAction extends BDJAction {
         public UserEventAction(UserEventItem item, UserEvent event) {
             this.listener = item.listener;
             this.event = event;

@@ -31,8 +31,8 @@ public class UserPreferenceManager {
         synchronized (UserPreferenceManager.class) {
             if (instance == null)
                 instance = new UserPreferenceManager();
+            return instance;
         }
-        return instance;
     }
 
     public void read(Preference p) {

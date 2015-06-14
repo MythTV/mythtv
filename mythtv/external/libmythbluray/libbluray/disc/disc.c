@@ -65,6 +65,10 @@ static BD_FILE_H *_bdrom_open_path(void *p, const char *rel_path)
     char *abs_path;
 
     abs_path = str_printf("%s%s", disc->disc_root, rel_path);
+    if (!abs_path) {
+        return NULL;
+    }
+
     fp = file_open(abs_path, "rb");
     X_FREE(abs_path);
 
@@ -78,6 +82,10 @@ static BD_DIR_H *_bdrom_open_dir(void *p, const char *dir)
     char *path;
 
     path = str_printf("%s%s", disc->disc_root, dir);
+    if (!path) {
+        return NULL;
+    }
+
     dp = dir_open(path);
     X_FREE(path);
 
@@ -96,8 +104,10 @@ static BD_FILE_H *_overlay_open_path(BD_DISC *p, const char *rel_path)
 
     if (p->overlay_root) {
         char *abs_path = str_printf("%s%s", p->overlay_root, rel_path);
-        fp = file_open(abs_path, "rb");
-        X_FREE(abs_path);
+        if (abs_path) {
+            fp = file_open(abs_path, "rb");
+            X_FREE(abs_path);
+        }
     }
 
     bd_mutex_unlock(&p->ovl_mutex);
@@ -113,8 +123,10 @@ static BD_DIR_H *_overlay_open_dir(BD_DISC *p, const char *dir)
 
     if (p->overlay_root) {
         char *abs_path = str_printf("%s%s", p->disc_root, dir);
-        dp = dir_open_default()(abs_path);
-        X_FREE(abs_path);
+        if (abs_path) {
+            dp = dir_open_default()(abs_path);
+            X_FREE(abs_path);
+        }
     }
 
     bd_mutex_unlock(&p->ovl_mutex);
@@ -183,6 +195,10 @@ static BD_DIR_H *_combine_dirs(BD_DIR_H *ovl, BD_DIR_H *rom)
         dp->read     = _comb_dir_read;
         dp->close    = _comb_dir_close;
         dp->internal = calloc(1, sizeof(COMB_DIR));
+        if (!dp->internal) {
+            X_FREE(dp);
+            goto out;
+        }
 
         while (!dir_read(ovl, &entry)) {
             _comb_dir_append(dp, &entry);
@@ -191,6 +207,8 @@ static BD_DIR_H *_combine_dirs(BD_DIR_H *ovl, BD_DIR_H *rom)
             _comb_dir_append(dp, &entry);
         }
     }
+
+ out:
     dir_close(ovl);
     dir_close(rom);
 
@@ -342,6 +360,10 @@ BD_FILE_H *disc_open_file(BD_DISC *p, const char *dir, const char *file)
     char *path;
 
     path = str_printf("%s" DIR_SEP "%s", dir, file);
+    if (!path) {
+        return NULL;
+    }
+
     fp = disc_open_path(p, path);
     X_FREE(path);
 

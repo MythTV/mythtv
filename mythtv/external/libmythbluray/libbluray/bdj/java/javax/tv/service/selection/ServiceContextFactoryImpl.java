@@ -33,12 +33,14 @@ public class ServiceContextFactoryImpl extends ServiceContextFactory {
         synchronized (ServiceContextFactoryImpl.class) {
             if (instance == null)
                 instance = new ServiceContextFactoryImpl();
+            return instance;
         }
-        return instance;
     }
 
     public static void shutdown() {
-        instance = null;
+        synchronized (ServiceContextFactoryImpl.class) {
+            instance = null;
+        }
     }
 
     public ServiceContext createServiceContext()
@@ -60,10 +62,19 @@ public class ServiceContextFactoryImpl extends ServiceContextFactory {
     }
 
     public ServiceContext[] getServiceContexts() {
-        SecurityManager sec = System.getSecurityManager();
-        if (sec != null)
-            sec.checkPermission(new ServiceContextPermission("access", "own"));
-        return serviceContexts;
+        try {
+            SecurityManager sec = System.getSecurityManager();
+            if (sec != null)
+                sec.checkPermission(new ServiceContextPermission("access", "own"));
+
+            ServiceContext[] r = new ServiceContext[1];
+            r[0] = serviceContexts[0];
+            return r;
+
+        } catch (Exception e) {
+        }
+
+        return new ServiceContext[0];
     }
 
     private ServiceContext[] serviceContexts;

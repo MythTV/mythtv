@@ -45,10 +45,10 @@ typedef enum {
 } BDJ_EVENT;
 
 typedef struct {
-    char *persistent_root;
-    char *cache_root;
+    char *persistent_root;   /* BD-J Xlet persistent storage */
+    char *cache_root;        /* BD-J binding unit data area */
 
-    char *classpath;
+    char *classpath;         /* BD-J implementation class path (location of libbluray.jar) */
 } BDJ_STORAGE;
 
 typedef struct bdjava_s BDJAVA;

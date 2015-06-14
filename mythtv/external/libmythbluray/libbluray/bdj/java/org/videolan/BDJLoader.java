@@ -147,6 +147,15 @@ public class BDJLoader {
                 AppID id = (AppID)ids.nextElement();
                 BDJAppProxy proxy = (BDJAppProxy)db.getAppProxy(id);
                 AppEntry entry = (AppEntry)db.getAppAttributes(id);
+                if (proxy == null) {
+                    logger.error("AppsDatabase corrupted!");
+                    continue;
+                }
+                if (entry == null) {
+                    logger.error("AppsDatabase corrupted!");
+                    proxy.release();
+                    continue;
+                }
                 for (int i = 0; i < appTable.length; i++) {
                     if (id.equals(appTable[i].getIdentifier()) &&
                         entry.getInitialClass().equals(appTable[i].getInitialClass())) {

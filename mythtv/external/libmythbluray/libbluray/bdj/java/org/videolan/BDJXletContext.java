@@ -102,6 +102,8 @@ public class BDJXletContext implements javax.tv.xlet.XletContext, javax.microedi
             return Integer.toHexString(appid.getAID());
         else if (key.equals("org.dvb.application.appid"))
             return appid;
+
+        logger.error("unhandled getXletProperty(" + key + ")");
         return null;
     }
 

@@ -20,6 +20,10 @@
 #ifndef BD_OVERLAY_H_
 #define BD_OVERLAY_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 
 #define BD_OVERLAY_INTERFACE_VERSION 2
@@ -198,5 +202,9 @@ typedef struct bd_argb_buffer_s {
     } dirty[2]; /* [0] - PG plane, [1] - IG plane */
 
 } BD_ARGB_BUFFER;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // BD_OVERLAY_H_

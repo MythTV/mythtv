@@ -103,7 +103,15 @@ static int _sound_read_samples(BITSTREAM *bs, SOUND_OBJECT *obj)
     uint32_t n;
     uint32_t num_samples = obj->num_frames * obj->num_channels;
 
+    if (!num_samples) {
+        return 1;
+    }
+
     obj->samples = calloc(num_samples, sizeof(uint16_t));
+    if (!obj->samples) {
+        BD_DEBUG(DBG_CRIT, "out of memory\n");
+        return 0;
+    }
 
     for (n = 0; n < num_samples; n++) {
         obj->samples[n] = bs_read(bs, 16);
@@ -116,13 +124,14 @@ void sound_free(SOUND_DATA **p)
 {
     if (p && *p) {
 
-        unsigned i;
-        for (i = 0 ; i < (*p)->num_sounds; i++) {
-            X_FREE((*p)->sounds[i].samples);
+        if ((*p)->sounds) {
+            unsigned i;
+            for (i = 0 ; i < (*p)->num_sounds; i++) {
+                X_FREE((*p)->sounds[i].samples);
+            }
+
+            X_FREE((*p)->sounds);
         }
-
-        X_FREE((*p)->sounds);
-
         X_FREE(*p);
     }
 }
@@ -150,21 +159,29 @@ static SOUND_DATA *_sound_parse(BD_FILE_H *fp)
     bs_skip(&bs, 8); /* reserved */
     num_sounds = bs_read(&bs, 8);
 
-    if (data_len < 1) {
+    if (data_len < 1 || num_sounds < 1) {
         BD_DEBUG(DBG_NAV | DBG_CRIT, "empty database\n");
         goto error;
     }
 
     data_offsets = calloc(num_sounds, sizeof(uint32_t));
     data = calloc(1, sizeof(SOUND_DATA));
+    if (!data_offsets | !data) {
+        BD_DEBUG(DBG_CRIT, "out of memory\n");
+        goto error;
+    }
     data->num_sounds = num_sounds;
     data->sounds = calloc(num_sounds, sizeof(SOUND_OBJECT));
+    if (!data->sounds) {
+        BD_DEBUG(DBG_CRIT, "out of memory\n");
+        goto error;
+    }
 
     /* parse headers */
 
     for (i = 0; i < data->num_sounds; i++) {
         if (!_sound_parse_index(&bs, data_offsets + i, &data->sounds[i])) {
-            BD_DEBUG(DBG_NAV | DBG_CRIT, "error parsing sound %d attribues\n", i);
+            BD_DEBUG(DBG_NAV | DBG_CRIT, "error parsing sound %d attributes\n", i);
             goto error;
         }
     }

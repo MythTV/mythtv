@@ -108,6 +108,9 @@ static void *_open_libaacs(void)
 BD_AACS *libaacs_load(void)
 {
     BD_AACS *p = calloc(1, sizeof(BD_AACS));
+    if (!p) {
+        return NULL;
+    }
 
     p->h_libaacs = _open_libaacs();
     if (!p->h_libaacs) {

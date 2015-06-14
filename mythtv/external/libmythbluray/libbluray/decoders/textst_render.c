@@ -74,6 +74,10 @@ TEXTST_RENDER *textst_render_init(void)
 #ifdef HAVE_FT2
     TEXTST_RENDER *p = calloc(1, sizeof(TEXTST_RENDER));
 
+    if (!p) {
+        return NULL;
+    }
+
     if (!FT_Init_FreeType(&p->ft_lib)) {
         return p;
     }

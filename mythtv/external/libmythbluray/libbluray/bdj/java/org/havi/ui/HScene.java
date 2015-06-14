@@ -239,8 +239,10 @@ public class HScene extends Container implements HComponentOrdering {
     }
 
     public synchronized void dispose() {
-        if (null != BDJXletContext.getCurrentContext())
-            HSceneFactory.getInstance().dispose(this);
+        HSceneFactory sf = HSceneFactory.getInstance();
+        if (sf != null) {
+            sf.dispose(this);
+        }
     }
 
     protected void disposeImpl()

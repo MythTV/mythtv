@@ -180,6 +180,10 @@ final class BDJSecurityManager extends SecurityManager {
         throw new SecurityException("exit denied");
     }
 
+    public void checkSystemClipboardAccess() {
+        throw new SecurityException("clipboard access denied");
+    }
+
     /*
      * file read access
      */

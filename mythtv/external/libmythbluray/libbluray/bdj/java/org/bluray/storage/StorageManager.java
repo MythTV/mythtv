@@ -24,8 +24,8 @@ public class StorageManager {
         synchronized (StorageManager.class) {
             if (instance == null)
                 instance = new StorageManager();
+            return instance;
         }
-        return instance;
     }
 
     protected StorageManager() {

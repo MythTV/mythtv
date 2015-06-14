@@ -67,6 +67,9 @@ static int64_t _file_read(BD_FILE_H *file, uint8_t *buf, int64_t size)
 BD_FILE_H *udf_file_open(void *udf, const char *filename)
 {
     BD_FILE_H *file = calloc(1, sizeof(BD_FILE_H));
+    if (!file) {
+        return NULL;
+    }
 
     BD_DEBUG(DBG_FILE, "Opening UDF file %s... (%p)\n", filename, (void*)file);
 
@@ -116,6 +119,9 @@ static int _dir_read(BD_DIR_H *dir, BD_DIRENT *entry)
 BD_DIR_H *udf_dir_open(void *udf, const char* dirname)
 {
     BD_DIR_H *dir = calloc(1, sizeof(BD_DIR_H));
+    if (!dir) {
+        return NULL;
+    }
 
     BD_DEBUG(DBG_DIR, "Opening UDF dir %s... (%p)\n", dirname, (void*)dir);
 

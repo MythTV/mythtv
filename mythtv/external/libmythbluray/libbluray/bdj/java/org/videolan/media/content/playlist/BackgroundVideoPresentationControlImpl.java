@@ -99,40 +99,40 @@ public class BackgroundVideoPresentationControlImpl extends VideoControl
         return new AWTVideoSize(
                                 new Rectangle(vd.width, vd.height),
                                 new Rectangle(sd.width, sd.height));
-        }
+    }
 
-        public Dimension getSourceVideoSize() {
-            return getVideoSize();
-        }
+    public Dimension getSourceVideoSize() {
+        return getVideoSize();
+    }
 
-        public boolean setSize(AWTVideoSize size) {
-            setClipRegion(size.getSource());
-            setVideoArea(getNormalizedRectangle(getScreenSize(), size.getDestination()));
-            return true;
-        }
+    public boolean setSize(AWTVideoSize size) {
+        setClipRegion(size.getSource());
+        setVideoArea(getNormalizedRectangle(getScreenSize(), size.getDestination()));
+        return true;
+    }
 
-        public AWTVideoSize checkSize(AWTVideoSize size) {
-            Dimension vd = getInputVideoSize();
-            Rectangle sr = size.getSource();
-            if (sr.x < 0)
+    public AWTVideoSize checkSize(AWTVideoSize size) {
+        Dimension vd = getInputVideoSize();
+        Rectangle sr = size.getSource();
+        if (sr.x < 0)
+            sr.x = 0;
+        if ((sr.x + sr.width) > vd.width) {
+            sr.width = vd.width - sr.x;
+            if (sr.width <= 0) {
                 sr.x = 0;
-            if ((sr.x + sr.width) > vd.width) {
-                sr.width = vd.width - sr.x;
-                if (sr.width <= 0) {
-                    sr.x = 0;
-                    sr.width = 0;
-                }
+                sr.width = 0;
             }
-            if (sr.y < 0)
-                sr.y = 0;
-            if ((sr.y + sr.height) > vd.height) {
-                sr.height = vd.height - sr.y;
-                if (sr.height <= 0) {
-                    sr.y = 0;
-                    sr.height = 0;
-                }
-            }
-            Rectangle dr = size.getDestination();
-            return new AWTVideoSize(sr, dr);
         }
+        if (sr.y < 0)
+            sr.y = 0;
+        if ((sr.y + sr.height) > vd.height) {
+            sr.height = vd.height - sr.y;
+            if (sr.height <= 0) {
+                sr.y = 0;
+                sr.height = 0;
+            }
+        }
+        Rectangle dr = size.getDestination();
+        return new AWTVideoSize(sr, dr);
+    }
 }

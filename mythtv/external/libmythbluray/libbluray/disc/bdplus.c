@@ -107,6 +107,9 @@ static void *_libbdplus_open(void)
 BD_BDPLUS *libbdplus_load(void)
 {
     BD_BDPLUS *p = calloc(1, sizeof(BD_BDPLUS));
+    if (!p) {
+        return NULL;
+    }
 
     BD_DEBUG(DBG_BDPLUS, "attempting to load libbdplus\n");
 
@@ -241,10 +244,12 @@ BD_BDPLUS_ST *libbdplus_m2ts(BD_BDPLUS *p, uint32_t clip_id, uint64_t pos)
         if (!p->m2ts) {
             /* use old API */
             BD_BDPLUS_ST *ret = calloc(1, sizeof(BD_BDPLUS_ST));
-            ret->lib = p;
-            ret->st  = NULL;
-            p->title(p->bdplus, clip_id);
-            p->seek(p->bdplus, pos);
+            if (ret) {
+                ret->lib = p;
+                ret->st  = NULL;
+                p->title(p->bdplus, clip_id);
+                p->seek(p->bdplus, pos);
+            }
             return ret;
         }
 
@@ -258,9 +263,11 @@ BD_BDPLUS_ST *libbdplus_m2ts(BD_BDPLUS *p, uint32_t clip_id, uint64_t pos)
             p->m2ts_close(st);
         } else {
             BD_BDPLUS_ST *ret = calloc(1, sizeof(BD_BDPLUS_ST));
-            ret->lib = p;
-            ret->st  = st;
-            BD_DEBUG(DBG_BLURAY | DBG_CRIT, "BD+ active for clip %05d.m2ts\n", clip_id);
+            if (ret) {
+                ret->lib = p;
+                ret->st  = st;
+                BD_DEBUG(DBG_BLURAY | DBG_CRIT, "BD+ active for clip %05d.m2ts\n", clip_id);
+            }
             return ret;
         }
     }

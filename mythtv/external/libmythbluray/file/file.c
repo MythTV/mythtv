@@ -52,6 +52,10 @@ int file_mkdirs(const char *path)
     char *end = dir;
     char *p;
 
+    if (!dir) {
+        return -1;
+    }
+
     /* strip file name */
     if (!(end = strrchr(end, DIR_SEP_CHAR))) {
         X_FREE(dir);

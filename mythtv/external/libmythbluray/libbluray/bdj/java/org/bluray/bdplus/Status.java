@@ -28,8 +28,8 @@ public class Status {
         synchronized (Status.class) {
             if (instance == null)
                 instance = new Status();
+            return instance;
         }
-        return instance;
     }
 
     public static void shutdown() {

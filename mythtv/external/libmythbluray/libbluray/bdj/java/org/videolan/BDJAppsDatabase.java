@@ -35,8 +35,8 @@ public class BDJAppsDatabase extends AppsDatabase {
         synchronized (BDJAppsDatabase.class) {
             if (instance == null)
                 instance = new BDJAppsDatabase();
+            return instance;
         }
-        return instance;
     }
 
     public int size() {
@@ -106,5 +106,5 @@ public class BDJAppsDatabase extends AppsDatabase {
     private BDJAppProxy[] appProxys = null;
     private AppEntry[] appTable = null;
 
-    protected static BDJAppsDatabase instance = null;
+    private static BDJAppsDatabase instance = null;
 }

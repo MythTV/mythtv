@@ -20,8 +20,9 @@ package javax.tv.graphics;
 
 import java.awt.Container;
 import javax.tv.xlet.XletContext;
-import org.havi.ui.HScene;
 import org.havi.ui.HSceneFactory;
+
+import org.videolan.BDJXletContext;
 
 public class TVContainer {
     public static Container getRootContainer(XletContext context)
@@ -30,7 +31,15 @@ public class TVContainer {
             throw new NullPointerException();
         }
 
-        HScene scene = HSceneFactory.getInstance().getDefaultHScene();
-        return scene;
+        if (!(context instanceof BDJXletContext) || (BDJXletContext)context != BDJXletContext.getCurrentContext()) {
+            org.videolan.Logger.getLogger(TVContainer.class.getName()).error("wrong context");
+        }
+
+        /* GEM: return instance of org.havi.ui.HScene or NULL */
+        HSceneFactory sf = HSceneFactory.getInstance();
+        if (sf != null) {
+            return sf.getDefaultHScene();
+        }
+        return null;
     }
 }

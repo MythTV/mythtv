@@ -403,15 +403,20 @@ static void _fill_clip(NAV_TITLE *title,
     strncpy(&clip->name[5], ".m2ts", 6);
     clip->clip_id = atoi(mpls_clip[clip->angle].clip_id);
 
-    file = str_printf("%s.clpi", mpls_clip[clip->angle].clip_id);
     clpi_free(clip->cl);
-    clip->cl = clpi_get(title->disc, file);
-    X_FREE(file);
+    clip->cl = NULL;
+
+    file = str_printf("%s.clpi", mpls_clip[clip->angle].clip_id);
+    if (file) {
+        clip->cl = clpi_get(title->disc, file);
+        X_FREE(file);
+    }
     if (clip->cl == NULL) {
         clip->start_pkt = 0;
         clip->end_pkt = 0;
         return;
     }
+
     switch (connection_condition) {
         case 5:
         case 6:

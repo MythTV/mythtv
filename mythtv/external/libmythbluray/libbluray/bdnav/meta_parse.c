@@ -145,6 +145,10 @@ META_ROOT *meta_parse(BD_DISC *disc)
 {
 #ifdef HAVE_LIBXML2
     META_ROOT *root = calloc(1, sizeof(META_ROOT));
+    if (!root) {
+        BD_DEBUG(DBG_CRIT, "out of memory\n");
+        return NULL;
+    }
     root->dl_count = 0;
 
     xmlDocPtr doc;

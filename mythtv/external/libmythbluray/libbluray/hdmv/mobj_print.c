@@ -159,6 +159,7 @@ static const char * const psr_info[128] = {
     /* PSR127 */ NULL,
 };
 
+#if 0
 static const char * const insn_groups[4] = {
     "BRANCH",
     "COMPARE",
@@ -175,6 +176,7 @@ static const char * const insn_group_set[8] = {
     "SET",
     "SETSYSTEM",
 };
+#endif
 
 static const char * const insn_opt_set[32] = {
     NULL,

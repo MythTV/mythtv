@@ -136,6 +136,10 @@ static void *_jvm_dlopen(const char *java_home, const char *jvm_dir, const char 
 {
     if (java_home) {
         char *path = str_printf("%s/%s/%s", java_home, jvm_dir, jvm_lib);
+        if (!path) {
+            BD_DEBUG(DBG_CRIT, "out of memory\n");
+            return NULL;
+        }
         BD_DEBUG(DBG_BDJ, "Opening %s ...\n", path);
         void *h = dl_dlopen(path, NULL);
         X_FREE(path);
@@ -208,7 +212,13 @@ static void *_load_jvm(const char **p_java_home)
 
 static int _can_read_file(const char *fn)
 {
-    FILE *fp = fopen(fn, "rb");
+    FILE *fp;
+
+    if (!fn) {
+        return 0;
+    }
+
+    fp = fopen(fn, "rb");
     if (fp) {
         char b;
         int result = (int)fread(&b, 1, 1, fp);
@@ -460,6 +470,11 @@ static int _create_jvm(void *jvm_lib, const char *java_home, const char *jar_fil
     }
 
     JavaVMOption* option = calloc(1, sizeof(JavaVMOption) * 20);
+    if (!option) {
+        BD_DEBUG(DBG_CRIT, "out of memory\n");
+        return 0;
+    }
+
     int n = 0;
     JavaVMInitArgs args;
     option[n++].optionString = str_dup   ("-Dawt.toolkit=java.awt.BDToolkit");
@@ -534,16 +549,22 @@ BDJAVA* bdj_open(const char *path, struct bluray *bd,
         return 0;
     }
 
+    BDJAVA* bdjava = calloc(1, sizeof(BDJAVA));
+    if (!bdjava) {
+        dl_dlclose(jvm_lib);
+        return NULL;
+    }
+
     JNIEnv* env = NULL;
     JavaVM *jvm = NULL;
     if (!_find_jvm(jvm_lib, &env, &jvm) &&
         !_create_jvm(jvm_lib, java_home, jar_file, &env, &jvm)) {
 
+        X_FREE(bdjava);
         dl_dlclose(jvm_lib);
         return NULL;
     }
 
-    BDJAVA* bdjava = calloc(1, sizeof(BDJAVA));
     bdjava->h_libjvm = jvm_lib;
     bdjava->jvm = jvm;
 

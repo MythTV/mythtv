@@ -158,6 +158,10 @@ static int _bdrom_have_file(void *p, const char *dir, const char *file)
     char *path;
 
     path = str_printf("%s" DIR_SEP "%s", dir, file);
+    if (!path) {
+        return 0;
+    }
+
     fp = dev->pf_file_open_bdrom(dev->file_open_bdrom_handle, path);
     X_FREE(path);
 

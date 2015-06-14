@@ -72,6 +72,7 @@ public class Handler extends BDHandler {
         synchronized (this) {
             try {
                 locator = new BDLocator(source.getLocator().toExternalForm());
+                currentLocator = null;
             } catch (org.davic.net.InvalidLocatorException e) {
                 throw new IncompatibleSourceException();
             }
@@ -294,7 +295,11 @@ public class Handler extends BDHandler {
 
     protected void doEndOfMediaReached(int playlist) {
         synchronized (this) {
-            if (locator == null || locator.getPlayListId() != playlist) {
+            if (locator == null) {
+                System.err.println("endOfMedia(" + playlist + ") ignored: no current locator");
+                return;
+            }
+            if (locator.getPlayListId() != playlist) {
                 System.err.println("endOfMedia ignored: playlist does not match (" + playlist + " != " + locator.getPlayListId());
                 return;
             }
@@ -336,6 +341,7 @@ public class Handler extends BDHandler {
             if (pi == null)
                 throw new InvalidPlayListException();
             this.locator = locator;
+            this.currentLocator = null;
             baseMediaTime = 0;
             if (state == Prefetched)
                 doPrefetch();
