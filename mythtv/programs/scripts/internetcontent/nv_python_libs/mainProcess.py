@@ -186,7 +186,12 @@ xmlns:mythtv="http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format">""
         </item>""", 'end_channel': """
     </channel>""", 'end_rss': """
 </rss>
-""", }
+""",
+    'nextpagetoken': """
+        <nextpagetoken>%(nextpagetoken)s</nextpagetoken>""",
+    'prevpagetoken': """
+        <prevpagetoken>%(prevpagetoken)s</prevpagetoken>"""
+    }
 
         self.treeViewXML = {'header': """<?xml version="1.0" encoding="UTF-8"?>""", 'rss': """
 <rss version="2.0"
@@ -247,6 +252,10 @@ xmlns:mythtv="http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format">""
                 sys.stdout.write(self.searchXML['rss'])
                 self.firstVideo = False
             sys.stdout.write(self.searchXML['channel'] % data_set[0])
+            if 'nextpagetoken' in data_set[0]:
+                sys.stdout.write(self.searchXML['nextpagetoken'] % data_set[0])
+            if 'prevpagetoken' in data_set[0]:
+                sys.stdout.write(self.searchXML['prevpagetoken'] % data_set[0])
             for item in data_set[1]:
                 sys.stdout.write(self.searchXML['item'] % item)
             sys.stdout.write(self.searchXML['end_channel'])
@@ -396,12 +405,6 @@ class mainProcess:
 
         if not self.grabberInfo['search'] and not self.grabberInfo['tree'] and not self.grabberInfo['html']:
             sys.stderr.write("! Error: You have not selected a valid option.\n")
-            sys.exit(1)
-
-        try:
-            x = int(opts.pagenumber)
-        except:
-            sys.stderr.write("! Error: When specified the page number must be numeric. Yours was (%s)\n" % opts.pagenumber)
             sys.exit(1)
 
         Queries = siteQueries(self.apikey, self.target,

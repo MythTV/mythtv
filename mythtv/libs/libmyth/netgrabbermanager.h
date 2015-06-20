@@ -146,7 +146,7 @@ class MPUBLIC Search : public QObject
 
     void resetSearch(void);
     void executeSearch(const QString &script, const QString &query,
-                       uint pagenum = 1);
+                       const QString &pagenum = "");
     void process(void);
 
     QByteArray GetData() { return m_data; };
@@ -155,6 +155,8 @@ class MPUBLIC Search : public QObject
     uint numResults() { return m_numResults; };
     uint numReturned() { return m_numReturned; };
     uint numIndex() { return m_numIndex; };
+    QString nextPageToken() { return m_nextPageToken; }
+    QString prevPageToken() { return m_prevPageToken; }
 
     ResultItem::resultList GetVideoList() { return m_videoList; };
 
@@ -169,6 +171,9 @@ class MPUBLIC Search : public QObject
     uint                    m_numResults;
     uint                    m_numReturned;
     uint                    m_numIndex;
+
+    QString m_nextPageToken;
+    QString m_prevPageToken;
 
   signals:
 
