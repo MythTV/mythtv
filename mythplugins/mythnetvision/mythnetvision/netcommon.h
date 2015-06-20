@@ -11,6 +11,6 @@
 QString GetThumbnailFilename(QString url, QString title);
 QString GetMythXMLURL(void);
 QUrl GetMythXMLSearch(QString url, QString query,
-                      QString grabber, uint pagenum);
+                      QString grabber, QString pagenum);
 
 #endif // NETCOMMON_H_

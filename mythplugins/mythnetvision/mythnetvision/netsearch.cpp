@@ -346,8 +346,7 @@ void NetSearch::doSearch()
     connect(m_netSearch, SIGNAL(finished(QNetworkReply*)),
                        SLOT(searchFinished(void)));
 
-    QUrl init = GetMythXMLSearch(m_mythXML, m_currentSearch,
-                                m_currentCmd, m_pagenum);
+    QUrl init = GetMythXMLSearch(m_mythXML, m_currentSearch, m_currentCmd, "");
     QUrl req(init.toEncoded(), QUrl::TolerantMode);
     LOG(VB_GENERAL, LOG_INFO,
         QString("Using Search URL %1").arg(req.toString()));
@@ -365,8 +364,11 @@ void NetSearch::getLastResults()
                     .arg(m_currentSearch);
     createBusyDialog(title);
 
-    QUrl req = GetMythXMLSearch(m_mythXML, m_currentSearch,
-                                m_currentCmd, m_pagenum);
+    QString page = m_prevPageToken.isEmpty() ? QString::number(m_pagenum) :
+        m_prevPageToken;
+
+    QUrl req =
+        GetMythXMLSearch(m_mythXML, m_currentSearch, m_currentCmd, page);
     m_reply = m_netSearch->get(QNetworkRequest(req));
 }
 
@@ -381,8 +383,11 @@ void NetSearch::getMoreResults()
                     .arg(m_currentSearch);
     createBusyDialog(title);
 
-    QUrl req = GetMythXMLSearch(m_mythXML, m_currentSearch,
-                                m_currentCmd, m_pagenum);
+    QString page = m_nextPageToken.isEmpty() ? QString::number(m_pagenum) :
+        m_nextPageToken;
+
+    QUrl req =
+        GetMythXMLSearch(m_mythXML, m_currentSearch, m_currentCmd, page);
     m_reply = m_netSearch->get(QNetworkRequest(req));
 }
 
@@ -404,10 +409,12 @@ void NetSearch::searchFinished(void)
     uint returned = item->numReturned();
     uint firstitem = item->numIndex();
 
+    m_nextPageToken = item->nextPageToken();
+    m_prevPageToken = item->prevPageToken();
+
     if (returned > 0)
         m_siteList->GetItemAt(m_currentGrabber)->
-                  SetText(QString::number(
-                  searchresults), "count");
+                  SetText(QString::number(searchresults), "count");
     else
         return;
 

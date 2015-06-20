@@ -1,0 +1,10 @@
+<userYouTube>
+    <!-- Optional: Enter your API key in the tag below -->
+    <apikey></apikey>
+
+    <!-- Optional: Enter the region code used for tree view in the tag below.
+         See the following link for valid values:
+         http://www.iso.org/iso/country_codes/iso_3166_code_lists/country_names_and_code_elements.htm
+    -->
+    <region></region>
+</userYouTube>

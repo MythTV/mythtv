@@ -260,7 +260,8 @@ Search::~Search()
 }
 
 
-void Search::executeSearch(const QString &script, const QString &query, uint pagenum)
+void Search::executeSearch(const QString &script, const QString &query,
+                           const QString &pagenum)
 {
     resetSearch();
 
@@ -276,18 +277,18 @@ void Search::executeSearch(const QString &script, const QString &query, uint pag
 
     QStringList args;
 
-    if (pagenum > 1)
+    if (!pagenum.isEmpty())
     {
         args.append(QString("-p"));
-        args.append(QString::number(pagenum));
+        args.append(pagenum);
     }
 
     args.append("-S");
     QString term = query;
     args.append(MythSystemLegacy::ShellEscape(term));
 
-    LOG(VB_GENERAL, LOG_DEBUG, LOC +
-        QString("Internet Search Query: %1 %2") .arg(cmd).arg(args.join(" ")));
+    LOG(VB_GENERAL, LOG_INFO, LOC +
+        QString("Internet Search Query: %1 %2").arg(cmd).arg(args.join(" ")));
 
     uint flags = kMSRunShell | kMSStdOut | kMSRunBackground;
     m_searchProcess->SetCommand(cmd, args, flags);
@@ -355,6 +356,21 @@ void Search::process()
     else
         m_numIndex = 0;
 
+    Node = itemNode.namedItem(QString("nextpagetoken"));
+    if (!Node.isNull())
+    {
+        m_nextPageToken = Node.toElement().text();
+    }
+    else
+        m_nextPageToken = "";
+
+    Node = itemNode.namedItem(QString("prevpagetoken"));
+    if (!Node.isNull())
+    {
+        m_prevPageToken = Node.toElement().text();
+    }
+    else
+        m_prevPageToken = "";
 }
 
 void Search::slotProcessSearchExit(uint exitcode)

@@ -48,9 +48,9 @@ QString GetMythXMLURL(void)
 }
 
 QUrl GetMythXMLSearch(QString url, QString query, QString grabber,
-                         uint pagenum)
+                         QString pagenum)
 {
     QString tmp = QString("%1GetInternetSearch?Query=%2&Grabber=%3&Page=%4")
-        .arg(url).arg(query).arg(grabber).arg(QString::number(pagenum));
+        .arg(url).arg(query).arg(grabber).arg(pagenum);
     return QUrl(tmp);
 }

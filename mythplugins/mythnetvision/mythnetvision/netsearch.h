@@ -83,6 +83,9 @@ class NetSearch : public MythScreenType
     RSSSite::rssList    m_rssList;
     QMap<MythUIButtonListItem*,ResultItem> m_rssitems;
 
+    QString m_nextPageToken;
+    QString m_prevPageToken;
+
   private slots:
     void streamWebVideo(void);
     void showWebVideo(void);

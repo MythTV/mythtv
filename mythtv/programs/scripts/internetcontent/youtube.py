@@ -168,34 +168,6 @@ __tree_max_page_items__ = 20
 
 import sys, os
 
-class OutStreamEncoder(object):
-    """Wraps a stream with an encoder"""
-    def __init__(self, outstream, encoding=None):
-        self.out = outstream
-        if not encoding:
-            self.encoding = sys.getfilesystemencoding()
-        else:
-            self.encoding = encoding
-
-    def write(self, obj):
-        """Wraps the output stream, encoding Unicode strings with the specified encoding"""
-        if isinstance(obj, unicode):
-            try:
-                self.out.write(obj.encode(self.encoding))
-            except IOError:
-                pass
-        else:
-            try:
-                self.out.write(obj)
-            except IOError:
-                pass
-
-    def __getattr__(self, attr):
-        """Delegate everything but write to the stream"""
-        return getattr(self.out, attr)
-sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
-sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
-
 # Used for debugging
 #import nv_python_libs.youtube.youtube_api as target
 
@@ -230,8 +202,9 @@ if process.__version__ < '0.2.0':
     sys.exit(1)
 
 if __name__ == '__main__':
-    # No api key is required
     apikey = ""
+    # Set the base processing directory that the grabber is installed
+    target.baseProcessingDir = os.path.dirname( os.path.realpath(__file__))
     main = process.mainProcess(target, apikey, )
     main.grabberInfo = {}
     main.grabberInfo['title'] = __title__
