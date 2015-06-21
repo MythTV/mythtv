@@ -133,10 +133,33 @@ class Videos(object):
 
         self.config['search_all_languages'] = search_all_languages
 
-        self.error_messages = {'YouTubeUrlError': u"! Error: The URL (%s) cause the exception error (%s)\n", 'YouTubeHttpError': u"! Error: An HTTP communications error with YouTube was raised (%s)\n", 'YouTubeRssError': u"! Error: Invalid RSS meta data\nwas received from YouTube error (%s). Skipping item.\n", 'YouTubeVideoNotFound': u"! Error: Video search with YouTube did not return any results (%s)\n", 'YouTubeVideoDetailError': u"! Error: Invalid Video meta data detail\nwas received from YouTube error (%s). Skipping item.\n", }
+        self.error_messages = \
+                {'YouTubeUrlError': u"! Error: The URL (%s) cause the exception error (%s)\n",
+                'YouTubeHttpError': u"! Error: An HTTP communications error with YouTube was raised (%s)\n",
+                'YouTubeRssError': u"! Error: Invalid RSS meta data\nwas received from YouTube error (%s). Skipping item.\n",
+                'YouTubeVideoNotFound': u"! Error: Video search with YouTube did not return any results (%s)\n",
+                'YouTubeVideoDetailError': u"! Error: Invalid Video meta data detail\nwas received from YouTube error (%s). Skipping item.\n", }
 
         # This is an example that must be customized for each target site
-        self.key_translation = [{'channel_title': 'channel_title', 'channel_link': 'channel_link', 'channel_description': 'channel_description', 'channel_numresults': 'channel_numresults', 'channel_returned': 'channel_returned', 'channel_startindex': 'channel_startindex'}, {'title': 'item_title', 'author': 'item_author', 'published_parsed': 'item_pubdate', 'media_description': 'item_description', 'video': 'item_link', 'thumbnail': 'item_thumbnail', 'link': 'item_url', 'duration': 'item_duration', 'rating': 'item_rating', 'item_width': 'item_width', 'item_height': 'item_height', 'language': 'item_lang'}]
+        self.key_translation = \
+                [{'channel_title': 'channel_title',
+                    'channel_link': 'channel_link',
+                    'channel_description': 'channel_description',
+                    'channel_numresults': 'channel_numresults',
+                    'channel_returned': 'channel_returned',
+                    'channel_startindex': 'channel_startindex'},
+                 {'title': 'item_title',
+                    'author': 'item_author',
+                    'published_parsed': 'item_pubdate',
+                    'media_description': 'item_description',
+                    'video': 'item_link',
+                    'thumbnail': 'item_thumbnail',
+                    'link': 'item_url',
+                    'duration': 'item_duration',
+                    'rating': 'item_rating',
+                    'item_width': 'item_width',
+                    'item_height': 'item_height',
+                    'language': 'item_lang'}]
 
         # Defaulting to no language specified. The YouTube apis does support specifying a language
         if language:
