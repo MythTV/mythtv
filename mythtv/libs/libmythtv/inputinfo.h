@@ -114,6 +114,5 @@ class MTV_PUBLIC ChannelInputInfo : public InputInfo
     int          inputNumV4L;
     int          videoModeV4L2;
 };
-typedef QMap<uint, ChannelInputInfo*> InputMap;
 
 #endif // _INPUTINFO_H_

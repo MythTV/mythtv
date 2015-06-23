@@ -42,7 +42,7 @@ bool ExternalChannel::Open(void)
     if (!InitializeInputs())
         return false;
 
-    if (m_inputs.find(m_currentInputID) == m_inputs.end())
+    if (!m_input.inputid)
         return false;
 
     m_stream_handler = ExternalStreamHandler::Get(m_device);

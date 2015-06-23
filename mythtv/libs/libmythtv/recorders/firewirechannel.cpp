@@ -57,12 +57,11 @@ bool FirewireChannel::Open(void)
     if (!InitializeInputs())
         return false;
 
-    if (m_inputs.find(m_currentInputID) == m_inputs.end())
+    if (!m_input.inputid)
         return false;
 
-    InputMap::const_iterator it = m_inputs.find(m_currentInputID);
     if (!FirewireDevice::IsSTBSupported(fw_opts.model) &&
-        (*it)->externalChanger.isEmpty())
+        m_input.externalChanger.isEmpty())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Model: '%1' is not supported.").arg(fw_opts.model));

@@ -62,20 +62,20 @@ class ChannelBase
     // Gets
     virtual uint GetNextChannel(uint chanid, ChannelChangeDirection direction) const;
     virtual uint GetNextChannel(const QString &channum, ChannelChangeDirection direction) const;
-    virtual int GetInputByName(const QString &input) const;
-    virtual QString GetInputByNum(int capchannel) const;
+    virtual uint GetInputByName(const QString &input) const;
+    virtual QString GetInputByNum(uint inputid) const;
     virtual QString GetCurrentName(void) const
         { return m_curchannelname; }
     virtual int GetChanID(void) const;
     virtual int GetCurrentInputNum(void) const
-        { return m_currentInputID; }
+        { return m_input.inputid; }
     virtual QString GetCurrentInput(void) const
-        { return m_inputs[GetCurrentInputNum()]->name; }
+        { return m_input.name; }
     virtual uint GetCurrentSourceID(void) const
-        { return m_inputs[GetCurrentInputNum()]->sourceid; }
+        { return m_input.sourceid; }
     virtual uint GetSourceID(int inputID) const
-        { return m_inputs[inputID]->sourceid; }
-    virtual uint GetInputCardID(int inputNum) const;
+        { return m_input.sourceid; }
+    virtual uint GetInputCardID(uint inputNum) const;
     virtual ChannelInfoList GetChannels(int inputNum) const;
     virtual ChannelInfoList GetChannels(const QString &inputname) const;
     virtual QStringList GetConnectedInputs(void) const;
@@ -100,8 +100,7 @@ class ChannelBase
     virtual bool Retune(void) { return false; }
 
     /// Saves current channel as the default channel for the current input.
-    virtual void StoreInputChannels(void)
-        { StoreInputChannels(m_inputs); }
+    virtual void StoreInputChannels(void);
 
     // Picture attribute settings
     virtual bool InitPictureAttributes(void) { return false; }
@@ -128,15 +127,11 @@ class ChannelBase
   protected:
     /// \brief Switches to another input on hardware,
     ///        and sets the channel is setstarting is true.
-    virtual bool SwitchToInput(int inputNum, bool setstarting);
+    virtual bool SwitchToInput(uint inputNum, bool setstarting);
     virtual bool IsInputAvailable(
         int inputNum, uint &mplexid_restriction,
         uint &chanid_restrtiction) const;
     virtual bool IsExternalChannelChangeSupported(void) { return false; }
-
-    void ClearInputMap(void);
-
-    static void StoreInputChannels(const InputMap&);
 
   protected:
     bool KillScript(void);
@@ -151,10 +146,9 @@ class ChannelBase
 
     TVRec   *m_pParent;
     QString  m_curchannelname;
-    int      m_currentInputID;
     bool     m_commfree;
     uint     m_cardid;
-    InputMap m_inputs;
+    ChannelInputInfo m_input;
     ChannelInfoList m_allchannels; ///< channels across all inputs
 
     QMutex         m_system_lock;

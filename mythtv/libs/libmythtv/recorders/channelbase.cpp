@@ -48,15 +48,13 @@ using namespace std;
 
 ChannelBase::ChannelBase(TVRec *parent) :
     m_pParent(parent), m_curchannelname(""),
-    m_currentInputID(-1), m_commfree(false), m_cardid(0),
+    m_commfree(false), m_cardid(0), m_input(),
     m_system(NULL), m_system_status(0)
 {
 }
 
 ChannelBase::~ChannelBase(void)
 {
-    ClearInputMap();
-
     QMutexLocker locker(&m_system_lock);
     if (m_system)
         KillScript();
@@ -181,28 +179,22 @@ bool ChannelBase::IsTunable(const QString &input, const QString &channum) const
 {
     QString loc = LOC + QString("IsTunable(%1,%2)").arg(input).arg(channum);
 
-    int inputid = m_currentInputID;
-    if (!input.isEmpty())
-        inputid = GetInputByName(input);
-
-    InputMap::const_iterator it = m_inputs.find(inputid);
-    if (it == m_inputs.end())
+    if (!m_input.inputid || (!input.isEmpty() && input != m_input.name))
     {
         LOG(VB_GENERAL, LOG_ERR, loc + " " +
-            QString("Requested non-existant input '%1':'%2' ")
-            .arg(input).arg(inputid));
+            QString("Requested non-existant input '%1'").arg(input));
 
         return false;
     }
 
     uint mplexid_restriction;
     uint chanid_restriction;
-    if (!IsInputAvailable(inputid, mplexid_restriction, chanid_restriction))
+    if (!IsInputAvailable(m_input.inputid, mplexid_restriction, chanid_restriction))
     {
         LOG(VB_GENERAL, LOG_ERR, loc + " " +
             QString("Requested channel is on input '%1' "
                     "which is in a busy input group")
-            .arg(inputid));
+            .arg(m_input.inputid));
 
         return false;
     }
@@ -215,7 +207,7 @@ bool ChannelBase::IsTunable(const QString &input, const QString &channum) const
     uint atsc_major, atsc_minor, mplexid, chanid, tsid, netid;
     bool commfree;
 
-    if (!ChannelUtil::GetChannelData((*it)->sourceid, chanid, channum,
+    if (!ChannelUtil::GetChannelData(m_input.sourceid, chanid, channum,
                                      tvformat, modulation, freqtable, freqid,
                                      finetune, frequency, dtv_si_std,
                                      mpeg_prog_num, atsc_major, atsc_minor,
@@ -223,7 +215,7 @@ bool ChannelBase::IsTunable(const QString &input, const QString &channum) const
     {
         LOG(VB_GENERAL, LOG_ERR, loc + " " +
             QString("Failed to find channel in DB on input '%1' ")
-            .arg(inputid));
+            .arg(m_input.inputid));
 
         return false;
     }
@@ -247,16 +239,15 @@ uint ChannelBase::GetNextChannel(uint chanid, ChannelChangeDirection direction) 
 {
     if (!chanid)
     {
-        InputMap::const_iterator it = m_inputs.find(m_currentInputID);
-        if (it == m_inputs.end())
+        if (!m_input.inputid)
             return 0;
 
-        chanid = ChannelUtil::GetChanID((*it)->sourceid, m_curchannelname);
+        chanid = ChannelUtil::GetChanID(m_input.sourceid, m_curchannelname);
     }
 
     uint mplexid_restriction = 0;
     uint chanid_restriction = 0;
-    (void)IsInputAvailable(m_currentInputID, mplexid_restriction,
+    (void)IsInputAvailable(m_input.inputid, mplexid_restriction,
                            chanid_restriction);
 
     return ChannelUtil::GetNextChannel(
@@ -266,11 +257,10 @@ uint ChannelBase::GetNextChannel(uint chanid, ChannelChangeDirection direction) 
 
 uint ChannelBase::GetNextChannel(const QString &channum, ChannelChangeDirection direction) const
 {
-    InputMap::const_iterator it = m_inputs.find(m_currentInputID);
-    if (it == m_inputs.end())
+    if (!m_input.inputid)
         return 0;
 
-    uint chanid = ChannelUtil::GetChanID((*it)->sourceid, channum);
+    uint chanid = ChannelUtil::GetChanID(m_input.sourceid, channum);
     return GetNextChannel(chanid, direction);
 }
 
@@ -281,10 +271,8 @@ QStringList ChannelBase::GetConnectedInputs(void) const
 {
     QStringList list;
 
-    InputMap::const_iterator it = m_inputs.begin();
-    for (; it != m_inputs.end(); ++it)
-        if ((*it)->sourceid)
-            list.push_back((*it)->name);
+    if (m_input.sourceid)
+        list.push_back(m_input.name);
 
     return list;
 }
@@ -292,26 +280,21 @@ QStringList ChannelBase::GetConnectedInputs(void) const
 /** \fn ChannelBase::GetInputByNum(int capchannel) const
  *  \brief Returns name of numbered input, returns null if not found.
  */
-QString ChannelBase::GetInputByNum(int capchannel) const
+QString ChannelBase::GetInputByNum(uint inputid) const
 {
-    InputMap::const_iterator it = m_inputs.find(capchannel);
-    if (it != m_inputs.end())
-        return (*it)->name;
+    if (m_input.inputid == inputid)
+        return m_input.name;
     return QString::null;
 }
 
 /** \fn ChannelBase::GetInputByName(const QString &input) const
  *  \brief Returns number of named input, returns -1 if not found.
  */
-int ChannelBase::GetInputByName(const QString &input) const
+uint ChannelBase::GetInputByName(const QString &input) const
 {
-    InputMap::const_iterator it = m_inputs.begin();
-    for (; it != m_inputs.end(); ++it)
-    {
-        if ((*it)->name == input)
-            return (int)it.key();
-    }
-    return -1;
+    if (m_input.name == input)
+        return m_input.inputid;
+    return 0;
 }
 
 bool ChannelBase::SwitchToInput(const QString &inputname)
@@ -351,10 +334,9 @@ bool ChannelBase::SwitchToInput(const QString &inputname, const QString &chan)
     return ok;
 }
 
-bool ChannelBase::SwitchToInput(int newInputNum, bool setstarting)
+bool ChannelBase::SwitchToInput(uint newInputNum, bool setstarting)
 {
-    InputMap::const_iterator it = m_inputs.find(newInputNum);
-    if (it == m_inputs.end() || (*it)->startChanNum.isEmpty())
+    if (m_input.inputid != newInputNum || m_input.startChanNum.isEmpty())
         return false;
 
     uint mplexid_restriction;
@@ -366,7 +348,7 @@ bool ChannelBase::SwitchToInput(int newInputNum, bool setstarting)
     // input switching code would go here
 
     if (setstarting)
-        return SetChannelByString((*it)->startChanNum);
+        return SetChannelByString(m_input.startChanNum);
 
     return true;
 }
@@ -514,36 +496,21 @@ bool ChannelBase::IsInputAvailable(
     return res;
 }
 
-uint ChannelBase::GetInputCardID(int inputNum) const
+uint ChannelBase::GetInputCardID(uint inputNum) const
 {
-    InputMap::const_iterator it = m_inputs.find(inputNum);
-    if (it != m_inputs.end())
-        return (*it)->inputid;
+    if (m_input.inputid == inputNum)
+        return m_input.inputid;
     return 0;
 }
 
 ChannelInfoList ChannelBase::GetChannels(int inputNum) const
 {
-    int inputid = (inputNum > 0) ? inputNum : m_currentInputID;
-
-    ChannelInfoList ret;
-    InputMap::const_iterator it = m_inputs.find(inputid);
-    if (it != m_inputs.end())
-        ret = (*it)->channels;
-
-    return ret;
+    return m_input.channels;
 }
 
 ChannelInfoList ChannelBase::GetChannels(const QString &inputname) const
 {
-    int inputid = m_currentInputID;
-    if (!inputname.isEmpty())
-    {
-        int tmp = GetInputByName(inputname);
-        inputid = (tmp > 0) ? tmp : inputid;
-    }
-
-    return GetChannels(inputid);
+    return m_input.channels;
 }
 
 /// \note m_system_lock must be held when this is called
@@ -567,15 +534,14 @@ void ChannelBase::HandleScript(const QString &freqid)
     bool ok = true;
     m_system_status = 0; // unknown
 
-    InputMap::const_iterator it = m_inputs.find(m_currentInputID);
-    if (it == m_inputs.end())
+    if (!m_input.inputid)
     {
         m_system_status = 2; // failed
         HandleScriptEnd(true);
         return;
     }
 
-    if ((*it)->externalChanger.isEmpty())
+    if (m_input.externalChanger.isEmpty())
     {
         m_system_status = 3; // success
         HandleScriptEnd(true);
@@ -616,9 +582,9 @@ void ChannelBase::HandleScript(const QString &freqid)
     }
     else
     {
-        if ((*it)->externalChanger.toLower() == "internal")
+        if (m_input.externalChanger.toLower() == "internal")
         {
-            ok = ChangeInternalChannel(freqid, (*it)->inputid);
+            ok = ChangeInternalChannel(freqid, m_input.inputid);
             if (!ok)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC + "Can not execute internal channel "
@@ -632,7 +598,7 @@ void ChannelBase::HandleScript(const QString &freqid)
         }
         else
         {
-            ok = ChangeExternalChannel((*it)->externalChanger, freqid);
+            ok = ChangeExternalChannel(m_input.externalChanger, freqid);
             if (!ok)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC + "Can not execute channel changer.");
@@ -761,12 +727,10 @@ void ChannelBase::HandleScriptEnd(bool ok)
     if (ok)
     {
         LOG(VB_CHANNEL, LOG_INFO, LOC + "Channel change script succeeded.");
-
-        InputMap::const_iterator it = m_inputs.find(m_currentInputID);
-        if (it != m_inputs.end())
+        if (m_input.inputid)
         {
             // Set this as the future start channel for this source
-            (*it)->startChanNum = m_curchannelname;
+            m_input.startChanNum = m_curchannelname;
         }
     }
     else
@@ -794,8 +758,7 @@ uint ChannelBase::GetCardID(void) const
 
 int ChannelBase::GetChanID() const
 {
-    InputMap::const_iterator it = m_inputs.find(m_currentInputID);
-    if (it == m_inputs.end())
+    if (!m_input.inputid)
         return false;
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -804,7 +767,7 @@ int ChannelBase::GetChanID() const
                   "WHERE channum  = :CHANNUM AND "
                   "      sourceid = :SOURCEID");
     query.bindValue(":CHANNUM", m_curchannelname);
-    query.bindValue(":SOURCEID", (*it)->sourceid);
+    query.bindValue(":SOURCEID", m_input.sourceid);
 
     if (!query.exec() || !query.isActive())
     {
@@ -823,7 +786,7 @@ int ChannelBase::GetChanID() const
  */
 bool ChannelBase::InitializeInputs(void)
 {
-    ClearInputMap();
+    m_input.Clear();
 
     uint cardid = GetCardID();
     if (!cardid)
@@ -857,54 +820,44 @@ bool ChannelBase::InitializeInputs(void)
         return false;
     }
 
+    query.next();
+
     m_allchannels.clear();
     QString order = gCoreContext->GetSetting("ChannelOrdering", "channum");
-    while (query.next())
+
+    uint sourceid = query.value(5).toUInt();
+    ChannelInfoList channels = ChannelUtil::GetChannels(sourceid, false);
+
+    ChannelUtil::SortChannels(channels, order);
+
+    m_input = ChannelInputInfo(
+        query.value(1).toString(), query.value(2).toString(),
+        query.value(3).toString(), query.value(4).toString(),
+        sourceid,
+        query.value(0).toUInt(),   query.value(5).toUInt(),
+        0,                         channels);
+
+    if (!IsExternalChannelChangeSupported() &&
+        !m_input.externalChanger.isEmpty())
     {
-        uint sourceid = query.value(5).toUInt();
-        ChannelInfoList channels = ChannelUtil::GetChannels(sourceid, false);
-
-        ChannelUtil::SortChannels(channels, order);
-
-        m_inputs[query.value(0).toUInt()] = new ChannelInputInfo(
-            query.value(1).toString(), query.value(2).toString(),
-            query.value(3).toString(), query.value(4).toString(),
-            sourceid,
-            query.value(0).toUInt(),   query.value(5).toUInt(),
-            0,                         channels);
-
-        if (!IsExternalChannelChangeSupported() &&
-            !m_inputs[query.value(0).toUInt()]->externalChanger.isEmpty())
-        {
-            LOG(VB_GENERAL, LOG_WARNING, LOC + "External Channel changer is "
-                "set, but this device does not support it.");
-            m_inputs[query.value(0).toUInt()]->externalChanger.clear();
-        }
-
-        m_allchannels.insert(m_allchannels.end(),
-                           channels.begin(), channels.end());
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "External Channel changer is "
+            "set, but this device does not support it.");
+        m_input.externalChanger.clear();
     }
+
+    m_allchannels.insert(m_allchannels.end(),
+                         channels.begin(), channels.end());
     ChannelUtil::SortChannels(m_allchannels, order, true);
 
-    m_currentInputID = cardid;
-
-    // In case that initial input is not set
-    if (m_currentInputID == -1)
-        m_currentInputID = (*m_inputs.begin())->inputid;
-
-    // print em
-    InputMap::const_iterator it;
-    for (it = m_inputs.begin(); it != m_inputs.end(); ++it)
-    {
-        LOG(VB_CHANNEL, LOG_INFO, LOC +
-            QString("Input #%1: '%2' schan(%3) sourceid(%4)")
-            .arg(it.key()).arg((*it)->name).arg((*it)->startChanNum)
-            .arg((*it)->sourceid));
-    }
+    // print it
+    LOG(VB_CHANNEL, LOG_INFO, LOC +
+        QString("Input #%1: '%2' schan(%3) sourceid(%4)")
+        .arg(m_input.inputid).arg(m_input.name).arg(m_input.startChanNum)
+        .arg(m_input.sourceid));
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Current Input #%1: '%2'")
         .arg(GetCurrentInputNum()).arg(GetCurrentInput()));
 
-    return m_inputs.size();
+    return true;
 }
 
 /** \fn ChannelBase::Renumber(uint,const QString&,const QString&)
@@ -914,47 +867,39 @@ void ChannelBase::Renumber(uint sourceid,
                            const QString &oldChanNum,
                            const QString &newChanNum)
 {
-    InputMap::iterator it = m_inputs.begin();
-
-    for (; it != m_inputs.end(); ++it)
-    {
-        bool skip = ((*it)->name.isEmpty()                ||
-                     (*it)->startChanNum.isEmpty()        ||
-                     (*it)->startChanNum != oldChanNum ||
-                     (*it)->sourceid     != sourceid);
-        if (!skip)
-            (*it)->startChanNum = newChanNum;
-    }
+    bool skip = (m_input.name.isEmpty()                ||
+                 m_input.startChanNum.isEmpty()        ||
+                 m_input.startChanNum != oldChanNum ||
+                 m_input.sourceid     != sourceid);
+    if (!skip)
+        m_input.startChanNum = newChanNum;
 
     if (GetCurrentSourceID() == sourceid && oldChanNum == m_curchannelname)
         m_curchannelname = newChanNum;
 
-    StoreInputChannels(m_inputs);
+    StoreInputChannels();
 }
 
-/** \fn ChannelBase::StoreInputChannels(const InputMap&)
+/** \fn ChannelBase::StoreInputChannels(void)
  *  \brief Sets starting channel for the each input in the input map.
  *  \param input Map from cardinputid to input params.
  */
-void ChannelBase::StoreInputChannels(const InputMap &inputs)
+void ChannelBase::StoreInputChannels(void)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    InputMap::const_iterator it = inputs.begin();
-    for (; it != inputs.end(); ++it)
-    {
-        if ((*it)->name.isEmpty() || (*it)->startChanNum.isEmpty())
-            continue;
 
-        query.prepare(
-            "UPDATE capturecard "
-            "SET startchan = :STARTCHAN "
-            "WHERE cardid = :CARDINPUTID");
-        query.bindValue(":STARTCHAN",   (*it)->startChanNum);
-        query.bindValue(":CARDINPUTID", it.key());
+    if (m_input.name.isEmpty() || m_input.startChanNum.isEmpty())
+        return;
 
-        if (!query.exec() || !query.isActive())
-            MythDB::DBError("StoreInputChannels", query);
-    }
+    query.prepare(
+        "UPDATE capturecard "
+        "SET startchan = :STARTCHAN "
+        "WHERE cardid = :CARDINPUTID");
+    query.bindValue(":STARTCHAN", m_input.startChanNum);
+    query.bindValue(":CARDINPUTID", m_input.inputid);
+
+    if (!query.exec() || !query.isActive())
+        MythDB::DBError("StoreInputChannels", query);
 }
 
 bool ChannelBase::CheckChannel(const QString &channum,
@@ -1036,14 +981,6 @@ bool ChannelBase::CheckChannel(const QString &channum,
         ret = true;
 
     return ret;
-}
-
-void ChannelBase::ClearInputMap(void)
-{
-    InputMap::iterator it = m_inputs.begin();
-    for (; it != m_inputs.end(); ++it)
-        delete *it;
-    m_inputs.clear();
 }
 
 ChannelBase *ChannelBase::CreateChannel(
@@ -1177,14 +1114,15 @@ bool ChannelBase::IsExternalChannelChangeInUse(void)
     if (!IsExternalChannelChangeSupported())
         return false;
 
-    InputMap::const_iterator it = m_inputs.find(m_currentInputID);
-    if (it == m_inputs.end())
+    if (!m_input.inputid)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("IsExternalChannelChangeInUse: "
-                    "non-existant input id '%1'").arg(m_currentInputID));
+                    "non-existant input"));
         return false;
     }
 
-    return !(*it)->externalChanger.isEmpty();
+    return !m_input.externalChanger.isEmpty();
 }
+
+;

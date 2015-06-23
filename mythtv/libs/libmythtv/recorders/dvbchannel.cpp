@@ -326,7 +326,6 @@ bool DVBChannel::SwitchToInput(const QString &inputname, const QString &chan)
     bool ok = false;
     if (input >= 0)
     {
-        m_currentInputID = input;
         ok = SetChannelByString(chan);
     }
     else
@@ -343,9 +342,7 @@ bool DVBChannel::SwitchToInput(int newInputNum, bool setstarting)
     if (!ChannelBase::SwitchToInput(newInputNum, false))
         return false;
 
-    m_currentInputID = newInputNum;
-    InputMap::const_iterator it = m_inputs.find(m_currentInputID);
-    return SetChannelByString((*it)->startChanNum);
+    return SetChannelByString(m_input.startChanNum);
 }
 
 
@@ -533,7 +530,7 @@ void DVBChannel::SetTimeOffset(double offset)
 bool DVBChannel::Tune(const DTVMultiplex &tuning, QString inputname)
 {
     int inputid = inputname.isEmpty() ?
-        m_currentInputID : GetInputByName(inputname);
+        m_input.inputid : GetInputByName(inputname);
     if (inputid < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Tune(): Invalid input '%1'.")
@@ -863,7 +860,7 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
 
 bool DVBChannel::Retune(void)
 {
-    return Tune(desired_tuning, m_currentInputID, true, true);
+    return Tune(desired_tuning, m_input.inputid, true, true);
 }
 
 QString DVBChannel::GetFrontendName(void) const

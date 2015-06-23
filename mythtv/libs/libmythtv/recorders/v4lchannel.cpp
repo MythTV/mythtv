@@ -251,30 +251,23 @@ bool V4LChannel::InitializeInputs(void)
 
     // Insert info from hardware
     uint valid_cnt = 0;
-    InputMap::const_iterator it;
-    for (it = m_inputs.begin(); it != m_inputs.end(); ++it)
+    InputNames::const_iterator v4l_it = v4l_inputs.begin();
+    for (; v4l_it != v4l_inputs.end(); ++v4l_it)
     {
-        InputNames::const_iterator v4l_it = v4l_inputs.begin();
-        for (; v4l_it != v4l_inputs.end(); ++v4l_it)
+        if (*v4l_it == m_input.name)
         {
-            if (*v4l_it == (*it)->name)
-            {
-                (*it)->inputNumV4L   = v4l_it.key();
-                (*it)->videoModeV4L2 = videomode_v4l2;
-                valid_cnt++;
-            }
+            m_input.inputNumV4L   = v4l_it.key();
+            m_input.videoModeV4L2 = videomode_v4l2;
+            valid_cnt++;
         }
     }
 
-    // print em
-    for (it = m_inputs.begin(); it != m_inputs.end(); ++it)
-    {
-        LOG(VB_CHANNEL, LOG_INFO, LOC +
-            QString("Input #%1: '%2' schan(%3) tun(%4) v4l2(%6)")
-                .arg(it.key()).arg((*it)->name).arg((*it)->startChanNum)
-                .arg((*it)->tuneToChannel)
-                .arg(mode_to_format((*it)->videoModeV4L2)));
-    }
+    // print it
+    LOG(VB_CHANNEL, LOG_INFO, LOC +
+        QString("Input #%1: '%2' schan(%3) tun(%4) v4l2(%6)")
+        .arg(m_input.inputid).arg(m_input.name).arg(m_input.startChanNum)
+        .arg(m_input.tuneToChannel)
+        .arg(mode_to_format(m_input.videoModeV4L2)));
 
     return valid_cnt;
 }
@@ -293,16 +286,13 @@ void V4LChannel::SetFormat(const QString &format)
     if (!Open())
         return;
 
-    int inputNum = m_currentInputID;
-    if (m_currentInputID < 0)
-        inputNum = (*m_inputs.begin())->inputid;
+    int inputNum = m_input.inputid;
 
     QString fmt = format;
     if ((fmt == "Default") || format.isEmpty())
     {
-        InputMap::const_iterator it = m_inputs.find(inputNum);
-        if (it != m_inputs.end())
-            fmt = mode_to_format((*it)->videoModeV4L2);
+        if (m_input.inputid)
+            fmt = mode_to_format(m_input.videoModeV4L2);
     }
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("SetFormat(%1) fmt(%2) input(%3)")
@@ -533,11 +523,10 @@ QString V4LChannel::GetFormatForChannel(QString channum, QString inputname)
 
 bool V4LChannel::SetInputAndFormat(int inputNum, QString newFmt)
 {
-    InputMap::const_iterator it = m_inputs.find(inputNum);
-    if (it == m_inputs.end() || (*it)->inputNumV4L < 0)
+    if (!m_input.inputid || m_input.inputNumV4L < 0)
         return false;
 
-    int inputNumV4L = (*it)->inputNumV4L;
+    int inputNumV4L = m_input.inputNumV4L;
     bool ok = true;
 
     QString msg =
@@ -618,13 +607,12 @@ bool V4LChannel::SetInputAndFormat(int inputNum, QString newFmt)
 
 bool V4LChannel::SwitchToInput(int inputnum, bool setstarting)
 {
-    InputMap::const_iterator it = m_inputs.find(inputnum);
-    if (it == m_inputs.end())
+    if (!m_input.inputid)
         return false;
 
-    QString tuneFreqId = (*it)->tuneToChannel;
-    QString channum    = (*it)->startChanNum;
-    QString inputname  = (*it)->name;
+    QString tuneFreqId = m_input.tuneToChannel;
+    QString channum    = m_input.startChanNum;
+    QString inputname  = m_input.name;
 
     LOG(VB_CHANNEL, LOG_INFO, QString("Channel(%1)::SwitchToInput(in %2, '%3')")
             .arg(device).arg(inputnum)
@@ -635,7 +623,7 @@ bool V4LChannel::SwitchToInput(int inputnum, bool setstarting)
     if (!IsInputAvailable(inputnum, mplexid_restriction, chanid_restriction))
         return false;
 
-    QString newFmt = mode_to_format((*it)->videoModeV4L2);
+    QString newFmt = mode_to_format(m_input.videoModeV4L2);
 
     // If we are setting a channel, get its video mode...
     bool chanValid  = (channum != "Undefined") && !channum.isEmpty();
@@ -655,7 +643,6 @@ bool V4LChannel::SwitchToInput(int inputnum, bool setstarting)
     }
 
     currentFormat     = newFmt;
-    m_currentInputID = inputnum;
     m_curchannelname    = ""; // this will be set by SetChannelByString
 
     if (!tuneFreqId.isEmpty() && tuneFreqId != "Undefined")
