@@ -85,8 +85,8 @@
     <shape name="basebackground">
         <area>0,0,10,10</area>
         <type>roundbox</type>
-        <fill color="#000000" alpha="120" />
-        <line color="#FFFFFF" alpha="255" width="2" />
+        <fill color="#000000" alpha="120"/>
+        <line color="#FFFFFF" alpha="255" width="2"/>
         <cornerradius>12</cornerradius>
     </shape>
 
@@ -95,12 +95,12 @@
         <area>0,0,100%,100%</area>
         <type>roundbox</type>
         <cornerradius>4</cornerradius>
-        <fill color="#CCCCCC" alpha="120" />
-        <line color="#FFFFFF" width="3" />
+        <fill color="#CCCCCC" alpha="120"/>
+        <line color="#FFFFFF" width="3"/>
     </shape>
 
     <shape name="baseselectedwidgetshape" from="basewidgetshape">
-        <fill color="#43b038" alpha="200" />
+        <fill color="#43b038" alpha="200"/>
     </shape>
 
     <buttonlist name="basebuttonlist">
@@ -115,7 +115,7 @@
                 <shape name="buttonbackground">
                     <area>0,0,100%,100%</area>
                     <fill style="gradient">
-                        <gradient start="#505050" end="#000000" alpha="200" direction="vertical"  />
+                        <gradient start="#505050" end="#000000" alpha="200" direction="vertical"/>
                     </fill>
                 </shape>
                 <textarea name="buttontext">
@@ -150,14 +150,14 @@
             <state name="selectedactive" from="active">
                 <shape name="buttonbackground">
                     <fill style="gradient">
-                        <gradient start="#52CA38" end="#349838" alpha="255" />
+                        <gradient start="#52CA38" end="#349838" alpha="255"/>
                     </fill>
                 </shape>
             </state>
             <state name="selectedinactive" from="active">
                 <shape name="buttonbackground">
                     <fill style="gradient">
-                        <gradient start="#52CA38" end="#349838" alpha="100" />
+                        <gradient start="#52CA38" end="#349838" alpha="100"/>
                     </fill>
                 </shape>
                 <textarea name="buttontext">
@@ -229,7 +229,7 @@
                             <filename>schedule_recording.png</filename>
                         </imagetype>
                     </state>
-                    <state name="marked"></state>
+                    <state name="marked"/>
                 </statetype>
                 <textarea name="buttontext">
                     <area>33,1,730,24</area>
@@ -246,11 +246,11 @@
                 <shape name="selectbar">
                     <area>25,0,735,25</area>
                     <type>roundbox</type>
-                    <line color="#999999" alpha="255" width="2" />
+                    <line color="#999999" alpha="255" width="2"/>
                     <cornerradius>13</cornerradius>
                 </shape>
             </state>
-            <state name="selectedinactive" from="active" />
+            <state name="selectedinactive" from="active"/>
         </statetype>
         <statetype name="upscrollarrow">
             <position>710,285</position>
@@ -301,7 +301,7 @@
                     <filename>button_selected_background.png</filename>
                 </imagetype>
             </state>
-            <state name="disabled" from="active" />
+            <state name="disabled" from="active"/>
             <state name="pushed" from="active">
                 <imagetype name="background">
                     <filename>button_pushed_background.png</filename>
@@ -334,7 +334,7 @@
                     <filename>wide_button_selected_background.png</filename>
                 </imagetype>
             </state>
-            <state name="disabled" from="active" />
+            <state name="disabled" from="active"/>
             <state name="pushed" from="active">
                 <imagetype name="background">
                     <filename>wide_button_pushed_background.png</filename>
@@ -367,7 +367,7 @@
                     <filename>very_wide_button_selected_background.png</filename>
                 </imagetype>
             </state>
-            <state name="disabled" from="active" />
+            <state name="disabled" from="active"/>
             <state name="pushed" from="active">
                 <imagetype name="background">
                     <filename>very_wide_button_pushed_background.png</filename>
@@ -394,7 +394,7 @@
                     <filename>blankbutton_on.png</filename>
                 </imagetype>
             </state>
-            <state name="disabled" from="active" />
+            <state name="disabled" from="active"/>
             <state name="pushed" from="active">
                 <imagetype name="background">
                     <filename>blankbutton_pushed.png</filename>
@@ -417,11 +417,11 @@
                     <filename>checkbox_background_selected.png</filename>
                 </imagetype>
             </state>
-            <state name="disabled" />
+            <state name="disabled"/>
         </statetype>
         <statetype name="checkstate">
             <position>3,3</position>
-            <state type="off" />
+            <state type="off"/>
             <state type="half">
                 <imagetype name="background">
                     <filename>checkbox_halfcheck.png</filename>
@@ -442,7 +442,7 @@
         <statetype name="buttonitem">
             <state name="active">
                 <area>0,0,70,40</area>
-                <shape name="background" from="basewidgetshape" />
+                <shape name="background" from="basewidgetshape"/>
                 <textarea name="buttontext">
                     <area>5,5,55,30</area>
                     <font>basesmall</font>
@@ -451,9 +451,9 @@
                 </textarea>
             </state>
             <state name="selectedactive" from="active">
-                <shape name="background" from="baseselectedwidgetshape" />
+                <shape name="background" from="baseselectedwidgetshape"/>
             </state>
-            <state name="selectedinactive" from="active" />
+            <state name="selectedinactive" from="active"/>
         </statetype>
         <statetype name="downscrollarrow">
             <position>75,2</position>
@@ -496,9 +496,9 @@
                 </textarea>
             </state>
             <state name="selectedactive" from="active">
-                <shape name="background" from="baseselectedwidgetshape" />
+                <shape name="background" from="baseselectedwidgetshape"/>
             </state>
-            <state name="selectedinactive" from="active" />
+            <state name="selectedinactive" from="active"/>
         </statetype>
         <statetype name="downscrollarrow">
             <position>380,2</position>
@@ -516,7 +516,7 @@
         <statetype name="buttonitem">
             <state name="active">
                 <area>0,0,200,40</area>
-                <shape name="background" from="basewidgetshape" />
+                <shape name="background" from="basewidgetshape"/>
                 <textarea name="buttontext">
                     <area>5,5,190,30</area>
                     <font>basesmall</font>
@@ -525,9 +525,9 @@
                 </textarea>
             </state>
             <state name="selectedactive" from="active">
-                <shape name="background" from="baseselectedwidgetshape" />
+                <shape name="background" from="baseselectedwidgetshape"/>
             </state>
-            <state name="selectedinactive" from="active" />
+            <state name="selectedinactive" from="active"/>
         </statetype>
         <statetype name="downscrollarrow">
             <position>205,2</position>
@@ -569,9 +569,9 @@
                 </textarea>
             </state>
             <state name="selectedactive" from="active">
-                <shape name="background" from="baseselectedwidgetshape" />
+                <shape name="background" from="baseselectedwidgetshape"/>
             </state>
-            <state name="selectedinactive" from="active" />
+            <state name="selectedinactive" from="active"/>
         </statetype>
         <statetype name="downscrollarrow">
             <position>380,2</position>
@@ -595,21 +595,21 @@
         <statetype name="background">
             <state name="active">
                 <area>0,0,375,50</area>
-                <shape name="background" from="basewidgetshape" />
+                <shape name="background" from="basewidgetshape"/>
                 <shape name="textbackground">
                     <area>10,10,355,30</area>
                     <type>roundbox</type>
                     <cornerradius>4</cornerradius>
-                    <fill color="#FFFFFF" alpha="200" />
+                    <fill color="#FFFFFF" alpha="200"/>
                 </shape>
             </state>
             <state name="selected" from="active">
-                <shape name="background" from="baseselectedwidgetshape" />
+                <shape name="background" from="baseselectedwidgetshape"/>
                 <shape name="textbackground">
-                    <fill color="#FFFFFF" alpha="255" />
+                    <fill color="#FFFFFF" alpha="255"/>
                 </shape>
             </state>
-            <state name="inactive" from="active" />
+            <state name="inactive" from="active"/>
         </statetype>
         <imagetype name="cursor">
             <filename>cursor.png</filename>
@@ -626,21 +626,21 @@
         <statetype name="background">
             <state name="active">
                 <area>0,0,375,110</area>
-                <shape name="background" from="basewidgetshape" />
+                <shape name="background" from="basewidgetshape"/>
                 <shape name="textbackground">
                     <area>10,10,355,90</area>
                     <type>roundbox</type>
                     <cornerradius>4</cornerradius>
-                    <fill color="#FFFFFF" alpha="200" />
+                    <fill color="#FFFFFF" alpha="200"/>
                 </shape>
             </state>
             <state name="selected" from="active">
-                <shape name="background" from="baseselectedwidgetshape" />
+                <shape name="background" from="baseselectedwidgetshape"/>
                 <shape name="textbackground">
-                    <fill color="#FFFFFF" alpha="255" />
+                    <fill color="#FFFFFF" alpha="255"/>
                 </shape>
             </state>
-            <state name="inactive" from="active" />
+            <state name="inactive" from="active"/>
         </statetype>
         <imagetype name="cursor">
             <filename>cursor.png</filename>
@@ -727,6 +727,217 @@
         </state>
     </statetype>
 
+    <!-- Extra small text for Gallery images -->
+    <fontdef name="gallerytext" from="basesmall">
+        <pixelsize>18</pixelsize>
+        <outlinecolor>#000000</outlinecolor>
+        <outlinesize>2</outlinesize>
+    </fontdef>
+
+    <!-- A gallery button showing a picture, video or folder -->
+    <group name="galleryactivebutton">
+        <area>0,0,100%,100%</area>
+        <!-- Show a background image depending on node type -->
+        <statetype name="buttontype">
+            <area>0,0,100%,100%</area>
+            <state name="subfolder">
+                <area>0,0,100%,100%</area>
+                <imagetype name="background">
+                    <area>0,0,100%,100%</area>
+                    <filename>shared/folder-reg.png</filename>
+                </imagetype>
+            </state>
+            <state name="root" from="subfolder"/>
+            <state name="upfolder" from="subfolder">
+                <imagetype name="icon">
+                    <area>10%,2%,40%,13%</area>
+                    <filename>shared/updirectory.png</filename>
+                    <preserveaspect>yes</preserveaspect>
+                </imagetype>
+            </state>
+            <state name="image">
+                <area>0,0,100%,100%</area>
+                <imagetype name="background">
+                    <area>0,0,100%,100%</area>
+                    <filename>shared/grid_back_reg.png</filename>
+                    <alpha>64</alpha>
+                </imagetype>
+            </state>
+            <state name="video">
+                <area>0,0,100%,100%</area>
+                <imagetype name="background">
+                    <area>0,0,100%,100%</area>
+                    <filename>shared/movie-reg.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
+        <!-- Show how many images / directories are in this directory -->
+        <textarea name="childcount" from="basetextarea">
+            <area>0,0,55%,15%</area>
+            <font>gallerytext</font>
+            <align>allcenter</align>
+        </textarea>
+        <!-- Shows a picture image -->
+        <imagetype name="buttonimage">
+            <area>2%,2%,98%,98%</area>
+            <preserveaspect>yes</preserveaspect>
+        </imagetype>
+        <!-- Shows a single folder image -->
+        <imagetype name="folderimage">
+            <area>4%,15%,97%,98%</area>
+            <preserveaspect>yes</preserveaspect>
+        </imagetype>
+        <!-- Shows a video image -->
+        <imagetype name="videoimage">
+            <area>4%,10%,97%,90%</area>
+            <preserveaspect>yes</preserveaspect>
+        </imagetype>
+        <!-- Shows 4 images for default folder -->
+        <imagetype name="thumbimage0">
+            <area>4%,15%,47%,47%</area>
+            <preserveaspect>false</preserveaspect>
+        </imagetype>
+        <imagetype name="thumbimage1">
+            <area>51%,15%,92%,47%</area>
+            <preserveaspect>false</preserveaspect>
+        </imagetype>
+        <imagetype name="thumbimage2">
+            <area>4%,57%,47%,93%</area>
+            <preserveaspect>false</preserveaspect>
+        </imagetype>
+        <imagetype name="thumbimage3">
+            <area>51%,57%,92%,93%</area>
+            <preserveaspect>false</preserveaspect>
+        </imagetype>
+        <!-- Darken hidden files/ folders -->
+        <statetype name="buttonstate">
+            <area>0,0,100%,100%</area>
+            <state name="visible"/>
+            <state name="hidden">
+                <area>0,0,100%,100%</area>
+                <shape name="hidden_background_shape">
+                    <area>0,0,100%,100%</area>
+                    <type>box</type>
+                    <fill color="#000000" alpha="128"/>
+                </shape>
+            </state>
+        </statetype>
+        <!-- Shows that the image was marked/selected and
+        might be manipulated with other images -->
+        <statetype name="buttoncheck">
+            <area>0,0,100%,100%</area>
+            <state type="full">
+                <area>42%,49%,26%,26%</area>
+                <shape name="marked_background">
+                    <area>0,0,100%,100%</area>
+                    <type>ellipse</type>
+                    <fill color="#000000"/>
+                </shape>
+                <imagetype name="marked">
+                    <area>0,0,100%,100%</area>
+                    <filename>schedule_recording.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
+        <textarea name="buttontext">
+            <area>0,100%-22,100%,22</area>
+            <font>gallerytext</font>
+            <align>allcenter</align>
+        </textarea>
+    </group>
+
+    <!-- A selected gallery button of a picture, video or folder -->
+    <group name="galleryselectedbutton" from="galleryactivebutton">
+        <area>0,0,100%,100%</area>
+        <statetype name="buttontype">
+            <area>0,0,100%,100%</area>
+            <state name="subfolder">
+                <area>0,0,100%,100%</area>
+                <imagetype name="background">
+                    <area>0,0,100%,100%</area>
+                    <filename>shared/folder-sel.png</filename>
+                </imagetype>
+            </state>
+            <state name="root" from="subfolder"/>
+            <state name="upfolder" from="subfolder">
+                <imagetype name="icon">
+                    <area>10%,2%,40%,13%</area>
+                    <filename>shared/updirectory.png</filename>
+                    <preserveaspect>yes</preserveaspect>
+                </imagetype>
+            </state>
+            <state name="image">
+                <area>0,0,100%,100%</area>
+                <imagetype name="background">
+    <area>0,0,100%,100%</area>
+    <filename>shared/grid_back_sel.png</filename>
+    <alpha>255</alpha>
+    </imagetype>
+            </state>
+            <state name="video">
+                <area>0,0,100%,100%</area>
+                <imagetype name="background">
+                    <area>0,0,100%,100%</area>
+                    <filename>shared/movie-sel.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
+    </group>
+
+    <!--Image information used by multiple windows-->
+    <buttonlist name="galleryinfolist">
+        <area>1%,0,99%,100%-30</area>
+        <layout>vertical</layout>
+        <spacing>0</spacing>
+        <wrapstyle>selection</wrapstyle>
+        <buttonarea>0,5%,100%,98%</buttonarea>
+        <statetype name="buttonitem">
+            <area>0,0,100%,100%</area>
+            <state name="active">
+                <area>0,0,100%,34</area>
+                <shape name="buttonbackground">
+                    <area>0,0,100%,100%</area>
+                    <fill style="gradient">
+                        <gradient start="#505050" end="#000000" alpha="128" direction="vertical"/>
+                    </fill>
+                </shape>
+                <textarea name="name" from="basetextarea">
+                    <area>2%,0%,35%,100%</area>
+                    <align>vcenter</align>
+                </textarea>
+                <textarea name="value" from="name">
+                    <area>40%,0%,98%,100%</area>
+                </textarea>
+                </state>
+            <state name="selectedactive" from="active">
+                <shape name="buttonbackground">
+                    <area>0,0,100%,100%</area>
+                    <fill style="gradient">
+                        <gradient start="#52CA38" end="#349838" alpha="255"/>
+                    </fill>
+                </shape>
+            </state>
+            <state name="inactive" from="active"/>
+            <state name="selectedinactive" from="active"/>
+        </statetype>
+        <statetype name="upscrollarrow">
+            <position>46%,2%</position>
+            <state type="full">
+                <imagetype name="upoff">
+                    <filename>lb-uparrow-sel.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
+        <statetype name="downscrollarrow">
+            <position>46%,97%</position>
+            <state type="full">
+                <imagetype name="dnoff">
+                     <filename>lb-dnarrow-sel.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
+    </buttonlist>
+
     <!-- Popup Dialogue Box -->
     <window name="MythPopupBox">
         <area>-1,-1,500,500</area>
@@ -773,7 +984,7 @@
 
         <shape name="background" from="basebackground">
             <area>10,10,780,580</area>
-            <fill color="#333333" alpha="255" />
+            <fill color="#333333" alpha="255"/>
         </shape>
 
         <textarea name="title" from="basetextarea">
@@ -1017,7 +1228,7 @@
             <statetype name="buttonitem">
                 <state name="active">
                     <area>0,0,165,105</area>
-                    <shape name="buttonbackground" />
+                    <shape name="buttonbackground"/>
                     <statetype name="nodetype">
                         <state name="folder">
                             <imagetype name="icon">
@@ -1051,12 +1262,13 @@
                         <align>allcenter</align>
                     </textarea>
                 </state>
-                <state name="selectedinactive" from="active" />
+                <state name="inactive" from="active"/>
+                <state name="selectedinactive" from="active"/>
                 <state name="selectedactive" from="active">
                     <shape name="buttonbackground">
                         <area>0,0,165,105</area>
                         <fill style="gradient">
-                            <gradient start="#999999" end="#666666" alpha="220" />
+                            <gradient start="#999999" end="#666666" alpha="220"/>
                         </fill>
                     </shape>
                 </state>
@@ -1091,6 +1303,165 @@
         <button name="ok" from="basebutton">
             <position>530,440</position>
             <value>OK</value>
+        </button>
+
+    </window>
+
+    <window name="MythMultiFileBrowser">
+        <area>0,0,100%,100%</area>
+        <imagetype name="backimg">
+            <area>0,0,100%,100%</area>
+            <filename>mythfilebrowser-background.png</filename>
+        </imagetype>
+
+        <textedit name="location" from="basetextedit">
+            <area>4%,20,60%,50</area>
+        </textedit>
+
+        <buttonlist name="filelist">
+            <area>0,0,100%,100%</area>
+            <layout>grid</layout>
+            <buttonarea>2%,78,72%,100%-80</buttonarea>
+            <spacing>2</spacing>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <area>0,0,176,126</area>
+                    <shape name="buttonbackground"/>
+                    <statetype name="nodetype">
+                        <area>0,0,100%,100%</area>
+                        <state name="folder">
+                            <area>4%,4%,92%,66%</area>
+                            <imagetype name="icon">
+                                <area>0,0,100%,100%</area>
+                                <filename>shared/directory.png</filename>
+                                <preserveaspect>yes</preserveaspect>
+                            </imagetype>
+                        </state>
+                        <state name="upfolder" from="folder">
+                            <area>4%,4%,92%,66%</area>
+                            <imagetype name="icon">
+                                <area>0,0,100%,100%</area>
+                                <filename>shared/updirectory.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="executable" from="folder">
+                            <area>4%,4%,92%,66%</area>
+                            <imagetype name="icon">
+                                <area>0,0,100%,100%</area>
+                                <filename>shared/executable.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="file" from="folder">
+                            <area>4%,4%,92%,66%</area>
+                            <imagetype name="icon">
+                                <area>0,0,100%,100%</area>
+                                <filename>shared/file.png</filename>
+                            </imagetype>
+                        </state>
+                    </statetype>
+                    <imagetype name="buttonimage">
+                        <area>2%,3%,96%,97%-30</area>
+                        <preserveaspect>true</preserveaspect>
+                    </imagetype>
+                    <textarea name="buttontext" from="basetextarea">
+                        <area>0,100%-28,100%,26</area>
+                        <align>allcenter</align>
+                    </textarea>
+            <statetype name="buttoncheck">
+                <area>0,0,100%,100%</area>
+                <state type="full">
+                    <area>40%,35%,40%,40%</area>
+                    <imagetype name="marked">
+                        <area>0,0,100%,100%</area>
+                        <filename>playlist_yes.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+                </state>
+                <state name="inactive" from="active"/>
+                <state name="selectedinactive" from="active"/>
+                <state name="selectedactive" from="active">
+                    <area>0,0,176,126</area>
+                    <shape name="buttonbackground">
+                        <area>0,0,100%,100%</area>
+                        <fill style="gradient">
+                            <gradient start="#999999" end="#666666" alpha="220"/>
+                        </fill>
+                    </shape>
+                </state>
+            </statetype>
+            <statetype name="upscrollarrow">
+                <position>73%,78</position>
+                <state type="off">
+                    <imagetype name="upon">
+                        <filename>lb-uparrow-reg.png</filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="upoff">
+                        <filename>lb-uparrow-sel.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>73%,100%-100</position>
+                <state type="off">
+                    <imagetype name="dnon">
+                        <filename>lb-dnarrow-reg.png</filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="dnoff">
+                        <filename>lb-dnarrow-sel.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </buttonlist>
+
+        <!--<button name="back" from="basebutton">
+            <position>79%,20</position>
+            <value>Up Level</value>
+        </button>-->
+
+        <!--<button name="home" from="basebutton">
+            <position>79%,70</position>
+            <value>Home</value>
+        </button>-->
+
+        <button name="selectall" from="basebutton">
+            <position>79%,3%</position>
+            <value>Select All</value>
+        </button>
+
+        <button name="clearall" from="basebutton">
+            <position>79%,10%</position>
+            <value>Clear All</value>
+        </button>
+
+        <textarea name="selectcount" from="basetextarea">
+            <area>72%,19%,92%,30</area>
+            <align>allcenter</align>
+            <template>%n selection(s)</template>
+        </textarea>
+
+        <imagetype name="preview">
+            <area>72%,23%,92%,70%</area>
+            <preserveaspect>true</preserveaspect>
+        </imagetype>
+
+        <textarea name="info" from="basetextarea">
+            <area>72%,78%,100%,30</area>
+            <align>allcenter</align>
+        </textarea>
+
+        <button name="cancel" from="basebutton">
+            <position>79%,83%</position>
+            <value>Cancel</value>
+        </button>
+
+        <button name="ok" from="basebutton">
+            <position>79%,90%</position>
+            <value>Import</value>
         </button>
 
     </window>
@@ -1130,7 +1501,7 @@
         <shape name="shape1">
             <area>0,0,800,600</area>
             <type>box</type>
-            <fill color="#000000" alpha="255" />
+            <fill color="#000000" alpha="255"/>
         </shape>
 
         <textarea name="title" from="basetextarea">
@@ -1179,7 +1550,7 @@
                     <shape name="buttonbackground">
                         <area>0,0,100%,100%</area>
                         <fill style="gradient">
-                            <gradient start="#505050" end="#000000" alpha="200" direction="vertical"  />
+                            <gradient start="#505050" end="#000000" alpha="200" direction="vertical"/>
                         </fill>
                     </shape>
                     <imagetype name="buttonimage">
@@ -1196,14 +1567,14 @@
                 <state name="selectedactive" from="active">
                     <shape name="buttonbackground">
                         <fill style="gradient">
-                            <gradient start="#52CA38" end="#349838" alpha="255" />
+                            <gradient start="#52CA38" end="#349838" alpha="255"/>
                         </fill>
                     </shape>
                 </state>
                 <state name="selectedinactive" from="active">
                     <shape name="buttonbackground">
                         <fill style="gradient">
-                            <gradient start="#52CA38" end="#349838" alpha="100" />
+                            <gradient start="#52CA38" end="#349838" alpha="100"/>
                         </fill>
                     </shape>
                     <textarea name="resolution">

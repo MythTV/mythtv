@@ -1,44 +1,45 @@
+//! \file
+//! \brief Provides Gallery configuration screens
+//!
+
 #ifndef GALLERYCONFIG_H
 #define GALLERYCONFIG_H
 
-// Qt headers
-
-// MythTV headers
-#include "mythscreentype.h"
-
+#include <mythconfigdialogs.h>
+#include <mythconfiggroups.h>
+#include "gallerycommhelper.h"
 
 
-class GalleryConfig : public MythScreenType
+//! Settings page 1
+class GallerySettings : public VerticalConfigurationGroup
+{
+public:
+    GallerySettings();
+};
+
+
+//! Settings page 2
+class DatabaseSettings : public VerticalConfigurationGroup
 {
     Q_OBJECT
 public:
-    GalleryConfig(MythScreenStack *parent, const char *name);
-    ~GalleryConfig();
-
-    bool Create();
-    bool keyPressEvent(QKeyEvent *);
-    void customEvent(QEvent*);
-
-signals:
-    void configSaved();
-
-private:
-    MythUIButtonList   *m_sortOrder;
-    MythUISpinBox      *m_slideShowTime;
-    MythUIButtonList   *m_transitionType;
-    MythUISpinBox      *m_transitionTime;
-    MythUICheckBox     *m_showHiddenFiles;
-
-    MythUIButton       *m_saveButton;
-    MythUIButton       *m_cancelButton;
-    MythUIButton       *m_clearDbButton;
+    DatabaseSettings(bool enable);
 
 private slots:
-    void Save();
-    void Exit();
-    void Load();
-    void ConfirmClearDatabase();
-    void ClearDatabase();
+    void ClearDb()    { GalleryBERequest::ClearDatabase(); }
 };
+
+
+//! Gallery Settings pages
+class GalleryConfig : public ConfigurationWizard
+{
+public:
+    GalleryConfig(bool editMode)
+    {
+        addChild(new GallerySettings());
+        addChild(new DatabaseSettings(editMode));
+    }
+};
+
 
 #endif // GALLERYCONFIG_H

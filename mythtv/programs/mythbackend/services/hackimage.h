@@ -24,7 +24,6 @@
 
 #include <QScriptEngine>
 #include "services/imageServices.h"
-#include "imageutils.h"
 #include "imagemetadata.h"
 
 
@@ -36,36 +35,38 @@ public:
     Q_INVOKABLE Image( QObject *parent = 0 ) {}
 
 public:
-    bool                        SetImageInfo                ( int   Id,
-                                                              const QString &Tag,
-                                                              const QString &Value );
+    QString                     GetImageInfo       ( int   id,
+                                                     const QString &Tag );
 
-    bool                        SetImageInfoByFileName      ( const QString &FileName,
-                                                              const QString &Tag,
-                                                              const QString &Value );
+    DTC::ImageMetadataInfoList* GetImageInfoList   ( int   id );
 
-    QString                     GetImageInfo                ( int   Id,
-                                                              const QString &Tag );
+    bool                        RemoveImage        ( int   id );
 
-    QString                     GetImageInfoByFileName      ( const QString &FileName,
-                                                              const QString &Tag );
+    bool                        RenameImage        ( int   id,
+                                                     const QString &newName );
 
-    DTC::ImageMetadataInfoList* GetImageInfoList            ( int   Id );
+    bool                        MoveImage          ( int   id,
+                                                     int   destinationDir);
 
-    DTC::ImageMetadataInfoList* GetImageInfoListByFileName  ( const QString &FileName );
+    bool                        HideImage          ( int   id,
+                                                     bool  show);
 
-    bool                        RemoveImage        ( int   Id );
-    bool                        RenameImage        ( int   Id,
-                                                     const QString &NewName );
+    bool                        TransformImage     ( int   id,
+                                                     int   transform);
+
+    bool                        SetCover           ( int   dirId,
+                                                     int   thumbId );
+
+    bool                        CreateDir          ( int   id,
+                                                     const QString &name );
+
+    bool                        SetExclusionList   ( const QString &exclusions );
 
     bool                        StartSync          ( void );
     bool                        StopSync           ( void );
     DTC::ImageSyncInfo*         GetSyncStatus      ( void );
 
-    bool                        CreateThumbnail    (int   Id);
-private:
-    QString GetImage(int, ImageItem *, const QString & );
-
+    bool                        CreateThumbnail    ( int   id );
 };
 
 // --------------------------------------------------------------------------
@@ -101,25 +102,25 @@ class ScriptableImage : public QObject
 
     public slots:
 
-        bool SetImageInfo ( int   Id,
-                            const QString &Tag,
-                            const QString &Value )
-        {
-            SCRIPT_CATCH_EXCEPTION( false,
-                return m_obj.SetImageInfo( Id, Tag, Value );
-            )
-        }
+//        bool SetImageInfo ( int   Id,
+//                            const QString &Tag,
+//                            const QString &Value )
+//        {
+//            SCRIPT_CATCH_EXCEPTION( false,
+//                return m_obj.SetImageInfo( Id, Tag, Value );
+//            )
+//        }
 
-        bool SetImageInfoByFileName ( const QString &FileName,
-                                      const QString &Tag,
-                                      const QString &Value )
-        {
-            SCRIPT_CATCH_EXCEPTION( false,
-                return m_obj.SetImageInfoByFileName( FileName,
-                                                     Tag,
-                                                     Value );
-            )
-        }
+//        bool SetImageInfoByFileName ( const QString &FileName,
+//                                      const QString &Tag,
+//                                      const QString &Value )
+//        {
+//            SCRIPT_CATCH_EXCEPTION( false,
+//                return m_obj.SetImageInfoByFileName( FileName,
+//                                                     Tag,
+//                                                     Value );
+//            )
+//        }
 
         QString GetImageInfo( int   Id,
                               const QString &Tag )
@@ -129,13 +130,13 @@ class ScriptableImage : public QObject
             )
         }
 
-        QString GetImageInfoByFileName( const QString &FileName,
-                                        const QString &Tag )
-        {
-            SCRIPT_CATCH_EXCEPTION( QString(),
-                return m_obj.GetImageInfoByFileName( FileName, Tag );
-            )
-        }
+//        QString GetImageInfoByFileName( const QString &FileName,
+//                                        const QString &Tag )
+//        {
+//            SCRIPT_CATCH_EXCEPTION( QString(),
+//                return m_obj.GetImageInfoByFileName( FileName, Tag );
+//            )
+//        }
 
         QObject* GetImageInfoList( int   Id )
         {
@@ -144,12 +145,19 @@ class ScriptableImage : public QObject
             )
         }
 
-        QObject* GetImageInfoListByFileName ( const QString &FileName )
-        {
-            SCRIPT_CATCH_EXCEPTION( NULL,
-                return m_obj.GetImageInfoListByFileName( FileName );
-            )
-        }
+//        QObject* GetImageInfoListByFileName ( const QString &FileName )
+//        {
+//            SCRIPT_CATCH_EXCEPTION( NULL,
+//                return m_obj.GetImageInfoListByFileName( FileName );
+//            )
+//        }
+
+//        bool RemoveImageFromDB( int Id )
+//        {
+//            SCRIPT_CATCH_EXCEPTION( false,
+//                return m_obj.RemoveImageFromDB( Id );
+//            )
+//        }
 
         bool RemoveImage( int Id )
         {
@@ -187,10 +195,10 @@ class ScriptableImage : public QObject
             )
         }
 
-        bool CreateThumbnail    ( int   Id )
+        bool CreateThumbnail    ( int   Id, bool Recreate )
         {
             SCRIPT_CATCH_EXCEPTION( false,
-                return m_obj.CreateThumbnail( Id );
+                return m_obj.CreateThumbnail( Id, Recreate );
             )
         }
 };

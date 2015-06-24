@@ -1,95 +1,64 @@
+//! \file
+//! \brief Reads metadata (Exif & video tags) from an image file
+
 #ifndef IMAGEMETADATA_H
 #define IMAGEMETADATA_H
 
-// Qt headers
-#include <QFileInfo>
-#include <QString>
-#include <QImage>
-#include <QList>
+#include <QCoreApplication>
+#include <QMap>
+#include <QPair>
 
-// MythTV headers
-#include "mythmetaexp.h"
+#include <mythmetaexp.h>
+
+// FFMPEG Metadata
+extern "C" {
+#include <libavformat/avformat.h>
+}
+
+#include "imageutils.h"
 
 
+// Exif 2.2 standard tag names, see http://www.exiv2.org/tags.html
+#define EXIF_TAG_ORIENTATION      "Exif.Image.Orientation"
+#define EXIF_TAG_DATETIME         "Exif.Image.DateTime"
+#define EXIF_TAG_IMAGEDESCRIPTION "Exif.Image.ImageDescription"
+#define EXIF_TAG_USERCOMMENT      "Exif.Photo.UserComment"
 
-// We need to use other names to avoid
-// getting coflicts with the videolist.h file
-enum ImageTreeNodeType {
-    kUnknown        = 0,
-    kBaseDirectory  = 1,
-    kSubDirectory   = 2,
-    kUpDirectory    = 3,
-    kImageFile      = 4,
-    kVideoFile      = 5
+
+enum ImageFileTransform {
+    kResetExif      = 0, //!< Reset to Exif value
+    kRotateCW       = 1, //!< Rotate clockwise
+    kRotateCCW      = 2, //!< Rotate anti-clockwise
+    kFlipHorizontal = 3, //!< Reflect about vertical axis
+    kFlipVertical   = 4  //!< Reflect about horizontal axis
 };
 
-enum ImageFileOrientationState {
-    kFileRotateCW       = 0,
-    kFileRotateCCW      = 1,
-    kFileFlipHorizontal = 2,
-    kFileFlipVertical   = 3,
-    kFileZoomIn         = 4,
-    kFileZoomOut        = 5
+
+//! Manages Exif orientation code
+class META_PUBLIC ExifOrientation
+{
+    Q_DECLARE_TR_FUNCTIONS(ExifOrientation)
+public:
+    static QString FromRotation(QString);
+    static QString Description(QString);
+    static int     Transformed(int, int);
 };
 
-enum ImageFileSortOrder {
-    kSortByNameAsc     = 0,
-    kSortByNameDesc    = 1,
-    kSortByModTimeAsc  = 2,
-    kSortByModTimeDesc = 3,
-    kSortByExtAsc      = 4,
-    kSortByExtDesc     = 5,
-    kSortBySizeAsc     = 6,
-    kSortBySizeDesc    = 7,
-    kSortByDateAsc     = 8,
-    kSortByDateDesc    = 9
-};
 
-const static int kMaxFolderThumbnails = 4;
-
-
-class META_PUBLIC ImageMetadata
+//! Reads metadata from image files
+class META_PUBLIC ImageMetaData
 {
 public:
-    ImageMetadata();
-    ~ImageMetadata();
+    typedef QPair<QString, QString> TagPair;
+    typedef QMap<QString, TagPair>  TagMap;
 
-    // Database fields
-    int         m_id;
-    QString     m_fileName;
-    QString     m_name;
-    QString     m_path;
-    int         m_parentId;
-    int         m_dirCount;
-    int         m_fileCount;
-    int         m_type;
-    int         m_modTime;
-    int         m_size;
-    QString     m_extension;
-    double      m_date;
-    int         m_isHidden;
-
-    // Internal information
-    bool        m_selected;
-
-    int         GetAngle()  const   { return m_angle; }
-    int         GetZoom()   const   { return m_zoom; }
-    int         GetOrientation();
-    void        SetAngle(int);
-    void        SetZoom(int, bool);
-    void        SetOrientation(int, bool);
-
-    // Internal thumbnail information
-    QString         m_thumbPath;
-    QList<QString> *m_thumbFileNameList;
-    QList<int>      m_thumbFileIdList;
+    static bool PopulateMetaValues(ImageItem *);
+    static bool GetMetaData(ImageItem *, TagMap &);
 
 private:
-    int         m_zoom;
-    int         m_angle;
-    int         m_orientation;
+    static bool ReadExifTags(QString, TagMap &);
+    static bool ReadVideoTags(QString, TagMap &);
+    static void ExtractVideoTags(TagMap &tags, int &arbKey, AVDictionary *dict);
 };
-
-Q_DECLARE_METATYPE(ImageMetadata*)
 
 #endif // IMAGEMETADATA_H

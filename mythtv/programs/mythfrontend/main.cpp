@@ -93,7 +93,7 @@ using namespace std;
 #include "videolist.h"
 
 // Gallery
-#include "galleryview.h"
+#include "gallerythumbview.h"
 
 // DVD
 #include "DVD/dvdringbuffer.h"
@@ -685,11 +685,11 @@ static void jumpScreenVideoDefault() { RunVideoScreen(VideoDialog::DLG_DEFAULT, 
 static void RunGallery()
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    GalleryView *galleryView = new GalleryView(mainStack, "galleryview");
+    GalleryThumbView *galleryView = new GalleryThumbView(mainStack, "galleryview");
     if (galleryView->Create())
     {
         mainStack->AddScreen(galleryView);
-        galleryView->LoadData();
+        galleryView->Start();
     }
     else
     {
@@ -1402,30 +1402,40 @@ static void InitKeys(void)
          "Display Item Detail Popup"), "");
 
      // Gallery keybindings
-     REG_KEY("Images", "PLAY", QT_TRANSLATE_NOOP("MythControls",
+     REG_KEY("Images", "SLIDESHOW", QT_TRANSLATE_NOOP("MythControls",
          "Start Slideshow"), "P");
      REG_KEY("Images", "PAUSE", QT_TRANSLATE_NOOP("MythControls",
          "Pause Slideshow"), "Ctrl+P");
      REG_KEY("Images", "STOP", QT_TRANSLATE_NOOP("MythControls",
          "Stop Slideshow"), "Alt+P");
-     REG_KEY("Images", "SLIDESHOW", QT_TRANSLATE_NOOP("MythControls",
-         "Start Slideshow in thumbnail view"), "S");
-     REG_KEY("Images", "RANDOMSHOW", QT_TRANSLATE_NOOP("MythControls",
-         "Start Random Slideshow in thumbnail view"), "R");
+     REG_KEY("Images", "RECURSIVESHOW", QT_TRANSLATE_NOOP("MythControls",
+         "Start Recursive Slideshow"), "R");
      REG_KEY("Images", "ROTRIGHT", QT_TRANSLATE_NOOP("MythControls",
          "Rotate image right 90 degrees"), "],3");
      REG_KEY("Images", "ROTLEFT", QT_TRANSLATE_NOOP("MythControls",
          "Rotate image left 90 degrees"), "[,1");
-     REG_KEY("Images", "ZOOMOUT", QT_TRANSLATE_NOOP("MythControls",
-         "Zoom image out"), "7");
-     REG_KEY("Images", "ZOOMIN", QT_TRANSLATE_NOOP("MythControls",
-         "Zoom image in"), "9");
      REG_KEY("Images", "FLIPHORIZONTAL", QT_TRANSLATE_NOOP("MythControls",
          "Flip image horizontally"), "");
      REG_KEY("Images", "FLIPVERTICAL", QT_TRANSLATE_NOOP("MythControls",
          "Flip image vertically"), "");
+     REG_KEY("Images", "ZOOMOUT", QT_TRANSLATE_NOOP("MythControls",
+         "Zoom image out"), "7");
+     REG_KEY("Images", "ZOOMIN", QT_TRANSLATE_NOOP("MythControls",
+         "Zoom image in"), "9");
+     REG_KEY("Images", "FULLSIZE", QT_TRANSLATE_NOOP("MythControls",
+         "Full-size (un-zoom) image"), "0");
      REG_KEY("Images", "MARK", QT_TRANSLATE_NOOP("MythControls",
          "Mark image"), "T");
+     REG_KEY("Images", "SCROLLUP", QT_TRANSLATE_NOOP("MythControls",
+         "Scroll image up"), "2");
+     REG_KEY("Images", "SCROLLLEFT", QT_TRANSLATE_NOOP("MythControls",
+         "Scroll image left"), "4");
+     REG_KEY("Images", "SCROLLRIGHT", QT_TRANSLATE_NOOP("MythControls",
+         "Scroll image right"), "6");
+     REG_KEY("Images", "SCROLLDOWN", QT_TRANSLATE_NOOP("MythControls",
+         "Scroll image down"), "8");
+     REG_KEY("Images", "RECENTER", QT_TRANSLATE_NOOP("MythControls",
+         "Recenter image"), "5");
 }
 
 static void ReloadKeys(void)
