@@ -1282,17 +1282,17 @@ void MythUIImage::DrawSelf(MythPainter *p, int xoffset, int yoffset,
         if (!m_imageProperties.forceSize.isNull())
             area.setSize(area.size().expandedTo(currentImage->size()));
 
-        // Centre image in available space
-        int x = 0;
-        int y = 0;
+        // Centre image in available space, accounting for zoom
+        int x = 0, y = 0;
+        QRect visibleImage = m_Effects.GetExtent(currentImageArea.size());
 
-        if (area.width() > currentImageArea.width())
-            x = (area.width() - currentImageArea.width()) / 2;
+        if (area.width() > visibleImage.width())
+            x = area.width() / 2 + visibleImage.topLeft().x();
 
-        if (area.height() > currentImageArea.height())
-            y = (area.height() - currentImageArea.height()) / 2;
+        if (area.height() > visibleImage.height())
+            y = area.height() / 2 + visibleImage.topLeft().y();
 
-        if (x > 0 || y > 0)
+        if ((x > 0 || y > 0))
             area.translate(x, y);
 
         QRect srcRect;

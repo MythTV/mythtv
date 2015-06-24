@@ -31,6 +31,8 @@ class UIEffects
         return QPointF(x, y);
     }
 
+    QRect GetExtent(const QSize &size);
+
     int    alpha;
     float  hzoom;
     float  vzoom;
