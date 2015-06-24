@@ -322,6 +322,17 @@ class ImageLoader
 
         if (image && !bFoundInCache)
         {
+            if (imProps.isReflected)
+                image->Reflect(imProps.reflectAxis, imProps.reflectShear,
+                               imProps.reflectScale, imProps.reflectLength,
+                               imProps.reflectSpacing);
+
+            if (imProps.isGreyscale)
+                image->ToGreyscale();
+
+            if (imProps.isOriented)
+                image->Orientation(imProps.orientation);
+
             // Even if an explicit size wasn't defined this image may still need
             // to be scaled because of a difference between the theme resolution
             // and the screen resolution. We want to avoid scaling twice.
@@ -362,17 +373,6 @@ class ImageLoader
                 QImage mask = imProps.GetMaskImageSubset(imageArea);
                 image->setAlphaChannel(mask.alphaChannel());
             }
-
-            if (imProps.isReflected)
-                image->Reflect(imProps.reflectAxis, imProps.reflectShear,
-                               imProps.reflectScale, imProps.reflectLength,
-                               imProps.reflectSpacing);
-
-            if (imProps.isGreyscale)
-                image->ToGreyscale();
-
-            if (imProps.isOriented)
-                image->Orientation(imProps.orientation);
 
             if (!imageReader)
                 GetMythUI()->CacheImage(cacheKey, image);
