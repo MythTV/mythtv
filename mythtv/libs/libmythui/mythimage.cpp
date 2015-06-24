@@ -144,25 +144,25 @@ void MythImage::Orientation(int orientation)
         Assign(mirrored(false, true));
         break;
 
-    case 5: // The image is transposed (rotated 90° CW flipped horizontally)
+    case 5: // The image is transposed (flipped horizontally, then rotated 90° CCW)
         matrix.rotate(90);
         Assign(transformed(matrix, Qt::SmoothTransformation));
         Assign(mirrored(true, false));
         break;
 
     case 6: // The image is rotated 90° CCW
-        matrix.rotate(270);
+        matrix.rotate(90);
         Assign(transformed(matrix, Qt::SmoothTransformation));
         break;
 
-    case 7: // The image is transversed  (rotated 90° CW and flipped vertically)
-        matrix.rotate(90);
+    case 7: // The image is transversed (flipped horizontally, then rotated 90° CW)
+        matrix.rotate(270);
         Assign(transformed(matrix, Qt::SmoothTransformation));
-        Assign(mirrored(false, true));
+        Assign(mirrored(true, false));
         break;
 
     case 8: // The image is rotated 90° CW
-        matrix.rotate(90);
+        matrix.rotate(270);
         Assign(transformed(matrix, Qt::SmoothTransformation));
         break;
 
