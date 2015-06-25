@@ -38,7 +38,7 @@ class ChannelBase
     virtual ~ChannelBase(void);
 
     virtual bool Init(QString &inputname, QString &startchannel, bool setchan);
-    virtual bool IsTunable(const QString &input, const QString &channum) const;
+    virtual bool IsTunable(const QString &channum) const;
 
     // Methods that must be implemented.
     /// \brief Opens the channel changing hardware for use.
@@ -76,8 +76,6 @@ class ChannelBase
     virtual uint GetSourceID(int inputID) const
         { return m_input.sourceid; }
     virtual uint GetInputCardID(uint inputNum) const;
-    virtual ChannelInfoList GetChannels(int inputNum) const;
-    virtual ChannelInfoList GetChannels(const QString &inputname) const;
     virtual QStringList GetConnectedInputs(void) const;
 
     /// \brief Returns true iff commercial detection is not required

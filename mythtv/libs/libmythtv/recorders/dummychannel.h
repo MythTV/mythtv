@@ -20,7 +20,7 @@ class DummyChannel : public ChannelBase
         { (void)parent; m_curchannelname.clear(); curinputname.clear(); return; }
     ~DummyChannel(void) { return; }
 
-    bool IsTunable(const QString &input, const QString &channum) const
+    bool IsTunable(const QString &channum) const
         { return true; }
 
     bool Open(void)     { return InitializeInputs(); }

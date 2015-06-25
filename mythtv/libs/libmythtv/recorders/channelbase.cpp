@@ -65,7 +65,7 @@ bool ChannelBase::Init(QString &inputname, QString &startchannel, bool setchan)
     bool ok;
 
     if (!setchan)
-        ok = inputname.isEmpty() ? false : IsTunable(inputname, startchannel);
+        ok = inputname.isEmpty() ? false : IsTunable(startchannel);
     else if (inputname.isEmpty())
         ok = SetChannelByString(startchannel);
     else
@@ -80,93 +80,55 @@ bool ChannelBase::Init(QString &inputname, QString &startchannel, bool setchan)
     QString msg2 = "and we failed to find any suitible channels on any input.";
     bool msg_error = true;
 
-    QStringList inputs = GetConnectedInputs();
-    // Note we use qFind rather than std::find() for ulibc compat (#4507)
-    QStringList::const_iterator start =
-        qFind(inputs.begin(), inputs.end(), inputname);
-    start = (start == inputs.end()) ?  inputs.begin() : start;
-
-    if (start != inputs.end())
+    // Attempt to find the requested startchannel
+    ChannelInfoList::const_iterator cit = m_input.channels.begin();
+    for (; cit != m_input.channels.end(); ++cit)
     {
-        LOG(VB_CHANNEL, LOG_INFO, LOC +
-            QString("Looking for startchannel '%1' on input '%2'")
-            .arg(startchannel).arg(*start));
+        if ((*cit).channum == startchannel &&
+            IsTunable(startchannel))
+        {
+            LOG(VB_CHANNEL, LOG_INFO, LOC +
+                QString("Found startchannel '%1'").arg(startchannel));
+            return true;
+        }
     }
 
-    // Attempt to find an input for the requested startchannel
-    QStringList::const_iterator it = start;
-    while (it != inputs.end())
-    {
-        ChannelInfoList channels = GetChannels(*it);
+    uint mplexid_restriction = 0;
+    uint chanid_restriction = 0;
 
-        ChannelInfoList::const_iterator cit = channels.begin();
-        for (; cit != channels.end(); ++cit)
+    if (m_input.channels.size() &&
+        IsInputAvailable(m_input.inputid, mplexid_restriction,
+                         chanid_restriction))
+    {
+        uint chanid = ChannelUtil::GetNextChannel(
+            m_input.channels, m_input.channels[0].chanid,
+            mplexid_restriction, chanid_restriction, CHANNEL_DIRECTION_UP);
+
+        ChannelInfoList::const_iterator cit =
+            find(m_input.channels.begin(), m_input.channels.end(), chanid);
+
+        if (chanid && cit != m_input.channels.end())
         {
-            if ((*cit).channum == startchannel &&
-                IsTunable(*it, startchannel))
+            if (!setchan)
             {
-                inputname = *it;
-                LOG(VB_CHANNEL, LOG_INFO, LOC +
-                    QString("Found startchannel '%1' on input '%2'")
-                    .arg(startchannel).arg(inputname));
-                return true;
+                ok = IsTunable((mplexid_restriction || chanid_restriction)
+                               ? (*cit).channum : startchannel);
+            }
+            else
+                ok = SwitchToInput(m_input.name, (*cit).channum);
+
+            if (ok)
+            {
+                if (mplexid_restriction || chanid_restriction)
+                {
+                    startchannel = (*cit).channum;
+                    startchannel.detach();
+                }
+                msg2 = QString("selected to '%1' instead.")
+                    .arg(startchannel);
+                msg_error = false;
             }
         }
-
-        ++it;
-        it = (it == inputs.end()) ? inputs.begin() : it;
-        if (it == start)
-            break;
-    }
-
-    it = start;
-    while (it != inputs.end() && !ok)
-    {
-        uint mplexid_restriction = 0;
-        uint chanid_restriction = 0;
-
-        ChannelInfoList channels = GetChannels(*it);
-        if (channels.size() &&
-            IsInputAvailable(GetInputByName(*it), mplexid_restriction,
-                             chanid_restriction))
-        {
-            uint chanid = ChannelUtil::GetNextChannel(
-                channels, channels[0].chanid,
-                mplexid_restriction, chanid_restriction, CHANNEL_DIRECTION_UP);
-
-            ChannelInfoList::const_iterator cit =
-                find(channels.begin(), channels.end(), chanid);
-
-            if (chanid && cit != channels.end())
-            {
-                if (!setchan)
-                {
-                    ok = IsTunable(*it, (mplexid_restriction ||
-                                         chanid_restriction) ?
-                                   (*cit).channum : startchannel);
-                }
-                else
-                    ok = SwitchToInput(*it, (*cit).channum);
-
-                if (ok)
-                {
-                    inputname = *it;
-                    if (mplexid_restriction || chanid_restriction)
-                    {
-                        startchannel = (*cit).channum;
-                        startchannel.detach();
-                    }
-                    msg2 = QString("selected to '%1' on input '%2' instead.")
-                        .arg(startchannel).arg(inputname);
-                    msg_error = false;
-                }
-            }
-        }
-
-        ++it;
-        it = (it == inputs.end()) ? inputs.begin() : it;
-        if (it == start)
-            break;
     }
 
     LOG(VB_GENERAL, ((msg_error) ? LOG_ERR : LOG_WARNING), LOC +
@@ -175,14 +137,14 @@ bool ChannelBase::Init(QString &inputname, QString &startchannel, bool setchan)
     return ok;
 }
 
-bool ChannelBase::IsTunable(const QString &input, const QString &channum) const
+bool ChannelBase::IsTunable(const QString &channum) const
 {
-    QString loc = LOC + QString("IsTunable(%1,%2)").arg(input).arg(channum);
+    QString loc = LOC + QString("IsTunable(%1)").arg(channum);
 
-    if (!m_input.inputid || (!input.isEmpty() && input != m_input.name))
+    if (!m_input.inputid)
     {
         LOG(VB_GENERAL, LOG_ERR, loc + " " +
-            QString("Requested non-existant input '%1'").arg(input));
+            QString("Requested non-existant input"));
 
         return false;
     }
@@ -501,16 +463,6 @@ uint ChannelBase::GetInputCardID(uint inputNum) const
     if (m_input.inputid == inputNum)
         return m_input.inputid;
     return 0;
-}
-
-ChannelInfoList ChannelBase::GetChannels(int inputNum) const
-{
-    return m_input.channels;
-}
-
-ChannelInfoList ChannelBase::GetChannels(const QString &inputname) const
-{
-    return m_input.channels;
 }
 
 /// \note m_system_lock must be held when this is called
