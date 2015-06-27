@@ -44,6 +44,11 @@ class IPTVChannelInfo
     {
     }
 
+    bool IsValid(void) const
+    {
+        return !m_name.isEmpty() && m_tuning.IsValid();
+    }
+
   public:
     QString m_name;
     QString m_xmltvid;
