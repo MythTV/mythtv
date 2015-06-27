@@ -1395,7 +1395,7 @@ void TVRec::run(void)
 
                     switchingBuffer = true;
 
-                    SwitchLiveTVRingBuffer(channel->GetCurrentName(),
+                    SwitchLiveTVRingBuffer(channel->GetChannelName(),
                                            false, true);
                 }
                 else
@@ -2117,7 +2117,7 @@ int TVRec::SetSignalMonitoringRate(int rate, int notifyFrontend)
     ClearFlags(kFlagRingBufferReady, __FILE__, __LINE__);
 
     TuningRequest req = (rate > 0) ?
-        TuningRequest(kFlagAntennaAdjust, channel->GetCurrentName()) :
+        TuningRequest(kFlagAntennaAdjust, channel->GetChannelName()) :
         TuningRequest(kFlagLiveTV);
 
     tuningRequests.enqueue(req);
@@ -2459,15 +2459,14 @@ bool TVRec::IsBusy(InputInfo *busy_input, int time_buffer) const
     if (!channel)
         return false;
 
-    QStringList list = channel->GetConnectedInputs();
-    if (list.empty())
+    if (!channel->GetInputID())
         return false;
 
     uint chanid = 0;
 
     if (GetState() != kState_None)
     {
-        busy_input->inputid = channel->GetCurrentInputNum();
+        busy_input->inputid = channel->GetInputID();
         chanid              = channel->GetChanID();
     }
 
@@ -2919,8 +2918,8 @@ void TVRec::ToggleChannelFavorite(QString changroupname)
         return;
 
     // Get current channel id...
-    uint    sourceid = channel->GetCurrentSourceID();
-    QString channum  = channel->GetCurrentName();
+    uint    sourceid = channel->GetSourceID();
+    QString channum  = channel->GetChannelName();
     uint chanid = ChannelUtil::GetChanID(sourceid, channum);
 
     if (!chanid)
@@ -2999,7 +2998,7 @@ int TVRec::ChangePictureAttribute(PictureAdjustType type,
 QString TVRec::GetInput(void) const
 {
     if (channel)
-        return channel->GetCurrentInput();
+        return channel->GetInputName();
     return QString::null;
 }
 
@@ -3009,7 +3008,7 @@ QString TVRec::GetInput(void) const
 uint TVRec::GetSourceID(void) const
 {
     if (channel)
-        return channel->GetCurrentSourceID();
+        return channel->GetSourceID();
     return 0;
 }
 
@@ -3261,7 +3260,7 @@ bool TVRec::GetChannelInfo(uint &chanid, uint &sourceid,
         chanid = (uint) max(channel->GetChanID(), 0);
 
     if (!sourceid)
-        sourceid = channel->GetCurrentSourceID();
+        sourceid = channel->GetSourceID();
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
@@ -3411,8 +3410,8 @@ bool TVRec::TuningOnSameMultiplex(TuningRequest &request)
         return false;
     }
 
-    uint    sourceid   = channel->GetCurrentSourceID();
-    QString oldchannum = channel->GetCurrentName();
+    uint    sourceid   = channel->GetSourceID();
+    QString oldchannum = channel->GetChannelName();
     QString newchannum = request.channel;
 
     if (ChannelUtil::IsOnSameMultiplex(sourceid, newchannum, oldchannum))
@@ -3544,10 +3543,8 @@ uint TVRec::TuningCheckForHWChange(const TuningRequest &request,
 
     if (!inputname.isEmpty())
     {
-        int current_input = channel->GetCurrentInputNum();
-        int new_input     = channel->GetInputByName(inputname);
-        curCardID = channel->GetInputCardID(current_input);
-        newCardID = channel->GetInputCardID(new_input);
+        curCardID = channel->GetInputID();
+        newCardID = channel->GetInputID();
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("HW Tuner: %1->%2")
                 .arg(curCardID).arg(newCardID));
     }
@@ -4175,11 +4172,11 @@ void TVRec::TuningNewRecorder(MPEGStreamData *streamData)
         bool ok;
         if (!ringBuffer)
         {
-            ok = CreateLiveTVRingBuffer(channel->GetCurrentName());
+            ok = CreateLiveTVRingBuffer(channel->GetChannelName());
             SetFlags(kFlagRingBufferReady, __FILE__, __LINE__);
         }
         else
-            ok = SwitchLiveTVRingBuffer(channel->GetCurrentName(),
+            ok = SwitchLiveTVRingBuffer(channel->GetChannelName(),
                                         true, !had_dummyrec && recorder);
         if (!ok)
         {
@@ -4274,8 +4271,8 @@ void TVRec::TuningNewRecorder(MPEGStreamData *streamData)
     // Setup for framebuffer capture devices..
     if (channel)
     {
-        SetVideoFiltersForChannel(channel->GetCurrentSourceID(),
-                                  channel->GetCurrentName());
+        SetVideoFiltersForChannel(channel->GetSourceID(),
+                                  channel->GetChannelName());
     }
 
 #ifdef USING_V4L2
@@ -4330,7 +4327,7 @@ void TVRec::TuningRestartRecorder(void)
         had_dummyrec = true;
     }
 
-    SwitchLiveTVRingBuffer(channel->GetCurrentName(), true, !had_dummyrec);
+    SwitchLiveTVRingBuffer(channel->GetChannelName(), true, !had_dummyrec);
 
     if (had_dummyrec)
     {
@@ -4514,7 +4511,7 @@ bool TVRec::GetProgramRingBufferForLiveTV(RecordingInfo **pginfo,
     MythEvent me(QString("QUERY_NEXT_LIVETV_DIR %1").arg(cardid));
     gCoreContext->dispatch(me);
 
-    uint    sourceid = channel->GetSourceID(inputID);
+    uint    sourceid = channel->GetSourceID();
     int     chanid   = ChannelUtil::GetChanID(sourceid, channum);
 
     if (chanid < 0)
@@ -4614,7 +4611,7 @@ bool TVRec::CreateLiveTVRingBuffer(const QString & channum)
     }
 
     inputID = inputName.isEmpty() ?
-      channel->GetCurrentInputNum() : channel->GetInputByName(inputName);
+      channel->GetInputID() : channel->GetInputByName(inputName);
 
     if (!GetProgramRingBufferForLiveTV(&pginfo, &rb, channum, inputID))
     {
@@ -4632,8 +4629,8 @@ bool TVRec::CreateLiveTVRingBuffer(const QString & channum)
         pginfo->ApplyRecordRecGroupChange(RecordingInfo::kLiveTVRecGroup);
 
     bool discont = (tvchain->TotalSize() > 0);
-    tvchain->AppendNewProgram(pginfo, channel->GetCurrentName(),
-                              channel->GetCurrentInput(), discont);
+    tvchain->AppendNewProgram(pginfo, channel->GetChannelName(),
+                              channel->GetInputName(), discont);
 
     if (curRecording)
     {
@@ -4674,7 +4671,7 @@ bool TVRec::SwitchLiveTVRingBuffer(const QString & channum,
     }
 
     inputID = inputName.isEmpty() ?
-      channel->GetCurrentInputNum() : channel->GetInputByName(inputName);
+      channel->GetInputID() : channel->GetInputByName(inputName);
 
     if (!GetProgramRingBufferForLiveTV(&pginfo, &rb, channum, inputID))
     {
@@ -4688,8 +4685,8 @@ bool TVRec::SwitchLiveTVRingBuffer(const QString & channum,
     pginfo->SaveAutoExpire(kLiveTVAutoExpire);
     if (!pseudoLiveTVRecording)
         pginfo->ApplyRecordRecGroupChange(RecordingInfo::kLiveTVRecGroup);
-    tvchain->AppendNewProgram(pginfo, channel->GetCurrentName(),
-                              channel->GetCurrentInput(), discont);
+    tvchain->AppendNewProgram(pginfo, channel->GetChannelName(),
+                              channel->GetInputName(), discont);
 
     if (set_rec && recorder)
     {

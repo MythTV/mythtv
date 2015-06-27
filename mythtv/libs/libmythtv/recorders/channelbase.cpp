@@ -458,13 +458,6 @@ bool ChannelBase::IsInputAvailable(
     return res;
 }
 
-uint ChannelBase::GetInputCardID(uint inputNum) const
-{
-    if (m_input.inputid == inputNum)
-        return m_input.inputid;
-    return 0;
-}
-
 /// \note m_system_lock must be held when this is called
 bool ChannelBase::KillScript(void)
 {
@@ -806,8 +799,6 @@ bool ChannelBase::InitializeInputs(void)
         QString("Input #%1: '%2' schan(%3) sourceid(%4)")
         .arg(m_input.inputid).arg(m_input.name).arg(m_input.startChanNum)
         .arg(m_input.sourceid));
-    LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Current Input #%1: '%2'")
-        .arg(GetCurrentInputNum()).arg(GetCurrentInput()));
 
     return true;
 }
@@ -826,7 +817,7 @@ void ChannelBase::Renumber(uint sourceid,
     if (!skip)
         m_input.startChanNum = newChanNum;
 
-    if (GetCurrentSourceID() == sourceid && oldChanNum == m_curchannelname)
+    if (GetSourceID() == sourceid && oldChanNum == m_curchannelname)
         m_curchannelname = newChanNum;
 
     StoreInputChannels();
@@ -859,10 +850,6 @@ bool ChannelBase::CheckChannel(const QString &channum,
 {
     inputName = "";
 
-    bool ret = false;
-
-    QString channelinput = GetCurrentInput();
-
     MSqlQuery query(MSqlQuery::InitCon());
     if (!query.isConnected())
         return false;
@@ -872,12 +859,10 @@ bool ChannelBase::CheckChannel(const QString &channum,
         "FROM channel, capturecard "
         "WHERE channel.channum       = :CHANNUM             AND "
         "      channel.sourceid      = capturecard.sourceid AND "
-        "      capturecard.inputname = :INPUT               AND "
-        "      capturecard.cardid    = :CARDID              AND "
+        "      capturecard.cardid    = :INPUTID             AND "
         "      capturecard.hostname  = :HOSTNAME");
     query.bindValue(":CHANNUM",  channum);
-    query.bindValue(":INPUT",    channelinput);
-    query.bindValue(":CARDID",   GetCardID());
+    query.bindValue(":INPUTID",   m_input.inputid);
     query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
 
     if (!query.exec() || !query.isActive())
@@ -886,53 +871,14 @@ bool ChannelBase::CheckChannel(const QString &channum,
     }
     else if (query.size() > 0)
     {
+        inputName = m_input.name;
         return true;
     }
 
-    QString msg = QString(
-        "Failed to find channel(%1) on current input (%2) of card (%3).")
-        .arg(channum).arg(channelinput).arg(GetCardID());
-    LOG(VB_CHANNEL, LOG_ERR, LOC + msg);
-
-    // We didn't find it on the current input let's widen the search
-    query.prepare(
-        "SELECT channel.chanid, capturecard.inputname "
-        "FROM channel, capturecard "
-        "WHERE channel.channum      = :CHANNUM             AND "
-        "      channel.sourceid     = capturecard.sourceid AND "
-        "      capturecard.cardid   = :CARDID              AND "
-        "      capturecard.hostname = :HOSTNAME");
-    query.bindValue(":CHANNUM",  channum);
-    query.bindValue(":CARDID",   GetCardID());
-    query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
-
-    if (!query.exec() || !query.isActive())
-    {
-        MythDB::DBError("checkchannel", query);
-    }
-    else if (query.next())
-    {
-        QString test = query.value(1).toString();
-        if (test != QString::null)
-            inputName = test;
-
-        msg = QString("Found channel(%1) on another input (%2) of card (%3).")
-            .arg(channum).arg(inputName).arg(GetCardID());
-        LOG(VB_CHANNEL, LOG_INFO, LOC + msg);
-
-        return true;
-    }
-
-    msg = QString("Failed to find channel(%1) on any input of card (%2).")
-        .arg(channum).arg(GetCardID());
-    LOG(VB_CHANNEL, LOG_ERR, LOC + msg);
-
-    query.prepare("SELECT NULL FROM channel");
-
-    if (query.exec() && query.size() == 0)
-        ret = true;
-
-    return ret;
+    LOG(VB_CHANNEL, LOG_ERR, LOC +
+        QString("Failed to find channel(%1) on input (%2).")
+        .arg(channum).arg(m_input.inputid));
+    return false;
 }
 
 ChannelBase *ChannelBase::CreateChannel(

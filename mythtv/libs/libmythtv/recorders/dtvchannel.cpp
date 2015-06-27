@@ -69,7 +69,7 @@ void DTVChannel::SetSIStandard(const QString &si_std)
 QString DTVChannel::GetSuggestedTuningMode(bool is_live_tv) const
 {
     uint cardid = GetCardID();
-    QString input = GetCurrentInput();
+    QString input = GetInputName();
 
     uint quickTuning = 0;
     if (cardid && !input.isEmpty())
@@ -381,7 +381,7 @@ bool DTVChannel::SetChannelByString(const QString &channum)
     // Setup filters & recording picture attributes for framegrabing recorders
     // now that the new curchannelname has been established.
     if (m_pParent)
-        m_pParent->SetVideoFiltersForChannel(GetCurrentSourceID(), channum);
+        m_pParent->SetVideoFiltersForChannel(GetSourceID(), channum);
     InitPictureAttributes();
 
     HandleScript(freqid);

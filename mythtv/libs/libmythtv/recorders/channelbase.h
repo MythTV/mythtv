@@ -64,18 +64,15 @@ class ChannelBase
     virtual uint GetNextChannel(const QString &channum, ChannelChangeDirection direction) const;
     virtual uint GetInputByName(const QString &input) const;
     virtual QString GetInputByNum(uint inputid) const;
-    virtual QString GetCurrentName(void) const
+    virtual QString GetChannelName(void) const
         { return m_curchannelname; }
     virtual int GetChanID(void) const;
-    virtual int GetCurrentInputNum(void) const
+    virtual int GetInputID(void) const
         { return m_input.inputid; }
-    virtual QString GetCurrentInput(void) const
+    virtual QString GetInputName(void) const
         { return m_input.name; }
-    virtual uint GetCurrentSourceID(void) const
+    virtual uint GetSourceID(void) const
         { return m_input.sourceid; }
-    virtual uint GetSourceID(int inputID) const
-        { return m_input.sourceid; }
-    virtual uint GetInputCardID(uint inputNum) const;
     virtual QStringList GetConnectedInputs(void) const;
 
     /// \brief Returns true iff commercial detection is not required

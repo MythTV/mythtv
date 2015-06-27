@@ -415,9 +415,9 @@ bool V4LChannel::Tune(uint64_t frequency, QString inputname)
     int inputnum = GetInputByName(inputname);
 
     bool ok = true;
-    if ((inputnum >= 0) && (GetCurrentInputNum() != inputnum))
+    if ((inputnum >= 0) && (GetInputID() != inputnum))
         ok = SwitchToInput(inputnum, false);
-    else if (GetCurrentInputNum() < 0)
+    else if (GetInputID() <= 0)
         ok = SwitchToInput(0, false);
 
     if (!ok)
@@ -687,7 +687,7 @@ bool V4LChannel::InitPictureAttribute(const QString &db_col_name)
         return false;
 
     int cfield = ChannelUtil::GetChannelValueInt(
-        db_col_name, GetCurrentSourceID(), m_curchannelname);
+        db_col_name, GetSourceID(), m_curchannelname);
     int sfield = CardUtil::GetValueInt(
         db_col_name, GetCardID());
 
@@ -768,7 +768,7 @@ int V4LChannel::GetPictureAttribute(PictureAttribute attr) const
         return -1;
 
     int cfield = ChannelUtil::GetChannelValueInt(
-        db_col_name, GetCurrentSourceID(), m_curchannelname);
+        db_col_name, GetSourceID(), m_curchannelname);
     int sfield = CardUtil::GetValueInt(
         db_col_name, GetCardID());
     int dfield = 0;
@@ -886,13 +886,13 @@ int V4LChannel::ChangePictureAttribute(
     if (kAdjustingPicture_Channel == type)
     {
         int adj_value = ChannelUtil::GetChannelValueInt(
-            db_col_name, GetCurrentSourceID(), m_curchannelname);
+            db_col_name, GetSourceID(), m_curchannelname);
 
         int tmp = new_value - old_value + adj_value;
         tmp = (tmp < 0)      ? tmp + 0x10000 : tmp;
         tmp = (tmp > 0xffff) ? tmp - 0x10000 : tmp;
         ChannelUtil::SetChannelValue(db_col_name, QString::number(tmp),
-                                     GetCurrentSourceID(), m_curchannelname);
+                                     GetSourceID(), m_curchannelname);
     }
     else if (kAdjustingPicture_Recording == type)
     {
