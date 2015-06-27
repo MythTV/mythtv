@@ -65,6 +65,8 @@ class HLSReader
     static void CancelURL(const QString &url);
     static void CancelURL(const QStringList &urls);
 
+    static bool IsValidPlaylist(QTextStream & text);
+
   protected:
     void Cancel(bool quiet = false);
     bool LoadSegments(MythSingleDownload& downloader);
@@ -79,8 +81,6 @@ class HLSReader
     int  PlaylistRetryCount(void) const;
 
   private:
-    bool IsValidPlaylist(QTextStream & text);
-
     bool ParseM3U8(const QByteArray & buffer, HLSRecStream* stream = NULL);
     void DecreaseBitrate(int progid);
     void IncreaseBitrate(int progid);

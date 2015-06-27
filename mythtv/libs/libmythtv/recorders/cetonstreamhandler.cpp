@@ -107,7 +107,7 @@ void CetonStreamHandler::Return(CetonStreamHandler * & ref)
 
 CetonStreamHandler::CetonStreamHandler(const QString &device) :
     IPTVStreamHandler(IPTVTuningData(
-                          "", 0, IPTVTuningData::kNone, "", 0, "", 0)),
+                          "", 0, IPTVTuningData::kNone, "", 0, "", 0, IPTVTuningData::inValid)),
     _card(0),
     _tuner(0),
     _using_cablecard(false),
@@ -150,7 +150,7 @@ CetonStreamHandler::CetonStreamHandler(const QString &device) :
     int rtspPort = 8554;
     QString url = QString("rtsp://%1:%2/cetonmpeg%3")
         .arg(_ip_address).arg(rtspPort).arg(_tuner);
-    m_tuning = IPTVTuningData(url, 0, IPTVTuningData::kNone, "", 0, "", 0);
+    m_tuning = IPTVTuningData(url, 0, IPTVTuningData::kNone, "", 0, "", 0, IPTVTuningData::rtsp);
     m_use_rtp_streaming = true;
 
     _valid = true;
