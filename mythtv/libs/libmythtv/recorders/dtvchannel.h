@@ -50,7 +50,7 @@ class DTVChannel : public ChannelBase
     /// In rare cases such as ASI this does nothing since all the channels
     /// are in the same MPTS stream on the same input. But generally you
     /// will need to implement this when adding support for new hardware.
-    virtual bool Tune(const DTVMultiplex &tuning, QString inputname) = 0;
+    virtual bool Tune(const DTVMultiplex &tuning) = 0;
     /// \brief Performs IPTV Tuning. Only implemented by IPTVChannel.
     virtual bool Tune(const IPTVTuningData&, bool scanning) { return false; }
     /// \brief Leave it up to the implementation to map the channnum
@@ -75,9 +75,9 @@ class DTVChannel : public ChannelBase
         return false;
     }
 
-    virtual bool Tune(uint64_t frequency, QString inputname)
+    virtual bool Tune(uint64_t frequency)
     {
-        (void) frequency; (void) inputname;
+        (void) frequency;
         return false;
     }
 

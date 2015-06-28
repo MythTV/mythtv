@@ -88,7 +88,7 @@ static QString format_modulation(const DTVMultiplex &tuning)
     return "unknown";
 }
 
-bool CetonChannel::Tune(const DTVMultiplex &tuning, QString /*inputname*/)
+bool CetonChannel::Tune(const DTVMultiplex &tuning)
 {
     QString modulation = format_modulation(tuning);
 

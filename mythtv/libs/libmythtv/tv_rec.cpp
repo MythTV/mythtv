@@ -2239,8 +2239,7 @@ bool TVRec::CheckChannel(QString name) const
     if (!channel)
         return false;
 
-    QString dummyID;
-    return channel->CheckChannel(name, dummyID);
+    return channel->CheckChannel(name);
 }
 
 /** \fn QString add_spacer(const QString&, const QString&)
@@ -2491,7 +2490,7 @@ bool TVRec::IsBusy(InputInfo *busy_input, int time_buffer) const
             QString channum = QString::null, input = QString::null;
             if (pendinfo.info->QueryTuningInfo(channum, input))
             {
-                busy_input->inputid = channel->GetInputByName(input);
+                busy_input->inputid = channel->GetInputID();
                 chanid = pendinfo.info->GetChanID();
             }
         }
@@ -3389,7 +3388,7 @@ QString TVRec::TuningGetChanNum(const TuningRequest &request,
         }
     }
     if (request.flags & kFlagLiveTV)
-        channel->Init(input, channum, false);
+        channel->Init(channum, false);
 
     if (channel && !channum.isEmpty() && (channum.indexOf("NextChannel") >= 0))
     {
@@ -3539,7 +3538,7 @@ uint TVRec::TuningCheckForHWChange(const TuningRequest &request,
         request.program->QueryTuningInfo(channum, inputname);
 
     if (!channum.isEmpty() && inputname.isEmpty())
-        channel->CheckChannel(channum, inputname);
+        channel->CheckChannel(channum);
 
     if (!inputname.isEmpty())
     {
@@ -4604,14 +4603,13 @@ bool TVRec::CreateLiveTVRingBuffer(const QString & channum)
     int            inputID = -1;
 
     if (!channel ||
-        !channel->CheckChannel(channum, inputName))
+        !channel->CheckChannel(channum))
     {
         ChangeState(kState_None);
         return false;
     }
 
-    inputID = inputName.isEmpty() ?
-      channel->GetInputID() : channel->GetInputByName(inputName);
+    inputID = channel->GetInputID();
 
     if (!GetProgramRingBufferForLiveTV(&pginfo, &rb, channum, inputID))
     {
@@ -4664,14 +4662,13 @@ bool TVRec::SwitchLiveTVRingBuffer(const QString & channum,
     int            inputID = -1;
 
     if (!channel ||
-        !channel->CheckChannel(channum, inputName))
+        !channel->CheckChannel(channum))
     {
         ChangeState(kState_None);
         return false;
     }
 
-    inputID = inputName.isEmpty() ?
-      channel->GetInputID() : channel->GetInputByName(inputName);
+    inputID = channel->GetInputID();
 
     if (!GetProgramRingBufferForLiveTV(&pginfo, &rb, channum, inputID))
     {

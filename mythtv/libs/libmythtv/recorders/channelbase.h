@@ -37,7 +37,7 @@ class ChannelBase
     ChannelBase(TVRec *parent);
     virtual ~ChannelBase(void);
 
-    virtual bool Init(QString &inputname, QString &startchannel, bool setchan);
+    virtual bool Init(QString &startchannel, bool setchan);
     virtual bool IsTunable(const QString &channum) const;
 
     // Methods that must be implemented.
@@ -62,8 +62,6 @@ class ChannelBase
     // Gets
     virtual uint GetNextChannel(uint chanid, ChannelChangeDirection direction) const;
     virtual uint GetNextChannel(const QString &channum, ChannelChangeDirection direction) const;
-    virtual uint GetInputByName(const QString &input) const;
-    virtual QString GetInputByNum(uint inputid) const;
     virtual QString GetChannelName(void) const
         { return m_curchannelname; }
     virtual int GetChanID(void) const;
@@ -73,7 +71,6 @@ class ChannelBase
         { return m_input.name; }
     virtual uint GetSourceID(void) const
         { return m_input.sourceid; }
-    virtual QStringList GetConnectedInputs(void) const;
 
     /// \brief Returns true iff commercial detection is not required
     //         on current channel, for BBC, CBC, etc.
@@ -103,7 +100,7 @@ class ChannelBase
     virtual int  ChangePictureAttribute(
         PictureAdjustType, PictureAttribute, bool up) { return -1; }
 
-    bool CheckChannel(const QString &channum, QString& inputName) const;
+    bool CheckChannel(const QString &channum) const;
 
     // \brief Set cardid for scanning
     void SetCardID(uint _cardid) { m_cardid = _cardid; }
@@ -123,9 +120,8 @@ class ChannelBase
     /// \brief Switches to another input on hardware,
     ///        and sets the channel is setstarting is true.
     virtual bool SwitchToInput(uint inputNum, bool setstarting);
-    virtual bool IsInputAvailable(
-        int inputNum, uint &mplexid_restriction,
-        uint &chanid_restrtiction) const;
+    virtual bool IsInputAvailable(uint &mplexid_restriction,
+                                  uint &chanid_restrtiction) const;
     virtual bool IsExternalChannelChangeSupported(void) { return false; }
 
   protected:

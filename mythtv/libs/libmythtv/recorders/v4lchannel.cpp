@@ -53,14 +53,14 @@ V4LChannel::~V4LChannel(void)
     Close();
 }
 
-bool V4LChannel::Init(QString &inputname, QString &startchannel, bool setchan)
+bool V4LChannel::Init(QString &startchannel, bool setchan)
 {
     if (setchan)
     {
         SetFormat(gCoreContext->GetSetting("TVFormat"));
         SetDefaultFreqTable(gCoreContext->GetSetting("FreqTable"));
     }
-    return ChannelBase::Init(inputname, startchannel, setchan);
+    return ChannelBase::Init(startchannel, setchan);
 }
 
 bool V4LChannel::Open(void)
@@ -385,13 +385,12 @@ bool V4LChannel::Tune(const QString &freqid, int finetune)
 
     int frequency = (curList[i].freq + finetune) * 1000;
 
-    return Tune(frequency, "");
+    return Tune(frequency);
 }
 
-bool V4LChannel::Tune(const DTVMultiplex &tuning, QString inputname)
+bool V4LChannel::Tune(const DTVMultiplex &tuning)
 {
-    return Tune(tuning.frequency - 1750000, // to visual carrier
-                inputname);
+    return Tune(tuning.frequency - 1750000); // to visual carrier
 }
 
 /** \brief Tunes to a specific frequency (Hz) on a particular input
@@ -405,20 +404,14 @@ bool V4LChannel::Tune(const DTVMultiplex &tuning, QString inputname)
  *  \param inputname Name of the input (Television, Antenna 1, etc.)
  *  \param modulation "radio", "analog", or "digital"
  */
-bool V4LChannel::Tune(uint64_t frequency, QString inputname)
+bool V4LChannel::Tune(uint64_t frequency)
 {
-    LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Tune(%1, %2)")
-        .arg(frequency).arg(inputname));
+    LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Tune(%1)").arg(frequency));
 
     int ioctlval = 0;
 
-    int inputnum = GetInputByName(inputname);
-
     bool ok = true;
-    if ((inputnum >= 0) && (GetInputID() != inputnum))
-        ok = SwitchToInput(inputnum, false);
-    else if (GetInputID() <= 0)
-        ok = SwitchToInput(0, false);
+    ok = SwitchToInput(0, false);
 
     if (!ok)
         return false;
@@ -620,7 +613,7 @@ bool V4LChannel::SwitchToInput(int inputnum, bool setstarting)
 
     uint mplexid_restriction;
     uint chanid_restriction;
-    if (!IsInputAvailable(inputnum, mplexid_restriction, chanid_restriction))
+    if (!IsInputAvailable(mplexid_restriction, chanid_restriction))
         return false;
 
     QString newFmt = mode_to_format(m_input.videoModeV4L2);

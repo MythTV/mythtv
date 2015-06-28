@@ -311,20 +311,18 @@ bool DVBChannel::IsOpen(void) const
     return it != is_open.end();
 }
 
-bool DVBChannel::Init(QString &inputname, QString &startchannel, bool setchan)
+bool DVBChannel::Init(QString &startchannel, bool setchan)
 {
     if (setchan && !IsOpen())
         Open(this);
 
-    return ChannelBase::Init(inputname, startchannel, setchan);
+    return ChannelBase::Init(startchannel, setchan);
 }
 
 bool DVBChannel::SwitchToInput(const QString &inputname, const QString &chan)
 {
-    int input = GetInputByName(inputname);
-
     bool ok = false;
-    if (input >= 0)
+    if (m_input.inputid)
     {
         ok = SetChannelByString(chan);
     }
@@ -527,17 +525,14 @@ void DVBChannel::SetTimeOffset(double offset)
 }
 
 
-bool DVBChannel::Tune(const DTVMultiplex &tuning, QString inputname)
+bool DVBChannel::Tune(const DTVMultiplex &tuning)
 {
-    int inputid = inputname.isEmpty() ?
-        m_input.inputid : GetInputByName(inputname);
-    if (inputid < 0)
+    if (!m_input.inputid)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Tune(): Invalid input '%1'.")
-                .arg(inputname));
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Tune(): Invalid input."));
         return false;
     }
-    return Tune(tuning, inputid, false, false);
+    return Tune(tuning, false, false);
 }
 
 #if DVB_API_VERSION >= 5
@@ -657,7 +652,6 @@ static struct dtv_properties *dtvmultiplex_to_dtvproperties(
  *  \return true on success, false on failure
  */
 bool DVBChannel::Tune(const DTVMultiplex &tuning,
-                      uint inputid,
                       bool force_reset,
                       bool same_input)
 {
@@ -669,7 +663,7 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
     {
         LOG(VB_CHANNEL, LOG_INFO, LOC + "tuning on slave channel");
         SetSIStandard(tuning.sistandard);
-        bool ok = master->Tune(tuning, inputid, force_reset, false);
+        bool ok = master->Tune(tuning, force_reset, false);
         ReturnMasterLock(master);
         return ok;
     }
@@ -733,7 +727,7 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
         {
             // configure for new input
             if (!same_input)
-                diseqc_settings.Load(inputid);
+                diseqc_settings.Load(m_input.inputid);
 
             // execute diseqc commands
             if (!diseqc_tree->Execute(diseqc_settings, tuning))
@@ -860,7 +854,7 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
 
 bool DVBChannel::Retune(void)
 {
-    return Tune(desired_tuning, m_input.inputid, true, true);
+    return Tune(desired_tuning, true, true);
 }
 
 QString DVBChannel::GetFrontendName(void) const

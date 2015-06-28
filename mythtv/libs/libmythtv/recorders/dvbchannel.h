@@ -35,7 +35,7 @@ class DVBChannel : public DTVChannel
     bool Open(void) { return Open(this); }
     void Close(void) { Close(this); }
 
-    bool Init(QString &inputname, QString &startchannel, bool setchan);
+    bool Init(QString &startchannel, bool setchan);
 
     // Sets
     void SetPMT(const ProgramMapTable*);
@@ -82,8 +82,8 @@ class DVBChannel : public DTVChannel
     bool SwitchToInput(const QString &inputname, const QString &chan);
     bool SwitchToInput(int newcapchannel, bool setstarting);
     using DTVChannel::Tune;
-    bool Tune(const DTVMultiplex &tuning, QString inputname);
-    bool Tune(const DTVMultiplex &tuning, uint inputid,
+    bool Tune(const DTVMultiplex &tuning);
+    bool Tune(const DTVMultiplex &tuning,
               bool force_reset = false, bool same_input = false);
     bool Retune(void);
 

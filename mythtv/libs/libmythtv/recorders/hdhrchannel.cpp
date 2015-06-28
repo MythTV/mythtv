@@ -162,7 +162,7 @@ static QString get_tune_spec(
     return "auto";
 }
 
-bool HDHRChannel::Tune(const DTVMultiplex &tuning, QString /*inputname*/)
+bool HDHRChannel::Tune(const DTVMultiplex &tuning)
 {
     QString spec = get_tune_spec(tunerType, tuning);
     QString chan = QString("%1:%2").arg(spec).arg(tuning.frequency);

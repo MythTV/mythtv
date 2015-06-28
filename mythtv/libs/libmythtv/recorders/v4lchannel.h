@@ -34,7 +34,7 @@ class V4LChannel : public DTVChannel
     V4LChannel(TVRec *parent, const QString &videodevice);
     virtual ~V4LChannel(void);
 
-    bool Init(QString &inputname, QString &startchannel, bool setchan);
+    bool Init(QString &startchannel, bool setchan);
 
     // Commands
     using DTVChannel::SwitchToInput;
@@ -42,8 +42,8 @@ class V4LChannel : public DTVChannel
     bool Open(void);
     void Close(void);
     using DTVChannel::Tune;
-    bool Tune(const DTVMultiplex &tuning, QString inputname);
-    bool Tune(uint64_t frequency, QString inputname);
+    bool Tune(const DTVMultiplex &tuning);
+    bool Tune(uint64_t frequency);
     bool Tune(const QString &freqid, int finetune);
     bool Retune(void);
 

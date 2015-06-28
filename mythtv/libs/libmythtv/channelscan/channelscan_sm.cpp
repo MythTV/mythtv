@@ -1694,7 +1694,7 @@ bool ChannelScanSM::Tune(const transport_scan_items_it_t &transport)
     const uint64_t freq = item.freq_offset(transport.offset());
     DTVMultiplex tuning = item.tuning;
     tuning.frequency = freq;
-    return GetDTVChannel()->Tune(tuning, m_inputName);
+    return GetDTVChannel()->Tune(tuning);
 }
 
 void ChannelScanSM::ScanTransport(const transport_scan_items_it_t &transport)

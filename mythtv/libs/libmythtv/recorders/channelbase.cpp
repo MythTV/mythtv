@@ -60,16 +60,14 @@ ChannelBase::~ChannelBase(void)
         KillScript();
 }
 
-bool ChannelBase::Init(QString &inputname, QString &startchannel, bool setchan)
+bool ChannelBase::Init(QString &startchannel, bool setchan)
 {
     bool ok;
 
     if (!setchan)
-        ok = inputname.isEmpty() ? false : IsTunable(startchannel);
-    else if (inputname.isEmpty())
-        ok = SetChannelByString(startchannel);
+        ok = IsTunable(startchannel);
     else
-        ok = SwitchToInput(inputname, startchannel);
+        ok = SetChannelByString(startchannel);
 
     if (ok)
         return true;
@@ -97,8 +95,7 @@ bool ChannelBase::Init(QString &inputname, QString &startchannel, bool setchan)
     uint chanid_restriction = 0;
 
     if (m_input.channels.size() &&
-        IsInputAvailable(m_input.inputid, mplexid_restriction,
-                         chanid_restriction))
+        IsInputAvailable(mplexid_restriction, chanid_restriction))
     {
         uint chanid = ChannelUtil::GetNextChannel(
             m_input.channels, m_input.channels[0].chanid,
@@ -151,7 +148,7 @@ bool ChannelBase::IsTunable(const QString &channum) const
 
     uint mplexid_restriction;
     uint chanid_restriction;
-    if (!IsInputAvailable(m_input.inputid, mplexid_restriction, chanid_restriction))
+    if (!IsInputAvailable(mplexid_restriction, chanid_restriction))
     {
         LOG(VB_GENERAL, LOG_ERR, loc + " " +
             QString("Requested channel is on input '%1' "
@@ -209,8 +206,7 @@ uint ChannelBase::GetNextChannel(uint chanid, ChannelChangeDirection direction) 
 
     uint mplexid_restriction = 0;
     uint chanid_restriction = 0;
-    (void)IsInputAvailable(m_input.inputid, mplexid_restriction,
-                           chanid_restriction);
+    (void)IsInputAvailable(mplexid_restriction, chanid_restriction);
 
     return ChannelUtil::GetNextChannel(
         m_allchannels, chanid, mplexid_restriction, chanid_restriction,
@@ -226,45 +222,10 @@ uint ChannelBase::GetNextChannel(const QString &channum, ChannelChangeDirection 
     return GetNextChannel(chanid, direction);
 }
 
-/** \fn ChannelBase::GetConnectedInputs(void) const
- *  \brief Returns names of connected inputs
- */
-QStringList ChannelBase::GetConnectedInputs(void) const
-{
-    QStringList list;
-
-    if (m_input.sourceid)
-        list.push_back(m_input.name);
-
-    return list;
-}
-
-/** \fn ChannelBase::GetInputByNum(int capchannel) const
- *  \brief Returns name of numbered input, returns null if not found.
- */
-QString ChannelBase::GetInputByNum(uint inputid) const
-{
-    if (m_input.inputid == inputid)
-        return m_input.name;
-    return QString::null;
-}
-
-/** \fn ChannelBase::GetInputByName(const QString &input) const
- *  \brief Returns number of named input, returns -1 if not found.
- */
-uint ChannelBase::GetInputByName(const QString &input) const
-{
-    if (m_input.name == input)
-        return m_input.inputid;
-    return 0;
-}
-
 bool ChannelBase::SwitchToInput(const QString &inputname)
 {
-    int input = GetInputByName(inputname);
-
-    if (input >= 0)
-        return SwitchToInput(input, true);
+    if (m_input.inputid)
+        return SwitchToInput(m_input.inputid, true);
     else
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -278,12 +239,10 @@ bool ChannelBase::SwitchToInput(const QString &inputname, const QString &chan)
     LOG(VB_CHANNEL, LOG_DEBUG, LOC + QString("SwitchToInput(%1,%2)")
         .arg(inputname).arg(chan));
 
-    int input = GetInputByName(inputname);
-
     bool ok = false;
-    if (input >= 0)
+    if (m_input.inputid)
     {
-        ok = SwitchToInput(input, false);
+        ok = SwitchToInput(m_input.inputid, false);
         if (ok)
             ok = SetChannelByString(chan);
     }
@@ -303,8 +262,7 @@ bool ChannelBase::SwitchToInput(uint newInputNum, bool setstarting)
 
     uint mplexid_restriction;
     uint chanid_restriction;
-    if (!IsInputAvailable(newInputNum, mplexid_restriction,
-                          chanid_restriction))
+    if (!IsInputAvailable(mplexid_restriction, chanid_restriction))
         return false;
 
     // input switching code would go here
@@ -423,9 +381,9 @@ static bool is_input_busy(
 }
 
 bool ChannelBase::IsInputAvailable(
-    int inputid, uint &mplexid_restriction, uint &chanid_restriction) const
+    uint &mplexid_restriction, uint &chanid_restriction) const
 {
-    if (inputid < 0)
+    if (!m_input.inputid)
         return false;
 
     // Check each input to make sure it doesn't belong to an
@@ -450,9 +408,9 @@ bool ChannelBase::IsInputAvailable(
     mplexid_restriction = 0;
     chanid_restriction = 0;
 
-    vector<uint> groupids = CardUtil::GetInputGroups(inputid);
+    vector<uint> groupids = CardUtil::GetInputGroups(m_input.inputid);
 
-    bool res = !is_input_busy(inputid, groupids, cid,
+    bool res = !is_input_busy(m_input.inputid, groupids, cid,
                           busygrp, busyrec, busyin, mplexid_restriction,
                           chanid_restriction);
     return res;
@@ -845,11 +803,8 @@ void ChannelBase::StoreInputChannels(void)
         MythDB::DBError("StoreInputChannels", query);
 }
 
-bool ChannelBase::CheckChannel(const QString &channum,
-                               QString& inputName) const
+bool ChannelBase::CheckChannel(const QString &channum) const
 {
-    inputName = "";
-
     MSqlQuery query(MSqlQuery::InitCon());
     if (!query.isConnected())
         return false;
@@ -870,10 +825,7 @@ bool ChannelBase::CheckChannel(const QString &channum,
         MythDB::DBError("checkchannel", query);
     }
     else if (query.size() > 0)
-    {
-        inputName = m_input.name;
         return true;
-    }
 
     LOG(VB_CHANNEL, LOG_ERR, LOC +
         QString("Failed to find channel(%1) on input (%2).")
@@ -986,7 +938,7 @@ ChannelBase *ChannelBase::CreateChannel(
 
     QString input = CardUtil::GetInputName(tvrec->GetCaptureCardNum());
     QString channum = startchannel;
-    channel->Init(input, channum, true);
+    channel->Init(channum, true);
 
     if (enter_power_save_mode)
     {

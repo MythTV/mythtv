@@ -26,7 +26,7 @@ class FirewireChannel : public DTVChannel
     virtual void Close(void);
 
     using DTVChannel::Tune;
-    virtual bool Tune(const DTVMultiplex&, QString) { return false; }
+    virtual bool Tune(const DTVMultiplex&) { return false; }
     virtual bool Tune(const QString &freqid, int finetune);
     virtual bool Retune(void);
 

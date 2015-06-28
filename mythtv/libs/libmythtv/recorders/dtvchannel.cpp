@@ -193,8 +193,7 @@ bool DTVChannel::SetChannelByString(const QString &channum)
 
     uint mplexid_restriction;
     uint chanid_restriction;
-    if (!IsInputAvailable(m_input.inputid, mplexid_restriction,
-                          chanid_restriction))
+    if (!IsInputAvailable(mplexid_restriction, chanid_restriction))
     {
         LOG(VB_GENERAL, LOG_INFO, loc +
             QString("Requested channel '%1' is on input '%2' "
@@ -287,7 +286,7 @@ bool DTVChannel::SetChannelByString(const QString &channum)
                     "\n\t\t\tscript for a composite or s-video "
                     "input. Channel changing will do nothing.");
         }
-        else if (isFrequency && Tune(frequency, ""))
+        else if (isFrequency && Tune(frequency))
         {
         }
         else if (isFrequency)
@@ -306,7 +305,7 @@ bool DTVChannel::SetChannelByString(const QString &channum)
                 CheckOptions(tuning);
 
                 // Tune to proper multiplex
-                if (!Tune(tuning, m_input.name))
+                if (!Tune(tuning))
                 {
                     LOG(VB_GENERAL, LOG_ERR, loc + "Tuning to frequency.");
 
@@ -406,5 +405,5 @@ bool DTVChannel::TuneMultiplex(uint mplexid, QString inputname)
 
     CheckOptions(tuning);
 
-    return Tune(tuning, inputname);
+    return Tune(tuning);
 }
