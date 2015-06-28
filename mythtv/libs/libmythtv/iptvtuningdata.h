@@ -212,6 +212,12 @@ class MTV_PUBLIC IPTVTuningData
   protected:
     bool IsHLSPlaylist(void)
     {
+        if (!qApp)
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("IsHLSPlaylist - No QApplication!!"));
+            return false;
+        }
+
         QString url = m_data_url.toString();
         QByteArray buffer;
 
@@ -219,7 +225,7 @@ class MTV_PUBLIC IPTVTuningData
         downloader.DownloadURL(url, &buffer, 5000, 0, 10000);
         if (!buffer.size())
         {
-            LOG(VB_GENERAL, LOG_ERR,QString("IsHLSPlaylist - Open Failed: %1\n\t\t\t%2")
+            LOG(VB_GENERAL, LOG_ERR, QString("IsHLSPlaylist - Open Failed: %1\n\t\t\t%2")
                 .arg(downloader.ErrorString()).arg(url));
             return false;
         }
