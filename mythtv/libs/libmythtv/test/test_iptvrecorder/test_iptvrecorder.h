@@ -43,21 +43,26 @@ class TestIPTVRecorder: public QObject
 
         /* test url from #11949 without port, free.fr */
         tuning.m_data_url = QUrl (QString("rtsp://mafreebox.freebox.fr/fbxtv_pub/stream?namespace=1&service=203&flavour=sd"));
+        tuning.m_protocol = IPTVTuningData::rtsp;
         QVERIFY (tuning.IsValid());
 
         /* test url from #11949 with port, free.fr */
         tuning.m_data_url = QUrl (QString("rtsp://mafreebox.freebox.fr:554/fbxtv_pub/stream?namespace=1&service=203&flavour=sd"));
+        tuning.m_protocol = IPTVTuningData::rtsp;
         QVERIFY (tuning.IsValid());
 
         /* test url from #11852 with port, telekom.de */
         tuning.m_data_url = QUrl (QString("rtp://@239.35.10.1:10000"));
+        tuning.m_protocol = IPTVTuningData::rtp;
         QVERIFY (tuning.IsValid());
         /* test url from das-erste.de with port, telekom.de */
         tuning.m_data_url = QUrl (QString("rtp://239.35.10.4:10000"));
+        tuning.m_protocol = IPTVTuningData::rtp;
         QVERIFY (tuning.IsValid());
 
         /* test url from #11847 with port, Dreambox */
         tuning.m_data_url = QUrl (QString("http://yourdreambox:8001/1:0:1:488:3FE:22F1:EEEE0000:0:0:0:"));
+        tuning.m_protocol = IPTVTuningData::http_ts;
         QVERIFY (tuning.IsValid());
     }
 
