@@ -2014,47 +2014,13 @@ IPTVTuningData ChannelUtil::GetIPTVTuningData(uint chanid)
             case IPTVTuningData::kSMPTE2022_2:
                 break; // will be handled by type of first FEC stream
         }
-
-        if (data_url.toLower().startsWith("udp"))
-            protocol = IPTVTuningData::udp;
-
-        else if (data_url.toLower().startsWith("rtp"))
-            protocol = IPTVTuningData::rtp;
-
-        else if (data_url.toLower().startsWith("rtsp"))
-            protocol = IPTVTuningData::rtsp;
-
-        else if (data_url.toLower().startsWith("http") && ChannelUtil::IsHLSPlaylist(data_url))
-            protocol = IPTVTuningData::http_hls;
-
-        else if (data_url.toLower().startsWith("http"))
-            protocol = IPTVTuningData::http_ts;
     }
 
     IPTVTuningData tuning(data_url, bitrate[0], fec_type,
-                          fec_url0, bitrate[1], fec_url1, bitrate[2],
-                          protocol);
+                          fec_url0, bitrate[1], fec_url1, bitrate[2]);
     LOG(VB_GENERAL, LOG_INFO, QString("Loaded %1 for %2")
         .arg(tuning.GetDeviceName()).arg(chanid));
     return tuning;
-}
-
-bool ChannelUtil::IsHLSPlaylist(QString url)
-{
-    QByteArray buffer;
-
-    MythSingleDownload downloader;
-    downloader.DownloadURL(url, &buffer, 5000, 0, 10000);
-    if (!buffer.size())
-    {
-        LOG(VB_GENERAL, LOG_ERR,QString("IsHLSPlaylist - Open Failed: %1\n\t\t\t%2")
-            .arg(downloader.ErrorString()).arg(url));
-        return false;
-    }
-
-    QTextStream text(&buffer);
-    text.setCodec("UTF-8");
-    return (HLSReader::IsValidPlaylist(text));
 }
 
 // TODO This should be modified to load a complete channelinfo object including

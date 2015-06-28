@@ -42,28 +42,29 @@ class TestIPTVRecorder: public QObject
         IPTVTuningData tuning;
 
         /* test url from #11949 without port, free.fr */
-        tuning.m_data_url = QUrl (QString("rtsp://mafreebox.freebox.fr/fbxtv_pub/stream?namespace=1&service=203&flavour=sd"));
-        tuning.m_protocol = IPTVTuningData::rtsp;
+        tuning.SetDataURL(QUrl(QString("rtsp://mafreebox.freebox.fr/fbxtv_pub/stream?namespace=1&service=203&flavour=sd")));
         QVERIFY (tuning.IsValid());
+        QVERIFY (tuning.IsRTSP());
 
         /* test url from #11949 with port, free.fr */
-        tuning.m_data_url = QUrl (QString("rtsp://mafreebox.freebox.fr:554/fbxtv_pub/stream?namespace=1&service=203&flavour=sd"));
-        tuning.m_protocol = IPTVTuningData::rtsp;
+        tuning.SetDataURL(QUrl(QString("rtsp://mafreebox.freebox.fr:554/fbxtv_pub/stream?namespace=1&service=203&flavour=sd")));
         QVERIFY (tuning.IsValid());
+        QVERIFY (tuning.IsRTSP());
 
         /* test url from #11852 with port, telekom.de */
-        tuning.m_data_url = QUrl (QString("rtp://@239.35.10.1:10000"));
-        tuning.m_protocol = IPTVTuningData::rtp;
+        tuning.SetDataURL(QUrl(QString("rtp://@239.35.10.1:10000")));
         QVERIFY (tuning.IsValid());
+        QVERIFY (tuning.IsRTP());
+
         /* test url from das-erste.de with port, telekom.de */
-        tuning.m_data_url = QUrl (QString("rtp://239.35.10.4:10000"));
-        tuning.m_protocol = IPTVTuningData::rtp;
+        tuning.SetDataURL(QUrl(QString("rtp://239.35.10.4:10000")));
         QVERIFY (tuning.IsValid());
+        QVERIFY (tuning.IsRTP());
 
         /* test url from #11847 with port, Dreambox */
-        tuning.m_data_url = QUrl (QString("http://yourdreambox:8001/1:0:1:488:3FE:22F1:EEEE0000:0:0:0:"));
-        tuning.m_protocol = IPTVTuningData::http_ts;
+        tuning.SetDataURL(QUrl(QString("http://yourdreambox:8001/1:0:1:488:3FE:22F1:EEEE0000:0:0:0:")));
         QVERIFY (tuning.IsValid());
+        QVERIFY (tuning.IsHTTPTS());
     }
 
 
@@ -76,14 +77,19 @@ class TestIPTVRecorder: public QObject
         IPTVTuningData tuning;
 
         /* test url from http://www.tldp.org/HOWTO/VideoLAN-HOWTO/x549.html */
-        tuning.m_data_url = QUrl (QString("udp:@239.255.12.42"));
+        tuning.SetDataURL(QUrl(QString("udp:@239.255.12.42")));
         QVERIFY (tuning.IsValid());
+        QVERIFY (tuning.IsUDP());
+
         /* test url from http://www.tldp.org/HOWTO/VideoLAN-HOWTO/x1245.html */
-        tuning.m_data_url = QUrl (QString("udp:@[ff08::1]"));
+        tuning.SetDataURL(QUrl(QString("udp:@[ff08::1]")));
         QVERIFY (tuning.IsValid());
+        QVERIFY (tuning.IsUDP());
+
         /* test url from http://www.tldp.org/HOWTO/VideoLAN-HOWTO/x1245.html */
-        tuning.m_data_url = QUrl (QString("udp:[ff08::1%eth0]"));
+        tuning.SetDataURL(QUrl(QString("udp:[ff08::1%eth0]")));
         QVERIFY (tuning.IsValid());
+        QVERIFY (tuning.IsUDP());
     }
 
     /**
@@ -130,7 +136,6 @@ class TestIPTVRecorder: public QObject
         QCOMPARE (chanmap["001"].m_name, QString ("La 1"));
         QVERIFY (chanmap["001"].IsValid ());
         QVERIFY (chanmap["001"].m_tuning.IsValid ());
-        QCOMPARE (chanmap["001"].m_tuning.m_data_url.toString(), QString ("udp://239.0.0.76:8208"));
         QCOMPARE (chanmap["001"].m_tuning.GetDataURL().toString(), QString ("udp://239.0.0.76:8208"));
 
         /* test playlist for Neutrino STBs */
@@ -140,7 +145,7 @@ class TestIPTVRecorder: public QObject
         QCOMPARE (chanmap["1"].m_name, QString ("SVT1 HD Mitt"));
         QCOMPARE (chanmap["1"].m_xmltvid, QString ("svt1hd.svt.se"));
         QCOMPARE (chanmap["1"].m_programNumber, (uint) 1330);
-        QCOMPARE (chanmap["1"].m_tuning.m_data_url.toString(), QString ("http://192.168.0.234:8001/1:0:19:532:6:22F1:EEEE0000:0:0:0:"));
+        QCOMPARE (chanmap["1"].m_tuning.GetDataURL().toString(), QString ("http://192.168.0.234:8001/1:0:19:532:6:22F1:EEEE0000:0:0:0:"));
 
         /* test playlist for FreeboxTV, last channel in playlist "wins" */
         chanmap = IPTVChannelFetcher::ParsePlaylist (rawdataRTSP, NULL);

@@ -1,3 +1,3 @@
 #include "test_iptvrecorder.h"
 
-QTEST_APPLESS_MAIN(TestIPTVRecorder)
+QTEST_MAIN(TestIPTVRecorder)

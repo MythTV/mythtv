@@ -23,6 +23,7 @@
 #endif
 
 #include "mythlogging.h"
+#include "mythtvexp.h"
 
 #include "HLSSegment.h"
 #include "HLSStream.h"
@@ -30,7 +31,7 @@
 #include "HLSPlaylistWorker.h"
 
 
-class HLSReader
+class MTV_PUBLIC  HLSReader
 {
     friend class HLSStreamWorker;
     friend class HLSPlaylistWorker;

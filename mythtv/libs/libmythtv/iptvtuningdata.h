@@ -9,6 +9,8 @@
 // MythTV headers
 #include "mythtvexp.h"
 #include "mythlogging.h"
+#include "mythsingledownload.h"
+#include "recorders/HLS/HLSReader.h"
 
 class MTV_PUBLIC IPTVTuningData
 {
@@ -42,7 +44,7 @@ class MTV_PUBLIC IPTVTuningData
         http_hls
     } IPTVProtocol;
 
-    IPTVTuningData() : m_fec_type(kNone)
+    IPTVTuningData() : m_fec_type(kNone), m_protocol(inValid)
     {
         memset(&m_bitrate, 0, sizeof(m_bitrate));
     }
@@ -50,12 +52,11 @@ class MTV_PUBLIC IPTVTuningData
     IPTVTuningData(const QString &data_url, uint data_bitrate,
                    const FECType fec_type,
                    const QString &fec_url0, uint fec_bitrate0,
-                   const QString &fec_url1, uint fec_bitrate1,
-                   const IPTVProtocol protocol) :
+                   const QString &fec_url1, uint fec_bitrate1) :
         m_data_url(data_url),
-        m_fec_type(fec_type), m_fec_url0(fec_url0), m_fec_url1(fec_url1),
-        m_protocol(protocol)
+        m_fec_type(fec_type), m_fec_url0(fec_url0), m_fec_url1(fec_url1)
     {
+        GuessProtocol();
         m_bitrate[0] = data_bitrate;
         m_bitrate[1] = fec_bitrate0;
         m_bitrate[2] = fec_bitrate1;
@@ -64,12 +65,11 @@ class MTV_PUBLIC IPTVTuningData
     IPTVTuningData(const QString &data_url, uint data_bitrate,
                    const QString &fec_type,
                    const QString &fec_url0, uint fec_bitrate0,
-                   const QString &fec_url1, uint fec_bitrate1,
-                   const IPTVProtocol protocol) :
+                   const QString &fec_url1, uint fec_bitrate1) :
         m_data_url(data_url),
-        m_fec_type(kNone), m_fec_url0(fec_url0), m_fec_url1(fec_url1),
-        m_protocol(protocol)
+        m_fec_type(kNone), m_fec_url0(fec_url0), m_fec_url1(fec_url1)
     {
+        GuessProtocol();
         m_bitrate[0] = data_bitrate;
         m_bitrate[1] = fec_bitrate0;
         m_bitrate[2] = fec_bitrate1;
@@ -113,6 +113,12 @@ class MTV_PUBLIC IPTVTuningData
     bool operator!=(const IPTVTuningData &other) const
     {
         return GetDeviceName() != other.GetDeviceName();
+    }
+
+    void SetDataURL(const QUrl &url)
+    {
+        m_data_url = url;
+        GuessProtocol();
     }
 
     QUrl GetDataURL(void) const { return m_data_url; }
@@ -185,7 +191,45 @@ class MTV_PUBLIC IPTVTuningData
         return (m_protocol == http_ts);
     }
 
-  public:
+    void GuessProtocol(void)
+    {
+        if (!m_data_url.isValid())
+            m_protocol = IPTVTuningData::inValid;
+        else if (m_data_url.scheme() == "udp")
+            m_protocol = IPTVTuningData::udp;
+        else if (m_data_url.scheme() == "rtp")
+            m_protocol = IPTVTuningData::rtp;
+        else if (m_data_url.scheme() == "rtsp")
+            m_protocol = IPTVTuningData::rtsp;
+        else if ((m_data_url.scheme() == "http") && IsHLSPlaylist())
+            m_protocol = IPTVTuningData::http_hls;
+        else if (m_data_url.scheme() == "http")
+            m_protocol = IPTVTuningData::http_ts;
+        else
+            m_protocol = IPTVTuningData::inValid;
+    }
+
+  protected:
+    bool IsHLSPlaylist(void)
+    {
+        QString url = m_data_url.toString();
+        QByteArray buffer;
+
+        MythSingleDownload downloader;
+        downloader.DownloadURL(url, &buffer, 5000, 0, 10000);
+        if (!buffer.size())
+        {
+            LOG(VB_GENERAL, LOG_ERR,QString("IsHLSPlaylist - Open Failed: %1\n\t\t\t%2")
+                .arg(downloader.ErrorString()).arg(url));
+            return false;
+        }
+
+        QTextStream text(&buffer);
+        text.setCodec("UTF-8");
+        return (HLSReader::IsValidPlaylist(text));
+    }
+
+  protected:
     QUrl m_data_url;
     FECType m_fec_type;
     QUrl m_fec_url0;

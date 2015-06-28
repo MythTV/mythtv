@@ -165,7 +165,7 @@ void IPTVStreamHandler::run(void)
         urltuned.setScheme("rtp");
         urltuned.setPort(0);
         tuning = IPTVTuningData(urltuned.toString(), 0, IPTVTuningData::kNone,
-                                urltuned.toString(), 0, "", 0, IPTVTuningData::rtp);
+                                urltuned.toString(), 0, "", 0);
     }
 
     bool error = false;
