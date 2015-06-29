@@ -112,7 +112,7 @@ bool ChannelBase::Init(QString &startchannel, bool setchan)
                                ? (*cit).channum : startchannel);
             }
             else
-                ok = SwitchToInput(m_input.name, (*cit).channum);
+                ok = SetChannelByString((*cit).channum);
 
             if (ok)
             {
@@ -220,57 +220,6 @@ uint ChannelBase::GetNextChannel(const QString &channum, ChannelChangeDirection 
 
     uint chanid = ChannelUtil::GetChanID(m_input.sourceid, channum);
     return GetNextChannel(chanid, direction);
-}
-
-bool ChannelBase::SwitchToInput(const QString &inputname)
-{
-    if (m_input.inputid)
-        return SwitchToInput(m_input.inputid, true);
-    else
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("Could not find input: %1 on card").arg(inputname));
-        return false;
-    }
-}
-
-bool ChannelBase::SwitchToInput(const QString &inputname, const QString &chan)
-{
-    LOG(VB_CHANNEL, LOG_DEBUG, LOC + QString("SwitchToInput(%1,%2)")
-        .arg(inputname).arg(chan));
-
-    bool ok = false;
-    if (m_input.inputid)
-    {
-        ok = SwitchToInput(m_input.inputid, false);
-        if (ok)
-            ok = SetChannelByString(chan);
-    }
-    else
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("Could not find input: %1 on card when setting channel %2")
-            .arg(inputname).arg(chan));
-    }
-    return ok;
-}
-
-bool ChannelBase::SwitchToInput(uint newInputNum, bool setstarting)
-{
-    if (m_input.inputid != newInputNum || m_input.startChanNum.isEmpty())
-        return false;
-
-    uint mplexid_restriction;
-    uint chanid_restriction;
-    if (!IsInputAvailable(mplexid_restriction, chanid_restriction))
-        return false;
-
-    // input switching code would go here
-
-    if (setstarting)
-        return SetChannelByString(m_input.startChanNum);
-
-    return true;
 }
 
 static bool is_input_group_busy(

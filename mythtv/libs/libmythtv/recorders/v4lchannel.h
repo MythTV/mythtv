@@ -37,8 +37,6 @@ class V4LChannel : public DTVChannel
     bool Init(QString &startchannel, bool setchan);
 
     // Commands
-    using DTVChannel::SwitchToInput;
-    bool SwitchToInput(int newcapchannel, bool setstarting);
     bool Open(void);
     void Close(void);
     using DTVChannel::Tune;

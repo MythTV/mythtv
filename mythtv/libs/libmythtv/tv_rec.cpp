@@ -3717,12 +3717,7 @@ void TVRec::TuningFrequency(const TuningRequest &request)
     {
         channel->Open();
         if (!channum.isEmpty())
-        {
-            if (!input.isEmpty())
-                ok = channel->SwitchToInput(input, channum);
-            else
-                ok = channel->SetChannelByString(channum);
-        }
+            ok = channel->SetChannelByString(channum);
         else
             ok = false;
     }

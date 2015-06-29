@@ -319,31 +319,6 @@ bool DVBChannel::Init(QString &startchannel, bool setchan)
     return ChannelBase::Init(startchannel, setchan);
 }
 
-bool DVBChannel::SwitchToInput(const QString &inputname, const QString &chan)
-{
-    bool ok = false;
-    if (m_input.inputid)
-    {
-        ok = SetChannelByString(chan);
-    }
-    else
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("DVBChannel: Could not find input: %1 on card when "
-                    "setting channel %2\n").arg(inputname).arg(chan));
-    }
-    return ok;
-}
-
-bool DVBChannel::SwitchToInput(int newInputNum, bool setstarting)
-{
-    if (!ChannelBase::SwitchToInput(newInputNum, false))
-        return false;
-
-    return SetChannelByString(m_input.startChanNum);
-}
-
-
 /** \fn DVBChannel::CheckFrequency(uint64_t) const
  *  \brief Checks tuning frequency
  */

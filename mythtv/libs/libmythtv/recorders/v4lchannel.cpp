@@ -410,10 +410,9 @@ bool V4LChannel::Tune(uint64_t frequency)
 
     int ioctlval = 0;
 
-    bool ok = true;
-    ok = SwitchToInput(0, false);
-
-    if (!ok)
+    uint mplexid_restriction;
+    uint chanid_restriction;
+    if (!IsInputAvailable(mplexid_restriction, chanid_restriction))
         return false;
 
     // Video4Linux version 2 tuning
@@ -508,7 +507,7 @@ QString V4LChannel::GetFormatForChannel(QString channum, QString inputname)
 
     QString fmt = QString::null;
     if (!query.exec() || !query.isActive())
-        MythDB::DBError("SwitchToInput:find format", query);
+        MythDB::DBError("GetFormatForChannel:find format", query);
     else if (query.next())
         fmt = query.value(0).toString();
     return fmt;
@@ -593,65 +592,6 @@ bool V4LChannel::SetInputAndFormat(int inputNum, QString newFmt)
 
             ok = false;
         }
-    }
-
-    return ok;
-}
-
-bool V4LChannel::SwitchToInput(int inputnum, bool setstarting)
-{
-    if (!m_input.inputid)
-        return false;
-
-    QString tuneFreqId = m_input.tuneToChannel;
-    QString channum    = m_input.startChanNum;
-    QString inputname  = m_input.name;
-
-    LOG(VB_CHANNEL, LOG_INFO, QString("Channel(%1)::SwitchToInput(in %2, '%3')")
-            .arg(device).arg(inputnum)
-            .arg(setstarting ? channum : QString("")));
-
-    uint mplexid_restriction;
-    uint chanid_restriction;
-    if (!IsInputAvailable(mplexid_restriction, chanid_restriction))
-        return false;
-
-    QString newFmt = mode_to_format(m_input.videoModeV4L2);
-
-    // If we are setting a channel, get its video mode...
-    bool chanValid  = (channum != "Undefined") && !channum.isEmpty();
-    if (setstarting && chanValid)
-    {
-        QString tmp = GetFormatForChannel(channum, inputname);
-        if (tmp != "Default" && !tmp.isEmpty())
-            newFmt = tmp;
-    }
-
-    bool ok = SetInputAndFormat(inputnum, newFmt);
-
-    if (!ok)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "SetInputAndFormat() failed");
-        return false;
-    }
-
-    currentFormat     = newFmt;
-    m_curchannelname    = ""; // this will be set by SetChannelByString
-
-    if (!tuneFreqId.isEmpty() && tuneFreqId != "Undefined")
-        ok = Tune(tuneFreqId, 0);
-
-    if (!ok)
-        return false;
-
-    if (setstarting && chanValid)
-        ok = SetChannelByString(channum);
-    else if (setstarting && !chanValid)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("SwitchToInput(in %2, set ch): ").arg(inputnum) +
-            QString("\n\t\t\tDefault channel '%1' is not valid.").arg(channum));
-        ok = false;
     }
 
     return ok;

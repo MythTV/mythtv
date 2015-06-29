@@ -82,10 +82,6 @@ class ChannelBase
     virtual void Renumber(uint srcid, const QString &oldChanNum,
                           const QString &newChanNum);
 
-    // Input toggling convenience methods
-    virtual bool SwitchToInput(const QString &input);
-    virtual bool SwitchToInput(const QString &input, const QString &chan);
-
     virtual bool InitializeInputs(void);
 
     // Misc. Commands
@@ -119,7 +115,6 @@ class ChannelBase
   protected:
     /// \brief Switches to another input on hardware,
     ///        and sets the channel is setstarting is true.
-    virtual bool SwitchToInput(uint inputNum, bool setstarting);
     virtual bool IsInputAvailable(uint &mplexid_restriction,
                                   uint &chanid_restrtiction) const;
     virtual bool IsExternalChannelChangeSupported(void) { return false; }
