@@ -107,7 +107,20 @@ HDHRStreamHandler::HDHRStreamHandler(const QString &device) :
  */
 void HDHRStreamHandler::run(void)
 {
+    int tunerLock = 0;
+    char *error = NULL;
+
     RunProlog();
+    /* Get a tuner lock */
+    tunerLock = hdhomerun_device_tuner_lockkey_request(_hdhomerun_device, &error);
+    if(tunerLock < 1)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Get tuner lock failed. Aborting. Error: %1").arg(error));
+        _error = true;
+        RunEpilog();
+        return;
+    }
     /* Create TS socket. */
     if (!hdhomerun_device_stream_start(_hdhomerun_device))
     {
@@ -181,6 +194,12 @@ void HDHRStreamHandler::run(void)
 
     hdhomerun_device_stream_stop(_hdhomerun_device);
     LOG(VB_RECORD, LOG_INFO, LOC + "RunTS(): " + "end");
+
+    if(tunerLock == 1)
+    {
+        LOG(VB_RECORD, LOG_INFO, LOC + "Release tuner lock.");
+        hdhomerun_device_tuner_lockkey_release(_hdhomerun_device);
+    }
 
     SetRunning(false, false, false);
     RunEpilog();
