@@ -232,6 +232,7 @@ RingBuffer::RingBuffer(RingBufferType rbtype) :
     readaheadrunning(false),  reallyrunning(false),
     request_pause(false),     paused(false),
     ateof(false),
+    waitforwrite(false),      beingwritten(false),
     readsallowed(false),      readsdesired(false),
     recentseek(true),
     setswitchtonext(false),
@@ -1186,12 +1187,22 @@ void RingBuffer::run(void)
                     // typically active in-progress recording
                     // wait a little bit (60ms same wait as typical safe_read)
                     generalWait.wait(&rwlock, 60);
+                    beingwritten = true;
                 }
                 else
                 {
-                    LOG(VB_FILE, LOG_DEBUG,
-                        LOC + "setting ateof (read_return == 0)");
-                    ateof = true;
+                    if (waitforwrite && !beingwritten)
+                    {
+                        LOG(VB_FILE, LOG_DEBUG, LOC +
+                            "Waiting for file to grow large enough to process.");
+                        generalWait.wait(&rwlock, 300);
+                    }
+                    else
+                    {
+                        LOG(VB_FILE, LOG_DEBUG,
+                            LOC + "setting ateof (read_return == 0)");
+                        ateof = true;
+                    }
                 }
             }
 
