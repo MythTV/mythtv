@@ -58,7 +58,7 @@ static DTVMultiplex dvbparams_to_dtvmultiplex(
 int64_t concurrent_tunings_delay = 1000;
 QDateTime DVBChannel::last_tuning = QDateTime::currentDateTime();
 
-#define LOC QString("DVBChan[%1](%2): ").arg(GetCardID()).arg(GetDevice())
+#define LOC QString("DVBChan[%1](%2): ").arg(m_input.inputid).arg(GetDevice())
 
 /** \class DVBChannel
  *  \brief Provides interface to the tuning hardware when using DVB drivers
@@ -273,7 +273,7 @@ bool DVBChannel::Open(DVBChannel *who)
     if (tunerType.IsDiSEqCSupported())
     {
 
-        diseqc_tree = diseqc_dev.FindTree(GetCardID());
+        diseqc_tree = diseqc_dev.FindTree(m_input.inputid);
         if (diseqc_tree)
         {
             bool is_SCR = false;
@@ -954,10 +954,10 @@ int DVBChannel::GetChanID() const
                   "FROM channel, capturecard "
                   "WHERE capturecard.sourceid = channel.sourceid AND "
                   "      channel.channum = :CHANNUM AND "
-                  "      capturecard.cardid = :CARDID");
+                  "      capturecard.cardid = :INPUTID");
 
     query.bindValue(":CHANNUM", m_curchannelname);
-    query.bindValue(":CARDID", GetCardID());
+    query.bindValue(":INPUTID", m_input.inputid);
 
     if (!query.exec() || !query.isActive())
     {

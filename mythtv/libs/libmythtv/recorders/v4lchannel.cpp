@@ -29,7 +29,7 @@ using namespace std;
 #define DEBUG_ATTRIB 1
 
 #define LOC      QString("V4LChannel[%1](%2): ") \
-                 .arg(GetCardID()).arg(GetDevice())
+                 .arg(m_input.inputid).arg(GetDevice())
 
 static int format_to_mode(const QString &fmt);
 static QString mode_to_format(int mode);
@@ -499,11 +499,11 @@ QString V4LChannel::GetFormatForChannel(QString channum, QString inputname)
         "FROM channel, capturecard "
         "WHERE channum              = :CHANNUM   AND "
         "      inputname            = :INPUTNAME AND "
-        "      capturecard.cardid   = :CARDID    AND "
+        "      capturecard.cardid   = :INPUTID   AND "
         "      capturecard.sourceid = channel.sourceid");
     query.bindValue(":CHANNUM",   channum);
     query.bindValue(":INPUTNAME", inputname);
-    query.bindValue(":CARDID",    GetCardID());
+    query.bindValue(":INPUTID",    m_input.inputid);
 
     QString fmt = QString::null;
     if (!query.exec() || !query.isActive())
@@ -622,7 +622,7 @@ bool V4LChannel::InitPictureAttribute(const QString &db_col_name)
     int cfield = ChannelUtil::GetChannelValueInt(
         db_col_name, GetSourceID(), m_curchannelname);
     int sfield = CardUtil::GetValueInt(
-        db_col_name, GetCardID());
+        db_col_name, m_input.inputid);
 
     if ((cfield == -1) || (sfield == -1))
         return false;
@@ -703,7 +703,7 @@ int V4LChannel::GetPictureAttribute(PictureAttribute attr) const
     int cfield = ChannelUtil::GetChannelValueInt(
         db_col_name, GetSourceID(), m_curchannelname);
     int sfield = CardUtil::GetValueInt(
-        db_col_name, GetCardID());
+        db_col_name, m_input.inputid);
     int dfield = 0;
 
     if (pict_attr_default.find(db_col_name) != pict_attr_default.end())
@@ -830,12 +830,12 @@ int V4LChannel::ChangePictureAttribute(
     else if (kAdjustingPicture_Recording == type)
     {
         int adj_value = CardUtil::GetValueInt(
-            db_col_name, GetCardID());
+            db_col_name, m_input.inputid);
 
         int tmp = new_value - old_value + adj_value;
         tmp = (tmp < 0)      ? tmp + 0x10000 : tmp;
         tmp = (tmp > 0xffff) ? tmp - 0x10000 : tmp;
-        CardUtil::SetValue(db_col_name, GetCardID(), tmp);
+        CardUtil::SetValue(db_col_name, m_input.inputid, tmp);
     }
 
     return new_value;

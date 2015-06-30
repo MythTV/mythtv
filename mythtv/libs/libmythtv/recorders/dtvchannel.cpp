@@ -8,7 +8,7 @@
 #include "mpegtables.h"
 #include "mythlogging.h"
 
-#define LOC QString("DTVChan[%1](%2): ").arg(GetCardID()).arg(GetDevice())
+#define LOC QString("DTVChan[%1](%2): ").arg(m_input.inputid).arg(GetDevice())
 
 QReadWriteLock DTVChannel::master_map_lock(QReadWriteLock::Recursive);
 typedef QMap<QString,QList<DTVChannel*> > MasterMap;
@@ -68,12 +68,11 @@ void DTVChannel::SetSIStandard(const QString &si_std)
 
 QString DTVChannel::GetSuggestedTuningMode(bool is_live_tv) const
 {
-    uint cardid = GetCardID();
     QString input = GetInputName();
 
     uint quickTuning = 0;
-    if (cardid && !input.isEmpty())
-        quickTuning = CardUtil::GetQuickTuning(cardid, input);
+    if (m_input.inputid && !input.isEmpty())
+        quickTuning = CardUtil::GetQuickTuning(m_input.inputid, input);
 
     bool useQuickTuning = (quickTuning && is_live_tv) || (quickTuning > 1);
 

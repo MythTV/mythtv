@@ -98,10 +98,8 @@ class ChannelBase
 
     bool CheckChannel(const QString &channum) const;
 
-    // \brief Set cardid for scanning
-    void SetCardID(uint _cardid) { m_cardid = _cardid; }
-
-    virtual uint GetCardID(void) const;
+    // \brief Set inputid for scanning
+    void SetInputID(uint _inputid) { m_input.inputid = _inputid; }
 
     static ChannelBase *CreateChannel(
         TVRec                    *tv_rec,
@@ -133,7 +131,6 @@ class ChannelBase
     TVRec   *m_pParent;
     QString  m_curchannelname;
     bool     m_commfree;
-    uint     m_cardid;
     ChannelInputInfo m_input;
     ChannelInfoList m_allchannels; ///< channels across all inputs
 

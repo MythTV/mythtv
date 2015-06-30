@@ -1396,7 +1396,7 @@ ScanDTVTransportList ChannelScanSM::GetChannelList(void) const
 {
     ScanDTVTransportList list;
 
-    uint cardid = m_channel->GetCardID();
+    uint cardid = m_channel->GetInputID();
 
     DTVTunerType tuner_type = GuessDTVTunerType(DTVTunerType::kTunerTypeATSC);
 

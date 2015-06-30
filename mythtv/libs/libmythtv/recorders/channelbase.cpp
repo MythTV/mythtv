@@ -44,11 +44,11 @@ using namespace std;
 #include "cardutil.h"
 #include "compat.h"
 
-#define LOC QString("ChannelBase[%1]: ").arg(GetCardID())
+#define LOC QString("ChannelBase[%1]: ").arg(m_input.inputid)
 
 ChannelBase::ChannelBase(TVRec *parent) :
     m_pParent(parent), m_curchannelname(""),
-    m_commfree(false), m_cardid(0), m_input(),
+    m_commfree(false), m_input(),
     m_system(NULL), m_system_status(0)
 {
 }
@@ -225,7 +225,6 @@ uint ChannelBase::GetNextChannel(const QString &channum, ChannelChangeDirection 
 static bool is_input_group_busy(
     uint                       inputid,
     uint                       groupid,
-    uint                      excluded_input,
     QMap<uint,bool>           &busygrp,
     QMap<uint,bool>           &busyrec,
     QMap<uint,InputInfo>      &busyin,
@@ -244,7 +243,7 @@ static bool is_input_group_busy(
     vector<uint> cardids = CardUtil::GetGroupInputIDs(groupid);
     for (uint i = 0; i < cardids.size(); i++)
     {
-        if (excluded_input == cardids[i])
+        if (inputid == cardids[i])
             continue;
 
         InputInfo info;
@@ -312,7 +311,6 @@ static bool is_input_group_busy(
 static bool is_input_busy(
     uint                       inputid,
     const vector<uint>        &groupids,
-    uint                      excluded_input,
     QMap<uint,bool>           &busygrp,
     QMap<uint,bool>           &busyrec,
     QMap<uint,InputInfo>      &busyin,
@@ -323,7 +321,7 @@ static bool is_input_busy(
     for (uint i = 0; i < groupids.size() && !is_busy; i++)
     {
         is_busy |= is_input_group_busy(
-            inputid, groupids[i], excluded_input,
+            inputid, groupids[i],
             busygrp, busyrec, busyin, mplexid_restriction, chanid_restriction);
     }
     return is_busy;
@@ -341,15 +339,14 @@ bool ChannelBase::IsInputAvailable(
     QMap<uint,bool>           busyrec;
     QMap<uint,InputInfo>      busyin;
 
-    uint cid = GetCardID();
     // Cache our busy input if applicable
     if (m_pParent)
     {
         InputInfo info;
-        busyrec[cid] = m_pParent->IsBusy(&info);
-        if (busyrec[cid])
+        busyrec[m_input.inputid] = m_pParent->IsBusy(&info);
+        if (busyrec[m_input.inputid])
         {
-            busyin[cid] = info;
+            busyin[m_input.inputid] = info;
             info.chanid = GetChanID();
         }
     }
@@ -359,7 +356,7 @@ bool ChannelBase::IsInputAvailable(
 
     vector<uint> groupids = CardUtil::GetInputGroups(m_input.inputid);
 
-    bool res = !is_input_busy(m_input.inputid, groupids, cid,
+    bool res = !is_input_busy(m_input.inputid, groupids,
                           busygrp, busyrec, busyin, mplexid_restriction,
                           chanid_restriction);
     return res;
@@ -591,23 +588,6 @@ void ChannelBase::HandleScriptEnd(bool ok)
     }
 }
 
-/** \fn ChannelBase::GetCardID(void) const
- *  \brief Returns card id.
- */
-uint ChannelBase::GetCardID(void) const
-{
-    if (m_cardid > 0)
-        return m_cardid;
-
-    if (m_pParent)
-        return m_pParent->GetCaptureCardNum();
-
-    if (GetDevice().isEmpty())
-        return 0;
-
-    return CardUtil::GetFirstInputID(GetDevice());
-}
-
 int ChannelBase::GetChanID() const
 {
     if (!m_input.inputid)
@@ -640,13 +620,13 @@ bool ChannelBase::InitializeInputs(void)
 {
     m_input.Clear();
 
-    uint cardid = GetCardID();
-    if (!cardid)
+    if (!m_pParent)
     {
         LOG(VB_GENERAL, LOG_ERR,
-            "InitializeInputs(): Programmer error, cardid invalid.");
+            "InitializeInputs(): Programmer error, no parent.");
         return false;
     }
+    uint inputid = m_pParent->GetCaptureCardNum();
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
@@ -655,8 +635,8 @@ bool ChannelBase::InitializeInputs(void)
         "       tunechan,    externalcommand, "
         "       sourceid,    livetvorder "
         "FROM capturecard "
-        "WHERE cardid = :CARDID");
-    query.bindValue(":CARDID", cardid);
+        "WHERE cardid = :INPUTID");
+    query.bindValue(":INPUTID", inputid);
 
     if (!query.exec() || !query.isActive())
     {

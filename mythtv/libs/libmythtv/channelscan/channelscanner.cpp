@@ -453,7 +453,7 @@ void ChannelScanner::PreScanCommon(
     }
 
     // explicitly set the cardid
-    channel->SetCardID(cardid);
+    channel->SetInputID(cardid);
 
     // If the backend is running this may fail...
     if (!channel->Open())
