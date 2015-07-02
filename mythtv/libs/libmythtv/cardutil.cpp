@@ -602,32 +602,24 @@ vector<uint> CardUtil::GetInputIDs(QString videodevice,
 
     MSqlQuery query(MSqlQuery::InitCon());
     QString qstr =
-        (videodevice.isEmpty()) ?
         "SELECT cardid "
         "FROM capturecard "
-        "WHERE hostname    = :HOSTNAME" :
-
-        "SELECT cardid "
-        "FROM capturecard "
-        "WHERE videodevice = :DEVICE AND "
-        "      inputname   = :INPUTNAME AND "
-        "      hostname    = :HOSTNAME";
-
+        "WHERE hostname = :HOSTNAME ";
+    if (!videodevice.isEmpty())
+        qstr += "AND videodevice = :DEVICE ";
+    if (!inputname.isEmpty())
+        qstr += "AND inputname = :INPUTNAME ";
     if (!rawtype.isEmpty())
-        qstr += " AND cardtype = :INPUTTYPE";
-
-    qstr += " ORDER BY cardid";
+        qstr += "AND cardtype = :INPUTTYPE ";
+    qstr += "ORDER BY cardid";
 
     query.prepare(qstr);
 
-    if (!videodevice.isEmpty())
-    {
-        query.bindValue(":DEVICE",   videodevice);
-        query.bindValue(":INPUTNAME", inputname);
-    }
-
     query.bindValue(":HOSTNAME", hostname);
-
+    if (!videodevice.isEmpty())
+        query.bindValue(":DEVICE", videodevice);
+    if (!inputname.isEmpty())
+        query.bindValue(":INPUTNAME", inputname);
     if (!rawtype.isEmpty())
         query.bindValue(":INPUTTYPE", rawtype.toUpper());
 
