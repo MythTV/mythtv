@@ -620,13 +620,20 @@ bool ChannelBase::InitializeInputs(void)
 {
     m_input.Clear();
 
-    if (!m_pParent)
+    if (!m_input.inputid)
+    {
+        if (m_pParent)
+            m_input.inputid = m_pParent->GetCaptureCardNum();
+        else
+            m_input.inputid = CardUtil::GetFirstInputID(GetDevice());
+    }
+
+    if (!m_input.inputid)
     {
         LOG(VB_GENERAL, LOG_ERR,
             "InitializeInputs(): Programmer error, no parent.");
         return false;
     }
-    uint inputid = m_pParent->GetCaptureCardNum();
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
@@ -636,7 +643,7 @@ bool ChannelBase::InitializeInputs(void)
         "       sourceid,    livetvorder "
         "FROM capturecard "
         "WHERE cardid = :INPUTID");
-    query.bindValue(":INPUTID", inputid);
+    query.bindValue(":INPUTID", m_input.inputid);
 
     if (!query.exec() || !query.isActive())
     {
