@@ -641,6 +641,9 @@ class MTV_PUBLIC ProgramAssociationTable : public PSIPTable
 
   private:
     static ProgramAssociationTable* CreateBlank(bool smallPacket = true);
+
+    // for testing if CreateBlank create a table with invalid CRC
+    friend class TestMPEGTables;
 };
 
 /** \class ProgramMapTable

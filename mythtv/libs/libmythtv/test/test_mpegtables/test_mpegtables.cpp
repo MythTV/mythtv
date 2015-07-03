@@ -88,6 +88,28 @@ void TestMPEGTables::pat_test(void)
 
     // first PID that is a real PMT PID and not the NIT PID
     QCOMPARE (pat.FindAnyPID(),        (uint32_t)  6100);
+
+    // Create a PAT no CRC error
+    vector<uint> pnums, pids;
+    pnums.push_back(1);
+    pids.push_back(0x100);
+    ProgramAssociationTable* pat2 =
+        ProgramAssociationTable::Create(1, 0, pnums, pids);
+    QVERIFY (pat2->VerifyCRC());
+
+    // Create a blank PAT, CRC error!
+    ProgramAssociationTable* pat3 =
+        ProgramAssociationTable::CreateBlank();
+    QVERIFY (!pat3->VerifyCRC());
+    // we still have not found "CRC mismatch 0 != 0xFFFFFFFF"
+    QCOMPARE (pat3->CalcCRC(), (uint) 0x334FF8A0);
+    pat3->SetCRC(pat3->CalcCRC());
+    QVERIFY (pat3->VerifyCRC());
+
+    // Create a PAT object
+    unsigned char si_data4[188];
+    ProgramAssociationTable* pat4 = new ProgramAssociationTable((unsigned char*)&si_data4);
+    QVERIFY (pat4->VerifyCRC());
 }
 
 void TestMPEGTables::dvbdate(void)
