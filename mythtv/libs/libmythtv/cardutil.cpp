@@ -936,6 +936,10 @@ bool CardUtil::GetInputInfo(InputInfo &input, vector<uint> *groupids)
     input.recPriority = query.value(5).toInt();
     input.quickTune = query.value(6).toBool();
 
+    if (input.displayName.isEmpty())
+        input.displayName = QObject::tr("Input %1:%2")
+            .arg(input.inputid).arg(input.name);
+
     if (groupids)
         *groupids = GetInputGroups(input.inputid);
 
