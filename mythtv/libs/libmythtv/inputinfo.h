@@ -79,40 +79,4 @@ class MTV_PUBLIC InputInfo
     bool    quickTune;
 };
 
-class MTV_PUBLIC ChannelInputInfo : public InputInfo
-{
-  public:
-    ChannelInputInfo() :
-        startChanNum(QString::null),    tuneToChannel(QString::null),
-        externalChanger(QString::null),
-        inputNumV4L(-1), videoModeV4L2(0) {}
-    ChannelInputInfo(QString _name,            QString _startChanNum,
-                     QString _tuneToChannel,   QString _externalChanger,
-                     uint    _sourceid,
-                     uint    _inputid,         uint    _mplexid,
-                     uint    _livetvorder,
-                     const ChannelInfoList &_channels) :
-        InputInfo(_name, _sourceid, _inputid, _mplexid, 0,
-                  _livetvorder),
-        startChanNum(_startChanNum),
-        tuneToChannel(_tuneToChannel),  externalChanger(_externalChanger),
-        channels(_channels),
-        inputNumV4L(-1),
-        videoModeV4L2(0) {}
-    ChannelInputInfo(const ChannelInputInfo &other);
-    ChannelInputInfo &operator=(const ChannelInputInfo &other);
-    virtual ~ChannelInputInfo() {}
-
-    virtual void Clear(void);
-
-  public:
-    QString      startChanNum;    ///< channel to start on
-    QString      tuneToChannel;   ///< for using a cable box & S-Video
-    QString      externalChanger; ///< for using a cable box...
-    ChannelInfoList   channels;
-    vector<uint> groups;
-    int          inputNumV4L;
-    int          videoModeV4L2;
-};
-
 #endif // _INPUTINFO_H_

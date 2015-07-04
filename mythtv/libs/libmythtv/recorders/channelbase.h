@@ -10,7 +10,6 @@
 
 // MythTV headers
 #include "channelinfo.h"
-#include "inputinfo.h"
 #include "mythsystemlegacy.h"
 #include "tv.h"
 #include "videoouttypes.h" // for PictureAttribute

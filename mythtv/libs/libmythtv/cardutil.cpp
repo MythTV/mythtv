@@ -21,6 +21,7 @@
 #include "sourceutil.h"
 #include "mythdb.h"
 #include "mythlogging.h"
+#include "inputinfo.h"
 
 #ifdef USING_DVB
 #include "dvbtypes.h"

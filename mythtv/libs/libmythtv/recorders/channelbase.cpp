@@ -43,6 +43,7 @@ using namespace std;
 #include "exitcodes.h"
 #include "cardutil.h"
 #include "compat.h"
+#include "inputinfo.h"
 
 #define LOC QString("ChannelBase[%1]: ").arg(m_inputid)
 
