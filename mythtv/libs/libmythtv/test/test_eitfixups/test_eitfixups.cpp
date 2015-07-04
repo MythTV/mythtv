@@ -381,6 +381,7 @@ void TestEITFixups::testDEPro7Sat1()
     PRINT_EVENT(*event);
     QCOMPARE(event->title,    QString("Titel"));
     QCOMPARE(event->subtitle, QString("Folgentitel"));
+    QCOMPARE(event->airdate,  (unsigned short) 2011);
 
     DBEventEIT *event2 = SimpleDBEventEIT (EITFixUp::kFixP7S1,
                                            "Titel",
@@ -390,6 +391,7 @@ void TestEITFixups::testDEPro7Sat1()
     fixup.Fix(*event2);
     PRINT_EVENT(*event2);
     QCOMPARE(event2->subtitle, QString(""));
+    QCOMPARE(event2->airdate,  (unsigned short) 2015);
 
     DBEventEIT *event3 = SimpleDBEventEIT (EITFixUp::kFixP7S1,
                                            "Titel",
@@ -399,6 +401,7 @@ void TestEITFixups::testDEPro7Sat1()
     fixup.Fix(*event3);
     PRINT_EVENT(*event3);
     QCOMPARE(event3->subtitle, QString("Folgentitel"));
+    QCOMPARE(event3->airdate,  (unsigned short) 0);
 
     DBEventEIT *event4 = SimpleDBEventEIT (EITFixUp::kFixP7S1,
                                            "Titel",
@@ -408,6 +411,7 @@ void TestEITFixups::testDEPro7Sat1()
     fixup.Fix(*event4);
     PRINT_EVENT(*event4);
     QCOMPARE(event4->subtitle, QString("\"Lokal\", Ort"));
+    QCOMPARE(event4->airdate,  (unsigned short) 2015);
 }
 
 QTEST_APPLESS_MAIN(TestEITFixups)
