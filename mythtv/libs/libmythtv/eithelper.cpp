@@ -1118,16 +1118,18 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     fix[   1109LL << 32 |  1 << 16] = EITFixUp::kFixHDTV;
 
     // PRO7/SAT.1
-    fix[   1017LL << 32 |  1 << 16] = EITFixUp::kFixHDTV | EITFixUp::kFixP7S1;
-    fix[   1031LL << 32 |  1 << 16 | 5300] = EITFixUp::kFixHDTV | EITFixUp::kFixP7S1;
-    fix[   1031LL << 32 |  1 << 16 | 5301] = EITFixUp::kFixHDTV | EITFixUp::kFixP7S1;
-    fix[   1031LL << 32 |  1 << 16 | 5302] = EITFixUp::kFixHDTV | EITFixUp::kFixP7S1;
-    fix[   1031LL << 32 |  1 << 16 | 5303] = EITFixUp::kFixHDTV | EITFixUp::kFixP7S1;
-    fix[   1031LL << 32 |  1 << 16 | 5310] = EITFixUp::kFixP7S1;
-    fix[   1031LL << 32 |  1 << 16 | 5311] = EITFixUp::kFixP7S1;
-    fix[   1107LL << 32 |  1 << 16] = EITFixUp::kFixP7S1;
-    fix[   1082LL << 32 |  1 << 16] = EITFixUp::kFixP7S1;
-    fix[   5LL << 32 |  133 << 16 | 776] = EITFixUp::kFixP7S1;
+    fix[   1017LL << 32 |    1 << 16] = EITFixUp::kFixHDTV | EITFixUp::kFixP7S1;
+    fix[   1031LL << 32 |    1 << 16 | 5300] = EITFixUp::kFixHDTV | EITFixUp::kFixP7S1;
+    fix[   1031LL << 32 |    1 << 16 | 5301] = EITFixUp::kFixHDTV | EITFixUp::kFixP7S1;
+    fix[   1031LL << 32 |    1 << 16 | 5302] = EITFixUp::kFixHDTV | EITFixUp::kFixP7S1;
+    fix[   1031LL << 32 |    1 << 16 | 5303] = EITFixUp::kFixHDTV | EITFixUp::kFixP7S1;
+    fix[   1031LL << 32 |    1 << 16 | 5310] = EITFixUp::kFixP7S1;
+    fix[   1031LL << 32 |    1 << 16 | 5311] = EITFixUp::kFixP7S1;
+    fix[   1107LL << 32 |    1 << 16] = EITFixUp::kFixP7S1;
+    fix[   1082LL << 32 |    1 << 16] = EITFixUp::kFixP7S1;
+    fix[      5LL << 32 |  133 << 16 |   776] = EITFixUp::kFixP7S1;
+    fix[                  8468 << 16 | 16426] = EITFixUp::kFixP7S1; // ProSieben MAXX - DVB-T Rhein/Main
+    fix[   8707LL << 32 | 8468 << 16]         = EITFixUp::kFixP7S1; // ProSieben Sat.1 Mux - DVB-T Rhein/Main
 
     // Premiere EIT processing
     fix[   1LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
