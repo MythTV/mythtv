@@ -56,6 +56,7 @@ class EITFixUp
         kFixAUDescription    = 1 << 19,
         kFixAUNine           = 1 << 20,
         kFixAUSeven          = 1 << 21,
+        kFixP7S1             = 1 << 26,
 
         // Early fixups
         kEFixForceISO8859_1  = 1 << 22,
@@ -95,6 +96,7 @@ class EITFixUp
     void FixAUDescription(DBEventEIT &event) const;
     void FixMCA(DBEventEIT &event) const;           // MultiChoice Africa DVB-S
     void FixRTL(DBEventEIT &event) const;           // RTL group DVB
+    void FixPRO7(DBEventEIT &event) const;          // Pro7/Sat1 Group
     void FixFI(DBEventEIT &event) const;            // Finland DVB-T
     void FixPremiere(DBEventEIT &event) const;      // german pay-tv Premiere
     void FixNL(DBEventEIT &event) const;            // Netherlands DVB-C
@@ -184,6 +186,7 @@ class EITFixUp
     const QRegExp m_RTLSubtitle3;
     const QRegExp m_RTLSubtitle4;
     const QRegExp m_RTLSubtitle5;
+    const QRegExp m_PRO7Subtitle;
     const QRegExp m_RTLEpisodeNo1;
     const QRegExp m_RTLEpisodeNo2;
     const QRegExp m_fiRerun;

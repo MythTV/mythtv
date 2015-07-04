@@ -95,6 +95,7 @@ EITFixUp::EITFixUp()
       m_ukCompleteDots("^\\.\\.+$"),
       m_ukQuotedSubtitle("(?:^')([\\w\\s\\-,]+)(?:\\.' )"),
       m_ukAllNew("All New To 4Music!\\s?"),
+      m_PRO7Subtitle(",{0,1}[^,]*,[^,]+\s{0,1}\d{0,4}$"),
       m_comHemCountry("^(\\(.+\\))?\\s?([^ ]+)\\s([^\\.0-9]+)"
                       "(?:\\sfr\xE5n\\s([0-9]{4}))(?:\\smed\\s([^\\.]+))?\\.?"),
       m_comHemDirector("[Rr]egi"),
@@ -240,6 +241,9 @@ void EITFixUp::Fix(DBEventEIT &event) const
 
     if (kFixRTL & event.fixup)
         FixRTL(event);
+
+    if (kFixP7S1 & event.fixup)
+        FixPRO7(event);
 
     if (kFixFI & event.fixup)
         FixFI(event);
@@ -1685,6 +1689,18 @@ void EITFixUp::FixRTL(DBEventEIT &event) const
             }
         }
     }
+}
+
+/** fn EITFixUp::FixPRO7(DBEventEIT&) const
+ *  brief Use this to standardise the PRO7/Sat1 group guide in Germany.
+ */
+void EITFixUp::FixPRO7(DBEventEIT &event) const
+{
+
+//    int pos = event.subtitle.indexOf(m_PRO7Subtitle);
+//    if (pos != -1)
+	event.subtitle.replace(m_PRO7Subtitle,"");
+
 }
 
 /** \fn EITFixUp::FixFI(DBEventEIT&) const
