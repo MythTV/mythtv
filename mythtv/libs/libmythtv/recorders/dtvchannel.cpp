@@ -8,7 +8,7 @@
 #include "mpegtables.h"
 #include "mythlogging.h"
 
-#define LOC QString("DTVChan[%1](%2): ").arg(m_input.inputid).arg(GetDevice())
+#define LOC QString("DTVChan[%1](%2): ").arg(m_inputid).arg(GetDevice())
 
 QReadWriteLock DTVChannel::master_map_lock(QReadWriteLock::Recursive);
 typedef QMap<QString,QList<DTVChannel*> > MasterMap;
@@ -71,8 +71,8 @@ QString DTVChannel::GetSuggestedTuningMode(bool is_live_tv) const
     QString input = GetInputName();
 
     uint quickTuning = 0;
-    if (m_input.inputid && !input.isEmpty())
-        quickTuning = CardUtil::GetQuickTuning(m_input.inputid, input);
+    if (m_inputid && !input.isEmpty())
+        quickTuning = CardUtil::GetQuickTuning(m_inputid, input);
 
     bool useQuickTuning = (quickTuning && is_live_tv) || (quickTuning > 1);
 
@@ -187,7 +187,7 @@ bool DTVChannel::SetChannelByString(const QString &channum)
         return false;
     }
 
-    if (!m_input.inputid)
+    if (!m_inputid)
         return false;
 
     uint mplexid_restriction;
@@ -197,7 +197,7 @@ bool DTVChannel::SetChannelByString(const QString &channum)
         LOG(VB_GENERAL, LOG_INFO, loc +
             QString("Requested channel '%1' is on input '%2' "
                     "which is in a busy input group")
-                .arg(channum).arg(m_input.inputid));
+                .arg(channum).arg(m_inputid));
 
         return false;
     }
@@ -210,7 +210,7 @@ bool DTVChannel::SetChannelByString(const QString &channum)
     uint atsc_major, atsc_minor, mplexid, chanid, tsid, netid;
 
     if (!ChannelUtil::GetChannelData(
-        m_input.sourceid, chanid, channum,
+        m_sourceid, chanid, channum,
         tvformat, modulation, freqtable, freqid,
         finetune, frequency,
         si_std, mpeg_prog_num, atsc_major, atsc_minor, tsid, netid,
@@ -240,7 +240,7 @@ bool DTVChannel::SetChannelByString(const QString &channum)
     }
     bool isFrequency = (frequency > 10000000);
     bool hasTuneToChan =
-        !m_input.tuneToChannel.isEmpty() && m_input.tuneToChannel != "Undefined";
+        !m_tuneToChannel.isEmpty() && m_tuneToChannel != "Undefined";
 
     // If we are tuning to a freqid, rather than an actual frequency,
     // we may need to set the frequency table to use.
@@ -252,7 +252,7 @@ bool DTVChannel::SetChannelByString(const QString &channum)
 
     // If a tuneToChannel is set make sure we're still on it
     if (hasTuneToChan)
-        Tune(m_input.tuneToChannel, 0);
+        Tune(m_tuneToChannel, 0);
 
     // Clear out any old PAT or PMT & save version info
     uint version = 0;
@@ -264,11 +264,11 @@ bool DTVChannel::SetChannelByString(const QString &channum)
     }
 
     bool ok = true;
-    if (m_input.externalChanger.isEmpty())
+    if (m_externalChanger.isEmpty())
     {
         if (IsIPTV())
         {
-            int chanid = ChannelUtil::GetChanID(m_input.sourceid, channum);
+            int chanid = ChannelUtil::GetChanID(m_sourceid, channum);
             IPTVTuningData tuning = ChannelUtil::GetIPTVTuningData(chanid);
             if (!Tune(tuning, false))
             {
@@ -277,8 +277,8 @@ bool DTVChannel::SetChannelByString(const QString &channum)
                 ok = false;
             }
         }
-        else if (m_input.name.contains("composite", Qt::CaseInsensitive) ||
-                 m_input.name.contains("s-video", Qt::CaseInsensitive))
+        else if (m_name.contains("composite", Qt::CaseInsensitive) ||
+                 m_name.contains("s-video", Qt::CaseInsensitive))
         {
             LOG(VB_GENERAL, LOG_WARNING, loc + "You have not set "
                     "an external channel changing"
@@ -335,7 +335,7 @@ bool DTVChannel::SetChannelByString(const QString &channum)
     {
         // We need to pull the pid_cache since there are no tuning tables
         pid_cache_t pid_cache;
-        int chanid = ChannelUtil::GetChanID(m_input.sourceid, channum);
+        int chanid = ChannelUtil::GetChanID(m_sourceid, channum);
         ChannelUtil::GetCachedPids(chanid, pid_cache);
         if (pid_cache.empty())
         {

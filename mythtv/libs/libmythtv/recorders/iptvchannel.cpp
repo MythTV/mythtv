@@ -19,7 +19,7 @@
 #include "mythlogging.h"
 #include "mythdb.h"
 
-#define LOC QString("IPTVChan[%1]: ").arg(m_input.inputid)
+#define LOC QString("IPTVChan[%1]: ").arg(m_inputid)
 
 IPTVChannel::IPTVChannel(TVRec *rec, const QString &videodev) :
     DTVChannel(rec), m_firsttune(true), m_stream_handler(NULL),
@@ -43,7 +43,7 @@ bool IPTVChannel::Open(void)
 
     QMutexLocker locker(&m_tune_lock);
 
-    if (!InitializeInputs())
+    if (!InitializeInput())
     {
         Close();
         return false;

@@ -58,7 +58,7 @@ static DTVMultiplex dvbparams_to_dtvmultiplex(
 int64_t concurrent_tunings_delay = 1000;
 QDateTime DVBChannel::last_tuning = QDateTime::currentDateTime();
 
-#define LOC QString("DVBChan[%1](%2): ").arg(m_input.inputid).arg(GetDevice())
+#define LOC QString("DVBChan[%1](%2): ").arg(m_inputid).arg(GetDevice())
 
 /** \class DVBChannel
  *  \brief Provides interface to the tuning hardware when using DVB drivers
@@ -208,7 +208,7 @@ bool DVBChannel::Open(DVBChannel *who)
 
         is_open[who] = true;
 
-        if (!InitializeInputs())
+        if (!InitializeInput())
         {
             Close();
             ReturnMasterLock(master);
@@ -273,7 +273,7 @@ bool DVBChannel::Open(DVBChannel *who)
     if (tunerType.IsDiSEqCSupported())
     {
 
-        diseqc_tree = diseqc_dev.FindTree(m_input.inputid);
+        diseqc_tree = diseqc_dev.FindTree(m_inputid);
         if (diseqc_tree)
         {
             bool is_SCR = false;
@@ -293,7 +293,7 @@ bool DVBChannel::Open(DVBChannel *who)
 
     first_tune = true;
 
-    if (!InitializeInputs())
+    if (!InitializeInput())
     {
         Close();
         return false;
@@ -502,7 +502,7 @@ void DVBChannel::SetTimeOffset(double offset)
 
 bool DVBChannel::Tune(const DTVMultiplex &tuning)
 {
-    if (!m_input.inputid)
+    if (!m_inputid)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Tune(): Invalid input."));
         return false;
@@ -702,7 +702,7 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
         {
             // configure for new input
             if (!same_input)
-                diseqc_settings.Load(m_input.inputid);
+                diseqc_settings.Load(m_inputid);
 
             // execute diseqc commands
             if (!diseqc_tree->Execute(diseqc_settings, tuning))
@@ -957,7 +957,7 @@ int DVBChannel::GetChanID() const
                   "      capturecard.cardid = :INPUTID");
 
     query.bindValue(":CHANNUM", m_curchannelname);
-    query.bindValue(":INPUTID", m_input.inputid);
+    query.bindValue(":INPUTID", m_inputid);
 
     if (!query.exec() || !query.isActive())
     {

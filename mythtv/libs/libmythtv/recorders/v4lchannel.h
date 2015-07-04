@@ -100,6 +100,8 @@ class V4LChannel : public DTVChannel
     VidModV4L2  videomode_v4l2; ///< Current video mode if 'usingv4l2' is true
 
     int         defaultFreqTable;
+    int         m_inputNumV4L;
+    int         m_videoModeV4L2;
 };
 
 #endif

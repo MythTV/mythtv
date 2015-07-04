@@ -44,11 +44,12 @@ using namespace std;
 #include "cardutil.h"
 #include "compat.h"
 
-#define LOC QString("ChannelBase[%1]: ").arg(m_input.inputid)
+#define LOC QString("ChannelBase[%1]: ").arg(m_inputid)
 
 ChannelBase::ChannelBase(TVRec *parent) :
     m_pParent(parent), m_curchannelname(""),
-    m_commfree(false), m_input(),
+    m_commfree(false), m_inputid(0), m_sourceid(0), m_name(""),
+    m_startChanNum(""), m_externalChanger(""), m_tuneToChannel(""),
     m_system(NULL), m_system_status(0)
 {
 }
@@ -79,8 +80,8 @@ bool ChannelBase::Init(QString &startchannel, bool setchan)
     bool msg_error = true;
 
     // Attempt to find the requested startchannel
-    ChannelInfoList::const_iterator cit = m_input.channels.begin();
-    for (; cit != m_input.channels.end(); ++cit)
+    ChannelInfoList::const_iterator cit = m_channels.begin();
+    for (; cit != m_channels.end(); ++cit)
     {
         if ((*cit).channum == startchannel &&
             IsTunable(startchannel))
@@ -94,17 +95,17 @@ bool ChannelBase::Init(QString &startchannel, bool setchan)
     uint mplexid_restriction = 0;
     uint chanid_restriction = 0;
 
-    if (m_input.channels.size() &&
+    if (m_channels.size() &&
         IsInputAvailable(mplexid_restriction, chanid_restriction))
     {
         uint chanid = ChannelUtil::GetNextChannel(
-            m_input.channels, m_input.channels[0].chanid,
+            m_channels, m_channels[0].chanid,
             mplexid_restriction, chanid_restriction, CHANNEL_DIRECTION_UP);
 
         ChannelInfoList::const_iterator cit =
-            find(m_input.channels.begin(), m_input.channels.end(), chanid);
+            find(m_channels.begin(), m_channels.end(), chanid);
 
-        if (chanid && cit != m_input.channels.end())
+        if (chanid && cit != m_channels.end())
         {
             if (!setchan)
             {
@@ -138,7 +139,7 @@ bool ChannelBase::IsTunable(const QString &channum) const
 {
     QString loc = LOC + QString("IsTunable(%1)").arg(channum);
 
-    if (!m_input.inputid)
+    if (!m_inputid)
     {
         LOG(VB_GENERAL, LOG_ERR, loc + " " +
             QString("Requested non-existant input"));
@@ -153,7 +154,7 @@ bool ChannelBase::IsTunable(const QString &channum) const
         LOG(VB_GENERAL, LOG_ERR, loc + " " +
             QString("Requested channel is on input '%1' "
                     "which is in a busy input group")
-            .arg(m_input.inputid));
+            .arg(m_inputid));
 
         return false;
     }
@@ -166,7 +167,7 @@ bool ChannelBase::IsTunable(const QString &channum) const
     uint atsc_major, atsc_minor, mplexid, chanid, tsid, netid;
     bool commfree;
 
-    if (!ChannelUtil::GetChannelData(m_input.sourceid, chanid, channum,
+    if (!ChannelUtil::GetChannelData(m_sourceid, chanid, channum,
                                      tvformat, modulation, freqtable, freqid,
                                      finetune, frequency, dtv_si_std,
                                      mpeg_prog_num, atsc_major, atsc_minor,
@@ -174,7 +175,7 @@ bool ChannelBase::IsTunable(const QString &channum) const
     {
         LOG(VB_GENERAL, LOG_ERR, loc + " " +
             QString("Failed to find channel in DB on input '%1' ")
-            .arg(m_input.inputid));
+            .arg(m_inputid));
 
         return false;
     }
@@ -198,10 +199,10 @@ uint ChannelBase::GetNextChannel(uint chanid, ChannelChangeDirection direction) 
 {
     if (!chanid)
     {
-        if (!m_input.inputid)
+        if (!m_inputid)
             return 0;
 
-        chanid = ChannelUtil::GetChanID(m_input.sourceid, m_curchannelname);
+        chanid = ChannelUtil::GetChanID(m_sourceid, m_curchannelname);
     }
 
     uint mplexid_restriction = 0;
@@ -209,16 +210,16 @@ uint ChannelBase::GetNextChannel(uint chanid, ChannelChangeDirection direction) 
     (void)IsInputAvailable(mplexid_restriction, chanid_restriction);
 
     return ChannelUtil::GetNextChannel(
-        m_allchannels, chanid, mplexid_restriction, chanid_restriction,
+        m_channels, chanid, mplexid_restriction, chanid_restriction,
         direction);
 }
 
 uint ChannelBase::GetNextChannel(const QString &channum, ChannelChangeDirection direction) const
 {
-    if (!m_input.inputid)
+    if (!m_inputid)
         return 0;
 
-    uint chanid = ChannelUtil::GetChanID(m_input.sourceid, channum);
+    uint chanid = ChannelUtil::GetChanID(m_sourceid, channum);
     return GetNextChannel(chanid, direction);
 }
 
@@ -330,7 +331,7 @@ static bool is_input_busy(
 bool ChannelBase::IsInputAvailable(
     uint &mplexid_restriction, uint &chanid_restriction) const
 {
-    if (!m_input.inputid)
+    if (!m_inputid)
         return false;
 
     // Check each input to make sure it doesn't belong to an
@@ -343,10 +344,10 @@ bool ChannelBase::IsInputAvailable(
     if (m_pParent)
     {
         InputInfo info;
-        busyrec[m_input.inputid] = m_pParent->IsBusy(&info);
-        if (busyrec[m_input.inputid])
+        busyrec[m_inputid] = m_pParent->IsBusy(&info);
+        if (busyrec[m_inputid])
         {
-            busyin[m_input.inputid] = info;
+            busyin[m_inputid] = info;
             info.chanid = GetChanID();
         }
     }
@@ -354,9 +355,9 @@ bool ChannelBase::IsInputAvailable(
     mplexid_restriction = 0;
     chanid_restriction = 0;
 
-    vector<uint> groupids = CardUtil::GetInputGroups(m_input.inputid);
+    vector<uint> groupids = CardUtil::GetInputGroups(m_inputid);
 
-    bool res = !is_input_busy(m_input.inputid, groupids,
+    bool res = !is_input_busy(m_inputid, groupids,
                           busygrp, busyrec, busyin, mplexid_restriction,
                           chanid_restriction);
     return res;
@@ -383,14 +384,14 @@ void ChannelBase::HandleScript(const QString &freqid)
     bool ok = true;
     m_system_status = 0; // unknown
 
-    if (!m_input.inputid)
+    if (!m_inputid)
     {
         m_system_status = 2; // failed
         HandleScriptEnd(true);
         return;
     }
 
-    if (m_input.externalChanger.isEmpty())
+    if (m_externalChanger.isEmpty())
     {
         m_system_status = 3; // success
         HandleScriptEnd(true);
@@ -431,9 +432,9 @@ void ChannelBase::HandleScript(const QString &freqid)
     }
     else
     {
-        if (m_input.externalChanger.toLower() == "internal")
+        if (m_externalChanger.toLower() == "internal")
         {
-            ok = ChangeInternalChannel(freqid, m_input.inputid);
+            ok = ChangeInternalChannel(freqid, m_inputid);
             if (!ok)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC + "Can not execute internal channel "
@@ -447,7 +448,7 @@ void ChannelBase::HandleScript(const QString &freqid)
         }
         else
         {
-            ok = ChangeExternalChannel(m_input.externalChanger, freqid);
+            ok = ChangeExternalChannel(m_externalChanger, freqid);
             if (!ok)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC + "Can not execute channel changer.");
@@ -576,10 +577,10 @@ void ChannelBase::HandleScriptEnd(bool ok)
     if (ok)
     {
         LOG(VB_CHANNEL, LOG_INFO, LOC + "Channel change script succeeded.");
-        if (m_input.inputid)
+        if (m_inputid)
         {
             // Set this as the future start channel for this source
-            m_input.startChanNum = m_curchannelname;
+            m_startChanNum = m_curchannelname;
         }
     }
     else
@@ -590,7 +591,7 @@ void ChannelBase::HandleScriptEnd(bool ok)
 
 int ChannelBase::GetChanID() const
 {
-    if (!m_input.inputid)
+    if (!m_inputid)
         return false;
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -599,7 +600,7 @@ int ChannelBase::GetChanID() const
                   "WHERE channum  = :CHANNUM AND "
                   "      sourceid = :SOURCEID");
     query.bindValue(":CHANNUM", m_curchannelname);
-    query.bindValue(":SOURCEID", m_input.sourceid);
+    query.bindValue(":SOURCEID", m_sourceid);
 
     if (!query.exec() || !query.isActive())
     {
@@ -616,34 +617,31 @@ int ChannelBase::GetChanID() const
 /** \fn ChannelBase::InitializeInputs(void)
  *  \brief Fills in input map from DB
  */
-bool ChannelBase::InitializeInputs(void)
+bool ChannelBase::InitializeInput(void)
 {
-    m_input.Clear();
-
-    if (!m_input.inputid)
+    if (!m_inputid)
     {
         if (m_pParent)
-            m_input.inputid = m_pParent->GetCaptureCardNum();
+            m_inputid = m_pParent->GetCaptureCardNum();
         else
-            m_input.inputid = CardUtil::GetFirstInputID(GetDevice());
+            m_inputid = CardUtil::GetFirstInputID(GetDevice());
     }
 
-    if (!m_input.inputid)
+    if (!m_inputid)
     {
         LOG(VB_GENERAL, LOG_ERR,
-            "InitializeInputs(): Programmer error, no parent.");
+            "InitializeInput(): Programmer error, no parent.");
         return false;
     }
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
-        "SELECT cardid, "
-        "       inputname,   startchan, "
-        "       tunechan,    externalcommand, "
-        "       sourceid,    livetvorder "
+        "SELECT sourceid,    inputname, "
+        "       startchan,   externalcommand, "
+        "       tunechan "
         "FROM capturecard "
         "WHERE cardid = :INPUTID");
-    query.bindValue(":INPUTID", m_input.inputid);
+    query.bindValue(":INPUTID", m_inputid);
 
     if (!query.exec() || !query.isActive())
     {
@@ -661,38 +659,29 @@ bool ChannelBase::InitializeInputs(void)
 
     query.next();
 
-    m_allchannels.clear();
+    m_sourceid = query.value(0).toUInt();
+    m_name = query.value(1).toString();
+    m_startChanNum = query.value(2).toString();
+    m_externalChanger = query.value(3).toString();
+    m_tuneToChannel = query.value(4).toString();
+
+    ChannelInfoList m_channels = ChannelUtil::GetChannels(m_sourceid, false);
     QString order = gCoreContext->GetSetting("ChannelOrdering", "channum");
-
-    uint sourceid = query.value(5).toUInt();
-    ChannelInfoList channels = ChannelUtil::GetChannels(sourceid, false);
-
-    ChannelUtil::SortChannels(channels, order);
-
-    m_input = ChannelInputInfo(
-        query.value(1).toString(), query.value(2).toString(),
-        query.value(3).toString(), query.value(4).toString(),
-        sourceid,
-        query.value(0).toUInt(),   query.value(5).toUInt(),
-        0,                         channels);
+    ChannelUtil::SortChannels(m_channels, order);
 
     if (!IsExternalChannelChangeSupported() &&
-        !m_input.externalChanger.isEmpty())
+        !m_externalChanger.isEmpty())
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC + "External Channel changer is "
             "set, but this device does not support it.");
-        m_input.externalChanger.clear();
+        m_externalChanger.clear();
     }
-
-    m_allchannels.insert(m_allchannels.end(),
-                         channels.begin(), channels.end());
-    ChannelUtil::SortChannels(m_allchannels, order, true);
 
     // print it
     LOG(VB_CHANNEL, LOG_INFO, LOC +
         QString("Input #%1: '%2' schan(%3) sourceid(%4)")
-        .arg(m_input.inputid).arg(m_input.name).arg(m_input.startChanNum)
-        .arg(m_input.sourceid));
+        .arg(m_inputid).arg(m_name).arg(m_startChanNum)
+        .arg(m_sourceid));
 
     return true;
 }
@@ -704,12 +693,12 @@ void ChannelBase::Renumber(uint sourceid,
                            const QString &oldChanNum,
                            const QString &newChanNum)
 {
-    bool skip = (m_input.name.isEmpty()                ||
-                 m_input.startChanNum.isEmpty()        ||
-                 m_input.startChanNum != oldChanNum ||
-                 m_input.sourceid     != sourceid);
+    bool skip = (m_name.isEmpty()                ||
+                 m_startChanNum.isEmpty()        ||
+                 m_startChanNum != oldChanNum ||
+                 m_sourceid     != sourceid);
     if (!skip)
-        m_input.startChanNum = newChanNum;
+        m_startChanNum = newChanNum;
 
     if (GetSourceID() == sourceid && oldChanNum == m_curchannelname)
         m_curchannelname = newChanNum;
@@ -725,15 +714,15 @@ void ChannelBase::StoreInputChannels(void)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    if (m_input.name.isEmpty() || m_input.startChanNum.isEmpty())
+    if (m_name.isEmpty() || m_startChanNum.isEmpty())
         return;
 
     query.prepare(
         "UPDATE capturecard "
         "SET startchan = :STARTCHAN "
         "WHERE cardid = :CARDINPUTID");
-    query.bindValue(":STARTCHAN", m_input.startChanNum);
-    query.bindValue(":CARDINPUTID", m_input.inputid);
+    query.bindValue(":STARTCHAN", m_startChanNum);
+    query.bindValue(":CARDINPUTID", m_inputid);
 
     if (!query.exec() || !query.isActive())
         MythDB::DBError("StoreInputChannels", query);
@@ -753,7 +742,7 @@ bool ChannelBase::CheckChannel(const QString &channum) const
         "      capturecard.cardid    = :INPUTID             AND "
         "      capturecard.hostname  = :HOSTNAME");
     query.bindValue(":CHANNUM",  channum);
-    query.bindValue(":INPUTID",   m_input.inputid);
+    query.bindValue(":INPUTID",   m_inputid);
     query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
 
     if (!query.exec() || !query.isActive())
@@ -765,7 +754,7 @@ bool ChannelBase::CheckChannel(const QString &channum) const
 
     LOG(VB_CHANNEL, LOG_ERR, LOC +
         QString("Failed to find channel(%1) on input (%2).")
-        .arg(channum).arg(m_input.inputid));
+        .arg(channum).arg(m_inputid));
     return false;
 }
 
@@ -900,7 +889,7 @@ bool ChannelBase::IsExternalChannelChangeInUse(void)
     if (!IsExternalChannelChangeSupported())
         return false;
 
-    if (!m_input.inputid)
+    if (!m_inputid)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("IsExternalChannelChangeInUse: "
@@ -908,7 +897,7 @@ bool ChannelBase::IsExternalChannelChangeInUse(void)
         return false;
     }
 
-    return !m_input.externalChanger.isEmpty();
+    return !m_externalChanger.isEmpty();
 }
 
 ;

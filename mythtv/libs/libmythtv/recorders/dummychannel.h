@@ -23,7 +23,7 @@ class DummyChannel : public ChannelBase
     bool IsTunable(const QString &channum) const
         { return true; }
 
-    bool Open(void)     { return InitializeInputs(); }
+    bool Open(void)     { return InitializeInput(); }
     void Close(void)    { return; }
 
     // Sets

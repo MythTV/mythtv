@@ -66,11 +66,11 @@ class ChannelBase
         { return m_curchannelname; }
     virtual int GetChanID(void) const;
     virtual int GetInputID(void) const
-        { return m_input.inputid; }
+        { return m_inputid; }
     virtual QString GetInputName(void) const
-        { return m_input.name; }
+        { return m_name; }
     virtual uint GetSourceID(void) const
-        { return m_input.sourceid; }
+        { return m_sourceid; }
 
     /// \brief Returns true iff commercial detection is not required
     //         on current channel, for BBC, CBC, etc.
@@ -82,7 +82,7 @@ class ChannelBase
     virtual void Renumber(uint srcid, const QString &oldChanNum,
                           const QString &newChanNum);
 
-    virtual bool InitializeInputs(void);
+    virtual bool InitializeInput(void);
 
     // Misc. Commands
     virtual bool Retune(void) { return false; }
@@ -99,7 +99,7 @@ class ChannelBase
     bool CheckChannel(const QString &channum) const;
 
     // \brief Set inputid for scanning
-    void SetInputID(uint _inputid) { m_input.inputid = _inputid; }
+    void SetInputID(uint _inputid) { m_inputid = _inputid; }
 
     static ChannelBase *CreateChannel(
         TVRec                    *tv_rec,
@@ -131,8 +131,13 @@ class ChannelBase
     TVRec   *m_pParent;
     QString  m_curchannelname;
     bool     m_commfree;
-    ChannelInputInfo m_input;
-    ChannelInfoList m_allchannels; ///< channels across all inputs
+    uint     m_inputid;
+    uint     m_sourceid;
+    QString  m_name;
+    QString  m_startChanNum;
+    QString  m_externalChanger;
+    QString  m_tuneToChannel;
+    ChannelInfoList m_channels; ///< channels across all inputs
 
     QMutex         m_system_lock;
     MythSystemLegacy    *m_system;
