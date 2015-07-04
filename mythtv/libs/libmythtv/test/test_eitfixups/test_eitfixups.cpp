@@ -412,6 +412,28 @@ void TestEITFixups::testDEPro7Sat1()
     PRINT_EVENT(*event4);
     QCOMPARE(event4->subtitle, QString("\"Lokal\", Ort"));
     QCOMPARE(event4->airdate,  (unsigned short) 2015);
+
+    DBEventEIT *event5 = SimpleDBEventEIT (EITFixUp::kFixP7S1,
+                                           "Titel",
+                                           "In Morpheus' Armen, Science-Fiction, CDN/USA 2006",
+                                           "Beschreibung");
+    PRINT_EVENT(*event5);
+    fixup.Fix(*event5);
+    PRINT_EVENT(*event5);
+    QCOMPARE(event5->subtitle, QString("In Morpheus' Armen"));
+    QCOMPARE(event5->airdate,  (unsigned short) 2006);
+
+    DBEventEIT *event6 = SimpleDBEventEIT (EITFixUp::kFixP7S1,
+                                           "Titel",
+                                           "Drei Kleintiere durchschneiden (1), Zeichentrick, J 2014",
+                                           "Beschreibung");
+    PRINT_EVENT(*event6);
+    fixup.Fix(*event6);
+    PRINT_EVENT(*event6);
+    QCOMPARE(event6->subtitle, QString("Drei Kleintiere durchschneiden (1)"));
+    QCOMPARE(event6->airdate,  (unsigned short) 2014);
+
+
 }
 
 QTEST_APPLESS_MAIN(TestEITFixups)
