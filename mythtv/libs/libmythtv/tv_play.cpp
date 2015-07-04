@@ -11794,42 +11794,17 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
     {
         if (ctx->recorder)
         {
-            vector<uint> cardids = CardUtil::GetLiveTVCardList();
-            uint cardid  = ctx->GetCardID();
-            stable_sort(cardids.begin(), cardids.end());
-            vector<uint>::const_iterator it = cardids.begin();
-            InfoMap info;
-            ctx->recorder->GetChannelInfo(info);
-            uint sourceid = info["sourceid"].toUInt();
-            for (; it != cardids.end(); ++it)
+            uint inputid  = ctx->GetCardID();
+            vector<InputInfo> inputs = RemoteRequestFreeInputInfo(inputid);
+            vector<InputInfo>::iterator it = inputs.begin();
+            for (; it != inputs.end(); ++it)
             {
-                vector<InputInfo> inputs =
-                    RemoteRequestFreeInputList(*it, cardid);
-
-                for (uint i = 0; i < inputs.size(); i++)
-                {
-                    // don't add current input to list
-                    if ((inputs[i].inputid   == cardid) &&
-                        (inputs[i].sourceid == sourceid))
-                    {
-                        continue;
-                    }
-
-                    QString name = CardUtil::GetDisplayName(inputs[i].inputid);
-                    if (name.isEmpty())
-                    {
-                        //: %1 is the numeric card ID,
-                        //: %2 is the string input name
-                        name = tr("C:%1 I:%2",
-                                  "Playback OSD menu, Live TV input selection")
-                            .arg(QString::number(*it)).arg(inputs[i].name);
-                    }
-
-                    QString action = prefix +
-                        QString::number(inputs[i].inputid);
-                    active = false;
-                    BUTTON(action, name);
-                }
+                if ((*it).inputid == inputid)
+                    continue;
+                active = false;
+                QString action = QString("SWITCHTOINPUT_") +
+                    QString::number((*it).inputid);
+                BUTTON(action, (*it).displayName);
             }
         }
     }
@@ -11837,35 +11812,23 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
     {
         if (ctx->recorder)
         {
-            QMap<uint,InputInfo> sources;
-            vector<uint> cardids;
-            uint cardid = 0;
-            uint sourceid = 0;
-            cardids = CardUtil::GetLiveTVCardList();
-            cardid  = ctx->GetCardID();
+            uint inputid  = ctx->GetCardID();
             InfoMap info;
             ctx->recorder->GetChannelInfo(info);
-            sourceid = info["sourceid"].toUInt();
-            // Get sources available on other cards
-            vector<uint>::const_iterator it = cardids.begin();
-            for (; it != cardids.end(); ++it)
+            uint sourceid = info["sourceid"].toUInt();
+            QMap<uint, bool> sourceids;
+            vector<InputInfo> inputs = RemoteRequestFreeInputInfo(inputid);
+            vector<InputInfo>::iterator it = inputs.begin();
+            for (; it != inputs.end(); ++it)
             {
-                vector<InputInfo> inputs =
-                    RemoteRequestFreeInputList(*it, cardid);
-                if (inputs.empty())
+                if ((*it).sourceid == sourceid ||
+                    sourceids[(*it).sourceid])
                     continue;
-
-                for (uint i = 0; i < inputs.size(); i++)
-                    if (!sources.contains(inputs[i].sourceid))
-                        sources[inputs[i].sourceid] = inputs[i];
-            }
-            // delete current source from list
-            sources.remove(sourceid);
-            QMap<uint,InputInfo>::const_iterator sit = sources.begin();
-            for (; sit != sources.end(); ++sit)
-            {
-                QString action = QString("SWITCHTOINPUT_%1").arg((*sit).inputid);
-                BUTTON(action, SourceUtil::GetSourceName((*sit).sourceid));
+                active = false;
+                sourceids[(*it).sourceid] = true;
+                QString action = QString("SWITCHTOINPUT_") +
+                    QString::number((*it).inputid);
+                BUTTON(action, SourceUtil::GetSourceName((*it).sourceid));
             }
         }
     }
