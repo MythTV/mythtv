@@ -343,4 +343,71 @@ void TestEITFixups::testUKFixups9()
     QCOMPARE(event9.description, QString("Includes sport and weather"));
 }
 
+DBEventEIT *TestEITFixups::SimpleDBEventEIT (uint fixup, QString title, QString subtitle, QString description)
+{
+    DBEventEIT *event = new DBEventEIT (1, // channel id
+                                       title, // title
+                                       subtitle, // subtitle
+                                       description, // description
+                                       "", // category
+                                       ProgramInfo::kCategoryNone, // category_type
+                                       QDateTime::fromString("2015-02-28T19:40:00Z", Qt::ISODate),
+                                       QDateTime::fromString("2015-02-28T20:00:00Z", Qt::ISODate),
+                                       EITFixUp::kFixGenericDVB | fixup,
+                                       SUB_UNKNOWN,
+                                       AUD_STEREO,
+                                       VID_UNKNOWN,
+                                       0.0f, // star rating
+                                       "", // series id
+                                       "", // program id
+                                       0, // season
+                                       0, // episode
+                                       0); //episode total
+
+    return event;
+}
+
+void TestEITFixups::testDEPro7Sat1()
+{
+    EITFixUp fixup;
+
+    DBEventEIT *event = SimpleDBEventEIT (EITFixUp::kFixP7S1,
+                                         "Titel",
+                                         "Folgentitel, Mystery, USA 2011",
+                                         "Beschreibung");
+
+    PRINT_EVENT(*event);
+    fixup.Fix(*event);
+    PRINT_EVENT(*event);
+    QCOMPARE(event->title,    QString("Titel"));
+    QCOMPARE(event->subtitle, QString("Folgentitel"));
+
+    DBEventEIT *event2 = SimpleDBEventEIT (EITFixUp::kFixP7S1,
+                                           "Titel",
+                                           "Kurznachrichten, D 2015",
+                                           "Beschreibung");
+    PRINT_EVENT(*event2);
+    fixup.Fix(*event2);
+    PRINT_EVENT(*event2);
+    QCOMPARE(event2->subtitle, QString(""));
+
+    DBEventEIT *event3 = SimpleDBEventEIT (EITFixUp::kFixP7S1,
+                                           "Titel",
+                                           "Folgentitel",
+                                           "Beschreibung");
+    PRINT_EVENT(*event3);
+    fixup.Fix(*event3);
+    PRINT_EVENT(*event3);
+    QCOMPARE(event3->subtitle, QString("Folgentitel"));
+
+    DBEventEIT *event4 = SimpleDBEventEIT (EITFixUp::kFixP7S1,
+                                           "Titel",
+                                           "\"Lokal\", Ort, Doku-Soap, D 2015",
+                                           "Beschreibung");
+    PRINT_EVENT(*event4);
+    fixup.Fix(*event4);
+    PRINT_EVENT(*event4);
+    QCOMPARE(event4->subtitle, QString("\"Lokal\", Ort"));
+}
+
 QTEST_APPLESS_MAIN(TestEITFixups)

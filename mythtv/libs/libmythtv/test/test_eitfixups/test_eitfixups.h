@@ -26,6 +26,8 @@
 #define MSKIP(MSG) QSKIP(MSG)
 #endif
 
+#include <programdata.h>
+
 class TestEITFixups : public QObject
 {
     Q_OBJECT
@@ -40,4 +42,8 @@ class TestEITFixups : public QObject
     void testUKFixups7(void);
     void testUKFixups8(void);
     void testUKFixups9(void);
+    void testDEPro7Sat1(void);
+
+  private:
+    static DBEventEIT *SimpleDBEventEIT (uint chanid, QString title, QString subtitle, QString description);
 };
