@@ -6302,6 +6302,7 @@ fi
 enabled ffmpeg_pthreads && enable pthreads
 
 # Check for libuuid for zeromq
+enabled mythlogserver || disable libuuid
 if enabled libuuid ; then
   check_lib uuid/uuid.h uuid_generate -luuid || disable libuuid
   if disabled libuuid ; then
