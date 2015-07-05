@@ -6963,7 +6963,7 @@ else
     qt_libs="-L${sysroot}/$(${qmake} -query QT_INSTALL_LIBS)"
 fi
 
-if $(pkg-config --exists QtWebKit) ; then
+if $(pkg-config --exists QtWebKit) || $(pkg-config --exists Qt5WebKit) ; then
     enable qtwebkit
 else
     check_ecxx ${qt_inc} ${qt_inc}/QtCore <<EOF && enable qtwebkit
@@ -6974,7 +6974,7 @@ fi
 
 enabled qtwebkit || die "Error! QtWebkit headers not found"
 
-if $(pkg-config --exists QtScript) ; then
+if $(pkg-config --exists QtScript) || $(pkg-config --exists Qt5Script) ; then
     enable qtscript
 else
     check_ecxx ${qt_inc} <<EOF && enable qtscript
@@ -7003,8 +7003,8 @@ EOF
 fi
 
 # Disable OpenGL ES support if Qt does not support it
-QTGL=$(pkg-config --list-all | grep Qt | grep OpenGL | awk '{print $1}')
-if $(pkg-config --variable=qt_config $QTGL | grep -qv opengles2) ; then
+QTCONF=$(pkg-config --variable=qt_config QtCore || pkg-config --variable=qt_config Qt5Core)
+if echo "$QTCONF" | grep -qv opengles2 ; then
     if test $target_os != android ; then
         disable opengles
     fi
