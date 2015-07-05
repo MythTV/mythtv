@@ -177,7 +177,7 @@ RemoteEncoder *RemoteRequestNextFreeRecorder(int inputid)
         .arg(inputid));
 
     vector<InputInfo> inputs =
-        RemoteRequestFreeInputInfo(0);
+        RemoteRequestFreeInputInfo(inputid);
 
     if (inputs.empty())
     {
