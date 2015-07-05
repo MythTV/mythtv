@@ -541,10 +541,8 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
 
     // Source and input
     void SwitchSource(PlayerContext*, uint source_direction);
-    void SwitchInputs(PlayerContext*, uint inputid);
-    void ToggleInputs(PlayerContext*, uint inputid = 0);
-    void SwitchCards(PlayerContext*,
-                     uint chanid = 0, QString channum = "", uint inputid = 0);
+    void SwitchInputs(PlayerContext*,
+                      uint chanid = 0, QString channum = "", uint inputid = 0);
 
     // Pause/play
     void PauseLiveTV(PlayerContext*);
