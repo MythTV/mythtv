@@ -1971,7 +1971,6 @@ IPTVTuningData ChannelUtil::GetIPTVTuningData(uint chanid)
 
     QString data_url, fec_url0, fec_url1;
     IPTVTuningData::FECType fec_type = IPTVTuningData::kNone;
-    IPTVTuningData::IPTVProtocol protocol = IPTVTuningData::inValid;
     uint bitrate[3] = { 0, 0, 0, };
     while (query.next())
     {
