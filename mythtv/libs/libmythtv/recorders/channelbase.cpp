@@ -666,7 +666,7 @@ bool ChannelBase::InitializeInput(void)
     m_externalChanger = query.value(3).toString();
     m_tuneToChannel = query.value(4).toString();
 
-    ChannelInfoList m_channels = ChannelUtil::GetChannels(m_sourceid, false);
+    m_channels = ChannelUtil::GetChannels(m_sourceid, false);
     QString order = gCoreContext->GetSetting("ChannelOrdering", "channum");
     ChannelUtil::SortChannels(m_channels, order);
 
