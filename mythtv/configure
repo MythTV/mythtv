@@ -3419,10 +3419,10 @@ enable exiv2
 enable systemd_notify
 
 # mythtv paths
-dvb_path_default="${sysroot}/usr/include"
-x11_path_default="${sysroot}/usr/X11R6/include"
-libcec_path_default="${sysroot}/usr/include"
-libxml2_path_default="${sysroot}/usr/include/libxml2"
+dvb_path_default="$sysinclude"
+x11_path_default="${sysinclude}/X11"
+libcec_path_default="$sysinclude"
+libxml2_path_default="${sysinclude}/libxml2"
 firewiresdk_path_default=""
 
 # build settings
