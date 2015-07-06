@@ -61,7 +61,7 @@ ChannelInfo::ChannelInfo(const ChannelInfo &other)
 
     // Not in channel table
     m_groupIdList = other.m_groupIdList;
-    m_cardIdList  = other.m_cardIdList;
+    m_inputIdList = other.m_inputIdList;
     old_xmltvid   = other.old_xmltvid;
     m_sourcename  = other.m_sourcename;
 }
@@ -124,7 +124,7 @@ ChannelInfo &ChannelInfo::operator=(const ChannelInfo &other)
 
     // Not in channel table
     m_groupIdList = other.m_groupIdList;
-    m_cardIdList  = other.m_cardIdList;
+    m_inputIdList = other.m_inputIdList;
     old_xmltvid   = other.old_xmltvid;
     m_sourcename  = other.m_sourcename;
 
@@ -169,7 +169,7 @@ void ChannelInfo::Init()
     tmoffset = 0;
     iptvid = 0;
 
-    m_cardIdList.clear();
+    m_inputIdList.clear();
     m_groupIdList.clear();
     m_sourcename.clear();
 }
@@ -283,9 +283,9 @@ void ChannelInfo::ToMap(InfoMap& infoMap)
         infoMap["channelgroupname"] = ChannelGroup::GetChannelGroupName(GetGroupIds().first());
 }
 
-void ChannelInfo::LoadCardIds()
+void ChannelInfo::LoadInputIds()
 {
-    if (chanid && m_cardIdList.isEmpty())
+    if (chanid && m_inputIdList.isEmpty())
     {
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT capturecard.cardid FROM channel "
@@ -294,12 +294,12 @@ void ChannelInfo::LoadCardIds()
         query.bindValue(":CHANID", chanid);
 
         if (!query.exec())
-            MythDB::DBError("ChannelInfo::GetCardIds()", query);
+            MythDB::DBError("ChannelInfo::GetInputIds()", query);
         else
         {
             while(query.next())
             {
-                AddCardId(query.value(0).toUInt());
+                AddInputId(query.value(0).toUInt());
             }
         }
     }
@@ -315,7 +315,7 @@ void ChannelInfo::LoadGroupIds()
         query.bindValue(":CHANID", chanid);
 
         if (!query.exec())
-            MythDB::DBError("ChannelInfo::GetCardIds()", query);
+            MythDB::DBError("ChannelInfo::GetInputIds()", query);
         else if (query.size() == 0)
         {
             // HACK Avoid re-running this query each time for channels

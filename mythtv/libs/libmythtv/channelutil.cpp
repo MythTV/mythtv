@@ -2104,7 +2104,7 @@ ChannelInfoList ChannelUtil::GetChannelsInternal(
         QStringList cardIDs = query.value(11).toString().split(",");
         QString cardid;
         while (!cardIDs.isEmpty())
-                chan.AddCardId(cardIDs.takeFirst().toUInt());
+                chan.AddInputId(cardIDs.takeFirst().toUInt());
 
         QStringList groupIDs = query.value(10).toString().split(",");
         QString groupid;
@@ -2516,7 +2516,7 @@ ChannelInfoList ChannelUtil::LoadChannels(uint startIndex, uint count,
         QStringList cardIDs = query.value(29).toString().split(",");
         QString cardid;
         while (!cardIDs.isEmpty())
-                channelInfo.AddCardId(cardIDs.takeFirst().toUInt());
+                channelInfo.AddInputId(cardIDs.takeFirst().toUInt());
 
         channelList.push_back(channelInfo);
     }

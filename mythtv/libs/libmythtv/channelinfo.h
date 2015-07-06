@@ -56,16 +56,16 @@ class MTV_PUBLIC ChannelInfo
     void RemoveGroupId(uint lgroupid) { m_groupIdList.removeOne(lgroupid); }
 
     
-    const QList<uint> GetCardIds() const { return m_cardIdList; }
-    void LoadCardIds();
-    // Since cardids must only appear once in a list, protect access
+    const QList<uint> GetInputIds() const { return m_inputIdList; }
+    void LoadInputIds();
+    // Since inputids must only appear once in a list, protect access
     // to it
-    void AddCardId(uint lcardid)
+    void AddInputId(uint linputid)
     {
-        if (!m_cardIdList.contains(lcardid))
-            m_cardIdList.push_back(lcardid);
+        if (!m_inputIdList.contains(linputid))
+            m_inputIdList.push_back(linputid);
     }
-    void RemoveCardId(uint lcardid) { m_cardIdList.removeOne(lcardid); }
+    void RemoveInputId(uint linputid) { m_inputIdList.removeOne(linputid); }
     
     
   private:
@@ -116,7 +116,7 @@ class MTV_PUBLIC ChannelInfo
     QString m_sourcename; // Cache here rather than looking up each time
     // Following not in database - Cached
     QList<uint>  m_groupIdList;
-    QList<uint>  m_cardIdList;
+    QList<uint>  m_inputIdList;
 };
 typedef vector<ChannelInfo> ChannelInfoList;
 
