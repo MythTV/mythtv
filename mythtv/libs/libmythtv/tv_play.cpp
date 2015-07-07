@@ -1441,6 +1441,7 @@ void TV::PlaybackLoop(void)
             continue;
 
         int count = player.size();
+        int errorCount = 0;
         for (int i = 0; i < count; i++)
         {
             const PlayerContext *mctx = GetPlayerReadLock(i, __FILE__, __LINE__);
@@ -1453,9 +1454,17 @@ void TV::PlaybackLoop(void)
                     mctx->player->VideoLoop();
                 }
                 mctx->UnlockDeletePlayer(__FILE__, __LINE__);
+
+                if (mctx->errored || !mctx->player)
+                    errorCount++;
             }
             ReturnPlayerLock(mctx);
         }
+
+        // break out of the loop if there are no valid players
+        // or all PlayerContexts are errored
+        if (errorCount == count)
+            return;
     }
 }
 
