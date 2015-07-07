@@ -165,7 +165,7 @@ class MTV_PUBLIC ChannelUtil
     // Misc gets
     static QString GetDefaultAuthority(uint chanid);
     static QString GetIcon(uint chanid);
-    static vector<uint> GetCardIDs(uint chanid);
+    static vector<uint> GetInputIDs(uint chanid);
     static QString GetUnknownCallsign(void);
     static uint    FindChannel(uint sourceid, const QString &freqid);
     static int     GetChanID(uint sourceid, const QString &channum)
@@ -207,14 +207,15 @@ class MTV_PUBLIC ChannelUtil
      *  \note This replaces all previous methods e.g. GetChannels() and
      *        GetAllChannels() in channelutil.h
      *
-     *  \note There is no grouping option by design and here's why. Grouping
-     * with a ChannelInfo object is largely self-defeating, 99% of the
-     * information in the remaining result won't apply to the other 'grouped'
-     * channels. Therefore GroupBy should be used when you only care about
-     * Name, Number and Callsign. Loading a complete ChannelInfo object,
-     * including card/input info is therefore an actual waste of
-     * processor cycles and memory, so we may yet introduce a parent class for
-     * ChannelInfo called BasicChannelInfo or similar with it's own Load function
+     *  \note There is no grouping option by design and here's
+     * why. Grouping with a ChannelInfo object is largely
+     * self-defeating, 99% of the information in the remaining result
+     * won't apply to the other 'grouped' channels. Therefore GroupBy
+     * should be used when you only care about Name, Number and
+     * Callsign. Loading a complete ChannelInfo object, including
+     * input info is therefore an actual waste of processor cycles and
+     * memory, so we may yet introduce a parent class for ChannelInfo
+     * called BasicChannelInfo or similar with it's own Load function
     */
     static ChannelInfoList LoadChannels(uint startIndex, uint count,
                                         uint &totalAvailable,
@@ -235,8 +236,8 @@ class MTV_PUBLIC ChannelUtil
                                    group_by, channel_groupid);
     }
 
-    /// Returns channels that are not connected to a capture card
-    /// and channels that are not marked as visible.
+    /// Returns channels that are not connected to an input and
+    /// channels that are not marked as visible.
     /**
      * \deprecated
      */
@@ -299,7 +300,7 @@ class MTV_PUBLIC ChannelUtil
     static int     GetSourceID(int mplexid);
     static uint    GetSourceIDForChannel(uint chanid);
 
-    static QStringList GetCardTypes(uint chandid);
+    static QStringList GetInputTypes(uint chandid);
 
     static bool    GetCachedPids(uint chanid, pid_cache_t &pid_cache);
 
@@ -327,15 +328,15 @@ class MTV_PUBLIC ChannelUtil
         uint sourceid, bool visible_only, bool include_disconnected,
         const QString &group_by, uint channel_groupid);
     static QString GetChannelStringField(int chanid, const QString &field);
+#if 0
     static QString GetChannelValueStr(const QString &channel_field,
-                                      uint           cardid,
-                                      const QString &input,
-                                      const QString &channum);
+                                      const QString &channum,
+                                      uint           inputid);
 
     static int     GetChannelValueInt(const QString &channel_field,
-                                      uint           cardid,
-                                      const QString &input,
-                                      const QString &channum);
+                                      const QString &channum,
+                                      uint           inputid);
+#endif
 
 };
 

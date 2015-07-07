@@ -820,7 +820,7 @@ uint ChannelUtil::GetSourceIDForChannel(uint chanid)
     return 0;
 }
 
-QStringList ChannelUtil::GetCardTypes(uint chanid)
+QStringList ChannelUtil::GetInputTypes(uint chanid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT cardtype "
@@ -833,7 +833,7 @@ QStringList ChannelUtil::GetCardTypes(uint chanid)
     QStringList list;
     if (!query.exec())
     {
-        MythDB::DBError("ChannelUtil::GetCardTypes", query);
+        MythDB::DBError("ChannelUtil::GetInputTypes", query);
         return list;
     }
     while (query.next())
@@ -943,9 +943,9 @@ bool ChannelUtil::SaveCachedPids(uint chanid,
     return ok;
 }
 
+#if 0
 QString ChannelUtil::GetChannelValueStr(const QString &channel_field,
-                                        uint           cardid,
-                                        const QString &input,
+                                        uint           inputid,
                                         const QString &channum)
 {
     QString retval = QString::null;
@@ -958,12 +958,10 @@ QString ChannelUtil::GetChannelValueStr(const QString &channel_field,
             "FROM channel, capturecard "
             "WHERE channel.channum       = :CHANNUM             AND "
             "      channel.sourceid      = capturecard.sourceid AND "
-            "      capturecard.inputname = :INPUT               AND "
-            "      capturecard.cardid    = :CARDID ")
+            "      capturecard.cardid    = :INPUTID ")
         .arg(channel_field));
 
-    query.bindValue(":CARDID",   cardid);
-    query.bindValue(":INPUT",    input);
+    query.bindValue(":INPUTID",   inputid);
     query.bindValue(":CHANNUM",  channum);
 
     if (!query.exec() || !query.isActive())
@@ -973,6 +971,7 @@ QString ChannelUtil::GetChannelValueStr(const QString &channel_field,
 
     return retval;
 }
+#endif
 
 QString ChannelUtil::GetChannelValueStr(const QString &channel_field,
                                         uint           sourceid,
@@ -1001,12 +1000,12 @@ QString ChannelUtil::GetChannelValueStr(const QString &channel_field,
     return retval;
 }
 
+#if 0
 int ChannelUtil::GetChannelValueInt(const QString &channel_field,
-                                    uint           cardid,
-                                    const QString &input,
+                                    uint           inputid,
                                     const QString &channum)
 {
-    QString val = GetChannelValueStr(channel_field, cardid, input, channum);
+    QString val = GetChannelValueStr(channel_field, inputid, channum);
 
     int retval = 0;
     if (!val.isEmpty())
@@ -1014,6 +1013,7 @@ int ChannelUtil::GetChannelValueInt(const QString &channel_field,
 
     return (retval) ? retval : -1;
 }
+#endif
 
 int ChannelUtil::GetChannelValueInt(const QString &channel_field,
                                     uint           sourceid,
@@ -1056,7 +1056,7 @@ bool ChannelUtil::IsOnSameMultiplex(uint srcid,
 /** \fn get_valid_recorder_list(uint)
  *  \brief Returns list of the recorders that have chanid in their sources.
  *  \param chanid  Channel ID of channel we are querying recorders for.
- *  \return List of cardid's for recorders with channel.
+ *  \return List of inputid's for recorders with channel.
  */
 static QStringList get_valid_recorder_list(uint chanid)
 {
@@ -1090,7 +1090,7 @@ static QStringList get_valid_recorder_list(uint chanid)
 /** \fn get_valid_recorder_list(const QString&)
  *  \brief Returns list of the recorders that have channum in their sources.
  *  \param channum  Channel "number" we are querying recorders for.
- *  \return List of cardid's for recorders with channel.
+ *  \return List of inputid's for recorders with channel.
  */
 static QStringList get_valid_recorder_list(const QString &channum)
 {
@@ -1126,7 +1126,7 @@ static QStringList get_valid_recorder_list(const QString &channum)
  *         in their sources.
  *  \param chanid   Channel ID of channel we are querying recorders for.
  *  \param channum  Channel "number" we are querying recorders for.
- *  \return List of cardid's for recorders with channel.
+ *  \return List of inputid's for recorders with channel.
  */
 QStringList ChannelUtil::GetValidRecorderList(
     uint chanid, const QString &channum)
@@ -2100,10 +2100,10 @@ ChannelInfoList ChannelUtil::GetChannelsInternal(
 
         chan.xmltvid = query.value(12).toString();        /* xmltvid    */
 
-        QStringList cardIDs = query.value(11).toString().split(",");
-        QString cardid;
-        while (!cardIDs.isEmpty())
-                chan.AddInputId(cardIDs.takeFirst().toUInt());
+        QStringList inputIDs = query.value(11).toString().split(",");
+        QString inputid;
+        while (!inputIDs.isEmpty())
+                chan.AddInputId(inputIDs.takeFirst().toUInt());
 
         QStringList groupIDs = query.value(10).toString().split(",");
         QString groupid;
@@ -2408,7 +2408,7 @@ ChannelInfoList ChannelUtil::LoadChannels(uint startIndex, uint count,
                   "default_authority, commmethod, tmoffset, iptvid, "
                   "channel.chanid, "
                   "GROUP_CONCAT(DISTINCT channelgroup.grpid), " // Creates a CSV list of channel groupids for this channel
-                  "GROUP_CONCAT(DISTINCT capturecard.cardid) " // Creates a CSV list of cardids for this channel
+                  "GROUP_CONCAT(DISTINCT capturecard.cardid) " // Creates a CSV list of inputids for this channel
                   "FROM channel "
                   "LEFT JOIN channelgroup ON channel.chanid = channelgroup.chanid "
                   "LEFT JOIN capturecard  ON capturecard.sourceid = channel.sourceid ";
@@ -2512,10 +2512,10 @@ ChannelInfoList ChannelUtil::LoadChannels(uint startIndex, uint count,
         while (!groupIDs.isEmpty())
                 channelInfo.AddGroupId(groupIDs.takeFirst().toUInt());
 
-        QStringList cardIDs = query.value(29).toString().split(",");
-        QString cardid;
-        while (!cardIDs.isEmpty())
-                channelInfo.AddInputId(cardIDs.takeFirst().toUInt());
+        QStringList inputIDs = query.value(29).toString().split(",");
+        QString inputid;
+        while (!inputIDs.isEmpty())
+                channelInfo.AddInputId(inputIDs.takeFirst().toUInt());
 
         channelList.push_back(channelInfo);
     }
