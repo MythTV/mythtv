@@ -484,7 +484,7 @@ QString CardUtil::ProbeDVBFrontendName(const QString &device)
  *
  *  Note: "Philips TDA10046H DVB-T" was on this list but has been
  *        verified to not mess up the PMT with a recent kernel and
- *        firmware (See http://svn.mythtv.org/trac/ticket/3541).
+ *        firmware (See https://code.mythtv.org/trac/ticket/3541).
  *
  *  \param device Open DVB frontend device file descriptor to be checked
  *  \return true iff the device munges tables, so that they fail a CRC check.

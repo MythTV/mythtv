@@ -370,7 +370,7 @@ package MythTV::Recording;
             die "Unrecognized stream type.  Please execute the following and see if you\n"
                ."notice errors (make sure that you don't have the \"really quiet\" option\n"
                ."set in your mplayer config).  If not, create a ticket at\n"
-               ."http://svn.mythtv.org/trac/newticket and attach the output from:\n\n"
+               ."https://code.mythtv.org/trac/newticket and attach the output from:\n\n"
                ."    $program -v -v -v -v -nolirc -nojoystick -vo null -ao null \\\n"
                ."             -frames 0 -identify '$file'\n\n";
         }
