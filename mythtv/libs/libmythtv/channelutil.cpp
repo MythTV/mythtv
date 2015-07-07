@@ -943,36 +943,6 @@ bool ChannelUtil::SaveCachedPids(uint chanid,
     return ok;
 }
 
-#if 0
-QString ChannelUtil::GetChannelValueStr(const QString &channel_field,
-                                        uint           inputid,
-                                        const QString &channum)
-{
-    QString retval = QString::null;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    query.prepare(
-        QString(
-            "SELECT channel.%1 "
-            "FROM channel, capturecard "
-            "WHERE channel.channum       = :CHANNUM             AND "
-            "      channel.sourceid      = capturecard.sourceid AND "
-            "      capturecard.cardid    = :INPUTID ")
-        .arg(channel_field));
-
-    query.bindValue(":INPUTID",   inputid);
-    query.bindValue(":CHANNUM",  channum);
-
-    if (!query.exec() || !query.isActive())
-        MythDB::DBError("getchannelvalue", query);
-    else if (query.next())
-        retval = query.value(0).toString();
-
-    return retval;
-}
-#endif
-
 QString ChannelUtil::GetChannelValueStr(const QString &channel_field,
                                         uint           sourceid,
                                         const QString &channum)
@@ -999,21 +969,6 @@ QString ChannelUtil::GetChannelValueStr(const QString &channel_field,
 
     return retval;
 }
-
-#if 0
-int ChannelUtil::GetChannelValueInt(const QString &channel_field,
-                                    uint           inputid,
-                                    const QString &channum)
-{
-    QString val = GetChannelValueStr(channel_field, inputid, channum);
-
-    int retval = 0;
-    if (!val.isEmpty())
-        retval = val.toInt();
-
-    return (retval) ? retval : -1;
-}
-#endif
 
 int ChannelUtil::GetChannelValueInt(const QString &channel_field,
                                     uint           sourceid,

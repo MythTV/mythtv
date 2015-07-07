@@ -328,16 +328,6 @@ class MTV_PUBLIC ChannelUtil
         uint sourceid, bool visible_only, bool include_disconnected,
         const QString &group_by, uint channel_groupid);
     static QString GetChannelStringField(int chanid, const QString &field);
-#if 0
-    static QString GetChannelValueStr(const QString &channel_field,
-                                      const QString &channum,
-                                      uint           inputid);
-
-    static int     GetChannelValueInt(const QString &channel_field,
-                                      const QString &channum,
-                                      uint           inputid);
-#endif
-
 };
 
 #endif // CHANUTIL_H
