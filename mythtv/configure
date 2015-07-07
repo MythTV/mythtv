@@ -4408,7 +4408,7 @@ if enabled proc_error_msg; then
     echo ""
     echo " If you are using a recent checkout from "
     echo "   https://github.com/MythTV/mythtv "
-    echo " please e-mail the above to mythtv-users@mythtv.org"
+    echo " please e-mail the above to mythtv-dev@mythtv.org"
     echo " With the subject \"configure did not detect my cpu\""
     echo ""
 fi
