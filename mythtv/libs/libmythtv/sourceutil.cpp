@@ -169,7 +169,7 @@ bool SourceUtil::GetListingsLoginData(uint sourceid,
     return true;
 }
 
-static QStringList get_cardtypes(uint sourceid)
+static QStringList get_inputtypes(uint sourceid)
 {
     QStringList list;
 
@@ -181,18 +181,18 @@ static QStringList get_cardtypes(uint sourceid)
     query.bindValue(":SOURCEID", sourceid);
 
     if (!query.exec() || !query.isActive())
-        MythDB::DBError("get_cardtypes()", query);
+        MythDB::DBError("get_inputtypes()", query);
     else
     {
         while (query.next())
         {
-/// BEGIN HACK HACK HACK -- return correct card type for child cards
-            QString cardtype = query.value(0).toString().toUpper();
+/// BEGIN HACK HACK HACK -- return correct input type for child inputs
+            QString inputtype = query.value(0).toString().toUpper();
             QString inputname = query.value(1).toString().toUpper();
-            cardtype = ((cardtype == "DVB") && (!inputname.startsWith("DVB"))) ?
-                "V4L" : cardtype;
+            inputtype = ((inputtype == "DVB") && (!inputname.startsWith("DVB"))) ?
+                "V4L" : inputtype;
 /// END  HACK HACK HACK
-            list += cardtype;
+            list += inputtype;
         }
     }
 
@@ -201,13 +201,13 @@ static QStringList get_cardtypes(uint sourceid)
 
 uint SourceUtil::GetConnectionCount(uint sourceid)
 {
-    QStringList types = get_cardtypes(sourceid);
+    QStringList types = get_inputtypes(sourceid);
     return types.size();
 }
 
 bool SourceUtil::IsProperlyConnected(uint sourceid, bool strict)
 {
-    QStringList types = get_cardtypes(sourceid);
+    QStringList types = get_inputtypes(sourceid);
     QMap<QString,uint> counts;
     QStringList::const_iterator it = types.begin();
     for (; it != types.end(); ++it)
@@ -282,12 +282,12 @@ bool SourceUtil::IsEncoder(uint sourceid, bool strict)
 {
     bool encoder = true;
 
-    QStringList types = get_cardtypes(sourceid);
+    QStringList types = get_inputtypes(sourceid);
     QStringList::const_iterator it = types.begin();
     for (; it != types.end(); ++it)
         encoder &= CardUtil::IsEncoder(*it);
 
-    // Source is connected, go by card types for type determination
+    // Source is connected, go by input types for type determination
     if (!types.empty())
         return encoder;
 
@@ -317,7 +317,7 @@ bool SourceUtil::IsEncoder(uint sourceid, bool strict)
 bool SourceUtil::IsUnscanable(uint sourceid)
 {
     bool unscanable = true;
-    QStringList types = get_cardtypes(sourceid);
+    QStringList types = get_inputtypes(sourceid);
     QStringList::const_iterator it = types.begin();
     for (; it != types.end(); ++it)
         unscanable &= CardUtil::IsUnscanable(*it);
@@ -328,9 +328,9 @@ bool SourceUtil::IsUnscanable(uint sourceid)
 bool SourceUtil::IsCableCardPresent(uint sourceid)
 {
     bool ccpresent = false;
-    vector<uint> cards = CardUtil::GetInputIDs(sourceid);
-    vector<uint>::iterator it = cards.begin();
-    for (; it != cards.end(); ++it)
+    vector<uint> inputs = CardUtil::GetInputIDs(sourceid);
+    vector<uint>::iterator it = inputs.begin();
+    for (; it != inputs.end(); ++it)
     {
         if (CardUtil::IsCableCardPresent(*it, CardUtil::GetRawInputType(*it)))
             ccpresent = true;
@@ -359,7 +359,7 @@ bool SourceUtil::IsAnySourceScanable(void)
     return false;
 }
 
-bool SourceUtil::UpdateChannelsFromListings(uint sourceid, QString cardtype, bool wait)
+bool SourceUtil::UpdateChannelsFromListings(uint sourceid, QString inputtype, bool wait)
 {
     if (wait)
     {
@@ -373,10 +373,10 @@ bool SourceUtil::UpdateChannelsFromListings(uint sourceid, QString cardtype, boo
             args.append(QString("--sourceid"));
             args.append(QString::number(sourceid));
         }
-        if (!cardtype.isEmpty())
+        if (!inputtype.isEmpty())
         {
             args.append(QString("--cardtype"));
-            args.append(cardtype);
+            args.append(inputtype);
         }
 
         MythSystemLegacy getchan(cmd, args, kMSRunShell | kMSAutoCleanup );
@@ -389,8 +389,8 @@ bool SourceUtil::UpdateChannelsFromListings(uint sourceid, QString cardtype, boo
                       "mythfilldatabase --only-update-channels";
         if (sourceid)
             cmd += QString(" --sourceid %1").arg(sourceid);
-        if (!cardtype.isEmpty())
-            cmd += QString(" --cardtype %1").arg(cardtype);
+        if (!inputtype.isEmpty())
+            cmd += QString(" --cardtype %1").arg(inputtype);
         cmd += logPropagateArgs;
 
         myth_system(cmd);
@@ -510,7 +510,7 @@ bool SourceUtil::DeleteSource(uint sourceid)
 
     if (!query.exec() || !query.isActive())
     {
-        MythDB::DBError("Deleting cardinputs", query);
+        MythDB::DBError("Deleting inputs", query);
         return false;
     }
 
