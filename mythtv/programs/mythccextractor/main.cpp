@@ -113,7 +113,7 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    bool useDB = true;
+    bool useDB;
 
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHCCEXTRACTOR);
 
@@ -146,6 +146,8 @@ int main(int argc, char *argv[])
         cerr << "The input file --infile is required" << endl;
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
+
+    useDB = !QFile::exists(infile);
 
     CleanupGuard callCleanup(cleanup);
 
