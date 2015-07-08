@@ -1715,7 +1715,10 @@ void GalleryThumbView::Copy()
     if (progress->Create())
         popupStack->AddScreen(progress, false);
     else
+    {
         delete progress;
+        progress = NULL;
+    }
 
     // Copy files in a separate thread
     if (RunWorker(new FileTransferWorker(false, transfer, progress)))
