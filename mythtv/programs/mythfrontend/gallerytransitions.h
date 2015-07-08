@@ -32,6 +32,7 @@ class Transition : public QObject
 public:
     Transition(QString name)
         : m_duration(gCoreContext->GetNumSetting("GalleryTransitionTime", 1000)),
+          m_old(NULL), m_new(NULL), m_prev(NULL), m_next(NULL),
           m_name(name)                 {}
     virtual ~Transition()              {}
 
