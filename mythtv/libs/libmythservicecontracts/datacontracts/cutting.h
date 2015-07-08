@@ -38,7 +38,7 @@ class SERVICE_PUBLIC Cutting : public QObject
     public:
 
         Cutting(QObject *parent = 0)
-            : QObject         ( parent )
+            : QObject( parent ), m_Mark(0), m_Offset(0)
         {
         }
 
