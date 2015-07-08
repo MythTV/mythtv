@@ -41,7 +41,7 @@ public:
 class WorkerThread: public MThread
 {
 public:
-    WorkerThread(QString name) : MThread(name) {}
+    WorkerThread(QString name) : MThread(name), m_result(0) {}
     int GetResult(void) { return m_result; }
 protected:
     int m_result;
