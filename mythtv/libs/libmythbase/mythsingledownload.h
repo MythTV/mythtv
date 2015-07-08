@@ -25,7 +25,8 @@ class MBASE_PUBLIC MythSingleDownload : public QObject
    Q_OBJECT
 
   public:
-   MythSingleDownload(void) : m_reply(NULL), m_errorcode(QNetworkReply::NoError) { ; }
+   MythSingleDownload(void) : m_reply(NULL), m_errorcode(QNetworkReply::NoError),
+                              m_buffer(NULL), m_maxsize(0) { ; }
    ~MythSingleDownload(void) { ; }
 
    bool DownloadURL(const QUrl &url, QByteArray *buffer, uint timeout = 30000,
