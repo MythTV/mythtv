@@ -531,7 +531,10 @@ void Slide::SetPan(QPoint pos)
     QRect imageArea = m_Images[m_CurPos]->rect();
     float hRatio    = float(imageArea.height()) / m_Area.height();
     float wRatio    = float(imageArea.width()) / m_Area.width();
-    float ratio     = qMax(hRatio, wRatio) / m_zoom;
+    float ratio     = qMax(hRatio, wRatio);
+
+    if (m_zoom != 0.0)
+        ratio /= m_zoom;
 
     // Determine crop area
     int h = qMin(int(roundf(m_Area.height() * ratio)), imageArea.height());
