@@ -48,7 +48,7 @@ HTTPTSStreamHandler* HTTPTSStreamHandler::Get(const IPTVTuningData& tuning)
 }
 
 HTTPTSStreamHandler::HTTPTSStreamHandler(const IPTVTuningData& tuning) :
-    IPTVStreamHandler(tuning)
+    IPTVStreamHandler(tuning), m_reader(NULL)
 {
     LOG(VB_GENERAL, LOG_INFO, LOC + "ctor");
 }
