@@ -231,15 +231,17 @@ void GalleryThumbView::customEvent(QEvent *event)
                 foreach(const ThumbLocation &location, affected)
                 {
                     MythUIButtonListItem *button = location.first;
-                    int                   index  = location.second;
-                    ImageItem        *im     =
-                            button->GetData().value<ImageItem*>();
+                    int index  = location.second;
+                    ImageItem *im = button->GetData().value<ImageItem*>();
 
-                    // All buttons use the same url so only generate it once
-                    if (url.isEmpty())
-                        url = ImageSg::getInstance()->GenerateThumbUrl(im->m_thumbNails.at(index));
+                    if (im)
+                    {
+                        // All buttons use the same url so only generate it once
+                        if (url.isEmpty())
+                            url = ImageSg::getInstance()->GenerateThumbUrl(im->m_thumbNails.at(index));
 
-                    UpdateThumbnail(button, im, url, index);
+                        UpdateThumbnail(button, im, url, index);
+                    }
                 }
 
                 // Cancel pending request & store url
