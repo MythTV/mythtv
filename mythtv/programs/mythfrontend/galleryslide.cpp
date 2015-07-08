@@ -292,6 +292,7 @@ Slide::Slide(MythUIType *parent, QString name, MythUIImage *image)
     m_zoom(1.0),
     m_isReady(false),
     m_loadFailed(false),
+    m_locked(false),
     m_direction(0),
     m_zoomAnimation(NULL),
     m_panAnimation(NULL),
