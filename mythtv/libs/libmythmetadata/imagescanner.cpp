@@ -13,6 +13,8 @@ ImageScanThread::ImageScanThread() :
     MThread("ImageScanner"),
     m_db(),
     m_sg(ImageSg::getInstance()),
+    m_dbDirMap(NULL),
+    m_dbFileMap(NULL),
     m_progressCount(0),
     m_progressTotalCount(0),
     m_dir(ImageSg::getInstance()->GetImageFilters()),
