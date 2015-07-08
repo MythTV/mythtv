@@ -529,15 +529,18 @@ void ImageThumb::HandleCreateThumbnails(QStringList imList)
                 ? kFolderRequestPriority : kPicRequestPriority;
 
         // notify clients when done; highest priority
-        ThumbTask *task = new ThumbTask("CREATE", im, priority, true);
 
         if (im->m_type == kVideoFile)
         {
+            ThumbTask *task = new ThumbTask("CREATE", im, priority, true);
+
             if (m_videoThumbThread)
                 m_videoThumbThread->QueueThumbnails(task);
         }
         else if (im->m_type == kImageFile)
         {
+            ThumbTask *task = new ThumbTask("CREATE", im, priority, true);
+
             if (m_imageThumbThread)
                 m_imageThumbThread->QueueThumbnails(task);
         }
