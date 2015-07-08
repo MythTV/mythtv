@@ -78,6 +78,7 @@ public:
 class MarkedFiles
 {
 public:
+                MarkedFiles(void): parent(-1) {}
     void        Reset(int id = -1)      { ids.clear(); parent = id; }
     void        Add(int id)             { ids.insert(id); }
     void        Add(ImageIdList newIds) { ids += newIds.toSet(); }
