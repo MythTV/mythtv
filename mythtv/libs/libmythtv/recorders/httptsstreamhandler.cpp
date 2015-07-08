@@ -71,7 +71,7 @@ void HTTPTSStreamHandler::run(void)
     {
         if (!m_reader->DownloadStream(m_tuning.GetURL(0)))
         {
-            LOG(VB_RECORD, LOG_INFO, LOC + "DownloadStream failed to recieve bytes from " + m_tuning.GetURL(0).toString());
+            LOG(VB_RECORD, LOG_INFO, LOC + "DownloadStream failed to receive bytes from " + m_tuning.GetURL(0).toString());
             usleep(open_sleep);
             if (open_sleep < 10000000)
                 open_sleep += 250000;
@@ -98,7 +98,7 @@ bool HTTPReader::DownloadStream(const QUrl url)
     QEventLoop   event_loop;
 
     m_buffer = new uint8_t[BUFFER_SIZE];
-    size = 0;
+    m_size = 0;
     m_ok = false;
 
     // the HTTP request
@@ -151,17 +151,17 @@ void HTTPReader::ReadBytes()
     QMutexLocker replylock(&m_replylock);
     QMutexLocker bufferlock(&m_bufferlock);
 
-    if(m_reply == NULL || m_buffer == NULL || size > BUFFER_SIZE)
+    if(m_reply == NULL || m_buffer == NULL || m_size > BUFFER_SIZE)
         return;
 
-    qint64 bytesRead = m_reply->read( reinterpret_cast<char*>(m_buffer+size), BUFFER_SIZE-size);
-    size += (bytesRead > 0 ? bytesRead : 0);
-    LOG(VB_RECORD, LOG_DEBUG, LOC + QString("ReadBytes: %1 bytes recieved").arg(bytesRead));
+    qint64 bytesRead = m_reply->read( reinterpret_cast<char*>(m_buffer + m_size), BUFFER_SIZE - m_size);
+    m_size += (bytesRead > 0 ? bytesRead : 0);
+    LOG(VB_RECORD, LOG_DEBUG, LOC + QString("ReadBytes: %1 bytes received").arg(bytesRead));
 }
 
 void HTTPReader::WriteBytes()
 {
-    if (size < TS_SIZE)
+    if (m_size < TS_SIZE)
         return;
 
     QMutexLocker  replylock(&m_bufferlock);
@@ -172,12 +172,12 @@ void HTTPReader::WriteBytes()
         sit = m_parent->_stream_data_list.begin();
         for (; sit != m_parent->_stream_data_list.end(); ++sit)
         {
-            remainder = sit.key()->ProcessData(m_buffer, size);
+            remainder = sit.key()->ProcessData(m_buffer, m_size);
         }
     }
-    LOG(VB_RECORD, LOG_DEBUG, LOC + QString("WriteBytes: %1/%2 bytes remain").arg(remainder).arg(size));
-    memcpy(m_buffer, m_buffer+(size-remainder), remainder);
-    size = remainder;
+    LOG(VB_RECORD, LOG_DEBUG, LOC + QString("WriteBytes: %1/%2 bytes remain").arg(remainder).arg(m_size));
+    memcpy(m_buffer, m_buffer + (m_size - remainder), remainder);
+    m_size = remainder;
 }
 
 void HTTPReader::Cancel(void)

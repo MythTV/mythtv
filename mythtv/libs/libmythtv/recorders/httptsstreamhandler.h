@@ -41,7 +41,8 @@ class MBASE_PUBLIC HTTPReader : public QObject
     Q_OBJECT
 
   public:
-    HTTPReader(HTTPTSStreamHandler* parent) : m_parent(parent){}
+    HTTPReader(HTTPTSStreamHandler* parent) :
+        m_parent(parent), m_reply(NULL), m_buffer(NULL), m_ok(true), m_size(0) {}
     void Cancel(void);
     bool DownloadStream(const QUrl url);
 
@@ -53,16 +54,16 @@ class MBASE_PUBLIC HTTPReader : public QObject
     void HttpRead();
 
   private:
-    HTTPTSStreamHandler     *m_parent;
+    HTTPTSStreamHandler    *m_parent;
     QTimer                  m_timer;
     QNetworkAccessManager   m_mgr;
-    QNetworkReply           *m_reply;
+    QNetworkReply          *m_reply;
     QMutex                  m_lock;
     QMutex                  m_replylock;
     QMutex                  m_bufferlock;
-    uint8_t                 *m_buffer;
+    uint8_t                *m_buffer;
     bool                    m_ok;
-    int                     size;
+    int                     m_size;
 };
 
 #endif // _HTTPTSSTREAMHANDLER_H_
