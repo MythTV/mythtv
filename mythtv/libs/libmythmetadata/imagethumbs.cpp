@@ -366,10 +366,13 @@ void ThumbThread::QueueThumbnails(ThumbTask *task)
 */
 int ThumbThread::GetQueueSize(ImageThumbPriority priority)
 {
-    QMap<int,int> result;
-
     QMutexLocker locker(&m_mutex);
-    return m_thumbQueue.value(priority)->size();
+    ThumbQueue *thumbQueue = m_thumbQueue.value(priority);
+
+    if (thumbQueue)
+        return m_thumbQueue.value(priority)->size();
+
+    return 0;
 }
 
 
