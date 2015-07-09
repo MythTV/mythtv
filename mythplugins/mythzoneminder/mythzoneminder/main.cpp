@@ -195,7 +195,7 @@ int mythplugin_init(const char *libversion)
         return -1;
 
     // setup a connection to the mythzmserver
-    checkConnection();
+    (void) checkConnection();
 
     setupKeys();
 
