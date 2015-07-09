@@ -36,7 +36,7 @@ const int TIME_UPDATE_TIME = 1000 * 1;    // update the time every 1 second
 FunctionDialog::FunctionDialog(MythScreenStack *parent, Monitor *monitor) :
     MythScreenType(parent, "functionpopup"), m_monitor(monitor),
     m_captionText(NULL), m_functionList(NULL),
-    m_enabledCheck(NULL), m_okButton(NULL)
+    m_enabledCheck(NULL), m_notificationCheck(NULL), m_okButton(NULL)
 {
 }
 
