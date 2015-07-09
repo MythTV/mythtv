@@ -240,6 +240,15 @@ void MediaMonitor::ChooseAndEjectMedia(void)
     AttemptEject(selected);
 }
 
+
+void MediaMonitor::EjectMedia(const QString &path)
+{
+    MythMediaDevice *device = GetMedia(path);
+    if (device)
+        AttemptEject(device);
+}
+
+
 void MediaMonitor::AttemptEject(MythMediaDevice *device)
 {
     QString  dev = DevName(device);

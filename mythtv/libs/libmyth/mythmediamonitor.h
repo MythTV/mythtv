@@ -46,6 +46,7 @@ class MPUBLIC MediaMonitor : public QObject
     virtual void StartMonitoring(void);
     void StopMonitoring(void);
     void ChooseAndEjectMedia(void);
+    void EjectMedia(const QString &path);
 
     static MediaMonitor *GetMediaMonitor(void);
     static QString GetMountPath(const QString& devPath);
