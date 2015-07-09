@@ -1068,9 +1068,11 @@ int NativeArchive::importRecording(const QDomElement &itemNode,
             // delete any records for this recordings
             query.prepare("DELETE FROM recordedmarkup "
                           "WHERE chanid = :CHANID AND starttime = :STARTTIME;");
-                query.bindValue(":CHANID", chanID);
-                query.bindValue(":STARTTIME", startTime);
-            query.exec();
+            query.bindValue(":CHANID", chanID);
+            query.bindValue(":STARTTIME", startTime);
+
+            if (!query.exec())
+                MythDB::DBError("recordedmarkup delete", query);
 
             // add any new records for this recording
             for (int x = 0; x < nodeList.count(); x++)
