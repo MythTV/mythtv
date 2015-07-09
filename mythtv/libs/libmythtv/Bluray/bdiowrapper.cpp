@@ -37,7 +37,8 @@ static int dir_read_mythiowrapper(BD_DIR_H *dir, BD_DIRENT *entry)
     char *filename = mythdir_readdir((int)(intptr_t)dir->internal);
     if (filename)
     {
-        strncpy(entry->d_name, filename, 256);
+        entry->d_name[255] = '\0';
+        strncpy(entry->d_name, filename, 255);
         free(filename);
         return 0;
     }
