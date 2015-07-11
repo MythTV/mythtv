@@ -255,9 +255,13 @@ bool DVBChannel::Open(DVBChannel *who)
     frontend_name       = info.name;
     tunerType           = info.type;
 #if HAVE_FE_CAN_2G_MODULATION
-    if (tunerType == DTVTunerType::kTunerTypeDVBS1 &&
-        (info.caps & FE_CAN_2G_MODULATION))
-        tunerType = DTVTunerType::kTunerTypeDVBS2;
+    if (info.caps & FE_CAN_2G_MODULATION)
+    {
+        if (tunerType == DTVTunerType::kTunerTypeDVBS1)
+            tunerType = DTVTunerType::kTunerTypeDVBS2;
+        else if (tunerType == DTVTunerType::kTunerTypeDVBT)
+            tunerType = DTVTunerType::kTunerTypeDVBT2;
+    }
 #endif // HAVE_FE_CAN_2G_MODULATION
     capabilities        = info.caps;
     frequency_minimum   = info.frequency_min;
@@ -409,7 +413,8 @@ void DVBChannel::CheckOptions(DTVMultiplex &tuning) const
            "Selected modulation parameter unsupported by this driver.");
     }
 
-    if (DTVTunerType::kTunerTypeDVBT != tunerType)
+    if (DTVTunerType::kTunerTypeDVBT != tunerType &&
+        DTVTunerType::kTunerTypeDVBT2 != tunerType)
     {
         LOG(VB_CHANNEL, LOG_INFO, LOC + tuning.toString());
         return;
@@ -554,7 +559,8 @@ static struct dtv_properties *dtvmultiplex_to_dtvproperties(
     if (tuner_type != DTVTunerType::kTunerTypeDVBT  &&
         tuner_type != DTVTunerType::kTunerTypeDVBC  &&
         tuner_type != DTVTunerType::kTunerTypeDVBS1 &&
-        tuner_type != DTVTunerType::kTunerTypeDVBS2)
+        tuner_type != DTVTunerType::kTunerTypeDVBS2 &&
+        tuner_type != DTVTunerType::kTunerTypeDVBT2)
     {
         LOG(VB_GENERAL, LOG_ERR, "DVBChan: Unsupported tuner type " +
             tuner_type.toString());
@@ -565,7 +571,7 @@ static struct dtv_properties *dtvmultiplex_to_dtvproperties(
     if (!cmdseq)
         return NULL;
 
-    cmdseq->props = (struct dtv_property*) calloc(11, sizeof(*(cmdseq->props)));
+    cmdseq->props = (struct dtv_property*) calloc(12, sizeof(*(cmdseq->props)));
     if (!(cmdseq->props))
     {
         free(cmdseq);
@@ -577,7 +583,8 @@ static struct dtv_properties *dtvmultiplex_to_dtvproperties(
     if (tuning.mod_sys == DTVModulationSystem::kModulationSystem_DVBS2)
         can_fec_auto = false;
 
-    if (tuner_type == DTVTunerType::kTunerTypeDVBS2)
+    if (tuner_type == DTVTunerType::kTunerTypeDVBS2 ||
+        tuner_type == DTVTunerType::kTunerTypeDVBT2)
     {
         cmdseq->props[c].cmd      = DTV_DELIVERY_SYSTEM;
         cmdseq->props[c++].u.data = tuning.mod_sys;
@@ -604,7 +611,8 @@ static struct dtv_properties *dtvmultiplex_to_dtvproperties(
         cmdseq->props[c++].u.data = can_fec_auto ? FEC_AUTO : tuning.fec;
     }
 
-    if (tuner_type == DTVTunerType::kTunerTypeDVBT)
+    if (tuner_type == DTVTunerType::kTunerTypeDVBT ||
+        tuner_type == DTVTunerType::kTunerTypeDVBT2)
     {
         cmdseq->props[c].cmd      = DTV_BANDWIDTH_HZ;
         cmdseq->props[c++].u.data = (8-tuning.bandwidth) * 1000000;
@@ -782,7 +790,8 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
         }
 
 #if DVB_API_VERSION >=5
-        if (DTVTunerType::kTunerTypeDVBS2 == tunerType)
+        if (DTVTunerType::kTunerTypeDVBS2 == tunerType ||
+            DTVTunerType::kTunerTypeDVBT2 == tunerType)
         {
             struct dtv_property p_clear;
             struct dtv_properties cmdseq_clear;
@@ -1306,7 +1315,8 @@ static struct dvb_frontend_parameters dtvmultiplex_to_dvbparams(
         params.u.qam.modulation   = (fe_modulation_t) (int) tuning.modulation;
     }
 
-    if (DTVTunerType::kTunerTypeDVBT == tuner_type)
+    if (DTVTunerType::kTunerTypeDVBT == tuner_type ||
+        DTVTunerType::kTunerTypeDVBT2 == tuner_type)
     {
         params.u.ofdm.bandwidth             =
             (fe_bandwidth_t) (int) tuning.bandwidth;
@@ -1355,7 +1365,8 @@ static DTVMultiplex dvbparams_to_dtvmultiplex(
         tuning.modulation     = params.u.qam.modulation;
     }
 
-    if (DTVTunerType::kTunerTypeDVBT   == tuner_type)
+    if (DTVTunerType::kTunerTypeDVBT   == tuner_type ||
+        DTVTunerType::kTunerTypeDVBT2  == tuner_type)
     {
         tuning.bandwidth      = params.u.ofdm.bandwidth;
         tuning.hp_code_rate   = params.u.ofdm.code_rate_HP;

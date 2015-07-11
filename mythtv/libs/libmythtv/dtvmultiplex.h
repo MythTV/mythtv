@@ -60,6 +60,13 @@ class DTVMultiplex
         const QString &modulation,   const QString &polarity,
         const QString &mod_sys,      const QString &rolloff);
 
+    bool ParseDVB_T2(
+        const QString &frequency,   const QString &inversion,
+        const QString &bandwidth,   const QString &coderate_hp,
+        const QString &coderate_lp, const QString &constellation,
+        const QString &trans_mode,  const QString &guard_interval,
+        const QString &hierarchy,   const QString &mod_sys);
+
     bool ParseTuningParams(
         DTVTunerType type,
         QString frequency,    QString inversion,      QString symbolrate,

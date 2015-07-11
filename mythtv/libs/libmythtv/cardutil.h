@@ -68,6 +68,7 @@ class MTV_PUBLIC CardUtil
         ASI       = 16,
         CETON     = 17,
         EXTERNAL  = 18,
+        DVBT2     = 19,
     };
 
     static enum CARD_TYPES toCardType(const QString &name)
@@ -110,6 +111,8 @@ class MTV_PUBLIC CardUtil
             return CETON;
         if ("EXTERNAL" == name)
             return EXTERNAL;
+        if ("DVB_T2" == name)
+            return DVBT2;
         return ERROR_UNKNOWN;
     }
 

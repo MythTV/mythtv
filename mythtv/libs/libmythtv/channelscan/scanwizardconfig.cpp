@@ -12,6 +12,7 @@
 #include "panedvbs2.h"
 #include "panedvbc.h"
 #include "panedvbt.h"
+#include "panedvbt2.h"
 #include "paneatsc.h"
 #include "paneanalog.h"
 #include "panesingle.h"
@@ -120,6 +121,16 @@ void ScanTypeSetting::SetInput(const QString &cardids_inputname)
             addSelection(tr("Import existing scan"),
                          QString::number(ExistingScanImport));
             break;
+        case CardUtil::DVBT2:
+            addSelection(tr("Full Scan"),
+                         QString::number(FullScan_DVBT2), true);
+            addSelection(tr("Full Scan (Tuned)"),
+                         QString::number(NITAddScan_DVBT2));
+//             addSelection(tr("Import channels.conf"),
+//                          QString::number(DVBUtilsImport));
+            addSelection(tr("Import existing scan"),
+                         QString::number(ExistingScanImport));
+            break;
         case CardUtil::DVBS:
             addSelection(tr("Full Scan (Tuned)"),
                          QString::number(NITAddScan_DVBS));
@@ -209,12 +220,14 @@ ScanOptionalConfig::ScanOptionalConfig(ScanTypeSetting *_scan_type) :
     scanType(_scan_type),
     country(new ScanCountry()),
     network(new ScanNetwork()),
-    paneDVBT(new PaneDVBT()),     paneDVBS(new PaneDVBS()),
-    paneDVBS2(new PaneDVBS2()),   paneATSC(new PaneATSC()),
+    paneDVBT(new PaneDVBT()),     paneDVBT2(new PaneDVBT2()),
+    paneDVBS(new PaneDVBS()),     paneDVBS2(new PaneDVBS2()),
+    paneATSC(new PaneATSC()),
     paneDVBC(new PaneDVBC()),     paneAnalog(new PaneAnalog()),
     paneSingle(new PaneSingle()), paneAll(new PaneAll()),
     paneDVBUtilsImport(new PaneDVBUtilsImport()),
     paneExistingScanImport(new PaneExistingScanImport())
+
 {
     setTrigger(scanType);
 
@@ -233,11 +246,15 @@ ScanOptionalConfig::ScanOptionalConfig(ScanTypeSetting *_scan_type) :
               paneDVBS2);
     addTarget(QString::number(ScanTypeSetting::NITAddScan_DVBT),
               paneDVBT);
+    addTarget(QString::number(ScanTypeSetting::NITAddScan_DVBT2),
+              paneDVBT2);
     addTarget(QString::number(ScanTypeSetting::FullScan_ATSC),
               paneATSC);
     addTarget(QString::number(ScanTypeSetting::FullScan_DVBC),
               network);
     addTarget(QString::number(ScanTypeSetting::FullScan_DVBT),
+              country);
+    addTarget(QString::number(ScanTypeSetting::FullScan_DVBT2),
               country);
     addTarget(QString::number(ScanTypeSetting::FullScan_Analog),
               paneAnalog);
@@ -278,6 +295,7 @@ QString ScanOptionalConfig::GetFrequencyStandard(void) const
         case ScanTypeSetting::FullScan_DVBC:
             return "dvbc";
         case ScanTypeSetting::FullScan_DVBT:
+        case ScanTypeSetting::FullScan_DVBT2:
             return "dvbt";
         case ScanTypeSetting::FullScan_Analog:
             return "analog";
@@ -297,6 +315,7 @@ QString ScanOptionalConfig::GetModulation(void) const
         case ScanTypeSetting::FullScan_DVBC:
             return "qam";
         case ScanTypeSetting::FullScan_DVBT:
+        case ScanTypeSetting::FullScan_DVBT2:
             return "ofdm";
         case ScanTypeSetting::FullScan_Analog:
             return "analog";
@@ -316,6 +335,7 @@ QString ScanOptionalConfig::GetFrequencyTable(void) const
         case ScanTypeSetting::FullScan_DVBC:
             return network->getValue();
         case ScanTypeSetting::FullScan_DVBT:
+        case ScanTypeSetting::FullScan_DVBT2:
             return country->getValue();
         case ScanTypeSetting::FullScan_Analog:
             return paneAnalog->GetFrequencyTable();
@@ -403,6 +423,23 @@ QMap<QString,QString> ScanOptionalConfig::GetStartChan(void) const
         startChan["trans_mode"]     = pane->trans_mode();
         startChan["guard_interval"] = pane->guard_interval();
         startChan["hierarchy"]      = pane->hierarchy();
+    }
+    else if (ScanTypeSetting::NITAddScan_DVBT2 == st)
+    {
+        const PaneDVBT2 *pane = paneDVBT2;
+
+        startChan["std"]            = "dvb";
+        startChan["type"]           = "DVB_T2";
+        startChan["frequency"]      = pane->frequency();
+        startChan["inversion"]      = pane->inversion();
+        startChan["bandwidth"]      = pane->bandwidth();
+        startChan["coderate_hp"]    = pane->coderate_hp();
+        startChan["coderate_lp"]    = pane->coderate_lp();
+        startChan["constellation"]  = pane->constellation();
+        startChan["trans_mode"]     = pane->trans_mode();
+        startChan["guard_interval"] = pane->guard_interval();
+        startChan["hierarchy"]      = pane->hierarchy();
+        startChan["mod_sys"]        = pane->mod_sys();
     }
     else if (ScanTypeSetting::NITAddScan_DVBS == st)
     {
