@@ -3837,6 +3837,31 @@ bool TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
         idleTimerId = StartTimer(db_idle_timeout, __LINE__);
     }
 
+#ifdef Q_OS_LINUX
+    // Fixups for _some_ linux native codes that QT doesn't know
+    if (e->key() <= 0)
+    {
+        int keycode = 0;
+        switch(e->nativeScanCode())
+        {
+            case 209: // XF86AudioPause
+                keycode = Qt::Key_MediaPause;
+                break;
+            default:
+              break;
+        }
+
+        if (keycode > 0)
+        {
+            QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, keycode,
+                                            e->modifiers());
+            QCoreApplication::postEvent(this, key);
+        }
+
+        return true;
+    }
+#endif
+
     QStringList actions;
     bool handled = false;
 
