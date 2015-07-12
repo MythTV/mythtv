@@ -1802,6 +1802,17 @@ int main(int argc, char **argv)
         return GENERIC_EXIT_OK;
     }
 
+#if QT_VERSION >= QT_VERSION_CHECK(5,3,0)
+    qApp->setSetuidAllowed(true);
+#endif
+
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+    // If Qt graphics platform is egl (Raspberry Pi) then setuid hangs
+    LOG(VB_GENERAL, LOG_NOTICE, "QT_QPA_PLATFORM=" + qApp->platformName());
+    if (qApp->platformName().contains("egl"))
+      ;
+    else
+#endif
     if (setuid(getuid()) != 0)
     {
         LOG(VB_GENERAL, LOG_ERR, "Failed to setuid(), exiting.");
