@@ -230,7 +230,7 @@ void AutoExpire::CalcParams()
                 thisKBperMin += (((uint64_t)maxBitrate)*((uint64_t)15))>>11;
                 LOG(VB_FILE, LOG_INFO, QString("    Cardid %1: max bitrate "
                         "%2 Kb/sec, fsID %3 max is now %4 KB/min")
-                        .arg(enc->GetCardID())
+                        .arg(enc->GetInputID())
                         .arg(enc->GetMaxBitrate() >> 10)
                         .arg(fsit->getFSysID())
                         .arg(thisKBperMin));

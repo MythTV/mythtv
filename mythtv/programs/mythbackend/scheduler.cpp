@@ -3307,7 +3307,7 @@ void Scheduler::PutInactiveSlavesToSleep(void)
                             LOG(VB_SCHEDULE, LOG_DEBUG,
                                 QString("    Marking card %1 on slave %2 "
                                         "as falling asleep.")
-                                    .arg(slv->GetCardID())
+                                    .arg(slv->GetInputID())
                                     .arg(slv->GetHostName()));
                             slv->SetSleepStatus(sStatus_FallingAsleep);
                         }
@@ -4045,7 +4045,7 @@ void Scheduler::AddNewRecords(void)
     {
         EncoderLink *enc = *enciter;
         if (enc->IsConnected() || enc->IsAsleep())
-            cardMap[enc->GetCardID()] = true;
+            cardMap[enc->GetInputID()] = true;
     }
 
     QMap<int, bool> tooManyMap;
@@ -5328,7 +5328,7 @@ void Scheduler::SchedLiveTV(void)
         dummy->SetRecordingStartTime(schedTime);
         if (schedTime.secsTo(dummy->GetRecordingEndTime()) < 1800)
             dummy->SetRecordingEndTime(schedTime.addSecs(1800));
-        dummy->SetInputID(enc->GetCardID());
+        dummy->SetInputID(enc->GetInputID());
         dummy->mplexid = dummy->QueryMplexID();
         dummy->SetRecordingStatus(RecStatus::Unknown);
 

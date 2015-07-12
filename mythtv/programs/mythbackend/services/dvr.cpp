@@ -396,7 +396,7 @@ DTC::EncoderList* Dvr::GetEncoderList()
         {
             DTC::Encoder *pEncoder = pList->AddNewEncoder();
             
-            pEncoder->setId            ( elink->GetCardID()       );
+            pEncoder->setId            ( elink->GetInputID()      );
             pEncoder->setState         ( elink->GetState()        );
             pEncoder->setLocal         ( elink->IsLocal()         );
             pEncoder->setConnected     ( elink->IsConnected()     );
@@ -412,7 +412,7 @@ DTC::EncoderList* Dvr::GetEncoderList()
             for (; it < inputInfoList.end(); ++it)
             {
                 InputInfo inputInfo = *it;
-                if (inputInfo.inputid == static_cast<uint>(elink->GetCardID()))
+                if (inputInfo.inputid == static_cast<uint>(elink->GetInputID()))
                 {
                     DTC::Input *input = pEncoder->AddNewInput();
                     FillInputInfo(input, inputInfo);

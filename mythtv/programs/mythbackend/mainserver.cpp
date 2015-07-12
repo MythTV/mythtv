@@ -3990,7 +3990,7 @@ void MainServer::HandleLockTuner(PlaybackSock *pbs, int cardid)
         EncoderLink *elink = *iter;
 
         // we're looking for a specific card but this isn't the one we want
-        if ((cardid != -1) && (cardid != elink->GetCardID()))
+        if ((cardid != -1) && (cardid != elink->GetInputID()))
             continue;
 
         if (elink->IsLocal())
@@ -4114,7 +4114,7 @@ void MainServer::HandleGetFreeInputInfo(PlaybackSock *pbs,
     {
         EncoderLink *elink = *iter;
         InputInfo info;
-        info.inputid = elink->GetCardID();
+        info.inputid = elink->GetInputID();
 
         if (!elink->IsConnected() || elink->IsTunerLocked())
         {
@@ -4280,7 +4280,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         else
         {
             ProgramInfo dummy;
-            dummy.SetInputID(enc->GetCardID());
+            dummy.SetInputID(enc->GetInputID());
             dummy.ToStringList(retlist);
         }
     }
@@ -4344,7 +4344,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         else
         {
             ProgramInfo dummy;
-            dummy.SetInputID(enc->GetCardID());
+            dummy.SetInputID(enc->GetInputID());
             dummy.ToStringList(retlist);
         }
     }
@@ -4509,7 +4509,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     else if (command == "SHOULD_SWITCH_CARD")
     {
         QString chanid = slist[2];
-        retlist << QString::number((int)(enc->ShouldSwitchToAnotherCard(chanid)));
+        retlist << QString::number((int)(enc->ShouldSwitchToAnotherInput(chanid)));
     }
     else if (command == "CHECK_CHANNEL_PREFIX")
     {
@@ -4743,7 +4743,7 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
         else
         {
             ProgramInfo dummy;
-            dummy.SetInputID(enc->GetCardID());
+            dummy.SetInputID(enc->GetInputID());
             dummy.ToStringList(retlist);
         }
     }
@@ -4829,7 +4829,7 @@ size_t MainServer::GetCurrentMaxBitrate(void)
         long long thisKBperMin = (((size_t)maxBitrate)*((size_t)15))>>11;
         totalKBperMin += thisKBperMin;
         LOG(VB_FILE, LOG_INFO, LOC + QString("Cardid %1: max bitrate %2 KB/min")
-                .arg(enc->GetCardID()).arg(thisKBperMin));
+                .arg(enc->GetInputID()).arg(thisKBperMin));
     }
 
     LOG(VB_FILE, LOG_INFO, LOC +
@@ -7202,7 +7202,7 @@ void MainServer::connectionClosed(MythSocket *socket)
 
                         elink->SetSocket(NULL);
                         if (m_sched)
-                            disconnectedSlaves.push_back(elink->GetCardID());
+                            disconnectedSlaves.push_back(elink->GetInputID());
                     }
                 }
                 if (m_sched && !isFallingAsleep)
@@ -7619,7 +7619,7 @@ void MainServer::reconnectTimeout(void)
         else
         {
             ProgramInfo dummy;
-            dummy.SetInputID(elink->GetCardID());
+            dummy.SetInputID(elink->GetInputID());
             dummy.ToStringList(strlist);
         }
     }
