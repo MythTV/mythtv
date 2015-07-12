@@ -258,9 +258,9 @@ void cleanup(void)
         TaskQueue::Instance()->wait();
     }
 
-    while (!TVRec::cards.empty())
+    while (!TVRec::inputs.empty())
     {
-        TVRec *rec = *TVRec::cards.begin();
+        TVRec *rec = *TVRec::inputs.begin();
         delete rec;
     }
 

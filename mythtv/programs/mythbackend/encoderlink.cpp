@@ -917,7 +917,7 @@ bool EncoderLink::CheckChannel(const QString &name)
 bool EncoderLink::ShouldSwitchToAnotherInput(const QString &channelid)
 {
     if (local)
-        return tv->ShouldSwitchToAnotherCard(channelid);
+        return tv->ShouldSwitchToAnotherInput(channelid);
 
     LOG(VB_GENERAL, LOG_ERR,
         "Should be local only query: ShouldSwitchToAnotherInput");

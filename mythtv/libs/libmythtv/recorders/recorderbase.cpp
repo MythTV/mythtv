@@ -34,7 +34,7 @@ using namespace std;
 #include "mythdate.h"
 
 #define TVREC_CARDNUM \
-        ((tvrec != NULL) ? QString::number(tvrec->GetCaptureCardNum()) : "NULL")
+        ((tvrec != NULL) ? QString::number(tvrec->GetInputId()) : "NULL")
 
 #define LOC QString("RecBase[%1](%2): ") \
             .arg(TVREC_CARDNUM).arg(videodevice)
@@ -834,26 +834,26 @@ RecorderBase *RecorderBase::CreateRecorder(
         return NULL;
 
     RecorderBase *recorder = NULL;
-    if (genOpt.cardtype == "MPEG")
+    if (genOpt.inputtype == "MPEG")
     {
 #ifdef USING_IVTV
         recorder = new MpegRecorder(tvrec);
 #endif // USING_IVTV
     }
-    else if (genOpt.cardtype == "HDPVR")
+    else if (genOpt.inputtype == "HDPVR")
     {
 #ifdef USING_HDPVR
         recorder = new MpegRecorder(tvrec);
 #endif // USING_HDPVR
     }
-    else if (genOpt.cardtype == "FIREWIRE")
+    else if (genOpt.inputtype == "FIREWIRE")
     {
 #ifdef USING_FIREWIRE
         recorder = new FirewireRecorder(
             tvrec, dynamic_cast<FirewireChannel*>(channel));
 #endif // USING_FIREWIRE
     }
-    else if (genOpt.cardtype == "HDHOMERUN")
+    else if (genOpt.inputtype == "HDHOMERUN")
     {
 #ifdef USING_HDHOMERUN
         recorder = new HDHRRecorder(
@@ -861,7 +861,7 @@ RecorderBase *RecorderBase::CreateRecorder(
         recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
 #endif // USING_HDHOMERUN
     }
-    else if (genOpt.cardtype == "CETON")
+    else if (genOpt.inputtype == "CETON")
     {
 #ifdef USING_CETON
         recorder = new CetonRecorder(
@@ -869,7 +869,7 @@ RecorderBase *RecorderBase::CreateRecorder(
         recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
 #endif // USING_CETON
     }
-    else if (genOpt.cardtype == "DVB")
+    else if (genOpt.inputtype == "DVB")
     {
 #ifdef USING_DVB
         recorder = new DVBRecorder(
@@ -877,7 +877,7 @@ RecorderBase *RecorderBase::CreateRecorder(
         recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
 #endif // USING_DVB
     }
-    else if (genOpt.cardtype == "FREEBOX")
+    else if (genOpt.inputtype == "FREEBOX")
     {
 #ifdef USING_IPTV
         recorder = new IPTVRecorder(
@@ -885,14 +885,14 @@ RecorderBase *RecorderBase::CreateRecorder(
         recorder->SetOption("mrl", genOpt.videodev);
 #endif // USING_IPTV
     }
-    else if (genOpt.cardtype == "VBOX")
+    else if (genOpt.inputtype == "VBOX")
     {
 #ifdef USING_VBOX
         recorder = new IPTVRecorder(
             tvrec, dynamic_cast<IPTVChannel*>(channel));
 #endif // USING_VBOX
     }
-    else if (genOpt.cardtype == "ASI")
+    else if (genOpt.inputtype == "ASI")
     {
 #ifdef USING_ASI
         recorder = new ASIRecorder(
@@ -900,11 +900,11 @@ RecorderBase *RecorderBase::CreateRecorder(
         recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
 #endif // USING_ASI
     }
-    else if (genOpt.cardtype == "IMPORT")
+    else if (genOpt.inputtype == "IMPORT")
     {
         recorder = new ImportRecorder(tvrec);
     }
-    else if (genOpt.cardtype == "DEMO")
+    else if (genOpt.inputtype == "DEMO")
     {
 #ifdef USING_IVTV
         recorder = new MpegRecorder(tvrec);
@@ -912,7 +912,7 @@ RecorderBase *RecorderBase::CreateRecorder(
         recorder = new ImportRecorder(tvrec);
 #endif
     }
-    else if (CardUtil::IsV4L(genOpt.cardtype))
+    else if (CardUtil::IsV4L(genOpt.inputtype))
     {
 #ifdef USING_V4L2
         // V4L/MJPEG/GO7007 from here on
@@ -920,7 +920,7 @@ RecorderBase *RecorderBase::CreateRecorder(
         recorder->SetOption("skipbtaudio", genOpt.skip_btaudio);
 #endif // USING_V4L2
     }
-    else if (genOpt.cardtype == "EXTERNAL")
+    else if (genOpt.inputtype == "EXTERNAL")
     {
         recorder = new ExternalRecorder(tvrec,
                                 dynamic_cast<ExternalChannel*>(channel));
@@ -939,7 +939,7 @@ RecorderBase *RecorderBase::CreateRecorder(
     else
     {
         QString msg = "Need %1 recorder, but compiled without %2 support!";
-        msg = msg.arg(genOpt.cardtype).arg(genOpt.cardtype);
+        msg = msg.arg(genOpt.inputtype).arg(genOpt.inputtype);
         LOG(VB_GENERAL, LOG_ERR,
             "RecorderBase::CreateRecorder() Error, " + msg);
     }

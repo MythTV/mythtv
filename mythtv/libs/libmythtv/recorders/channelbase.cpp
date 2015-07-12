@@ -623,7 +623,7 @@ bool ChannelBase::InitializeInput(void)
     if (!m_inputid)
     {
         if (m_pParent)
-            m_inputid = m_pParent->GetCaptureCardNum();
+            m_inputid = m_pParent->GetInputId();
         else
             m_inputid = CardUtil::GetFirstInputID(GetDevice());
     }
@@ -771,7 +771,7 @@ ChannelBase *ChannelBase::CreateChannel(
     rbFileExt = "ts";
 
     ChannelBase *channel = NULL;
-    if (genOpt.cardtype == "DVB")
+    if (genOpt.inputtype == "DVB")
     {
 #ifdef USING_DVB
         channel = new DVBChannel(genOpt.videodev, tvrec);
@@ -779,61 +779,61 @@ ChannelBase *ChannelBase::CreateChannel(
             dvbOpt.dvb_tuning_delay);
 #endif
     }
-    else if (genOpt.cardtype == "FIREWIRE")
+    else if (genOpt.inputtype == "FIREWIRE")
     {
 #ifdef USING_FIREWIRE
         channel = new FirewireChannel(tvrec, genOpt.videodev, fwOpt);
 #endif
     }
-    else if (genOpt.cardtype == "HDHOMERUN")
+    else if (genOpt.inputtype == "HDHOMERUN")
     {
 #ifdef USING_HDHOMERUN
         channel = new HDHRChannel(tvrec, genOpt.videodev);
 #endif
     }
-    else if ((genOpt.cardtype == "IMPORT") ||
-             (genOpt.cardtype == "DEMO") ||
-             (genOpt.cardtype == "MPEG" &&
+    else if ((genOpt.inputtype == "IMPORT") ||
+             (genOpt.inputtype == "DEMO") ||
+             (genOpt.inputtype == "MPEG" &&
               genOpt.videodev.toLower().startsWith("file:")))
     {
         channel = new DummyChannel(tvrec);
         rbFileExt = "mpg";
     }
-    else if (genOpt.cardtype == "FREEBOX") // IPTV
+    else if (genOpt.inputtype == "FREEBOX") // IPTV
     {
 #ifdef USING_IPTV
         channel = new IPTVChannel(tvrec, genOpt.videodev);
 #endif
     }
-    else if (genOpt.cardtype == "VBOX")
+    else if (genOpt.inputtype == "VBOX")
     {
 #ifdef USING_VBOX
         channel = new IPTVChannel(tvrec, genOpt.videodev);
 #endif
     }
-    else if (genOpt.cardtype == "ASI")
+    else if (genOpt.inputtype == "ASI")
     {
 #ifdef USING_ASI
         channel = new ASIChannel(tvrec, genOpt.videodev);
 #endif
     }
-    else if (genOpt.cardtype == "CETON")
+    else if (genOpt.inputtype == "CETON")
     {
 #ifdef USING_CETON
         channel = new CetonChannel(tvrec, genOpt.videodev);
 #endif
     }
-    else if (CardUtil::IsV4L(genOpt.cardtype))
+    else if (CardUtil::IsV4L(genOpt.inputtype))
     {
 #ifdef USING_V4L2
         channel = new V4LChannel(tvrec, genOpt.videodev);
 #endif
-        if ((genOpt.cardtype != "MPEG") && (genOpt.cardtype != "HDPVR"))
+        if ((genOpt.inputtype != "MPEG") && (genOpt.inputtype != "HDPVR"))
             rbFileExt = "nuv";
         else
             rbFileExt = "mpg";
     }
-    else if (genOpt.cardtype == "EXTERNAL")
+    else if (genOpt.inputtype == "EXTERNAL")
     {
         channel = new ExternalChannel(tvrec, genOpt.videodev);
         rbFileExt = "mpg";
@@ -847,8 +847,8 @@ ChannelBase *ChannelBase::CreateChannel(
             "\n"
             "Recompile MythTV with %4 support or remove the card \n"
             "from the configuration and restart MythTV.")
-            .arg(genOpt.cardtype).arg(genOpt.videodev)
-            .arg(genOpt.cardtype).arg(genOpt.cardtype);
+            .arg(genOpt.inputtype).arg(genOpt.videodev)
+            .arg(genOpt.inputtype).arg(genOpt.inputtype);
         LOG(VB_GENERAL, LOG_ERR, "ChannelBase: CreateChannel() Error: \n" +
             msg + "\n");
         return NULL;
@@ -862,15 +862,15 @@ ChannelBase *ChannelBase::CreateChannel(
         return NULL;
     }
 
-    QString input = CardUtil::GetInputName(tvrec->GetCaptureCardNum());
+    QString input = CardUtil::GetInputName(tvrec->GetInputId());
     QString channum = startchannel;
     channel->Init(channum, true);
 
     if (enter_power_save_mode)
     {
         if (channel &&
-            ((genOpt.cardtype == "DVB" && dvbOpt.dvb_on_demand) ||
-             CardUtil::IsV4L(genOpt.cardtype)))
+            ((genOpt.inputtype == "DVB" && dvbOpt.dvb_on_demand) ||
+             CardUtil::IsV4L(genOpt.inputtype)))
         {
             channel->Close();
         }

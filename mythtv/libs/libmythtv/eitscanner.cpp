@@ -245,7 +245,7 @@ void EITScanner::StartActiveScan(TVRec *_rec, uint max_seconds_per_source)
             "GROUP BY mplexid "
             "ORDER BY capturecard.sourceid, mplexid, "
             "         atsc_major_chan, atsc_minor_chan ");
-        query.bindValue(":CARDID", rec->GetCaptureCardNum());
+        query.bindValue(":CARDID", rec->GetInputId());
 
         if (!query.exec() || !query.isActive())
         {

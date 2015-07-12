@@ -29,7 +29,7 @@
 #include "tv_rec.h"
 
 #define LOC QString("ExternalRec[%1](%2): ") \
-            .arg(tvrec ? tvrec->GetCaptureCardNum() : -1) \
+            .arg(tvrec ? tvrec->GetInputId() : -1) \
             .arg(m_channel->GetDevice())
 
 ExternalRecorder::ExternalRecorder(TVRec *rec, ExternalChannel *channel) :

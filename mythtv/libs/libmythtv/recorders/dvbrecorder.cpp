@@ -31,7 +31,7 @@
 #include "mythlogging.h"
 
 #define LOC QString("DVBRec[%1](%2): ") \
-            .arg(tvrec ? tvrec->GetCaptureCardNum() : -1).arg(videodevice)
+            .arg(tvrec ? tvrec->GetInputId() : -1).arg(videodevice)
 
 DVBRecorder::DVBRecorder(TVRec *rec, DVBChannel *channel)
     : DTVRecorder(rec), _channel(channel), _stream_handler(NULL)
