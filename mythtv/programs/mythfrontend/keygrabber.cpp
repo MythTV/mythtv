@@ -90,7 +90,7 @@ bool KeyGrabPopupBox::keyPressEvent(QKeyEvent *event)
         m_waitingForKeyRelease = false;
         m_keyReleaseSeen       = true;
 
-        QString key_name = QKeySequence(event->key()).toString();
+        QString key_name = QKeySequence(keycode).toString();
         if (!key_name.isEmpty())
         {
             QString modifiers;
@@ -111,6 +111,7 @@ bool KeyGrabPopupBox::keyPressEvent(QKeyEvent *event)
         if (key_name.isEmpty())
         {
             m_messageText->SetText(tr("Pressed key not recognized"));
+            LOG(VB_GENERAL, LOG_ERR, QString("Pressed key not recognized: '%1' (keycode %2)").arg(event->text()).arg(event->nativeScanCode()) );
         }
         else
         {

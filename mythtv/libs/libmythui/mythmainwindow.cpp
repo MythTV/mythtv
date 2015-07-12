@@ -2092,6 +2092,35 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
             if (!ke)
                 ke = static_cast<QKeyEvent *>(e);
 
+#ifdef Q_OS_LINUX
+            // Fixups for _some_ linux native codes that QT doesn't know
+            if (ke->key() <= 0)
+            {
+                int keycode = 0;
+                switch(ke->nativeScanCode())
+                {
+                    case 209: // XF86AudioPause
+                        keycode = Qt::Key_MediaPause;
+                        break;
+                    default:
+                      break;
+                }
+
+                if (keycode > 0)
+                {
+                    QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, keycode,
+                                                   ke->modifiers());
+                    QObject *key_target = getTarget(*key);
+                    if (!key_target)
+                        QCoreApplication::postEvent(this, key);
+                    else
+                        QCoreApplication::postEvent(key_target, key);
+                }
+
+                return true;
+            }
+#endif
+
             if (currentWidget())
             {
                 ke->accept();
