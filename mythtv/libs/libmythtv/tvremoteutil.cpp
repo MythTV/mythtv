@@ -401,7 +401,7 @@ bool RemoteGetRecordingStatus(
     vector<TunerStatus> *tunerList, bool list_inactive)
 {
     bool isRecording = false;
-    vector<uint> inputlist = CardUtil::GetCardList();
+    vector<uint> inputlist = CardUtil::GetInputList();
 
     if (tunerList)
         tunerList->clear();

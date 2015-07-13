@@ -37,13 +37,13 @@ typedef enum
 } dvb_dev_type_t;
 
 /** \class CardUtil
- *  \brief Collection of helper utilities for capture card DB use
+ *  \brief Collection of helper utilities for input DB use
  */
 class MTV_PUBLIC CardUtil
 {
   public:
-    /// \brief all the different capture cards
-    enum CARD_TYPES
+    /// \brief all the different inputs
+    enum INPUT_TYPES
     {
         ERROR_OPEN    = 0,
         ERROR_UNKNOWN = 1,
@@ -67,7 +67,7 @@ class MTV_PUBLIC CardUtil
         VBOX      = 19,
     };
 
-    static enum CARD_TYPES toInputType(const QString &name)
+    static enum INPUT_TYPES toInputType(const QString &name)
     {
         if ("ERROR_OPEN" == name)
             return ERROR_OPEN;
@@ -205,7 +205,7 @@ class MTV_PUBLIC CardUtil
     static int          CreateCaptureCard(const QString &videodevice,
                                           const QString &audiodevice,
                                           const QString &vbidevice,
-                                          const QString &cardtype,
+                                          const QString &inputtype,
                                           const uint audioratelimit,
                                           const QString &hostname,
                                           const uint dvb_swfilter,
@@ -227,10 +227,10 @@ class MTV_PUBLIC CardUtil
                                           const uint diseqcid,
                                           bool       dvb_eitscan);
 
-    static bool         DeleteCard(uint cardid);
+    static bool         DeleteCard(uint inputid);
     static bool         DeleteAllCards(void);
-    static vector<uint> GetCardList(void);
-    static vector<uint> GetLiveTVCardList(void);
+    static vector<uint> GetInputList(void);
+    static vector<uint> GetLiveTVInputList(void);
 
     /// Convenience function for GetInputIDs()
     static uint         GetFirstInputID(const QString &videodevice)
@@ -251,7 +251,7 @@ class MTV_PUBLIC CardUtil
 
     static bool         IsInputTypePresent(const QString &rawtype,
                                            QString hostname = QString::null);
-    static QStringList  GetInputTypes(void); // card types on ALL hosts
+    static QStringList  GetInputTypes(void); // input types on ALL hosts
 
     static QStringList  GetVideoDevices(const QString &rawtype,
                                         QString hostname = QString::null);
@@ -278,7 +278,7 @@ class MTV_PUBLIC CardUtil
                                         const QString &channum);
 
     // Input creation and deletion
-    static int           CreateCardInput(const uint cardid,
+    static int           CreateCardInput(const uint inputid,
                                          const uint sourceid,
                                          const QString &inputname,
                                          const QString &externalcommand,
@@ -305,7 +305,6 @@ class MTV_PUBLIC CardUtil
     static QString      GetInputName(uint inputid);
     static QString      GetStartingChannel(uint inputid);
     static QString      GetDisplayName(uint inputid);
-    static vector<uint> GetAllInputIDs(void);
     static uint         GetSourceID(uint inputid);
 
     // Input Groups
@@ -320,26 +319,26 @@ class MTV_PUBLIC CardUtil
     static vector<uint> GetGroupInputIDs(uint inputgroupid);
     static vector<uint> GetConflictingInputs(uint inputid);
 
-    static QString      GetDeviceLabel(const QString &cardtype,
+    static QString      GetDeviceLabel(const QString &inputtype,
                                        const QString &videodevice);
     static QString      GetDeviceLabel(uint inputid);
 
     static QString      ProbeSubTypeName(uint inputid);
 
     static QStringList  ProbeVideoInputs(QString device,
-                                         QString cardtype = QString::null);
+                                         QString inputtype = QString::null);
     static QStringList  ProbeAudioInputs(QString device,
-                                         QString cardtype = QString::null);
+                                         QString inputtype = QString::null);
     static void         GetDeviceInputNames(uint               inputid,
                                             const QString      &device,
-                                            const QString      &cardtype,
+                                            const QString      &inputtype,
                                             QStringList        &inputs);
 
     // General info from OS
     static QStringList  ProbeVideoDevices(const QString &rawtype);
 
     // Other
-    static bool         CloneCard(uint src_cardid, uint dst_cardid);
+    static bool         CloneCard(uint src_inputid, uint dst_inputid);
     static QString      GetFirewireChangerNode(uint inputid);
     static QString      GetFirewireChangerModel(uint inputid);
 
@@ -354,10 +353,10 @@ class MTV_PUBLIC CardUtil
     static uint         GetQuickTuning(uint inputid, const QString &inputname);
 
     // DVB info
-    /// \brief Returns true if the card is a DVB card
+    /// \brief Returns true if the input is a DVB input
     static bool         IsDVB(uint inputid)
         { return "DVB" == GetRawInputType(inputid); }
-    static bool         IsDVBInputType(const QString &card_type);
+    static bool         IsDVBInputType(const QString &input_type);
     static QString      ProbeDVBFrontendName(const QString &device);
     static QString      ProbeDVBType(const QString &device);
     static bool         HasDVBCRCBug(const QString &device);
@@ -367,10 +366,10 @@ class MTV_PUBLIC CardUtil
 
     // V4L info
     static bool         hasV4L2(int videofd);
-    static bool         GetV4LInfo(int videofd, QString &card, QString &driver,
+    static bool         GetV4LInfo(int videofd, QString &input, QString &driver,
                                    uint32_t &version, uint32_t &capabilities);
-    static bool         GetV4LInfo(int videofd, QString &card, QString &driver)
-        { uint32_t d1,d2; return GetV4LInfo(videofd, card, driver, d1, d2); }
+    static bool         GetV4LInfo(int videofd, QString &input, QString &driver)
+        { uint32_t d1,d2; return GetV4LInfo(videofd, input, driver, d1, d2); }
     static InputNames   ProbeV4LVideoInputs(int videofd, bool &ok);
     static InputNames   ProbeV4LAudioInputs(int videofd, bool &ok);
 
