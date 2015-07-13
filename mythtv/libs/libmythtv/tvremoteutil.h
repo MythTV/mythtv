@@ -26,14 +26,14 @@ class TunerStatus
     QDateTime endTime;
 };
 
-MTV_PUBLIC uint RemoteGetState(uint cardid);
-MTV_PUBLIC uint RemoteGetFlags(uint cardid);
+MTV_PUBLIC uint RemoteGetState(uint inputid);
+MTV_PUBLIC uint RemoteGetFlags(uint inputid);
 MTV_PUBLIC bool RemoteRecordPending(
-    uint cardid, const ProgramInfo *pginfo, int secsleft, bool hasLater);
-MTV_PUBLIC bool RemoteStopLiveTV(uint cardid);
-MTV_PUBLIC bool RemoteStopRecording(uint cardid);
+    uint inputid, const ProgramInfo *pginfo, int secsleft, bool hasLater);
+MTV_PUBLIC bool RemoteStopLiveTV(uint inputid);
+MTV_PUBLIC bool RemoteStopRecording(uint inputid);
 MTV_PUBLIC void RemoteStopRecording(const ProgramInfo *pginfo);
-MTV_PUBLIC void RemoteCancelNextRecording(uint cardid, bool cancel);
+MTV_PUBLIC void RemoteCancelNextRecording(uint inputid, bool cancel);
 vector<InputInfo>
 RemoteRequestFreeInputInfo(uint excluded_input);
 MTV_PUBLIC int RemoteGetFreeRecorderCount(void);
@@ -48,8 +48,8 @@ RemoteRequestFreeRecorderList(uint excluded_input);
 MTV_PUBLIC vector<uint>
 RemoteRequestFreeInputList(uint excluded_input);
 MTV_PUBLIC vector<InputInfo> RemoteRequestFreeInputList(
-    uint cardid, uint excluded_input);
-MTV_PUBLIC bool RemoteIsBusy(uint cardid, InputInfo &busy_input);
+    uint inputid, uint excluded_input);
+MTV_PUBLIC bool RemoteIsBusy(uint inputid, InputInfo &busy_input);
 
 MTV_PUBLIC bool RemoteGetRecordingStatus(
     vector<TunerStatus> *tunerList = NULL, bool list_inactive = false);
