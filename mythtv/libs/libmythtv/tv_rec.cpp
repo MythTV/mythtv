@@ -2631,7 +2631,7 @@ void TVRec::SpawnLiveTV(LiveTVChain *newchain, bool pip, QString startchan)
                     gCoreContext->GetBackendServerPort());
 
     tvchain->SetHostPrefix(hostprefix);
-    tvchain->SetCardType(genOpt.inputtype);
+    tvchain->SetInputType(genOpt.inputtype);
 
     ispip = pip;
     LiveTVStartChannel = startchan;
@@ -3753,7 +3753,7 @@ void TVRec::TuningFrequency(const TuningRequest &request)
         RecordingInfo *tmp = pseudoLiveTVRecording;
         pseudoLiveTVRecording = NULL;
 
-        tvchain->SetCardType("DUMMY");
+        tvchain->SetInputType("DUMMY");
 
         if (!ringBuffer)
             ok = CreateLiveTVRingBuffer(channum);
@@ -3761,7 +3761,7 @@ void TVRec::TuningFrequency(const TuningRequest &request)
             ok = SwitchLiveTVRingBuffer(channum, true, false);
         pseudoLiveTVRecording = tmp;
 
-        tvchain->SetCardType(genOpt.inputtype);
+        tvchain->SetInputType(genOpt.inputtype);
 
         if (!ok)
         {
@@ -4664,7 +4664,7 @@ bool TVRec::SwitchLiveTVRingBuffer(const QString & channum,
         return false;
     }
 
-    QString oldinputtype = tvchain->GetCardType(-1);
+    QString oldinputtype = tvchain->GetInputType(-1);
 
     pginfo->MarkAsInUse(true, kRecorderInUseID);
     pginfo->SaveAutoExpire(kLiveTVAutoExpire);

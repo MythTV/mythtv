@@ -2334,11 +2334,11 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
             QString playbackURL = ctx->playingInfo->GetPlaybackURL(true);
             ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
-            bool opennow = (ctx->tvchain->GetCardType(-1) != "DUMMY");
+            bool opennow = (ctx->tvchain->GetInputType(-1) != "DUMMY");
 
             LOG(VB_GENERAL, LOG_INFO, LOC +
-                QString("playbackURL(%1) cardtype(%2)")
-                    .arg(playbackURL).arg(ctx->tvchain->GetCardType(-1)));
+                QString("playbackURL(%1) inputtype(%2)")
+                    .arg(playbackURL).arg(ctx->tvchain->GetInputType(-1)));
 
             ctx->SetRingBuffer(
                 RingBuffer::Create(
@@ -7172,7 +7172,7 @@ void TV::SwitchInputs(PlayerContext *ctx,
         {
             ctx->LockPlayingInfo(__FILE__, __LINE__);
             QString playbackURL = ctx->playingInfo->GetPlaybackURL(true);
-            bool opennow = (ctx->tvchain->GetCardType(-1) != "DUMMY");
+            bool opennow = (ctx->tvchain->GetInputType(-1) != "DUMMY");
             ctx->SetRingBuffer(
                 RingBuffer::Create(
                     playbackURL, false, true,

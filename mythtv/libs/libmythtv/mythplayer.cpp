@@ -901,7 +901,7 @@ int MythPlayer::OpenFile(uint retries)
     livetv = player_ctx->tvchain && player_ctx->buffer->LiveMode();
 
     if (player_ctx->tvchain &&
-        player_ctx->tvchain->GetCardType(player_ctx->tvchain->GetCurPos()) ==
+        player_ctx->tvchain->GetInputType(player_ctx->tvchain->GetCurPos()) ==
         "DUMMY")
     {
         OpenDummy();
@@ -2560,7 +2560,7 @@ void MythPlayer::SwitchToProgram(void)
         return;
     }
 
-    bool newIsDummy = player_ctx->tvchain->GetCardType(newid) == "DUMMY";
+    bool newIsDummy = player_ctx->tvchain->GetInputType(newid) == "DUMMY";
 
     SetPlayingInfo(*pginfo);
     Pause();
@@ -2590,8 +2590,8 @@ void MythPlayer::SwitchToProgram(void)
     if (!player_ctx->buffer->IsOpen())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "SwitchToProgram's OpenFile failed " +
-            QString("(card type: %1).")
-            .arg(player_ctx->tvchain->GetCardType(newid)));
+            QString("(input type: %1).")
+            .arg(player_ctx->tvchain->GetInputType(newid)));
         LOG(VB_GENERAL, LOG_ERR, player_ctx->tvchain->toString());
         SetEof(kEofStateImmediate);
         SetErrored(tr("Error opening switch program buffer"));
@@ -2700,7 +2700,7 @@ void MythPlayer::JumpToProgram(void)
 
     inJumpToProgramPause = true;
 
-    bool newIsDummy = player_ctx->tvchain->GetCardType(newid) == "DUMMY";
+    bool newIsDummy = player_ctx->tvchain->GetInputType(newid) == "DUMMY";
     SetPlayingInfo(*pginfo);
 
     Pause();
@@ -2742,8 +2742,8 @@ void MythPlayer::JumpToProgram(void)
     if (!player_ctx->buffer->IsOpen())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "JumpToProgram's OpenFile failed " +
-            QString("(card type: %1).")
-                .arg(player_ctx->tvchain->GetCardType(newid)));
+            QString("(input type: %1).")
+                .arg(player_ctx->tvchain->GetInputType(newid)));
         LOG(VB_GENERAL, LOG_ERR, player_ctx->tvchain->toString());
         SetEof(kEofStateImmediate);
         SetErrored(tr("Error opening jump program file buffer"));

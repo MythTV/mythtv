@@ -15,7 +15,7 @@ static inline void clear(LiveTVChainEntry &entry)
     entry.endtime = QDateTime();
     entry.discontinuity = true;
     entry.hostprefix = QString();
-    entry.cardtype = QString();
+    entry.inputtype = QString();
     entry.channum = QString();
     entry.inputname = QString();
 }
@@ -49,9 +49,9 @@ void LiveTVChain::SetHostPrefix(const QString &prefix)
     m_hostprefix = prefix;
 }
 
-void LiveTVChain::SetCardType(const QString &type)
+void LiveTVChain::SetInputType(const QString &type)
 {
-    m_cardtype = type;
+    m_inputtype = type;
 }
 
 void LiveTVChain::LoadFromExistingChain(const QString &id)
@@ -71,7 +71,7 @@ void LiveTVChain::AppendNewProgram(ProgramInfo *pginfo, QString channum,
     newent.endtime = pginfo->GetRecordingEndTime();
     newent.discontinuity = discont;
     newent.hostprefix = m_hostprefix;
-    newent.cardtype = m_cardtype;
+    newent.inputtype = m_inputtype;
     newent.channum = channum;
     newent.inputname = inputname;
 
@@ -82,7 +82,7 @@ void LiveTVChain::AppendNewProgram(ProgramInfo *pginfo, QString channum,
                   " chainpos, discontinuity, watching, hostprefix, cardtype, "
                   " channame, input) "
                   "VALUES(:CHANID, :START, :END, :CHAINID, :CHAINPOS, "
-                  " :DISCONT, :WATCHING, :PREFIX, :CARDTYPE, :CHANNAME, "
+                  " :DISCONT, :WATCHING, :PREFIX, :INPUTTYPE, :CHANNAME, "
                   " :INPUT );");
     query.bindValue(":CHANID", pginfo->GetChanID());
     query.bindValue(":START", pginfo->GetRecordingStartTime());
@@ -92,7 +92,7 @@ void LiveTVChain::AppendNewProgram(ProgramInfo *pginfo, QString channum,
     query.bindValue(":DISCONT", discont);
     query.bindValue(":WATCHING", 0);
     query.bindValue(":PREFIX", m_hostprefix);
-    query.bindValue(":CARDTYPE", m_cardtype);
+    query.bindValue(":INPUTTYPE", m_inputtype);
     query.bindValue(":CHANNAME", channum);
     query.bindValue(":INPUT", inputname);
 
@@ -234,7 +234,7 @@ void LiveTVChain::ReloadAll(const QStringList &data)
                     MythDate::as_utc(query.value(2).toDateTime());
                 entry.discontinuity = query.value(3).toInt();
                 entry.hostprefix = query.value(5).toString();
-                entry.cardtype = query.value(6).toString();
+                entry.inputtype = query.value(6).toString();
                 entry.channum = query.value(7).toString();
                 entry.inputname = query.value(8).toString();
 
@@ -283,7 +283,7 @@ void LiveTVChain::GetEntryAt(int at, LiveTVChainEntry &entry) const
         if (at == -1)
             LOG(VB_GENERAL, LOG_ERR, "It appears that your backend may "
                 "be misconfigured.  Check your backend logs to determine "
-                "whether your capture cards, lineups, channels, or storage "
+                "whether your inputs, lineups, channels, or storage "
                 "configuration are reporting errors.  This issue is commonly "
                 "caused by failing to complete all setup steps properly.  You "
                 "may wish to review the documentation for mythtv-setup.");
@@ -471,7 +471,7 @@ ProgramInfo *LiveTVChain::DoGetNextProgram(bool up, int curpos, int &newid,
                 ((newid <= curpos) && (newid == 0));
 
             // Skip dummy recordings, if possible.
-            if (at_last_entry || (entry.cardtype != "DUMMY"))
+            if (at_last_entry || (entry.inputtype != "DUMMY"))
                 pginfo = EntryToProgram(entry);
 
             // Skip empty recordings, if possible
@@ -507,7 +507,7 @@ ProgramInfo *LiveTVChain::DoGetNextProgram(bool up, int curpos, int &newid,
                     ((newid <= curpos) && (newid == 0));
 
                 // Skip dummy recordings, if possible.
-                if (at_last_entry || (entry.cardtype != "DUMMY"))
+                if (at_last_entry || (entry.inputtype != "DUMMY"))
                     pginfo = EntryToProgram(entry);
 
                 // Skip empty recordings, if possible
@@ -535,11 +535,11 @@ ProgramInfo *LiveTVChain::DoGetNextProgram(bool up, int curpos, int &newid,
     if (curpos == newid - 1)
         discont = entry.discontinuity;
 
-    newtype = (oldentry.cardtype != entry.cardtype);
+    newtype = (oldentry.inputtype != entry.inputtype);
 
-    // Some cards can change their streams dramatically on a channel change...
+    // Some inputs can change their streams dramatically on a channel change...
     if (discont)
-        newtype |= CardUtil::IsChannelChangeDiscontinuous(entry.cardtype);
+        newtype |= CardUtil::IsChannelChangeDiscontinuous(entry.inputtype);
 
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
         QString("DoGetNextProgram: %1 -> ").arg(newid) + pginfo->toString());
@@ -689,12 +689,12 @@ QString LiveTVChain::GetInputName(int pos) const
     return entry.inputname;
 }
 
-QString LiveTVChain::GetCardType(int pos) const
+QString LiveTVChain::GetInputType(int pos) const
 {
     LiveTVChainEntry entry;
     GetEntryAt(pos, entry);
 
-    return entry.cardtype;
+    return entry.inputtype;
 }
 
 void LiveTVChain::SetHostSocket(MythSocket *sock)
@@ -726,7 +726,7 @@ void LiveTVChain::DelHostSocket(MythSocket *sock)
 static QString toString(const LiveTVChainEntry &v)
 {
     return QString("%1: %2 (%3 to %4)%5")
-        .arg(v.cardtype,6).arg(v.chanid,4)
+        .arg(v.inputtype,6).arg(v.chanid,4)
         .arg(v.starttime.time().toString())
         .arg(v.endtime.time().toString())
         .arg(v.discontinuity?" discontinuous":"");
@@ -756,7 +756,7 @@ QStringList LiveTVChain::entriesToStringList() const
         ret << m_chain[i].endtime.toString(Qt::ISODate);
         ret << QString::number(m_chain[i].discontinuity);
         ret << m_chain[i].hostprefix;
-        ret << m_chain[i].cardtype;
+        ret << m_chain[i].inputtype;
         ret << m_chain[i].channum;
         ret << m_chain[i].inputname;
     }
@@ -794,7 +794,7 @@ bool LiveTVChain::entriesFromStringList(const QStringList &items)
         if (ok && itemIdx < numItems)
             entry.hostprefix = items[itemIdx++];
         if (ok && itemIdx < numItems)
-            entry.cardtype = items[itemIdx++];
+            entry.inputtype = items[itemIdx++];
         if (ok && itemIdx < numItems)
             entry.channum = items[itemIdx++];
         if (ok && itemIdx < numItems)
