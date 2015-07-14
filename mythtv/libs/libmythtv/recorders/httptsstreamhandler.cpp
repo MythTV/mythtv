@@ -11,24 +11,24 @@
 #define TS_SIZE     188
 #define BUFFER_SIZE (512 * TS_SIZE)
 
-QMap<QString,HTTPTSStreamHandler*>  HTTPTSStreamHandler::s_handlers;
-QMap<QString,uint>               HTTPTSStreamHandler::s_handlers_refcnt;
-QMutex                           HTTPTSStreamHandler::s_handlers_lock;
+QMap<QString, HTTPTSStreamHandler*> HTTPTSStreamHandler::s_httphandlers;
+QMap<QString, uint>                 HTTPTSStreamHandler::s_httphandlers_refcnt;
+QMutex                              HTTPTSStreamHandler::s_httphandlers_lock;
 
 HTTPTSStreamHandler* HTTPTSStreamHandler::Get(const IPTVTuningData& tuning)
 {
-    QMutexLocker locker(&s_handlers_lock);
+    QMutexLocker locker(&s_httphandlers_lock);
 
     QString devkey = tuning.GetDeviceKey();
 
-    QMap<QString,HTTPTSStreamHandler*>::iterator it = s_handlers.find(devkey);
+    QMap<QString,HTTPTSStreamHandler*>::iterator it = s_httphandlers.find(devkey);
 
-    if (it == s_handlers.end())
+    if (it == s_httphandlers.end())
     {
         HTTPTSStreamHandler* newhandler = new HTTPTSStreamHandler(tuning);
         newhandler->Start();
-        s_handlers[devkey] = newhandler;
-        s_handlers_refcnt[devkey] = 1;
+        s_httphandlers[devkey] = newhandler;
+        s_httphandlers_refcnt[devkey] = 1;
 
         LOG(VB_RECORD, LOG_INFO,
             QString("HTTPTSSH: Creating new stream handler %1 for %2")
@@ -36,15 +36,55 @@ HTTPTSStreamHandler* HTTPTSStreamHandler::Get(const IPTVTuningData& tuning)
     }
     else
     {
-        s_handlers_refcnt[devkey]++;
-        uint rcount = s_handlers_refcnt[devkey];
+        s_httphandlers_refcnt[devkey]++;
+        uint rcount = s_httphandlers_refcnt[devkey];
         LOG(VB_RECORD, LOG_INFO,
             QString("HTTPTSSH: Using existing stream handler %1 for %2")
             .arg(devkey).arg(tuning.GetDeviceName()) +
             QString(" (%1 in use)").arg(rcount));
     }
 
-    return s_handlers[devkey];
+    return s_httphandlers[devkey];
+}
+
+void HTTPTSStreamHandler::Return(HTTPTSStreamHandler * & ref)
+{
+    QMutexLocker locker(&s_httphandlers_lock);
+
+    QString devname = ref->_device;
+
+    QMap<QString,uint>::iterator rit = s_httphandlers_refcnt.find(devname);
+    if (rit == s_httphandlers_refcnt.end())
+        return;
+
+    LOG(VB_RECORD, LOG_INFO, QString("HTTPTSSH: Return(%1) has %2 handlers")
+        .arg(devname).arg(*rit));
+
+    if (*rit > 1)
+    {
+        ref = NULL;
+        (*rit)--;
+        return;
+    }
+
+    QMap<QString,HTTPTSStreamHandler*>::iterator it = s_httphandlers.find(devname);
+    if ((it != s_httphandlers.end()) && (*it == ref))
+    {
+        LOG(VB_RECORD, LOG_INFO, QString("HTTPTSSH: Closing handler for %1")
+                           .arg(devname));
+        ref->Stop();
+        delete *it;
+        s_httphandlers.erase(it);
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("HTTPTSSH Error: Couldn't find handler for %1")
+                .arg(devname));
+    }
+
+    s_httphandlers_refcnt.erase(rit);
+    ref = NULL;
 }
 
 HTTPTSStreamHandler::HTTPTSStreamHandler(const IPTVTuningData& tuning) :
@@ -88,10 +128,12 @@ void HTTPTSStreamHandler::run(void)
 
 
 #undef  LOC
-#define LOC QString("HTTPReader(%1): ").arg(m_parent->_device)
+#define LOC QString("HTTPReader(%1): ").arg(m_url)
 
 bool HTTPReader::DownloadStream(const QUrl url)
 {
+    m_url = url.toString();
+
     LOG(VB_RECORD, LOG_INFO, LOC + "DownloadStream -- begin");
 
     QMutexLocker lock(&m_lock);

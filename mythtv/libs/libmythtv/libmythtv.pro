@@ -720,6 +720,17 @@ using_backend {
         DEFINES += USING_HDHOMERUN
     }
 
+    # Support for VBox
+    using_vbox {
+        HEADERS += recorders/vboxutils.h
+        HEADERS += channelscan/vboxchannelfetcher.h
+
+        SOURCES += recorders/vboxutils.cpp
+        SOURCES += channelscan/vboxchannelfetcher.cpp
+
+        DEFINES += USING_VBOX
+    }
+
     # Support for Ceton
     using_ceton {
         # MythTV Ceton glue

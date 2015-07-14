@@ -89,6 +89,8 @@ class ScanTypeSetting : public ComboBoxSetting, public TransientStorage
         DVBUtilsImport,
         // Imports lists from previous mythtv scan
         ExistingScanImport,
+        // Import using the VBox API to get the channel list
+        VBoxImport,
     };
 
     ScanTypeSetting() : ComboBoxSetting(this), hw_cardid(0)

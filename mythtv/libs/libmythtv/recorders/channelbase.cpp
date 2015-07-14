@@ -1211,6 +1211,12 @@ ChannelBase *ChannelBase::CreateChannel(
         channel = new IPTVChannel(tvrec, genOpt.videodev);
 #endif
     }
+    else if (genOpt.cardtype == "VBOX")
+    {
+#ifdef USING_VBOX
+        channel = new IPTVChannel(tvrec, genOpt.videodev);
+#endif
+    }
     else if (genOpt.cardtype == "ASI")
     {
 #ifdef USING_ASI

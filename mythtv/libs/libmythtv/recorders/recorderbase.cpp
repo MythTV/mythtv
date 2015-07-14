@@ -885,6 +885,13 @@ RecorderBase *RecorderBase::CreateRecorder(
         recorder->SetOption("mrl", genOpt.videodev);
 #endif // USING_IPTV
     }
+    else if (genOpt.cardtype == "VBOX")
+    {
+#ifdef USING_VBOX
+        recorder = new IPTVRecorder(
+            tvrec, dynamic_cast<IPTVChannel*>(channel));
+#endif // USING_VBOX
+    }
     else if (genOpt.cardtype == "ASI")
     {
 #ifdef USING_ASI

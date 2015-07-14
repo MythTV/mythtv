@@ -68,6 +68,7 @@ class MTV_PUBLIC CardUtil
         ASI       = 16,
         CETON     = 17,
         EXTERNAL  = 18,
+        VBOX      = 19,
     };
 
     static enum CARD_TYPES toCardType(const QString &name)
@@ -110,6 +111,8 @@ class MTV_PUBLIC CardUtil
             return CETON;
         if ("EXTERNAL" == name)
             return EXTERNAL;
+        if ("VBOX" == name)
+            return VBOX;
         return ERROR_UNKNOWN;
     }
 
@@ -119,7 +122,8 @@ class MTV_PUBLIC CardUtil
             (rawtype != "DVB")       && (rawtype != "FIREWIRE") &&
             (rawtype != "HDHOMERUN") && (rawtype != "FREEBOX")  &&
             (rawtype != "IMPORT")    && (rawtype != "DEMO")     &&
-            (rawtype != "ASI")       && (rawtype != "CETON");
+            (rawtype != "ASI")       && (rawtype != "CETON")    &&
+            (rawtype != "VBOX");
     }
 
     static bool         IsV4L(const QString &rawtype)
@@ -189,12 +193,13 @@ class MTV_PUBLIC CardUtil
             (rawtype == "FIREWIRE")  || (rawtype == "HDHOMERUN") ||
             (rawtype == "FREEBOX")   || (rawtype == "ASI")       ||
             (rawtype == "IMPORT")    || (rawtype == "DEMO")      ||
-            (rawtype == "CETON")     || (rawtype == "EXTERNAL");
+            (rawtype == "CETON")     || (rawtype == "EXTERNAL")  ||
+            (rawtype == "VBOX");
     }
 
     static bool         IsChannelReusable(const QString &rawtype)
     {
-        return !(rawtype == "FREEBOX");
+        return !(rawtype == "FREEBOX" || rawtype == "VBOX");
     }
 
 
@@ -391,6 +396,10 @@ class MTV_PUBLIC CardUtil
     // HDHomeRun info
     static bool         HDHRdoesDVB(const QString &device);
     static QString      GetHDHRdesc(const QString &device);
+
+    // VBox info
+    static QString      GetVBoxdesc(const QString &id, const QString &ip,
+                                    const QString &tunerNo, const QString &tunerType);
 
     // ASI info
     static int          GetASIDeviceNumber(const QString &device,

@@ -49,6 +49,12 @@ class MTV_PUBLIC IPTVTuningData
         memset(&m_bitrate, 0, sizeof(m_bitrate));
     }
 
+    IPTVTuningData(const QString &data_url, IPTVProtocol protocol) :
+        m_data_url(data_url),  m_fec_type(kNone), m_protocol(protocol)
+    {
+        memset(&m_bitrate, 0, sizeof(m_bitrate));
+    }
+
     IPTVTuningData(const QString &data_url, uint data_bitrate,
                    const FECType fec_type,
                    const QString &fec_url0, uint fec_bitrate0,

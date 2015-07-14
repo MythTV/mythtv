@@ -3143,6 +3143,59 @@ NULL
             return false;
     }
 
+    if (dbver == "1339")
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+
+        // insert a new profile group for the VBox
+        query.prepare("INSERT INTO profilegroups SET name = 'VBox Recorder', "
+                       "cardtype = 'VBOX', is_default = 1;");
+        if (!query.exec())
+        {
+            MythDB::DBError("Unable to insert vbox profilegroup.", query);
+            return false;
+        }
+
+        // get the id of the new profile group
+        int groupid = query.lastInsertId().toInt();
+
+        // insert the recording profiles
+        query.prepare("INSERT INTO recordingprofiles SET name = \"Default\", profilegroup = :GROUPID;");
+        query.bindValue(":GROUPID", groupid);
+        if (!query.exec())
+        {
+            MythDB::DBError("Unable to insert 'Default' recordingprofile.", query);
+            return false;
+        }
+
+        query.prepare("INSERT INTO recordingprofiles SET name = \"Live TV\", profilegroup = :GROUPID;");
+        query.bindValue(":GROUPID", groupid);
+        if (!query.exec())
+        {
+            MythDB::DBError("Unable to insert 'Live TV' recordingprofile.", query);
+            return false;
+        }
+
+        query.prepare("INSERT INTO recordingprofiles SET name = \"High Quality\", profilegroup = :GROUPID;");
+        query.bindValue(":GROUPID", groupid);
+        if (!query.exec())
+        {
+            MythDB::DBError("Unable to insert 'High Quality' recordingprofile.", query);
+            return false;
+        }
+
+        query.prepare("INSERT INTO recordingprofiles SET name = \"Low Quality\", profilegroup = :GROUPID;");
+        query.bindValue(":GROUPID", groupid);
+        if (!query.exec())
+        {
+            MythDB::DBError("Unable to insert 'Low Quality' recordingprofile.", query);
+            return false;
+        }
+
+        if (!UpdateDBVersionNumber("1340", dbver))
+            return false;
+    }
+
     return true;
 }
 

@@ -52,6 +52,10 @@ using namespace std;
 #include <linux/videodev2.h>
 #endif
 
+#ifdef USING_VBOX
+#include "vboxutils.h"
+#endif
+
 #ifdef USING_HDHOMERUN
 #include "hdhomerun.h"
 #endif
@@ -1576,6 +1580,221 @@ void HDHomeRunDeviceIDList::UpdateDevices(const QString &v)
     _oldValue = v;
 };
 
+// -----------------------
+// VBOX Configuration
+// -----------------------
+
+VBoxIP::VBoxIP()
+{
+    setLabel(QObject::tr("IP Address"));
+    setHelpText(QObject::tr("Device IP or ID of a VBox device. eg. '192.168.1.100' or 'vbox_3718'"));
+    setEnabled(false);
+    connect(this, SIGNAL(valueChanged(const QString&)),
+            this, SLOT(UpdateDevices(const QString&)));
+    _oldValue="";
+};
+
+void VBoxIP::setEnabled(bool e)
+{
+    TransLineEditSetting::setEnabled(e);
+    if (e)
+    {
+        if (!_oldValue.isEmpty())
+            setValue(_oldValue);
+        emit NewIP(getValue());
+    }
+    else
+    {
+        _oldValue = getValue();
+        _oldValue.detach();
+    }
+}
+
+void VBoxIP::UpdateDevices(const QString &v)
+{
+   if (isEnabled())
+       emit NewIP(v);
+}
+
+VBoxTunerIndex::VBoxTunerIndex()
+{
+    setLabel(QObject::tr("Tuner"));
+    setHelpText(QObject::tr("Number and type of the tuner to use. eg '1-DVBT/T2'."));
+    setEnabled(false);
+    connect(this, SIGNAL(valueChanged(const QString&)),
+            this, SLOT(UpdateDevices(const QString&)));
+    _oldValue = "";
+};
+
+void VBoxTunerIndex::setEnabled(bool e)
+{
+    TransLineEditSetting::setEnabled(e);
+    if (e) {
+        if (!_oldValue.isEmpty())
+            setValue(_oldValue);
+        emit NewTuner(getValue());
+    }
+    else
+    {
+        _oldValue = getValue();
+    }
+}
+
+void VBoxTunerIndex::UpdateDevices(const QString &v)
+{
+   if (isEnabled())
+       emit NewTuner(v);
+}
+
+VBoxDeviceID::VBoxDeviceID(const CaptureCard &parent) :
+    LabelSetting(this),
+    CaptureCardDBStorage(this, parent, "videodevice"),
+    _ip(QString::null),
+    _tuner(QString::null),
+    _overridedeviceid(QString::null)
+{
+    setLabel(tr("Device ID"));
+    setHelpText(tr("Device ID of VBox device"));
+}
+
+void VBoxDeviceID::SetIP(const QString &ip)
+{
+    _ip = ip;
+    setValue(QString("%1-%2").arg(_ip).arg(_tuner));
+}
+
+void VBoxDeviceID::SetTuner(const QString &tuner)
+{
+    _tuner = tuner;
+    setValue(QString("%1-%2").arg(_ip).arg(_tuner));
+}
+
+void VBoxDeviceID::SetOverrideDeviceID(const QString &deviceid)
+{
+    _overridedeviceid = deviceid;
+    setValue(deviceid);
+}
+
+void VBoxDeviceID::Load(void)
+{
+    CaptureCardDBStorage::Load();
+    if (!_overridedeviceid.isEmpty())
+    {
+        setValue(_overridedeviceid);
+        _overridedeviceid = QString::null;
+    }
+}
+
+VBoxDeviceIDList::VBoxDeviceIDList(
+    VBoxDeviceID        *deviceid,
+    TransLabelSetting   *desc,
+    VBoxIP              *cardip,
+    VBoxTunerIndex      *cardtuner,
+    VBoxDeviceList      *devicelist) :
+    _deviceid(deviceid),
+    _desc(desc),
+    _cardip(cardip),
+    _cardtuner(cardtuner),
+    _devicelist(devicelist)
+{
+    setLabel(QObject::tr("Available devices"));
+    setHelpText(
+        QObject::tr(
+            "Device IP or ID, tuner number and tuner type of available VBox devices."));
+
+    connect(this, SIGNAL(valueChanged(const QString&)),
+            this, SLOT(UpdateDevices(const QString&)));
+
+    _oldValue = "";
+};
+
+/// \brief Adds all available device-tuner combinations to list
+void VBoxDeviceIDList::fillSelections(const QString &cur)
+{
+    clearSelections();
+
+    vector<QString> devs;
+    QMap<QString, bool> in_use;
+
+    QString current = cur;
+
+    VBoxDeviceList::iterator it = _devicelist->begin();
+    for (; it != _devicelist->end(); ++it)
+    {
+        devs.push_back(it.key());
+        in_use[it.key()] = (*it).inuse;
+    }
+
+    QString man_addr = VBoxDeviceIDList::tr("Manually Enter IP Address");
+    QString sel = man_addr;
+    devs.push_back(sel);
+
+    vector<QString>::const_iterator it2 = devs.begin();
+    for (; it2 != devs.end(); ++it2)
+        sel = (current == *it2) ? *it2 : sel;
+
+    QString usestr = QString(" -- ");
+    usestr += QObject::tr("Warning: already in use");
+
+    for (uint i = 0; i < devs.size(); i++)
+    {
+        const QString dev = devs[i];
+        QString desc = dev + (in_use[devs[i]] ? usestr : "");
+        addSelection(desc, dev, dev == sel);
+    }
+
+    if (current != cur)
+    {
+        _deviceid->SetOverrideDeviceID(current);
+    }
+    else if (sel == man_addr && !current.isEmpty())
+    {
+        // Populate the proper values for IP address and tuner
+        QStringList selection = current.split("-");
+
+        _cardip->SetOldValue(selection.first());
+        _cardtuner->SetOldValue(selection.last());
+
+        _cardip->setValue(selection.first());
+        _cardtuner->setValue(selection.last());
+    }
+}
+
+void VBoxDeviceIDList::Load(void)
+{
+    clearSelections();
+
+    fillSelections(_deviceid->getValue());
+}
+
+void VBoxDeviceIDList::UpdateDevices(const QString &v)
+{
+    if (v == VBoxDeviceIDList::tr("Manually Enter IP Address"))
+    {
+        _cardip->setEnabled(true);
+        _cardtuner->setEnabled(true);
+    }
+    else if (!v.isEmpty())
+    {
+        if (_oldValue == VBoxDeviceIDList::tr("Manually Enter IP Address"))
+        {
+            _cardip->setEnabled(false);
+            _cardtuner->setEnabled(false);
+        }
+        _deviceid->setValue(v);
+
+        // Update _cardip and _cardtuner
+        _cardip->setValue((*_devicelist)[v].cardip);
+        _cardtuner->setValue(QString("%1").arg((*_devicelist)[v].tunerno));
+        _desc->setValue((*_devicelist)[v].desc);
+    }
+    _oldValue = v;
+};
+
+// -----------------------
+// IPTV Configuration
+// -----------------------
+
 class IPTVHost : public LineEditSetting, public CaptureCardDBStorage
 {
   public:
@@ -1996,6 +2215,131 @@ void HDHomeRunConfigurationGroup::HDHomeRunExtraPanel(void)
 }
 
 // -----------------------
+// VBox Configuration
+// -----------------------
+
+class VBoxExtra : public ConfigurationWizard
+{
+  public:
+    VBoxExtra(VBoxConfigurationGroup &parent);
+    uint GetInstanceCount(void) const
+    {
+        return (uint) count->intValue();
+    }
+
+  private:
+    InstanceCount *count;
+};
+
+VBoxExtra::VBoxExtra(VBoxConfigurationGroup &parent) :
+    count(new InstanceCount(parent.parent))
+{
+    VerticalConfigurationGroup* rec = new VerticalConfigurationGroup(false);
+    rec->setLabel(QObject::tr("Recorder Options"));
+    rec->setUseLabel(false);
+
+    rec->addChild(new SignalTimeout(parent.parent, 1000, 250));
+    rec->addChild(new ChannelTimeout(parent.parent, 3000, 1750));
+    rec->addChild(count);
+
+    addChild(rec);
+}
+
+VBoxConfigurationGroup::VBoxConfigurationGroup
+        (CaptureCard& a_parent) :
+    VerticalConfigurationGroup(false, true, false, false),
+    parent(a_parent)
+{
+    setUseLabel(false);
+
+    // Fill Device list
+    FillDeviceList();
+
+    deviceid     = new VBoxDeviceID(parent);
+    desc         = new TransLabelSetting();
+    desc->setLabel(tr("Description"));
+    cardip       = new VBoxIP();
+    cardtuner    = new VBoxTunerIndex();
+    deviceidlist = new VBoxDeviceIDList(
+        deviceid, desc, cardip, cardtuner, &devicelist);
+
+    addChild(deviceidlist);
+    addChild(new EmptyAudioDevice(parent));
+    addChild(new EmptyVBIDevice(parent));
+    addChild(deviceid);
+    addChild(desc);
+    addChild(cardip);
+    addChild(cardtuner);
+
+    TransButtonSetting *buttonRecOpt = new TransButtonSetting();
+    buttonRecOpt->setLabel(tr("Recording Options"));
+    addChild(buttonRecOpt);
+
+    connect(buttonRecOpt, SIGNAL(pressed()),
+            this,         SLOT(  VBoxExtraPanel()));
+
+    connect(cardip,    SIGNAL(NewIP(const QString&)),
+            deviceid,  SLOT(  SetIP(const QString&)));
+    connect(cardtuner, SIGNAL(NewTuner(const QString&)),
+            deviceid,  SLOT(  SetTuner(const QString&)));
+};
+
+void VBoxConfigurationGroup::FillDeviceList(void)
+{
+    devicelist.clear();
+
+    // Find physical devices first
+    // ProbeVideoDevices returns "deviceid ip tunerno tunertype"
+    QStringList devs = CardUtil::ProbeVideoDevices("VBOX");
+
+    QStringList::const_iterator it;
+
+    for (it = devs.begin(); it != devs.end(); ++it)
+    {
+        QString dev = *it;
+        QStringList devinfo = dev.split(" ");
+        QString id = devinfo.at(0);
+        QString ip = devinfo.at(1);
+        QString tunerNo = devinfo.at(2);
+        QString tunerType = devinfo.at(3);
+
+        VBoxDevice tmpdevice;
+        tmpdevice.deviceid   = id;
+        tmpdevice.desc       = CardUtil::GetVBoxdesc(id, ip, tunerNo, tunerType);
+        tmpdevice.cardip     = ip;
+        tmpdevice.inuse      = false;
+        tmpdevice.discovered = true;
+        tmpdevice.tunerno  = tunerNo;
+        tmpdevice.tunertype  = tunerType;
+        tmpdevice.mythdeviceid = id + "-" + tunerNo + "-" + tunerType;
+        devicelist[tmpdevice.mythdeviceid] = tmpdevice;
+    }
+
+    // Now find configured devices
+
+    // returns "ip.ip.ip.ip-n-type" or deviceid-n-type values
+    QStringList db = CardUtil::GetVideoDevices("VBOX");
+
+    for (it = db.begin(); it != db.end(); ++it)
+    {
+        QMap<QString, VBoxDevice>::iterator dit;
+        dit = devicelist.find(*it);
+
+        if (dit != devicelist.end())
+            (*dit).inuse = true;
+    }
+}
+
+void VBoxConfigurationGroup::VBoxExtraPanel(void)
+{
+    parent.reload(); // ensure card id is valid
+
+    VBoxExtra acw(*this);
+    acw.exec();
+    parent.SetInstanceCount(acw.GetInstanceCount());
+}
+
+// -----------------------
 // Ceton Configuration
 // -----------------------
 
@@ -2365,6 +2709,10 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard &parent) :
     addTarget("HDHOMERUN", new HDHomeRunConfigurationGroup(parent));
 #endif // USING_HDHOMERUN
 
+#ifdef USING_VBOX
+    addTarget("VBOX",      new VBoxConfigurationGroup(parent));
+#endif // USING_VBOX
+
 #ifdef USING_FIREWIRE
     addTarget("FIREWIRE",  new FirewireConfigurationGroup(parent));
 #endif // USING_FIREWIRE
@@ -2559,6 +2907,11 @@ void CardType::fillSelections(SelectSetting* setting)
     setting->addSelection(
         QObject::tr("HDHomeRun networked tuner"), "HDHOMERUN");
 #endif // USING_HDHOMERUN
+
+#ifdef USING_VBOX
+    setting->addSelection(
+        QObject::tr("V@Box TV Gateway networked tuner"), "VBOX");
+#endif // USING_VBOX
 
 #ifdef USING_FIREWIRE
     setting->addSelection(

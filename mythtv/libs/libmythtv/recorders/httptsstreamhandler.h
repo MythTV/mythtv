@@ -21,6 +21,7 @@ class HTTPTSStreamHandler : public IPTVStreamHandler
     friend class HTTPReader;
   public:
     static HTTPTSStreamHandler* Get(const IPTVTuningData& tuning);
+    static void Return(HTTPTSStreamHandler * & ref);
 
 protected:
     HTTPTSStreamHandler(const IPTVTuningData &tuning);
@@ -30,9 +31,9 @@ protected:
   protected:
     HTTPReader*             m_reader;
     // for implementing Get & Return
-    static QMutex                               s_handlers_lock;
-    static QMap<QString, HTTPTSStreamHandler*>  s_handlers;
-    static QMap<QString, uint>                  s_handlers_refcnt;
+    static QMutex                               s_httphandlers_lock;
+    static QMap<QString, HTTPTSStreamHandler*>  s_httphandlers;
+    static QMap<QString, uint>                  s_httphandlers_refcnt;
 };
 
 
@@ -54,6 +55,7 @@ class MBASE_PUBLIC HTTPReader : public QObject
     void HttpRead();
 
   private:
+    QString                 m_url;
     HTTPTSStreamHandler    *m_parent;
     QTimer                  m_timer;
     QNetworkAccessManager   m_mgr;

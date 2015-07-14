@@ -117,6 +117,11 @@ void ScanWizard::SetPage(const QString &pageTitle)
         do_scan = false;
         scannerPane->ImportM3U(cardid, inputname, sourceid, false);
     }
+    else if (scantype == ScanTypeSetting::VBoxImport)
+    {
+        do_scan = false;
+        scannerPane->ImportVBox(cardid, inputname, sourceid);
+    }
     else if (scantype == ScanTypeSetting::IPTVImportMPTS)
     {
         scannerPane->ImportM3U(cardid, inputname, sourceid, true);

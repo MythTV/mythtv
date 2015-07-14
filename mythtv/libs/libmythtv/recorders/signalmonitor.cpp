@@ -140,6 +140,15 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
     }
 #endif
 
+#ifdef USING_VBOX
+    if (cardtype.toUpper() == "VBOX")
+    {
+        IPTVChannel *fbc = dynamic_cast<IPTVChannel*>(channel);
+        if (fbc)
+            signalMonitor = new IPTVSignalMonitor(db_cardnum, fbc);
+    }
+#endif
+
 #ifdef USING_FIREWIRE
     if (cardtype.toUpper() == "FIREWIRE")
     {

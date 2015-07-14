@@ -116,6 +116,7 @@ Advanced options (experts only):
   --firewire-sdk           specify location for mac FireWire SDK [mac only]
   --disable-firewire       disable support for FireWire cable boxes
   --disable-hdhomerun      disable support for HDHomeRun boxes
+  --disable-vbox           disable support for V@Box TV Gateway boxes
   --disable-ceton          disable support for Ceton cards
   --disable-v4l2           disable Video4Linux support
   --disable-ivtv           disable ivtv support (PVR-x50) req. v4l2 support
@@ -2112,6 +2113,7 @@ MYTHTV_CONFIG_LIST='
     firewire
     frontend
     hdhomerun
+    vbox
     ceton
     hdpvr
     ivtv
@@ -2979,6 +2981,7 @@ firewire_deps="backend"
 ivtv_deps="backend v4l2"
 hdpvr_deps="backend v4l2"
 hdhomerun_deps="backend"
+vbox_deps="backend"
 ceton_deps="backend"
 mpegtsraw_demuxer_deps="merge_libavformat_mpegts_c"
 mythtranscode_deps="backend frontend"
@@ -3140,6 +3143,7 @@ enable ffmpeg_pthreads
 enable firewire
 enable frontend
 enable hdhomerun
+enable vbox
 enable ceton
 enable hdpvr
 enable ivtv
@@ -7013,6 +7017,7 @@ if enabled backend; then
   echo "DVB support               ${dvb-no} [$dvb_path]"
   echo "DVB-S2 support            ${fe_can_2g_modulation-no}"
   echo "HDHomeRun support         ${hdhomerun-no}"
+  echo "V@Box TV Gateway support  ${vbox-no}"
   echo "Ceton support             ${ceton-no}"
   echo "ASI support               ${asi-no}"
 fi
@@ -7403,6 +7408,10 @@ fi
 if enabled dvb && non_standard_header $dvb_path; then
   append CONFIG_INCLUDEPATH "$dvb_path"
 fi
+
+#if enabled vbox; then
+#    append CCONFIG "using_vbox"
+#fi
 
 if enabled libcec; then
   append CONFIG_DEFINES "using_libcec"

@@ -170,6 +170,10 @@ void ScanTypeSetting::SetInput(const QString &cardids_inputname)
             addSelection(tr("Import existing scan"),
                          QString::number(ExistingScanImport));
             break;
+        case CardUtil::VBOX:
+            addSelection(tr("VBox Channel Import"),
+                         QString::number(VBoxImport), true);
+            return;
         case CardUtil::FREEBOX:
             addSelection(tr("M3U Import with MPTS"),
                          QString::number(IPTVImportMPTS), true);
@@ -248,6 +252,8 @@ ScanOptionalConfig::ScanOptionalConfig(ScanTypeSetting *_scan_type) :
     addTarget(QString::number(ScanTypeSetting::CurrentTransportScan),
               new BlankSetting());
     addTarget(QString::number(ScanTypeSetting::IPTVImport),
+              new BlankSetting());
+    addTarget(QString::number(ScanTypeSetting::VBoxImport),
               new BlankSetting());
 //     addTarget(QString::number(ScanTypeSetting::DVBUtilsImport),
 //               paneDVBUtilsImport);

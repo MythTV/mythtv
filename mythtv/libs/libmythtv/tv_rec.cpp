@@ -1178,7 +1178,8 @@ void TVRec::CloseChannel(void)
 {
     if (channel &&
         ((genOpt.cardtype == "DVB" && dvbOpt.dvb_on_demand) ||
-         genOpt.cardtype == "FREEBOX" || CardUtil::IsV4L(genOpt.cardtype)))
+         genOpt.cardtype == "FREEBOX" || genOpt.cardtype == "VBOX" ||
+         CardUtil::IsV4L(genOpt.cardtype)))
     {
         channel->Close();
     }

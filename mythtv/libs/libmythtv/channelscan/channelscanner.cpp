@@ -318,6 +318,28 @@ bool ChannelScanner::ImportM3U(uint cardid, const QString &inputname,
     return true;
 }
 
+bool ChannelScanner::ImportVBox(uint cardid, const QString &inputname, uint sourceid)
+{
+#ifdef USING_VBOX
+    if (!scanMonitor)
+        scanMonitor = new ScanMonitor(this);
+
+    // Create a VBox scan object
+    vboxScanner = new VBoxChannelFetcher(cardid, inputname, sourceid, scanMonitor);
+
+    MonitorProgress(false, false, false, false);
+
+    vboxScanner->Scan();
+
+    return true;
+#else
+    (void) cardid;
+    (void) inputname;
+    (void) sourceid;
+    return false;
+#endif
+}
+
 void ChannelScanner::PreScanCommon(
     int scantype,
     uint cardid,
@@ -393,6 +415,13 @@ void ChannelScanner::PreScanCommon(
 
 #ifdef USING_IPTV
     if ("FREEBOX" == card_type)
+    {
+        channel = new IPTVChannel(NULL, device);
+    }
+#endif
+
+#ifdef USING_VBOX
+    if ("VBOX" == card_type)
     {
         channel = new IPTVChannel(NULL, device);
     }

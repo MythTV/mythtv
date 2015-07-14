@@ -412,6 +412,49 @@ class HDHomeRunConfigurationGroup : public VerticalConfigurationGroup
     HDHomeRunDeviceList    devicelist;
 };
 
+class VBoxDevice
+{
+  public:
+    QString mythdeviceid;
+    QString deviceid;
+    QString desc;
+    QString cardip;
+    QString tunerno;
+    QString tunertype;
+    bool    inuse;
+    bool    discovered;
+};
+
+typedef QMap<QString, VBoxDevice> VBoxDeviceList;
+
+class VBoxDeviceIDList;
+class VBoxDeviceID;
+class VBoxIP;
+class VBoxTunerIndex;
+class VBoxConfigurationGroup : public VerticalConfigurationGroup
+{
+    Q_OBJECT
+
+    friend class VBoxExtra;
+
+  public:
+    VBoxConfigurationGroup(CaptureCard &parent);
+
+  public slots:
+    void VBoxExtraPanel(void);
+
+  private:
+    void FillDeviceList(void);
+
+  private:
+    CaptureCard       &parent;
+    TransLabelSetting *desc;
+    VBoxDeviceIDList  *deviceidlist;
+    VBoxDeviceID      *deviceid;
+    VBoxIP            *cardip;
+    VBoxTunerIndex    *cardtuner;
+    VBoxDeviceList    devicelist;
+};
 
 class CetonDeviceID;
 class CetonSetting;
@@ -925,6 +968,100 @@ class HDHomeRunDeviceID : public LabelSetting, public CaptureCardDBStorage
 
   public:
     HDHomeRunDeviceID(const CaptureCard &parent);
+
+    virtual void Load(void);
+
+  public slots:
+    void SetIP(const QString&);
+    void SetTuner(const QString&);
+    void SetOverrideDeviceID(const QString&);
+
+  private:
+    QString _ip;
+    QString _tuner;
+    QString _overridedeviceid;
+};
+
+///
+class VBoxDeviceID;
+class VBoxTunerIndex;
+
+class VBoxIP : public TransLineEditSetting
+{
+    Q_OBJECT
+
+  public:
+    VBoxIP();
+
+    virtual void setEnabled(bool e);
+    void SetOldValue(const QString &s)
+        { _oldValue = s; _oldValue.detach(); };
+
+  signals:
+    void NewIP(const QString&);
+
+  public slots:
+    void UpdateDevices(const QString&);
+
+  private:
+    QString _oldValue;
+};
+
+class VBoxTunerIndex : public TransLineEditSetting
+{
+    Q_OBJECT
+
+  public:
+    VBoxTunerIndex();
+
+    virtual void setEnabled(bool e);
+    void SetOldValue(const QString &s)
+        { _oldValue = s; _oldValue.detach(); };
+
+  signals:
+    void NewTuner(const QString&);
+
+  public slots:
+    void UpdateDevices(const QString&);
+
+  private:
+    QString _oldValue;
+};
+
+class VBoxDeviceIDList : public TransComboBoxSetting
+{
+    Q_OBJECT
+
+  public:
+    VBoxDeviceIDList(VBoxDeviceID *deviceid,
+                     TransLabelSetting *desc,
+                     VBoxIP *cardip,
+                     VBoxTunerIndex *cardtuner,
+                     VBoxDeviceList *devicelist);
+
+    void fillSelections(const QString &current);
+
+    virtual void Load(void);
+
+  public slots:
+    void UpdateDevices(const QString&);
+
+  private:
+    VBoxDeviceID      *_deviceid;
+    TransLabelSetting *_desc;
+    VBoxIP            *_cardip;
+    VBoxTunerIndex    *_cardtuner;
+    VBoxDeviceList    *_devicelist;
+
+    QString            _oldValue;
+};
+
+class VBoxDeviceID : public LabelSetting, public CaptureCardDBStorage
+{
+    Q_OBJECT
+
+  public:
+    VBoxDeviceID(const CaptureCard &parent);
 
     virtual void Load(void);
 
