@@ -446,6 +446,9 @@ void MythRenderOpenGL2::EnableShaderObject(uint obj)
 void MythRenderOpenGL2::SetShaderParams(uint obj, void* vals,
                                         const char* uniform)
 {
+    if (!(m_exts_supported & kGLSL))
+        return;
+
     makeCurrent();
     const float *v = (float*)vals;
 
@@ -883,7 +886,11 @@ bool MythRenderOpenGL2::ValidateShaderObject(uint obj)
 bool MythRenderOpenGL2::CheckObjectStatus(uint obj)
 {
     int ok;
+#ifdef GL_LINK_STATUS
+    m_glGetProgramiv(obj, GL_LINK_STATUS, &ok);
+#else
     m_glGetProgramiv(obj, GL_OBJECT_LINK_STATUS, &ok);
+#endif
     if (ok > 0)
         return true;
 
@@ -891,7 +898,11 @@ bool MythRenderOpenGL2::CheckObjectStatus(uint obj)
     int infologLength = 0;
     int charsWritten  = 0;
     char *infoLog;
+#ifdef GL_INFO_LOG_LENGTH
+    m_glGetProgramiv(obj, GL_INFO_LOG_LENGTH, &infologLength);
+#else
     m_glGetProgramiv(obj, GL_OBJECT_INFO_LOG_LENGTH, &infologLength);
+#endif
     if (infologLength > 0)
     {
         infoLog = (char *)malloc(infologLength);

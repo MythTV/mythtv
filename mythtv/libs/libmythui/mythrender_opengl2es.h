@@ -98,8 +98,8 @@ class MUI_PUBLIC MythRenderOpenGL2ES : public MythRenderOpenGL2
         m_glDeleteFramebuffers = (MYTH_GLDELETEFRAMEBUFFERSPROC)
                                 GetProcAddress("glDeleteFramebuffers");
         // GL_OES_mapbuffer
-        m_glMapBuffer   = (MYTH_GLMAPBUFFERPROC)GetProcAddress("glMapBuffer");
-        m_glUnmapBuffer = (MYTH_GLUNMAPBUFFERPROC)GetProcAddress("glUnmapBuffer");
+        m_glMapBuffer   = (MYTH_GLMAPBUFFERPROC)GetProcAddress("glMapBufferOES");
+        m_glUnmapBuffer = (MYTH_GLUNMAPBUFFERPROC)GetProcAddress("glUnmapBufferOES");
     }
 
     virtual bool InitFeatures(void)
@@ -145,33 +145,60 @@ class MUI_PUBLIC MythRenderOpenGL2ES : public MythRenderOpenGL2
         }
 
         LOG(VB_GENERAL, LOG_INFO, "OpenGL2ES: Found default functionality.");
-        m_exts_supported += kGLSL | kGLExtVBO | kGLVertexArray |
+
+        static bool glslshaders = !getenv("OPENGL_NOGLSL");
+        GLboolean b;
+        glGetBooleanv(GL_SHADER_COMPILER, &b);
+        if (!b)
+        {
+            LOG(VB_GENERAL, LOG_INFO, "OpenGL2ES: GLSL not supported.");
+            glslshaders = false;
+        }
+        else if (!glslshaders)
+            LOG(VB_GENERAL, LOG_NOTICE, "OpenGL2ES: Disabling GLSL.");
+
+        static bool framebuffers = !getenv("OPENGL_NOFBO");
+        if (!framebuffers)
+            LOG(VB_GENERAL, LOG_NOTICE, "OpenGL2ES: Disabling FrameBuffer Objects.");
+
+        static bool vertexbuffers = !getenv("OPENGL_NOVBO");
+        if (!vertexbuffers)
+            LOG(VB_GENERAL, LOG_NOTICE, "OpenGL2ES: Disabling VertexBuffer Objects.");
+
+        m_exts_supported += (glslshaders ? kGLSL : 0) |
+                            (vertexbuffers ? kGLExtVBO : 0) | kGLVertexArray |
                             kGLMultiTex;
         m_default_texture_type = GL_TEXTURE_2D;
 
         // GL_OES_framebuffer_object
         if (m_glGenFramebuffers && m_glBindFramebuffer &&
             m_glFramebufferTexture2D && m_glCheckFramebufferStatus &&
-            m_glDeleteFramebuffers)
+            m_glDeleteFramebuffers && framebuffers)
         {
             m_exts_supported += kGLExtFBufObj;
             LOG(VB_GENERAL, LOG_INFO,
                 "OpenGL2ES: Framebuffer Objects available.");
         }
 
-        // GL_OES_mapbuffer
         m_extensions = (const char*) glGetString(GL_EXTENSIONS);
+        LOG(VB_GENERAL, LOG_DEBUG, QString("OpenGL2ES: extensions: %1")
+            .arg(m_extensions));
+
+        // GL_OES_mapbuffer
         if (m_extensions.contains("GL_OES_mapbuffer") &&
             m_glMapBuffer && m_glUnmapBuffer)
         {
-            m_exts_supported += kGLExtPBufObj;
-            LOG(VB_GENERAL, LOG_INFO,
-                "OpenGL2ES: Pixel Buffer Objects available.");
+            // NB these functions don't support GL_PIXEL_UNPACK_BUFFER
+            // so kGLExtPBufObj is not enabled
+            LOG(VB_GENERAL, LOG_INFO, "OpenGL2ES: OES mapbuffer available.");
         }
-
         m_exts_used = m_exts_supported;
-        DeleteDefaultShaders();
-        CreateDefaultShaders();
+
+        if (m_exts_supported & kGLSL)
+        {
+            DeleteDefaultShaders();
+            CreateDefaultShaders();
+        }
 
         return true;
     }
