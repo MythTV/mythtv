@@ -18,17 +18,39 @@
 
 #define LOC QString("VBoxChanFetch: ")
 
-VBoxChannelFetcher::VBoxChannelFetcher(uint cardid, const QString &inputname,
-                                       uint sourceid, ScanMonitor *monitor) :
+VBoxChannelFetcher::VBoxChannelFetcher(uint cardid, const QString &inputname, uint sourceid,
+                                       bool ftaOnly, ServiceRequirements serviceType,
+                                       ScanMonitor *monitor) :
     _scan_monitor(monitor),
     _cardid(cardid),       _inputname(inputname),
-    _sourceid(sourceid),   _channels(NULL),
+    _sourceid(sourceid),   _ftaOnly(ftaOnly),
+    _serviceType(serviceType),
+    _transType("UNKNOWN"), _channels(NULL),
     _chan_cnt(1),          _thread_running(false),
     _stop_now(false),      _thread(new MThread("VBoxChannelFetcher", this)),
     _lock()
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Has ScanMonitor %1")
         .arg(monitor?"true":"false"));
+
+    // videoDev is of the form xx.xx.xx.xx-n-t or xxxxxxx-n-t
+    QString videoDev = CardUtil::GetVideoDevice(cardid);
+    QStringList list = videoDev.split('-');
+    if (list.count() == 3)
+    {
+        QString tunerType = list.at(2);
+        if (tunerType == "DVBT" || tunerType == "DVBT/T2")
+            _transType = "T";
+        else if (tunerType == "DVBS" || tunerType == "DVBS/S2")
+            _transType = "S";
+        else if (tunerType == "DVBC")
+            _transType = "C";
+        else if (tunerType == "ATSC")
+            _transType = "A";
+    }
+
+     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("VideoDevice is: %1, tunerType is: %2")
+         .arg(videoDev).arg(_transType));
 }
 
 VBoxChannelFetcher::~VBoxChannelFetcher()
@@ -143,42 +165,73 @@ void VBoxChannelFetcher::run(void)
     vbox_chan_map_t::const_iterator it = _channels->begin();
     for (uint i = 1; it != _channels->end(); ++it, ++i)
     {
-        QString channum = it.key();
-        QString name    = (*it).m_name;
-        QString xmltvid = (*it).m_xmltvid.isEmpty() ? "" : (*it).m_xmltvid;
-        uint serviceID = (*it).m_serviceID;
+        QString channum   = it.key();
+        QString name      = (*it).m_name;
+        QString xmltvid   = (*it).m_xmltvid.isEmpty() ? "" : (*it).m_xmltvid;
+        uint serviceID    = (*it).m_serviceID;
+        bool fta          = (*it).m_fta;
+        QString chanType  = (*it).m_channelType;
+        QString transType = (*it).m_transType;
+
         //: %1 is the channel number, %2 is the channel name
         QString msg = tr("Channel #%1 : %2").arg(channum).arg(name);
 
         LOG(VB_CHANNEL, LOG_INFO, QString("Handling channel %1 %2")
             .arg(channum).arg(name));
 
-        int chanid = ChannelUtil::GetChanID(_sourceid, channum);
-        if (chanid <= 0)
+        if (_ftaOnly && !fta)
         {
+            // ignore this encrypted channel
             if (_scan_monitor)
             {
-                _scan_monitor->ScanAppendTextToLog(tr("Adding %1").arg(msg));
+                _scan_monitor->ScanAppendTextToLog(tr("Ignoring Encrypted %1").arg(msg));
             }
-            chanid = ChannelUtil::CreateChanID(_sourceid, channum);
-            ChannelUtil::CreateChannel(0, _sourceid, chanid, name, name,
-                                       channum, serviceID, 0, 0,
-                                       false, false, false, QString::null,
-                                       QString::null, "Default", xmltvid);
-            ChannelUtil::CreateIPTVTuningData(chanid, (*it).m_tuning);
+        }
+        else if (chanType == "Radio" && _serviceType != kRequireAudio)
+        {
+            // ignore this radio channel
+            if (_scan_monitor)
+            {
+                _scan_monitor->ScanAppendTextToLog(tr("Ignoring Radio %1").arg(msg));
+            }
+        }
+        else if (transType != _transType && transType != "UNKNOWN")
+        {
+            // ignore this channel
+            if (_scan_monitor)
+            {
+                _scan_monitor->ScanAppendTextToLog(tr("Ignoring Bad Transmission Type %1").arg(msg));
+            }
         }
         else
         {
-            if (_scan_monitor)
+            int chanid = ChannelUtil::GetChanID(_sourceid, channum);
+            if (chanid <= 0)
             {
-                _scan_monitor->ScanAppendTextToLog(
-                                            tr("Updating %1").arg(msg));
+                if (_scan_monitor)
+                {
+                    _scan_monitor->ScanAppendTextToLog(tr("Adding %1").arg(msg));
+                }
+                chanid = ChannelUtil::CreateChanID(_sourceid, channum);
+                ChannelUtil::CreateChannel(0, _sourceid, chanid, name, name,
+                                            channum, serviceID, 0, 0,
+                                            false, false, false, QString::null,
+                                            QString::null, "Default", xmltvid);
+                ChannelUtil::CreateIPTVTuningData(chanid, (*it).m_tuning);
             }
-            ChannelUtil::UpdateChannel(0, _sourceid, chanid, name, name,
-                                       channum, serviceID, 0, 0,
-                                       false, false, false, QString::null,
-                                       QString::null, "Default", xmltvid);
-            ChannelUtil::UpdateIPTVTuningData(chanid, (*it).m_tuning);
+            else
+            {
+                if (_scan_monitor)
+                {
+                    _scan_monitor->ScanAppendTextToLog(
+                                                tr("Updating %1").arg(msg));
+                }
+                ChannelUtil::UpdateChannel(0, _sourceid, chanid, name, name,
+                                            channum, serviceID, 0, 0,
+                                            false, false, false, QString::null,
+                                            QString::null, "Default", xmltvid);
+                ChannelUtil::UpdateIPTVTuningData(chanid, (*it).m_tuning);
+            }
         }
 
         SetNumChannelsInserted(i);

@@ -120,7 +120,9 @@ void ScanWizard::SetPage(const QString &pageTitle)
     else if (scantype == ScanTypeSetting::VBoxImport)
     {
         do_scan = false;
-        scannerPane->ImportVBox(cardid, inputname, sourceid);
+        scannerPane->ImportVBox(cardid, inputname, sourceid,
+                                configPane->DoFreeToAirOnly(),
+                                configPane->GetServiceRequirements());
     }
     else if (scantype == ScanTypeSetting::IPTVImportMPTS)
     {

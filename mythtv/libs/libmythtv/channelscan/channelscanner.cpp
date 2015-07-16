@@ -318,14 +318,15 @@ bool ChannelScanner::ImportM3U(uint cardid, const QString &inputname,
     return true;
 }
 
-bool ChannelScanner::ImportVBox(uint cardid, const QString &inputname, uint sourceid)
+bool ChannelScanner::ImportVBox(uint cardid, const QString &inputname, uint sourceid,
+                                bool ftaOnly, ServiceRequirements serviceType)
 {
 #ifdef USING_VBOX
     if (!scanMonitor)
         scanMonitor = new ScanMonitor(this);
 
     // Create a VBox scan object
-    vboxScanner = new VBoxChannelFetcher(cardid, inputname, sourceid, scanMonitor);
+    vboxScanner = new VBoxChannelFetcher(cardid, inputname, sourceid, ftaOnly, serviceType, scanMonitor);
 
     MonitorProgress(false, false, false, false);
 

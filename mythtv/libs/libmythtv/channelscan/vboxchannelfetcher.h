@@ -12,6 +12,7 @@
 // MythTV headers
 #include "iptvtuningdata.h"
 #include "mthread.h"
+#include "channelscantypes.h"
 
 class ScanMonitor;
 class VBoxChannelFetcher;
@@ -25,8 +26,12 @@ class VBoxChannelInfo
     VBoxChannelInfo(const QString &name,
                     const QString &xmltvid,
                     const QString &data_url,
+                    bool fta,
+                    const QString &chanType,
+                    const QString &transType,
                     uint serviceID) :
         m_name(name), m_xmltvid(xmltvid), m_serviceID(serviceID),
+        m_fta(fta), m_channelType(chanType), m_transType(transType),
         m_tuning(data_url, IPTVTuningData::http_ts)
     {
     }
@@ -40,6 +45,9 @@ class VBoxChannelInfo
     QString m_name;
     QString m_xmltvid;
     uint m_serviceID;
+    bool m_fta;
+    QString m_channelType; // TV/Radio
+    QString m_transType;   // T/T2/S/S2/C/A
     IPTVTuningData m_tuning;
 };
 typedef QMap<QString,VBoxChannelInfo> vbox_chan_map_t;
@@ -49,8 +57,9 @@ class VBoxChannelFetcher : public QRunnable
     Q_DECLARE_TR_FUNCTIONS(VBoxChannelFetcher)
 
   public:
-    VBoxChannelFetcher(uint cardid, const QString &inputname,
-                       uint sourceid, ScanMonitor *monitor = NULL);
+    VBoxChannelFetcher(uint cardid, const QString &inputname, uint sourceid,
+                       bool ftaOnly, ServiceRequirements serviceType,
+                       ScanMonitor *monitor = NULL);
     ~VBoxChannelFetcher();
 
     void Scan(void);
@@ -69,7 +78,10 @@ class VBoxChannelFetcher : public QRunnable
     uint      _cardid;
     QString   _inputname;
     uint      _sourceid;
-    vbox_chan_map_t *_channels;
+    bool      _ftaOnly;
+    ServiceRequirements _serviceType;
+    QString   _transType;
+    vbox_chan_map_t    *_channels;
     uint      _chan_cnt;
     bool      _thread_running;
     bool      _stop_now;

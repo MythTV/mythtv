@@ -305,11 +305,19 @@ vbox_chan_map_t *VBox::getChannels(void)
         QDomElement chanElem = chanNodes.at(x).toElement();
         QString xmltvid = chanElem.attribute("id", "UNKNOWN_ID");
         QString name = getStrValue(chanElem, "display-name", 0);
-        QString type = getStrValue(chanElem, "display-name", 1);
+        QString chanType = getStrValue(chanElem, "display-name", 1);
         QString triplet = getStrValue(chanElem, "display-name", 2);
-        QString free = getStrValue(chanElem, "display-name", 3);
+        bool    fta = (getStrValue(chanElem, "display-name", 3) == "Free");
         QString lcn = getStrValue(chanElem, "display-name", 4);
         uint serviceID = triplet.right(4).toUInt(0, 16);
+
+        QString transType = "UNKNOWN";
+        QStringList slist = triplet.split('-');
+
+        //sanity check - the triplet should look something like this: T-GER-111100020001
+        // where T is the tuner type, GER is the country, and the numbers are the NIT/TID/SID
+        if (slist.count() == 3)
+            transType = slist[0];
 
         QString icon = "";
         QDomNodeList iconNodes = chanElem.elementsByTagName("icon");
@@ -327,7 +335,7 @@ vbox_chan_map_t *VBox::getChannels(void)
             url = urlElem.attribute("src", "");
         }
 
-        VBoxChannelInfo chanInfo(name, xmltvid, url, serviceID);
+        VBoxChannelInfo chanInfo(name, xmltvid, url, fta, chanType, transType, serviceID);
         result->insert(lcn, chanInfo);
     }
 
