@@ -1,10 +1,17 @@
+#include "mythrender_opengl.h"
+
 #include <QLibrary>
+#include <QPainter>
+#ifdef USE_OPENGL_QT5
+#include <QWindow>
+#include <QGLFormat>
+#endif
+#include <QWidget>
 #include <algorithm>
 using namespace std;
 
 #include "mythlogging.h"
 #include "mythuitype.h"
-#include "mythrender_opengl.h"
 #include "mythxdisplay.h"
 
 #define LOC QString("OpenGL: ")
@@ -51,8 +58,16 @@ OpenGLLocker::~OpenGLLocker()
 MythRenderOpenGL* MythRenderOpenGL::Create(const QString &painter,
                                            QPaintDevice* device)
 {
-    QGLFormat format;
-    format.setDepth(false);
+#ifdef USE_OPENGL_QT5
+    MythRenderFormat format = QSurfaceFormat::defaultFormat();
+    format.setDepthBufferSize(0);
+    format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
+# ifdef USING_OPENGLES
+    format.setRenderableType(QSurfaceFormat::OpenGLES);
+# endif
+#else
+    MythRenderFormat format = QGLFormat(QGL::NoDepthBuffer);
+#endif
 
     bool setswapinterval = false;
     int synctovblank = -1;
@@ -88,6 +103,8 @@ MythRenderOpenGL* MythRenderOpenGL::Create(const QString &painter,
 #if ANDROID
     int openGLVersionFlags = QGLFormat::OpenGL_ES_Version_2_0;
     LOG(VB_GENERAL, LOG_INFO, "OpenGL ES2 forced for Android");
+#elif defined USE_OPENGL_QT5 && defined USING_OPENGLES
+    int openGLVersionFlags = QGLFormat::OpenGL_ES_Version_2_0;
 #else
     // Check OpenGL version supported
     QGLWidget *dummy = new QGLWidget;
@@ -134,7 +151,27 @@ MythRenderOpenGL* MythRenderOpenGL::Create(const QString &painter,
 #endif
 }
 
-MythRenderOpenGL::MythRenderOpenGL(const QGLFormat& format, QPaintDevice* device,
+#ifdef USE_OPENGL_QT5
+MythRenderOpenGL::MythRenderOpenGL(const MythRenderFormat& format, QPaintDevice* device,
+                                   RenderType type)
+  : MythRender(type), m_lock(QMutex::Recursive)
+{
+    QWidget *w = dynamic_cast<QWidget*>(device);
+    m_window = (w) ? w->windowHandle() : NULL;
+    ResetVars();
+    ResetProcs();
+    setFormat(format);
+}
+
+MythRenderOpenGL::MythRenderOpenGL(const MythRenderFormat& format, RenderType type)
+  : MythRender(type), m_lock(QMutex::Recursive), m_window(0)
+{
+    ResetVars();
+    ResetProcs();
+    setFormat(format);
+}
+#else
+MythRenderOpenGL::MythRenderOpenGL(const MythRenderFormat& format, QPaintDevice* device,
                                    RenderType type)
   : QGLContext(format, device), MythRender(type), m_lock(QMutex::Recursive)
 {
@@ -142,12 +179,13 @@ MythRenderOpenGL::MythRenderOpenGL(const QGLFormat& format, QPaintDevice* device
     ResetProcs();
 }
 
-MythRenderOpenGL::MythRenderOpenGL(const QGLFormat& format, RenderType type)
+MythRenderOpenGL::MythRenderOpenGL(const MythRenderFormat& format, RenderType type)
   : QGLContext(format), MythRender(type), m_lock(QMutex::Recursive)
 {
     ResetVars();
     ResetProcs();
 }
+#endif
 
 MythRenderOpenGL::~MythRenderOpenGL()
 {
@@ -155,6 +193,13 @@ MythRenderOpenGL::~MythRenderOpenGL()
 
 void MythRenderOpenGL::Init(void)
 {
+    if (!isValid())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Init an invalid context."
+                            " Missing call to setWidget or create?");
+        return;
+    }
+
     OpenGLLocker locker(this);
     InitProcs();
     Init2DState();
@@ -168,13 +213,15 @@ bool MythRenderOpenGL::IsRecommendedRenderer(void)
     bool recommended = true;
     OpenGLLocker locker(this);
     QString renderer = (const char*) glGetString(GL_RENDERER);
-    if (!(this->format().directRendering()))
+
+    if (!IsDirectRendering())
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             "OpenGL is using software rendering.");
         recommended = false;
     }
-    else if (renderer.contains("Software Rasterizer", Qt::CaseInsensitive))
+    else
+    if (renderer.contains("Software Rasterizer", Qt::CaseInsensitive))
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             "OpenGL is using software rasterizer.");
@@ -190,11 +237,59 @@ bool MythRenderOpenGL::IsRecommendedRenderer(void)
     return recommended;
 }
 
+#ifdef USE_OPENGL_QT5
+bool MythRenderOpenGL::IsDirectRendering() const
+{
+    return QGLFormat::fromSurfaceFormat(format()).directRendering();
+}
+
+void MythRenderOpenGL::swapBuffers()
+{
+    QOpenGLContext::swapBuffers(m_window);
+}
+
+void MythRenderOpenGL::setWidget(QWidget *w)
+{
+    if (!w)
+        return;
+
+    m_window = w->windowHandle();
+    if (!m_window)
+    {
+        w = w->nativeParentWidget();
+        if (w)
+            m_window = w->windowHandle();
+    }
+
+    if (!create())
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "setWidget create failed");
+    else if (w)
+        w->setAttribute(Qt::WA_PaintOnScreen);
+}
+#else
+bool MythRenderOpenGL::IsDirectRendering() const
+{
+    return format().directRendering();
+}
+
+void MythRenderOpenGL::setWidget(QGLWidget *w)
+{
+    setDevice(w);
+    w->setContext(this);
+}
+#endif
+
 void MythRenderOpenGL::makeCurrent()
 {
     m_lock.lock();
+#ifdef USE_OPENGL_QT5
+    // Testing MythRenderOpenGL::currentContext is not reliable
+    if (m_lock_level == 0)
+        QOpenGLContext::makeCurrent(m_window);
+#else
     if (this != MythRenderOpenGL::currentContext())
         QGLContext::makeCurrent();
+#endif
     m_lock_level++;
 }
 
@@ -222,7 +317,11 @@ void MythRenderOpenGL::Release(void)
 
 void MythRenderOpenGL::MoveResizeWindow(const QRect &rect)
 {
-    QWidget *parent = (QWidget*)this->device();
+#ifdef USE_OPENGL_QT5
+    QWindow *parent = m_window;
+#else
+    QWidget *parent = dynamic_cast<QWidget* >(this->device());
+#endif
     if (parent)
         parent->setGeometry(rect);
 }
@@ -995,7 +1094,7 @@ bool MythRenderOpenGL::InitFeatures(void)
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Max texture units: %1")
                 .arg(m_max_units));
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Direct rendering: %1")
-                .arg((this->format().directRendering()) ? "Yes" : "No"));
+                .arg(IsDirectRendering() ? "Yes" : "No"));
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Extensions Supported: %1")
                 .arg(m_exts_supported, 0, 16));
     }

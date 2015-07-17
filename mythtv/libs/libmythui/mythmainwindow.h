@@ -137,6 +137,8 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     void EnterStandby(bool manual = true);
     void ExitStandby(bool manual = true);
 
+    virtual QPaintEngine *paintEngine() const;
+
   public slots:
     void mouseTimeout();
     void HideMouseTimeout();

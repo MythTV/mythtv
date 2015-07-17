@@ -1,6 +1,9 @@
 // Config header generated in base directory by configure
 #include "config.h"
 
+// Own header
+#include "mythpainter_ogl.h"
+
 // QT headers
 #include <QCoreApplication>
 #include <QPainter>
@@ -12,13 +15,10 @@
 // Mythui headers
 #include "mythrender_opengl.h"
 
-// Own header
-#include "mythpainter_ogl.h"
-
 using namespace std;
 
 MythOpenGLPainter::MythOpenGLPainter(MythRenderOpenGL *render,
-                                     QGLWidget *parent) :
+                                     QWidget *parent) :
     MythPainter(), realParent(parent), realRender(render),
     target(0), swapControl(true)
 {
@@ -26,7 +26,7 @@ MythOpenGLPainter::MythOpenGLPainter(MythRenderOpenGL *render,
         LOG(VB_GENERAL, LOG_INFO,
             "OpenGL painter using existing OpenGL context.");
     if (realParent)
-        LOG(VB_GENERAL, LOG_INFO, "OpenGL painter using existing QGLWidget.");
+        LOG(VB_GENERAL, LOG_INFO, "OpenGL painter using existing QWidget.");
 }
 
 MythOpenGLPainter::~MythOpenGLPainter()
@@ -76,19 +76,20 @@ void MythOpenGLPainter::Begin(QPaintDevice *parent)
 {
     MythPainter::Begin(parent);
 
-    if (!realParent && parent)
-        realParent = dynamic_cast<QGLWidget *>(parent);
-
-    if (!realParent)
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            "FATAL ERROR: Failed to cast parent to QGLWidget");
-        return;
-    }
-
     if (!realRender)
     {
-        realRender = (MythRenderOpenGL*)(realParent->context());
+        QGLWidget *glw = dynamic_cast<QGLWidget *>(realParent);
+        if (!glw)
+            glw = dynamic_cast<QGLWidget *>(parent);
+
+        if (!glw)
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                "FATAL ERROR: Failed to cast parent to QGLWidget");
+            return;
+        }
+
+        realRender = (MythRenderOpenGL*)(glw->context());
         if (!realRender)
         {
             LOG(VB_GENERAL, LOG_ERR,

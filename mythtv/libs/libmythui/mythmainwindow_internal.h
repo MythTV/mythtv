@@ -13,13 +13,28 @@ class MythMainWindowPrivate;
 #ifdef USE_OPENGL_PAINTER
 #include "mythrender_opengl.h"
 
-class MythPainterWindowGL : public QGLWidget
+#ifdef USE_OPENGL_QT5
+#include <QWidget>
+typedef QWidget MythPainterWindowWidget;
+#else
+#include <QGLWidget>
+typedef QGLWidget MythPainterWindowWidget;
+#endif
+#ifdef USING_MINGW
+#include <QGLWidget>
+#endif
+
+class MythPainterWindowGL : public MythPainterWindowWidget
 {
     Q_OBJECT
 
   public:
     MythPainterWindowGL(MythMainWindow *win, MythMainWindowPrivate *priv,
                         MythRenderOpenGL *rend);
+#ifdef USE_OPENGL_QT5
+    ~MythPainterWindowGL();
+    QPaintEngine *paintEngine() const;
+#endif
 
     void paintEvent(QPaintEvent *e);
 

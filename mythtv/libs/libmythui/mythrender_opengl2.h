@@ -23,9 +23,9 @@ class GLMatrix;
 class MUI_PUBLIC MythRenderOpenGL2 : public MythRenderOpenGL
 {
   public:
-    MythRenderOpenGL2(const QGLFormat& format, QPaintDevice* device,
+    MythRenderOpenGL2(const MythRenderFormat& format, QPaintDevice* device,
                       RenderType type = kRenderOpenGL2);
-    MythRenderOpenGL2(const QGLFormat& format, RenderType type = kRenderOpenGL2);
+    MythRenderOpenGL2(const MythRenderFormat& format, RenderType type = kRenderOpenGL2);
 
     virtual uint CreateShaderObject(const QString &vert, const QString &frag);
     virtual void DeleteShaderObject(uint obj);

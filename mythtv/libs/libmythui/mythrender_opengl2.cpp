@@ -1,3 +1,4 @@
+#include <QPainter>
 #include "math.h"
 #include "mythrender_opengl2.h"
 
@@ -197,7 +198,7 @@ class MythGLShaderObject
     GLuint m_fragment_shader;
 };
 
-MythRenderOpenGL2::MythRenderOpenGL2(const QGLFormat& format,
+MythRenderOpenGL2::MythRenderOpenGL2(const MythRenderFormat& format,
                                      QPaintDevice* device,
                                      RenderType type)
   : MythRenderOpenGL(format, device, type)
@@ -206,7 +207,7 @@ MythRenderOpenGL2::MythRenderOpenGL2(const QGLFormat& format,
     ResetProcs();
 }
 
-MythRenderOpenGL2::MythRenderOpenGL2(const QGLFormat& format, RenderType type)
+MythRenderOpenGL2::MythRenderOpenGL2(const MythRenderFormat& format, RenderType type)
   : MythRenderOpenGL(format, type)
 {
     ResetVars();

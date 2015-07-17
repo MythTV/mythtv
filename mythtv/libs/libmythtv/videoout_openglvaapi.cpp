@@ -1,4 +1,6 @@
 #include "videoout_openglvaapi.h"
+#include "mythrender_opengl.h"
+#include "openglvideo.h"
 #include "vaapicontext.h"
 #include "mythpainter.h"
 

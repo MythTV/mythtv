@@ -1,12 +1,15 @@
+#include "videoout_opengl.h"
 #include "mythcontext.h"
 #include "mythmainwindow.h"
 #include "mythplayer.h"
 #include "videooutbase.h"
-#include "videoout_opengl.h"
 #include "videodisplayprofile.h"
 #include "filtermanager.h"
 #include "osd.h"
 #include "mythuihelper.h"
+#include "openglvideo.h"
+#include "mythrender_opengl.h"
+#include "mythpainter_ogl.h"
 
 #define LOC      QString("VidOutGL: ")
 
@@ -311,10 +314,10 @@ bool VideoOutputOpenGL::SetupContext(void)
         return true;
     }
 
-    QGLWidget *device = (QGLWidget*)QWidget::find(gl_parent_win);
+    QWidget *device = QWidget::find(gl_parent_win);
     if (!device)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to cast parent to QGLWidget");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to find parent to windowID");
         return false;
     }
 
@@ -389,7 +392,7 @@ void VideoOutputOpenGL::CreatePainter(void)
     MythMainWindow *win = MythMainWindow::getMainWindow();
     if (gl_context && !gl_context->IsShared())
     {
-        QGLWidget *device = (QGLWidget*)QWidget::find(gl_parent_win);
+        QWidget *device = QWidget::find(gl_parent_win);
         gl_painter = new MythOpenGLPainter(gl_context, device);
         if (!gl_painter)
         {
@@ -657,7 +660,7 @@ void VideoOutputOpenGL::Show(FrameScanType scan)
         return;
     }
 
-    if (gl_context && gl_context->format().doubleBuffer())
+    if (gl_context)
         gl_context->swapBuffers();
 }
 
@@ -974,4 +977,23 @@ QStringList VideoOutputOpenGL::GetVisualiserList(void)
     if (gl_context)
         return VideoVisual::GetVisualiserList(gl_context->Type());
     return VideoOutput::GetVisualiserList();
+}
+
+//virtual
+MythPainter *VideoOutputOpenGL::GetOSDPainter(void)
+{
+    return gl_painter;
+}
+
+// virtual
+bool VideoOutputOpenGL::CanVisualise(AudioPlayer *audio, MythRender *render)
+{
+    return VideoOutput::CanVisualise(audio, gl_context);
+}
+
+// virtual
+bool VideoOutputOpenGL::SetupVisualisation(AudioPlayer *audio,
+                                MythRender *render, const QString &name)
+{
+    return VideoOutput::SetupVisualisation(audio, gl_context, name);
 }

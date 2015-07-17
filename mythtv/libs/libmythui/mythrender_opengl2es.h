@@ -6,12 +6,12 @@
 class MUI_PUBLIC MythRenderOpenGL2ES : public MythRenderOpenGL2
 {
   public:
-    MythRenderOpenGL2ES(const QGLFormat& format, QPaintDevice* device)
+    MythRenderOpenGL2ES(const MythRenderFormat& format, QPaintDevice* device)
         : MythRenderOpenGL2(format, device, kRenderOpenGL2ES)
     {
     }
 
-    explicit MythRenderOpenGL2ES(const QGLFormat& format)
+    explicit MythRenderOpenGL2ES(const MythRenderFormat& format)
         : MythRenderOpenGL2(format, kRenderOpenGL2ES)
     {
     }
@@ -123,7 +123,7 @@ class MUI_PUBLIC MythRenderOpenGL2ES : public MythRenderOpenGL2
             LOG(VB_GENERAL, LOG_INFO, LOC + QString("Max texture size: %1 x %2")
                     .arg(m_max_tex_size).arg(m_max_tex_size));
             LOG(VB_GENERAL, LOG_INFO, LOC + QString("Direct rendering: %1")
-                    .arg((this->format().directRendering()) ? "Yes" : "No"));
+                    .arg(IsDirectRendering() ? "Yes" : "No"));
             LOG(VB_GENERAL, LOG_INFO, LOC + QString("Extensions Supported: %1")
                     .arg(m_exts_supported, 0, 16));
         }

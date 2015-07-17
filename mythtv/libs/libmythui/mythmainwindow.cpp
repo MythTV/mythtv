@@ -11,7 +11,7 @@ using namespace std;
 
 // QT headers
 #ifdef USE_OPENGL_PAINTER
-#include <QGLWidget>
+#include <QGLFormat>
 #endif
 
 #include <QWaitCondition>
@@ -197,7 +197,8 @@ class MythMainWindowPrivate
         standby(false),
         enteringStandby(false),
         NC(NULL),
-        firstinit(true)
+        firstinit(true),
+        m_bSavedPOS(false)
     {
     }
 
@@ -295,6 +296,7 @@ class MythMainWindowPrivate
     MythNotificationCenter *NC;
         // window aspect
     bool firstinit;
+    bool m_bSavedPOS;
 };
 
 // Make keynum in QKeyEvent be equivalent to what's in QKeySequence
@@ -394,11 +396,32 @@ MythNotificationCenter *GetNotificationCenter(void)
 MythPainterWindowGL::MythPainterWindowGL(MythMainWindow *win,
                                          MythMainWindowPrivate *priv,
                                          MythRenderOpenGL *rend)
-                   : QGLWidget(rend, win),
-                     parent(win), d(priv), render(rend)
+            : MythPainterWindowWidget(win), parent(win), d(priv), render(rend)
 {
+    rend->setWidget(this);
+#ifdef USE_OPENGL_QT5
+    winId();
+    setAttribute(Qt::WA_NoSystemBackground);
+#else
     setAutoBufferSwap(false);
+#endif
 }
+
+#ifdef USE_OPENGL_QT5
+QPaintEngine *MythPainterWindowGL::paintEngine() const
+{
+    return parent->paintEngine();
+}
+
+MythPainterWindowGL::~MythPainterWindowGL()
+{
+    if (render)
+    {
+        render->DecrRef();
+        render = NULL;
+    }
+}
+#endif
 
 void MythPainterWindowGL::paintEvent(QPaintEvent *pe)
 {
@@ -846,6 +869,16 @@ void MythMainWindow::draw(void)
     d->painter->End();
 }
 
+// virtual
+QPaintEngine *MythMainWindow::paintEngine() const
+{
+#ifdef USE_OPENGL_QT5
+    return testAttribute(Qt::WA_PaintOnScreen) ? 0 : QWidget::paintEngine();
+#else
+    return QWidget::paintEngine();
+#endif
+}
+
 void MythMainWindow::closeEvent(QCloseEvent *e)
 {
     if (e->spontaneous())
@@ -1084,40 +1117,54 @@ void MythMainWindow::Init(QString forcedpainter)
     }
 #endif
 #ifdef USE_OPENGL_PAINTER
-    if ((painter == AUTO_PAINTER && (!d->painter && !d->paintwin)) ||
+    if (!QGLFormat::hasOpenGL())
+    {
+        if (painter.contains(OPENGL_PAINTER))
+            LOG(VB_GENERAL, LOG_WARNING,
+                "OpenGL not available. Falling back to Qt painter.");
+    }
+    else
+# if !defined USE_OPENGL_QT5 && QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+    // On an EGLFS platform can't mix QWidget based MythMainWindow with a
+    // QGLWidget based paintwin - MythPainterWindowGL ctor aborts:
+    //   EGLFS: OpenGL windows cannot be mixed with others.
+    if (qApp->platformName().contains("egl"))
+    {
+        if (painter.contains(OPENGL_PAINTER))
+            LOG(VB_GENERAL, LOG_WARNING,
+                "OpenGL is incompatible with the EGLFS platform. "
+                "Falling back to Qt painter.");
+    }
+    else
+# endif
+    if (
+#ifdef USE_OPENGL_QT5
+        // The Qt5 OpenGL painter doesn't render all screens correctly (yet)
+        // so only use OpenGL if explicitly requested
+#else
+        (painter == AUTO_PAINTER && (!d->painter && !d->paintwin)) ||
+#endif
         painter.contains(OPENGL_PAINTER))
     {
-        d->render = MythRenderOpenGL::Create(painter);
-        if (d->render)
+        MythRenderOpenGL *gl = MythRenderOpenGL::Create(painter);
+        d->render = gl;
+        if (!gl)
         {
-            d->painter = new MythOpenGLPainter();
-            MythRenderOpenGL *gl = dynamic_cast<MythRenderOpenGL*>(d->render);
+            LOG(VB_GENERAL, LOG_ERR, "Failed to create OpenGL render.");
+        }
+        else if (painter == AUTO_PAINTER && !gl->IsRecommendedRenderer())
+        {
+            LOG(VB_GENERAL, LOG_WARNING,
+                "OpenGL painter not recommended with this system's "
+                "hardware/drivers. Falling back to Qt painter.");
+            d->render->DecrRef(), d->render = NULL;
+        }
+        else
+        {
+            d->painter = new MythOpenGLPainter(gl);
+            // NB MythPainterWindowGL takes ownership of gl
             d->paintwin = new MythPainterWindowGL(this, d, gl);
-            QGLWidget *qgl = static_cast<QGLWidget*>(d->paintwin);
-            bool teardown = false;
-            if (!qgl->isValid())
-            {
-                LOG(VB_GENERAL, LOG_ERR, "Failed to create OpenGL painter. "
-                                         "Check your OpenGL installation.");
-                teardown = true;
-            }
-            else if (painter == AUTO_PAINTER && gl && !gl->IsRecommendedRenderer())
-            {
-                LOG(VB_GENERAL, LOG_WARNING,
-                    "OpenGL painter not recommended with this system's "
-                    "hardware/drivers. Falling back to Qt painter.");
-                teardown = true;
-            }
-            if (teardown)
-            {
-                delete d->painter;
-                d->painter = NULL;
-                delete d->paintwin;
-                d->paintwin = NULL;
-                d->render = NULL; // deleted by the painterwindow
-            }
-            else
-                gl->Init();
+            gl->Init();
         }
     }
 #endif
@@ -1407,6 +1454,14 @@ void MythMainWindow::attach(QWidget *child)
             }
         }
     }
+#ifdef USE_OPENGL_QT5
+    else
+    {
+        // Save & disable WA_PaintOnScreen, used by OpenGL GUI painter
+        if ((d->m_bSavedPOS = testAttribute(Qt::WA_PaintOnScreen)))
+            setAttribute(Qt::WA_PaintOnScreen, false);
+    }
+#endif
 
     d->widgetList.push_back(child);
     child->winId();
@@ -1434,6 +1489,12 @@ void MythMainWindow::detach(QWidget *child)
         current = this;
         // We're be to the main window, enable it just in case
         setEnabled(true);
+#ifdef USE_OPENGL_QT5
+        // Restore WA_PaintOnScreen, used by OpenGL GUI painter
+        setAttribute(Qt::WA_PaintOnScreen, d->m_bSavedPOS);
+        // Need to repaint the UI or it remains black
+        QTimer::singleShot(2, d->paintwin, SLOT(update()));
+#endif
     }
     else
     {

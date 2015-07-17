@@ -3,8 +3,13 @@
 
 #include <stdint.h>
 
-#include <QPainter>
+#include <QtGlobal>
+#if defined USING_OPENGLES && QT_VERSION >= QT_VERSION_CHECK(5, 4, 0)
+#define USE_OPENGL_QT5
+#include <QOpenGLContext>
+#else
 #include <QGLContext>
+#endif
 #include <QHash>
 #include <QMutex>
 
@@ -100,19 +105,40 @@ class MUI_PUBLIC OpenGLLocker
     MythRenderOpenGL *m_render;
 };
 
-class MUI_PUBLIC MythRenderOpenGL : public QGLContext, public MythRender
+#ifdef USE_OPENGL_QT5
+typedef class QSurfaceFormat MythRenderFormat;
+typedef class QOpenGLContext MythRenderContext;
+class QWindow;
+#else
+typedef class QGLFormat MythRenderFormat;
+typedef class QGLContext MythRenderContext;
+#endif
+
+class QPaintDevice;
+
+class MUI_PUBLIC MythRenderOpenGL : protected MythRenderContext, public MythRender
 {
   public:
     static MythRenderOpenGL* Create(const QString &painter,
                                     QPaintDevice* device = NULL);
 
-    MythRenderOpenGL(const QGLFormat& format, QPaintDevice* device,
+    MythRenderOpenGL(const MythRenderFormat &format, QPaintDevice* device,
                      RenderType type = kRenderUnknown);
-    MythRenderOpenGL(const QGLFormat& format, RenderType type = kRenderUnknown);
+    MythRenderOpenGL(const MythRenderFormat &format, RenderType type = kRenderUnknown);
 
     virtual void makeCurrent();
     virtual void doneCurrent();
     virtual void Release(void);
+
+    using MythRenderContext::create;
+#ifdef USE_OPENGL_QT5
+    void swapBuffers();
+    void setWidget(QWidget *w);
+#else
+    using MythRenderContext::swapBuffers;
+    void setWidget(QGLWidget *w);
+#endif
+    bool IsDirectRendering() const;
 
     void  Init(void);
 
@@ -273,6 +299,11 @@ class MUI_PUBLIC MythRenderOpenGL : public QGLContext, public MythRender
     MYTH_GLDELETEFENCESAPPLEPROC         m_glDeleteFencesAPPLE;
     MYTH_GLSETFENCEAPPLEPROC             m_glSetFenceAPPLE;
     MYTH_GLFINISHFENCEAPPLEPROC          m_glFinishFenceAPPLE;
+
+#ifdef USE_OPENGL_QT5
+  private:
+    QWindow *m_window;
+#endif
 };
 
 #endif

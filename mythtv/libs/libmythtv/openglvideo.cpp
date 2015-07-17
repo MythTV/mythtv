@@ -1,7 +1,7 @@
 // MythTV headers
+#include "openglvideo.h"
 #include "mythcontext.h"
 #include "tv.h"
-#include "openglvideo.h"
 #include "mythrender_opengl.h"
 #include "mythavutil.h"
 
