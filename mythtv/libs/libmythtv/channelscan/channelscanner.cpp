@@ -49,6 +49,9 @@ using namespace std;
 
 ChannelScanner::ChannelScanner() :
     scanMonitor(NULL), channel(NULL), sigmonScanner(NULL), iptvScanner(NULL),
+#ifdef USING_VBOX
+    vboxScanner(NULL),
+#endif
     freeToAirOnly(false), serviceRequirements(kRequireAV)
 {
 }
@@ -84,6 +87,15 @@ void ChannelScanner::Teardown(void)
         delete iptvScanner;
         iptvScanner = NULL;
     }
+
+#ifdef USING_VBOX
+    if (vboxScanner)
+    {
+        vboxScanner->Stop();
+        delete vboxScanner;
+        vboxScanner = NULL;
+    }
+#endif
 
     if (scanMonitor)
     {

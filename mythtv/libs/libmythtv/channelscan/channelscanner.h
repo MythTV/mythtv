@@ -119,7 +119,6 @@ class MTV_PUBLIC ChannelScanner
     // vbox support
 #ifdef USING_VBOX
     VBoxChannelFetcher *vboxScanner;
-    vbox_chan_map_t     vbox_channels;
 #endif
 
     /// Only fta channels desired post scan?
