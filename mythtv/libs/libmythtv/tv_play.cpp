@@ -5090,8 +5090,6 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
                     StopFFRew(ctx);
                     ctx->ts_normal = 1.0f;
                     ChangeTimeStretch(ctx, 0, false);
-
-                    ReturnPlayerLock(ctx);
                     return;
                 }
 
