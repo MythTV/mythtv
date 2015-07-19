@@ -135,6 +135,8 @@ bool ZMClient::connectToHost(const QString &lhostname, unsigned int lport)
 
 bool ZMClient::sendReceiveStringList(QStringList &strList)
 {
+    QMutexLocker locker(&m_socketLock);
+
     QStringList origStrList = strList;
 
     bool ok = false;
