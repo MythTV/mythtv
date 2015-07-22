@@ -6895,6 +6895,7 @@ check_optflags -fno-signed-zeros
 enabled ftrapv && check_cflags -ftrapv
 
 if enabled dvb; then
+    [ -d "$dvb_path" ] || dvb_path="${sysroot}/usr/include"
     if test -f "$dvb_path"/linux/dvb/frontend.h ; then
         if test -f "$dvb_path"/../MAINTAINERS ; then
             echo "Warning: DVB location in kernel. May not compile."
@@ -6903,6 +6904,8 @@ if enabled dvb; then
         KERNEL_RELEASE=`uname -r 2>/dev/null`
         if test x"$KERNEL_RELEASE" != x"" ; then
             dvb_path="${sysroot}/usr/src/linux-$KERNEL_RELEASE/include"
+            [ -d "$dvb_path" ] ||\
+                dvb_path="${sysroot}/usr/src/linux-headers-$KERNEL_RELEASE/include/uapi"
         else
             dvb_path="${sysroot}/usr/src/linux/include"
         fi
