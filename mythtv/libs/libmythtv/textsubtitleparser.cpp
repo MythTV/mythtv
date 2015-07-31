@@ -17,6 +17,7 @@ using std::lower_bound;
 #include <QRunnable>
 #include <QTextCodec>
 #include <QFile>
+#include <QDataStream>
 
 // MythTV
 #include "mythcorecontext.h"
