@@ -171,7 +171,7 @@ class Videos(object):
 
         # Read region code from user preferences, used by tree view
         region = self.userPrefs.find("region")
-        if region != None:
+        if region != None and region.text:
             self.config['region'] = region.text
         else:
             self.config['region'] = u'us'
