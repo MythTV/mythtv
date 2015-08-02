@@ -213,11 +213,12 @@ void MythRenderOpenGL1::EnableShaderObject(uint obj)
     doneCurrent();
 }
 
-void MythRenderOpenGL1::SetShaderParams(uint obj, void* vals,
+void MythRenderOpenGL1::SetShaderParams(uint obj, const QMatrix4x4 &m,
                                         const char* uniform)
 {
+    GLMatrix4x4 v(m);
+
     makeCurrent();
-    const float *v = (float*)vals;
 
     EnableShaderObject(obj);
     m_glProgramLocalParameter4fARB(GL_FRAGMENT_PROGRAM_ARB,

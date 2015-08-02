@@ -12,6 +12,7 @@
 #endif
 #include <QHash>
 #include <QMutex>
+#include <QMatrix4x4>
 
 #define GL_GLEXT_PROTOTYPES
 
@@ -184,7 +185,7 @@ class MUI_PUBLIC MythRenderOpenGL : protected MythRenderContext, public MythRend
     virtual uint CreateShaderObject(const QString &vert, const QString &frag) = 0;
     virtual void DeleteShaderObject(uint obj) = 0;
     virtual void EnableShaderObject(uint obj) = 0;
-    virtual void SetShaderParams(uint prog, void* vals, const char* uniform) = 0;
+    virtual void SetShaderParams(uint prog, const QMatrix4x4 &m, const char* uniform) = 0;
 
     void DrawBitmap(uint tex, uint target, const QRect *src,
                     const QRect *dst, uint prog, int alpha = 255,
@@ -304,6 +305,39 @@ class MUI_PUBLIC MythRenderOpenGL : protected MythRenderContext, public MythRend
   private:
     QWindow *m_window;
 #endif
+};
+
+class GLMatrix4x4
+{
+  public:
+    GLMatrix4x4(const QMatrix4x4 &m)
+    {
+        // Convert from Qt's row-major to GL's column-major order
+        for (int c = 0, i = 0; c < 4; ++c)
+            for (int r = 0; r < 4; ++r)
+                m_v[i++] = m(r, c);
+    }
+
+    GLMatrix4x4(const GLfloat v[16])
+    {
+        for (int i = 0; i < 16; ++i)
+            m_v[i] = v[i];
+    }
+
+    operator const GLfloat*() const { return m_v; }
+
+    operator QMatrix4x4() const
+    {
+        // Convert from GL's column-major order to Qt's row-major
+        QMatrix4x4 m;
+        for (int c = 0, i = 0; c < 4; ++c)
+            for (int r = 0; r < 4; ++r)
+                m(r, c) = m_v[i++];
+        return m;
+    }
+
+  private:
+    GLfloat m_v[4*4];
 };
 
 #endif

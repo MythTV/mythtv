@@ -15,7 +15,7 @@ class MUI_PUBLIC MythRenderOpenGL1 : public MythRenderOpenGL
     virtual uint CreateShaderObject(const QString &vert, const QString &frag);
     virtual void DeleteShaderObject(uint obj);
     virtual void EnableShaderObject(uint obj);
-    virtual void SetShaderParams(uint obj, void* vals, const char* uniform);
+    virtual void SetShaderParams(uint obj, const QMatrix4x4 &m, const char* uniform);
 
     virtual uint CreateHelperTexture(void);
 

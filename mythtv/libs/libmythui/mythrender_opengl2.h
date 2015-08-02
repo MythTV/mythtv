@@ -2,6 +2,8 @@
 #define MYTHRENDEROPENGL2_H
 
 #include <QStack>
+#include <QHash>
+#include <QMatrix4x4>
 
 #include "mythrender_opengl.h"
 #include "mythrender_opengl_defs2.h"
@@ -18,7 +20,6 @@ typedef enum
 } DefaultShaders;
 
 class MythGLShaderObject;
-class GLMatrix;
 
 class MUI_PUBLIC MythRenderOpenGL2 : public MythRenderOpenGL
 {
@@ -30,7 +31,7 @@ class MUI_PUBLIC MythRenderOpenGL2 : public MythRenderOpenGL
     virtual uint CreateShaderObject(const QString &vert, const QString &frag);
     virtual void DeleteShaderObject(uint obj);
     virtual void EnableShaderObject(uint obj);
-    virtual void SetShaderParams(uint obj, void* vals, const char* uniform);
+    virtual void SetShaderParams(uint obj, const QMatrix4x4 &m, const char* uniform);
 
     virtual bool RectanglesAreAccelerated(void) { return true; }
 
@@ -73,11 +74,14 @@ class MUI_PUBLIC MythRenderOpenGL2 : public MythRenderOpenGL
 
     // State
     uint  m_active_obj;
-    float m_projection[4][4];
-    QStack<GLMatrix> m_transforms;
-    float m_parameters[4][4];
+    QMatrix4x4 m_projection;
+    QStack<QMatrix4x4> m_transforms;
+    QMatrix4x4 m_parameters;
     QString m_qualifiers;
     QString m_GLSLVersion;
+
+    typedef QHash<QString,QMatrix4x4> map_t;
+    map_t m_map;
 
     // Procs
     MYTH_GLGETSHADERIVPROC               m_glGetShaderiv;
