@@ -1,9 +1,9 @@
 
 We are using the following jQuery components from the following locations:
 
-1. jQuery 2.0.3 - http://jquery.com/download/
+1. jQuery 2.1.4 - http://jquery.com/download/
 
-    js/jquery-2.0.3.js
+    js/jquery-2.1.4.min.js
 
 2. jQuery-UI 1.10.3 - http://jqueryui.com/ (No Themes)
 

@@ -9,7 +9,7 @@ import "/video/js/gallery.qjs"
 <title><%=qsTr("Video Gallery")%></title>
 <link rel="stylesheet" type="text/css" href="/css/site.css">
 <link rel="stylesheet" type="text/css" href="/video/css/gallery.css">
-<script type="text/javascript" src="/3rdParty/jquery/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="/3rdParty/jquery/jquery-2.1.4.min.js"></script>
 <script type="text/javascript" src="/video/js/gallery.js"></script>
 </head>
 <body>
