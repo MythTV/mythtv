@@ -73,6 +73,11 @@ void MythUtilCommandLineParser::LoadArguments(void)
                 "Clear the seek table.", "")
                 ->SetGroup("Recording Markup")
                 ->SetParentOf(ChanidStartimeVideo)
+        << add("--clearbookmarks", "clearbookmarks", false,
+                "Clear all bookmarks.", "This command will reset the playback "
+                "start to the very beginning of the recording file.")
+                ->SetGroup("Recording Markup")
+                ->SetParentOf(ChanidStartimeVideo)
         << add("--getmarkup", "getmarkup", "",
                "Write markup data to the specified local file.", "")
                 ->SetGroup("Recording Markup")
