@@ -76,9 +76,9 @@ QString CardUtil::GetScanableInputTypes(void)
 #endif // USING_IPTV
 
 #ifdef USING_VBOX
-    if (!cardTypes.isEmpty())
-        cardTypes += ",";
-    cardTypes += "'VBOX'";
+    if (!inputTypes.isEmpty())
+        inputTypes += ",";
+    inputTypes += "'VBOX'";
 #endif // USING_VBOX
 
 #ifdef USING_HDHOMERUN
