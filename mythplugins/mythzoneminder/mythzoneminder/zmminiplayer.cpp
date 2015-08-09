@@ -90,7 +90,7 @@ void ZMMiniPlayer::customEvent (QEvent* event)
 
                 m_frameTimer->stop();
 
-                Monitor *mon = ZMClient::get()->getMonitorAt(monID);
+                Monitor *mon = ZMClient::get()->getMonitorByID(monID);
 
                 if (mon)
                 {
