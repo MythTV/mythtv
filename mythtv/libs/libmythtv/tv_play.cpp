@@ -9745,7 +9745,7 @@ void TV::customEvent(QEvent *e)
 
         PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
         OSD *osd = GetOSDLock(mctx);
-        if (osd && !osd->IsWindowVisible(OSD_WIN_INTERACT))
+        if (osd)
         {
             for (uint i = 0; mctx && (i < player.size()); i++)
             {
