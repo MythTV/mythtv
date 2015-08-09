@@ -44,6 +44,7 @@ class VBox
     QString m_url;
 
   private:
+    static QStringList doUPNPSearch(void);
     QString getFirstText(QDomElement &element);
     QString getStrValue(QDomElement &element, const QString &name, int index = 0);
     int getIntValue(QDomElement &element, const QString &name, int index = 0);

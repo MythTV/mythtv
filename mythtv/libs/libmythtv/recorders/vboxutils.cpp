@@ -36,8 +36,14 @@ VBox::~VBox(void)
 QStringList VBox::probeDevices(void)
 {
     const int milliSeconds = SEARCH_TIME;
-    QStringList result;
 
+    // see if we have already found one or more vboxes
+    QStringList result = VBox::doUPNPSearch();
+
+    if (result.count())
+        return result;
+
+    // non found so start a new search
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Using UPNP to search for Vboxes (%1 secs)")
         .arg(milliSeconds / 1000));
 
@@ -59,6 +65,13 @@ QStringList VBox::probeDevices(void)
             searchTime.start();
         }
     }
+
+    return VBox::doUPNPSearch();
+}
+
+QStringList VBox::doUPNPSearch(void)
+{
+    QStringList result;
 
     SSDPCacheEntries *vboxes = SSDP::Instance()->Find(VBOX_URI);
 
