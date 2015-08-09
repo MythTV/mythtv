@@ -42,6 +42,7 @@
 #include "profilegroup.h"
 #include "signalhandling.h"
 #include "mythmiscutil.h"
+#include "ssdp.h"
 
 using namespace std;
 
@@ -336,6 +337,11 @@ int main(int argc, char *argv[])
            scanServiceRequirements = kRequireNothing;
     }
 
+    if (!cmdline.toBool("noupnp"))
+    {
+        // start looking for any uPnP devices we can use like VBoxes
+        SSDP::Instance()->PerformSearch("ssdp:all");
+    }
     if (cmdline.toBool("scan"))
     {
         scanCardId = cmdline.toUInt("scan");
