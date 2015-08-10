@@ -138,6 +138,15 @@ void VideoOutputOpenGL::DestroyGPUResources(void)
     if (gl_context)
         gl_context->makeCurrent();
 
+#ifdef USE_OPENGL_QT5
+    if (gl_created_painter)
+    {
+        QWidget *device = QWidget::find(gl_parent_win);
+        if (device)
+            device->setAttribute(Qt::WA_PaintOnScreen, false);
+    }
+#endif
+
     if (gl_created_painter)
         delete gl_painter;
     else if (gl_painter)
@@ -148,6 +157,7 @@ void VideoOutputOpenGL::DestroyGPUResources(void)
 
     if (gl_context)
         gl_context->doneCurrent();
+
     gl_context_lock.unlock();
 }
 
@@ -400,6 +410,10 @@ void VideoOutputOpenGL::CreatePainter(void)
             return;
         }
         gl_created_painter = true;
+#ifdef USE_OPENGL_QT5
+        if (device)
+            device->setAttribute(Qt::WA_PaintOnScreen);
+#endif
     }
     else
     {
@@ -565,18 +579,22 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
 
     // main UI when embedded
     MythMainWindow *mwnd = GetMythMainWindow();
-    if (gl_context->IsShared() && mwnd && mwnd->GetPaintWindow() &&
-        window.IsEmbedding())
+    if (mwnd && mwnd->GetPaintWindow() && window.IsEmbedding())
     {
         if (twopass)
             gl_context->SetViewPort(first, true);
-        mwnd->GetPaintWindow()->setMask(QRegion());
-        mwnd->draw();
+        mwnd->GetPaintWindow()->clearMask();
+        // Must force a UI redraw when embedded.  If not, when the EPG or
+        // finder screen is popped up over the video and the user then clicks
+        // away from Myth, the UI is left blank.
+        mwnd->GetMainStack()->GetTopScreen()->SetRedraw();
+        mwnd->draw(gl_painter);
         if (twopass)
         {
             gl_context->SetViewPort(second, true);
-            mwnd->GetPaintWindow()->setMask(QRegion());
-            mwnd->draw();
+            mwnd->GetPaintWindow()->clearMask();
+            mwnd->GetMainStack()->GetTopScreen()->SetRedraw();
+            mwnd->draw(gl_painter);
             gl_context->SetViewPort(main, true);
         }
     }
