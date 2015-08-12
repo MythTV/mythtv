@@ -1001,6 +1001,12 @@ void MythUIWebBrowser::Init(void)
                                                      false);
     }
 
+    if (!gCoreContext->GetNumSetting("WebBrowserEnableJavascript",1))
+    {
+        LOG(VB_GENERAL, LOG_INFO, "MythUIWebBrowser: disabling JavaScript");
+        QWebSettings::globalSettings()->setAttribute(QWebSettings::JavascriptEnabled, false);
+    }
+
     QImage image = QImage(m_actualBrowserArea.size(), QImage::Format_ARGB32);
     m_image = GetPainter()->GetFormatImage();
     m_image->Assign(image);
