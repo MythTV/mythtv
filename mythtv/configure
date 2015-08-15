@@ -133,6 +133,7 @@ Advanced options (experts only):
   --disable-vdpau          disable NVidia VDPAU hardware acceleration.
   --disable-crystalhd      disable Broadcom CrystalHD hardware decoder support
   --disable-vaapi          disable VAAPI hardware accelerated video decoding
+  --disable-openmax        disable OpenMAX hardware accelerated video decoding
   --disable-dxva2          disable hardware accelerated decoding on windows
   --disable-opengl-video   disable OpenGL based video display
   --disable-libass         disable libass SSA/ASS subtitle support
@@ -1719,6 +1720,7 @@ HWACCEL_LIST="
     vdpau
     videotoolbox
     xvmc
+    openmax
 "
 
 LIBRARY_LIST="
@@ -2307,6 +2309,7 @@ USING_LIST='
     opengles
     vaapi
     vdpau
+    openmax
 '
 
 CMDLINE_SELECT="
@@ -6264,6 +6267,12 @@ check_type "va/va.h" "VAPictureParameterBufferHEVC"
 
 check_type "vdpau/vdpau.h" "VdpPictureInfoHEVC"
 
+# check for OpenMAX header & lib
+if ! disabled openmax; then
+    check_header 'IL/OMX_Core.h' && enable openmax
+fi
+disabled openmax || check_lib 'IL/OMX_Core.h' OMX_Init -lopenmaxil || disable openmax
+
 if ! disabled w32threads && ! enabled pthreads; then
     check_func_headers "windows.h process.h" _beginthreadex &&
         enable w32threads || disable w32threads
@@ -7710,6 +7719,7 @@ if enabled x11 ; then
   echo "VDPAU support             ${vdpau-no}"
   echo "VAAPI support             ${vaapi-no}"
   echo "CrystalHD support         ${crystalhd-no}"
+  echo "OpenMAX support           ${openmax-no}"
 fi
   echo "OpenGL video              ${opengl_video-no}"
   if test x"$target_os" = x"darwin" ; then

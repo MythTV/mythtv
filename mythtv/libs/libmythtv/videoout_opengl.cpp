@@ -36,6 +36,8 @@ void VideoOutputOpenGL::GetRenderOptions(render_opts &opts,
         (*opts.safe_renderers)["vda"].append("opengl");
     if (opts.decoders->contains("crystalhd"))
         (*opts.safe_renderers)["crystalhd"].append("opengl");
+    if (opts.decoders->contains("openmax"))
+        (*opts.safe_renderers)["openmax"].append("opengl");
     opts.priorities->insert("opengl", 65);
 
     // lite profile - no colourspace control, GPU deinterlacing
@@ -51,6 +53,8 @@ void VideoOutputOpenGL::GetRenderOptions(render_opts &opts,
         (*opts.safe_renderers)["vda"].append("opengl-lite");
     if (opts.decoders->contains("crystalhd"))
         (*opts.safe_renderers)["crystalhd"].append("opengl-lite");
+    if (opts.decoders->contains("openmax"))
+        (*opts.safe_renderers)["openmax"].append("opengl-lite");
     opts.priorities->insert("opengl", 60);
 }
 

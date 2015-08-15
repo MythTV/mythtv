@@ -4,6 +4,10 @@
 #include "privatedecoder_vda.h"
 #endif
 
+#ifdef USING_OPENMAX
+#include "privatedecoder_omx.h"
+#endif
+
 #ifdef USING_CRYSTALHD
 #include "privatedecoder_crystalhd.h"
 #endif
@@ -12,6 +16,10 @@ void PrivateDecoder::GetDecoders(render_opts &opts)
 {
 #if defined(Q_OS_MACX)
     PrivateDecoderVDA::GetDecoders(opts);
+#endif
+
+#ifdef USING_OPENMAX
+    PrivateDecoderOMX::GetDecoders(opts);
 #endif
 
 #ifdef USING_CRYSTALHD
@@ -28,6 +36,13 @@ PrivateDecoder* PrivateDecoder::Create(const QString &decoder,
     if (vda && vda->Init(decoder, flags, avctx))
         return vda;
     delete vda;
+#endif
+
+#ifdef USING_OPENMAX
+    PrivateDecoderOMX *omx = new PrivateDecoderOMX;
+    if (omx && omx->Init(decoder, flags, avctx))
+        return omx;
+    delete omx;
 #endif
 
 #ifdef USING_CRYSTALHD
