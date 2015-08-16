@@ -328,7 +328,7 @@ void PlaylistEditorView::customEvent(QEvent *event)
                 doUpdatePlaylist();
             }
         }
-        else if (resultid == "playlistmenu")
+        else if (resultid == "treeplaylistmenu")
         {
             if (GetFocusWidget() != m_playlistTree)
                 return;
@@ -705,7 +705,7 @@ MythMenu* PlaylistEditorView::createPlaylistMenu(void)
 
         if (mnode->getAction() == "playlist")
         {
-            menu = new MythMenu(tr("Playlist Actions"), this, "playlistmenu");
+            menu = new MythMenu(tr("Playlist Actions"), this, "treeplaylistmenu");
             menu->AddItem(tr("Replace Tracks"));
             menu->AddItem(tr("Add Tracks"));
             menu->AddItem(tr("Remove Playlist"));
