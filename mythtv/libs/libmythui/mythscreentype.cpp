@@ -434,7 +434,8 @@ void MythScreenType::ShowMenu(void)
 
 bool MythScreenType::keyPressEvent(QKeyEvent *event)
 {
-    if (m_CurrentFocusWidget && m_CurrentFocusWidget->keyPressEvent(event))
+    if (!GetMythMainWindow()->IsExitingToMain() && m_CurrentFocusWidget &&
+        m_CurrentFocusWidget->keyPressEvent(event))
         return true;
 
     bool handled = false;

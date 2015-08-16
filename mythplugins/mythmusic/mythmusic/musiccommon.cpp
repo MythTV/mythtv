@@ -581,6 +581,10 @@ bool MusicCommon::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
 
+    // if there is a pending jump point pass the key press to the default handler
+    if (GetMythMainWindow()->IsExitingToMain())
+        return false;
+
     QStringList actions;
     handled = GetMythMainWindow()->TranslateKeyPress("Music", e, actions, true);
 
@@ -631,7 +635,7 @@ bool MusicCommon::keyPressEvent(QKeyEvent *e)
         if (action == "ESCAPE")
         {
             // if we was started from another music view screen return to it
-            if (m_parentScreen || GetMythMainWindow()->IsExitingToMain())
+            if (m_parentScreen)
             {
                 handled = false;
             }

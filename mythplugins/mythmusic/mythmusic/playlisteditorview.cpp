@@ -368,6 +368,10 @@ void PlaylistEditorView::customEvent(QEvent *event)
 
 bool PlaylistEditorView::keyPressEvent(QKeyEvent *event)
 {
+    // if there is a pending jump point pass the key press to the default handler
+    if (GetMythMainWindow()->IsExitingToMain())
+        return MythScreenType::keyPressEvent(event);
+
     if (!m_moveTrackMode && GetFocusWidget() && GetFocusWidget()->keyPressEvent(event))
         return true;
 
