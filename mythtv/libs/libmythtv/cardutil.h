@@ -22,11 +22,7 @@ class InputInfo;
 class CardInput;
 typedef QMap<int,QString> InputNames;
 
-MTV_PUBLIC QString get_on_cardid(const QString&, uint);
-
-MTV_PUBLIC bool set_on_source(const QString&, uint, uint, const QString&);
-
-MTV_PUBLIC QString get_on_inputid(const QString&, uint);
+MTV_PUBLIC QString get_on_input(const QString&, uint);
 
 MTV_PUBLIC bool set_on_input(const QString&, uint, const QString&);
 
@@ -41,13 +37,13 @@ typedef enum
 } dvb_dev_type_t;
 
 /** \class CardUtil
- *  \brief Collection of helper utilities for capture card DB use
+ *  \brief Collection of helper utilities for input DB use
  */
 class MTV_PUBLIC CardUtil
 {
   public:
-    /// \brief all the different capture cards
-    enum CARD_TYPES
+    /// \brief all the different inputs
+    enum INPUT_TYPES
     {
         ERROR_OPEN    = 0,
         ERROR_UNKNOWN = 1,
@@ -71,7 +67,7 @@ class MTV_PUBLIC CardUtil
         VBOX      = 19,
     };
 
-    static enum CARD_TYPES toCardType(const QString &name)
+    static enum INPUT_TYPES toInputType(const QString &name)
     {
         if ("ERROR_OPEN" == name)
             return ERROR_OPEN;
@@ -145,10 +141,10 @@ class MTV_PUBLIC CardUtil
             (rawtype == "IMPORT")    || (rawtype == "DEMO")  ||
             (rawtype == "GO7007")    || (rawtype == "MJPEG");
     }
-    static QString      GetScanableCardTypes(void);
+    static QString      GetScanableInputTypes(void);
 
-    static bool         IsCableCardPresent(uint cardid,
-                                           const QString &cardType);
+    static bool         IsCableCardPresent(uint inputid,
+                                           const QString &inputType);
 
     static bool         IsEITCapable(const QString &rawtype)
     {
@@ -164,7 +160,7 @@ class MTV_PUBLIC CardUtil
             (rawtype == "CETON")     || (rawtype == "EXTERNAL");
     }
 
-    static bool         IsTunerShared(uint cardidA, uint cardidB);
+    static bool         IsTunerShared(uint inputidA, uint inputidB);
 
     static bool         IsTuningDigital(const QString &rawtype)
     {
@@ -187,7 +183,7 @@ class MTV_PUBLIC CardUtil
             (rawtype == "EXTERNAL");
     }
 
-    static bool         IsSingleInputCard(const QString &rawtype)
+    static bool         IsSingleInputType(const QString &rawtype)
     {
         return
             (rawtype == "FIREWIRE")  || (rawtype == "HDHOMERUN") ||
@@ -209,7 +205,7 @@ class MTV_PUBLIC CardUtil
     static int          CreateCaptureCard(const QString &videodevice,
                                           const QString &audiodevice,
                                           const QString &vbidevice,
-                                          const QString &cardtype,
+                                          const QString &inputtype,
                                           const uint audioratelimit,
                                           const QString &hostname,
                                           const uint dvb_swfilter,
@@ -231,60 +227,58 @@ class MTV_PUBLIC CardUtil
                                           const uint diseqcid,
                                           bool       dvb_eitscan);
 
-    static bool         DeleteCard(uint cardid);
+    static bool         DeleteCard(uint inputid);
     static bool         DeleteAllCards(void);
-    static vector<uint> GetCardList(void);
-    static vector<uint> GetLiveTVCardList(void);
+    static vector<uint> GetInputList(void);
+    static vector<uint> GetLiveTVInputList(void);
 
-    /// Convenience function for GetCardIDs()
-    static uint         GetFirstCardID(const QString &videodevice)
+    /// Convenience function for GetInputIDs()
+    static uint         GetFirstInputID(const QString &videodevice)
     {
-        vector<uint> list = GetCardIDs(videodevice);
+        vector<uint> list = GetInputIDs(videodevice);
         if (list.empty())
             return 0;
         return list[0];
     }
 
-    static vector<uint> GetCardIDs(QString videodevice = QString::null,
-                                   QString rawtype     = QString::null,
-                                   QString inputname   = QString::null,
-                                   QString hostname    = QString::null);
+    static vector<uint> GetInputIDs(QString videodevice = QString::null,
+                                    QString rawtype     = QString::null,
+                                    QString inputname   = QString::null,
+                                    QString hostname    = QString::null);
 
-    static uint         GetChildCardCount(uint cardid);
-    static vector<uint> GetChildCardIDs(uint cardid);
+    static uint         GetChildInputCount(uint inputid);
+    static vector<uint> GetChildInputIDs(uint inputid);
 
-    static bool         IsCardTypePresent(const QString &rawtype,
-                                          QString hostname = QString::null);
-    static QStringList  GetCardTypes(void); // card types on ALL hosts
+    static bool         IsInputTypePresent(const QString &rawtype,
+                                           QString hostname = QString::null);
+    static QStringList  GetInputTypes(void); // input types on ALL hosts
 
     static QStringList  GetVideoDevices(const QString &rawtype,
                                         QString hostname = QString::null);
 
-    static QString      GetRawCardType(uint cardid)
-        { return get_on_cardid("cardtype", cardid).toUpper(); }
-    static QString      GetVideoDevice(uint cardid)
-        { return get_on_cardid("videodevice", cardid); }
-    static QString      GetAudioDevice(uint cardid)
-        { return get_on_cardid("audiodevice", cardid); }
-    static QString      GetVBIDevice(uint cardid)
-        { return get_on_cardid("vbidevice", cardid); }
+    static QString      GetRawInputType(uint inputid)
+        { return get_on_input("cardtype", inputid).toUpper(); }
+    static QString      GetVideoDevice(uint inputid)
+        { return get_on_input("videodevice", inputid); }
+    static QString      GetAudioDevice(uint inputid)
+        { return get_on_input("audiodevice", inputid); }
+    static QString      GetVBIDevice(uint inputid)
+        { return get_on_input("vbidevice", inputid); }
 
-    static int          GetValueInt(const QString &col, uint cid)
-        { return get_on_cardid(col, cid).toInt(); }
-    static bool         SetValue(const QString &col, uint cid,
-                                 uint sid, int val)
-        { return set_on_source(col, cid, sid, QString::number(val)); }
-    static bool         SetValue(const QString &col, uint cid,
-                                 uint sid, const QString &val)
-        { return set_on_source(col, cid, sid, val); }
+    static int          GetValueInt(const QString &col, uint inputid)
+        { return get_on_input(col, inputid).toInt(); }
+    static bool         SetValue(const QString &col, uint inputid,
+                                 int val)
+        { return set_on_input(col, inputid, QString::number(val)); }
+    static bool         SetValue(const QString &col, uint inputid,
+                                 const QString &val)
+        { return set_on_input(col, inputid, val); }
 
-    static int          GetCardInputID(uint cardid, const QString &channum,
-                                       QString &inputname);
-    static bool         SetStartChannel(uint cardinputid,
+    static bool         SetStartChannel(uint inputid,
                                         const QString &channum);
 
     // Input creation and deletion
-    static int           CreateCardInput(const uint cardid,
+    static int           CreateCardInput(const uint inputid,
                                          const uint sourceid,
                                          const QString &inputname,
                                          const QString &externalcommand,
@@ -304,79 +298,65 @@ class MTV_PUBLIC CardUtil
 
     // Other input functions
 
-    static vector<uint> GetCardIDs(uint sourceid);
-    static QString      GetStartInput(uint cardid);
-    static QStringList  GetInputNames(uint cardid, uint sourceid = 0);
+    static vector<uint> GetInputIDs(uint sourceid);
     static bool         GetInputInfo(InputInfo &info,
                                      vector<uint> *groupids = NULL);
     static QList<InputInfo> GetAllInputInfo();
-    static uint         GetCardID(uint inputid);
     static QString      GetInputName(uint inputid);
     static QString      GetStartingChannel(uint inputid);
     static QString      GetDisplayName(uint inputid);
-    static vector<uint> GetAllInputIDs(void);
-    static vector<uint> GetInputIDs(uint cardid);
-    static uint         GetInputID(uint cardid, const QString &inputname);
     static uint         GetSourceID(uint inputid);
-    static bool         DeleteOrphanInputs(void);
-
-    static bool         SetInputValue(const QString &col, uint iid,
-                                 int val)
-        { return set_on_input(col, iid, QString::number(val)); }
-    static bool         SetInputValue(const QString &col, uint iid,
-                                 const QString &val)
-        { return set_on_input(col, iid, val); }
 
     // Input Groups
     static uint         CreateInputGroup(const QString &name);
     static uint         CreateDeviceInputGroup(const QString &host,
                                                const QString &device)
         { return CreateInputGroup(host + '|' + device); }
-    static uint         GetDeviceInputGroup(uint cardid);
+    static uint         GetDeviceInputGroup(uint inputid);
     static bool         LinkInputGroup(uint inputid, uint inputgroupid);
     static bool         UnlinkInputGroup(uint inputid, uint inputgroupid);
     static vector<uint> GetInputGroups(uint inputid);
-    static vector<uint> GetSharedInputGroups(uint cardid);
-    static vector<uint> GetGroupCardIDs(uint inputgroupid);
-    static vector<uint> GetConflictingCards(uint inputid, uint exclude_cardid);
+    static vector<uint> GetGroupInputIDs(uint inputgroupid);
+    static vector<uint> GetConflictingInputs(uint inputid);
 
-    static QString      GetDeviceLabel(const QString &cardtype,
+    static QString      GetDeviceLabel(const QString &inputtype,
                                        const QString &videodevice);
-    static QString      GetDeviceLabel(uint cardid);
+    static QString      GetDeviceLabel(uint inputid);
 
-    static QString      ProbeSubTypeName(uint cardid);
+    static QString      ProbeSubTypeName(uint inputid);
 
     static QStringList  ProbeVideoInputs(QString device,
-                                         QString cardtype = QString::null);
+                                         QString inputtype = QString::null);
     static QStringList  ProbeAudioInputs(QString device,
-                                         QString cardtype = QString::null);
-    static void         GetCardInputs(uint                cardid,
-                                      const QString      &device,
-                                      const QString      &cardtype,
-                                      QStringList        &inputs);
+                                         QString inputtype = QString::null);
+    static void         GetDeviceInputNames(uint               inputid,
+                                            const QString      &device,
+                                            const QString      &inputtype,
+                                            QStringList        &inputs);
 
     // General info from OS
     static QStringList  ProbeVideoDevices(const QString &rawtype);
 
     // Other
-    static bool         CloneCard(uint src_cardid, uint dst_cardid);
+    static bool         CloneCard(uint src_inputid, uint dst_inputid);
     static QString      GetFirewireChangerNode(uint inputid);
     static QString      GetFirewireChangerModel(uint inputid);
 
     // DTV info
-    static bool         GetTimeouts(uint cardid,
+    static bool         GetTimeouts(uint inputid,
                                     uint &signal_timeout,
                                     uint &channel_timeout);
-    static bool         IgnoreEncrypted(uint cardid, const QString &inputname);
-    static bool         TVOnly(uint cardid, const QString &inputname);
-    static bool         IsInNeedOfExternalInputConf(uint cardid);
-    static uint         GetQuickTuning(uint cardid, const QString &inputname);
+    static bool         IgnoreEncrypted(uint inputid,
+                                        const QString &inputname);
+    static bool         TVOnly(uint inputid, const QString &inputname);
+    static bool         IsInNeedOfExternalInputConf(uint inputid);
+    static uint         GetQuickTuning(uint inputid, const QString &inputname);
 
     // DVB info
-    /// \brief Returns true if the card is a DVB card
-    static bool         IsDVB(uint cardid)
-        { return "DVB" == GetRawCardType(cardid); }
-    static bool         IsDVBCardType(const QString &card_type);
+    /// \brief Returns true if the input is a DVB input
+    static bool         IsDVB(uint inputid)
+        { return "DVB" == GetRawInputType(inputid); }
+    static bool         IsDVBInputType(const QString &input_type);
     static QString      ProbeDVBFrontendName(const QString &device);
     static QString      ProbeDVBType(const QString &device);
     static bool         HasDVBCRCBug(const QString &device);
@@ -386,10 +366,10 @@ class MTV_PUBLIC CardUtil
 
     // V4L info
     static bool         hasV4L2(int videofd);
-    static bool         GetV4LInfo(int videofd, QString &card, QString &driver,
+    static bool         GetV4LInfo(int videofd, QString &input, QString &driver,
                                    uint32_t &version, uint32_t &capabilities);
-    static bool         GetV4LInfo(int videofd, QString &card, QString &driver)
-        { uint32_t d1,d2; return GetV4LInfo(videofd, card, driver, d1, d2); }
+    static bool         GetV4LInfo(int videofd, QString &input, QString &driver)
+        { uint32_t d1,d2; return GetV4LInfo(videofd, input, driver, d1, d2); }
     static InputNames   ProbeV4LVideoInputs(int videofd, bool &ok);
     static InputNames   ProbeV4LAudioInputs(int videofd, bool &ok);
 

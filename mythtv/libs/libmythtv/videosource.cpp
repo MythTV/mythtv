@@ -2764,7 +2764,7 @@ QString CaptureCard::GetRawCardType(void) const
     int cardid = getCardID();
     if (cardid <= 0)
         return QString::null;
-    return CardUtil::GetRawCardType(cardid);
+    return CardUtil::GetRawInputType(cardid);
 }
 
 void CaptureCard::fillSelections(SelectSetting *setting)
@@ -2802,16 +2802,16 @@ void CaptureCard::loadByID(int cardid)
 
     // Update instance count for cloned cards.
     if (cardid)
-        instance_count = CardUtil::GetChildCardCount(cardid) + 1;
+        instance_count = CardUtil::GetChildInputCount(cardid) + 1;
 }
 
 void CaptureCard::Save(void)
 {
     uint init_cardid = getCardID();
-    QString init_type = CardUtil::GetRawCardType(init_cardid);
+    QString init_type = CardUtil::GetRawInputType(init_cardid);
     QString init_dev = CardUtil::GetVideoDevice(init_cardid);
     QString init_input = CardUtil::GetInputName(init_cardid);
-    vector<uint> cardids = CardUtil::GetChildCardIDs(init_cardid);
+    vector<uint> cardids = CardUtil::GetChildInputIDs(init_cardid);
 
     ////////
 
@@ -2820,7 +2820,7 @@ void CaptureCard::Save(void)
     ////////
 
     uint cardid = getCardID();
-    QString type = CardUtil::GetRawCardType(cardid);
+    QString type = CardUtil::GetRawInputType(cardid);
     QString dev = CardUtil::GetVideoDevice(cardid);
 
     if (dev != init_dev)
@@ -2973,10 +2973,10 @@ class InputName : public ComboBoxSetting, public CardInputDBStorage
         clearSelections();
         addSelection(QObject::tr("(None)"), "None");
         uint cardid = getInputID();
-        QString type = CardUtil::GetRawCardType(cardid);
+        QString type = CardUtil::GetRawInputType(cardid);
         QString device = CardUtil::GetVideoDevice(cardid);
         QStringList inputs;
-        CardUtil::GetCardInputs(cardid, device, type, inputs);
+        CardUtil::GetDeviceInputNames(cardid, device, type, inputs);
         while (!inputs.isEmpty())
         {
             addSelection(inputs.front());
@@ -3419,7 +3419,7 @@ CardInput::~CardInput()
 void CardInput::SetSourceID(const QString &sourceid)
 {
     uint cid = id->getValue().toUInt();
-    QString raw_card_type = CardUtil::GetRawCardType(cid);
+    QString raw_card_type = CardUtil::GetRawInputType(cid);
     bool enable = (sourceid.toInt() > 0);
     scan->setEnabled(enable && !raw_card_type.isEmpty() &&
                      !CardUtil::IsUnscanable(raw_card_type));
@@ -3511,7 +3511,7 @@ void CardInput::channelScanner(void)
 
     Save(); // save info for scanner.
 
-    QString cardtype = CardUtil::GetRawCardType(crdid);
+    QString cardtype = CardUtil::GetRawInputType(crdid);
     if (CardUtil::IsUnscanable(cardtype))
     {
         LOG(VB_GENERAL, LOG_ERR,
@@ -3548,7 +3548,7 @@ void CardInput::sourceFetch(void)
     {
         Save(); // save info for fetch..
 
-        QString cardtype = CardUtil::GetRawCardType(crdid);
+        QString cardtype = CardUtil::GetRawInputType(crdid);
 
         if (!CardUtil::IsCableCardPresent(crdid, cardtype) &&
             !CardUtil::IsUnscanable(cardtype) &&
@@ -3626,16 +3626,14 @@ void CardInput::Save(void)
     externalInputSettings->Store(getInputID());
 
     // Handle any cloning we may need to do
-    QString type = CardUtil::GetRawCardType(src_cardid);
+    QString type = CardUtil::GetRawInputType(src_cardid);
     if (CardUtil::IsTunerSharingCapable(type))
     {
-        vector<uint> clones = CardUtil::GetChildCardIDs(src_cardid);
+        vector<uint> clones = CardUtil::GetChildInputIDs(src_cardid);
         for (uint i = 0; i < clones.size(); i++)
             CardUtil::CloneCard(src_cardid, clones[i]);
     }
 
-    // Delete any orphaned inputs
-    CardUtil::DeleteOrphanInputs();
     // Delete any unused input groups
     CardUtil::UnlinkInputGroup(0,0);
 }
@@ -4022,7 +4020,7 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
     QString err_open  = tr("Could not open card %1").arg(videodevice);
     QString err_other = tr("Could not get card info for card %1").arg(videodevice);
 
-    switch (CardUtil::toCardType(subtype))
+    switch (CardUtil::toInputType(subtype))
     {
         case CardUtil::ERROR_OPEN:
             cardname->setValue(err_open);
@@ -4131,7 +4129,7 @@ TunerCardAudioInput::TunerCardAudioInput(const CaptureCard &parent,
     if (cardid <= 0)
         return;
 
-    last_cardtype = CardUtil::GetRawCardType(cardid);
+    last_cardtype = CardUtil::GetRawInputType(cardid);
     last_device   = CardUtil::GetAudioDevice(cardid);
 }
 

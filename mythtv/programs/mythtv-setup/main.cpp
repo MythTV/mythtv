@@ -395,20 +395,18 @@ int main(int argc, char *argv[])
     {
         bool okCardID = scanCardId;
 
-        QStringList inputnames = CardUtil::GetInputNames(scanCardId);
-        okCardID &= !inputnames.empty();
-
         if (scanInputName.isEmpty())
-            scanInputName = CardUtil::GetStartInput(scanCardId);
+            scanInputName = CardUtil::GetInputName(scanCardId);
 
-        bool okInputName = inputnames.contains(scanInputName);
+        bool okInputName = (scanInputName == CardUtil::GetInputName(scanCardId)
+                            && scanInputName != "None");
 
         doScan = (okCardID && okInputName);
 
         if (!okCardID)
         {
             cerr << "You must enter a valid cardid to scan." << endl;
-            vector<uint> cardids = CardUtil::GetCardIDs();
+            vector<uint> cardids = CardUtil::GetInputIDs();
             if (cardids.empty())
             {
                 cerr << "But no cards have been defined on this host"
@@ -420,7 +418,7 @@ int main(int argc, char *argv[])
             {
                 fprintf(stderr, "%5u: %s %s\n",
                         cardids[i],
-                        CardUtil::GetRawCardType(cardids[i])
+                        CardUtil::GetRawInputType(cardids[i])
                         .toLatin1().constData(),
                         CardUtil::GetVideoDevice(cardids[i])
                         .toLatin1().constData());
@@ -432,11 +430,9 @@ int main(int argc, char *argv[])
         {
             cerr << "You must enter a valid input to scan this card."
                  << endl;
-            cerr << "Valid inputs: " << endl;
-            for (int i = 0; i < inputnames.size(); i++)
-            {
-                cerr << inputnames[i].toLatin1().constData() << endl;
-            }
+            cerr << "Valid input: "
+                 << CardUtil::GetInputName(scanCardId).toLatin1().constData()
+                 << endl;
             return GENERIC_EXIT_INVALID_CMDLINE;
         }
     }
@@ -458,7 +454,7 @@ int main(int argc, char *argv[])
         QString mod      = scanTableName.mid(
             firstBreak+1, secondBreak-firstBreak-1).toLower();
         QString tbl      = scanTableName.mid(secondBreak+1).toLower();
-        uint    inputid  = CardUtil::GetInputID(scanCardId, scanInputName);
+        uint    inputid  = scanCardId;
         uint    sourceid = CardUtil::GetSourceID(inputid);
         QMap<QString,QString> startChan;
         {

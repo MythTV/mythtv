@@ -77,6 +77,7 @@ using namespace std;
 #include "imagescanner.h"
 #include "imagethumbs.h"
 #include "imagehandlers.h"
+#include "cardutil.h"
 
 // mythbackend headers
 #include "backendcontext.h"
@@ -675,21 +676,12 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     {
         HandleSGFileQuery(listline, pbs);
     }
-    else if (command == "GET_FREE_RECORDER")
+    else if (command == "GET_FREE_INPUT_INFO")
     {
-        HandleGetFreeRecorder(pbs);
-    }
-    else if (command == "GET_FREE_RECORDER_COUNT")
-    {
-        HandleGetFreeRecorderCount(pbs);
-    }
-    else if (command == "GET_FREE_RECORDER_LIST")
-    {
-        HandleGetFreeRecorderList(pbs);
-    }
-    else if (command == "GET_NEXT_FREE_RECORDER")
-    {
-        HandleGetNextFreeRecorder(listline, pbs);
+        if (tokens.size() != 2)
+            SendErrorResponse(pbs, "Bad GET_FREE_INPUT_INFO");
+        else
+            HandleGetFreeInputInfo(pbs, tokens[1].toUInt());
     }
     else if (command == "QUERY_RECORDER")
     {
@@ -4009,7 +4001,7 @@ void MainServer::HandleLockTuner(PlaybackSock *pbs, int cardid)
         EncoderLink *elink = *iter;
 
         // we're looking for a specific card but this isn't the one we want
-        if ((cardid != -1) && (cardid != elink->GetCardID()))
+        if ((cardid != -1) && (cardid != elink->GetInputID()))
             continue;
 
         if (elink->IsLocal())
@@ -4107,224 +4099,115 @@ void MainServer::HandleFreeTuner(int cardid, PlaybackSock *pbs)
     SendResponse(pbssock, strlist);
 }
 
-void MainServer::HandleGetFreeRecorder(PlaybackSock *pbs)
-{
-    MythSocket *pbssock = pbs->getSocket();
-    QString pbshost = pbs->getHostname();
-
-    vector<uint> excluded_cardids;
-    QStringList strlist;
-    int retval = -1;
-
-    EncoderLink *encoder = NULL;
-    QString enchost;
-    uint bestorder = 0;
-
-    QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
-    for (; iter != encoderList->end(); ++iter)
-    {
-        EncoderLink *elink = *iter;
-
-        if (elink->IsLocal())
-            enchost = gCoreContext->GetHostName();
-        else
-            enchost = elink->GetHostName();
-
-        LOG(VB_RECORD, LOG_INFO, LOC +
-            QString("Checking card %1. Best card so far %2")
-            .arg(iter.key()).arg(retval));
-
-        if (!elink->IsConnected() || elink->IsTunerLocked())
-            continue;
-
-        vector<InputInfo> inputs = elink->GetFreeInputs(excluded_cardids);
-
-        for (uint i = 0; i < inputs.size(); ++i)
-        {
-            if (!encoder || inputs[i].livetvorder < bestorder)
-            {
-                retval = iter.key();
-                encoder = elink;
-                bestorder = inputs[i].livetvorder;
-            }
-        }
-    }
-
-    LOG(VB_RECORD, LOG_INFO, LOC +
-        QString("Best card is %1").arg(retval));
-
-    strlist << QString::number(retval);
-
-    if (encoder)
-    {
-        if (encoder->IsLocal())
-        {
-            strlist << gCoreContext->GetBackendServerIP();
-            strlist << QString::number(gCoreContext->GetBackendServerPort());
-        }
-        else
-        {
-            strlist << gCoreContext->GetBackendServerIP(encoder->GetHostName());
-            strlist << QString::number(gCoreContext->GetBackendServerPort(encoder->GetHostName()));
-        }
-    }
-    else
-    {
-        strlist << "nohost";
-        strlist << "-1";
-    }
-
-    SendResponse(pbssock, strlist);
-}
-
-void MainServer::HandleGetFreeRecorderCount(PlaybackSock *pbs)
-{
-    MythSocket *pbssock = pbs->getSocket();
-
-    vector<uint> excluded_cardids;
-    QStringList strlist;
-    int count = 0;
-
-    QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
-    for (; iter != encoderList->end(); ++iter)
-    {
-        EncoderLink *elink = *iter;
-
-        if (elink->IsConnected() && !elink->IsTunerLocked() &&
-            !elink->GetFreeInputs(excluded_cardids).empty())
-        {
-            count++;
-        }
-    }
-
-    strlist << QString::number(count);
-
-    SendResponse(pbssock, strlist);
-}
-
 static bool comp_livetvorder(const InputInfo &a, const InputInfo &b)
 {
-    return a.livetvorder < b.livetvorder;
+    if (a.livetvorder != b.livetvorder)
+        return a.livetvorder < b.livetvorder;
+    return a.inputid < b.inputid;
 }
 
-void MainServer::HandleGetFreeRecorderList(PlaybackSock *pbs)
+void MainServer::HandleGetFreeInputInfo(PlaybackSock *pbs,
+                                        uint excluded_input)
 {
+    LOG(VB_CHANNEL, LOG_INFO,
+        LOC + QString("Excluding input %1")
+        .arg(excluded_input));
+
     MythSocket *pbssock = pbs->getSocket();
+    vector<InputInfo> busyinputs;
+    vector<InputInfo> freeinputs;
+    QMap<uint, QSet<uint> > groupids;
 
-    vector<uint> excluded_cardids;
-    vector<InputInfo> allinputs;
-
+    // Lopp over each encoder and divide the inputs into busy and free
+    // lists.
     QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
     for (; iter != encoderList->end(); ++iter)
     {
         EncoderLink *elink = *iter;
+        InputInfo info;
+        info.inputid = elink->GetInputID();
 
         if (!elink->IsConnected() || elink->IsTunerLocked())
+        {
+            LOG(VB_CHANNEL, LOG_INFO,
+                LOC + QString("Input %1 is locked or not connected")
+                .arg(info.inputid));
             continue;
+        }
 
-        vector<InputInfo> inputs = elink->GetFreeInputs(excluded_cardids);
-        allinputs.insert(allinputs.end(), inputs.begin(), inputs.end());
-    }
+        vector<uint> infogroups;
+        CardUtil::GetInputInfo(info, &infogroups);
+        for (uint i = 0; i < infogroups.size(); ++i)
+            groupids[info.inputid].insert(infogroups[i]);
 
-    stable_sort(allinputs.begin(), allinputs.end(), comp_livetvorder);
-
-    QStringList strlist;
-    QMap<int, bool> cardidused;
-    for (uint i = 0; i < allinputs.size(); ++i)
-    {
-        uint cardid = allinputs[i].cardid;
-        if (!cardidused[cardid])
+        InputInfo busyinfo;
+        if (info.inputid != excluded_input && elink->IsBusy(&busyinfo))
         {
-            strlist << QString::number(cardid);
-            cardidused[cardid] = true;
+            LOG(VB_CHANNEL, LOG_DEBUG,
+                LOC + QString("Input %1 is busy on %2/%3")
+                .arg(info.inputid).arg(busyinfo.chanid).arg(busyinfo.mplexid));
+            info.chanid = busyinfo.chanid;
+            info.mplexid = busyinfo.mplexid;
+            busyinputs.push_back(info);
+        }
+        else if (info.livetvorder)
+        {
+            LOG(VB_CHANNEL, LOG_DEBUG,
+                LOC + QString("Input %1 is free")
+                .arg(info.inputid));
+            freeinputs.push_back(info);
         }
     }
 
-    if (strlist.size() == 0)
-        strlist << "0";
-
-    SendResponse(pbssock, strlist);
-}
-
-void MainServer::HandleGetNextFreeRecorder(QStringList &slist,
-                                           PlaybackSock *pbs)
-{
-    MythSocket *pbssock = pbs->getSocket();
-    QString pbshost = pbs->getHostname();
-
-    QStringList strlist;
-    int retval = -1;
-    int currrec = slist[1].toInt();
-
-    EncoderLink *encoder = NULL;
-    QString enchost;
-
-    LOG(VB_RECORD, LOG_INFO, LOC +
-        QString("Getting next free recorder after : %1")
-            .arg(currrec));
-
-    // find current recorder
-    QMap<int, EncoderLink *>::Iterator iter, curr = encoderList->find(currrec);
-
-    if (currrec > 0 && curr != encoderList->end())
+    // Loop over each busy input and restrict or delete any free
+    // inputs that are in the same group.
+    vector<InputInfo>::iterator busyiter = busyinputs.begin();
+    for (; busyiter != busyinputs.end(); ++busyiter)
     {
-        vector<uint> excluded_cardids;
-        excluded_cardids.push_back(currrec);
+        InputInfo &busyinfo = *busyiter;
 
-        // cycle through all recorders
-        for (iter = curr;;)
+        vector<InputInfo>::iterator freeiter = freeinputs.begin();
+        while (freeiter != freeinputs.end())
         {
-            EncoderLink *elink;
+            InputInfo &freeinfo = *freeiter;
 
-            // last item? go back
-            if (++iter == encoderList->end())
+            if ((groupids[busyinfo.inputid] & groupids[freeinfo.inputid])
+                .isEmpty())
             {
-                iter = encoderList->begin();
+                ++freeiter;
+                continue;
             }
 
-            elink = *iter;
-
-            if (retval == -1 && elink->IsConnected() &&
-                !elink->IsTunerLocked() &&
-                !elink->GetFreeInputs(excluded_cardids).empty())
+            if (busyinfo.sourceid == freeinfo.sourceid)
             {
-                encoder = elink;
-                retval = iter.key();
+                LOG(VB_CHANNEL, LOG_DEBUG,
+                    LOC + QString("Input %1 is limited to %2/%3 by input %4")
+                    .arg(freeinfo.inputid).arg(busyinfo.chanid)
+                    .arg(busyinfo.mplexid).arg(busyinfo.inputid));
+                freeinfo.chanid = busyinfo.chanid;
+                freeinfo.mplexid = busyinfo.mplexid;
+                ++freeiter;
+                continue;
             }
 
-            // cycled right through? no more available recorders
-            if (iter == curr)
-                break;
+            LOG(VB_CHANNEL, LOG_DEBUG,
+                LOC + QString("Input %1 is unavailable by input %2")
+                .arg(freeinfo.inputid).arg(busyinfo.inputid));
+            freeiter = freeinputs.erase(freeiter);
         }
     }
-    else
+
+    // Return the results in livetvorder.
+    stable_sort(freeinputs.begin(), freeinputs.end(), comp_livetvorder);
+    QStringList strlist;
+    for (uint i = 0; i < freeinputs.size(); ++i)
     {
-        HandleGetFreeRecorder(pbs);
-        return;
+        LOG(VB_CHANNEL, LOG_INFO,
+            LOC + QString("Input %1 is available on %2/%3")
+            .arg(freeinputs[i].inputid).arg(freeinputs[i].chanid)
+            .arg(freeinputs[i].mplexid));
+        freeinputs[i].ToStringList(strlist);
     }
-
-
-    strlist << QString::number(retval);
-
-    if (encoder)
-    {
-        if (encoder->IsLocal())
-        {
-            strlist << gCoreContext->GetBackendServerIP();
-            strlist << QString::number(gCoreContext->GetBackendServerPort());
-        }
-        else
-        {
-            strlist << gCoreContext->GetBackendServerIP(encoder->GetHostName());
-            strlist << QString::number(gCoreContext->GetBackendServerPort(encoder->GetHostName()));
-        }
-    }
-    else
-    {
-        strlist << "nohost";
-        strlist << "-1";
-    }
-
     SendResponse(pbssock, strlist);
 }
 
@@ -4408,7 +4291,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         else
         {
             ProgramInfo dummy;
-            dummy.SetInputID(enc->GetCardID());
+            dummy.SetInputID(enc->GetInputID());
             dummy.ToStringList(retlist);
         }
     }
@@ -4472,7 +4355,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         else
         {
             ProgramInfo dummy;
-            dummy.SetInputID(enc->GetCardID());
+            dummy.SetInputID(enc->GetInputID());
             dummy.ToStringList(retlist);
         }
     }
@@ -4537,22 +4420,6 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         int recording = slist[2].toInt();
         enc->SetLiveRecording(recording);
         retlist << "OK";
-    }
-    else if (command == "GET_FREE_INPUTS")
-    {
-        vector<uint> excluded_cardids;
-        for (int i = 2; i < slist.size(); i++)
-            excluded_cardids.push_back(slist[i].toUInt());
-
-        vector<InputInfo> inputs = enc->GetFreeInputs(excluded_cardids);
-
-        if (inputs.empty())
-            retlist << "EMPTY_LIST";
-        else
-        {
-            for (uint i = 0; i < inputs.size(); i++)
-                inputs[i].ToStringList(retlist);
-        }
     }
     else if (command == "GET_INPUT")
     {
@@ -4653,7 +4520,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     else if (command == "SHOULD_SWITCH_CARD")
     {
         QString chanid = slist[2];
-        retlist << QString::number((int)(enc->ShouldSwitchToAnotherCard(chanid)));
+        retlist << QString::number((int)(enc->ShouldSwitchToAnotherInput(chanid)));
     }
     else if (command == "CHECK_CHANNEL_PREFIX")
     {
@@ -4887,24 +4754,8 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
         else
         {
             ProgramInfo dummy;
-            dummy.SetInputID(enc->GetCardID());
+            dummy.SetInputID(enc->GetInputID());
             dummy.ToStringList(retlist);
-        }
-    }
-    else if (command == "GET_FREE_INPUTS")
-    {
-        vector<uint> excluded_cardids;
-        for (int i = 2; i < slist.size(); i++)
-            excluded_cardids.push_back(slist[i].toUInt());
-
-        vector<InputInfo> inputs = enc->GetFreeInputs(excluded_cardids);
-
-        if (inputs.empty())
-            retlist << "EMPTY_LIST";
-        else
-        {
-            for (uint i = 0; i < inputs.size(); i++)
-                inputs[i].ToStringList(retlist);
         }
     }
 
@@ -4989,7 +4840,7 @@ size_t MainServer::GetCurrentMaxBitrate(void)
         long long thisKBperMin = (((size_t)maxBitrate)*((size_t)15))>>11;
         totalKBperMin += thisKBperMin;
         LOG(VB_FILE, LOG_INFO, LOC + QString("Cardid %1: max bitrate %2 KB/min")
-                .arg(enc->GetCardID()).arg(thisKBperMin));
+                .arg(enc->GetInputID()).arg(thisKBperMin));
     }
 
     LOG(VB_FILE, LOG_INFO, LOC +
@@ -7506,7 +7357,7 @@ void MainServer::connectionClosed(MythSocket *socket)
 
                         elink->SetSocket(NULL);
                         if (m_sched)
-                            disconnectedSlaves.push_back(elink->GetCardID());
+                            disconnectedSlaves.push_back(elink->GetInputID());
                     }
                 }
                 if (m_sched && !isFallingAsleep)
@@ -7923,7 +7774,7 @@ void MainServer::reconnectTimeout(void)
         else
         {
             ProgramInfo dummy;
-            dummy.SetInputID(elink->GetCardID());
+            dummy.SetInputID(elink->GetInputID());
             dummy.ToStringList(strlist);
         }
     }

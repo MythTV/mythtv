@@ -58,7 +58,7 @@ class TransportWizard : public ConfigurationWizard
 {
   public:
     TransportWizard(
-        uint mplexid, uint sourceid, CardUtil::CARD_TYPES _cardtype);
+        uint mplexid, uint sourceid, CardUtil::INPUT_TYPES _cardtype);
 
   private:
     MultiplexID *mplexid;
@@ -149,7 +149,7 @@ void TransportList::fillSelections(void)
     }
 }
 
-static CardUtil::CARD_TYPES get_cardtype(uint sourceid)
+static CardUtil::INPUT_TYPES get_cardtype(uint sourceid)
 {
     vector<uint> cardids;
 
@@ -186,16 +186,16 @@ static CardUtil::CARD_TYPES get_cardtype(uint sourceid)
         return CardUtil::ERROR_PROBE;
     }
 
-    vector<CardUtil::CARD_TYPES> cardtypes;
+    vector<CardUtil::INPUT_TYPES> cardtypes;
 
     vector<uint>::const_iterator it = cardids.begin();
     for (; it != cardids.end(); ++it)
     {
-        CardUtil::CARD_TYPES nType = CardUtil::ERROR_PROBE;
-        QString cardtype = CardUtil::GetRawCardType(*it);
+        CardUtil::INPUT_TYPES nType = CardUtil::ERROR_PROBE;
+        QString cardtype = CardUtil::GetRawInputType(*it);
         if (cardtype == "DVB")
             cardtype = CardUtil::ProbeSubTypeName(*it);
-        nType = CardUtil::toCardType(cardtype);
+        nType = CardUtil::toInputType(cardtype);
 
         if ((CardUtil::ERROR_OPEN    == nType) ||
             (CardUtil::ERROR_UNKNOWN == nType) ||
@@ -221,11 +221,11 @@ static CardUtil::CARD_TYPES get_cardtype(uint sourceid)
 
     for (uint i = 1; i < cardtypes.size(); i++)
     {
-        CardUtil::CARD_TYPES typeA = cardtypes[i - 1];
+        CardUtil::INPUT_TYPES typeA = cardtypes[i - 1];
         typeA = (CardUtil::HDHOMERUN == typeA) ? CardUtil::ATSC : typeA;
         typeA = (CardUtil::MPEG      == typeA) ? CardUtil::V4L  : typeA;
 
-        CardUtil::CARD_TYPES typeB = cardtypes[i + 0];
+        CardUtil::INPUT_TYPES typeB = cardtypes[i + 0];
         typeB = (CardUtil::HDHOMERUN == typeB) ? CardUtil::ATSC : typeB;
         typeB = (CardUtil::MPEG      == typeB) ? CardUtil::V4L  : typeB;
 
@@ -298,7 +298,7 @@ DialogCode TransportListEditor::exec(void)
 void TransportListEditor::Edit(void)
 {
     uint sourceid = m_videosource->getValue().toUInt();
-    CardUtil::CARD_TYPES cardtype = get_cardtype(sourceid);
+    CardUtil::INPUT_TYPES cardtype = get_cardtype(sourceid);
 
     if ((CardUtil::ERROR_OPEN    != cardtype) &&
         (CardUtil::ERROR_UNKNOWN != cardtype) &&
@@ -758,7 +758,7 @@ TransportPage::TransportPage(const MultiplexID *_id, uint nType) :
 };
 
 TransportWizard::TransportWizard(
-    uint _mplexid, uint _sourceid, CardUtil::CARD_TYPES _cardtype) :
+    uint _mplexid, uint _sourceid, CardUtil::INPUT_TYPES _cardtype) :
     mplexid(new MultiplexID())
 {
     setLabel(QObject::tr("DVB Transport"));

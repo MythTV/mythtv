@@ -217,7 +217,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
             QDomElement encoder = pDoc->createElement("Encoder");
             encoders.appendChild(encoder);
 
-            encoder.setAttribute("id"            , elink->GetCardID()       );
+            encoder.setAttribute("id"            , elink->GetInputID()      );
             encoder.setAttribute("local"         , isLocal                  );
             encoder.setAttribute("connected"     , elink->IsConnected()     );
             encoder.setAttribute("state"         , state                    );
@@ -230,7 +230,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
                 encoder.setAttribute("hostname", elink->GetHostName());
 
             encoder.setAttribute("devlabel",
-                          CardUtil::GetDeviceLabel(elink->GetCardID()) );
+                          CardUtil::GetDeviceLabel(elink->GetInputID()) );
 
             if (elink->IsConnected())
                 numencoders++;

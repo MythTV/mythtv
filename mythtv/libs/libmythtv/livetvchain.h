@@ -22,7 +22,7 @@ struct MTV_PUBLIC LiveTVChainEntry
     QDateTime endtime;
     bool discontinuity; // if true, can't play smooth from last entry
     QString hostprefix;
-    QString cardtype;
+    QString inputtype;
     QString channum;
     QString inputname;
 };
@@ -37,7 +37,7 @@ class MTV_PUBLIC LiveTVChain : public ReferenceCounter
     void LoadFromExistingChain(const QString &id);
 
     void SetHostPrefix(const QString &prefix);
-    void SetCardType(const QString &type);
+    void SetInputType(const QString &type);
 
     void DestroyChain(void);
 
@@ -68,7 +68,7 @@ class MTV_PUBLIC LiveTVChain : public ReferenceCounter
         { return (m_switchid >= 0 && m_jumppos != INT_MAX); }
     QString GetChannelName(int pos = -1) const;
     QString GetInputName(int pos = -1) const;
-    QString GetCardType(int pos = -1) const;
+    QString GetInputType(int pos = -1) const;
 
     // sets/gets program to switch to
     void SetProgram(const ProgramInfo &pginfo);
@@ -108,7 +108,7 @@ class MTV_PUBLIC LiveTVChain : public ReferenceCounter
     mutable QMutex m_lock;
 
     QString m_hostprefix;
-    QString m_cardtype;
+    QString m_inputtype;
 
     int m_curpos;
     uint m_cur_chanid;

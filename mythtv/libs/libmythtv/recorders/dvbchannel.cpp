@@ -58,7 +58,7 @@ static DTVMultiplex dvbparams_to_dtvmultiplex(
 int64_t concurrent_tunings_delay = 1000;
 QDateTime DVBChannel::last_tuning = QDateTime::currentDateTime();
 
-#define LOC QString("DVBChan[%1](%2): ").arg(GetCardID()).arg(GetDevice())
+#define LOC QString("DVBChan[%1](%2): ").arg(m_inputid).arg(GetDevice())
 
 /** \class DVBChannel
  *  \brief Provides interface to the tuning hardware when using DVB drivers
@@ -208,7 +208,7 @@ bool DVBChannel::Open(DVBChannel *who)
 
         is_open[who] = true;
 
-        if (!InitializeInputs())
+        if (!InitializeInput())
         {
             Close();
             ReturnMasterLock(master);
@@ -273,7 +273,7 @@ bool DVBChannel::Open(DVBChannel *who)
     if (tunerType.IsDiSEqCSupported())
     {
 
-        diseqc_tree = diseqc_dev.FindTree(GetCardID());
+        diseqc_tree = diseqc_dev.FindTree(m_inputid);
         if (diseqc_tree)
         {
             bool is_SCR = false;
@@ -293,7 +293,7 @@ bool DVBChannel::Open(DVBChannel *who)
 
     first_tune = true;
 
-    if (!InitializeInputs())
+    if (!InitializeInput())
     {
         Close();
         return false;
@@ -311,43 +311,13 @@ bool DVBChannel::IsOpen(void) const
     return it != is_open.end();
 }
 
-bool DVBChannel::Init(QString &inputname, QString &startchannel, bool setchan)
+bool DVBChannel::Init(QString &startchannel, bool setchan)
 {
     if (setchan && !IsOpen())
         Open(this);
 
-    return ChannelBase::Init(inputname, startchannel, setchan);
+    return ChannelBase::Init(startchannel, setchan);
 }
-
-bool DVBChannel::SwitchToInput(const QString &inputname, const QString &chan)
-{
-    int input = GetInputByName(inputname);
-
-    bool ok = false;
-    if (input >= 0)
-    {
-        m_currentInputID = input;
-        ok = SetChannelByString(chan);
-    }
-    else
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("DVBChannel: Could not find input: %1 on card when "
-                    "setting channel %2\n").arg(inputname).arg(chan));
-    }
-    return ok;
-}
-
-bool DVBChannel::SwitchToInput(int newInputNum, bool setstarting)
-{
-    if (!ChannelBase::SwitchToInput(newInputNum, false))
-        return false;
-
-    m_currentInputID = newInputNum;
-    InputMap::const_iterator it = m_inputs.find(m_currentInputID);
-    return SetChannelByString((*it)->startChanNum);
-}
-
 
 /** \fn DVBChannel::CheckFrequency(uint64_t) const
  *  \brief Checks tuning frequency
@@ -530,17 +500,14 @@ void DVBChannel::SetTimeOffset(double offset)
 }
 
 
-bool DVBChannel::Tune(const DTVMultiplex &tuning, QString inputname)
+bool DVBChannel::Tune(const DTVMultiplex &tuning)
 {
-    int inputid = inputname.isEmpty() ?
-        m_currentInputID : GetInputByName(inputname);
-    if (inputid < 0)
+    if (!m_inputid)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Tune(): Invalid input '%1'.")
-                .arg(inputname));
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Tune(): Invalid input."));
         return false;
     }
-    return Tune(tuning, inputid, false, false);
+    return Tune(tuning, false, false);
 }
 
 #if DVB_API_VERSION >= 5
@@ -660,7 +627,6 @@ static struct dtv_properties *dtvmultiplex_to_dtvproperties(
  *  \return true on success, false on failure
  */
 bool DVBChannel::Tune(const DTVMultiplex &tuning,
-                      uint inputid,
                       bool force_reset,
                       bool same_input)
 {
@@ -672,7 +638,7 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
     {
         LOG(VB_CHANNEL, LOG_INFO, LOC + "tuning on slave channel");
         SetSIStandard(tuning.sistandard);
-        bool ok = master->Tune(tuning, inputid, force_reset, false);
+        bool ok = master->Tune(tuning, force_reset, false);
         ReturnMasterLock(master);
         return ok;
     }
@@ -736,7 +702,7 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
         {
             // configure for new input
             if (!same_input)
-                diseqc_settings.Load(inputid);
+                diseqc_settings.Load(m_inputid);
 
             // execute diseqc commands
             if (!diseqc_tree->Execute(diseqc_settings, tuning))
@@ -863,7 +829,7 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
 
 bool DVBChannel::Retune(void)
 {
-    return Tune(desired_tuning, m_currentInputID, true, true);
+    return Tune(desired_tuning, true, true);
 }
 
 QString DVBChannel::GetFrontendName(void) const
@@ -988,10 +954,10 @@ int DVBChannel::GetChanID() const
                   "FROM channel, capturecard "
                   "WHERE capturecard.sourceid = channel.sourceid AND "
                   "      channel.channum = :CHANNUM AND "
-                  "      capturecard.cardid = :CARDID");
+                  "      capturecard.cardid = :INPUTID");
 
     query.bindValue(":CHANNUM", m_curchannelname);
-    query.bindValue(":CARDID", GetCardID());
+    query.bindValue(":INPUTID", m_inputid);
 
     if (!query.exec() || !query.isActive())
     {

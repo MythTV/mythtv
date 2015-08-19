@@ -477,8 +477,7 @@ void GuideGrid::RunProgramGuide(uint chanid, const QString &channum,
     }
     if (chanid == 0 && actualChannum.isEmpty())
     {
-        vector<uint> excluded_cardids;
-        vector<uint> inputIDs = RemoteRequestFreeInputList(excluded_cardids);
+        vector<uint> inputIDs = RemoteRequestFreeInputList(0);
         if (!inputIDs.empty())
             actualChannum = CardUtil::GetStartingChannel(inputIDs[0]);
     }

@@ -13,7 +13,7 @@
 #endif
 #include "firewirechannel.h"
 
-#define LOC QString("FireChan[%1](%2): ").arg(GetCardID()).arg(GetDevice())
+#define LOC QString("FireChan[%1](%2): ").arg(m_inputid).arg(GetDevice())
 
 FirewireChannel::FirewireChannel(TVRec *parent, const QString &_videodevice,
                                  const FireWireDBOptions &firewire_opts) :
@@ -54,15 +54,14 @@ bool FirewireChannel::Open(void)
     if (isopen)
         return true;
 
-    if (!InitializeInputs())
+    if (!InitializeInput())
         return false;
 
-    if (m_inputs.find(m_currentInputID) == m_inputs.end())
+    if (!m_inputid)
         return false;
 
-    InputMap::const_iterator it = m_inputs.find(m_currentInputID);
     if (!FirewireDevice::IsSTBSupported(fw_opts.model) &&
-        (*it)->externalChanger.isEmpty())
+        m_externalChanger.isEmpty())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Model: '%1' is not supported.").arg(fw_opts.model));

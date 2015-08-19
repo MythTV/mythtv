@@ -8,7 +8,7 @@
 #include "ExternalChannel.h"
 #include "tv_rec.h"
 
-#define LOC  QString("ExternChan[%1](%2): ").arg(GetCardID()).arg(GetDevice())
+#define LOC  QString("ExternChan[%1](%2): ").arg(m_inputid).arg(GetDevice())
 
 ExternalChannel::ExternalChannel(TVRec *parent, const QString & device) :
     DTVChannel(parent), m_device(device), m_stream_handler(0)
@@ -39,10 +39,10 @@ bool ExternalChannel::Open(void)
     }
 
 
-    if (!InitializeInputs())
+    if (!InitializeInput())
         return false;
 
-    if (m_inputs.find(m_currentInputID) == m_inputs.end())
+    if (!m_inputid)
         return false;
 
     m_stream_handler = ExternalStreamHandler::Get(m_device);

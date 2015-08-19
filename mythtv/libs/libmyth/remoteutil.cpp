@@ -416,24 +416,6 @@ int RemoteGetRecordingMask(void)
     return mask;
 }
 
-int RemoteGetFreeRecorderCount(void)
-{
-    QStringList strlist( "GET_FREE_RECORDER_COUNT" );
-
-    if (!gCoreContext->SendReceiveStringList(strlist, true) || strlist.isEmpty())
-        return 0;
-
-    if (strlist[0] == "UNKNOWN_COMMAND")
-    {
-        LOG(VB_GENERAL, LOG_EMERG,
-                 "Unknown command GET_FREE_RECORDER_COUNT, upgrade your "
-                 "backend version.");
-        return 0;
-    }
-
-    return strlist[0].toInt();
-}
-
 bool RemoteGetFileList(QString host, QString path, QStringList* list,
                        QString sgroup, bool fileNamesOnly)
 {

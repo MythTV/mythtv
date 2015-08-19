@@ -198,7 +198,7 @@ void ChannelScanner::Scan(
         LOG(VB_CHANSCAN, LOG_INFO, LOC +
             QString("ScanForChannels(%1)").arg(sourceid));
 
-        QString card_type = CardUtil::GetRawCardType(cardid);
+        QString card_type = CardUtil::GetRawInputType(cardid);
         QString sub_type  = card_type;
         if (card_type == "DVB")
         {
@@ -376,7 +376,7 @@ void ChannelScanner::PreScanCommon(
     if (!scanMonitor)
         scanMonitor = new ScanMonitor(this);
 
-    QString card_type = CardUtil::GetRawCardType(cardid);
+    QString card_type = CardUtil::GetRawInputType(cardid);
 
     if ("DVB" == card_type)
     {
@@ -453,7 +453,7 @@ void ChannelScanner::PreScanCommon(
     }
 
     // explicitly set the cardid
-    channel->SetCardID(cardid);
+    channel->SetInputID(cardid);
 
     // If the backend is running this may fail...
     if (!channel->Open())

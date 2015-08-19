@@ -25,7 +25,7 @@ ScanWizardConfig::ScanWizardConfig(
     QString default_inputname) :
     VerticalConfigurationGroup(false, true, false, false),
     videoSource(new VideoSourceSelector(
-                    default_sourceid, CardUtil::GetScanableCardTypes(), false)),
+                    default_sourceid, CardUtil::GetScanableInputTypes(), false)),
     input(new InputSelector(default_cardid, default_inputname)),
     scanType(new ScanTypeSetting()),
     scanConfig(new ScanOptionalConfig(scanType)),
@@ -98,7 +98,7 @@ void ScanTypeSetting::SetInput(const QString &cardids_inputname)
 
     hw_cardid       = cardid;
     QString subtype = CardUtil::ProbeSubTypeName(hw_cardid);
-    int nCardType   = CardUtil::toCardType(subtype);
+    int nCardType   = CardUtil::toInputType(subtype);
     clearSelections();
 
     switch (nCardType)

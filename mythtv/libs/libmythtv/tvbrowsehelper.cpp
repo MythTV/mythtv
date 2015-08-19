@@ -185,7 +185,7 @@ void TVBrowseHelper::BrowseChannel(PlayerContext *ctx, const QString &channum)
         return;
 
     QString inputname = ctx->recorder->GetInput();
-    uint    inputid   = CardUtil::GetInputID(ctx->last_cardid, inputname);
+    uint    inputid   = ctx->last_cardid;
     uint    sourceid  = CardUtil::GetSourceID(inputid);
     if (sourceid)
     {
@@ -243,7 +243,7 @@ uint TVBrowseHelper::GetChanId(
         ChannelInfoList::const_iterator it = db_all_channels.begin();
         for (; it != db_all_channels.end(); ++it)
         {
-            if ((*it).GetCardIds().contains(pref_cardid) &&
+            if ((*it).GetInputIds().contains(pref_cardid) &&
                 (*it).channum == channum)
                 return (*it).chanid;
         }

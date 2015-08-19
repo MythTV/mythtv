@@ -12,7 +12,7 @@
 /// Update this whenever the plug-in ABI changes.
 /// Including changes in the libmythbase, libmyth, libmythtv, libmythav* and
 /// libmythui class methods in exported headers.
-#define MYTH_BINARY_VERSION "0.28.20150620-1"
+#define MYTH_BINARY_VERSION "0.28.20150817-1"
 
 /** \brief Increment this whenever the MythTV network protocol changes.
  *
@@ -43,8 +43,8 @@
  *       http://www.mythtv.org/wiki/Category:Myth_Protocol_Commands
  *       http://www.mythtv.org/wiki/Category:Myth_Protocol
  */
-#define MYTH_PROTO_VERSION "86"
-#define MYTH_PROTO_TOKEN "(ノಠ益ಠ)ノ彡┻━┻"
+#define MYTH_PROTO_VERSION "87"
+#define MYTH_PROTO_TOKEN "(ノಠ益ಠ)ノ彡┻━┻ (No entiendo!)"
 
 /** \brief Increment this whenever the MythTV core database schema changes.
  *

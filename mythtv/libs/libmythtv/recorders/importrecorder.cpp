@@ -37,7 +37,7 @@
 #include "mythdate.h"
 
 #define TVREC_CARDNUM \
-        ((tvrec != NULL) ? QString::number(tvrec->GetCaptureCardNum()) : "NULL")
+        ((tvrec != NULL) ? QString::number(tvrec->GetInputId()) : "NULL")
 
 #define LOC QString("ImportRec[%1](%2): ") \
             .arg(TVREC_CARDNUM).arg(videodevice)

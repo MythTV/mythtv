@@ -2297,9 +2297,7 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
             if (reclist.size())
             {
                 RemoteEncoder *testrec = NULL;
-                vector<uint> excluded_cardids;
-                testrec = RemoteRequestFreeRecorderFromList(reclist,
-                                                            excluded_cardids);
+                testrec = RemoteRequestFreeRecorderFromList(reclist, 0);
                 if (testrec && testrec->IsValidRecorder())
                 {
                     ctx->SetRecorder(testrec);
@@ -2336,11 +2334,11 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
             QString playbackURL = ctx->playingInfo->GetPlaybackURL(true);
             ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
-            bool opennow = (ctx->tvchain->GetCardType(-1) != "DUMMY");
+            bool opennow = (ctx->tvchain->GetInputType(-1) != "DUMMY");
 
             LOG(VB_GENERAL, LOG_INFO, LOC +
-                QString("playbackURL(%1) cardtype(%2)")
-                    .arg(playbackURL).arg(ctx->tvchain->GetCardType(-1)));
+                QString("playbackURL(%1) inputtype(%2)")
+                    .arg(playbackURL).arg(ctx->tvchain->GetInputType(-1)));
 
             ctx->SetRingBuffer(
                 RingBuffer::Create(
@@ -2961,7 +2959,7 @@ void TV::timerEvent(QTimerEvent *te)
         {
             uint tmp = switchToInputId;
             switchToInputId = 0;
-            SwitchInputs(actx, tmp);
+            SwitchInputs(actx, 0, QString::null, tmp);
         }
         ReturnPlayerLock(actx);
 
@@ -4748,11 +4746,6 @@ bool TV::ToggleHandleAction(PlayerContext *ctx,
         DoTogglePictureAttribute(ctx, kAdjustingPicture_Channel);
     else if (has_action(ACTION_TOGGLERECCONTROLS, actions) && islivetv)
         DoTogglePictureAttribute(ctx, kAdjustingPicture_Recording);
-    else if (has_action(ACTION_TOGGLEINPUTS, actions) &&
-             islivetv && !ctx->pseudoLiveTVState)
-    {
-        ToggleInputs(ctx);
-    }
     else if (has_action("TOGGLEBROWSE", actions))
     {
         if (islivetv)
@@ -4880,9 +4873,7 @@ bool TV::ActivePostQHandleAction(PlayerContext *ctx, const QStringList &actions)
     else if (has_action("PREVSOURCE", actions) && islivetv)
         SwitchSource(ctx, kPreviousSource);
     else if (has_action("NEXTINPUT", actions) && islivetv)
-        ToggleInputs(ctx);
-    else if (has_action("NEXTCARD", actions) && islivetv)
-        SwitchCards(ctx);
+        SwitchInputs(ctx);
     else if (has_action(ACTION_GUIDE, actions))
         EditSchedule(ctx, kScheduleProgramGuide);
     else if (has_action("PREVCHAN", actions) && islivetv)
@@ -7013,9 +7004,7 @@ void TV::SwitchSource(PlayerContext *ctx, uint source_direction)
 {
     QMap<uint,InputInfo> sources;
     uint         cardid  = ctx->GetCardID();
-    vector<uint> excluded_cardids;
-    excluded_cardids.push_back(cardid);
-    vector<uint> cardids = RemoteRequestFreeRecorderList(excluded_cardids);
+    vector<uint> cardids = RemoteRequestFreeRecorderList(cardid);
     stable_sort(cardids.begin(), cardids.end());
 
     InfoMap info;
@@ -7025,8 +7014,7 @@ void TV::SwitchSource(PlayerContext *ctx, uint source_direction)
     vector<uint>::const_iterator it = cardids.begin();
     for (; it != cardids.end(); ++it)
     {
-        vector<InputInfo> inputs = RemoteRequestFreeInputList(
-            *it, excluded_cardids);
+        vector<InputInfo> inputs = RemoteRequestFreeInputList(*it, cardid);
 
         if (inputs.empty())
             continue;
@@ -7035,8 +7023,8 @@ void TV::SwitchSource(PlayerContext *ctx, uint source_direction)
         {
             // prefer the current card's input in sources list
             if ((sources.find(inputs[i].sourceid) == sources.end()) ||
-                ((cardid == inputs[i].cardid) &&
-                 (cardid != sources[inputs[i].sourceid].cardid)))
+                ((cardid == inputs[i].inputid) &&
+                 (cardid != sources[inputs[i].sourceid].inputid)))
             {
                 sources[inputs[i].sourceid] = inputs[i];
             }
@@ -7086,46 +7074,24 @@ void TV::SwitchSource(PlayerContext *ctx, uint source_direction)
         switchToInputTimerId = StartTimer(1, __LINE__);
 }
 
-void TV::SwitchInputs(PlayerContext *ctx, uint inputid)
+void TV::SwitchInputs(PlayerContext *ctx,
+                      uint chanid, QString channum, uint inputid)
 {
     if (!ctx->recorder)
-    {
         return;
-    }
 
-    LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Input %1").arg(inputid));
-
-    if ((uint)ctx->GetCardID() == CardUtil::GetCardID(inputid))
-    {
-        ToggleInputs(ctx, inputid);
-    }
-    else
-    {
-        SwitchCards(ctx, 0, QString::null, inputid);
-    }
-}
-
-void TV::SwitchCards(PlayerContext *ctx,
-                     uint chanid, QString channum, uint inputid)
-{
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("(%1,'%2',%3)")
             .arg(chanid).arg(channum).arg(inputid));
 
     RemoteEncoder *testrec = NULL;
 
     if (!StateIsLiveTV(GetState(ctx)))
-    {
         return;
-    }
 
-    uint input_cardid = 0;
     QStringList reclist;
     if (inputid)
     {
-        // If we are switching to a specific input..
-        input_cardid = CardUtil::GetCardID(inputid);
-        if (input_cardid)
-            reclist.push_back(QString::number(input_cardid));
+        reclist.push_back(QString::number(inputid));
     }
     else if (chanid || !channum.isEmpty())
     {
@@ -7135,45 +7101,18 @@ void TV::SwitchCards(PlayerContext *ctx,
     }
 
     if (!reclist.empty())
-    {
-        vector<uint> excluded_cardids;
-        excluded_cardids.push_back(ctx->GetCardID());
-        testrec = RemoteRequestFreeRecorderFromList(reclist, excluded_cardids);
-    }
+        testrec = RemoteRequestFreeRecorderFromList(reclist, ctx->GetCardID());
 
     if (testrec && testrec->IsValidRecorder())
     {
-        uint cardid = testrec->GetRecorderNumber();
-        int cardinputid = (int) inputid;
-        QString inputname;
-
-        // We are switching to a specific input..
-        if (inputid)
-            inputname = CardUtil::GetInputName(inputid);
+        inputid = testrec->GetRecorderNumber();
 
         // We are switching to a specific channel...
-        if (inputname.isEmpty() && (chanid || !channum.isEmpty()))
-        {
-            if (chanid && channum.isEmpty())
-                channum = ChannelUtil::GetChanNum(chanid);
+        if (chanid && channum.isEmpty())
+            channum = ChannelUtil::GetChanNum(chanid);
 
-            cardinputid = CardUtil::GetCardInputID(
-                cardid, channum, inputname);
-        }
-
-        if (cardid && cardinputid>0 && !inputname.isEmpty())
-        {
-            if (!channum.isEmpty())
-                CardUtil::SetStartChannel(cardinputid, channum);
-        }
-        else
-        {
-            LOG(VB_GENERAL, LOG_WARNING, LOC +
-                QString("(%1,'%2',%3)")
-                    .arg(chanid).arg(channum).arg(inputid) +
-                "\n\t\t\tWe should have been able to set a start "
-                "channel or input but failed to do so.");
-        }
+        if (!channum.isEmpty())
+            CardUtil::SetStartChannel(inputid, channum);
     }
 
     // If we are just switching recorders find first available recorder.
@@ -7182,7 +7121,7 @@ void TV::SwitchCards(PlayerContext *ctx,
 
     if (testrec && testrec->IsValidRecorder())
     {
-        // Switching cards so clear the pseudoLiveTVState.
+        // Switching inputs so clear the pseudoLiveTVState.
         ctx->SetPseudoLiveTV(NULL, kPseudoNormalLiveTV);
 
         PlayerContext *mctx = GetPlayer(ctx, 0);
@@ -7233,7 +7172,7 @@ void TV::SwitchCards(PlayerContext *ctx,
         {
             ctx->LockPlayingInfo(__FILE__, __LINE__);
             QString playbackURL = ctx->playingInfo->GetPlaybackURL(true);
-            bool opennow = (ctx->tvchain->GetCardType(-1) != "DUMMY");
+            bool opennow = (ctx->tvchain->GetInputType(-1) != "DUMMY");
             ctx->SetRingBuffer(
                 RingBuffer::Create(
                     playbackURL, false, true,
@@ -7289,60 +7228,6 @@ void TV::SwitchCards(PlayerContext *ctx,
     UnpauseLiveTV(ctx);
 
     ITVRestart(ctx, true);
-}
-
-void TV::ToggleInputs(PlayerContext *ctx, uint inputid)
-{
-    if (!ctx->recorder)
-    {
-        return;
-    }
-
-    // If MythPlayer is paused, unpause it
-    if (ContextIsPaused(ctx, __FILE__, __LINE__))
-    {
-        HideOSDWindow(ctx, "osd_status");
-        GetMythUI()->DisableScreensaver();
-    }
-
-    const QString curinputname = ctx->recorder->GetInput();
-    QString inputname = curinputname;
-
-    uint cardid = ctx->GetCardID();
-    vector<uint> excluded_cardids;
-    excluded_cardids.push_back(cardid);
-    vector<InputInfo> inputs = RemoteRequestFreeInputList(
-        cardid, excluded_cardids);
-
-    vector<InputInfo>::const_iterator it = inputs.end();
-
-    if (inputid)
-    {
-        it = find(inputs.begin(), inputs.end(), inputid);
-    }
-    else
-    {
-        it = find(inputs.begin(), inputs.end(), inputname);
-        if (it != inputs.end())
-            ++it;
-    }
-
-    if (it == inputs.end())
-        it = inputs.begin();
-
-    if (it != inputs.end())
-        inputname = (*it).name;
-
-    if (curinputname != inputname)
-    {
-        // Pause the backend recorder, send command, and then unpause..
-        PauseLiveTV(ctx);
-        lockTimerOn = false;
-        inputname = ctx->recorder->SetInput(inputname);
-        UnpauseLiveTV(ctx);
-    }
-
-    UpdateOSDInput(ctx, inputname);
 }
 
 void TV::ToggleChannelFavorite(PlayerContext *ctx)
@@ -7676,21 +7561,11 @@ static uint get_chanid(const PlayerContext *ctx,
         if (chanid)
             return chanid;
     }
-    // try to find channel on all inputs
-    vector<uint> inputs = CardUtil::GetInputIDs(cardid);
-    for (vector<uint>::const_iterator it = inputs.begin();
-         it != inputs.end(); ++it)
-    {
-        uint sourceid = CardUtil::GetSourceID(*it);
-        if (cur_sourceid == sourceid)
-            continue; // already tested above
-        if (sourceid)
-        {
-            chanid = max(ChannelUtil::GetChanID(sourceid, channum), 0);
-            if (chanid)
-                return chanid;
-        }
-    }
+    // try to find channel on specified input
+
+    uint sourceid = CardUtil::GetSourceID(cardid);
+    if (cur_sourceid != sourceid && sourceid)
+        chanid = max(ChannelUtil::GetChanID(sourceid, channum), 0);
     return chanid;
 }
 
@@ -7781,9 +7656,7 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
     if (reclist.size())
     {
         RemoteEncoder *testrec = NULL;
-        vector<uint> excluded_cardids;
-        excluded_cardids.push_back(ctx->GetCardID());
-        testrec = RemoteRequestFreeRecorderFromList(reclist, excluded_cardids);
+        testrec = RemoteRequestFreeRecorderFromList(reclist, ctx->GetCardID());
         if (!testrec || !testrec->IsValidRecorder())
         {
             ClearInputQueues(ctx, true);
@@ -7807,7 +7680,7 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
         // Save the current channel if this is the first time
         if (ctx->prevChan.empty())
             ctx->PushPreviousChannel();
-        SwitchCards(ctx, chanid, channum, inputid);
+        SwitchInputs(ctx, chanid, channum, inputid);
         return;
     }
 
@@ -8504,16 +8377,18 @@ QSet<uint> TV::IsTunableOn(TV *tv,
     uint mplexid = ChannelUtil::GetMplexID(chanid);
     mplexid = (32767 == mplexid) ? 0 : mplexid;
 
-    vector<uint> excluded_cards;
+    uint excluded_input = 0;
     if (ctx && ctx->recorder && ctx->pseudoLiveTVState == kPseudoNormalLiveTV)
-        excluded_cards.push_back(ctx->GetCardID());
+        excluded_input = ctx->GetCardID();
 
     uint sourceid = ChannelUtil::GetSourceIDForChannel(chanid);
-    vector<uint> connected   = RemoteRequestFreeRecorderList(excluded_cards);
-    vector<uint> interesting = CardUtil::GetCardIDs(sourceid);
+    vector<uint> connected   = RemoteRequestFreeRecorderList(excluded_input);
+    vector<uint> interesting = CardUtil::GetInputIDs(sourceid);
 
     // filter disconnected cards
-    vector<uint> cardids = excluded_cards;
+    vector<uint> cardids;
+    if (excluded_input)
+        cardids.push_back(excluded_input);
     for (uint i = 0; i < connected.size(); i++)
     {
         for (uint j = 0; j < interesting.size(); j++)
@@ -8555,7 +8430,7 @@ QSet<uint> TV::IsTunableOn(TV *tv,
 
         if (!used_cache)
         {
-            inputs = RemoteRequestFreeInputList(cardids[i], excluded_cards);
+            inputs = RemoteRequestFreeInputList(cardids[i], excluded_input);
             if (tv)
             {
                 QMutexLocker locker(&tv->is_tunable_cache_lock);
@@ -11820,44 +11695,17 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
     {
         if (ctx->recorder)
         {
-            vector<uint> cardids = CardUtil::GetLiveTVCardList();
-            uint cardid  = ctx->GetCardID();
-            vector<uint> excluded_cardids;
-            stable_sort(cardids.begin(), cardids.end());
-            excluded_cardids.push_back(cardid);
-            vector<uint>::const_iterator it = cardids.begin();
-            InfoMap info;
-            ctx->recorder->GetChannelInfo(info);
-            uint sourceid = info["sourceid"].toUInt();
-            for (; it != cardids.end(); ++it)
+            uint inputid  = ctx->GetCardID();
+            vector<InputInfo> inputs = RemoteRequestFreeInputInfo(inputid);
+            vector<InputInfo>::iterator it = inputs.begin();
+            for (; it != inputs.end(); ++it)
             {
-                vector<InputInfo> inputs =
-                    RemoteRequestFreeInputList(*it, excluded_cardids);
-
-                for (uint i = 0; i < inputs.size(); i++)
-                {
-                    // don't add current input to list
-                    if ((inputs[i].cardid   == cardid) &&
-                        (inputs[i].sourceid == sourceid))
-                    {
-                        continue;
-                    }
-
-                    QString name = CardUtil::GetDisplayName(inputs[i].inputid);
-                    if (name.isEmpty())
-                    {
-                        //: %1 is the numeric card ID,
-                        //: %2 is the string input name
-                        name = tr("C:%1 I:%2",
-                                  "Playback OSD menu, Live TV input selection")
-                            .arg(QString::number(*it)).arg(inputs[i].name);
-                    }
-
-                    QString action = prefix +
-                        QString::number(inputs[i].inputid);
-                    active = false;
-                    BUTTON(action, name);
-                }
+                if ((*it).inputid == inputid)
+                    continue;
+                active = false;
+                QString action = QString("SWITCHTOINPUT_") +
+                    QString::number((*it).inputid);
+                BUTTON(action, (*it).displayName);
             }
         }
     }
@@ -11865,51 +11713,23 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
     {
         if (ctx->recorder)
         {
-            QMap<uint,InputInfo> sources;
-            vector<uint> cardids;
-            uint cardid = 0;
-            vector<uint> excluded_cardids;
-            uint sourceid = 0;
-            cardids = CardUtil::GetLiveTVCardList();
-            cardid  = ctx->GetCardID();
-            excluded_cardids.push_back(cardid);
+            uint inputid  = ctx->GetCardID();
             InfoMap info;
             ctx->recorder->GetChannelInfo(info);
-            sourceid = info["sourceid"].toUInt();
-            // Get sources available on other cards
-            vector<uint>::const_iterator it = cardids.begin();
-            for (; it != cardids.end(); ++it)
+            uint sourceid = info["sourceid"].toUInt();
+            QMap<uint, bool> sourceids;
+            vector<InputInfo> inputs = RemoteRequestFreeInputInfo(inputid);
+            vector<InputInfo>::iterator it = inputs.begin();
+            for (; it != inputs.end(); ++it)
             {
-                vector<InputInfo> inputs =
-                    RemoteRequestFreeInputList(*it, excluded_cardids);
-                if (inputs.empty())
+                if ((*it).sourceid == sourceid ||
+                    sourceids[(*it).sourceid])
                     continue;
-
-                for (uint i = 0; i < inputs.size(); i++)
-                    if (!sources.contains(inputs[i].sourceid))
-                        sources[inputs[i].sourceid] = inputs[i];
-            }
-            // Get other sources available on this card
-            vector<uint> currentinputs = CardUtil::GetInputIDs(cardid);
-            if (!currentinputs.empty())
-            {
-                for (uint i = 0; i < currentinputs.size(); i++)
-                {
-                    InputInfo info;
-                    info.inputid = currentinputs[i];
-                    if (CardUtil::GetInputInfo(info))
-                        if (!sources.contains(info.sourceid) &&
-                            info.livetvorder)
-                            sources[info.sourceid] = info;
-                }
-            }
-            // delete current source from list
-            sources.remove(sourceid);
-            QMap<uint,InputInfo>::const_iterator sit = sources.begin();
-            for (; sit != sources.end(); ++sit)
-            {
-                QString action = QString("SWITCHTOINPUT_%1").arg((*sit).inputid);
-                BUTTON(action, SourceUtil::GetSourceName((*sit).sourceid));
+                active = false;
+                sourceids[(*it).sourceid] = true;
+                QString action = QString("SWITCHTOINPUT_") +
+                    QString::number((*it).inputid);
+                BUTTON(action, SourceUtil::GetSourceName((*it).sourceid));
             }
         }
     }
@@ -12960,8 +12780,7 @@ void TV::ShowNoRecorderDialog(const PlayerContext *ctx, NoRecorderMsg msgType)
 }
 
 /**
- *  \brief Used in ChangeChannel(), ChangeChannel(),
- *         and ToggleInputs() to temporarily stop video output.
+ *  \brief Used in ChangeChannel() to temporarily stop video output.
  */
 void TV::PauseLiveTV(PlayerContext *ctx)
 {
@@ -13001,8 +12820,7 @@ void TV::PauseLiveTV(PlayerContext *ctx)
 }
 
 /**
- *  \brief Used in ChangeChannel(), ChangeChannel(),
- *         and ToggleInputs() to restart video output.
+ *  \brief Used in ChangeChannel() to restart video output.
  */
 void TV::UnpauseLiveTV(PlayerContext *ctx, bool bQuietly /*=false*/)
 {

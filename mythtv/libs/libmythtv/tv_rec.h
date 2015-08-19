@@ -66,7 +66,7 @@ class GeneralDBOptions
     GeneralDBOptions() :
         videodev(""),         vbidev(""),
         audiodev(""),
-        cardtype("V4L"),
+        inputtype("V4L"),
         audiosamplerate(-1),  skip_btaudio(false),
         signal_timeout(1000), channel_timeout(3000),
         wait_for_seqstart(false) {}
@@ -74,7 +74,7 @@ class GeneralDBOptions
     QString videodev;
     QString vbidev;
     QString audiodev;
-    QString cardtype;
+    QString inputtype;
     int     audiosamplerate;
     bool    skip_btaudio;
     uint    signal_timeout;
@@ -153,7 +153,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     friend class TVRecRecordThread;
 
   public:
-    TVRec(int capturecardnum);
+    TVRec(int _inputid);
    ~TVRec(void);
 
     bool Init(void);
@@ -204,7 +204,6 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
 
     void SetLiveRecording(int recording);
 
-    vector<InputInfo> GetFreeInputs(const vector<uint> &excluded_cards) const;
     QString     GetInput(void) const;
     uint        GetSourceID(void) const;
     QString     SetInput(QString input, uint requestType = kFlagDetect);
@@ -220,7 +219,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     int  ChangePictureAttribute(PictureAdjustType type, PictureAttribute attr,
                                 bool direction);
     bool CheckChannel(QString name) const;
-    bool ShouldSwitchToAnotherCard(QString chanid);
+    bool ShouldSwitchToAnotherInput(QString chanid);
     bool CheckChannelPrefix(const QString&,uint&,bool&,QString&);
     void GetNextProgram(BrowseDirection direction,
                         QString &title,       QString &subtitle,
@@ -236,8 +235,8 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
                         QString callsign, QString channum,
                         QString channame, QString xmltvid);
 
-    /// \brief Returns the caputure card number
-    uint GetCaptureCardNum(void) { return cardid; }
+    /// \brief Returns the inputid
+    uint GetInputId(void) { return inputid; }
     /// \brief Returns true is "errored" is true, false otherwise.
     bool IsErrored(void)  const { return HasFlags(kFlagErrored); }
 
@@ -248,7 +247,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
 
     uint GetFlags(void) const { return stateFlags; }
 
-    static TVRec *GetTVRec(uint cardid);
+    static TVRec *GetTVRec(uint inputid);
 
     virtual void AllGood(void) { WakeEventLoop(); }
     virtual void StatusChannelTuned(const SignalMonitorValue&) { }
@@ -265,12 +264,12 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     void TeardownAll(void);
     void WakeEventLoop(void);
 
-    static bool GetDevices(uint cardid,
+    static bool GetDevices(uint inputid,
                            GeneralDBOptions   &general_opts,
                            DVBDBOptions       &dvb_opts,
                            FireWireDBOptions  &firewire_opts);
 
-    static QString GetStartChannel(uint cardid, const QString &startinput);
+    static QString GetStartChannel(uint inputid);
 
     void TeardownRecorder(uint request_flags);
     DTVRecorder  *GetDTVRecorder(void);
@@ -371,10 +370,10 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     InputGroupMap igrp;
 
     // Configuration variables from setup routines
-    uint              cardid;
+    uint              inputid;
     bool              ispip;
 
-    // Configuration variables from database, based on cardid
+    // Configuration variables from database, based on inputid
     GeneralDBOptions   genOpt;
     DVBDBOptions       dvbOpt;
     FireWireDBOptions  fwOpt;
@@ -426,8 +425,8 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     QString      rbFileExt;
 
   public:
-    static QMutex            cardsLock;
-    static QMap<uint,TVRec*> cards;
+    static QMutex            inputsLock;
+    static QMap<uint,TVRec*> inputs;
 
   public:
     static const uint kSignalMonitoringRate;

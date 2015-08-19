@@ -215,6 +215,6 @@ void ScanWizard::SetInput(const QString &cardids_inputname)
     {
         lastHWCardID    = cardid;
         QString subtype = CardUtil::ProbeSubTypeName(cardid);
-        lastHWCardType  = CardUtil::toCardType(subtype);
+        lastHWCardType  = CardUtil::toInputType(subtype);
     }
 }

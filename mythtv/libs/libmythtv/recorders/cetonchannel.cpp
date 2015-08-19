@@ -13,7 +13,7 @@
 #include "channelutil.h"
 #include "mythdbcon.h"
 
-#define LOC QString("CetonChan[%1](%2): ").arg(GetCardID()).arg(GetDevice())
+#define LOC QString("CetonChan[%1](%2): ").arg(m_inputid).arg(GetDevice())
 
 CetonChannel::CetonChannel(TVRec *parent, const QString &device) :
     DTVChannel(parent), _device_id(device), _stream_handler(NULL)
@@ -37,7 +37,7 @@ bool CetonChannel::Open(void)
     tunerType = DTVTunerType::kTunerTypeATSC;
     _tuner_types.push_back(tunerType);
 
-    if (!InitializeInputs())
+    if (!InitializeInput())
     {
         Close();
         return false;
@@ -88,7 +88,7 @@ static QString format_modulation(const DTVMultiplex &tuning)
     return "unknown";
 }
 
-bool CetonChannel::Tune(const DTVMultiplex &tuning, QString /*inputname*/)
+bool CetonChannel::Tune(const DTVMultiplex &tuning)
 {
     QString modulation = format_modulation(tuning);
 

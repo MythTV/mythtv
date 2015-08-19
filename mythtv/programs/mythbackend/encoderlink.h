@@ -21,8 +21,8 @@ class QStringList;
 class EncoderLink
 {
   public:
-    EncoderLink(int capturecardnum, PlaybackSock *lsock, QString lhostname);
-    EncoderLink(int capturecardnum, TVRec *ltv);
+    EncoderLink(int inputid, PlaybackSock *lsock, QString lhostname);
+    EncoderLink(int inputid, TVRec *ltv);
 
    ~EncoderLink();
 
@@ -63,8 +63,8 @@ class EncoderLink
     /// \brief Returns the current Sleep Status of the encoder.
     SleepStatus GetSleepStatus(void) const { return (sleepStatus); }
 
-    /// \brief Returns the cardid used to refer to the recorder in the DB.
-    int GetCardID(void) const { return m_capturecardnum; }
+    /// \brief Returns the inputid used to refer to the recorder in the DB.
+    int GetInputID(void) const { return m_inputid; }
     /// \brief Returns the TVRec used by a local EncoderLink instance.
     TVRec *GetTVRec(void) { return tv; }
 
@@ -114,7 +114,6 @@ class EncoderLink
     void PauseRecorder(void);
     void SetLiveRecording(int);
     void SetNextLiveTVDir(QString dir);
-    std::vector<InputInfo> GetFreeInputs(const std::vector<uint> &excluded_cards);
     QString GetInput(void) const;
     QString SetInput(QString);
     void ToggleChannelFavorite(QString);
@@ -125,7 +124,7 @@ class EncoderLink
                                 PictureAttribute  attr,
                                 bool              direction);
     bool CheckChannel(const QString &name);
-    bool ShouldSwitchToAnotherCard(const QString &channelid);
+    bool ShouldSwitchToAnotherInput(const QString &channelid);
     bool CheckChannelPrefix(const QString&,uint&,bool&,QString&);
     void GetNextProgram(BrowseDirection direction,
                         QString &title, QString &subtitle, QString &desc,
@@ -145,7 +144,7 @@ class EncoderLink
     bool HasSockAndIncrRef();
     bool HasSockAndDecrRef();
 
-    int m_capturecardnum;
+    int m_inputid;
 
     PlaybackSock *sock;
     QMutex sockLock;
