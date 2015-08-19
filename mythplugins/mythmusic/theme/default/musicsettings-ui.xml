@@ -131,22 +131,31 @@
             <position>410,210</position>
         </buttonlist>
 
+        <textarea name="jumpaction_label" from="basetextarea">
+            <area>20,260,380,40</area>
+            <align>right,vcenter</align>
+            <value>Action on jumppoint:</value>
+        </textarea>
+        <buttonlist name="jumpaction" from="baseselector">
+            <position>410,260</position>
+        </buttonlist>
+
         <textarea name="autolookupcd_label" from="basetextarea">
-            <area>20,275,380,40</area>
+            <area>20,315,380,40</area>
             <align>right,vcenter</align>
             <value>Automatically lookup CDs:</value>
         </textarea>
         <checkbox name="autolookupcd" from="basecheckbox">
-            <position>410,280</position>
+            <position>410,320</position>
         </checkbox>
 
         <textarea name="autoplaycd_label" from="basetextarea">
-            <area>20,325,380,40</area>
+            <area>20,365,380,40</area>
             <align>right,vcenter</align>
             <value>Automatically Play CDs:</value>
         </textarea>
         <checkbox name="autoplaycd" from="basecheckbox">
-            <position>410,330</position>
+            <position>410,370</position>
         </checkbox>
 
         <textarea name="helptext" from="basetextarea">
