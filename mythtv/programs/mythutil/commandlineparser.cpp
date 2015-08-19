@@ -158,6 +158,10 @@ void MythUtilCommandLineParser::LoadArguments(void)
         << add("--calctracklen", "calctracklen", false,
                 "Decode a track to determine its exact length", "")
                 ->SetGroup("Metadata Reading/Writing")
+        << add("--findlyrics", "findlyrics", false,
+                "Search for some lyrics for a track", "")
+                ->SetGroup("Metadata Reading/Writing")
+                ->SetRequiredChild(QStringList("songid"))
 
         // recordingutils.cpp
         << add("--checkrecordings", "checkrecordings", false,
@@ -240,6 +244,10 @@ void MythUtilCommandLineParser::LoadArguments(void)
         ->SetChildOf("extractimage");
     add("--songid", "songid", "", "ID of track to determine the length", "")
         ->SetChildOf("calctracklen");
+    add("--songid", "songid", "", "ID of track to find lyrics for", "")
+        ->SetChildOf("findlyrics");
+    add("--grabber", "grabber", "", "(optional) Name of grabber to use or 'ALL' to try all available grabbers", "")
+        ->SetChildOf("findlyrics");
 
     // recordingutils.cpp
     add("--fixseektable", "fixseektable", false, "(optional) fix the seektable if missing for a recording", "")
