@@ -895,6 +895,17 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
         else
             HandleMusicTagChangeImage(listline, pbs);
     }
+    else if (command == "MUSIC_LYRICS_FIND")
+    {
+        if (listline.size() < 3)
+            SendErrorResponse(pbs, "Bad MUSIC_LYRICS_FIND");
+        else
+            HandleMusicFindLyrics(listline, pbs);
+    }
+    else if (command == "MUSIC_LYRICS_GETGRABBERS")
+    {
+        HandleMusicGetLyricGrabbers(listline, pbs);
+    }
     else if (command == "IMAGE_SCAN")
     {
         QStringList reply = ImageScan::getInstance()->HandleScanRequest(listline);
@@ -6625,6 +6636,150 @@ void MainServer::HandleMusicTagRemoveImage(const QStringList& slist, PlaybackSoc
         SendResponse(pbssock, strlist);
 }
 
+void MainServer::HandleMusicFindLyrics(const QStringList &slist, PlaybackSock *pbs)
+{
+// format: MUSIC_LYRICS_FIND <hostname> <songid> <grabbername (optional)>
+// if no grabbername is given all grabbers will be tried until a match is found
+
+    QStringList strlist;
+
+    MythSocket *pbssock = pbs->getSocket();
+
+    QString hostname = slist[1];
+    QString songid = slist[2];
+    QString grabberName = "ALL";
+
+    if (slist.size() >= 4)
+        grabberName = slist[3];
+
+    if (ismaster && !gCoreContext->IsThisHost(hostname))
+    {
+        // forward the request to the slave BE
+        PlaybackSock *slave = GetMediaServerByHostname(hostname);
+        if (slave)
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC +
+                QString("HandleMusicFindLyrics: asking slave '%1' to "
+                        "find lyrics").arg(hostname));
+            strlist = slave->ForwardRequest(slist);
+            slave->DecrRef();
+
+            if (pbssock)
+                SendResponse(pbssock, strlist);
+
+            return;
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC +
+                QString("HandleMusicFindLyrics: Failed to grab slave "
+                        "socket on '%1'").arg(hostname));
+        }
+    }
+    else
+    {
+        QStringList paramList;
+        paramList.append(QString("--songid='%1'").arg(songid));
+        paramList.append(QString("--grabber='%1'").arg(grabberName));
+
+        QString command = GetAppBinDir() + "mythutil --findlyrics " + paramList.join(" ");
+
+        QScopedPointer<MythSystem> cmd(MythSystem::Create(command,
+                                       kMSAutoCleanup | kMSRunBackground |
+                                       kMSDontDisableDrawing | kMSProcessEvents |
+                                       kMSDontBlockInputDevs));
+    }
+
+    strlist << "OK";
+
+    if (pbssock)
+        SendResponse(pbssock, strlist);
+}
+
+void MainServer::HandleMusicGetLyricGrabbers(const QStringList &slist, PlaybackSock *pbs)
+{
+    QStringList strlist;
+
+    MythSocket *pbssock = pbs->getSocket();
+
+    QString  scriptDir = GetShareDir() + "metadata/Music/lyrics";
+    QDir d(scriptDir);
+
+    if (!d.exists())
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Cannot find lyric scripts directory: %1").arg(scriptDir));
+        strlist << QString("ERROR: Cannot find lyric scripts directory: %1").arg(scriptDir);
+
+        if (pbssock)
+            SendResponse(pbssock, strlist);
+
+        return;
+    }
+
+    d.setFilter(QDir::Files | QDir::NoDotAndDotDot);
+    d.setNameFilters(QStringList("*.py"));
+    QFileInfoList list = d.entryInfoList();
+    if (list.isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Cannot find any lyric scripts in: %1").arg(scriptDir));
+        strlist << QString("ERROR: Cannot find any lyric scripts in: %1").arg(scriptDir);
+
+        if (pbssock)
+            SendResponse(pbssock, strlist);
+
+        return;
+    }
+
+    QStringList scripts;
+    QFileInfoList::const_iterator it = list.begin();
+    const QFileInfo *fi;
+
+    while (it != list.end())
+    {
+        fi = &(*it);
+        ++it;
+        LOG(VB_GENERAL, LOG_NOTICE, QString("Found lyric script at: %1").arg(fi->filePath()));
+        scripts.append(fi->filePath());
+    }
+
+    QStringList grabbers;
+
+    // query the grabbers to get their name
+    for (int x = 0; x < scripts.count(); x++)
+    {
+        QProcess p;
+        p.start(QString("python %1 -v").arg(scripts.at(x)));
+        p.waitForFinished(-1);
+        QString result = p.readAllStandardOutput();
+
+        QDomDocument domDoc;
+        QString errorMsg;
+        int errorLine, errorColumn;
+
+        if (!domDoc.setContent(result, false, &errorMsg, &errorLine, &errorColumn))
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("FindLyrics: Could not parse version from %1").arg(scripts.at(x)) +
+                QString("\n\t\t\tError at line: %1  column: %2 msg: %3").arg(errorLine).arg(errorColumn).arg(errorMsg));
+            continue;
+        }
+
+        QDomNodeList itemList = domDoc.elementsByTagName("grabber");
+        QDomNode itemNode = itemList.item(0);
+
+        grabbers.append(itemNode.namedItem(QString("name")).toElement().text());
+    }
+
+    grabbers.sort();
+
+    strlist << "OK";
+
+    for (int x = 0; x < grabbers.count(); x++)
+        strlist.append(grabbers.at(x));
+
+    if (pbssock)
+        SendResponse(pbssock, strlist);
+}
 
 void MainServer::HandleFileTransferQuery(QStringList &slist,
                                          QStringList &commands,

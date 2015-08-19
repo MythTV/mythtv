@@ -228,6 +228,8 @@ class MainServer : public QObject, public MythSocketCBs
     void HandleMusicTagRemoveImage(const QStringList &slist, PlaybackSock *pbs);
     void HandleMusicTagChangeImage(const QStringList &slist, PlaybackSock *pbs);
     void HandleMusicCalcTrackLen(const QStringList &slist, PlaybackSock *pbs);
+    void HandleMusicFindLyrics(const QStringList &slist, PlaybackSock *pbs);
+    void HandleMusicGetLyricGrabbers(const QStringList &slist, PlaybackSock *pbs);
     void HandleVersion(MythSocket *socket, const QStringList &slist);
     void HandleBackendRefresh(MythSocket *socket);
     void HandleQueryLoad(PlaybackSock *pbs);
