@@ -233,7 +233,7 @@ class MTV_PUBLIC CardUtil
 
     static bool         DeleteCard(uint cardid);
     static bool         DeleteAllCards(void);
-    static vector<uint> GetCardList(void);
+    static vector<uint> GetCardList(const QString &hostname = NULL);
     static vector<uint> GetLiveTVCardList(void);
 
     /// Convenience function for GetCardIDs()

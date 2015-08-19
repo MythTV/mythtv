@@ -231,7 +231,7 @@ static bool isRecording()
         }
     }
 
-    return RemoteGetRecordingStatus(NULL, false);
+    return RemoteGetRecordingStatus(NULL, false, gCoreContext->GetHostName());
 }
 
 static int getStatus(bool bWantRecStatus)
@@ -277,7 +277,16 @@ static int getStatus(bool bWantRecStatus)
         res |= 16;
     }
 
-    if (JobQueue::HasRunningOrPendingJobs(15))
+    // Is this host allowed to run jobs?
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT value FROM settings "
+          "WHERE value LIKE 'JobAllow%' AND hostname = :HOST AND data = '1'");
+    query.bindValue(":HOST", gCoreContext->GetHostName());
+    if (!query.exec())
+          MythDB::DBError("isAllowedToRunJobs -- select", query);
+    bool isHostAllowedToRunJobs = query.size() == 1;
+
+    if (isHostAllowedToRunJobs && JobQueue::HasRunningOrPendingJobs(15))
     {
         LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
             QObject::tr("Has queued or pending jobs", "mythshutdown") + "\n");

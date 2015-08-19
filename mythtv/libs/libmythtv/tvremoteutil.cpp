@@ -361,10 +361,10 @@ bool RemoteIsBusy(uint cardid, InputInfo &busy_input)
 }
 
 bool RemoteGetRecordingStatus(
-    vector<TunerStatus> *tunerList, bool list_inactive)
+    vector<TunerStatus> *tunerList, bool list_inactive, const QString &hostname)
 {
     bool isRecording = false;
-    vector<uint> cardlist = CardUtil::GetCardList();
+    vector<uint> cardlist = CardUtil::GetCardList(hostname);
 
     if (tunerList)
         tunerList->clear();

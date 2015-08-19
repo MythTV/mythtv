@@ -2177,15 +2177,16 @@ bool CardUtil::DeleteAllCards(void)
             query.exec("TRUNCATE TABLE capturecard"));
 }
 
-vector<uint> CardUtil::GetCardList(void)
+vector<uint> CardUtil::GetCardList(const QString &hostname)
 {
     vector<uint> list;
+    QString sql = "SELECT cardid FROM capturecard ";
+    if (hostname != NULL) 
+        sql.append(" WHERE hostname = '").append(hostname).append("'");
+    sql.append(" ORDER by cardid");
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        "SELECT cardid "
-        "FROM capturecard "
-        "ORDER BY cardid");
+    query.prepare(sql);
 
     if (!query.exec())
         MythDB::DBError("CardUtil::GetCardList()", query);
