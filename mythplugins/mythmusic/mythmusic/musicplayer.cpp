@@ -722,6 +722,20 @@ void MusicPlayer::customEvent(QEvent *event)
                     MythEvent me(message);
                     gCoreContext->dispatch(me);
                 }
+                else if (list[2] == "GET_STATUS")
+                {
+                    QString statusStr = "STOPPED";
+
+                    if (gPlayer->isPlaying())
+                        statusStr = "PLAYING";
+                    else if (gPlayer->isPaused())
+                        statusStr = "PAUSED";
+
+                    QString message = QString("MUSIC_CONTROL ANSWER %1 %2")
+                            .arg(gCoreContext->GetHostName()).arg(statusStr);
+                    MythEvent me(message);
+                    gCoreContext->dispatch(me);
+                }
             }
             else
                 LOG(VB_GENERAL, LOG_ERR,
