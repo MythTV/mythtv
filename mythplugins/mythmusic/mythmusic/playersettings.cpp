@@ -13,6 +13,7 @@ PlayerSettings::PlayerSettings(MythScreenStack *parent, const char *name)
         m_resumeModeEditor(),
         m_resumeModeRadio(),
         m_exitAction(NULL),
+        m_jumpAction(NULL),
         m_autoLookupCD(NULL),
         m_autoPlayCD(NULL),
         m_saveButton(NULL),
@@ -37,6 +38,7 @@ bool PlayerSettings::Create()
     UIUtilE::Assign(this, m_resumeModeEditor, "resumemodeeditor", &err);
     UIUtilE::Assign(this, m_resumeModeRadio, "resumemoderadio", &err);
     UIUtilE::Assign(this, m_exitAction, "exitaction", &err);
+    UIUtilE::Assign(this, m_jumpAction, "jumpaction", &err);
     UIUtilE::Assign(this, m_autoLookupCD, "autolookupcd", &err);
     UIUtilE::Assign(this, m_autoPlayCD, "autoplaycd", &err);
     UIUtilE::Assign(this, m_saveButton, "save", &err);
@@ -67,7 +69,11 @@ bool PlayerSettings::Create()
     new MythUIButtonListItem(m_exitAction, tr("Prompt"), qVariantFromValue(QString("prompt")));
     new MythUIButtonListItem(m_exitAction, tr("Stop playing"), qVariantFromValue(QString("stop")));
     new MythUIButtonListItem(m_exitAction, tr("Continue Playing"), qVariantFromValue(QString("play")));
-    m_exitAction->SetValueByData(gCoreContext->GetSetting("MusicExitAction"));
+    m_exitAction->SetValueByData(gCoreContext->GetSetting("MusicExitAction", "prompt"));
+
+    new MythUIButtonListItem(m_jumpAction, tr("Stop playing"), qVariantFromValue(QString("stop")));
+    new MythUIButtonListItem(m_jumpAction, tr("Continue Playing"), qVariantFromValue(QString("play")));
+    m_jumpAction->SetValueByData(gCoreContext->GetSetting("MusicJumpPointAction", "stop"));
 
     int loadAutoLookupCD = gCoreContext->GetNumSetting("AutoLookupCD", 0);
     if (loadAutoLookupCD == 1)
@@ -84,6 +90,7 @@ bool PlayerSettings::Create()
                  "or an exact point within the last track played or not at all."));
     m_resumeModeRadio->SetHelpText(tr("Radio screen - Resume playback at the previous station or not at all"));
     m_exitAction->SetHelpText(tr("Specify what action to take when exiting MythMusic plugin."));
+    m_jumpAction->SetHelpText(tr("Specify what action to take when exiting MythMusic plugin due to a jumppoint being executed."));
     m_autoLookupCD->SetHelpText(tr("Automatically lookup an audio CD if it is "
                  "present and show its information in the "
                  "Music Selection Tree."));
@@ -106,6 +113,7 @@ void PlayerSettings::slotSave(void)
     gCoreContext->SaveSetting("ResumeModeEditor", m_resumeModeEditor->GetDataValue().toInt());
     gCoreContext->SaveSetting("ResumeModeRadio", m_resumeModeRadio->GetDataValue().toInt());
     gCoreContext->SaveSetting("MusicExitAction", m_exitAction->GetDataValue().toString());
+    gCoreContext->SaveSetting("MusicJumpPointAction", m_jumpAction->GetDataValue().toString());
 
     int saveAutoLookupCD = (m_autoLookupCD->GetCheckState() == MythUIStateType::Full) ? 1 : 0;
     gCoreContext->SaveSetting("AutoLookupCD", saveAutoLookupCD);
