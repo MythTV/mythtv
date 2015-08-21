@@ -44,7 +44,7 @@
  *       http://www.mythtv.org/wiki/Category:Myth_Protocol
  */
 #define MYTH_PROTO_VERSION "87"
-#define MYTH_PROTO_TOKEN "(ノಠ益ಠ)ノ彡┻━┻ (No entiendo!)"
+#define MYTH_PROTO_TOKEN "(ノಠ益ಠ)ノ彡┻━┻_No_entiendo!)"
 
 /** \brief Increment this whenever the MythTV core database schema changes.
  *
