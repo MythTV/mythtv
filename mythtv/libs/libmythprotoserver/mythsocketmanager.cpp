@@ -364,8 +364,9 @@ void MythSocketManager::HandleVersion(MythSocket *socket,
     QString token = slist[2];
     if (token != MYTH_PROTO_TOKEN)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Client sent incorrect protocol token "
-                                 "for protocol version. Refusing connection!");
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Client sent incorrect protocol token \"%1\" for "
+                    "protocol version. Refusing connection!").arg(token));
         retlist << "REJECT" << MYTH_PROTO_VERSION;
         socket->WriteStringList(retlist);
         HandleDone(socket);
