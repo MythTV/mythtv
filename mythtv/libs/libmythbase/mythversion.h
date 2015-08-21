@@ -15,6 +15,7 @@
 #define MYTH_BINARY_VERSION "0.28.20150817-1"
 
 /** \brief Increment this whenever the MythTV network protocol changes.
+ *   Note that the token currently cannot contain spaces.
  *
  *   You must also update this value and any corresponding changes to the
  *   ProgramInfo network protocol layout in the following files:

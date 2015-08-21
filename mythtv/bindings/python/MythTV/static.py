@@ -9,7 +9,7 @@ SCHEMA_VERSION = 1340
 NVSCHEMA_VERSION = 1007
 MUSICSCHEMA_VERSION = 1018
 PROTO_VERSION = '87'
-PROTO_TOKEN = '(ノಠ益ಠ)ノ彡┻━┻ (No entiendo!)'
+PROTO_TOKEN = '(ノಠ益ಠ)ノ彡┻━┻_No_entiendo!)'
 BACKEND_SEP = '[]:[]'
 INSTALL_PREFIX = '/usr/local'
 
