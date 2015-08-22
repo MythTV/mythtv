@@ -611,6 +611,13 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
         else
             HandleDeleteFile(listline, pbs);
     }
+    else if (command == "MOVE_FILE")
+    {
+        if (listline.size() < 4)
+            SendErrorResponse(pbs, "Bad MOVE_FILE command");
+        else
+            HandleMoveFile(pbs, listline[1], listline[2], listline[3]);
+    }
     else if (command == "STOP_RECORDING")
     {
         HandleStopRecording(listline, pbs);
@@ -5156,6 +5163,80 @@ void MainServer::GetFilesystemInfos(QList<FileSystemInfo> &fsInfos)
         LOG(VB_FILE | VB_SCHEDULE, LOG_INFO, LOC +
             "--- GetFilesystemInfos directory list end ---");
     }
+}
+
+void MainServer::HandleMoveFile(PlaybackSock *pbs, const QString &storagegroup,
+                                const QString &src, const QString &dst)
+{
+    StorageGroup sgroup(storagegroup, "", false);
+    QStringList retlist;
+
+    if (src.isEmpty() || dst.isEmpty()
+        || src.contains("..") || dst.contains(".."))
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("HandleMoveFile: ERROR moving file '%1' -> '%2', "
+                    "a path fails sanity checks").arg(src, dst));
+        retlist << "0" << "Invalid path";
+        SendResponse(pbs->getSocket(), retlist);
+        return;
+    }
+
+    QString srcAbs = sgroup.FindFile(src);
+    if (srcAbs.isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("HandleMoveFile: Unable to find %1").arg(src));
+        retlist << "0" << "Source file not found";
+        SendResponse(pbs->getSocket(), retlist);
+        return;
+    }
+
+    // Path of files must be unique within SG. Rename will permit <sgdir1>/<dst>
+    // even when <sgdir2>/<dst> already exists.
+    // Directory paths do not have to be unique.
+    QString dstAbs = sgroup.FindFile(dst);
+    if (!dstAbs.isEmpty() && QFileInfo(dstAbs).isFile())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("HandleMoveFile: Destination exists at %1").arg(dstAbs));
+        retlist << "0" << "Destination file exists";
+        SendResponse(pbs->getSocket(), retlist);
+        return;
+    }
+
+    // Files never move filesystems, so use current SG dir
+    int sgPathSize = srcAbs.size() - src.size();
+    dstAbs = srcAbs.mid(0, sgPathSize) + dst;
+
+    // Renaming on same filesystem should always be fast but is liable to delays
+    // for unknowable reasons so we delegate to a separate thread for safety.
+    RenameThread *renamer = new RenameThread(*this, *pbs, srcAbs, dstAbs);
+    MThreadPool::globalInstance()->start(renamer, "Rename");
+}
+
+QMutex RenameThread::m_renamelock;
+
+void RenameThread::run()
+{
+    // Only permit one rename to run at any time
+    QMutexLocker lock(&m_renamelock);
+    LOG(VB_FILE, LOG_INFO, QString("MainServer::RenameThread: Renaming %1 -> %2")
+        .arg(m_src, m_dst));
+
+    QStringList retlist;
+    QFileInfo   fi(m_dst);
+
+    if (QDir().mkpath(fi.path()) && QFile::rename(m_src, m_dst))
+    {
+        retlist << "1";
+    }
+    else
+    {
+        retlist << "0" << "Rename failed";
+        LOG(VB_FILE, LOG_ERR, "MainServer::DoRenameThread: Rename failed");
+    }
+    m_ms.SendResponse(m_pbs.getSocket(), retlist);
 }
 
 void TruncateThread::run(void)

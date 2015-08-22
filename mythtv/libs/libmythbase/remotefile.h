@@ -43,6 +43,8 @@ class MBASE_PUBLIC RemoteFile
                                     bool allowFallback = false);
     static bool CopyFile(const QString &src, const QString &dest,
                          bool overwrite = false, bool verify = false);
+    static bool MoveFile(const QString &src, const QString &dest,
+                         bool overwrite = false);
 
     int Write(const void *data, int size);
     int Read(void *data, int size);

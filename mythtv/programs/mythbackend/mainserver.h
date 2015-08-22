@@ -92,6 +92,21 @@ class TruncateThread : public QRunnable, public DeleteStruct
     void run(void);
 };
 
+class RenameThread : public QRunnable
+{
+public:
+    RenameThread(MainServer &ms, PlaybackSock &pbs, QString src, QString dst)
+        : m_ms(ms), m_pbs(pbs), m_src(src), m_dst(dst) {}
+    void run(void);
+
+private:
+    static QMutex m_renamelock;
+
+    MainServer   &m_ms;
+    PlaybackSock &m_pbs;
+    QString       m_src, m_dst;
+};
+
 class MainServer : public QObject, public MythSocketCBs
 {
     Q_OBJECT
@@ -99,6 +114,7 @@ class MainServer : public QObject, public MythSocketCBs
     friend class DeleteThread;
     friend class TruncateThread;
     friend class FreeSpaceUpdater;
+    friend class RenameThread;
   public:
     MainServer(bool master, int port,
                QMap<int, EncoderLink *> *tvList,
@@ -147,6 +163,8 @@ class MainServer : public QObject, public MythSocketCBs
     void GetActiveBackends(QStringList &hosts);
     void HandleActiveBackendsQuery(PlaybackSock *pbs);
     void HandleIsActiveBackendQuery(QStringList &slist, PlaybackSock *pbs);
+    void HandleMoveFile(PlaybackSock *pbs, const QString &storagegroup,
+                        const QString &src, const QString &dst);
     bool HandleDeleteFile(QStringList &slist, PlaybackSock *pbs);
     bool HandleDeleteFile(QString filename, QString storagegroup,
                           PlaybackSock *pbs = NULL);
