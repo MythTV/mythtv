@@ -394,7 +394,7 @@ void CDRipperThread::run(void)
                 destFile = gCoreContext->GenMythURL(url.host(), 0, destFile, "Music");
 
                 QApplication::postEvent(m_parent, new RipStatusEvent(RipStatusEvent::kCopyStartEvent, 0));
-                RemoteFile::CopyFile(saveDir + outfile, destFile);
+                RemoteFile::CopyFile(saveDir + outfile, destFile, true);
                 QApplication::postEvent(m_parent, new RipStatusEvent(RipStatusEvent::kCopyEndEvent, 0));
             }
         }

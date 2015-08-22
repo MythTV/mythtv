@@ -53,7 +53,7 @@ FileCopyThread::FileCopyThread(const QString &src, const QString &dst) :
 void FileCopyThread::run()
 {
     RunProlog();
-    m_result = RemoteFile::CopyFile(m_srcFile, m_dstFile);
+    m_result = RemoteFile::CopyFile(m_srcFile, m_dstFile, true);
     RunEpilog();
 }
 
@@ -438,7 +438,7 @@ void ImportMusicDialog::addPressed()
 
         m_somethingWasImported = true;
 
-        m_tracks->at(m_currentTrack)->isNewTune = 
+        m_tracks->at(m_currentTrack)->isNewTune =
                 isNewTune(meta->Artist(), meta->Album(), meta->Title());
 
         // update the UI
@@ -543,7 +543,7 @@ void ImportMusicDialog::startScan()
         location.append('/');
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythUIBusyDialog *busy = 
+    MythUIBusyDialog *busy =
             new MythUIBusyDialog(tr("Searching for music files"),
                                      popupStack,
                                      "scanbusydialog");
@@ -814,7 +814,7 @@ void ImportMusicDialog::setAlbum(void)
     MusicMetadata *data = m_tracks->at(m_currentTrack)->metadata;
     data->setAlbum(m_defaultAlbum);
 
-    m_tracks->at(m_currentTrack)->isNewTune = 
+    m_tracks->at(m_currentTrack)->isNewTune =
             isNewTune(data->Artist(), data->Album(), data->Title());
 
     fillWidgets();
@@ -1075,7 +1075,7 @@ void ImportCoverArtDialog::copyPressed()
 {
     if (m_filelist.size() > 0)
     {
-        if (!RemoteFile::CopyFile(m_filelist[m_currentFile], m_saveFilename))
+        if (!RemoteFile::CopyFile(m_filelist[m_currentFile], m_saveFilename, true))
         {
             //: %1 is the filename
             ShowOkPopup(tr("Copy CoverArt Failed.\nCopying to %1").arg(m_saveFilename));
