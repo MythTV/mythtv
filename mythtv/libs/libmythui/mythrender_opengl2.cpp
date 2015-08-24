@@ -200,7 +200,7 @@ void MythRenderOpenGL2::ResetProcs(void)
     m_glDetachShader = NULL;
     m_glDeleteShader = NULL;
     m_glGetUniformLocation = NULL;
-    m_glUniform4f = NULL;
+    m_glUniform1i = NULL;
     m_glUniformMatrix4fv = NULL;
     m_glVertexAttribPointer = NULL;
     m_glEnableVertexAttribArray = NULL;
@@ -232,7 +232,7 @@ bool MythRenderOpenGL2::InitFeatures(void)
         m_glUseProgram    && m_glGetProgramInfoLog &&
         m_glDetachShader  && m_glGetProgramiv &&
         m_glDeleteShader  && m_glGetUniformLocation &&
-        m_glUniform4f     && m_glUniformMatrix4fv &&
+        m_glUniform1i     && m_glUniformMatrix4fv &&
         m_glVertexAttribPointer &&
         m_glEnableVertexAttribArray &&
         m_glDisableVertexAttribArray &&
@@ -293,8 +293,8 @@ void MythRenderOpenGL2::InitProcs(void)
         GetProcAddress("glDeleteShader");
     m_glGetUniformLocation = (MYTH_GLGETUNIFORMLOCATIONPROC)
         GetProcAddress("glGetUniformLocation");
-    m_glUniform4f = (MYTH_GLUNIFORM4FPROC)
-        GetProcAddress("glUniform4f");
+    m_glUniform1i = (MYTH_GLUNIFORM1IPROC)
+        GetProcAddress("glUniform1i");
     m_glUniformMatrix4fv = (MYTH_GLUNIFORMMATRIX4FVPROC)
         GetProcAddress("glUniformMatrix4fv");
     m_glVertexAttribPointer = (MYTH_GLVERTEXATTRIBPOINTERPROC)
@@ -403,7 +403,8 @@ void MythRenderOpenGL2::SetShaderParams(uint obj, const QMatrix4x4 &m,
     else
         return;
     GLint loc = m_glGetUniformLocation(obj, uniform);
-    m_glUniformMatrix4fv(loc, 1, GL_FALSE, GLMatrix4x4(m));
+    if (loc != -1)
+        m_glUniformMatrix4fv(loc, 1, GL_FALSE, GLMatrix4x4(m));
 }
 
 void MythRenderOpenGL2::DrawBitmapPriv(uint tex, const QRect *src,
@@ -420,6 +421,12 @@ void MythRenderOpenGL2::DrawBitmapPriv(uint tex, const QRect *src,
     SetBlend(true);
 
     EnableTextures(tex);
+
+    GLint loc = m_glGetUniformLocation(prog, "s_texture0");
+    if (loc != -1)
+        m_glUniform1i(loc, 0);
+
+    ActiveTexture(GL_TEXTURE0);
     glBindTexture(m_textures[tex].m_type, tex);
 
     m_glBindBuffer(GL_ARRAY_BUFFER, m_textures[tex].m_vbo);
@@ -478,6 +485,11 @@ void MythRenderOpenGL2::DrawBitmapPriv(uint *textures, uint texture_count,
     {
         if (m_textures.contains(textures[i]))
         {
+            QString uniform = QString("s_texture%1").arg(active_tex);
+            GLint loc = m_glGetUniformLocation(prog, qPrintable(uniform));
+            if (loc != -1)
+                m_glUniform1i(loc, active_tex);
+
             ActiveTexture(GL_TEXTURE0 + active_tex++);
             glBindTexture(m_textures[textures[i]].m_type, textures[i]);
         }

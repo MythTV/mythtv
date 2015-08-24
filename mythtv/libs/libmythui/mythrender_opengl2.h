@@ -101,7 +101,7 @@ class MUI_PUBLIC MythRenderOpenGL2 : public MythRenderOpenGL
     MYTH_GLGETPROGRAMIVPROC              m_glGetProgramiv;
 
     MYTH_GLGETUNIFORMLOCATIONPROC        m_glGetUniformLocation;
-    MYTH_GLUNIFORM4FPROC                 m_glUniform4f;
+    MYTH_GLUNIFORM1IPROC                 m_glUniform1i;
     MYTH_GLUNIFORMMATRIX4FVPROC          m_glUniformMatrix4fv;
     MYTH_GLVERTEXATTRIBPOINTERPROC       m_glVertexAttribPointer;
     MYTH_GLENABLEVERTEXATTRIBARRAYPROC   m_glEnableVertexAttribArray;

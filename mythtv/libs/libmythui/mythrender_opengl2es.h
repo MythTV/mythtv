@@ -56,8 +56,8 @@ class MUI_PUBLIC MythRenderOpenGL2ES : public MythRenderOpenGL2
 
         m_glGetUniformLocation  = (MYTH_GLGETUNIFORMLOCATIONPROC)
                                     GetProcAddress("glGetUniformLocation");
-        m_glUniform4f           = (MYTH_GLUNIFORM4FPROC)
-                                    GetProcAddress("glUniform4f");
+        m_glUniform1i           = (MYTH_GLUNIFORM1IPROC)
+                                    GetProcAddress("glUniform1i");
         m_glUniformMatrix4fv    = (MYTH_GLUNIFORMMATRIX4FVPROC)
                                     GetProcAddress("glUniformMatrix4fv");
         m_glVertexAttribPointer = (MYTH_GLVERTEXATTRIBPOINTERPROC)
@@ -133,7 +133,7 @@ class MUI_PUBLIC MythRenderOpenGL2ES : public MythRenderOpenGL2
             m_glDetachShader && m_glDeleteShader && m_glDeleteProgram &&
             m_glCreateProgram && m_glLinkProgram && m_glUseProgram &&
             m_glGetProgramInfoLog && m_glGetProgramiv && m_glGetUniformLocation &&
-            m_glUniform4f && m_glUniformMatrix4fv && m_glVertexAttribPointer &&
+            m_glUniform1i && m_glUniformMatrix4fv && m_glVertexAttribPointer &&
             m_glEnableVertexAttribArray && m_glDisableVertexAttribArray &&
             m_glBindAttribLocation && m_glVertexAttrib4f && m_glGenBuffers &&
             m_glBindBuffer && m_glDeleteBuffers && m_glBufferData &&
