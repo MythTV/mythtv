@@ -101,7 +101,9 @@ void ZMMiniPlayer::customEvent (QEvent* event)
                 m_frameTimer->start(FRAME_UPDATE_TIME);
             }
 
-            m_displayTimer->start(10000);
+            // restart the display timer on any notification messages if it is active
+            if (m_displayTimer->isActive())
+                m_displayTimer->start(10000);
         }
     }
 
