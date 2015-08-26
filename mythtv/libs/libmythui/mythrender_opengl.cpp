@@ -1468,6 +1468,13 @@ bool MythRenderOpenGL::ClearTexture(uint tex)
     }
     delete [] scratch;
 
+    if (glCheck())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("glTexImage size %1 failed")
+            .arg(tmp_size));
+        return false;
+    }
+
     return true;
 }
 

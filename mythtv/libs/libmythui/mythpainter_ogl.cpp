@@ -155,15 +155,35 @@ int MythOpenGLPainter::GetTextureFromCache(MythImage *im)
     im->SetChanged(false);
 
     QImage tx = QGLWidget::convertToGLFormat(*im);
-    GLuint tx_id =
-        realRender->CreateTexture(tx.size(), false, 0,
+    GLuint tx_id = 0;
+    for (;;)
+    {
+        tx_id = realRender->CreateTexture(tx.size(), false, 0,
                                   GL_UNSIGNED_BYTE, GL_RGBA, GL_RGBA8,
                                   GL_LINEAR_MIPMAP_LINEAR);
+        if (tx_id)
+            break;
 
-    if (!tx_id)
-    {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to create OpenGL texture.");
-        return tx_id;
+        // This can happen if the cached textures are too big for GPU memory
+        if (m_HardwareCacheSize <= 8 * 1024 * 1024)
+        {
+            LOG(VB_GENERAL, LOG_ERR, "Failed to create OpenGL texture.");
+            return 0;
+        }
+
+        // Shrink the cache size
+        m_MaxHardwareCacheSize = (3 * m_HardwareCacheSize) / 4;
+        LOG(VB_GENERAL, LOG_NOTICE, QString(
+                "Shrinking UIPainterMaxCacheHW to %1KB")
+            .arg(m_MaxHardwareCacheSize / 1024));
+
+        while (m_HardwareCacheSize > m_MaxHardwareCacheSize)
+        {
+            MythImage *expiredIm = m_ImageExpireList.front();
+            m_ImageExpireList.pop_front();
+            DeleteFormatImagePriv(expiredIm);
+            DeleteTextures();
+        }
     }
 
     CheckFormatImage(im);
