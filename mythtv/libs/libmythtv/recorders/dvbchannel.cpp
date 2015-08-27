@@ -179,6 +179,12 @@ bool DVBChannel::Open(DVBChannel *who)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Opening DVB channel");
 
+    if (!m_inputid)
+    {
+        if (!InitializeInput())
+            return false;
+    }
+
     QMutexLocker locker(&hw_lock);
 
     if (fd_frontend >= 0)
