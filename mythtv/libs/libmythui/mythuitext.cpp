@@ -406,7 +406,7 @@ void MythUIText::ShiftCanvas(int x, int y)
 void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
                           int alphaMod, QRect clipRect)
 {
-    if (m_Canvas.isNull())
+    if (m_Canvas.isEmpty())
         return;
 
     FormatVector formats;
