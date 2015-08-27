@@ -1,5 +1,8 @@
 #include "mythrender_opengl.h"
 
+#include <algorithm>
+using std::min;
+
 #include <QLibrary>
 #include <QPainter>
 #ifdef USE_OPENGL_QT5
@@ -7,8 +10,6 @@
 #include <QGLFormat>
 #endif
 #include <QWidget>
-#include <algorithm>
-using namespace std;
 
 #include "mythlogging.h"
 #include "mythuitype.h"
@@ -1487,10 +1488,18 @@ uint MythRenderOpenGL::GetBufferSize(QSize size, uint fmt, uint type)
     {
         bpp = 4;
     }
+    else if (fmt == GL_RGB)
+    {
+        bpp = 3;
+    }
     else if (fmt == GL_YCBCR_MESA || fmt == GL_YCBCR_422_APPLE ||
              fmt == MYTHTV_UYVY)
     {
         bpp = 2;
+    }
+    else if (fmt == GL_LUMINANCE || fmt == GL_ALPHA)
+    {
+        bpp = 1;
     }
     else
     {
