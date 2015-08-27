@@ -47,7 +47,7 @@ namespace {
     };
 }
 
-static int RunCCExtract(const ProgramInfo &program_info)
+static int RunCCExtract(const ProgramInfo &program_info, const QString & destdir)
 {
     QString filename = program_info.GetPlaybackURL();
     if (filename.startsWith("myth://"))
@@ -86,7 +86,8 @@ static int RunCCExtract(const ProgramInfo &program_info)
                                       kDecodeNoLoopFilter | kDecodeFewBlocks |
                                       kDecodeLowRes | kDecodeSingleThreaded |
                                       kDecodeNoDecode);
-    MythCCExtractorPlayer *ccp = new MythCCExtractorPlayer(flags, true, filename);
+    MythCCExtractorPlayer *ccp = new MythCCExtractorPlayer(flags, true,
+                                                           filename, destdir);
     PlayerContext *ctx = new PlayerContext(kCCExtractorInUseID);
     ctx->SetPlayingInfo(&program_info);
     ctx->SetRingBuffer(tmprbuf);
@@ -147,6 +148,8 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
+    QString destdir = cmdline.toString("destdir");
+
     useDB = !QFile::exists(infile);
 
     CleanupGuard callCleanup(cleanup);
@@ -172,7 +175,7 @@ int main(int argc, char *argv[])
     }
 
     ProgramInfo pginfo(infile);
-    return RunCCExtract(pginfo);
+    return RunCCExtract(pginfo, destdir);
 }
 
 

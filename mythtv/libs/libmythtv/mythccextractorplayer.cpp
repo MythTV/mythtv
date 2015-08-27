@@ -49,8 +49,9 @@ CC708Stuff::~CC708Stuff() { delete reader; }
 TeletextStuff::~TeletextStuff() { delete reader; }
 DVBSubStuff::~DVBSubStuff() { delete reader; }
 
-MythCCExtractorPlayer::MythCCExtractorPlayer(
-    PlayerFlags flags, bool showProgress, const QString &fileName) :
+MythCCExtractorPlayer::MythCCExtractorPlayer(PlayerFlags flags, bool showProgress,
+                                             const QString &fileName,
+                                             const QString &destdir) :
     MythPlayer(flags),
     m_curTime(0),
     m_myFramesPlayed(0),
@@ -61,7 +62,14 @@ MythCCExtractorPlayer::MythCCExtractorPlayer(
     QStringList comps = QFileInfo(m_fileName).fileName().split(".");
     if (!comps.empty())
         comps.removeLast();
-    m_workingDir = QDir(QFileInfo(m_fileName).path());
+    if (destdir.isEmpty())
+        m_workingDir = QDir(QFileInfo(m_fileName).path());
+    else
+    {
+        m_workingDir = QDir(destdir);
+        if (!m_workingDir.exists())
+            m_workingDir = QDir(QFileInfo(m_fileName).path());
+    }
     m_baseName = comps.join(".");
 }
 
