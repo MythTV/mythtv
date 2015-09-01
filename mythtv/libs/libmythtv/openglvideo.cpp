@@ -750,7 +750,7 @@ uint OpenGLVideo::CreateVideoTexture(QSize size, QSize &tex_size)
     {
         tmp_tex = gl_context->CreateTexture(size, use_pbo, textureType,
                                             GL_UNSIGNED_SHORT_8_8_MESA,
-                                            GL_YCBCR_MESA, GL_YCBCR_MESA);
+                                            GL_YCBCR_MESA, GL_RGBA);
     }
     else if (GL_YCBCR_422_APPLE == videoTextureType)
     {
