@@ -577,6 +577,11 @@ void TVBrowseHelper::run()
         m_lock.unlock();
 
         // pull in additional data from the DB...
+        if (m_tv->channelGroupId > -1 && db_use_channel_groups)
+            infoMap["channelgroup"] = ChannelGroup::GetChannelGroupName(m_tv->channelGroupId);
+        else
+            infoMap["channelgroup"] = QObject::tr("All channels");
+
         QDateTime startts = MythDate::fromString(m_starttime);
         RecordingInfo recinfo(m_chanid, startts, false);
         recinfo.ToMap(infoMap);

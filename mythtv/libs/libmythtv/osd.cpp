@@ -461,6 +461,16 @@ void OSD::SetText(const QString &window, const InfoMap &map,
             }
         }
     }
+
+    if (map.contains("channelgroup"))
+    {
+        MythUIText *textArea = dynamic_cast<MythUIText *> (win->GetChild("channelgroup"));
+        if (textArea)
+        {
+            textArea->SetText(map["channelgroup"]);
+        }
+    }
+
     if (map.contains("inetref"))
     {
         MythUIImage *cover = dynamic_cast<MythUIImage *> (win->GetChild("coverart"));
