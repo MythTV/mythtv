@@ -507,6 +507,7 @@ void AudioOutputALSA::CloseDevice()
     m_mixer.handle = NULL;
     if (pcm_handle)
     {
+        snd_pcm_drain(pcm_handle);
         snd_pcm_close(pcm_handle);
         pcm_handle = NULL;
     }
