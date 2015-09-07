@@ -623,6 +623,7 @@ class DVBConfigurationGroup : public VerticalConfigurationGroup
 
   public slots:
     void probeCard(const QString& cardNumber);
+    void reloadDiseqcTree(const QString &device);
     void DiSEqCPanel(void);
     void DVBExtraPanel(void);
 

@@ -1737,34 +1737,10 @@ void CardUtil::GetDeviceInputNames(
     inputs.clear();
     if (IsSingleInputType(inputtype))
         inputs += "MPEG2TS";
-    else if ("DVB" != inputtype)
+    else if (inputtype == "DVB")
+        inputs += "DVBInput";
+    else
         inputs += ProbeV4LVideoInputs(device);
-
-#ifdef USING_DVB
-    if ("DVB" == inputtype)
-    {
-        bool needs_conf = IsInNeedOfExternalInputConf(inputid);
-        InputNames list = GetConfiguredDVBInputs(device);
-        if (!needs_conf && list.empty())
-        {
-            inputs += "DVBInput";
-        }
-
-        // Always list the 1 through n+1 inputs
-        if (needs_conf)
-        {
-            for (int i = 0; i <= list.size(); ++i)
-                inputs += QString("DVBInput #%1").arg(i+1);
-        }
-
-        // Always list the existing inputs
-        InputNames::const_iterator it;
-        for (it = list.begin(); it != list.end(); ++it)
-        {
-            inputs += *it;
-        }
-    }
-#endif // USING_DVB
 }
 
 int CardUtil::CreateCaptureCard(const QString &videodevice,
@@ -1868,14 +1844,8 @@ bool CardUtil::DeleteCard(uint inputid)
     if (!inputid)
         return true;
 
-    // delete any DiSEqC device tree
     DiSEqCDevTree tree;
     tree.Load(inputid);
-    if (!tree.Root())
-    {
-        tree.SetRoot(NULL);
-        tree.Store(inputid);
-    }
 
     // delete any clones
     QString rawtype     = GetRawInputType(inputid);
@@ -1885,9 +1855,7 @@ bool CardUtil::DeleteCard(uint inputid)
         query.prepare(
             "SELECT cardid "
             "FROM capturecard "
-            "WHERE videodevice = :DEVICE AND "
-            "      cardid      > :INPUTID");
-        query.bindValue(":DEVICE", videodevice);
+            "WHERE parentid = :INPUTID");
         query.bindValue(":INPUTID", inputid);
 
         if (!query.exec())
@@ -1903,7 +1871,6 @@ bool CardUtil::DeleteCard(uint inputid)
             return false;
     }
 
-    // delete input
     ok &= CardUtil::DeleteInput(inputid);
 
     if (!ok)
@@ -1921,6 +1888,23 @@ bool CardUtil::DeleteCard(uint inputid)
 
     if (ok)
     {
+        // Delete the diseqc tree if no more inputs reference it.
+        if (tree.Root())
+        {
+            query.prepare("SELECT cardid FROM capturecard "
+                          "WHERE diseqcid = :DISEQCID LIMIT 1");
+            query.bindValue(":DISEQCID", tree.Root()->GetDeviceID());
+            if (!query.exec())
+            {
+                MythDB::DBError("DeleteCard -- find diseqc tree", query);
+            }
+            else if (!query.next())
+            {
+                tree.SetRoot(NULL);
+                tree.Store(inputid);
+            }
+        }
+
         // delete any unused input groups
         UnlinkInputGroup(0,0);
     }

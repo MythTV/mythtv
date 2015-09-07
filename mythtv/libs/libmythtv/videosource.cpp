@@ -2960,7 +2960,6 @@ class InputName : public ComboBoxSetting, public CardInputDBStorage
         ComboBoxSetting(this), CardInputDBStorage(this, parent, "inputname")
     {
         setLabel(QObject::tr("Input name"));
-        addSelection(QObject::tr("(None)"), "None");
     };
 
     virtual void Load(void)
@@ -3940,10 +3939,8 @@ void CardInputEditor::Load(void)
         QString videodevice = query.value(1).toString();
         QString cardtype    = query.value(2).toString();
         QString inputname   = query.value(3).toString();
-        if (inputname.isEmpty())
-            inputname = QObject::tr("(None)");
 
-        CardInput *cardinput = new CardInput(cardtype, false, cardid);
+        CardInput *cardinput = new CardInput(cardtype, true, cardid);
         cardinput->loadByID(cardid);
         QString inputlabel = QString("%1 (%2) -> %3")
             .arg(CardUtil::GetDeviceLabel(cardtype, videodevice))
@@ -3996,6 +3993,12 @@ static QString remove_chaff(const QString &name)
     return short_name;
 }
 #endif // USING_DVB
+
+void DVBConfigurationGroup::reloadDiseqcTree(const QString &videodevice)
+{
+    if (diseqc_tree)
+        diseqc_tree->Load(videodevice);
+}
 
 void DVBConfigurationGroup::probeCard(const QString &videodevice)
 {
@@ -4230,6 +4233,8 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent) :
 
     connect(cardnum,      SIGNAL(valueChanged(const QString&)),
             this,         SLOT(  probeCard   (const QString&)));
+    connect(cardnum,      SIGNAL(valueChanged(const QString&)),
+            this,         SLOT(  reloadDiseqcTree(const QString&)));
     connect(diseqc_btn,   SIGNAL(pressed()),
             this,         SLOT(  DiSEqCPanel()));
     connect(buttonRecOpt, SIGNAL(pressed()),
@@ -4256,7 +4261,7 @@ void DVBConfigurationGroup::DiSEqCPanel()
 void DVBConfigurationGroup::Load(void)
 {
     VerticalConfigurationGroup::Load();
-    diseqc_tree->Load(parent.getCardID());
+    reloadDiseqcTree(cardnum->getValue());
     if (cardtype->getValue() == "DVB-S" ||
         cardtype->getValue() == "DVB-S2" ||
         DiSEqCDevTree::Exists(parent.getCardID()))
@@ -4268,7 +4273,7 @@ void DVBConfigurationGroup::Load(void)
 void DVBConfigurationGroup::Save(void)
 {
     VerticalConfigurationGroup::Save();
-    diseqc_tree->Store(parent.getCardID());
+    diseqc_tree->Store(cardnum->getValue());
     DiSEqCDev trees;
     trees.InvalidateTrees();
 }

@@ -323,6 +323,38 @@ DiSEqCDevTree::~DiSEqCDevTree()
     delete m_root;
 }
 
+/** \fn DiSEqCDevTree::Load(const QString&, const QString&)
+ *  \brief Loads the device tree from the database.
+ *  \param device recording input uses.
+ *  \return True if successful.
+ */
+bool DiSEqCDevTree::Load(const QString &device)
+{
+    // lookup configuration for this card
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT cardid "
+        "FROM capturecard "
+        "WHERE hostname = :HOSTNAME AND "
+        "      videodevice = :VIDEODEVICE "
+        "LIMIT 1");
+    query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
+    query.bindValue(":VIDEODEVICE", device);
+
+    uint cardid = 0;
+
+    if (!query.exec())
+    {
+        MythDB::DBError("DiSEqCDevTree::Load", query);
+    }
+    else if (query.next())
+    {
+        cardid = query.value(0).toUInt();
+    }
+
+    return Load(cardid);
+}
+
 /** \fn DiSEqCDevTree::Load(uint)
  *  \brief Loads the device tree from the database.
  *  \param cardid Capture card id.
@@ -394,7 +426,71 @@ bool DiSEqCDevTree::Exists(int cardid)
     return false;
 }
 
-/** \fn DiSEqCDevTree::Store(uint)
+/** \fn DiSEqCDevTree::Store(QString)
+ *  \brief Stores the device tree to the database.
+ *  \param device.
+ *  \return True if successful.
+ */
+bool DiSEqCDevTree::Store(const QString &device)
+{
+    MSqlQuery query0(MSqlQuery::InitCon());
+
+    // apply pending node deletions
+    if (!m_delete.empty())
+    {
+        MSqlQuery query1(MSqlQuery::InitCon());
+
+        query0.prepare(
+            "DELETE FROM diseqc_tree "
+            "WHERE diseqcid = :DEVID");
+        query1.prepare(
+            "DELETE FROM diseqc_config "
+            "WHERE diseqcid = :DEVID");
+
+        vector<uint>::const_iterator it = m_delete.begin();
+        for (; it != m_delete.end(); ++it)
+        {
+            query0.bindValue(":DEVID", *it);
+            if (!query0.exec())
+                MythDB::DBError("DiSEqCDevTree::Store 1", query0);
+
+            query1.bindValue(":DEVID", *it);
+            if (!query1.exec())
+                MythDB::DBError("DiSEqCDevTree::Store 2", query1);
+
+        }
+        m_delete.clear();
+    }
+
+    // store changed and new nodes
+    uint devid = 0;
+    if (m_root && m_root->Store())
+        devid = m_root->GetDeviceID();
+    else if (m_root)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to save DiSEqC tree.");
+        return false;
+    }
+
+    // update capture card to point to tree, or 0 if there is no tree
+    query0.prepare(
+        "UPDATE capturecard "
+        "SET diseqcid = :DEVID "
+        "WHERE hostname = :HOSTNAME AND "
+        "      videodevice = :VIDEODEVICE");
+    query0.bindValue(":DEVID",  devid);
+    query0.bindValue(":HOSTNAME", gCoreContext->GetHostName());
+    query0.bindValue(":VIDEODEVICE", device);
+    if (!query0.exec())
+    {
+        MythDB::DBError("DiSEqCDevTree::Store 3", query0);
+        return false;
+    }
+
+    return true;
+}
+
+/** \fn DiSEqCDevTree::Store(QString)
  *  \brief Stores the device tree to the database.
  *  \param cardid Capture card id.
  *  \return True if successful.
