@@ -641,18 +641,8 @@ int AudioOutputALSA::GetBufferedOnSoundcard(void) const
     if (snd_pcm_delay(pcm_handle, &delay) < 0)
         return 0;
 
-    snd_pcm_state_t state = snd_pcm_state(pcm_handle);
-
-    if (state == SND_PCM_STATE_RUNNING || state == SND_PCM_STATE_DRAINING)
-    {
-        delay *= output_bytes_per_frame;
-    }
-    else
-    {
-        delay = 0;
-    }
-
-    return delay;
+    // BUG: calling snd_pcm_state causes noise and repeats on the Raspberry Pi
+    return delay * output_bytes_per_frame;
 }
 
 /**
