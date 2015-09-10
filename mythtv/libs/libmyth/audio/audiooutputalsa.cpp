@@ -1,5 +1,6 @@
 #include <cstdio>
 #include <cstdlib>
+#include <stdint.h>
 #include <sys/time.h>
 #include <time.h>
 #include "config.h"
@@ -862,7 +863,7 @@ void AudioOutputALSA::SetVolumeChannel(int channel, int volume)
     if (!(internal_vol && m_mixer.elem))
         return;
 
-    long mixervol = volume * m_mixer.volrange / 100.0f - m_mixer.volmin + 0.5f;
+    long mixervol = long((int64_t(volume) * m_mixer.volrange) / 100) + m_mixer.volmin;
     mixervol = max(mixervol, m_mixer.volmin);
     mixervol = min(mixervol, m_mixer.volmax);
 
