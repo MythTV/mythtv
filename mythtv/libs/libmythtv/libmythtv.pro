@@ -57,6 +57,9 @@ INCLUDEPATH += $$DEPENDPATH
 }
 
 macx {
+    OBJECTIVE_HEADERS += util-osx.h
+    OBJECTIVE_SOURCES += util-osx.mm
+
     # Mac OS X Frameworks
     libs += -framework ApplicationServices
     libs += -framework Cocoa

@@ -8,6 +8,7 @@
 #include "mythframe.h"
 #include "util-osx-cocoa.h"
 #include "privatedecoder_vda.h"
+#include "util-osx.h"
 
 #include "H264Parser.h"
 
@@ -401,10 +402,10 @@ bool PrivateDecoderVDA::Init(const QString &decoder,
     }
 
     bool isMountainLion = false;
-    SInt32 majorVersion, minorVersion;
+    int32_t majorVersion, minorVersion;
 
-    Gestalt(gestaltSystemVersionMajor, &majorVersion);
-    Gestalt(gestaltSystemVersionMinor, &minorVersion);
+    GetOSXVersion(&majorVersion, &minorVersion);
+
     if (majorVersion >= 10 && minorVersion >= 8)
     {
         isMountainLion = true;
