@@ -1031,12 +1031,6 @@ void VideoDisplayProfile::CreateNewProfiles(const QString &hostname)
     CreateProfile(groupid, 2, ">", 0, 0, "", 0, 0,
                   "ffmpeg", 1, true, "xv-blit", "softblend", true,
                   "yadifdoubleprocessdeint", "yadifdeint", "");
-    CreateProfile(groupid, 3, ">=", 1920, 1080, "", 0, 0,
-                  "ffmpeg", 2, true, "quartz-blit", "softblend", true,
-                  "linearblend", "linearblend", "");
-    CreateProfile(groupid, 4, ">", 0, 0, "", 0, 0,
-                  "ffmpeg", 1, true, "quartz-blit", "softblend", true,
-                  "yadifdoubleprocessdeint", "yadifdeint", "");
 
     (void) QObject::tr("Normal", "Sample: average quality");
     DeleteProfileGroup("Normal", hostname);
@@ -1047,12 +1041,6 @@ void VideoDisplayProfile::CreateNewProfiles(const QString &hostname)
     CreateProfile(groupid, 2, ">", 0, 0, "", 0, 0,
                   "ffmpeg", 1, true, "xv-blit", "softblend", true,
                   "greedyhdoubleprocessdeint", "kerneldeint", "");
-    CreateProfile(groupid, 3, ">=", 1280, 720, "", 0, 0,
-                  "ffmpeg", 1, true, "quartz-blit", "softblend", false,
-                  "linearblend", "linearblend", "");
-    CreateProfile(groupid, 4, ">", 0, 0, "", 0, 0,
-                  "ffmpeg", 1, true, "quartz-blit", "softblend", true,
-                  "greedyhdoubleprocessdeint", "kerneldeint", "");
 
     (void) QObject::tr("Slim", "Sample: low CPU usage");
     DeleteProfileGroup("Slim", hostname);
@@ -1062,12 +1050,6 @@ void VideoDisplayProfile::CreateNewProfiles(const QString &hostname)
                   "onefield", "onefield", "");
     CreateProfile(groupid, 2, ">", 0, 0, "", 0, 0,
                   "ffmpeg", 1, true, "xv-blit", "softblend", false,
-                  "linearblend", "linearblend", "");
-    CreateProfile(groupid, 3, ">=", 1280, 720, "", 0, 0,
-                  "ffmpeg", 1, true, "quartz-blit", "softblend", false,
-                  "onefield", "onefield", "");
-    CreateProfile(groupid, 4, ">", 0, 0, "", 0, 0,
-                  "ffmpeg", 1, true, "quartz-blit", "softblend", false,
                   "linearblend", "linearblend", "");
 }
 
@@ -1239,14 +1221,6 @@ QString VideoDisplayProfile::GetVideoRendererHelp(const QString &renderer)
             "Windows video renderer based on Direct3D. Requires "
             "video card compatible with Direct3D 9. This is the preferred "
             "renderer for current Windows systems.");
-
-    if (renderer == "quartz-blit")
-        msg = QObject::tr(
-            "This is the standard video render for Macintosh OS X systems.");
-
-    if (renderer == "quartz-accel")
-        msg = QObject::tr(
-            "This is the only video renderer for the MacAccel decoder.");
 
     if (renderer == "opengl")
     {

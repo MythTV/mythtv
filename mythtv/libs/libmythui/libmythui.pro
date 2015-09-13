@@ -125,7 +125,7 @@ macx {
     QMAKE_OBJECTIVE_CXXFLAGS += $$QMAKE_CXXFLAGS
     OBJECTIVE_HEADERS += util-osx-cocoa.h
     OBJECTIVE_SOURCES += util-osx-cocoa.mm
-    LIBS              += -framework Carbon -framework Cocoa -framework IOKit
+    LIBS              += -framework Cocoa -framework IOKit
 
     using_appleremote {
         HEADERS += AppleRemote.h   AppleRemoteListener.h

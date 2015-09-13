@@ -58,17 +58,14 @@ INCLUDEPATH += $$DEPENDPATH
 
 macx {
     # Mac OS X Frameworks
-    FWKS = AGL ApplicationServices Carbon Cocoa CoreServices CoreFoundation OpenGL QuickTime IOKit
-    using_quartz_video {
-        FWKS += QuartzCore
-    } else {
-        FWKS += CoreVideo
-    }
-
-    FC = $$join(FWKS,",")
-
-    QMAKE_CXXFLAGS += -F$${FC}
-    LIBS           += -framework $$join(FWKS," -framework ")
+    libs += -framework ApplicationServices
+    libs += -framework Cocoa
+    libs += -framework CoreServices
+    libs += -framework CoreFoundation
+    libs += -framework OpenGL
+    libs += -framework QuickTime
+    libs += -framework IOKit
+    libs += -framework CoreVideo
 
     using_firewire:using_backend {
         QMAKE_CXXFLAGS += -F$${CONFIG_MAC_AVC}
@@ -417,10 +414,6 @@ using_frontend {
         using_opengl: HEADERS += visualisations/videovisualcircles.h
         using_opengl: SOURCES += visualisations/videovisualcircles.cpp
     }
-
-    using_quartz_video: DEFINES += USING_QUARTZ_VIDEO
-    using_quartz_video: HEADERS += videoout_quartz.h
-    using_quartz_video: SOURCES += videoout_quartz.cpp
 
     using_x11:DEFINES += USING_X11
 

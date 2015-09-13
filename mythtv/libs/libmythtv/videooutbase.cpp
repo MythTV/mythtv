@@ -25,10 +25,6 @@
 #include "videoout_d3d.h"
 #endif
 
-#ifdef USING_QUARTZ_VIDEO
-#include "videoout_quartz.h"
-#endif
-
 #ifdef USING_OPENGL_VIDEO
 #include "videoout_opengl.h"
 #endif
@@ -84,10 +80,6 @@ void VideoOutput::GetRenderOptions(render_opts &opts)
     VideoOutputXv::GetRenderOptions(opts, cpudeints);
 #endif // USING_XV
 
-#ifdef USING_QUARTZ_VIDEO
-    VideoOutputQuartz::GetRenderOptions(opts, cpudeints);
-#endif // USING_QUARTZ_VIDEO
-
 #ifdef USING_OPENGL_VIDEO
     VideoOutputOpenGL::GetRenderOptions(opts, cpudeints);
 #endif // USING_OPENGL_VIDEO
@@ -122,9 +114,6 @@ VideoOutput *VideoOutput::Create(
 #ifdef USING_XV
     QStringList xvlist;
 #endif
-#ifdef USING_QUARTZ_VIDEO
-    QStringList osxlist;
-#endif
 
     // select the best available output
     if (playerFlags & kVideoIsNull)
@@ -154,12 +143,6 @@ VideoOutput *VideoOutput::Create(
             GetAllowedRenderers(codec_id, video_dim_disp);
         renderers += xvlist;
 #endif // USING_XV
-
-#ifdef USING_QUARTZ_VIDEO
-        osxlist = VideoOutputQuartz::
-            GetAllowedRenderers(codec_id, video_dim_disp);
-        renderers += osxlist;
-#endif // Q_OS_MACX
 
 #ifdef USING_OPENGL_VIDEO
         renderers += VideoOutputOpenGL::
@@ -222,11 +205,6 @@ VideoOutput *VideoOutput::Create(
         else if (renderer == "direct3d")
             vo = new VideoOutputD3D();
 #endif // _WIN32
-
-#ifdef USING_QUARTZ_VIDEO
-        else if (osxlist.contains(renderer))
-            vo = new VideoOutputQuartz();
-#endif // Q_OS_MACX
 
 #ifdef USING_OPENGL_VIDEO
         else if (renderer.contains("opengl") && (renderer != "openglvaapi"))

@@ -207,16 +207,12 @@ macx {
     }
 
     # Mac OS X Frameworks
-    FWKS = ApplicationServices AudioUnit AudioToolbox Carbon CoreAudio IOKit
-
-    darwin_da : FWKS += DiskArbitration
-
-    # The following trick is tidier, and shortens the command line, but it
-    # depends on the shell expanding Csh-style braces. Luckily, Bash & Zsh do.
-    FC = $$join(FWKS,",","{","}")
-
-    QMAKE_CXXFLAGS += -F/System/Library/Frameworks/$${FC}.framework/Frameworks
-    LIBS           += -framework $$join(FWKS," -framework ")
+    darwin_da : LIBS += -framework DiskArbitration
+    LIBS += -framework ApplicationServices
+    LIBS += -framework AudioUnit
+    LIBS += -framework AudioToolbox
+    LIBS += -framework CoreAudio
+    LIBS += -framework IOKit
 }
 
 INSTALLS += inc inc2

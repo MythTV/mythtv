@@ -135,7 +135,6 @@ Advanced options (experts only):
   --disable-vaapi          disable VAAPI hardware accelerated video decoding
   --disable-dxva2          disable hardware accelerated decoding on windows
   --disable-opengl-video   disable OpenGL based video display
-  --disable-quartz-video   disable Mac OS X CoreVideo based video display
   --disable-libass         disable libass SSA/ASS subtitle support
 
   --enable-mac-bundle      produce standalone OS X apps (e.g. mythfrontend.app)
@@ -2132,7 +2131,6 @@ MYTHTV_CONFIG_LIST='
     qtwebkit
     qtscript
     qtdbus
-    quartz_video
     sdl
     taglib
     v4l2
@@ -3160,7 +3158,6 @@ enable mythtranscode
 enable opengl
 enable opengles
 enable opengl_video
-enable quartz_video
 enable symbol_visibility
 enable v4l1
 enable v4l2
@@ -3368,10 +3365,6 @@ for opt do
         --disable-ccache) disable ccache
         ;;
         --disable-distcc) disable distcc
-        ;;
-        --enable-quartz-video) enable quartz_video
-        ;;
-        --disable-quartz-video) disable quartz_video
         ;;
 # disabled due to abuse in Gentoo ebuild
         --disable-frontend)
@@ -6332,6 +6325,9 @@ enabled exiv2 && $(pkg-config --exists exiv2) ||
 if test $target_os = mingw32 ; then
     qt_inc="-I`cd $(${qmake} -query QT_INSTALL_HEADERS); pwd`"
     qt_libs="-L`cd $(${qmake} -query QT_INSTALL_LIBS) ; pwd`"
+elif test $target_os = darwin ; then
+    qt_inc="-I`cd $(${qmake} -query QT_INSTALL_HEADERS); pwd` -F`cd $(${qmake} -query QT_INSTALL_LIBS); pwd`"
+    qt_libs="-L`cd $(${qmake} -query QT_INSTALL_LIBS) ; pwd`"
 else
     qt_inc="-I${sysroot}/$(${qmake} -query QT_INSTALL_HEADERS)"
     qt_libs="-L${sysroot}/$(${qmake} -query QT_INSTALL_LIBS)"
@@ -6476,14 +6472,10 @@ if enabled x11; then
     fi
 fi
 
-# Quartz video is Mac only and requires Carbon which is 32bit only
-enabled quartz_video && test $target_os = darwin && check_cpp_condition QtCore/qglobal.h "!defined(QT_MAC_USE_COCOA)" || disable quartz_video
-
 # CoreVideo in only available on Mac OS 10.4, or on 10.3 with QuickTime 7.
 # This checks for it, and some other calls that the module needs
 if test $target_os = darwin; then
     cat > $TMPC << EOF
-#include <QuartzCore/CVDisplayLink.h>
 #include <AGL/agl.h>
 int main( void ) { return aglGetCGLContext(0,0L); }
 EOF
@@ -7046,7 +7038,6 @@ if enabled x11 ; then
 fi
   echo "OpenGL video              ${opengl_video-no}"
   if test x"$target_os" = x"darwin" ; then
-    echo "Quartz video              ${quartz_video-no}"
     echo "VDA support               ${vda-no}"
   fi
   if test x"$target_os" = x"mingw32" ; then

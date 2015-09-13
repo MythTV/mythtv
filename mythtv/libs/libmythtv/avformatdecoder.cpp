@@ -42,8 +42,6 @@ using namespace std;
 
 #include "lcddevice.h"
 
-#include "videoout_quartz.h"  // For VOQ::GetBestSupportedCodec()
-
 #ifdef USING_VDPAU
 #include "videoout_vdpau.h"
 extern "C" {
