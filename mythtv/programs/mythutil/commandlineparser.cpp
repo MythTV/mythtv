@@ -167,6 +167,7 @@ void MythUtilCommandLineParser::LoadArguments(void)
                 "Search for some lyrics for a track", "")
                 ->SetGroup("Metadata Reading/Writing")
                 ->SetRequiredChild(QStringList("songid"))
+                ->SetParentOf(QStringList() << "artist" << "album" << "title")
 
         // recordingutils.cpp
         << add("--checkrecordings", "checkrecordings", false,
@@ -252,6 +253,12 @@ void MythUtilCommandLineParser::LoadArguments(void)
     add("--songid", "songid", "", "ID of track to find lyrics for", "")
         ->SetChildOf("findlyrics");
     add("--grabber", "grabber", "", "(optional) Name of grabber to use or 'ALL' to try all available grabbers", "")
+        ->SetChildOf("findlyrics");
+    add("--artist", "grabber", "", "(optional) Artist of track to find lyrics for", "")
+        ->SetChildOf("findlyrics");
+    add("--album", "grabber", "", "(optional) Album of track to find lyrics for", "")
+        ->SetChildOf("findlyrics");
+    add("--title", "grabber", "", "(optional) Title of track to find lyrics for", "")
         ->SetChildOf("findlyrics");
 
     // recordingutils.cpp

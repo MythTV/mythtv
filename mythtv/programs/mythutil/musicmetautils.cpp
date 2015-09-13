@@ -329,7 +329,6 @@ static int FindLyrics(const MythUtilCommandLineParser &cmdline)
     if (!dir.exists())
         dir.mkpath(lyricsDir);
 
-    //FIXME what about radio station tracks or CD tracks?
     if (cmdline.toString("songid").isEmpty())
     {
         LOG(VB_GENERAL, LOG_ERR, "Missing --songid option");
@@ -338,56 +337,93 @@ static int FindLyrics(const MythUtilCommandLineParser &cmdline)
 
     int songID = cmdline.toInt("songid");
     QString grabberName = "ALL";
+    QString lyricsFile;
+    QString artist;
+    QString album;
+    QString title;
+    QString filename;
 
     if (!cmdline.toString("grabber").isEmpty())
         grabberName = cmdline.toString("grabber");
 
-    MusicMetadata *mdata = MusicMetadata::createFromID(songID);
-    if (!mdata)
+    if (ID_TO_REPO(songID) == RT_Database)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Cannot find metadata for trackid: %1").arg(songID));
-        return GENERIC_EXIT_NOT_OK;
-    }
-
-    QString musicFile = mdata->getLocalFilename();
-
-    if (musicFile.isEmpty() || !QFile::exists(musicFile))
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("Cannot find file for trackid: %1").arg(songID));
-        //return GENERIC_EXIT_NOT_OK;
-    }
-
-    // first check if we have already saved a lyrics file for this track
-    QString lyricsFile = GetConfDir() + QString("/MythMusic/Lyrics/%1.txt").arg(songID);
-    if (QFile::exists(lyricsFile))
-    {
-        // if the user specified a specific grabber assume they want to
-        // re-search for the lyrics using the given grabber
-        if (grabberName != "ALL")
-            QFile::remove(lyricsFile);
-        else
+        MusicMetadata *mdata = MusicMetadata::createFromID(songID);
+        if (!mdata)
         {
-            // load these lyrics to speed up future lookups
-            QFile file(QLatin1String(qPrintable(lyricsFile)));
-            QString lyrics;
+            LOG(VB_GENERAL, LOG_ERR, QString("Cannot find metadata for trackid: %1").arg(songID));
+            return GENERIC_EXIT_NOT_OK;
+        }
 
-            if (file.open(QIODevice::ReadOnly))
+        QString musicFile = mdata->getLocalFilename();
+
+        if (musicFile.isEmpty() || !QFile::exists(musicFile))
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Cannot find file for trackid: %1").arg(songID));
+            //return GENERIC_EXIT_NOT_OK;
+        }
+
+        // first check if we have already saved a lyrics file for this track
+        lyricsFile = GetConfDir() + QString("/MythMusic/Lyrics/%1.txt").arg(songID);
+        if (QFile::exists(lyricsFile))
+        {
+            // if the user specified a specific grabber assume they want to
+            // re-search for the lyrics using the given grabber
+            if (grabberName != "ALL")
+                QFile::remove(lyricsFile);
+            else
             {
-                QTextStream stream(&file);
+                // load these lyrics to speed up future lookups
+                QFile file(QLatin1String(qPrintable(lyricsFile)));
+                QString lyrics;
 
-                while (!stream.atEnd())
+                if (file.open(QIODevice::ReadOnly))
                 {
-                    lyrics.append(stream.readLine());
+                    QTextStream stream(&file);
+
+                    while (!stream.atEnd())
+                    {
+                        lyrics.append(stream.readLine());
+                    }
+
+                    file.close();
                 }
 
-                file.close();
+                // tell any clients that a lyrics file is available for this track
+                gCoreContext->SendMessage(QString("MUSIC_LYRICS_FOUND %1 %2").arg(songID).arg(lyrics));
+
+                return GENERIC_EXIT_OK;
             }
-
-            // tell any clients that a lyrics file is available for this track
-            gCoreContext->SendMessage(QString("MUSIC_LYRICS_FOUND %1 %2").arg(songID).arg(lyrics));
-
-            return GENERIC_EXIT_OK;
         }
+
+        artist = mdata->Artist();
+        album = mdata->Album();
+        title = mdata->Title();
+        filename = mdata->getLocalFilename();
+    }
+    else
+    {
+        // must be a CD or Radio Track
+        if (cmdline.toString("artist").isEmpty())
+        {
+            LOG(VB_GENERAL, LOG_ERR, "Missing --artist option");
+            return GENERIC_EXIT_INVALID_CMDLINE;
+        }
+        artist = cmdline.toString("artist");
+
+        if (cmdline.toString("album").isEmpty())
+        {
+            LOG(VB_GENERAL, LOG_ERR, "Missing --album option");
+            return GENERIC_EXIT_INVALID_CMDLINE;
+        }
+        album = cmdline.toString("album");
+
+        if (cmdline.toString("title").isEmpty())
+        {
+            LOG(VB_GENERAL, LOG_ERR, "Missing --title option");
+            return GENERIC_EXIT_INVALID_CMDLINE;
+        }
+        title = cmdline.toString("title");
     }
 
     // not found so try the grabbers
@@ -474,8 +510,7 @@ static int FindLyrics(const MythUtilCommandLineParser &cmdline)
 
         QProcess p;
         p.start(QString("python %1 --artist=\"%2\" --album=\"%3\" --title=\"%4\" --filename=\"%5\"")
-                        .arg(grabber.filename).arg(mdata->Artist()).arg(mdata->Album())
-                        .arg(mdata->Title()).arg(mdata->getLocalFilename()));
+                        .arg(grabber.filename).arg(artist).arg(album).arg(title).arg(filename));
         p.waitForFinished(-1);
         QString result = p.readAllStandardOutput();
 
@@ -485,14 +520,17 @@ static int FindLyrics(const MythUtilCommandLineParser &cmdline)
         {
             LOG(VB_GENERAL, LOG_NOTICE, QString("Lyrics Found using: %1").arg(grabber.name));
 
-            // save these lyrics to speed up future lookups
-            QFile file(QLatin1String(qPrintable(lyricsFile)));
-
-            if (file.open(QIODevice::WriteOnly))
+            // save these lyrics to speed up future lookups if it is a DB track
+            if (ID_TO_REPO(songID) == RT_Database)
             {
-                QTextStream stream(&file);
-                stream << result;
-                file.close();
+                QFile file(QLatin1String(qPrintable(lyricsFile)));
+
+                if (file.open(QIODevice::WriteOnly))
+                {
+                    QTextStream stream(&file);
+                    stream << result;
+                    file.close();
+                }
             }
 
             gCoreContext->SendMessage(QString("MUSIC_LYRICS_FOUND %1 %2").arg(songID).arg(result));
