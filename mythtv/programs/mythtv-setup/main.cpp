@@ -43,6 +43,9 @@
 #include "signalhandling.h"
 #include "mythmiscutil.h"
 #include "ssdp.h"
+#if CONFIG_DARWIN
+#include "mythuidefines.h"
+#endif
 
 using namespace std;
 
@@ -284,7 +287,7 @@ int main(int argc, char *argv[])
 #ifdef Q_OS_MAC
     // Without this, we can't set focus to any of the CheckBoxSetting, and most
     // of the MythPushButton widgets, and they don't use the themed background.
-    QApplication::setDesktopSettingsAware(FALSE);
+    QApplication::setDesktopSettingsAware(false);
 #endif
     new QApplication(argc, argv, use_display);
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHTV_SETUP);

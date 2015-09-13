@@ -46,6 +46,7 @@ using namespace std;
 #include <QDir>
 #include <QUrl>
 #include <QHostAddress>
+#include <QDataStream>
 
 // Myth headers
 #include "mythcorecontext.h"
