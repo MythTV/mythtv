@@ -43,12 +43,6 @@ class RTPDataPacket : public UDPPacket
                 .arg(GetVersion()));
             return false;
         }
-        if (HasPadding() && (m_data.size() < 1328))
-        {
-            LOG(VB_GENERAL, LOG_INFO, QString("HasPadding && %1 < 1328")
-                .arg(m_data.size()));
-            return false;
-        }
 
         int off = 12 + 4 * GetCSRCCount();
         if (off > m_data.size())
@@ -120,7 +114,7 @@ class RTPDataPacket : public UDPPacket
     {
         if (!HasPadding())
             return 0;
-        return m_data[1328];
+        return m_data[m_data.size()-1];
     }
 
   protected:
