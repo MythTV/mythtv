@@ -3208,6 +3208,16 @@ NULL
             return false;
     }
 
+    if (dbver == "1341")
+    {
+        const char *updates[] = {
+            "UPDATE profilegroups SET cardtype='FREEBOX' WHERE cardtype='Freebox'",
+            NULL
+        };
+        if (!performActualUpdate(updates, "1342", dbver))
+            return false;
+    }
+
     return true;
 }
 
