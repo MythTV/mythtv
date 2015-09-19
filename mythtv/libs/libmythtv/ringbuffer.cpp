@@ -251,7 +251,10 @@ RingBuffer::RingBuffer(RingBufferType rbtype) :
         if (subExt.empty())
         {
             // Possible subtitle file extensions '.srt', '.sub', '.txt'
+            // since #9294 also .ass and .ssa
+            subExt += ".ass";
             subExt += ".srt";
+            subExt += ".ssa";
             subExt += ".sub";
             subExt += ".txt";
 
