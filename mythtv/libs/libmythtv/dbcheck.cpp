@@ -3196,6 +3196,18 @@ NULL
             return false;
     }
 
+    if (dbver == "1340")
+    {
+        const char *updates[] = {
+            // Add filter to ignore episodes (e.g. in a person search)
+            "REPLACE INTO recordfilter (filterid, description, clause, newruledefault) "
+            "  VALUES (11, 'No episodes', 'program.category_type <> ''series''', 0)",
+            NULL
+        };
+        if (!performActualUpdate(updates, "1341", dbver))
+            return false;
+    }
+
     return true;
 }
 
