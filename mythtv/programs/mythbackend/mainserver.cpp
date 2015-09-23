@@ -898,6 +898,13 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     {
         HandleMusicGetLyricGrabbers(listline, pbs);
     }
+    else if (command == "MUSIC_LYRICS_SAVE")
+    {
+        if (listline.size() < 3)
+            SendErrorResponse(pbs, "Bad MUSIC_LYRICS_SAVE");
+        else
+            HandleMusicSaveLyrics(listline, pbs);
+    }
     else if (command == "IMAGE_SCAN")
     {
         QStringList reply = ImageScan::getInstance()->HandleScanRequest(listline);
@@ -6542,13 +6549,13 @@ void MainServer::HandleMusicFindLyrics(const QStringList &slist, PlaybackSock *p
         paramList.append(QString("--grabber='%1'").arg(grabberName));
 
         if (!artist.isEmpty())
-            paramList.append(QString("--artist='%1'").arg(artist));
+            paramList.append(QString("--artist=\"%1\"").arg(artist));
 
         if (!album.isEmpty())
-            paramList.append(QString("--album='%1'").arg(album));
+            paramList.append(QString("--album=\"%1\"").arg(album));
 
         if (!title.isEmpty())
-            paramList.append(QString("--title='%1'").arg(title));
+            paramList.append(QString("--title=\"%1\"").arg(title));
 
         QString command = GetAppBinDir() + "mythutil --findlyrics " + paramList.join(" ");
 
@@ -6644,6 +6651,80 @@ void MainServer::HandleMusicGetLyricGrabbers(const QStringList &slist, PlaybackS
 
     for (int x = 0; x < grabbers.count(); x++)
         strlist.append(grabbers.at(x));
+
+    if (pbssock)
+        SendResponse(pbssock, strlist);
+}
+
+void MainServer::HandleMusicSaveLyrics(const QStringList& slist, PlaybackSock* pbs)
+{
+// format: MUSIC_LYRICS_SAVE <hostname> <songid>
+// followed by the lyrics lines
+
+    QStringList strlist;
+
+    MythSocket *pbssock = pbs->getSocket();
+
+    QString hostname = slist[1];
+    int songID = slist[2].toInt();
+
+    if (ismaster && !gCoreContext->IsThisHost(hostname))
+    {
+        // forward the request to the slave BE
+        PlaybackSock *slave = GetMediaServerByHostname(hostname);
+        if (slave)
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC +
+                QString("HandleMusicSaveLyrics: asking slave '%1' to "
+                        "save the lyrics").arg(hostname));
+            strlist = slave->ForwardRequest(slist);
+            slave->DecrRef();
+
+            if (pbssock)
+                SendResponse(pbssock, strlist);
+
+            return;
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC +
+               QString("HandleMusicSaveLyrics: Failed to grab slave "
+                        "socket on '%1'").arg(hostname));
+        }
+    }
+    else
+    {
+        MusicMetadata *mdata = MusicMetadata::createFromID(songID);
+        if (!mdata)
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Cannot find metadata for trackid: %1").arg(songID));
+            strlist << QString("ERROR: Cannot find metadata for trackid: %1").arg(songID);
+
+            if (pbssock)
+                SendResponse(pbssock, strlist);
+
+            return;
+        }
+
+        QString lyricsFile = GetConfDir() + QString("/MythMusic/Lyrics/%1.txt").arg(songID);
+
+        // remove any existing lyrics for this songID
+        if (QFile::exists(lyricsFile))
+            QFile::remove(lyricsFile);
+
+        // save the new lyrics
+        QFile file(QLatin1String(qPrintable(lyricsFile)));
+
+        if (file.open(QIODevice::WriteOnly))
+        {
+            QTextStream stream(&file);
+            for (int x = 3; x < slist.count(); x++)
+                stream << slist.at(x);
+            file.close();
+        }
+    }
+
+    strlist << "OK";
 
     if (pbssock)
         SendResponse(pbssock, strlist);
