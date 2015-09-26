@@ -4288,6 +4288,7 @@ void TVRec::TuningNewRecorder(MPEGStreamData *streamData)
     return;
 
   err_ret:
+    SetRecordingStatus(RecStatus::Failed, __LINE__, true);
     ChangeState(kState_None);
     if (tvchain)
         delete rec;
