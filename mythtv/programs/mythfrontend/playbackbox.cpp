@@ -1702,6 +1702,10 @@ bool PlaybackBox::UpdateUILists(void)
                 if (!isDeletedGroup)
                     continue;
             }
+            else if (pRecgroup.startsWith('.'))
+            {
+                continue;
+            }
             // Optionally ignore LiveTV
             else if (!(m_viewMask & VIEW_LIVETVGRP) && pRecgroup == "LiveTV")
             {
@@ -2168,7 +2172,7 @@ bool PlaybackBox::UpdateUILists(void)
             while (query.next())
             {
                 name = query.value(0).toString();
-                if (name != "Deleted" && name != "LiveTV")
+                if (name != "Deleted" && name != "LiveTV" && !name.startsWith('.'))
                 {
                     m_recGroups.append(name);
                     m_recGroupType[name] = "recgroup";
