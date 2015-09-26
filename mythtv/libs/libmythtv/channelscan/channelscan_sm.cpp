@@ -1727,7 +1727,7 @@ bool ChannelScanSM::Tune(const transport_scan_items_it_t &transport)
             tuning.mod_sys = DTVModulationSystem::kModulationSystem_DVBT;
     }
 
-    return GetDTVChannel()->Tune(tuning, m_inputName);
+    return GetDTVChannel()->Tune(tuning);
 }
 
 void ChannelScanSM::ScanTransport(const transport_scan_items_it_t &transport)
