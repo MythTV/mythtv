@@ -130,6 +130,17 @@ class TestIPTVRecorder: public QObject
                               "#EXTINF:0,10. ZDFinfokanal\n"
                               "rtp://239.0.0.76:8200\n");
 
+        /*
+         * Austrian A1 TV playlist with empty lines, channel number in tvg-num and VLC style urls
+         */
+        QString rawdataA1TV ("#EXTM3U\n"
+                             "# A1 TV Basispaket 2015-09-11 09:17\n"
+                             "\n"
+                             "#EXTINF:-1 tvg-num=\"1\" tvg-logo=\"609\",ORFeins\n"
+                             "rtp://@239.2.16.1:8208\n"
+                             "#EXTINF:-1 tvg-num=\"2\" tvg-logo=\"625\",ORF 2 W\n"
+                             "rtp://@239.2.16.2:8208\n");
+
 
         fbox_chan_map_t chanmap;
 
@@ -161,6 +172,12 @@ class TestIPTVRecorder: public QObject
         QVERIFY (chanmap["10"].IsValid ());
         QVERIFY (chanmap["10"].m_tuning.IsValid ());
         QCOMPARE (chanmap["10"].m_name, QString ("ZDFinfokanal"));
+
+        /* test playlist from A1 TV with empty lines, tvg-num and @ */
+        chanmap = IPTVChannelFetcher::ParsePlaylist (rawdataA1TV, NULL);
+        QVERIFY (chanmap["1"].IsValid ());
+        QVERIFY (chanmap["1"].m_tuning.IsValid ());
+        QCOMPARE (chanmap["1"].m_name, QString ("ORFeins"));
     }
 
     /**
