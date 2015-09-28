@@ -277,7 +277,7 @@ static uint estimate_number_of_channels(const QString &rawdata)
     uint numLine = 1;
     while (true)
     {
-        QString url = rawdata.section("\n", numLine, numLine);
+        QString url = rawdata.section("\n", numLine, numLine, QString::SectionSkipEmpty);
         if (url.isEmpty())
             return result;
 
@@ -379,7 +379,7 @@ static bool parse_chan_info(const QString   &rawdata,
 
     while (true)
     {
-        QString line = rawdata.section("\n", lineNum, lineNum);
+        QString line = rawdata.section("\n", lineNum, lineNum, QString::SectionSkipEmpty);
         if (line.isEmpty())
             return false;
 
