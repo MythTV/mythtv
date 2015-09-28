@@ -1039,6 +1039,8 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
     if (isAnimation)
         Clear();
 
+    bool complete = true;
+
     QString imagelabel;
 
     int j = 0;
@@ -1164,7 +1166,13 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
         }
 
         ++j;
+
+        // Load is complete if no image is loading in background
+        complete &= !do_background_load;
     }
+
+    if (complete)
+        emit LoadComplete();
 
     return true;
 }
@@ -1597,26 +1605,25 @@ void MythUIImage::customEvent(QEvent *event)
         if (le->GetParent() != this)
             return;
 
-        image  = le->GetImage();
-        number = le->GetNumber();
-        filename = le->GetFilename();
+        image           = le->GetImage();
+        number          = le->GetNumber();
+        filename        = le->GetFilename();
         animationFrames = le->GetAnimationFrames();
-        aborted = le->GetAbortState();
+        aborted         = le->GetAbortState();
 
         m_runningThreads--;
 
         d->m_UpdateLock.lockForRead();
+        QString propFilename = m_imageProperties.filename;
+        d->m_UpdateLock.unlock();
 
         // 1) We aborted loading the image for some reason (e.g. two requests
         //    for same image)
         // 2) Filename changed since we started this image, so abort to avoid
         // rendering two different images in quick succession which causes
         // unsightly flickering
-        if (aborted ||
-            (le->GetBasefile() != m_imageProperties.filename))
+        if (aborted || (le->GetBasefile() != propFilename))
         {
-            d->m_UpdateLock.unlock();
-
             if (aborted)
                 LOG(VB_GUI, LOG_DEBUG, QString("Aborted loading image %1")
                                                                 .arg(filename));
@@ -1638,22 +1645,14 @@ void MythUIImage::customEvent(QEvent *event)
 
                 delete animationFrames;
             }
-
-            return;
         }
-
-        d->m_UpdateLock.unlock();
-
-        if (animationFrames)
+        else if (animationFrames)
         {
             SetAnimationFrames(*animationFrames);
 
             delete animationFrames;
-
-            return;
         }
-
-        if (image)
+        else if (image)
         {
             // We don't clear until we have the new image ready to display to
             // avoid unsightly flashing. This isn't currently supported for
@@ -1690,12 +1689,14 @@ void MythUIImage::customEvent(QEvent *event)
             d->m_UpdateLock.lockForWrite();
             m_LastDisplay = QTime::currentTime();
             d->m_UpdateLock.unlock();
-
-            return;
+        }
+        else
+        {
+            // No Images were loaded, so trigger Reset to default
+            Reset();
         }
 
-        // No Images were loaded, so trigger Reset to default
-        Reset();
+        emit LoadComplete();
     }
 }
 

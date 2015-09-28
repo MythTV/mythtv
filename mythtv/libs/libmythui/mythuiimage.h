@@ -87,6 +87,8 @@ typedef QVector<AnimationFrame> AnimationFrames;
  */
 class MUI_PUBLIC MythUIImage : public MythUIType
 {
+    Q_OBJECT
+
   public:
     MythUIImage(const QString &filepattern, int low, int high, int delayms,
                 MythUIType *parent, const QString &name);
@@ -125,6 +127,9 @@ class MUI_PUBLIC MythUIImage : public MythUIType
     virtual void LoadNow(void);
 
     void SetOrientation(int orientation);
+
+  signals:
+    void LoadComplete();
 
   protected:
     virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
