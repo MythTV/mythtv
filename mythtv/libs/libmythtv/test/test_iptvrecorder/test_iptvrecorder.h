@@ -141,6 +141,17 @@ class TestIPTVRecorder: public QObject
                              "#EXTINF:-1 tvg-num=\"2\" tvg-logo=\"625\",ORF 2 W\n"
                              "rtp://@239.2.16.2:8208\n");
 
+        /*
+         * #12188 - Spanish Movistar TV playlist with channel number in square braces and VLC style urls
+         * first variant from https://code.mythtv.org/trac/ticket/12188#comment:6
+         * second variant from http://www.adslzone.net/postt350532.html
+         */
+        QString rawdataMovistarTV ("#EXTM3U\n"
+                                   "#EXTINF:-1,Canal Sur Andalucía [2275]\n"
+                                   "rtp://@239.0.0.1:8208\n"
+                                   "#EXTINF:-1,[001] La 1\n"
+                                   "rtp://@239.0.0.76:8208\n");
+
 
         fbox_chan_map_t chanmap;
 
@@ -173,11 +184,20 @@ class TestIPTVRecorder: public QObject
         QVERIFY (chanmap["10"].m_tuning.IsValid ());
         QCOMPARE (chanmap["10"].m_name, QString ("ZDFinfokanal"));
 
-        /* test playlist from A1 TV with empty lines, tvg-num and @ */
+        /* test playlist from A1 TV with empty lines and tvg-num */
         chanmap = IPTVChannelFetcher::ParsePlaylist (rawdataA1TV, NULL);
         QVERIFY (chanmap["1"].IsValid ());
         QVERIFY (chanmap["1"].m_tuning.IsValid ());
         QCOMPARE (chanmap["1"].m_name, QString ("ORFeins"));
+
+        /* test playlist from Movistar TV with channel number in braces */
+        chanmap = IPTVChannelFetcher::ParsePlaylist (rawdataMovistarTV, NULL);
+        QVERIFY (chanmap["001"].IsValid ());
+        QVERIFY (chanmap["001"].m_tuning.IsValid ());
+        QCOMPARE (chanmap["001"].m_name, QString ("La 1"));
+        QVERIFY (chanmap["2275"].IsValid ());
+        QVERIFY (chanmap["2275"].m_tuning.IsValid ());
+        QCOMPARE (chanmap["2275"].m_name, QString ("Canal Sur Andalucía"));
     }
 
     /**
