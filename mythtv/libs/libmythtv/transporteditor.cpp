@@ -100,7 +100,8 @@ void TransportList::fillSelections(void)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT mplexid, modulation, frequency, "
-        "       symbolrate, networkid, transportid, constellation "
+        "       symbolrate, networkid, transportid, "
+        "       constellation, mod_sys "
         "FROM dtv_multiplex, videosource "
         "WHERE dtv_multiplex.sourceid = :SOURCEID AND "
         "      dtv_multiplex.sourceid = videosource.sourceid "
@@ -115,7 +116,8 @@ void TransportList::fillSelections(void)
 
     while (query.next())
     {
-        QString rawmod = (CardUtil::OFDM == cardtype) ?
+        QString rawmod = ((CardUtil::OFDM == cardtype) ||
+                          (CardUtil::DVBT2 == cardtype)) ?
             query.value(6).toString() : query.value(1).toString();
 
         QString mod = pp_modulation(rawmod);
@@ -136,6 +138,8 @@ void TransportList::fillSelections(void)
         QString type = "";
         if (CardUtil::OFDM == cardtype)
             type = "(DVB-T)";
+        if (CardUtil::DVBT2 == cardtype)
+            type = QString("(%1)").arg(query.value(7).toString());
         if (CardUtil::QPSK == cardtype)
             type = "(DVB-S)";
         if (CardUtil::QAM == cardtype)
@@ -501,7 +505,8 @@ class Modulation : public ComboBoxSetting, public MuxDBStorage
 
 Modulation::Modulation(const MultiplexID *id,  uint nType) :
     ComboBoxSetting(this),
-    MuxDBStorage(this, id, (CardUtil::OFDM == nType) ?
+    MuxDBStorage(this, id, ((CardUtil::OFDM == nType) ||
+                            (CardUtil::DVBT2 == nType)) ?
                  "constellation" : "modulation")
 {
     setLabel(QObject::tr("Modulation"));
@@ -512,7 +517,8 @@ Modulation::Modulation(const MultiplexID *id,  uint nType) :
         // no modulation options
         setVisible(false);
     }
-    else if ((CardUtil::QAM == nType) || (CardUtil::OFDM == nType))
+    else if ((CardUtil::QAM == nType) || (CardUtil::OFDM == nType) ||
+             (CardUtil::DVBT2 == nType))
     {
         addSelection(QObject::tr("QAM Auto"), "auto");
         addSelection("QAM-16",   "qam_16");
@@ -521,7 +527,7 @@ Modulation::Modulation(const MultiplexID *id,  uint nType) :
         addSelection("QAM-128",  "qam_128");
         addSelection("QAM-256",  "qam_256");
 
-        if (CardUtil::OFDM == nType)
+        if ((CardUtil::OFDM == nType) || (CardUtil::DVBT2 == nType))
         {
             addSelection("QPSK", "qpsk");
         }
@@ -675,6 +681,19 @@ class DVBTHierarchy : public ComboBoxSetting, public MuxDBStorage
     }
 };
 
+class DVBTModulationSystem : public ComboBoxSetting, public MuxDBStorage
+{
+  public:
+    DVBTModulationSystem(const MultiplexID *id) :
+        ComboBoxSetting(this), MuxDBStorage(this, id, "mod_sys")
+    {
+        setLabel(QObject::tr("Modulation System"));
+        setHelpText(QObject::tr("Modulation System (Default: DVB-T)"));
+        addSelection(QObject::tr("DVB-T"),  "DVB-T");
+        addSelection(QObject::tr("DVB-T2"), "DVB-T2");
+    };
+};
+
 
 class TransportPage : public HorizontalConfigurationGroup
 {
@@ -702,6 +721,22 @@ TransportPage::TransportPage(const MultiplexID *_id, uint nType) :
         left->addChild(new DVBTBandwidth(id));
         left->addChild(new DVBInversion(id));
         left->addChild(new Modulation(id, nType));
+
+        right = new VerticalConfigurationGroup(false, true, false, false);
+        right->addChild(new DVBTCoderateLP(id));
+        right->addChild(new DVBTCoderateHP(id));
+        right->addChild(new DVBTTransmissionMode(id));
+        right->addChild(new DVBTGuardInterval(id));
+        right->addChild(new DVBTHierarchy(id));
+    }
+    else if (CardUtil::DVBT2 == nType)
+    {
+        left->addChild(new DTVStandard(id, true, false));
+        left->addChild(new Frequency(id));
+        left->addChild(new DVBTBandwidth(id));
+        left->addChild(new DVBInversion(id));
+        left->addChild(new Modulation(id, nType));
+        left->addChild(new DVBTModulationSystem(id));
 
         right = new VerticalConfigurationGroup(false, true, false, false);
         right->addChild(new DVBTCoderateLP(id));

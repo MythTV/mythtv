@@ -65,6 +65,7 @@ class MTV_PUBLIC CardUtil
         CETON     = 17,
         EXTERNAL  = 18,
         VBOX      = 19,
+        DVBT2     = 20,
     };
 
     static enum INPUT_TYPES toInputType(const QString &name)
@@ -109,6 +110,8 @@ class MTV_PUBLIC CardUtil
             return EXTERNAL;
         if ("VBOX" == name)
             return VBOX;
+        if ("DVB_T2" == name)
+            return DVBT2;
         return ERROR_UNKNOWN;
     }
 

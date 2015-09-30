@@ -530,6 +530,7 @@ using_backend {
     HEADERS += channelscan/panedvbs.h
     HEADERS += channelscan/panedvbs2.h
     HEADERS += channelscan/panedvbt.h
+    HEADERS += channelscan/panedvbt2.h
     HEADERS += channelscan/panedvbutilsimport.h
     HEADERS += channelscan/panesingle.h
     HEADERS += channelscan/scanmonitor.h
