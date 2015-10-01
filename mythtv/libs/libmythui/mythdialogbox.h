@@ -88,6 +88,8 @@ class MUI_PUBLIC MythMenu
 
     void SetParent(MythMenu *parent) { m_parentMenu = parent; }
 
+    bool IsEmpty()  { return m_menuItems.isEmpty(); }
+
   private:
     void Init(void);
 
