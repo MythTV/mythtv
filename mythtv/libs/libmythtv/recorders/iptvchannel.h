@@ -60,6 +60,7 @@ class IPTVChannel : QObject, public DTVChannel
     IPTVTuningData     m_last_tuning;
     IPTVStreamHandler *m_stream_handler;
     MPEGStreamData    *m_stream_data;
+    QString            m_videodev;
 };
 
 #endif // _IPTV_CHANNEL_H_

@@ -402,6 +402,8 @@ MythSystemEventEditor::MythSystemEventEditor(MythScreenStack *parent,
         tr("Playback unpaused");
     m_settings["EventCmdPlayChanged"]          = // PLAY_CHANGED
         tr("Playback program changed");
+    m_settings["EventCmdTuningSignalTimeout"]  = // TUNING_SIGNAL_TIMEOUT
+        tr("Tuning signal waiting");
     m_settings["EventCmdMasterStarted"]        = // MASTER_STARTED
         tr("Master backend started");
     m_settings["EventCmdMasterShutdown"]       = // MASTER_SHUTDOWN

@@ -329,6 +329,9 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     SignalMonitor    *signalMonitor;
     EITScanner       *scanner;
 
+    QDateTime         signalEventCmdTimeout;
+    bool              signalEventCmdSent;
+
     QDateTime         signalMonitorDeadline;
     uint              signalMonitorCheckCnt;
 

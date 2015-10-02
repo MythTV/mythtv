@@ -196,6 +196,7 @@ class MTV_PUBLIC ChannelUtil
     static QString GetVideoFilters(uint sourceid, const QString &channum)
         { return GetChannelValueStr("videofilters", sourceid, channum); }
     static IPTVTuningData GetIPTVTuningData(uint chanid);
+    static bool IsHLSPlaylist(QString url);
 
     static ChannelInfoList GetChannels(
         uint sourceid, bool visible_only, 

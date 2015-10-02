@@ -252,7 +252,7 @@ bool HLSReader::IsValidPlaylist(QTextStream & text)
         line = text.readLine();
         if (line.isNull())
             break;
-        LOG(VB_RECORD, LOG_DEBUG, LOC +
+        LOG(VB_RECORD, LOG_DEBUG, /*LOC + */
             QString("IsValidPlaylist: |'%1'").arg(line));
         if (line.startsWith(QLatin1String("#EXT-X-TARGETDURATION"))  ||
             line.startsWith(QLatin1String("#EXT-X-MEDIA-SEQUENCE"))  ||
