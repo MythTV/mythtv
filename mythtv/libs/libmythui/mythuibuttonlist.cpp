@@ -3518,7 +3518,7 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
 
             QString newText = text->GetTemplateText();
 
-            QRegExp regexp("%(([^\\|%]+)?\\||\\|(.))?(\\S+)(\\|(.+))?%");
+            QRegExp regexp("%(([^\\|%]+)?\\||\\|(.))?([\\w#]+)(\\|(.+))?%");
             regexp.setMinimal(true);
 
             if (!newText.isEmpty() && newText.contains(regexp))
