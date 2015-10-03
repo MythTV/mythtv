@@ -31,6 +31,7 @@ from optparse import OptionParser
 import sys
 
 def buildSingle(inetref, opts):
+    from MythTV.tmdb3.tmdb_exceptions import TMDBRequestInvalid
     from MythTV.tmdb3 import Movie
     from MythTV import VideoMetadata
     from lxml import etree
@@ -49,8 +50,13 @@ def buildSingle(inetref, opts):
                ['budget',       'budget'],      ['revenue',     'revenue']]
     m = VideoMetadata()
     for i,j in mapping:
-        if getattr(movie, j):
-            setattr(m, i, getattr(movie, j))
+        try:
+            if getattr(movie, j):
+                setattr(m, i, getattr(movie, j))
+        except TMDBRequestInvalid:
+            sys.stdout.write(etree.tostring(tree, encoding='UTF-8', pretty_print=True,
+                                            xml_declaration=True))
+            sys.exit()
 
     if movie.title:
         m.title = movie.title
@@ -173,6 +179,7 @@ def buildList(query, opts):
     sys.exit(0)
 
 def buildCollection(inetref, opts):
+    from MythTV.tmdb3.tmdb_exceptions import TMDBRequestInvalid
     from MythTV.tmdb3 import Collection
     from MythTV import VideoMetadata
     from lxml import etree
@@ -180,7 +187,12 @@ def buildCollection(inetref, opts):
     tree = etree.XML(u'<metadata></metadata>')
     m = VideoMetadata()
     m.collectionref = str(collection.id)
-    m.title = collection.name
+    try:
+        m.title = collection.name
+    except TMDBRequestInvalid:
+        sys.stdout.write(etree.tostring(tree, encoding='UTF-8', pretty_print=True,
+                                        xml_declaration=True))
+        sys.exit()
     if collection.backdrop:
         b = collection.backdrop
         m.images.append({'type':'fanart', 'url':b.geturl(),
