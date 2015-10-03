@@ -63,7 +63,7 @@ def buildSingle(inetref, opts):
             # is selected by the metadata libraries
             index = zip(*releases)[0].index(opts.country)
             releases.insert(0, releases.pop(index))
-        except ValueError:
+        except IndexError, ValueError:
             pass
         else:
             m.releasedate = releases[0][1].releasedate
