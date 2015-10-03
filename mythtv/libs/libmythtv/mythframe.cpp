@@ -358,11 +358,14 @@ void framecopy(VideoFrame* dst, const VideoFrame* src, bool useSSE)
             return;
         }
 
-        if (height == dheight && width == dwidth &&
-            dst->pitches[0] != src->pitches[0])
+        if (dst->pitches[0] != src->pitches[0] ||
+            dst->pitches[1] != src->pitches[1] ||
+            dst->pitches[2] != src->pitches[2])
         {
             // We have a different stride between the two frames
             // drop the garbage data
+            height = (dst->height < src->height) ? dst->height : src->height;
+            width = (dst->width < src->width) ? dst->width : src->width;
             copyplane(dst->buf + dst->offsets[0], dst->pitches[0],
                       src->buf + src->offsets[0], src->pitches[0],
                       width, height);
