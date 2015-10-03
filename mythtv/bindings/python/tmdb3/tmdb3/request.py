@@ -134,6 +134,7 @@ class Request(urllib2.Request):
             pprint.PrettyPrinter().pprint(data)
         return data
 
+# See https://www.themoviedb.org/documentation/api/status-codes
 status_handlers = {
     1: None,
     2: TMDBRequestInvalid('Invalid service - This service does not exist.'),
@@ -157,7 +158,9 @@ status_handlers = {
     14: TMDBRequestError('Authentication Failed.'),
     15: TMDBError('Failed'),
     16: TMDBError('Device Denied'),
-    17: TMDBError('Session Denied')}
+    17: TMDBError('Session Denied'),
+    # collection not found
+    34: TMDBRequestInvalid('The resource you requested could not be found.')}
 
 def handle_status(data, query):
     status = status_handlers[data.get('status_code', 1)]
