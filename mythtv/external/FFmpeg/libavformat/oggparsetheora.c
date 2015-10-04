@@ -116,7 +116,7 @@ static int theora_header(AVFormatContext *s, int idx)
     }
     break;
     case 0x81:
-        ff_vorbis_comment(s, &st->metadata, os->buf + os->pstart + 7, os->psize - 7, 1);
+        ff_vorbis_stream_comment(s, st, os->buf + os->pstart + 7, os->psize - 7);
     case 0x82:
         if (!thp->version)
             return AVERROR_INVALIDDATA;
@@ -127,11 +127,11 @@ static int theora_header(AVFormatContext *s, int idx)
     }
 
     if ((err = av_reallocp(&st->codec->extradata,
-                           cds + FF_INPUT_BUFFER_PADDING_SIZE)) < 0) {
+                           cds + AV_INPUT_BUFFER_PADDING_SIZE)) < 0) {
         st->codec->extradata_size = 0;
         return err;
     }
-    memset(st->codec->extradata + cds, 0, FF_INPUT_BUFFER_PADDING_SIZE);
+    memset(st->codec->extradata + cds, 0, AV_INPUT_BUFFER_PADDING_SIZE);
 
     cdp    = st->codec->extradata + st->codec->extradata_size;
     *cdp++ = os->psize >> 8;

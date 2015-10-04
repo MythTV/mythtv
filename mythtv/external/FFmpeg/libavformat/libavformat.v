@@ -3,12 +3,6 @@ LIBAVFORMAT_$MAJOR {
                 #FIXME those are for ffserver
                 ff_inet_aton;
                 ff_socket_nonblock;
-                ffm_set_write_index;
-                ffm_read_write_index;
-                ffm_write_write_index;
-                ff_mpegts_parse_close;
-                ff_mpegts_parse_open;
-                ff_mpegts_parse_packet;
                 ff_rtsp_parse_line;
                 ff_rtp_get_local_rtp_port;
                 ff_rtp_get_local_rtcp_port;

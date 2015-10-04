@@ -53,10 +53,10 @@ static av_cold int tqi_decode_init(AVCodecContext *avctx)
     ff_blockdsp_init(&s->bdsp, avctx);
     ff_bswapdsp_init(&t->bsdsp);
     ff_idctdsp_init(&s->idsp, avctx);
-    ff_init_scantable_permutation(s->idsp.idct_permutation, FF_NO_IDCT_PERM);
+    ff_init_scantable_permutation(s->idsp.idct_permutation, FF_IDCT_PERM_NONE);
     ff_init_scantable(s->idsp.idct_permutation, &s->intra_scantable, ff_zigzag_direct);
     s->qscale = 1;
-    avctx->time_base = (AVRational){1, 15};
+    avctx->framerate = (AVRational){ 15, 1 };
     avctx->pix_fmt = AV_PIX_FMT_YUV420P;
     ff_mpeg12_init_vlcs();
     return 0;
@@ -85,7 +85,7 @@ static inline void tqi_idct_put(TqiContext *t, AVFrame *frame, int16_t (*block)[
     ff_ea_idct_put_c(dest_y              + 8, linesize, block[1]);
     ff_ea_idct_put_c(dest_y + 8*linesize    , linesize, block[2]);
     ff_ea_idct_put_c(dest_y + 8*linesize + 8, linesize, block[3]);
-    if(!(s->avctx->flags&CODEC_FLAG_GRAY)) {
+    if(!(s->avctx->flags & AV_CODEC_FLAG_GRAY)) {
         ff_ea_idct_put_c(dest_cb, frame->linesize[1], block[4]);
         ff_ea_idct_put_c(dest_cr, frame->linesize[2], block[5]);
     }
@@ -149,7 +149,7 @@ static int tqi_decode_frame(AVCodecContext *avctx,
 static av_cold int tqi_decode_end(AVCodecContext *avctx)
 {
     TqiContext *t = avctx->priv_data;
-    av_free(t->bitstream_buf);
+    av_freep(&t->bitstream_buf);
     return 0;
 }
 
@@ -162,5 +162,5 @@ AVCodec ff_eatqi_decoder = {
     .init           = tqi_decode_init,
     .close          = tqi_decode_end,
     .decode         = tqi_decode_frame,
-    .capabilities   = CODEC_CAP_DR1,
+    .capabilities   = AV_CODEC_CAP_DR1,
 };

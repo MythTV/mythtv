@@ -230,7 +230,7 @@ using_jack {
 }
 
 contains( HAVE_MMX, yes ) {
-    HEADERS += ../../external/FFmpeg/libavcodec/dsputil.h
+    HEADERS += ../../external/FFmpeg/libavutil/cpu.h
 }
 
 use_hidesyms {

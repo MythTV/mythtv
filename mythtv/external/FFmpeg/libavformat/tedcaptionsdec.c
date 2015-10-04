@@ -34,7 +34,7 @@ typedef struct {
 
 static const AVOption tedcaptions_options[] = {
     { "start_time", "set the start time (offset) of the subtitles, in ms",
-      offsetof(TEDCaptionsDemuxer, start_time), FF_OPT_TYPE_INT64,
+      offsetof(TEDCaptionsDemuxer, start_time), AV_OPT_TYPE_INT64,
       { .i64 = 15000 }, INT64_MIN, INT64_MAX,
       AV_OPT_FLAG_SUBTITLE_PARAM | AV_OPT_FLAG_DECODING_PARAM },
     { NULL },
@@ -51,7 +51,7 @@ static const AVClass tedcaptions_demuxer_class = {
 
 #define HEX_DIGIT_TEST(c) (BETWEEN(c, '0', '9') || BETWEEN((c) | 32, 'a', 'z'))
 #define HEX_DIGIT_VAL(c) ((c) <= '9' ? (c) - '0' : ((c) | 32) - 'a' + 10)
-#define ERR_CODE(c) (c < 0 ? c : AVERROR_INVALIDDATA)
+#define ERR_CODE(c) ((c) < 0 ? (c) : AVERROR_INVALIDDATA)
 
 static void av_bprint_utf8(AVBPrint *bp, unsigned c)
 {

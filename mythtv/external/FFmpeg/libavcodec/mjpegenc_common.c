@@ -29,7 +29,9 @@
 
 #include "avcodec.h"
 #include "idctdsp.h"
+#include "jpegtables.h"
 #include "put_bits.h"
+#include "mjpegenc.h"
 #include "mjpegenc_common.h"
 #include "mjpeg.h"
 
@@ -121,7 +123,10 @@ static void jpeg_put_comments(AVCodecContext *avctx, PutBitContext *p)
         put_marker(p, APP0);
         put_bits(p, 16, 16);
         avpriv_put_string(p, "JFIF", 1); /* this puts the trailing zero-byte too */
-        put_bits(p, 16, 0x0102);         /* v 1.02 */
+        /* The most significant byte is used for major revisions, the least
+         * significant byte for minor revisions. Version 1.02 is the current
+         * released revision. */
+        put_bits(p, 16, 0x0102);
         put_bits(p,  8, 0);              /* units type: 0 - aspect ratio */
         put_bits(p, 16, avctx->sample_aspect_ratio.num);
         put_bits(p, 16, avctx->sample_aspect_ratio.den);
@@ -130,7 +135,7 @@ static void jpeg_put_comments(AVCodecContext *avctx, PutBitContext *p)
     }
 
     /* comment */
-    if (!(avctx->flags & CODEC_FLAG_BITEXACT)) {
+    if (!(avctx->flags & AV_CODEC_FLAG_BITEXACT)) {
         put_marker(p, COM);
         flush_put_bits(p);
         ptr = put_bits_ptr(p);
@@ -140,9 +145,10 @@ static void jpeg_put_comments(AVCodecContext *avctx, PutBitContext *p)
         AV_WB16(ptr, size);
     }
 
-    if (avctx->pix_fmt == AV_PIX_FMT_YUV420P ||
-        avctx->pix_fmt == AV_PIX_FMT_YUV422P ||
-        avctx->pix_fmt == AV_PIX_FMT_YUV444P) {
+    if (((avctx->pix_fmt == AV_PIX_FMT_YUV420P ||
+          avctx->pix_fmt == AV_PIX_FMT_YUV422P ||
+          avctx->pix_fmt == AV_PIX_FMT_YUV444P) && avctx->color_range != AVCOL_RANGE_JPEG)
+        || avctx->color_range == AVCOL_RANGE_MPEG) {
         put_marker(p, COM);
         flush_put_bits(p);
         ptr = put_bits_ptr(p);
@@ -337,20 +343,30 @@ void ff_mjpeg_escape_FF(PutBitContext *pb, int start)
     }
 }
 
-void ff_mjpeg_encode_stuffing(MpegEncContext *s)
+int ff_mjpeg_encode_stuffing(MpegEncContext *s)
 {
     int i;
     PutBitContext *pbc = &s->pb;
     int mb_y = s->mb_y - !s->mb_x;
+
+    int ret = ff_mpv_reallocate_putbitbuffer(s, put_bits_count(&s->pb) / 8 + 100,
+                                                put_bits_count(&s->pb) / 4 + 1000);
+    if (ret < 0) {
+        av_log(s->avctx, AV_LOG_ERROR, "Buffer reallocation failed\n");
+        goto fail;
+    }
 
     ff_mjpeg_escape_FF(pbc, s->esc_pos);
 
     if((s->avctx->active_thread_type & FF_THREAD_SLICE) && mb_y < s->mb_height)
         put_marker(pbc, RST0 + (mb_y&7));
     s->esc_pos = put_bits_count(pbc) >> 3;
+fail:
 
     for(i=0; i<3; i++)
         s->last_dc[i] = 128 << s->intra_dc_precision;
+
+    return ret;
 }
 
 void ff_mjpeg_encode_picture_trailer(PutBitContext *pb, int header_bits)

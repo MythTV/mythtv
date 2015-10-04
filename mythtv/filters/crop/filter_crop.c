@@ -20,7 +20,7 @@
 #include "filter.h"
 #include "mythframe.h"
 #include "libavutil/mem.h"
-#include "libavcodec/dsputil.h"
+#include "libavutil/cpu.h"
 
 #ifdef MMX
 #include "ffmpeg-mmx.h"

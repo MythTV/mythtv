@@ -31,7 +31,7 @@
 #include <math.h>
 
 #include "libavutil/mem.h"
-#include "libavcodec/dsputil.h"
+#include "libavutil/cpu.h"
 
 #include "color.h"
 

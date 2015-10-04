@@ -102,7 +102,7 @@ ogm_header(AVFormatContext *s, int idx)
                 size -= 4;
             }
             if (size > 52) {
-                av_assert0(FF_INPUT_BUFFER_PADDING_SIZE <= 52);
+                av_assert0(AV_INPUT_BUFFER_PADDING_SIZE <= 52);
                 size -= 52;
                 ff_alloc_extradata(st->codec, size);
                 bytestream2_get_buffer(&p, st->codec->extradata, st->codec->extradata_size);
@@ -111,7 +111,7 @@ ogm_header(AVFormatContext *s, int idx)
     } else if (bytestream2_peek_byte(&p) == 3) {
         bytestream2_skip(&p, 7);
         if (bytestream2_get_bytes_left(&p) > 1)
-            ff_vorbis_comment(s, &st->metadata, p.buffer, bytestream2_get_bytes_left(&p) - 1, 1);
+            ff_vorbis_stream_comment(s, st, p.buffer, bytestream2_get_bytes_left(&p) - 1);
     }
 
     return 1;

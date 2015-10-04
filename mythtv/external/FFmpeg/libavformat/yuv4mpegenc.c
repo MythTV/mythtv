@@ -143,7 +143,6 @@ static int yuv4_write_packet(AVFormatContext *s, AVPacket *pkt)
     int width, height, h_chroma_shift, v_chroma_shift;
     int i;
     char buf2[Y4M_LINE_MAX + 1];
-    char buf1[20];
     uint8_t *ptr, *ptr1, *ptr2;
 
     memcpy(&picture_tmp, pkt->data, sizeof(AVPicture));
@@ -163,8 +162,7 @@ static int yuv4_write_packet(AVFormatContext *s, AVPacket *pkt)
 
     /* construct frame header */
 
-    snprintf(buf1, sizeof(buf1), "%s\n", Y4M_FRAME_MAGIC);
-    avio_write(pb, buf1, strlen(buf1));
+    avio_printf(s->pb, "%s\n", Y4M_FRAME_MAGIC);
 
     width  = st->codec->width;
     height = st->codec->height;
@@ -268,7 +266,7 @@ static int yuv4_write_header(AVFormatContext *s)
     case AV_PIX_FMT_YUV420P16:
     case AV_PIX_FMT_YUV422P16:
     case AV_PIX_FMT_YUV444P16:
-        if (s->streams[0]->codec->strict_std_compliance >= FF_COMPLIANCE_NORMAL) {
+        if (s->strict_std_compliance >= FF_COMPLIANCE_NORMAL) {
             av_log(s, AV_LOG_ERROR, "'%s' is not a official yuv4mpegpipe pixel format. "
                    "Use '-strict -1' to encode to this pixel format.\n",
                    av_get_pix_fmt_name(s->streams[0]->codec->pix_fmt));

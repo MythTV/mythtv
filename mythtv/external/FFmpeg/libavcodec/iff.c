@@ -41,7 +41,7 @@ typedef enum {
     MASK_LASSO
 } mask_type;
 
-typedef struct {
+typedef struct IffContext {
     AVFrame *frame;
     int planesize;
     uint8_t * planebuf;
@@ -240,7 +240,7 @@ static int extract_header(AVCodecContext *const avctx,
                 avctx->pix_fmt = AV_PIX_FMT_RGB32;
                 av_freep(&s->mask_buf);
                 av_freep(&s->mask_palbuf);
-                s->mask_buf = av_malloc((s->planesize * 32) + FF_INPUT_BUFFER_PADDING_SIZE);
+                s->mask_buf = av_malloc((s->planesize * 32) + AV_INPUT_BUFFER_PADDING_SIZE);
                 if (!s->mask_buf)
                     return AVERROR(ENOMEM);
                 if (s->bpp > 16) {
@@ -248,7 +248,7 @@ static int extract_header(AVCodecContext *const avctx,
                     av_freep(&s->mask_buf);
                     return AVERROR(ENOMEM);
                 }
-                s->mask_palbuf = av_malloc((2 << s->bpp) * sizeof(uint32_t) + FF_INPUT_BUFFER_PADDING_SIZE);
+                s->mask_palbuf = av_malloc((2 << s->bpp) * sizeof(uint32_t) + AV_INPUT_BUFFER_PADDING_SIZE);
                 if (!s->mask_palbuf) {
                     av_freep(&s->mask_buf);
                     return AVERROR(ENOMEM);
@@ -275,12 +275,12 @@ static int extract_header(AVCodecContext *const avctx,
             int ham_count;
             const uint8_t *const palette = avctx->extradata + AV_RB16(avctx->extradata);
 
-            s->ham_buf = av_malloc((s->planesize * 8) + FF_INPUT_BUFFER_PADDING_SIZE);
+            s->ham_buf = av_malloc((s->planesize * 8) + AV_INPUT_BUFFER_PADDING_SIZE);
             if (!s->ham_buf)
                 return AVERROR(ENOMEM);
 
             ham_count = 8 * (1 << s->ham);
-            s->ham_palbuf = av_malloc((ham_count << !!(s->masking == MASK_HAS_MASK)) * sizeof (uint32_t) + FF_INPUT_BUFFER_PADDING_SIZE);
+            s->ham_palbuf = av_malloc((ham_count << !!(s->masking == MASK_HAS_MASK)) * sizeof (uint32_t) + AV_INPUT_BUFFER_PADDING_SIZE);
             if (!s->ham_palbuf) {
                 av_freep(&s->ham_buf);
                 return AVERROR(ENOMEM);
@@ -366,7 +366,7 @@ static av_cold int decode_init(AVCodecContext *avctx)
     if ((err = av_image_check_size(avctx->width, avctx->height, 0, avctx)))
         return err;
     s->planesize = FFALIGN(avctx->width, 16) >> 3; // Align plane size in bits to word-boundary
-    s->planebuf  = av_malloc(s->planesize + FF_INPUT_BUFFER_PADDING_SIZE);
+    s->planebuf  = av_malloc(s->planesize + AV_INPUT_BUFFER_PADDING_SIZE);
     if (!s->planebuf)
         return AVERROR(ENOMEM);
 
@@ -677,11 +677,15 @@ static int decode_frame(AVCodecContext *avctx,
     const uint8_t *buf_end = buf + buf_size;
     int y, plane, res;
     GetByteContext gb;
+    const AVPixFmtDescriptor *desc;
 
     if ((res = extract_header(avctx, avpkt)) < 0)
         return res;
     if ((res = ff_reget_buffer(avctx, s->frame)) < 0)
         return res;
+
+    desc = av_pix_fmt_desc_get(avctx->pix_fmt);
+
     if (!s->init && avctx->bits_per_coded_sample <= 8 &&
         avctx->pix_fmt == AV_PIX_FMT_PAL8) {
         if ((res = cmap_read_palette(avctx, (uint32_t *)s->frame->data[1])) < 0)
@@ -721,7 +725,6 @@ static int decode_frame(AVCodecContext *avctx,
             } else
                 return unsupported(avctx);
         } else if (avctx->codec_tag == MKTAG('D', 'E', 'E', 'P')) {
-            const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(avctx->pix_fmt);
             int raw_width = avctx->width * (av_get_bits_per_pixel(desc) >> 3);
             int x;
             for (y = 0; y < avctx->height && buf < buf_end; y++) {
@@ -838,7 +841,6 @@ static int decode_frame(AVCodecContext *avctx,
             } else
                 return unsupported(avctx);
         } else if (avctx->codec_tag == MKTAG('D', 'E', 'E', 'P')) { // IFF-DEEP
-            const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(avctx->pix_fmt);
             if (av_get_bits_per_pixel(desc) == 32)
                 decode_deep_rle32(s->frame->data[0], buf, buf_size, avctx->width, avctx->height, s->frame->linesize[0]);
             else
@@ -847,16 +849,15 @@ static int decode_frame(AVCodecContext *avctx,
         break;
     case 4:
         bytestream2_init(&gb, buf, buf_size);
-        if (avctx->codec_tag == MKTAG('R', 'G', 'B', '8'))
+        if (avctx->codec_tag == MKTAG('R', 'G', 'B', '8') && avctx->pix_fmt == AV_PIX_FMT_RGB32)
             decode_rgb8(&gb, s->frame->data[0], avctx->width, avctx->height, s->frame->linesize[0]);
-        else if (avctx->codec_tag == MKTAG('R', 'G', 'B', 'N'))
+        else if (avctx->codec_tag == MKTAG('R', 'G', 'B', 'N') && avctx->pix_fmt == AV_PIX_FMT_RGB444)
             decode_rgbn(&gb, s->frame->data[0], avctx->width, avctx->height, s->frame->linesize[0]);
         else
             return unsupported(avctx);
         break;
     case 5:
         if (avctx->codec_tag == MKTAG('D', 'E', 'E', 'P')) {
-            const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(avctx->pix_fmt);
             if (av_get_bits_per_pixel(desc) == 32)
                 decode_deep_tvdc32(s->frame->data[0], buf, buf_size, avctx->width, avctx->height, s->frame->linesize[0], s->tvdc);
             else
@@ -886,7 +887,7 @@ AVCodec ff_iff_ilbm_decoder = {
     .init           = decode_init,
     .close          = decode_end,
     .decode         = decode_frame,
-    .capabilities   = CODEC_CAP_DR1,
+    .capabilities   = AV_CODEC_CAP_DR1,
 };
 #endif
 #if CONFIG_IFF_BYTERUN1_DECODER
@@ -899,6 +900,6 @@ AVCodec ff_iff_byterun1_decoder = {
     .init           = decode_init,
     .close          = decode_end,
     .decode         = decode_frame,
-    .capabilities   = CODEC_CAP_DR1,
+    .capabilities   = AV_CODEC_CAP_DR1,
 };
 #endif

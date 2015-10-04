@@ -23,7 +23,9 @@
 #include "libavutil/avassert.h"
 #include "libavutil/channel_layout.h"
 #include "libavutil/imgutils.h"
+#include "libavutil/internal.h"
 #include "libavutil/intreadwrite.h"
+#include "libavcodec/get_bits.h"
 #include "swf.h"
 
 static const AVCodecTag swf_audio_codec_tags[] = {
@@ -39,7 +41,7 @@ static int get_swf_tag(AVIOContext *pb, int *len_ptr)
 {
     int tag, len;
 
-    if (url_feof(pb))
+    if (avio_feof(pb))
         return AVERROR_EOF;
 
     tag = avio_rl16(pb);
@@ -55,6 +57,9 @@ static int get_swf_tag(AVIOContext *pb, int *len_ptr)
 
 static int swf_probe(AVProbeData *p)
 {
+    GetBitContext gb;
+    int len, xmin, xmax, ymin, ymax;
+
     if(p->buf_size < 15)
         return 0;
 
@@ -63,7 +68,25 @@ static int swf_probe(AVProbeData *p)
         && AV_RB24(p->buf) != AV_RB24("FWS"))
         return 0;
 
-    if (p->buf[3] >= 20)
+    if (   AV_RB24(p->buf) == AV_RB24("CWS")
+        && p->buf[3] <= 20)
+        return AVPROBE_SCORE_MAX / 4 + 1;
+
+    if (init_get_bits8(&gb, p->buf + 3, p->buf_size - 3) < 0)
+        return 0;
+
+    skip_bits(&gb, 40);
+    len = get_bits(&gb, 5);
+    if (!len)
+        return 0;
+    xmin = get_bits_long(&gb, len);
+    xmax = get_bits_long(&gb, len);
+    ymin = get_bits_long(&gb, len);
+    ymax = get_bits_long(&gb, len);
+    if (xmin || ymin || !xmax || !ymax)
+        return 0;
+
+    if (p->buf[3] >= 20 || xmax < 16 || ymax < 16)
         return AVPROBE_SCORE_MAX / 4;
 
     return AVPROBE_SCORE_MAX;
@@ -289,6 +312,7 @@ static int swf_read_packet(AVFormatContext *s, AVPacket *pkt)
             const int bmp_fmt = avio_r8(pb);
             const int width   = avio_rl16(pb);
             const int height  = avio_rl16(pb);
+            int pix_fmt;
 
             len -= 2+1+2+2;
 
@@ -320,7 +344,7 @@ static int swf_read_packet(AVFormatContext *s, AVPacket *pkt)
 
             out_len = colormapsize * colormapbpp + linesize * height;
 
-            av_dlog(s, "bitmap: ch=%d fmt=%d %dx%d (linesize=%d) len=%d->%ld pal=%d\n",
+            ff_dlog(s, "bitmap: ch=%d fmt=%d %dx%d (linesize=%d) len=%d->%ld pal=%d\n",
                     ch_id, bmp_fmt, width, height, linesize, len, out_len, colormapsize);
 
             zbuf = av_malloc(len);
@@ -353,17 +377,21 @@ static int swf_read_packet(AVFormatContext *s, AVPacket *pkt)
                 avpriv_set_pts_info(vst, 64, 256, swf->frame_rate);
                 st = vst;
             }
-            st->codec->width  = width;
-            st->codec->height = height;
 
             if ((res = av_new_packet(pkt, out_len - colormapsize * colormapbpp)) < 0)
                 goto bitmap_end;
+            if (!st->codec->width && !st->codec->height) {
+                st->codec->width  = width;
+                st->codec->height = height;
+            } else {
+                ff_add_param_change(pkt, 0, 0, 0, width, height);
+            }
             pkt->pos = pos;
             pkt->stream_index = st->index;
 
             switch (bmp_fmt) {
             case 3:
-                st->codec->pix_fmt = AV_PIX_FMT_PAL8;
+                pix_fmt = AV_PIX_FMT_PAL8;
                 for (i = 0; i < colormapsize; i++)
                     if (alpha_bmp)  colormap[i] = buf[3]<<24 | AV_RB24(buf + 4*i);
                     else            colormap[i] = 0xffU <<24 | AV_RB24(buf + 3*i);
@@ -375,14 +403,18 @@ static int swf_read_packet(AVFormatContext *s, AVPacket *pkt)
                 memcpy(pal, colormap, AVPALETTE_SIZE);
                 break;
             case 4:
-                st->codec->pix_fmt = AV_PIX_FMT_RGB555;
+                pix_fmt = AV_PIX_FMT_RGB555;
                 break;
             case 5:
-                st->codec->pix_fmt = alpha_bmp ? AV_PIX_FMT_ARGB : AV_PIX_FMT_0RGB;
+                pix_fmt = alpha_bmp ? AV_PIX_FMT_ARGB : AV_PIX_FMT_0RGB;
                 break;
             default:
                 av_assert0(0);
             }
+            if (st->codec->pix_fmt != AV_PIX_FMT_NONE && st->codec->pix_fmt != pix_fmt) {
+                av_log(s, AV_LOG_ERROR, "pixel format change unsupported\n");
+            } else
+                st->codec->pix_fmt = pix_fmt;
 
             if (linesize * height > pkt->size) {
                 res = AVERROR_INVALIDDATA;

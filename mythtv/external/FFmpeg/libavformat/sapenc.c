@@ -49,7 +49,7 @@ static int sap_write_close(AVFormatContext *s)
         if (!rtpctx)
             continue;
         av_write_trailer(rtpctx);
-        avio_close(rtpctx->pb);
+        avio_closep(&rtpctx->pb);
         avformat_free_context(rtpctx);
         s->streams[i]->priv_data = NULL;
     }
@@ -134,7 +134,7 @@ static int sap_write_header(AVFormatContext *s)
         freeaddrinfo(ai);
     }
 
-    contexts = av_mallocz(sizeof(AVFormatContext*) * s->nb_streams);
+    contexts = av_mallocz_array(s->nb_streams, sizeof(AVFormatContext*));
     if (!contexts) {
         ret = AVERROR(ENOMEM);
         goto fail;
@@ -256,7 +256,7 @@ static int sap_write_packet(AVFormatContext *s, AVPacket *pkt)
         sap->last_time = now;
     }
     rtpctx = s->streams[pkt->stream_index]->priv_data;
-    return ff_write_chained(rtpctx, 0, pkt, s);
+    return ff_write_chained(rtpctx, 0, pkt, s, 0);
 }
 
 AVOutputFormat ff_sap_muxer = {

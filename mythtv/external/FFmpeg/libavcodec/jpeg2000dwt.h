@@ -30,11 +30,14 @@
 #include <stdint.h>
 
 #define FF_DWT_MAX_DECLVLS 32 ///< max number of decomposition levels
+#define F_LFTG_K      1.230174104914001f
+#define F_LFTG_X      0.812893066115961f
 
 enum DWTType {
     FF_DWT97,
     FF_DWT53,
-    FF_DWT97_INT
+    FF_DWT97_INT,
+    FF_DWT_NB
 };
 
 typedef struct DWTContext {

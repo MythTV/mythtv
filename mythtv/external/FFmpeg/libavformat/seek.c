@@ -410,17 +410,6 @@ AVParserState *ff_store_parser_state(AVFormatContext *s)
 
     state->fpos = avio_tell(s->pb);
 
-    // copy context structures
-    state->packet_buffer                    = s->packet_buffer;
-    state->parse_queue                      = s->parse_queue;
-    state->raw_packet_buffer                = s->raw_packet_buffer;
-    state->raw_packet_buffer_remaining_size = s->raw_packet_buffer_remaining_size;
-
-    s->packet_buffer                        = NULL;
-    s->parse_queue                          = NULL;
-    s->raw_packet_buffer                    = NULL;
-    s->raw_packet_buffer_remaining_size     = RAW_PACKET_BUFFER_SIZE;
-
     // copy stream structures
     state->nb_streams = s->nb_streams;
     for (i = 0; i < s->nb_streams; i++) {
@@ -452,12 +441,6 @@ void ff_restore_parser_state(AVFormatContext *s, AVParserState *state)
         return;
 
     avio_seek(s->pb, state->fpos, SEEK_SET);
-
-    // copy context structures
-    s->packet_buffer                    = state->packet_buffer;
-    s->parse_queue                      = state->parse_queue;
-    s->raw_packet_buffer                = state->raw_packet_buffer;
-    s->raw_packet_buffer_remaining_size = state->raw_packet_buffer_remaining_size;
 
     // copy stream structures
     for (i = 0; i < state->nb_streams; i++) {
@@ -498,10 +481,6 @@ void ff_free_parser_state(AVFormatContext *s, AVParserState *state)
         if (ss->parser)
             av_parser_close(ss->parser);
     }
-
-    free_packet_list(state->packet_buffer);
-    free_packet_list(state->parse_queue);
-    free_packet_list(state->raw_packet_buffer);
 
     av_free(state->stream_states);
     av_free(state);

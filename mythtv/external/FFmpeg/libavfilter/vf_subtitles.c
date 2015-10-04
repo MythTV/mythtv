@@ -50,11 +50,14 @@ typedef struct {
     ASS_Renderer *renderer;
     ASS_Track    *track;
     char *filename;
+    char *fontsdir;
     char *charenc;
+    char *force_style;
     int stream_index;
     uint8_t rgba_map[4];
     int     pix_step[4];       ///< steps per pixel for each plane of the main output
     int original_w, original_h;
+    int shaping;
     FFDrawContext draw;
 } AssContext;
 
@@ -65,22 +68,25 @@ typedef struct {
     {"filename",       "set the filename of file to read",                         OFFSET(filename),   AV_OPT_TYPE_STRING,     {.str = NULL},  CHAR_MIN, CHAR_MAX, FLAGS }, \
     {"f",              "set the filename of file to read",                         OFFSET(filename),   AV_OPT_TYPE_STRING,     {.str = NULL},  CHAR_MIN, CHAR_MAX, FLAGS }, \
     {"original_size",  "set the size of the original video (used to scale fonts)", OFFSET(original_w), AV_OPT_TYPE_IMAGE_SIZE, {.str = NULL},  CHAR_MIN, CHAR_MAX, FLAGS }, \
+    {"fontsdir",       "set the directory containing the fonts to read",           OFFSET(fontsdir),   AV_OPT_TYPE_STRING,     {.str = NULL},  CHAR_MIN, CHAR_MAX, FLAGS }, \
 
 /* libass supports a log level ranging from 0 to 7 */
 static const int ass_libavfilter_log_level_map[] = {
-    AV_LOG_QUIET,               /* 0 */
-    AV_LOG_PANIC,               /* 1 */
-    AV_LOG_FATAL,               /* 2 */
-    AV_LOG_ERROR,               /* 3 */
-    AV_LOG_WARNING,             /* 4 */
-    AV_LOG_INFO,                /* 5 */
-    AV_LOG_VERBOSE,             /* 6 */
-    AV_LOG_DEBUG,               /* 7 */
+    [0] = AV_LOG_FATAL,     /* MSGL_FATAL */
+    [1] = AV_LOG_ERROR,     /* MSGL_ERR */
+    [2] = AV_LOG_WARNING,   /* MSGL_WARN */
+    [3] = AV_LOG_WARNING,   /* <undefined> */
+    [4] = AV_LOG_INFO,      /* MSGL_INFO */
+    [5] = AV_LOG_INFO,      /* <undefined> */
+    [6] = AV_LOG_VERBOSE,   /* MSGL_V */
+    [7] = AV_LOG_DEBUG,     /* MSGL_DBG2 */
 };
 
 static void ass_log(int ass_level, const char *fmt, va_list args, void *ctx)
 {
-    int level = ass_libavfilter_log_level_map[ass_level];
+    const int ass_level_clip = av_clip(ass_level, 0,
+        FF_ARRAY_ELEMS(ass_libavfilter_log_level_map) - 1);
+    const int level = ass_libavfilter_log_level_map[ass_level_clip];
 
     av_vlog(ctx, level, fmt, args);
     av_log(ctx, level, "\n");
@@ -101,6 +107,8 @@ static av_cold int init(AVFilterContext *ctx)
         return AVERROR(EINVAL);
     }
     ass_set_message_cb(ass->library, ass_log, ctx);
+
+    ass_set_fonts_dir(ass->library, ass->fontsdir);
 
     ass->renderer = ass_renderer_init(ass->library);
     if (!ass->renderer) {
@@ -125,8 +133,7 @@ static av_cold void uninit(AVFilterContext *ctx)
 
 static int query_formats(AVFilterContext *ctx)
 {
-    ff_set_common_formats(ctx, ff_draw_supported_pixel_formats(0));
-    return 0;
+    return ff_set_common_formats(ctx, ff_draw_supported_pixel_formats(0));
 }
 
 static int config_input(AVFilterLink *inlink)
@@ -139,6 +146,8 @@ static int config_input(AVFilterLink *inlink)
     if (ass->original_w && ass->original_h)
         ass_set_aspect_ratio(ass->renderer, (double)inlink->w / inlink->h,
                              (double)ass->original_w / ass->original_h);
+    if (ass->shaping != -1)
+        ass_set_shaper(ass->renderer, ass->shaping);
 
     return 0;
 }
@@ -147,7 +156,7 @@ static int config_input(AVFilterLink *inlink)
 #define AR(c)  ( (c)>>24)
 #define AG(c)  (((c)>>16)&0xFF)
 #define AB(c)  (((c)>>8) &0xFF)
-#define AA(c)  ((0xFF-c) &0xFF)
+#define AA(c)  ((0xFF-(c)) &0xFF)
 
 static void overlay_ass_image(AssContext *ass, AVFrame *picref,
                               const ASS_Image *image)
@@ -205,6 +214,10 @@ static const AVFilterPad ass_outputs[] = {
 
 static const AVOption ass_options[] = {
     COMMON_OPTIONS
+    {"shaping", "set shaping engine", OFFSET(shaping), AV_OPT_TYPE_INT, { .i64 = -1 }, -1, 1, FLAGS, "shaping_mode"},
+        {"auto", NULL,                 0, AV_OPT_TYPE_CONST, {.i64 = -1},                  INT_MIN, INT_MAX, FLAGS, "shaping_mode"},
+        {"simple",  "simple shaping",  0, AV_OPT_TYPE_CONST, {.i64 = ASS_SHAPING_SIMPLE},  INT_MIN, INT_MAX, FLAGS, "shaping_mode"},
+        {"complex", "complex shaping", 0, AV_OPT_TYPE_CONST, {.i64 = ASS_SHAPING_COMPLEX}, INT_MIN, INT_MAX, FLAGS, "shaping_mode"},
     {NULL},
 };
 
@@ -251,10 +264,11 @@ static const AVOption subtitles_options[] = {
     {"charenc",      "set input character encoding", OFFSET(charenc),      AV_OPT_TYPE_STRING, {.str = NULL}, CHAR_MIN, CHAR_MAX, FLAGS},
     {"stream_index", "set stream index",             OFFSET(stream_index), AV_OPT_TYPE_INT,    { .i64 = -1 }, -1,       INT_MAX,  FLAGS},
     {"si",           "set stream index",             OFFSET(stream_index), AV_OPT_TYPE_INT,    { .i64 = -1 }, -1,       INT_MAX,  FLAGS},
+    {"force_style",  "force subtitle style",         OFFSET(force_style),  AV_OPT_TYPE_STRING, {.str = NULL}, CHAR_MIN, CHAR_MAX, FLAGS},
     {NULL},
 };
 
-static const char *font_mimetypes[] = {
+static const char * const font_mimetypes[] = {
     "application/x-truetype-font",
     "application/vnd.ms-opentype",
     "application/x-font-ttf",
@@ -383,6 +397,27 @@ static av_cold int init_subtitles(AVFilterContext *ctx)
     if (ret < 0)
         goto end;
 
+    if (ass->force_style) {
+        char **list = NULL;
+        char *temp = NULL;
+        char *ptr = av_strtok(ass->force_style, ",", &temp);
+        int i = 0;
+        while (ptr) {
+            av_dynarray_add(&list, &i, ptr);
+            if (!list) {
+                ret = AVERROR(ENOMEM);
+                goto end;
+            }
+            ptr = av_strtok(NULL, ",", &temp);
+        }
+        av_dynarray_add(&list, &i, NULL);
+        if (!list) {
+            ret = AVERROR(ENOMEM);
+            goto end;
+        }
+        ass_set_style_overrides(ass->library, list);
+        av_free(list);
+    }
     /* Decode subtitles and push them into the renderer (libass) */
     if (dec_ctx->subtitle_header)
         ass_process_codec_private(ass->track,
