@@ -131,7 +131,7 @@ class TestIPTVRecorder: public QObject
                               "rtp://239.0.0.76:8200\n");
 
         /*
-         * Austrian A1 TV playlist with empty lines, channel number in tvg-num and VLC style urls
+         * Austrian A1 TV playlist with empty lines and channel number in tvg-num
          */
         QString rawdataA1TV ("#EXTM3U\n"
                              "# A1 TV Basispaket 2015-09-11 09:17\n"
@@ -142,7 +142,7 @@ class TestIPTVRecorder: public QObject
                              "rtp://@239.2.16.2:8208\n");
 
         /*
-         * #12188 - Spanish Movistar TV playlist with channel number in square braces and VLC style urls
+         * #12188 - Spanish Movistar TV playlist with channel number in square braces
          * first variant from https://code.mythtv.org/trac/ticket/12188#comment:6
          * second variant from http://www.adslzone.net/postt350532.html
          */
