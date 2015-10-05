@@ -45,7 +45,7 @@ class MainVisual :  public QObject, public MythTV::Visual
 
     void resize(const QSize &size);
 
-    void add(uchar *, unsigned long, unsigned long, int, int);
+    void add(const void *, unsigned long, unsigned long, int, int);
     void prepare(void);
 
     void customEvent(QEvent *);
