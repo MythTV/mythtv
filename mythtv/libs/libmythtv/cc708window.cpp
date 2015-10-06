@@ -599,16 +599,16 @@ void CC708Window::SetPenLocation(uint row, uint column)
       QString("SetPenLocation nr %1 nc %2 rc %3 cc %4 tr %5 tc %6").arg(row).arg(
           column).arg(row_count).arg(column_count).arg(true_row_count).arg(
           true_column_count));
-  if(k708DirBottomToTop == scroll_dir && 0 == row && text)
-  {
-    for ( uint i = 0; i < true_column_count; i++ )
-    {
-      text [ ( row * true_column_count ) + i].character = QChar(' ');
-      text [ ( row * true_column_count ) + i].attr = pen.attr;
-    }
-  }
-  Scroll(row, column);
-  LimitPenLocation();
+     if(0 == row)
+     {
+          Scroll(true_row_count, column);
+          pen.row = row;
+     }
+     else
+     {
+          Scroll(row, column);
+     }
+     LimitPenLocation();
 }
 
 void CC708Window::LimitPenLocation(void)
