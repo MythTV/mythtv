@@ -846,7 +846,7 @@ def getDefaultParametersFromMythTVDB():
                         'DBSchemaVer',
                         'ISO639Language0',
                         'ISO639Language1') 
-                    OR (hostname=%s AND value IN(
+                    OR (hostname='{0}' AND value IN(
                         'VideoStartupDir',
                         'GalleryDir',
                         'MusicLocation',
@@ -880,7 +880,7 @@ def getDefaultParametersFromMythTVDB():
     # create a cursor
     cursor = DB.cursor()
     # execute SQL statement
-    cursor.execute(sqlstatement, configHostname)
+    cursor.execute(sqlstatement.format(configHostname))
     # get the resultset as a tuple
     result = cursor.fetchall()
 
