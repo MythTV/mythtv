@@ -865,9 +865,9 @@ class Video( CMPVideo, VideoSchema, DBDataWrite ):
                     self._fill_cm(self._db)
                 if self.category.lower() not in self._cm_toid:
                     with self._db.cursor(self._log) as cursor:
-                        cursor.execute("""INSERT INTO videocategory
-                                          SET category=%s""",
-                                      self.category)
+                        cursor.execute("""INSERT INTO videocategory (category)
+                                          VALUES (%s)""",
+                                      [self.category])
                         self._cm_toid[self.category] = cursor.lastrowid
                 self.category = self._cm_toid[self.category]
             except AttributeError:
