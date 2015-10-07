@@ -474,7 +474,7 @@ void ImageScanThread<DBFS>::SyncFile(const QFileInfo &fileInfo, int devId,
                          im->m_comment, im->m_date, fileOrient);
 
         // Reset file orientation, retaining existing setting
-        int currentOrient = Orientation(dbIm->m_orientation).GetCurrent();
+        int currentOrient = Orientation(dbIm->m_orientation).GetCurrent(false);
         im->m_orientation = Orientation(currentOrient, fileOrient).Composite();
 
         // Remove it from removed list
