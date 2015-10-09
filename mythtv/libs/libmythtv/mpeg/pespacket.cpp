@@ -145,7 +145,7 @@ void PESPacket::GetAsTSPackets(vector<TSPacket> &output, uint cc) const
 uint PESPacket::CalcCRC(void) const
 {
     if (Length() < 1)
-        return 0xffffffff;
+        return kTheMagicNoCRCCRC;
     return av_bswap32(av_crc(av_crc_get_table(AV_CRC_32_IEEE), (uint32_t) -1,
                              _pesdata, Length() - 1));
 }

@@ -109,8 +109,11 @@ void TestMPEGTables::pat_test(void)
     // Create a PAT object
     unsigned char si_data4[188];
     memset (&si_data4, 0, sizeof(si_data4));
+    si_data4[1] = 1 << 7 & 0 << 6 & 3 << 4 & 0 << 2 & 0;
+    si_data4[2] = 0x00;
     ProgramAssociationTable* pat4 = new ProgramAssociationTable((unsigned char*)&si_data4);
-//    QVERIFY (pat4->VerifyCRC());
+    QCOMPARE (pat4->CalcCRC(), (uint) 0xFFFFFFFF);
+    QVERIFY (pat4->VerifyCRC());
 }
 
 void TestMPEGTables::dvbdate(void)
