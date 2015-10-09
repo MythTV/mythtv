@@ -816,9 +816,7 @@ void MythUIImage::SetImage(MythImage *img)
     Clear();
     m_Delay = -1;
 
-    if (m_imageProperties.isOriented && !img->IsOriented() &&
-        (m_imageProperties.orientation >= 1 &&
-         m_imageProperties.orientation <= 8))
+    if (m_imageProperties.isOriented && !img->IsOriented())
         img->Orientation(m_imageProperties.orientation);
 
     if (m_imageProperties.forceSize.isNull())
@@ -884,9 +882,7 @@ void MythUIImage::SetImages(QVector<MythImage *> *images)
         if (m_imageProperties.isGreyscale && !im->isGrayscale())
             im->ToGreyscale();
 
-        if (m_imageProperties.isOriented && !im->IsOriented() &&
-            (m_imageProperties.orientation >= 1 &&
-             m_imageProperties.orientation <= 8))
+        if (m_imageProperties.isOriented && !im->IsOriented())
             im->Orientation(m_imageProperties.orientation);
 
         m_ImagesLock.lock();

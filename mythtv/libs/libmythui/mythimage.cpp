@@ -114,6 +114,37 @@ void MythImage::Assign(const QPixmap &pix)
     Assign(pix.toImage());
 }
 
+QImage MythImage::ApplyExifOrientation(QImage &image, int orientation)
+{
+    QTransform transform;
+
+    switch (orientation)
+    {
+    case 1: // normal
+        return image;
+    case 2: // mirror horizontal
+        return image.mirrored(true, false);
+    case 3: // rotate 180
+        transform.rotate(180);
+        return image.transformed(transform);
+    case 4: // mirror vertical
+        return image.mirrored(false, true);
+    case 5: // mirror horizontal and rotate 270 CCW
+        transform.rotate(270);
+        return image.mirrored(true, false).transformed(transform);
+    case 6: // rotate 90 CW
+        transform.rotate(90);
+        return image.transformed(transform);
+    case 7: // mirror horizontal and rotate 90 CW
+        transform.rotate(90);
+        return image.mirrored(true, false).transformed(transform);
+    case 8: // rotate 270 CW
+        transform.rotate(270);
+        return image.transformed(transform);
+    }
+    return image;
+}
+
 /**
  * Changes the orientation angle of the image according to
  * the exif rotation values. The image will be rotated accordingly.
@@ -122,55 +153,11 @@ void MythImage::Assign(const QPixmap &pix)
  */
 void MythImage::Orientation(int orientation)
 {
-    if (m_isOriented)
-        return;
-
-    QMatrix matrix;
-    switch (orientation)
+    if (!m_isOriented)
     {
-    case 1: // If the image is in its original state
-        break;
-
-    case 2: // The image is horizontally flipped
-        Assign(mirrored(true, false));
-        break;
-
-    case 3: // The image is rotated 180°
-        matrix.rotate(180);
-        Assign(transformed(matrix, Qt::SmoothTransformation));
-        break;
-
-    case 4: // The image is vertically flipped
-        Assign(mirrored(false, true));
-        break;
-
-    case 5: // The image is transposed (flipped horizontally, then rotated 90° CCW)
-        matrix.rotate(90);
-        Assign(transformed(matrix, Qt::SmoothTransformation));
-        Assign(mirrored(true, false));
-        break;
-
-    case 6: // The image is rotated 90° CCW
-        matrix.rotate(90);
-        Assign(transformed(matrix, Qt::SmoothTransformation));
-        break;
-
-    case 7: // The image is transversed (flipped horizontally, then rotated 90° CW)
-        matrix.rotate(270);
-        Assign(transformed(matrix, Qt::SmoothTransformation));
-        Assign(mirrored(true, false));
-        break;
-
-    case 8: // The image is rotated 90° CW
-        matrix.rotate(270);
-        Assign(transformed(matrix, Qt::SmoothTransformation));
-        break;
-
-    default:
-        break;
+        Assign(ApplyExifOrientation(*this, orientation));
+        m_isOriented = true;
     }
-
-    m_isOriented = true;
 }
 
 void MythImage::Resize(const QSize &newSize, bool preserveAspect)

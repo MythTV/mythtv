@@ -69,7 +69,6 @@ public:
     QString Description();
 
     static int FromRotation(const QString &degrees);
-    static QImage ApplyExifOrientation(QImage &image, int orientation);
 
 private:
     static QString AsText(int orientation);

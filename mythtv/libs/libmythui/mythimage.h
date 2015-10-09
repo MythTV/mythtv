@@ -31,6 +31,8 @@ class MUI_PUBLIC MythImageReader: public QImageReader
 class MUI_PUBLIC MythImage : public QImage, public ReferenceCounter
 {
   public:
+    static QImage ApplyExifOrientation(QImage &image, int orientation);
+
     /// Creates a reference counted image, call DecrRef() to delete.
     MythImage(MythPainter *parent, const char *name = "MythImage");
 

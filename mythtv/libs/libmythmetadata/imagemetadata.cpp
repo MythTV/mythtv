@@ -1,7 +1,5 @@
 #include "imagemetadata.h"
 
-#include <QImage>
-
 #include "mythlogging.h"
 #include "mythcorecontext.h"  // for avcodeclock
 #include "mythdirs.h"         // for ffprobe
@@ -38,38 +36,6 @@ int Orientation::Transform(int transform)
 {
     m_current = Apply(transform);
     return Composite();
-}
-
-
-QImage Orientation::ApplyExifOrientation(QImage &image, int orientation)
-{
-    QTransform transform;
-
-    switch (orientation)
-    {
-    case 1: // normal
-        return image;
-    case 2: // mirror horizontal
-        return image.mirrored(true, false);
-    case 3: // rotate 180
-        transform.rotate(180);
-        return image.transformed(transform);
-    case 4: // mirror vertical
-        return image.mirrored(false, true);
-    case 5: // mirror horizontal and rotate 270 CCW
-        transform.rotate(270);
-        return image.mirrored(true, false).transformed(transform);
-    case 6: // rotate 90 CW
-        transform.rotate(90);
-        return image.transformed(transform);
-    case 7: // mirror horizontal and rotate 90 CW
-        transform.rotate(90);
-        return image.mirrored(true, false).transformed(transform);
-    case 8: // rotate 270 CW
-        transform.rotate(270);
-        return image.transformed(transform);
-    }
-    return image;
 }
 
 

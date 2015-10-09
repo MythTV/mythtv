@@ -309,7 +309,7 @@ QString ThumbThread<DBFS>::CreateThumbnail(ImagePtrK im, int thumbPriority)
 
     // Orientate now to optimise load/display time - no orientation
     // is required when displaying thumbnails
-    image = Orientation::ApplyExifOrientation(image, orientBy);
+    image = MythImage::ApplyExifOrientation(image, orientBy);
 
     // Create the thumbnail
     if (!image.save(im->m_thumbPath))
