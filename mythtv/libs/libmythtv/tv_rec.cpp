@@ -84,6 +84,7 @@ TVRec::TVRec(int capturecardnum)
        // Various components TVRec coordinates
     : recorder(NULL), channel(NULL), signalMonitor(NULL),
       scanner(NULL),
+      signalEventCmdSent(false),
       // Various threads
       eventThread(new MThread("TVRecEvent", this)),
       recorderThread(NULL),
@@ -3883,6 +3884,11 @@ void TVRec::TuningFrequency(const TuningRequest &request)
                         expire.addMSecs(genOpt.channel_timeout * 2);
                 }
                 signalMonitorCheckCnt = 0;
+
+                //System Event TUNING_TIMEOUT deadline
+                QDateTime expire = MythDate::current();
+                signalEventCmdTimeout = expire.addMSecs(genOpt.channel_timeout);
+                signalEventCmdSent = false;
             }
         }
 
@@ -3921,6 +3927,15 @@ void TVRec::TuningFrequency(const TuningRequest &request)
 MPEGStreamData *TVRec::TuningSignalCheck(void)
 {
     RecStatusType newRecStatus = rsRecording;
+
+    if ((signalMonitor->IsErrored() ||
+         MythDate::current() > signalEventCmdTimeout) &&
+         !signalEventCmdSent)
+    {
+        gCoreContext->SendSystemEvent(QString("TUNING_SIGNAL_TIMEOUT CARDID %1").arg(cardid));
+        signalEventCmdSent=true;
+    }
+
     if (signalMonitor->IsAllGood())
     {
         LOG(VB_RECORD, LOG_INFO, LOC + "TuningSignalCheck: Have a good signal");

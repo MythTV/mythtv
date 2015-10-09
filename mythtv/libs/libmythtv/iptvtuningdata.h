@@ -8,6 +8,7 @@
 
 // MythTV headers
 #include "mythtvexp.h"
+#include "mythlogging.h"
 
 class MTV_PUBLIC IPTVTuningData
 {
@@ -31,17 +32,29 @@ class MTV_PUBLIC IPTVTuningData
         kSMPTE2022_2,
     } IPTVType;
 
+    typedef enum IPTVProtocol
+    {
+        inValid = 0,
+        udp,
+        rtp,
+        rtsp,
+        http_ts,
+        http_hls
+    } IPTVProtocol;
+
     IPTVTuningData() : m_fec_type(kNone)
     {
         memset(&m_bitrate, 0, sizeof(m_bitrate));
     }
 
     IPTVTuningData(const QString &data_url, uint data_bitrate,
-                   FECType fec_type,
+                   const FECType fec_type,
                    const QString &fec_url0, uint fec_bitrate0,
-                   const QString &fec_url1, uint fec_bitrate1) :
+                   const QString &fec_url1, uint fec_bitrate1,
+                   const IPTVProtocol protocol) :
         m_data_url(data_url),
-        m_fec_type(fec_type), m_fec_url0(fec_url0), m_fec_url1(fec_url1)
+        m_fec_type(fec_type), m_fec_url0(fec_url0), m_fec_url1(fec_url1),
+        m_protocol(protocol)
     {
         m_bitrate[0] = data_bitrate;
         m_bitrate[1] = fec_bitrate0;
@@ -51,9 +64,11 @@ class MTV_PUBLIC IPTVTuningData
     IPTVTuningData(const QString &data_url, uint data_bitrate,
                    const QString &fec_type,
                    const QString &fec_url0, uint fec_bitrate0,
-                   const QString &fec_url1, uint fec_bitrate1) :
+                   const QString &fec_url1, uint fec_bitrate1,
+                   const IPTVProtocol protocol) :
         m_data_url(data_url),
-        m_fec_type(kNone), m_fec_url0(fec_url0), m_fec_url1(fec_url1)
+        m_fec_type(kNone), m_fec_url0(fec_url0), m_fec_url1(fec_url1),
+        m_protocol(protocol)
     {
         m_bitrate[0] = data_bitrate;
         m_bitrate[1] = fec_bitrate0;
@@ -76,6 +91,8 @@ class MTV_PUBLIC IPTVTuningData
         const QUrl u = GetDataURL();
         if (IsHLS())
             return u.toString();
+	if (IsHTTPTS())
+            return QString("%1").arg(u.toString());
         return QString("%1:%2:%3")
             .arg(u.host()).arg(u.userInfo()).arg(u.port()).toLower();
     }
@@ -133,18 +150,40 @@ class MTV_PUBLIC IPTVTuningData
 
     uint GetURLCount(void) const { return 3; }
 
-    bool IsHLS(void) const
-    {
-        return m_data_url.scheme().startsWith("http") && m_data_url.isValid();
-    }
-
     bool IsValid(void) const
     {
-        return m_data_url.isValid() &&
-               (IsHLS() ||
-                ((m_data_url.scheme() == "rtp" || m_data_url.scheme() == "udp") && m_data_url.port() != -1) ||
-                m_data_url.scheme() == "rtsp"
-               );
+        bool ret = (m_data_url.isValid() && (IsUDP() || IsRTP() || IsRTSP() || IsHLS() || IsHTTPTS()));
+
+        LOG(VB_CHANNEL, LOG_DEBUG, QString("IPTVTuningdata (%1): IsValid = %2")
+            .arg(m_data_url.toString())
+            .arg(ret ? "true" : "false"));
+
+        return ret;
+    }
+
+    bool IsUDP(void) const
+    {
+        return (m_protocol == udp);
+    }
+
+    bool IsRTP(void) const
+    {
+        return (m_protocol == rtp);
+    }
+
+    bool IsRTSP(void) const
+    {
+        return (m_protocol == rtsp);
+    }
+
+    bool IsHLS() const
+    {
+        return (m_protocol == http_hls);
+    }
+
+    bool IsHTTPTS() const
+    {
+        return (m_protocol == http_ts);
     }
 
   public:
@@ -153,6 +192,7 @@ class MTV_PUBLIC IPTVTuningData
     QUrl m_fec_url0;
     QUrl m_fec_url1;
     uint m_bitrate[3];
+    IPTVProtocol m_protocol;
 };
 
 #endif // _IPTV_TUNING_DATA_H_

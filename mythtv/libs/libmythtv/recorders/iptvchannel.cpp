@@ -12,6 +12,7 @@
 
 // MythTV headers
 #include "iptvstreamhandler.h"
+#include "httptsstreamhandler.h"
 #include "hlsstreamhandler.h"
 #include "iptvrecorder.h"
 #include "iptvchannel.h"
@@ -20,8 +21,8 @@
 
 #define LOC QString("IPTVChan[%1]: ").arg(GetCardID())
 
-IPTVChannel::IPTVChannel(TVRec *rec, const QString&) :
-    DTVChannel(rec), m_firsttune(true),
+IPTVChannel::IPTVChannel(TVRec *rec, const QString &videodev) :
+    DTVChannel(rec), m_videodev(videodev), m_firsttune(true),
     m_stream_handler(NULL), m_stream_data(NULL)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
@@ -102,6 +103,10 @@ void IPTVChannel::OpenStreamHandler(void)
     if (m_last_tuning.IsHLS())
     {
         m_stream_handler = HLSStreamHandler::Get(m_last_tuning);
+    }
+    else if (m_last_tuning.IsHTTPTS())
+    {
+        m_stream_handler = HTTPTSStreamHandler::Get(m_last_tuning);
     }
     else
     {

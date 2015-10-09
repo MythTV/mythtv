@@ -651,6 +651,10 @@ using_backend {
     SOURCES += recorders/rtp/packetbuffer.cpp
     SOURCES += recorders/rtp/rtppacketbuffer.cpp
 
+    # Support for HTTP TS streams
+    HEADERS += recorders/httptsstreamhandler.h
+    SOURCES += recorders/httptsstreamhandler.cpp
+
     # Suppport for HLS recorder
     HEADERS += recorders/hlsstreamhandler.h
     SOURCES += recorders/hlsstreamhandler.cpp
