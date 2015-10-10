@@ -61,14 +61,14 @@ macx {
     OBJECTIVE_SOURCES += util-osx.mm
 
     # Mac OS X Frameworks
-    libs += -framework ApplicationServices
-    libs += -framework Cocoa
-    libs += -framework CoreServices
-    libs += -framework CoreFoundation
-    libs += -framework OpenGL
-    libs += -framework QuickTime
-    libs += -framework IOKit
-    libs += -framework CoreVideo
+    LIBS += -framework ApplicationServices
+    LIBS += -framework Cocoa
+    LIBS += -framework CoreServices
+    LIBS += -framework CoreFoundation
+    LIBS += -framework OpenGL
+    LIBS += -framework QuickTime
+    LIBS += -framework IOKit
+    LIBS += -framework CoreVideo
 
     using_firewire:using_backend {
         QMAKE_CXXFLAGS += -F$${CONFIG_MAC_AVC}
