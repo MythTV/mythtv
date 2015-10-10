@@ -34,6 +34,10 @@ QString toString(MythCodecID codecid)
             return "WMV3";
         case kCodec_VP8:
             return "VP8";
+        case kCodec_VP9:
+            return "VP9";
+        case kCodec_HEVC:
+            return "HEVC";
 
         case kCodec_MPEG1_VDPAU:
             return "MPEG1 VDPAU";
@@ -51,6 +55,10 @@ QString toString(MythCodecID codecid)
             return "WMV3 VDPAU";
         case kCodec_VP8_VDPAU:
             return "VP8 VDPAU";
+        case kCodec_VP9_VDPAU:
+            return "VP9 VDPAU";
+        case kCodec_HEVC_VDPAU:
+            return "HEVC VDPAU";
 
         case kCodec_MPEG1_VAAPI:
             return "MPEG1 VAAPI";
@@ -68,6 +76,10 @@ QString toString(MythCodecID codecid)
             return "WMV3 VAAPI";
         case kCodec_VP8_VAAPI:
             return "VP8 VAAPI";
+        case kCodec_VP9_VAAPI:
+            return "VP9 VAAPI";
+        case kCodec_HEVC_VAAPI:
+            return "HEVC VAAPI";
 
         case kCodec_MPEG1_DXVA2:
             return "MPEG1 DXVA2";
@@ -85,6 +97,10 @@ QString toString(MythCodecID codecid)
             return "WMV3 DXVA2";
         case kCodec_VP8_DXVA2:
             return "VP8 DXVA2";
+        case kCodec_VP9_DXVA2:
+            return "VP9 DXVA2";
+        case kCodec_HEVC_DXVA2:
+            return "HEVC DXVA2";
 
         default:
             break;
@@ -122,6 +138,12 @@ int myth2av_codecid(MythCodecID codec_id, bool &vdpau)
             break;
         case kCodec_VP8:
             ret = AV_CODEC_ID_VP8;
+            break;
+        case kCodec_VP9:
+            ret = AV_CODEC_ID_VP9;
+            break;
+        case kCodec_HEVC:
+            ret = AV_CODEC_ID_HEVC;
             break;
 
         case kCodec_VC1:
@@ -162,6 +184,12 @@ int myth2av_codecid(MythCodecID codec_id, bool &vdpau)
         case kCodec_VP8_VDPAU:
             ret = AV_CODEC_ID_VP8;
             break;
+        case kCodec_VP9_VDPAU:
+            ret = AV_CODEC_ID_VP9;
+            break;
+        case kCodec_HEVC_VDPAU:
+            ret = AV_CODEC_ID_HEVC;
+            break;
 
         case kCodec_MPEG1_VAAPI:
             ret = AV_CODEC_ID_MPEG1VIDEO;
@@ -187,6 +215,12 @@ int myth2av_codecid(MythCodecID codec_id, bool &vdpau)
         case kCodec_VP8_VAAPI:
             ret = AV_CODEC_ID_VP8;
             break;
+        case kCodec_VP9_VAAPI:
+            ret = AV_CODEC_ID_VP9;
+            break;
+        case kCodec_HEVC_VAAPI:
+            ret = AV_CODEC_ID_HEVC;
+            break;
 
         case kCodec_MPEG1_DXVA2:
             ret = AV_CODEC_ID_MPEG1VIDEO;
@@ -211,6 +245,12 @@ int myth2av_codecid(MythCodecID codec_id, bool &vdpau)
             break;
         case kCodec_VP8_DXVA2:
             ret = AV_CODEC_ID_VP8;
+            break;
+        case kCodec_VP9_DXVA2:
+            ret = AV_CODEC_ID_VP9;
+            break;
+        case kCodec_HEVC_DXVA2:
+            ret = AV_CODEC_ID_HEVC;
             break;
 
         default:
@@ -242,6 +282,10 @@ int mpeg_version(int codec_id)
             return 7;
         case AV_CODEC_ID_VP8:
             return 8;
+        case AV_CODEC_ID_VP9:
+            return 9;
+        case AV_CODEC_ID_HEVC:
+            return 10;
         default:
             break;
     }
@@ -301,6 +345,18 @@ QString get_encoding_type(MythCodecID codecid)
         case kCodec_VP8_VAAPI:
         case kCodec_VP8_DXVA2:
             return "VP8";
+
+        case kCodec_VP9:
+        case kCodec_VP9_VDPAU:
+        case kCodec_VP9_VAAPI:
+        case kCodec_VP9_DXVA2:
+            return "VP8";
+
+        case kCodec_HEVC:
+        case kCodec_HEVC_VDPAU:
+        case kCodec_HEVC_VAAPI:
+        case kCodec_HEVC_DXVA2:
+            return "HEVC";
 
         case kCodec_NONE:
         case kCodec_NORMAL_END:
