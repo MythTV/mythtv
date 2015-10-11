@@ -2306,7 +2306,7 @@ void MythPlayer::ForceDeinterlacer(const QString &override)
          videoOutput->NeedsDoubleFramerate();
     m_double_process = videoOutput->IsExtraProcessingRequired();
 
-    if ((m_double_framerate && !CanSupportDoubleRate()) || !normal)
+    if (m_double_framerate && (!CanSupportDoubleRate() || !normal))
         FallbackDeint();
 
     videofiltersLock.unlock();
