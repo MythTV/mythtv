@@ -921,6 +921,7 @@ bool AvFormatDecoder::CanHandle(char testbuf[kDecoderProbeBufferSize],
     }
 
     AVProbeData probe;
+    memset(&probe, 0, sizeof(AVProbeData));
 
     QByteArray fname = filename.toLatin1();
     probe.filename = fname.constData();
@@ -1058,6 +1059,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     const char    *filename = fnamea.constData();
 
     AVProbeData probe;
+    memset(&probe, 0, sizeof(AVProbeData));
     probe.filename = filename;
     probe.buf = (unsigned char *)testbuf;
     if (testbufsize + AVPROBE_PADDING_SIZE <= kDecoderProbeBufferSize)
