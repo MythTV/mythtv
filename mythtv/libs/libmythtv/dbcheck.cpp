@@ -4559,7 +4559,7 @@ NULL
 };
 
     QString dbver = "";
-    if (!performActualUpdate(updates, "1307", dbver))
+    if (!performActualUpdate(updates, MYTH_DATABASE_VERSION, dbver))
         return false;
 
     GetMythDB()->SetHaveSchema(true);
