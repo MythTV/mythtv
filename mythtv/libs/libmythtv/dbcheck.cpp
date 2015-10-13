@@ -4559,10 +4559,15 @@ NULL
 };
 
     QString dbver = "";
-    if (!performActualUpdate(updates, MYTH_DATABASE_VERSION, dbver))
+    if (!performActualUpdate(updates, "1307", dbver))
         return false;
 
     GetMythDB()->SetHaveSchema(true);
+
+    // Apply any outstanding updates
+    if (!doUpgradeTVDatabaseSchema())
+        return false;
+
     return true;
 }
 
