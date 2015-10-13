@@ -426,7 +426,7 @@ static void fw_init(QMap<uint64_t,QString> &id_to_model)
     {
         /* DCH-3200, DCX-3200 */
         0x1c11,    0x1cfb,    0x1fc4,    0x23a3,    0x23ee,    0x25f1,
-        0xfa01,    0x25f1,    0x25f2,  0xcc7d37,  0x946269,
+        0xfa01,    0x25f1,    0x25f2,  0xcc7d37,  0x946269,  0x6655b1,
         /* DCX-3432 */
         0x24a0,
         /* DCH-3416 */
