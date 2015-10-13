@@ -4564,10 +4564,6 @@ NULL
 
     GetMythDB()->SetHaveSchema(true);
 
-    // Apply any outstanding updates
-    if (!doUpgradeTVDatabaseSchema())
-        return false;
-
     return true;
 }
 
