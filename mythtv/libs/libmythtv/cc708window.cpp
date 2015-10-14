@@ -178,6 +178,7 @@ void CC708Window::DefineWindow(int _priority,         int _visible,
 // end, row_count and column_count are NOT updated.
 void CC708Window::Resize(uint new_rows, uint new_columns)
 {
+
     if (!GetExists() || text == NULL)
     {
         true_row_count = 0;
@@ -197,12 +198,15 @@ void CC708Window::Resize(uint new_rows, uint new_columns)
       true_column_count = new_columns;
       pen.row = 0;
       pen.column = 0;
+      Clear();
       SetChanged();
+      SetExists(true);
       LOG(VB_VBI,
           LOG_DEBUG,
           QString("Shrinked nr %1 nc %2 rc %3 cc %4 tr %5 tc %6").arg(new_rows) .arg(
               new_columns) .arg(row_count) .arg(column_count) .arg(true_row_count) .arg(
                   true_column_count));
+      return;
     }
 
     if (new_rows > true_row_count || new_columns > true_column_count)
