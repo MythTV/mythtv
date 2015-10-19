@@ -40,6 +40,11 @@
 #ifdef USING_GLVAAPI
 #include "videoout_openglvaapi.h"
 #endif
+
+#ifdef USING_OPENMAX
+#include "videoout_omx.h"
+#endif
+
 #include "videoout_null.h"
 #include "dithertable.h"
 
@@ -98,6 +103,10 @@ void VideoOutput::GetRenderOptions(render_opts &opts)
 #ifdef USING_GLVAAPI
     VideoOutputOpenGLVAAPI::GetRenderOptions(opts);
 #endif // USING_GLVAAPI
+
+#ifdef USING_OPENMAX
+    VideoOutputOMX::GetRenderOptions(opts, cpudeints);
+#endif // USING_OPENMAX
 }
 
 /**
@@ -161,6 +170,11 @@ VideoOutput *VideoOutput::Create(
         renderers += VideoOutputOpenGLVAAPI::
             GetAllowedRenderers(codec_id, video_dim_disp);
 #endif // USING_GLVAAPI
+
+#ifdef USING_OPENMAX
+        renderers += VideoOutputOMX::
+            GetAllowedRenderers(codec_id, video_dim_disp);
+#endif // USING_OPENMAX
     }
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "Allowed renderers: " +
@@ -230,6 +244,11 @@ VideoOutput *VideoOutput::Create(
         else if (renderer == "openglvaapi")
             vo = new VideoOutputOpenGLVAAPI();
 #endif // USING_GLVAAPI
+
+#ifdef USING_OPENMAX
+        else if (renderer == VideoOutputOMX::kName)
+            vo = new VideoOutputOMX();
+#endif // USING_OPENMAX
 
 #ifdef USING_XV
         else if (xvlist.contains(renderer))

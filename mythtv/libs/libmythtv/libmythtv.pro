@@ -357,6 +357,8 @@ using_frontend {
         SOURCES += omxcontext.cpp
         HEADERS += privatedecoder_omx.h
         SOURCES += privatedecoder_omx.cpp
+        HEADERS += videoout_omx.h
+        SOURCES += videoout_omx.cpp
         LIBS += -lopenmaxil
     }
 
