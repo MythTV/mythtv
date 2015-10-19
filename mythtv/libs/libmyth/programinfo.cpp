@@ -220,7 +220,6 @@ ProgramInfo::ProgramInfo(void) :
     parttotal(0),
 
     recstatus(RecStatus::Unknown),
-    oldrecstatus(RecStatus::Unknown),
     rectype(kNotRecording),
     dupin(kDupsInAll),
     dupmethod(kDupCheckSubThenDesc),
@@ -305,7 +304,6 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other) :
     parttotal(other.parttotal),
 
     recstatus(other.recstatus),
-    oldrecstatus(other.oldrecstatus),
     rectype(other.rectype),
     dupin(other.dupin),
     dupmethod(other.dupmethod),
@@ -494,7 +492,6 @@ ProgramInfo::ProgramInfo(
     parttotal(_parttotal),
 
     recstatus(_recstatus),
-    oldrecstatus(RecStatus::Unknown),
     rectype(kNotRecording),
     dupin(_dupin),
     dupmethod(_dupmethod),
@@ -613,7 +610,6 @@ ProgramInfo::ProgramInfo(
     parttotal(0),
 
     recstatus(_recstatus),
-    oldrecstatus(RecStatus::Unknown),
     rectype(_rectype),
     dupin(0),
     dupmethod(0),
@@ -745,7 +741,6 @@ ProgramInfo::ProgramInfo(
     parttotal(_parttotal),
 
     recstatus(_recstatus),
-    oldrecstatus(RecStatus::Unknown),
     rectype(_rectype),
     dupin(kDupsInAll),
     dupmethod(kDupCheckSubThenDesc),
@@ -899,7 +894,6 @@ ProgramInfo::ProgramInfo(
     parttotal(0),
 
     recstatus(RecStatus::Unknown),
-    oldrecstatus(RecStatus::Unknown),
     rectype(kNotRecording),
     dupin(kDupsInAll),
     dupmethod(kDupCheckSubThenDesc),
@@ -1127,7 +1121,6 @@ void ProgramInfo::clone(const ProgramInfo &other,
     lastInUseTime = MythDate::current().addSecs(-4 * 60 * 60);
 
     recstatus = other.recstatus;
-    oldrecstatus = other.oldrecstatus;
 
     prefinput = other.prefinput;
     recpriority2 = other.recpriority2;
@@ -1239,7 +1232,6 @@ void ProgramInfo::clear(void)
     lastInUseTime = startts.addSecs(-4 * 60 * 60);
 
     recstatus = RecStatus::Unknown;
-    oldrecstatus = RecStatus::Unknown;
 
     prefinput = 0;
     recpriority2 = 0;
@@ -1996,7 +1988,6 @@ bool ProgramInfo::LoadProgramFromRecorded(
         catType = kCategoryNone;
         lastInUseTime = MythDate::current().addSecs(-4 * 60 * 60);
         rectype = kNotRecording;
-        oldrecstatus = RecStatus::Unknown;
         prefinput = 0;
         recpriority2 = 0;
         parentid = 0;
@@ -2083,7 +2074,6 @@ bool ProgramInfo::LoadProgramFromRecorded(
     /**///lastInUseTime;
 
     recstatus    = RecStatus::Recorded;
-    /**///oldrecstatus;
 
     /**///prefinput;
     /**///recpriority2;
