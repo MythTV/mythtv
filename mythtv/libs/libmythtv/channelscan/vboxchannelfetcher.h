@@ -22,7 +22,7 @@ class VBoxChannelInfo
     Q_DECLARE_TR_FUNCTIONS(VBoxChannelInfo)
 
   public:
-    VBoxChannelInfo() : m_serviceID(0) {}
+    VBoxChannelInfo() : m_fta(false), m_serviceID(0) {}
     VBoxChannelInfo(const QString &name,
                     const QString &xmltvid,
                     const QString &data_url,
