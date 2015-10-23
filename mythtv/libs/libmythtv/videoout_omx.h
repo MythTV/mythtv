@@ -5,8 +5,6 @@
 #include <IL/OMX_Core.h>
 
 #include <QStringList>
-#include <QMutex>
-#include <QSemaphore>
 #include <QVector>
 #include <QRect>
 
@@ -30,6 +28,8 @@ class VideoOutputOMX : public VideoOutput, private OMXComponentCtx
     virtual void EmbedInWidget(const QRect&);
     virtual void StopEmbedding(void);
     virtual bool ApproveDeintFilter(const QString&) const;
+    virtual bool SetDeinterlacingEnabled(bool interlaced);
+    virtual bool SetupDeinterlace(bool interlaced, const QString& ovrf="");
 
     // VideoOutput implementation
     virtual void PrepareFrame(VideoFrame*, FrameScanType, OSD*);
@@ -53,9 +53,11 @@ class VideoOutputOMX : public VideoOutput, private OMXComponentCtx
     bool SetVideoRect(const QRect &disp_rect, const QRect &vid_rect);
     bool CreateBuffers(const QSize&, const QSize&, WId = 0);
     void DeleteBuffers();
+    bool Start();
+    OMX_ERRORTYPE SetImageFilter(OMX_IMAGEFILTERTYPE);
 
   private:
-    OMXComponent m_render;
+    OMXComponent m_render, m_imagefx;
     VideoFrame av_pause_frame;
     QRect m_disp_rect, m_vid_rect;
     QVector<void*> m_bufs;

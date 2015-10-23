@@ -752,6 +752,14 @@ QString VideoDisplayProfile::GetDeinterlacerName(const QString &short_name)
         return QObject::tr("One Field (1x, HW)");
     else if ("vaapibobdeint" == short_name)
         return QObject::tr("Bob (2x, HW)");
+#ifdef USING_OPENMAX
+    else if ("openmaxadvanced" == short_name)
+        return QObject::tr("Advanced (HW)");
+    else if ("openmaxfast" == short_name)
+        return QObject::tr("Fast (HW)");
+    else if ("openmaxlinedouble" == short_name)
+        return QObject::tr("Line double (HW)");
+#endif // def USING_OPENMAX
 
     return "";
 }

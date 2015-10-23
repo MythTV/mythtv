@@ -1,9 +1,9 @@
 #include "videoout_omx.h"
 
-#include <cassert>
 #include <cstddef>
-#include <vector>
+#include <cassert>
 #include <algorithm> // max/min
+#include <vector>
 
 #include <IL/OMX_Core.h>
 #include <IL/OMX_Video.h>
@@ -60,7 +60,13 @@ void VideoOutputOMX::GetRenderOptions(render_opts &opts,
                                       QStringList &cpudeints)
 {
     opts.renderers->append(kName);
+
     opts.deints->insert(kName, cpudeints);
+#ifdef USING_BROADCOM
+    (*opts.deints)[kName].append(kName + "advanced");
+    (*opts.deints)[kName].append(kName + "fast");
+    (*opts.deints)[kName].append(kName + "linedouble");
+#endif
     (*opts.osds)[kName].append("softblend");
 
     (*opts.safe_renderers)["dummy"].append(kName);
@@ -86,7 +92,8 @@ QStringList VideoOutputOMX::GetAllowedRenderers(
     return list;
 }
 
-VideoOutputOMX::VideoOutputOMX() : m_render("video_render", *this)
+VideoOutputOMX::VideoOutputOMX() : m_render("video_render", *this),
+    m_imagefx("image_fx", *this)
 {
     init(&av_pause_frame, FMT_YV12, NULL, 0, 0, 0);
 
@@ -97,18 +104,32 @@ VideoOutputOMX::VideoOutputOMX() : m_render("video_render", *this)
         return;
 
     // Show default port definitions and video formats supported
-    for (int port = 0; port < m_render.Ports(); ++port)
+    for (unsigned port = 0; port < m_render.Ports(); ++port)
     {
         m_render.ShowPortDef(port, LOG_DEBUG);
         if (0) m_render.ShowFormats(port, LOG_DEBUG);
+    }
+
+    if (OMX_ErrorNone != m_imagefx.Init(OMX_IndexParamImageInit))
+        return;
+
+    if (!m_imagefx.IsValid())
+        return;
+
+    // Show default port definitions and formats supported
+    for (unsigned port = 0; port < m_imagefx.Ports(); ++port)
+    {
+        m_imagefx.ShowPortDef(port, LOG_DEBUG);
+        if (0) m_imagefx.ShowFormats(port, LOG_DEBUG);
     }
 }
 
 // virtual
 VideoOutputOMX::~VideoOutputOMX()
 {
-    // Must shutdown the decoder now before our state becomes invalid.
-    // When the decoder dtor is called our state has already been destroyed.
+    // Must shutdown the OMX components now before our state becomes invalid.
+    // When the component's dtor is called our state has already been destroyed.
+    m_imagefx.Shutdown();
     m_render.Shutdown();
 
     DeleteBuffers();
@@ -153,6 +174,12 @@ bool VideoOutputOMX::Init(          // Return true if successful
         errorState = kError_Unknown;
         return false;
     }
+    if (!m_imagefx.IsValid())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + __func__ + " No image fx");
+        errorState = kError_Unknown;
+        return false;
+    }
 
     window.SetAllowPreviewEPG(true);
 
@@ -163,33 +190,35 @@ bool VideoOutputOMX::Init(          // Return true if successful
         return false;
     }
 
+    if (db_vdisp_profile)
+        db_vdisp_profile->SetVideoRenderer(kName);
+
     // Set resolution/measurements
     InitDisplayMeasurements(video_dim_disp.width(), video_dim_disp.height(), false);
+
+    if (OMX_ErrorNone != SetImageFilter(OMX_ImageFilterNone))
+        return false;
 
     // Setup video buffers
     vbuffers.Init(std::max(OMX_U32(kNumBuffers), m_render.PortDef().nBufferCountMin),
                   true, kNeedFreeFrames,
                   kPrebufferFramesNormal, kPrebufferFramesSmall,
                   kKeepPrebuffer);
+
+    // Allocate video buffers
     if (!CreateBuffers(video_dim_buf, video_dim_disp, winid))
         return false;
 
-    // Goto OMX_StateIdle & allocate all buffers
-    OMXComponentCB<VideoOutputOMX> cb(this, &VideoOutputOMX::UseBuffersCB);
-    OMX_ERRORTYPE e = m_render.SetState(OMX_StateIdle, 500, &cb);
-    if (e != OMX_ErrorNone)
+    m_disp_rect = m_vid_rect = QRect();
+    if (!SetVideoRect(window.GetDisplayVideoRect(), window.GetVideoRect()))
         return false;
 
-    // Goto OMX_StateExecuting
-    e = m_render.SetState(OMX_StateExecuting, 500);
-    if (e != OMX_ErrorNone)
+    if (!Start())
         return false;
-
-    if (db_vdisp_profile)
-        db_vdisp_profile->SetVideoRenderer(kName);
 
     MoveResize();
 
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + __func__ + " done");
     return true;
 }
 
@@ -237,20 +266,18 @@ bool VideoOutputOMX::InputChanged(  // Return true if successful
                               aspect, av_codec_id, codec_private,
                               aspect_only);
 
-    OMXComponentCB<VideoOutputOMX> cb(this, &VideoOutputOMX::FreeBuffersCB);
-    OMX_ERRORTYPE e;
-    e = m_render.PortDisable(0, 500, &cb);
-    if (e != OMX_ErrorNone)
-        return false;
+    m_imagefx.Shutdown();
+    m_render.Shutdown();
 
     DeleteBuffers();
     if (!CreateBuffers(video_dim_buf, video_dim_disp))
         return false;
 
-    // Re-enable port and allocate new buffers
-    OMXComponentCB<VideoOutputOMX> cb2(this, &VideoOutputOMX::UseBuffersCB);
-    e = m_render.PortEnable(0, 500, &cb2);
-    if (e != OMX_ErrorNone)
+    m_disp_rect = m_vid_rect = QRect();
+    if (!SetVideoRect(window.GetDisplayVideoRect(), window.GetVideoRect()))
+        return false;
+
+    if (!Start())
         return false;
 
     MoveResize();
@@ -258,20 +285,113 @@ bool VideoOutputOMX::InputChanged(  // Return true if successful
     if (db_vdisp_profile)
         db_vdisp_profile->SetVideoRenderer(kName);
 
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + __func__ + " done");
     return true;
 }
 
 // virtual
 bool VideoOutputOMX::ApproveDeintFilter(const QString& filtername) const
 {
-    if (codec_is_std(video_codec_id))
+    if (filtername.contains(kName))
+        return true;
+
+    return VideoOutput::ApproveDeintFilter(filtername);
+}
+
+// virtual
+bool VideoOutputOMX::SetDeinterlacingEnabled(bool interlaced)
+{
+    return SetupDeinterlace(interlaced);
+}
+
+// virtual
+bool VideoOutputOMX::SetupDeinterlace(bool interlaced, const QString &ovrf)
+{
+    QString deintfiltername;
+    if (db_vdisp_profile)
+        deintfiltername = db_vdisp_profile->GetFilteredDeint(ovrf);
+
+    if (!deintfiltername.contains(kName))
     {
-        return !filtername.contains("bobdeint") &&
-               !filtername.contains("opengl") &&
-               !filtername.contains("vdpau");
+        if (m_deinterlacing && m_deintfiltername.contains(kName))
+            SetImageFilter(OMX_ImageFilterNone);
+        return VideoOutput::SetupDeinterlace(interlaced, ovrf);
     }
 
-    return false;
+    if (m_deinterlacing == interlaced && deintfiltername == m_deintfiltername)
+        return m_deinterlacing;
+
+    m_deintfiltername = deintfiltername;
+    m_deinterlacing = interlaced;
+
+    // Remove non-openmax filters
+    delete m_deintFiltMan, m_deintFiltMan = NULL;
+    delete m_deintFilter, m_deintFilter = NULL;
+
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + __func__ + " switching " +
+        (interlaced ? "on" : "off") + " '" +  deintfiltername + "'");
+
+    OMX_IMAGEFILTERTYPE type;
+    if (!m_deinterlacing || m_deintfiltername.isEmpty())
+        type = OMX_ImageFilterNone;
+#ifdef USING_BROADCOM
+    else if (m_deintfiltername.contains("advanced"))
+        type = OMX_ImageFilterDeInterlaceAdvanced;
+    else if (m_deintfiltername.contains("fast"))
+        type = OMX_ImageFilterDeInterlaceFast;
+    else if (m_deintfiltername.contains("linedouble"))
+        type = OMX_ImageFilterDeInterlaceLineDouble;
+#endif
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + __func__ +  " Unknown type: '" +
+            m_deintfiltername + "'");
+        type = OMX_ImageFilterDeInterlaceFast;
+    }
+
+    (void)SetImageFilter(type);
+
+    return m_deinterlacing;
+}
+
+OMX_ERRORTYPE VideoOutputOMX::SetImageFilter(OMX_IMAGEFILTERTYPE type)
+{
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + __func__ + " " + Filter2String(type));
+
+#ifdef USING_BROADCOM
+    OMX_INDEXTYPE index = OMX_IndexConfigCommonImageFilterParameters;
+    OMX_CONFIG_IMAGEFILTERPARAMSTYPE image_filter;
+    OMX_DATA_INIT(image_filter);
+    switch (type)
+    {
+      case OMX_ImageFilterDeInterlaceAdvanced:
+        image_filter.nNumParams = 1;
+        image_filter.nParams[0] = 3;
+        break;
+
+      case OMX_ImageFilterDeInterlaceFast:
+      case OMX_ImageFilterDeInterlaceLineDouble:
+      case OMX_ImageFilterNone:
+        break;
+
+      default:
+        break;
+    }
+
+#else
+    OMX_INDEXTYPE index = OMX_IndexConfigCommonImageFilter;
+    OMX_CONFIG_IMAGEFILTERTYPE image_filter;
+    OMX_DATA_INIT(image_filter);
+#endif //def USING_BROADCOM
+
+    image_filter.nPortIndex = m_imagefx.Base() + 1;
+    image_filter.eImageFilter = type;
+    OMX_ERRORTYPE e = m_imagefx.SetConfig(index, &image_filter);
+    if (e != OMX_ErrorNone)
+        LOG(VB_PLAYBACK, LOG_ERR, LOC + QString(
+                "SetConfig CommonImageFilter error %1")
+            .arg(Error2String(e)));
+    return e;
 }
 
 // virtual
@@ -362,6 +482,8 @@ void VideoOutputOMX::ProcessFrame(VideoFrame *frame, OSD *osd,
 
     if (!frame)
     {
+        // Rotate pause frames
+        vbuffers.Enqueue(kVideoBuffer_pause, vbuffers.Dequeue(kVideoBuffer_pause));
         frame = vbuffers.GetScratchFrame();
         CopyFrame(frame, &av_pause_frame);
     }
@@ -396,8 +518,6 @@ void VideoOutputOMX::PrepareFrame(VideoFrame *buffer, FrameScanType scan, OSD *o
     {
         buffer = vbuffers.GetScratchFrame();
         vbuffers.SetLastShownFrameToScratch();
-        // Rotate pause frames
-        vbuffers.Enqueue(kVideoBuffer_pause, vbuffers.Dequeue(kVideoBuffer_pause));
     }
 
     framesPlayed = buffer->frameNumber + 1;
@@ -442,7 +562,7 @@ void VideoOutputOMX::Show(FrameScanType scan)
     assert(frame->codec == FMT_YV12);
     hdr->nFilledLen = frame->offsets[2] + (frame->offsets[1] >> 2);
     hdr->nFlags = OMX_BUFFERFLAG_ENDOFFRAME;
-    OMX_ERRORTYPE e = OMX_EmptyThisBuffer(m_render.Handle(), hdr);
+    OMX_ERRORTYPE e = OMX_EmptyThisBuffer(m_imagefx.Handle(), hdr);
     if (e != OMX_ErrorNone)
     {
         LOG(VB_PLAYBACK, LOG_ERR, LOC + QString(
@@ -471,85 +591,76 @@ bool VideoOutputOMX::CreateBuffers(
     WId winid )
 {
     // Set the video dimensions
-    OMX_PARAM_PORTDEFINITIONTYPE def = m_render.PortDef();
+    OMX_S32 nStride = ROUNDUP(video_dim_buf.width(), 32);
+    OMX_U32 nSliceHeight = ROUNDUP(video_dim_buf.height(), 16);
+    OMX_PARAM_PORTDEFINITIONTYPE def = m_imagefx.PortDef();
     assert(vbuffers.Size() >= def.nBufferCountMin);
     def.nBufferCountActual = vbuffers.Size();
+    def.nBufferSize = 0;
+    def.bBuffersContiguous = OMX_FALSE;
+    def.nBufferAlignment = sizeof(int);
+    def.eDomain = OMX_PortDomainVideo;
     def.format.video.cMIMEType = NULL;
-    if (winid)
-        def.format.video.pNativeRender = NULL;
+    def.format.video.pNativeRender = NULL;
     def.format.video.nFrameWidth = video_dim_disp.width();
     def.format.video.nFrameHeight = video_dim_disp.height();
-    def.format.video.nStride = ROUNDUP(video_dim_buf.width(), 32);
-    def.format.video.nSliceHeight = video_dim_buf.height();
+    def.format.video.nStride = nStride;
+    def.format.video.nSliceHeight = nSliceHeight;
     def.format.video.nBitrate = 0;
     def.format.video.xFramerate = 0;
     def.format.video.bFlagErrorConcealment = OMX_FALSE;
     def.format.video.eCompressionFormat = OMX_VIDEO_CodingUnused;
     def.format.video.eColorFormat = OMX_COLOR_FormatYUV420PackedPlanar;
-    if (winid)
-        def.format.video.pNativeWindow = OMX_NATIVE_WINDOWTYPE(winid);
-    OMX_ERRORTYPE e = m_render.SetParameter(OMX_IndexParamPortDefinition, &def);
+    def.format.video.pNativeWindow = NULL;
+    OMX_ERRORTYPE e = m_imagefx.SetParameter(OMX_IndexParamPortDefinition, &def);
     if (e != OMX_ErrorNone)
     {
         LOG(VB_PLAYBACK, LOG_ERR, LOC + QString(
-                "Set OMX_IndexParamPortDefinition error %1")
+                "SetParameter PortDefinition error %1")
             .arg(Error2String(e)));
         return false;
     }
 
     // Update port status with revised buffer size etc
-    if (OMX_ErrorNone != m_render.GetPortDef())
+    if (OMX_ErrorNone != m_imagefx.GetPortDef())
         return false;
 
-#ifdef USING_BROADCOM
-    // Setup output
-    OMX_CONFIG_DISPLAYREGIONTYPE dregion;
-    OMX_DATA_INIT(dregion);
-    dregion.nPortIndex = m_render.Base();
-    dregion.set = OMX_DISPLAYSETTYPE( OMX_DISPLAY_SET_FULLSCREEN |
-                    OMX_DISPLAY_SET_TRANSFORM |
-                    OMX_DISPLAY_SET_MODE |
-                    OMX_DISPLAY_SET_PIXEL |
-                    OMX_DISPLAY_SET_NOASPECT |
-                    OMX_DISPLAY_SET_LAYER );
-    dregion.fullscreen = OMX_FALSE;
-    dregion.transform = OMX_DISPLAY_ROT0;
-    dregion.noaspect = OMX_TRUE;
-    dregion.mode = OMX_DISPLAY_MODE_FILL; //OMX_DISPLAY_MODE_LETTERBOX;
-    dregion.pixel_x = dregion.pixel_y = 0;
-    // NB Qt EGLFS uses layer 1 - See createDispmanxLayer() in
-    // mkspecs/devices/linux-rasp-pi-g++/qeglfshooks_pi.cpp.
-    // Therefore to view video must select layer >= 1
-    dregion.layer = 2;
-
-    e = m_render.SetConfig(OMX_IndexConfigDisplayRegion, &dregion);
+    // Setup image_fx output
+    def = m_imagefx.PortDef(1);
+    def.nBufferCountActual = 1 + std::max(def.nBufferCountMin,
+                                        m_render.PortDef().nBufferCountMin);
+    def.nBufferSize = 0;
+    assert(def.eDomain == OMX_PortDomainImage);
+    def.format.image.nFrameWidth = video_dim_disp.width();
+    def.format.image.nFrameHeight = video_dim_disp.height();
+    def.format.image.nStride = nStride;
+    def.format.image.nSliceHeight = nSliceHeight;
+    e = m_imagefx.SetParameter(OMX_IndexParamPortDefinition, &def);
     if (e != OMX_ErrorNone)
     {
         LOG(VB_PLAYBACK, LOG_ERR, LOC + QString(
-                "Set OMX_IndexConfigDisplayRegion error %1")
+                "SetParameter image_fx output PortDefinition error %1")
             .arg(Error2String(e)));
         return false;
     }
-#endif // USING_BROADCOM
 
-    if (!SetVideoRect(window.GetDisplayVideoRect(), window.GetVideoRect()))
+    if (OMX_ErrorNone != m_imagefx.GetPortDef(1))
         return false;
 
-    const OMX_VIDEO_PORTDEFINITIONTYPE &vdef = m_render.PortDef().format.video;
-    const OMX_U32 nBufferSize = m_render.PortDef().nBufferSize;
     int pitches[3], offsets[3];
-    pitches[0] = vdef.nStride;
-    pitches[1] = pitches[2] = vdef.nStride >> 1;
+    pitches[0] = nStride;
+    pitches[1] = pitches[2] = nStride >> 1;
     offsets[0] = 0;
-    offsets[1] = vdef.nStride * vdef.nSliceHeight;
+    offsets[1] = nStride * nSliceHeight;
     offsets[2] = offsets[1] + (offsets[1] >> 2);
+    uint nBufferSize = buffersize(FMT_YV12, nStride, nSliceHeight);
 
     std::vector<unsigned char*> bufs;
     std::vector<YUVInfo> yuvinfo;
     for (uint i = 0; i < vbuffers.Size(); ++i)
     {
-        yuvinfo.push_back(YUVInfo(vdef.nFrameWidth, vdef.nFrameHeight,
-                            nBufferSize, pitches, offsets));
+        yuvinfo.push_back(YUVInfo(video_dim_disp.width(),
+            video_dim_disp.height(), nBufferSize, pitches, offsets));
         void *buf = av_malloc(nBufferSize + 64);
         if (!buf)
         {
@@ -560,8 +671,8 @@ bool VideoOutputOMX::CreateBuffers(
         m_bufs.push_back(buf);
         bufs.push_back((unsigned char *)buf);
     }
-    if (!vbuffers.CreateBuffers(FMT_YV12, vdef.nFrameWidth,
-                                vdef.nFrameHeight, bufs, yuvinfo))
+    if (!vbuffers.CreateBuffers(FMT_YV12, video_dim_disp.width(),
+                                video_dim_disp.height(), bufs, yuvinfo))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "CreateBuffers failed");
         errorState = kError_Unknown;
@@ -587,6 +698,46 @@ void VideoOutputOMX::DeleteBuffers()
     }
 }
 
+bool VideoOutputOMX::Start()
+{
+    // Setup a tunnel between image_fx & video_render
+    OMX_ERRORTYPE e = OMX_SetupTunnel(m_imagefx.Handle(), m_imagefx.Base() + 1,
+        m_render.Handle(), m_render.Base());
+    if (e != OMX_ErrorNone)
+    {
+        LOG(VB_PLAYBACK, LOG_ERR, LOC + QString("OMX_SetupTunnel error %1")
+            .arg(Error2String(e)));
+        return false;
+    }
+
+    // Disable image_fx input port.
+    // A disabled port is not populated with buffers on a transition to IDLE
+    if (m_imagefx.PortDisable(0, 500) != OMX_ErrorNone)
+        return false;
+
+    // Goto OMX_StateIdle
+    if (m_imagefx.SetState(OMX_StateIdle, 500) != OMX_ErrorNone)
+        return false;
+
+    if (m_render.SetState(OMX_StateIdle, 500) != OMX_ErrorNone)
+        return false;
+
+    // Enable image_fx input port and populate buffers
+    OMXComponentCB<VideoOutputOMX> cb(this, &VideoOutputOMX::UseBuffersCB);
+    e = m_imagefx.PortEnable(0, 500, &cb);
+    if (e != OMX_ErrorNone)
+        return false;
+
+    // Goto OMX_StateExecuting
+    if (m_imagefx.SetState(OMX_StateExecuting, 500) != OMX_ErrorNone)
+        return false;
+
+    if (m_render.SetState(OMX_StateExecuting, 500) != OMX_ErrorNone)
+        return false;
+
+    return true;
+}
+
 bool VideoOutputOMX::SetVideoRect(const QRect &disp_rect, const QRect &vid_rect)
 {
     if (disp_rect == m_disp_rect && vid_rect == m_vid_rect)
@@ -604,8 +755,15 @@ bool VideoOutputOMX::SetVideoRect(const QRect &disp_rect, const QRect &vid_rect)
     OMX_CONFIG_DISPLAYREGIONTYPE dregion;
     OMX_DATA_INIT(dregion);
     dregion.nPortIndex = m_render.Base();
-    dregion.set = OMX_DISPLAYSETTYPE(
-                    OMX_DISPLAY_SET_DEST_RECT | OMX_DISPLAY_SET_SRC_RECT);
+    dregion.set = OMX_DISPLAYSETTYPE( OMX_DISPLAY_SET_FULLSCREEN |
+                    OMX_DISPLAY_SET_TRANSFORM |
+                    OMX_DISPLAY_SET_DEST_RECT | OMX_DISPLAY_SET_SRC_RECT |
+                    OMX_DISPLAY_SET_MODE |
+                    OMX_DISPLAY_SET_PIXEL |
+                    OMX_DISPLAY_SET_NOASPECT |
+                    OMX_DISPLAY_SET_LAYER );
+    dregion.fullscreen = OMX_FALSE;
+    dregion.transform = OMX_DISPLAY_ROT0;
     dregion.dest_rect.x_offset = disp_rect.x();
     dregion.dest_rect.y_offset = disp_rect.y();
     dregion.dest_rect.width    = disp_rect.width();
@@ -614,12 +772,19 @@ bool VideoOutputOMX::SetVideoRect(const QRect &disp_rect, const QRect &vid_rect)
     dregion.src_rect.y_offset = vid_rect.y();
     dregion.src_rect.width    = vid_rect.width();
     dregion.src_rect.height   = vid_rect.height();
+    dregion.noaspect = OMX_TRUE;
+    dregion.mode = OMX_DISPLAY_MODE_FILL; //OMX_DISPLAY_MODE_LETTERBOX;
+    dregion.pixel_x = dregion.pixel_y = 0;
+    // NB Qt EGLFS uses layer 1 - See createDispmanxLayer() in
+    // mkspecs/devices/linux-rasp-pi-g++/qeglfshooks_pi.cpp.
+    // Therefore to view video must select layer >= 1
+    dregion.layer = 2;
 
     OMX_ERRORTYPE e = m_render.SetConfig(OMX_IndexConfigDisplayRegion, &dregion);
     if (e != OMX_ErrorNone)
     {
         LOG(VB_PLAYBACK, LOG_ERR, LOC + QString(
-                "Set OMX_IndexConfigDisplayRegion error %1")
+                "SetConfig DisplayRegion error %1")
             .arg(Error2String(e)));
         return false;
     }
@@ -644,44 +809,35 @@ OMX_ERRORTYPE VideoOutputOMX::EmptyBufferDone(
 
 // Shutdown OMX_StateIdle -> OMX_StateLoaded callback
 // virtual
-void VideoOutputOMX::ReleaseBuffers(OMXComponent &)
+void VideoOutputOMX::ReleaseBuffers(OMXComponent &cmpnt)
 {
-    for (uint i = 0; i < vbuffers.Size(); ++i)
-    {
-        VideoFrame *vf = vbuffers.At(i);
-        assert(vf);
-        OMX_BUFFERHEADERTYPE *hdr = FRAME2HDR(vf);
-        assert(hdr);
-        assert(hdr->nSize == sizeof(OMX_BUFFERHEADERTYPE));
-        assert(hdr->nVersion.nVersion == OMX_VERSION);
-        assert(vf == HDR2FRAME(hdr));
-
-        OMX_ERRORTYPE e = OMX_FreeBuffer(m_render.Handle(), m_render.Base(), hdr);
-        if (e != OMX_ErrorNone)
-        {
-            LOG(VB_PLAYBACK, LOG_ERR, LOC + QString(
-                    "OMX_FreeBuffer 0x%1 error %2")
-                .arg(quintptr(hdr),0,16).arg(Error2String(e)));
-        }
-    }
+    if(cmpnt.Handle() == m_imagefx.Handle())
+        FreeBuffersCB();
 }
 
 // Use frame buffers
 OMX_ERRORTYPE VideoOutputOMX::UseBuffersCB()
 {
-    const OMX_PARAM_PORTDEFINITIONTYPE &def = m_render.PortDef();
-    assert(vbuffers.Size() == def.nBufferCountActual);
+    const OMX_PARAM_PORTDEFINITIONTYPE &def = m_imagefx.PortDef();
+    assert(vbuffers.Size() >= def.nBufferCountActual);
+
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("Use %1 of %2 byte buffer(s)")
+        .arg(def.nBufferCountActual).arg(def.nBufferSize));
 
     OMX_ERRORTYPE e = OMX_ErrorNone;
 
     for (uint i = 0; i < vbuffers.Size(); ++i)
     {
         VideoFrame *vf = vbuffers.At(i);
+        assert(vf);
         assert(OMX_U32(vf->size) >= def.nBufferSize);
         assert(vf->buf);
+        if (i >= def.nBufferCountActual)
+            continue;
 
         OMX_BUFFERHEADERTYPE *hdr;
-        e = OMX_UseBuffer(m_render.Handle(), &hdr, m_render.Base(), vf, def.nBufferSize, vf->buf);
+        e = OMX_UseBuffer(m_imagefx.Handle(), &hdr, m_imagefx.Base(), vf,
+                            def.nBufferSize, vf->buf);
         if (e != OMX_ErrorNone)
         {
             LOG(VB_PLAYBACK, LOG_ERR, LOC + QString(
@@ -691,14 +847,14 @@ OMX_ERRORTYPE VideoOutputOMX::UseBuffersCB()
         if (hdr->nSize != sizeof(OMX_BUFFERHEADERTYPE))
         {
             LOG(VB_PLAYBACK, LOG_ERR, LOC + "OMX_UseBuffer header mismatch");
-            OMX_FreeBuffer(m_render.Handle(), m_render.Base(), hdr);
+            OMX_FreeBuffer(m_imagefx.Handle(), m_imagefx.Base(), hdr);
             e = OMX_ErrorVersionMismatch;
             break;
         }
         if (hdr->nVersion.nVersion != OMX_VERSION)
         {
             LOG(VB_PLAYBACK, LOG_ERR, LOC + "OMX_UseBuffer version mismatch");
-            OMX_FreeBuffer(m_render.Handle(), m_render.Base(), hdr);
+            OMX_FreeBuffer(m_imagefx.Handle(), m_imagefx.Base(), hdr);
             e = OMX_ErrorVersionMismatch;
             break;
         }
@@ -715,29 +871,28 @@ OMX_ERRORTYPE VideoOutputOMX::UseBuffersCB()
 // OMX_CommandPortDisable callback
 OMX_ERRORTYPE VideoOutputOMX::FreeBuffersCB()
 {
-    assert(vbuffers.Size() == m_render.PortDef().nBufferCountActual);
-
-    OMX_ERRORTYPE e = OMX_ErrorNone;
+    assert(vbuffers.Size() >= m_imagefx.PortDef().nBufferCountActual);
 
     for (uint i = 0; i < vbuffers.Size(); ++i)
     {
         VideoFrame *vf = vbuffers.At(i);
         assert(vf);
         OMX_BUFFERHEADERTYPE *hdr = FRAME2HDR(vf);
-        assert(hdr);
+        if (!hdr)
+            continue;
         assert(hdr->nSize == sizeof(OMX_BUFFERHEADERTYPE));
         assert(hdr->nVersion.nVersion == OMX_VERSION);
         assert(vf == HDR2FRAME(hdr));
+        FRAMESETHDR(vf, NULL);
 
-        e = OMX_FreeBuffer(m_render.Handle(), m_render.Base(), hdr);
+        OMX_ERRORTYPE e = OMX_FreeBuffer(m_imagefx.Handle(), m_imagefx.Base(), hdr);
         if (e != OMX_ErrorNone)
         {
             LOG(VB_PLAYBACK, LOG_ERR, LOC + QString(
                     "OMX_FreeBuffer 0x%1 error %2")
                 .arg(quintptr(hdr),0,16).arg(Error2String(e)));
-            break;
         }
     }
-    return e;
+    return OMX_ErrorNone;
 }
 // EOF
