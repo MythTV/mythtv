@@ -152,8 +152,6 @@ ClassicCommDetector::ClassicCommDetector(SkipType commDetectMethod_in,
     fps(0.0),                                  framesProcessed(0),
     preRoll(0),                                postRoll(0)
 {
-    commDetectBorder =
-        gCoreContext->GetNumSetting("CommDetectBorder", 20);
     commDetectBlankFrameMaxDiff =
         gCoreContext->GetNumSetting("CommDetectBlankFrameMaxDiff", 25);
     commDetectDarkBrightness =
@@ -188,6 +186,16 @@ void ClassicCommDetector::Init()
         max(int64_t(0), int64_t(recordingStartedAt.secsTo(startedAt))) * fps);
     postRoll = (long long)(
         max(int64_t(0), int64_t(stopsAt.secsTo(recordingStopsAt))) * fps);
+
+    // CommDetectBorder's default value of 20 predates the change to use
+    // ffmpeg's lowres decoding capability by 5 years.
+    // I believe it should be adjusted based on the height of the lowres video
+    // CommDetectBorder * height / 720 seems to produce reasonable results.
+    // source height =  480 gives border = 20 *  480 / 4 / 720 = 2
+    // source height =  720 gives border = 20 *  720 / 4 / 720 = 5
+    // source height = 1080 gives border = 20 * 1080 / 4 / 720 = 7
+    commDetectBorder =
+        gCoreContext->GetNumSetting("CommDetectBorder", 20) * height / 720;
 
 #ifdef SHOW_DEBUG_WIN
     comm_debug_init(width, height);
