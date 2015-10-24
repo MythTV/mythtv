@@ -63,7 +63,15 @@ QString dvb_decode_text(const unsigned char *src, uint raw_length,
 
     /* UCS-2 aka ISO/IEC 10646-1 Basic Multilingual Plane */
     if (src[0] == 0x11)
-        return QString::fromRawData((const QChar *)&src[1], (raw_length - 1) / sizeof (QChar));
+    {
+        size_t length = (raw_length - 1) / 2;
+        QChar *to = new QChar[length];
+        for (size_t i=0; i<length; i++)
+            to[i] = (src[1 + i*2] << 8) + src[1 + i*2 + 1];
+        QString to2(to, length);
+        delete [] to;
+        return to2;
+    }
 
     if (((0x11 < src[0]) && (src[0] < 0x15)) ||
         ((0x15 < src[0]) && (src[0] < 0x1f)))
