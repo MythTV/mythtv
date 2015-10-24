@@ -30,11 +30,14 @@ enum frameAspects {
     COMM_ASPECT_WIDE
 } FrameAspects;
 
+// letter-box and pillar-box are not mutually exclusive
+// So 3 is a valid value = (COMM_FORMAT_LETTERBOX | COMM_FORMAT_PILLARBOX)
+// And 4 = COMM_FORMAT_MAX is the number of valid values.
 enum frameFormats {
-    COMM_FORMAT_NORMAL = 0,
-    COMM_FORMAT_LETTERBOX,
-    COMM_FORMAT_PILLARBOX,
-    COMM_FORMAT_MAX
+    COMM_FORMAT_NORMAL    = 0,
+    COMM_FORMAT_LETTERBOX = 1,
+    COMM_FORMAT_PILLARBOX = 2,
+    COMM_FORMAT_MAX       = 4,
 } FrameFormats;
 
 static QString toStringFrameMaskValues(int mask, bool verbose)
@@ -87,16 +90,18 @@ static QString toStringFrameFormats(int format, bool verbose)
     switch (format)
     {
         case COMM_FORMAT_NORMAL:
-            return (verbose) ? "normal" : "N";
+            return (verbose) ? "normal" : " N ";
         case COMM_FORMAT_LETTERBOX:
-            return (verbose) ? "letter" : "L";
+            return (verbose) ? "letter" : " L ";
         case COMM_FORMAT_PILLARBOX:
-            return (verbose) ? "pillar" : "P";
+            return (verbose) ? "pillar" : " P ";
+        case COMM_FORMAT_LETTERBOX | COMM_FORMAT_PILLARBOX:
+            return (verbose) ? "letter,pillar" : "L,P";
         case COMM_FORMAT_MAX:
-            return (verbose) ? " max  " : "M";
+            return (verbose) ? " max  " : " M ";
     }
 
-    return (verbose) ? " null " : "n";
+    return (verbose) ? "unknown" : " U ";
 }
 
 QString FrameInfoEntry::GetHeader(void)
@@ -916,23 +921,20 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
         delete[] colMax;
         colMax = 0;
 
+        frameInfo[curFrameNumber].format = COMM_FORMAT_NORMAL;
         if ((topDarkRow > commDetectBorder) &&
             (topDarkRow < (height * .20)) &&
             (bottomDarkRow < (height - commDetectBorder)) &&
             (bottomDarkRow > (height * .80)))
         {
-            frameInfo[curFrameNumber].format = COMM_FORMAT_LETTERBOX;
+            frameInfo[curFrameNumber].format |= COMM_FORMAT_LETTERBOX;
         }
-        else if ((leftDarkCol > commDetectBorder) &&
+        if ((leftDarkCol > commDetectBorder) &&
                  (leftDarkCol < (width * .20)) &&
                  (rightDarkCol < (width - commDetectBorder)) &&
                  (rightDarkCol > (width * .80)))
         {
-            frameInfo[curFrameNumber].format = COMM_FORMAT_PILLARBOX;
-        }
-        else
-        {
-            frameInfo[curFrameNumber].format = COMM_FORMAT_NORMAL;
+            frameInfo[curFrameNumber].format |= COMM_FORMAT_PILLARBOX;
         }
 
         avg = totBrightness / blankPixelsChecked;
