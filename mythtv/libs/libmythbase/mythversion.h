@@ -59,12 +59,10 @@
  *
  *  MythTV Python Bindings
  *      mythtv/bindings/python/MythTV/static.py
- */
-#if 0
  *
  *  MythTV PHP Bindings
  *      mythtv/bindings/php/MythBackend.php
-#endif
+ */
 
 #define MYTH_DATABASE_VERSION "1342"
 
