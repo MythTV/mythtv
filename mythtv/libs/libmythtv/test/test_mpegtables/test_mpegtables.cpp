@@ -274,14 +274,17 @@ void TestMPEGTables::ItemList_test (void)
 void TestMPEGTables::TestUCS2 (void)
 {
     unsigned char ucs2_data[] = {
-        0x17, 0x11, 0x80, 0x06, 0x5e, 0xb7, 0x67, 0x03, 0x54,  0x48, 0x73, 0x7b, 0x00, 0x3a, 0x95, 0x8b, 0xc3,
-        0x80, 0x01, 0x53, 0xcb, 0x8a, 0x18, 0xbf, 0x11
+        0x17, 0x11, 0x80, 0x06, 0x5e, 0xb7, 0x67, 0x03,  0x54, 0x48, 0x73, 0x7b, 0x00, 0x3a, 0x95, 0x8b,
+        0xc3, 0x80, 0x01, 0x53, 0xcb, 0x8a, 0x18, 0xbf
     };
 
+    wchar_t wchar_data[] = L"\u8006\u5eb7\u6703\u5448\u737b\u003a\u958b\uc380\u0153\ucb8a\u18bf";
+
     QCOMPARE (sizeof (QChar), (size_t) 2);
+    QCOMPARE (sizeof (ucs2_data) - 1, (size_t) ucs2_data[0]);
     QString ucs2 = dvb_decode_text (&ucs2_data[1], ucs2_data[0], NULL, 0);
-    QCOMPARE (ucs2.length(), (int) (sizeof (ucs2_data) - 2) / 2);
-    QCOMPARE (ucs2, QString ((QChar*) &ucs2_data[2], (sizeof (ucs2_data) - 2) / 2));
+    QCOMPARE (ucs2.length(), (int) (ucs2_data[0] - 1) / 2);
+    QCOMPARE (ucs2, QString::fromWCharArray (wchar_data));
 }
 
 QTEST_APPLESS_MAIN(TestMPEGTables)
