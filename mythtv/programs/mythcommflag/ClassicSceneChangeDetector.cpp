@@ -25,7 +25,7 @@ void ClassicSceneChangeDetector::deleteLater(void)
     SceneChangeDetectorBase::deleteLater();
 }
 
-void ClassicSceneChangeDetector::processFrame(unsigned char* frame)
+void ClassicSceneChangeDetector::processFrame(VideoFrame* frame)
 {
     histogram->generateFromImage(frame, width, height, commdetectborder,
                                  width-commdetectborder, commdetectborder,

@@ -139,7 +139,7 @@ ClassicCommDetector::ClassicCommDetector(SkipType commDetectMethod_in,
     totalMinBrightness(0),                     detectBlankFrames(false),
     detectSceneChanges(false),                 detectStationLogo(false),
     logoInfoAvailable(false),                  logoDetector(0),
-    framePtr(0),                               frameIsBlank(false),
+    frameIsBlank(false),
     sceneHasChanged(false),                    stationLogoPresent(false),
     lastFrameWasBlank(false),                  lastFrameWasSceneChange(false),
     decoderFoundAspectChanges(false),          sceneChangeDetector(0),
@@ -264,8 +264,6 @@ void ClassicCommDetector::Init()
 
     frameIsBlank = false;
     stationLogoPresent = false;
-
-    framePtr = NULL;
 
     logoInfoAvailable = false;
 
@@ -780,7 +778,8 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
     }
 
     curFrameNumber = frame_number;
-    framePtr = frame->buf;
+    unsigned char* framePtr = frame->buf;
+    int bytesPerLine = frame->pitches[0];
 
     fInfo.minBrightness = -1;
     fInfo.maxBrightness = -1;
@@ -817,7 +816,7 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
 
     if (commDetectMethod & COMM_DETECT_SCENE)
     {
-        sceneChangeDetector->processFrame(framePtr);
+        sceneChangeDetector->processFrame(frame);
     }
 
     stationLogoPresent = false;
@@ -828,7 +827,7 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
         for(int x = commDetectBorder; x < (width - commDetectBorder);
                 x += horizSpacing)
         {
-            pixel = framePtr[y * width + x];
+            pixel = framePtr[y * bytesPerLine + x];
 
             if (commDetectMethod & COMM_DETECT_BLANKS)
             {
@@ -947,7 +946,7 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
     if ((logoInfoAvailable) && (commDetectMethod & COMM_DETECT_LOGO))
     {
         stationLogoPresent =
-            logoDetector->doesThisFrameContainTheFoundLogo(framePtr);
+            logoDetector->doesThisFrameContainTheFoundLogo(frame);
     }
 
 #if 0

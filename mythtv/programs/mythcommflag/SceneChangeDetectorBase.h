@@ -3,6 +3,8 @@
 
 #include <QObject>
 
+typedef struct VideoFrame_ VideoFrame;
+
 class SceneChangeDetectorBase : public QObject
 {
     Q_OBJECT
@@ -11,7 +13,7 @@ class SceneChangeDetectorBase : public QObject
     SceneChangeDetectorBase(unsigned int w, unsigned int h) :
         width(w), height(h) {}
 
-    virtual void processFrame(unsigned char *frame) = 0;
+    virtual void processFrame(VideoFrame* frame) = 0;
 
   signals:
     void haveNewInformation(unsigned int framenum, bool scenechange,
