@@ -100,12 +100,23 @@ bool ClassicLogoDetector::searchForLogo(MythPlayer* player)
 
     edgeCounts = new EdgeMaskEntry[width * height];
 
+    // Back in 2005, a threshold of 50 minimum pixelsInMask was established.
+    // I don't know whether that was tested against SD or HD resolutions.
+    // I do know that in 2010, mythcommflag was changed to use ffmpeg's
+    // lowres support, effectively dividing the video area by 16.
+    // But the 50 pixel minimum was not adjusted accordingly.
+    // I believe the minimum threshold should vary with the video's area.
+    // I am using 1280x720 (for 720p) video as the baseline.
+    // This should improve logo detection for SD video.
+    int minPixelsInMask = 50 * (width*height) / (1280*720 / 16);
+
     for (i = 0; edgeDiffs[i] != 0 && !logoInfoAvailable; i++)
     {
         int pixelsInMask = 0;
 
-        LOG(VB_COMMFLAG, LOG_INFO, QString("Trying with edgeDiff == %1")
-                .arg(edgeDiffs[i]));
+        LOG(VB_COMMFLAG, LOG_INFO,
+            QString("Trying with edgeDiff == %1, minPixelsInMask=%2")
+            .arg(edgeDiffs[i]).arg(minPixelsInMask));
 
         memset(edgeCounts, 0, sizeof(EdgeMaskEntry) * width * height);
         memset(edgeMask, 0, sizeof(EdgeMaskEntry) * width * height);
@@ -237,7 +248,7 @@ bool ClassicLogoDetector::searchForLogo(MythPlayer* player)
 #endif
         if (((logoMaxX - logoMinX) < (width / 4)) &&
             ((logoMaxY - logoMinY) < (height / 4)) &&
-            (pixelsInMask > 50))
+            (pixelsInMask > minPixelsInMask))
         {
             logoInfoAvailable = true;
             logoEdgeDiff = edgeDiffs[i];
