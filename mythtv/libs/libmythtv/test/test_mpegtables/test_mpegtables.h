@@ -66,4 +66,8 @@ class TestMPEGTables: public QObject
     /** test for DVB-EIT style cast
      */
     void ItemList_test (void);
+
+    /** test decoding chinese multi-byte strings, #12507
+     */
+    void TestUCS2 (void);
 };

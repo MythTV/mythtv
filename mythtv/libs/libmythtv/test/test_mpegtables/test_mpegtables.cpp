@@ -271,4 +271,17 @@ void TestMPEGTables::ItemList_test (void)
     QCOMPARE (descriptor2.LengthOfItems(), (uint) 139);
 }
 
+void TestMPEGTables::TestUCS2 (void)
+{
+    unsigned char ucs2_data[] = {
+        0x17, 0x11, 0x80, 0x06, 0x5e, 0xb7, 0x67, 0x03, 0x54,  0x48, 0x73, 0x7b, 0x00, 0x3a, 0x95, 0x8b, 0xc3,
+        0x80, 0x01, 0x53, 0xcb, 0x8a, 0x18, 0xbf, 0x11
+    };
+
+    QCOMPARE (sizeof (QChar), (size_t) 2);
+    QString ucs2 = dvb_decode_text (&ucs2_data[1], ucs2_data[0], NULL, 0);
+    QCOMPARE (ucs2.length(), (int) (sizeof (ucs2_data) - 2) / 2);
+    QCOMPARE (ucs2, QString ((QChar*) &ucs2_data[2], (sizeof (ucs2_data) - 2) / 2));
+}
+
 QTEST_APPLESS_MAIN(TestMPEGTables)
