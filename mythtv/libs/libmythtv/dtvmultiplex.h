@@ -16,11 +16,11 @@
 // MythTV headers
 #include "dtvconfparserhelpers.h"
 #include "channelinfo.h"
-#include "mythexp.h"
+#include "mythtvexp.h"
 
 class MPEGDescriptor;
 
-class MPUBLIC DTVMultiplex
+class MTV_PUBLIC DTVMultiplex
 {
   public:
     DTVMultiplex()
@@ -93,7 +93,7 @@ class MPUBLIC DTVMultiplex
     QString          sistandard;
 };
 
-class MPUBLIC ScanDTVTransport : public DTVMultiplex
+class MTV_PUBLIC ScanDTVTransport : public DTVMultiplex
 {
   public:
     ScanDTVTransport() :
