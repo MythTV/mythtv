@@ -2784,8 +2784,8 @@ bool Scheduler::HandleRecording(
             ri.SetRecordingStartTime(tempri.GetRecordingStartTime());
 
             // activate auto expirer
-            if (m_expirer)
-                m_expirer->Update(ri.GetInputID(), fsID, true);
+            if (m_expirer && recStatus == RecStatus::Tuning)
+                m_expirer->Update(ri.GetInputID(), fsID, false);
         }
     }
 
