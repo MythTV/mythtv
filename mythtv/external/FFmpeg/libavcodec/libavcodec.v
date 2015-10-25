@@ -10,5 +10,6 @@ LIBAVCODEC_$MAJOR {
                 ff_codec_id_string;
                 ff_zigzag_direct;
                 avpriv_find_start_code;
+                ff_fft_init;
         local:  *;
 };
