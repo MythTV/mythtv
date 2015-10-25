@@ -2702,7 +2702,12 @@ static int mpegts_read_header(AVFormatContext *s)
     AVIOContext *pb = s->pb;
     uint8_t buf[8*1024] = {0};
     int len, sid, i;
-    int64_t pos;
+    int64_t pos, probesize =
+#if FF_API_PROBESIZE_32
+                             s->probesize ? s->probesize : s->probesize2;
+#else
+                             s->probesize;
+#endif
 
     memset(ts->pids, 0, NB_PID_MAX * sizeof(MpegTSFilter *));
 
@@ -2743,7 +2748,7 @@ static int mpegts_read_header(AVFormatContext *s)
         ts->pat_filter =
         mpegts_open_section_filter(ts, PAT_PID, pat_cb, ts, 1);
 
-        handle_packets(ts, s->probesize / ts->raw_packet_size);
+        handle_packets(ts, probesize / ts->raw_packet_size);
         ts->scanning = 0;
 
         if (ts->nb_prg <= 0) {
@@ -2769,7 +2774,7 @@ static int mpegts_read_header(AVFormatContext *s)
             
             avio_seek(pb, pos, SEEK_SET);
             ts->req_sid = sid = ts->prg[i].id;
-            handle_packets(ts, s->probesize / ts->raw_packet_size);
+            handle_packets(ts, probesize / ts->raw_packet_size);
 
             /* fallback code to deal with broken streams from
              * DBOX2/Firewire cable boxes. */
@@ -2784,7 +2789,7 @@ static int mpegts_read_header(AVFormatContext *s)
                 /* try again */
                 avio_seek(pb, pos, SEEK_SET);
                 ts->req_sid = sid = ts->prg[i].id;
-                handle_packets(ts, s->probesize / ts->raw_packet_size);
+                handle_packets(ts, probesize / ts->raw_packet_size);
             }
 
             /* fallback code to deal with streams that are not complete PMT
@@ -2799,7 +2804,7 @@ static int mpegts_read_header(AVFormatContext *s)
                 /* try again */
                 avio_seek(pb, pos, SEEK_SET);
                 ts->req_sid = sid = ts->prg[i].id;
-                handle_packets(ts, s->probesize / ts->raw_packet_size);
+                handle_packets(ts, probesize / ts->raw_packet_size);
             }
         }
         ts->scanning = 0;
