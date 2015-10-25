@@ -11,7 +11,7 @@ using namespace std;
 #include <QString>
 #include <QWaitCondition>
 
-#include "mythexp.h"
+#include "mythtvexp.h"
 #include "mythframe.h"
 #include "mythdeque.h"
 
@@ -58,7 +58,7 @@ class YUVInfo
     uint offsets[3];
 };
 
-class MPUBLIC VideoBuffers
+class MTV_PUBLIC VideoBuffers
 {
   public:
     VideoBuffers();
