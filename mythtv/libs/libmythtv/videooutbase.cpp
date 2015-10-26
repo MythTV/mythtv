@@ -1226,6 +1226,12 @@ void VideoOutput::ResizeVideo(VideoFrame *frame)
                        resize.width(), resize.height());
         avpicture_fill(&img_in, (uint8_t *)frame->buf, PIX_FMT_YUV420P,
                        frame->width, frame->height);
+        img_in.data[0] = frame->buf + frame->offsets[0];
+        img_in.data[1] = frame->buf + frame->offsets[1];
+        img_in.data[2] = frame->buf + frame->offsets[2];
+        img_in.linesize[0] = frame->pitches[0];
+        img_in.linesize[1] = frame->pitches[1];
+        img_in.linesize[2] = frame->pitches[2];
         sws_scale(vsz_scale_context, img_in.data, img_in.linesize, 0,
                       frame->height, img_out.data, img_out.linesize);
     }
@@ -1236,29 +1242,41 @@ void VideoOutput::ResizeVideo(VideoFrame *frame)
     int xoff = resize.left();
     int yoff = resize.top();
     int resw = resize.width();
+    int vidw = frame->pitches[0];
+
+    unsigned char *yptr = frame->buf + frame->offsets[0];
+    unsigned char *videoyptr = vsz_tmp_buf;
 
     // Copy Y (intensity values)
+    yptr += yoff * vidw + xoff;
     for (int i = 0; i < resize.height(); i++)
     {
-        memcpy(frame->buf + (i + yoff) * frame->width + xoff,
-               vsz_tmp_buf + i * resw, resw);
+        memcpy(yptr, videoyptr, resw);
+        yptr += vidw;
+        videoyptr += resw;
     }
 
     // Copy U & V (half plane chroma values)
     xoff /= 2;
     yoff /= 2;
 
-    unsigned char *uptr = frame->buf + frame->width * frame->height;
-    unsigned char *vptr = frame->buf + frame->width * frame->height * 5 / 4;
-    int vidw = frame->width / 2;
+    unsigned char *uptr = frame->buf + frame->offsets[1];
+    unsigned char *vptr = frame->buf + frame->offsets[2];
+    vidw = frame->pitches[1];
+    uptr += yoff * vidw + xoff;
+    vptr += yoff * vidw + xoff;
 
     unsigned char *videouptr = vsz_tmp_buf + resw * resize.height();
-    unsigned char *videovptr = vsz_tmp_buf + resw * resize.height() * 5 / 4;
+    unsigned char *videovptr = vsz_tmp_buf + (resw * resize.height() * 5) / 4;
     resw /= 2;
     for (int i = 0; i < resize.height() / 2; i ++)
     {
-        memcpy(uptr + (i + yoff) * vidw + xoff, videouptr + i * resw, resw);
-        memcpy(vptr + (i + yoff) * vidw + xoff, videovptr + i * resw, resw);
+        memcpy(uptr, videouptr, resw);
+        uptr += vidw;
+        videouptr += resw;
+        memcpy(vptr, videovptr, resw);
+        vptr += vidw;
+        videovptr += resw;
     }
 }
 
