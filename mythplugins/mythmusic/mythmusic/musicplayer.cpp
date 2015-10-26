@@ -393,7 +393,8 @@ bool MusicPlayer::openOutputDevice(void)
 {
     QString adevice, pdevice;
 
-    if (gCoreContext->GetSetting("MusicAudioDevice") == "default")
+    adevice = gCoreContext->GetSetting("MusicAudioDevice", "default");
+    if (adevice == "default" || adevice.isEmpty())
         adevice = gCoreContext->GetSetting("AudioOutputDevice");
     else
         adevice = gCoreContext->GetSetting("MusicAudioDevice");
