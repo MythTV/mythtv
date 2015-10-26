@@ -1456,6 +1456,13 @@ float AvFormatDecoder::normalized_fps(AVStream *stream, AVCodecContext *enc)
 static enum PixelFormat get_format_vdpau(struct AVCodecContext *avctx,
                                          const enum PixelFormat *fmt)
 {
+    AvFormatDecoder *nd = (AvFormatDecoder *)(avctx->opaque);
+    if (nd && nd->GetPlayer())
+    {
+        static uint8_t *dummy[1] = { 0 };
+        avctx->hwaccel_context = nd->GetPlayer()->GetDecoderContext(NULL, dummy[0]);
+        ((AVVDPAUContext*)(avctx->hwaccel_context))->render2 = render_wrapper_vdpau;
+    }
     return AV_PIX_FMT_VDPAU;
 }
 #endif
@@ -1473,7 +1480,16 @@ enum PixelFormat get_format_dxva2(struct AVCodecContext *avctx,
     int i = 0;
     for (; fmt[i] != PIX_FMT_NONE ; i++)
         if (PIX_FMT_DXVA2_VLD == fmt[i])
+        {
+            AvFormatDecoder *nd = (AvFormatDecoder *)(avctx->opaque);
+            if (nd && nd->GetPlayer())
+            {
+                static uint8_t *dummy[1] = { 0 };
+                avctx->hwaccel_context =
+                    (dxva_context*)nd->GetPlayer()->GetDecoderContext(NULL, dummy[0]);
+            }
             break;
+        }
     return fmt[i];
 }
 #endif
@@ -1498,7 +1514,16 @@ enum PixelFormat get_format_vaapi(struct AVCodecContext *avctx,
     int i = 0;
     for (; fmt[i] != PIX_FMT_NONE ; i++)
         if (IS_VAAPI_PIX_FMT(fmt[i]))
+        {
+            AvFormatDecoder *nd = (AvFormatDecoder *)(avctx->opaque);
+            if (nd && nd->GetPlayer())
+            {
+                static uint8_t *dummy[1] = { 0 };
+                avctx->hwaccel_context =
+                    (vaapi_context*)nd->GetPlayer()->GetDecoderContext(NULL, dummy[0]);
+            }
             break;
+        }
     return fmt[i];
 }
 #endif
@@ -2834,13 +2859,6 @@ int get_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic, int flags)
     frame->pix_fmt  = c->pix_fmt;
     pic->reordered_opaque = c->reordered_opaque;
 
-    static uint8_t *dummy[1] = { 0 };
-    if (nd->GetPlayer())
-    {
-        c->hwaccel_context = nd->GetPlayer()->GetDecoderContext(NULL, dummy[0]);
-        ((AVVDPAUContext*)(c->hwaccel_context))->render2 = render_wrapper_vdpau;
-    }
-
     // Set release method
     AVBufferRef *buffer =
         av_buffer_create((uint8_t*)frame, 0, release_avf_buffer_vdpau, nd, 0);
@@ -2909,15 +2927,8 @@ int get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic, int flags)
     pic->opaque      = frame;
     frame->pix_fmt   = c->pix_fmt;
     pic->reordered_opaque = c->reordered_opaque;
-
-    if (nd->GetPlayer())
-    {
-        static uint8_t *dummy[1] = { 0 };
-        c->hwaccel_context =
-            (dxva_context*)nd->GetPlayer()->GetDecoderContext(NULL, dummy[0]);
-        pic->data[0] = (uint8_t*)frame->buf;
-        pic->data[3] = (uint8_t*)frame->buf;
-    }
+    pic->data[0] = (uint8_t*)frame->buf;
+    pic->data[3] = (uint8_t*)frame->buf;
 
     // Set release method
     AVBufferRef *buffer =
@@ -2944,8 +2955,7 @@ int get_avf_buffer_vaapi(struct AVCodecContext *c, AVFrame *pic, int flags)
 
     if (nd->GetPlayer())
     {
-        c->hwaccel_context =
-            (vaapi_context*)nd->GetPlayer()->GetDecoderContext(frame->buf, pic->data[3]);
+        nd->GetPlayer()->GetDecoderContext(frame->buf, pic->data[3]);
     }
 
     // Set release method
