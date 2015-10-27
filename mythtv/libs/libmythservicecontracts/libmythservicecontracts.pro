@@ -125,3 +125,11 @@ use_hidesyms {
 include ( ../libs-targetfix.pro )
 
 LIBS += $$EXTRA_LIBS $$LATE_LIBS
+
+android {
+    DEPENDPATH += ../libmythbase
+    INCLUDEPATH += ../libmythbase
+    HEADERS += ../libmyth/programtypes.h
+    SOURCES += ../libmyth/programtypes.cpp
+    LIBS += -L../libmythbase -lmythbase-$${LIBVERSION}
+}

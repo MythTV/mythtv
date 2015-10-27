@@ -633,6 +633,9 @@ class MTV_PUBLIC MythPlayer
     PlayerContext *player_ctx;
     DecoderThread *decoderThread;
     QThread       *playerThread;
+#ifdef Q_OS_ANDROID
+    int            playerThreadId;
+#endif
 
     // Window stuff
     QWidget *parentWidget;

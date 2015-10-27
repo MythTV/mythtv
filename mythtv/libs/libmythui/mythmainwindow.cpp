@@ -2182,14 +2182,15 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
                 d->gesture.stop();
                 ge = d->gesture.gesture();
 
+                QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent*>(e);
+                QVector<MythScreenStack *>::iterator it;
+
                 /* handle clicks separately */
                 if (ge->gesture() == MythGestureEvent::Click)
                 {
-                    QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent*>(e);
                     if (!mouseEvent)
                         return false;
 
-                    QVector<MythScreenStack *>::iterator it;
                     QPoint p = mouseEvent->pos();
 
                     ge->SetPosition(p);
@@ -2243,7 +2244,53 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
                     delete ge;
                 }
                 else
-                    QCoreApplication::postEvent(this, ge);
+                {
+                    bool handled = false;
+                    
+                    if (!mouseEvent)
+                    {
+                        QCoreApplication::postEvent(this, ge);
+                        return true;
+                    }
+
+                    QPoint p = mouseEvent->pos();
+
+                    ge->SetPosition(p);
+                    
+                    for (it = d->stackList.end()-1; it != d->stackList.begin()-1;
+                         --it)
+                    {
+                        MythScreenType *screen = (*it)->GetTopScreen();
+
+                        if (!screen || !screen->ContainsPoint(p))
+                            continue;
+
+                        if (screen->gestureEvent(ge))
+                        {
+                            handled = true;
+                            break;
+                        }
+
+                        // Note:  The following break prevents clicks being
+                        //        sent to windows below popups
+                        //
+                        //        we want to permit this in some cases, e.g.
+                        //        when the music miniplayer is on screen or a
+                        //        non-interactive alert/news scroller. So these
+                        //        things need to be in a third or more stack
+                        if ((*it)->objectName() == "popup stack")
+                            break;
+                    }
+
+                    if (handled)
+                    {
+                        delete ge;
+                    }
+                    else
+                    {
+                        QCoreApplication::postEvent(this, ge);
+                    }
+                }
 
                 return true;
             }
@@ -2259,7 +2306,10 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
                 d->gestureTimer->stop();
                 d->gestureTimer->start(GESTURE_TIMEOUT);
 
-                d->gesture.record(static_cast<QMouseEvent*>(e)->pos());
+                QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent*>(e);
+                if (!mouseEvent)
+                    return false;
+                d->gesture.record(mouseEvent->pos());
                 return true;
             }
             break;

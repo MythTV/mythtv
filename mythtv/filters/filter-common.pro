@@ -15,3 +15,8 @@ DEPENDPATH += ../../libs/libmythtv ../../libs/libmythbase
 DEPENDPATH  += ../../external/FFmpeg
 
 macx:LIBS += $$EXTRA_LIBS
+
+android {
+    # to discriminate filters in a flat directory structure
+    TARGET = mythfilter$${TARGET}
+}

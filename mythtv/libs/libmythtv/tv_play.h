@@ -365,14 +365,20 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     // Private initialisation
     bool Init(bool createWindow = true);
     void InitFromDB(void);
-
+    QList<QKeyEvent> ConvertScreenPressKeyMap(const QString& keyList);
+    
     // Top level playback methods
     bool LiveTV(bool showDialogs, const ChannelInfoList &selection);
     int  Playback(const ProgramInfo &rcinfo);
     void PlaybackLoop(void);
 
     // Private event handling
-    bool ProcessKeypress(PlayerContext*, QKeyEvent *e);
+    bool ProcessKeypressOrGesture(PlayerContext*, QEvent *e);
+    bool TranslateKeyPressOrGesture(const QString &context, QEvent *e,
+                                    QStringList &actions, bool isLiveTV, 
+                                    bool allowJumps = true);
+    bool TranslateGesture(const QString &context, MythGestureEvent *e,
+                          QStringList &actions, bool isLiveTV);
     void ProcessNetworkControlCommand(PlayerContext *, const QString &command);
 
     bool HandleTrackAction(PlayerContext*, const QString &action);
@@ -885,6 +891,15 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     /// Initial chanid override for Live TV
     uint            initialChanID;
 
+    /// screen area to keypress translation
+    /// region is now 0..11
+    ///  0  1   2  3
+    ///  4  5   6  7
+    ///  8  9  10 11
+    static constexpr int screenPressRegionCount = 12;
+    QList<QKeyEvent>    screenPressKeyMapPlayback;
+    QList<QKeyEvent>    screenPressKeyMapLiveTV;
+    
     // Channel changing timeout notification variables
     QTime   lockTimer;
     bool    lockTimerOn;

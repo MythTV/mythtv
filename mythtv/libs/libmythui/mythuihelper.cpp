@@ -1350,6 +1350,10 @@ bool MythUIHelper::FindThemeFile(QString &path)
 
     if (fi.isAbsolute() && fi.exists())
         return true;
+#ifdef Q_OS_ANDROID
+    if (path.startsWith("assets:/") && fi.exists())
+        return true;
+#endif
 
     QString file;
     bool foundit = false;

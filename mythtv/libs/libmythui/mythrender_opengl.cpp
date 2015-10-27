@@ -85,14 +85,20 @@ MythRenderOpenGL* MythRenderOpenGL::Create(const QString &painter,
     if (setswapinterval)
         format.setSwapInterval(1);
 
+#if ANDROID
+    int openGLVersionFlags = QGLFormat::OpenGL_ES_Version_2_0;
+    LOG(VB_GENERAL, LOG_INFO, "OpenGL ES2 forced for Android");
+#else
     // Check OpenGL version supported
     QGLWidget *dummy = new QGLWidget;
     dummy->makeCurrent();
     QGLFormat qglFormat = dummy->format();
+    int openGLVersionFlags = qglFormat.openGLVersionFlags();
     delete dummy;
+#endif
 
 #ifdef USING_OPENGLES
-    if (!(qglFormat.openGLVersionFlags() & QGLFormat::OpenGL_ES_Version_2_0))
+    if (!(openGLVersionFlags & QGLFormat::OpenGL_ES_Version_2_0))
     {
         LOG(VB_GENERAL, LOG_WARNING,
             "Using OpenGL ES 2.0 render, however OpenGL ES 2.0 "
@@ -102,7 +108,7 @@ MythRenderOpenGL* MythRenderOpenGL::Create(const QString &painter,
         return new MythRenderOpenGL2ES(format, device);
     return new MythRenderOpenGL2ES(format);
 #else
-    if ((qglFormat.openGLVersionFlags() & QGLFormat::OpenGL_Version_2_0) &&
+    if ((openGLVersionFlags & QGLFormat::OpenGL_Version_2_0) &&
         (painter.contains(OPENGL2_PAINTER) || painter.contains(AUTO_PAINTER) ||
          painter.isEmpty()))
     {
@@ -113,7 +119,7 @@ MythRenderOpenGL* MythRenderOpenGL::Create(const QString &painter,
         return new MythRenderOpenGL2(format);
     }
 
-    if (!(qglFormat.openGLVersionFlags() & QGLFormat::OpenGL_Version_1_2))
+    if (!(openGLVersionFlags & QGLFormat::OpenGL_Version_1_2))
     {
         LOG(VB_GENERAL, LOG_WARNING, "OpenGL 1.2 not supported, get new hardware!");
         return NULL;
@@ -981,6 +987,8 @@ bool MythRenderOpenGL::InitFeatures(void)
                 .arg(m_max_units));
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Direct rendering: %1")
                 .arg((this->format().directRendering()) ? "Yes" : "No"));
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Extensions Supported: %1")
+                .arg(m_exts_supported, 0, 16));
     }
 
     m_exts_used = m_exts_supported;
@@ -1050,6 +1058,15 @@ uint MythRenderOpenGL::CreatePBO(uint tex)
         return 0;
 
     m_glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+    if (glCheck())
+    {
+        // looks like we dont support PBOs so dont bother doing the rest
+        // and stop using it in the future
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Pixel Buffer Objects unusable, disabling");
+        m_exts_supported &= ~kGLExtPBufObj;
+        m_exts_used &= ~kGLExtPBufObj;
+        return 0;
+    }
     glTexImage2D(m_textures[tex].m_type, 0, m_textures[tex].m_internal_fmt,
                  m_textures[tex].m_size.width(),
                  m_textures[tex].m_size.height(), 0,
@@ -1275,12 +1292,18 @@ void MythRenderOpenGL::GetCachedVBO(GLuint type, const QRect &area)
         m_vboExpiry.append(ref);
 
         m_glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        m_glBufferData(GL_ARRAY_BUFFER, kTextureOffset, NULL, GL_STREAM_DRAW);
-        void* target = m_glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-        if (target)
-            memcpy(target, vertices, kTextureOffset);
-        m_glUnmapBuffer(GL_ARRAY_BUFFER);
-
+        if (m_exts_used & kGLExtPBufObj)
+        {
+            m_glBufferData(GL_ARRAY_BUFFER, kTextureOffset, NULL, GL_STREAM_DRAW);
+            void* target = m_glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+            if (target)
+                memcpy(target, vertices, kTextureOffset);
+            m_glUnmapBuffer(GL_ARRAY_BUFFER);
+        }
+        else
+        {
+            m_glBufferData(GL_ARRAY_BUFFER, kTextureOffset, vertices, GL_STREAM_DRAW);
+        }
         ExpireVBOS(MAX_VERTEX_CACHE);
         return;
     }

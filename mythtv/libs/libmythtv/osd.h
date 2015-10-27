@@ -178,6 +178,7 @@ class OSD
 
     bool DialogVisible(QString window = QString());
     bool DialogHandleKeypress(QKeyEvent *e);
+    bool DialogHandleGesture(MythGestureEvent *e);
     void DialogQuit(void);
     void DialogShow(const QString &window, const QString &text = "",
                     int updatefor = 0);

@@ -4808,6 +4808,7 @@ enabled opengl            && { check_lib GL/glx.h glXGetProcAddress "-lGL" ||
                                check_lib2 windows.h wglGetProcAddress "-lopengl32 -lgdi32" ||
                                check_lib2 OpenGL/gl3.h glGetError "-Wl,-framework,OpenGL" ||
                                check_lib2 ES2/gl.h glGetError "-isysroot=${sysroot} -Wl,-framework,OpenGLES" ||
+                               check_lib2 GLES2/gl2.h glGetError "-lGLESv2" ||
                                die "ERROR: opengl not found."
                              }
 enabled openssl           && { check_lib openssl/ssl.h SSL_library_init -lssl -lcrypto ||

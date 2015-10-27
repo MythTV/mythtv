@@ -17,15 +17,27 @@
 ThemeInfo::ThemeInfo(QString theme)
           :XMLParseBase()
 {
-    m_theme = QFileInfo(theme);
+    QString themeNoTrailingSlash = theme;
+    if (themeNoTrailingSlash.endsWith('/'))
+    {
+        themeNoTrailingSlash.chop(1);
+    }
+    m_theme = QFileInfo(themeNoTrailingSlash);
     m_type = THEME_UNKN;
     m_baseres = QSize(800, 600);
     m_majorver = m_minorver = 0;
 
     if (m_theme.exists())
+        // since all the usages have a / inserted, remove the one in the url
         m_themeurl = m_theme.absoluteFilePath();
     else
         m_themeurl = theme;
+
+    // since all the usages have a / insterted, remove the one in the url
+    if (m_themeurl.endsWith('/'))
+    {
+        m_themeurl.chop(1);
+    }
 
     if (!parseThemeInfo())
     {

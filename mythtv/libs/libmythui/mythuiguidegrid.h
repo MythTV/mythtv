@@ -53,6 +53,8 @@ class MUI_PUBLIC MythUIGuideGrid : public MythUIType
     void SetProgPast(int ppast);
     void SetMultiLine(bool multiline);
 
+    QPoint GetRowAndColumn(QPoint position);
+
   protected:
     virtual void Finalize(void);
     virtual bool ParseElement(

@@ -124,6 +124,8 @@ class MUI_PUBLIC MythRenderOpenGL2ES : public MythRenderOpenGL2
                     .arg(m_max_tex_size).arg(m_max_tex_size));
             LOG(VB_GENERAL, LOG_INFO, LOC + QString("Direct rendering: %1")
                     .arg((this->format().directRendering()) ? "Yes" : "No"));
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Extensions Supported: %1")
+                    .arg(m_exts_supported, 0, 16));
         }
 
         if (!(m_glCreateShader && m_glShaderSource && m_glCompileShader &&

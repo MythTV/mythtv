@@ -50,6 +50,7 @@ using namespace std;
 #include "mythscreentype.h"             // for MythScreenType
 #include "mythuiactions.h"              // for ACTION_SELECT, ACTION_DOWN, etc
 #include "mythuiutils.h"                // for UIUtilW, UIUtilE
+#include "mythgesture.h"
 
 // mythfrontend
 #include "progfind.h"
@@ -874,6 +875,201 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
     }
 
     if (!handled && MythScreenType::keyPressEvent(event))
+        handled = true;
+
+    return handled;
+}
+
+bool GuideGrid::gestureEvent(MythGestureEvent *event)
+{
+    bool handled = true;
+
+    if (!event)
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Guide Gesture no event");
+        return false;
+    }
+
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Guide Gesture event %1")
+        .arg((QString)event->gesture()));
+    switch (event->gesture())
+    {
+        case MythGestureEvent::Click:
+            {
+                handled = false;
+
+                // We want the relative position of the click
+                QPoint position = event->GetPosition();
+                if (m_Parent)
+                    position -= m_Parent->GetArea().topLeft();
+
+                MythUIType *type = GetChildAt(position, false, false);
+
+                if (!type)
+                    return false;
+
+                MythUIStateType *object = dynamic_cast<MythUIStateType *>(type);
+
+                if (object)
+                {
+                    QString name = object->objectName();
+                    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Guide Gesture Click name %1").arg(name));
+
+                    if (name.startsWith("channellist"))
+                    {
+                        MythUIButtonList* channelList = dynamic_cast<MythUIButtonList*>(object);
+
+                        handled = channelList->gestureEvent(event);
+                        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Guide Gesture Click channel list %1").arg(handled));
+                    }
+                    else if (name.startsWith("guidegrid"))
+                    {
+                        MythUIGuideGrid* guidegrid = dynamic_cast<MythUIGuideGrid*>(object);
+
+                        handled = true;
+
+                        QPoint rowCol = guidegrid->GetRowAndColumn(position - guidegrid->GetArea().topLeft());
+
+                        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Guide Gesture Click gg %1,%2 (%3,%4)")
+                            .arg(rowCol.y())
+                            .arg(rowCol.x())
+                            .arg(m_currentRow)
+                            .arg(m_currentCol)
+                            );
+                        if ((rowCol.y() >= 0) &&  (rowCol.x() >= 0))
+                        {
+                            if ((rowCol.y() == m_currentRow) && (rowCol.x() == m_currentCol))
+                            {
+                                if (m_player && (m_player->GetState(-1) == kState_WatchingLiveTV))
+                                {
+                                    // See if this show is far enough into the future that it's
+                                    // probable that the user wanted to schedule it to record
+                                    // instead of changing the channel.
+                                    ProgramInfo *pginfo =
+                                        m_programInfos[m_currentRow][m_currentCol];
+                                    int secsTillStart =
+                                        (pginfo) ? MythDate::current().secsTo(
+                                            pginfo->GetScheduledStartTime()) : 0;
+                                    if (pginfo && (pginfo->GetTitle() != kUnknownTitle) &&
+                                        ((secsTillStart / 60) >= m_selectRecThreshold))
+                                    {
+                                        //EditRecording();
+                                        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Guide Gesture Click gg EditRec"));
+                                    }
+                                    else
+                                    {
+                                        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Guide Gesture Click gg enter"));
+                                        enter();
+                                    }
+                                }
+                                else
+                                {
+                                    //EditRecording();
+                                    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Guide Gesture Click gg not live"));
+                                }
+                            }
+                            else
+                            {
+                                bool rowChanged = (rowCol.y() != m_currentRow);
+                                bool colChanged = (rowCol.x() != m_currentCol);
+                                if (rowChanged)
+                                    setStartChannel(m_currentStartChannel + rowCol.y() - m_currentRow);
+
+                                m_currentRow = rowCol.y();
+                                m_currentCol = rowCol.x();
+
+                                fillProgramInfos();
+                                if (colChanged)
+                                {
+                                    m_currentStartTime = m_programInfos[m_currentRow][m_currentCol]->GetScheduledStartTime();
+                                    fillTimeInfos();
+                                }
+                                if (rowChanged)
+                                    updateChannels();
+                                if (colChanged)
+                                    updateDateText();
+                            }
+                        }
+                    }
+
+                }
+            }
+            break;
+
+        case MythGestureEvent::Up:
+            if (m_verticalLayout)
+                cursorLeft();
+            else
+                cursorUp();
+            break;
+            
+        case MythGestureEvent::Down:
+            if (m_verticalLayout)
+                cursorRight();
+            else
+                cursorDown();
+            break;
+
+        case MythGestureEvent::Left:
+            if (m_verticalLayout)
+                cursorUp();
+            else
+                cursorLeft();
+            break;
+
+        case MythGestureEvent::Right:
+            if (m_verticalLayout)
+                cursorDown();
+            else
+                cursorRight();
+            break;
+
+        case MythGestureEvent::UpThenLeft:
+            if (m_verticalLayout)
+                moveLeftRight(kPageLeft);
+            else
+                moveUpDown(kPageUp);
+            break;
+
+        case MythGestureEvent::DownThenRight:
+            if (m_verticalLayout)
+                moveLeftRight(kPageRight);
+            else
+                moveUpDown(kPageDown);
+            break;
+
+        case MythGestureEvent::LeftThenUp:
+            if (m_verticalLayout)
+                moveUpDown(kPageUp);
+            else
+                moveLeftRight(kPageLeft);
+            break;
+
+        case MythGestureEvent::RightThenDown:
+            if (m_verticalLayout)
+                moveUpDown(kPageDown);
+            else
+                moveLeftRight(kPageRight);
+            break;
+
+        case MythGestureEvent::LeftThenDown:
+            moveLeftRight(kDayLeft);
+            break;
+
+        case MythGestureEvent::RightThenUp:
+            moveLeftRight(kDayRight);
+            break;
+
+        case MythGestureEvent::RightThenLeft:
+            enter();
+            break;
+
+        default:
+            handled = false;
+            break;
+    }
+
+    if (!handled && MythScreenType::gestureEvent(event))
         handled = true;
 
     return handled;

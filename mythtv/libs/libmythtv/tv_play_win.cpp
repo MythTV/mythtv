@@ -1,5 +1,8 @@
 // Qt
 #include <QTimer>
+#ifdef ANDROID
+#include <QCoreApplication>
+#endif
 
 // MythTV
 #include "mythmainwindow.h"
@@ -65,10 +68,38 @@ void TvPlayWindow::UpdateProgress(void)
 bool TvPlayWindow::gestureEvent(MythGestureEvent *event)
 {
     bool handled = false;
+#ifdef Q_OS_ANDROID
+    switch (event->gesture())
+    {
+        case MythGestureEvent::Click:
+            switch (event->GetButton())
+            {
+                case MythGestureEvent::RightButton :
+                    LOG(VB_GENERAL, LOG_NOTICE, "TV Play Window R Click");
+                    handled = true;
+                    break;
+                case MythGestureEvent::LeftButton :
+                    {
+                        LOG(VB_GENERAL, LOG_NOTICE, "TV Play Window L Click");
+                        // send it on like the others to be handled by TV
+                        QCoreApplication::postEvent(GetMythMainWindow(), new MythGestureEvent(*event));
+                        handled = true;
+                    }
+                    break;
+                default:
+                    LOG(VB_GENERAL, LOG_NOTICE, "TV Play Window other Click");
+                    handled = true;
+                    break;
+            }
+            break;
+
+    }
+#else
     if (event->gesture() == MythGestureEvent::Click)
     {
         LOG(VB_GENERAL, LOG_NOTICE, "TV Play Window Click");
         handled = true;
     }
+#endif
     return handled;
 }

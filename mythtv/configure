@@ -1868,6 +1868,8 @@ HEADERS_LIST="
     dlfcn_h
     dxva_h
     ES2_gl_h
+    EGL_egl_h
+    GLES2_gl2_h
     fcntl_h
     gsm_h
     io_h
@@ -1974,6 +1976,7 @@ SYSTEM_FUNCS="
     usleep
     VirtualAlloc
     wglGetProcAddress
+    eglGetProcAddress
 "
 
 TOOLCHAIN_FEATURES="
@@ -2301,6 +2304,7 @@ CMDLINE_APPEND="
 armv5te_deps="arm"
 armv6_deps="arm"
 armv6t2_deps="arm"
+armv7_a_deps="arm"
 armv8_deps="aarch64"
 neon_deps_any="aarch64 arm"
 vfp_deps_any="aarch64 arm"
@@ -2983,7 +2987,7 @@ vbox_deps="backend"
 ceton_deps="backend"
 mpegtsraw_demuxer_deps="merge_libavformat_mpegts_c"
 mythtranscode_deps="backend frontend"
-opengl_deps_any="agl_h GL_gl_h GLES2_gl2_h darwin windows x11"
+opengl_deps_any="agl_h GL_gl_h EGL_egl_h GLES2_gl2_h darwin windows x11"
 opengles_deps="GLES2_gl2_h"
 opengl_video_deps="opengl"
 v4l2_deps="backend linux_videodev2_h"
@@ -4773,10 +4777,12 @@ case $target_os in
         ;;
     android)
         disable symver
+        disable qtdbus
         SLIB_INSTALL_NAME='$(SLIBNAME)'
         SLIB_INSTALL_LINKS=
         # soname not set on purpose
         SHFLAGS=-shared
+        enable pic
         ;;
     haiku)
         prefix_default="/boot/common"
@@ -4902,7 +4908,12 @@ case $target_os in
         SLIBSUF=".dll"
         SLIBNAME_WITH_VERSION='$(SLIBPREF)$(NAME)-$(LIBVERSION)$(SLIBSUF)'
         SLIBNAME_WITH_MAJOR='$(SLIBPREF)$(NAME)-$(LIBMAJOR)$(SLIBSUF)'
-        SLIB_EXTRA_CMD='-lib.exe /machine:$(LIBTARGET) /def:$$(@:$(SLIBSUF)=.def) /out:$(SUBDIR)$(SLIBNAME_WITH_MAJOR:$(SLIBSUF)=.lib)'
+        dlltool="${cross_prefix}dlltool"
+        if check_cmd lib.exe -list ; then
+            SLIB_EXTRA_CMD='-lib.exe /machine:$(LIBTARGET) /def:$$(@:$(SLIBSUF)=.def) /out:$(SUBDIR)$(SLIBNAME_WITH_MAJOR:$(SLIBSUF)=.lib)'
+        else
+            SLIB_EXTRA_CMD=-'sed -e "s/ @[^ ]*//" $$(@:$(SLIBSUF)=.orig.def) > $$(@:$(SLIBSUF)=.def); $(DLLTOOL) -m $(LIBTARGET) -d $$(@:$(SLIBSUF)=.def) -l $(SUBDIR)$(SLIBNAME:$(SLIBSUF)=.lib) -D $(SLIBNAME_WITH_MAJOR)'
+        fi
         SLIB_INSTALL_EXTRA_CMD='-install -m 644 $(SUBDIR)$(SLIBNAME_WITH_MAJOR:$(SLIBSUF)=.lib) "$(SHLIBDIR)/$(SLIBNAME:$(SLIBSUF)=.lib)"; \
             install -m 644 $(SUBDIR)$(SLIBNAME_WITH_MAJOR:$(SLIBSUF)=.lib) "$(SHLIBDIR)/$(SLIBNAME_WITH_MAJOR:$(SLIBSUF)=.lib)"; \
             install -d "$(LIBDIR)"; \
@@ -5110,7 +5121,9 @@ test -n "$host_libc_type" && enable host_libc_$host_libc_type
 
 case $libc_type in
     bionic)
-        add_compat strtod.o strtod=avpriv_strtod
+        if test $target_os != android ; then
+            add_compat strtod.o strtod=avpriv_strtod
+        fi
         ;;
     msvcrt)
         add_compat strtod.o strtod=avpriv_strtod
@@ -5149,6 +5162,9 @@ set_default $PATHS_LIST
 set_default nm
 
 set_default $MYTHTV_PATHS_LIST
+if test $target_os = android ; then
+    append CONFIG_INCLUDEPATH $sysinclude "${sysroot}${prefix}"
+fi
 
 append CCONFIG "$compile_type"
 if test x$compile_type = x"profile" ; then
@@ -5372,7 +5388,7 @@ EOF
     enabled vfp     && check_insn vfp     'fadds s0, s0, s0'
     enabled vfpv3   && check_insn vfpv3   'vmov.f32 s0, #1.0'
 
-    [ $target_os = linux ] ||
+    [ $target_os = linux -o $target_os = android ] ||
         map 'enabled_any ${v}_external ${v}_inline || disable $v' \
             $ARCH_EXT_LIST_ARM
 
@@ -5802,12 +5818,16 @@ if enabled taglib; then
             echo "Can't find taglib-config. Assuming 1.7 or later."
             taglib_minor="7"
         fi
-        tagprefix=${sysroot}`taglib-config --prefix`
+        if test $target_os = android ; then
+            tagprefix=`taglib-config --prefix`
+        else
+            tagprefix=${sysroot}`taglib-config --prefix`
+        fi
         tagincludes="-I${tagprefix}/include"
         taglibs=`taglib-config --libs`
     fi
 
-    if test $taglib_minor -lt 7 || ! check_class_headers_cpp taglib/fileref.h TagLib::FileRef $tagincludes $taglibs -lstdc++; then
+    if test $taglib_minor -lt 7 || ! check_class_headers_cpp "taglib/fileref.h stdlib.h" TagLib::FileRef $tagincludes $taglibs -lstdc++; then
         die "ERROR: cannot find taglib 1.7 or later."
     fi
 fi
@@ -5949,6 +5969,10 @@ enabled opengl            && { check_lib GL/glx.h glXGetProcAddress "-lGL" ||
                                check_lib2 windows.h wglGetProcAddress "-lopengl32 -lgdi32" ||
                                check_lib2 OpenGL/gl3.h glGetError "-Wl,-framework,OpenGL" ||
                                check_lib2 ES2/gl.h glGetError "-isysroot=${sysroot} -Wl,-framework,OpenGLES" ||
+                               check_lib2 GLES/gl.h glGetError "-Wl,-framework,OpenGLES" ||
+                               { check_lib2 GLES2/gl2.h glGetError "-lGLESv2" &&
+                                 check_lib2 EGL/egl.h eglGetProcAddress "-lEGL"
+                               } ||
                                die "ERROR: opengl not found."
                              }
 enabled openssl           && { check_lib openssl/ssl.h SSL_library_init -lssl -lcrypto ||
@@ -6328,6 +6352,9 @@ if test $target_os = mingw32 ; then
 elif test $target_os = darwin ; then
     qt_inc="-I`cd $(${qmake} -query QT_INSTALL_HEADERS); pwd` -F`cd $(${qmake} -query QT_INSTALL_LIBS); pwd`"
     qt_libs="-L`cd $(${qmake} -query QT_INSTALL_LIBS) ; pwd`"
+elif test $target_os = android ; then
+    qt_inc="-I$(${qmake} -query QT_INSTALL_HEADERS)"
+    qt_libs="-L$(${qmake} -query QT_INSTALL_LIBS)"
 else
     qt_inc="-I${sysroot}/$(${qmake} -query QT_INSTALL_HEADERS)"
     qt_libs="-L${sysroot}/$(${qmake} -query QT_INSTALL_LIBS)"
@@ -6375,7 +6402,9 @@ fi
 # Disable OpenGL ES support if Qt does not support it
 QTGL=$(pkg-config --list-all | grep Qt | grep OpenGL | awk '{print $1}')
 if $(pkg-config --variable=qt_config $QTGL | grep -qv opengles2) ; then
-    disable opengles
+    if test $target_os != android ; then
+        disable opengles
+    fi
 fi
 
 if enabled firewire; then

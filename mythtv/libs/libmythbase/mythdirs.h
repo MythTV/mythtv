@@ -16,6 +16,7 @@
  MBASE_PUBLIC  QString GetTranslationsDir(void);
  MBASE_PUBLIC  QString GetFiltersDir(void);
 
+ MBASE_PUBLIC  QString GetFiltersNameFilter(void);
  MBASE_PUBLIC  QString GetPluginsNameFilter(void);
  MBASE_PUBLIC  QString FindPluginName(const QString &plugname);
  MBASE_PUBLIC  QString GetTranslationsNameFilter(void);
