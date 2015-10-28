@@ -89,7 +89,8 @@ Makefile.app {
 
     QMAKE_CLEAN += $(TARGET)
 
-    unix:QMAKE_POST_LINK=$${QMAKE_STRIP} $(TARGET)
+    # FIXME QMAKE_STRIP is empty sometimes, skip for now
+    # unix:QMAKE_POST_LINK=$${QMAKE_STRIP} $(TARGET)
     
     SOURCES += hdhomerun_config.c
 
