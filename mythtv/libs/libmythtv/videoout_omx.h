@@ -30,6 +30,9 @@ class VideoOutputOMX : public VideoOutput, private OMXComponentCtx
     virtual bool ApproveDeintFilter(const QString&) const;
     virtual bool SetDeinterlacingEnabled(bool interlaced);
     virtual bool SetupDeinterlace(bool interlaced, const QString& ovrf="");
+    virtual bool IsPIPSupported(void) const { return true; }
+    virtual bool IsPBPSupported(void) const { return true; }
+    virtual QRect GetPIPRect(PIPLocation, MythPlayer* = NULL, bool = true) const;
 
     // VideoOutput implementation
     virtual void PrepareFrame(VideoFrame*, FrameScanType, OSD*);

@@ -26,6 +26,10 @@ void VideoOutputNull::GetRenderOptions(render_opts &opts,
         (*opts.safe_renderers)["crystalhd"].append("null");
     if (opts.decoders->contains("vda"))
         (*opts.safe_renderers)["vda"].append("null");
+#ifdef USING_OPENMAX
+    if (opts.decoders->contains("openmax"))
+        (*opts.safe_renderers)["openmax"].append("null");
+#endif
 
     opts.priorities->insert("null", 10);
 }

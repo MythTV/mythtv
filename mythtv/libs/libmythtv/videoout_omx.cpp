@@ -5,6 +5,8 @@
 #include <algorithm> // max/min
 #include <vector>
 
+#include <QTransform>
+
 #include <IL/OMX_Core.h>
 #include <IL/OMX_Video.h>
 #ifdef USING_BROADCOM
@@ -413,6 +415,26 @@ void VideoOutputOMX::Zoom(ZoomDirection direction)
 {
     VideoOutput::Zoom(direction);
     MoveResize();
+}
+
+// virtual
+QRect VideoOutputOMX::GetPIPRect(
+    PIPLocation location, MythPlayer *pipplayer, bool do_pixel_adj) const
+{
+    QRect r = VideoOutput::GetPIPRect(location, pipplayer, do_pixel_adj);
+
+    const QRect display_video_rect     = window.GetDisplayVideoRect();
+    const QRect video_rect             = window.GetVideoRect();
+    const QRect display_visible_rect   = window.GetDisplayVisibleRect();
+
+    // Transform PIP rect from DisplayVisibleRect to VideoRect
+    qreal s = qreal(display_video_rect.width())  / display_visible_rect.width();
+    s      /= qreal(display_video_rect.height()) / display_visible_rect.height();
+    r = QTransform()
+        .scale( (s * video_rect.width())  / display_video_rect.width(),
+                (s * video_rect.height()) / display_video_rect.height() )
+        .mapRect(r);
+    return r;
 }
 
 void VideoOutputOMX::CreatePauseFrame(void)
