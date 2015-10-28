@@ -3857,15 +3857,16 @@ QList<QKeyEvent> TV::ConvertScreenPressKeyMap(const QString &keyList)
     QList<QKeyEvent> keyPressList;
     int i;
     QStringList stringKeyList = keyList.split(',');
-    for(QString s : stringKeyList)
+    QStringList::const_iterator it;
+    for (it = stringKeyList.begin(); it != stringKeyList.end(); ++it)
     {
-        QKeySequence keySequence(s);
+        QKeySequence keySequence(*it);
         for(i = 0; i < keySequence.count(); i++)
         {
             unsigned int keynum = keySequence[i];
-            QKeyEvent keyEvent{QEvent::None, 
+            QKeyEvent keyEvent(QEvent::None, 
                                (int)(keynum & ~Qt::KeyboardModifierMask),
-                               (Qt::KeyboardModifiers)(keynum & Qt::KeyboardModifierMask)};
+                               (Qt::KeyboardModifiers)(keynum & Qt::KeyboardModifierMask));
             keyPressList.append(keyEvent);
         }
     }
@@ -3874,7 +3875,7 @@ QList<QKeyEvent> TV::ConvertScreenPressKeyMap(const QString &keyList)
         // add default remainders
         for(; i < screenPressRegionCount; i++)
         {
-            QKeyEvent keyEvent{QEvent::None, Qt::Key_Escape, Qt::NoModifier};
+            QKeyEvent keyEvent(QEvent::None, Qt::Key_Escape, Qt::NoModifier);
             keyPressList.append(keyEvent);
         }
     }
@@ -3952,26 +3953,27 @@ bool TV::ProcessKeypressOrGesture(PlayerContext *actx, QEvent *e)
 
 #ifdef Q_OS_LINUX
     // Fixups for _some_ linux native codes that QT doesn't know
-    if (e->key() <= 0)
-    {
-        int keycode = 0;
-        switch(e->nativeScanCode())
+    if (dynamic_cast<QKeyEvent*>(e)) {
+        QKeyEvent* eKeyEvent = dynamic_cast<QKeyEvent*>(e);
+        if (eKeyEvent->key() <= 0)
         {
-            case 209: // XF86AudioPause
-                keycode = Qt::Key_MediaPause;
-                break;
-            default:
-              break;
-        }
+            int keycode = 0;
+            switch(eKeyEvent->nativeScanCode())
+            {
+                case 209: // XF86AudioPause
+                    keycode = Qt::Key_MediaPause;
+                    break;
+                default:
+                  break;
+            }
 
-        if (keycode > 0)
-        {
-            QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, keycode,
-                                            e->modifiers());
-            QCoreApplication::postEvent(this, key);
+            if (keycode > 0)
+            {
+                QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, keycode,
+                                                eKeyEvent->modifiers());
+                QCoreApplication::postEvent(this, key);
+            }
         }
-
-        return true;
     }
 #endif
 
