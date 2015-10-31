@@ -58,13 +58,16 @@ static QString to_comma_list(const QStringList &list);
 
 void VideoOutput::GetRenderOptions(render_opts &opts)
 {
+    FilterManager fm;
     QStringList cpudeints;
     cpudeints += "onefield";
     cpudeints += "linearblend";
     cpudeints += "kerneldeint";
     cpudeints += "kerneldoubleprocessdeint";
-    cpudeints += "greedyhdeint";
-    cpudeints += "greedyhdoubleprocessdeint";
+    if (fm.GetFilterInfo("greedyhdeint"))
+        cpudeints += "greedyhdeint";
+    if (fm.GetFilterInfo("greedyhdoubleprocessdeint"))
+        cpudeints += "greedyhdoubleprocessdeint";
     cpudeints += "yadifdeint";
     cpudeints += "yadifdoubleprocessdeint";
     cpudeints += "fieldorderdoubleprocessdeint";
