@@ -24,6 +24,9 @@ MythUIShape::MythUIShape(MythUIType *parent, const QString &name)
     m_type = "box";
     m_fillBrush = QBrush(Qt::NoBrush);
     m_linePen = QPen(Qt::NoPen);
+    // Workaround a feature in Qt 4.8 where a QPen constructed with
+    // style Qt::NoPen returns width = 1;
+    m_linePen.setWidth(0);
     m_cornerRadius = 10;
     m_cropRect = MythRect(0, 0, 0, 0);
 }
