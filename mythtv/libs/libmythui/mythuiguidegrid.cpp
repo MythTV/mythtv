@@ -562,6 +562,25 @@ void MythUIGuideGrid::drawText(MythPainter *p, UIGTCon *data, int alphaMod)
     p->DrawText(area, msg, m_justification, *m_font, alphaMod, area);
 }
 
+QPoint MythUIGuideGrid::GetRowAndColumn(QPoint position)
+{
+    for (int i = 0; i < m_rowCount; i++)
+    {
+        QList<UIGTCon *>::iterator it = m_allData[i].begin();
+
+        for (int col = 0; it != m_allData[i].end(); ++it, ++col)
+        {
+            UIGTCon *data = *it;
+
+            if (data->m_drawArea.contains(position))
+            {
+                return QPoint(col, i);
+            }
+        }
+    }
+    return QPoint(-1,-1);
+}
+
 void MythUIGuideGrid::SetProgramInfo(int row, int col, const QRect &area,
                                      const QString &title, const QString &genre,
                                      int arrow, int recType, int recStat,

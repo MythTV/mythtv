@@ -128,3 +128,29 @@ using_libdns_sd {
     DEFINES += USING_LIBDNS_SD
     using_libcrypto: DEFINES += USING_AIRPLAY
 }
+
+android {
+    QT += androidextras
+
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIBCOMMON)libtag.so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIBCOMMON)libexiv2.13.so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIBCOMMON)libfreetype.so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIBCOMMON)mariadb/libmariadb.so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIBCOMMON)libmythavutil.so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIBCOMMON)libmythpostproc.so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIBCOMMON)libmythswresample.so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIBCOMMON)libmythswscale.so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIBCOMMON)libmythavcodec.so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIBCOMMON)libmythavformat.so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIB)libmythqjson.so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIB)libmythbase-0.28.so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIB)libmythui-0.28.so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIB)libmythservicecontracts-0.28.so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIB)libmythupnp-0.28.so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIB)libmyth-0.28.so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIB)libmythtv-0.28.so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIB)libmythmetadata-0.28.so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIB)libmythprotoserver-0.28.so
+
+    ANDROID_PACKAGE_SOURCE_DIR += $$(MYTHPACKAGEBASE)/android-package-source
+}

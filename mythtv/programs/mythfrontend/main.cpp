@@ -1611,6 +1611,18 @@ int main(int argc, char **argv)
     bool bPromptForBackend    = false;
     bool bBypassAutoDiscovery = false;
 
+#ifdef Q_OS_ANDROID
+    // extra for 0 termination
+    char *newargv[argc+4+1];
+    memset(newargv, 0, sizeof(newargv));
+    memcpy(newargv, argv, sizeof(char*) * argc);
+    //newargv[argc++] = "-v";
+    //newargv[argc++] = "general,gui,playback";
+    //newargv[argc++] = "--loglevel";
+    //newargv[argc++] = "debug";
+    argv = &newargv[0];
+#endif
+
     MythFrontendCommandLineParser cmdline;
     if (!cmdline.Parse(argc, argv))
     {
@@ -1641,6 +1653,9 @@ int main(int argc, char **argv)
     // This makes Xlib calls thread-safe which seems to be required for hardware
     // accelerated Flash playback to work without causing mythfrontend to abort.
     QApplication::setAttribute(Qt::AA_X11InitThreads);
+#endif
+#ifdef Q_OS_ANDROID
+    //QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
 #endif
 #if QT_VERSION >= 0x050300
     QApplication::setSetuidAllowed(true);

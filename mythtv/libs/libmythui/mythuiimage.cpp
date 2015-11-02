@@ -221,6 +221,9 @@ class ImageLoader
                     .arg(w)
                     .arg(h);
         imagelabel.replace('/', '-');
+#ifdef Q_OS_ANDROID
+        imagelabel.replace(':', '-');
+#endif
 
         return imagelabel;
     }

@@ -14,6 +14,10 @@
 #include "screensaver-osx.h"
 #endif
 
+#if ANDROID
+#include "screensaver-android.h"
+#endif
+
 QEvent::Type ScreenSaverEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
@@ -32,7 +36,11 @@ ScreenSaverControl::ScreenSaverControl() :
     tmp = new ScreenSaverOSX();
     m_screenSavers.push_back(tmp);
 #endif
-#if not (defined(USING_DBUS) || defined(USING_X11) || CONFIG_DARWIN)
+#if defined(ANDROID)
+    tmp = new ScreenSaverAndroid();
+    m_screenSavers.push_back(tmp);
+#endif
+#if not (defined(USING_DBUS) || defined(USING_X11) || CONFIG_DARWIN || defined(ANDROID))
     tmp = new ScreenSaverNull();
     m_screenSavers.push_back(tmp);
 #endif

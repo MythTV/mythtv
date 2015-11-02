@@ -474,11 +474,18 @@ void MythRenderOpenGL2::DrawBitmapPriv(uint tex, const QRect *src,
 
     m_glBindBuffer(GL_ARRAY_BUFFER, m_textures[tex].m_vbo);
     UpdateTextureVertices(tex, src, dst);
-    m_glBufferData(GL_ARRAY_BUFFER, kVertexSize, NULL, GL_STREAM_DRAW);
-    void* target = m_glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-    if (target)
-        memcpy(target, m_textures[tex].m_vertex_data, kVertexSize);
-    m_glUnmapBuffer(GL_ARRAY_BUFFER);
+    if (m_exts_used & kGLExtPBufObj)
+    {
+        m_glBufferData(GL_ARRAY_BUFFER, kVertexSize, NULL, GL_STREAM_DRAW);
+        void* target = m_glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+        if (target)
+            memcpy(target, m_textures[tex].m_vertex_data, kVertexSize);
+        m_glUnmapBuffer(GL_ARRAY_BUFFER);
+    }
+    else
+    {
+        m_glBufferData(GL_ARRAY_BUFFER, kVertexSize, m_textures[tex].m_vertex_data, GL_STREAM_DRAW);
+    }
 
     m_glEnableVertexAttribArray(VERTEX_INDEX);
     m_glEnableVertexAttribArray(TEXTURE_INDEX);
@@ -529,11 +536,18 @@ void MythRenderOpenGL2::DrawBitmapPriv(uint *textures, uint texture_count,
 
     m_glBindBuffer(GL_ARRAY_BUFFER, m_textures[first].m_vbo);
     UpdateTextureVertices(first, src, dst);
-    m_glBufferData(GL_ARRAY_BUFFER, kVertexSize, NULL, GL_STREAM_DRAW);
-    void* target = m_glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-    if (target)
-        memcpy(target, m_textures[first].m_vertex_data, kVertexSize);
-    m_glUnmapBuffer(GL_ARRAY_BUFFER);
+    if (m_exts_used & kGLExtPBufObj)
+    {
+        m_glBufferData(GL_ARRAY_BUFFER, kVertexSize, NULL, GL_STREAM_DRAW);
+        void* target = m_glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+        if (target)
+            memcpy(target, m_textures[first].m_vertex_data, kVertexSize);
+        m_glUnmapBuffer(GL_ARRAY_BUFFER);
+    }
+    else
+    {
+        m_glBufferData(GL_ARRAY_BUFFER, kVertexSize, m_textures[first].m_vertex_data, GL_STREAM_DRAW);
+    }
 
     m_glEnableVertexAttribArray(VERTEX_INDEX);
     m_glEnableVertexAttribArray(TEXTURE_INDEX);

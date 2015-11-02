@@ -304,6 +304,8 @@ SOURCES += HLS/m3u.cpp
 using_libcrypto:DEFINES += USING_LIBCRYPTO
 using_libcrypto:LIBS    += -lcrypto
 
+INCLUDEPATH += ../../external/minilzo
+DEPENDPATH += ../../external/minilzo
 
 using_frontend {
     # Recording profile stuff
@@ -576,8 +578,8 @@ using_backend {
     SOURCES += recorders/importrecorder.cpp
 
     # Simple NuppelVideo Recorder
-    INCLUDEPATH += ../../external/minilzo
-    DEPENDPATH += ../../external/minilzo
+    #INCLUDEPATH += ../../external/minilzo
+    #DEPENDPATH += ../../external/minilzo
     using_ffmpeg_threads:DEFINES += USING_FFMPEG_THREADS
     !mingw:!win32-msvc*:HEADERS += recorders/NuppelVideoRecorder.h
     HEADERS += recorders/RTjpegN.h

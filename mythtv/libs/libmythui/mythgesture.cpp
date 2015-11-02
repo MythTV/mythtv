@@ -89,6 +89,10 @@ MythGesture::MythGesture(size_t max_points, size_t min_points,
     p->sequences.insert("98741",MythGestureEvent::LeftThenUp);
     p->sequences.insert("12369",MythGestureEvent::RightThenDown);
     p->sequences.insert("78963",MythGestureEvent::RightThenUp);
+    p->sequences.insert("45654",MythGestureEvent::RightThenLeft);
+    p->sequences.insert("65456",MythGestureEvent::LeftThenRight);
+    p->sequences.insert("85258",MythGestureEvent::UpThenDown);
+    p->sequences.insert("25852",MythGestureEvent::DownThenUp);
 }
 
 MythGesture::~MythGesture()
@@ -348,6 +352,10 @@ static const char *gesturename[] = {
     "LeftThenDown",
     "RightThenUp",
     "RightThenDown",
+    "RightThenLeft",
+    "LeftThenRight",
+    "UpThenDown",
+    "DownThenUp",
     "Click",
     "MaxGesture"
 };

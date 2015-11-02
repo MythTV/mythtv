@@ -424,8 +424,6 @@ class MPUBLIC ProgramInfo
     uint    GetRecordingID(void)              const { return recordedid; }
     RecStatus::Type GetRecordingStatus(void)    const
         { return (RecStatus::Type)recstatus; }
-    RecStatus::Type GetOldRecordingStatus(void) const
-        { return (RecStatus::Type)oldrecstatus; }
     uint    GetPreferedInputID(void)          const { return prefinput; }
     uint    GetRecordingRuleID(void)          const { return recordid;  }
     uint    GetParentRecordingRuleID(void)    const { return parentid;  }
@@ -759,7 +757,6 @@ class MPUBLIC ProgramInfo
     uint16_t parttotal;
 
     int8_t recstatus;
-    int8_t oldrecstatus;
     uint8_t rectype;
     uint8_t dupin;
     uint8_t dupmethod;

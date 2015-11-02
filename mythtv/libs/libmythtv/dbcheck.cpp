@@ -4563,6 +4563,7 @@ NULL
         return false;
 
     GetMythDB()->SetHaveSchema(true);
+
     return true;
 }
 

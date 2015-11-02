@@ -520,6 +520,11 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
 
     // load average ---------------------
 
+#ifdef Q_OS_ANDROID
+    load.setAttribute("avg1", 0);
+    load.setAttribute("avg2", 1);
+    load.setAttribute("avg3", 2);
+#else
     double rgdAverages[3];
 
     if (getloadavg(rgdAverages, 3) != -1)
@@ -528,6 +533,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
         load.setAttribute("avg2", rgdAverages[1]);
         load.setAttribute("avg3", rgdAverages[2]);
     }
+#endif
 
     // Guide Data ---------------------
 

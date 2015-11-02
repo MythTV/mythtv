@@ -14,10 +14,12 @@ unix {
 
     HEADERS += hdhomerun_os_posix.h
     SOURCES += hdhomerun_os_posix.c hdhomerun_sock_posix.c
+    !android {
     LIBS += -lpthread
 
     !macx {
         LIBS += -lrt
+    }
     }
 
 }
@@ -87,7 +89,8 @@ Makefile.app {
 
     QMAKE_CLEAN += $(TARGET)
 
-    unix:QMAKE_POST_LINK=strip $(TARGET)
+    # FIXME QMAKE_STRIP is empty sometimes, skip for now
+    # unix:QMAKE_POST_LINK=$${QMAKE_STRIP} $(TARGET)
     
     SOURCES += hdhomerun_config.c
 

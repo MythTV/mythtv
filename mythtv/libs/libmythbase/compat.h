@@ -383,4 +383,13 @@ static __inline struct tm *localtime_r(const time_t *timep, struct tm *result)
 #    define PREFIX64 "ll"
 #endif
 
+#ifdef ANDROID
+#ifndef S_IREAD
+#define S_IREAD S_IRUSR
+#endif
+#ifndef S_IWRITE
+#define S_IWRITE S_IRUSR
+#endif
+#endif
+
 #endif // __COMPAT_H__

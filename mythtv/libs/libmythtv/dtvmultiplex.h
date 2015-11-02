@@ -17,10 +17,11 @@
 #include "dtvconfparserhelpers.h"
 #include "channelinfo.h"
 #include "iptvtuningdata.h"
+#include "mythtvexp.h"
 
 class MPEGDescriptor;
 
-class DTVMultiplex
+class MTV_PUBLIC DTVMultiplex
 {
   public:
     DTVMultiplex()
@@ -101,7 +102,7 @@ class DTVMultiplex
     IPTVTuningData   iptv_tuning;
 };
 
-class ScanDTVTransport : public DTVMultiplex
+class MTV_PUBLIC ScanDTVTransport : public DTVMultiplex
 {
   public:
     ScanDTVTransport() :

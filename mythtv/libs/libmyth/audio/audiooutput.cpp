@@ -36,6 +36,9 @@ using namespace std;
 #ifdef USING_PULSE
 #include "audiopulsehandler.h"
 #endif
+#ifdef Q_OS_ANDROID
+#include "audiooutputopensles.h"
+#endif
 
 extern "C" {
 #include "libavcodec/avcodec.h"  // to get codec id
@@ -186,6 +189,16 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
 #else
         LOG(VB_GENERAL, LOG_ERR, "Audio output device is set to a Windows "
                                  "device but Windows support is not compiled "
+                                 "in!");
+#endif
+    }
+    else if (main_device.startsWith("OpenSLES:"))
+    {
+#ifdef Q_OS_ANDROID
+        ret = new AudioOutputOpenSLES(settings);
+#else
+        LOG(VB_GENERAL, LOG_ERR, "Audio output device is set to a OpenSLES "
+                                 "device but Android support is not compiled "
                                  "in!");
 #endif
     }
@@ -535,6 +548,20 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
         }
     }
 #endif
+
+#ifdef ANDROID
+    {
+        QString name = "OpenSLES:";
+        QString desc =  tr("OpenSLES default output.");
+        adc = GetAudioDeviceConfig(name, desc);
+        if (adc)
+        {
+            list->append(*adc);
+            delete adc;
+        }
+    }
+#endif
+
     QString name = "NULL";
     QString desc = "NULL device";
     adc = GetAudioDeviceConfig(name, desc);

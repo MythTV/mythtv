@@ -59,6 +59,8 @@ AudioDeviceComboBox::AudioDeviceComboBox(AudioConfigSettings *parent) :
     QString dflt = "CoreAudio:";
 #elif _WIN32
     QString dflt = "Windows:";
+#elif ANDROID
+    QString dflt = "OpenSLES:";
 #else
     QString dflt = "NULL";
 #endif
@@ -1050,6 +1052,9 @@ HostComboBox *AudioMixerSettings::MixerDevice()
 #ifdef _WIN32
     gc->addSelection("DirectX:", "DirectX:");
     gc->addSelection("Windows:", "Windows:");
+#endif
+#ifdef ANDROID
+    gc->addSelection("OpenSLES:", "OpenSLES:");
 #endif
 #if !defined(_WIN32)
     gc->addSelection(tr("software"), "software");

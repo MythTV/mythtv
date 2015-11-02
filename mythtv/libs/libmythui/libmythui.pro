@@ -7,6 +7,7 @@ QT += webkit
 contains(QT_VERSION, ^5\\.[0-9]\\..*) {
 QT += widgets
 QT += webkitwidgets
+android: QT += androidextras
 }
 
 TEMPLATE = lib
@@ -133,6 +134,11 @@ macx {
         !using_lirc: HEADERS += lircevent.h
         !using_lirc: SOURCES += lircevent.cpp
     }
+}
+
+android {
+    HEADERS += screensaver-android.h
+    SOURCES += screensaver-android.cpp
 }
 
 using_joystick_menu {

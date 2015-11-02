@@ -64,6 +64,10 @@ extern "C" {
 // QJson
 #include "qjsonwrapper/Json.h"
 
+#ifdef Q_OS_ANDROID
+#include <android/log.h>
+#endif
+
 static QMutex                  logQueueMutex;
 static QQueue<LoggingItem *>   logQueue;
 static QRegExp                 logRegExp = QRegExp("[%]{1,2}");
@@ -230,7 +234,9 @@ void LoggingItem::setThreadTid(void)
     {
         m_tid = 0;
 
-#if defined(linux)
+#if defined(Q_OS_ANDROID)
+        m_tid = (int64_t)gettid();
+#elif defined(linux)
         m_tid = (int64_t)syscall(SYS_gettid);
 #elif defined(__FreeBSD__)
         long lwpid;
@@ -668,8 +674,12 @@ bool LoggerThread::logConsole(LoggingItem *item)
                   shortname, item->m_message );
     }
 
+#ifdef Q_OS_ANDROID
+    __android_log_print(ANDROID_LOG_INFO, "mfe", line);
+#else
     int result = write( 1, line, strlen(line) );
     (void)result;
+#endif
 
     item->DecrRef();
 
@@ -852,7 +862,7 @@ void logPropagateCalc(void)
         logPropagateArgList << "--enable-dblog";
     }
 
-#ifndef _WIN32
+#if !defined(_WIN32) && !defined(Q_OS_ANDROID)
     if (logPropagateOpts.facility >= 0)
     {
         const CODE *syslogname;
@@ -990,6 +1000,14 @@ int syslogGetFacility(QString facility)
 #ifdef _WIN32
     LOG(VB_GENERAL, LOG_NOTICE,
         "Windows does not support syslog, disabling" );
+    return( -2 );
+#elif defined(Q_OS_ANDROID)
+    LOG(VB_GENERAL, LOG_NOTICE,
+        "Android does not support syslog, disabling" );
+    return( -2 );
+#elif defined(Q_OS_ANDROID)
+    LOG(VB_GENERAL, LOG_NOTICE,
+        "Android does not support syslog, disabling" );
     return( -2 );
 #else
     const CODE *name;

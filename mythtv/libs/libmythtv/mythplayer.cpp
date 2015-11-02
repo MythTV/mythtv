@@ -125,7 +125,10 @@ MythPlayer::MythPlayer(PlayerFlags flags)
     : playerFlags(flags),
       decoder(NULL),                decoder_change_lock(QMutex::Recursive),
       videoOutput(NULL),            player_ctx(NULL),
-      decoderThread(NULL),          playerThread(NULL),
+      decoderThread(NULL),          playerThread(NULL),  
+#ifdef Q_OS_ANDROID
+      playerThreadId(0),
+#endif
       // Window stuff
       parentWidget(NULL), embedding(false), embedRect(QRect()),
       // State
@@ -220,6 +223,9 @@ MythPlayer::MythPlayer(PlayerFlags flags)
     memset(&tc_wrap,    0, sizeof(tc_wrap));
 
     playerThread = QThread::currentThread();
+#ifdef Q_OS_ANDROID
+    playerThreadId = gettid();
+#endif
     // Playback (output) zoom control
     detect_letter_box = new DetectLetterbox(this);
 
@@ -2846,6 +2852,9 @@ bool MythPlayer::StartPlaying(void)
     VideoStart();
 
     playerThread->setPriority(QThread::TimeCriticalPriority);
+#ifdef Q_OS_ANDROID
+    setpriority(PRIO_PROCESS, playerThreadId, -20);
+#endif
     UnpauseDecoder();
     return !IsErrored();
 }
@@ -2866,6 +2875,9 @@ void MythPlayer::StopPlaying()
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("StopPlaying - begin"));
     playerThread->setPriority(QThread::NormalPriority);
+#ifdef Q_OS_ANDROID
+    setpriority(PRIO_PROCESS, playerThreadId, 0);
+#endif
 
     DecoderEnd();
     VideoEnd();

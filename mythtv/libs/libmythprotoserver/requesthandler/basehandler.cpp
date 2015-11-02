@@ -86,7 +86,10 @@ bool BaseRequestHandler::HandleQueryLoad(SocketHandler *sock)
 {
     QStringList strlist;
 
-#ifndef _WIN32
+#ifdef Q_OS_ANDROID
+    strlist << "ERROR";
+    strlist << "getloadavg() not supported in Android";
+#elif !defined(_WIN32)
     double loads[3];
     if (getloadavg(loads,3) == -1)
     {

@@ -30,11 +30,13 @@
 #include <QString>
 #include <QEvent>
 
+#include "mythbaseexp.h"
+
 /**
  * \class MythGestureEvent
  * \brief A custom event that represents a mouse gesture.
  */
-class MythGestureEvent : public QEvent
+class MBASE_PUBLIC MythGestureEvent : public QEvent
 {
   public:
     /**
@@ -64,6 +66,10 @@ class MythGestureEvent : public QEvent
         LeftThenDown,
         RightThenUp,
         RightThenDown,
+        RightThenLeft,
+        LeftThenRight,
+        UpThenDown,
+        DownThenUp,
 
         /* A click */
         Click,

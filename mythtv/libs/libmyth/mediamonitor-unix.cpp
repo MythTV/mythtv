@@ -8,7 +8,9 @@
 #include <dirent.h>
 #include <unistd.h>
 #include <fcntl.h>
+#ifndef ANDROID
 #include <fstab.h>
+#endif
 
 // UNIX System headers
 #include <sys/file.h>
@@ -88,6 +90,7 @@ const char * MediaMonitorUnix::kUDEV_FIFO = "/tmp/mythtv_media";
 
 static const QString LOC = QString("MMUnix:");
 
+#ifndef Q_OS_ANDROID
 // TODO: are these used?
 static void fstabError(const QString &methodName)
 {
@@ -95,6 +98,7 @@ static void fstabError(const QString &methodName)
              LOC + methodName + " Error: failed to open " + _PATH_FSTAB +
              " for reading, " + ENO);
 }
+#endif
 
 static void statError(const QString &methodName, const QString &devPath)
 {
@@ -135,6 +139,7 @@ void MediaMonitorUnix::deleteLater(void)
 // Loop through the file system table and add any supported devices.
 bool MediaMonitorUnix::CheckFileSystemTable(void)
 {
+#ifndef Q_OS_ANDROID
     struct fstab * mep = NULL;
 
     // Attempt to open the file system descriptor entry.
@@ -154,6 +159,9 @@ bool MediaMonitorUnix::CheckFileSystemTable(void)
         return false;
 
     return true;
+#else
+    return false;
+#endif
 }
 
 #if CONFIG_QTDBUS
@@ -611,6 +619,7 @@ bool MediaMonitorUnix::AddDevice(struct fstab * mep)
     if (!mep)
         return false;
 
+#ifndef Q_OS_ANDROID
     QString devicePath( mep->fs_spec );
 #if 0
     LOG(VB_GENERAL, LOG_DEBUG, "AddDevice - " + devicePath);
@@ -695,6 +704,7 @@ bool MediaMonitorUnix::AddDevice(struct fstab * mep)
         }
         pDevice->deleteLater();
     }
+#endif
 
     return false;
 }

@@ -81,7 +81,7 @@ public:
         resize(0);
     }
 
-    void Append(const uchar *b, unsigned long len, unsigned long timecode, int channels, int bits)
+    void Append(const void *b, unsigned long len, unsigned long timecode, int channels, int bits)
     {
         if (m_bits != bits || m_channels != channels)
         {
@@ -151,7 +151,7 @@ protected:
         return ms > 0 ? (ms * m_sample_rate) / 1000 : 0; // NB round down
     }
 
-    void Append(const uchar *b, unsigned long len, int bits)
+    void Append(const void *b, unsigned long len, int bits)
     {
         switch (bits)
         {
@@ -161,9 +161,10 @@ protected:
                 unsigned long cnt = len;
                 int n = size();
                 resize(n + sizeof(int16_t) * cnt);
+                const uchar *s = reinterpret_cast< const uchar* >(b);
                 int16_t *p = reinterpret_cast< int16_t* >(data() + n);
                 while (cnt--)
-                    *p++ = (int16_t(*b++) - CHAR_MAX) << (16 - CHAR_BIT);
+                    *p++ = (int16_t(*s++) - CHAR_MAX) << (16 - CHAR_BIT);
             }
             break;
 
@@ -252,7 +253,7 @@ void AudioOutputGraph::prepare()
 {
 }
 
-void AudioOutputGraph::add(uchar *buf, unsigned long len, unsigned long timecode, int channels, int bits)
+void AudioOutputGraph::add(const void *buf, unsigned long len, unsigned long timecode, int channels, int bits)
 {
     QMutexLocker lock(&m_mutex);
     m_buffer->Append(buf, len, timecode, channels, bits);

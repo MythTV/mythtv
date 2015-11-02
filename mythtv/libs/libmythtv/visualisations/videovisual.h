@@ -49,7 +49,7 @@ class VideoVisual : public MythTV::Visual
                       QPaintDevice* device) = 0;
     virtual QString Name(void) = 0;
 
-    virtual void add(uchar *b, unsigned long b_len, unsigned long w, int c, int p);
+    virtual void add(const void *b, unsigned long b_len, unsigned long w, int c, int p);
     virtual void prepare();
 
   protected:
