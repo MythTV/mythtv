@@ -1902,11 +1902,21 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
         osdLock.lock();
         videoOutput->PrepareFrame(buffer, ps, osd);
         osdLock.unlock();
-        LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO,
-            LOC + QString("AVSync waitforframe %1 %2")
-                .arg(avsync_adjustment).arg(m_double_framerate));
-        vsync_delay_clock = videosync->WaitForFrame
-                            (frameDelay + avsync_adjustment + repeat_delay);
+        // Don't wait for sync if this is a secondary PBP otherwise
+        // the primary PBP will become out of sync
+        if (!player_ctx->IsPBP() || player_ctx->IsPrimaryPBP())
+        {
+            LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO,
+                LOC + QString("AVSync waitforframe %1 %2")
+                    .arg(avsync_adjustment).arg(m_double_framerate));
+            vsync_delay_clock = videosync->WaitForFrame
+                                (frameDelay + avsync_adjustment + repeat_delay);
+        }
+        else
+        {
+            vsync_delay_clock = 0;
+            lastsync = true;
+        }
         //currentaudiotime = AVSyncGetAudiotime();
         LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC + "AVSync show");
         videoOutput->Show(ps);
@@ -1936,7 +1946,8 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
             videoOutput->PrepareFrame(buffer, ps, osd);
             osdLock.unlock();
             // Display the second field
-            vsync_delay_clock = videosync->WaitForFrame(frameDelay +
+            if (!player_ctx->IsPBP() || player_ctx->IsPrimaryPBP())
+                vsync_delay_clock = videosync->WaitForFrame(frameDelay +
                                                         avsync_adjustment);
             videoOutput->Show(ps);
         }
@@ -2434,7 +2445,17 @@ bool MythPlayer::VideoLoop(void)
 {
     if (videoPaused || isDummy)
     {
-        usleep(frame_interval);
+        switch (player_ctx->GetPIPState())
+        {
+          case kPIPonTV:
+          case kPBPRight:
+            break;
+          case kPIPOff:
+          case kPIPStandAlone:
+          case kPBPLeft:  // PrimaryBPB
+            usleep(frame_interval);
+            break;
+        }
         DisplayPauseFrame();
     }
     else
