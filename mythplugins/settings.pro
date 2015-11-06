@@ -1,4 +1,6 @@
 CONFIG += $$CCONFIG
+# enable C++11 support, QT5.7 will be based on C++11 anyway
+CONFIG += c++11
 
 LIBVERSION = 0.28
 
