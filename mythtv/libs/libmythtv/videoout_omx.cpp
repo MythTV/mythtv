@@ -11,7 +11,28 @@
 #include <IL/OMX_Video.h>
 #ifdef USING_BROADCOM
 #include <IL/OMX_Broadcom.h>
+#include <bcm_host.h>
 #endif
+
+#ifdef USING_OPENGLES
+#define OSD_EGL // OSD with EGL
+#endif
+
+#ifdef OSD_EGL
+#include <EGL/egl.h>
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(5, 4, 0)
+#include <QtPlatformHeaders/QEGLNativeContext>
+#endif
+#endif
+
+// MythTV
+#ifdef OSD_EGL
+# define LOC QString("EGL: ")
+# include "mythrender_opengl2es.h"
+# undef LOC
+# include "mythpainter_ogl.h"
+#endif //def OSD_EGL
 
 #include "filtermanager.h"
 #include "videodisplayprofile.h"
@@ -39,6 +60,45 @@ using namespace omxcontext;
 /*
  * Types
  */
+#ifdef OSD_EGL
+typedef MythRenderOpenGL2ES MythRenderBase;
+
+class MythRenderEGL : public MythRenderBase
+{
+    // No copying
+    MythRenderEGL(MythRenderEGL&);
+    MythRenderEGL& operator =(MythRenderEGL &rhs);
+
+  public:
+    MythRenderEGL();
+
+    virtual void makeCurrent();
+    virtual void doneCurrent();
+#ifdef USE_OPENGL_QT5
+    virtual void swapBuffers();
+#else
+    virtual void swapBuffers() const;
+    virtual bool create(const QGLContext * = 0) { return isValid(); }
+#endif
+
+  protected:
+    virtual ~MythRenderEGL(); // Use MythRenderBase::DecrRef to delete
+
+    EGLNativeWindowType createNativeWindow();
+    void destroyNativeWindow();
+
+    EGLDisplay m_display;
+    EGLContext m_context;
+    EGLNativeWindowType m_window;
+    EGLSurface m_surface;
+
+#ifdef USING_BROADCOM
+private:
+    EGL_DISPMANX_WINDOW_T gNativewindow;
+    DISPMANX_DISPLAY_HANDLE_T m_dispman_display;
+#endif
+};
+#endif //def OSD_EGL
 
 
 /*
@@ -56,7 +116,6 @@ QString const VideoOutputOMX::kName ="openmax";
 /*
  * Functions
  */
-
 // static
 void VideoOutputOMX::GetRenderOptions(render_opts &opts,
                                       QStringList &cpudeints)
@@ -68,6 +127,9 @@ void VideoOutputOMX::GetRenderOptions(render_opts &opts,
     (*opts.deints)[kName].append(kName + "advanced");
     (*opts.deints)[kName].append(kName + "fast");
     (*opts.deints)[kName].append(kName + "linedouble");
+#endif
+#ifdef OSD_EGL
+    (*opts.osds)[kName].append("opengl2");
 #endif
     (*opts.osds)[kName].append("softblend");
 
@@ -95,9 +157,13 @@ QStringList VideoOutputOMX::GetAllowedRenderers(
 }
 
 VideoOutputOMX::VideoOutputOMX() : m_render("video_render", *this),
-    m_imagefx("image_fx", *this)
+    m_imagefx("image_fx", *this),
+    m_context(0), m_osdpainter(0)
 {
     init(&av_pause_frame, FMT_YV12, NULL, 0, 0, 0);
+
+    if (gCoreContext->GetNumSetting("UseVideoModes", 0))
+        display_res = DisplayRes::GetDisplayRes(true);
 
     if (OMX_ErrorNone != m_render.Init(OMX_IndexParamVideoInit))
         return;
@@ -135,6 +201,12 @@ VideoOutputOMX::~VideoOutputOMX()
     m_render.Shutdown();
 
     DeleteBuffers();
+
+#ifdef OSD_EGL
+    delete m_osdpainter, m_osdpainter = 0;
+    if (m_context)
+        m_context->DecrRef(), m_context = 0;
+#endif
 }
 
 // virtual
@@ -210,6 +282,27 @@ bool VideoOutputOMX::Init(          // Return true if successful
     // Allocate video buffers
     if (!CreateBuffers(video_dim_buf, video_dim_disp, winid))
         return false;
+
+#ifdef OSD_EGL
+    if (GetOSDRenderer() == "opengl2")
+    {
+        MythRenderEGL *render = new MythRenderEGL();
+        if (render->create())
+        {
+            render->Init();
+            m_context = render;
+            MythOpenGLPainter *p = new MythOpenGLPainter(m_context);
+            p->SetSwapControl(false);
+            m_osdpainter = p;
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + __func__ +
+                " failed to create MythRenderEGL");
+            render->DecrRef();
+        }
+    }
+#endif
 
     m_disp_rect = m_vid_rect = QRect();
     if (!SetVideoRect(window.GetDisplayVideoRect(), window.GetVideoRect()))
@@ -434,6 +527,8 @@ QRect VideoOutputOMX::GetPIPRect(
         .scale( (s * video_rect.width())  / display_video_rect.width(),
                 (s * video_rect.height()) / display_video_rect.height() )
         .mapRect(r);
+
+    r.setRect(r.x() & ~1, r.y() & ~1, r.width() & ~1, r.height() & ~1);
     return r;
 }
 
@@ -544,7 +639,9 @@ void VideoOutputOMX::PrepareFrame(VideoFrame *buffer, FrameScanType scan, OSD *o
 
     framesPlayed = buffer->frameNumber + 1;
 
-    SetVideoRect(window.GetDisplayVideoRect(), window.GetVideoRect() );
+    SetVideoRect( (hasFullScreenOSD() && vsz_enabled) ?
+            vsz_desired_display_rect : window.GetDisplayVideoRect(),
+        window.GetVideoRect() );
 }
 
 // BLT the last prepared frame to the screen as quickly as possible.
@@ -594,17 +691,107 @@ void VideoOutputOMX::Show(FrameScanType scan)
     }
 }
 
-// virtual
+// pure virtual
 void VideoOutputOMX::MoveResizeWindow(QRect r)
 {
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + __func__ + QString(" rect=%1,%2,%3x%4")
         .arg(r.x()).arg(r.y()).arg(r.width()).arg(r.height()) );
+
+    if (!hasFullScreenOSD())
+        return;
+
+// TODO...
+}
+
+// virtual
+bool VideoOutputOMX::hasFullScreenOSD(void) const
+{
+#ifdef OSD_EGL
+    if (m_context && m_osdpainter)
+        return true;
+#endif
+    return VideoOutput::hasFullScreenOSD();
+}
+
+// virtual
+MythPainter *VideoOutputOMX::GetOSDPainter(void)
+{
+    return m_osdpainter ? m_osdpainter : VideoOutput::GetOSDPainter();
+}
+
+// virtual
+bool VideoOutputOMX::DisplayOSD(VideoFrame *frame, OSD *osd)
+{
+#ifdef OSD_EGL
+    if (m_context && m_osdpainter)
+    {
+        m_context->makeCurrent();
+
+        m_context->BindFramebuffer(0);
+
+        QRect bounds = GetTotalOSDBounds();
+        bool redraw = false;
+        if (m_visual)
+        {
+            m_visual->Draw(bounds, m_osdpainter, NULL);
+            redraw = true;
+        }
+
+        if (osd)
+            redraw |= osd->DrawDirect(m_osdpainter, bounds.size(), redraw);
+
+        if (redraw)
+        {
+            m_context->swapBuffers();
+            m_context->SetBackground(0, 0, 0, 0);
+            m_context->ClearFramebuffer();
+        }
+
+        m_context->doneCurrent();
+        return true;
+    }
+#endif
+    return VideoOutput::DisplayOSD(frame, osd);
 }
 
 // virtual
 void VideoOutputOMX::DrawUnusedRects(bool sync)
 {
     (void)sync;
+}
+
+// virtual
+bool VideoOutputOMX::CanVisualise(AudioPlayer *audio, MythRender *render)
+{
+#ifdef OSD_EGL
+    return VideoOutput::CanVisualise(audio, m_context ? m_context : render);
+#else
+    return VideoOutput::CanVisualise(audio, render);
+#endif
+}
+
+// virtual
+bool VideoOutputOMX::SetupVisualisation(AudioPlayer *audio, MythRender *render,
+                                        const QString &name)
+{
+#ifdef OSD_EGL
+    return VideoOutput::SetupVisualisation(audio,
+        m_context ? m_context : render, name);
+#else
+    return VideoOutput::SetupVisualisation(audio, render, name);
+#endif
+}
+
+// virtual
+QStringList VideoOutputOMX::GetVisualiserList(void)
+{
+#ifdef OSD_EGL
+    return m_context ?
+        VideoVisual::GetVisualiserList(m_context->Type()) :
+        VideoOutput::GetVisualiserList();
+#else
+    return VideoOutput::GetVisualiserList();
+#endif
 }
 
 bool VideoOutputOMX::CreateBuffers(
@@ -812,6 +999,11 @@ bool VideoOutputOMX::SetVideoRect(const QRect &disp_rect, const QRect &vid_rect)
     }
 #endif // USING_BROADCOM
 
+#ifdef OSD_EGL
+    if (m_context)
+        m_context->SetViewPort(window.GetDisplayVisibleRect());
+#endif
+
     m_disp_rect = disp_rect;
     m_vid_rect = vid_rect;
 
@@ -917,4 +1109,250 @@ OMX_ERRORTYPE VideoOutputOMX::FreeBuffersCB()
     }
     return OMX_ErrorNone;
 }
+
+#ifdef OSD_EGL
+MythRenderEGL::MythRenderEGL() :
+    MythRenderBase(MythRenderFormat()),
+    m_display(EGL_NO_DISPLAY),
+    m_context(EGL_NO_CONTEXT),
+    m_window(0),
+    m_surface(EGL_NO_SURFACE)
+{
+    // get an EGL display connection
+    m_display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+    if (m_display == EGL_NO_DISPLAY)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "eglGetDisplay => EGL_NO_DISPLAY");
+        return;
+    }
+
+    // initialize the EGL display connection
+    EGLint major, minor;
+    EGLBoolean b = eglInitialize(m_display, &major, &minor);
+    if (!b)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "eglInitialize failed");
+        return;
+    }
+    LOG(VB_PLAYBACK, LOG_INFO, QString("EGL runtime version %1.%2")
+        .arg(major).arg(minor));
+
+    // get an appropriate EGL frame buffer configuration
+    static EGLint const attribute_list[] = {
+        EGL_RED_SIZE, 8,
+        EGL_GREEN_SIZE, 8,
+        EGL_BLUE_SIZE, 8,
+        EGL_ALPHA_SIZE, 8,
+        EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
+        EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT, // ES2 required for GLSL
+        EGL_NONE
+    };
+    EGLConfig config;
+    EGLint num_config;
+    b = eglChooseConfig(m_display, attribute_list, &config, 1, &num_config);
+    if (!b)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "eglChooseConfig failed");
+        return;
+    }
+
+    // create an EGL rendering context
+    static EGLint const ctx_attribute_list[] = {
+        EGL_CONTEXT_CLIENT_VERSION, 2, // ES2 required for GLSL
+        EGL_NONE
+    };
+    m_context = eglCreateContext(m_display, config, EGL_NO_CONTEXT, ctx_attribute_list);
+    if (m_context == EGL_NO_CONTEXT)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "eglCreateContext failed");
+        return;
+    }
+
+#ifdef USE_OPENGL_QT5
+    QVariant v;
+    v.setValue(QEGLNativeContext(m_context, m_display));
+    setNativeHandle(v);
+#endif
+
+    m_window = createNativeWindow();
+
+    m_surface = eglCreateWindowSurface(m_display, config, m_window, NULL);
+    if (m_context == EGL_NO_SURFACE)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "eglCreateWindowSurface failed");
+        return;
+    }
+
+    // connect the context to the surface
+    b = eglMakeCurrent(m_display, m_surface, m_surface, m_context);
+    if (!b)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "eglMakeCurrent failed");
+        return;
+    }
+
+    // clear the color buffer
+    glClearColor(0, 0, 0, 0); // RGBA
+    glClear(GL_COLOR_BUFFER_BIT);
+    glFlush();
+    b = eglSwapBuffers(m_display, m_surface);
+    if (!b)
+        LOG(VB_GENERAL, LOG_ERR, "eglSwapBuffers failed");
+
+    b = eglMakeCurrent(m_display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+    if (!b)
+        LOG(VB_GENERAL, LOG_ERR, "eglMakeCurrent EGL_NO_SURFACE failed");
+
+#ifndef USE_OPENGL_QT5
+    setValid(true);
+#endif
+}
+
+MythRenderEGL::~MythRenderEGL()
+{
+#ifndef USE_OPENGL_QT5
+    setValid(false);
+#endif
+
+    if (m_display == EGL_NO_DISPLAY)
+        return;
+
+    EGLBoolean b;
+    if (m_context != EGL_NO_CONTEXT)
+    {
+        b = eglMakeCurrent(m_display, m_surface, m_surface, m_context);
+        assert(b == EGL_TRUE);
+    }
+
+    if (m_surface != EGL_NO_SURFACE)
+    {
+        b = eglDestroySurface(m_display, m_surface);
+        assert(b == EGL_TRUE);
+        m_surface = EGL_NO_SURFACE;
+    }
+
+    destroyNativeWindow();
+
+    if (m_context != EGL_NO_CONTEXT)
+    {
+        b = eglDestroyContext(m_display, m_context);
+        assert(b == EGL_TRUE);
+        m_context = EGL_NO_CONTEXT;
+    }
+
+#if 0 // This causes Qt to throw a segv
+    b = eglTerminate(m_display);
+    assert(b == EGL_TRUE);
+#endif
+    m_display = EGL_NO_DISPLAY;
+}
+
+EGLNativeWindowType MythRenderEGL::createNativeWindow()
+{
+#ifdef USING_BROADCOM
+    uint32_t width = 0, height = 0;
+    int32_t ret = graphics_get_display_size(DISPMANX_ID_MAIN_LCD, &width, &height);
+    assert(ret >= 0);
+
+    m_dispman_display = vc_dispmanx_display_open(DISPMANX_ID_MAIN_LCD);
+    assert(m_dispman_display != DISPMANX_NO_HANDLE);
+
+    DISPMANX_UPDATE_HANDLE_T update = vc_dispmanx_update_start(0);
+    assert(update != DISPMANX_NO_HANDLE);
+
+    VC_RECT_T dst_rect;
+    dst_rect.x = 0;
+    dst_rect.y = 0;
+    dst_rect.width = width;
+    dst_rect.height = height;
+
+    VC_RECT_T src_rect;
+    src_rect.x = 0;
+    src_rect.y = 0;
+    src_rect.width = width << 16;
+    src_rect.height = height << 16;
+
+    VC_DISPMANX_ALPHA_T alpha = {
+        DISPMANX_FLAGS_ALPHA_T(
+            DISPMANX_FLAGS_ALPHA_FROM_SOURCE |
+            (0&DISPMANX_FLAGS_ALPHA_FIXED_ALL_PIXELS) |
+            (0&DISPMANX_FLAGS_ALPHA_FIXED_NON_ZERO) |
+            (0&DISPMANX_FLAGS_ALPHA_FIXED_EXCEED_0X07) |
+            (~0&DISPMANX_FLAGS_ALPHA_PREMULT) |
+            (0&DISPMANX_FLAGS_ALPHA_MIX)
+        ),  // flags
+        0,  // opacity(alpha) 0->255
+        0   // DISPMANX_RESOURCE_HANDLE_T mask
+    };
+
+    DISPMANX_ELEMENT_HANDLE_T dispman_element = vc_dispmanx_element_add(
+        update, m_dispman_display, 3/*layer*/, &dst_rect,
+        DISPMANX_RESOURCE_HANDLE_T(0) /*src*/, &src_rect,
+        DISPMANX_PROTECTION_NONE, &alpha, NULL /*clamp*/, DISPMANX_NO_ROTATE);
+    assert(dispman_element != DISPMANX_NO_HANDLE);
+
+    gNativewindow.element = dispman_element;
+    gNativewindow.width = width;
+    gNativewindow.height = height;
+
+    vc_dispmanx_update_submit_sync(update);
+    return &gNativewindow;
+#else
+    return 0;
+#endif
+}
+
+void MythRenderEGL::destroyNativeWindow()
+{
+#ifdef USING_BROADCOM
+    if (m_dispman_display != DISPMANX_NO_HANDLE)
+    {
+        int ret;
+        if (DISPMANX_NO_HANDLE != gNativewindow.element)
+        {
+            DISPMANX_UPDATE_HANDLE_T update = vc_dispmanx_update_start(0);
+            assert(update != DISPMANX_NO_HANDLE);
+
+            ret = vc_dispmanx_element_remove(update, gNativewindow.element);
+            assert(ret >= 0);
+
+            ret = vc_dispmanx_update_submit_sync(update);
+            assert(ret >= 0);
+
+            gNativewindow.element = DISPMANX_NO_HANDLE;
+        }
+
+        ret = vc_dispmanx_display_close(m_dispman_display);
+        assert(ret >= 0);
+        m_dispman_display = DISPMANX_NO_HANDLE;
+    }
+#endif //def USING_BROADCOM
+}
+
+// virtual
+void MythRenderEGL::makeCurrent()
+{
+    assert(m_lock_level >= 0);
+    if (++m_lock_level == 1)
+        eglMakeCurrent(m_display, m_surface, m_surface, m_context);
+}
+
+// virtual
+void MythRenderEGL::doneCurrent()
+{
+    assert(m_lock_level > 0);
+    if (--m_lock_level == 0)
+        eglMakeCurrent(m_display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+}
+
+// virtual
+#ifdef USE_OPENGL_QT5
+void MythRenderEGL::swapBuffers()
+#else
+void MythRenderEGL::swapBuffers() const
+#endif
+{
+    eglSwapBuffers(m_display, m_surface);
+}
+#endif //def OSD_EGL
 // EOF

@@ -11,6 +11,8 @@
 #include "videooutbase.h"
 #include "omxcontext.h"
 
+class MythRenderEGL;
+
 class VideoOutputOMX : public VideoOutput, private OMXComponentCtx
 {
   public:
@@ -33,6 +35,7 @@ class VideoOutputOMX : public VideoOutput, private OMXComponentCtx
     virtual bool IsPIPSupported(void) const { return true; }
     virtual bool IsPBPSupported(void) const { return true; }
     virtual QRect GetPIPRect(PIPLocation, MythPlayer* = NULL, bool = true) const;
+    virtual MythPainter *GetOSDPainter(void);
 
     // VideoOutput implementation
     virtual void PrepareFrame(VideoFrame*, FrameScanType, OSD*);
@@ -41,6 +44,14 @@ class VideoOutputOMX : public VideoOutput, private OMXComponentCtx
     virtual void MoveResizeWindow(QRect);
     virtual void DrawUnusedRects(bool);
     virtual void UpdatePauseFrame(int64_t &);
+
+  protected:
+    // VideoOutput overrides
+    virtual bool hasFullScreenOSD(void) const;
+    virtual bool DisplayOSD(VideoFrame *frame, OSD *osd);
+    virtual bool CanVisualise(AudioPlayer*, MythRender*);
+    virtual bool SetupVisualisation(AudioPlayer*, MythRender*, const QString&);
+    virtual QStringList GetVisualiserList(void);
 
   private:
     // OMXComponentCtx implementation
@@ -64,6 +75,8 @@ class VideoOutputOMX : public VideoOutput, private OMXComponentCtx
     VideoFrame av_pause_frame;
     QRect m_disp_rect, m_vid_rect;
     QVector<void*> m_bufs;
+    MythRenderEGL *m_context;
+    MythPainter *m_osdpainter;
 };
 
 #endif // ndef VIDEOOUT_OMX_H

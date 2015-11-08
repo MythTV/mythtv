@@ -133,7 +133,7 @@ class MUI_PUBLIC MythRenderOpenGL : protected MythRenderContext, public MythRend
 
     using MythRenderContext::create;
 #ifdef USE_OPENGL_QT5
-    void swapBuffers();
+    virtual void swapBuffers();
     void setWidget(QWidget *w);
 #else
     using MythRenderContext::swapBuffers;
