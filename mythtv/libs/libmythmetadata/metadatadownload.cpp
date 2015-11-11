@@ -540,15 +540,35 @@ MetadataLookupList MetadataDownload::handleMovie(MetadataLookup *lookup)
 /**
  * handleTelevision
  * attempt to find television data via the following (in order)
- * 1- By inetref with subtitle
- * 2- By inetref with season and episode
- * 3- By inetref
- * 4- By title and subtitle
- * 5- By title
+ * 1- Local MXML
+ * 2- Local NFO
+ * 3- By inetref with subtitle
+ * 4- By inetref with season and episode
+ * 5- By inetref
+ * 6- By title and subtitle
+ * 7- By title
  */
 MetadataLookupList MetadataDownload::handleTelevision(MetadataLookup *lookup)
 {
     MetadataLookupList list;
+
+    QString mxml;
+    QString nfo;
+
+    if (!lookup->GetFilename().isEmpty())
+    {
+        mxml = getMXMLPath(lookup->GetFilename());
+        nfo = getNFOPath(lookup->GetFilename());
+    }
+
+    if (!mxml.isEmpty())
+        list = readMXML(mxml, lookup);
+    else if (!nfo.isEmpty())
+        list = readNFO(nfo, lookup);
+
+    if (!list.isEmpty())
+        return list;
+
     MetaGrabberScript grabber =
         MetaGrabberScript::GetGrabber(kGrabberTelevision, lookup);
     bool searchcollection = false;
