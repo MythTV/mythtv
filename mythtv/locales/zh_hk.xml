@@ -17,10 +17,10 @@
 
   <!-- Per-host Settings -->
     <!-- Languages - Self Explanatory -->
-    <setting name="Language" global="true">zh_HK</setting>
+    <setting name="Language" global="true">zh_HK</setting> <!-- translation to load -->
 
     <!-- Country -->
-    <setting name="Country" global="true">HK</setting>
+    <setting name="Country" global="true">gb</setting> <!-- Should set the 'Country' under 'Scan configuration' (for digital tv frequency table) to 'United Kingdom' -->
 
     <!-- Date/Time format -->
     <setting name="DateFormat">dddd yyyy年M月d日</setting>
@@ -28,7 +28,7 @@
     <setting name="ShortDateFormat">M月d日</setting>
 
     <!-- Playback -->
-    <setting name="EnableMHEG">1</setting> <!-- Should enable TVB's interactive TV feature -->
+    <setting name="EnableMHEG">1</setting> <!-- Enable TVB's interactive TV feature -->
 
   <!-- Plugins -->
     <!-- MythArchive -->
