@@ -273,7 +273,7 @@ class TestMythSystem: public QObject
     void getexitcode_returns_neg_1_when_signal_seen(void)
     {
         QScopedPointer<MythSystem> cmd(
-            MythSystem::Create("sleep 0.5", kMSRunShell));
+            MythSystem::Create("sleep 5", kMSRunShell));
         usleep(50 * 1000);
         cmd->Signal(kSignalQuit);
         cmd->Wait();
