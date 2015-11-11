@@ -291,7 +291,7 @@ void MONITOR::initMonitor(bool debug, string mmapPath, int shmKey)
         // using the legacy shared memory support
         if (debug)
         {
-            cout << "Failed to open mmap file [" << mmap_filename << "] "
+            cout << "Failed to open mmap file [" << mmap_filename.str() << "] "
                  << "for monitor: " << mon_id
                  << " : " << strerror(errno) << endl;
             cout << "Falling back to the legacy shared memory method" << endl;
