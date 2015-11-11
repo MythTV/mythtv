@@ -272,7 +272,7 @@ void MONITOR::initMonitor(bool debug, string mmapPath, int shmKey)
         if (shm_ptr == MAP_FAILED)
         {
             cout << "Failed to map shared memory from file ["
-                 << mmap_filename << "] " << "for monitor: "
+                 << mmap_filename.str() << "] " << "for monitor: "
                  << mon_id << endl;
             status = "Error";
 
