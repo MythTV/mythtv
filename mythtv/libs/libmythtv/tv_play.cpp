@@ -12063,8 +12063,8 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
         {
             uint max_cnt = min(kMaxPBPCount, kMaxPIPCount+1);
             if (player.size() <= max_cnt &&
-                !(m_tvm_hasPIP && !m_tvm_allowPBP) &&
-                !(m_tvm_hasPBP && !m_tvm_allowPIP))
+                ((m_tvm_hasPIP && m_tvm_allowPBP) ||
+                    (m_tvm_hasPBP && m_tvm_allowPIP)) )
             {
                 active = !m_tvm_hasPBP;
                 BUTTON2(actionName, tr("Switch to PBP"), tr("Switch to PIP"));
