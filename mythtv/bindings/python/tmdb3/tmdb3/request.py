@@ -16,6 +16,7 @@ from urllib import urlencode
 import urllib2
 import json
 import os
+import time
 
 DEBUG = False
 cache = Cache(filename='pytmdb3.cache')
@@ -113,21 +114,32 @@ class Request(urllib2.Request):
     def readJSON(self):
         """Parse result from specified URL as JSON data."""
         url = self.get_full_url()
-        try:
-            # catch HTTP error from open()
-            data = json.load(self.open())
-        except TMDBHTTPError, e:
+        tries = 0
+        while tries < 100:
             try:
-                # try to load whatever was returned
-                data = json.loads(e.response)
-            except:
-                # cannot parse json, just raise existing error
+                # catch HTTP error from open()
+                data = json.load(self.open())
+                break
+            except TMDBHTTPError, e:
+                try:
+                    # try to load whatever was returned
+                    data = json.loads(e.response)
+                except:
+                    # cannot parse json, just raise existing error
+                    raise e
+                else:
+                    # Check for error code of 25 which means we are doing more than 40 requests per 10 seconds
+                    if data.get('status_code', 1) ==25:
+                        # Sleep and retry query.
+                        if DEBUG:
+                            print 'Retry after {0} seconds'.format(max(float(e.headers['retry-after']),10))
+                        time.sleep(max(float(e.headers['retry-after']),10))
+                        continue
+                    else:
+                        # response parsed, try to raise error from TMDB
+                        handle_status(data, url)
+                # no error from TMDB, just raise existing error
                 raise e
-            else:
-                # response parsed, try to raise error from TMDB
-                handle_status(data, url)
-            # no error from TMDB, just raise existing error
-            raise e
         handle_status(data, url)
         if DEBUG:
             import pprint
