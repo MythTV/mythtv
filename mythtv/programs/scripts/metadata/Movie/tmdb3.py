@@ -63,22 +63,26 @@ def buildSingle(inetref, opts):
 
     releases = movie.releases.items()
 
-    if opts.country:
-        try:
-            # resort releases with selected country at top to ensure it
-            # is selected by the metadata libraries
-            index = zip(*releases)[0].index(opts.country)
-            releases.insert(0, releases.pop(index))
-        except IndexError, ValueError:
-            pass
-        else:
-            m.releasedate = releases[0][1].releasedate
+# get the release date for the wanted country
+# TODO if that is not part of the reply use the primary release date (Primary=true)
+# if that is not part of the reply use whatever release date is first in list
+# if there is not a single release date in the reply, then leave it empty
+    if len(releases) > 0:
+        if opts.country:
+            # resort releases with selected country at top to ensure it 
+            # is selected by the metadata libraries 
+            r = zip(*releases) 
+            if opts.country in r[0]: 
+                index = r[0].index(opts.country) 
+                releases.insert(0, releases.pop(index)) 
+
+        m.releasedate = releases[0][1].releasedate 
 
     m.inetref = str(movie.id)
     if movie.collection:
         m.collectionref = str(movie.collection.id)
-    if movie.releasedate:
-        m.year = movie.releasedate.year
+    if m.releasedate:
+        m.year = m.releasedate.year
     for country, release in releases:
         if release.certification:
             m.certifications[country] = release.certification
