@@ -2,6 +2,7 @@
 #include <QReadWriteLock>
 #include <QWriteLocker>
 #include <QReadLocker>
+#include <QTcpSocket>
 
 #include "mythcorecontext.h"
 #include "mythlogging.h"
