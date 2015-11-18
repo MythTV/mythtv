@@ -3384,7 +3384,7 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
 
         bool res_changed = ((width  != (uint)current_width) ||
                             (height != (uint)current_height));
-        bool fps_changed = (seqFPS > fps+0.01f) || (seqFPS < fps-0.01f);
+        bool fps_changed = seqFPS > 0.0 && ((seqFPS > fps + 0.01f) || (seqFPS < fps - 0.01f));
 
         if (fps_changed || res_changed)
         {
@@ -3392,7 +3392,9 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
 
             current_width  = width;
             current_height = height;
-            fps            = seqFPS;
+
+            if (seqFPS > 0.0)
+                fps = seqFPS;
 
             gopset = false;
             prevgoppos = 0;
