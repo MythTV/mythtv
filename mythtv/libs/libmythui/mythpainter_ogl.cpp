@@ -76,6 +76,9 @@ void MythOpenGLPainter::Begin(QPaintDevice *parent)
 {
     MythPainter::Begin(parent);
 
+    if (!realParent)
+        realParent = dynamic_cast<QWidget *>(parent);
+
     if (!realRender)
     {
         QGLWidget *glw = dynamic_cast<QGLWidget *>(realParent);
@@ -104,7 +107,8 @@ void MythOpenGLPainter::Begin(QPaintDevice *parent)
     if (target || swapControl)
     {
         realRender->BindFramebuffer(target);
-        realRender->SetViewPort(QRect(0, 0, realParent->width(), realParent->height()));
+        if (realParent)
+            realRender->SetViewPort(QRect(0, 0, realParent->width(), realParent->height()));
         realRender->SetColor(255, 255, 255, 255);
         realRender->SetBackground(0, 0, 0, 0);
         realRender->ClearFramebuffer();
