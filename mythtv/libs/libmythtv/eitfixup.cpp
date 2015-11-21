@@ -137,7 +137,7 @@ EITFixUp::EITFixUp()
       m_RTLEpisodeNo2("^(\\d{1,2}\\/[IVX]+)\\.*\\s*"),
       m_fiRerun("\\ ?Uusinta[a-zA-Z\\ ]*\\.?"),
       m_fiRerun2("\\([Uu]\\)"),
-      m_dePremiereInfos("([^.]+)?\\s?([0-9]{4})\\.\\s[0-9]+\\sMin\\.(?:\\sVon"
+      m_dePremiereInfos("\\s*[0-9]+\\sMin\\.([^.]+)?\\s?([0-9]{4})\\.(?:\\sVon"
                         "\\s([^,]+)(?:,|\\su\\.\\sa\\.)\\smit\\s(.+)\\.)?"),
       m_dePremiereOTitle("\\s*\\(([^\\)]*)\\)$"),
       m_deSkyDescriptionSeasonEpisode("^(\\d{1,2}).\\sStaffel,\\sFolge\\s(\\d{1,2}):\\s"),
@@ -1808,9 +1808,9 @@ void EITFixUp::FixPremiere(DBEventEIT &event) const
     QRegExp tmpInfos =  m_dePremiereInfos;
     if (tmpInfos.indexIn(event.description) != -1)
     {
-        country = tmpInfos.cap(1).trimmed();
+        country = tmpInfos.cap(2).trimmed();
         bool ok;
-        uint y = tmpInfos.cap(2).toUInt(&ok);
+        uint y = tmpInfos.cap(1).toUInt(&ok);
         if (ok)
             event.airdate = y;
         event.AddPerson(DBPerson::kDirector, tmpInfos.cap(3));
@@ -1819,7 +1819,7 @@ void EITFixUp::FixPremiere(DBEventEIT &event) const
         QStringList::const_iterator it = actors.begin();
         for (; it != actors.end(); ++it)
             event.AddPerson(DBPerson::kActor, *it);
-        event.description = event.description.replace(tmpInfos.cap(0), "");
+        event.description = event.description.replace(tmpInfos, "");
     }
 
     // move the original titel from the title to subtitle
@@ -1827,7 +1827,7 @@ void EITFixUp::FixPremiere(DBEventEIT &event) const
     if (tmpOTitle.indexIn(event.title) != -1)
     {
         event.subtitle = QString("%1, %2").arg(tmpOTitle.cap(1)).arg(country);
-        event.title = event.title.replace(tmpOTitle.cap(0), "");
+        event.title = event.title.replace(tmpOTitle, "");
     }
 
     // Find infos about season and episode number
