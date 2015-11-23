@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
 <TS version="2.0" language="it_IT">
+<defaultcodec>UTF-8</defaultcodec>
 <context>
     <name>(GameTypes)</name>
     <message>
@@ -182,17 +183,17 @@ Rimuoverlo dal database?</translation>
 <context>
     <name>GameScanner</name>
     <message>
-        <location filename="../mythgame/gamescan.cpp" line="67"/>
+        <location filename="../mythgame/gamescan.cpp" line="68"/>
         <source>Verifying game files...</source>
         <translation>Verifica in corso dei file di gioco...</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamescan.cpp" line="110"/>
+        <location filename="../mythgame/gamescan.cpp" line="111"/>
         <source>Updating game database...</source>
         <translation>Aggiornamento database di gioco...</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamescan.cpp" line="145"/>
+        <location filename="../mythgame/gamescan.cpp" line="146"/>
         <source>Searching for games...</source>
         <translation>Ricerca in corso per giochi...</translation>
     </message>
@@ -200,27 +201,27 @@ Rimuoverlo dal database?</translation>
 <context>
     <name>GameUI</name>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="160"/>
+        <location filename="../mythgame/gameui.cpp" line="162"/>
         <source>All Games</source>
         <translation>Tutti i giochi</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="165"/>
+        <location filename="../mythgame/gameui.cpp" line="167"/>
         <source>-   By Genre</source>
         <translation>-   Per genere</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="170"/>
+        <location filename="../mythgame/gameui.cpp" line="172"/>
         <source>-   By Year</source>
         <translation>-   Per anno</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="175"/>
+        <location filename="../mythgame/gameui.cpp" line="177"/>
         <source>-   By Name</source>
         <translation>-   Per nome</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="180"/>
+        <location filename="../mythgame/gameui.cpp" line="182"/>
         <source>-   By Publisher</source>
         <translation>-   Per autore</translation>
     </message>
@@ -229,23 +230,23 @@ Rimuoverlo dal database?</translation>
         <translation type="obsolete">Scegliere sistema per</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="547"/>
+        <location filename="../mythgame/gameui.cpp" line="549"/>
         <source>Cancel</source>
         <translation>Annulla</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="453"/>
-        <location filename="../mythgame/gameui.cpp" line="531"/>
+        <location filename="../mythgame/gameui.cpp" line="455"/>
+        <location filename="../mythgame/gameui.cpp" line="533"/>
         <source>Show Information</source>
         <translation>Mostrare informazioni</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="146"/>
+        <location filename="../mythgame/gameui.cpp" line="148"/>
         <source>Favorites</source>
         <translation>Favoriti</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="279"/>
+        <location filename="../mythgame/gameui.cpp" line="281"/>
         <source>Choose System for:
 %1</source>
         <extracomment>%1 is the game name</extracomment>
@@ -253,37 +254,47 @@ Rimuoverlo dal database?</translation>
 %1</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="447"/>
-        <location filename="../mythgame/gameui.cpp" line="527"/>
+        <location filename="../mythgame/gameui.cpp" line="449"/>
+        <location filename="../mythgame/gameui.cpp" line="529"/>
         <source>Scan For Changes</source>
         <translation>Scansione per cambiamenti</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="455"/>
-        <location filename="../mythgame/gameui.cpp" line="536"/>
+        <location filename="../mythgame/gameui.cpp" line="457"/>
+        <location filename="../mythgame/gameui.cpp" line="538"/>
         <source>Remove Favorite</source>
         <translation>Rimuovere favoriti</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="457"/>
-        <location filename="../mythgame/gameui.cpp" line="535"/>
+        <location filename="../mythgame/gameui.cpp" line="459"/>
+        <location filename="../mythgame/gameui.cpp" line="537"/>
         <source>Make Favorite</source>
         <translation>Rendere favorito</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="458"/>
-        <location filename="../mythgame/gameui.cpp" line="540"/>
+        <location filename="../mythgame/gameui.cpp" line="460"/>
+        <location filename="../mythgame/gameui.cpp" line="542"/>
         <source>Retrieve Details</source>
         <translation>Recupero dettagli</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="459"/>
-        <location filename="../mythgame/gameui.cpp" line="523"/>
+        <location filename="../mythgame/gameui.cpp" line="461"/>
+        <location filename="../mythgame/gameui.cpp" line="525"/>
         <source>Edit Details</source>
         <translation>Modificare dettagli</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="931"/>
+        <location filename="../mythgame/gameui.cpp" line="647"/>
+        <source>Failed to retrieve image(s)</source>
+        <translation>Fallito il recupero delle immagini</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gameui.cpp" line="649"/>
+        <source>Check logs</source>
+        <translation>Verificare i registri log</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gameui.cpp" line="940"/>
         <source>Fetching details for %1</source>
         <extracomment>%1 is the game name</extracomment>
         <translation>Scaricamento dettagli per %1</translation>
@@ -293,7 +304,7 @@ Rimuoverlo dal database?</translation>
         <translation type="obsolete">Modificare metadati</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="487"/>
+        <location filename="../mythgame/gameui.cpp" line="489"/>
         <source>Game Search</source>
         <translation>Ricerca gioco</translation>
     </message>
@@ -999,6 +1010,11 @@ di volerlo fare?</translation>
         <location filename="themestrings.h" line="30"/>
         <source>Click here to search existing fanart...</source>
         <translation>Clic qui per ricercare fanart esistenti...</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="32"/>
+        <source>From %1</source>
+        <translation>Da %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="33"/>

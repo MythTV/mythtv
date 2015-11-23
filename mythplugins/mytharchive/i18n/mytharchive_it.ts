@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
 <TS version="2.0" language="it_IT">
+<defaultcodec>UTF-8</defaultcodec>
 <context>
     <name>(ArchiveUtils)</name>
     <message>
@@ -36,7 +37,7 @@ Rimuove lo stato di blocco del file.</translation>
     <message>
         <location filename="../mytharchive/importnative.cpp" line="212"/>
         <source>Find File To Import</source>
-        <translation>Trovare file da importare</translation>
+        <translation>Trova file da importare</translation>
     </message>
     <message>
         <location filename="../mytharchive/importnative.cpp" line="272"/>
@@ -114,7 +115,7 @@ Rimuove lo stato di blocco del file.</translation>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="101"/>
         <source>Command to run when test playing a created DVD. &apos;Internal&apos; will use the internal MythTV player. %f will be replaced with the path to the created DVD structure eg. &apos;xine -pfhq --no-splash dvd:/%f&apos;.</source>
-        <translation>Comando da eseguire quando si testa la riproduzione di un DVD creato &apos;Interno&apos;userà il riproduttore interno MythTV. %f sarà sostituito con il percorso della strutura del DVD creato es. &apos;xine -pfhq --no-splash dvd:/%f&apos;.</translation>
+        <translation>Comando da eseguire quando si testa la riproduzione di un DVD creato &quot;Internal&quot;userà il riproduttore interno MythTV. %f sarà sostituito con il percorso della strutura del DVD creato es. &apos;xine -pfhq --no-splash dvd:/%f&apos;.</translation>
     </message>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="114"/>
@@ -702,37 +703,37 @@ Questo può richiedere alcuni minuti.</translation>
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mytharchive/main.cpp" line="302"/>
+        <location filename="../mytharchive/main.cpp" line="336"/>
         <source>Toggle use cut list state for selected program</source>
         <translation>Attivare/Disattivare stato dell&apos;elenco lista tagli per il programma selezionato</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="305"/>
+        <location filename="../mytharchive/main.cpp" line="339"/>
         <source>Create DVD</source>
         <translation>Creare DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="307"/>
+        <location filename="../mytharchive/main.cpp" line="341"/>
         <source>Create Archive</source>
         <translation>Creare archivio</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="309"/>
+        <location filename="../mytharchive/main.cpp" line="343"/>
         <source>Import Archive</source>
         <translation>Importare archivio</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="311"/>
+        <location filename="../mytharchive/main.cpp" line="345"/>
         <source>View Archive Log</source>
         <translation>Mostrare log archivio</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="313"/>
+        <location filename="../mytharchive/main.cpp" line="347"/>
         <source>Play Created DVD</source>
         <translation>Riproduzione DVD creato</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="315"/>
+        <location filename="../mytharchive/main.cpp" line="349"/>
         <source>Burn DVD</source>
         <translation>Masterizzare DVD</translation>
     </message>
@@ -1046,8 +1047,8 @@ Collocare un DVD vergine nell&apos;unità e selezionare un opzione sotto.</trans
     <name>RecordingSelector</name>
     <message>
         <location filename="../mytharchive/recordingselector.cpp" line="112"/>
-        <location filename="../mytharchive/recordingselector.cpp" line="420"/>
-        <location filename="../mytharchive/recordingselector.cpp" line="525"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="416"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="521"/>
         <source>All Recordings</source>
         <translation>Tutte le registrazioni</translation>
     </message>
@@ -1729,17 +1730,17 @@ Attendere...</translation>
 <context>
     <name>ThumbFinder</name>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="921"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="882"/>
         <source>Menu</source>
         <translation>Menù</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="928"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="889"/>
         <source>Exit, Save Thumbnails</source>
         <translation>Uscire, salvare le anteprime</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="929"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="890"/>
         <source>Exit, Don&apos;t Save Thumbnails</source>
         <translation>Uscire, non salvare le anteprime</translation>
     </message>
@@ -1747,28 +1748,28 @@ Attendere...</translation>
 <context>
     <name>VideoSelector</name>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="153"/>
+        <location filename="../mytharchive/videoselector.cpp" line="155"/>
         <source>Menu</source>
         <translation>Menù</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="160"/>
+        <location filename="../mytharchive/videoselector.cpp" line="162"/>
         <source>Clear All</source>
         <translation>Pulisci tutto</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="161"/>
+        <location filename="../mytharchive/videoselector.cpp" line="163"/>
         <source>Select All</source>
         <translation>Selezionare tutto</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="359"/>
-        <location filename="../mytharchive/videoselector.cpp" line="489"/>
+        <location filename="../mytharchive/videoselector.cpp" line="364"/>
+        <location filename="../mytharchive/videoselector.cpp" line="534"/>
         <source>All Videos</source>
         <translation>Tutti i video</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="546"/>
+        <location filename="../mytharchive/videoselector.cpp" line="591"/>
         <source>You need to enter a valid password for this parental level</source>
         <translation>È richiesto l&apos;inserimento di una password valida per questo controllo genitori</translation>
     </message>
