@@ -57,6 +57,7 @@ class EITFixUp
         kFixAUNine           = 1 << 20,
         kFixAUSeven          = 1 << 21,
         kFixP7S1             = 1 << 26,
+        kFixHTML             = 1 << 27,
 
         // Early fixups
         kEFixForceISO8859_1  = 1 << 22,
@@ -104,6 +105,7 @@ class EITFixUp
     void FixNO(DBEventEIT &event) const;            // Norwegian DVB-S
     void FixNRK_DVBT(DBEventEIT &event) const;      // Norwegian NRK DVB-T
     void FixDK(DBEventEIT &event) const;            // Danish YouSee DVB-C
+    void FixStripHTML(DBEventEIT &event) const;     // Strip HTML tags
 
     static QString AddDVBEITAuthority(uint chanid, const QString &id);
 
@@ -236,6 +238,7 @@ class EITFixUp
     const QRegExp m_AUFreeviewY;//year
     const QRegExp m_AUFreeviewYC;//year, cast
     const QRegExp m_AUFreeviewSYC;//subtitle, year, cast
+    const QRegExp m_HTML;
 };
 
 #endif // EITFIXUP_H

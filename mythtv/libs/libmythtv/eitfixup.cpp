@@ -185,7 +185,8 @@ EITFixUp::EITFixUp()
       m_AUFreeviewSY("(.*) \\((.+)\\) \\(([12][0-9][0-9][0-9])\\)$"),
       m_AUFreeviewY("(.*) \\(([12][0-9][0-9][0-9])\\)$"),
       m_AUFreeviewYC("(.*) \\(([12][0-9][0-9][0-9])\\) \\((.+)\\)$"),
-      m_AUFreeviewSYC("(.*) \\((.+)\\) \\(([12][0-9][0-9][0-9])\\) \\((.+)\\)$")
+      m_AUFreeviewSYC("(.*) \\((.+)\\) \\(([12][0-9][0-9][0-9])\\) \\((.+)\\)$"),
+      m_HTML("</?EM>", Qt::CaseInsensitive)
 {
 }
 
@@ -202,6 +203,9 @@ void EITFixUp::Fix(DBEventEIT &event) const
             event.subtitle = QString("");
         }
     }
+
+    if (kFixHTML & event.fixup)
+        FixStripHTML(event);
 
     if (kFixHDTV & event.fixup)
         event.videoProps |= VID_HDTV;
@@ -2312,4 +2316,13 @@ void EITFixUp::FixDK(DBEventEIT &event) const
     event.description = event.description.trimmed();
     event.title       = event.title.trimmed();
     event.subtitle    = event.subtitle.trimmed();
+}
+
+/** \fn EITFixUp::FixStripHTML(DBEventEIT&) const
+ *  \brief Use this to clean HTML Tags from EIT Data
+ */
+void EITFixUp::FixStripHTML(DBEventEIT &event) const
+{
+    LOG(VB_EIT, LOG_INFO, QString("Applying html strip to %1").arg(event.title));
+    event.title.remove(m_HTML);
 }

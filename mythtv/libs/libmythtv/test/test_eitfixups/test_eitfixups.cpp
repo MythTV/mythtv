@@ -436,4 +436,41 @@ void TestEITFixups::testDEPro7Sat1()
 
 }
 
+void TestEITFixups::testHTMLFixup()
+{
+    // Make sure we correctly strip HTML tags from EIT data
+    EITFixUp fixup;
+
+    DBEventEIT event(9311,
+                      "<EM>CSI: Crime Scene Investigation</EM>",
+                      "Double-Cross: Las Vegas-based forensic drama. The team investigates when two nuns find a woman crucified in the rafters of their church - and clues implicate the priest. (S7 Ep 5)",
+                      QDateTime::fromString("2015-02-28T19:40:00Z", Qt::ISODate),
+                      QDateTime::fromString("2015-02-28T20:00:00Z", Qt::ISODate),
+                      EITFixUp::kFixHTML | EITFixUp::kFixUK,
+                      SUB_UNKNOWN,
+                      AUD_STEREO,
+                      VID_UNKNOWN);
+
+    fixup.Fix(event);
+    PRINT_EVENT(event);
+    QCOMPARE(event.title,       QString("CSI: Crime Scene Investigation"));
+    QCOMPARE(event.subtitle,    QString("Double-Cross"));
+// FIXME: Need to fix the capturing of (S7 Ep 5) for this to properly validate.
+//    QCOMPARE(event.description, QString("Las Vegas-based forensic drama. The team investigates when two nuns find a woman crucified in the rafters of their church - and clues implicate the priest."));
+
+    DBEventEIT event2(9311,
+                      "<EM>New: Redneck Island</EM>",
+                      "Twelve rednecks are stranded on a tropical island with 'Stone Cold' Steve Austin, but this is no holiday, they're here to compete for $100,000. S4, Ep4",
+                      QDateTime::fromString("2015-02-28T19:40:00Z", Qt::ISODate),
+                      QDateTime::fromString("2015-02-28T20:00:00Z", Qt::ISODate),
+                      EITFixUp::kFixHTML | EITFixUp::kFixUK,
+                      SUB_UNKNOWN,
+                      AUD_STEREO,
+                      VID_UNKNOWN);
+
+    fixup.Fix(event2);
+    PRINT_EVENT(event2);
+    QCOMPARE(event2.title,       QString("Redneck Island"));
+}
+
 QTEST_APPLESS_MAIN(TestEITFixups)

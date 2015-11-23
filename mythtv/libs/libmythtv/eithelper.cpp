@@ -1005,72 +1005,51 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     fix[ 4097U << 16] = EITFixUp::kFixBell;
     fix[ 4098U << 16] = EITFixUp::kFixBell;
 
-    // United Kingdom
+    // United Kingdom - DVB-T/T2
     fix[ 9018U << 16] = EITFixUp::kFixUK;
-    // UK BBC
-    fix[ 2013LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2017LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2018LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2026LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2036LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2041LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2042LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2043LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2044LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2045LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2046LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2047LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2048LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2049LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2050LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2053LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2054LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2057LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+
+    // UK - Astra 28.2
+    for (int i = 2001; i <= 2040; ++i)
+       fix[ (long long)i << 32 | 2U << 16] = EITFixUp::kFixUK;
+
+    fix[ 2036LL << 32 | 2U << 16] = EITFixUp::kFixUK | EITFixUp::kFixHTML;
+
+    for (int i = 2041; i <= 2057; ++i)
+       fix[ (long long)i << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2061LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2063LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2064LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2066LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2068LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2301LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2076LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2081LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2096LL << 32 | 2U << 16] = EITFixUp::kFixUK | EITFixUp::kFixHTML;
+    fix[ 2301LL << 32 | 2U << 16] = EITFixUp::kFixUK | EITFixUp::kFixHTML;
     fix[ 2302LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2303LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2304LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2304LL << 32 | 2U << 16] = EITFixUp::kFixUK | EITFixUp::kFixHTML;
     fix[ 2305LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2306LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2306LL << 32 | 2U << 16] = EITFixUp::kFixUK | EITFixUp::kFixHTML;
     fix[ 2311LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2312LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2313LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2314LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2401LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2411LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2412LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2413LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2602LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2612LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2614LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    // R.caroline
-    fix[ 2315LL << 32 | 59U << 16] = EITFixUp::kFixUK;
-    // UK Sky
-    fix[ 2051LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2052LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2055LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2056LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2076LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2081LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2315LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2316LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    for (int i = 2402; i <= 2412; ++i)
+    for (int i = 2401; i <= 2413; ++i)
         fix[ (long long)i << 32 | 2U << 16] = EITFixUp::kFixUK;
-    for (int i = 2001; i <= 2012; ++i)
-       fix[ (long long)i << 32 | 2U << 16] = EITFixUp::kFixUK;
-    for (int i = 2014; i <= 2040; ++i)
-       fix[ (long long)i << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2611LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2612LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2601LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2613LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2602LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2603LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2604LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2612LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2614LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2611LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2612LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2613LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+
+    // R.caroline
+    fix[ 2315LL << 32 | 59U << 16] = EITFixUp::kFixUK;
 
     // ComHem Sweden
     fix[40999U << 16       ] = EITFixUp::kFixComHem;
