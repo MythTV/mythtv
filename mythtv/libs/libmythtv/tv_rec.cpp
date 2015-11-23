@@ -1128,7 +1128,8 @@ void TVRec::TeardownRecorder(uint request_flags)
         delete recorderThread;
         recorderThread = NULL;
     }
-    ClearFlags(kFlagRecorderRunning, __FILE__, __LINE__);
+    ClearFlags(kFlagRecorderRunning | kFlagNeedToStartRecorder,
+               __FILE__, __LINE__);
 
     RecordingQuality *recq = NULL;
     if (recorder)
@@ -3602,12 +3603,13 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
         }
 
         if (HasFlags(kFlagRecorderRunning) ||
-            (curRecording && curRecording->GetRecordingStatus() == RecStatus::Failed))
+            (curRecording &&
+             (curRecording->GetRecordingStatus() == RecStatus::Failed ||
+              curRecording->GetRecordingStatus() == RecStatus::Failing)))
         {
             stateChangeLock.unlock();
             TeardownRecorder(request.flags);
             stateChangeLock.lock();
-            ClearFlags(kFlagRecorderRunning, __FILE__, __LINE__);
         }
         // At this point the recorders are shut down
 
