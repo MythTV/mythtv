@@ -1473,22 +1473,22 @@
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="89"/>
         <source>[Not Selected]</source>
-        <translation type="unfinished">[Ei valittuna]</translation>
+        <translation>[Ei valittuna]</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="132"/>
         <source>TV Format</source>
-        <translation type="unfinished">TV-muoto</translation>
+        <translation>TV-formaatti</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="133"/>
         <source>If this channel uses a format other than TV Format in the General Backend Setup screen, set it here.</source>
-        <translation type="unfinished">Jos tämä kanava käyttää muuta asetusta kuin mitä on määritetty yleisen taustaohjelman asetuksissa, määritä se tässä.</translation>
+        <translation>Jos tämä kanava käyttää muuta formaattia kuin mitä on määritetty yleisen taustaohjelman asetuksissa, määritä se tässä.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="173"/>
         <source>DataDirect Time Offset</source>
-        <translation type="unfinished"></translation>
+        <translation>DataDirect -aikaero</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="176"/>
@@ -1498,7 +1498,7 @@
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="191"/>
         <source>Priority</source>
-        <translation type="unfinished"></translation>
+        <translation>Prioriteetti</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="193"/>
@@ -15093,7 +15093,7 @@ ei voi olla tyhjä.</translation>
         <location filename="../libs/libmyth/programtypes.cpp" line="96"/>
         <source>A</source>
         <comment>RecStatusChar RecStatus::Aborted</comment>
-        <translation type="unfinished">A</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programtypes.cpp" line="99"/>
@@ -17041,7 +17041,7 @@ Useimmat tv-kortit havaitsevat tämän automaattisesti.</translation>
         <location filename="../programs/mythbackend/upnpcdsvideo.cpp" line="497"/>
         <location filename="../programs/mythbackend/upnpcdsvideo.cpp" line="498"/>
         <source>%n Episode(s)</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n jakso</numerusform>
             <numerusform>%n jaksoa</numerusform>
         </translation>
@@ -21076,7 +21076,7 @@ ei voi olla tyhjä.</translation>
     <message>
         <location filename="../libs/libmyth/mythcontext.cpp" line="205"/>
         <source>%1 failed to run for some reason</source>
-        <translation type="unfinished"></translation>
+        <translation>Jostain syystä %1:n ajaminen epäonnistui</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythcontext.cpp" line="385"/>
@@ -21918,7 +21918,7 @@ ei voi olla tyhjä.</translation>
         <location filename="../programs/mythbackend/upnpcdsvideo.cpp" line="420"/>
         <location filename="../programs/mythbackend/upnpcdsvideo.cpp" line="421"/>
         <source>%n Seasons</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n kausi</numerusform>
             <numerusform>%n kautta</numerusform>
         </translation>
@@ -22688,7 +22688,7 @@ Hakijasi ei anna kanavanumeroita, joten aseta ne manuaalisesti.</translation>
         <location filename="../libs/libmyth/recordingtypes.cpp" line="137"/>
         <source>1</source>
         <comment>RecTypeChar kOneRecord</comment>
-        <translation type="unfinished">1</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../libs/libmyth/recordingtypes.cpp" line="139"/>
@@ -22861,7 +22861,7 @@ Hakijasi ei anna kanavanumeroita, joten aseta ne manuaalisesti.</translation>
     <message>
         <location filename="../libs/libmyth/audio/audiooutput.cpp" line="368"/>
         <source> (guessing: </source>
-        <translation type="unfinished"></translation>
+        <translation> (arvuutellaan: </translation>
     </message>
     <message>
         <location filename="../libs/libmyth/audio/audiooutputalsa.cpp" line="478"/>
@@ -22877,7 +22877,7 @@ Hakijasi ei anna kanavanumeroita, joten aseta ne manuaalisesti.</translation>
     <message>
         <location filename="../libs/libmyth/audio/audiooutputbase.cpp" line="670"/>
         <source>Aborting Audio Reconfigure. Can&apos;t handle audio with more than 8 channels.</source>
-        <translation type="unfinished"></translation>
+        <translation>Äänen uudelleenmäärittely keskeytetään. Yli 8 kanavaista ääntä ei pysty käsittelemään.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/audio/audiooutputbase.cpp" line="722"/>
@@ -22887,12 +22887,12 @@ Hakijasi ei anna kanavanumeroita, joten aseta ne manuaalisesti.</translation>
     <message>
         <location filename="../libs/libmyth/audio/audiooutputbase.cpp" line="758"/>
         <source>AC-3 encoder initialization failed</source>
-        <translation type="unfinished"></translation>
+        <translation>AC-3 -enkooderin alustus epäonnistui</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/audio/audiooutputbase.cpp" line="819"/>
         <source>Aborting reconfigure</source>
-        <translation type="unfinished"></translation>
+        <translation>Uudelleenmäärittely perutaan</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/audio/audiooutputdx.cpp" line="459"/>
@@ -22937,7 +22937,7 @@ Hakijasi ei anna kanavanumeroita, joten aseta ne manuaalisesti.</translation>
     <message>
         <location filename="../programs/mythbackend/upnpcdsmusic.cpp" line="133"/>
         <source>Album</source>
-        <translation type="unfinished"></translation>
+        <translation>Albumi</translation>
     </message>
     <message>
         <location filename="../programs/mythbackend/upnpcdsmusic.cpp" line="147"/>
@@ -26448,7 +26448,7 @@ Halutako jatkaa katsomista?</translation>
     <message>
         <location filename="../themes/themestrings.h" line="207"/>
         <source>(1) All  (2) Important</source>
-        <translation>(1) Kaikki    (2) Tärkeät</translation>
+        <translation>(1) Kaikki  (2) Tärkeät</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="204"/>
@@ -26478,12 +26478,12 @@ Halutako jatkaa katsomista?</translation>
     <message>
         <location filename="../themes/themestrings.h" line="242"/>
         <source>Priority</source>
-        <translation>Tärkeysjärjestys</translation>
+        <translation>Prioriteetti</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="231"/>
         <source>Program Listings</source>
-        <translation>Ohjelmat</translation>
+        <translation>Ohjelmaluettelot</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="209"/>
@@ -26967,7 +26967,7 @@ Halutako jatkaa katsomista?</translation>
     <message>
         <location filename="../themes/themestrings.h" line="170"/>
         <source>%DATE% %TIME%</source>
-        <translation>%DATE% %TIME%</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="569"/>
@@ -26988,8 +26988,7 @@ Halutako jatkaa katsomista?</translation>
         <location filename="../themes/themestrings.h" line="370"/>
         <source>%CHANNELNUMBER%
 %CALLSIGN%</source>
-        <translation>%CHANNELNUMBER%
-%CALLSIGN%</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="638"/>
@@ -27151,7 +27150,7 @@ Halutako jatkaa katsomista?</translation>
     <message>
         <location filename="../themes/themestrings.h" line="149"/>
         <source>0%</source>
-        <translation>0%</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="403"/>
@@ -28103,8 +28102,7 @@ Halutako jatkaa katsomista?</translation>
         <location filename="../themes/themestrings.h" line="950"/>
         <source>%|&quot;SUBTITLE|&quot;%
 %YEARSTARS%%DESCRIPTION%</source>
-        <translation>%|&quot;SUBTITLE|&quot;%
-%YEARSTARS%%DESCRIPTION%</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="206"/>
@@ -28157,8 +28155,7 @@ Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&
         <location filename="../themes/themestrings.h" line="972"/>
         <source>%|&quot;SUBTITLE|&quot;%
 %LONGREPEAT%%STARS| %%DESCRIPTION%</source>
-        <translation>%|&quot;SUBTITLE|&quot;%
-%LONGREPEAT%%STARS| %%DESCRIPTION%</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="248"/>
@@ -28183,7 +28180,7 @@ Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&
     <message>
         <location filename="../themes/themestrings.h" line="955"/>
         <source>%|&quot;SUBTITLE|&quot;% %LONGREPEAT%%STARS| %%DESCRIPTION%</source>
-        <translation>%|&quot;SUBTITLE|&quot;% %LONGREPEAT%%STARS| %%DESCRIPTION%</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="375"/>
@@ -28367,7 +28364,7 @@ Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&
     <message>
         <location filename="../themes/themestrings.h" line="157"/>
         <source>%DESCRIPTION%</source>
-        <translation>%DESCRIPTION%</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="165"/>
@@ -28387,7 +28384,7 @@ Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&
     <message>
         <location filename="../themes/themestrings.h" line="168"/>
         <source>XMLTV ID</source>
-        <translation>XMLTV-tunnus</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="617"/>
@@ -28437,7 +28434,7 @@ Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&
     <message>
         <location filename="../themes/themestrings.h" line="158"/>
         <source>%DATE%, %TIME%</source>
-        <translation>%DATE%, %TIME%</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="779"/>
@@ -28522,7 +28519,7 @@ Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&
     <message>
         <location filename="../themes/themestrings.h" line="161"/>
         <source>%DESCRIPTION% %VALUE%%UNITS%</source>
-        <translation>%DESCRIPTION% %VALUE%%UNITS%</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="814"/>
@@ -28542,7 +28539,7 @@ Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&
     <message>
         <location filename="../themes/themestrings.h" line="817"/>
         <source>XMLTV #:</source>
-        <translation>XMLTV #:</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="647"/>
@@ -28651,7 +28648,7 @@ Kun olet valmis, paina OK-näppäintä.</translation>
     <message>
         <location filename="../themes/themestrings.h" line="837"/>
         <source>(%STARTTIME% - %ENDTIME%) %LONGREPEAT% %YEARSTARS%%DESCRIPTION%</source>
-        <translation>(%STARTTIME% - %ENDTIME%) %LONGREPEAT% %YEARSTARS%%DESCRIPTION%</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="838"/>
@@ -28706,7 +28703,7 @@ Kun olet valmis, paina OK-näppäintä.</translation>
     <message>
         <location filename="../themes/themestrings.h" line="439"/>
         <source>%&quot;|SUBTITLE|&quot; %%DESCRIPTION%</source>
-        <translation>%&quot;|SUBTITLE|&quot; %%DESCRIPTION%</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="964"/>
@@ -28716,46 +28713,44 @@ Kun olet valmis, paina OK-näppäintä.</translation>
     <message>
         <location filename="../themes/themestrings.h" line="172"/>
         <source>%&quot;|SUBTITLE|&quot; %%(|STARS|) %%DESCRIPTION%</source>
-        <translation>%&quot;|SUBTITLE|&quot; %%(|STARS|) %%DESCRIPTION%</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="193"/>
         <source>%LONGREPEAT%%YEARSTARS| %%DESCRIPTION%</source>
-        <translation>%LONGREPEAT%%YEARSTARS| %%DESCRIPTION%</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="205"/>
         <source>%&quot;|SUBTITLE|&quot;
 %%YEARSTARS| %%DESCRIPTION%</source>
-        <translation>%&quot;|SUBTITLE|&quot;
-%%YEARSTARS| %%DESCRIPTION%</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="237"/>
         <source>%&quot;|SUBTITLE|&quot;
 %%LONGREPEAT%%(|STARS|) %%DESCRIPTION%</source>
-        <translation>%&quot;|SUBTITLE|&quot;
-%%LONGREPEAT%%(|STARS|) %%DESCRIPTION%</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="148"/>
         <source>%&quot;|SUBTITLE|&quot; %%LONGREPEAT%%(|STARS|) %%DESCRIPTION%</source>
-        <translation>%&quot;|SUBTITLE|&quot; %%LONGREPEAT%%(|STARS|) %%DESCRIPTION%</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="159"/>
         <source>%LENMINS%</source>
-        <translation>%LENMINS%</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="162"/>
         <source>%STARTTIME%-%ENDTIME%</source>
-        <translation>%STARTTIME%-%ENDTIME%</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="441"/>
         <source>%VALUE%%UNITS%</source>
-        <translation>%VALUE%%UNITS%</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="442"/>
@@ -28782,7 +28777,7 @@ Kun olet valmis, paina OK-näppäintä.</translation>
     <message>
         <location filename="../themes/themestrings.h" line="468"/>
         <source>-</source>
-        <translation>-</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="491"/>
@@ -28862,8 +28857,8 @@ When you have completed your configuration, press &quot;OK&quot; to search.</sou
         <location filename="../themes/themestrings.h" line="859"/>
         <source>-%n</source>
         <translation>
-            <numerusform>-%n</numerusform>
-            <numerusform>-%n</numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -28875,8 +28870,8 @@ When you have completed your configuration, press &quot;OK&quot; to search.</sou
         <location filename="../themes/themestrings.h" line="861"/>
         <source>+%n</source>
         <translation>
-            <numerusform>+%n</numerusform>
-            <numerusform>+%n</numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -29192,7 +29187,7 @@ Lopuksi voit testata, aktivoida samantien, tai perua sääntösi.</translation>
     <message>
         <location filename="../themes/themestrings.h" line="965"/>
         <source>%|&quot;SUBTITLE|&quot;%</source>
-        <translation>%|&quot;SUBTITLE|&quot;%</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="966"/>
@@ -29202,7 +29197,7 @@ Lopuksi voit testata, aktivoida samantien, tai perua sääntösi.</translation>
     <message>
         <location filename="../themes/themestrings.h" line="967"/>
         <source>(%STARTTIME% - %ENDTIME%) %LONGREPEAT%%YEARSTARS%%DESCRIPTION%</source>
-        <translation>(%STARTTIME% - %ENDTIME%) %LONGREPEAT%%YEARSTARS%%DESCRIPTION%</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="968"/>
@@ -29289,7 +29284,7 @@ Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&
     <message>
         <location filename="../themes/themestrings.h" line="163"/>
         <source>%CHANNUM%</source>
-        <translation>%CHANNUM%</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="169"/>
@@ -29299,7 +29294,7 @@ Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&
     <message>
         <location filename="../themes/themestrings.h" line="721"/>
         <source>%YEARSTARS% %DESCRIPTION% %LONGREPEAT%</source>
-        <translation>%YEARSTARS% %DESCRIPTION% %LONGREPEAT%</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1016"/>
@@ -29319,7 +29314,7 @@ Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&
     <message>
         <location filename="../themes/themestrings.h" line="1019"/>
         <source>%DATE%   %TIME%</source>
-        <translation>%DATE%   %TIME%</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1021"/>
@@ -29344,12 +29339,12 @@ Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&
     <message>
         <location filename="../themes/themestrings.h" line="1025"/>
         <source>(%1)</source>
-        <translation>(%1)</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1026"/>
         <source>%|RATING| %%|(STARS|) %%DESCRIPTION%</source>
-        <translation>%|RATING| %%|(STARS|) %%DESCRIPTION%</translation>
+        <translation></translation>
     </message>
     <message>
         <source>%1</source>
@@ -29363,12 +29358,12 @@ Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&
     <message>
         <location filename="../themes/themestrings.h" line="1015"/>
         <source>%TITLE%% - |SUBTITLE%</source>
-        <translation>%TITLE%% - |SUBTITLE%</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="985"/>
         <source>%TITLESUBTITLE% %YEARSTARS%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="988"/>
@@ -29378,22 +29373,22 @@ Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&
     <message>
         <location filename="../themes/themestrings.h" line="989"/>
         <source>%PROGRESS_TEXT% %PROGRESS%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="990"/>
         <source>%STARTDATE|, %%STARTTIME%% - |ENDTIME%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="991"/>
         <source>%STARTTIME%% - |ENDTIME%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="992"/>
         <source>%SUBTITLE% %YEARSTARS%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="993"/>
@@ -29411,12 +29406,12 @@ Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&
         <location filename="../themes/themestrings.h" line="996"/>
         <source>%STARTTIME%%-|ENDTIME| %%&quot;|SUBTITLE|&quot; %%00X00| %%(|ORIGINALAIRDATE|)
 %</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="998"/>
         <source>Showing: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Katsotaan: %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1009"/>
@@ -29432,7 +29427,7 @@ Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&
     <message>
         <location filename="../themes/themestrings.h" line="1013"/>
         <source>%year%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1027"/>
@@ -29442,7 +29437,7 @@ Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&
     <message>
         <location filename="../themes/themestrings.h" line="1028"/>
         <source>%Part |PARTNUMBER| of %%PARTTOTAL%</source>
-        <translation type="unfinished"></translation>
+        <translation>%Part |PARTNUMBER| / %%PARTTOTAL%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1030"/>
@@ -29457,7 +29452,7 @@ Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&
     <message>
         <location filename="../themes/themestrings.h" line="1034"/>
         <source>: %1</source>
-        <translation>: %1</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1035"/>
@@ -29472,7 +29467,7 @@ Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&
     <message>
         <location filename="../themes/themestrings.h" line="1037"/>
         <source>: %BUFFERAVAIL% of %BUFFERSIZE%Mb</source>
-        <translation>: %BUFFERAVAIL% of %BUFFERSIZE%Mt</translation>
+        <translation>: %BUFFERAVAIL% / %BUFFERSIZE%Mt</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1038"/>
@@ -29502,12 +29497,12 @@ Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&
     <message>
         <location filename="../themes/themestrings.h" line="1043"/>
         <source>: %VIDEOCODEC% %VIDEODECODER%</source>
-        <translation>: %VIDEOCODEC% %VIDEODECODER%</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1044"/>
         <source>: %VIDEOWIDTH%x%VIDEOHEIGHT%@%VIDEOFRAMERATE%fps</source>
-        <translation>: %VIDEOWIDTH%x%VIDEOHEIGHT%@%VIDEOFRAMERATE%fps</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1045"/>
@@ -29517,12 +29512,12 @@ Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&
     <message>
         <location filename="../themes/themestrings.h" line="1046"/>
         <source>%DESCRIPTION% %(|REMAININGTIME|)%%(|BEHINDTIME|)%%VALUE%%UNITS%</source>
-        <translation>%DESCRIPTION% %(|REMAININGTIME|)%%(|BEHINDTIME|)%%VALUE%%UNITS%</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1048"/>
         <source>%|&quot;SUBTITLE|&quot;% %|(STARS|) %%DESCRIPTION%</source>
-        <translation>%|&quot;SUBTITLE|&quot;% %|(STARS|) %%DESCRIPTION%</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1049"/>
@@ -29537,7 +29532,7 @@ Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&
     <message>
         <location filename="../themes/themestrings.h" line="1051"/>
         <source>XMLTV ID:</source>
-        <translation>XMLTV ID:</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1052"/>
@@ -29736,7 +29731,7 @@ Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&
     <message>
         <location filename="../themes/themestrings.h" line="160"/>
         <source>%TIME%</source>
-        <translation>%TIME%</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="287"/>
@@ -29828,7 +29823,7 @@ pp KKKK vvvv</translation>
     <message>
         <location filename="../themes/themestrings.h" line="399"/>
         <source>%DATE%</source>
-        <translation>%DATE%</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="400"/>
@@ -29868,12 +29863,12 @@ pp KKKK vvvv</translation>
     <message>
         <location filename="../themes/themestrings.h" line="538"/>
         <source>%STARTTIME%-%ENDTIME% : %LENMINS%</source>
-        <translation>%STARTTIME%-%ENDTIME% : %LENMINS%</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="539"/>
         <source>%VIDEOWIDTH%x%VIDEOHEIGHT%, %VIDEOFRAMERATE%fps, %VIDEOCODECDESC%</source>
-        <translation>%VIDEOWIDTH%x%VIDEOHEIGHT%, %VIDEOFRAMERATE%fps, %VIDEOCODECDESC%</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="554"/>
@@ -30497,7 +30492,7 @@ Jos valitset &quot;Käytä oletus toistinta,&quot; laajennoksen toistokomento j�
     <message>
         <location filename="../themes/themestrings.h" line="485"/>
         <source>%Season - |SEASON| %% Episode - |EPISODE| %</source>
-        <translation>%Season - |SEASON| %% Episode - |EPISODE| %</translation>
+        <translation>%Kausi - |SEASON| %% Jakso - |EPISODE| %</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="493"/>
@@ -30527,12 +30522,12 @@ Jos valitset &quot;Käytä oletus toistinta,&quot; laajennoksen toistokomento j�
     <message>
         <location filename="../themes/themestrings.h" line="171"/>
         <source>%startdate%%| startyear%, %starttime%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="212"/>
         <source>You haven&apos;t defined any channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Et ole määritellyt yhtään kanavaa</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="232"/>
@@ -30547,7 +30542,7 @@ Jos valitset &quot;Käytä oletus toistinta,&quot; laajennoksen toistokomento j�
     <message>
         <location filename="../themes/themestrings.h" line="354"/>
         <source>Move the selected corner of the preview image to the corner of the TV screen.  Press SELECT to edit the other corner.  Press MENU for options and ESC to quit.</source>
-        <translation type="unfinished"></translation>
+        <translation>Siirrä valittu nurkka esikatseluruudusta TV ruudun nurkkaan. Paina VALITSE muokataksesi toista nurkkaa. Paina MENU päästäksesi valintoihin ja ESC lopettaaksesi.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="404"/>
@@ -30632,67 +30627,67 @@ Jos valitset &quot;Käytä oletus toistinta,&quot; laajennoksen toistokomento j�
     <message>
         <location filename="../themes/themestrings.h" line="452"/>
         <source>Inetref</source>
-        <translation type="unfinished"></translation>
+        <translation>Nettiref</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="453"/>
         <source>Season/Epsiode</source>
-        <translation type="unfinished"></translation>
+        <translation>Kausi/Jakso</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="497"/>
         <source>View and schedule recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Katso ja ajasta tallennuksia</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="498"/>
         <source>Search and browse internet video sites</source>
-        <translation type="unfinished"></translation>
+        <translation>Etsi ja selaa Internetin videosivustoja</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="499"/>
         <source>Play music files and internet radio streams</source>
-        <translation type="unfinished"></translation>
+        <translation>Soita musiikkitiedostoja ja Internet -radiovirtoja</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="500"/>
         <source>Browse the video library</source>
-        <translation type="unfinished"></translation>
+        <translation>Selaa videokirjastoasi</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="501"/>
         <source>Play online streams</source>
-        <translation type="unfinished"></translation>
+        <translation>Soita suoratoistoja verkosta</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="502"/>
         <source>Look at pictures</source>
-        <translation type="unfinished"></translation>
+        <translation>Katsele kuvia</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="503"/>
         <source>Play games</source>
-        <translation type="unfinished"></translation>
+        <translation>Pelaa pelejä</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="504"/>
         <source>View the weather forecast</source>
-        <translation type="unfinished"></translation>
+        <translation>Katso sääennuste</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="506"/>
         <source>View weather statistics</source>
-        <translation type="unfinished"></translation>
+        <translation>Katso säätilastoja</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="509"/>
         <source>Backup a program to DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Varmuuskopioi ohjelma DVD:lle</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="510"/>
         <source>View live and recorded home surveillance camera images</source>
-        <translation type="unfinished"></translation>
+        <translation>Katso suoria ja tallennettuja valvontakameran kuvia</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="517"/>
@@ -30752,7 +30747,7 @@ Jos valitset &quot;Käytä oletus toistinta,&quot; laajennoksen toistokomento j�
     <message>
         <location filename="../themes/themestrings.h" line="528"/>
         <source>%VIDEOWIDTH%x%VIDEOHEIGHT%@%VIDEOFRAMERATE%fps</source>
-        <translation>%VIDEOWIDTH%x%VIDEOHEIGHT%@%VIDEOFRAMERATE%fps</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="529"/>
@@ -30762,7 +30757,7 @@ Jos valitset &quot;Käytä oletus toistinta,&quot; laajennoksen toistokomento j�
     <message>
         <location filename="../themes/themestrings.h" line="530"/>
         <source>%VIDEOCODEC% %VIDEODECODER%</source>
-        <translation>%VIDEOCODEC% %VIDEODECODER%</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="531"/>
@@ -30902,77 +30897,77 @@ Jos valitset &quot;Käytä oletus toistinta,&quot; laajennoksen toistokomento j�
     <message>
         <location filename="../themes/themestrings.h" line="625"/>
         <source>Move the selected arrow to the corner of the TV screen. Press SELECT to edit the other arrow. Press MENU for options and ESC to quit.</source>
-        <translation type="unfinished"></translation>
+        <translation>Siirrä valittu nuoli TV ruudun nurkkaan. Paina VALITSE muokataksesi toista nuolta. Paina MENU päästäksesi valintoihin ja ESC lopettaaksesi.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="626"/>
         <source>1280 x 720</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="627"/>
         <source>0 x 0</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="628"/>
         <source>1 pixel</source>
-        <translation type="unfinished"></translation>
+        <translation>1 pikseli</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="629"/>
         <source>Ok</source>
-        <translation type="unfinished">Ok</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="630"/>
         <source>%title %%messagearea%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="631"/>
         <source>Metadata Results</source>
-        <translation type="unfinished"></translation>
+        <translation>Metadatan tulokset</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="632"/>
         <source>%title%% - |subtitle%% (|year|)%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="633"/>
         <source>text_window_title</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="634"/>
         <source>1</source>
-        <translation type="unfinished">1</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="635"/>
         <source>2</source>
-        <translation type="unfinished">2</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="636"/>
         <source>3</source>
-        <translation type="unfinished">3</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="637"/>
         <source>4</source>
-        <translation type="unfinished">4</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="639"/>
         <source>Key Shortcuts</source>
-        <translation type="unfinished"></translation>
+        <translation>Pikanäppäimet</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="640"/>
         <source>%STARTTIME% - %ENDTIME% (%LENTIME%)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="641"/>
@@ -30982,222 +30977,222 @@ Jos valitset &quot;Käytä oletus toistinta,&quot; laajennoksen toistokomento j�
     <message>
         <location filename="../themes/themestrings.h" line="642"/>
         <source>Edit the details about this channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Muokkaa tämän kanavan yksityiskohtia</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="643"/>
         <source>Callsign :</source>
-        <translation type="unfinished"></translation>
+        <translation>Nimike:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="644"/>
         <source>Channel # :</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanava #:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="645"/>
         <source>Chan Name :</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan. nimi:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="646"/>
         <source>XMLTV # :</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="648"/>
         <source>%PLAYEDTIME% of %TOTALTIME% %(|REMAININGTIME| remaining)%</source>
-        <translation type="unfinished"></translation>
+        <translation>%PLAYEDTIME% / %TOTALTIME% %(|REMAININGTIME| jäljellä)%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="649"/>
         <source>LiveTV</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="650"/>
         <source>Recorded</source>
-        <translation type="unfinished">Tallennettu</translation>
+        <translation>Tallennettu</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="651"/>
         <source>DVD</source>
-        <translation type="unfinished">DVD</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="652"/>
         <source>BD</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="653"/>
         <source>Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Tallenne</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="654"/>
         <source>PCM-DVD</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="655"/>
         <source>PCM-BluRay</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="656"/>
         <source>AC3</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="657"/>
         <source>E-AC3</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="658"/>
         <source>TrueHD</source>
-        <translation type="unfinished">TrueHD</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="659"/>
         <source>WMAPro</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="660"/>
         <source>DTS</source>
-        <translation type="unfinished">DTS</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="661"/>
         <source>AAC</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="662"/>
         <source>MPEG2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="663"/>
         <source>MP3</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="664"/>
         <source>Vorbis</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="665"/>
         <source>Mono 1.0</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="666"/>
         <source>Stereo 2.0</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="667"/>
         <source>Surround 5.0</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="668"/>
         <source>Surround 5.1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="669"/>
         <source>Surround 7.0</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="670"/>
         <source>Surround 7.1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="671"/>
         <source>MPEG-2</source>
-        <translation type="unfinished">MPEG-2</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="672"/>
         <source>VC-1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="673"/>
         <source>H.264</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="674"/>
         <source>MPEG-4</source>
-        <translation type="unfinished">MPEG-4</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="675"/>
         <source>RTjpeg</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="676"/>
         <source>WMV3</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="677"/>
         <source>H.263</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="678"/>
         <source>Standard</source>
-        <translation type="unfinished">Standardi</translation>
+        <translation>Standardi</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="679"/>
         <source>720P</source>
-        <translation type="unfinished">0% {720P?}</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="680"/>
         <source>1080i</source>
-        <translation type="unfinished">0% {1080i?}</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="681"/>
         <source>1080p</source>
-        <translation type="unfinished">0% {1080p?}</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="682"/>
         <source>Season</source>
-        <translation type="unfinished">Kausi</translation>
+        <translation>Kausi</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="683"/>
         <source>Episode</source>
-        <translation type="unfinished">Jakso</translation>
+        <translation>Jakso</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="684"/>
         <source>Change Groups</source>
-        <translation type="unfinished"></translation>
+        <translation>Vaihda ryhmiä</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="686"/>
         <source>Change Password</source>
-        <translation type="unfinished">Vaihda salasana</translation>
+        <translation>Vaihda salasana</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="687"/>
         <source>%startdate|, %%starttime%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="688"/>
@@ -31207,62 +31202,62 @@ Jos valitset &quot;Käytä oletus toistinta,&quot; laajennoksen toistokomento j�
     <message>
         <location filename="../themes/themestrings.h" line="689"/>
         <source>%startdate|, %%starttime%% - |endtime%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="690"/>
         <source>%longchannel%% (|RECSTARTTIME%% - |RECENDTIME|)%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="691"/>
         <source>%REC_COUNT| recordings in this group%</source>
-        <translation type="unfinished"></translation>
+        <translation>%REC_COUNT| tallennetta tässä ryhmässä%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="692"/>
         <source>Channel Rec. Prio.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanavan tallennusprioriteetti.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="693"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Nimi</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="694"/>
         <source>Source</source>
-        <translation type="unfinished">Lähde</translation>
+        <translation>Lähde</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="696"/>
         <source>To create a custom recording rule, either select an existing rule, or create a new rule by typing in a name.  Then select a rule type and hit enter.  The SQL code will be transferred below, and you can edit it and insert your own program information. Finally, you can test, immediately activate, store, or cancel your rule.</source>
-        <translation type="unfinished"></translation>
+        <translation>Luodaksesi muokatun tallenussäännön, joko valitse olemassa oleva sääntö, tai luo uusi syöttämällä nimi.  Sitten valitse sääntö ja paina enteriä. Alle ilmestyy SQL koodi jota voit editoida ja lisätä omat ohjelmatietosi. Lopuksi voit testata, aktivoida samantien, tai perua sääntösi.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="698"/>
         <source>Category list:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategorialista:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="699"/>
         <source>Genres list:</source>
-        <translation type="unfinished"></translation>
+        <translation>Lajien lista:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="700"/>
         <source>Channel list:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanavalista:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="701"/>
         <source>Manage Rec. Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Hallitse tallennussääntöjä</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="702"/>
         <source>%Final Priority: |finalpriority%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="703"/>
@@ -31272,17 +31267,17 @@ Jos valitset &quot;Käytä oletus toistinta,&quot; laajennoksen toistokomento j�
     <message>
         <location filename="../themes/themestrings.h" line="704"/>
         <source>%Recording Profile: |recordingprofile%</source>
-        <translation type="unfinished"></translation>
+        <translation>%Tallennusprofiili: |recordingprofile%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="705"/>
         <source>%Rec. Group: |recgroup%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="706"/>
         <source>%Storage Group: |storagegroup%</source>
-        <translation type="unfinished"></translation>
+        <translation>%Tallennusryhmä: |storagegroup%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="707"/>
@@ -31292,12 +31287,12 @@ Jos valitset &quot;Käytä oletus toistinta,&quot; laajennoksen toistokomento j�
     <message>
         <location filename="../themes/themestrings.h" line="709"/>
         <source>Start Time (hh:mm):</source>
-        <translation type="unfinished"></translation>
+        <translation>Aloitusaika: (tt:mm):</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="710"/>
         <source>Duration (min):</source>
-        <translation type="unfinished"></translation>
+        <translation>Kesto (minuuttia):</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="711"/>
@@ -31307,7 +31302,7 @@ Jos valitset &quot;Käytä oletus toistinta,&quot; laajennoksen toistokomento j�
     <message>
         <location filename="../themes/themestrings.h" line="718"/>
         <source>Run User job #2</source>
-        <translation type="unfinished"></translation>
+        <translation>Aja käyttäjän työ #2</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="720"/>
@@ -31317,17 +31312,17 @@ Jos valitset &quot;Käytä oletus toistinta,&quot; laajennoksen toistokomento j�
     <message>
         <location filename="../themes/themestrings.h" line="722"/>
         <source>Sort by (1) Time, (2) Title:</source>
-        <translation type="unfinished"></translation>
+        <translation>Järjestä (1) Aika, (2) Nimike:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="724"/>
         <source>Sort by (1) Title, (2) Priority, (4) Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Järjestä (1) Nimike (2) Prioriteetti (4) Tyyppi</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="725"/>
         <source>Final Priority: %finalpriority%</source>
-        <translation type="unfinished"></translation>
+        <translation>Lopullinen prioriteetti: %finalpriority%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="726"/>
@@ -31337,39 +31332,39 @@ Jos valitset &quot;Käytä oletus toistinta,&quot; laajennoksen toistokomento j�
     <message>
         <location filename="../themes/themestrings.h" line="727"/>
         <source>Program Priority : %progpriority%</source>
-        <translation type="unfinished"></translation>
+        <translation>Ohjelman prioriteetti: %finalpriority%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="728"/>
         <source>Type Priority : %storagegroup%</source>
-        <translation type="unfinished"></translation>
+        <translation>Tyypin Prioriteetti : %storagegroup%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="731"/>
         <source>Sort by (1) Time, (2) Important</source>
-        <translation type="unfinished"></translation>
+        <translation>Järjestä (1) Aika, (2) Tärkeä</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="732"/>
         <source>System Event command Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Järjestelmätapahtumien komentomuokkaus</translation>
     </message>
     <message numerus="yes">
         <location filename="../themes/themestrings.h" line="733"/>
         <source>%name%% (v.|version%)</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform></numerusform>
         </translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="734"/>
         <source>%resolution% %(|aspect|)%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="736"/>
         <source>%title%% (|year|)%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="737"/>
@@ -31384,122 +31379,122 @@ Jos valitset &quot;Käytä oletus toistinta,&quot; laajennoksen toistokomento j�
     <message>
         <location filename="../themes/themestrings.h" line="739"/>
         <source>%Rating: |rating%</source>
-        <translation type="unfinished"></translation>
+        <translation>%Arvostelu: |rating%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="740"/>
         <source>Videolevel: 1</source>
-        <translation type="unfinished"></translation>
+        <translation>Videotaso: 1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="741"/>
         <source>Videolevel: 2</source>
-        <translation type="unfinished"></translation>
+        <translation>Videotaso: 2</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="742"/>
         <source>Videolevel: 3</source>
-        <translation type="unfinished"></translation>
+        <translation>Videotaso: 3</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="743"/>
         <source>Videolevel: 4</source>
-        <translation type="unfinished"></translation>
+        <translation>Videotaso: 4</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="745"/>
         <source>Edit Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>Muokkaa metadataa</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="752"/>
         <source>Player Cmd:</source>
-        <translation type="unfinished"></translation>
+        <translation>Soitinkomento:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="753"/>
         <source>Cover Art</source>
-        <translation type="unfinished"></translation>
+        <translation>Kansikuva</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="754"/>
         <source>Net Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Verkkohaku</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="755"/>
         <source>Banner</source>
-        <translation type="unfinished"></translation>
+        <translation>Banneri</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="756"/>
         <source>Screenshot</source>
-        <translation type="unfinished"></translation>
+        <translation>Kuvankaappaus</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="757"/>
         <source>Trailer</source>
-        <translation type="unfinished"></translation>
+        <translation>Traileri</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="760"/>
         <source>No videos in library, or no files found. If you have configured a video directory, press &quot;M&quot; (or the MENU key) and select &quot;Scan for Changes.&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>Ei videoita kirjastossa, tai tiedostoja ei löydy. Jos olet asettanut videohakemiston, paina &quot;M&quot; (tai MENU näppäintä) ja valitse &quot;Etsi muutoksia.&quot;</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="764"/>
         <source>Rated: %rating%</source>
-        <translation type="unfinished"></translation>
+        <translation>Arvosteltu: %rating%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="765"/>
         <source>Parental: 0</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikäsuositus: 0</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="766"/>
         <source>Parental: 1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikäsuositus: 1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="767"/>
         <source>Parental: 2</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikäsuositus: 2</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="768"/>
         <source>Parental: 3</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikäsuositus: 3</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="769"/>
         <source>Parental: 4</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikäsuositus: 4</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="771"/>
         <source>BluRay Player:</source>
-        <translation type="unfinished"></translation>
+        <translation>BluRay -soitin:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="772"/>
         <source>BluRay Region:</source>
-        <translation type="unfinished"></translation>
+        <translation>BluRay -alue:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="773"/>
         <source>Welcome</source>
-        <translation type="unfinished"></translation>
+        <translation>Tervetuloa</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="774"/>
         <source>Retrieving Recording Status ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Haetaan tallennuksen tilaa ...</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="775"/>
         <source>Retrieving Scheduled Recordings ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Haetaan ajastettuja tallennuksia ...</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="777"/>
@@ -31609,14 +31604,13 @@ Jos valitset &quot;Käytä oletus toistinta,&quot; laajennoksen toistokomento j�
     <message>
         <location filename="../themes/themestrings.h" line="156"/>
         <source>%TITLE%% - |SUBTITLE%% (|YEAR|)%</source>
-        <translation>%TITLE%% - |SUBTITLE%% (|YEAR|)%</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="984"/>
         <source>%&quot;|SUBTITLE|&quot; %%00X00| %%(|ORIGINALAIRDATE|)
 %%YEARSTARS| %%DESCRIPTION%</source>
-        <translation>%&quot;|SUBTITLE|&quot; %%00X00| %%(|ORIGINALAIRDATE|)
-%%YEARSTARS| %%DESCRIPTION%</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="986"/>
@@ -31640,7 +31634,7 @@ Jos valitset &quot;Käytä oletus toistinta,&quot; laajennoksen toistokomento j�
     <message>
         <location filename="../themes/themestrings.h" line="997"/>
         <source>%YEARSTARS| %%DESCRIPTION%</source>
-        <translation>%YEARSTARS| %%DESCRIPTION%</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="999"/>
@@ -31723,7 +31717,7 @@ Jos valitset &quot;Käytä oletus toistinta,&quot; laajennoksen toistokomento j�
     <message>
         <location filename="../themes/themestrings.h" line="1063"/>
         <source>-&gt;</source>
-        <translation>-&gt;</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1064"/>
@@ -31738,12 +31732,12 @@ Jos valitset &quot;Käytä oletus toistinta,&quot; laajennoksen toistokomento j�
     <message>
         <location filename="../themes/themestrings.h" line="1067"/>
         <source>(%1) +</source>
-        <translation>(%1) +</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1068"/>
         <source>= %1</source>
-        <translation>= %1</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1069"/>
@@ -31753,7 +31747,7 @@ Jos valitset &quot;Käytä oletus toistinta,&quot; laajennoksen toistokomento j�
     <message>
         <location filename="../themes/themestrings.h" line="1070"/>
         <source>%|(STARS|) %%DESCRIPTION%</source>
-        <translation>%|(STARS|) %%DESCRIPTION%</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Radio Stream</source>
@@ -31770,7 +31764,7 @@ Jos valitset &quot;Käytä oletus toistinta,&quot; laajennoksen toistokomento j�
     <message>
         <location filename="../themes/themestrings.h" line="1130"/>
         <source>%1 -</source>
-        <translation>%1 -</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Add/Edit Music Stream</source>
@@ -31896,12 +31890,12 @@ Jos valitset &quot;Käytä oletus toistinta,&quot; laajennoksen toistokomento j�
     <message>
         <location filename="../themes/themestrings.h" line="487"/>
         <source>%TITLE%</source>
-        <translation>%TITLE%</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="818"/>
         <source>%00x00| - %%SUBTITLE%</source>
-        <translation>%00x00| - %%SUBTITLE%</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="889"/>
@@ -31961,177 +31955,177 @@ Jos valitset &quot;Käytä oletus toistinta,&quot; laajennoksen toistokomento j�
     <message>
         <location filename="../themes/themestrings.h" line="1071"/>
         <source>Designed to show off some different element arrangements.  Tested at 1280x720 and with Français. Reminder: On Watch Recordings screen [Rew] and [FF] can be used to change the Rec. Group.</source>
-        <translation type="unfinished"></translation>
+        <translation>Suunniteltu näyttämään joitain erilaisia elementtijärjestelyjä.  Kokeiltu1280x720 resoluutiolla ranskan kielellä. Muistutus: Katsottujen tallenteiden ruudussa voidaan käyttää [Rew] ja [FF] vaihtamaan tallennusryhmää.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1089"/>
         <source>Designed to show off some different element arrangements.  Reminder: On Watch Recordings screen [Rew] and [FF] can be used to change the Rec. Group.</source>
-        <translation type="unfinished"></translation>
+        <translation>Suunniteltu näyttämään joitain erilaisia elementtijärjestelyjä.  Muistutus: Katsottujen tallenteiden ruudussa voidaan käyttää [Rew] ja [FF] vaihtamaan tallennusryhmää.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1090"/>
         <source>Import DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Tuo DVD</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1091"/>
         <source>Import video from a movie DVD and convert it</source>
-        <translation type="unfinished"></translation>
+        <translation>Tuo video DVD:ltä ja muunna se</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1092"/>
         <source>Read music from a CD and convert it</source>
-        <translation type="unfinished"></translation>
+        <translation>Lue musiikki CD:ltä ja muunna se</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1093"/>
         <source>Webbrowser</source>
-        <translation type="unfinished"></translation>
+        <translation>Nettiselain</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1094"/>
         <source>Start surfing from your selected homepage</source>
-        <translation type="unfinished"></translation>
+        <translation>Aloita selailu valitsemaltasi kotisivulta</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1095"/>
         <source>Bookmarks</source>
-        <translation type="unfinished"></translation>
+        <translation>Kirjanmerkit</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1096"/>
         <source>Choose favourite webpages from a list</source>
-        <translation type="unfinished"></translation>
+        <translation>Valitse suosikkinettisivustosi listalta</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1097"/>
         <source>Zoneminder</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1098"/>
         <source>Monitor your cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Seuraa kameroitasi</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1099"/>
         <source>Listen to your Music</source>
-        <translation type="unfinished"></translation>
+        <translation>Kuuntele musiikkiasi</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1100"/>
         <source>Listen to music from your current playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Kuuntele musiikkia nykyiseltä soittolistaltasi</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1101"/>
         <source>Play Streams</source>
-        <translation type="unfinished"></translation>
+        <translation>Soita suoratoistoja</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1102"/>
         <source>Listen to music from the internet</source>
-        <translation type="unfinished"></translation>
+        <translation>Kuuntele musiikkia Internetistä</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1103"/>
         <source>Select Music</source>
-        <translation type="unfinished"></translation>
+        <translation>Valitse musiikki</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1104"/>
         <source>Create and manage your music playlists</source>
-        <translation type="unfinished"></translation>
+        <translation>Luo ja hallitse musiikkisoittolistojasi</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1105"/>
         <source>Scan for New Music</source>
-        <translation type="unfinished"></translation>
+        <translation>Etsi uutta musiikkia</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1106"/>
         <source>Update your collection by looking for new music</source>
-        <translation type="unfinished"></translation>
+        <translation>Päivitä kokoelmasi etsimällä uutta musiikkia</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1107"/>
         <source>Blue-abstract is a modern looking theme meant for widescreen HD displays. The blue background and the consistent layout makes it an attractive and elegant looking theme. This contains an adjusted menu structure for the theme.</source>
-        <translation type="unfinished"></translation>
+        <translation>Blue-abstract on modernin näköinen teema laajakuvanäytöille. Sininen tausta ja johdonmukainen asettelu tekee teemasta houkuttelevan ja elegantin näköisen. Tämä sisältää muokatun valikkorakenteen teemalle.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1108"/>
         <source>Live TV</source>
-        <translation type="unfinished"></translation>
+        <translation>Suora TV</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1109"/>
         <source>Look at the program list and schedule them</source>
-        <translation type="unfinished"></translation>
+        <translation>Katso ohjelmaluetteloa ja ajasta ohjelmia</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1110"/>
         <source>Organize Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Järjestele Tallenteita</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1111"/>
         <source>Find shows or pick shows to record or delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Etsi tai valitse ohjelmia ohjelmien tallentamiseksi tai poistamiseksi</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1112"/>
         <source>Advanced planning</source>
-        <translation type="unfinished"></translation>
+        <translation>Edistynyt suunnittelu</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1113"/>
         <source>Search for shows and more options</source>
-        <translation type="unfinished"></translation>
+        <translation>Etsi ohjelmia ja lisää vaihtoehtoja</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1114"/>
         <source>TV Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>TV -tallennukset</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1115"/>
         <source>Play DVD</source>
-        <translation type="unfinished">Toistetaan DVD</translation>
+        <translation>Toista DVD</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1116"/>
         <source>Browse video highlights and popular sites</source>
-        <translation type="unfinished"></translation>
+        <translation>Selaa parhaita videoita ja suosittuja sivustoja</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1117"/>
         <source>File Browser</source>
-        <translation type="unfinished">Tiedostoselain</translation>
+        <translation>Tiedostoselain</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1118"/>
         <source>Directory:</source>
-        <translation type="unfinished">Hakemisto:</translation>
+        <translation>Hakemisto:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1119"/>
         <source>Metadata Search Results</source>
-        <translation type="unfinished"></translation>
+        <translation>Metadatan hakutulokset</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1120"/>
         <source>Artwork Search Results</source>
-        <translation type="unfinished"></translation>
+        <translation>Kuvamateriaalin hakutulokset</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1121"/>
         <source>Search Term:</source>
-        <translation type="unfinished"></translation>
+        <translation>Hakutermi:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1122"/>
         <source>Search State:</source>
-        <translation type="unfinished"></translation>
+        <translation>Haun tila:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1123"/>
@@ -32141,287 +32135,292 @@ Jos valitset &quot;Käytä oletus toistinta,&quot; laajennoksen toistokomento j�
     <message>
         <location filename="../themes/themestrings.h" line="1124"/>
         <source>Channel: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanava: %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1125"/>
         <source>%LONGREPEAT%%(|STARS|) %%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1126"/>
         <source>Season: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Kausi: %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1127"/>
         <source>Episode: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Jakso: %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1128"/>
         <source>Icon import</source>
-        <translation type="unfinished"></translation>
+        <translation>Kuvakkeiden tuonti</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1129"/>
         <source>Result:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tulos:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1131"/>
         <source>States</source>
-        <translation type="unfinished"></translation>
+        <translation>Tilat</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1132"/>
         <source>Use this language for the Movie Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>Käytä tätä kieltä elokuvan metadataan</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1133"/>
         <source>Use this language for TV Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>Käytä tätä kieltä TV:n metadataan</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1134"/>
         <source>Use this language for Game Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>Käytä tätä kieltä pelin metadataan</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1135"/>
         <source>Current Profile:</source>
-        <translation type="unfinished"></translation>
+        <translation>Nykyinen profiili:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1136"/>
         <source>View</source>
-        <translation type="unfinished"></translation>
+        <translation>Näkymä</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1137"/>
         <source>Submit</source>
-        <translation type="unfinished"></translation>
+        <translation>Lähetä</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1138"/>
         <source>Video Profile Format:</source>
-        <translation type="unfinished"></translation>
+        <translation>Videoprofiilimuoto:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1139"/>
         <source>Version: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Versio: %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1140"/>
         <source>Protocol-Version: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Protokollan versio: %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1141"/>
         <source>Connection Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>Yhteys Ok</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1142"/>
         <source>Protocol Version Mismatch</source>
-        <translation type="unfinished"></translation>
+        <translation>Protokollan versioristiriita</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1143"/>
         <source>Blocked By Firewall</source>
-        <translation type="unfinished"></translation>
+        <translation>Palomuurin estämä</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1144"/>
         <source>Watch live TV or schedule recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Katso suoraa TV:tä tai ajasta tallennuksia</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1145"/>
         <source>Browse the internet or your video library</source>
-        <translation type="unfinished"></translation>
+        <translation>Selaa Internetiä tai videokirjastoasi</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1146"/>
         <source>Listen to your music or from the internet</source>
-        <translation type="unfinished"></translation>
+        <translation>Kuuntele musiikkiasi tai musiikkia Internetistä</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1147"/>
         <source>Pictures</source>
-        <translation type="unfinished"></translation>
+        <translation>Kuvia</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1148"/>
         <source>Internet and Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Internet ja informaatio</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1149"/>
         <source>Surf the net, read news and more</source>
-        <translation type="unfinished"></translation>
+        <translation>Selaa Internetiä, lue uutisia ja muuta</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1150"/>
         <source>Extras</source>
-        <translation type="unfinished"></translation>
+        <translation>Ekstrat</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1151"/>
         <source>Setup, status information and import</source>
-        <translation type="unfinished"></translation>
+        <translation>Asetukset, tilatieto ja tuonti</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1152"/>
         <source>OSD Debug Information</source>
-        <translation type="unfinished"></translation>
+        <translation>OSD Debug -tietoja</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1153"/>
         <source>OSD Input</source>
-        <translation type="unfinished"></translation>
+        <translation>OSD -sisääntulo</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1154"/>
         <source>Bluray</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1155"/>
         <source>Frames: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ruutuja: %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1156"/>
         <source>Seek: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Kelaus: %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1157"/>
         <source>Action: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Toiminto: %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1158"/>
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded.
 To schedule a recording, exit this screen and select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Et ole ajastanut yhtään tallennusta.
+ Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&apos; tai &apos;Ohjelmahaku&apos;</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1159"/>
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded
  To schedule a recording, exit this screen and Select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Et ole ajastanut yhtään tallennusta
+ Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&apos; tai &apos;Ohjelmahaku&apos;</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1160"/>
         <source>Custom Recording Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Mukautetut tallennussäännöt</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1161"/>
         <source>System Event Command Editor</source>
-        <translation type="unfinished">Järjestelmän tapahtumien muokkaus</translation>
+        <translation>Järjestelmätapahtumien komentomuokkaus</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1162"/>
         <source>Event command:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tapahtuman komento:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1163"/>
         <source>Resolution: %RESOLUTION%</source>
-        <translation type="unfinished"></translation>
+        <translation>Resoluutio: %RESOLUTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1164"/>
         <source>Download progress:</source>
-        <translation type="unfinished"></translation>
+        <translation>Latauksen edistyminen:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1165"/>
         <source>Description: %DESCRIPTION%
 Errata: %ERRATA%</source>
-        <translation type="unfinished"></translation>
+        <translation>Kuvaus: %DESCRIPTION%
+Virheet: %ERRATA%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1166"/>
         <source>Frontend in standby mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Käyttöliittymä lepotilassa</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1167"/>
         <source>Blue-abstract is a modern looking theme meant for widescreen HD displays. The blue background and the consistent layout makes it an attractive and elegant looking theme. It also contains a custom menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Blue-abstract on modernin näköinen teema laajakuvanäytöille. Sininen tausta ja johdonmukainen asettelu tekee teemasta houkuttelevan ja elegantin näköisen. Teema sisältää myös räätälöidyn valikon.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1168"/>
         <source>No videos in library or files are being loaded...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ei tallenteita kirjastossa, tai tiedostot ovat latautumassa...</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1169"/>
         <source>No videos in library, or no files found.
 
  If you have configured a video directory, press &quot;M&quot; (or the MENU key) and select &quot;Scan for Changes.&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>Ei videoita kirjastossa, tai tiedostoja ei löydy.
+
+ Jos olet asettanut videohakemiston, paina &quot;M&quot; (tai MENU näppäintä) ja valitse &quot;Etsi muutoksia.&quot;</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1170"/>
         <source>Video Tree</source>
-        <translation type="unfinished"></translation>
+        <translation>Videopuu</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1171"/>
         <source>Edit File Extensions</source>
-        <translation type="unfinished"></translation>
+        <translation>Muokkaa tiedostopäätteitä</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1172"/>
         <source>InetRef:</source>
-        <translation type="unfinished"></translation>
+        <translation>Nettiref:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1173"/>
         <source>Sort by:</source>
-        <translation type="unfinished"></translation>
+        <translation>Järjestä:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1174"/>
         <source>Video Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Videon yksityiskohdat</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1175"/>
         <source>Browseable:</source>
-        <translation type="unfinished"></translation>
+        <translation>Selattavissa:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1176"/>
         <source>Undefined</source>
-        <translation type="unfinished">Määrittelemätön</translation>
+        <translation>Määrittelemätön</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1177"/>
         <source>Perform metadata update after video scan:</source>
-        <translation type="unfinished"></translation>
+        <translation>Päivitä metadata videohaun jälkeen:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1178"/>
         <source>Enable Random Trailer Playback:</source>
-        <translation type="unfinished"></translation>
+        <translation>Käytä satunnaista trailereiden toistoa:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1179"/>
         <source>Enable metadata in file browse mode:</source>
-        <translation type="unfinished"></translation>
+        <translation>Mahdollista metatiedot tiedostojen selaustilassa:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1180"/>
         <source>Display unknown file types:</source>
-        <translation type="unfinished"></translation>
+        <translation>Näytä tuntemattomat tiedostotyypit:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1181"/>
@@ -32431,7 +32430,7 @@ Errata: %ERRATA%</source>
     <message>
         <location filename="../themes/themestrings.h" line="1182"/>
         <source>This theme is based on, and inspired by, the original XBMC skin called Aeon by Duncan Harris. When using this theme you should select the customized menu called &apos;MythAeon&apos; as this menu lay-out and items are tailored for this particular theme.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä teema perustuu Duncan Harrisin Aeon XBMC skiniin ja on Aeon -skinin innoittama. Käyttäessäsi teemaa sinun tulisi käyttää MythAeon muokattua menua. Menun ulkoasu ja asettelu ovat räätälöitä juuri tätä teemaa varten.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1185"/>
@@ -32516,7 +32515,7 @@ Errata: %ERRATA%</source>
     <message>
         <location filename="../themes/themestrings.h" line="1047"/>
         <source>%STARTDATE%   %STARTTIME%% - |ENDTIME%</source>
-        <translation>%STARTDATE%   %STARTTIME%% - |ENDTIME%</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1054"/>
