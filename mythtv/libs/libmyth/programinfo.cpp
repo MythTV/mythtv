@@ -788,6 +788,7 @@ ProgramInfo::ProgramInfo(
         dupmethod   = s.dupmethod;
         findid      = s.findid;
         recordedid  = s.recordedid;
+        hostname    = s.hostname;
 
         // This is the exact showing (same chanid or callsign)
         // which will be recorded
