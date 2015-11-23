@@ -681,6 +681,7 @@ ProgramInfo::ProgramInfo(
         dupin       = s.dupin;
         dupmethod   = s.dupmethod;
         findid      = s.findid;
+        hostname    = s.hostname;
 
         if (chanstr != s.chanstr)
         {
