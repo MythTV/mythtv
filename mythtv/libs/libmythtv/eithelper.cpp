@@ -159,23 +159,33 @@ void EITHelper::AddEIT(uint atsc_major, uint atsc_minor,
                      eit->title(i).GetBestMatch(languagePreferences),
                      eit->Descriptors(i), eit->DescriptorsLength(i));
 
+        // Look to see if there has been a recent ett message with the same event id.
         EventIDToETT::iterator it = etts.find(eit->EventID(i));
-
+        QString ett_text = QString::null;
+        bool found_matching_ett = false;
         if (it != etts.end())
         {
-            CompleteEvent(atsc_major, atsc_minor, ev, *it);
+            // Don't use an ett description if it was scanned long in the past.
+            if (!it->IsStale()) {
+              ett_text = it->ett_text;
+              found_matching_ett = true;
+            }
             etts.erase(it);
         }
-        else if (!ev.etm)
+
+        // Create an event immediately if a matching ett description was found,
+        // or if item is false, indicating that no ett description should be
+        // expected.
+        if (found_matching_ett || !ev.etm)
         {
-            CompleteEvent(atsc_major, atsc_minor, ev, QString::null);
+            CompleteEvent(atsc_major, atsc_minor, ev, ett_text);
         }
         else
         {
             unsigned char *tmp = new unsigned char[ev.desc_length];
             memcpy(tmp, eit->Descriptors(i), ev.desc_length);
             ev.desc = tmp;
-            events[eit->EventID(i)] = ev;
+            events.insert(eit->EventID(i), ev);
         }
     }
 }
@@ -184,33 +194,51 @@ void EITHelper::AddETT(uint atsc_major, uint atsc_minor,
                        const ExtendedTextTable *ett)
 {
     uint atsc_key = (atsc_major << 16) | atsc_minor;
-    // Try to complete an Event
+    // Try to match up the ett with an eit event.
     ATSCSRCToEvents::iterator eits_it = incomplete_events.find(atsc_key);
     if (eits_it != incomplete_events.end())
     {
         EventIDToATSCEvent::iterator it = (*eits_it).find(ett->EventID());
         if (it != (*eits_it).end())
         {
-            CompleteEvent(
-                atsc_major, atsc_minor, *it,
-                ett->ExtendedTextMessage().GetBestMatch(languagePreferences));
+            bool completed_event = false;
+            // Only consider eit events from the recent past.
+            if (!it->IsStale()) {
+              completed_event = true;
+              CompleteEvent(
+                  atsc_major, atsc_minor, *it,
+                  ett->ExtendedTextMessage().GetBestMatch(languagePreferences));
+            }
 
             if ((*it).desc)
                 delete [] (*it).desc;
 
             (*eits_it).erase(it);
 
-            return;
+            if (completed_event) return;
         }
     }
 
-    // Couldn't find matching EIT. If not yet in unmatched ETT map, insert it.
+    // Report if an unmatched ett was previously noted and overwrite it.
+    // See also https://code.mythtv.org/trac/ticket/11739
     EventIDToETT &elist = unmatched_etts[atsc_key];
-    if (elist.find(ett->EventID()) == elist.end())
+    EventIDToETT::iterator existing_unmatched_ett_it =
+        elist.find(ett->EventID());
+    const QString next_ett_text = ett->ExtendedTextMessage()
+        .GetBestMatch(languagePreferences);
+    if (existing_unmatched_ett_it != elist.end() &&
+        existing_unmatched_ett_it->ett_text != next_ett_text)
     {
-        elist[ett->EventID()] = ett->ExtendedTextMessage()
-            .GetBestMatch(languagePreferences);
+       LOG(VB_EIT, LOG_DEBUG, LOC +
+           QString("Overwriting previously unmatched ett. stale: %1 major: %2 "
+                   "minor: %3 old ett: %4  new ett: %5")
+               .arg(existing_unmatched_ett_it->IsStale())
+               .arg(atsc_major)
+               .arg(atsc_minor)
+               .arg(existing_unmatched_ett_it->ett_text)
+               .arg(next_ett_text));
     }
+    elist.insert(ett->EventID(), ATSCEtt(next_ett_text));
 }
 
 static void parse_dvb_event_descriptors(desc_list_t list, uint fix,
