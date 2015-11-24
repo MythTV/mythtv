@@ -275,7 +275,7 @@ class TestMythSystem: public QObject
         QScopedPointer<MythSystem> cmd(
             MythSystem::Create("sleep 5", kMSRunShell));
         usleep(50 * 1000);
-        cmd->Signal(kSignalQuit);
+        cmd->Signal(kSignalTerm);
         cmd->Wait();
         QVERIFY(cmd->GetExitCode() == -1);
     }
