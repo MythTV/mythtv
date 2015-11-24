@@ -277,7 +277,7 @@ class TestMythSystem: public QObject
         usleep(50 * 1000);
         cmd->Signal(kSignalTerm);
         cmd->Wait();
-        QVERIFY(cmd->GetExitCode() == -1);
+        QCOMPARE(cmd->GetExitCode(), -1);
     }
 
     void getexitcode_returns_neg_2_when_still_running(void)
