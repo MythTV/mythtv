@@ -230,7 +230,11 @@ win32 {
 
     EXTRA_LIBS += $$LOCAL_LIBDIR_OGL
     EXTRA_LIBS += $$LOCAL_LIBDIR_X11
-    EXTRA_LIBS += $$CONFIG_OPENGL_LIBS
+    !isEmpty( CONFIG_OPENGL_LIBS ) {
+        # Replace FFmpeg's OpenGL with OpenGLES
+        EXTRA_LIBS -= -lGL
+        EXTRA_LIBS += $$CONFIG_OPENGL_LIBS
+    }
 
     EXTRA_LIBS += -L$$SRC_PATH_BARE/external/qjson/lib -lmythqjson
 
