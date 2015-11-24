@@ -606,6 +606,7 @@ RecStatus::Type TVRec::StartRecording(ProgramInfo *pginfo)
         // Tell event loop to begin recording.
         curRecording = new RecordingInfo(*rcinfo);
         curRecording->MarkAsInUse(true, kRecorderInUseID);
+        StartedRecording(curRecording);
         pginfo->SetRecordingID(curRecording->GetRecordingID());
         pginfo->SetRecordingStartTime(curRecording->GetRecordingStartTime());
 
@@ -4176,8 +4177,6 @@ void TVRec::TuningNewRecorder(MPEGStreamData *streamData)
 
     if (lastTuningRequest.flags & kFlagRecording)
     {
-        StartedRecording(rec);
-
         bool write = genOpt.inputtype != "IMPORT";
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("rec->GetPathname(): '%1'")
                 .arg(rec->GetPathname()));
