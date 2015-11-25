@@ -248,14 +248,24 @@ bool RemoteFile::OpenInternal()
 {
     if (isLocal())
     {
-        if (!Exists(path))
-        {
-            LOG(VB_FILE, LOG_ERR,
-                QString("RemoteFile::Open(%1) Error: Do not exist").arg(path));
-            return false;
-        }
         if (writemode)
         {
+            // make sure the directories are created if necessary
+            QFileInfo fi(path);
+            QDir dir(fi.path());
+            if (!dir.exists())
+            {
+                LOG(VB_FILE, LOG_WARNING, QString("RemoteFile::Open(%1) creating directories")
+                    .arg(path));
+
+                if (!dir.mkpath(fi.path()))
+                {
+                    LOG(VB_GENERAL, LOG_ERR, QString("RemoteFile::Open(%1) failed to create the directories")
+                        .arg(path));
+                    return false;
+                }
+            }
+
             fileWriter = new ThreadedFileWriter(path,
                                                 O_WRONLY|O_TRUNC|O_CREAT|O_LARGEFILE,
                                                 0644);
@@ -271,7 +281,15 @@ bool RemoteFile::OpenInternal()
             SetBlocking();
             return true;
         }
+
         // local mode, read only
+        if (!Exists(path))
+        {
+            LOG(VB_FILE, LOG_ERR,
+                QString("RemoteFile::Open(%1) Error: Does not exist").arg(path));
+            return false;
+        }
+
         localFile = ::open(path.toLocal8Bit().constData(), O_RDONLY);
         if (localFile == -1)
         {
