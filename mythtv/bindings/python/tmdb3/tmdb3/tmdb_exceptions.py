@@ -96,6 +96,7 @@ class TMDBHTTPError(TMDBError):
     def __init__(self, err):
         self.httperrno = err.code
         self.response = err.fp.read()
+        self.headers = err.headers
         super(TMDBHTTPError, self).__init__(str(err))
 
 

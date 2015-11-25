@@ -61,8 +61,20 @@ QString dvb_decode_text(const unsigned char *src, uint raw_length,
     if (src[0] == 0x1f)
         return freesat_huffman_to_string(src, raw_length);
 
-    if (((0x10 < src[0]) && (src[0] < 0x15)) ||
-        ((0x15 < src[0]) && (src[0] < 0x20)))
+    /* UCS-2 aka ISO/IEC 10646-1 Basic Multilingual Plane */
+    if (src[0] == 0x11)
+    {
+        size_t length = (raw_length - 1) / 2;
+        QChar *to = new QChar[length];
+        for (size_t i=0; i<length; i++)
+            to[i] = (src[1 + i*2] << 8) + src[1 + i*2 + 1];
+        QString to2(to, length);
+        delete [] to;
+        return to2;
+    }
+
+    if (((0x11 < src[0]) && (src[0] < 0x15)) ||
+        ((0x15 < src[0]) && (src[0] < 0x1f)))
     {
         // TODO: Handle multi-byte encodings
         LOG(VB_SIPARSER, LOG_ERR, 

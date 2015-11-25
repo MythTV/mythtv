@@ -16,7 +16,7 @@ class ClassicLogoDetector : public LogoDetectorBase
     virtual void deleteLater(void);
 
     bool searchForLogo(MythPlayer* player);
-    bool doesThisFrameContainTheFoundLogo(unsigned char* frame);
+    bool doesThisFrameContainTheFoundLogo(VideoFrame* frame);
     bool pixelInsideLogo(unsigned int x, unsigned int y);
 
     unsigned int getRequiredAvailableBufferForSearch();

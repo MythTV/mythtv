@@ -4660,12 +4660,11 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                 // for passthru or codecs for which the decoder won't downmix
                 // let the decoder set the number of channels. For other codecs
                 // we downmix if necessary in audiooutputbase
-                ctx->request_channel_layout = 0;
+                ctx->request_channels = 0;
             }
             else // No passthru, the decoder will downmix
             {
-                ctx->request_channel_layout =
-                    av_get_default_channel_layout(m_audio->GetMaxChannels());
+                ctx->request_channels = m_audio->GetMaxChannels();
                 if (ctx->codec_id == AV_CODEC_ID_AC3)
                     ctx->channels = m_audio->GetMaxChannels();
             }
@@ -4739,15 +4738,12 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
             {
                 if (DecoderWillDownmix(ctx))
                 {
-                    ctx->request_channel_layout =
-                        av_get_default_channel_layout(m_audio->GetMaxChannels());
+                    ctx->request_channels = m_audio->GetMaxChannels();
                     if (ctx->codec_id == AV_CODEC_ID_AC3)
                         ctx->channels = m_audio->GetMaxChannels();
                 }
                 else
-                {
-                    ctx->request_channel_layout = 0;
-                }
+                    ctx->request_channels = 0;
 
                 ret = m_audio->DecodeAudio(ctx, audioSamples, data_size, &tmp_pkt);
                 decoded_size = data_size;
@@ -5275,7 +5271,7 @@ bool AvFormatDecoder::SetupAudioStream(void)
     AVCodecContext *ctx = NULL;
     AudioInfo old_in    = audioIn;
     bool using_passthru = false;
-    int requested_channels;
+    int  orig_channels  = 2;
 
     if ((currentTrack[kTrackTypeAudio] >= 0) && ic &&
         (selectedTrack[kTrackTypeAudio].av_stream_index <=
@@ -5286,6 +5282,7 @@ bool AvFormatDecoder::SetupAudioStream(void)
         assert(curstream);
         assert(curstream->codec);
         ctx = curstream->codec;
+        orig_channels = selectedTrack[kTrackTypeAudio].orig_num_channels;
         AudioFormat fmt =
             AudioOutputSettings::AVSampleFormatToFormat(ctx->sample_fmt,
                                                         ctx->bits_per_raw_sample);
@@ -5308,25 +5305,17 @@ bool AvFormatDecoder::SetupAudioStream(void)
 
         using_passthru = DoPassThrough(ctx, false);
 
-        requested_channels = ctx->channels;
-        ctx->request_channel_layout =
-            av_get_default_channel_layout(requested_channels);
+        ctx->request_channels = ctx->channels;
 
         if (!using_passthru &&
             ctx->channels > (int)m_audio->GetMaxChannels() &&
             DecoderWillDownmix(ctx))
         {
-            requested_channels = m_audio->GetMaxChannels();
-            ctx->request_channel_layout =
-                av_get_default_channel_layout(requested_channels);
-        }
-        else
-        {
-            ctx->request_channel_layout = 0;
+            ctx->request_channels = m_audio->GetMaxChannels();
         }
 
         info = AudioInfo(ctx->codec_id, fmt, ctx->sample_rate,
-                         requested_channels, using_passthru, ctx->channels,
+                         ctx->channels, using_passthru, orig_channels,
                          ctx->codec_id == AV_CODEC_ID_DTS ? ctx->profile : 0);
     }
 
@@ -5350,8 +5339,8 @@ bool AvFormatDecoder::SetupAudioStream(void)
         QString("\n\t\t\tfrom %1 to %2")
             .arg(old_in.toString()).arg(audioOut.toString()));
 
-    m_audio->SetAudioParams(audioOut.format, ctx->channels,
-                            requested_channels,
+    m_audio->SetAudioParams(audioOut.format, orig_channels,
+                            ctx->request_channels,
                             audioOut.codec_id, audioOut.sample_rate,
                             audioOut.do_passthru, audioOut.codec_profile);
     m_audio->ReinitAudio();

@@ -3,6 +3,8 @@
 #include <cmath>
 #include <cstring>
 
+#include "frame.h"
+
 Histogram::Histogram()
 {
     memset(data,0,sizeof(data));
@@ -15,7 +17,7 @@ Histogram::~Histogram()
 {
 }
 
-void Histogram::generateFromImage(unsigned char* frame, unsigned int frameWidth,
+void Histogram::generateFromImage(VideoFrame* frame, unsigned int frameWidth,
          unsigned int frameHeight, unsigned int minScanX, unsigned int maxScanX,
          unsigned int minScanY, unsigned int maxScanY, unsigned int XSpacing,
          unsigned int YSpacing)
@@ -29,10 +31,12 @@ void Histogram::generateFromImage(unsigned char* frame, unsigned int frameWidth,
     if (maxScanY > frameHeight-1)
         maxScanY = frameHeight-1;
 
+    unsigned char* framePtr = frame->buf;
+    int bytesPerLine = frame->pitches[0];
     for(unsigned int y = minScanY; y < maxScanY; y += YSpacing)
         for(unsigned int x = minScanX; x < maxScanX; x += XSpacing)
         {
-            data[frame[y * frameWidth + x]]++;
+            data[framePtr[y * bytesPerLine + x]]++;
             numberOfSamples++;
         }
 }
@@ -85,4 +89,3 @@ float Histogram::calculateSimilarityWith(const Histogram& other) const
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
-

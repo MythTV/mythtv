@@ -4,6 +4,7 @@
 #include <QObject>
 
 class MythPlayer;
+typedef struct VideoFrame_ VideoFrame;
 
 class LogoDetectorBase : public QObject
 {
@@ -14,7 +15,7 @@ class LogoDetectorBase : public QObject
         foundLogo(false), width(w),height(h) {};
 
     virtual bool searchForLogo(MythPlayer* player) = 0;
-    virtual bool doesThisFrameContainTheFoundLogo(unsigned char* frame) = 0;
+    virtual bool doesThisFrameContainTheFoundLogo(VideoFrame* frame) = 0;
     virtual bool pixelInsideLogo(unsigned int x, unsigned int y) = 0;
     virtual unsigned int getRequiredAvailableBufferForSearch() = 0;
 
