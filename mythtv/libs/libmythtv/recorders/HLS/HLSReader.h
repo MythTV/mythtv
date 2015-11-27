@@ -64,6 +64,7 @@ class HLSReader
     static void CancelURL(const QString &url);
     static void CancelURL(const QStringList &urls);
     static QString RelativeURI(const QString surl, const QString spath);
+    static bool IsValidPlaylist(QTextStream & text);
 
   protected:
     bool FatalError(void) const { return m_fatal; }
@@ -81,9 +82,6 @@ class HLSReader
 
   private:
     static QString DecodedURI(const QString uri);
-
-    bool IsValidPlaylist(QTextStream & text);
-
     static QString ParseAttributes(const QString& line, const char* attr);
     static bool ParseDecimalValue(const QString& line, int& target);
     static bool ParseDecimalValue(const QString& line, int64_t& target);
