@@ -33,6 +33,7 @@
 # undef LOC
 # include "mythpainter_ogl.h"
 #endif //def OSD_EGL
+#include "mythmainwindow.h"
 
 #include "filtermanager.h"
 #include "videodisplayprofile.h"
@@ -304,14 +305,14 @@ bool VideoOutputOMX::Init(          // Return true if successful
     }
 #endif
 
+    MoveResize();
+
     m_disp_rect = m_vid_rect = QRect();
     if (!SetVideoRect(window.GetDisplayVideoRect(), window.GetVideoRect()))
         return false;
 
     if (!Start())
         return false;
-
-    MoveResize();
 
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + __func__ + " done");
     return true;
@@ -368,14 +369,14 @@ bool VideoOutputOMX::InputChanged(  // Return true if successful
     if (!CreateBuffers(video_dim_buf, video_dim_disp))
         return false;
 
+    MoveResize();
+
     m_disp_rect = m_vid_rect = QRect();
     if (!SetVideoRect(window.GetDisplayVideoRect(), window.GetVideoRect()))
         return false;
 
     if (!Start())
         return false;
-
-    MoveResize();
 
     if (db_vdisp_profile)
         db_vdisp_profile->SetVideoRenderer(kName);
@@ -692,15 +693,8 @@ void VideoOutputOMX::Show(FrameScanType scan)
 }
 
 // pure virtual
-void VideoOutputOMX::MoveResizeWindow(QRect r)
+void VideoOutputOMX::MoveResizeWindow(QRect)
 {
-    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + __func__ + QString(" rect=%1,%2,%3x%4")
-        .arg(r.x()).arg(r.y()).arg(r.width()).arg(r.height()) );
-
-    if (!hasFullScreenOSD())
-        return;
-
-// TODO...
 }
 
 // virtual
@@ -947,8 +941,11 @@ bool VideoOutputOMX::Start()
     return true;
 }
 
-bool VideoOutputOMX::SetVideoRect(const QRect &disp_rect, const QRect &vid_rect)
+bool VideoOutputOMX::SetVideoRect(const QRect &d_rect, const QRect &vid_rect)
 {
+    // Translate display rect to screen coordinates
+    QRect disp_rect = d_rect.translated(GetMythMainWindow()->geometry().topLeft());
+
     if (disp_rect == m_disp_rect && vid_rect == m_vid_rect)
         return true;
 
