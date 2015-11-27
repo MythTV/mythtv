@@ -639,7 +639,7 @@ void VideoOutputOMX::PrepareFrame(VideoFrame *buffer, FrameScanType scan, OSD *o
 
     framesPlayed = buffer->frameNumber + 1;
 
-    SetVideoRect( (hasFullScreenOSD() && vsz_enabled) ?
+    SetVideoRect( (hasFullScreenOSD() && vsz_enabled && !IsEmbedding()) ?
             vsz_desired_display_rect : window.GetDisplayVideoRect(),
         window.GetVideoRect() );
 }
