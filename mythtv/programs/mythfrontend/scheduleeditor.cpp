@@ -930,7 +930,7 @@ bool SchedEditChild::keyPressEvent(QKeyEvent *event)
 }
 
 bool SchedEditChild::CreateEditChild(
-    const QString xmlfile, const QString winname, bool isTemplate)
+    const QString &xmlfile, const QString &winname, bool isTemplate)
 {
     if (!LoadWindowFromXML(xmlfile, winname, this))
         return false;
