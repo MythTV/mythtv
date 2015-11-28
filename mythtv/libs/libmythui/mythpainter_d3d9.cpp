@@ -236,8 +236,8 @@ D3D9Image* MythD3D9Painter::GetImageFromCache(MythImage *im)
     else
     {
        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create D3D9 UI bitmap.");
-       if (newimage)
-           delete newimage;
+       delete newimage;
+       newimage = NULL;
     }
 
     return newimage;
