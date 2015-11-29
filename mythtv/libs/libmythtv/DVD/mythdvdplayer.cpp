@@ -455,7 +455,7 @@ void MythDVDPlayer::ChangeSpeed(void)
 
     if (decoder)
         decoder->UpdateFramesPlayed();
-    if (play_speed != normal_speed && player_ctx->buffer->IsDVD())
+    if (play_speed > 0.99f && play_speed < 1.01f && normal_speed && player_ctx->buffer->IsDVD())
         player_ctx->buffer->DVD()->SetDVDSpeed(-1);
     else if (player_ctx->buffer->IsDVD())
         player_ctx->buffer->DVD()->SetDVDSpeed();
