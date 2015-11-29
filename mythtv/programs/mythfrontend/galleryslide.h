@@ -26,7 +26,7 @@
 class ImageLoadingThread : public QThread
 {
 public:
-    ImageLoadingThread(MythUIImage *image) : QThread(), m_image(image) {}
+    explicit ImageLoadingThread(MythUIImage *image) : QThread(), m_image(image) {}
 
 protected:
     void run()   { if (m_image) m_image->Load(false); }
@@ -160,7 +160,7 @@ protected:
 class PanAnimation : public Animation
 {
 public:
-    PanAnimation(Slide *image) : Animation(image) {}
+    explicit PanAnimation(Slide *image) : Animation(image) {}
     virtual void updateCurrentValue(const QVariant &value);
 };
 

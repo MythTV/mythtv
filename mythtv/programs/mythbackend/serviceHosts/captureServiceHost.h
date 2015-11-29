@@ -43,7 +43,7 @@ class CaptureServiceHost : public ServiceHost
 {
     public:
 
-        CaptureServiceHost( const QString &sSharePath )
+        explicit CaptureServiceHost( const QString &sSharePath )
                 : ServiceHost( Capture::staticMetaObject,
                                "Capture",
                                "/Capture",

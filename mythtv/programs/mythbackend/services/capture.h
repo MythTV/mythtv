@@ -36,7 +36,7 @@ class Capture : public CaptureServices
 
     public:
 
-        Q_INVOKABLE Capture( QObject *parent = 0 ) {}
+        Q_INVOKABLE explicit Capture( QObject *parent = 0 ) {}
 
     public:
 

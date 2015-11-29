@@ -33,7 +33,7 @@ class ImageServiceHost : public ServiceHost
 {
     public:
 
-        ImageServiceHost( const QString &sSharePath )
+        explicit ImageServiceHost( const QString &sSharePath )
              : ServiceHost( Image::staticMetaObject,
                             "Image",
                             "/Image",

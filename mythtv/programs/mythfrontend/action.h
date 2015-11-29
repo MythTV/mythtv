@@ -39,7 +39,7 @@ class Action
 {
   public:
     /// \brief Create a new empty action.
-    Action(const QString &description) : m_description(description)
+    explicit Action(const QString &description) : m_description(description)
     {
         m_description.detach();
     }

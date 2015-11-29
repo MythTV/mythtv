@@ -33,7 +33,7 @@ class Image : public ImageServices
     Q_OBJECT
 
 public:
-    Q_INVOKABLE Image( QObject *parent = 0 ) {}
+    Q_INVOKABLE explicit Image( QObject *parent = 0 ) {}
 
 public:
     bool                        SetImageInfo                ( int   Id,

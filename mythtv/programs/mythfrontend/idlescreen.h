@@ -14,7 +14,7 @@ class IdleScreen : public MythScreenType
     Q_OBJECT
 
   public:
-    IdleScreen(MythScreenStack *parent);
+    explicit IdleScreen(MythScreenStack *parent);
     virtual ~IdleScreen();
 
     bool Create(void);

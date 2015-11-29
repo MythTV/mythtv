@@ -39,12 +39,12 @@ namespace
         };
 
       public:
-        FileAssociationWrap(const QString &new_extension) : m_state(efsSAVE)
+        explicit FileAssociationWrap(const QString &new_extension) : m_state(efsSAVE)
         {
             m_fa.extension = new_extension;
         }
 
-        FileAssociationWrap(const FileAssociations::file_association &fa) :
+        explicit FileAssociationWrap(const FileAssociations::file_association &fa) :
             m_fa(fa), m_state(efsNONE) {}
 
         unsigned int GetIDx(void) const { return m_fa.id; }

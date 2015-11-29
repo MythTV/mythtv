@@ -23,7 +23,7 @@ class ChannelRecPriority : public MythScreenType
 {
     Q_OBJECT
   public:
-    ChannelRecPriority(MythScreenStack *parent);
+    explicit ChannelRecPriority(MythScreenStack *parent);
     ~ChannelRecPriority();
 
     bool Create(void);

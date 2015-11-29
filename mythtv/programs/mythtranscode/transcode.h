@@ -14,7 +14,7 @@ typedef vector<struct kfatable_entry> KFATable;
 class Transcode : public QObject
 {
   public:
-    Transcode(ProgramInfo *pginfo);
+    explicit Transcode(ProgramInfo *pginfo);
     ~Transcode();
     int TranscodeFile(
         const QString &inputname,

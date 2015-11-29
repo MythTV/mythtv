@@ -85,7 +85,7 @@ class MediaServer : public MediaServerItem
        m_renewalTimerId(0), m_systemUpdateID(-1)
     {
     }
-    MediaServer(QUrl URL)
+    explicit MediaServer(QUrl URL)
      : MediaServerItem(QString("0"), QString(), QString(), QString()),
        m_URL(URL), m_connectionAttempts(0), m_controlURL(QUrl()),
        m_eventSubURL(QUrl()), m_eventSubPath(QString()),

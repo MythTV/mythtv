@@ -8,7 +8,7 @@
 class AirPlayPictureScreen : public MythScreenType
 {
   public:
-    AirPlayPictureScreen(MythScreenStack *parent);
+    explicit AirPlayPictureScreen(MythScreenStack *parent);
    ~AirPlayPictureScreen();
 
    // These two methods are declared by MythScreenType and their signatures

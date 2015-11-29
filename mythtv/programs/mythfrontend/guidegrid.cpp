@@ -229,7 +229,7 @@ public:
 class GuideUpdaterBase
 {
 public:
-    GuideUpdaterBase(GuideGrid *guide) : m_guide(guide) {}
+    explicit GuideUpdaterBase(GuideGrid *guide) : m_guide(guide) {}
     virtual ~GuideUpdaterBase() {}
 
     // Execute the initial non-UI part (in a separate thread).  Return
@@ -357,7 +357,7 @@ public:
 class UpdateGuideEvent : public QEvent
 {
 public:
-    UpdateGuideEvent(GuideUpdaterBase *updater) :
+    explicit UpdateGuideEvent(GuideUpdaterBase *updater) :
         QEvent(kEventType), m_updater(updater) {}
     GuideUpdaterBase *m_updater;
     static Type kEventType;

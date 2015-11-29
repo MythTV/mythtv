@@ -36,7 +36,7 @@ class Dvr : public DvrServices
 
     public:
 
-        Q_INVOKABLE Dvr( QObject *parent = 0 ) {}
+        Q_INVOKABLE explicit Dvr( QObject *parent = 0 ) {}
 
     public:
 

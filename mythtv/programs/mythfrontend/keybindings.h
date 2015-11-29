@@ -39,7 +39,7 @@ class KeyBindings
     /// \brief Levels of conflict
     enum ConflictLevels { kKeyBindingWarning, kKeyBindingError, };
 
-    KeyBindings(const QString &hostname);
+    explicit KeyBindings(const QString &hostname);
 
     // Commands
     bool        AddActionKey(const QString &context_name,

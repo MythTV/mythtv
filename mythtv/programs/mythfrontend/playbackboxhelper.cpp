@@ -30,7 +30,7 @@ using namespace std;
 class PBHEventHandler : public QObject
 {
   public:
-    PBHEventHandler(PlaybackBoxHelper &pbh) :
+    explicit PBHEventHandler(PlaybackBoxHelper &pbh) :
         m_pbh(pbh), m_freeSpaceTimerId(0), m_checkAvailabilityTimerId(0)
     {
         StorageGroup::ClearGroupToUseCache();

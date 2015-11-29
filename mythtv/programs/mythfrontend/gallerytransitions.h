@@ -30,7 +30,7 @@ class Transition : public QObject
 {
     Q_OBJECT
 public:
-    Transition(QString name)
+    explicit Transition(QString name)
         : m_duration(gCoreContext->GetNumSetting("GalleryTransitionTime", 1000)),
           m_old(NULL), m_new(NULL), m_prev(NULL), m_next(NULL),
           m_name(name)                 {}
@@ -160,7 +160,7 @@ class TransitionRandom : public Transition
 {
     Q_OBJECT
 public:
-    TransitionRandom(TransitionMap peers) : Transition(tr("Random")),
+    explicit TransitionRandom(TransitionMap peers) : Transition(tr("Random")),
           m_peers(peers.values()), m_current(NULL) {}
     virtual void Start(Slide *from, Slide *to,
                        bool forwards, float speed = 1.0);
@@ -181,7 +181,7 @@ protected:
 class TransitionRegistry
 {
 public:
-    TransitionRegistry(bool includeAnimations);
+    explicit TransitionRegistry(bool includeAnimations);
     ~TransitionRegistry()    { qDeleteAll(m_map); }
     const TransitionMap GetAll() { return m_map; }
     Transition *Select(int setting);

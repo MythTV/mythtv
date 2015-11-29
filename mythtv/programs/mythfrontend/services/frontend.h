@@ -12,7 +12,7 @@ class Frontend : public FrontendServices
     Q_OBJECT
 
   public:
-    Q_INVOKABLE Frontend(QObject *parent = 0) : FrontendServices(parent) { }
+    Q_INVOKABLE explicit Frontend(QObject *parent = 0) : FrontendServices(parent) { }
 
   public:
     DTC::FrontendStatus* GetStatus(void);

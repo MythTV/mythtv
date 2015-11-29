@@ -37,7 +37,7 @@ class Myth : public MythServices
 
     public:
 
-        Q_INVOKABLE Myth( QObject *parent = 0 ) : MythServices( parent ) {}
+        Q_INVOKABLE explicit Myth( QObject *parent = 0 ) : MythServices( parent ) {}
 
     public:
 

@@ -68,7 +68,7 @@ class UPNPScanner : public QObject
     void replyFinished(QNetworkReply *reply);
 
   private:
-    UPNPScanner(UPNPSubscription *sub);
+    explicit UPNPScanner(UPNPSubscription *sub);
     void ScheduleUpdate(void);
     void CheckFailure(const QUrl &url);
     void Debug(void);

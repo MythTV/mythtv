@@ -205,7 +205,7 @@ template <typename T>
 class BasicFilterSettingsProxy : public FilterSettingsProxy
 {
   public:
-    BasicFilterSettingsProxy(T &type) : m_type(type) {}
+    explicit BasicFilterSettingsProxy(T &type) : m_type(type) {}
 
     const VideoFilterSettings &getSettings()
     {

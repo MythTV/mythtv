@@ -90,7 +90,7 @@ public:
      \brief Settings for Importing
      \param enable True if password has been entered
     */
-    ImportSettings(bool enable) : VerticalConfigurationGroup()
+    explicit ImportSettings(bool enable) : VerticalConfigurationGroup()
     {
         setLabel(tr("Import"));
         setEnabled(enable);

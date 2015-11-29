@@ -169,7 +169,7 @@ class ProcessRequestRunnable : public QRunnable
 class FreeSpaceUpdater : public QRunnable
 {
   public:
-    FreeSpaceUpdater(MainServer &parent) :
+    explicit FreeSpaceUpdater(MainServer &parent) :
         m_parent(parent), m_dorun(true), m_running(true)
     {
         m_lastRequest.start();

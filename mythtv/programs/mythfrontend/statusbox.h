@@ -19,7 +19,7 @@ class StatusBox : public MythScreenType
 {
     Q_OBJECT
   public:
-    StatusBox(MythScreenStack *parent);
+    explicit StatusBox(MythScreenStack *parent);
    ~StatusBox(void);
 
     bool Create(void);

@@ -43,7 +43,7 @@ class DvrServiceHost : public ServiceHost
 {
     public:
 
-        DvrServiceHost( const QString &sSharePath )
+        explicit DvrServiceHost( const QString &sSharePath )
                 : ServiceHost( Dvr::staticMetaObject, 
                                "Dvr", 
                                "/Dvr",

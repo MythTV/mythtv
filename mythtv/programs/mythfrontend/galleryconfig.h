@@ -23,7 +23,7 @@ class DatabaseSettings : public VerticalConfigurationGroup
 {
     Q_OBJECT
 public:
-    DatabaseSettings(bool enable);
+    explicit DatabaseSettings(bool enable);
 
 private slots:
     void ClearDb()    { GalleryBERequest::ClearDatabase(); }
@@ -34,7 +34,7 @@ private slots:
 class GalleryConfig : public ConfigurationWizard
 {
 public:
-    GalleryConfig(bool editMode)
+    explicit GalleryConfig(bool editMode)
     {
         addChild(new GallerySettings());
         addChild(new DatabaseSettings(editMode));

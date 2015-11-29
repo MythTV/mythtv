@@ -41,7 +41,7 @@ public:
 class WorkerThread: public MThread
 {
 public:
-    WorkerThread(QString name) : MThread(name), m_result(0) {}
+    explicit WorkerThread(QString name) : MThread(name), m_result(0) {}
     int GetResult(void) { return m_result; }
 protected:
     int m_result;
@@ -52,7 +52,7 @@ protected:
 class ShellWorker: public WorkerThread
 {
 public:
-    ShellWorker(QString cmd) : WorkerThread("import"), m_command(cmd) {}
+    explicit ShellWorker(QString cmd) : WorkerThread("import"), m_command(cmd) {}
     virtual void run();
 private:
     QString m_command;

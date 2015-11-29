@@ -21,7 +21,7 @@ class LCDProcClient : public QObject
 
   public:
 
-    LCDProcClient(LCDServer *lparent);
+    explicit LCDProcClient(LCDServer *lparent);
 
     void customEvent(QEvent  *e);
 

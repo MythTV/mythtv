@@ -144,7 +144,7 @@ class PlaybackProfileItemConfig : public QObject, public ConfigurationWizard
     Q_OBJECT
 
   public:
-    PlaybackProfileItemConfig(ProfileItem &_item);
+    explicit PlaybackProfileItemConfig(ProfileItem &_item);
 
     virtual void Load(void);
     virtual void Save(void);
@@ -178,7 +178,7 @@ class PlaybackProfileConfig : public VerticalConfigurationGroup
     Q_OBJECT
 
   public:
-    PlaybackProfileConfig(const QString &profilename);
+    explicit PlaybackProfileConfig(const QString &profilename);
     virtual ~PlaybackProfileConfig();
 
     virtual void Load(void);
@@ -214,7 +214,7 @@ class PlaybackProfileConfigs : public TriggeredConfigurationGroup
     Q_OBJECT
 
   public:
-    PlaybackProfileConfigs(const QString &str);
+    explicit PlaybackProfileConfigs(const QString &str);
     virtual ~PlaybackProfileConfigs();
 
   private:

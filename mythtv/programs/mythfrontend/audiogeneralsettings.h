@@ -21,7 +21,7 @@ class AudioConfigSettings : public VerticalConfigurationGroup
     Q_OBJECT
 
   public:
-    AudioConfigSettings(ConfigurationWizard *);
+    explicit AudioConfigSettings(ConfigurationWizard *);
 
     typedef QMap<QString,AudioOutput::AudioDeviceConfig> ADCMap;
 
@@ -73,7 +73,7 @@ class AudioDeviceComboBox : public HostComboBox
 {
     Q_OBJECT
   public:
-    AudioDeviceComboBox(AudioConfigSettings*);
+    explicit AudioDeviceComboBox(AudioConfigSettings*);
     void AudioRescan();
 
   private slots:
@@ -109,7 +109,7 @@ class AudioAdvancedSettings : public VerticalConfigurationGroup
     Q_OBJECT
 
   public:
-    AudioAdvancedSettings(bool mpcm);
+    explicit AudioAdvancedSettings(bool mpcm);
 
     HostCheckBox       *MPCM();
     HostCheckBox       *SRCQualityOverride();
@@ -126,7 +126,7 @@ class AudioAdvancedSettings : public VerticalConfigurationGroup
 class AudioAdvancedSettingsGroup : public ConfigurationWizard
 {
   public:
-    AudioAdvancedSettingsGroup(bool mpcm);
+    explicit AudioAdvancedSettingsGroup(bool mpcm);
 };
 
 class AudioTestGroup : public ConfigurationWizard

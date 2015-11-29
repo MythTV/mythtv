@@ -142,7 +142,7 @@ namespace
         }
 
       private:
-        RunSettingsCompletion(bool check)
+        explicit RunSettingsCompletion(bool check)
         {
             if (check)
             {

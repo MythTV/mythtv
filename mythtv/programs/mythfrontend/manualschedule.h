@@ -22,7 +22,7 @@ class ManualSchedule : public MythScreenType
     Q_OBJECT
   public:
 
-    ManualSchedule(MythScreenStack *parent);
+    explicit ManualSchedule(MythScreenStack *parent);
    ~ManualSchedule(void) {};
 
     bool Create(void);
