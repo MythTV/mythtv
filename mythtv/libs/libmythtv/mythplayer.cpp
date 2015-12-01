@@ -4904,7 +4904,7 @@ uint64_t MythPlayer::FindFrame(float offset, bool use_cutlist) const
         // Always get an updated totalFrame value for in progress recordings
         if (islivetvcur || IsWatchingInprogress())
         {
-            long long framesWritten = player_ctx->recorder->GetFramesWritten();
+            uint64_t framesWritten = player_ctx->recorder->GetFramesWritten();
 
             if (totalFrames < framesWritten)
             {
