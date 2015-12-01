@@ -26,7 +26,6 @@ class ClassicLogoDetector : public LogoDetectorBase
 
   private:
     void SetLogoMaskArea();
-    void SetLogoMask(unsigned char *mask);
     void DumpLogo(bool fromCurrentFrame,unsigned char* framePtr);
     void DetectEdges(VideoFrame *frame, EdgeMaskEntry *edges, int edgeDiff);
 
