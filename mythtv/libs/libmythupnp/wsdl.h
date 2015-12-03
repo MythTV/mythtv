@@ -70,7 +70,7 @@ class UPNP_PUBLIC Wsdl : public QDomDocument
 
     public:
 
-        Wsdl( ServiceHost *pServiceHost );
+        explicit Wsdl( ServiceHost *pServiceHost );
 
         bool GetWSDL( HTTPRequest *pRequest );
 };

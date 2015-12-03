@@ -72,7 +72,7 @@ class UPnpNotifyTask : public Task
 
     public:
 
-        UPnpNotifyTask( int nServicePort );
+        explicit UPnpNotifyTask( int nServicePort );
 
         virtual QString Name   ()               { return( "Notify" );   }
         virtual void    Execute( TaskQueue * );

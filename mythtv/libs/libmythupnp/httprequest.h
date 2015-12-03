@@ -276,7 +276,7 @@ class BufferedSocketDeviceRequest : public HTTPRequest
 
     public:
         
-                 BufferedSocketDeviceRequest( QTcpSocket *pSocket );
+        explicit BufferedSocketDeviceRequest( QTcpSocket *pSocket );
         virtual ~BufferedSocketDeviceRequest() {};
 
         virtual QString  ReadLine        ( int msecs );

@@ -58,7 +58,7 @@ public:
     enum Type { Stream, Datagram };
     enum Protocol { IPv4, IPv6, Unknown };
 
-    MSocketDevice(Type type = Stream);
+    explicit MSocketDevice(Type type = Stream);
     MSocketDevice(Type type, Protocol protocol, int dummy);
     MSocketDevice(int socket, Type type);
     virtual ~MSocketDevice();

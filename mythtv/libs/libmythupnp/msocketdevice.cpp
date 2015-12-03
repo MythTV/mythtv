@@ -53,7 +53,7 @@ class MSocketDevicePrivate
 {
 
 public:
-    MSocketDevicePrivate(MSocketDevice::Protocol p)
+    explicit MSocketDevicePrivate(MSocketDevice::Protocol p)
             : protocol(p)
     { }
 
