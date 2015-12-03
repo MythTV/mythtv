@@ -253,6 +253,7 @@ static void parse_dvb_event_descriptors(desc_list_t list, uint fix,
     // from EN 300 468, Appendix A.2 - Selection of character table
     unsigned char enc_1[3]  = { 0x10, 0x00, 0x01 };
     unsigned char enc_2[3]  = { 0x10, 0x00, 0x02 };
+    unsigned char enc_7[3]  = { 0x10, 0x00, 0x07 }; // Latin/Greek Alphabet
     unsigned char enc_9[3]  = { 0x10, 0x00, 0x09 }; // could use { 0x05 } instead
     unsigned char enc_15[3] = { 0x10, 0x00, 0x0f }; // could use { 0x0B } instead
     int enc_len = 0;
@@ -283,11 +284,19 @@ static void parse_dvb_event_descriptors(desc_list_t list, uint fix,
     }
 
     // Is this broken DVB provider in Western Europe?
-    // Use an encoding override of ISO 8859-15 (Latin6)
+    // Use an encoding override of ISO 8859-15 (Latin9)
     if (fix & EITFixUp::kEFixForceISO8859_15)
     {
         enc = enc_15;
         enc_len = sizeof(enc_15);
+    }
+
+    // Is this broken DVB provider in Greece?
+    // Use an encoding override of ISO 8859-7 (Latin/Greek)
+    if (fix & EITFixUp::kEFixForceISO8859_7)
+    {
+        enc = enc_7;
+        enc_len = sizeof(enc_7);
     }
 
     if (bestShortEvent)
@@ -575,6 +584,32 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
                         break;
                 }
                 category_type = content.GetMythCategory(0);
+            }
+            else if (EITFixUp::kFixGreekEIT & fix)//Greek
+            {
+                ContentDescriptor content(content_data);
+                switch (content.Nibble2(0))
+                {
+                    case 0x01:
+                        category = "Ταινία";       // confirmed
+                        break;
+                    case 0x02:
+                        category = "Ενημερωτικό";  // confirmed
+                        break;
+                    case 0x04:
+                        category = "Αθλητικό";     // confirmed
+                        break;
+                    case 0x05:
+                        category = "Παιδικό";      // confirmed
+                        break;
+                    case 0x09:
+                        category = "Ντοκιμαντέρ";  // confirmed
+                        break;
+                    default:
+                        category = "";
+                        break;
+                }
+                category_type = content.GetMythCategory(2);
             }
             else
             {
@@ -1326,6 +1361,19 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     // DVB-C T-Kábel Hungary
     // FIXME this should be more specific. Is the encoding really wrong for all services?
     fix[  100 << 16] = EITFixUp::kEFixForceISO8859_2;
+    // Greece
+    // Pelion Transmitter
+    // transport_id<<32 | netword_id<<16 | service_id
+    fix[  100LL << 32 |  8492LL << 16 ] = // Ant1,Alpha,Art,10E
+    fix[  102LL << 32 |  8492LL << 16 ] = // Mega,Star,SKAI,M.tv
+    fix[  320LL << 32 |  8492LL << 16 ] = // Astra,Thessalia,TRT,TV10,ZEYS
+        EITFixUp::kFixGreekEIT |
+        EITFixUp::kFixGreekCategories;
+    fix[    2LL << 32 |  8492LL << 16 ] = // N1,Nplus,NHD,Vouli
+        EITFixUp::kEFixForceISO8859_7 |   // it is encoded in cp-1253
+        EITFixUp::kFixGreekSubtitle |     // Subtitle has too much info and is
+        EITFixUp::kFixGreekEIT |              // cut in db. Will move to descr.
+        EITFixUp::kFixGreekCategories;
 }
 
 /** \fn EITHelper::RescheduleRecordings(void)
