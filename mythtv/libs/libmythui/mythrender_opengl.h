@@ -94,7 +94,7 @@ class MythRenderOpenGL;
 class MUI_PUBLIC OpenGLLocker
 {
   public:
-    OpenGLLocker(MythRenderOpenGL *render);
+    explicit OpenGLLocker(MythRenderOpenGL *render);
    ~OpenGLLocker();
   private:
     MythRenderOpenGL *m_render;

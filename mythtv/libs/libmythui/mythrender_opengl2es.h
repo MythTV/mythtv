@@ -11,7 +11,7 @@ class MUI_PUBLIC MythRenderOpenGL2ES : public MythRenderOpenGL2
     {
     }
 
-    MythRenderOpenGL2ES(const QGLFormat& format)
+    explicit MythRenderOpenGL2ES(const QGLFormat& format)
         : MythRenderOpenGL2(format, kRenderOpenGL2ES)
     {
     }

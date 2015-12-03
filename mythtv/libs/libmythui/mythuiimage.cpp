@@ -551,7 +551,7 @@ private:
 class MythUIImagePrivate
 {
 public:
-    MythUIImagePrivate(MythUIImage *p)
+    explicit MythUIImagePrivate(MythUIImage *p)
         : m_parent(p),            m_UpdateLock(QReadWriteLock::Recursive)
     { };
     ~MythUIImagePrivate() {};

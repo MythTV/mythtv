@@ -81,7 +81,7 @@ class JoystickMap
 class JoystickMenuThread : public MThread
 {
   public:
-    JoystickMenuThread(QObject *main_window);
+    explicit JoystickMenuThread(QObject *main_window);
     ~JoystickMenuThread();
     bool Init(QString &config_file);
 

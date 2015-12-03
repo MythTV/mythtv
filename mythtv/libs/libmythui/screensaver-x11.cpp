@@ -28,7 +28,7 @@ class ScreenSaverX11Private
     friend class ScreenSaverX11;
 
   public:
-    ScreenSaverX11Private(ScreenSaverX11 *outer) :
+    explicit ScreenSaverX11Private(ScreenSaverX11 *outer) :
         m_dpmsaware(false),           m_dpmsdeactivated(false),
         m_xscreensaverRunning(false),
         m_dpmsenabled(false),

@@ -8,7 +8,7 @@ class MUI_PUBLIC MythRenderOpenGL1 : public MythRenderOpenGL
 {
   public:
     MythRenderOpenGL1(const QGLFormat& format, QPaintDevice* device);
-    MythRenderOpenGL1(const QGLFormat& format);
+    explicit MythRenderOpenGL1(const QGLFormat& format);
 
     virtual void SetColor(int r, int g, int b, int a);
 

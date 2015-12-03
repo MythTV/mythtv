@@ -99,7 +99,7 @@ static const VdpOutputSurfaceRenderBlendState VDPBlends[3] = {
 class VDPAUColor
 {
   public:
-    VDPAUColor(int color = 0x0) : m_color(color)
+    explicit VDPAUColor(int color = 0x0) : m_color(color)
     {
         SetColor(m_color);
     }

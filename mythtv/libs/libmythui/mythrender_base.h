@@ -22,7 +22,7 @@ typedef enum
 class MUI_PUBLIC MythRender : public ReferenceCounter
 {
   public:
-    MythRender(RenderType type) :
+    explicit MythRender(RenderType type) :
         ReferenceCounter(QString("MythRender:%1").arg(type)),
         m_type(type), m_size(QSize()), m_errored(false)
     {

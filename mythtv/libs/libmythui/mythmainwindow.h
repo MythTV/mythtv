@@ -150,7 +150,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     void signalRemoteScreenShot(QString filename, int x, int y);
 
   protected:
-    MythMainWindow(const bool useDB = true);
+    explicit MythMainWindow(const bool useDB = true);
     virtual ~MythMainWindow();
 
     void InitKeys(void);

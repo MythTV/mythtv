@@ -39,7 +39,7 @@ class MUI_PUBLIC DisplayResScreen
                      const double* refreshRates, uint rr_length);
     DisplayResScreen(int w, int h, int mw, int mh,
                      const short* refreshRates, uint rr_length);
-    DisplayResScreen(const QString &str);
+    explicit DisplayResScreen(const QString &str);
     inline void Init();
 
     // Gets

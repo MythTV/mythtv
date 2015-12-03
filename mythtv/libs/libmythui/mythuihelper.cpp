@@ -83,7 +83,7 @@ void DestroyMythUI()
 class MythUIHelperPrivate
 {
 public:
-    MythUIHelperPrivate(MythUIHelper *p);
+    explicit MythUIHelperPrivate(MythUIHelper *p);
     ~MythUIHelperPrivate();
 
     void Init();

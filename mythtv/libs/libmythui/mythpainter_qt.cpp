@@ -15,7 +15,7 @@
 class MythQtImage : public MythImage
 {
   public:
-    MythQtImage(MythQtPainter *parent) :
+    explicit MythQtImage(MythQtPainter *parent) :
         MythImage(parent, "MythQtImage"),
         m_Pixmap(NULL), m_bRegenPixmap(false) { }
 

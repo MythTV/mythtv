@@ -56,7 +56,7 @@ class MUI_PUBLIC MythXDisplay
 class MythXLocker
 {
   public:
-    MythXLocker(MythXDisplay*d) : disp(d)
+    explicit MythXLocker(MythXDisplay*d) : disp(d)
     {
         if (disp) disp->Lock();
     }

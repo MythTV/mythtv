@@ -22,7 +22,7 @@
 class SemaphoreLocker
 {
   public:
-    SemaphoreLocker(QSemaphore *lock) : m_lock(lock)
+    explicit SemaphoreLocker(QSemaphore *lock) : m_lock(lock)
     {
         if (m_lock)
             m_lock->acquire();
@@ -42,7 +42,7 @@ QEvent::Type ScreenLoadCompletionEvent::kEventType =
 class ScreenLoadTask : public QRunnable
 {
   public:
-    ScreenLoadTask(MythScreenType &parent) : m_parent(parent) {}
+    explicit ScreenLoadTask(MythScreenType &parent) : m_parent(parent) {}
 
   private:
     void run(void)

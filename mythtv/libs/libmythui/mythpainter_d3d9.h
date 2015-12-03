@@ -13,7 +13,7 @@ class MythRenderD3D9;
 class MUI_PUBLIC MythD3D9Painter : public MythPainter
 {
   public:
-    MythD3D9Painter(MythRenderD3D9 *render = NULL);
+    explicit MythD3D9Painter(MythRenderD3D9 *render = NULL);
    ~MythD3D9Painter();
 
     void         SetTarget(D3D9Image *target) { m_target = target;  }
