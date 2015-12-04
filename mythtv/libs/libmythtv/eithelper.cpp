@@ -1361,7 +1361,8 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     // DVB-C T-Kábel Hungary
     // FIXME this should be more specific. Is the encoding really wrong for all services?
     fix[  100 << 16] = EITFixUp::kEFixForceISO8859_2;
-    // Greece
+
+    // DVB-T Greece
     // Pelion Transmitter
     // transport_id<<32 | netword_id<<16 | service_id
     fix[  100LL << 32 |  8492LL << 16 ] = // Ant1,Alpha,Art,10E
@@ -1374,6 +1375,24 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
         EITFixUp::kFixGreekSubtitle |     // Subtitle has too much info and is
         EITFixUp::kFixGreekEIT |              // cut in db. Will move to descr.
         EITFixUp::kFixGreekCategories;
+
+    // DVB-S Star One C2 70W (Brazil)
+    // it has original_network_id = 1 like Astra on 19.2E, but transport_id does
+    // not collide at the moment
+    fix[  1LL << 32 | 1LL << 16 ] = EITFixUp::kEFixForceISO8859_1;
+    fix[  2LL << 32 | 1LL << 16 ] = EITFixUp::kEFixForceISO8859_1;
+    fix[  3LL << 32 | 1LL << 16 ] = EITFixUp::kEFixForceISO8859_1;
+    fix[  4LL << 32 | 1LL << 16 ] = EITFixUp::kEFixForceISO8859_1;
+    fix[ 50LL << 32 | 1LL << 16 ] = EITFixUp::kEFixForceISO8859_1;
+    fix[ 51LL << 32 | 1LL << 16 ] = EITFixUp::kEFixForceISO8859_1;
+    fix[ 52LL << 32 | 1LL << 16 ] = EITFixUp::kEFixForceISO8859_1;
+    fix[ 53LL << 32 | 1LL << 16 ] = EITFixUp::kEFixForceISO8859_1;
+    fix[ 54LL << 32 | 1LL << 16 ] = EITFixUp::kEFixForceISO8859_1;
+    fix[ 55LL << 32 | 1LL << 16 ] = EITFixUp::kEFixForceISO8859_1;
+    fix[ 56LL << 32 | 1LL << 16 ] = EITFixUp::kEFixForceISO8859_1;
+    fix[ 57LL << 32 | 1LL << 16 ] = EITFixUp::kEFixForceISO8859_1;
+    fix[ 58LL << 32 | 1LL << 16 ] = EITFixUp::kEFixForceISO8859_1;
+    fix[ 59 << 32 | 1 << 16 ] = EITFixUp::kEFixForceISO8859_1;
 }
 
 /** \fn EITHelper::RescheduleRecordings(void)
