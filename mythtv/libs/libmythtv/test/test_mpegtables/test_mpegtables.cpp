@@ -287,4 +287,16 @@ void TestMPEGTables::TestUCS2 (void)
     QCOMPARE (ucs2, QString::fromWCharArray (wchar_data));
 }
 
+void TestMPEGTables::ParentalRatingDescriptor_test (void)
+{
+    /* from https://forum.mythtv.org/viewtopic.php?p=4376 / #12553 */
+    const unsigned char si_data[] = { 
+        0x55, 0x04, 0x47, 0x42, 0x52, 0x0B
+    };
+    ParentalRatingDescriptor desc(si_data);
+    QCOMPARE (desc.Count(), 1u);
+    QCOMPARE (desc.CountryCodeString(0), QString("GBR"));
+    QCOMPARE (desc.Rating(0), 14);
+}
+
 QTEST_APPLESS_MAIN(TestMPEGTables)

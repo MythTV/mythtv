@@ -70,4 +70,8 @@ class TestMPEGTables: public QObject
     /** test decoding chinese multi-byte strings, #12507
      */
     void TestUCS2 (void);
+
+    /** test ParentalRatingDescriptor, #12553
+     */
+    void ParentalRatingDescriptor_test (void);
 };

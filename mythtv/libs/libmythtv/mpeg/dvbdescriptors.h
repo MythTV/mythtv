@@ -1326,6 +1326,7 @@ class NVODReferenceDescriptor : public MPEGDescriptor
 };
 
 // DVB Bluebook A038 (Sept 2011) p 78
+// ETSI EN 300 468
 class ParentalRatingDescriptor : public MPEGDescriptor
 {
   public:
@@ -1341,6 +1342,42 @@ class ParentalRatingDescriptor : public MPEGDescriptor
     //   country_code          24
     //   rating                 8
     // }
+    QString CountryCodeString(uint i) const
+    {
+        int o = 2 + i*4;
+        if (i < Count())
+        {
+            return QString(_data[o]) + QChar(_data[o+1]) + QChar(_data[o+2]);
+        }
+        else
+        {
+            return QString("");
+        }
+    }
+    int Rating(uint i) const
+    {
+        if (i >= Count())
+        {
+            return -1;
+        }
+
+        unsigned char rawRating = _data[2 + 3 + i*4];
+        if (rawRating == 0)
+        {
+            // 0x00 - undefined
+            return -1;
+        }
+        else if ((rawRating >= 0x01) && (rawRating <= 0x0F))
+        {
+            // 0x01 to 0x0F - minumum age = rating + 3 years
+            return rawRating + 3;
+        }
+        else
+        {
+            // 0x10 to 0xFF - defined by the broadcaster
+            return -1;
+        }
+    }
 };
 
 // DVB Bluebook A038 (Sept 2011) p 78 (see also ETSI EN 300 231 PDC)
