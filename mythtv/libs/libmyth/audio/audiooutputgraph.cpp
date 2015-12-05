@@ -51,17 +51,17 @@ public:
             timecode = m_tcNext;
 
         int64_t tc1 = timecode - Samples2MS(m_maxSamples / 2);
-        if (tc1 < m_tcFirst)
+        if (tc1 < (int64_t)m_tcFirst)
             tc1 = m_tcFirst;
 
         int64_t tc2 = tc1 + Samples2MS(m_maxSamples);
-        if (tc2 > m_tcNext)
+        if (tc2 > (int64_t)m_tcNext)
         {
             tc2 = m_tcNext;
-            if (tc2 < tc1 + Samples2MS(m_maxSamples))
+            if (tc2 < tc1 + (int64_t)Samples2MS(m_maxSamples))
             {
                 tc1 = tc2 - Samples2MS(m_maxSamples);
-                if (tc1 < m_tcFirst)
+                if (tc1 < (int64_t)m_tcFirst)
                     tc1 = m_tcFirst;
             }
         }
@@ -93,7 +93,7 @@ public:
         }
 
         unsigned samples = Bytes2Samples(len);
-        int64_t tcNext = timecode + Samples2MS(samples);
+        uint64_t tcNext = timecode + Samples2MS(samples);
 
         if (qAbs(timecode - m_tcNext) <= 1)
         {
