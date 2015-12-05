@@ -1392,7 +1392,7 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     fix[ 56LL << 32 | 1LL << 16 ] = EITFixUp::kEFixForceISO8859_1;
     fix[ 57LL << 32 | 1LL << 16 ] = EITFixUp::kEFixForceISO8859_1;
     fix[ 58LL << 32 | 1LL << 16 ] = EITFixUp::kEFixForceISO8859_1;
-    fix[ 59 << 32 | 1 << 16 ] = EITFixUp::kEFixForceISO8859_1;
+    fix[ 59LL << 32 | 1LL << 16 ] = EITFixUp::kEFixForceISO8859_1;
 }
 
 /** \fn EITHelper::RescheduleRecordings(void)
