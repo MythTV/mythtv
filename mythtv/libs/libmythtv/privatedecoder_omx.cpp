@@ -176,22 +176,36 @@ bool PrivateDecoderOMX::Init(const QString &decoder, PlayerFlags flags,
             .arg(H264Profile2String(avctx->profile)) );
         type = OMX_VIDEO_CodingAVC;
         break;
+#ifdef OMX_AUDIO_CodingTheora_Supported
       case AV_CODEC_ID_THEORA:
         type = OMX_VIDEO_CodingTheora;
         break;
+#endif
+#ifdef OMX_AUDIO_CodingVP6_Supported
       case AV_CODEC_ID_VP3:
       case AV_CODEC_ID_VP5:
       case AV_CODEC_ID_VP6:
       case AV_CODEC_ID_VP6F:
       case AV_CODEC_ID_VP6A:
-      //case AV_CODEC_ID_VP8:
-      //case AV_CODEC_ID_VP9:
         type = OMX_VIDEO_CodingVP6;
         break;
+#endif
+#ifdef OMX_AUDIO_CodingVP8_Supported
+      case AV_CODEC_ID_VP8:
+        type = OMX_VIDEO_CodingVP8;
+        break;
+#endif
+#ifdef OMX_AUDIO_CodingVP9_Supported
+      case AV_CODEC_ID_VP9:
+        type = OMX_VIDEO_CodingVP9;
+        break;
+#endif
+#ifdef OMX_AUDIO_CodingMVC_Supported
       case AV_CODEC_ID_MVC1:
       case AV_CODEC_ID_MVC2:
         type = OMX_VIDEO_CodingMVC;
         break;
+#endif
       default:
         LOG(VB_PLAYBACK, LOG_ERR, LOC + QString("Codec %1 not supported")
                 .arg(ff_codec_id_string(avctx->codec_id)));
