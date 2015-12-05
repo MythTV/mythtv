@@ -35,6 +35,9 @@ extern volatile guint32 c_resoly;
 
 void c_zoom (unsigned int *expix1, unsigned int *expix2, unsigned int prevX, unsigned int prevY, signed int *brutS, signed int *brutD);
 
+/* Prototype to keep gcc from spewing warnings */
+static void select_zoom_filter (void);
+
 #ifdef MMX
 
 void    zoom_filter_xmmx (int prevX, int prevY, unsigned int *expix1, unsigned int *expix2, int *brutS, int *brutD, int buffratio, int precalCoef[16][16]);
@@ -65,7 +68,7 @@ static void select_zoom_filter (void) {
 
 #else /* MMX */
 
-static void select_zoom_filter () {
+static void select_zoom_filter (void) {
 	static int firsttime = 1;
 	if (firsttime) {
 		printf ("No MMX support compiled in\n");
