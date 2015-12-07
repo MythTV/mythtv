@@ -16,6 +16,7 @@ extern "C" {
 #include "libavcodec/avcodec.h"
 }
 
+#include "avformatdecoder.h"
 #include "mythlogging.h"
 #include "omxcontext.h"
 using namespace omxcontext;
@@ -27,6 +28,12 @@ using namespace omxcontext;
 #define _STR(s) #s
 #define STR(s) _STR(s)
 
+// VideoFrame <> OMX_BUFFERHEADERTYPE
+#define FRAMESETHDR(f,h) ((f)->priv[2] = reinterpret_cast<unsigned char* >(h))
+#define FRAME2HDR(f) ((OMX_BUFFERHEADERTYPE*)((f)->priv[2]))
+#define FRAMESETREF(f,r) ((f)->priv[1] = reinterpret_cast<unsigned char* >(r))
+#define FRAME2REF(f) ((AVBufferRef*)((f)->priv[1]))
+#define HDR2FRAME(h) ((VideoFrame*)((h)->pAppPrivate))
 
 /*
  * Types
@@ -79,6 +86,7 @@ PrivateDecoderOMX::PrivateDecoderOMX() : m_videc("video_decode", *this),
 #ifdef USING_BROADCOM
     m_eMode(OMX_InterlaceFieldsInterleavedUpperFirst), m_bRepeatFirstField(false),
 #endif
+    m_avctx(0),
     m_lock(QMutex::Recursive), m_bSettingsChanged(false),
     m_bSettingsHaveChanged(false)
 {
@@ -248,7 +256,6 @@ bool PrivateDecoderOMX::Init(const QString &decoder, PlayerFlags flags,
     {
       case OMX_COLOR_FormatYUV420Planar:
       case OMX_COLOR_FormatYUV420PackedPlanar: // Broadcom default
-        // AV_PIX_FMT_YUV420P;
         break;
 
       default:
@@ -266,6 +273,7 @@ bool PrivateDecoderOMX::Init(const QString &decoder, PlayerFlags flags,
         }
         break;
     }
+    avctx->pix_fmt = AV_PIX_FMT_YUV420P; // == FMT_YV12
 
     // Ensure at least 2 output buffers
     OMX_PARAM_PORTDEFINITIONTYPE &def = m_videc.PortDef(1);
@@ -549,6 +557,20 @@ OMX_ERRORTYPE PrivateDecoderOMX::FreeOutputBuffersCB()
         OMX_BUFFERHEADERTYPE *hdr = m_obufs.takeFirst();
         m_lock.unlock();
 
+        VideoFrame *frame = HDR2FRAME(hdr);
+        if (frame)
+        {
+            assert(FRAME2HDR(frame) == hdr);
+            FRAMESETHDR(frame, 0);
+
+            AVBufferRef *ref = FRAME2REF(frame);
+            if (ref)
+            {
+                FRAMESETREF(frame, 0);
+                av_buffer_unref(&ref);
+            }
+        }
+
         OMX_ERRORTYPE e = OMX_FreeBuffer(m_videc.Handle(), m_videc.Base() + index, hdr);
         if (e != OMX_ErrorNone)
             LOG(VB_PLAYBACK, LOG_ERR, LOC + QString(
@@ -577,7 +599,7 @@ OMX_ERRORTYPE PrivateDecoderOMX::AllocOutputBuffersCB()
     {
         OMX_BUFFERHEADERTYPE *hdr;
         OMX_ERRORTYPE e = OMX_AllocateBuffer(m_videc.Handle(), &hdr,
-            m_videc.Base() + index, this, pdef->nBufferSize);
+            m_videc.Base() + index, 0, pdef->nBufferSize);
         if (e != OMX_ErrorNone)
         {
             LOG(VB_PLAYBACK, LOG_ERR, LOC + QString(
@@ -605,6 +627,74 @@ OMX_ERRORTYPE PrivateDecoderOMX::AllocOutputBuffersCB()
     return OMX_ErrorNone;
 }
 
+// Use VideoOutput buffers
+// OMX_CommandPortEnable callback
+OMX_ERRORTYPE PrivateDecoderOMX::UseBuffersCB()
+{
+    assert(m_obufs_sema.available() == 0);
+    assert(m_obufs.isEmpty());
+    assert(m_avctx);
+
+    const int index = 1;
+    const OMX_PARAM_PORTDEFINITIONTYPE &def = m_videc.PortDef(index);
+    OMX_U32 uBufs = def.nBufferCountActual;
+
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString(
+            "Use %1 of %2 byte output buffer(s)")
+        .arg(uBufs).arg(def.nBufferSize));
+
+    OMX_ERRORTYPE e = OMX_ErrorNone;
+
+    while (uBufs--)
+    {
+        MythAVFrame picture;
+        if (m_avctx->get_buffer2(m_avctx, picture, 0) < 0)
+        {
+            LOG(VB_PLAYBACK, LOG_ERR, LOC + __func__ + " no video frames");
+            return OMX_ErrorOverflow;
+        }
+
+        VideoFrame *frame = (VideoFrame*)picture->opaque;
+        assert(frame);
+        assert(unsigned(frame->size) >= def.nBufferSize);
+
+        OMX_BUFFERHEADERTYPE *hdr;
+        e = OMX_UseBuffer(m_videc.Handle(), &hdr, m_videc.Base() + index, frame,
+                            def.nBufferSize, frame->buf);
+        if (e != OMX_ErrorNone)
+        {
+            LOG(VB_PLAYBACK, LOG_ERR, LOC + QString(
+                "OMX_UseBuffer error %1").arg(Error2String(e)) );
+            return e;
+        }
+        if (hdr->nSize != sizeof(OMX_BUFFERHEADERTYPE))
+        {
+            LOG(VB_PLAYBACK, LOG_ERR, LOC + "OMX_UseBuffer header mismatch");
+            OMX_FreeBuffer(m_videc.Handle(), m_videc.Base() + index, hdr);
+            return OMX_ErrorVersionMismatch;
+        }
+        if (hdr->nVersion.nVersion != OMX_VERSION)
+        {
+            LOG(VB_PLAYBACK, LOG_ERR, LOC + "OMX_UseBuffer version mismatch");
+            OMX_FreeBuffer(m_videc.Handle(), m_videc.Base() + index, hdr);
+            return OMX_ErrorVersionMismatch;
+        }
+
+        assert(frame == HDR2FRAME(hdr));
+        FRAMESETHDR(frame, hdr);
+        FRAMESETREF(frame, picture->buf[0]);
+        picture->buf[0] = 0;
+
+        hdr->nFilledLen = 0;
+        hdr->nOffset = 0;
+
+        m_obufs.append(hdr);
+        m_obufs_sema.release();
+    }
+
+    return e;
+}
+
 // pure virtual
 bool PrivateDecoderOMX::Reset(void)
 {
@@ -627,10 +717,18 @@ bool PrivateDecoderOMX::Reset(void)
         e = m_videc.SendCommand(OMX_CommandFlush, m_videc.Base() + 1, 0, 50);
         if (e != OMX_ErrorNone)
             return false;
-    }
 
-    // Re-submit the empty output buffers
-    FillOutputBuffers();
+        if (m_avctx && m_avctx->get_buffer2)
+        {
+            // Request new buffers when GetFrame is next called
+            m_bSettingsChanged = true;
+        }
+        else
+        {
+            // Re-submit the empty output buffers
+            FillOutputBuffers();
+        }
+    }
 
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + __func__ + " - end");
     return true;
@@ -657,7 +755,7 @@ int PrivateDecoderOMX::GetFrame(
         *got_picture_ptr = 1;
 
     // Check for OMX_EventPortSettingsChanged notification
-    if (SettingsChanged() != OMX_ErrorNone)
+    if (SettingsChanged(stream->codec) != OMX_ErrorNone)
         return -1;
 
     // Submit a packet for decoding
@@ -700,7 +798,7 @@ int PrivateDecoderOMX::ProcessPacket(AVStream *stream, AVPacket *pkt)
     {
         if (!m_ibufs_sema.tryAcquire(1, 5))
         {
-            LOG(VB_PLAYBACK, LOG_DEBUG, LOC + __func__ + " - no buffers");
+            LOG(VB_PLAYBACK, LOG_DEBUG, LOC + __func__ + " - no input buffers");
             ret = 0;
             break;
         }
@@ -773,6 +871,9 @@ int PrivateDecoderOMX::GetBufferedFrame(AVStream *stream, AVFrame *picture)
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
             QString("Decoded frame flags=%1").arg(HeaderFlags(hdr->nFlags)) );
 
+    if (avctx->pix_fmt < 0)
+        avctx->pix_fmt = AV_PIX_FMT_YUV420P; // == FMT_YV12
+
     int ret = 1; // Assume success
     if (hdr->nFilledLen == 0)
     {
@@ -823,8 +924,48 @@ int PrivateDecoderOMX::GetBufferedFrame(AVStream *stream, AVFrame *picture)
             break;
         }
 
-        if (in_fmt == out_fmt)
+        picture->reordered_opaque = Ticks2Pts(stream, hdr->nTimeStamp);
+
+        VideoFrame *frame = HDR2FRAME(hdr);
+        if (frame)
         {
+            assert(FRAME2HDR(frame) == hdr);
+            assert(FRAME2REF(frame));
+
+            frame->bpp    = bitsperpixel(frametype);
+            frame->codec  = frametype;
+            frame->width  = vdef.nFrameWidth;
+            frame->height = vdef.nFrameHeight;
+            memcpy(frame->offsets, offsets, sizeof frame->offsets);
+            memcpy(frame->pitches, pitches, sizeof frame->pitches);
+
+            VideoFrame *frame2 = (VideoFrame*)picture->opaque;
+            OMX_BUFFERHEADERTYPE *hdr2 = FRAME2HDR(frame2);
+            if (hdr2 && HDR2FRAME(hdr2) == frame2)
+            {
+                // The new frame has an associated hdr so use that
+                hdr = hdr2;
+            }
+            else
+            {
+                // Re-use the current header with the new frame
+                assert(unsigned(frame2->size) >= hdr->nAllocLen);
+                hdr->pBuffer = frame2->buf;
+                hdr->pAppPrivate = frame2;
+                assert(frame2 == HDR2FRAME(hdr));
+                FRAMESETHDR(frame2, hdr);
+            }
+
+            FRAMESETREF(frame2, picture->buf[0]);
+
+            // Indicate the buffered frame from the completed OMX buffer
+            picture->buf[0] = FRAME2REF(frame);
+            FRAMESETREF(frame, 0);
+            picture->opaque = frame;
+        }
+        else if (in_fmt == avctx->pix_fmt)
+        {
+            // Prepare to copy the OMX buffer
             init(&vf, frametype, &hdr->pBuffer[hdr->nOffset],
                 vdef.nFrameWidth, vdef.nFrameHeight, hdr->nFilledLen,
                 pitches, offsets);
@@ -862,48 +1003,43 @@ int PrivateDecoderOMX::GetBufferedFrame(AVStream *stream, AVFrame *picture)
             switch (m_eMode)
             {
               case OMX_InterlaceProgressive:
-                vf.interlaced_frame = 0;
-                vf.top_field_first = 0;
+                picture->interlaced_frame = 0;
+                picture->top_field_first = 0;
                 break;
               case OMX_InterlaceFieldSingleUpperFirst:
                 /* The data is interlaced, fields sent
                  * separately in temporal order, with upper field first */
-                vf.interlaced_frame = 1;
-                vf.top_field_first = 1;
+                picture->interlaced_frame = 1;
+                picture->top_field_first = 1;
                 break;
               case OMX_InterlaceFieldSingleLowerFirst:
-                vf.interlaced_frame = 1;
-                vf.top_field_first = 0;
+                picture->interlaced_frame = 1;
+                picture->top_field_first = 0;
                 break;
               case OMX_InterlaceFieldsInterleavedUpperFirst:
                 /* The data is interlaced, two fields sent together line
                  * interleaved, with the upper field temporally earlier */
-                vf.interlaced_frame = 1;
-                vf.top_field_first = 1;
+                picture->interlaced_frame = 1;
+                picture->top_field_first = 1;
                 break;
               case OMX_InterlaceFieldsInterleavedLowerFirst:
-                vf.interlaced_frame = 1;
-                vf.top_field_first = 0;
+                picture->interlaced_frame = 1;
+                picture->top_field_first = 0;
                 break;
               case OMX_InterlaceMixed:
                 /* The stream may contain a mixture of progressive
                  * and interlaced frames */
-                vf.interlaced_frame = 1;
+                picture->interlaced_frame = 1;
                 break;
             }
-            vf.repeat_pict = m_bRepeatFirstField;
+            picture->repeat_pict = m_bRepeatFirstField;
 #endif // USING_BROADCOM
 
-            copy((VideoFrame*)picture->opaque, &vf);
-
-            picture->repeat_pict = vf.repeat_pict;
-            picture->interlaced_frame = vf.interlaced_frame;
-            picture->top_field_first = vf.top_field_first;
-            picture->reordered_opaque = Ticks2Pts(stream, hdr->nTimeStamp);
-            LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC + QString(
-                    "Decoder output tc %1uS (pts %2)")
-                .arg(TICKS_TO_S64(hdr->nTimeStamp))
-                .arg(picture->reordered_opaque) );
+            if (!frame)
+            {
+                // Copy OMX buffer to the frame provided
+                copy((VideoFrame*)picture->opaque, &vf);
+            }
         }
 
         av_freep(&buf);
@@ -920,7 +1056,7 @@ int PrivateDecoderOMX::GetBufferedFrame(AVStream *stream, AVFrame *picture)
 }
 
 // Handle the port settings changed notification
-OMX_ERRORTYPE PrivateDecoderOMX::SettingsChanged()
+OMX_ERRORTYPE PrivateDecoderOMX::SettingsChanged(AVCodecContext *avctx)
 {
     QMutexLocker lock(&m_lock);
 
@@ -1030,8 +1166,16 @@ OMX_ERRORTYPE PrivateDecoderOMX::SettingsChanged()
                 .arg(aspect.nX).arg(aspect.nY) );
     }
 
+    ComponentCB PrivateDecoderOMX::*allocBuffers =
+        &PrivateDecoderOMX::AllocOutputBuffersCB; // -> member fn
+    if ((m_avctx = avctx) && avctx->get_buffer2)
+    {
+        // Use the video output buffers directly
+        allocBuffers = &PrivateDecoderOMX::UseBuffersCB;
+    }
+
     // Re-enable output port and allocate new output buffers
-    OMXComponentCB<PrivateDecoderOMX> cb2(this, &PrivateDecoderOMX::AllocOutputBuffersCB);
+    OMXComponentCB<PrivateDecoderOMX> cb2(this, allocBuffers);
     e = m_videc.PortEnable(index, 500, &cb2);
     if (e != OMX_ErrorNone)
         return e;

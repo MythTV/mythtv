@@ -53,9 +53,10 @@ class PrivateDecoderOMX : public PrivateDecoder, private OMXComponentCtx
     typedef OMX_ERRORTYPE ComponentCB();
     ComponentCB AllocBuffersCB;
     ComponentCB FreeOutputBuffersCB, AllocOutputBuffersCB;
+    ComponentCB UseBuffersCB;
 
     OMX_ERRORTYPE FillOutputBuffers();
-    OMX_ERRORTYPE SettingsChanged();
+    OMX_ERRORTYPE SettingsChanged(AVCodecContext *);
     OMX_ERRORTYPE SetNalType(AVCodecContext *);
     OMX_ERRORTYPE GetAspect(OMX_CONFIG_POINTTYPE &, int index) const;
 #ifdef USING_BROADCOM
@@ -73,6 +74,7 @@ class PrivateDecoderOMX : public PrivateDecoder, private OMXComponentCtx
     OMX_INTERLACETYPE m_eMode;
     bool m_bRepeatFirstField;
 #endif
+    AVCodecContext *m_avctx;
 
     QMutex mutable m_lock;      // Protects data following
     bool m_bSettingsChanged;
