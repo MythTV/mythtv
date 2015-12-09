@@ -904,7 +904,7 @@ void EITFixUp::FixUK(DBEventEIT &event) const
 
         if (position1 != -1)
         {
-            LOG(VB_EIT, LOG_INFO, QString("Extracted S%1E%2/%3 from title (%4) \"%5\"")
+            LOG(VB_EIT, LOG_DEBUG, QString("Extracted S%1E%2/%3 from title (%4) \"%5\"")
                 .arg(event.season).arg(event.episode).arg(event.totalepisodes)
                 .arg(event.title, event.description));
 
@@ -912,7 +912,7 @@ void EITFixUp::FixUK(DBEventEIT &event) const
         }
         else
         {
-            LOG(VB_EIT, LOG_INFO, QString("Extracted S%1E%2/%3 from description (%4) \"%5\"")
+            LOG(VB_EIT, LOG_DEBUG, QString("Extracted S%1E%2/%3 from description (%4) \"%5\"")
                 .arg(event.season).arg(event.episode).arg(event.totalepisodes)
                 .arg(event.title, event.description));
 
@@ -936,7 +936,7 @@ void EITFixUp::FixUK(DBEventEIT &event) const
         event.partnumber = tmpPart.cap(1).toUInt();
         event.parttotal  = tmpPart.cap(2).toUInt();
 
-        LOG(VB_EIT, LOG_INFO, QString("Extracted Part %1/%2 from title (%3)")
+        LOG(VB_EIT, LOG_DEBUG, QString("Extracted Part %1/%2 from title (%3)")
             .arg(event.partnumber).arg(event.parttotal).arg(event.title));
 
         // Remove from the title
@@ -947,7 +947,7 @@ void EITFixUp::FixUK(DBEventEIT &event) const
         event.partnumber = tmpPart.cap(1).toUInt();
         event.parttotal  = tmpPart.cap(2).toUInt();
 
-        LOG(VB_EIT, LOG_INFO, QString("Extracted Part %1/%2 from description (%3) \"%4\"")
+        LOG(VB_EIT, LOG_DEBUG, QString("Extracted Part %1/%2 from description (%3) \"%4\"")
             .arg(event.partnumber).arg(event.parttotal)
             .arg(event.title, event.description));
 
