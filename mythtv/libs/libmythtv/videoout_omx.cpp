@@ -33,7 +33,9 @@
 # undef LOC
 # include "mythpainter_ogl.h"
 #endif //def OSD_EGL
+
 #include "mythmainwindow.h"
+#include "mythcorecontext.h"
 
 #include "filtermanager.h"
 #include "videodisplayprofile.h"
@@ -105,11 +107,12 @@ private:
 /*
  * Constants
  */
-const int kNumBuffers = 31;
+const int kNumBuffers = 11; // +1 if extra_for_pause
+const int kMinBuffers = 5;
 const int kNeedFreeFrames = 1;
-const int kPrebufferFramesNormal = 12;
-const int kPrebufferFramesSmall = 4;
-const int kKeepPrebuffer = 2;
+const int kPrebufferFramesNormal = 1;
+const int kPrebufferFramesSmall = 1;
+const int kKeepPrebuffer = 1;
 
 QString const VideoOutputOMX::kName ="openmax";
 
@@ -275,7 +278,9 @@ bool VideoOutputOMX::Init(          // Return true if successful
         return false;
 
     // Setup video buffers
-    vbuffers.Init(std::max(OMX_U32(kNumBuffers), m_render.PortDef().nBufferCountMin),
+    static const int kBuffers = std::max(
+        gCoreContext->GetNumSetting("OmxVideoBuffers", kNumBuffers), kMinBuffers);
+    vbuffers.Init(std::max(kBuffers, int(m_render.PortDef().nBufferCountMin)),
                   true, kNeedFreeFrames,
                   kPrebufferFramesNormal, kPrebufferFramesSmall,
                   kKeepPrebuffer);
