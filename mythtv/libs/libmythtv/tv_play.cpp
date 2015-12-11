@@ -3363,11 +3363,6 @@ void TV::PrepareToExitPlayer(PlayerContext *ctx, int line, BookmarkAction bookma
         }
         if (db_auto_set_watched)
             ctx->player->SetWatched();
-
-        if (ctx->player->GetAudio()->ControlsVolume())
-        {
-            ctx->player->SaveVolume();
-        }
     }
     ctx->UnlockDeletePlayer(__FILE__, line);
 }
