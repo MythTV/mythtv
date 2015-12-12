@@ -185,6 +185,8 @@ void connectToDatabase(void)
         exit(mysql_errno(&g_dbConn));
     }
 
+    g_dbConn.reconnect = 1;
+
     if (!mysql_real_connect(&g_dbConn, g_server.c_str(), g_user.c_str(),
          g_password.c_str(), 0, 0, 0, 0))
     {
