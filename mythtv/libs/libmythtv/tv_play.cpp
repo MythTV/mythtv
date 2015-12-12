@@ -13320,13 +13320,11 @@ bool TV::HandleOSDVideoExit(PlayerContext *ctx, QString action)
     {
         allowRerecord = true;
         requestDelete = true;
-        PrepareToExitPlayer(ctx, __LINE__);
         SetExitPlayer(true, true);
     }
     else if (action == "JUSTDELETE" && delete_ok)
     {
         requestDelete = true;
-        PrepareToExitPlayer(ctx, __LINE__);
         SetExitPlayer(true, true);
     }
     else if (action == "CONFIRMDELETE")
