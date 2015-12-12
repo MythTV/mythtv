@@ -93,16 +93,14 @@ MuteState VolumeBase::NextMuteState(MuteState cur)
 void VolumeBase::UpdateVolume(void)
 {
     int new_volume = volume;
-    bool save = true;
     if (current_mute_state == kMuteAll)
     {
         new_volume = 0;
-        save = false;
     }
 
     if (swvol)
     {
-        SetSWVolume(new_volume, save);
+        SetSWVolume(new_volume, false);
         return;
     }
     
