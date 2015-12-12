@@ -353,8 +353,6 @@ using_frontend {
 
     using_openmax {
         DEFINES += USING_OPENMAX OMX_SKIP64BIT USING_BROADCOM
-        HEADERS += omxcontext.h
-        SOURCES += omxcontext.cpp
         HEADERS += privatedecoder_omx.h
         SOURCES += privatedecoder_omx.cpp
         HEADERS += videoout_omx.h

@@ -1056,6 +1056,9 @@ HostComboBox *AudioMixerSettings::MixerDevice()
 #ifdef ANDROID
     gc->addSelection("OpenSLES:", "OpenSLES:");
 #endif
+#ifdef USING_OPENMAX
+    gc->addSelection("OpenMAX:",   "OpenMAX:");
+#endif
 #if !defined(_WIN32)
     gc->addSelection(tr("software"), "software");
 #endif

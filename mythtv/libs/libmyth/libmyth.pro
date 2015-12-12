@@ -237,6 +237,15 @@ using_jack {
     SOURCES += audio/audiooutputjack.cpp
 }
 
+using_openmax {
+    DEFINES += USING_OPENMAX OMX_SKIP64BIT USING_BROADCOM
+    HEADERS += omxcontext.h
+    SOURCES += omxcontext.cpp
+    HEADERS += audio/audiooutput_omx.h
+    SOURCES += audio/audiooutput_omx.cpp
+    LIBS += -lopenmaxil
+}
+
 contains( HAVE_MMX, yes ) {
     HEADERS += ../../external/FFmpeg/libavutil/cpu.h
 }

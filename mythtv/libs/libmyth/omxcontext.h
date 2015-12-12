@@ -15,12 +15,13 @@
 #include <QMutex>
 #include <QSemaphore>
 
+#include "mythexp.h"
 #include "mythlogging.h"
 
 class OMXComponentCtx;
 class OMXComponentAbstractCB;
 
-class OMXComponent
+class MPUBLIC OMXComponent
 {
     friend OMXComponentCtx;
 
@@ -46,8 +47,8 @@ class OMXComponent
     OMX_ERRORTYPE GetPortDef(unsigned index = 0);
     const OMX_PARAM_PORTDEFINITIONTYPE &PortDef(unsigned index = 0) const;
     OMX_PARAM_PORTDEFINITIONTYPE &PortDef(unsigned index = 0);
-    void ShowPortDef(unsigned index = 0, LogLevel_t level = LOG_INFO) const;
-    void ShowFormats(unsigned index = 0, LogLevel_t level = LOG_INFO) const;
+    void ShowPortDef(unsigned index = 0, LogLevel_t = LOG_INFO, uint64_t = VB_PLAYBACK) const;
+    void ShowFormats(unsigned index = 0, LogLevel_t = LOG_INFO, uint64_t = VB_PLAYBACK) const;
 
     OMX_ERRORTYPE SendCommand(OMX_COMMANDTYPE cmd, OMX_U32 nParam = 0,
             void *pCmdData = 0, int ms = -1, OMXComponentAbstractCB *cb = 0);
@@ -57,7 +58,7 @@ class OMXComponent
 
     OMX_ERRORTYPE SetState(OMX_STATETYPE state, int ms = -1,
             OMXComponentAbstractCB *cb = 0);
-    OMX_STATETYPE GetState() const;
+    OMX_STATETYPE GetState();
 
     OMX_ERRORTYPE SetParameter(OMX_INDEXTYPE type, OMX_PTR p) {
         return OMX_SetParameter(m_handle, type, p); }
@@ -76,12 +77,13 @@ class OMXComponent
             OMXComponentAbstractCB *cb = 0) {
         return SendCommand(OMX_CommandPortDisable, Base() + index, 0, ms, cb); }
 
-    static void EnumComponents(const QRegExp &re, LogLevel_t level = LOG_INFO)
-        { GetComponent(0, re, level); }
+    static void EnumComponents(const QRegExp &re, LogLevel_t level = LOG_INFO,
+                                uint64_t mask = VB_PLAYBACK)
+        { GetComponent(0, re, level, mask); }
 
   private:
     static OMX_ERRORTYPE GetComponent(OMXComponent*, const QRegExp&,
-                                        LogLevel_t level = LOG_INFO);
+                    LogLevel_t level = LOG_INFO, uint64_t mask = VB_PLAYBACK);
     static bool IncrRef();
     static void DecrRef();
 
@@ -107,7 +109,7 @@ class OMXComponent
 };
 
 // Mix-in class for creators of OMXComponent
-class OMXComponentCtx
+class MPUBLIC OMXComponentCtx
 {
   public:
     // OpenMAX callback handlers, override as required
@@ -119,7 +121,7 @@ class OMXComponentCtx
 };
 
 // Interface class to handle callbacks from OMXComponent::SendCommand
-class OMXComponentAbstractCB
+class MPUBLIC OMXComponentAbstractCB
 {
   public:
     virtual ~OMXComponentAbstractCB() {}
@@ -132,7 +134,7 @@ class OMXComponentAbstractCB
 // OMXComponentCB<mytype> cb(this, &mytype::callback);
 // e = cmpnt.SetState(OMX_StateIdle, 0, &cb);
 template<typename T>
-class OMXComponentCB : public OMXComponentAbstractCB
+class MPUBLIC OMXComponentCB : public OMXComponentAbstractCB
 {
   public:
     OMXComponentCB( T *inst, OMX_ERRORTYPE (T::*cb)() ) :
@@ -175,18 +177,20 @@ static inline OMX_TICKS S64_TO_TICKS(int64_t n)
 }
 #endif
 
-const char *Coding2String(OMX_VIDEO_CODINGTYPE);
-const char *Coding2String(OMX_IMAGE_CODINGTYPE);
-const char *Format2String(OMX_COLOR_FORMATTYPE);
-const char *Event2String(OMX_EVENTTYPE);
-const char *Error2String(OMX_ERRORTYPE);
-const char *State2String(OMX_STATETYPE);
-const char *Command2String(OMX_COMMANDTYPE);
-QString HeaderFlags(OMX_U32 nFlags);
+MPUBLIC const char *Coding2String(OMX_VIDEO_CODINGTYPE);
+MPUBLIC const char *Coding2String(OMX_IMAGE_CODINGTYPE);
+MPUBLIC const char *Coding2String(OMX_AUDIO_CODINGTYPE);
+MPUBLIC const char *Other2String(OMX_OTHER_FORMATTYPE);
+MPUBLIC const char *Format2String(OMX_COLOR_FORMATTYPE);
+MPUBLIC const char *Event2String(OMX_EVENTTYPE);
+MPUBLIC const char *Error2String(OMX_ERRORTYPE);
+MPUBLIC const char *State2String(OMX_STATETYPE);
+MPUBLIC const char *Command2String(OMX_COMMANDTYPE);
+MPUBLIC QString HeaderFlags(OMX_U32 nFlags);
 #ifdef USING_BROADCOM
-const char *Interlace2String(OMX_INTERLACETYPE);
+MPUBLIC const char *Interlace2String(OMX_INTERLACETYPE);
 #endif
-const char *Filter2String(OMX_IMAGEFILTERTYPE);
+MPUBLIC const char *Filter2String(OMX_IMAGEFILTERTYPE);
 } // namespace omxcontext
 
 #endif // ndef OMXCONTEXT_H

@@ -106,11 +106,9 @@ void OMXComponent::DecrRef()
 {
     if (s_iRefcnt.fetchAndAddOrdered(-1) == 1)
     {
-        LOG(VB_PLAYBACK, LOG_DEBUG, LOCA + "OMX_DeInit...");
+        LOG(VB_GENERAL, LOG_DEBUG, LOCA + "OMX_DeInit...");
         OMX_ERRORTYPE e = OMX_Deinit();
-        if (e == OMX_ErrorNone)
-            LOG(VB_PLAYBACK, LOG_DEBUG, LOCA + "OMX_Deinit OK");
-        else
+        if (e != OMX_ErrorNone)
             LOG(VB_GENERAL, LOG_ERR, LOCA + QString("OMX_Deinit error %1")
                 .arg(Error2String(e)));
     }
@@ -133,8 +131,8 @@ OMXComponent::OMXComponent(const QString &name, OMXComponentCtx &cb) :
         LOG(VB_GENERAL, LOG_ERR, LOC + "Can't find component: " + name);
 
         // List available components
-        LOG(VB_PLAYBACK, LOG_NOTICE, "Components available:");
-        EnumComponents(QRegExp(), LOG_NOTICE);
+        LOG(VB_GENERAL, LOG_NOTICE, "Components available:");
+        EnumComponents(QRegExp(), LOG_NOTICE, VB_GENERAL);
         return;
     }
     m_state = OMX_StateLoaded;
@@ -145,7 +143,7 @@ OMXComponent::OMXComponent(const QString &name, OMXComponentCtx &cb) :
     if (OMX_GetComponentVersion(Handle(), buf, &ver, &spec, &uuid) != OMX_ErrorNone)
         return;
 
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString(
+    LOG(VB_GENERAL, LOG_DEBUG, LOC + QString(
             "Attached %1 ver=%2.%3.%4.%5 spec=%6.%7.%8.%9")
         .arg(buf)
         .arg(ver.s.nVersionMajor).arg(ver.s.nVersionMinor)
@@ -165,7 +163,7 @@ OMXComponent::~OMXComponent()
         m_handle = 0;
         m_state = OMX_StateInvalid;
         if (e != OMX_ErrorNone)
-            LOG(VB_PLAYBACK, LOG_ERR, LOC + QString("OMX_FreeHandle error %1")
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("OMX_FreeHandle error %1")
                 .arg(Error2String(e)));
     }
 
@@ -174,6 +172,9 @@ OMXComponent::~OMXComponent()
 
 void OMXComponent::Shutdown()
 {
+    if (!m_handle)
+        return;
+
     if (m_state > OMX_StateIdle)
         SetState(OMX_StateIdle, 50);
 
@@ -191,7 +192,7 @@ void OMXComponent::Shutdown()
         else
             e = OMX_SetupTunnel(0, 0, Handle(), Base() + port);
         if (e != OMX_ErrorNone)
-            LOG(VB_PLAYBACK, LOG_ERR, LOC + QString(
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString(
                 "OMX_SetupTunnel shutdown error %1").arg(Error2String(e)));
     }
 }
@@ -204,6 +205,9 @@ OMX_ERRORTYPE OMXComponent::ReleaseBuffers()
 
 OMX_ERRORTYPE OMXComponent::Init(OMX_INDEXTYPE type)
 {
+    if (!m_handle)
+        return OMX_ErrorInvalidComponent;
+
     if (m_state != OMX_StateLoaded)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + __func__ + " in incorrect state");
@@ -228,7 +232,7 @@ OMX_ERRORTYPE OMXComponent::Init(OMX_INDEXTYPE type)
     OMX_ERRORTYPE e = OMX_GetParameter(m_handle, type, &port);
     if (e != OMX_ErrorNone)
     {
-        LOG(VB_PLAYBACK, LOG_ERR, LOC + __func__ + QString(" error %1")
+        LOG(VB_GENERAL, LOG_ERR, LOC + __func__ + QString(" error %1")
             .arg(Error2String(e)));
         return e;
     }
@@ -257,6 +261,9 @@ OMX_ERRORTYPE OMXComponent::Init(OMX_INDEXTYPE type)
 
 OMX_ERRORTYPE OMXComponent::GetPortDef(unsigned index)
 {
+    if (!m_handle)
+        return OMX_ErrorInvalidComponent;
+
     if ((int)index >= m_portdefs.size())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + __func__ + QString(" invalid index %1")
@@ -270,7 +277,7 @@ OMX_ERRORTYPE OMXComponent::GetPortDef(unsigned index)
     OMX_ERRORTYPE e = OMX_GetParameter(m_handle, OMX_IndexParamPortDefinition,
                                         &def);
     if (e != OMX_ErrorNone)
-        LOG(VB_PLAYBACK, LOG_ERR, LOC + QString(
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString(
                 "Get IndexParamPortDefinition error %1").arg(Error2String(e)));
     return e;
 }
@@ -287,23 +294,25 @@ OMX_PARAM_PORTDEFINITIONTYPE &OMXComponent::PortDef(unsigned index)
     return m_portdefs[index];
 }
 
-void OMXComponent::ShowPortDef(unsigned index, LogLevel_t level) const
+void OMXComponent::ShowPortDef(unsigned index, LogLevel_t level, uint64_t mask) const
 {
     const OMX_PARAM_PORTDEFINITIONTYPE &def = PortDef(index);
 
-    LOG(VB_PLAYBACK, level, LOC + QString(
-            "Port %1: %2, bufs=%3,%4 bufsize=%5, %6, %7")
+    LOG(mask, level, LOC + QString(
+            "Port %1: %2, bufs=%3(%4) bufsize=%5@%9 %8, %6, %7")
         .arg(def.nPortIndex)
         .arg(def.eDir == OMX_DirInput ? "input" : "output")
         .arg(def.nBufferCountActual).arg(def.nBufferCountMin)
         .arg(def.nBufferSize)
         .arg(def.bEnabled ? "enabled" : "disabled")
-        .arg(def.bPopulated ? "populated" : "unpopulated") );
+        .arg(def.bPopulated ? "populated" : "unpopulated")
+        .arg(def.bBuffersContiguous ? "contiguous" : "discontiguous")
+        .arg(def.nBufferAlignment) );
 
     switch (def.eDomain)
     {
     case OMX_PortDomainVideo:
-        LOG(VB_PLAYBACK, level, LOC + QString(
+        LOG(mask, level, LOC + QString(
                 "Port %1: video, w=%2 h=%3 stride=%4 sliceH=%5 bps=%6"
                 " fps=%7 compress=%8 enc=%9")
             .arg(def.nPortIndex)
@@ -317,13 +326,13 @@ void OMXComponent::ShowPortDef(unsigned index, LogLevel_t level) const
             .arg(Format2String(def.format.video.eColorFormat)) );
         break;
     case OMX_PortDomainAudio:
-        LOG(VB_PLAYBACK, level, LOC + QString(
+        LOG(mask, level, LOC + QString(
                 "Port %1: audio, encoding=%2")
             .arg(def.nPortIndex)
-            .arg(def.format.audio.eEncoding) );
+            .arg(Coding2String(def.format.audio.eEncoding)) );
         break;
     case OMX_PortDomainImage:
-        LOG(VB_PLAYBACK, level, LOC + QString(
+        LOG(mask, level, LOC + QString(
                 "Port %1: image, w=%2 h=%3 stride=%4 sliceH=%5"
                 " compress=%6 enc=%7")
             .arg(def.nPortIndex)
@@ -335,20 +344,58 @@ void OMXComponent::ShowPortDef(unsigned index, LogLevel_t level) const
             .arg(Format2String(def.format.image.eColorFormat)) );
         break;
     case OMX_PortDomainOther:
-        LOG(VB_PLAYBACK, level, LOC + QString("Port %1: other")
+        LOG(mask, level, LOC + QString("Port %1: other")
             .arg(def.nPortIndex) );
         break;
     default:
-        LOG(VB_PLAYBACK, level, LOC + QString("Port %1: domain 0x%2")
+        LOG(mask, level, LOC + QString("Port %1: domain 0x%2")
             .arg(def.nPortIndex).arg(def.eDomain,0,16) );
         break;
     }
 }
 
-template<typename T, OMX_INDEXTYPE type>
-void ShowFormats(const OMXComponent &cmpnt, unsigned n, LogLevel_t level)
+static inline void ShowFormat(const OMXComponent &cmpnt, LogLevel_t level,
+    uint64_t mask, const OMX_VIDEO_PARAM_PORTFORMATTYPE &fmt)
 {
-    if  (!VERBOSE_LEVEL_CHECK(VB_PLAYBACK, level))
+    LOG(mask, level, LOCB(cmpnt) + QString(
+            "Port %1 #%2: compress=%3 colour=%4")
+        .arg(fmt.nPortIndex).arg(fmt.nIndex)
+        .arg(Coding2String(fmt.eCompressionFormat))
+        .arg(Format2String(fmt.eColorFormat)) );
+}
+
+static inline void ShowFormat(const OMXComponent &cmpnt, LogLevel_t level,
+    uint64_t mask, const OMX_IMAGE_PARAM_PORTFORMATTYPE &fmt)
+{
+    LOG(mask, level, LOCB(cmpnt) + QString(
+            "Port %1 #%2: compress=%3 colour=%4")
+        .arg(fmt.nPortIndex).arg(fmt.nIndex)
+        .arg(Coding2String(fmt.eCompressionFormat))
+        .arg(Format2String(fmt.eColorFormat)) );
+}
+
+static inline void ShowFormat(const OMXComponent &cmpnt, LogLevel_t level,
+    uint64_t mask, const OMX_AUDIO_PARAM_PORTFORMATTYPE &fmt)
+{
+    LOG(mask, level, LOCB(cmpnt) + QString(
+            "Port %1 #%2: encoding=%3")
+        .arg(fmt.nPortIndex).arg(fmt.nIndex)
+        .arg(Coding2String(fmt.eEncoding)) );
+}
+
+static inline void ShowFormat(const OMXComponent &cmpnt, LogLevel_t level,
+    uint64_t mask, const OMX_OTHER_PARAM_PORTFORMATTYPE &fmt)
+{
+    LOG(mask, level, LOCB(cmpnt) + QString(
+            "Port %1 #%2: encoding=%3")
+        .arg(fmt.nPortIndex).arg(fmt.nIndex)
+        .arg(Other2String(fmt.eFormat)) );
+}
+
+template<typename T, OMX_INDEXTYPE type>
+void ShowFormats(const OMXComponent &cmpnt, unsigned n, LogLevel_t level, uint64_t mask)
+{
+    if  (!VERBOSE_LEVEL_CHECK(mask, level))
         return;
 
     T fmt;
@@ -363,16 +410,12 @@ void ShowFormats(const OMXComponent &cmpnt, unsigned n, LogLevel_t level)
         switch (e)
         {
         case OMX_ErrorNone:
-            LOG(VB_PLAYBACK, level, LOCB(cmpnt) + QString(
-                    "Port %1 #%2: compress=%3 colour=%4")
-                .arg(fmt.nPortIndex).arg(index)
-                .arg(Coding2String(fmt.eCompressionFormat))
-                .arg(Format2String(fmt.eColorFormat)) );
+            ShowFormat(cmpnt, level, mask, fmt);
             break;
         case OMX_ErrorNoMore:
             break;
         default:
-            LOG(VB_PLAYBACK, LOG_ERR, LOCB(cmpnt) + QString(
+            LOG(mask, LOG_ERR, LOCB(cmpnt) + QString(
                     "GetParameter PortFormat error %1")
                 .arg(Error2String(e)));
             break;
@@ -380,22 +423,32 @@ void ShowFormats(const OMXComponent &cmpnt, unsigned n, LogLevel_t level)
     }
 }
 
-void OMXComponent::ShowFormats(unsigned index, LogLevel_t level) const
+void OMXComponent::ShowFormats(unsigned index, LogLevel_t level, uint64_t mask) const
 {
     if (PortDef(index).eDomain == OMX_PortDomainVideo)
         ::ShowFormats<OMX_VIDEO_PARAM_PORTFORMATTYPE, OMX_IndexParamVideoPortFormat>(
-            *this, index, level);
+            *this, index, level, mask);
     else if (PortDef(index).eDomain == OMX_PortDomainImage)
         ::ShowFormats<OMX_IMAGE_PARAM_PORTFORMATTYPE, OMX_IndexParamImagePortFormat>(
-            *this, index, level);
+            *this, index, level, mask);
+    else if (PortDef(index).eDomain == OMX_PortDomainAudio)
+        ::ShowFormats<OMX_AUDIO_PARAM_PORTFORMATTYPE, OMX_IndexParamAudioPortFormat>(
+            *this, index, level, mask);
+    else if (PortDef(index).eDomain == OMX_PortDomainOther)
+        ::ShowFormats<OMX_OTHER_PARAM_PORTFORMATTYPE, OMX_IndexParamOtherPortFormat>(
+            *this, index, level, mask);
     else
-        LOG(VB_PLAYBACK, LOG_ERR, LOC + "Unknown port domain");
+        LOG(mask, LOG_ERR, LOC + QString("Unknown port domain 0x%1")
+            .arg(PortDef(index).eDomain,0,16));
 }
 
 OMX_ERRORTYPE OMXComponent::SetState(OMX_STATETYPE state, int ms, OMXComponentAbstractCB *cb)
 {
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("SetState %1")
         .arg(State2String(state)));
+
+    if (!m_handle)
+        return OMX_ErrorInvalidComponent;
 
     QMutexLocker lock(&m_state_lock);
     if (m_state == state)
@@ -409,7 +462,7 @@ OMX_ERRORTYPE OMXComponent::SetState(OMX_STATETYPE state, int ms, OMXComponentAb
     lock.relock();
     if (m_state != state)
     {
-        LOG(VB_PLAYBACK, LOG_ERR, LOC + QString(
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString(
                 "SetState %1 not set").arg(State2String(state)));
         return OMX_ErrorNotReady;
     }
@@ -417,9 +470,11 @@ OMX_ERRORTYPE OMXComponent::SetState(OMX_STATETYPE state, int ms, OMXComponentAb
     return OMX_ErrorNone;
 }
 
-OMX_STATETYPE OMXComponent::GetState() const
+OMX_STATETYPE OMXComponent::GetState()
 {
     QMutexLocker lock(&m_state_lock);
+    if (m_handle)
+        OMX_GetState(m_handle, &m_state);
     return m_state;
 }
 
@@ -429,6 +484,9 @@ OMX_ERRORTYPE OMXComponent::SendCommand(OMX_COMMANDTYPE cmd,
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + __func__ + QString(" %1 %2 begin")
         .arg(Command2String(cmd)).arg(nParam) );
 
+    if (!m_handle)
+        return OMX_ErrorInvalidComponent;
+
     while (m_state_sema.tryAcquire())
         ;
     (void)LastError();
@@ -436,7 +494,7 @@ OMX_ERRORTYPE OMXComponent::SendCommand(OMX_COMMANDTYPE cmd,
     OMX_ERRORTYPE e = OMX_SendCommand(m_handle, cmd, nParam, pCmdData);
     if (e != OMX_ErrorNone)
     {
-        LOG(VB_PLAYBACK, LOG_ERR, LOC + __func__ + QString(" %1 %2")
+        LOG(VB_GENERAL, LOG_ERR, LOC + __func__ + QString(" %1 %2")
             .arg(Command2String(cmd)).arg(Error2String(e)) );
         return e;
     }
@@ -465,7 +523,7 @@ OMX_ERRORTYPE OMXComponent::SendCommand(OMX_COMMANDTYPE cmd,
             LOG(VB_PLAYBACK, LOG_DEBUG, LOC + __func__ + QString(" %1 %2 pending")
                 .arg(Command2String(cmd)).arg(nParam) );
         else
-            LOG(VB_PLAYBACK, LOG_ERR, LOC + __func__ + QString(" %1 %2 timed out")
+            LOG(VB_GENERAL, LOG_ERR, LOC + __func__ + QString(" %1 %2 timed out")
                 .arg(Command2String(cmd)).arg(nParam) );
         return OMX_ErrorTimeout;
     }
@@ -487,13 +545,13 @@ OMX_ERRORTYPE OMXComponent::WaitComplete(int ms)
 {
     if (!m_state_sema.tryAcquire(1, ms))
     {
-        LOG(VB_PLAYBACK, LOG_DEBUG, LOC + __func__ + " Timed out");
+        LOG(VB_GENERAL, LOG_DEBUG, LOC + __func__ + " Timed out");
         return OMX_ErrorTimeout;
     }
 
     OMX_ERRORTYPE e = LastError();
     if (e != OMX_ErrorNone)
-        LOG(VB_PLAYBACK, LOG_ERR, LOC + __func__ + " " + Error2String(e));
+        LOG(VB_GENERAL, LOG_ERR, LOC + __func__ + " " + Error2String(e));
     return e;
 }
 
@@ -510,9 +568,9 @@ OMX_ERRORTYPE OMXComponent::LastError()
  */
 // static
 OMX_ERRORTYPE OMXComponent::GetComponent(OMXComponent *cmpnt, const QRegExp &re,
-    LogLevel_t level)
+    LogLevel_t level, uint64_t mask)
 {
-    if (!cmpnt && !VERBOSE_LEVEL_CHECK(VB_PLAYBACK, level))
+    if (!cmpnt && !VERBOSE_LEVEL_CHECK(mask, level))
         return OMX_ErrorNone;
 
     char buf[128];
@@ -534,7 +592,7 @@ OMX_ERRORTYPE OMXComponent::GetComponent(OMXComponent *cmpnt, const QRegExp &re,
                 return OMX_GetHandle(&cmpnt->m_handle, buf, cmpnt, &cb);
             }
 
-            LOG(VB_PLAYBACK, level, LOCA + QString("%1"). arg(buf));
+            LOG(mask, level, LOCA + QString("%1"). arg(buf));
             break;
 
           case OMX_ErrorNoMore:
@@ -638,22 +696,22 @@ OMX_ERRORTYPE OMXComponentCtx::Event( OMXComponent &cmpnt,
         switch (nData1)
         {
           case OMX_ErrorInvalidState:
-            LOG(VB_PLAYBACK, LOG_ERR, LOCB(cmpnt) + "EventError: InvalidState");
+            LOG(VB_GENERAL, LOG_ERR, LOCB(cmpnt) + "EventError: InvalidState");
             cmpnt.m_state = OMX_StateInvalid;
             break;
           case OMX_ErrorResourcesPreempted:
-            LOG(VB_PLAYBACK, LOG_ERR, LOCB(cmpnt) + "EventError: ResourcesPreempted");
+            LOG(VB_GENERAL, LOG_ERR, LOCB(cmpnt) + "EventError: ResourcesPreempted");
             cmpnt.m_state = OMX_StateIdle;
             break;
           case OMX_ErrorResourcesLost:
-            LOG(VB_PLAYBACK, LOG_ERR, LOCB(cmpnt) + "EventError: ResourcesLost");
+            LOG(VB_GENERAL, LOG_ERR, LOCB(cmpnt) + "EventError: ResourcesLost");
             cmpnt.m_state = OMX_StateLoaded;
             break;
           case OMX_ErrorUnsupportedSetting:
             LOG(VB_PLAYBACK, LOG_ERR, LOCB(cmpnt) + "EventError: UnsupportedSetting");
             break;
           default:
-            LOG(VB_PLAYBACK, LOG_ERR, LOCB(cmpnt) + QString("EventError: %1")
+            LOG(VB_GENERAL, LOG_ERR, LOCB(cmpnt) + QString("EventError: %1")
                 .arg(Error2String(OMX_ERRORTYPE(nData1))));
             break;
         }
@@ -763,6 +821,69 @@ const char *Coding2String(OMX_IMAGE_CODINGTYPE eCompressionFormat)
     static char buf[32];
     return strcpy(buf, qPrintable(QString("IMAGE_Coding 0x%1")
                                     .arg(eCompressionFormat,0,16)));
+}
+
+const char *Coding2String(OMX_AUDIO_CODINGTYPE eEncoding)
+{
+    switch(eEncoding)
+    {
+        CASE2STR(OMX_AUDIO_CodingUnused);
+        CASE2STR(OMX_AUDIO_CodingAutoDetect);
+        CASE2STR(OMX_AUDIO_CodingPCM);
+        CASE2STR(OMX_AUDIO_CodingADPCM);
+        CASE2STR(OMX_AUDIO_CodingAMR);
+        CASE2STR(OMX_AUDIO_CodingGSMFR);
+        CASE2STR(OMX_AUDIO_CodingGSMEFR);
+        CASE2STR(OMX_AUDIO_CodingGSMHR);
+        CASE2STR(OMX_AUDIO_CodingPDCFR);
+        CASE2STR(OMX_AUDIO_CodingPDCEFR);
+        CASE2STR(OMX_AUDIO_CodingPDCHR);
+        CASE2STR(OMX_AUDIO_CodingTDMAFR);
+        CASE2STR(OMX_AUDIO_CodingTDMAEFR);
+        CASE2STR(OMX_AUDIO_CodingQCELP8);
+        CASE2STR(OMX_AUDIO_CodingQCELP13);
+        CASE2STR(OMX_AUDIO_CodingEVRC);
+        CASE2STR(OMX_AUDIO_CodingSMV);
+        CASE2STR(OMX_AUDIO_CodingG711);
+        CASE2STR(OMX_AUDIO_CodingG723);
+        CASE2STR(OMX_AUDIO_CodingG726);
+        CASE2STR(OMX_AUDIO_CodingG729);
+        CASE2STR(OMX_AUDIO_CodingAAC);
+        CASE2STR(OMX_AUDIO_CodingMP3);
+        CASE2STR(OMX_AUDIO_CodingSBC);
+        CASE2STR(OMX_AUDIO_CodingVORBIS);
+        CASE2STR(OMX_AUDIO_CodingWMA);
+        CASE2STR(OMX_AUDIO_CodingRA);
+        CASE2STR(OMX_AUDIO_CodingMIDI);
+        // Conditional
+        CASE2STR(OMX_AUDIO_CodingFLAC);
+        CASE2STR(OMX_AUDIO_CodingDDP); // Any variant of Dolby Digital Plus
+        CASE2STR(OMX_AUDIO_CodingDTS);
+        CASE2STR(OMX_AUDIO_CodingWMAPRO);
+        CASE2STR(OMX_AUDIO_CodingATRAC3);
+        CASE2STR(OMX_AUDIO_CodingATRACX);
+        CASE2STR(OMX_AUDIO_CodingATRACAAL);
+    }
+    static char buf[32];
+    return strcpy(buf, qPrintable(QString("AUDIO_Coding 0x%1")
+                                    .arg(eEncoding,0,16)));
+}
+
+const char *Other2String(OMX_OTHER_FORMATTYPE eFormat)
+{
+    switch(eFormat)
+    {
+        CASE2STR(OMX_OTHER_FormatTime);
+        CASE2STR(OMX_OTHER_FormatPower);
+        CASE2STR(OMX_OTHER_FormatStats);
+        CASE2STR(OMX_OTHER_FormatBinary);
+        CASE2STR(OMX_OTHER_FormatText);
+        CASE2STR(OMX_OTHER_FormatTextSKM2);
+        CASE2STR(OMX_OTHER_FormatText3GP5);
+    }
+    static char buf[32];
+    return strcpy(buf, qPrintable(QString("Other format 0x%1")
+                                    .arg(eFormat,0,16)));
 }
 
 const char *Format2String(OMX_COLOR_FORMATTYPE eColorFormat)
