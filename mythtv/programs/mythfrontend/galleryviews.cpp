@@ -2,269 +2,34 @@
 
 #include <cmath> // for qsrand
 
-#include <QTime>
 
-#include "gallerycommhelper.h"
+#define LOC QString("Galleryviews: ")
 
-
-/*!
- \brief Number of thumbnails to use for folders
-*/
+//! Number of thumbnails to use for folders
 const static int   kMaxFolderThumbnails = 4;
-
-/*!
- \brief Exif data with these titles comprise the Basic file info
-*/
-static QStringList kBasicInfoFields = QStringList()
-                                      // Exif tags
-                                      << "Date and Time"
-                                      << "Exposure Time"
-                                      << "FNumber"
-                                      << "Focal Length"
-                                      << "Image Description"
-                                      << "User Comment"
-                                      << "Manufacturer"
-                                      << "Max Aperture Value"
-                                      << "Model"
-                                      << "Orientation"
-                                      << "Pixel X Dimension"
-                                      << "Pixel Y Dimension"
-                                      // Video tags
-                                      << "model"
-                                      << "encoder";
-
-/*!
- \brief 
- Tuning parameter for seasonal weights, between 0 and 1, where lower numbers
- give greater weight to seasonal photos. The leading beta shape controls
- dates that are approaching and the trailing beta shape controls dates that
- just passed. When these are set to 0.175 and 0.31, respectively, about one
- quarter of the photos are from the upcoming week in prior years and about one
- quarter of the photos are from the preceding month in prior years.
-*/
-const double LEADING_BETA_SHAPE  = 0.175;
-/*!
- \brief See LEADING_BETA_SHAPE
-*/
-const double TRAILING_BETA_SHAPE = 0.31;
-/*!
- \brief Photos without an exif timestamp will default to the mode of the beta distribution.
-*/
-const double DEFAULT_WEIGHT = std::pow(0.5, TRAILING_BETA_SHAPE - 1) *
-                              std::pow(0.5, LEADING_BETA_SHAPE - 1);
-/*!
- \brief The edges of the distribution get clipped to avoid a singularity.
-*/
-const qint64 BETA_CLIP = 60 * 60 * 24;
-
-/*!
- \brief Reset menu state
-*/
-void MenuSubjects::Clear()
-{
-    m_selected       = NULL;
-    m_selectedMarked = false;
-    m_childCount     = 0;
-    m_markedId.clear();
-    m_prevMarkedId.clear();
-    m_hiddenMarked   = false;
-    m_unhiddenMarked = false;
-}
-
-
-/*!
- \brief Factory for initialising an info/details buttonlist
-
- \param container The Screen widget
- \param focusable Set if info list should be focusable (for scrolling)
- \param undefined Text to display for tags with no value
- \return InfoList The info buttonlist
-*/
-InfoList* InfoList::Create(MythScreenType *container,
-                           bool focusable,
-                           QString undefined)
-{
-    MythUIButtonList *btnList;
-    bool              err = false;
-    UIUtilE::Assign(container, btnList, "infolist", &err);
-    if (err)
-        return NULL;
-
-    return new InfoList(container, focusable, undefined, btnList);
-}
-
-
-/*!
- \brief Info/details buttonlist constructor
-
- \param container The Screen widget
- \param focusable Set if info list should be focusable (for scrolling)
- \param undefined Text to display for tags with no value
- \param btnList Buttonlist provided by the theme
-*/
-InfoList::InfoList(MythScreenType *container, bool focusable, QString undefined,
-                   MythUIButtonList *btnList)
-    : m_screen(container),
-    m_btnList(btnList),
-    m_infoVisible(kNoInfo),
-    m_undefinedText(undefined)
-{
-    m_btnList->SetVisible(false);
-    m_btnList->SetCanTakeFocus(focusable);
-}
-
-
-/*!
- \brief Toggle infolist state for an image. Focusable widgets toggle between
- Basic & Full info. Non-focusable widgets toggle between Basic & Off.
- \param im The image/dir for which info is shown
-*/
-void InfoList::Toggle(const ImageItem *im)
-{
-    // Only focusable lists have an extra 'full' state as they can
-    // be scrolled to view it all
-    if (m_btnList->CanTakeFocus())
-
-        // Start showing basic info then toggle between basic/full
-        m_infoVisible = m_infoVisible == kBasicInfo ? kFullInfo : kBasicInfo;
-
-    // Toggle between off/basic
-    else if (m_infoVisible == kBasicInfo)
-    {
-        m_infoVisible = kNoInfo;
-        m_btnList->SetVisible(false);
-        return;
-    }
-    else
-        m_infoVisible = kBasicInfo;
-
-    Update(im);
-
-    m_btnList->SetVisible(true);
-}
-
-
-/*!
- \brief Remove infolist from display
- \return bool True if buttonlist was displayed/removed
-*/
-bool InfoList::Hide()
-{
-    // Only handle event if info currently displayed
-    bool handled = (m_infoVisible != kNoInfo);
-    m_infoVisible = kNoInfo;
-
-    m_btnList->SetVisible(false);
-
-    return handled;
-}
-
-
-/*!
- \brief Populate a buttonlist item with exif tag name & value
- \param name Exif tag name
- \param value Exif tag value
-*/
-void InfoList::CreateButton(QString name, QString value)
-{
-    MythUIButtonListItem *item = new MythUIButtonListItem(m_btnList, "");
-
-    InfoMap               infoMap;
-    infoMap.insert("name", name);
-    infoMap.insert("value", value.isEmpty() ? m_undefinedText : value);
-
-    item->SetTextFromMap(infoMap);
-}
-
-
-/*!
- \brief Populates available exif details for the current image/dir.
- \param im An image or dir
-*/
-void InfoList::Update(const ImageItem *im)
-{
-    if (!im || m_infoVisible == kNoInfo)
-        return;
-
-    // Clear info
-    m_btnList->Reset();
-
-    if (im->IsFile())
-    {
-        // File stats
-        CreateButton("Filename", im->m_name);
-        CreateButton("File Modified",
-                     QDateTime::fromTime_t(im->m_modTime).toString());
-        CreateButton("File size", QString("%1 Kb").arg(im->m_size / 1024));
-        CreateButton("Path", im->m_path);
-
-        NameMap tags = GalleryBERequest::GetMetaData(im);
-
-        // Now go through the info list and create a map for the buttonlist
-        NameMap::const_iterator i = tags.constBegin();
-        while (i != tags.constEnd())
-        {
-            if (m_infoVisible == kFullInfo || kBasicInfoFields.contains(i.key()))
-                CreateButton(i.key(), i.value());
-            ++i;
-        }
-
-        // Only give list focus if requested
-        if (m_btnList->CanTakeFocus())
-            m_screen->SetFocusWidget(m_btnList);
-    }
-    else if (im->m_id == ROOT_DB_ID)
-    {
-        // Gallery stats
-        CreateButton("Last scan", QDateTime::fromTime_t(
-                         im->m_modTime).toString());
-        CreateButton("Contains", QString("%1 Images, %2 Directories")
-                     .arg(im->m_fileCount).arg(im->m_dirCount));
-    }
-    else // dir
-    {
-        // File stats
-        CreateButton("Dirname", im->m_name);
-        CreateButton("Dir Modified",
-                     QDateTime::fromTime_t(im->m_modTime).toString());
-        CreateButton("Path", im->m_path);
-        CreateButton("Contains", QString("%1 Images, %2 Directories")
-                     .arg(im->m_fileCount).arg(im->m_dirCount));
-    }
-}
-
-
-/*!
- \brief Get current displayed state of buttonlist
- \return InfoVisibleState
-*/
-InfoVisibleState InfoList::GetState()
-{
-    return m_infoVisible;
-}
 
 
 /*!
  \brief Get all images/dirs in view
  \return ImageList List of images/dirs
 */
-ImageList FlatView::GetAllNodes() const
+ImageListK FlatView::GetAllNodes() const
 {
-    ImageList files;
-    foreach (ImageRef ptr, m_sequence)
-        files.append(*ptr);
+    ImageListK files;
+    foreach (int id, m_sequence)
+        files.append(m_images.value(id));
     return files;
 }
 
 
 /*!
  \brief Get current selection
- \return ImageItem* An image or NULL
+ \return ImagePtr An image or NULL
 */
-ImageItem* FlatView::GetSelected() const
+ImagePtrK FlatView::GetSelected() const
 {
     return m_active < 0 || m_active >= m_sequence.size()
-           ? NULL : *m_sequence[m_active];
+            ? ImagePtrK() : m_images.value(m_sequence.at(m_active));
 }
 
 
@@ -282,10 +47,10 @@ QString FlatView::GetPosition() const
  \brief Peeks at next image in view but does not advance iterator
  \return ImageItem The next image or NULL
 */
-ImageItem* FlatView::HasNext() const
+ImagePtrK FlatView::HasNext() const
 {
     return m_sequence.isEmpty() || m_active >= m_sequence.size() - 1
-           ? NULL : *m_sequence[m_active + 1];
+            ? ImagePtrK() : m_images.value(m_sequence.at(m_active + 1));
 }
 
 
@@ -293,10 +58,10 @@ ImageItem* FlatView::HasNext() const
  \brief Peeks at previous image in view but does not decrement iterator
  \return ImageItem The previous image or NULL
 */
-ImageItem* FlatView::HasPrev() const
+ImagePtrK FlatView::HasPrev() const
 {
     return m_sequence.isEmpty() || m_active <= 0
-           ? NULL : *m_sequence[m_active - 1];
+            ? ImagePtrK() : m_images.value(m_sequence.at(m_active - 1));
 }
 
 
@@ -307,40 +72,29 @@ ImageItem* FlatView::HasPrev() const
 */
 bool FlatView::Update(int id)
 {
-    bool activeUpdated = false;
+    ImagePtrK im = m_images.value(id);
+    if (!im)
+        return false;
 
-    // Replace old version of image
-    for (int j=0; j < m_images.size(); ++j)
-    {
-        if (m_images.at(j)->m_id == id)
-        {
-            // Get updated image
-            ImageList files;
-            m_db->ReadDbFilesById(files, QString::number(id), false);
+    // Get updated image
+    ImageList files, dirs;
+    ImageIdList ids = ImageIdList() << id;
+    if (m_mgr.GetImages(ids, files, dirs) != 1 || files.size() != 1)
+        return false;
 
-            if (files.size() == 1)
-            {
-                activeUpdated = GetSelected() == m_images.at(j);
+    bool active = (im == GetSelected());
 
-                // Replace image
-                delete m_images.at(j);
-                m_images.replace(j, files.at(0));
+    // Replace image
+    m_images.insert(id, files.at(0));
 
-                LOG(VB_FILE, LOG_DEBUG, QString("Views: Modified id %1 @ index %2")
-                    .arg(id).arg(j));
-            }
-            else
-                qDeleteAll(files);
+    LOG(VB_FILE, LOG_DEBUG, LOC + QString("Modified id %1").arg(id));
 
-            break;
-        }
-    }
-    return activeUpdated;
+    return active;
 }
 
 
 /*!
- \brief Select image
+ \brief Selects first occurrence of an image
  \param id Image id
  \param fallback View index to select if image is not in view. Defaults to first
  image. If negative then current selection is not changed if the image is not found
@@ -349,14 +103,11 @@ bool FlatView::Update(int id)
 bool FlatView::Select(int id, int fallback)
 {
     // Select first appearance of image
-    for (int i = 0; i < m_sequence.size(); ++i)
+    int index = m_sequence.indexOf(id);
+    if (index >= 0)
     {
-        ImageItem *im = *m_sequence.at(i);
-        if (im->m_id == id)
-        {
-            m_active = i;
-            return true;
-        }
+        m_active = index;
+        return true;
     }
 
     if (fallback >= 0)
@@ -372,13 +123,11 @@ bool FlatView::Select(int id, int fallback)
 */
 void FlatView::Clear(bool resetParent)
 {
-    if (!m_images.isEmpty())
-        qDeleteAll(m_images);
     m_images.clear();
     m_sequence.clear();
     m_active = -1;
     if (resetParent)
-        m_parentId = ROOT_DB_ID;
+        m_parentId = GALLERY_DB_ID;
 }
 
 
@@ -387,10 +136,10 @@ void FlatView::Clear(bool resetParent)
  view order on wrap, if necessary
  \return ImageItem Next image or NULL if empty
 */
-ImageItem *FlatView::Next()
+ImagePtrK FlatView::Next()
 {
     if (m_sequence.isEmpty())
-        return NULL;
+        return ImagePtrK();
 
     // wrap at end
     if (m_active >= m_sequence.size() - 1)
@@ -398,12 +147,12 @@ ImageItem *FlatView::Next()
         if (m_order == kOrdered)
             m_active = -1;
         // Regenerate unordered views on every repeat
-        else if (!LoadFromDb())
+        else if (!LoadFromDb(m_parentId))
             // Images have disappeared
-            return NULL;
+            return ImagePtrK();
     }
 
-    return *m_sequence[++m_active];
+    return m_images.value(m_sequence.at(++m_active));
 }
 
 
@@ -411,15 +160,15 @@ ImageItem *FlatView::Next()
  \brief Decrements iterator and returns previous image. Wraps at start.
  \return ImageItem Previous image or NULL if empty
 */
-ImageItem *FlatView::Prev()
+ImagePtrK FlatView::Prev()
 {
     if (m_sequence.isEmpty())
-        return NULL;
+        return ImagePtrK();
 
     if (m_active <= 0)
         m_active = m_sequence.size();
 
-    return *m_sequence[--m_active];
+    return m_images.value(m_sequence.at(--m_active));
 }
 
 
@@ -435,17 +184,24 @@ void FlatView::Populate(ImageList &files)
     if (files.isEmpty())
         return;
 
-    // Store available images for view
-    m_images = files;
-
-    if (m_images.size() == 1 || m_order == kOrdered || m_order == kShuffle)
+    foreach (ImagePtrK im, files)
     {
-        // Default sequence is ordered
-        for (int i = 0; i < m_images.size(); ++i)
-            m_sequence.append(&m_images.at(i));
+        // Add image to view
+        m_images.insert(im->m_id, im);
+
+        // Cache all displayed images
+        if (im->IsFile())
+            Cache(im->m_id, im->m_parentId, im->m_url, im->m_thumbNails.at(0).second);
     }
 
-    if (m_images.size() > 1)
+    if (files.size() == 1 || m_order == kOrdered || m_order == kShuffle)
+    {
+        // Default sequence is ordered
+        foreach (ImagePtrK im, files)
+            m_sequence.append(im->m_id);
+    }
+
+    if (files.size() > 1)
     {
         // Modify viewing sequence
         if (m_order == kShuffle)
@@ -455,99 +211,18 @@ void FlatView::Populate(ImageList &files)
         else if (m_order == kRandom)
         {
             qsrand(QTime::currentTime().msec());
-            int range = m_images.size() - 1;
-            int rand, slot = range;
-            for (int i = 0; i < m_images.size(); ++i)
+            // An image is not a valid candidate for its successor
+            int range = files.size() - 1;
+            int index = range;
+            for (int count = 0; count < files.size(); ++count)
             {
-                rand = qrand() % range;
+                int rand = qrand() % range;
                 // Avoid consecutive repeats
-                slot = (rand < slot) ? rand : rand + 1;
-                m_sequence.append(&m_images.at(slot));
-//                LOG(VB_FILE, LOG_DEBUG, QString("Rand %1").arg(slot));
-            }
-        }
-        else if (m_order == kSeasonal)
-        {
-            WeightList weights   = CalculateSeasonalWeights(m_images);
-            double     maxWeight = weights.last();
-
-            qsrand(QTime::currentTime().msec());
-            for (int i = 0; i < m_images.size(); ++i)
-            {
-                double               randWeight = qrand() * maxWeight / RAND_MAX;
-                WeightList::iterator it =
-                        std::upper_bound(weights.begin(), weights.end(), randWeight);
-                int                  slot = std::distance(weights.begin(), it);
-                m_sequence.append(&m_images.at(slot));
+                index = (rand < index) ? rand : rand + 1;
+                m_sequence.append(files.at(index)->m_id);
             }
         }
     }
-}
-
-
-/*!
- \brief 
- * This method calculates a weight for the item based on how closely it was
- * taken to the current time of year. This means that New Year's pictures will
- * be displayed very frequently on every New Year's, and that anniversary
- * pictures will be favored again every anniversary. The weights are chosen
- * using a beta distribution with a tunable shape parameter.
- \param files List of database images
- \return WeightList Corresponding list of weightings
-*/
-WeightList FlatView::CalculateSeasonalWeights(ImageList &files)
-{
-    WeightList weights(files.size());
-    double     totalWeight = 0;
-    QDateTime  now         = QDateTime::currentDateTime();
-
-    for (int i = 0; i < files.size(); ++i)
-    {
-        ImageItem *im      = files.at(i);
-        double         weight;
-
-        if (im->m_date == 0)
-            weight = DEFAULT_WEIGHT;
-        else
-        {
-            QDateTime      timestamp = QDateTime::fromTime_t(im->m_date);
-            QDateTime curYearAnniversary =
-                QDateTime(QDate(now.date().year(),
-                                timestamp.date().month(),
-                                timestamp.date().day()),
-                          timestamp.time());
-
-            bool      isAnniversaryPast = curYearAnniversary < now;
-
-            QDateTime adjacentYearAnniversary =
-                QDateTime(QDate(now.date().year() +
-                                (isAnniversaryPast ? 1 : -1),
-                                timestamp.date().month(),
-                                timestamp.date().day()),
-                          timestamp.time());
-
-            double range = std::abs(
-                curYearAnniversary.secsTo(adjacentYearAnniversary)) + BETA_CLIP;
-
-            // This calculation is not normalized, because that would require the
-            // beta function, which isn't part of the C++98 libraries. Weights
-            // that aren't normalized work just as well relative to each other.
-            weight = std::pow(abs(now.secsTo(
-                                      isAnniversaryPast ? curYearAnniversary
-                                      : adjacentYearAnniversary
-                                      ) + BETA_CLIP) / range,
-                              TRAILING_BETA_SHAPE - 1) *
-                     std::pow(abs(now.secsTo(
-                                      isAnniversaryPast ?
-                                      adjacentYearAnniversary :
-                                      curYearAnniversary
-                                      ) + BETA_CLIP) / range,
-                              LEADING_BETA_SHAPE - 1);
-        }
-        totalWeight += weight;
-        weights[i]   = totalWeight;
-    }
-    return weights;
 }
 
 
@@ -559,12 +234,11 @@ WeightList FlatView::CalculateSeasonalWeights(ImageList &files)
 */
 bool FlatView::LoadFromDb(int parentId)
 {
-    if (parentId > 0)
-        m_parentId = parentId;
+    m_parentId = parentId;
 
     // Load child images of the parent
-    ImageList files;
-    m_db->ReadDbChildFiles(files, QString::number(m_parentId), false, true);
+    ImageList files, dirs;
+    m_mgr.GetChildren(m_parentId, files, dirs);
 
     // Load gallery datastore with current dir
     Populate(files);
@@ -574,25 +248,87 @@ bool FlatView::LoadFromDb(int parentId)
 
 
 /*!
+ \brief Clears UI cache
+*/
+void FlatView::ClearCache()
+{
+    LOG(VB_FILE, LOG_DEBUG, LOC + "Cleared File cache");
+    m_fileCache.clear();
+}
+
+
+/*!
+ \brief Clear file from UI cache and optionally from view
+ \param id
+ \param remove If true, file is also deleted from view
+ \return QStringList Url of image & thumbnail to remove from image cache
+*/
+QStringList FlatView::ClearImage(int id, bool remove)
+{
+    if (remove)
+    {
+        m_sequence.removeAll(id);
+        m_images.remove(id);
+    }
+
+    QStringList urls;
+    FileCacheEntry file = m_fileCache.take(id);
+
+    if (!file.m_url.isEmpty())
+        urls << file.m_url;
+
+    if (!file.m_thumbUrl.isEmpty())
+        urls << file.m_thumbUrl;
+
+    LOG(VB_FILE, LOG_DEBUG, LOC + QString("Cleared %1 from file cache (%2)")
+        .arg(id).arg(urls.join(",")));
+    return urls;
+}
+
+
+/*!
  \brief Rotate view so that starting image is at front.
  \param id The image to be positioned
- \param offset Distance the image will be from element 0
 */
-void FlatView::Rotate(int id, int offset)
+void FlatView::Rotate(int id)
 {
     // Rotate sequence so that (first appearance of) specified image is
     // at offset from front
-    for (int i = 0; i < m_sequence.size(); ++i)
+    int index = m_sequence.indexOf(id);
+    if (index >= 0)
     {
-        ImageItem *im = *m_sequence.at(i);
-        if (im->m_id == id)
-        {
-            int first = (i + offset) % m_sequence.size();
-            if (first > 0)
-                m_sequence = m_sequence.mid(first) + m_sequence.mid(0, first);
-            break;
-        }
+        int first = index % m_sequence.size();
+        if (first > 0)
+            m_sequence = m_sequence.mid(first) + m_sequence.mid(0, first);
     }
+}
+
+
+/*!
+ * \brief Cache image properties to optimize UI
+ * \param id Image id
+ * \param parent Its dir
+ * \param url Image url
+ * \param thumb Thumbnail url
+ */
+void FlatView::Cache(int id, int parent, const QString &url, const QString &thumb)
+{
+    // Cache parent dir so that dir thumbs are updated when a child changes.
+    // Also store urls for image cache cleanup
+    FileCacheEntry cached(parent, url, thumb);
+    m_fileCache.insert(id, cached);
+    LOG(VB_FILE, LOG_DEBUG, LOC + "Caching " + cached.ToString(id));
+}
+
+
+QString DirCacheEntry::ToString(int id) const
+{
+    QStringList ids;
+    for (int i = 0; i < m_thumbs.size(); ++i)
+        ids << QString::number(m_thumbs.at(i).first);
+    return QString("Dir %1 (%2, %3) Thumbs %4 (%5) Parent %6")
+            .arg(id).arg(m_fileCount).arg(m_dirCount).arg(ids.join(","))
+            .arg(m_thumbCount).arg(m_parent);
 }
 
 
@@ -600,27 +336,21 @@ void FlatView::Rotate(int id, int offset)
  \brief Constructs a view of images & directories that can be marked
  \param order Ordering to use for view
 */
-DirectoryView::DirectoryView(SlideOrderType order, ImageDbReader *db)
-    : FlatView(order, db)
+DirectoryView::DirectoryView(SlideOrderType order)
+    : FlatView(order)
 {
-    m_marked.Reset(ROOT_DB_ID);
-    m_prevMarked.Reset();
+    m_marked.Clear();
+    m_prevMarked.Clear();
 }
 
 
 /*!
- \brief Get all view items except the first (the parent dir)
- \return ImageIdList List of images/dirs
+ \brief Get positional status
+ \return QString "m/n" where m is selected index (0 for parent), n is total images
 */
-ImageIdList DirectoryView::GetChildren() const
+QString DirectoryView::GetPosition() const
 {
-    ImageIdList children;
-    for (int i = 1; i < m_sequence.size(); ++i)
-    {
-        ImageItem *im = *m_sequence.at(i);
-        children.append(im->m_id);
-    }
-    return children;
+    return QString("%1/%2").arg(m_active).arg(m_sequence.size() - 1);
 }
 
 
@@ -634,38 +364,61 @@ subtree.
 */
 bool DirectoryView::LoadFromDb(int parentId)
 {
-    // Invalid id signifies a refresh of the current view
-    if (parentId > 0)
-        SetDirectory(parentId);
-    else
-        parentId = m_parentId;
-
-    // Load visible parent or root
-    ImageItem *parent = GetDbParent(parentId);
-    if (!parent)
+    // Determine parent (defaulting to ancestor) & get initial children
+    ImageList files, dirs;
+    ImagePtr parent;
+    int count;
+    // Root is guaranteed to return at least 1 item
+    while ((count = m_mgr.GetDirectory(parentId, parent, files, dirs)) == 0)
     {
-        Clear();
+        // Fallback if dir no longer exists
+        // Ascend to Gallery for gallery subdirs, Root for device dirs & Gallery
+        parentId = parentId > PHOTO_DB_ID ? PHOTO_DB_ID : GALLERY_DB_ID;
+    }
+
+    SetDirectory(parentId);
+    m_parentId = parentId;
+
+    // No SG & no devices uses special 'empty' screen
+    if (!parent || (parentId == GALLERY_DB_ID && count == 1))
+    {
+        parent.clear();
         return false;
     }
 
-    m_parentId = parent->m_id;
+    // Populate all subdirs
+    foreach (ImagePtr im, dirs)
+    {
+        if (im)
+            // Load sufficient thumbs from each dir as subsequent dirs may be empty
+            LoadDirThumbs(*im, kMaxFolderThumbnails);
+    }
 
-    // Preserve current selection
-    ImageItem *selected = GetSelected();
+    // Populate parent
+    if (!PopulateFromCache(*parent, kMaxFolderThumbnails))
+        PopulateThumbs(*parent, kMaxFolderThumbnails, files, dirs);
+
+    // Dirs shown before images
+    ImageList images = dirs + files;
+
+    // Validate marked images
+    if (!m_marked.isEmpty())
+    {
+        QSet<int> ids;
+        foreach (ImagePtrK im, images)
+            ids.insert(im->m_id);
+        m_marked.intersect(ids);
+    }
+
+    // Parent is always first (for navigating up).
+    images.prepend(parent);
+
+    // Preserve current selection before view is destroyed
+    ImagePtrK selected = GetSelected();
     int activeId = selected ? selected->m_id : 0;
 
-    // Load db data for this parent dir
-    ImageList dirs, images;
-    GetDbTree(images, dirs, parent);
-
-    // Construct view as:
-    //  Parent kUpDirectory at start for navigating up.
-    //  Ordered dirs
-    //  Ordered files
-    ImageList files = dirs + images;
-    files.prepend(parent);
-
-    Populate(files);
+    // Construct view
+    Populate(images);
 
     // Reinstate selection, falling back to parent
     Select(activeId);
@@ -675,13 +428,150 @@ bool DirectoryView::LoadFromDb(int parentId)
 
 
 /*!
+ \brief Populate thumbs for a dir
+ \param parent Parent dir
+ \param thumbsNeeded Number of thumbnails needed
+ \param level Recursion depth
+*/
+void DirectoryView::LoadDirThumbs(ImageItem &parent, int thumbsNeeded, int level)
+{
+    // Use cached data, if available
+    if (PopulateFromCache(parent, thumbsNeeded))
+        return;
+
+    // Load child images & dirs
+    ImageList files, dirs;
+    m_mgr.GetChildren(parent.m_id, files, dirs);
+
+    PopulateThumbs(parent, thumbsNeeded, files, dirs, level);
+}
+
+
+/*!
+ \brief Populate directory stats & thumbnails recursively from database as follows:
+Use user cover, if assigned. Otherwise derive 4 thumbnails from: first 4 images,
+then 1st thumbnail from first 4 sub-dirs, then 2nd thumbnail from sub-dirs etc
+ \param parent The parent dir
+ \param limit Number of thumbnails required
+ \param level Recursion level (to detect recursion deadlocks)
+*/
+void DirectoryView::PopulateThumbs(ImageItem &parent, int thumbsNeeded,
+                                   const ImageList &files, const ImageList &dirs,
+                                   int level)
+{
+    // Set parent stats
+    parent.m_fileCount = files.size();
+    parent.m_dirCount  = dirs.size();
+
+    // Locate user assigned thumb amongst children, if defined
+    ImagePtr userIm;
+    if (parent.m_userThumbnail != 0)
+    {
+        foreach (ImagePtr im, files + dirs)
+        {
+            if (im && im->m_id == parent.m_userThumbnail)
+            {
+                userIm = im;
+                break;
+            }
+        }
+    }
+
+    // Children to use as thumbnails
+    ImageList thumbFiles, thumbDirs;
+
+    if (!userIm)
+    {
+        // Construct multi-thumbnail from all children
+        thumbFiles = files;
+        thumbDirs  = dirs;
+    }
+    else if (userIm->IsFile())
+    {
+        thumbFiles.append(userIm);
+        thumbsNeeded = 1;
+    }
+    else
+        thumbDirs.append(userIm);
+
+    // Fill parent thumbs from child files first
+    // Whilst they're available fill as many as possible for cache
+    for (int i = 0; i < qMin(kMaxFolderThumbnails, thumbFiles.size()); ++i)
+    {
+        parent.m_thumbNails.append(thumbFiles.at(i)->m_thumbNails.at(0));
+        --thumbsNeeded;
+    }
+
+    // Only recurse if necessary
+    if (thumbsNeeded > 0)
+    {
+        // Prevent lengthy/infinite recursion due to deep/cyclic folder
+        // structures
+        if (++level > 10)
+            LOG(VB_GENERAL, LOG_NOTICE, LOC +
+                "Directory thumbnails are more than 10 levels deep");
+        else
+        {
+            // Recursively load subdir thumbs to try to get 1 thumb from each
+            foreach (ImagePtr im, thumbDirs)
+            {
+                if (!im)
+                    continue;
+
+                // Load sufficient thumbs from each dir as subsequent dirs may
+                // be empty
+                LoadDirThumbs(*im, thumbsNeeded, level);
+
+                if (im->m_thumbNails.size() > 0)
+                {
+                    // Add first thumbnail to parent thumb
+                    parent.m_thumbNails.append(im->m_thumbNails.at(0));
+
+                    // Quit when we have sufficient thumbs
+                    if (--thumbsNeeded == 0)
+                        break;
+                }
+            }
+
+            // If insufficient dirs to supply 1 thumb per dir, use other dir
+            // thumbs (indices 1-3) as well
+            int i = 0;
+            while (thumbsNeeded > 0 && ++i < kMaxFolderThumbnails)
+            {
+                foreach (ImagePtrK im, thumbDirs)
+                {
+                    if (i < im->m_thumbNails.size())
+                    {
+                        parent.m_thumbNails.append(im->m_thumbNails.at(i));
+                        if (--thumbsNeeded == 0)
+                            break;
+                    }
+                }
+            }
+        }
+    }
+
+    // Flag the cached entry with number of thumbs loaded. If future uses require
+    // more, then the dir must be reloaded.
+    // For user thumbs and dirs with insufficient child images, the cache is always valid
+    int scanned = (userIm || thumbsNeeded > 0)
+            ? kMaxFolderThumbnails
+            : parent.m_thumbNails.size();
+
+    // Cache result to optimize navigation
+    Cache(parent, scanned);
+}
+
+
+/*!
  \brief Resets view
  \param resetParent parent id is only reset to root when this is set
 */
-void DirectoryView::Clear(bool resetParent)
+void DirectoryView::Clear(bool)
 {
     ClearMarked();
-    FlatView::Clear(resetParent);
+    ClearCache();
+    FlatView::Clear();
 }
 
 
@@ -691,8 +581,7 @@ void DirectoryView::Clear(bool resetParent)
 void DirectoryView::MarkAll()
 {
     // Any marking clears previous marks
-    m_prevMarked.Reset();
-
+    m_prevMarked.Clear();
     m_marked.Add(GetChildren());
 }
 
@@ -707,11 +596,14 @@ void DirectoryView::Mark(int id, bool mark)
     if (mark)
     {
         // Any marking clears previous marks
-        m_prevMarked.Reset();
+        m_prevMarked.Clear();
         m_marked.Add(id);
     }
     else
-        m_marked.Remove(id);
+    {
+        m_prevMarked.remove(id);
+        m_marked.remove(id);
+    }
 }
 
 
@@ -721,8 +613,7 @@ void DirectoryView::Mark(int id, bool mark)
 void DirectoryView::InvertMarked()
 {
     // Any marking clears previous marks
-    m_prevMarked.Reset();
-
+    m_prevMarked.Clear();
     m_marked.Invert(GetChildren());
 }
 
@@ -732,8 +623,8 @@ void DirectoryView::InvertMarked()
 */
 void DirectoryView::ClearMarked()
 {
-    m_marked.Reset();
-    m_prevMarked.Reset();
+    m_marked.Clear();
+    m_prevMarked.Clear();
 }
 
 
@@ -743,23 +634,27 @@ void DirectoryView::ClearMarked()
 */
 void DirectoryView::SetDirectory(int newParent)
 {
+    if (m_marked.IsFor(newParent))
+        // Directory hasn't changed
+        return;
+
     // Markings are cleared on every dir change
-    // Any current markings become previous markingsConfirmDeleteSelected
+    // Any current markings become previous markings
     // Only 1 set of previous markings are preserved
     if (m_prevMarked.IsFor(newParent))
     {
         // Returned to dir of previous markings: reinstate them
         m_marked = m_prevMarked;
-        m_prevMarked.Reset();
+        m_prevMarked.Clear();
         return;
     }
 
-    if (!m_marked.IsEmpty())
+    if (!m_marked.isEmpty())
         // Preserve current markings
         m_prevMarked = m_marked;
 
     // Initialise current markings for new dir
-    m_marked.Reset(newParent);
+    m_marked.Initialise(newParent);
 }
 
 
@@ -769,257 +664,126 @@ void DirectoryView::SetDirectory(int newParent)
 */
 MenuSubjects DirectoryView::GetMenuSubjects()
 {
-    MenuSubjects state;
-    state.Clear();
-
-    state.m_selected       = GetSelected();
-    state.m_selectedMarked = state.m_selected
-                             && m_marked.Contains(state.m_selected->m_id);
-
-    // At least one set will be empty
-    state.m_markedId     = m_marked.GetIds();
-    state.m_prevMarkedId = m_prevMarked.GetIds();
-
-    state.m_childCount   = m_sequence.size() - 1;
-
-    // Only inspect children
-    for (int i = 1; i < m_sequence.size(); ++i)
+    // hiddenMarked is true if 1 or more marked items are hidden
+    // unhiddenMarked is true if 1 or more marked items are not hidden
+    bool hiddenMarked   = false;
+    bool unhiddenMarked = false;
+    foreach (int id, m_marked)
     {
-        ImageItem *im = *m_sequence.at(i);
+        ImagePtrK im = m_images.value(id);
+        if (!im)
+            continue;
 
-        if (m_marked.Contains(im->m_id))
-        {
-            state.m_hiddenMarked   = state.m_hiddenMarked || im->m_isHidden;
-            state.m_unhiddenMarked = state.m_unhiddenMarked || !im->m_isHidden;
-        }
-    }
-    return state;
-}
+        if (im->m_isHidden)
+            hiddenMarked = true;
+        else
+            unhiddenMarked = true;
 
-
-/*!
- \brief Get parent dir from database
- \param parentId Id of dir
- \return ImageItem Dir image info
-*/
-ImageItem *DirectoryView::GetDbParent(int parentId) const
-{
-    ImageList dirs;
-    m_db->ReadDbDirsById(dirs, QString::number(parentId), false, false);
-
-    if (dirs.isEmpty())
-    {
-        // Fallback to top level if parent dir no longer exists
-        // If no root then Db is empty
-        return parentId == ROOT_DB_ID ? NULL : GetDbParent(ROOT_DB_ID);
-    }
-
-    // Override parent type
-    if (dirs[0]->m_id != ROOT_DB_ID)
-        dirs[0]->m_type = kUpDirectory;
-    return dirs[0];
-}
-
-
-/*!
- \brief Get all dirs & images from database, populate stats and determine thumbnails
- for parent & sub-dirs as follows: Use user cover, if assigned. Otherwise derive
-4 thumbnails from: first 4 images, then 1st thumbnail from first 4 sub-dirs,
-then 2nd thumbnail from sub-dirs etc
- \param files List to fill with images
- \param dirs List to fill with sub-dirs
- \param parent Parent dir
-*/
-void DirectoryView::GetDbTree(ImageList &files,
-                              ImageList &dirs,
-                              ImageItem *parent) const
-{
-    if (!parent)
-        return;
-
-    // Load child images & dirs and set parent stats
-    parent->m_fileCount = m_db->ReadDbChildFiles(
-        files, QString::number(parent->m_id), false, true);
-    parent->m_dirCount = m_db->ReadDbChildDirs(
-        dirs, QString::number(parent->m_id), false, true);
-
-    const ImageItem *userIm = NULL;
-
-    // Load thumbs for child dirs
-    foreach (ImageItem *im, dirs)
-    {
-        // Load sufficient thumbs from each dir as subsequent dirs may be empty
-        GetDbSubTree(im, kMaxFolderThumbnails);
-
-        // Locate user thumbnail amongst dirs
-        if (!userIm && im->m_id == parent->m_userThumbnail)
-            userIm = im;
-    }
-
-    // Try user assigned thumb, if defined
-    if (parent->m_userThumbnail != 0)
-    {
-        if (!userIm)
-            // Locate user thumb amongst images
-            foreach (ImageItem *im, files)
-            {
-                if (im->m_id == parent->m_userThumbnail)
-                {
-                    userIm = im;
-                    break;
-                }
-            }
-
-        if (userIm)
-        {
-            // Using user assigned thumbnail
-            parent->m_thumbIds   = userIm->m_thumbIds;
-            parent->m_thumbNails = userIm->m_thumbNails;
-            return;
-        }
-    }
-
-    // Fill parent thumbs from images
-    foreach (const ImageItem *im, files.mid(0, kMaxFolderThumbnails))
-    {
-        parent->m_thumbIds.append(im->m_id);
-        parent->m_thumbNails.append(im->m_thumbNails.at(0));
-    }
-
-    // If sufficient images, we're done
-    int thumbsNeeded = kMaxFolderThumbnails - files.size();
-    if (thumbsNeeded <= 0)
-        return;
-
-    // Resort to dirs. Use 1st thumb from each dir, then 2nd from each, etc.
-    for (int i = 0; i < kMaxFolderThumbnails; ++i)
-        foreach (const ImageItem *im, dirs)
-        {
-            if (i < im->m_thumbIds.size())
-            {
-                parent->m_thumbIds.append(im->m_thumbIds.at(i));
-                parent->m_thumbNails.append(im->m_thumbNails.at(i));
-                if (--thumbsNeeded == 0)
-                    // Found enough
-                    return;
-            }
-        }
-}
-
-
-/*!
- \brief Populate directory stats & thumbnails recursively from database as follows:
-Use user cover, if assigned. Otherwise derive 4 thumbnails from: first 4 images,
-then 1st thumbnail from first 4 sub-dirs, then 2nd thumbnail from sub-dirs etc
- \param parent The parent dir
- \param limit Number of thumbnails required
- \param level Recursion level (to detect recursion deadlocks)
-*/
-void DirectoryView::GetDbSubTree(ImageItem *parent, int limit, int level) const
-{
-    // Load child images & dirs
-    ImageList files, dirs;
-    int       imageCount = m_db->ReadDbChildFiles(
-                files, QString::number(parent->m_id), false, true);
-    int       dirCount = m_db->ReadDbChildDirs(
-                dirs, QString::number(parent->m_id), false, true);
-
-    // Set parent stats
-    parent->m_fileCount = imageCount;
-    parent->m_dirCount  = dirCount;
-
-    // Try user assigned thumb, if defined
-    if (parent->m_userThumbnail != 0)
-    {
-        // Locate user thumb amongst images
-        bool found = false;
-        for (int i = 0; i < files.size(); ++i)
-            if (files.at(i)->m_id == parent->m_userThumbnail)
-            {
-                // Only need this image so move it to front
-                found = true;
-                limit = 1;
-                if (i != 0)
-                    files.move(i, 0);
-                break;
-            }
-
-        if (!found)
-        {
-            // Locate user thumb amongst dirs
-            foreach (const ImageItem *im, dirs)
-            {
-                if (im->m_id == parent->m_userThumbnail)
-                {
-                    // Discard all children & use this dir only
-                    ImageItem *tmp = new ImageItem(*im);
-                    qDeleteAll(files);
-                    files.clear();
-                    qDeleteAll(dirs);
-                    dirs.clear();
-                    dirs.append(tmp);
-                    break;
-                }
-            }
-        }
-
-    }
-
-    // Fill parent thumbs from images
-    foreach (const ImageItem *im, files)
-    {
-        parent->m_thumbIds.append(im->m_id);
-        parent->m_thumbNails.append(im->m_thumbNails.at(0));
-        if (--limit == 0)
+        if (hiddenMarked && unhiddenMarked)
             break;
     }
 
-    if (limit > 0)
+    return MenuSubjects(GetSelected(), m_sequence.size() - 1,
+                        m_marked,      m_prevMarked,
+                        hiddenMarked,  unhiddenMarked);
+}
+
+
+/*!
+ \brief Retrieve cached dir, if available
+ \param dir Dir image
+ \param required Number of thumbnails required
+ \return bool True if a cache entry exists
+*/
+bool DirectoryView::PopulateFromCache(ImageItem &dir, int required)
+{
+    DirCacheEntry cached(m_dirCache.value(dir.m_id));
+    if (cached.m_dirCount == -1 || cached.m_thumbCount < required)
+        return false;
+
+    dir.m_fileCount  = cached.m_fileCount;
+    dir.m_dirCount   = cached.m_dirCount;
+    dir.m_thumbNails = cached.m_thumbs;
+
+    LOG(VB_FILE, LOG_DEBUG, LOC + "Using cached " + cached.ToString(dir.m_id));
+    return true;
+}
+
+
+/*!
+ \brief Cache displayed dir
+ \param dir Dir image
+ \param thumbCount Number of populated thumbnails
+*/
+void DirectoryView::Cache(ImageItemK &dir, int thumbCount)
+{
+    // Cache counts & thumbnails for each dir so that we don't need to reload its
+    // children from Db each time it's displayed
+    DirCacheEntry cacheEntry(dir.m_parentId, dir.m_dirCount, dir.m_fileCount,
+                             dir.m_thumbNails, thumbCount);
+
+    m_dirCache.insert(dir.m_id, cacheEntry);
+
+    // Cache images used by dir thumbnails
+    foreach (const ThumbPair &thumb, dir.m_thumbNails)
     {
-        // Prevent lengthy/infinite recursion due to deep/cyclic folder
-        // structures
-        if (++level > 10)
-            LOG(VB_GENERAL, LOG_NOTICE,
-                "Directory thumbnails are more than 10 levels deep");
-        else
-        {
-            // Recursively load subdir thumbs to try to get 1 thumb from each
-            foreach (ImageItem *im, dirs)
-            {
-                // Load sufficient thumbs from each dir as subsequent dirs may
-                // be empty
-                GetDbSubTree(im, limit, level);
-
-                if (im->m_thumbIds.size() > 0)
-                {
-                    // Add first thumbnail to parent thumb
-                    parent->m_thumbIds.append(im->m_thumbIds.at(0));
-                    parent->m_thumbNails.append(im->m_thumbNails.at(0));
-
-                    // Quit when we have sufficient thumbs
-                    if (--limit == 0)
-                        break;
-                }
-            }
-
-            if (limit > 0)
-                // Insufficient dirs to supply 1 thumb per dir so use other dir
-                // thumbs as well
-                for (int i = 1; i < kMaxFolderThumbnails; ++i)
-                    foreach (const ImageItem *im, dirs)
-                    {
-                        if (i < im->m_thumbIds.size())
-                        {
-                            parent->m_thumbIds.append(im->m_thumbIds.at(i));
-                            parent->m_thumbNails.append(im->m_thumbNails.at(i));
-                            if (--limit == 0)
-                                break;
-                        }
-                    }
-        }
+        // Do not overwrite any existing image url nor parent.
+        // Image url is cached when image is displayed as a child, but not as a
+        // ancestor dir thumbnail
+        // First cache attempt will be by parent. Subsequent attempts may be
+        // by ancestor dirs.
+        if (!m_fileCache.contains(thumb.first))
+            FlatView::Cache(thumb.first, dir.m_id, "", thumb.second);
     }
-    qDeleteAll(files);
-    qDeleteAll(dirs);
+    LOG(VB_FILE, LOG_DEBUG, LOC + "Caching " + cacheEntry.ToString(dir.m_id));
+}
+
+
+/*!
+ \brief Clears UI cache
+*/
+void DirectoryView::ClearCache()
+{
+    LOG(VB_FILE, LOG_DEBUG, LOC + "Cleared Dir cache");
+    m_dirCache.clear();
+    FlatView::ClearCache();
+}
+
+
+/*!
+ \brief Clear file/dir and all its ancestors from UI cache so that ancestor
+ thumbnails are recalculated. Optionally deletes file/dir from view.
+ \param id Image id
+ \param remove If true, file is also deleted from view
+ \return QStringList Url of image & thumbnail to remove from image cache
+*/
+QStringList DirectoryView::RemoveImage(int id, bool deleted)
+{
+    QStringList urls;
+    int dirId = id;
+
+    if (deleted)
+    {
+        m_marked.remove(id);
+        m_prevMarked.remove(id);
+    }
+
+    // If id is a file then start with its parent
+    if (m_fileCache.contains(id))
+    {
+        // Clear file cache & start from its parent dir
+        dirId = m_fileCache.value(id).m_parent;
+        urls = FlatView::ClearImage(id, deleted);
+    }
+
+    // Clear ancestor dirs
+    while (m_dirCache.contains(dirId))
+    {
+        LOG(VB_FILE, LOG_DEBUG, LOC + QString("Cleared %1 from dir cache").arg(dirId));
+        DirCacheEntry dir = m_dirCache.take(dirId);
+        dirId = dir.m_parent;
+    }
+    return urls;
 }
 
 
@@ -1032,20 +796,15 @@ order of a tree is depth-first traversal
 */
 bool TreeView::LoadFromDb(int parentId)
 {
-    if (parentId > 0)
-        m_parentId = parentId;
+    m_parentId = parentId;
 
     // Load visible subtree of the parent
-    // Ordered images of parent first, then depth-first recursion of ordered dirs
-    ImageList  files, dirs;
-    QStringList root = QStringList() << QString::number(m_parentId);
-    m_db->ReadDbTree(files, dirs, root, false, true);
+    // Ordered images of parent first, then breadth-first recursion of ordered dirs
+    ImageList files;
+    m_mgr.GetImageTree(m_parentId, files);
 
     // Load view
     Populate(files);
-
-    // Discard dirs
-    qDeleteAll(dirs);
 
     return !files.isEmpty();
 }

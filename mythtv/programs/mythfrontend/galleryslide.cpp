@@ -1,22 +1,36 @@
 #include "galleryslide.h"
 
-#include <math.h>
+#include <math.h>       // for roundf
+#include "mythmainwindow.h"
+#include "mythlogging.h"
 
-#include <mythmainwindow.h>
+#include "imagemetadata.h"
+
+
+#define LOC QString("Slide: ")
+#define SBLOC QString("SlideBuffer: ")
+
+
+// Number of slides to use for buffering image requests.
+// When browsing quickly the buffer will load consecutive slides until it fills.
+// If too large, rapid browsing will be stodgy (sequential access) for images that
+// aren't cached (Cached images are always fast).
+// If too small, rapid browsing will result in skipping slides rather than flicking
+// quickly through them.
+// Minimum is 4: 3 for displaying a transition, 1 to handle load requests
+#define SLIDE_BUFFER_SIZE 9
 
 
 /*!
  \brief Initialise & start base animation
  \param forwards Direction
  \param speed Factor, 1 = real-time, 2 = double-time
- \return bool Always True
 */
-bool AbstractAnimation::Start(bool forwards, float speed)
+void AbstractAnimation::Start(bool forwards, float speed)
 {
     m_forwards = forwards;
     m_speed    = speed;
     m_running  = true;
-    return true;
 }
 
 
@@ -57,17 +71,16 @@ void Animation::Set(QVariant from, QVariant to, int duration,
  \brief Start a single animation
  \param forwards Direction
  \param speed Speed factor, 1x, 2x etc
- \return bool True if started
 */
-bool Animation::Start(bool forwards, float speed)
+void Animation::Start(bool forwards, float speed)
 {
     if (duration() == 0)
-        return false;
+        return;
 
     m_elapsed = forwards ? 0 : duration();
     setCurrentTime(m_elapsed);
 
-    return AbstractAnimation::Start(forwards, speed);
+    AbstractAnimation::Start(forwards, speed);
 }
 
 
@@ -86,7 +99,7 @@ void Animation::Pulse(int interval)
 
     // Detect completion
     if ((m_forwards && m_elapsed >= duration())
-        || (!m_forwards && m_elapsed <= 0))
+            || (!m_forwards && m_elapsed <= 0))
         Finished();
 }
 
@@ -103,15 +116,12 @@ void Animation::updateCurrentValue(const QVariant &value)
 
         switch (m_type)
         {
-            case Position: m_parent->SetPosition(value.toPoint()); break;
-            case Alpha: m_parent->SetAlpha(value.toInt()); break;
-            case Zoom: m_parent->SetZoom(value.toFloat()); break;
-            case HorizontalZoom: m_parent->SetHorizontalZoom(value.toFloat());
-                break;
-            case VerticalZoom: m_parent->SetVerticalZoom(value.toFloat());
-                break;
-            case Angle: m_parent->SetAngle(value.toFloat()); break;
-            case None:;
+        case Position:       m_parent->SetPosition(value.toPoint()); break;
+        case Alpha:          m_parent->SetAlpha(value.toInt()); break;
+        case Zoom:           m_parent->SetZoom(value.toFloat()); break;
+        case HorizontalZoom: m_parent->SetHorizontalZoom(value.toFloat()); break;
+        case VerticalZoom:   m_parent->SetVerticalZoom(value.toFloat()); break;
+        case Angle:          m_parent->SetAngle(value.toFloat()); break;
         }
     }
 }
@@ -157,19 +167,17 @@ void SequentialAnimation::Pulse(int interval)
  \brief Start sequential animation
  \param forwards Direction. If false, the last child will be played (backwards) first
  \param speed Factor, 1x, 2x etc
- \return bool Always true
 */
-bool SequentialAnimation::Start(bool forwards, float speed)
+void SequentialAnimation::Start(bool forwards, float speed)
 {
     if (m_group.size() == 0)
-        return false;
+        return;
 
     m_current = forwards ? 0 : m_group.size() - 1;
 
     // Start group, then first child
     AbstractAnimation::Start(forwards, speed);
     m_group.at(m_current)->Start(m_forwards, m_speed);
-    return true;
 }
 
 
@@ -197,7 +205,7 @@ void SequentialAnimation::Finished()
 {
     // Finish group when last child finishes
     if ((m_forwards && ++m_current == m_group.size())
-        || (!m_forwards && --m_current < 0))
+            || (!m_forwards && --m_current < 0))
         AbstractAnimation::Finished();
     else
         // Start next child
@@ -222,12 +230,11 @@ void ParallelAnimation::Pulse(int interval)
  \brief Start parallel group. All children play simultaneously
  \param forwards Direction
  \param speed Factor, 1x, 2x etc
- \return bool Always true
 */
-bool ParallelAnimation::Start(bool forwards, float speed)
+void ParallelAnimation::Start(bool forwards, float speed)
 {
     if (m_group.size() == 0)
-        return false;
+        return;
 
     m_finished = m_group.size();
 
@@ -235,8 +242,6 @@ bool ParallelAnimation::Start(bool forwards, float speed)
     AbstractAnimation::Start(forwards, speed);
     foreach(AbstractAnimation *animation, m_group)
         animation->Start(m_forwards, m_speed);
-
-    return true;
 }
 
 
@@ -286,17 +291,14 @@ void PanAnimation::updateCurrentValue(const QVariant &value)
 */
 Slide::Slide(MythUIType *parent, QString name, MythUIImage *image)
     : MythUIImage(parent, name),
-    m_ilt(new ImageLoadingThread(this)),
-    m_data(NULL),
-    m_waitingFor(NULL),
-    m_zoom(1.0),
-    m_isReady(false),
-    m_loadFailed(false),
-    m_locked(false),
-    m_direction(0),
-    m_zoomAnimation(NULL),
-    m_panAnimation(NULL),
-    m_pan(QPoint(0,0))
+      m_state(kEmpty),
+      m_data(NULL),
+      m_waitingFor(NULL),
+      m_zoom(1.0),
+      m_direction(0),
+      m_zoomAnimation(NULL),
+      m_panAnimation(NULL),
+      m_pan(QPoint(0,0))
 {
     // Clone from image
     CopyFrom(image);
@@ -308,12 +310,10 @@ Slide::Slide(MythUIType *parent, QString name, MythUIImage *image)
         // Slides sit on top of parent image area
         SetArea(MythRect(image->GetArea().toQRect()));
         m_Area.moveTo(0, 0);
+        setParent(image);
         m_Parent = image;
         image->AddChild(this);
     }
-
-    // Listen for "image completed load" signals
-    connect(m_ilt, SIGNAL(finished()), this, SLOT(LoadComplete()));
 
     // Provide animations for pan & zoom
     if (GetPainter()->SupportsAnimation())
@@ -321,19 +321,19 @@ Slide::Slide(MythUIType *parent, QString name, MythUIImage *image)
         m_zoomAnimation = new Animation(this, Animation::Zoom);
         m_panAnimation  = new PanAnimation(this);
     }
+
+    connect(this, SIGNAL(LoadComplete()), this, SLOT(SlideLoaded()));
 }
 
 
 /*!
- \brief Destroy slide
+ \brief Destructor
 */
 Slide::~Slide()
 {
-    if (m_ilt)
-        m_ilt->wait();
-    delete m_ilt;
     delete m_zoomAnimation;
     delete m_panAnimation;
+    LOG(VB_GUI, LOG_DEBUG, "Deleted Slide " + objectName());
 }
 
 
@@ -342,86 +342,108 @@ Slide::~Slide()
 */
 void Slide::Clear()
 {
-    m_isReady   = false;
-    m_loadFailed = false;
-    m_data       = NULL;
+    m_state = kEmpty;
+    m_data.clear();
+    m_waitingFor.clear();
+    SetCropRect(0, 0, 0, 0);
+    SetVisible(false);
+}
+
+
+/*!
+   \brief Return debug status
+   \return Char representing state
+ */
+QChar Slide::GetDebugState() const
+{
+    switch (m_state)
+    {
+    case kEmpty:   return 'e';
+    case kFailed:  return 'f';
+    case kLoaded:  return m_waitingFor ? 'r' : 'a';
+    case kLoading: return m_waitingFor ? 'l' : 'p';
+    }
+    return '?';
 }
 
 
 /*!
  \brief Load slide with an image
- \details If the requested image is already loaded (due to pre-load) then returns immediately.
- Otherwise it initiates an image load in a child thread, provided an image is not already loading
- (multiple requests due to skipping). If loader is busy then the most recent request is queued.
- Intervening requests are discarded.
+ \details If the requested image is already loaded (due to pre-load) then returns
+ immediately. Otherwise it initiates an image load in a child thread, provided
+ an image is not already loading (multiple requests due to skipping). If loader
+ is busy then the most recent request is queued. Intervening requests are discarded.
  \param im The image to load
  \param direction Navigation that caused this load. Determines transition direction
- \param notifyCompletion if True, emits a signal when the last requested image has loaded
+ \param notifyCompletion if True, emits a signal when the last requested image
+ has loaded
  \return bool True if the requested image is already loaded
 */
-bool Slide::Load(ImageItem *im, int direction, bool notifyCompletion)
+bool Slide::LoadSlide(ImagePtrK im, int direction, bool notifyCompletion)
 {
-    m_waitingFor = notifyCompletion ? im : NULL;
-    m_direction = direction;
+    m_direction  = direction;
+    m_waitingFor = notifyCompletion ? im : ImagePtrK();
 
     if (im == m_data)
     {
-        LOG(VB_FILE, LOG_DEBUG, QString("Slide: Already loading/loaded %1 in %2")
-            .arg(im->m_fileName, objectName()));
+        LOG(VB_FILE, LOG_DEBUG, LOC + QString("Already loading/loaded %1 in %2")
+            .arg(im->m_filePath, objectName()));
 
-        if (m_isReady && notifyCompletion)
+        if (m_state >= kLoaded && notifyCompletion)
             // Image has been pre-loaded
             emit ImageLoaded(this);
 
-        return m_isReady;
+        return (m_state >= kLoaded);
     }
 
     // Is a different image loading ?
-    if (m_ilt && m_ilt->isRunning())
+    if (m_state == kLoading)
     {
         // Can't abort image loads, so must wait for it to finish
         // before starting new load
         m_waitingFor = im;
 
-        LOG(VB_FILE, LOG_DEBUG, QString("Slide: Postponing load of %1 in %2")
-            .arg(im->m_fileName, objectName()));
+        LOG(VB_FILE, LOG_DEBUG, LOC + QString("Postponing load of %1 in %2")
+            .arg(im->m_filePath, objectName()));
 
         return false;
     }
 
     // Start load
-    m_data      = im;
-    m_isReady   = m_loadFailed = false;
-    ImageSg *sg = ImageSg::getInstance();
+    m_data  = im;
+    m_state = kLoading;
 
     if (im->m_type == kVideoFile)
     {
         // Use thumbnail, which has already been orientated
-        SetFilename(sg->GenerateThumbUrl(im->m_thumbNails.at(0)));
+        SetFilename(im->m_thumbNails.at(0).second);
         SetOrientation(1);
     }
     else
     {
-        SetFilename(sg->GenerateUrl(im->m_fileName));
-        SetOrientation(m_data->m_orientation);
+        // Load image and orientate
+        SetFilename(im->m_url);
+        SetOrientation(Orientation(m_data->m_orientation).GetCurrent());
     }
 
-    SetCropRect(0, 0, 0, 0);
-    m_ilt->start();
+    // Load in background
+    Load(true);
     return false;
 }
 
 
 /*!
  \brief An image has completed loading
- \details If the loaded image matches the most recently requested and client is waiting then
- signals that the slide is ready. Otherwise starts loading the latest requested image, if
- different. Superseded loads are discarded.
+ \details If the loaded image matches the most recently requested and client is
+ waiting then signals that the slide is ready. Otherwise starts loading the
+ latest requested image, if different. Superseded loads are discarded.
 */
-void Slide::LoadComplete()
+void Slide::SlideLoaded()
 {
-    m_isReady = true;
-    m_loadFailed = (m_Images[0] == NULL);
+    m_state = m_Images[0] ? kLoaded : kFailed;
+    if (m_state == kFailed)
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Failed to load %1").arg(m_data->m_filePath));
 
     // Ignore superseded requests and preloads
     if (m_data == m_waitingFor)
@@ -431,11 +453,11 @@ void Slide::LoadComplete()
     }
     else if (m_waitingFor)
     {
-        LOG(VB_FILE, LOG_DEBUG, QString("Slide: Starting delayed load %1")
-            .arg(m_waitingFor->m_fileName));
+        LOG(VB_FILE, LOG_DEBUG, LOC + QString("Starting delayed load %1")
+            .arg(m_waitingFor->m_filePath));
 
         // Start latest postponed load
-        Load(m_waitingFor, m_direction, true);
+        LoadSlide(m_waitingFor, m_direction, true);
     }
 }
 
@@ -449,9 +471,9 @@ void Slide::Zoom(int percentage)
 {
     // Sentinel indicates reset to default zoom
     float newZoom = (percentage == 0)
-                    ? 1.0
-                    : qMax(MIN_ZOOM,
-                           qMin(MAX_ZOOM, m_zoom * (1.0 + percentage / 100.0)));
+            ? 1.0
+            : qMax(MIN_ZOOM,
+                   qMin(MAX_ZOOM, m_zoom * (1.0 + percentage / 100.0)));
     if (newZoom != m_zoom)
     {
         if (m_zoomAnimation)
@@ -462,6 +484,26 @@ void Slide::Zoom(int percentage)
         else
             SetZoom(newZoom);
     }
+}
+
+
+/*!
+ \brief Sets slide zoom
+ \details Applies zoom immediately
+ \sa Slide::Zoom
+ \param zoom New zoom level, 1.0 = full-size
+*/
+void Slide::SetZoom(float zoom)
+{
+    m_zoom          = zoom;
+    m_Effects.hzoom = m_Effects.vzoom = zoom;
+
+    // TODO
+    // MythUIImage displaces widget or doesn't centre for some combinations of
+    // zoom centre/cropping so frig centre for now.
+    m_Effects.centre = zoom < 1.0 ? UIEffects::Middle : UIEffects::TopLeft;
+
+    SetPan(m_pan);
 }
 
 
@@ -494,26 +536,6 @@ void Slide::Pan(QPoint offset)
 
 
 /*!
- \brief Sets slide zoom
- \details Applies zoom immediately
- \sa Slide::Zoom
- \param zoom New zoom level, 1.0 = full-size
-*/
-void Slide::SetZoom(float zoom)
-{
-    m_zoom          = zoom;
-    m_Effects.hzoom = m_Effects.vzoom = zoom;
-
-    // TODO
-    // MythUIImage displaces widget or doesn't centre for some combinations of
-    // zoom centre/cropping so frig centre for now.
-    m_Effects.centre = zoom < 1.0 ? UIEffects::Middle : UIEffects::TopLeft;
-
-    SetPan(m_pan);
-}
-
-
-/*!
  \brief Sets slide pan
  \details Applies pan immediately
  \sa Slide::Pan
@@ -521,7 +543,7 @@ void Slide::SetZoom(float zoom)
 */
 void Slide::SetPan(QPoint pos)
 {
-    if (m_loadFailed)
+    if (m_state == kFailed)
     {
         m_pan = pos;
         return;
@@ -567,56 +589,77 @@ void Slide::Pulse()
 }
 
 
+SlideBuffer::~SlideBuffer()
+{
+    LOG(VB_GUI, LOG_DEBUG, "Deleted Slidebuffer");
+}
+
+
+void SlideBuffer::Teardown()
+{
+    QMutexLocker lock(&m_mutexQ);
+    foreach (Slide *s, m_queue)
+        s->Clear();
+    LOG(VB_GUI, LOG_DEBUG, "Aborted Slidebuffer");
+}
+
+
 /*!
  \brief Construct buffer
- \details Slides are cloned from an image and become children of it. Only the
- first is visible. Requires a minimum of 3 slides: 2 for a transition, 1 to handle
- requests
+ \details Slides are cloned from an XML image and become children of it.
  \param image Parent image used as a template for slides
- \param size Number of slides in buffer
 */
-SlideBuffer::SlideBuffer(MythUIImage *image, int size)
-    : m_nextLoad(1)
+void SlideBuffer::Initialise(MythUIImage &image)
 {
-    if (size < 3)
-        // Require at least 3 slides: 2 for transitions & 1 to handle further requests
-        return;
+    // Require at least 4 slides: 2 for transitions, 1 to handle further requests
+    // and 1 to prevent solitary slide from being used whilst it is loading
+    int size = qMax(SLIDE_BUFFER_SIZE, 4);
 
     // Fill buffer with slides cloned from the XML image widget
 
-    // Create first as a child of the image.
-    Slide *slide = new Slide(NULL, "slide0", image);
+    // Create first as a child of the XML image.
+    Slide *slide = new Slide(NULL, "slide0", &image);
 
     // Buffer is notified when it has loaded image
     connect(slide, SIGNAL(ImageLoaded(Slide *)),
-            this, SLOT(FlushAvailable(Slide *)));
+            this, SLOT(Flush(Slide *)));
 
     m_queue.enqueue(slide);
 
     // Rest are simple clones of first
     for (int i = 1; i < size; ++i)
     {
-        slide = new Slide(image, QString("slide%1").arg(i), slide);
+        slide = new Slide(&image, QString("slide%1").arg(i), slide);
 
         // All slides (except first) start off hidden
         slide->SetVisible(false);
 
         // Buffer is notified when it has loaded image
         connect(slide, SIGNAL(ImageLoaded(Slide *)),
-                this, SLOT(FlushAvailable(Slide *)));
+                this, SLOT(Flush(Slide *)));
 
         m_queue.enqueue(slide);
     }
+
+    m_nextLoad = 1;
 }
 
 
 /*!
- \brief Destructor
-*/
-SlideBuffer::~SlideBuffer()
+ * \brief Determines buffer state for debug logging
+ * \return String showing state of each slide
+ */
+QString SlideBuffer::BufferState()
 {
-    // TODO: Detach from parent
-    qDeleteAll(m_queue);
+    QMutexLocker lock(&m_mutexQ);
+
+    QString state;
+    for (int i = 0; i < m_queue.size(); ++i)
+    {
+        QChar code(m_queue.at(i)->GetDebugState());
+        state += (i == m_nextLoad ? code.toUpper() : code);
+    }
+    return QString("[%1] (%2)").arg(state, m_queue.head()->objectName());
 }
 
 
@@ -627,22 +670,24 @@ SlideBuffer::~SlideBuffer()
  \param direction Navigation causing the load
  \return bool True if image is already loaded
 */
-bool SlideBuffer::Load(ImageItem *im, int direction)
+bool SlideBuffer::Load(ImagePtrK im, int direction)
 {
+    if (!im)
+        return false;
+
+    QMutexLocker lock(&m_mutexQ);
+
     // Start loading image in next available slide
     Slide *slide = m_queue.at(m_nextLoad);
 
     // Further load requests will go to same slide if no free ones are available
-    QString extra = "";
     if (m_nextLoad < m_queue.size() - 1)
         ++m_nextLoad;
-    else
-        extra = "(No spare slides)";
 
-    LOG(VB_FILE, LOG_DEBUG, QString("SlideBuffer: Loading %1 in %2, next load in slot %3 %4")
-        .arg(im->m_fileName, slide->objectName()).arg(m_nextLoad).arg(extra));
+    LOG(VB_FILE, LOG_DEBUG, SBLOC + QString("Loading %1 in %2, %3")
+        .arg(im->m_filePath, slide->objectName()).arg(BufferState()));
 
-    return slide->Load(im, direction, true);
+    return slide->LoadSlide(im, direction, true);
 }
 
 
@@ -650,63 +695,47 @@ bool SlideBuffer::Load(ImageItem *im, int direction)
  \brief Load an image in next available slide
  \param im Image to load
 */
-void SlideBuffer::Preload(ImageItem *im)
+void SlideBuffer::Preload(ImagePtrK im)
 {
-    if (im)
-    {
-        // Start loading image in next available slide
-        Slide *slide = m_queue.at(m_nextLoad);
+    if (!im)
+        return;
 
-        LOG(VB_FILE, LOG_DEBUG, QString("SlideBuffer: Preloading %1 in %2 in slot %3")
-            .arg(im->m_fileName, slide->objectName()).arg(m_nextLoad));
+    QMutexLocker lock(&m_mutexQ);
 
-        // Load silently
-        m_queue.at(m_nextLoad)->Load(im);
-    }
+    // Start loading image in next available slide
+    Slide *slide = m_queue.at(m_nextLoad);
+
+    LOG(VB_FILE, LOG_DEBUG, SBLOC + QString("Preloading %1 in %2, %3")
+        .arg(im->m_filePath, slide->objectName()).arg(BufferState()));
+
+    // Load silently
+    slide->LoadSlide(im);
 }
 
 
 /*!
- \brief Remove & return slide from head of queue
- \return Slide Next slide for display
-*/
-Slide* SlideBuffer::TakeNext()
-{
-    if (m_queue.isEmpty())
-        // Shouldn't happen unless init failed
-        return NULL;
-
-    // Dispense next slide & adjust load ptr to account for queue shuffling
-    Slide *next = m_queue.dequeue();
-    --m_nextLoad;
-
-    ImageItem *im = next->GetImageData();
-    LOG(VB_FILE, LOG_DEBUG, QString("SlideBuffer: Taking %1 in %2, next load in slot %3")
-        .arg(im ? im->m_fileName : "Empty", next->objectName()).arg(m_nextLoad));
-
-    return next;
-}
-
-
-/*!
- \brief Return slide to queue and flush next image, if it is waiting for display
- \param slide Unused slide for re-use
+ \brief Move head slide to back of queue and flush waiting slides
  \return int Number of slides waiting for display at head
 */
-int SlideBuffer::Release(Slide *slide)
+void SlideBuffer::ReleaseCurrent()
 {
-    LOG(VB_FILE, LOG_DEBUG, QString("SlideBuffer: Releasing %1").arg(slide->objectName()));
+    QMutexLocker lock(&m_mutexQ);
 
     // Reset slide & return to buffer for re-use
+    Slide *slide = m_queue.dequeue();
     slide->Clear();
     m_queue.enqueue(slide);
 
+    QString name = slide->objectName();
+
     // Free constrained load ptr now a spare slide is available
-    if (m_queue.at(m_nextLoad)->IsAvailable())
+    if (!m_queue.at(--m_nextLoad)->IsEmpty())
         ++m_nextLoad;
 
+    LOG(VB_FILE, LOG_DEBUG, SBLOC + QString("Released %1").arg(name));
+
     // Flush any pending slides that originate from multiple requests (skipping)
-    return FlushAvailable(m_queue.head(), "Pending");
+    Flush(m_queue.head(), "Pending");
 }
 
 
@@ -716,23 +745,26 @@ int SlideBuffer::Release(Slide *slide)
  \param reason Debug text describing reason for test
  \return int Number of slides available for display
 */
-int SlideBuffer::FlushAvailable(Slide *slide, QString reason)
+void SlideBuffer::Flush(Slide *slide, QString reason)
 {
-    // Determine number of consecutive slides that are now available at head
-    // Ignore last slide: it can't be displayed because it may start handling a new request
-    int available = 0;
-    while (available < m_queue.size() - 1 && m_queue.at(available)->IsAvailable())
+    QMutexLocker lock(&m_mutexQ);
+
+    // Determine number of consecutive slides that are now available after head
+    // Include last slide to ensure transition speed is consistent: it will never
+    // be displayed because queue size is always > 2
+    int available = 1;
+    while (available < m_queue.size() && m_queue.at(available)->IsLoaded())
         ++available;
 
-    // Notify if slides are available
-    if (available > 0)
-    {
-        LOG(VB_FILE, LOG_DEBUG, QString("SlideBuffer: %1 %2 in %3 (%4 available)")
-            .arg(reason, slide->GetImageData()->m_fileName, slide->objectName())
-            .arg(available));
+    if (available == 1)
+        return;
 
-        emit SlideReady(available);
-    }
+    // Notify that more slides are available
+    ImagePtrK im = slide->GetImageData();
+    QString   path = im ? im->m_filePath : "Unknown";
 
-    return available;
+    LOG(VB_FILE, LOG_DEBUG, SBLOC + QString("%1 %2 in %3, %4")
+        .arg(reason, path, slide->objectName()).arg(BufferState()));
+
+    emit SlideReady(--available);
 }

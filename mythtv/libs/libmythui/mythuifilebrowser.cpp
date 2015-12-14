@@ -156,7 +156,7 @@ MythUIFileBrowser::MythUIFileBrowser(MythScreenStack *parent,
         m_backButton(NULL),     m_homeButton(NULL),
         m_previewImage(NULL),   m_infoText(NULL),
         m_filenameText(NULL),   m_fullpathText(NULL),
-        m_retObject(NULL),      m_widgetName("MythFileBrowser")
+        m_retObject(NULL)
 {
     SetPath(startPath);
 
@@ -210,7 +210,7 @@ void MythUIFileBrowser::SetPath(const QString &startPath)
 
 bool MythUIFileBrowser::Create()
 {
-    if (!CopyWindowFromBase(m_widgetName, this))
+    if (!CopyWindowFromBase("MythFileBrowser", this))
         return false;
 
     m_fileList = dynamic_cast<MythUIButtonList *>(GetChild("filelist"));

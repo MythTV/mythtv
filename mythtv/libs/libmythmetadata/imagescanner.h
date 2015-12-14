@@ -1,110 +1,88 @@
 //! \file
-//! \brief Synchronises image database to storage group
-//! \details Detects supported pictures and videos within storage group and populates
+//! \brief Synchronises image database to filesystem
+//! \details Detects supported pictures and videos and populates
 //! the image database with metadata for each, including directory structure.
-//! After a scan completes, a background task then creates thumbnails for each new image
-//! to improve client performance.
+//! All images are passed to the associated thumbnail generator.
+//! Db images that have disappeared are notified to frontends so that they can clean up.
+//! Also clears database & removes devices (to prevent contention with running scans).
+//!
+//! Clone directories & duplicate files can only occur in a Storage Group/Backend scanner.
+//! They can never occur with local devices/Frontend scanner
 
-#ifndef IMAGESCAN_H
-#define IMAGESCAN_H
+#ifndef IMAGESCANNER_H
+#define IMAGESCANNER_H
 
 #include <QFileInfo>
-#include <QMap>
 #include <QDir>
-#include <QRegExp>
-#include <QMutex>
+#include <QRegularExpression>
+#include <QElapsedTimer>
 
-#include <mthread.h>
-#include <imageutils.h>
-
-
-//! \brief Current/last requested scanner state
-//! \details Valid state transitions are:
-//!  Scan -> Dormant : Scan requested
-//!  Clear -> Dormant : Clear db requested
-//!  Scan -> Interrupt -> Dormant : Scan requested, then interrupted
-//!  Scan -> Clear -> Dormant : Clear db requested during scan
-//!  Scan -> Interrupt -> Clear -> Dormant : Scan interrupted, then Clear Db requested
-enum ScannerState
-{
-    kScan,      //!< sync is pending/in effect
-    kInterrupt, //!< cancelled sync is pending/in effect
-    kClear,     //!< clear db is pending/in effect
-    kDormant    //!< doing nothing
-};
+#include "imagethumbs.h"
 
 
-//! Scanner worker thread
+//! Image Scanner thread requires a database/filesystem adapter
+template <class DBFS>
 class META_PUBLIC ImageScanThread : public MThread
 {
 public:
-    ImageScanThread();
+    ImageScanThread(DBFS *const dbfs, ImageThumb<DBFS> *thumbGen);
     ~ImageScanThread();
 
-    void cancel();
+    void        cancel();
+    bool        IsScanning();
+    bool        ClearsPending();
+    void        ChangeState(bool scan);
+    void        EnqueueClear(int devId, const QString &action);
     QStringList GetProgress();
-    ScannerState GetState();
-    void ChangeState(ScannerState to);
 
 protected:
     void run();
 
 private:
-    ImageItem* LoadDirectoryData(QFileInfo, int, QString);
-    ImageItem* LoadFileData(QFileInfo, QString);
+    Q_DISABLE_COPY(ImageScanThread)
+    
+    void SyncSubTree(const QFileInfo &dirInfo, int parentId, int devId,
+                     const QString &base);
+    int  SyncDirectory(const QFileInfo &dirInfo, int devId,
+                       const QString &base, int parentId);
+    void PopulateMetadata(const QString &path, int type,
+                          QString &comment, uint &time, int &orientation);
+    void SyncFile(const QFileInfo &fileInfo, int devId,
+                  const QString &base, int parentId);
+    void CountTree(QDir &dir);
+    void CountFiles(const QStringList &paths);
+    void Broadcast(int progress);
 
-    void SyncFilesFromDir(QString, int, QString);
-    int  SyncDirectory(QFileInfo, int, QString);
-    void SyncFile(QFileInfo, int, QString);
-    void WaitForThumbs();
-    void BroadcastStatus(QString);
-    void CountFiles(QStringList paths);
-    void CountTree(QDir &);
+    typedef QPair<int, QString> ClearTask;
 
-    //! The latest state from all clients.
-    ScannerState m_state;
-    //! Mutex protecting state
-    QMutex m_mutexState;
+    bool              m_scanning;   //!< The requested scan state
+    QMutex            m_mutexState; //!< Mutex protecting scan state
+    QList<ClearTask>  m_clearQueue; //!< Queue of pending Clear requests
+    QMutex            m_mutexQueue; //!< Mutex protecting Clear requests
+    DBFS             &m_dbfs;       //!< Database/filesystem adapter
+    ImageThumb<DBFS> &m_thumb;      //!< Companion thumbnail generator
 
-    // Global working vars
-    ImageDbWriter  m_db;
-    ImageSg       *m_sg;
+    //! Dirs in the Db from last scan, Map<Db filepath, Db Image>
+    ImageHash   m_dbDirMap;
+    //! Files in the Db from last scan, Map<Db filepath, Db Image>
+    ImageHash   m_dbFileMap;
+    //! Dirs seen by current scan, Map<Db filepath, Earlier Image>
+    ImageHash   m_seenDir;
+    //! Files seen by current scan Map <Db filepath, Earlier abs filepath>
+    NameHash    m_seenFile;
+    //! Ids of dirs/files that have been updates/modified.
+    QStringList m_changedImages;
 
-    //! Maps dir paths (relative to SG) to dir metadata
-    ImageMap *m_dbDirMap;
-    //! Maps file paths (relative to SG) to file metadata
-    ImageMap *m_dbFileMap;
-
-    //! Number of images scanned
-    int  m_progressCount;
-    //! Total number of images to scan
-    int  m_progressTotalCount;
-    //! Progress counts mutex
-    QMutex m_mutexProgress;
+    //! Elapsed time since last progress event generated
+    QElapsedTimer m_bcastTimer;
+    int           m_progressCount;      //!< Number of images scanned
+    int           m_progressTotalCount; //!< Total number of images to scan
+    QMutex        m_mutexProgress;      //!< Progress counts mutex
 
     //! Global working dir for file detection
     QDir m_dir;
     //! Pattern of dir names to ignore whilst scanning
-    QRegExp m_exclusions;
+    QRegularExpression m_exclusions;
 };
 
-
-//! Synchronises database to the filesystem
-class META_PUBLIC ImageScan
-{
-public:
-    static ImageScan*    getInstance();
-
-    QStringList HandleScanRequest(QStringList);
-
-private:
-    ImageScan();
-    ~ImageScan();
-
-    //! Scanner singleton
-    static ImageScan    *m_instance;
-    //! Internal thread
-    ImageScanThread     *m_imageScanThread;
-};
-
-#endif // IMAGESCAN_H
+#endif // IMAGESCANNER_H

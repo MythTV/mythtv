@@ -24,8 +24,7 @@
 
 #include <QScriptEngine>
 #include "services/imageServices.h"
-#include "imageutils.h"
-#include "imagemetadata.h"
+#include "imagemanager.h"
 
 
 class Image : public ImageServices
@@ -36,23 +35,10 @@ public:
     Q_INVOKABLE explicit Image( QObject *parent = 0 ) {}
 
 public:
-    bool                        SetImageInfo                ( int   Id,
-                                                              const QString &Tag,
-                                                              const QString &Value );
-
-    bool                        SetImageInfoByFileName      ( const QString &FileName,
-                                                              const QString &Tag,
-                                                              const QString &Value );
-
     QString                     GetImageInfo                ( int   Id,
                                                               const QString &Tag );
 
-    QString                     GetImageInfoByFileName      ( const QString &FileName,
-                                                              const QString &Tag );
-
     DTC::ImageMetadataInfoList* GetImageInfoList            ( int   Id );
-
-    DTC::ImageMetadataInfoList* GetImageInfoListByFileName  ( const QString &FileName );
 
     bool                        RemoveImage        ( int   Id );
     bool                        RenameImage        ( int   Id,
@@ -63,8 +49,6 @@ public:
     DTC::ImageSyncInfo*         GetSyncStatus      ( void );
 
     bool                        CreateThumbnail    (int   Id);
-private:
-    QString GetImage(int, ImageItem *, const QString & );
 
 };
 
@@ -101,26 +85,6 @@ class ScriptableImage : public QObject
 
     public slots:
 
-        bool SetImageInfo ( int   Id,
-                            const QString &Tag,
-                            const QString &Value )
-        {
-            SCRIPT_CATCH_EXCEPTION( false,
-                return m_obj.SetImageInfo( Id, Tag, Value );
-            )
-        }
-
-        bool SetImageInfoByFileName ( const QString &FileName,
-                                      const QString &Tag,
-                                      const QString &Value )
-        {
-            SCRIPT_CATCH_EXCEPTION( false,
-                return m_obj.SetImageInfoByFileName( FileName,
-                                                     Tag,
-                                                     Value );
-            )
-        }
-
         QString GetImageInfo( int   Id,
                               const QString &Tag )
         {
@@ -129,25 +93,10 @@ class ScriptableImage : public QObject
             )
         }
 
-        QString GetImageInfoByFileName( const QString &FileName,
-                                        const QString &Tag )
-        {
-            SCRIPT_CATCH_EXCEPTION( QString(),
-                return m_obj.GetImageInfoByFileName( FileName, Tag );
-            )
-        }
-
         QObject* GetImageInfoList( int   Id )
         {
             SCRIPT_CATCH_EXCEPTION( NULL,
                 return m_obj.GetImageInfoList( Id );
-            )
-        }
-
-        QObject* GetImageInfoListByFileName ( const QString &FileName )
-        {
-            SCRIPT_CATCH_EXCEPTION( NULL,
-                return m_obj.GetImageInfoListByFileName( FileName );
             )
         }
 

@@ -10,47 +10,30 @@
 #ifndef GALLERYSLIDE_H
 #define GALLERYSLIDE_H
 
-#include <QThread>
 #include <QQueue>
-#include <QVariantAnimation>
 
-#include <mythuiimage.h>
-#include <imageutils.h>
+#include "mythuiimage.h"
+#include "imagetypes.h"
+
 
 // Min/max zoom extents available in slideshow
 #define MIN_ZOOM 0.1
 #define MAX_ZOOM 20.0
 
-
-//! An wrapped image loader so that we can detect when it completes
-class ImageLoadingThread : public QThread
-{
-public:
-    explicit ImageLoadingThread(MythUIImage *image) : QThread(), m_image(image) {}
-
-protected:
-    void run()   { if (m_image) m_image->Load(false); }
-
-    MythUIImage *m_image;
-};
-
-
 class Slide;
 
 //! \brief Base animation class that is driven by a Myth pulse and implements
 //! variable speed
-//! \note Although concrete, for convenience, this shouldn't be used directly
 class AbstractAnimation : public QObject
 {
     Q_OBJECT
 public:
     AbstractAnimation() : m_forwards(true), m_running(false), m_speed(0.0) {}
-    virtual bool Start(bool forwards, float speed = 1.0);
-    virtual void Stop()                { m_running = false; }
+    virtual void Start(bool forwards, float speed = 1.0);
+    virtual void Stop()                 { m_running = false; }
     virtual void SetSpeed(float speed) { m_speed = speed; }
-    virtual void Pulse(int interval) = 0;
-    virtual void Clear()               {}
-    bool         IsRunning() const     { return m_running; }
+    virtual void Pulse(int interval)   = 0;
+    virtual void Clear()                {}
 
 protected slots:
     //! To be called when animation completes
@@ -61,11 +44,9 @@ signals:
     void         finished();
 
 protected:
-    // Play direction
-    bool  m_forwards;
-    bool  m_running;
-    // Real-time = 1.0, Double-speed = 2.0
-    float m_speed;
+    bool  m_forwards; //!< Play direction
+    bool  m_running;  //!< True whilst animation is active
+    float m_speed;    //!< Real-time = 1.0, Double-speed = 2.0
 };
 
 
@@ -78,7 +59,7 @@ public:
     enum Type {None, Alpha, Position, Zoom, HorizontalZoom, VerticalZoom, Angle};
 
     Animation(Slide *image, Type type = Alpha);
-    virtual bool Start(bool forwards = true, float speed = 1.0);
+    virtual void Start(bool forwards = true, float speed = 1.0);
     virtual void Pulse(int interval);
     void         Set(QVariant from, QVariant to,
                      int duration = 500,
@@ -89,7 +70,7 @@ public:
 protected:
     //! Image to be animated
     // Should be MythUItype but that impacts elsewhere: SetZoom must become
-    // virtual, which causes compiler warnings in subtitles (fn hiding)
+    // virtual, which causes compiler (fn hiding) warnings in subtitles
     Slide            *m_parent;
     Type              m_type;
     UIEffects::Centre m_centre;
@@ -103,11 +84,11 @@ protected:
 class GroupAnimation : public AbstractAnimation
 {
 public:
-    GroupAnimation() : AbstractAnimation()                 {}
-    virtual ~GroupAnimation()                              { Clear(); }
-    virtual void Pulse(int interval)                     = 0;
-    virtual bool Start(bool forwards, float speed = 1.0) = 0;
-    virtual void SetSpeed(float speed)                   = 0;
+    GroupAnimation() : AbstractAnimation()            {}
+    virtual ~GroupAnimation()                        { Clear(); }
+    virtual void Pulse(int interval)                      = 0;
+    virtual void Start(bool forwards, float speed = 1.0) = 0;
+    virtual void SetSpeed(float speed)                    = 0;
     virtual void Add(AbstractAnimation *child);
     virtual void Clear();
 
@@ -124,15 +105,14 @@ class SequentialAnimation : public GroupAnimation
 public:
     SequentialAnimation() : GroupAnimation(), m_current(-1)  {}
     virtual void Pulse(int interval);
-    virtual bool Start(bool forwards, float speed = 1.0);
+    virtual void Start(bool forwards, float speed = 1.0);
     virtual void SetSpeed(float speed);
 
 protected slots:
     virtual void Finished();
 
 protected:
-    //! Index of child currently playing
-    int m_current;
+    int m_current; //!< Index of child currently playing
 };
 
 
@@ -143,15 +123,14 @@ class ParallelAnimation : public GroupAnimation
 public:
     ParallelAnimation() : GroupAnimation(), m_finished(0)  {}
     virtual void Pulse(int interval);
-    virtual bool Start(bool forwards, float speed = 1.0);
+    virtual void Start(bool forwards, float speed = 1.0);
     virtual void SetSpeed(float speed);
 
 protected slots:
     virtual void Finished();
 
 protected:
-    //! Count of child animations that have finished
-    int m_finished;
+    int m_finished; //!< Count of child animations that have finished
 };
 
 
@@ -173,52 +152,43 @@ public:
     Slide(MythUIType *parent, QString name, MythUIImage *image);
     ~Slide();
 
-    bool       Load(ImageItem *im, int direction = 0, bool waiting = false);
-    bool       Display(ImageItem *im);
-    ImageItem *GetImageData() const  { return m_data; }
-    void       Zoom(int percentage);
-    void       SetZoom(float);
-    void       SetPan(QPoint value);
-    void       Pan(QPoint distance);
-    bool       CanZoomIn() const     { return m_zoom < MAX_ZOOM; }
-    bool       CanZoomOut() const    { return m_zoom > MIN_ZOOM; }
-    void       Clear();
-    bool       IsAvailable() const   { return m_isReady; }
-    bool       FailedLoad() const    { return m_loadFailed; }
-    int        GetDirection() const  { return m_direction; }
-    void       Lock(bool set = true) { m_locked = set; }
-    bool       IsLocked() const      { return m_locked; }
-    void       Pulse();
+    void      Clear();
+    bool      LoadSlide(ImagePtrK im, int direction = 0, bool waiting = false);
+    ImagePtrK GetImageData() const  { return m_data; }
+    void      Zoom(int percentage);
+    void      SetZoom(float);
+    void      Pan(QPoint distance);
+    void      SetPan(QPoint value);
+    bool      CanZoomIn() const     { return m_zoom < MAX_ZOOM; }
+    bool      CanZoomOut() const    { return m_zoom > MIN_ZOOM; }
+    bool      IsEmpty() const       { return m_state == kEmpty || !m_waitingFor; }
+    bool      IsLoaded() const      { return m_state >= kLoaded && m_waitingFor; }
+    bool      FailedLoad() const    { return m_state == kFailed; }
+    int       GetDirection() const  { return m_direction; }
+    void      Pulse();
+
+    QChar     GetDebugState() const;
 
 public slots:
-    void       LoadComplete();
+    void      SlideLoaded();
 
 signals:
     //! Generated when the last requested image has loaded
-    void       ImageLoaded(Slide*);
+    void      ImageLoaded(Slide*);
 
 private:
-    //! Separate thread loads images from BE
-    ImageLoadingThread *m_ilt;
-    //! The image currently loading/loaded
-    ImageItem      *m_data;
-    //! The most recently requested image. Differs from m_data when skipping
-    ImageItem      *m_waitingFor;
-    //! Current zoom, 1.0 = fullsize
-    float           m_zoom;
-    //! True when image is available for display
-    bool            m_isReady;
-    //! True when image load failed (it's disappeared or BE is down)
-    bool            m_loadFailed;
-    bool            m_locked;
+    enum SlideState { kEmpty, kLoading, kLoaded, kFailed }; // Order is significant
+
+    SlideState    m_state;        //!< Slide validity
+    ImagePtrK     m_data;         //!< The image currently loading/loaded
+    //! The most recently requested image. Null for preloads. Differs from m_data when skipping
+    ImagePtrK     m_waitingFor;
+    float         m_zoom;         //!< Current zoom, 1.0 = fullsize
     //! Navigation that created this image, -1 = Prev, 0 = Update, 1 = Next
-    int             m_direction;
-    //! Dedicated animation for zoom
-    Animation      *m_zoomAnimation;
-    //! Dedicated animation for panning
-    PanAnimation   *m_panAnimation;
-    //! Pan position (0,0) = no pan
-    QPoint          m_pan;
+    int           m_direction;
+    Animation    *m_zoomAnimation;//!< Dedicated animation for zoom, if supported
+    PanAnimation *m_panAnimation; //!< Dedicated animation for panning, if supported
+    QPoint        m_pan;          //!< Pan position (0,0) = no pan
 };
 
 
@@ -227,35 +197,51 @@ private:
  \details Slides are cloned from a theme-provided image definition, so are
  created at start-up and re-used (a pool).
  Image requests are assigned to successive slides. When loaded a slide becomes
- available for display in requested order (a queue). When displayed the head
- slide is removed from the queue and returned to the tail for re-use only when
- it is no longer displayed. If a rapid batch of requests fill the buffer then
- subsequent requests overwrite the last slide, discarding the previous image
- (jumping behaviour)
+ available for display in requested order (a queue).
+ The head slide is the one displayed, its successor is also displayed during a
+ transition. When a transition completes the head slide is removed and returned
+ to the tail for re-use.
+ If a rapid batch of requests fill the buffer then subsequent requests overwrite
+ the last slide, discarding the previous image (jumping behaviour).
 */
 class SlideBuffer : public QObject
 {
     Q_OBJECT
 public:
-    SlideBuffer(MythUIImage *image, int size);
+    SlideBuffer() : m_mutexQ(QMutex::Recursive), m_nextLoad(0) {}
     ~SlideBuffer();
-    bool Load(ImageItem *im, int direction);
-    void Preload(ImageItem *im);
-    Slide* TakeNext();
-    int Release(Slide*);
+
+    void   Initialise(MythUIImage &image);
+    void   Teardown();
+    bool   Load(ImagePtrK im, int direction);
+    void   Preload(ImagePtrK im);
+    void   ReleaseCurrent();
+    Slide &GetCurrent()
+    {
+        QMutexLocker lock(&m_mutexQ);
+        return *(m_queue.head());
+    }
+
+    Slide  &GetNext()
+    {
+        QMutexLocker lock(&m_mutexQ);
+        return *(m_queue.at(1));
+    }
 
 signals:
     //! Signals that buffer has (count) loaded slides awaiting display
     void SlideReady(int count);
 
 private slots:
-    int FlushAvailable(Slide*, QString reason = "Loaded");
+    void Flush(Slide*, QString reason = "Loaded");
 
 protected:
-    //! Queue of slides awaiting display, loading or spare
-    QQueue<Slide*> m_queue;
-    //! Queue index of first spare slide, or last slide if none spare
-    int m_nextLoad;
+    QString BufferState();
+
+    // Must be recursive to enable Flush->signal->Get whilst retaining lock
+    QMutex         m_mutexQ;   //!< Queue protection
+    QQueue<Slide*> m_queue;    //!< Queue of slides
+    int            m_nextLoad; //!< Index of first spare slide, (or last slide if none spare)
 };
 
 #endif // GALLERYSLIDE_H

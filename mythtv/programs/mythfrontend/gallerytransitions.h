@@ -4,17 +4,12 @@
 #ifndef GALLERYTRANSITIONS_H
 #define GALLERYTRANSITIONS_H
 
-#include <QMap>
-#include <QList>
-
-#include <mythcorecontext.h>
-
 #include "galleryslide.h"
 
 
 //! Available transitions
 enum ImageTransitionType {
-    // First transition must be useable by all painters
+    // First transition must be 0 and useable by all painters
     kNoTransition      = 0,
     kRandomTransition  = 1,
     kBlendTransition   = 2,
@@ -22,6 +17,7 @@ enum ImageTransitionType {
     kSlideTransition   = 4,
     kZoomTransition    = 5,
     kSpinTransition    = 6,
+    kLastTransSentinel = 7  // Must be last
 };
 
 
@@ -30,18 +26,14 @@ class Transition : public QObject
 {
     Q_OBJECT
 public:
-    explicit Transition(QString name)
-        : m_duration(gCoreContext->GetNumSetting("GalleryTransitionTime", 1000)),
-          m_old(NULL), m_new(NULL), m_prev(NULL), m_next(NULL),
-          m_name(name)                 {}
+    explicit Transition(QString name);
     virtual ~Transition()              {}
 
-    virtual void Start(Slide *from, Slide *to, bool forwards, float speed = 1.0);
-    virtual void SetSpeed(float speed) {}
+    virtual void Start(Slide &from, Slide &to, bool forwards, float speed = 1.0);
+    virtual void SetSpeed(float)       {}
     virtual void Pulse(int interval)   = 0;
     virtual void Initialise()          {}
     virtual void Finalise()            {}
-    QString GetName()                  { return m_name; }
 
 protected slots:
     virtual void Finished();
@@ -68,8 +60,6 @@ protected:
     Slide *m_prev;
     //! The image occurring later in the slideshow sequence
     Slide *m_next;
-    //! Name that appears in settings
-    QString m_name;
 };
 
 
@@ -81,7 +71,7 @@ class TransitionNone : public Transition
 {
 public:
     TransitionNone() : Transition("None") {}
-    virtual void Start(Slide *from, Slide *to,
+    virtual void Start(Slide &from, Slide &to,
                        bool forwards, float speed = 1.0);
     virtual void Pulse(int) {}
 };
@@ -93,11 +83,11 @@ class GroupTransition : public Transition
 public:
     GroupTransition(GroupAnimation *animation, QString name);
     virtual ~GroupTransition();
-    virtual void Start(Slide *from, Slide *to,
+    virtual void Start(Slide &from, Slide &to,
                        bool forwards, float speed = 1.0);
     virtual void SetSpeed(float speed);
     virtual void Pulse(int interval);
-    virtual void Initialise() = 0;
+    virtual void Initialise()  = 0;
     virtual void Finalise()    = 0;
 
 protected:
@@ -109,7 +99,8 @@ protected:
 class TransitionBlend : public GroupTransition
 {
 public:
-    TransitionBlend() : GroupTransition(new ParallelAnimation(), tr("Blend")) {}
+    TransitionBlend() : GroupTransition(new ParallelAnimation(), 
+                                        Transition::tr("Blend")) {}
     virtual void Initialise();
     virtual void Finalise();
 };
@@ -119,7 +110,8 @@ public:
 class TransitionTwist : public GroupTransition
 {
 public:
-    TransitionTwist() : GroupTransition(new SequentialAnimation(), tr("Twist")) {}
+    TransitionTwist() : GroupTransition(new SequentialAnimation(), 
+                                        Transition::tr("Twist")) {}
     virtual void Initialise();
     virtual void Finalise();
 };
@@ -129,7 +121,8 @@ public:
 class TransitionSlide : public GroupTransition
 {
 public:
-    TransitionSlide() : GroupTransition(new ParallelAnimation(), tr("Slide")) {}
+    TransitionSlide() : GroupTransition(new ParallelAnimation(), 
+                                        Transition::tr("Slide")) {}
     virtual void Initialise();
     virtual void Finalise();
 };
@@ -139,7 +132,8 @@ public:
 class TransitionZoom : public GroupTransition
 {
 public:
-    TransitionZoom() : GroupTransition(new ParallelAnimation(), tr("Zoom")) {}
+    TransitionZoom() : GroupTransition(new ParallelAnimation(), 
+                                       Transition::tr("Zoom")) {}
     virtual void Initialise();
     virtual void Finalise();
 };
@@ -149,7 +143,8 @@ public:
 class TransitionSpin : public TransitionBlend
 {
 public:
-    TransitionSpin() : TransitionBlend() { m_name = tr("Spin"); }
+    TransitionSpin() : TransitionBlend() 
+    { setObjectName(Transition::tr("Spin")); }
     virtual void Initialise();
     virtual void Finalise();
 };
@@ -160,20 +155,22 @@ class TransitionRandom : public Transition
 {
     Q_OBJECT
 public:
-    explicit TransitionRandom(TransitionMap peers) : Transition(tr("Random")),
-          m_peers(peers.values()), m_current(NULL) {}
-    virtual void Start(Slide *from, Slide *to,
-                       bool forwards, float speed = 1.0);
-    virtual void Pulse(int interval) { if (m_current) m_current->Pulse(interval); }
-    virtual void Initialise()        { if (m_current) m_current->Initialise(); }
-    virtual void Finalise()          { if (m_current) m_current->Finalise(); }
+    explicit TransitionRandom(QList<Transition*> peers)
+        : Transition(Transition::tr("Random")), m_peers(peers), m_current(NULL) {}
+    virtual void Start(Slide &from, Slide &to, bool forwards, float speed = 1.0);
+    virtual void SetSpeed(float speed) { if (m_current) m_current->SetSpeed(speed); }
+    virtual void Pulse(int interval)   { if (m_current) m_current->Pulse(interval); }
+    virtual void Initialise()          { if (m_current) m_current->Initialise(); }
+    virtual void Finalise()            { if (m_current) m_current->Finalise(); }
 
 protected slots:
     void Finished();
 
 protected:
+    //! Set of distinct transitions
     QList<Transition*> m_peers;
-    Transition *m_current;
+    //! Selected transition
+    Transition        *m_current;
 };
 
 
@@ -183,10 +180,14 @@ class TransitionRegistry
 public:
     explicit TransitionRegistry(bool includeAnimations);
     ~TransitionRegistry()    { qDeleteAll(m_map); }
-    const TransitionMap GetAll() { return m_map; }
-    Transition *Select(int setting);
+    const TransitionMap GetAll() const { return m_map; }
+    Transition &Select(int setting);
+
+    //! A transition that updates instantly
+    TransitionNone m_immediate;
 
 private:
+    //! All possible transitions
     TransitionMap m_map;
 };
 

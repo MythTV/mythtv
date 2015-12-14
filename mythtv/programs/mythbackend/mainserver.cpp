@@ -74,9 +74,7 @@ using namespace std;
 #include "filesysteminfo.h"
 #include "metaio.h"
 #include "musicmetadata.h"
-#include "imagescanner.h"
-#include "imagethumbs.h"
-#include "imagehandlers.h"
+#include "imagemanager.h"
 #include "cardutil.h"
 
 // mythbackend headers
@@ -914,15 +912,29 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     }
     else if (command == "IMAGE_SCAN")
     {
-        QStringList reply = ImageScan::getInstance()->HandleScanRequest(listline);
+        // Expects command
+        QStringList reply = (listline.size() == 2)
+                ? ImageManagerBe::getInstance()->HandleScanRequest(listline[1])
+                : QStringList("ERROR") << "Bad: " << listline;
+
+        SendResponse(pbs->getSocket(), reply);
+    }
+    else if (command == "IMAGE_COPY")
+    {
+        // Expects at least 1 comma-delimited image definition
+        QStringList reply = (listline.size() >= 2)
+                ? ImageManagerBe::getInstance()->HandleDbCreate(listline.mid(1))
+                : QStringList("ERROR") << "Bad: " << listline;
+
         SendResponse(pbs->getSocket(), reply);
     }
     else if (command == "IMAGE_MOVE")
     {
-        // Expects destination dir id, comma-delimited dir/file ids
-        QStringList reply = (listline.size() == 3)
-                         ? ImageHandler::HandleMove(listline[1], listline[2])
-                         : QStringList("ERROR") << "Bad IMAGE_MOVE";
+        // Expects comma-delimited dir/file ids, path to replace, new path
+        QStringList reply = (listline.size() == 4)
+                ? ImageManagerBe::getInstance()->
+                  HandleDbMove(listline[1], listline[2], listline[3])
+                : QStringList("ERROR") << "Bad: " << listline;
 
         SendResponse(pbs->getSocket(), reply);
     }
@@ -930,8 +942,8 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     {
         // Expects comma-delimited dir/file ids
         QStringList reply = (listline.size() == 2)
-                ? ImageHandler::HandleDelete(listline[1])
-                : QStringList("ERROR") << "Bad IMAGE_DELETE";
+                ? ImageManagerBe::getInstance()->HandleDelete(listline[1])
+                : QStringList("ERROR") << "Bad: " << listline;
 
         SendResponse(pbs->getSocket(), reply);
     }
@@ -939,8 +951,9 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     {
         // Expects hide flag, comma-delimited file/dir ids
         QStringList reply = (listline.size() == 3)
-                ? ImageHandler::HandleHide(listline[1].toInt(), listline[2])
-                : QStringList("ERROR") << "Bad IMAGE_HIDE";
+                ? ImageManagerBe::getInstance()->
+                  HandleHide(listline[1].toInt(), listline[2])
+                : QStringList("ERROR") << "Bad: " << listline;
 
         SendResponse(pbs->getSocket(), reply);
     }
@@ -948,8 +961,9 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     {
         // Expects transformation, write file flag,
         QStringList reply = (listline.size() == 3)
-                ? ImageHandler::HandleTransform(listline[1].toInt(), listline[2])
-                : QStringList("ERROR") << "Bad IMAGE_TRANSFORM";
+                ? ImageManagerBe::getInstance()->
+                  HandleTransform(listline[1].toInt(), listline[2])
+                : QStringList("ERROR") << "Bad: " << listline;
 
         SendResponse(pbs->getSocket(), reply);
     }
@@ -957,17 +971,18 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     {
         // Expects file/dir id, new basename
         QStringList reply = (listline.size() == 3)
-                ? ImageHandler::HandleRename(listline[1], listline[2])
-                : QStringList("ERROR") << "Bad IMAGE_RENAME";
+                ? ImageManagerBe::getInstance()->HandleRename(listline[1], listline[2])
+                : QStringList("ERROR") << "Bad: " << listline;
 
         SendResponse(pbs->getSocket(), reply);
     }
     else if (command == "IMAGE_CREATE_DIRS")
     {
-        // Expects list of dir names
-        QStringList reply = (listline.size() == 2)
-                ? ImageHandler::HandleDirs(listline[1].split(","))
-                : QStringList("ERROR") << "Bad IMAGE_CREATE_DIRS";
+        // Expects destination path, rescan flag, list of dir names
+        QStringList reply = (listline.size() >= 4)
+                ? ImageManagerBe::getInstance()->
+                  HandleDirs(listline[1], listline[2].toInt(), listline.mid(3))
+                : QStringList("ERROR") << "Bad: " << listline;
 
         SendResponse(pbs->getSocket(), reply);
     }
@@ -975,17 +990,9 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     {
         // Expects dir id, cover id. Cover id of 0 resets dir to use its own
         QStringList reply = (listline.size() == 3)
-                ? ImageHandler::HandleCover(listline[1].toInt(), listline[2].toInt())
-                : QStringList("ERROR") << "Bad IMAGE_COVER";
-
-        SendResponse(pbs->getSocket(), reply);
-    }
-    else if (command == "IMAGE_GET_METADATA")
-    {
-        // Expects "IMAGE_GET_METADATA", image id
-        QStringList reply = (listline.size() == 2)
-                ? ImageHandler::HandleGetMetadata(listline[1])
-                : QStringList("ERROR") << "Bad IMAGE_GET_METADATA";
+                ? ImageManagerBe::getInstance()->
+                  HandleCover(listline[1].toInt(), listline[2].toInt())
+                : QStringList("ERROR") << "Bad: " << listline;
 
         SendResponse(pbs->getSocket(), reply);
     }
@@ -993,8 +1000,8 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     {
         // Expects list of exclusion patterns
         QStringList reply = (listline.size() == 2)
-                ? ImageHandler::HandleIgnore(listline[1])
-                : QStringList("ERROR") << "Bad IMAGE_IGNORE";
+                ? ImageManagerBe::getInstance()->HandleIgnore(listline[1])
+                : QStringList("ERROR") << "Bad: " << listline;
 
         SendResponse(pbs->getSocket(), reply);
     }
@@ -1393,7 +1400,10 @@ void MainServer::customEvent(QEvent *e)
             return;
 
         if (me->Message() == "CREATE_THUMBNAILS")
-            ImageThumb::getInstance()->HandleCreateThumbnails(me->ExtraDataList());
+            ImageManagerBe::getInstance()->HandleCreateThumbnails(me->ExtraDataList());
+
+        if (me->Message() == "IMAGE_GET_METADATA")
+            ImageManagerBe::getInstance()->HandleGetMetadata(me->ExtraData());
 
         MythEvent mod_me("");
         if (me->Message().startsWith("MASTER_UPDATE_REC_INFO"))

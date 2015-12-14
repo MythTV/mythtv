@@ -4,56 +4,11 @@
 #ifndef GALLERYVIEW_H
 #define GALLERYVIEW_H
 
-#include <QMap>
-#include <QHash>
-#include <QList>
-#include <QMutex>
-#include <QPair>
-#include <QEvent>
-#include <QKeyEvent>
-#include <QDir>
-
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-    #include <QTemporaryDir>
-#else
-
-#define DIRNAME "import"
-class QTemporaryDir
-{
-public:
-    QTemporaryDir() : m_dir(QDir::temp())
-    {
-        m_dir.mkdir(DIRNAME);
-        m_dir.cd(DIRNAME);
-    }
-
-    ~QTemporaryDir()
-    {
-        foreach (const QString &name, m_dir.entryList(QDir::Files | QDir::NoDotAndDotDot))
-            m_dir.remove(name);
-        m_dir.cdUp();
-        m_dir.rmdir(DIRNAME);
-    }
-
-    bool isValid() { return m_dir.exists(); }
-    QString path() { return m_dir.absolutePath(); }
-
-private:
-    QDir m_dir;
-};
-
-#endif
-
-#include <mythuitext.h>
-#include <mythuibuttonlist.h>
-#include <mythdialogbox.h>
-#include <imagemetadata.h>
-#include <mythmediamonitor.h>
-
-#include "galleryviews.h"
 #include "galleryslideview.h"
+#include "galleryviews.h"
 
-
+class DirectoryView;
+class MythMenu;
 
 //! Type of captions to display
 enum ImageCaptionType {
@@ -75,44 +30,42 @@ public:
 
 public slots:
     void    Start();
-
-signals:
-    void    ThumbnailChanged(int);
+    void    Close();
+    void    ClearSgDb()  { m_mgr.ClearStorageGroup(); }
 
 private:
     bool    keyPressEvent(QKeyEvent *);
+    void    mediaEvent(MythMediaEvent *event)     { m_mgr.DeviceEvent(event); }
     void    customEvent(QEvent *);
+    void    RemoveImages(const QStringList &ids, bool deleted = true);
     void    BuildImageList();
     void    ResetUiSelection();
     void    TransformItem(ImageFileTransform tran = kRotateCW);
     void    TransformMarked(ImageFileTransform tran = kRotateCW);
     void    UpdateImageItem(MythUIButtonListItem *);
-    void    UpdateScanProgress(QString, QString, QString);
+    void    UpdateScanProgress(const QString &, int, int);
     void    StartSlideshow(ImageSlideShowType mode);
     void    SelectZoomWidget(int change);
-    void    ImportFiles(QStringList);
-    void    SetUiSelection(MythUIButtonListItem *);
-    QString CheckThumbnail(MythUIButtonListItem *, ImageItem *,
-                           QStringList &, int = 0);
-    void    UpdateThumbnail(MythUIButtonListItem *, ImageItem *,
-                            const QString &url, int = 0);
+    QString CheckThumbnail(MythUIButtonListItem *, ImagePtrK,
+                           ImageIdList &required, int);
+    void    UpdateThumbnail(MythUIButtonListItem *, ImagePtrK,
+                            const QString &url, int);
     void    MenuMain();
     void    MenuShow(MythMenu *);
     void    MenuMarked(MythMenu *);
     void    MenuPaste(MythMenu *);
     void    MenuTransform(MythMenu *);
     void    MenuAction(MythMenu *);
-    void    MenuImport(MythMenu *);
     void    MenuSlideshow(MythMenu *);
     bool    DirSelectUp();
     void    DirSelectDown();
     void    ShowDialog(QString, QString = "");
 
 private slots:
-    void    LoadData(int parent = -1);
-    void    SelectImage(int id);
+    void    LoadData(int);
+    void    SelectImage(int);
     void    ItemClicked(MythUIButtonListItem *);
-    void    ItemSelected(MythUIButtonListItem *);
+    void    SetUiSelection(MythUIButtonListItem *);
     void    Slideshow()            { StartSlideshow(kNormalSlideShow); }
     void    RecursiveSlideshow()   { StartSlideshow(kRecursiveSlideShow); }
     void    ShowDetails();
@@ -120,12 +73,12 @@ private slots:
     void    RotateCCW()            { TransformItem(kRotateCCW); }
     void    FlipHorizontal()       { TransformItem(kFlipHorizontal); }
     void    FlipVertical()         { TransformItem(kFlipVertical); }
-    void    ResetExif()            { TransformItem(kResetExif); }
+    void    ResetExif()            { TransformItem(kResetToExif); }
     void    RotateCWMarked()       { TransformMarked(kRotateCW); }
     void    RotateCCWMarked()      { TransformMarked(kRotateCCW); }
     void    FlipHorizontalMarked() { TransformMarked(kFlipHorizontal); }
     void    FlipVerticalMarked()   { TransformMarked(kFlipVertical); }
-    void    ResetExifMarked()      { TransformMarked(kResetExif); }
+    void    ResetExifMarked()      { TransformMarked(kResetToExif); }
     void    MarkItem(bool = true);
     void    UnmarkItem()           { MarkItem(false); }
     void    MarkAll(bool = true);
@@ -140,10 +93,6 @@ private slots:
     void    HideHidden()           { ShowHidden(false); }
     void    SetCover(bool reset = false);
     void    ResetCover()           { SetCover(true); }
-    void    ShowCaptions(int = kNoCaption);
-    void    CaptionsName()         { ShowCaptions(kNameCaption); }
-    void    CaptionsDate()         { ShowCaptions(kDateCaption); }
-    void    CaptionsComment()      { ShowCaptions(kUserCaption); }
     void    ShowType(int = kPicAndVideo);
     void    HidePictures()         { ShowType(kVideoOnly); }
     void    HideVideos()           { ShowType(kPicOnly); }
@@ -154,54 +103,49 @@ private slots:
     void    StopScan()             { StartScan(false); }
     void    DeleteItem();
     void    DeleteMarked();
-    void    ShowImport(bool deleteAfter = false);
-    void    ShowMoveImport()           { ShowImport(true); }
-    void    RunImportCmd();
+    void    Import();
     void    MakeDir();
-    void    Eject()  { MediaMonitor::GetMediaMonitor()->ChooseAndEjectMedia(); }
-    void    Copy();
+    void    Eject();
+    void    Copy(bool deleteAfter = false);
     void    Move();
     void    ShowPassword();
-    void    RepeatOn(int on = 1)  { gCoreContext->SaveSetting("GalleryRepeat", on); }
-    void    RepeatOff()        { RepeatOn(0); }
+    void    RepeatOn(int on = 1)   { gCoreContext->SaveSetting("GalleryRepeat", on); }
+    void    RepeatOff()            { RepeatOn(0); }
 
 private:
-    ImageDbReader     *m_db;
-    DirectoryView     *m_view;
-    MythScreenStack   *m_popupStack,       *m_mainStack;
+    typedef QPair<int,int> IntPair;
+
+    // Theme widgets
     MythUIButtonList  *m_imageList;
-    MythUIText        *m_captionText,      *m_crumbsText;
-    MythUIText        *m_hideFilterText,   *m_typeFilterText;
-    MythUIText        *m_positionText,     *m_emptyText;
+    MythUIText        *m_captionText,    *m_crumbsText,     *m_emptyText;
+    MythUIText        *m_hideFilterText, *m_typeFilterText, *m_positionText;
     MythUIText        *m_scanProgressText;
     MythUIProgressBar *m_scanProgressBar;
-    bool               m_scanInProgress;
-    int                m_zoomLevel;
 
-    //! Image details overlay
-    InfoList *m_infoList;
+    //! Theme buttonlist widgets implementing zoom levels
+    QList<MythUIButtonList *> m_zoomWidgets;
+    int                       m_zoomLevel;
+
+    MythScreenStack &m_popupStack;
+    ImageManagerFe  &m_mgr;  //!< Manages the images
+    DirectoryView   *m_view; //!< List of images comprising the view
+    InfoList         m_infoList; //!< Image details overlay
+
+    //! Last scan updates received from scanners
+    QHash<QString, IntPair> m_scanProgress;
+    //! Scanners currently scanning
+    QSet<QString>          m_scanActive;
 
     //! Current selection/marked files when menu is invoked
     MenuSubjects m_menuState;
 
-    //! Theme buttonlist widgets implementing zoom levels
-    QList<MythUIButtonList *> m_zoomWidgets;
-
-    //! Buttons waiting for BE to create thumbnail
     typedef QPair<MythUIButtonListItem *, int> ThumbLocation;
+    //! Buttons waiting for thumbnails to be created
     QHash<int, ThumbLocation> m_pendingMap;
 
-    //! Urls of images where thumbnails are known to exist
-    QHash<int, QString> m_url;
-
-    //! Edit privileges
-    bool m_editsAllowed;
-
-    //! Distinguishes Import(Copy) from Import(Move)
-    bool m_deleteAfterImport;
-
-    //! Temporary dir for import commands/scripts
-    QTemporaryDir *m_importTmp;
+    QSet<int> m_thumbExists;  //!< Images where thumbnails are known to exist
+    bool      m_editsAllowed; //!< Edit privileges
 };
+
 
 #endif // GALLERYVIEW_H

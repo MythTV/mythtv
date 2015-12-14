@@ -1,7 +1,18 @@
 #include "gallerytransitions.h"
 
-#include <QEasingCurve>
-#include <QPoint>
+#include "mythcorecontext.h"
+
+
+#define LOC QString("Transition: ")
+
+
+Transition::Transition(QString name)
+    : QObject(),
+      m_duration(gCoreContext->GetNumSetting("GalleryTransitionTime", 1000)),
+      m_old(NULL), m_new(NULL), m_prev(NULL), m_next(NULL)
+{
+    setObjectName(name);
+}
 
 
 /*!
@@ -10,16 +21,26 @@
  \param setting The user selected transition setting
  \return Transition The transition object or an alternative
 */
-Transition* TransitionRegistry::Select(int setting)
+Transition &TransitionRegistry::Select(int setting)
 {
+    // Guard against garbage
+    int value = (setting >= kNoTransition && setting < kLastTransSentinel)
+            ? setting : kNoTransition;
+
     // If chosen transition isn't viable for painter then use previous ones.
-    // First transition ust always be useable by all painters
+    // First transition must always be useable by all painters
     Transition *result = NULL;
     do
-        result = m_map.value(setting--, NULL);
-    while (setting >= 0 && !result);
+        result = m_map.value(value--, NULL);
+    while (value >= kNoTransition && !result);
 
-    return result;
+    if (result)
+        return *result;
+
+    LOG(VB_GENERAL, LOG_CRIT,
+        LOC + QString("No transitions found for setting %1").arg(setting));
+
+    return m_immediate;
 }
 
 
@@ -28,6 +49,7 @@ Transition* TransitionRegistry::Select(int setting)
  \param includeAnimations Whether to use animated transitions (zoom, rotate)
 */
 TransitionRegistry::TransitionRegistry(bool includeAnimations)
+    : m_immediate()
 {
     // Create all non-animated transitions to be used by Random
     m_map.insert(kBlendTransition, new TransitionBlend());
@@ -41,10 +63,10 @@ TransitionRegistry::TransitionRegistry(bool includeAnimations)
         m_map.insert(kSpinTransition,  new TransitionSpin());
     }
 
-    // Create random set
-    m_map.insert(kRandomTransition, new TransitionRandom(m_map));
+    // Create random set from those already defined
+    m_map.insert(kRandomTransition, new TransitionRandom(m_map.values()));
 
-    // Create all transitions not to be used by Random
+    // Create other transitions that aren't to be used by Random
     m_map.insert(kNoTransition, new TransitionNone());
 }
 
@@ -56,20 +78,20 @@ TransitionRegistry::TransitionRegistry(bool includeAnimations)
  \param forwards Direction
  \param speed Unused
 */
-void Transition::Start(Slide *from, Slide *to,
+void Transition::Start(Slide &from, Slide &to,
                        bool forwards, float speed)
 {
-    LOG(VB_FILE, LOG_DEBUG,
-        QString("Transition: Starting transition from %1 to %2 (forwards= %3, speed= %4)")
-        .arg(from->objectName(), to->objectName()).arg(forwards).arg(speed));
+    LOG(VB_FILE, LOG_DEBUG, LOC +
+        QString("Starting transition %1 -> %2 (forwards= %3, speed= %4)")
+        .arg(from.objectName(), to.objectName()).arg(forwards).arg(speed));
 
-    m_old = from;
-    m_new = to;
+    m_old = &from;
+    m_new = &to;
 
     // When playing forwards next image replaces prev image
     // When playing backwards prev image replaces next image
-    m_prev  = forwards ? from : to;
-    m_next = forwards ? to : from;
+    m_prev  = forwards ? m_old : m_new;
+    m_next = forwards ? m_new : m_old;
 
     // Set up transition
     Initialise();
@@ -90,6 +112,9 @@ void Transition::Finished()
     // Undo transition effects
     Finalise();
 
+    LOG(VB_FILE, LOG_DEBUG, LOC +
+        QString("Finished transition to %1").arg(m_new->objectName()));
+
     emit finished();
 }
 
@@ -101,7 +126,7 @@ void Transition::Finished()
  \param forwards Direction
  \param speed Factor, 1.0 = real-time
 */
-void TransitionNone::Start(Slide *from, Slide *to,
+void TransitionNone::Start(Slide &from, Slide &to,
                            bool forwards, float speed)
 {
     Transition::Start(from, to, forwards, speed);
@@ -125,7 +150,6 @@ GroupTransition::GroupTransition(GroupAnimation *animation, QString name)
 
 /*!
  \brief Destroy group transition
-
 */
 GroupTransition::~GroupTransition()
 {
@@ -141,7 +165,7 @@ GroupTransition::~GroupTransition()
  \param forwards Direction
  \param speed Factor, 1.0 = real-time
 */
-void GroupTransition::Start(Slide *from, Slide *to,
+void GroupTransition::Start(Slide &from, Slide &to,
                             bool forwards, float speed)
 {
     // Clear previous transition
@@ -162,10 +186,7 @@ void GroupTransition::Start(Slide *from, Slide *to,
 void GroupTransition::SetSpeed(float speed)
 {
     if (m_animation)
-    {
-        LOG(VB_FILE, LOG_DEBUG, QString("Transition: Changing speed to %1").arg(speed));
         m_animation->SetSpeed(speed);
-    }
 }
 
 
@@ -383,7 +404,7 @@ void TransitionSpin::Finalise()
  \param forwards Direction
  \param speed Unused
 */
-void TransitionRandom::Start(Slide *from, Slide *to, bool forwards, float speed)
+void TransitionRandom::Start(Slide &from, Slide &to, bool forwards, float speed)
 {
     // Select a random peer.
     int rand = qrand() % m_peers.size();

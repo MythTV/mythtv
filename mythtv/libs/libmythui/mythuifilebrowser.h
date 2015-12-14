@@ -80,28 +80,28 @@ class MUI_PUBLIC MythUIFileBrowser : public MythScreenType
     MythUIFileBrowser(MythScreenStack *parent, const QString &startPath);
    ~MythUIFileBrowser();
 
-    virtual bool Create(void);
+    bool Create(void);
 
     void SetReturnEvent(QObject *retobject, const QString &resultid);
 
     void SetTypeFilter(QDir::Filters filter) { m_typeFilter = filter; }
     void SetNameFilter(QStringList filter) { m_nameFilter = filter; }
 
-  protected slots:
-    virtual void OKPressed(void);
+  private slots:
+    void OKPressed(void);
     void cancelPressed(void);
-    virtual void backPressed(void);
-    virtual void homePressed(void);
+    void backPressed(void);
+    void homePressed(void);
     void editLostFocus(void);
     void PathSelected(MythUIButtonListItem *item);
-    virtual void PathClicked(MythUIButtonListItem *item);
+    void PathClicked(MythUIButtonListItem *item);
     void LoadPreview(void);
 
-  protected:
+  private:
     void SetPath(const QString &startPath);
     bool GetRemoteFileList(const QString &url, const QString &sgDir,
                            QStringList &list);
-    virtual void updateFileList(void);
+    void updateFileList(void);
     void updateRemoteFileList(void);
     void updateLocalFileList(void);
     void updateSelectedList(void);
@@ -136,7 +136,6 @@ class MUI_PUBLIC MythUIFileBrowser : public MythScreenType
 
     QObject           *m_retObject;
     QString            m_id;
-    QString            m_widgetName;
 };
 
 #endif

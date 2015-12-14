@@ -747,14 +747,7 @@
                     <filename>shared/folder-reg.png</filename>
                 </imagetype>
             </state>
-            <state name="root" from="subfolder"/>
-            <state name="upfolder" from="subfolder">
-                <imagetype name="icon">
-                    <area>10%,2%,40%,13%</area>
-                    <filename>shared/updirectory.png</filename>
-                    <preserveaspect>yes</preserveaspect>
-                </imagetype>
-            </state>
+            <state name="device" from="subfolder"/>
             <state name="image">
                 <area>0,0,100%,100%</area>
                 <imagetype name="background">
@@ -773,9 +766,9 @@
         </statetype>
         <!-- Show how many images / directories are in this directory -->
         <textarea name="childcount" from="basetextarea">
-            <area>0,0,55%,15%</area>
+            <area>5%,0,100%,15%</area>
             <font>gallerytext</font>
-            <align>allcenter</align>
+            <align>left,vcenter</align>
         </textarea>
         <!-- Shows a picture image -->
         <imagetype name="buttonimage">
@@ -809,6 +802,19 @@
             <area>51%,57%,92%,93%</area>
             <preserveaspect>false</preserveaspect>
         </imagetype>
+        <!-- Show up arrow on parent dir with ancestors -->
+        <statetype name="parenttype">
+            <area>0,0,100%,100%</area>
+            <state name="upfolder">
+                <area>0,0,100%,100%</area>
+                <imagetype name="icon">
+                    <area>4%,14%,10%,20%</area>
+                    <filename>uparrow.png</filename>
+                    <preserveaspect>no</preserveaspect>
+                    <alpha>208</alpha>
+                </imagetype>
+            </state>
+        </statetype>
         <!-- Darken hidden files/ folders -->
         <statetype name="buttonstate">
             <area>0,0,100%,100%</area>
@@ -840,7 +846,7 @@
             </state>
         </statetype>
         <textarea name="buttontext">
-            <area>0,100%-22,100%,22</area>
+            <area>2%,100%-22,99%,22</area>
             <font>gallerytext</font>
             <align>allcenter</align>
         </textarea>
@@ -858,21 +864,14 @@
                     <filename>shared/folder-sel.png</filename>
                 </imagetype>
             </state>
-            <state name="root" from="subfolder"/>
-            <state name="upfolder" from="subfolder">
-                <imagetype name="icon">
-                    <area>10%,2%,40%,13%</area>
-                    <filename>shared/updirectory.png</filename>
-                    <preserveaspect>yes</preserveaspect>
-                </imagetype>
-            </state>
+            <state name="device" from="subfolder"/>
             <state name="image">
                 <area>0,0,100%,100%</area>
                 <imagetype name="background">
-    <area>0,0,100%,100%</area>
-    <filename>shared/grid_back_sel.png</filename>
-    <alpha>255</alpha>
-    </imagetype>
+                    <area>0,0,100%,100%</area>
+                    <filename>shared/grid_back_sel.png</filename>
+                    <alpha>255</alpha>
+                </imagetype>
             </state>
             <state name="video">
                 <area>0,0,100%,100%</area>
@@ -902,13 +901,13 @@
                     </fill>
                 </shape>
                 <textarea name="name" from="basetextarea">
-                    <area>2%,0%,35%,100%</area>
+                    <area>1%,0%,33%,100%</area>
                     <align>vcenter</align>
                 </textarea>
                 <textarea name="value" from="name">
-                    <area>40%,0%,98%,100%</area>
+                    <area>35%,0%,99%,100%</area>
                 </textarea>
-                </state>
+            </state>
             <state name="selectedactive" from="active">
                 <shape name="buttonbackground">
                     <area>0,0,100%,100%</area>
@@ -916,6 +915,15 @@
                         <gradient start="#52CA38" end="#349838" alpha="255"/>
                     </fill>
                 </shape>
+                <textarea name="name" from="basetextarea">
+                    <area>1%,0%,33%,100%</area>
+                    <align>vcenter</align>
+                    <cutdown>no</cutdown>
+                    <scroll direction="horizontal" startdelay="0" returndelay="0"/>
+                </textarea>
+                <textarea name="value" from="name">
+                    <area>35%,0%,99%,100%</area>
+                </textarea>
             </state>
             <state name="inactive" from="active"/>
             <state name="selectedinactive" from="active"/>
@@ -929,7 +937,7 @@
             </state>
         </statetype>
         <statetype name="downscrollarrow">
-            <position>46%,97%</position>
+            <position>46%,98%</position>
             <state type="full">
                 <imagetype name="dnoff">
                      <filename>lb-dnarrow-sel.png</filename>
@@ -1303,165 +1311,6 @@
         <button name="ok" from="basebutton">
             <position>530,440</position>
             <value>OK</value>
-        </button>
-
-    </window>
-
-    <window name="MythMultiFileBrowser">
-        <area>0,0,100%,100%</area>
-        <imagetype name="backimg">
-            <area>0,0,100%,100%</area>
-            <filename>mythfilebrowser-background.png</filename>
-        </imagetype>
-
-        <textedit name="location" from="basetextedit">
-            <area>4%,20,60%,50</area>
-        </textedit>
-
-        <buttonlist name="filelist">
-            <area>0,0,100%,100%</area>
-            <layout>grid</layout>
-            <buttonarea>2%,78,72%,100%-80</buttonarea>
-            <spacing>2</spacing>
-            <statetype name="buttonitem">
-                <state name="active">
-                    <area>0,0,176,126</area>
-                    <shape name="buttonbackground"/>
-                    <statetype name="nodetype">
-                        <area>0,0,100%,100%</area>
-                        <state name="folder">
-                            <area>4%,4%,92%,66%</area>
-                            <imagetype name="icon">
-                                <area>0,0,100%,100%</area>
-                                <filename>shared/directory.png</filename>
-                                <preserveaspect>yes</preserveaspect>
-                            </imagetype>
-                        </state>
-                        <state name="upfolder" from="folder">
-                            <area>4%,4%,92%,66%</area>
-                            <imagetype name="icon">
-                                <area>0,0,100%,100%</area>
-                                <filename>shared/updirectory.png</filename>
-                            </imagetype>
-                        </state>
-                        <state name="executable" from="folder">
-                            <area>4%,4%,92%,66%</area>
-                            <imagetype name="icon">
-                                <area>0,0,100%,100%</area>
-                                <filename>shared/executable.png</filename>
-                            </imagetype>
-                        </state>
-                        <state name="file" from="folder">
-                            <area>4%,4%,92%,66%</area>
-                            <imagetype name="icon">
-                                <area>0,0,100%,100%</area>
-                                <filename>shared/file.png</filename>
-                            </imagetype>
-                        </state>
-                    </statetype>
-                    <imagetype name="buttonimage">
-                        <area>2%,3%,96%,97%-30</area>
-                        <preserveaspect>true</preserveaspect>
-                    </imagetype>
-                    <textarea name="buttontext" from="basetextarea">
-                        <area>0,100%-28,100%,26</area>
-                        <align>allcenter</align>
-                    </textarea>
-            <statetype name="buttoncheck">
-                <area>0,0,100%,100%</area>
-                <state type="full">
-                    <area>40%,35%,40%,40%</area>
-                    <imagetype name="marked">
-                        <area>0,0,100%,100%</area>
-                        <filename>playlist_yes.png</filename>
-                    </imagetype>
-                </state>
-            </statetype>
-                </state>
-                <state name="inactive" from="active"/>
-                <state name="selectedinactive" from="active"/>
-                <state name="selectedactive" from="active">
-                    <area>0,0,176,126</area>
-                    <shape name="buttonbackground">
-                        <area>0,0,100%,100%</area>
-                        <fill style="gradient">
-                            <gradient start="#999999" end="#666666" alpha="220"/>
-                        </fill>
-                    </shape>
-                </state>
-            </statetype>
-            <statetype name="upscrollarrow">
-                <position>73%,78</position>
-                <state type="off">
-                    <imagetype name="upon">
-                        <filename>lb-uparrow-reg.png</filename>
-                    </imagetype>
-                </state>
-                <state type="full">
-                    <imagetype name="upoff">
-                        <filename>lb-uparrow-sel.png</filename>
-                    </imagetype>
-                </state>
-            </statetype>
-            <statetype name="downscrollarrow">
-                <position>73%,100%-100</position>
-                <state type="off">
-                    <imagetype name="dnon">
-                        <filename>lb-dnarrow-reg.png</filename>
-                    </imagetype>
-                </state>
-                <state type="full">
-                    <imagetype name="dnoff">
-                        <filename>lb-dnarrow-sel.png</filename>
-                    </imagetype>
-                </state>
-            </statetype>
-        </buttonlist>
-
-        <!--<button name="back" from="basebutton">
-            <position>79%,20</position>
-            <value>Up Level</value>
-        </button>-->
-
-        <!--<button name="home" from="basebutton">
-            <position>79%,70</position>
-            <value>Home</value>
-        </button>-->
-
-        <button name="selectall" from="basebutton">
-            <position>79%,3%</position>
-            <value>Select All</value>
-        </button>
-
-        <button name="clearall" from="basebutton">
-            <position>79%,10%</position>
-            <value>Clear All</value>
-        </button>
-
-        <textarea name="selectcount" from="basetextarea">
-            <area>72%,19%,92%,30</area>
-            <align>allcenter</align>
-            <template>%n selection(s)</template>
-        </textarea>
-
-        <imagetype name="preview">
-            <area>72%,23%,92%,70%</area>
-            <preserveaspect>true</preserveaspect>
-        </imagetype>
-
-        <textarea name="info" from="basetextarea">
-            <area>72%,78%,100%,30</area>
-            <align>allcenter</align>
-        </textarea>
-
-        <button name="cancel" from="basebutton">
-            <position>79%,83%</position>
-            <value>Cancel</value>
-        </button>
-
-        <button name="ok" from="basebutton">
-            <position>79%,90%</position>
-            <value>Import</value>
         </button>
 
     </window>

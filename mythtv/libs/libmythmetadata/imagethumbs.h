@@ -1,125 +1,149 @@
 //! \file
-//! \brief Creates and manages thumbnails in the cache
-//! \details Uses two worker threads to process thumbnail requests that are queued.
-//! One for pictures and a one for videos, which are off-loaded to previewgenerator,
-//! and time-consuming. Both background threads are low-priority to avoid recording issues.
-//! Requests are handled by client-assigned priority so that on-demand display requests
-//! are serviced before background pre-generation requests.
+//! \brief Creates and manages thumbnails
+//! \details Uses two worker threads to process thumbnail requests that are queued
+//! from the scanner and UI.
+//! One thread generates picture thumbs; the other video thumbs, which are delegated
+//! to previewgenerator and time-consuming.
+//! Both background threads are low-priority to avoid recording issues.
+//! Requests are handled by client-assigned priority so that UI display requests
+//! are serviced before background scanner requests.
 //! When images are removed, their thumbnails are also deleted (thumbnail cache is
-//! synchronised to database). Obselete thumbnails are broadcast to enable clients to
-//! also manage/synchronise their caches.
+//! synchronised to database). Obsolete images are broadcast to enable clients to
+//! also cleanup/synchronise their caches.
 
-#ifndef IMAGETHUMBGEN_H
-#define IMAGETHUMBGEN_H
+#ifndef IMAGETHUMBS_H
+#define IMAGETHUMBS_H
 
-// Qt headers
-#include <QMutex>
-#include <QList>
 #include <QMap>
-#include <QDir>
-#include <QImage>
+#include <QMutex>
+#include <QWaitCondition>
 
-// MythTV headers
-#include <mthread.h>
-#include <imageutils.h>
-
+#include "imagetypes.h"
+#include "mthread.h"
 
 //! \brief Priority of a thumbnail request. First/lowest are handled before later/higher
 //! \details Ordered to optimise perceived client performance, ie. pictures will be
 //! displayed before directories (4 thumbnails), then videos (slow to generate) are filled
 //! in last.
-typedef enum priorities {
-    kPicRequestPriority    = 0, //!< Client request to display an image thumbnail
-    kFolderRequestPriority = 1, //!< Client request to display a directory thumbnail
-    kVideoRequestPriority  = 2, //!< Client request to display a video preview
-    kScannerUrgentPriority = 3, //!< Scanner request needed to complete a scan
-    kBackgroundPriority    = 4  //!< Scanner background request
-} ImageThumbPriority;
+enum ImageThumbPriority {
+    kUrgentPriority     = -10, //!< Scanner request needed to complete a scan
+    kPicRequestPriority =  -7, //!< Client request to display an image thumbnail
+    kDirRequestPriority =  -3, //!< Client request to display a directory thumbnail
+    kBackgroundPriority =   0  //!< Scanner background request
+};
 
 
 //! A generator request that is queued
-class META_PUBLIC ThumbTask : public ImageList
+class META_PUBLIC ThumbTask
 {
 public:
-    ThumbTask(const QString &,
-              ImageThumbPriority = kBackgroundPriority, bool = false);
-    ThumbTask(QString, ImageItem*,
-              ImageThumbPriority = kBackgroundPriority, bool = false);
-    ThumbTask(const QString &, ImageMap&,
-              ImageThumbPriority = kBackgroundPriority, bool = false);
-    ThumbTask(QString, ImageList&,
-              ImageThumbPriority = kBackgroundPriority, bool = false);
 
+    /*!
+     \brief Construct request for a single image
+     \param action Request action
+     \param im Image object that will be deleted.
+     \param priority Request priority
+     \param notify If true a 'thumbnail exists' event will be broadcast when done.
+    */
+    ThumbTask(QString action, ImagePtrK im,
+              int priority = kUrgentPriority, bool notify = false)
+        : m_action(action), m_priority(priority), m_notify(notify)
+    { m_images.append(im); }
+
+    /*!
+     \brief Construct request for a list of images/dirs
+     \details Assumes ownership of list contents. Items will be deleted after processing
+     \param action Request action
+     \param list Image objects that will be deleted.
+     \param priority Request priority
+     \param notify If true a 'thumbnail exists' event will be broadcast when done.
+    */
+    ThumbTask(QString action, const ImageListK &list,
+              int priority = kUrgentPriority, bool notify = false)
+        : m_images(list),
+          m_action(action),
+          m_priority(priority),
+          m_notify(notify)      {}
+
+    //! Images for thumbnail task
+    ImageListK m_images;
     //! Request action: Create, delete etc.
     QString m_action;
     //! Request reason/priority
-    ImageThumbPriority m_priority;
+    int m_priority;
     //! If true, a "THUMBNAIL_CREATED" event is broadcast
     bool m_notify;
 };
 
+typedef QSharedPointer<ThumbTask> TaskPtr;
+
 
 //! A generator worker thread
-class META_PUBLIC ThumbThread : public MThread
+template <class DBFS>
+class ThumbThread : public MThread
 {
-  public:
-    ThumbThread(QString name);
+public:
+    ThumbThread(const QString &name, DBFS *const dbfs);
     ~ThumbThread();
 
-    void QueueThumbnails(ThumbTask *);
-    void ClearThumbnails();
-    int GetQueueSize(ImageThumbPriority);
-
-  protected:
-    void run();
     void cancel();
+    void Enqueue(const TaskPtr &task);
+    void AbortDevice(int devId, const QString &action);
+    void PauseBackground(bool pause);
 
-  private:
-    void CreateImageThumbnail(ImageItem *);
-    void CreateVideoThumbnail(ImageItem *);
-    bool RemoveDirContents(QString);
-    void Orientate(ImageItem *im, QImage &image);
+protected:
+    void run();
 
-    //! A queue of generator requests
-    typedef QList<ThumbTask *> ThumbQueue;
+private:
+    Q_DISABLE_COPY(ThumbThread)
+
     //! A priority queue where 0 is highest priority
-    QMap<ImageThumbPriority, ThumbQueue *> m_thumbQueue;
-    //! Queue protection
-    QMutex m_mutex;
+    typedef QMultiMap<int, TaskPtr> ThumbQueue;
 
-    //! Storage Group accessor
-    ImageSg *m_sg;
+    QString CreateThumbnail(ImagePtrK im, int thumbPriority);
+    static void RemoveTasks(ThumbQueue &queue, int devId);
 
-    //! Path of backend thumbnail cache
-    QDir m_thumbDir;
-    //! Path of backend temp
-    QDir m_tempDir;
+    DBFS &m_dbfs;               //!< Database/filesystem adapter
+    QWaitCondition m_taskDone;  //! Synchronises completed tasks
+
+    ThumbQueue m_requestQ;   //!< Priority queue of requests
+    ThumbQueue m_backgroundQ;   //!< Priority queue of background tasks
+    bool m_doBackground;       //!< Whether to process background tasks
+    QMutex m_mutex;            //!< Queue protection
 };
 
 
-//! Singleton creating/managing image thumbnails
+template <class DBFS>
 class META_PUBLIC ImageThumb
 {
-  public:
-    static ImageThumb* getInstance();
-
-    void        CreateThumbnail(ImageItem *, ImageThumbPriority);
-    void        HandleCreateThumbnails(QStringList imlist);
-    int         GetQueueSize(ImageThumbPriority);
-    void        ClearAllThumbs();
-    QStringList DeleteThumbs(ImageList, ImageList);
-
-  private:
-    ImageThumb();
+public:
+    explicit ImageThumb(DBFS *const dbfs);
     ~ImageThumb();
 
-    //! Singleton
-    static ImageThumb *m_instance;
+    void    ClearThumbs(int devId, const QString &action);
+    QString DeleteThumbs(const ImageList &images);
+    void    CreateThumbnail(const ImagePtrK &im,
+                            int priority = kBackgroundPriority,
+                            bool notify = false);
+    void    MoveThumbnail(const ImagePtrK &im);
+    void    PauseBackground(bool pause);
 
-    //! Worker thread generating picture thumbnails
-    ThumbThread       *m_imageThumbThread;
-    //! Worker thread generating video previews
-    ThumbThread       *m_videoThumbThread;
+private:
+    Q_DISABLE_COPY(ImageThumb)
+
+    //! Assign priority to a background task.
+    // Major element = tree depth, so shallow thumbs are created before deep ones
+    // Minor element = id, so thumbs are created in order they were scanned
+    // If not unique, QMultiMap will process later requests before earlier ones
+    int Priority(ImageItemK &im)
+    { return im.m_filePath.count('/') * 1000 + im.m_id; }
+
+    //! Db/filesystem adapter
+    DBFS              &m_dbfs;
+    //! Thread generating picture thumbnails
+    ThumbThread<DBFS> *m_imageThread;
+    //! Thread generating video previews
+    ThumbThread<DBFS> *m_videoThread;
 };
 
-#endif // IMAGETHUMBGEN_H
+#endif // IMAGETHUMBS_H

@@ -1,14 +1,15 @@
 #include "imagemetadata.h"
 
-#include <QRegExp>
-#include <QMap>
-#include <QPair>
-#include <QDateTime>
-#include <QMutexLocker>
-#include <QByteArray>
+#include <QImage>
+
+#include "mythlogging.h"
+#include "mythcorecontext.h"  // for avcodeclock
+#include "mythdirs.h"         // for ffprobe
+#include "mythsystemlegacy.h" // for ffprobe
+#include "exitcodes.h"        // for ffprobe
 
 // libexiv2 for Exif metadata
-#include <exiv2/exiv2.hpp>
+//#include <exiv2/exiv2.hpp>
 // Note: Older versions of Exiv2 don't have the exiv2.hpp include
 // file.  Using image.hpp instead seems to work.
 #ifdef _MSC_VER
@@ -17,59 +18,77 @@
 #include <exiv2/image.hpp>
 #endif
 
-#include <mythlogging.h>
-
-
-/*!
- \brief Convert degree rotation into orientation code
- \param degrees Rotation required to show video correctly
- \return QString Code as per Exif spec.
-*/
-QString ExifOrientation::FromRotation(QString degrees)
-{
-    if      (degrees ==   "0") return "1";
-    else if (degrees ==  "90") return "6";
-    else if (degrees == "180") return "3";
-    else if (degrees == "270") return "8";
-    return "0";
+// To read FFMPEG Metadata
+extern "C" {
+#include "libavformat/avformat.h"
 }
 
+// Uncomment this to log raw metadata from exif/ffmpeg
+//#define DUMP_METADATA_TAGS yes
 
-/*!
- \brief Converts orientation code to text description
- \param orientation Exif code
- \return QString Description text
-*/
-QString ExifOrientation::Description(QString orientation)
-{
-    if      (orientation == "0") return tr("0 - Unset");
-    else if (orientation == "1") return tr("1 - Normal");
-    else if (orientation == "2") return tr("2 - Horizontally Reflected");
-    else if (orientation == "3") return tr("3 - Rotated 180°");
-    else if (orientation == "4") return tr("4 - Vertically Reflected");
-    else if (orientation == "5") return tr("5 - Rotated 90°, Horizontally Reflected");
-    else if (orientation == "6") return tr("6 - Rotated 270°");
-    else if (orientation == "7") return tr("7 - Rotated 90°, Vertically Reflected");
-    else if (orientation == "8") return tr("8 - Rotated 90°");
-    return orientation;
-}
+#define LOC QString("ImageMetaData: ")
 
 
 /*!
- * \brief Determines effect of applying a transform to an image
- * \sa http://jpegclub.org/exif_orientation.html
- * \details These transforms are not intuitive!
- * For rotations the orientation is adjusted in the opposite direction.
- * The transform is applied from the user perspective (as the image will be displayed),
- * not the current orientation. When rotated 90° horizontal/vertical flips are
- * reversed, and when flipped rotations are reversed.
- * \param im Image
- * \param transform Rotation/flip
- * \return int New orientation after applying transform
+ * \brief Adjust orientation to apply a transform to an image
+ * \param transform Rotation/flip/reset to apply
+ * \return int Adjusted composite orientation of the image
  */
-int ExifOrientation::Transformed(int orientation, int transform)
+int Orientation::Transform(int transform)
 {
+    m_current = Apply(transform);
+    return Composite();
+}
+
+
+QImage Orientation::ApplyExifOrientation(QImage &image, int orientation)
+{
+    QTransform transform;
+
     switch (orientation)
+    {
+    case 1: // normal
+        return image;
+    case 2: // mirror horizontal
+        return image.mirrored(true, false);
+    case 3: // rotate 180
+        transform.rotate(180);
+        return image.transformed(transform);
+    case 4: // mirror vertical
+        return image.mirrored(false, true);
+    case 5: // mirror horizontal and rotate 270 CCW
+        transform.rotate(270);
+        return image.mirrored(true, false).transformed(transform);
+    case 6: // rotate 90 CW
+        transform.rotate(90);
+        return image.transformed(transform);
+    case 7: // mirror horizontal and rotate 90 CW
+        transform.rotate(90);
+        return image.mirrored(true, false).transformed(transform);
+    case 8: // rotate 270 CW
+        transform.rotate(270);
+        return image.transformed(transform);
+    }
+    return image;
+}
+
+
+/*!
+ * \brief Adjust current orientation code to apply a transform to an image
+ * \details When displayed the image will be orientated iaw its orientation
+ * code. The transform is effected by applying the reverse transform to the
+ * orientation code.
+ * \sa http://jpegclub.org/exif_orientation.html
+ * \param transform Rotation/flip to apply
+ * \return int New orientation code that will apply the transform to the image
+ */
+int Orientation::Apply(int transform)
+{
+    if (transform == kResetToExif)
+        return m_file;
+
+    // https://github.com/recurser/exif-orientation-examples is a useful resource.
+    switch (m_current)
     {
     case 0: // The image has no orientation info
     case 1: // The image is in its original state
@@ -79,7 +98,6 @@ int ExifOrientation::Transformed(int orientation, int transform)
         case kRotateCCW:      return 8;
         case kFlipHorizontal: return 2;
         case kFlipVertical:   return 4;
-        default:              return orientation;
         }
 
     case 2: // The image is horizontally flipped
@@ -89,7 +107,6 @@ int ExifOrientation::Transformed(int orientation, int transform)
         case kRotateCCW:      return 5;
         case kFlipHorizontal: return 1;
         case kFlipVertical:   return 3;
-        default:              return orientation;
         }
 
     case 3: // The image is rotated 180°
@@ -99,7 +116,6 @@ int ExifOrientation::Transformed(int orientation, int transform)
         case kRotateCCW:      return 6;
         case kFlipHorizontal: return 4;
         case kFlipVertical:   return 2;
-        default:              return orientation;
         }
 
     case 4: // The image is vertically flipped
@@ -109,17 +125,15 @@ int ExifOrientation::Transformed(int orientation, int transform)
         case kRotateCCW:      return 7;
         case kFlipHorizontal: return 3;
         case kFlipVertical:   return 1;
-        default:              return orientation;
         }
 
-    case 5: // The image is transposed (rotated 90° CW flipped horizontally)
+    case 5: // The image is rotated 90° CW and flipped horizontally
         switch (transform)
         {
         case kRotateCW:       return 2;
         case kRotateCCW:      return 4;
         case kFlipHorizontal: return 6;
         case kFlipVertical:   return 8;
-        default:              return orientation;
         }
 
     case 6: // The image is rotated 90° CCW
@@ -129,18 +143,15 @@ int ExifOrientation::Transformed(int orientation, int transform)
         case kRotateCCW:      return 1;
         case kFlipHorizontal: return 5;
         case kFlipVertical:   return 7;
-        default:              return orientation;
         }
 
-    case 7: // The image is transversed  (rotated 90° CW and flipped
-        // vertically)
+    case 7: // The image is rotated 90° CW and flipped vertically
         switch (transform)
         {
         case kRotateCW:       return 4;
         case kRotateCCW:      return 2;
         case kFlipHorizontal: return 8;
         case kFlipVertical:   return 6;
-        default:              return orientation;
         }
 
     case 8: // The image is rotated 90° CW
@@ -150,325 +161,547 @@ int ExifOrientation::Transformed(int orientation, int transform)
         case kRotateCCW:      return 3;
         case kFlipHorizontal: return 7;
         case kFlipVertical:   return 5;
-        default:              return orientation;
         }
-
-    default: return orientation;
     }
+    return m_current;
 }
 
 
 /*!
- \brief Sets orientation, datestamp & comment from file metadata
- \details Reads Exif for pictures, metadata tags from FFMPEG for videos
- \param im The image item to set
- \return bool True if metadata found
+ \brief Convert degrees of rotation into Exif orientation code
+ \param degrees CW rotation required to show video correctly
+ \return QString Orientation code as per Exif spec.
 */
-bool ImageMetaData::PopulateMetaValues(ImageItem *im)
+int Orientation::FromRotation(const QString &degrees)
 {
-    QString absPath = ImageSg::getInstance()->GetFilePath(im);
-    TagMap tags;
-
-    // Only require orientation, date, comment
-    QPair<QString, QString> toBeFilled = qMakePair(QString(), QString());
-    tags.insert(EXIF_TAG_ORIENTATION, toBeFilled);
-    tags.insert(EXIF_TAG_DATETIME, toBeFilled);
-    tags.insert(EXIF_TAG_USERCOMMENT, toBeFilled);
-    tags.insert(EXIF_TAG_IMAGEDESCRIPTION, toBeFilled);
-
-    bool ok = false;
-    if (im->m_type == kImageFile)
-    {
-        ok = ReadExifTags(absPath, tags);
-    }
-    else if (im->m_type == kVideoFile)
-    {
-        ok = ReadVideoTags(absPath, tags);
-    }
-
-    if (ok)
-    {
-        // Extract orientation
-        if (tags.contains(EXIF_TAG_ORIENTATION))
-        {
-            QString orient = tags.value(EXIF_TAG_ORIENTATION).first;
-            bool valid;
-            int orientation = orient.toInt(&valid);
-            im->m_orientation = (valid ? orientation : 0);
-        }
-        else
-        {
-            im->m_orientation = 0;
-            LOG(VB_FILE, LOG_DEBUG,
-                QString("Image: No Orientation metadata in %1").arg(im->m_name));
-        }
-
-        // Extract Datetime
-        if (tags.contains(EXIF_TAG_DATETIME))
-        {
-            QString date = tags.value(EXIF_TAG_DATETIME).first;
-            // Exif time has no timezone
-            QDateTime dateTime = QDateTime::fromString(date, "yyyy:MM:dd hh:mm:ss");
-            if (dateTime.isValid())
-                im->m_date = dateTime.toTime_t();
-        }
-        else
-        {
-            im->m_date = 0;
-            LOG(VB_FILE, LOG_DEBUG,
-                QString("Image: No DateStamp metadata in %1").arg(im->m_name));
-        }
-
-        // Extract User Comment or else Image Description
-        QString comment = "";
-        if (tags.contains(EXIF_TAG_USERCOMMENT))
-        {
-            comment = tags.value(EXIF_TAG_USERCOMMENT).first;
-        }
-        else if (tags.contains(EXIF_TAG_IMAGEDESCRIPTION))
-        {
-            comment = tags.value(EXIF_TAG_IMAGEDESCRIPTION).first;
-        }
-        else
-        {
-            LOG(VB_FILE, LOG_DEBUG, QString("Image: No Comment metadata in %1")
-                .arg(im->m_name));
-        }
-        im->m_comment = comment.simplified();
-    }
-
-    return ok;
+    if      (degrees ==   "0") return 1;
+    else if (degrees ==  "90") return 6;
+    else if (degrees == "180") return 3;
+    else if (degrees == "270") return 8;
+    return 0;
 }
 
 
 /*!
- \brief Reads all metadata for an image
- \param im The image
- \param tags Map of metadata tags. Map values = Pair< camera value, camera tag label >
-For pictures: key = Exif standard tag name; for videos: key = Exif tag name for
-orientation, date & comment only and an arbitrary, unique int for all other tags.
- \return bool True if metadata exists & could be read
-*/
-bool ImageMetaData::GetMetaData(ImageItem *im, TagMap &tags)
+ * \brief Generate text description of orientation
+ * \details Reports code & its interpretation of file orientation and, if
+ * different, the Db orientation
+ * \return Text description of orientation
+ */
+QString Orientation::Description()
 {
-    QString absPath = ImageSg::getInstance()->GetFilePath(im);
-
-    if (absPath.isEmpty())
-        return false;
-
-    //
-    bool ok = false;
-    if (im->m_type == kImageFile)
-    {
-        ok = ReadExifTags(absPath, tags);
-    }
-    else if (im->m_type == kVideoFile)
-    {
-        ok = ReadVideoTags(absPath, tags);
-    }
-
-    if (ok && tags.contains(EXIF_TAG_ORIENTATION))
-    {
-        TagPair val = tags.value(EXIF_TAG_ORIENTATION);
-        tags.insert(EXIF_TAG_ORIENTATION,
-                    qMakePair(ExifOrientation::Description(val.first), val.second));
-    }
-    return ok;
+    return (m_file == m_current)
+            ? AsText(m_file)
+            : tr("File: %1, Db: %2").arg(AsText(m_file),
+                                         AsText(m_current));
 }
 
 
 /*!
- \brief Get Exif tags for an image
- \param filePath Image file
- \param exif Map of exif tags & values requested and/or returned.
- For each key the corresponding exif value is populated.
- If empty it is populated with all exif key/values from the image.
- \return bool False on exif error
+ \brief Converts orientation code to text description for info display
+ \param orientation Exif code
+ \return QString Description text
 */
-bool ImageMetaData::ReadExifTags(QString filePath, TagMap &tags)
+QString Orientation::AsText(int orientation)
+{
+    switch (orientation)
+    {
+    case 1:  return tr("1 (Normal)");
+    case 2:  return tr("2 (H Mirror)");
+    case 3:  return tr("3 (Rotate 180°)");
+    case 4:  return tr("4 (V Mirror)");
+    case 5:  return tr("5 (H Mirror, Rot 270°)");
+    case 6:  return tr("6 (Rotate 90°)");
+    case 7:  return tr("7 (H Mirror, Rot 90°)");
+    case 8:  return tr("8 (Rotate 270°)");
+    default: return tr("%1 (Undefined)").arg(orientation);
+    }
+}
+
+
+//! Reads Exif metadata from a picture using libexiv2
+class PictureMetaData : public ImageMetaData
+{
+public:
+    PictureMetaData(const QString &filePath);
+    ~PictureMetaData()
+    { // libexiv2 closes file, cleans up via autoptrs
+    }
+
+    virtual bool        IsValid()                  { return m_image.get(); }
+    virtual QStringList GetAllTags();
+    virtual int         GetOrientation(bool *exists = NULL);
+    virtual QDateTime   GetOriginalDateTime(bool *exists = NULL);
+    virtual QString     GetComment(bool *exists = NULL);
+
+protected:
+    static QString DecodeComment(std::string rawValue);
+
+    std::string GetTag(const QString &key, bool *exists = NULL);
+
+    Exiv2::Image::AutoPtr m_image;
+    Exiv2::ExifData       m_exifData;
+};
+
+
+/*!
+   \brief Constructor. Reads metadata from image.
+   \param filePath Absolute image path
+ */
+PictureMetaData::PictureMetaData(const QString &filePath)
+    : ImageMetaData(filePath), m_image(NULL), m_exifData()
 {
     try
     {
-        Exiv2::Image::AutoPtr image =
-            Exiv2::ImageFactory::open(filePath.toLocal8Bit().constData());
+        m_image = Exiv2::ImageFactory::open(filePath.toStdString());
 
-        if (!image.get())
+        if (IsValid())
         {
-            LOG(VB_GENERAL, LOG_ERR,
-                QString("Image: Exiv2 error: Could not open file %1").arg(
-                    filePath));
-            return false;
-        }
-
-        image->readMetadata();
-        Exiv2::ExifData &exifData = image->exifData();
-
-        if (exifData.empty())
-        {
-            LOG(VB_FILE, LOG_NOTICE,
-                QString("Image: Exiv2 error: No exif data for file %1").arg(filePath));
-            return false;
-        }
-
-        if (tags.isEmpty())
-        {
-            // No specific tags requested - extract all exif data
-            LOG(VB_FILE, LOG_DEBUG,
-                QString("Image: Found %1 tag(s) for file %2")
-                .arg(exifData.count())
-                .arg(filePath));
-
-            Exiv2::ExifData::const_iterator i;
-            for (i = exifData.begin(); i != exifData.end(); ++i)
-            {
-                QString label = QString::fromStdString(i->tagLabel());
-
-                // Ignore empty labels
-                if (!label.isEmpty())
-                {
-                    QString key   = QString::fromStdString(i->key());
-                    std::string rawValue = i->value().toString();
-                    QString value;
-
-                    if (key == EXIF_TAG_USERCOMMENT)
-                    {
-                        // Decode charset
-                        Exiv2::CommentValue comVal = Exiv2::CommentValue(rawValue);
-                        value = QString::fromStdString(comVal.comment());
-                    }
-                    else
-                        value = QString::fromStdString(rawValue);
-
-                    // Remove control chars from malformed exif values.
-                    // They can pervert the myth message response mechanism
-                    value.replace(QRegExp("[\\0000-\\0037]"), "");
-
-#if 0
-                    LOG(VB_FILE, LOG_DEBUG,
-                        QString("Image: Exif %1/\"%2\" (Type %3) : %4")
-                        .arg(key, label, i->typeName(), value));
-#endif
-                    tags.insert(key, qMakePair(value, label));
-                }
-            }
+            m_image->readMetadata();
+            m_exifData = m_image->exifData();
         }
         else
-        {
-            // Extract requested tags only
-            QMap<QString, QPair<QString, QString> >::iterator it;
-            for (it = tags.begin(); it != tags.end(); ++it)
-            {
-                Exiv2::ExifKey            key =
-                        Exiv2::ExifKey(it.key().toLocal8Bit().constData());
-                Exiv2::ExifData::iterator exifIt = exifData.findKey(key);
-
-                if (exifIt != exifData.end())
-                {
-                    QString value;
-                    std::string rawValue = exifIt->value().toString();
-                    if (key.key() == EXIF_TAG_USERCOMMENT)
-                    {
-                        // Decode charset
-                        Exiv2::CommentValue comVal = Exiv2::CommentValue(rawValue);
-                        value = QString::fromStdString(comVal.comment());
-                    }
-                    else
-                        value = QString::fromStdString(rawValue);
-
-                    it.value() = qMakePair(value, QString());
-                }
-            }
-        }
-        return true;
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("Exiv2 error: Could not open file %1").arg(filePath));
     }
     catch (Exiv2::Error &e)
     {
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("Image: Exiv2 exception %1").arg(e.what()));
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Exiv2 exception %1").arg(e.what()));
     }
-    return false;
 }
 
 
 /*!
- \brief Extract metadata tags from FFMPEG dict
- \param[in,out] tags Extracted tags
- \param[in,out] arbKey Used as a map key for tags other than Orientation or Date
- \param dict    FFMPEG metdata dict containing video metadata
-*/
-void ImageMetaData::ExtractVideoTags(TagMap &tags, int &arbKey, AVDictionary *dict)
+   \brief Returns all metadata tags
+   \details Ignores "Exif.Image.PrintImageMatching" and lengthy tag values,
+   which are probably proprietary/binary
+   \return List of encoded strings
+   \sa ImageMetaData::FromString()
+ */
+QStringList PictureMetaData::GetAllTags()
 {
-    AVDictionaryEntry *avTag = av_dict_get(dict, "\0", NULL, AV_DICT_IGNORE_SUFFIX);
-    while (avTag)
-    {
-        QString key;
-        QString label = QString(avTag->key);
-        QString value = QString::fromUtf8(avTag->value);
+    QStringList tags;
+    if (!IsValid())
+        return tags;
 
-        if (label == "rotate")
+    LOG(VB_FILE, LOG_DEBUG, LOC + QString("Found %1 tag(s) for file %2")
+        .arg(m_exifData.count()).arg(m_filePath));
+
+    Exiv2::ExifData::const_iterator i;
+    for (i = m_exifData.begin(); i != m_exifData.end(); ++i)
+    {
+        QString label = QString::fromStdString(i->tagLabel());
+
+        // Ignore empty labels
+        if (label.isEmpty())
+            continue;
+
+        QString key = QString::fromStdString(i->key());
+
+        // Ignore large values (binary/private tags)
+        if (i->size() >= 256)
         {
-            // Flag orientation & convert to Exif code
-            key   = EXIF_TAG_ORIENTATION;
-            label = "Orientation";
-            value = ExifOrientation::FromRotation(value);
+            LOG(VB_FILE, LOG_DEBUG, LOC +
+                QString("Ignoring %1 (%2, %3) : Too big")
+                .arg(key, i->typeName()).arg(i->size()));
         }
-        else if (label == "creation_time")
+        // Ignore 'Print Image Matching'
+        else if (i->tag() == EXIF_PRINT_IMAGE_MATCHING)
         {
-            // Flag date & convert to Exif date format "YYYY:MM:DD"
-            key   = EXIF_TAG_DATETIME;
-            label = "Date and Time";
-            value.replace("-", ":");
+            LOG(VB_FILE, LOG_DEBUG, LOC +
+                QString("Ignoring %1 (%2, %3) : Undecodable")
+                .arg(key, i->typeName()).arg(i->size()));
         }
         else
-            key = QString::number(arbKey++);
+        {
+            // Use interpreted values
+            std::string val = i->print(&m_exifData);
 
-        tags.insert(key, qMakePair(value, label));
-#if 0
-        LOG(VB_FILE, LOG_DEBUG,
-            QString("Image: Video %1/\"%2\" : %3").arg(key, avTag->key, value));
+            // Comment needs charset decoding
+            QString value = (key == EXIF_TAG_USERCOMMENT)
+                    ? DecodeComment(val) : QString::fromStdString(val);
+
+            // Nulls can arise from corrupt metadata (MakerNote)
+            // Remove them as they disrupt socket comms between BE & remote FE's
+            if (value.contains(QChar::Null))
+            {
+                LOG(VB_GENERAL, LOG_NOTICE, LOC +
+                    QString("Corrupted Exif detected in %1").arg(m_filePath));
+                value = "????";
+            }
+
+            // Encode tag
+            QString str = ToString(key, label, value);
+            tags << str;
+
+#ifdef DUMP_METADATA_TAGS
+            LOG(VB_FILE, LOG_DEBUG, LOC + QString("%1 (%2, %3)")
+                .arg(str, i->typeName()).arg(i->size()));
 #endif
-        avTag = av_dict_get(dict, "\0", avTag, AV_DICT_IGNORE_SUFFIX);
+        }
     }
+    return tags;
 }
 
 
 /*!
- \brief Get metadata tags from a video file
- \param filePath Video file
- \param[in,out] tags Map of extracted tags
- \return bool True if metadata exists and could be read
-*/
-bool ImageMetaData::ReadVideoTags(QString filePath, TagMap &tags)
+   \brief Read a single Exif metadata tag
+   \param [in] key Exif tag key, as per http://www.exiv2.org/tags.html
+   \param [out] exists (Optional) True if key is found in metadata
+   \return Encoded tag
+   \sa ImageMetaData::FromString()
+ */
+std::string PictureMetaData::GetTag(const QString &key, bool *exists)
 {
-    {
-        QMutexLocker locker(avcodeclock);
-        av_register_all();
-    }
+    std::string value;
+    if (exists)
+        *exists = false;
 
-    AVFormatContext* p_context = NULL;
+    if (!IsValid())
+        return value;
+
+    Exiv2::ExifKey exifKey = Exiv2::ExifKey(key.toStdString());
+    Exiv2::ExifData::iterator exifIt = m_exifData.findKey(exifKey);
+
+    if (exifIt == m_exifData.end())
+        return value;
+
+    if (exists)
+        *exists = true;
+
+    // Use raw value
+    return exifIt->value().toString();
+}
+
+
+/*!
+   \brief Read Exif orientation
+   \param [out] exists (Optional) True if orientation is defined by metadata
+   \return Exif orientation code
+ */
+int PictureMetaData::GetOrientation(bool *exists)
+{
+    std::string value = GetTag(EXIF_TAG_ORIENTATION, exists);
+    return QString::fromStdString(value).toInt();
+}
+
+
+/*!
+   \brief Read Exif timestamp of image capture
+   \param [out] exists (Optional) True if date exists in metadata
+   \return Timestamp (possibly invalid) in camera timezone
+ */
+QDateTime PictureMetaData::GetOriginalDateTime(bool *exists)
+{
+    std::string value = GetTag(EXIF_TAG_DATETIME, exists);
+    QString dt = QString::fromStdString(value);
+
+    // Exif time has no timezone
+    return QDateTime::fromString(dt, EXIF_TAG_DATE_FORMAT);
+}
+
+
+/*!
+   \brief Read Exif comments from metadata
+   \details Returns UserComment, if not empty. Otherwise returns ImageDescription
+   \param [out] exists (Optional) True if either comment is found in metadata
+   \return Comment as a string
+ */
+QString PictureMetaData::GetComment(bool *exists)
+{
+    // Use User Comment or else Image Description
+    bool comExists, desExists = false;
+
+    std::string comment = GetTag(EXIF_TAG_USERCOMMENT, &comExists);
+
+    if (comment.empty())
+        comment = GetTag(EXIF_TAG_IMAGEDESCRIPTION, &desExists);
+
+    if (exists)
+        *exists = comExists || desExists;
+
+    return DecodeComment(comment);
+}
+
+
+/*!
+   \brief Decodes charset of UserComment
+   \param rawValue Metadata value with optional "[charset=...]" prefix
+   \return Decoded comment
+ */
+QString PictureMetaData::DecodeComment(std::string rawValue)
+{
+    // Decode charset
+    Exiv2::CommentValue comVal = Exiv2::CommentValue(rawValue);
+    if (comVal.charsetId() != Exiv2::CommentValue::undefined)
+        rawValue = comVal.comment();
+    return QString::fromStdString(rawValue.c_str());
+}
+
+
+//! Reads video metadata tags using FFmpeg
+//! Raw values for Orientation & Date are read quickly via FFmpeg API.
+//! However, as collating and interpreting other tags is messy and dependant on
+//! internal FFmpeg changes, informational data is derived via mythffprobe
+//! (a slow operation)
+class VideoMetaData : public ImageMetaData
+{
+public:
+    VideoMetaData(const QString &filePath);
+    ~VideoMetaData();
+
+    virtual bool        IsValid()                        { return m_dict; }
+    virtual QStringList GetAllTags();
+    virtual int         GetOrientation(bool *exists = NULL);
+    virtual QDateTime   GetOriginalDateTime(bool *exists = NULL);
+    virtual QString     GetComment(bool *exists = NULL);
+
+protected:
+    QString GetTag(const QString &key, bool *exists = NULL);
+
+    AVFormatContext *m_context;
+    //! FFmpeg tag dictionary
+    AVDictionary    *m_dict;
+};
+
+
+/*!
+   \brief Constructor. Opens best video stream from video
+   \param filePath Absolute video path
+ */
+VideoMetaData::VideoMetaData(const QString &filePath)
+    : ImageMetaData(filePath), m_context(NULL), m_dict(NULL)
+{
+    avcodeclock->lock();
+    av_register_all();
+    avcodeclock->unlock();
+
     AVInputFormat* p_inputformat = NULL;
-    QByteArray local8bit = filePath.toLocal8Bit();
 
     // Open file
-    if ((avformat_open_input(&p_context, local8bit.constData(),
-                             p_inputformat, NULL) < 0))
-        return false;
+    if (avformat_open_input(&m_context, filePath.toLatin1().constData(),
+                            p_inputformat, NULL) < 0)
+        return;
 
     // Locate video stream
-    int vidStream = av_find_best_stream(p_context, AVMEDIA_TYPE_VIDEO, -1, -1, NULL, 0);
-    if (vidStream < 0)
-        return false;
+    int vidStream = av_find_best_stream(m_context, AVMEDIA_TYPE_VIDEO, -1, -1, NULL, 0);
+    if (vidStream >= 0)
+        m_dict  = m_context->streams[vidStream]->metadata;
 
-    // Cannot search tags so must extract them all
-    // No tag classification for video so use arbitrary, unique keys
+    if (!IsValid())
+        avformat_close_input(&m_context);
+}
 
-    int arbKey = 1;
-    // Extract file tags
-    ExtractVideoTags(tags, arbKey, p_context->metadata);
-    // Extract video tags
-    ExtractVideoTags(tags, arbKey, p_context->streams[vidStream]->metadata);
 
-    avformat_close_input(&p_context);
+/*!
+   \brief Destructor. Closes file
+ */
+VideoMetaData::~VideoMetaData()
+{
+    if (IsValid())
+        avformat_close_input(&m_context);
+}
 
-    return true;
+
+/*!
+   \brief Reads relevant video metadata by running mythffprobe.
+   \warning Blocks for up to 5 secs
+   \details As video tags are unstructured they are massaged into groups of format,
+   stream0, streamN to segregate them and permit reasonable display ordering.
+   The stream indices reflect the stream order returned by mythffprobe and do not
+   necessarily correlate with FFmpeg streams
+   \return List of encoded video metadata tags
+   \sa ImageMetaData::FromString()
+ */
+QStringList VideoMetaData::GetAllTags()
+{
+    QStringList tags;
+    if (!IsValid())
+        return tags;
+
+    // Only extract interesting fields:
+    // For list use: mythffprobe -show_format -show_streams <file>
+    QString cmd = GetAppBinDir() + MYTH_APPNAME_MYTHFFPROBE;
+    QStringList args;
+    args << "-loglevel quiet"
+         << "-print_format compact" // Returns "section|key=value|key=value..."
+         << "-pretty"               // Add units etc
+         << "-show_entries "
+            "format=format_long_name,duration,bit_rate:format_tags:"
+            "stream=codec_long_name,codec_type,width,height,pix_fmt,color_space,avg_frame_rate"
+            ",codec_tag_string,sample_rate,channels,channel_layout,bit_rate:stream_tags"
+         << m_filePath;
+
+    MythSystemLegacy ffprobe(cmd, args, kMSRunShell | kMSStdOut);
+
+    ffprobe.Run(5);
+
+    if (ffprobe.Wait() != GENERIC_EXIT_OK)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Timeout or Failed: %2 %3").arg(cmd, args.join(" ")));
+        return tags;
+    }
+
+    QByteArray result = ffprobe.ReadAll();
+    QTextStream ostream(result);
+    int stream = 0;
+    while (!ostream.atEnd())
+    {
+        QStringList fields = ostream.readLine().split('|');
+
+        if (fields.size() <= 1)
+            // Empty section
+            continue;
+
+        // First fields should be "format" or "stream"
+        QString prefix = "";
+        QString group  = fields.takeFirst();
+        if (group == "stream")
+        {
+            // Streams use index as group
+            prefix = QString::number(stream++) + ":";
+            group.append(prefix);
+        }
+
+        foreach (const QString &field, fields)
+        {
+            // Expect label=value
+            QStringList parts = field.split('=');
+            if (parts.size() != 2)
+                continue;
+
+            // Remove ffprobe "tag:" prefix
+            QString label = parts[0].remove("tag:");
+            QString value = parts[1];
+
+            // Construct a pseudo-key for FFMPEG tags
+            QString key = QString("FFmpeg.%1.%2").arg(group, label);
+
+            // Add stream id to labels
+            QString str = ToString(key, prefix + label, value);
+            tags << str;
+
+#ifdef DUMP_METADATA_TAGS
+            LOG(VB_FILE, LOG_DEBUG, LOC + str);
+#endif
+        }
+    }
+    return tags;
+}
+
+
+/*!
+   \brief Read a single video tag
+   \param [in] key FFmpeg tag name
+   \param [out] exists (Optional) True if tag exists in metadata
+   \return Tag value as a string
+ */
+QString VideoMetaData::GetTag(const QString &key, bool *exists)
+{
+    if (m_dict)
+    {
+        AVDictionaryEntry *tag = NULL;
+        while ((tag = av_dict_get(m_dict, "\0", tag, AV_DICT_IGNORE_SUFFIX)))
+        {
+            if (QString(tag->key) == key)
+            {
+                if (exists)
+                    *exists = true;
+                return QString::fromUtf8(tag->value);
+            }
+        }
+    }
+    if (exists)
+        *exists = false;
+    return QString();
+}
+
+
+/*!
+   \brief Read FFmpeg video orientation tag
+   \param [out] exists (Optional) True if orientation is defined by metadata
+   \return Exif orientation code
+ */
+int VideoMetaData::GetOrientation(bool *exists)
+{
+    QString angle = GetTag(FFMPEG_TAG_ORIENTATION, exists);
+    return Orientation::FromRotation(angle);
+}
+
+
+/*!
+   \brief Read video datestamp
+   \param [out] exists (Optional) True if datestamp is defined by metadata
+   \return Timestamp (possibly invalid) in camera timezone
+ */
+QDateTime VideoMetaData::GetOriginalDateTime(bool *exists)
+{
+    QString dt = GetTag(FFMPEG_TAG_DATETIME, exists);
+
+    // Video time has no timezone
+    return QDateTime::fromString(dt, FFMPEG_TAG_DATE_FORMAT);
+}
+
+
+/*!
+   \brief Read Video comment from metadata
+   \details Always empty
+   \param [out] exists (Optional) Always false
+   \return Empty comment
+ */
+QString VideoMetaData::GetComment(bool *exists)
+{
+    if (exists)
+        *exists = false;
+    return QString();
+}
+
+
+/*!
+   \brief Factory to retrieve metadata from pictures
+   \param filePath Image path
+   \return Picture metadata reader
+*/
+ImageMetaData* ImageMetaData::FromPicture(const QString &filePath)
+{ return new PictureMetaData(filePath); }
+
+
+/*!
+   \brief Factory to retrieve metadata from videos
+   \param filePath Image path
+   \return Video metadata reader
+ */
+ImageMetaData* ImageMetaData::FromVideo(const QString &filePath)
+{ return new VideoMetaData(filePath); }
+
+
+const QString ImageMetaData::kSeparator = "|-|";
+
+
+/*!
+   \brief Creates a map of metadata tags as
+   \param tagStrings List of strings containing encoded metadata
+   \return multimap<key group, list<key, label, value>>
+ */
+ImageMetaData::TagMap ImageMetaData::ToMap(const QStringList &tagStrings)
+{
+    TagMap tags;
+    foreach (const QString &token, tagStrings)
+    {
+        QStringList parts = FromString(token);
+        // Expect Key, Label, Value.
+        if (parts.size() == 3)
+        {
+            // Map tags by Family.Group to keep them together
+            // Within each group they will preserve list ordering
+            QString group = parts[0].section('.', 0, 1);
+            tags.insertMulti(group, parts);
+
+#ifdef DUMP_METADATA_TAGS
+            LOG(VB_FILE, LOG_DEBUG, LOC + QString("%1 = %2").arg(group, token));
+#endif
+        }
+    }
+    return tags;
 }

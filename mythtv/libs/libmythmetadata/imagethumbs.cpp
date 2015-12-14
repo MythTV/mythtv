@@ -1,92 +1,135 @@
 #include "imagethumbs.h"
 
-#include <exitcodes.h> // for previewgen
-
-#include <QFile>
 #include <QDir>
-#include <QtAlgorithms>
-#include <QImage>
-#include <QThread>
-#include <QMutexLocker>
-#include <QMatrix>
+#include <QStringList>
 
-#include <mythdirs.h>
-#include <mythsystemlegacy.h>
+#include "mythlogging.h"
+#include "mythcorecontext.h"  // for events
+#include "mythsystemlegacy.h" // for previewgen
+#include "mythdirs.h"         // for previewgen
+#include "exitcodes.h"        // for previewgen
+#include "mythimage.h"
+
+#include "imagemetadata.h"
+
+/*!
+ \brief Constructor
+ \param name Thread name
+ \param dbfs Filesystem/Database adapter
+*/
+template <class DBFS>
+ThumbThread<DBFS>::ThumbThread(const QString &name, DBFS *const dbfs)
+    : MThread(name), m_dbfs(*dbfs),
+      m_requestQ(), m_backgroundQ(), m_doBackground(true)
+{}
 
 
 /*!
- \brief Contstruct request for a single image
- \param action Request action
- \param im Image object that will be deleted.
- \param priority Request priority
- \param notify If true a 'thumbnail exists' event will be broadcast when done.
+ \brief Destructor
 */
-ThumbTask::ThumbTask(QString action, ImageItem *im,
-                     ImageThumbPriority priority, bool notify)
-    : m_action(action),
-      m_priority(priority),
-      m_notify(notify)
-{
-    append(im);
-}
-
-
-/*!
- \brief Contstruct request for a list of images/dirs
- \param action Request action
- \param list Image objects that will be deleted.
- \param priority Request priority
- \param notify If true a 'thumbnail exists' event will be broadcast when done.
-*/
-ThumbTask::ThumbTask(QString action, ImageList &list,
-                     ImageThumbPriority priority, bool notify)
-    : ImageList(list),
-      m_action(action),
-      m_priority(priority),
-      m_notify(notify)
-{
-    // Assume ownership of list contents
-    list.clear();
-}
-
-
-/*!
- \brief  Construct worker thread
-*/
-ThumbThread::ThumbThread(QString name)
-    : MThread(name), m_sg(ImageSg::getInstance())
-{
-    m_tempDir = QString("%1/%2").arg(GetConfDir(), TEMP_DIR);
-    m_thumbDir = m_tempDir.absoluteFilePath(THUMBNAIL_DIR);
-    m_tempDir.mkdir(THUMBNAIL_DIR);
-
-    // Use priorities: 0 = image requests, 1 = video requests, 2 = urgent, 3 = background
-    for (int i = 0; i <= kBackgroundPriority; ++i)
-        m_thumbQueue.insert(static_cast<ImageThumbPriority>(i), new ThumbQueue());
-
-    if (!gCoreContext->IsBackend())
-        LOG(VB_GENERAL, LOG_ERR, "Thumbnail Generators MUST be run on a backend");
-}
-
-
-/*!
- \brief  Destructor
-*/
-ThumbThread::~ThumbThread()
+template <class DBFS>
+ThumbThread<DBFS>::~ThumbThread()
 {
     cancel();
     wait();
-    qDeleteAll(m_thumbQueue);
+}
+
+
+/*!
+ \brief Clears all queues so that the thread will terminate.
+*/
+template <class DBFS>
+void ThumbThread<DBFS>::cancel()
+{
+    // Clear all queues
+    QMutexLocker locker(&m_mutex);
+    m_requestQ.clear();
+    m_backgroundQ.clear();
+}
+
+
+/*!
+ \brief Queues a Create request
+ \param task The request
+*/
+template <class DBFS>
+void ThumbThread<DBFS>::Enqueue(const TaskPtr &task)
+{
+    if (task)
+    {
+        bool background = task->m_priority > kBackgroundPriority;
+
+        QMutexLocker locker(&m_mutex);
+        if (background)
+            m_backgroundQ.insert(task->m_priority, task);
+        else
+            m_requestQ.insert(task->m_priority, task);
+
+        // restart if not already running
+        if ((m_doBackground || !background) && !this->isRunning())
+            this->start();
+    }
+}
+
+
+/*!
+ \brief Clears thumbnail request queue
+ \warning May block for several seconds
+*/
+template <class DBFS>
+void ThumbThread<DBFS>::AbortDevice(int devId, const QString &action)
+{
+    if (action == "DEVICE CLOSE ALL" || action == "DEVICE CLEAR ALL")
+    {
+        if (isRunning())
+            LOG(VB_FILE, LOG_INFO,
+                QString("Aborting all thumbnails %1").arg(action));
+
+        // Abort thumbnail generation for all devices
+        cancel();
+        return;
+    }
+
+    LOG(VB_FILE, LOG_INFO, QString("Aborting thumbnails (%1) for '%2'")
+        .arg(action).arg(m_dbfs.DeviceName(devId)));
+
+    // Remove all tasks for specific device from every queue
+    QMutexLocker locker(&m_mutex);
+    RemoveTasks(m_requestQ, devId);
+    RemoveTasks(m_backgroundQ, devId);
+    if (isRunning())
+        // Wait until current task is complete - it may be using the device
+        m_taskDone.wait(&m_mutex, 3000);
+}
+
+
+/*!
+  /brief Removes all tasks for a device from a task queue
+ */
+template <class DBFS>
+void ThumbThread<DBFS>::RemoveTasks(ThumbQueue &queue, int devId)
+{
+    QMutableMapIterator<int, TaskPtr> it(queue);
+    while (it.hasNext())
+    {
+        it.next();
+        TaskPtr task = it.value();
+        // All thumbs in a task come from same device
+        if (task && !task->m_images.isEmpty()
+                && task->m_images.at(0)->m_device == devId)
+            it.remove();
+    }
 }
 
 
 /*!
  \brief  Handles thumbnail requests by priority
  \details Repeatedly processes next request from highest priority queue until all
- queues are empty, then quits. For Create requests an event is broadcast once the
- thumbnail exists. Dirs are only deleted if empty
- */
-void ThumbThread::run()
+  queues are empty, then quits. For Create requests an event is broadcast once the
+  thumbnail exists. Dirs are only deleted if empty
+*/
+template <class DBFS>
+void ThumbThread<DBFS>::run()
 {
     RunProlog();
 
@@ -94,105 +137,101 @@ void ThumbThread::run()
 
     while (true)
     {
+        // Signal previous task is complete (its files have been closed)
+        m_taskDone.wakeAll();
+
+        // Do all we can to run in background
+        QThread::yieldCurrentThread();
+
         // process next highest-priority task
-        ThumbTask *task = NULL;
+        TaskPtr task;
         {
             QMutexLocker locker(&m_mutex);
-            foreach(ThumbQueue *q, m_thumbQueue)
-                if (!q->isEmpty())
-                {
-                    task = q->takeFirst();
-                    break;
-                }
+            if (!m_requestQ.isEmpty())
+                task = m_requestQ.take(m_requestQ.firstKey());
+            else if (m_doBackground && !m_backgroundQ.isEmpty())
+                task = m_backgroundQ.take(m_backgroundQ.firstKey());
+            else
+                // quit when both queues exhausted
+                break;
         }
-        // quit when all queues exhausted
-        if (!task)
-            break;
 
         // Shouldn't receive empty requests
-        if (task->isEmpty())
+        if (task->m_images.isEmpty())
             continue;
 
         if (task->m_action == "CREATE")
         {
-            ImageItem *im = task->at(0);
+            ImagePtrK im = task->m_images.at(0);
 
-            LOG(VB_FILE, LOG_DEBUG, objectName()
-                + QString(": Creating %1 (Id %2, priority %3)")
-                .arg(im->m_fileName).arg(im->m_id).arg(task->m_priority));
+            QString err = CreateThumbnail(im, task->m_priority);
 
-            // Shouldn't receive any dirs or empty thumb lists
-            if (im->m_thumbPath.isEmpty())
-                continue;
-
-            if (m_tempDir.exists(im->m_thumbPath))
-
-                LOG(VB_FILE, LOG_DEBUG, objectName()
-                    + QString(": Thumbnail %1 already exists")
-                    .arg(im->m_thumbPath));
-
-            else if (im->m_type == kImageFile)
-
-                CreateImageThumbnail(im);
-
-            else if (im->m_type == kVideoFile)
-
-                CreateVideoThumbnail(im);
-
-            else
-                LOG(VB_FILE, LOG_ERR, objectName()
-                    + QString(": Can't create thumbnail for type %1 : image %2")
-                    .arg(im->m_type).arg(im->m_fileName));
-
-            // notify clients when done
-            if (task->m_notify)
+            if (!err.isEmpty())
             {
-                QString id = QString::number(im->m_id);
-
-                // Return requested thumbnails - FE uses it as a message signature
-                MythEvent me = MythEvent("THUMB_AVAILABLE", id);
-                gCoreContext->SendEvent(me);
+                LOG(VB_GENERAL, LOG_ERR,  QString("%1").arg(err));
+            }
+            else if (task->m_notify)
+            {
+                // notify clients when done
+                m_dbfs.Notify("THUMB_AVAILABLE",
+                              QStringList(QString::number(im->m_id)));
             }
         }
         else if (task->m_action == "DELETE")
         {
-            foreach(const ImageItem *im, *task)
+            foreach(ImagePtrK im, task->m_images)
             {
-                if (m_tempDir.remove(im->m_thumbPath))
+                QString thumbnail = im->m_thumbPath;
+                if (!QDir::root().remove(thumbnail))
+                {
+                    LOG(VB_FILE, LOG_WARNING,
+                        QString("Failed to delete thumbnail %1").arg(thumbnail));
+                    continue;
+                }
+                LOG(VB_FILE, LOG_DEBUG,
+                    QString("Deleted thumbnail %1").arg(thumbnail));
 
-                    LOG(VB_FILE, LOG_DEBUG, objectName()
-                        + QString(": Deleted thumbnail %1")
-                        .arg(im->m_fileName));
-                else
-                    LOG(VB_FILE, LOG_WARNING, objectName()
-                        + QString(": Couldn't delete thumbnail %1")
-                        .arg(im->m_thumbPath));
+                // Clean up empty dirs
+                QString path = QFileInfo(thumbnail).path();
+                if (QDir::root().rmpath(path))
+                    LOG(VB_FILE, LOG_DEBUG,
+                        QString("Cleaned up path %1").arg(path));
             }
         }
-        else if (task->m_action == "DELETE_DIR")
+        else if (task->m_action == "MOVE")
         {
-            ImageList::const_iterator it = (*task).constEnd();
-            while (it != (*task).constBegin())
+            foreach(ImagePtrK im, task->m_images)
             {
-                ImageItem *im = *(--it);
+                // Build new thumb path
+                QString newThumbPath =
+                        m_dbfs.GetAbsThumbPath(m_dbfs.ThumbDir(im->m_device),
+                                               m_dbfs.ThumbPath(*im.data()));
 
-                if (m_tempDir.rmdir(im->m_thumbPath))
-
-                    LOG(VB_FILE, LOG_DEBUG, objectName()
-                        + QString(": Deleted thumbdir %1")
-                        .arg(im->m_fileName));
+                // Ensure path exists
+                if (QDir::root().mkpath(QFileInfo(newThumbPath).path())
+                        && QFile::rename(im->m_thumbPath, newThumbPath))
+                {
+                    LOG(VB_FILE, LOG_DEBUG, QString("Moved thumbnail %1 -> %2")
+                        .arg(im->m_thumbPath, newThumbPath));
+                }
                 else
-                    LOG(VB_FILE, LOG_WARNING, objectName()
-                        + QString(": Couldn't delete thumbdir %1")
-                        .arg(im->m_thumbPath));
+                {
+                    LOG(VB_FILE, LOG_WARNING,
+                        QString("Failed to rename thumbnail %1 -> %2")
+                        .arg(im->m_thumbPath, newThumbPath));
+                    continue;
+                }
+
+                // Clean up empty dirs
+                QString path = QFileInfo(im->m_thumbPath).path();
+                if (QDir::root().rmpath(path))
+                    LOG(VB_FILE, LOG_DEBUG,
+                        QString("Cleaned up path %1").arg(path));
             }
         }
         else
-            LOG(VB_FILE, LOG_ERR, objectName() + QString(": Unknown task %1")
-                .arg(task->m_action));
-
-        qDeleteAll(*task);
-        delete task;
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Unknown task %1").arg(task->m_action));
     }
 
     RunEpilog();
@@ -200,415 +239,267 @@ void ThumbThread::run()
 
 
 /*!
- \brief Rotates/reflects an image iaw its orientation
- \note Duplicates MythImage::Orientation
- \param im Image details
- \param image Image to be transformed
-*/
-void ThumbThread::Orientate(ImageItem *im, QImage &image)
-{
-    QMatrix matrix;
-    switch (im->m_orientation)
-    {
-    case 1: // If the image is in its original state
-        break;
-
-    case 2: // The image is horizontally flipped
-        image = image.mirrored(true, false);
-        break;
-
-    case 3: // The image is rotated 180°
-        matrix.rotate(180);
-        image = image.transformed(matrix, Qt::SmoothTransformation);
-        break;
-
-    case 4: // The image is vertically flipped
-        image = image.mirrored(false, true);
-        break;
-
-    case 5: // The image is transposed (flipped horizontally, then rotated 90° CCW)
-        matrix.rotate(90);
-        image = image.transformed(matrix, Qt::SmoothTransformation);
-        image = image.mirrored(true, false);
-        break;
-
-    case 6: // The image is rotated 90° CCW
-        matrix.rotate(90);
-        image = image.transformed(matrix, Qt::SmoothTransformation);
-        break;
-
-    case 7: // The image is transversed (flipped horizontally, then rotated 90° CW)
-        matrix.rotate(270);
-        image = image.transformed(matrix, Qt::SmoothTransformation);
-        image = image.mirrored(true, false);
-        break;
-
-    case 8: // The image is rotated 90° CW
-        matrix.rotate(270);
-        image = image.transformed(matrix, Qt::SmoothTransformation);
-        break;
-
-    default:
-        break;
-    }
-}
-
-/*!
- \brief  Creates a picture thumbnail with the correct size and rotation
- \param  im The image
-*/
-void ThumbThread::CreateImageThumbnail(ImageItem *im)
-{
-    QString imagePath = m_sg->GetFilePath(im);
-
-    if (!im->m_path.isEmpty())
-        m_thumbDir.mkpath(im->m_path);
-
-    // Absolute path of the BE thumbnail
-    QString thumbPath = m_tempDir.absoluteFilePath(im->m_thumbPath);
-
-    QImage image;
-    if (!image.load(imagePath))
-    {
-        LOG(VB_FILE, LOG_ERR, QString("%1: Failed to open image %2")
-            .arg(objectName(), imagePath));
-        return;
-    }
-
-    // Resize & orientate now to optimise load/display time by FE's
-    image = image.scaled(QSize(240,180), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    Orientate(im, image);
-
-    // create the thumbnail
-    if (image.save(thumbPath))
-
-        LOG(VB_FILE, LOG_INFO, QString("%1: Created thumbnail for %2")
-            .arg(objectName(), imagePath));
-    else
-        LOG(VB_FILE, LOG_ERR, QString("%1: Failed to create thumbnail for %2")
-            .arg(objectName(), imagePath));
-}
-
-
-/*!
- \brief  Creates a video preview image with the correct size using mythpreviewgen
- \param  im The image
-*/
-void ThumbThread::CreateVideoThumbnail(ImageItem *im)
-{
-    QString videoPath = m_sg->GetFilePath(im);
-
-    if (!im->m_path.isEmpty())
-        m_thumbDir.mkpath(im->m_path);
-
-    // Absolute path of the BE thumbnail
-    QString thumbPath = m_tempDir.absoluteFilePath(im->m_thumbPath);
-
-    QString cmd = "mythpreviewgen";
-    QStringList args;
-    args << logPropagateArgs.split(" ", QString::SkipEmptyParts);
-    args << "--size 320x240"; // Video thumbnails are shown in slideshow
-    args << "--infile"  << QString("\"%1\"").arg(videoPath);
-    args << "--outfile" << QString("\"%1\"").arg(thumbPath);
-
-    MythSystemLegacy ms(cmd, args, kMSRunShell);
-    ms.SetDirectory(m_thumbDir.absolutePath());
-    ms.Run();
-
-    // If the process exited successful
-    // then try to load the thumbnail
-    if (ms.Wait() != GENERIC_EXIT_OK)
-    {
-        LOG(VB_FILE, LOG_ERR, QString("%1: Preview Generator failed for %2")
-            .arg(objectName(), videoPath));
-        return;
-    }
-
-    QImage image;
-    if (image.load(thumbPath))
-    {
-        Orientate(im, image);
-
-        image.save(thumbPath);
-
-        LOG(VB_FILE, LOG_INFO, QString("%1: Created thumbnail for %2")
-            .arg(objectName(), videoPath));
-    }
-    else
-        LOG(VB_FILE, LOG_ERR, QString("%1: Failed to create thumbnail for %2")
-            .arg(objectName(), videoPath));
-}
-
-
-/*!
- \brief Queues a Create request
- \param task The request
+ \brief Generate thumbnail for an image
+ \param im Image
+ \param int priority
  */
-void ThumbThread::QueueThumbnails(ThumbTask *task)
+template <class DBFS>
+QString ThumbThread<DBFS>::CreateThumbnail(ImagePtrK im, int thumbPriority)
 {
-    // null tasks will terminate the thread prematurely
-    if (task)
+    if (QDir::root().exists(im->m_thumbPath))
     {
-        QMutexLocker locker(&m_mutex);
-        m_thumbQueue.value(task->m_priority)->append(task);
-
-        // restart if not already running
-        if (!this->isRunning())
-            this->start();
+        LOG(VB_FILE, LOG_DEBUG,  QString("[%3] %2 already exists")
+            .arg(im->m_thumbPath).arg(thumbPriority));
+        return QString(); // Notify anyway
     }
-}
 
+    // Local filenames are always absolute
+    // Remote filenames are absolute from the scanner only
+    // UI requests (derived from Db) are relative
+    QString imagePath = m_dbfs.GetAbsFilePath(im);
+    if (imagePath.isEmpty())
+        return QString("Empty image path: %1").arg(im->m_filePath);
 
-/*!
- \brief Return size of a specific queue
- \param priority The queue of interest
- \return int Number of requests pending
-*/
-int ThumbThread::GetQueueSize(ImageThumbPriority priority)
-{
-    QMutexLocker locker(&m_mutex);
-    ThumbQueue *thumbQueue = m_thumbQueue.value(priority);
+    // Ensure path exists
+    QDir::root().mkpath(QFileInfo(im->m_thumbPath).path());
 
-    if (thumbQueue)
-        return m_thumbQueue.value(priority)->size();
-
-    return 0;
-}
-
-
-/*!
- \brief Clears thumbnail cache
-*/
-void ThumbThread::ClearThumbnails()
-{
-    LOG(VB_FILE, LOG_INFO, objectName() + ": Removing all thumbnails");
-
-    // Clear all queues & wait for generator thread to terminate
-    cancel();
-    wait();
-
-    // Remove all thumbnails
-    RemoveDirContents(m_thumbDir.absolutePath());
-}
-
-
-/*!
- \brief Clears all files and sub-dirs within a directory
- \param dirName Dir to clear
- \return bool True on success
-*/
-bool ThumbThread::RemoveDirContents(QString dirName)
-{
-    // Delete all files
-    QDir dir = QDir(dirName);
-    bool result = true;
-
-    foreach(const QFileInfo &info, dir.entryInfoList(QDir::AllEntries
-                                                     | QDir::NoDotAndDotDot))
+    QImage image;
+    if (im->m_type == kImageFile)
     {
-        if (info.isDir())
+        if (!image.load(imagePath))
+            return QString("Failed to open image %1").arg(imagePath);
+
+        // Resize to optimise load/display time by FE's
+        image = image.scaled(QSize(240,180), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    }
+    else if (im->m_type == kVideoFile)
+    {
+        // Run Preview Generator in foreground
+        QString cmd = GetAppBinDir() + MYTH_APPNAME_MYTHPREVIEWGEN;
+        QStringList args;
+        args << "--size 320x240"; // Video thumbnails are also shown in slideshow
+        args << QString("--infile '%1'").arg(imagePath);
+        args << QString("--outfile '%1'").arg(im->m_thumbPath);
+
+        MythSystemLegacy ms(cmd, args,
+                            kMSRunShell           |
+                            kMSDontBlockInputDevs |
+                            kMSDontDisableDrawing |
+                            kMSProcessEvents      |
+                            kMSAutoCleanup        |
+                            kMSPropagateLogs);
+        ms.SetNice(10);
+        ms.SetIOPrio(7);
+        ms.Run(30);
+        if (ms.Wait() != GENERIC_EXIT_OK)
         {
-            RemoveDirContents(info.absoluteFilePath());
-            result = dir.rmdir(info.absoluteFilePath());
+            LOG(VB_GENERAL, LOG_ERR,  QString("Failed to run %2 %3")
+                .arg(cmd, args.join(" ")));
+            return QString("Preview Generator failed for %1").arg(imagePath);
         }
-        else
-            result = QFile::remove(info.absoluteFilePath());
 
-        if (!result)
-            LOG(VB_FILE, LOG_ERR, QString("%1: Can't delete %2")
-                .arg(objectName(), info.absoluteFilePath()));
+        if (!image.load(im->m_thumbPath))
+            return QString("Failed to open preview %1").arg(im->m_thumbPath);
     }
-    return result;
+    else
+        return QString("Can't create thumbnail for type %1 (image %2)")
+                .arg(im->m_type).arg(imagePath);
+
+    int orientBy = Orientation(im->m_orientation).GetCurrent();
+
+    // Orientate now to optimise load/display time - no orientation
+    // is required when displaying thumbnails
+    image = Orientation::ApplyExifOrientation(image, orientBy);
+
+    // Create the thumbnail
+    if (!image.save(im->m_thumbPath))
+        return QString("Failed to create thumbnail %1").arg(im->m_thumbPath);
+
+    LOG(VB_FILE, LOG_INFO,  QString("[%2] Created %1")
+        .arg(im->m_thumbPath).arg(thumbPriority));
+    return QString();
 }
 
 
 /*!
- \brief Clears all queues so that the thread can terminate.
-*/
-void ThumbThread::cancel()
+  \brief Pauses or restarts processing of background tasks (scanner requests)
+ */
+template <class DBFS>
+void ThumbThread<DBFS>::PauseBackground(bool pause)
 {
-    // Clear all queues
     QMutexLocker locker(&m_mutex);
-    foreach(ThumbQueue *q, m_thumbQueue)
-    {
-        qDeleteAll(*q);
-        q->clear();
-    }
+    m_doBackground = !pause;
+
+    // restart if not already running
+    if (m_doBackground && !this->isRunning())
+        this->start();
 }
-
-
-//////////////////////////////////////////////////////////////////////////
-
-
-//! Thumbnail generator singleton
-ImageThumb* ImageThumb::m_instance = NULL;
 
 
 /*!
  \brief Constructor
-*/
-ImageThumb::ImageThumb()
-{
-    m_imageThumbThread = new ThumbThread("ImageThumbGen");
-    m_videoThumbThread = new ThumbThread("VideoThumbGen");
-}
+ */
+template <class DBFS>
+ImageThumb<DBFS>::ImageThumb(DBFS *const dbfs)
+    : m_dbfs(*dbfs),
+      m_imageThread(new ThumbThread<DBFS>("ImageThumbs", dbfs)),
+      m_videoThread(new ThumbThread<DBFS>("VideoThumbs", dbfs))
+{}
 
 
 /*!
  \brief Destructor
-*/
-ImageThumb::~ImageThumb()
+ \*/
+template <class DBFS>
+ImageThumb<DBFS>::~ImageThumb()
 {
-    delete m_imageThumbThread;
-    m_imageThumbThread = NULL;
-    delete m_videoThumbThread;
-    m_videoThumbThread = NULL;
+    delete m_imageThread;
+    delete m_videoThread;
+    m_imageThread = m_videoThread = NULL;
 }
 
 
 /*!
- \brief Get generator
- \return ImageThumb Generator singleton
+ \brief Clears thumbnails for a device
+ \param devId Device identity
+ \param deleteFiles If true, the device thumbnails will be deleted
+ \warning May block for several seconds
 */
-ImageThumb* ImageThumb::getInstance()
+template <class DBFS>
+void ImageThumb<DBFS>::ClearThumbs(int devId, const QString &action)
 {
-    if (!m_instance)
-        m_instance = new ImageThumb();
+    // Cancel pending requests for the device
+    // Waits for current generator task to complete
+    if (m_imageThread)
+        m_imageThread->AbortDevice(devId, action);
+    if (m_videoThread)
+        m_videoThread->AbortDevice(devId, action);
 
-    return m_instance;
+    // Remove devices now they are not in use
+    QStringList mountPaths = m_dbfs.CloseDevices(devId, action);
+//    if (mountPaths.isEmpty())
+//        return;
+
+    // Generate file & thumbnail urls (as per image cache) of mountpoints
+    QStringList mesg;
+    foreach (const QString &mount, mountPaths)
+        mesg << m_dbfs.MakeFileUrl(mount)
+             << m_dbfs.MakeThumbUrl(mount);
+
+    // Notify clients to clear cache
+    m_dbfs.Notify("IMAGE_DEVICE_CHANGED", mesg);
 }
 
 
 /*!
- \brief Return size of specific queue
- \param priority Queue of interest
- \return int Number of requests pending
-*/
-int ImageThumb::GetQueueSize(ImageThumbPriority priority)
-{
-    // Ignore video thread
-    if (m_imageThumbThread)
-        return m_imageThumbThread->GetQueueSize(priority);
-    return 0;
-}
-
-
-/*!
- \brief Clears thumbnail cache, blocking until generator thread terminates
-*/
-void ImageThumb::ClearAllThumbs()
-{
-    // Image task will clear videos as well
-    if (m_imageThumbThread)
-        m_imageThumbThread->ClearThumbnails();
-}
-
-
-/*!
- \brief Creates thumbnails on-demand from clients
- \details Display requests are the highest priority. Thumbnails required for an image
-node will be created before those that are part of a directory thumbnail.
-A THUMBNAIL_CREATED event is broadcast for each image.
- \param imList List of images requiring thumbnails
-*/
-void ImageThumb::HandleCreateThumbnails(QStringList imList)
-{
-    if (imList.size() != 2)
-        return;
-
-    bool isForFolder = imList[1].toInt();
-
-    // get specific image details from db
-    ImageList images;
-    ImageDbWriter db;
-    db.ReadDbItemsById(images, imList[0]);
-
-    foreach (ImageItem *im, images)
-    {
-        ImageThumbPriority priority = isForFolder
-                ? kFolderRequestPriority : kPicRequestPriority;
-
-        // notify clients when done; highest priority
-
-        if (im->m_type == kVideoFile)
-        {
-            ThumbTask *task = new ThumbTask("CREATE", im, priority, true);
-
-            if (m_videoThumbThread)
-                m_videoThumbThread->QueueThumbnails(task);
-        }
-        else if (im->m_type == kImageFile)
-        {
-            ThumbTask *task = new ThumbTask("CREATE", im, priority, true);
-
-            if (m_imageThumbThread)
-                m_imageThumbThread->QueueThumbnails(task);
-        }
-    }
-}
-
-
-/*!
- \brief Remove thumbnails from cache
+ \brief Remove specific thumbnails
  \param images List of obselete images
- \param dirs List of obselete dirs
- \return QStringList Csv list of deleted ids, empty (no modified ids), csv list of
- deleted thumbnail and image urls (compatible with FE cache)
+ \return QString Csv list of deleted ids
 */
-QStringList ImageThumb::DeleteThumbs(ImageList images, ImageList dirs)
+template <class DBFS>
+QString ImageThumb<DBFS>::DeleteThumbs(const ImageList &images)
 {
     // Determine affected images and redundant images/thumbnails
-    QStringList mesg = QStringList(""); // Empty item (no modified ids)
     QStringList ids;
-    ImageSg *isg = ImageSg::getInstance();
 
-    foreach (const ImageItem *im, images)
+    // Pictures & videos are deleted by their own threads
+    ImageListK pics, videos;
+    foreach (ImagePtrK im, images)
     {
+        if (im->m_type == kVideoFile)
+            videos.append(im);
+        else
+            pics.append(im);
+
         ids << QString::number(im->m_id);
-        // Remove thumbnail
-        mesg << isg->GenerateThumbUrl(im->m_thumbPath);
-        // Remove cached image
-        mesg << isg->GenerateUrl(im->m_fileName);
     }
-    // Insert deleted ids at front
-    mesg.insert(0, ids.join(","));
 
-    if (!m_imageThumbThread)
-        return QStringList();
-
-    // FIXME: Video thread could be affected
-    if (!images.isEmpty())
-        // Delete BE thumbs with high priority to prevent future client
-        // requests from usurping the Delete and using the old thumbs.
-        // Thumb generator now owns the image objects
-        m_imageThumbThread->QueueThumbnails(new ThumbTask("DELETE",
-                                                          images,
-                                                          kPicRequestPriority));
-    if (!dirs.isEmpty())
-        // Clean up thumbdirs as low priority
-        m_imageThumbThread->QueueThumbnails(new ThumbTask("DELETE_DIR", dirs));
-
-    return mesg;
+    if (!pics.isEmpty() && m_imageThread)
+        m_imageThread->Enqueue(TaskPtr(new ThumbTask("DELETE", pics)));
+    if (!videos.isEmpty() && m_videoThread)
+        m_videoThread->Enqueue(TaskPtr(new ThumbTask("DELETE", videos)));
+    return ids.join(",");
 }
 
 
 /*!
- \brief Creates thumbnails for new images/dirs detected by scanner
+ \brief Creates a thumbnail
+ \param im Image
+ \param priority Request priority
+ \param notify If true a THUMB_AVAILABLE event will be generated
+*/
+template <class DBFS>
+void ImageThumb<DBFS>::CreateThumbnail(const ImagePtrK &im, int priority,
+                                       bool notify)
+{
+    if (!im)
+        return;
+
+    // Allocate task a (hopefully) unique priority
+    if (priority == kBackgroundPriority)
+        priority = Priority(*im);
+
+    TaskPtr task(new ThumbTask("CREATE", im, priority, notify));
+
+    if (im->m_type == kImageFile && m_imageThread)
+
+        m_imageThread->Enqueue(task);
+
+    else if (im->m_type == kVideoFile && m_videoThread)
+
+        m_videoThread->Enqueue(task);
+
+    else
+        LOG(VB_FILE, LOG_INFO, QString("Ignoring create thumbnail %1, type %2")
+            .arg(im->m_id).arg(im->m_type));
+}
+
+
+/*!
+ \brief Renames a thumbnail
  \param im Image
  \param priority Request priority
 */
-void ImageThumb::CreateThumbnail(ImageItem *im, ImageThumbPriority priority)
+template <class DBFS>
+void ImageThumb<DBFS>::MoveThumbnail(const ImagePtrK &im)
 {
-    ThumbTask *task = new ThumbTask("CREATE", im, priority);
+    if (!im)
+        return;
 
-    if (im->m_type == kVideoFile)
-    {
-        if (m_videoThumbThread)
-            m_videoThumbThread->QueueThumbnails(task);
-    }
-    else if (im->m_type == kImageFile)
-    {
-        if (m_imageThumbThread)
-            m_imageThumbThread->QueueThumbnails(task);
-    }
+    TaskPtr task(new ThumbTask("MOVE", im));
+
+    if (im->m_type == kImageFile && m_imageThread)
+
+        m_imageThread->Enqueue(task);
+
+    else if (im->m_type == kVideoFile && m_videoThread)
+
+        m_videoThread->Enqueue(task);
+
+    else
+        LOG(VB_FILE, LOG_INFO, QString("Ignoring move thumbnail %1, type %2")
+            .arg(im->m_id).arg(im->m_type));
 }
+
+
+/*!
+  \brief Pauses or restarts processing of background tasks (scanner requests)
+ */
+template <class DBFS>
+void ImageThumb<DBFS>::PauseBackground(bool pause)
+{
+    LOG(VB_FILE, LOG_INFO,  QString("Paused %1").arg(pause));
+
+    if (m_imageThread)
+        m_imageThread->PauseBackground(pause);
+    if (m_videoThread)
+        m_videoThread->PauseBackground(pause);
+}
+
+
+// Must define the valid template implementations to generate code for the
+// instantiations (as they are defined in the cpp rather than header).
+// Otherwise the linker will fail with undefined references...
+#include "imagemanager.h"
+template class ImageThumb<ImageDbLocal>;
+template class ImageThumb<ImageDbSg>;

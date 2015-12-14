@@ -4,51 +4,25 @@
 
     <window name="gallery">
 
-        <!--Shows scan progress-->
-        <progressbar name="scanprogressbar" from="baseprogressbar">
-            <area>25%,5,50%,40</area>
-            <imagetype name="background">
-                <area>0,0,100%,100%</area>
-            </imagetype>
-            <imagetype name="progressimage">
-                <area>0,0,100%,100%</area>
-            </imagetype>
-        </progressbar>
-
-        <!--Shows numerical scan progress-->
-        <textarea name="scanprogresstext" from="basetextarea">
-            <area>25%,10,50%,30</area>
-            <align>center</align>
-        </textarea>
-
         <!--shows path to current image -->
         <textarea name="breadcrumbs" from="basetextarea">
-            <area>20,5,70%,30</area>
+            <area>15,5,100%-170,30</area>
             <font>title</font>
-            <cutdown>yes</cutdown>
+            <cutdown>no</cutdown>
+            <scroll direction="horizontal" startdelay="0" returndelay="0"/>
         </textarea>
 
         <!-- shows the name of the folder or image -->
         <textarea name="caption" from="basetextarea">
-            <area>20,30,70%,30</area>
-            <cutdown>yes</cutdown>
+            <area>15,30,100%-100,30</area>
             <font>title</font>
-            <align>left</align>
-        </textarea>
-
-        <!-- shows state of hidden filter -->
-        <textarea name="hidefilter" from="basetextarea">
-            <area>65%,5,120,30</area>
-        </textarea>
-
-        <!-- shows state of type filter -->
-        <textarea name="typefilter" from="basetextarea">
-            <area>75%,5,130,30</area>
+            <cutdown>no</cutdown>
+            <scroll direction="horizontal" startdelay="0" returndelay="0"/>
         </textarea>
 
         <!-- shows current position in grid eg '1/123' -->
         <textarea name="position" from="basetextarea">
-            <area>100%-160,5,140,30</area>
+            <area>100%-170,5,155,30</area>
             <font>title</font>
             <align>right</align>
         </textarea>
@@ -154,6 +128,48 @@
             <drawfrombottom>true</drawfrombottom>
         </buttonlist>
 
+        <!--Shows scan progress-->
+        <group name="progress">
+            <area>0,0,100%,100%</area>
+            <animation trigger="AboutToShow">
+                <section duration="2000">
+                    <alpha start="0" end="255" easingcurve="OutQuad"/>
+                </section>
+            </animation>
+            <animation trigger="AboutToHide">
+                <section duration="2000">
+                    <alpha start="255" end="0" easingcurve="InQuad"/>
+                </section>
+            </animation>
+            <!-- Progress bar-->
+            <progressbar name="scanprogressbar" from="baseprogressbar">
+                <area>20%,100%-28,75%,28</area>
+                <imagetype name="background">
+                    <area>0,0,100%,100%</area>
+                </imagetype>
+                <imagetype name="progressimage">
+                    <area>0,0,100%,100%</area>
+                </imagetype>
+            </progressbar>
+            <!--Shows numerical scan progress-->
+            <textarea name="scanprogresstext" from="basetextarea">
+                <area>20%,100%-29,75%,30</area>
+                <align>center</align>
+            </textarea>
+        </group>
+
+        <!-- shows state of type filter -->
+        <textarea name="typefilter" from="basetextarea">
+            <area>15,100%-29,180,30</area>
+            <align>vcenter</align>
+        </textarea>
+
+        <!-- shows state of hidden filter -->
+        <textarea name="hidefilter" from="basetextarea">
+            <area>100%-180,100%-29,165,30</area>
+            <align>vcenter,right</align>
+        </textarea>
+
     </window>
 
     <!-- Gallery Slideshow window which shows the a single image only or a slideshow. -->
@@ -185,7 +201,7 @@
 
         <!-- End/Loading/Failed to load status -->
         <textarea name="status" from="basetextarea" depends="!hidecaptions">
-            <area>10,0,400,30</area>
+            <area>10,0,100%-200,30</area>
             <font>gallerytext</font>
         </textarea>
 
@@ -196,11 +212,13 @@
             <align>right, vcentre</align>
         </textarea>
 
-        <!-- Name/date/Comment -->
+        <!-- Date/Comment -->
         <textarea name="caption" from="basetextarea" depends="!hidecaptions">
-            <area>10,100%-30,100%-20,30</area>
+            <area>10,100%-28,100%-20,30</area>
             <font>gallerytext</font>
             <align>centre, vcentre</align>
+            <cutdown>no</cutdown>
+            <scroll direction="horizontal"/>
         </textarea>
 
       <!-- Shows file info overlay -->

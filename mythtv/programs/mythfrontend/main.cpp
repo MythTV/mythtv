@@ -810,6 +810,39 @@ static void handleDVDMedia(MythMediaDevice *dvd)
     }
 }
 
+static void handleGalleryMedia(MythMediaDevice *dev)
+{
+    // Only handle events for media that are newly mounted
+    if (!dev || (dev->getStatus() != MEDIASTAT_MOUNTED
+                  && dev->getStatus() != MEDIASTAT_USEABLE))
+        return;
+
+    // Check if gallery is already running
+    QVector<MythScreenType*> screens;
+    GetMythMainWindow()->GetMainStack()->GetScreenList(screens);
+
+    QVector<MythScreenType*>::const_iterator it    = screens.begin();
+    QVector<MythScreenType*>::const_iterator itend = screens.end();
+
+    for (; it != itend; ++it)
+    {
+        if (dynamic_cast<GalleryThumbView*>(*it))
+        {
+            // Running gallery will receive this event later
+            LOG(VB_MEDIA, LOG_INFO, "Main: Ignoring new gallery media - already running");
+            return;
+        }
+    }
+
+    if (gCoreContext->GetNumSetting("GalleryAutoLoad", 0))
+    {
+        LOG(VB_GUI, LOG_INFO, "Main: Autostarting Gallery for new media");
+        GetMythMainWindow()->JumpTo(JUMP_GALLERY_DEFAULT);
+    }
+    else
+        LOG(VB_MEDIA, LOG_INFO, "Main: Ignoring new gallery media - autorun not set");
+}
+
 static void TVMenuCallback(void *data, QString &selection)
 {
     (void)data;
@@ -1364,6 +1397,11 @@ static void InitJumpPoints(void)
      REG_JUMP("Play Disc", QT_TRANSLATE_NOOP("MythControls",
          "Play an Optical Disc"), "", playDisc);
 
+     // Gallery
+
+     REG_JUMP(JUMP_GALLERY_DEFAULT, QT_TRANSLATE_NOOP("MythControls",
+         "Image Gallery"), "", RunGallery);
+
      REG_JUMPEX(QT_TRANSLATE_NOOP("MythControls", "Toggle Show Widget Borders"),
          "", "", setDebugShowBorders, false);
      REG_JUMPEX(QT_TRANSLATE_NOOP("MythControls", "Toggle Show Widget Names"),
@@ -1371,11 +1409,6 @@ static void InitJumpPoints(void)
      REG_JUMPEX(QT_TRANSLATE_NOOP("MythControls", "Reset All Keys"),
          QT_TRANSLATE_NOOP("MythControls", "Reset all keys to defaults"),
          "", resetAllKeys, false);
-
-     // Gallery
-
-     REG_JUMP(JUMP_GALLERY_DEFAULT, QT_TRANSLATE_NOOP("MythControls",
-         "The Gallery Default View"), "", RunGallery);
 }
 
 static void ReloadJumpPoints(void)
@@ -1403,12 +1436,8 @@ static void InitKeys(void)
          "Display Item Detail Popup"), "");
 
      // Gallery keybindings
-     REG_KEY("Images", "SLIDESHOW", QT_TRANSLATE_NOOP("MythControls",
-         "Start Slideshow"), "P");
-     REG_KEY("Images", "PAUSE", QT_TRANSLATE_NOOP("MythControls",
-         "Pause Slideshow"), "Ctrl+P");
-     REG_KEY("Images", "STOP", QT_TRANSLATE_NOOP("MythControls",
-         "Stop Slideshow"), "Alt+P");
+     REG_KEY("Images", "PLAY", QT_TRANSLATE_NOOP("MythControls",
+         "Start/Stop Slideshow"), "P");
      REG_KEY("Images", "RECURSIVESHOW", QT_TRANSLATE_NOOP("MythControls",
          "Start Recursive Slideshow"), "R");
      REG_KEY("Images", "ROTRIGHT", QT_TRANSLATE_NOOP("MythControls",
@@ -1496,6 +1525,17 @@ static int internal_media_init()
     REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
         "MythDVD DVD Media Handler"), "", "", handleDVDMedia,
         MEDIATYPE_DVD, QString::null);
+    REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
+        "MythImage Media Handler 1/2"), "", "", handleGalleryMedia,
+        MEDIATYPE_DATA | MEDIATYPE_MIXED, QString::null);
+
+    QStringList extensions;
+    foreach (const QByteArray &ext, QImageReader::supportedImageFormats())
+        extensions << QString(ext);
+
+    REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
+        "MythImage Media Handler 2/2"), "", "", handleGalleryMedia,
+        MEDIATYPE_MGALLERY, extensions.join(","));
     return 0;
 }
 

@@ -1,14 +1,144 @@
 #include "gallerythumbview.h"
 
-#include <QFileInfo>
+#include <unistd.h> // for usleep
 
-#include <mythcontext.h>
-#include <mythscreentype.h>
-#include <mythuimultifilebrowser.h>
-#include <mythuiprogressbar.h>
-#include <imageutils.h>
+#include <QApplication>
+
+#include "mythuitext.h"
+#include "mythprogressdialog.h"
+#include "mythuiprogressbar.h"
+#include "remotefile.h"
+#include "mythsystemlegacy.h"
+#include "mythdialogbox.h"
 
 #include "galleryconfig.h"
+
+#define LOC QString("Thumbview: ")
+
+
+//! Worker thread for running import
+class ShellThread: public MThread
+{
+public:
+    ShellThread(QString cmd, QString path)
+        : MThread("Import"), m_result(0), m_command(cmd), m_path(path) {}
+
+    int GetResult(void) { return m_result; }
+
+    virtual void run()
+    {
+        RunProlog();
+
+        QString cmd = QString("cd %1 && %2").arg(m_path, m_command);
+        LOG(VB_GENERAL, LOG_INFO, QString("Executing \"%1\"").arg(cmd));
+
+        m_result = myth_system(cmd);
+
+        LOG(VB_GENERAL, LOG_INFO, QString(" ...with result %1").arg(m_result));
+
+        RunEpilog();
+    }
+
+private:
+    int     m_result;
+    QString m_command;
+    QString m_path;
+};
+
+
+//! Worker thread for copying/moving files
+class TransferThread : public MThread
+{
+    Q_DECLARE_TR_FUNCTIONS(FileTransferWorker)
+public:
+    typedef QMap<ImagePtrK, QString> TransferMap;
+    typedef QSet<ImagePtrK> ImageSet;
+
+    TransferThread(const TransferMap &files, bool move, MythUIProgressDialog *dialog)
+        : MThread("FileTransfer"),
+          m_move(move), m_files(files), m_failed(), m_dialog(dialog) {}
+
+    ImageSet GetResult(void) { return m_failed; }
+
+    virtual void run()
+    {
+        RunProlog();
+
+        QString action = m_move ? tr("Moving") : tr("Copying");
+
+        // Sum file sizes
+        int total = 0;
+        foreach (ImagePtrK im, m_files.keys())
+            total += im->m_size;
+
+        int progressSize = 0;
+        foreach (ImagePtrK im, m_files.keys())
+        {
+            // Update progress dialog
+            if (m_dialog)
+            {
+                QString message = QString("%1 %2\n%3")
+                        .arg(action, QFileInfo(im->m_url).fileName(),
+                             ImageAdapterBase::FormatSize(im->m_size / 1024));
+
+                ProgressUpdateEvent *pue =
+                        new ProgressUpdateEvent(progressSize, total, message);
+                QApplication::postEvent(m_dialog, pue);
+            }
+
+            QString newPath = m_files.value(im);
+            LOG(VB_FILE, LOG_INFO, QString("%2 %3 -> %4")
+                .arg(action, im->m_url, newPath));
+
+            bool success = m_move ? RemoteFile::MoveFile(im->m_url, newPath)
+                                  : RemoteFile::CopyFile(im->m_url, newPath,
+                                                         false, true);
+            if (!success)
+            {
+                // Flag failures
+                m_failed.insert(im);
+
+                LOG(VB_GENERAL, LOG_ERR,
+                    QString("%1: Failed to copy/move %2 -> %3")
+                    .arg(objectName(), im->m_url, m_files[im]));
+            }
+
+            progressSize += im->m_size;
+        }
+
+        // Update progress dialog
+        if (m_dialog)
+        {
+            ProgressUpdateEvent *pue =
+                    new ProgressUpdateEvent(progressSize, total, tr("Complete"));
+            QApplication::postEvent(m_dialog, pue);
+        }
+
+        RunEpilog();
+    }
+
+private:
+    bool                  m_move;   //!< Copy if false, Move if true
+    TransferMap           m_files;  //!< Maps source filepath to destination filepath
+    ImageSet              m_failed; //! Images for which copy/move failed
+    MythUIProgressDialog *m_dialog; //!< Progress dialog for transfer
+};
+
+
+/*!
+ \brief Runs a worker thread and waits for it to finish
+ \param worker Thread to execute
+*/
+static void WaitUntilDone(MThread &worker)
+{
+    worker.start();
+    while (!worker.isFinished())
+    {
+        usleep(1000);
+        qApp->processEvents();
+    }
+}
+
 
 /*!
  *  \brief  Constructor
@@ -17,51 +147,53 @@
  */
 GalleryThumbView::GalleryThumbView(MythScreenStack *parent, const char *name)
     : MythScreenType(parent, name),
-    m_imageList(NULL),
-    m_captionText(NULL),
-    m_crumbsText(NULL),
-    m_hideFilterText(NULL),
-    m_typeFilterText(NULL),
-    m_positionText(NULL),
-    m_emptyText(NULL),
-    m_scanProgressText(NULL),
-    m_scanProgressBar(NULL),
-    m_scanInProgress(false),
-    m_zoomLevel(0),
-    m_infoList(NULL),
-    m_editsAllowed(false),
-    m_deleteAfterImport(false),
-    m_importTmp(NULL)
+      m_imageList(NULL),
+      m_captionText(NULL),      m_crumbsText(NULL),     m_emptyText(NULL),
+      m_hideFilterText(NULL),   m_typeFilterText(NULL), m_positionText(NULL),
+      m_scanProgressText(NULL), m_scanProgressBar(NULL),
+      m_zoomWidgets(),          m_zoomLevel(0),
+      m_popupStack(*GetMythMainWindow()->GetStack("popup stack")),
+      m_mgr(ImageManagerFe::getInstance()),
+      // This screen uses a single fixed view (Parent dir, ordered dirs, ordered images)
+      m_view(new DirectoryView(kOrdered)),
+      m_infoList(*this),
+      m_scanProgress(),         m_scanActive(),         m_menuState(),
+      m_pendingMap(),           m_thumbExists(),
+      // Start in edit mode unless a password exists
+      m_editsAllowed(gCoreContext->GetSetting("GalleryPassword").isEmpty())
 {
-    // Handles BE messages for all views
-    gCoreContext->addListener(this);
-
-    m_popupStack = GetMythMainWindow()->GetStack("popup stack");
-    m_mainStack  = GetMythMainWindow()->GetMainStack();
-
-    // Filter db reads using current settings
-    m_db = new ImageDbReader(gCoreContext->GetNumSetting("GallerySortOrder"),
-                             gCoreContext->GetNumSetting("GalleryShowHidden"),
-                             gCoreContext->GetNumSetting("GalleryShowType"));
-
-    // This screen uses a single fixed view (Parent dir, ordered dirs, ordered images)
-    m_view = new DirectoryView(kOrdered, m_db);
-
-    m_menuState.Clear();
+    // Hide hidden when edits disallowed
+    if (!m_editsAllowed)
+        m_mgr.SetVisibility(false);
 }
 
 
 /*!
- *  \brief  Destructor
+ \brief  Destructor
  */
 GalleryThumbView::~GalleryThumbView()
 {
+    LOG(VB_GUI, LOG_DEBUG, LOC + "Exiting Gallery");
+    delete m_view;
+}
+
+
+/*!
+ \brief Exit Gallery
+*/
+void GalleryThumbView::Close()
+{
+    LOG(VB_GUI, LOG_DEBUG, LOC + "Closing Gallery");
+
     gCoreContext->removeListener(this);
 
-    delete m_view;
-    delete m_db;
-    delete m_infoList;
-    delete m_importTmp;
+    // Cleanup local devices
+    m_mgr.CloseDevices();
+
+    // Cleanup view
+    m_view->Clear();
+
+    MythScreenType::Close();
 }
 
 
@@ -91,17 +223,16 @@ bool GalleryThumbView::Create()
 
     if (m_zoomWidgets.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_ERR, "Thumbview: Screen 'Gallery' is missing 'images0'");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Screen 'Gallery' is missing 'images0'");
         return false;
     }
-    LOG(VB_GUI, LOG_DEBUG, QString("Thumbview: Screen 'Gallery' found %1 zoom levels")
+    LOG(VB_GUI, LOG_DEBUG, LOC + QString("Screen 'Gallery' found %1 zoom levels")
         .arg(m_zoomWidgets.size()));
 
     // File details list is managed elsewhere
-    m_infoList = InfoList::Create(this, false, tr("Not defined"));
-    if (!m_infoList)
+    if (!m_infoList.Create(false))
     {
-        LOG(VB_GENERAL, LOG_ERR, "Slideview: Cannot load screen 'Gallery'");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Cannot load 'Info buttonlist'");
         return false;
     }
 
@@ -124,9 +255,6 @@ bool GalleryThumbView::Create()
     // Initialise list widget with appropriate zoom level for this theme.
     m_zoomLevel = gCoreContext->GetNumSetting("GalleryZoomLevel", 0);
     SelectZoomWidget(0);
-
-    // Start in edit mode unless a password exists
-    m_editsAllowed = gCoreContext->GetSetting("GalleryPassword").isEmpty();
 
     return true;
 }
@@ -165,26 +293,32 @@ bool GalleryThumbView::keyPressEvent(QKeyEvent *event)
             FlipHorizontal();
         else if (action == "FLIPVERTICAL")
             FlipVertical();
-        else if (action == "SLIDESHOW")
+        else if (action == "PLAY")
             Slideshow();
         else if (action == "RECURSIVESHOW")
-            RecursiveSlideshow();
+        {
+            ImagePtrK im = m_view->GetSelected();
+            if (im && im->IsDirectory())
+                RecursiveSlideshow();
+        }
         else if (action == "MARK")
         {
-            ImageItem *im = m_view->GetSelected();
-            if (im && m_editsAllowed)
+            ImagePtrK im = m_view->GetSelected();
+            if (m_editsAllowed && im && im != m_view->GetParent())
                 MarkItem(!m_view->IsMarked(im->m_id));
         }
         else if (action == "ESCAPE" && !GetMythMainWindow()->IsExitingToMain())
         {
             // Exit info list, if shown
-            handled = m_infoList->Hide();
+            handled = m_infoList.Hide();
 
-            // Ascend the tree if first node is an kUpDirectory
+            // Ascend the tree unless parent is root,
+            // or a device and multiple devices/imports exist
             if (!handled)
             {
-                ImageItem *data = m_view->GetParent();
-                if (data && data->m_type == kUpDirectory)
+                ImagePtrK node = m_view->GetParent();
+                if (node && node->m_id != GALLERY_DB_ID
+                        && (!node->IsDevice() || m_mgr.DeviceCount() > 0))
                     handled = DirSelectUp();
             }
         }
@@ -205,112 +339,104 @@ bool GalleryThumbView::keyPressEvent(QKeyEvent *event)
  */
 void GalleryThumbView::customEvent(QEvent *event)
 {
+
     if ((MythEvent::Type)(event->type()) == MythEvent::MythEventMessage)
     {
-        MythEvent *me      = (MythEvent *)event;
-        QString    message = me->Message();
-
+        MythEvent  *me    = (MythEvent *)event;
+        QString     mesg  = me->Message();
         QStringList extra = me->ExtraDataList();
 
-        if (message == "THUMB_AVAILABLE")
+        // Internal messages contain a hostname. Ignore other FE messages
+        QStringList token = mesg.split(' ');
+        if (token.size() >= 2 && token[1] != gCoreContext->GetHostName())
+            return;
+
+        if (token[0] == "IMAGE_METADATA")
         {
             int id = extra[0].toInt();
+            ImagePtrK selected = m_view->GetSelected();
+
+            if (selected && selected->m_id == id)
+                m_infoList.Display(*selected, extra.mid(1));
+        }
+        else if (token[0] == "THUMB_AVAILABLE")
+        {
+            int id = extra[0].toInt();
+
+            // Note existance of all thumbs
+            m_thumbExists.insert(id);
 
             // Get all buttons waiting for this thumbnail
             QList<ThumbLocation> affected = m_pendingMap.values(id);
 
-            // Thumbview is only concerned with thumbnails we've requested
-            if (!affected.isEmpty())
+            // Only concerned with thumbnails we've requested
+            if (affected.isEmpty())
+                return;
+
+            LOG(VB_GENERAL, LOG_DEBUG, LOC +
+                QString("Rx %1 : %2").arg(token[0], extra.join(",")));
+
+            // Thumb url was cached when request was sent
+            QString url = m_view->GetCachedThumbUrl(id);
+
+            // Set thumbnail for each button now it exists
+            foreach(const ThumbLocation &location, affected)
             {
-                LOG(VB_GENERAL, LOG_DEBUG,
-                    QString("Thumbview: Rx %1 : %2").arg(message, extra.join(",")));
+                MythUIButtonListItem *button = location.first;
+                int                   index  = location.second;
 
-                QString url = "";
-
-                // Set thumbnail for each button now it exists
-                foreach(const ThumbLocation &location, affected)
-                {
-                    MythUIButtonListItem *button = location.first;
-                    int index  = location.second;
-                    ImageItem *im = button->GetData().value<ImageItem*>();
-
-                    if (im)
-                    {
-                        // All buttons use the same url so only generate it once
-                        if (url.isEmpty())
-                            url = ImageSg::getInstance()->GenerateThumbUrl(im->m_thumbNails.at(index));
-
-                        UpdateThumbnail(button, im, url, index);
-                    }
-                }
-
-                // Cancel pending request & store url
-                m_pendingMap.remove(id);
-                m_url.insert(id, url);
+                ImagePtrK im = button->GetData().value<ImagePtrK>();
+                if (im)
+                    UpdateThumbnail(button, im, url, index);
             }
 
-            // Pass on to Slideshow
-            emit ThumbnailChanged(id);
+            // Cancel pending request
+            m_pendingMap.remove(id);
         }
-        else if (message == "IMAGE_DB_CHANGED")
+        else if (token[0] == "IMAGE_DB_CHANGED")
         {
-            // Expects either:
-            // "ALL" when db cleared, or
-            // csv list of deleted ids, csv list of changed ids,
-            // csv list of urls to remove from cache
-            LOG(VB_GENERAL, LOG_DEBUG,
-                QString("Thumbview: Rx %1 : %2").arg(message, extra.join(",")));
-
-            QStringList idDeleted, idChanged;
+            // Expects csv list of deleted ids, csv list of changed ids
+            LOG(VB_GENERAL, LOG_DEBUG, LOC +
+                QString("Rx %1 : %2").arg(token[0], extra.join(",")));
 
             if (!extra.isEmpty())
-                idDeleted = extra.takeFirst().split(",",  QString::SkipEmptyParts);
-            if (!extra.isEmpty())
-                idChanged = extra.takeFirst().split(",",  QString::SkipEmptyParts);
-
-            if (!idDeleted.isEmpty() && idDeleted[0] == "ALL")
             {
-                m_view->Clear();
-                m_url.clear();
+                QStringList idDeleted =
+                        extra[0].split(",", QString::SkipEmptyParts);
 
-                LOG(VB_FILE, LOG_DEBUG, "Thumbview: Clearing image cache");
-
-                // Remove all cached thumbnails
-                GetMythUI()->RemoveFromCacheByFile(QString("/%1/").arg(THUMBNAIL_DIR));
-                // Remove all cached images
-                GetMythUI()->RemoveFromCacheByFile(QString("//%1@").arg(IMAGE_STORAGE_GROUP));
+                RemoveImages(idDeleted);
             }
-            else
+            if (extra.size() >= 2)
             {
-                LOG(VB_FILE, LOG_DEBUG, QString("Thumbview: Removing %1- Updating %2")
-                    .arg(idDeleted.join(","), idChanged.join(",")));
-
-                // Reset image urls so that new thumbnails are requested
-                foreach (const QString &ident, idChanged)
-                    m_url.remove(ident.toInt());
-
-                // Cleanup image urls & marked files
-                foreach (const QString &ident, idDeleted)
-                {
-                    m_url.remove(ident.toInt());
-                    m_view->Mark(ident.toInt(), false);
-                }
-
-                // Remove cached thumbs & images
-                foreach(const QString &url, extra)
-                    GetMythUI()->RemoveFromCacheByFile(url);
+                QStringList idChanged =
+                        extra[1].split(",", QString::SkipEmptyParts);
+                RemoveImages(idChanged, false);
             }
 
             // Refresh display
-            LoadData();
+            LoadData(m_view->GetParentId());
         }
-        else if (message == "IMAGE_SCAN_STATUS")
+        else if (token[0] == "IMAGE_DEVICE_CHANGED")
         {
-            // Expects mode, scanned#, total#
-            if (extra.size() == 3)
-            {
-                UpdateScanProgress(extra[0], extra[1], extra[2]);
-            }
+            // Expects list of url prefixes
+            LOG(VB_GENERAL, LOG_DEBUG, LOC +
+                QString("Rx %1 : %2").arg(token[0], extra.join(",")));
+
+            // Clear everything. Local devices will be rebuilt
+            m_view->Clear();
+            m_thumbExists.clear();
+
+            // Remove thumbs & images from image cache using supplied prefixes
+            foreach(const QString &url, extra)
+                GetMythUI()->RemoveFromCacheByFile(url);
+
+            // Refresh display
+            LoadData(m_view->GetParentId());
+        }
+        else if (token[0] == "IMAGE_SCAN_STATUS" && extra.size() == 3)
+        {
+            // Expects scanner id, scanned#, total#
+            UpdateScanProgress(extra[0], extra[1].toInt(), extra[2].toInt());
         }
     }
     else if (event->type() == DialogCompletionEvent::kEventType)
@@ -325,35 +451,25 @@ void GalleryThumbView::customEvent(QEvent *event)
             QString newName = dce->GetResultText();
             if (m_menuState.m_selected)
             {
-                QString err = GalleryBERequest::RenameFile(
-                    m_menuState.m_selected->m_id, newName);
-
+                QString err = m_mgr.RenameFile(m_menuState.m_selected,
+                                               newName);
                 if (!err.isEmpty())
                     ShowOkPopup(err);
             }
         }
-        else if (resultid == "ImportFilesSelected")
-        {
-            QStringList files = dce->GetData().value<QStringList>();
-            LOG(VB_FILE, LOG_DEBUG, "Thumbview: Import files " + files.join(","));
-            ImportFiles(files);
-        }
         else if (resultid == "MakeDir")
         {
-            if (!m_menuState.m_selected)
-                return;
-
-            QStringList newPath;
-            newPath << QString("%1/%2")
-                .arg(m_menuState.m_selected->m_fileName,
-                     dce->GetResultText());
-
-            QString err = GalleryBERequest::MakeDirs(newPath);
-            if (err.isEmpty())
-                // Rescan to display new dir
-                StartScan();
-            else
-                ShowOkPopup(err);
+            if (m_menuState.m_selected)
+            {
+                // Prohibit subtrees
+                QString name = dce->GetResultText();
+                QString err  = name.contains("/")
+                        ? tr("Invalid Name")
+                        : m_mgr.MakeDir(m_menuState.m_selected->m_id,
+                                        QStringList(name));
+                if (!err.isEmpty())
+                    ShowOkPopup(err);
+            }
         }
         else if (resultid == "SlideOrderMenu")
         {
@@ -361,13 +477,39 @@ void GalleryThumbView::customEvent(QEvent *event)
 
             switch (buttonnum)
             {
-                case 0: slideOrder = kOrdered; break;
-                case 1: slideOrder = kShuffle; break;
-                case 2: slideOrder = kRandom; break;
-                case 3: slideOrder = kSeasonal; break;
+            case 0: slideOrder = kOrdered; break;
+            case 1: slideOrder = kShuffle; break;
+            case 2: slideOrder = kRandom; break;
             }
             gCoreContext->SaveSetting("GallerySlideOrder", slideOrder);
-            LOG(VB_FILE, LOG_DEBUG, QString("Order %1").arg(slideOrder));
+            LOG(VB_FILE, LOG_DEBUG, LOC + QString("Order %1").arg(slideOrder));
+        }
+        else if (resultid == "ImageCaptionMenu")
+        {
+            ImageCaptionType captions = kNoCaption;
+
+            switch (buttonnum)
+            {
+            case 0: captions = kNameCaption; break;
+            case 1: captions = kDateCaption; break;
+            case 2: captions = kUserCaption; break;
+            case 3: captions = kNoCaption;   break;
+            }
+            gCoreContext->SaveSetting("GalleryImageCaption", captions);
+            BuildImageList();
+        }
+        else if (resultid == "DirCaptionMenu")
+        {
+            ImageCaptionType captions = kNoCaption;
+
+            switch (buttonnum)
+            {
+            case 0: captions = kNameCaption; break;
+            case 1: captions = kDateCaption; break;
+            case 2: captions = kNoCaption;   break;
+            }
+            gCoreContext->SaveSetting("GalleryDirCaption", captions);
+            BuildImageList();
         }
         else if (resultid == "Password")
         {
@@ -377,36 +519,72 @@ void GalleryThumbView::customEvent(QEvent *event)
         else if (buttonnum == 1)
         {
             // Confirm current file deletion
+            QString err;
             if (resultid == "ConfirmDelete" && m_menuState.m_selected)
             {
                 ImageIdList ids = ImageIdList() << m_menuState.m_selected->m_id;
-                QString     err = GalleryBERequest::RemoveFiles(ids);
-                if (!err.isEmpty())
-                    ShowOkPopup(err);
+                err = m_mgr.DeleteFiles(ids);
             }
-            // Confirm all selected file deletion
+            // Confirm marked file deletion
             else if (resultid == "ConfirmDeleteMarked")
             {
-                QString err = GalleryBERequest::RemoveFiles(m_menuState.m_markedId);
-                if (!err.isEmpty())
-                    ShowOkPopup(err);
+                err = m_mgr.DeleteFiles(m_menuState.m_markedId);
             }
+            else
+                return;
+
+            if (!err.isEmpty())
+                ShowOkPopup(err);
         }
     }
 }
 
 
-/**
- * @brief Start Thumbnail screen
+/*!
+ \brief Cleanup UI & image caches when a device is removed
+ \param prefixes List of url prefixes to remove from image cache
+*/
+void GalleryThumbView::RemoveImages(const QStringList &ids, bool deleted)
+{
+    foreach (const QString &id, ids)
+    {
+        // Remove image from view
+        QStringList urls = m_view->RemoveImage(id.toInt(), deleted);
+        // Cleanup url lookup
+        m_thumbExists.remove(id.toInt());
+
+        // Remove thumbs & images from image cache
+        foreach(const QString &url, urls)
+        {
+            LOG(VB_FILE, LOG_DEBUG, LOC +
+                QString("Clearing image cache of '%1'").arg(url));
+
+            GetMythUI()->RemoveFromCacheByFile(url);
+        }
+    }
+}
+
+
+/*!
+ \brief Start Thumbnail screen
  */
 void GalleryThumbView::Start()
 {
-    // Detect any current scans
-    QStringList message = GalleryBERequest::ScanQuery();
-    UpdateScanProgress(message[1], message[2], message[3]);
+    // Detect any running BE scans
+    // Expects OK, scanner id, current#, total#
+    QStringList message = m_mgr.ScanQuery();
+    if (message.size() == 4 && message[0] == "OK")
+    {
+        UpdateScanProgress(message[1], message[2].toInt(), message[3].toInt());
+    }
 
-    // Always start showing top level images
-    LoadData(ROOT_DB_ID);
+    // Only receive events after device/scan status has been established
+    gCoreContext->addListener(this);
+
+    // Start at Root if devices exist. Otherwise go straight to SG node
+    int start = m_mgr.DetectLocalDevices() ? GALLERY_DB_ID : PHOTO_DB_ID;
+
+    LoadData(start);
 }
 
 
@@ -425,19 +603,19 @@ void GalleryThumbView::LoadData(int parent)
         if (m_emptyText)
             m_emptyText->SetVisible(false);
 
-        // Build the buttonlist
+        // Construct the buttonlist
         BuildImageList();
     }
     else
     {
-        m_infoList->Hide();
+        m_infoList.Hide();
         m_imageList->SetVisible(false);
         if (m_emptyText)
         {
             m_emptyText->SetVisible(true);
-            m_emptyText->SetText(tr("No images found in the database.\n"
-                                    "Set Photographs storage group,\n"
-                                    "then scan from menu."));
+            m_emptyText->SetText(tr("No images found.\n"
+                                    "Scan storage group using menu,\n"
+                                    "or insert/mount local media.\n"));
         }
     }
 }
@@ -451,139 +629,134 @@ void GalleryThumbView::BuildImageList()
     m_imageList->Reset();
     m_pendingMap.clear();
 
-    // get all children from the the active node
-    ImageList      children = m_view->GetAllNodes();
-    ImageItem *selected = m_view->GetSelected();
+    // Get parent & all children
+    ImageListK nodes    = m_view->GetAllNodes();
+    ImagePtrK  selected = m_view->GetSelected();
 
     // go through the entire list and update
-    foreach(ImageItem *im, children)
-    if (im)
-    {
-        // Data must be set by constructor: First item is automatically
-        // selected and must have data available for selection event, as
-        // subsequent reselection of same item will always fail.
-        MythUIButtonListItem *item = new MythUIButtonListItem(
-            m_imageList, "", qVariantFromValue(im));
+    foreach(const ImagePtrK &im, nodes)
+        if (im)
+        {
+            // Data must be set by constructor: First item is automatically
+            // selected and must have data available for selection event, as
+            // subsequent reselection of same item will always fail.
+            MythUIButtonListItem *item =
+                    new MythUIButtonListItem(m_imageList, "", qVariantFromValue(im));
 
-        item->setCheckable(true);
-        item->setChecked(MythUIButtonListItem::NotChecked);
+            item->setCheckable(true);
+            item->setChecked(MythUIButtonListItem::NotChecked);
 
-        // assign and display all information about
-        // the current item, like title and subdirectory count
-        UpdateImageItem(item);
+            // assign and display all information about
+            // the current item, like title and subdirectory count
+            UpdateImageItem(item);
 
-        // Reinstate the active button item
-        if (im == selected)
-            m_imageList->SetItemCurrent(item);
-    }
-
-    // Updates all other widgets on the screen that show
-    // information about the selected MythUIButtonListItem
-    SetUiSelection(m_imageList->GetItemCurrent());
+            // Treat parent differently
+            if (im == nodes[0])
+            {
+                // Only non-root parents can ascend
+                if (im->m_id != GALLERY_DB_ID)
+                    item->DisplayState("upfolder", "parenttype");
+            }
+            else if (im == selected)
+                // Reinstate the active button item. Note this would fail for parent
+                m_imageList->SetItemCurrent(item);
+        }
 }
 
 
 /*!
  *  \brief  Initialises a single buttonlist item
  *  \param  item The buttonlist item
-
  */
 void GalleryThumbView::UpdateImageItem(MythUIButtonListItem *item)
 {
-    ImageItem *im = item->GetData().value<ImageItem *>();
+    ImagePtrK im = item->GetData().value<ImagePtrK >();
     if (!im)
         return;
 
     // Allow themes to distinguish between roots, folders, pics, videos
     switch (im->m_type)
     {
-        case kUpDirectory:
-            item->DisplayState("upfolder", "buttontype");
-            break;
+    case kDevice:
+    case kCloneDir:
+    case kDirectory:
+        if (im->m_dirCount > 0)
+            item->SetText(QString("%1/%2")
+                          .arg(im->m_fileCount).arg(im->m_dirCount),
+                          "childcount");
+        else
+            item->SetText(QString::number(im->m_fileCount), "childcount");
 
-        case kBaseDirectory:
-        case kSubDirectory:
-            if (im->m_dirCount > 0)
-                item->SetText(QString("%1/%2")
-                              .arg(im->m_fileCount).arg(im->m_dirCount),
-                              "childcount");
-            else
-                item->SetText(QString::number(im->m_fileCount), "childcount");
+        item->DisplayState(im->IsDevice() ? "device" : "subfolder", "buttontype");
+        break;
 
-            item->DisplayState("subfolder", "buttontype");
-            break;
+    case kImageFile:
+        item->DisplayState("image", "buttontype");
+        break;
 
-        case kImageFile:
-            item->DisplayState("image", "buttontype");
-            break;
+    case kVideoFile:
+        item->DisplayState("video", "buttontype");
+        break;
 
-        case kVideoFile:
-            item->DisplayState("video", "buttontype");
-            break;
-
-        default:
-            break;
+    default:
+        break;
     }
 
     // Allow theme to distinguish visible/hidden nodes
     QString hideState = (im->m_isHidden) ? "hidden" : "visible";
     item->DisplayState(hideState, "buttonstate");
 
-    // No text for roots or Upfolders
-    if (im->m_type >= kSubDirectory)
+    // Caption
+    QString text;
+    int show = gCoreContext->GetNumSetting(
+                im->IsFile() ? "GalleryImageCaption"
+                             : "GalleryDirCaption");
+    switch (show)
     {
-        int     show = gCoreContext->GetNumSetting("GalleryShowCaption");
-        QString text;
-        switch (show)
-        {
-            case kNameCaption: text = im->m_name; break;
-            case kDateCaption: text = ImageUtils::ImageDateOf(im); break;
-            case kUserCaption: text = im->m_comment; break;
-            default:
-            case kNoCaption:   text = ""; break;
-        }
-        item->SetText(text);
+    case kNameCaption: text = m_mgr.CrumbName(*im); break;
+    case kDateCaption: text = m_mgr.ShortDateOf(im); break;
+    case kUserCaption: text = im->m_comment; break;
+    default:
+    case kNoCaption:   text = ""; break;
     }
+    item->SetText(text);
 
     // Set marked state
     MythUIButtonListItem::CheckState state
-        = m_view->IsMarked(im->m_id)
-          ? MythUIButtonListItem::FullChecked
-          : MythUIButtonListItem::NotChecked;
+            = m_view->IsMarked(im->m_id)
+            ? MythUIButtonListItem::FullChecked
+            : MythUIButtonListItem::NotChecked;
 
     item->setChecked(state);
 
-    // Thumbnails required from BE
-    QStringList required = QStringList();
+    // Thumbnails required
+    ImageIdList request;
 
     if (im->m_thumbNails.size() == 1)
     {
         // Single thumbnail
-        QString url = CheckThumbnail(item, im, required);
+        QString url = CheckThumbnail(item, im, request, 0);
 
         if (!url.isEmpty())
-            UpdateThumbnail(item, im, url);
+            UpdateThumbnail(item, im, url, 0);
     }
     else
     {
-        // Dir showing up to 4 thumbs
+        // Dir showing up to 4 thumbs. Set them all at same time
         InfoMap thumbMap;
         for (int index = 0; index < im->m_thumbNails.size(); ++index)
         {
-            QString url = CheckThumbnail(item, im, required, index);
-
+            QString url = CheckThumbnail(item, im, request, index);
             if (!url.isEmpty())
                 thumbMap.insert(QString("thumbimage%1").arg(index), url);
         }
-
-        // Set multiple images at same time
         if (!thumbMap.isEmpty())
             item->SetImageFromMap(thumbMap);
     }
 
-    // Request BE to create/verify any missing thumbnails.
-    if (!required.isEmpty())
-        GalleryBERequest::CreateThumbnails(required, im->IsDirectory());
+    // Request creation/verification of unknown thumbnails.
+    if (!request.isEmpty())
+        m_mgr.CreateThumbnails(request, im->IsDirectory());
 }
 
 
@@ -598,20 +771,18 @@ void GalleryThumbView::UpdateImageItem(MythUIButtonListItem *item)
  \param index Thumbnail index in buttonlist item (Dirs use 4 thumbnails)
  \return QString URL of thumbnail
 */
-QString GalleryThumbView::CheckThumbnail(MythUIButtonListItem *item, ImageItem *im,
-                                         QStringList &request, int index)
+QString GalleryThumbView::CheckThumbnail(MythUIButtonListItem *item, ImagePtrK im,
+                                         ImageIdList &request, int index)
 {
-    int id = im->m_thumbIds.at(index);
+    ThumbPair thumb(im->m_thumbNails.at(index));
+    int id = thumb.first;
 
-    // Thumbs are retrieved & cached as urls
-    QString url = m_url.value(id, "");
-
-    if (!url.isEmpty())
-        return url;
+    if (m_thumbExists.contains(id))
+        return thumb.second;
 
     // Request BE thumbnail check if it is not already pending
     if (!m_pendingMap.contains(id))
-        request << QString::number(id);
+        request << id;
 
     // Note this button is awaiting an update
     m_pendingMap.insertMulti(id, qMakePair(item, index));
@@ -628,21 +799,18 @@ QString GalleryThumbView::CheckThumbnail(MythUIButtonListItem *item, ImageItem *
  \param index Index of the thumbnail on the button
 */
 void GalleryThumbView::UpdateThumbnail(MythUIButtonListItem *button,
-                                       ImageItem *im, const QString &url,
+                                       ImagePtrK im, const QString &url,
                                        int index)
 {
     if (im->m_thumbNails.size() == 1)
     {
         // Pics, dirs & videos use separate widgets
-        QString widget;
         switch (im->m_type)
         {
-            case kImageFile: widget = ""; break;
-            case kVideoFile: widget = "videoimage"; break;
-            default:         widget = "folderimage"; break;
+        case kImageFile: button->SetImage(url); break;
+        case kVideoFile: button->SetImage(url, "videoimage"); break;
+        default:         button->SetImage(url, "folderimage"); break;
         }
-
-        button->SetImage(url, widget);
     }
     else
         // Dir with 4 thumbnails
@@ -652,48 +820,79 @@ void GalleryThumbView::UpdateThumbnail(MythUIButtonListItem *button,
 
 /*!
  \brief Update progressbar with scan status
- \param mode BE scan state
+ \details Combines progress of both BE & FE scanners
+ \param scanner Scanner id
  \param current Number of images scanned
  \param total Total number of images to scan
 */
-void GalleryThumbView::UpdateScanProgress(QString mode,
-                                          QString current,
-                                          QString total)
+void GalleryThumbView::UpdateScanProgress(const QString &scanner,
+                                          int current, int total)
 {
-    if (!mode.isEmpty() && !m_scanInProgress)
-    {
-        // Scan just started
-        if (m_scanProgressBar)
-        {
-            m_scanProgressBar->SetVisible(true);
-            m_scanProgressBar->SetStart(0);
-        }
-        if (m_scanProgressText)
-            m_scanProgressText->SetVisible(true);
-    }
+    // Scan update
+    m_scanProgress.insert(scanner, qMakePair(current, total));
 
-    m_scanInProgress = !mode.isEmpty();
-
-    if (m_scanInProgress)
+    // Detect end of this scan
+    if (current >= total)
     {
-        // Scan update
-        if (m_scanProgressBar)
+        LOG(VB_GUI, LOG_DEBUG, LOC + QString("Scan Finished %1 %2/%3")
+            .arg(scanner).arg(current).arg(total));
+
+        // Mark inactive scanner
+        m_scanActive.remove(scanner);
+
+        // Detect end of last scan
+        if (m_scanActive.isEmpty())
         {
-            m_scanProgressBar->SetUsed(current.toInt());
-            m_scanProgressBar->SetTotal(total.toInt());
+            if (m_scanProgressText)
+                m_scanProgressText->SetVisible(false);
+            if (m_scanProgressBar)
+                m_scanProgressBar->SetVisible(false);
+
+            m_scanProgress.clear();
+
+            return;
         }
-        if (m_scanProgressText)
-            m_scanProgressText->SetText(tr("%1 of %3")
-                                        .arg(current, total));
     }
     else
     {
-        // Scan just finished
-        if (m_scanProgressText)
-            m_scanProgressText->SetVisible(false);
-        if (m_scanProgressBar)
-            m_scanProgressBar->SetVisible(false);
+        // Detect first scan update
+        if (m_scanActive.isEmpty())
+        {
+            // Show progressbar when first scan starts
+            if (m_scanProgressBar)
+            {
+                m_scanProgressBar->SetVisible(true);
+                m_scanProgressBar->SetStart(0);
+            }
+            if (m_scanProgressText)
+                m_scanProgressText->SetVisible(true);
+        }
+
+        if (!m_scanActive.contains(scanner))
+        {
+            LOG(VB_GUI, LOG_DEBUG, LOC + QString("Scan Started %1 %2/%3")
+                .arg(scanner).arg(current).arg(total));
+
+            // Mark active scanner
+            m_scanActive.insert(scanner);
+        }
     }
+
+    // Aggregate all running scans
+    int currentAgg = 0, totalAgg = 0;
+    foreach (IntPair scan, m_scanProgress.values())
+    {
+        currentAgg += scan.first;
+        totalAgg   += scan.second;
+    }
+
+    if (m_scanProgressBar)
+    {
+        m_scanProgressBar->SetUsed(currentAgg);
+        m_scanProgressBar->SetTotal(totalAgg);
+    }
+    if (m_scanProgressText)
+        m_scanProgressText->SetText(tr("%L1 of %L3").arg(currentAgg).arg(totalAgg));
 }
 
 
@@ -725,61 +924,52 @@ void GalleryThumbView::ResetUiSelection()
  */
 void GalleryThumbView::SetUiSelection(MythUIButtonListItem *item)
 {
-    ImageItem *im = item->GetData().value<ImageItem *>();
+    ImagePtrK im = item->GetData().value<ImagePtrK >();
     if (im)
     {
+        // update the position in the node list
+        m_view->Select(im->m_id);
+
+        // show the name/path of the image
+        if (m_crumbsText)
+            m_crumbsText->SetText(m_mgr.CrumbName(*im, true));
+
         if (m_captionText)
         {
-            // show the date & comment of a node
+            // show the date & comment of non-root nodes
             QStringList text;
-            text << ImageUtils::ImageDateOf(im);
-
-            if (!im->m_comment.isEmpty())
-                text << im->m_comment;
-
+            if (im->m_id != GALLERY_DB_ID)
+            {
+                text << m_mgr.LongDateOf(im);
+                if (!im->m_comment.isEmpty())
+                    text << im->m_comment;
+            }
             m_captionText->SetText(text.join(" - "));
         }
 
         if (m_hideFilterText)
         {
-            int show = gCoreContext->GetNumSetting("GalleryShowHidden");
-            m_hideFilterText->SetText(show ? tr("Hidden") : "");
+            m_hideFilterText->SetText(m_mgr.GetVisibility() ? tr("Hidden") : "");
         }
 
         if (m_typeFilterText)
         {
-            int type = gCoreContext->GetNumSetting("GalleryShowType");
             QString text = "";
-            switch (type)
+            switch (m_mgr.GetType())
             {
             case kPicAndVideo : text = ""; break;
             case kPicOnly     : text = tr("Pictures"); break;
             case kVideoOnly   : text = tr("Videos"); break;
             }
-
             m_typeFilterText->SetText(text);
         }
 
         // show the position of the image
         if (m_positionText)
-            m_positionText->SetText(QString("%1/%2")
-                                    .arg(m_imageList->GetCurrentPos())
-                                    .arg(m_imageList->GetCount() - 1));
-
-        // show the path of the image
-        if (m_crumbsText)
-        {
-            if (im->m_id == ROOT_DB_ID)
-                m_crumbsText->SetText(tr("Gallery"));
-            else
-            {
-                QString crumbs = im->m_fileName;
-                m_crumbsText->SetText(crumbs.replace("/", " - "));
-            }
-        }
+            m_positionText->SetText(m_view->GetPosition());
 
         // Update any file details information
-        m_infoList->Update(im);
+        m_infoList.Update(im);
     }
 }
 
@@ -810,17 +1000,17 @@ void GalleryThumbView::MenuMain()
             menu->AddItem(tr("Enable Edits"), SLOT(ShowPassword()));
     }
 
-    // Scan control depends on current status
-    if (m_scanInProgress)
+    // Depends on current status of backend scanner - string(number(isBackend()))
+    if (m_scanActive.contains("1"))
         menu->AddItem(tr("Stop Scan"), SLOT(StopScan()));
     else
-        menu->AddItem(tr("Start Scan"), SLOT(StartScan()));
+        menu->AddItem(tr("Scan Storage Group"), SLOT(StartScan()));
 
     menu->AddItem(tr("Settings"), SLOT(ShowSettings()));
 
-    MythDialogBox *popup = new MythDialogBox(menu, m_popupStack, "menuPopup");
+    MythDialogBox *popup = new MythDialogBox(menu, &m_popupStack, "menuPopup");
     if (popup->Create())
-        m_popupStack->AddScreen(popup);
+        m_popupStack.AddScreen(popup);
     else
         delete popup;
 }
@@ -832,12 +1022,13 @@ void GalleryThumbView::MenuMain()
  */
 void GalleryThumbView::MenuMarked(MythMenu *mainMenu)
 {
-    if (m_menuState.m_childCount == 0)
+    ImagePtrK parent = m_view->GetParent();
+
+    if (m_menuState.m_childCount == 0 || parent.isNull())
         return;
 
-    QString title = tr("%1 marked").arg(m_menuState.m_markedId.size());
-
-    MythMenu *menu = new MythMenu(title, this, "markmenu");
+    QString   title = tr("%L1 marked").arg(m_menuState.m_markedId.size());
+    MythMenu *menu  = new MythMenu(title, this, "markmenu");
 
     // Mark/unmark selected
     if (m_menuState.m_selected->IsFile())
@@ -848,7 +1039,8 @@ void GalleryThumbView::MenuMarked(MythMenu *mainMenu)
             menu->AddItem(tr("Mark File"), SLOT(MarkItem()));
     }
     // Cannot mark/unmark parent dir from this level
-    else if (m_menuState.m_selected->m_type == kSubDirectory)
+    else if (!m_menuState.m_selected->IsDevice()
+             && m_menuState.m_selected != parent)
     {
         if (m_menuState.m_selectedMarked)
             menu->AddItem(tr("Unmark Directory"), SLOT(UnmarkItem()));
@@ -856,18 +1048,24 @@ void GalleryThumbView::MenuMarked(MythMenu *mainMenu)
             menu->AddItem(tr("Mark Directory"), SLOT(MarkItem()));
     }
 
-    // Mark All if unmarked files exist
-    if (m_menuState.m_markedId.size() < m_menuState.m_childCount)
-        menu->AddItem(tr("Mark All"), SLOT(MarkAll()));
-
-    // Unmark All if marked files exist
-    if (!m_menuState.m_markedId.isEmpty())
+    if (parent->m_id != GALLERY_DB_ID)
     {
-        menu->AddItem(tr("Unmark All"), SLOT(UnmarkAll()));
-        menu->AddItem(tr("Invert Marked"), SLOT(MarkInvertAll()));
+        // Mark All if unmarked files exist
+        if (m_menuState.m_markedId.size() < m_menuState.m_childCount)
+            menu->AddItem(tr("Mark All"), SLOT(MarkAll()));
+
+        // Unmark All if marked files exist
+        if (!m_menuState.m_markedId.isEmpty())
+        {
+            menu->AddItem(tr("Unmark All"), SLOT(UnmarkAll()));
+            menu->AddItem(tr("Invert Marked"), SLOT(MarkInvertAll()));
+        }
     }
 
-    mainMenu->AddItem(tr("Mark"), NULL, menu);
+    if (menu->IsEmpty())
+        delete menu;
+    else
+        mainMenu->AddItem(tr("Mark"), NULL, menu);
 }
 
 
@@ -877,8 +1075,9 @@ void GalleryThumbView::MenuMarked(MythMenu *mainMenu)
 */
 void GalleryThumbView::MenuPaste(MythMenu *mainMenu)
 {
-    // Can only copy/move into dirs
-    if (m_menuState.m_selected->IsDirectory())
+    // Can only copy/move into non-root dirs
+    if (m_menuState.m_selected->IsDirectory()
+            && m_menuState.m_selected->m_id != GALLERY_DB_ID)
     {
         // Operate on current marked files, if any
         ImageIdList files = m_menuState.m_markedId;
@@ -887,7 +1086,7 @@ void GalleryThumbView::MenuPaste(MythMenu *mainMenu)
         if (files.isEmpty())
             return;
 
-        QString title = tr("%1 marked").arg(files.size());
+        QString title = tr("%L1 marked").arg(files.size());
 
         MythMenu *menu = new MythMenu(title, this, "pastemenu");
 
@@ -908,7 +1107,7 @@ void GalleryThumbView::MenuTransform(MythMenu *mainMenu)
     // Operate on marked files, if any, otherwise selected node
     if (!m_menuState.m_markedId.isEmpty())
     {
-        QString title = tr("%1 marked").arg(m_menuState.m_markedId.size());
+        QString title = tr("%L1 marked").arg(m_menuState.m_markedId.size());
 
         MythMenu *menu = new MythMenu(title, this, "");
 
@@ -922,7 +1121,7 @@ void GalleryThumbView::MenuTransform(MythMenu *mainMenu)
     }
     else if (m_menuState.m_selected->IsFile())
     {
-        MythMenu *menu = new MythMenu(m_menuState.m_selected->m_name, this, "");
+        MythMenu *menu = new MythMenu(m_menuState.m_selected->m_baseName, this, "");
 
         menu->AddItem(tr("Rotate CW"), SLOT(RotateCW()));
         menu->AddItem(tr("Rotate CCW"), SLOT(RotateCCW()));
@@ -942,11 +1141,12 @@ void GalleryThumbView::MenuTransform(MythMenu *mainMenu)
 void GalleryThumbView::MenuAction(MythMenu *mainMenu)
 {
     MythMenu *menu;
+    ImagePtrK selected = m_menuState.m_selected;
 
     // Operate on current marked files, if any
     if (m_menuState.m_markedId.size() > 0)
     {
-        QString title = tr("%1 marked").arg(m_menuState.m_markedId.size());
+        QString title = tr("%L1 marked").arg(m_menuState.m_markedId.size());
 
         menu = new MythMenu(title, this, "actionmenu");
 
@@ -961,52 +1161,42 @@ void GalleryThumbView::MenuAction(MythMenu *mainMenu)
     else
     {
         // Operate on selected file/dir
-        menu = new MythMenu(m_menuState.m_selected->m_name, this, "actionmenu");
+        menu = new MythMenu(selected->m_baseName, this, "actionmenu");
 
-        // No actions on Base/Up dirs
-        if (m_menuState.m_selected->m_type >= kSubDirectory)
+        // Prohibit actions on devices and parent dirs
+        if (!selected->IsDevice() && selected != m_view->GetParent())
         {
-            menu->AddItem(tr("Use as Cover"), SLOT(SetCover()));
-
-            if (m_menuState.m_selected->m_isHidden)
+            if (selected->m_isHidden)
                 menu->AddItem(tr("Unhide"), SLOT(Unhide()));
             else
                 menu->AddItem(tr("Hide"), SLOT(HideItem()));
 
-            menu->AddItem(tr("Delete"), SLOT(DeleteItem()));
-            menu->AddItem(tr("Rename"), SLOT(ShowRenameInput()));
+            menu->AddItem(tr("Use as Cover"), SLOT(SetCover()));
+            menu->AddItem(tr("Delete"),       SLOT(DeleteItem()));
+            menu->AddItem(tr("Rename"),       SLOT(ShowRenameInput()));
         }
-        else if (m_menuState.m_selected->m_userThumbnail)
+        else if (selected->m_userThumbnail)
             menu->AddItem(tr("Reset Cover"), SLOT(ResetCover()));
 
-        // Can only import/mkdir in a dir
-        if (m_menuState.m_selected->IsDirectory())
-        {
+        // Can only mkdir in a non-root dir
+        if (selected->IsDirectory()
+                && selected->m_id != GALLERY_DB_ID)
             menu->AddItem(tr("Create Directory"), SLOT(MakeDir()));
-            MenuImport(menu);
-        }
-        menu->AddItem(tr("Eject media"), SLOT(Eject()));
+
+        // Only show import command on root, when defined
+        if (selected->m_id == GALLERY_DB_ID
+                && !gCoreContext->GetSetting("GalleryImportCmd").isEmpty())
+            menu->AddItem(tr("Import"), SLOT(Import()));
     }
 
-    mainMenu->AddItem(tr("Actions"), NULL, menu);
-}
+    // Only show eject when devices (excluding import) exist
+    if (selected->IsDevice() && selected->IsLocal())
+        menu->AddItem(tr("Eject media"), SLOT(Eject()));
 
-
-/*!
- \brief Add an Import submenu
- \param mainMenu Parent menu
-*/
-void GalleryThumbView::MenuImport(MythMenu *parent)
-{
-    MythMenu *menu = new MythMenu(tr("Import Options"), this, "importmenu");
-
-    menu->AddItem(tr("By Moving"), SLOT(ShowMoveImport()));
-    menu->AddItem(tr("By Copying"), SLOT(ShowImport()));
-
-    if (gCoreContext->GetNumSetting("GalleryUseImportCmd"))
-        menu->AddItem(tr("Run Import Command"), SLOT(RunImportCmd()));
-
-    parent->AddItem(tr("Import"), NULL, menu);
+    if (menu->IsEmpty())
+        delete menu;
+    else
+        mainMenu->AddItem(tr("Actions"), NULL, menu);
 }
 
 
@@ -1021,19 +1211,20 @@ void GalleryThumbView::MenuSlideshow(MythMenu *mainMenu)
     QString ordering;
     switch (order)
     {
-    case 0 : ordering = tr("Ordered\n"); break;
-    case 1 : ordering = tr("Shuffled\n"); break;
-    case 2 : ordering = tr("Random\n"); break;
-    case 3 : ordering = tr("Seasonal\n"); break;
-    default: ordering = tr("Unknown ordering\n"); break;
+    case kShuffle  : ordering = tr("Shuffled"); break;
+    case kRandom   : ordering = tr("Random"); break;
+    default: 
+    case kOrdered  : ordering = tr("Ordered"); break;
     }
 
-    MythMenu *menu = new MythMenu(ordering + tr("Slideshow"), this, "SlideshowMenu");
+    MythMenu *menu = new MythMenu(tr("Slideshow") + " (" + ordering + ")", 
+                                  this, "SlideshowMenu");
 
     // Use selected dir or parent, if image selected
     if (m_menuState.m_selected->IsDirectory())
     {
-        menu->AddItem(tr("Directory"), SLOT(Slideshow()));
+        if (m_menuState.m_selected->m_fileCount > 0)
+            menu->AddItem(tr("Directory"), SLOT(Slideshow()));
 
         if (m_menuState.m_selected->m_dirCount > 0)
             menu->AddItem(tr("Recursive"), SLOT(RecursiveSlideshow()));
@@ -1041,12 +1232,12 @@ void GalleryThumbView::MenuSlideshow(MythMenu *mainMenu)
     else
         menu->AddItem(tr("Current Directory"), SLOT(Slideshow()));
 
-    MythMenu *orderMenu = new MythMenu(tr("Slideshow Order"), this, "SlideOrderMenu");
+    MythMenu *orderMenu = new MythMenu(tr("Slideshow Order"), this,
+                                       "SlideOrderMenu");
 
     orderMenu->AddItem(tr("Ordered"),  NULL, NULL, order == kOrdered);
     orderMenu->AddItem(tr("Shuffled"), NULL, NULL, order == kShuffle);
     orderMenu->AddItem(tr("Random"),   NULL, NULL, order == kRandom);
-    orderMenu->AddItem(tr("Seasonal"), NULL, NULL, order == kSeasonal);
 
     menu->AddItem(tr("Change Order"), NULL, orderMenu);
 
@@ -1067,7 +1258,7 @@ void GalleryThumbView::MenuShow(MythMenu *mainMenu)
 {
     MythMenu *menu = new MythMenu(tr("Show Options"), this, "showmenu");
 
-    int type = gCoreContext->GetNumSetting("GalleryShowType");
+    int type = m_mgr.GetType();
     if (type == kPicAndVideo)
     {
         menu->AddItem(tr("Hide Pictures"), SLOT(HidePictures()));
@@ -1077,45 +1268,45 @@ void GalleryThumbView::MenuShow(MythMenu *mainMenu)
         menu->AddItem(type == kPicOnly ? tr("Show Videos") : tr("Show Pictures"),
                       SLOT(ShowType()));
 
-    int show = gCoreContext->GetNumSetting("GalleryShowCaption");
-    if (show != kNoCaption)
-        menu->AddItem(tr("Hide Captions"), SLOT(ShowCaptions()));
-    if (show != kNameCaption)
-        menu->AddItem(tr("Show Name Captions"), SLOT(CaptionsName()));
-    if (show != kDateCaption)
-        menu->AddItem(tr("Show Date Captions"), SLOT(CaptionsDate()));
-    if (show != kUserCaption)
-        menu->AddItem(tr("Show Comment Captions"), SLOT(CaptionsComment()));
+    int show = gCoreContext->GetNumSetting("GalleryImageCaption");
+    MythMenu *captionMenu = new MythMenu(tr("Image Captions"), this,
+                                         "ImageCaptionMenu");
 
-    if (gCoreContext->GetNumSetting("GalleryShowHidden"))
-        menu->AddItem(tr("Hide Hidden Files"), SLOT(HideHidden()));
-    else
-        menu->AddItem(tr("Show Hidden Files"), SLOT(ShowHidden()));
+    captionMenu->AddItem(tr("Name"),    NULL, NULL, show == kNameCaption);
+    captionMenu->AddItem(tr("Date"),    NULL, NULL, show == kDateCaption);
+    captionMenu->AddItem(tr("Comment"), NULL, NULL, show == kUserCaption);
+    captionMenu->AddItem(tr("None"),    NULL, NULL, show == kNoCaption);
+
+    menu->AddItem(tr("Image Captions"), NULL, captionMenu);
+
+    show = gCoreContext->GetNumSetting("GalleryDirCaption");
+    captionMenu = new MythMenu(tr("Directory Captions"), this, "DirCaptionMenu");
+
+    captionMenu->AddItem(tr("Name"), NULL, NULL, show == kNameCaption);
+    captionMenu->AddItem(tr("Date"), NULL, NULL, show == kDateCaption);
+    captionMenu->AddItem(tr("None"), NULL, NULL, show == kNoCaption);
+
+    menu->AddItem(tr("Directory Captions"), NULL, captionMenu);
+
+    if (m_editsAllowed)
+    {
+        if (m_mgr.GetVisibility())
+            menu->AddItem(tr("Hide Hidden Items"), SLOT(HideHidden()));
+        else
+            menu->AddItem(tr("Show Hidden Items"), SLOT(ShowHidden()));
+    }
 
     if (m_zoomLevel > 0)
         menu->AddItem(tr("Zoom Out"), SLOT(ZoomOut()));
     if (m_zoomLevel < m_zoomWidgets.size() - 1)
         menu->AddItem(tr("Zoom In"), SLOT(ZoomIn()));
 
+    QString details = m_infoList.GetState() == kNoInfo
+            ? tr("Show Details") : tr("Hide Details");
+
+    menu->AddItem(details, SLOT(ShowDetails()));
+
     mainMenu->AddItem(tr("Show"), NULL, menu);
-}
-
-
-/*!
- \brief Update item that has been selected
- \param item Buttonlist item
-*/
-void GalleryThumbView::ItemSelected(MythUIButtonListItem *item)
-{
-    ImageItem *im = item->GetData().value<ImageItem *>();
-    if (!im)
-        return;
-
-    // update the position in the node list
-    m_view->Select(im->m_id);
-
-    // Update other widgets
-    SetUiSelection(item);
 }
 
 
@@ -1140,17 +1331,24 @@ void GalleryThumbView::ItemClicked(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    ImageItem *im = item->GetData().value<ImageItem *>();
+    ImagePtrK im = item->GetData().value<ImagePtrK>();
     if (!im)
         return;
 
     switch (im->m_type)
     {
-        case kBaseDirectory:
-        case kSubDirectory:     DirSelectDown(); break;
-        case kUpDirectory:      DirSelectUp(); break;
-        case kImageFile:
-        case kVideoFile:        StartSlideshow(kBrowseSlides); break;
+    case kDevice:
+    case kCloneDir:
+    case kDirectory:
+        if (im == m_view->GetParent())
+            DirSelectUp();
+        else
+            DirSelectDown();
+        break;
+
+    case kImageFile:
+    case kVideoFile:
+        StartSlideshow(kBrowseSlides); break;
     };
 }
 
@@ -1161,7 +1359,7 @@ void GalleryThumbView::ItemClicked(MythUIButtonListItem *item)
 */
 void GalleryThumbView::StartScan(bool start)
 {
-    QString err = GalleryBERequest::ScanImagesAction(start);
+    QString err = m_mgr.ScanImagesAction(start);
     if (!err.isEmpty())
         ShowOkPopup(err);
 }
@@ -1173,18 +1371,16 @@ void GalleryThumbView::StartScan(bool start)
 */
 void GalleryThumbView::StartSlideshow(ImageSlideShowType mode)
 {
-    ImageItem *selected = m_view->GetSelected();
+    ImagePtrK selected = m_view->GetSelected();
     if (!selected)
         return;
 
-    GallerySlideView *slide = new GallerySlideView(m_mainStack, "galleryslideview");
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    GallerySlideView *slide = new GallerySlideView(mainStack, "galleryslideview",
+                                                   m_editsAllowed);
     if (slide->Create())
     {
-        m_mainStack->AddScreen(slide);
-
-        // Pass on thumbnail updates
-        connect(this, SIGNAL(ThumbnailChanged(int)),
-                slide, SLOT(ThumbnailChange(int)));
+        mainStack->AddScreen(slide);
 
         // Update selected item when slideshow exits
         connect(slide, SIGNAL(ImageSelected(int)),
@@ -1207,9 +1403,12 @@ void GalleryThumbView::StartSlideshow(ImageSlideShowType mode)
  */
 bool GalleryThumbView::DirSelectUp()
 {
-    ImageItem *im = m_view->GetParent();
+    ImagePtrK im = m_view->GetParent();
     if (im)
     {
+        LOG(VB_GUI, LOG_DEBUG, LOC +
+            QString("Going up from %1").arg(im->m_filePath));
+
         // Select the upfolder in the higher dir
         m_view->Select(im->m_id);
 
@@ -1225,10 +1424,15 @@ bool GalleryThumbView::DirSelectUp()
  */
 void GalleryThumbView::DirSelectDown()
 {
-    ImageItem *im = m_view->GetSelected();
+    ImagePtrK im = m_view->GetSelected();
     if (im)
+    {
+        LOG(VB_GUI, LOG_DEBUG, LOC +
+            QString("Going down to %1").arg(im->m_filePath));
+
         // Create tree rooted at selected item
         LoadData(im->m_id);
+    }
 }
 
 
@@ -1238,13 +1442,13 @@ void GalleryThumbView::DirSelectDown()
 */
 void GalleryThumbView::MarkItem(bool mark)
 {
-    ImageItem *im = m_view->GetSelected();
+    ImagePtrK im = m_view->GetSelected();
     if (im)
     {
         // Mark/unmark selected item
         m_view->Mark(im->m_id, mark);
 
-        // Redisplay buttonlist as a parent dir may have been unmarked by this mark
+        // Redisplay buttonlist as a parent dir may have been unmarked
         BuildImageList();
     }
 }
@@ -1284,12 +1488,12 @@ void GalleryThumbView::MarkInvertAll()
 */
 void GalleryThumbView::TransformItem(ImageFileTransform transform)
 {
-    ImageItem *im = m_view->GetSelected();
+    ImagePtrK im = m_view->GetSelected();
     if (im && m_editsAllowed)
     {
         ImageIdList ids;
         ids.append(im->m_id);
-        QString err = GalleryBERequest::ChangeOrientation(transform, ids);
+        QString err = m_mgr.ChangeOrientation(transform, ids);
         if (!err.isEmpty())
             ShowOkPopup(err);
     }
@@ -1302,7 +1506,7 @@ void GalleryThumbView::TransformItem(ImageFileTransform transform)
 */
 void GalleryThumbView::TransformMarked(ImageFileTransform transform)
 {
-    QString err = GalleryBERequest::ChangeOrientation(transform, m_menuState.m_markedId);
+    QString err = m_mgr.ChangeOrientation(transform, m_menuState.m_markedId);
     if (!err.isEmpty())
         ShowOkPopup(err);
 }
@@ -1319,14 +1523,14 @@ void GalleryThumbView::HideItem(bool hide)
         ImageIdList ids;
         ids.append(m_menuState.m_selected->m_id);
 
-        QString err = GalleryBERequest::HideFiles(hide, ids);
+        QString err = m_mgr.HideFiles(hide, ids);
         if (!err.isEmpty())
 
             ShowOkPopup(err);
 
-        else if (hide)
+        else if (hide && !m_mgr.GetVisibility())
 
-            // Unmark hidden file
+            // Unmark invisible file
             m_view->Mark(m_menuState.m_selected->m_id, false);
     }
 }
@@ -1338,18 +1542,16 @@ void GalleryThumbView::HideItem(bool hide)
 */
 void GalleryThumbView::HideMarked(bool hide)
 {
-    QString err = GalleryBERequest::HideFiles(hide, m_menuState.m_markedId);
+    QString err = m_mgr.HideFiles(hide, m_menuState.m_markedId);
     if (!err.isEmpty())
 
         ShowOkPopup(err);
 
-    else if (hide)
+    else if (hide && !m_mgr.GetVisibility())
 
-        // Unmark hidden files
+        // Unmark invisible files
         foreach (int id, m_menuState.m_markedId)
-        {
             m_view->Mark(id, false);
-        }
 }
 
 
@@ -1359,10 +1561,8 @@ void GalleryThumbView::HideMarked(bool hide)
 void GalleryThumbView::DeleteItem()
 {
     if (m_menuState.m_selected)
-    {
-        ShowDialog(tr("Do you want to delete\n%1 ?").arg(m_menuState.m_selected->m_name),
-                   "ConfirmDelete");
-    }
+        ShowDialog(tr("Do you want to delete\n%1 ?")
+                   .arg(m_menuState.m_selected->m_baseName), "ConfirmDelete");
 }
 
 
@@ -1381,28 +1581,42 @@ void GalleryThumbView::DeleteMarked()
 */
 void GalleryThumbView::ShowSettings()
 {
+    QString oldDate       = gCoreContext->GetSetting("GalleryDateFormat");
     QString oldExclusions = gCoreContext->GetSetting("GalleryIgnoreFilter");
-    int oldSort = gCoreContext->GetNumSetting("GallerySortOrder");
+    int oldSortIm         = gCoreContext->GetNumSetting("GalleryImageOrder");
+    int oldSortDir        = gCoreContext->GetNumSetting("GalleryDirOrder");
 
     // Show settings dialog
     GalleryConfig config = GalleryConfig(m_editsAllowed);
+    connect(config.GetClearPage(), SIGNAL(ClearDbPressed()),
+            this, SLOT(ClearSgDb()));
+
     config.exec();
     gCoreContext->ClearSettingsCache();
 
-    QString exclusions = gCoreContext->GetSetting("GalleryIgnoreFilter");
-    int sort = gCoreContext->GetNumSetting("GallerySortOrder");
-
-    if (exclusions != oldExclusions)
-
-        // Exclusions changed: request rescan
-        GalleryBERequest::IgnoreDirs(exclusions);
-
-    else if (sort != oldSort)
+    // Effect any changes
+    QString date = gCoreContext->GetSetting("GalleryDateFormat");
+    if (date != oldDate)
     {
-        // Order changed: Update db view & reload
-        m_db->SetSortOrder(sort);
-        LoadData();
+        m_mgr.SetDateFormat(date);
+        BuildImageList();
     }
+
+    int sortIm  = gCoreContext->GetNumSetting("GalleryImageOrder");
+    int sortDir = gCoreContext->GetNumSetting("GalleryDirOrder");
+
+    if (sortIm != oldSortIm || sortDir != oldSortDir)
+    {
+        // Order changed: Update db view, reset cover cache & reload
+        m_mgr.SetSortOrder(sortIm, sortDir);
+        m_view->ClearCache();;
+        LoadData(m_view->GetParentId());
+    }
+
+    QString exclusions = gCoreContext->GetSetting("GalleryIgnoreFilter");
+    if (exclusions != oldExclusions)
+        // Exclusions changed: request rescan
+        m_mgr.IgnoreDirs(exclusions);
 }
 
 
@@ -1412,21 +1626,15 @@ void GalleryThumbView::ShowSettings()
 */
 void GalleryThumbView::ShowHidden(bool show)
 {
-    // Save setting, update db view & reload
     gCoreContext->SaveSetting("GalleryShowHidden", show);
-    m_db->SetVisibility(show);
-    LoadData();
-}
 
+    // Update Db(s)
+    m_mgr.SetVisibility(show);
 
-/*!
- \brief Show or hide captions
- \param setting None, Names, Dates or Comments
-*/
-void GalleryThumbView::ShowCaptions(int setting)
-{
-    gCoreContext->SaveSetting("GalleryShowCaption", setting);
-    BuildImageList();
+    // Reset dir thumbnail cache
+    m_view->ClearCache();;
+
+    LoadData(m_view->GetParentId());
 }
 
 
@@ -1438,12 +1646,12 @@ void GalleryThumbView::ShowCaptions(int setting)
 void GalleryThumbView::ShowDialog(QString msg, QString event)
 {
     MythConfirmationDialog *popup =
-        new MythConfirmationDialog(m_popupStack, msg, true);
+            new MythConfirmationDialog(&m_popupStack, msg, true);
 
     if (popup->Create())
     {
         popup->SetReturnEvent(this, event);
-        m_popupStack->AddScreen(popup);
+        m_popupStack.AddScreen(popup);
     }
     else
         delete popup;
@@ -1457,15 +1665,14 @@ void GalleryThumbView::ShowRenameInput()
 {
     if (m_menuState.m_selected)
     {
-        QString base =
-            QFileInfo(m_menuState.m_selected->m_name).completeBaseName();
-        QString              msg   = tr("Enter a new name for '%1'.").arg(base);
+        QString base = QFileInfo(m_menuState.m_selected->m_baseName).completeBaseName();
+        QString msg  = tr("Enter a new name:");
         MythTextInputDialog *popup =
-            new MythTextInputDialog(m_popupStack, msg, FilterNone, false, base);
+                new MythTextInputDialog(&m_popupStack, msg, FilterNone, false, base);
         if (popup->Create())
         {
             popup->SetReturnEvent(this, "FileRename");
-            m_popupStack->AddScreen(popup);
+            m_popupStack.AddScreen(popup);
         }
         else
             delete popup;
@@ -1478,7 +1685,7 @@ void GalleryThumbView::ShowRenameInput()
  */
 void GalleryThumbView::ShowDetails()
 {
-    m_infoList->Toggle(m_view->GetSelected());
+    m_infoList.Toggle(m_view->GetSelected());
 }
 
 
@@ -1489,11 +1696,11 @@ void GalleryThumbView::ShowPassword()
 {
     QString msg = tr("Enter password:");
     MythTextInputDialog *popup =
-        new MythTextInputDialog(m_popupStack, msg, FilterNone, true);
+            new MythTextInputDialog(&m_popupStack, msg, FilterNone, true);
     if (popup->Create())
     {
         popup->SetReturnEvent(this, "Password");
-        m_popupStack->AddScreen(popup);
+        m_popupStack.AddScreen(popup);
     }
     else
         delete popup;
@@ -1506,8 +1713,14 @@ void GalleryThumbView::ShowPassword()
 void GalleryThumbView::ShowType(int type)
 {
     gCoreContext->SaveSetting("GalleryShowType", type);
-    m_db->SetType(type);
-    LoadData();
+
+    // Update Db(s)
+    m_mgr.SetType(type);
+
+    // Reset dir thumbnail cache
+    m_view->ClearCache();
+
+    LoadData(m_view->GetParentId());
 }
 
 
@@ -1519,10 +1732,9 @@ void GalleryThumbView::SetCover(bool reset)
 {
     if (m_menuState.m_selected)
     {
-        QString err = reset
-                ? GalleryBERequest::SetCover(m_menuState.m_selected->m_id, 0)
-                : GalleryBERequest::SetCover(m_menuState.m_selected->m_parentId,
-                                              m_menuState.m_selected->m_id);
+        QString err = reset ? m_mgr.SetCover(m_menuState.m_selected->m_id, 0)
+                            : m_mgr.SetCover(m_menuState.m_selected->m_parentId,
+                                             m_menuState.m_selected->m_id);
         if (!err.isEmpty())
             ShowOkPopup(err);
     }
@@ -1563,7 +1775,7 @@ void GalleryThumbView::SelectZoomWidget(int change)
     if (m_zoomLevel >= m_zoomWidgets.size())
         m_zoomLevel = m_zoomWidgets.size() - 1;
 
-    // store any requested change, but not constraining adjustments
+    // Store any requested change, but not constraining adjustments
     // Thus, changing to a theme with fewer zoom levels will not overwrite the
     // setting
     if (change != 0)
@@ -1586,7 +1798,7 @@ void GalleryThumbView::SelectZoomWidget(int change)
     connect(m_imageList, SIGNAL(itemClicked(MythUIButtonListItem *)),
             SLOT(ItemClicked(MythUIButtonListItem *)));
     connect(m_imageList, SIGNAL(itemSelected(MythUIButtonListItem *)),
-            SLOT(ItemSelected(MythUIButtonListItem *)));
+            SLOT(SetUiSelection(MythUIButtonListItem*)));
 }
 
 
@@ -1595,12 +1807,13 @@ void GalleryThumbView::SelectZoomWidget(int change)
 */
 void GalleryThumbView::MakeDir()
 {
-    MythTextInputDialog *popup = new MythTextInputDialog(
-        m_popupStack, tr("Enter name of new directory"), FilterNone, false);
+    MythTextInputDialog *popup =
+            new MythTextInputDialog(&m_popupStack, tr("Enter name of new directory"),
+                                    FilterNone, false);
     if (popup->Create())
     {
         popup->SetReturnEvent(this, "MakeDir");
-        m_popupStack->AddScreen(popup);
+        m_popupStack.AddScreen(popup);
     }
     else
         delete popup;
@@ -1608,110 +1821,78 @@ void GalleryThumbView::MakeDir()
 
 
 /*!
- \brief Move marked files to selected dir. If no marked files, use previously
- marked files
+ \brief Remove local device (or Import) from Gallery
 */
-void GalleryThumbView::Move()
+void GalleryThumbView::Eject()
 {
-    ImageItem *destIm = m_menuState.m_selected;
-
-    // Destination must be a dir
-    if (!destIm || destIm->IsFile())
-        return;
-
-    // Use current markings, if any. Otherwise use previous markings
-    ImageIdList files = m_menuState.m_markedId;
-    if (files.isEmpty())
-        files = m_menuState.m_prevMarkedId;
-    if (files.isEmpty())
-        return;
-
-    // Move files/dirs in clipboard
-    QString err = GalleryBERequest::MoveFiles(destIm->m_id, files);
-    if (!err.isEmpty())
-        ShowOkPopup(err);
+    ImagePtrK dir = m_menuState.m_selected;
+    if (dir)
+        m_mgr.CloseDevices(dir->m_device, true);
 }
 
 
 /*!
- \brief Copy marked files to selected dir. If no marked files, use previously
- marked files
+ \brief Copy marked images to selected dir. If no marked files, use previously
+ marked files. Will not overwrite/duplicate existing files on destination host.
+ \details Copies files and dir subtrees and updates Db to preserve states such as
+ hidden, orientation & cover.
+ Attempts to copy all files and reports the number of failures (but not which ones)
+ \param deleteAfter If set, source images will be deleted after being successfully
+ copied.
 */
-void GalleryThumbView::Copy()
+void GalleryThumbView::Copy(bool deleteAfter)
 {
     // Destination must be a dir
-    ImageItem *destIm = m_menuState.m_selected;
-    if (!destIm || destIm->IsFile())
+    ImagePtrK destDir = m_menuState.m_selected;
+    if (!destDir || destDir->IsFile())
         return;
 
     // Use current markings, if any. Otherwise use previous markings
-    ImageIdList files = m_menuState.m_markedId;
-    if (files.isEmpty())
-        files = m_menuState.m_prevMarkedId;
-    if (files.isEmpty())
-        return;
-
-    // Get paste files from clipboard
-    QStringList ids;
-    foreach (int id, files)
-        ids.append(QString::number(id));
-
-    // Create new dir subtree & copy all files within it
-
-    // Get all files/dirs in subtree
-    ImageList images, dirs;
-    m_db->ReadDbTree(images, dirs, ids);
-
-    // Determine root dir of marked items
-    ImageItem *baseIm;
-    // Any dirs will be in hierarchial order so root must be derived from first
-    if (!dirs.isEmpty())
-        baseIm = dirs[0];
-    // If no dirs, root can be derived from any image
-    else if (!images.isEmpty())
-        baseIm = images[0];
-    else // should never happen
-        return;
-
-    QDir base = QDir("/" + baseIm->m_path);
-    QDir destDir(destIm->m_id == ROOT_DB_ID ? "" : destIm->m_fileName);
-
-    // Create dir subtree
-    if (!dirs.isEmpty())
+    ImageIdList markedIds = m_menuState.m_markedId;
+    if (markedIds.isEmpty())
     {
-        // Build list of destination paths for dirs
-        QStringList newDirs;
-        foreach(const ImageItem *im, dirs)
-            newDirs << destDir.filePath(base.relativeFilePath("/" + im->m_fileName));
-
-        qDeleteAll(dirs);
-
-        // Request BE to create directories first
-        QString err = GalleryBERequest::MakeDirs(newDirs);
-        if (!err.isEmpty())
+        markedIds = m_menuState.m_prevMarkedId;
+        if (markedIds.isEmpty())
         {
-            ShowOkPopup(err);
+            ShowOkPopup(tr("No files specified"));
             return;
         }
     }
 
-    // Build map of source & destination paths for each image
-    NameMap transfer;
-    foreach(const ImageItem *im, images)
+    // Get all files/dirs in subtree(s). Only files are copied
+    ImageList files, dirs;
+    m_mgr.GetDescendants(markedIds, files, dirs);
+
+    if (dirs.isEmpty() && files.isEmpty())
     {
-        ImageSg *sg = ImageSg::getInstance();
-        QString srcName  = sg->GenerateUrl(im->m_fileName);
-        QString destName = sg->GenerateUrl(
-            destDir.filePath(base.relativeFilePath("/" + im->m_fileName)));
-        transfer.insert(srcName, destName);
+        ShowOkPopup(tr("No images"));
+        // Nothing to clean up
+        return;
     }
 
-    qDeleteAll(images);
+    // Child dirs appear before their subdirs. If no dirs, images are all direct children
+    ImagePtrK aChild = dirs.isEmpty() ? files[0] : dirs[0];
+
+    // Determine parent path including trailing /
+    int basePathSize = aChild->m_filePath.size() - aChild->m_baseName.size();
+
+    // Update filepaths for Db & generate URLs for filesystem copy
+    // Only copy files, destination dirs will be created automatically
+    TransferThread::TransferMap transfers;
+    foreach(ImagePtr im, files)
+    {
+        // Replace base path with destination path
+        im->m_filePath = m_mgr.ConstructPath(destDir->m_filePath,
+                                             im->m_filePath.mid(basePathSize));
+
+        transfers.insert(im, m_mgr.BuildTransferUrl(im->m_filePath,
+                                                    destDir->IsLocal()));
+    }
 
     // Create progress dialog
     MythScreenStack      *popupStack = GetMythMainWindow()->GetStack("popup stack");
     MythUIProgressDialog *progress   =
-        new MythUIProgressDialog(tr("Copying files"), popupStack, "copydialog");
+            new MythUIProgressDialog(tr("Copying files"), popupStack, "copydialog");
     if (progress->Create())
         popupStack->AddScreen(progress, false);
     else
@@ -1720,129 +1901,203 @@ void GalleryThumbView::Copy()
         progress = NULL;
     }
 
-    // Copy files in a separate thread
-    if (RunWorker(new FileTransferWorker(false, transfer, progress)))
-        // Rescan to detect new files
-        GalleryBERequest::ScanImagesAction(true);
+    // Copy files in a servant thread
+    TransferThread copy(transfers, false, progress);
+    WaitUntilDone(copy);
+    TransferThread::ImageSet failed = copy.GetResult();
+
+    if (progress)
+        progress->Close();
+
+    if (!failed.isEmpty())
+        ShowOkPopup(tr("Failed to copy %L1/%Ln file(s)", 0, transfers.size())
+                    .arg(failed.size()));
+
+    // Don't update Db for files that failed
+    foreach (ImagePtrK im, failed)
+        transfers.remove(im);
+
+    ImageListK newImages = transfers.keys();
+
+    // Include dirs
+    QStringList dirPaths;
+    foreach(ImagePtr im, dirs)
+    {
+        QString relPath = im->m_filePath.mid(basePathSize);
+
+        dirPaths << relPath;
+
+        // Replace base path with destination path
+        im->m_filePath = m_mgr.ConstructPath(destDir->m_filePath, relPath);
+
+        // Append dirs so that hidden state & cover is preserved for new dirs
+        // Pre-existing dirs will take precedance over these.
+        newImages.append(im);
+    }
+
+    // Copy empty dirs as well (will fail for non-empty dirs)
+    if (!dirPaths.isEmpty())
+        m_mgr.MakeDir(destDir->m_id, dirPaths, false);
+
+    if (!newImages.isEmpty())
+    {
+        // Update Db
+        m_mgr.CreateImages(destDir->m_id, newImages);
+
+        if (deleteAfter)
+        {
+            // Delete files/dirs that have been successfully copied
+            // Will fail for dirs containing images that failed to copy
+            ImageIdList ids;
+            foreach (ImagePtrK im, newImages)
+                ids << im->m_id;
+
+            m_mgr.DeleteFiles(ids);
+        }
+    }
+}
+
+
+/*!
+ \brief Move marked images to selected dir. If no marked files, use previously
+ marked files. Will not overwrite/duplicate existing files on destination host.
+ \details When moving between different hosts the files are copied then deleted.
+ When moving on same host the files are renamed by the filesystem (which may also
+ copy/delete). The Db is updated to preserve states such as hidden, orientation & cover.
+ Attempts to move all files and reports the number of failures (but not which ones)
+ Successful moves are unmarked, failed ones remain marked.
+*/
+void GalleryThumbView::Move()
+{
+    // Destination must be a dir
+    ImagePtrK destDir = m_menuState.m_selected;
+    if (!destDir || destDir->IsFile())
+        return;
+
+    // Use current markings, if any. Otherwise use previous markings
+    ImageIdList markedIds = m_menuState.m_markedId;
+    if (markedIds.isEmpty())
+    {
+        markedIds = m_menuState.m_prevMarkedId;
+        if (markedIds.isEmpty())
+        {
+            ShowOkPopup(tr("No files specified"));
+            return;
+        }
+    }
+
+    // Note UI mandates that transferees are either all local or all remote
+    if (destDir->IsLocal() != ImageItem::IsLocalId(markedIds[0]))
+    {
+        // Moves between hosts require copy/delete
+        Copy(true);
+        return;
+    }
+
+    // Get marked images. Each file and dir will be renamed
+    ImageList files, dirs;
+    if (m_mgr.GetImages(markedIds, files, dirs) <= 0)
+    {
+        ShowOkPopup(tr("No images specified"));
+        // Nothing to clean up
+        return;
+    }
+    ImageList images = dirs + files;
+
+    // Determine parent from first dir or pic
+    ImagePtr aChild = images[0];
+
+    // Determine parent path including trailing /
+    // Note UI mandates that transferees all have same parent.
+    int basePathSize = aChild->m_filePath.size() - aChild->m_baseName.size();
+    QString parentPath = aChild->m_filePath.left(basePathSize);
+
+    // Determine destination URLs
+    TransferThread::TransferMap transfers;
+    foreach(ImagePtrK im, images)
+    {
+        // Replace base path with destination path
+        QString newPath = m_mgr.ConstructPath(destDir->m_filePath,
+                                              im->m_filePath.mid(basePathSize));
+
+        transfers.insert(im, m_mgr.BuildTransferUrl(newPath, aChild->IsLocal()));
+    }
+
+    // Create progress dialog
+    MythScreenStack      *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythUIProgressDialog *progress   =
+            new MythUIProgressDialog(tr("Moving files"), popupStack, "movedialog");
+
+    if (progress->Create())
+        popupStack->AddScreen(progress, false);
     else
-        ShowOkPopup(tr("Failed to copy files"));
+    {
+        delete progress;
+        progress = NULL;
+    }
+
+    // Move files in a servant thread
+    TransferThread move(transfers, true, progress);
+    WaitUntilDone(move);
+    TransferThread::ImageSet failed = move.GetResult();
+
+    if (progress)
+        progress->Close();
+
+    if (!failed.isEmpty())
+        ShowOkPopup(tr("Failed to move %L1/%Ln file(s)", 0, transfers.size())
+                    .arg(failed.size()));
+
+    // Don't update Db for files that failed
+    foreach (ImagePtrK im, failed)
+        transfers.remove(im);
+
+    if (!transfers.isEmpty())
+    {
+        ImageListK moved = transfers.keys();
+
+        // Unmark moved files
+        foreach (ImagePtrK im, moved)
+            m_view->Mark(im->m_id, false);
+
+        // Update Db
+        m_mgr.MoveDbImages(destDir, moved, parentPath);
+    }
 }
 
 
 /*!
  \brief Executes user 'Import command'
 */
-void GalleryThumbView::RunImportCmd()
+void GalleryThumbView::Import()
 {
-    // Replace tokens
-    QString cmd = gCoreContext->GetSetting("GalleryImportCmd");
-    QString dir = gCoreContext->GetSetting("GalleryImportLocation");
-
-    cmd.replace("%DIR%", QString("'%1'").arg(dir));
-
-    if (cmd.contains("%TMPDIR%"))
+    QString path = m_mgr.CreateImport();
+    if (path.isEmpty())
     {
-        // Remove previous temp dir
-        delete m_importTmp;
-        // Create temp dir
-        m_importTmp = new QTemporaryDir();
-        if (!m_importTmp->isValid())
-        {
-            ShowOkPopup(QString(tr("Failed to create temporary directory\n%1"))
-                        .arg(m_importTmp->path()));
-            return;
-        }
-
-        cmd.replace("%TMPDIR%", m_importTmp->path());
+        ShowOkPopup(tr("Failed to create temporary directory."));
+        return;
     }
 
-    // Run command in a separate thread
-    MythUIBusyDialog *busy = ShowBusyPopup(tr("Running Import command.\nPlease wait..."));
+    // Replace placeholder in command
+    QString cmd = gCoreContext->GetSetting("GalleryImportCmd");
+    cmd.replace("%TMPDIR%", path);
 
-    int error = RunWorker(new ShellWorker(cmd));
+    // Run command in a separate thread
+    MythUIBusyDialog *busy =
+            ShowBusyPopup(tr("Running Import command.\nPlease wait..."));
+
+    ShellThread thread(cmd, path);
+    WaitUntilDone(thread);
 
     if (busy)
         busy->Close();
 
+    int error = thread.GetResult();
     if (error != 0)
-        ShowOkPopup(QString(tr("Import command failed: Error %1")).arg(error));
-}
+        ShowOkPopup(QString(tr("Import command failed.\nError: %1")).arg(error));
 
-
-/*!
- \brief Show import dialog
-*/
-void GalleryThumbView::ShowImport(bool deleteAfter)
-{
-    m_deleteAfterImport = deleteAfter;
-
-    // Use temp dir if it exists
-    QString start = m_importTmp
-            ? m_importTmp->path()
-            : gCoreContext->GetSetting("GalleryImportLocation", "/media");
-
-    MythScreenStack        *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythUIMultiFileBrowser *fb = new MythUIMultiFileBrowser(popupStack, start);
-
-    // Only browse supported image/video files
-    QDir filters(ImageSg::getInstance()->GetImageFilters());
-    fb->SetNameFilter(filters.nameFilters());
-
-    fb->SetTypeFilter(QDir::AllDirs | QDir::Files | QDir::NoSymLinks | QDir::Readable);
-    if (fb->Create())
-    {
-        fb->SetReturnEvent(this, "ImportFilesSelected");
-        popupStack->AddScreen(fb);
-    }
-    else
-        delete fb;
-}
-
-
-/*!
- \brief Import files into selected dir
- \param files List of file names
-*/
-void GalleryThumbView::ImportFiles(QStringList files)
-{
-    // Determine destination dir
-    ImageItem *destIm = m_menuState.m_selected;
-
-    // Destination must be a dir
-    if (!destIm || destIm->IsFile())
-        return;
-
-    QDir    destDir(destIm->m_id == ROOT_DB_ID ? "" : destIm->m_fileName);
-
-    // Build map of source & destination paths.
-    // Assumes all files are images; no dirs permitted
-    NameMap transfer;
-    ImageSg *sg = ImageSg::getInstance();
-    foreach(const QString &source, files)
-    {
-        QFileInfo fi(source);
-        QString   destName(sg->GenerateUrl(destDir.filePath(fi.fileName())));
-        transfer.insert(source, destName);
-    }
-
-    // Create progress dialog
-    MythScreenStack      *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythUIProgressDialog *progress   =
-        new MythUIProgressDialog(tr("Importing files"),
-                                 popupStack,
-                                 "importdialog");
-    if (progress->Create())
-        popupStack->AddScreen(progress, false);
-    else
-    {
-        delete progress;
-        progress = NULL;
-    }
-
-    // Import files in a separate thread
-    if (RunWorker(new FileTransferWorker(m_deleteAfterImport, transfer, progress)))
-        // Rescan to detect new files
-        GalleryBERequest::ScanImagesAction(true);
-    else
-        ShowOkPopup(tr("Failed to import files"));
+    // Rescan local devices
+    QString err = m_mgr.ScanImagesAction(true, true);
+    if (!err.isEmpty())
+        LOG(VB_GENERAL, LOG_ERR, LOC + err);
 }
