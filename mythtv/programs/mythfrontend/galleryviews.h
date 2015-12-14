@@ -18,7 +18,8 @@
 enum SlideOrderType {
     kOrdered  = 0, //!< Ordered as per user setting GallerySortOrder
     kShuffle  = 1, //!< Each image appears exactly once, but in random order
-    kRandom   = 2  //!< Random selection from view. An image may be absent or appear multiple times
+    kRandom   = 2, //!< Random selection from view. An image may be absent or appear multiple times
+    kSeasonal = 3  //!< Biased random selection so that images are more likely to appear on anniversaries
 };
 
 

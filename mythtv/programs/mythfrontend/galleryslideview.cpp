@@ -362,7 +362,7 @@ void GallerySlideView::Start(ImageSlideShowType type, int parentId, int selected
     {
         int orderInt = gCoreContext->GetNumSetting("GallerySlideOrder", kOrdered);
 
-        SlideOrderType order = (orderInt < kOrdered) || (orderInt > kRandom)
+        SlideOrderType order = (orderInt < kOrdered) || (orderInt > kSeasonal)
                 ? kOrdered
                 : static_cast<SlideOrderType>(orderInt);
 

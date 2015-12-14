@@ -480,6 +480,7 @@ void GalleryThumbView::customEvent(QEvent *event)
             case 0: slideOrder = kOrdered; break;
             case 1: slideOrder = kShuffle; break;
             case 2: slideOrder = kRandom; break;
+            case 3: slideOrder = kSeasonal; break;
             }
             gCoreContext->SaveSetting("GallerySlideOrder", slideOrder);
             LOG(VB_FILE, LOG_DEBUG, LOC + QString("Order %1").arg(slideOrder));
@@ -1213,6 +1214,7 @@ void GalleryThumbView::MenuSlideshow(MythMenu *mainMenu)
     {
     case kShuffle  : ordering = tr("Shuffled"); break;
     case kRandom   : ordering = tr("Random"); break;
+    case kSeasonal : ordering = tr("Seasonal"); break;
     default: 
     case kOrdered  : ordering = tr("Ordered"); break;
     }
@@ -1238,6 +1240,7 @@ void GalleryThumbView::MenuSlideshow(MythMenu *mainMenu)
     orderMenu->AddItem(tr("Ordered"),  NULL, NULL, order == kOrdered);
     orderMenu->AddItem(tr("Shuffled"), NULL, NULL, order == kShuffle);
     orderMenu->AddItem(tr("Random"),   NULL, NULL, order == kRandom);
+    orderMenu->AddItem(tr("Seasonal"), NULL, NULL, order == kSeasonal);
 
     menu->AddItem(tr("Change Order"), NULL, orderMenu);
 

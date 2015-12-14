@@ -8,6 +8,22 @@
 //! Number of thumbnails to use for folders
 const static int   kMaxFolderThumbnails = 4;
 
+//! Tuning parameter for seasonal weights, between 0 and 1, where lower numbers
+//! give greater weight to seasonal photos. The leading beta shape controls
+//! dates that are approaching and the trailing beta shape controls dates that
+//! just passed. When these are set to 0.175 and 0.31, respectively, about one
+//! quarter of the photos are from the upcoming week in prior years and about one
+//! quarter of the photos are from the preceding month in prior years.
+const double LEADING_BETA_SHAPE  = 0.175;
+//! See LEADING_BETA_SHAPE
+const double TRAILING_BETA_SHAPE = 0.31;
+
+//! Photos without an exif timestamp will default to the mode of the beta distribution.
+const double DEFAULT_WEIGHT = std::pow(0.5, TRAILING_BETA_SHAPE - 1) *
+                              std::pow(0.5, LEADING_BETA_SHAPE - 1);
+//! The edges of the distribution get clipped to avoid a singularity.
+const qint64 BETA_CLIP = 60 * 60 * 24;
+
 
 /*!
  \brief Get all images/dirs in view
@@ -222,7 +238,85 @@ void FlatView::Populate(ImageList &files)
                 m_sequence.append(files.at(index)->m_id);
             }
         }
+        else if (m_order == kSeasonal)
+        {
+            WeightList weights   = CalculateSeasonalWeights(files);
+            double     maxWeight = weights.last();
+
+            qsrand(QTime::currentTime().msec());
+            for (int count = 0; count < files.size(); ++count)
+            {
+                double randWeight = qrand() * maxWeight / RAND_MAX;
+                WeightList::iterator it =
+                        std::upper_bound(weights.begin(), weights.end(), randWeight);
+                int    index      = std::distance(weights.begin(), it);
+                m_sequence.append(files.at(index)->m_id);
+            }
+        }
     }
+}
+
+
+/*!
+ \brief
+ * This method calculates a weight for the item based on how closely it was
+ * taken to the current time of year. This means that New Year's pictures will
+ * be displayed very frequently on every New Year's, and that anniversary
+ * pictures will be favored again every anniversary. The weights are chosen
+ * using a beta distribution with a tunable shape parameter.
+ \param files List of database images
+ \return WeightList Corresponding list of weightings
+*/
+WeightList FlatView::CalculateSeasonalWeights(ImageList &files)
+{
+    WeightList weights(files.size());
+    double     totalWeight = 0;
+    QDateTime  now         = QDateTime::currentDateTime();
+
+    for (int i = 0; i < files.size(); ++i)
+    {
+        ImagePtrK im = files.at(i);
+        double weight;
+
+        if (im->m_date == 0)
+            weight = DEFAULT_WEIGHT;
+        else
+        {
+            QDateTime timestamp = QDateTime::fromTime_t(im->m_date);
+            QDateTime curYearAnniversary =
+                    QDateTime(QDate(now.date().year(),
+                                    timestamp.date().month(),
+                                    timestamp.date().day()),
+                              timestamp.time());
+
+            bool isAnniversaryPast = curYearAnniversary < now;
+
+            QDateTime adjacentYearAnniversary =
+                    QDateTime(QDate(now.date().year() +
+                                    (isAnniversaryPast ? 1 : -1),
+                                    timestamp.date().month(),
+                                    timestamp.date().day()),
+                              timestamp.time());
+
+            double range = abs(curYearAnniversary.secsTo(
+                                   adjacentYearAnniversary)) + BETA_CLIP;
+
+            // This calculation is not normalized, because that would require the
+            // beta function, which isn't part of the C++98 libraries. Weights
+            // that aren't normalized work just as well relative to each other.
+            QDateTime d1(isAnniversaryPast ? curYearAnniversary
+                                           : adjacentYearAnniversary);
+            QDateTime d2(isAnniversaryPast ? adjacentYearAnniversary
+                                           : curYearAnniversary);
+            weight = std::pow(abs(now.secsTo(d1) + BETA_CLIP) / range,
+                              TRAILING_BETA_SHAPE - 1)
+                    * std::pow(abs(now.secsTo(d2) + BETA_CLIP) / range,
+                               LEADING_BETA_SHAPE - 1);
+        }
+        totalWeight += weight;
+        weights[i]   = totalWeight;
+    }
+    return weights;
 }
 
 
