@@ -47,4 +47,30 @@ private:
 };
 
 
+//! Settings for Thumbnail view
+class ThumbSettings : public VerticalConfigurationGroup
+{
+    Q_OBJECT
+public:
+    ThumbSettings();
+};
+
+
+//! Settings for Slideshow view
+class SlideSettings : public VerticalConfigurationGroup
+{
+    Q_OBJECT
+public:
+    SlideSettings();
+};
+
+
+//! Settings for Import 
+class ImportSettings : public VerticalConfigurationGroup
+{
+    Q_OBJECT
+public:
+    explicit ImportSettings(bool enable);
+};
+
 #endif // GALLERYCONFIG_H

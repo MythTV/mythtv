@@ -328,7 +328,6 @@ private:
 template <class DBFS>
 class META_PUBLIC ImageHandler : protected DBFS
 {
-    Q_DECLARE_TR_FUNCTIONS()
 public:
     QStringList HandleRename(const QString &, const QString &) const;
     QStringList HandleDelete(const QString &) const;
