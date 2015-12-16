@@ -1193,6 +1193,14 @@ void MythMainWindow::Init(QString forcedpainter)
     ResizePainterWindow(size());
     d->paintwin->raise();
     ShowPainterWindow();
+
+# if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+    // Redraw the window now to avoid race conditions in EGLFS (Qt5.4) if a
+    // 2nd window (e.g. TVPlayback) is created before this is redrawn.
+    if (qApp->platformName().contains("egl"))
+        qApp->processEvents();
+#endif
+
     if (!GetMythDB()->GetNumSetting("HideMouseCursor", 0))
         d->paintwin->setMouseTracking(true); // Required for mouse cursor auto-hide
 
