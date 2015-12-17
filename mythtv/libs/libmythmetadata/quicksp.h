@@ -91,7 +91,7 @@ class simple_ref_ptr
     class ref : public Locker
     {
       public:
-        ref(T *ptr) : m_count(1), m_type(ptr) {}
+        explicit ref(T *ptr) : m_count(1), m_type(ptr) {}
 
         ~ref()
         {

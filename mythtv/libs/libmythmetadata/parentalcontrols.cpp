@@ -211,7 +211,7 @@ class ParentalLevelChangeCheckerPrivate : public QObject
     Q_OBJECT
 
   public:
-    ParentalLevelChangeCheckerPrivate(QObject *lparent) : QObject(lparent)
+    explicit ParentalLevelChangeCheckerPrivate(QObject *lparent) : QObject(lparent)
     {
         m_pm.Add(ParentalLevel::plHigh,
                 gCoreContext->GetSetting("VideoAdminPassword"));

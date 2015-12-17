@@ -40,7 +40,7 @@ class META_PUBLIC VideoMetadata
     {
       public:
         SortKey();
-        SortKey(const SortData &data);
+        explicit SortKey(const SortData &data);
         SortKey(const SortKey &other);
         SortKey &operator=(const SortKey &rhs);
         ~SortKey();
@@ -101,7 +101,7 @@ class META_PUBLIC VideoMetadata
              bool processed = false,
              VideoContentType contenttype = kContentUnknown);
     ~VideoMetadata();
-    VideoMetadata(MSqlQuery &query);
+    explicit VideoMetadata(MSqlQuery &query);
     VideoMetadata(const VideoMetadata &rhs);
     VideoMetadata &operator=(const VideoMetadata &rhs);
 

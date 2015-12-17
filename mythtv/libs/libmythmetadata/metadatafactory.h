@@ -18,8 +18,8 @@ class RecordingRule;
 class META_PUBLIC MetadataFactoryMultiResult : public QEvent
 {
   public:
-    MetadataFactoryMultiResult(MetadataLookupList res) : QEvent(kEventType),
-                                            results(res) {}
+    explicit MetadataFactoryMultiResult(MetadataLookupList res)
+        : QEvent(kEventType), results(res) {}
     ~MetadataFactoryMultiResult() {}
 
     MetadataLookupList results;
@@ -30,8 +30,8 @@ class META_PUBLIC MetadataFactoryMultiResult : public QEvent
 class META_PUBLIC MetadataFactorySingleResult : public QEvent
 {
   public:
-    MetadataFactorySingleResult(MetadataLookup *res) : QEvent(kEventType),
-                                            result(res)
+    explicit MetadataFactorySingleResult(MetadataLookup *res)
+        : QEvent(kEventType), result(res)
     {
         if (result)
         {
@@ -55,8 +55,8 @@ class META_PUBLIC MetadataFactorySingleResult : public QEvent
 class META_PUBLIC MetadataFactoryNoResult : public QEvent
 {
   public:
-    MetadataFactoryNoResult(MetadataLookup *res) : QEvent(kEventType),
-                                            result(res)
+    explicit MetadataFactoryNoResult(MetadataLookup *res)
+        : QEvent(kEventType), result(res)
     {
         if (result)
         {
@@ -98,7 +98,7 @@ class META_PUBLIC MetadataFactory : public QObject
 
   public:
 
-    MetadataFactory(QObject *parent);
+    explicit MetadataFactory(QObject *parent);
     ~MetadataFactory();
 
     void Lookup(ProgramInfo *pginfo, bool automatic = true,

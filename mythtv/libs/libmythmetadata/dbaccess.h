@@ -25,7 +25,7 @@ class META_PUBLIC SingleValue
     void load_data();
 
   protected:
-    SingleValue(SingleValueImp *imp);
+    explicit SingleValue(SingleValueImp *imp);
     virtual ~SingleValue();
 
   private:
@@ -55,7 +55,7 @@ class META_PUBLIC MultiValue
     void load_data();
 
   protected:
-    MultiValue(MultiValueImp *imp);
+    explicit MultiValue(MultiValueImp *imp);
     virtual ~MultiValue();
 
   private:

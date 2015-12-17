@@ -360,7 +360,7 @@ class META_PUBLIC MetadataLoadingThread : public MThread
 
   public:
 
-    MetadataLoadingThread(AllMusic *parent_ptr);
+    explicit MetadataLoadingThread(AllMusic *parent_ptr);
     virtual void run();
 
   private:
@@ -457,7 +457,7 @@ class META_PUBLIC AllStream
 class AlbumArtScannerThread: public MThread
 {
   public:
-    AlbumArtScannerThread(QStringList strList) :
+    explicit AlbumArtScannerThread(QStringList strList) :
             MThread("AlbumArtScanner"), m_strList(strList) {}
 
     virtual void run()

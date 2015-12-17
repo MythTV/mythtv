@@ -30,7 +30,7 @@ template <typename T>
 class META_PUBLIC SimpleCleanup : public CleanupProc
 {
   public:
-    SimpleCleanup(T *inst) : m_inst(inst)
+    explicit SimpleCleanup(T *inst) : m_inst(inst)
     {
         CleanupHooks::getInstance()->addHook(this);
     }

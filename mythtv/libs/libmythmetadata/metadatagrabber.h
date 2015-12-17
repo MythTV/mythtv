@@ -30,8 +30,8 @@ class META_PUBLIC MetaGrabberScript : public QObject
 {
   public:
     MetaGrabberScript();
-    MetaGrabberScript(const QDomElement &dom);
-    MetaGrabberScript(const QString &path);
+    explicit MetaGrabberScript(const QDomElement &dom);
+    explicit MetaGrabberScript(const QString &path);
     MetaGrabberScript(const QString &path, const QDomElement &dom);
     MetaGrabberScript(const MetaGrabberScript &other);
 
