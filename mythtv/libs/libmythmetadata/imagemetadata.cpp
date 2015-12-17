@@ -77,7 +77,8 @@ Orientation::Matrix Orientation::InitOrientationMatrix()
 }
 
 const bool Orientation::krunningQt541 = (strcmp(qVersion(), "5.4.1") == 0);
-const Orientation::Matrix Orientation::kQt541_orientation = InitOrientationMatrix();
+const Orientation::Matrix Orientation::kQt541_orientation =
+        Orientation::InitOrientationMatrix();
 
 
 /*!
@@ -258,7 +259,7 @@ QString Orientation::AsText(int orientation)
 class PictureMetaData : public ImageMetaData
 {
 public:
-    PictureMetaData(const QString &filePath);
+    explicit PictureMetaData(const QString &filePath);
     ~PictureMetaData()
     { // libexiv2 closes file, cleans up via autoptrs
     }
@@ -482,7 +483,7 @@ QString PictureMetaData::DecodeComment(std::string rawValue)
 class VideoMetaData : public ImageMetaData
 {
 public:
-    VideoMetaData(const QString &filePath);
+    explicit VideoMetaData(const QString &filePath);
     ~VideoMetaData();
 
     virtual bool        IsValid()                        { return m_dict; }

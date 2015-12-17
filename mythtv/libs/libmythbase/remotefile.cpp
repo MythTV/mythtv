@@ -579,21 +579,20 @@ bool RemoteFile::CopyFile (const QString& src, const QString& dst,
         return false;
     }
 
+    RemoteFile srcFile(src, false);
+    if (!srcFile.isOpen())
+    {
+         LOG(VB_GENERAL, LOG_ERR,
+             QString("RemoteFile::CopyFile: Failed to open file (%1) for reading.").arg(src));
+         return false;
+    }
+
     const int readSize = 2 * 1024 * 1024;
     char *buf = new char[readSize];
     if (!buf)
     {
         LOG(VB_GENERAL, LOG_ERR, "RemoteFile::CopyFile: ERROR, unable to allocate copy buffer");
         return false;
-    }
-
-    RemoteFile srcFile(src, false);
-    if (!srcFile.isOpen())
-    {
-         LOG(VB_GENERAL, LOG_ERR,
-             QString("RemoteFile::CopyFile: Failed to open file (%1) for reading.").arg(src));
-         delete[] buf;
-         return false;
     }
 
     if (overwrite)
@@ -603,6 +602,7 @@ bool RemoteFile::CopyFile (const QString& src, const QString& dst,
     else if (Exists(dst))
     {
         LOG(VB_GENERAL, LOG_ERR, "RemoteFile::CopyFile: File already exists");
+        delete[] buf;
         return false;
     }
 
