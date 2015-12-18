@@ -7897,8 +7897,8 @@ Please wait...</translation>
         <location filename="../programs/mythfrontend/idlescreen.cpp" line="138"/>
         <source>Backend will shutdown in %n second(s).</source>
         <translation>
-            <numerusform>Backend will shutdown in %n second(s).</numerusform>
-            <numerusform></numerusform>
+            <numerusform>Backend will shutdown in %n second.</numerusform>
+            <numerusform>Backend will shutdown in %n seconds.</numerusform>
         </translation>
     </message>
 </context>
