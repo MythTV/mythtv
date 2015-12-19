@@ -910,10 +910,10 @@ void MythRenderOpenGL2::PushTransformation(const UIEffects &fx, QPointF &center)
     QMatrix4x4 newtop = m_transforms.top();
     if (fx.hzoom != 1.0 || fx.vzoom != 1.0 || fx.angle != 0.0)
     {
-        newtop.translate(-center.x(), -center.y());
-        newtop.scale(fx.hzoom, fx.vzoom);
-        newtop.rotate(fx.angle * (M_PI / 180.0), 0, 0);
         newtop.translate(center.x(), center.y());
+        newtop.scale(fx.hzoom, fx.vzoom);
+        newtop.rotate(fx.angle, 0, 0, 1);
+        newtop.translate(-center.x(), -center.y());
     }
     m_transforms.push(newtop);
 }
