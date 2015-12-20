@@ -1,51 +1,86 @@
 #-*- coding: UTF-8 -*-
+"""
+Scraper for http://www.genius.com
+
+taxigps
+"""
 import sys
 import urllib
+import urllib2
+import socket
 import re
+import chardet
+import HTMLParser
+from hashlib import md5
+import chardet
+import difflib
 from optparse import OptionParser
-from common import *
+from common import utilities
+
+if sys.version_info < (2, 7):
+    import simplejson
+else:
+    import json as simplejson
 
 __author__      = "Paul Harrison and ronie'"
-__title__       = "LyricsTime"
-__description__ = "Search http://www.lyricstime.com for lyrics"
-__priority__    = "220"
+__title__       = "Genius"
+__description__ = "Search http://www.genius.com for lyrics"
+__priority__    = "210"
 __version__     = "0.1"
 __syncronized__ = False
 
+
 debug = False
 
-def replace_char(string):
-    invalid_char = [" ",",","'",]
-    for char in invalid_char:
-        string = string.replace(char,"-")
-    return string
+socket.setdefaulttimeout(10)
 
 class LyricsFetcher:
     def __init__( self ):
-        self.clean_lyrics_regex = re.compile( "<.+?>" )
-        self.normalize_lyrics_regex = re.compile( "&#[x]*(?P<name>[0-9]+);*" )
-        self.clean_br_regex = re.compile( "<br[ /]*>[\s]*", re.IGNORECASE )
-        self.clean_info_regex = re.compile( "\[[a-z]+?:.*\]\s" )
+        self.url = 'http://api.genius.com/search?q=%s%s%s&access_token=7pTrhwtmyQmccHoJX8HjXpYmyAdkbe19x5sjvwkf1UEIQTrPeXEm6LgylJi9GiPO'
 
     def get_lyrics(self, lyrics):
         utilities.log(debug, "%s: searching lyrics for %s - %s - %s" % (__title__, lyrics.artist, lyrics.album, lyrics.title))
 
-        try: # ***** parser - changing this changes search string
-            url = "http://www.lyricstime.com/%s-%s-lyrics.html" % (replace_char(lyrics.artist.lower()).replace("&","and").replace("---","-").replace("--","-"),replace_char(lyrics.title.lower()).replace("&","and").replace("---","-").replace("--","-"))
-            song_search = urllib.urlopen(url).read()
-            utilities.log(debug, "%s: search url: %s" % (__title__, url))
-            lyr = song_search.split('<div id="songlyrics" style="padding-right:20px;">')[1].split('</div>')[0]
-            lyr = self.clean_br_regex.sub( "\n", lyr ).strip()
-            lyr = self.clean_lyrics_regex.sub( "", lyr ).strip()
-            lyr = self.normalize_lyrics_regex.sub(
-                      lambda m: unichr( int( m.group( 1 ) ) ), lyr.decode("ISO-8859-1") )
-            lyr = u"\n".join( [ lyric.strip() for lyric in lyr.splitlines() ] )
-            lyr = self.clean_info_regex.sub( "", lyr )
-            lyrics.lyrics = lyr
+        try:
+            request = urllib2.Request(self.url % (urllib2.quote(lyrics.artist), '%20', urllib2.quote(lyrics.title)))
+            request.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; rv:25.0) Gecko/20100101 Firefox/25.0')
+            req = urllib2.urlopen(request)
+            response = req.read()
+        except:
+            return False
+
+        req.close()
+        data = simplejson.loads(response)
+
+        try:
+            self.page = data['response']['hits'][0]['result']['url']
+        except:
+            return False
+
+        utilities.log(debug, "%s: search url: %s" % (__title__, self.page))
+
+        try:
+            request = urllib2.Request(self.page)
+            request.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; rv:25.0) Gecko/20100101 Firefox/25.0')
+            req = urllib2.urlopen(request)
+            response = req.read()
+        except:
+            return False
+
+        req.close()
+        matchcode = re.search('div class="lyrics".*?">(.*?)</div', response, flags=re.DOTALL)
+
+        try:
+            lyricscode = (matchcode.group(1))
+            htmlparser = HTMLParser.HTMLParser()
+            lyricstext = htmlparser.unescape(lyricscode).replace('<br />', '\n')
+            templyr = re.sub('<[^<]+?>', '', lyricstext)
+            lyr = re.sub('\[(.*?)\]', '', templyr)
+            lyrics.lyrics = lyr.strip().replace('\n\n\n', '\n\n')
             return True
         except:
-            utilities.log(True, "%s: %s::%s (%d) [%s]" % ( __title__, self.__class__.__name__, sys.exc_info()[ 2 ].tb_frame.f_code.co_name, sys.exc_info()[ 2 ].tb_lineno, sys.exc_info()[ 1 ] ))
             return False
+
 
 def performSelfTest():
     found = False
@@ -88,7 +123,7 @@ def buildVersion():
     version = etree.XML(u'<grabber></grabber>')
     etree.SubElement(version, "name").text = __title__
     etree.SubElement(version, "author").text = __author__
-    etree.SubElement(version, "command").text = 'lyricstime.py'
+    etree.SubElement(version, "command").text = 'minilyrics.py'
     etree.SubElement(version, "type").text = 'lyrics'
     etree.SubElement(version, "description").text = __description__
     etree.SubElement(version, "version").text = __version__
@@ -153,6 +188,6 @@ def main():
         utilities.log(True, "No lyrics found for this track")
         sys.exit(1)
 
-
 if __name__ == '__main__':
     main()
+ 
