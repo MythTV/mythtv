@@ -42,6 +42,7 @@ LIBS += -lmythprotoserver-$$LIBVERSION
 using_live:LIBS += -L../../libs/libmythlivemedia -lmythlivemedia-$$LIBVERSION
 using_mheg:LIBS += -L../../libs/libmythfreemheg -lmythfreemheg-$$LIBVERSION
 using_hdhomerun:LIBS += -L../../external/libhdhomerun -lmythhdhomerun-$$LIBVERSION
+using_taglib: LIBS += $$CONFIG_TAGLIB_LIBS
 
 win32 {
     CONFIG += console
