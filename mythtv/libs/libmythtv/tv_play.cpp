@@ -13420,7 +13420,7 @@ void TV::HandleSaveLastPlayPosEvent(void)
                 start(new PositionSaver(*ctx->playingInfo, framesPlayed),
                       "PositionSaver");
         }
-        ReturnPlayerLock(ctx);
+        ctx->UnlockDeletePlayer(__FILE__, __LINE__);
     }
     ReturnPlayerLock(mctx);
 
