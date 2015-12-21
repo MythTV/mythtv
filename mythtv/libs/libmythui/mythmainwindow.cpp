@@ -400,7 +400,6 @@ MythPainterWindowGL::MythPainterWindowGL(MythMainWindow *win,
 {
     rend->setWidget(this);
 #ifdef USE_OPENGL_QT5
-    winId();
     setAttribute(Qt::WA_NoSystemBackground);
 #else
     setAutoBufferSwap(false);
@@ -410,7 +409,7 @@ MythPainterWindowGL::MythPainterWindowGL(MythMainWindow *win,
 #ifdef USE_OPENGL_QT5
 QPaintEngine *MythPainterWindowGL::paintEngine() const
 {
-    return parent->paintEngine();
+    return testAttribute(Qt::WA_PaintOnScreen) ? 0 : parent->paintEngine();
 }
 
 MythPainterWindowGL::~MythPainterWindowGL()

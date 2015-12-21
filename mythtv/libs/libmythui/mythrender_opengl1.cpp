@@ -1,5 +1,8 @@
 #include "mythrender_opengl1.h"
 
+#include <QPen>
+#include <QBrush>
+
 #define LOC QString("OpenGL1: ")
 
 MythRenderOpenGL1::MythRenderOpenGL1(const MythRenderFormat& format, QPaintDevice* device)

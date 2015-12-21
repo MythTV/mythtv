@@ -254,6 +254,7 @@ void MythRenderOpenGL::setWidget(QWidget *w)
     if (!w)
         return;
 
+    w->winId(); // Ensure native window
     m_window = w->windowHandle();
     if (!m_window)
     {
@@ -283,15 +284,21 @@ void MythRenderOpenGL::setWidget(QGLWidget *w)
 void MythRenderOpenGL::makeCurrent()
 {
     m_lock.lock();
-#ifdef USE_OPENGL_QT5
+#if QT_VERSION >= QT_VERSION_CHECK(5, 4, 0)
     // Testing MythRenderOpenGL::currentContext is not reliable
-    if (m_lock_level == 0)
+    if (!m_lock_level++)
+    {
+#ifdef USE_OPENGL_QT5
         QOpenGLContext::makeCurrent(m_window);
+#else
+        QGLContext::makeCurrent();
+#endif
+    }
 #else
     if (this != MythRenderOpenGL::currentContext())
         QGLContext::makeCurrent();
-#endif
     m_lock_level++;
+ #endif
 }
 
 void MythRenderOpenGL::doneCurrent()
@@ -951,7 +958,7 @@ void* MythRenderOpenGL::GetProcAddress(const QString &proc) const
         if (result)
             break;
 #else
-        result = reinterpret_cast<void*>(getProcAddress(proc + exts[i]));
+        result = reinterpret_cast<void*>(getProcAddress(qPrintable(proc + exts[i])));
         if (result)
             break;
 #endif
