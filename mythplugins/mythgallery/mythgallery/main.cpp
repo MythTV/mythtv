@@ -79,10 +79,7 @@ static void handleMedia(MythMediaDevice *dev)
         return;
 
     if (dev && dev->isUsable())
-    {
-        GetMythMainWindow()->JumpTo("Main Menu");
         run(dev);
-    }
 }
 
 static void setupKeys(void)

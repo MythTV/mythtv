@@ -314,7 +314,8 @@ void MediaMonitor::AttemptEject(MythMediaDevice *device)
  */
 MediaMonitor::MediaMonitor(QObject* par, unsigned long interval,
                            bool allowEject)
-    : QObject(par), m_Active(false), m_Thread(NULL),
+    : QObject(par), m_DevicesLock(QMutex::Recursive),
+      m_Active(false), m_Thread(NULL),
       m_MonitorPollingInterval(interval), m_AllowEject(allowEject)
 {
     // User can specify that some devices are not monitored
@@ -378,6 +379,9 @@ bool MediaMonitor::RemoveDevice(const QString &dev)
     {
         if ((*it)->getDevicePath() == dev)
         {
+            // Ensure device gets an unmount
+            (*it)->checkMedia();
+
             if (m_UseCount[*it] == 0)
             {
                 m_UseCount.remove(*it);
@@ -711,7 +715,9 @@ void MediaMonitor::mediaStatusChanged(MythMediaStatus oldStatus,
     // This gets called from outside the main thread so we need
     // to post an event back to the main thread.
     // We now send events for all non-error statuses, so plugins get ejects
-    if (stat != MEDIASTAT_ERROR && stat != MEDIASTAT_UNKNOWN)
+    if (stat != MEDIASTAT_ERROR && stat != MEDIASTAT_UNKNOWN &&
+        // Don't send an event for a new device that's not mounted
+        !(oldStatus == MEDIASTAT_UNPLUGGED && stat == MEDIASTAT_NOTMOUNTED))
     {
         // Should we ValidateAndLock() first?
         QEvent *e = new MythMediaEvent(stat, pMedia);

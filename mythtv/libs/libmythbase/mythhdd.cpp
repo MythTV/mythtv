@@ -67,6 +67,7 @@ MythMediaStatus MythHDD::checkMedia(void)
 
         case MEDIASTAT_MOUNTED:
             // device was mounted and someone unmounted it.
+            clearData();
             return setStatus(MEDIASTAT_NOTMOUNTED);
 
         default:

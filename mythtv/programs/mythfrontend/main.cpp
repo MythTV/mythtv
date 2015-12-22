@@ -798,10 +798,8 @@ static void handleDVDMedia(MythMediaDevice *dvd)
         case 0 : // Do nothing
             break;
         case 1 : // Display menu (mythdvd)*/
-            GetMythMainWindow()->JumpTo("Main Menu");
             break;
         case 2 : // play DVD or Blu-ray
-            GetMythMainWindow()->JumpTo("Main Menu");
             playDisc();
             break;
         default:
