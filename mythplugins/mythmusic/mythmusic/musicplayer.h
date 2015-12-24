@@ -130,6 +130,8 @@ class MusicPlayer : public QObject, public MythObservable
     bool         setCurrentTrackPos(int pos);
     void         changeCurrentTrack(int trackNo);
 
+    int          getCurrentTrackTime(void) { return m_currentTime; }
+
     void         activePlaylistChanged(int trackID, bool deleted);
     void         playlistChanged(int playlistID);
 

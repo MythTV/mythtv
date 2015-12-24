@@ -45,7 +45,7 @@ HEADERS += playlistview.h playlisteditorview.h
 HEADERS += visualizerview.h searchview.h streamview.h
 HEADERS += generalsettings.h visualizationsettings.h
 HEADERS += importsettings.h playersettings.h ratingsettings.h
-HEADERS += remoteavformatcontext.h
+HEADERS += remoteavformatcontext.h lyricsview.h
 
 SOURCES += decoder.cpp
 SOURCES += flacencoder.cpp main.cpp
@@ -65,6 +65,7 @@ SOURCES += playlistview.cpp playlisteditorview.cpp
 SOURCES += visualizerview.cpp searchview.cpp streamview.cpp
 SOURCES += generalsettings.cpp visualizationsettings.cpp
 SOURCES += importsettings.cpp playersettings.cpp ratingsettings.cpp
+SOURCES += lyricsview.cpp
 
 cdio {
     INCLUDEPATH -= $${SYSROOT}/usr/include/cdda

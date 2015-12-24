@@ -335,6 +335,218 @@
 
     </window>
 
+    <window name="trackslyricsview">
+
+        <shape name="playlist_background" from="basebackground">
+            <area>15,15,1250,410</area>
+        </shape>
+
+        <buttonlist name="lyrics_list">
+            <area>40,40,1200,370</area>
+            <buttonarea>0,0,115,370</buttonarea>
+            <spacing>0</spacing>
+            <layout>vertical</layout>
+            <arrange>stack</arrange>
+            <showarrow>no</showarrow>
+            <searchposition>-1,410</searchposition>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <area>0,0,100%,30</area>
+                    <textarea name="buttontext">
+                        <area>0,0,100%,100%</area>
+                        <align>left,vcenter</align>
+                        <font>basesmall</font>
+                    </textarea>
+                </state>
+                <state name="selectedactive" from="active">
+                    <textarea name="buttontext">
+                        <area>0,0,100%,100%</area>
+                        <align>left,vcenter</align>
+                        <font>basesmallyellow</font>
+                    </textarea>
+                </state>
+                <state name="selectedinactive" from="selectedactive">
+
+                </state>
+            </statetype>
+
+            <statetype name="upscrollarrow">
+                <position>1160,272</position>
+            </statetype>
+
+            <statetype name="downscrollarrow">
+                <position>1190,272</position>
+            </statetype>
+        </buttonlist>
+
+        <statetype name="loading_state">
+            <position>587,167</position>
+            <state name="off"></state>
+            <state name="on">
+                <imagetype name="loadinganimation">
+                    <position>0,0</position>
+                    <filepattern low="0" high="24">busyimages/%1.png</filepattern>
+                    <delay>150</delay>
+                </imagetype>
+            </state>
+        </statetype>
+
+        <textarea name="status_text" from="basetextarea">
+            <area>100,280,1080,50</area>
+            <font>basemediumyellow</font>
+            <align>center</align>
+        </textarea>
+
+        <group name="trackinfopanel" from="baseinfopanel">
+            <area>0,440,1250,260</area>
+        </group>
+
+    </window>
+
+    <window name="streamlyricsview">
+
+        <shape name="playlist_background" from="basebackground">
+            <area>15,15,1250,440</area>
+        </shape>
+
+        <buttonlist name="lyrics_list">
+            <area>40,40,1200,400</area>
+            <buttonarea>0,0,1200,400</buttonarea>
+            <spacing>0</spacing>
+            <layout>vertical</layout>
+            <arrange>stack</arrange>
+            <showarrow>no</showarrow>
+            <searchposition>-1,410</searchposition>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <area>0,0,100%,30</area>
+                    <textarea name="buttontext">
+                        <area>0,0,100%,100%</area>
+                        <align>left,vcenter</align>
+                        <font>basesmall</font>
+                    </textarea>
+                </state>
+                <state name="selectedactive" from="active">
+                    <textarea name="buttontext">
+                        <area>0,0,100%,100%</area>
+                        <align>left,vcenter</align>
+                        <font>basesmallyellow</font>
+                    </textarea>
+                </state>
+                <state name="selectedinactive" from="selectedactive">
+
+                </state>
+            </statetype>
+
+            <statetype name="upscrollarrow">
+                <position>1160,272</position>
+            </statetype>
+
+            <statetype name="downscrollarrow">
+                <position>1190,272</position>
+            </statetype>
+        </buttonlist>
+
+        <statetype name="loading_state">
+            <position>587,167</position>
+            <state name="off"></state>
+            <state name="on">
+                <imagetype name="loadinganimation">
+                    <position>0,0</position>
+                    <filepattern low="0" high="24">busyimages/%1.png</filepattern>
+                    <delay>150</delay>
+                </imagetype>
+            </state>
+        </statetype>
+
+        <textarea name="status_text" from="basetextarea">
+            <area>100,280,1080,50</area>
+            <font>basemediumyellow</font>
+            <align>center</align>
+        </textarea>
+
+        <group name="streaminfopanel" from="basestreaminfopanel">
+            <area>0,465,1250,240</area>
+        </group>
+
+    </window>
+
+    <window name="editlyrics">
+
+        <textarea name="title" from="basetextarea">
+            <area>15,5,800,50</area>
+            <font>baselarge</font>
+            <value>Add/Edit Lyrics</value>
+        </textarea>
+
+        <textarea name="grabber_label">
+            <font>basesmallyellow</font>
+            <align>right,vcenter</align>
+            <area>640,45,200,50</area>
+            <value>Grabber:</value>
+        </textarea>
+
+        <textarea name="syncroniszed_label" from="grabber_label">
+            <position>640,100</position>
+            <value>Syncronized:</value>
+        </textarea>
+
+        <textarea name="title_label" from="grabber_label">
+            <position>14,45</position>
+            <value>Title:</value>
+        </textarea>
+
+        <textarea name="artist_label" from="grabber_label">
+            <position>14,100</position>
+            <value>Artist:</value>
+        </textarea>
+
+        <textarea name="album_label" from="grabber_label">
+            <position>14,155</position>
+            <value>Album:</value>
+        </textarea>
+
+        <textarea name="lyrics_label" from="grabber_label">
+            <position>14,210</position>
+            <value>Lyrics:</value>
+        </textarea>
+
+        <textedit name="titleedit" from="basetextedit">
+            <position>224,45</position>
+        </textedit>
+
+        <textedit name="artistedit" from="titleedit">
+            <position>224,100</position>
+        </textedit>
+
+        <textedit name="albumedit" from="titleedit">
+            <position>224,155</position>
+        </textedit>
+
+        <textedit name="grabberedit" from="titleedit">
+            <position>850,45</position>
+        </textedit>
+
+        <checkbox name="syncronizedcheck" from="basecheckbox">
+            <position>850,110</position>
+        </checkbox>
+
+        <textedit name="lyricsedit" from="basemultilinetextedit">
+            <area>224,210,1000,400</area>
+        </textedit>
+
+        <button name="cancelbutton" from="basebutton">
+            <position>100,650</position>
+            <value>Cancel</value>
+        </button>
+
+        <button name="okbutton" from="basebutton">
+            <position>1000,650</position>
+            <value>OK</value>
+        </button>
+
+    </window>
+
     <!-- used in the visualiser screen to show some track details after a track change -->
     <window name="trackinfo_popup">
         <area>-1,500,1000,190</area>

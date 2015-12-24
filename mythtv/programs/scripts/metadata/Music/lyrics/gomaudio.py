@@ -53,7 +53,7 @@ class LyricsFetcher:
         self.base_url = "http://newlyrics.gomtv.com/"
 
     def get_lyrics(self, lyrics):
-        utilities.log(debug, "%s: searching lyrics for %s - %s -%s" % (__title__,  lyrics.artist, lyrics.album, lyrics.title))
+        utilities.log(debug, "%s: searching lyrics for %s - %s - %s" % (__title__,  lyrics.artist, lyrics.album, lyrics.title))
         key = None
         try:
             ext = os.path.splitext(lyrics.filename.decode("utf-8"))[1].lower()
@@ -62,7 +62,7 @@ class LyricsFetcher:
                 key = gomClient.GetKeyFromFile(lyrics.filename)
             if not key:
                 return False
-            url = GOM_URL %(key, urllib.quote(title.decode("utf-8").encode("euc-kr")), urllib.quote(artist.decode("utf-8").encode("euc-kr")))
+            url = GOM_URL %(key, urllib.quote(lyrics.title.decode("utf-8").encode("euc-kr")), urllib.quote(lyrics.artist.decode("utf-8").encode("euc-kr")))
             response = urllib.urlopen(url)
             Page = response.read()
         except:
@@ -78,14 +78,17 @@ class LyricsFetcher:
             return False
         syncs = re.compile('<sync start="(\d+)">([^<]*)</sync>').findall(Page)
         lyrline = []
-        lyrline.append( "[ti:%s]" %song.title )
-        lyrline.append( "[ar:%s]" %song.artist )
+        lyrline.append( "[ti:%s]" %lyrics.title )
+        lyrline.append( "[ar:%s]" %lyrics.artist )
         for sync in syncs:
             # timeformat conversion
             t = "%02d:%02d.%02d" % gomClient.mSecConv( int(sync[0]) )
             # unescape string
-            s = unicode(sync[1], "euc-kr").encode("utf-8").replace("&apos;","'").replace("&quot;",'"')
-            lyrline.append( "[%s]%s" %(t,s) )
+            try:
+                s = unicode(sync[1], "euc-kr").encode("utf-8").replace("&apos;","'").replace("&quot;",'"')
+                lyrline.append( "[%s]%s" %(t,s) )
+            except:
+                pass
         lyrics.lyrics = '\n'.join( lyrline )
         return True
 
@@ -94,10 +97,10 @@ def performSelfTest():
     lyrics = utilities.Lyrics()
     lyrics.source = __title__
     lyrics.syncronized = __syncronized__
-    lyrics.artist = 'Dire Straits'
-    lyrics.album = 'Brothers In Arms'
-    lyrics.title = 'Money For Nothing'
-    lyrics.filename = 'FIXME'
+    lyrics.artist = 'Robb Benson'
+    lyrics.album = 'Demo Tracks'
+    lyrics.title = 'Lone Rock'
+    lyrics.filename = os.path.dirname(os.path.abspath(__file__)) + '/examples/taglyrics.mp3'
 
     fetcher = LyricsFetcher()
     found = fetcher.get_lyrics(lyrics)

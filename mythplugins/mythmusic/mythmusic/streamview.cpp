@@ -96,6 +96,7 @@ void StreamView::ShowMenu(void)
     }
 
     menu->AddItem(MusicCommon::tr("Fullscreen Visualizer"), qVariantFromValue((int)MV_VISUALIZER));
+    menu->AddItem(MusicCommon::tr("Lyrics"), qVariantFromValue((int)MV_LYRICS));
 
     menu->AddItem(tr("More Options"), NULL, createSubMenu());
 
@@ -343,11 +344,11 @@ bool StreamView::keyPressEvent(QKeyEvent *event)
         QString action = actions[i];
         handled = true;
 
-        if (action == "EDIT" && GetFocusWidget() == m_streamList)
+        if (action == "EDIT")
         {
             editStream();
         }
-        else if (action == "DELETE" && GetFocusWidget() == m_streamList)
+        else if (action == "DELETE")
         {
             removeStream();
         }

@@ -10,11 +10,7 @@
         </shape>
 
         <shape name="playlist_background" from="basebackground">
-            <area>15,290,1250,170</area>
-        </shape>
-
-        <shape name="track_info_background" from="basebackground">
-            <area>15,470,1250,230</area>
+            <area>15,287,1250,170</area>
         </shape>
 
         <textarea name="nostreams" from="basetextarea">
@@ -104,7 +100,7 @@
         </buttonlist>
 
         <buttonlist name="playedtrackslist" from="basebuttonlist2">
-            <area>25,300,1225,150</area>
+            <area>25,297,1225,150</area>
             <spacing>0</spacing>
             <layout>vertical</layout>
             <arrange>stack</arrange>
@@ -167,85 +163,9 @@
             </statetype>
         </buttonlist>
 
-        <imagetype name="mm_blackhole_border">
-            <filename>mm_blackhole_border.png</filename>
-            <area>32,489,162,162</area>
-        </imagetype>
-
-        <textarea name="title" from="basetextarea">
-            <area>230,485,900,34</area>
-            <font>baselarge</font>
-        </textarea>
-
-        <textarea name="artist" from="basetextarea">
-            <area>230,525,900,34</area>
-            <font>basemedium</font>
-        </textarea>
-
-        <textarea name="channel" from="basetextarea">
-            <area>230,560,900,34</area>
-            <font>basemedium</font>
-            <template>%STATION% - %CHANNEL%</template>
-        </textarea>
-
-        <textarea name="url" from="basetextarea">
-            <font>basesmall</font>
-            <area>230,595,840,35</area>
-        </textarea>
-
-        <progressbar name="bufferprogress">
-            <position>230,670</position>
-            <layout>horizontal</layout>
-           <style>reveal</style>
-            <imagetype name="background">
-                <filename>mm_progress-bg.png</filename>
-            </imagetype>
-            <imagetype name="progressimage">
-                <filename>mm_progress-fg.png</filename>
-            </imagetype>
-        </progressbar>
-
-        <textarea name="bufferstatus" from="basetextarea">
-            <area>230,645,400,35</area>
-            <font>basesmall</font>
-            <value></value>
-        </textarea>
-
-        <imagetype name="visualizer_border">
-            <filename>mm_blackhole_border.png</filename>
-            <area>1082,489,162,162,</area>
-        </imagetype>
-
-        <video name="visualizer">
-            <area>1085,493,156,155,</area>
-        </video>
-
-        <textarea name="visualizername" from="basetextarea">
-            <area>1085,650,156,35</area>
-            <font>basesmall</font>
-            <align>center</align>
-        </textarea>
-
-        <textarea name="volume" from="basevolume">
-            <position>70,667</position>
-        </textarea>
-
-        <statetype name="mutestate" from="basemutestate">
-            <position>30,670</position>
-        </statetype>
-
-        <imagetype name="coverart">
-            <filename>mm_nothumb.png</filename>
-            <area>35,493,156,155</area>
-        </imagetype>
-
-        <button name="play" from="baseplaybutton">
-            <position>840,650</position>
-        </button>
-
-        <button name="stop" from="basestopbutton">
-            <position>885,650</position>
-        </button>
+        <group name="infopanel" from="basestreaminfopanel">
+            <area>0,465,1250,240</area>
+        </group>
 
     </window>
 
