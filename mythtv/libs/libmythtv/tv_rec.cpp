@@ -3899,18 +3899,18 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
             newRecStatus = RecStatus::Failing;
             curRecording->SaveVideoProperties(VID_DAMAGED, VID_DAMAGED);
 
-            QString desc = tr("Good signal seen after %1 ms")
-                           .arg(genOpt.channel_timeout +
-                        startRecordingDeadline.msecsTo(MythDate::current()));
+//            QString desc = tr("Good signal seen after %1 ms")
+//                           .arg(genOpt.channel_timeout +
+//                        startRecordingDeadline.msecsTo(MythDate::current()));
             QString title = curRecording->GetTitle();
             if (!curRecording->GetSubtitle().isEmpty())
                 title += " - " + curRecording->GetSubtitle();
 
-            MythNotification mn(MythNotification::Check, desc,
-                                "Recording", title,
-                                tr("See 'Tuning timeout' in mythtv-setup "
-                                   "for this input."));
-            gCoreContext->SendEvent(MythEvent(mn));
+//            MythNotification mn(MythNotification::Check, desc,
+//                                "Recording", title,
+//                                tr("See 'Tuning timeout' in mythtv-setup "
+//                                   "for this input."));
+//            gCoreContext->SendEvent(MythEvent(mn));
 
             LOG(VB_GENERAL, LOG_WARNING, LOC +
                 QString("It took longer than %1 ms to get a signal lock. "
@@ -3958,12 +3958,12 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
         if (!curRecording->GetSubtitle().isEmpty())
             title += " - " + curRecording->GetSubtitle();
 
-        MythNotification mn(MythNotification::Error, desc,
-                            "Recording", title,
-                            tr("See 'Tuning timeout' in mythtv-setup "
-                               "for this input."));
-        mn.SetDuration(30);
-        gCoreContext->SendEvent(MythEvent(mn));
+//        MythNotification mn(MythNotification::Error, desc,
+//                            "Recording", title,
+//                            tr("See 'Tuning timeout' in mythtv-setup "
+//                               "for this input."));
+//        mn.SetDuration(30);
+//        gCoreContext->SendEvent(MythEvent(mn));
 
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             QString("TuningSignalCheck: taking more than %1 ms to get a lock. "
