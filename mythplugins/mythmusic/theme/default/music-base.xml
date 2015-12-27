@@ -472,8 +472,120 @@
             <filename>mm_nothumb.png</filename>
             <area>35,23,126,125</area>
         </imagetype>
+    </group>
 
+    <group name="basestreaminfopanel">
+        <area>0,424,770,161</area>
 
+        <shape name="track_info_background" from="basebackground">
+            <area>15,0,770,161</area>
+        </shape>
+
+        <imagetype name="coverart_border">
+            <filename>mm_blackhole_border.png</filename>
+            <area>27,11,114,114</area>
+        </imagetype>
+
+        <imagetype name="coverart">
+            <filename>mm_nothumb.png</filename>
+            <area>30,13,110,110</area>
+        </imagetype>
+
+        <textarea name="title" from="basetextarea">
+            <area>150,7,500,34</area>
+            <font>baselarge</font>
+        </textarea>
+
+        <textarea name="artist" from="basetextarea">
+            <area>150,47,500,34</area>
+            <font>basemedium</font>
+        </textarea>
+
+        <textarea name="channel" from="basetextarea">
+            <area>150,82,500,34</area>
+            <font>basemedium</font>
+            <template>%STATION% - %CHANNEL%</template>
+        </textarea>
+
+        <progressbar name="bufferprogress">
+            <position>150,137</position>
+            <layout>horizontal</layout>
+           <style>reveal</style>
+            <imagetype name="background">
+                <filename>mm_progress-bg.png</filename>
+            </imagetype>
+            <imagetype name="progressimage">
+                <filename>mm_progress-fg.png</filename>
+            </imagetype>
+        </progressbar>
+
+        <textarea name="bufferstatus" from="basetextarea">
+            <area>150,112,400,35</area>
+            <font>basesmall</font>
+            <value></value>
+        </textarea>
+
+        <imagetype name="visualizer_border">
+            <filename>mm_blackhole_border.png</filename>
+            <area>657,11,114,114,</area>
+        </imagetype>
+
+        <video name="visualizer">
+            <area>659,13,110,110,</area>
+        </video>
+
+        <textarea name="volume" from="basevolume">
+            <position>70,133</position>
+            <template>%VOLUMEPERCENT%</template>
+        </textarea>
+
+        <statetype name="mutestate" from="basemutestate">
+            <position>30,126</position>
+        </statetype>
+
+        <button name="play">
+            <position>565,116</position>
+            <statetype name="buttonstate">
+                <state name="active">
+                    <imagetype name="background">
+                        <filename>play_button_off.png</filename>
+                    </imagetype>
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="background">
+                        <filename>play_button_on.png</filename>
+                    </imagetype>
+                </state>
+                <state name="disabled" from="active" />
+                    <state name="pushed" from="active">
+                        <imagetype name="background">
+                            <filename>play_button_pushed.png</filename>
+                        </imagetype>
+                    </state>
+            </statetype>
+        </button>
+
+        <button name="stop">
+            <position>610,116</position>
+            <statetype name="buttonstate">
+                <state name="active">
+                    <imagetype name="background">
+                        <filename>stop_button_off.png</filename>
+                    </imagetype>
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="background">
+                        <filename>stop_button_on.png</filename>
+                    </imagetype>
+                </state>
+                <state name="disabled" from="active" />
+                <state name="pushed" from="active">
+                    <imagetype name="background">
+                        <filename>stop_button_pushed.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </button>
     </group>
 
     <group name="baseplayliststatusgroup">
