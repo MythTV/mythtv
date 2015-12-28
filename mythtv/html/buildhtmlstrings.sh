@@ -14,7 +14,7 @@ echo "/*********************************************************/" >> ${OUTFILE}
 echo >> ${OUTFILE}
 echo "void html_strings_null() {" >> ${OUTFILE}
 
-find ${BASEDIR}/ -type f | egrep "\.(qsp|qjs)$" | while read FILE
+find ${BASEDIR}/ -type f | egrep "\.(qsp|qjs)$" | sort | while read FILE
 do
     echo "Checking: ${FILE}"
     ${BASEDIR}/getTransStringsFromFile.pl ${BASEDIR}/${FILE} ${FILE} >> ${OUTFILE}
