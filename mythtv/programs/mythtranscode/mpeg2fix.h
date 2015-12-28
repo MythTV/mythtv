@@ -44,7 +44,7 @@ enum MPFListType {
 class MPEG2frame
 {
   public:
-    MPEG2frame(int size);
+    explicit MPEG2frame(int size);
     ~MPEG2frame();
     void ensure_size(int size);
     void set_pkt(AVPacket *newpkt);

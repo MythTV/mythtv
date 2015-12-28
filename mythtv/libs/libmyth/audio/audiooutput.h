@@ -171,7 +171,7 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
      * data decoded will be S16 samples if class instance can't handle HD audio
      * or S16 and above otherwise. No U8 PCM format can be returned
      */
-    int DecodeAudio(AVCodecContext *ctx,
+    virtual int DecodeAudio(AVCodecContext *ctx,
                     uint8_t *buffer, int &data_size,
                     const AVPacket *pkt);
     /**

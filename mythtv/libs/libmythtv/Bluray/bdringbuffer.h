@@ -10,7 +10,7 @@
 #include <QCoreApplication>
 
 // external/libmythbluray
-#include "bluray.h"
+#include "libbluray/bluray.h"
 
 #include "ringbuffer.h"
 
@@ -141,6 +141,8 @@ class MTV_PUBLIC BDRingBuffer : public RingBuffer
     uint64_t           m_titlesize;
     uint64_t           m_currentTitleAngleCount;
     uint64_t           m_currentTime;
+
+    int                m_imgHandle;
 
     int                m_currentAngle;
     int                m_currentTitle;

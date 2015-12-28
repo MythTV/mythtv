@@ -19,7 +19,7 @@ meta data, video and image URLs from youtube. These routines are based on the ap
 for this api are published at http://developer.youtubenservices.com/docs
 '''
 
-__version__="v0.2.5"
+__version__="v0.3.0"
 # 0.1.0 Initial development
 # 0.1.1 Added Tree view display option
 # 0.1.2 Modified Tree view internals to be consistent in approach and structure.
@@ -34,68 +34,37 @@ __version__="v0.2.5"
 # 0.2.3 Fixed an exception message output code error in two places
 # 0.2.4 Removed the need for python MythTV bindings and added "%SHAREDIR%" to icon directory path
 # 0.2.5 Fixed the Foreign Film icon file name
+# 0.3.0 Adapted to the v3 API
 
-import os, struct, sys, re, time
+import os, struct, sys, re, time, shutil
 import urllib, urllib2
+import json
 import logging
 from MythTV import MythXML
-
-try:
-    import xml.etree.cElementTree as ElementTree
-except ImportError:
-    import xml.etree.ElementTree as ElementTree
+from ..common import common_api
 
 from youtube_exceptions import (YouTubeUrlError, YouTubeHttpError, YouTubeRssError, YouTubeVideoNotFound, YouTubeInvalidSearchType, YouTubeXmlError, YouTubeVideoDetailError, YouTubeCategoryNotFound)
+from youtube_data import getData
 
-class OutStreamEncoder(object):
-    """Wraps a stream with an encoder"""
-    def __init__(self, outstream, encoding=None):
-        self.out = outstream
-        if not encoding:
-            self.encoding = sys.getfilesystemencoding()
-        else:
-            self.encoding = encoding
+try:
+    import aniso8601
+except:
+    sys.stderr.write("The module aniso8601 could not be imported, duration "
+                     "parsing will be disabled\n")
+    pass
 
-    def write(self, obj):
-        """Wraps the output stream, encoding Unicode strings with the specified encoding"""
-        if isinstance(obj, unicode):
-            try:
-                self.out.write(obj.encode(self.encoding))
-            except IOError:
-                pass
-        else:
-            try:
-                self.out.write(obj)
-            except IOError:
-                pass
-
-    def __getattr__(self, attr):
-        """Delegate everything but write to the stream"""
-        return getattr(self.out, attr)
-sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
-sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
-
-
-class XmlHandler:
-    """Deals with retrieval of XML files from API
+class JsonHandler:
+    """Deals with retrieval of JSON data from API
     """
     def __init__(self, url):
         self.url = url
 
-    def _grabUrl(self, url):
+    def getJson(self):
         try:
-            urlhandle = urllib.urlopen(url)
+            urlhandle = urllib.urlopen(self.url)
+            return json.load(urlhandle)
         except IOError, errormsg:
             raise YouTubeHttpError(errormsg)
-        return urlhandle.read()
-
-    def getEt(self):
-        xml = self._grabUrl(self.url)
-        try:
-            et = ElementTree.fromstring(xml)
-        except SyntaxError, errormsg:
-            raise YouTubeXmlError(errormsg)
-        return et
 
 
 class Videos(object):
@@ -104,7 +73,6 @@ class Videos(object):
     target.
 
     Supports search methods
-    The apikey is a not required to access http://www.youtube.com/
     """
     def __init__(self,
                 apikey,
@@ -149,12 +117,8 @@ class Videos(object):
 
         """
         self.config = {}
+        self.common = common_api.Common()
         self.mythxml = MythXML()
-
-        if apikey is not None:
-            self.config['apikey'] = apikey
-        else:
-            pass    # YouTube does not require an apikey
 
         self.config['debug_enabled'] = debug # show debugging messages
 
@@ -169,10 +133,33 @@ class Videos(object):
 
         self.config['search_all_languages'] = search_all_languages
 
-        self.error_messages = {'YouTubeUrlError': u"! Error: The URL (%s) cause the exception error (%s)\n", 'YouTubeHttpError': u"! Error: An HTTP communications error with YouTube was raised (%s)\n", 'YouTubeRssError': u"! Error: Invalid RSS meta data\nwas received from YouTube error (%s). Skipping item.\n", 'YouTubeVideoNotFound': u"! Error: Video search with YouTube did not return any results (%s)\n", 'YouTubeVideoDetailError': u"! Error: Invalid Video meta data detail\nwas received from YouTube error (%s). Skipping item.\n", }
+        self.error_messages = \
+                {'YouTubeUrlError': u"! Error: The URL (%s) cause the exception error (%s)\n",
+                'YouTubeHttpError': u"! Error: An HTTP communications error with YouTube was raised (%s)\n",
+                'YouTubeRssError': u"! Error: Invalid RSS meta data\nwas received from YouTube error (%s). Skipping item.\n",
+                'YouTubeVideoNotFound': u"! Error: Video search with YouTube did not return any results (%s)\n",
+                'YouTubeVideoDetailError': u"! Error: Invalid Video meta data detail\nwas received from YouTube error (%s). Skipping item.\n", }
 
         # This is an example that must be customized for each target site
-        self.key_translation = [{'channel_title': 'channel_title', 'channel_link': 'channel_link', 'channel_description': 'channel_description', 'channel_numresults': 'channel_numresults', 'channel_returned': 'channel_returned', 'channel_startindex': 'channel_startindex'}, {'title': 'item_title', 'author': 'item_author', 'published_parsed': 'item_pubdate', 'media_description': 'item_description', 'video': 'item_link', 'thumbnail': 'item_thumbnail', 'link': 'item_url', 'duration': 'item_duration', 'rating': 'item_rating', 'item_width': 'item_width', 'item_height': 'item_height', 'language': 'item_lang'}]
+        self.key_translation = \
+                [{'channel_title': 'channel_title',
+                    'channel_link': 'channel_link',
+                    'channel_description': 'channel_description',
+                    'channel_numresults': 'channel_numresults',
+                    'channel_returned': 'channel_returned',
+                    'channel_startindex': 'channel_startindex'},
+                 {'title': 'item_title',
+                    'author': 'item_author',
+                    'published_parsed': 'item_pubdate',
+                    'media_description': 'item_description',
+                    'video': 'item_link',
+                    'thumbnail': 'item_thumbnail',
+                    'link': 'item_url',
+                    'duration': 'item_duration',
+                    'rating': 'item_rating',
+                    'item_width': 'item_width',
+                    'item_height': 'item_height',
+                    'language': 'item_lang'}]
 
         # Defaulting to no language specified. The YouTube apis does support specifying a language
         if language:
@@ -180,95 +167,67 @@ class Videos(object):
         else:
             self.config['language'] = u''
 
-        self.config[u'urls'] = {}
+        self.getUserPreferences("~/.mythtv/MythNetvision/userGrabberPrefs/youtube.xml")
 
-        # v2 api calls - An example that must be customized for each target site
-        self.config[u'urls'][u'video.search'] = 'http://gdata.youtube.com/feeds/api/videos?vq=%s&max-results=%s&start-index=%s&orderby=relevance&Ir=%s'
+        # Read region code from user preferences, used by tree view
+        region = self.userPrefs.find("region")
+        if region != None and region.text:
+            self.config['region'] = region.text
+        else:
+            self.config['region'] = u'us'
 
+        self.apikey = getData().update(getData().a)
 
-        # Functions that parse video data from RSS data
-        self.config['item_parser'] = {}
-        self.config['item_parser']['main'] = self.getVideosForURL
-
-        # Tree view url and the function that parses that urls meta data
-        self.config[u'urls'][u'tree.view'] = {
-            'standard_feeds': {
-                '__all__': ['http://gdata.youtube.com/feeds/api/standardfeeds/%s?v=2', 'main'],
-                },
-            'category': {
-                '__all__': ['http://gdata.youtube.com/feeds/api/videos?category=%s&v=2', 'main'],
-                },
-            'local_feeds': {
-                '__all__': ['http://gdata.youtube.com/feeds/api/standardfeeds/%s?v=2', 'main'],
-                },
-            'location_feeds': {
-                '__all__': ['http://gdata.youtube.com/feeds/api/videos?v=2&q=%s', 'main'],
-                },
-            }
-        self.config[u'urls'][u'categories_list'] = 'http://gdata.youtube.com/schemas/2007/categories.cat'
-
-        self.config[u'image_extentions'] = ["png", "jpg", "bmp"] # Acceptable image extentions
-
-        self.tree_order = ['standard_feeds', 'location_feeds', 'local_feeds', 'category']
-        self.tree_org = {
-            'category': [
-                ['', ['Film']],
-                ['', ['Sports']],
-                ['Information', ['News', 'Tech', 'Education', 'Howto', ]],
-                ['Entertainment', ['Comedy', 'Music', 'Games', 'Entertainment', ]],
-                ['Other', ['Autos', 'Animals', 'Travel', 'People', 'Nonprofit']] ],
-            'standard_feeds':
-                [['Feeds', ['top_rated', 'top_favourites', 'most_viewed', 'most_popular', 'most_recent', 'most_discussed', 'most_responded', 'recently_featured', '']], ],
-            'local_feeds':
-                [['Feeds', ['top_rated', 'top_favourites', 'most_viewed', 'most_popular', 'most_recent', 'most_discussed', 'most_responded', 'recently_featured', '']], ],
-            'location_feeds':
-                [['', ['location']], ]
-            }
-
-        self.tree_customize = {
-            'category': {
-                '__default__': {'order': 'rating', 'max-results': '20', 'start-index': '1', 'Ir': self.config['language']},
-                #'cat name': {'order: '', 'max-results': , 'start-index': , 'restriction: '', 'time': '', 'Ir': ''},
-                'Film': {'max-results': '40', 'time': 'this_month',},
-                'Music': {'max-results': '40', 'time': 'this_month',},
-                'Sports': {'max-results': '40', 'time': 'this_month',},
-            },
-            'standard_feeds': {
-                '__default__': {'order': 'rating', 'max-results': '20', 'start-index': '1', 'Ir': self.config['language'], 'time': 'this_month'},
-                #'feed name": {'order: '', 'max-results': , 'start-index': , 'restriction: '', 'time': '', 'Ir': ''}
-            },
-            'local_feeds': {
-                '__default__': {'order': 'rating', 'max-results': '20', 'start-index': '1', 'Ir': self.config['language'], 'location': '', 'location-radius':'500km'},
-                #'feed name": {'order: '', 'max-results': , 'start-index': , 'restriction: '', 'time': '', 'Ir': ''}
-            },
-            'location_feeds': {
-                '__default__': {'order': 'rating', 'max-results': '20', 'start-index': '1', 'Ir': self.config['language'], },
-                #'feed name": {'order: '', 'max-results': , 'start-index': , 'restriction: '', 'time': '', 'Ir': ''}
-            },
-            }
-
-        self.feed_names = {
-            'standard_feeds': {'top_rated': 'Highest Rated', 'top_favourites': 'Most Subscribed', 'most_viewed': 'Most Viewed', 'most_popular': 'Most Popular', 'most_recent': 'Most Recent', 'most_discussed': 'Most Comments', 'most_responded': 'Most Responses', 'recently_featured': 'Featured'}
-            }
+        apikey = self.userPrefs.find("apikey")
+        if apikey != None and apikey.text:
+            self.apikey = apikey.text
 
         self.feed_icons = {
-            'standard_feeds': {'top_rated': 'directories/topics/rated', 'top_favourites': 'directories/topics/most_subscribed', 'most_viewed': 'directories/topics/most_viewed', 'most_popular': None, 'most_recent': 'directories/topics/most_recent', 'most_discussed': 'directories/topics/most_comments', 'most_responded': None, 'recently_featured': 'directories/topics/featured'
-                },
-            'local_feeds': {'top_rated': 'directories/topics/rated', 'top_favourites': 'directories/topics/most_subscribed', 'most_viewed': 'directories/topics/most_viewed', 'most_popular': None, 'most_recent': 'directories/topics/most_recent', 'most_discussed': 'directories/topics/most_comments', 'most_responded': None, 'recently_featured': 'directories/topics/featured'
-                },
-            'category': {
-                'Film': 'directories/topics/movies',
-                'Comedy': 'directories/film_genres/comedy',
+                'Film & Animation': 'directories/topics/movies',
+                'Movies': 'directories/topics/movies',
+                'Trailers': 'directories/topics/movies',
                 'Sports': 'directories/topics/sports',
-                'News': 'directories/topics/news', 'Tech': 'directories/topics/technology', 'Education': 'directories/topics/education', 'Howto': 'directories/topics/howto',
-                'Music': 'directories/topics/music', 'Games': 'directories/topics/games', 'Entertainment': 'directories/topics/entertainment',
-                'Autos': 'directories/topics/automotive', 'Animals': 'directories/topics/animals', 'Travel': 'directories/topics/travel', 'People': 'directories/topics/people', 'Nonprofit': 'directories/topics/nonprofit',
-                },
+                'News & Politics': 'directories/topics/news',
+                'Science & Technology': 'directories/topics/technology',
+                'Education': 'directories/topics/education',
+                'Howto & Style': 'directories/topics/howto',
+                'Music': 'directories/topics/music',
+                'Gaming': 'directories/topics/games',
+                'Entertainment': 'directories/topics/entertainment',
+                'Autos & Vehicles': 'directories/topics/automotive',
+                'Pets & Animals': 'directories/topics/animals',
+                'Travel & Events': 'directories/topics/travel',
+                'People & Blogs': 'directories/topics/people',
             }
 
         self.treeview = False
         self.channel_icon = u'%SHAREDIR%/mythnetvision/icons/youtube.png'
     # end __init__()
+
+    def getUserPreferences(self, userPreferenceFilePath):
+        userPreferenceFilePath = os.path.expanduser(userPreferenceFilePath)
+
+        # If the user config file does not exists then copy one the default
+        if not os.path.isfile(userPreferenceFilePath):
+            # Make the necessary directories if they do not already exist
+            prefDir = os.path.dirname(userPreferenceFilePath)
+            if not os.path.isdir(prefDir):
+                os.makedirs(prefDir)
+
+            fileName = os.path.basename(userPreferenceFilePath)
+            defaultConfig = u'%s/nv_python_libs/configs/XML/defaultUserPrefs/%s' \
+                    % (baseProcessingDir, fileName)
+            shutil.copy2(defaultConfig, userPreferenceFilePath)
+
+        # Read the grabber hulu_config.xml configuration file
+        url = u'file://%s' % userPreferenceFilePath
+        if self.config['debug_enabled']:
+            print(url)
+            print
+        try:
+            self.userPrefs = self.common.etree.parse(url)
+        except Exception as e:
+            raise Exception(url, e)
 
 ###########################################################################################################
 #
@@ -366,9 +325,8 @@ class Videos(object):
                     else:
                         return unicode(entity, "iso-8859-1")
             return text # leave as is
-        return self.ampReplace(re.sub(u"(?s)<[^>]*>|&#?\w+;", fixup, self.textUtf8(text))).replace(u'\n',u' ')
+        return self.common.ampReplace(re.sub(u"(?s)<[^>]*>|&#?\w+;", fixup, self.common.textUtf8(text)))
     # end massageDescription()
-
 
     def _initLogger(self):
         """Setups a logger using the logging module, returns a log object
@@ -388,26 +346,6 @@ class Videos(object):
         return logger
     #end initLogger
 
-
-    def textUtf8(self, text):
-        if text == None:
-            return text
-        try:
-            return unicode(text, 'utf8')
-        except UnicodeDecodeError:
-            return u''
-        except (UnicodeEncodeError, TypeError):
-            return text
-    # end textUtf8()
-
-
-    def ampReplace(self, text):
-        '''Replace all "&" characters with "&amp;"
-        '''
-        text = self.textUtf8(text)
-        return text.replace(u'&amp;',u'~~~~~').replace(u'&',u'&amp;').replace(u'~~~~~', u'&amp;')
-    # end ampReplace()
-
     def setTreeViewIcon(self, dir_icon=None):
         '''Check if there is a specific generic tree view icon. If not default to the channel icon.
         return self.tree_dir_icon
@@ -416,9 +354,7 @@ class Videos(object):
         if not dir_icon:
             if not self.feed_icons.has_key(self.tree_key):
                 return self.tree_dir_icon
-            if not self.feed_icons[self.tree_key].has_key(self.feed):
-                return self.tree_dir_icon
-            dir_icon = self.feed_icons[self.tree_key][self.feed]
+            dir_icon = self.feed_icons[self.tree_key]
             if not dir_icon:
                 return self.tree_dir_icon
         self.tree_dir_icon = u'%%SHAREDIR%%/mythnetvision/icons/%s.png' % (dir_icon, )
@@ -437,140 +373,116 @@ class Videos(object):
         return an array of matching item dictionaries
         return
         '''
-        url = self.config[u'urls'][u'video.search'] % (urllib.quote_plus(title.encode("utf-8")), pagelen, pagenumber, self.config['language'], )
+        # Special case where the grabber has been executed without any page
+        # argument
+        if 1 == pagenumber:
+            pagenumber = ""
+
+        result = self.getSearchResults(title, pagenumber, pagelen)
+        if not result:
+            raise YouTubeVideoNotFound(u"No YouTube Video matches found for search value (%s)" % title)
+
+        self.channel['channel_numresults'] = int(result['pageInfo']['totalResults'])
+        if 'nextPageToken' in result:
+            self.channel['nextpagetoken'] = result['nextPageToken']
+        if 'prevPageToken' in result:
+            self.channel['prevpagetoken'] = result['prevPageToken']
+
+        ids = map(lambda entry: entry['id']['videoId'], result['items'])
+
+        result = self.getVideoDetails(ids)
+        data = map(lambda entry: self.parseDetails(entry), result['items'])
+
+        if not len(data):
+            raise YouTubeVideoNotFound(u"No YouTube Video matches found for search value (%s)" % title)
+
+        return data
+        # end searchTitle()
+
+    def getSearchResults(self, title, pagenumber, pagelen):
+        url = ('https://www.googleapis.com/youtube/v3/search?part=snippet&' + \
+                'type=video&q=%s&maxResults=%s&order=relevance&' + \
+                'videoEmbeddable=true&key=%s&pageToken=%s') % \
+                (urllib.quote_plus(title.encode("utf-8")), pagelen, self.apikey,
+                        pagenumber)
         if self.config['debug_enabled']:
             print url
             print
 
         try:
-            etree = XmlHandler(url).getEt()
+            return JsonHandler(url).getJson()
         except Exception, errormsg:
             raise YouTubeUrlError(self.error_messages['YouTubeUrlError'] % (url, errormsg))
 
-        if etree is None:
-            raise YouTubeVideoNotFound(u"No YouTube Video matches found for search value (%s)" % title)
+    def getVideoDetails(self, ids):
+        url = 'https://www.googleapis.com/youtube/v3/videos?part=id,snippet,' + \
+                'contentDetails&key=%s&id=%s' % (self.apikey, ",".join(ids))
+        try:
+            return JsonHandler(url).getJson()
+        except Exception as errormsg:
+            raise YouTubeUrlError(self.error_messages['YouTubeUrlError'] % (url, errormsg))
 
-        data = []
-        for entry in etree:
-            if entry.tag.endswith('totalResults'):
-                if entry.text:
-                    self.channel['channel_numresults'] = int(entry.text)
-                else:
-                    self.channel['channel_numresults'] = 0
-                continue
-            if not entry.tag.endswith('entry'):
-                continue
-            item = {}
-            cur_size = True
-            flash = False
-            for parts in entry:
-                if parts.tag.endswith('id'):
-                    item['id'] = parts.text
-                    continue
-                if parts.tag.endswith('title'):
-                    item['title'] = parts.text
-                    continue
-                if parts.tag.endswith('author'):
-                    for e in parts:
-                        if e.tag.endswith('name'):
-                            item['author'] = e.text
-                            break
-                    continue
-                if parts.tag.endswith('published'):
-                    item['published_parsed'] = parts.text
-                    continue
-                if parts.tag.endswith('content'):
-                    item['media_description'] = parts.text
-                    continue
-                if parts.tag.endswith(u'rating'):
-                    item['rating'] = parts.get('average')
-                    continue
-                if not parts.tag.endswith(u'group'):
-                    continue
-                for elem in parts:
-                    if elem.tag.endswith(u'duration'):
-                        item['duration'] =  elem.get('seconds')
-                        continue
-                    if elem.tag.endswith(u'thumbnail'):
-                        if cur_size == False:
-                            continue
-                        height = elem.get('height')
-                        width = elem.get('width')
-                        if int(width) > cur_size:
-                            item['thumbnail'] = self.ampReplace(elem.get('url'))
-                            cur_size = int(width)
-                        if int(width) >= 200:
-                            cur_size = False
-                        continue
-                    if elem.tag.endswith(u'player'):
-                        item['link'] = self.ampReplace(elem.get('url'))
-                        continue
-                    if elem.tag.endswith(u'content') and flash == False:
-                        for key in elem.keys():
-                            if not key.endswith(u'format'):
-                                continue
-                            if not elem.get(key) == '5':
-                                continue
-                            self.processVideoUrl(item, elem)
-                            flash = True
-                        continue
-            if not item.has_key('video'):
-                item['video'] =  item['link']
-                item['duration'] =  u''
-            else:
-                item['link'] =  item['video']
-            data.append(item)
+    def parseDetails(self, entry):
+        item = {}
+        try:
+            item['id'] = entry['id']
+            item['video'] = \
+                self.mythxml.getInternetContentUrl("nv_python_libs/configs/HTML/youtube.html", \
+                                                   item['id'])
+            item['link'] = item['video']
+            snippet = entry['snippet']
+            item['title'] = snippet['title']
+            item['media_description'] = snippet['description']
+            item['thumbnail'] = snippet['thumbnails']['high']['url']
+            item['author'] = snippet['channelTitle']
+            item['published_parsed'] = snippet['publishedAt']
 
-        # Make sure there are no item elements that are None
-        for item in data:
+            try:
+                duration = aniso8601.parse_duration(entry['contentDetails']['duration'])
+                item['duration'] = duration.days * 24 * 3600 + duration.seconds
+            except Exception:
+                pass
+
             for key in item.keys():
+                # Make sure there are no item elements that are None
                 if item[key] == None:
                     item[key] = u''
-
-        # Massage each field and eliminate any item without a URL
-        elements_final = []
-        for item in data:
-            if not 'id' in item.keys():
-                continue
-            item['language'] = self.config['language']
-            for key in item.keys(): # 2010-01-23T08:38:39.000Z
-                if key == 'published_parsed':
+                elif key == 'published_parsed': # 2010-01-23T08:38:39.000Z
                     if item[key]:
                         pub_time = time.strptime(item[key].strip(), "%Y-%m-%dT%H:%M:%S.%fZ")
                         item[key] = time.strftime('%a, %d %b %Y %H:%M:%S GMT', pub_time)
-                    continue
-                if key == 'media_description' or key == 'title':
+                elif key == 'media_description' or key == 'title':
                     # Strip the HTML tags
                     if item[key]:
                         item[key] = self.massageDescription(item[key].strip())
                         item[key] = item[key].replace(u'|', u'-')
-                    continue
-                if type(item[key]) == type(u''):
+                elif type(item[key]) == type(u''):
                     if item[key]:
-                        item[key] = self.ampReplace(item[key].replace('"\n',' ').strip())
-            elements_final.append(item)
+                        item[key] = self.common.ampReplace(item[key].replace('"\n',' ').strip())
+        except KeyError:
+            pass
 
-        if not len(elements_final):
-            raise YouTubeVideoNotFound(u"No YouTube Video matches found for search value (%s)" % title)
-
-        return elements_final
-        # end searchTitle()
-
+        return item
 
     def searchForVideos(self, title, pagenumber):
         """Common name for a video search. Used to interface with MythTV plugin NetVision
         """
         # Channel details and search results
-        self.channel = {'channel_title': u'YouTube', 'channel_link': u'http://www.youtube.com/', 'channel_description': u"Share your videos with friends, family, and the world.", 'channel_numresults': 0, 'channel_returned': 1, u'channel_startindex': 0}
+        self.channel = {
+            'channel_title': u'YouTube',
+            'channel_link': u'http://www.youtube.com/',
+            'channel_description': u"Share your videos with friends, family, and the world.",
+            'channel_numresults': 0,
+            'channel_returned': 1,
+            'channel_startindex': 0}
 
         # Easier for debugging
 #        print self.searchTitle(title, pagenumber, self.page_limit)
 #        print
 #        sys.exit()
 
-        startindex = (int(pagenumber) -1) * self.page_limit + 1
         try:
-            data = self.searchTitle(title, startindex, self.page_limit)
+            data = self.searchTitle(title, pagenumber, self.page_limit)
         except YouTubeVideoNotFound, msg:
             sys.stderr.write(u"%s\n" % msg)
             return None
@@ -592,17 +504,7 @@ class Videos(object):
         if not len(data):
             return None
 
-        items = []
-        for match in data:
-            item_data = {}
-            for key in self.key_translation[1].keys():
-                if key in match.keys():
-                    item_data[self.key_translation[1][key]] = match[key]
-                else:
-                    item_data[self.key_translation[1][key]] = u''
-            items.append(item_data)
-
-        self.channel['channel_startindex'] = self.page_limit * int(pagenumber)
+        items = map(lambda match: self.translateItem(match), data)
         self.channel['channel_returned'] = len(items)
 
         if len(items):
@@ -610,171 +512,70 @@ class Videos(object):
         return None
     # end searchForVideos()
 
-    def getCategories(self, dir_dict, categories):
-        '''Parse a dictionary made of subdictionaries and category list and extract all of the categories
-        return a list of categories
-        '''
-        for sets in dir_dict:
-            if isinstance(sets[1], str):
-                continue
-            for cat in sets[1]:
-                categories.append(cat)
-        return categories
-    # end getCategories()
+    def translateItem(self, item):
+        item_data = {}
+        for key in self.key_translation[1].keys():
+            if key in item.keys():
+                item_data[self.key_translation[1][key]] = item[key]
+            else:
+                item_data[self.key_translation[1][key]] = u''
+        return item_data
 
     def displayTreeView(self):
         '''Gather the Youtube categories/feeds/...etc then get a max page of videos meta data in each of them
         return array of directories and their video metadata
         '''
         # Channel details and search results
-        self.channel = {'channel_title': u'YouTube', 'channel_link': u'http://www.youtube.com/', 'channel_description': u"Share your videos with friends, family, and the world.", 'channel_numresults': 0, 'channel_returned': 1, u'channel_startindex': 0}
+        self.channel = {
+            'channel_title': u'YouTube',
+            'channel_link': u'http://www.youtube.com/',
+            'channel_description': u"Share your videos with friends, family, and the world.",
+            'channel_numresults': 0,
+            'channel_returned': 1,
+            'channel_startindex': 0}
 
-        if self.config['debug_enabled']:
-            print self.config[u'urls']
-            print
-
-        if self.config['debug_enabled']:
-            print self.config[u'urls'][u'categories_list']
-            print
-
-        try:
-            etree = XmlHandler(self.config[u'urls'][u'categories_list']).getEt()
-        except Exception, errormsg:
-            raise YouTubeUrlError(self.error_messages['YouTubeUrlError'] % (url, errormsg))
-
+        etree = self.getVideoCategories()
         if etree is None:
             raise YouTubeCategoryNotFound(u"No YouTube Categories found for Tree view")
 
-        cats = []
-        for category in etree:
-            if category.tag.endswith('category'):
-                cats.append({'term': category.get('term'), 'label': category.get('label')})
-        if not len(cats):
-            raise YouTubeCategoryNotFound(u"No YouTube Category tags found for Tree view")
-
-        self.feed_names['category'] = {}
-        for category in cats:
-            self.feed_names['category'][category['term']] = self.ampReplace(category['label'])
-
-        # Verify all categories are already in site tree map add any new ones to 'Other'
-        categories = []
-        categories = self.getCategories(self.tree_org['category'], categories)
-
-        # Add any categories that are not in the preset tree map
-        new_category = []
-        for category in self.feed_names['category'].keys():
-            if category in categories:
-                continue
-            new_category.append(category)
-        if len(new_category):
-            self.tree_org['category'].append(['New', new_category])
-            self.tree_org['category'].append(['', u''])
-
-        # Add local feed details
-        # {'Latitude': '43.6667', 'Country': 'Canada', 'Longitude': '-79.4167', 'City': 'Toronto'}
-        longitude_latitude = self.detectUserLocationByIP()
-        if len(longitude_latitude):
-            self.feed_names['local_feeds'] = dict(self.feed_names['standard_feeds'])
-            self.tree_customize['local_feeds']['__default__']['location'] = u"%s,%s" % (longitude_latitude['Latitude'], longitude_latitude['Longitude'])
-            self.tree_org['local_feeds'][0][0] = u'Youtube Feeds within %s of %s, %s' % (self.tree_customize['local_feeds']['__default__']['location-radius'], longitude_latitude['City'], longitude_latitude['Country'])
-        else:
-            self.tree_order.remove('local_feeds')
-        # Set location search parameters
-        if len(longitude_latitude):
-            city_country = u'%s+%s' % (longitude_latitude['City'], longitude_latitude['Country'])
-            self.tree_org['location_feeds'][0][1][0] = city_country
-            self.feed_names['location_feeds'] = dict({u'%s' % city_country: u'Youtube Videos for %s, %s' % (longitude_latitude['City'], longitude_latitude['Country'])})
-        else:
-            self.tree_order.remove('location_feeds')
-
-        # Set the default videos per page limit for all feeds/categories/... etc
-        for key in self.tree_customize.keys():
-            if '__default__' in self.tree_customize[key].keys():
-                if 'max-results' in self.tree_customize[key]['__default__'].keys():
-                    self.tree_customize[key]['__default__']['max-results'] = unicode(self.page_limit)
+        feed_names = {}
+        for category in etree['items']:
+            snippet = category['snippet']
+            feed_names[snippet['title']] = self.common.ampReplace(category['id'])
 
         # Get videos within each category
         dictionaries = []
 
         # Process the various video feeds/categories/... etc
-        for key in self.tree_order:
-            self.tree_key = key
-            dictionaries = self.getVideos(self.tree_org[key], dictionaries)
+        for category in feed_names:
+            self.tree_key = category
+            dictionaries = self.getVideosForCategory(feed_names[category], dictionaries)
 
         return [[self.channel, dictionaries]]
     # end displayTreeView()
 
-    def processVideoUrl(self, item, elem):
-        '''Processes elem.get('url') to either use a custom HTML page served by
-        the backend, or include '&autoplay=1'
-        '''
-        m = re.search('/v/([^?]+)', elem.get('url'))
-        if m:
-            url = self.mythxml.getInternetContentUrl("nv_python_libs/configs/HTML/youtube.html", \
-                                                     m.group(1))
-            item['video'] = self.ampReplace(url)
-        else:
-            item['video'] = self.ampReplace((elem.get('url')+'&autoplay=1'))
+    def getVideoCategories(self):
+        try:
+            url = 'https://www.googleapis.com/youtube/v3/videoCategories?' + \
+                    'part=snippet&regionCode=%s&key=%s' % \
+                    (self.config['region'], self.apikey)
+            return JsonHandler(url).getJson()
+        except Exception as errormsg:
+            raise YouTubeUrlError(self.error_messages['YouTubeUrlError'] % (url, errormsg))
 
-    def makeURL(self, URL):
-        '''Form a URL to search for videos
-        return a URL
-        '''
-        additions = dict(self.tree_customize[self.tree_key]['__default__']) # Set defaults
-
-        # Add customizations
-        if self.feed in self.tree_customize[self.tree_key].keys():
-            for element in self.tree_customize[self.tree_key][self.feed].keys():
-                additions[element] = self.tree_customize[self.tree_key][self.feed][element]
-
-        # Make the search extension string that is added to the URL
-        addition = u''
-        for ky in additions.keys():
-            if ky.startswith('add_'):
-                addition+=u'/%s' %  additions[ky]
-            else:
-                addition+=u'&%s=%s' %  (ky, additions[ky])
-        index = URL.find('%')
-        if index == -1:
-            return (URL+addition)
-        else:
-            return (URL+addition) % self.feed
-    # end makeURL()
-
-
-    def getVideos(self, dir_dict, dictionaries):
+    def getVideosForCategory(self, categoryId, dictionaries):
         '''Parse a list made of category lists and retrieve video meta data
         return a dictionary of directory names and categories video metadata
         '''
-        for sets in dir_dict:
-            if not isinstance(sets[1], list):
-                if sets[0] != '': # Add the nested dictionaries display name
-                    try:
-                        dictionaries.append([self.massageDescription(sets[0]), self.setTreeViewIcon(self.feed_icons[self.tree_key][sets[0]])])
-                    except KeyError:
-                        dictionaries.append([self.massageDescription(sets[0]), self.channel_icon])
-                else:
-                    dictionaries.append(['', u'']) # Add the nested dictionary indicator
-                continue
-            temp_dictionary = []
-            for self.feed in sets[1]:
-                if self.config[u'urls'][u'tree.view'][self.tree_key].has_key('__all__'):
-                    URL = self.config[u'urls'][u'tree.view'][self.tree_key]['__all__']
-                else:
-                    URL = self.config[u'urls'][u'tree.view'][self.tree_key][self.feed]
-                temp_dictionary = self.config['item_parser'][URL[1]](self.makeURL(URL[0]), temp_dictionary)
-            if len(temp_dictionary):
-                if len(sets[0]): # Add the nested dictionaries display name
-                    try:
-                        dictionaries.append([self.massageDescription(sets[0]), self.setTreeViewIcon(self.feed_icons[self.tree_key][sets[0]])])
-                    except KeyError:
-                        dictionaries.append([self.massageDescription(sets[0]), self.channel_icon])
-                for element in temp_dictionary:
-                    dictionaries.append(element)
-                if len(sets[0]):
-                    dictionaries.append(['', u'']) # Add the nested dictionary indicator
+        url = 'https://www.googleapis.com/youtube/v3/videos?part=snippet&' + \
+                'chart=mostPopular&videoCategoryId=%s&maxResults=%s&key=%s' %  \
+                (categoryId, self.page_limit, self.apikey)
+        temp_dictionary = []
+        temp_dictionary = self.getVideosForURL(url, temp_dictionary)
+        for element in temp_dictionary:
+            dictionaries.append(element)
         return dictionaries
-    # end getVideos()
+    # end getVideosForCategory()
 
     def getVideosForURL(self, url, dictionaries):
         '''Get the video metadata for url search
@@ -788,110 +589,31 @@ class Videos(object):
             print
 
         try:
-            etree = XmlHandler(url).getEt()
+            result = JsonHandler(url).getJson()
         except Exception, errormsg:
             sys.stderr.write(self.error_messages['YouTubeUrlError'] % (url, errormsg))
             return dictionaries
 
-        if etree is None:
+        if result is None:
             sys.stderr.write(u'1-No Videos for (%s)\n' % self.feed)
             return dictionaries
 
+        if 'pageInfo' not in result or 'items' not in result:
+            return dictionaries
+
         dictionary_first = False
-        for elements in etree:
-            if elements.tag.endswith(u'totalResults'):
-                self.channel['channel_numresults'] += int(elements.text)
-                self.channel['channel_startindex'] = self.page_limit
-                self.channel['channel_returned'] = self.page_limit # False value CHANGE later
-                continue
-
-            if not elements.tag.endswith(u'entry'):
-                continue
-
-            metadata = {}
-            cur_size = True
-            flash = False
-            for e in elements:
-                metadata['language'] = self.config['language']
-                if e.tag.endswith(u'published'): # '2009-02-13T04:54:28.000Z'
-                    if e.text:
-                        pub_time = time.strptime(e.text.strip(), "%Y-%m-%dT%H:%M:%S.000Z")
-                        metadata['published_parsed'] = time.strftime('%a, %d %b %Y %H:%M:%S GMT', pub_time)
-                    continue
-                if e.tag.endswith(u'rating'):
-                    if e.get('average'):
-                        metadata['rating'] = e.get('average')
-                    continue
-                if e.tag.endswith(u'title'):
-                    if e.text:
-                        metadata['title'] = self.massageDescription(e.text.strip())
-                    continue
-                if e.tag.endswith(u'author'):
-                    for a in e:
-                        if a.tag.endswith(u'name'):
-                            if a.text:
-                                metadata['author'] = self.massageDescription(a.text.strip())
-                            break
-                    continue
-                if not e.tag.endswith(u'group'):
-                    continue
-                for elem in e:
-                    if elem.tag.endswith(u'description'):
-                        if elem.text != None:
-                            metadata['media_description'] = self.massageDescription(elem.text.strip())
-                        else:
-                            metadata['media_description'] = u''
-                        continue
-                    if elem.tag.endswith(u'duration'):
-                        if elem.get('seconds'):
-                            metadata['duration'] =  elem.get('seconds').strip()
-                        continue
-                    if elem.tag.endswith(u'thumbnail'):
-                        if cur_size == False:
-                            continue
-                        height = elem.get('height')
-                        width = elem.get('width')
-                        if int(width) > cur_size:
-                            if elem.get('url'):
-                                metadata['thumbnail'] = self.ampReplace(elem.get('url'))
-                                cur_size = int(width)
-                        if int(width) >= 200:
-                            cur_size = False
-                        continue
-                    if elem.tag.endswith(u'player'):
-                        if elem.get('url'):
-                            metadata['link'] = self.ampReplace(elem.get('url'))
-                        continue
-                    if elem.tag.endswith(u'content') and flash == False:
-                        for key in elem.keys():
-                            if not key.endswith(u'format'):
-                                continue
-                            if not elem.get(key) == '5':
-                                continue
-                            if elem.get('url'):
-                                self.processVideoUrl(metadata, elem)
-                                flash = True
-                        continue
-
-            if not metadata.has_key('video') and not metadata.has_key('link'):
-                continue
-
-            if not metadata.has_key('video'):
-                metadata['video'] = metadata['link']
-            else:
-                metadata['link'] =  metadata['video']
+        self.channel['channel_numresults'] += int(result['pageInfo']['totalResults'])
+        self.channel['channel_startindex'] = self.page_limit
+        self.channel['channel_returned'] = len(result['items'])
+        for entry in result['items']:
+            item = self.parseDetails(entry)
 
             if not dictionary_first:  # Add the dictionaries display name
-                dictionaries.append([self.massageDescription(self.feed_names[self.tree_key][self.feed]), self.setTreeViewIcon()])
+                dictionaries.append([self.massageDescription(self.tree_key),
+                    self.setTreeViewIcon()])
                 dictionary_first = True
 
-            final_item = {}
-            for key in self.key_translation[1].keys():
-                if not metadata.has_key(key):
-                    final_item[self.key_translation[1][key]] = u''
-                else:
-                    final_item[self.key_translation[1][key]] = metadata[key]
-            dictionaries.append(final_item)
+            dictionaries.append(self.translateItem(item))
 
         if initial_length < len(dictionaries): # Need to check if there was any items for this Category
             dictionaries.append(['', u'']) # Add the nested dictionary indicator

@@ -1420,9 +1420,9 @@ void MHIText::AddText(int x, int y, const QString &str, MHRgba colour)
         int baseX = FT2Point(posX) + slot->bitmap_left;
         int baseY = pixelY - slot->bitmap_top;
         // Copy the bitmap into the image.
-        for (int i = 0; i < slot->bitmap.rows; i++)
+        for (unsigned int i = 0; i < slot->bitmap.rows; i++)
         {
-            for (int j = 0; j < slot->bitmap.width; j++)
+            for (unsigned int j = 0; j < slot->bitmap.width; j++)
             {
                 int greyLevel = source[j];
                 // Set the pixel to the specified colour but scale its

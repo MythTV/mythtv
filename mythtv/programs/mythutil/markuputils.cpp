@@ -196,6 +196,25 @@ static int ClearSeekTable(const MythUtilCommandLineParser &cmdline)
     return GENERIC_EXIT_OK;
 }
 
+static int ClearBookmarks(const MythUtilCommandLineParser &cmdline)
+{
+    ProgramInfo pginfo;
+    if (!GetProgramInfo(cmdline, pginfo))
+        return GENERIC_EXIT_NO_RECORDING_DATA;
+
+    cout << "Clearing bookmarks\n";
+    LOG(VB_GENERAL, LOG_NOTICE, pginfo.IsVideo() ?
+        QString("Clearing bookmarks for video %1").arg(pginfo.GetPathname()) :
+        QString("Clearing bookmarks for channel id %1 @ %2")
+                .arg(pginfo.GetChanID())
+                .arg(pginfo.GetScheduledStartTime().toString()));
+    pginfo.ClearMarkupFlag(MARK_BOOKMARK);
+    pginfo.ClearMarkupFlag(MARK_UTIL_PROGSTART);
+    pginfo.ClearMarkupFlag(MARK_UTIL_LASTPLAYPOS);
+
+    return GENERIC_EXIT_OK;
+}
+
 static int GetMarkup(const MythUtilCommandLineParser &cmdline)
 {
     ProgramInfo pginfo;
@@ -352,6 +371,7 @@ void registerMarkupUtils(UtilMap &utilMap)
     utilMap["setskiplist"]            = &SetSkipList;
     utilMap["clearskiplist"]          = &ClearSkipList;
     utilMap["clearseektable"]         = &ClearSeekTable;
+    utilMap["clearbookmarks"]         = &ClearBookmarks;
     utilMap["getmarkup"]              = &GetMarkup;
     utilMap["setmarkup"]              = &SetMarkup;
 }

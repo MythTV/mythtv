@@ -37,7 +37,7 @@ class Rtti : public RttiServices
 
     public:
 
-        Q_INVOKABLE Rtti( QObject *parent = 0 ) : RttiServices( parent ) {}
+        Q_INVOKABLE explicit Rtti( QObject *parent = 0 ) : RttiServices( parent ) {}
 
     public:
 
@@ -70,7 +70,7 @@ class ScriptableRtti : public QObject
 
     public:
 
-        Q_INVOKABLE ScriptableRtti( QObject *parent = 0 ) : QObject( parent ) {}
+        Q_INVOKABLE explicit ScriptableRtti( QObject *parent = 0 ) : QObject( parent ) {}
 
     public slots:
 

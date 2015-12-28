@@ -63,7 +63,7 @@ void ProfileGroup::loadByID(int profileId) {
 
 void ProfileGroup::fillSelections(SelectSetting* setting)
 {
-    QStringList cardtypes = CardUtil::GetCardTypes();
+    QStringList cardtypes = CardUtil::GetInputTypes();
     QString     tid       = QString::null;
 
     MSqlQuery result(MSqlQuery::InitCon());
@@ -86,7 +86,8 @@ void ProfileGroup::fillSelections(SelectSetting* setting)
         QString cardtype   = result.value(4).toString();
 
         // Only show default profiles that match installed cards
-        bool have_cardtype = cardtypes.contains(cardtype);
+        // Workaround for #12481 in fixes/0.27
+        bool have_cardtype = cardtypes.contains(cardtype, Qt::CaseInsensitive);
         if (is_default && (cardtype == "TRANSCODE") && !have_cardtype)
         {
             tid = id;

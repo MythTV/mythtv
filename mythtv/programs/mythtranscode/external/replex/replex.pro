@@ -45,4 +45,4 @@ POST_TARGETDEPS += ../../../../external/FFmpeg/libavformat/$$avLibName(avformat)
 DEPENDPATH += ../../../../external/FFmpeg
 DEPENDPATH += ../../../../libs/libmythbase
 
-CONFIG  -= qt
+# NB the myth libraries need link link against Qt libs so CONFIG needs qt

@@ -25,8 +25,8 @@
 #include "libavutil/attributes.h"
 #include "libavutil/imgutils.h"
 #include "avcodec.h"
-#include "dsputil.h"
 #include "imgconvert.h"
+#include "me_cmp.h"
 #include "mpegvideoencdsp.h"
 
 static int try_8x8basis_c(int16_t rem[64], int16_t weight[64],
@@ -176,4 +176,6 @@ av_cold void ff_mpegvideoencdsp_init(MpegvideoEncDSPContext *c,
         ff_mpegvideoencdsp_init_ppc(c, avctx);
     if (ARCH_X86)
         ff_mpegvideoencdsp_init_x86(c, avctx);
+    if (ARCH_MIPS)
+        ff_mpegvideoencdsp_init_mips(c, avctx);
 }

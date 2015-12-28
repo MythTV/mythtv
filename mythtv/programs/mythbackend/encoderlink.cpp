@@ -18,8 +18,8 @@
 #include "mythlogging.h"                // for LOG
 #include "programinfo.h"                // for ProgramInfo
 
-#define LOC QString("EncoderLink(%1): ").arg(m_capturecardnum)
-#define LOC_ERR QString("EncoderLink(%1) Error: ").arg(m_capturecardnum)
+#define LOC QString("EncoderLink(%1): ").arg(m_inputid)
+#define LOC_ERR QString("EncoderLink(%1) Error: ").arg(m_inputid)
 
 /**
  * \class EncoderLink
@@ -39,9 +39,9 @@
 /** \fn EncoderLink::EncoderLink(int, PlaybackSock*, QString)
  *  \brief This is the EncoderLink constructor for non-local recorders.
  */
-EncoderLink::EncoderLink(int capturecardnum, PlaybackSock *lsock,
+EncoderLink::EncoderLink(int inputid, PlaybackSock *lsock,
                          QString lhostname)
-    : m_capturecardnum(capturecardnum), sock(lsock), hostname(lhostname),
+    : m_inputid(inputid), sock(lsock), hostname(lhostname),
       tv(NULL), local(false), locked(false),
       sleepStatus(sStatus_Undefined), chanid(0)
 {
@@ -58,8 +58,8 @@ EncoderLink::EncoderLink(int capturecardnum, PlaybackSock *lsock,
 /** \fn EncoderLink::EncoderLink(int, TVRec *)
  *  \brief This is the EncoderLink constructor for local recorders.
  */
-EncoderLink::EncoderLink(int capturecardnum, TVRec *ltv)
-    : m_capturecardnum(capturecardnum), sock(NULL),
+EncoderLink::EncoderLink(int inputid, TVRec *ltv)
+    : m_inputid(inputid), sock(NULL),
       tv(ltv), local(true), locked(false),
       sleepStatus(sStatus_Undefined), chanid(0)
 {
@@ -163,7 +163,7 @@ bool EncoderLink::IsBusy(InputInfo *busy_input, int time_buffer)
     if (HasSockAndIncrRef())
     {
         ReferenceLocker rlocker(sock);
-        return sock->IsBusy(m_capturecardnum, busy_input, time_buffer);
+        return sock->IsBusy(m_inputid, busy_input, time_buffer);
     }
 
     return false;
@@ -208,11 +208,11 @@ TVState EncoderLink::GetState(void)
     else if (HasSockAndIncrRef())
     {
         ReferenceLocker rlocker(sock);
-        retval = (TVState)sock->GetEncoderState(m_capturecardnum);
+        retval = (TVState)sock->GetEncoderState(m_inputid);
     }
     else
-        LOG(VB_GENERAL, LOG_ERR, QString("Broken for card: %1")
-            .arg(m_capturecardnum));
+        LOG(VB_GENERAL, LOG_ERR, QString("Broken for input: %1")
+            .arg(m_inputid));
 
     return retval;
 }
@@ -233,7 +233,7 @@ uint EncoderLink::GetFlags(void)
     else if (HasSockAndIncrRef())
     {
         ReferenceLocker rlocker(sock);
-        retval = sock->GetEncoderState(m_capturecardnum);
+        retval = sock->GetEncoderState(m_inputid);
     }
     else
         LOG(VB_GENERAL, LOG_ERR, LOC + "GetFlags failed");
@@ -284,7 +284,7 @@ bool EncoderLink::MatchesRecording(const ProgramInfo *rec)
         if (HasSockAndIncrRef())
         {
             ReferenceLocker rlocker(sock);
-            retval = sock->EncoderIsRecording(m_capturecardnum, rec);
+            retval = sock->EncoderIsRecording(m_inputid, rec);
         }
     }
 
@@ -307,7 +307,7 @@ void EncoderLink::RecordPending(const ProgramInfo *rec, int secsleft,
     else if (HasSockAndIncrRef())
     {
         ReferenceLocker rlocker(sock);
-        sock->RecordPending(m_capturecardnum, rec, secsleft, hasLater);
+        sock->RecordPending(m_inputid, rec, secsleft, hasLater);
     }
 }
 
@@ -367,7 +367,7 @@ long long EncoderLink::GetMaxBitrate()
     else if (HasSockAndIncrRef())
     {
         ReferenceLocker rlocker(sock);
-        return sock->GetMaxBitrate(m_capturecardnum);
+        return sock->GetMaxBitrate(m_inputid);
     }
 
     return -1;
@@ -394,7 +394,7 @@ int EncoderLink::SetSignalMonitoringRate(int rate, int notifyFrontend)
     else if (HasSockAndIncrRef())
     {
         ReferenceLocker rlocker(sock);
-        return sock->SetSignalMonitoringRate(m_capturecardnum, rate,
+        return sock->SetSignalMonitoringRate(m_inputid, rate,
                                              notifyFrontend);
     }
     return -1;
@@ -414,7 +414,7 @@ bool EncoderLink::GoToSleep(void)
 }
 
 /** \brief Lock the tuner for exclusive use.
- *  \return -2 if tuner is already locked, GetCardID() if you get the lock.
+ *  \return -2 if tuner is already locked, GetInputID() if you get the lock.
  * \sa FreeTuner(), IsTunerLocked()
  */
 int EncoderLink::LockTuner()
@@ -423,7 +423,7 @@ int EncoderLink::LockTuner()
         return -2;
 
     locked = true;
-    return m_capturecardnum;
+    return m_inputid;
 }
 
 /** \fn EncoderLink::StartRecording(ProgramInfo*)
@@ -446,13 +446,13 @@ RecStatus::Type EncoderLink::StartRecording(ProgramInfo *rec)
     else if (HasSockAndIncrRef())
     {
         ReferenceLocker rlocker(sock);
-        retval = sock->StartRecording(m_capturecardnum, rec);
+        retval = sock->StartRecording(m_inputid, rec);
     }
     else
         LOG(VB_GENERAL, LOG_ERR,
             QString("Wanted to start recording on recorder %1,\n\t\t\t"
                     "but the backend is not there anymore\n")
-                .arg(m_capturecardnum));
+                .arg(m_inputid));
 
     if (retval != RecStatus::Recording && retval != RecStatus::Tuning && retval != RecStatus::Failing)
     {
@@ -473,13 +473,13 @@ RecStatus::Type EncoderLink::GetRecordingStatus(void)
     else if (HasSockAndIncrRef())
     {
         ReferenceLocker rlocker(sock);
-        retval = sock->GetRecordingStatus(m_capturecardnum);
+        retval = sock->GetRecordingStatus(m_inputid);
     }
     else
         LOG(VB_GENERAL, LOG_ERR,
             QString("Wanted to get status on recorder %1,\n\t\t\t"
                     "but the backend is not there anymore\n")
-                .arg(m_capturecardnum));
+                .arg(m_inputid));
 
     if (retval != RecStatus::Recording && retval != RecStatus::Tuning && retval != RecStatus::Failing)
     {
@@ -506,7 +506,7 @@ ProgramInfo *EncoderLink::GetRecording(void)
     else if (HasSockAndIncrRef())
     {
         ReferenceLocker rlocker(sock);
-        info = sock->GetRecording(m_capturecardnum);
+        info = sock->GetRecording(m_inputid);
     }
 
     return info;
@@ -678,7 +678,7 @@ void EncoderLink::CancelNextRecording(bool cancel)
     else if (HasSockAndIncrRef())
     {
         ReferenceLocker rlocker(sock);
-        sock->CancelNextRecording(m_capturecardnum, cancel);
+        sock->CancelNextRecording(m_inputid, cancel);
     }
 }
 
@@ -764,29 +764,8 @@ void EncoderLink::SetNextLiveTVDir(QString dir)
     else if (HasSockAndIncrRef())
     {
         ReferenceLocker rlocker(sock);
-        sock->SetNextLiveTVDir(m_capturecardnum, dir);
+        sock->SetNextLiveTVDir(m_inputid, dir);
     }
-}
-
-/** \fn EncoderLink::GetFreeInputs(const vector<uint>&) const
- *  \brief Returns TVRec's recorders connected inputs.
- *
- *  \sa TVRec::GetFreeInputs(const vector<uint>&) const
- */
-vector<InputInfo> EncoderLink::GetFreeInputs(
-    const vector<uint> &excluded_cardids)
-{
-    vector<InputInfo> list;
-
-    if (local)
-        list = tv->GetFreeInputs(excluded_cardids);
-    else if (HasSockAndIncrRef())
-    {
-        ReferenceLocker rlocker(sock);
-        list = sock->GetFreeInputs(m_capturecardnum, excluded_cardids);
-    }
-
-    return list;
 }
 
 /** \fn EncoderLink::GetInput(void) const
@@ -915,7 +894,7 @@ int EncoderLink::ChangePictureAttribute(PictureAdjustType type,
  *  \return true if it succeeds, false otherwise.
  *  \sa TVRec::CheckChannel(QString),
  *      RemoteEncoder::CheckChannel(QString),
- *      ShouldSwitchToAnotherCard(const QString&)
+ *      ShouldSwitchToAnotherInput(const QString&)
  */
 bool EncoderLink::CheckChannel(const QString &name)
 {
@@ -926,7 +905,7 @@ bool EncoderLink::CheckChannel(const QString &name)
     return false;
 }
 
-/** \fn EncoderLink::ShouldSwitchToAnotherCard(const QString&)
+/** \fn EncoderLink::ShouldSwitchToAnotherInput(const QString&)
  *  \brief Checks if named channel exists on current tuner, or
  *         another tuner.
  *         <b>This only works on local recorders.</b>
@@ -935,13 +914,13 @@ bool EncoderLink::CheckChannel(const QString &name)
  *          false otherwise.
  *  \sa CheckChannel(const QString&)
  */
-bool EncoderLink::ShouldSwitchToAnotherCard(const QString &channelid)
+bool EncoderLink::ShouldSwitchToAnotherInput(const QString &channelid)
 {
     if (local)
-        return tv->ShouldSwitchToAnotherCard(channelid);
+        return tv->ShouldSwitchToAnotherInput(channelid);
 
     LOG(VB_GENERAL, LOG_ERR,
-        "Should be local only query: ShouldSwitchToAnotherCard");
+        "Should be local only query: ShouldSwitchToAnotherInput");
     return false;
 }
 

@@ -12,6 +12,10 @@ DEFINES += SERVICE_API
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 QMAKE_CLEAN += version.cpp
 
+INCLUDEPATH += ../libmythbase
+DEPENDPATH += ../libmythbase
+LIBS += -L../libmythbase -lmythbase-$${LIBVERSION}
+
 # Input
 
 HEADERS += serviceexp.h service.h datacontracthelper.h
@@ -60,8 +64,12 @@ SOURCES += service.cpp
 INCLUDEPATH += ./datacontracts
 INCLUDEPATH += ./services
 
+# Dirty hack to prevent cross dependencies.
 # needed only for enums in programtypes.h, recordingtypes.h
-DEPENDPATH += ../libmyth
+INCLUDEPATH += ../libmyth
+HEADERS += ../libmyth/programtypes.h ../libmyth/recordingtypes.h
+SOURCES += ../libmyth/programtypes.cpp ../libmyth/recordingtypes.cpp
+
 INCLUDEPATH += $$DEPENDPATH
 
 inc.path = $${PREFIX}/include/mythtv/libmythservicecontracts/
@@ -117,3 +125,11 @@ use_hidesyms {
 include ( ../libs-targetfix.pro )
 
 LIBS += $$EXTRA_LIBS $$LATE_LIBS
+
+android {
+    DEPENDPATH += ../libmythbase
+    INCLUDEPATH += ../libmythbase
+    HEADERS += ../libmyth/programtypes.h
+    SOURCES += ../libmyth/programtypes.cpp
+    LIBS += -L../libmythbase -lmythbase-$${LIBVERSION}
+}

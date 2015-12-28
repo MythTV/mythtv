@@ -30,11 +30,14 @@ enum frameAspects {
     COMM_ASPECT_WIDE
 } FrameAspects;
 
+// letter-box and pillar-box are not mutually exclusive
+// So 3 is a valid value = (COMM_FORMAT_LETTERBOX | COMM_FORMAT_PILLARBOX)
+// And 4 = COMM_FORMAT_MAX is the number of valid values.
 enum frameFormats {
-    COMM_FORMAT_NORMAL = 0,
-    COMM_FORMAT_LETTERBOX,
-    COMM_FORMAT_PILLARBOX,
-    COMM_FORMAT_MAX
+    COMM_FORMAT_NORMAL    = 0,
+    COMM_FORMAT_LETTERBOX = 1,
+    COMM_FORMAT_PILLARBOX = 2,
+    COMM_FORMAT_MAX       = 4,
 } FrameFormats;
 
 static QString toStringFrameMaskValues(int mask, bool verbose)
@@ -87,16 +90,18 @@ static QString toStringFrameFormats(int format, bool verbose)
     switch (format)
     {
         case COMM_FORMAT_NORMAL:
-            return (verbose) ? "normal" : "N";
+            return (verbose) ? "normal" : " N ";
         case COMM_FORMAT_LETTERBOX:
-            return (verbose) ? "letter" : "L";
+            return (verbose) ? "letter" : " L ";
         case COMM_FORMAT_PILLARBOX:
-            return (verbose) ? "pillar" : "P";
+            return (verbose) ? "pillar" : " P ";
+        case COMM_FORMAT_LETTERBOX | COMM_FORMAT_PILLARBOX:
+            return (verbose) ? "letter,pillar" : "L,P";
         case COMM_FORMAT_MAX:
-            return (verbose) ? " max  " : "M";
+            return (verbose) ? " max  " : " M ";
     }
 
-    return (verbose) ? " null " : "n";
+    return (verbose) ? "unknown" : " U ";
 }
 
 QString FrameInfoEntry::GetHeader(void)
@@ -139,7 +144,7 @@ ClassicCommDetector::ClassicCommDetector(SkipType commDetectMethod_in,
     totalMinBrightness(0),                     detectBlankFrames(false),
     detectSceneChanges(false),                 detectStationLogo(false),
     logoInfoAvailable(false),                  logoDetector(0),
-    framePtr(0),                               frameIsBlank(false),
+    frameIsBlank(false),
     sceneHasChanged(false),                    stationLogoPresent(false),
     lastFrameWasBlank(false),                  lastFrameWasSceneChange(false),
     decoderFoundAspectChanges(false),          sceneChangeDetector(0),
@@ -152,8 +157,6 @@ ClassicCommDetector::ClassicCommDetector(SkipType commDetectMethod_in,
     fps(0.0),                                  framesProcessed(0),
     preRoll(0),                                postRoll(0)
 {
-    commDetectBorder =
-        gCoreContext->GetNumSetting("CommDetectBorder", 20);
     commDetectBlankFrameMaxDiff =
         gCoreContext->GetNumSetting("CommDetectBlankFrameMaxDiff", 25);
     commDetectDarkBrightness =
@@ -188,6 +191,16 @@ void ClassicCommDetector::Init()
         max(int64_t(0), int64_t(recordingStartedAt.secsTo(startedAt))) * fps);
     postRoll = (long long)(
         max(int64_t(0), int64_t(stopsAt.secsTo(recordingStopsAt))) * fps);
+
+    // CommDetectBorder's default value of 20 predates the change to use
+    // ffmpeg's lowres decoding capability by 5 years.
+    // I believe it should be adjusted based on the height of the lowres video
+    // CommDetectBorder * height / 720 seems to produce reasonable results.
+    // source height =  480 gives border = 20 *  480 / 4 / 720 = 2
+    // source height =  720 gives border = 20 *  720 / 4 / 720 = 5
+    // source height = 1080 gives border = 20 * 1080 / 4 / 720 = 7
+    commDetectBorder =
+        gCoreContext->GetNumSetting("CommDetectBorder", 20) * height / 720;
 
 #ifdef SHOW_DEBUG_WIN
     comm_debug_init(width, height);
@@ -265,8 +278,6 @@ void ClassicCommDetector::Init()
     frameIsBlank = false;
     stationLogoPresent = false;
 
-    framePtr = NULL;
-
     logoInfoAvailable = false;
 
     ClearAllMaps();
@@ -318,8 +329,19 @@ bool ClassicCommDetector::go()
 
     if (commDetectMethod & COMM_DETECT_LOGO)
     {
+        // Use a different border for logo detection.
+        // If we try to detect logos in letterboxed areas,
+        // chances are we won't detect the logo.
+        // Generally speaking, SD video is likely to be letter boxed
+        // and HD video is not likely to be letter boxed.
+        // To detect logos, try to exclude letterboxed area from SD video
+        // but exclude too much from HD video and you'll miss the logo.
+        // Using the same border for both with no scaling seems to be
+        // a good compromise.
+        int logoDetectBorder =
+            gCoreContext->GetNumSetting("CommDetectLogoBorder", 16);
         logoDetector = new ClassicLogoDetector(this, width, height,
-            commDetectBorder, horizSpacing, vertSpacing);
+            logoDetectBorder, horizSpacing, vertSpacing);
 
         requiredHeadStart += max(
             int64_t(0), int64_t(recordingStartedAt.secsTo(startedAt)));
@@ -780,7 +802,8 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
     }
 
     curFrameNumber = frame_number;
-    framePtr = frame->buf;
+    unsigned char* framePtr = frame->buf;
+    int bytesPerLine = frame->pitches[0];
 
     fInfo.minBrightness = -1;
     fInfo.maxBrightness = -1;
@@ -817,7 +840,7 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
 
     if (commDetectMethod & COMM_DETECT_SCENE)
     {
-        sceneChangeDetector->processFrame(framePtr);
+        sceneChangeDetector->processFrame(frame);
     }
 
     stationLogoPresent = false;
@@ -828,7 +851,7 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
         for(int x = commDetectBorder; x < (width - commDetectBorder);
                 x += horizSpacing)
         {
-            pixel = framePtr[y * width + x];
+            pixel = framePtr[y * bytesPerLine + x];
 
             if (commDetectMethod & COMM_DETECT_BLANKS)
             {
@@ -898,23 +921,20 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
         delete[] colMax;
         colMax = 0;
 
+        frameInfo[curFrameNumber].format = COMM_FORMAT_NORMAL;
         if ((topDarkRow > commDetectBorder) &&
             (topDarkRow < (height * .20)) &&
             (bottomDarkRow < (height - commDetectBorder)) &&
             (bottomDarkRow > (height * .80)))
         {
-            frameInfo[curFrameNumber].format = COMM_FORMAT_LETTERBOX;
+            frameInfo[curFrameNumber].format |= COMM_FORMAT_LETTERBOX;
         }
-        else if ((leftDarkCol > commDetectBorder) &&
+        if ((leftDarkCol > commDetectBorder) &&
                  (leftDarkCol < (width * .20)) &&
                  (rightDarkCol < (width - commDetectBorder)) &&
                  (rightDarkCol > (width * .80)))
         {
-            frameInfo[curFrameNumber].format = COMM_FORMAT_PILLARBOX;
-        }
-        else
-        {
-            frameInfo[curFrameNumber].format = COMM_FORMAT_NORMAL;
+            frameInfo[curFrameNumber].format |= COMM_FORMAT_PILLARBOX;
         }
 
         avg = totBrightness / blankPixelsChecked;
@@ -947,7 +967,7 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
     if ((logoInfoAvailable) && (commDetectMethod & COMM_DETECT_LOGO))
     {
         stationLogoPresent =
-            logoDetector->doesThisFrameContainTheFoundLogo(framePtr);
+            logoDetector->doesThisFrameContainTheFoundLogo(frame);
     }
 
 #if 0

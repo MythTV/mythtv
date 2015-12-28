@@ -103,7 +103,7 @@ void NetBase::StreamWebVideo()
     GetMythMainWindow()->HandleMedia("Internal", item->GetMediaURL(),
         item->GetDescription(), item->GetTitle(), item->GetSubtitle(),
         QString(), item->GetSeason(), item->GetEpisode(), QString(),
-        item->GetTime().toInt(), item->GetDate().toString("yyyy"));
+        item->GetTime().toInt() / 60, item->GetDate().toString("yyyy"));
 }
 
 void NetBase::ShowWebVideo()

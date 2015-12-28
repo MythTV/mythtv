@@ -19,18 +19,11 @@
 #include "mythdate.h"
 #include "mythtypes.h"
 
-/* If NUMPROGRAMLINES gets updated following files need
-   updates and code changes:
-   mythweb/modules/tv/classes/Program.php (layout)
-   mythtv/bindings/perl/MythTV.pm (version number)
-   mythtv/bindings/perl/MythTV/Program.pm (layout)
-   mythtv/bindings/php/MythBackend.php (version number)
-   mythtv/bindings/php/MythTVProgram.php (layout)
-   mythtv/bindings/php/MythTVRecording.php (layout)
-   mythtv/bindings/python/MythTV/static.py (version number)
-   mythtv/bindings/python/MythTV/mythproto.py (layout)
+/* If NUMPROGRAMLINES gets updated, then MYTH_PROTO_VERSION and MYTH_PROTO_TOKEN
+   in mythversion.h need to be bumped, and also follow the instructions in
+   myth_version.h about other changes needed when the network protocol changes.
 */
-#define NUMPROGRAMLINES 50
+#define NUMPROGRAMLINES 52
 
 class ProgramInfo;
 typedef AutoDeleteDeque<ProgramInfo*> ProgramList;
@@ -144,7 +137,9 @@ class MPUBLIC ProgramInfo
                 uint programflags,
                 uint audioproperties,
                 uint videoproperties,
-                uint subtitleType);
+                uint subtitleType,
+                const QString &inputname,
+                const QDateTime &bookmarkupdate);
 
     /// Constructs a ProgramInfo from data in 'oldrecorded' table
     ProgramInfo(const QString &title,
@@ -429,8 +424,6 @@ class MPUBLIC ProgramInfo
     uint    GetRecordingID(void)              const { return recordedid; }
     RecStatus::Type GetRecordingStatus(void)    const
         { return (RecStatus::Type)recstatus; }
-    RecStatus::Type GetOldRecordingStatus(void) const
-        { return (RecStatus::Type)oldrecstatus; }
     uint    GetPreferedInputID(void)          const { return prefinput; }
     uint    GetRecordingRuleID(void)          const { return recordid;  }
     uint    GetParentRecordingRuleID(void)    const { return parentid;  }
@@ -452,7 +445,8 @@ class MPUBLIC ProgramInfo
 
     uint32_t GetProgramFlags(void)        const { return programflags; }
     ProgramInfoType GetProgramInfoType(void) const
-        { return (ProgramInfoType)((programflags & FL_TYPEMASK) >> 16); }
+        { return (ProgramInfoType)((programflags & FL_TYPEMASK) >> 20); }
+    QDateTime GetBookmarkUpdate(void) const { return bookmarkupdate; }
     bool IsGeneric(void) const;
     bool IsInUsePlaying(void)   const { return programflags & FL_INUSEPLAYING;}
     bool IsCommercialFree(void) const { return programflags & FL_CHANCOMMFREE;}
@@ -489,7 +483,7 @@ class MPUBLIC ProgramInfo
     // Quick sets
     void SetTitle(const QString &t) { title = t; title.detach(); }
     void SetProgramInfoType(ProgramInfoType t)
-        { programflags &= ~FL_TYPEMASK; programflags |= ((uint32_t)t<<16); }
+        { programflags &= ~FL_TYPEMASK; programflags |= ((uint32_t)t<<20); }
     void SetPathname(const QString&) const;
     void SetChanID(uint _chanid) { chanid = _chanid; }
     void SetScheduledStartTime(const QDateTime &dt) { startts      = dt;    }
@@ -532,6 +526,21 @@ class MPUBLIC ProgramInfo
         programflags &= ~FL_IGNOREBOOKMARK;
         programflags |= (ignore) ? FL_IGNOREBOOKMARK : 0;
     }
+    /// \brief If "ignore" is true QueryProgStart() will return 0, otherwise
+    ///        QueryProgStart() will return the progstart position if it exists.
+    void SetIgnoreProgStart(bool ignore)
+    {
+        programflags &= ~FL_IGNOREPROGSTART;
+        programflags |= (ignore) ? FL_IGNOREPROGSTART : 0;
+    }
+    /// \brief If "ignore" is true QueryLastPlayPos() will return 0, otherwise
+    ///        QueryLastPlayPos() will return the last playback position
+    ///        if it exists.
+    void SetAllowLastPlayPos(bool allow)
+    {
+        programflags &= ~FL_ALLOWLASTPLAYPOS;
+        programflags |= (allow) ? FL_ALLOWLASTPLAYPOS : 0;
+    }
     virtual void SetRecordingID(uint _recordedid) { recordedid = _recordedid; }
     void SetRecordingStatus(RecStatus::Type status) { recstatus = status; }
     void SetRecordingRuleType(RecordingType type) { rectype   = type;   }
@@ -544,6 +553,8 @@ class MPUBLIC ProgramInfo
     uint        QueryMplexID(void) const;
     QDateTime   QueryBookmarkTimeStamp(void) const;
     uint64_t    QueryBookmark(void) const;
+    uint64_t    QueryProgStart(void) const;
+    uint64_t    QueryLastPlayPos(void) const;
     CategoryType QueryCategoryType(void) const;
     QStringList QueryDVDBookmark(const QString &serialid) const;
     bool        QueryIsEditing(void) const;
@@ -658,7 +669,6 @@ class MPUBLIC ProgramInfo
     static QMap<QString,bool> QueryJobsRunning(int type);
     static QStringList LoadFromScheduler(const QString &altTable, int recordid);
 
-  protected:
     // Flagging map support methods
     void QueryMarkupMap(frm_dir_map_t&, MarkTypes type,
                         bool merge = false) const;
@@ -667,6 +677,7 @@ class MPUBLIC ProgramInfo
     void ClearMarkupMap(MarkTypes type = MARK_ALL,
                         int64_t min_frm = -1, int64_t max_frm = -1) const;
 
+  protected:
     // Creates a basename from the start and end times
     QString CreateRecordBasename(const QString &ext) const;
 
@@ -746,12 +757,13 @@ class MPUBLIC ProgramInfo
     uint16_t parttotal;
 
     int8_t recstatus;
-    int8_t oldrecstatus;
     uint8_t rectype;
     uint8_t dupin;
     uint8_t dupmethod;
 
     uint    recordedid;
+    QString inputname;
+    QDateTime bookmarkupdate;
 
 // everything below this line is not serialized
     uint8_t availableStatus; // only used for playbackbox.cpp

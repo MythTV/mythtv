@@ -323,7 +323,7 @@ void EditMetadataDialog::fillWidgets()
     m_episodeSpin->SetValue(m_workingMetadata->GetEpisode());
     if (m_yearSpin)
     {
-        m_yearSpin->SetRange(0,9999,1,10);
+        m_yearSpin->SetRange(0,9999,1,100);
         m_yearSpin->SetValue(m_workingMetadata->GetYear());
     }
     if (m_userRatingSpin)

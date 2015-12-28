@@ -38,8 +38,8 @@ class LoggedCursor( MySQLdb.cursors.Cursor ):
             self.ping = ref(self._ping122)
         self.ping()
 
-    def _ping121(self): self.connection.ping(True)
-    def _ping122(self): self.connection.ping()
+    def _ping121(self): self._get_db().ping(True)
+    def _ping122(self): self._get_db().ping()
 
     def _sanitize(self, query): return query.replace('?', '%s')
 
@@ -95,8 +95,8 @@ class LoggedCursor( MySQLdb.cursors.Cursor ):
         except Exception, e:
             raise MythDBError(MythDBError.DB_RAW, e.args)
 
-    def commit(self): self.connection.commit()
-    def rollback(self): self.connection.rollback()
+    def commit(self): self._get_db().commit()
+    def rollback(self): self._get_db().rollback()
 
     def __enter__(self):
         return self

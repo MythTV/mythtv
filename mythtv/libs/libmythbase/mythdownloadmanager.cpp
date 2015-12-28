@@ -11,6 +11,7 @@
 #include <QTextStream>
 #include <QNetworkProxy>
 #include <QMutexLocker>
+#include <QUrl>
 
 #include "stdlib.h"
 
@@ -29,7 +30,6 @@
 
 #include "mythdownloadmanager.h"
 #include "mythlogging.h"
-#include <QUrl>
 
 using namespace std;
 
@@ -278,6 +278,8 @@ void MythDownloadManager::run(void)
             updateCookieJar();
         }
         m_infoLock->lock();
+        LOG(VB_FILE, LOG_DEBUG, LOC + QString("items downloading %1").arg(m_downloadInfos.count()));
+        LOG(VB_FILE, LOG_DEBUG, LOC + QString("items queued %1").arg(m_downloadQueue.count()));
         downloading = !m_downloadInfos.isEmpty();
         itemsInCancellationQueue = !m_cancellationQueue.isEmpty();
         m_infoLock->unlock();
@@ -299,9 +301,15 @@ void MythDownloadManager::run(void)
             m_queueWaitLock.lock();
 
             if (downloading)
+            {
+                LOG(VB_FILE, LOG_DEBUG, LOC + QString("waiting 200ms"));
                 m_queueWaitCond.wait(&m_queueWaitLock, 200);
+            }
             else
+            {
+                LOG(VB_FILE, LOG_DEBUG, LOC + QString("waiting for more items to download"));
                 m_queueWaitCond.wait(&m_queueWaitLock);
+            }
 
             m_queueWaitLock.unlock();
         }
@@ -319,8 +327,7 @@ void MythDownloadManager::run(void)
                 continue;
             }
 
-            QUrl qurl(dlInfo->m_url);
-            if (m_downloadInfos.contains(qurl.toString()))
+            if (m_downloadInfos.contains(dlInfo->m_url))
             {
                 // Push request to the end of the queue to let others process.
                 // If this is the only item in the queue, force the loop to
@@ -340,7 +347,7 @@ void MythDownloadManager::run(void)
                 downloadQNetworkRequest(dlInfo);
             }
 
-            m_downloadInfos[qurl.toString()] = dlInfo;
+            m_downloadInfos[dlInfo->m_url] = dlInfo;
         }
         m_infoLock->unlock();
     }
@@ -1253,9 +1260,15 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
         // else we downloaded via QNetworkAccessManager
         // AND the caller is handling the reply
 
-        m_downloadInfos.remove(dlInfo->m_url);
+        m_infoLock->lock();
+        if (!m_downloadInfos.remove(dlInfo->m_url))
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("ERROR download finished but failed to remove url: %1")
+                        .arg(dlInfo->m_url));
+
         if (reply)
             m_downloadReplies.remove(reply);
+        m_infoLock->unlock();
 
         dlInfo->SetDone(true);
 

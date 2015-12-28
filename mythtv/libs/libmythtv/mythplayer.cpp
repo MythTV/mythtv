@@ -125,7 +125,10 @@ MythPlayer::MythPlayer(PlayerFlags flags)
     : playerFlags(flags),
       decoder(NULL),                decoder_change_lock(QMutex::Recursive),
       videoOutput(NULL),            player_ctx(NULL),
-      decoderThread(NULL),          playerThread(NULL),
+      decoderThread(NULL),          playerThread(NULL),  
+#ifdef Q_OS_ANDROID
+      playerThreadId(0),
+#endif
       // Window stuff
       parentWidget(NULL), embedding(false), embedRect(QRect()),
       // State
@@ -220,6 +223,9 @@ MythPlayer::MythPlayer(PlayerFlags flags)
     memset(&tc_wrap,    0, sizeof(tc_wrap));
 
     playerThread = QThread::currentThread();
+#ifdef Q_OS_ANDROID
+    playerThreadId = gettid();
+#endif
     // Playback (output) zoom control
     detect_letter_box = new DetectLetterbox(this);
 
@@ -901,7 +907,7 @@ int MythPlayer::OpenFile(uint retries)
     livetv = player_ctx->tvchain && player_ctx->buffer->LiveMode();
 
     if (player_ctx->tvchain &&
-        player_ctx->tvchain->GetCardType(player_ctx->tvchain->GetCurPos()) ==
+        player_ctx->tvchain->GetInputType(player_ctx->tvchain->GetCurPos()) ==
         "DUMMY")
     {
         OpenDummy();
@@ -1013,9 +1019,7 @@ int MythPlayer::OpenFile(uint retries)
         {
             int cardid = player_ctx->recorder->GetRecorderNumber();
             QString channum = player_ctx->playingInfo->GetChanNum();
-            QString inputname;
-            int cardinputid = CardUtil::GetCardInputID(cardid, channum, inputname);
-            CardUtil::SetStartChannel(cardinputid, channum);
+            CardUtil::SetStartChannel(cardid, channum);
         }
     }
 
@@ -1374,6 +1378,7 @@ void MythPlayer::DisableCaptions(uint mode, bool osd_msg)
 
     QMutexLocker locker(&osdLock);
 
+    textDesired = textDisplayMode & kDisplayAllTextCaptions;
     QString msg = "";
     if (kDisplayNUVTeletextCaptions & mode)
         msg += tr("TXT CAP");
@@ -1410,7 +1415,8 @@ void MythPlayer::DisableCaptions(uint mode, bool osd_msg)
 void MythPlayer::EnableCaptions(uint mode, bool osd_msg)
 {
     QMutexLocker locker(&osdLock);
-    QString msg;
+    textDesired = mode & kDisplayAllTextCaptions;
+    QString msg = "";
     if ((kDisplayCC608 & mode) || (kDisplayCC708 & mode) ||
         (kDisplayAVSubtitle & mode) || kDisplayRawTextSubtitle & mode)
     {
@@ -2560,7 +2566,7 @@ void MythPlayer::SwitchToProgram(void)
         return;
     }
 
-    bool newIsDummy = player_ctx->tvchain->GetCardType(newid) == "DUMMY";
+    bool newIsDummy = player_ctx->tvchain->GetInputType(newid) == "DUMMY";
 
     SetPlayingInfo(*pginfo);
     Pause();
@@ -2590,8 +2596,8 @@ void MythPlayer::SwitchToProgram(void)
     if (!player_ctx->buffer->IsOpen())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "SwitchToProgram's OpenFile failed " +
-            QString("(card type: %1).")
-            .arg(player_ctx->tvchain->GetCardType(newid)));
+            QString("(input type: %1).")
+            .arg(player_ctx->tvchain->GetInputType(newid)));
         LOG(VB_GENERAL, LOG_ERR, player_ctx->tvchain->toString());
         SetEof(kEofStateImmediate);
         SetErrored(tr("Error opening switch program buffer"));
@@ -2700,7 +2706,7 @@ void MythPlayer::JumpToProgram(void)
 
     inJumpToProgramPause = true;
 
-    bool newIsDummy = player_ctx->tvchain->GetCardType(newid) == "DUMMY";
+    bool newIsDummy = player_ctx->tvchain->GetInputType(newid) == "DUMMY";
     SetPlayingInfo(*pginfo);
 
     Pause();
@@ -2742,8 +2748,8 @@ void MythPlayer::JumpToProgram(void)
     if (!player_ctx->buffer->IsOpen())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "JumpToProgram's OpenFile failed " +
-            QString("(card type: %1).")
-                .arg(player_ctx->tvchain->GetCardType(newid)));
+            QString("(input type: %1).")
+                .arg(player_ctx->tvchain->GetInputType(newid)));
         LOG(VB_GENERAL, LOG_ERR, player_ctx->tvchain->toString());
         SetEof(kEofStateImmediate);
         SetErrored(tr("Error opening jump program file buffer"));
@@ -2846,6 +2852,9 @@ bool MythPlayer::StartPlaying(void)
     VideoStart();
 
     playerThread->setPriority(QThread::TimeCriticalPriority);
+#ifdef Q_OS_ANDROID
+    setpriority(PRIO_PROCESS, playerThreadId, -20);
+#endif
     UnpauseDecoder();
     return !IsErrored();
 }
@@ -2866,6 +2875,9 @@ void MythPlayer::StopPlaying()
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("StopPlaying - begin"));
     playerThread->setPriority(QThread::NormalPriority);
+#ifdef Q_OS_ANDROID
+    setpriority(PRIO_PROCESS, playerThreadId, 0);
+#endif
 
     DecoderEnd();
     VideoEnd();
@@ -2879,7 +2891,14 @@ void MythPlayer::EventStart(void)
     player_ctx->LockPlayingInfo(__FILE__, __LINE__);
     {
         if (player_ctx->playingInfo)
+        {
+            // When initial playback gets underway, we override the ProgramInfo
+            // flags such that future calls to GetBookmark() will consider only
+            // an actual bookmark and not progstart or lastplaypos information.
             player_ctx->playingInfo->SetIgnoreBookmark(false);
+            player_ctx->playingInfo->SetIgnoreProgStart(true);
+            player_ctx->playingInfo->SetAllowLastPlayPos(false);
+        }
     }
     player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
     commBreakMap.LoadMap(player_ctx, framesPlayed);
@@ -3204,6 +3223,7 @@ void MythPlayer::DecoderStart(bool start_paused)
     }
 
     killdecoder = false;
+    decoderPaused = start_paused;
     decoderThread = new DecoderThread(this, start_paused);
     if (decoderThread)
         decoderThread->start();
@@ -3609,8 +3629,15 @@ uint64_t MythPlayer::GetBookmark(void)
     else
     {
         player_ctx->LockPlayingInfo(__FILE__, __LINE__);
-        if (player_ctx->playingInfo)
-            bookmark = player_ctx->playingInfo->QueryBookmark();
+        if (const ProgramInfo *pi = player_ctx->playingInfo)
+        {
+            bookmark = pi->QueryBookmark();
+            // Disable progstart if the program has a cutlist.
+            if (bookmark == 0 && !pi->HasCutlist())
+                bookmark = pi->QueryProgStart();
+            if (bookmark == 0)
+                bookmark = pi->QueryLastPlayPos();
+        }
         player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
     }
 
@@ -4878,7 +4905,7 @@ uint64_t MythPlayer::FindFrame(float offset, bool use_cutlist) const
         // Always get an updated totalFrame value for in progress recordings
         if (islivetvcur || IsWatchingInprogress())
         {
-            long long framesWritten = player_ctx->recorder->GetFramesWritten();
+            uint64_t framesWritten = player_ctx->recorder->GetFramesWritten();
 
             if (totalFrames < framesWritten)
             {

@@ -77,10 +77,10 @@
 typedef struct MpegTSContext MpegTSContext;
 
 void mpegts_remove_stream(MpegTSContext *ts, int pid);
-MpegTSContext *ff_mpegts_parse_open(AVFormatContext *s);
-int ff_mpegts_parse_packet(MpegTSContext *ts, AVPacket *pkt,
+MpegTSContext *avpriv_mpegts_parse_open(AVFormatContext *s);
+int avpriv_mpegts_parse_packet(MpegTSContext *ts, AVPacket *pkt,
                            const uint8_t *buf, int len);
-void ff_mpegts_parse_close(MpegTSContext *ts);
+void avpriv_mpegts_parse_close(MpegTSContext *ts);
 
 typedef struct {
     int use_au_start;
@@ -144,5 +144,9 @@ int ff_parse_mpeg2_descriptor(AVFormatContext *fc, pmt_entry_t *item, int stream
                               const uint8_t **pp, const uint8_t *desc_list_end,
                               Mp4Descr *mp4_descr, int mp4_descr_count, int pid,
                               MpegTSContext *ts, dvb_caption_info_t *dvbci);
+
+AVStream *av_new_stream(AVFormatContext *s, int id);
+void av_set_pts_info(AVStream *s, int pts_wrap_bits,
+                     unsigned int pts_num, unsigned int pts_den);
 
 #endif /* AVFORMAT_MPEGTS_MYTHTV_H */

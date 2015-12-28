@@ -41,7 +41,7 @@ ChannelWizard::ChannelWizard(int id, int default_sourceid)
         new ChannelOptionsFilters(*cid);
     addChild(filters);
 
-    QStringList cardtypes = ChannelUtil::GetCardTypes(cid->getValue().toUInt());
+    QStringList cardtypes = ChannelUtil::GetInputTypes(cid->getValue().toUInt());
     bool all_v4l = !cardtypes.empty();
     bool all_asi = !cardtypes.empty();
     for (uint i = 0; i < (uint) cardtypes.size(); i++)

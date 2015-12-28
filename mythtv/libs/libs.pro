@@ -5,6 +5,7 @@ TEMPLATE = subdirs
 # Libraries without dependencies
 SUBDIRS += libmythfreesurround libmythbase
 SUBDIRS += libmythservicecontracts
+libmythservicecontracts.depends = libmythbase
 
 using_mheg:SUBDIRS += libmythfreemheg
 using_x11:SUBDIRS += libmythnvctrl

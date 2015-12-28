@@ -6,12 +6,12 @@
 class MUI_PUBLIC MythRenderOpenGL2ES : public MythRenderOpenGL2
 {
   public:
-    MythRenderOpenGL2ES(const QGLFormat& format, QPaintDevice* device)
+    MythRenderOpenGL2ES(const MythRenderFormat& format, QPaintDevice* device)
         : MythRenderOpenGL2(format, device, kRenderOpenGL2ES)
     {
     }
 
-    MythRenderOpenGL2ES(const QGLFormat& format)
+    explicit MythRenderOpenGL2ES(const MythRenderFormat& format)
         : MythRenderOpenGL2(format, kRenderOpenGL2ES)
     {
     }
@@ -56,8 +56,8 @@ class MUI_PUBLIC MythRenderOpenGL2ES : public MythRenderOpenGL2
 
         m_glGetUniformLocation  = (MYTH_GLGETUNIFORMLOCATIONPROC)
                                     GetProcAddress("glGetUniformLocation");
-        m_glUniform4f           = (MYTH_GLUNIFORM4FPROC)
-                                    GetProcAddress("glUniform4f");
+        m_glUniform1i           = (MYTH_GLUNIFORM1IPROC)
+                                    GetProcAddress("glUniform1i");
         m_glUniformMatrix4fv    = (MYTH_GLUNIFORMMATRIX4FVPROC)
                                     GetProcAddress("glUniformMatrix4fv");
         m_glVertexAttribPointer = (MYTH_GLVERTEXATTRIBPOINTERPROC)
@@ -98,8 +98,8 @@ class MUI_PUBLIC MythRenderOpenGL2ES : public MythRenderOpenGL2
         m_glDeleteFramebuffers = (MYTH_GLDELETEFRAMEBUFFERSPROC)
                                 GetProcAddress("glDeleteFramebuffers");
         // GL_OES_mapbuffer
-        m_glMapBuffer   = (MYTH_GLMAPBUFFERPROC)GetProcAddress("glMapBuffer");
-        m_glUnmapBuffer = (MYTH_GLUNMAPBUFFERPROC)GetProcAddress("glUnmapBuffer");
+        m_glMapBuffer   = (MYTH_GLMAPBUFFERPROC)GetProcAddress("glMapBufferOES");
+        m_glUnmapBuffer = (MYTH_GLUNMAPBUFFERPROC)GetProcAddress("glUnmapBufferOES");
     }
 
     virtual bool InitFeatures(void)
@@ -123,7 +123,9 @@ class MUI_PUBLIC MythRenderOpenGL2ES : public MythRenderOpenGL2
             LOG(VB_GENERAL, LOG_INFO, LOC + QString("Max texture size: %1 x %2")
                     .arg(m_max_tex_size).arg(m_max_tex_size));
             LOG(VB_GENERAL, LOG_INFO, LOC + QString("Direct rendering: %1")
-                    .arg((this->format().directRendering()) ? "Yes" : "No"));
+                    .arg(IsDirectRendering() ? "Yes" : "No"));
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Extensions Supported: %1")
+                    .arg(m_exts_supported, 0, 16));
         }
 
         if (!(m_glCreateShader && m_glShaderSource && m_glCompileShader &&
@@ -131,7 +133,7 @@ class MUI_PUBLIC MythRenderOpenGL2ES : public MythRenderOpenGL2
             m_glDetachShader && m_glDeleteShader && m_glDeleteProgram &&
             m_glCreateProgram && m_glLinkProgram && m_glUseProgram &&
             m_glGetProgramInfoLog && m_glGetProgramiv && m_glGetUniformLocation &&
-            m_glUniform4f && m_glUniformMatrix4fv && m_glVertexAttribPointer &&
+            m_glUniform1i && m_glUniformMatrix4fv && m_glVertexAttribPointer &&
             m_glEnableVertexAttribArray && m_glDisableVertexAttribArray &&
             m_glBindAttribLocation && m_glVertexAttrib4f && m_glGenBuffers &&
             m_glBindBuffer && m_glDeleteBuffers && m_glBufferData &&
@@ -143,33 +145,60 @@ class MUI_PUBLIC MythRenderOpenGL2ES : public MythRenderOpenGL2
         }
 
         LOG(VB_GENERAL, LOG_INFO, "OpenGL2ES: Found default functionality.");
-        m_exts_supported += kGLSL | kGLExtVBO | kGLVertexArray |
+
+        static bool glslshaders = !getenv("OPENGL_NOGLSL");
+        GLboolean b;
+        glGetBooleanv(GL_SHADER_COMPILER, &b);
+        if (!b)
+        {
+            LOG(VB_GENERAL, LOG_INFO, "OpenGL2ES: GLSL not supported.");
+            glslshaders = false;
+        }
+        else if (!glslshaders)
+            LOG(VB_GENERAL, LOG_NOTICE, "OpenGL2ES: Disabling GLSL.");
+
+        static bool framebuffers = !getenv("OPENGL_NOFBO");
+        if (!framebuffers)
+            LOG(VB_GENERAL, LOG_NOTICE, "OpenGL2ES: Disabling FrameBuffer Objects.");
+
+        static bool vertexbuffers = !getenv("OPENGL_NOVBO");
+        if (!vertexbuffers)
+            LOG(VB_GENERAL, LOG_NOTICE, "OpenGL2ES: Disabling VertexBuffer Objects.");
+
+        m_exts_supported += (glslshaders ? kGLSL : 0) |
+                            (vertexbuffers ? kGLExtVBO : 0) | kGLVertexArray |
                             kGLMultiTex;
         m_default_texture_type = GL_TEXTURE_2D;
 
         // GL_OES_framebuffer_object
         if (m_glGenFramebuffers && m_glBindFramebuffer &&
             m_glFramebufferTexture2D && m_glCheckFramebufferStatus &&
-            m_glDeleteFramebuffers)
+            m_glDeleteFramebuffers && framebuffers)
         {
             m_exts_supported += kGLExtFBufObj;
             LOG(VB_GENERAL, LOG_INFO,
                 "OpenGL2ES: Framebuffer Objects available.");
         }
 
-        // GL_OES_mapbuffer
         m_extensions = (const char*) glGetString(GL_EXTENSIONS);
+        LOG(VB_GENERAL, LOG_DEBUG, QString("OpenGL2ES: extensions: %1")
+            .arg(m_extensions));
+
+        // GL_OES_mapbuffer
         if (m_extensions.contains("GL_OES_mapbuffer") &&
             m_glMapBuffer && m_glUnmapBuffer)
         {
-            m_exts_supported += kGLExtPBufObj;
-            LOG(VB_GENERAL, LOG_INFO,
-                "OpenGL2ES: Pixel Buffer Objects available.");
+            // NB these functions don't support GL_PIXEL_UNPACK_BUFFER
+            // so kGLExtPBufObj is not enabled
+            LOG(VB_GENERAL, LOG_INFO, "OpenGL2ES: OES mapbuffer available.");
         }
-
         m_exts_used = m_exts_supported;
-        DeleteDefaultShaders();
-        CreateDefaultShaders();
+
+        if (m_exts_supported & kGLSL)
+        {
+            DeleteDefaultShaders();
+            CreateDefaultShaders();
+        }
 
         return true;
     }

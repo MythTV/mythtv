@@ -7,6 +7,7 @@
 // MythTV headers
 #include "mythcorecontext.h"
 #include "mythplayer.h"
+#include "libavutil/frame.h"
 
 // Commercial Flagging headers
 #include "ClassicLogoDetector.h"
@@ -83,7 +84,7 @@ void ClassicLogoDetector::deleteLater(void)
 
 bool ClassicLogoDetector::searchForLogo(MythPlayer* player)
 {
-    int seekIncrement = 
+    int seekIncrement =
         (int)(commDetectLogoSampleSpacing * player->GetFrameRate());
     long long seekFrame;
     int loops;
@@ -99,12 +100,23 @@ bool ClassicLogoDetector::searchForLogo(MythPlayer* player)
 
     edgeCounts = new EdgeMaskEntry[width * height];
 
+    // Back in 2005, a threshold of 50 minimum pixelsInMask was established.
+    // I don't know whether that was tested against SD or HD resolutions.
+    // I do know that in 2010, mythcommflag was changed to use ffmpeg's
+    // lowres support, effectively dividing the video area by 16.
+    // But the 50 pixel minimum was not adjusted accordingly.
+    // I believe the minimum threshold should vary with the video's area.
+    // I am using 1280x720 (for 720p) video as the baseline.
+    // This should improve logo detection for SD video.
+    int minPixelsInMask = 50 * (width*height) / (1280*720 / 16);
+
     for (i = 0; edgeDiffs[i] != 0 && !logoInfoAvailable; i++)
     {
         int pixelsInMask = 0;
 
-        LOG(VB_COMMFLAG, LOG_INFO, QString("Trying with edgeDiff == %1")
-                .arg(edgeDiffs[i]));
+        LOG(VB_COMMFLAG, LOG_INFO,
+            QString("Trying with edgeDiff == %1, minPixelsInMask=%2")
+            .arg(edgeDiffs[i]).arg(minPixelsInMask));
 
         memset(edgeCounts, 0, sizeof(EdgeMaskEntry) * width * height);
         memset(edgeMask, 0, sizeof(EdgeMaskEntry) * width * height);
@@ -236,20 +248,21 @@ bool ClassicLogoDetector::searchForLogo(MythPlayer* player)
 #endif
         if (((logoMaxX - logoMinX) < (width / 4)) &&
             ((logoMaxY - logoMinY) < (height / 4)) &&
-            (pixelsInMask > 50))
+            (pixelsInMask > minPixelsInMask))
         {
             logoInfoAvailable = true;
             logoEdgeDiff = edgeDiffs[i];
 
-            LOG(VB_COMMFLAG, LOG_INFO, 
+            LOG(VB_COMMFLAG, LOG_INFO,
                 QString("Using Logo area: topleft (%1,%2), "
-                        "bottomright (%3,%4)")
+                        "bottomright (%3,%4), pixelsInMask (%5).")
                     .arg(logoMinX).arg(logoMinY)
-                    .arg(logoMaxX).arg(logoMaxY));
+                    .arg(logoMaxX).arg(logoMaxY)
+                    .arg(pixelsInMask));
         }
         else
         {
-            LOG(VB_COMMFLAG, LOG_INFO, 
+            LOG(VB_COMMFLAG, LOG_INFO,
                 QString("Rejecting Logo area: topleft (%1,%2), "
                         "bottomright (%3,%4), pixelsInMask (%5). "
                         "Not within specified limits.")
@@ -311,82 +324,6 @@ void ClassicLogoDetector::SetLogoMaskArea()
         logoMaxY = (height-5);
 }
 
-void ClassicLogoDetector::SetLogoMask(unsigned char *mask)
-{
-    int pixels = 0;
-
-    memcpy(logoMask, mask, width * height);
-
-    SetLogoMaskArea();
-
-    for(unsigned int y = logoMinY; y <= logoMaxY; y++)
-        for(unsigned int x = logoMinX; x <= logoMaxX; x++)
-            if (!logoMask[y * width + x] == 1)
-                pixels++;
-
-    if (pixels < 30)
-        return;
-
-    // set the pixels around our logo
-    for(unsigned int y = (logoMinY - 1); y <= (logoMaxY + 1); y++)
-    {
-        for(unsigned int x = (logoMinX - 1); x <= (logoMaxX + 1); x++)
-        {
-            if (!logoMask[y * width + x])
-            {
-                for (unsigned int y2 = y - 1; y2 <= (y + 1); y2++)
-                {
-                    for (unsigned int x2 = x - 1; x2 <= (x + 1); x2++)
-                    {
-                        if ((logoMask[y2 * width + x2] == 1) &&
-                            (!logoMask[y * width + x]))
-                        {
-                            logoMask[y * width + x] = 2;
-                            x2 = x + 2;
-                            y2 = y + 2;
-
-                            logoCheckMask[y2 * width + x2] = 1;
-                            logoCheckMask[y * width + x] = 1;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    for(unsigned int y = (logoMinY - 2); y <= (logoMaxY + 2); y++)
-    {
-        for(unsigned int x = (logoMinX - 2); x <= (logoMaxX + 2); x++)
-        {
-            if (!logoMask[y * width + x])
-            {
-                for (unsigned int y2 = y - 1; y2 <= (y + 1); y2++)
-                {
-                    for (unsigned int x2 = x - 1; x2 <= (x + 1); x2++)
-                    {
-                        if ((logoMask[y2 * width + x2] == 2) &&
-                            (!logoMask[y * width + x]))
-                        {
-                            logoMask[y * width + x] = 3;
-                            x2 = x + 2;
-                            y2 = y + 2;
-
-                            logoCheckMask[y * width + x] = 1;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-#ifdef SHOW_DEBUG_WIN
-    DumpLogo(true,framePtr);
-#endif
-
-    logoFrameCount = 0;
-    logoInfoAvailable = true;
-}
-
 
 void ClassicLogoDetector::DumpLogo(bool fromCurrentFrame,
     unsigned char* framePtr)
@@ -441,28 +378,33 @@ void ClassicLogoDetector::DumpLogo(bool fromCurrentFrame,
  * which are partially mods based on Myth's original commercial skip
  * code written by Chris Pinkham. */
 bool ClassicLogoDetector::doesThisFrameContainTheFoundLogo(
-    unsigned char* framePtr)
+    VideoFrame* frame)
 {
     int radius = 2;
     unsigned int x, y;
     int pos1, pos2, pos3;
+    int edgePos;
     int pixel;
     int goodEdges = 0;
     int badEdges = 0;
     int testEdges = 0;
     int testNotEdges = 0;
 
+    unsigned char* framePtr = frame->buf;
+    int bytesPerLine = frame->pitches[0];
+
     for (y = logoMinY; y <= logoMaxY; y++ )
     {
         for (x = logoMinX; x <= logoMaxX; x++ )
         {
-            pos1 = y * width + x;
-            pos2 = (y - radius) * width + x;
-            pos3 = (y + radius) * width + x;
+            pos1 = y * bytesPerLine + x;
+            edgePos = y * width + x;
+            pos2 = (y - radius) * bytesPerLine + x;
+            pos3 = (y + radius) * bytesPerLine + x;
 
             pixel = framePtr[pos1];
 
-            if (edgeMask[pos1].horiz)
+            if (edgeMask[edgePos].horiz)
             {
                 if ((abs(framePtr[pos1 - radius] - pixel) >= logoEdgeDiff) ||
                     (abs(framePtr[pos1 + radius] - pixel) >= logoEdgeDiff))
@@ -477,7 +419,7 @@ bool ClassicLogoDetector::doesThisFrameContainTheFoundLogo(
                 testNotEdges++;
             }
 
-            if (edgeMask[pos1].vert)
+            if (edgeMask[edgePos].vert)
             {
                 if ((abs(framePtr[pos2] - pixel) >= logoEdgeDiff) ||
                     (abs(framePtr[pos3] - pixel) >= logoEdgeDiff))
@@ -520,6 +462,7 @@ void ClassicLogoDetector::DetectEdges(VideoFrame *frame, EdgeMaskEntry *edges,
 {
     int r = 2;
     unsigned char *buf = frame->buf;
+    int bytesPerLine = frame->pitches[0];
     unsigned char p;
     unsigned int pos, x, y;
 
@@ -536,30 +479,30 @@ void ClassicLogoDetector::DetectEdges(VideoFrame *frame, EdgeMaskEntry *edges,
                 continue;
 
             pos = y * width + x;
-            p = buf[pos];
+            p = buf[y * bytesPerLine + x];
 
-            if (( abs(buf[y * width + (x - r)] - p) >= edgeDiff) ||
-                ( abs(buf[y * width + (x + r)] - p) >= edgeDiff))
+            if (( abs(buf[y * bytesPerLine + (x - r)] - p) >= edgeDiff) ||
+                ( abs(buf[y * bytesPerLine + (x + r)] - p) >= edgeDiff))
             {
                 edges[pos].horiz++;
                 edgeCount++;
             }
-            if (( abs(buf[(y - r) * width + x] - p) >= edgeDiff) ||
-                ( abs(buf[(y + r) * width + x] - p) >= edgeDiff))
+            if (( abs(buf[(y - r) * bytesPerLine + x] - p) >= edgeDiff) ||
+                ( abs(buf[(y + r) * bytesPerLine + x] - p) >= edgeDiff))
             {
                 edges[pos].vert++;
                 edgeCount++;
             }
 
-            if (( abs(buf[(y - r) * width + (x - r)] - p) >= edgeDiff) ||
-                ( abs(buf[(y + r) * width + (x + r)] - p) >= edgeDiff))
+            if (( abs(buf[(y - r) * bytesPerLine + (x - r)] - p) >= edgeDiff) ||
+                ( abs(buf[(y + r) * bytesPerLine + (x + r)] - p) >= edgeDiff))
             {
                 edges[pos].ldiag++;
                 edgeCount++;
             }
 
-            if (( abs(buf[(y - r) * width + (x + r)] - p) >= edgeDiff) ||
-                ( abs(buf[(y + r) * width + (x - r)] - p) >= edgeDiff))
+            if (( abs(buf[(y - r) * bytesPerLine + (x + r)] - p) >= edgeDiff) ||
+                ( abs(buf[(y + r) * bytesPerLine + (x - r)] - p) >= edgeDiff))
             {
                 edges[pos].rdiag++;
                 edgeCount++;
@@ -572,4 +515,3 @@ void ClassicLogoDetector::DetectEdges(VideoFrame *frame, EdgeMaskEntry *edges,
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
-

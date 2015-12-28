@@ -31,6 +31,7 @@
 #define MYTH_APPNAME_MYTHUTIL "mythutil"
 #define MYTH_APPNAME_MYTHLOGSERVER "mythlogserver"
 #define MYTH_APPNAME_MYTHSCREENWIZARD "mythscreenwizard"
+#define MYTH_APPNAME_MYTHFFPROBE "mythffprobe"
 
 class MDBManager;
 class MythCoreContextPrivate;

@@ -20,6 +20,7 @@ private:
     MythUIButtonList   *m_resumeModeEditor;
     MythUIButtonList   *m_resumeModeRadio;
     MythUIButtonList   *m_exitAction;
+    MythUIButtonList   *m_jumpAction;
     MythUICheckBox     *m_autoLookupCD;
     MythUICheckBox     *m_autoPlayCD;
     MythUIButton       *m_saveButton;

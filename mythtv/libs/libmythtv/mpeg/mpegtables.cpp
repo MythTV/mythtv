@@ -869,10 +869,11 @@ QString ProgramMapTable::toString(void) const
     QString str =
         QString("Program Map Section"
                 "\n%1"
-                "      pnum(%2) pid(0x%3)\n")
+                "      pnum(%2) pid(0x%3) pcrpid(%4)\n")
         .arg(PSIPTable::toString())
         .arg(ProgramNumber())
-        .arg(tsheader()->PID(),0,16);
+        .arg(tsheader()->PID(),0,16)
+        .arg(PCRPID(),0,16);
 
     vector<const unsigned char*> desc =
         MPEGDescriptor::Parse(ProgramInfo(), ProgramInfoLength());

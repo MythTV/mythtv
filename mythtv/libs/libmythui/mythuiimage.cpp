@@ -221,6 +221,9 @@ class ImageLoader
                     .arg(w)
                     .arg(h);
         imagelabel.replace('/', '-');
+#ifdef Q_OS_ANDROID
+        imagelabel.replace(':', '-');
+#endif
 
         return imagelabel;
     }
@@ -322,6 +325,17 @@ class ImageLoader
 
         if (image && !bFoundInCache)
         {
+            if (imProps.isReflected)
+                image->Reflect(imProps.reflectAxis, imProps.reflectShear,
+                               imProps.reflectScale, imProps.reflectLength,
+                               imProps.reflectSpacing);
+
+            if (imProps.isGreyscale)
+                image->ToGreyscale();
+
+            if (imProps.isOriented)
+                image->Orientation(imProps.orientation);
+
             // Even if an explicit size wasn't defined this image may still need
             // to be scaled because of a difference between the theme resolution
             // and the screen resolution. We want to avoid scaling twice.
@@ -362,17 +376,6 @@ class ImageLoader
                 QImage mask = imProps.GetMaskImageSubset(imageArea);
                 image->setAlphaChannel(mask.alphaChannel());
             }
-
-            if (imProps.isReflected)
-                image->Reflect(imProps.reflectAxis, imProps.reflectShear,
-                               imProps.reflectScale, imProps.reflectLength,
-                               imProps.reflectSpacing);
-
-            if (imProps.isGreyscale)
-                image->ToGreyscale();
-
-            if (imProps.isOriented)
-                image->Orientation(imProps.orientation);
 
             if (!imageReader)
                 GetMythUI()->CacheImage(cacheKey, image);
@@ -548,7 +551,7 @@ private:
 class MythUIImagePrivate
 {
 public:
-    MythUIImagePrivate(MythUIImage *p)
+    explicit MythUIImagePrivate(MythUIImage *p)
         : m_parent(p),            m_UpdateLock(QReadWriteLock::Recursive)
     { };
     ~MythUIImagePrivate() {};
@@ -813,9 +816,7 @@ void MythUIImage::SetImage(MythImage *img)
     Clear();
     m_Delay = -1;
 
-    if (m_imageProperties.isOriented && !img->IsOriented() &&
-        (m_imageProperties.orientation >= 1 &&
-         m_imageProperties.orientation <= 8))
+    if (m_imageProperties.isOriented && !img->IsOriented())
         img->Orientation(m_imageProperties.orientation);
 
     if (m_imageProperties.forceSize.isNull())
@@ -881,9 +882,7 @@ void MythUIImage::SetImages(QVector<MythImage *> *images)
         if (m_imageProperties.isGreyscale && !im->isGrayscale())
             im->ToGreyscale();
 
-        if (m_imageProperties.isOriented && !im->IsOriented() &&
-            (m_imageProperties.orientation >= 1 &&
-             m_imageProperties.orientation <= 8))
+        if (m_imageProperties.isOriented && !im->IsOriented())
             im->Orientation(m_imageProperties.orientation);
 
         m_ImagesLock.lock();
@@ -1036,6 +1035,8 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
     if (isAnimation)
         Clear();
 
+    bool complete = true;
+
     QString imagelabel;
 
     int j = 0;
@@ -1074,9 +1075,6 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
                 do_background_load = true;
         }
 
-        if (!isAnimation && !GetMythUI()->IsImageInCache(imagelabel))
-            Clear();
-
         if (do_background_load)
         {
             SetMinArea(MythRect());
@@ -1093,6 +1091,9 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
         }
         else
         {
+            if (!isAnimation && !GetMythUI()->IsImageInCache(imagelabel))
+                Clear();
+
             // Perform a blocking load
             LOG(VB_GUI | VB_FILE, LOG_DEBUG, LOC +
                 QString("Load(), loading '%1' in foreground").arg(filename));
@@ -1161,7 +1162,13 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
         }
 
         ++j;
+
+        // Load is complete if no image is loading in background
+        complete &= !do_background_load;
     }
+
+    if (complete)
+        emit LoadComplete();
 
     return true;
 }
@@ -1219,9 +1226,10 @@ void MythUIImage::Pulse(void)
             }
 
             m_ImagesLock.unlock();
+
+            SetRedraw();
         }
 
-        SetRedraw();
         m_LastDisplay = QTime::currentTime();
     }
 
@@ -1282,17 +1290,17 @@ void MythUIImage::DrawSelf(MythPainter *p, int xoffset, int yoffset,
         if (!m_imageProperties.forceSize.isNull())
             area.setSize(area.size().expandedTo(currentImage->size()));
 
-        // Centre image in available space
-        int x = 0;
-        int y = 0;
+        // Centre image in available space, accounting for zoom
+        int x = 0, y = 0;
+        QRect visibleImage = m_Effects.GetExtent(currentImageArea.size());
 
-        if (area.width() > currentImageArea.width())
-            x = (area.width() - currentImageArea.width()) / 2;
+        if (area.width() > visibleImage.width())
+            x = area.width() / 2 + visibleImage.topLeft().x();
 
-        if (area.height() > currentImageArea.height())
-            y = (area.height() - currentImageArea.height()) / 2;
+        if (area.height() > visibleImage.height())
+            y = area.height() / 2 + visibleImage.topLeft().y();
 
-        if (x > 0 || y > 0)
+        if ((x > 0 || y > 0))
             area.translate(x, y);
 
         QRect srcRect;
@@ -1594,26 +1602,25 @@ void MythUIImage::customEvent(QEvent *event)
         if (le->GetParent() != this)
             return;
 
-        image  = le->GetImage();
-        number = le->GetNumber();
-        filename = le->GetFilename();
+        image           = le->GetImage();
+        number          = le->GetNumber();
+        filename        = le->GetFilename();
         animationFrames = le->GetAnimationFrames();
-        aborted = le->GetAbortState();
+        aborted         = le->GetAbortState();
 
         m_runningThreads--;
 
         d->m_UpdateLock.lockForRead();
+        QString propFilename = m_imageProperties.filename;
+        d->m_UpdateLock.unlock();
 
         // 1) We aborted loading the image for some reason (e.g. two requests
         //    for same image)
         // 2) Filename changed since we started this image, so abort to avoid
         // rendering two different images in quick succession which causes
         // unsightly flickering
-        if (aborted ||
-            (le->GetBasefile() != m_imageProperties.filename))
+        if (aborted || (le->GetBasefile() != propFilename))
         {
-            d->m_UpdateLock.unlock();
-
             if (aborted)
                 LOG(VB_GUI, LOG_DEBUG, QString("Aborted loading image %1")
                                                                 .arg(filename));
@@ -1635,22 +1642,14 @@ void MythUIImage::customEvent(QEvent *event)
 
                 delete animationFrames;
             }
-
-            return;
         }
-
-        d->m_UpdateLock.unlock();
-
-        if (animationFrames)
+        else if (animationFrames)
         {
             SetAnimationFrames(*animationFrames);
 
             delete animationFrames;
-
-            return;
         }
-
-        if (image)
+        else if (image)
         {
             // We don't clear until we have the new image ready to display to
             // avoid unsightly flashing. This isn't currently supported for
@@ -1687,12 +1686,14 @@ void MythUIImage::customEvent(QEvent *event)
             d->m_UpdateLock.lockForWrite();
             m_LastDisplay = QTime::currentTime();
             d->m_UpdateLock.unlock();
-
-            return;
+        }
+        else
+        {
+            // No Images were loaded, so trigger Reset to default
+            Reset();
         }
 
-        // No Images were loaded, so trigger Reset to default
-        Reset();
+        emit LoadComplete();
     }
 }
 

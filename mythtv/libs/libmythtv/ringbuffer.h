@@ -61,6 +61,7 @@ class MTV_PUBLIC RingBuffer : protected MThread
     void UpdatePlaySpeed(float playspeed);
     void EnableBitrateMonitor(bool enable) { bitrateMonitorEnabled = enable; }
     void SetBufferSizeFactors(bool estbitrate, bool matroska);
+    void SetWaitForWrite(void) { waitforwrite = true; }
 
     // Gets
     QString   GetSafeFilename(void) { return safefilename; }
@@ -235,6 +236,8 @@ class MTV_PUBLIC RingBuffer : protected MThread
     bool      request_pause;      // protected by rwlock
     bool      paused;             // protected by rwlock
     bool      ateof;              // protected by rwlock
+    bool      waitforwrite;       // protected by rwlock
+    bool      beingwritten;       // protected by rwlock
     bool      readsallowed;       // protected by rwlock
     bool      readsdesired;       // protected by rwlock
     volatile bool recentseek;

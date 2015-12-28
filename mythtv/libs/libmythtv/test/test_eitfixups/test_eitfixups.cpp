@@ -343,4 +343,177 @@ void TestEITFixups::testUKFixups9()
     QCOMPARE(event9.description, QString("Includes sport and weather"));
 }
 
+DBEventEIT *TestEITFixups::SimpleDBEventEIT (uint fixup, QString title, QString subtitle, QString description)
+{
+    DBEventEIT *event = new DBEventEIT (1, // channel id
+                                       title, // title
+                                       subtitle, // subtitle
+                                       description, // description
+                                       "", // category
+                                       ProgramInfo::kCategoryNone, // category_type
+                                       QDateTime::fromString("2015-02-28T19:40:00Z", Qt::ISODate),
+                                       QDateTime::fromString("2015-02-28T20:00:00Z", Qt::ISODate),
+                                       EITFixUp::kFixGenericDVB | fixup,
+                                       SUB_UNKNOWN,
+                                       AUD_STEREO,
+                                       VID_UNKNOWN,
+                                       0.0f, // star rating
+                                       "", // series id
+                                       "", // program id
+                                       0, // season
+                                       0, // episode
+                                       0); //episode total
+
+    return event;
+}
+
+void TestEITFixups::testDEPro7Sat1()
+{
+    EITFixUp fixup;
+
+    DBEventEIT *event = SimpleDBEventEIT (EITFixUp::kFixP7S1,
+                                         "Titel",
+                                         "Folgentitel, Mystery, USA 2011",
+                                         "Beschreibung");
+
+    PRINT_EVENT(*event);
+    fixup.Fix(*event);
+    PRINT_EVENT(*event);
+    QCOMPARE(event->title,    QString("Titel"));
+    QCOMPARE(event->subtitle, QString("Folgentitel"));
+    QCOMPARE(event->airdate,  (unsigned short) 2011);
+
+    DBEventEIT *event2 = SimpleDBEventEIT (EITFixUp::kFixP7S1,
+                                           "Titel",
+                                           "Kurznachrichten, D 2015",
+                                           "Beschreibung");
+    PRINT_EVENT(*event2);
+    fixup.Fix(*event2);
+    PRINT_EVENT(*event2);
+    QCOMPARE(event2->subtitle, QString(""));
+    QCOMPARE(event2->airdate,  (unsigned short) 2015);
+
+    DBEventEIT *event3 = SimpleDBEventEIT (EITFixUp::kFixP7S1,
+                                           "Titel",
+                                           "Folgentitel",
+                                           "Beschreibung");
+    PRINT_EVENT(*event3);
+    fixup.Fix(*event3);
+    PRINT_EVENT(*event3);
+    QCOMPARE(event3->subtitle, QString("Folgentitel"));
+    QCOMPARE(event3->airdate,  (unsigned short) 0);
+
+    DBEventEIT *event4 = SimpleDBEventEIT (EITFixUp::kFixP7S1,
+                                           "Titel",
+                                           "\"Lokal\", Ort, Doku-Soap, D 2015",
+                                           "Beschreibung");
+    PRINT_EVENT(*event4);
+    fixup.Fix(*event4);
+    PRINT_EVENT(*event4);
+    QCOMPARE(event4->subtitle, QString("\"Lokal\", Ort"));
+    QCOMPARE(event4->airdate,  (unsigned short) 2015);
+
+    DBEventEIT *event5 = SimpleDBEventEIT (EITFixUp::kFixP7S1,
+                                           "Titel",
+                                           "In Morpheus' Armen, Science-Fiction, CDN/USA 2006",
+                                           "Beschreibung");
+    PRINT_EVENT(*event5);
+    fixup.Fix(*event5);
+    PRINT_EVENT(*event5);
+    QCOMPARE(event5->subtitle, QString("In Morpheus' Armen"));
+    QCOMPARE(event5->airdate,  (unsigned short) 2006);
+
+    DBEventEIT *event6 = SimpleDBEventEIT (EITFixUp::kFixP7S1,
+                                           "Titel",
+                                           "Drei Kleintiere durchschneiden (1), Zeichentrick, J 2014",
+                                           "Beschreibung");
+    PRINT_EVENT(*event6);
+    fixup.Fix(*event6);
+    PRINT_EVENT(*event6);
+    QCOMPARE(event6->subtitle, QString("Drei Kleintiere durchschneiden (1)"));
+    QCOMPARE(event6->airdate,  (unsigned short) 2014);
+
+
+}
+
+void TestEITFixups::testHTMLFixup()
+{
+    // Make sure we correctly strip HTML tags from EIT data
+    EITFixUp fixup;
+
+    DBEventEIT event(9311,
+                      "<EM>CSI: Crime Scene Investigation</EM>",
+                      "Double-Cross: Las Vegas-based forensic drama. The team investigates when two nuns find a woman crucified in the rafters of their church - and clues implicate the priest. (S7 Ep 5)",
+                      QDateTime::fromString("2015-02-28T19:40:00Z", Qt::ISODate),
+                      QDateTime::fromString("2015-02-28T20:00:00Z", Qt::ISODate),
+                      EITFixUp::kFixHTML | EITFixUp::kFixUK,
+                      SUB_UNKNOWN,
+                      AUD_STEREO,
+                      VID_UNKNOWN);
+
+    fixup.Fix(event);
+    PRINT_EVENT(event);
+    QCOMPARE(event.title,       QString("CSI: Crime Scene Investigation"));
+    QCOMPARE(event.subtitle,    QString("Double-Cross"));
+// FIXME: Need to fix the capturing of (S7 Ep 5) for this to properly validate.
+//    QCOMPARE(event.description, QString("Las Vegas-based forensic drama. The team investigates when two nuns find a woman crucified in the rafters of their church - and clues implicate the priest."));
+
+    DBEventEIT event2(9311,
+                      "<EM>New: Redneck Island</EM>",
+                      "Twelve rednecks are stranded on a tropical island with 'Stone Cold' Steve Austin, but this is no holiday, they're here to compete for $100,000. S4, Ep4",
+                      QDateTime::fromString("2015-02-28T19:40:00Z", Qt::ISODate),
+                      QDateTime::fromString("2015-02-28T20:00:00Z", Qt::ISODate),
+                      EITFixUp::kFixHTML | EITFixUp::kFixUK,
+                      SUB_UNKNOWN,
+                      AUD_STEREO,
+                      VID_UNKNOWN);
+
+    fixup.Fix(event2);
+    PRINT_EVENT(event2);
+    QCOMPARE(event2.title,       QString("Redneck Island"));
+}
+
+void TestEITFixups::testSkyEpisodes()
+{
+    EITFixUp fixup;
+
+    DBEventEIT *event = SimpleDBEventEIT (EITFixUp::kFixPremiere,
+                                         "Titel",
+                                         "Subtitle",
+                                         "4. Staffel, Folge 16: Viele Mitglieder einer christlichen Gemeinde erkranken nach einem Giftanschlag tödlich. Doch die fanatisch Gläubigen lassen weder polizeiliche, noch ärztliche Hilfe zu. Don (Rob Morrow) und Charlie (David Krumholtz) gelingt es jedoch durch einen Nebeneingang ins Gebäude zu kommen. Bei ihren Ermittlungen finden sie heraus, dass der Anführer der Sekte ein Betrüger war. Auch sein Sohn wusste von den Machenschaften des Vaters. War der Giftanschlag ein Racheakt? 50 Min. USA 2008. Von Leslie Libman, mit Rob Morrow, David Krumholtz, Judd Hirsch. Ab 12 Jahren");
+
+    PRINT_EVENT(*event);
+    fixup.Fix(*event);
+    PRINT_EVENT(*event);
+    QCOMPARE(event->description, QString("Viele Mitglieder einer christlichen Gemeinde erkranken nach einem Giftanschlag tödlich. Doch die fanatisch Gläubigen lassen weder polizeiliche, noch ärztliche Hilfe zu. Don (Rob Morrow) und Charlie (David Krumholtz) gelingt es jedoch durch einen Nebeneingang ins Gebäude zu kommen. Bei ihren Ermittlungen finden sie heraus, dass der Anführer der Sekte ein Betrüger war. Auch sein Sohn wusste von den Machenschaften des Vaters. War der Giftanschlag ein Racheakt? Ab 12 Jahren"));
+    QCOMPARE(event->season,   4u);
+    QCOMPARE(event->episode, 16u);
+    /* FixPremiere should scrape the credits, too! */
+    QVERIFY(event->HasCredits());
+
+    DBEventEIT *event2 = SimpleDBEventEIT (EITFixUp::kFixPremiere,
+                                         "Titel",
+                                         "Subtitle",
+                                         "Washington, 1971: Vor dem Obersten Gerichtshof wird über die Kriegsdienstverweigerung von Box-Ikone Cassius Clay aka Muhammad Ali verhandelt. Während draußen Tausende gegen den Vietnamkrieg protestieren, verteidigen acht weiße, alte Bundesrichter unter dem Vorsitzenden Warren Burger (Frank Langella) die harte Linie der Regierung Nixon. Doch Kevin Connolly (Benjamin Walker), ein idealistischer junger Mitarbeiter von Richter Harlan (Christopher Plummer), gibt nicht auf. - Muhammad Alis Kiegsdienst-Verweigerungsprozess, als Mix aus Kammerspiel und Archivaufnahmen starbesetzt verfilmt. 94 Min. USA 2012. Von Stephen Frears, mit Danny Glover, Barry Levinson, Bob Balaban. Ab 12 Jahren");
+
+    PRINT_EVENT(*event2);
+    fixup.Fix(*event2);
+    PRINT_EVENT(*event2);
+    QCOMPARE(event2->description, QString("Washington, 1971: Vor dem Obersten Gerichtshof wird über die Kriegsdienstverweigerung von Box-Ikone Cassius Clay aka Muhammad Ali verhandelt. Während draußen Tausende gegen den Vietnamkrieg protestieren, verteidigen acht weiße, alte Bundesrichter unter dem Vorsitzenden Warren Burger (Frank Langella) die harte Linie der Regierung Nixon. Doch Kevin Connolly (Benjamin Walker), ein idealistischer junger Mitarbeiter von Richter Harlan (Christopher Plummer), gibt nicht auf. - Muhammad Alis Kiegsdienst-Verweigerungsprozess, als Mix aus Kammerspiel und Archivaufnahmen starbesetzt verfilmt. Ab 12 Jahren"));
+    QCOMPARE(event2->season,  0u);
+    QCOMPARE(event2->episode, 0u);
+
+    DBEventEIT *event3 = SimpleDBEventEIT (EITFixUp::kFixPremiere,
+                                         "Titel",
+                                         "Subtitle",
+                                         "50 Min. USA 2008. Von Leslie Libman, mit Rob Morrow, David Krumholtz, Judd Hirsch. Ab 12 Jahren");
+
+    PRINT_EVENT(*event3);
+    fixup.Fix(*event3);
+    PRINT_EVENT(*event3);
+    QCOMPARE(event3->description, QString("Ab 12 Jahren"));
+    QCOMPARE(event3->season,  0u);
+    QCOMPARE(event3->episode, 0u);
+}
+
 QTEST_APPLESS_MAIN(TestEITFixups)

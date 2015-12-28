@@ -467,6 +467,8 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
         case TableID::BAT:
         case TableID::TDT:
         case TableID::TOT:
+        case TableID::DVBCA_82:
+        case TableID::DVBCA_83:
         {
             // All DVB specific tables, not handled here
             return false;

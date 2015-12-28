@@ -13,10 +13,6 @@
             <area>15,244,770,170</area>
         </shape>
 
-        <shape name="track_info_background" from="basebackground">
-            <area>15,424,770,161</area>
-        </shape>
-
         <textarea name="nostreams" from="basetextarea">
             <area>25,25,750,250</area>
             <multiline>yes</multiline>
@@ -161,111 +157,9 @@
             </statetype>
         </buttonlist>
 
-        <imagetype name="coverart_border">
-            <filename>mm_blackhole_border.png</filename>
-            <area>27,435,114,114</area>
-        </imagetype>
-
-        <imagetype name="coverart">
-            <filename>mm_nothumb.png</filename>
-            <area>30,437,110,110</area>
-        </imagetype>
-
-        <textarea name="title" from="basetextarea">
-            <area>150,431,500,34</area>
-            <font>baselarge</font>
-        </textarea>
-
-        <textarea name="artist" from="basetextarea">
-            <area>150,471,500,34</area>
-            <font>basemedium</font>
-        </textarea>
-
-        <textarea name="channel" from="basetextarea">
-            <area>150,506,500,34</area>
-            <font>basemedium</font>
-            <template>%STATION% - %CHANNEL%</template>
-        </textarea>
-
-        <progressbar name="bufferprogress">
-            <position>150,561</position>
-            <layout>horizontal</layout>
-           <style>reveal</style>
-            <imagetype name="background">
-                <filename>mm_progress-bg.png</filename>
-            </imagetype>
-            <imagetype name="progressimage">
-                <filename>mm_progress-fg.png</filename>
-            </imagetype>
-        </progressbar>
-
-        <textarea name="bufferstatus" from="basetextarea">
-            <area>150,536,400,35</area>
-            <font>basesmall</font>
-            <value></value>
-        </textarea>
-
-        <imagetype name="visualizer_border">
-            <filename>mm_blackhole_border.png</filename>
-            <area>657,435,114,114,</area>
-        </imagetype>
-
-        <video name="visualizer">
-            <area>659,437,110,110,</area>
-        </video>
-
-        <textarea name="volume" from="basevolume">
-            <position>70,557</position>
-            <template>%VOLUMEPERCENT%</template>
-        </textarea>
-
-        <statetype name="mutestate" from="basemutestate">
-            <position>30,560</position>
-        </statetype>
-
-        <button name="play">
-            <position>565,540</position>
-            <statetype name="buttonstate">
-                <state name="active">
-                    <imagetype name="background">
-                        <filename>play_button_off.png</filename>
-                    </imagetype>
-                </state>
-                <state name="selected" from="active">
-                    <imagetype name="background">
-                        <filename>play_button_on.png</filename>
-                    </imagetype>
-                </state>
-                <state name="disabled" from="active" />
-                    <state name="pushed" from="active">
-                        <imagetype name="background">
-                            <filename>play_button_pushed.png</filename>
-                        </imagetype>
-                    </state>
-            </statetype>
-        </button>
-
-        <button name="stop">
-            <position>610,540</position>
-            <statetype name="buttonstate">
-                <state name="active">
-                    <imagetype name="background">
-                        <filename>stop_button_off.png</filename>
-                    </imagetype>
-                </state>
-                <state name="selected" from="active">
-                    <imagetype name="background">
-                        <filename>stop_button_on.png</filename>
-                    </imagetype>
-                </state>
-                <state name="disabled" from="active" />
-                <state name="pushed" from="active">
-                    <imagetype name="background">
-                        <filename>stop_button_pushed.png</filename>
-                    </imagetype>
-                </state>
-            </statetype>
-        </button>
+        <group name="streaminfopanel" from="basestreaminfopanel">
+            <position>0,424</position>
+        </group>
 
     </window>
 
@@ -305,7 +199,7 @@
             <value>URL:</value>
         </textarea>
         <textedit name="urledit" from="stationedit">
-            <area>274,246,700,50</area>
+            <area>274,246,500,50</area>
         </textedit>
 
         <textarea name="logourllabel" from="stationlabel">

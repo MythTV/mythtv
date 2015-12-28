@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="en_GB">
+<TS version="2.1" language="en_GB">
 <context>
     <name>BookmarkEditor</name>
     <message>
-        <location filename="../mythbrowser/bookmarkeditor.cpp" line="56"/>
+        <location filename="../mythbrowser/bookmarkeditor.cpp" line="66"/>
         <source>Edit Bookmark Details</source>
         <translation>Edit Bookmark Details</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkeditor.cpp" line="58"/>
+        <location filename="../mythbrowser/bookmarkeditor.cpp" line="68"/>
         <source>Enter Bookmark Details</source>
         <translation>Enter Bookmark Details</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkeditor.cpp" line="138"/>
+        <location filename="../mythbrowser/bookmarkeditor.cpp" line="139"/>
         <source>Select a category</source>
         <translation>Select a category</translation>
     </message>
@@ -31,52 +31,62 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
 Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="286"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="288"/>
         <source>Actions</source>
         <translation>Actions</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="301"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="303"/>
+        <source>Set Homepage</source>
+        <translation>Set Homepage</translation>
+    </message>
+    <message>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="304"/>
         <source>Add Bookmark</source>
         <translation>Add Bookmark</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="305"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="308"/>
         <source>Edit Bookmark</source>
         <translation>Edit Bookmark</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="306"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="309"/>
         <source>Delete Bookmark</source>
         <translation>Delete Bookmark</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="307"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="310"/>
         <source>Show Bookmark</source>
         <translation>Show Bookmark</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="312"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="315"/>
         <source>Delete Marked</source>
         <translation>Delete Marked</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="313"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="316"/>
         <source>Show Marked</source>
         <translation>Show Marked</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="314"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="317"/>
         <source>Clear Marked</source>
         <translation>Clear Marked</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="496"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="320"/>
+        <source>Settings</source>
+        <translation>Settings</translation>
+    </message>
+    <message>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="526"/>
         <source>Are you sure you want to delete the selected bookmark?</source>
         <translation>Are you sure you want to delete the selected bookmark?</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="540"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="570"/>
         <source>Are you sure you want to delete the marked bookmarks?</source>
         <translation>Are you sure you want to delete the marked bookmarks?</translation>
     </message>
@@ -171,17 +181,27 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</translation>
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="65"/>
+        <location filename="../mythbrowser/main.cpp" line="106"/>
         <source>Move to next browser tab</source>
         <translation>Move to next browser tab</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="67"/>
+        <location filename="../mythbrowser/main.cpp" line="108"/>
         <source>Move to previous browser tab</source>
         <translation>Move to previous browser tab</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="70"/>
+        <location filename="../mythbrowser/main.cpp" line="111"/>
+        <source>Show the bookmark manager</source>
+        <translation>Show the bookmark manager</translation>
+    </message>
+    <message>
+        <location filename="../mythbrowser/main.cpp" line="113"/>
+        <source>Show the webbrowser homepage</source>
+        <translation>Show the webbrowser homepage</translation>
+    </message>
+    <message>
+        <location filename="../mythbrowser/main.cpp" line="116"/>
         <source>Internal Web Browser</source>
         <translation>Internal Web Browser</translation>
     </message>

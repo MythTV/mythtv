@@ -22,13 +22,17 @@
 #ifndef AVCODEC_SNOW_H
 #define AVCODEC_SNOW_H
 
-#include "dsputil.h"
+#include "libavutil/motion_vector.h"
+
 #include "hpeldsp.h"
+#include "me_cmp.h"
 #include "qpeldsp.h"
 #include "snow_dwt.h"
 
 #include "rangecoder.h"
 #include "mathops.h"
+
+#define FF_MPV_OFFSET(x) (offsetof(MpegEncContext, x) + offsetof(SnowContext, m))
 #include "mpegvideo.h"
 #include "h264qpel.h"
 
@@ -110,14 +114,14 @@ typedef struct SnowContext{
     AVClass *class;
     AVCodecContext *avctx;
     RangeCoder c;
-    DSPContext dsp;
+    MECmpContext mecc;
     HpelDSPContext hdsp;
     QpelDSPContext qdsp;
     VideoDSPContext vdsp;
     H264QpelContext h264qpel;
     MpegvideoEncDSPContext mpvencdsp;
     SnowDWTContext dwt;
-    AVFrame *new_picture;
+    const AVFrame *new_picture;
     AVFrame *input_picture;              ///< new_picture with the internal linesizes
     AVFrame *current_picture;
     AVFrame *last_picture[MAX_REF_FRAMES];
@@ -171,11 +175,17 @@ typedef struct SnowContext{
     slice_buffer sb;
     int memc_only;
     int no_bitstream;
+    int intra_penalty;
+    int motion_est;
+    int iterative_dia_size;
 
     MpegEncContext m; // needed for motion estimation, should not be used for anything else, the idea is to eventually make the motion estimation independent of MpegEncContext, so this will be removed then (FIXME/XXX)
 
     uint8_t *scratchbuf;
     uint8_t *emu_edge_buffer;
+
+    AVMotionVector *avmv;
+    int avmv_index;
 }SnowContext;
 
 /* Tables */
@@ -231,7 +241,7 @@ void ff_snow_reset_contexts(SnowContext *s);
 int ff_snow_alloc_blocks(SnowContext *s);
 int ff_snow_frame_start(SnowContext *s);
 void ff_snow_pred_block(SnowContext *s, uint8_t *dst, uint8_t *tmp, ptrdiff_t stride,
-                     int sx, int sy, int b_w, int b_h, BlockNode *block,
+                     int sx, int sy, int b_w, int b_h, const BlockNode *block,
                      int plane_index, int w, int h);
 int ff_snow_get_buffer(SnowContext *s, AVFrame *frame);
 /* common inline functions */
@@ -296,6 +306,8 @@ static av_always_inline void add_yblock(SnowContext *s, int sliced, slice_buffer
     BlockNode *lb= lt+b_stride;
     BlockNode *rb= lb+1;
     uint8_t *block[4];
+    // When src_stride is large enough, it is possible to interleave the blocks.
+    // Otherwise the blocks are written sequentially in the tmp buffer.
     int tmp_step= src_stride >= 7*MB_SIZE ? MB_SIZE : MB_SIZE*src_stride;
     uint8_t *tmp = s->scratchbuf;
     uint8_t *ptmp;
@@ -338,8 +350,6 @@ static av_always_inline void add_yblock(SnowContext *s, int sliced, slice_buffer
     }
 
     if(b_w<=0 || b_h<=0) return;
-
-    av_assert2(src_stride > 2*MB_SIZE + 5);
 
     if(!sliced && offset_dst)
         dst += src_x + src_y*dst_stride;
@@ -555,6 +565,8 @@ static inline int get_symbol(RangeCoder *c, uint8_t *state, int is_signed){
         e= 0;
         while(get_rac(c, state+1 + FFMIN(e,9))){ //1..10
             e++;
+            if (e > 31)
+                return AVERROR_INVALIDDATA;
         }
 
         a= 1;
@@ -659,7 +671,10 @@ static inline void unpack_coeffs(SnowContext *s, SubBand *b, SubBand * parent, i
                 if(v){
                     v= 2*(get_symbol2(&s->c, b->state[context + 2], context-4) + 1);
                     v+=get_rac(&s->c, &b->state[0][16 + 1 + 3 + ff_quant3bA[l&0xFF] + 3*ff_quant3bA[t&0xFF]]);
-
+                    if ((uint16_t)v != v) {
+                        av_log(s->avctx, AV_LOG_ERROR, "Coefficient damaged\n");
+                        v = 1;
+                    }
                     xc->x=x;
                     (xc++)->coeff= v;
                 }
@@ -669,6 +684,10 @@ static inline void unpack_coeffs(SnowContext *s, SubBand *b, SubBand * parent, i
                     else           run= INT_MAX;
                     v= 2*(get_symbol2(&s->c, b->state[0 + 2], 0-4) + 1);
                     v+=get_rac(&s->c, &b->state[0][16 + 1 + 3]);
+                    if ((uint16_t)v != v) {
+                        av_log(s->avctx, AV_LOG_ERROR, "Coefficient damaged\n");
+                        v = 1;
+                    }
 
                     xc->x=x;
                     (xc++)->coeff= v;

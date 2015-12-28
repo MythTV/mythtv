@@ -23,10 +23,12 @@
 #ifndef BD_BITS_H
 #define BD_BITS_H
 
-#include "file/file.h"
+#include "util/attributes.h"
+#include "file/filesystem.h" // BD_FILE_H
 
-#include <unistd.h>
-#include <stdio.h>
+#include <stdint.h>
+#include <stddef.h>    // size_t
+
 
 /**
  * \file
@@ -36,42 +38,44 @@
 #define BF_BUF_SIZE   (1024*32)
 
 typedef struct {
-    uint8_t *p_start;
-    uint8_t *p;
-    uint8_t *p_end;
+    const uint8_t *p_start;
+    const uint8_t *p;
+    const uint8_t *p_end;
 
-    ssize_t  i_left;    /* i_count number of available bits */
+    int            i_left;    /* i_count number of available bits */
 } BITBUFFER;
 
 typedef struct {
     BD_FILE_H *fp;
     uint8_t    buf[BF_BUF_SIZE];
     BITBUFFER  bb;
-    off_t      pos;
-    off_t      end;
+    int64_t    pos;
+    int64_t    end;
     size_t     size;
 } BITSTREAM;
 
-BD_PRIVATE void bb_init( BITBUFFER *bb, uint8_t *p_data, size_t i_data );
+BD_PRIVATE void bb_init( BITBUFFER *bb, const uint8_t *p_data, size_t i_data );
 BD_PRIVATE void bs_init( BITSTREAM *bs, BD_FILE_H *fp );
-BD_PRIVATE void bb_seek( BITBUFFER *bb, off_t off, int whence);
-BD_PRIVATE void bs_seek( BITSTREAM *bs, off_t off, int whence);
-BD_PRIVATE void bb_skip( BITBUFFER *bb, ssize_t i_count );
-BD_PRIVATE void bs_skip( BITSTREAM *bs, ssize_t i_count );
+BD_PRIVATE void bb_seek( BITBUFFER *bb, int64_t off, int whence);
+BD_PRIVATE void bs_seek( BITSTREAM *bs, int64_t off, int whence);
+BD_PRIVATE void bb_seek_byte( BITBUFFER *bb, int64_t off);
+BD_PRIVATE void bs_seek_byte( BITSTREAM *s, int64_t off);
+BD_PRIVATE void bb_skip( BITBUFFER *bb, size_t i_count );
+BD_PRIVATE void bs_skip( BITSTREAM *bs, size_t i_count );  /* note: i_count must be less than BF_BUF_SIZE */
 BD_PRIVATE uint32_t bb_read( BITBUFFER *bb, int i_count );
 BD_PRIVATE uint32_t bs_read( BITSTREAM *bs, int i_count );
 
-static inline off_t bb_pos( const BITBUFFER *bb )
+static inline int64_t bb_pos( const BITBUFFER *bb )
 {
     return 8 * ( bb->p - bb->p_start ) + 8 - bb->i_left;
 }
 
-static inline off_t bs_pos( const BITSTREAM *bs )
+static inline int64_t bs_pos( const BITSTREAM *bs )
 {
     return bs->pos * 8 + bb_pos(&bs->bb);
 }
 
-static inline off_t bs_end( const BITSTREAM *bs )
+static inline int64_t bs_end( const BITSTREAM *bs )
 {
     return bs->end * 8;
 }
@@ -80,20 +84,16 @@ static inline int bb_eof( const BITBUFFER *bb )
 {
     return bb->p >= bb->p_end ? 1: 0 ;
 }
-
+/*
 static inline int bs_eof( const BITSTREAM *bs )
 {
     return file_eof(bs->fp) && bb_eof(&bs->bb);
 }
+*/
 
-static inline void bb_seek_byte( BITBUFFER *bb, off_t off)
+static inline int64_t bs_avail( const BITSTREAM *bs )
 {
-    bb_seek(bb, off << 3, SEEK_SET);
-}
-
-static inline void bs_seek_byte( BITSTREAM *s, off_t off)
-{
-    bs_seek(s, off << 3, SEEK_SET);
+    return bs_end(bs) - bs_pos(bs);
 }
 
 static inline void bb_read_bytes( BITBUFFER *bb, uint8_t *buf, int i_count )
@@ -113,6 +113,11 @@ static inline void bs_read_bytes( BITSTREAM *s, uint8_t *buf, int i_count )
         buf[ii] = bs_read(s, 8);
     }
 }
+static inline void bs_read_string( BITSTREAM *s, char *buf, int i_count )
+{
+    bs_read_bytes(s, (uint8_t*)buf, i_count);
+    buf[i_count] = '\0';
+}
 
 static inline uint32_t bb_show( BITBUFFER *bb, int i_count )
 {
@@ -122,14 +127,14 @@ static inline uint32_t bb_show( BITBUFFER *bb, int i_count )
 
 static inline int bb_is_align( BITBUFFER *bb, uint32_t mask )
 {
-    off_t off = bb_pos(bb);
+    int64_t off = bb_pos(bb);
 
     return !(off & mask);
 }
 
 static inline int bs_is_align( BITSTREAM *s, uint32_t mask )
 {
-    off_t off = bs_pos(s);
+    int64_t off = bs_pos(s);
 
     return !(off & mask);
 }

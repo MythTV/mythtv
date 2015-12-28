@@ -277,7 +277,7 @@ static uint estimate_number_of_channels(const QString &rawdata)
     uint numLine = 1;
     while (true)
     {
-        QString url = rawdata.section("\n", numLine, numLine);
+        QString url = rawdata.section("\n", numLine, numLine, QString::SectionSkipEmpty);
         if (url.isEmpty())
             return result;
 
@@ -379,7 +379,7 @@ static bool parse_chan_info(const QString   &rawdata,
 
     while (true)
     {
-        QString line = rawdata.section("\n", lineNum, lineNum);
+        QString line = rawdata.section("\n", lineNum, lineNum, QString::SectionSkipEmpty);
         if (line.isEmpty())
             return false;
 
@@ -425,28 +425,56 @@ static bool parse_chan_info(const QString   &rawdata,
     }
 }
 
-static bool parse_extinf(const QString &line1,
+static bool parse_extinf(const QString &line,
                          QString       &channum,
                          QString       &name)
 {
-    // data is supposed to contain the "0,2 - France 2" part
-    QString msg = LOC +
-        QString("Invalid header in channel list line \n\t\t\tEXTINF:%1")
-        .arg(line1);
-
-    // Parse extension portion
-    QRegExp chanNumName("^-?\\d+,(\\d+)(?:\\.\\s|\\s-\\s)(.*)$");
-    int pos = chanNumName.indexIn(line1);
-    if (pos < 0)
+    // Parse extension portion, Freebox or SAT>IP format
+    QRegExp chanNumName1("^-?\\d+,(\\d+)(?:\\.\\s|\\s-\\s)(.*)$");
+    int pos = chanNumName1.indexIn(line);
+    if (pos != -1)
     {
-        LOG(VB_GENERAL, LOG_ERR, msg);
-        return false;
+        channum = chanNumName1.cap(1);
+        name = chanNumName1.cap(2);
+        return true;
     }
 
-    channum = chanNumName.cap(1);
-    name = chanNumName.cap(2);
+    // Parse extension portion, A1 TV format
+    QRegExp chanNumName2("^-?\\d+\\s+[^,]*tvg-num=\"(\\d+)\"[^,]*,(.*)$");
+    pos = chanNumName2.indexIn(line);
+    if (pos != -1)
+    {
+        channum = chanNumName2.cap(1);
+        name = chanNumName2.cap(2);
+        return true;
+    }
 
-    return true;
+    // Parse extension portion, Moviestar TV number then name
+    QRegExp chanNumName3("^-?\\d+,\\[(\\d+)\\]\\s+(.*)$");
+    pos = chanNumName3.indexIn(line);
+    if (pos != -1)
+    {
+        channum = chanNumName3.cap(1);
+        name = chanNumName3.cap(2);
+        return true;
+    }
+
+    // Parse extension portion, Moviestar TV name then number
+    QRegExp chanNumName4("^-?\\d+,(.*)\\s+\\[(\\d+)\\]$");
+    pos = chanNumName4.indexIn(line);
+    if (pos != -1)
+    {
+        channum = chanNumName4.cap(2);
+        name = chanNumName4.cap(1);
+        return true;
+    }
+
+    // line is supposed to contain the "0,2 - France 2" part
+    QString msg = LOC +
+        QString("Invalid header in channel list line \n\t\t\tEXTINF:%1")
+        .arg(line);
+    LOG(VB_GENERAL, LOG_ERR, msg);
+    return false;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

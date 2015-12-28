@@ -8,7 +8,7 @@
 #include "mpegtables.h"
 #include "mythlogging.h"
 
-#define LOC QString("DTVChan[%1](%2): ").arg(GetCardID()).arg(GetDevice())
+#define LOC QString("DTVChan[%1](%2): ").arg(m_inputid).arg(GetDevice())
 
 QReadWriteLock DTVChannel::master_map_lock(QReadWriteLock::Recursive);
 typedef QMap<QString,QList<DTVChannel*> > MasterMap;
@@ -68,12 +68,11 @@ void DTVChannel::SetSIStandard(const QString &si_std)
 
 QString DTVChannel::GetSuggestedTuningMode(bool is_live_tv) const
 {
-    uint cardid = GetCardID();
-    QString input = GetCurrentInput();
+    QString input = GetInputName();
 
     uint quickTuning = 0;
-    if (cardid && !input.isEmpty())
-        quickTuning = CardUtil::GetQuickTuning(cardid, input);
+    if (m_inputid && !input.isEmpty())
+        quickTuning = CardUtil::GetQuickTuning(m_inputid, input);
 
     bool useQuickTuning = (quickTuning && is_live_tv) || (quickTuning > 1);
 
@@ -188,38 +187,17 @@ bool DTVChannel::SetChannelByString(const QString &channum)
         return false;
     }
 
-    if (m_inputs.size() > 1)
-    {
-        QString inputName;
-        if (!CheckChannel(channum, inputName))
-        {
-            LOG(VB_GENERAL, LOG_ERR, loc +
-                    "CheckChannel failed.\n\t\t\tPlease verify the channel "
-                    "in the 'mythtv-setup' Channel Editor.");
-
-            return false;
-        }
-
-        // If CheckChannel filled in the inputName then we need to
-        // change inputs and return, since the act of changing
-        // inputs will change the channel as well.
-        if (!inputName.isEmpty())
-            return SwitchToInput(inputName, channum);
-    }
-
-    InputMap::const_iterator it = m_inputs.find(m_currentInputID);
-    if (it == m_inputs.end())
+    if (!m_inputid)
         return false;
 
     uint mplexid_restriction;
     uint chanid_restriction;
-    if (!IsInputAvailable(m_currentInputID, mplexid_restriction,
-                          chanid_restriction))
+    if (!IsInputAvailable(mplexid_restriction, chanid_restriction))
     {
         LOG(VB_GENERAL, LOG_INFO, loc +
             QString("Requested channel '%1' is on input '%2' "
                     "which is in a busy input group")
-                .arg(channum).arg(m_currentInputID));
+                .arg(channum).arg(m_inputid));
 
         return false;
     }
@@ -232,7 +210,7 @@ bool DTVChannel::SetChannelByString(const QString &channum)
     uint atsc_major, atsc_minor, mplexid, chanid, tsid, netid;
 
     if (!ChannelUtil::GetChannelData(
-        (*it)->sourceid, chanid, channum,
+        m_sourceid, chanid, channum,
         tvformat, modulation, freqtable, freqid,
         finetune, frequency,
         si_std, mpeg_prog_num, atsc_major, atsc_minor, tsid, netid,
@@ -262,7 +240,7 @@ bool DTVChannel::SetChannelByString(const QString &channum)
     }
     bool isFrequency = (frequency > 10000000);
     bool hasTuneToChan =
-        !(*it)->tuneToChannel.isEmpty() && (*it)->tuneToChannel != "Undefined";
+        !m_tuneToChannel.isEmpty() && m_tuneToChannel != "Undefined";
 
     // If we are tuning to a freqid, rather than an actual frequency,
     // we may need to set the frequency table to use.
@@ -274,7 +252,7 @@ bool DTVChannel::SetChannelByString(const QString &channum)
 
     // If a tuneToChannel is set make sure we're still on it
     if (hasTuneToChan)
-        Tune((*it)->tuneToChannel, 0);
+        Tune(m_tuneToChannel, 0);
 
     // Clear out any old PAT or PMT & save version info
     uint version = 0;
@@ -286,11 +264,11 @@ bool DTVChannel::SetChannelByString(const QString &channum)
     }
 
     bool ok = true;
-    if ((*it)->externalChanger.isEmpty())
+    if (m_externalChanger.isEmpty())
     {
         if (IsIPTV())
         {
-            int chanid = ChannelUtil::GetChanID((*it)->sourceid, channum);
+            int chanid = ChannelUtil::GetChanID(m_sourceid, channum);
             IPTVTuningData tuning = ChannelUtil::GetIPTVTuningData(chanid);
             if (!Tune(tuning, false))
             {
@@ -299,15 +277,15 @@ bool DTVChannel::SetChannelByString(const QString &channum)
                 ok = false;
             }
         }
-        else if ((*it)->name.contains("composite", Qt::CaseInsensitive) ||
-                 (*it)->name.contains("s-video", Qt::CaseInsensitive))
+        else if (m_name.contains("composite", Qt::CaseInsensitive) ||
+                 m_name.contains("s-video", Qt::CaseInsensitive))
         {
             LOG(VB_GENERAL, LOG_WARNING, loc + "You have not set "
                     "an external channel changing"
                     "\n\t\t\tscript for a composite or s-video "
                     "input. Channel changing will do nothing.");
         }
-        else if (isFrequency && Tune(frequency, ""))
+        else if (isFrequency && Tune(frequency))
         {
         }
         else if (isFrequency)
@@ -326,7 +304,7 @@ bool DTVChannel::SetChannelByString(const QString &channum)
                 CheckOptions(tuning);
 
                 // Tune to proper multiplex
-                if (!Tune(tuning, (*it)->name))
+                if (!Tune(tuning))
                 {
                     LOG(VB_GENERAL, LOG_ERR, loc + "Tuning to frequency.");
 
@@ -357,7 +335,7 @@ bool DTVChannel::SetChannelByString(const QString &channum)
     {
         // We need to pull the pid_cache since there are no tuning tables
         pid_cache_t pid_cache;
-        int chanid = ChannelUtil::GetChanID((*it)->sourceid, channum);
+        int chanid = ChannelUtil::GetChanID(m_sourceid, channum);
         ChannelUtil::GetCachedPids(chanid, pid_cache);
         if (pid_cache.empty())
         {
@@ -401,7 +379,7 @@ bool DTVChannel::SetChannelByString(const QString &channum)
     // Setup filters & recording picture attributes for framegrabing recorders
     // now that the new curchannelname has been established.
     if (m_pParent)
-        m_pParent->SetVideoFiltersForChannel(GetCurrentSourceID(), channum);
+        m_pParent->SetVideoFiltersForChannel(GetSourceID(), channum);
     InitPictureAttributes();
 
     HandleScript(freqid);
@@ -426,5 +404,5 @@ bool DTVChannel::TuneMultiplex(uint mplexid, QString inputname)
 
     CheckOptions(tuning);
 
-    return Tune(tuning, inputname);
+    return Tune(tuning);
 }

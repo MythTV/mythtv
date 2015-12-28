@@ -89,6 +89,10 @@ MythGesture::MythGesture(size_t max_points, size_t min_points,
     p->sequences.insert("98741",MythGestureEvent::LeftThenUp);
     p->sequences.insert("12369",MythGestureEvent::RightThenDown);
     p->sequences.insert("78963",MythGestureEvent::RightThenUp);
+    p->sequences.insert("45654",MythGestureEvent::RightThenLeft);
+    p->sequences.insert("65456",MythGestureEvent::LeftThenRight);
+    p->sequences.insert("85258",MythGestureEvent::UpThenDown);
+    p->sequences.insert("25852",MythGestureEvent::DownThenUp);
 }
 
 MythGesture::~MythGesture()
@@ -100,7 +104,7 @@ MythGesture::~MythGesture()
 void MythGesture::adjustExtremes(int x, int y)
 {
     min_x = std::min(min_x, x);
-    max_x = std::max(max_y, x);
+    max_x = std::max(max_x, x);
     min_y = std::min(min_y, y);
     max_y = std::max(max_y, y);
 }
@@ -331,6 +335,7 @@ bool MythGesture::record(const QPoint & p)
 
 
 static const char *gesturename[] = {
+    "Unknown",
     "Up",
     "Down",
     "Left",
@@ -347,6 +352,10 @@ static const char *gesturename[] = {
     "LeftThenDown",
     "RightThenUp",
     "RightThenDown",
+    "RightThenLeft",
+    "LeftThenRight",
+    "UpThenDown",
+    "DownThenUp",
     "Click",
     "MaxGesture"
 };

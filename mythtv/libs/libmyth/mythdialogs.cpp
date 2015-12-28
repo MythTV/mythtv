@@ -3,7 +3,7 @@
 #include <algorithm>
 using namespace std;
 
-#include <QCoreApplication>
+#include <QApplication>
 #include <QCursor>
 #include <QDialog>
 #include <QDir>
@@ -35,12 +35,21 @@ using namespace std;
 #undef LoadImage
 #endif
 
+static bool inline IsEGLFS()
+{
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+  return qApp->platformName().contains("egl");
+#else
+  return false;
+#endif
+}
+
 /** \class MythDialog
  *  \brief Base dialog for most dialogs in MythTV using the old UI
  */
 
 MythDialog::MythDialog(MythMainWindow *parent, const char *name, bool setsize)
-    : QFrame(parent), wmult(0.0), hmult(0.0),
+    : QFrame(IsEGLFS() ? 0 : parent), wmult(0.0), hmult(0.0),
       screenwidth(0), screenheight(0), xbase(0), ybase(0),
       m_parent(NULL), rescode(kDialogCodeAccepted), in_loop(false)
 {
@@ -540,6 +549,11 @@ void MythPopupBox::ShowPopupAtXY(int destx, int desty,
     {
         width = parentWidget()->width();
         height = parentWidget()->height();
+    }
+    else if (m_parent)
+    {
+        width = m_parent->width();
+        height = m_parent->height();
     }
 
     if (destx == -1)

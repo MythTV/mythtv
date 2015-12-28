@@ -40,6 +40,10 @@
 #include "scanmonitor.h"
 #include "channelscantypes.h"
 
+#ifdef USING_VBOX
+#include "vboxchannelfetcher.h"
+#endif
+
 class ScanMonitor;
 class IPTVChannelFetcher;
 class ChannelScanSM;
@@ -82,6 +86,8 @@ class MTV_PUBLIC ChannelScanner
 
     virtual bool ImportM3U(uint cardid, const QString &inputname,
                            uint sourceid, bool is_mpts);
+    virtual bool ImportVBox(uint cardid, const QString &inputname, uint sourceid,
+                            bool ftaOnly, ServiceRequirements serviceType);
 
   protected:
     virtual void Teardown(void);
@@ -109,6 +115,11 @@ class MTV_PUBLIC ChannelScanner
     /// imported channels
     DTVChannelList      channels;
     fbox_chan_map_t     iptv_channels;
+
+    // vbox support
+#ifdef USING_VBOX
+    VBoxChannelFetcher *vboxScanner;
+#endif
 
     /// Only fta channels desired post scan?
     bool                freeToAirOnly;

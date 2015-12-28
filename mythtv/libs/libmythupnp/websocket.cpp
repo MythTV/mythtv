@@ -11,6 +11,7 @@
 
 // QT headers
 #include <QThread>
+#include <QTcpSocket>
 #include <QSslCipher>
 #include <QCryptographicHash>
 #include <QtCore>
@@ -54,8 +55,11 @@ void WebSocketServer::newTcpConnection(qt_socket_fd_t socket)
         type = server->GetServerType();
 
     m_threadPool.startReserved(
-        new WebSocketWorkerThread(*this, socket, type,
-                       m_sslConfig),
+        new WebSocketWorkerThread(*this, socket, type
+#ifndef QT_NO_OPENSSL
+               , m_sslConfig
+#endif
+               ),
         QString("WebSocketServer%1").arg(socket));
 }
 
@@ -64,11 +68,17 @@ void WebSocketServer::newTcpConnection(qt_socket_fd_t socket)
 /////////////////////////////////////////////////////////////////////////////
 
 WebSocketWorkerThread::WebSocketWorkerThread(WebSocketServer& webSocketServer,
-                                 qt_socket_fd_t sock, PoolServerType type,
-                                 QSslConfiguration sslConfig)
+                                 qt_socket_fd_t sock, PoolServerType type
+#ifndef QT_NO_OPENSSL
+                                 , QSslConfiguration sslConfig
+#endif
+                                 )
                 :
                   m_webSocketServer(webSocketServer), m_socketFD(sock),
-                  m_connectionType(type), m_sslConfig(sslConfig)
+                  m_connectionType(type)
+#ifndef QT_NO_OPENSSL
+                  , m_sslConfig(sslConfig)
+#endif
 {
 }
 
@@ -79,7 +89,11 @@ WebSocketWorkerThread::~WebSocketWorkerThread()
 void WebSocketWorkerThread::run(void)
 {
     WebSocketWorker *worker = new WebSocketWorker(m_webSocketServer, m_socketFD,
-                                                  m_connectionType, m_sslConfig);
+                                                  m_connectionType
+#ifndef QT_NO_OPENSSL
+                                                  , m_sslConfig
+#endif
+                                                  );
     worker->Exec();
 
     worker->deleteLater();
@@ -90,14 +104,20 @@ void WebSocketWorkerThread::run(void)
 /////////////////////////////////////////////////////////////////////////////
 
 WebSocketWorker::WebSocketWorker(WebSocketServer& webSocketServer,
-                                 qt_socket_fd_t sock, PoolServerType type,
-                                 QSslConfiguration sslConfig)
+                                 qt_socket_fd_t sock, PoolServerType type
+#ifndef QT_NO_OPENSSL
+                                 , QSslConfiguration sslConfig
+#endif
+                                 )
                 : m_eventLoop(new QEventLoop()),
                   m_webSocketServer(webSocketServer),
                   m_socketFD(sock), m_socket(NULL),
                   m_connectionType(type), m_webSocketMode(false),
                   m_errorCount(0), m_isRunning(false),
-                  m_heartBeat(new QTimer()), m_sslConfig(sslConfig),
+                  m_heartBeat(new QTimer()),
+#ifndef QT_NO_OPENSSL
+                  m_sslConfig(sslConfig),
+#endif
                   m_fuzzTesting(false)
 {
     setObjectName(QString("WebSocketWorker(%1)")

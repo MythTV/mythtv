@@ -766,6 +766,86 @@
         </group>
     </group>
 
+    <group name="basestreaminfopanel">
+        <area>0,420,1280,240</area>
+
+        <shape name="track_info_background" from="basebackground">
+            <area>15,0,1250,240</area>
+        </shape>
+
+        <textarea name="title" from="basetextarea">
+            <area>220,15,850,34</area>
+            <font>baselarge</font>
+        </textarea>
+
+        <textarea name="artist" from="basetextarea">
+            <area>220,55,850,34</area>
+            <font>basemedium</font>
+        </textarea>
+
+       <textarea name="channel" from="basetextarea">
+            <area>220,90,850,34</area>
+            <font>basemedium</font>
+            <template>%STATION% - %CHANNEL%</template>
+        </textarea>
+
+        <textarea name="url" from="basetextarea">
+            <font>basesmall</font>
+            <area>220,125,850,35</area>
+        </textarea>
+
+        <progressbar name="bufferprogress" from="basetrackprogress">
+            <position>230,210</position>
+        </progressbar>
+
+        <textarea name="bufferstatus" from="basetextarea">
+            <area>230,185,385,35</area>
+            <font>basesmall</font>
+        </textarea>
+
+        <imagetype name="visualizer_border">
+            <filename>mm_blackhole_border.png</filename>
+            <area>1082,19,162,162,</area>
+        </imagetype>
+
+        <video name="visualizer">
+            <area>1085,23,156,155,</area>
+        </video>
+
+        <textarea name="visualizername" from="basetextarea">
+            <area>1085,180,156,35</area>
+            <font>basesmall</font>
+            <align>center</align>
+        </textarea>
+
+        <statetype name="mutestate" from="basemutestate">
+            <position>30,210</position>
+        </statetype>
+
+        <textarea name="volume" from="basevolume">
+            <position>70,207</position>
+        </textarea>
+
+        <imagetype name="mm_blackhole_border">
+            <filename>mm_blackhole_border.png</filename>
+            <area>32,19,162,162</area>
+        </imagetype>
+
+        <imagetype name="coverart">
+            <filename>mm_nothumb.png</filename>
+            <area>35,23,156,155</area>
+        </imagetype>
+
+        <button name="play" from="baseplaybutton">
+            <position>840,190</position>
+        </button>
+
+        <button name="stop" from="basestopbutton">
+            <position>885,190</position>
+        </button>
+
+    </group>
+
     <group name="baseplayliststatusgroup">
         <textarea name="playlistposition" from="basetextarea">
             <area>40,0,170,30</area>

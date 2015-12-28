@@ -61,7 +61,7 @@ class UPNP_PUBLIC XmlConfiguration : public Configuration
 
     public:
 
-        XmlConfiguration( const QString &sFileName );
+        explicit XmlConfiguration( const QString &sFileName );
 
         virtual ~XmlConfiguration() {}
 

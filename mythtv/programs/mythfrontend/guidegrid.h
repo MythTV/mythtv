@@ -125,6 +125,7 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
     virtual void Load(void);
     virtual void Init(void);
     bool keyPressEvent(QKeyEvent *event);
+    bool gestureEvent(MythGestureEvent *event);
 
     virtual void aboutToShow();
     virtual void aboutToHide();

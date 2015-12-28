@@ -188,7 +188,7 @@ class MTV_PUBLIC PESPacket
     uint CRC(void) const
     {
         if (!HasCRC() || (Length() < 1))
-            return 0x0;
+            return kTheMagicNoCRCCRC;
         uint offset = Length() - 1;
         return ((_pesdata[offset+0]<<24) |
                 (_pesdata[offset+1]<<16) |
@@ -222,6 +222,10 @@ class MTV_PUBLIC PESPacket
     uint _pesdataSize;  ///< Number of data bytes (TS header + PES data)
     uint _allocSize;    ///< Total number of bytes we allocated
     bool _badPacket;    ///< true if a CRC is not good yet
+
+    // FIXME re-read the specs and follow all negations to find out the
+    // initial value of the CRC function when its being returned
+    static const uint kTheMagicNoCRCCRC = 0xFFFFFFFF;
 };
 
 class SequenceHeader

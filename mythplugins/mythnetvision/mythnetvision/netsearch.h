@@ -58,6 +58,9 @@ class NetSearch : public NetBase
 
     RSSSite::rssList    m_rssList;
 
+    QString m_nextPageToken;
+    QString m_prevPageToken;
+
   private slots:
     void ShowMenu(void);
     void GetMoreResults();

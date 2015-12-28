@@ -1,0 +1,86 @@
+Lyrics Grabbers
+===============
+
+You can add your own grabbers to this directory and MythMusic will
+automatically use them so long as they comply with the other grabbers.
+
+The grabber should support these command line options :-
+
+Options:
+  -h, --help            show this help message and exit
+  -v, --version         Display version and author
+  -t, --test            Perform self-test for dependencies and do an example search.
+  -s, --search          Search for lyrics.
+  -a ARTIST, --artist=ARTIST
+                        Artist of track.
+  -b ALBUM, --album=ALBUM
+                        Album of track.
+  -n TITLE, --title=TITLE
+                        Title of track.
+  -f FILENAME, --filename=FILENAME
+                        Filename of track.
+  -d, --debug           Show debug messages
+
+
+-h, --help: will show the options as above
+
+-v, --version: should output some version xml to stdout like this
+
+            <?xml version='1.0' encoding='UTF-8'?>
+            <grabber>
+                <name>EmbeddedLyrics</name>
+                <author>Paul Harrison and 'ronin'</author>
+                <command>alsong.py</command>
+                <type>lyrics</type>
+                <description>Search tracks tag for embedded lyrics</description>
+                <version>0.1</version>
+                <priority>100</priority>
+                <lrc>True</lrc>
+            </grabber>
+
+            Important elements used by MythMusic are <name> used to display and find the correct grabber to use
+            and <priority> used to determin the order the grabbers will be used to perform a search.
+
+-t, --test: should test for any unusual dependencies and also perform a
+            search for a known track to make sure everything is working.
+
+            Exit with '1' for error or '0' for success.
+
+-s, --search: is the default option and can be ommited. It should do a search
+              for some lyrics using the ARTIST, ALBUM, TITLE and FILENAME
+              options as required.
+
+              Exit with '1' for error or not found or '0' for success.
+
+              The grabber should output to stdout an xml file with the result of the search
+              like this :-
+
+              <?xml version='1.0' encoding='UTF-8'?>
+              <lyrics>
+                  <artist>Robb Benson</artist>
+                  <album>Demo Tracks</album>
+                  <title>Lone Rock</title>
+                  <lrc>True</lrc>
+                  <grabber>FileLyrics</grabber>
+                  <lyric>One, two, three, four</lyric>
+                  <lyric>It wasn't until the wood stove fire was too big</lyric>
+                  <lyric>Burn down house</lyric>
+                  <lyric>Silent</lyric>
+                  <lyric>Almost causing another sleepless night</lyric>
+                  <lyric>Almost causing another sleepless night</lyric>
+                  <lyric>But answers can be so real</lyric>
+                  <lyric>Can be so real, can be so real, can be so real</lyric>
+                  <lyric>Each lifetime leads to the next</lyric>
+                  <lyric>I question do you believe</lyric>
+                  <lyric>Many hour of suffering will be over</lyric>
+                  <lyric>And once again you will learn</lyric>
+                  <lyric>I miss your stories and your laughter</lyric>
+                  <lyric>Memories count, memories count</lyric>
+                  <lyric>I miss your stories and your laughter</lyric>
+                  <lyric>Memories count, memories count</lyric>
+                  <lyric>But answers can be so real</lyric>
+                  <lyric>Can be so real, can be so real, can be so real</lyric>
+                  <lyric>Can be so real, can be so real, can be so real</lyric>
+              </lyrics>
+
+-d, --debug: This option should turn on extra debug output

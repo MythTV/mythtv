@@ -135,6 +135,8 @@ bool ZMClient::connectToHost(const QString &lhostname, unsigned int lport)
 
 bool ZMClient::sendReceiveStringList(QStringList &strList)
 {
+    QMutexLocker locker(&m_socketLock);
+
     QStringList origStrList = strList;
 
     bool ok = false;
@@ -327,6 +329,34 @@ void ZMClient::updateMonitorStatus(void)
     }
 }
 
+static QString stateToString(State state)
+{
+    QString result = "UNKNOWN";
+
+    switch (state)
+    {
+        case IDLE:
+            result = "IDLE";
+            break;
+        case PREALARM:
+            result = "PREALARM";
+            break;
+        case ALARM:
+            result = "ALARM";
+            break;
+        case ALERT:
+            result = "ALERT";
+            break;
+        case TAPE:
+            result = "TAPE";
+            break;
+        default:
+            result = "UNKNOWN";
+    }
+
+    return result;
+}
+
 bool ZMClient::updateAlarmStates(void)
 {
     QStringList strList("GET_ALARM_STATES");
@@ -355,7 +385,7 @@ bool ZMClient::updateAlarmStates(void)
     for (int x = 0; x < monitorCount; x++)
     {
         int monID = strList[x * 2 + 2].toInt();
-        int state = strList[x * 2 + 3].toInt();
+        State state = (State)strList[x * 2 + 3].toInt();
 
         if (m_monitorMap.contains(monID))
         {
@@ -363,6 +393,10 @@ bool ZMClient::updateAlarmStates(void)
             if (mon->state != state)
             {
                 // alarm state has changed for this monitor
+                LOG(VB_GENERAL, LOG_DEBUG,
+                    QString("ZMClient monitor %1 changed state from %2 to %3")
+                            .arg(mon->name).arg(stateToString(mon->state)).arg(stateToString(state)));
+                mon->previousState = mon->state;
                 mon->state = (State)state;
                 changed = true;
             }

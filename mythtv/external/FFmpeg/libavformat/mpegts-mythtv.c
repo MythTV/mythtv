@@ -37,6 +37,7 @@
 #include "seek.h"
 #include "mpeg.h"
 #include "isom.h"
+#include "internal.h"
 
 /* maximum size in which we look for synchronisation if
    synchronisation is lost */
@@ -2701,7 +2702,12 @@ static int mpegts_read_header(AVFormatContext *s)
     AVIOContext *pb = s->pb;
     uint8_t buf[8*1024] = {0};
     int len, sid, i;
-    int64_t pos;
+    int64_t pos, probesize =
+#if FF_API_PROBESIZE_32
+                             s->probesize ? s->probesize : s->probesize2;
+#else
+                             s->probesize;
+#endif
 
     memset(ts->pids, 0, NB_PID_MAX * sizeof(MpegTSFilter *));
 
@@ -2742,7 +2748,7 @@ static int mpegts_read_header(AVFormatContext *s)
         ts->pat_filter =
         mpegts_open_section_filter(ts, PAT_PID, pat_cb, ts, 1);
 
-        handle_packets(ts, s->probesize / ts->raw_packet_size);
+        handle_packets(ts, probesize / ts->raw_packet_size);
         ts->scanning = 0;
 
         if (ts->nb_prg <= 0) {
@@ -2768,7 +2774,7 @@ static int mpegts_read_header(AVFormatContext *s)
             
             avio_seek(pb, pos, SEEK_SET);
             ts->req_sid = sid = ts->prg[i].id;
-            handle_packets(ts, s->probesize / ts->raw_packet_size);
+            handle_packets(ts, probesize / ts->raw_packet_size);
 
             /* fallback code to deal with broken streams from
              * DBOX2/Firewire cable boxes. */
@@ -2783,7 +2789,7 @@ static int mpegts_read_header(AVFormatContext *s)
                 /* try again */
                 avio_seek(pb, pos, SEEK_SET);
                 ts->req_sid = sid = ts->prg[i].id;
-                handle_packets(ts, s->probesize / ts->raw_packet_size);
+                handle_packets(ts, probesize / ts->raw_packet_size);
             }
 
             /* fallback code to deal with streams that are not complete PMT
@@ -2798,7 +2804,7 @@ static int mpegts_read_header(AVFormatContext *s)
                 /* try again */
                 avio_seek(pb, pos, SEEK_SET);
                 ts->req_sid = sid = ts->prg[i].id;
-                handle_packets(ts, s->probesize / ts->raw_packet_size);
+                handle_packets(ts, probesize / ts->raw_packet_size);
             }
         }
         ts->scanning = 0;
@@ -3113,7 +3119,7 @@ static int read_seek(AVFormatContext *s, int stream_index, int64_t target_ts, in
 /**************************************************************/
 /* parsing functions - called from other demuxers such as RTP */
 
-MpegTSContext *ff_mpegts_parse_open(AVFormatContext *s)
+MpegTSContext *avpriv_mpegts_parse_open(AVFormatContext *s)
 {
     MpegTSContext *ts;
 
@@ -3132,8 +3138,8 @@ MpegTSContext *ff_mpegts_parse_open(AVFormatContext *s)
 
 /* return the consumed length if a packet was output, or -1 if no
    packet is output */
-int ff_mpegts_parse_packet(MpegTSContext *ts, AVPacket *pkt,
-                                  const uint8_t *buf, int len)
+int avpriv_mpegts_parse_packet(MpegTSContext *ts, AVPacket *pkt,
+                               const uint8_t *buf, int len)
 {
     int len1;
 
@@ -3157,13 +3163,27 @@ int ff_mpegts_parse_packet(MpegTSContext *ts, AVPacket *pkt,
     return len1 - len;
 }
 
-void ff_mpegts_parse_close(MpegTSContext *ts)
+void avpriv_mpegts_parse_close(MpegTSContext *ts)
 {
     int i;
 
     for(i=0;i<NB_PID_MAX;i++)
         av_free(ts->pids[i]);
     av_free(ts);
+}
+
+AVStream *av_new_stream(AVFormatContext *s, int id)
+{
+    AVStream *st = avformat_new_stream(s, NULL);
+    if (st)
+        st->id = id;
+    return st;
+}
+
+void av_set_pts_info(AVStream *s, int pts_wrap_bits,
+                     unsigned int pts_num, unsigned int pts_den)
+{
+    avpriv_set_pts_info(s, pts_wrap_bits, pts_num, pts_den);
 }
 
 AVInputFormat ff_mythtv_mpegts_demuxer = {

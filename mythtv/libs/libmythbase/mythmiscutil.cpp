@@ -39,12 +39,14 @@ using namespace std;
 #include <QReadWriteLock>
 #include <QNetworkProxy>
 #include <QStringList>
+#include <QDataStream>
 #include <QUdpSocket>
 #include <QFileInfo>
 #include <QFile>
 #include <QDir>
 #include <QUrl>
 #include <QHostAddress>
+#include <QDataStream>
 
 // Myth headers
 #include "mythcorecontext.h"

@@ -139,7 +139,7 @@ void StatusBox::Init()
     m_categoryList->SetItemCurrent(itemCurrent);
 }
 
-MythUIButtonListItem* StatusBox::AddLogLine(const QString & line,
+void StatusBox::AddLogLine(const QString & line,
                                             const QString & help,
                                             const QString & detail,
                                             const QString & helpdetail,
@@ -175,8 +175,6 @@ MythUIButtonListItem* StatusBox::AddLogLine(const QString & line,
     item->SetFontState(logline.state);
     item->DisplayState(logline.state, "status");
     item->SetText(logline.detail, "detail");
-
-    return item;
 }
 
 bool StatusBox::keyPressEvent(QKeyEvent *event)
@@ -1231,7 +1229,7 @@ void StatusBox::doMachineStatus()
     // weighted average loads
     line.append(".   " + tr("Load") + ": ");
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(Q_OS_ANDROID)
     line.append(tr("unknown") + " - getloadavg() " + tr("failed"));
 #else // if !_WIN32
     double loads[3];

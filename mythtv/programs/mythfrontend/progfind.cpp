@@ -458,12 +458,12 @@ void ProgFinder::updateTimesList()
             MythUIButtonListItem *item =
                 new MythUIButtonListItem(m_timesList, "");
 
-            m_showData[i]->ToMap(infoMap);
-            item->SetTextFromMap(infoMap);
-
             QString state = RecStatus::toUIState(m_showData[i]->GetRecordingStatus());
             item->SetText(itemText, "buttontext", state);
             item->DisplayState(state, "status");
+
+            m_showData[i]->ToMap(infoMap);
+            item->SetTextFromMap(infoMap, state);
         }
     }
 }

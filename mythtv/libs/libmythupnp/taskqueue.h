@@ -65,7 +65,7 @@ class Task : public ReferenceCounter
 
     public:
 
-                        Task(const QString &debugName); 
+               explicit Task(const QString &debugName); 
 
                 long    Id() const { return( m_nTaskId ); }
 

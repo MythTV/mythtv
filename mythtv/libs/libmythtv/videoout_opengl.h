@@ -3,8 +3,10 @@
 
 // MythTV headers
 #include "videooutbase.h"
-#include "openglvideo.h"
-#include "mythpainter_ogl.h"
+
+class MythRenderOpenGL;
+class OpenGLVideo;
+class MythOpenGLPainter;
 
 class VideoOutputOpenGL : public VideoOutput
 {
@@ -52,13 +54,11 @@ class VideoOutputOpenGL : public VideoOutput
     virtual bool IsPIPSupported(void) const   { return true; }
     virtual bool hasFullScreenOSD(void) const { return true; }
     virtual bool ApproveDeintFilter(const QString& filtername) const;
-    virtual MythPainter *GetOSDPainter(void)  { return gl_painter; }
+    virtual MythPainter *GetOSDPainter(void);
 
-    virtual bool CanVisualise(AudioPlayer *audio, MythRender *render)
-        { return VideoOutput::CanVisualise(audio, gl_context);       }
+    virtual bool CanVisualise(AudioPlayer *audio, MythRender *render);
     virtual bool SetupVisualisation(AudioPlayer *audio, MythRender *render,
-                                    const QString &name)
-        { return VideoOutput::SetupVisualisation(audio, gl_context, name); }
+                                    const QString &name);
     virtual QStringList GetVisualiserList(void);
 
     virtual bool StereoscopicModesAllowed(void) const { return true; }

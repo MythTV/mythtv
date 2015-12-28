@@ -43,7 +43,7 @@ class RttiServiceHost : public ServiceHost
 {
     public:
 
-        RttiServiceHost( const QString &sSharePath )
+        explicit RttiServiceHost( const QString &sSharePath )
                 : ServiceHost( Rtti::staticMetaObject, 
                                "Rtti", 
                                "/Rtti",

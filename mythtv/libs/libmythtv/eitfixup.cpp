@@ -132,13 +132,15 @@ EITFixUp::EITFixUp()
       m_RTLSubtitle3("^(?:Folge\\s)?(\\d{1,4}(?:\\/[IVX]+)?)\\s+(.{,5}[^\\.]{,120})[\\?!\\.]\\s*"),
       m_RTLSubtitle4("^Thema.{0,5}:\\s([^\\.]+)\\.\\s*"),
       m_RTLSubtitle5("^'(.+)'\\.\\s*"),
+      m_PRO7Subtitle(",{0,1}([^,]*),([^,]+)\\s{0,1}(\\d{4})$"),
       m_RTLEpisodeNo1("^(Folge\\s\\d{1,4})\\.*\\s*"),
       m_RTLEpisodeNo2("^(\\d{1,2}\\/[IVX]+)\\.*\\s*"),
       m_fiRerun("\\ ?Uusinta[a-zA-Z\\ ]*\\.?"),
       m_fiRerun2("\\([Uu]\\)"),
-      m_dePremiereInfos("([^.]+)?\\s?([0-9]{4})\\.\\s[0-9]+\\sMin\\.(?:\\sVon"
+      m_dePremiereInfos("\\s*[0-9]+\\sMin\\.([^.]+)?\\s?([0-9]{4})\\.(?:\\sVon"
                         "\\s([^,]+)(?:,|\\su\\.\\sa\\.)\\smit\\s(.+)\\.)?"),
       m_dePremiereOTitle("\\s*\\(([^\\)]*)\\)$"),
+      m_deSkyDescriptionSeasonEpisode("^(\\d{1,2}).\\sStaffel,\\sFolge\\s(\\d{1,2}):\\s"),
       m_nlTxt("txt"),
       m_nlWide("breedbeeld"),
       m_nlRepeat("herh."),
@@ -184,7 +186,52 @@ EITFixUp::EITFixUp()
       m_AUFreeviewSY("(.*) \\((.+)\\) \\(([12][0-9][0-9][0-9])\\)$"),
       m_AUFreeviewY("(.*) \\(([12][0-9][0-9][0-9])\\)$"),
       m_AUFreeviewYC("(.*) \\(([12][0-9][0-9][0-9])\\) \\((.+)\\)$"),
-      m_AUFreeviewSYC("(.*) \\((.+)\\) \\(([12][0-9][0-9][0-9])\\) \\((.+)\\)$")
+      m_AUFreeviewSYC("(.*) \\((.+)\\) \\(([12][0-9][0-9][0-9])\\) \\((.+)\\)$"),
+      m_HTML("</?EM>", Qt::CaseInsensitive),
+      m_grReplay("\\([ΕE]\\)"),
+      m_grDescriptionFinale("\\s*Τελευταίο\\sΕπεισόδιο\\.\\s*"),
+      m_grActors("(?:[Ππ]α[ιί]ζουν:|[Μμ]ε τους:|Πρωταγωνιστο[υύ]ν:|Πρωταγωνιστε[ιί]:?)(?:\\s+στο ρόλο(?: του| της)?\\s(?:\\w+\\s[οη]\\s))?([-\\w\\s']+(?:,[-\\w\\s']+)*)(?:κ\\.[αά])?(?:\\W?)"),
+      // cap(1) actors, just names
+      m_grFixnofullstopActors("(\\w\\s(Παίζουν:|Πρωταγων))"),
+      m_grFixnofullstopDirectors("((\\w\\s(Σκηνοθ[εέ]))"),
+      m_grPeopleSeparator("(,\\s+)"),
+      m_grDirector("(?:Σκηνοθεσία: |Σκηνοθέτης: )(\\w+\\s\\w+\\s?)(?:\\W?)"),
+      m_grPres("(?:Παρουσ[ιί]αση:(?:\\b)*|Παρουσι[αά]ζ(?:ουν|ει)(?::|\\sο|\\sη)|Με τ(?:ον |ην )(?:[\\s|:|ο|η])*(?:\\b)*)([-\\w\\s]+(?:,[-\\w\\s]+)*)(?:\\W?)"),
+      m_grYear("(?:\\W?)(?:\\s?παραγωγ[ηή]ς|\\s?-|,)\\s*([1-2]{1}[0-9]{3})(?:-\\d{1,4})?",Qt::CaseInsensitive),
+      m_grCountry("(?:\\W|\\b)(?:(ελλην|τουρκ|αμερικ[αά]ν|γαλλ|αγγλ|βρεττ?αν|γερμαν|ρωσσ?|ιταλ|ελβετ|σουηδ|ισπαν|πορτογαλ|μεξικ[αά]ν|κιν[εέ]ζικ|ιαπων|καναδ|βραζιλι[αά]ν)(ικ[ηή][ςσ]))",Qt::CaseInsensitive),
+      m_grlongEp("\\b(?:Επ.|επεισ[οό]διο:?)\\s*(\\d+)(?:\\W?)",Qt::CaseInsensitive),
+      m_grSeason("(?:-\\s)?\\b((\\D{1,2})(?:')?|(\\d{1,2})(?:ος|ου)?)(?:\\sκ[υύ]κλο(?:[σς]|υ)){1}\\s?",Qt::CaseInsensitive),
+      m_grRealTitleinDescription("(?:^\\()([\\w\\s\\d\\D-]+)(?:\\))(?:\\s*)"),
+      // cap1 = real title
+      // cap0 = real title in parentheses.
+      m_grRealTitleinTitle("(?:\\()([\\w\\s\\d\\D-]+)(?:\\))(?:\\s*$)*"),
+      // cap1 = real title
+      // cap0 = real title in parentheses.
+      m_grNotPreviouslyShown("(?:\\b[Α1]['η]?\\s*(?:τηλεοπτικ[ηή]\\s*)?(?:μετ[αά]δοση|προβολ[ηή]))(?:\\W?)"),
+      // Try to exctract Greek categories from keywords in description.
+      m_grEpisodeAsSubtitle("(?:^Επεισ[οό]διο:\\s?)([\\w\\s-,']+)\\.(?:\\s)?"),
+      m_grCategFood("(?:\\W)?(?:εκπομπ[ηή]\\W)?(Γαστρονομ[ιί]α[σς]?|μαγειρικ[ηή][σς]?|chef|συνταγ[εέηή]|διατροφ|wine|μ[αά]γειρα[σς]?)(?:\\W)?",Qt::CaseInsensitive),
+      m_grCategDrama("(?:\\W)?(κοινωνικ[ηήό]|δραματικ[ηή]|δρ[αά]μα)(?:\\W)(?:(?:εκπομπ[ηή]|σειρ[αά]|ταιν[ιί]α)\\W)?",Qt::CaseInsensitive),
+      m_grCategComedy("(?:\\W)?(κωμικ[ηήοό]|χιουμοριστικ[ηήοό]|κωμωδ[ιί]α)(?:\\W)(?:(?:εκπομπ[ηή]|σειρ[αά]|ταιν[ιί]α)\\W)?",Qt::CaseInsensitive),
+      m_grCategChildren("(?:\\W)?(παιδικ[ηήοό]|κινο[υύ]μ[εέ]ν(ων|α)\\sσχ[εέ]δ[ιί](ων|α))(?:\\W)(?:(?:εκπομπ[ηή]|σειρ[αά]|ταιν[ιί]α)\\W)?",Qt::CaseInsensitive),
+      m_grCategMystery("(?:(?:εκπομπ[ηή]|σειρ[αά]|ταιν[ιί]α)\\W)?(?:\\W)?(μυστηρ[ιί]ου)(?:\\W)?",Qt::CaseInsensitive),
+      m_grCategFantasy("(?:(?:εκπομπ[ηή]|σειρ[αά]|ταιν[ιί]α)\\W)?(?:\\W)?(φαντασ[ιί]ας)(?:\\W)?",Qt::CaseInsensitive),
+      m_grCategHistory("(?:\\W)?(ιστορικ[ηήοό])(?:\\W)?(?:(?:εκπομπ[ηή]|σειρ[αά]|ταιν[ιί]α)\\W)?",Qt::CaseInsensitive),
+      m_grCategTeleMag("(?:\\W)?(ενημερωτικ[ηή]|ψυχαγωγικ[ηή]|τηλεπεριοδικ[οό]|μαγκαζ[ιί]νο)(?:\\W)?(?:(?:εκπομπ[ηή]|σειρ[αά]|ταιν[ιί]α)\\W)?",Qt::CaseInsensitive),
+      m_grCategTeleShop("(?:\\W)?(οδηγ[οό][σς]?\\sαγορ[ωώ]ν|τηλεπ[ωώ]λ[ηή]σ|τηλεαγορ|τηλεμ[αά]ρκετ|telemarket)(?:\\W)?(?:(?:εκπομπ[ηή]|σειρ[αά]|ταιν[ιί]α)\\W)?",Qt::CaseInsensitive),
+      m_grCategGameShow("(?:\\W)?(τηλεπαιχν[ιί]δι|quiz)(?:\\W)?",Qt::CaseInsensitive),
+      m_grCategDocumentary("(?:\\W)?(ντοκ[ιυ]μαντ[εέ]ρ)(?:\\W)?",Qt::CaseInsensitive),
+      m_grCategBiography("(?:\\W)?(βιογραφ[ιί]α|βιογραφικ[οό][σς]?)(?:\\W)?",Qt::CaseInsensitive),
+      m_grCategNews("(?:\\W)?(δελτ[ιί]ο\\W?|ειδ[ηή]σε(ι[σς]|ων))(?:\\W)?",Qt::CaseInsensitive),
+      m_grCategSports("(?:\\W)?(champion|αθλητικ[αάοόηή]|πρωτ[αά]θλημα|ποδ[οό]σφαιρο(ου)?|κολ[υύ]μβηση|πατιν[αά]ζ|formula|μπ[αά]σκετ|β[οό]λε[ιϊ])(?:\\W)?",Qt::CaseInsensitive),
+      m_grCategMusic("(?:\\W)?(μουσικ[οόηή]|eurovision|τραγο[υύ]δι)(?:\\W)?",Qt::CaseInsensitive),
+      m_grCategReality("(?:\\W)?(ρι[αά]λιτι|reality)(?:\\W)?",Qt::CaseInsensitive),
+      m_grCategReligion("(?:\\W)?(θρησκε[ιί]α|θρησκευτικ|να[οό][σς]?|θε[ιί]α λειτουργ[ιί]α)(?:\\W)?",Qt::CaseInsensitive),
+      m_grCategCulture("(?:\\W)?(τ[εέ]χν(η|ε[σς])|πολιτισμ)(?:\\W)?",Qt::CaseInsensitive),
+      m_grCategNature("(?:\\W)?(φ[υύ]ση|περιβ[αά]λλο|κατασκευ|επιστ[ηή]μ(?!ονικ[ηή]ς φαντασ[ιί]ας))(?:\\W)?",Qt::CaseInsensitive),
+      m_grCategSciFi("(?:\\W)?(επιστ(.|ημονικ[ηή]ς)\\s?φαντασ[ιί]ας)(?:\\W)?",Qt::CaseInsensitive),
+      m_grCategHealth("(?:\\W)?(υγε[ιί]α|υγειιν|ιατρικ|διατροφ)(?:\\W)?",Qt::CaseInsensitive),
+      m_grCategSpecial("(?:\\W)?(αφι[εέ]ρωμα)(?:\\W)?",Qt::CaseInsensitive)
 {
 }
 
@@ -201,6 +248,9 @@ void EITFixUp::Fix(DBEventEIT &event) const
             event.subtitle = QString("");
         }
     }
+
+    if (kFixHTML & event.fixup)
+        FixStripHTML(event);
 
     if (kFixHDTV & event.fixup)
         event.videoProps |= VID_HDTV;
@@ -241,6 +291,9 @@ void EITFixUp::Fix(DBEventEIT &event) const
     if (kFixRTL & event.fixup)
         FixRTL(event);
 
+    if (kFixP7S1 & event.fixup)
+        FixPRO7(event);
+
     if (kFixFI & event.fixup)
         FixFI(event);
 
@@ -261,6 +314,15 @@ void EITFixUp::Fix(DBEventEIT &event) const
 
     if (kFixCategory & event.fixup)
         FixCategory(event);
+
+    if (kFixGreekSubtitle & event.fixup)
+        FixGreekSubtitle(event);
+
+    if (kFixGreekEIT & event.fixup)
+        FixGreekEIT(event);
+
+    if (kFixGreekCategories & event.fixup)
+        FixGreekCategories(event);
 
     if (event.fixup)
     {
@@ -842,7 +904,7 @@ void EITFixUp::FixUK(DBEventEIT &event) const
 
         if (position1 != -1)
         {
-            LOG(VB_EIT, LOG_INFO, QString("Extracted S%1E%2/%3 from title (%4) \"%5\"")
+            LOG(VB_EIT, LOG_DEBUG, QString("Extracted S%1E%2/%3 from title (%4) \"%5\"")
                 .arg(event.season).arg(event.episode).arg(event.totalepisodes)
                 .arg(event.title, event.description));
 
@@ -850,7 +912,7 @@ void EITFixUp::FixUK(DBEventEIT &event) const
         }
         else
         {
-            LOG(VB_EIT, LOG_INFO, QString("Extracted S%1E%2/%3 from description (%4) \"%5\"")
+            LOG(VB_EIT, LOG_DEBUG, QString("Extracted S%1E%2/%3 from description (%4) \"%5\"")
                 .arg(event.season).arg(event.episode).arg(event.totalepisodes)
                 .arg(event.title, event.description));
 
@@ -874,7 +936,7 @@ void EITFixUp::FixUK(DBEventEIT &event) const
         event.partnumber = tmpPart.cap(1).toUInt();
         event.parttotal  = tmpPart.cap(2).toUInt();
 
-        LOG(VB_EIT, LOG_INFO, QString("Extracted Part %1/%2 from title (%3)")
+        LOG(VB_EIT, LOG_DEBUG, QString("Extracted Part %1/%2 from title (%3)")
             .arg(event.partnumber).arg(event.parttotal).arg(event.title));
 
         // Remove from the title
@@ -885,7 +947,7 @@ void EITFixUp::FixUK(DBEventEIT &event) const
         event.partnumber = tmpPart.cap(1).toUInt();
         event.parttotal  = tmpPart.cap(2).toUInt();
 
-        LOG(VB_EIT, LOG_INFO, QString("Extracted Part %1/%2 from description (%3) \"%4\"")
+        LOG(VB_EIT, LOG_DEBUG, QString("Extracted Part %1/%2 from description (%3) \"%4\"")
             .arg(event.partnumber).arg(event.parttotal)
             .arg(event.title, event.description));
 
@@ -1687,6 +1749,25 @@ void EITFixUp::FixRTL(DBEventEIT &event) const
     }
 }
 
+/** \fn EITFixUp::FixPRO7(DBEventEIT&) const
+ *  \brief Use this to standardise the PRO7/Sat1 group guide in Germany.
+ */
+void EITFixUp::FixPRO7(DBEventEIT &event) const
+{
+    QRegExp tmp = m_PRO7Subtitle;
+
+    int pos = tmp.indexIn(event.subtitle);
+    if (pos != -1)
+    {
+        if (event.airdate == 0)
+        {
+            event.airdate = tmp.cap(3).toUInt();
+        }
+        event.subtitle.replace(tmp, "");
+    }
+
+}
+
 /** \fn EITFixUp::FixFI(DBEventEIT&) const
  *  \brief Use this to clean DVB-T guide in Finland.
  */
@@ -1727,9 +1808,9 @@ void EITFixUp::FixPremiere(DBEventEIT &event) const
     QRegExp tmpInfos =  m_dePremiereInfos;
     if (tmpInfos.indexIn(event.description) != -1)
     {
-        country = tmpInfos.cap(1).trimmed();
+        country = tmpInfos.cap(2).trimmed();
         bool ok;
-        uint y = tmpInfos.cap(2).toUInt(&ok);
+        uint y = tmpInfos.cap(1).toUInt(&ok);
         if (ok)
             event.airdate = y;
         event.AddPerson(DBPerson::kDirector, tmpInfos.cap(3));
@@ -1738,7 +1819,7 @@ void EITFixUp::FixPremiere(DBEventEIT &event) const
         QStringList::const_iterator it = actors.begin();
         for (; it != actors.end(); ++it)
             event.AddPerson(DBPerson::kActor, *it);
-        event.description = event.description.replace(tmpInfos.cap(0), "");
+        event.description = event.description.replace(tmpInfos, "");
     }
 
     // move the original titel from the title to subtitle
@@ -1746,7 +1827,16 @@ void EITFixUp::FixPremiere(DBEventEIT &event) const
     if (tmpOTitle.indexIn(event.title) != -1)
     {
         event.subtitle = QString("%1, %2").arg(tmpOTitle.cap(1)).arg(country);
-        event.title = event.title.replace(tmpOTitle.cap(0), "");
+        event.title = event.title.replace(tmpOTitle, "");
+    }
+
+    // Find infos about season and episode number
+    QRegExp tmpSeasonEpisode =  m_deSkyDescriptionSeasonEpisode;
+    if (tmpSeasonEpisode.indexIn(event.description) != -1)
+    {
+        event.season = tmpSeasonEpisode.cap(1).trimmed().toUInt();
+        event.episode = tmpSeasonEpisode.cap(2).trimmed().toUInt();
+        event.description.replace(tmpSeasonEpisode, "");
     }
 }
 
@@ -2289,4 +2379,418 @@ void EITFixUp::FixDK(DBEventEIT &event) const
     event.description = event.description.trimmed();
     event.title       = event.title.trimmed();
     event.subtitle    = event.subtitle.trimmed();
+}
+
+/** \fn EITFixUp::FixStripHTML(DBEventEIT&) const
+ *  \brief Use this to clean HTML Tags from EIT Data
+ */
+void EITFixUp::FixStripHTML(DBEventEIT &event) const
+{
+    LOG(VB_EIT, LOG_INFO, QString("Applying html strip to %1").arg(event.title));
+    event.title.remove(m_HTML);
+}
+
+// Moves the subtitle field into the description since it's just used
+// as more description field. All the sort-out will happen in the description
+// field. Also, sometimes the description is just a repeat of the title. If so,
+// we remove it.
+void EITFixUp::FixGreekSubtitle(DBEventEIT &event) const
+{
+    if (event.title == event.description)
+    {
+        event.description = QString("");
+    }
+    if (!event.subtitle.isEmpty())
+    {
+        if (event.subtitle.trimmed().right(1) != ".'" )
+            event.subtitle = event.subtitle.trimmed() + ".";
+        event.description = event.subtitle.trimmed() + QString(" ") + event.description;
+        event.subtitle = QString("");
+    }
+}
+
+void EITFixUp::FixGreekEIT(DBEventEIT &event) const
+{
+    //Live show
+    int position;
+    QRegExp tmpRegEx;
+    position = event.title.indexOf("(Ζ)");
+    if (position != -1)
+    {
+        event.title = event.title.replace("(Ζ)", "");
+        event.description.prepend("Ζωντανή Μετάδοση. ");
+    }
+
+    // Greek not previously Shown
+    position = event.title.indexOf(m_grNotPreviouslyShown);
+    if (position != -1)
+    {
+        event.previouslyshown = false;
+        event.title = event.title.replace(m_grNotPreviouslyShown.cap(0), "");
+    }
+
+    // Greek Replay (Ε)
+    // it might look redundant compared to previous check but at least it helps
+    // remove the (Ε) From the title.
+    tmpRegEx = m_grReplay;
+    if (event.title.indexOf(tmpRegEx) !=  -1)
+    {
+        event.previouslyshown = true;
+        event.title = event.title.replace(tmpRegEx, "");
+    }
+
+    tmpRegEx = m_grFixnofullstopActors;
+    position = event.description.indexOf(tmpRegEx);
+    if (position != -1)
+    {
+        event.description.insert(position + 1, ".");
+    }
+
+    // If they forgot the "." at the end of the sentence before the actors/directors begin, let's insert it.
+    tmpRegEx = m_grFixnofullstopDirectors;
+    position = event.description.indexOf(tmpRegEx);
+    if (position != -1)
+    {
+        event.description.insert(position + 1, ".");
+    }
+
+    // Find actors and director in description
+    // I am looking for actors first and then for directors/presenters because
+    // sometimes punctuation is missing and the "Παίζουν:" label is mistaken
+    // for a director's/presenter's surname (directors/presenters are shown
+    // before actors in the description field.). So removing the text after
+    // adding the actors AND THEN looking for dir/pres helps to clear things up.
+    tmpRegEx = m_grActors;
+    position = event.description.indexOf(tmpRegEx);
+    if (position != -1)
+    {
+        QString tmpActorsString = tmpRegEx.cap(1);
+        const QStringList actors =
+            tmpActorsString.split(m_grPeopleSeparator, QString::SkipEmptyParts);
+        QStringList::const_iterator it = actors.begin();
+        for (; it != actors.end(); ++it)
+        {
+            tmpActorsString = it->split(":").last().trimmed().
+                    remove(QRegExp("\\.$"));
+            if (tmpActorsString != "")
+                event.AddPerson(DBPerson::kActor, tmpActorsString);
+        }
+        event.description.replace(tmpRegEx.cap(0), "");
+    }
+    // Director
+    tmpRegEx = m_grDirector;
+    position = event.description.indexOf(tmpRegEx);
+    if (position != -1)
+    {
+        QString tmpDirectorsString = tmpRegEx.cap(1);
+        const QStringList directors =
+            tmpDirectorsString.split(m_grPeopleSeparator, QString::SkipEmptyParts);
+        QStringList::const_iterator it = directors.begin();
+        for (; it != directors.end(); ++it)
+        {
+            tmpDirectorsString = it->split(":").last().trimmed().
+                    remove(QRegExp("\\.$"));
+            if (tmpDirectorsString != "")
+            {
+                event.AddPerson(DBPerson::kDirector, tmpDirectorsString);
+            }
+        }
+        event.description.replace(tmpRegEx.cap(0), "");
+    }
+
+/*
+
+    tmpRegEx = m_grDirector;
+    position = event.description.indexOf(tmpRegEx);
+    if (position != -1)
+    {
+        // director is captured in cap(1).Due to sometimes miswritten data in
+        // eit, e.g no fullstop present(!)
+        QString tmpDirectorsString = tmpRegEx.cap(1);
+        // look for actors in director string (lack of fullstop, etc)
+        tmpRegEx = m_grActors;
+        int actposition = tmpDirectorsString.indexOf(tmpRegEx);
+        if (actposition != -1)
+        {
+            tmpDirectorsString = tmpDirectorsString.replace(tmpRegEx,"");
+        }
+        const QStringList directors =
+            tmpDirectorsString.split(m_grPeopleSeparator, QString::SkipEmptyParts);
+        QStringList::const_iterator it = directors.begin();
+        for (; it != directors.end(); ++it)
+        {
+            tmpDirectorsString = it->split(":").last().trimmed().
+                    remove(QRegExp("\\.$"));
+            if (tmpDirectorsString != "")
+                event.AddPerson(DBPerson::kDirector, tmpDirectorsString);
+
+        }
+        event.description.replace(tmpRegEx.cap(0), "");
+       // directorPresent = true;
+    }
+*/
+    //Try to find presenter
+    tmpRegEx = m_grPres;
+    position = event.description.indexOf(tmpRegEx);
+    if (position != -1)
+    {
+        QString tmpPresentersString = tmpRegEx.cap(1);
+        const QStringList presenters =
+            tmpPresentersString.split(m_grPeopleSeparator, QString::SkipEmptyParts);
+        QStringList::const_iterator it = presenters.begin();
+        for (; it != presenters.end(); ++it)
+        {
+            tmpPresentersString = it->split(":").last().trimmed().
+                    remove(QRegExp("\\.$"));
+            if (tmpPresentersString != "")
+            {
+                event.AddPerson(DBPerson::kPresenter, tmpPresentersString);
+            }
+        }
+        event.description.replace(tmpRegEx.cap(0), "");
+    }
+
+    //find year e.g Παραγωγής 1966 ή ΝΤΟΚΙΜΑΝΤΕΡ - 1998 Κατάλληλο για όλους
+    // Used in Private channels (not 'secret', just not owned by Government!)
+    tmpRegEx = m_grYear;
+    position = event.description.indexOf(tmpRegEx);
+    if (position != -1)
+    {
+        bool ok;
+        uint y = tmpRegEx.cap(1).toUInt(&ok);
+        if (ok)
+            event.originalairdate = QDate(y, 1, 1);
+            event.description.replace(tmpRegEx, "");
+    }
+    // Remove white spaces
+    event.description = event.description.trimmed();
+    event.title       = event.title.trimmed();
+    event.subtitle    = event.subtitle.trimmed();
+
+    //find country of origin and remove it from description.
+    tmpRegEx = m_grCountry;
+    position = event.description.indexOf(tmpRegEx);
+    if (position != -1)
+    {
+        event.description.replace(tmpRegEx, "");
+    }
+
+    // Work out the season and episode numbers (if any)
+    // Matching pattern "Επεισ[όο]διο:?|Επ 3 από 14|3/14" etc
+    bool    series  = false;
+    int position1;
+    int position2;
+    QRegExp tmpSeries = m_grSeason;
+    // cap(2) is the season for ΑΒΓΔ
+    // cap(3) is the season for 1234
+    if ((position1 = tmpSeries.indexIn(event.title)) != -1
+            || (position2 = tmpSeries.indexIn(event.description)) != -1)
+    {
+        if (!tmpSeries.cap(2).isEmpty()) // we found a letter representing a number
+        {
+            //sometimes Nat. TV writes numbers as letters, i.e Α=1, Β=2, Γ=3, etc
+            //must convert them to numbers.
+            int tmpinteger = tmpSeries.cap(2).toUInt();
+            if (tmpinteger < 1)
+            {
+                if (tmpSeries.cap(2) == "ΣΤ") // 6, don't ask!
+                    event.season = 6;
+                else
+                {
+                    QString LettToNumber = "0ΑΒΓΔΕ6ΖΗΘΙΚΛΜΝ";
+                    tmpinteger = LettToNumber.indexOf(tmpSeries.cap(2));
+                    if (tmpinteger != -1)
+                        event.season = tmpinteger;
+                }
+            }
+        }
+        else if (!tmpSeries.cap(3).isEmpty()) //number
+        {
+            event.season = tmpSeries.cap(3).toUInt();
+        }
+        series = true;
+        if (position1 != -1)
+            event.title.replace(tmpSeries.cap(0),"");
+        if (position2 != -1)
+            event.description.replace(tmpSeries.cap(0),"");
+    }
+
+    QRegExp tmpEpisode = m_grlongEp;
+    //tmpEpisode.setMinimal(true);
+    // cap(1) is the Episode No.
+    if ((position1 = tmpEpisode.indexIn(event.title)) != -1
+            || (position2 = tmpEpisode.indexIn(event.description)) != -1)
+    {
+        if (!tmpEpisode.cap(1).isEmpty())
+        {
+            event.episode = tmpEpisode.cap(1).toUInt();
+            series = true;
+            if (position1 != -1)
+                event.title.replace(tmpEpisode.cap(0),"");
+            if (position2 != -1)
+                event.description.replace(tmpEpisode.cap(0),"");
+            // Sometimes description omits Season if it's 1. We fix this
+            if (0 == event.season)
+                event.season = 1;
+        }
+    }
+
+    // Sometimes the real (mostly English) title of a movie or series is
+    // enclosed in parentheses in the event title, subtitle or description.
+    // Since the subtitle has been moved to the description field by
+    // EITFixUp::FixGreekSubtitle, I will search for it only in the description.
+    // It will replace the translated one to get better chances of metadata
+    // retrieval. The old title will be moved in the description.
+    QRegExp tmptitle = m_grRealTitleinDescription;
+    tmptitle.setMinimal(true);
+    position = event.description.indexOf(tmptitle);
+    if (position != -1)
+    {
+        event.description = event.description.replace(tmptitle, "");
+        if (QString(tmptitle.cap(0)) != event.title.trimmed())
+        {
+            event.description = "(" + event.title.trimmed() + "). " + event.description;
+        }
+        event.title = tmptitle.cap(1);
+        // Remove the real title from the description
+    }
+    else // search in title
+    {
+        tmptitle = m_grRealTitleinTitle;
+        position = event.title.indexOf(tmptitle);
+        if (position != -1) // found in title instead
+        {
+            event.title.replace(tmptitle.cap(0),"");
+            QString tmpTranslTitle = event.title;
+            //QString tmpTranslTitle = event.title.replace(tmptitle.cap(0),"");
+            event.title = tmptitle.cap(1);
+            event.description = "(" + tmpTranslTitle.trimmed() + "). " + event.description;
+        }
+    }
+
+    // Description field: "^Episode: Lion in the cage. (Description follows)"
+    tmpRegEx = m_grEpisodeAsSubtitle;
+    position = event.description.indexOf(tmpRegEx);
+    if (position != -1)
+    {
+        event.subtitle = tmpRegEx.cap(1).trimmed();
+        event.description.replace(tmpRegEx, "");
+    }
+    QRegExp m_grMovie("\\bταιν[ιί]α\\b",Qt::CaseInsensitive);
+    bool isMovie = (event.description.indexOf(m_grMovie) !=-1) ;
+    if (isMovie)
+    {
+        event.categoryType = ProgramInfo::kCategoryMovie;
+    }
+    else if (series)
+    {
+        event.categoryType = ProgramInfo::kCategorySeries;
+    }
+    // just for luck, retrim fields.
+    event.description = event.description.trimmed();
+    event.title       = event.title.trimmed();
+    event.subtitle    = event.subtitle.trimmed();
+
+// να σβήσω τα κομμάτια που περισσεύουν από την περιγραφή πχ παραγωγής χχχχ
+}
+
+void EITFixUp::FixGreekCategories(DBEventEIT &event) const
+{
+    if (event.description.indexOf(m_grCategComedy) != -1)
+    {
+        event.category = "Κωμωδία";
+    }
+    else if (event.description.indexOf(m_grCategTeleMag) != -1)
+    {
+        event.category = "Τηλεπεριοδικό";
+    }
+    else if (event.description.indexOf(m_grCategNature) != -1)
+    {
+        event.category = "Επιστήμη/Φύση";
+    }
+    else if (event.description.indexOf(m_grCategHealth) != -1)
+    {
+        event.category = "Υγεία";
+    }
+    else if (event.description.indexOf(m_grCategReality) != -1)
+    {
+        event.category = "Ριάλιτι";
+    }
+    else if (event.description.indexOf(m_grCategDrama) != -1)
+    {
+        event.category = "Κοινωνικό";
+    }
+    else if (event.description.indexOf(m_grCategChildren) != -1)
+    {
+        event.category = "Παιδικό";
+    }
+    else if (event.description.indexOf(m_grCategSciFi) != -1)
+    {
+        event.category = "Επιστ.Φαντασίας";
+    }
+    else if ((event.description.indexOf(m_grCategFantasy) != -1)
+             && (event.description.indexOf(m_grCategMystery) != -1))
+    {
+        event.category = "Φαντασίας/Μυστηρίου";
+    }
+    else if (event.description.indexOf(m_grCategMystery) != -1)
+    {
+        event.category = "Μυστηρίου";
+    }
+    else if (event.description.indexOf(m_grCategFantasy) != -1)
+    {
+        event.category = "Φαντασίας";
+    }
+    else if (event.description.indexOf(m_grCategHistory) != -1)
+    {
+        event.category = "Ιστορικό";
+    }
+    else if (event.description.indexOf(m_grCategTeleShop) != -1
+            || event.title.indexOf(m_grCategTeleShop) != -1)
+    {
+        event.category = "Τηλεπωλήσεις";
+    }
+    else if (event.description.indexOf(m_grCategFood) != -1)
+    {
+        event.category = "Γαστρονομία";
+    }
+    else if (event.description.indexOf(m_grCategGameShow) != -1
+             || event.title.indexOf(m_grCategGameShow) != -1)
+    {
+        event.category = "Τηλεπαιχνίδι";
+    }
+    else if (event.description.indexOf(m_grCategBiography) != -1)
+    {
+        event.category = "Βιογραφία";
+    }
+    else if (event.title.indexOf(m_grCategNews) != -1)
+    {
+        event.category = "Ειδήσεις";
+    }
+    else if (event.description.indexOf(m_grCategSports) != -1)
+    {
+        event.category = "Αθλητικά";
+    }
+    else if (event.description.indexOf(m_grCategMusic) != -1
+            || event.title.indexOf(m_grCategMusic) != -1)
+    {
+        event.category = "Μουσική";
+    }
+    else if (event.description.indexOf(m_grCategDocumentary) != -1)
+    {
+        event.category = "Ντοκιμαντέρ";
+    }
+    else if (event.description.indexOf(m_grCategReligion) != -1)
+    {
+        event.category = "Θρησκεία";
+    }
+    else if (event.description.indexOf(m_grCategCulture) != -1)
+    {
+        event.category = "Τέχνες/Πολιτισμός";
+    }
+    else if (event.description.indexOf(m_grCategSpecial) != -1)
+    {
+        event.category = "Αφιέρωμα";
+    }
+
 }

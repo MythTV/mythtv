@@ -19,7 +19,7 @@ class StatusBox : public MythScreenType
 {
     Q_OBJECT
   public:
-    StatusBox(MythScreenStack *parent);
+    explicit StatusBox(MythScreenStack *parent);
    ~StatusBox(void);
 
     bool Create(void);
@@ -46,7 +46,7 @@ class StatusBox : public MythScreenType
     void doAutoExpireList(bool updateExpList = true);
 
   private:
-    MythUIButtonListItem* AddLogLine(const QString & line,
+    void AddLogLine(const QString & line,
                      const QString & help = "",
                      const QString & detail = "",
                      const QString & helpdetail = "",

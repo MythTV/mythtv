@@ -1667,6 +1667,7 @@ void HTTPRequest::ExtractMethodFromURL()
 {
     // Strip out leading http://192.168.1.1:6544/ -> /
     // Should fix #8678
+    // FIXME what about https?
     QRegExp sRegex("^http://.*/");
     sRegex.setMinimal(true);
     m_sBaseUrl.replace(sRegex, "/");

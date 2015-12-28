@@ -14,13 +14,15 @@ git://source.ffmpeg.org/ffmpeg.git at SHA1 59549b5a on June 20th, 2013 (jya) (re
 git://source.ffmpeg.org/ffmpeg.git at SHA1 c9ea1f7f on July 16th, 2013 (jya) (release/1.2 branch)
 git://source.ffmpeg.org/ffmpeg.git at SHA1 875649bf on July 27th, 2013 (jya) (release/1.2 branch)
 git://source.ffmpeg.org/ffmpeg.git at SHA1 f9c87262 on August 12th, 2013 (jya) (release/1.2 branch)
-git://source.ffmpeg.org/ffmpeg.git at SHA1 3d79041f on May 4th, 2014 (jya) (release/1.2 branch, release 1.2.6))
-git://source.ffmpeg.org/ffmpeg.git at n2.2.2-30-gacafd18 on May 30th, 2014 (jya) (release/2.2 branch, release 2.2.2))
-git://source.ffmpeg.org/ffmpeg.git at n2.2.3 on May 6th, 2014 (jya) (release/2.2 branch, release 2.2.3))
-git://source.ffmpeg.org/ffmpeg.git at n2.2.4 on July 14th, 2014 (jya) (release/2.2 branch, release 2.2.4))
+git://source.ffmpeg.org/ffmpeg.git at SHA1 3d79041f on May 4th, 2014 (jya) (release/1.2 branch, release 1.2.6)
+git://source.ffmpeg.org/ffmpeg.git at n2.2.2-30-gacafd18 on May 30th, 2014 (jya) (release/2.2 branch, release 2.2.2)
+git://source.ffmpeg.org/ffmpeg.git at n2.2.3 on May 6th, 2014 (jya) (release/2.2 branch, release 2.2.3)
+git://source.ffmpeg.org/ffmpeg.git at n2.2.4 on July 14th, 2014 (jya) (release/2.2 branch, release 2.2.4)
+git://source.ffmpeg.org/ffmpeg.git at n2.2.6 on August 9th, 2014 (jya) (release/2.2 branch, release 2.2.6)
 git://source.ffmpeg.org/ffmpeg.git at n2.2.6 on August 9th, 2014 (jya) (release/2.2 branch, release 2.2.6))
-git://source.ffmpeg.org/ffmpeg.git at n2.2.6 on August 9th, 2014 (jya) (release/2.2 branch, release 2.2.6))
-git://source.ffmpeg.org/ffmpeg.git at n2.3.1 on August 10th, 2014 (jya) (release/2.3 branch, release 2.3.1))
+git://source.ffmpeg.org/ffmpeg.git at n2.3.1 on August 10th, 2014 (jya) (release/2.3 branch, release 2.3.1)
+git://source.ffmpeg.org/ffmpeg.git at n2.8-2-gaa46ae8 on October 4th, 2015 (jya) (release/2.8 branch, release 2.8)
+git://source.ffmpeg.org/ffmpeg.git at n2.8.1-16-gfcb8ee9 on November 1st, 2015 (jya) (release/2.8 branch, release 2.8.1)
 
 List of files modified from original FFmpeg:
 Makefile
@@ -53,6 +55,7 @@ libavcodec/pgssubdec.c          // support for forced display of PGS subtitle
 libavformat/Makefile
 libavformat/allformats.c        // add MythTV mpegts demuxer
 libavformat/avformat.h          // extra field to all callbacks for stream change
+libavformat/format.c
 libavformat/mov.c               // Fix http streaming of iPhone videos (Fix from xbmc)
 libavformat/mpeg.c              // support for AAC/LATM, mpeg2vbi stream and stream change callback
 libavformat/mpeg.h              // AAC/LATM stream type definition
@@ -68,5 +71,4 @@ libavformat/wtvdec.c <- header change
 libavutil/bswap.h
 libavutil/frame.c               // CEA-708/608 AVFrame members addition
 libpostproc/Makefile
-libpostproc/postprocess.c
 library.mak                     // change so it doesn't install pkgconfig info

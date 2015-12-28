@@ -2,18 +2,19 @@
 #define MYTHPAINTER_OPENGL_H_
 
 #include <QMutex>
-#include <QGLWidget>
 
 #include <list>
 
 #include "mythpainter.h"
 #include "mythimage.h"
-#include "mythrender_opengl.h"
+
+class QWidget;
+class MythRenderOpenGL;
 
 class MUI_PUBLIC MythOpenGLPainter : public MythPainter
 {
   public:
-    MythOpenGLPainter(MythRenderOpenGL *render =  NULL, QGLWidget *parent = NULL);
+    MythOpenGLPainter(MythRenderOpenGL *render =  NULL, QWidget *parent = NULL);
    ~MythOpenGLPainter();
 
     void SetTarget(int new_target)       { target = new_target;      }
@@ -45,7 +46,7 @@ class MUI_PUBLIC MythOpenGLPainter : public MythPainter
     void       DeleteTextures(void);
     int        GetTextureFromCache(MythImage *im);
 
-    QGLWidget        *realParent;
+    QWidget          *realParent;
     MythRenderOpenGL *realRender;
     int               target;
     bool              swapControl;

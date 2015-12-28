@@ -62,6 +62,8 @@ typedef void ( * MYTH_GLDELETESHADERPROC)
     (GLuint id);
 typedef GLint ( * MYTH_GLGETUNIFORMLOCATIONPROC)
     (GLuint program, const char *name);
+typedef void  ( * MYTH_GLUNIFORM1IPROC)
+    (GLint location, GLint);
 typedef void  ( * MYTH_GLUNIFORM4FPROC)
     (GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
 typedef void  ( * MYTH_GLUNIFORMMATRIX4FVPROC)

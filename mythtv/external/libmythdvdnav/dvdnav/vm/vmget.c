@@ -339,6 +339,7 @@ video_attr_t vm_get_video_attr(vm_t *vm) {
   default:
     assert(0);
   }
+  return (video_attr_t){};
 }
 
 audio_attr_t vm_get_audio_attr(vm_t *vm, int streamN) {
@@ -353,6 +354,7 @@ audio_attr_t vm_get_audio_attr(vm_t *vm, int streamN) {
   default:
     assert(0);
   }
+  return (audio_attr_t){};
 }
 
 subp_attr_t vm_get_subp_attr(vm_t *vm, int streamN) {
@@ -367,4 +369,5 @@ subp_attr_t vm_get_subp_attr(vm_t *vm, int streamN) {
   default:
     assert(0);
   }
+  return (subp_attr_t){};
 }

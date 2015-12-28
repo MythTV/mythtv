@@ -218,7 +218,7 @@ class VideoListDeathDelay : public QObject
     Q_OBJECT
 
   public:
-    VideoListDeathDelay(VideoDialog::VideoListPtr toSave);
+    explicit VideoListDeathDelay(VideoDialog::VideoListPtr toSave);
     ~VideoListDeathDelay();
 
     VideoDialog::VideoListPtr GetSaved();

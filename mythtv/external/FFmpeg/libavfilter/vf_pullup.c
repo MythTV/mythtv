@@ -63,11 +63,14 @@ static int query_formats(AVFilterContext *ctx)
         AV_PIX_FMT_YUVJ411P, AV_PIX_FMT_GRAY8,
         AV_PIX_FMT_NONE
     };
-    ff_set_common_formats(ctx, ff_make_format_list(pix_fmts));
-    return 0;
+
+    AVFilterFormats *fmts_list = ff_make_format_list(pix_fmts);
+    if (!fmts_list)
+        return AVERROR(ENOMEM);
+    return ff_set_common_formats(ctx, fmts_list);
 }
 
-#define ABS(a) ((a) > 0 ? (a) : -(a))
+#define ABS(a) (((a) ^ ((a) >> 31)) - ((a) >> 31))
 
 static int diff_c(const uint8_t *a, const uint8_t *b, ptrdiff_t s)
 {
@@ -389,8 +392,8 @@ static void compute_affinity(PullupContext *s, PullupField *f)
         int v  = f->vars[i];
         int lv = f->prev->vars[i];
         int rv = f->next->vars[i];
-        int lc = f->combs[i] - (v + lv) + ABS(v - lv);
-        int rc = f->next->combs[i] - (v + rv) + ABS(v - rv);
+        int lc = f->      combs[i] - 2*(v < lv ? v : lv);
+        int rc = f->next->combs[i] - 2*(v < rv ? v : rv);
 
         lc = FFMAX(lc, 0);
         rc = FFMAX(rc, 0);

@@ -24,6 +24,7 @@ using namespace std;
 #include "referencecounter.h"
 #include "mythmiscutil.h"
 #include "mythconfig.h"
+#include "mythcdrom.h"
 #include "mythsystemlegacy.h"
 #include "tv.h"
 #include "proglist.h"
@@ -66,6 +67,7 @@ using namespace std;
 #include "mythtranslation.h"
 #include "commandlineparser.h"
 #include "channelgroupsettings.h"
+#include "tvremoteutil.h"
 
 #include "myththemedmenu.h"
 #include "mediarenderer.h"
@@ -91,7 +93,7 @@ using namespace std;
 #include "videolist.h"
 
 // Gallery
-#include "galleryview.h"
+#include "gallerythumbview.h"
 
 // DVD
 #include "DVD/dvdringbuffer.h"
@@ -139,7 +141,7 @@ namespace
         }
 
       private:
-        RunSettingsCompletion(bool check)
+        explicit RunSettingsCompletion(bool check)
         {
             if (check)
             {
@@ -692,11 +694,11 @@ static void jumpScreenVideoDefault() { RunVideoScreen(VideoDialog::DLG_DEFAULT, 
 static void RunGallery()
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    GalleryView *galleryView = new GalleryView(mainStack, "galleryview");
+    GalleryThumbView *galleryView = new GalleryThumbView(mainStack, "galleryview");
     if (galleryView->Create())
     {
         mainStack->AddScreen(galleryView);
-        galleryView->LoadData();
+        galleryView->Start();
     }
     else
     {
@@ -718,7 +720,7 @@ static void playDisc()
             gCoreContext->GetSetting("BluRayMountpoint", "/media/cdrom");
     QDir bdtest(bluray_mountpoint + "/BDMV");
 
-    if (bdtest.exists())
+    if (bdtest.exists() || MythCDROM::inspectImage(bluray_mountpoint) == MythCDROM::kBluray)
         isBD = true;
 
     if (isBD)
@@ -804,16 +806,47 @@ static void handleDVDMedia(MythMediaDevice *dvd)
         case 0 : // Do nothing
             break;
         case 1 : // Display menu (mythdvd)*/
-            GetMythMainWindow()->JumpTo("Main Menu");
             break;
         case 2 : // play DVD or Blu-ray
-            GetMythMainWindow()->JumpTo("Main Menu");
             playDisc();
             break;
         default:
             LOG(VB_GENERAL, LOG_ERR,
                 "mythdvd main.o: handleMedia() does not know what to do");
     }
+}
+
+static void handleGalleryMedia(MythMediaDevice *dev)
+{
+    // Only handle events for media that are newly mounted
+    if (!dev || (dev->getStatus() != MEDIASTAT_MOUNTED
+                  && dev->getStatus() != MEDIASTAT_USEABLE))
+        return;
+
+    // Check if gallery is already running
+    QVector<MythScreenType*> screens;
+    GetMythMainWindow()->GetMainStack()->GetScreenList(screens);
+
+    QVector<MythScreenType*>::const_iterator it    = screens.begin();
+    QVector<MythScreenType*>::const_iterator itend = screens.end();
+
+    for (; it != itend; ++it)
+    {
+        if (dynamic_cast<GalleryThumbView*>(*it))
+        {
+            // Running gallery will receive this event later
+            LOG(VB_MEDIA, LOG_INFO, "Main: Ignoring new gallery media - already running");
+            return;
+        }
+    }
+
+    if (gCoreContext->GetNumSetting("GalleryAutoLoad", 0))
+    {
+        LOG(VB_GUI, LOG_INFO, "Main: Autostarting Gallery for new media");
+        GetMythMainWindow()->JumpTo(JUMP_GALLERY_DEFAULT);
+    }
+    else
+        LOG(VB_MEDIA, LOG_INFO, "Main: Ignoring new gallery media - autorun not set");
 }
 
 static void TVMenuCallback(void *data, QString &selection)
@@ -1453,6 +1486,11 @@ static void InitJumpPoints(void)
      REG_JUMP("Play Disc", QT_TRANSLATE_NOOP("MythControls",
          "Play an Optical Disc"), "", playDisc);
 
+     // Gallery
+
+     REG_JUMP(JUMP_GALLERY_DEFAULT, QT_TRANSLATE_NOOP("MythControls",
+         "Image Gallery"), "", RunGallery);
+
      REG_JUMPEX(QT_TRANSLATE_NOOP("MythControls", "Toggle Show Widget Borders"),
          "", "", setDebugShowBorders, false);
      REG_JUMPEX(QT_TRANSLATE_NOOP("MythControls", "Toggle Show Widget Names"),
@@ -1460,11 +1498,6 @@ static void InitJumpPoints(void)
      REG_JUMPEX(QT_TRANSLATE_NOOP("MythControls", "Reset All Keys"),
          QT_TRANSLATE_NOOP("MythControls", "Reset all keys to defaults"),
          "", resetAllKeys, false);
-
-     // Gallery
-
-     REG_JUMP(JUMP_GALLERY_DEFAULT, QT_TRANSLATE_NOOP("MythControls",
-         "The Gallery Default View"), "", RunGallery);
 }
 
 static void ReloadJumpPoints(void)
@@ -1493,29 +1526,35 @@ static void InitKeys(void)
 
      // Gallery keybindings
      REG_KEY("Images", "PLAY", QT_TRANSLATE_NOOP("MythControls",
-         "Start Slideshow"), "P");
-     REG_KEY("Images", "PAUSE", QT_TRANSLATE_NOOP("MythControls",
-         "Pause Slideshow"), "Ctrl+P");
-     REG_KEY("Images", "STOP", QT_TRANSLATE_NOOP("MythControls",
-         "Stop Slideshow"), "Alt+P");
-     REG_KEY("Images", "SLIDESHOW", QT_TRANSLATE_NOOP("MythControls",
-         "Start Slideshow in thumbnail view"), "S");
-     REG_KEY("Images", "RANDOMSHOW", QT_TRANSLATE_NOOP("MythControls",
-         "Start Random Slideshow in thumbnail view"), "R");
+         "Start/Stop Slideshow"), "P");
+     REG_KEY("Images", "RECURSIVESHOW", QT_TRANSLATE_NOOP("MythControls",
+         "Start Recursive Slideshow"), "R");
      REG_KEY("Images", "ROTRIGHT", QT_TRANSLATE_NOOP("MythControls",
          "Rotate image right 90 degrees"), "],3");
      REG_KEY("Images", "ROTLEFT", QT_TRANSLATE_NOOP("MythControls",
          "Rotate image left 90 degrees"), "[,1");
-     REG_KEY("Images", "ZOOMOUT", QT_TRANSLATE_NOOP("MythControls",
-         "Zoom image out"), "7");
-     REG_KEY("Images", "ZOOMIN", QT_TRANSLATE_NOOP("MythControls",
-         "Zoom image in"), "9");
      REG_KEY("Images", "FLIPHORIZONTAL", QT_TRANSLATE_NOOP("MythControls",
          "Flip image horizontally"), "");
      REG_KEY("Images", "FLIPVERTICAL", QT_TRANSLATE_NOOP("MythControls",
          "Flip image vertically"), "");
+     REG_KEY("Images", "ZOOMOUT", QT_TRANSLATE_NOOP("MythControls",
+         "Zoom image out"), "7");
+     REG_KEY("Images", "ZOOMIN", QT_TRANSLATE_NOOP("MythControls",
+         "Zoom image in"), "9");
+     REG_KEY("Images", "FULLSIZE", QT_TRANSLATE_NOOP("MythControls",
+         "Full-size (un-zoom) image"), "0");
      REG_KEY("Images", "MARK", QT_TRANSLATE_NOOP("MythControls",
          "Mark image"), "T");
+     REG_KEY("Images", "SCROLLUP", QT_TRANSLATE_NOOP("MythControls",
+         "Scroll image up"), "2");
+     REG_KEY("Images", "SCROLLLEFT", QT_TRANSLATE_NOOP("MythControls",
+         "Scroll image left"), "4");
+     REG_KEY("Images", "SCROLLRIGHT", QT_TRANSLATE_NOOP("MythControls",
+         "Scroll image right"), "6");
+     REG_KEY("Images", "SCROLLDOWN", QT_TRANSLATE_NOOP("MythControls",
+         "Scroll image down"), "8");
+     REG_KEY("Images", "RECENTER", QT_TRANSLATE_NOOP("MythControls",
+         "Recenter image"), "5");
 }
 
 static void ReloadKeys(void)
@@ -1572,9 +1611,21 @@ static int internal_media_init()
 {
     REG_MEDIAPLAYER("Internal", QT_TRANSLATE_NOOP("MythControls",
         "MythTV's native media player."), internal_play_media);
+    REG_MEDIA_HANDLER(
+        QT_TRANSLATE_NOOP("MythControls", "MythDVD DVD Media Handler"),
+        QT_TRANSLATE_NOOP("MythControls", "MythDVD media"),
+        "", handleDVDMedia, MEDIATYPE_DVD, QString::null);
     REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
-        "MythDVD DVD Media Handler"), "", "", handleDVDMedia,
-        MEDIATYPE_DVD, QString::null);
+        "MythImage Media Handler 1/2"), "", "", handleGalleryMedia,
+        MEDIATYPE_DATA | MEDIATYPE_MIXED, QString::null);
+
+    QStringList extensions;
+    foreach (const QByteArray &ext, QImageReader::supportedImageFormats())
+        extensions << QString(ext);
+
+    REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
+        "MythImage Media Handler 2/2"), "", "", handleGalleryMedia,
+        MEDIATYPE_MGALLERY, extensions.join(","));
     return 0;
 }
 
@@ -1690,6 +1741,18 @@ int main(int argc, char **argv)
     bool bPromptForBackend    = false;
     bool bBypassAutoDiscovery = false;
 
+#ifdef Q_OS_ANDROID
+    // extra for 0 termination
+    char *newargv[argc+4+1];
+    memset(newargv, 0, sizeof(newargv));
+    memcpy(newargv, argv, sizeof(char*) * argc);
+    //newargv[argc++] = "-v";
+    //newargv[argc++] = "general,gui,playback";
+    //newargv[argc++] = "--loglevel";
+    //newargv[argc++] = "debug";
+    argv = &newargv[0];
+#endif
+
     MythFrontendCommandLineParser cmdline;
     if (!cmdline.Parse(argc, argv))
     {
@@ -1720,6 +1783,9 @@ int main(int argc, char **argv)
     // This makes Xlib calls thread-safe which seems to be required for hardware
     // accelerated Flash playback to work without causing mythfrontend to abort.
     QApplication::setAttribute(Qt::AA_X11InitThreads);
+#endif
+#ifdef Q_OS_ANDROID
+    //QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
 #endif
 #if QT_VERSION >= 0x050300
     QApplication::setSetuidAllowed(true);
@@ -1827,6 +1893,17 @@ int main(int argc, char **argv)
         return GENERIC_EXIT_OK;
     }
 
+#if QT_VERSION >= QT_VERSION_CHECK(5,3,0)
+    qApp->setSetuidAllowed(true);
+#endif
+
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+    // If Qt graphics platform is egl (Raspberry Pi) then setuid hangs
+    LOG(VB_GENERAL, LOG_NOTICE, "QT_QPA_PLATFORM=" + qApp->platformName());
+    if (qApp->platformName().contains("egl"))
+      ;
+    else
+#endif
     if (setuid(getuid()) != 0)
     {
         LOG(VB_GENERAL, LOG_ERR, "Failed to setuid(), exiting.");

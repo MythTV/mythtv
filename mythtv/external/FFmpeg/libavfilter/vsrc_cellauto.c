@@ -26,6 +26,7 @@
 /* #define DEBUG */
 
 #include "libavutil/file.h"
+#include "libavutil/internal.h"
 #include "libavutil/lfg.h"
 #include "libavutil/opt.h"
 #include "libavutil/parseutils.h"
@@ -249,7 +250,7 @@ static void evolve(AVFilterContext *ctx)
             v|= i+1 < cellauto->w ? prev_row[i+1]    : 0;
         }
         row[i] = !!(cellauto->rule & (1<<v));
-        av_dlog(ctx, "i:%d context:%c%c%c -> cell:%d\n", i,
+        ff_dlog(ctx, "i:%d context:%c%c%c -> cell:%d\n", i,
                 v&4?'@':' ', v&2?'@':' ', v&1?'@':' ', row[i]);
     }
 
@@ -310,8 +311,10 @@ static int request_frame(AVFilterLink *outlink)
 static int query_formats(AVFilterContext *ctx)
 {
     static const enum AVPixelFormat pix_fmts[] = { AV_PIX_FMT_MONOBLACK, AV_PIX_FMT_NONE };
-    ff_set_common_formats(ctx, ff_make_format_list(pix_fmts));
-    return 0;
+    AVFilterFormats *fmts_list = ff_make_format_list(pix_fmts);
+    if (!fmts_list)
+        return AVERROR(ENOMEM);
+    return ff_set_common_formats(ctx, fmts_list);
 }
 
 static const AVFilterPad cellauto_outputs[] = {

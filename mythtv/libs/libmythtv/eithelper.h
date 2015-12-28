@@ -17,32 +17,57 @@
 
 class MSqlQuery;
 
+// An entry from the EIT table containing event details.
 class ATSCEvent
 {
   public:
-    /// This empty constructor is needed for the QMap<> to work, it is
-    /// not intended to be used to initialize an ATSC Event.
-    /// Since we immediately initialize the value inserted into the
-    /// QMap this is safe in that use.
-    ATSCEvent() : start_time(0), length(0), etm(0), desc_length(0), desc(NULL) {}
-    /// This is the only valid constructor for ATSCEvent.
     ATSCEvent(uint a, uint b, uint c, QString d,
               const unsigned char *e, uint f)
-        : start_time(a), length(b), etm(c), desc_length(f), title(d), desc(e)
-    {
+        : start_time(a), length(b), etm(c), desc_length(f), title(d), desc(e),
+          scan_time(time(NULL)) {}
+
+    bool IsStale() const {
+      // The minimum recommended repetition time for EIT events according to
+      // http://atsc.org/wp-content/uploads/2015/03/Program-and-system-information-protocol-implementation-guidelines-for-broadcaster.pdf
+      // is one minute. Consider any EIT event seen > 2 minutes in the past as stale.
+      return scan_time + 2 * 60 < time(NULL);
     }
 
-  public:
     uint32_t start_time;
     uint32_t length;
     uint32_t etm;
     uint32_t desc_length;
     QString  title;
     const unsigned char *desc;
+
+  private:
+    // The time the event was created.
+    time_t scan_time;
 };
 
+// An entry from the ETT table containing description text for an event.
+class ATSCEtt
+{
+  public:
+    explicit ATSCEtt(QString text) : ett_text(text), scan_time(time(NULL)) {}
+
+    bool IsStale() const {
+      // The minimum recommended repetition time for ETT events according to
+      // http://atsc.org/wp-content/uploads/2015/03/Program-and-system-information-protocol-implementation-guidelines-for-broadcaster.pdf
+      // is one minute. Consider any ETT event seen > 2 minutes in the past as stale.
+      return scan_time + 2 * 60 < time(NULL);
+    }
+
+    QString ett_text;
+
+  private:
+    // The time the ETT was created.
+    time_t scan_time;
+};
+
+
 typedef QMap<uint,ATSCEvent>               EventIDToATSCEvent;
-typedef QMap<uint,QString>                 EventIDToETT;
+typedef QMap<uint,ATSCEtt>                 EventIDToETT;
 typedef QMap<uint,EventIDToATSCEvent>      ATSCSRCToEvents;
 typedef QMap<uint,EventIDToETT>            ATSCSRCToETTs;
 typedef QMap<unsigned long long,uint>      ServiceToChanID;

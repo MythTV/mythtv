@@ -51,11 +51,14 @@ MonitorThread::MonitorThread(MediaMonitor* pMon, unsigned long interval) :
 void MonitorThread::run(void)
 {
     RunProlog();
+    QMutex mtx;
+    mtx.lock();
     while (m_Monitor && m_Monitor->IsActive())
     {
         m_Monitor->CheckDevices();
-        msleep(m_Interval);
+        m_Monitor->m_wait.wait(&mtx, m_Interval);
     }
+    mtx.unlock();
     RunEpilog();
 }
 
@@ -240,6 +243,15 @@ void MediaMonitor::ChooseAndEjectMedia(void)
     AttemptEject(selected);
 }
 
+
+void MediaMonitor::EjectMedia(const QString &path)
+{
+    MythMediaDevice *device = GetMedia(path);
+    if (device)
+        AttemptEject(device);
+}
+
+
 void MediaMonitor::AttemptEject(MythMediaDevice *device)
 {
     QString  dev = DevName(device);
@@ -302,7 +314,8 @@ void MediaMonitor::AttemptEject(MythMediaDevice *device)
  */
 MediaMonitor::MediaMonitor(QObject* par, unsigned long interval,
                            bool allowEject)
-    : QObject(par), m_Active(false), m_Thread(NULL),
+    : QObject(par), m_DevicesLock(QMutex::Recursive),
+      m_Active(false), m_Thread(NULL),
       m_MonitorPollingInterval(interval), m_AllowEject(allowEject)
 {
     // User can specify that some devices are not monitored
@@ -366,6 +379,9 @@ bool MediaMonitor::RemoveDevice(const QString &dev)
     {
         if ((*it)->getDevicePath() == dev)
         {
+            // Ensure device gets an unmount
+            (*it)->checkMedia();
+
             if (m_UseCount[*it] == 0)
             {
                 m_UseCount.remove(*it);
@@ -394,6 +410,8 @@ void MediaMonitor::CheckDevices(void)
 {
     /* check if new devices have been plugged in */
     CheckDeviceNotifications();
+
+    QMutexLocker locker(&m_DevicesLock);
 
     QList<MythMediaDevice*>::iterator itr = m_Devices.begin();
     MythMediaDevice* pDev;
@@ -436,7 +454,9 @@ void MediaMonitor::StopMonitoring(void)
 
     LOG(VB_MEDIA, LOG_NOTICE, "Stopping MediaMonitor");
     m_Active = false;
+    m_wait.wakeAll();
     m_Thread->wait();
+    LOG(VB_MEDIA, LOG_NOTICE, "Stopped MediaMonitor");
 }
 
 /** \fn MediaMonitor::ValidateAndLock(MythMediaDevice *pMedia)
@@ -447,7 +467,7 @@ void MediaMonitor::StopMonitoring(void)
  *
  *   NOTE: This function can block.
  *
- *  \sa Unlock(MythMediaDevice *pMedia), GetMedias(MythMediaType mediatype)
+ *  \sa Unlock(MythMediaDevice *pMedia), GetMedias(unsigned mediatypes)
  */
 bool MediaMonitor::ValidateAndLock(MythMediaDevice *pMedia)
 {
@@ -464,7 +484,7 @@ bool MediaMonitor::ValidateAndLock(MythMediaDevice *pMedia)
 /** \fn MediaMonitor::Unlock(MythMediaDevice *pMedia)
  *  \brief decrements the MythMediaDevices reference count
  *
- *  \sa ValidateAndLock(MythMediaDevice *pMedia), GetMedias(MythMediaType mediatype)
+ *  \sa ValidateAndLock(MythMediaDevice *pMedia), GetMedias(unsigned mediatypes)
  */
 void MediaMonitor::Unlock(MythMediaDevice *pMedia)
 {
@@ -543,7 +563,7 @@ QString MediaMonitor::GetMountPath(const QString& devPath)
     return mountPath;
 }
 
-/** \fn MediaMonitor::GetMedias(MythMediaType mediatype)
+/** \fn MediaMonitor::GetMedias(unsigned mediatypes)
  *  \brief Ask for available media. Must be locked with ValidateAndLock().
  *
  *   This method returns a list of MythMediaDevice pointers which match
@@ -561,7 +581,7 @@ QString MediaMonitor::GetMountPath(const QString& devPath)
  *  \sa ValidateAndLock(MythMediaDevice *pMedia)
  *  \sa Unlock(MythMediaDevice *pMedia)
  */
-QList<MythMediaDevice*> MediaMonitor::GetMedias(MythMediaType mediatype)
+QList<MythMediaDevice*> MediaMonitor::GetMedias(unsigned mediatypes)
 {
     QMutexLocker locker(&m_DevicesLock);
 
@@ -570,7 +590,7 @@ QList<MythMediaDevice*> MediaMonitor::GetMedias(MythMediaType mediatype)
     QList<MythMediaDevice*>::iterator it = m_Devices.begin();
     for (;it != m_Devices.end(); ++it)
     {
-        if (((*it)->getMediaType() & mediatype) &&
+        if (((*it)->getMediaType() & mediatypes) &&
             (((*it)->getStatus() == MEDIASTAT_USEABLE) ||
              ((*it)->getStatus() == MEDIASTAT_MOUNTED) ||
              ((*it)->getStatus() == MEDIASTAT_NOTMOUNTED)))
@@ -580,24 +600,6 @@ QList<MythMediaDevice*> MediaMonitor::GetMedias(MythMediaType mediatype)
     }
 
     return medias;
-}
-
-/** \fn MediaMonitor::MonitorRegisterExtensions(uint,const QString&)
- *  \brief Register the extension list on all known devices
- */
-void MediaMonitor::MonitorRegisterExtensions(uint mediatype,
-                                             const QString &extensions)
-{
-    LOG(VB_GENERAL, LOG_DEBUG,
-             QString("MonitorRegisterExtensions(0x%1, %2)")
-                 .arg(mediatype, 0, 16).arg(extensions));
-
-    QList<MythMediaDevice*>::iterator it = m_Devices.begin();
-    for (; it != m_Devices.end(); ++it)
-    {
-        if (*it)
-            (*it)->RegisterMediaExtensions(mediatype, extensions);
-    }
 }
 
 void MediaMonitor::RegisterMediaHandler(const QString  &destination,
@@ -614,7 +616,7 @@ void MediaMonitor::RegisterMediaHandler(const QString  &destination,
         QString msg = MythMediaDevice::MediaTypeString((MythMediaType)mediaType);
 
         if (extensions.length())
-            msg += QString(", ext(%1)").arg(extensions);
+            msg += QString(", ext(0x%1)").arg(extensions, 0, 16);
 
         LOG(VB_MEDIA, LOG_INFO,
                  "Registering '" + destination + "' as a media handler for " +
@@ -623,7 +625,7 @@ void MediaMonitor::RegisterMediaHandler(const QString  &destination,
         m_handlerMap[destination] = mhd;
 
         if (extensions.length())
-            MonitorRegisterExtensions(mediaType, extensions);
+            MythMediaDevice::RegisterMediaExtensions(mediaType, extensions);
     }
     else
     {
@@ -662,10 +664,33 @@ void MediaMonitor::JumpToMediaHandler(MythMediaDevice* pMedia)
         return;
     }
 
-
-    // TODO - Generate a dialog, add buttons for each description,
-    // if user didn't cancel, selected = handlers.at(choice);
     int selected = 0;
+    if (handlers.size() > 1)
+    {
+        QStringList buttonmsgs;
+        for (QList<MHData>::const_iterator it = handlers.begin(); it != handlers.end(); ++it)
+            buttonmsgs << ((!it->description.isEmpty()) ? it->description : it->destination);
+        buttonmsgs << tr("Cancel");
+
+        const DialogCode cancelbtn = DialogCode(
+            int(kDialogCodeButton0) + buttonmsgs.size() - 1);
+
+        DialogCode ret = MythPopupBox::ShowButtonPopup(GetMythMainWindow(),
+                                tr("Media Handler Selection"),
+                                tr("The new media contains mixed content "
+                                   "that can be rendered in different ways. "
+                                   "Select your preferred method."),
+                                buttonmsgs, cancelbtn);
+        if (kDialogCodeRejected == ret || cancelbtn == ret)
+        {
+            LOG(VB_MEDIA, LOG_INFO, "User cancelled media handler selection");
+            return;
+        }
+
+        selected = MythDialog::CalcItemIndex(ret);
+        LOG(VB_MEDIA, LOG_NOTICE, QString("User selected '%1'")
+            .arg(handlers.at(selected).destination) );
+    }
 
     handlers.at(selected).callback(pMedia);
 }
@@ -690,7 +715,9 @@ void MediaMonitor::mediaStatusChanged(MythMediaStatus oldStatus,
     // This gets called from outside the main thread so we need
     // to post an event back to the main thread.
     // We now send events for all non-error statuses, so plugins get ejects
-    if (stat != MEDIASTAT_ERROR && stat != MEDIASTAT_UNKNOWN)
+    if (stat != MEDIASTAT_ERROR && stat != MEDIASTAT_UNKNOWN &&
+        // Don't send an event for a new device that's not mounted
+        !(oldStatus == MEDIASTAT_UNPLUGGED && stat == MEDIASTAT_NOTMOUNTED))
     {
         // Should we ValidateAndLock() first?
         QEvent *e = new MythMediaEvent(stat, pMedia);

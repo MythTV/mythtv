@@ -31,7 +31,9 @@
 #include "thread.h"
 #include "version.h"
 #include "video.h"
+#include "libavcodec/avcodec.h"
 
+#if FF_API_AVFILTERBUFFER
 #define POOL_SIZE 32
 typedef struct AVFilterPool {
     AVFilterBufferRef *pic[POOL_SIZE];
@@ -39,6 +41,7 @@ typedef struct AVFilterPool {
     int refcount;
     int draining;
 } AVFilterPool;
+#endif
 
 typedef struct AVFilterCommand {
     double time;                ///< time expressed in seconds
@@ -304,8 +307,27 @@ int ff_poll_frame(AVFilterLink *link);
 /**
  * Request an input frame from the filter at the other end of the link.
  *
+ * The input filter may pass the request on to its inputs, fulfill the
+ * request from an internal buffer or any other means specific to its function.
+ *
+ * When the end of a stream is reached AVERROR_EOF is returned and no further
+ * frames are returned after that.
+ *
+ * When a filter is unable to output a frame for example due to its sources
+ * being unable to do so or because it depends on external means pushing data
+ * into it then AVERROR(EAGAIN) is returned.
+ * It is important that a AVERROR(EAGAIN) return is returned all the way to the
+ * caller (generally eventually a user application) as this step may (but does
+ * not have to be) necessary to provide the input with the next frame.
+ *
+ * If a request is successful then the filter_frame() function will be called
+ * at least once before ff_request_frame() returns
+ *
  * @param link the input link
  * @return     zero on success
+ *             AVERROR_EOF on end of file
+ *             AVERROR(EAGAIN) if the previous filter cannot output a frame
+ *             currently and can neither guarantee that EOF has been reached.
  */
 int ff_request_frame(AVFilterLink *link);
 
@@ -318,9 +340,6 @@ int ff_request_frame(AVFilterLink *link);
         .category   = AV_CLASS_CATEGORY_FILTER, \
     }
 
-AVFilterBufferRef *ff_copy_buffer_ref(AVFilterLink *outlink,
-                                      AVFilterBufferRef *ref);
-
 /**
  * Find the index of a link.
  *
@@ -329,9 +348,6 @@ AVFilterBufferRef *ff_copy_buffer_ref(AVFilterLink *outlink,
 #define FF_INLINK_IDX(link)  ((int)((link)->dstpad - (link)->dst->input_pads))
 #define FF_OUTLINK_IDX(link) ((int)((link)->srcpad - (link)->src->output_pads))
 
-int ff_buffersink_read_compat(AVFilterContext *ctx, AVFilterBufferRef **buf);
-int ff_buffersink_read_samples_compat(AVFilterContext *ctx, AVFilterBufferRef **pbuf,
-                                      int nb_samples);
 /**
  * Send a frame of data to the next filter.
  *
@@ -373,5 +389,21 @@ AVFilterContext *ff_filter_alloc(const AVFilter *filter, const char *inst_name);
  * Remove a filter from a graph;
  */
 void ff_filter_graph_remove_filter(AVFilterGraph *graph, AVFilterContext *filter);
+
+/**
+ * Normalize the qscale factor
+ * FIXME the H264 qscale is a log based scale, mpeg1/2 is not, the code below
+ *       cannot be optimal
+ */
+static inline int ff_norm_qscale(int qscale, int type)
+{
+    switch (type) {
+    case FF_QSCALE_TYPE_MPEG1: return qscale;
+    case FF_QSCALE_TYPE_MPEG2: return qscale >> 1;
+    case FF_QSCALE_TYPE_H264:  return qscale >> 2;
+    case FF_QSCALE_TYPE_VP56:  return (63 - qscale + 2) >> 2;
+    }
+    return qscale;
+}
 
 #endif /* AVFILTER_INTERNAL_H */

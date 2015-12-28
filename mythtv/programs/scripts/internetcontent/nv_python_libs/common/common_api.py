@@ -215,6 +215,7 @@ class Common(object):
         self.language = u'en'
         self.mythdb = None
         self.linksWebPage = None
+        self.etree = etree
     # end __init__()
 
     def massageText(self, text):
@@ -287,10 +288,14 @@ class Common(object):
 
 
     def ampReplace(self, text):
-        '''Replace all "&" characters with "&amp;"
+        '''Replace all &, ', ", <, and > characters with the predefined XML
+           entities
         '''
         text = self.textUtf8(text)
-        return text.replace(u'&amp;',u'~~~~~').replace(u'&',u'&amp;').replace(u'~~~~~', u'&amp;')
+        text = text.replace(u'&amp;',u'~~~~~').replace(u'&',u'&amp;').replace(u'~~~~~', u'&amp;')
+        text = text.replace(u"'", u"&apos;").replace(u'"', u'&quot;')
+        text = text.replace(u'<', u'&lt;').replace(u'>', u'&gt;')
+        return text
     # end ampReplace()
 
     def callCommandLine(self, command, stderr=False):

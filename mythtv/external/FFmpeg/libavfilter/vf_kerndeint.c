@@ -63,12 +63,12 @@ static av_cold void uninit(AVFilterContext *ctx)
 {
     KerndeintContext *kerndeint = ctx->priv;
 
-    av_free(kerndeint->tmp_data[0]);
+    av_freep(&kerndeint->tmp_data[0]);
 }
 
 static int query_formats(AVFilterContext *ctx)
 {
-    static const enum PixelFormat pix_fmts[] = {
+    static const enum AVPixelFormat pix_fmts[] = {
         AV_PIX_FMT_YUV420P,
         AV_PIX_FMT_YUYV422,
         AV_PIX_FMT_ARGB, AV_PIX_FMT_0RGB,
@@ -78,9 +78,10 @@ static int query_formats(AVFilterContext *ctx)
         AV_PIX_FMT_NONE
     };
 
-    ff_set_common_formats(ctx, ff_make_format_list(pix_fmts));
-
-    return 0;
+    AVFilterFormats *fmts_list = ff_make_format_list(pix_fmts);
+    if (!fmts_list)
+        return AVERROR(ENOMEM);
+    return ff_set_common_formats(ctx, fmts_list);
 }
 
 static int config_props(AVFilterLink *inlink)
@@ -154,10 +155,10 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *inpic)
         h = plane == 0 ? inlink->h : FF_CEIL_RSHIFT(inlink->h, kerndeint->vsub);
         bwidth = kerndeint->tmp_bwidth[plane];
 
-        srcp = srcp_saved = inpic->data[plane];
+        srcp_saved        = inpic->data[plane];
         src_linesize      = inpic->linesize[plane];
         psrc_linesize     = kerndeint->tmp_linesize[plane];
-        dstp = dstp_saved = outpic->data[plane];
+        dstp_saved        = outpic->data[plane];
         dst_linesize      = outpic->linesize[plane];
         srcp              = srcp_saved + (1 - order) * src_linesize;
         dstp              = dstp_saved + (1 - order) * dst_linesize;

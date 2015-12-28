@@ -22,7 +22,7 @@
 #include "tv.h" // for VBIMode
 
 #define TVREC_CARDNUM \
-        ((tvrec != NULL) ? QString::number(tvrec->GetCaptureCardNum()) : "NULL")
+        ((tvrec != NULL) ? QString::number(tvrec->GetInputId()) : "NULL")
 
 #define LOC QString("V4LRec[%1](%2): ") \
             .arg(TVREC_CARDNUM).arg(videodevice)

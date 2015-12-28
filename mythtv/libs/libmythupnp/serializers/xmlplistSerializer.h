@@ -34,7 +34,7 @@ class UPNP_PUBLIC XmlPListSerializer : public XmlSerializer
                                                    bool    needKey );
 
     public:
-                 XmlPListSerializer( QIODevice *pDevice );
+        explicit XmlPListSerializer( QIODevice *pDevice );
         virtual ~XmlPListSerializer();
 
         virtual QString GetContentType();

@@ -446,15 +446,13 @@ int SSDPCache::RemoveStale()
             pEntries->IncrRef();
 
             nCount += pEntries->RemoveStale( ttNow );
-     
+
             if (pEntries->Count() == 0)
                 lstKeys.append( it.key() );
 
             pEntries->DecrRef();
         }
     }
-
-    Unlock();
 
     nCount = lstKeys.count();
 
@@ -477,6 +475,8 @@ int SSDPCache::RemoveStale()
             m_cache.erase(it);
         }
     }
+
+    Unlock();
 
     return nCount;
 }

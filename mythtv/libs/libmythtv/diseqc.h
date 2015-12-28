@@ -78,7 +78,9 @@ class DiSEqCDevTree
     DiSEqCDevTree();
     ~DiSEqCDevTree();
 
+    bool Load(const QString &device);
     bool Load(uint cardid);
+    bool Store(const QString &device);
     bool Store(uint cardid);
     bool Execute(const DiSEqCDevSettings &settings,
                  const DTVMultiplex &tuning);

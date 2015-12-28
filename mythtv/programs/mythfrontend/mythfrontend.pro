@@ -52,10 +52,10 @@ HEADERS += videofilter.h                videolist.h
 HEADERS += videoplayersettings.h        videodlg.h
 HEADERS += videoglobalsettings.h        upnpscanner.h
 HEADERS += commandlineparser.h          idlescreen.h
-HEADERS += galleryview.h                galleryviewhelper.h
-HEADERS += galleryconfig.h              galleryfilehelper.h
-HEADERS += gallerydatabasehelper.h      gallerywidget.h
-HEADERS += gallerytypedefs.h
+HEADERS += gallerythumbview.h           galleryslideview.h
+HEADERS += galleryconfig.h              galleryviews.h
+HEADERS += galleryslide.h               gallerytransitions.h
+HEADERS += galleryinfo.h
 
 SOURCES += main.cpp playbackbox.cpp viewscheduled.cpp audiogeneralsettings.cpp
 SOURCES += globalsettings.cpp manualschedule.cpp programrecpriority.cpp
@@ -77,9 +77,10 @@ SOURCES += videofilter.cpp              videolist.cpp
 SOURCES += videoplayersettings.cpp      videodlg.cpp
 SOURCES += videoglobalsettings.cpp      upnpscanner.cpp
 SOURCES += commandlineparser.cpp        idlescreen.cpp
-SOURCES += galleryview.cpp              gallerywidget.cpp
-SOURCES += galleryviewhelper.cpp        galleryconfig.cpp
-SOURCES += gallerydatabasehelper.cpp    galleryfilehelper.cpp
+SOURCES += gallerythumbview.cpp         galleryslideview.cpp
+SOURCES += galleryconfig.cpp            galleryviews.cpp
+SOURCES += galleryslide.cpp             gallerytransitions.cpp
+SOURCES += galleryinfo.cpp
 
 HEADERS += serviceHosts/frontendServiceHost.h
 HEADERS += services/frontend.h
@@ -122,8 +123,35 @@ using_pulseoutput: DEFINES += USING_PULSEOUTPUT
 using_alsa:DEFINES += USING_ALSA
 using_jack:DEFINES += USING_JACK
 using_oss: DEFINES += USING_OSS
+using_openmax: DEFINES += USING_OPENMAX
 macx:      DEFINES += USING_COREAUDIO
 using_libdns_sd {
     DEFINES += USING_LIBDNS_SD
     using_libcrypto: DEFINES += USING_AIRPLAY
+}
+
+android {
+    QT += androidextras
+
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIBCOMMON)libtag.so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIBCOMMON)libexiv2.13.so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIBCOMMON)libfreetype.so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIBCOMMON)mariadb/libmariadb.so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIBCOMMON)libmythavutil.so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIBCOMMON)libmythpostproc.so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIBCOMMON)libmythswresample.so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIBCOMMON)libmythswscale.so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIBCOMMON)libmythavcodec.so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIBCOMMON)libmythavformat.so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIB)libmythqjson.so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIB)libmythbase-0.28.so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIB)libmythui-0.28.so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIB)libmythservicecontracts-0.28.so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIB)libmythupnp-0.28.so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIB)libmyth-0.28.so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIB)libmythtv-0.28.so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIB)libmythmetadata-0.28.so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIB)libmythprotoserver-0.28.so
+
+    ANDROID_PACKAGE_SOURCE_DIR += $$(MYTHPACKAGEBASE)/android-package-source
 }

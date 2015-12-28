@@ -62,6 +62,8 @@ static char *parse_link_name(const char **buf, void *log_ctx)
     (*buf)++;
 
     name = av_get_token(buf, "]");
+    if (!name)
+        goto fail;
 
     if (!name[0]) {
         av_log(log_ctx, AV_LOG_ERROR,
@@ -116,13 +118,16 @@ static int create_filter(AVFilterContext **filt_ctx, AVFilterGraph *ctx, int ind
         return AVERROR(ENOMEM);
     }
 
-    if (!strcmp(filt_name, "scale") && args && !strstr(args, "flags") &&
+    if (!strcmp(filt_name, "scale") && (!args || !strstr(args, "flags")) &&
         ctx->scale_sws_opts) {
-        tmp_args = av_asprintf("%s:%s",
-                 args, ctx->scale_sws_opts);
-        if (!tmp_args)
-            return AVERROR(ENOMEM);
-        args = tmp_args;
+        if (args) {
+            tmp_args = av_asprintf("%s:%s",
+                    args, ctx->scale_sws_opts);
+            if (!tmp_args)
+                return AVERROR(ENOMEM);
+            args = tmp_args;
+        } else
+            args = ctx->scale_sws_opts;
     }
 
     ret = avfilter_init_str(*filt_ctx, args);
@@ -241,8 +246,8 @@ static int link_filter_inouts(AVFilterContext *filt_ctx,
 
         if (p->filter_ctx) {
             ret = link_filter(p->filter_ctx, p->pad_idx, filt_ctx, pad, log_ctx);
-            av_free(p->name);
-            av_free(p);
+            av_freep(&p->name);
+            av_freep(&p);
             if (ret < 0)
                 return ret;
         } else {
@@ -344,10 +349,10 @@ static int parse_outputs(const char **buf, AVFilterInOut **curr_inputs,
                 av_free(name);
                 return ret;
             }
-            av_free(match->name);
-            av_free(name);
-            av_free(match);
-            av_free(input);
+            av_freep(&match->name);
+            av_freep(&name);
+            av_freep(&match);
+            av_freep(&input);
         } else {
             /* Not in the list, so add the first input as a open_output */
             input->name = name;

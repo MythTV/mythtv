@@ -28,6 +28,7 @@
 /ffserver
 /config.*
 /coverage.info
+/avversion.h
 /doc/*.1
 /doc/*.3
 /doc/*.html
@@ -36,9 +37,11 @@
 /doc/avoptions_codec.texi
 /doc/avoptions_format.texi
 /doc/doxy/html/
+/doc/examples/avio_dir_cmd
 /doc/examples/avio_reading
 /doc/examples/decoding_encoding
 /doc/examples/demuxing_decoding
+/doc/examples/extract_mvs
 /doc/examples/filter_audio
 /doc/examples/filtering_audio
 /doc/examples/filtering_video
@@ -60,8 +63,11 @@
 /libavutil/ffversion.h
 /tests/audiogen
 /tests/base64
+/tests/checkasm/checkasm
 /tests/data/
+/tests/pixfmts.mak
 /tests/rotozoom
+/tests/test_copy.ffmeta
 /tests/tiny_psnr
 /tests/tiny_ssim
 /tests/videogen
@@ -80,6 +86,7 @@
 /tools/pktdumper
 /tools/probetest
 /tools/qt-faststart
+/tools/sidxindex
 /tools/trasher
 /tools/seek_print
 /tools/uncoded_frame

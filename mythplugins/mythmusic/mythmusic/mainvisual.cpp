@@ -147,10 +147,19 @@ void MainVisual::prepare()
 // This is called via : mythtv/libs/libmyth/output.cpp :: OutputListeners::dispatchVisual
 //    from : mythtv/libs/libmyth/audio/audiooutputbase.cpp :: AudioOutputBase::AddData
 // Caller holds mutex() lock
-void MainVisual::add(uchar *buffer, unsigned long b_len, unsigned long timecode, int source_channels, int bits_per_sample)
+void MainVisual::add(const void *buffer, unsigned long b_len, unsigned long timecode, int source_channels, int bits_per_sample)
 {
     unsigned long len = b_len, cnt;
     short *l = 0, *r = 0;
+    bool s32le = false;
+
+    // 24 bit samples are stored as s32le in the buffer.
+    // 32 bit samples are stored as float. Flag the difference.
+    if (bits_per_sample == 24)
+    {
+        s32le = true;
+        bits_per_sample = 32;
+    }
 
     // len is length of buffer in fully converted samples
     len /= source_channels;
@@ -167,18 +176,30 @@ void MainVisual::add(uchar *buffer, unsigned long b_len, unsigned long timecode,
         r = new short[len];
 
         if (bits_per_sample == 8)
-            stereo16_from_stereopcm8(l, r, buffer, cnt);
+            stereo16_from_stereopcm8(l, r, (uchar *) buffer, cnt);
         else if (bits_per_sample == 16)
             stereo16_from_stereopcm16(l, r, (short *) buffer, cnt);
+        else if (s32le)
+            stereo16_from_stereopcm32(l, r, (int *) buffer, cnt);
+        else if (bits_per_sample == 32)
+            stereo16_from_stereopcmfloat(l, r, (float *) buffer, cnt);
+        else
+            len = 0;
     }
     else if (source_channels == 1)
     {
         l = new short[len];
 
         if (bits_per_sample == 8)
-            mono16_from_monopcm8(l, buffer, cnt);
+            mono16_from_monopcm8(l, (uchar *) buffer, cnt);
         else if (bits_per_sample == 16)
             mono16_from_monopcm16(l, (short *) buffer, cnt);
+        else if (s32le)
+            mono16_from_monopcm32(l, (int *) buffer, cnt);
+        else if (bits_per_sample == 32)
+            mono16_from_monopcmfloat(l, (float *) buffer, cnt);
+        else
+            len = 0;
     }
     else
         len = 0;

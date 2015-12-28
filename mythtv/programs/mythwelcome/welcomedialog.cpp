@@ -8,7 +8,6 @@
 #include <QCoreApplication>
 #include <QKeyEvent>
 #include <QEvent>
-#include <QtConcurrent/QtConcurrentRun>
 
 // myth
 #include "exitcodes.h"
@@ -105,14 +104,11 @@ bool WelcomeDialog::Create(void)
 
 void WelcomeDialog::startFrontend(void)
 {
-    // this makes sure the button appears to click properly
-    usleep(500 * 1000);
-
     QString startFECmd = gCoreContext->GetSetting("MythWelcomeStartFECmd",
                          m_appBinDir + "mythfrontend");
 
-    myth_system(startFECmd, kMSDisableUDPListener);
-
+    myth_system(startFECmd, kMSDisableUDPListener | kMSProcessEvents);
+    updateAll();
     m_frontendIsRunning = false;
 }
 
@@ -123,7 +119,8 @@ void WelcomeDialog::startFrontendClick(void)
 
     m_frontendIsRunning = true;
 
-    QtConcurrent::run(this, &WelcomeDialog::startFrontend);
+    // this makes sure the button appears to click properly
+    QTimer::singleShot(500, this, SLOT(startFrontend()));
 }
 
 void WelcomeDialog::checkAutoStart(void)
@@ -351,33 +348,29 @@ void WelcomeDialog::updateScreen(void)
         // update recording
         if (m_isRecording && !m_tunerList.empty())
         {
-            if (m_screenTunerNo >= m_tunerList.size())
-                m_screenTunerNo = 0;
-
             TunerStatus tuner = m_tunerList[m_screenTunerNo];
 
-            if (tuner.isRecording)
+            do
             {
-                status = tr("Tuner %1 is recording:").arg(tuner.id);
-                status += "\n";
-                status += tuner.channame;
-                status += "\n" + tuner.title;
-                if (!tuner.subtitle.isEmpty())
-                    status += "\n("+tuner.subtitle+")";
-                status += "\n" +
-                    tr("%1 to %2", "Time period, 'starttime to endtime'")
-                        .arg(MythDate::toString(tuner.startTime, MythDate::kTime))
-                        .arg(MythDate::toString(tuner.endTime, MythDate::kTime));
+                if (m_screenTunerNo < m_tunerList.size() - 1)
+                    m_screenTunerNo++;
+                else
+                    m_screenTunerNo = 0;
+              tuner = m_tunerList[m_screenTunerNo];
             }
-            else
-            {
-                status = tr("Tuner %1 is not recording").arg(tuner.id);
-            }
+            while (!tuner.isRecording);
 
-            if (m_screenTunerNo < m_tunerList.size() - 1)
-                m_screenTunerNo++;
-            else
-                m_screenTunerNo = 0;
+            status = tr("Tuner %1 is recording:").arg(tuner.id);
+            status += "\n";
+            status += tuner.channame;
+            status += "\n" + tuner.title;
+            if (!tuner.subtitle.isEmpty())
+                status += "\n("+tuner.subtitle+")";
+
+            status += "\n" +
+              tr("%1 to %2", "Time period, 'starttime to endtime'")
+                  .arg(MythDate::toString(tuner.startTime, MythDate::kTime))
+                  .arg(MythDate::toString(tuner.endTime, MythDate::kTime));
         }
         else
             status = tr("There are no recordings currently taking place");

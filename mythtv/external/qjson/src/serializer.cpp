@@ -164,7 +164,7 @@ QByteArray Serializer::SerializerPrivate::serialize( const QVariant &v, int rese
     const double value = v.toDouble();
 #if defined _WIN32 && !defined(Q_OS_SYMBIAN)
     const bool special = _isnan(value) || !_finite(value);
-#elif defined(Q_OS_SYMBIAN) || defined(Q_OS_ANDROID)
+#elif defined(Q_OS_SYMBIAN)
     const bool special = isnan(value) || isinf(value);
 #else
     const bool special = std::isnan(value) || std::isinf(value);

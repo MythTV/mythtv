@@ -45,6 +45,7 @@ extern "C" {
 
 static int has_sse2     = -1;
 static int has_sse3     = -1;
+static int has_ssse3    = -1;
 static int has_sse4     = -1;
 
 #if defined _WIN32 && !defined __MINGW32__
@@ -90,12 +91,14 @@ static inline bool sse2_check()
         cpuid(info,0x00000001);
         has_sse2  = (info[3] & ((int)1 << 26)) != 0;
         has_sse3  = (info[2] & ((int)1 <<  0)) != 0;
+        has_ssse3 = (info[2] & ((int)1 <<  9)) != 0;
         has_sse4  = (info[2] & ((int)1 << 19)) != 0;
     }
     else
     {
         has_sse2  = 0;
         has_sse3  = 0;
+        has_ssse3 = 0;
         has_sse4  = 0;
     }
     return has_sse2;
@@ -111,6 +114,18 @@ static inline bool sse3_check()
     sse2_check();
 
     return has_sse3;
+}
+
+static inline bool ssse3_check()
+{
+    if (has_ssse3 != -1)
+    {
+        return has_ssse3;
+    }
+
+    sse2_check();
+
+    return has_ssse3;
 }
 
 static inline bool sse4_check()
@@ -135,6 +150,7 @@ static inline void SSE_splitplanes(uint8_t* dstu, int dstu_pitch,
     const uint8_t mask[] = { 0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0x00,
                              0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0x00 };
     const bool sse3 = sse3_check();
+    const bool ssse3 = ssse3_check();
 
     asm volatile ("mfence");
 
@@ -166,7 +182,7 @@ static inline void SSE_splitplanes(uint8_t* dstu, int dstu_pitch,
 
         if (((uintptr_t)src & 0xf) == 0)
         {
-            if (sse3)
+            if (sse3 && ssse3)
             {
                 for (; x < (width & ~31); x += 32)
                 {
@@ -210,7 +226,7 @@ static inline void SSE_splitplanes(uint8_t* dstu, int dstu_pitch,
         }
         else
         {
-            if (sse3)
+            if (sse3 && ssse3)
             {
                 for (; x < (width & ~31); x += 32)
                 {
@@ -342,11 +358,14 @@ void framecopy(VideoFrame* dst, const VideoFrame* src, bool useSSE)
             return;
         }
 
-        if (height == dheight && width == dwidth &&
-            dst->pitches[0] != src->pitches[0])
+        if (dst->pitches[0] != src->pitches[0] ||
+            dst->pitches[1] != src->pitches[1] ||
+            dst->pitches[2] != src->pitches[2])
         {
             // We have a different stride between the two frames
             // drop the garbage data
+            height = (dst->height < src->height) ? dst->height : src->height;
+            width = (dst->width < src->width) ? dst->width : src->width;
             copyplane(dst->buf + dst->offsets[0], dst->pitches[0],
                       src->buf + src->offsets[0], src->pitches[0],
                       width, height);

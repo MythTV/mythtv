@@ -24,7 +24,7 @@ class ProgramInfoCache
 {
     friend class ProgramInfoLoader;
   public:
-    ProgramInfoCache(QObject *o);
+    explicit ProgramInfoCache(QObject *o);
     ~ProgramInfoCache();
 
     void ScheduleLoad(const bool updateUI = true);

@@ -26,6 +26,8 @@ typedef enum
     kCodec_VC1,
     kCodec_WMV3,
     kCodec_VP8,
+    kCodec_VP9,
+    kCodec_HEVC,
 
     kCodec_NORMAL_END,
     
@@ -39,6 +41,8 @@ typedef enum
     kCodec_VC1_VDPAU,
     kCodec_WMV3_VDPAU,
     kCodec_VP8_VDPAU,
+    kCodec_VP9_VDPAU,
+    kCodec_HEVC_VDPAU,
 
     kCodec_VDPAU_END,
 
@@ -52,6 +56,8 @@ typedef enum
     kCodec_VC1_VAAPI,
     kCodec_WMV3_VAAPI,
     kCodec_VP8_VAAPI,
+    kCodec_VP9_VAAPI,
+    kCodec_HEVC_VAAPI,
 
     kCodec_VAAPI_END,
 
@@ -65,6 +71,8 @@ typedef enum
     kCodec_VC1_DXVA2,
     kCodec_WMV3_DXVA2,
     kCodec_VP8_DXVA2,
+    kCodec_VP9_DXVA2,
+    kCodec_HEVC_DXVA2,
 
     kCodec_DXVA2_END,
 } MythCodecID;

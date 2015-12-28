@@ -107,7 +107,7 @@ VisualNode* VideoVisual::GetNode(void)
 }
 
 // caller holds lock
-void VideoVisual::add(uchar *b, unsigned long b_len, unsigned long w, int c,
+void VideoVisual::add(const void *b, unsigned long b_len, unsigned long w, int c,
                       int p)
 {
     if (!m_disabled && m_nodes.size() > 500)
@@ -138,7 +138,7 @@ void VideoVisual::add(uchar *b, unsigned long b_len, unsigned long w, int c,
         r = new short[len];
 
         if (p == 8)
-            stereo16_from_stereopcm8(l, r, b, cnt);
+            stereo16_from_stereopcm8(l, r, (uchar *) b, cnt);
         else if (p == 16)
             stereo16_from_stereopcm16(l, r, (short *) b, cnt);
     }
@@ -147,7 +147,7 @@ void VideoVisual::add(uchar *b, unsigned long b_len, unsigned long w, int c,
         l = new short[len];
 
         if (p == 8)
-            mono16_from_monopcm8(l, b, cnt);
+            mono16_from_monopcm8(l, (uchar *) b, cnt);
         else if (p == 16)
             mono16_from_monopcm16(l, (short *) b, cnt);
     }

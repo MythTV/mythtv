@@ -31,19 +31,24 @@ static int dirac_header(AVFormatContext *s, int idx)
     AVStream *st = s->streams[idx];
     dirac_source_params source;
     GetBitContext gb;
+    int ret;
 
     // already parsed the header
     if (st->codec->codec_id == AV_CODEC_ID_DIRAC)
         return 0;
 
-    init_get_bits(&gb, os->buf + os->pstart + 13, (os->psize - 13) * 8);
-    if (avpriv_dirac_parse_sequence_header(st->codec, &gb, &source) < 0)
-        return -1;
+    ret = init_get_bits8(&gb, os->buf + os->pstart + 13, (os->psize - 13));
+    if (ret < 0)
+        return ret;
+
+    ret = avpriv_dirac_parse_sequence_header(st->codec, &gb, &source);
+    if (ret < 0)
+        return ret;
 
     st->codec->codec_type = AVMEDIA_TYPE_VIDEO;
     st->codec->codec_id = AV_CODEC_ID_DIRAC;
     // dirac in ogg always stores timestamps as though the video were interlaced
-    avpriv_set_pts_info(st, 64, st->codec->time_base.num, 2*st->codec->time_base.den);
+    avpriv_set_pts_info(st, 64, st->codec->framerate.den, 2*st->codec->framerate.num);
     return 1;
 }
 

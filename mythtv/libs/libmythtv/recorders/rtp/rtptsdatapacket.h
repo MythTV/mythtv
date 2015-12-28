@@ -29,7 +29,7 @@ class RTPTSDataPacket : public RTPDataPacket
 
     unsigned int GetTSDataSize(void) const
     {
-        return max(1328 - (int)GetTSOffset() - (int)GetPaddingSize(), 0);
+        return max(m_data.size() - (int)GetTSOffset() - (int)GetPaddingSize(), 0);
     }
 
   private:

@@ -159,23 +159,33 @@ void EITHelper::AddEIT(uint atsc_major, uint atsc_minor,
                      eit->title(i).GetBestMatch(languagePreferences),
                      eit->Descriptors(i), eit->DescriptorsLength(i));
 
+        // Look to see if there has been a recent ett message with the same event id.
         EventIDToETT::iterator it = etts.find(eit->EventID(i));
-
+        QString ett_text = QString::null;
+        bool found_matching_ett = false;
         if (it != etts.end())
         {
-            CompleteEvent(atsc_major, atsc_minor, ev, *it);
+            // Don't use an ett description if it was scanned long in the past.
+            if (!it->IsStale()) {
+              ett_text = it->ett_text;
+              found_matching_ett = true;
+            }
             etts.erase(it);
         }
-        else if (!ev.etm)
+
+        // Create an event immediately if a matching ett description was found,
+        // or if item is false, indicating that no ett description should be
+        // expected.
+        if (found_matching_ett || !ev.etm)
         {
-            CompleteEvent(atsc_major, atsc_minor, ev, QString::null);
+            CompleteEvent(atsc_major, atsc_minor, ev, ett_text);
         }
         else
         {
             unsigned char *tmp = new unsigned char[ev.desc_length];
             memcpy(tmp, eit->Descriptors(i), ev.desc_length);
             ev.desc = tmp;
-            events[eit->EventID(i)] = ev;
+            events.insert(eit->EventID(i), ev);
         }
     }
 }
@@ -184,33 +194,51 @@ void EITHelper::AddETT(uint atsc_major, uint atsc_minor,
                        const ExtendedTextTable *ett)
 {
     uint atsc_key = (atsc_major << 16) | atsc_minor;
-    // Try to complete an Event
+    // Try to match up the ett with an eit event.
     ATSCSRCToEvents::iterator eits_it = incomplete_events.find(atsc_key);
     if (eits_it != incomplete_events.end())
     {
         EventIDToATSCEvent::iterator it = (*eits_it).find(ett->EventID());
         if (it != (*eits_it).end())
         {
-            CompleteEvent(
-                atsc_major, atsc_minor, *it,
-                ett->ExtendedTextMessage().GetBestMatch(languagePreferences));
+            bool completed_event = false;
+            // Only consider eit events from the recent past.
+            if (!it->IsStale()) {
+              completed_event = true;
+              CompleteEvent(
+                  atsc_major, atsc_minor, *it,
+                  ett->ExtendedTextMessage().GetBestMatch(languagePreferences));
+            }
 
             if ((*it).desc)
                 delete [] (*it).desc;
 
             (*eits_it).erase(it);
 
-            return;
+            if (completed_event) return;
         }
     }
 
-    // Couldn't find matching EIT. If not yet in unmatched ETT map, insert it.
+    // Report if an unmatched ett was previously noted and overwrite it.
+    // See also https://code.mythtv.org/trac/ticket/11739
     EventIDToETT &elist = unmatched_etts[atsc_key];
-    if (elist.find(ett->EventID()) == elist.end())
+    EventIDToETT::iterator existing_unmatched_ett_it =
+        elist.find(ett->EventID());
+    const QString next_ett_text = ett->ExtendedTextMessage()
+        .GetBestMatch(languagePreferences);
+    if (existing_unmatched_ett_it != elist.end() &&
+        existing_unmatched_ett_it->ett_text != next_ett_text)
     {
-        elist[ett->EventID()] = ett->ExtendedTextMessage()
-            .GetBestMatch(languagePreferences);
+       LOG(VB_EIT, LOG_DEBUG, LOC +
+           QString("Overwriting previously unmatched ett. stale: %1 major: %2 "
+                   "minor: %3 old ett: %4  new ett: %5")
+               .arg(existing_unmatched_ett_it->IsStale())
+               .arg(atsc_major)
+               .arg(atsc_minor)
+               .arg(existing_unmatched_ett_it->ett_text)
+               .arg(next_ett_text));
     }
+    elist.insert(ett->EventID(), ATSCEtt(next_ett_text));
 }
 
 static void parse_dvb_event_descriptors(desc_list_t list, uint fix,
@@ -225,6 +253,7 @@ static void parse_dvb_event_descriptors(desc_list_t list, uint fix,
     // from EN 300 468, Appendix A.2 - Selection of character table
     unsigned char enc_1[3]  = { 0x10, 0x00, 0x01 };
     unsigned char enc_2[3]  = { 0x10, 0x00, 0x02 };
+    unsigned char enc_7[3]  = { 0x10, 0x00, 0x07 }; // Latin/Greek Alphabet
     unsigned char enc_9[3]  = { 0x10, 0x00, 0x09 }; // could use { 0x05 } instead
     unsigned char enc_15[3] = { 0x10, 0x00, 0x0f }; // could use { 0x0B } instead
     int enc_len = 0;
@@ -255,11 +284,19 @@ static void parse_dvb_event_descriptors(desc_list_t list, uint fix,
     }
 
     // Is this broken DVB provider in Western Europe?
-    // Use an encoding override of ISO 8859-15 (Latin6)
+    // Use an encoding override of ISO 8859-15 (Latin9)
     if (fix & EITFixUp::kEFixForceISO8859_15)
     {
         enc = enc_15;
         enc_len = sizeof(enc_15);
+    }
+
+    // Is this broken DVB provider in Greece?
+    // Use an encoding override of ISO 8859-7 (Latin/Greek)
+    if (fix & EITFixUp::kEFixForceISO8859_7)
+    {
+        enc = enc_7;
+        enc_len = sizeof(enc_7);
     }
 
     if (bestShortEvent)
@@ -547,6 +584,32 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
                         break;
                 }
                 category_type = content.GetMythCategory(0);
+            }
+            else if (EITFixUp::kFixGreekEIT & fix)//Greek
+            {
+                ContentDescriptor content(content_data);
+                switch (content.Nibble2(0))
+                {
+                    case 0x01:
+                        category = "Ταινία";       // confirmed
+                        break;
+                    case 0x02:
+                        category = "Ενημερωτικό";  // confirmed
+                        break;
+                    case 0x04:
+                        category = "Αθλητικό";     // confirmed
+                        break;
+                    case 0x05:
+                        category = "Παιδικό";      // confirmed
+                        break;
+                    case 0x09:
+                        category = "Ντοκιμαντέρ";  // confirmed
+                        break;
+                    default:
+                        category = "";
+                        break;
+                }
+                category_type = content.GetMythCategory(2);
             }
             else
             {
@@ -1005,68 +1068,51 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     fix[ 4097U << 16] = EITFixUp::kFixBell;
     fix[ 4098U << 16] = EITFixUp::kFixBell;
 
-    // United Kingdom
+    // United Kingdom - DVB-T/T2
     fix[ 9018U << 16] = EITFixUp::kFixUK;
-    // UK BBC
-    fix[ 2013LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2017LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2018LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2026LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2036LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2041LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2042LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2043LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2044LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2045LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2046LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2047LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2048LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2049LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2050LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2053LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2054LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2057LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+
+    // UK - Astra 28.2
+    for (int i = 2001; i <= 2040; ++i)
+       fix[ (long long)i << 32 | 2U << 16] = EITFixUp::kFixUK;
+
+    fix[ 2036LL << 32 | 2U << 16] = EITFixUp::kFixUK | EITFixUp::kFixHTML;
+
+    for (int i = 2041; i <= 2057; ++i)
+       fix[ (long long)i << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2061LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2063LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2064LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2066LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2068LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2301LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2076LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2081LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2096LL << 32 | 2U << 16] = EITFixUp::kFixUK | EITFixUp::kFixHTML;
+    fix[ 2301LL << 32 | 2U << 16] = EITFixUp::kFixUK | EITFixUp::kFixHTML;
     fix[ 2302LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2303LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2304LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2304LL << 32 | 2U << 16] = EITFixUp::kFixUK | EITFixUp::kFixHTML;
     fix[ 2305LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2306LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2306LL << 32 | 2U << 16] = EITFixUp::kFixUK | EITFixUp::kFixHTML;
     fix[ 2311LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2312LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2313LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2314LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2401LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2411LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2412LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2413LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2602LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2612LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2614LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    // R.caroline
-    fix[ 2315LL << 32 | 59U << 16] = EITFixUp::kFixUK;
-    // UK Sky
-    fix[ 2051LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2052LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2055LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2056LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2315LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2316LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    for (int i = 2402; i <= 2412; ++i)
+    for (int i = 2401; i <= 2413; ++i)
         fix[ (long long)i << 32 | 2U << 16] = EITFixUp::kFixUK;
-    for (int i = 2001; i <= 2012; ++i)
-       fix[ (long long)i << 32 | 2U << 16] = EITFixUp::kFixUK;
-    for (int i = 2014; i <= 2040; ++i)
-       fix[ (long long)i << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2611LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2612LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2601LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2613LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2602LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2603LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2604LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2612LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2614LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2611LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2612LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2613LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+
+    // R.caroline
+    fix[ 2315LL << 32 | 59U << 16] = EITFixUp::kFixUK;
 
     // ComHem Sweden
     fix[40999U << 16       ] = EITFixUp::kFixComHem;
@@ -1099,23 +1145,52 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
 
     // RTL Subtitle parsing
     fix[      1089LL << 32 |     1  << 16] = // DVB-S
+    fix[ 1041LL << 32 | 1 << 16] = // DVB-S RTL Group HD Austria Transponder
+    fix[ 1057LL << 32 | 1 << 16] = // DVB-S RTL Group HD Transponder
         fix[   773LL << 32 |  8468U << 16] = // DVB-T Berlin/Brandenburg
         fix[  2819LL << 32 |  8468U << 16] = // DVB-T Niedersachsen + Bremen
         fix[  8706LL << 32 |  8468U << 16] = // DVB-T NRW
         fix[ 12801LL << 32 |  8468U << 16] = // DVB-T Bayern
         EITFixUp::kFixRTL;
 
+    // Mark HD+ channels as HDTV
+    fix[   1041LL << 32 |  1 << 16] = EITFixUp::kFixHDTV;
+    fix[   1055LL << 32 |  1 << 16] = EITFixUp::kFixHDTV;
+    fix[   1057LL << 32 |  1 << 16] = EITFixUp::kFixHDTV;
+    fix[   1109LL << 32 |  1 << 16] = EITFixUp::kFixHDTV;
+
+    // PRO7/SAT.1
+    fix[   1017LL << 32 |    1 << 16] = EITFixUp::kFixHDTV | EITFixUp::kFixP7S1;
+    fix[   1031LL << 32 |    1 << 16 | 5300] = EITFixUp::kFixHDTV | EITFixUp::kFixP7S1;
+    fix[   1031LL << 32 |    1 << 16 | 5301] = EITFixUp::kFixHDTV | EITFixUp::kFixP7S1;
+    fix[   1031LL << 32 |    1 << 16 | 5302] = EITFixUp::kFixHDTV | EITFixUp::kFixP7S1;
+    fix[   1031LL << 32 |    1 << 16 | 5303] = EITFixUp::kFixHDTV | EITFixUp::kFixP7S1;
+    fix[   1031LL << 32 |    1 << 16 | 5310] = EITFixUp::kFixP7S1;
+    fix[   1031LL << 32 |    1 << 16 | 5311] = EITFixUp::kFixP7S1;
+    fix[   1107LL << 32 |    1 << 16] = EITFixUp::kFixP7S1;
+    fix[   1082LL << 32 |    1 << 16] = EITFixUp::kFixP7S1;
+    fix[      5LL << 32 |  133 << 16 |   776] = EITFixUp::kFixP7S1;
+    fix[                  8468 << 16 | 16426] = EITFixUp::kFixP7S1; // ProSieben MAXX - DVB-T Rhein/Main
+    fix[   8707LL << 32 | 8468 << 16]         = EITFixUp::kFixP7S1; // ProSieben Sat.1 Mux - DVB-T Rhein/Main
+
     // Premiere EIT processing
     fix[   1LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
     fix[   2LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
     fix[   3LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
     fix[   4LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
-    fix[   5LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
     fix[   6LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
+    fix[   8LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
+    fix[  10LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
+    fix[  11LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
+    fix[  12LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
+    fix[  13LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
+    fix[  14LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
+    fix[  15LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
     fix[  17LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
-    // Mark Premiere HD and Discovery HD as HDTV
+    // Mark Premiere HD, AXN HD and Discovery HD as HDTV
     fix[   6LL << 32 |  133 << 16 | 129] = EITFixUp::kFixHDTV;
     fix[   6LL << 32 |  133 << 16 | 130] = EITFixUp::kFixHDTV;
+    fix[  10LL << 32 |  133 << 16 | 125] = EITFixUp::kFixHDTV;
 
     // Netherlands DVB-C
     fix[ 1000U << 16] = EITFixUp::kFixNL;
@@ -1286,6 +1361,38 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     // DVB-C T-Kábel Hungary
     // FIXME this should be more specific. Is the encoding really wrong for all services?
     fix[  100 << 16] = EITFixUp::kEFixForceISO8859_2;
+
+    // DVB-T Greece
+    // Pelion Transmitter
+    // transport_id<<32 | netword_id<<16 | service_id
+    fix[  100LL << 32 |  8492LL << 16 ] = // Ant1,Alpha,Art,10E
+    fix[  102LL << 32 |  8492LL << 16 ] = // Mega,Star,SKAI,M.tv
+    fix[  320LL << 32 |  8492LL << 16 ] = // Astra,Thessalia,TRT,TV10,ZEYS
+        EITFixUp::kFixGreekEIT |
+        EITFixUp::kFixGreekCategories;
+    fix[    2LL << 32 |  8492LL << 16 ] = // N1,Nplus,NHD,Vouli
+        EITFixUp::kEFixForceISO8859_7 |   // it is encoded in cp-1253
+        EITFixUp::kFixGreekSubtitle |     // Subtitle has too much info and is
+        EITFixUp::kFixGreekEIT |              // cut in db. Will move to descr.
+        EITFixUp::kFixGreekCategories;
+
+    // DVB-S Star One C2 70W (Brazil)
+    // it has original_network_id = 1 like Astra on 19.2E, but transport_id does
+    // not collide at the moment
+    fix[  1LL << 32 | 1LL << 16 ] = EITFixUp::kEFixForceISO8859_1;
+    fix[  2LL << 32 | 1LL << 16 ] = EITFixUp::kEFixForceISO8859_1;
+    fix[  3LL << 32 | 1LL << 16 ] = EITFixUp::kEFixForceISO8859_1;
+    fix[  4LL << 32 | 1LL << 16 ] = EITFixUp::kEFixForceISO8859_1;
+    fix[ 50LL << 32 | 1LL << 16 ] = EITFixUp::kEFixForceISO8859_1;
+    fix[ 51LL << 32 | 1LL << 16 ] = EITFixUp::kEFixForceISO8859_1;
+    fix[ 52LL << 32 | 1LL << 16 ] = EITFixUp::kEFixForceISO8859_1;
+    fix[ 53LL << 32 | 1LL << 16 ] = EITFixUp::kEFixForceISO8859_1;
+    fix[ 54LL << 32 | 1LL << 16 ] = EITFixUp::kEFixForceISO8859_1;
+    fix[ 55LL << 32 | 1LL << 16 ] = EITFixUp::kEFixForceISO8859_1;
+    fix[ 56LL << 32 | 1LL << 16 ] = EITFixUp::kEFixForceISO8859_1;
+    fix[ 57LL << 32 | 1LL << 16 ] = EITFixUp::kEFixForceISO8859_1;
+    fix[ 58LL << 32 | 1LL << 16 ] = EITFixUp::kEFixForceISO8859_1;
+    fix[ 59LL << 32 | 1LL << 16 ] = EITFixUp::kEFixForceISO8859_1;
 }
 
 /** \fn EITHelper::RescheduleRecordings(void)

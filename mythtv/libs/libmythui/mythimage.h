@@ -20,7 +20,7 @@ class MythUIHelper;
 class MUI_PUBLIC MythImageReader: public QImageReader
 {
   public:
-    MythImageReader(const QString &fileName);
+    explicit MythImageReader(const QString &fileName);
    ~MythImageReader();
 
   private:
@@ -31,6 +31,8 @@ class MUI_PUBLIC MythImageReader: public QImageReader
 class MUI_PUBLIC MythImage : public QImage, public ReferenceCounter
 {
   public:
+    static QImage ApplyExifOrientation(QImage &image, int orientation);
+
     /// Creates a reference counted image, call DecrRef() to delete.
     MythImage(MythPainter *parent, const char *name = "MythImage");
 

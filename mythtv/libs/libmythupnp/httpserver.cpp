@@ -184,6 +184,7 @@ HttpServer::~HttpServer()
 
 void HttpServer::LoadSSLConfig()
 {
+#ifndef QT_NO_OPENSSL
     m_sslConfig = QSslConfiguration::defaultConfiguration();
 
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
@@ -212,6 +213,7 @@ void HttpServer::LoadSSLConfig()
         secureCiphers.append(*it);
     }
     m_sslConfig.setCiphers(secureCiphers);
+#endif
 
     QString hostKeyPath = gCoreContext->GetSetting("hostSSLKey", "");
 
@@ -225,6 +227,7 @@ void HttpServer::LoadSSLConfig()
         return;
     }
 
+#ifndef QT_NO_OPENSSL
     QByteArray rawHostKey = hostKeyFile.readAll();
     QSslKey hostKey = QSslKey(rawHostKey, QSsl::Rsa, QSsl::Pem, QSsl::PrivateKey);
     if (!hostKey.isNull())
@@ -270,6 +273,7 @@ void HttpServer::LoadSSLConfig()
         m_sslConfig.setCaCertificates(CACertList);
     else if (!caCertPath.isEmpty()) // Only warn if a path was actually configured, this isn't an error otherwise
         LOG(VB_GENERAL, LOG_ERR, QString("HttpServer: Unable to load CA cert file (%1)").arg(caCertPath));
+#endif
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -307,8 +311,11 @@ void HttpServer::newTcpConnection(qt_socket_fd_t socket)
         type = server->GetServerType();
 
     m_threadPool.startReserved(
-        new HttpWorker(*this, socket, type,
-                       m_sslConfig),
+        new HttpWorker(*this, socket, type
+#ifndef QT_NO_OPENSSL
+                       , m_sslConfig
+#endif
+                       ),
         QString("HttpServer%1").arg(socket));
 }
 
@@ -444,10 +451,16 @@ uint HttpServer::GetSocketTimeout(HTTPRequest* pRequest) const
 /////////////////////////////////////////////////////////////////////////////
 
 HttpWorker::HttpWorker(HttpServer &httpServer, qt_socket_fd_t sock,
-                       PoolServerType type, QSslConfiguration sslConfig)
+                       PoolServerType type
+#ifndef QT_NO_OPENSSL
+                       , QSslConfiguration sslConfig
+#endif
+)
            : m_httpServer(httpServer), m_socket(sock),
-             m_socketTimeout(5 * 1000), m_connectionType(type),
-             m_sslConfig(sslConfig)
+             m_socketTimeout(5 * 1000), m_connectionType(type)
+#ifndef QT_NO_OPENSSL
+             , m_sslConfig(sslConfig)
+#endif
 {
     LOG(VB_HTTP, LOG_INFO, QString("HttpWorker(%1): New connection")
                                         .arg(m_socket));

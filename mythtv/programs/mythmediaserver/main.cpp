@@ -13,6 +13,7 @@
 #include <QString>
 #include <QDir>
 
+#include "mythconfig.h"
 #include "mythsocketmanager.h"
 #include "mythcontext.h"
 #include "exitcodes.h"

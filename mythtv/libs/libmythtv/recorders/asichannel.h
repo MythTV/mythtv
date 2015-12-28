@@ -23,9 +23,9 @@ class ASIChannel : public DTVChannel
     virtual void Close(void);
 
     using DTVChannel::Tune;
-    virtual bool Tune(const DTVMultiplex&, QString) { return true; }
+    virtual bool Tune(const DTVMultiplex&)          { return true; }
     virtual bool Tune(const QString&, int)          { return true; }
-    virtual bool Tune(uint64_t, QString)            { return true; }
+    virtual bool Tune(uint64_t)                     { return true; }
     // Gets
     virtual bool IsOpen(void) const { return m_isopen; }
     virtual QString GetDevice(void) const { return m_device; }

@@ -474,4 +474,69 @@
   <catcolor category="Weather" color="DarkOrange3"></catcolor> 
   <catcolor category="Wrestling" color="DarkCyan"></catcolor>
 
+  <!-- Categories introduced by Greek DVB-T channels -->
+  <catcolor category="Ενημερωτικό" color="DarkOrange3"></catcolor>
+  <catcolor category="Ταινία" color="Blue"></catcolor>
+  <catcolor category="Αθλητικά" color="DarkCyan"></catcolor>
+  <catcolor category="Ποδόσφαιρο" color="DarkCyan"></catcolor>
+  <catcolor category="Παιδικό" color="MediumSlateBlue"></catcolor>
+  <catcolor category="Ντοκιμαντέρ" color="goldenrod"></catcolor>
+  <catcolor category="Εκπαιδευτικό" color="CornflowerBlue"></catcolor>
+  <catcolor category="Για Ενήλικες" color="thistle3"></catcolor>
+  <catcolor category="Μιούζικαλ" color="turquoise3"></catcolor>
+  <catcolor category="Τηλεπεριοδικό" color="DarkOrange3"></catcolor>
+  <catcolor category="Ριάλιτι" color="sienna"></catcolor>
+  <catcolor category="Γαστρονομία" color="tan3"></catcolor>
+  <catcolor category="Ιατρικό" color="goldenrod"></catcolor>
+  <catcolor category="Μυστηρίου" color="SlateGrey"></catcolor>
+  <catcolor category="Αστυνομικό/Μυστηρίου" color="SlateGrey"></catcolor>
+  <catcolor category="Μουσική" color="DarkRed"></catcolor>
+  <catcolor category="Μουσικό αφιέρωμα" color="#aa0000"></catcolor>
+  <catcolor category="Δραματικό" color="rosybrown3"></catcolor>
+  <catcolor category="Κοινωνικό" color="rosybrown3"></catcolor>
+  <catcolor category="Κλασσικό" color="grey62"></catcolor>
+  <catcolor category="Αστυνομικό" color="MediumVioletRed"></catcolor>
+  <catcolor category="Αστυνομικό Δράμα" color="MediumVioletRed"></catcolor>
+  <catcolor category="Συζήτηση" color="MediumTurquoise"></catcolor>
+  <catcolor category="Ζωα" color="ForestGreen"></catcolor>
+  <catcolor category="Γουέστερν" color="#bbbb00"></catcolor>
+  <catcolor category="Πολεμικό" color="#dddd00"></catcolor>
+  <catcolor category="Αφιέρωμα" color="#ee0000"></catcolor>
+  <catcolor category="Κωμωδία" color="DarkOrchid"></catcolor>
+  <catcolor category="Κωμωδία-δράμα" color="#880099"></catcolor>
+  <catcolor category="Αισθηματική κομεντί" color="#bbaa00"></catcolor>
+  <catcolor category="Κωμική σειρά" color="#880088"></catcolor>
+  <catcolor category="Ζωα" color="#00ff44"></catcolor>
+  <catcolor category="Φύση" color="#33ff99"></catcolor>
+  <catcolor category="Επιστήμη/Φύση" color="#33ff99"></catcolor>
+  <catcolor category="Επιστ.Φαντασίας" color="#DD00DD"></catcolor>
+  <catcolor category="Φαντασίας/Επιστ.Φαντασίας" color="DarkBlue"></catcolor>
+  <catcolor category="Φαντασίας" color="#996666"></catcolor>
+  <catcolor category="Φαντασίας/Μυστηρίου" color="#996666"></catcolor>
+  <catcolor category="Τρόμου" color="firebrick3"></catcolor>
+  <catcolor category="Αγωνίας" color="firebrick3"></catcolor>
+  <catcolor category="Περιπέτεια" color="maroon"></catcolor>
+  <catcolor category="Αισθηματικό" color="#ff9999"></catcolor>
+  <catcolor category="Γαστρονομία/Ταξίδια" color="#aa00aa"></catcolor>
+  <catcolor category="Τουρισμός/Ταξίδια" color="#aa00aa"></catcolor>
+  <catcolor category="Υγεία" color="#00ffaa"></catcolor>
+  <catcolor category="Σπίτι/Φτιάξτο μόνος σου" color="Red"></catcolor>
+  <catcolor category="Σπιτικές Βελτιώσεις" color="#00cc00"></catcolor>
+  <catcolor category="Φτιάξτο μόνος σου" color="#00aa00"></catcolor>
+  <catcolor category="Σπίτι/κηπουρική" color="#00ee00"></catcolor>
+  <catcolor category="Παιχνίδι" color="orchid"></catcolor>
+  <catcolor category="Ανθολογία" color="DarkOrchid"></catcolor>
+  <catcolor category="Κιν.Σχέδια" color="#3333aa"></catcolor>
+  <catcolor category="Τηλεπαιχνίδι" color="orchid"></catcolor>
+  <catcolor category="Γυμναστική" color="#00dd99"></catcolor>
+  <catcolor category="Εμπόριο/Οικονομία" color="DarkOrange3"></catcolor>
+  <catcolor category="Αυτοκίνητο" color="#a8bde8"></catcolor>
+  <catcolor category="Βιογραφία" color="#e9ecf3"></catcolor>
+  <catcolor category="Μόδα" color="#a8cdea"></catcolor>
+  <catcolor category="Σαπουνόπερα" color="DarkOrchid"></catcolor>
+  <catcolor category="Ιστορικό" color="DarkOrange1"></catcolor>
+  <catcolor category="Τηλεπωλήσεις" color="#222200"></catcolor>
+  <catcolor category="Ειδήσεις" color="DarkOrange3"></catcolor>
+  <catcolor category="Θρησκεία" color="goldenrod"></catcolor>
+  <catcolor category="Τέχνες/Πολιτισμός" color="goldenrod"></catcolor>
 </categorycolors>

@@ -1,10 +1,188 @@
 Entries are sorted chronologically from oldest to youngest within each release,
 releases are sorted from youngest to oldest.
 
-version 2.3.1:
-- public AVDCT API/ABI for DCT functions
-- g2meet: allow size changes within original sizes
-- dv: improved error resilience, fixing Ticket2340 and Ticket2341
+version 2.8.1:
+- swscale: fix ticket #4881
+- doc: fix spelling errors
+- hls: only seek if there is an offset
+- asfdec: add more checks for size left in asf packet buffer
+- asfdec: alloc enough space for storing name in asf_read_metadata_obj
+- avcodec/pngdec: Check blend_op.
+- h264_mp4toannexb: fix pps offfset fault when there are more than one sps in avcc
+- avcodec/h264_mp4toannexb_bsf: Use av_freep() to free spspps_buf
+- avformat/avidec: Workaround broken initial frame
+- avformat/hls: fix some cases of HLS streams which require cookies
+- avcodec/pngdec: reset has_trns after every decode_frame_png()
+- lavf/img2dec: Fix memory leak
+- avcodec/mp3: fix skipping zeros
+- avformat/srtdec: make sure we probe a number
+- configure: check for ID3D11VideoContext
+- avformat/vobsub: compare correct packet stream IDs
+- avformat/srtdec: more lenient first line probing
+- avformat/srtdec: fix number check for the first character
+- avcodec/mips: build fix for MSA 64bit
+- avcodec/mips: build fix for MSA
+- avformat/httpauth: Add space after commas in HTTP/RTSP auth header
+- libavformat/hlsenc: Use of uninitialized memory unlinking old files
+- avcodec/x86/sbrdsp: Fix using uninitialized upper 32bit of noise
+- avcodec/ffv1dec: Fix off by 1 error in quant_table_count check
+- avcodec/ffv1dec: Explicitly check read_quant_table() return value
+- dnxhddata: correct weight tables
+- dnxhddec: decode and use interlace mb flag
+- swscale: fix ticket #4877
+- avcodec/rangecoder: Check e
+- avcodec/ffv1: seperate slice_count from max_slice_count
+- swscale: fix ticket 4850
+- cmdutils: Filter dst/srcw/h
+- avutil/log: fix zero length gnu_printf format string warning
+- lavf/webvttenc: Require webvtt file to contain exactly one WebVTT stream.
+- swscale/swscale: Fix "unused variable" warning
+- avcodec/mjpegdec: Fix decoding RGBA RCT LJPEG
+- MAINTAINERS: add 2.8, drop 2.2
+- doc: mention libavcodec can decode Opus natively
+- hevc: properly handle no_rasl_output_flag when removing pictures from the DPB
+- avfilter/af_ladspa: process all channels for nb_handles > 1
+- configure: add libsoxr to swresample's pkgconfig
+- lavc: Fix compilation with --disable-everything --enable-parser=mpeg4video.
+
+version 2.8:
+- colorkey video filter
+- BFSTM/BCSTM demuxer
+- little-endian ADPCM_THP decoder
+- Hap decoder and encoder
+- DirectDraw Surface image/texture decoder
+- ssim filter
+- optional new ASF demuxer
+- showvolume filter
+- Many improvements to the JPEG 2000 decoder
+- Go2Meeting decoding support
+- adrawgraph audio and drawgraph video filter
+- removegrain video filter
+- Intel QSV-accelerated MPEG-2 video and HEVC encoding
+- Intel QSV-accelerated MPEG-2 video and HEVC decoding
+- Intel QSV-accelerated VC-1 video decoding
+- libkvazaar HEVC encoder
+- erosion, dilation, deflate and inflate video filters
+- Dynamic Audio Normalizer as dynaudnorm filter
+- Reverse video and areverse audio filter
+- Random filter
+- deband filter
+- AAC fixed-point decoding
+- sidechaincompress audio filter
+- bitstream filter for converting HEVC from MP4 to Annex B
+- acrossfade audio filter
+- allyuv and allrgb video sources
+- atadenoise video filter
+- OS X VideoToolbox support
+- aphasemeter filter
+- showfreqs filter
+- vectorscope filter
+- waveform filter
+- hstack and vstack filter
+- Support DNx100 (1440x1080@8)
+- VAAPI hevc hwaccel
+- VDPAU hevc hwaccel
+- framerate filter
+- Switched default encoders for webm to VP9 and Opus
+- Removed experimental flag from the JPEG 2000 encoder
+
+
+version 2.7:
+- FFT video filter
+- TDSC decoder
+- DTS lossless extension (XLL) decoding (not lossless, disabled by default)
+- showwavespic filter
+- DTS decoding through libdcadec
+- Drop support for nvenc API before 5.0
+- nvenc HEVC encoder
+- Detelecine filter
+- Intel QSV-accelerated H.264 encoding
+- MMAL-accelerated H.264 decoding
+- basic APNG encoder and muxer with default extension "apng"
+- unpack DivX-style packed B-frames in MPEG-4 bitstream filter
+- WebM Live Chunk Muxer
+- nvenc level and tier options
+- chorus filter
+- Canopus HQ/HQA decoder
+- Automatically rotate videos based on metadata in ffmpeg
+- improved Quickdraw compatibility
+- VP9 high bit-depth and extended colorspaces decoding support
+- WebPAnimEncoder API when available for encoding and muxing WebP
+- Direct3D11-accelerated decoding
+- Support Secure Transport
+- Multipart JPEG demuxer
+
+
+version 2.6:
+- nvenc encoder
+- 10bit spp filter
+- colorlevels filter
+- RIFX format for *.wav files
+- RTP/mpegts muxer
+- non continuous cache protocol support
+- tblend filter
+- cropdetect support for non 8bpp, absolute (if limit >= 1) and relative (if limit < 1.0) threshold
+- Camellia symmetric block cipher
+- OpenH264 encoder wrapper
+- VOC seeking support
+- Closed caption Decoder
+- fspp, uspp, pp7 MPlayer postprocessing filters ported to native filters
+- showpalette filter
+- Twofish symmetric block cipher
+- Support DNx100 (960x720@8)
+- eq2 filter ported from libmpcodecs as eq filter
+- removed libmpcodecs
+- Changed default DNxHD colour range in QuickTime .mov derivatives to mpeg range
+- ported softpulldown filter from libmpcodecs as repeatfields filter
+- dcshift filter
+- RTP depacketizer for loss tolerant payload format for MP3 audio (RFC 5219)
+- RTP depacketizer for AC3 payload format (RFC 4184)
+- palettegen and paletteuse filters
+- VP9 RTP payload format (draft 0) experimental depacketizer
+- RTP depacketizer for DV (RFC 6469)
+- DXVA2-accelerated HEVC decoding
+- AAC ELD 480 decoding
+- Intel QSV-accelerated H.264 decoding
+- DSS SP decoder and DSS demuxer
+- Fix stsd atom corruption in DNxHD QuickTimes
+- Canopus HQX decoder
+- RTP depacketization of T.140 text (RFC 4103)
+- Port MIPS optimizations to 64-bit
+
+
+version 2.5:
+- HEVC/H.265 RTP payload format (draft v6) packetizer
+- SUP/PGS subtitle demuxer
+- ffprobe -show_pixel_formats option
+- CAST128 symmetric block cipher, ECB mode
+- STL subtitle demuxer and decoder
+- libutvideo YUV 4:2:2 10bit support
+- XCB-based screen-grabber
+- UDP-Lite support (RFC 3828)
+- xBR scaling filter
+- AVFoundation screen capturing support
+- ffserver supports codec private options
+- creating DASH compatible fragmented MP4, MPEG-DASH segmenting muxer
+- WebP muxer with animated WebP support
+- zygoaudio decoding support
+- APNG demuxer
+- postproc visualization support
+
+
+version 2.4:
+- Icecast protocol
+- ported lenscorrection filter from frei0r filter
+- large optimizations in dctdnoiz to make it usable
+- ICY metadata are now requested by default with the HTTP protocol
+- support for using metadata in stream specifiers in fftools
+- LZMA compression support in TIFF decoder
+- H.261 RTP payload format (RFC 4587) depacketizer and experimental packetizer
+- HEVC/H.265 RTP payload format (draft v6) depacketizer
+- added codecview filter to visualize information exported by some codecs
+- Matroska 3D support thorugh side data
+- HTML generation using texi2html is deprecated in favor of makeinfo/texi2any
+- silenceremove filter
+
 
 version 2.3:
 - AC3 fixed-point decoding
@@ -29,7 +207,7 @@ version 2.3:
 - libbs2b-based stereo-to-binaural audio filter
 - libx264 reference frames count limiting depending on level
 - native Opus decoder
-- display matrix export and rotation api
+- display matrix export and rotation API
 - WebVTT encoder
 - showcqt multimedia filter
 - zoompan filter
@@ -71,6 +249,7 @@ version 2.2:
 - libx265 encoder
 - dejudder filter
 - Autodetect VDA like all other hardware accelerations
+- aliases and defaults for Ogg subtypes (opus, spx)
 
 
 version 2.1:
@@ -477,7 +656,7 @@ easier to use. The changes are:
           all the stream in the first input file, except for the second audio
           stream'.
     * There is a new option -c (or -codec) for choosing the decoder/encoder to
-      use, which allows to precisely specify target stream(s) consistently with
+      use, which makes it possible to precisely specify target stream(s) consistently with
       other options. E.g. -c:v lib264 sets the codec for all video streams, -c:a:0
       libvorbis sets the codec for the first audio stream and -c copy copies all
       the streams without reencoding. Old -vcodec/-acodec/-scodec options are now

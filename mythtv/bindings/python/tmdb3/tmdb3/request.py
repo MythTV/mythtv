@@ -16,6 +16,7 @@ from urllib import urlencode
 import urllib2
 import json
 import os
+import time
 
 DEBUG = False
 cache = Cache(filename='pytmdb3.cache')
@@ -113,27 +114,39 @@ class Request(urllib2.Request):
     def readJSON(self):
         """Parse result from specified URL as JSON data."""
         url = self.get_full_url()
-        try:
-            # catch HTTP error from open()
-            data = json.load(self.open())
-        except TMDBHTTPError, e:
+        tries = 0
+        while tries < 100:
             try:
-                # try to load whatever was returned
-                data = json.loads(e.response)
-            except:
-                # cannot parse json, just raise existing error
+                # catch HTTP error from open()
+                data = json.load(self.open())
+                break
+            except TMDBHTTPError, e:
+                try:
+                    # try to load whatever was returned
+                    data = json.loads(e.response)
+                except:
+                    # cannot parse json, just raise existing error
+                    raise e
+                else:
+                    # Check for error code of 25 which means we are doing more than 40 requests per 10 seconds
+                    if data.get('status_code', 1) ==25:
+                        # Sleep and retry query.
+                        if DEBUG:
+                            print 'Retry after {0} seconds'.format(max(float(e.headers['retry-after']),10))
+                        time.sleep(max(float(e.headers['retry-after']),10))
+                        continue
+                    else:
+                        # response parsed, try to raise error from TMDB
+                        handle_status(data, url)
+                # no error from TMDB, just raise existing error
                 raise e
-            else:
-                # response parsed, try to raise error from TMDB
-                handle_status(data, url)
-            # no error from TMDB, just raise existing error
-            raise e
         handle_status(data, url)
         if DEBUG:
             import pprint
             pprint.PrettyPrinter().pprint(data)
         return data
 
+# See https://www.themoviedb.org/documentation/api/status-codes
 status_handlers = {
     1: None,
     2: TMDBRequestInvalid('Invalid service - This service does not exist.'),
@@ -157,7 +170,9 @@ status_handlers = {
     14: TMDBRequestError('Authentication Failed.'),
     15: TMDBError('Failed'),
     16: TMDBError('Device Denied'),
-    17: TMDBError('Session Denied')}
+    17: TMDBError('Session Denied'),
+    # collection not found
+    34: TMDBRequestInvalid('The resource you requested could not be found.')}
 
 def handle_status(data, query):
     status = status_handlers[data.get('status_code', 1)]

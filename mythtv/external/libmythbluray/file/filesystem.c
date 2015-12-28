@@ -26,14 +26,14 @@
 
 BD_FILE_OPEN bd_register_file(BD_FILE_OPEN p)
 {
-  BD_FILE_OPEN old = file_open;
-  file_open = p;
-  return old;
+    BD_FILE_OPEN old = file_open;
+    file_open = p;
+    return old;
 }
 
 BD_DIR_OPEN bd_register_dir(BD_DIR_OPEN p)
 {
-  BD_DIR_OPEN old = dir_open;
-  dir_open = p;
-  return old;
+    BD_DIR_OPEN old = dir_open;
+    dir_open = p;
+    return old;
 }

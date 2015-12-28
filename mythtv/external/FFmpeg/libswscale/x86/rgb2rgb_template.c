@@ -1090,7 +1090,7 @@ static inline void RENAME(shuffle_bytes_2103)(const uint8_t *src, uint8_t *dst, 
         : "r" (s), "r" (d), "m" (mask32b), "m" (mask32r), "m" (mmx_one)
         : "memory");
     for (; idx<15; idx+=4) {
-        register int v = *(const uint32_t *)&s[idx], g = v & 0xff00ff00;
+        register unsigned v  = *(const uint32_t *)&s[idx], g = v & 0xff00ff00;
         v &= 0xff00ff;
         *(uint32_t *)&d[idx] = (v>>16) + g + (v<<16);
     }
@@ -1634,6 +1634,16 @@ static inline void RENAME(rgb24toyv12)(const uint8_t *src, uint8_t *ydst, uint8_
 #define BGR2V_IDX "16*4+16*34"
     int y;
     const x86_reg chromWidth= width>>1;
+
+    if (height > 2) {
+        ff_rgb24toyv12_c(src, ydst, udst, vdst, width, 2, lumStride, chromStride, srcStride, rgb2yuv);
+        src  += 2*srcStride;
+        ydst += 2*lumStride;
+        udst += chromStride;
+        vdst += chromStride;
+        height -= 2;
+    }
+
     for (y=0; y<height-2; y+=2) {
         int i;
         for (i=0; i<2; i++) {
@@ -1877,6 +1887,7 @@ static void RENAME(interleaveBytes)(const uint8_t *src1, const uint8_t *src2, ui
     for (h=0; h < height; h++) {
         int w;
 
+        if (width >= 16)
 #if COMPILE_TEMPLATE_SSE2
         __asm__(
             "xor              %%"REG_a", %%"REG_a"  \n\t"
@@ -1894,7 +1905,7 @@ static void RENAME(interleaveBytes)(const uint8_t *src1, const uint8_t *src2, ui
             "cmp                     %3, %%"REG_a"  \n\t"
             " jb                     1b             \n\t"
             ::"r"(dest), "r"(src1), "r"(src2), "r" ((x86_reg)width-15)
-            : "memory", "%"REG_a""
+            : "memory", XMM_CLOBBERS("xmm0", "xmm1", "xmm2",) "%"REG_a
         );
 #else
         __asm__(
@@ -1932,7 +1943,9 @@ static void RENAME(interleaveBytes)(const uint8_t *src1, const uint8_t *src2, ui
         src2 += src2Stride;
     }
     __asm__(
+#if !COMPILE_TEMPLATE_SSE2
             EMMS"       \n\t"
+#endif
             SFENCE"     \n\t"
             ::: "memory"
             );
@@ -1960,7 +1973,9 @@ static void RENAME(deinterleaveBytes)(const uint8_t *src, uint8_t *dst1, uint8_t
         dst2 += dst2Stride;
     }
     __asm__(
+#if !COMPILE_TEMPLATE_SSE2
             EMMS"       \n\t"
+#endif
             SFENCE"     \n\t"
             ::: "memory"
             );

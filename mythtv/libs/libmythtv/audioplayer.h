@@ -63,7 +63,6 @@ class MTV_PUBLIC AudioPlayer
     uint  GetVolume(void);
     uint  AdjustVolume(int change);
     uint  SetVolume(int newvolume);
-    void  SaveVolume(void);
     float GetStretchFactor(void) const { return m_stretchfactor; }
     void  SetStretchFactor(float factor);
     bool  IsUpmixing(void);

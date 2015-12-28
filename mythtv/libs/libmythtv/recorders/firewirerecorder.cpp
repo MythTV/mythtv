@@ -13,7 +13,7 @@
 #include "tv_rec.h"
 
 #define LOC QString("FireRecBase[%1](%2): ") \
-            .arg(tvrec ? tvrec->GetCaptureCardNum() : -1) \
+            .arg(tvrec ? tvrec->GetInputId() : -1) \
             .arg(channel->GetDevice())
 
 FirewireRecorder::FirewireRecorder(TVRec *rec, FirewireChannel *chan) :
@@ -145,6 +145,11 @@ void FirewireRecorder::AddData(const unsigned char *data, uint len)
 
 bool FirewireRecorder::ProcessTSPacket(const TSPacket &tspacket)
 {
+    const uint pid = tspacket.PID();
+
+    if (pid == 0x1fff) // Stuffing
+        return true;
+
     if (tspacket.TransportError())
         return true;
 

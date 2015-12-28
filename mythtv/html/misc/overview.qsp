@@ -10,7 +10,7 @@ import "/js/utility.js"
 <link rel="stylesheet" type="text/css" href="/css/site.css">
 <link rel="stylesheet" type="text/css" href="/misc/css/overview.css">
 <script type="text/javascript"  src="/js/util.qjs"></script>
-<script type="text/javascript"  src="/3rdParty/jquery/jquery-2.0.3.min.js"></script>
+<script type="text/javascript"  src="/3rdParty/jquery/jquery-2.1.4.min.js"></script>
 <script type="text/javascript"  src="/3rdParty/jquery/jqueryUI/js/jquery-ui-1.10.3.js"></script>
 <script type="text/javascript"  src="/3rdParty/jquery/galleria/galleria.js"></script>
 <script type="text/javascript"  src="/misc/js/overview.js"></script>

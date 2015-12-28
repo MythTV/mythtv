@@ -28,7 +28,7 @@ using namespace std;
 #include "channelutil.h"
 #include "hdhrstreamhandler.h"
 
-#define LOC     QString("HDHRChan[%1](%2): ").arg(GetCardID()).arg(GetDevice())
+#define LOC     QString("HDHRChan[%1](%2): ").arg(m_inputid).arg(GetDevice())
 
 HDHRChannel::HDHRChannel(TVRec *parent, const QString &device)
     : DTVChannel(parent),
@@ -65,7 +65,7 @@ bool HDHRChannel::Open(void)
     tunerType = (_tuner_types.empty()) ?
         DTVTunerType::kTunerTypeUnknown : (int) _tuner_types[0];
 
-    if (!InitializeInputs())
+    if (!InitializeInput())
     {
         Close();
         return false;
@@ -162,7 +162,7 @@ static QString get_tune_spec(
     return "auto";
 }
 
-bool HDHRChannel::Tune(const DTVMultiplex &tuning, QString /*inputname*/)
+bool HDHRChannel::Tune(const DTVMultiplex &tuning)
 {
     QString spec = get_tune_spec(tunerType, tuning);
     QString chan = QString("%1:%2").arg(spec).arg(tuning.frequency);

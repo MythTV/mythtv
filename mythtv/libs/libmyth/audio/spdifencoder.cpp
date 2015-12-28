@@ -48,7 +48,7 @@ SPDIFEncoder::SPDIFEncoder(QString muxer, int codec_id)
     }
     m_oc->oformat = fmt;
 
-    m_oc->pb = avio_alloc_context(m_buffer, sizeof(m_buffer), 0,
+    m_oc->pb = avio_alloc_context(m_buffer, sizeof(m_buffer), 1,
                                   this, NULL, funcIO, NULL);
     if (!m_oc->pb)
     {

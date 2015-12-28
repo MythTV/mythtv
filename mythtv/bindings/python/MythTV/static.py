@@ -5,11 +5,11 @@ Contains any static and global variables for MythTV Python Bindings
 """
 
 OWN_VERSION = (0,28,-1,0)
-SCHEMA_VERSION = 1339
+SCHEMA_VERSION = 1342
 NVSCHEMA_VERSION = 1007
 MUSICSCHEMA_VERSION = 1018
-PROTO_VERSION = '83'
-PROTO_TOKEN = 'BreakingGlass'
+PROTO_VERSION = '88'
+PROTO_TOKEN = 'XmasGift'
 BACKEND_SEP = '[]:[]'
 INSTALL_PREFIX = '/usr/local'
 

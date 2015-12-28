@@ -12,7 +12,7 @@ namespace
     template <typename T, typename arg_type>
     struct call_sort
     {
-        call_sort(T &c) : m_c(c) {}
+        explicit call_sort(T &c) : m_c(c) {}
 
         bool operator()(const arg_type &lhs, const arg_type &rhs)
         {

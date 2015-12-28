@@ -112,7 +112,7 @@ class AudioDeviceComboBox : public HostComboBoxSetting
 {
     Q_OBJECT
   public:
-    AudioDeviceComboBox(AudioConfigSettings*);
+    explicit AudioDeviceComboBox(AudioConfigSettings*);
     void AudioRescan();
 
     virtual void edit(MythScreenType * screen);

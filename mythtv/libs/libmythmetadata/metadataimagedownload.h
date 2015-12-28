@@ -18,7 +18,7 @@ typedef struct {
 class META_PUBLIC ImageDLEvent : public QEvent
 {
   public:
-    ImageDLEvent(MetadataLookup *lookup) :
+    explicit ImageDLEvent(MetadataLookup *lookup) :
                  QEvent(kEventType),
                  item(lookup)
     {
@@ -44,7 +44,7 @@ class META_PUBLIC ImageDLEvent : public QEvent
 class META_PUBLIC ImageDLFailureEvent : public QEvent
 {
   public:
-    ImageDLFailureEvent(MetadataLookup *lookup) :
+    explicit ImageDLFailureEvent(MetadataLookup *lookup) :
                  QEvent(kEventType),
                  item(lookup)
     {
@@ -70,7 +70,7 @@ class META_PUBLIC ImageDLFailureEvent : public QEvent
 class META_PUBLIC ThumbnailDLEvent : public QEvent
 {
   public:
-    ThumbnailDLEvent(ThumbnailData *data) :
+    explicit ThumbnailDLEvent(ThumbnailData *data) :
                  QEvent(kEventType),
                  thumb(data) {}
     ~ThumbnailDLEvent()
@@ -88,7 +88,7 @@ class META_PUBLIC MetadataImageDownload : public MThread
 {
   public:
 
-    MetadataImageDownload(QObject *parent);
+    explicit MetadataImageDownload(QObject *parent);
     ~MetadataImageDownload();
 
     void addThumb(QString title, QString url, QVariant data);

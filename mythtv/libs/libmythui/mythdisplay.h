@@ -10,7 +10,7 @@ class DisplayInfo
 {
   public:
     DisplayInfo(void)  : size(QSize(0,0)), res(QSize(0,0)), rate(-1) { }
-    DisplayInfo(int r) : size(QSize(0,0)), res(QSize(0,0)), rate(r)  { }
+    explicit DisplayInfo(int r) : size(QSize(0,0)), res(QSize(0,0)), rate(r)  { }
 
     int Rate(void) const { return (int)(rate + 0.5); }
     QSize size;

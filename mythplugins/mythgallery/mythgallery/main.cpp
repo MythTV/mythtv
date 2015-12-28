@@ -17,6 +17,7 @@
 #include "config.h"
 #include "iconview.h"
 #include "gallerysettings.h"
+#include "galleryutil.h"
 #include "dbcheck.h"
 
 #ifdef DCRAW_SUPPORT
@@ -78,10 +79,7 @@ static void handleMedia(MythMediaDevice *dev)
         return;
 
     if (dev && dev->isUsable())
-    {
-        GetMythMainWindow()->JumpTo("Main Menu");
         run(dev);
-    }
 }
 
 static void setupKeys(void)
@@ -130,20 +128,36 @@ static void setupKeys(void)
         "Mark image"), "T");
     REG_KEY("Gallery", "FULLSCREEN", QT_TRANSLATE_NOOP("MythControls",
         "Toggle scale to fullscreen/scale to fit"), "W");
-    REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
-        "MythGallery Media Handler 1/2"), "", "", handleMedia,
-        MEDIATYPE_DATA | MEDIATYPE_MIXED, QString::null);
+    REG_MEDIA_HANDLER(
+        QT_TRANSLATE_NOOP("MythControls", "MythGallery Media Handler 1/3"),
+        QT_TRANSLATE_NOOP("MythControls", "MythGallery mixed data"),
+        "", handleMedia, MEDIATYPE_DATA | MEDIATYPE_MIXED, QString::null);
     QString filt;
-    Q_FOREACH(QByteArray format, QImageReader::supportedImageFormats())
+    Q_FOREACH(QString format, GalleryUtil::GetImageFilter())
     {
+        format.remove(0,2); // Remoce "*."
         if (filt.isEmpty())
             filt = format;
         else
             filt += "," + format;
     }
-    REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
-        "MythGallery Media Handler 2/2"), "", "", handleMedia,
-        MEDIATYPE_MGALLERY, filt);
+    REG_MEDIA_HANDLER(
+        QT_TRANSLATE_NOOP("MythControls", "MythGallery Media Handler 2/3"),
+        QT_TRANSLATE_NOOP("MythControls", "MythGallery images"),
+        "", handleMedia, MEDIATYPE_MGALLERY, filt);
+    filt.clear();
+    Q_FOREACH(QString format, GalleryUtil::GetMovieFilter())
+    {
+        format.remove(0,2); // Remoce "*."
+        if (filt.isEmpty())
+            filt = format;
+        else
+            filt += "," + format;
+    }
+    REG_MEDIA_HANDLER(
+        QT_TRANSLATE_NOOP("MythControls", "MythGallery Media Handler 3/3"),
+        QT_TRANSLATE_NOOP("MythControls", "MythGallery movies"),
+        "", handleMedia, MEDIATYPE_MVIDEO, filt);
 }
 
 int mythplugin_init(const char *libversion)

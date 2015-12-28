@@ -23,106 +23,13 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <QFile>
+//#include "mythcorecontext.h"
 
-#include "mythcorecontext.h"
-#include "storagegroup.h"
-
-#include "imagescan.h"
-#include "imagethumbgenthread.h"
-#include "imageutils.h"
 #include "image.h"
 
-QString Image::GetImage(int id, ImageMetadata* im, const QString &function)
-{
-    QString imageFileName = QString();
+#define LOC QString("ImageService: ")
 
-    ImageUtils *iu = ImageUtils::getInstance();
-    iu->LoadFileFromDB(im, id);
-
-    if (im->m_fileName.isEmpty())
-
-        LOG(VB_GENERAL, LOG_ERR, QString("%1 - Image %2 not found in DB.")
-            .arg(function)
-            .arg(id));
-    else
-    {
-        QString sgName = IMAGE_STORAGE_GROUP;
-        StorageGroup sg = StorageGroup(sgName, gCoreContext->GetHostName());
-        imageFileName = sg.FindFile(im->m_fileName);
-
-        if (imageFileName.isEmpty())
-
-            LOG(VB_GENERAL, LOG_ERR,
-                QString("%1 - Storage Group file %2 not found for image %3")
-                .arg(function)
-                .arg(im->m_fileName)
-                .arg(id));
-    }
-    return imageFileName;
-}
-
-/** \fn     Image::SetImageInfo( int id,
-                                 const QString &tag,
-                                 const QString &value )
- *  \brief  Saves the given value into the exif tag of the filename.
- *  \param  id The database id of the file
- *  \param  tag The tag that shall be overwritten
- *  \param  value The new value
- *  \return bool True when saving was successful, otherwise false
- */
-bool Image::SetImageInfo( int id, const QString &tag, const QString &value )
-{
-    ImageMetadata *im = new ImageMetadata();
-    QString fileName = GetImage(id, im, QString("SetImageInfo"));
-    delete im;
-
-    if (fileName.isEmpty())
-
-        return false;
-
-    // We got the file name from the ID, so use this method
-    // which does the same but just on a filename basis.
-    return SetImageInfoByFileName(fileName, tag, value);
- }
-
-
-
-/** \fn     Image::SetImageInfoByFileName( const QString &fileName,
-                                           const QString &tag,
-                                           const QString &value )
- *  \brief  Saves the given value into the exif tag of the filename.
- *  \param  fileName The full filename
- *  \param  tag The tag that shall be overwritten
- *  \param  value The new value
- *  \return bool True when saving was successful, otherwise false
- */
-bool Image::SetImageInfoByFileName( const QString &fileName,
-                                    const QString &tag,
-                                    const QString &value )
-{
-    if (!QFile::exists( fileName ))
-    {
-        LOG(VB_GENERAL, LOG_ERR, "SetImageInfoByFileName - File does not exist.");
-        return false;
-    }
-
-    if (tag.isEmpty() || value.isEmpty())
-    {
-        LOG(VB_GENERAL, LOG_ERR, "SetImageInfoByFileName - Exif tag name or value is missing.");
-        return false;
-    }
-
-    bool ok;
-    ImageUtils *iu = ImageUtils::getInstance();
-    iu->SetExifValue(fileName, tag, value, &ok);
-
-    return ok;
-}
-
-
-
-/** \fn     Image::GetImageInfo( int id, const QString &tag )
+/**
  *  \brief  Returns the value of the specified exif tag from the image
             file. If the filename or exif tag do not
             exist or the tag has no contents, an empty value is returned.
@@ -132,306 +39,145 @@ bool Image::SetImageInfoByFileName( const QString &fileName,
  */
 QString Image::GetImageInfo( int id, const QString &tag )
 {
-    ImageMetadata *im = new ImageMetadata();
-    QString fileName = GetImage(id, im, QString("GetImageInfo"));
-    delete im;
+//    ImageManagerBe *mgr = ImageManagerBe::getInstance();
 
-    if (fileName.isEmpty())
+//    // Find image in DB
+//    ImageList images;
+//    if (mgr->GetFiles(images, QString::number(id)) != 1)
+//    {
+//        qDeleteAll(images);
+//        LOG(VB_FILE, LOG_NOTICE, LOC + QString("Image %1 not found").arg(id));
+//        return QString();
+//    }
 
-        return QString();
+//    // Read all metadata tags
+//    ImageAdapterBase::TagMap tags;
+//    tags.insert(tag, qMakePair(QString(), QString()));
 
-    // We got the file name from the ID, so use this method
-    // which does the same but just on a filename basis.
-    return GetImageInfoByFileName( fileName, tag );
+//    ImageItem *im = images[0];
+//    bool found = mgr->HandleGetMetadata(id, tags);
+//    delete im;
+
+//    if (found)
+//        return tags[tag].first;
+
+//    LOG(VB_FILE, LOG_DEBUG, LOC + QString("Tag %1 not found for %2").arg(tag).arg(id));
+    return QString();
 }
 
 
 
-/** \fn     Image::GetImageInfoByFileName( const QString &fileName,
-                                           const QString &tag )
- *  \brief  Returns the value of the specified exif tag from the image
-            file. If the filename or exif tag do not
-            exist or the tag has no contents, an empty value is returned.
- *  \param  fileName The full filename
- *  \param  tag The exif tag
- *  \return QString The exif tag value if successful, otherwise empty
- */
-QString Image::GetImageInfoByFileName( const QString &fileName, const QString &tag )
-{
-    if (!QFile::exists( fileName ))
-    {
-        LOG(VB_GENERAL, LOG_ERR, "GetImageInfoByFileName - File does not exist.");
-        return QString();
-    }
-
-    if (tag.isEmpty())
-    {
-        LOG(VB_GENERAL, LOG_ERR, "GetImageInfoByFileName - Exif tag name is missing.");
-        return QString();
-    }
-
-    bool ok;
-    ImageUtils *iu = ImageUtils::getInstance();
-    QString value = iu->GetExifValue(fileName, tag, &ok);
-
-    if (!ok)
-    {
-        LOG(VB_GENERAL, LOG_ERR, "GetImageInfoByFileName - Could not read exif tag");
-        return QString();
-    }
-
-    return value;
-}
-
-
-
-/** \fn     Image::GetImageInfoList(int id)
+/**
  *  \brief  Returns all values from all available exif tags
  *  \param  id The database id of the file
  *  \return DTC::ImageMetadataInfoList The list with all exif values
  */
-DTC::ImageMetadataInfoList* Image::GetImageInfoList( int id )
+DTC::ImageMetadataInfoList* Image::GetImageInfoList(int id)
 {
-    ImageMetadata *im = new ImageMetadata();
-    QString fileName = GetImage(id, im, QString("GetImageInfoList"));
-    delete im;
-
-    if (fileName.isEmpty())
-
-        return NULL;
-
-    // We got the file name from the ID, so use this method
-    // which does the same but just on a filename basis.
-    return GetImageInfoListByFileName(fileName);
-}
-
-
-
-/** \fn     Image::GetImageInfoListByFileName(QString &fileName)
- *  \brief  Returns all values from all available exif tags
- *  \param  fileName The name of the file
- *  \return DTC::ImageMetadataInfoList The list with all exif values
- */
-DTC::ImageMetadataInfoList* Image::GetImageInfoListByFileName( const QString &fileName )
-{
-    if (!QFile::exists(fileName))
-    {
-        LOG(VB_GENERAL, LOG_ERR, "GetImageInfoListByFileName - File does not exist.");
-        return NULL;
-    }
-
-    // Read all available exif tag
-    // values from the given image file
-    ImageUtils *iu = ImageUtils::getInstance();
-    QList<QStringList> valueList = iu->GetAllExifValues(fileName);
-
-    if (valueList.size() == 0)
-    {
-        LOG(VB_GENERAL, LOG_ERR, "GetImageInfoListByFileName - Could not read exif tags");
-        return NULL;
-    }
-
     // This holds the xml data structure from
     // the returned stringlist with the exif data
     DTC::ImageMetadataInfoList *imInfoList = new DTC::ImageMetadataInfoList();
 
-    // Set the general information of the image
-    QFileInfo fi(fileName);
-    imInfoList->setCount(valueList.size());
-    imInfoList->setFile(fi.fileName());
-    imInfoList->setPath(fi.path());
-    imInfoList->setSize(fi.size());
-    imInfoList->setExtension(fi.suffix());
+    // Read all metadata tags
+//    ImageManagerBe *mgr = ImageManagerBe::getInstance();
+    QStringList tags; // = mgr->HandleGetMetadata(QString::number(id));
 
-    // The returned stringlist contents are
-    // <familyname>, <groupname>, <tagname>, <taglabel>, <value>
-    // Go through all list items and build the response. Create
-    // a new tag and add the tagnames below it. Each tagname
-    // has these children: family, group, name, label, value.
-    for (int i = 0; i < valueList.size(); ++i)
+    if (tags.size() < 2 || tags[0] != "OK")
     {
-        QStringList values = valueList.at(i);
+        LOG(VB_FILE, LOG_NOTICE, LOC +
+            QString("Image %1 - %2").arg(id).arg(tags.join(",")));
+        return imInfoList;
+    }
+    tags.removeFirst();
 
+    // Set the general information of the image
+    imInfoList->setCount(tags.size());
+//    imInfoList->setFile(im->m_filePath);
+//    imInfoList->setPath(im->m_path);
+//    imInfoList->setSize(im->m_size);
+//    imInfoList->setExtension(im->m_extension);
+
+    // Each string contains a Name<seperator>Label<seperator>Value.
+    QString seperator = tags.takeFirst();
+    int index = 0;
+    foreach (const QString &token, tags)
+    {
+        QStringList parts = token.split(seperator);
+        if (parts.size() != 3)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("Bad Metadata received: '%1' (%2)").arg(token, seperator));
+            continue;
+        }
         DTC::ImageMetadataInfo *imInfo = imInfoList->AddNewImageMetadataInfo();
 
-        imInfo->setNumber(  i);
-        imInfo->setFamily(  values.at(0));
-        imInfo->setGroup(   values.at(1));
-        imInfo->setTag(     values.at(2));
-        imInfo->setKey(     values.at(3));
-        imInfo->setLabel(   values.at(4));
-        imInfo->setValue(   values.at(5));
-    }
+        imInfo->setNumber(index++);
+        imInfo->setTag(parts[0]);
+        imInfo->setLabel(parts[1]);
+        imInfo->setValue(parts[2]);
 
+#if DUMP_METADATA_TAGS
+        LOG(VB_FILE, LOG_DEBUG, LOC +
+            QString("Metadata %1 : %2 : '%3'").arg(parts[0], parts[1], parts[2]));
+#endif
+    }
     return imInfoList;
 }
 
 
 
-/** \fn     Image::RemoveImageFromDB(int id)
- *  \brief  Returns all values from all available exif tags
- *  \param  id The database id of the file
- *  \return bool True if successful, otherwise false
- */
-bool Image::RemoveImageFromDB( int id )
-{
-    ImageUtils *iu = ImageUtils::getInstance();
-    return iu->RemoveFileFromDB(id);
-}
-
-
-
-/** \fn     Image::RemoveImage(int id)
- *  \brief  Returns all values from all available exif tags
- *  \param  id The database id of the file
- *  \return bool True if successful, otherwise false
- */
+/*!
+ \brief Deletes an image file or dir subtree from filesystem and database
+ \param id Image
+ \return bool True if deleted, false otherwise
+*/
 bool Image::RemoveImage( int id )
 {
-    ImageMetadata *im = new ImageMetadata();
-    QString fileName = GetImage(id, im, QString("RemoveImage"));
-    delete im;
-
-    if (fileName.isEmpty())
-
-        return false;
-
-    if (!QFile::exists( fileName ))
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("RemoveImage - File %1 not found for image %2")
-            .arg(fileName)
-            .arg(id));
-    }
-    else if (!QFile::remove( fileName ))
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("RemoveImage - Could not delete file %1 for image %2")
-            .arg(fileName)
-            .arg(id));
-    }
-    else
-    {
-        LOG(VB_FILE, LOG_DEBUG,
-            QString("RemoveImage - Deleted %1 for image %3")
-                    .arg(fileName)
-                    .arg(id));
-
-        // Remove the database entry if the file has been deleted.
-        return RemoveImageFromDB(id);
-    }
-    return false;
+    QStringList result = ImageManagerBe::getInstance()->
+            HandleDelete(QString::number(id));
+    return result[0] == "OK";
 }
 
 
-/** \fn     Image::RenameImage(int Id,
- *                             const QString &sNewFile)
+/**
  *  \brief  Renames the file to the new name.
  *  \param  id The database id of the file
  *  \param  sNewName  The new name of the file (only the name, no path)
  *  \return bool True if renaming was successful, otherwise false
  */
-bool Image::RenameImage( int id,
-                         const QString &newName)
+bool Image::RenameImage( int id, const QString &newName)
 {
-    ImageMetadata *im = new ImageMetadata();
-    QString fileName = GetImage(id, im, QString("RenameImage"));
-    delete im;
-
-    if (fileName.isEmpty())
-
-        return false;
-
-    // Check if the file exists
-    if (!QFile::exists(fileName))
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("RenameImage - File %1 not found for image %2")
-            .arg(fileName)
-            .arg(id));
-        return false;
-    }
-
-    // New name must not contain a path
-    if (newName.contains("/") || newName.contains("\\"))
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("RenameImage - New filename '%1' for image %2 must "
-                    "not contain a path")
-            .arg(newName)
-            .arg(id));
-        return false;
-    }
-
-    // Rename the file
-    QFile file;
-    file.setFileName(fileName);
-    QFileInfo info = QFileInfo(file);
-    QDir::setCurrent(info.absolutePath());
-    bool done = file.rename(newName);
-
-    if (done)
-    {
-        LOG(VB_FILE, LOG_DEBUG,
-            QString("RenameImage - Renamed %1 to %2 for image %3")
-                    .arg(fileName)
-                    .arg(newName)
-                    .arg(id));
-    }
-    else
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("RenameImage - Renaming %1 to %2 failed for image %3")
-                    .arg(fileName)
-                    .arg(newName)
-                    .arg(id));
-    }
-
-    return done;
+    QStringList result = ImageManagerBe::getInstance()->
+            HandleRename(QString::number(id), newName);
+    return result[0] == "OK";
 }
 
 
-/** \fn     Image::StartSync(void)
+/**
  *  \brief  Starts the synchronization of the images with the database
  *  \return bool True if the sync has started, otherwise false
  */
 bool Image::StartSync( void )
 {
-    // Check that the required image tables exist to avoid
-    // syncing against non existent tables in the database.
-    if (gCoreContext->GetNumSetting("DBSchemaVer") < 1318)
-    {
-        LOG(VB_GENERAL, LOG_INFO,
-            "Sync cannot start, the required database tables are missing."
-            "Please upgrade your database schema to at least 1318.");
-        return false;
-    }
-
-    ImageScan *is = ImageScan::getInstance();
-    if (!is->SyncIsRunning())
-        is->StartSync();
-
-    return is->SyncIsRunning();
+    QStringList result = ImageManagerBe::getInstance()->HandleScanRequest("START");
+    return result.size() >= 2 && !result[1].isEmpty();
 }
 
 
 
-/** \fn     Image::StopSync(void)
+/**
  *  \brief  Stops the image synchronization if its running
  *  \return bool True if the sync has stopped, otherwise false
  */
 bool Image::StopSync( void )
 {
-    ImageScan *is = ImageScan::getInstance();
-    if (is->SyncIsRunning())
-        is->StopSync();
-
-    return is->SyncIsRunning();
+    QStringList result = ImageManagerBe::getInstance()->HandleScanRequest("STOP");
+    return result.size() >= 2 && !result[1].isEmpty();
 }
 
 
 
-/** \fn     Image::GetSyncStatus(void)
+/**
  *  \brief  Returns a list with information if the synchronization is
             currently running, the already synchronized images and
             the total amount of images that shall be synchronized.
@@ -439,37 +185,41 @@ bool Image::StopSync( void )
  */
 DTC::ImageSyncInfo* Image::GetSyncStatus( void )
 {
-    DTC::ImageSyncInfo *syncInfo = new DTC::ImageSyncInfo();
+    // Default to No Scan
+    bool running = false;
+    int  current = 0;
+    int  total   = 0;
 
-    ImageScan *is = ImageScan::getInstance();
+    // Expects OK, scanner id, current#, total#
+    QStringList result = ImageManagerBe::getInstance()->HandleScanRequest("QUERY");
+    if (result.size() == 4 && result[0] == "OK")
+    {
+        current = result[2].toInt();
+        total   = result[3].toInt();
+        running = (current != total);
+    }
 
     LOG(VB_GENERAL, LOG_DEBUG,
         QString("Image: Sync status is running: %1, current: %2, total: %3")
-        .arg(is->SyncIsRunning())
-        .arg(is->GetCurrent())
-        .arg(is->GetTotal()));
+        .arg(running).arg(current).arg(total));
 
-    syncInfo->setRunning(is->SyncIsRunning());
-    syncInfo->setCurrent(is->GetCurrent());
-    syncInfo->setTotal(is->GetTotal());
+    DTC::ImageSyncInfo *syncInfo = new DTC::ImageSyncInfo();
+    syncInfo->setRunning(running);
+    syncInfo->setCurrent(current);
+    syncInfo->setTotal(total);
 
     return syncInfo;
 }
 
-bool Image::CreateThumbnail(int id, bool recreate)
+/*!
+ \brief Request creation of a thumbnail
+ \param id Image
+ \return bool True if image is valid
+*/
+bool Image::CreateThumbnail(int id)
 {
-    ImageMetadata *im = new ImageMetadata();
-    ImageUtils *iu = ImageUtils::getInstance();
-    iu->LoadFileFromDB(im, id);
-
-    if (im->m_fileName.isEmpty())
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("CreateThumbnail - Image %1 not found in DB").arg(id));
-        delete im;
-        return false;
-    }
-
-    ImageThumbGen *thumbGen = ImageThumbGen::getInstance();
-    return thumbGen->AddToThumbnailList(im, recreate);
+    QStringList mesg("0");
+    mesg << QString::number(id);
+    ImageManagerBe::getInstance()->HandleCreateThumbnails(mesg);
+    return true;
 }

@@ -757,56 +757,6 @@
         <url>http://rss.cnn.com/rss/cnn_showbiz.rss</url>
     </item>
 
-    <item>
-        <title>Digital Spy - Media Headlines</title>
-        <url>http://www.digitalspy.co.uk/rss/zones/gb/media.xml</url>
-    </item>
-
-    <item>
-        <title>Digital Spy - Big Brother</title>
-        <url>http://www.digitalspy.co.uk/rss/categories/gb/bigbrother.xml</url>
-    </item>
-
-    <item>
-        <title>Digital Spy - Cult</title>
-        <url>http://www.digitalspy.co.uk/rss/categories/gb/cult.xml</url>
-    </item>
-
-    <item>
-        <title>Digital Spy - Movies</title>
-        <url>http://www.digitalspy.co.uk/rss/categories/gb/movies.xml</url>
-    </item>
-
-    <item>
-        <title>Digital Spy - Music</title>
-        <url>http://www.digitalspy.co.uk/rss/categories/gb/music.xml</url>
-    </item>
-
-    <item>
-        <title>Digital Spy - Reality</title>
-        <url>http://www.digitalspy.co.uk/rss/categories/gb/realitytv.xml</url>
-    </item>
-
-    <item>
-        <title>Digital Spy - Showbiz</title>
-        <url>http://www.digitalspy.co.uk/rss/categories/gb/showbiz.xml</url>
-    </item>
-
-    <item>
-        <title>Digital Spy - Soaps</title>
-        <url>http://www.digitalspy.co.uk/rss/categories/gb/soaps.xml</url>
-    </item>
-
-    <item>
-        <title>Digital Spy - Television</title>
-        <url>http://www.digitalspy.co.uk/rss/categories/gb/tv.xml</url>
-    </item>
-
-    <item>
-        <title>Digital Spy - US TV</title>
-        <url>http://www.digitalspy.co.uk/rss/categories/gb/ustv.xml</url>
-    </item>
-
 </category>
 
 <category name="MythTV">

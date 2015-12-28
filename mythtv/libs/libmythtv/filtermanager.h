@@ -47,9 +47,10 @@ class FilterManager
                              int &height, int &bufsize,
                              int max_threads = 1);
 
+    const FilterInfo *GetFilterInfo(const QString &name) const;
+
   private:
     bool LoadFilterLib(const QString &path);
-    const FilterInfo *GetFilterInfo(const QString &name) const;
 
     library_map_t dlhandles;
     filter_map_t  filters;

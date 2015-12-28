@@ -3,6 +3,7 @@
 #include <algorithm>
 using namespace std;
 
+#include <QSharedPointer>
 #include "dvbstreamdata.h"
 #include "dvbtables.h"
 #include "premieretables.h"

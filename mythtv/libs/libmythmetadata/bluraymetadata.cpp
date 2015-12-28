@@ -3,7 +3,7 @@
 #include <QCoreApplication>
 #include <QStringList>
 
-#include "bdnav/meta_data.h"
+#include "libbluray/bdnav/meta_data.h"
 #include "bluraymetadata.h"
 #include "mythdirs.h"
 

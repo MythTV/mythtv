@@ -16,7 +16,7 @@ using std::min;
 class MythD3DVertexBuffer
 {
   public:
-    MythD3DVertexBuffer(IDirect3DTexture9* tex = NULL) :
+    explicit MythD3DVertexBuffer(IDirect3DTexture9* tex = NULL) :
         m_color(0xFFFFFFFF), m_dest(QRect(QPoint(0,0),QSize(0,0))),
         m_src(QRect(QPoint(0,0),QSize(0,0))), m_texture(tex)
     {

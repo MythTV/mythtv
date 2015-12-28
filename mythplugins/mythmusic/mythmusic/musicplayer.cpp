@@ -270,7 +270,6 @@ void MusicPlayer::stop(bool stopAll)
 
     if (m_output)
     {
-        saveVolume();
         if (m_output->IsPaused())
             pause();
         m_output->Reset();
@@ -393,7 +392,8 @@ bool MusicPlayer::openOutputDevice(void)
 {
     QString adevice, pdevice;
 
-    if (gCoreContext->GetSetting("MusicAudioDevice") == "default")
+    adevice = gCoreContext->GetSetting("MusicAudioDevice", "default");
+    if (adevice == "default" || adevice.isEmpty())
         adevice = gCoreContext->GetSetting("AudioOutputDevice");
     else
         adevice = gCoreContext->GetSetting("MusicAudioDevice");
@@ -599,6 +599,7 @@ void MusicPlayer::customEvent(QEvent *event)
         if (getCurrentMetadata())
         {
             mdata->setID(getCurrentMetadata()->ID());
+            mdata->setHostname(gCoreContext->GetMasterHostName());
             mdata->setTrack(m_playedList.count() + 1);
             mdata->setStation(getCurrentMetadata()->Station());
             mdata->setChannel(getCurrentMetadata()->Channel());
@@ -719,6 +720,20 @@ void MusicPlayer::customEvent(QEvent *event)
 
                     QString message = QString("MUSIC_CONTROL ANSWER %1 %2")
                             .arg(gCoreContext->GetHostName()).arg(mdataStr);
+                    MythEvent me(message);
+                    gCoreContext->dispatch(me);
+                }
+                else if (list[2] == "GET_STATUS")
+                {
+                    QString statusStr = "STOPPED";
+
+                    if (gPlayer->isPlaying())
+                        statusStr = "PLAYING";
+                    else if (gPlayer->isPaused())
+                        statusStr = "PAUSED";
+
+                    QString message = QString("MUSIC_CONTROL ANSWER %1 %2")
+                            .arg(gCoreContext->GetHostName()).arg(statusStr);
                     MythEvent me(message);
                     gCoreContext->dispatch(me);
                 }
@@ -1408,12 +1423,6 @@ uint MusicPlayer::getVolume(void) const
     if (m_output)
         return m_output->GetCurrentVolume();
     return 0;
-}
-
-void MusicPlayer::saveVolume(void)
-{
-    if (m_output)
-        m_output->SaveCurrentVolume();
 }
 
 void MusicPlayer::toggleMute(void)

@@ -132,7 +132,7 @@ class VideoMetadataImp
         VideoCategory::GetCategory().get(m_categoryID, m_category);
     }
 
-    VideoMetadataImp(MSqlQuery &query)
+    explicit VideoMetadataImp(MSqlQuery &query)
     {
         fromDBRow(query);
     }
@@ -418,7 +418,7 @@ class VideoMetadataImp
 bool VideoMetadataImp::removeDir(const QString &dirName)
 {
     QDir d(dirName);
-    
+
     d.setFilter(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
     QFileInfoList contents = d.entryInfoList();
     if (!contents.size())

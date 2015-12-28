@@ -538,7 +538,7 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
                         QString::null,
                         chan.default_authority);
 
-                    if (!transports[i].iptv_tuning.m_data_url.isEmpty())
+                    if (!transports[i].iptv_tuning.GetDataURL().isEmpty())
                         ChannelUtil::CreateIPTVTuningData(chan.channel_id,
                                           transports[i].iptv_tuning);
                 }

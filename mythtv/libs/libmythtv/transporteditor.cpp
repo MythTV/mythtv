@@ -58,7 +58,7 @@ class TransportWizard : public ConfigurationWizard
 {
   public:
     TransportWizard(
-        uint mplexid, uint sourceid, CardUtil::CARD_TYPES _cardtype);
+        uint mplexid, uint sourceid, CardUtil::INPUT_TYPES _cardtype);
 
   private:
     MultiplexID *mplexid;
@@ -100,7 +100,8 @@ void TransportList::fillSelections(void)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT mplexid, modulation, frequency, "
-        "       symbolrate, networkid, transportid, constellation "
+        "       symbolrate, networkid, transportid, "
+        "       constellation, mod_sys "
         "FROM dtv_multiplex, videosource "
         "WHERE dtv_multiplex.sourceid = :SOURCEID AND "
         "      dtv_multiplex.sourceid = videosource.sourceid "
@@ -115,7 +116,8 @@ void TransportList::fillSelections(void)
 
     while (query.next())
     {
-        QString rawmod = (CardUtil::OFDM == cardtype) ?
+        QString rawmod = ((CardUtil::OFDM == cardtype) ||
+                          (CardUtil::DVBT2 == cardtype)) ?
             query.value(6).toString() : query.value(1).toString();
 
         QString mod = pp_modulation(rawmod);
@@ -136,6 +138,8 @@ void TransportList::fillSelections(void)
         QString type = "";
         if (CardUtil::OFDM == cardtype)
             type = "(DVB-T)";
+        if (CardUtil::DVBT2 == cardtype)
+            type = QString("(%1)").arg(query.value(7).toString());
         if (CardUtil::QPSK == cardtype)
             type = "(DVB-S)";
         if (CardUtil::QAM == cardtype)
@@ -149,7 +153,7 @@ void TransportList::fillSelections(void)
     }
 }
 
-static CardUtil::CARD_TYPES get_cardtype(uint sourceid)
+static CardUtil::INPUT_TYPES get_cardtype(uint sourceid)
 {
     vector<uint> cardids;
 
@@ -186,16 +190,16 @@ static CardUtil::CARD_TYPES get_cardtype(uint sourceid)
         return CardUtil::ERROR_PROBE;
     }
 
-    vector<CardUtil::CARD_TYPES> cardtypes;
+    vector<CardUtil::INPUT_TYPES> cardtypes;
 
     vector<uint>::const_iterator it = cardids.begin();
     for (; it != cardids.end(); ++it)
     {
-        CardUtil::CARD_TYPES nType = CardUtil::ERROR_PROBE;
-        QString cardtype = CardUtil::GetRawCardType(*it);
+        CardUtil::INPUT_TYPES nType = CardUtil::ERROR_PROBE;
+        QString cardtype = CardUtil::GetRawInputType(*it);
         if (cardtype == "DVB")
             cardtype = CardUtil::ProbeSubTypeName(*it);
-        nType = CardUtil::toCardType(cardtype);
+        nType = CardUtil::toInputType(cardtype);
 
         if ((CardUtil::ERROR_OPEN    == nType) ||
             (CardUtil::ERROR_UNKNOWN == nType) ||
@@ -221,11 +225,11 @@ static CardUtil::CARD_TYPES get_cardtype(uint sourceid)
 
     for (uint i = 1; i < cardtypes.size(); i++)
     {
-        CardUtil::CARD_TYPES typeA = cardtypes[i - 1];
+        CardUtil::INPUT_TYPES typeA = cardtypes[i - 1];
         typeA = (CardUtil::HDHOMERUN == typeA) ? CardUtil::ATSC : typeA;
         typeA = (CardUtil::MPEG      == typeA) ? CardUtil::V4L  : typeA;
 
-        CardUtil::CARD_TYPES typeB = cardtypes[i + 0];
+        CardUtil::INPUT_TYPES typeB = cardtypes[i + 0];
         typeB = (CardUtil::HDHOMERUN == typeB) ? CardUtil::ATSC : typeB;
         typeB = (CardUtil::MPEG      == typeB) ? CardUtil::V4L  : typeB;
 
@@ -298,7 +302,7 @@ DialogCode TransportListEditor::exec(void)
 void TransportListEditor::Edit(void)
 {
     uint sourceid = m_videosource->getValue().toUInt();
-    CardUtil::CARD_TYPES cardtype = get_cardtype(sourceid);
+    CardUtil::INPUT_TYPES cardtype = get_cardtype(sourceid);
 
     if ((CardUtil::ERROR_OPEN    != cardtype) &&
         (CardUtil::ERROR_UNKNOWN != cardtype) &&
@@ -501,7 +505,8 @@ class Modulation : public ComboBoxSetting, public MuxDBStorage
 
 Modulation::Modulation(const MultiplexID *id,  uint nType) :
     ComboBoxSetting(this),
-    MuxDBStorage(this, id, (CardUtil::OFDM == nType) ?
+    MuxDBStorage(this, id, ((CardUtil::OFDM == nType) ||
+                            (CardUtil::DVBT2 == nType)) ?
                  "constellation" : "modulation")
 {
     setLabel(QObject::tr("Modulation"));
@@ -512,7 +517,8 @@ Modulation::Modulation(const MultiplexID *id,  uint nType) :
         // no modulation options
         setVisible(false);
     }
-    else if ((CardUtil::QAM == nType) || (CardUtil::OFDM == nType))
+    else if ((CardUtil::QAM == nType) || (CardUtil::OFDM == nType) ||
+             (CardUtil::DVBT2 == nType))
     {
         addSelection(QObject::tr("QAM Auto"), "auto");
         addSelection("QAM-16",   "qam_16");
@@ -521,7 +527,7 @@ Modulation::Modulation(const MultiplexID *id,  uint nType) :
         addSelection("QAM-128",  "qam_128");
         addSelection("QAM-256",  "qam_256");
 
-        if (CardUtil::OFDM == nType)
+        if ((CardUtil::OFDM == nType) || (CardUtil::DVBT2 == nType))
         {
             addSelection("QPSK", "qpsk");
         }
@@ -675,6 +681,19 @@ class DVBTHierarchy : public ComboBoxSetting, public MuxDBStorage
     }
 };
 
+class DVBTModulationSystem : public ComboBoxSetting, public MuxDBStorage
+{
+  public:
+    DVBTModulationSystem(const MultiplexID *id) :
+        ComboBoxSetting(this), MuxDBStorage(this, id, "mod_sys")
+    {
+        setLabel(QObject::tr("Modulation System"));
+        setHelpText(QObject::tr("Modulation System (Default: DVB-T)"));
+        addSelection(QObject::tr("DVB-T"),  "DVB-T");
+        addSelection(QObject::tr("DVB-T2"), "DVB-T2");
+    };
+};
+
 
 class TransportPage : public HorizontalConfigurationGroup
 {
@@ -702,6 +721,22 @@ TransportPage::TransportPage(const MultiplexID *_id, uint nType) :
         left->addChild(new DVBTBandwidth(id));
         left->addChild(new DVBInversion(id));
         left->addChild(new Modulation(id, nType));
+
+        right = new VerticalConfigurationGroup(false, true, false, false);
+        right->addChild(new DVBTCoderateLP(id));
+        right->addChild(new DVBTCoderateHP(id));
+        right->addChild(new DVBTTransmissionMode(id));
+        right->addChild(new DVBTGuardInterval(id));
+        right->addChild(new DVBTHierarchy(id));
+    }
+    else if (CardUtil::DVBT2 == nType)
+    {
+        left->addChild(new DTVStandard(id, true, false));
+        left->addChild(new Frequency(id));
+        left->addChild(new DVBTBandwidth(id));
+        left->addChild(new DVBInversion(id));
+        left->addChild(new Modulation(id, nType));
+        left->addChild(new DVBTModulationSystem(id));
 
         right = new VerticalConfigurationGroup(false, true, false, false);
         right->addChild(new DVBTCoderateLP(id));
@@ -758,7 +793,7 @@ TransportPage::TransportPage(const MultiplexID *_id, uint nType) :
 };
 
 TransportWizard::TransportWizard(
-    uint _mplexid, uint _sourceid, CardUtil::CARD_TYPES _cardtype) :
+    uint _mplexid, uint _sourceid, CardUtil::INPUT_TYPES _cardtype) :
     mplexid(new MultiplexID())
 {
     setLabel(QObject::tr("DVB Transport"));

@@ -1,6 +1,9 @@
 // Config header generated in base directory by configure
 #include "config.h"
 
+// Own header
+#include "mythpainter_ogl.h"
+
 // QT headers
 #include <QCoreApplication>
 #include <QPainter>
@@ -12,13 +15,10 @@
 // Mythui headers
 #include "mythrender_opengl.h"
 
-// Own header
-#include "mythpainter_ogl.h"
-
 using namespace std;
 
 MythOpenGLPainter::MythOpenGLPainter(MythRenderOpenGL *render,
-                                     QGLWidget *parent) :
+                                     QWidget *parent) :
     MythPainter(), realParent(parent), realRender(render),
     target(0), swapControl(true)
 {
@@ -26,7 +26,7 @@ MythOpenGLPainter::MythOpenGLPainter(MythRenderOpenGL *render,
         LOG(VB_GENERAL, LOG_INFO,
             "OpenGL painter using existing OpenGL context.");
     if (realParent)
-        LOG(VB_GENERAL, LOG_INFO, "OpenGL painter using existing QGLWidget.");
+        LOG(VB_GENERAL, LOG_INFO, "OpenGL painter using existing QWidget.");
 }
 
 MythOpenGLPainter::~MythOpenGLPainter()
@@ -76,19 +76,23 @@ void MythOpenGLPainter::Begin(QPaintDevice *parent)
 {
     MythPainter::Begin(parent);
 
-    if (!realParent && parent)
-        realParent = dynamic_cast<QGLWidget *>(parent);
-
     if (!realParent)
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            "FATAL ERROR: Failed to cast parent to QGLWidget");
-        return;
-    }
+        realParent = dynamic_cast<QWidget *>(parent);
 
     if (!realRender)
     {
-        realRender = (MythRenderOpenGL*)(realParent->context());
+        QGLWidget *glw = dynamic_cast<QGLWidget *>(realParent);
+        if (!glw)
+            glw = dynamic_cast<QGLWidget *>(parent);
+
+        if (!glw)
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                "FATAL ERROR: Failed to cast parent to QGLWidget");
+            return;
+        }
+
+        realRender = (MythRenderOpenGL*)(glw->context());
         if (!realRender)
         {
             LOG(VB_GENERAL, LOG_ERR,
@@ -103,7 +107,8 @@ void MythOpenGLPainter::Begin(QPaintDevice *parent)
     if (target || swapControl)
     {
         realRender->BindFramebuffer(target);
-        realRender->SetViewPort(QRect(0, 0, realParent->width(), realParent->height()));
+        if (realParent)
+            realRender->SetViewPort(QRect(0, 0, realParent->width(), realParent->height()));
         realRender->SetColor(255, 255, 255, 255);
         realRender->SetBackground(0, 0, 0, 0);
         realRender->ClearFramebuffer();
@@ -150,15 +155,35 @@ int MythOpenGLPainter::GetTextureFromCache(MythImage *im)
     im->SetChanged(false);
 
     QImage tx = QGLWidget::convertToGLFormat(*im);
-    GLuint tx_id =
-        realRender->CreateTexture(tx.size(), false, 0,
+    GLuint tx_id = 0;
+    for (;;)
+    {
+        tx_id = realRender->CreateTexture(tx.size(), false, 0,
                                   GL_UNSIGNED_BYTE, GL_RGBA, GL_RGBA8,
                                   GL_LINEAR_MIPMAP_LINEAR);
+        if (tx_id)
+            break;
 
-    if (!tx_id)
-    {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to create OpenGL texture.");
-        return tx_id;
+        // This can happen if the cached textures are too big for GPU memory
+        if (m_HardwareCacheSize <= 8 * 1024 * 1024)
+        {
+            LOG(VB_GENERAL, LOG_ERR, "Failed to create OpenGL texture.");
+            return 0;
+        }
+
+        // Shrink the cache size
+        m_MaxHardwareCacheSize = (3 * m_HardwareCacheSize) / 4;
+        LOG(VB_GENERAL, LOG_NOTICE, QString(
+                "Shrinking UIPainterMaxCacheHW to %1KB")
+            .arg(m_MaxHardwareCacheSize / 1024));
+
+        while (m_HardwareCacheSize > m_MaxHardwareCacheSize)
+        {
+            MythImage *expiredIm = m_ImageExpireList.front();
+            m_ImageExpireList.pop_front();
+            DeleteFormatImagePriv(expiredIm);
+            DeleteTextures();
+        }
     }
 
     CheckFormatImage(im);

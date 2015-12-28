@@ -155,8 +155,6 @@ public:
     MythNotificationScreen(MythScreenStack *stack,
                              const MythNotificationScreen &screen);
     
-    MythNotificationScreen &operator=(const MythNotificationScreen &s);
-
     virtual ~MythNotificationScreen();
 
     bool keyPressEvent(QKeyEvent *event);
@@ -172,6 +170,7 @@ public:
     void UpdateArtwork(const QString &image);
     void UpdateMetaData(const DMAP &data);
     void UpdatePlayback(float progress, const QString &text);
+    void UpdateFrom(const MythNotificationScreen &s);
 
     void SetSingleShotTimer(int s, bool update = false);
     void SetErrorState(void);

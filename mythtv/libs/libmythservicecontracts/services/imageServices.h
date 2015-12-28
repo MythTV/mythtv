@@ -14,8 +14,6 @@ class SERVICE_PUBLIC ImageServices : public Service
 {
     Q_OBJECT
     Q_CLASSINFO( "version"    , "2.0" )
-    Q_CLASSINFO( "SetImageInfo_Method",             "POST" )
-    Q_CLASSINFO( "RemoveImageFromDB_Method",        "POST" )
     Q_CLASSINFO( "RemoveImage_Method",              "POST" )
     Q_CLASSINFO( "RenameImage_Method",              "POST" )
     Q_CLASSINFO( "StartSync_Method",                "POST" )
@@ -36,35 +34,20 @@ class SERVICE_PUBLIC ImageServices : public Service
 
     public slots:
 
-        virtual bool                        SetImageInfo                ( int   Id,
-                                                                          const QString &Tag,
-                                                                          const QString &Value ) = 0;
+        virtual QString                     GetImageInfo       ( int   Id,
+                                                                 const QString &Tag ) = 0;
 
-        virtual bool                        SetImageInfoByFileName      ( const QString &FileName,
-                                                                          const QString &Tag,
-                                                                          const QString &Value ) = 0;
+        virtual DTC::ImageMetadataInfoList* GetImageInfoList   ( int   Id ) = 0;
 
-        virtual QString                     GetImageInfo                ( int   Id,
-                                                                          const QString &Tag ) = 0;
-
-        virtual QString                     GetImageInfoByFileName      ( const QString &FileName,
-                                                                          const QString &Tag ) = 0;
-
-        virtual DTC::ImageMetadataInfoList* GetImageInfoList            ( int   Id ) = 0;
-
-        virtual DTC::ImageMetadataInfoList* GetImageInfoListByFileName  ( const QString &FileName ) = 0;
-
-        virtual bool                        RemoveImageFromDB  ( int   Id ) = 0;
         virtual bool                        RemoveImage        ( int   Id ) = 0;
-        virtual bool                        RenameImage        ( int Id,
+        virtual bool                        RenameImage        ( int   Id,
                                                                  const QString &NewName ) = 0;
 
         virtual bool                        StartSync          ( void ) = 0;
         virtual bool                        StopSync           ( void ) = 0;
         virtual DTC::ImageSyncInfo*         GetSyncStatus      ( void ) = 0;
 
-        virtual bool                        CreateThumbnail    ( int  Id,
-                                                                 bool Recreate) = 0;
+        virtual bool                        CreateThumbnail    ( int  Id ) = 0;
 };
 
 #endif

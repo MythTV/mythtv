@@ -20,7 +20,7 @@ class MythUIBusyDialog;
 class MUI_PUBLIC ScreenLoadCompletionEvent : public QEvent
 {
   public:
-    ScreenLoadCompletionEvent(const QString &id) :
+    explicit ScreenLoadCompletionEvent(const QString &id) :
         QEvent(kEventType), m_id(id) { }
 
     QString GetId() { return m_id; }

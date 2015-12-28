@@ -517,34 +517,6 @@ void PlaybackSock::SetNextLiveTVDir(int capturecardnum, QString dir)
     SendReceiveStringList(strlist);
 }
 
-vector<InputInfo> PlaybackSock::GetFreeInputs(int capturecardnum,
-                                           const vector<uint> &excluded_cardids)
-{
-    QStringList strlist(QString("QUERY_REMOTEENCODER %1").arg(capturecardnum));
-    strlist << "GET_FREE_INPUTS";
-
-    for (uint i = 0; i < excluded_cardids.size(); i++)
-        strlist << QString::number(excluded_cardids[i]);
-
-    SendReceiveStringList(strlist);
-
-    vector<InputInfo> list;
-
-    QStringList::const_iterator it = strlist.begin();
-    if ((it == strlist.end()) || (*it == "EMPTY_LIST"))
-        return list;
-
-    while (it != strlist.end())
-    {
-        InputInfo info;
-        if (!info.FromStringList(it, strlist.end()))
-            break;
-        list.push_back(info);
-    }
-
-    return list;
-}
-
 void PlaybackSock::CancelNextRecording(int capturecardnum, bool cancel)
 {
     QStringList strlist(QString("QUERY_REMOTEENCODER %1")

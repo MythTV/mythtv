@@ -1,12 +1,15 @@
+#include "videoout_opengl.h"
 #include "mythcontext.h"
 #include "mythmainwindow.h"
 #include "mythplayer.h"
 #include "videooutbase.h"
-#include "videoout_opengl.h"
 #include "videodisplayprofile.h"
 #include "filtermanager.h"
 #include "osd.h"
 #include "mythuihelper.h"
+#include "openglvideo.h"
+#include "mythrender_opengl.h"
+#include "mythpainter_ogl.h"
 
 #define LOC      QString("VidOutGL: ")
 
@@ -33,6 +36,8 @@ void VideoOutputOpenGL::GetRenderOptions(render_opts &opts,
         (*opts.safe_renderers)["vda"].append("opengl");
     if (opts.decoders->contains("crystalhd"))
         (*opts.safe_renderers)["crystalhd"].append("opengl");
+    if (opts.decoders->contains("openmax"))
+        (*opts.safe_renderers)["openmax"].append("opengl");
     opts.priorities->insert("opengl", 65);
 
     // lite profile - no colourspace control, GPU deinterlacing
@@ -48,6 +53,8 @@ void VideoOutputOpenGL::GetRenderOptions(render_opts &opts,
         (*opts.safe_renderers)["vda"].append("opengl-lite");
     if (opts.decoders->contains("crystalhd"))
         (*opts.safe_renderers)["crystalhd"].append("opengl-lite");
+    if (opts.decoders->contains("openmax"))
+        (*opts.safe_renderers)["openmax"].append("opengl-lite");
     opts.priorities->insert("opengl", 60);
 }
 
@@ -135,6 +142,15 @@ void VideoOutputOpenGL::DestroyGPUResources(void)
     if (gl_context)
         gl_context->makeCurrent();
 
+#ifdef USE_OPENGL_QT5
+    if (gl_created_painter)
+    {
+        QWidget *device = QWidget::find(gl_parent_win);
+        if (device)
+            device->setAttribute(Qt::WA_PaintOnScreen, false);
+    }
+#endif
+
     if (gl_created_painter)
         delete gl_painter;
     else if (gl_painter)
@@ -145,6 +161,7 @@ void VideoOutputOpenGL::DestroyGPUResources(void)
 
     if (gl_context)
         gl_context->doneCurrent();
+
     gl_context_lock.unlock();
 }
 
@@ -311,10 +328,10 @@ bool VideoOutputOpenGL::SetupContext(void)
         return true;
     }
 
-    QGLWidget *device = (QGLWidget*)QWidget::find(gl_parent_win);
+    QWidget *device = QWidget::find(gl_parent_win);
     if (!device)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to cast parent to QGLWidget");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to find parent to windowID");
         return false;
     }
 
@@ -389,7 +406,7 @@ void VideoOutputOpenGL::CreatePainter(void)
     MythMainWindow *win = MythMainWindow::getMainWindow();
     if (gl_context && !gl_context->IsShared())
     {
-        QGLWidget *device = (QGLWidget*)QWidget::find(gl_parent_win);
+        QWidget *device = QWidget::find(gl_parent_win);
         gl_painter = new MythOpenGLPainter(gl_context, device);
         if (!gl_painter)
         {
@@ -397,6 +414,10 @@ void VideoOutputOpenGL::CreatePainter(void)
             return;
         }
         gl_created_painter = true;
+#ifdef USE_OPENGL_QT5
+        if (device)
+            device->setAttribute(Qt::WA_PaintOnScreen);
+#endif
     }
     else
     {
@@ -562,18 +583,22 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
 
     // main UI when embedded
     MythMainWindow *mwnd = GetMythMainWindow();
-    if (gl_context->IsShared() && mwnd && mwnd->GetPaintWindow() &&
-        window.IsEmbedding())
+    if (mwnd && mwnd->GetPaintWindow() && window.IsEmbedding())
     {
         if (twopass)
             gl_context->SetViewPort(first, true);
-        mwnd->GetPaintWindow()->setMask(QRegion());
-        mwnd->draw();
+        mwnd->GetPaintWindow()->clearMask();
+        // Must force a UI redraw when embedded.  If not, when the EPG or
+        // finder screen is popped up over the video and the user then clicks
+        // away from Myth, the UI is left blank.
+        mwnd->GetMainStack()->GetTopScreen()->SetRedraw();
+        mwnd->draw(gl_painter);
         if (twopass)
         {
             gl_context->SetViewPort(second, true);
-            mwnd->GetPaintWindow()->setMask(QRegion());
-            mwnd->draw();
+            mwnd->GetPaintWindow()->clearMask();
+            mwnd->GetMainStack()->GetTopScreen()->SetRedraw();
+            mwnd->draw(gl_painter);
             gl_context->SetViewPort(main, true);
         }
     }
@@ -657,7 +682,7 @@ void VideoOutputOpenGL::Show(FrameScanType scan)
         return;
     }
 
-    if (gl_context && gl_context->format().doubleBuffer())
+    if (gl_context)
         gl_context->swapBuffers();
 }
 
@@ -974,4 +999,23 @@ QStringList VideoOutputOpenGL::GetVisualiserList(void)
     if (gl_context)
         return VideoVisual::GetVisualiserList(gl_context->Type());
     return VideoOutput::GetVisualiserList();
+}
+
+//virtual
+MythPainter *VideoOutputOpenGL::GetOSDPainter(void)
+{
+    return gl_painter;
+}
+
+// virtual
+bool VideoOutputOpenGL::CanVisualise(AudioPlayer *audio, MythRender *render)
+{
+    return VideoOutput::CanVisualise(audio, gl_context);
+}
+
+// virtual
+bool VideoOutputOpenGL::SetupVisualisation(AudioPlayer *audio,
+                                MythRender *render, const QString &name)
+{
+    return VideoOutput::SetupVisualisation(audio, gl_context, name);
 }

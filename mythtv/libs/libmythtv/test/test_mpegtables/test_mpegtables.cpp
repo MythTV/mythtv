@@ -88,6 +88,32 @@ void TestMPEGTables::pat_test(void)
 
     // first PID that is a real PMT PID and not the NIT PID
     QCOMPARE (pat.FindAnyPID(),        (uint32_t)  6100);
+
+    // Create a PAT no CRC error
+    vector<uint> pnums, pids;
+    pnums.push_back(1);
+    pids.push_back(0x100);
+    ProgramAssociationTable* pat2 =
+        ProgramAssociationTable::Create(1, 0, pnums, pids);
+    QVERIFY (pat2->VerifyCRC());
+
+    // Create a blank PAT, CRC error!
+    ProgramAssociationTable* pat3 =
+        ProgramAssociationTable::CreateBlank();
+    QVERIFY (!pat3->VerifyCRC());
+    // we still have not found "CRC mismatch 0 != 0xFFFFFFFF"
+    QCOMPARE (pat3->CalcCRC(), (uint) 0x334FF8A0);
+    pat3->SetCRC(pat3->CalcCRC());
+    QVERIFY (pat3->VerifyCRC());
+
+    // Create a PAT object
+    unsigned char si_data4[188];
+    memset (&si_data4, 0, sizeof(si_data4));
+    si_data4[1] = 1 << 7 & 0 << 6 & 3 << 4 & 0 << 2 & 0;
+    si_data4[2] = 0x00;
+    ProgramAssociationTable* pat4 = new ProgramAssociationTable((unsigned char*)&si_data4);
+    QCOMPARE (pat4->CalcCRC(), (uint) 0xFFFFFFFF);
+    QVERIFY (pat4->VerifyCRC());
 }
 
 void TestMPEGTables::dvbdate(void)
@@ -228,6 +254,49 @@ void TestMPEGTables::PrivateUPCCablecomEpisodetitleDescriptor_test (void)
     QCOMPARE (descriptor.CanonicalLanguageString(), QString("ger"));
     QCOMPARE (descriptor.TextLength(), (uint) 16);
     QCOMPARE (descriptor.Text(), QString("Krank vor Liebe"));
+}
+
+void TestMPEGTables::ItemList_test (void)
+{
+    ShortEventDescriptor descriptor(&eit_data_0000[26]);
+    QVERIFY  (descriptor.IsValid());
+    QCOMPARE (descriptor.DescriptorTag(), (unsigned int) DescriptorID::short_event);
+    QCOMPARE (descriptor.size(), (unsigned int) 194);
+    QCOMPARE (descriptor.LanguageString(), QString("ger"));
+    QVERIFY  (descriptor.Text().startsWith(QString("Krimiserie. ")));
+
+    ExtendedEventDescriptor descriptor2(&eit_data_0000[26+descriptor.size()]);
+    QCOMPARE (descriptor2.DescriptorTag(), (unsigned int) DescriptorID::extended_event);
+    /* tests for items start here */
+    QCOMPARE (descriptor2.LengthOfItems(), (uint) 139);
+}
+
+void TestMPEGTables::TestUCS2 (void)
+{
+    unsigned char ucs2_data[] = {
+        0x17, 0x11, 0x80, 0x06, 0x5e, 0xb7, 0x67, 0x03,  0x54, 0x48, 0x73, 0x7b, 0x00, 0x3a, 0x95, 0x8b,
+        0xc3, 0x80, 0x01, 0x53, 0xcb, 0x8a, 0x18, 0xbf
+    };
+
+    wchar_t wchar_data[] = L"\u8006\u5eb7\u6703\u5448\u737b\u003a\u958b\uc380\u0153\ucb8a\u18bf";
+
+    QCOMPARE (sizeof (QChar), (size_t) 2);
+    QCOMPARE (sizeof (ucs2_data) - 1, (size_t) ucs2_data[0]);
+    QString ucs2 = dvb_decode_text (&ucs2_data[1], ucs2_data[0], NULL, 0);
+    QCOMPARE (ucs2.length(), (int) (ucs2_data[0] - 1) / 2);
+    QCOMPARE (ucs2, QString::fromWCharArray (wchar_data));
+}
+
+void TestMPEGTables::ParentalRatingDescriptor_test (void)
+{
+    /* from https://forum.mythtv.org/viewtopic.php?p=4376 / #12553 */
+    const unsigned char si_data[] = { 
+        0x55, 0x04, 0x47, 0x42, 0x52, 0x0B
+    };
+    ParentalRatingDescriptor desc(si_data);
+    QCOMPARE (desc.Count(), 1u);
+    QCOMPARE (desc.CountryCodeString(0), QString("GBR"));
+    QCOMPARE (desc.Rating(0), 14);
 }
 
 QTEST_APPLESS_MAIN(TestMPEGTables)

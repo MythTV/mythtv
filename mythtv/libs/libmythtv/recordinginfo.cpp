@@ -995,6 +995,7 @@ bool RecordingInfo::InsertProgram(RecordingInfo *pg,
                                   const RecordingRule *rule)
 {
     QString inputname = pg->QueryInputDisplayName();
+    int recgroupid = GetRecgroupID(pg->recgroup);
 
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -1044,7 +1045,7 @@ bool RecordingInfo::InsertProgram(RecordingInfo *pg,
         "    stars,     previouslyshown,              originalairdate,  "
         "    findid,    transcoder,  playgroup,       recpriority,      "
         "    basename,  progstart,   progend,         profile,          "
-        "    duplicate, storagegroup, inputname) "
+        "    duplicate, storagegroup, inputname,      recgroupid) "
         "VALUES"
         "  (:CHANID,   :STARTS,     :ENDS,           :TITLE,            "
         "   :SUBTITLE, :DESC,       :SEASON,         :EPISODE,          "
@@ -1053,7 +1054,7 @@ bool RecordingInfo::InsertProgram(RecordingInfo *pg,
         "   :STARS,    :REPEAT,                      :ORIGAIRDATE,      "
         "   :FINDID,   :TRANSCODER, :PLAYGROUP,      :RECPRIORITY,      "
         "   :BASENAME, :PROGSTART,  :PROGEND,        :PROFILE,          "
-        "   0,         :STORGROUP,  :INPUTNAME) "
+        "   0,         :STORGROUP,  :INPUTNAME,      :RECGROUPID) "
         );
 
     if (pg->rectype == kOverrideRecord)
@@ -1093,6 +1094,7 @@ bool RecordingInfo::InsertProgram(RecordingInfo *pg,
     query.bindValue(":PROGEND",     pg->endts);
     query.bindValue(":PROFILE",     null_to_empty(rule->m_recProfile));
     query.bindValue(":INPUTNAME",   inputname);
+    query.bindValue(":RECGROUPID",  recgroupid);
 
     bool ok = query.exec() && (query.numRowsAffected() > 0);
     if (ok)
@@ -1266,7 +1268,7 @@ void RecordingInfo::AddHistory(bool resched, bool forcedup, bool future)
     result.bindValue(":RECTYPE", rectype);
     result.bindValue(":RECSTATUS", rs);
     result.bindValue(":DUPLICATE", dup);
-    result.bindValue(":REACTIVATE", IsReactivated());
+    result.bindValue(":REACTIVATE", 0);
     result.bindValue(":FUTURE", future);
 
     if (!result.exec())
@@ -1615,7 +1617,9 @@ void RecordingInfo::SetFilesize(uint64_t fsize)
         LoadRecordingFile();
     GetRecordingFile()->m_fileSize = fsize;
     updater->insert(recordedid, kPIUpdateFileSize, fsize);
-    //ProgramInfo::SetFilesize(fsize);
+
+    // Make sure the old storage location is updated for now
+    ProgramInfo::SetFilesize(fsize);
 }
 
 uint64_t RecordingInfo::GetFilesize(void) const

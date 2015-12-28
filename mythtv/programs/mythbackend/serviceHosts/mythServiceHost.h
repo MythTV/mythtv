@@ -43,7 +43,7 @@ class MythServiceHost : public ServiceHost
 {
     public:
 
-        MythServiceHost( const QString &sSharePath )
+        explicit MythServiceHost( const QString &sSharePath )
                 : ServiceHost( Myth::staticMetaObject, 
                                "Myth", 
                                "/Myth",

@@ -38,7 +38,7 @@ class Video : public VideoServices
 
     public:
 
-        Q_INVOKABLE Video( QObject *parent = 0 ) {}
+        Q_INVOKABLE explicit Video( QObject *parent = 0 ) {}
 
     public:
 

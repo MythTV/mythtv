@@ -5,6 +5,7 @@ INCLUDEPATH += ../../libs/libmythlivemedia ../../libs/libmythbase
 INCLUDEPATH += ../../external/libmythdvdnav/dvdnav ../../external/libmythdvdnav/dvdread
 INCLUDEPATH += ../../external/libmythbluray
 INCLUDEPATH += ../../external/libmythsoundtouch
+INCLUDEPATH += ../../external/libudfread
 INCLUDEPATH += ../../external/libsamplerate
 INCLUDEPATH += ../../libs/libmythtv/mpeg
 INCLUDEPATH += ../../libs/libmythtv/vbitext
@@ -41,6 +42,7 @@ LIBS += -lmythprotoserver-$$LIBVERSION
 using_live:LIBS += -L../../libs/libmythlivemedia -lmythlivemedia-$$LIBVERSION
 using_mheg:LIBS += -L../../libs/libmythfreemheg -lmythfreemheg-$$LIBVERSION
 using_hdhomerun:LIBS += -L../../external/libhdhomerun -lmythhdhomerun-$$LIBVERSION
+using_taglib: LIBS += $$CONFIG_TAGLIB_LIBS
 
 win32 {
     CONFIG += console

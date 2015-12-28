@@ -30,7 +30,7 @@ using namespace std;
 class PBHEventHandler : public QObject
 {
   public:
-    PBHEventHandler(PlaybackBoxHelper &pbh) :
+    explicit PBHEventHandler(PlaybackBoxHelper &pbh) :
         m_pbh(pbh), m_freeSpaceTimerId(0), m_checkAvailabilityTimerId(0)
     {
         StorageGroup::ClearGroupToUseCache();
@@ -215,11 +215,8 @@ bool PBHEventHandler::event(QEvent *e)
                 bool ok = RemoteUndeleteRecording(recordingID);
 
                 QStringList &res = (ok) ? successes : failures;
-                for (uint i = 0; i < 2; i++)
-                {
-                    res.push_back(list.front());
-                    list.pop_front();
-                }
+
+                res.push_back(QString::number(recordingID));
             }
             if (!successes.empty())
             {

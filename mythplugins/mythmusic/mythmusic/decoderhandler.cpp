@@ -255,7 +255,7 @@ void DecoderHandler::customEvent(QEvent *event)
                 }
                 else
                 {
-                    QUrl fileUrl(filename);
+                    QUrl fileUrl = QUrl::fromLocalFile(filename);
                     createPlaylistFromFile(fileUrl);
                 }
             }

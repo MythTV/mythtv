@@ -47,9 +47,10 @@ namespace {
     };
 }
 
-static int RunCCExtract(const ProgramInfo &program_info)
+static int RunCCExtract(const ProgramInfo &program_info, const QString & destdir)
 {
-    if (!program_info.IsLocal())
+    QString filename = program_info.GetPlaybackURL();
+    if (filename.startsWith("myth://"))
     {
         QString msg =
             QString("Only locally accessible files are supported (%1).")
@@ -58,7 +59,6 @@ static int RunCCExtract(const ProgramInfo &program_info)
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
-    QString filename = program_info.GetPathname();
     if (!QFile::exists(filename))
     {
         cerr << qPrintable(
@@ -74,12 +74,20 @@ static int RunCCExtract(const ProgramInfo &program_info)
         return GENERIC_EXIT_PERMISSIONS_ERROR;
     }
 
+    if (program_info.GetRecordingEndTime() > MythDate::current())
+    {
+        cout << "Program will end @ "
+             << qPrintable(program_info.GetRecordingEndTime(MythDate::ISODate))
+             << endl;
+        tmprbuf->SetWaitForWrite();
+    }
 
     PlayerFlags flags = (PlayerFlags)(kVideoIsNull | kAudioMuted  |
                                       kDecodeNoLoopFilter | kDecodeFewBlocks |
                                       kDecodeLowRes | kDecodeSingleThreaded |
                                       kDecodeNoDecode);
-    MythCCExtractorPlayer *ccp = new MythCCExtractorPlayer(flags, true, filename);
+    MythCCExtractorPlayer *ccp = new MythCCExtractorPlayer(flags, true,
+                                                           filename, destdir);
     PlayerContext *ctx = new PlayerContext(kCCExtractorInUseID);
     ctx->SetPlayingInfo(&program_info);
     ctx->SetRingBuffer(tmprbuf);
@@ -106,7 +114,7 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    bool useDB = false;
+    bool useDB;
 
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHCCEXTRACTOR);
 
@@ -140,6 +148,10 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
+    QString destdir = cmdline.toString("destdir");
+
+    useDB = !QFile::exists(infile);
+
     CleanupGuard callCleanup(cleanup);
 
 #ifndef _WIN32
@@ -163,7 +175,7 @@ int main(int argc, char *argv[])
     }
 
     ProgramInfo pginfo(infile);
-    return RunCCExtract(pginfo);
+    return RunCCExtract(pginfo, destdir);
 }
 
 

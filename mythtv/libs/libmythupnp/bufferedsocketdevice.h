@@ -58,7 +58,7 @@ class BufferedSocketDevice
 
     public:
 
-        BufferedSocketDevice( int nSocket );
+        explicit BufferedSocketDevice( int nSocket );
         explicit BufferedSocketDevice( MSocketDevice *pSocket = NULL,
                                        bool bTakeOwnership    = false );
 

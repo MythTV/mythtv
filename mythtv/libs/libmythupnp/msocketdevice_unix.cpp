@@ -44,6 +44,12 @@
 #include "qplatformdefs.h"
 #include "mythlogging.h"
 
+#ifdef Q_OS_ANDROID
+#include <sys/socket.h>
+#include <linux/in.h>
+#include <linux/in6.h>
+#endif
+
 // Almost always the same. If not, specify in qplatformdefs.h.
 #if !defined(QT_SOCKOPTLEN_T)
 # define QT_SOCKOPTLEN_T QT_SOCKLEN_T

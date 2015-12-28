@@ -41,7 +41,10 @@ class MBASE_PUBLIC RemoteFile
     static QStringList FindFileList(const QString &filename, const QString &host,
                                     const QString &storageGroup, bool useRegex = false,
                                     bool allowFallback = false);
-    static bool CopyFile(const QString &src, const QString &dest);
+    static bool CopyFile(const QString &src, const QString &dest,
+                         bool overwrite = false, bool verify = false);
+    static bool MoveFile(const QString &src, const QString &dest,
+                         bool overwrite = false);
 
     int Write(const void *data, int size);
     int Read(void *data, int size);
@@ -93,7 +96,7 @@ class MBASE_PUBLIC RemoteFile
 
     QStringList     possibleauxfiles;
     QStringList     auxfiles;
-    QFile          *localFile;
+    int             localFile;
     ThreadedFileWriter *fileWriter;
 };
 

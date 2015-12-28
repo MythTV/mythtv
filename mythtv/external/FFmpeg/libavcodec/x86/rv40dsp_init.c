@@ -33,7 +33,7 @@
 #include "hpeldsp.h"
 
 #define DEFINE_FN(op, size, insn) \
-static void op##_rv40_qpel##size##_mc33_##insn(uint8_t *dst, uint8_t *src, \
+static void op##_rv40_qpel##size##_mc33_##insn(uint8_t *dst, const uint8_t *src, \
                                                ptrdiff_t stride) \
 { \
     ff_##op##_pixels##size##_xy2_##insn(dst, src, stride, size); \
@@ -77,12 +77,12 @@ DECLARE_WEIGHT(ssse3)
  */
 #define QPEL_FUNC_DECL(OP, SIZE, PH, PV, OPT)                           \
 static void OP ## rv40_qpel ##SIZE ##_mc ##PH ##PV ##OPT(uint8_t *dst,  \
-                                                         uint8_t *src,  \
+                                                         const uint8_t *src, \
                                                          ptrdiff_t stride)  \
 {                                                                       \
     int i;                                                              \
     if (PH && PV) {                                                     \
-        DECLARE_ALIGNED(16, uint8_t, tmp)[SIZE * (SIZE + 5)];           \
+        LOCAL_ALIGNED(16, uint8_t, tmp, [SIZE * (SIZE + 5)]);           \
         uint8_t *tmpptr = tmp + SIZE * 2;                               \
         src -= stride * 2;                                              \
                                                                         \

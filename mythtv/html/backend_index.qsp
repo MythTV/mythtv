@@ -15,7 +15,7 @@
 <!-- Scripts -->
 <script type="text/javascript" src="/js/websocket_events.js"></script> <!-- Global websocket manager -->
 <script type="text/javascript" src="/js/util.qjs"></script>
-<script type="text/javascript" src="/3rdParty/jquery/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="/3rdParty/jquery/jquery-2.1.4.min.js"></script>
 <script type="text/javascript" src="/3rdParty/jquery/jqueryUI/js/jquery-ui-1.10.3.js"></script>
 <script type="text/javascript" src="/js/menu.js"></script>
 

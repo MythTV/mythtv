@@ -43,6 +43,7 @@ using namespace std;
 #include "streamview.h"
 #include "visualizerview.h"
 #include "searchview.h"
+#include "lyricsview.h"
 
 MusicCommon::MusicCommon(MythScreenStack *parent, MythScreenType *parentScreen,
                          const QString &name)
@@ -204,7 +205,7 @@ void MusicCommon::init(bool startPlayback)
         {
             // if we are playing but we are switching to a view from a different playmode
             // we need to restart playback in the new mode
-            if (m_currentView == MV_VISUALIZER || m_currentView == MV_MINIPLAYER)
+            if (m_currentView == MV_VISUALIZER || m_currentView == MV_MINIPLAYER || m_currentView == MV_LYRICS)
             {
                 // these views can be used in both play modes
             }
@@ -403,28 +404,28 @@ void MusicCommon::switchView(MusicView view)
         case MV_PLAYLIST:
         {
             if (view != MV_PLAYLISTEDITORTREE && view != MV_PLAYLISTEDITORGALLERY &&
-                    view != MV_SEARCH && view != MV_VISUALIZER)
+                    view != MV_SEARCH && view != MV_VISUALIZER && view != MV_LYRICS)
                 return;
             break;
         }
 
         case MV_PLAYLISTEDITORTREE:
         {
-            if (view != MV_PLAYLISTEDITORGALLERY && view != MV_SEARCH && view != MV_VISUALIZER)
+            if (view != MV_PLAYLISTEDITORGALLERY && view != MV_SEARCH && view != MV_VISUALIZER && view != MV_LYRICS)
                 return;
             break;
         }
 
         case MV_PLAYLISTEDITORGALLERY:
         {
-            if (view != MV_PLAYLISTEDITORTREE && view != MV_SEARCH && view != MV_VISUALIZER)
+            if (view != MV_PLAYLISTEDITORTREE && view != MV_SEARCH && view != MV_VISUALIZER && view != MV_LYRICS)
                 return;
             break;
         }
 
         case MV_SEARCH:
         {
-            if (view != MV_VISUALIZER)
+            if (view != MV_VISUALIZER && view != MV_LYRICS)
                 return;
             break;
         }
@@ -434,9 +435,15 @@ void MusicCommon::switchView(MusicView view)
             return;
         }
 
-        case MV_RADIO:
+        case MV_LYRICS:
         {
             if (view != MV_VISUALIZER)
+                return;
+        }
+
+        case MV_RADIO:
+        {
+            if (view != MV_VISUALIZER && view != MV_LYRICS)
                 return;
             break;
         }
@@ -565,6 +572,21 @@ void MusicCommon::switchView(MusicView view)
             break;
         }
 
+        case MV_LYRICS:
+        {
+            LyricsView *view = new LyricsView(mainStack, this);
+
+            if (view->Create())
+            {
+                mainStack->AddScreen(view);
+                connect(view, SIGNAL(Exiting()), this, SLOT(viewExited()));
+            }
+            else
+                delete view;
+
+            break;
+        }
+
         default:
             break;
     }
@@ -580,6 +602,16 @@ void MusicCommon::viewExited(void)
 bool MusicCommon::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
+
+    // if there is a pending jump point pass the key press to the default handler
+    if (GetMythMainWindow()->IsExitingToMain())
+    {
+        // do we need to stop playing?
+        if (gPlayer->isPlaying() && gCoreContext->GetSetting("MusicJumpPointAction", "stop") == "stop")
+            gPlayer->stop(true);
+
+        return false;
+    }
 
     QStringList actions;
     handled = GetMythMainWindow()->TranslateKeyPress("Music", e, actions, true);
@@ -631,7 +663,7 @@ bool MusicCommon::keyPressEvent(QKeyEvent *e)
         if (action == "ESCAPE")
         {
             // if we was started from another music view screen return to it
-            if (m_parentScreen || GetMythMainWindow()->IsExitingToMain())
+            if (m_parentScreen)
             {
                 handled = false;
             }
@@ -1352,6 +1384,8 @@ void MusicCommon::customEvent(QEvent *event)
                 switchView(MV_PLAYLISTEDITORGALLERY);
             else if (resulttext == tr("Switch To Tree View"))
                 switchView(MV_PLAYLISTEDITORTREE);
+            else if (resulttext == tr("Lyrics"))
+                switchView(MV_LYRICS);
         }
         else if (resultid == "submenu")
         {
@@ -2191,8 +2225,22 @@ MythMenu* MusicCommon::createMainMenu(void)
     else if (m_currentView == MV_PLAYLIST)
         menu->AddItem(MusicCommon::tr("Playlist Editor"));
 
-    menu->AddItem(tr("Search for Music"));
-    menu->AddItem(tr("Fullscreen Visualizer"));
+    QStringList screenList;
+    MythScreenType *screen = this;
+    while (screen)
+    {
+        screenList.append(screen->objectName());
+        screen = dynamic_cast<MusicCommon*>(screen)->m_parentScreen;
+    }
+
+    if (!screenList.contains("searchview") && !screenList.contains("streamview"))
+        menu->AddItem(tr("Search for Music"));
+
+    if (!screenList.contains("visualizerview"))
+        menu->AddItem(tr("Fullscreen Visualizer"));
+
+    if (!screenList.contains("lyricsview"))
+        menu->AddItem(tr("Lyrics"));
 
     menu->AddItem(tr("More Options"), NULL, createSubMenu());
 

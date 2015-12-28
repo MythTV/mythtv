@@ -119,10 +119,9 @@ void InternetContent::GetInternetSearch( HTTPRequest *pRequest )
     QString query   =  pRequest->m_mapParams[ "Query" ];
     QString page    =  pRequest->m_mapParams[ "Page" ];
 
-    if (grabber.isEmpty() || query.isEmpty() || page.isEmpty())
+    if (grabber.isEmpty() || query.isEmpty())
         return;
 
-    uint pagenum = page.toUInt();
     QString command = QString("%1internetcontent/%2").arg(GetShareDir())
                         .arg(grabber);
 
@@ -133,11 +132,6 @@ void InternetContent::GetInternetSearch( HTTPRequest *pRequest )
         return;
     }
 
-    LOG(VB_GENERAL, LOG_INFO,
-        QString("InternetContent::GetInternetSearch Executing "
-                "Command: %1 -p %2 -S '%3'")
-            .arg(command).arg(pagenum).arg(query));
-
     Search *search = new Search();
     QEventLoop loop;
 
@@ -146,7 +140,7 @@ void InternetContent::GetInternetSearch( HTTPRequest *pRequest )
     QObject::connect(search, SIGNAL(searchTimedOut(Search *)),
                      &loop, SLOT(quit(void)));
 
-    search->executeSearch(command, query, pagenum);
+    search->executeSearch(command, query, page);
     loop.exec();
 
     search->process();

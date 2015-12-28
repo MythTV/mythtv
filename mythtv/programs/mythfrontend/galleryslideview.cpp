@@ -1,0 +1,729 @@
+#include "galleryslideview.h"
+
+#include "mythmainwindow.h"
+#include "mythuitext.h"
+#include "mythdialogbox.h"
+
+#include "galleryviews.h"
+
+#define LOC QString("Slideview: ")
+
+
+/**
+ *  \brief  Constructor
+ *  \param  parent The screen parent
+ *  \param  name The name of the screen
+ */
+GallerySlideView::GallerySlideView(MythScreenStack *parent, const char *name,
+                                   bool editsAllowed)
+    : MythScreenType(parent, name),
+      m_uiImage(NULL),
+      m_uiStatus(NULL),
+      m_uiSlideCount(NULL), m_uiCaptionText(NULL), m_uiHideCaptions(NULL),
+      m_mgr(ImageManagerFe::getInstance()),
+      m_view(NULL),
+      m_availableTransitions(GetMythPainter()->SupportsAnimation()),
+      m_transition(m_availableTransitions.Select(
+                       gCoreContext->GetNumSetting("GalleryTransitionType",
+                                                   kBlendTransition))),
+      m_updateTransition(),
+      m_slides(),
+      m_infoList(*this),
+      m_slideShowTime(gCoreContext->GetNumSetting("GallerySlideShowTime", 3000)),
+      m_playing(false),
+      m_suspended(false),
+      m_showCaptions(gCoreContext->GetNumSetting("GalleryShowSlideCaptions", true)),
+      m_transitioning(false),
+      m_editsAllowed(editsAllowed)
+{
+    // Detect when transitions finish. Queued signal to allow redraw/pulse to
+    // complete before handling event.
+    connect(&m_transition, SIGNAL(finished()),
+            this, SLOT(TransitionComplete()), Qt::QueuedConnection);
+    connect(&m_updateTransition, SIGNAL(finished()),
+            this, SLOT(TransitionComplete()), Qt::QueuedConnection);
+
+    // Seed random generator for random transitions
+    qsrand(QTime::currentTime().msec());
+
+    // Initialise slideshow timer
+    m_timer.setSingleShot(true);
+    m_timer.setInterval(m_slideShowTime);
+    connect(&m_timer, SIGNAL(timeout()), this, SLOT(ShowNextSlide()));
+}
+
+
+/**
+ *  \brief  Destructor
+ */
+GallerySlideView::~GallerySlideView()
+{
+    delete m_view;
+    LOG(VB_GUI, LOG_DEBUG, "Deleted Slideview");
+}
+
+
+/**
+ *  \brief  Initialises the graphical elements
+ *  \return True if successful otherwise false
+ */
+bool GallerySlideView::Create()
+{
+    if (!LoadWindowFromXML("image-ui.xml", "slideshow", this))
+        return false;
+
+    // Get widgets from XML
+    bool err = false;
+    UIUtilE::Assign(this, m_uiImage, "image", &err);
+    UIUtilW::Assign(this, m_uiStatus, "status");
+    UIUtilW::Assign(this, m_uiSlideCount, "slidecount");
+    UIUtilW::Assign(this, m_uiCaptionText, "caption");
+    UIUtilW::Assign(this, m_uiHideCaptions, "hidecaptions");
+
+    if (err)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Cannot load screen 'Slideshow'");
+        return false;
+    }
+
+    // Initialise details list
+    if (!m_infoList.Create(true))
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Cannot load 'Info buttonlist'");
+        return false;
+    }
+
+    // Create display buffer
+    m_slides.Initialise(*m_uiImage);
+
+    if (m_uiHideCaptions)
+        m_uiHideCaptions->SetText(m_showCaptions ? "" : tr("Hide"));
+
+    BuildFocusList();
+    SetFocusWidget(m_uiImage);
+
+    // Detect when slides are available for display.
+    // Queue so that keypress events always complete before transition starts
+    connect(&m_slides, SIGNAL(SlideReady(int)),
+            this, SLOT(SlideAvailable(int)), Qt::QueuedConnection);
+
+    return true;
+}
+
+
+/*!
+ \brief Update transition
+*/
+void GallerySlideView::Pulse()
+{
+    // Update transition animations
+    m_transition.Pulse(GetMythMainWindow()->GetDrawInterval());
+
+    MythScreenType::Pulse();
+}
+
+
+/**
+ *  \brief  Handle keypresses
+ *  \param  event The pressed key
+ *  \return True if key was used, otherwise false
+ */
+bool GallerySlideView::keyPressEvent(QKeyEvent *event)
+{
+    if (GetFocusWidget()->keyPressEvent(event))
+        return true;
+
+    QStringList actions;
+    bool handled = GetMythMainWindow()->TranslateKeyPress("Images", event, actions);
+
+    for (int i = 0; i < actions.size() && !handled; i++)
+    {
+        QString action = actions[i];
+        handled = true;
+
+        if (action == "LEFT")
+            ShowPrevSlide();
+        else if (action == "RIGHT")
+            ShowNextSlide();
+        else if (action == "INFO")
+            ShowInfo();
+        else if (action == "MENU")
+            MenuMain();
+        else if (action == "PLAY")
+        {
+            if (m_playing)
+                Stop();
+            else
+                Play();
+        }
+        else if (action == "SELECT")
+            PlayVideo();
+        else if (action == "STOP")
+            Stop();
+        else if (action == "ROTRIGHT")
+            Transform(kRotateCW);
+        else if (action == "ROTLEFT")
+            Transform(kRotateCCW);
+        else if (action == "FLIPHORIZONTAL")
+            Transform(kFlipHorizontal);
+        else if (action == "FLIPVERTICAL")
+            Transform(kFlipVertical);
+        else if (action == "ZOOMIN")
+            Zoom(10);
+        else if (action == "ZOOMOUT")
+            Zoom(-10);
+        else if (action == "FULLSIZE")
+            Zoom();
+        else if (action == "SCROLLUP")
+            Pan(QPoint(0, 100));
+        else if (action == "SCROLLDOWN")
+            Pan(QPoint(0, -100));
+        else if (action == "SCROLLLEFT")
+            Pan(QPoint(-120, 0));
+        else if (action == "SCROLLRIGHT")
+            Pan(QPoint(120, 0));
+        else if (action == "RECENTER")
+            Pan();
+        else if (action == "ESCAPE" && !GetMythMainWindow()->IsExitingToMain())
+            // Exit info details, if shown
+            handled = m_infoList.Hide();
+        else
+            handled = false;
+    }
+
+    if (!handled)
+        handled = MythScreenType::keyPressEvent(event);
+
+    return handled;
+}
+
+
+/**
+ *  \brief  Handle custom events
+ *  \param  event The custom event
+ */
+void GallerySlideView::customEvent(QEvent *event)
+{
+    if ((MythEvent::Type)(event->type()) == MythEvent::MythEventMessage)
+    {
+        MythEvent *me      = (MythEvent *)event;
+        QString    message = me->Message();
+
+        QStringList extra = me->ExtraDataList();
+
+        if (message == "IMAGE_METADATA" && !extra.isEmpty())
+        {
+            int id = extra[0].toInt();
+            ImagePtrK selected = m_view->GetSelected();
+
+            if (selected && selected->m_id == id)
+                m_infoList.Display(*selected, extra.mid(1));
+        }
+        else if (message == "THUMB_AVAILABLE")
+        {
+            if (!extra.isEmpty() && m_view->Update(extra[0].toInt()))
+                ShowSlide(0);
+        }
+    }
+    else if (event->type() == DialogCompletionEvent::kEventType)
+    {
+        DialogCompletionEvent *dce = (DialogCompletionEvent *)(event);
+
+        QString resultid  = dce->GetId();
+        int     buttonnum = dce->GetResult();
+
+        if (resultid == "metadatamenu")
+        {
+            switch (buttonnum)
+            {
+            case 0: Transform(kRotateCW); break;
+            case 1: Transform(kRotateCCW); break;
+            case 2: Transform(kFlipHorizontal); break;
+            case 3: Transform(kFlipVertical); break;
+            case 4: Transform(kResetToExif); break;
+            case 5: Zoom(10); break;
+            case 6: Zoom(-10); break;
+            }
+        }
+    }
+}
+
+
+/**
+ *  \brief  Shows the popup menu
+ */
+void GallerySlideView::MenuMain()
+{
+    // Create the main menu that will contain the submenus above
+    MythMenu *menu = new MythMenu(tr("Slideshow Options"), this, "mainmenu");
+
+    ImagePtrK im = m_slides.GetCurrent().GetImageData();
+    if (im && im->m_type == kVideoFile)
+        menu->AddItem(tr("Play Video"), SLOT(PlayVideo()));
+
+    if (m_playing)
+        menu->AddItem(tr("Stop"), SLOT(Stop()));
+    else
+        menu->AddItem(tr("Start SlideShow"), SLOT(Play()));
+
+    if (gCoreContext->GetNumSetting("GalleryRepeat", 0))
+        menu->AddItem(tr("Turn Repeat Off"), SLOT(RepeatOff()));
+    else
+        menu->AddItem(tr("Turn Repeat On"), SLOT(RepeatOn()));
+
+    MenuTransforms(*menu);
+
+    if (m_uiHideCaptions)
+    {
+        if (m_showCaptions)
+            menu->AddItem(tr("Hide Captions"), SLOT(HideCaptions()));
+        else
+            menu->AddItem(tr("Show Captions"), SLOT(ShowCaptions()));
+    }
+
+    QString details;
+    switch (m_infoList.GetState())
+    {
+    case kBasicInfo: details = tr("More Details"); break;
+    case kFullInfo:  details = tr("Less Details"); break;
+    default:
+    case kNoInfo:    details = tr("Show Details"); break;
+    }
+    menu->AddItem(details, SLOT(ShowInfo()));
+
+    if (m_infoList.GetState() != kNoInfo)
+        menu->AddItem(tr("Hide Details"), SLOT(HideInfo()));
+
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythDialogBox *menuPopup = new MythDialogBox(menu, popupStack, "menuPopup");
+    if (menuPopup->Create())
+        popupStack->AddScreen(menuPopup);
+    else
+        delete menuPopup;
+}
+
+
+/**
+ *  \brief  Add Transforms submenu
+ *  \param  mainMenu Parent menu
+ */
+void GallerySlideView::MenuTransforms(MythMenu &mainMenu)
+{
+    ImagePtrK im = m_slides.GetCurrent().GetImageData();
+    if (im && !m_playing)
+    {
+        MythMenu *menu = new MythMenu(tr("Transform Options"),
+                                      this, "metadatamenu");
+        if (m_editsAllowed)
+        {
+            menu->AddItem(tr("Rotate CW"));
+            menu->AddItem(tr("Rotate CCW"));
+            menu->AddItem(tr("Flip Horizontal"));
+            menu->AddItem(tr("Flip Vertical"));
+            menu->AddItem(tr("Reset to Exif"));
+        }
+
+        if (m_slides.GetCurrent().CanZoomIn())
+            menu->AddItem(tr("Zoom In"));
+
+        if (m_slides.GetCurrent().CanZoomOut())
+            menu->AddItem(tr("Zoom Out"));
+
+        mainMenu.AddItem(tr("Transforms"), NULL, menu);
+    }
+}
+
+
+/*!
+ \brief  Start slideshow
+ \param type Browsing, Normal or Recursive
+ \param view View to initialise slideshow from.
+ \param newScreen True if starting from Thumbview, False otherwise
+*/
+void GallerySlideView::Start(ImageSlideShowType type, int parentId, int selectedId)
+{
+    gCoreContext->addListener(this);
+
+    if (type == kBrowseSlides)
+    {
+        // Browsing views a single ordered directory
+        m_view = new FlatView(kOrdered);
+
+        // Load db images
+        m_view->LoadFromDb(parentId);
+
+        // Display current selection, falling back to first
+        m_view->Select(selectedId);
+
+        // Display slide immediately
+        ShowSlide();
+    }
+    else
+    {
+        int orderInt = gCoreContext->GetNumSetting("GallerySlideOrder", kOrdered);
+
+        SlideOrderType order = (orderInt < kOrdered) || (orderInt > kSeasonal)
+                ? kOrdered
+                : static_cast<SlideOrderType>(orderInt);
+
+        // Recursive uses a view of a directory subtree; Normal views a single directory
+        m_view = (type == kRecursiveSlideShow) ? new TreeView(order)
+                                               : new FlatView(order);
+        // Load db images
+        m_view->LoadFromDb(parentId);
+
+        // Ordered views start from selected image
+        if (order == kOrdered)
+            // Adjust view so that slideshows show count rather than position
+            m_view->Rotate(selectedId);
+
+        // No transition for first image
+        Play(false);
+    }
+}
+
+
+void GallerySlideView::Close()
+{
+    gCoreContext->removeListener(this);
+
+    // Stop further loads
+    m_slides.Teardown();
+
+    // Update gallerythumbview selection
+    ImagePtrK im = m_view->GetSelected();
+    if (im)
+        emit ImageSelected(im->m_id);
+
+    MythScreenType::Close();
+}
+
+
+/**
+ *  \brief Stop a playing slideshow
+ */
+void GallerySlideView::Stop()
+{
+    m_playing = false;
+    m_timer.stop();
+    SetStatus(tr("Stopped"));
+}
+
+
+/**
+ *  \brief Start a slideshow
+ */
+void GallerySlideView::Play(bool useTransition)
+{
+    // Start from next slide
+    ShowNextSlide(useTransition);
+
+    m_playing = true;
+    if (!m_suspended)
+        m_timer.start();
+    if (m_uiStatus)
+        SetStatus(tr("Playing"));
+}
+
+
+/*!
+ \brief Pause transition timer temporarily
+*/
+void GallerySlideView::Suspend()
+{
+    m_timer.stop();
+    m_suspended = true;
+}
+
+
+/*!
+ \brief Unpause transition timer
+*/
+void GallerySlideView::Release()
+{
+    m_suspended = false;
+    if (m_playing)
+        m_timer.start();
+}
+
+
+/*!
+ \brief Action transform request
+ \param state Transform to apply
+*/
+void GallerySlideView::Transform(ImageFileTransform state)
+{
+    ImagePtrK im = m_view->GetSelected();
+    if (im && !m_playing)
+    {
+        ImageIdList list;
+        list.append(im->m_id);
+        QString err = m_mgr.ChangeOrientation(state, list);
+        if (!err.isEmpty())
+            ShowOkPopup(err);
+    }
+}
+
+
+/*!
+ \brief Zoom current slide
+ \param increment Percentage factor
+*/
+void GallerySlideView::Zoom(int increment)
+{
+    if (!m_playing)
+        m_slides.GetCurrent().Zoom(increment);
+}
+
+
+/*!
+ \brief Pan current slide
+ \param offset Offset from current position
+*/
+void GallerySlideView::Pan(QPoint offset)
+{
+    if (!m_playing)
+        m_slides.GetCurrent().Pan(offset);
+}
+
+
+/*!
+ \brief Show exif info list
+*/
+void GallerySlideView::ShowInfo()
+{
+    m_infoList.Toggle(m_slides.GetCurrent().GetImageData());
+}
+
+
+/*!
+ \brief Hide exif info list
+*/
+void GallerySlideView::HideInfo()
+{
+    m_infoList.Hide();
+}
+
+
+/*!
+ \brief Show text widgets
+*/
+void GallerySlideView::ShowCaptions()
+{
+    m_showCaptions = true;
+    m_uiHideCaptions->SetText("");
+}
+
+
+/*!
+ \brief Hide text widgets
+*/
+void GallerySlideView::HideCaptions()
+{
+    m_showCaptions = false;
+    m_uiHideCaptions->SetText(tr("Hide"));
+}
+
+
+/*!
+ \brief Display slide
+ \param direction Navigation direction +1 = forwards, 0 = update, -1 = backwards
+*/
+void GallerySlideView::ShowSlide(int direction)
+{
+    ImagePtrK im = m_view->GetSelected();
+    if (!im)
+        // Reached view limits
+        return;
+
+    LOG(VB_FILE, LOG_DEBUG, LOC + QString("Selected %1").arg(im->m_filePath));
+
+    // Suspend the timer until the transition has finished
+    Suspend();
+
+    // Load image from file
+    if (!m_slides.Load(im, direction))
+        // Image not yet available: show loading status
+        SetStatus(tr("Loading"));
+}
+
+
+/*!
+ \brief Start transition
+ \details Displays image that has just loaded
+ \param count Number of slides ready for display
+*/
+void GallerySlideView::SlideAvailable(int count)
+{
+    // Transition speed = 0.5x for every slide waiting. Min = 1x, Max = Half buffer size
+    float speed = 0.5 + count / 2.0;
+
+    // Are we transitioning ?
+    if (m_transitioning)
+    {
+        // More slides waiting for display: accelerate current transition
+        LOG(VB_FILE, LOG_DEBUG, LOC + QString("Changing speed to %1").arg(speed));
+        m_transition.SetSpeed(speed);
+        return;
+    }
+
+    // We've been waiting for this slide: transition immediately
+    m_transitioning = true;
+
+    // Take next slide
+    Slide &next = m_slides.GetNext();
+
+    // Update loading status
+    if (m_uiStatus)
+    {
+        if (!next.FailedLoad())
+
+            m_uiStatus->SetVisible(false);
+
+        else if (ImagePtrK im = next.GetImageData())
+
+            SetStatus(tr("Failed to load %1").arg(im->m_filePath));
+    }
+
+    // Update slide counts
+    if (m_uiSlideCount)
+        m_uiSlideCount->SetText(m_view->GetPosition());
+
+    int direction = next.GetDirection();
+
+    // Use special transition for updates/start-up
+    Transition &transition = (direction == 0) ? m_updateTransition : m_transition;
+
+    // Reset any zoom before starting transition
+    Zoom();
+    transition.Start(m_slides.GetCurrent(), next, direction >= 0, speed);
+}
+
+
+/*!
+ \brief Transition to new slide has finished
+ \details Resets buffers & old slide. Starts next transition if slide loads
+ are pending (skipping). Otherwise updates text widgets for new slide, pre-loads
+ next slide & starts any video.
+*/
+void GallerySlideView::TransitionComplete()
+{
+    if (m_IsDeleting)
+        return;
+
+    m_transitioning = false;
+
+    // Release old slide, which may start a new transition
+    m_slides.ReleaseCurrent();
+
+    // No further actions when skipping
+    if (m_transitioning)
+        return;
+
+    // Preload next slide, if any
+    m_slides.Preload(m_view->HasNext());
+
+    // Populate display for new slide
+    ImagePtrK im  = m_slides.GetCurrent().GetImageData();
+
+    // Update any file details information
+    m_infoList.Update(im);
+
+    if (im && m_uiCaptionText)
+    {
+        // show the date & comment
+        QStringList text;
+        text << m_mgr.LongDateOf(im);
+
+        if (!im->m_comment.isEmpty())
+            text << im->m_comment;
+
+        m_uiCaptionText->SetText(text.join(" - "));
+    }
+
+    // Start any video unless we're paused or browsing
+    if (im && im->m_type == kVideoFile)
+    {
+        if (m_playing)
+            PlayVideo();
+        else
+            SetStatus(tr("Video"));
+    }
+
+    // Resume slideshow timer
+    Release();
+}
+
+
+/*!
+ \brief Display the previous slide in the sequence
+*/
+void GallerySlideView::ShowPrevSlide()
+{
+    if (m_playing && m_view->HasPrev() == NULL)
+        // Prohibit back-wrapping during slideshow: it will cause premature end
+        //: Cannot go back beyond first slide of slideshow
+        SetStatus(tr("Start"));
+
+    else if (m_view->Prev())
+        ShowSlide(-1);
+}
+
+
+/*!
+ \brief Display the next slide in the sequence
+ \param useTransition if false, slide will be updated instantly
+*/
+void GallerySlideView::ShowNextSlide(bool useTransition)
+{
+    // Browsing always wraps; slideshows depend on repeat setting
+    if (m_playing && m_view->HasNext() == NULL
+            && !gCoreContext->GetNumSetting("GalleryRepeat", false))
+    {
+        Stop();
+        //: Slideshow has reached last slide
+        SetStatus(tr("End"));
+    }
+    else if (m_view->Next())
+        ShowSlide(useTransition ? 1 : 0);
+    else
+    {
+        // No images
+        Stop();
+        m_infoList.Hide();
+        m_slides.GetCurrent().Clear();
+        if (m_uiSlideCount)
+            m_uiSlideCount->SetText("0/0");
+        if (m_uiCaptionText)
+            m_uiCaptionText->SetText("");
+    }
+}
+
+
+/*!
+ \brief Starts internal player for video
+*/
+void GallerySlideView::PlayVideo()
+{
+    if (m_slides.GetCurrent().FailedLoad())
+        return;
+
+    ImagePtrK im = m_slides.GetCurrent().GetImageData();
+
+    if (im && im->m_type == kVideoFile)
+        GetMythMainWindow()->HandleMedia("Internal", im->m_url);
+}
+
+
+/*!
+ \brief Displays status text (Loading, Paused etc.)
+ \param msg Text to show
+*/
+void GallerySlideView::SetStatus(QString msg)
+{
+    if (m_uiStatus)
+    {
+        m_uiStatus->SetText(msg);
+        m_uiStatus->SetVisible(true);
+    }
+}

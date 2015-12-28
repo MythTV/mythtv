@@ -256,7 +256,7 @@ bool Capture::UpdateCaptureCard  ( int              nCardId,
     if ( nCardId < 1 || sSetting.isEmpty() || sValue.isEmpty() )
         throw( QString( "Card ID, Setting Name, and Value are required." ));
 
-    return set_on_source(sSetting, nCardId, 0, sValue);
+    return set_on_input(sSetting, nCardId, sValue);
 }
 
 // Card Inputs

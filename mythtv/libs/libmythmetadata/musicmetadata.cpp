@@ -33,6 +33,7 @@
 #include "metaioflacvorbis.h"
 #include "metaiowavpack.h"
 #include "musicutils.h"
+#include "lyricsdata.h"
 
 using namespace std;
 
@@ -82,6 +83,7 @@ MusicMetadata::MusicMetadata(int lid, QString lstation, QString lchannel, QStrin
             m_tempplaycount(0),
             m_compilation(0),
             m_albumArt(NULL),
+            m_lyricsData(NULL),
             m_id(lid),
             m_filename(lurl),
             m_hostname(""),
@@ -101,6 +103,12 @@ MusicMetadata::~MusicMetadata()
     {
         delete m_albumArt;
         m_albumArt = NULL;
+    }
+
+    if (m_lyricsData)
+    {
+        delete m_lyricsData;
+        m_lyricsData = NULL;
     }
 }
 
@@ -137,6 +145,7 @@ MusicMetadata& MusicMetadata::operator=(const MusicMetadata &rhs)
     m_albumid = rhs.m_albumid;
     m_genreid = rhs.m_genreid;
     m_albumArt = NULL;
+    m_lyricsData = NULL;
     m_format = rhs.m_format;
     m_changed = rhs.m_changed;
     m_fileSize = rhs.m_fileSize;
@@ -1192,6 +1201,13 @@ void MusicMetadata::reloadAlbumArtImages(void)
     m_albumArt = NULL; //new AlbumArtImages(this);
 }
 
+LyricsData* MusicMetadata::getLyricsData(void)
+{
+    if (!m_lyricsData)
+        m_lyricsData = new LyricsData(this);
+
+    return m_lyricsData;
+}
 
 // create a MetaIO for the file to read/write any tags etc
 // NOTE the caller is responsible for deleting it

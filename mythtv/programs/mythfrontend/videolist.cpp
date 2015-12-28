@@ -28,7 +28,7 @@ using namespace std;
 class TreeNodeDataPrivate
 {
   public:
-    TreeNodeDataPrivate(VideoMetadata *metadata) :
+    explicit TreeNodeDataPrivate(VideoMetadata *metadata) :
         m_metadata(metadata)
     {
         if (m_metadata)
@@ -170,7 +170,7 @@ struct metadata_sort
 
 struct metadata_path_sort
 {
-    metadata_path_sort(bool ignore_case) : m_ignore_case(ignore_case) {}
+    explicit metadata_path_sort(bool ignore_case) : m_ignore_case(ignore_case) {}
 
     bool operator()(const VideoMetadata &lhs, const VideoMetadata &rhs)
     {
@@ -1117,7 +1117,7 @@ void tree_view_to_flat(meta_dir_node &tree,
                        VideoListImp::metadata_view_list &flat);
 struct call_tree_flat
 {
-    call_tree_flat(VideoListImp::metadata_view_list &list) : m_list(list) {}
+    explicit call_tree_flat(VideoListImp::metadata_view_list &list) : m_list(list) {}
 
     void operator()(smart_dir_node &sdn)
     {

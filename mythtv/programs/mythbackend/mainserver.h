@@ -92,6 +92,21 @@ class TruncateThread : public QRunnable, public DeleteStruct
     void run(void);
 };
 
+class RenameThread : public QRunnable
+{
+public:
+    RenameThread(MainServer &ms, PlaybackSock &pbs, QString src, QString dst)
+        : m_ms(ms), m_pbs(pbs), m_src(src), m_dst(dst) {}
+    void run(void);
+
+private:
+    static QMutex m_renamelock;
+
+    MainServer   &m_ms;
+    PlaybackSock &m_pbs;
+    QString       m_src, m_dst;
+};
+
 class MainServer : public QObject, public MythSocketCBs
 {
     Q_OBJECT
@@ -99,6 +114,7 @@ class MainServer : public QObject, public MythSocketCBs
     friend class DeleteThread;
     friend class TruncateThread;
     friend class FreeSpaceUpdater;
+    friend class RenameThread;
   public:
     MainServer(bool master, int port,
                QMap<int, EncoderLink *> *tvList,
@@ -147,6 +163,8 @@ class MainServer : public QObject, public MythSocketCBs
     void GetActiveBackends(QStringList &hosts);
     void HandleActiveBackendsQuery(PlaybackSock *pbs);
     void HandleIsActiveBackendQuery(QStringList &slist, PlaybackSock *pbs);
+    void HandleMoveFile(PlaybackSock *pbs, const QString &storagegroup,
+                        const QString &src, const QString &dst);
     bool HandleDeleteFile(QStringList &slist, PlaybackSock *pbs);
     bool HandleDeleteFile(QString filename, QString storagegroup,
                           PlaybackSock *pbs = NULL);
@@ -181,6 +199,7 @@ class MainServer : public QObject, public MythSocketCBs
     void HandleGetExpiringRecordings(PlaybackSock *pbs);
     void HandleSGGetFileList(QStringList &sList, PlaybackSock *pbs);
     void HandleSGFileQuery(QStringList &sList, PlaybackSock *pbs);
+    void HandleGetFreeInputInfo(PlaybackSock *pbs, uint excluded_input);
     void HandleGetNextFreeRecorder(QStringList &slist, PlaybackSock *pbs);
     void HandleGetFreeRecorder(PlaybackSock *pbs);
     void HandleGetFreeRecorderCount(PlaybackSock *pbs);
@@ -228,13 +247,9 @@ class MainServer : public QObject, public MythSocketCBs
     void HandleMusicTagRemoveImage(const QStringList &slist, PlaybackSock *pbs);
     void HandleMusicTagChangeImage(const QStringList &slist, PlaybackSock *pbs);
     void HandleMusicCalcTrackLen(const QStringList &slist, PlaybackSock *pbs);
-    QString HandleScanImages(QStringList &slist, PlaybackSock *pbs);
-    void HandleQueryImageScanStatus(PlaybackSock *pbs);
-    void HandleCreateThumbnails(QStringList &slist, PlaybackSock *pbs);
-    QString HandleDeleteImage(QStringList &slist, PlaybackSock *pbs);
-    QString HandleRenameImage(QStringList &slist, PlaybackSock *pbs);
-    QString HandleSetImageExif(QStringList &slist, PlaybackSock *pbs);
-    QString HandleGetImageExif(QStringList &slist, PlaybackSock *pbs);
+    void HandleMusicFindLyrics(const QStringList &slist, PlaybackSock *pbs);
+    void HandleMusicGetLyricGrabbers(const QStringList &slist, PlaybackSock *pbs);
+    void HandleMusicSaveLyrics(const QStringList &slist, PlaybackSock *pbs);
     void HandleVersion(MythSocket *socket, const QStringList &slist);
     void HandleBackendRefresh(MythSocket *socket);
     void HandleQueryLoad(PlaybackSock *pbs);

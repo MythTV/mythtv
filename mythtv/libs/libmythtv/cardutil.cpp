@@ -21,6 +21,7 @@
 #include "sourceutil.h"
 #include "mythdb.h"
 #include "mythlogging.h"
+#include "inputinfo.h"
 
 #ifdef USING_DVB
 #include "dvbtypes.h"
@@ -38,6 +39,10 @@
 #include "hdhomerun.h"
 #endif
 
+#ifdef USING_VBOX
+#include "vboxutils.h"
+#endif
+
 #ifdef USING_ASI
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -47,68 +52,74 @@
 
 #define LOC      QString("CardUtil: ")
 
-QString CardUtil::GetScanableCardTypes(void)
+QString CardUtil::GetScanableInputTypes(void)
 {
-    QString cardTypes = "";
+    QString inputTypes = "";
 
 #ifdef USING_DVB
-    cardTypes += "'DVB'";
+    inputTypes += "'DVB'";
 #endif // USING_DVB
 
 #ifdef USING_V4L2
-    if (!cardTypes.isEmpty())
-        cardTypes += ",";
-    cardTypes += "'V4L'";
+    if (!inputTypes.isEmpty())
+        inputTypes += ",";
+    inputTypes += "'V4L'";
 # ifdef USING_IVTV
-    cardTypes += ",'MPEG'";
+    inputTypes += ",'MPEG'";
 # endif // USING_IVTV
 #endif // USING_V4L2
 
 #ifdef USING_IPTV
-    if (!cardTypes.isEmpty())
-        cardTypes += ",";
-    cardTypes += "'FREEBOX'";
+    if (!inputTypes.isEmpty())
+        inputTypes += ",";
+    inputTypes += "'FREEBOX'";
 #endif // USING_IPTV
 
+#ifdef USING_VBOX
+    if (!inputTypes.isEmpty())
+        inputTypes += ",";
+    inputTypes += "'VBOX'";
+#endif // USING_VBOX
+
 #ifdef USING_HDHOMERUN
-    if (!cardTypes.isEmpty())
-        cardTypes += ",";
-    cardTypes += "'HDHOMERUN'";
+    if (!inputTypes.isEmpty())
+        inputTypes += ",";
+    inputTypes += "'HDHOMERUN'";
 #endif // USING_HDHOMERUN
 
 #ifdef USING_ASI
-    if (!cardTypes.isEmpty())
-        cardTypes += ",";
-    cardTypes += "'ASI'";
+    if (!inputTypes.isEmpty())
+        inputTypes += ",";
+    inputTypes += "'ASI'";
 #endif
 
 #ifdef USING_CETON
-    if (!cardTypes.isEmpty())
-        cardTypes += ",";
-    cardTypes += "'CETON'";
+    if (!inputTypes.isEmpty())
+        inputTypes += ",";
+    inputTypes += "'CETON'";
 #endif // USING_CETON
 
 #if !defined( USING_MINGW ) && !defined( _MSC_VER )
-    if (!cardTypes.isEmpty())
-        cardTypes += ",";
-    cardTypes += "'EXTERNAL'";
+    if (!inputTypes.isEmpty())
+        inputTypes += ",";
+    inputTypes += "'EXTERNAL'";
 #endif
 
-    if (cardTypes.isEmpty())
-        cardTypes = "'DUMMY'";
+    if (inputTypes.isEmpty())
+        inputTypes = "'DUMMY'";
 
-    return QString("(%1)").arg(cardTypes);
+    return QString("(%1)").arg(inputTypes);
 }
 
-bool CardUtil::IsCableCardPresent(uint cardid,
-                                  const QString &cardType)
+bool CardUtil::IsCableCardPresent(uint inputid,
+                                  const QString &inputType)
 {
-    if (cardType == "HDHOMERUN")
+    if (inputType == "HDHOMERUN")
     {
 #ifdef USING_HDHOMERUN
         hdhomerun_device_t *hdhr;
         hdhomerun_tuner_status_t status;
-        QString device = GetVideoDevice(cardid);
+        QString device = GetVideoDevice(inputid);
         hdhr = hdhomerun_device_create_from_str(device.toLatin1(), NULL);
         if (!hdhr)
             return false;
@@ -130,7 +141,7 @@ bool CardUtil::IsCableCardPresent(uint cardid,
 #endif
         return false;
     }
-    else if (cardType == "CETON")
+    else if (inputType == "CETON")
     {
 #ifdef USING_CETON
         // TODO FIXME implement detection of Cablecard presence
@@ -144,18 +155,18 @@ bool CardUtil::IsCableCardPresent(uint cardid,
         return false;
 }
 
-bool CardUtil::IsTunerShared(uint cardidA, uint cardidB)
+bool CardUtil::IsTunerShared(uint inputidA, uint inputidB)
 {
     LOG(VB_GENERAL, LOG_DEBUG, QString("IsTunerShared(%1,%2)")
-            .arg(cardidA).arg(cardidB));
+            .arg(inputidA).arg(inputidB));
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT videodevice, hostname, cardtype "
                   "FROM capturecard "
-                  "WHERE ( (cardid = :CARDID_A) OR "
-                  "        (cardid = :CARDID_B) )");
-    query.bindValue(":CARDID_A", cardidA);
-    query.bindValue(":CARDID_B", cardidB);
+                  "WHERE ( (cardid = :INPUTID_A) OR "
+                  "        (cardid = :INPUTID_B) )");
+    query.bindValue(":INPUTID_A", inputidA);
+    query.bindValue(":INPUTID_B", inputidB);
 
     if (!query.exec())
     {
@@ -168,9 +179,9 @@ bool CardUtil::IsTunerShared(uint cardidA, uint cardidB)
 
     const QString vdevice  = query.value(0).toString();
     const QString hostname = query.value(1).toString();
-    const QString cardtype = query.value(2).toString();
+    const QString inputtype = query.value(2).toString();
 
-    if (!IsTunerSharingCapable(cardtype.toUpper()))
+    if (!IsTunerSharingCapable(inputtype.toUpper()))
         return false;
 
     if (!query.next())
@@ -178,20 +189,20 @@ bool CardUtil::IsTunerShared(uint cardidA, uint cardidB)
 
     bool ret = ((vdevice  == query.value(0).toString()) &&
                 (hostname == query.value(1).toString()) &&
-                (cardtype == query.value(2).toString()));
+                (inputtype == query.value(2).toString()));
 
     LOG(VB_RECORD, LOG_DEBUG, QString("IsTunerShared(%1,%2) -> %3")
-            .arg(cardidA).arg(cardidB).arg(ret));
+            .arg(inputidA).arg(inputidB).arg(ret));
 
     return ret;
 }
 
-/** \fn CardUtil::IsCardTypePresent(const QString&, QString)
- *  \brief Returns true if the card type is present and connected to an input
- *  \param rawtype  Card type as used in DB or empty string for all cards
+/** \fn CardUtil::IsInputTypePresent(const QString&, QString)
+ *  \brief Returns true if the input type is present and connected to an input
+ *  \param rawtype  Input type as used in DB or empty string for all inputs
  *  \param hostname Host to check, or empty string for current host
  */
-bool CardUtil::IsCardTypePresent(const QString &rawtype, QString hostname)
+bool CardUtil::IsInputTypePresent(const QString &rawtype, QString hostname)
 {
     if (hostname.isEmpty())
         hostname = gCoreContext->GetHostName();
@@ -203,18 +214,18 @@ bool CardUtil::IsCardTypePresent(const QString &rawtype, QString hostname)
         "WHERE capturecard.hostname = :HOSTNAME ";
 
     if (!rawtype.isEmpty())
-        qstr += " AND capturecard.cardtype = :CARDTYPE";
+        qstr += " AND capturecard.cardtype = :INPUTTYPE";
 
     query.prepare(qstr);
 
     if (!rawtype.isEmpty())
-        query.bindValue(":CARDTYPE", rawtype.toUpper());
+        query.bindValue(":INPUTTYPE", rawtype.toUpper());
 
     query.bindValue(":HOSTNAME", hostname);
 
     if (!query.exec())
     {
-        MythDB::DBError("CardUtil::IsCardTypePresent", query);
+        MythDB::DBError("CardUtil::IsInputTypePresent", query);
         return false;
     }
 
@@ -225,9 +236,9 @@ bool CardUtil::IsCardTypePresent(const QString &rawtype, QString hostname)
     return count > 0;
 }
 
-QStringList CardUtil::GetCardTypes(void)
+QStringList CardUtil::GetInputTypes(void)
 {
-    QStringList cardtypes;
+    QStringList inputtypes;
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT DISTINCT cardtype "
@@ -235,20 +246,20 @@ QStringList CardUtil::GetCardTypes(void)
 
     if (!query.exec())
     {
-        MythDB::DBError("CardUtil::GetCardTypes()", query);
+        MythDB::DBError("CardUtil::GetInputTypes()", query);
     }
     else
     {
         while (query.next())
-            cardtypes.push_back(query.value(0).toString());
+            inputtypes.push_back(query.value(0).toString());
     }
 
-    return cardtypes;
+    return inputtypes;
 }
 
 /** \fn CardUtil::GetVideoDevices(const QString&, QString)
- *  \brief Returns the videodevices of the matching cards, duplicates removed
- *  \param rawtype  Card type as used in DB or empty string for all cardids
+ *  \brief Returns the videodevices of the matching inputs, duplicates removed
+ *  \param rawtype  Input type as used in DB or empty string for all inputids
  *  \param hostname Host to check, or empty string for current host
  */
 QStringList CardUtil::GetVideoDevices(const QString &rawtype, QString hostname)
@@ -265,12 +276,12 @@ QStringList CardUtil::GetVideoDevices(const QString &rawtype, QString hostname)
         "WHERE hostname = :HOSTNAME";
 
     if (!rawtype.isEmpty())
-        qstr += " AND cardtype = :CARDTYPE";
+        qstr += " AND cardtype = :INPUTTYPE";
 
     query.prepare(qstr);
 
     if (!rawtype.isEmpty())
-        query.bindValue(":CARDTYPE", rawtype.toUpper());
+        query.bindValue(":INPUTTYPE", rawtype.toUpper());
 
     query.bindValue(":HOSTNAME", hostname);
 
@@ -380,6 +391,12 @@ QStringList CardUtil::ProbeVideoDevices(const QString &rawtype)
         }
     }
 #endif // USING_HDHOMERUN
+#ifdef USING_VBOX
+    else if (rawtype.toUpper() == "VBOX")
+    {
+        devs = VBox::probeDevices();
+    }
+#endif // USING_VBOX
 #ifdef USING_CETON
     else if (rawtype.toUpper() == "CETON")
     {
@@ -430,9 +447,13 @@ QString CardUtil::ProbeDVBType(const QString &device)
 
     DTVTunerType type(info.type);
 #if HAVE_FE_CAN_2G_MODULATION
-    if (type == DTVTunerType::kTunerTypeDVBS1 &&
-        (info.caps & FE_CAN_2G_MODULATION))
-        type = DTVTunerType::kTunerTypeDVBS2;
+    if (info.caps & FE_CAN_2G_MODULATION)
+    {
+        if (type == DTVTunerType::kTunerTypeDVBS1)
+            type = DTVTunerType::kTunerTypeDVBS2;
+        else if (type == DTVTunerType::kTunerTypeDVBT)
+            type = DTVTunerType::kTunerTypeDVBT2;
+    }
 #endif // HAVE_FE_CAN_2G_MODULATION
     ret = (type.toString() != "UNKNOWN") ? type.toString().toUpper() : ret;
 #endif // USING_DVB
@@ -441,7 +462,7 @@ QString CardUtil::ProbeDVBType(const QString &device)
 }
 
 /** \fn CardUtil::ProbeDVBFrontendName(const QString &)
- *  \brief Returns the card type from the video device
+ *  \brief Returns the input type from the video device
  */
 QString CardUtil::ProbeDVBFrontendName(const QString &device)
 {
@@ -484,7 +505,7 @@ QString CardUtil::ProbeDVBFrontendName(const QString &device)
  *
  *  Note: "Philips TDA10046H DVB-T" was on this list but has been
  *        verified to not mess up the PMT with a recent kernel and
- *        firmware (See http://svn.mythtv.org/trac/ticket/3541).
+ *        firmware (See https://code.mythtv.org/trac/ticket/3541).
  *
  *  \param device Open DVB frontend device file descriptor to be checked
  *  \return true iff the device munges tables, so that they fail a CRC check.
@@ -506,13 +527,13 @@ uint CardUtil::GetMinSignalMonitoringDelay(const QString &device)
     return 25;
 }
 
-QString CardUtil::ProbeSubTypeName(uint cardid)
+QString CardUtil::ProbeSubTypeName(uint inputid)
 {
-    QString type = GetRawCardType(cardid);
+    QString type = GetRawInputType(inputid);
     if ("DVB" != type)
         return type;
 
-    QString device = GetVideoDevice(cardid);
+    QString device = GetVideoDevice(inputid);
 
     if (device.isEmpty())
         return "ERROR_OPEN";
@@ -520,58 +541,15 @@ QString CardUtil::ProbeSubTypeName(uint cardid)
     return ProbeDVBType(device);
 }
 
-/// \brief Returns true iff the card_type is one of the DVB types.
-bool CardUtil::IsDVBCardType(const QString &card_type)
+/// \brief Returns true iff the input_type is one of the DVB types.
+bool CardUtil::IsDVBInputType(const QString &inputType)
 {
-    QString ct = card_type.toUpper();
-    return (ct == "DVB") || (ct == "QAM") || (ct == "QPSK") ||
-        (ct == "OFDM") || (ct == "ATSC") || (ct == "DVB_S2");
+    QString t = inputType.toUpper();
+    return (t == "DVB") || (t == "QAM") || (t == "QPSK") ||
+        (t == "OFDM") || (t == "ATSC") || (t == "DVB_S2");
 }
 
-QString get_on_cardid(const QString &to_get, uint cardid)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        QString("SELECT %1 ").arg(to_get) +
-        "FROM capturecard "
-        "WHERE capturecard.cardid = :CARDID");
-    query.bindValue(":CARDID", cardid);
-
-    if (!query.exec())
-        MythDB::DBError("CardUtil::get_on_source", query);
-    else if (query.next())
-        return query.value(0).toString();
-
-    return QString::null;
-}
-
-bool set_on_source(const QString &to_set, uint cardid, uint sourceid,
-                   const QString &value)
-{
-    QString tmp = get_on_cardid("capturecard.cardid", cardid);
-    if (tmp.isEmpty())
-        return false;
-
-    bool ok;
-    uint input_cardid = tmp.toUInt(&ok);
-    if (!ok)
-        return false;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        QString("UPDATE capturecard SET %1 = :VALUE ").arg(to_set) +
-        "WHERE cardid = :CARDID");
-    query.bindValue(":CARDID", input_cardid);
-    query.bindValue(":VALUE",  value);
-
-    if (query.exec())
-        return true;
-
-    MythDB::DBError("CardUtil::set_on_source", query);
-    return false;
-}
-
-QString get_on_inputid(const QString &to_get, uint inputid)
+QString get_on_input(const QString &to_get, uint inputid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
@@ -581,7 +559,7 @@ QString get_on_inputid(const QString &to_get, uint inputid)
     query.bindValue(":INPUTID", inputid);
 
     if (!query.exec())
-        MythDB::DBError("CardUtil::get_on_inputid", query);
+        MythDB::DBError("CardUtil::get_on_source", query);
     else if (query.next())
         return query.value(0).toString();
 
@@ -590,20 +568,15 @@ QString get_on_inputid(const QString &to_get, uint inputid)
 
 bool set_on_input(const QString &to_set, uint inputid, const QString &value)
 {
-    QString tmp = get_on_inputid("capturecard.cardid", inputid);
+    QString tmp = get_on_input("capturecard.cardid", inputid);
     if (tmp.isEmpty())
-        return false;
-
-    bool ok;
-    uint input_cardinputid = tmp.toUInt(&ok);
-    if (!ok)
         return false;
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         QString("UPDATE capturecard SET %1 = :VALUE ").arg(to_set) +
         "WHERE cardid = :INPUTID");
-    query.bindValue(":INPUTID", input_cardinputid);
+    query.bindValue(":INPUTID", inputid);
     query.bindValue(":VALUE",  value);
 
     if (query.exec())
@@ -614,18 +587,18 @@ bool set_on_input(const QString &to_set, uint inputid, const QString &value)
 }
 
 /**
- *  \brief Returns all cardids of cards that uses the specified
+ *  \brief Returns all inputids of inputs that uses the specified
  *         videodevice if specified, and optionally rawtype and a non-local
  *         hostname. The result is ordered from smallest to largest.
- *  \param videodevice Video device we want card ids for
- *  \param rawtype     Card type as used in DB or empty string for any type
+ *  \param videodevice Video device we want input ids for
+ *  \param rawtype     Input type as used in DB or empty string for any type
  *  \param hostname    Host on which device resides, only
  *                     required if said host is not the localhost
  */
-vector<uint> CardUtil::GetCardIDs(QString videodevice,
-                                  QString rawtype,
-                                  QString inputname,
-                                  QString hostname)
+vector<uint> CardUtil::GetInputIDs(QString videodevice,
+                                   QString rawtype,
+                                   QString inputname,
+                                   QString hostname)
 {
     vector<uint> list;
 
@@ -634,37 +607,29 @@ vector<uint> CardUtil::GetCardIDs(QString videodevice,
 
     MSqlQuery query(MSqlQuery::InitCon());
     QString qstr =
-        (videodevice.isEmpty()) ?
         "SELECT cardid "
         "FROM capturecard "
-        "WHERE hostname    = :HOSTNAME" :
-
-        "SELECT cardid "
-        "FROM capturecard "
-        "WHERE videodevice = :DEVICE AND "
-        "      inputname   = :INPUTNAME AND "
-        "      hostname    = :HOSTNAME";
-
+        "WHERE hostname = :HOSTNAME ";
+    if (!videodevice.isEmpty())
+        qstr += "AND videodevice = :DEVICE ";
+    if (!inputname.isEmpty())
+        qstr += "AND inputname = :INPUTNAME ";
     if (!rawtype.isEmpty())
-        qstr += " AND cardtype = :CARDTYPE";
-
-    qstr += " ORDER BY cardid";
+        qstr += "AND cardtype = :INPUTTYPE ";
+    qstr += "ORDER BY cardid";
 
     query.prepare(qstr);
 
-    if (!videodevice.isEmpty())
-    {
-        query.bindValue(":DEVICE",   videodevice);
-        query.bindValue(":INPUTNAME", inputname);
-    }
-
     query.bindValue(":HOSTNAME", hostname);
-
+    if (!videodevice.isEmpty())
+        query.bindValue(":DEVICE", videodevice);
+    if (!inputname.isEmpty())
+        query.bindValue(":INPUTNAME", inputname);
     if (!rawtype.isEmpty())
-        query.bindValue(":CARDTYPE", rawtype.toUpper());
+        query.bindValue(":INPUTTYPE", rawtype.toUpper());
 
     if (!query.exec())
-        MythDB::DBError("CardUtil::GetCardIDs(videodevice...)", query);
+        MythDB::DBError("CardUtil::GetInputIDs(videodevice...)", query);
     else
     {
         while (query.next())
@@ -674,49 +639,49 @@ vector<uint> CardUtil::GetCardIDs(QString videodevice,
     return list;
 }
 
-uint CardUtil::GetChildCardCount(uint cardid)
+uint CardUtil::GetChildInputCount(uint inputid)
 {
-    if (!cardid)
+    if (!inputid)
         return 0;
 
     MSqlQuery query(MSqlQuery::InitCon());
     QString qstr =
         "SELECT COUNT(*) "
         "FROM capturecard "
-        "WHERE parentid = :CARDID";
+        "WHERE parentid = :INPUTID";
 
     query.prepare(qstr);
-    query.bindValue(":CARDID", cardid);
+    query.bindValue(":INPUTID", inputid);
 
     uint count = 0;
 
     if (!query.exec())
-        MythDB::DBError("CardUtil::GetChildCardCount()", query);
+        MythDB::DBError("CardUtil::GetChildInputCount()", query);
     else if (query.next())
         count = query.value(0).toUInt();
 
     return count;
 }
 
-vector<uint> CardUtil::GetChildCardIDs(uint cardid)
+vector<uint> CardUtil::GetChildInputIDs(uint inputid)
 {
     vector<uint> list;
 
-    if (!cardid)
+    if (!inputid)
         return list;
 
     MSqlQuery query(MSqlQuery::InitCon());
     QString qstr =
         "SELECT cardid "
         "FROM capturecard "
-        "WHERE parentid = :CARDID "
+        "WHERE parentid = :INPUTID "
         "ORDER BY cardid";
 
     query.prepare(qstr);
-    query.bindValue(":CARDID", cardid);
+    query.bindValue(":INPUTID", inputid);
 
     if (!query.exec())
-        MythDB::DBError("CardUtil::GetChildCardIDs()", query);
+        MythDB::DBError("CardUtil::GetChildInputIDs()", query);
     else
     {
         while (query.next())
@@ -726,12 +691,12 @@ vector<uint> CardUtil::GetChildCardIDs(uint cardid)
     return list;
 }
 
-static uint clone_capturecard(uint src_cardid, uint orig_dst_cardid)
+static uint clone_capturecard(uint src_inputid, uint orig_dst_inputid)
 {
-    uint dst_cardid = orig_dst_cardid;
+    uint dst_inputid = orig_dst_inputid;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    if (!dst_cardid)
+    if (!dst_inputid)
     {
         query.prepare(
             "DELETE FROM capturecard "
@@ -770,7 +735,7 @@ static uint clone_capturecard(uint src_cardid, uint orig_dst_cardid)
             return 0;
         }
 
-        dst_cardid = query.value(0).toUInt();
+        dst_inputid = query.value(0).toUInt();
     }
 
     query.prepare(
@@ -784,8 +749,8 @@ static uint clone_capturecard(uint src_cardid, uint orig_dst_cardid)
         "       recpriority,           quicktune,      schedorder,       "
         "       livetvorder "
         "FROM capturecard "
-        "WHERE cardid = :CARDID");
-    query.bindValue(":CARDID", src_cardid);
+        "WHERE cardid = :INPUTID");
+    query.bindValue(":INPUTID", src_inputid);
 
     if (!query.exec())
     {
@@ -826,44 +791,44 @@ static uint clone_capturecard(uint src_cardid, uint orig_dst_cardid)
         "    schedorder            = :V22, "
         "    livetvorder           = :V23,  "
         "    parentid              = :PARENTID "
-        "WHERE cardid = :CARDID");
+        "WHERE cardid = :INPUTID");
     for (uint i = 0; i < 24; i++)
         query2.bindValue(QString(":V%1").arg(i), query.value(i).toString());
-    query2.bindValue(":CARDID", dst_cardid);
-    query2.bindValue(":PARENTID", src_cardid);
+    query2.bindValue(":INPUTID", dst_inputid);
+    query2.bindValue(":PARENTID", src_inputid);
 
     if (!query2.exec())
     {
         MythDB::DBError("clone_capturecard -- save data", query2);
-        if (!orig_dst_cardid)
-            CardUtil::DeleteCard(dst_cardid);
+        if (!orig_dst_inputid)
+            CardUtil::DeleteCard(dst_inputid);
         return 0;
     }
 
     // copy input group linkages
-    vector<uint> src_grps = CardUtil::GetInputGroups(src_cardid);
-    vector<uint> dst_grps = CardUtil::GetInputGroups(dst_cardid);
+    vector<uint> src_grps = CardUtil::GetInputGroups(src_inputid);
+    vector<uint> dst_grps = CardUtil::GetInputGroups(dst_inputid);
     for (uint j = 0; j < dst_grps.size(); j++)
-        CardUtil::UnlinkInputGroup(dst_cardid, dst_grps[j]);
+        CardUtil::UnlinkInputGroup(dst_inputid, dst_grps[j]);
     for (uint j = 0; j < src_grps.size(); j++)
-        CardUtil::LinkInputGroup(dst_cardid, src_grps[j]);
+        CardUtil::LinkInputGroup(dst_inputid, src_grps[j]);
 
     // clone diseqc_config (just points to the same diseqc_tree row)
     DiSEqCDevSettings diseqc;
-    if (diseqc.Load(src_cardid))
-        diseqc.Store(dst_cardid);
+    if (diseqc.Load(src_inputid))
+        diseqc.Store(dst_inputid);
 
-    return dst_cardid;
+    return dst_inputid;
 }
 
-bool CardUtil::CloneCard(uint src_cardid, uint orig_dst_cardid)
+bool CardUtil::CloneCard(uint src_inputid, uint orig_dst_inputid)
 {
-    QString type = CardUtil::GetRawCardType(src_cardid);
+    QString type = CardUtil::GetRawInputType(src_inputid);
     if (!IsTunerSharingCapable(type))
         return false;
 
-    uint dst_cardid = clone_capturecard(src_cardid, orig_dst_cardid);
-    if (!dst_cardid)
+    uint dst_inputid = clone_capturecard(src_inputid, orig_dst_inputid);
+    if (!dst_inputid)
         return false;
 
     return true;
@@ -876,7 +841,7 @@ QString CardUtil::GetFirewireChangerNode(uint inputid)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT changer_device "
                   "FROM capturecard WHERE cardid = :INPUTID ");
-    query.bindValue(":CARDID", inputid);
+    query.bindValue(":INPUTID", inputid);
 
     if (query.exec() && query.next())
     {
@@ -893,7 +858,7 @@ QString CardUtil::GetFirewireChangerModel(uint inputid)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT changer_model "
                   "FROM capturecard WHERE cardid = :INPUTID ");
-    query.bindValue(":CARDID", inputid);
+    query.bindValue(":INPUTID", inputid);
 
     if (query.exec() && query.next())
     {
@@ -903,7 +868,7 @@ QString CardUtil::GetFirewireChangerModel(uint inputid)
     return fwnode;
 }
 
-vector<uint> CardUtil::GetCardIDs(uint sourceid)
+vector<uint> CardUtil::GetInputIDs(uint sourceid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -917,7 +882,7 @@ vector<uint> CardUtil::GetCardIDs(uint sourceid)
 
     if (!query.exec())
     {
-        MythDB::DBError("CardUtil::GetCardIDs()", query);
+        MythDB::DBError("CardUtil::GetInputIDs()", query);
         return list;
     }
 
@@ -927,38 +892,14 @@ vector<uint> CardUtil::GetCardIDs(uint sourceid)
     return list;
 }
 
-int CardUtil::GetCardInputID(
-    uint cardid, const QString &channum, QString &inputname)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        "SELECT cardid, inputname "
-        "FROM channel, capturecard "
-        "WHERE channel.channum      = :CHANNUM             AND "
-        "      channel.sourceid     = capturecard.sourceid AND "
-        "      capturecard.cardid   = :CARDID");
-    query.bindValue(":CHANNUM", channum);
-    query.bindValue(":CARDID", cardid);
-
-    if (!query.exec() || !query.isActive())
-        MythDB::DBError("get_cardinputid", query);
-    else if (query.next())
-    {
-        inputname = query.value(1).toString();
-        return query.value(0).toInt();
-    }
-
-    return -1;
-}
-
-bool CardUtil::SetStartChannel(uint cardinputid, const QString &channum)
+bool CardUtil::SetStartChannel(uint inputid, const QString &channum)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("UPDATE capturecard "
                   "SET startchan = :CHANNUM "
                   "WHERE cardid = :INPUTID");
     query.bindValue(":CHANNUM", channum);
-    query.bindValue(":INPUTID", cardinputid);
+    query.bindValue(":INPUTID", inputid);
 
     if (!query.exec())
     {
@@ -969,64 +910,6 @@ bool CardUtil::SetStartChannel(uint cardinputid, const QString &channum)
     return true;
 }
 
-/** \fn CardUtil::GetStartInput(uint)
- *  \brief Returns the start input for the card
- *  \param nCardID card id to check
- *  \return the start input
- */
-QString CardUtil::GetStartInput(uint nCardID)
-{
-    QString str = QString::null;
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT inputname "
-                  "FROM capturecard "
-                  "WHERE capturecard.cardid = :CARDID "
-                  "ORDER BY livetvorder = 0, livetvorder, cardid "
-                  "LIMIT 1");
-    query.bindValue(":CARDID", nCardID);
-
-    if (!query.exec() || !query.isActive())
-        MythDB::DBError("CardUtil::GetStartInput()", query);
-    else if (query.next())
-        str = query.value(0).toString();
-
-    return str;
-}
-
-QStringList CardUtil::GetInputNames(uint cardid, uint sourceid)
-{
-    QStringList list;
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    if (sourceid)
-    {
-        query.prepare("SELECT inputname "
-                      "FROM capturecard "
-                      "WHERE sourceid = :SOURCEID AND "
-                      "      cardid   = :CARDID");
-        query.bindValue(":SOURCEID", sourceid);
-    }
-    else
-    {
-        query.prepare("SELECT inputname "
-                      "FROM capturecard "
-                      "WHERE cardid   = :CARDID");
-    }
-    query.bindValue(":CARDID",   cardid);
-
-    if (!query.exec())
-    {
-        MythDB::DBError("CardUtil::GetInputNames()", query);
-    }
-    else
-    {
-        while (query.next())
-            list.append( query.value(0).toString() );
-    }
-
-    return list;
-}
-
 bool CardUtil::GetInputInfo(InputInfo &input, vector<uint> *groupids)
 {
     if (!input.inputid)
@@ -1034,7 +917,7 @@ bool CardUtil::GetInputInfo(InputInfo &input, vector<uint> *groupids)
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT "
-                  "inputname, sourceid, cardid, livetvorder, "
+                  "inputname, sourceid, livetvorder, "
                   "schedorder, displayname, recpriority, quicktune "
                   "FROM capturecard "
                   "WHERE cardid = :INPUTID");
@@ -1051,12 +934,15 @@ bool CardUtil::GetInputInfo(InputInfo &input, vector<uint> *groupids)
 
     input.name     = query.value(0).toString();
     input.sourceid = query.value(1).toUInt();
-    input.cardid   = query.value(2).toUInt();
-    input.livetvorder = query.value(3).toUInt();
-    input.scheduleOrder = query.value(4).toUInt();
-    input.displayName = query.value(5).toString();
-    input.recPriority = query.value(6).toInt();
-    input.quickTune = query.value(7).toBool();
+    input.livetvorder = query.value(2).toUInt();
+    input.scheduleOrder = query.value(3).toUInt();
+    input.displayName = query.value(4).toString();
+    input.recPriority = query.value(5).toInt();
+    input.quickTune = query.value(6).toBool();
+
+    if (input.displayName.isEmpty())
+        input.displayName = QObject::tr("Input %1:%2")
+            .arg(input.inputid).arg(input.name);
 
     if (groupids)
         *groupids = GetInputGroups(input.inputid);
@@ -1070,7 +956,7 @@ QList<InputInfo> CardUtil::GetAllInputInfo()
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT cardid, "
-                  "inputname, sourceid, cardid, livetvorder, "
+                  "inputname, sourceid, livetvorder, "
                   "schedorder, displayname, recpriority, quicktune "
                   "FROM capturecard");
 
@@ -1086,12 +972,11 @@ QList<InputInfo> CardUtil::GetAllInputInfo()
         input.inputid  = query.value(0).toUInt();
         input.name     = query.value(1).toString();
         input.sourceid = query.value(2).toUInt();
-        input.cardid   = query.value(3).toUInt();
-        input.livetvorder = query.value(4).toUInt();
-        input.scheduleOrder = query.value(5).toUInt();
-        input.displayName = query.value(6).toString();
-        input.recPriority = query.value(7).toInt();
-        input.quickTune = query.value(8).toBool();
+        input.livetvorder = query.value(3).toUInt();
+        input.scheduleOrder = query.value(4).toUInt();
+        input.displayName = query.value(5).toString();
+        input.recPriority = query.value(6).toInt();
+        input.quickTune = query.value(7).toBool();
 
         infoInputList.push_back(input);
     }
@@ -1099,16 +984,9 @@ QList<InputInfo> CardUtil::GetAllInputInfo()
     return infoInputList;
 }
 
-uint CardUtil::GetCardID(uint inputid)
-{
-    InputInfo info("None", 0, inputid, 0, 0, 0, 0);
-    GetInputInfo(info);
-    return info.cardid;
-}
-
 QString CardUtil::GetInputName(uint inputid)
 {
-    InputInfo info("None", 0, inputid, 0, 0, 0, 0);
+    InputInfo info("None", 0, inputid, 0, 0, 0);
     GetInputInfo(info);
     return info.name;
 }
@@ -1154,24 +1032,6 @@ QString CardUtil::GetDisplayName(uint inputid)
     return QString::null;
 }
 
-uint CardUtil::GetInputID(uint cardid, const QString &inputname)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT cardid "
-                  "FROM capturecard "
-                  "WHERE inputname = :INPUTNAME AND "
-                  "      cardid    = :CARDID");
-    query.bindValue(":INPUTNAME", inputname);
-    query.bindValue(":CARDID",    cardid);
-
-    if (!query.exec())
-        MythDB::DBError("CardUtil::GetInputID(uint,QString)", query);
-    else if (query.next())
-        return query.value(0).toUInt();
-
-    return 0;
-}
-
 uint CardUtil::GetSourceID(uint inputid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1188,52 +1048,7 @@ uint CardUtil::GetSourceID(uint inputid)
     return 0;
 }
 
-vector<uint> CardUtil::GetAllInputIDs(void)
-{
-    vector<uint> list;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        "SELECT cardid "
-        "FROM capturecard");
-
-    if (!query.exec())
-    {
-        MythDB::DBError("CardUtil::GetAllInputIDs(uint)", query);
-        return list;
-    }
-
-    while (query.next())
-        list.push_back(query.value(0).toUInt());
-
-    return list;
-}
-
-vector<uint> CardUtil::GetInputIDs(uint cardid)
-{
-    vector<uint> list;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        "SELECT cardid "
-        "FROM capturecard "
-        "WHERE cardid = :CARDID");
-
-    query.bindValue(":CARDID", cardid);
-
-    if (!query.exec())
-    {
-        MythDB::DBError("CardUtil::GetInputIDs(uint)", query);
-        return list;
-    }
-
-    while (query.next())
-        list.push_back(query.value(0).toUInt());
-
-    return list;
-}
-
-int CardUtil::CreateCardInput(const uint cardid,
+int CardUtil::CreateCardInput(const uint inputid,
                               const uint sourceid,
                               const QString &inputname,
                               const QString &externalcommand,
@@ -1266,10 +1081,10 @@ int CardUtil::CreateCardInput(const uint cardid,
         "    quicktune = :QUICKTUNE, "
         "    schedorder = :SCHEDORDER, "
         "    livetvorder = :LIVETVORDER "
-        "WHERE cardid = :CARDID AND "
+        "WHERE cardid = :INPUTID AND "
         "      inputname = 'None'");
 
-    query.bindValue(":CARDID", cardid);
+    query.bindValue(":INPUTID", inputid);
     query.bindValue(":SOURCEID", sourceid);
     query.bindValue(":INPUTNAME", inputname);
     query.bindValue(":EXTERNALCOMMAND", externalcommand);
@@ -1290,7 +1105,7 @@ int CardUtil::CreateCardInput(const uint cardid,
         return -1;
     }
 
-    return cardid;
+    return inputid;
 }
 
 bool CardUtil::DeleteInput(uint inputid)
@@ -1331,11 +1146,6 @@ bool CardUtil::DeleteInput(uint inputid)
         return false;
     }
 
-    return true;
-}
-
-bool CardUtil::DeleteOrphanInputs(void)
-{
     return true;
 }
 
@@ -1381,7 +1191,7 @@ uint CardUtil::CreateInputGroup(const QString &name)
     return inputgroupid;
 }
 
-uint CardUtil::GetDeviceInputGroup(uint cardid)
+uint CardUtil::GetDeviceInputGroup(uint inputid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
@@ -1389,7 +1199,7 @@ uint CardUtil::GetDeviceInputGroup(uint cardid)
         "FROM inputgroup "
         "WHERE cardinputid = :INPUTID "
         "      AND inputgroupname REGEXP '^[a-z_-]*\\\\|'");
-    query.bindValue(":INPUTID", cardid);
+    query.bindValue(":INPUTID", inputid);
 
     if (!query.exec())
     {
@@ -1502,31 +1312,7 @@ vector<uint> CardUtil::GetInputGroups(uint inputid)
     return list;
 }
 
-vector<uint> CardUtil::GetSharedInputGroups(uint cardid)
-{
-    vector<uint> list;
-
-    vector<uint> inputs = GetInputIDs(cardid);
-    if (inputs.empty())
-        return list;
-
-    list = GetInputGroups(inputs[0]);
-    for (uint i = 1; (i < inputs.size()) && !list.empty(); i++)
-    {
-        vector<uint> curlist = GetInputGroups(inputs[i]);
-        vector<uint> newlist;
-        for (uint j = 0; j < list.size(); j++)
-        {
-            if (find(curlist.begin(), curlist.end(), list[j]) != curlist.end())
-                newlist.push_back(list[j]);
-        }
-        list = newlist;
-    }
-
-    return list;
-}
-
-vector<uint> CardUtil::GetGroupCardIDs(uint inputgroupid)
+vector<uint> CardUtil::GetGroupInputIDs(uint inputgroupid)
 {
     vector<uint> list;
 
@@ -1543,7 +1329,7 @@ vector<uint> CardUtil::GetGroupCardIDs(uint inputgroupid)
 
     if (!query.exec())
     {
-        MythDB::DBError("CardUtil::GetGroupCardIDs()", query);
+        MythDB::DBError("CardUtil::GetGroupInputIDs()", query);
         return list;
     }
 
@@ -1553,47 +1339,44 @@ vector<uint> CardUtil::GetGroupCardIDs(uint inputgroupid)
     return list;
 }
 
-vector<uint> CardUtil::GetConflictingCards(uint inputid, uint exclude_cardid)
+vector<uint> CardUtil::GetConflictingInputs(uint inputid)
 {
+    vector<uint> inputids;
     vector<uint> inputgroupids = CardUtil::GetInputGroups(inputid);
 
     for (uint i = 0; i < inputgroupids.size(); i++)
     {
         LOG(VB_RECORD, LOG_INFO, LOC + QString("  Group ID %1")
                                      .arg(inputgroupids[i]));
-    }
 
-    vector<uint> cardids;
-    for (uint i = 0; i < inputgroupids.size(); i++)
-    {
-        vector<uint> tmp = CardUtil::GetGroupCardIDs(inputgroupids[i]);
+        vector<uint> tmp = CardUtil::GetGroupInputIDs(inputgroupids[i]);
         for (uint j = 0; j < tmp.size(); j++)
         {
-            if (tmp[j] == exclude_cardid)
+            if (tmp[j] == inputid)
                 continue;
-
-            if (find(cardids.begin(), cardids.end(), tmp[j]) != cardids.end())
+            if (find(inputids.begin(), inputids.end(), tmp[j])
+                != inputids.end())
                 continue;
-
-            cardids.push_back(tmp[j]);
+            inputids.push_back(tmp[j]);
         }
     }
 
-    for (uint i = 0; i < cardids.size(); i++)
-        LOG(VB_RECORD, LOG_INFO, LOC + QString("  Card ID %1").arg(cardids[i]));
+    for (uint i = 0; i < inputids.size(); i++)
+        LOG(VB_RECORD, LOG_INFO,
+            LOC + QString("  Input ID %1").arg(inputids[i]));
 
-    return cardids;
+    return inputids;
 }
 
-bool CardUtil::GetTimeouts(uint cardid,
+bool CardUtil::GetTimeouts(uint inputid,
                            uint &signal_timeout, uint &channel_timeout)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT signal_timeout, channel_timeout "
         "FROM capturecard "
-        "WHERE cardid = :CARDID");
-    query.bindValue(":CARDID", cardid);
+        "WHERE cardid = :INPUTID");
+    query.bindValue(":INPUTID", inputid);
 
     if (!query.exec() || !query.isActive())
         MythDB::DBError("CardUtil::GetTimeouts()", query);
@@ -1607,10 +1390,10 @@ bool CardUtil::GetTimeouts(uint cardid,
     return false;
 }
 
-bool CardUtil::IsInNeedOfExternalInputConf(uint cardid)
+bool CardUtil::IsInNeedOfExternalInputConf(uint inputid)
 {
     DiSEqCDev dev;
-    DiSEqCDevTree *diseqc_tree = dev.FindTree(cardid);
+    DiSEqCDevTree *diseqc_tree = dev.FindTree(inputid);
 
     bool needsConf = false;
     if (diseqc_tree)
@@ -1619,7 +1402,7 @@ bool CardUtil::IsInNeedOfExternalInputConf(uint cardid)
     return needsConf;
 }
 
-uint CardUtil::GetQuickTuning(uint cardid, const QString &input_name)
+uint CardUtil::GetQuickTuning(uint inputid, const QString &input_name)
 {
     uint quicktune = 0;
 
@@ -1627,9 +1410,9 @@ uint CardUtil::GetQuickTuning(uint cardid, const QString &input_name)
     query.prepare(
         "SELECT quicktune "
         "FROM capturecard "
-        "WHERE cardid    = :CARDID AND "
+        "WHERE cardid    = :INPUTID AND "
         "      inputname = :INPUTNAME");
-    query.bindValue(":CARDID",    cardid);
+    query.bindValue(":INPUTID",    inputid);
     query.bindValue(":INPUTNAME", input_name);
 
     if (!query.exec() || !query.isActive())
@@ -1655,10 +1438,10 @@ bool CardUtil::hasV4L2(int videofd)
 }
 
 bool CardUtil::GetV4LInfo(
-    int videofd, QString &card, QString &driver, uint32_t &version,
+    int videofd, QString &input, QString &driver, uint32_t &version,
     uint32_t &capabilities)
 {
-    card = driver = QString::null;
+    input = driver = QString::null;
     version = 0;
     capabilities = 0;
 
@@ -1671,7 +1454,7 @@ bool CardUtil::GetV4LInfo(
     memset(&capability, 0, sizeof(struct v4l2_capability));
     if (ioctl(videofd, VIDIOC_QUERYCAP, &capability) >= 0)
     {
-        card = QString::fromLatin1((const char*)capability.card);
+        input = QString::fromLatin1((const char*)capability.card);
         driver = QString::fromLatin1((const char*)capability.driver);
         version = capability.version;
         capabilities = capability.capabilities;
@@ -1681,7 +1464,7 @@ bool CardUtil::GetV4LInfo(
     {
         struct video_capability capability;
         if (ioctl(videofd, VIDIOCGCAP, &capability) >= 0)
-            card = QString::fromLatin1((const char*)capability.name);
+            input = QString::fromLatin1((const char*)capability.name);
     }
 #endif // USING_V4L1
 #endif // USING_V4L2
@@ -1689,7 +1472,7 @@ bool CardUtil::GetV4LInfo(
     if (!driver.isEmpty())
         driver.remove( QRegExp("\\[[0-9]\\]$") );
 
-    return !card.isEmpty();
+    return !input.isEmpty();
 }
 
 InputNames CardUtil::ProbeV4LVideoInputs(int videofd, bool &ok)
@@ -1748,7 +1531,7 @@ InputNames CardUtil::ProbeV4LVideoInputs(int videofd, bool &ok)
     }
 #endif // USING_V4L1
 
-    // Create an input on single input cards that don't advertise input
+    // Create an input when none are advertised
     if (list.isEmpty())
         list[0] = "Television";
 
@@ -1816,13 +1599,13 @@ InputNames CardUtil::GetConfiguredDVBInputs(const QString &device)
     return list;
 }
 
-QStringList CardUtil::ProbeVideoInputs(QString device, QString cardtype)
+QStringList CardUtil::ProbeVideoInputs(QString device, QString inputtype)
 {
     QStringList ret;
 
-    if (IsSingleInputCard(cardtype))
+    if (IsSingleInputType(inputtype))
         ret += "MPEG2TS";
-    else if ("DVB" == cardtype)
+    else if ("DVB" == inputtype)
         ret += ProbeDVBInputs(device);
     else
         ret += ProbeV4LVideoInputs(device);
@@ -1830,13 +1613,13 @@ QStringList CardUtil::ProbeVideoInputs(QString device, QString cardtype)
     return ret;
 }
 
-QStringList CardUtil::ProbeAudioInputs(QString device, QString cardtype)
+QStringList CardUtil::ProbeAudioInputs(QString device, QString inputtype)
 {
     LOG(VB_GENERAL, LOG_DEBUG, QString("ProbeAudioInputs(%1,%2)")
-                                   .arg(device).arg(cardtype));
+                                   .arg(device).arg(inputtype));
     QStringList ret;
 
-    if ("HDPVR" == cardtype)
+    if ("HDPVR" == inputtype)
         ret += ProbeV4LAudioInputs(device);
 
     return ret;
@@ -1926,19 +1709,19 @@ QStringList CardUtil::ProbeDVBInputs(QString device)
     return ret;
 }
 
-QString CardUtil::GetDeviceLabel(const QString &cardtype,
+QString CardUtil::GetDeviceLabel(const QString &inputtype,
                                  const QString &videodevice)
 {
-    return QString("[ %1 : %2 ]").arg(cardtype).arg(videodevice);
+    return QString("[ %1 : %2 ]").arg(inputtype).arg(videodevice);
 }
 
-QString CardUtil::GetDeviceLabel(uint cardid)
+QString CardUtil::GetDeviceLabel(uint inputid)
 {
     QString devlabel;
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT cardtype, videodevice "
-                  "FROM capturecard WHERE cardid = :CARDID ");
-    query.bindValue(":CARDID", cardid);
+                  "FROM capturecard WHERE cardid = :INPUTID ");
+    query.bindValue(":INPUTID", inputid);
 
     if (query.exec() && query.next())
     {
@@ -1949,49 +1732,25 @@ QString CardUtil::GetDeviceLabel(uint cardid)
     return "[ UNKNOWN ]";
 }
 
-void CardUtil::GetCardInputs(
-    uint                cardid,
+void CardUtil::GetDeviceInputNames(
+    uint                inputid,
     const QString      &device,
-    const QString      &cardtype,
+    const QString      &inputtype,
     QStringList        &inputs)
 {
     inputs.clear();
-    if (IsSingleInputCard(cardtype))
+    if (IsSingleInputType(inputtype))
         inputs += "MPEG2TS";
-    else if ("DVB" != cardtype)
+    else if (inputtype == "DVB")
+        inputs += "DVBInput";
+    else
         inputs += ProbeV4LVideoInputs(device);
-
-#ifdef USING_DVB
-    if ("DVB" == cardtype)
-    {
-        bool needs_conf = IsInNeedOfExternalInputConf(cardid);
-        InputNames list = GetConfiguredDVBInputs(device);
-        if (!needs_conf && list.empty())
-        {
-            inputs += "DVBInput";
-        }
-
-        // Always list the 1 through n+1 inputs
-        if (needs_conf)
-        {
-            for (uint i = 0; i <= list.size(); ++i)
-                inputs += QString("DVBInput #%1").arg(i+1);
-        }
-
-        // Always list the existing inputs
-        InputNames::const_iterator it;
-        for (it = list.begin(); it != list.end(); ++it)
-        {
-            inputs += *it;
-        }
-    }
-#endif // USING_DVB
 }
 
 int CardUtil::CreateCaptureCard(const QString &videodevice,
                                  const QString &audiodevice,
                                  const QString &vbidevice,
-                                 const QString &cardtype,
+                                 const QString &inputtype,
                                  const uint audioratelimit,
                                  const QString &hostname,
                                  const uint dvb_swfilter,
@@ -2023,7 +1782,7 @@ int CardUtil::CreateCaptureCard(const QString &videodevice,
         "firewire_speed, firewire_model, firewire_connection, signal_timeout, "
         "channel_timeout, dvb_tuning_delay, contrast, brightness, colour, "
         "hue, diseqcid, dvb_eitscan) "
-        "VALUES (:VIDEODEVICE, :AUDIODEVICE, :VBIDEVICE, :CARDTYPE, "
+        "VALUES (:VIDEODEVICE, :AUDIODEVICE, :VBIDEVICE, :INPUTTYPE, "
         ":AUDIORATELIMIT, :HOSTNAME, :DVBSWFILTER, :DVBSATTYPE, "
         ":DVBWAITFORSEQSTART, :SKIPBTAUDIO, :DVBONDEMAND, :DVBDISEQCTYPE, "
         ":FIREWIRESPEED, :FIREWIREMODEL, :FIREWIRECONNECTION, :SIGNALTIMEOUT, "
@@ -2033,7 +1792,7 @@ int CardUtil::CreateCaptureCard(const QString &videodevice,
     query.bindValue(":VIDEODEVICE", videodevice);
     query.bindValue(":AUDIODEVICE", audiodevice);
     query.bindValue(":VBIDEVICE", vbidevice);
-    query.bindValue(":CARDTYPE", cardtype);
+    query.bindValue(":INPUTTYPE", inputtype);
     query.bindValue(":AUDIORATELIMIT", audioratelimit);
     query.bindValue(":HOSTNAME", hostname);
     query.bindValue(":DVBSWFILTER", dvb_swfilter);
@@ -2065,55 +1824,47 @@ int CardUtil::CreateCaptureCard(const QString &videodevice,
 
     if (!query.exec())
     {
-        MythDB::DBError("CreateCaptureCard maxcard", query);
+        MythDB::DBError("CreateCaptureCard maxinput", query);
         return -1;
     }
 
-    int cardid = -1;  /* must be int not uint because of return type. */
+    int inputid = -1;  /* must be int not uint because of return type. */
 
     if (query.next())
     {
-        cardid = query.value(0).toInt();
+        inputid = query.value(0).toInt();
         uint groupid = CardUtil::CreateDeviceInputGroup(hostname, videodevice);
-        CardUtil::LinkInputGroup(cardid, groupid);
+        CardUtil::LinkInputGroup(inputid, groupid);
     }
 
-    return cardid;
+    return inputid;
 }
 
-bool CardUtil::DeleteCard(uint cardid)
+bool CardUtil::DeleteCard(uint inputid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     bool ok = true;
 
-    if (!cardid)
+    if (!inputid)
         return true;
 
-    // delete any DiSEqC device tree
     DiSEqCDevTree tree;
-    tree.Load(cardid);
-    if (!tree.Root())
-    {
-        tree.SetRoot(NULL);
-        tree.Store(cardid);
-    }
+    tree.Load(inputid);
 
     // delete any clones
-    QString rawtype     = GetRawCardType(cardid);
-    QString videodevice = GetVideoDevice(cardid);
+    QString rawtype     = GetRawInputType(inputid);
+    QString videodevice = GetVideoDevice(inputid);
     if (IsTunerSharingCapable(rawtype) && !videodevice.isEmpty())
     {
         query.prepare(
             "SELECT cardid "
             "FROM capturecard "
-            "WHERE videodevice = :DEVICE AND "
-            "      cardid      > :CARDID");
-        query.bindValue(":DEVICE", videodevice);
-        query.bindValue(":CARDID", cardid);
+            "WHERE parentid = :INPUTID");
+        query.bindValue(":INPUTID", inputid);
 
         if (!query.exec())
         {
-            MythDB::DBError("DeleteCard -- find clone cards", query);
+            MythDB::DBError("DeleteCard -- find clone inputs", query);
             return false;
         }
 
@@ -2124,17 +1875,14 @@ bool CardUtil::DeleteCard(uint cardid)
             return false;
     }
 
-    // delete inputs
-    vector<uint> inputs = CardUtil::GetInputIDs(cardid);
-    for (uint i = 0; i < inputs.size(); i++)
-        ok &= CardUtil::DeleteInput(inputs[i]);
+    ok &= CardUtil::DeleteInput(inputid);
 
     if (!ok)
         return false;
 
-    // actually delete the capturecard row for this card
-    query.prepare("DELETE FROM capturecard WHERE cardid = :CARDID");
-    query.bindValue(":CARDID", cardid);
+    // actually delete the capturecard row for this input
+    query.prepare("DELETE FROM capturecard WHERE cardid = :INPUTID");
+    query.bindValue(":INPUTID", inputid);
 
     if (!query.exec())
     {
@@ -2144,8 +1892,24 @@ bool CardUtil::DeleteCard(uint cardid)
 
     if (ok)
     {
-        // delete any orphaned inputs & unused input groups
-        DeleteOrphanInputs();
+        // Delete the diseqc tree if no more inputs reference it.
+        if (tree.Root())
+        {
+            query.prepare("SELECT cardid FROM capturecard "
+                          "WHERE diseqcid = :DISEQCID LIMIT 1");
+            query.bindValue(":DISEQCID", tree.Root()->GetDeviceID());
+            if (!query.exec())
+            {
+                MythDB::DBError("DeleteCard -- find diseqc tree", query);
+            }
+            else if (!query.next())
+            {
+                tree.SetRoot(NULL);
+                tree.Store(inputid);
+            }
+        }
+
+        // delete any unused input groups
         UnlinkInputGroup(0,0);
     }
 
@@ -2161,7 +1925,7 @@ bool CardUtil::DeleteAllCards(void)
             query.exec("TRUNCATE TABLE capturecard"));
 }
 
-vector<uint> CardUtil::GetCardList(void)
+vector<uint> CardUtil::GetInputList(void)
 {
     vector<uint> list;
 
@@ -2172,7 +1936,7 @@ vector<uint> CardUtil::GetCardList(void)
         "ORDER BY cardid");
 
     if (!query.exec())
-        MythDB::DBError("CardUtil::GetCardList()", query);
+        MythDB::DBError("CardUtil::GetInputList()", query);
     else
     {
         while (query.next())
@@ -2182,7 +1946,7 @@ vector<uint> CardUtil::GetCardList(void)
     return list;
 }
 
-vector<uint> CardUtil::GetLiveTVCardList(void)
+vector<uint> CardUtil::GetLiveTVInputList(void)
 {
     vector<uint> list;
 
@@ -2194,7 +1958,7 @@ vector<uint> CardUtil::GetLiveTVCardList(void)
         "ORDER BY livetvorder");
 
     if (!query.exec())
-        MythDB::DBError("CardUtil::GetCardList()", query);
+        MythDB::DBError("CardUtil::GetInputList()", query);
     else
     {
         while (query.next())
@@ -2311,6 +2075,50 @@ QString CardUtil::GetHDHRdesc(const QString &device)
 #else
 
     (void) device;
+    return connectErr;
+#endif
+}
+
+/**
+ * Get a nicely formatted string describing the device
+ */
+
+QString CardUtil::GetVBoxdesc(const QString &id, const QString &ip,
+                              const QString &tunerNo, const QString &tunerType)
+{
+    QString connectErr = QObject::tr("Unable to connect to device.");
+
+#ifdef USING_VBOX
+    VBox *vbox = new VBox(ip);
+
+    if (!vbox->checkConnection())
+    {
+        delete vbox;
+        return connectErr;
+    }
+
+    QString version;
+
+    if (!vbox->checkVersion(version))
+    {
+        QString apiVersionErr = QObject::tr("The VBox software version is to old (%1), we require %2")
+                                            .arg(version).arg(VBOX_MIN_API_VERSION);
+        delete vbox;
+        return apiVersionErr;
+
+    }
+
+    delete vbox;
+
+    return QString("V@Box TV Gateway - ID: %1, IP: %2, Tuner: %3-%4").arg(id)
+                   .arg(ip).arg(tunerNo).arg(tunerType);
+
+#else
+    (void) id;
+    (void) ip;
+    (void) tunerNo;
+    (void) tunerType;
+
     return connectErr;
 #endif
 }

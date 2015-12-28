@@ -13,6 +13,7 @@ using namespace std;
 
 #include <QStringList>
 #include <QDateTime>
+#include <QMultiMap>
 #include <QObject>
 #include <QMutex>
 #include <QMap>
@@ -140,8 +141,10 @@ class PlaybackBox : public ScheduleCommon
     void ItemVisible(MythUIButtonListItem *item);
     void ItemLoaded(MythUIButtonListItem *item);
     void selected(MythUIButtonListItem *item);
+    void PlayFromBookmarkOrProgStart(MythUIButtonListItem *item = NULL);
     void PlayFromBookmark(MythUIButtonListItem *item = NULL);
     void PlayFromBeginning(MythUIButtonListItem *item = NULL);
+    void PlayFromLastPlayPos(MythUIButtonListItem *item = NULL);
     void deleteSelected(MythUIButtonListItem *item);
 
     void SwitchList(void);
@@ -270,11 +273,15 @@ class PlaybackBox : public ScheduleCommon
 
     void PlayX(const ProgramInfo &rec,
                bool ignoreBookmark,
+               bool ignoreProgStart,
+               bool ignoreLastPlayPos,
                bool underNetworkControl);
 
     bool Play(const ProgramInfo &rec,
               bool inPlaylist,
               bool ignoreBookmark,
+              bool ignoreProgStart,
+              bool ignoreLastPlayPos,
               bool underNetworkControl);
 
     virtual ProgramInfo *GetCurrentProgram(void) const;
@@ -326,6 +333,9 @@ class PlaybackBox : public ScheduleCommon
     bool CreatePopupMenuPlaylist(void);
 
     QString CreateProgramInfoString(const ProgramInfo &program) const;
+
+    QString extract_job_state(const ProgramInfo &pginfo);
+    QString extract_commflag_state(const ProgramInfo &pginfo);
 
 
     QRegExp m_prefixes;   ///< prefixes to be ignored when sorting
@@ -436,6 +446,29 @@ class PlaybackBox : public ScheduleCommon
     bool                m_usingGroupSelector;
     bool                m_groupSelected;
     bool                m_passwordEntered;
+
+    // This class caches the contents of the jobqueue table to avoid excessive
+    // DB queries each time the PBB selection changes (currently 4 queries per
+    // displayed item).  The cache remains valid for 15 seconds
+    // (kInvalidateTimeMs).
+    class PbbJobQueue
+    {
+    public:
+        PbbJobQueue() { Update(); }
+        bool IsJobQueued(int jobType, uint chanid,
+                         const QDateTime &recstartts);
+        bool IsJobRunning(int jobType, uint chanid,
+                          const QDateTime &recstartts);
+        bool IsJobQueuedOrRunning(int jobType, uint chanid,
+                                  const QDateTime &recstartts);
+    private:
+        static const qint64 kInvalidateTimeMs = 15000;
+        void Update();
+        QDateTime m_lastUpdated;
+        // Maps <chanid, recstartts> to a set of JobQueueEntry values.
+        typedef QMultiMap<QPair<uint, QDateTime>, JobQueueEntry> MapType;
+        MapType m_jobs;
+    } m_jobQueue;
 };
 
 class GroupSelector : public MythScreenType
@@ -550,7 +583,7 @@ class HelpPopup : public MythScreenType
     Q_OBJECT
 
   public:
-    HelpPopup(MythScreenStack *lparent);
+    explicit HelpPopup(MythScreenStack *lparent);
 
     bool Create(void);
 

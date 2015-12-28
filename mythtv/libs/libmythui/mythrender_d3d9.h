@@ -51,7 +51,7 @@ class MUI_PUBLIC D3D9Image
 class MUI_PUBLIC D3D9Locker
 {
   public:
-    D3D9Locker(MythRenderD3D9 *render);
+    explicit D3D9Locker(MythRenderD3D9 *render);
    ~D3D9Locker();
     IDirect3DDevice9* Acquire(void);
   private:

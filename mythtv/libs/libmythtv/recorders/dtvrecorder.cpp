@@ -34,7 +34,7 @@ extern "C" {
 }
 
 #define LOC ((tvrec) ? \
-    QString("DTVRec[%1]: ").arg(tvrec->GetCaptureCardNum()) : \
+    QString("DTVRec[%1]: ").arg(tvrec->GetInputId()) : \
     QString("DTVRec(0x%1): ").arg(intptr_t(this),0,16))
 
 const uint DTVRecorder::kMaxKeyFrameDistance = 80;
@@ -1427,6 +1427,12 @@ void DTVRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt, bool insert)
 //             .arg(StreamID::GetDescription(pmt->StreamType(i))));
         _stream_id[pmt->StreamPID(i)] = pmt->StreamType(i);
     }
+
+    // If the PCRPID is valid and the PCR is not contained
+    // in another stream, make sure the PCR stream is not
+    // discarded (use PrivSec type as dummy 'valid' value)
+    if(pmt->PCRPID() != 0x1fff && pmt->FindPID(pmt->PCRPID()) == -1)
+        _stream_id[pmt->PCRPID()] = StreamID::PrivSec;
 
     if (!ringBuffer)
         return;

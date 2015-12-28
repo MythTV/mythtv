@@ -69,7 +69,7 @@ namespace
         void SigLevelChanged();
 
       public:
-        ParentalLevelNotifyContainer(QObject *lparent = 0) :
+        explicit ParentalLevelNotifyContainer(QObject *lparent = 0) :
             QObject(lparent), m_level(ParentalLevel::plNone)
         {
             connect(&m_levelCheck,
@@ -371,7 +371,7 @@ namespace
     class ScreenCopyDest : public CopyMetadataDestination
     {
       public:
-        ScreenCopyDest(MythScreenType *screen) : m_screen(screen) {}
+        explicit ScreenCopyDest(MythScreenType *screen) : m_screen(screen) {}
 
         void handleText(const QString &name, const QString &value)
         {
@@ -413,7 +413,7 @@ namespace
     class MythUIButtonListItemCopyDest : public CopyMetadataDestination
     {
       public:
-        MythUIButtonListItemCopyDest(MythUIButtonListItem *item) :
+        explicit MythUIButtonListItemCopyDest(MythUIButtonListItem *item) :
             m_item(item) {}
 
         void handleText(const QString &name, const QString &value)
@@ -807,7 +807,7 @@ VideoDialog::VideoListDeathDelayPtr VideoDialogPrivate::m_savedPtr;
 class VideoListDeathDelayPrivate
 {
   public:
-    VideoListDeathDelayPrivate(VideoDialog::VideoListPtr toSave) :
+    explicit VideoListDeathDelayPrivate(VideoDialog::VideoListPtr toSave) :
         m_savedList(toSave)
     {
     }
@@ -3143,7 +3143,7 @@ namespace
 {
     struct SimpleCollect : public DirectoryHandler
     {
-        SimpleCollect(QStringList &fileList) : m_fileList(fileList) {}
+        explicit SimpleCollect(QStringList &fileList) : m_fileList(fileList) {}
 
         DirectoryHandler *newDir(const QString &dirName,
                 const QString &fqDirName)

@@ -25,7 +25,7 @@ MythHDD::MythHDD(QObject *par, const char *DevicePath,
 {
     LOG(VB_MEDIA, LOG_INFO, "MythHDD::MythHDD " + m_DevicePath);
     m_Status = MEDIASTAT_NOTMOUNTED;
-    m_MediaType = MEDIATYPE_DATA;       // default type is data
+    m_MediaType = MEDIATYPE_UNKNOWN;
 }
 
 /** \fn MythHDD::checkMedia(void)
@@ -44,7 +44,10 @@ MythMediaStatus MythHDD::checkMedia(void)
 
         // device is mounted, trigger event
         if (m_Status != MEDIASTAT_MOUNTED)
+        {
             m_Status = MEDIASTAT_NOTMOUNTED;
+            onDeviceMounted();
+        }
 
         return setStatus(MEDIASTAT_MOUNTED);
     }
@@ -64,6 +67,7 @@ MythMediaStatus MythHDD::checkMedia(void)
 
         case MEDIASTAT_MOUNTED:
             // device was mounted and someone unmounted it.
+            clearData();
             return setStatus(MEDIASTAT_NOTMOUNTED);
 
         default:

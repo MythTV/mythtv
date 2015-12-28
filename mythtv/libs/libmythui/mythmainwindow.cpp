@@ -11,7 +11,7 @@ using namespace std;
 
 // QT headers
 #ifdef USE_OPENGL_PAINTER
-#include <QGLWidget>
+#include <QGLFormat>
 #endif
 
 #include <QWaitCondition>
@@ -197,7 +197,8 @@ class MythMainWindowPrivate
         standby(false),
         enteringStandby(false),
         NC(NULL),
-        firstinit(true)
+        firstinit(true),
+        m_bSavedPOS(false)
     {
     }
 
@@ -295,6 +296,7 @@ class MythMainWindowPrivate
     MythNotificationCenter *NC;
         // window aspect
     bool firstinit;
+    bool m_bSavedPOS;
 };
 
 // Make keynum in QKeyEvent be equivalent to what's in QKeySequence
@@ -394,11 +396,31 @@ MythNotificationCenter *GetNotificationCenter(void)
 MythPainterWindowGL::MythPainterWindowGL(MythMainWindow *win,
                                          MythMainWindowPrivate *priv,
                                          MythRenderOpenGL *rend)
-                   : QGLWidget(rend, win),
-                     parent(win), d(priv), render(rend)
+            : MythPainterWindowWidget(win), parent(win), d(priv), render(rend)
 {
+    rend->setWidget(this);
+#ifdef USE_OPENGL_QT5
+    setAttribute(Qt::WA_NoSystemBackground);
+#else
     setAutoBufferSwap(false);
+#endif
 }
+
+#ifdef USE_OPENGL_QT5
+QPaintEngine *MythPainterWindowGL::paintEngine() const
+{
+    return testAttribute(Qt::WA_PaintOnScreen) ? 0 : parent->paintEngine();
+}
+
+MythPainterWindowGL::~MythPainterWindowGL()
+{
+    if (render)
+    {
+        render->DecrRef();
+        render = NULL;
+    }
+}
+#endif
 
 void MythPainterWindowGL::paintEvent(QPaintEvent *pe)
 {
@@ -428,6 +450,9 @@ MythPainterWindowQt::MythPainterWindowQt(MythMainWindow *win,
                    : QWidget(win),
                      parent(win), d(priv)
 {
+#ifdef USE_OPENGL_QT5
+    setAttribute(Qt::WA_NoSystemBackground);
+#endif
 }
 
 void MythPainterWindowQt::paintEvent(QPaintEvent *pe)
@@ -811,12 +836,18 @@ void MythMainWindow::drawScreen(void)
     d->repaintRegion = QRegion(QRect(0, 0, 0, 0));
 }
 
-void MythMainWindow::draw(void)
+void MythMainWindow::draw(MythPainter *painter /* = 0 */)
 {
-    if (!d->painter)
+    if (!painter)
+        painter = d->painter;
+
+    if (!painter)
         return;
 
-    d->painter->Begin(d->paintwin);
+    painter->Begin(d->paintwin);
+
+    if (!painter->SupportsClipping())
+        d->repaintRegion = QRegion(d->uiScreenRect);
 
     QVector<QRect> rects = d->repaintRegion.rects();
 
@@ -826,7 +857,7 @@ void MythMainWindow::draw(void)
             continue;
 
         if (rects[i] != d->uiScreenRect)
-            d->painter->SetClipRect(rects[i]);
+            painter->SetClipRect(rects[i]);
 
         QVector<MythScreenStack *>::Iterator it;
         for (it = d->stackList.begin(); it != d->stackList.end(); ++it)
@@ -838,12 +869,23 @@ void MythMainWindow::draw(void)
             for (screenit = redrawList.begin(); screenit != redrawList.end();
                  ++screenit)
             {
-                (*screenit)->Draw(d->painter, 0, 0, 255, rects[i]);
+                (*screenit)->Draw(painter, 0, 0, 255, rects[i]);
             }
         }
     }
 
-    d->painter->End();
+    painter->End();
+    d->repaintRegion = QRegion();
+}
+
+// virtual
+QPaintEngine *MythMainWindow::paintEngine() const
+{
+#ifdef USE_OPENGL_QT5
+    return testAttribute(Qt::WA_PaintOnScreen) ? 0 : QWidget::paintEngine();
+#else
+    return QWidget::paintEngine();
+#endif
 }
 
 void MythMainWindow::closeEvent(QCloseEvent *e)
@@ -1084,40 +1126,54 @@ void MythMainWindow::Init(QString forcedpainter)
     }
 #endif
 #ifdef USE_OPENGL_PAINTER
-    if ((painter == AUTO_PAINTER && (!d->painter && !d->paintwin)) ||
+    if (!QGLFormat::hasOpenGL())
+    {
+        if (painter.contains(OPENGL_PAINTER))
+            LOG(VB_GENERAL, LOG_WARNING,
+                "OpenGL not available. Falling back to Qt painter.");
+    }
+    else
+# if !defined USE_OPENGL_QT5 && QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+    // On an EGLFS platform can't mix QWidget based MythMainWindow with a
+    // QGLWidget based paintwin - MythPainterWindowGL ctor aborts:
+    //   EGLFS: OpenGL windows cannot be mixed with others.
+    if (qApp->platformName().contains("egl"))
+    {
+        if (painter.contains(OPENGL_PAINTER))
+            LOG(VB_GENERAL, LOG_WARNING,
+                "OpenGL is incompatible with the EGLFS platform. "
+                "Falling back to Qt painter.");
+    }
+    else
+# endif
+    if (
+#ifdef USE_OPENGL_QT5
+        // The Qt5 OpenGL painter doesn't render all screens correctly (yet)
+        // so only use OpenGL if explicitly requested
+#else
+        (painter == AUTO_PAINTER && (!d->painter && !d->paintwin)) ||
+#endif
         painter.contains(OPENGL_PAINTER))
     {
-        d->render = MythRenderOpenGL::Create(painter);
-        if (d->render)
+        MythRenderOpenGL *gl = MythRenderOpenGL::Create(painter);
+        d->render = gl;
+        if (!gl)
         {
-            d->painter = new MythOpenGLPainter();
-            MythRenderOpenGL *gl = dynamic_cast<MythRenderOpenGL*>(d->render);
+            LOG(VB_GENERAL, LOG_ERR, "Failed to create OpenGL render.");
+        }
+        else if (painter == AUTO_PAINTER && !gl->IsRecommendedRenderer())
+        {
+            LOG(VB_GENERAL, LOG_WARNING,
+                "OpenGL painter not recommended with this system's "
+                "hardware/drivers. Falling back to Qt painter.");
+            d->render->DecrRef(), d->render = NULL;
+        }
+        else
+        {
+            d->painter = new MythOpenGLPainter(gl);
+            // NB MythPainterWindowGL takes ownership of gl
             d->paintwin = new MythPainterWindowGL(this, d, gl);
-            QGLWidget *qgl = static_cast<QGLWidget*>(d->paintwin);
-            bool teardown = false;
-            if (!qgl->isValid())
-            {
-                LOG(VB_GENERAL, LOG_ERR, "Failed to create OpenGL painter. "
-                                         "Check your OpenGL installation.");
-                teardown = true;
-            }
-            else if (painter == AUTO_PAINTER && gl && !gl->IsRecommendedRenderer())
-            {
-                LOG(VB_GENERAL, LOG_WARNING,
-                    "OpenGL painter not recommended with this system's "
-                    "hardware/drivers. Falling back to Qt painter.");
-                teardown = true;
-            }
-            if (teardown)
-            {
-                delete d->painter;
-                d->painter = NULL;
-                delete d->paintwin;
-                d->paintwin = NULL;
-                d->render = NULL; // deleted by the painterwindow
-            }
-            else
-                gl->Init();
+            gl->Init();
         }
     }
 #endif
@@ -1146,6 +1202,14 @@ void MythMainWindow::Init(QString forcedpainter)
     ResizePainterWindow(size());
     d->paintwin->raise();
     ShowPainterWindow();
+
+# if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+    // Redraw the window now to avoid race conditions in EGLFS (Qt5.4) if a
+    // 2nd window (e.g. TVPlayback) is created before this is redrawn.
+    if (qApp->platformName().contains("egl"))
+        qApp->processEvents();
+#endif
+
     if (!GetMythDB()->GetNumSetting("HideMouseCursor", 0))
         d->paintwin->setMouseTracking(true); // Required for mouse cursor auto-hide
 
@@ -1407,6 +1471,14 @@ void MythMainWindow::attach(QWidget *child)
             }
         }
     }
+#ifdef USE_OPENGL_QT5
+    else
+    {
+        // Save & disable WA_PaintOnScreen, used by OpenGL GUI painter
+        if ((d->m_bSavedPOS = testAttribute(Qt::WA_PaintOnScreen)))
+            setAttribute(Qt::WA_PaintOnScreen, false);
+    }
+#endif
 
     d->widgetList.push_back(child);
     child->winId();
@@ -1434,6 +1506,12 @@ void MythMainWindow::detach(QWidget *child)
         current = this;
         // We're be to the main window, enable it just in case
         setEnabled(true);
+#ifdef USE_OPENGL_QT5
+        // Restore WA_PaintOnScreen, used by OpenGL GUI painter
+        setAttribute(Qt::WA_PaintOnScreen, d->m_bSavedPOS);
+        // Need to repaint the UI or it remains black
+        QTimer::singleShot(2, d->paintwin, SLOT(update()));
+#endif
     }
     else
     {
@@ -2092,6 +2170,35 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
             if (!ke)
                 ke = static_cast<QKeyEvent *>(e);
 
+#ifdef Q_OS_LINUX
+            // Fixups for _some_ linux native codes that QT doesn't know
+            if (ke->key() <= 0)
+            {
+                int keycode = 0;
+                switch(ke->nativeScanCode())
+                {
+                    case 209: // XF86AudioPause
+                        keycode = Qt::Key_MediaPause;
+                        break;
+                    default:
+                      break;
+                }
+
+                if (keycode > 0)
+                {
+                    QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, keycode,
+                                                   ke->modifiers());
+                    QObject *key_target = getTarget(*key);
+                    if (!key_target)
+                        QCoreApplication::postEvent(this, key);
+                    else
+                        QCoreApplication::postEvent(key_target, key);
+                }
+
+                return true;
+            }
+#endif
+
             if (currentWidget())
             {
                 ke->accept();
@@ -2153,14 +2260,15 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
                 d->gesture.stop();
                 ge = d->gesture.gesture();
 
+                QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent*>(e);
+                QVector<MythScreenStack *>::iterator it;
+
                 /* handle clicks separately */
                 if (ge->gesture() == MythGestureEvent::Click)
                 {
-                    QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent*>(e);
                     if (!mouseEvent)
                         return false;
 
-                    QVector<MythScreenStack *>::iterator it;
                     QPoint p = mouseEvent->pos();
 
                     ge->SetPosition(p);
@@ -2214,7 +2322,53 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
                     delete ge;
                 }
                 else
-                    QCoreApplication::postEvent(this, ge);
+                {
+                    bool handled = false;
+                    
+                    if (!mouseEvent)
+                    {
+                        QCoreApplication::postEvent(this, ge);
+                        return true;
+                    }
+
+                    QPoint p = mouseEvent->pos();
+
+                    ge->SetPosition(p);
+                    
+                    for (it = d->stackList.end()-1; it != d->stackList.begin()-1;
+                         --it)
+                    {
+                        MythScreenType *screen = (*it)->GetTopScreen();
+
+                        if (!screen || !screen->ContainsPoint(p))
+                            continue;
+
+                        if (screen->gestureEvent(ge))
+                        {
+                            handled = true;
+                            break;
+                        }
+
+                        // Note:  The following break prevents clicks being
+                        //        sent to windows below popups
+                        //
+                        //        we want to permit this in some cases, e.g.
+                        //        when the music miniplayer is on screen or a
+                        //        non-interactive alert/news scroller. So these
+                        //        things need to be in a third or more stack
+                        if ((*it)->objectName() == "popup stack")
+                            break;
+                    }
+
+                    if (handled)
+                    {
+                        delete ge;
+                    }
+                    else
+                    {
+                        QCoreApplication::postEvent(this, ge);
+                    }
+                }
 
                 return true;
             }
@@ -2230,7 +2384,10 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
                 d->gestureTimer->stop();
                 d->gestureTimer->start(GESTURE_TIMEOUT);
 
-                d->gesture.record(static_cast<QMouseEvent*>(e)->pos());
+                QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent*>(e);
+                if (!mouseEvent)
+                    return false;
+                d->gesture.record(mouseEvent->pos());
                 return true;
             }
             break;

@@ -7,6 +7,7 @@ QT += webkit
 contains(QT_VERSION, ^5\\.[0-9]\\..*) {
 QT += widgets
 QT += webkitwidgets
+android: QT += androidextras
 }
 
 TEMPLATE = lib
@@ -109,6 +110,13 @@ using_x11 {
     POST_TARGETDEPS += ../libmythnvctrl/libmythnvctrl-$${MYTH_LIB_EXT}
 }
 
+using_qtdbus {
+    QT      += dbus
+    DEFINES += USING_DBUS
+    HEADERS += screensaver-dbus.h
+    SOURCES += screensaver-dbus.cpp
+}
+
 macx {
     HEADERS += screensaver-osx.h   DisplayResOSX.h   util-osx.h
     SOURCES += screensaver-osx.cpp DisplayResOSX.cpp util-osx.cpp
@@ -116,7 +124,7 @@ macx {
     QMAKE_OBJECTIVE_CXXFLAGS += $$QMAKE_CXXFLAGS
     OBJECTIVE_HEADERS += util-osx-cocoa.h
     OBJECTIVE_SOURCES += util-osx-cocoa.mm
-    LIBS              += -framework Carbon -framework Cocoa -framework IOKit
+    LIBS              += -framework Cocoa -framework IOKit
 
     using_appleremote {
         HEADERS += AppleRemote.h   AppleRemoteListener.h
@@ -124,6 +132,11 @@ macx {
         !using_lirc: HEADERS += lircevent.h
         !using_lirc: SOURCES += lircevent.cpp
     }
+}
+
+android {
+    HEADERS += screensaver-android.h
+    SOURCES += screensaver-android.cpp
 }
 
 using_joystick_menu {

@@ -21,7 +21,7 @@ typedef enum {
 class MUI_PUBLIC ThemeInfo : public XMLParseBase
 {
   public:
-    ThemeInfo(QString theme);
+    explicit ThemeInfo(QString theme);
     ~ThemeInfo();
 
     bool IsWide() const;

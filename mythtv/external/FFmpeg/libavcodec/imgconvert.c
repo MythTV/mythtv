@@ -40,14 +40,6 @@
 #include "libavutil/pixdesc.h"
 #include "libavutil/imgutils.h"
 
-#if HAVE_MMX_EXTERNAL
-#define deinterlace_line_inplace ff_deinterlace_line_inplace_mmx
-#define deinterlace_line         ff_deinterlace_line_mmx
-#else
-#define deinterlace_line_inplace deinterlace_line_inplace_c
-#define deinterlace_line         deinterlace_line_c
-#endif
-
 void avcodec_get_chroma_sub_sample(enum AVPixelFormat pix_fmt, int *h_shift, int *v_shift)
 {
     const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(pix_fmt);
@@ -209,12 +201,14 @@ int av_picture_crop(AVPicture *dst, const AVPicture *src,
     const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(pix_fmt);
     int y_shift;
     int x_shift;
+    int max_step[4];
 
     if (pix_fmt < 0 || pix_fmt >= AV_PIX_FMT_NB)
         return -1;
 
     y_shift = desc->log2_chroma_h;
     x_shift = desc->log2_chroma_w;
+    av_image_fill_max_pixsteps(max_step, NULL, desc);
 
     if (is_yuv_planar(desc)) {
     dst->data[0] = src->data[0] + (top_band * src->linesize[0]) + left_band;
@@ -223,9 +217,7 @@ int av_picture_crop(AVPicture *dst, const AVPicture *src,
     } else{
         if(top_band % (1<<y_shift) || left_band % (1<<x_shift))
             return -1;
-        if(left_band) //FIXME add support for this too
-            return -1;
-        dst->data[0] = src->data[0] + (top_band * src->linesize[0]) + left_band;
+        dst->data[0] = src->data[0] + (top_band * src->linesize[0]) + (left_band * max_step[0]);
     }
 
     dst->linesize[0] = src->linesize[0];
@@ -297,7 +289,13 @@ int av_picture_pad(AVPicture *dst, const AVPicture *src, int height, int width,
 
 #if FF_API_DEINTERLACE
 
-#if !HAVE_MMX_EXTERNAL
+#if HAVE_MMX_EXTERNAL
+#define deinterlace_line_inplace ff_deinterlace_line_inplace_mmx
+#define deinterlace_line         ff_deinterlace_line_mmx
+#else
+#define deinterlace_line_inplace deinterlace_line_inplace_c
+#define deinterlace_line         deinterlace_line_c
+
 /* filter parameters: [-1 4 2 4 -1] // 8 */
 static void deinterlace_line_c(uint8_t *dst,
                              const uint8_t *lum_m4, const uint8_t *lum_m3,
@@ -380,13 +378,15 @@ static void deinterlace_bottom_field(uint8_t *dst, int dst_wrap,
     deinterlace_line(dst,src_m2,src_m1,src_0,src_0,src_0,width);
 }
 
-static void deinterlace_bottom_field_inplace(uint8_t *src1, int src_wrap,
-                                             int width, int height)
+static int deinterlace_bottom_field_inplace(uint8_t *src1, int src_wrap,
+                                            int width, int height)
 {
     uint8_t *src_m1, *src_0, *src_p1, *src_p2;
     int y;
     uint8_t *buf;
     buf = av_malloc(width);
+    if (!buf)
+        return AVERROR(ENOMEM);
 
     src_m1 = src1;
     memcpy(buf,src_m1,width);
@@ -403,12 +403,13 @@ static void deinterlace_bottom_field_inplace(uint8_t *src1, int src_wrap,
     /* do last line */
     deinterlace_line_inplace(buf,src_m1,src_0,src_0,src_0,width);
     av_free(buf);
+    return 0;
 }
 
 int avpicture_deinterlace(AVPicture *dst, const AVPicture *src,
                           enum AVPixelFormat pix_fmt, int width, int height)
 {
-    int i;
+    int i, ret;
 
     if (pix_fmt != AV_PIX_FMT_YUV420P &&
         pix_fmt != AV_PIX_FMT_YUVJ420P &&
@@ -444,8 +445,11 @@ int avpicture_deinterlace(AVPicture *dst, const AVPicture *src,
             }
         }
         if (src == dst) {
-            deinterlace_bottom_field_inplace(dst->data[i], dst->linesize[i],
-                                 width, height);
+            ret = deinterlace_bottom_field_inplace(dst->data[i],
+                                                   dst->linesize[i],
+                                                   width, height);
+            if (ret < 0)
+                return ret;
         } else {
             deinterlace_bottom_field(dst->data[i],dst->linesize[i],
                                         src->data[i], src->linesize[i],

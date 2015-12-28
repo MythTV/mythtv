@@ -328,7 +328,7 @@ void PlaylistEditorView::customEvent(QEvent *event)
                 doUpdatePlaylist();
             }
         }
-        else if (resultid == "playlistmenu")
+        else if (resultid == "treeplaylistmenu")
         {
             if (GetFocusWidget() != m_playlistTree)
                 return;
@@ -368,6 +368,16 @@ void PlaylistEditorView::customEvent(QEvent *event)
 
 bool PlaylistEditorView::keyPressEvent(QKeyEvent *event)
 {
+    // if there is a pending jump point pass the key press to the default handler
+    if (GetMythMainWindow()->IsExitingToMain())
+    {
+        // do we need to stop playing?
+        if (gPlayer->isPlaying() && gCoreContext->GetSetting("MusicJumpPointAction", "stop") == "stop")
+            gPlayer->stop(true);
+
+        return MythScreenType::keyPressEvent(event);
+    }
+
     if (!m_moveTrackMode && GetFocusWidget() && GetFocusWidget()->keyPressEvent(event))
         return true;
 
@@ -705,7 +715,7 @@ MythMenu* PlaylistEditorView::createPlaylistMenu(void)
 
         if (mnode->getAction() == "playlist")
         {
-            menu = new MythMenu(tr("Playlist Actions"), this, "playlistmenu");
+            menu = new MythMenu(tr("Playlist Actions"), this, "treeplaylistmenu");
             menu->AddItem(tr("Replace Tracks"));
             menu->AddItem(tr("Add Tracks"));
             menu->AddItem(tr("Remove Playlist"));

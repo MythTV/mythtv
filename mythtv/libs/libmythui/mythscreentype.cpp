@@ -22,7 +22,7 @@
 class SemaphoreLocker
 {
   public:
-    SemaphoreLocker(QSemaphore *lock) : m_lock(lock)
+    explicit SemaphoreLocker(QSemaphore *lock) : m_lock(lock)
     {
         if (m_lock)
             m_lock->acquire();
@@ -42,7 +42,7 @@ QEvent::Type ScreenLoadCompletionEvent::kEventType =
 class ScreenLoadTask : public QRunnable
 {
   public:
-    ScreenLoadTask(MythScreenType &parent) : m_parent(parent) {}
+    explicit ScreenLoadTask(MythScreenType &parent) : m_parent(parent) {}
 
   private:
     void run(void)
@@ -434,7 +434,8 @@ void MythScreenType::ShowMenu(void)
 
 bool MythScreenType::keyPressEvent(QKeyEvent *event)
 {
-    if (m_CurrentFocusWidget && m_CurrentFocusWidget->keyPressEvent(event))
+    if (!GetMythMainWindow()->IsExitingToMain() && m_CurrentFocusWidget &&
+        m_CurrentFocusWidget->keyPressEvent(event))
         return true;
 
     bool handled = false;

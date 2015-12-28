@@ -41,7 +41,7 @@ class CetonChannel : public DTVChannel
 
     using DTVChannel::Tune;
     // ATSC/DVB scanning/tuning stuff
-    bool Tune(const DTVMultiplex &tuning, QString inputname);
+    bool Tune(const DTVMultiplex &tuning);
 
     // Virtual tuning
     bool Tune(const QString &freqid, int /*finetune*/);

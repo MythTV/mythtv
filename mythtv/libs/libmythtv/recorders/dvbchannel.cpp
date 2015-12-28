@@ -47,6 +47,7 @@
 #include "dvbtypes.h"
 #include "dvbchannel.h"
 #include "dvbcam.h"
+#include "tv_rec.h"
 
 static void drain_dvb_events(int fd);
 static bool wait_for_backend(int fd, int timeout_ms);
@@ -58,7 +59,7 @@ static DTVMultiplex dvbparams_to_dtvmultiplex(
 int64_t concurrent_tunings_delay = 1000;
 QDateTime DVBChannel::last_tuning = QDateTime::currentDateTime();
 
-#define LOC QString("DVBChan[%1](%2): ").arg(GetCardID()).arg(GetDevice())
+#define LOC QString("DVBChan[%1](%2): ").arg(m_inputid).arg(GetDevice())
 
 /** \class DVBChannel
  *  \brief Provides interface to the tuning hardware when using DVB drivers
@@ -83,9 +84,12 @@ DVBChannel::DVBChannel(const QString &aDevice, TVRec *parent)
     has_crc_bug(false)
 {
     master_map_lock.lockForWrite();
-    QString devname = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, device);
-    master_map[devname].push_back(this); // == RegisterForMaster
-    DVBChannel *master = static_cast<DVBChannel*>(master_map[devname].front());
+    QString key = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, device);
+    if (m_pParent)
+        key += QString(":%1")
+            .arg(CardUtil::GetSourceID(m_pParent->GetInputId()));
+    master_map[key].push_back(this); // == RegisterForMaster
+    DVBChannel *master = static_cast<DVBChannel*>(master_map[key].front());
     if (master == this)
     {
         dvbcam = new DVBCam(device);
@@ -106,20 +110,23 @@ DVBChannel::~DVBChannel()
     // set a new master if there are other instances and we're the master
     // whether we are the master or not remove us from the map..
     master_map_lock.lockForWrite();
-    QString devname = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, device);
-    DVBChannel *master = static_cast<DVBChannel*>(master_map[devname].front());
+    QString key = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, device);
+    if (m_pParent)
+        key += QString(":%1")
+            .arg(CardUtil::GetSourceID(m_pParent->GetInputId()));
+    DVBChannel *master = static_cast<DVBChannel*>(master_map[key].front());
     if (master == this)
     {
-        master_map[devname].pop_front();
+        master_map[key].pop_front();
         DVBChannel *new_master = NULL;
-        if (!master_map[devname].empty())
-            new_master = dynamic_cast<DVBChannel*>(master_map[devname].front());
+        if (!master_map[key].empty())
+            new_master = dynamic_cast<DVBChannel*>(master_map[key].front());
         if (new_master)
             new_master->is_open = master->is_open;
     }
     else
     {
-        master_map[devname].removeAll(this);
+        master_map[key].removeAll(this);
     }
     master_map_lock.unlock();
 
@@ -127,7 +134,7 @@ DVBChannel::~DVBChannel()
 
     // if we're the last one out delete dvbcam
     master_map_lock.lockForRead();
-    MasterMap::iterator mit = master_map.find(devname);
+    MasterMap::iterator mit = master_map.find(key);
     if ((*mit).empty())
         delete dvbcam;
     dvbcam = NULL;
@@ -179,6 +186,12 @@ bool DVBChannel::Open(DVBChannel *who)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Opening DVB channel");
 
+    if (!m_inputid)
+    {
+        if (!InitializeInput())
+            return false;
+    }
+
     QMutexLocker locker(&hw_lock);
 
     if (fd_frontend >= 0)
@@ -208,7 +221,7 @@ bool DVBChannel::Open(DVBChannel *who)
 
         is_open[who] = true;
 
-        if (!InitializeInputs())
+        if (!InitializeInput())
         {
             Close();
             ReturnMasterLock(master);
@@ -255,9 +268,13 @@ bool DVBChannel::Open(DVBChannel *who)
     frontend_name       = info.name;
     tunerType           = info.type;
 #if HAVE_FE_CAN_2G_MODULATION
-    if (tunerType == DTVTunerType::kTunerTypeDVBS1 &&
-        (info.caps & FE_CAN_2G_MODULATION))
-        tunerType = DTVTunerType::kTunerTypeDVBS2;
+    if (info.caps & FE_CAN_2G_MODULATION)
+    {
+        if (tunerType == DTVTunerType::kTunerTypeDVBS1)
+            tunerType = DTVTunerType::kTunerTypeDVBS2;
+        else if (tunerType == DTVTunerType::kTunerTypeDVBT)
+            tunerType = DTVTunerType::kTunerTypeDVBT2;
+    }
 #endif // HAVE_FE_CAN_2G_MODULATION
     capabilities        = info.caps;
     frequency_minimum   = info.frequency_min;
@@ -273,7 +290,7 @@ bool DVBChannel::Open(DVBChannel *who)
     if (tunerType.IsDiSEqCSupported())
     {
 
-        diseqc_tree = diseqc_dev.FindTree(GetCardID());
+        diseqc_tree = diseqc_dev.FindTree(m_inputid);
         if (diseqc_tree)
         {
             bool is_SCR = false;
@@ -293,7 +310,7 @@ bool DVBChannel::Open(DVBChannel *who)
 
     first_tune = true;
 
-    if (!InitializeInputs())
+    if (!InitializeInput())
     {
         Close();
         return false;
@@ -311,43 +328,13 @@ bool DVBChannel::IsOpen(void) const
     return it != is_open.end();
 }
 
-bool DVBChannel::Init(QString &inputname, QString &startchannel, bool setchan)
+bool DVBChannel::Init(QString &startchannel, bool setchan)
 {
     if (setchan && !IsOpen())
         Open(this);
 
-    return ChannelBase::Init(inputname, startchannel, setchan);
+    return ChannelBase::Init(startchannel, setchan);
 }
-
-bool DVBChannel::SwitchToInput(const QString &inputname, const QString &chan)
-{
-    int input = GetInputByName(inputname);
-
-    bool ok = false;
-    if (input >= 0)
-    {
-        m_currentInputID = input;
-        ok = SetChannelByString(chan);
-    }
-    else
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("DVBChannel: Could not find input: %1 on card when "
-                    "setting channel %2\n").arg(inputname).arg(chan));
-    }
-    return ok;
-}
-
-bool DVBChannel::SwitchToInput(int newInputNum, bool setstarting)
-{
-    if (!ChannelBase::SwitchToInput(newInputNum, false))
-        return false;
-
-    m_currentInputID = newInputNum;
-    InputMap::const_iterator it = m_inputs.find(m_currentInputID);
-    return SetChannelByString((*it)->startChanNum);
-}
-
 
 /** \fn DVBChannel::CheckFrequency(uint64_t) const
  *  \brief Checks tuning frequency
@@ -409,7 +396,8 @@ void DVBChannel::CheckOptions(DTVMultiplex &tuning) const
            "Selected modulation parameter unsupported by this driver.");
     }
 
-    if (DTVTunerType::kTunerTypeDVBT != tunerType)
+    if (DTVTunerType::kTunerTypeDVBT != tunerType &&
+        DTVTunerType::kTunerTypeDVBT2 != tunerType)
     {
         LOG(VB_CHANNEL, LOG_INFO, LOC + tuning.toString());
         return;
@@ -530,17 +518,14 @@ void DVBChannel::SetTimeOffset(double offset)
 }
 
 
-bool DVBChannel::Tune(const DTVMultiplex &tuning, QString inputname)
+bool DVBChannel::Tune(const DTVMultiplex &tuning)
 {
-    int inputid = inputname.isEmpty() ?
-        m_currentInputID : GetInputByName(inputname);
-    if (inputid < 0)
+    if (!m_inputid)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Tune(): Invalid input '%1'.")
-                .arg(inputname));
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Tune(): Invalid input."));
         return false;
     }
-    return Tune(tuning, inputid, false, false);
+    return Tune(tuning, false, false);
 }
 
 #if DVB_API_VERSION >= 5
@@ -554,7 +539,8 @@ static struct dtv_properties *dtvmultiplex_to_dtvproperties(
     if (tuner_type != DTVTunerType::kTunerTypeDVBT  &&
         tuner_type != DTVTunerType::kTunerTypeDVBC  &&
         tuner_type != DTVTunerType::kTunerTypeDVBS1 &&
-        tuner_type != DTVTunerType::kTunerTypeDVBS2)
+        tuner_type != DTVTunerType::kTunerTypeDVBS2 &&
+        tuner_type != DTVTunerType::kTunerTypeDVBT2)
     {
         LOG(VB_GENERAL, LOG_ERR, "DVBChan: Unsupported tuner type " +
             tuner_type.toString());
@@ -565,7 +551,7 @@ static struct dtv_properties *dtvmultiplex_to_dtvproperties(
     if (!cmdseq)
         return NULL;
 
-    cmdseq->props = (struct dtv_property*) calloc(11, sizeof(*(cmdseq->props)));
+    cmdseq->props = (struct dtv_property*) calloc(12, sizeof(*(cmdseq->props)));
     if (!(cmdseq->props))
     {
         free(cmdseq);
@@ -577,7 +563,8 @@ static struct dtv_properties *dtvmultiplex_to_dtvproperties(
     if (tuning.mod_sys == DTVModulationSystem::kModulationSystem_DVBS2)
         can_fec_auto = false;
 
-    if (tuner_type == DTVTunerType::kTunerTypeDVBS2)
+    if (tuner_type == DTVTunerType::kTunerTypeDVBS2 ||
+        tuner_type == DTVTunerType::kTunerTypeDVBT2)
     {
         cmdseq->props[c].cmd      = DTV_DELIVERY_SYSTEM;
         cmdseq->props[c++].u.data = tuning.mod_sys;
@@ -604,7 +591,8 @@ static struct dtv_properties *dtvmultiplex_to_dtvproperties(
         cmdseq->props[c++].u.data = can_fec_auto ? FEC_AUTO : tuning.fec;
     }
 
-    if (tuner_type == DTVTunerType::kTunerTypeDVBT)
+    if (tuner_type == DTVTunerType::kTunerTypeDVBT ||
+        tuner_type == DTVTunerType::kTunerTypeDVBT2)
     {
         cmdseq->props[c].cmd      = DTV_BANDWIDTH_HZ;
         cmdseq->props[c++].u.data = (8-tuning.bandwidth) * 1000000;
@@ -660,7 +648,6 @@ static struct dtv_properties *dtvmultiplex_to_dtvproperties(
  *  \return true on success, false on failure
  */
 bool DVBChannel::Tune(const DTVMultiplex &tuning,
-                      uint inputid,
                       bool force_reset,
                       bool same_input)
 {
@@ -672,7 +659,7 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
     {
         LOG(VB_CHANNEL, LOG_INFO, LOC + "tuning on slave channel");
         SetSIStandard(tuning.sistandard);
-        bool ok = master->Tune(tuning, inputid, force_reset, false);
+        bool ok = master->Tune(tuning, force_reset, false);
         ReturnMasterLock(master);
         return ok;
     }
@@ -736,7 +723,7 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
         {
             // configure for new input
             if (!same_input)
-                diseqc_settings.Load(inputid);
+                diseqc_settings.Load(m_inputid);
 
             // execute diseqc commands
             if (!diseqc_tree->Execute(diseqc_settings, tuning))
@@ -782,7 +769,8 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
         }
 
 #if DVB_API_VERSION >=5
-        if (DTVTunerType::kTunerTypeDVBS2 == tunerType)
+        if (DTVTunerType::kTunerTypeDVBS2 == tunerType ||
+            DTVTunerType::kTunerTypeDVBT2 == tunerType)
         {
             struct dtv_property p_clear;
             struct dtv_properties cmdseq_clear;
@@ -863,7 +851,7 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
 
 bool DVBChannel::Retune(void)
 {
-    return Tune(desired_tuning, m_currentInputID, true, true);
+    return Tune(desired_tuning, true, true);
 }
 
 QString DVBChannel::GetFrontendName(void) const
@@ -988,10 +976,10 @@ int DVBChannel::GetChanID() const
                   "FROM channel, capturecard "
                   "WHERE capturecard.sourceid = channel.sourceid AND "
                   "      channel.channum = :CHANNUM AND "
-                  "      capturecard.cardid = :CARDID");
+                  "      capturecard.cardid = :INPUTID");
 
     query.bindValue(":CHANNUM", m_curchannelname);
-    query.bindValue(":CARDID", GetCardID());
+    query.bindValue(":INPUTID", m_inputid);
 
     if (!query.exec() || !query.isActive())
     {
@@ -1153,8 +1141,11 @@ double DVBChannel::GetUncorrectedBlockCount(bool *ok) const
 
 DVBChannel *DVBChannel::GetMasterLock(void)
 {
-    QString devname = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, device);
-    DTVChannel *master = DTVChannel::GetMasterLock(devname);
+    QString key = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, device);
+    if (m_pParent)
+        key += QString(":%1")
+            .arg(CardUtil::GetSourceID(m_pParent->GetInputId()));
+    DTVChannel *master = DTVChannel::GetMasterLock(key);
     DVBChannel *dvbm = dynamic_cast<DVBChannel*>(master);
     if (master && !dvbm)
         DTVChannel::ReturnMasterLock(master);
@@ -1170,8 +1161,11 @@ void DVBChannel::ReturnMasterLock(DVBChannelP &dvbm)
 
 const DVBChannel *DVBChannel::GetMasterLock(void) const
 {
-    QString devname = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, device);
-    DTVChannel *master = DTVChannel::GetMasterLock(devname);
+    QString key = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, device);
+    if (m_pParent)
+        key += QString(":%1")
+            .arg(CardUtil::GetSourceID(m_pParent->GetInputId()));
+    DTVChannel *master = DTVChannel::GetMasterLock(key);
     DVBChannel *dvbm = dynamic_cast<DVBChannel*>(master);
     if (master && !dvbm)
         DTVChannel::ReturnMasterLock(master);
@@ -1306,7 +1300,8 @@ static struct dvb_frontend_parameters dtvmultiplex_to_dvbparams(
         params.u.qam.modulation   = (fe_modulation_t) (int) tuning.modulation;
     }
 
-    if (DTVTunerType::kTunerTypeDVBT == tuner_type)
+    if (DTVTunerType::kTunerTypeDVBT == tuner_type ||
+        DTVTunerType::kTunerTypeDVBT2 == tuner_type)
     {
         params.u.ofdm.bandwidth             =
             (fe_bandwidth_t) (int) tuning.bandwidth;
@@ -1355,7 +1350,8 @@ static DTVMultiplex dvbparams_to_dtvmultiplex(
         tuning.modulation     = params.u.qam.modulation;
     }
 
-    if (DTVTunerType::kTunerTypeDVBT   == tuner_type)
+    if (DTVTunerType::kTunerTypeDVBT   == tuner_type ||
+        DTVTunerType::kTunerTypeDVBT2  == tuner_type)
     {
         tuning.bandwidth      = params.u.ofdm.bandwidth;
         tuning.hp_code_rate   = params.u.ofdm.code_rate_HP;

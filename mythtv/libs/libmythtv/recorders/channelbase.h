@@ -10,7 +10,6 @@
 
 // MythTV headers
 #include "channelinfo.h"
-#include "inputinfo.h"
 #include "mythsystemlegacy.h"
 #include "tv.h"
 #include "videoouttypes.h" // for PictureAttribute
@@ -37,8 +36,8 @@ class ChannelBase
     ChannelBase(TVRec *parent);
     virtual ~ChannelBase(void);
 
-    virtual bool Init(QString &inputname, QString &startchannel, bool setchan);
-    virtual bool IsTunable(const QString &input, const QString &channum) const;
+    virtual bool Init(QString &startchannel, bool setchan);
+    virtual bool IsTunable(const QString &channum) const;
 
     // Methods that must be implemented.
     /// \brief Opens the channel changing hardware for use.
@@ -62,30 +61,15 @@ class ChannelBase
     // Gets
     virtual uint GetNextChannel(uint chanid, ChannelChangeDirection direction) const;
     virtual uint GetNextChannel(const QString &channum, ChannelChangeDirection direction) const;
-    virtual int GetInputByName(const QString &input) const;
-    virtual QString GetInputByNum(int capchannel) const;
-    virtual QString GetCurrentName(void) const
+    virtual QString GetChannelName(void) const
         { return m_curchannelname; }
     virtual int GetChanID(void) const;
-    virtual int GetCurrentInputNum(void) const
-        { return m_currentInputID; }
-    virtual QString GetCurrentInput(void) const
-        { return m_inputs[GetCurrentInputNum()]->name; }
-    virtual int GetNextInputNum(void) const;
-    virtual QString GetNextInput(void) const
-        { return m_inputs[GetNextInputNum()]->name; }
-    virtual QString GetNextInputStartChan(void)
-        { return m_inputs[GetNextInputNum()]->startChanNum; }
-    virtual uint GetCurrentSourceID(void) const
-        { return m_inputs[GetCurrentInputNum()]->sourceid; }
-    virtual uint GetSourceID(int inputID) const
-        { return m_inputs[inputID]->sourceid; }
-    virtual uint GetInputCardID(int inputNum) const;
-    virtual ChannelInfoList GetChannels(int inputNum) const;
-    virtual ChannelInfoList GetChannels(const QString &inputname) const;
-    virtual vector<InputInfo> GetFreeInputs(
-        const vector<uint> &excluded_cards) const;
-    virtual QStringList GetConnectedInputs(void) const;
+    virtual int GetInputID(void) const
+        { return m_inputid; }
+    virtual QString GetInputName(void) const
+        { return m_name; }
+    virtual uint GetSourceID(void) const
+        { return m_sourceid; }
 
     /// \brief Returns true iff commercial detection is not required
     //         on current channel, for BBC, CBC, etc.
@@ -97,18 +81,13 @@ class ChannelBase
     virtual void Renumber(uint srcid, const QString &oldChanNum,
                           const QString &newChanNum);
 
-    // Input toggling convenience methods
-    virtual bool SwitchToInput(const QString &input);
-    virtual bool SwitchToInput(const QString &input, const QString &chan);
-
-    virtual bool InitializeInputs(void);
+    virtual bool InitializeInput(void);
 
     // Misc. Commands
     virtual bool Retune(void) { return false; }
 
     /// Saves current channel as the default channel for the current input.
-    virtual void StoreInputChannels(void)
-        { StoreInputChannels(m_inputs); }
+    virtual void StoreInputChannels(void);
 
     // Picture attribute settings
     virtual bool InitPictureAttributes(void) { return false; }
@@ -116,12 +95,10 @@ class ChannelBase
     virtual int  ChangePictureAttribute(
         PictureAdjustType, PictureAttribute, bool up) { return -1; }
 
-    bool CheckChannel(const QString &channum, QString& inputName) const;
+    bool CheckChannel(const QString &channum) const;
 
-    // \brief Set cardid for scanning
-    void SetCardID(uint _cardid) { m_cardid = _cardid; }
-
-    virtual uint GetCardID(void) const;
+    // \brief Set inputid for scanning
+    void SetInputID(uint _inputid) { m_inputid = _inputid; }
 
     static ChannelBase *CreateChannel(
         TVRec                    *tv_rec,
@@ -135,16 +112,9 @@ class ChannelBase
   protected:
     /// \brief Switches to another input on hardware,
     ///        and sets the channel is setstarting is true.
-    virtual bool SwitchToInput(int inputNum, bool setstarting);
-    virtual bool IsInputAvailable(
-        int inputNum, uint &mplexid_restriction,
-        uint &chanid_restrtiction) const;
+    virtual bool IsInputAvailable(uint &mplexid_restriction,
+                                  uint &chanid_restrtiction) const;
     virtual bool IsExternalChannelChangeSupported(void) { return false; }
-
-    int GetStartInput(uint cardid);
-    void ClearInputMap(void);
-
-    static void StoreInputChannels(const InputMap&);
 
   protected:
     bool KillScript(void);
@@ -159,11 +129,14 @@ class ChannelBase
 
     TVRec   *m_pParent;
     QString  m_curchannelname;
-    int      m_currentInputID;
     bool     m_commfree;
-    uint     m_cardid;
-    InputMap m_inputs;
-    ChannelInfoList m_allchannels; ///< channels across all inputs
+    uint     m_inputid;
+    uint     m_sourceid;
+    QString  m_name;
+    QString  m_startChanNum;
+    QString  m_externalChanger;
+    QString  m_tuneToChannel;
+    ChannelInfoList m_channels; ///< channels across all inputs
 
     QMutex         m_system_lock;
     MythSystemLegacy    *m_system;

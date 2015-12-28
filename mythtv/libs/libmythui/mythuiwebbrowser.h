@@ -24,7 +24,7 @@ class BrowserApi : public QObject
 {
     Q_OBJECT
   public:
-    BrowserApi(QObject *parent);
+    explicit BrowserApi(QObject *parent);
     ~BrowserApi(void);
 
     void setWebView(QWebView *view);
@@ -70,7 +70,7 @@ class MythWebPage : public QWebPage
   Q_OBJECT
 
   public:
-    MythWebPage(QObject *parent = 0);
+    explicit MythWebPage(QObject *parent = 0);
     ~MythWebPage();
 
     virtual bool extension (Extension extension, const ExtensionOption *option = 0, ExtensionReturn *output = 0);

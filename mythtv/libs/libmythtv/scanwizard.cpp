@@ -97,6 +97,11 @@ void ScanWizard::SetPage(const QString &pageTitle)
         start_chan = configPane->GetStartChan();
         parse_type = DTVTunerType::kTunerTypeDVBT;
     }
+    else if (scantype == ScanTypeSetting::NITAddScan_DVBT2)
+    {
+        start_chan = configPane->GetStartChan();
+        parse_type = DTVTunerType::kTunerTypeDVBT2;
+    }
     else if (scantype == ScanTypeSetting::NITAddScan_DVBS)
     {
         start_chan = configPane->GetStartChan();
@@ -117,6 +122,13 @@ void ScanWizard::SetPage(const QString &pageTitle)
         do_scan = false;
         scannerPane->ImportM3U(cardid, inputname, sourceid, false);
     }
+    else if (scantype == ScanTypeSetting::VBoxImport)
+    {
+        do_scan = false;
+        scannerPane->ImportVBox(cardid, inputname, sourceid,
+                                configPane->DoFreeToAirOnly(),
+                                configPane->GetServiceRequirements());
+    }
     else if (scantype == ScanTypeSetting::IPTVImportMPTS)
     {
         scannerPane->ImportM3U(cardid, inputname, sourceid, true);
@@ -127,6 +139,7 @@ void ScanWizard::SetPage(const QString &pageTitle)
              (scantype == ScanTypeSetting::CurrentTransportScan) ||
              (scantype == ScanTypeSetting::FullScan_DVBC)     ||
              (scantype == ScanTypeSetting::FullScan_DVBT)     ||
+             (scantype == ScanTypeSetting::FullScan_DVBT2)    ||
              (scantype == ScanTypeSetting::FullScan_Analog))
     {
         ;
@@ -208,6 +221,6 @@ void ScanWizard::SetInput(const QString &cardids_inputname)
     {
         lastHWCardID    = cardid;
         QString subtype = CardUtil::ProbeSubTypeName(cardid);
-        lastHWCardType  = CardUtil::toCardType(subtype);
+        lastHWCardType  = CardUtil::toInputType(subtype);
     }
 }

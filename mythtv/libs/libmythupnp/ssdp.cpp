@@ -24,6 +24,9 @@
 #include <QRegExp>
 #include <QStringList>
 
+#ifdef ANDROID
+#include <sys/select.h>
+#endif
 #include <stdlib.h>
 #include <errno.h>
 

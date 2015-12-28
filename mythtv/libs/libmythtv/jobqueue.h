@@ -161,6 +161,8 @@ class MTV_PUBLIC JobQueue : public QObject, public QRunnable
     static bool IsJobRunning(int jobType, const ProgramInfo &pginfo);
     static bool IsJobQueued(int jobType,
                             uint chanid, const QDateTime &recstartts);
+    static bool IsJobStatusQueued(int status);
+    static bool IsJobStatusRunning(int status);
     static bool PauseJob(int jobID);
     static bool ResumeJob(int jobID);
     static bool RestartJob(int jobID);

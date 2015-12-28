@@ -1001,6 +1001,12 @@ void MythUIWebBrowser::Init(void)
                                                      false);
     }
 
+    if (!gCoreContext->GetNumSetting("WebBrowserEnableJavascript",1))
+    {
+        LOG(VB_GENERAL, LOG_INFO, "MythUIWebBrowser: disabling JavaScript");
+        QWebSettings::globalSettings()->setAttribute(QWebSettings::JavascriptEnabled, false);
+    }
+
     QImage image = QImage(m_actualBrowserArea.size(), QImage::Format_ARGB32);
     m_image = GetPainter()->GetFormatImage();
     m_image->Assign(image);
@@ -1126,12 +1132,25 @@ void MythUIWebBrowser::SetActive(bool active)
         m_browser->setFocus();
         m_browser->show();
         m_browser->raise();
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+        if (qApp->platformName().contains("egl"))
+        {
+            m_browser->setParent(0);
+            m_browser->setFocus();
+            m_browser->show();
+            m_browser->raise();
+        }
+#endif
         m_browser->setUpdatesEnabled(true);
     }
     else
     {
         m_browser->clearFocus();
         m_browser->hide();
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+        if (qApp->platformName().contains("egl"))
+            m_browser->setParent(GetMythMainWindow());
+#endif
         UpdateBuffer();
     }
 }

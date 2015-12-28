@@ -41,7 +41,7 @@ class AutoExpire;
 class ExpireThread : public MThread
 {
   public:
-    ExpireThread(AutoExpire *p) : MThread("Expire"), m_parent(p) {}
+    explicit ExpireThread(AutoExpire *p) : MThread("Expire"), m_parent(p) {}
     virtual ~ExpireThread() { wait(); }
     virtual void run(void);
   private:
@@ -52,7 +52,7 @@ class UpdateThread : public QObject, public MThread
 {
     Q_OBJECT
   public:
-    UpdateThread(AutoExpire *p) : MThread("Update"), m_parent(p) {}
+    explicit UpdateThread(AutoExpire *p) : MThread("Update"), m_parent(p) {}
     virtual ~UpdateThread() { wait(); }
     virtual void run(void);
   private:
@@ -66,7 +66,7 @@ class AutoExpire : public QObject
     friend class ExpireThread;
     friend class UpdateThread;
   public:
-    AutoExpire(QMap<int, EncoderLink *> *encoderList);
+    explicit AutoExpire(QMap<int, EncoderLink *> *encoderList);
     AutoExpire(void);
    ~AutoExpire();
 

@@ -82,7 +82,6 @@ class MusicPlayer : public QObject, public MythObservable
     void incVolume(void);
     void decVolume(void);
     uint getVolume(void) const;
-    void saveVolume(void);
 
     void  setSpeed(float speed);
     void  incSpeed();
@@ -130,6 +129,8 @@ class MusicPlayer : public QObject, public MythObservable
     int          getCurrentTrackPos(void) { return m_currentTrack; }
     bool         setCurrentTrackPos(int pos);
     void         changeCurrentTrack(int trackNo);
+
+    int          getCurrentTrackTime(void) { return m_currentTime; }
 
     void         activePlaylistChanged(int trackID, bool deleted);
     void         playlistChanged(int playlistID);

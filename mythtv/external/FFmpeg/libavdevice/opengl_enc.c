@@ -31,12 +31,16 @@
 #include "config.h"
 
 #if HAVE_WINDOWS_H
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #endif
 #if HAVE_OPENGL_GL3_H
 #include <OpenGL/gl3.h>
 #elif HAVE_ES2_GL_H
 #include <ES2/gl.h>
+#elif HAVE_EGL_EGL_H && HAVE_GLES2_GL2_H
+#include <EGL/egl.h>
+#include <GLES2/gl2.h>
 #else
 #include <GL/gl.h>
 #include <GL/glext.h>
@@ -164,7 +168,7 @@ typedef struct OpenGLVertexInfo
 } OpenGLVertexInfo;
 
 /* defines 2 triangles to display */
-static GLushort g_index[6] =
+static const GLushort g_index[6] =
 {
     0, 1, 2,
     0, 3, 2,
@@ -507,6 +511,8 @@ static int av_cold opengl_load_procedures(OpenGLContext *opengl)
 #define SelectedGetProcAddress glXGetProcAddress
 #elif HAVE_WGLGETPROCADDRESS
 #define SelectedGetProcAddress wglGetProcAddress
+#elif HAVE_EGLGETPROCADDRESS
+#define SelectedGetProcAddress eglGetProcAddress
 #endif
 
 #define LOAD_OPENGL_FUN(name, type) \

@@ -25,10 +25,6 @@
 #include "videoout_d3d.h"
 #endif
 
-#ifdef USING_QUARTZ_VIDEO
-#include "videoout_quartz.h"
-#endif
-
 #ifdef USING_OPENGL_VIDEO
 #include "videoout_opengl.h"
 #endif
@@ -44,6 +40,11 @@
 #ifdef USING_GLVAAPI
 #include "videoout_openglvaapi.h"
 #endif
+
+#ifdef USING_OPENMAX
+#include "videoout_omx.h"
+#endif
+
 #include "videoout_null.h"
 #include "dithertable.h"
 
@@ -62,13 +63,16 @@ static QString to_comma_list(const QStringList &list);
 
 void VideoOutput::GetRenderOptions(render_opts &opts)
 {
+    FilterManager fm;
     QStringList cpudeints;
     cpudeints += "onefield";
     cpudeints += "linearblend";
     cpudeints += "kerneldeint";
     cpudeints += "kerneldoubleprocessdeint";
-    cpudeints += "greedyhdeint";
-    cpudeints += "greedyhdoubleprocessdeint";
+    if (fm.GetFilterInfo("greedyhdeint"))
+        cpudeints += "greedyhdeint";
+    if (fm.GetFilterInfo("greedyhdoubleprocessdeint"))
+        cpudeints += "greedyhdoubleprocessdeint";
     cpudeints += "yadifdeint";
     cpudeints += "yadifdoubleprocessdeint";
     cpudeints += "fieldorderdoubleprocessdeint";
@@ -83,10 +87,6 @@ void VideoOutput::GetRenderOptions(render_opts &opts)
 #ifdef USING_XV
     VideoOutputXv::GetRenderOptions(opts, cpudeints);
 #endif // USING_XV
-
-#ifdef USING_QUARTZ_VIDEO
-    VideoOutputQuartz::GetRenderOptions(opts, cpudeints);
-#endif // USING_QUARTZ_VIDEO
 
 #ifdef USING_OPENGL_VIDEO
     VideoOutputOpenGL::GetRenderOptions(opts, cpudeints);
@@ -103,6 +103,10 @@ void VideoOutput::GetRenderOptions(render_opts &opts)
 #ifdef USING_GLVAAPI
     VideoOutputOpenGLVAAPI::GetRenderOptions(opts);
 #endif // USING_GLVAAPI
+
+#ifdef USING_OPENMAX
+    VideoOutputOMX::GetRenderOptions(opts, cpudeints);
+#endif // USING_OPENMAX
 }
 
 /**
@@ -121,9 +125,6 @@ VideoOutput *VideoOutput::Create(
     QStringList renderers;
 #ifdef USING_XV
     QStringList xvlist;
-#endif
-#ifdef USING_QUARTZ_VIDEO
-    QStringList osxlist;
 #endif
 
     // select the best available output
@@ -155,12 +156,6 @@ VideoOutput *VideoOutput::Create(
         renderers += xvlist;
 #endif // USING_XV
 
-#ifdef USING_QUARTZ_VIDEO
-        osxlist = VideoOutputQuartz::
-            GetAllowedRenderers(codec_id, video_dim_disp);
-        renderers += osxlist;
-#endif // Q_OS_MACX
-
 #ifdef USING_OPENGL_VIDEO
         renderers += VideoOutputOpenGL::
             GetAllowedRenderers(codec_id, video_dim_disp);
@@ -175,6 +170,11 @@ VideoOutput *VideoOutput::Create(
         renderers += VideoOutputOpenGLVAAPI::
             GetAllowedRenderers(codec_id, video_dim_disp);
 #endif // USING_GLVAAPI
+
+#ifdef USING_OPENMAX
+        renderers += VideoOutputOMX::
+            GetAllowedRenderers(codec_id, video_dim_disp);
+#endif // USING_OPENMAX
     }
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "Allowed renderers: " +
@@ -223,11 +223,6 @@ VideoOutput *VideoOutput::Create(
             vo = new VideoOutputD3D();
 #endif // _WIN32
 
-#ifdef USING_QUARTZ_VIDEO
-        else if (osxlist.contains(renderer))
-            vo = new VideoOutputQuartz();
-#endif // Q_OS_MACX
-
 #ifdef USING_OPENGL_VIDEO
         else if (renderer.contains("opengl") && (renderer != "openglvaapi"))
             vo = new VideoOutputOpenGL(renderer);
@@ -249,6 +244,11 @@ VideoOutput *VideoOutput::Create(
         else if (renderer == "openglvaapi")
             vo = new VideoOutputOpenGLVAAPI();
 #endif // USING_GLVAAPI
+
+#ifdef USING_OPENMAX
+        else if (renderer == VideoOutputOMX::kName)
+            vo = new VideoOutputOMX();
+#endif // USING_OPENMAX
 
 #ifdef USING_XV
         else if (xvlist.contains(renderer))
@@ -1099,10 +1099,10 @@ void VideoOutput::ShowPIP(VideoFrame  *frame,
     }
 
     QRect position = GetPIPRect(loc, pipplayer);
+
     pip_desired_display_size = position.size();
 
     // Scale the image if we have to...
-    unsigned char *pipbuf = pipimage->buf;
     if (pipw != pip_desired_display_size.width() ||
         piph != pip_desired_display_size.height())
     {
@@ -1122,36 +1122,31 @@ void VideoOutput::ShowPIP(VideoFrame  *frame,
             sws_scale(pip_scaling_context, img_in.data, img_in.linesize, 0,
                       piph, img_out.data, img_out.linesize);
 
-            if (pipActive)
-            {
-                AVPicture img_padded;
-                avpicture_fill(
-                    &img_padded, (uint8_t *)pip_tmp_buf2, PIX_FMT_YUV420P,
-                    pip_display_size.width(), pip_display_size.height());
-
-                int color[3] = { 20, 0, 200 }; //deep red YUV format
-                av_picture_pad(&img_padded, &img_out,
-                               pip_display_size.height(),
-                               pip_display_size.width(),
-                               PIX_FMT_YUV420P, 10, 10, 10, 10, color);
-
-                pipbuf = pip_tmp_buf2;
-            }
-            else
-            {
-                pipbuf = pip_tmp_buf;
-            }
-            int pitches[3] = { img_out.linesize[0],
-                               img_out.linesize[1],
-                               img_out.linesize[2] };
-            int offsets[3] = { 0,
-                               (int)(img_out.data[1] - img_out.data[0]),
-                               (int)(img_out.data[2] - img_out.data[0]) };
             pipw = pip_display_size.width();
             piph = pip_display_size.height();
 
-            init(&pip_tmp_image, FMT_YV12, pipbuf, pipw, piph, size,
-                 pitches, offsets);
+            if (pipActive)
+            {
+                AVPicture img_padded;
+                avpicture_fill( &img_padded, (uint8_t *)pip_tmp_buf2,
+                    PIX_FMT_YUV420P, pipw, piph);
+
+                int color[3] = { 20, 0, 200 }; //deep red YUV format
+                av_picture_pad(&img_padded, &img_out, piph, pipw,
+                               PIX_FMT_YUV420P, 4, 4, 4, 4, color);
+
+                int offsets[3] = {0, img_padded.data[1] - img_padded.data[0],
+                                    img_padded.data[2] - img_padded.data[0] };
+                init(&pip_tmp_image, FMT_YV12, img_padded.data[0], pipw, piph,
+                    sizeof(int), img_padded.linesize, offsets);
+            }
+            else
+            {
+                int offsets[3] = {0, img_out.data[1] - img_out.data[0],
+                                    img_out.data[2] - img_out.data[0] };
+                init(&pip_tmp_image, FMT_YV12, img_out.data[0], pipw, piph,
+                    sizeof(int), img_out.linesize, offsets);
+            }
         }
     }
 
@@ -1164,15 +1159,17 @@ void VideoOutput::ShowPIP(VideoFrame  *frame,
 
         int pip_height = pip_tmp_image.height;
         int height[3] = { pip_height, pip_height>>1, pip_height>>1 };
+        int pip_width = pip_tmp_image.width;
+        int widths[3] = { pip_width, pip_width>>1, pip_width>>1 };
 
         for (int p = 0; p < 3; p++)
         {
-            for (int h = 2; h < height[p]; h++)
+            for (int h = pipActive ? 0 : 1; h < height[p]; h++)
             {
                 memcpy((frame->buf + frame->offsets[p]) + (h + yoff2[p]) *
                        frame->pitches[p] + xoff2[p],
                        (pip_tmp_image.buf + pip_tmp_image.offsets[p]) + h *
-                       pip_tmp_image.pitches[p], pip_tmp_image.pitches[p]);
+                       pip_tmp_image.pitches[p], widths[p]);
             }
         }
     }
@@ -1248,6 +1245,12 @@ void VideoOutput::ResizeVideo(VideoFrame *frame)
                        resize.width(), resize.height());
         avpicture_fill(&img_in, (uint8_t *)frame->buf, PIX_FMT_YUV420P,
                        frame->width, frame->height);
+        img_in.data[0] = frame->buf + frame->offsets[0];
+        img_in.data[1] = frame->buf + frame->offsets[1];
+        img_in.data[2] = frame->buf + frame->offsets[2];
+        img_in.linesize[0] = frame->pitches[0];
+        img_in.linesize[1] = frame->pitches[1];
+        img_in.linesize[2] = frame->pitches[2];
         sws_scale(vsz_scale_context, img_in.data, img_in.linesize, 0,
                       frame->height, img_out.data, img_out.linesize);
     }
@@ -1258,29 +1261,41 @@ void VideoOutput::ResizeVideo(VideoFrame *frame)
     int xoff = resize.left();
     int yoff = resize.top();
     int resw = resize.width();
+    int vidw = frame->pitches[0];
+
+    unsigned char *yptr = frame->buf + frame->offsets[0];
+    unsigned char *videoyptr = vsz_tmp_buf;
 
     // Copy Y (intensity values)
+    yptr += yoff * vidw + xoff;
     for (int i = 0; i < resize.height(); i++)
     {
-        memcpy(frame->buf + (i + yoff) * frame->width + xoff,
-               vsz_tmp_buf + i * resw, resw);
+        memcpy(yptr, videoyptr, resw);
+        yptr += vidw;
+        videoyptr += resw;
     }
 
     // Copy U & V (half plane chroma values)
     xoff /= 2;
     yoff /= 2;
 
-    unsigned char *uptr = frame->buf + frame->width * frame->height;
-    unsigned char *vptr = frame->buf + frame->width * frame->height * 5 / 4;
-    int vidw = frame->width / 2;
+    unsigned char *uptr = frame->buf + frame->offsets[1];
+    unsigned char *vptr = frame->buf + frame->offsets[2];
+    vidw = frame->pitches[1];
+    uptr += yoff * vidw + xoff;
+    vptr += yoff * vidw + xoff;
 
     unsigned char *videouptr = vsz_tmp_buf + resw * resize.height();
-    unsigned char *videovptr = vsz_tmp_buf + resw * resize.height() * 5 / 4;
+    unsigned char *videovptr = vsz_tmp_buf + (resw * resize.height() * 5) / 4;
     resw /= 2;
     for (int i = 0; i < resize.height() / 2; i ++)
     {
-        memcpy(uptr + (i + yoff) * vidw + xoff, videouptr + i * resw, resw);
-        memcpy(vptr + (i + yoff) * vidw + xoff, videovptr + i * resw, resw);
+        memcpy(uptr, videouptr, resw);
+        uptr += vidw;
+        videouptr += resw;
+        memcpy(vptr, videovptr, resw);
+        vptr += vidw;
+        videovptr += resw;
     }
 }
 

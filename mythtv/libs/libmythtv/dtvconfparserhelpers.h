@@ -89,6 +89,7 @@ class DTVTunerType : public DTVParamHelper
     static const int kTunerTypeDVBS2; // QPSK, 8PSK, 16APSK, 32APSK
     static const int kTunerTypeDVBC;  // QAM-64, QAM-256
     static const int kTunerTypeDVBT;  // OFDM
+    static const int kTunerTypeDVBT2; // OFDM
     static const int kTunerTypeATSC;  // 8-VSB, 16-VSB,
                                       // QAM-16, QAM-64, QAM-256, QPSK
     static const int kTunerTypeASI;   // baseband
@@ -498,7 +499,7 @@ class DTVModulationSystem : public DTVParamHelper
     static const DTVParamHelperStruct confTable[];
     static const DTVParamHelperStruct vdrTable[];
     static const DTVParamHelperStruct parseTable[];
-    static const uint kDBStrCnt = 16;
+    static const uint kDBStrCnt = 17;
     static const char *dbStr[kDBStrCnt];
 
   public:
@@ -520,6 +521,7 @@ class DTVModulationSystem : public DTVParamHelper
         kModulationSystem_DMBTH,
         kModulationSystem_CMMB,
         kModulationSystem_DAB,
+        kModulationSystem_DVBT2,
     };
 
     DTVModulationSystem(int _default = kModulationSystem_UNDEFINED)

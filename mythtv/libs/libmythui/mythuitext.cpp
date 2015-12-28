@@ -132,7 +132,7 @@ void MythUIText::ResetMap(const InfoMap &map)
     if (newText.isEmpty())
         newText = GetDefaultText();
 
-    QRegExp regexp("%(([^\\|%]+)?\\||\\|(.))?(\\w+)(\\|(.+))?%");
+    QRegExp regexp("%(([^\\|%]+)?\\||\\|(.))?([\\w#]+)(\\|(.+))?%");
     regexp.setMinimal(true);
 
     bool replaced = map.contains(objectName());
@@ -194,7 +194,7 @@ void MythUIText::SetTextFromMap(const InfoMap &map)
     if (newText.isEmpty())
         newText = GetDefaultText();
 
-    QRegExp regexp("%(([^\\|%]+)?\\||\\|(.))?(\\S+)(\\|(.+))?%");
+    QRegExp regexp("%(([^\\|%]+)?\\||\\|(.))?([\\w#]+)(\\|(.+))?%");
     regexp.setMinimal(true);
 
     if (!newText.isEmpty() && newText.contains(regexp))
@@ -406,7 +406,7 @@ void MythUIText::ShiftCanvas(int x, int y)
 void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
                           int alphaMod, QRect clipRect)
 {
-    if (m_Canvas.isNull())
+    if (m_Canvas.isEmpty())
         return;
 
     FormatVector formats;

@@ -36,7 +36,7 @@ class InternetContent : public HttpServerExtension
         void    GetInternetContent( HTTPRequest *pRequest );
 
     public:
-                 InternetContent( const QString &sSharePath);
+                 explicit InternetContent( const QString &sSharePath);
         virtual ~InternetContent();
 
         virtual QStringList GetBasePaths();

@@ -130,12 +130,14 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     uint PushDrawDisabled(void);
     uint PopDrawDisabled(void);
     void SetEffectsEnabled(bool enable);
-    void draw(void);
+    void draw(MythPainter *painter = 0);
 
     void ResetIdleTimer(void);
     void PauseIdleTimer(bool pause);
     void EnterStandby(bool manual = true);
     void ExitStandby(bool manual = true);
+
+    virtual QPaintEngine *paintEngine() const;
 
   public slots:
     void mouseTimeout();
@@ -150,7 +152,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     void signalRemoteScreenShot(QString filename, int x, int y);
 
   protected:
-    MythMainWindow(const bool useDB = true);
+    explicit MythMainWindow(const bool useDB = true);
     virtual ~MythMainWindow();
 
     void InitKeys(void);

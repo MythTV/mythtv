@@ -96,7 +96,7 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
     }
 
 #ifdef USING_DVB
-    if (CardUtil::IsDVBCardType(cardtype))
+    if (CardUtil::IsDVBInputType(cardtype))
     {
         DVBChannel *dvbc = dynamic_cast<DVBChannel*>(channel);
         if (dvbc)
@@ -133,6 +133,15 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
 
 #ifdef USING_IPTV
     if (cardtype.toUpper() == "FREEBOX")
+    {
+        IPTVChannel *fbc = dynamic_cast<IPTVChannel*>(channel);
+        if (fbc)
+            signalMonitor = new IPTVSignalMonitor(db_cardnum, fbc);
+    }
+#endif
+
+#ifdef USING_VBOX
+    if (cardtype.toUpper() == "VBOX")
     {
         IPTVChannel *fbc = dynamic_cast<IPTVChannel*>(channel);
         if (fbc)

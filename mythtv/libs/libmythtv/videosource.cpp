@@ -52,6 +52,10 @@ using namespace std;
 #include <linux/videodev2.h>
 #endif
 
+#ifdef USING_VBOX
+#include "vboxutils.h"
+#endif
+
 #ifdef USING_HDHOMERUN
 #include "hdhomerun.h"
 #endif
@@ -1576,6 +1580,221 @@ void HDHomeRunDeviceIDList::UpdateDevices(const QString &v)
     _oldValue = v;
 };
 
+// -----------------------
+// VBOX Configuration
+// -----------------------
+
+VBoxIP::VBoxIP()
+{
+    setLabel(QObject::tr("IP Address"));
+    setHelpText(QObject::tr("Device IP or ID of a VBox device. eg. '192.168.1.100' or 'vbox_3718'"));
+    setEnabled(false);
+    connect(this, SIGNAL(valueChanged(const QString&)),
+            this, SLOT(UpdateDevices(const QString&)));
+    _oldValue="";
+};
+
+void VBoxIP::setEnabled(bool e)
+{
+    TransLineEditSetting::setEnabled(e);
+    if (e)
+    {
+        if (!_oldValue.isEmpty())
+            setValue(_oldValue);
+        emit NewIP(getValue());
+    }
+    else
+    {
+        _oldValue = getValue();
+        _oldValue.detach();
+    }
+}
+
+void VBoxIP::UpdateDevices(const QString &v)
+{
+   if (isEnabled())
+       emit NewIP(v);
+}
+
+VBoxTunerIndex::VBoxTunerIndex()
+{
+    setLabel(QObject::tr("Tuner"));
+    setHelpText(QObject::tr("Number and type of the tuner to use. eg '1-DVBT/T2'."));
+    setEnabled(false);
+    connect(this, SIGNAL(valueChanged(const QString&)),
+            this, SLOT(UpdateDevices(const QString&)));
+    _oldValue = "";
+};
+
+void VBoxTunerIndex::setEnabled(bool e)
+{
+    TransLineEditSetting::setEnabled(e);
+    if (e) {
+        if (!_oldValue.isEmpty())
+            setValue(_oldValue);
+        emit NewTuner(getValue());
+    }
+    else
+    {
+        _oldValue = getValue();
+    }
+}
+
+void VBoxTunerIndex::UpdateDevices(const QString &v)
+{
+   if (isEnabled())
+       emit NewTuner(v);
+}
+
+VBoxDeviceID::VBoxDeviceID(const CaptureCard &parent) :
+    LabelSetting(this),
+    CaptureCardDBStorage(this, parent, "videodevice"),
+    _ip(QString::null),
+    _tuner(QString::null),
+    _overridedeviceid(QString::null)
+{
+    setLabel(tr("Device ID"));
+    setHelpText(tr("Device ID of VBox device"));
+}
+
+void VBoxDeviceID::SetIP(const QString &ip)
+{
+    _ip = ip;
+    setValue(QString("%1-%2").arg(_ip).arg(_tuner));
+}
+
+void VBoxDeviceID::SetTuner(const QString &tuner)
+{
+    _tuner = tuner;
+    setValue(QString("%1-%2").arg(_ip).arg(_tuner));
+}
+
+void VBoxDeviceID::SetOverrideDeviceID(const QString &deviceid)
+{
+    _overridedeviceid = deviceid;
+    setValue(deviceid);
+}
+
+void VBoxDeviceID::Load(void)
+{
+    CaptureCardDBStorage::Load();
+    if (!_overridedeviceid.isEmpty())
+    {
+        setValue(_overridedeviceid);
+        _overridedeviceid = QString::null;
+    }
+}
+
+VBoxDeviceIDList::VBoxDeviceIDList(
+    VBoxDeviceID        *deviceid,
+    TransLabelSetting   *desc,
+    VBoxIP              *cardip,
+    VBoxTunerIndex      *cardtuner,
+    VBoxDeviceList      *devicelist) :
+    _deviceid(deviceid),
+    _desc(desc),
+    _cardip(cardip),
+    _cardtuner(cardtuner),
+    _devicelist(devicelist)
+{
+    setLabel(QObject::tr("Available devices"));
+    setHelpText(
+        QObject::tr(
+            "Device IP or ID, tuner number and tuner type of available VBox devices."));
+
+    connect(this, SIGNAL(valueChanged(const QString&)),
+            this, SLOT(UpdateDevices(const QString&)));
+
+    _oldValue = "";
+};
+
+/// \brief Adds all available device-tuner combinations to list
+void VBoxDeviceIDList::fillSelections(const QString &cur)
+{
+    clearSelections();
+
+    vector<QString> devs;
+    QMap<QString, bool> in_use;
+
+    QString current = cur;
+
+    VBoxDeviceList::iterator it = _devicelist->begin();
+    for (; it != _devicelist->end(); ++it)
+    {
+        devs.push_back(it.key());
+        in_use[it.key()] = (*it).inuse;
+    }
+
+    QString man_addr = VBoxDeviceIDList::tr("Manually Enter IP Address");
+    QString sel = man_addr;
+    devs.push_back(sel);
+
+    vector<QString>::const_iterator it2 = devs.begin();
+    for (; it2 != devs.end(); ++it2)
+        sel = (current == *it2) ? *it2 : sel;
+
+    QString usestr = QString(" -- ");
+    usestr += QObject::tr("Warning: already in use");
+
+    for (uint i = 0; i < devs.size(); i++)
+    {
+        const QString dev = devs[i];
+        QString desc = dev + (in_use[devs[i]] ? usestr : "");
+        addSelection(desc, dev, dev == sel);
+    }
+
+    if (current != cur)
+    {
+        _deviceid->SetOverrideDeviceID(current);
+    }
+    else if (sel == man_addr && !current.isEmpty())
+    {
+        // Populate the proper values for IP address and tuner
+        QStringList selection = current.split("-");
+
+        _cardip->SetOldValue(selection.first());
+        _cardtuner->SetOldValue(selection.last());
+
+        _cardip->setValue(selection.first());
+        _cardtuner->setValue(selection.last());
+    }
+}
+
+void VBoxDeviceIDList::Load(void)
+{
+    clearSelections();
+
+    fillSelections(_deviceid->getValue());
+}
+
+void VBoxDeviceIDList::UpdateDevices(const QString &v)
+{
+    if (v == VBoxDeviceIDList::tr("Manually Enter IP Address"))
+    {
+        _cardip->setEnabled(true);
+        _cardtuner->setEnabled(true);
+    }
+    else if (!v.isEmpty())
+    {
+        if (_oldValue == VBoxDeviceIDList::tr("Manually Enter IP Address"))
+        {
+            _cardip->setEnabled(false);
+            _cardtuner->setEnabled(false);
+        }
+        _deviceid->setValue(v);
+
+        // Update _cardip and _cardtuner
+        _cardip->setValue((*_devicelist)[v].cardip);
+        _cardtuner->setValue(QString("%1").arg((*_devicelist)[v].tunerno));
+        _desc->setValue((*_devicelist)[v].desc);
+    }
+    _oldValue = v;
+};
+
+// -----------------------
+// IPTV Configuration
+// -----------------------
+
 class IPTVHost : public LineEditSetting, public CaptureCardDBStorage
 {
   public:
@@ -1996,6 +2215,131 @@ void HDHomeRunConfigurationGroup::HDHomeRunExtraPanel(void)
 }
 
 // -----------------------
+// VBox Configuration
+// -----------------------
+
+class VBoxExtra : public ConfigurationWizard
+{
+  public:
+    VBoxExtra(VBoxConfigurationGroup &parent);
+    uint GetInstanceCount(void) const
+    {
+        return (uint) count->intValue();
+    }
+
+  private:
+    InstanceCount *count;
+};
+
+VBoxExtra::VBoxExtra(VBoxConfigurationGroup &parent) :
+    count(new InstanceCount(parent.parent))
+{
+    VerticalConfigurationGroup* rec = new VerticalConfigurationGroup(false);
+    rec->setLabel(QObject::tr("Recorder Options"));
+    rec->setUseLabel(false);
+
+    rec->addChild(new SignalTimeout(parent.parent, 1000, 250));
+    rec->addChild(new ChannelTimeout(parent.parent, 3000, 1750));
+    rec->addChild(count);
+
+    addChild(rec);
+}
+
+VBoxConfigurationGroup::VBoxConfigurationGroup
+        (CaptureCard& a_parent) :
+    VerticalConfigurationGroup(false, true, false, false),
+    parent(a_parent)
+{
+    setUseLabel(false);
+
+    // Fill Device list
+    FillDeviceList();
+
+    deviceid     = new VBoxDeviceID(parent);
+    desc         = new TransLabelSetting();
+    desc->setLabel(tr("Description"));
+    cardip       = new VBoxIP();
+    cardtuner    = new VBoxTunerIndex();
+    deviceidlist = new VBoxDeviceIDList(
+        deviceid, desc, cardip, cardtuner, &devicelist);
+
+    addChild(deviceidlist);
+    addChild(new EmptyAudioDevice(parent));
+    addChild(new EmptyVBIDevice(parent));
+    addChild(deviceid);
+    addChild(desc);
+    addChild(cardip);
+    addChild(cardtuner);
+
+    TransButtonSetting *buttonRecOpt = new TransButtonSetting();
+    buttonRecOpt->setLabel(tr("Recording Options"));
+    addChild(buttonRecOpt);
+
+    connect(buttonRecOpt, SIGNAL(pressed()),
+            this,         SLOT(  VBoxExtraPanel()));
+
+    connect(cardip,    SIGNAL(NewIP(const QString&)),
+            deviceid,  SLOT(  SetIP(const QString&)));
+    connect(cardtuner, SIGNAL(NewTuner(const QString&)),
+            deviceid,  SLOT(  SetTuner(const QString&)));
+};
+
+void VBoxConfigurationGroup::FillDeviceList(void)
+{
+    devicelist.clear();
+
+    // Find physical devices first
+    // ProbeVideoDevices returns "deviceid ip tunerno tunertype"
+    QStringList devs = CardUtil::ProbeVideoDevices("VBOX");
+
+    QStringList::const_iterator it;
+
+    for (it = devs.begin(); it != devs.end(); ++it)
+    {
+        QString dev = *it;
+        QStringList devinfo = dev.split(" ");
+        QString id = devinfo.at(0);
+        QString ip = devinfo.at(1);
+        QString tunerNo = devinfo.at(2);
+        QString tunerType = devinfo.at(3);
+
+        VBoxDevice tmpdevice;
+        tmpdevice.deviceid   = id;
+        tmpdevice.desc       = CardUtil::GetVBoxdesc(id, ip, tunerNo, tunerType);
+        tmpdevice.cardip     = ip;
+        tmpdevice.inuse      = false;
+        tmpdevice.discovered = true;
+        tmpdevice.tunerno  = tunerNo;
+        tmpdevice.tunertype  = tunerType;
+        tmpdevice.mythdeviceid = id + "-" + tunerNo + "-" + tunerType;
+        devicelist[tmpdevice.mythdeviceid] = tmpdevice;
+    }
+
+    // Now find configured devices
+
+    // returns "ip.ip.ip.ip-n-type" or deviceid-n-type values
+    QStringList db = CardUtil::GetVideoDevices("VBOX");
+
+    for (it = db.begin(); it != db.end(); ++it)
+    {
+        QMap<QString, VBoxDevice>::iterator dit;
+        dit = devicelist.find(*it);
+
+        if (dit != devicelist.end())
+            (*dit).inuse = true;
+    }
+}
+
+void VBoxConfigurationGroup::VBoxExtraPanel(void)
+{
+    parent.reload(); // ensure card id is valid
+
+    VBoxExtra acw(*this);
+    acw.exec();
+    parent.SetInstanceCount(acw.GetInstanceCount());
+}
+
+// -----------------------
 // Ceton Configuration
 // -----------------------
 
@@ -2365,6 +2709,10 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard &parent) :
     addTarget("HDHOMERUN", new HDHomeRunConfigurationGroup(parent));
 #endif // USING_HDHOMERUN
 
+#ifdef USING_VBOX
+    addTarget("VBOX",      new VBoxConfigurationGroup(parent));
+#endif // USING_VBOX
+
 #ifdef USING_FIREWIRE
     addTarget("FIREWIRE",  new FirewireConfigurationGroup(parent));
 #endif // USING_FIREWIRE
@@ -2416,7 +2764,7 @@ QString CaptureCard::GetRawCardType(void) const
     int cardid = getCardID();
     if (cardid <= 0)
         return QString::null;
-    return CardUtil::GetRawCardType(cardid);
+    return CardUtil::GetRawInputType(cardid);
 }
 
 void CaptureCard::fillSelections(SelectSetting *setting)
@@ -2454,16 +2802,16 @@ void CaptureCard::loadByID(int cardid)
 
     // Update instance count for cloned cards.
     if (cardid)
-        instance_count = CardUtil::GetChildCardCount(cardid) + 1;
+        instance_count = CardUtil::GetChildInputCount(cardid) + 1;
 }
 
 void CaptureCard::Save(void)
 {
     uint init_cardid = getCardID();
-    QString init_type = CardUtil::GetRawCardType(init_cardid);
+    QString init_type = CardUtil::GetRawInputType(init_cardid);
     QString init_dev = CardUtil::GetVideoDevice(init_cardid);
     QString init_input = CardUtil::GetInputName(init_cardid);
-    vector<uint> cardids = CardUtil::GetChildCardIDs(init_cardid);
+    vector<uint> cardids = CardUtil::GetChildInputIDs(init_cardid);
 
     ////////
 
@@ -2472,7 +2820,7 @@ void CaptureCard::Save(void)
     ////////
 
     uint cardid = getCardID();
-    QString type = CardUtil::GetRawCardType(cardid);
+    QString type = CardUtil::GetRawInputType(cardid);
     QString dev = CardUtil::GetVideoDevice(cardid);
 
     if (dev != init_dev)
@@ -2560,6 +2908,11 @@ void CardType::fillSelections(SelectSetting* setting)
         QObject::tr("HDHomeRun networked tuner"), "HDHOMERUN");
 #endif // USING_HDHOMERUN
 
+#ifdef USING_VBOX
+    setting->addSelection(
+        QObject::tr("V@Box TV Gateway networked tuner"), "VBOX");
+#endif // USING_VBOX
+
 #ifdef USING_FIREWIRE
     setting->addSelection(
         QObject::tr("FireWire cable box"), "FIREWIRE");
@@ -2607,7 +2960,6 @@ class InputName : public ComboBoxSetting, public CardInputDBStorage
         ComboBoxSetting(this), CardInputDBStorage(this, parent, "inputname")
     {
         setLabel(QObject::tr("Input name"));
-        addSelection(QObject::tr("(None)"), "None");
     };
 
     virtual void Load(void)
@@ -2620,10 +2972,10 @@ class InputName : public ComboBoxSetting, public CardInputDBStorage
         clearSelections();
         addSelection(QObject::tr("(None)"), "None");
         uint cardid = getInputID();
-        QString type = CardUtil::GetRawCardType(cardid);
+        QString type = CardUtil::GetRawInputType(cardid);
         QString device = CardUtil::GetVideoDevice(cardid);
         QStringList inputs;
-        CardUtil::GetCardInputs(cardid, device, type, inputs);
+        CardUtil::GetDeviceInputNames(cardid, device, type, inputs);
         while (!inputs.isEmpty())
         {
             addSelection(inputs.front());
@@ -3066,7 +3418,7 @@ CardInput::~CardInput()
 void CardInput::SetSourceID(const QString &sourceid)
 {
     uint cid = id->getValue().toUInt();
-    QString raw_card_type = CardUtil::GetRawCardType(cid);
+    QString raw_card_type = CardUtil::GetRawInputType(cid);
     bool enable = (sourceid.toInt() > 0);
     scan->setEnabled(enable && !raw_card_type.isEmpty() &&
                      !CardUtil::IsUnscanable(raw_card_type));
@@ -3158,7 +3510,7 @@ void CardInput::channelScanner(void)
 
     Save(); // save info for scanner.
 
-    QString cardtype = CardUtil::GetRawCardType(crdid);
+    QString cardtype = CardUtil::GetRawInputType(crdid);
     if (CardUtil::IsUnscanable(cardtype))
     {
         LOG(VB_GENERAL, LOG_ERR,
@@ -3195,7 +3547,7 @@ void CardInput::sourceFetch(void)
     {
         Save(); // save info for fetch..
 
-        QString cardtype = CardUtil::GetRawCardType(crdid);
+        QString cardtype = CardUtil::GetRawInputType(crdid);
 
         if (!CardUtil::IsCableCardPresent(crdid, cardtype) &&
             !CardUtil::IsUnscanable(cardtype) &&
@@ -3273,16 +3625,14 @@ void CardInput::Save(void)
     externalInputSettings->Store(getInputID());
 
     // Handle any cloning we may need to do
-    QString type = CardUtil::GetRawCardType(src_cardid);
+    QString type = CardUtil::GetRawInputType(src_cardid);
     if (CardUtil::IsTunerSharingCapable(type))
     {
-        vector<uint> clones = CardUtil::GetChildCardIDs(src_cardid);
+        vector<uint> clones = CardUtil::GetChildInputIDs(src_cardid);
         for (uint i = 0; i < clones.size(); i++)
             CardUtil::CloneCard(src_cardid, clones[i]);
     }
 
-    // Delete any orphaned inputs
-    CardUtil::DeleteOrphanInputs();
     // Delete any unused input groups
     CardUtil::UnlinkInputGroup(0,0);
 }
@@ -3589,10 +3939,8 @@ void CardInputEditor::Load(void)
         QString videodevice = query.value(1).toString();
         QString cardtype    = query.value(2).toString();
         QString inputname   = query.value(3).toString();
-        if (inputname.isEmpty())
-            inputname = QObject::tr("(None)");
 
-        CardInput *cardinput = new CardInput(cardtype, false, cardid);
+        CardInput *cardinput = new CardInput(cardtype, true, cardid);
         cardinput->loadByID(cardid);
         QString inputlabel = QString("%1 (%2) -> %3")
             .arg(CardUtil::GetDeviceLabel(cardtype, videodevice))
@@ -3646,6 +3994,12 @@ static QString remove_chaff(const QString &name)
 }
 #endif // USING_DVB
 
+void DVBConfigurationGroup::reloadDiseqcTree(const QString &videodevice)
+{
+    if (diseqc_tree)
+        diseqc_tree->Load(videodevice);
+}
+
 void DVBConfigurationGroup::probeCard(const QString &videodevice)
 {
     if (videodevice.isEmpty())
@@ -3669,7 +4023,7 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
     QString err_open  = tr("Could not open card %1").arg(videodevice);
     QString err_other = tr("Could not get card info for card %1").arg(videodevice);
 
-    switch (CardUtil::toCardType(subtype))
+    switch (CardUtil::toInputType(subtype))
     {
         case CardUtil::ERROR_OPEN:
             cardname->setValue(err_open);
@@ -3778,7 +4132,7 @@ TunerCardAudioInput::TunerCardAudioInput(const CaptureCard &parent,
     if (cardid <= 0)
         return;
 
-    last_cardtype = CardUtil::GetRawCardType(cardid);
+    last_cardtype = CardUtil::GetRawInputType(cardid);
     last_device   = CardUtil::GetAudioDevice(cardid);
 }
 
@@ -3879,6 +4233,8 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent) :
 
     connect(cardnum,      SIGNAL(valueChanged(const QString&)),
             this,         SLOT(  probeCard   (const QString&)));
+    connect(cardnum,      SIGNAL(valueChanged(const QString&)),
+            this,         SLOT(  reloadDiseqcTree(const QString&)));
     connect(diseqc_btn,   SIGNAL(pressed()),
             this,         SLOT(  DiSEqCPanel()));
     connect(buttonRecOpt, SIGNAL(pressed()),
@@ -3905,7 +4261,7 @@ void DVBConfigurationGroup::DiSEqCPanel()
 void DVBConfigurationGroup::Load(void)
 {
     VerticalConfigurationGroup::Load();
-    diseqc_tree->Load(parent.getCardID());
+    reloadDiseqcTree(cardnum->getValue());
     if (cardtype->getValue() == "DVB-S" ||
         cardtype->getValue() == "DVB-S2" ||
         DiSEqCDevTree::Exists(parent.getCardID()))
@@ -3917,7 +4273,7 @@ void DVBConfigurationGroup::Load(void)
 void DVBConfigurationGroup::Save(void)
 {
     VerticalConfigurationGroup::Save();
-    diseqc_tree->Store(parent.getCardID());
+    diseqc_tree->Store(cardnum->getValue());
     DiSEqCDev trees;
     trees.InvalidateTrees();
 }

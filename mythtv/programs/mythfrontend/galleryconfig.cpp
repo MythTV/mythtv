@@ -1,274 +1,206 @@
-
 #include "galleryconfig.h"
 
-// Qt headers
+#include <QStringBuilder>
 
-// MythTV headers
-#include "mythcontext.h"
-#include "mythmainwindow.h"
-#include "mythuitextedit.h"
-#include "mythuicheckbox.h"
-#include "mythuibutton.h"
-#include "mythuibuttonlist.h"
-#include "mythuispinbox.h"
-#include "mythdialogbox.h"
-#include "mythscreentype.h"
+#include "mythcorecontext.h"
+#include "mythdate.h"
+#include "gallerytransitions.h"
 
-#include "gallerydatabasehelper.h"
-#include "gallerytypedefs.h"
+#define ADD_FORMAT(date, format) fmt->addSelection(gCoreContext->GetQLocale().toString(date, format), format)
 
 
-
-/** \fn     GalleryConfig::GalleryConfig(MythScreenStack *, const char *)
- *  \brief  Constructor
- *  \param  parent The screen parent
- *  \param  name The name of the screen
- *  \return void
- */
-GalleryConfig::GalleryConfig(MythScreenStack *parent, const char *name)
-    : MythScreenType(parent, name),
-      m_sortOrder(NULL),
-      m_slideShowTime(NULL),
-      m_transitionType(NULL),
-      m_transitionTime(NULL),
-      m_showHiddenFiles(NULL),
-      m_saveButton(NULL),
-      m_cancelButton(NULL),
-      m_clearDbButton(NULL)
+ThumbSettings::ThumbSettings() : VerticalConfigurationGroup()
 {
-    // preset or load all variables
-    m_sortOrder = 0;
+    setLabel(tr("Thumbnails"));
+    
+    HostComboBox *order = new HostComboBox("GalleryImageOrder");
+    order->setLabel(tr("Image Order"));
+    order->setHelpText(tr("The order that pictures/videos are shown in thumbnail "
+                          "view and ordered slideshows."));
+    order->addSelection(tr("Filename (A-Z)"), QString::number(kSortByNameAsc));
+    order->addSelection(tr("Reverse Filename (Z-A)"), QString::number(kSortByNameDesc));
+    order->addSelection(tr("Exif Date (oldest first)"), QString::number(kSortByDateAsc));
+    order->addSelection(tr("Reverse Exif Date (newest first)"), QString::number(kSortByDateDesc));
+    order->addSelection(tr("File Modified Time (oldest first)"), QString::number(kSortByModTimeAsc));
+    order->addSelection(tr("Reverse File Modified Time (newest first)"), QString::number(kSortByModTimeDesc));
+    order->addSelection(tr("File Extension (A-Z)"), QString::number(kSortByExtAsc));
+    order->addSelection(tr("Reverse File Extension (Z-A)"), QString::number(kSortByExtDesc));
+    order->addSelection(tr("File Size (smallest first)"), QString::number(kSortBySizeAsc));
+    order->addSelection(tr("Reverse File Size (largest first)"), QString::number(kSortBySizeDesc));
+    addChild(order);
+    
+    HostComboBox *orderDir = new HostComboBox("GalleryDirOrder");
+    orderDir->setLabel(tr("Directory Order"));
+    orderDir->setHelpText(tr("The order that dirctories are shown and traversed "
+                             "in recursive slideshows."));
+    orderDir->addSelection(tr("Filename (A-Z)"), QString::number(kSortByNameAsc));
+    orderDir->addSelection(tr("Reverse Filename (Z-A)"), QString::number(kSortByNameDesc));
+    orderDir->addSelection(tr("File Modified Time (oldest first)"), QString::number(kSortByModTimeAsc));
+    orderDir->addSelection(tr("Reverse File Modified Time (newest first)"), QString::number(kSortByModTimeDesc));
+    addChild(orderDir);
+    
+    HostComboBox *fmt = new HostComboBox("GalleryDateFormat");
+    fmt->setLabel(tr("Date Format"));
+    
+    QDateTime sampdate = MythDate::fromString("2002-05-03");
+    
+    ADD_FORMAT(sampdate, "dd/MM/yy");
+    ADD_FORMAT(sampdate, "dd-MM-yy");
+    ADD_FORMAT(sampdate, "d/M/yy");
+    ADD_FORMAT(sampdate, "d-M-yy");
+    ADD_FORMAT(sampdate, "MM/dd/yy");
+    ADD_FORMAT(sampdate, "MM-dd-yy");
+    ADD_FORMAT(sampdate, "M/d/yy");
+    ADD_FORMAT(sampdate, "M-d-yy");
+    ADD_FORMAT(sampdate, "yyyy/MM/dd");
+    ADD_FORMAT(sampdate, "yyyy-MM-dd");
+    ADD_FORMAT(sampdate, QString("yyyy") % QChar(0x5E74) %
+               "M" % QChar(0x6708) % "d" % QChar(0x65E5)); // yyyy年M月d日
+    
+    fmt->setHelpText(tr("Date format of thumbnail captions. Other places use the system date format. "
+                        "Sample shows 3rd May 2002."));
+    addChild(fmt);
 }
 
 
-
-/** \fn     GalleryConfig::~GalleryConfig()
- *  \brief  Destructor
- *  \return void
- */
-GalleryConfig::~GalleryConfig()
+SlideSettings::SlideSettings() : VerticalConfigurationGroup()
 {
-
-}
-
-
-
-/** \fn     GalleryConfig::Create()
- *  \brief  Initialises and shows the graphical elements
- *  \return void
- */
-bool GalleryConfig::Create()
-{
-    // Load the theme for this screen
-    if (!LoadWindowFromXML("image-ui.xml", "galleryconfig", this))
-        return false;
-
-    bool err = false;
-    UIUtilE::Assign(this, m_sortOrder, "sortorder", &err);
-    UIUtilE::Assign(this, m_slideShowTime, "slideshowtime", &err);
-    UIUtilE::Assign(this, m_transitionType, "transitiontype", &err);
-    UIUtilE::Assign(this, m_transitionTime, "transitiontime", &err);
-    UIUtilE::Assign(this, m_showHiddenFiles, "showhiddenfiles", &err);
-
-    UIUtilE::Assign(this, m_saveButton, "save", &err);
-    UIUtilE::Assign(this, m_cancelButton, "cancel", &err);
-    UIUtilW::Assign(this, m_clearDbButton, "cleardatabase", &err);
-
-    // check if all widgets are present
-    if (err)
+    setLabel(tr("Slideshow"));
+    
+    HostComboBox *tranBox = new HostComboBox("GalleryTransitionType");
+    tranBox->setLabel(tr("Transition"));
+    tranBox->setHelpText(tr("Effect to use between slides"));
+    
+    // Initialise selected transition
+    TransitionRegistry availableTransitions(GetMythPainter()->SupportsAnimation());
+    TransitionMap transitions = availableTransitions.GetAll();
+    QMapIterator<int, Transition*> i(transitions);
+    while (i.hasNext())
     {
-        LOG(VB_GENERAL, LOG_ERR, "Theme is missing critical theme elements.");
-        return false;
+        i.next();
+        tranBox->addSelection(i.value()->objectName(), QString::number(i.key()));
     }
-
-    // Load the values from the database
-    Load();
-
-    // connect the widgets to their methods
-    connect(m_saveButton, SIGNAL(Clicked()), this, SLOT(Save()));
-    connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(Exit()));
-
-    if (m_clearDbButton)
-        connect(m_clearDbButton, SIGNAL(Clicked()), this, SLOT(ConfirmClearDatabase()));
-
-    BuildFocusList();
-
-    SetFocusWidget(m_sortOrder);
-
-    return true;
+    addChild(tranBox);
+    
+    HostSpinBox *slide = new HostSpinBox("GallerySlideShowTime", 100, 60000, 100);
+    slide->setLabel(tr("Slide Duration (ms)"));
+    slide->setHelpText(tr("The time that a slide is displayed (between transitions), "
+                          "in milliseconds."));
+    addChild(slide);
+    
+    HostSpinBox *transition = new HostSpinBox("GalleryTransitionTime", 100, 60000, 100);
+    transition->setLabel(tr("Transition Duration (ms)"));
+    transition->setHelpText(tr("The time that each transition lasts, in milliseconds."));
+    addChild(transition);
 }
 
 
-
-/** \fn     GalleryConfig::keyPressEvent(QKeyEvent *)
- *  \brief  Translates the keypresses and keys bound to the
- *          plugin to specific actions within the plugin
- *  \param  event The pressed key
- *  \return bool True if the key was used, otherwise false
- */
-bool GalleryConfig::keyPressEvent(QKeyEvent *event)
+/*!
+ \brief Settings Page 1
+*/
+GallerySettings::GallerySettings() : VerticalConfigurationGroup(false)
 {
-    if (GetFocusWidget()->keyPressEvent(event))
-        return true;
+    setLabel(tr("Gallery Settings"));
 
-    bool handled = false;
-
-    if (!handled && MythScreenType::keyPressEvent(event))
-        handled = true;
-
-    return handled;
+    addChild(new ThumbSettings());
+    addChild(new SlideSettings());
 }
 
 
-
-/** \fn     GalleryView::customEvent(QEvent *)
- *  \brief  Translates the keypresses to specific actions within the plugin
- *  \param  event The custom event
- *  \return void
- */
-void GalleryConfig::customEvent(QEvent *event)
+/*!
+ \brief Settings for Importing
+ \param enable True if password has been entered
+*/
+ImportSettings::ImportSettings(bool enable) : VerticalConfigurationGroup()
 {
-    if (event->type() == DialogCompletionEvent::kEventType)
-    {
-        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
-
-        QString resultid  = dce->GetId();
-        int     buttonnum = dce->GetResult();
-
-        // Confirm current file deletion
-        if (resultid == "confirmdelete")
-        {
-            switch (buttonnum)
-            {
-            case 0 :
-                break;
-            case 1 :
-                ClearDatabase();
-                break;
-            }
-        }
-    }
+    setLabel(tr("Import"));
+    setEnabled(enable);
+    
+    HostLineEdit *script = new HostLineEdit("GalleryImportCmd", true);
+    script->setLabel(tr("Import Command"));
+    script->setHelpText(tr("Command/script that can be run from the menu. "
+                           "\n%TMPDIR% will be replaced by a new temporary directory, "
+                           "which the import dialog will show automatically. The "
+                           "directory will be removed when Gallery exits."));
+    
+    script->setEnabled(enable);
+    addChild(script);
 }
 
 
-
-/** \fn     GalleryConfig::Load()
- *  \brief  Load the values from the database and adds them to the widgets
- *  \return void
- */
-void GalleryConfig::Load()
+/*!
+ \brief Settings Page 2
+ \param enable True if password has been entered
+*/
+DatabaseSettings::DatabaseSettings(bool enable)
+    : VerticalConfigurationGroup(false)
 {
-    new MythUIButtonListItem(m_sortOrder, tr("Name (A-Z alpha)"),
-                             qVariantFromValue(QString::number(kSortByNameAsc)));
-    new MythUIButtonListItem(m_sortOrder, tr("Reverse Name (Z-A alpha)"),
-                             qVariantFromValue(QString::number(kSortByNameDesc)));
-    new MythUIButtonListItem(m_sortOrder, tr("Mod Time (oldest first)"),
-                             qVariantFromValue(QString::number(kSortByModTimeAsc)));
-    new MythUIButtonListItem(m_sortOrder, tr("Reverse Mod Time (newest first)"),
-                             qVariantFromValue(QString::number(kSortByModTimeDesc)));
-    new MythUIButtonListItem(m_sortOrder, tr("Extension (A-Z alpha)"),
-                             qVariantFromValue(QString::number(kSortByExtAsc)));
-    new MythUIButtonListItem(m_sortOrder, tr("Reverse Extension (Z-A alpha)"),
-                             qVariantFromValue(QString::number(kSortByExtDesc)));
-    new MythUIButtonListItem(m_sortOrder, tr("Filesize (smallest first)"),
-                             qVariantFromValue(QString::number(kSortBySizeAsc)));
-    new MythUIButtonListItem(m_sortOrder, tr("Reverse Filesize (largest first)"),
-                             qVariantFromValue(QString::number(kSortBySizeDesc)));
-    new MythUIButtonListItem(m_sortOrder, tr("Date (oldest first)"),
-                             qVariantFromValue(QString::number(kSortByDateAsc)));
-    new MythUIButtonListItem(m_sortOrder, tr("Reverse Date (neweset first)"),
-                             qVariantFromValue(QString::number(kSortByDateDesc)));
-    m_sortOrder->SetValueByData(gCoreContext->GetNumSetting("GallerySortOrder", kSortByDateAsc));
+    setLabel(tr("Database Settings") + (enable ? "" : tr(" (Requires edit privileges)")));
 
-    m_slideShowTime->SetRange(0, 30000, 500);
-    m_slideShowTime->SetValue(gCoreContext->GetSetting("GallerySlideShowTime", "3000"));
+    addChild(new ImportSettings(enable));
 
-    new MythUIButtonListItem(m_transitionType, tr("None"), qVariantFromValue(0));
-    new MythUIButtonListItem(m_transitionType, tr("Fade"), qVariantFromValue(1));
-    m_transitionType->SetValueByData(gCoreContext->GetNumSetting("GalleryTransitionType", kFade));
+    // Exclusions - Use stacked to preserve spacing
+    StackedConfigurationGroup *group1 = new StackedConfigurationGroup(false, false);
+    addChild(group1);
 
-    m_transitionTime->SetRange(0, 5000, 100);
-    m_transitionTime->SetValue(gCoreContext->GetSetting("GalleryTransitionTime", "1000"));
+    GlobalLineEdit *exclusions = new GlobalLineEdit("GalleryIgnoreFilter");
+    exclusions->setLabel(tr("Scanner Exclusions"));
+    exclusions->setHelpText(tr("Comma-separated list of filenames/directory names "
+                               "to be ignored when scanning. "
+                               "Glob wildcards * and ? are valid."));
+    exclusions->setEnabled(enable);
+    group1->addChild(exclusions);
 
-    int setting = gCoreContext->GetNumSetting("GalleryShowHiddenFiles", 0);
-    if (setting == 1)
-        m_showHiddenFiles->SetCheckState(MythUIStateType::Full);
-}
+    // Autorun - Use stacked to preserve spacing
+    StackedConfigurationGroup *group4 = new StackedConfigurationGroup(false, false);
+    addChild(group4);
 
+    HostCheckBox *autorun = new HostCheckBox("GalleryAutoLoad");
+    autorun->setLabel(tr("Start Gallery when media inserted"));
+    autorun->setHelpText(tr("Set to automatically start Gallery when media "
+                            "(USB/CD's containing images) are inserted."));
+    autorun->setEnabled(enable);
+    group4->addChild(autorun);
 
+    // Password - Use stacked to preserve spacing
+    StackedConfigurationGroup *group2 = new StackedConfigurationGroup(false, false);
+    addChild(group2);
 
-/** \fn     GalleryConfig::Save()
- *  \brief  Saves the values from the widgets into the database
- *  \return void
- */
-void GalleryConfig::Save()
-{
-    gCoreContext->SaveSetting("GallerySortOrder",
-                              m_sortOrder->GetDataValue().toString());
-    gCoreContext->SaveSetting("GallerySlideShowTime",
-                              m_slideShowTime->GetValue());
-    gCoreContext->SaveSetting("GalleryTransitionType",
-                              m_transitionType->GetDataValue().toString());
-    gCoreContext->SaveSetting("GalleryTransitionTime",
-                              m_transitionTime->GetValue());
+    GlobalLineEdit *password = new GlobalLineEdit("GalleryPassword");
+    password->setLabel(tr("Password"));
+    password->SetPasswordEcho(true);
+    password->setHelpText(tr("When set all actions that modify the filesystem or "
+                             "database are protected (copy, move, transform, "
+                             "hiding, covers). Hidden items cannot be viewed. "
+                             "Applies to all frontends. "
+                             "\nDisabled by an empty password. "
+                             "Privileges persist until Gallery exits to main menu."));
+    password->setEnabled(enable);
+    group2->addChild(password);
 
-    int checkstate = (m_showHiddenFiles->GetCheckState() == MythUIStateType::Full) ? 1 : 0;
-    gCoreContext->SaveSetting("GalleryShowHiddenFiles", checkstate);
+    // Clear Db
+    TriggeredConfigurationGroup *group3 = new TriggeredConfigurationGroup(false, false);
+    group3->SetVertical(false);
+    addChild(group3);
 
-    // tell the main view to reload the images
-    // because the storage group dir might have changed
-    emit configSaved();
+    TransCheckBoxSetting *clear = new TransCheckBoxSetting();
+    clear->setLabel(tr("Reset Image Database"));
+    clear->setHelpText(tr("Clears the database and thumbnails for the Image Storage Group. "
+                          "A rescan will be required. Images for local media will persist."));
+    clear->setEnabled(enable);
+    group3->addChild(clear);
 
-    Close();
-}
+    HorizontalConfigurationGroup *clrSub =new HorizontalConfigurationGroup(false, false);
 
+    TransButtonSetting *confirm = new TransButtonSetting("clearDb");
+    confirm->setLabel(tr("Clear Now!"));
+    confirm->setHelpText(tr("Warning! This will erase settings for: hidden images, "
+                            "directory covers and re-orientations. "
+                            "You will have to set them again after re-scanning."));
+    connect(confirm, SIGNAL(pressed()), this, SIGNAL(ClearDbPressed()));
+    clrSub->addChild(confirm);
 
-
-/** \fn     GalleryConfig::Exit()
- *  \brief  Exits the configuration screen
- *  \return void
- */
-void GalleryConfig::Exit()
-{
-    Close();
-}
-
-
-
-/** \fn     GalleryConfig::ConfirmClearDatabase()
- *  \brief  Asks the user to confirm the removal of
- *          all image related contents from the database
- *  \return void
- */
-void GalleryConfig::ConfirmClearDatabase()
-{
-    QString msg = QString("Do you want to clear all database contents?");
-    MythScreenStack         *m_popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythConfirmationDialog  *m_confirmPopup = new MythConfirmationDialog(m_popupStack, msg, true);
-
-    if (m_confirmPopup->Create())
-    {
-        m_confirmPopup->SetReturnEvent(this, "confirmdelete");
-        m_popupStack->AddScreen(m_confirmPopup);
-    }
-    else
-        delete m_confirmPopup;
-}
-
-
-
-/** \fn     GalleryConfig::ClearDatabase()
- *  \brief  Clears all image related contents from the database
- *  \return void
- */
-void GalleryConfig::ClearDatabase()
-{
-    GalleryDatabaseHelper *m_dbHelper = new GalleryDatabaseHelper();
-    m_dbHelper->ClearDatabase();
-    delete m_dbHelper;
-
-    // tell the main view to reload the images
-    // because the storage group dir might have changed
-    emit configSaved();
-    Close();
+    group3->setTrigger(clear);
+    group3->addTarget("0", new HorizontalConfigurationGroup(false, false));
+    group3->addTarget("1", clrSub);
 }

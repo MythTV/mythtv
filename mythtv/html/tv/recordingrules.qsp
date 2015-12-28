@@ -54,7 +54,7 @@ import "/tv/js/tvutil.qjs"
 <link rel="stylesheet" type="text/css" href="/tv/css/category_colors.css">
 <script src="/js/utility.js"></script> <!-- ECMA not JS -->
 <script src="/js/util.qjs"></script>
-<script type="text/javascript" src="/3rdParty/jquery/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="/3rdParty/jquery/jquery-2.1.4.min.js"></script>
 <script type="text/javascript" src="/3rdParty/jquery/jqueryUI/js/jquery-ui-1.10.3.js"></script>
 <script src="/3rdParty/jquery/jqueryJScroll/jquery.jscroll.js"></script>
 <script src="/tv/js/common.js"></script>

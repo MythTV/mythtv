@@ -27,10 +27,15 @@
 
 #include <stdint.h>
 
-#define BD_DEBUG(MASK,...) bd_debug(__FILE__,__LINE__,MASK,__VA_ARGS__)
+BD_PRIVATE extern uint32_t debug_mask;
 
+#define BD_DEBUG(MASK,...) \
+  do {                                                  \
+    if (BD_UNLIKELY((MASK) & debug_mask)) {             \
+      bd_debug(__FILE__,__LINE__,MASK,__VA_ARGS__);     \
+    }                                                   \
+  } while (0)
 
-BD_PRIVATE char *print_hex(char *out, const uint8_t *str, int count);
 BD_PRIVATE void bd_debug(const char *file, int line, uint32_t mask, const char *format, ...) BD_ATTR_FORMAT_PRINTF(4,5);
 
 

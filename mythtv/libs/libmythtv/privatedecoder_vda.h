@@ -6,11 +6,7 @@
 #include <QList>
 
 #import  "CoreFoundation/CoreFoundation.h"
-#ifdef USING_QUARTZ_VIDEO
-#import  "QuartzCore/CoreVideo.h"
-#else
 #import  "CoreVideo/CoreVideo.h"
-#endif
 #include "privatedecoder_vda_defs.h"
 #include "privatedecoder.h"
 

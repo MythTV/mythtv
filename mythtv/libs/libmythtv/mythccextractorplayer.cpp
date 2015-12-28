@@ -49,8 +49,9 @@ CC708Stuff::~CC708Stuff() { delete reader; }
 TeletextStuff::~TeletextStuff() { delete reader; }
 DVBSubStuff::~DVBSubStuff() { delete reader; }
 
-MythCCExtractorPlayer::MythCCExtractorPlayer(
-    PlayerFlags flags, bool showProgress, const QString &fileName) :
+MythCCExtractorPlayer::MythCCExtractorPlayer(PlayerFlags flags, bool showProgress,
+                                             const QString &fileName,
+                                             const QString &destdir) :
     MythPlayer(flags),
     m_curTime(0),
     m_myFramesPlayed(0),
@@ -61,7 +62,14 @@ MythCCExtractorPlayer::MythCCExtractorPlayer(
     QStringList comps = QFileInfo(m_fileName).fileName().split(".");
     if (!comps.empty())
         comps.removeLast();
-    m_workingDir = QDir(QFileInfo(m_fileName).path());
+    if (destdir.isEmpty())
+        m_workingDir = QDir(QFileInfo(m_fileName).path());
+    else
+    {
+        m_workingDir = QDir(destdir);
+        if (!m_workingDir.exists())
+            m_workingDir = QDir(QFileInfo(m_fileName).path());
+    }
     m_baseName = comps.join(".");
 }
 
@@ -98,6 +106,9 @@ static QString progress_string(
             .arg(m_myFramesPlayed,7);
     }
 
+    static char const spin_chars[] = "/-\\|";
+    static uint spin_cnt = 0;
+
     double elapsed = flagTime.elapsed() * 0.001;
     double flagFPS = (elapsed > 0.0) ? (m_myFramesPlayed / elapsed) : 0;
 
@@ -105,16 +116,13 @@ static QString progress_string(
     percentage = (percentage > 100.0 && percentage < 101.0) ?
         100.0 : percentage;
 
-    if (flagFPS < 10.0)
-    {
-        return QString("%1 fps %2%     \r")
-            .arg(flagFPS,4,'f',1).arg(percentage,4,'f',1);
-    }
+    if (m_myFramesPlayed < totalFrames)
+        return QString("%1 fps %2%      \r")
+          .arg(flagFPS,4,'f', (flagFPS < 10.0 ? 1 : 0)).arg(percentage,4,'f',1);
     else
-    {
-        return QString("%1 fps %2%     \r")
-            .arg(flagFPS,4,'f',0).arg(percentage,4,'f',1);
-    }
+        return QString("%1 fps %2      \r")
+          .arg(flagFPS,4,'f', (flagFPS < 10.0 ? 1 : 0))
+          .arg(spin_chars[++spin_cnt % 4]);
 }
 
 bool MythCCExtractorPlayer::run(void)

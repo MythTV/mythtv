@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
 <TS version="2.0" language="it_IT">
+<defaultcodec>UTF-8</defaultcodec>
 <context>
     <name>MythControls</name>
     <message>
@@ -11,7 +12,7 @@
     <message>
         <location filename="../mythnews/main.cpp" line="51"/>
         <source>Update news items</source>
-        <translation>Aggiornare le notizie</translation>
+        <translation>Aggiorna le notizie</translation>
     </message>
     <message>
         <location filename="../mythnews/main.cpp" line="53"/>
@@ -27,12 +28,12 @@
 <context>
     <name>MythNews</name>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="393"/>
+        <location filename="../mythnews/mythnews.cpp" line="392"/>
         <source>Updated</source>
-        <translation>Aggiornamento</translation>
+        <translation>Aggiornato</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="400"/>
+        <location filename="../mythnews/mythnews.cpp" line="399"/>
         <source>Unknown</source>
         <translation>Sconosciuto</translation>
     </message>
@@ -47,7 +48,7 @@
     <message>
         <location filename="../mythnews/mythnews.cpp" line="121"/>
         <source>You haven&apos;t configured MythNews to use any sites.</source>
-        <translation>Nessun sito configurato in MythNews.</translation>
+        <translation>Non si ha configurato MythNews ad utilizzare altri siti.</translation>
     </message>
     <message>
         <source>%1 of %2 (%3 percent)</source>
@@ -58,29 +59,29 @@
         <translation type="obsolete">Scaricamento media...</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="595"/>
+        <location filename="../mythnews/mythnews.cpp" line="594"/>
         <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
-        <translation>Nessun browser disponibile! MythNews necessita di MythBrowser installato.</translation>
+        <translation>Nessun comando browser impostato! MythNews necessita di MythBrowser installato.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="687"/>
+        <location filename="../mythnews/mythnews.cpp" line="686"/>
         <source>Manage Feeds</source>
         <translation>Gestire feed</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="688"/>
+        <location filename="../mythnews/mythnews.cpp" line="687"/>
         <source>Add Feed</source>
-        <translation>Aggiungere feed</translation>
+        <translation>Aggiungi feed</translation>
+    </message>
+    <message>
+        <location filename="../mythnews/mythnews.cpp" line="690"/>
+        <source>Edit Feed</source>
+        <translation>Modifica feed</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnews.cpp" line="691"/>
-        <source>Edit Feed</source>
-        <translation>Modificare feed</translation>
-    </message>
-    <message>
-        <location filename="../mythnews/mythnews.cpp" line="692"/>
         <source>Delete Feed</source>
-        <translation>Cancellare feed</translation>
+        <translation>Cancella feed</translation>
     </message>
     <message>
         <source>Add News Site</source>
@@ -91,7 +92,7 @@
         <translation type="obsolete">Eliminare sito di notizie</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="674"/>
+        <location filename="../mythnews/mythnews.cpp" line="673"/>
         <source>Options</source>
         <translation>Opzioni</translation>
     </message>
@@ -190,7 +191,7 @@
     <message>
         <location filename="themestrings.h" line="10"/>
         <source>Edit RSS News Feeds</source>
-        <translation>Modificare i Feed RSS</translation>
+        <translation>Modifica i Feed RSS</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="11"/>
@@ -265,6 +266,11 @@ Quando è terminata la modifica, selezionare &quot;Ok&quot; o &quot;Annulla&quot
         <location filename="themestrings.h" line="19"/>
         <source>Choose the news sites you would like to read.</source>
         <translation>Scegliere il sito di news che si desidera leggere.</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="20"/>
+        <source>News</source>
+        <translation>News</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="21"/>

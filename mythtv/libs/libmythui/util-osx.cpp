@@ -15,7 +15,6 @@
 
 #import "util-osx.h"
 #import "util-osx-cocoa.h"
-#import "Carbon/Carbon.h"
 #import <CoreFoundation/CFNumber.h>
 #include <stdio.h>
 
@@ -53,22 +52,5 @@ CGDirectDisplayID GetOSXDisplay(WId win)
     if (!win)
         return NULL;
 
-#ifdef QT_MAC_USE_COCOA
     return GetOSXCocoaDisplay((void*)win);
-#else
-    CGDirectDisplayID disp = NULL;
-    HIViewRef hiview = (HIViewRef)win;
-    WindowRef winref = HIViewGetWindow(hiview);
-    Rect bounds;
-    if (!GetWindowBounds(winref, kWindowStructureRgn, &bounds))
-    {
-        CGDisplayCount ct;
-        CGPoint pt;
-        pt.x = bounds.left;
-        pt.y = bounds.top;
-        if (kCGErrorSuccess != CGGetDisplaysWithPoint(pt, 1, &disp, &ct))
-            disp = CGMainDisplayID();
-    }
-    return disp;
-#endif
 }

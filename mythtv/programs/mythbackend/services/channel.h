@@ -36,7 +36,7 @@ class Channel : public ChannelServices
 
     public:
 
-        Q_INVOKABLE Channel( QObject *parent = 0 ) {}
+        Q_INVOKABLE explicit Channel( QObject *parent = 0 ) {}
 
     public:
 

@@ -59,7 +59,7 @@ class META_PUBLIC VideoScannerThread : public MThread
     Q_DECLARE_TR_FUNCTIONS(VideoScannerThread)
 
   public:
-    VideoScannerThread(QObject *parent);
+    explicit VideoScannerThread(QObject *parent);
     ~VideoScannerThread();
 
     void run();

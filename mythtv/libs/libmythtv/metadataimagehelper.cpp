@@ -8,13 +8,16 @@
 #include "mythcorecontext.h"
 #include "storagegroup.h"
 
-QString generate_myth_url(const QString &storage_group, const QString &host,
-                          const QString &path)
-{
-    uint port = gCoreContext->GetBackendServerPort(host);
+// a helper functions that is used only in this file
+namespace {
+    QString generate_myth_url(const QString &storage_group, const QString &host,
+                              const QString &path)
+    {
+        uint port = gCoreContext->GetBackendServerPort(host);
 
-    return gCoreContext->GenMythURL(host, port, path,
-                                    StorageGroup::GetGroupToUse(host, storage_group));
+        return gCoreContext->GenMythURL(host, port, path,
+                                        StorageGroup::GetGroupToUse(host, storage_group));
+    }
 }
 
 ArtworkMap GetArtwork(QString inetref,

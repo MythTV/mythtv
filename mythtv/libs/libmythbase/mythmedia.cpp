@@ -64,6 +64,8 @@ const char* MythMediaDevice::MediaErrorStrings[] =
 QEvent::Type MythMediaEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
+ext_to_media_t MythMediaDevice::s_ext_to_media;
+
 MythMediaDevice::MythMediaDevice(QObject* par, const char* DevicePath,
                                  bool SuperMount,  bool AllowEject)
                : QObject(par)
@@ -141,20 +143,37 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
                 .arg(m_DevicePath);
 
         LOG(VB_MEDIA, LOG_INFO, QString("Executing '%1'").arg(MountCommand));
-        if (myth_system(MountCommand, kMSDontBlockInputDevs) == GENERIC_EXIT_OK)
+        int ret = myth_system(MountCommand, kMSDontBlockInputDevs);
+        if (ret !=  GENERIC_EXIT_OK)
+        {
+            usleep(300000);
+            LOG(VB_MEDIA, LOG_INFO, QString("Retrying '%1'").arg(MountCommand));
+            ret = myth_system(MountCommand, kMSDontBlockInputDevs);
+        }
+        if (ret == GENERIC_EXIT_OK)
         {
             if (DoMount)
             {
                 // we cannot tell beforehand what the pmount mount point is
                 // so verify the mount status of the device
+                // In the case that m_DevicePath is a symlink to a device
+                // in /etc/fstab then pmount delegates to mount which
+                // performs the mount asynchronously so we must wait a bit
+                usleep(1000000);
+                for (int tries = 2; !findMountPath() && tries > 0; --tries)
+                {
+                    LOG(VB_MEDIA, LOG_INFO,
+                        QString("Repeating '%1'").arg(MountCommand));
+                    myth_system(MountCommand, kMSDontBlockInputDevs);
+                    usleep(500000);
+                }
                 if (!findMountPath())
                 {
                     LOG(VB_MEDIA, LOG_ERR, "performMountCmd() attempted to"
                                            " find mounted media, but failed?");
                     return false;
                 }
-                m_Status = MEDIASTAT_MOUNTED;
-                onDeviceMounted();
+                onDeviceMounted(); // Identify disk type & content
                 LOG(VB_GENERAL, LOG_INFO,
                         QString("Detected MediaType ") + MediaTypeString());
             }
@@ -164,8 +183,8 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
             return true;
         }
         else
-            LOG(VB_GENERAL, LOG_ERR, QString("Failed to mount %1.")
-                                       .arg(m_DevicePath));
+            LOG(VB_GENERAL, LOG_ERR, QString("Failed to %1 %2.")
+                    .arg(DoMount ? "mount" : "unmount").arg(m_DevicePath));
     }
     else
     {
@@ -192,7 +211,6 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
  */
 MythMediaType MythMediaDevice::DetectMediaType(void)
 {
-    MythMediaType mediatype = MEDIATYPE_UNKNOWN;
     ext_cnt_t ext_cnt;
 
     if (!ScanMediaType(m_MountPath, ext_cnt))
@@ -200,43 +218,44 @@ MythMediaType MythMediaDevice::DetectMediaType(void)
         LOG(VB_MEDIA, LOG_NOTICE,
             QString("No files with extensions found in '%1'")
                 .arg(m_MountPath));
-        return mediatype;
+        return MEDIATYPE_UNKNOWN;
     }
 
-    QMap<uint, uint> media_cnts, media_cnt;
+    QMap<uint, uint> media_cnts;
 
     // convert raw counts to composite mediatype counts
     ext_cnt_t::const_iterator it = ext_cnt.begin();
     for (; it != ext_cnt.end(); ++it)
     {
-        ext_to_media_t::const_iterator found = m_ext_to_media.find(it.key());
-        if (found != m_ext_to_media.end())
+        ext_to_media_t::const_iterator found = s_ext_to_media.find(it.key());
+        if (found != s_ext_to_media.end())
+        {
+            LOG(VB_MEDIA, LOG_INFO, QString("DetectMediaType %1 (%2)")
+                .arg(MediaTypeString(found.value())).arg(it.key()));
             media_cnts[*found] += *it;
+        }
+        else
+        {
+            LOG(VB_MEDIA, LOG_NOTICE, QString(
+                    "DetectMediaType(this=0x%1) unknown file type %2")
+                .arg(quintptr(this),0,16).arg(it.key()));
+        }
     }
 
     // break composite mediatypes into constituent components
+    uint mediatype = 0;
+
     QMap<uint, uint>::const_iterator cit = media_cnts.begin();
     for (; cit != media_cnts.end(); ++cit)
     {
-        for (uint key = 0, j = 0; key != MEDIATYPE_END; j++)
+        for (uint key = 1; key != MEDIATYPE_END; key <<= 1)
         {
-            if ((key = 1 << j) & cit.key())
-                media_cnt[key] += *cit;
+            if (key & cit.key())
+                mediatype |= key;
         }
     }
 
-    // decide on mediatype based on which one has a handler for > # of files
-    uint max_cnt = 0;
-    for (cit = media_cnt.begin(); cit != media_cnt.end(); ++cit)
-    {
-        if (*cit > max_cnt)
-        {
-            mediatype = (MythMediaType) cit.key();
-            max_cnt   = *cit;
-        }
-    }
-
-    return mediatype;
+    return mediatype ? (MythMediaType)mediatype : MEDIATYPE_UNKNOWN;
 }
 
 /**
@@ -281,12 +300,13 @@ bool MythMediaDevice::ScanMediaType(const QString &directory, ext_cnt_t &cnt)
  *  \param mediatype  MythMediaType flag.
  *  \param extensions Comma separated list of extensions like 'mp3,ogg,flac'.
  */
+// static
 void MythMediaDevice::RegisterMediaExtensions(uint mediatype,
                                               const QString &extensions)
 {
     const QStringList list = extensions.split(",");
     for (QStringList::const_iterator it = list.begin(); it != list.end(); ++it)
-        m_ext_to_media[*it] |= mediatype;
+        s_ext_to_media[*it] |= mediatype;
 }
 
 MythMediaError MythMediaDevice::eject(bool open_close)
@@ -457,6 +477,10 @@ MythMediaStatus MythMediaDevice::setStatus( MythMediaStatus NewStatus,
     // depending on the old and new status.
     if (NewStatus != OldStatus)
     {
+        LOG(VB_MEDIA, LOG_DEBUG,
+            QString("MythMediaDevice::setStatus %1 %2->%3")
+            .arg(getDevicePath()).arg(MediaStatusStrings[OldStatus])
+            .arg(MediaStatusStrings[NewStatus]));
         switch (NewStatus)
         {
             // the disk is not / should not be mounted.
@@ -495,36 +519,46 @@ void MythMediaDevice::clearData()
     m_MediaType = MEDIATYPE_UNKNOWN;
 }
 
-const char* MythMediaDevice::MediaTypeString()
+QString MythMediaDevice::MediaTypeString()
 {
     return MediaTypeString(m_MediaType);
 }
 
-const char* MythMediaDevice::MediaTypeString(MythMediaType type)
+QString MythMediaDevice::MediaTypeString(uint type)
 {
-    // MythMediaType is currently a bitmask.  This code will only output the
-    // first matched type.
+    // MediaType is a bitmask.
+    QString mediatype;
+    for (uint u = MEDIATYPE_UNKNOWN; u != MEDIATYPE_END; u <<= 1)
+    {
+        QString s;
+        if (u & type & MEDIATYPE_UNKNOWN)
+            s = "MEDIATYPE_UNKNOWN";
+        else if (u & type & MEDIATYPE_DATA)
+            s = "MEDIATYPE_DATA";
+        else if (u & type & MEDIATYPE_MIXED)
+            s = "MEDIATYPE_MIXED";
+        else if (u & type & MEDIATYPE_AUDIO)
+            s = "MEDIATYPE_AUDIO";
+        else if (u & type & MEDIATYPE_DVD)
+            s = "MEDIATYPE_DVD";
+        else if (u & type & MEDIATYPE_BD)
+            s = "MEDIATYPE_BD";
+        else if (u & type & MEDIATYPE_VCD)
+            s = "MEDIATYPE_VCD";
+        else if (u & type & MEDIATYPE_MMUSIC)
+            s = "MEDIATYPE_MMUSIC";
+        else if (u & type & MEDIATYPE_MVIDEO)
+            s = "MEDIATYPE_MVIDEO";
+        else if (u & type & MEDIATYPE_MGALLERY)
+            s = "MEDIATYPE_MGALLERY";
+        else
+            continue;
 
-    if (type == MEDIATYPE_UNKNOWN)
-        return "MEDIATYPE_UNKNOWN";
-    if (type & MEDIATYPE_DATA)
-        return "MEDIATYPE_DATA";
-    if (type & MEDIATYPE_MIXED)
-        return "MEDIATYPE_MIXED";
-    if (type & MEDIATYPE_AUDIO)
-        return "MEDIATYPE_AUDIO";
-    if (type & MEDIATYPE_DVD)
-        return "MEDIATYPE_DVD";
-    if (type & MEDIATYPE_BD)
-        return "MEDIATYPE_BD";
-    if (type & MEDIATYPE_VCD)
-        return "MEDIATYPE_VCD";
-    if (type & MEDIATYPE_MMUSIC)
-        return "MEDIATYPE_MMUSIC";
-    if (type & MEDIATYPE_MVIDEO)
-        return "MEDIATYPE_MVIDEO";
-    if (type & MEDIATYPE_MGALLERY)
-        return "MEDIATYPE_MGALLERY";
+        if (mediatype.isEmpty())
+            mediatype = s;
+        else
+            mediatype += "|" + s;
+    }
 
-    return "MEDIATYPE_UNKNOWN";
+    return mediatype;
 }

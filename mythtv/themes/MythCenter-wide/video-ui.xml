@@ -709,13 +709,23 @@
     </window>
 
     <window name="tree">
+
+        <imagetype name="fanart">
+            <area>0,0,100%,100%</area>
+            <preserveaspect>no</preserveaspect>
+        </imagetype>
+
+        <shape name="tree_background" from="basebackground">
+            <area>15,15,1250,350</area>
+        </shape>
+
         <textarea name="breadcrumbs" from="basetextarea">
             <area>50,20,1180,40</area>
             <font>basemedium</font>
         </textarea>
 
         <buttontree name="videos">
-            <area>40,50,1200,310</area>
+            <area>40,50,1200,300</area>
             <numlists>3</numlists>
             <spacing>10</spacing>
             <buttonlist name="listtemplate" from="basebuttonlist">
@@ -723,6 +733,10 @@
                 <triggerevent context="Global" action="INFO">RIGHT</triggerevent>
             </buttonlist>
         </buttontree>
+
+        <shape name="info_background" from="basebackground">
+            <area>15,375,1250,335</area>
+        </shape>
 
         <textarea name="title" from="basetextarea">
             <area>40,380,1200,40</area>
@@ -873,10 +887,9 @@
     <window name="edit_metadata">
 
         <textarea name="title" from="basetextarea">
-            <area>260,30,760,50</area>
-            <value>Edit Video Information</value>
-            <align>hcenter,vcenter</align>
+            <area>15,5,800,50</area>
             <font>baselarge</font>
+            <value>Edit Video Information</value>
         </textarea>
 
         <!-- Labels  -->
@@ -905,6 +918,12 @@
             <align>right,top</align>
         </textarea>
 
+        <textarea name="year_text" from="basetextarea">
+            <area>790,185,150,40</area>
+            <value>Year:</value>
+            <align>right,top</align>
+        </textarea>
+
         <textarea name="category_text" from="title_text">
             <area>620,232,150,40</area>
             <align>right</align>
@@ -912,13 +931,13 @@
         </textarea>
 
         <textarea name="level_text" from="title_text">
-            <area>220,232,200,40</area>
+            <area>120,232,300,40</area>
             <align>right</align>
             <value>Parental Control:</value>
         </textarea>
 
         <textarea name="child_text" from="title_text">
-            <area>220,277,200,40</area>
+            <area>120,277,300,40</area>
             <align>right</align>
             <value>File to Always Play Next:</value>
         </textarea>
@@ -983,6 +1002,10 @@
             <position>730,181</position>
         </spinbox>
 
+        <spinbox name="year_spin" from="basespinbox">
+            <position>950,181</position>
+        </spinbox>
+
         <buttonlist name="level_select" from="baseselector">
             <position>430,225</position>
         </buttonlist>
@@ -1031,8 +1054,8 @@
         </button>
 
         <textarea name="coverart_text" from="basetextarea">
-            <area>550,358,250,40</area>
-            <value>/path/to/the/thing.jpg</value>
+            <area>550,358,650,40</area>
+            <value></value>
         </textarea>
 
         <button name="net_screenshot_button" from="basewidebutton">
@@ -1063,8 +1086,8 @@
         </button>
 
         <textarea name="screenshot_text" from="basetextarea">
-            <area>550,397,250,40</area>
-            <value>/path/to/the/thing.jpg</value>
+            <area>550,397,650,40</area>
+            <value></value>
         </textarea>
 
         <button name="net_banner_button" from="basewidebutton">
@@ -1095,8 +1118,8 @@
         </button>
 
         <textarea name="banner_text" from="basetextarea">
-            <area>550,436,250,40</area>
-            <value>/path/to/the/thing.jpg</value>
+            <area>550,436,650,40</area>
+            <value></value>
         </textarea>
 
         <button name="net_fanart_button" from="basewidebutton">
@@ -1127,8 +1150,8 @@
         </button>
 
         <textarea name="fanart_text" from="basetextarea">
-            <area>550,477,250,40</area>
-            <value>/path/to/the/thing.jpg</value>
+            <area>550,477,650,40</area>
+            <value></value>
         </textarea>
 
         <button name="trailer_button">
@@ -1154,8 +1177,8 @@
         </button>
 
         <textarea name="trailer_text" from="basetextarea">
-            <area>550,517,250,40</area>
-            <value>/path/to/the/thing.jpg</value>
+            <area>550,517,650,40</area>
+            <value></value>
         </textarea>
 
         <textedit name="player_edit" from="basetextedit">

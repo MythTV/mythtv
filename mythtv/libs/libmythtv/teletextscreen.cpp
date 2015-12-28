@@ -26,8 +26,9 @@ const int    TeletextScreen::kTeletextColumns = 40;
 const int    TeletextScreen::kTeletextRows    = 26;
 
 static MythFontProperties* gTTFont;
+static int gTTBackgroundAlpha;
 
-static char cvt_char(char ch, int lang)
+static QChar cvt_char(char ch, int lang)
 {
     int c = 0;
     for (int j = 0; j < 14; j++)
@@ -36,7 +37,7 @@ static char cvt_char(char ch, int lang)
         if (c == lang_chars[0][j])
             ch = lang_chars[lang + 1][j];
     }
-    return ch;
+    return QLatin1Char(ch);
 }
 
 TeletextScreen::TeletextScreen(MythPlayer *player, const char * name,
@@ -322,7 +323,8 @@ void TeletextScreen::SetBackgroundColor(int ttcolor)
             .arg(TTColorToString(ttcolor)));
 
     m_bgColor = ttcolortoqcolor(ttcolor);
-    m_bgColor.setAlpha((ttcolor & kTTColorTransparent) ? 0x00 : 0xff);
+    m_bgColor.setAlpha((ttcolor & kTTColorTransparent) ?
+                       0x00 : gTTBackgroundAlpha);
 }
 
 void TeletextScreen::DrawLine(const uint8_t *page, uint row, int lang)
@@ -524,7 +526,7 @@ void TeletextScreen::DrawLine(const uint8_t *page, uint row, int lang)
                 }
                 else
                 {
-                    char c2 = cvt_char(ch, lang);
+                    QChar c2 = cvt_char(ch, lang);
                     DrawCharacter(x, row, c2, doubleheight);
                 }
             }
@@ -709,6 +711,8 @@ bool TeletextScreen::InitialiseFont()
     }
     else
         return false;
+
+    gTTBackgroundAlpha = SubtitleScreen::GetTeletextBackgroundAlpha();
 
     initialised = true;
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Loaded main subtitle font '%1'")

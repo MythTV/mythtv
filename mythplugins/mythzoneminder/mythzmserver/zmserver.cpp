@@ -185,6 +185,8 @@ void connectToDatabase(void)
         exit(mysql_errno(&g_dbConn));
     }
 
+    g_dbConn.reconnect = 1;
+
     if (!mysql_real_connect(&g_dbConn, g_server.c_str(), g_user.c_str(),
          g_password.c_str(), 0, 0, 0, 0))
     {
@@ -274,7 +276,7 @@ void MONITOR::initMonitor(bool debug, string mmapPath, int shmKey)
         if (shm_ptr == MAP_FAILED)
         {
             cout << "Failed to map shared memory from file ["
-                 << mmap_filename << "] " << "for monitor: "
+                 << mmap_filename.str() << "] " << "for monitor: "
                  << mon_id << endl;
             status = "Error";
 
@@ -293,7 +295,7 @@ void MONITOR::initMonitor(bool debug, string mmapPath, int shmKey)
         // using the legacy shared memory support
         if (debug)
         {
-            cout << "Failed to open mmap file [" << mmap_filename << "] "
+            cout << "Failed to open mmap file [" << mmap_filename.str() << "] "
                  << "for monitor: " << mon_id
                  << " : " << strerror(errno) << endl;
             cout << "Falling back to the legacy shared memory method" << endl;

@@ -4,6 +4,47 @@
 
 #include <QDomDocument>
 
+QRect UIEffects::GetExtent(const QSize &size)
+{
+    int x = 0, y = 0;
+    int zoomedWidth = size.width() * hzoom;
+    int zoomedHeight = size.height() * vzoom;
+
+    switch (centre)
+    {
+    case TopLeft:
+    case Top:
+    case TopRight:
+        y = -zoomedHeight / 2; break;
+    case Left:
+    case Middle:
+    case Right:
+        y = -size.height() / 2; break;
+    case BottomLeft:
+    case Bottom:
+    case BottomRight:
+        y = size.height() - zoomedHeight / 2; break;
+    }
+
+    switch (centre)
+    {
+    case TopLeft:
+    case Left:
+    case BottomLeft:
+        x = -zoomedWidth / 2; break;
+    case Top:
+    case Middle:
+    case Bottom:
+        x = -size.width() / 2; break;
+    case TopRight:
+    case Right:
+    case BottomRight:
+        x = size.width() - zoomedWidth / 2; break;
+    }
+
+    return QRect(x, y, zoomedWidth, zoomedHeight);
+}
+
 MythUIAnimation::MythUIAnimation(MythUIType* parent, Trigger trigger, Type type)
     : m_parent(parent), m_type(type), m_trigger(trigger),
       m_centre(UIEffects::Middle), m_active(false), m_looped(false),

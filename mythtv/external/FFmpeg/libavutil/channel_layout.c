@@ -102,6 +102,7 @@ static const struct {
     { "7.1(wide)",   8,  AV_CH_LAYOUT_7POINT1_WIDE_BACK },
     { "7.1(wide-side)",   8,  AV_CH_LAYOUT_7POINT1_WIDE },
     { "octagonal",   8,  AV_CH_LAYOUT_OCTAGONAL },
+    { "hexadecagonal", 16, AV_CH_LAYOUT_HEXADECAGONAL },
     { "downmix",     2,  AV_CH_LAYOUT_STEREO_DOWNMIX, },
 };
 
@@ -138,8 +139,8 @@ static uint64_t get_channel_layout_single(const char *name, int name_len)
                        "switch to the syntax '%.*sc' otherwise it will be interpreted as a "
                        "channel layout number in a later version\n",
                        name_len, name, name_len, name);
-                return layout;
             }
+            return layout;
         }
     } else {
 #endif

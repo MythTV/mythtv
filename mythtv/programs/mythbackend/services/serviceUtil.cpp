@@ -445,7 +445,7 @@ void FillInputInfo(DTC::Input* input, InputInfo inputInfo)
 {
     input->setId(inputInfo.inputid);
     input->setInputName(inputInfo.name);
-    input->setCardId(inputInfo.cardid);
+    input->setCardId(inputInfo.inputid);
     input->setSourceId(inputInfo.sourceid);
     input->setDisplayName(inputInfo.displayName);
     input->setLiveTVOrder(inputInfo.livetvorder);

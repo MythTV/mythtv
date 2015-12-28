@@ -1030,7 +1030,17 @@ ThemeUpdateChecker::ThemeUpdateChecker(void) :
     gCoreContext->SaveSetting("ThemeUpdateStatus", "");
 
     connect(m_updateTimer, SIGNAL(timeout()), SLOT(checkForUpdate()));
-    m_updateTimer->start(60 * 60 * 1000); // Run once an hour
+
+    if (getenv("MYTHTV_DEBUGMDM"))
+    {
+        LOG(VB_GENERAL, LOG_INFO, "Checking for theme updates every minute");
+        m_updateTimer->start(60 * 1000); // Run once a minute
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_INFO, "Checking for theme updates every hour");
+        m_updateTimer->start(60 * 60 * 1000); // Run once an hour
+    }
 
     // Run once 15 seconds from now
     QTimer::singleShot(15 * 1000, this, SLOT(checkForUpdate()));

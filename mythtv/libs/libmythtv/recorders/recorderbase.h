@@ -292,6 +292,8 @@ class MTV_PUBLIC RecorderBase : public QRunnable
      */
     void SetTotalFrames(uint64_t total_frames);
 
+    void TryWriteProgStartMark(const frm_pos_map_t &durationDeltaCopy);
+
     TVRec         *tvrec;
     RingBuffer    *ringBuffer;
     bool           weMadeBuffer;
@@ -340,6 +342,11 @@ class MTV_PUBLIC RecorderBase : public QRunnable
     frm_pos_map_t  durationMap;
     frm_pos_map_t  durationMapDelta;
     MythTimer      positionMapTimer;
+
+    // ProgStart mark support
+    qint64         estimatedProgStartMS;
+    long long      lastSavedKeyframe;
+    long long      lastSavedDuration;
 
     // Statistics
     // Note: Once we enter RecorderBase::run(), only that thread can

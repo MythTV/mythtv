@@ -83,7 +83,7 @@ void DestroyMythUI()
 class MythUIHelperPrivate
 {
 public:
-    MythUIHelperPrivate(MythUIHelper *p);
+    explicit MythUIHelperPrivate(MythUIHelper *p);
     ~MythUIHelperPrivate();
 
     void Init();
@@ -202,7 +202,7 @@ MythUIHelperPrivate::~MythUIHelperPrivate()
 
 void MythUIHelperPrivate::Init(void)
 {
-    screensaver = ScreenSaverControl::get();
+    screensaver = new ScreenSaverControl();
     GetScreenBounds();
     StoreGUIsettings();
     screenSetup = true;
@@ -1350,6 +1350,10 @@ bool MythUIHelper::FindThemeFile(QString &path)
 
     if (fi.isAbsolute() && fi.exists())
         return true;
+#ifdef Q_OS_ANDROID
+    if (path.startsWith("assets:/") && fi.exists())
+        return true;
+#endif
 
     QString file;
     bool foundit = false;

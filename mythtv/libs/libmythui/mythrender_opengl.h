@@ -3,10 +3,16 @@
 
 #include <stdint.h>
 
-#include <QPainter>
+#include <QtGlobal>
+#if defined USING_OPENGLES && QT_VERSION >= QT_VERSION_CHECK(5, 4, 0)
+#define USE_OPENGL_QT5
+#include <QOpenGLContext>
+#else
 #include <QGLContext>
+#endif
 #include <QHash>
 #include <QMutex>
+#include <QMatrix4x4>
 
 #define GL_GLEXT_PROTOTYPES
 
@@ -94,25 +100,46 @@ class MythRenderOpenGL;
 class MUI_PUBLIC OpenGLLocker
 {
   public:
-    OpenGLLocker(MythRenderOpenGL *render);
+    explicit OpenGLLocker(MythRenderOpenGL *render);
    ~OpenGLLocker();
   private:
     MythRenderOpenGL *m_render;
 };
 
-class MUI_PUBLIC MythRenderOpenGL : public QGLContext, public MythRender
+#ifdef USE_OPENGL_QT5
+typedef class QSurfaceFormat MythRenderFormat;
+typedef class QOpenGLContext MythRenderContext;
+class QWindow;
+#else
+typedef class QGLFormat MythRenderFormat;
+typedef class QGLContext MythRenderContext;
+#endif
+
+class QPaintDevice;
+
+class MUI_PUBLIC MythRenderOpenGL : protected MythRenderContext, public MythRender
 {
   public:
     static MythRenderOpenGL* Create(const QString &painter,
                                     QPaintDevice* device = NULL);
 
-    MythRenderOpenGL(const QGLFormat& format, QPaintDevice* device,
+    MythRenderOpenGL(const MythRenderFormat &format, QPaintDevice* device,
                      RenderType type = kRenderUnknown);
-    MythRenderOpenGL(const QGLFormat& format, RenderType type = kRenderUnknown);
+    MythRenderOpenGL(const MythRenderFormat &format, RenderType type = kRenderUnknown);
 
     virtual void makeCurrent();
     virtual void doneCurrent();
     virtual void Release(void);
+
+    using MythRenderContext::create;
+#ifdef USE_OPENGL_QT5
+    virtual void swapBuffers();
+    void setWidget(QWidget *w);
+#else
+    using MythRenderContext::swapBuffers;
+    void setWidget(QGLWidget *w);
+#endif
+    bool IsDirectRendering() const;
 
     void  Init(void);
 
@@ -158,7 +185,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QGLContext, public MythRender
     virtual uint CreateShaderObject(const QString &vert, const QString &frag) = 0;
     virtual void DeleteShaderObject(uint obj) = 0;
     virtual void EnableShaderObject(uint obj) = 0;
-    virtual void SetShaderParams(uint prog, void* vals, const char* uniform) = 0;
+    virtual void SetShaderParams(uint prog, const QMatrix4x4 &m, const char* uniform) = 0;
 
     void DrawBitmap(uint tex, uint target, const QRect *src,
                     const QRect *dst, uint prog, int alpha = 255,
@@ -273,6 +300,44 @@ class MUI_PUBLIC MythRenderOpenGL : public QGLContext, public MythRender
     MYTH_GLDELETEFENCESAPPLEPROC         m_glDeleteFencesAPPLE;
     MYTH_GLSETFENCEAPPLEPROC             m_glSetFenceAPPLE;
     MYTH_GLFINISHFENCEAPPLEPROC          m_glFinishFenceAPPLE;
+
+#ifdef USE_OPENGL_QT5
+  private:
+    QWindow *m_window;
+#endif
+};
+
+class GLMatrix4x4
+{
+  public:
+    GLMatrix4x4(const QMatrix4x4 &m)
+    {
+        // Convert from Qt's row-major to GL's column-major order
+        for (int c = 0, i = 0; c < 4; ++c)
+            for (int r = 0; r < 4; ++r)
+                m_v[i++] = m(r, c);
+    }
+
+    GLMatrix4x4(const GLfloat v[16])
+    {
+        for (int i = 0; i < 16; ++i)
+            m_v[i] = v[i];
+    }
+
+    operator const GLfloat*() const { return m_v; }
+
+    operator QMatrix4x4() const
+    {
+        // Convert from GL's column-major order to Qt's row-major
+        QMatrix4x4 m;
+        for (int c = 0, i = 0; c < 4; ++c)
+            for (int r = 0; r < 4; ++r)
+                m(r, c) = m_v[i++];
+        return m;
+    }
+
+  private:
+    GLfloat m_v[4*4];
 };
 
 #endif

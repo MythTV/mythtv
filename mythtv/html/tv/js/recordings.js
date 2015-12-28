@@ -162,6 +162,18 @@ var MythRecordings = new function() {
         window.location.href = "/tv/stream.qsp?MediaType=recording&MediaID=" + recordedId + "&PlaylistFormat=" + type;
     }
 
+   /*!
+    * \fn Download
+    * \param int The ID of the recording
+    * \public
+    *
+    * Download the recording file
+    */
+    this.Download = function (recordedId)
+    {
+        window.location.href = "/Content/GetRecording?RecordedId=" + recordedId;
+    }
+
     /*!
      * \var wsClient
      * \private

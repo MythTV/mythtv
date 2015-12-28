@@ -81,6 +81,8 @@ enum
     kDisplayRawTextSubtitle     = 0x080,
     kDisplayAllCaptions         = 0x0FF,
     kDisplayTeletextMenu        = 0x100,
+    kDisplayAllTextCaptions     = ~kDisplayDVDButton &
+                                   kDisplayAllCaptions,
 };
 
 enum PlayerFlags
@@ -398,7 +400,6 @@ class MTV_PUBLIC MythPlayer
     // Audio Sets
     uint AdjustVolume(int change)           { return audio.AdjustVolume(change); }
     uint SetVolume(int newvolume)           { return audio.SetVolume(newvolume); }
-    void SaveVolume(void)                   { audio.SaveVolume(); }
     bool SetMuted(bool mute)                { return audio.SetMuted(mute);       }
     MuteState SetMuteState(MuteState state) { return audio.SetMuteState(state);  }
     MuteState IncrMuteState(void)           { return audio.IncrMuteState();      }
@@ -631,6 +632,9 @@ class MTV_PUBLIC MythPlayer
     PlayerContext *player_ctx;
     DecoderThread *decoderThread;
     QThread       *playerThread;
+#ifdef Q_OS_ANDROID
+    int            playerThreadId;
+#endif
 
     // Window stuff
     QWidget *parentWidget;

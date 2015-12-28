@@ -7,15 +7,15 @@
 class MUI_PUBLIC MythRenderOpenGL1 : public MythRenderOpenGL
 {
   public:
-    MythRenderOpenGL1(const QGLFormat& format, QPaintDevice* device);
-    MythRenderOpenGL1(const QGLFormat& format);
+    MythRenderOpenGL1(const MythRenderFormat& format, QPaintDevice* device);
+    explicit MythRenderOpenGL1(const MythRenderFormat& format);
 
     virtual void SetColor(int r, int g, int b, int a);
 
     virtual uint CreateShaderObject(const QString &vert, const QString &frag);
     virtual void DeleteShaderObject(uint obj);
     virtual void EnableShaderObject(uint obj);
-    virtual void SetShaderParams(uint obj, void* vals, const char* uniform);
+    virtual void SetShaderParams(uint obj, const QMatrix4x4 &m, const char* uniform);
 
     virtual uint CreateHelperTexture(void);
 

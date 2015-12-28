@@ -860,7 +860,7 @@ void EditMetadataDialog::customEvent(QEvent *event)
                     return;
                 }
 
-                RemoteFile::CopyFile(oldFilename, newFilename);
+                RemoteFile::CopyFile(oldFilename, newFilename, true);
                 QFile::remove(oldFilename);
 
                 if (m_searchType == "album")
@@ -1373,7 +1373,7 @@ void EditAlbumartDialog::doCopyImageToTag(const AlbumArtImage *image)
                                                     QString("AlbumArt/") + fi.fileName(),
                                                     "MusicArt");
 
-    RemoteFile::CopyFile(image->filename, saveFilename);
+    RemoteFile::CopyFile(image->filename, saveFilename, true);
 
     // ask the backend to add the image to the tracks tag
     QStringList strList("MUSIC_TAG_ADDIMAGE");

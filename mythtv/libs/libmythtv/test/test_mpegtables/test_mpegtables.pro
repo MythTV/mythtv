@@ -62,7 +62,7 @@ QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../..
 
 # Input
 HEADERS += test_mpegtables.h
-SOURCES += test_mpegtables.cpp
+SOURCES += specimen.cpp test_mpegtables.cpp
 
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 QMAKE_CLEAN += ; rm -f *.gcov *.gcda *.gcno

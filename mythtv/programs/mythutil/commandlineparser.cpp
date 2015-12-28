@@ -73,6 +73,11 @@ void MythUtilCommandLineParser::LoadArguments(void)
                 "Clear the seek table.", "")
                 ->SetGroup("Recording Markup")
                 ->SetParentOf(ChanidStartimeVideo)
+        << add("--clearbookmarks", "clearbookmarks", false,
+                "Clear all bookmarks.", "This command will reset the playback "
+                "start to the very beginning of the recording file.")
+                ->SetGroup("Recording Markup")
+                ->SetParentOf(ChanidStartimeVideo)
         << add("--getmarkup", "getmarkup", "",
                "Write markup data to the specified local file.", "")
                 ->SetGroup("Recording Markup")
@@ -158,6 +163,11 @@ void MythUtilCommandLineParser::LoadArguments(void)
         << add("--calctracklen", "calctracklen", false,
                 "Decode a track to determine its exact length", "")
                 ->SetGroup("Metadata Reading/Writing")
+        << add("--findlyrics", "findlyrics", false,
+                "Search for some lyrics for a track", "")
+                ->SetGroup("Metadata Reading/Writing")
+                ->SetRequiredChild(QStringList("songid"))
+                ->SetParentOf(QStringList() << "artist" << "album" << "title")
 
         // recordingutils.cpp
         << add("--checkrecordings", "checkrecordings", false,
@@ -240,6 +250,16 @@ void MythUtilCommandLineParser::LoadArguments(void)
         ->SetChildOf("extractimage");
     add("--songid", "songid", "", "ID of track to determine the length", "")
         ->SetChildOf("calctracklen");
+    add("--songid", "songid", "", "ID of track to find lyrics for", "")
+        ->SetChildOf("findlyrics");
+    add("--grabber", "grabber", "", "(optional) Name of grabber to use or 'ALL' to try all available grabbers", "")
+        ->SetChildOf("findlyrics");
+    add("--artist", "grabber", "", "(optional) Artist of track to find lyrics for", "")
+        ->SetChildOf("findlyrics");
+    add("--album", "grabber", "", "(optional) Album of track to find lyrics for", "")
+        ->SetChildOf("findlyrics");
+    add("--title", "grabber", "", "(optional) Title of track to find lyrics for", "")
+        ->SetChildOf("findlyrics");
 
     // recordingutils.cpp
     add("--fixseektable", "fixseektable", false, "(optional) fix the seektable if missing for a recording", "")

@@ -360,17 +360,22 @@
             <template>%TIME%</template>
             <align>right,top</align>
         </clock>
-        <textarea name="channum">
+        <textarea name="channelgroup">
             <font>small</font>
             <area>20,100,150,30</area>
             <align>hcenter,vcenter</align>
         </textarea>
+        <textarea name="channum">
+            <font>small</font>
+            <area>20,125,150,30</area>
+            <align>hcenter,vcenter</align>
+        </textarea>
         <imagetype name="iconpath">
-            <area>30,140,130,100</area>
+            <area>30,160,130,100</area>
         </imagetype>
         <textarea name="callsign">
             <font>smaller</font>
-            <area>20,250,150,30</area>
+            <area>20,265,150,30</area>
             <align>hcenter,vcenter</align>
         </textarea>
         <textarea name="description">

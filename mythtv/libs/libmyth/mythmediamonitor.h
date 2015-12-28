@@ -4,6 +4,7 @@
 #include <QStringList>
 #include <QPointer>
 #include <QMutex>
+#include <QWaitCondition>
 #include <QList>
 
 #include "mthread.h"
@@ -46,6 +47,7 @@ class MPUBLIC MediaMonitor : public QObject
     virtual void StartMonitoring(void);
     void StopMonitoring(void);
     void ChooseAndEjectMedia(void);
+    void EjectMedia(const QString &path);
 
     static MediaMonitor *GetMediaMonitor(void);
     static QString GetMountPath(const QString& devPath);
@@ -59,10 +61,9 @@ class MPUBLIC MediaMonitor : public QObject
     // it is safe to dereference the pointer. When finished call Unlock()
     QList<MythMediaDevice*> GetRemovable(bool showMounted = false,
                                          bool showUsable = false);
-    QList<MythMediaDevice*> GetMedias(MythMediaType mediatype);
+    QList<MythMediaDevice*> GetMedias(unsigned mediatypes);
     MythMediaDevice*        GetMedia(const QString &path);
 
-    void MonitorRegisterExtensions(uint mediaType, const QString &extensions);
     void RegisterMediaHandler(const QString  &destination,
                               const QString  &description,
                               const QString  &key,
@@ -115,7 +116,8 @@ class MPUBLIC MediaMonitor : public QObject
     // List of devices/mountpoints that the user doesn't want to monitor:
     QStringList                  m_IgnoreList;
 
-    bool                         m_Active;      ///< Was MonitorThread started?
+    bool volatile                m_Active;      ///< Was MonitorThread started?
+    QWaitCondition               m_wait;
     MonitorThread                *m_Thread;
     unsigned long                m_MonitorPollingInterval;
     bool                         m_AllowEject;

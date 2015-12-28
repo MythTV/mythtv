@@ -14,7 +14,7 @@ class ChannelEditor : public MythScreenType
 {
     Q_OBJECT
   public:
-    ChannelEditor(MythScreenStack *parent);
+    explicit ChannelEditor(MythScreenStack *parent);
 
     bool Create(void);
     bool keyPressEvent(QKeyEvent *);

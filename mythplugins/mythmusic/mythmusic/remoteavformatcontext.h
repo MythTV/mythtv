@@ -67,6 +67,7 @@ class RemoteAVFormatContext
 
             // probe the stream
             AVProbeData probe_data;
+            memset(&probe_data, 0, sizeof(AVProbeData));
             probe_data.filename = "stream";
             probe_data.buf_size = m_rf->Read(m_buffer, BUFFER_SIZE);
             probe_data.buf = m_buffer;

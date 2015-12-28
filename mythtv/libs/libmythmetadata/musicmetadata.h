@@ -20,6 +20,7 @@
 
 class AllMusic;
 class AlbumArtImages;
+class LyricsData;
 class MetaIO;
 
 enum ImageType
@@ -109,6 +110,7 @@ class META_PUBLIC MusicMetadata
                    m_tempplaycount(0),
                    m_compilation(lcompilation),
                    m_albumArt(NULL),
+                   m_lyricsData(NULL),
                    m_id(lid),
                    m_filename(lfilename),
                    m_fileSize(0),
@@ -282,6 +284,8 @@ class META_PUBLIC MusicMetadata
     AlbumArtImages *getAlbumArtImages(void);
     void reloadAlbumArtImages(void);
 
+    LyricsData *getLyricsData(void);
+
     MetaIO *getTagger(void);
 
   private:
@@ -318,6 +322,8 @@ class META_PUBLIC MusicMetadata
     bool m_compilation;
 
     AlbumArtImages *m_albumArt;
+
+    LyricsData *m_lyricsData;
 
     IdType   m_id;
     QString  m_filename;       // file name as stored in the DB
@@ -360,7 +366,7 @@ class META_PUBLIC MetadataLoadingThread : public MThread
 
   public:
 
-    MetadataLoadingThread(AllMusic *parent_ptr);
+    explicit MetadataLoadingThread(AllMusic *parent_ptr);
     virtual void run();
 
   private:
@@ -457,7 +463,7 @@ class META_PUBLIC AllStream
 class AlbumArtScannerThread: public MThread
 {
   public:
-    AlbumArtScannerThread(QStringList strList) :
+    explicit AlbumArtScannerThread(QStringList strList) :
             MThread("AlbumArtScanner"), m_strList(strList) {}
 
     virtual void run()

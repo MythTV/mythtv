@@ -15,7 +15,7 @@ import "/js/utility.js"
   <title>MythFrontend Status</title>
   <link rel="stylesheet" href="/css/site.css"   type="text/css">
   <link rel="stylesheet" href="/css/Status.css" type="text/css">
-  <script type="text/javascript"  src="/3rdParty/jquery/jquery-2.0.3.min.js"></script>
+  <script type="text/javascript"  src="/3rdParty/jquery/jquery-2.1.4.min.js"></script>
 <!--  <script type="text/javascript"  src="/js/util.qjs"></script>-->
 </head>
 <body>

@@ -236,7 +236,7 @@ struct ConfigPage
     typedef std::vector<ConfigurationGroup *> PageList;
 
   protected:
-    ConfigPage(PageList &pl) : m_pl(pl)
+    explicit ConfigPage(PageList &pl) : m_pl(pl)
     {
     }
 

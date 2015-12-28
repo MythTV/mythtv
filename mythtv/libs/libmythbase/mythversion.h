@@ -12,9 +12,10 @@
 /// Update this whenever the plug-in ABI changes.
 /// Including changes in the libmythbase, libmyth, libmythtv, libmythav* and
 /// libmythui class methods in exported headers.
-#define MYTH_BINARY_VERSION "0.28.20150304-1"
+#define MYTH_BINARY_VERSION "0.28.20151224-1"
 
 /** \brief Increment this whenever the MythTV network protocol changes.
+ *   Note that the token currently cannot contain spaces.
  *
  *   You must also update this value and any corresponding changes to the
  *   ProgramInfo network protocol layout in the following files:
@@ -23,24 +24,28 @@
  *       mythweb/modules/tv/classes/Program.php (layout)
  *
  *   MythTV Perl Bindings
- *       mythtv/bindings/perl/MythTV.pm (version number and layout)
- *       mythtv/bindings/perl/MythTV/Program.pm (layout)
+ *       mythtv/bindings/perl/MythTV.pm (PROTO_VERSION, PROTO_TOKEN)
+ *       mythtv/bindings/perl/MythTV.pm (NUMPROGRAMLINES)
+ *       mythtv/bindings/perl/MythTV/Program.pm (_parse_data, to_string)
  *
  *   MythTV PHP Bindings
- *       mythtv/bindings/php/MythBackend.php (version number and layout)
+ *       mythtv/bindings/php/MythBackend.php (protocol_version, protocol_token)
+ *       mythtv/bindings/php/MythBackend.php (program_line_number)
  *       mythtv/bindings/php/MythTVProgram.php (layout)
+ *         (but only to reflect new columns in the program table)
  *       mythtv/bindings/php/MythTVRecording.php (layout)
+ *         (but only to reflect new columns in the recorded table)
  *
  *   MythTV Python Bindings
- *       mythtv/bindings/python/MythTV/static.py (version number)
+ *       mythtv/bindings/python/MythTV/static.py (PROTO_VERSION, PROTO_TOKEN)
  *       mythtv/bindings/python/MythTV/mythproto.py (layout)
  *
  *   Be kind and update the wiki as well.
  *       http://www.mythtv.org/wiki/Category:Myth_Protocol_Commands
  *       http://www.mythtv.org/wiki/Category:Myth_Protocol
  */
-#define MYTH_PROTO_VERSION "85"
-#define MYTH_PROTO_TOKEN "BluePool"
+#define MYTH_PROTO_VERSION "88"
+#define MYTH_PROTO_TOKEN "XmasGift"
 
 /** \brief Increment this whenever the MythTV core database schema changes.
  *
@@ -54,14 +59,12 @@
  *
  *  MythTV Python Bindings
  *      mythtv/bindings/python/MythTV/static.py
- */
-#if 0
  *
  *  MythTV PHP Bindings
  *      mythtv/bindings/php/MythBackend.php
-#endif
+ */
 
-#define MYTH_DATABASE_VERSION "1339"
+#define MYTH_DATABASE_VERSION "1342"
 
 
  MBASE_PUBLIC  const char *GetMythSourceVersion();

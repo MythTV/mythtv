@@ -42,8 +42,6 @@ using namespace std;
 
 #include "lcddevice.h"
 
-#include "videoout_quartz.h"  // For VOQ::GetBestSupportedCodec()
-
 #ifdef USING_VDPAU
 #include "videoout_vdpau.h"
 extern "C" {
@@ -397,7 +395,7 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
       video_codec_id(kCodec_NONE),
       maxkeyframedist(-1),
       // Closed Caption & Teletext decoders
-      ignore_scte(false),
+      ignore_scte(0),
       invert_scte_field(0),
       last_scte_field(0),
       ccd608(new CC608Decoder(parent->GetCC608Reader())),
@@ -923,6 +921,7 @@ bool AvFormatDecoder::CanHandle(char testbuf[kDecoderProbeBufferSize],
     }
 
     AVProbeData probe;
+    memset(&probe, 0, sizeof(AVProbeData));
 
     QByteArray fname = filename.toLatin1();
     probe.filename = fname.constData();
@@ -1060,6 +1059,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     const char    *filename = fnamea.constData();
 
     AVProbeData probe;
+    memset(&probe, 0, sizeof(AVProbeData));
     probe.filename = filename;
     probe.buf = (unsigned char *)testbuf;
     if (testbufsize + AVPROBE_PADDING_SIZE <= kDecoderProbeBufferSize)
@@ -1456,6 +1456,13 @@ float AvFormatDecoder::normalized_fps(AVStream *stream, AVCodecContext *enc)
 static enum PixelFormat get_format_vdpau(struct AVCodecContext *avctx,
                                          const enum PixelFormat *fmt)
 {
+    AvFormatDecoder *nd = (AvFormatDecoder *)(avctx->opaque);
+    if (nd && nd->GetPlayer())
+    {
+        static uint8_t *dummy[1] = { 0 };
+        avctx->hwaccel_context = nd->GetPlayer()->GetDecoderContext(NULL, dummy[0]);
+        ((AVVDPAUContext*)(avctx->hwaccel_context))->render2 = render_wrapper_vdpau;
+    }
     return AV_PIX_FMT_VDPAU;
 }
 #endif
@@ -1473,7 +1480,16 @@ enum PixelFormat get_format_dxva2(struct AVCodecContext *avctx,
     int i = 0;
     for (; fmt[i] != PIX_FMT_NONE ; i++)
         if (PIX_FMT_DXVA2_VLD == fmt[i])
+        {
+            AvFormatDecoder *nd = (AvFormatDecoder *)(avctx->opaque);
+            if (nd && nd->GetPlayer())
+            {
+                static uint8_t *dummy[1] = { 0 };
+                avctx->hwaccel_context =
+                    (dxva_context*)nd->GetPlayer()->GetDecoderContext(NULL, dummy[0]);
+            }
             break;
+        }
     return fmt[i];
 }
 #endif
@@ -1498,7 +1514,16 @@ enum PixelFormat get_format_vaapi(struct AVCodecContext *avctx,
     int i = 0;
     for (; fmt[i] != PIX_FMT_NONE ; i++)
         if (IS_VAAPI_PIX_FMT(fmt[i]))
+        {
+            AvFormatDecoder *nd = (AvFormatDecoder *)(avctx->opaque);
+            if (nd && nd->GetPlayer())
+            {
+                static uint8_t *dummy[1] = { 0 };
+                avctx->hwaccel_context =
+                    (vaapi_context*)nd->GetPlayer()->GetDecoderContext(NULL, dummy[0]);
+            }
             break;
+        }
     return fmt[i];
 }
 #endif
@@ -2834,13 +2859,6 @@ int get_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic, int flags)
     frame->pix_fmt  = c->pix_fmt;
     pic->reordered_opaque = c->reordered_opaque;
 
-    static uint8_t *dummy[1] = { 0 };
-    if (nd->GetPlayer())
-    {
-        c->hwaccel_context = nd->GetPlayer()->GetDecoderContext(NULL, dummy[0]);
-        ((AVVDPAUContext*)(c->hwaccel_context))->render2 = render_wrapper_vdpau;
-    }
-
     // Set release method
     AVBufferRef *buffer =
         av_buffer_create((uint8_t*)frame, 0, release_avf_buffer_vdpau, nd, 0);
@@ -2909,15 +2927,8 @@ int get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic, int flags)
     pic->opaque      = frame;
     frame->pix_fmt   = c->pix_fmt;
     pic->reordered_opaque = c->reordered_opaque;
-
-    if (nd->GetPlayer())
-    {
-        static uint8_t *dummy[1] = { 0 };
-        c->hwaccel_context =
-            (dxva_context*)nd->GetPlayer()->GetDecoderContext(NULL, dummy[0]);
-        pic->data[0] = (uint8_t*)frame->buf;
-        pic->data[3] = (uint8_t*)frame->buf;
-    }
+    pic->data[0] = (uint8_t*)frame->buf;
+    pic->data[3] = (uint8_t*)frame->buf;
 
     // Set release method
     AVBufferRef *buffer =
@@ -2944,8 +2955,7 @@ int get_avf_buffer_vaapi(struct AVCodecContext *c, AVFrame *pic, int flags)
 
     if (nd->GetPlayer())
     {
-        c->hwaccel_context =
-            (vaapi_context*)nd->GetPlayer()->GetDecoderContext(frame->buf, pic->data[3]);
+        nd->GetPlayer()->GetDecoderContext(frame->buf, pic->data[3]);
     }
 
     // Set release method
@@ -3374,7 +3384,7 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
 
         bool res_changed = ((width  != (uint)current_width) ||
                             (height != (uint)current_height));
-        bool fps_changed = (seqFPS > fps+0.01f) || (seqFPS < fps-0.01f);
+        bool fps_changed = seqFPS > 0.0 && ((seqFPS > fps + 0.01f) || (seqFPS < fps - 0.01f));
 
         if (fps_changed || res_changed)
         {
@@ -3382,7 +3392,9 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
 
             current_width  = width;
             current_height = height;
-            fps            = seqFPS;
+
+            if (seqFPS > 0.0)
+                fps = seqFPS;
 
             gopset = false;
             prevgoppos = 0;
@@ -3623,17 +3635,31 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
 {
     AVCodecContext *context = stream->codec;
 
+    // We need to mediate between ATSC and SCTE data when both are present.  If
+    // both are present, we generally want to prefer ATSC.  However, there may
+    // be large sections of the recording where ATSC is used and other sections
+    // where SCTE is used.  In that case, we want to allow a natural transition
+    // from ATSC back to SCTE.  We do this by allowing 10 consecutive SCTE
+    // frames, without an intervening ATSC frame, to cause a switch back to
+    // considering SCTE frames.  The number 10 is somewhat arbitrarily chosen.
+
     uint cc_len = (uint) max(mpa_pic->scte_cc_len,0);
     uint8_t *cc_buf = mpa_pic->scte_cc_buf;
     bool scte = true;
 
+    // If we saw SCTE, then decrement a nonzero ignore_scte count.
+    if (cc_len > 0 && ignore_scte)
+        --ignore_scte;
+
     // If both ATSC and SCTE caption data are available, prefer ATSC
     if ((mpa_pic->atsc_cc_len > 0) || ignore_scte)
     {
-        ignore_scte = true;
         cc_len = (uint) max(mpa_pic->atsc_cc_len, 0);
         cc_buf = mpa_pic->atsc_cc_buf;
         scte = false;
+        // If we explicitly saw ATSC, then reset ignore_scte count.
+        if (cc_len > 0)
+            ignore_scte = 10;
     }
 
     // Decode CEA-608 and CEA-708 captions

@@ -327,7 +327,7 @@ static int handle_cc_c0_ext1_p16(CC708Reader* cc, uint service_num, int i)
             if (code2<=0x1f)
             {
                 // C2 code -- nothing in EIA-708-A
-                i = handle_cc_c2(cc, service_num, i+1);
+                i = handle_cc_c2(cc, service_num, i);
             }
             else if (code2<=0x7f)
             {

@@ -52,14 +52,10 @@ static GrabberOpts GrabberOptsMaker(QString thepath, QString thesetting, QString
 
 static void InitializeStaticMaps(void)
 {
+    QMutexLocker lock(&typeLock);
+
     if (!initialized)
     {
-        QMutexLocker lock(&typeLock);
-
-        // double check now that we have the lock
-        if (initialized)
-            return;
-
         grabberTypes[kGrabberMovie] =
               GrabberOptsMaker ("%1metadata/Movie/",
                                 "MovieGrabber",

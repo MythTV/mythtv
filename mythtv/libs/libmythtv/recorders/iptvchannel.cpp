@@ -12,17 +12,18 @@
 
 // MythTV headers
 #include "iptvstreamhandler.h"
+#include "httptsstreamhandler.h"
 #include "hlsstreamhandler.h"
 #include "iptvrecorder.h"
 #include "iptvchannel.h"
 #include "mythlogging.h"
 #include "mythdb.h"
 
-#define LOC QString("IPTVChan[%1]: ").arg(GetCardID())
+#define LOC QString("IPTVChan[%1]: ").arg(m_inputid)
 
-IPTVChannel::IPTVChannel(TVRec *rec, const QString&) :
-    DTVChannel(rec), m_firsttune(true),
-    m_stream_handler(NULL), m_stream_data(NULL)
+IPTVChannel::IPTVChannel(TVRec *rec, const QString &videodev) :
+    DTVChannel(rec), m_firsttune(true), m_stream_handler(NULL),
+    m_stream_data(NULL), m_videodev(videodev)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
 }
@@ -42,7 +43,7 @@ bool IPTVChannel::Open(void)
 
     QMutexLocker locker(&m_tune_lock);
 
-    if (!InitializeInputs())
+    if (!InitializeInput())
     {
         Close();
         return false;
@@ -98,10 +99,17 @@ void IPTVChannel::OpenStreamHandler(void)
 {
     if (m_last_tuning.IsHLS())
     {
+        LOG(VB_CHANNEL, LOG_INFO, LOC + "Creating HLSStreamHandler");
         m_stream_handler = HLSStreamHandler::Get(m_last_tuning);
+    }
+    else if (m_last_tuning.IsHTTPTS())
+    {
+        LOG(VB_CHANNEL, LOG_INFO, LOC + "Creating HTTPTSStreamHandler");
+        m_stream_handler = HTTPTSStreamHandler::Get(m_last_tuning);
     }
     else
     {
+        LOG(VB_CHANNEL, LOG_INFO, LOC + "Creating IPTVStreamHandler");
         m_stream_handler = IPTVStreamHandler::Get(m_last_tuning);
     }
 }
@@ -117,13 +125,18 @@ void IPTVChannel::CloseStreamHandler(void)
         if (m_stream_data)
             m_stream_handler->RemoveListener(m_stream_data);
 
-        HLSStreamHandler* hsh =
-            dynamic_cast<HLSStreamHandler*>(m_stream_handler);
+        HLSStreamHandler* hsh = dynamic_cast<HLSStreamHandler*>(m_stream_handler);
+        HTTPTSStreamHandler* httpsh = dynamic_cast<HTTPTSStreamHandler*>(m_stream_handler);
 
         if (hsh)
         {
             HLSStreamHandler::Return(hsh);
             m_stream_handler = hsh;
+        }
+        else if (httpsh)
+        {
+            HTTPTSStreamHandler::Return(httpsh);
+            m_stream_handler = httpsh;
         }
         else
         {

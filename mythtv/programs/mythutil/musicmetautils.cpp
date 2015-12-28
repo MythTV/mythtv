@@ -1,5 +1,7 @@
 // qt
 #include <QDir>
+#include <QProcess>
+#include <QDomDocument>
 
 // libmyth* headers
 #include "exitcodes.h"
@@ -10,6 +12,7 @@
 #include "mythcontext.h"
 #include "musicfilescanner.h"
 #include "musicutils.h"
+#include "mythdirs.h"
 
 extern "C" {
 #include <libavformat/avformat.h>
@@ -311,10 +314,241 @@ static int CalcTrackLength(const MythUtilCommandLineParser &cmdline)
     return GENERIC_EXIT_OK;
 }
 
+typedef struct
+{
+    QString name;
+    QString filename;
+    int priority;
+} LyricsGrabber;
+
+static int FindLyrics(const MythUtilCommandLineParser &cmdline)
+{
+    // make sure our lyrics cache directory exists
+    QString lyricsDir = GetConfDir() + "/MythMusic/Lyrics/";
+    QDir dir(lyricsDir);
+    if (!dir.exists())
+        dir.mkpath(lyricsDir);
+
+    if (cmdline.toString("songid").isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Missing --songid option");
+        return GENERIC_EXIT_INVALID_CMDLINE;
+    }
+
+    int songID = cmdline.toInt("songid");
+    QString grabberName = "ALL";
+    QString lyricsFile;
+    QString artist;
+    QString album;
+    QString title;
+    QString filename;
+
+    if (!cmdline.toString("grabber").isEmpty())
+        grabberName = cmdline.toString("grabber");
+
+    if (ID_TO_REPO(songID) == RT_Database)
+    {
+        MusicMetadata *mdata = MusicMetadata::createFromID(songID);
+        if (!mdata)
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Cannot find metadata for trackid: %1").arg(songID));
+            return GENERIC_EXIT_NOT_OK;
+        }
+
+        QString musicFile = mdata->getLocalFilename();
+
+        if (musicFile.isEmpty() || !QFile::exists(musicFile))
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Cannot find file for trackid: %1").arg(songID));
+            //return GENERIC_EXIT_NOT_OK;
+        }
+
+        // first check if we have already saved a lyrics file for this track
+        lyricsFile = GetConfDir() + QString("/MythMusic/Lyrics/%1.txt").arg(songID);
+        if (QFile::exists(lyricsFile))
+        {
+            // if the user specified a specific grabber assume they want to
+            // re-search for the lyrics using the given grabber
+            if (grabberName != "ALL")
+                QFile::remove(lyricsFile);
+            else
+            {
+                // load these lyrics to speed up future lookups
+                QFile file(QLatin1String(qPrintable(lyricsFile)));
+                QString lyrics;
+
+                if (file.open(QIODevice::ReadOnly))
+                {
+                    QTextStream stream(&file);
+
+                    while (!stream.atEnd())
+                    {
+                        lyrics.append(stream.readLine());
+                    }
+
+                    file.close();
+                }
+
+                // tell any clients that a lyrics file is available for this track
+                gCoreContext->SendMessage(QString("MUSIC_LYRICS_FOUND %1 %2").arg(songID).arg(lyrics));
+
+                return GENERIC_EXIT_OK;
+            }
+        }
+
+        artist = mdata->Artist();
+        album = mdata->Album();
+        title = mdata->Title();
+        filename = mdata->getLocalFilename();
+    }
+    else
+    {
+        // must be a CD or Radio Track
+        if (cmdline.toString("artist").isEmpty())
+        {
+            LOG(VB_GENERAL, LOG_ERR, "Missing --artist option");
+            return GENERIC_EXIT_INVALID_CMDLINE;
+        }
+        artist = cmdline.toString("artist");
+
+        if (cmdline.toString("album").isEmpty())
+        {
+            LOG(VB_GENERAL, LOG_ERR, "Missing --album option");
+            return GENERIC_EXIT_INVALID_CMDLINE;
+        }
+        album = cmdline.toString("album");
+
+        if (cmdline.toString("title").isEmpty())
+        {
+            LOG(VB_GENERAL, LOG_ERR, "Missing --title option");
+            return GENERIC_EXIT_INVALID_CMDLINE;
+        }
+        title = cmdline.toString("title");
+    }
+
+    // not found so try the grabbers
+    // first get a list of available grabbers
+    QString  scriptDir = GetShareDir() + "metadata/Music/lyrics";
+    QDir d(scriptDir);
+
+    if (!d.exists())
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Cannot find lyric scripts directory: %1").arg(scriptDir));
+        gCoreContext->SendMessage(QString("MUSIC_LYRICS_ERROR NO_SCRIPTS_DIR"));
+        return GENERIC_EXIT_NOT_OK;
+    }
+
+    d.setFilter(QDir::Files | QDir::NoDotAndDotDot);
+    d.setNameFilters(QStringList("*.py"));
+    QFileInfoList list = d.entryInfoList();
+    if (list.isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Cannot find any lyric scripts in: %1").arg(scriptDir));
+        gCoreContext->SendMessage(QString("MUSIC_LYRICS_ERROR NO_SCRIPTS_FOUND"));
+        return GENERIC_EXIT_NOT_OK;
+    }
+
+    QStringList scripts;
+    QFileInfoList::const_iterator it = list.begin();
+    const QFileInfo *fi;
+
+    while (it != list.end())
+    {
+        fi = &(*it);
+        ++it;
+        LOG(VB_GENERAL, LOG_NOTICE, QString("Found lyric script at: %1").arg(fi->filePath()));
+        scripts.append(fi->filePath());
+    }
+
+    QMap<int, LyricsGrabber> grabberMap;
+
+    // query the grabbers to get their priority
+    for (int x = 0; x < scripts.count(); x++)
+    {
+        QProcess p;
+        p.start(QString("python %1 -v").arg(scripts.at(x)));
+        p.waitForFinished(-1);
+        QString result = p.readAllStandardOutput();
+
+        QDomDocument domDoc;
+        QString errorMsg;
+        int errorLine, errorColumn;
+
+        if (!domDoc.setContent(result, false, &errorMsg, &errorLine, &errorColumn))
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("FindLyrics: Could not parse version from %1").arg(scripts.at(x)) +
+                QString("\n\t\t\tError at line: %1  column: %2 msg: %3").arg(errorLine).arg(errorColumn).arg(errorMsg));
+            continue;
+        }
+
+        QDomNodeList itemList = domDoc.elementsByTagName("grabber");
+        QDomNode itemNode = itemList.item(0);
+
+        LyricsGrabber grabber;
+        grabber.name = itemNode.namedItem(QString("name")).toElement().text();
+        grabber.priority = itemNode.namedItem(QString("priority")).toElement().text().toInt();
+        grabber.filename = scripts.at(x);
+
+        grabberMap.insert(grabber.priority, grabber);
+    }
+
+    // try each grabber in turn until we find a match
+    QMap<int, LyricsGrabber>::const_iterator i = grabberMap.constBegin();
+    while (i != grabberMap.constEnd())
+    {
+        LyricsGrabber grabber = i.value();
+
+        ++i;
+
+        if (grabberName != "ALL" && grabberName != grabber.name)
+            continue;
+
+        LOG(VB_GENERAL, LOG_NOTICE, QString("Trying grabber: %1, Priority: %2").arg(grabber.name).arg(grabber.priority));
+        QString statusMessage = QObject::tr("Searching '%1' for lyrics...").arg(grabber.name);
+        gCoreContext->SendMessage(QString("MUSIC_LYRICS_STATUS %1 %2").arg(songID).arg(statusMessage));
+
+        QProcess p;
+        p.start(QString("python %1 --artist=\"%2\" --album=\"%3\" --title=\"%4\" --filename=\"%5\"")
+                        .arg(grabber.filename).arg(artist).arg(album).arg(title).arg(filename));
+        p.waitForFinished(-1);
+        QString result = p.readAllStandardOutput();
+
+        LOG(VB_GENERAL, LOG_DEBUG, QString("Grabber: %1, Exited with code: %2").arg(grabber.name).arg(p.exitCode()));
+
+        if (p.exitCode() == 0)
+        {
+            LOG(VB_GENERAL, LOG_NOTICE, QString("Lyrics Found using: %1").arg(grabber.name));
+
+            // save these lyrics to speed up future lookups if it is a DB track
+            if (ID_TO_REPO(songID) == RT_Database)
+            {
+                QFile file(QLatin1String(qPrintable(lyricsFile)));
+
+                if (file.open(QIODevice::WriteOnly))
+                {
+                    QTextStream stream(&file);
+                    stream << result;
+                    file.close();
+                }
+            }
+
+            gCoreContext->SendMessage(QString("MUSIC_LYRICS_FOUND %1 %2").arg(songID).arg(result));
+            return GENERIC_EXIT_OK;
+        }
+    }
+
+    // if we got here we didn't find any lyrics
+    gCoreContext->SendMessage(QString("MUSIC_LYRICS_NOTFOUND %1").arg(songID));
+
+    return GENERIC_EXIT_OK;
+}
+
 void registerMusicUtils(UtilMap &utilMap)
 {
     utilMap["updatemeta"] = &UpdateMeta;
     utilMap["extractimage"] = &ExtractImage;
     utilMap["scanmusic"] = &ScanMusic;
     utilMap["calctracklen"] = &CalcTrackLength;
+    utilMap["findlyrics"] = &FindLyrics;
 }

@@ -128,7 +128,7 @@ void ProgramRecPriorityInfo::ToMap(InfoMap &progMap,
 class TitleSort
 {
   public:
-    TitleSort(bool reverse) : m_reverse(reverse) {}
+    explicit TitleSort(bool reverse) : m_reverse(reverse) {}
 
     bool operator()(const ProgramRecPriorityInfo *a,
                     const ProgramRecPriorityInfo *b) const
@@ -178,7 +178,7 @@ class TitleSort
 class ProgramRecPrioritySort
 {
   public:
-    ProgramRecPrioritySort(bool reverse) : m_reverse(reverse) {}
+    explicit ProgramRecPrioritySort(bool reverse) : m_reverse(reverse) {}
 
     bool operator()(const ProgramRecPriorityInfo *a,
                     const ProgramRecPriorityInfo *b) const
@@ -220,7 +220,7 @@ class ProgramRecPrioritySort
 class ProgramRecTypeSort
 {
   public:
-    ProgramRecTypeSort(bool reverse) : m_reverse(reverse) {}
+    explicit ProgramRecTypeSort(bool reverse) : m_reverse(reverse) {}
 
     bool operator()(const ProgramRecPriorityInfo *a,
                     const ProgramRecPriorityInfo *b) const
@@ -262,7 +262,7 @@ class ProgramRecTypeSort
 class ProgramCountSort
 {
   public:
-    ProgramCountSort(bool reverse) : m_reverse(reverse) {}
+    explicit ProgramCountSort(bool reverse) : m_reverse(reverse) {}
 
     bool operator()(const ProgramRecPriorityInfo *a,
                     const ProgramRecPriorityInfo *b) const
@@ -301,7 +301,7 @@ class ProgramCountSort
 class ProgramRecCountSort
 {
   public:
-    ProgramRecCountSort(bool reverse) : m_reverse(reverse) {}
+    explicit ProgramRecCountSort(bool reverse) : m_reverse(reverse) {}
 
     bool operator()(const ProgramRecPriorityInfo *a,
                     const ProgramRecPriorityInfo *b) const
@@ -340,7 +340,7 @@ class ProgramRecCountSort
 class ProgramLastRecordSort
 {
   public:
-    ProgramLastRecordSort(bool reverse) : m_reverse(reverse) {}
+    explicit ProgramLastRecordSort(bool reverse) : m_reverse(reverse) {}
 
     bool operator()(const ProgramRecPriorityInfo *a,
                     const ProgramRecPriorityInfo *b) const
@@ -369,7 +369,7 @@ class ProgramLastRecordSort
 class ProgramAvgDelaySort
 {
   public:
-    ProgramAvgDelaySort(bool reverse) : m_reverse(reverse) {}
+    explicit ProgramAvgDelaySort(bool reverse) : m_reverse(reverse) {}
 
     bool operator()(const ProgramRecPriorityInfo *a,
                     const ProgramRecPriorityInfo *b) const

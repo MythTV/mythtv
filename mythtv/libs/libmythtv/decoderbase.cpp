@@ -532,9 +532,9 @@ uint64_t DecoderBase::SavePositionMapDelta(long long first, long long last)
     frm_pos_map_t posMap;
     for (uint i = 0; i < m_positionMap.size(); i++)
     {
-        if ((uint64_t)m_positionMap[i].index < first)
+        if (m_positionMap[i].index < first)
             continue;
-        if ((uint64_t)m_positionMap[i].index > last)
+        if (m_positionMap[i].index > last)
             break;
 
         posMap[m_positionMap[i].index] = m_positionMap[i].pos;

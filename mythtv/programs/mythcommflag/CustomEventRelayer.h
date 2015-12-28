@@ -16,7 +16,7 @@ class CustomEventRelayer : public QObject
     Q_OBJECT
 
   public:
-    CustomEventRelayer(void (*fp_in)(QEvent*)) : fp(fp_in)
+    explicit CustomEventRelayer(void (*fp_in)(QEvent*)) : fp(fp_in)
     {
         gCoreContext->addListener(this);
     }

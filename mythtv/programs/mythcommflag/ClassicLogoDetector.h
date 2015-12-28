@@ -16,7 +16,7 @@ class ClassicLogoDetector : public LogoDetectorBase
     virtual void deleteLater(void);
 
     bool searchForLogo(MythPlayer* player);
-    bool doesThisFrameContainTheFoundLogo(unsigned char* frame);
+    bool doesThisFrameContainTheFoundLogo(VideoFrame* frame);
     bool pixelInsideLogo(unsigned int x, unsigned int y);
 
     unsigned int getRequiredAvailableBufferForSearch();
@@ -26,7 +26,6 @@ class ClassicLogoDetector : public LogoDetectorBase
 
   private:
     void SetLogoMaskArea();
-    void SetLogoMask(unsigned char *mask);
     void DumpLogo(bool fromCurrentFrame,unsigned char* framePtr);
     void DetectEdges(VideoFrame *frame, EdgeMaskEntry *edges, int edgeDiff);
 

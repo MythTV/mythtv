@@ -18,7 +18,7 @@
 #if HAVE_MMX
 
 #include "libavutil/mem.h"
-#include "libavcodec/dsputil.h"
+#include "libavutil/cpu.h"
 #include "ffmpeg-mmx.h"
 
 static const mmx_t mm_cpool[] = {

@@ -31,7 +31,7 @@ class PlaybackBoxHelper : public MThread
     friend class PBHEventHandler;
 
   public:
-    PlaybackBoxHelper(QObject *listener);
+    explicit PlaybackBoxHelper(QObject *listener);
     ~PlaybackBoxHelper(void);
 
     void ForceFreeSpaceUpdate(void);

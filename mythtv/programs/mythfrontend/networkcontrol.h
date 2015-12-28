@@ -25,7 +25,7 @@ class NetworkControlClient : public QObject
 {
     Q_OBJECT
   public:
-    NetworkControlClient(QTcpSocket *);
+    explicit NetworkControlClient(QTcpSocket *);
    ~NetworkControlClient();
 
     QTcpSocket  *getSocket()     { return m_socket; }
@@ -76,7 +76,7 @@ class NetworkCommand : public QObject
 class NetworkControlCloseEvent : public QEvent
 {
   public:
-    NetworkControlCloseEvent(NetworkControlClient *ncc) :
+    explicit NetworkControlCloseEvent(NetworkControlClient *ncc) :
         QEvent(kEventType), m_networkControlClient(ncc) {}
 
     NetworkControlClient *getClient() { return m_networkControlClient; }

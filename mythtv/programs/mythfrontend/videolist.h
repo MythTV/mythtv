@@ -62,7 +62,7 @@ class TreeNodeData
 {
   public:
     TreeNodeData();
-    TreeNodeData(VideoMetadata *metadata);
+    explicit TreeNodeData(VideoMetadata *metadata);
     TreeNodeData(QString path, QString host, QString prefix);
 
     TreeNodeData(const TreeNodeData &other);

@@ -1,7 +1,6 @@
 
 #include "DisplayResOSX.h"
 
-#import <Carbon/Carbon.h>
 #import <IOKit/graphics/IOGraphicsLib.h> // for IODisplayCreateInfoDictionary()
 
 #include "mythdisplay.h"

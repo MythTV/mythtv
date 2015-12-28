@@ -48,7 +48,7 @@ RemoteFile::RemoteFile(const QString &_path, bool write, bool useRA,
     controlSock(NULL),    sock(NULL),
     query("QUERY_FILETRANSFER %1"),
     writemode(write),     completed(false),
-    localFile(NULL),      fileWriter(NULL)
+    localFile(-1),        fileWriter(NULL)
 {
     if (writemode)
     {
@@ -82,7 +82,7 @@ RemoteFile::~RemoteFile()
 bool RemoteFile::isLocal(const QString &path)
 {
     bool is_local = !path.isEmpty() &&
-        !path.startsWith("/dev") && !path.startsWith("myth:") &&
+        !path.startsWith("myth:") &&
         (path.startsWith("/") || QFile::exists(path));
     return is_local;
 }
@@ -225,7 +225,7 @@ bool RemoteFile::isOpen() const
 {
     if (isLocal())
     {
-        return writemode ? (fileWriter != NULL) : (localFile != NULL);
+        return writemode ? (fileWriter != NULL) : (localFile != -1);
     }
     return sock && controlSock;
 }
@@ -248,14 +248,24 @@ bool RemoteFile::OpenInternal()
 {
     if (isLocal())
     {
-        if (!Exists(path))
-        {
-            LOG(VB_FILE, LOG_ERR,
-                QString("RemoteFile::Open(%1) Error: Do not exist").arg(path));
-            return false;
-        }
         if (writemode)
         {
+            // make sure the directories are created if necessary
+            QFileInfo fi(path);
+            QDir dir(fi.path());
+            if (!dir.exists())
+            {
+                LOG(VB_FILE, LOG_WARNING, QString("RemoteFile::Open(%1) creating directories")
+                    .arg(path));
+
+                if (!dir.mkpath(fi.path()))
+                {
+                    LOG(VB_GENERAL, LOG_ERR, QString("RemoteFile::Open(%1) failed to create the directories")
+                        .arg(path));
+                    return false;
+                }
+            }
+
             fileWriter = new ThreadedFileWriter(path,
                                                 O_WRONLY|O_TRUNC|O_CREAT|O_LARGEFILE,
                                                 0644);
@@ -271,14 +281,20 @@ bool RemoteFile::OpenInternal()
             SetBlocking();
             return true;
         }
+
         // local mode, read only
-        localFile = new QFile(path);
-        if (!localFile->open(QIODevice::ReadOnly))
+        if (!Exists(path))
+        {
+            LOG(VB_FILE, LOG_ERR,
+                QString("RemoteFile::Open(%1) Error: Does not exist").arg(path));
+            return false;
+        }
+
+        localFile = ::open(path.toLocal8Bit().constData(), O_RDONLY);
+        if (localFile == -1)
         {
             LOG(VB_FILE, LOG_ERR, QString("RemoteFile::Open(%1) Error: %2")
-                .arg(path).arg(localFile->error()));
-            delete localFile;
-            localFile = NULL;
+                .arg(path).arg(strerror(errno)));
             return false;
         }
         return true;
@@ -339,8 +355,8 @@ void RemoteFile::Close(bool haslock)
 {
     if (isLocal())
     {
-        delete localFile;
-        localFile = NULL;
+        ::close(localFile);
+        localFile = -1;
         delete fileWriter;
         fileWriter = NULL;
         return;
@@ -449,7 +465,7 @@ bool RemoteFile::Exists(const QString &url, struct stat *fileinfo)
         else
         {
             QFileInfo info(url);
-            fileExists = info.exists() && info.isFile();
+            fileExists = info.exists() /*&& info.isFile()*/;
             fullFilePath = url;
         }
 
@@ -550,15 +566,25 @@ QString RemoteFile::GetFileHash(const QString &url)
     return result;
 }
 
-bool RemoteFile::CopyFile (const QString& src, const QString& dst)
+bool RemoteFile::CopyFile (const QString& src, const QString& dst,
+                           bool overwrite, bool verify)
 {
-    LOG(VB_FILE, LOG_INFO, QString("RemoteFile::CopyFile: Copying file from '%1' to '%2'").arg(src).arg(dst));
+    LOG(VB_FILE, LOG_INFO,
+        QString("RemoteFile::CopyFile: Copying file from '%1' to '%2'").arg(src).arg(dst));
 
     // sanity check
     if (src == dst)
     {
         LOG(VB_GENERAL, LOG_ERR, "RemoteFile::CopyFile: Cannot copy a file to itself");
         return false;
+    }
+
+    RemoteFile srcFile(src, false);
+    if (!srcFile.isOpen())
+    {
+         LOG(VB_GENERAL, LOG_ERR,
+             QString("RemoteFile::CopyFile: Failed to open file (%1) for reading.").arg(src));
+         return false;
     }
 
     const int readSize = 2 * 1024 * 1024;
@@ -569,13 +595,15 @@ bool RemoteFile::CopyFile (const QString& src, const QString& dst)
         return false;
     }
 
-    RemoteFile srcFile(src, false);
-    if (!srcFile.isOpen())
+    if (overwrite)
     {
-         LOG(VB_GENERAL, LOG_ERR,
-             QString("RemoteFile::CopyFile: Failed to open file (%1) for reading.").arg(src));
-         delete[] buf;
-         return false;
+        DeleteFile(dst);
+    }
+    else if (Exists(dst))
+    {
+        LOG(VB_GENERAL, LOG_ERR, "RemoteFile::CopyFile: File already exists");
+        delete[] buf;
+        return false;
     }
 
     RemoteFile dstFile(dst, true);
@@ -588,6 +616,9 @@ bool RemoteFile::CopyFile (const QString& src, const QString& dst)
          return false;
     }
 
+    dstFile.SetBlocking(true);
+
+    bool success = true;
     int srcLen, dstLen;
 
     while ((srcLen = srcFile.Read(buf, readSize)) > 0)
@@ -597,11 +628,8 @@ bool RemoteFile::CopyFile (const QString& src, const QString& dst)
         if (dstLen == -1 || srcLen != dstLen)
         {
             LOG(VB_GENERAL, LOG_ERR,
-                "RemoteFile::CopyFile:: Error while trying to write to destination file.");
-            srcFile.Close();
-            dstFile.Close();
-            delete[] buf;
-            return false;
+                "RemoteFile::CopyFile: Error while trying to write to destination file.");
+            success = false;
         }
     }
 
@@ -609,7 +637,92 @@ bool RemoteFile::CopyFile (const QString& src, const QString& dst)
     dstFile.Close();
     delete[] buf;
 
-    return true;
+    if (success && verify)
+    {
+        // Check written file is correct size
+        struct stat fileinfo;
+        long long dstSize = Exists(dst, &fileinfo) ? fileinfo.st_size : -1;
+        long long srcSize = srcFile.GetFileSize();
+        if (dstSize != srcSize)
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("RemoteFile::CopyFile: Copied file is wrong size (%1 rather than %2)")
+                    .arg(dstSize).arg(srcSize));
+            success = false;
+            DeleteFile(dst);
+        }
+    }
+
+    return success;
+}
+
+bool RemoteFile::MoveFile (const QString& src, const QString& dst, bool overwrite)
+{
+    LOG(VB_FILE, LOG_INFO,
+        QString("RemoteFile::MoveFile: Moving file from '%1' to '%2'").arg(src).arg(dst));
+
+    // sanity check
+    if (src == dst)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "RemoteFile::MoveFile: Cannot move a file to itself");
+        return false;
+    }
+
+    if (isLocal(src) != isLocal(dst))
+    {
+        // Moving between local & remote requires a copy & delete
+        bool ok = CopyFile(src, dst, overwrite, true);
+        if (ok)
+        {
+            if (!DeleteFile(src))
+                LOG(VB_FILE, LOG_ERR,
+                    "RemoteFile::MoveFile: Failed to delete file after successful copy");
+        }
+        return ok;
+    }
+
+    if (overwrite)
+    {
+        DeleteFile(dst);
+    }
+    else if (Exists(dst))
+    {
+        LOG(VB_GENERAL, LOG_ERR, "RemoteFile::MoveFile: File already exists");
+        return false;
+    }
+
+    if (isLocal(src))
+    {
+        // Moving local -> local
+        QFileInfo fi(dst);
+        if (QDir().mkpath(fi.path()) && QFile::rename(src, dst))
+            return true;
+
+        LOG(VB_FILE, LOG_ERR, "RemoteFile::MoveFile: Rename failed");
+        return false;
+    }
+
+    // Moving remote -> remote
+    QUrl srcUrl(src);
+    QUrl dstUrl(dst);
+
+    if (srcUrl.userName() != dstUrl.userName())
+    {
+        LOG(VB_FILE, LOG_ERR, "RemoteFile::MoveFile: Cannot change a file's Storage Group");
+        return false;
+    }
+
+    QStringList strlist("MOVE_FILE");
+    strlist << srcUrl.userName() << srcUrl.path() << dstUrl.path();
+
+    gCoreContext->SendReceiveStringList(strlist);
+
+    if (!strlist.isEmpty() && strlist[0] == "1")
+        return true;
+
+    LOG(VB_FILE, LOG_ERR, QString("RemoteFile::MoveFile: MOVE_FILE failed with: %1")
+        .arg(strlist.join(",")));
+    return false;
 }
 
 void RemoteFile::Reset(void)
@@ -647,26 +760,30 @@ long long RemoteFile::SeekInternal(long long pos, int whence, long long curpos)
         long long offset = 0LL;
         if (whence == SEEK_SET)
         {
-            offset = min(pos, localFile->size());
+            QFileInfo info(path);
+            offset = min(pos, info.size());
         }
         else if (whence == SEEK_END)
         {
-            offset = localFile->size() + pos;
+            QFileInfo info(path);
+            offset = info.size() + pos;
         }
         else if (whence == SEEK_CUR)
         {
-            offset = ((curpos > 0) ? curpos : localFile->pos()) + pos;
+            offset = ((curpos > 0) ? curpos : ::lseek64(localFile, 0, SEEK_CUR)) + pos;
         }
         else
             return -1;
-        if (!localFile->seek(offset))
+
+        off64_t localpos = ::lseek64(localFile, (off64_t)pos, whence);
+        if (localpos != (off64_t)pos)
         {
             LOG(VB_FILE, LOG_ERR,
                 QString("RemoteFile::Seek(): Couldn't seek to offset %1")
                 .arg(offset));
             return -1;
         }
-        return localFile->pos();
+        return (long long)localpos;
     }
 
     if (!CheckConnection(false))
@@ -820,8 +937,7 @@ int RemoteFile::Read(void *data, int size)
         }
         if (isOpen())
         {
-            QDataStream stream(localFile);
-            return stream.readRawData(static_cast<char*>(data), size);
+            return ::read(localFile, data, size);
         }
         LOG(VB_FILE, LOG_ERR, "RemoteFile:Read() called when local file not opened");
         return -1;
@@ -951,15 +1067,9 @@ long long RemoteFile::GetFileSize(void) const
 {
     if (isLocal())
     {
-        if (isOpen())
+        if (isOpen() && writemode)
         {
-            if (writemode)
-            {
-                fileWriter->Flush();
-                QFileInfo info(path);
-                return info.size();
-            }
-            return localFile->size();
+            fileWriter->Flush();
         }
         if (Exists(path))
         {

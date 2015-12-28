@@ -115,6 +115,8 @@ enum {
     kStartTVInPlayList       = 0x02,
     kStartTVByNetworkCommand = 0x04,
     kStartTVIgnoreBookmark   = 0x08,
+    kStartTVIgnoreProgStart  = 0x10,
+    kStartTVAllowLastPlayPos = 0x20,
 };
 
 class AskProgramInfo
@@ -363,14 +365,20 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     // Private initialisation
     bool Init(bool createWindow = true);
     void InitFromDB(void);
-
+    QList<QKeyEvent> ConvertScreenPressKeyMap(const QString& keyList);
+    
     // Top level playback methods
     bool LiveTV(bool showDialogs, const ChannelInfoList &selection);
     int  Playback(const ProgramInfo &rcinfo);
     void PlaybackLoop(void);
 
     // Private event handling
-    bool ProcessKeypress(PlayerContext*, QKeyEvent *e);
+    bool ProcessKeypressOrGesture(PlayerContext*, QEvent *e);
+    bool TranslateKeyPressOrGesture(const QString &context, QEvent *e,
+                                    QStringList &actions, bool isLiveTV, 
+                                    bool allowJumps = true);
+    bool TranslateGesture(const QString &context, MythGestureEvent *e,
+                          QStringList &actions, bool isLiveTV);
     void ProcessNetworkControlCommand(PlayerContext *, const QString &command);
 
     bool HandleTrackAction(PlayerContext*, const QString &action);
@@ -409,6 +417,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     bool HandlePxPTimerEvent(void);
     bool HandleLCDTimerEvent(void);
     void HandleLCDVolumeTimerEvent(void);
+    void HandleSaveLastPlayPosEvent();
 
     // Commands used by frontend UI screens (PlaybackBox, GuideGrid etc)
     void EditSchedule(const PlayerContext*,
@@ -538,10 +547,8 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
 
     // Source and input
     void SwitchSource(PlayerContext*, uint source_direction);
-    void SwitchInputs(PlayerContext*, uint inputid);
-    void ToggleInputs(PlayerContext*, uint inputid = 0);
-    void SwitchCards(PlayerContext*,
-                     uint chanid = 0, QString channum = "", uint inputid = 0);
+    void SwitchInputs(PlayerContext*,
+                      uint chanid = 0, QString channum = "", uint inputid = 0);
 
     // Pause/play
     void PauseLiveTV(PlayerContext*);
@@ -884,6 +891,15 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     /// Initial chanid override for Live TV
     uint            initialChanID;
 
+    /// screen area to keypress translation
+    /// region is now 0..11
+    ///  0  1   2  3
+    ///  4  5   6  7
+    ///  8  9  10 11
+    static const int screenPressRegionCount = 12;
+    QList<QKeyEvent>    screenPressKeyMapPlayback;
+    QList<QKeyEvent>    screenPressKeyMapLiveTV;
+    
     // Channel changing timeout notification variables
     QTime   lockTimer;
     bool    lockTimerOn;
@@ -979,6 +995,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     volatile int         speedChangeTimerId;
     volatile int         errorRecoveryTimerId;
     mutable volatile int exitPlayerTimerId;
+    volatile int         saveLastPlayPosTimerId;
     TimerContextMap      stateChangeTimerId;
     TimerContextMap      signalMonitorTimerId;
 
@@ -1095,6 +1112,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     static const uint kErrorRecoveryCheckFrequency;
     static const uint kEndOfRecPromptCheckFrequency;
     static const uint kEndOfPlaybackFirstCheckTimer;
+    static const uint kSaveLastPlayPosTimeout;
 };
 
 #endif

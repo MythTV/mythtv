@@ -89,7 +89,7 @@ import "/tv/js/tvutil.qjs"
 <link rel="stylesheet" type="text/css" href="/css/settings.css">
 <link rel="stylesheet" type="text/css" href="/tv/css/schedule.css">
 <script src="/js/utility.js"></script> <!-- ECMA not JS -->
-<script type="text/javascript" src="/3rdParty/jquery/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="/3rdParty/jquery/jquery-2.1.4.min.js"></script>
 <script type="text/javascript" src="/3rdParty/jquery/jqueryUI/js/jquery-ui-1.10.3.js"></script>
 <script src="/js/settings.js"></script>
 <script src="/tv/js/common.js"></script>

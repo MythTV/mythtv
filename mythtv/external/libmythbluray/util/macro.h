@@ -21,14 +21,17 @@
 #ifndef MACRO_H_
 #define MACRO_H_
 
-#include <stdio.h>   /* fprintf() */
 #include <stdlib.h>  /* free() */
 
-#define HEX_PRINT(X,Y) { int zz; for(zz = 0; zz < Y; zz++) fprintf(stderr, "%02X", X[zz]); fprintf(stderr, "\n"); }
 #define MKINT_BE16(X) ( (X)[0] << 8 | (X)[1] )
 #define MKINT_BE24(X) ( (X)[0] << 16 | (X)[1] << 8 | (X)[2] )
 #define MKINT_BE32(X) ( (X)[0] << 24 | (X)[1] << 16 |  (X)[2] << 8 | (X)[3] )
 #define X_FREE(X)     ( free(X), X = NULL )
+
+#define BD_MIN(a,b) ((a)<(b)?(a):(b))
+#define BD_MAX(a,b) ((a)>(b)?(a):(b))
+
+#define BD_MAX_SSIZE ((int64_t)(((size_t)-1)>>1))
 
 /*
  * automatic cast from void* (malloc/calloc/realloc)
@@ -61,6 +64,7 @@ auto_cast_wrapper<R> auto_cast(const R& x)
 #  define calloc(n,s)  auto_cast(calloc(n,s))
 #  define malloc(s)    auto_cast(malloc(s))
 #  define realloc(p,s) auto_cast(realloc(p,s))
+#  define refcnt_realloc(p,s) auto_cast(refcnt_realloc(p,s))
 #endif /* __cplusplus */
 
 

@@ -290,7 +290,7 @@ QString PreviewGeneratorQueue::GeneratePreviewImage(
         bool locally_accessible = false;
         bool bookmark_updated = false;
 
-        QDateTime bookmark_ts = pginfo.QueryBookmarkTimeStamp();
+        QDateTime bookmark_ts = pginfo.GetBookmarkUpdate();
         QDateTime cmp_ts;
         if (bookmark_ts.isValid())
             cmp_ts = bookmark_ts;

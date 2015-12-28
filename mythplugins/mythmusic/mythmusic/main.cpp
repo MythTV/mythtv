@@ -8,6 +8,7 @@
 #include <QDir>
 #include <QApplication>
 #include <QRegExp>
+#include <QScopedPointer>
 
 // MythTV headers
 #include <mythcontext.h>
@@ -44,6 +45,7 @@
 #include "importsettings.h"
 #include "ratingsettings.h"
 #include "importmusic.h"
+#include "metaio.h"
 
 #ifdef HAVE_CDIO
 #include "cdrip.h"
@@ -445,15 +447,195 @@ static void showMiniPlayer(void)
         gPlayer->showMiniPlayer();
 }
 
+static QStringList GetMusicFilter()
+{
+    QString filt = MetaIO::ValidFileExtensions;
+    filt.replace(".", "*.");
+    return filt.split('|');
+}
+
+static QStringList BuildFileList(const QString &dir, const QStringList &filters)
+{
+    QStringList ret;
+
+    QDir d(dir);
+    if (!d.exists())
+        return ret;
+
+    d.setNameFilters(filters);
+    d.setFilter(QDir::Files       | QDir::AllDirs |
+                QDir::NoSymLinks  | QDir::Readable |
+                QDir::NoDotAndDotDot);
+    d.setSorting(QDir::Name | QDir::DirsLast);
+
+    QFileInfoList list = d.entryInfoList();
+    if (list.isEmpty())
+        return ret;
+
+    for(QFileInfoList::const_iterator it = list.begin(); it != list.end(); ++it)
+    {
+        const QFileInfo &fi = *it;
+        if (fi.isDir())
+        {
+            ret += BuildFileList(fi.absoluteFilePath(), filters);
+            qApp->processEvents();
+        }
+        else
+        {
+            ret << fi.absoluteFilePath();
+        }
+    }
+    return ret;
+}
+
 static void handleMedia(MythMediaDevice *cd)
 {
+    static QString s_mountPath;
+
     if (!cd)
         return;
 
-    // Note that we should deal with other disks that may contain music.
-    // e.g. MEDIATYPE_MMUSIC or MEDIATYPE_MIXED
-    LOG(VB_MEDIA, LOG_NOTICE, QString("Ignoring changed media event of type: %1")
-        .arg(MythMediaDevice::MediaTypeString(cd->getMediaType())));
+    if (MEDIASTAT_MOUNTED != cd->getStatus())
+    {
+        if (s_mountPath != cd->getMountPath())
+            return;
+
+        LOG(VB_MEDIA, LOG_INFO, QString(
+            "MythMusic: '%1' unmounted, clearing data").arg(cd->getVolumeID()));
+
+        if (gPlayer->isPlaying() && gPlayer->getCurrentMetadata()
+            && gPlayer->getCurrentMetadata()->isCDTrack())
+        {
+            // Now playing a track which is no longer available so stop playback
+            gPlayer->stop(true);
+        }
+
+        // device is not usable so remove any existing CD tracks
+        if (gMusicData->all_music)
+        {
+            gMusicData->all_music->clearCDData();
+            gMusicData->all_playlists->getActive()->removeAllCDTracks();
+        }
+
+        gPlayer->activePlaylistChanged(-1, false);
+        gPlayer->sendCDChangedEvent();
+
+        return;
+    }
+
+    LOG(VB_MEDIA, LOG_NOTICE, QString("MythMusic: '%1' mounted on '%2'")
+        .arg(cd->getVolumeID()).arg(cd->getMountPath()) );
+
+    s_mountPath.clear();
+
+    // don't show the music screen if AutoPlayCD is off
+    if (!gCoreContext->GetNumSetting("AutoPlayCD", 0))
+        return;
+
+    if (!gMusicData->initialized)
+        gMusicData->loadMusic();
+
+    // remove any existing CD tracks
+    if (gMusicData->all_music)
+    {
+        gMusicData->all_music->clearCDData();
+        gMusicData->all_playlists->getActive()->removeAllCDTracks();
+    }
+
+    gPlayer->sendCDChangedEvent();
+
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+
+    QString message = qApp->translate("(MythMusicMain)",
+                                      "Searching for music files...");
+    MythUIBusyDialog *busy = new MythUIBusyDialog( message, popupStack,
+                                                    "musicscanbusydialog");
+    if (busy->Create())
+        popupStack->AddScreen(busy, false);
+    else
+    {
+        delete busy;
+        busy = NULL;
+    }
+
+    // Search for music files
+    QStringList trackList = BuildFileList(cd->getMountPath(), GetMusicFilter());
+    LOG(VB_MEDIA, LOG_INFO, QString("MythMusic: %1 music files found")
+                                .arg(trackList.count()));
+
+    if (busy)
+        busy->Close();
+
+    if (trackList.isEmpty())
+        return;
+
+    message = qApp->translate("(MythMusicMain)", "Loading music tracks");
+    MythUIProgressDialog *progress = new MythUIProgressDialog( message,
+                                        popupStack, "scalingprogressdialog");
+    if (progress->Create())
+    {
+        popupStack->AddScreen(progress, false);
+        progress->SetTotal(trackList.count());
+    }
+    else
+    {
+        delete progress;
+        progress = NULL;
+    }
+
+    // Read track metadata and add to all_music
+    int track = 0;
+    for (QStringList::const_iterator it = trackList.begin();
+            it != trackList.end(); ++it)
+    {
+        QScopedPointer<MusicMetadata> meta(MetaIO::readMetadata(*it));
+        if (meta)
+        {
+            meta->setTrack(++track);
+            gMusicData->all_music->addCDTrack(*meta);
+        }
+        if (progress)
+        {
+            progress->SetProgress(track);
+            qApp->processEvents();
+        }
+    }
+    LOG(VB_MEDIA, LOG_INFO, QString("MythMusic: %1 tracks scanned").arg(track));
+
+    if (progress)
+        progress->Close();
+
+    // Remove all tracks from the playlist
+    gMusicData->all_playlists->getActive()->removeAllTracks();
+
+    // Create list of new tracks
+    QList<int> songList;
+    const int tracks = gMusicData->all_music->getCDTrackCount();
+    for (track = 1; track <= tracks; track++)
+    {
+        MusicMetadata *mdata = gMusicData->all_music->getCDMetadata(track);
+        if (mdata)
+            songList.append(mdata->ID());
+    }
+    if (songList.isEmpty())
+        return;
+
+    s_mountPath = cd->getMountPath();
+
+    // Add new tracks to playlist
+    gMusicData->all_playlists->getActive()->fillSonglistFromList(
+            songList, true, PL_REPLACE, 0);
+    gPlayer->setCurrentTrackPos(0);
+
+    // if there is no music screen showing then show the Playlist view
+    if (!gPlayer->hasClient())
+    {
+        // make sure we start playing from the first track
+        gCoreContext->SaveSetting("MusicBookmark", 0);
+        gCoreContext->SaveSetting("MusicBookmarkPosition", 0);
+
+        runMusicPlayback();
+    }
 }
 
 #ifdef HAVE_CDIO
@@ -463,7 +645,7 @@ static void handleCDMedia(MythMediaDevice *cd)
     if (!cd)
         return;
 
-    LOG(VB_MEDIA, LOG_NOTICE, "Got a media changed event");
+    LOG(VB_MEDIA, LOG_NOTICE, "Got a CD media changed event");
 
     QString newDevice;
 
@@ -684,14 +866,17 @@ static void setupKeys(void)
     REG_KEY("Music", "SWITCHTORADIO",                 QT_TRANSLATE_NOOP("MythControls",
         "Switch to the radio stream view"), "");
 
-    REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
-        "MythMusic Media Handler 1/2"), "", "", handleCDMedia,
-        MEDIATYPE_AUDIO | MEDIATYPE_MIXED, QString::null);
-    REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
-        "MythMusic Media Handler 2/2"), "", "", handleMedia,
-        MEDIATYPE_MMUSIC, "mp3,mp2,ogg,oga,flac,wma,wav,ac3,"
-                          "oma,omg,atp,ra,dts,aac,m4a,aa3,tta,"
-                          "mka,aiff,swa,wv");
+    REG_MEDIA_HANDLER(
+        QT_TRANSLATE_NOOP("MythControls", "MythMusic Media Handler 1/2"),
+        QT_TRANSLATE_NOOP("MythControls", "MythMusic audio CD"),
+        "", handleCDMedia, MEDIATYPE_AUDIO | MEDIATYPE_MIXED, QString::null);
+    QString filt = MetaIO::ValidFileExtensions;
+    filt.replace('|',',');
+    filt.remove('.');
+    REG_MEDIA_HANDLER(
+        QT_TRANSLATE_NOOP("MythControls", "MythMusic Media Handler 2/2"),
+        QT_TRANSLATE_NOOP("MythControls", "MythMusic audio files"),
+         "", handleMedia, MEDIATYPE_MMUSIC, filt);
 }
 
 int mythplugin_init(const char *libversion)

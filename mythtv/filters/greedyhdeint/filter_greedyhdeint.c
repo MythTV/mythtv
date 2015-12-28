@@ -173,6 +173,7 @@ static int GreedyHDeint (VideoFilter * f, VideoFrame * frame, int field)
     if (!filter->got_frames[last_frame])
         last_frame = cur_frame;
 
+    int valid = 1;
 #ifdef MMX
     /* SSE Version has best quality. 3DNOW and MMX a litte bit impure */
     if (filter->mm_flags & AV_CPU_FLAG_SSE)
@@ -197,10 +198,13 @@ static int GreedyHDeint (VideoFilter * f, VideoFrame * frame, int field)
             bottom_field, field, frame->width, frame->height);
     }
     else
+#else
+#   warning Greedy HighMotion deinterlace filter requires MMX
 #endif
     {
         /* TODO plain old C implementation */
         (void) bottom_field;
+        valid = 0;
     }
 
 #if 0
@@ -209,7 +213,7 @@ static int GreedyHDeint (VideoFilter * f, VideoFrame * frame, int field)
 #endif
 
     /* convert back to yv12, cause myth only works with this format */
-    yuy2_to_yv12(
+    if ( valid) yuy2_to_yv12(
         filter->deint_frame, 2 * frame->width,
         frame->buf + frame->offsets[0], frame->pitches[0],
         frame->buf + frame->offsets[1], frame->pitches[1],
@@ -260,6 +264,13 @@ static VideoFilter* GreedyHDeintFilter(VideoFrameType inpixfmt,
 #else
     filter->mm_flags = 0;
 #endif
+    if (!(filter->mm_flags & (AV_CPU_FLAG_SSE|AV_CPU_FLAG_3DNOW|AV_CPU_FLAG_MMX)))
+    {
+        /* TODO plain old C implementation */
+        fprintf (stderr, "GreedyHDeint: Requires MMX extensions.\n");
+        CleanupGreedyHDeintFilter(&filter->vf);
+        return NULL;
+    }
 
     filter->vf.filter = &GreedyHDeint;
     filter->vf.cleanup = &CleanupGreedyHDeintFilter;
@@ -278,14 +289,18 @@ const FilterInfo filter_table[] =
             .filter_init= &GreedyHDeintFilter,
             .name=       (char*)"greedyhdeint",
             .descript=   (char*)"combines data from several fields to deinterlace with less motion blur",
+#ifdef MMX
             .formats=    FmtList,
+#endif
             .libname=    NULL
     },
     {
             .filter_init= &GreedyHDeintFilter,
             .name=       (char*)"greedyhdoubleprocessdeint",
             .descript=   (char*)"combines data from several fields to deinterlace with less motion blur",
+#ifdef MMX
             .formats=    FmtList,
+#endif
             .libname=    NULL
     },FILT_NULL
 };

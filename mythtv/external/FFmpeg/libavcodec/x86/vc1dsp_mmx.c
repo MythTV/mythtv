@@ -80,7 +80,7 @@
     "movq      %%mm"#R1", "#OFF"(%1)   \n\t"    \
     "add       %2, %0                  \n\t"
 
-/** Sacrifying mm6 allows to pipeline loads from src */
+/** Sacrificing mm6 makes it possible to pipeline loads from src */
 static void vc1_put_ver_16b_shift2_mmx(int16_t *dst,
                                        const uint8_t *src, x86_reg stride,
                                        int rnd, int64_t shift)
@@ -446,7 +446,7 @@ static void OP ## vc1_mspel_mc(uint8_t *dst, const uint8_t *src, int stride,\
             static const int shift_value[] = { 0, 5, 1, 5 };\
             int              shift = (shift_value[hmode]+shift_value[vmode])>>1;\
             int              r;\
-            DECLARE_ALIGNED(16, int16_t, tmp)[12*8];\
+            LOCAL_ALIGNED(16, int16_t, tmp, [12*8]);\
 \
             r = (1<<(shift-1)) + rnd-1;\
             vc1_put_shift_ver_16bits[vmode](tmp, src-1, stride, r, shift);\

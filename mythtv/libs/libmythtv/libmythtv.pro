@@ -57,18 +57,18 @@ INCLUDEPATH += $$DEPENDPATH
 }
 
 macx {
+    OBJECTIVE_HEADERS += util-osx.h
+    OBJECTIVE_SOURCES += util-osx.mm
+
     # Mac OS X Frameworks
-    FWKS = AGL ApplicationServices Carbon Cocoa CoreServices CoreFoundation OpenGL QuickTime IOKit
-    using_quartz_video {
-        FWKS += QuartzCore
-    } else {
-        FWKS += CoreVideo
-    }
-
-    FC = $$join(FWKS,",")
-
-    QMAKE_CXXFLAGS += -F$${FC}
-    LIBS           += -framework $$join(FWKS," -framework ")
+    LIBS += -framework ApplicationServices
+    LIBS += -framework Cocoa
+    LIBS += -framework CoreServices
+    LIBS += -framework CoreFoundation
+    LIBS += -framework OpenGL
+    LIBS += -framework QuickTime
+    LIBS += -framework IOKit
+    LIBS += -framework CoreVideo
 
     using_firewire:using_backend {
         QMAKE_CXXFLAGS += -F$${CONFIG_MAC_AVC}
@@ -100,7 +100,7 @@ using_valgrind:DEFINES += USING_VALGRIND
 
 # mmx macros from avlib
 contains( HAVE_MMX, yes ) {
-    HEADERS += ../libmythbase/ffmpeg-mmx.h ../../external/FFmpeg/libavcodec/dsputil.h
+    HEADERS += ../libmythbase/ffmpeg-mmx.h ../../external/FFmpeg/libavutil/cpu.h
 }
 
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
@@ -277,8 +277,8 @@ LIBS += -lmythdvdnav-$$LIBVERSION
 DEPENDPATH   += ../../external/libmythbluray/
 INCLUDEPATH  += ../../external/libmythbluray/
 !win32-msvc*:POST_TARGETDEPS += ../../external/libmythbluray/libmythbluray-$${MYTH_LIB_EXT}
-HEADERS += Bluray/bdringbuffer.h
-SOURCES += Bluray/bdringbuffer.cpp
+HEADERS += Bluray/bdiowrapper.h Bluray/bdringbuffer.h
+SOURCES += Bluray/bdiowrapper.cpp Bluray/bdringbuffer.cpp
 using_frontend {
     HEADERS += Bluray/mythbdplayer.h
     SOURCES += Bluray/mythbdplayer.cpp
@@ -290,6 +290,10 @@ using_frontend {
 LIBS += -L../../external/libmythbluray
 LIBS += -lmythbluray-$$LIBVERSION
 
+DEPENDPATH += ../../external/libudfread
+LIBS += -L../../external/libudfread
+LIBS += -lmythudfread-$$LIBVERSION
+
 #HLS stuff
 HEADERS += HLS/httplivestream.h
 SOURCES += HLS/httplivestream.cpp
@@ -300,6 +304,8 @@ SOURCES += HLS/m3u.cpp
 using_libcrypto:DEFINES += USING_LIBCRYPTO
 using_libcrypto:LIBS    += -lcrypto
 
+INCLUDEPATH += ../../external/minilzo
+DEPENDPATH += ../../external/minilzo
 
 using_frontend {
     # Recording profile stuff
@@ -343,6 +349,15 @@ using_frontend {
         HEADERS += privatedecoder_crystalhd.h
         SOURCES += privatedecoder_crystalhd.cpp
         LIBS += -lcrystalhd
+    }
+
+    using_openmax {
+        DEFINES += USING_OPENMAX OMX_SKIP64BIT USING_BROADCOM
+        HEADERS += privatedecoder_omx.h
+        SOURCES += privatedecoder_omx.cpp
+        HEADERS += videoout_omx.h
+        SOURCES += videoout_omx.cpp
+        LIBS += -lopenmaxil
     }
 
     using_libass {
@@ -414,10 +429,6 @@ using_frontend {
         using_opengl: SOURCES += visualisations/videovisualcircles.cpp
     }
 
-    using_quartz_video: DEFINES += USING_QUARTZ_VIDEO
-    using_quartz_video: HEADERS += videoout_quartz.h
-    using_quartz_video: SOURCES += videoout_quartz.cpp
-
     using_x11:DEFINES += USING_X11
 
     using_xv:HEADERS += videoout_xv.h   util-xv.h   osdchromakey.h
@@ -437,6 +448,7 @@ using_frontend {
         DEFINES += USING_OPENGL
         HEADERS += util-opengl.h
         SOURCES += util-opengl.cpp
+        using_opengles: DEFINES += USING_OPENGLES
         QT += opengl
     }
 
@@ -530,6 +542,7 @@ using_backend {
     HEADERS += channelscan/panedvbs.h
     HEADERS += channelscan/panedvbs2.h
     HEADERS += channelscan/panedvbt.h
+    HEADERS += channelscan/panedvbt2.h
     HEADERS += channelscan/panedvbutilsimport.h
     HEADERS += channelscan/panesingle.h
     HEADERS += channelscan/scanmonitor.h
@@ -575,8 +588,8 @@ using_backend {
     SOURCES += recorders/importrecorder.cpp
 
     # Simple NuppelVideo Recorder
-    INCLUDEPATH += ../../external/minilzo
-    DEPENDPATH += ../../external/minilzo
+    #INCLUDEPATH += ../../external/minilzo
+    #DEPENDPATH += ../../external/minilzo
     using_ffmpeg_threads:DEFINES += USING_FFMPEG_THREADS
     !mingw:!win32-msvc*:HEADERS += recorders/NuppelVideoRecorder.h
     HEADERS += recorders/RTjpegN.h
@@ -671,6 +684,10 @@ using_backend {
     SOURCES += recorders/rtp/packetbuffer.cpp
     SOURCES += recorders/rtp/rtppacketbuffer.cpp
 
+    # Support for HTTP TS streams
+    HEADERS += recorders/httptsstreamhandler.h
+    SOURCES += recorders/httptsstreamhandler.cpp
+
     # Suppport for HLS recorder
     HEADERS += recorders/hlsstreamhandler.h
     SOURCES += recorders/hlsstreamhandler.cpp
@@ -710,6 +727,17 @@ using_backend {
         SOURCES *= recorders/streamhandler.cpp
 
         DEFINES += USING_HDHOMERUN
+    }
+
+    # Support for VBox
+    using_vbox {
+        HEADERS += recorders/vboxutils.h
+        HEADERS += channelscan/vboxchannelfetcher.h
+
+        SOURCES += recorders/vboxutils.cpp
+        SOURCES += channelscan/vboxchannelfetcher.cpp
+
+        DEFINES += USING_VBOX
     }
 
     # Support for Ceton

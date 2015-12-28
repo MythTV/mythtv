@@ -1,5 +1,6 @@
 #include <cstdio>
 #include <cstdlib>
+#include <stdint.h>
 #include <sys/time.h>
 #include <time.h>
 #include "config.h"
@@ -507,6 +508,7 @@ void AudioOutputALSA::CloseDevice()
     m_mixer.handle = NULL;
     if (pcm_handle)
     {
+        snd_pcm_drain(pcm_handle);
         snd_pcm_close(pcm_handle);
         pcm_handle = NULL;
     }
@@ -641,18 +643,8 @@ int AudioOutputALSA::GetBufferedOnSoundcard(void) const
     if (snd_pcm_delay(pcm_handle, &delay) < 0)
         return 0;
 
-    snd_pcm_state_t state = snd_pcm_state(pcm_handle);
-
-    if (state == SND_PCM_STATE_RUNNING || state == SND_PCM_STATE_DRAINING)
-    {
-        delay *= output_bytes_per_frame;
-    }
-    else
-    {
-        delay = 0;
-    }
-
-    return delay;
+    // BUG: calling snd_pcm_state causes noise and repeats on the Raspberry Pi
+    return delay * output_bytes_per_frame;
 }
 
 /**
@@ -871,7 +863,7 @@ void AudioOutputALSA::SetVolumeChannel(int channel, int volume)
     if (!(internal_vol && m_mixer.elem))
         return;
 
-    long mixervol = volume * m_mixer.volrange / 100.0f - m_mixer.volmin + 0.5f;
+    long mixervol = long((int64_t(volume) * m_mixer.volrange) / 100) + m_mixer.volmin;
     mixervol = max(mixervol, m_mixer.volmin);
     mixervol = min(mixervol, m_mixer.volmax);
 

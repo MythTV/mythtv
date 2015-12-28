@@ -1440,7 +1440,8 @@ void MythUIButtonList::CalculateArrowStates()
     QMap<int, MythUIButtonListItem*>::const_iterator i = m_ButtonToItem.constBegin();
     while (i != m_ButtonToItem.constEnd())
     {
-        i.value()->setVisible(false);
+        if (i.value())
+            i.value()->setVisible(false);
         ++i;
     }
 
@@ -1526,6 +1527,17 @@ void MythUIButtonList::RemoveItem(MythUIButtonListItem *item)
 
     if (curIndex == -1)
         return;
+
+    QMap<int, MythUIButtonListItem*>::iterator it = m_ButtonToItem.begin();
+    while (it != m_ButtonToItem.end())
+    {
+        if (it.value() == item)
+        {
+            m_ButtonToItem.erase(it);
+            break;
+        }
+        ++it;
+    }
 
     if (curIndex == m_topPosition &&
         m_topPosition > 0 &&
@@ -2626,48 +2638,101 @@ bool MythUIButtonList::gestureEvent(MythGestureEvent *event)
 {
     bool handled = false;
 
-    if (event->gesture() == MythGestureEvent::Click)
+    switch (event->gesture())
     {
-        // We want the relative position of the click
-        QPoint position = event->GetPosition() -
-                          m_Parent->GetArea().topLeft();
-
-        MythUIType *type = GetChildAt(position, false, false);
-
-        if (!type)
-            return false;
-
-        MythUIStateType *object = dynamic_cast<MythUIStateType *>(type);
-
-        if (object)
-        {
-            handled = true;
-            QString name = object->objectName();
-
-            if (name == "upscrollarrow")
+        case MythGestureEvent::Click:
             {
-                MoveUp(MovePage);
-            }
-            else if (name == "downscrollarrow")
-            {
-                MoveDown(MovePage);
-            }
-            else if (name.startsWith("buttonlist button"))
-            {
-                int pos = name.section(' ', 2, 2).toInt();
-                MythUIButtonListItem *item = m_ButtonToItem[pos];
+                // We want the relative position of the click
+                QPoint position = event->GetPosition() -
+                                m_Parent->GetArea().topLeft();
 
-                if (item)
+                MythUIType *type = GetChildAt(position, false, false);
+
+                if (!type)
+                    return false;
+
+                MythUIStateType *object = dynamic_cast<MythUIStateType *>(type);
+
+                if (object)
                 {
-                    if (item == GetItemCurrent())
-                        emit itemClicked(item);
+                    handled = true;
+                    QString name = object->objectName();
+
+                    if (name == "upscrollarrow")
+                    {
+                        MoveUp(MovePage);
+                    }
+                    else if (name == "downscrollarrow")
+                    {
+                        MoveDown(MovePage);
+                    }
+                    else if (name.startsWith("buttonlist button"))
+                    {
+                        int pos = name.section(' ', 2, 2).toInt();
+                        MythUIButtonListItem *item = m_ButtonToItem[pos];
+
+                        if (item)
+                        {
+                            if (item == GetItemCurrent())
+                                emit itemClicked(item);
+                            else
+                                SetItemCurrent(item);
+                        }
+                    }
                     else
-                        SetItemCurrent(item);
+                        handled = false;
                 }
             }
-            else
-                handled = false;
-        }
+            break;
+
+        case MythGestureEvent::Up:
+            if ((m_layout == LayoutVertical) || (m_layout == LayoutGrid))
+                handled = MoveUp(MovePage);
+            break;
+            
+        case MythGestureEvent::UpLeft:
+        case MythGestureEvent::UpRight:
+            if ((m_layout == LayoutVertical) || (m_layout == LayoutGrid))
+                handled = MoveUp(MoveRow);
+            break;
+            
+        case MythGestureEvent::Down:
+            if ((m_layout == LayoutVertical) || (m_layout == LayoutGrid))
+                handled = MoveDown(MovePage);
+            break;
+            
+        case MythGestureEvent::DownLeft:
+        case MythGestureEvent::DownRight:
+            if ((m_layout == LayoutVertical) || (m_layout == LayoutGrid))
+                handled = MoveDown(MoveRow);
+            break;
+            
+        case MythGestureEvent::Right:
+            if (m_layout == LayoutHorizontal)
+                handled = MoveDown(MoveItem);
+            else if (m_layout == LayoutGrid)
+            {
+                if (m_scrollStyle == ScrollFree)
+                    handled = MoveDown(MoveColumn);
+                else
+                    handled = MoveDown(MoveItem);
+            }
+            break;
+            
+        case MythGestureEvent::Left:
+            if (m_layout == LayoutHorizontal)
+                handled = MoveUp(MoveItem);
+            else if (m_layout == LayoutGrid)
+            {
+                if (m_scrollStyle == ScrollFree)
+                    handled = MoveUp(MoveColumn);
+                else
+                    handled = MoveUp(MoveItem);
+            }
+            break;
+            
+        default:
+            break;
     }
 
     return handled;
@@ -3666,7 +3731,7 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
 
             QString newText = text->GetTemplateText();
 
-            QRegExp regexp("%(([^\\|%]+)?\\||\\|(.))?(\\S+)(\\|(.+))?%");
+            QRegExp regexp("%(([^\\|%]+)?\\||\\|(.))?([\\w#]+)(\\|(.+))?%");
             regexp.setMinimal(true);
 
             if (!newText.isEmpty() && newText.contains(regexp))

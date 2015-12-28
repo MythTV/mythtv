@@ -880,7 +880,7 @@ def getDefaultParametersFromMythTVDB():
     # create a cursor
     cursor = DB.cursor()
     # execute SQL statement
-    cursor.execute(sqlstatement, configHostname)
+    cursor.execute(sqlstatement, (configHostname,))
     # get the resultset as a tuple
     result = cursor.fetchall()
 

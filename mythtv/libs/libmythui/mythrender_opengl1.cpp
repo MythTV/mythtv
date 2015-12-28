@@ -1,15 +1,18 @@
 #include "mythrender_opengl1.h"
 
+#include <QPen>
+#include <QBrush>
+
 #define LOC QString("OpenGL1: ")
 
-MythRenderOpenGL1::MythRenderOpenGL1(const QGLFormat& format, QPaintDevice* device)
+MythRenderOpenGL1::MythRenderOpenGL1(const MythRenderFormat& format, QPaintDevice* device)
   : MythRenderOpenGL(format, device, kRenderOpenGL1)
 {
     ResetVars();
     ResetProcs();
 }
 
-MythRenderOpenGL1::MythRenderOpenGL1(const QGLFormat& format)
+MythRenderOpenGL1::MythRenderOpenGL1(const MythRenderFormat& format)
   : MythRenderOpenGL(format, kRenderOpenGL1)
 {
     ResetVars();
@@ -213,11 +216,12 @@ void MythRenderOpenGL1::EnableShaderObject(uint obj)
     doneCurrent();
 }
 
-void MythRenderOpenGL1::SetShaderParams(uint obj, void* vals,
+void MythRenderOpenGL1::SetShaderParams(uint obj, const QMatrix4x4 &m,
                                         const char* uniform)
 {
+    GLMatrix4x4 v(m);
+
     makeCurrent();
-    const float *v = (float*)vals;
 
     EnableShaderObject(obj);
     m_glProgramLocalParameter4fARB(GL_FRAGMENT_PROGRAM_ARB,

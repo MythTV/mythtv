@@ -303,7 +303,7 @@ static int x8_setup_spatial_predictor(IntraX8Context * const w, const int chroma
     int sum;
     int quant;
 
-    w->dsp.setup_spatial_compensation(s->dest[chroma], s->edge_emu_buffer,
+    w->dsp.setup_spatial_compensation(s->dest[chroma], s->sc.edge_emu_buffer,
                                       s->current_picture.f->linesize[chroma>0],
                                       &range, &sum, w->edges);
     if(chroma){
@@ -639,7 +639,7 @@ static int x8_decode_intra_mb(IntraX8Context* const w, const int chroma){
     if(w->flat_dc){
         dsp_x8_put_solidcolor(w->predicted_dc, s->dest[chroma], s->current_picture.f->linesize[!!chroma]);
     }else{
-        w->dsp.spatial_compensation[w->orient]( s->edge_emu_buffer,
+        w->dsp.spatial_compensation[w->orient]( s->sc.edge_emu_buffer,
                                             s->dest[chroma],
                                             s->current_picture.f->linesize[!!chroma] );
     }
@@ -719,9 +719,9 @@ av_cold void ff_intrax8_common_end(IntraX8Context * w)
 /**
  * Decode single IntraX8 frame.
  * The parent codec must fill s->loopfilter and s->gb (bitstream).
- * The parent codec must call MPV_frame_start(), ff_er_frame_start() before calling this function.
- * The parent codec must call ff_er_frame_end(), MPV_frame_end() after calling this function.
- * This function does not use MPV_decode_mb().
+ * The parent codec must call ff_mpv_frame_start(), ff_er_frame_start() before calling this function.
+ * The parent codec must call ff_er_frame_end(), ff_mpv_frame_end() after calling this function.
+ * This function does not use ff_mpv_decode_mb().
  * lowres decoding is theoretically impossible.
  * @param w pointer to IntraX8Context
  * @param dquant doubled quantizer, it would be odd in case of VC-1 halfpq==1.

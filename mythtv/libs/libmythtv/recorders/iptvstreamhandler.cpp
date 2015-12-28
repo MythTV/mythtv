@@ -115,7 +115,7 @@ IPTVStreamHandler::IPTVStreamHandler(const IPTVTuningData &tuning) :
 {
     memset(m_sockets, 0, sizeof(m_sockets));
     memset(m_read_helpers, 0, sizeof(m_read_helpers));
-    m_use_rtp_streaming = m_tuning.GetDataURL().scheme().toUpper() == "RTP";
+    m_use_rtp_streaming = m_tuning.IsRTP();
 }
 
 void IPTVStreamHandler::run(void)
@@ -131,7 +131,7 @@ void IPTVStreamHandler::run(void)
     // Setup
     CetonRTSP *rtsp = NULL;
     IPTVTuningData tuning = m_tuning;
-    if (m_tuning.GetURL(0).scheme().toLower() == "rtsp")
+    if(m_tuning.IsRTSP())
     {
         rtsp = new CetonRTSP(m_tuning.GetURL(0));
 
@@ -169,6 +169,7 @@ void IPTVStreamHandler::run(void)
     }
 
     bool error = false;
+
     int start_port = 0;
     for (uint i = 0; i < IPTV_SOCKET_COUNT; i++)
     {
@@ -279,7 +280,7 @@ void IPTVStreamHandler::run(void)
 
     if (!error)
     {
-        if (m_use_rtp_streaming)
+        if (m_tuning.IsRTP() || m_tuning.IsRTSP())
             m_buffer = new RTPPacketBuffer(tuning.GetBitrate(0));
         else
             m_buffer = new UDPPacketBuffer(tuning.GetBitrate(0));

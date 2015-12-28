@@ -35,7 +35,7 @@ class IPTVChannel : QObject, public DTVChannel
 
     using DTVChannel::Tune;
     virtual bool Tune(const IPTVTuningData&, bool scanning);
-    virtual bool Tune(const DTVMultiplex&, QString) { return false; }
+    virtual bool Tune(const DTVMultiplex&) { return false; }
 
     // Sets
     void SetStreamData(MPEGStreamData*);
@@ -64,6 +64,7 @@ class IPTVChannel : QObject, public DTVChannel
     mutable QMutex     m_stream_lock;
     IPTVStreamHandler *m_stream_handler;
     MPEGStreamData    *m_stream_data;
+    QString            m_videodev;
 };
 
 #endif // _IPTV_CHANNEL_H_

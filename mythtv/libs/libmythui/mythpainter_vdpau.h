@@ -13,7 +13,7 @@ class MythRenderVDPAU;
 class MUI_PUBLIC MythVDPAUPainter : public MythPainter
 {
   public:
-    MythVDPAUPainter(MythRenderVDPAU *render = NULL);
+    explicit MythVDPAUPainter(MythRenderVDPAU *render = NULL);
    ~MythVDPAUPainter();
 
     void SetTarget(uint target)    { m_target = target;     }
