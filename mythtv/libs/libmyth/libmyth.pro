@@ -238,12 +238,19 @@ using_jack {
 }
 
 using_openmax {
-    DEFINES += USING_OPENMAX OMX_SKIP64BIT USING_BROADCOM
+    DEFINES += USING_OPENMAX
     HEADERS += omxcontext.h
     SOURCES += omxcontext.cpp
     HEADERS += audio/audiooutput_omx.h
     SOURCES += audio/audiooutput_omx.cpp
-    LIBS += -lopenmaxil
+    contains( HAVE_OPENMAX_BROADCOM, yes ) {
+        DEFINES += OMX_SKIP64BIT USING_BROADCOM
+        #LIBS += -lopenmaxil
+    }
+    contains( HAVE_OPENMAX_BELLAGIO, yes ) {
+        DEFINES += USING_BELLAGIO
+        #LIBS += -lomxil-bellagio
+    }
 }
 
 contains( HAVE_MMX, yes ) {

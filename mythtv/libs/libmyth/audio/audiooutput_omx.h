@@ -1,8 +1,8 @@
 #ifndef AUDIOOUTPUT_OMX_H
 #define AUDIOOUTPUT_OMX_H
 
-#include <IL/OMX_Types.h>
-#include <IL/OMX_Core.h>
+#include <OMX_Types.h>
+#include <OMX_Core.h>
 
 #include <QMutex>
 #include <QSemaphore>
@@ -16,7 +16,7 @@ class AudioDecoderOMX;
 
 class AudioOutputOMX : public AudioOutputBase, private OMXComponentCtx
 {
-    friend AudioDecoderOMX;
+    friend class AudioDecoderOMX;
 
     // No copying
     AudioOutputOMX(const AudioOutputOMX&);

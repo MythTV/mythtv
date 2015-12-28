@@ -352,12 +352,19 @@ using_frontend {
     }
 
     using_openmax {
-        DEFINES += USING_OPENMAX OMX_SKIP64BIT USING_BROADCOM
+        DEFINES += USING_OPENMAX
         HEADERS += privatedecoder_omx.h
         SOURCES += privatedecoder_omx.cpp
         HEADERS += videoout_omx.h
         SOURCES += videoout_omx.cpp
-        LIBS += -lopenmaxil
+        contains( HAVE_OPENMAX_BROADCOM, yes ) {
+            DEFINES += OMX_SKIP64BIT USING_BROADCOM
+            #LIBS += -lopenmaxil
+        }
+        contains( HAVE_OPENMAX_BELLAGIO, yes ) {
+            DEFINES += USING_BELLAGIO
+            #LIBS += -lomxil-bellagio
+        }
     }
 
     using_libass {

@@ -1,8 +1,8 @@
 #ifndef VIDEOOUT_OMX_H
 #define VIDEOOUT_OMX_H
 
-#include <IL/OMX_Types.h>
-#include <IL/OMX_Core.h>
+#include <OMX_Types.h>
+#include <OMX_Core.h>
 
 #include <QStringList>
 #include <QVector>

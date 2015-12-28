@@ -3,11 +3,11 @@
 
 #include "privatedecoder.h"
 
-#include <IL/OMX_Types.h>
-#include <IL/OMX_Core.h>
-#include <IL/OMX_Component.h>
+#include <OMX_Types.h>
+#include <OMX_Core.h>
+#include <OMX_Component.h>
 #ifdef USING_BROADCOM
-#include <IL/OMX_Broadcom.h>
+#include <OMX_Broadcom.h>
 #endif
 
 #include <QMutex>
