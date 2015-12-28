@@ -219,7 +219,7 @@ void SingleView::paintEvent(QPaintEvent *)
     if (!m_effect_running)
     {
         QPixmap pix(screenwidth, screenheight);
-        pix.fill(this, 0, 0);
+        pix.fill(QWidget::palette().color(this->backgroundRole()));
 
         if (m_pixmap)
         {
@@ -785,7 +785,7 @@ void SingleView::CreateEffectPixmap(void)
     if (!m_effect_pixmap)
         m_effect_pixmap = new QPixmap(screenwidth, screenheight);
 
-    m_effect_pixmap->fill(this, 0, 0);
+    m_effect_pixmap->fill(QWidget::palette().color(this->backgroundRole()));
 
     if (m_pixmap)
     {

@@ -321,11 +321,9 @@ void ThumbGenerator::loadFile(QImage& image, const QFileInfo& fi)
 
         if (!thumbnailCreated)
         {
-            QImage *img = GetMythUI()->LoadScaleImage("gallery-moviethumb.png");
-            if (img)
-            {
-                image = *img;
-            }
+            QString movie("gallery-moviethumb.png");
+            if (GetMythUI()->FindThemeFile(movie))
+                image.load(movie);
         }
     }
     else

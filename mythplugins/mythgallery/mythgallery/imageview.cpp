@@ -1,8 +1,8 @@
 // -*- Mode: c++ -*-
 /* ============================================================
  * File  : imageview.cpp
- * Description : 
- * 
+ * Description :
+ *
  * Copyright 2004-2006 Renchi Raju, Daniel Kristjansson
  *
  * This program is free software; you can redistribute it
@@ -10,12 +10,12 @@
  * Public License as published bythe Free Software Foundation;
  * either version 2, or (at your option)
  * any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * ============================================================ */
 
 // STL headers
@@ -150,7 +150,7 @@ ImageView::ImageView(const ThumbList &itemList,
     // --------------------------------------------------------------------
 
     // since we remove dirs item position might have changed
-    if (origItem) 
+    if (origItem)
         m_pos = m_itemList.indexOf(origItem);
 
     m_pos = (!origItem || (m_pos == -1)) ? 0 : m_pos;
@@ -280,11 +280,9 @@ void ImageView::GetScreenShot(QImage& image, const ThumbItem *item)
     }
     else
     {
-        QImage *img = GetMythUI()->LoadScaleImage("gallery-moviethumb.png");
-        if (img)
-        {
-            image = *img;
-        }
+        QString movie("gallery-moviethumb.png");
+        if (GetMythUI()->FindThemeFile(movie))
+            image.load(movie);
     }
 }
 
