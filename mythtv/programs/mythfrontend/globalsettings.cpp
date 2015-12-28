@@ -2204,25 +2204,34 @@ static HostComboBoxSetting *TVVidModeResolution(int idx=-1)
 
 void HostRefreshRateComboBoxSetting::ChangeResolution(StandardSetting * setting)
 {
+    const QString previousValue = getValue();
+    const bool wasUnchanged = !haveChanged();
+
     clearSelections();
     QString resolution = setting->getValue();
-
+    int hz50 = -1, hz60 = -1;
     const vector<double> list = GetRefreshRates(resolution);
     addSelection(QObject::tr("Auto"), "0");
-    int hz50 = -1, hz60 = -1;
     for (uint i = 0; i < list.size(); ++i)
     {
         QString sel = QString::number((double) list[i], 'f', 3);
-        addSelection(sel + " Hz", sel);
+        addSelection(sel + " Hz", sel, sel == previousValue);
         hz50 = (fabs(50.0 - list[i]) < 0.01) ? i : hz50;
         hz60 = (fabs(60.0 - list[i]) < 0.01) ? i : hz60;
     }
 
-    setValue(0);
-    if ("640x480" == resolution || "720x480" == resolution)
-        setValue(hz60 + 1);
-    if ("640x576" == resolution || "720x576" == resolution)
-        setValue(hz50 + 1);
+    // addSelection() will cause setValue() to be called, marking the setting as
+    // changed even though the previous value might still be available.  Mark it
+    // as unchanged in this case if it wasn't already changed.
+    if (wasUnchanged && previousValue == getValue())
+        setChanged(false);
+    else
+    {
+        if ("640x480" == resolution || "720x480" == resolution)
+            setValue(hz60+1);
+        if ("640x576" == resolution || "720x576" == resolution)
+            setValue(hz50+1);
+    }
 
     setEnabled(list.size());
 }
