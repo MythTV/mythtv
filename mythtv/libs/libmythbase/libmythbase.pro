@@ -33,6 +33,7 @@ HEADERS += mythsystemlegacy.h mythtypes.h
 HEADERS += threadedfilewriter.h mythsingledownload.h codecutil.h
 HEADERS += mythsession.h
 HEADERS += ../../external/qjsonwrapper/qjsonwrapper/Json.h
+HEADERS += cleanupguard.h
 
 SOURCES += mthread.cpp mthreadpool.cpp
 SOURCES += mythsocket.cpp
@@ -53,6 +54,7 @@ SOURCES += mythsystemlegacy.cpp mythtypes.cpp
 SOURCES += threadedfilewriter.cpp mythsingledownload.cpp codecutil.cpp
 SOURCES += mythsession.cpp
 SOURCES += ../../external/qjsonwrapper/qjsonwrapper/Json.cpp
+SOURCES += cleanupguard.cpp
 
 unix {
     SOURCES += mythsystemunix.cpp

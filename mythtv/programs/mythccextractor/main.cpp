@@ -19,6 +19,7 @@ using namespace std;
 #include "ringbuffer.h"
 #include "exitcodes.h"
 #include "signalhandling.h"
+#include "cleanupguard.h"
 
 namespace {
     void cleanup()
@@ -27,24 +28,6 @@ namespace {
         gContext = NULL;
         SignalHandler::Done();
     }
-
-    class CleanupGuard
-    {
-      public:
-        typedef void (*CleanupFunc)();
-
-      public:
-        CleanupGuard(CleanupFunc cleanFunction) :
-            m_cleanFunction(cleanFunction) {}
-
-        ~CleanupGuard()
-        {
-            m_cleanFunction();
-        }
-
-      private:
-        CleanupFunc m_cleanFunction;
-    };
 }
 
 static int RunCCExtract(const ProgramInfo &program_info, const QString & destdir)

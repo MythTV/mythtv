@@ -82,6 +82,7 @@ using namespace std;
 #include "themechooser.h"
 #include "mythversion.h"
 #include "taskqueue.h"
+#include "cleanupguard.h"
 
 // Video
 #include "cleanup.h"
@@ -286,24 +287,6 @@ namespace
 
         SignalHandler::Done();
     }
-
-    class CleanupGuard
-    {
-      public:
-        typedef void (*CleanupFunc)();
-
-      public:
-        CleanupGuard(CleanupFunc cleanFunction) :
-            m_cleanFunction(cleanFunction) {}
-
-        ~CleanupGuard()
-        {
-            m_cleanFunction();
-        }
-
-      private:
-        CleanupFunc m_cleanFunction;
-    };
 }
 
 static void startAppearWiz(void)

@@ -24,6 +24,7 @@
 #include "mythsystemevent.h"
 #include "commandlineparser.h"
 #include "signalhandling.h"
+#include "cleanupguard.h"
 
 #include "controlrequesthandler.h"
 #include "requesthandler/basehandler.h"
@@ -51,27 +52,6 @@ static void cleanup(void)
     }
 
     SignalHandler::Done();
-}
-
-namespace
-{
-    class CleanupGuard
-    {
-      public:
-        typedef void (*CleanupFunc)();
-
-      public:
-        CleanupGuard(CleanupFunc cleanFunction) :
-            m_cleanFunction(cleanFunction) {}
-
-        ~CleanupGuard()
-        {
-            m_cleanFunction();
-        }
-
-      private:
-        CleanupFunc m_cleanFunction;
-    };
 }
 
 int main(int argc, char *argv[])

@@ -29,6 +29,7 @@ using namespace std;
 #include "recordinginfo.h"
 #include "signalhandling.h"
 #include "HLS/httplivestream.h"
+#include "cleanupguard.h"
 
 static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
                         frm_dir_map_t *deleteMap, int &exitCode,
@@ -139,24 +140,6 @@ namespace
         gContext = NULL;
         SignalHandler::Done();
     }
-
-    class CleanupGuard
-    {
-      public:
-        typedef void (*CleanupFunc)();
-
-      public:
-        CleanupGuard(CleanupFunc cleanFunction) :
-            m_cleanFunction(cleanFunction) {}
-
-        ~CleanupGuard()
-        {
-            m_cleanFunction();
-        }
-
-      private:
-        CleanupFunc m_cleanFunction;
-    };
 }
 
 int main(int argc, char *argv[])

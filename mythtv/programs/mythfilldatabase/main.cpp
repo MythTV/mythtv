@@ -29,6 +29,7 @@ using namespace std;
 #include "mythsystemevent.h"
 #include "mythlogging.h"
 #include "signalhandling.h"
+#include "cleanupguard.h"
 
 // filldata headers
 #include "filldata.h"
@@ -40,24 +41,6 @@ namespace
         gContext = NULL;
         SignalHandler::Done();
     }
-
-    class CleanupGuard
-    {
-      public:
-        typedef void (*CleanupFunc)();
-
-      public:
-        CleanupGuard(CleanupFunc cleanFunction) :
-            m_cleanFunction(cleanFunction) {}
-
-        ~CleanupGuard()
-        {
-            m_cleanFunction();
-        }
-
-      private:
-        CleanupFunc m_cleanFunction;
-    };
 }
 
 int main(int argc, char *argv[])

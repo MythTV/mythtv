@@ -46,6 +46,7 @@
 #if CONFIG_DARWIN
 #include "mythuidefines.h"
 #endif
+#include "cleanupguard.h"
 
 using namespace std;
 
@@ -54,24 +55,6 @@ StartPrompter  *startPrompt = NULL;
 
 static MythThemedMenu *menu;
 static QString  logfile;
-
-class CleanupGuard
-{
-  public:
-    typedef void (*CleanupFunc)();
-
-  public:
-    CleanupGuard(CleanupFunc cleanFunction) :
-        m_cleanFunction(cleanFunction) {}
-
-    ~CleanupGuard()
-    {
-        m_cleanFunction();
-    }
-
-  private:
-    CleanupFunc m_cleanFunction;
-};
 
 static void cleanup()
 {

@@ -24,6 +24,7 @@ using namespace std;
 #include "commandlineparser.h"
 #include "mythlogging.h"
 #include "signalhandling.h"
+#include "cleanupguard.h"
 
 #include "lookup.h"
 
@@ -35,24 +36,6 @@ namespace
         gContext = NULL;
         SignalHandler::Done();
     }
-
-    class CleanupGuard
-    {
-      public:
-        typedef void (*CleanupFunc)();
-
-      public:
-        CleanupGuard(CleanupFunc cleanFunction) :
-            m_cleanFunction(cleanFunction) {}
-
-        ~CleanupGuard()
-        {
-            m_cleanFunction();
-        }
-
-      private:
-        CleanupFunc m_cleanFunction;
-    };
 }
 
 bool inJobQueue = false;

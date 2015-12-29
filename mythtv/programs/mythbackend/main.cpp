@@ -43,6 +43,7 @@
 #include "compat.h"
 #include "mythdb.h"
 #include "tv_rec.h"
+#include "cleanupguard.h"
 
 
 #define LOC      QString("MythBackend: ")

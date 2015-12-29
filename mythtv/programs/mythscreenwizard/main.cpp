@@ -41,6 +41,7 @@
 #if CONFIG_DARWIN
 #include "mythuidefines.h"
 #endif
+#include "cleanupguard.h"
 
 #define LOC      QString("MythScreenWizard: ")
 #define LOC_WARN QString("MythScreenWizard, Warning: ")
@@ -63,24 +64,6 @@ namespace
 
         SignalHandler::Done();
     }
-
-    class CleanupGuard
-    {
-      public:
-        typedef void (*CleanupFunc)();
-
-      public:
-        CleanupGuard(CleanupFunc cleanFunction) :
-            m_cleanFunction(cleanFunction) {}
-
-        ~CleanupGuard()
-        {
-            m_cleanFunction();
-        }
-
-      private:
-        CleanupFunc m_cleanFunction;
-    };
 }
 
 // If the theme specified in the DB is somehow broken, try a standard one:
