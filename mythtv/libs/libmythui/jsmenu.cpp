@@ -231,6 +231,59 @@ void JoystickMenuThread::run(void)
 
     while (!m_bStop)
     {
+#ifdef __linux__
+        if(m_configRead && m_readError){
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("Joystick read error, Awaiting Reconnection"));
+            struct udev *udev;
+            udev = udev_new();
+            struct udev_monitor *mon;
+            int fd;
+            struct udev_device *dev;
+            /* Set up a monitor to monitor input devices */
+            mon = udev_monitor_new_from_netlink(udev, "udev");
+            udev_monitor_filter_add_match_subsystem_devtype(mon, "input", NULL);
+            udev_monitor_enable_receiving(mon);
+            /* Get the file descriptor (fd) for the monitor.
+            This fd will get passed to select() */
+            fd = udev_monitor_get_fd(mon);
+            /* This section will run till no error, calling usleep() at
+            the end of each pass. This is to use a udev_monitor in a
+            non-blocking way. */
+            /*===========================================================
+             * instead of a loop, could QSocketNotifier be used here
+             *=========================================================*/
+            while(m_configRead && m_readError){
+                /* Set up the call to select(). In this case, select() will
+                   only operate on a single file descriptor, the one
+                   associated with our udev_monitor. Note that the timeval
+                   object is set to 0, which will cause select() to not
+                   block. 
+                */
+                fd_set fds;
+                struct timeval tv;
+                int ret;
+                FD_ZERO(&fds);
+                FD_SET(fd, &fds);
+                tv.tv_sec = 0;
+                tv.tv_usec = 0;
+                ret = select(fd+1, &fds, NULL, NULL, &tv);
+                /* Check if our file descriptor has received data. */
+                if (ret > 0 && FD_ISSET(fd, &fds)) {
+                     dev = udev_monitor_receive_device(mon);
+                     if (dev) {
+                         this->Init(m_configFile);
+                    }
+                }
+                usleep(250*1000);
+            }
+            //close File Descriptior
+            close(fd);
+            // unref the monitor
+            udev_monitor_unref(mon);
+            delete(udev);
+        }
+#endif
 
         /*--------------------------------------------------------------------
         ** Wait for activity from the joy stick (we wait a configurable
