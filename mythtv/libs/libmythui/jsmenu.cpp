@@ -229,7 +229,7 @@ void JoystickMenuThread::run(void)
     struct js_event js;
     struct timeval timeout;
 
-    while (!m_bStop)
+    while (!m_bStop && m_configRead)
     {
 #ifdef __linux__
         if(m_configRead && m_readError){
