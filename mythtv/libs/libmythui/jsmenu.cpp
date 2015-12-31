@@ -304,7 +304,11 @@ void JoystickMenuThread::run(void)
             **        (what happens when we unplug a joystick?)
             **--------------------------------------------------------------*/
             LOG(VB_GENERAL, LOG_ERR, "select: " + ENO);
+#ifdef __linux__
+            continue;
+#else
             return;
+#endif
         }
 
         if (rc == 1)
@@ -316,7 +320,11 @@ void JoystickMenuThread::run(void)
             if (rc != sizeof(js))
             {
                     LOG(VB_GENERAL, LOG_ERR, "error reading js:" + ENO);
-                    return;
+#ifdef __linux__
+            continue;
+#else
+            return;
+#endif
             }
 
             /*----------------------------------------------------------------
