@@ -49,6 +49,12 @@
 // Mythui headers
 #include "jsmenuevent.h"
 
+#ifdef __linux__
+extern "C" {
+    #include <libudev.h>
+}
+#endif
+
 #define LOC QString("JoystickMenuThread: ")
 
 JoystickMenuThread::JoystickMenuThread(QObject *main_window)
