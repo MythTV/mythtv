@@ -62,6 +62,12 @@ class JoystickMap
             m_axisMap.push_back(new_axis);
         }
 
+        void Clear(){
+            m_axisMap.clear();
+            m_buttonMap.clear();
+        }
+
+
         typedef std::vector<buttonMapType> button_map_t;
         typedef std::vector<axisMapType> axis_map_t;
         const button_map_t &buttonMap() const { return m_buttonMap; }
