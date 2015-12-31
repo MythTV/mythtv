@@ -91,8 +91,12 @@ bool JoystickMenuThread::Init(QString &config_file)
     /*------------------------------------------------------------------------
     ** Read the config file
     **----------------------------------------------------------------------*/
-    if (!ReadConfig(config_file))
+    if (!ReadConfig(config_file)){
+        m_configRead = false;
         return false;
+    }
+    m_configFile = config_file;
+    m_configRead = true;
 
     /*------------------------------------------------------------------------
     ** Open the joystick device, retrieve basic info
@@ -103,7 +107,13 @@ bool JoystickMenuThread::Init(QString &config_file)
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Joystick disabled - Failed to open device %1")
                                                     .arg(m_devicename));
+        m_readError = true;
+        // If udev is avaliable we want to return true on read error to start the required loop
+#ifdef __linux__
+        return true;
+#else
         return false;
+#endif
     }
 
     rc = ioctl(m_fd, JSIOCGAXES, &m_axesCount);
@@ -134,6 +144,7 @@ bool JoystickMenuThread::Init(QString &config_file)
     LOG(VB_GENERAL, LOG_INFO, LOC +
         QString("Initialization of %1 succeeded using config file %2")
                                         .arg(m_devicename) .arg(config_file));
+    m_readError = false;
     return true;
 }
 
