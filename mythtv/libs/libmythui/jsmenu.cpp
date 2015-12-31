@@ -179,6 +179,8 @@ bool JoystickMenuThread::ReadConfig(QString config_file)
         return false;
     }
 
+    m_map.Clear();
+
     QTextStream istream(fp);
     for (int line = 1; ! istream.atEnd(); line++)
     {
