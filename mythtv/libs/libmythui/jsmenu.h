@@ -93,6 +93,10 @@ class JoystickMenuThread : public MThread
 
   private:
     void run(void);
+    bool m_configRead;
+    bool m_readError;
+    // put here to avoid changing other classes
+    QString m_configFile;
 
     QObject *m_mainWindow;
     QString m_devicename;
