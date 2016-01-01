@@ -346,7 +346,7 @@ DTC::ProgramList* Dvr::GetExpiringList( int nStartIndex,
 
     DTC::ProgramList *pPrograms = new DTC::ProgramList();
 
-    nStartIndex   = min( nStartIndex, (int)infoList.size() );
+    nStartIndex   = (nStartIndex > 0) ? min( nStartIndex, (int)infoList.size() ) : 0;
     nCount        = (nCount > 0) ? min( nCount, (int)infoList.size() ) : infoList.size();
     int nEndIndex = min((nStartIndex + nCount), (int)infoList.size() );
 
@@ -665,7 +665,7 @@ DTC::ProgramList* Dvr::GetUpcomingList( int  nStartIndex,
 
     DTC::ProgramList *pPrograms = new DTC::ProgramList();
 
-    nStartIndex   = min( nStartIndex, (int)recordingList.size() );
+    nStartIndex   = (nStartIndex > 0) ? min( nStartIndex, (int)recordingList.size() ) : 0;
     nCount        = (nCount > 0) ? min( nCount, (int)recordingList.size() ) : recordingList.size();
     int nEndIndex = min((nStartIndex + nCount), (int)recordingList.size() );
 
@@ -729,7 +729,7 @@ DTC::ProgramList* Dvr::GetConflictList( int  nStartIndex,
 
     DTC::ProgramList *pPrograms = new DTC::ProgramList();
 
-    nStartIndex   = min( nStartIndex, (int)recordingList.size() );
+    nStartIndex   = (nStartIndex > 0) ? min( nStartIndex, (int)recordingList.size() ) : 0;
     nCount        = (nCount > 0) ? min( nCount, (int)recordingList.size() ) : recordingList.size();
     int nEndIndex = min((nStartIndex + nCount), (int)recordingList.size() );
 
@@ -1126,7 +1126,7 @@ DTC::RecRuleList* Dvr::GetRecordScheduleList( int nStartIndex,
 
     DTC::RecRuleList *pRecRules = new DTC::RecRuleList();
 
-    nStartIndex   = min( nStartIndex, (int)recList.size() );
+    nStartIndex   = (nStartIndex > 0) ? min( nStartIndex, (int)recList.size() ) : 0;
     nCount        = (nCount > 0) ? min( nCount, (int)recList.size() ) : recList.size();
     int nEndIndex = min((nStartIndex + nCount), (int)recList.size() );
 
