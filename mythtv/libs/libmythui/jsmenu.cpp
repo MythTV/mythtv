@@ -305,6 +305,7 @@ void JoystickMenuThread::run(void)
             **--------------------------------------------------------------*/
             LOG(VB_GENERAL, LOG_ERR, "select: " + ENO);
 #ifdef __linux__
+            m_readError =true;
             continue;
 #else
             return;
@@ -321,6 +322,7 @@ void JoystickMenuThread::run(void)
             {
                     LOG(VB_GENERAL, LOG_ERR, "error reading js:" + ENO);
 #ifdef __linux__
+            m_readError = true;
             continue;
 #else
             return;
