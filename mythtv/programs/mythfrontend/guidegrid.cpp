@@ -1626,6 +1626,9 @@ void GuideGrid::fillProgramRowInfos(int firstRow, bool useExistingData)
             m_guideGrid->ResetRow(i);
         }
     }
+
+    m_channelList->SetItemCurrent(m_currentRow);
+
     GuideStatus gs(firstRow, chanNums.size(), chanNums, m_channelInfos.size(),
                    m_guideGrid->GetArea(), m_guideGrid->getChannelCount(),
                    m_currentStartTime, m_currentEndTime, m_currentStartChannel,
@@ -2183,6 +2186,7 @@ void GuideGrid::updateChannelsUI(const QVector<ChannelInfo *> &chinfos,
             }
         }
     }
+    m_channelList->SetItemCurrent(m_currentRow);
 }
 
 void GuideGrid::updateInfo(void)
