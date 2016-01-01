@@ -1616,6 +1616,11 @@ QObject *MythCoreContext::GetGUIObject(void)
     return d->m_GUIobject;
 }
 
+QObject *MythCoreContext::GetGUIContext(void)
+{
+    return d->m_GUIcontext;
+}
+
 MythDB *MythCoreContext::GetDB(void)
 {
     return d->m_database;

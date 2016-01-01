@@ -438,7 +438,7 @@ bool MythSocket::Validate(uint timeout_ms, bool error_dialog_desired)
             .arg(QString::fromUtf8(MYTH_PROTO_TOKEN))
             .arg(strlist[1]));
 
-        QObject *GUIcontext = gCoreContext->GetGUIObject();
+        QObject *GUIcontext = gCoreContext->GetGUIContext();
         if (error_dialog_desired && GUIcontext)
         {
             QStringList list(strlist[1]);
