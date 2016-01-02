@@ -272,7 +272,7 @@ void JoystickMenuThread::run(void)
                 if (ret > 0 && FD_ISSET(fd, &fds)) {
                      dev = udev_monitor_receive_device(mon);
                      if (dev) {
-                         this->Init(m_configFile);
+                             this->Init(m_configFile);
                     }
                 }
                 usleep(250*1000);
@@ -282,6 +282,7 @@ void JoystickMenuThread::run(void)
             // unref the monitor
             udev_monitor_unref(mon);
             delete(udev);
+            delete(dev);
         }
 #endif
 
