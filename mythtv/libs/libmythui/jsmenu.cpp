@@ -233,8 +233,8 @@ void JoystickMenuThread::run(void)
     {
 #ifdef __linux__
         if(m_configRead && m_readError){
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("Joystick read error, Awaiting Reconnection"));
+            LOG(VB_GENERAL, LOG_INFO, LOC +
+                QString("Joystick error, Awaiting Reconnection"));
             struct udev *udev;
             udev = udev_new();
             struct udev_monitor *mon;
