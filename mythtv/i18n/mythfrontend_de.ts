@@ -15139,19 +15139,21 @@ Die Frequenz dieses Senders in Hz.</translation>
         <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="167"/>
         <source>Symbol Rate (symbols/second).
 Most DVB-S transponders transmit at 27.5 million symbols per second.</source>
-        <translation>Symbolrate (Symbole/Sek.). Die meisten DVB-S Transponder senden mit einer Symbolrate von 27,5 Millionen.</translation>
+        <translation>Symbolrate (Symbole/Sek.).
+Die meisten DVB-S Transponder senden mit einer Symbolrate von 27,5 Millionen.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="187"/>
         <source>Symbol Rate (symbols/second).
 Most DVB-C transports transmit at 6.9 or 6.875 million symbols per second.</source>
-        <translation>Symbolrate (Symbole/Sek.). Die meisten DVB-C Transponder senden mit einer Symbolrate von 6,9 oder 6,875 Millionen.</translation>
+        <translation>Symbolrate (Symbole/Sek.).
+Die meisten DVB-C Transponder senden mit einer Symbolrate von 6,9 oder 6,875 Millionen.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="205"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="486"/>
         <source>Polarity</source>
-        <translation>Polarität</translation>
+        <translation>Polarisation</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="207"/>
@@ -15223,17 +15225,17 @@ Most DVB-C transports transmit at 6.9 or 6.875 million symbols per second.</sour
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="344"/>
         <source>Modulation system (Default: DVB-S)</source>
-        <translation>Modulationsssystem (Standard: DVB-S)</translation>
+        <translation>Modulationsart (Standard: DVB-S)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="355"/>
         <source>Roll-off</source>
-        <translation>Rollbewegung</translation>
+        <translation>Roll-Off</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="356"/>
         <source>Roll-off factor (Default: 0.35)</source>
-        <translation>Faktor der Rollbewegung (Standard: 0.35)</translation>
+        <translation>Roll-Off-Faktor (Standard: 0,35)</translation>
     </message>
     <message>
         <source>Terrestrial</source>
@@ -16741,7 +16743,7 @@ Möchten Sie weitersehen?</translation>
         <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="206"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="487"/>
         <source>Polarity (Option has no default)</source>
-        <translation>Polarität (kein Vorgabewert)</translation>
+        <translation>Polarisation (kein Vorgabewert)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="220"/>
@@ -18691,7 +18693,7 @@ Prüfen Sie, ob die Videodatei existiert</translation>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="91"/>
         <source>This section lists each transport that MythTV currently knows about. The display fields are video source, modulation, frequency, and when relevant symbol rate, network id, and transport id.</source>
-        <translation>Diese Liste zeigt alle momentan bekannten Transponder. Angezeigt werden Videoquelle, Modulation, Frequenz und ggf. Symbolrate, Sender-ID und Transport-ID.</translation>
+        <translation>Diese Liste zeigt alle momentan bekannten Transponder. Angezeigt werden Videoquelle, Modulation, Frequenz und ggf. Symbolrate, Netzwerk-ID und Transport-ID.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="183"/>
@@ -18899,7 +18901,7 @@ Die meisten DVB-S Transponder senden mit einer Symbolrate von 27,5 Millionen.</t
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="212"/>
         <source>Set this to the actual network ID at your location, if you have a provider that broadcasts a broken NIT. Leave at -1 if everything works out of the box.</source>
-        <translation>Setzen Sie dies auf die aktuelle Network ID Ihres Standortes falls Ihr Provider eine kaputte NIT sendet. Lassen Sie den Wert auf -1 wenn alles funktioniert.</translation>
+        <translation>Setzen Sie dies auf die tatsächliche Netzwerk-ID Ihres Standortes, falls Ihr Provider eine kaputte NIT sendet. Lassen Sie den Wert auf -1 wenn alles funktioniert.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="319"/>
