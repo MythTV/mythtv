@@ -11,7 +11,6 @@ SUBDIRS += libmythbluray
 SUBDIRS += libmythdvdnav
 SUBDIRS += libsamplerate
 SUBDIRS += libudfread
-SUBDIRS += qjson/src
 SUBDIRS += nzmqt/src/nzmqt.pro
 SUBDIRS += minilzo
 SUBDIRS += libmythsoundtouch
