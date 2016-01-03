@@ -165,7 +165,6 @@ win32 {
         }
 
         EXTRA_LIBS += -lmythnzmqt
-        EXTRA_LIBS += -lmythqjson
 
 
     }
@@ -236,7 +235,6 @@ win32 {
         EXTRA_LIBS += $$CONFIG_OPENGL_LIBS
     }
 
-    EXTRA_LIBS += -L$$SRC_PATH_BARE/external/qjson/lib -lmythqjson
 
     contains( CONFIG_MYTHLOGSERVER, "yes" ) {
         INCLUDEPATH += $$SRC_PATH_BARE/external/zeromq/include

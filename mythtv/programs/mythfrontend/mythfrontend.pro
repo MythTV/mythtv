@@ -143,7 +143,6 @@ android {
     ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIBCOMMON)libmythswscale.so
     ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIBCOMMON)libmythavcodec.so
     ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIBCOMMON)libmythavformat.so
-    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIB)libmythqjson.so
     ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIB)libmythbase-0.28.so
     ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIB)libmythui-0.28.so
     ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIB)libmythservicecontracts-0.28.so
