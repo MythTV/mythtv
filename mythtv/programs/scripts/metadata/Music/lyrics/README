@@ -84,3 +84,19 @@ Options:
               </lyrics>
 
 -d, --debug: This option should turn on extra debug output
+
+
+
+Current Grabbers And Their Priority
+===================================
+
+EmbeddedLyrics 100
+FileLyrics     105
+TTPlayer       110
+Baidu          120
+GomAudio       135
+Lyrdb          150
+LyricsWiki     200
+Genius         210
+LyricsMode     220
+DarkLyrics     230

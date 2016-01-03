@@ -8,7 +8,7 @@ from common import utilities
 __author__      = "Paul Harrison and ronie'"
 __title__       = "LyricsMode"
 __description__ = "Search http://www.lyricsmode.com for lyrics"
-__priority__    = "210"
+__priority__    = "220"
 __version__     = "0.1"
 __syncronized__ = False
 
