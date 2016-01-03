@@ -118,7 +118,6 @@ win32 {
 
         INCLUDEPATH += ./
         INCLUDEPATH += $$SRC_PATH_BARE/external
-        INCLUDEPATH += $$SRC_PATH_BARE/external/qjson/src
 
         contains( CONFIG_MYTHLOGSERVER, "yes" ) {
             INCLUDEPATH += $$SRC_PATH_BARE/external/zeromq/include
@@ -208,7 +207,6 @@ win32 {
     MYTH_LIB_EXT  =$${LIBVERSION}.$${QMAKE_EXTENSION_LIB}
 
     INCLUDEPATH += $$unique(CONFIG_INCLUDEPATH)
-    INCLUDEPATH += $$SRC_PATH_BARE/external/qjson/include
 
     LOCAL_LIBDIR_OGL =
     !isEmpty( QMAKE_LIBDIR_OPENGL ) {

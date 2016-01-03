@@ -8278,9 +8278,6 @@ if enabled mythlogserver; then
     (cd external/nzmqt/src ; \
            ${qmakeconf} -o Makefile)
 fi
-echo "Configuring qjson..."
-(cd external/qjson ; \
-       ${qmakeconf} -o Makefile)
 if ! disabled hdhomerun ; then
     echo "Configuring libhdhomerun..."
     (cd external/libhdhomerun; \
