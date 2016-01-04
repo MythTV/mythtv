@@ -51,6 +51,72 @@ static int ClearEIT(const MythUtilCommandLineParser &cmdline)
             MythDB::DBError("Delete program entries from EIT", query);
             result = GENERIC_EXIT_NOT_OK;
         }
+
+        // delete programrating for all channels that use EIT on sources that use EIT
+        sql = "DELETE FROM programrating WHERE chanid IN ("
+              "SELECT chanid FROM channel WHERE useonairguide=1 AND sourceid IN ("
+              "SELECT sourceid FROM videosource WHERE useeit=1";
+        if (-1 != sourceid)
+        {
+            sql += " AND sourceid = :SOURCEID";
+        }
+        sql += "));";
+        query.prepare(sql);
+        if (-1 != sourceid)
+        {
+            query.bindValue(":SOURCEID", sourceid);
+        }
+        LOG(VB_GENERAL, LOG_DEBUG,
+            QString("Deleting program rating entries from EIT."));
+        if (!query.exec())
+        {
+            MythDB::DBError("Delete program rating entries from EIT", query);
+            result = GENERIC_EXIT_NOT_OK;
+        }
+
+        // delete credits for all channels that use EIT on sources that use EIT
+        sql = "DELETE FROM credits WHERE chanid IN ("
+              "SELECT chanid FROM channel WHERE useonairguide=1 AND sourceid IN ("
+              "SELECT sourceid FROM videosource WHERE useeit=1";
+        if (-1 != sourceid)
+        {
+            sql += " AND sourceid = :SOURCEID";
+        }
+        sql += "));";
+        query.prepare(sql);
+        if (-1 != sourceid)
+        {
+            query.bindValue(":SOURCEID", sourceid);
+        }
+        LOG(VB_GENERAL, LOG_DEBUG,
+            QString("Deleting credits from EIT."));
+        if (!query.exec())
+        {
+            MythDB::DBError("Delete credits from EIT", query);
+            result = GENERIC_EXIT_NOT_OK;
+        }
+
+        // delete program genres for all channels that use EIT on sources that use EIT
+        sql = "DELETE FROM programgenres WHERE chanid IN ("
+              "SELECT chanid FROM channel WHERE useonairguide=1 AND sourceid IN ("
+              "SELECT sourceid FROM videosource WHERE useeit=1";
+        if (-1 != sourceid)
+        {
+            sql += " AND sourceid = :SOURCEID";
+        }
+        sql += "));";
+        query.prepare(sql);
+        if (-1 != sourceid)
+        {
+            query.bindValue(":SOURCEID", sourceid);
+        }
+        LOG(VB_GENERAL, LOG_DEBUG,
+            QString("Deleting program genre entries from EIT."));
+        if (!query.exec())
+        {
+            MythDB::DBError("Delete program genre entries from EIT", query);
+            result = GENERIC_EXIT_NOT_OK;
+        }
     }
 
     return result;
