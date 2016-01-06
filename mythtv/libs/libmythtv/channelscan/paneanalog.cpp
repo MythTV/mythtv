@@ -6,11 +6,11 @@
 #include "paneanalog.h"
 #include "videosource.h"
 
-PaneAnalog::PaneAnalog() :
-    VerticalConfigurationGroup(false, false, true, false),
+PaneAnalog::PaneAnalog(const QString &target, StandardSetting *setting) :
     freq_table(new TransFreqTableSelector(0))
 {
-    addChild(freq_table);
+    setVisible(false);
+    setting->addTargetedChildren(target, {this, freq_table});
 }
 
 void PaneAnalog::SetSourceID(uint sourceid)

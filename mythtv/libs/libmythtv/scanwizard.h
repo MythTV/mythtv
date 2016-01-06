@@ -37,11 +37,12 @@
 #include "mythdbcon.h"
 #include "mythwizard.h"
 #include "settings.h"
+#include "standardsettings.h"
 
 class ScanWizardConfig;
 class ChannelScannerGUI;
 
-class MTV_PUBLIC ScanWizard : public QObject, public ConfigurationWizard
+class MTV_PUBLIC ScanWizard : public GroupSetting
 {
     Q_OBJECT
 
@@ -50,14 +51,11 @@ class MTV_PUBLIC ScanWizard : public QObject, public ConfigurationWizard
                uint    default_cardid    = 0,
                QString default_inputname = QString::null);
 
-    MythDialog *dialogWidget(MythMainWindow *parent, const char *widgetName);
+    ~ScanWizard() { }
 
   protected slots:
-    void SetPage(const QString &pageTitle);
+    void Scan();
     void SetInput(const QString &cardid_inputname);
-
-  protected:
-    ~ScanWizard() { }
 
   protected:
     uint               lastHWCardID;

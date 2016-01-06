@@ -633,6 +633,11 @@ void MythUIComboBoxSetting::fillSelectionsFromDir(const QDir &dir, bool absPath)
     }
 }
 
+int MythUIComboBoxSetting::size(void) const
+{
+    return m_labels.size();
+}
+
 /******************************************************************************
                             SpinBox Setting
 *******************************************************************************/

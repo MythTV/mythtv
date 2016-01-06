@@ -69,7 +69,7 @@ class VideoSourceDBStorage : public SimpleDBStorage
     const VideoSource& m_parent;
 };
 
-class VideoSourceSelector : public ComboBoxSetting, public TransientStorage
+class VideoSourceSelector : public TransMythUIComboBoxSetting
 {
     Q_OBJECT
 
@@ -98,7 +98,7 @@ protected:
     QString freq;
 };
 
-class TransFreqTableSelector : public ComboBoxSetting, public TransientStorage
+class TransFreqTableSelector : public TransMythUIComboBoxSetting
 {
   public:
     explicit TransFreqTableSelector(uint _sourceid);

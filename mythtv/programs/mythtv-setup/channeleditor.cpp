@@ -499,11 +499,21 @@ void ChannelEditor::menu()
 void ChannelEditor::scan(void)
 {
 #ifdef USING_BACKEND
-    ScanWizard *scanwizard = new ScanWizard(m_sourceFilter);
-    scanwizard->exec(false, true);
-    scanwizard->deleteLater();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    StandardSettingDialog *ssd =
+        new StandardSettingDialog(mainStack, "scanwizard",
+                                  new ScanWizard(m_sourceFilter));
+    if (ssd->Create())
+    {
+        mainStack->AddScreen(ssd);
+    }
+    else
+        delete ssd;
 
-    fillList();
+//    scanwizard->exec(false, true);
+//    scanwizard->deleteLater();
+//
+//    fillList();
 #else
     LOG(VB_GENERAL, LOG_ERR,
         "You must compile the backend to be able to scan for channels");

@@ -280,7 +280,7 @@ TransportListEditor::TransportListEditor(uint sourceid) :
 
     m_list->SetSourceID(m_videosource->GetSourceID());
 
-    addChild(m_videosource);
+//    addChild(m_videosource);
     addChild(m_list);
 
     connect(m_videosource, SIGNAL(valueChanged(const QString&)),

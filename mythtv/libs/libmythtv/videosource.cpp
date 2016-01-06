@@ -63,7 +63,6 @@ static const uint kDefaultMultirecCount = 2;
 VideoSourceSelector::VideoSourceSelector(uint           _initial_sourceid,
                                          const QString &_card_types,
                                          bool           _must_have_mplexid) :
-    ComboBoxSetting(this),
     initial_sourceid(_initial_sourceid),
     card_types(_card_types),
     must_have_mplexid(_must_have_mplexid)
@@ -385,7 +384,7 @@ FreqTableSelector::FreqTableSelector(const VideoSource &parent) :
 }
 
 TransFreqTableSelector::TransFreqTableSelector(uint _sourceid) :
-    ComboBoxSetting(this), sourceid(_sourceid),
+    sourceid(_sourceid),
     loaded_freq_table(QString::null)
 {
     setLabel(QObject::tr("Channel frequency table"));
@@ -3542,17 +3541,29 @@ void CardInput::channelScanner(void)
         return;
     }
 
-    ScanWizard *scanwizard = new ScanWizard(srcid, crdid, in);
-    scanwizard->exec(false, true);
-    scanwizard->deleteLater();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    StandardSettingDialog *ssd =
+        new StandardSettingDialog(mainStack, "generalsettings",
+                                  new ScanWizard(srcid, crdid, in));
 
-    if (SourceUtil::GetChannelCount(srcid))
-        startchan->SetSourceID(QString::number(srcid));
-    if (num_channels_before)
+    if (ssd->Create())
     {
-        startchan->Load();
-        startchan->Save();
+        connect(ssd, &StandardSettingDialog::Exiting,
+                [=]()
+                {
+                    if (SourceUtil::GetChannelCount(srcid))
+                        startchan->SetSourceID(QString::number(srcid));
+                    if (num_channels_before)
+                    {
+                        startchan->Load();
+                        startchan->Save();
+                    }
+                });
+        mainStack->AddScreen(ssd);
     }
+    else
+        delete ssd;
+
 #else
     LOG(VB_GENERAL, LOG_ERR, "You must compile the backend "
                              "to be able to scan for channels");

@@ -221,6 +221,7 @@ class MPUBLIC MythUIComboBoxSetting : public StandardSetting
     void clearSelections();
     void fillSelectionsFromDir(const QDir &dir, bool absPath = true);
     virtual void updateButton(MythUIButtonListItem *item);
+    virtual int size(void) const;
 
   public slots:
     void setValue(const QString&);
