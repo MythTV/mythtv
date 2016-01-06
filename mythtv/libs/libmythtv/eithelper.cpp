@@ -244,7 +244,7 @@ void EITHelper::AddETT(uint atsc_major, uint atsc_minor,
 static void parse_dvb_event_descriptors(desc_list_t list, uint fix,
                                         QMap<uint,uint> languagePreferences,
                                         QString &title, QString &subtitle,
-                                        QString &description)
+                                        QString &description, QMap<QString,QString> &items)
 {
     const unsigned char *bestShortEvent =
         MPEGDescriptor::FindBestMatch(
@@ -332,6 +332,9 @@ static void parse_dvb_event_descriptors(desc_list_t list, uint fix,
             description += eed.Text(enc, enc_len);
         else
             description += eed.Text();
+
+        // add items from the decscriptor to the items
+        items.unite (eed.Items());
     }
 }
 
@@ -402,6 +405,7 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
         ProgramInfo::CategoryType category_type = ProgramInfo::kCategoryNone;
         unsigned char subtitle_type=0, audio_props=0, video_props=0;
         uint season = 0, episode = 0, totalepisodes = 0;
+        QMap<QString,QString> items;
 
         // Parse descriptors
         desc_list_t list = MPEGDescriptor::Parse(
@@ -433,7 +437,7 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
         else
         {
             parse_dvb_event_descriptors(list, fix, languagePreferences,
-                                        title, subtitle, description);
+                                        title, subtitle, description, items);
         }
 
         parse_dvb_component_descriptors(list, subtitle_type, audio_props,
@@ -692,6 +696,7 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
             video_props, stars,
             seriesId,  programId,
             season, episode, totalepisodes);
+        event->items = items;
 
         db_events.enqueue(event);
     }
@@ -712,13 +717,14 @@ void EITHelper::AddEIT(const PremiereContentInformationTable *cit)
     ProgramInfo::CategoryType category_type = ProgramInfo::kCategoryNone;
     unsigned char subtitle_type=0, audio_props=0, video_props=0;
     uint season = 0, episode = 0, totalepisodes = 0;
+    QMap<QString,QString> items;
 
     // Parse descriptors
     desc_list_t list = MPEGDescriptor::Parse(
         cit->Descriptors(), cit->DescriptorsLength());
 
     parse_dvb_event_descriptors(list, fix, languagePreferences,
-                                title, subtitle, description);
+                                title, subtitle, description, items);
 
     parse_dvb_component_descriptors(list, subtitle_type, audio_props,
                                     video_props);
@@ -801,6 +807,7 @@ void EITHelper::AddEIT(const PremiereContentInformationTable *cit)
                 video_props, 0.0,
                 "",  "",
                 season, episode, totalepisodes);
+            event->items = items;
 
             db_events.enqueue(event);
         }
