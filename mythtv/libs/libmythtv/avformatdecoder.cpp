@@ -2378,6 +2378,10 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 video_codec_id = (MythCodecID)(kCodec_MPEG1 + version - 1);
 
                 // Check it's a codec we can decode using GPU
+#ifdef USING_OPENMAX
+            // The OpenMAX decoder supports H264 high 10, 422 and 444 profiles
+            if (dec != "openmax")
+#endif
             if (force_sw_decode(enc))
             {
                 dec = "ffmpeg";
