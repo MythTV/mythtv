@@ -74,4 +74,8 @@ class TestMPEGTables: public QObject
     /** test ParentalRatingDescriptor, #12553
      */
     void ParentalRatingDescriptor_test (void);
+
+    /** test items from ExtendedEventDescriptor
+     */
+    void ExtendedEventDescriptor_test (void);
 };

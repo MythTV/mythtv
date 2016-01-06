@@ -678,3 +678,24 @@ QString AC3Descriptor::toString(void) const
         ret += QString("asvc(%1) ").arg(ASVC());
     return ret;
 }
+
+QMap<QString,QString> ExtendedEventDescriptor::Items(void) const
+{
+    QMap<QString, QString> ret;
+
+    uint index = 0;
+
+    /* handle all items
+     * minimum item size is for 8bit length + 8bit length
+     */
+    while (LengthOfItems() - index >= 2)
+    {
+        QString item_description = dvb_decode_text (&_data[8 + index], _data[7 + index]);
+        index += 1 + _data[7 + index];
+        QString item = dvb_decode_text (&_data[8 + index], _data[7 + index]);
+        index += 1 + _data[7 + index];
+        ret.insertMulti (item_description, item);
+    }
+
+    return ret;
+}

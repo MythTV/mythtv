@@ -299,4 +299,15 @@ void TestMPEGTables::ParentalRatingDescriptor_test (void)
     QCOMPARE (desc.Rating(0), 14);
 }
 
+void TestMPEGTables::ExtendedEventDescriptor_test (void)
+{
+    ExtendedEventDescriptor desc(&eit_data_0000[16*13+12]);
+    QCOMPARE (desc.LengthOfItems(), 139u);
+    QMultiMap<QString,QString> items = desc.Items();
+    QCOMPARE (items.count(), 5);
+    QVERIFY (items.contains (QString ("Role Player")));
+    QCOMPARE (items.count (QString ("Role Player")), 5);
+    QCOMPARE (items.count (QString ("Role Player"), QString ("Nathan Fillion")), 1);
+}
+
 QTEST_APPLESS_MAIN(TestMPEGTables)
