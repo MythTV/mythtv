@@ -143,6 +143,14 @@ void printEvent(const DBEventEIT& event, const QString& name)
     printf("SubtitleType   %s\n",  getSubtitleType(event.subtitleType).toLocal8Bit().constData());
     printf("Audio props    %s\n",  getAudioProps(event.audioProps).toLocal8Bit().constData());
     printf("Video props    %s\n",  getVideoProps(event.videoProps).toLocal8Bit().constData());
+    if (event.credits && !event.credits->empty())
+    {
+        printf("Credits      %3lu\n", event.credits->size());
+    }
+    if (!event.items.isEmpty())
+    {
+        printf("Items        %3d\n", event.items.count());
+    }
     printf("\n");
 }
 
@@ -343,7 +351,7 @@ void TestEITFixups::testUKFixups9()
     QCOMPARE(event9.description, QString("Includes sport and weather"));
 }
 
-DBEventEIT *TestEITFixups::SimpleDBEventEIT (uint fixup, QString title, QString subtitle, QString description)
+DBEventEIT *TestEITFixups::SimpleDBEventEIT (FixupValue fixup, QString title, QString subtitle, QString description)
 {
     DBEventEIT *event = new DBEventEIT (1, // channel id
                                        title, // title
@@ -545,6 +553,36 @@ void TestEITFixups::testSkyEpisodes()
     QCOMPARE(event3->description, QString("Ab 12 Jahren"));
     QCOMPARE(event3->season,  0u);
     QCOMPARE(event3->episode, 0u);
+}
+
+void TestEITFixups::testUnitymedia()
+{
+    EITFixUp fixup;
+
+    DBEventEIT *event = SimpleDBEventEIT (EITFixUp::kFixUnitymedia,
+                                         "Titel",
+                                         "Beschreib",
+                                         "Beschreibung ... IMDb Rating: 8.9 /10");
+    QMap<QString,QString> cast;
+    cast.insertMulti ("Role Player", "Great Actor");
+    cast.insertMulti ("Role Player", "Other Actor");
+    cast.insertMulti ("Director", "Great Director");
+    cast.insertMulti ("Unhandled", "lets fix it up");
+    event->items = cast;
+
+    QVERIFY(!event->HasCredits());
+    QCOMPARE(event->items.count(), 4);
+
+    PRINT_EVENT(*event);
+    fixup.Fix(*event);
+    PRINT_EVENT(*event);
+
+    QVERIFY(event->HasCredits());
+    QCOMPARE(event->credits->size(), 3ul);
+    QVERIFY(event->subtitle.isEmpty());
+    QCOMPARE(event->description, QString("Beschreibung ..."));
+    QCOMPARE(event->stars, 0.89f);
+    QCOMPARE(event->items.count(), 1);
 }
 
 QTEST_APPLESS_MAIN(TestEITFixups)

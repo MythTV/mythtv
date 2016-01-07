@@ -58,6 +58,7 @@ class EITFixUp
         kFixAUSeven          = 1 << 21,
         kFixP7S1             = 1 << 26,
         kFixHTML             = 1 << 27,
+        kFixUnitymedia       = 1ll << 32,
 
         // Early fixups
         kEFixForceISO8859_1  = 1 << 22,
@@ -114,6 +115,7 @@ class EITFixUp
     void FixGreekSubtitle(DBEventEIT &event) const; // Greek Nat TV fix
     void FixGreekEIT(DBEventEIT &event) const;
     void FixGreekCategories(DBEventEIT &event) const; // Greek categories from descr.
+    void FixUnitymedia(DBEventEIT &event) const;    // handle cast/crew from Unitymedia
 
     static QString AddDVBEITAuthority(uint chanid, const QString &id);
 
@@ -291,6 +293,7 @@ class EITFixUp
     const QRegExp m_grCategSciFi;  // Greek category for Science Fiction
     const QRegExp m_grCategHealth; //Greek category for Health
     const QRegExp m_grCategSpecial; //Greek category for specials.
+    const QRegExp m_unitymediaImdbrating; ///< IMDb Rating
 };
 
 #endif // EITFIXUP_H
