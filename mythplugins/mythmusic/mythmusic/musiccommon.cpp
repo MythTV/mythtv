@@ -437,8 +437,9 @@ void MusicCommon::switchView(MusicView view)
 
         case MV_LYRICS:
         {
-            if (view != MV_VISUALIZER)
+            if (view != MV_VISUALIZER && view != MV_SEARCH)
                 return;
+            break;
         }
 
         case MV_RADIO:
