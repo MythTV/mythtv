@@ -314,7 +314,7 @@ void MusicFileScanner::AddFileToDB(const QString &filename, const QString &start
 
         // Set values from cache
         int did = m_directoryid[directory];
-        if (did > 0)
+        if (did >= 0)
             data->setDirectoryId(did);
 
         int aid = m_artistid[data->Artist().toLower()];
