@@ -2089,6 +2089,12 @@
             <align>right</align>
         </textarea>
 
+        <textarea name="songid" from="basetextarea">
+            <area>1090,5,80,35</area>
+            <font>basesmaller</font>
+            <align>right, top</align>
+        </textarea>
+
         <textarea name="title" from="basetextarea">
             <area>520,50,630,35</area>
             <font>basemedium</font>
