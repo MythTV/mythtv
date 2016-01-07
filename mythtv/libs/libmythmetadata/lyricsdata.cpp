@@ -115,8 +115,7 @@ void LyricsData::findLyrics(const QString &grabber)
               << album
               << title;
 
-   LOG(VB_GENERAL, LOG_ERR,
-            QString("LyricsData:: Sending command %1").arg(slist.join('~')));
+   LOG(VB_NETWORK, LOG_INFO, QString("LyricsData:: Sending command %1").arg(slist.join('~')));
 
    gCoreContext->SendReceiveStringList(slist);
 }
