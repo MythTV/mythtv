@@ -114,7 +114,7 @@ bool ZMClient::connectToHost(const QString &lhostname, unsigned int lport)
     {
         if (GetNotificationCenter())
         {
-            ShowNotificationError("Can't connect to the mythzmserver" , "MythZoneMinder",
+            ShowNotificationError(tr("Can't connect to the mythzmserver") , "MythZoneMinder",
                                tr("Is it running? "
                                   "Have you set the correct IP and port in the settings?"));
         }
