@@ -1,31 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="es_ES">
-<defaultcodec>UTF-8</defaultcodec>
+<TS version="2.1" language="es_ES">
 <context>
     <name>FunctionDialog</name>
     <message>
-        <location filename="../mythzoneminder/zmconsole.cpp" line="70"/>
         <source>OK</source>
-        <translation>Aceptar</translation>
+        <translation type="vanished">Aceptar</translation>
     </message>
 </context>
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythzoneminder/main.cpp" line="164"/>
+        <location filename="../mythzoneminder/main.cpp" line="180"/>
         <source>ZoneMinder Console</source>
         <translation>Consola de ZoneMinder</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/main.cpp" line="166"/>
+        <location filename="../mythzoneminder/main.cpp" line="182"/>
         <source>ZoneMinder Live View</source>
         <translation>Vista en vivo de ZoneMinder</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/main.cpp" line="168"/>
+        <location filename="../mythzoneminder/main.cpp" line="184"/>
         <source>ZoneMinder Events</source>
         <translation>Eventos de ZoneMinder</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/main.cpp" line="186"/>
+        <source>ZoneMinder Mini Live View</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -292,12 +295,21 @@
 <context>
     <name>ZMClient</name>
     <message>
-        <location filename="../mythzoneminder/zmclient.cpp" line="117"/>
         <source>Cannot connect to the mythzmserver - Is it running? Have you set the correct IP and port in the settings?</source>
-        <translation>No es posible conectar con mythzmserver - ¿Está ejecutándose? ¿Ha establecido la IP y el puerto correctos en la configuración?</translation>
+        <translation type="vanished">No es posible conectar con mythzmserver - ¿Está ejecutándose? ¿Ha establecido la IP y el puerto correctos en la configuración?</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmclient.cpp" line="200"/>
+        <location filename="../mythzoneminder/zmclient.cpp" line="117"/>
+        <source>Can&apos;t connect to the mythzmserver</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmclient.cpp" line="118"/>
+        <source>Is it running? Have you set the correct IP and port in the settings?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmclient.cpp" line="204"/>
         <source>The mythzmserver didn&apos;t respond to our request to get the protocol version!!</source>
         <translation>¡¡El mythzmserver no respondió a nuestra petición de obtener la versión del protocolo!!</translation>
     </message>
@@ -305,12 +317,12 @@
 <context>
     <name>ZMConsole</name>
     <message>
-        <location filename="../mythzoneminder/zmconsole.cpp" line="208"/>
+        <location filename="../mythzoneminder/zmconsole.cpp" line="211"/>
         <source>Running</source>
         <translation>Ejecutándose</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmconsole.cpp" line="213"/>
+        <location filename="../mythzoneminder/zmconsole.cpp" line="216"/>
         <source>Stopped</source>
         <translation>Detenido</translation>
     </message>
@@ -379,12 +391,12 @@
 <context>
     <name>ZMLivePlayer</name>
     <message>
-        <location filename="../mythzoneminder/zmliveplayer.cpp" line="135"/>
+        <location filename="../mythzoneminder/zmliveplayer.cpp" line="150"/>
         <source>Can&apos;t show live view.</source>
         <translation>No es posible mostrar la vista en vivo.</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmliveplayer.cpp" line="136"/>
+        <location filename="../mythzoneminder/zmliveplayer.cpp" line="151"/>
         <source>You don&apos;t have any monitors defined!</source>
         <translation>¡No ha definido ningún monitor!</translation>
     </message>

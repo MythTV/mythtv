@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="el_GR">
-<defaultcodec>UTF-8</defaultcodec>
+<TS version="2.1" language="el_GR">
 <context>
     <name>MythControls</name>
     <message>
@@ -289,12 +288,17 @@
 <context>
     <name>ZMClient</name>
     <message>
+        <location filename="../mythzoneminder/zmclient.cpp" line="117"/>
+        <source>Can&apos;t connect to the mythzmserver</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../mythzoneminder/zmclient.cpp" line="118"/>
         <source>Is it running? Have you set the correct IP and port in the settings?</source>
         <translation>Είναι σε λειτουργία; Έχετε εισάγει τη σωστή διεύθυνση ip και θύρα στις ρυθμίσεις;</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmclient.cpp" line="202"/>
+        <location filename="../mythzoneminder/zmclient.cpp" line="204"/>
         <source>The mythzmserver didn&apos;t respond to our request to get the protocol version!!</source>
         <translation>O διακομιστής mythzmserver δεν αποκρίθηκε στην αίτηση για έκδοση πρωτοκόλλου!!</translation>
     </message>
@@ -302,12 +306,12 @@
 <context>
     <name>ZMConsole</name>
     <message>
-        <location filename="../mythzoneminder/zmconsole.cpp" line="210"/>
+        <location filename="../mythzoneminder/zmconsole.cpp" line="211"/>
         <source>Running</source>
         <translation>Ενεργό</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmconsole.cpp" line="215"/>
+        <location filename="../mythzoneminder/zmconsole.cpp" line="216"/>
         <source>Stopped</source>
         <translation>Σταματημένο</translation>
     </message>

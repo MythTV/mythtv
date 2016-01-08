@@ -1,30 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="en_US">
+<TS version="2.1" language="en_US">
 <context>
     <name>FunctionDialog</name>
     <message>
-        <location filename="../mythzoneminder/zmconsole.cpp" line="70"/>
         <source>OK</source>
-        <translation>OK</translation>
+        <translation type="vanished">OK</translation>
     </message>
 </context>
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythzoneminder/main.cpp" line="130"/>
+        <location filename="../mythzoneminder/main.cpp" line="180"/>
         <source>ZoneMinder Console</source>
         <translation>ZoneMinder Console</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/main.cpp" line="132"/>
+        <location filename="../mythzoneminder/main.cpp" line="182"/>
         <source>ZoneMinder Live View</source>
         <translation>ZoneMinder Live View</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/main.cpp" line="134"/>
+        <location filename="../mythzoneminder/main.cpp" line="184"/>
         <source>ZoneMinder Events</source>
         <translation>ZoneMinder Events</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/main.cpp" line="186"/>
+        <source>ZoneMinder Mini Live View</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -290,12 +294,21 @@
 <context>
     <name>ZMClient</name>
     <message>
-        <location filename="../mythzoneminder/zmclient.cpp" line="117"/>
         <source>Cannot connect to the mythzmserver - Is it running? Have you set the correct IP and port in the settings?</source>
-        <translation>Cannot connect to the mythzmserver - Is it running? Have you set the correct IP and port in the settings?</translation>
+        <translation type="vanished">Cannot connect to the mythzmserver - Is it running? Have you set the correct IP and port in the settings?</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmclient.cpp" line="200"/>
+        <location filename="../mythzoneminder/zmclient.cpp" line="117"/>
+        <source>Can&apos;t connect to the mythzmserver</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmclient.cpp" line="118"/>
+        <source>Is it running? Have you set the correct IP and port in the settings?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmclient.cpp" line="204"/>
         <source>The mythzmserver didn&apos;t respond to our request to get the protocol version!!</source>
         <translation>The mythzmserver didn&apos;t respond to our request to get the protocol version!!</translation>
     </message>
@@ -303,12 +316,12 @@
 <context>
     <name>ZMConsole</name>
     <message>
-        <location filename="../mythzoneminder/zmconsole.cpp" line="208"/>
+        <location filename="../mythzoneminder/zmconsole.cpp" line="211"/>
         <source>Running</source>
         <translation>Running</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmconsole.cpp" line="213"/>
+        <location filename="../mythzoneminder/zmconsole.cpp" line="216"/>
         <source>Stopped</source>
         <translation>Stopped</translation>
     </message>
@@ -316,50 +329,60 @@
 <context>
     <name>ZMEvents</name>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="96"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="100"/>
         <source>Play</source>
         <translation>Play</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="103"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="107"/>
         <source>Delete</source>
         <translation>Delete</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="179"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="185"/>
         <location filename="../mythzoneminder/zmevents.cpp" line="354"/>
         <location filename="../mythzoneminder/zmevents.cpp" line="369"/>
         <source>All Cameras</source>
         <translation>All Cameras</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="182"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="188"/>
         <location filename="../mythzoneminder/zmevents.cpp" line="378"/>
         <source>All Dates</source>
         <translation>All Dates</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="454"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="456"/>
         <source>Refresh</source>
         <translation>Refresh</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="455"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="459"/>
+        <source>Don&apos;t Show Continuous Events</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmevents.cpp" line="461"/>
+        <source>Show Continuous Events</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmevents.cpp" line="463"/>
         <source>Change View</source>
         <translation>Change View</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="456"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="464"/>
         <source>Delete All</source>
         <translation>Delete All</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="468"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="482"/>
         <source>Delete All Events?</source>
         <translation>Delete All Events?</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="469"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="483"/>
         <source>Deleting %1 events in this view.</source>
         <translation>Deleting %1 events in this view.</translation>
     </message>
@@ -367,12 +390,12 @@
 <context>
     <name>ZMLivePlayer</name>
     <message>
-        <location filename="../mythzoneminder/zmliveplayer.cpp" line="119"/>
+        <location filename="../mythzoneminder/zmliveplayer.cpp" line="150"/>
         <source>Can&apos;t show live view.</source>
         <translation>Can&apos;t show live view.</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmliveplayer.cpp" line="120"/>
+        <location filename="../mythzoneminder/zmliveplayer.cpp" line="151"/>
         <source>You don&apos;t have any monitors defined!</source>
         <translation>You don&apos;t have any monitors defined!</translation>
     </message>
@@ -381,7 +404,7 @@
     <name>ZMPlayer</name>
     <message>
         <location filename="../mythzoneminder/zmplayer.cpp" line="101"/>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="290"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="287"/>
         <source>Pause</source>
         <translation>Pause</translation>
     </message>
@@ -401,8 +424,8 @@
         <translation>Next</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="297"/>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="376"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="294"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="373"/>
         <source>Play</source>
         <translation>Play</translation>
     </message>

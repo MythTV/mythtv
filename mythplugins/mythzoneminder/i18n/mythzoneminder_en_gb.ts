@@ -298,6 +298,11 @@
         <translation type="vanished">Cannot connect to mythzmserver - Is it running? Have you set the correct IP and port in the settings?</translation>
     </message>
     <message>
+        <location filename="../mythzoneminder/zmclient.cpp" line="117"/>
+        <source>Can&apos;t connect to the mythzmserver</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../mythzoneminder/zmclient.cpp" line="118"/>
         <source>Is it running? Have you set the correct IP and port in the settings?</source>
         <translation>Is it running? Have you specified the correct IP address and port?</translation>
