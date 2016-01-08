@@ -425,13 +425,17 @@
     </message>
     <message>
         <location filename="../mythzoneminder/zmevents.cpp" line="459"/>
+        <source>Hide Continuous Events</source>
+        <translation>permanente Ereignisse ausblenden</translation>
+    </message>
+    <message>
         <source>Don&apos;t Show Continuous Events</source>
-        <translation type="unfinished">Ereignisse durchgehende anzeigen nicht</translation>
+        <translation type="obsolete">Ereignisse durchgehende anzeigen nicht</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmevents.cpp" line="461"/>
         <source>Show Continuous Events</source>
-        <translation type="unfinished">Ereignisse durchgehende anzeigen</translation>
+        <translation>permanente Ereignisse zeigen</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmevents.cpp" line="463"/>
