@@ -1,34 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="sv_SE">
+<TS version="2.0" language="sv_SE">
 <context>
     <name>FunctionDialog</name>
     <message>
+        <location filename="../mythzoneminder/zmconsole.cpp" line="70"/>
         <source>OK</source>
-        <translation type="vanished">OK</translation>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythzoneminder/main.cpp" line="180"/>
+        <location filename="../mythzoneminder/main.cpp" line="130"/>
         <source>ZoneMinder Console</source>
         <translation>Övervakningsterminal</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/main.cpp" line="182"/>
+        <location filename="../mythzoneminder/main.cpp" line="132"/>
         <source>ZoneMinder Live View</source>
         <translation>Direktvisning av övervakning</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/main.cpp" line="184"/>
+        <location filename="../mythzoneminder/main.cpp" line="134"/>
         <source>ZoneMinder Events</source>
         <translation>Övervakningshändelser</translation>
-    </message>
-    <message>
-        <location filename="../mythzoneminder/main.cpp" line="186"/>
-        <source>ZoneMinder Mini Live View</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -295,21 +291,12 @@
 <context>
     <name>ZMClient</name>
     <message>
-        <source>Cannot connect to the mythzmserver - Is it running? Have you set the correct IP and port in the settings?</source>
-        <translation type="vanished">Kan  inte ansluta till övervakningsservern &apos;mythzmserver&apos;. Kör den? Har du ställt in rätt IP-adress och port i inställningarna?</translation>
-    </message>
-    <message>
         <location filename="../mythzoneminder/zmclient.cpp" line="117"/>
-        <source>Can&apos;t connect to the mythzmserver</source>
-        <translation type="unfinished"></translation>
+        <source>Cannot connect to the mythzmserver - Is it running? Have you set the correct IP and port in the settings?</source>
+        <translation>Kan  inte ansluta till övervakningsservern &apos;mythzmserver&apos;. Kör den? Har du ställt in rätt IP-adress och port i inställningarna?</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmclient.cpp" line="118"/>
-        <source>Is it running? Have you set the correct IP and port in the settings?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythzoneminder/zmclient.cpp" line="204"/>
+        <location filename="../mythzoneminder/zmclient.cpp" line="200"/>
         <source>The mythzmserver didn&apos;t respond to our request to get the protocol version!!</source>
         <translation>Övervakningsservern svarade inte på en begäran om att få protokollversionen!</translation>
     </message>
@@ -317,12 +304,12 @@
 <context>
     <name>ZMConsole</name>
     <message>
-        <location filename="../mythzoneminder/zmconsole.cpp" line="211"/>
+        <location filename="../mythzoneminder/zmconsole.cpp" line="208"/>
         <source>Running</source>
         <translation>Kör</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmconsole.cpp" line="216"/>
+        <location filename="../mythzoneminder/zmconsole.cpp" line="213"/>
         <source>Stopped</source>
         <translation>Stoppad</translation>
     </message>
@@ -330,60 +317,50 @@
 <context>
     <name>ZMEvents</name>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="100"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="96"/>
         <source>Play</source>
         <translation>Visa</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="107"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="103"/>
         <source>Delete</source>
         <translation>Ta bort</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="185"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="179"/>
         <location filename="../mythzoneminder/zmevents.cpp" line="354"/>
         <location filename="../mythzoneminder/zmevents.cpp" line="369"/>
         <source>All Cameras</source>
         <translation>Alla kameror</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="188"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="182"/>
         <location filename="../mythzoneminder/zmevents.cpp" line="378"/>
         <source>All Dates</source>
         <translation>Alla datum</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="456"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="454"/>
         <source>Refresh</source>
         <translation>Uppdatera</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="459"/>
-        <source>Don&apos;t Show Continuous Events</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="461"/>
-        <source>Show Continuous Events</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="463"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="455"/>
         <source>Change View</source>
         <translation>Ändra vy</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="464"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="456"/>
         <source>Delete All</source>
         <translation>Ta bort alla</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="482"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="468"/>
         <source>Delete All Events?</source>
         <translation>Ta bort alla händelser?</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="483"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="469"/>
         <source>Deleting %1 events in this view.</source>
         <translation>Tar bort %1 händelser i vyn.</translation>
     </message>
@@ -391,12 +368,12 @@
 <context>
     <name>ZMLivePlayer</name>
     <message>
-        <location filename="../mythzoneminder/zmliveplayer.cpp" line="150"/>
+        <location filename="../mythzoneminder/zmliveplayer.cpp" line="119"/>
         <source>Can&apos;t show live view.</source>
         <translation>Kan inte visa direktsändning.</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmliveplayer.cpp" line="151"/>
+        <location filename="../mythzoneminder/zmliveplayer.cpp" line="120"/>
         <source>You don&apos;t have any monitors defined!</source>
         <translation>Du har inte några skärmar definierade!</translation>
     </message>
@@ -405,7 +382,7 @@
     <name>ZMPlayer</name>
     <message>
         <location filename="../mythzoneminder/zmplayer.cpp" line="101"/>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="287"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="290"/>
         <source>Pause</source>
         <translation>Paus</translation>
     </message>
@@ -425,8 +402,8 @@
         <translation>Nästa</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="294"/>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="373"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="297"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="376"/>
         <source>Play</source>
         <translation>Visa</translation>
     </message>

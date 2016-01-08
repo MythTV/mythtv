@@ -456,7 +456,7 @@ void ZMEvents::showMenu()
     m_menuPopup->AddButton(tr("Refresh"), SLOT(getEventList()));
 
     if (m_showContinuous)
-        m_menuPopup->AddButton(tr("Hide Continuous Events"), SLOT(toggleShowContinuous()));
+        m_menuPopup->AddButton(tr("Don't Show Continuous Events"), SLOT(toggleShowContinuous()));
     else
         m_menuPopup->AddButton(tr("Show Continuous Events"), SLOT(toggleShowContinuous()));
 

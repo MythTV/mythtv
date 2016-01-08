@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="it_IT">
+<TS version="2.0" language="it_IT">
+<defaultcodec>UTF-8</defaultcodec>
 <context>
     <name>FunctionDialog</name>
     <message>
@@ -343,11 +344,6 @@
     <message>
         <source>Cannot connect to the mythzmserver - Is it running? Have you set the correct IP and port in the settings?</source>
         <translation type="obsolete">Impossibile connettersi al server mythzmserve - È in esecuzione? È stato impostato correttamente l&apos;IP e la porta nelle impostazioni?</translation>
-    </message>
-    <message>
-        <location filename="../mythzoneminder/zmclient.cpp" line="117"/>
-        <source>Can&apos;t connect to the mythzmserver</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmclient.cpp" line="118"/>
