@@ -2631,7 +2631,7 @@ void ExternalConfigurationGroup::probeApp(const QString & path)
         if (!fileInfo.isReadable() || !fileInfo.isFile())
             ci = tr("File not readable: ");
         if (!fileInfo.isExecutable())
-            ci = tr("File is not exacutable: ");
+            ci = tr("File is not executable: ");
     }
     else
     {
