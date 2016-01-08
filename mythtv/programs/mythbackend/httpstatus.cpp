@@ -1398,12 +1398,16 @@ int HttpStatus::PrintMachineInfo( QTextStream &os, QDomElement info )
             QString sStatus = e.attribute( "status"   , ""  );
             QDateTime next  = MythDate::fromString( e.attribute( "next"     , ""  ));
             QString sNext   = next.isNull() ? "" :
-                                MythDate::toString(next, MythDate::kDatabase);
+                                MythDate::toString(next, MythDate::kDateTimeFull);
             QString sMsg    = "";
 
             QDateTime thru  = MythDate::fromString( e.attribute( "guideThru", ""  ));
 
             QDomText  text  = e.firstChild().toText();
+
+            QString mfdblrs =
+                gCoreContext->GetSetting("mythfilldatabaseLastRunStart");
+            QDateTime lastrunstart = MythDate::fromString(mfdblrs);
 
             if (!text.isNull())
                 sMsg = text.nodeValue();
@@ -1418,7 +1422,7 @@ int HttpStatus::PrintMachineInfo( QTextStream &os, QDomElement info )
 
             os << sStatus << "<br />\r\n";
 
-            if (!next.isNull() && sNext >= sStart)
+            if (!next.isNull() && next >= lastrunstart)
             {
                 os << "    Suggested next mythfilldatabase run: "
                     << sNext << ".<br />\r\n";
