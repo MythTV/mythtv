@@ -6,6 +6,9 @@
 #include <algorithm>
 using namespace std;
 
+// Qt includes
+#include <QtCore> // for qAbs
+
 // MythTV headers
 #include "programdata.h"
 #include "channelutil.h"
@@ -470,9 +473,9 @@ int DBEvent::GetMatch(const vector<DBEvent> &programs, int &bestmatch) const
         int mv = 0;
         int duration_loop = programs[i].starttime.secsTo(programs[i].endtime);
 
-        mv -= abs(starttime.secsTo(programs[i].starttime));
-        mv -= abs(endtime.secsTo(programs[i].endtime));
-        mv -= abs(duration - duration_loop);
+        mv -= qAbs(starttime.secsTo(programs[i].starttime));
+        mv -= qAbs(endtime.secsTo(programs[i].endtime));
+        mv -= qAbs(duration - duration_loop);
         mv += score_match(title, programs[i].title) * 10;
         mv += score_match(subtitle, programs[i].subtitle);
         mv += score_match(description, programs[i].description);
