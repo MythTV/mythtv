@@ -1118,7 +1118,7 @@ void VideoOutput::ShowPIP(VideoFrame  *frame,
         if (pip_tmp_buf && pip_scaling_context)
         {
             AVPicture img_in, img_out;
-            int size = avpicture_fill(
+            avpicture_fill(
                 &img_out, (uint8_t *)pip_tmp_buf, PIX_FMT_YUV420P,
                 pip_display_size.width(), pip_display_size.height());
 
@@ -1140,15 +1140,15 @@ void VideoOutput::ShowPIP(VideoFrame  *frame,
                 av_picture_pad(&img_padded, &img_out, piph, pipw,
                                PIX_FMT_YUV420P, 4, 4, 4, 4, color);
 
-                int offsets[3] = {0, img_padded.data[1] - img_padded.data[0],
-                                    img_padded.data[2] - img_padded.data[0] };
+                int offsets[3] = {0, int(img_padded.data[1] - img_padded.data[0]),
+                                    int(img_padded.data[2] - img_padded.data[0]) };
                 init(&pip_tmp_image, FMT_YV12, img_padded.data[0], pipw, piph,
                     sizeof(int), img_padded.linesize, offsets);
             }
             else
             {
-                int offsets[3] = {0, img_out.data[1] - img_out.data[0],
-                                    img_out.data[2] - img_out.data[0] };
+                int offsets[3] = {0, int(img_out.data[1] - img_out.data[0]),
+                                    int(img_out.data[2] - img_out.data[0]) };
                 init(&pip_tmp_image, FMT_YV12, img_out.data[0], pipw, piph,
                     sizeof(int), img_out.linesize, offsets);
             }
