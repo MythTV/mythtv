@@ -46,7 +46,7 @@ public:
     LoadAlbumListener(ImageView *parent);
     virtual ~LoadAlbumListener();
 private slots:
-    void finishLoading() const;
+    void FinishLoading() const;
 };  
 
 class ImageView
@@ -60,6 +60,8 @@ class ImageView
     virtual ~ImageView();
 
   protected:
+    static SequenceBase *ComposeSlideshowSequence(int slideshow_sequencing);
+
     // Commands
     virtual void Rotate(int angle) = 0;
     virtual void DisplayNext(bool reset, bool loadImage) = 0;
@@ -83,7 +85,8 @@ class ImageView
 
   private:
     friend class LoadAlbumListener;
-    void finishLoading();
+    void FinishLoading();
+    double GetSeasonalWeight(ThumbItem *item);
 
   protected:
     QSize                  m_screenSize;

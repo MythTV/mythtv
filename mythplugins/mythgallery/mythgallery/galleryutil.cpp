@@ -351,7 +351,7 @@ QString GalleryUtil::GetCaption(const QString &filePath)
                 if (entry)
                 {
 #if NEW_LIB_EXIF
-                    exif_entry_get_value(entry, exifvalue, 1023);
+                    exif_entry_get_value(entry, exifvalue, 1024);
                     caption = exifvalue;
 #else
                     caption = exif_entry_get_value(entry);
@@ -366,7 +366,7 @@ QString GalleryUtil::GetCaption(const QString &filePath)
                 if (entry)
                 {
 #if NEW_LIB_EXIF
-                    exif_entry_get_value(entry, exifvalue, 1023);
+                    exif_entry_get_value(entry, exifvalue, 1024);
                     caption = exifvalue;
 #else
                     caption = exif_entry_get_value(entry);
@@ -395,6 +395,68 @@ QString GalleryUtil::GetCaption(const QString &filePath)
     }
 
     return caption;
+}
+
+QDateTime GalleryUtil::GetTimestamp(const QString &filePath)
+{
+    QDateTime timestamp;
+
+    try
+    {
+#ifdef EXIF_SUPPORT
+#if NEW_LIB_EXIF
+        char *exifvalue = new char[20];
+#endif
+        ExifData *data = exif_data_new_from_file(
+            filePath.toLocal8Bit().constData());
+        if (data)
+        {
+            for (int i = 0; i < EXIF_IFD_COUNT; i++)
+            {
+                ExifEntry *entry = exif_content_get_entry (data->ifd[i],
+                    EXIF_TAG_DATE_TIME_ORIGINAL);
+                if (entry)
+                {
+#if NEW_LIB_EXIF
+                    exif_entry_get_value(entry, exifvalue, 20);
+                    QString formatted = exifvalue;
+#else
+                    QString formatted = exif_entry_get_value(entry);
+#endif
+                    timestamp = QDateTime::fromString(formatted,
+                        "yyyy:MM:dd hh:mm:ss");
+                    if (timestamp.isValid())
+                    {
+                        // Found one, done
+                        break;
+                    }
+                    else
+                    {
+                        LOG(VB_FILE, LOG_ERR, LOC +
+                            QString("Could not parse exif timestamp from '%1'")
+                            .arg(filePath));
+                    }
+                }
+            }
+            exif_data_free(data);
+        }
+        else
+        {
+           LOG(VB_FILE, LOG_ERR, LOC +
+               QString("Could not load exif data from '%1'") .arg(filePath));
+        }
+#if NEW_LIB_EXIF
+        delete [] exifvalue;
+#endif
+#endif // EXIF_SUPPORT
+    }
+    catch (...)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Failed to extract EXIF headers from '%1'") .arg(filePath));
+    }
+
+    return timestamp;
 }
 
 bool GalleryUtil::Copy(const QFileInfo &src, QFileInfo &dst)

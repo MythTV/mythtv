@@ -453,7 +453,7 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
             m_movieState = 1;
         }
         else if (action == "PLAY" || action == "SLIDESHOW" ||
-                 action == "RANDOMSHOW")
+                 action == "RANDOMSHOW" || action == "SEASONALSHOW")
         {
             m_source_x   = 0;
             m_source_y   = 0;

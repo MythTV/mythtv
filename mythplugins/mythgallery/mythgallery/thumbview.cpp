@@ -59,6 +59,12 @@ void ThumbItem::InitCaption(bool get_caption)
         SetCaption(m_name);
 }
 
+void ThumbItem::InitTimestamp()
+{
+    if (!HasTimestamp())
+        SetTimestamp(GalleryUtil::GetTimestamp(m_path));
+}
+
 void ThumbItem::SetRotationAngle(int angle)
 {
     MSqlQuery query(MSqlQuery::InitCon());
