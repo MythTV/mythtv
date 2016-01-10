@@ -1461,7 +1461,11 @@ static enum PixelFormat get_format_vdpau(struct AVCodecContext *avctx,
     {
         static uint8_t *dummy[1] = { 0 };
         avctx->hwaccel_context = nd->GetPlayer()->GetDecoderContext(NULL, dummy[0]);
-        ((AVVDPAUContext*)(avctx->hwaccel_context))->render2 = render_wrapper_vdpau;
+        if (avctx->hwaccel_context)
+        {
+            ((AVVDPAUContext*)(avctx->hwaccel_context))->render2 =
+                render_wrapper_vdpau;
+        }
     }
     return AV_PIX_FMT_VDPAU;
 }
