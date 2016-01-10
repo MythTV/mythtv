@@ -61,9 +61,11 @@ class MUI_PUBLIC MythRenderVDPAU : public MythRender
     static bool gVDPAUSupportChecked;
     static uint gVDPAUBestScaling;
     static bool gVDPAUMPEG4Accel;
+    static bool gVDPAUHEVCAccel;
     static bool gVDPAUNVIDIA;
     static bool IsVDPAUAvailable(void);
     static bool IsMPEG4Available(void);
+    static bool IsHEVCAvailable(void);
     static bool H264DecoderSizeSupported(uint width, uint height);
     bool        CreateDummy(void);
 
