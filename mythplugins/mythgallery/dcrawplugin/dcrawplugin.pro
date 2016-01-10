@@ -15,4 +15,5 @@ SOURCES += dcrawformats.cpp
 SOURCES += dcrawhandler.cpp
 SOURCES += dcrawplugin.cpp
 
-QT += sql widgets
+QT += sql
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
