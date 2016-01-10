@@ -77,6 +77,13 @@
    </button>
 
     <button>
+        <type>IMAGES</type>
+        <text>View Images</text>
+        <description>Look at pictures</description>
+        <action>JUMP Gallery Default</action>
+    </button>
+
+    <button>
         <type>MENU_PLUGINS</type>
         <text>Plugins</text>
         <description>Other Plugins</description>
