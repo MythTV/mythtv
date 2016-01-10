@@ -200,6 +200,10 @@ long GalleryUtil::GetNaturalRotation(void *exifData)
     long rotateAngle = 0;
 
 #ifdef EXIF_SUPPORT
+    // Qt 5.4.1 automatically orientates images according to their EXIF data
+    if (strcmp(qVersion(), "5.4.1") == 0)
+        return 0;
+
     ExifData *data = (ExifData *)exifData;
 
     if (!data)
@@ -261,7 +265,7 @@ bool GalleryUtil::LoadDirectory(ThumbList& itemList, const QString& dir,
     // Create .thumbcache dir if neccesary
     if (thumbGen)
         thumbGen->getThumbcacheDir(currDir);
-    
+
     QFileInfoList list = d.entryInfoList(GetMediaFilter(),
                                          QDir::Files | QDir::AllDirs |
                                          QDir::NoDotAndDotDot,
