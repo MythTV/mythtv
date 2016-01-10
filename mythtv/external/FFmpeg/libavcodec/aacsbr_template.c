@@ -70,6 +70,7 @@ av_cold void AAC_RENAME(ff_aac_sbr_init)(void)
 /** Places SBR in pure upsampling mode. */
 static void sbr_turnoff(SpectralBandReplication *sbr) {
     sbr->start = 0;
+    sbr->ready_for_dequant = 0;
     // Init defults used in pure upsampling mode
     sbr->kx[1] = 32; //Typo in spec, kx' inits to 32
     sbr->m[1] = 0;
@@ -177,6 +178,7 @@ static unsigned int read_sbr_header(SpectralBandReplication *sbr, GetBitContext 
     SpectrumParameters old_spectrum_params;
 
     sbr->start = 1;
+    sbr->ready_for_dequant = 0;
 
     // Save last spectrum parameters variables to compare to new ones
     memcpy(&old_spectrum_params, &sbr->spectrum_params, sizeof(SpectrumParameters));
@@ -716,8 +718,8 @@ static int read_sbr_grid(AACContext *ac, SpectralBandReplication *sbr,
     }
 
     for (i = 1; i <= ch_data->bs_num_env; i++) {
-        if (ch_data->t_env[i-1] > ch_data->t_env[i]) {
-            av_log(ac->avctx, AV_LOG_ERROR, "Non monotone time borders\n");
+        if (ch_data->t_env[i-1] >= ch_data->t_env[i]) {
+            av_log(ac->avctx, AV_LOG_ERROR, "Not strictly monotone time borders\n");
             return -1;
         }
     }
@@ -1032,6 +1034,7 @@ static unsigned int read_sbr_data(AACContext *ac, SpectralBandReplication *sbr,
     unsigned int cnt = get_bits_count(gb);
 
     sbr->id_aac = id_aac;
+    sbr->ready_for_dequant = 1;
 
     if (id_aac == TYPE_SCE || id_aac == TYPE_CCE) {
         if (read_sbr_single_channel_element(ac, sbr, gb)) {
@@ -1151,6 +1154,9 @@ static void sbr_qmf_analysis(AVFloatDSPContext *dsp, FFTContext *mdct,
                              INTFLOAT z[320], INTFLOAT W[2][32][32][2], int buf_idx)
 {
     int i;
+#if USE_FIXED
+    int j;
+#endif
     memcpy(x    , x+1024, (320-32)*sizeof(x[0]));
     memcpy(x+288, in,         1024*sizeof(x[0]));
     for (i = 0; i < 32; i++) { // numTimeSlots*RATE = 16*2 as 960 sample frames
@@ -1158,6 +1164,21 @@ static void sbr_qmf_analysis(AVFloatDSPContext *dsp, FFTContext *mdct,
         dsp->vector_fmul_reverse(z, sbr_qmf_window_ds, x, 320);
         sbrdsp->sum64x5(z);
         sbrdsp->qmf_pre_shuffle(z);
+#if USE_FIXED
+        for (j = 64; j < 128; j++) {
+            if (z[j] > 1<<24) {
+                av_log(NULL, AV_LOG_WARNING,
+                       "sbr_qmf_analysis: value %09d too large, setting to %09d\n",
+                       z[j], 1<<24);
+                z[j] = 1<<24;
+            } else if (z[j] < -(1<<24)) {
+                av_log(NULL, AV_LOG_WARNING,
+                       "sbr_qmf_analysis: value %09d too small, setting to %09d\n",
+                       z[j], -(1<<24));
+                z[j] = -(1<<24);
+            }
+        }
+#endif
         mdct->imdct_half(mdct, z, z+64);
         sbrdsp->qmf_post_shuffle(W[buf_idx][i], z);
         x += 32;
@@ -1412,7 +1433,7 @@ static void sbr_env_estimate(AAC_FLOAT (*e_curr)[48], INTFLOAT X_high[64][40][2]
 
             for (p = 0; p < sbr->n[ch_data->bs_freq_res[e + 1]]; p++) {
 #if USE_FIXED
-                SoftFloat sum = { 0, 0 };
+                SoftFloat sum = FLOAT_0;
                 const SoftFloat den = av_int2sf(0x20000000 / (env_size * (table[p + 1] - table[p])), 29);
                 for (k = table[p]; k < table[p + 1]; k++) {
                     sum = av_add_sf(sum, sbr->dsp.sum_square(X_high[k] + ilb, iub - ilb));
@@ -1449,6 +1470,12 @@ void AAC_RENAME(ff_sbr_apply)(AACContext *ac, SpectralBandReplication *sbr, int 
         sbr_turnoff(sbr);
     }
 
+    if (sbr->start && !sbr->ready_for_dequant) {
+        av_log(ac->avctx, AV_LOG_ERROR,
+               "No quantized data read for sbr_dequant.\n");
+        sbr_turnoff(sbr);
+    }
+
     if (!sbr->kx_and_m_pushed) {
         sbr->kx[0] = sbr->kx[1];
         sbr->m[0] = sbr->m[1];
@@ -1458,6 +1485,7 @@ void AAC_RENAME(ff_sbr_apply)(AACContext *ac, SpectralBandReplication *sbr, int 
 
     if (sbr->start) {
         sbr_dequant(sbr, id_aac);
+        sbr->ready_for_dequant = 0;
     }
     for (ch = 0; ch < nch; ch++) {
         /* decode channel */

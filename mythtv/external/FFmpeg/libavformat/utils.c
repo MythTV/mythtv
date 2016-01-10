@@ -2486,7 +2486,7 @@ static void estimate_timings_from_bit_rate(AVFormatContext *ic)
 
 /** Maximum number of bytes we read to determine timing from PTS stream. */
 #define DURATION_MAX_READ_SIZE 250000LL
-#define DURATION_MAX_RETRY 4
+#define DURATION_MAX_RETRY 6
 
 /**
  * @brief Estimates timings using PTS stream.
@@ -3202,7 +3202,7 @@ int avformat_find_stream_info(AVFormatContext *ic, AVDictionary **options)
                 st->codec->time_base = st->time_base;
         }
         // only for the split stuff
-        if (!st->parser && !(ic->flags & AVFMT_FLAG_NOPARSE)) {
+        if (!st->parser && !(ic->flags & AVFMT_FLAG_NOPARSE) && st->request_probe <= 0) {
             st->parser = av_parser_init(st->codec->codec_id);
             if (st->parser) {
                 if (st->need_parsing == AVSTREAM_PARSE_HEADERS) {
