@@ -31,6 +31,18 @@ INCLUDEPATH += $$POSTINC
 # for -ldl
 LIBS += $$EXTRA_LIBS
 
+# The version numbers here should match the ones defined in libdvdread's 'configure.ac'
+dvdread_major = 5
+dvdread_minor = 90
+dvdread_micro = 0
+dvdread_version = $$dvdread_major"."$$dvdread_minor"."$$dvdread_micro
+
+DEFINES += DVDREAD_VERSION_MAJOR=$$dvdread_major
+DEFINES += DVDREAD_VERSION_MINOR=$$dvdread_minor
+DEFINES += DVDREAD_VERSION_MICRO=$$dvdread_micro
+DEFINES += DVDREAD_VERSION=$$dvdread_version
+DEFINES += DVDREAD_VERSION_STRING=\\\"$$dvdread_version\\\"
+
 DEFINES += HAVE_AV_CONFIG_H
 
 # DEFINES += LOG_DEBUG TRACE
