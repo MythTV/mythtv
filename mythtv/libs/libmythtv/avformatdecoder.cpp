@@ -1467,7 +1467,7 @@ static enum PixelFormat get_format_vdpau(struct AVCodecContext *avctx,
                 render_wrapper_vdpau;
         }
     }
-    return AV_PIX_FMT_VDPAU;
+    return avctx->hwaccel_context ? AV_PIX_FMT_VDPAU : AV_PIX_FMT_YUV420P;
 }
 #endif
 
@@ -1481,20 +1481,14 @@ enum PixelFormat get_format_dxva2(struct AVCodecContext *avctx,
 {
     if (!fmt)
         return PIX_FMT_NONE;
-    int i = 0;
-    for (; fmt[i] != PIX_FMT_NONE ; i++)
-        if (PIX_FMT_DXVA2_VLD == fmt[i])
-        {
-            AvFormatDecoder *nd = (AvFormatDecoder *)(avctx->opaque);
-            if (nd && nd->GetPlayer())
-            {
-                static uint8_t *dummy[1] = { 0 };
-                avctx->hwaccel_context =
-                    (dxva_context*)nd->GetPlayer()->GetDecoderContext(NULL, dummy[0]);
-            }
-            break;
-        }
-    return fmt[i];
+    AvFormatDecoder *nd = (AvFormatDecoder *)(avctx->opaque);
+    if (nd && nd->GetPlayer())
+    {
+        static uint8_t *dummy[1] = { 0 };
+        avctx->hwaccel_context =
+            (dxva_context*)nd->GetPlayer()->GetDecoderContext(NULL, dummy[0]);
+    }
+    return avctx->hwaccel_context ? PIX_FMT_DXVA2_VLD : AV_PIX_FMT_YUV420P;
 }
 #endif
 
@@ -1515,20 +1509,14 @@ enum PixelFormat get_format_vaapi(struct AVCodecContext *avctx,
 {
     if (!fmt)
         return PIX_FMT_NONE;
-    int i = 0;
-    for (; fmt[i] != PIX_FMT_NONE ; i++)
-        if (IS_VAAPI_PIX_FMT(fmt[i]))
-        {
-            AvFormatDecoder *nd = (AvFormatDecoder *)(avctx->opaque);
-            if (nd && nd->GetPlayer())
-            {
-                static uint8_t *dummy[1] = { 0 };
-                avctx->hwaccel_context =
-                    (vaapi_context*)nd->GetPlayer()->GetDecoderContext(NULL, dummy[0]);
-            }
-            break;
-        }
-    return fmt[i];
+    AvFormatDecoder *nd = (AvFormatDecoder *)(avctx->opaque);
+    if (nd && nd->GetPlayer())
+    {
+        static uint8_t *dummy[1] = { 0 };
+        avctx->hwaccel_context =
+            (vaapi_context*)nd->GetPlayer()->GetDecoderContext(NULL, dummy[0]);
+    }
+    return avctx->hwaccel_context ? PIX_FMT_VAAPI_VLD : AV_PIX_FMT_YUV420P;
 }
 #endif
 
