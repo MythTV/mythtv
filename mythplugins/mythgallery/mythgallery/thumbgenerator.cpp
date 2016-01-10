@@ -368,6 +368,14 @@ void ThumbGenerator::loadFile(QImage& image, const QFileInfo& fi)
 #endif
 
         image.load(fi.absoluteFilePath());
+
+        long rotateangle = GalleryUtil::GetNaturalRotation(fi.absoluteFilePath());
+        if (rotateangle != 0)
+        {
+            QMatrix matrix;
+            matrix.rotate(rotateangle);
+            image = image.transformed(matrix, Qt::SmoothTransformation);
+        }
     }
 }
 
