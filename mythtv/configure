@@ -6776,7 +6776,7 @@ enabled dxva2api_h &&
 int main(void) { IDirectXVideoDecoder *o = NULL; IDirectXVideoDecoder_Release(o); return 0; }
 EOF
 
-enabled vaapi &&
+enabled vaapi && enabled opengl &&
     check_lib va/va.h vaInitialize -lva ||
     disable vaapi
 
