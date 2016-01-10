@@ -52,6 +52,8 @@ QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 # dvdnav
 HEADERS += dvdnav/dvdnav_internal.h dvdnav/read_cache.h \
     dvdnav/vm/vm_serialize.h
+HEADERS += dvdnav/dvdnav/dvd_types.h dvdnav/dvdnav/dvdnav.h \
+    dvdnav/dvdnav/dvdnav_events.h
 HEADERS += dvdnav/vm/decoder.h dvdnav/vm/vm.h dvdnav/vm/vmcmd.h \
     dvdnav/vm/getset.h dvdnav/vm/play.h
 
