@@ -817,6 +817,11 @@ uint32_t dvdnav_describe_title_chapters(dvdnav_t *this, int32_t title, uint64_t 
   if(!tmp)
     goto fail;
 
+  if(!ptt) {
+      printerr("ptt NULL");
+      goto fail;
+  }
+
   length = 0;
   for(i=0; i<parts; i++) {
     uint32_t cellnr, endcellnr;
