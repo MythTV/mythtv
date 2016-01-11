@@ -2548,9 +2548,13 @@ static HostComboBox *MythShortDateFormat()
     gc->addSelection(locale.toString(sampdate, "M/d ddd"), "M/d ddd");
     gc->addSelection(locale.toString(sampdate, "d/M ddd"), "d/M ddd");
 
-    QString cn = QString("M") + QChar(0x6708) + "d" + QChar(0x65E5); // M月d日
+    QString cn_short1 = QString("M") + QChar(0x6708) + "d" + QChar(0x65E5); // M月d日
 
-    gc->addSelection(locale.toString(sampdate, cn), cn);
+    gc->addSelection(locale.toString(sampdate, cn_short1), cn_short1);
+
+    QString cn_short2 = QString("ddd M") + QChar(0x6708) + "d" + QChar(0x65E5); // ddd M月d日
+
+    gc->addSelection(locale.toString(sampdate, cn_short2), cn_short2);
 
     //: %1 gives additional information regarding the date format
     gc->setHelpText(AppearanceSettings::tr("Your preferred short date format. %1")
