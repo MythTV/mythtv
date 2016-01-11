@@ -10,6 +10,8 @@
 
 #include "mythlogging.h"
 
+#include <initializer_list>
+
 class StandardSetting;
 
 class MythUIButtonListItemSetting : public QObject, public MythUIButtonListItem
@@ -75,6 +77,8 @@ class MPUBLIC StandardSetting : public QObject, public StorageUser
     Storage *GetStorage(void) const { return m_storage; }
 
     void addTargetedChild(const QString &value, StandardSetting *setting);
+    void addTargetedChildren(const QString &value,
+                             std::initializer_list<StandardSetting *> settings);
     void removeTargetedChild(const QString &value, StandardSetting *child);
 
     //not sure I want to do that yet

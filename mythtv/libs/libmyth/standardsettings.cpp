@@ -106,6 +106,16 @@ void StandardSetting::updateButton(MythUIButtonListItem *item)
     item->setDrawArrow(haveSubSettings());
 }
 
+void StandardSetting::addTargetedChildren(const QString &value,
+                              std::initializer_list<StandardSetting *> settings)
+{
+    m_targets[value].reserve(settings.size());
+    foreach (StandardSetting *setting, settings)
+    {
+        m_targets[value].append(setting);
+        setting->setParent(this);
+    }
+}
 void StandardSetting::addTargetedChild(const QString &value,
                                        StandardSetting * setting)
 {
