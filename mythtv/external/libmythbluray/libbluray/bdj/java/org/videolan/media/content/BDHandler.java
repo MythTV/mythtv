@@ -67,10 +67,13 @@ public abstract class BDHandler implements Player, ServiceContentHandler {
 
     public BDHandler() {
         ownerContext = BDJXletContext.getCurrentContext();
-
-        PlayerAction action = new PlayerAction(this, PlayerAction.ACTION_INIT, null);
-        BDJActionManager.getInstance().putCommand(action);
-        action.waitEnd();
+        if (ownerContext == null) {
+            doInitAction();
+        } else {
+            PlayerAction action = new PlayerAction(this, PlayerAction.ACTION_INIT, null);
+            BDJActionManager.getInstance().putCommand(action);
+            action.waitEnd();
+        }
     }
 
     private void doInitAction() {

@@ -270,16 +270,19 @@ class VFSCache {
         accessFileSynced(absPath);
     }
 
-    protected synchronized void accessFileSynced(String absPath) {
+    private synchronized void accessFileSynced(String absPath) {
 
         if (inAccessFile) {
             /* avoid recursion from SecurityManager checks */
             return;
         }
 
-        inAccessFile = true;
-        accessFileImp(absPath);
-        inAccessFile = false;
+        try {
+            inAccessFile = true;
+            accessFileImp(absPath);
+        } finally {
+            inAccessFile = false;
+        }
     }
 
     private void accessFileImp(String absPath) {
@@ -297,7 +300,7 @@ class VFSCache {
         }
 
         /* do not cache .m2ts streams */
-        if (relPath.startsWith("BDMV" + File.separator + "STREAM" + File.separator)) {
+        if (relPath.startsWith(streamDir)) {
             return;
         }
 
@@ -352,6 +355,7 @@ class VFSCache {
 
     private static final String jarDir = "BDMV" + File.separator + "JAR" + File.separator;
     private static final String fontDir = "BDMV" + File.separator + "AUXDATA" + File.separator;
+    private static final String streamDir = "BDMV" + File.separator + "STREAM" + File.separator;
 
     private static final Logger logger = Logger.getLogger(VFSCache.class.getName());
 }

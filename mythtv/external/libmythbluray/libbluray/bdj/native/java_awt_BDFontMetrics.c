@@ -135,7 +135,10 @@ static char *_win32_resolve_font(const char *family, int style)
 
     memset(&lf, 0, sizeof(lf));
     lf.lfCharSet = DEFAULT_CHARSET;
-    MultiByteToWideChar(CP_UTF8, 0, family, -1, lf.lfFaceName, sizeof(lf.lfFaceName));
+    int length = MultiByteToWideChar(CP_UTF8, 0, family, -1, lf.lfFaceName, LF_FACESIZE);
+    if (!length) {
+        return NULL;
+    }
 
     hDC = GetDC(NULL);
     EnumFontFamiliesExW(hDC, &lf, (FONTENUMPROCW)&EnumFontCallbackW, (LPARAM)&data, 0);

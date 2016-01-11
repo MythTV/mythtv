@@ -61,5 +61,12 @@
 #define IS_HDMV_PID_IG(pid)     ((pid) >= HDMV_PID_IG_FIRST && (pid) <= HDMV_PID_IG_LAST)
 #define IS_HDMV_PID_TEXTST(pid) ((pid) == HDMV_PID_TEXTST)
 
+/*
+ * Extract PID from HDMV MPEG-TS packet
+ */
+
+#define TS_PID(buf)                             \
+  ((((buf)[4+1] & 0x1f) << 8) | (buf)[4+2])
+
 
 #endif // _HDMV_PIDS_H_

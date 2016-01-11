@@ -78,9 +78,9 @@ public class FileAttributes {
     {
         boolean r = f.canRead();
         boolean w = f.canWrite();
-        
+
         FileAccessPermissions permissions = new FileAccessPermissions(r, w, r, w, r, w);
-        
+
         return new FileAttributes(null, permissions, PRIORITY_LOW);
     }
 

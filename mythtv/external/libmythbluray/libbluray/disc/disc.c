@@ -399,7 +399,11 @@ size_t disc_read_file(BD_DISC *disc, const char *dir, const char *file,
 
     *data = NULL;
 
-    fp = disc_open_file(disc, dir, file);
+    if (dir) {
+        fp = disc_open_file(disc, dir, file);
+    } else {
+        fp = disc_open_path(disc, file);
+    }
     if (!fp) {
         return 0;
     }
@@ -476,7 +480,7 @@ int disc_cache_bdrom_file(BD_DISC *p, const char *rel_path, const char *cache_pa
             BD_DEBUG(DBG_FILE | DBG_CRIT, "error caching file %s\n", rel_path);
             file_close(fp_out);
             file_close(fp_in);
-            file_unlink(cache_path);
+            (void)file_unlink(cache_path);
             return -1;
         }
     }

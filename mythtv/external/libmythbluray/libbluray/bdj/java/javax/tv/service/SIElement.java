@@ -26,7 +26,7 @@ public interface SIElement extends SIRetrievable
     public Locator getLocator();
 
     public boolean equals(Object obj);
-    
+
     public int hashCode();
 
     public ServiceInformationType getServiceInformationType();

@@ -1089,7 +1089,7 @@ int udfread_open_input(udfread *udf, udfread_block_input *input/*, int partition
     struct volume_descriptor_set vds;
     struct long_ad fsd_location;
 
-    if (!udf || !input) {
+    if (!udf || !input || !input->read) {
         return -1;
     }
 
@@ -1133,6 +1133,10 @@ int udfread_open(udfread *udf, const char *path)
     udfread_block_input *input;
     int result;
 
+    if (!path) {
+        return -1;
+    }
+
     input = block_input_new(path);
     if (!input) {
         return -1;
@@ -1140,7 +1144,9 @@ int udfread_open(udfread *udf, const char *path)
 
     result = udfread_open_input(udf, input);
     if (result < 0) {
-        input->close(input);
+        if (input->close) {
+            input->close(input);
+        }
     }
 
     return result;
@@ -1150,7 +1156,9 @@ void udfread_close(udfread *udf)
 {
     if (udf) {
         if (udf->input) {
-            udf->input->close(udf->input);
+            if (udf->input->close) {
+                udf->input->close(udf->input);
+            }
             udf->input = NULL;
         }
 
@@ -1216,7 +1224,7 @@ UDFDIR *udfread_opendir(udfread *udf, const char *path)
 
 struct udfread_dirent *udfread_readdir(UDFDIR *p, struct udfread_dirent *entry)
 {
-    const struct udf_file_identifier *fe;
+    const struct udf_file_identifier *fi;
 
     if (!p || !entry || !p->dir) {
         return NULL;
@@ -1226,14 +1234,14 @@ struct udfread_dirent *udfread_readdir(UDFDIR *p, struct udfread_dirent *entry)
         return NULL;
     }
 
-    fe = &p->dir->files[p->current_file];
+    fi = &p->dir->files[p->current_file];
 
-    entry->d_name = fe->filename;
+    entry->d_name = fi->filename;
 
-    if (fe->characteristic & CHAR_FLAG_PARENT) {
+    if (fi->characteristic & CHAR_FLAG_PARENT) {
         entry->d_type = UDF_DT_DIR;
         entry->d_name = "..";
-    } else if (fe->characteristic & CHAR_FLAG_DIR) {
+    } else if (fi->characteristic & CHAR_FLAG_DIR) {
         entry->d_type = UDF_DT_DIR;
     } else {
         entry->d_type = UDF_DT_REG;

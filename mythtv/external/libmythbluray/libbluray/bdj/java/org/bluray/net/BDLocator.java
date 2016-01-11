@@ -29,11 +29,11 @@ public class BDLocator extends Locator {
         super(url);
         try {
 
-        if (!url.startsWith("bd://"))
-            throw new InvalidLocatorException();
-        String str = url.substring(5);
-        if (!parseJar(str) && !parseSound(str) && !parsePlaylist(str))
-            throw new InvalidLocatorException();
+            if (!url.startsWith("bd://"))
+                throw new InvalidLocatorException();
+            String str = url.substring(5);
+            if (!parseJar(str) && !parseSound(str) && !parsePlaylist(str))
+                throw new InvalidLocatorException();
 
         } catch (InvalidLocatorException e) {
             System.err.println("Invalid locator: " + url);

@@ -65,6 +65,7 @@ static int _sound_parse_attributes(BITSTREAM *bs, SOUND_OBJECT *obj)
 
     switch (i = bs_read(bs, 4)) {
         default: BD_DEBUG(DBG_NAV, "unknown channel configuration code %d\n", i);
+                 /* fall thru */
         case 1:  obj->num_channels = 1;
                  break;
         case 3:  obj->num_channels = 2;
@@ -72,11 +73,13 @@ static int _sound_parse_attributes(BITSTREAM *bs, SOUND_OBJECT *obj)
     };
     switch (i = bs_read(bs, 4)) {
         default: BD_DEBUG(DBG_NAV, "unknown sample rate code %d\n", i);
+                 /* fall thru */
         case 1:  obj->sample_rate = 48000;
                  break;
     };
     switch (i = bs_read(bs, 2)) {
         default: BD_DEBUG(DBG_NAV, "unknown bits per sample code %d\n", i);
+                 /* fall thru */
         case 1:  obj->bits_per_sample = 16;
                  break;
     };

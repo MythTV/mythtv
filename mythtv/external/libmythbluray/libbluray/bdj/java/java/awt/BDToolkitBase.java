@@ -124,6 +124,10 @@ abstract class BDToolkitBase extends Toolkit {
     }
 
     public Image getImage(String filename) {
+        if (BDJXletContext.getCurrentContext() == null) {
+            logger.error("getImage(): no context " + Logger.dumpStack());
+        }
+
         if (cachedImages.containsKey(filename))
             return (Image)cachedImages.get(filename);
         Image newImage = createImage(filename);
@@ -133,6 +137,10 @@ abstract class BDToolkitBase extends Toolkit {
     }
 
     public Image getImage(URL url) {
+        if (BDJXletContext.getCurrentContext() == null) {
+            logger.error("getImage(): no context " + Logger.dumpStack());
+        }
+
         if (cachedImages.containsKey(url))
             return (Image)cachedImages.get(url);
         Image newImage = createImage(url);
@@ -142,6 +150,10 @@ abstract class BDToolkitBase extends Toolkit {
     }
 
     public Image createImage(String filename) {
+        if (BDJXletContext.getCurrentContext() == null) {
+            logger.error("createImage(): no context " + Logger.dumpStack());
+        }
+
         if (!new File(filename).isAbsolute()) {
             String home = BDJXletContext.getCurrentXletHome();
             if (home != null) {
@@ -161,6 +173,9 @@ abstract class BDToolkitBase extends Toolkit {
     }
 
     public Image createImage(URL url) {
+        if (BDJXletContext.getCurrentContext() == null) {
+            logger.error("createImage(): no context " + Logger.dumpStack());
+        }
         ImageProducer ip = new URLImageSource(url);
         Image newImage = createImage(ip);
         return newImage;
@@ -169,12 +184,20 @@ abstract class BDToolkitBase extends Toolkit {
     public Image createImage(byte[] imagedata,
         int imageoffset,
         int imagelength) {
+
+        if (BDJXletContext.getCurrentContext() == null) {
+            logger.error("createImage(): no context " + Logger.dumpStack());
+        }
+
         ImageProducer ip = new ByteArrayImageSource(imagedata, imageoffset, imagelength);
         Image newImage = createImage(ip);
         return newImage;
     }
 
     public Image createImage(ImageProducer producer) {
+        if (BDJXletContext.getCurrentContext() == null) {
+            logger.error("createImage(): no context " + Logger.dumpStack());
+        }
         return new BDImageConsumer(producer);
     }
 
@@ -243,7 +266,7 @@ abstract class BDToolkitBase extends Toolkit {
             }
         }
 
-        logger.warning("getSystemEventQueue(): no context");
+        logger.warning("getSystemEventQueue(): no context   from:" + logger.dumpStack());
         return eventQueue;
     }
 }

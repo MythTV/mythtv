@@ -29,6 +29,7 @@ import javax.tv.service.navigation.ServiceListImpl;
 import javax.tv.service.transport.Transport;
 import javax.tv.service.transport.TransportImpl;
 
+import org.bluray.net.BDLocator;
 import org.bluray.ti.TitleImpl;
 import org.videolan.Libbluray;
 
@@ -82,6 +83,15 @@ public class SIManagerImpl extends SIManager {
     }
 
     public Service getService(Locator locator) throws InvalidLocatorException, SecurityException {
+
+        BDLocator bdLocator = null;
+        try {
+            bdLocator = new BDLocator(locator.toExternalForm());
+        } catch (org.davic.net.InvalidLocatorException e) {
+            System.err.println("invalid locator: " + locator.toExternalForm() + "\n" + org.videolan.Logger.dumpStack(e));
+            throw new javax.tv.locator.InvalidLocatorException(locator);
+        }
+
         return titles.findService(locator);
     }
 

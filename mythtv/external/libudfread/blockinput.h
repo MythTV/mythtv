@@ -40,9 +40,12 @@ extern "C" {
 typedef struct udfread_block_input udfread_block_input;
 
 struct udfread_block_input {
+    /* Close input. Optional. */
     int      (*close) (udfread_block_input *);
+    /* Read block(s) from input. Mandatory. */
     int      (*read)  (udfread_block_input *, uint32_t lba, void *buf, uint32_t nblocks, int flags);
-    uint32_t (*size)  (udfread_block_input *);  /* size in blocks */
+    /* Input size in blocks. Optional. */
+    uint32_t (*size)  (udfread_block_input *);
 };
 
 

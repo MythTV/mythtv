@@ -19,6 +19,10 @@
  * <http://www.gnu.org/licenses/>.
  */
 
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include "ecma167.h"
 
 #include <stdint.h>
@@ -300,6 +304,12 @@ struct file_entry *decode_file_entry(const uint8_t *p, size_t size, uint16_t par
     l_ea = _get_u32(p + 168);
     l_ad = _get_u32(p + 172);
 
+    /* check for integer overflow */
+    if ((uint64_t)l_ea + (uint64_t)l_ad + (uint64_t)176 >= (uint64_t)1<<32) {
+        ecma_error("invalid file entry\n");
+        return NULL;
+    }
+
     return _decode_file_entry(p, size, partition, l_ad, 176 + l_ea);
 }
 
@@ -310,6 +320,12 @@ struct file_entry *decode_ext_file_entry(const uint8_t *p, size_t size, uint16_t
 
     l_ea = _get_u32(p + 208);
     l_ad = _get_u32(p + 212);
+
+    /* check for integer overflow */
+    if ((uint64_t)l_ea + (uint64_t)l_ad + (uint64_t)216 >= (uint64_t)1<<32) {
+        ecma_error("invalid file entry\n");
+        return NULL;
+    }
 
     return _decode_file_entry(p, size, partition, l_ad, 216 + l_ea);
 }
