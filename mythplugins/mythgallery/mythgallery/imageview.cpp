@@ -407,7 +407,8 @@ void ImageView::LoadAlbumRunnable::run()
         ThumbItem *dir = m_dirList.takeFirst();
         ThumbList children;
         GalleryUtil::LoadDirectory(children, dir->GetPath(),
-                                   m_sortorder, false, NULL, NULL);
+                                   GalleryFilter(m_sortorder != 0),
+                                   false, NULL, NULL);
 
         {
             QMutexLocker guard(&m_isAliveLock);

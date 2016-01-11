@@ -2,8 +2,8 @@
  * File  : thumbgenerator.h
  * Author: Renchi Raju <renchi@pooh.tam.uiuc.edu>
  * Date  : 2004-01-02
- * Description : 
- * 
+ * Description :
+ *
  * Copyright 2004 by Renchi Raju
 
  * This program is free software; you can redistribute it
@@ -11,12 +11,12 @@
  * Public License as published bythe Free Software Foundation;
  * either version 2, or (at your option)
  * any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * ============================================================ */
 
 #ifndef THUMBGENERATOR_H
@@ -39,7 +39,7 @@ typedef struct {
 class ThumbGenEvent : public QEvent
 {
   public:
-    ThumbGenEvent(ThumbData *td) : QEvent(kEventType), thumbData(td) {}
+    explicit ThumbGenEvent(ThumbData *td) : QEvent(kEventType), thumbData(td) {}
     ~ThumbGenEvent() {}
 
     ThumbData *thumbData;
@@ -64,7 +64,7 @@ public:
 protected:
 
     void run();
-    
+
 private:
 
     bool moreWork();
