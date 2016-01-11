@@ -1552,7 +1552,7 @@ void MythRenderVDPAU::ClearVideoSurface(uint id)
 
     memset(tmp, 0, width * height);
     memset(tmp + (width * height), 127, (width * height)>>1);
-    uint32_t pitches[3] = {width, width, width>>1};
+    uint32_t pitches[3] = {width, (width+1)>>1, (width+1)>>1};
     void* const planes[3] = {tmp, tmp + (width * height), tmp + (width * height)};
     vdp_st = vdp_video_surface_put_bits_y_cb_cr(m_videoSurfaces[id].m_id,
                                                 VDP_YCBCR_FORMAT_YV12,
