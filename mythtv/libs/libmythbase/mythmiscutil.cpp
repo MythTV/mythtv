@@ -47,6 +47,7 @@ using namespace std;
 #include <QUrl>
 #include <QHostAddress>
 #include <QDataStream>
+#include <QCryptographicHash>
 
 // Myth headers
 #include "mythcorecontext.h"
@@ -595,42 +596,12 @@ bool IsMACAddress(QString MAC)
 
 QString FileHash(QString filename)
 {
-    QFile file(filename);
-    QFileInfo fileinfo(file);
-    qint64 initialsize = fileinfo.size();
-    quint64 hash = 0;
-
-    if (initialsize == 0)
-        return QString("NULL");
-
-    if (file.open(QIODevice::ReadOnly))
-        hash = initialsize;
-    else
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            "Error: Unable to open selected file, missing read permissions?");
-        return QString("NULL");
-    }
-
-    file.seek(0);
-    QDataStream stream(&file);
-    stream.setByteOrder(QDataStream::LittleEndian);
-    for (quint64 tmp = 0, i = 0; i < 65536/sizeof(tmp); i++)
-    {
-        stream >> tmp;
-        hash += tmp;
-    }
-
-    file.seek(initialsize - 65536);
-    for (quint64 tmp = 0, i = 0; i < 65536/sizeof(tmp); i++)
-    {
-        stream >> tmp;
-        hash += tmp;
-    }
-
-    file.close();
-
-    QString output = QString("%1").arg(hash, 0, 16);
+    /* generate an md5 hash of the filename (instead of hashing the file's contents)
+       this allows the same file to be in multiple places (incase it it symlinked).
+       Each path to the file will be unique.
+     */
+    QByteArray array (filename.toStdString().c_str());
+    QString output = QString(QCryptographicHash::hash((array),QCryptographicHash::Md5).toHex());
     return output;
 }
 
