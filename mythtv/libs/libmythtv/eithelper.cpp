@@ -1072,18 +1072,19 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     fix[ 9018U << 16] = EITFixUp::kFixUK;
 
     // UK - Astra 28.2
-    for (int i = 2001; i <= 2040; ++i)
+    for (int i = 2001; i <= 2035; ++i)
        fix[ (long long)i << 32 | 2U << 16] = EITFixUp::kFixUK;
 
     fix[ 2036LL << 32 | 2U << 16] = EITFixUp::kFixUK | EITFixUp::kFixHTML;
 
-    for (int i = 2041; i <= 2057; ++i)
+    for (int i = 2037; i <= 2057; ++i)
        fix[ (long long)i << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2061LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2063LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2064LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2066LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2068LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2069LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2076LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2081LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2096LL << 32 | 2U << 16] = EITFixUp::kFixUK | EITFixUp::kFixHTML;

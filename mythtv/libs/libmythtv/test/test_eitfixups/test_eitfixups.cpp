@@ -471,6 +471,22 @@ void TestEITFixups::testHTMLFixup()
     fixup.Fix(event2);
     PRINT_EVENT(event2);
     QCOMPARE(event2.title,       QString("Redneck Island"));
+
+    DBEventEIT event3(14101,
+                      "New: Jericho",
+                      "Drama set in 1870s Yorkshire. In her desperation to protect her son, Annie unwittingly opens the door for Bamford the railway detective, who has returned to Jericho. [AD,S]",
+                      QDateTime::fromString("2015-02-28T19:40:00Z", Qt::ISODate),
+                      QDateTime::fromString("2015-02-28T20:00:00Z", Qt::ISODate),
+                      EITFixUp::kFixHTML | EITFixUp::kFixUK,
+                      SUB_UNKNOWN,
+                      AUD_STEREO,
+                      VID_UNKNOWN);
+
+    fixup.Fix(event3);
+    PRINT_EVENT(event3);
+    QCOMPARE(event3.title,       QString("Jericho"));
+    QCOMPARE(event3.description, QString("Drama set in 1870s Yorkshire. In her desperation to protect her son, Annie unwittingly opens the door for Bamford the railway detective, who has returned to Jericho."));
+
 }
 
 void TestEITFixups::testSkyEpisodes()
