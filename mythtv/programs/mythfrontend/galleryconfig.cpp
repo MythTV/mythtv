@@ -161,7 +161,7 @@ DatabaseSettings::DatabaseSettings(bool enable)
     StackedConfigurationGroup *group4 = new StackedConfigurationGroup(false, false);
     addChild(group4);
 
-    HostCheckBox *autorun = new HostCheckBox("GalleryAutoLoad");
+    HostCheckBox *autorun = new HostCheckBox("GalleryAutoStart");
     autorun->setLabel(tr("Start Gallery when media inserted"));
     autorun->setHelpText(tr("Set to automatically start Gallery when media "
                             "(USB/CD's containing images) are inserted."));
