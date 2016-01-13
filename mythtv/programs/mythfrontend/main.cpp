@@ -1503,21 +1503,22 @@ static int internal_media_init()
 {
     REG_MEDIAPLAYER("Internal", QT_TRANSLATE_NOOP("MythControls",
         "MythTV's native media player."), internal_play_media);
+
     REG_MEDIA_HANDLER(
         QT_TRANSLATE_NOOP("MythControls", "MythDVD DVD Media Handler"),
         QT_TRANSLATE_NOOP("MythControls", "MythDVD media"),
         "", handleDVDMedia, MEDIATYPE_DVD, QString::null);
+
     REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
         "MythImage Media Handler 1/2"), "", "", handleGalleryMedia,
         MEDIATYPE_DATA | MEDIATYPE_MIXED, QString::null);
 
-    QStringList extensions;
-    foreach (const QByteArray &ext, QImageReader::supportedImageFormats())
-        extensions << QString(ext);
+    QStringList extensions(ImageAdapterBase::SupportedImages()
+                           + ImageAdapterBase::SupportedVideos());
 
     REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
         "MythImage Media Handler 2/2"), "", "", handleGalleryMedia,
-        MEDIATYPE_MGALLERY, extensions.join(","));
+        MEDIATYPE_MGALLERY | MEDIATYPE_MVIDEO, extensions.join(","));
     return 0;
 }
 

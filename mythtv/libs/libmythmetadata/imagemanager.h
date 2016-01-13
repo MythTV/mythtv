@@ -70,7 +70,7 @@
     class QTemporaryDir
     {
     public:
-        QTemporaryDir(const QString &templatePath) 
+        QTemporaryDir(const QString &templatePath)
         {
             QString path(templatePath);
             QString dynamic(QString("%1").arg(++Count(), 6, 10, QChar('0')));
@@ -152,9 +152,13 @@ private:
 
 
 //! Common filesystem facilities
-class ImageAdapterBase : public DeviceManager
+class META_PUBLIC ImageAdapterBase : public DeviceManager
 {
 public:
+    static QStringList SupportedImages();
+
+    static QStringList SupportedVideos();
+
     //! Assembles a canonical file path without corrupting its absolute/relative nature.
     static QString ConstructPath(const QString &path, const QString &name)
     {  return path.isEmpty() ? name : path + "/" + name; }

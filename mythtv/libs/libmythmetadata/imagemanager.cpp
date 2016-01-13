@@ -286,24 +286,10 @@ QList<int> DeviceManager::GetAbsentees()
  \brief Constructor
  \param thumbPath Absolute path of dir where thumbnails will be stored
 */
-ImageAdapterBase::ImageAdapterBase() : DeviceManager()
+ImageAdapterBase::ImageAdapterBase() : DeviceManager(),
+    m_imageFileExt(SupportedImages()),
+    m_videoFileExt(SupportedVideos())
 {
-    // Determine supported picture formats from Qt
-    m_imageFileExt.clear();
-    foreach (const QByteArray &ext, QImageReader::supportedImageFormats())
-        m_imageFileExt << QString(ext);
-
-    // Determine supported video formats from MythVideo
-    m_videoFileExt.clear();
-    const FileAssociations::association_list faList =
-        FileAssociations::getFileAssociation().getList();
-    for (FileAssociations::association_list::const_iterator p =
-        faList.begin(); p != faList.end(); ++p)
-    {
-        if (!p->use_default && p->playcommand == "Internal")
-            m_videoFileExt << QString(p->extension);
-    }
-
     // Generate glob list from supported extensions
     QStringList glob;
     foreach (const QString &ext, m_imageFileExt + m_videoFileExt)
@@ -317,6 +303,39 @@ ImageAdapterBase::ImageAdapterBase() : DeviceManager()
     // Sync files before dirs to improve thumb generation response
     // Order by time (oldest first) - this determines the order thumbs appear
     m_dirFilter.setSorting(QDir::DirsLast | QDir::Time | QDir::Reversed);
+}
+
+/*!
+   \brief Return recognised pictures
+   \return List of file extensions
+ */
+QStringList ImageAdapterBase::SupportedImages()
+{
+    // Determine supported picture formats from Qt
+    QStringList formats;
+    foreach (const QByteArray &ext, QImageReader::supportedImageFormats())
+        formats << QString(ext);
+    return formats;
+}
+
+
+/*!
+   \brief Return recognised video extensions
+   \return List of file extensions
+ */
+QStringList ImageAdapterBase::SupportedVideos()
+{
+    // Determine supported video formats from MythVideo
+    QStringList formats;
+    const FileAssociations::association_list faList =
+        FileAssociations::getFileAssociation().getList();
+    for (FileAssociations::association_list::const_iterator p =
+        faList.begin(); p != faList.end(); ++p)
+    {
+        if (!p->use_default && p->playcommand == "Internal")
+            formats << QString(p->extension);
+    }
+    return formats;
 }
 
 
