@@ -25,6 +25,8 @@
 {   LOG(VB_FILE, LOG_DEBUG, LOC + MESG); \
     return QStringList("OK"); }
 
+#define IMPORTDIR "Import"
+
 
 //! A device containing images (ie. USB stick, CD, storage group etc)
 class Device
@@ -337,14 +339,15 @@ ImageItem *ImageAdapterLocal::CreateItem(const QFileInfo &fi, int parentId,
 
     if (parentId == GALLERY_DB_ID)
     {
-        // Devices hold 'last scan time'
-        im->m_type    = kDevice;
-        im->m_date    = QDateTime::currentMSecsSinceEpoch() / 1000;
+        // Import devices show time of import, other devices show 'last scan time'
+        im->m_date    = im->m_filePath.contains(IMPORTDIR)
+                ? fi.lastModified().toTime_t()
+                : QDateTime::currentMSecsSinceEpoch() / 1000;
         im->m_modTime = im->m_date;
+        im->m_type    = kDevice;
         return im;
     }
 
-    // Strip device path & leading / to create a relative path
     im->m_modTime = fi.lastModified().toTime_t();
 
     if (fi.isDir())
@@ -2471,7 +2474,7 @@ void ImageManagerFe::DeviceEvent(MythMediaEvent *event)
 
 QString ImageManagerFe::CreateImport()
 {
-    QTemporaryDir *tmp = new QTemporaryDir(QDir::tempPath() % "/Import-XXXXXX");
+    QTemporaryDir *tmp = new QTemporaryDir(QDir::tempPath() % "/" IMPORTDIR "-XXXXXX");
     if (!tmp->isValid())
     {
         delete tmp;
