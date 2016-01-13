@@ -2833,8 +2833,8 @@ void CaptureCard::Save(void)
         if (!dev.isEmpty())
         {
             uint groupid =
-                CardUtil::CreateDeviceInputGroup(gCoreContext->GetHostName(),
-                                                  dev);
+                CardUtil::CreateDeviceInputGroup(cardid, type,
+                                                 gCoreContext->GetHostName(), dev);
             CardUtil::LinkInputGroup(cardid, groupid);
             CardUtil::UnlinkInputGroup(0, groupid);
         }

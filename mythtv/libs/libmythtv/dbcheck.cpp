@@ -3218,6 +3218,61 @@ NULL
             return false;
     }
 
+    if (dbver == "1342")
+    {
+        LOG(VB_GENERAL, LOG_CRIT, "Upgrading to MythTV schema version 1332");
+        MSqlQuery select(MSqlQuery::InitCon());
+        MSqlQuery update(MSqlQuery::InitCon());
+
+        const char *updates[] = {
+            // Delete automatically created inputgroups.
+            "DELETE FROM inputgroup WHERE inputgroupname REGEXP '^[a-z_-]*\\\\|'",
+            // Increase the size of inputgroup.inputgroupname.
+            "ALTER TABLE inputgroup "
+            "    MODIFY COLUMN inputgroupname VARCHAR(128)",
+            NULL
+        };
+
+        if (!performUpdateSeries(updates))
+            return false;
+
+        // Recreate automatically generated inputgroup for each card.
+        select.prepare("SELECT cardid, parentid, cardtype, hostname, "
+                       "       videodevice "
+                       "FROM capturecard c "
+                       "ORDER BY c.cardid");
+        if (!select.exec())
+        {
+            MythDB::DBError("Unable to retrieve cardtids.", select);
+            return false;
+        }
+
+        while (select.next())
+        {
+            uint cardid = select.value(0).toUInt();
+            uint parentid = select.value(1).toUInt();
+            QString type = select.value(2).toString();
+            QString host = select.value(3).toString();
+            QString device = select.value(4).toString();
+            QString name = host + "|" + device;
+            if (type == "FREEBOX" || type == "IMPORT" ||
+                type == "DEMO"    || type == "EXTERNAL")
+                name += QString("|%1").arg(parentid ? parentid : cardid);
+            uint groupid = CardUtil::CreateInputGroup(name);
+            if (!groupid)
+                return false;
+            if (!CardUtil::LinkInputGroup(cardid, groupid))
+                return false;
+        }
+
+        // Remove orphan and administrative inputgroup entries.
+        if (!CardUtil::UnlinkInputGroup(0, 0))
+            return false;
+
+        if (!UpdateDBVersionNumber("1343", dbver))
+            return false;
+    }
+
     return true;
 }
 

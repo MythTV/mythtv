@@ -1191,6 +1191,18 @@ uint CardUtil::CreateInputGroup(const QString &name)
     return inputgroupid;
 }
 
+uint CardUtil::CreateDeviceInputGroup(uint inputid,
+                                      const QString &type,
+                                      const QString &host,
+                                      const QString &device)
+{
+    QString name = host + '|' + device;
+    if (type == "FREEBOX" || type == "IMPORT" ||
+        type == "DEMO"    || type == "EXTERNAL")
+        name += QString("|%1").arg(inputid);
+    return CreateInputGroup(name);
+}
+
 uint CardUtil::GetDeviceInputGroup(uint inputid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1833,7 +1845,8 @@ int CardUtil::CreateCaptureCard(const QString &videodevice,
     if (query.next())
     {
         inputid = query.value(0).toInt();
-        uint groupid = CardUtil::CreateDeviceInputGroup(hostname, videodevice);
+        uint groupid = CardUtil::CreateDeviceInputGroup(inputid, inputtype,
+                                                        hostname, videodevice);
         CardUtil::LinkInputGroup(inputid, groupid);
     }
 
