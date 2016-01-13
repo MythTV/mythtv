@@ -6,6 +6,11 @@
 
 #include <QStringList>
 #include <QSharedPointer>
+#include <QPair>
+#include <QList>
+#include <QHash>
+#include <QMap>
+#include <QMetaType>
 
 #include "mythmetaexp.h"
 

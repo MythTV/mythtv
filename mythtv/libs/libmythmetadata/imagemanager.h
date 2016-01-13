@@ -45,8 +45,6 @@
 #ifndef IMAGEMANAGER_H
 #define IMAGEMANAGER_H
 
-#include <QTemporaryDir>
-
 #include "mythcorecontext.h"
 #include "storagegroup.h"
 #include "mythdirs.h"
@@ -65,6 +63,42 @@
 #define THUMBNAIL_SUBDIR            "Images"
 
 #define DEVICE_INVALID -1
+
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+    #include <QTemporaryDir>
+#else
+    class QTemporaryDir
+    {
+    public:
+        QTemporaryDir(const QString &templatePath) 
+        {
+            QString path(templatePath);
+            QString dynamic(QString("%1").arg(++Count(), 6, 10, QChar('0')));
+            path.replace("XXXXXX", dynamic);
+            m_dir = QDir(path);
+            m_dir.mkpath(path);
+            m_dir.cd(path);
+        }
+
+        ~QTemporaryDir()
+        {
+            // Assume no subdirs
+            foreach (const QString &name, m_dir.entryList(QDir::Files | QDir::NoDotAndDotDot))
+                m_dir.remove(name);
+            QString dirName(m_dir.dirName());
+            m_dir.cdUp();
+            m_dir.rmdir(dirName);
+        }
+
+        bool isValid() { return m_dir.exists(); }
+        QString path() { return m_dir.absolutePath(); }
+
+    private:
+        QDir m_dir;
+        // Embeds a static var in header to avoid the need for a cpp
+        static int& Count() { static int count; return count; }
+    };
+#endif
 
 
 class MythMediaDevice;

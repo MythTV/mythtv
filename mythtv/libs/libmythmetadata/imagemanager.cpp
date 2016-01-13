@@ -79,13 +79,39 @@ public:
     }
 
 
+    /*!
+     \brief Clears all files and sub-dirs within a directory
+     \param path Dir to clear
+    */
+    void RemoveDirContents(QString path)
+    {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+        QDir(path).removeRecursively();
+#else
+        // Delete all files
+        QDir dir = QDir(path);
+        foreach(const QFileInfo &info,
+                dir.entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot))
+        {
+            if (info.isDir())
+            {
+                RemoveDirContents(info.absoluteFilePath());
+                dir.rmdir(info.absoluteFilePath());
+            }
+            else
+                QFile::remove(info.absoluteFilePath());
+        }
+#endif
+    }
+
+
     //! Delete thumbnails associated with device
     void RemoveThumbs(bool eject = false)
     {
         // Remove thumbnails
         QString dir = QString("%1/" TEMP_SUBDIR "/%2").arg(GetConfDir(), m_thumbs);
         LOG(VB_FILE, LOG_INFO, LOC + QString("Removing thumbnails in %1").arg(dir));
-        QDir(dir).removeRecursively();
+        RemoveDirContents(dir);
         QDir::root().rmpath(dir);
     }
 
@@ -151,7 +177,7 @@ int DeviceManager::OpenDevice(const QString &name, const QString &mount,
     if (id == DEVICE_INVALID)
     {
         state = "New";
-        id = m_devices.isEmpty() ? 0 : m_devices.lastKey() + 1;
+        id = m_devices.isEmpty() ? 0 : (m_devices.constEnd() - 1).key() + 1;
         m_devices.insert(id, new Device(name, mount, media, dir));
     }
     else
@@ -556,10 +582,13 @@ int ImageDb<FS>::GetDirectory(int id, ImagePtr &parent,
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(QString("SELECT " DB_COLUMNS " FROM %1 "
-                          "WHERE (dir_id = :ID OR file_id = :ID) "
+                          "WHERE (dir_id = :ID1 OR file_id = :ID2) "
                           "%2;").arg(m_table, refine));
 
-    query.bindValue(":ID",  FS::DbId(id));
+    // Qt < 5.4 won't bind multiple occurrences
+    int dbId = FS::DbId(id);
+    query.bindValue(":ID1", dbId);
+    query.bindValue(":ID2", dbId);
 
     if (!query.exec())
     {
@@ -2331,9 +2360,9 @@ QString ImageManagerFe::CrumbName(ImageItemK &im, bool getPath) const
 
     if (!getPath)
         return im.m_baseName;
-    
+
     QString dev, path(im.m_filePath);
-    
+
     if (im.IsLocal())
     {
         // Replace local mount path with device name
@@ -2364,7 +2393,7 @@ bool ImageManagerFe::DetectLocalDevices()
         return false;
 
     // Detect all local media
-    QList<MythMediaDevice*> devices 
+    QList<MythMediaDevice*> devices
             = monitor->GetMedias(MEDIATYPE_DATA | MEDIATYPE_MGALLERY);
 
     foreach (MythMediaDevice* dev, devices)
