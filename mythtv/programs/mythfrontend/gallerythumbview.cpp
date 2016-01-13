@@ -1618,8 +1618,11 @@ void GalleryThumbView::ShowSettings()
 
     QString exclusions = gCoreContext->GetSetting("GalleryIgnoreFilter");
     if (exclusions != oldExclusions)
+    {
         // Exclusions changed: request rescan
+        m_view->ClearCache();;
         m_mgr.IgnoreDirs(exclusions);
+    }
 }
 
 
