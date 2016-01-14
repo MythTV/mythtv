@@ -84,10 +84,10 @@
             <spacing>7</spacing>  <!-- (100% - 8*12%) / (8-1) or 0.57% -->
             <statetype name="buttonitem">
                 <state name="active" from="galleryactivebutton">
-                    <area>0,0,12%,25%</area>
+                    <area>0,0,12%,24%</area>
                 </state>
                 <state name="selectedactive" from="galleryselectedbutton">
-                    <area>0,0,12%,25%</area>
+                    <area>0,0,12%,24%</area>
                 </state>
             </statetype>
         </buttonlist>
@@ -97,10 +97,10 @@
             <spacing>10</spacing>  <!-- (100% - 6*16%) / (6-1) or 0.8% -->
             <statetype name="buttonitem">
                 <state name="active" from="galleryactivebutton">
-                    <area>0,0,16%,33%</area>
+                    <area>0,0,16%,32%</area>
                 </state>
                 <state name="selectedactive" from="galleryselectedbutton">
-                    <area>0,0,16%,33%</area>
+                    <area>0,0,16%,32%</area>
                 </state>
             </statetype>
         </buttonlist>
