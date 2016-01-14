@@ -433,7 +433,22 @@ void TestEITFixups::testDEPro7Sat1()
     QCOMPARE(event6->subtitle, QString("Drei Kleintiere durchschneiden (1)"));
     QCOMPARE(event6->airdate,  (unsigned short) 2014);
 
-
+    /* #12151 */
+    DBEventEIT *event7 = SimpleDBEventEIT (EITFixUp::kFixP7S1,
+                                           "Criminal Minds",
+                                           "<episode title>, Crime-Serie, USA 2011",
+                                           "<plot summary>\n\n"
+                                           "Regie: Frau Regisseur\n"
+                                           "Drehbuch: Lieschen Mueller, Frau Meier\n\n"
+                                           "Darsteller:\n"
+                                           "Herr Schauspieler (in einer (kleinen) Rolle)\n"
+                                           "Frau Schauspielerin (in einer Rolle)");
+    PRINT_EVENT(*event7);
+    fixup.Fix(*event7);
+    PRINT_EVENT(*event7);
+    QCOMPARE(event7->subtitle, QString("<episode title>"));
+    QCOMPARE(event7->airdate,  (unsigned short) 2011);
+    QCOMPARE(event7->description, QString("<plot summary>"));
 }
 
 void TestEITFixups::testHTMLFixup()

@@ -197,6 +197,10 @@ class EITFixUp
     const QRegExp m_RTLSubtitle4;
     const QRegExp m_RTLSubtitle5;
     const QRegExp m_PRO7Subtitle;
+    const QRegExp m_PRO7Crew;
+    const QRegExp m_PRO7CrewOne;
+    const QRegExp m_PRO7Cast;
+    const QRegExp m_PRO7CastOne;
     const QRegExp m_RTLEpisodeNo1;
     const QRegExp m_RTLEpisodeNo2;
     const QRegExp m_fiRerun;
