@@ -4,7 +4,7 @@
 <context>
     <name>(MythGalleryMain)</name>
     <message>
-        <location filename="../mythgallery/main.cpp" line="54"/>
+        <location filename="../mythgallery/main.cpp" line="55"/>
         <source>MythGallery cannot find its start directory.
 %1
 Check the directory exists, is readable and the setting is correct on MythGallery&apos;s settings page.</source>
@@ -16,7 +16,7 @@ Sprawdź czy katalog istnieje oraz czy jest poprawnie zadeklarowany w ustawienia
 <context>
     <name>GLSingleView</name>
     <message>
-        <location filename="../mythgallery/glsingleview.cpp" line="243"/>
+        <location filename="../mythgallery/glsingleview.cpp" line="246"/>
         <source>Press SELECT to play again</source>
         <translation>SELECT ponownie startuje pokaz zdjęć</translation>
     </message>
@@ -44,117 +44,117 @@ Sprawdź czy katalog istnieje oraz czy jest poprawnie zadeklarowany w ustawienia
         <translation type="obsolete">Filtrowanie: znaleziono %1 katalogów z %2 zdjęć i %3 filmów</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="136"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="140"/>
         <source>All</source>
         <translation>Wszystkie</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="138"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="142"/>
         <source>Images only</source>
         <translation>Tylko zdjęcia</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="140"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="144"/>
         <source>Movies only</source>
         <translation>Tylko filmy</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="143"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="147"/>
         <source>Filter result : (unknown)</source>
         <translation>Wynik filtrowania: (nie znaleziono)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="146"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="150"/>
         <source>Unsorted</source>
         <translation>Nie posortowane</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="148"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="152"/>
         <source>Name (A-Z alpha)</source>
         <translation>Nazwa (A-Z)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="151"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="155"/>
         <source>Reverse Name (Z-A alpha)</source>
         <translation>Nazwa (Z-A)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="153"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="157"/>
         <source>Mod Time (oldest first)</source>
         <translation>Czas modyfikacji (najstarsze jako pierwsze)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="156"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="160"/>
         <source>Reverse Mod Time (newest first)</source>
         <translation>Czas modyfikacji (najmłodsze jako pierwsze)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="158"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="162"/>
         <source>Extension (A-Z alpha)</source>
         <translation>Rozszerzenie (A-Z)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="161"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="165"/>
         <source>Reverse Extension (Z-A alpha)</source>
         <translation>Rozszerzenie (Z-A)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="164"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="168"/>
         <source>Filesize (smallest first)</source>
         <translation>Rozmiar pliku (najmniejszy jako pierwszy)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="167"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="171"/>
         <source>Reverse Filesize (largest first)</source>
         <translation>Rozmiar pliku (największy jako pierwszy)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="176"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="180"/>
         <source>-- please be patient --</source>
         <translation>Proszę o cierpliwość</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="188"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="192"/>
         <source>-- scanning current filter --</source>
         <translation>Wyszukuję z aktualnym filtrem</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="203"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="207"/>
         <source>No files / folders found</source>
         <translation>Nie znaleziono żadnych plików/katalogów</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="207"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="211"/>
         <source>Filter result : %1 folder(s) found but no files</source>
         <translation>Filtrowanie: %1 katalogów ale 0 plików</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="211"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="215"/>
         <source>Filter result : %1 folder(s), %2 movie(s) found</source>
         <translation>Filtrowanie: %1 katalogów, %2 filmów</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="215"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="219"/>
         <source>Filter result : %1 folder(s), %2 image(s) found</source>
         <translation>Filtrowanie: znaleziono %1 katalogów z %2 zdjęć</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="219"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="223"/>
         <source>Filter result : %1 folder(s), %2 image(s) and %3 movie(s) found</source>
         <translation>Filtrowanie: znaleziono %1 katalogów z %2 zdjęć i %3 filmów</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="224"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="228"/>
         <source>Filter result : %1 image(s) and %2 movie(s) found</source>
         <translation>Filtrowanie: znaleziono %1 zdjęć i %2 filmów</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="228"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="232"/>
         <source>Filter result : %1 image(s) found</source>
         <translation>Filtrowanie: znaleziono %1 zdjęć</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="231"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="235"/>
         <source>Filter result : %1 movie(s) found</source>
         <translation>Filtrowanie: znaleziono %1 filmów</translation>
     </message>
@@ -293,260 +293,270 @@ Sprawdź czy katalog istnieje oraz czy jest poprawnie zadeklarowany w ustawienia
     </message>
     <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="121"/>
+        <source>Allow the import to run external scripts</source>
+        <translation>Pozwalaj na import zewnętrznymi skryptami</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/gallerysettings.cpp" line="123"/>
+        <source>If set, you can use an external script to import images from your camera. Only enable this if you are sure your system is secure.</source>
+        <translation>Jeśli zaznaczone, MythTV będzie używał zewnętrznego skryptu do importu zdjęć z aparatu. Zaznacz jedynie gdy masz pewność co do bezpieczeństwa zewnętrznego skryptu.</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/gallerysettings.cpp" line="132"/>
         <source>Automatically load MythGallery to display pictures</source>
         <translation>Automatycznie uruchamiaj MythGallery</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="124"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="135"/>
         <source>When a new CD-Rom or removable storage device containing pictures is detected then load MythGallery to display the content.</source>
         <translation>Jeśli wykryto CD-ROM lub pendrive ze zdjęciami - automatycznie uruchom MythGallery.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="136"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="147"/>
         <source>Use OpenGL transitions</source>
         <translation>Używaj silnika OpenGL </translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="138"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="149"/>
         <source>Check this to enable OpenGL based slideshow transitions</source>
         <translation>Odzancz aby włączyć efekty transformacji bazujące na OpenGL</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="146"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="157"/>
         <source>Type of OpenGL transition</source>
         <translation>Rodzaj transformacji OpenGL</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="149"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="160"/>
         <source>none</source>
         <extracomment>No OpenGL transition</extracomment>
         <translation>Bez transformacji OpenGL</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="151"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="162"/>
         <source>blend (gl)</source>
         <extracomment>Blend OpenGL transition</extracomment>
         <translation>Blend</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="153"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="164"/>
         <source>zoom blend (gl)</source>
         <extracomment>Room blend OpenGL transition</extracomment>
         <translation>Zoom</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="155"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="166"/>
         <source>fade (gl)</source>
         <extracomment>Fade OpenGL transition</extracomment>
         <translation>OpenGL Fade</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="157"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="168"/>
         <source>rotate (gl)</source>
         <extracomment>Rotate OpenGL transition</extracomment>
         <translation>Rotate</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="159"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="170"/>
         <source>bend (gl)</source>
         <extracomment>Bend OpenGL transition</extracomment>
         <translation>Blend</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="161"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="172"/>
         <source>inout (gl)</source>
         <extracomment>Inout OpenGL transition</extracomment>
         <translation>InOut</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="163"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="174"/>
         <source>slide (gl)</source>
         <extracomment>Slide OpenGL transition</extracomment>
         <translation>Slide</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="165"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="176"/>
         <source>flutter (gl)</source>
         <extracomment>Flutter OpenGL transition</extracomment>
         <translation>Flutter</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="167"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="178"/>
         <source>cube (gl)</source>
         <extracomment>Cube OpenGL transition</extracomment>
         <translation>Cube</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="169"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="180"/>
         <source>Ken Burns (gl)</source>
         <extracomment>Ken Burns OpenGL transition</extracomment>
         <translation>Ken Burns</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="171"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="182"/>
         <source>random (gl)</source>
         <extracomment>Random OpenGL transition</extracomment>
         <translation>Random</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="173"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="184"/>
         <source>This is the type of OpenGL transition used between pictures in slideshow mode.</source>
         <translation>To jest rodzaj transformacji OpenGL, który będzie używany podczas pokazu zdjęć.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="183"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="194"/>
         <source>Duration of OpenGL Transition (milliseconds)</source>
         <translation>Czas trwania trensformacji OpenGL (w mSek)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="194"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="205"/>
         <source>Type of transition</source>
         <translation>Rodzaj transformacji</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="196"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="207"/>
         <source>none</source>
         <comment>Slideshow transition</comment>
         <translation>Bez Trnasformacji</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="199"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="210"/>
         <source>chess board</source>
         <comment>Slideshow transition</comment>
         <translation>Chess Board</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="202"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="213"/>
         <source>melt down</source>
         <comment>Slideshow transition</comment>
         <translation>Melt Down</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="205"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="216"/>
         <source>sweep</source>
         <comment>Slideshow transition</comment>
         <translation>Sweep</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="208"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="219"/>
         <source>noise</source>
         <comment>Slideshow transition</comment>
         <translation>Noise</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="211"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="222"/>
         <source>growing</source>
         <comment>Slideshow transition</comment>
         <translation>Growing</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="214"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="225"/>
         <source>incoming edges</source>
         <comment>Slideshow transition</comment>
         <translation>Incoming Edges</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="217"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="228"/>
         <source>horizontal lines</source>
         <comment>Slideshow transition</comment>
         <translation>Horizontal Lines</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="220"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="231"/>
         <source>vertical lines</source>
         <comment>Slideshow transition</comment>
         <translation>Vertical Lines</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="223"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="234"/>
         <source>circle out</source>
         <comment>Slideshow transition</comment>
         <translation>Circle Out</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="225"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="236"/>
         <source>multicircle out</source>
         <comment>Slideshow transition</comment>
         <translation>Multicircle Out</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="228"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="239"/>
         <source>spiral in</source>
         <comment>Slideshow transition</comment>
         <translation>Spiral In</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="231"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="242"/>
         <source>blobs</source>
         <comment>Slideshow transition</comment>
         <translation>Blobs</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="234"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="245"/>
         <source>random</source>
         <comment>Slideshow transition</comment>
         <translation>Random</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="238"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="249"/>
         <source>This is the type of transition used between pictures in slideshow mode.</source>
         <translation>To jest typ transformacji używane podczas pokazu zdjęć.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="246"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="257"/>
         <source>Type of background</source>
         <translation>Rodzaj tła</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="248"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="259"/>
         <source>theme</source>
         <comment>Slideshow background</comment>
         <translation>Skórka</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="251"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="262"/>
         <source>black</source>
         <comment>Slideshow background</comment>
         <translation>Black</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="254"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="265"/>
         <source>white</source>
         <comment>Slideshow background</comment>
         <translation>White</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="257"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="268"/>
         <source>This is the type of background for each picture in single view mode.</source>
         <translation>To jest typ tła dla każdego zdjęcia podczas pokazywania pojedyńczych zdjęć.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="265"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="276"/>
         <source>Slideshow Delay</source>
         <translation>Czas Wyświetlania Zdjęcia</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="267"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="278"/>
         <source>This is the number of seconds to display each picture.</source>
         <translation>To jest czas wyświetlania każdego zdjęcia podczas pokazu.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="275"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="286"/>
         <source>Recurse into directories</source>
         <translation>Pokazuj z podkatalogów</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="276"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="287"/>
         <source>Check this to let the slideshow recurse into sub-directories.</source>
         <translation>Zaznacz jeśli chcesz aby były pokazywane zdjęcia także z podkatalogów.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="287"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="298"/>
         <source>MythGallery Settings (Slideshow)</source>
         <translation>Ustawienia Galerii (pokaz)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="317"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="328"/>
         <source>MythGallery Settings (General)</source>
         <translation>Ustawienia Galerii (ogólne)</translation>
     </message>
@@ -554,7 +564,7 @@ Sprawdź czy katalog istnieje oraz czy jest poprawnie zadeklarowany w ustawienia
 <context>
     <name>IconView</name>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="130"/>
+        <location filename="../mythgallery/iconview.cpp" line="146"/>
         <source>MythGallery Directory &apos;%1&apos; does not exist or is unreadable.</source>
         <translation>Katalog MythGallery &apos;%1&apos; nie istnieje albo jest niedostępny.</translation>
     </message>
@@ -563,37 +573,37 @@ Sprawdź czy katalog istnieje oraz czy jest poprawnie zadeklarowany w ustawienia
         <translation type="obsolete">W katalogu nie znaleźiono żadnych zdjęć.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="383"/>
+        <location filename="../mythgallery/iconview.cpp" line="399"/>
         <source>%1 of %2</source>
         <translation>%1 z %2</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="394"/>
+        <location filename="../mythgallery/iconview.cpp" line="410"/>
         <source>Gallery Home</source>
         <translation>Katalog domowy</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="553"/>
+        <location filename="../mythgallery/iconview.cpp" line="569"/>
         <source>Error</source>
         <translation>Błąd</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="554"/>
+        <location filename="../mythgallery/iconview.cpp" line="570"/>
         <source>The selected device is no longer available</source>
         <translation>Podane urządznie przestało być dostępne</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="886"/>
+        <location filename="../mythgallery/iconview.cpp" line="902"/>
         <source>Gallery Options</source>
         <translation>Ustawienie Galerii zdjęć</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="890"/>
+        <location filename="../mythgallery/iconview.cpp" line="908"/>
         <source>SlideShow</source>
         <translation>Pokaz zdjęć</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="891"/>
+        <location filename="../mythgallery/iconview.cpp" line="909"/>
         <source>Random</source>
         <translation>Losowy</translation>
     </message>
@@ -618,174 +628,190 @@ Sprawdź czy katalog istnieje oraz czy jest poprawnie zadeklarowany w ustawienia
         <translation type="obsolete">Ustawienia</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="921"/>
+        <location filename="../mythgallery/iconview.cpp" line="941"/>
         <source>Metadata Options</source>
         <translation>Opcje dla metadanych</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="925"/>
+        <location filename="../mythgallery/iconview.cpp" line="945"/>
         <source>Rotate CW</source>
         <translation>Obróć 90 w prawo</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="926"/>
+        <location filename="../mythgallery/iconview.cpp" line="946"/>
         <source>Rotate CCW</source>
         <translation>Obróć 180 w prawo</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="893"/>
-        <location filename="../mythgallery/iconview.cpp" line="933"/>
+        <location filename="../mythgallery/iconview.cpp" line="913"/>
+        <location filename="../mythgallery/iconview.cpp" line="953"/>
         <source>Marking Options</source>
         <translation>Opcje zaznaczania</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="937"/>
+        <location filename="../mythgallery/iconview.cpp" line="957"/>
         <source>Select One</source>
         <translation>Wybierz jedno</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="938"/>
+        <location filename="../mythgallery/iconview.cpp" line="958"/>
         <source>Clear One Marked</source>
         <translation>Wykasuj zaznaczenie</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="939"/>
+        <location filename="../mythgallery/iconview.cpp" line="959"/>
         <source>Select All</source>
         <translation>Zaznacz wszystkie </translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="940"/>
+        <location filename="../mythgallery/iconview.cpp" line="960"/>
         <source>Clear Marked</source>
         <translation>Wykasuj zaznaczenia</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="895"/>
-        <location filename="../mythgallery/iconview.cpp" line="960"/>
+        <location filename="../mythgallery/iconview.cpp" line="915"/>
+        <location filename="../mythgallery/iconview.cpp" line="980"/>
         <source>File Options</source>
         <translation>Opcje pliku</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="190"/>
+        <location filename="../mythgallery/iconview.cpp" line="206"/>
         <source>No images found in this folder.</source>
         <translation>Nie znaleziono żadnych zdjęć.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="892"/>
+        <location filename="../mythgallery/iconview.cpp" line="910"/>
         <source>Meta Data Options</source>
         <translation>Opcje Metadanych</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="894"/>
+        <location filename="../mythgallery/iconview.cpp" line="914"/>
         <source>Filter / Sort...</source>
         <translation>Filtruj / Sortuj...</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="896"/>
+        <location filename="../mythgallery/iconview.cpp" line="916"/>
         <source>Settings...</source>
         <translation>Ustawienia...</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="964"/>
+        <location filename="../mythgallery/iconview.cpp" line="984"/>
         <source>Show Devices</source>
         <translation>Pokaż Urządzenia</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="965"/>
+        <location filename="../mythgallery/iconview.cpp" line="985"/>
         <source>Eject</source>
         <translation>Wysuń</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="966"/>
+        <location filename="../mythgallery/iconview.cpp" line="986"/>
         <source>Import</source>
         <translation>Importuj</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="967"/>
+        <location filename="../mythgallery/iconview.cpp" line="990"/>
         <source>Copy here</source>
         <translation>Kopiuj tutaj</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="968"/>
+        <location filename="../mythgallery/iconview.cpp" line="991"/>
         <source>Move here</source>
         <translation>Przenieś tutaj</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="969"/>
+        <location filename="../mythgallery/iconview.cpp" line="995"/>
         <source>Delete</source>
         <translation>Skasuj</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/iconview.cpp" line="1151"/>
+        <source>Importing images from camera. Please wait...</source>
+        <translation>Importuję zdjęcia z aparatu. Proszę Czekać...</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/iconview.cpp" line="1181"/>
+        <source>Found an import script (%1) but running them has been disabled in the settings!</source>
+        <translation>Znaleziono skrypt (%1) do importu zdjęć, ale używanie skryptów jest wyłączone w konfiguracji MythTV!</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/iconview.cpp" line="1192"/>
+        <source>Could not read or execute %1</source>
+        <translation>Nie mogę odczytać/wykonać %1</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/iconview.cpp" line="1205"/>
+        <source>Found %1 images</source>
+        <translation>Znaleziono %1 zdjęć</translation>
     </message>
     <message>
         <source>Create Dir</source>
         <translation type="obsolete">Utwórz katalog</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="970"/>
+        <location filename="../mythgallery/iconview.cpp" line="997"/>
         <source>Create folder</source>
         <translation>Utwórz katalog</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="971"/>
-        <location filename="../mythgallery/iconview.cpp" line="1345"/>
+        <location filename="../mythgallery/iconview.cpp" line="1000"/>
+        <location filename="../mythgallery/iconview.cpp" line="1396"/>
         <source>Rename</source>
         <translation>Zmień Nazwę</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1023"/>
+        <location filename="../mythgallery/iconview.cpp" line="1052"/>
         <source>Delete Current File or Folder</source>
         <translation>Skasuj bieżący plik lub katalog</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1025"/>
+        <location filename="../mythgallery/iconview.cpp" line="1054"/>
         <source>Deleting 1 folder, including any subfolders and files.</source>
         <translation>Kasuję 1 katalog włącznie z podkatalogami i plikami.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1026"/>
+        <location filename="../mythgallery/iconview.cpp" line="1055"/>
         <source>Deleting 1 image.</source>
         <translation>Kasuję jedno zdjęcie.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1100"/>
         <source>Import pictures?</source>
         <translation>Czy importować zdjęcia ?</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1102"/>
         <source>No</source>
         <translation>Nie</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1103"/>
         <source>Yes</source>
         <translation>Tak</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1146"/>
+        <location filename="../mythgallery/iconview.cpp" line="1200"/>
         <source>Nothing found to import</source>
         <translation>Nic nie znaleziono</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1148"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1251"/>
+        <location filename="../mythgallery/iconview.cpp" line="1302"/>
         <source>Deleting %1 images and folders, including any subfolders and files.</source>
         <translation>Kasuję %1 zdjęć/katalogów włącznie z podkatalogami i plikami.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1314"/>
+        <location filename="../mythgallery/iconview.cpp" line="1365"/>
         <source>New Folder</source>
         <translation>Nowy katalog</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1316"/>
+        <location filename="../mythgallery/iconview.cpp" line="1367"/>
         <source>Create New Folder</source>
         <translation>Utwórz nowy katalog</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1381"/>
+        <location filename="../mythgallery/iconview.cpp" line="1432"/>
         <source>Failed to rename folder</source>
         <translation>Nieudana zmiana nazwy katalogu</translation>
     </message>
@@ -794,17 +820,17 @@ Sprawdź czy katalog istnieje oraz czy jest poprawnie zadeklarowany w ustawienia
         <translation type="obsolete">Zmiana nazwy niepowiodła się</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1383"/>
+        <location filename="../mythgallery/iconview.cpp" line="1434"/>
         <source>Failed to rename file</source>
         <translation>Nieudana zmiana nazwy pliku</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1443"/>
+        <location filename="../mythgallery/iconview.cpp" line="1494"/>
         <source>Moving marked images...</source>
         <translation>Przenoszę zaznaczone zdjęcia...</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1443"/>
+        <location filename="../mythgallery/iconview.cpp" line="1494"/>
         <source>Copying marked images...</source>
         <translation>Kopiuję zaznaczone zdjęcia...</translation>
     </message>
@@ -812,12 +838,12 @@ Sprawdź czy katalog istnieje oraz czy jest poprawnie zadeklarowany w ustawienia
 <context>
     <name>ImageView</name>
     <message>
-        <location filename="../mythgallery/imageview.cpp" line="113"/>
+        <location filename="../mythgallery/imageview.cpp" line="118"/>
         <source>Random Slideshow</source>
         <translation>Random</translation>
     </message>
     <message>
-        <location filename="../mythgallery/imageview.cpp" line="119"/>
+        <location filename="../mythgallery/imageview.cpp" line="124"/>
         <source>Slideshow</source>
         <translation>Pokaz Zdjęć</translation>
     </message>
@@ -825,113 +851,141 @@ Sprawdź czy katalog istnieje oraz czy jest poprawnie zadeklarowany w ustawienia
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythgallery/main.cpp" line="89"/>
+        <location filename="../mythgallery/main.cpp" line="87"/>
         <source>Image viewer / slideshow</source>
         <translation>Przeglądarka / odtwarzacz zdjęć</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="94"/>
+        <location filename="../mythgallery/main.cpp" line="92"/>
         <source>Start/Stop Slideshow</source>
         <translation>Zacznij/Zakończ pokaz zdjęć </translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="96"/>
+        <location filename="../mythgallery/main.cpp" line="94"/>
         <source>Go to the first image in thumbnail view</source>
         <translation>Idź do pierwszego zdjęcia w widoku miniatur</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="98"/>
+        <location filename="../mythgallery/main.cpp" line="96"/>
         <source>Go to the last image in thumbnail view</source>
         <translation>Idź do ostatniego zdjęcia w widoku miniatur</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="100"/>
+        <location filename="../mythgallery/main.cpp" line="98"/>
         <source>Start Slideshow in thumbnail view</source>
         <translation>Zacznij pokaz z widokiem miniatur</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="91"/>
-        <location filename="../mythgallery/main.cpp" line="102"/>
+        <location filename="../mythgallery/main.cpp" line="89"/>
+        <location filename="../mythgallery/main.cpp" line="100"/>
         <source>Start Random Slideshow in thumbnail view</source>
         <translation>Zacznij pokaz miniatur z przypadkową kolejnością</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="105"/>
+        <location filename="../mythgallery/main.cpp" line="103"/>
         <source>Rotate image right 90 degrees</source>
         <translation>Obróć zdjęcie 90 w prawo</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="107"/>
+        <location filename="../mythgallery/main.cpp" line="105"/>
         <source>Rotate image left 90 degrees</source>
         <translation>Obróć zdjęcie 90 w lewo</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="109"/>
+        <location filename="../mythgallery/main.cpp" line="107"/>
         <source>Zoom image out</source>
         <translation>Powiększ zdjęcie</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="111"/>
+        <location filename="../mythgallery/main.cpp" line="109"/>
         <source>Zoom image in</source>
         <translation>Zmniejsz zdjęcie</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="113"/>
+        <location filename="../mythgallery/main.cpp" line="111"/>
         <source>Scroll image up</source>
         <translation>Przesuń zdjęcie do góry</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="115"/>
+        <location filename="../mythgallery/main.cpp" line="113"/>
         <source>Scroll image left</source>
         <translation>Przesuń zdjęcie w lewo</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="117"/>
+        <location filename="../mythgallery/main.cpp" line="115"/>
         <source>Scroll image right</source>
         <translation>Przesuń zdjęcie w prawo</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="119"/>
+        <location filename="../mythgallery/main.cpp" line="117"/>
         <source>Scroll image down</source>
         <translation>Przesuń zdjęcie w dół</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="121"/>
+        <location filename="../mythgallery/main.cpp" line="119"/>
         <source>Recenter image</source>
         <translation>Wycentruj zdjęcie </translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="123"/>
+        <location filename="../mythgallery/main.cpp" line="121"/>
         <source>Full-size (un-zoom) image</source>
         <translation>Pokaż zdjęcie w pełnym rozmiarze</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="125"/>
+        <location filename="../mythgallery/main.cpp" line="123"/>
         <source>Go to the upper-left corner of the image</source>
         <translation>Idż do górnego lewego rogu zdjęcia</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="127"/>
+        <location filename="../mythgallery/main.cpp" line="125"/>
         <source>Go to the lower-right corner of the image</source>
         <translation>Idż do górnego prawego rogu zdjęcia</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="129"/>
+        <location filename="../mythgallery/main.cpp" line="127"/>
         <source>Mark image</source>
         <translation>Zaznacz zdjęcie</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="131"/>
+        <location filename="../mythgallery/main.cpp" line="129"/>
         <source>Toggle scale to fullscreen/scale to fit</source>
         <translation>Oryginalny rozmiar &lt;-&gt; pełny ekran</translation>
     </message>
     <message>
+        <location filename="../mythgallery/main.cpp" line="132"/>
+        <source>MythGallery Media Handler 1/3</source>
+        <translation>Obsługa mediów w Galerii 1/3</translation>
+    </message>
+    <message>
         <location filename="../mythgallery/main.cpp" line="133"/>
+        <source>MythGallery mixed data</source>
+        <translation>Galeria: wszystkie typy danych</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="145"/>
+        <source>MythGallery Media Handler 2/3</source>
+        <translation>Obsługa mediów w Galerii 2/3</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="146"/>
+        <source>MythGallery images</source>
+        <translation>Galeria: tylko zdjęcia</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="158"/>
+        <source>MythGallery Media Handler 3/3</source>
+        <translation>Obsługa mediów w Galerii 3/3</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="159"/>
+        <source>MythGallery movies</source>
+        <translation>Galeria: tylko filmy</translation>
+    </message>
+    <message>
         <source>MythGallery Media Handler 1/2</source>
         <translation>Obsługa mediów w Galerii 1/2</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="144"/>
         <source>MythGallery Media Handler 2/2</source>
         <translation>Obsługa mediów w Galerii 2/2</translation>
     </message>
@@ -1214,7 +1268,6 @@ Check the directory exists, is readable and the setting is correct on MythGaller
         <translation>MENU: Aktywne Menu</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="30"/>
         <source>Video Gallery</source>
         <translation>Galeria Zdjęć</translation>
     </message>
@@ -1309,13 +1362,13 @@ Check the directory exists, is readable and the setting is correct on MythGaller
         <translation>Wprowadź bieżącą lokalizację, najbliższe duże miasto. W niektórych krajach może to być także kod pocztowy.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="32"/>
         <source>Folder filter :</source>
         <oldsource>Directory filter :</oldsource>
         <translation>Filtr katalogów:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="33"/>
         <source>Type filter :</source>
         <translation>Typ filtra:</translation>
     </message>
@@ -1324,7 +1377,7 @@ Check the directory exists, is readable and the setting is correct on MythGaller
         <translation type="obsolete">NumImages_Text</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
+        <location filename="themestrings.h" line="34"/>
         <source>Sort by :</source>
         <translation>Sortuj po:</translation>
     </message>
@@ -1334,12 +1387,12 @@ Check the directory exists, is readable and the setting is correct on MythGaller
         <translation>Sprawdź filtr</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Done</source>
         <translation>Zrobione</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Save as default</source>
         <translation>Zapisz jako domyślny</translation>
     </message>
