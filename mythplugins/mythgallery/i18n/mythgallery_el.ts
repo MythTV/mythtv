@@ -5,7 +5,7 @@
 <context>
     <name>(MythGalleryMain)</name>
     <message>
-        <location filename="../mythgallery/main.cpp" line="54"/>
+        <location filename="../mythgallery/main.cpp" line="55"/>
         <source>MythGallery cannot find its start directory.
 %1
 Check the directory exists, is readable and the setting is correct on MythGallery&apos;s settings page.</source>
@@ -784,115 +784,135 @@ Check the directory exists, is readable and the setting is correct on MythGaller
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythgallery/main.cpp" line="89"/>
+        <location filename="../mythgallery/main.cpp" line="87"/>
         <source>Image viewer / slideshow</source>
         <translation>Προβολή Φωτογραφιών / Προβολή Διαφανειών</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="94"/>
+        <location filename="../mythgallery/main.cpp" line="92"/>
         <source>Start/Stop Slideshow</source>
         <translation>Εκκίνηση/Διακοπή Προβολής Διαφανειών</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="96"/>
+        <location filename="../mythgallery/main.cpp" line="94"/>
         <source>Go to the first image in thumbnail view</source>
         <translation>Πήγαινε στην πρώτη φωτογραφία της προβολής διαφανειών</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="98"/>
+        <location filename="../mythgallery/main.cpp" line="96"/>
         <source>Go to the last image in thumbnail view</source>
         <translation>Πήγαινε στην τελευταία φωτογραφία της προβολής διαφανειών</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="100"/>
+        <location filename="../mythgallery/main.cpp" line="98"/>
         <source>Start Slideshow in thumbnail view</source>
         <translation>Εκκίνηση Προβολής διαφανειών σε σμίκρυνση</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="91"/>
-        <location filename="../mythgallery/main.cpp" line="102"/>
+        <location filename="../mythgallery/main.cpp" line="89"/>
+        <location filename="../mythgallery/main.cpp" line="100"/>
         <source>Start Random Slideshow in thumbnail view</source>
         <translation>Εκκίνηση Τυχαίας Προβολής διαφανειών σε σμίκρυνση</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="105"/>
+        <location filename="../mythgallery/main.cpp" line="103"/>
         <source>Rotate image right 90 degrees</source>
         <translation>Περιστροφή φωτογρ. δεξιά 90 μοίρες</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="107"/>
+        <location filename="../mythgallery/main.cpp" line="105"/>
         <source>Rotate image left 90 degrees</source>
         <translation>Περιστροφή φωτογρ. αριστερά 90 μοίρες</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="109"/>
+        <location filename="../mythgallery/main.cpp" line="107"/>
         <source>Zoom image out</source>
         <translation>Σμίκρυνση φωτογραφίας</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="111"/>
+        <location filename="../mythgallery/main.cpp" line="109"/>
         <source>Zoom image in</source>
         <translation>Μεγέθυνση Φωτογραφίας</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="113"/>
+        <location filename="../mythgallery/main.cpp" line="111"/>
         <source>Scroll image up</source>
         <translation>Κύλιση φωτογραφίας προς τα πάνω</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="115"/>
+        <location filename="../mythgallery/main.cpp" line="113"/>
         <source>Scroll image left</source>
         <translation>Κύλιση φωτογραφίας προς τα αριστερά</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="117"/>
+        <location filename="../mythgallery/main.cpp" line="115"/>
         <source>Scroll image right</source>
         <translation>Κύλιση φωτογραφίας προς τα δεξιά</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="119"/>
+        <location filename="../mythgallery/main.cpp" line="117"/>
         <source>Scroll image down</source>
         <translation>Κύλιση φωτογραφίας προς τα κάτω</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="121"/>
+        <location filename="../mythgallery/main.cpp" line="119"/>
         <source>Recenter image</source>
         <translation>Κεντράρισμα φωτογραφίας</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="123"/>
+        <location filename="../mythgallery/main.cpp" line="121"/>
         <source>Full-size (un-zoom) image</source>
         <translation>Πλήρες μέγεθος (χωρίς μεγέθυνση)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="125"/>
+        <location filename="../mythgallery/main.cpp" line="123"/>
         <source>Go to the upper-left corner of the image</source>
         <translation>Στην πάνω-αριστερή γωνία της φωτογραφίας</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="127"/>
+        <location filename="../mythgallery/main.cpp" line="125"/>
         <source>Go to the lower-right corner of the image</source>
         <translation>Στην κάτω-δεξιά γωνία της φωτογραφίας</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="129"/>
+        <location filename="../mythgallery/main.cpp" line="127"/>
         <source>Mark image</source>
         <translation>Σημάδεμα φωτογραφίας</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="131"/>
+        <location filename="../mythgallery/main.cpp" line="129"/>
         <source>Toggle scale to fullscreen/scale to fit</source>
         <translation>Εναλλαγή κλίμακας μεταξύ Πλήρους οθόνης/όσο ταιριάζει</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="133"/>
-        <source>MythGallery Media Handler 1/2</source>
-        <translation>Διαχείριση Μέσων 1/2</translation>
+        <location filename="../mythgallery/main.cpp" line="132"/>
+        <source>MythGallery Media Handler 1/3</source>
+        <translation>Διαχείριση Φωτογραφικών Αρχείων 1/3</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="144"/>
-        <source>MythGallery Media Handler 2/2</source>
-        <translation>Διαχείριση Μέσων 2/2</translation>
+        <location filename="../mythgallery/main.cpp" line="133"/>
+        <source>MythGallery mixed data</source>
+        <translation>Μικτά αρχεία</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="145"/>
+        <source>MythGallery Media Handler 2/3</source>
+        <translation>Διαχείριση Φωτογραφικών Αρχείων 2/3</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="146"/>
+        <source>MythGallery images</source>
+        <translation>Αρχεία εικόνων </translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="158"/>
+        <source>MythGallery Media Handler 3/3</source>
+        <translation>Διαχείριση Φωτογραφικών Αρχείων 3/3</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="159"/>
+        <source>MythGallery movies</source>
+        <translation>Αρχεία ταινιών</translation>
     </message>
 </context>
 <context>
