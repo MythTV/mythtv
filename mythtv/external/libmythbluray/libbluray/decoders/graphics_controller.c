@@ -825,6 +825,8 @@ void gc_free(GRAPHICS_CONTROLLER **p)
 
         bd_mutex_destroy(&gc->mutex);
 
+        X_FREE(gc->saved_bog_data);
+
         X_FREE(*p);
     }
 }

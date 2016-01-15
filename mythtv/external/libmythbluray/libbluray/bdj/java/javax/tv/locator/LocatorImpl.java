@@ -24,7 +24,7 @@ public class LocatorImpl implements Locator {
         this.url = url;
     }
 
-    public boolean hasMultipleTransformations()    {
+    public boolean hasMultipleTransformations() {
         return false;
     }
 

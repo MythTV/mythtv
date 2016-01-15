@@ -433,7 +433,22 @@ void TestEITFixups::testDEPro7Sat1()
     QCOMPARE(event6->subtitle, QString("Drei Kleintiere durchschneiden (1)"));
     QCOMPARE(event6->airdate,  (unsigned short) 2014);
 
-
+    /* #12151 */
+    DBEventEIT *event7 = SimpleDBEventEIT (EITFixUp::kFixP7S1,
+                                           "Criminal Minds",
+                                           "<episode title>, Crime-Serie, USA 2011",
+                                           "<plot summary>\n\n"
+                                           "Regie: Frau Regisseur\n"
+                                           "Drehbuch: Lieschen Mueller, Frau Meier\n\n"
+                                           "Darsteller:\n"
+                                           "Herr Schauspieler (in einer (kleinen) Rolle)\n"
+                                           "Frau Schauspielerin (in einer Rolle)");
+    PRINT_EVENT(*event7);
+    fixup.Fix(*event7);
+    PRINT_EVENT(*event7);
+    QCOMPARE(event7->subtitle, QString("<episode title>"));
+    QCOMPARE(event7->airdate,  (unsigned short) 2011);
+    QCOMPARE(event7->description, QString("<plot summary>"));
 }
 
 void TestEITFixups::testHTMLFixup()
@@ -471,6 +486,22 @@ void TestEITFixups::testHTMLFixup()
     fixup.Fix(event2);
     PRINT_EVENT(event2);
     QCOMPARE(event2.title,       QString("Redneck Island"));
+
+    DBEventEIT event3(14101,
+                      "New: Jericho",
+                      "Drama set in 1870s Yorkshire. In her desperation to protect her son, Annie unwittingly opens the door for Bamford the railway detective, who has returned to Jericho. [AD,S]",
+                      QDateTime::fromString("2015-02-28T19:40:00Z", Qt::ISODate),
+                      QDateTime::fromString("2015-02-28T20:00:00Z", Qt::ISODate),
+                      EITFixUp::kFixHTML | EITFixUp::kFixUK,
+                      SUB_UNKNOWN,
+                      AUD_STEREO,
+                      VID_UNKNOWN);
+
+    fixup.Fix(event3);
+    PRINT_EVENT(event3);
+    QCOMPARE(event3.title,       QString("Jericho"));
+    QCOMPARE(event3.description, QString("Drama set in 1870s Yorkshire. In her desperation to protect her son, Annie unwittingly opens the door for Bamford the railway detective, who has returned to Jericho."));
+
 }
 
 void TestEITFixups::testSkyEpisodes()

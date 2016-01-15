@@ -198,6 +198,9 @@ public class Font implements java.io.Serializable {
     public Font deriveFont(int style, int size) {
         return new Font(name, style, size, fontFile, family);
     }
+    public Font deriveFont(int style, float size) {
+        return new Font(name, style, (int)size, fontFile, family);
+    }
 
     /* constructor */
     private Font(String name, int style, int size, File fontFile, String family) {

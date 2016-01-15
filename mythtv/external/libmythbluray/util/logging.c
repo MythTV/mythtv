@@ -81,19 +81,34 @@ void bd_debug(const char *file, int line, uint32_t mask, const char *format, ...
 
     if (mask & debug_mask) {
         const char *f = strrchr(file, DIR_SEP_CHAR);
-        char buffer[4096], *pt = buffer;
+        char buffer[4096];
         va_list args;
+        int len, len2;
 
-        pt += sprintf(buffer, "%s:%d: ", f ? f + 1 : file, line);
+        len = sprintf(buffer, "%s:%d: ", f ? f + 1 : file, line);
+        if (len < 0) {
+            return;
+        }
 
         va_start(args, format);
-        vsnprintf(pt, sizeof(buffer) - (size_t)(intptr_t)(pt - buffer) - 1, format, args);
+        len2 = vsnprintf(buffer + len, sizeof(buffer) - len - 1, format, args);
         va_end(args);
 
+        if (len2 < 0) {
+            return;
+        }
+
         if (log_func) {
+            buffer[sizeof(buffer)-1] = 0;
             log_func(buffer);
+
         } else {
-            fprintf(logfile, "%s", buffer);
+            len += len2;
+            if ((size_t)len >= sizeof(buffer)) {
+                len = sizeof(buffer);
+            }
+
+            fwrite(buffer, len, 1, logfile);
         }
     }
 }

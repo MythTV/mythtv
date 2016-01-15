@@ -355,11 +355,28 @@ const BLURAY_DISC_INFO *bd_get_disc_info(BLURAY *bd);
  *  If information is provided in multiple languages, currently
  *  selected language (BLURAY_PLAYER_SETTING_MENU_LANG) is used.
  *
+ *  Referenced thumbnail images should be read with bd_get_meta_file().
+ *
  * @param bd  BLURAY object
  * @return META_DL (disclib) object, NULL on error
  */
 struct meta_dl;
 const struct meta_dl *bd_get_meta(BLURAY *bd);
+
+/**
+ *
+ *  Read metadata file from BluRay disc.
+ *
+ *  Allocate large enough memory block and read file contents.
+ *  Caller must free the memory block with free().
+ *
+ * @param bd  BLURAY object
+ * @param file_name  name of metadata file
+ * @param data  where to store pointer to file data
+ * @param size  where to store file size
+ * @return 1 on success, 0 on error
+ */
+int bd_get_meta_file(BLURAY *bd, const char *file_name, void **data, int64_t *size);
 
 
 /*
@@ -536,6 +553,7 @@ void bd_seamless_angle_change(BLURAY *bd, unsigned angle);
  * @param stream_id  stream number (1..N)
  * @param enable_flag  set to 0 to disable streams of this type
  */
+#define BLURAY_AUDIO_STREAM      0
 #define BLURAY_PG_TEXTST_STREAM  1
 
 void bd_select_stream(BLURAY *bd, uint32_t stream_type, uint32_t stream_id, uint32_t enable_flag);
@@ -1000,6 +1018,21 @@ void bd_free_bdjo(struct bdjo_data *);
 
 int  bd_start_bdj(BLURAY *bd, const char* start_object); // start BD-J from the specified BD-J object (should be a 5 character string)
 void bd_stop_bdj(BLURAY *bd); // shutdown BD-J and clean up resources
+
+/**
+ *
+ *  Read a file from BluRay Virtual File System.
+ *
+ *  Allocate large enough memory block and read file contents.
+ *  Caller must free the memory block with free().
+ *
+ * @param bd  BLURAY object
+ * @param file_name  path to the file (relative to disc root)
+ * @param data  where to store pointer to allocated data
+ * @param size  where to store file size
+ * @return 1 on success, 0 on error
+ */
+int bd_read_file(BLURAY *, const char *path, void **data, int64_t *size);
 
 
 #ifdef __cplusplus

@@ -20,6 +20,10 @@
 #ifndef BD_REFCNT_H_
 #define BD_REFCNT_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "attributes.h"
 
 #include <stddef.h>
@@ -51,6 +55,10 @@ BD_PRIVATE void *refcnt_realloc(void *obj, size_t sz);
 #ifndef BD_OVERLAY_INTERFACE_VERSION
 void bd_refcnt_inc(const void *obj);
 void bd_refcnt_dec(const void *obj);
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif // BD_REFCNT_H_

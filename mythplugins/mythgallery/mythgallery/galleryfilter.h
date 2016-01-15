@@ -36,7 +36,7 @@ class GalleryFilter
     static bool TestFilter(const QString& dir, const GalleryFilter& flt,
                            int *dirCount, int *imageCount, int *movieCount);
 
-    GalleryFilter(bool loaddefaultsettings = true);
+    explicit GalleryFilter(bool loaddefaultsettings = true);
     GalleryFilter(const GalleryFilter &gfs);
     GalleryFilter &operator=(const GalleryFilter &gfs);
 

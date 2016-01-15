@@ -33,6 +33,7 @@
 
 char *mount_get_mountpoint(const char *device_path)
 {
+#ifndef __ANDROID__
 #ifdef HAVE_MNTENT_H
     struct stat st;
     if (stat (device_path, &st) ) {
@@ -62,6 +63,7 @@ char *mount_get_mountpoint(const char *device_path)
         endmntent (f);
     }
 #endif /* HAVE_MNTENT_H */
+#endif /*  __ANDROID__ */
 
     return str_dup(device_path);
 }

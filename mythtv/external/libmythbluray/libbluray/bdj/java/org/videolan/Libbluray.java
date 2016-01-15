@@ -52,14 +52,7 @@ public class Libbluray {
 
     /* hook system properties: make "user.dir" point to current Xlet home directory */
 
-    private static boolean propertiesHooked = false;
-
     private static void hookProperties() {
-        if (propertiesHooked) {
-            return;
-        }
-        propertiesHooked = true;
-
         java.util.Properties p = new java.util.Properties(System.getProperties()) {
                 public String getProperty(String key) {
                     if (key.equals("user.dir")) {
@@ -67,11 +60,34 @@ public class Libbluray {
                         if (ctx != null) {
                             return ctx.getXletHome();
                         }
+                        System.err.println("getProperty(user.dir): no context !  " + Logger.dumpStack());
                     }
                     return super.getProperty(key);
                 }
             };
         System.setProperties(p);
+    }
+
+    private static boolean initOnce = false;
+    private static void initOnce() {
+        if (initOnce) {
+            return;
+        }
+        initOnce = true;
+
+        /* hook system properties (provide Xlet-specific user.dir) */
+        try {
+            hookProperties();
+        } catch (Throwable t) {
+            System.err.println("hookProperties() failed: " + t);
+        }
+
+        /* hook sockets (limit network connections) */
+        try {
+            BDJSocketFactory.init();
+        } catch (Throwable t) {
+            System.err.println("Hooking socket factory failed: " + t + "\n" + Logger.dumpStack(t));
+        }
     }
 
     private static String canonicalize(String path, boolean create) {
@@ -91,7 +107,7 @@ public class Libbluray {
     private static void init(long nativePointer, String discID, String discRoot,
                                String persistentRoot, String budaRoot) {
 
-        hookProperties();
+        initOnce();
 
         /* set up directories */
         persistentRoot = canonicalize(persistentRoot, true);
@@ -186,8 +202,6 @@ public class Libbluray {
         System.setProperty("bluray.memory.font_cache", "4096");
 
         System.setProperty("bluray.network.connected", "YES");
-
-        BDJSocketFactory.init();
 
         try {
             System.setSecurityManager(new BDJSecurityManager(discRoot, persistentRoot, budaRoot));

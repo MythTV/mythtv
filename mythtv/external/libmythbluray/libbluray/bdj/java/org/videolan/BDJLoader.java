@@ -44,8 +44,60 @@ import org.videolan.media.content.PlayerManager;
 
 public class BDJLoader {
 
+    private static class FontCacheAction extends BDJAction {
+        public FontCacheAction(InputStream is) {
+            this.fontPath = null;
+            this.is = is;
+        }
+        public FontCacheAction(String fontPath) {
+            this.fontPath = fontPath;
+            this.is = null;
+        }
+
+        protected void doAction() {
+            try {
+                if (this.is != null) {
+                    this.cacheFile = addFontImpl(is);
+                } else {
+                    this.cacheFile = addFontImpl(fontPath);
+                }
+            } catch (RuntimeException e) {
+                this.exception = e;
+            }
+        }
+
+        public File execute() {
+            BDJActionManager.getInstance().putCommand(this);
+            waitEnd();
+            if (exception != null) {
+                throw exception;
+            }
+            return cacheFile;
+        }
+
+        private final String fontPath;
+        private final InputStream is;
+        private File cacheFile = null;
+        private RuntimeException exception = null;
+    }
+
     /* called by org.dvb.ui.FontFactory */
     public static File addFont(InputStream is) {
+        if (BDJXletContext.getCurrentContext() == null)
+            return addFontImpl(is);
+        /* dispatch cache request to privileged thread */
+        return new FontCacheAction(is).execute();
+    }
+
+    /* called by org.dvb.ui.FontFactory */
+    public static File addFont(String fontFile) {
+        if (BDJXletContext.getCurrentContext() == null)
+            return addFontImpl(fontFile);
+        /* dispatch cache request to privileged thread */
+        return new FontCacheAction(fontFile).execute();
+    }
+
+    private static File addFontImpl(InputStream is) {
         VFSCache localCache = vfsCache;
         if (localCache != null) {
             return localCache.addFont(is);
@@ -53,8 +105,7 @@ public class BDJLoader {
         return null;
     }
 
-    /* called by org.dvb.ui.FontFactory */
-    public static File addFont(String fontFile) {
+    private static File addFontImpl(String fontFile) {
         VFSCache localCache = vfsCache;
         if (localCache != null) {
             return localCache.addFont(fontFile);
@@ -134,11 +185,6 @@ public class BDJLoader {
                 throw new InvalidObjectException("bdjo not loaded");
             AppEntry[] appTable = bdjo.getAppTable();
 
-            // initialize AppCaches
-            if (vfsCache != null) {
-                vfsCache.add(bdjo.getAppCaches());
-            }
-
             // reuse appProxys
             BDJAppProxy[] proxys = new BDJAppProxy[appTable.length];
             AppsDatabase db = AppsDatabase.getAppsDatabase();
@@ -164,7 +210,6 @@ public class BDJLoader {
                             proxy.stop(true);
                         } else {
                             logger.info("Keeping xlet " + appTable[i].getInitialClass());
-                            proxy.getXletContext().update(appTable[i], bdjo.getAppCaches());
                             proxys[i] = proxy;
                             proxy = null;
                         }
@@ -189,6 +234,11 @@ public class BDJLoader {
             Libbluray.setUOMask(terminfo.getMenuCallMask(), terminfo.getTitleSearchMask());
             Libbluray.setKeyInterest(bdjo.getKeyInterestTable());
 
+            // initialize AppCaches
+            if (vfsCache != null) {
+                vfsCache.add(bdjo.getAppCaches());
+            }
+
             // initialize appProxys
             for (int i = 0; i < appTable.length; i++) {
                 if (proxys[i] == null) {
@@ -205,6 +255,7 @@ public class BDJLoader {
                     }
                     logger.info("Loaded class: " + appTable[i].getInitialClass() + p + " from " + appTable[i].getBasePath() + ".jar");
                 } else {
+                    proxys[i].getXletContext().update(appTable[i], bdjo.getAppCaches());
                     logger.info("Reused class: " + appTable[i].getInitialClass() +     " from " + appTable[i].getBasePath() + ".jar");
                 }
             }
@@ -214,6 +265,19 @@ public class BDJLoader {
 
             // notify AppsDatabase
             ((BDJAppsDatabase)BDJAppsDatabase.getAppsDatabase()).newDatabase(bdjo, proxys);
+
+            // auto start playlist
+            try {
+                PlayListTable plt = bdjo.getAccessiblePlaylists();
+                if ((plt != null) && (plt.isAutostartFirst())) {
+                    logger.info("Auto-starting playlist");
+                    String[] pl = plt.getPlayLists();
+                    if (pl.length > 0)
+                        Manager.createPlayer(new MediaLocator(new BDLocator("bd://PLAYLIST:" + pl[0]))).start();
+                }
+            } catch (Exception e) {
+                logger.error("loadN(): autoplaylist failed: " + e + "\n" + Logger.dumpStack(e));
+            }
 
             // now run all the xlets
             for (int i = 0; i < appTable.length; i++) {
@@ -230,15 +294,6 @@ public class BDJLoader {
             }
 
             logger.info("Finished initializing and starting xlets.");
-
-            // auto start playlist
-            PlayListTable plt = bdjo.getAccessiblePlaylists();
-            if ((plt != null) && (plt.isAutostartFirst())) {
-                logger.info("Auto-starting playlist");
-                String[] pl = plt.getPlayLists();
-                if (pl.length > 0)
-                    Manager.createPlayer(new MediaLocator(new BDLocator("bd://PLAYLIST:" + pl[0]))).start();
-            }
 
             return true;
 

@@ -70,7 +70,12 @@ public class BDJXletContext implements javax.tv.xlet.XletContext, javax.microedi
         try {
             int homeJarID = Integer.parseInt(home);
             long time = System.currentTimeMillis();
-            homeMountPoint = MountManager.mount(homeJarID, false) + java.io.File.separator;
+            homeMountPoint = MountManager.mount(homeJarID, false);
+            if (homeMountPoint == null) {
+                logger.error("Failed mounting " + home + ".jar");
+            } else {
+                homeMountPoint = homeMountPoint + java.io.File.separator;
+            }
             time = System.currentTimeMillis() - time;
             logger.info("Mounted Xlet home directory from " + home + ".jar " +
                         "to " + homeMountPoint + "(" + time + "ms)");
@@ -80,6 +85,8 @@ public class BDJXletContext implements javax.tv.xlet.XletContext, javax.microedi
     }
 
     public String getXletHome() {
+        if (homeMountPoint == null)
+            logger.error("Home directory not mounted!");
         return homeMountPoint;
     }
 

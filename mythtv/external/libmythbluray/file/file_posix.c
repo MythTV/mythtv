@@ -38,6 +38,13 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+#ifdef __ANDROID__
+# undef  lseek
+# define lseek lseek64
+# undef  off_t
+# define off_t off64_t
+#endif
+
 static void _file_close(BD_FILE_H *file)
 {
     if (file) {

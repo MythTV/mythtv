@@ -53,6 +53,7 @@ class BDGraphics extends BDGraphicsBase {
 
     public java.awt.font.FontRenderContext getFontRenderContext()
     {
+        logger.unimplemented("getFontRenderContext");
         return null;
     }
     public void setPaint(Paint p) {

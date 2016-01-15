@@ -25,20 +25,31 @@ public class BDJUtil {
     /**
      * Make a five digit zero padded string based on an integer
      * Ex. integer 1 -> string "00001"
-     * 
+     *
      * @param id
      * @return
      */
-    public static String makeFiveDigitStr(int id) 
+    public static String makeFiveDigitStr(int id)
     {
+        if (id < 0 || id > 99999) {
+            System.err.println("Invalid ID: " + id);
+            throw new IllegalArgumentException("Invalid ID " + id);
+        }
+        String s = "" + id;
+        while (s.length() < 5) {
+            s = "0" + s;
+        }
+        return s;
+        /*
         DecimalFormat fmt = new DecimalFormat();
         fmt.setMaximumIntegerDigits(5);
         fmt.setMinimumIntegerDigits(5);
         fmt.setGroupingUsed(false);
-        
+
         return fmt.format(id);
+        */
     }
-    
+
     /**
      * Make a path based on the disc root to an absolute path based on the filesystem of the computer
      * Ex. /BDMV/JAR/00000.jar -> /bluray/disc/mount/point/BDMV/JAR/00000.jar
@@ -47,6 +58,11 @@ public class BDJUtil {
      */
     public static String discRootToFilesystem(String path)
     {
-        return System.getProperty("bluray.vfs.root") + path;
+        String vfsRoot = System.getProperty("bluray.vfs.root");
+        if (vfsRoot == null) {
+            System.err.println("discRootToFilesystem(): disc root not set !");
+            return path;
+        }
+        return vfsRoot + path;
     }
 }

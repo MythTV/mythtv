@@ -26,6 +26,7 @@
 
 #include "native/register_native.h"
 
+#include "file/file.h"
 #include "file/dirs.h"
 #include "file/dl.h"
 #include "util/strutl.h"
@@ -41,9 +42,6 @@
 #ifdef _WIN32
 #include <windows.h>
 #include <winreg.h>
-#define DIR_SEP "\\"
-#else
-#define DIR_SEP "/"
 #endif
 
 #ifdef HAVE_BDJ_J2ME
@@ -67,7 +65,7 @@ static void *_load_jvm_win32(const char **p_java_home)
 
     wchar_t buf_loc[4096] = L"SOFTWARE\\JavaSoft\\Java Runtime Environment\\";
     wchar_t buf_vers[128];
-
+    wchar_t java_path[4096] = L"";
     char strbuf[256];
 
     LONG r;
@@ -77,14 +75,14 @@ static void *_load_jvm_win32(const char **p_java_home)
 
     r = RegOpenKeyExW(HKEY_LOCAL_MACHINE, buf_loc, 0, KEY_READ, &hkey);
     if (r != ERROR_SUCCESS) {
-        BD_DEBUG(DBG_BDJ | DBG_CRIT, "Error opening registry key SOFTWARE\\JavaSoft\\Java Runtime Environment\\");
+        BD_DEBUG(DBG_BDJ | DBG_CRIT, "Error opening registry key SOFTWARE\\JavaSoft\\Java Runtime Environment\\\n");
         return NULL;
     }
 
     r = RegQueryValueExW(hkey, L"CurrentVersion", NULL, &lType, (LPBYTE)buf_vers, &dSize);
     RegCloseKey(hkey);
     if (r != ERROR_SUCCESS) {
-        BD_DEBUG(DBG_BDJ | DBG_CRIT, "CurrentVersion registry value not found");
+        BD_DEBUG(DBG_BDJ | DBG_CRIT, "CurrentVersion registry value not found\n");
         return NULL;
     }
 
@@ -97,7 +95,7 @@ static void *_load_jvm_win32(const char **p_java_home)
     dSize = sizeof(buf_loc);
     r = RegOpenKeyExW(HKEY_LOCAL_MACHINE, buf_loc, 0, KEY_READ, &hkey);
     if (r != ERROR_SUCCESS) {
-        BD_DEBUG(DBG_BDJ | DBG_CRIT, "Error opening JRE version-specific registry key");
+        BD_DEBUG(DBG_BDJ | DBG_CRIT, "Error opening JRE version-specific registry key\n");
         return NULL;
     }
 
@@ -108,6 +106,9 @@ static void *_load_jvm_win32(const char **p_java_home)
         WideCharToMultiByte(CP_UTF8, 0, buf_loc, -1, java_home, sizeof(java_home), NULL, NULL);
         *p_java_home = java_home;
         BD_DEBUG(DBG_BDJ, "JavaHome: %s\n", java_home);
+
+        wcscat(java_path, buf_loc);
+        wcscat(java_path, L"\\bin");
     }
 
     dSize = sizeof(buf_loc);
@@ -115,11 +116,13 @@ static void *_load_jvm_win32(const char **p_java_home)
     RegCloseKey(hkey);
 
     if (r != ERROR_SUCCESS) {
-        BD_DEBUG(DBG_BDJ | DBG_CRIT, "RuntimeLib registry value not found");
+        BD_DEBUG(DBG_BDJ | DBG_CRIT, "RuntimeLib registry value not found\n");
         return NULL;
     }
 
+    SetDllDirectoryW(java_path);
     void *result = LoadLibraryW(buf_loc);
+    SetDllDirectoryW(NULL);
 
     WideCharToMultiByte(CP_UTF8, 0, buf_loc, -1, strbuf, sizeof(strbuf), NULL, NULL);
     if (!result) {
@@ -129,6 +132,35 @@ static void *_load_jvm_win32(const char **p_java_home)
     }
 
     return result;
+}
+#endif
+
+#ifdef _WIN32
+static inline char *_utf8_to_cp(const char *utf8)
+{
+    int wlen = MultiByteToWideChar(CP_UTF8, 0, utf8, -1, NULL, 0);
+    if (wlen == 0) {
+        return NULL;
+    }
+
+    wchar_t *wide = (wchar_t *)malloc(wlen * sizeof(wchar_t));
+    if (!wide) {
+        return NULL;
+    }
+    MultiByteToWideChar(CP_UTF8, 0, utf8, -1, wide, wlen);
+
+    size_t len = WideCharToMultiByte(CP_ACP, 0, wide, -1, NULL, 0, NULL, NULL);
+    if (len == 0) {
+        X_FREE(wide);
+        return NULL;
+    }
+
+    char *out = (char *)malloc(len);
+    if (out != NULL) {
+        WideCharToMultiByte(CP_ACP, 0, wide, -1, out, len, NULL, NULL);
+    }
+    X_FREE(wide);
+    return out;
 }
 #endif
 
@@ -212,17 +244,17 @@ static void *_load_jvm(const char **p_java_home)
 
 static int _can_read_file(const char *fn)
 {
-    FILE *fp;
+    BD_FILE_H *fp;
 
     if (!fn) {
         return 0;
     }
 
-    fp = fopen(fn, "rb");
+    fp = file_open(fn, "rb");
     if (fp) {
-        char b;
-        int result = (int)fread(&b, 1, 1, fp);
-        fclose(fp);
+        uint8_t b;
+        int result = (int)file_read(fp, &b, 1);
+        file_close(fp);
         if (result == 1) {
             return 1;
         }
@@ -513,6 +545,17 @@ static int _create_jvm(void *jvm_lib, const char *java_home, const char *jar_fil
     args.nOptions = n;
     args.options = option;
     args.ignoreUnrecognized = JNI_FALSE; // don't ignore unrecognized options
+
+#ifdef _WIN32
+    /* ... in windows, JVM options are not UTF8 but current system code page ... */
+    /* luckily, most BD-J options can be passed in as java strings later. But, not class path. */
+    int ii;
+    for (ii = 0; ii < n; ii++) {
+        char *tmp = _utf8_to_cp(option[ii].optionString);
+        X_FREE(option[ii].optionString);
+        option[ii].optionString = tmp;
+    }
+#endif
 
     int result = JNI_CreateJavaVM_fp(jvm, (void**) env, &args);
 

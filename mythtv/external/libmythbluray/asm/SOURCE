@@ -1,0 +1,9 @@
+Core functionality from asm 5.0.4
+
+http://asm.ow2.org/
+
+ASM is an all purpose Java bytecode manipulation and analysis framework. It can be used to modify
+existing classes or dynamically generate classes, directly in binary form. Provided common
+transformations and analysis algorithms allow to easily assemble custom complex transformations
+and code analysis tools.
+

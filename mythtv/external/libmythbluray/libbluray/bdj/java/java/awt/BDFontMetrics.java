@@ -192,7 +192,12 @@ public class BDFontMetrics extends sun.font.FontDesignMetrics {
     }
 
     static synchronized String[] getFontList() {
-        init();
+        try {
+            init();
+        } catch (Throwable t) {
+            System.err.println("getFontList() failed: " + t);
+            return new String[0];
+        }
 
         ArrayList fontNames = new ArrayList();
 

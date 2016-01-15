@@ -53,6 +53,8 @@ public class BackgroundVideoPresentationControlImpl extends VideoControl
     }
 
     public boolean setVideoTransformation(VideoTransformation transform) {
+        if (transform == null)
+            return false;
         setClipRegion(transform.getClipRegion());
         HScreenPoint pos = transform.getVideoPosition();
         float[] scales = transform.getScalingFactors();

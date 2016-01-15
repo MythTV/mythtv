@@ -24,7 +24,7 @@ public class TitleInfo {
         this.objType = objType;
         this.playbackType = playbackType;
         if (objType == OBJ_TYPE_BDJ)
-            this.bdjoName = (new java.text.DecimalFormat("00000")).format(idRef);
+            this.bdjoName = (BDJUtil.makeFiveDigitStr(idRef));
         else
             this.hdmvOID = idRef;
     }

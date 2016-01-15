@@ -94,13 +94,17 @@ void ShoutCastMetaParser::setMetaFormat(const QString &metaformat)
     while (pos >= 0)
     {
         pos++;
-        QChar ch = m_meta_format.at(pos);
 
-        if (ch == '%')
+        QChar ch;
+
+        if (pos < m_meta_format.length())
+            ch = m_meta_format.at(pos);
+
+        if (!ch.isNull() && ch == '%')
         {
             pos++;
         }
-        else if (ch == 'r' || ch == 'a' || ch == 'b' || ch == 't')
+        else if (!ch.isNull() && (ch == 'r' || ch == 'a' || ch == 'b' || ch == 't'))
         {
             if (ch == 'a')
                 m_meta_artist_pos = assign_index;

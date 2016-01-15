@@ -38,9 +38,11 @@ import javax.tv.service.selection.ServiceContextPermission;
 
 import org.bluray.ti.Title;
 import org.bluray.ti.TitleImpl;
+
 import org.videolan.BDJLoader;
 import org.videolan.BDJLoaderCallback;
 import org.videolan.BDJListeners;
+import org.videolan.Logger;
 import org.videolan.media.content.PlayerManager;
 
 public class TitleContextImpl implements TitleContext {
@@ -71,19 +73,30 @@ public class TitleContextImpl implements TitleContext {
     }
 
     public void start(Title title, boolean restart) throws SecurityException {
+        logger.info("start(" + title.getName() + ", restart=" + restart + ")");
+
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
             sm.checkPermission(new SelectPermission(title.getLocator(), "own"));
         }
-
-        if (state == STATE_DESTROYED)
+        if (state == STATE_DESTROYED) {
+            logger.error("start() failed: Title Context already destroyed");
             throw new IllegalStateException();
+        }
+
+        if (!restart && (this.title == null || !title.equals(this.title))) {
+            /* force restarting of service bound Xlets when title changes */
+            logger.info("start(): title changed,  force restart");
+            restart = true;
+        }
+
         TitleStartAction action = new TitleStartAction(this, (TitleImpl)title);
         if (!BDJLoader.load((TitleImpl)title, restart, action))
             action.loaderDone(false);
     }
 
     public void select(Service service) throws SecurityException {
+        logger.info("select(" + service.getName() + ")");
         start((Title)service, true);
     }
 
@@ -96,6 +109,8 @@ public class TitleContextImpl implements TitleContext {
     }
 
     public void stop() throws SecurityException {
+        logger.info("stop()");
+
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
             sm.checkPermission(new ServiceContextPermission("stop", "own"));
@@ -187,4 +202,6 @@ public class TitleContextImpl implements TitleContext {
     private BDJListeners listeners = new BDJListeners();
     private TitleImpl title = null;
     private int state = STATE_STOPPED;
+
+    private static final Logger logger = Logger.getLogger(TitleContextImpl.class.getName());
 }

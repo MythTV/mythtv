@@ -205,7 +205,7 @@ static int _libaacs_init(BD_DEC *dec, struct dec_dev *dev,
     }
 
     if (result) {
-        BD_DEBUG(DBG_BLURAY | DBG_CRIT, "aacs_open() failed!\n");
+        BD_DEBUG(DBG_BLURAY | DBG_CRIT, "aacs_open() failed: %d!\n", result);
         libaacs_unload(&dec->aacs);
         return 0;
     }

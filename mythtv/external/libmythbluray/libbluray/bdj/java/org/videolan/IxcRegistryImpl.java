@@ -260,7 +260,7 @@ public class IxcRegistryImpl {
             return result;
         }
 
-        public class RemoteMethod implements Runnable
+        private class RemoteMethod implements Runnable
         {
             final BDJXletContext calleeContext;
             final BDJXletContext callerContext;
@@ -276,9 +276,11 @@ public class IxcRegistryImpl {
                 callerContext  = BDJXletContext.getCurrentContext();
                 if (callerContext == null) {
                     logger.error("caller context is null");
+                    throw new RemoteException("no caller context");
                 }
                 if (context == null) {
                     logger.error("callee context is null");
+                    throw new RemoteException("no callee context");
                 }
                 calleeContext  = context;
 
@@ -426,6 +428,18 @@ public class IxcRegistryImpl {
             throw new IllegalArgumentException("xc not current BDJXletContext");
         }
 
+        if ("/7fff7669/4050/Messenger".equals(path)) {
+            /* known discs:
+               - Terminator Salvation
+            */
+            try {
+                logger.error("Enabling Ixc delay hack for " + path);
+                Thread.sleep(200L);
+            } catch (InterruptedException ie) {
+                ie.printStackTrace();
+            }
+        }
+
         WrappedRemoteObj wrappedObj = null;
         synchronized (remoteObjects) {
             if (!remoteObjects.containsKey(path)) {
@@ -438,7 +452,7 @@ public class IxcRegistryImpl {
         }
         Object remoteObj = wrapOrCopy(wrappedObj, wrappedObj.context, (BDJXletContext)xc);
 
-        Debug("IxcRegistry.lookup(" + path + ") => " + remoteObj);
+        Debug("IxcRegistry.lookup(" + path + ") => OK");
 
         return (Remote)remoteObj;
     }

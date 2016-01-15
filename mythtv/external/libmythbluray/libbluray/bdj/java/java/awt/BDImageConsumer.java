@@ -25,7 +25,7 @@ import java.awt.image.ImageObserver;
 import java.awt.image.ImageConsumer;
 import java.awt.image.ColorModel;
 
-public class BDImageConsumer extends BDImage implements ImageConsumer {
+class BDImageConsumer extends BDImage implements ImageConsumer {
     private Hashtable properties;
     private ImageProducer producer;
     private int status;

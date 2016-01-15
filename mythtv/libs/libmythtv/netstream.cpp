@@ -759,15 +759,10 @@ void NAMThread::run()
     // Setup cache
     QScopedPointer<QNetworkDiskCache> cache(new QNetworkDiskCache());
 
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-        cache->setCacheDirectory(
-                QStandardPaths::standardLocations(
-                    QStandardPaths::CacheLocation).value(0) );
-#else
-        cache->setCacheDirectory(
-                QDesktopServices::storageLocation(QDesktopServices::CacheLocation) );
-#endif
-        m_nam->setCache(cache.take());
+    cache->setCacheDirectory(GetConfDir() + "/cache/netstream-" +
+                             gCoreContext->GetHostName());
+
+    m_nam->setCache(cache.take());
 
     // Setup a network proxy e.g. for TOR: socks://localhost:9050
     // TODO get this from mythdb

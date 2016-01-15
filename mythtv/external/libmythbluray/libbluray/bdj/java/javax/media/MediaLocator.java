@@ -25,11 +25,11 @@ import java.net.URL;
 
 public class MediaLocator implements Serializable
 {
-    public MediaLocator(URL url) { 
+    public MediaLocator(URL url) {
         this(url.toExternalForm());
     }
 
-    public MediaLocator(String locatorString) { 
+    public MediaLocator(String locatorString) {
         int index = locatorString.indexOf(":");
         if (index <= 0)
             throw new IllegalArgumentException("Bad locator string.");
@@ -56,7 +56,7 @@ public class MediaLocator implements Serializable
     public String toExternalForm() {
         return protocol + ":" + remainder;
     }
-    
+
     private String protocol = "";
     private String remainder = "";
 

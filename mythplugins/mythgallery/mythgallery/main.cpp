@@ -21,7 +21,12 @@
 #include "dbcheck.h"
 
 #ifdef DCRAW_SUPPORT
-Q_IMPORT_PLUGIN(dcrawplugin)
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+    // Qt5 imports class name
+    Q_IMPORT_PLUGIN(DcrawPlugin)
+#else
+    Q_IMPORT_PLUGIN(dcrawplugin)
+#endif // QT_VERSION
 #endif // DCRAW_SUPPORT
 void runRandomSlideshow(void);
 

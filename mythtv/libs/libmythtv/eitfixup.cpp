@@ -133,6 +133,10 @@ EITFixUp::EITFixUp()
       m_RTLSubtitle4("^Thema.{0,5}:\\s([^\\.]+)\\.\\s*"),
       m_RTLSubtitle5("^'(.+)'\\.\\s*"),
       m_PRO7Subtitle(",{0,1}([^,]*),([^,]+)\\s{0,1}(\\d{4})$"),
+      m_PRO7Crew("\n\n(Regie:.*)$"),
+      m_PRO7CrewOne("^(.*):\\s+(.*)$"),
+      m_PRO7Cast("\n\nDarsteller:\n(.*)$"),
+      m_PRO7CastOne("^([^\\(]*)\\((.*)\\)$"),
       m_RTLEpisodeNo1("^(Folge\\s\\d{1,4})\\.*\\s*"),
       m_RTLEpisodeNo2("^(\\d{1,2}\\/[IVX]+)\\.*\\s*"),
       m_fiRerun("\\ ?Uusinta[a-zA-Z\\ ]*\\.?"),
@@ -1766,6 +1770,69 @@ void EITFixUp::FixPRO7(DBEventEIT &event) const
         event.subtitle.replace(tmp, "");
     }
 
+    /* handle cast, the very last in description */
+    tmp = m_PRO7Cast;
+    pos = tmp.indexIn(event.description);
+    if (pos != -1)
+    {
+        QStringList cast = tmp.cap(1).split("\n");
+        QRegExp tmpOne = m_PRO7CastOne;
+        QStringListIterator i(cast);
+        while (i.hasNext())
+        {
+            pos = tmpOne.indexIn (i.next());
+            if (pos != -1)
+            {
+                event.AddPerson (DBPerson::kActor, tmpOne.cap(1).simplified());
+            }
+        }
+        event.description.replace(tmp, "");
+    }
+
+    /* handle crew, the new very last in description
+     * format: "Role: Name" or "Role: Name1, Name2"
+     */
+    tmp = m_PRO7Crew;
+    pos = tmp.indexIn(event.description);
+    if (pos != -1)
+    {
+        QStringList crew = tmp.cap(1).split("\n");
+        QRegExp tmpOne = m_PRO7CrewOne;
+        QStringListIterator i(crew);
+        while (i.hasNext())
+        {
+            pos = tmpOne.indexIn (i.next());
+            if (pos != -1)
+            {
+                DBPerson::Role role = DBPerson::kUnknown;
+                if (QString::compare (tmpOne.cap(1), "Regie") == 0)
+                {
+                    role = DBPerson::kDirector;
+                }
+                else if (QString::compare (tmpOne.cap(1), "Drehbuch") == 0)
+                {
+                    role = DBPerson::kWriter;
+                }
+                else if (QString::compare (tmpOne.cap(1), "Autor") == 0)
+                {
+                    role = DBPerson::kWriter;
+                }
+                // FIXME add more jobs
+
+                QStringList names = tmpOne.cap(2).simplified().split("\\s*,\\s*");
+                QStringListIterator j(names);
+                while (j.hasNext())
+                {
+                    event.AddPerson (role, j.next());
+                }
+            }
+        }
+        event.description.replace(tmp, "");
+    }
+
+    /* FIXME unless its Jamie Oliver, then there is neither Crew nor Cast only
+     * \n\nKoch: Jamie Oliver
+     */
 }
 
 /** \fn EITFixUp::FixFI(DBEventEIT&) const

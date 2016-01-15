@@ -19,6 +19,7 @@
 package org.videolan.media.content;
 
 import java.util.ArrayList;
+import org.videolan.Logger;
 
 public class PlayerManager {
 
@@ -81,7 +82,7 @@ public class PlayerManager {
             return;
         }
 
-        System.err.println("unknown player type: " + player.getClass().getName());
+        logger.error("unknown player type: " + player.getClass().getName());
     }
 
     protected boolean allocateResource(BDHandler player) {
@@ -91,6 +92,9 @@ public class PlayerManager {
             }
             synchronized (playlistPlayerLock) {
                 if (playlistPlayer != null && player != playlistPlayer) {
+
+                    logger.info("allocateResource(): Stopping old playlist player");
+
                     playlistPlayer.stop();
                     playlistPlayer.deallocate();
                 }
@@ -108,7 +112,7 @@ public class PlayerManager {
             return true;
         }
 
-        System.err.println("unknown player type: " + player.getClass().getName());
+        logger.error("allocateResource(): unknown player type: " + player.getClass().getName());
         return false;
     }
 
@@ -153,4 +157,6 @@ public class PlayerManager {
         }
         }
     }
+
+    private static final Logger logger = Logger.getLogger(PlayerManager.class.getName());
 }

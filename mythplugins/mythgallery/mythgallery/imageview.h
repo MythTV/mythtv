@@ -1,8 +1,8 @@
 // -*- Mode: c++ -*-
 /* ============================================================
  * File  : imageview.h
- * Description : 
- * 
+ * Description :
+ *
  * Copyright 2004-2006 Renchi Raju, Daniel Kristjansson
  *
  * This program is free software; you can redistribute it
@@ -10,12 +10,12 @@
  * Public License as published bythe Free Software Foundation;
  * either version 2, or (at your option)
  * any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * ============================================================ */
 
 #ifndef IMAGEVIEW_H
@@ -43,11 +43,11 @@ class LoadAlbumListener : public QObject {
     Q_OBJECT
     ImageView *m_parent;
 public:
-    LoadAlbumListener(ImageView *parent);
+    explicit LoadAlbumListener(ImageView *parent);
     virtual ~LoadAlbumListener();
 private slots:
     void FinishLoading() const;
-};  
+};
 
 class ImageView
 {
@@ -117,6 +117,7 @@ class ImageView
     bool                   m_effect_random;
 
 private:
+    Q_DISABLE_COPY(ImageView)
     class LoadAlbumRunnable;
 
     LoadAlbumRunnable     *m_loaderRunnable;

@@ -242,14 +242,15 @@ void ThumbGenerator::loadDir(QImage& image, const QFileInfo& fi)
     QDir dir(fi.absoluteFilePath());
     dir.setFilter(QDir::Files);
 
+    QList<QByteArray> const fmts = QImageReader::supportedImageFormats();
+
     QFileInfoList list = dir.entryInfoList();
 
     for (QFileInfoList::const_iterator it = list.begin();
          it != list.end() && !m_cancel; ++it)
     {
         const QFileInfo *f = &(*it);
-        QImageReader testread(f->absoluteFilePath());
-        if (testread.canRead())
+        if (fmts.contains(f->completeSuffix().toLower().toLatin1()))
         {
             loadFile(image, *f);
             return;
@@ -328,6 +329,7 @@ void ThumbGenerator::loadFile(QImage& image, const QFileInfo& fi)
     }
     else
     {
+        long rotateAngle = GalleryUtil::GetNaturalRotation(fi.absoluteFilePath());
 #ifdef EXIF_SUPPORT
         // Try to get thumbnail from exif data
         ExifData *ed = exif_data_new_from_file(fi.absoluteFilePath()
@@ -335,6 +337,14 @@ void ThumbGenerator::loadFile(QImage& image, const QFileInfo& fi)
         if (ed && ed->data)
         {
             image.loadFromData(ed->data, ed->size);
+            // Strictly image orientation doesn't necessarily apply to thumbnail
+            // However it commonly does.
+            if (rotateAngle != 0)
+            {
+                QMatrix matrix;
+                matrix.rotate(rotateAngle);
+                image = image.transformed(matrix);
+            }
         }
 
         if (ed)
@@ -347,7 +357,6 @@ void ThumbGenerator::loadFile(QImage& image, const QFileInfo& fi)
 #ifdef DCRAW_SUPPORT
         QString extension = fi.suffix();
         QSet<QString> dcrawFormats = DcrawFormats::getFormats();
-        int rotateAngle;
 
         if (dcrawFormats.contains(extension) &&
             (rotateAngle = DcrawHandler::loadThumbnail(&image,
@@ -366,12 +375,10 @@ void ThumbGenerator::loadFile(QImage& image, const QFileInfo& fi)
 #endif
 
         image.load(fi.absoluteFilePath());
-
-        long rotateangle = GalleryUtil::GetNaturalRotation(fi.absoluteFilePath());
-        if (rotateangle != 0)
+        if (rotateAngle != 0)
         {
             QMatrix matrix;
-            matrix.rotate(rotateangle);
+            matrix.rotate(rotateAngle);
             image = image.transformed(matrix, Qt::SmoothTransformation);
         }
     }
