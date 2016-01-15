@@ -3076,8 +3076,10 @@ NULL
             "    ADD parentid INT UNSIGNED NOT NULL DEFAULT 0 AFTER cardid",
             "UPDATE capturecard c, "
             "       (SELECT min(cardid) cardid, hostname, videodevice, "
-            "               inputname "
+            "               inputname, cardtype "
             "        FROM capturecard "
+            "        WHERE cardtype NOT IN "
+            "              ('FREEBOX', 'IMPORT', 'DEMO', 'EXTERNAL') "
             "        GROUP BY hostname, videodevice, inputname) mins "
             "SET c.parentid = mins.cardid "
             "WHERE c.hostname = mins.hostname and "
