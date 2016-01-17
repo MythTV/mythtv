@@ -3222,7 +3222,7 @@ NULL
 
     if (dbver == "1342")
     {
-        LOG(VB_GENERAL, LOG_CRIT, "Upgrading to MythTV schema version 1332");
+        LOG(VB_GENERAL, LOG_CRIT, "Upgrading to MythTV schema version 1343");
         MSqlQuery select(MSqlQuery::InitCon());
         MSqlQuery update(MSqlQuery::InitCon());
 
