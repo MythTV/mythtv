@@ -253,7 +253,7 @@ void JoystickMenuThread::run(void)
             /*===========================================================
              * instead of a loop, could QSocketNotifier be used here
              *=========================================================*/
-            while(m_configRead && m_readError){
+            while(!m_bStop && m_configRead && m_readError){
                 /* Set up the call to select(). In this case, select() will
                    only operate on a single file descriptor, the one
                    associated with our udev_monitor. Note that the timeval
