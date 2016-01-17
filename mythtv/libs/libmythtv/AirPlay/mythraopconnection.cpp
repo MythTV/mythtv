@@ -1057,6 +1057,7 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
         *m_textStream << base64.trimmed() << "\r\n";
     }
 
+    QString responseData;
     if (option == "OPTIONS")
     {
         *m_textStream << "Public: ANNOUNCE, SETUP, RECORD, PAUSE, FLUSH, "
@@ -1410,6 +1411,27 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
             }
         }
     }
+    else if (option == "GET_PARAMETER")
+    {
+        if (tags.contains("Content-Type"))
+        {
+            if (tags["Content-Type"] == "text/parameters")
+            {
+                QStringList lines = splitLines(content);
+                *m_textStream << "Content-Type: text/parameters\r\n";
+                foreach (QString line, lines)
+                {
+                    if (line == "volume")
+                    {
+                        int volume = (m_allowVolumeControl && m_audio) ?
+                            m_audio->GetCurrentVolume() : 0;
+                        responseData += QString("volume: %1\r\n")
+                            .arg(volume * 30.0f / 100.0f - 30.0f,1,'f',6,'0');
+                    }
+                }
+            }
+        }
+    }
     else if (option == "TEARDOWN")
     {
         m_socket->disconnectFromHost();
@@ -1420,7 +1442,7 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("Command not handled: %1")
             .arg(option));
     }
-    FinishResponse(m_textStream, m_socket, option, tags["CSeq"]);
+    FinishResponse(m_textStream, m_socket, option, tags["CSeq"], responseData);
 }
 
 void MythRAOPConnection::FinishAuthenticationResponse(_NetStream *stream,
@@ -1442,13 +1464,16 @@ void MythRAOPConnection::FinishAuthenticationResponse(_NetStream *stream,
 }
 
 void MythRAOPConnection::FinishResponse(_NetStream *stream, QTcpSocket *socket,
-                                        QString &option, QString &cseq)
+                                        QString &option, QString &cseq, QString &responseData)
 {
     if (!stream)
         return;
     *stream << "Server: AirTunes/130.14\r\n";
     *stream << "CSeq: " << cseq << "\r\n";
-    *stream << "\r\n";
+    if (responseData.length())
+        *stream << "Content-Length: " << QString::number(responseData.length()) << "\r\n\r\n" << responseData;
+    else
+        *stream << "\r\n";
     stream->flush();
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("Finished %1 %2 , Send: %3")
         .arg(option).arg(cseq).arg(socket->flush()));

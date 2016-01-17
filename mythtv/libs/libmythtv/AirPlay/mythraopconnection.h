@@ -80,7 +80,7 @@ class MTV_PUBLIC MythRAOPConnection : public QObject
     void     ProcessRequest(const QStringList &header,
                             const QByteArray &content);
     void     FinishResponse(_NetStream *stream, QTcpSocket *socket,
-                            QString &option, QString &cseq);
+			    QString &option, QString &cseq, QString &responseData);
     void     FinishAuthenticationResponse(_NetStream *stream, QTcpSocket *socket,
                                           QString &cseq);
 
