@@ -61,9 +61,72 @@ void ProfileGroup::loadByID(int profileId) {
     Load();
 }
 
+bool ProfileGroup::addMissingDynamicProfiles(void)
+{
+    // We need separate profiles for different V4L2 card types
+    QStringList existing;
+    MSqlQuery   query(MSqlQuery::InitCon());
+    query.prepare("SELECT DISTINCT cardtype FROM profilegroups");
+
+    if (!query.exec())
+    {
+        MythDB::DBError("ProfileGroup::createMissingDynamicProfiles", query);
+        return false;
+    }
+
+    while (query.next())
+        existing.push_back(query.value(0).toString());
+
+
+    const uint num_profiles = 4;
+    const QString profile_names[num_profiles] = { "Default", "Live TV",
+                                                  "High Quality",
+                                                  "Low Quality" };
+
+    CardUtil::InputTypes cardtypes = CardUtil::GetInputTypes();
+
+    CardUtil::InputTypes::iterator Itype = cardtypes.begin();
+    for ( ; Itype != cardtypes.end(); ++Itype)
+    {
+        if (Itype.key().startsWith("V4L2:") && existing.indexOf(Itype.key()) == -1)
+        {
+            // Add dynamic profile group
+            query.prepare("INSERT INTO profilegroups SET name = "
+                          ":CARDNAME, cardtype = :CARDTYPE, is_default = 1;");
+            query.bindValue(":CARDTYPE", Itype.key());
+            query.bindValue(":CARDNAME", Itype.value());
+            if (!query.exec())
+            {
+                MythDB::DBError("Unable to insert V4L2 profilegroup.", query);
+                return false;
+            }
+
+            // get the id of the new profile group
+            int groupid = query.lastInsertId().toInt();
+
+            for (uint idx = 0 ; idx < num_profiles; ++idx)
+            {
+                // insert the recording profiles
+                query.prepare("INSERT INTO recordingprofiles SET name = "
+                              ":NAME, profilegroup = :GROUPID;");
+                query.bindValue(":NAME", profile_names[idx]);
+                query.bindValue(":GROUPID", groupid);
+                if (!query.exec())
+                {
+                    MythDB::DBError("Unable to insert 'Default' "
+                                    "recordingprofile.", query);
+                    return false;
+                }
+            }
+        }
+    }
+
+    return true;
+}
+
 void ProfileGroup::fillSelections(SelectSetting* setting)
 {
-    QStringList cardtypes = CardUtil::GetInputTypes();
+    CardUtil::InputTypes cardtypes = CardUtil::GetInputTypes();
     QString     tid       = QString::null;
 
     MSqlQuery result(MSqlQuery::InitCon());
@@ -87,7 +150,7 @@ void ProfileGroup::fillSelections(SelectSetting* setting)
 
         // Only show default profiles that match installed cards
         // Workaround for #12481 in fixes/0.27
-        bool have_cardtype = cardtypes.contains(cardtype, Qt::CaseInsensitive);
+        bool have_cardtype = cardtypes.contains(cardtype);
         if (is_default && (cardtype == "TRANSCODE") && !have_cardtype)
         {
             tid = id;
@@ -233,6 +296,7 @@ void ProfileGroupEditor::open(int id) {
 void ProfileGroupEditor::Load(void)
 {
     listbox->clearSelections();
+    ProfileGroup::addMissingDynamicProfiles();
     ProfileGroup::fillSelections(listbox);
     listbox->addSelection(tr("(Create new profile group)"), "0");
 }

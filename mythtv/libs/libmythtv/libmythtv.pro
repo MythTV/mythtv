@@ -142,6 +142,7 @@ HEADERS += streamingringbuffer.h    metadataimagehelper.h
 HEADERS += icringbuffer.h
 HEADERS += mythavutil.h
 HEADERS += recordingfile.h
+HEADERS += driveroption.h
 
 SOURCES += recordinginfo.cpp
 SOURCES += dbcheck.cpp
@@ -625,10 +626,20 @@ using_backend {
     }
 
     using_v4l2 {
+        HEADERS += v4l2util.h
+        SOURCES += v4l2util.cpp
+
         HEADERS += recorders/v4lchannel.h
         HEADERS += recorders/analogsignalmonitor.h
         SOURCES += recorders/v4lchannel.cpp
         SOURCES += recorders/analogsignalmonitor.cpp
+
+        HEADERS += recorders/v4l2encrecorder.h
+        SOURCES += recorders/v4l2encrecorder.cpp
+        HEADERS += recorders/v4l2encstreamhandler.h
+        SOURCES += recorders/v4l2encstreamhandler.cpp
+        HEADERS += recorders/v4l2encsignalmonitor.h
+        SOURCES += recorders/v4l2encsignalmonitor.cpp
 
         DEFINES += USING_V4L2
     }

@@ -92,6 +92,7 @@ public:
 
     virtual void loadByID(int id);
 
+    static bool addMissingDynamicProfiles(void);
     static void fillSelections(SelectSetting* setting);
     static void getHostNames(QStringList* hostnames);
     int getProfileNum(void) const {
@@ -143,4 +144,3 @@ class MTV_PUBLIC ProfileGroupEditor :
 };
 
 #endif
-

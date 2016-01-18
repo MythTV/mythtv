@@ -25,7 +25,10 @@ extern "C" {
 #endif
 
 #ifdef USING_V4L2
+// Old
 #   include "analogsignalmonitor.h"
+// New
+#   include "v4l2encsignalmonitor.h"
 #   include "v4lchannel.h"
 #endif
 
@@ -110,6 +113,12 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
         V4LChannel *chan = dynamic_cast<V4LChannel*>(channel);
         if (chan)
             signalMonitor = new AnalogSignalMonitor(db_cardnum, chan);
+    }
+    else if (cardtype.toUpper() == "V4L2ENC")
+    {
+        V4LChannel *chan = dynamic_cast<V4LChannel*>(channel);
+        if (chan)
+            signalMonitor = new V4L2encSignalMonitor(db_cardnum, chan);
     }
 #endif
 

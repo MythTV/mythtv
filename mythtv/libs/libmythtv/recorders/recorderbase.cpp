@@ -13,6 +13,7 @@ using namespace std;
 #include "hdhrrecorder.h"
 #include "iptvrecorder.h"
 #include "mpegrecorder.h"
+#include "v4l2encrecorder.h"
 #include "recorderbase.h"
 #include "cetonchannel.h"
 #include "asirecorder.h"
@@ -845,6 +846,13 @@ RecorderBase *RecorderBase::CreateRecorder(
 #ifdef USING_HDPVR
         recorder = new MpegRecorder(tvrec);
 #endif // USING_HDPVR
+    }
+    else if (genOpt.inputtype == "V4L2ENC")
+    {
+#ifdef USING_V4L2
+        recorder = new V4L2encRecorder(tvrec,
+                                    dynamic_cast<V4LChannel*>(channel));
+#endif
     }
     else if (genOpt.inputtype == "FIREWIRE")
     {

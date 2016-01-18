@@ -49,7 +49,7 @@ using namespace std;
 #endif
 
 #ifdef USING_V4L2
-#include <linux/videodev2.h>
+#include "v4l2util.h"
 #endif
 
 #ifdef USING_VBOX
@@ -136,7 +136,9 @@ class InstanceCount : public TransSpinBoxSetting
                 "Maximum number of simultaneous recordings this device "
                 "should make. Some digital transmitters transmit multiple "
                 "programs on a multiplex, if this is set to a value greater "
-                "than one MythTV can sometimes take advantage of this."));
+                "than one MythTV can sometimes take advantage of this. "
+                "If only a single program is available, setting this to 2 "
+                "allows overlapping schedules to record."));
         uint cnt = parent.GetInstanceCount();
         cnt = (!cnt) ? kDefaultMultirecCount : cnt;
         setValue(cnt);
@@ -821,10 +823,10 @@ class VideoDevice : public PathSetting, public CaptureCardDBStorage
             int videofd = open(tmp.constData(), O_RDWR);
             if (videofd >= 0)
             {
-                QString cn, dn;
-                if (CardUtil::GetV4LInfo(videofd, cn, dn) &&
-                    (!driverExp     || (driverExp->exactMatch(dn)))  &&
-                    (card.isEmpty() || (cn == card)))
+                QString card_name, driver_name;
+                if (CardUtil::GetV4LInfo(videofd, card_name, driver_name) &&
+                    (!driverExp     || (driverExp->exactMatch(driver_name)))  &&
+                    (card.isEmpty() || (card_name == card)))
                 {
                     addSelection(filepath);
                     cnt++;
@@ -840,8 +842,13 @@ class VideoDevice : public PathSetting, public CaptureCardDBStorage
         return cnt;
     }
 
+    QString Driver(void) const { return driver_name; }
+    QString Card(void) const { return card_name; }
+
   private:
     QMap<uint, uint> minor_list;
+    QString card_name;
+    QString driver_name;
 };
 
 class VBIDevice : public PathSetting, public CaptureCardDBStorage
@@ -853,6 +860,7 @@ class VBIDevice : public PathSetting, public CaptureCardDBStorage
     {
         setLabel(QObject::tr("VBI device"));
         setFilter(QString::null, QString::null);
+        setHelpText(QObject::tr("Device to read VBI (captions) from."));
     };
 
     void setFilter(const QString &card, const QString &driver)
@@ -951,6 +959,8 @@ class AudioDevice : public PathSetting, public CaptureCardDBStorage
         addSelection("ALSA:default", "ALSA:default");
 #endif
         addSelection(QObject::tr("(None)"), "NULL");
+        setHelpText(QObject::tr("Device to read audio from, "
+                                "if audio is separate from the video."));
     };
 };
 
@@ -2456,12 +2466,13 @@ V4LConfigurationGroup::V4LConfigurationGroup(CaptureCard& a_parent) :
     HorizontalConfigurationGroup *audgrp =
         new HorizontalConfigurationGroup(false, false, true, true);
 
-    cardinfo->setLabel(tr("Probed info"));
     audgrp->addChild(new AudioRateLimit(parent));
     audgrp->addChild(new SkipBtAudio(parent));
 
     addChild(device);
+    cardinfo->setLabel(tr("Probed info"));
     addChild(cardinfo);
+
     addChild(vbidev);
     addChild(new AudioDevice(parent));
     addChild(audgrp);
@@ -2490,7 +2501,6 @@ void V4LConfigurationGroup::probeCard(const QString &device)
     cardinfo->setValue(ci);
     vbidev->setFilter(cn, dn);
 }
-
 
 MPEGConfigurationGroup::MPEGConfigurationGroup(CaptureCard &a_parent) :
     VerticalConfigurationGroup(false, true, false, false),
@@ -2684,6 +2694,95 @@ void HDPVRConfigurationGroup::probeCard(const QString &device)
     audioinput->fillSelections(device);
 }
 
+#ifdef USING_V4L2
+V4L2encGroup::V4L2encGroup(CaptureCard &parent) :
+    TriggeredConfigurationGroup(false),
+    m_parent(parent),
+    m_cardinfo(new TransLabelSetting()),
+    m_instances(new InstanceCount(m_parent))
+{
+    setLabel(QObject::tr("V4L2 encoder devices (multirec capable)"));
+    VideoDevice *device = new VideoDevice(m_parent, 0, 15);
+
+    addChild(device);
+    m_cardinfo->setLabel(tr("Probed info"));
+    addChild(m_cardinfo);
+    m_parent.SetInstanceCount(2);
+
+    // Choose children to show based on which device is active
+    setTrigger(device);
+    // Only save settings for 'this' device.
+    setSaveAll(false);
+
+    connect(device, SIGNAL(valueChanged(const QString&)),
+            this,   SLOT(  probeCard(   const QString&)));
+
+    probeCard(device->getValue());
+}
+
+void V4L2encGroup::triggerChanged(const QString& dev_path)
+{
+    probeCard(dev_path);
+    TriggeredConfigurationGroup::triggerChanged(m_DriverName);
+}
+
+void V4L2encGroup::probeCard(const QString &device_name)
+{
+    QString    card_name = tr("Failed to open");
+    QString    card_info = card_name;
+    V4L2util   v4l2(device_name);
+
+    if (!v4l2.IsOpen())
+    {
+        m_DriverName = tr("Failed to probe");
+        return;
+    }
+    m_DriverName = v4l2.DriverName();
+    card_name = v4l2.CardName();
+
+    if (!m_DriverName.isEmpty())
+        card_info = card_name + "  [" + m_DriverName + "]";
+
+    m_cardinfo->setValue(card_info);
+
+    VerticalConfigurationGroup* grp;
+    QMap<QString,Configurable*>::iterator it = triggerMap.find(m_DriverName);
+    if (it == triggerMap.end())
+    {
+        grp = new VerticalConfigurationGroup(false);
+
+        TunerCardAudioInput* audioinput =
+            new TunerCardAudioInput(m_parent, QString::null, "V4L2");
+        audioinput->fillSelections(device_name);
+        if (audioinput->size() > 1)
+        {
+            audioinput->setName("AudioInput");
+            grp->addChild(audioinput);
+        }
+        else
+            delete audioinput;
+
+        if (v4l2.HasSlicedVBI())
+        {
+            VBIDevice* vbidev = new VBIDevice(m_parent);
+            vbidev->setFilter(card_name, m_DriverName);
+            if (vbidev->size() > 0)
+            {
+                vbidev->setName("VBIDevice");
+                grp->addChild(vbidev);
+            }
+            else
+                delete vbidev;
+        }
+
+        grp->addChild(new EmptyVBIDevice(m_parent));
+        grp->addChild(new ChannelTimeout(m_parent, 15000, 2000));
+
+        addTarget(m_DriverName, grp);
+    }
+}
+#endif // USING_V4L2
+
 CaptureCardGroup::CaptureCardGroup(CaptureCard &parent) :
     TriggeredConfigurationGroup(true, true, false, false)
 {
@@ -2726,6 +2825,7 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard &parent) :
 #endif // USING_IPTV
 
 #ifdef USING_V4L2
+    addTarget("V4L2ENC",   new V4L2encGroup(parent));
     addTarget("V4L",       new V4LConfigurationGroup(parent));
 # ifdef USING_IVTV
     addTarget("MPEG",      new MPEGConfigurationGroup(parent));
@@ -2897,7 +2997,9 @@ void CardType::fillSelections(SelectSetting* setting)
 #endif // USING_DVB
 
 #ifdef USING_V4L2
-# ifdef USING_HDPVR
+    setting->addSelection(
+        QObject::tr("V4L2 encoder"), "V4L2ENC");
+#ifdef USING_HDPVR
     setting->addSelection(
         QObject::tr("HD-PVR H.264 encoder"), "HDPVR");
 # endif // USING_HDPVR
@@ -3308,7 +3410,7 @@ class DishNetEIT : public CheckBoxSetting, public CardInputDBStorage
     };
 };
 
-CardInput::CardInput(const QString & cardtype,
+CardInput::CardInput(const QString & cardtype, const QString & device,
                      bool isNewInput, int _cardid) :
     id(new ID()),
     inputname(new InputName(*this)),
@@ -3340,7 +3442,7 @@ CardInput::CardInput(const QString & cardtype,
     if (CardUtil::IsEncoder(cardtype) || CardUtil::IsUnscanable(cardtype))
     {
         basic->addChild(new ExternalChannelCommand(*this));
-        if (CardUtil::IsV4L(cardtype) && cardtype != "HDPVR")
+        if (CardUtil::HasTuner(cardtype, device))
             basic->addChild(new PresetTuner(*this));
     }
     else
@@ -3940,7 +4042,8 @@ void CardInputEditor::Load(void)
         QString cardtype    = query.value(2).toString();
         QString inputname   = query.value(3).toString();
 
-        CardInput *cardinput = new CardInput(cardtype, true, cardid);
+        CardInput *cardinput = new CardInput(cardtype, videodevice,
+                                             true, cardid);
         cardinput->loadByID(cardid);
         QString inputlabel = QString("%1 (%2) -> %3")
             .arg(CardUtil::GetDeviceLabel(cardtype, videodevice))
@@ -4128,6 +4231,8 @@ TunerCardAudioInput::TunerCardAudioInput(const CaptureCard &parent,
     last_device(dev), last_cardtype(type)
 {
     setLabel(QObject::tr("Audio input"));
+    setHelpText(QObject::tr("If there is more than one audio input, "
+                            "select which one to use."));
     int cardid = parent.getCardID();
     if (cardid <= 0)
         return;
@@ -4285,4 +4390,5 @@ void DVBConfigurationGroup::DVBExtraPanel(void)
     DVBExtra acw(*this);
     acw.exec();
     parent.SetInstanceCount(acw.GetInstanceCount());
+
 }

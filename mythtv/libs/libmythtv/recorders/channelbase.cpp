@@ -823,6 +823,14 @@ ChannelBase *ChannelBase::CreateChannel(
         channel = new CetonChannel(tvrec, genOpt.videodev);
 #endif
     }
+    else if (genOpt.inputtype == "V4L2ENC")
+    {
+#ifdef USING_V4L2
+        channel = new V4LChannel(tvrec, genOpt.videodev);
+#endif
+        if (genOpt.inputtype == "MPEG")
+            rbFileExt = "mpg";
+    }
     else if (CardUtil::IsV4L(genOpt.inputtype))
     {
 #ifdef USING_V4L2

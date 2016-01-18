@@ -32,7 +32,7 @@
 #endif
 
 #ifdef USING_V4L2
-#include <linux/videodev2.h>
+#include "v4l2util.h"
 #endif
 
 #ifdef USING_HDHOMERUN
@@ -155,6 +155,27 @@ bool CardUtil::IsCableCardPresent(uint inputid,
         return false;
 }
 
+bool CardUtil::HasTuner(const QString &rawtype, const QString & device)
+{
+    if (rawtype == "DVB"     || rawtype == "HDHOMERUN" ||
+        rawtype == "FREEBOX" || rawtype == "CETON")
+        return true;
+
+    if (rawtype == "V4L2ENC")
+    {
+        V4L2util v4l2(device);
+        return !v4l2 ? false : v4l2.HasTuner();
+    }
+
+    if (rawtype == "EXTERNAL")
+    {
+        // TODO: query EXTERNAL for capability
+        return true;
+    }
+
+    return false;
+}
+
 bool CardUtil::IsTunerShared(uint inputidA, uint inputidB)
 {
     LOG(VB_GENERAL, LOG_DEBUG, QString("IsTunerShared(%1,%2)")
@@ -236,12 +257,12 @@ bool CardUtil::IsInputTypePresent(const QString &rawtype, QString hostname)
     return count > 0;
 }
 
-QStringList CardUtil::GetInputTypes(void)
+CardUtil::InputTypes CardUtil::GetInputTypes(void)
 {
-    QStringList inputtypes;
+    InputTypes inputtypes;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT DISTINCT cardtype "
+    query.prepare("SELECT DISTINCT cardtype, videodevice "
                   "FROM capturecard");
 
     if (!query.exec())
@@ -250,8 +271,23 @@ QStringList CardUtil::GetInputTypes(void)
     }
     else
     {
+        QString cardtype;
+
         while (query.next())
-            inputtypes.push_back(query.value(0).toString());
+        {
+            cardtype = query.value(0).toString();
+            if (cardtype != "V4L2ENC")
+                inputtypes[cardtype] = "";
+            else
+            {
+                V4L2util v4l2(query.value(1).toString());
+                if (v4l2.IsOpen())
+                {
+                    QString driver_name = "V4L2:" + v4l2.DriverName();
+                    inputtypes[driver_name] = v4l2.CardName();
+                }
+            }
+        }
     }
 
     return inputtypes;
@@ -1633,7 +1669,8 @@ QStringList CardUtil::ProbeAudioInputs(QString device, QString inputtype)
                                    .arg(device).arg(inputtype));
     QStringList ret;
 
-    if ("HDPVR" == inputtype)
+    if ("HDPVR" == inputtype ||
+        "V4L2"  == inputtype)
         ret += ProbeV4LAudioInputs(device);
 
     return ret;

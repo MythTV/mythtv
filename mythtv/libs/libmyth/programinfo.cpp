@@ -5190,6 +5190,8 @@ static int init_tr(void)
         QObject::tr("Transcoders",
                     "Recording Profile Group Name") +
         QObject::tr("USB MPEG-4 Encoder (Plextor ConvertX, etc)",
+                    "Recording Profile Group Name") +
+        QObject::tr("V4L2 Encoders",
                     "Recording Profile Group Name");
 
     QString display_rec_groups =
