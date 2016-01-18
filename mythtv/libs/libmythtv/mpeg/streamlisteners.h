@@ -100,6 +100,15 @@ class MPEGSingleProgramStreamListener
     virtual void HandleSingleProgramPMT(ProgramMapTable*, bool insert) = 0;
 };
 
+class PSStreamListener
+{
+  public:
+    virtual void FindPSKeyFrames(const uint8_t *buffer, uint len) = 0;
+
+  protected:
+    virtual ~PSStreamListener() { }
+};
+
 class ATSCMainStreamListener
 {
   protected:

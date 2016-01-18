@@ -1009,6 +1009,15 @@ int MPEGStreamData::ProcessData(const unsigned char *buffer, int len)
     int pos = 0;
     bool resync = false;
 
+    if (!_ps_listeners.empty())
+    {
+
+        for (uint j = 0; j < _ps_listeners.size(); ++j)
+            _ps_listeners[j]->FindPSKeyFrames(buffer, len);
+
+        return 0;
+    }
+
     while (pos + int(TSPacket::kSize) <= len)
     { // while we have a whole packet left...
         if (buffer[pos] != SYNC_BYTE || resync)
@@ -1811,6 +1820,33 @@ void MPEGStreamData::RemoveMPEGSPListener(MPEGSingleProgramStreamListener *val)
         if (((void*)val) == ((void*)*it))
         {
             _mpeg_sp_listeners.erase(it);
+            return;
+        }
+    }
+}
+
+void MPEGStreamData::AddPSStreamListener(PSStreamListener *val)
+{
+    QMutexLocker locker(&_listener_lock);
+
+    ps_listener_vec_t::iterator it = _ps_listeners.begin();
+    for (; it != _ps_listeners.end(); ++it)
+        if (((void*)val) == ((void*)*it))
+            return;
+
+    _ps_listeners.push_back(val);
+}
+
+void MPEGStreamData::RemovePSStreamListener(PSStreamListener *val)
+{
+    QMutexLocker locker(&_listener_lock);
+
+    ps_listener_vec_t::iterator it = _ps_listeners.begin();
+    for (; it != _ps_listeners.end(); ++it)
+    {
+        if (((void*)val) == ((void*)*it))
+        {
+            _ps_listeners.erase(it);
             return;
         }
     }

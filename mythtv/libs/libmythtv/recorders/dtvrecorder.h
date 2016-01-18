@@ -32,7 +32,8 @@ class DTVRecorder :
     public DVBMainStreamListener,
     public ATSCMainStreamListener,
     public TSPacketListener,
-    public TSPacketListenerAV
+    public TSPacketListenerAV,
+    public PSStreamListener
 {
   public:
     DTVRecorder(TVRec *rec);
@@ -112,7 +113,7 @@ class DTVRecorder :
     void HandleH264Keyframe(void);
 
     // MPEG2 PS support (Hauppauge PVR-x50/PVR-500)
-    void FindPSKeyFrames(const uint8_t *buffer, uint len);
+    virtual void FindPSKeyFrames(const uint8_t *buffer, uint len);
 
     // For handling other (non audio/video) packets
     bool FindOtherKeyframes(const TSPacket *tspacket);
