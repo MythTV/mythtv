@@ -278,11 +278,12 @@ bool DTVChannel::SetChannelByString(const QString &channum)
             }
         }
         else if (m_name.contains("composite", Qt::CaseInsensitive) ||
+                 m_name.contains("component", Qt::CaseInsensitive) ||
                  m_name.contains("s-video", Qt::CaseInsensitive))
         {
             LOG(VB_GENERAL, LOG_WARNING, loc + "You have not set "
                     "an external channel changing"
-                    "\n\t\t\tscript for a composite or s-video "
+                    "\n\t\t\tscript for a component|composite|s-video "
                     "input. Channel changing will do nothing.");
         }
         else if (isFrequency && Tune(frequency))
