@@ -7,7 +7,7 @@
 using namespace std;
 
 #include <QString>
-#include <QAtomicInteger>
+#include <QAtomicInt>
 #include <QMutex>
 #include <QMap>
 #include <stdint.h>
