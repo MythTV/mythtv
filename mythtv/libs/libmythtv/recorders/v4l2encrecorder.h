@@ -8,8 +8,6 @@
 #ifndef _V4L2encRecorder_H_
 #define _V4L2encRecorder_H_
 
-#include <linux/videodev2.h>
-
 // MythTV includes
 #include "v4l2encstreamhandler.h"
 #include "v4lrecorder.h"

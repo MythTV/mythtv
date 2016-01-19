@@ -1,7 +1,7 @@
 #ifndef _V4L2_util_h_
 #define _V4L2_util_h_
 
-#include <linux/videodev2.h>
+#include "videodev2.h" // our copy
 
 #include "tv.h"
 #include "mythtvexp.h"
