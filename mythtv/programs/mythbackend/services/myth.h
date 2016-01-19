@@ -138,6 +138,8 @@ class Myth : public MythServices
         QString             ProfileUpdated      ( void );
 
         QString             ProfileText         ( void );
+
+        DTC::BackendInfo*   GetBackendInfo      ( void );
 };
 
 // --------------------------------------------------------------------------
@@ -384,6 +386,13 @@ class ScriptableMyth : public QObject
         {
             SCRIPT_CATCH_EXCEPTION( QString(),
                 return m_obj.ProfileText();
+            )
+        }
+
+        QObject* GetBackendInfo( void )
+        {
+            SCRIPT_CATCH_EXCEPTION( NULL,
+                return m_obj.GetBackendInfo();
             )
         }
 };
