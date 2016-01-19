@@ -183,7 +183,7 @@ class MTV_PUBLIC CardUtil
     static bool         IsTuningAnalog(const QString &rawtype)
     {
         return
-            (rawtype == "V4L")       || (rawtype == "V4L2enc"    ||
+            (rawtype == "V4L")       || (rawtype == "V4L2ENC"    ||
              rawtype == "MPEG");
     }
 
