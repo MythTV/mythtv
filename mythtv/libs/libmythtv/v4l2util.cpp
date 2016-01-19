@@ -51,15 +51,11 @@ bool V4L2util::Open(const QString& dev_name, const QString& vbi_dev_name)
     }
     m_device_name = dev_name;
 
-#if defined(VIDIOC_QUERY_EXT_CTRL) && defined(V4L2_CTRL_FLAG_NEXT_COMPOUND)
     struct v4l2_query_ext_ctrl qc = {
         V4L2_CTRL_FLAG_NEXT_CTRL | V4L2_CTRL_FLAG_NEXT_COMPOUND
     };
 
     m_have_query_ext_ctrl = (v4l2_ioctl(m_fd, VIDIOC_QUERY_EXT_CTRL, &qc) == 0);
-#else
-    m_have_query_ext_ctrl = false;
-#endif
 
     m_card_name = m_driver_name = QString::null;
     m_version = 0;
@@ -154,12 +150,11 @@ QString V4L2util::ctrlflags_toString(uint32_t flags)
                      "write-only");
     bitmask_toString(result, flags, V4L2_CTRL_FLAG_VOLATILE,
                      "volatile");
-#if 0
     bitmask_toString(result, flags, V4L2_CTRL_FLAG_HAS_PAYLOAD,
                      "has-payload");
     bitmask_toString(result, flags, V4L2_CTRL_FLAG_EXECUTE_ON_WRITE,
                      "execute-on-write");
-#endif
+
     return result;
 }
 
@@ -250,108 +245,90 @@ void V4L2util::log_qctrl(struct v4l2_queryctrl& queryctrl,
     else
         drv_opt.category = DriverOption::UNKNOWN_CAT;
 
-    if (queryctrl.type >= 0x0100 /* V4L2_CTRL_COMPOUND_TYPES */)
+    switch (queryctrl.type)
     {
-        msg = QString("%1 : min=%2 max=%3 step=%4 default=%5")
-              .arg(QString("%1 (%2)").arg(nameStr)
-                   .arg(queryctrl_toString(queryctrl.type)), 31, QChar(' '))
-              .arg(queryctrl.minimum)
-              .arg(queryctrl.maximum)
-              .arg(queryctrl.step)
-              .arg(queryctrl.default_value);
-        drv_opt.type = DriverOption::INTEGER;
-    }
-    else
-    {
-        switch (queryctrl.type)
+        case V4L2_CTRL_TYPE_INTEGER:
+        case V4L2_CTRL_TYPE_INTEGER64:
+        case V4L2_CTRL_TYPE_U8:
+        case V4L2_CTRL_TYPE_U16:
+        case V4L2_CTRL_TYPE_U32:
+          msg = QString("%1 : min=%2 max=%3 step=%4 default=%5")
+                .arg(QString("%1 (%2)").arg(nameStr)
+                     .arg(queryctrl_toString(queryctrl.type)), 31, QChar(' '))
+                .arg(queryctrl.minimum)
+                .arg(queryctrl.maximum)
+                .arg(queryctrl.step)
+                .arg(queryctrl.default_value);
+          drv_opt.type = DriverOption::INTEGER;
+          break;
+        case V4L2_CTRL_TYPE_STRING:
+          msg =  QString("%1 : min=%2 max=%3 step=%4")
+                .arg(QString("%1 (%2)").arg(nameStr)
+                     .arg(queryctrl_toString(queryctrl.type)), 31, QChar(' '))
+                 .arg(queryctrl.minimum)
+                 .arg(queryctrl.maximum)
+                 .arg(queryctrl.step);
+          drv_opt.type = DriverOption::STRING;
+          break;
+        case V4L2_CTRL_TYPE_BOOLEAN:
+          msg = QString("%1 : default=%2")
+                .arg(QString("%1 (%2)").arg(nameStr)
+                     .arg(queryctrl_toString(queryctrl.type)), 31, QChar(' '))
+                .arg(queryctrl.default_value);
+          drv_opt.type = DriverOption::BOOLEAN;
+          break;
+        case V4L2_CTRL_TYPE_MENU:
+        case V4L2_CTRL_TYPE_INTEGER_MENU:
         {
-            case V4L2_CTRL_TYPE_INTEGER:
-            case V4L2_CTRL_TYPE_INTEGER64:
-              msg = QString("%1 : min=%2 max=%3 step=%4 default=%5")
-                    .arg(QString("%1 (%2)").arg(nameStr)
-                         .arg(queryctrl_toString(queryctrl.type)), 31,
-                         QChar(' '))
-                    .arg(queryctrl.minimum)
-                    .arg(queryctrl.maximum)
-                    .arg(queryctrl.step)
-                    .arg(queryctrl.default_value);
-              drv_opt.type = DriverOption::INTEGER;
-              break;
-            case V4L2_CTRL_TYPE_STRING:
-              msg =  QString("%1 : min=%2 max=%3 step=%4")
-                     .arg(QString("%1 (%2)").arg(nameStr)
-                          .arg(queryctrl_toString(queryctrl.type)), 31,
-                          QChar(' '))
-                     .arg(queryctrl.minimum)
-                     .arg(queryctrl.maximum)
-                     .arg(queryctrl.step);
-              drv_opt.type = DriverOption::STRING;
-              break;
-            case V4L2_CTRL_TYPE_BOOLEAN:
-              msg = QString("%1 : default=%2")
-                    .arg(QString("%1 (%2)").arg(nameStr)
-                         .arg(queryctrl_toString(queryctrl.type)), 31,
-                         QChar(' '))
-                    .arg(queryctrl.default_value);
-              drv_opt.type = DriverOption::BOOLEAN;
-              break;
-            case V4L2_CTRL_TYPE_MENU:
-            case V4L2_CTRL_TYPE_INTEGER_MENU:
-            {
-                msg = QString("%1 : min=%3 max=%4 default=%5")
-                      .arg(QString("%1 (%2)").arg(nameStr)
-                           .arg(queryctrl_toString(queryctrl.type)), 31,
-                           QChar(' '))
-                      .arg(queryctrl.minimum)
-                      .arg(queryctrl.maximum)
-                      .arg(queryctrl.default_value);
+            msg = QString("%1 : min=%3 max=%4 default=%5")
+                .arg(QString("%1 (%2)").arg(nameStr)
+                     .arg(queryctrl_toString(queryctrl.type)), 31, QChar(' '))
+                  .arg(queryctrl.minimum)
+                  .arg(queryctrl.maximum)
+                  .arg(queryctrl.default_value);
 #if 0
-                struct v4l2_querymenu querymenu = { 0, };
-                memset (&querymenu, 0, sizeof (querymenu));
-                querymenu.id = queryctrl.id;
+            struct v4l2_querymenu querymenu = { 0, };
+            memset (&querymenu, 0, sizeof (querymenu));
+            querymenu.id = queryctrl.id;
 
-                for (querymenu.index = queryctrl.minimum;
-                     static_cast<int>(querymenu.index) <= queryctrl.maximum;
-                     ++querymenu.index)
+            for (querymenu.index = queryctrl.minimum;
+                 static_cast<int>(querymenu.index) <= queryctrl.maximum;
+                 ++querymenu.index)
+            {
+                drv_opt.menu.clear();
+                if (0 == ioctl(m_fd, VIDIOC_QUERYMENU, &querymenu))
                 {
-                    drv_opt.menu.clear();
-                    if (0 == ioctl(m_fd, VIDIOC_QUERYMENU, &querymenu))
-                    {
-                        msg += QString(" menu>%1").arg((char *)querymenu.name);
-                        drv_opt.menu[querymenu.index] =
-                            QString((char *)querymenu.name);
-                    }
+                    msg += QString(" menu>%1").arg((char *)querymenu.name);
+                    drv_opt.menu[querymenu.index] =
+                        QString((char *)querymenu.name);
                 }
-#endif
-                drv_opt.type = DriverOption::MENU;
-                break;
             }
-            case V4L2_CTRL_TYPE_BUTTON:
-              msg = QString("%1 :")
-                    .arg(QString("%1 (%2)").arg(nameStr)
-                         .arg(queryctrl_toString(queryctrl.type)), 31,
-                         QChar(' '));
-              drv_opt.type = DriverOption::BUTTON;
-              break;
-            case V4L2_CTRL_TYPE_BITMASK:
-              msg = QString("%1 : max=0x%2 default=0x%3")
-                    .arg(QString("%1 (%2)").arg(nameStr)
-                         .arg(queryctrl_toString(queryctrl.type)), 31,
-                         QChar(' '))
-                    .arg(queryctrl.maximum, 8, 16, QChar(' '))
-                    .arg(queryctrl.default_value, 8, 16, QChar(' '));
-              drv_opt.type = DriverOption::BITMASK;
-              break;
-
-            default:
-              msg = QString("%1 : type=%2")
-                    .arg(QString("%1 (%2)").arg(nameStr)
-                         .arg(queryctrl_toString(queryctrl.type)), 31,
-                         QChar(' '))
-                    .arg(queryctrl.type);
-              drv_opt.type = DriverOption::UNKNOWN_TYPE;
-              break;
+#endif
+            drv_opt.type = DriverOption::MENU;
+            break;
         }
+        case V4L2_CTRL_TYPE_BUTTON:
+          msg = QString("%1 :")
+                .arg(QString("%1 (%2)").arg(nameStr)
+                     .arg(queryctrl_toString(queryctrl.type)), 31, QChar(' '));
+          drv_opt.type = DriverOption::BUTTON;
+                break;
+        case V4L2_CTRL_TYPE_BITMASK:
+          msg = QString("%1 : max=0x%2 default=0x%3")
+                .arg(QString("%1 (%2)").arg(nameStr)
+                     .arg(queryctrl_toString(queryctrl.type)), 31, QChar(' '))
+                .arg(queryctrl.maximum, 8, 16, QChar(' '))
+                .arg(queryctrl.default_value, 8, 16, QChar(' '));
+          drv_opt.type = DriverOption::BITMASK;
+          break;
+
+        default:
+          msg = QString("%1 : type=%2")
+                .arg(QString("%1 (%2)").arg(nameStr)
+                     .arg(queryctrl_toString(queryctrl.type)), 31, QChar(' '))
+                .arg(queryctrl.type);
+          drv_opt.type = DriverOption::UNKNOWN_TYPE;
+          break;
     }
 
     if (queryctrl.flags)
@@ -898,7 +875,7 @@ bool V4L2util::SetVideoBitratePeak(int value)
                          "Video Peak Bitrate", desc);
 }
 
-bool V4L2util::SetResolution(uint width, uint height)
+bool V4L2util::SetResolution(int width, int height)
 {
     struct v4l2_format vfmt;
     memset(&vfmt, 0, sizeof(vfmt));
