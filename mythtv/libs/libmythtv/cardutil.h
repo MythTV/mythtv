@@ -134,7 +134,7 @@ class MTV_PUBLIC CardUtil
     {
         return (rawtype == "V4L"   || rawtype == "MPEG"      ||
                 rawtype == "HDPVR" || rawtype == "GO7007"    ||
-                rawtype == "MJPEG" || rawtype == "V4L2enc");
+                rawtype == "MJPEG" || rawtype == "V4L2ENC");
     }
 
     static bool         IsChannelChangeDiscontinuous(const QString &rawtype)
