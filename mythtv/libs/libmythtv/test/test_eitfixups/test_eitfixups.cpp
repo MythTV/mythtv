@@ -145,7 +145,7 @@ void printEvent(const DBEventEIT& event, const QString& name)
     printf("Video props    %s\n",  getVideoProps(event.videoProps).toLocal8Bit().constData());
     if (event.credits && !event.credits->empty())
     {
-        printf("Credits      %3lu\n", event.credits->size());
+        printf("Credits      %3zu\n", event.credits->size());
     }
     if (!event.items.isEmpty())
     {
