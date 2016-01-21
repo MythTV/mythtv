@@ -578,7 +578,7 @@ void TestEITFixups::testUnitymedia()
     PRINT_EVENT(*event);
 
     QVERIFY(event->HasCredits());
-    QCOMPARE(event->credits->size(), 3ul);
+    QCOMPARE(event->credits->size(), (size_t)3);
     QVERIFY(event->subtitle.isEmpty());
     QCOMPARE(event->description, QString("Beschreibung ..."));
     QCOMPARE(event->stars, 0.89f);
