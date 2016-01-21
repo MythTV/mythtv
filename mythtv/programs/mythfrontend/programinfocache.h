@@ -24,6 +24,8 @@ typedef enum {
     PIC_NONE              = 0x00,
     PIC_MARK_CHANGED      = 0x01,
     PIC_RECGROUP_CHANGED  = 0x02,
+    PIC_PART_WATCHED      = 0X04,
+    PIC_WATCHLIST_CHANGED = 0x08,
     PIC_NO_ACTION         = 0x80,
 } UpdateState;
 

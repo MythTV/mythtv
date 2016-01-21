@@ -222,13 +222,6 @@ typedef enum AvailableStatusTypes {
 } AvailableStatusType; // note stored in uint8_t in ProgramInfo
 MPUBLIC QString toString(AvailableStatusType);
 
-enum WatchListStatus {
-    wlDeleted = -4,
-    wlEarlier = -3,
-    wlWatched = -2,
-    wlExpireOff = -1
-};
-
 typedef enum AutoExpireTypes {
     kDisableAutoExpire = 0,
     kNormalAutoExpire  = 1,

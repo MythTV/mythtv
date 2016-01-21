@@ -101,16 +101,6 @@ static int comp_originalAirDate_rev(const ProgramInfo *a, const ProgramInfo *b)
         return (dt1 > dt2 ? 1 : -1);
 }
 
-static int comp_recpriority2(const ProgramInfo *a, const ProgramInfo *b)
-{
-    if (a->GetRecordingPriority2() == b->GetRecordingPriority2())
-        return (a->GetRecordingStartTime() <
-                b->GetRecordingStartTime() ? 1 : -1);
-    else
-        return (a->GetRecordingPriority2() <
-                b->GetRecordingPriority2() ? 1 : -1);
-}
-
 static int comp_recordDate(const ProgramInfo *a, const ProgramInfo *b)
 {
     if (a->GetScheduledStartTime().date() == b->GetScheduledStartTime().date())
@@ -177,12 +167,6 @@ static bool comp_originalAirDate_rev_less_than(
     const ProgramInfo *a, const ProgramInfo *b)
 {
     return comp_originalAirDate_rev(a, b) < 0;
-}
-
-static bool comp_recpriority2_less_than(
-    const ProgramInfo *a, const ProgramInfo *b)
-{
-    return comp_recpriority2(a, b) < 0;
 }
 
 static bool comp_recordDate_less_than(
@@ -405,8 +389,6 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name,
       m_titleView(false),
       m_useCategories(false),
       m_useRecGroups(false),
-      m_watchListAutoExpire(false),
-      m_watchListMaxAge(60),              m_watchListBlackOut(2),
       m_listOrder(1),
       // Recording Group settings
       m_groupDisplayName(ProgramInfo::i18n("All Programs")),
@@ -449,11 +431,7 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name,
     int pbOrder        = gCoreContext->GetNumSetting("PlayBoxOrdering", 1);
     // Split out sort order modes, wacky order for backward compatibility
     m_listOrder = (pbOrder >> 1) ^ (m_allOrder = pbOrder & 1);
-    m_watchListStart     = gCoreContext->GetNumSetting("PlaybackWLStart", 0);
-
-    m_watchListAutoExpire= gCoreContext->GetNumSetting("PlaybackWLAutoExpire", 0);
-    m_watchListMaxAge    = gCoreContext->GetNumSetting("PlaybackWLMaxAge", 60);
-    m_watchListBlackOut  = gCoreContext->GetNumSetting("PlaybackWLBlackOut", 2);
+    m_watchListStart  = gCoreContext->GetNumSetting("PlaybackWLStart", 0);
 
     bool displayCat  = gCoreContext->GetNumSetting("DisplayRecGroupIsCategory", 0);
 
@@ -954,6 +932,11 @@ void PlaybackBox::ItemLoaded(MythUIButtonListItem *item)
         item->SetFontState(state);
 
         InfoMap infoMap;
+
+        // watchlist episode count only set when watchlist group is selected
+        if (groupname == m_watchGroupLabel)
+            infoMap["watchtotal"] = m_watchlist.GetTotal(*pginfo);
+
         pginfo->ToMap(infoMap);
         item->SetTextFromMap(infoMap);
 
@@ -1627,6 +1610,7 @@ bool PlaybackBox::UpdateUILists(void)
     m_progsInDB = 0;
     m_titleList.clear();
     m_progLists.clear();
+    m_watchlist.Clear();
     m_recordingList->Reset();
     m_groupList->Reset();
     if (m_recgroupList)
@@ -1641,7 +1625,6 @@ bool PlaybackBox::UpdateUILists(void)
 
     QMap<QString, QString> sortedList;
     QMap<int, QString> searchRule;
-    QMap<int, int> recidEpisodes;
 
     m_programInfoCache.Refresh();
 
@@ -1773,37 +1756,7 @@ bool PlaybackBox::UpdateUILists(void)
                     p->GetRecordingGroup() != "LiveTV" &&
                     p->GetRecordingGroup() != "Deleted")
                 {
-                    if (m_watchListAutoExpire && !p->IsAutoExpirable())
-                    {
-                        p->SetRecordingPriority2(wlExpireOff);
-                        LOG(VB_FILE, LOG_INFO, QString("Auto-expire off:  %1")
-                                .arg(p->GetTitle()));
-                    }
-                    else if (p->IsWatched())
-                    {
-                        p->SetRecordingPriority2(wlWatched);
-                        LOG(VB_FILE, LOG_INFO,
-                            QString("Marked as 'watched':  %1")
-                                .arg(p->GetTitle()));
-                    }
-                    else
-                    {
-                        if (p->GetRecordingRuleID())
-                            recidEpisodes[p->GetRecordingRuleID()] += 1;
-                        if (recidEpisodes[p->GetRecordingRuleID()] == 1 ||
-                            !p->GetRecordingRuleID())
-                        {
-                            m_progLists[m_watchGroupLabel].push_front(p);
-                            m_progLists[m_watchGroupLabel].setAutoDelete(false);
-                        }
-                        else
-                        {
-                            p->SetRecordingPriority2(wlEarlier);
-                            LOG(VB_FILE, LOG_INFO,
-                                QString("Not the earliest:  %1")
-                                    .arg(p->GetTitle()));
-                        }
-                    }
+                    m_watchlist.Add(p);
                 }
             }
         }
@@ -1879,244 +1832,13 @@ bool PlaybackBox::UpdateUILists(void)
         }
     }
 
-    if (!m_progLists[m_watchGroupLabel].empty())
+    if (!m_watchlist.Empty())
     {
-        QDateTime now = MythDate::current();
-        int baseValue = m_watchListMaxAge * 2 / 3;
+        // Shows with same score will appear in reverse alphabetic order
+        foreach (ProgramInfo* wp, m_watchlist.Order())
+            m_progLists[m_watchGroupLabel].push_front(wp);
 
-        QMap<int, int> recType;
-        QMap<int, int> maxEpisodes;
-        QMap<int, int> avgDelay;
-        QMap<int, int> spanHours;
-        QMap<int, int> delHours;
-        QMap<int, int> nextHours;
-
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("SELECT recordid, type, maxepisodes, avg_delay, "
-                      "next_record, last_record, last_delete FROM record;");
-
-        if (query.exec())
-        {
-            while (query.next())
-            {
-                int recid = query.value(0).toInt();
-                recType[recid] = query.value(1).toInt();
-                maxEpisodes[recid] = query.value(2).toInt();
-                avgDelay[recid] = query.value(3).toInt();
-
-                QDateTime next_record =
-                    MythDate::as_utc(query.value(4).toDateTime());
-                QDateTime last_record =
-                    MythDate::as_utc(query.value(5).toDateTime());
-                QDateTime last_delete =
-                    MythDate::as_utc(query.value(6).toDateTime());
-
-                // Time between the last and next recordings
-                spanHours[recid] = 1000;
-                if (last_record.isValid() && next_record.isValid())
-                    spanHours[recid] =
-                        last_record.secsTo(next_record) / 3600 + 1;
-
-                // Time since the last episode was deleted
-                delHours[recid] = 1000;
-                if (last_delete.isValid())
-                    delHours[recid] = last_delete.secsTo(now) / 3600 + 1;
-
-                // Time until the next recording if any
-                if (next_record.isValid())
-                    nextHours[recid] = now.secsTo(next_record) / 3600 + 1;
-            }
-        }
-
-        ProgramList::iterator pit = m_progLists[m_watchGroupLabel].begin();
-        while (pit != m_progLists[m_watchGroupLabel].end())
-        {
-            int recid = (*pit)->GetRecordingRuleID();
-            int avgd =  avgDelay[recid];
-
-            if (avgd == 0)
-                avgd = 100;
-
-            // Set the intervals beyond range if there is no record entry
-            if (spanHours[recid] == 0)
-            {
-                spanHours[recid] = 1000;
-                delHours[recid] = 1000;
-            }
-
-            // add point equal to baseValue for each additional episode
-            if (!(*pit)->GetRecordingRuleID() || maxEpisodes[recid] > 0)
-                (*pit)->SetRecordingPriority2(0);
-            else
-            {
-                (*pit)->SetRecordingPriority2(
-                    (recidEpisodes[(*pit)->GetRecordingRuleID()] - 1) *
-                    baseValue);
-            }
-
-            // add points every 3hr leading up to the next recording
-            if (nextHours[recid] > 0 && nextHours[recid] < baseValue * 3)
-            {
-                (*pit)->SetRecordingPriority2(
-                    (*pit)->GetRecordingPriority2() +
-                    (baseValue * 3 - nextHours[recid]) / 3);
-            }
-
-            int hrs = (*pit)->GetScheduledEndTime().secsTo(now) / 3600;
-            if (hrs < 1)
-                hrs = 1;
-
-            // add points for a new recording that decrease each hour
-            if (hrs < 42)
-            {
-                (*pit)->SetRecordingPriority2(
-                    (*pit)->GetRecordingPriority2() + 42 - hrs);
-            }
-
-            // add points for how close the recorded time of day is to 'now'
-            (*pit)->SetRecordingPriority2(
-                (*pit)->GetRecordingPriority2() + abs((hrs % 24) - 12) * 2);
-
-            // Daily
-            if (spanHours[recid] < 50 ||
-                recType[recid] == kDailyRecord)
-            {
-                if (delHours[recid] < m_watchListBlackOut * 4)
-                {
-                    (*pit)->SetRecordingPriority2(wlDeleted);
-                    LOG(VB_FILE, LOG_INFO,
-                        QString("Recently deleted daily:  %1")
-                            .arg((*pit)->GetTitle()));
-                    pit = m_progLists[m_watchGroupLabel].erase(pit);
-                    continue;
-                }
-                else
-                {
-                    LOG(VB_FILE, LOG_INFO, QString("Daily interval:  %1")
-                            .arg((*pit)->GetTitle()));
-
-                    if (maxEpisodes[recid] > 0)
-                    {
-                        (*pit)->SetRecordingPriority2(
-                            (*pit)->GetRecordingPriority2() +
-                            (baseValue / 2) + (hrs / 24));
-                    }
-                    else
-                    {
-                        (*pit)->SetRecordingPriority2(
-                            (*pit)->GetRecordingPriority2() +
-                            (baseValue / 5) + hrs);
-                    }
-                }
-            }
-            // Weekly
-            else if (nextHours[recid] ||
-                     recType[recid] == kWeeklyRecord)
-
-            {
-                if (delHours[recid] < (m_watchListBlackOut * 24) - 4)
-                {
-                    (*pit)->SetRecordingPriority2(wlDeleted);
-                    LOG(VB_FILE, LOG_INFO,
-                        QString("Recently deleted weekly:  %1")
-                            .arg((*pit)->GetTitle()));
-                    pit = m_progLists[m_watchGroupLabel].erase(pit);
-                    continue;
-                }
-                else
-                {
-                    LOG(VB_FILE, LOG_INFO, QString("Weekly interval: %1")
-                            .arg((*pit)->GetTitle()));
-
-                    if (maxEpisodes[recid] > 0)
-                    {
-                        (*pit)->SetRecordingPriority2(
-                            (*pit)->GetRecordingPriority2() +
-                            (baseValue / 2) + (hrs / 24));
-                    }
-                    else
-                    {
-                        (*pit)->SetRecordingPriority2(
-                            (*pit)->GetRecordingPriority2() +
-                            (baseValue / 3) + (baseValue * hrs / 24 / 4));
-                    }
-                }
-            }
-            // Not recurring
-            else
-            {
-                if (delHours[recid] < (m_watchListBlackOut * 48) - 4)
-                {
-                    (*pit)->SetRecordingPriority2(wlDeleted);
-                    pit = m_progLists[m_watchGroupLabel].erase(pit);
-                    continue;
-                }
-                else
-                {
-                    // add points for a new Single or final episode
-                    if (hrs < 36)
-                    {
-                        (*pit)->SetRecordingPriority2(
-                            (*pit)->GetRecordingPriority2() +
-                            baseValue * (36 - hrs) / 36);
-                    }
-
-                    if (avgd != 100)
-                    {
-                        if (maxEpisodes[recid] > 0)
-                        {
-                            (*pit)->SetRecordingPriority2(
-                                (*pit)->GetRecordingPriority2() +
-                                (baseValue / 2) + (hrs / 24));
-                        }
-                        else
-                        {
-                            (*pit)->SetRecordingPriority2(
-                                (*pit)->GetRecordingPriority2() +
-                                (baseValue / 3) + (baseValue * hrs / 24 / 4));
-                        }
-                    }
-                    else if ((hrs / 24) < m_watchListMaxAge)
-                    {
-                        (*pit)->SetRecordingPriority2(
-                            (*pit)->GetRecordingPriority2() +
-                            hrs / 24);
-                    }
-                    else
-                    {
-                        (*pit)->SetRecordingPriority2(
-                            (*pit)->GetRecordingPriority2() +
-                            m_watchListMaxAge);
-                    }
-                }
-            }
-
-            // Factor based on the average time shift delay.
-            // Scale the avgd range of 0 thru 200 hours to 133% thru 67%
-            int delaypct = avgd / 3 + 67;
-
-            if (avgd < 100)
-            {
-                (*pit)->SetRecordingPriority2(
-                    (*pit)->GetRecordingPriority2() * (200 - delaypct) / 100);
-            }
-            else if (avgd > 100)
-            {
-                (*pit)->SetRecordingPriority2(
-                    (*pit)->GetRecordingPriority2() * 100 / delaypct);
-            }
-
-            LOG(VB_FILE, LOG_INFO, QString(" %1  %2  %3")
-                    .arg(MythDate::toString((*pit)->GetScheduledStartTime(),
-                                            MythDate::kDateShort))
-                    .arg((*pit)->GetRecordingPriority2())
-                    .arg((*pit)->GetTitle()));
-
-            ++pit;
-        }
-        std::stable_sort(m_progLists[m_watchGroupLabel].begin(),
-                         m_progLists[m_watchGroupLabel].end(),
-                         comp_recpriority2_less_than);
+        m_progLists[m_watchGroupLabel].setAutoDelete(false);
     }
 
     m_titleList = QStringList("");
@@ -4430,8 +4152,9 @@ void PlaybackBox::HandleRecordingAddEvent(const ProgramInfo &evinfo)
 
 void PlaybackBox::HandleUpdateItemEvent(uint recordingId, uint flags)
 {
-    // Changing recording group full reload
-    if (flags & PIC_RECGROUP_CHANGED)
+    // Changing recording group or watchlist-dependent metadata requires full reload
+    if ((flags & PIC_RECGROUP_CHANGED) ||
+            ((flags & PIC_WATCHLIST_CHANGED) && (m_viewMask & VIEW_WATCHLIST)))
     {
         ScheduleUpdateUIList();
     }
@@ -4880,47 +4603,12 @@ void PlaybackBox::saveRecMetadata(const QString &newTitle,
     {
         m_recordingList->RemoveItem(item);
     }
-    else
-    {
-        QString tempSubTitle = newTitle;
-        if (!newSubtitle.trimmed().isEmpty())
-            tempSubTitle = QString("%1 - \"%2\"")
-                            .arg(tempSubTitle).arg(newSubtitle);
-
-        QString seasone;
-        QString seasonx;
-        QString season;
-        QString episode;
-        if (newSeason > 0 || newEpisode > 0)
-        {
-            season = format_season_and_episode(newSeason, 1);
-            episode = format_season_and_episode(newEpisode, 1);
-            seasone = QString("s%1e%2")
-                .arg(format_season_and_episode(newSeason, 2))
-                .arg(format_season_and_episode(newEpisode, 2));
-            seasonx = QString("%1x%2")
-                .arg(format_season_and_episode(newSeason, 1))
-                .arg(format_season_and_episode(newEpisode, 2));
-        }
-
-        item->SetText(tempSubTitle, "titlesubtitle");
-        item->SetText(newTitle, "title");
-        item->SetText(newSubtitle, "subtitle");
-        item->SetText(newInetref, "inetref");
-        item->SetText(seasonx, "00x00");
-        item->SetText(seasone, "s00e00");
-        item->SetText(season, "season");
-        item->SetText(episode, "episode");
-        if (newDescription != NULL)
-            item->SetText(newDescription, "description");
-    }
 
     pginfo->SaveInetRef(newInetref);
     pginfo->SaveSeasonEpisode(newSeason, newEpisode);
 
     RecordingInfo ri(*pginfo);
     ri.ApplyRecordRecTitleChange(newTitle, newSubtitle, newDescription);
-    *pginfo = ri;
 }
 
 void PlaybackBox::setRecGroup(QString newRecGroup)
@@ -4974,10 +4662,8 @@ void PlaybackBox::setRecGroup(QString newRecGroup)
 
             RecordingInfo ri(*p);
             ri.ApplyRecordRecGroupChange(newRecGroup);
-            *p = ri;
         }
         doClearPlaylist();
-        UpdateUILists();
         return;
     }
 
@@ -4992,8 +4678,6 @@ void PlaybackBox::setRecGroup(QString newRecGroup)
 
     RecordingInfo ri(*p);
     ri.ApplyRecordRecGroupChange(newRecGroup);
-    *p = ri;
-    UpdateUILists();
 }
 
 void PlaybackBox::setPlayGroup(QString newPlayGroup)
@@ -5017,7 +4701,6 @@ void PlaybackBox::setPlayGroup(QString newPlayGroup)
             {
                 RecordingInfo ri(*tmpItem);
                 ri.ApplyRecordPlayGroupChange(newPlayGroup);
-                *tmpItem = ri;
             }
         }
         doClearPlaylist();
@@ -5026,7 +4709,6 @@ void PlaybackBox::setPlayGroup(QString newPlayGroup)
     {
         RecordingInfo ri(*tmpItem);
         ri.ApplyRecordPlayGroupChange(newPlayGroup);
-        *tmpItem = ri;
     }
 }
 
@@ -5620,6 +5302,441 @@ bool PlaybackBox::PbbJobQueue::IsJobQueuedOrRunning(int jobType, uint chanid,
 {
     return IsJobQueued(jobType, chanid, recstartts) ||
         IsJobRunning(jobType, chanid, recstartts);
+}
+
+////////////////////////////////////////////////////////
+
+ProgramInfo* WatchGroup::GetFirst() const
+{
+    // Use earliest episode of the 3 variants
+    ProgramInfo* earliest = m_season;
+
+    if (m_episode && (!earliest || m_episode->GetScheduledStartTime()
+                      < earliest->GetScheduledStartTime()))
+        earliest = m_episode;
+
+    if (m_date && (!earliest || m_date->GetScheduledStartTime()
+                   < earliest->GetScheduledStartTime()))
+        earliest = m_date;
+
+    return earliest;
+}
+
+/*!
+ * \brief Insert episode into watchlist
+ * \param current Current earliest episode of a variant
+ * \param p Episode being added
+ */
+void WatchGroup::Add(ProgramInfo* &current, ProgramInfo* p)
+{
+    ++m_count;
+
+    uint      ps(p->GetSeason());
+    uint      pe(p->GetEpisode());
+    QDateTime pt(p->GetScheduledStartTime());
+
+    if (!current)
+    {
+        // first episode with this title
+        current = p;
+
+        LOG(VB_GUI, LOG_DEBUG,
+            QString("Watchlist: New      - %1 %2 (%3x%4)")
+            .arg(MythDate::toString(pt, Qt::ISODate))
+            .arg(p->GetTitle()).arg(ps).arg(pe));
+        return;
+    }
+
+    // duplicate title
+    uint      cs(current->GetSeason());
+    uint      ce(current->GetEpisode());
+    QDateTime ct(current->GetScheduledStartTime());
+
+    // succeed earliest if;
+    // - earlier season, or
+    // - same season, both with episodes and earlier episode, or
+    // - same season, at least one episode undefined and earlier recording
+    if (ps < cs
+            || (ps == cs
+                && ((pe > 0 && ce > 0 && pe < ce)
+                    || ((pe == 0 || ce == 0) && pt < ct))))
+    {
+        // replace existing episode
+        current = p;
+
+        LOG(VB_GUI, LOG_DEBUG,
+            QString("Watchlist: Replace  - %1 %2 (%3x%4) "
+                    "succeeding %5 (%6x%7)")
+            .arg(MythDate::toString(pt, Qt::ISODate))
+            .arg(p->GetTitle())
+            .arg(ps).arg(pe)
+            .arg(MythDate::toString(ct, Qt::ISODate))
+            .arg(cs).arg(ce));
+    }
+    else
+        LOG(VB_GUI, LOG_DEBUG,
+            QString("Watchlist: Earlier  - %1 %2 (%3x%4)")
+            .arg(MythDate::toString(pt, Qt::ISODate))
+            .arg(p->GetTitle())
+            .arg(ps).arg(pe));
+}
+
+WatchList::WatchList()
+    : m_list(),
+      m_watchListAutoExpire(gCoreContext->GetNumSetting("PlaybackWLAutoExpire", 0)),
+      m_watchListMaxAge(gCoreContext->GetNumSetting("PlaybackWLMaxAge", 60)),
+      m_watchListBlackOut(gCoreContext->GetNumSetting("PlaybackWLBlackOut", 2)),
+      m_watchListRecentLimit(gCoreContext->GetNumSetting("PlaybackWLRecentLimit", 2)),
+      m_watchListOldLimit(gCoreContext->GetNumSetting("PlaybackWLOldLimit", 30)),
+      m_watchListStrategy(gCoreContext->GetSetting("PlaybackWLOrder", "Classic"))
+{}
+
+// Group titles ignore case, punctuation & whitespace
+QString WatchList::GroupOf(const ProgramInfo &pginfo)
+{
+    QRegExp chaff("\\W");
+    return pginfo.GetTitle().remove(chaff).toLower();
+}
+
+/// Add episode to watchlist
+void WatchList::Add(ProgramInfo *p)
+{
+    if (!p)
+        return;
+
+    if (p->IsWatched())
+    {
+        // Ignore watched
+        LOG(VB_GUI, LOG_DEBUG,
+            QString("Watchlist: Watched  - %1 %2 (%3x%4)")
+            .arg(MythDate::toString(p->GetScheduledStartTime(), Qt::ISODate))
+            .arg(p->GetTitle())
+            .arg(p->GetSeason())
+            .arg(p->GetEpisode()));
+    }
+    else if (m_watchListAutoExpire && !p->IsAutoExpirable())
+    {
+        LOG(VB_GUI, LOG_DEBUG,
+            QString("Watchlist: No expire - %1 %2 (%3x%4)")
+            .arg(MythDate::toString(p->GetScheduledStartTime(),
+                                    Qt::ISODate))
+            .arg(p->GetTitle())
+            .arg(p->GetSeason())
+            .arg(p->GetEpisode()));
+    }
+    else
+    {
+        // Create group if it doesn't exist
+        WatchGroup &group = m_list[GroupOf(*p)];
+
+        // Process according to variant
+        if (p->GetSeason() > 0)
+            group.AddSeason(p);
+        else if (p->GetEpisode() > 0)
+            group.AddEpisode(p);
+        else
+            group.AddDate(p);
+    }
+}
+
+/// Return sorted watchlist
+WatchList::ProgramOrder WatchList::Order()
+{
+     if (m_watchListStrategy == "Classic")
+         return OrderByClassicStrategy();
+
+     if (m_watchListStrategy == "LimitedOldest")
+         return OrderByOldestStrategy();
+
+     return ProgramOrder();
+}
+
+/// Sort programs by original Watchlist rules
+WatchList::ProgramOrder WatchList::OrderByClassicStrategy()
+{
+    QDateTime now = MythDate::current();
+    int baseValue = m_watchListMaxAge * 2 / 3;
+
+    QMap<int, int> recType;
+    QMap<int, int> maxEpisodes;
+    QMap<int, int> avgDelay;
+    QMap<int, int> spanHours;
+    QMap<int, int> delHours;
+    QMap<int, int> nextHours;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT recordid, type, maxepisodes, avg_delay, "
+                  "next_record, last_record, last_delete FROM record;");
+
+    if (query.exec())
+    {
+        while (query.next())
+        {
+            int recid = query.value(0).toInt();
+            recType[recid] = query.value(1).toInt();
+            maxEpisodes[recid] = query.value(2).toInt();
+            avgDelay[recid] = query.value(3).toInt();
+
+            QDateTime next_record =
+                    MythDate::as_utc(query.value(4).toDateTime());
+            QDateTime last_record =
+                    MythDate::as_utc(query.value(5).toDateTime());
+            QDateTime last_delete =
+                    MythDate::as_utc(query.value(6).toDateTime());
+
+            // Time between the last and next recordings
+            spanHours[recid] = 1000;
+            if (last_record.isValid() && next_record.isValid())
+                spanHours[recid] =
+                        last_record.secsTo(next_record) / 3600 + 1;
+
+            // Time since the last episode was deleted
+            delHours[recid] = 1000;
+            if (last_delete.isValid())
+                delHours[recid] = last_delete.secsTo(now) / 3600 + 1;
+
+            // Time until the next recording if any
+            if (next_record.isValid())
+                nextHours[recid] = now.secsTo(next_record) / 3600 + 1;
+        }
+    }
+
+    ProgramOrder ordered;
+    foreach (const WatchGroup &group, m_list)
+    {
+        ProgramInfo* p = group.GetFirst();
+        uint score = 0;
+        int recid = p->GetRecordingRuleID();
+        int avgd =  avgDelay[recid];
+
+        if (avgd == 0)
+            avgd = 100;
+
+        // Set the intervals beyond range if there is no record entry
+        if (spanHours[recid] == 0)
+        {
+            spanHours[recid] = 1000;
+            delHours[recid] = 1000;
+        }
+
+        // add point equal to baseValue for each additional episode
+        if (recid && maxEpisodes[recid] == 0)
+            score += (group.GetCount() - 1) * baseValue;
+
+        // add points every 3hr leading up to the next recording
+        if (nextHours[recid] > 0 && nextHours[recid] < baseValue * 3)
+            score += (baseValue * 3 - nextHours[recid]) / 3;
+
+        int hrs = p->GetScheduledEndTime().secsTo(now) / 3600;
+        if (hrs < 1)
+            hrs = 1;
+
+        // add points for a new recording that decrease each hour
+        if (hrs < 42)
+            score += 42 - hrs;
+
+        // add points for how close the recorded time of day is to 'now'
+        score += abs((hrs % 24) - 12) * 2;
+
+        // Daily
+        if (spanHours[recid] < 50 ||
+                recType[recid] == kDailyRecord)
+        {
+            if (delHours[recid] < m_watchListBlackOut * 4)
+            {
+                LOG(VB_GUI, LOG_DEBUG,
+                    QString("Watchlist: Recently deleted daily:  %1")
+                    .arg(p->GetTitle()));
+
+                continue;
+            }
+            else
+            {
+                LOG(VB_GUI, LOG_DEBUG, QString("Watchlist: Daily interval:  %1")
+                    .arg(p->GetTitle()));
+
+                if (maxEpisodes[recid] > 0)
+                    score += (baseValue / 2) + (hrs / 24);
+                else
+                    score += (baseValue / 5) + hrs;
+            }
+        }
+        // Weekly
+        else if (nextHours[recid] ||
+                 recType[recid] == kWeeklyRecord)
+
+        {
+            if (delHours[recid] < (m_watchListBlackOut * 24) - 4)
+            {
+                LOG(VB_GUI, LOG_DEBUG,
+                    QString("Watchlist: Recently deleted weekly:  %1")
+                    .arg(p->GetTitle()));
+
+                continue;
+            }
+            else
+            {
+                LOG(VB_GUI, LOG_DEBUG, QString("Watchlist: Weekly interval: %1")
+                    .arg(p->GetTitle()));
+
+                if (maxEpisodes[recid] > 0)
+                    score += (baseValue / 2) + (hrs / 24);
+                else
+                    score += (baseValue / 3) + (baseValue * hrs / 24 / 4);
+            }
+        }
+        // Not recurring
+        else
+        {
+            if (delHours[recid] < (m_watchListBlackOut * 48) - 4)
+            {
+                continue;
+            }
+            else
+            {
+                // add points for a new Single or final episode
+                if (hrs < 36)
+                    score += baseValue * (36 - hrs) / 36;
+
+                if (avgd != 100)
+                {
+                    if (maxEpisodes[recid] > 0)
+                        score += (baseValue / 2) + (hrs / 24);
+                    else
+                        score += (baseValue / 3) + (baseValue * hrs / 24 / 4);
+                }
+                else if ((hrs / 24) < m_watchListMaxAge)
+                    score += hrs / 24;
+                else
+                    score += m_watchListMaxAge;
+            }
+        }
+
+        // Factor based on the average time shift delay.
+        // Scale the avgd range of 0 thru 200 hours to 133% thru 67%
+        int delaypct = avgd / 3 + 67;
+
+        if (avgd < 100)
+            score = score * (200 - delaypct) / 100;
+        else if (avgd > 100)
+            score = score * 100 / delaypct;
+
+        // use score as primary key in top 32 bits,
+        // use age in secs as a secondary key in low 32 bits to ensure equal
+        // scores are ordered oldest first. Copes with progs up to 136 yrs old
+        score_type longScore = (static_cast<score_type>(score) << 32)
+                | p->GetScheduledStartTime().secsTo(now);
+
+        ordered.insert(longScore, p);
+
+        LOG(VB_GUI, LOG_DEBUG, QString("Watchlist:%1 %2 %3 %4")
+            .arg(score, 5)
+            .arg(longScore, 12)
+            .arg(p->GetTitle())
+            .arg(MythDate::toString(p->GetScheduledStartTime(),
+                                    MythDate::kDateShort)));
+    }
+    return ordered;
+}
+
+/// Sort programs oldest first, with new at top and relegating oldest
+WatchList::ProgramOrder WatchList::OrderByOldestStrategy()
+{
+    QDateTime now = MythDate::current();
+
+    QMap<int, int> avgDelay;
+    QMap<int, QDateTime> lastDelete;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT recordid, avg_delay, last_delete FROM record;");
+
+    if (query.exec())
+    {
+        while (query.next())
+        {
+            int recid = query.value(0).toInt();
+            avgDelay[recid] = query.value(1).toInt();
+            lastDelete[recid] = query.value(2).toDateTime();
+        }
+    }
+
+    ProgramOrder ordered;
+    foreach (const WatchGroup &group, m_list)
+    {
+        ProgramInfo* p = group.GetFirst();
+
+        int recid = p->GetRecordingRuleID();
+        bool knownRule = avgDelay.contains(recid);
+
+        // use priority as primary key in top 32 bits:
+        // 0 = bottom, 1 = middle, 2 = top
+        // use age in secs as a secondary key in low 32 bits to ensure equal
+        // scores are ordered oldest first. Copes with progs up to 136 yrs old
+        score_type score = p->GetScheduledStartTime().secsTo(now);
+
+        // put new shows or those from rules that are watched quickly, at the top
+        int ageInHours = p->GetScheduledEndTime().secsTo(now) / 3600;
+        if (ageInHours <= m_watchListRecentLimit
+                || (knownRule && avgDelay[recid] <= m_watchListRecentLimit))
+        {
+            score |= 0x0200000000;
+
+            LOG(VB_GUI, LOG_DEBUG,
+                QString("Watchlist: Top   :%1 - '%2' was recorded %3 hrs "
+                        "ago & being watched after %4 hrs")
+                .arg(score, 11)
+                .arg(p->GetTitle())
+                .arg(ageInHours)
+                .arg(avgDelay[recid]));
+        }
+        // put part-watched shows at top
+        else if (p->GetProgressPercent() > 0)
+        {
+            score |= 0x0200000000;
+
+            LOG(VB_GUI, LOG_DEBUG,
+                QString("Watchlist: Top   :%1 - '%2' is %3% watched")
+                .arg(score, 11)
+                .arg(p->GetTitle())
+                .arg(p->GetProgressPercent()));
+        }
+        // shows go to middle if not yet old enough
+        else if (ageInHours / 24 <= m_watchListOldLimit)
+        {
+            score |= 0x0100000000;
+
+            LOG(VB_GUI, LOG_DEBUG,
+                QString("Watchlist: Middle:%1 - '%2' was recorded %3 hrs ago")
+                .arg(score, 11)
+                .arg(p->GetTitle())
+                .arg(ageInHours));
+        }
+        // or a previous episode for the rule was deleted recently
+        else if (knownRule)
+        {
+            QDateTime deleted = MythDate::as_utc(lastDelete[recid]);
+            if (deleted.isValid()
+                    && deleted.secsTo(now) / 3600 / 24 <= m_watchListOldLimit)
+            {
+                score |= 0x0100000000;
+
+                LOG(VB_GUI, LOG_DEBUG,
+                    QString("Watchlist: Middle:%1 - '%2' was watched %3 days ago")
+                    .arg(score, 11)
+                    .arg(p->GetTitle())
+                    .arg(deleted.secsTo(now) / 3600 / 24));
+            }
+        }
+        else
+            LOG(VB_GUI, LOG_DEBUG,
+                QString("Watchlist: Bottom:%1 - '%2' is %3 hrs old")
+                .arg(score, 11)
+                .arg(p->GetTitle())
+                .arg(ageInHours));
+
+        ordered.insert(score, p);
+    }
+    return ordered;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

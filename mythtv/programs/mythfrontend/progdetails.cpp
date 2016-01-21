@@ -589,8 +589,6 @@ void ProgDetails::loadPage(void)
     QString lastRecorded;
     QString nextRecording;
     QString averageTimeShift;
-    QString watchListScore;
-    QString watchListStatus;
     QString searchPhrase;
 
     if (m_progInfo.GetRecordingRuleID())
@@ -619,31 +617,6 @@ void ProgDetails::loadPage(void)
                 averageTimeShift = tr("%n hour(s)", "",
                                                 query.value(2).toInt());
         }
-        if (recorded)
-        {
-            if (m_progInfo.GetRecordingPriority2() > 0)
-                watchListScore =
-                    QString::number(m_progInfo.GetRecordingPriority2());
-
-            if (m_progInfo.GetRecordingPriority2() < 0)
-            {
-                switch (m_progInfo.GetRecordingPriority2())
-                {
-                    case wlExpireOff:
-                        watchListStatus = tr("Auto-expire off");
-                        break;
-                    case wlWatched:
-                        watchListStatus = tr("Marked as 'watched'");
-                        break;
-                    case wlEarlier:
-                        watchListStatus = tr("Not the earliest episode");
-                        break;
-                    case wlDeleted:
-                        watchListStatus = tr("Recently deleted episode");
-                        break;
-                }
-            }
-        }
         if (record->m_searchType != kManualSearch &&
             record->m_description != m_progInfo.GetDescription())
         {
@@ -655,8 +628,9 @@ void ProgDetails::loadPage(void)
     addItem("LAST_RECORDED", tr("Last Recorded"), lastRecorded);
     addItem("NEXT_RECORDING", tr("Next Recording"), nextRecording);
     addItem("AVERAGE_TIME_SHIFT", tr("Average Time Shift"), averageTimeShift);
-    addItem("WATCH_LIST_SCORE", tr("Watch List Score"), watchListScore);
-    addItem("WATCH_LIST_STATUS", tr("Watch List Status"), watchListStatus);
+    // Blank removed labels until all themes have removed it
+    addItem("WATCH_LIST_SCORE", "","");
+    addItem("WATCH_LIST_STATUS", "","");
     addItem("SEARCH_PHRASE", tr("Search Phrase"), searchPhrase);
 
     s.clear();

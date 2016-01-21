@@ -38,6 +38,13 @@ class LcdSettings : public TriggeredConfigurationGroup
     LcdSettings();
 };
 
+class WatchListStrategy : public TriggeredConfigurationGroup
+{
+    Q_OBJECT
+
+  public:
+    WatchListStrategy();
+};
 
 class WatchListSettings : public TriggeredConfigurationGroup
 {
