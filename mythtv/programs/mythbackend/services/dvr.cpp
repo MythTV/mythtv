@@ -582,8 +582,7 @@ DTC::TitleInfoList* Dvr::GetTitleInfoList()
     QString querystr = QString(
         "SELECT title, inetref, count(title) as count "
         "    FROM recorded "
-        "    WHERE inetref <> '' "
-        "    AND deletepending = 0 "
+        "    WHERE deletepending = 0 "
         "    GROUP BY title, inetref "
         "    ORDER BY title");
 
