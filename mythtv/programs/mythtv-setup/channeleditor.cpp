@@ -16,16 +16,13 @@
 #include "mythlogging.h"
 #include "mythuiimage.h"
 #include "mythuitext.h"
-#include "mythwizard.h"
 #include "scanwizard.h"
 #include "sourceutil.h"
 #include "cardutil.h"
-#include "settings.h"
 #include "mythdirs.h"
 #include "mythdb.h"
 
 ChannelWizard::ChannelWizard(int id, int default_sourceid)
-    : ConfigurationWizard()
 {
     setLabel(tr("Channel Options"));
 
@@ -450,11 +447,19 @@ void ChannelEditor::edit(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    int chanid = item->GetData().toInt();
-    ChannelWizard cw(chanid, m_sourceFilter);
-    cw.exec();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    fillList();
+    int chanid = item->GetData().toInt();
+    ChannelWizard *cw = new ChannelWizard(chanid, m_sourceFilter);
+    StandardSettingDialog *ssd = new StandardSettingDialog(mainStack,
+                                                           "channelwizard", cw);
+    if (ssd->Create())
+    {
+        connect(ssd, SIGNAL(Exiting()), SLOT(fillList()));
+        mainStack->AddScreen(ssd);
+    }
+    else
+        delete ssd;
 }
 
 void ChannelEditor::menu()
@@ -505,15 +510,12 @@ void ChannelEditor::scan(void)
                                   new ScanWizard(m_sourceFilter));
     if (ssd->Create())
     {
+        connect(ssd, SIGNAL(Exiting()), SLOT(fillList()));
         mainStack->AddScreen(ssd);
     }
     else
         delete ssd;
 
-//    scanwizard->exec(false, true);
-//    scanwizard->deleteLater();
-//
-//    fillList();
 #else
     LOG(VB_GENERAL, LOG_ERR,
         "You must compile the backend to be able to scan for channels");
