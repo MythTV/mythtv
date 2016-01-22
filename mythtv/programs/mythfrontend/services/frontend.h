@@ -43,6 +43,7 @@ class Frontend : public FrontendServices
 
     static bool          IsValidAction(const QString &action);
     static void          InitialiseActions(void);
+    bool                 SendKey(const QString &Key);
 
   protected:
     static QStringList gActionList;
