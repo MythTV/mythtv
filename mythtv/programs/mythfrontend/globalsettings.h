@@ -268,7 +268,6 @@ class PlayBackGroupsSetting : public GroupSetting
   public:
     PlayBackGroupsSetting();
     virtual void Load();
-    virtual void Open();
 
   public slots:
     //void newPlayBackGroup(StandardSetting *);
@@ -284,7 +283,6 @@ class ChannelGroupSetting : public GroupSetting
   public:
     ChannelGroupSetting(const QString &groupName, int groupId);
     virtual void Load();
-    virtual void Open();
     virtual void Close();
 
   private:
@@ -299,7 +297,6 @@ class ChannelGroupsSetting : public GroupSetting
   public:
     ChannelGroupsSetting();
     virtual void Load();
-    virtual void Open();
 
   private:
     ButtonStandardSetting *m_addGroupButton;

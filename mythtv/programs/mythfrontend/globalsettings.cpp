@@ -4480,10 +4480,10 @@ AppearanceSettings::AppearanceSettings()
 *                                PlayBack Groups                               *
 *******************************************************************************/
 
-class PlayBackGroupSetting : public GroupSetting
+class PlayGroupConfig : public GroupSetting
 {
   public:
-    PlayBackGroupSetting(const QString &label, const QString &name);
+    PlayGroupConfig(const QString &label, const QString &name);
     virtual void updateButton(MythUIButtonListItem *item);
     virtual void Load();
     virtual void Save();
@@ -4502,17 +4502,16 @@ class PlayBackGroupSetting : public GroupSetting
 
 //TODO allow to delete a group
 
-void PlayBackGroupSetting::updateButton(MythUIButtonListItem *item)
+void PlayGroupConfig::updateButton(MythUIButtonListItem *item)
 {
     GroupSetting::updateButton(item);
     item->SetText("", "value");
 }
 
-PlayBackGroupSetting::PlayBackGroupSetting(const QString &label,
+PlayGroupConfig::PlayGroupConfig(const QString &label,
                                            const QString &name)
     :GroupSetting(), m_isNew(true)
 {
-
     setLabel(label);
     setValue(name);
 
@@ -4562,7 +4561,7 @@ PlayBackGroupSetting::PlayBackGroupSetting(const QString &label,
     addChild(m_markForDeletion);
 }
 
-void PlayBackGroupSetting::Load()
+void PlayGroupConfig::Load()
 {
     if (getValue().isEmpty())
     {
@@ -4574,7 +4573,7 @@ void PlayBackGroupSetting::Load()
                   "timestretch FROM playgroup WHERE name = :NAME ;");
     query.bindValue(":NAME", getValue());
     if (!query.exec())
-        MythDB::DBError("PlayBackGroupSetting::Load()", query);
+        MythDB::DBError("PlayGroupConfig::Load()", query);
     else if (query.next())
     {
         m_isNew = false;
@@ -4595,12 +4594,12 @@ void PlayBackGroupSetting::Load()
     }
 }
 
-void PlayBackGroupSetting::Close()
+void PlayGroupConfig::Close()
 {
     Save();
 }
 
-void PlayBackGroupSetting::Save()
+void PlayGroupConfig::Save()
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -4619,7 +4618,7 @@ void PlayBackGroupSetting::Save()
         query.bindValue(":TIMESTRETCH", m_timeStrech->intValue());
 
         if (!query.exec())
-            MythDB::DBError("PlayBackGroupSetting::Save", query);
+            MythDB::DBError("PlayGroupConfig::Save", query);
     }
     else if (m_markForDeletion->boolValue())
     {
@@ -4628,7 +4627,7 @@ void PlayBackGroupSetting::Save()
         query.bindValue(":NAME",        getValue());
 
         if (!query.exec())
-            MythDB::DBError("PlayBackGroupSetting::Save", query);
+            MythDB::DBError("PlayGroupConfig::Save", query);
     }
     else
     {
@@ -4656,12 +4655,11 @@ void PlayBackGroupSetting::Save()
         query.bindValue(":NAME",        getValue());
 
         if (!query.exec())
-            MythDB::DBError("PlayBackGroupSetting::Save", query);
+            MythDB::DBError("PlayGroupConfig::Save", query);
     }
 
     GroupSetting::Save();
 }
-
 
 PlayBackGroupsSetting::PlayBackGroupsSetting()
     : GroupSetting(),
@@ -4670,26 +4668,17 @@ PlayBackGroupsSetting::PlayBackGroupsSetting()
     setLabel(tr("Playback Groups"));
 }
 
-
-void PlayBackGroupsSetting::Open()
-{
-    //TODO the play groups are loaded twice when the dialog is open for the
-    //first time
-    Load();
-}
-
-
 void PlayBackGroupsSetting::Load()
 {
     clearSettings();
-    addChild(new PlayBackGroupSetting(tr("Create new group"), ""));
+    addChild(new PlayGroupConfig(tr("Create new group"), ""));
 
-    addChild(new PlayBackGroupSetting(tr("Default"), "Default"));
+    addChild(new PlayGroupConfig(tr("Default"), "Default"));
 
     QStringList names = PlayGroup::GetNames();
     while (!names.isEmpty())
     {
-        addChild(new PlayBackGroupSetting(names.front(), names.front()));
+        addChild(new PlayGroupConfig(names.front(), names.front()));
         names.pop_front();
     }
 
@@ -4725,7 +4714,6 @@ ChannelCheckBoxSetting::ChannelCheckBoxSetting(uint chanid,
     setHelpText(tr("Select/Unselect channels for this channel group"));
 }
 
-
 ChannelGroupSetting::ChannelGroupSetting(const QString &groupName,
                                          int groupId = -1)
     :GroupSetting(),
@@ -4737,11 +4725,6 @@ ChannelGroupSetting::ChannelGroupSetting(const QString &groupName,
     setValue(groupName);
     m_groupName = new TransTextEditSetting();
     m_groupName->setLabel(groupName);
-}
-
-void ChannelGroupSetting::Open()
-{
-    Load();
 }
 
 void ChannelGroupSetting::Close()
@@ -4886,7 +4869,6 @@ void ChannelGroupSetting::Load()
     GroupSetting::Load();
 }
 
-
 ChannelGroupsSetting::ChannelGroupsSetting()
     : GroupSetting(),
       m_addGroupButton(NULL)
@@ -4894,21 +4876,11 @@ ChannelGroupsSetting::ChannelGroupsSetting()
     setLabel(tr("Channel Groups"));
 }
 
-
-void ChannelGroupsSetting::Open()
-{
-    //TODO the play groups are loaded twice when the dialog is open for the
-    //first time
-    Load();
-}
-
-
 void ChannelGroupsSetting::Load()
 {
     clearSettings();
     addChild(new ChannelGroupSetting(tr("Create New Channel Group")));
     addChild(new ChannelGroupSetting(tr("Favorites"), 1));
-
 
     MSqlQuery query(MSqlQuery::InitCon());
 
