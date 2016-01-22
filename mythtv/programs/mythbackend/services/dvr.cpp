@@ -356,7 +356,6 @@ DTC::TitleInfoList* Dvr::GetTitleInfoList()
     QString querystr = QString(
         "SELECT DISTINCT title, inetref "
         "    FROM recorded "
-        "    WHERE inetref <> '' "
         "    ORDER BY title");
 
     query.prepare(querystr);
