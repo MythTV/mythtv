@@ -878,8 +878,8 @@ void logPropagateCalc(void)
 
     if (logPropagateOpts.noserver)
     {
-        logPropagateArgs += " --nologserver";
-        logPropagateArgList << "--nologserver";
+        logPropagateArgs += " --disable-mythlogserver";
+        logPropagateArgList << "--disable-mythlogserver";
     }
 }
 
@@ -890,8 +890,8 @@ bool logPropagateQuiet(void)
     return logPropagateOpts.quiet;
 }
 
-/// \brief Check if we are propagating a "--nologserver"
-/// \return true if --nologserver is being propagated
+/// \brief Check if we are propagating a "--disable-mythlogserver"
+/// \return true if --disable-mythlogserver is being propagated
 bool logPropagateNoServer(void)
 {
     return logPropagateOpts.noserver;
