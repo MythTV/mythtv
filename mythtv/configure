@@ -6777,6 +6777,7 @@ int main(void) { IDirectXVideoDecoder *o = NULL; IDirectXVideoDecoder_Release(o)
 EOF
 
 enabled vaapi && enabled opengl &&
+    check_header GL/glx.h &&
     check_lib va/va.h vaInitialize -lva ||
     disable vaapi
 
