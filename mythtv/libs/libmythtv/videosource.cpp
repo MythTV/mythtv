@@ -43,13 +43,10 @@ using namespace std;
 #include "libmythupnp/httprequest.h"    // for TestMimeType()
 #include "mythsystemlegacy.h"
 #include "exitcodes.h"
+#include "v4l2util.h"
 
 #ifdef USING_DVB
 #include "dvbtypes.h"
-#endif
-
-#ifdef USING_V4L2
-#include "v4l2util.h"
 #endif
 
 #ifdef USING_VBOX
@@ -2694,7 +2691,6 @@ void HDPVRConfigurationGroup::probeCard(const QString &device)
     audioinput->fillSelections(device);
 }
 
-#ifdef USING_V4L2
 V4L2encGroup::V4L2encGroup(CaptureCard &parent) :
     TriggeredConfigurationGroup(false),
     m_parent(parent),
@@ -2728,6 +2724,7 @@ void V4L2encGroup::triggerChanged(const QString& dev_path)
 
 void V4L2encGroup::probeCard(const QString &device_name)
 {
+#ifdef USING_V4L2
     QString    card_name = tr("Failed to open");
     QString    card_info = card_name;
     V4L2util   v4l2(device_name);
@@ -2780,8 +2777,8 @@ void V4L2encGroup::probeCard(const QString &device_name)
 
         addTarget(m_DriverName, grp);
     }
-}
 #endif // USING_V4L2
+}
 
 CaptureCardGroup::CaptureCardGroup(CaptureCard &parent) :
     TriggeredConfigurationGroup(true, true, false, false)

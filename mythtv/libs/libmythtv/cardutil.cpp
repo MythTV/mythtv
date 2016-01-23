@@ -161,11 +161,13 @@ bool CardUtil::HasTuner(const QString &rawtype, const QString & device)
         rawtype == "FREEBOX" || rawtype == "CETON")
         return true;
 
+#ifdef USING_V4L2
     if (rawtype == "V4L2ENC")
     {
         V4L2util v4l2(device);
         return !v4l2 ? false : v4l2.HasTuner();
     }
+#endif
 
     if (rawtype == "EXTERNAL")
     {
@@ -278,6 +280,7 @@ CardUtil::InputTypes CardUtil::GetInputTypes(void)
             cardtype = query.value(0).toString();
             if (cardtype != "V4L2ENC")
                 inputtypes[cardtype] = "";
+#ifdef USING_V4L2
             else
             {
                 V4L2util v4l2(query.value(1).toString());
@@ -287,6 +290,7 @@ CardUtil::InputTypes CardUtil::GetInputTypes(void)
                     inputtypes[driver_name] = v4l2.CardName();
                 }
             }
+#endif
         }
     }
 

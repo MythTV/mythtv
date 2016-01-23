@@ -4,7 +4,6 @@
 #include "mythtvexp.h"
 #include "settings.h"
 #include "mythdbcon.h"
-#include "v4l2util.h"
 
 const QString availProfiles[] =
       {"Default", "Live TV", "High Quality", "Low Quality", "" };
@@ -12,6 +11,7 @@ const QString availProfiles[] =
 class RecordingProfile;
 class VideoCompressionSettings;
 class AudioCompressionSettings;
+class V4L2util;
 
 // A parameter associated with the profile itself
 class RecordingProfileStorage : public SimpleDBStorage
@@ -84,7 +84,7 @@ class MTV_PUBLIC RecordingProfile : public QObject, public ConfigurationWizard
   public:
     // initializers
     RecordingProfile(QString profName = QString());
-    virtual ~RecordingProfile() { }
+    virtual ~RecordingProfile(void);
     virtual void loadByID(int id);
     virtual bool loadByType(const QString &name, const QString &cardtype,
                             const QString &videodev);
@@ -154,7 +154,7 @@ class MTV_PUBLIC RecordingProfile : public QObject, public ConfigurationWizard
     QString                   profileName;
     bool                      isEncoder;
 
-    V4L2util                  v4l2util;
+    V4L2util                 *v4l2util;
 };
 
 class RecordingProfileEditor :

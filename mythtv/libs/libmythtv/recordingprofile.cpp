@@ -6,6 +6,7 @@
 #include "mythlogging.h"
 #include "mythwizard.h"
 #include "mythwidgets.h" // for MythLineEdit
+#include "v4l2util.h"
 
 QString RecordingProfileStorage::GetWhereClause(MSqlBindings &bindings) const
 {
@@ -401,7 +402,7 @@ class AudioCompressionSettings : public TriggeredConfigurationGroup
 {
   public:
     AudioCompressionSettings(const RecordingProfile &parentProfile,
-                             QString profName, V4L2util& v4l2) :
+                             QString profName, V4L2util* v4l2) :
         TriggeredConfigurationGroup(false, true, false, false),
         m_parent(parentProfile)
     {
@@ -446,14 +447,15 @@ class AudioCompressionSettings : public TriggeredConfigurationGroup
         params->setLabel("AAC Hardware Encoder");
         addTarget("AAC Hardware Encoder", params);
 
-        if (v4l2.IsOpen())
+#ifdef USING_V4L2
+        if (v4l2)
         {
             // Dynamically create user options based on the
             // capabilties the driver reports.
 
             DriverOption::Options options;
 
-            if (v4l2.GetOptions(options))
+            if (v4l2->GetOptions(options))
             {
                 VerticalConfigurationGroup* grp =
                     new VerticalConfigurationGroup(false);
@@ -517,7 +519,8 @@ class AudioCompressionSettings : public TriggeredConfigurationGroup
                     addTarget(*Icodec, grp);
             }
         }
-    };
+#endif //  USING_V4L2
+    }
 
     void selectCodecs(const QString & groupType)
     {
@@ -898,7 +901,7 @@ class VideoCompressionSettings : public TriggeredConfigurationGroup
 {
   public:
     VideoCompressionSettings(const RecordingProfile &parentProfile,
-                             QString profName, V4L2util& v4l2) :
+                             QString profName, V4L2util* v4l2) :
         TriggeredConfigurationGroup(false, true, false, false),
         m_parent(parentProfile)
     {
@@ -1004,11 +1007,12 @@ class VideoCompressionSettings : public TriggeredConfigurationGroup
         params->addChild(h2);
         addTarget("MPEG-4 AVC Hardware Encoder", params);
 
-        if (v4l2.IsOpen())
+#ifdef USING_V4L2
+        if (v4l2)
         {
             DriverOption::Options options;
 
-            if (v4l2.GetOptions(options))
+            if (v4l2->GetOptions(options))
             {
                 VerticalConfigurationGroup* grp =
                     new VerticalConfigurationGroup(false);
@@ -1019,7 +1023,7 @@ class VideoCompressionSettings : public TriggeredConfigurationGroup
                     new VerticalConfigurationGroup(true);
                 VerticalConfigurationGroup* bit_high =
                     new VerticalConfigurationGroup(true);
-                bool dynamic_res = !v4l2.UserAdjustableResolution();
+                bool dynamic_res = !v4l2->UserAdjustableResolution();
 
                 DriverOption::Options::iterator Iopt = options.begin();
                 for ( ; Iopt != options.end(); ++Iopt)
@@ -1151,7 +1155,7 @@ class VideoCompressionSettings : public TriggeredConfigurationGroup
                     addTarget(*Icodec, grp);
             }
         }
-
+#endif // USING_V4L2
     }
 
     void selectCodecs(QString groupType)
@@ -1450,7 +1454,7 @@ RecordingProfile::RecordingProfile(QString profName)
     : id(new ID()),        name(new Name(*this)),
       imageSize(NULL),     videoSettings(NULL),
       audioSettings(NULL), profileName(profName),
-      isEncoder(true)
+      isEncoder(true),     v4l2util(NULL)
 {
     // This must be first because it is needed to load/save the other settings
     addChild(id);
@@ -1495,6 +1499,14 @@ RecordingProfile::RecordingProfile(QString profName)
 
     addChild(profile);
 };
+
+RecordingProfile::~RecordingProfile(void)
+{
+#ifdef USING_V4L2
+    delete v4l2util;
+    v4l2util = nullptr;
+#endif
+}
 
 void RecordingProfile::ResizeTranscode(bool resize)
 {
@@ -1573,12 +1585,14 @@ bool RecordingProfile::loadByType(const QString &name, const QString &card,
     QString cardtype = card;
     uint profileId = 0;
 
+#ifdef USING_V4L2
     if (cardtype == "V4L2ENC")
     {
-        v4l2util.Open(videodev);
-        if (v4l2util.IsOpen())
-            cardtype = v4l2util.ProfileName();
+        v4l2util = new V4L2util(videodev);
+        if (v4l2util->IsOpen())
+            cardtype = v4l2util->ProfileName();
     }
+#endif
 
     MSqlQuery result(MSqlQuery::InitCon());
     result.prepare(
@@ -1659,6 +1673,7 @@ void RecordingProfile::CompleteLoad(int profileId, const QString &type,
 
     if (isEncoder)
     {
+#ifdef USING_V4L2
         if (type.startsWith("V4L2:"))
         {
             QStringList devices = CardUtil::GetVideoDevices("V4L2ENC");
@@ -1667,20 +1682,26 @@ void RecordingProfile::CompleteLoad(int profileId, const QString &type,
                 QStringList::iterator Idev = devices.begin();
                 for ( ; Idev != devices.end(); ++Idev)
                 {
-                    v4l2util.Open(*Idev);
-                    if (v4l2util.IsOpen() && v4l2util.DriverName() == type.mid(5))
+                    if (v4l2util)
+                        delete v4l2util;
+                    v4l2util = new V4L2util(*Idev);
+                    if (v4l2util->IsOpen() &&
+                        v4l2util->DriverName() == type.mid(5))
                         break;
-                    v4l2util.Close();
+                    delete v4l2util;
+                    v4l2util = nullptr;
                 }
             }
         }
+#endif
 
         QString tvFormat = gCoreContext->GetSetting("TVFormat");
         // TODO: When mpegrecorder is remove, don't check for "HDPVR' anymore...
-        if (type != "HDPVR" && v4l2util.IsOpen() &&
-            v4l2util.UserAdjustableResolution())
+        if (type != "HDPVR")
+#ifdef USING_V4L2
+            if (v4l2util && v4l2util->UserAdjustableResolution())
             addChild(new ImageSize(*this, tvFormat, profileName));
-
+#endif
         videoSettings = new VideoCompressionSettings(*this, profileName,
                                                      v4l2util);
         addChild(videoSettings);

@@ -4277,13 +4277,11 @@ void TVRec::TuningNewRecorder(MPEGStreamData *streamData)
                                   channel->GetChannelName());
     }
 
-#ifdef USING_V4L2
     if (GetV4LChannel())
     {
         channel->InitPictureAttributes();
         CloseChannel();
     }
-#endif
 
     recorderThread = new MThread("RecThread", recorder);
     recorderThread->start();
