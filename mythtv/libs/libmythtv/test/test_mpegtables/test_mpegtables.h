@@ -78,4 +78,8 @@ class TestMPEGTables: public QObject
     /** test items from ExtendedEventDescriptor
      */
     void ExtendedEventDescriptor_test (void);
+
+    /** test encoding override that removes the existing encoding signalling, #9480
+     */
+    void TestISO6937Override (void);
 };
