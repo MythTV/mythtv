@@ -1,7 +1,9 @@
 #ifndef _V4L2_util_h_
 #define _V4L2_util_h_
 
+#ifdef USING_V4L2
 #include "videodev2.h" // our copy
+#endif
 
 #include "tv.h"
 #include "mythtvexp.h"
@@ -33,11 +35,10 @@ class MTV_PUBLIC V4L2util
     int  GetSignalStrength(void) const;
     bool GetResolution(int& width, int& height) const;
 
-    bool HasTuner(void) const { return m_capabilities & V4L2_CAP_TUNER; }
-    bool HasAudioSupport(void) const { return m_capabilities & V4L2_CAP_AUDIO; }
+    bool HasTuner(void) const;
+    bool HasAudioSupport(void) const;
     bool HasStreaming(void) const;
-    bool HasSlicedVBI(void) const
-        { return m_capabilities & V4L2_CAP_SLICED_VBI_CAPTURE; }
+    bool HasSlicedVBI(void) const;
     bool IsEncoder(void) const;
     bool UserAdjustableResolution(void) const;
 

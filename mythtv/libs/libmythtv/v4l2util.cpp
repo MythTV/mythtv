@@ -119,6 +119,11 @@ bool V4L2util::HasStreaming(void) const
     return true;
 }
 
+bool V4L2util::HasSlicedVBI(void) const
+{
+    return m_capabilities & V4L2_CAP_SLICED_VBI_CAPTURE;
+}
+
 void V4L2util::bitmask_toString(QString& result, uint32_t flags,
                                 uint32_t mask, const QString& desc)
 {
@@ -681,6 +686,15 @@ bool V4L2util::GetResolution(int& width, int& height) const
     return true;
 }
 
+bool V4L2util::HasTuner(void) const
+{
+    return m_capabilities & V4L2_CAP_TUNER;
+}
+
+bool V4L2util::HasAudioSupport(void) const
+{
+    return m_capabilities & V4L2_CAP_AUDIO;
+}
 
 bool V4L2util::IsEncoder(void) const
 {
