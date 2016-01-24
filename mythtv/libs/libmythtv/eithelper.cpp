@@ -1390,12 +1390,15 @@ static void init_fixup(FixupMap &fix)
     // generic Unitymedia / Liberty Global / Eventis.nl?
     fix[ 9999 << 16 |   121LL << 32 | 12107 ] = // Super RTL
     fix[ 9999 << 16 |   151LL << 32 | 15110 ] = // Bibel TV
+    fix[ 9999 << 16 |   161LL << 32 | 12107 ] = // Super RTL
     fix[ 9999 << 16 |   161LL << 32 | 12109 ] = // n-tv
     fix[ 9999 << 16 |   171LL << 32 | 17119 ] = // RiC
+    fix[ 9999 << 16 |   171LL << 32 | 27102 ] = // DELUXE MUSIC
     fix[ 9999 << 16 |   181LL << 32 | 24108 ] = // DMAX
     fix[ 9999 << 16 |   181LL << 32 | 25102 ] = // TV5MONDE Europe
     fix[ 9999 << 16 |   191LL << 32 | 11102 ] = // Disney SD
     fix[ 9999 << 16 |   191LL << 32 | 12110 ] = // N24
+    fix[ 9999 << 16 |   191LL << 32 | 12111 ] = // Tele 5
     fix[ 9999 << 16 |   201LL << 32 | 27103 ] = // TLC
     fix[ 9999 << 16 |   211LL << 32 | 29108 ] = // Astro TV
     fix[ 9999 << 16 |   231LL << 32 | 23117 ] = // Deutsches Musik Fernsehen
