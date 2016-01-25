@@ -420,8 +420,8 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
                                 (FixupKey)eit->ServiceID()];
 
         fix |= fixup[1ll<<48 | (((FixupKey)eit->SourceTransportID()) << 32) |
-                      (FixupKey)((FixupKey)eit->SourceNetworkID() << 16) |
-                       (FixupKey)(FixupKey)eit->ServiceID()];
+                                ((FixupKey)eit->SourceNetworkID() << 16) |
+                                 (FixupKey)eit->ServiceID()];
     }
 
     uint tableid   = eit->TableID();
