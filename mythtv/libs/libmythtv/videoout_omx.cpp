@@ -1,3 +1,7 @@
+#ifdef OSD_EGL /* includes QJson with enum value named Bool, must go before EGL/egl.h */
+# include "mythpainter_ogl.h"
+#endif //def OSD_EGL
+
 #include "videoout_omx.h"
 
 #include <cstddef>
@@ -31,7 +35,9 @@
 # define LOC QString("EGL: ")
 # include "mythrender_opengl2es.h"
 # undef LOC
-# include "mythpainter_ogl.h"
+# if 0 /* moved to top so it goes before X11/Xlib.h which is included via EGL/egl.h on Raspbian */
+#  include "mythpainter_ogl.h"
+# endif
 #endif //def OSD_EGL
 
 #include "mythmainwindow.h"
