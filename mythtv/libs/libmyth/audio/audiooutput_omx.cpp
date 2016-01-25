@@ -567,6 +567,10 @@ int AudioOutputOMX::GetBufferedOnSoundcard(void) const
     }
     return u.nU32 * output_bytes_per_frame;
 #else
+#    if (QT_VERSION >= QT_VERSION_CHECK(5,0,0)) && (QT_VERSION < QT_VERSION_CHECK(5,3,0))
+#        error No OpenMAX audio with QT5 before 5.3 due to missing operator int() of QAtomicInt, update your QT or remove libomxil-bellagio-dev
+#    endif
+
     return m_pending;
 #endif
 }
