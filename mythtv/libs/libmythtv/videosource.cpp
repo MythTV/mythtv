@@ -623,8 +623,7 @@ void XMLTV_generic_config::Save()
     if (is_grabber_external(grabber))
     {
         LOG(VB_GENERAL, LOG_ERR, err_msg);
-        MythPopupBox::showOkPopup(
-            GetMythMainWindow(), QObject::tr("Warning."), err_msg);
+        ShowOkPopup(err_msg);
     }
 #endif
 }
@@ -3472,8 +3471,7 @@ void CardInput::CreateNewInputGroup(void)
 
         if (tmp_name.isEmpty())
         {
-            MythPopupBox::showOkPopup(
-                GetMythMainWindow(), tr("Error"),
+            ShowOkPopup(
                 tr("Sorry, this Input Group name cannot be blank."));
             continue;
         }
@@ -3495,8 +3493,7 @@ void CardInput::CreateNewInputGroup(void)
 
         if (query.next())
         {
-            MythPopupBox::showOkPopup(
-                GetMythMainWindow(), tr("Error"),
+            ShowOkPopup(
                 tr("Sorry, this Input Group name is already in use."));
             continue;
         }
@@ -3762,10 +3759,9 @@ void CaptureCardEditor::DeleteAllCaptureCardsOnHost(bool doDelete)
 
     if (!cards.exec() || !cards.isActive())
     {
-        MythPopupBox::showOkPopup(
-            GetMythMainWindow(),
-            tr("Error getting list of cards for this host"),
-            tr("Unable to delete capturecards for %1")
+        ShowOkPopup(
+            tr("Error getting list of cards for this host. "
+               "Unable to delete capturecards for %1")
             .arg(gCoreContext->GetHostName()));
 
         MythDB::DBError("Selecting cardids for deletion", cards);
