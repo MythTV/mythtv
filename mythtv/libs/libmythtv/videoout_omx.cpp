@@ -2,6 +2,9 @@
 # include "mythpainter_ogl.h"
 #endif //def OSD_EGL
 
+/* must go before X11/X.h due to #define None 0L */
+#include "privatedecoder_omx.h" // For PrivateDecoderOMX::s_name
+
 #include "videoout_omx.h"
 
 #include <cstddef>
@@ -47,7 +50,6 @@
 #include "videodisplayprofile.h"
 #include "videobuffers.h"
 
-#include "privatedecoder_omx.h" // For PrivateDecoderOMX::s_name
 #include "omxcontext.h"
 using namespace omxcontext;
 
