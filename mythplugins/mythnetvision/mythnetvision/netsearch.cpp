@@ -264,9 +264,11 @@ void NetSearch::DoSearch()
     OpenBusyPopup(title);
 
     if (!m_netSearch)
+    {
         m_netSearch = new QNetworkAccessManager(this);
-    connect(m_netSearch, SIGNAL(finished(QNetworkReply*)),
-            SLOT(SearchFinished(void)));
+        connect(m_netSearch, SIGNAL(finished(QNetworkReply*)),
+                SLOT(SearchFinished(void)));
+    }
 
     QUrl init = GetMythXMLSearch(m_mythXML, m_currentSearch, m_currentCmd, "");
     QUrl req(init.toEncoded(), QUrl::TolerantMode);
