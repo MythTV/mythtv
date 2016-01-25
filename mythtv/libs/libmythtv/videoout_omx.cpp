@@ -1,3 +1,7 @@
+#ifdef USING_OPENGLES
+#define OSD_EGL // OSD with EGL
+#endif
+
 #ifdef OSD_EGL /* includes QJson with enum value named Bool, must go before EGL/egl.h */
 # include "mythpainter_ogl.h"
 #endif //def OSD_EGL
@@ -19,10 +23,6 @@
 #ifdef USING_BROADCOM
 #include <OMX_Broadcom.h>
 #include <bcm_host.h>
-#endif
-
-#ifdef USING_OPENGLES
-#define OSD_EGL // OSD with EGL
 #endif
 
 #ifdef OSD_EGL
