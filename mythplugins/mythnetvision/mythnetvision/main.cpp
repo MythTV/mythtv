@@ -78,6 +78,11 @@ static void setupKeys(void)
         "Internet Television Client - Search"), "", runNetVision);
     REG_JUMP("MythNetTree", QT_TRANSLATE_NOOP("MythControls",
         "Internet Television Client - Site/Tree View"), "", runNetTree);
+
+    REG_KEY("Internet Video", "PAGELEFT", QT_TRANSLATE_NOOP("MythControls",
+            "Previous Page"), "");
+    REG_KEY("Internet Video", "PAGERIGHT", QT_TRANSLATE_NOOP("MythControls",
+            "Next Page"), "");
 }
 
 int mythplugin_init(const char *libversion)
