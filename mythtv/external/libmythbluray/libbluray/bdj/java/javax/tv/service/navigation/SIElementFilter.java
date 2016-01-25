@@ -1,6 +1,7 @@
 /*
  * This file is part of libbluray
  * Copyright (C) 2010  William Hahne
+ * Copyright (C) 2015  Petri Hintukainen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -25,9 +26,21 @@ import javax.tv.service.SIElement;
 import javax.tv.service.SIRequest;
 import javax.tv.service.SIRequestorImpl;
 
+import org.bluray.net.BDLocator;
+
 public final class SIElementFilter extends ServiceFilter
 {
     public SIElementFilter(SIElement element) throws FilterNotSupportedException {
+        if (element == null)
+            throw new NullPointerException();
+
+        try {
+            new BDLocator(element.getLocator().toExternalForm());
+        } catch (Exception e) {
+            System.err.println("Invalid SI element: " + e + " at " + org.videolan.Logger.dumpStack(e));
+            throw new FilterNotSupportedException();
+        }
+
         this.element = element;
     }
 
@@ -37,9 +50,9 @@ public final class SIElementFilter extends ServiceFilter
 
     public boolean accept(Service service) {
         SIRequestorImpl requestor = new SIRequestorImpl();
-        
+
         SIRequest req = service.retrieveDetails(requestor);
-        
+
         // TODO: This may be a bit excessive
         int timeout = 0;
         while (!requestor.getResponse() && timeout < 1000) {
@@ -48,27 +61,27 @@ public final class SIElementFilter extends ServiceFilter
             } catch (InterruptedException e) {
                 // ignore
             }
-            
+
             timeout++;
         }
-        
+
         // if we still don't have a response just cancel the request
         if (!requestor.getResponse()) {
             if (req != null)
                 req.cancel();
         }
-        
+
         if (requestor.getResult() == null)
             return false;
-        
+
         SIRetrievable[] rets = requestor.getResult();
         for (int i = 0; i < rets.length; i++) {
             if (rets[i].equals(element))
                 return true;
         }
-        
+
         return false;
     }
-    
+
     SIElement element;
 }

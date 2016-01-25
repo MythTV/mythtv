@@ -34,9 +34,10 @@ using namespace std;
 static int format_to_mode(const QString &fmt);
 static QString mode_to_format(int mode);
 
-V4LChannel::V4LChannel(TVRec *parent, const QString &videodevice)
-    : DTVChannel(parent),
-      device(videodevice),          videofd(-1),
+V4LChannel::V4LChannel(TVRec *parent, const QString &videodevice,
+                       const QString &audiodevice)
+    : DTVChannel(parent),           device(videodevice),
+      audio_device(audiodevice),    videofd(-1),
       device_name(),                driver_name(),
       curList(NULL),                totalChannels(0),
       currentFormat(),

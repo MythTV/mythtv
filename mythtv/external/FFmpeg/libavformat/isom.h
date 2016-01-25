@@ -103,6 +103,7 @@ typedef struct MOVSbgp {
 typedef struct MOVFragmentIndexItem {
     int64_t moof_offset;
     int64_t time;
+    int headers_read;
 } MOVFragmentIndexItem;
 
 typedef struct MOVFragmentIndex {
@@ -183,6 +184,7 @@ typedef struct MOVContext {
     MOVTrackExt *trex_data;
     unsigned trex_count;
     int itunes_metadata;  ///< metadata are itunes style
+    int handbrake_version;
     int chapter_track;
     int use_absolute_path;
     int ignore_editlist;
@@ -197,6 +199,7 @@ typedef struct MOVContext {
     int has_looked_for_mfra;
     MOVFragmentIndex** fragment_index_data;
     unsigned fragment_index_count;
+    int fragment_index_complete;
     int atom_depth;
     unsigned int aax_mode;  ///< 'aax' file has been detected
     uint8_t file_key[20];

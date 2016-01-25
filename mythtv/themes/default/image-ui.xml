@@ -35,7 +35,7 @@
             <layout>grid</layout>
             <arrange>fixed</arrange>
             <align>allcenter</align>
-            <spacing>0</spacing>
+            <spacing>0</spacing>  <!-- (100% - 10*10%) / (10-1) or 0% -->
             <statetype name="buttonitem">
                 <area>0,0,100%,100%</area>
                 <state name="active" from="galleryactivebutton">
@@ -81,30 +81,33 @@
 
         <!-- the image list 8 columns x 4 rows -->
         <buttonlist name="images1" from="images0">
+            <spacing>7</spacing>  <!-- (100% - 8*12%) / (8-1) or 0.57% -->
             <statetype name="buttonitem">
                 <state name="active" from="galleryactivebutton">
-                    <area>0,0,12%,25%</area>
+                    <area>0,0,12%,24%</area>
                 </state>
                 <state name="selectedactive" from="galleryselectedbutton">
-                    <area>0,0,12%,25%</area>
+                    <area>0,0,12%,24%</area>
                 </state>
             </statetype>
         </buttonlist>
 
         <!-- the image list 6 columns x 3 rows -->
         <buttonlist name="images2" from="images0">
+            <spacing>10</spacing>  <!-- (100% - 6*16%) / (6-1) or 0.8% -->
             <statetype name="buttonitem">
                 <state name="active" from="galleryactivebutton">
-                    <area>0,0,16%,33%</area>
+                    <area>0,0,16%,32%</area>
                 </state>
                 <state name="selectedactive" from="galleryselectedbutton">
-                    <area>0,0,16%,33%</area>
+                    <area>0,0,16%,32%</area>
                 </state>
             </statetype>
         </buttonlist>
 
         <!-- the image list 4 columns x 2 rows -->
         <buttonlist name="images3" from="images0">
+            <spacing>0</spacing>  <!-- (100% - 4*25%) / (4-1) or 0% -->
             <statetype name="buttonitem">
                 <state name="active" from="galleryactivebutton">
                     <area>0,0,25%,50%</area>
@@ -184,7 +187,7 @@
         <!-- the background behind the images -->
         <shape name="background_shape">
             <area>0,0,100%,100%</area>
-            <fill color="#000000" alpha="30"/>
+            <fill color="#000000" alpha="255"/>
         </shape>
 
         <!-- an image  -->

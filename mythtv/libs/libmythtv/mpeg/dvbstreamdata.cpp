@@ -397,7 +397,7 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
         SetVersionEIT(psip.TableID(), service_id, psip.Version(),  psip.LastSection());
         SetEITSectionSeen(psip.TableID(), service_id, psip.Section());
 
-        DVBEventInformationTable eit(psip);
+        DVBEventInformationTable eit(psip, _desired_netid, _desired_tsid);
         for (uint i = 0; i < _dvb_eit_listeners.size(); i++)
             _dvb_eit_listeners[i]->HandleEIT(&eit);
 

@@ -27,13 +27,16 @@
 #include <backendcontext.h>
 
 #include <QDir>
+#include <QFileInfo>
 #include <QCryptographicHash>
 #include <QHostAddress>
 #include <QUdpSocket>
 
+#include "config.h"
 #include "version.h"
 #include "mythversion.h"
 #include "mythcorecontext.h"
+#include "mythcoreutil.h"
 #include "mythdbcon.h"
 #include "mythlogging.h"
 #include "storagegroup.h"
@@ -41,6 +44,7 @@
 #include "hardwareprofile.h"
 #include "mythtimezone.h"
 #include "mythdate.h"
+#include "mythversion.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -242,7 +246,7 @@ DTC::StorageGroupDirList *Myth::GetStorageGroupDirs( const QString &sGroupName,
     }
 
     // ----------------------------------------------------------------------
-    // return the results of the query
+    // return the results of the query plus R/W and size information
     // ----------------------------------------------------------------------
 
     DTC::StorageGroupDirList* pList = new DTC::StorageGroupDirList();
@@ -250,11 +254,18 @@ DTC::StorageGroupDirList *Myth::GetStorageGroupDirs( const QString &sGroupName,
     while (query.next())
     {
         DTC::StorageGroupDir *pStorageGroupDir = pList->AddNewStorageGroupDir();
+        QFileInfo fi(query.value(3).toString());
+        int64_t free, total, used;
+
+        free = getDiskSpace(query.value(3).toString(), total, used);
 
         pStorageGroupDir->setId            ( query.value(0).toInt()       );
         pStorageGroupDir->setGroupName     ( query.value(1).toString()    );
         pStorageGroupDir->setHostName      ( query.value(2).toString()    );
         pStorageGroupDir->setDirName       ( query.value(3).toString()    );
+        pStorageGroupDir->setDirRead       ( fi.isReadable()              );
+        pStorageGroupDir->setDirWrite      ( fi.isWritable()              );
+        pStorageGroupDir->setKiBFree       ( free                         );
     }
 
     return pList;
@@ -1023,3 +1034,36 @@ QString Myth::ProfileText()
     return sProfileText;
 }
 
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+DTC::BackendInfo* Myth::GetBackendInfo( void )
+{
+
+    // ----------------------------------------------------------------------
+    // Create and populate a Configuration object
+    // ----------------------------------------------------------------------
+
+    DTC::BackendInfo       *pInfo      = new DTC::BackendInfo();
+    DTC::BuildInfo         *pBuild     = pInfo->Build();
+    DTC::EnvInfo           *pEnv       = pInfo->Env();
+    DTC::LogInfo           *pLog       = pInfo->Log();
+
+    pBuild->setVersion     ( MYTH_SOURCE_VERSION   );
+    pBuild->setLibX264     ( CONFIG_LIBX264        );
+    pBuild->setLibDNS_SD   ( CONFIG_LIBDNS_SD      );
+    pEnv->setLANG          ( getenv("LANG")        );
+    pEnv->setLCALL         ( getenv("LC_ALL")      );
+    pEnv->setLCCTYPE       ( getenv("LC_CTYPE")    );
+    pEnv->setHOME          ( getenv("HOME")        );
+    pEnv->setMYTHCONFDIR   ( getenv("MYTHCONFDIR") );
+    pLog->setLogArgs       ( logPropagateArgs      );
+
+    // ----------------------------------------------------------------------
+    // Return the pointer... caller is responsible to delete it!!!
+    // ----------------------------------------------------------------------
+
+    return pInfo;
+
+}

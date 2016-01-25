@@ -279,13 +279,10 @@ void MythSystemLegacyManager::run(void)
     // exit during shutdown.
     while( run_system )
     {
-        struct timespec ts;
-        ts.tv_sec = 0;
-        ts.tv_nsec = 100 * 1000 * 1000; // 100ms
-        nanosleep(&ts, NULL); // sleep 100ms
+        m_mapLock.lock();
+        m_wait.wait(&m_mapLock, m_pMap.isEmpty() ? 100 : 20);
 
         // check for any running processes
-        m_mapLock.lock();
 
         if( m_pMap.isEmpty() )
         {
@@ -455,6 +452,7 @@ void MythSystemLegacyManager::append(MythSystemLegacyUnix *ms)
     m_mapLock.lock();
     ms->IncrRef();
     m_pMap.insert(ms->m_pid, ms);
+    m_wait.wakeAll();
     m_mapLock.unlock();
 
     if (ms->m_stdpipe[0] >= 0)
@@ -926,6 +924,7 @@ void MythSystemLegacyUnix::Fork(time_t timeout)
     if( timeout )
         m_timeout += time(NULL);
 
+    listLock.lock();
     pid_t child = fork();
 
     if (child < 0)
@@ -933,6 +932,7 @@ void MythSystemLegacyUnix::Fork(time_t timeout)
         /* Fork failed, still in parent */
         LOG(VB_SYSTEM, LOG_ERR, "fork() failed: " + ENO);
         SetStatus( GENERIC_EXIT_NOT_OK );
+        listLock.unlock();
     }
     else if( child > 0 )
     {
@@ -948,14 +948,23 @@ void MythSystemLegacyUnix::Fork(time_t timeout)
                         .arg(GetLogCmd()) .arg(timeout));
 
         /* close unused pipe ends */
-        CLOSE(p_stdin[0]);
-        CLOSE(p_stdout[1]);
-        CLOSE(p_stderr[1]);
+        close(p_stdin[0]);
+        close(p_stdout[1]);
+        close(p_stderr[1]);
 
         // store the rest
         m_stdpipe[0] = p_stdin[1];
         m_stdpipe[1] = p_stdout[0];
         m_stdpipe[2] = p_stderr[0];
+
+        if( manager == NULL )
+        {
+            manager = new MythSystemLegacyManager;
+            manager->start();
+        }
+        manager->append(this);
+
+        listLock.unlock();
     }
     else if (child == 0)
     {
@@ -1153,12 +1162,6 @@ void MythSystemLegacyUnix::Fork(time_t timeout)
 
 void MythSystemLegacyUnix::Manage(void)
 {
-    if( manager == NULL )
-    {
-        manager = new MythSystemLegacyManager;
-        manager->start();
-    }
-    manager->append(this);
 }
 
 void MythSystemLegacyUnix::JumpAbort(void)

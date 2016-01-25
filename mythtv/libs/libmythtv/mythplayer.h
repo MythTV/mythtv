@@ -832,6 +832,7 @@ class MTV_PUBLIC MythPlayer
     int        prevrp;        ///< repeat_pict of last frame
     int64_t    tc_wrap[TCTYPESMAX];
     int64_t    tc_lastval[TCTYPESMAX];
+    int64_t    savedAudioTimecodeOffset;
 
     // LiveTV
     TV *m_tv;

@@ -411,7 +411,8 @@ void MythRenderOpenGL1::DrawRectPriv(const QRect &area, const QBrush &fillBrush,
                        ((float)linePen.color().alpha() / 255.0f));
         SetColor(linePen.color().red(), linePen.color().green(),
                  linePen.color().blue(), a);
-        glLineWidth(linePen.width());
+        // glLineWidth() requires its argument to be at least 1.
+        glLineWidth(std::max(1, lineWidth));
         GLfloat *vertices = GetCachedVertices(GL_LINE_LOOP, r);
         glVertexPointer(2, GL_FLOAT, 0, vertices);
         glDrawArrays(GL_LINE_LOOP, 0, 4);

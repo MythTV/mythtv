@@ -173,7 +173,10 @@ class MPUBLIC IntegerSetting : public Setting
     Q_OBJECT
 
   protected:
-    IntegerSetting(Storage *_storage) : Setting(_storage) { }
+    IntegerSetting(Storage *_storage) : Setting(_storage)
+    {
+        settingValue = QString::number(0);
+    }
 
   public:
     int intValue(void) const { return settingValue.toInt(); }

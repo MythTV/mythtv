@@ -459,7 +459,7 @@ class Tvdb:
         return resp.read()
 
     def _getetsrc(self, url):
-        """Loads a URL sing caching, returns an ElementTree of the source
+        """Loads a URL using caching, returns an ElementTree of the source
         """
         src = self._loadUrl(url)
         try:

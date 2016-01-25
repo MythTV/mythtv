@@ -661,7 +661,7 @@ bool CommDetector2::go(void)
                         .arg((nframes == 0) ? 0 : 
                             (int)roundf(currentFrameNumber * 100.0 / nframes))
                         .arg((currentFrameNumber - lastLoggedFrame) * 1000 /
-                            elapsed));
+                            (elapsed ? elapsed : 1)));
                 lastLoggedFrame = currentFrameNumber;
             }
 

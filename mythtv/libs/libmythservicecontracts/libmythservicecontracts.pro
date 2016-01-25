@@ -58,6 +58,8 @@ HEADERS += datacontracts/recRuleFilter.h         datacontracts/recRuleFilterList
 HEADERS += datacontracts/castMember.h            datacontracts/castMemberList.h
 HEADERS += datacontracts/frontend.h              datacontracts/frontendList.h
 HEADERS += datacontracts/cutting.h               datacontracts/cutList.h
+HEADERS += datacontracts/backendInfo.h           datacontracts/envInfo.h
+HEADERS += datacontracts/buildInfo.h             datacontracts/logInfo.h
 
 SOURCES += service.cpp
 
@@ -111,6 +113,8 @@ incDatacontracts.files += datacontracts/recRuleFilter.h       datacontracts/recR
 incDatacontracts.files += datacontracts/castMember.h          datacontracts/castMemberList.h
 incDatacontracts.files += datacontracts/enum.h                datacontracts/enumItem.h
 incDatacontracts.files += datacontracts/cutting.h             datacontracts/cutList.h
+incDatacontracts.files += datacontracts/backendInfo.h         datacontracts/envInfo.h
+incDatacontracts.files += datacontracts/buildInfo.h           datacontracts/logInfo.h
 
 INSTALLS += inc incServices incDatacontracts
 

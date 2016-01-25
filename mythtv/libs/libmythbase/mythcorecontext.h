@@ -125,6 +125,7 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
 
     void SetGUIObject(QObject *gui);
     QObject *GetGUIObject(void);
+    QObject *GetGUIContext(void);
     bool HasGUI(void) const;
     bool IsUIThread(void);
 

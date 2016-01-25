@@ -14,7 +14,7 @@ __author__      = "Paul Harrison"
 __title__       = "FileLyrics"
 __description__ = "Search the same directory as the track for lyrics"
 __version__     = "0.1"
-__priority__    = "110"
+__priority__    = "105"
 __syncronized__ = True
 
 debug = False

@@ -8,12 +8,13 @@
 class SERVICE_PUBLIC FrontendServices : public Service
 {
     Q_OBJECT
-    Q_CLASSINFO( "version", "2.0" );
+    Q_CLASSINFO( "version", "2.1" );
     Q_CLASSINFO( "SendMessage_Method",            "POST" )
     Q_CLASSINFO( "SendNotification_Method",       "POST" )
     Q_CLASSINFO( "SendAction_Method",             "POST" )
     Q_CLASSINFO( "PlayRecording_Method",          "POST" )
     Q_CLASSINFO( "PlayVideo_Method",              "POST" )
+    Q_CLASSINFO( "SendKey_Method",                "POST" )
 
 
   public:
@@ -50,6 +51,7 @@ class SERVICE_PUBLIC FrontendServices : public Service
                                            bool  UseBookmark) = 0;
     virtual QStringList          GetContextList(void) = 0;
     virtual DTC::FrontendActionList* GetActionList(const QString &Context) = 0;
+    virtual bool                 SendKey(const QString &Key) = 0;
 
 
 };

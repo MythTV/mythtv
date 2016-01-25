@@ -24,6 +24,8 @@ import javax.tv.service.ServiceType;
 public final class ServiceTypeFilter extends ServiceFilter {
     public ServiceTypeFilter(ServiceType type)
     {
+        if (type == null)
+            throw new NullPointerException();
         this.type = type;
     }
 

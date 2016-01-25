@@ -148,9 +148,9 @@ void ThumbThread<DBFS>::run()
         {
             QMutexLocker locker(&m_mutex);
             if (!m_requestQ.isEmpty())
-                task = m_requestQ.take(m_requestQ.firstKey());
+                task = m_requestQ.take(m_requestQ.constBegin().key());
             else if (m_doBackground && !m_backgroundQ.isEmpty())
-                task = m_backgroundQ.take(m_backgroundQ.firstKey());
+                task = m_backgroundQ.take(m_backgroundQ.constBegin().key());
             else
                 // quit when both queues exhausted
                 break;

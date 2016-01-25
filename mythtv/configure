@@ -1196,7 +1196,7 @@ check_class_headers_cpp(){
             i=$(expr $i + 1)
         done
         echo "return 0; }"
-    } | check_ld "cxx" "$@" && enable $funcs && enable_safe $headers
+    } | check_ld "cxx" "$@" && enable_safe $headers
 }
 
 check_cpp_condition(){
@@ -2273,6 +2273,8 @@ MYTHTV_HAVE_LIST='
     ftime
     getifaddrs
     gettimeofday
+    openmax_bellagio
+    openmax_broadcom
     posix_fadvise
     libudev
     libuuid
@@ -6269,9 +6271,17 @@ check_type "vdpau/vdpau.h" "VdpPictureInfoHEVC"
 
 # check for OpenMAX header & lib
 if ! disabled openmax; then
-    check_header 'IL/OMX_Core.h' && enable openmax
+    check_header 'OMX_Core.h' && enable openmax
 fi
-disabled openmax || check_lib 'IL/OMX_Core.h' OMX_Init -lopenmaxil || disable openmax
+if ! disabled openmax; then
+    if check_lib 'OMX_Broadcom.h' OMX_Init -lopenmaxil; then
+        enable openmax_broadcom
+    elif check_lib 'bellagio/omxcore.h' OMX_Init -lomxil-bellagio; then
+        enable openmax_bellagio
+    else
+        disable openmax
+    fi
+fi
 
 if ! disabled w32threads && ! enabled pthreads; then
     check_func_headers "windows.h process.h" _beginthreadex &&
@@ -6766,7 +6776,8 @@ enabled dxva2api_h &&
 int main(void) { IDirectXVideoDecoder *o = NULL; IDirectXVideoDecoder_Release(o); return 0; }
 EOF
 
-enabled vaapi &&
+enabled vaapi && enabled opengl &&
+    check_header GL/glx.h &&
     check_lib va/va.h vaInitialize -lva ||
     disable vaapi
 
@@ -6976,7 +6987,7 @@ else
     qt_libs="-L${sysroot}/$(${qmake} -query QT_INSTALL_LIBS)"
 fi
 
-if $(pkg-config --exists QtWebKit) || $(pkg-config --exists Qt5WebKit) ; then
+if $(pkg-config --exists Qt5WebKit) || $(pkg-config --exists QtWebKit) ; then
     enable qtwebkit
 else
     check_ecxx ${qt_inc} ${qt_inc}/QtCore <<EOF && enable qtwebkit
@@ -6987,7 +6998,7 @@ fi
 
 enabled qtwebkit || die "Error! QtWebkit headers not found"
 
-if $(pkg-config --exists QtScript) || $(pkg-config --exists Qt5Script) ; then
+if $(pkg-config --exists Qt5Script) || $(pkg-config --exists QtScript) ; then
     enable qtscript
 else
     check_ecxx ${qt_inc} <<EOF && enable qtscript
@@ -7016,7 +7027,7 @@ EOF
 fi
 
 # Disable OpenGL ES support if Qt does not support it
-QTCONF=$(pkg-config --variable=qt_config QtCore || pkg-config --variable=qt_config Qt5Core)
+QTCONF=$(pkg-config --variable=qt_config Qt5Core || pkg-config --variable=qt_config QtCore)
 if echo "$QTCONF" | grep -qv opengles2 ; then
     if test $target_os != android ; then
         disable opengles
@@ -7960,7 +7971,7 @@ cat > $TMPH <<EOF
 #define MYTHTV_CONFIG_H
 #define FFMPEG_CONFIGURATION "$(c_escape $FFMPEG_CONFIGURATION)"
 #define FFMPEG_LICENSE "$(c_escape $license)"
-#define CONFIG_THIS_YEAR 2015
+#define CONFIG_THIS_YEAR 2016
 #define FFMPEG_DATADIR "$(eval c_escape $datadir)"
 #define AVCONV_DATADIR "$(eval c_escape $datadir)"
 #define CC_IDENT "$(c_escape ${cc_ident:-Unknown compiler})"
@@ -8268,9 +8279,6 @@ if enabled mythlogserver; then
     (cd external/nzmqt/src ; \
            ${qmakeconf} -o Makefile)
 fi
-echo "Configuring qjson..."
-(cd external/qjson ; \
-       ${qmakeconf} -o Makefile)
 if ! disabled hdhomerun ; then
     echo "Configuring libhdhomerun..."
     (cd external/libhdhomerun; \

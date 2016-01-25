@@ -4,11 +4,12 @@
 #define CHANNEL_H
 
 #include "dtvchannel.h"
+
 #ifdef USING_V4L2
-#include <linux/videodev2.h> // needed for v4l2_std_id type
+#include "videodev2.h" // needed for v4l2_std_id type
 #else
 typedef uint64_t v4l2_std_id;
-#endif //USING_V4L2
+#endif
 
 using namespace std;
 
@@ -31,7 +32,8 @@ typedef QMap<int,v4l2_std_id> VidModV4L2;
 class V4LChannel : public DTVChannel
 {
  public:
-    V4LChannel(TVRec *parent, const QString &videodevice);
+    V4LChannel(TVRec *parent, const QString &videodevice,
+               const QString &audiodevice = "");
     virtual ~V4LChannel(void);
 
     bool Init(QString &startchannel, bool setchan);
@@ -54,6 +56,7 @@ class V4LChannel : public DTVChannel
     bool IsOpen(void)       const { return GetFd() >= 0; }
     int  GetFd(void)        const { return videofd; }
     QString GetDevice(void) const { return device; }
+    QString GetAudioDevice(void) const { return audio_device; }
     QString GetSIStandard(void) const { return "atsc"; }
 
     // Picture attributes.
@@ -82,6 +85,7 @@ class V4LChannel : public DTVChannel
   private:
     // Data
     QString     device;
+    QString     audio_device;
     int         videofd;
     QString     device_name;
     QString     driver_name;

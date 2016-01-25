@@ -12,7 +12,7 @@
 ThumbSettings::ThumbSettings() : VerticalConfigurationGroup()
 {
     setLabel(tr("Thumbnails"));
-    
+
     HostComboBox *order = new HostComboBox("GalleryImageOrder");
     order->setLabel(tr("Image Order"));
     order->setHelpText(tr("The order that pictures/videos are shown in thumbnail "
@@ -28,7 +28,7 @@ ThumbSettings::ThumbSettings() : VerticalConfigurationGroup()
     order->addSelection(tr("File Size (smallest first)"), QString::number(kSortBySizeAsc));
     order->addSelection(tr("Reverse File Size (largest first)"), QString::number(kSortBySizeDesc));
     addChild(order);
-    
+
     HostComboBox *orderDir = new HostComboBox("GalleryDirOrder");
     orderDir->setLabel(tr("Directory Order"));
     orderDir->setHelpText(tr("The order that dirctories are shown and traversed "
@@ -38,12 +38,12 @@ ThumbSettings::ThumbSettings() : VerticalConfigurationGroup()
     orderDir->addSelection(tr("File Modified Time (oldest first)"), QString::number(kSortByModTimeAsc));
     orderDir->addSelection(tr("Reverse File Modified Time (newest first)"), QString::number(kSortByModTimeDesc));
     addChild(orderDir);
-    
+
     HostComboBox *fmt = new HostComboBox("GalleryDateFormat");
     fmt->setLabel(tr("Date Format"));
-    
+
     QDateTime sampdate = MythDate::fromString("2002-05-03");
-    
+
     ADD_FORMAT(sampdate, "dd/MM/yy");
     ADD_FORMAT(sampdate, "dd-MM-yy");
     ADD_FORMAT(sampdate, "d/M/yy");
@@ -56,7 +56,7 @@ ThumbSettings::ThumbSettings() : VerticalConfigurationGroup()
     ADD_FORMAT(sampdate, "yyyy-MM-dd");
     ADD_FORMAT(sampdate, QString("yyyy") % QChar(0x5E74) %
                "M" % QChar(0x6708) % "d" % QChar(0x65E5)); // yyyy年M月d日
-    
+
     fmt->setHelpText(tr("Date format of thumbnail captions. Other places use the system date format. "
                         "Sample shows 3rd May 2002."));
     addChild(fmt);
@@ -66,11 +66,11 @@ ThumbSettings::ThumbSettings() : VerticalConfigurationGroup()
 SlideSettings::SlideSettings() : VerticalConfigurationGroup()
 {
     setLabel(tr("Slideshow"));
-    
+
     HostComboBox *tranBox = new HostComboBox("GalleryTransitionType");
     tranBox->setLabel(tr("Transition"));
     tranBox->setHelpText(tr("Effect to use between slides"));
-    
+
     // Initialise selected transition
     TransitionRegistry availableTransitions(GetMythPainter()->SupportsAnimation());
     TransitionMap transitions = availableTransitions.GetAll();
@@ -81,17 +81,23 @@ SlideSettings::SlideSettings() : VerticalConfigurationGroup()
         tranBox->addSelection(i.value()->objectName(), QString::number(i.key()));
     }
     addChild(tranBox);
-    
+
     HostSpinBox *slide = new HostSpinBox("GallerySlideShowTime", 100, 60000, 100);
     slide->setLabel(tr("Slide Duration (ms)"));
     slide->setHelpText(tr("The time that a slide is displayed (between transitions), "
                           "in milliseconds."));
     addChild(slide);
-    
+
     HostSpinBox *transition = new HostSpinBox("GalleryTransitionTime", 100, 60000, 100);
     transition->setLabel(tr("Transition Duration (ms)"));
     transition->setHelpText(tr("The time that each transition lasts, in milliseconds."));
     addChild(transition);
+
+    HostCheckBox *browseTran = new HostCheckBox("GalleryBrowseTransition");
+    browseTran->setLabel(tr("Use transitions when browsing"));
+    browseTran->setHelpText(tr("When cleared, transitions will only be used "
+                               "during a slideshow."));
+    addChild(browseTran);
 }
 
 
@@ -115,14 +121,14 @@ ImportSettings::ImportSettings(bool enable) : VerticalConfigurationGroup()
 {
     setLabel(tr("Import"));
     setEnabled(enable);
-    
+
     HostLineEdit *script = new HostLineEdit("GalleryImportCmd", true);
     script->setLabel(tr("Import Command"));
     script->setHelpText(tr("Command/script that can be run from the menu. "
                            "\n%TMPDIR% will be replaced by a new temporary directory, "
                            "which the import dialog will show automatically. The "
                            "directory will be removed when Gallery exits."));
-    
+
     script->setEnabled(enable);
     addChild(script);
 }
@@ -155,7 +161,7 @@ DatabaseSettings::DatabaseSettings(bool enable)
     StackedConfigurationGroup *group4 = new StackedConfigurationGroup(false, false);
     addChild(group4);
 
-    HostCheckBox *autorun = new HostCheckBox("GalleryAutoLoad");
+    HostCheckBox *autorun = new HostCheckBox("GalleryAutoStart");
     autorun->setLabel(tr("Start Gallery when media inserted"));
     autorun->setHelpText(tr("Set to automatically start Gallery when media "
                             "(USB/CD's containing images) are inserted."));

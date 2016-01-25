@@ -185,6 +185,7 @@ public class MountManager {
                 new PrivilegedAction() {
                     public Object run() {
                         if (mountPoint.decRefCount() < 1) {
+                            logger.error("Removing JAR " + id + " from mount cache");
                             mountPoints.remove(id);
                         }
                         return null;
@@ -221,7 +222,7 @@ public class MountManager {
         if (mountPoint != null) {
             return mountPoint.getMountPoint();
         } else {
-            logger.info("JAR " + jarId + " not mounted");
+            logger.error("JAR " + jarId + " not mounted");
         }
         return null;
     }
@@ -247,6 +248,7 @@ public class MountManager {
             if (dir != null) {
                 return dir.getAbsolutePath();
             }
+            logger.error("getMountPoint(): already unmounted !");
             return null;
         }
 

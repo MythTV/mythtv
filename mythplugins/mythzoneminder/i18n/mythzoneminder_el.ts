@@ -289,12 +289,17 @@
 <context>
     <name>ZMClient</name>
     <message>
+        <location filename="../mythzoneminder/zmclient.cpp" line="117"/>
+        <source>Can&apos;t connect to the mythzmserver</source>
+        <translation>Δεν μπορώ να συνδεθώ στον mythzmserver</translation>
+    </message>
+    <message>
         <location filename="../mythzoneminder/zmclient.cpp" line="118"/>
         <source>Is it running? Have you set the correct IP and port in the settings?</source>
         <translation>Είναι σε λειτουργία; Έχετε εισάγει τη σωστή διεύθυνση ip και θύρα στις ρυθμίσεις;</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmclient.cpp" line="202"/>
+        <location filename="../mythzoneminder/zmclient.cpp" line="204"/>
         <source>The mythzmserver didn&apos;t respond to our request to get the protocol version!!</source>
         <translation>O διακομιστής mythzmserver δεν αποκρίθηκε στην αίτηση για έκδοση πρωτοκόλλου!!</translation>
     </message>
@@ -302,12 +307,12 @@
 <context>
     <name>ZMConsole</name>
     <message>
-        <location filename="../mythzoneminder/zmconsole.cpp" line="210"/>
+        <location filename="../mythzoneminder/zmconsole.cpp" line="211"/>
         <source>Running</source>
         <translation>Ενεργό</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmconsole.cpp" line="215"/>
+        <location filename="../mythzoneminder/zmconsole.cpp" line="216"/>
         <source>Stopped</source>
         <translation>Σταματημένο</translation>
     </message>
@@ -344,13 +349,13 @@
     </message>
     <message>
         <location filename="../mythzoneminder/zmevents.cpp" line="459"/>
-        <source>Don&apos;t Show Continuous Events</source>
-        <translation>Χωρίς αδιάλειπτη εμφάνιση συμβάντων</translation>
+        <source>Hide Continuous Events</source>
+        <translation>Απόκρυψη Αδειάλειπτων Συμβάντων</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmevents.cpp" line="461"/>
         <source>Show Continuous Events</source>
-        <translation>Εμφάνιση συμβάντων αδιάλειπτα</translation>
+        <translation>Εμφάνιση Αδιάλειπτων Συμβάντων</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmevents.cpp" line="463"/>

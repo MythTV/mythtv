@@ -79,7 +79,6 @@ contains(CONFIG_MYTHLOGSERVER, "yes") {
   EXTRA_LIBS += -lmythzmq
   EXTRA_LIBS += -lmythnzmqt
 }
-EXTRA_LIBS += -lmythqjson
 
 LIRC_LIBS = $$CONFIG_LIRC_LIBS
 

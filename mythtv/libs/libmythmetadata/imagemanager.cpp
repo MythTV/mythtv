@@ -25,6 +25,8 @@
 {   LOG(VB_FILE, LOG_DEBUG, LOC + MESG); \
     return QStringList("OK"); }
 
+#define IMPORTDIR "Import"
+
 
 //! A device containing images (ie. USB stick, CD, storage group etc)
 class Device
@@ -79,13 +81,39 @@ public:
     }
 
 
+    /*!
+     \brief Clears all files and sub-dirs within a directory
+     \param path Dir to clear
+    */
+    void RemoveDirContents(QString path)
+    {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+        QDir(path).removeRecursively();
+#else
+        // Delete all files
+        QDir dir = QDir(path);
+        foreach(const QFileInfo &info,
+                dir.entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot))
+        {
+            if (info.isDir())
+            {
+                RemoveDirContents(info.absoluteFilePath());
+                dir.rmdir(info.absoluteFilePath());
+            }
+            else
+                QFile::remove(info.absoluteFilePath());
+        }
+#endif
+    }
+
+
     //! Delete thumbnails associated with device
     void RemoveThumbs(bool eject = false)
     {
         // Remove thumbnails
         QString dir = QString("%1/" TEMP_SUBDIR "/%2").arg(GetConfDir(), m_thumbs);
         LOG(VB_FILE, LOG_INFO, LOC + QString("Removing thumbnails in %1").arg(dir));
-        QDir(dir).removeRecursively();
+        RemoveDirContents(dir);
         QDir::root().rmpath(dir);
     }
 
@@ -151,7 +179,7 @@ int DeviceManager::OpenDevice(const QString &name, const QString &mount,
     if (id == DEVICE_INVALID)
     {
         state = "New";
-        id = m_devices.isEmpty() ? 0 : m_devices.lastKey() + 1;
+        id = m_devices.isEmpty() ? 0 : (m_devices.constEnd() - 1).key() + 1;
         m_devices.insert(id, new Device(name, mount, media, dir));
     }
     else
@@ -258,24 +286,10 @@ QList<int> DeviceManager::GetAbsentees()
  \brief Constructor
  \param thumbPath Absolute path of dir where thumbnails will be stored
 */
-ImageAdapterBase::ImageAdapterBase() : DeviceManager()
+ImageAdapterBase::ImageAdapterBase() : DeviceManager(),
+    m_imageFileExt(SupportedImages()),
+    m_videoFileExt(SupportedVideos())
 {
-    // Determine supported picture formats from Qt
-    m_imageFileExt.clear();
-    foreach (const QByteArray &ext, QImageReader::supportedImageFormats())
-        m_imageFileExt << QString(ext);
-
-    // Determine supported video formats from MythVideo
-    m_videoFileExt.clear();
-    const FileAssociations::association_list faList =
-        FileAssociations::getFileAssociation().getList();
-    for (FileAssociations::association_list::const_iterator p =
-        faList.begin(); p != faList.end(); ++p)
-    {
-        if (!p->use_default && p->playcommand == "Internal")
-            m_videoFileExt << QString(p->extension);
-    }
-
     // Generate glob list from supported extensions
     QStringList glob;
     foreach (const QString &ext, m_imageFileExt + m_videoFileExt)
@@ -289,6 +303,39 @@ ImageAdapterBase::ImageAdapterBase() : DeviceManager()
     // Sync files before dirs to improve thumb generation response
     // Order by time (oldest first) - this determines the order thumbs appear
     m_dirFilter.setSorting(QDir::DirsLast | QDir::Time | QDir::Reversed);
+}
+
+/*!
+   \brief Return recognised pictures
+   \return List of file extensions
+ */
+QStringList ImageAdapterBase::SupportedImages()
+{
+    // Determine supported picture formats from Qt
+    QStringList formats;
+    foreach (const QByteArray &ext, QImageReader::supportedImageFormats())
+        formats << QString(ext);
+    return formats;
+}
+
+
+/*!
+   \brief Return recognised video extensions
+   \return List of file extensions
+ */
+QStringList ImageAdapterBase::SupportedVideos()
+{
+    // Determine supported video formats from MythVideo
+    QStringList formats;
+    const FileAssociations::association_list faList =
+        FileAssociations::getFileAssociation().getList();
+    for (FileAssociations::association_list::const_iterator p =
+        faList.begin(); p != faList.end(); ++p)
+    {
+        if (!p->use_default && p->playcommand == "Internal")
+            formats << QString(p->extension);
+    }
+    return formats;
 }
 
 
@@ -311,14 +358,15 @@ ImageItem *ImageAdapterLocal::CreateItem(const QFileInfo &fi, int parentId,
 
     if (parentId == GALLERY_DB_ID)
     {
-        // Devices hold 'last scan time'
-        im->m_type    = kDevice;
-        im->m_date    = QDateTime::currentMSecsSinceEpoch() / 1000;
+        // Import devices show time of import, other devices show 'last scan time'
+        im->m_date    = im->m_filePath.contains(IMPORTDIR)
+                ? fi.lastModified().toTime_t()
+                : QDateTime::currentMSecsSinceEpoch() / 1000;
         im->m_modTime = im->m_date;
+        im->m_type    = kDevice;
         return im;
     }
 
-    // Strip device path & leading / to create a relative path
     im->m_modTime = fi.lastModified().toTime_t();
 
     if (fi.isDir())
@@ -556,10 +604,13 @@ int ImageDb<FS>::GetDirectory(int id, ImagePtr &parent,
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(QString("SELECT " DB_COLUMNS " FROM %1 "
-                          "WHERE (dir_id = :ID OR file_id = :ID) "
+                          "WHERE (dir_id = :ID1 OR file_id = :ID2) "
                           "%2;").arg(m_table, refine));
 
-    query.bindValue(":ID",  FS::DbId(id));
+    // Qt < 5.4 won't bind multiple occurrences
+    int dbId = FS::DbId(id);
+    query.bindValue(":ID1", dbId);
+    query.bindValue(":ID2", dbId);
 
     if (!query.exec())
     {
@@ -2331,9 +2382,9 @@ QString ImageManagerFe::CrumbName(ImageItemK &im, bool getPath) const
 
     if (!getPath)
         return im.m_baseName;
-    
+
     QString dev, path(im.m_filePath);
-    
+
     if (im.IsLocal())
     {
         // Replace local mount path with device name
@@ -2364,7 +2415,7 @@ bool ImageManagerFe::DetectLocalDevices()
         return false;
 
     // Detect all local media
-    QList<MythMediaDevice*> devices 
+    QList<MythMediaDevice*> devices
             = monitor->GetMedias(MEDIATYPE_DATA | MEDIATYPE_MGALLERY);
 
     foreach (MythMediaDevice* dev, devices)
@@ -2442,7 +2493,7 @@ void ImageManagerFe::DeviceEvent(MythMediaEvent *event)
 
 QString ImageManagerFe::CreateImport()
 {
-    QTemporaryDir *tmp = new QTemporaryDir(QDir::tempPath() % "/Import-XXXXXX");
+    QTemporaryDir *tmp = new QTemporaryDir(QDir::tempPath() % "/" IMPORTDIR "-XXXXXX");
     if (!tmp->isValid())
     {
         delete tmp;

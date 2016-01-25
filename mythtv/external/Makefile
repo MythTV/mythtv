@@ -1,6 +1,6 @@
 include ../config.mak
 
-SUBDIRS = FFmpeg qjson libmythbluray libmythdvdnav libsamplerate libudfread minilzo
+SUBDIRS = FFmpeg libmythbluray libmythdvdnav libsamplerate libudfread minilzo
 SUBDIRS += libmythsoundtouch
 ifeq ($(CONFIG_MYTHLOGSERVER),yes)
     SUBDIRS += zeromq nzmqt
@@ -42,15 +42,6 @@ nzmqt-all:	zeromq-all
 
 nzmqt-install nzmqt-uninstall nzmqt-clean nzmqt-distclean:
 	${MAKE} -C nzmqt/src ${@:nzmqt-%=%}
-
-qjson-all:
-	(cd qjson ; ${QMAKE} -o Makefile)
-	-[ -f qjson/include/QJson ] && \
-	  (cd qjson/include ; ${RM} QJson ; ${LN_S} ../src QJson)
-	${MAKE} -C qjson all
-
-qjson-install qjson-uninstall qjson-clean qjson-distclean:
-	${MAKE} -C qjson ${@:qjson-%=%}
 
 libhdhomerun-all libhdhomerun-clean libhdhomerun-distclean libhdhomerun-install libhdhomerun-uninstall:
 	${MAKE} -C libhdhomerun -f Makefile.lib ${@:libhdhomerun-%=%}

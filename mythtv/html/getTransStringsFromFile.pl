@@ -30,7 +30,7 @@ foreach my $line ( @lines ) {
     }
 }
 
-@lines = split('\)', $contents);
+@lines = split("\"\\)", $contents);
 foreach my $line ( @lines ) {
     if ($line =~ /qsTr\(/i) {
         $line =~ s/.*qsTr\(\s*["']//i;

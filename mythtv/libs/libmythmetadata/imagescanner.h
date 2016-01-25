@@ -14,8 +14,17 @@
 
 #include <QFileInfo>
 #include <QDir>
-#include <QRegularExpression>
 #include <QElapsedTimer>
+
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+    #include <QRegularExpression>
+    #define REGEXP QRegularExpression
+    #define MATCHES(RE, SUBJECT) RE.match(SUBJECT).hasMatch()
+#else
+    #include <QRegExp>
+    #define REGEXP QRegExp
+    #define MATCHES(RE, SUBJECT) RE.exactMatch(SUBJECT)
+#endif
 
 #include "imagethumbs.h"
 
@@ -40,7 +49,7 @@ protected:
 
 private:
     Q_DISABLE_COPY(ImageScanThread)
-    
+
     void SyncSubTree(const QFileInfo &dirInfo, int parentId, int devId,
                      const QString &base);
     int  SyncDirectory(const QFileInfo &dirInfo, int devId,
@@ -82,7 +91,7 @@ private:
     //! Global working dir for file detection
     QDir m_dir;
     //! Pattern of dir names to ignore whilst scanning
-    QRegularExpression m_exclusions;
+    REGEXP m_exclusions;
 };
 
 #endif // IMAGESCANNER_H

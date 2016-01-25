@@ -5,10 +5,10 @@
 #include <algorithm> // max/min
 #include <vector>
 
-#include <IL/OMX_Core.h>
-#include <IL/OMX_Audio.h>
+#include <OMX_Core.h>
+#include <OMX_Audio.h>
 #ifdef USING_BROADCOM
-#include <IL/OMX_Broadcom.h>
+#include <OMX_Broadcom.h>
 #include <bcm_host.h>
 #endif
 
@@ -28,6 +28,15 @@ using namespace omxcontext;
 #define _STR(s) #s
 #define STR(s) _STR(s)
 #define CASE2STR(f) case f: return STR(f)
+
+// Component names
+#ifdef USING_BELLAGIO
+# define AUDIO_RENDER "alsasink"
+# define AUDIO_DECODE "audio_decoder.mp3.mad" // or audio_decoder.ogg.single
+#else
+# define AUDIO_RENDER "audio_render"
+# define AUDIO_DECODE "audio_decode"
+#endif
 
 
 /*
@@ -84,7 +93,8 @@ class AudioDecoderOMX : public OMXComponentCtx
  */
 AudioOutputOMX::AudioOutputOMX(const AudioSettings &settings) :
     AudioOutputBase(settings),
-    m_audiorender("audio_render", *this), m_audiodecoder(0),
+    m_audiorender(gCoreContext->GetSetting("OMXAudioRender", AUDIO_RENDER), *this),
+    m_audiodecoder(0),
     m_lock(QMutex::Recursive)
 {
     if (m_audiorender.GetState() != OMX_StateLoaded)
@@ -96,9 +106,11 @@ AudioOutputOMX::AudioOutputOMX(const AudioSettings &settings) :
         return;
     }
 
+#ifndef USING_BELLAGIO // Bellagio 0.9.3 times out in PortDisable
     // Disable the renderer's clock port, otherwise can't goto OMX_StateIdle
     if (OMX_ErrorNone == m_audiorender.Init(OMX_IndexParamOtherInit))
         m_audiorender.PortDisable(0, 500);
+#endif
 
     if (OMX_ErrorNone != m_audiorender.Init(OMX_IndexParamAudioInit))
         return;
@@ -202,6 +214,7 @@ static bool Format2Pcm(OMX_AUDIO_PARAM_PCMMODETYPE &pcm, AudioFormat afmt)
     return true;
 }
 
+#ifdef OMX_AUDIO_CodingDDP_Supported
 static const char *toString(OMX_AUDIO_DDPBITSTREAMID id)
 {
     switch (id)
@@ -212,6 +225,7 @@ static const char *toString(OMX_AUDIO_DDPBITSTREAMID id)
     static char buf[32];
     return strcpy(buf, qPrintable(QString("DDPBitStreamId 0x%1").arg(id,0,16)));
 }
+#endif
 
 // virtual
 bool AudioOutputOMX::OpenDevice(void)
@@ -399,13 +413,16 @@ bool AudioOutputOMX::OpenDevice(void)
     }
 
     // Setup buffer size & count
+    // NB the OpenMAX spec requires PCM buffer size >= 5mS data
     m_audiorender.GetPortDef();
     OMX_PARAM_PORTDEFINITIONTYPE &def = m_audiorender.PortDef();
 #define OUT_CHANNELS(n) (((n) > 4) ? 8U: ((n) > 2) ? 4U: unsigned(n))
-    def.nBufferSize = (1024U * nBitPerSample * OUT_CHANNELS(channels)) / 8;
-    def.nBufferCountActual = std::max(10U, def.nBufferCountActual);
+    def.nBufferSize = std::max(
+        OMX_U32((1024 * nBitPerSample * OUT_CHANNELS(channels)) / 8),
+        def.nBufferSize);
+    def.nBufferCountActual = std::max(OMX_U32(10), def.nBufferCountActual);
     //def.bBuffersContiguous = OMX_FALSE;
-    def.nBufferAlignment = std::max(sizeof(int), def.nBufferAlignment);
+    def.nBufferAlignment = std::max(OMX_U32(sizeof(int)), def.nBufferAlignment);
     e = m_audiorender.SetParameter(OMX_IndexParamPortDefinition, &def);
     if (e != OMX_ErrorNone)
     {
@@ -550,6 +567,10 @@ int AudioOutputOMX::GetBufferedOnSoundcard(void) const
     }
     return u.nU32 * output_bytes_per_frame;
 #else
+#    if (QT_VERSION >= QT_VERSION_CHECK(5,0,0)) && (QT_VERSION < QT_VERSION_CHECK(5,3,0))
+#        error No OpenMAX audio with QT5 before 5.3 due to missing operator int() of QAtomicInt, update your QT or remove libomxil-bellagio-dev
+#    endif
+
     return m_pending;
 #endif
 }
@@ -620,6 +641,10 @@ AudioOutputSettings* AudioOutputOMX::GetOutputSettings(bool passthrough)
 
     for (uint channels = 1; channels <= 8; channels++)
     {
+#ifdef USING_BELLAGIO // v0.9.3 aborts on 6 channels
+        if (channels == 6)
+            continue;
+#endif
         pcm.nChannels = channels;
         if (OMX_ErrorNone == m_audiorender.SetParameter(OMX_IndexParamAudioPcm, &pcm))
             settings->AddSupportedChannels(channels);
@@ -853,7 +878,7 @@ OMX_ERRORTYPE AudioOutputOMX::AllocBuffersCB()
 
 AudioDecoderOMX::AudioDecoderOMX(OMXComponent &render) :
     m_audiorender(render),
-    m_audiodecoder("audio_decode", *this),
+    m_audiodecoder(gCoreContext->GetSetting("OMXAudioDecode", AUDIO_DECODE), *this),
     m_bIsStarted(false), m_lock(QMutex::Recursive)
 {
     if (m_audiodecoder.GetState() != OMX_StateLoaded)
@@ -914,7 +939,10 @@ bool AudioDecoderOMX::Start(AVCodecID codec, AudioFormat format, int chnls, int 
     Stop();
 
     if (m_audiodecoder.Ports() < 2)
+    {
+        LOG(VB_AUDIO, LOG_ERR, LOC + __func__ + ": missing output port");
         return false;
+    }
 
     OMX_ERRORTYPE e;
     OMX_AUDIO_PARAM_PORTFORMATTYPE fmt;
@@ -923,6 +951,8 @@ bool AudioDecoderOMX::Start(AVCodecID codec, AudioFormat format, int chnls, int 
     // Map Ffmpeg audio codec ID to OMX coding
     switch (codec)
     {
+      case AV_CODEC_ID_NONE:
+        return false;
       case AV_CODEC_ID_PCM_S16LE:
       case AV_CODEC_ID_PCM_S16BE:
       case AV_CODEC_ID_PCM_U16LE:
@@ -1187,7 +1217,7 @@ bool AudioDecoderOMX::Start(AVCodecID codec, AudioFormat format, int chnls, int 
 
       case OMX_AUDIO_CodingAAC: // TODO
       case OMX_AUDIO_CodingWMA: // TODO
-      case OMX_AUDIO_CodingATRAC3: // TODO
+      //case OMX_AUDIO_CodingATRAC3: // TODO
       default:
         LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Unhandled codec %1")
             .arg(Coding2String(fmt.eEncoding)));
@@ -1198,7 +1228,7 @@ bool AudioDecoderOMX::Start(AVCodecID codec, AudioFormat format, int chnls, int 
     m_audiodecoder.GetPortDef();
     OMX_PARAM_PORTDEFINITIONTYPE &def = m_audiodecoder.PortDef();
     //def.nBufferSize = 1024;
-    def.nBufferCountActual = std::max(2U, def.nBufferCountMin);
+    def.nBufferCountActual = std::max(OMX_U32(2), def.nBufferCountMin);
     assert(def.eDomain == OMX_PortDomainAudio);
     assert(def.format.audio.eEncoding == fmt.eEncoding);
     e = m_audiodecoder.SetParameter(OMX_IndexParamPortDefinition, &def);
@@ -1278,7 +1308,7 @@ bool AudioDecoderOMX::Start(AVCodecID codec, AudioFormat format, int chnls, int 
     // Setup output buffer size & count
     // NB the OpenMAX spec requires PCM buffer size >= 5mS data
     //odef.nBufferSize = 16384;
-    odef.nBufferCountActual = std::max(4U, odef.nBufferCountMin);
+    odef.nBufferCountActual = std::max(OMX_U32(4), odef.nBufferCountMin);
     e = m_audiodecoder.SetParameter(OMX_IndexParamPortDefinition, &odef);
     if (e != OMX_ErrorNone)
     {

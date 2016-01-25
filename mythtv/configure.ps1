@@ -931,7 +931,6 @@ else
         Get-ChildItem external\libmythdvdnav\*.vcxproj* -recurse | remove-item -ErrorAction SilentlyContinue
         Get-ChildItem external\libsamplerate\*.vcxproj* -recurse | remove-item -ErrorAction SilentlyContinue
         Get-ChildItem external\nzmqt\*.vcxproj*         -recurse | remove-item -ErrorAction SilentlyContinue
-        Get-ChildItem external\qjson\*.vcxproj*         -recurse | remove-item -ErrorAction SilentlyContinue
 
         Remove-Item mythtv.sln  -ErrorAction SilentlyContinue
         Remove-Item mythtv.suo  -ErrorAction SilentlyContinue -force

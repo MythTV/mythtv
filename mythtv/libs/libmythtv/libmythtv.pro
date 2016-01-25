@@ -142,6 +142,7 @@ HEADERS += streamingringbuffer.h    metadataimagehelper.h
 HEADERS += icringbuffer.h
 HEADERS += mythavutil.h
 HEADERS += recordingfile.h
+HEADERS += driveroption.h
 
 SOURCES += recordinginfo.cpp
 SOURCES += dbcheck.cpp
@@ -352,12 +353,19 @@ using_frontend {
     }
 
     using_openmax {
-        DEFINES += USING_OPENMAX OMX_SKIP64BIT USING_BROADCOM
+        DEFINES += USING_OPENMAX
         HEADERS += privatedecoder_omx.h
         SOURCES += privatedecoder_omx.cpp
         HEADERS += videoout_omx.h
         SOURCES += videoout_omx.cpp
-        LIBS += -lopenmaxil
+        contains( HAVE_OPENMAX_BROADCOM, yes ) {
+            DEFINES += OMX_SKIP64BIT USING_BROADCOM
+            #LIBS += -lopenmaxil
+        }
+        contains( HAVE_OPENMAX_BELLAGIO, yes ) {
+            DEFINES += USING_BELLAGIO
+            #LIBS += -lomxil-bellagio
+        }
     }
 
     using_libass {
@@ -618,10 +626,20 @@ using_backend {
     }
 
     using_v4l2 {
+        HEADERS += v4l2util.h
+        SOURCES += v4l2util.cpp
+
         HEADERS += recorders/v4lchannel.h
         HEADERS += recorders/analogsignalmonitor.h
         SOURCES += recorders/v4lchannel.cpp
         SOURCES += recorders/analogsignalmonitor.cpp
+
+        HEADERS += recorders/v4l2encrecorder.h
+        SOURCES += recorders/v4l2encrecorder.cpp
+        HEADERS += recorders/v4l2encstreamhandler.h
+        SOURCES += recorders/v4l2encstreamhandler.cpp
+        HEADERS += recorders/v4l2encsignalmonitor.h
+        SOURCES += recorders/v4l2encsignalmonitor.cpp
 
         DEFINES += USING_V4L2
     }

@@ -299,4 +299,73 @@ void TestMPEGTables::ParentalRatingDescriptor_test (void)
     QCOMPARE (desc.Rating(0), 14);
 }
 
+void TestMPEGTables::ExtendedEventDescriptor_test (void)
+{
+    ExtendedEventDescriptor desc(&eit_data_0000[16*13+12]);
+    QCOMPARE (desc.LengthOfItems(), 139u);
+    QMultiMap<QString,QString> items = desc.Items();
+    QCOMPARE (items.count(), 5);
+    QVERIFY (items.contains (QString ("Role Player")));
+    QCOMPARE (items.count (QString ("Role Player")), 5);
+    QCOMPARE (items.count (QString ("Role Player"), QString ("Nathan Fillion")), 1);
+}
+
+void TestMPEGTables::TestISO6937Override (void)
+{
+    /* part one, override to ISO 6937 */
+    /* constructed from information in #9480 */
+    unsigned char iso6937_data[] = {
+        0x0f, 0x05, 0x50, 0x69, 0x65, 0x6c, 0xce, 0x65, 0x99, 0x67, 0x6e, 0x69, 0x61, 0x72, 0x6b, 0x69
+    };
+
+    QString iso6937_wrong = dvb_decode_text (&iso6937_data[1], iso6937_data[0], NULL, 0);
+    QString iso6937_right = dvb_decode_text (&iso6937_data[1], iso6937_data[0], (const unsigned char *)"", 0);
+    QCOMPARE (iso6937_wrong, QString ("Piel\u00ceegniarki"));
+    QCOMPARE (iso6937_right, QString ("Piel\u0119gniarki"));
+
+    /* part two, override from ISO 6937 */
+    unsigned char iso8859_15_data[] = {
+        0x05, 0x47, 0x72, 0xfc, 0xdf, 0x65 /* greetings in german */
+    };
+
+    QString iso8859_15_wrong = dvb_decode_text (&iso8859_15_data[1], iso8859_15_data[0], NULL, 0);
+    QString iso8859_15_right = dvb_decode_text (&iso8859_15_data[1], iso8859_15_data[0], (const unsigned char *)"\x0b", 1);
+    QCOMPARE (iso8859_15_wrong, QString ("Gr\u00fe\u215ee"));
+    QCOMPARE (iso8859_15_right, QString ("Gr\u00fc\u00dfe"));
+
+    /* part three, source Polsat, ISO 8859-2 incl. encoding signalling */
+    unsigned char three_data[] = {
+        0x1b, 0x10, 0x00, 0x02, 0x41, 0x6e, 0x61, 0x6b,  0x6f, 0x6e, 0x64, 0x61, 0x20, 0x2d, 0x20, 0x63, /* ....Anakonda - c */
+        0x69, 0x63, 0x68, 0x79, 0x20, 0x7a, 0x61, 0x62,  0xf3, 0x6a, 0x63, 0x61                          /* ichy zab.jca */
+    };
+
+    QString three = dvb_decode_text (&three_data[1], three_data[0]);
+    QCOMPARE (three, QString ("Anakonda - cichy zab\u00f3jca"));
+
+    /* test greek alphabet, #12618
+     * english event_name - "Vodka with Orange"
+     */
+    unsigned char six_data[] = {
+        0x10, 0x03, 0xc2, 0xfc, 0xf4, 0xea, 0xe1, 0x20,  0xd0, 0xef, 0xf1, 0xf4, 0xef, 0xea, 0xdc, 0xeb,
+        0xe9
+    };
+
+    QString six = dvb_decode_text (&six_data[1], six_data[0]);
+    QCOMPARE (six, QString ("\u0392\u03cc\u03c4\u03ba\u03b1 \u03a0\u03bf\u03c1\u03c4\u03bf\u03ba\u03ac\u03bb\u03b9"));
+
+    /* test greek alphabet, #12618
+     * english event_name - "Health Above All - Season 4"
+     */
+    unsigned char seven_data[] = {
+        0x20, 0x03, 0xd5, 0xe3, 0xe5, 0xdf, 0xe1, 0x20,  0xd0, 0xdc, 0xed, 0xf9, 0x20, 0xe1, 0xf0, 0x27,
+        0x20, 0xbc, 0xeb, 0xe1, 0x20, 0x2d, 0x20, 0x34,  0xef, 0xf2, 0x20, 0xca, 0xfd, 0xea, 0xeb, 0xef,
+        0xf2
+    };
+
+    QString seven = dvb_decode_text (&seven_data[1], seven_data[0]);
+    QCOMPARE (seven, QString ("\u03a5\u03b3\u03b5\u03af\u03b1"
+              " \u03a0\u03ac\u03bd\u03c9 \u03b1\u03c0' \u038c\u03bb\u03b1"
+              " - 4\u03bf\u03c2 \u039a\u03cd\u03ba\u03bb\u03bf\u03c2"));
+}
+
 QTEST_APPLESS_MAIN(TestMPEGTables)

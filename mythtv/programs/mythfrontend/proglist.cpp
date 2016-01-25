@@ -1390,8 +1390,11 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
     for (uint i = 0; i < m_itemList.size(); i++)
     {
         ProgramInfo *s = m_itemList[i];
-        s->sortTitle = (m_type == plTitle) ? s->GetSubtitle() : s->GetTitle();
-        s->sortTitle.remove(prefixes);
+        if (s)
+        {
+            s->sortTitle = (m_type == plTitle) ? s->GetSubtitle() : s->GetTitle();
+            s->sortTitle.remove(prefixes);
+        }
     }
 
     if (m_type == plNewListings || m_titleSort)

@@ -26,6 +26,7 @@
 #define MSKIP(MSG) QSKIP(MSG)
 #endif
 
+#include <eithelper.h> /* for FixupValue */
 #include <programdata.h>
 
 class TestEITFixups : public QObject
@@ -45,7 +46,8 @@ class TestEITFixups : public QObject
     void testDEPro7Sat1(void);
     void testHTMLFixup(void);
     void testSkyEpisodes(void);
+    void testUnitymedia(void);
 
   private:
-    static DBEventEIT *SimpleDBEventEIT (uint chanid, QString title, QString subtitle, QString description);
+    static DBEventEIT *SimpleDBEventEIT (FixupValue fix, QString title, QString subtitle, QString description);
 };

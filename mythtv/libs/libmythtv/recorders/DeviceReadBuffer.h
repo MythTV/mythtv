@@ -58,6 +58,7 @@ class DeviceReadBuffer : protected MThread
     bool IsRunning(void) const;
 
     uint Read(unsigned char *buf, uint count);
+    uint GetUsed(void) const;
 
   private:
     virtual void run(void); // MThread
@@ -76,7 +77,6 @@ class DeviceReadBuffer : protected MThread
     bool IsOpen(void) const { return _stream_fd >= 0; }
     void ClosePipes(void) const;
     uint GetUnused(void) const;
-    uint GetUsed(void) const;
     uint GetContiguousUnused(void) const;
 
     bool CheckForErrors(ssize_t read_len, size_t requested_len, uint &err_cnt);

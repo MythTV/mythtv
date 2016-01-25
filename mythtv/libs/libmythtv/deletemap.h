@@ -44,6 +44,8 @@ class MTV_PUBLIC DeleteMap
     bool IsFileEditing(void);
     bool IsEmpty(void) const;
     bool IsSaved(void) const;
+    bool IsChanged(void) const { return m_changed; }
+    void SetChanged(bool changed = true) { m_changed = changed; }
 
     void SetMap(const frm_dir_map_t &map);
     void LoadCommBreakMap(frm_dir_map_t &map);

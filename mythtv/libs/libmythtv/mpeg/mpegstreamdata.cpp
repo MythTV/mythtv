@@ -357,21 +357,23 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
         return 0;
     }
 
-    const int offset = tspacket->AFCOffset() + tspacket->StartOfFieldPointer();
-    if (offset>181)
+    // table_id (8 bits) and section_length(12), syntax(1), priv(1), res(2)
+    // pointer_field (+8 bits), since payload start is true if we are here.
+    const unsigned int extra_offset = 4;
+
+    const unsigned int offset = tspacket->AFCOffset() + tspacket->StartOfFieldPointer();
+    if (offset + extra_offset > TSPacket::kSize)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Error: offset>181, pes length & "
-                "current cannot be queried");
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error: "
+                "AFCOffset(%1)+StartOfFieldPointer(%2)>184, "
+                "pes length & current cannot be queried")
+                .arg(tspacket->AFCOffset()).arg(tspacket->StartOfFieldPointer()));
         return 0;
     }
 
-    // table_id (8 bits) and section_length(12), syntax(1), priv(1), res(2)
-    // pointer_field (+8 bits), since payload start is true if we are here.
-    const int extra_offset = 4;
-
     const unsigned char* pesdata = tspacket->data() + offset;
-    const int pes_length = (pesdata[2] & 0x0f) << 8 | pesdata[3];
-    if ((pes_length + offset + extra_offset) > 188)
+    const unsigned int pes_length = (pesdata[2] & 0x0f) << 8 | pesdata[3];
+    if ((pes_length + offset + extra_offset) > TSPacket::kSize)
     {
         SavePartialPSIP(tspacket->PID(), new PSIPTable(*tspacket));
         moreTablePackets = false;
@@ -645,8 +647,8 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable &pmt)
     for (uint i = 0; i < audioPIDs.size(); i++)
         AddAudioPID(audioPIDs[i]);
 
-    if (!videoPIDs.empty())
-        _pid_video_single_program = videoPIDs[0];
+    _pids_writing.clear();
+    _pid_video_single_program = !videoPIDs.empty() ? videoPIDs[0] : 0xffffffff;
     for (uint i = 1; i < videoPIDs.size(); i++)
         AddWritingPID(videoPIDs[i]);
 
@@ -1006,6 +1008,15 @@ int MPEGStreamData::ProcessData(const unsigned char *buffer, int len)
 {
     int pos = 0;
     bool resync = false;
+
+    if (!_ps_listeners.empty())
+    {
+
+        for (uint j = 0; j < _ps_listeners.size(); ++j)
+            _ps_listeners[j]->FindPSKeyFrames(buffer, len);
+
+        return 0;
+    }
 
     while (pos + int(TSPacket::kSize) <= len)
     { // while we have a whole packet left...
@@ -1809,6 +1820,33 @@ void MPEGStreamData::RemoveMPEGSPListener(MPEGSingleProgramStreamListener *val)
         if (((void*)val) == ((void*)*it))
         {
             _mpeg_sp_listeners.erase(it);
+            return;
+        }
+    }
+}
+
+void MPEGStreamData::AddPSStreamListener(PSStreamListener *val)
+{
+    QMutexLocker locker(&_listener_lock);
+
+    ps_listener_vec_t::iterator it = _ps_listeners.begin();
+    for (; it != _ps_listeners.end(); ++it)
+        if (((void*)val) == ((void*)*it))
+            return;
+
+    _ps_listeners.push_back(val);
+}
+
+void MPEGStreamData::RemovePSStreamListener(PSStreamListener *val)
+{
+    QMutexLocker locker(&_listener_lock);
+
+    ps_listener_vec_t::iterator it = _ps_listeners.begin();
+    for (; it != _ps_listeners.end(); ++it)
+    {
+        if (((void*)val) == ((void*)*it))
+        {
+            _ps_listeners.erase(it);
             return;
         }
     }

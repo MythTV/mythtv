@@ -17,26 +17,4 @@ int  connect_to_master(void);
 void print_warnings(const MythBackendCommandLineParser &cmdline);
 int  run_backend(MythBackendCommandLineParser &cmdline);
 
-namespace
-{
-    class CleanupGuard
-    {
-      public:
-        typedef void (*CleanupFunc)();
-
-      public:
-        CleanupGuard(CleanupFunc cleanFunction) :
-            m_cleanFunction(cleanFunction) {}
-
-        ~CleanupGuard()
-        {
-            m_cleanFunction();
-            ReferenceCounter::PrintDebug();
-        }
-
-      private:
-        CleanupFunc m_cleanFunction;
-    };
-}
-
 #endif // _MAIN_HELPERS_H_

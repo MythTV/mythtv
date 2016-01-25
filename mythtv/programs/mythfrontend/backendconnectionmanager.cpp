@@ -30,7 +30,7 @@ class Reconnect : public QRunnable
 
     virtual void run(void)
     {
-        if (!gCoreContext->SafeConnectToMasterServer())
+        if (!gCoreContext->SafeConnectToMasterServer(gCoreContext->IsBlockingClient()))
             gCoreContext->dispatch(MythEvent(QString("RECONNECT_FAILURE")));
         else
             gCoreContext->dispatch(MythEvent(QString("RECONNECT_SUCCESS")));

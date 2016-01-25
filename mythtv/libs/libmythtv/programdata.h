@@ -18,6 +18,7 @@ using namespace std;
 #include "mythtvexp.h"
 #include "listingsources.h"
 #include "programinfo.h"
+#include "eithelper.h" /* for FixupValue */
 
 class MSqlQuery;
 
@@ -194,7 +195,7 @@ class MTV_PUBLIC DBEventEIT : public DBEvent
                const QString   &_desc,
                const QString   &_category,  ProgramInfo::CategoryType _category_type,
                const QDateTime &_start,     const QDateTime &_end,
-               uint             _fixup,
+               FixupValue       _fixup,
                unsigned char    _subtitleType,
                unsigned char    _audioProps,
                unsigned char    _videoProps,
@@ -213,7 +214,7 @@ class MTV_PUBLIC DBEventEIT : public DBEvent
     DBEventEIT(uint             _chanid,
                const QString   &_title,     const QString   &_desc,
                const QDateTime &_start,     const QDateTime &_end,
-               uint             _fixup,
+               FixupValue       _fixup,
                unsigned char    _subtitleType,
                unsigned char    _audioProps,
                unsigned char    _videoProps) :
@@ -231,7 +232,8 @@ class MTV_PUBLIC DBEventEIT : public DBEvent
 
   public:
     uint32_t      chanid;
-    uint32_t      fixup;
+    FixupValue    fixup;
+    QMap<QString,QString> items;
 };
 
 class MTV_PUBLIC ProgInfo : public DBEvent

@@ -437,8 +437,9 @@ void MusicCommon::switchView(MusicView view)
 
         case MV_LYRICS:
         {
-            if (view != MV_VISUALIZER)
+            if (view != MV_VISUALIZER && view != MV_SEARCH)
                 return;
+            break;
         }
 
         case MV_RADIO:
@@ -2829,6 +2830,11 @@ bool TrackInfoDialog::Create(void)
         }
     }
 
+    // hide the song ID by default
+    MythUIText *songID = dynamic_cast<MythUIText *>(GetChild("songid"));
+    if (songID)
+        songID->Hide();
+
     return true;
 }
 
@@ -2844,6 +2850,13 @@ bool TrackInfoDialog::keyPressEvent(QKeyEvent *event)
 
         if (action == "INFO")
             Close();
+        if (action == "0")
+        {
+            // if it's available show the song ID
+            MythUIText *songID = dynamic_cast<MythUIText *>(GetChild("songid"));
+            if (songID)
+                songID->Show();
+        }
         else
             handled = false;
     }

@@ -1178,17 +1178,17 @@ void GalleryThumbView::MenuAction(MythMenu *mainMenu)
         }
         else if (selected->m_userThumbnail)
             menu->AddItem(tr("Reset Cover"), SLOT(ResetCover()));
-
-        // Can only mkdir in a non-root dir
-        if (selected->IsDirectory()
-                && selected->m_id != GALLERY_DB_ID)
-            menu->AddItem(tr("Create Directory"), SLOT(MakeDir()));
-
-        // Only show import command on root, when defined
-        if (selected->m_id == GALLERY_DB_ID
-                && !gCoreContext->GetSetting("GalleryImportCmd").isEmpty())
-            menu->AddItem(tr("Import"), SLOT(Import()));
     }
+
+    // Can only mkdir in a non-root dir
+    if (selected->IsDirectory()
+            && selected->m_id != GALLERY_DB_ID)
+        menu->AddItem(tr("Create Directory"), SLOT(MakeDir()));
+
+    // Only show import command on root, when defined
+    if (selected->m_id == GALLERY_DB_ID
+            && !gCoreContext->GetSetting("GalleryImportCmd").isEmpty())
+        menu->AddItem(tr("Import"), SLOT(Import()));
 
     // Only show eject when devices (excluding import) exist
     if (selected->IsDevice() && selected->IsLocal())
@@ -1215,11 +1215,11 @@ void GalleryThumbView::MenuSlideshow(MythMenu *mainMenu)
     case kShuffle  : ordering = tr("Shuffled"); break;
     case kRandom   : ordering = tr("Random"); break;
     case kSeasonal : ordering = tr("Seasonal"); break;
-    default: 
+    default:
     case kOrdered  : ordering = tr("Ordered"); break;
     }
 
-    MythMenu *menu = new MythMenu(tr("Slideshow") + " (" + ordering + ")", 
+    MythMenu *menu = new MythMenu(tr("Slideshow") + " (" + ordering + ")",
                                   this, "SlideshowMenu");
 
     // Use selected dir or parent, if image selected
@@ -1618,8 +1618,11 @@ void GalleryThumbView::ShowSettings()
 
     QString exclusions = gCoreContext->GetSetting("GalleryIgnoreFilter");
     if (exclusions != oldExclusions)
+    {
         // Exclusions changed: request rescan
+        m_view->ClearCache();;
         m_mgr.IgnoreDirs(exclusions);
+    }
 }
 
 

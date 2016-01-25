@@ -2798,6 +2798,7 @@ int MPEG2fixup::BuildKeyframeIndex(QString &file,
     int count = 0;
 
     /*============ initialise AV ===============*/
+    vid_id = -1;
     if (!InitAV(file, NULL, 0))
         return GENERIC_EXIT_NOT_OK;
 

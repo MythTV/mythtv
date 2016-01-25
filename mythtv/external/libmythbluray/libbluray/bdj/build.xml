@@ -7,6 +7,7 @@
     <property name="build" location="build"/>
     <property name="dist"  location="../../.libs"/>
     <property name="src_awt" value=""/>
+    <property name="src_asm" value="../../asm/src/"/>
     <property name="bootclasspath" value=""/>
     <property name="version" value=""/>
 
@@ -18,6 +19,12 @@
 
     <target name="compile" depends="init"
             description="compile the source " >
+        <javac srcdir="${src_asm}" destdir="${build}" debug="yes"
+               bootclasspath="${bootclasspath}"
+               source="1.5" target="1.5">
+               <compilerarg value="-XDignore.symbol.file"/>
+               <compilerarg value="-Xlint:-deprecation"/>
+        </javac>
         <javac srcdir="${src}${src_awt}" destdir="${build}" debug="yes"
                bootclasspath="${bootclasspath}"
                source="1.4" target="1.4">

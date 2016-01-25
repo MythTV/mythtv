@@ -45,6 +45,7 @@ using namespace std;
 #include <mythmediamonitor.h>
 
 // MythGallery headers
+#include "config.h"
 #include "galleryutil.h"
 #include "gallerysettings.h"
 #include "galleryfilter.h"
@@ -486,6 +487,8 @@ bool IconView::keyPressEvent(QKeyEvent *event)
                 HandleSlideShow();
             else if (action == "RANDOMSHOW")
                 HandleRandomShow();
+            else if (action == "SEASONALSHOW")
+                HandleSeasonalShow();
             else
                 handled = false;
         }
@@ -588,6 +591,13 @@ void IconView::HandleRandomShow(void)
     SetFocusWidget(m_imageList);
 }
 
+void IconView::HandleSeasonalShow(void)
+{
+    HandleImageSelect("SEASONALSHOW");
+
+    SetFocusWidget(m_imageList);
+}
+
 bool IconView::HandleImageSelect(const QString &action)
 {
     ThumbItem *thumbitem = GetCurrentThumb();
@@ -596,7 +606,8 @@ bool IconView::HandleImageSelect(const QString &action)
         return false;
 
     int slideShow = ((action == "PLAY" || action == "SLIDESHOW") ? 1 :
-                     (action == "RANDOMSHOW") ? 2 : 0);
+                     (action == "RANDOMSHOW") ? 2 :
+                     (action == "SEASONALSHOW" ? 3 : 0));
 
     int pos = m_imageList->GetCurrentPos();
 
@@ -823,6 +834,9 @@ void IconView::customEvent(QEvent *event)
                 case 6:
                     HandleSettings();
                     break;
+                case 7:
+                    HandleSeasonalShow();
+                    break;
             }
         }
         else if (resultid == "metadatamenu")
@@ -907,6 +921,9 @@ void IconView::HandleMainMenu(void)
     {
         menu->AddItem(tr("SlideShow"), 0);
         menu->AddItem(tr("Random"), 1);
+#ifdef EXIF_SUPPORT
+        menu->AddItem(tr("Seasonal"), 7);
+#endif // EXIF_SUPPORT
         menu->AddItem(tr("Meta Data Options"), 2, CreateMetadataMenu());
     }
 

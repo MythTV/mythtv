@@ -32,7 +32,7 @@
 #endif
 
 #ifdef USING_V4L2
-#include <linux/videodev2.h>
+#include "v4l2util.h"
 #endif
 
 #ifdef USING_HDHOMERUN
@@ -155,6 +155,29 @@ bool CardUtil::IsCableCardPresent(uint inputid,
         return false;
 }
 
+bool CardUtil::HasTuner(const QString &rawtype, const QString & device)
+{
+    if (rawtype == "DVB"     || rawtype == "HDHOMERUN" ||
+        rawtype == "FREEBOX" || rawtype == "CETON")
+        return true;
+
+#ifdef USING_V4L2
+    if (rawtype == "V4L2ENC")
+    {
+        V4L2util v4l2(device);
+        return !v4l2 ? false : v4l2.HasTuner();
+    }
+#endif
+
+    if (rawtype == "EXTERNAL")
+    {
+        // TODO: query EXTERNAL for capability
+        return true;
+    }
+
+    return false;
+}
+
 bool CardUtil::IsTunerShared(uint inputidA, uint inputidB)
 {
     LOG(VB_GENERAL, LOG_DEBUG, QString("IsTunerShared(%1,%2)")
@@ -236,12 +259,12 @@ bool CardUtil::IsInputTypePresent(const QString &rawtype, QString hostname)
     return count > 0;
 }
 
-QStringList CardUtil::GetInputTypes(void)
+CardUtil::InputTypes CardUtil::GetInputTypes(void)
 {
-    QStringList inputtypes;
+    InputTypes inputtypes;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT DISTINCT cardtype "
+    query.prepare("SELECT DISTINCT cardtype, videodevice "
                   "FROM capturecard");
 
     if (!query.exec())
@@ -250,8 +273,25 @@ QStringList CardUtil::GetInputTypes(void)
     }
     else
     {
+        QString cardtype;
+
         while (query.next())
-            inputtypes.push_back(query.value(0).toString());
+        {
+            cardtype = query.value(0).toString();
+            if (cardtype != "V4L2ENC")
+                inputtypes[cardtype] = "";
+#ifdef USING_V4L2
+            else
+            {
+                V4L2util v4l2(query.value(1).toString());
+                if (v4l2.IsOpen())
+                {
+                    QString driver_name = "V4L2:" + v4l2.DriverName();
+                    inputtypes[driver_name] = v4l2.CardName();
+                }
+            }
+#endif
+        }
     }
 
     return inputtypes;
@@ -739,15 +779,15 @@ static uint clone_capturecard(uint src_inputid, uint orig_dst_inputid)
     }
 
     query.prepare(
-        "SELECT videodevice,           cardtype,                         "
-        "       hostname,              signal_timeout, channel_timeout,  "
-        "       dvb_wait_for_seqstart, dvb_on_demand,  dvb_tuning_delay, "
-        "       dvb_diseqc_type,       diseqcid,       dvb_eitscan,      "
-        "       inputname,             sourceid,       externalcommand,  "
-        "       changer_device,        changer_model,  tunechan,         "
-        "       startchan,             displayname,    dishnet_eit,      "
-        "       recpriority,           quicktune,      schedorder,       "
-        "       livetvorder "
+        "SELECT videodevice,           audiodevice,           vbidevice,       "
+        "       cardtype,              hostname,              signal_timeout,  "
+        "       channel_timeout,       dvb_wait_for_seqstart, dvb_on_demand,   "
+        "       dvb_tuning_delay,      dvb_diseqc_type,       diseqcid,        "
+        "       dvb_eitscan,           inputname,             sourceid,        "
+        "       externalcommand,       changer_device,        changer_model,   "
+        "       tunechan,              startchan,             displayname,     "
+        "       dishnet_eit,           recpriority,           quicktune,       "
+        "       schedorder,            livetvorder "
         "FROM capturecard "
         "WHERE cardid = :INPUTID");
     query.bindValue(":INPUTID", src_inputid);
@@ -767,32 +807,34 @@ static uint clone_capturecard(uint src_inputid, uint orig_dst_inputid)
     query2.prepare(
         "UPDATE capturecard "
         "SET videodevice           = :V0, "
-        "    cardtype              = :V1, "
-        "    hostname              = :V2, "
-        "    signal_timeout        = :V3, "
-        "    channel_timeout       = :V4, "
-        "    dvb_wait_for_seqstart = :V5, "
-        "    dvb_on_demand         = :V6, "
-        "    dvb_tuning_delay      = :V7, "
-        "    dvb_diseqc_type       = :V8, "
-        "    diseqcid              = :V9,"
-        "    dvb_eitscan           = :V10, "
-        "    inputname             = :V11, "
-        "    sourceid              = :V12, "
-        "    externalcommand       = :V13, "
-        "    changer_device        = :V14, "
-        "    changer_model         = :V15, "
-        "    tunechan              = :V16, "
-        "    startchan             = :V17, "
-        "    displayname           = :V18, "
-        "    dishnet_eit           = :V19, "
-        "    recpriority           = :V20, "
-        "    quicktune             = :V21, "
-        "    schedorder            = :V22, "
-        "    livetvorder           = :V23,  "
+        "    audiodevice           = :V1, "
+        "    vbidevice             = :V2, "
+        "    cardtype              = :V3, "
+        "    hostname              = :V4, "
+        "    signal_timeout        = :V5, "
+        "    channel_timeout       = :V6, "
+        "    dvb_wait_for_seqstart = :V7, "
+        "    dvb_on_demand         = :V8, "
+        "    dvb_tuning_delay      = :V9, "
+        "    dvb_diseqc_type       = :V10, "
+        "    diseqcid              = :V11,"
+        "    dvb_eitscan           = :V12, "
+        "    inputname             = :V13, "
+        "    sourceid              = :V14, "
+        "    externalcommand       = :V15, "
+        "    changer_device        = :V16, "
+        "    changer_model         = :V17, "
+        "    tunechan              = :V18, "
+        "    startchan             = :V19, "
+        "    displayname           = :V20, "
+        "    dishnet_eit           = :V21, "
+        "    recpriority           = :V22, "
+        "    quicktune             = :V23, "
+        "    schedorder            = :V24, "
+        "    livetvorder           = :V25,  "
         "    parentid              = :PARENTID "
         "WHERE cardid = :INPUTID");
-    for (uint i = 0; i < 24; i++)
+    for (uint i = 0; i < 24; ++i)
         query2.bindValue(QString(":V%1").arg(i), query.value(i).toString());
     query2.bindValue(":INPUTID", dst_inputid);
     query2.bindValue(":PARENTID", src_inputid);
@@ -1189,6 +1231,18 @@ uint CardUtil::CreateInputGroup(const QString &name)
     }
 
     return inputgroupid;
+}
+
+uint CardUtil::CreateDeviceInputGroup(uint inputid,
+                                      const QString &type,
+                                      const QString &host,
+                                      const QString &device)
+{
+    QString name = host + '|' + device;
+    if (type == "FREEBOX" || type == "IMPORT" ||
+        type == "DEMO"    || type == "EXTERNAL")
+        name += QString("|%1").arg(inputid);
+    return CreateInputGroup(name);
 }
 
 uint CardUtil::GetDeviceInputGroup(uint inputid)
@@ -1619,7 +1673,8 @@ QStringList CardUtil::ProbeAudioInputs(QString device, QString inputtype)
                                    .arg(device).arg(inputtype));
     QStringList ret;
 
-    if ("HDPVR" == inputtype)
+    if ("HDPVR" == inputtype ||
+        "V4L2"  == inputtype)
         ret += ProbeV4LAudioInputs(device);
 
     return ret;
@@ -1833,7 +1888,8 @@ int CardUtil::CreateCaptureCard(const QString &videodevice,
     if (query.next())
     {
         inputid = query.value(0).toInt();
-        uint groupid = CardUtil::CreateDeviceInputGroup(hostname, videodevice);
+        uint groupid = CardUtil::CreateDeviceInputGroup(inputid, inputtype,
+                                                        hostname, videodevice);
         CardUtil::LinkInputGroup(inputid, groupid);
     }
 

@@ -30,13 +30,13 @@
 #include <QString>
 #include <QEvent>
 
-#include "mythbaseexp.h"
+#include "mythuiexp.h"
 
 /**
  * \class MythGestureEvent
  * \brief A custom event that represents a mouse gesture.
  */
-class MBASE_PUBLIC MythGestureEvent : public QEvent
+class MUI_PUBLIC MythGestureEvent : public QEvent
 {
   public:
     /**

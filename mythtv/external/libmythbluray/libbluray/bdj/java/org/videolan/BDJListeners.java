@@ -56,6 +56,8 @@ import org.dvb.media.SubtitleListener;
 import org.dvb.media.SubtitleNotAvailableEvent;
 import org.dvb.media.SubtitleNotSelectedEvent;
 import org.dvb.media.SubtitleSelectedEvent;
+import org.dvb.media.VideoFormatListener;
+import org.dvb.media.VideoFormatEvent;
 
 public class BDJListeners {
     private LinkedList listeners = new LinkedList();
@@ -219,6 +221,9 @@ public class BDJListeners {
             } else if (event instanceof SubtitleAvailableEvent || event instanceof SubtitleNotAvailableEvent ||
                        event instanceof SubtitleNotSelectedEvent || event instanceof SubtitleSelectedEvent) {
                 ((SubtitleListener)listener).subtitleStatusChanged((EventObject)event);
+
+            } else if (event instanceof VideoFormatEvent) {
+                ((VideoFormatListener)listener).receiveVideoFormatEvent((VideoFormatEvent)event);
 
             } else if (event instanceof PSR102Status) {
                 ((StatusListener)listener).receive(((PSR102Status)event).value);

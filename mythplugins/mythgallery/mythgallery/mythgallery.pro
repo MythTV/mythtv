@@ -37,9 +37,8 @@ opengl {
     DEFINES += USING_OPENGL
 }
 
-
-#The following line was inserted by qt3to4
-QT += network opengl sql xml widgets
+QT += network opengl sql xml
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 DEFINES += MPLUGIN_API
 

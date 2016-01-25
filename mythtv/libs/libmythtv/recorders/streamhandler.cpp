@@ -130,15 +130,10 @@ void StreamHandler::RemoveListener(MPEGStreamData *data)
         _stream_data_list.erase(it);
     }
 
+    _listener_lock.unlock();
+
     if (_stream_data_list.empty())
-    {
-        _listener_lock.unlock();
         Stop();
-    }
-    else
-    {
-        _listener_lock.unlock();
-    }
 
     LOG(VB_RECORD, LOG_INFO, LOC + QString("RemoveListener(0x%1) -- end")
                 .arg((uint64_t)data,0,16));
@@ -190,8 +185,12 @@ void StreamHandler::Stop(void)
 
 bool StreamHandler::IsRunning(void) const
 {
-    QMutexLocker locker(&_start_stop_lock);
-    return _running;
+    // This used to use QMutexLocker, but that sometimes left the
+    // mutex locked on exit, so...
+    _start_stop_lock.lock();
+    bool r = _running;
+    _start_stop_lock.unlock();
+    return r;
 }
 
 void StreamHandler::SetRunning(bool is_running,

@@ -38,8 +38,16 @@ char *win32_get_font_dir(const char *font_file)
 {
     wchar_t wdir[MAX_PATH];
     if (S_OK != SHGetFolderPathW(NULL, CSIDL_FONTS, NULL, SHGFP_TYPE_CURRENT, wdir)) {
-        GetWindowsDirectoryW(wdir, MAX_PATH);
-        wcscat(wdir, L"\\fonts");
+        int lenght = GetWindowsDirectoryW(wdir, MAX_PATH);
+        if (lenght == 0 || lenght > (MAX_PATH - 8)) {
+            BD_DEBUG(DBG_FILE, "Font directory path too long!\n");
+            return NULL;
+        }
+        if (!wcscat(wdir, L"\\fonts")) {
+            BD_DEBUG(DBG_FILE, "Could not construct font directory path!\n");
+            return NULL;
+        }
+
     }
 
     int   len  = WideCharToMultiByte (CP_UTF8, 0, wdir, -1, NULL, 0, NULL, NULL);

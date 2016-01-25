@@ -143,6 +143,14 @@ void printEvent(const DBEventEIT& event, const QString& name)
     printf("SubtitleType   %s\n",  getSubtitleType(event.subtitleType).toLocal8Bit().constData());
     printf("Audio props    %s\n",  getAudioProps(event.audioProps).toLocal8Bit().constData());
     printf("Video props    %s\n",  getVideoProps(event.videoProps).toLocal8Bit().constData());
+    if (event.credits && !event.credits->empty())
+    {
+        printf("Credits      %3zu\n", event.credits->size());
+    }
+    if (!event.items.isEmpty())
+    {
+        printf("Items        %3d\n", event.items.count());
+    }
     printf("\n");
 }
 
@@ -343,7 +351,7 @@ void TestEITFixups::testUKFixups9()
     QCOMPARE(event9.description, QString("Includes sport and weather"));
 }
 
-DBEventEIT *TestEITFixups::SimpleDBEventEIT (uint fixup, QString title, QString subtitle, QString description)
+DBEventEIT *TestEITFixups::SimpleDBEventEIT (FixupValue fixup, QString title, QString subtitle, QString description)
 {
     DBEventEIT *event = new DBEventEIT (1, // channel id
                                        title, // title
@@ -433,7 +441,22 @@ void TestEITFixups::testDEPro7Sat1()
     QCOMPARE(event6->subtitle, QString("Drei Kleintiere durchschneiden (1)"));
     QCOMPARE(event6->airdate,  (unsigned short) 2014);
 
-
+    /* #12151 */
+    DBEventEIT *event7 = SimpleDBEventEIT (EITFixUp::kFixP7S1,
+                                           "Criminal Minds",
+                                           "<episode title>, Crime-Serie, USA 2011",
+                                           "<plot summary>\n\n"
+                                           "Regie: Frau Regisseur\n"
+                                           "Drehbuch: Lieschen Mueller, Frau Meier\n\n"
+                                           "Darsteller:\n"
+                                           "Herr Schauspieler (in einer (kleinen) Rolle)\n"
+                                           "Frau Schauspielerin (in einer Rolle)");
+    PRINT_EVENT(*event7);
+    fixup.Fix(*event7);
+    PRINT_EVENT(*event7);
+    QCOMPARE(event7->subtitle, QString("<episode title>"));
+    QCOMPARE(event7->airdate,  (unsigned short) 2011);
+    QCOMPARE(event7->description, QString("<plot summary>"));
 }
 
 void TestEITFixups::testHTMLFixup()
@@ -471,6 +494,22 @@ void TestEITFixups::testHTMLFixup()
     fixup.Fix(event2);
     PRINT_EVENT(event2);
     QCOMPARE(event2.title,       QString("Redneck Island"));
+
+    DBEventEIT event3(14101,
+                      "New: Jericho",
+                      "Drama set in 1870s Yorkshire. In her desperation to protect her son, Annie unwittingly opens the door for Bamford the railway detective, who has returned to Jericho. [AD,S]",
+                      QDateTime::fromString("2015-02-28T19:40:00Z", Qt::ISODate),
+                      QDateTime::fromString("2015-02-28T20:00:00Z", Qt::ISODate),
+                      EITFixUp::kFixHTML | EITFixUp::kFixUK,
+                      SUB_UNKNOWN,
+                      AUD_STEREO,
+                      VID_UNKNOWN);
+
+    fixup.Fix(event3);
+    PRINT_EVENT(event3);
+    QCOMPARE(event3.title,       QString("Jericho"));
+    QCOMPARE(event3.description, QString("Drama set in 1870s Yorkshire. In her desperation to protect her son, Annie unwittingly opens the door for Bamford the railway detective, who has returned to Jericho."));
+
 }
 
 void TestEITFixups::testSkyEpisodes()
@@ -514,6 +553,36 @@ void TestEITFixups::testSkyEpisodes()
     QCOMPARE(event3->description, QString("Ab 12 Jahren"));
     QCOMPARE(event3->season,  0u);
     QCOMPARE(event3->episode, 0u);
+}
+
+void TestEITFixups::testUnitymedia()
+{
+    EITFixUp fixup;
+
+    DBEventEIT *event = SimpleDBEventEIT (EITFixUp::kFixUnitymedia,
+                                         "Titel",
+                                         "Beschreib",
+                                         "Beschreibung ... IMDb Rating: 8.9 /10");
+    QMap<QString,QString> cast;
+    cast.insertMulti ("Role Player", "Great Actor");
+    cast.insertMulti ("Role Player", "Other Actor");
+    cast.insertMulti ("Director", "Great Director");
+    cast.insertMulti ("Unhandled", "lets fix it up");
+    event->items = cast;
+
+    QVERIFY(!event->HasCredits());
+    QCOMPARE(event->items.count(), 4);
+
+    PRINT_EVENT(*event);
+    fixup.Fix(*event);
+    PRINT_EVENT(*event);
+
+    QVERIFY(event->HasCredits());
+    QCOMPARE(event->credits->size(), (size_t)3);
+    QVERIFY(event->subtitle.isEmpty());
+    QCOMPARE(event->description, QString("Beschreibung ..."));
+    QCOMPARE(event->stars, 0.89f);
+    QCOMPARE(event->items.count(), 1);
 }
 
 QTEST_APPLESS_MAIN(TestEITFixups)

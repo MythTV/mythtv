@@ -823,20 +823,30 @@ ChannelBase *ChannelBase::CreateChannel(
         channel = new CetonChannel(tvrec, genOpt.videodev);
 #endif
     }
+    else if (genOpt.inputtype == "V4L2ENC")
+    {
+#ifdef USING_V4L2
+        channel = new V4LChannel(tvrec, genOpt.videodev);
+#endif
+        if (genOpt.inputtype == "MPEG")
+            rbFileExt = "mpg";
+    }
     else if (CardUtil::IsV4L(genOpt.inputtype))
     {
 #ifdef USING_V4L2
         channel = new V4LChannel(tvrec, genOpt.videodev);
 #endif
-        if ((genOpt.inputtype != "MPEG") && (genOpt.inputtype != "HDPVR"))
-            rbFileExt = "nuv";
-        else
-            rbFileExt = "mpg";
+        if (genOpt.inputtype != "HDPVR")
+        {
+            if (genOpt.inputtype != "MPEG")
+                rbFileExt = "nuv";
+            else
+                rbFileExt = "mpg";
+        }
     }
     else if (genOpt.inputtype == "EXTERNAL")
     {
         channel = new ExternalChannel(tvrec, genOpt.videodev);
-        rbFileExt = "mpg";
     }
 
     if (!channel)

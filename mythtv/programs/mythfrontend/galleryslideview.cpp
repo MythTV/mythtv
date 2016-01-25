@@ -591,8 +591,12 @@ void GallerySlideView::SlideAvailable(int count)
 
     int direction = next.GetDirection();
 
-    // Use special transition for updates/start-up
-    Transition &transition = (direction == 0) ? m_updateTransition : m_transition;
+    // Use instant transition for start-up & updates (dir = 0)
+    // and browsing with transitions turned off
+    Transition &transition =
+            (direction != 0 &&
+             (m_playing || gCoreContext->GetNumSetting("GalleryBrowseTransition", 0)))
+            ? m_transition : m_updateTransition;
 
     // Reset any zoom before starting transition
     Zoom();

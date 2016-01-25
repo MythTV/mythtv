@@ -3,17 +3,10 @@
 
     <button>
         <type>IMAGES</type>
-        <text>Image Gallery</text>
-        <description>Look at Pictures</description>
+        <text>Old Gallery</text>
         <action>PLUGIN mythgallery</action>
+        <description>Look at pictures (deprecated plugin)</description>
         <depends>mythgallery</depends>
-    </button>
-
-    <button>
-        <type>IMAGES</type>
-        <text>New Image Gallery</text>
-        <description>Look at Pictures</description>
-        <action>JUMP Gallery Default</action>
     </button>
 
     <button>

@@ -14,8 +14,8 @@ InteractiveScreen::~InteractiveScreen(void)
 
 void InteractiveScreen::Close(void)
 {
-    if (m_player && m_player->GetVideoOutput())
-        m_player->GetVideoOutput()->SetVideoResize(QRect());
+    if (m_player)
+        m_player->SetVideoResize(QRect());
 }
 
 void InteractiveScreen::UpdateArea(void)

@@ -37,7 +37,7 @@ protected:
 };
 
 
-class MBASE_PUBLIC HTTPReader : public QObject
+class MTV_PUBLIC HTTPReader : public QObject
 {
     Q_OBJECT
 

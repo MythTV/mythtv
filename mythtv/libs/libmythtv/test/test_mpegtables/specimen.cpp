@@ -2,7 +2,7 @@
 
 /**
  * source: german DVB-C Unitymedia (Liberty Global)
- * has IMDb Rating at the end of the synopsis " IMDb Rating: 8.9 /10" (1.0 to 10.0) (gone by now)
+ * has IMDb Rating at the end of the synopsis " IMDb Rating: 8.9 /10" (1.0 to 10.0)
  * has genre at the beginning of the short/long synopsis "Krimiserie. "
  * has short synopsis (subtitle) containing the first part of the long synopsis
  * has items (key/value set) with item "Role Player" for cast and "Director" for the director

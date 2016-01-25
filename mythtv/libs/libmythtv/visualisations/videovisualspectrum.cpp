@@ -84,10 +84,15 @@ void VideoVisualSpectrum::Draw(const QRect &area, MythPainter *painter,
     for (int l = 0, r = m_scale.range(); l < m_scale.range(); l++, r++)
     {
         int index = m_scale[l];
-        magL = (log(sq(real(lout[index])) + sq(real(lout[FFTW_N - index]))) - 22.0) *
-               m_scaleFactor;
-        magR = (log(sq(real(rout[index])) + sq(real(rout[FFTW_N - index]))) - 22.0) *
-               m_scaleFactor;
+
+        // The 1D output is Hermitian symmetric (Yk = Yn-k) so Yn = Y0 etc.
+        // The dft_r2c_1d plan doesn't output these redundant values
+        // and furthermore they're not allocated in the ctor
+        tmp = 2 * sq(real(lout[index]));
+        magL = (tmp > 1.) ? (log(tmp) - 22.0) * m_scaleFactor : 0.;
+
+        tmp = 2 * sq(real(rout[index]));
+        magR = (tmp > 1.) ? (log(tmp) - 22.0) * m_scaleFactor : 0.;
 
         if (magL > m_range)
             magL = 1.0;

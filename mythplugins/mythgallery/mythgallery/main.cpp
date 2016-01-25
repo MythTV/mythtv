@@ -21,7 +21,12 @@
 #include "dbcheck.h"
 
 #ifdef DCRAW_SUPPORT
-Q_IMPORT_PLUGIN(dcrawplugin)
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+    // Qt5 imports class name
+    Q_IMPORT_PLUGIN(DcrawPlugin)
+#else
+    Q_IMPORT_PLUGIN(dcrawplugin)
+#endif // QT_VERSION
 #endif // DCRAW_SUPPORT
 void runRandomSlideshow(void);
 
@@ -96,9 +101,13 @@ static void setupKeys(void)
     REG_KEY("Gallery", "END", QT_TRANSLATE_NOOP("MythControls",
         "Go to the last image in thumbnail view"), "End");
     REG_KEY("Gallery", "SLIDESHOW", QT_TRANSLATE_NOOP("MythControls",
-        "Start Slideshow in thumbnail view"), "S");
+        "Start slideshow in thumbnail view"), "S");
     REG_KEY("Gallery", "RANDOMSHOW", QT_TRANSLATE_NOOP("MythControls",
-        "Start Random Slideshow in thumbnail view"), "R");
+        "Start random slideshow in thumbnail view"), "R");
+#ifdef EXIF_SUPPORT
+    REG_KEY("Gallery", "SEASONALSHOW", QT_TRANSLATE_NOOP("MythControls",
+        "Start random slideshow with seasonal theme in thumbnail view"), "");
+#endif // EXIF_SUPPORT
 
     REG_KEY("Gallery", "ROTRIGHT", QT_TRANSLATE_NOOP("MythControls",
         "Rotate image right 90 degrees"), "],3");

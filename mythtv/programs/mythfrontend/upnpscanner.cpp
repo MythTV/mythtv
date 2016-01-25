@@ -571,6 +571,7 @@ void UPNPScanner::CheckStatus(void)
     while (it.hasNext())
     {
         it.next();
+        // FIXME UPNP version comparision done wrong, we are using urn:schemas-upnp-org:device:MediaServer:4 ourselves
         if (!SSDP::Find("urn:schemas-upnp-org:device:MediaServer:1", it.key()))
         {
             LOG(VB_UPNP, LOG_INFO, LOC +
@@ -713,6 +714,7 @@ void UPNPScanner::customEvent(QEvent *event)
     QString    uri = me->ExtraDataCount() > 0 ? me->ExtraData(0) : QString();
     QString    usn = me->ExtraDataCount() > 1 ? me->ExtraData(1) : QString();
 
+    // FIXME UPNP version comparision done wrong, we are using urn:schemas-upnp-org:device:MediaServer:4 ourselves
     if (uri == "urn:schemas-upnp-org:device:MediaServer:1")
     {
         QString url = (ev == "SSDP_ADD") ? me->ExtraData(2) : QString();
@@ -1386,6 +1388,7 @@ void UPNPScanner::ParseService(QDomElement &element, QString &controlURL,
         if (!e.isNull())
         {
             if (e.tagName() == "serviceType")
+                // FIXME UPNP version comparision done wrong, we are using urn:schemas-upnp-org:device:MediaServer:4 ourselves
                 iscds = (e.text() == "urn:schemas-upnp-org:service:ContentDirectory:1");
             if (e.tagName() == "controlURL")
                 control_url = e.text();

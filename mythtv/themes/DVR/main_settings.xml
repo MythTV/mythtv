@@ -84,8 +84,8 @@
     <!-- Keep this in sync with mythtv/themes/defaultmenu/media_settings.xml -->
     <button>
         <type>SETTINGS_IMAGES</type>
-        <text>Images Settings</text>
-        <description>Configure display of image gallery</description>
+        <text>Old Gallery Settings</text>
+        <description>Configure display of images (deprecated plugin)</description>
         <action>CONFIGPLUGIN mythgallery</action>
         <depends>mythgallery</depends>
     </button>

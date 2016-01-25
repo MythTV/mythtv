@@ -72,6 +72,10 @@ typedef QMap<uint,EventIDToATSCEvent>      ATSCSRCToEvents;
 typedef QMap<uint,EventIDToETT>            ATSCSRCToETTs;
 typedef QMap<unsigned long long,uint>      ServiceToChanID;
 
+typedef uint64_t                           FixupKey;
+typedef uint64_t                           FixupValue;
+typedef QMap<FixupKey, FixupValue>         FixupMap;
+
 class DBEventEIT;
 class EITFixUp;
 class EITCache;
@@ -95,7 +99,7 @@ class EITHelper
 
     void SetChannelID(uint _channelid);
     void SetGPSOffset(uint _gps_offset) { gps_offset = 0 - _gps_offset; }
-    void SetFixup(uint atsc_major, uint atsc_minor, uint eitfixup);
+    void SetFixup(uint atsc_major, uint atsc_minor, FixupValue eitfixup);
     void SetLanguagePreferences(const QStringList &langPref);
     void SetSourceID(uint _sourceid);
     void RescheduleRecordings(void);
@@ -145,7 +149,7 @@ class EITHelper
     QDateTime               maxStarttime;        ///< latest starttime of changed events
     bool                    seenEITother;        ///< if false we only reschedule the active mplex
 
-    QMap<uint64_t,uint>     fixup;
+    FixupMap fixup;
     ATSCSRCToEvents         incomplete_events;
     ATSCSRCToETTs           unmatched_etts;
 

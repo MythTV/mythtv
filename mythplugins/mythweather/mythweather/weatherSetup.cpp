@@ -102,16 +102,8 @@ ScreenSetup::ScreenSetup(MythScreenStack *parent, const QString &name,
 ScreenSetup::~ScreenSetup()
 {
     if (m_createdSrcMan)
-    {
-        if (m_sourceManager)
-            delete m_sourceManager;
-    }
-    else
-    {
-        m_sourceManager->clearSources();
-        m_sourceManager->findScriptsDB();
-        m_sourceManager->setupSources();
-    }
+        delete m_sourceManager;
+    m_sourceManager = NULL;
 
     // Deallocate the ScreenListInfo objects created for the inactive screen list.
     for (int i=0; i < m_inactiveList->GetCount(); i++)

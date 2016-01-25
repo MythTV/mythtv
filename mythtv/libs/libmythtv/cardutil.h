@@ -42,6 +42,8 @@ typedef enum
 class MTV_PUBLIC CardUtil
 {
   public:
+    using InputTypes = QMap<QString, QString>;
+
     /// \brief all the different inputs
     enum INPUT_TYPES
     {
@@ -66,6 +68,7 @@ class MTV_PUBLIC CardUtil
         EXTERNAL  = 18,
         VBOX      = 19,
         DVBT2     = 20,
+        V4L2ENC   = 21,
     };
 
     static enum INPUT_TYPES toInputType(const QString &name)
@@ -112,6 +115,8 @@ class MTV_PUBLIC CardUtil
             return VBOX;
         if ("DVB_T2" == name)
             return DVBT2;
+        if ("V4L2ENC" == name)
+            return V4L2ENC;
         return ERROR_UNKNOWN;
     }
 
@@ -129,7 +134,7 @@ class MTV_PUBLIC CardUtil
     {
         return (rawtype == "V4L"   || rawtype == "MPEG"      ||
                 rawtype == "HDPVR" || rawtype == "GO7007"    ||
-                rawtype == "MJPEG");
+                rawtype == "MJPEG" || rawtype == "V4L2ENC");
     }
 
     static bool         IsChannelChangeDiscontinuous(const QString &rawtype)
@@ -160,9 +165,11 @@ class MTV_PUBLIC CardUtil
         return
             (rawtype == "DVB")       || (rawtype == "HDHOMERUN") ||
             (rawtype == "ASI")       || (rawtype == "FREEBOX")   ||
-            (rawtype == "CETON")     || (rawtype == "EXTERNAL");
+            (rawtype == "CETON")     || (rawtype == "EXTERNAL")  ||
+            (rawtype == "V4L2ENC");
     }
 
+    static bool         HasTuner(const QString &rawtype, const QString & device);
     static bool         IsTunerShared(uint inputidA, uint inputidB);
 
     static bool         IsTuningDigital(const QString &rawtype)
@@ -176,14 +183,15 @@ class MTV_PUBLIC CardUtil
     static bool         IsTuningAnalog(const QString &rawtype)
     {
         return
-            (rawtype == "V4L")       || (rawtype == "MPEG");
+            (rawtype == "V4L")       || (rawtype == "V4L2ENC"    ||
+             rawtype == "MPEG");
     }
 
     static bool         IsTuningVirtual(const QString &rawtype)
     {
         return
             (rawtype == "FIREWIRE")  || (rawtype == "HDPVR") ||
-            (rawtype == "EXTERNAL");
+            (rawtype == "EXTERNAL")  || (rawtype == "V4L2ENC");
     }
 
     static bool         IsSingleInputType(const QString &rawtype)
@@ -254,7 +262,7 @@ class MTV_PUBLIC CardUtil
 
     static bool         IsInputTypePresent(const QString &rawtype,
                                            QString hostname = QString::null);
-    static QStringList  GetInputTypes(void); // input types on ALL hosts
+    static InputTypes   GetInputTypes(void); // input types on ALL hosts
 
     static QStringList  GetVideoDevices(const QString &rawtype,
                                         QString hostname = QString::null);
@@ -312,9 +320,10 @@ class MTV_PUBLIC CardUtil
 
     // Input Groups
     static uint         CreateInputGroup(const QString &name);
-    static uint         CreateDeviceInputGroup(const QString &host,
-                                               const QString &device)
-        { return CreateInputGroup(host + '|' + device); }
+    static uint         CreateDeviceInputGroup(uint inputid,
+                                               const QString &type,
+                                               const QString &host,
+                                               const QString &device);
     static uint         GetDeviceInputGroup(uint inputid);
     static bool         LinkInputGroup(uint inputid, uint inputgroupid);
     static bool         UnlinkInputGroup(uint inputid, uint inputgroupid);

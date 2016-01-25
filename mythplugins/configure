@@ -565,6 +565,7 @@ ECXXFLAGS=${ECXXFLAGS#ECXXFLAGS=}
 CXXPPFLAGS=$(cat mythconfig.mak | grep -e "^CXXPPFLAGS=")
 CXXPPFLAGS=${CXXPPFLAGS#CXXPPFLAGS=}
 OPENGLV=$(cat mythconfig.mak | grep -e "^CONFIG_OPENGL_VIDEO=yes")
+OPENGLES=$(cat mythconfig.mak | grep -e "^HAVE_GLES2_GL2_H=yes")
 
 EXTRALIBS=$(cat mythconfig.mak | grep -e "^EXTRALIBS=")
 EXTRALIBS=${EXTRALIBS#EXTRALIBS=}
@@ -595,6 +596,11 @@ fi
 
 # rely on what was discover during MythTV configure
 if enabled opengl && test "$OPENGLV" != "CONFIG_OPENGL_VIDEO=yes"; then
+    disable opengl
+fi
+
+# OpenGL is only used for mythgallery and must not be OpenGL ES!
+if enabled opengl && test "$OPENGLES" == "HAVE_GLES2_GL2_H=yes"; then
     disable opengl
 fi
 

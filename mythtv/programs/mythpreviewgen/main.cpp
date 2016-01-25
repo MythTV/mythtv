@@ -47,6 +47,7 @@ using namespace std;
 #include "mythsystemevent.h"
 #include "mythlogging.h"
 #include "signalhandling.h"
+#include "cleanupguard.h"
 
 #define LOC      QString("MythPreviewGen: ")
 #define LOC_WARN QString("MythPreviewGen, Warning: ")
@@ -67,24 +68,6 @@ namespace
         gContext = NULL;
         SignalHandler::Done();
     }
-
-    class CleanupGuard
-    {
-      public:
-        typedef void (*CleanupFunc)();
-
-      public:
-        CleanupGuard(CleanupFunc cleanFunction) :
-            m_cleanFunction(cleanFunction) {}
-
-        ~CleanupGuard()
-        {
-            m_cleanFunction();
-        }
-
-      private:
-        CleanupFunc m_cleanFunction;
-    };
 }
 
 int preview_helper(uint chanid, QDateTime starttime,

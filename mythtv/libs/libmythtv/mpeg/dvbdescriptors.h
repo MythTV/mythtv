@@ -1082,17 +1082,18 @@ class ExtendedEventDescriptor : public MPEGDescriptor
     //   item_length            8   1.0+p2
     //   for (j=0;j<N;j++) { item_char 8 }
     // }
+    QMap<QString,QString> Items(void) const;
     // text_length 8
-    uint TextLength(void)       const { return _data[7 + _data[6]]; }
+    uint TextLength(void)       const { return _data[7 + LengthOfItems()]; }
     // for (i=0; i<N; i++) { text_char 8 }
     QString Text(void) const
-        { return dvb_decode_text(&_data[8 + _data[6]], TextLength()); }
+        { return dvb_decode_text(&_data[8 + LengthOfItems()], TextLength()); }
 
     // HACK beg -- Pro7Sat is missing encoding
     QString Text(const unsigned char *encoding_override,
                  uint encoding_length) const
     {
-        return dvb_decode_text(&_data[8 + _data[6]], TextLength(),
+        return dvb_decode_text(&_data[8 + LengthOfItems()], TextLength(),
                                encoding_override, encoding_length);
     }
     // HACK end -- Pro7Sat is missing encoding

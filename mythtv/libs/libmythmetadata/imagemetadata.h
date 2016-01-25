@@ -12,6 +12,7 @@
 #include <QCoreApplication> // for tr()
 #include <QStringBuilder>
 #include <QStringList>
+#include <QDateTime>
 
 #include "mythmetaexp.h"
 
@@ -58,7 +59,7 @@ class META_PUBLIC Orientation
 {
     Q_DECLARE_TR_FUNCTIONS(Orientation)
 public:
-    explicit Orientation(int composite) 
+    explicit Orientation(int composite)
         : m_current(composite / 10), m_file(composite % 10) {}
     Orientation(int current, int file) : m_current(current), m_file(file) {}
 

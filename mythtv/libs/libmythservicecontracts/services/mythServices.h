@@ -23,6 +23,7 @@
 #include "datacontracts/logMessage.h"
 #include "datacontracts/logMessageList.h"
 #include <datacontracts/frontendList.h>
+#include "datacontracts/backendInfo.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -70,6 +71,7 @@ class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
             DTC::LogMessage         ::InitializeCustomTypes();
             DTC::LogMessageList     ::InitializeCustomTypes();
             DTC::FrontendList       ::InitializeCustomTypes();
+            DTC::BackendInfo        ::InitializeCustomTypes();
         }
 
     public slots:
@@ -169,6 +171,8 @@ class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
         virtual QString             ProfileUpdated      ( void ) = 0;
 
         virtual QString             ProfileText         ( void ) = 0;
+
+        virtual DTC::BackendInfo*   GetBackendInfo      ( void ) = 0;
 };
 
 #endif

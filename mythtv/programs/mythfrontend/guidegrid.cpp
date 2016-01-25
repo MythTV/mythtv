@@ -63,6 +63,7 @@ QWaitCondition epgIsVisibleCond;
 
 const QString kUnknownTitle = "";
 //const QString kUnknownCategory = QObject::tr("Unknown");
+const unsigned long kUpdateMS = 60 * 1000UL; // Grid update interval (mS)
 
 JumpToChannel::JumpToChannel(
     JumpToChannelListener *parent, const QString &start_entry,
@@ -402,11 +403,9 @@ public:
     static void Wait(GuideGrid *guide)
     {
         QMutexLocker locker(&s_lock);
-        if (!s_loading[guide])
-            return;
-        while (s_wait.wait(&s_lock))
+        while (s_loading[guide])
         {
-            if (!s_loading[guide])
+            if (!s_wait.wait(locker.mutex(), 15000UL))
                 return;
         }
     }
@@ -516,7 +515,7 @@ GuideGrid::GuideGrid(MythScreenStack *parent,
            m_embedVideo(embedVideo),
            m_previewVideoRefreshTimer(new QTimer(this)),
            m_channelOrdering(gCoreContext->GetSetting("ChannelOrdering", "channum")),
-           m_updateTimer(NULL),
+           m_updateTimer(new QTimer(this)),
            m_threadPool("GuideGridHelperPool"),
            m_changrpid(changrpid),
            m_changrplist(ChannelGroup::GetChannelGroups(false)),
@@ -533,6 +532,7 @@ GuideGrid::GuideGrid(MythScreenStack *parent,
 {
     connect(m_previewVideoRefreshTimer, SIGNAL(timeout()),
             this,                     SLOT(refreshVideo()));
+    connect(m_updateTimer, SIGNAL(timeout()), SLOT(updateTimeout()) );
 
     for (uint i = 0; i < MAX_DISPLAY_CHANS; i++)
         m_programs.push_back(NULL);
@@ -635,9 +635,7 @@ void GuideGrid::Init(void)
 
     fillProgramInfos(true);
 
-    m_updateTimer = new QTimer(this);
-    connect(m_updateTimer, SIGNAL(timeout()), SLOT(updateTimeout()) );
-    m_updateTimer->start(60 * 1000);
+    m_updateTimer->start(kUpdateMS);
 
     updateDateText();
 
@@ -651,6 +649,9 @@ void GuideGrid::Init(void)
 
 GuideGrid::~GuideGrid()
 {
+    m_updateTimer->disconnect(this);
+    m_updateTimer = NULL;
+
     GuideHelper::Wait(this);
 
     gCoreContext->removeListener(this);
@@ -663,12 +664,6 @@ GuideGrid::~GuideGrid()
     }
 
     m_channelInfos.clear();
-
-    if (m_updateTimer)
-    {
-        m_updateTimer->disconnect(this);
-        m_updateTimer = NULL;
-    }
 
     if (m_previewVideoRefreshTimer)
     {
@@ -1370,7 +1365,7 @@ void GuideGrid::updateTimeout(void)
 {
     m_updateTimer->stop();
     fillProgramInfos();
-    m_updateTimer->start((int)(60 * 1000));
+    m_updateTimer->start(kUpdateMS);
 }
 
 void GuideGrid::fillChannelInfos(bool gotostartchannel)
@@ -1626,6 +1621,9 @@ void GuideGrid::fillProgramRowInfos(int firstRow, bool useExistingData)
             m_guideGrid->ResetRow(i);
         }
     }
+
+    m_channelList->SetItemCurrent(m_currentRow);
+
     GuideStatus gs(firstRow, chanNums.size(), chanNums, m_channelInfos.size(),
                    m_guideGrid->GetArea(), m_guideGrid->getChannelCount(),
                    m_currentStartTime, m_currentEndTime, m_currentStartChannel,
@@ -1879,6 +1877,7 @@ void GuideGrid::customEvent(QEvent *event)
 
         if (message == "SCHEDULE_CHANGE")
         {
+            GuideHelper::Wait(this);
             LoadFromScheduler(m_recList);
             fillProgramInfos();
         }
@@ -2183,6 +2182,7 @@ void GuideGrid::updateChannelsUI(const QVector<ChannelInfo *> &chinfos,
             }
         }
     }
+    m_channelList->SetItemCurrent(m_currentRow);
 }
 
 void GuideGrid::updateInfo(void)
@@ -2537,8 +2537,7 @@ void GuideGrid::enter()
     if (!m_player)
         return;
 
-    if (m_updateTimer)
-        m_updateTimer->stop();
+    m_updateTimer->stop();
 
     channelUpdate();
 
@@ -2555,8 +2554,7 @@ void GuideGrid::Close()
     if (GetMythMainWindow()->GetStack("popup stack")->TotalScreens() > 0)
         return;
 
-    if (m_updateTimer)
-        m_updateTimer->stop();
+    m_updateTimer->stop();
 
     // don't fade the screen if we are returning to the player
     if (m_player)

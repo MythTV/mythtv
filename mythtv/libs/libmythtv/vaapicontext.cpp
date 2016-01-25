@@ -48,12 +48,18 @@ QString profileToString(VAProfile profile)
     if (VAProfileVC1Main == profile)                    return "VC1Main";
     if (VAProfileVC1Advanced == profile)                return "VC1Advanced";
     if (VAProfileH263Baseline == profile)               return "H263Base";
+
 #if VA_CHECK_VERSION(0,34,0)
     if (VAProfileNone == profile)                       return "None";
 #endif
 #if VA_CHECK_VERSION(0,36,0)
     if (VAProfileH264StereoHigh == profile)             return "H264StereoHigh";
 #endif
+#if VA_CHECK_VERSION(0,38,0)
+    if (VAProfileHEVCMain == profile)                   return "HEVCMain";
+    if (VAProfileHEVCMain10 == profile)                 return "HEVCMain10";
+#endif
+
     return "Unknown";
 }
 
@@ -79,7 +85,10 @@ VAProfile preferredProfile(MythCodecID codec)
     if (kCodec_VC1_VAAPI   == codec) return VAProfileVC1Advanced;
     if (kCodec_WMV3_VAAPI  == codec) return VAProfileVC1Main;
     if (kCodec_MPEG2_VAAPI == codec) return VAProfileMPEG2Main;
-    if (kCodec_MPEG1_VAAPI == codec) return VAProfileMPEG2Main;
+#if VA_CHECK_VERSION(0,38,0)
+    if (kCodec_HEVC_VAAPI  == codec) return VAProfileHEVCMain;
+#endif
+    // NB Ffmpeg 1.2.2 doesn't support MPEG1 with VAAPI pix_fmts
     return VAProfileMPEG2Simple; // error
 }
 

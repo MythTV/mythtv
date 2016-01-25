@@ -846,7 +846,7 @@ bool ExternalStreamHandler::StartStreaming(bool flush_buffer)
 
     if (flush_buffer && m_replay)
     {
-        /* If the input is not a 'broadcast' it may only one have
+        /* If the input is not a 'broadcast' it may only have one
          * copy of the SPS right at the beginning of the stream,
          * so make sure we don't miss it!
          */

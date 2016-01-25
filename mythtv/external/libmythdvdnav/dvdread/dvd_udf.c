@@ -794,7 +794,7 @@ static int UDFFindPartition( dvd_reader_t *device, int partnum,
   return part->valid;
 }
 
-uint32_t UDFFindFile( dvd_reader_t *device, char *filename,
+uint32_t UDFFindFile( dvd_reader_t *device, const char *filename,
                       uint32_t *filesize )
 {
   uint8_t LogBlock_base[ DVD_VIDEO_LB_LEN + 2048 ];

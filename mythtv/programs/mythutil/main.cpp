@@ -16,6 +16,7 @@
 #include "mythutil.h"
 #include "commandlineparser.h"
 #include "backendutils.h"
+#include "eitutils.h"
 #include "fileutils.h"
 #include "mpegutils.h"
 #include "jobutils.h"
@@ -102,6 +103,7 @@ int main(int argc, char *argv[])
     UtilMap utilMap;
 
     registerBackendUtils(utilMap);
+    registerEITUtils(utilMap);
     registerFileUtils(utilMap);
     registerMPEGUtils(utilMap);
     registerJobUtils(utilMap);

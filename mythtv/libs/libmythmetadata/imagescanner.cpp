@@ -248,7 +248,7 @@ void ImageScanThread<DBFS>::SyncSubTree(const QFileInfo &dirInfo, int parentId,
                                   int devId, const QString &base)
 {
     // Ignore excluded dirs
-    if (m_exclusions.match(dirInfo.fileName()).hasMatch())
+    if (MATCHES(m_exclusions, dirInfo.fileName()))
     {
         LOG(VB_FILE, LOG_INFO,
             QString("Excluding dir %1").arg(dirInfo.absoluteFilePath()));
@@ -440,6 +440,14 @@ template <class DBFS>
 void ImageScanThread<DBFS>::SyncFile(const QFileInfo &fileInfo, int devId,
                                const QString &base, int parentId)
 {
+    // Ignore excluded files
+    if (MATCHES(m_exclusions, fileInfo.fileName()))
+    {
+        LOG(VB_FILE, LOG_INFO,
+            QString("Excluding file %1").arg(fileInfo.absoluteFilePath()));
+        return;
+    }
+
     QString absFilePath = fileInfo.absoluteFilePath();
 
     ImagePtr im(m_dbfs.CreateItem(fileInfo, parentId, devId, base));
@@ -531,11 +539,14 @@ void ImageScanThread<DBFS>::CountTree(QDir &dir)
 
     foreach(const QFileInfo &fileInfo, files)
     {
+        // Ignore excluded dirs/files
+        if (MATCHES(m_exclusions, fileInfo.fileName()))
+            continue;
+
         if (fileInfo.isFile())
             ++m_progressTotalCount;
-        // Ignore excluded dirs and missing dirs
-        else if (!m_exclusions.match(fileInfo.fileName()).hasMatch()
-                 && dir.cd(fileInfo.fileName()))
+        // Ignore missing dirs
+        else if (dir.cd(fileInfo.fileName()))
         {
             CountTree(dir);
             dir.cdUp();
@@ -561,7 +572,7 @@ void ImageScanThread<DBFS>::CountFiles(const QStringList &paths)
     excPattern.replace(",", "|");   // Convert list to OR's
 
     QString pattern = QString("^(%1)$").arg(excPattern);
-    m_exclusions = QRegularExpression(pattern);
+    m_exclusions = REGEXP(pattern);
 
     LOG(VB_FILE, LOG_DEBUG, QString("Exclude regexp is \"%1\"").arg(pattern));
 

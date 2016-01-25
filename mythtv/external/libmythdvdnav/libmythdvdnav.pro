@@ -31,6 +31,18 @@ INCLUDEPATH += $$POSTINC
 # for -ldl
 LIBS += $$EXTRA_LIBS
 
+# The version numbers here should match the ones defined in libdvdread's 'configure.ac'
+dvdread_major = 5
+dvdread_minor = 90
+dvdread_micro = 0
+dvdread_version = $$dvdread_major"."$$dvdread_minor"."$$dvdread_micro
+
+DEFINES += DVDREAD_VERSION_MAJOR=$$dvdread_major
+DEFINES += DVDREAD_VERSION_MINOR=$$dvdread_minor
+DEFINES += DVDREAD_VERSION_MICRO=$$dvdread_micro
+DEFINES += DVDREAD_VERSION=$$dvdread_version
+DEFINES += DVDREAD_VERSION_STRING=\\\"$$dvdread_version\\\"
+
 DEFINES += HAVE_AV_CONFIG_H
 
 # DEFINES += LOG_DEBUG TRACE
@@ -40,6 +52,8 @@ QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 # dvdnav
 HEADERS += dvdnav/dvdnav_internal.h dvdnav/read_cache.h \
     dvdnav/vm/vm_serialize.h
+HEADERS += dvdnav/dvdnav/dvd_types.h dvdnav/dvdnav/dvdnav.h \
+    dvdnav/dvdnav/dvdnav_events.h
 HEADERS += dvdnav/vm/decoder.h dvdnav/vm/vm.h dvdnav/vm/vmcmd.h \
     dvdnav/vm/getset.h dvdnav/vm/play.h
 

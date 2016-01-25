@@ -3,11 +3,14 @@
 
 #include <cstring> // memset
 
-#include <IL/OMX_Component.h>
-#include <IL/OMX_Image.h>
-#include <IL/OMX_Video.h>
+#include <OMX_Component.h>
+#include <OMX_Image.h>
+#include <OMX_Video.h>
 #ifdef USING_BROADCOM
-#include <IL/OMX_Broadcom.h>
+#include <OMX_Broadcom.h>
+#endif
+#ifdef USING_BELLAGIO
+#include <bellagio/omxcore.h>
 #endif
 
 #include <QString>
@@ -23,7 +26,7 @@ class OMXComponentAbstractCB;
 
 class MPUBLIC OMXComponent
 {
-    friend OMXComponentCtx;
+    friend class OMXComponentCtx;
 
     // No copying
     OMXComponent(OMXComponent&);
@@ -149,12 +152,24 @@ class MPUBLIC OMXComponentCB : public OMXComponentAbstractCB
 
 namespace omxcontext {
 
+#ifndef OMX_VERSION
+// For Bellagio.  Assume little endian architecture
+#define OMX_VERSION (((SPECSTEP)<<24) | ((SPECREVISION)<<16) | ((SPECVERSIONMINOR)<<8) | (SPECVERSIONMAJOR))
+#endif
+
 // Initialize an OpenMAX struct
 template<typename T> inline void OMX_DATA_INIT(T &s)
 {
     std::memset(&s, 0, sizeof s);
     s.nSize = sizeof s;
+#ifdef OMX_VERSION
     s.nVersion.nVersion = OMX_VERSION;
+#else
+    s.nVersion.s.nVersionMajor = SPECVERSIONMAJOR;
+    s.nVersion.s.nVersionMinor = SPECVERSIONMINOR;
+    s.nVersion.s.nRevision = SPECREVISION;
+    s.nVersion.s.nStep = SPECSTEP;
+#endif
 }
 
 /*

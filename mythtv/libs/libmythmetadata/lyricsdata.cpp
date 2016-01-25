@@ -115,8 +115,7 @@ void LyricsData::findLyrics(const QString &grabber)
               << album
               << title;
 
-   LOG(VB_GENERAL, LOG_ERR,
-            QString("LyricsData:: Sending command %1").arg(slist.join('~')));
+   LOG(VB_NETWORK, LOG_INFO, QString("LyricsData:: Sending command %1").arg(slist.join('~')));
 
    gCoreContext->SendReceiveStringList(slist);
 }
@@ -272,7 +271,43 @@ void LyricsData::loadLyrics(const QString &xmlData)
         QDomNode lyricNode = itemList.at(x);
         QString lyric = lyricNode.toElement().text();
 
-        lyrics.append(lyric);
+        if (m_syncronized)
+        {
+            QStringList times;
+            int lastind = 0;
+            while (lyric.indexOf(QRegExp("\\[\\d\\d:\\d\\d\\]"),
+                                 lastind) == lastind ||
+                   lyric.indexOf(QRegExp("\\[\\d\\d:\\d\\d\\.\\d\\d\\]"),
+                                 lastind) == lastind)
+            {
+                if (lyric[lastind+6] == '.')
+                {
+                    times.append(lyric.mid(lastind,10));
+                    lastind += 10;
+                }
+                else
+                {
+                    // short version
+                    times.append(lyric.mid(lastind,7));
+                    lastind += 7;
+                }
+            }
+            if (!times.isEmpty())
+            {
+                for (int x = 0; x < times.count(); x++)
+                {
+                    lyrics.append(times.at(x) + lyric.mid(lastind));
+                }
+            }
+            else
+            {
+                lyrics.append(lyric);
+            }
+        }
+        else
+        {
+            lyrics.append(lyric);
+        }
     }
 
     setLyrics(lyrics);
@@ -285,6 +320,7 @@ void LyricsData::setLyrics(const QStringList &lyrics)
     clearLyrics();
 
     int lastTime = -1;
+    int offset = 0;  // offset in milliseconds
 
     for (int x = 0; x < lyrics.count(); x++)
     {
@@ -292,18 +328,41 @@ void LyricsData::setLyrics(const QStringList &lyrics)
 
         LyricsLine *line = new LyricsLine;
 
+        if (lyric.startsWith("[offset:"))
+        {
+            offset = lyric.mid(8,lyric.indexOf("]", 8)-8).toInt();
+        }
+
         if (m_syncronized)
         {
             if (!lyric.isEmpty())
             {
-                // does the line start with a time code like [12:34.56]
-                if (lyric.indexOf(QRegExp("\\[\\d\\d:\\d\\d\\.\\d\\d\\]"), 0) == 0)
+                // does the line start with a time code like [12:34] or [12:34.56]
+                if (lyric.indexOf(QRegExp("\\[\\d\\d:\\d\\d\\]"), 0) == 0 ||
+                    lyric.indexOf(QRegExp("\\[\\d\\d:\\d\\d\\.\\d\\d\\]"), 0) == 0)
                 {
                     int minutes = lyric.mid(1, 2).toInt();
                     int seconds = lyric.mid(4, 2).toInt();
-                    int hundredths = lyric.mid(7, 2).toInt();
+                    int hundredths = 0;
+                    if (lyric[6] == '.')
+                    {
+                        hundredths = lyric.mid(7, 2).toInt();
+                        line->Lyric = lyric.mid(10);
+                    }
+                    else
+                    {
+                        line->Lyric = lyric.mid(7);
+                    }
                     line->Time = (minutes * 60 * 1000) + (seconds * 1000) + (hundredths * 10);
-                    line->Lyric = lyric.mid(10);
+                    if (offset > 0)
+                    {
+                        if (offset > line->Time) line->Time = 0;
+                        else line->Time -= offset;
+                    }
+                    else
+                    {
+                        line->Time -= offset;
+                    }
                     lastTime = line->Time;
                 }
                 else
@@ -318,9 +377,9 @@ void LyricsData::setLyrics(const QStringList &lyrics)
             // synthesize a time code from the track length and the number of lyrics lines
             if (m_parent && !m_parent->isRadio())
             {
-                line->Time = (m_parent->Length() / lyrics.count()) * x ;
+                line->Time = (m_parent->Length() / lyrics.count()) * x;
                 line->Lyric = lyric;
-                lastTime = line->Time; 
+                lastTime = line->Time;
             }
             else
             {
@@ -332,7 +391,9 @@ void LyricsData::setLyrics(const QStringList &lyrics)
         // ignore anything that is not a lyric
         if (line->Lyric.startsWith("[ti:") || line->Lyric.startsWith("[al:") || 
             line->Lyric.startsWith("[ar:") || line->Lyric.startsWith("[by:") ||
-            line->Lyric.startsWith("[url:") || line->Lyric.startsWith("[offset:"))
+            line->Lyric.startsWith("[url:") || line->Lyric.startsWith("[offset:") ||
+            line->Lyric.startsWith("[id:") || line->Lyric.startsWith("[length:") ||
+            line->Lyric.startsWith("[au:") || line->Lyric.startsWith("[la:"))
         {
             delete line;
             continue;

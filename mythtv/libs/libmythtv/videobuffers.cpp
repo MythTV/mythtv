@@ -815,7 +815,7 @@ void VideoBuffers::DeleteBuffers()
     allocated_arrays.clear();
 }
 
-static unsigned long long to_bitmap(const frame_queue_t& list);
+static unsigned long long to_bitmap(const frame_queue_t& list, int);
 QString VideoBuffers::GetStatus(int n) const
 {
     if (n <= 0)
@@ -824,13 +824,14 @@ QString VideoBuffers::GetStatus(int n) const
     QString str("");
     if (global_lock.tryLock())
     {
-        unsigned long long a = to_bitmap(available);
-        unsigned long long u = to_bitmap(used);
-        unsigned long long d = to_bitmap(displayed);
-        unsigned long long l = to_bitmap(limbo);
-        unsigned long long p = to_bitmap(pause);
-        unsigned long long f = to_bitmap(finished);
-        unsigned long long x = to_bitmap(decode);
+        int m = Size();
+        unsigned long long a = to_bitmap(available, m);
+        unsigned long long u = to_bitmap(used, m);
+        unsigned long long d = to_bitmap(displayed, m);
+        unsigned long long l = to_bitmap(limbo, m);
+        unsigned long long p = to_bitmap(pause, m);
+        unsigned long long f = to_bitmap(finished, m);
+        unsigned long long x = to_bitmap(decode, m);
         for (uint i=0; i<(uint)n; i++)
         {
             unsigned long long mask = 1ull<<i;
@@ -909,19 +910,17 @@ static int DebugNum(const VideoFrame *frame)
 {
     map<const VideoFrame *, int>::iterator it = dbg_str.find(frame);
     if (it == dbg_str.end())
-    {
-        dbg_str[frame] = next_dbg_str;
-        next_dbg_str = (next_dbg_str+1) % DBG_STR_ARR_SIZE;
-    }
-    return dbg_str[frame];
+        return dbg_str[frame] = next_dbg_str++;
+
+    return it->second;
 }
 
 const QString& DebugString(const VideoFrame *frame, bool short_str)
 {
     if (short_str)
-        return dbg_str_arr_short[DebugNum(frame)];
+        return dbg_str_arr_short[DebugNum(frame) % DBG_STR_ARR_SIZE];
     else
-        return dbg_str_arr[DebugNum(frame)];
+        return dbg_str_arr[DebugNum(frame) % DBG_STR_ARR_SIZE];
 }
 
 const QString& DebugString(uint i, bool short_str)
@@ -929,14 +928,14 @@ const QString& DebugString(uint i, bool short_str)
     return ((short_str) ? dbg_str_arr_short : dbg_str_arr)[i];
 }
 
-static unsigned long long to_bitmap(const frame_queue_t& list)
+static unsigned long long to_bitmap(const frame_queue_t& list, int n)
 {
     unsigned long long bitmap = 0;
     frame_queue_t::const_iterator it = list.begin();
     for (; it != list.end(); ++it)
     {
-        int shift = DebugNum(*it);
-        bitmap |= 1<<shift;
+        int shift = DebugNum(*it) % n;
+        bitmap |= 1ULL<<shift;
     }
     return bitmap;
 }
@@ -951,7 +950,7 @@ static QString bitmap_to_string(unsigned long long bitmap)
 
 const QString DebugString(const frame_queue_t& list)
 {
-    return bitmap_to_string(to_bitmap(list));
+    return bitmap_to_string(to_bitmap(list, DBG_STR_ARR_SIZE));
 }
 
 const QString DebugString(const vector<const VideoFrame*>& list)
@@ -961,8 +960,8 @@ const QString DebugString(const vector<const VideoFrame*>& list)
     vector<const VideoFrame*>::const_iterator it = list.begin();
     for (; it != list.end(); ++it)
     {
-        int shift = DebugNum(*it);
-        bitmap |= 1<<shift;
+        int shift = DebugNum(*it) % DBG_STR_ARR_SIZE;
+        bitmap |= 1ULL<<shift;
     }
     // then transform bitmap to string
     return bitmap_to_string(bitmap);

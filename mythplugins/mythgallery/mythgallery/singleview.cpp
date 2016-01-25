@@ -187,7 +187,7 @@ void SingleView::paintEvent(QPaintEvent *)
     {
         m_movieState = 2;
 
-        ThumbItem *item = m_itemList.at(m_pos);
+        ThumbItem *item = getCurrentItem();
 
         if (item)
             GalleryUtil::PlayVideo(item->GetPath());
@@ -219,7 +219,7 @@ void SingleView::paintEvent(QPaintEvent *)
     if (!m_effect_running)
     {
         QPixmap pix(screenwidth, screenheight);
-        pix.fill(this, 0, 0);
+        pix.fill(QWidget::palette().color(this->backgroundRole()));
 
         if (m_pixmap)
         {
@@ -248,7 +248,7 @@ void SingleView::paintEvent(QPaintEvent *)
             }
             else if (m_caption_show && !m_caption_timer->isActive())
             {
-                ThumbItem *item = m_itemList.at(m_pos);
+                ThumbItem *item = getCurrentItem();
                 if (!item->HasCaption())
                     item->InitCaption(true);
 
@@ -307,7 +307,7 @@ void SingleView::paintEvent(QPaintEvent *)
 
                 QPainter p(&pix);
                 p.initFrom(this);
-                ThumbItem *item = m_itemList.at(m_pos);
+                ThumbItem *item = getCurrentItem();
                 QString info = QString::null;
                 if (item)
                 {
@@ -489,7 +489,7 @@ void SingleView::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "DELETE")
         {
-            ThumbItem *item = m_itemList.at(m_pos);
+            ThumbItem *item = getCurrentItem();
             if (item && GalleryUtil::Delete(item->GetPath()))
             {
                 item->SetPixmap(NULL);
@@ -499,7 +499,7 @@ void SingleView::keyPressEvent(QKeyEvent *e)
             m_slideshow_running = wasRunning;
         }
         else if (action == "PLAY" || action == "SLIDESHOW" ||
-                 action == "RANDOMSHOW")
+                 action == "RANDOMSHOW" || action == "SEASONALSHOW")
         {
             m_source_loc = QPoint(0, 0);
             m_zoom = 1.0f;
@@ -566,8 +566,7 @@ void SingleView::DisplayNext(bool reset, bool loadImage)
     int oldpos = m_pos;
     while (true)
     {
-        m_pos = m_slideshow_sequence->next();
-        item = m_itemList.at(m_pos);
+        item = advanceItem();
         if (item)
         {
             if (QFile::exists(item->GetPath()))
@@ -600,9 +599,7 @@ void SingleView::DisplayPrev(bool reset, bool loadImage)
     int oldpos = m_pos;
     while (true)
     {
-        m_pos = m_slideshow_sequence->prev();
-
-        ThumbItem *item = m_itemList.at(m_pos);
+        ThumbItem *item = retreatItem();
         if (item && QFile::exists(item->GetPath()))
             break;
 
@@ -623,7 +620,7 @@ void SingleView::Load(void)
 
     SetPixmap(NULL);
 
-    ThumbItem *item = m_itemList.at(m_pos);
+    ThumbItem *item = getCurrentItem();
     if (!item)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("No item at %1").arg(m_pos));
@@ -660,7 +657,7 @@ void SingleView::Rotate(int angle)
     m_angle = (m_angle >= 360) ? m_angle - 360 : m_angle;
     m_angle = (m_angle < 0)    ? m_angle + 360 : m_angle;
 
-    ThumbItem *item = m_itemList.at(m_pos);
+    ThumbItem *item = getCurrentItem();
     if (item)
         item->SetRotationAngle(m_angle);
 
@@ -788,7 +785,7 @@ void SingleView::CreateEffectPixmap(void)
     if (!m_effect_pixmap)
         m_effect_pixmap = new QPixmap(screenwidth, screenheight);
 
-    m_effect_pixmap->fill(this, 0, 0);
+    m_effect_pixmap->fill(QWidget::palette().color(this->backgroundRole()));
 
     if (m_pixmap)
     {

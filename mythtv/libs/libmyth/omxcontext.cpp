@@ -4,7 +4,7 @@ using namespace omxcontext;
 #include <cstddef>
 #include <cassert>
 
-#include <IL/OMX_Core.h>
+#include <OMX_Core.h>
 #ifdef USING_BROADCOM
 #include <bcm_host.h>
 #endif
@@ -46,21 +46,21 @@ STATIC_ASSERT(sizeof(OMX_BUFFERHEADERTYPE) == 18 * 4);
  */
 namespace {
 
+#ifdef USING_BROADCOM
 struct BroadcomLib
 {
     BroadcomLib()
     {
-#ifdef USING_BROADCOM
+        LOG(VB_GENERAL, LOG_DEBUG, LOCA + "bcm_host_init...");
         bcm_host_init();
-#endif
     }
     ~BroadcomLib()
     {
-#ifdef USING_BROADCOM
+        LOG(VB_GENERAL, LOG_DEBUG, LOCA + "bcm_host_deinit...");
         bcm_host_deinit();
-#endif
     }
 };
+#endif
 
 } // namespace
 
@@ -82,14 +82,18 @@ bool OMXComponent::IncrRef()
 
     if (s_iRefcnt.fetchAndAddOrdered(1) == 0)
     {
+#ifdef USING_BROADCOM
         // BUG: Calling bcm_host_init/bcm_host_deinit more than once causes
         // occasional InsufficientResources errors
         static BroadcomLib s_bBcmInit;
+#endif
 
+        LOG(VB_GENERAL, LOG_DEBUG, LOCA + "OMX_Init...");
         OMX_ERRORTYPE e = OMX_Init();
         if (e == OMX_ErrorNone)
         {
             s_bOK = true;
+            LOG(VB_GENERAL, LOG_DEBUG, LOCA + "OMX_Init done");
         }
         else
         {
@@ -106,11 +110,18 @@ void OMXComponent::DecrRef()
 {
     if (s_iRefcnt.fetchAndAddOrdered(-1) == 1)
     {
+#ifdef USING_BELLAGIO
+        // version 0.9.3 throws SEGVs after repeated init/deinit
+        s_iRefcnt.fetchAndAddOrdered(1);
+#else
         LOG(VB_GENERAL, LOG_DEBUG, LOCA + "OMX_DeInit...");
         OMX_ERRORTYPE e = OMX_Deinit();
-        if (e != OMX_ErrorNone)
+        if (e == OMX_ErrorNone)
+            LOG(VB_GENERAL, LOG_DEBUG, LOCA + "OMX_DeInit done");
+        else
             LOG(VB_GENERAL, LOG_ERR, LOCA + QString("OMX_Deinit error %1")
                 .arg(Error2String(e)));
+#endif
     }
 }
 
@@ -124,6 +135,9 @@ OMXComponent::OMXComponent(const QString &name, OMXComponentCtx &cb) :
         LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid OpenMAX context");
         return;
     }
+
+    if (name.isEmpty())
+        return;
 
     OMX_ERRORTYPE e = GetComponent(this, QRegExp(name + "$", Qt::CaseInsensitive));
     if (e != OMX_ErrorNone)
@@ -403,7 +417,7 @@ void ShowFormats(const OMXComponent &cmpnt, unsigned n, LogLevel_t level, uint64
     fmt.nPortIndex = cmpnt.Base() + n;
 
     OMX_ERRORTYPE e = OMX_ErrorNone;
-    for (OMX_U32 index = 0; e == OMX_ErrorNone; ++index)
+    for (OMX_U32 index = 0; e == OMX_ErrorNone && index < 100; ++index)
     {
         fmt.nIndex = index;
         e = OMX_GetParameter(cmpnt.Handle(), type, &fmt);
@@ -741,7 +755,7 @@ OMX_ERRORTYPE OMXComponentCtx::Event( OMXComponent &cmpnt,
       case OMX_EventComponentResumed:
       case OMX_EventDynamicResourcesAvailable:
       case OMX_EventPortFormatDetected:
-      case OMX_EventParamOrConfigChanged:
+      //case OMX_EventParamOrConfigChanged:
         break;
 
       default:
@@ -788,6 +802,7 @@ const char *Coding2String(OMX_VIDEO_CODINGTYPE eCompressionFormat)
         CASE2STR(OMX_VIDEO_CodingRV);
         CASE2STR(OMX_VIDEO_CodingAVC);
         CASE2STR(OMX_VIDEO_CodingMJPEG);
+#ifdef USING_BROADCOM
         CASE2STR(OMX_VIDEO_CodingVP6);
         CASE2STR(OMX_VIDEO_CodingVP7);
         CASE2STR(OMX_VIDEO_CodingVP8);
@@ -795,6 +810,7 @@ const char *Coding2String(OMX_VIDEO_CODINGTYPE eCompressionFormat)
         CASE2STR(OMX_VIDEO_CodingSorenson);
         CASE2STR(OMX_VIDEO_CodingTheora);
         CASE2STR(OMX_VIDEO_CodingMVC);
+#endif
     }
     static char buf[32];
     return strcpy(buf, qPrintable(QString("VIDEO_Coding 0x%1")
@@ -815,8 +831,10 @@ const char *Coding2String(OMX_IMAGE_CODINGTYPE eCompressionFormat)
         CASE2STR(OMX_IMAGE_CodingPNG);
         CASE2STR(OMX_IMAGE_CodingLZW);
         CASE2STR(OMX_IMAGE_CodingBMP);
+#ifdef USING_BROADCOM
         CASE2STR(OMX_IMAGE_CodingTGA);
         CASE2STR(OMX_IMAGE_CodingPPM);
+#endif
     }
     static char buf[32];
     return strcpy(buf, qPrintable(QString("IMAGE_Coding 0x%1")
@@ -855,7 +873,7 @@ const char *Coding2String(OMX_AUDIO_CODINGTYPE eEncoding)
         CASE2STR(OMX_AUDIO_CodingWMA);
         CASE2STR(OMX_AUDIO_CodingRA);
         CASE2STR(OMX_AUDIO_CodingMIDI);
-        // Conditional
+#ifdef USING_BROADCOM
         CASE2STR(OMX_AUDIO_CodingFLAC);
         CASE2STR(OMX_AUDIO_CodingDDP); // Any variant of Dolby Digital Plus
         CASE2STR(OMX_AUDIO_CodingDTS);
@@ -863,6 +881,7 @@ const char *Coding2String(OMX_AUDIO_CODINGTYPE eEncoding)
         CASE2STR(OMX_AUDIO_CodingATRAC3);
         CASE2STR(OMX_AUDIO_CodingATRACX);
         CASE2STR(OMX_AUDIO_CodingATRACAAL);
+#endif
     }
     static char buf[32];
     return strcpy(buf, qPrintable(QString("AUDIO_Coding 0x%1")
@@ -877,9 +896,11 @@ const char *Other2String(OMX_OTHER_FORMATTYPE eFormat)
         CASE2STR(OMX_OTHER_FormatPower);
         CASE2STR(OMX_OTHER_FormatStats);
         CASE2STR(OMX_OTHER_FormatBinary);
+#ifdef USING_BROADCOM
         CASE2STR(OMX_OTHER_FormatText);
         CASE2STR(OMX_OTHER_FormatTextSKM2);
         CASE2STR(OMX_OTHER_FormatText3GP5);
+#endif
     }
     static char buf[32];
     return strcpy(buf, qPrintable(QString("Other format 0x%1")
@@ -936,16 +957,16 @@ const char *Format2String(OMX_COLOR_FORMATTYPE eColorFormat)
         CASE2STR(OMX_COLOR_Format24BitABGR6666);
         CASE2STR(OMX_COLOR_FormatKhronosExtensions);
         CASE2STR(OMX_COLOR_FormatVendorStartUnused);
+#ifdef USING_BROADCOM
         CASE2STR(OMX_COLOR_Format32bitABGR8888);
         CASE2STR(OMX_COLOR_Format8bitPalette);
         CASE2STR(OMX_COLOR_FormatYUVUV128);
         CASE2STR(OMX_COLOR_FormatRawBayer12bit);
-#ifdef USING_BROADCOM
         CASE2STR(OMX_COLOR_FormatBRCMEGL);
         CASE2STR(OMX_COLOR_FormatBRCMOpaque);
-#endif
         CASE2STR(OMX_COLOR_FormatYVU420PackedPlanar);
         CASE2STR(OMX_COLOR_FormatYVU420PackedSemiPlanar);
+#endif
     }
     static char buf[32];
     return strcpy(buf, qPrintable(QString("COLOR_Format 0x%1")
@@ -965,7 +986,9 @@ const char *Event2String(OMX_EVENTTYPE eEvent)
         CASE2STR(OMX_EventComponentResumed);
         CASE2STR(OMX_EventDynamicResourcesAvailable);
         CASE2STR(OMX_EventPortFormatDetected);
+#ifdef USING_BROADCOM
         CASE2STR(OMX_EventParamOrConfigChanged);
+#endif
     }
     static char buf[32];
     return strcpy(buf, qPrintable(QString("Event 0x%1").arg(eEvent,0,16)));
@@ -1013,11 +1036,13 @@ const char *Error2String(OMX_ERRORTYPE eError)
         CASE2STR(OMX_ErrorContentPipeCreationFailed);
         CASE2STR(OMX_ErrorSeperateTablesUsed);
         CASE2STR(OMX_ErrorTunnelingUnsupported);
+#ifdef USING_BROADCOM
         CASE2STR(OMX_ErrorDiskFull);
         CASE2STR(OMX_ErrorMaxFileSize);
         CASE2STR(OMX_ErrorDrmUnauthorised);
         CASE2STR(OMX_ErrorDrmExpired);
         CASE2STR(OMX_ErrorDrmGeneral);
+#endif
     }
     static char buf[32];
     return strcpy(buf, qPrintable(QString("Error 0x%1").arg(eError,0,16)));

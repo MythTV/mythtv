@@ -142,6 +142,26 @@ bool NetSearch::keyPressEvent(QKeyEvent *event)
 
         if (action == "MENU")
             ShowMenu();
+        else if (action == "PAGELEFT" && m_pagenum > 1)
+        {
+            if (m_prevPageToken.isEmpty())
+                SkipPagesBack();
+            else
+                GetLastResults();
+        }
+        else if (action == "PAGERIGHT" && m_searchResultList->GetCount() > 0 &&
+                 m_pagenum + 10 < m_maxpage)
+        {
+            if (m_nextPageToken.isEmpty())
+                SkipPagesForward();
+            else
+                GetMoreResults();
+        }
+        else if (action == "PREVVIEW" && m_pagenum > 1)
+            GetLastResults();
+        else if (action == "NEXTVIEW" && m_searchResultList->GetCount() > 0 &&
+                 m_pagenum < m_maxpage)
+            GetMoreResults();
         else
             handled = false;
     }
@@ -202,13 +222,20 @@ void NetSearch::ShowMenu(void)
                     menuPopup->AddButton(tr("Delete"), SLOT(SlotDeleteVideo()));
                 }
             }
-
-            if (m_pagenum > 1)
-                menuPopup->AddButton(tr("Previous Page"),
-                                     SLOT(GetLastResults()));
-            if (m_searchResultList->GetCount() > 0 && m_pagenum < m_maxpage)
-                menuPopup->AddButton(tr("Next Page"), SLOT(GetMoreResults()));
         }
+
+        if (m_pagenum > 1)
+            menuPopup->AddButton(tr("Previous Page"), SLOT(GetLastResults()));
+        if (m_searchResultList->GetCount() > 0 && m_pagenum < m_maxpage)
+            menuPopup->AddButton(tr("Next Page"), SLOT(GetMoreResults()));
+        if (m_pagenum > 1 && m_prevPageToken.isEmpty())
+            menuPopup->AddButton(tr("Skip 10 Pages Back"),
+                                 SLOT(SkipPagesBack()));
+        if (m_searchResultList->GetCount() > 0 && m_pagenum < m_maxpage &&
+            m_nextPageToken.isEmpty())
+            menuPopup->AddButton(tr("Skip 10 Pages Forward"),
+                                 SLOT(SkipPagesForward()));
+
         menuPopup->AddButton(tr("Manage Search Scripts"),
                              SLOT(RunSearchEditor()));
     }
@@ -264,9 +291,11 @@ void NetSearch::DoSearch()
     OpenBusyPopup(title);
 
     if (!m_netSearch)
+    {
         m_netSearch = new QNetworkAccessManager(this);
-    connect(m_netSearch, SIGNAL(finished(QNetworkReply*)),
-            SLOT(SearchFinished(void)));
+        connect(m_netSearch, SIGNAL(finished(QNetworkReply*)),
+                SLOT(SearchFinished(void)));
+    }
 
     QUrl init = GetMythXMLSearch(m_mythXML, m_currentSearch, m_currentCmd, "");
     QUrl req(init.toEncoded(), QUrl::TolerantMode);
@@ -311,6 +340,23 @@ void NetSearch::GetMoreResults()
     QUrl req =
         GetMythXMLSearch(m_mythXML, m_currentSearch, m_currentCmd, page);
     m_reply = m_netSearch->get(QNetworkRequest(req));
+}
+
+void NetSearch::SkipPagesBack()
+{
+    if (m_pagenum < 11)
+        m_pagenum = 2;
+    else
+        m_pagenum = m_pagenum - 10 + 1;
+
+    GetLastResults();
+}
+
+void NetSearch::SkipPagesForward()
+{
+    m_pagenum = m_pagenum + 10 - 1;
+
+    GetMoreResults();
 }
 
 void NetSearch::SearchFinished(void)

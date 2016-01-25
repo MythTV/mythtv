@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="pl_PL">
+<TS version="2.1" language="pl_PL">
 <context>
     <name>MythControls</name>
     <message>
@@ -27,12 +27,12 @@
 <context>
     <name>MythNews</name>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="393"/>
+        <location filename="../mythnews/mythnews.cpp" line="392"/>
         <source>Updated</source>
         <translation>Zaktualizowany</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="400"/>
+        <location filename="../mythnews/mythnews.cpp" line="399"/>
         <source>Unknown</source>
         <translation>Nieznany</translation>
     </message>
@@ -41,22 +41,22 @@
         <translation type="obsolete">Pobieram zawartość...</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="687"/>
+        <location filename="../mythnews/mythnews.cpp" line="686"/>
         <source>Manage Feeds</source>
         <translation>Zarządzaj Kanałami</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="688"/>
+        <location filename="../mythnews/mythnews.cpp" line="687"/>
         <source>Add Feed</source>
         <translation>Dodaj Kanał</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="691"/>
+        <location filename="../mythnews/mythnews.cpp" line="690"/>
         <source>Edit Feed</source>
         <translation>Edytuj Kanał</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="692"/>
+        <location filename="../mythnews/mythnews.cpp" line="691"/>
         <source>Delete Feed</source>
         <translation>Usuń Kanał</translation>
     </message>
@@ -77,7 +77,7 @@
         <translation type="obsolete">Usuń stronę wiadomości</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="674"/>
+        <location filename="../mythnews/mythnews.cpp" line="673"/>
         <source>Options</source>
         <translation>Opcje</translation>
     </message>
@@ -87,7 +87,7 @@
         <translation>W MythNews nie skonfigurowano żadnej kanału RSS.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="595"/>
+        <location filename="../mythnews/mythnews.cpp" line="594"/>
         <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
         <translation>Nie podano polecenia przeglądarki! Należy zainstalować MythBrowser.</translation>
     </message>
@@ -270,29 +270,34 @@ When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to c
         <translation>Ustawienia wiadomości</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="20"/>
+        <source>News</source>
+        <translation>Wiadomości</translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="21"/>
         <source>You Haven&apos;t Specified Any News Feeds.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie Zdefiniowanego Żadnego Kanału RSS.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="22"/>
         <source>Edit News</source>
-        <translation type="unfinished"></translation>
+        <translation>Edytuj Kanały RSS</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="24"/>
         <source>News Config</source>
-        <translation type="unfinished"></translation>
+        <translation>Konfigurcja Wiadomości</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="25"/>
         <source>Available Categories</source>
-        <translation type="unfinished"></translation>
+        <translation>Dostępne Kategorie</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="26"/>
         <source>Available Sites</source>
-        <translation type="unfinished"></translation>
+        <translation>Dotępne Źródła</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="28"/>
@@ -335,7 +340,7 @@ When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to c
     <message>
         <location filename="themestrings.h" line="23"/>
         <source>Ok</source>
-        <translation type="unfinished">Ok</translation>
+        <translation>Ok</translation>
     </message>
 </context>
 </TS>

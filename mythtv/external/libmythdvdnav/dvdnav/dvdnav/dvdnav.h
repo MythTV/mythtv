@@ -26,10 +26,8 @@
 #ifndef LIBDVDNAV_DVDNAV_H
 #define LIBDVDNAV_DVDNAV_H
 
-#define MP_DVDNAV 1
-
-// Change this only when syncing to mplayer dvdnav trunk
-#define DVDNAV_VERSION "5fb919774444aa382f6e02cb63801c82f2c38325"
+#define DVDNAV_VERSION 50400
+#define DVDNAV_VERSION_GIT "8a270d6dd40ac43c98c948fe9d10e5bcb4aa3d41"
 
 #ifdef __cplusplus
 extern "C" {

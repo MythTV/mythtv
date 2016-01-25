@@ -927,6 +927,7 @@ void MusicMetadata::getField(const QString &field, QString *data)
 void MusicMetadata::toMap(InfoMap &metadataMap, const QString &prefix)
 {
     using namespace MythDate;
+    metadataMap[prefix + "songid"] = QString::number(m_id);
     metadataMap[prefix + "artist"] = m_artist;
     metadataMap[prefix + "formatartist"] = FormatArtist();
     metadataMap[prefix + "compilationartist"] = m_compilation_artist;

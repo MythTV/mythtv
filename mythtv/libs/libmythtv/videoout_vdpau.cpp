@@ -931,6 +931,8 @@ MythCodecID VideoOutputVDPAU::GetBestSupportedCodec(
             use_cpu |= !MythRenderVDPAU::IsMPEG4Available();
         if (!use_cpu && test_cid == kCodec_H264_VDPAU)
             use_cpu |= !MythRenderVDPAU::H264DecoderSizeSupported(width, height);
+        if (!use_cpu && test_cid == kCodec_HEVC_VDPAU)
+            use_cpu |= !MythRenderVDPAU::IsHEVCAvailable();
     }
 
     if (use_cpu)

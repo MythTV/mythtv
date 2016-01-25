@@ -8,8 +8,13 @@
             }
         </style>
 
-        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
         <script type="text/javascript">
+            /* Taken from https://developers.google.com/youtube/iframe_api_reference#Loading_a_Video_Player */
+            var tag = document.createElement('script');
+            tag.src = "https://www.youtube.com/iframe_api";
+            var firstScriptTag = document.getElementsByTagName('script')[0];
+            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
             /* gup function by R.D. Vaughan */
             function gup( name )
             {
@@ -25,23 +30,24 @@
 
             var myth_player = null;
 
-            var params = {
-                allowScriptAccess: "always",
-                allowfullscreen: 'true',
-                wmode: 'opaque'
-            };
-            var atts = { id: "myytplayer" };
-            swfobject.embedSWF("http://www.youtube.com/apiplayer?version=3&enablejsapi=1&playerapiid=ytplayer",
-                               "myth_player", window.innerWidth, window.innerHeight, "8", null, null, params, atts);
+            function onYouTubeIframeAPIReady() {
+                myth_player = new YT.Player("myytplayer", {
+                    height: window.innerHeight,
+                    width: window.innerWidth,
+                    videoId: gup('videocode'),
+                    playerVars: {
+                        'enablejsapi': 1,
+                        'iv_load_policy': 3, /* Hide annotations */
+                    },
+                    events: {
+                        'onReady': onYouTubePlayerReady,
+                    }
+                });
+            }
 
-            function onYouTubePlayerReady(playerId) {
-                myth_player = document.getElementById("myytplayer");
-                myth_player.setVolume(50);
-                var videocode = gup('videocode');
-                if (videocode != "") {
-                    myth_player.cueVideoById(videocode);
-                    myth_player.playVideo();
-                }
+            function onYouTubePlayerReady(event) {
+                event.target.setVolume(100);
+                event.target.playVideo();
             }
 
             function play() {
@@ -70,7 +76,6 @@
                 document.body.style.width = window.innerWidth;
                 document.body.style.height = window.innerHeight;
                 if (myth_player) {
-                    //             myth_player.setSize(window.innerWidth, window.innerHeight);
                     document.getElementById("myytplayer").width = window.innerWidth;
                     document.getElementById("myytplayer").height = window.innerHeight;
                 }
@@ -78,6 +83,6 @@
         </script>
     </head>
     <body>
-        <div id="myth_player"/>
+        <div id="myytplayer"/>
     </body>
 </html>

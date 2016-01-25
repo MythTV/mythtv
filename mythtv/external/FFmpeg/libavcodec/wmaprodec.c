@@ -300,6 +300,12 @@ static av_cold int decode_init(AVCodecContext *avctx)
         s->decode_flags    = AV_RL16(edata_ptr+14);
         channel_mask       = AV_RL32(edata_ptr+2);
         s->bits_per_sample = AV_RL16(edata_ptr);
+
+        if (s->bits_per_sample > 32 || s->bits_per_sample < 1) {
+            avpriv_request_sample(avctx, "bits per sample is %d", s->bits_per_sample);
+            return AVERROR_PATCHWELCOME;
+        }
+
         /** dump the extradata */
         for (i = 0; i < avctx->extradata_size; i++)
             ff_dlog(avctx, "[%x] ", avctx->extradata[i]);
@@ -477,7 +483,7 @@ static av_cold int decode_init(AVCodecContext *avctx)
     /** calculate subwoofer cutoff values */
     for (i = 0; i < num_possible_block_sizes; i++) {
         int block_size = s->samples_per_frame >> i;
-        int cutoff = (440*block_size + 3 * (s->avctx->sample_rate >> 1) - 1)
+        int cutoff = (440*block_size + 3LL * (s->avctx->sample_rate >> 1) - 1)
                      / s->avctx->sample_rate;
         s->subwoofer_cutoffs[i] = av_clip(cutoff, 4, block_size);
     }
@@ -1621,6 +1627,11 @@ static int decode_packet(AVCodecContext *avctx, void *data,
             s->packet_done = !decode_frame(s, data, got_frame_ptr);
         } else
             s->packet_done = 1;
+    }
+
+    if (remaining_bits(s, gb) < 0) {
+        av_log(avctx, AV_LOG_ERROR, "Overread %d\n", -remaining_bits(s, gb));
+        s->packet_loss = 1;
     }
 
     if (s->packet_done && !s->packet_loss &&

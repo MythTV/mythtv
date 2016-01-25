@@ -57,19 +57,19 @@
 
     <button>
         <type>IMAGES</type>
-        <text>Image Gallery</text>
-        <description>Look at Pictures</description>
-        <action>PLUGIN mythgallery</action>
-        <depends>mythgallery</depends>
+        <text>Images</text>
+        <description>Look at pictures</description>
+        <action>JUMP Gallery Default</action>
     </button>
 
     <button>
         <type>IMAGES</type>
-        <text>New Image Gallery</text>
-        <description>Look at Pictures</description>
-        <action>JUMP Gallery Default</action>
+        <text>Old Gallery</text>
+        <action>PLUGIN mythgallery</action>
+        <description>Look at pictures (deprecated plugin)</description>
+        <depends>mythgallery</depends>
     </button>
-    
+
     <button>
         <type>GAME</type>
         <text>Play Games</text>

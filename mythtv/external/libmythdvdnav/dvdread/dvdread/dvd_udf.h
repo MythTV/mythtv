@@ -46,7 +46,7 @@ extern "C" {
  * '/VIDEO_TS/VTS_01_1.IFO'.  On success, filesize will be set to the size of
  * the file in bytes.
  */
-uint32_t UDFFindFile( dvd_reader_t *device, char *filename, uint32_t *size );
+uint32_t UDFFindFile( dvd_reader_t *device, const char *filename, uint32_t *size );
 
 int UDFGetVolumeIdentifier(dvd_reader_t *device,
                            char *volid, unsigned int volid_size);

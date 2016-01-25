@@ -15,6 +15,7 @@
 #include <QImage>
 #include <QDir>
 #include <QUrl>
+#include <QApplication>
 
 // MythTV headers
 #include "mythconfig.h"
@@ -75,6 +76,10 @@ PreviewGenerator::PreviewGenerator(const ProgramInfo *pginfo,
       m_outSize(0,0),  m_outFormat("PNG"),
       m_token(_token), m_gotReply(false), m_pixmapOk(false)
 {
+    // Qt requires that a receiver have the same thread affinity as the QThread
+    // sending the event, which is used to dispatch MythEvents sent by
+    // gCoreContext->dispatchNow(me)
+    moveToThread(QApplication::instance()->thread());
 }
 
 PreviewGenerator::~PreviewGenerator()

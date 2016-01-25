@@ -88,13 +88,50 @@ QString dvb_decode_text(const unsigned char *src, uint raw_length,
         new unsigned char[raw_length + encoding_override_length];
 
     uint length = 0;
-    if (encoding_override && src[0] >= 0x20) {
-        memcpy(dst, encoding_override, encoding_override_length);
-        length = encoding_override_length;
+    uint skip = 0;
+    if (encoding_override)
+    {
+        /* skip over encoding signalling in source */
+        switch (src[0])
+        {
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+        case 9:
+        case 0x0a:
+        case 0x0b:
+        case 0x11:
+        case 0x12:
+        case 0x13:
+        case 0x14:
+        case 0x15:
+            skip += 1;
+            break;
+        case 0x1f:
+            skip += 2;
+            break;
+        case 0x10:
+            skip += 3;
+            break;
+        default:
+            break;
+        }
+
+        /* Does the override actually add encoding signalling? Then add
+         * it in front of the text. */
+        if (encoding_override_length)
+        {
+            memcpy(dst, encoding_override, encoding_override_length);
+            length += encoding_override_length;
+        }
     }
 
     // Strip formatting characters
-    for (uint i = 0; i < raw_length; i++)
+    for (uint i = skip; i < raw_length; i++)
     {
         if ((src[i] < 0x80) || (src[i] > 0x9F))
             dst[length++] = src[i];
@@ -676,5 +713,26 @@ QString AC3Descriptor::toString(void) const
         ret += QString("mainid(0x%1) ").arg(MainID(),0,16);
     if (HasASVC())
         ret += QString("asvc(%1) ").arg(ASVC());
+    return ret;
+}
+
+QMap<QString,QString> ExtendedEventDescriptor::Items(void) const
+{
+    QMap<QString, QString> ret;
+
+    uint index = 0;
+
+    /* handle all items
+     * minimum item size is for 8bit length + 8bit length
+     */
+    while (LengthOfItems() - index >= 2)
+    {
+        QString item_description = dvb_decode_text (&_data[8 + index], _data[7 + index]);
+        index += 1 + _data[7 + index];
+        QString item = dvb_decode_text (&_data[8 + index], _data[7 + index]);
+        index += 1 + _data[7 + index];
+        ret.insertMulti (item_description, item);
+    }
+
     return ret;
 }

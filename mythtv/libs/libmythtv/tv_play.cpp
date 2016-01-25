@@ -452,7 +452,9 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags,
     }
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "-- process events 2 begin");
-    qApp->processEvents();
+    do
+        qApp->processEvents();
+    while (tv->isEmbedded);
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "-- process events 2 end");
 
     // check if the show has reached the end.
@@ -3031,8 +3033,12 @@ void TV::timerEvent(QTimerEvent *te)
         {
             OSD *osd = GetOSDLock(actx);
             if (osd && !osd->IsWindowVisible("osd_input"))
+            {
+                ReturnOSDLock(actx, osd);
                 CommitQueuedInput(actx);
-            ReturnOSDLock(actx, osd);
+            }
+            else
+                ReturnOSDLock(actx, osd);
         }
         ReturnPlayerLock(actx);
 
@@ -8742,6 +8748,10 @@ vector<bool> TV::DoSetPauseState(PlayerContext *lctx, const vector<bool> &pause)
 
 void TV::DoEditSchedule(int editType)
 {
+    // Prevent nesting of the pop-up UI
+    if (ignoreKeyPresses)
+        return;
+
     if ((editType == kScheduleProgramGuide  && !RunProgramGuidePtr) ||
         (editType == kScheduleProgramFinder && !RunProgramFinderPtr) ||
         (editType == kScheduledRecording    && !RunScheduleEditorPtr) ||
@@ -9836,14 +9846,14 @@ void TV::customEvent(QEvent *e)
         DoSetPauseState(actx, saved_pause); // Restore pause states
         disableDrawUnusedRects = false;
 
-        qApp->processEvents();
-
         if (!weDisabledGUI)
         {
             weDisabledGUI = true;
             GetMythMainWindow()->PushDrawDisabled();
-            DrawUnusedRects();
         }
+
+        qApp->processEvents();
+        DrawUnusedRects();
 
         isEmbedded = false;
         ignoreKeyPresses = false;
@@ -10039,6 +10049,17 @@ void TV::HandleOSDClosed(int osdType)
             break;
         case kOSDFunctionalType_AudioSyncAdjust:
             audiosyncAdjustment = false;
+            {
+            PlayerContext *ctx = GetPlayerReadLock(0, __FILE__, __LINE__);
+            ctx->LockDeletePlayer(__FILE__, __LINE__);
+            if (ctx->player)
+            {
+                int64_t aoff = ctx->player->GetAudioTimecodeOffset();
+                gCoreContext->SaveSetting("AudioSyncOffset", QString::number(aoff));
+            }
+            ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+            ReturnPlayerLock(ctx);
+            }
             break;
         case kOSDFunctionalType_SubtitleZoomAdjust:
             subtitleZoomAdjustment = false;

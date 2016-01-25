@@ -118,6 +118,8 @@ void UPnpSearchTask::SendMsg( MSocketDevice  *pSocket,
         // Descope the Link Local address. The scope is only valid
         // on the server sending the announcement, not the clients
         // that receive it
+        // FIXME what happens for scopeId "4"? Do we remove all 4s from the address?
+        // http://doc.qt.io/qt-5/qhostaddress.html#scopeId
         if ((*it).isInSubnet(kLinkLocal6))
         {
             ipaddress = "[" + (*it).toString()

@@ -411,7 +411,21 @@
         <translation>Aktualisieren</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="455"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="459"/>
+        <source>Hide Continuous Events</source>
+        <translation>permanente Ereignisse ausblenden</translation>
+    </message>
+    <message>
+        <source>Don&apos;t Show Continuous Events</source>
+        <translation type="obsolete">Ereignisse durchgehende anzeigen nicht</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmevents.cpp" line="461"/>
+        <source>Show Continuous Events</source>
+        <translation>permanente Ereignisse zeigen</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmevents.cpp" line="463"/>
         <source>Change View</source>
         <translation>Ansicht ändern</translation>
     </message>

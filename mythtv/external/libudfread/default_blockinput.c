@@ -41,6 +41,12 @@
 #include <io.h>
 #endif
 
+#ifdef __ANDROID__
+# undef  lseek
+# define lseek lseek64
+# undef  off_t
+# define off_t off64_t
+#endif
 
 #ifdef _WIN32
 static ssize_t pread(int fd, void *buf, size_t count, off_t offset)

@@ -20,9 +20,9 @@
 
 package org.videolan;
 
-public class BDJThreadGroup extends ThreadGroup {
+class BDJThreadGroup extends ThreadGroup {
 
-    public BDJThreadGroup(String name, BDJXletContext context) {
+    protected BDJThreadGroup(String name, BDJXletContext context) {
         super(name);
         this.context = context;
     }
@@ -45,15 +45,11 @@ public class BDJThreadGroup extends ThreadGroup {
         }
     }
 
-    public BDJXletContext getContext() {
+    protected BDJXletContext getContext() {
         return context;
     }
 
-    public void setContext(BDJXletContext context) {
-        this.context = context;
-    }
-
-    public boolean waitForShutdown(int timeout, int maxThreads) {
+    protected boolean waitForShutdown(int timeout, int maxThreads) {
 
         if (parentOf(Thread.currentThread().getThreadGroup()) && maxThreads < 1) {
             logger.error("Current Thread is contained within ThreadGroup to be disposed.");
@@ -94,8 +90,6 @@ public class BDJThreadGroup extends ThreadGroup {
         } catch (IllegalThreadStateException e) {
             logger.error("ThreadGroup destroy failed: " + e);
         }
-
-        context = null;
     }
 
     public void dumpThreads() {
@@ -115,6 +109,6 @@ public class BDJThreadGroup extends ThreadGroup {
         }
     }
 
-    private BDJXletContext context;
+    private final BDJXletContext context;
     private static final Logger logger = Logger.getLogger(BDJThreadGroup.class.getName());
 }

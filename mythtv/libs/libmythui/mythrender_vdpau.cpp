@@ -278,6 +278,7 @@ static void vdpau_preemption_callback(VdpDevice device, void *myth_render)
 
 bool MythRenderVDPAU::gVDPAUSupportChecked = false;
 bool MythRenderVDPAU::gVDPAUMPEG4Accel     = false;
+bool MythRenderVDPAU::gVDPAUHEVCAccel      = false;
 uint MythRenderVDPAU::gVDPAUBestScaling    = 0;
 bool MythRenderVDPAU::gVDPAUNVIDIA         = false;
 
@@ -319,15 +320,15 @@ bool MythRenderVDPAU::IsMPEG4Available(void)
     if (gVDPAUSupportChecked)
         return gVDPAUMPEG4Accel;
 
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + "Checking VDPAU capabilities.");
-    MythRenderVDPAU *dummy = new MythRenderVDPAU();
-    bool ok = dummy->CreateDummy();
-    delete dummy;
+    return IsVDPAUAvailable() && gVDPAUMPEG4Accel;
+}
 
-    if (ok)
-        return gVDPAUMPEG4Accel;
+bool MythRenderVDPAU::IsHEVCAvailable(void)
+{
+    if (gVDPAUSupportChecked)
+        return gVDPAUHEVCAccel;
 
-    return false;
+    return IsVDPAUAvailable() && gVDPAUHEVCAccel;
 }
 
 bool MythRenderVDPAU::H264DecoderSizeSupported(uint width, uint height)
@@ -1551,7 +1552,7 @@ void MythRenderVDPAU::ClearVideoSurface(uint id)
 
     memset(tmp, 0, width * height);
     memset(tmp + (width * height), 127, (width * height)>>1);
-    uint32_t pitches[3] = {width, width, width>>1};
+    uint32_t pitches[3] = {width, (width+1)>>1, (width+1)>>1};
     void* const planes[3] = {tmp, tmp + (width * height), tmp + (width * height)};
     vdp_st = vdp_video_surface_put_bits_y_cb_cr(m_videoSurfaces[id].m_id,
                                                 VDP_YCBCR_FORMAT_YV12,
@@ -1809,22 +1810,38 @@ bool MythRenderVDPAU::CheckHardwareSupport(void)
         else
             LOG(VB_PLAYBACK, LOG_INFO, LOC + "HQ Scaling not supported.");
 
-        VdpBool supported = false;
-
 #ifdef VDP_DECODER_PROFILE_MPEG4_PART2_ASP
+        {
         INIT_ST
+        VdpBool supported = false;
         uint32_t tmp1, tmp2, tmp3, tmp4;
         vdp_st = vdp_decoder_query_capabilities(m_device,
                     VDP_DECODER_PROFILE_MPEG4_PART2_ASP, &supported,
                     &tmp1, &tmp2, &tmp3, &tmp4);
         CHECK_ST
+        gVDPAUMPEG4Accel = (bool)supported;
+        }
 #endif
 
-        gVDPAUMPEG4Accel = (bool)supported;
+#ifdef VDP_DECODER_PROFILE_HEVC_MAIN
+        {
+        INIT_ST
+        VdpBool supported = false;
+        uint32_t tmp1, tmp2, tmp3, tmp4;
+        vdp_st = vdp_decoder_query_capabilities(m_device,
+                    VDP_DECODER_PROFILE_HEVC_MAIN, &supported,
+                    &tmp1, &tmp2, &tmp3, &tmp4);
+        CHECK_ST
+        gVDPAUHEVCAccel = (bool)supported;
+        }
+#endif
 
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("MPEG4 hardware acceleration %1supported.")
                 .arg(gVDPAUMPEG4Accel ? "" : "not "));
+        LOG(VB_PLAYBACK, LOG_INFO, LOC +
+            QString("HEVC hardware acceleration %1supported.")
+                .arg(gVDPAUHEVCAccel ? "" : "not "));
     }
 
     return true;

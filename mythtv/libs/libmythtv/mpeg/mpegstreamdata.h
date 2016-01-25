@@ -54,6 +54,7 @@ typedef vector<MPEGStreamListener*>     mpeg_listener_vec_t;
 typedef vector<TSPacketListener*>       ts_listener_vec_t;
 typedef vector<TSPacketListenerAV*>     ts_av_listener_vec_t;
 typedef vector<MPEGSingleProgramStreamListener*> mpeg_sp_listener_vec_t;
+typedef vector<PSStreamListener*>       ps_listener_vec_t;
 
 typedef enum
 {
@@ -116,7 +117,7 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
                                   uint_vec_t& /*del_pids*/) const
         { return false; }
 
-    // Table processing
+    // Table processin
     void SetIgnoreCRC(bool haveCRCbug) { _have_CRC_bug = haveCRCbug; }
     virtual bool IsRedundant(uint pid, const PSIPTable&) const;
     virtual bool HandleTables(uint pid, const PSIPTable &psip);
@@ -289,6 +290,10 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     void UpdatePATSingleProgram(ProgramAssociationTable*);
     void UpdatePMTSingleProgram(ProgramMapTable*);
 
+    // Program Stream Stuff
+    void AddPSStreamListener(PSStreamListener *val);
+    void RemovePSStreamListener(PSStreamListener *val);
+
   public:
     // Single program stuff, sets
     void SetDesiredProgram(int p);
@@ -387,6 +392,7 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     mpeg_sp_listener_vec_t    _mpeg_sp_listeners;
     ts_listener_vec_t         _ts_writing_listeners;
     ts_av_listener_vec_t      _ts_av_listeners;
+    ps_listener_vec_t         _ps_listeners;
 
     // Table versions
     QMap<uint, int>           _pat_version;

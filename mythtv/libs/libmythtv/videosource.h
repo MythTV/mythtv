@@ -527,9 +527,30 @@ class HDPVRConfigurationGroup: public VerticalConfigurationGroup
     CaptureCard         &parent;
     TransLabelSetting   *cardinfo;
     TunerCardAudioInput *audioinput;
+    VBIDevice           *vbidevice;
 };
 
 class InstanceCount;
+
+class V4L2encGroup: public TriggeredConfigurationGroup
+{
+    Q_OBJECT
+
+  public:
+    V4L2encGroup(CaptureCard& parent);
+
+  private:
+    CaptureCard         &m_parent;
+    TransLabelSetting   *m_cardinfo;
+    InstanceCount       *m_instances;
+
+    QString m_DriverName;
+
+  protected slots:
+    virtual void triggerChanged(const QString& value);
+    void probeCard(const QString &device);
+};
+
 class ASIDevice;
 
 class ASIConfigurationGroup: public VerticalConfigurationGroup
@@ -849,7 +870,8 @@ class CardInput : public QObject, public ConfigurationWizard
 {
     Q_OBJECT
   public:
-    CardInput(const QString & cardtype, bool is_new_input, int cardid);
+    CardInput(const QString & cardtype, const QString & device,
+              bool is_new_input, int cardid);
     ~CardInput();
 
     int getInputID(void) const { return id->intValue(); };
