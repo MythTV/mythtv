@@ -60,6 +60,7 @@ static QString fs7(QT_TRANSLATE_NOOP("SchedFilterEditor", "This series"));
 static QString fs8(QT_TRANSLATE_NOOP("SchedFilterEditor", "This time"));
 static QString fs9(QT_TRANSLATE_NOOP("SchedFilterEditor", "This day and time"));
 static QString fs10(QT_TRANSLATE_NOOP("SchedFilterEditor", "This channel"));
+static QString fs11(QT_TRANSLATE_NOOP("SchedFilterEditor", "No episodes"));
 
 void *ScheduleEditor::RunScheduleEditor(ProgramInfo *proginfo, void *player)
 {
