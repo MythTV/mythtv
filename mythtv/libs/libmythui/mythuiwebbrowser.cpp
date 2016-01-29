@@ -779,9 +779,8 @@ QString MythWebView::getReplyMimetype(void)
     return mimeType;
 }
 
-QWebView *MythWebView::createWindow(QWebPage::WebWindowType type)
+QWebView *MythWebView::createWindow(QWebPage::WebWindowType /* type */)
 {
-    (void) type;
     return (QWebView *) this;
 }
 
@@ -1400,10 +1399,8 @@ void MythUIWebBrowser::slotScrollBarHiding(void)
     slotTopScreenChanged(NULL);
 }
 
-void MythUIWebBrowser::slotTopScreenChanged(MythScreenType *screen)
+void MythUIWebBrowser::slotTopScreenChanged(MythScreenType * /* screen */)
 {
-    (void) screen;
-
     if (IsOnTopScreen())
         SetActive(m_wasActive);
     else

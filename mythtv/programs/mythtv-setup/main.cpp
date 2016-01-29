@@ -68,10 +68,8 @@ static void cleanup()
     SignalHandler::Done();
 }
 
-static void SetupMenuCallback(void* data, QString& selection)
+static void SetupMenuCallback(void* /* data */, QString& selection)
 {
-    (void)data;
-
     QString sel = selection.toLower();
 
     if (sel == "general")
