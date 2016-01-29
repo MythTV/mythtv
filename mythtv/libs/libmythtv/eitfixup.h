@@ -61,7 +61,6 @@ class EITFixUp
         kFixUnitymedia       = 1ll << 32,
 
         // Early fixups
-        kEFixForceISO6937    = 1ll << 33,
         kEFixForceISO8859_1  = 1 << 22,
         kEFixForceISO8859_2  = 1 << 23,
         kEFixForceISO8859_9  = 1 << 24,

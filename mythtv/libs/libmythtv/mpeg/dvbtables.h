@@ -285,13 +285,6 @@ class MTV_PUBLIC SelectionInformationTable : public PSIPTable
 class MTV_PUBLIC DVBEventInformationTable : public PSIPTable
 {
   public:
-    DVBEventInformationTable(const PSIPTable& table, uint onid, uint tsid) : PSIPTable(table)
-    {
-        assert(IsEIT(TableID()));
-        _source_onid = onid;
-        _source_tsid = tsid;
-        Parse();
-    }
     DVBEventInformationTable(const PSIPTable& table) : PSIPTable(table)
     {
     // table_id                 8   0.0       0xC7
@@ -370,18 +363,8 @@ class MTV_PUBLIC DVBEventInformationTable : public PSIPTable
 
     static bool IsEIT(uint table_id);
 
-    uint SourceNetworkID(void)   const { return _source_onid; }
-    uint SourceTransportID(void) const { return _source_tsid;  }
-    bool ActualTS() const {
-        return (TableID() == TableID::PF_EIT)
-                || ((TableID() > TableID::SC_EITbeg)
-                     && (TableID() < TableID::SC_EITend));
-    }
-
   private:
     mutable vector<const unsigned char*> _ptrs; // used to parse
-    uint _source_onid;
-    uint _source_tsid;
 };
 
 /** \class TimeDateTable

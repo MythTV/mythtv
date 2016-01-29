@@ -310,28 +310,4 @@ void TestMPEGTables::ExtendedEventDescriptor_test (void)
     QCOMPARE (items.count (QString ("Role Player"), QString ("Nathan Fillion")), 1);
 }
 
-void TestMPEGTables::TestISO6937Override (void)
-{
-    /* part one, override to ISO 6937 */
-    /* constructed from information in #9480 */
-    unsigned char iso6937_data[] = {
-        0x0f, 0x05, 0x50, 0x69, 0x65, 0x6c, 0xce, 0x65, 0x99, 0x67, 0x6e, 0x69, 0x61, 0x72, 0x6b, 0x69
-    };
-
-    QString iso6937_wrong = dvb_decode_text (&iso6937_data[1], iso6937_data[0], NULL, 0);
-    QString iso6937_right = dvb_decode_text (&iso6937_data[1], iso6937_data[0], (const unsigned char *)"", 0);
-    QCOMPARE (iso6937_wrong, QString ("Piel\u00ceegniarki"));
-    QCOMPARE (iso6937_right, QString ("Piel\u0119gniarki"));
-
-    /* part two, override from ISO 6937 */
-    unsigned char iso8859_15_data[] = {
-        0x05, 0x47, 0x72, 0xfc, 0xdf, 0x65 /* greetings in german */
-    };
-
-    QString iso8859_15_wrong = dvb_decode_text (&iso8859_15_data[1], iso8859_15_data[0], NULL, 0);
-    QString iso8859_15_right = dvb_decode_text (&iso8859_15_data[1], iso8859_15_data[0], (const unsigned char *)"\x0b", 1);
-    QCOMPARE (iso8859_15_wrong, QString ("Gr\u00fe\u215ee"));
-    QCOMPARE (iso8859_15_right, QString ("Gr\u00fc\u00dfe"));
-}
-
 QTEST_APPLESS_MAIN(TestMPEGTables)
