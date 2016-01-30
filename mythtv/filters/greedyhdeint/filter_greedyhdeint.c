@@ -277,11 +277,13 @@ static VideoFilter* GreedyHDeintFilter(VideoFrameType inpixfmt,
     return (VideoFilter *) filter;
 }
 
+#ifdef MMX
 static FmtConv FmtList[] =
 {
     { FMT_YV12, FMT_YV12 } ,
     FMT_NULL
 };
+#endif
 
 const FilterInfo filter_table[] =
 {
