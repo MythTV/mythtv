@@ -258,8 +258,8 @@ INSTALLS += inc
 #DVD stuff
 DEPENDPATH  += ../../external/libmythdvdnav/
 DEPENDPATH  += ../../external/libmythdvdnav/dvdread # for dvd_reader.h & dvd_input.h
-INCLUDEPATH += ../../external/libmythdvdnav/dvdnav
-INCLUDEPATH += ../../external/libmythdvdnav/dvdread
+QMAKE_CXXFLAGS += -isystem ../../external/libmythdvdnav/dvdnav
+QMAKE_CXXFLAGS += -isystem ../../external/libmythdvdnav/dvdread
 
 !win32-msvc*:POST_TARGETDEPS += ../../external/libmythdvdnav/libmythdvdnav-$${MYTH_LIB_EXT}
 
