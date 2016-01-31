@@ -3966,8 +3966,8 @@ bool TV::ProcessKeypressOrGesture(PlayerContext *actx, QEvent *e)
 
 #ifdef Q_OS_LINUX
     // Fixups for _some_ linux native codes that QT doesn't know
-    if (dynamic_cast<QKeyEvent*>(e)) {
-        QKeyEvent* eKeyEvent = dynamic_cast<QKeyEvent*>(e);
+    QKeyEvent* eKeyEvent = dynamic_cast<QKeyEvent*>(e);
+    if (eKeyEvent) {
         if (eKeyEvent->key() <= 0)
         {
             int keycode = 0;
