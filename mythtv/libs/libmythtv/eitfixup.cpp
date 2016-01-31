@@ -2661,13 +2661,12 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event) const
     // Work out the season and episode numbers (if any)
     // Matching pattern "Επεισ[όο]διο:?|Επ 3 από 14|3/14" etc
     bool    series  = false;
-    int position1;
-    int position2;
     QRegExp tmpSeries = m_grSeason;
     // cap(2) is the season for ΑΒΓΔ
     // cap(3) is the season for 1234
-    if ((position1 = tmpSeries.indexIn(event.title)) != -1
-            || (position2 = tmpSeries.indexIn(event.description)) != -1)
+    int position1 = tmpSeries.indexIn(event.title);
+    int position2 = tmpSeries.indexIn(event.description);
+    if ((position1 != -1) || (position2 != -1))
     {
         if (!tmpSeries.cap(2).isEmpty()) // we found a letter representing a number
         {
