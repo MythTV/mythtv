@@ -914,8 +914,11 @@ bool GuideGrid::gestureEvent(MythGestureEvent *event)
                     {
                         MythUIButtonList* channelList = dynamic_cast<MythUIButtonList*>(object);
 
-                        handled = channelList->gestureEvent(event);
-                        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Guide Gesture Click channel list %1").arg(handled));
+                        if (channelList)
+                        {
+                            handled = channelList->gestureEvent(event);
+                            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Guide Gesture Click channel list %1").arg(handled));
+                        }
                     }
                     else if (name.startsWith("guidegrid"))
                     {
