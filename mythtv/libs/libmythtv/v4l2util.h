@@ -53,7 +53,7 @@ class MTV_PUBLIC V4L2util
     bool SetVideoBitrateMode(int value);
     bool SetVideoBitrate(int value);
     bool SetVideoBitratePeak(int value);
-    bool SetResolution(int width, int height);
+    bool SetResolution(uint32_t width, uint32_t height);
     // Audio controls
     bool SetAudioInput(int value);
     bool SetAudioCodec(int value);
