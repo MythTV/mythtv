@@ -4155,6 +4155,12 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
             signal_timeout->setValue(1000);
             channel_timeout->setValue(3000);
             break;
+        case CardUtil::DVBT2:
+            cardtype->setValue("DVB-T2");
+            cardname->setValue(frontend_name);
+            signal_timeout->setValue(1000);
+            channel_timeout->setValue(3000);
+            break;
         case CardUtil::OFDM:
         {
             cardtype->setValue("DVB-T");
