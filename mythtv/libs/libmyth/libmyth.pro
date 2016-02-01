@@ -246,6 +246,7 @@ using_openmax {
     contains( HAVE_OPENMAX_BROADCOM, yes ) {
         DEFINES += OMX_SKIP64BIT USING_BROADCOM
         #LIBS += -lopenmaxil
+        LIBS += -L/opt/vc/lib -lopenmaxil
     }
     contains( HAVE_OPENMAX_BELLAGIO, yes ) {
         DEFINES += USING_BELLAGIO
