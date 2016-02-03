@@ -50,8 +50,8 @@ private:
     void ClearStatus(Slide &next);
 
 private slots:
-    void ShowPrevSlide();
-    void ShowNextSlide(bool useTransition = true);
+    void ShowPrevSlide(int inc = 1);
+    void ShowNextSlide(int inc = 1, bool useTransition = true);
     void SlideAvailable(int count);
     void TransitionComplete();
     void ShowSlide(int direction = 0);
