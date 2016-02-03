@@ -2391,7 +2391,7 @@ QString ImageManagerFe::CrumbName(ImageItemK &im, bool getPath) const
         path.remove(0, DeviceMount(im.m_device).size());
         dev = DeviceName(im.m_device);
     }
-    return dev + path.replace("/", " : ");
+    return dev + path.replace("/", " > ");
 }
 
 
