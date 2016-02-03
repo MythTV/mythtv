@@ -60,28 +60,6 @@ QString FlatView::GetPosition() const
 
 
 /*!
- \brief Peeks at next image in view but does not advance iterator
- \return ImageItem The next image or NULL
-*/
-ImagePtrK FlatView::HasNext() const
-{
-    return m_sequence.isEmpty() || m_active >= m_sequence.size() - 1
-            ? ImagePtrK() : m_images.value(m_sequence.at(m_active + 1));
-}
-
-
-/*!
- \brief Peeks at previous image in view but does not decrement iterator
- \return ImageItem The previous image or NULL
-*/
-ImagePtrK FlatView::HasPrev() const
-{
-    return m_sequence.isEmpty() || m_active <= 0
-            ? ImagePtrK() : m_images.value(m_sequence.at(m_active - 1));
-}
-
-
-/*!
  \brief Updates view with images that have been updated.
  \param idList List of image ids that have been updated
  \return bool True if the current selection has been updated
@@ -148,27 +126,47 @@ void FlatView::Clear(bool resetParent)
 
 
 /*!
- \brief Advance iterator and return next image. Wraps at end and regenerates
- view order on wrap, if necessary
+ \brief Peeks at next image in view but does not advance iterator
+ \return ImageItem The next image or NULL
+*/
+ImagePtrK FlatView::HasNext(int inc) const
+{
+    return m_sequence.isEmpty() || m_active + inc >= m_sequence.size()
+            ? ImagePtrK() : m_images.value(m_sequence.at(m_active + inc));
+}
+
+
+/*!
+ \brief Advance iterator and return next image, wrapping if necessary.
+ Regenerates unordered views on wrap.
  \return ImageItem Next image or NULL if empty
 */
-ImagePtrK FlatView::Next()
+ImagePtrK FlatView::Next(int inc)
 {
     if (m_sequence.isEmpty())
         return ImagePtrK();
 
-    // wrap at end
-    if (m_active >= m_sequence.size() - 1)
-    {
-        if (m_order == kOrdered)
-            m_active = -1;
-        // Regenerate unordered views on every repeat
-        else if (!LoadFromDb(m_parentId))
-            // Images have disappeared
-            return ImagePtrK();
-    }
+    // Preserve index as it may be reset when wrapping
+    int next = m_active + inc;
 
-    return m_images.value(m_sequence.at(++m_active));
+    // Regenerate unordered views when wrapping
+    if (next >= m_sequence.size() && m_order != kOrdered && !LoadFromDb(m_parentId))
+        // Images have disappeared
+        return ImagePtrK();
+
+    m_active = next % m_sequence.size();
+    return m_images.value(m_sequence.at(m_active));
+}
+
+
+/*!
+ \brief Peeks at previous image in view but does not decrement iterator
+ \return ImageItem The previous image or NULL
+*/
+ImagePtrK FlatView::HasPrev(int inc) const
+{
+    return m_sequence.isEmpty() || m_active < inc
+            ? ImagePtrK() : m_images.value(m_sequence.at(m_active - inc));
 }
 
 
@@ -176,15 +174,17 @@ ImagePtrK FlatView::Next()
  \brief Decrements iterator and returns previous image. Wraps at start.
  \return ImageItem Previous image or NULL if empty
 */
-ImagePtrK FlatView::Prev()
+ImagePtrK FlatView::Prev(int inc)
 {
     if (m_sequence.isEmpty())
         return ImagePtrK();
 
-    if (m_active <= 0)
-        m_active = m_sequence.size();
+    // Wrap avoiding modulo of negative uncertainty
+    m_active -= inc % m_sequence.size();
+    if (m_active < 0)
+        m_active += m_sequence.size();
 
-    return m_images.value(m_sequence.at(--m_active));
+    return m_images.value(m_sequence.at(m_active));
 }
 
 

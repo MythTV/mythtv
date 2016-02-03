@@ -147,9 +147,13 @@ bool GallerySlideView::keyPressEvent(QKeyEvent *event)
         handled = true;
 
         if (action == "LEFT")
-            ShowPrevSlide();
+            ShowPrevSlide(1);
         else if (action == "RIGHT")
-            ShowNextSlide();
+            ShowNextSlide(1);
+        else if (action == "UP")
+            ShowPrevSlide(10);
+        else if (action == "DOWN")
+            ShowNextSlide(10);
         else if (action == "INFO")
             ShowInfo();
         else if (action == "MENU")
@@ -421,7 +425,7 @@ void GallerySlideView::Stop()
 void GallerySlideView::Play(bool useTransition)
 {
     // Start from next slide
-    ShowNextSlide(useTransition);
+    ShowNextSlide(1, useTransition);
 
     m_playing = true;
     if (!m_suspended)
@@ -620,7 +624,7 @@ void GallerySlideView::TransitionComplete()
         return;
 
     // Preload next slide, if any
-    m_slides.Preload(m_view->HasNext());
+    m_slides.Preload(m_view->HasNext(1));
 
     // Populate display for new slide
     ImagePtrK im  = m_slides.GetCurrent().GetImageData();
@@ -657,14 +661,14 @@ void GallerySlideView::TransitionComplete()
 /*!
  \brief Display the previous slide in the sequence
 */
-void GallerySlideView::ShowPrevSlide()
+void GallerySlideView::ShowPrevSlide(int inc)
 {
-    if (m_playing && m_view->HasPrev() == NULL)
+    if (m_playing && m_view->HasPrev(inc) == NULL)
         // Prohibit back-wrapping during slideshow: it will cause premature end
         //: Cannot go back beyond first slide of slideshow
         SetStatus(tr("Start"));
 
-    else if (m_view->Prev())
+    else if (m_view->Prev(inc))
         ShowSlide(-1);
 }
 
@@ -673,17 +677,21 @@ void GallerySlideView::ShowPrevSlide()
  \brief Display the next slide in the sequence
  \param useTransition if false, slide will be updated instantly
 */
-void GallerySlideView::ShowNextSlide(bool useTransition)
+void GallerySlideView::ShowNextSlide(int inc, bool useTransition)
 {
     // Browsing always wraps; slideshows depend on repeat setting
-    if (m_playing && m_view->HasNext() == NULL
+    if (m_playing && m_view->HasNext(inc) == NULL
             && !gCoreContext->GetNumSetting("GalleryRepeat", false))
     {
-        Stop();
-        //: Slideshow has reached last slide
-        SetStatus(tr("End"));
+        // Don't stop due to jumping past end
+        if (inc == 1)
+        {
+            Stop();
+            //: Slideshow has reached last slide
+            SetStatus(tr("End"));
+        }
     }
-    else if (m_view->Next())
+    else if (m_view->Next(inc))
         ShowSlide(useTransition ? 1 : 0);
     else
     {
