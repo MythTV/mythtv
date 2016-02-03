@@ -46,7 +46,8 @@ private:
     void Transform(ImageFileTransform);
     void Zoom(int = 0);
     void Pan(QPoint = QPoint(0, 0));
-    void SetStatus(QString msg);
+    void SetStatus(QString msg, bool delay = false);
+    void ClearStatus(Slide &next);
 
 private slots:
     void ShowPrevSlide();
@@ -63,6 +64,7 @@ private slots:
     void ShowCaptions();
     void HideCaptions();
     void PlayVideo();
+    void ShowStatus();
 
 private:
     // Theme widgets
@@ -81,6 +83,7 @@ private:
     InfoList    m_infoList;      //!< Image details overlay
     int         m_slideShowTime; //!< Time to display a slide in a slideshow
     QTimer      m_timer;         //!< Slide duration timer
+    QTimer      m_delay;         //!< Status delay timer
     bool        m_playing;       //!< True when slideshow is running
     bool        m_suspended;     //!< True when transition is running or video playing
     bool        m_showCaptions;  //!< If true, captions are shown
