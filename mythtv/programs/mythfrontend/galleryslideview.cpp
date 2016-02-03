@@ -50,6 +50,11 @@ GallerySlideView::GallerySlideView(MythScreenStack *parent, const char *name,
     m_timer.setSingleShot(true);
     m_timer.setInterval(m_slideShowTime);
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(ShowNextSlide()));
+
+    // Initialise status delay timer
+    m_delay.setSingleShot(true);
+    m_delay.setInterval(gCoreContext->GetNumSetting("GalleryStatusDelay", 0));
+    connect(&m_delay, SIGNAL(timeout()), this, SLOT(ShowStatus()));
 }
 
 
@@ -421,8 +426,7 @@ void GallerySlideView::Play(bool useTransition)
     m_playing = true;
     if (!m_suspended)
         m_timer.start();
-    if (m_uiStatus)
-        SetStatus(tr("Playing"));
+    SetStatus(tr("Playing"), true);
 }
 
 
@@ -544,7 +548,7 @@ void GallerySlideView::ShowSlide(int direction)
     // Load image from file
     if (!m_slides.Load(im, direction))
         // Image not yet available: show loading status
-        SetStatus(tr("Loading"));
+        SetStatus(tr("Loading"), true);
 }
 
 
@@ -574,16 +578,7 @@ void GallerySlideView::SlideAvailable(int count)
     Slide &next = m_slides.GetNext();
 
     // Update loading status
-    if (m_uiStatus)
-    {
-        if (!next.FailedLoad())
-
-            m_uiStatus->SetVisible(false);
-
-        else if (ImagePtrK im = next.GetImageData())
-
-            SetStatus(tr("Failed to load %1").arg(im->m_filePath));
-    }
+    ClearStatus(next);
 
     // Update slide counts
     if (m_uiSlideCount)
@@ -723,11 +718,37 @@ void GallerySlideView::PlayVideo()
  \brief Displays status text (Loading, Paused etc.)
  \param msg Text to show
 */
-void GallerySlideView::SetStatus(QString msg)
+void GallerySlideView::SetStatus(QString msg, bool delay)
 {
     if (m_uiStatus)
     {
         m_uiStatus->SetText(msg);
+        if (delay)
+            m_delay.start();
+        else
+            ShowStatus();
+    }
+}
+
+
+void GallerySlideView::ShowStatus()
+{
+    if (m_uiStatus)
         m_uiStatus->SetVisible(true);
+}
+
+void GallerySlideView::ClearStatus(Slide &slide)
+{
+    if (m_uiStatus)
+    {
+        m_delay.stop();
+
+        if (!slide.FailedLoad())
+
+            m_uiStatus->SetVisible(false);
+
+        else if (ImagePtrK im = slide.GetImageData())
+
+            SetStatus(tr("Failed to load %1").arg(im->m_filePath));
     }
 }

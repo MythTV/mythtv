@@ -98,6 +98,12 @@ SlideSettings::SlideSettings() : VerticalConfigurationGroup()
     transition->setHelpText(tr("The time that each transition lasts, in milliseconds."));
     addChild(transition);
 
+    HostSpinBox *delay = new HostSpinBox("GalleryStatusDelay", 0, 10000, 50);
+    delay->setLabel(tr("Status Delay (ms)"));
+    delay->setHelpText(tr("The delay before showing the Loading/Playing status, "
+                          "in milliseconds."));
+    addChild(delay);
+
     HostCheckBox *browseTran = new HostCheckBox("GalleryBrowseTransition");
     browseTran->setLabel(tr("Use transitions when browsing"));
     browseTran->setHelpText(tr("When cleared, transitions will only be used "
