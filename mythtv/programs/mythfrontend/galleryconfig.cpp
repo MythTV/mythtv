@@ -46,14 +46,19 @@ ThumbSettings::ThumbSettings() : VerticalConfigurationGroup()
 
     ADD_FORMAT(sampdate, "dd/MM/yy");
     ADD_FORMAT(sampdate, "dd-MM-yy");
+    ADD_FORMAT(sampdate, "dd.MM.yy");
     ADD_FORMAT(sampdate, "d/M/yy");
     ADD_FORMAT(sampdate, "d-M-yy");
+    ADD_FORMAT(sampdate, "d.M.yy");
     ADD_FORMAT(sampdate, "MM/dd/yy");
     ADD_FORMAT(sampdate, "MM-dd-yy");
+    ADD_FORMAT(sampdate, "MM.dd.yy");
     ADD_FORMAT(sampdate, "M/d/yy");
     ADD_FORMAT(sampdate, "M-d-yy");
+    ADD_FORMAT(sampdate, "M.d.yy");
     ADD_FORMAT(sampdate, "yyyy/MM/dd");
     ADD_FORMAT(sampdate, "yyyy-MM-dd");
+    ADD_FORMAT(sampdate, "yyyy.MM.dd");
     ADD_FORMAT(sampdate, QString("yyyy") % QChar(0x5E74) %
                "M" % QChar(0x6708) % "d" % QChar(0x65E5)); // yyyy年M月d日
 
