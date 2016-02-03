@@ -293,6 +293,19 @@ bool GalleryThumbView::keyPressEvent(QKeyEvent *event)
             FlipHorizontal();
         else if (action == "FLIPVERTICAL")
             FlipVertical();
+        else if (action == "COVER")
+        {
+            ImagePtrK im = m_view->GetSelected();
+            if (m_editsAllowed && im)
+            {
+                if (im == m_view->GetParent())
+                    // Reset dir
+                    m_mgr.SetCover(im->m_id, 0);
+                else
+                    // Set parent cover
+                    m_mgr.SetCover(im->m_parentId, im->m_id);
+            }
+        }
         else if (action == "PLAY")
             Slideshow();
         else if (action == "RECURSIVESHOW")

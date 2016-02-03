@@ -1473,6 +1473,8 @@ static void InitKeys(void)
          "Scroll image down"), "8");
      REG_KEY("Images", "RECENTER", QT_TRANSLATE_NOOP("MythControls",
          "Recenter image"), "5");
+     REG_KEY("Images", "COVER", QT_TRANSLATE_NOOP("MythControls",
+         "Set or clear cover image"), "C");
 }
 
 static void ReloadKeys(void)
