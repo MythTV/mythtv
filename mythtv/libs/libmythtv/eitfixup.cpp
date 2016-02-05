@@ -58,6 +58,7 @@ EITFixUp::EITFixUp()
       m_ukCompleteDots("^\\.\\.+$"),
       m_ukQuotedSubtitle("(?:^')([\\w\\s\\-,]+)(?:\\.' )"),
       m_ukAllNew("All New To 4Music!\\s?"),
+      m_ukLaONoSplit("^Law & Order: (?:Criminal Intent|LA|Special Victims Unit|Trial by Jury|You the Jury)"),
       m_comHemCountry("^(\\(.+\\))?\\s?([^ ]+)\\s([^\\.0-9]+)"
                       "(?:\\sfrån\\s([0-9]{4}))(?:\\smed\\s([^\\.]+))?\\.?"),
       m_comHemDirector("[Rr]egi"),
@@ -809,6 +810,7 @@ void EITFixUp::FixUK(DBEventEIT &event) const
 
     QRegExp tmp24ep = m_uk24ep;
     if (!event.title.startsWith("CSI:") && !event.title.startsWith("CD:") &&
+        !event.title.contains(m_ukLaONoSplit) &&
         !event.title.startsWith("Mission: Impossible"))
     {
         if (((position1=event.title.indexOf(m_ukDoubleDotEnd)) != -1) &&

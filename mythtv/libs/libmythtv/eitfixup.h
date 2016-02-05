@@ -150,6 +150,7 @@ class EITFixUp
     const QRegExp m_ukCompleteDots;
     const QRegExp m_ukQuotedSubtitle;
     const QRegExp m_ukAllNew;
+    const QRegExp m_ukLaONoSplit;
     const QRegExp m_comHemCountry;
     const QRegExp m_comHemDirector;
     const QRegExp m_comHemActor;
