@@ -95,7 +95,7 @@ EITFixUp::EITFixUp()
       m_ukCompleteDots("^\\.\\.+$"),
       m_ukQuotedSubtitle("(?:^')([\\w\\s\\-,]+)(?:\\.' )"),
       m_ukAllNew("All New To 4Music!\\s?"),
-      m_ukLaONoSplit("^Law & Order: (?:Criminal Intent|LA|Special Victims Unit|Trial by Jury|You the Jury)"),
+      m_ukLaONoSplit("^Law & Order: (?:Criminal Intent|LA|Special Victims Unit|Trial by Jury|UK|You the Jury)"),
       m_comHemCountry("^(\\(.+\\))?\\s?([^ ]+)\\s([^\\.0-9]+)"
                       "(?:\\sfr\xE5n\\s([0-9]{4}))(?:\\smed\\s([^\\.]+))?\\.?"),
       m_comHemDirector("[Rr]egi"),
