@@ -1472,6 +1472,8 @@ is_python3() {
 import sys
 if sys.version_info > (3,0):
     sys.exit(0)
+else:
+    sys.exit(1)
 EOF
 }
 
