@@ -381,6 +381,34 @@ void TestEITFixups::testUKLawAndOrder()
     delete event2;
 }
 
+void TestEITFixups::testUKMarvel()
+{
+    EITFixUp fixup;
+
+    DBEventEIT *event = SimpleDBEventEIT (EITFixUp::kFixUK,
+                                         "Marvel's Agents of S.H.I.E.L.D.",
+                                         "",
+                                         "");
+
+    PRINT_EVENT(*event);
+    fixup.Fix(*event);
+    PRINT_EVENT(*event);
+    QCOMPARE(event->title,    QString("Marvel's Agents of S.H.I.E.L.D."));
+    delete event;
+
+
+    DBEventEIT *event2 = SimpleDBEventEIT (EITFixUp::kFixUK,
+                                          "NEW: Marvel's Agents of S.H.I.E.L.D.",
+                                          "",
+                                          "");
+
+    PRINT_EVENT(*event2);
+    fixup.Fix(*event2);
+    PRINT_EVENT(*event2);
+    QCOMPARE(event2->title,    QString("Marvel's Agents of S.H.I.E.L.D."));
+    delete event2;
+}
+
 DBEventEIT *TestEITFixups::SimpleDBEventEIT (FixupValue fixup, QString title, QString subtitle, QString description)
 {
     DBEventEIT *event = new DBEventEIT (1, // channel id
