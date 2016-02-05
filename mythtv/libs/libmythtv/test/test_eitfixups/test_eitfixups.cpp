@@ -377,6 +377,7 @@ void TestEITFixups::testUKLawAndOrder()
     PRINT_EVENT(*event2);
     QCOMPARE(event2->title,    QString("Law & Order: Special Victims Unit"));
     QCOMPARE(event2->subtitle, QString("Sugar"));
+    QCOMPARE(event2->description, QString("Police drama series about an elite sex crime  ..."));
     delete event2;
 }
 
