@@ -587,7 +587,7 @@ void MythUIComboBoxSetting::fillSelectionsFromDir(const QDir &dir, bool absPath)
 MythUISpinBoxSetting::MythUISpinBoxSetting(Storage *_storage, int min, int max,
                                            int step, bool allow_single_step,
                                            const QString &special_value_text)
-    : MythUIComboBoxSetting(_storage, false),
+    : StandardSetting(_storage),
       m_min(min),
       m_max(max),
       m_step(step),
@@ -604,16 +604,10 @@ void MythUISpinBoxSetting::updateButton(MythUIButtonListItem *item)
     item->DisplayState("spinbox", "widgettype");
     item->setEnabled(isEnabled());
     item->SetText(m_label);
-    int indexValue = m_values.indexOf(m_settingValue);
-    if (indexValue >= 0)
-        item->SetText(m_labels.value(indexValue), "value");
+    if (m_settingValue.toInt() == m_min && !m_special_value_text.isEmpty())
+        item->SetText(m_special_value_text, "value");
     else
-    {
-        if (m_settingValue.toInt() == m_min && !m_special_value_text.isEmpty())
-            item->SetText(m_special_value_text, "value");
-        else
-            item->SetText(m_settingValue, "value");
-    }
+        item->SetText(m_settingValue, "value");
     item->SetText(getHelpText(), "description");
     item->setDrawArrow(haveSubSettings());
 }
@@ -637,10 +631,10 @@ void MythUISpinBoxSetting::edit(MythScreenType * screen)
     {
         settingdialog->SetRange(m_min, m_max, m_step);
         //Add custom values
-        for (int i = 0; i < m_labels.size() && m_values.size(); ++i)
+        for (int i = m_min; i <= m_max; i += m_step)
         {
-            QString value = m_values.at(i);
-            settingdialog->AddSelection(m_labels.at(i), value.toInt());
+            QString value = QString::number(i);
+            settingdialog->AddSelection(value, i);
         }
         if (!m_special_value_text.isEmpty())
             settingdialog->AddSelection(m_special_value_text, m_min);
@@ -655,7 +649,7 @@ void MythUISpinBoxSetting::edit(MythScreenType * screen)
 void MythUISpinBoxSetting::resultEdit(DialogCompletionEvent *dce)
 {
     if (m_settingValue != dce->GetResultText())
-        MythUIComboBoxSetting::setValue(dce->GetResultText());
+        setValue(dce->GetResultText());
 }
 
 /******************************************************************************

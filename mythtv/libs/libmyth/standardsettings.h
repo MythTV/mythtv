@@ -275,7 +275,7 @@ class MPUBLIC HostTimeBoxSetting : public HostComboBoxSetting
 *******************************************************************************/
 
 
-class MPUBLIC MythUISpinBoxSetting : public MythUIComboBoxSetting
+class MPUBLIC MythUISpinBoxSetting : public StandardSetting
 {
   public:
     //void setValue(int value);
@@ -300,8 +300,10 @@ class MPUBLIC TransMythUISpinBoxSetting: public MythUISpinBoxSetting
 {
   public:
     TransMythUISpinBoxSetting(int min, int max, int step,
-                              bool allow_single_step = false) :
-        MythUISpinBoxSetting(NULL, min, max, step, allow_single_step)
+                              bool allow_single_step = false,
+                              const QString &special_value_text = QString()) :
+        MythUISpinBoxSetting(NULL, min, max, step, allow_single_step,
+                             special_value_text)
     { }
 };
 
@@ -309,9 +311,10 @@ class MPUBLIC HostSpinBoxSetting: public MythUISpinBoxSetting
 {
   public:
     HostSpinBoxSetting(const QString &name, int min, int max, int step,
-                       bool allow_single_step = false) :
+                       bool allow_single_step = false,
+                       const QString &special_value_text = QString()) :
         MythUISpinBoxSetting(new HostDBStorage(this, name), min, max, step,
-                             allow_single_step)
+                             allow_single_step, special_value_text)
     { }
 };
 
@@ -319,9 +322,10 @@ class MPUBLIC GlobalSpinBoxSetting: public MythUISpinBoxSetting
 {
   public:
     GlobalSpinBoxSetting(const QString &name, int min, int max, int step,
-                         bool allow_single_step = false) :
+                         bool allow_single_step = false,
+                         const QString &special_value_text = QString()) :
         MythUISpinBoxSetting(new GlobalDBStorage(this, name), min, max, step,
-                             allow_single_step)
+                             allow_single_step, special_value_text)
     { }
 };
 

@@ -1430,7 +1430,7 @@ static HostSpinBoxSetting *VertScanPercentage()
 
     gs->setLabel(PlaybackSettings::tr("Vertical scaling"));
 
-    gs->setValue("0");
+    gs->setValue(0);
 
     gs->setHelpText(PlaybackSettings::tr("Adjust this if the image does not "
                                          "fill your screen vertically. Range "
@@ -1444,7 +1444,7 @@ static HostSpinBoxSetting *HorizScanPercentage()
 
     gs->setLabel(PlaybackSettings::tr("Horizontal scaling"));
 
-    gs->setValue("0");
+    gs->setValue(0);
 
     gs->setHelpText(PlaybackSettings::tr("Adjust this if the image does not "
                                          "fill your screen horizontally. Range "
@@ -1458,7 +1458,7 @@ static HostSpinBoxSetting *XScanDisplacement()
 
     gs->setLabel(PlaybackSettings::tr("Scan displacement (X)"));
 
-    gs->setValue("0");
+    gs->setValue(0);
 
     gs->setHelpText(PlaybackSettings::tr("Adjust this to move the image "
                                          "horizontally."));
@@ -1472,7 +1472,7 @@ static HostSpinBoxSetting *YScanDisplacement()
 
     gs->setLabel(PlaybackSettings::tr("Scan displacement (Y)"));
 
-    gs->setValue("0");
+    gs->setValue(0);
 
     gs->setHelpText(PlaybackSettings::tr("Adjust this to move the image "
                                          "vertically."));
@@ -1976,7 +1976,7 @@ static HostSpinBoxSetting *GuiWidth()
 
     gs->setLabel(AppearanceSettings::tr("GUI width (pixels)"));
 
-    gs->setValue("0");
+    gs->setValue(0);
 
     gs->setHelpText(AppearanceSettings::tr("The width of the GUI. Do not make "
                                            "the GUI wider than your actual "
@@ -1992,7 +1992,7 @@ static HostSpinBoxSetting *GuiHeight()
 
     gs->setLabel(AppearanceSettings::tr("GUI height (pixels)"));
 
-    gs->setValue("0");
+    gs->setValue(0);
 
     gs->setHelpText(AppearanceSettings::tr("The height of the GUI. Do not make "
                                            "the GUI taller than your actual "
@@ -2008,7 +2008,7 @@ static HostSpinBoxSetting *GuiOffsetX()
 
     gs->setLabel(AppearanceSettings::tr("GUI X offset"));
 
-    gs->setValue("0");
+    gs->setValue(0);
 
     gs->setHelpText(AppearanceSettings::tr("The horizontal offset where the "
                                            "GUI will be displayed. May only "
@@ -2022,7 +2022,7 @@ static HostSpinBoxSetting *GuiOffsetY()
 
     gs->setLabel(AppearanceSettings::tr("GUI Y offset"));
 
-    gs->setValue("0");
+    gs->setValue(0);
 
     gs->setHelpText(AppearanceSettings::tr("The vertical offset where the "
                                            "GUI will be displayed."));
@@ -2097,7 +2097,7 @@ static HostSpinBoxSetting *VidModeWidth(int idx)
 
     gs->setLabel(VideoModeSettings::tr("In X", "Video mode width"));
 
-    gs->setValue("0");
+    gs->setValue(0);
 
     gs->setHelpText(VideoModeSettings::tr("Horizontal resolution of video "
                                           "which needs a special output "
@@ -2113,7 +2113,7 @@ static HostSpinBoxSetting *VidModeHeight(int idx)
 
     gs->setLabel(VideoModeSettings::tr("In Y", "Video mode height"));
 
-    gs->setValue("0");
+    gs->setValue(0);
 
     gs->setHelpText(VideoModeSettings::tr("Vertical resolution of video "
                                           "which needs a special output "
@@ -4560,29 +4560,27 @@ PlayBackGroupSetting::PlayBackGroupSetting(const QString &label,
                                  "which \"News\" or \"CNN\" appears."));
     addChild(m_titleMatch);
 
-    m_skipAhead = new TransMythUISpinBoxSetting(0, 600, 5, true);
-    m_skipAhead->addSelection(tr("Default"),"0",true);
+    m_skipAhead = new TransMythUISpinBoxSetting(0, 600, 5, true, tr("Default"));
     m_skipAhead->setLabel(tr("Skip ahead (seconds)"));
     m_skipAhead->setHelpText(tr("How many seconds to skip forward on a fast "
                                 "forward."));
     addChild(m_skipAhead);
 
-    m_skipBack = new TransMythUISpinBoxSetting(0, 600, 5, true);
-    m_skipBack->addSelection(tr("Default"),"0",true);
+    m_skipBack = new TransMythUISpinBoxSetting(0, 600, 5, true, tr("Default"));
     m_skipBack->setLabel(tr("Skip back (seconds)"));
     m_skipBack->setHelpText(tr("How many seconds to skip backward on a "
                                "rewind."));
     addChild(m_skipBack);
 
-    m_jumpMinutes = new TransMythUISpinBoxSetting(0, 30, 10, true);
-    m_jumpMinutes->addSelection(tr("Default"),"0",true);
+    m_jumpMinutes = new TransMythUISpinBoxSetting(0, 30, 10, true,
+                                                  tr("Default"));
     m_jumpMinutes->setLabel(tr("Jump amount (minutes)"));
     m_jumpMinutes->setHelpText(tr("How many minutes to jump forward or "
                                   "backward when the jump keys are pressed."));
     addChild(m_jumpMinutes);
 
-    m_timeStrech = new TransMythUISpinBoxSetting(45, 200, 5, false);
-    m_timeStrech->addSelection(tr("Default"),"0",true);
+    m_timeStrech = new TransMythUISpinBoxSetting(45, 200, 5, false,
+                                                 tr("Default"));
     m_timeStrech->setLabel(tr("Time stretch (speed x 100)"));
     m_timeStrech->setHelpText(tr("Initial playback speed with adjusted audio. "
                                  "Use 100 for normal speed, 50 for half speed "
@@ -4619,7 +4617,7 @@ void PlayBackGroupSetting::Load()
         m_jumpMinutes->setValue(query.value(4).toInt());
 
         if (query.value(5).toInt() < 45 || query.value(5).toInt() > 200)
-            m_timeStrech->setValue(0);
+            m_timeStrech->setValue(45);
         else
             m_timeStrech->setValue(query.value(4).toInt());
         m_markForDeletion->setEnabled(getValue() != "Default");
@@ -4679,7 +4677,13 @@ void PlayBackGroupSetting::Save()
         query.bindValue(":SKIPAHEAD",   m_skipAhead->intValue());
         query.bindValue(":SKIPBACK",    m_skipBack->intValue());
         query.bindValue(":JUMP",        m_jumpMinutes->intValue());
-        query.bindValue(":TIMESTRETCH", m_timeStrech->intValue());
+
+        int timestretch = m_timeStrech->intValue();
+        if (timestretch < 50 || timestretch > 200)
+            timestretch = 0;
+
+        query.bindValue(":TIMESTRETCH", timestretch);
+
         query.bindValue(":NAME",        getValue());
 
         if (!query.exec())
