@@ -12,7 +12,6 @@ using namespace std;
 #include "schemawizard.h"
 #include "mythdb.h"
 #include "mythlogging.h"
-#include "diseqcsettings.h" // for convert_diseqc_db()
 #include "videodbcheck.h" // for 1267
 #include "compat.h"
 #include "recordingrule.h"
