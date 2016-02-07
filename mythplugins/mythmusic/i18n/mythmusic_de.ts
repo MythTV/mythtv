@@ -698,7 +698,7 @@ Copying to %1</source>
         <location filename="../mythmusic/importmusic.cpp" line="1163"/>
         <source>%1 of %2</source>
         <comment>Current file copied</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1 von %2</translation>
     </message>
     <message>
         <location filename="../mythmusic/importmusic.cpp" line="1205"/>
@@ -1263,7 +1263,7 @@ GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR</translation>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1373"/>
         <location filename="../mythmusic/musiccommon.cpp" line="2241"/>
-        <location filename="../mythmusic/streamview.cpp" line="98"/>
+        <location filename="../mythmusic/streamview.cpp" line="100"/>
         <source>Fullscreen Visualizer</source>
         <translation>Vollbild Visualisierung</translation>
     </message>
@@ -1288,7 +1288,7 @@ GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR</translation>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1388"/>
         <location filename="../mythmusic/musiccommon.cpp" line="2244"/>
-        <location filename="../mythmusic/streamview.cpp" line="99"/>
+        <location filename="../mythmusic/streamview.cpp" line="101"/>
         <source>Lyrics</source>
         <translation type="unfinished">Liedtext</translation>
     </message>
@@ -3212,18 +3212,43 @@ Wollen Sie die vorhandene Datei dauerhaft löschen?</translation>
 <context>
     <name>SearchStream</name>
     <message>
-        <location filename="../mythmusic/streamview.cpp" line="823"/>
-        <location filename="../mythmusic/streamview.cpp" line="895"/>
-        <location filename="../mythmusic/streamview.cpp" line="916"/>
         <source>&lt;All Stations&gt;</source>
-        <translation>&lt;Alle Stationen&gt;</translation>
+        <translation type="vanished">&lt;Alle Stationen&gt;</translation>
     </message>
     <message>
-        <location filename="../mythmusic/streamview.cpp" line="824"/>
-        <location filename="../mythmusic/streamview.cpp" line="905"/>
+        <location filename="../mythmusic/streamview.cpp" line="893"/>
+        <location filename="../mythmusic/streamview.cpp" line="910"/>
+        <location filename="../mythmusic/streamview.cpp" line="1021"/>
+        <source>&lt;All Broadcasters&gt;</source>
+        <translation>&lt;Alle Rundfunkveranstalter&gt;</translation>
+    </message>
+    <message>
         <location filename="../mythmusic/streamview.cpp" line="917"/>
+        <location filename="../mythmusic/streamview.cpp" line="934"/>
+        <location filename="../mythmusic/streamview.cpp" line="1022"/>
         <source>&lt;All Genres&gt;</source>
         <translation>&lt;Alle Genres&gt;</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/streamview.cpp" line="943"/>
+        <location filename="../mythmusic/streamview.cpp" line="960"/>
+        <location filename="../mythmusic/streamview.cpp" line="1007"/>
+        <location filename="../mythmusic/streamview.cpp" line="1024"/>
+        <source>&lt;All Countries&gt;</source>
+        <translation>&lt;Alle Länder&gt;</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/streamview.cpp" line="970"/>
+        <location filename="../mythmusic/streamview.cpp" line="987"/>
+        <location filename="../mythmusic/streamview.cpp" line="1006"/>
+        <location filename="../mythmusic/streamview.cpp" line="1023"/>
+        <source>&lt;All Languages&gt;</source>
+        <translation>&lt;Alle Sprachen&gt;</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/streamview.cpp" line="1111"/>
+        <source>Updating stream list. Please Wait ...</source>
+        <translation>Aktualisiere Streamliste. Bitte warten ...</translation>
     </message>
 </context>
 <context>
@@ -3650,38 +3675,44 @@ Wollen Sie die vorhandene Datei dauerhaft löschen?</translation>
 <context>
     <name>StreamView</name>
     <message>
-        <location filename="../mythmusic/streamview.cpp" line="89"/>
+        <location filename="../mythmusic/streamview.cpp" line="91"/>
         <source>Stream Actions</source>
         <translation>Streamaktionen</translation>
     </message>
     <message>
-        <location filename="../mythmusic/streamview.cpp" line="90"/>
-        <location filename="../mythmusic/streamview.cpp" line="301"/>
+        <location filename="../mythmusic/streamview.cpp" line="92"/>
+        <location filename="../mythmusic/streamview.cpp" line="303"/>
         <source>Add Stream</source>
         <translation>Stream hinzufügen</translation>
     </message>
     <message>
-        <location filename="../mythmusic/streamview.cpp" line="94"/>
-        <location filename="../mythmusic/streamview.cpp" line="315"/>
+        <location filename="../mythmusic/streamview.cpp" line="96"/>
+        <location filename="../mythmusic/streamview.cpp" line="317"/>
         <source>Edit Stream</source>
         <translation>Stream bearbeitet</translation>
     </message>
     <message>
-        <location filename="../mythmusic/streamview.cpp" line="95"/>
-        <location filename="../mythmusic/streamview.cpp" line="311"/>
+        <location filename="../mythmusic/streamview.cpp" line="97"/>
+        <location filename="../mythmusic/streamview.cpp" line="313"/>
         <source>Remove Stream</source>
         <translation>Stream entfernen</translation>
     </message>
     <message>
-        <location filename="../mythmusic/streamview.cpp" line="101"/>
+        <location filename="../mythmusic/streamview.cpp" line="103"/>
         <source>More Options</source>
         <translation>Mehr Optionen</translation>
     </message>
     <message>
-        <location filename="../mythmusic/streamview.cpp" line="396"/>
+        <location filename="../mythmusic/streamview.cpp" line="398"/>
+        <source>Are you sure you want to delete this Stream?
+Broadcaster: %1 - Channel: %2</source>
+        <translation>Sind Sie sicher, daß Sie diesen Stream löschen wollen?
+Rundfunkveranstalter: %1 - Sender: %2</translation>
+    </message>
+    <message>
         <source>Are you sure you want to delete this Stream?
 Station: %1 - Channel: %2</source>
-        <translation>Sind Sie sicher, daß Sie diesen Stream löschen wollen?
+        <translation type="vanished">Sind Sie sicher, daß Sie diesen Stream löschen wollen?
 Station: %1 - Sender: %2</translation>
     </message>
 </context>
@@ -5201,7 +5232,7 @@ Station: %1 - Sender: %2</translation>
 <context>
     <name>avfDecoderFactory</name>
     <message>
-        <location filename="../mythmusic/avfdecoder.cpp" line="624"/>
+        <location filename="../mythmusic/avfdecoder.cpp" line="628"/>
         <source>Internal Decoder</source>
         <translation>Interner Dekoder</translation>
     </message>
