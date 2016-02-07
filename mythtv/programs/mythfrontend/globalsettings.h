@@ -81,7 +81,7 @@ class ChannelGroupSettings : public TriggeredConfigurationGroup
 };
 
 #if CONFIG_DARWIN
-class MacMainSettings : public TriggeredConfigurationGroup
+class MacMainSettings : public GroupSetting
 {
     Q_OBJECT
 
@@ -89,7 +89,7 @@ class MacMainSettings : public TriggeredConfigurationGroup
     MacMainSettings();
 };
 
-class MacFloatSettings : public TriggeredConfigurationGroup
+class MacFloatSettings : public GroupSetting
 {
     Q_OBJECT
 
@@ -98,7 +98,7 @@ class MacFloatSettings : public TriggeredConfigurationGroup
 };
 
 
-class MacDockSettings : public TriggeredConfigurationGroup
+class MacDockSettings : public GroupSetting
 {
     Q_OBJECT
 
@@ -107,7 +107,7 @@ class MacDockSettings : public TriggeredConfigurationGroup
 };
 
 
-class MacDesktopSettings : public TriggeredConfigurationGroup
+class MacDesktopSettings : public GroupSetting
 {
     Q_OBJECT
 

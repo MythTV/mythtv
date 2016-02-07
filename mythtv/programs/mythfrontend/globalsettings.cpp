@@ -3534,24 +3534,6 @@ static HostSpinBoxSetting *MacMainOpacity()
     return gs;
 }
 
-MacMainSettings::MacMainSettings() : TriggeredConfigurationGroup(false)
-{
-    setLabel(tr("Video in main window"));
-    setUseLabel(false);
-    Setting *gc = MacMainEnabled();
-    addChild(gc);
-    setTrigger(gc);
-
-    GroupSetting *opts =
-        new GroupSetting(false, false);
-    opts->addChild(MacMainSkip());
-    opts->addChild(MacMainOpacity());
-
-    addTarget("1", opts);
-    addTarget("0", new GroupSetting(false, false));
-
-};
-
 static HostCheckBoxSetting *MacFloatEnabled()
 {
     HostCheckBoxSetting *gc = new HostCheckBoxSetting("MacFloatEnabled");
@@ -3598,25 +3580,6 @@ static HostSpinBoxSetting *MacFloatOpacity()
     return gs;
 }
 
-MacFloatSettings::MacFloatSettings() : TriggeredConfigurationGroup(false)
-{
-    setLabel(tr("Video in floating window"));
-
-    setUseLabel(false);
-    Setting *gc = MacFloatEnabled();
-    addChild(gc);
-    setTrigger(gc);
-
-    GroupSetting *opts =
-        new GroupSetting(false, false);
-    opts->addChild(MacFloatSkip());
-    opts->addChild(MacFloatOpacity());
-
-    addTarget("1", opts);
-    addTarget("0", new GroupSetting(false, false));
-
-};
-
 static HostCheckBoxSetting *MacDockEnabled()
 {
     HostCheckBoxSetting *gc = new HostCheckBoxSetting("MacDockEnabled");
@@ -3646,20 +3609,6 @@ static HostSpinBoxSetting *MacDockSkip()
                                         "to 0 to show every frame."));
     return gs;
 }
-
-MacDockSettings::MacDockSettings() : TriggeredConfigurationGroup(false)
-{
-    setLabel(tr("Video in the dock"));
-    setUseLabel(false);
-    Setting *gc = MacDockEnabled();
-    addChild(gc);
-    setTrigger(gc);
-
-    Setting *skip = MacDockSkip();
-    addTarget("1", skip);
-    addTarget("0", new HorizontalConfigurationGroup(false, false));
-
-};
 
 static HostCheckBoxSetting *MacDesktopEnabled()
 {
@@ -3693,19 +3642,6 @@ static HostSpinBoxSetting *MacDesktopSkip()
                                            "frame."));
     return gs;
 }
-
-MacDesktopSettings::MacDesktopSettings() : TriggeredConfigurationGroup(false)
-{
-    setLabel(tr("Video on the desktop"));
-    setUseLabel(false);
-    Setting *gc = MacDesktopEnabled();
-    addChild(gc);
-    setTrigger(gc);
-    Setting *skip = MacDesktopSkip();
-    addTarget("1", skip);
-    addTarget("0", new HorizontalConfigurationGroup(false, false));
-
-};
 #endif
 
 /* This code is a duplication the class DatabaseSettings. As it it also use
@@ -4268,10 +4204,23 @@ void PlaybackSettings::Load(void)
     mac->addChild(MacScaleUp());
     mac->addChild(MacFullSkip());
 
-    mac->addChild(MacMainEnabled());
-    mac->addChild(MacFloatEnabled());
-    mac->addChild(MacDockEnabled());
-    mac->addChild(MacDesktopEnabled());
+    StandardSetting *floatEnabled = MacFloatEnabled();
+    floatEnabled->addTargetedChild("1", MacFloatSkip());
+    floatEnabled->addTargetedChild("1", MacFloatOpacity());
+    mac->addChild(floatEnabled);
+
+    StandardSetting *macMainEnabled = MacMainEnabled();
+    macMainEnabled->addTargetedChild("1", MacMainSkip());
+    macMainEnabled->addTargetedChild("1", MacMainOpacity());
+    mac->addChild(macMainEnabled);
+
+    StandardSetting *dockEnabled = MacDockEnabled();
+    dockEnabled->addTargetedChild("1", MacDockSkip());
+    mac->addChild(dockEnabled);
+
+    StandardSetting* desktopEnabled = MacDesktopEnabled();
+    desktopEnabled->addTargetedChild("1", MacDesktopSkip());
+    mac->addChild(desktopEnabled);
 
     addChild(mac);
 #endif
