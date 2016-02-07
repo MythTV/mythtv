@@ -469,6 +469,21 @@ static bool parse_extinf(const QString &line,
         return true;
     }
 
+    // Parse extension portion, russion iptv plugin style
+    QRegExp chanNumName5("^(-?\\d+)\\s+[^,]*,\\s*(.*)$");
+    pos = chanNumName5.indexIn(line);
+    if (pos != -1)
+    {
+        channum = chanNumName5.cap(1).simplified();
+        name = chanNumName5.cap(2).simplified();
+        bool ok;
+        int channel_number = channum.toInt (&ok);
+        if ((ok == true) && (channel_number > 0))
+        {
+            return true;
+        }
+    }
+
     // line is supposed to contain the "0,2 - France 2" part
     QString msg = LOC +
         QString("Invalid header in channel list line \n\t\t\tEXTINF:%1")
