@@ -1072,7 +1072,8 @@ void EITFixUp::FixUK(DBEventEIT &event) const
         }
     }
 
-    if (!isMovie && event.subtitle.isEmpty())
+    if (!isMovie && event.subtitle.isEmpty() &&
+        !event.title.startsWith("The X-Files"))
     {
         if ((position1=event.description.indexOf(m_ukTime)) != -1)
         {
