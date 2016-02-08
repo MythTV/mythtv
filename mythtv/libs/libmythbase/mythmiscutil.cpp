@@ -225,8 +225,8 @@ bool hasUtf8(const char *str)
 bool ping(const QString &host, int timeout)
 {
 #ifdef _WIN32
-    QString cmd = QString("%systemroot%\\system32\\ping.exe -i %1 -n 1 %2>NUL")
-                  .arg(timeout).arg(host);
+    QString cmd = QString("%systemroot%\\system32\\ping.exe -w %1 -n 1 %2>NUL")
+                  .arg(timeout*1000).arg(host);
 
     if (myth_system(cmd, kMSDontBlockInputDevs | kMSDontDisableDrawing |
                          kMSProcessEvents) != GENERIC_EXIT_OK)
