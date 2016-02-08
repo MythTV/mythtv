@@ -433,6 +433,27 @@ DBEventEIT *TestEITFixups::SimpleDBEventEIT (FixupValue fixup, QString title, QS
     return event;
 }
 
+void TestEITFixups::testUKXFiles()
+{
+    // Make sure numbers don't get misinterpreted as episode number or similar.
+    EITFixUp fixup;
+
+    DBEventEIT event(1005,
+                      "New: The X-Files",
+                      "Hit sci-fi drama series returns. Mulder and Scully are reunited after the collapse of their relationship when a TV host contacts them, believing he has uncovered a significant conspiracy. (Ep 1)[AD,S]",
+                      QDateTime::fromString("2016-02-08T22:00:00Z", Qt::ISODate),
+                      QDateTime::fromString("2016-02-08T23:00:00Z", Qt::ISODate),
+                      EITFixUp::kFixGenericDVB | EITFixUp::kFixUK,
+                      SUB_UNKNOWN,
+                      AUD_STEREO,
+                      VID_UNKNOWN);
+
+    fixup.Fix(event);
+    PRINT_EVENT(event);
+    QCOMPARE(event.title,       QString("The X-Files"));
+    QCOMPARE(event.description, QString("Hit sci-fi drama series returns. Mulder and Scully are reunited after the collapse of their relationship when a TV host contacts them, believing he has uncovered a significant conspiracy."));
+}
+
 void TestEITFixups::testDEPro7Sat1()
 {
     EITFixUp fixup;

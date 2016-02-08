@@ -45,6 +45,7 @@ class TestEITFixups : public QObject
     void testUKFixups9(void);
     void testUKLawAndOrder(void);
     void testUKMarvel(void);
+    void testUKXFiles(void);
     void testDEPro7Sat1(void);
     void testHTMLFixup(void);
     void testSkyEpisodes(void);
