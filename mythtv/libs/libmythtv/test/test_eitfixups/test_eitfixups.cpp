@@ -451,7 +451,7 @@ void TestEITFixups::testUKXFiles()
     fixup.Fix(event);
     PRINT_EVENT(event);
     QCOMPARE(event.title,       QString("The X-Files"));
-    QCOMPARE(event.description, QString("Hit sci-fi drama series returns. Mulder and Scully are reunited after the collapse of their relationship when a TV host contacts them, believing he has uncovered a significant conspiracy."));
+    QCOMPARE(event.description, QString("Hit sci-fi drama series returns. Mulder and Scully are reunited after the collapse of their relationship when a TV host contacts them, believing he has uncovered a significant conspiracy. (Ep 1)"));
 }
 
 void TestEITFixups::testDEPro7Sat1()
