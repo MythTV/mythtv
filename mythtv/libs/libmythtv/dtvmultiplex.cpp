@@ -460,6 +460,8 @@ bool DTVMultiplex::FillFromDeliverySystemDesc(DTVTunerType type,
                     cd.TransmissionModeString(),        cd.GuardIntervalString(),
                     cd.HierarchyString(),               "DVB-T");
             }
+
+            break;
         }
         case DescriptorID::satellite_delivery_system:
         {
