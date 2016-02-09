@@ -361,6 +361,7 @@ using_frontend {
         contains( HAVE_OPENMAX_BROADCOM, yes ) {
             DEFINES += OMX_SKIP64BIT USING_BROADCOM
             #LIBS += -lopenmaxil
+            QMAKE_CXXFLAGS += -isystem /opt/vc/include -isystem /opt/vc/include/IL
             LIBS += -L/opt/vc/lib -lopenmaxil
         }
         contains( HAVE_OPENMAX_BELLAGIO, yes ) {
