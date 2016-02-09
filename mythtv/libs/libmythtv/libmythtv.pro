@@ -729,7 +729,7 @@ using_backend {
     # Support for HDHomeRun box
     using_hdhomerun {
         # MythTV HDHomeRun glue
-        INCLUDEPATH += ../../external/libhdhomerun
+        QMAKE_CXXFLAGS += -isystem ../../external/libhdhomerun
         DEPENDPATH += ../../external/libhdhomerun
 
         HEADERS += recorders/hdhrsignalmonitor.h
