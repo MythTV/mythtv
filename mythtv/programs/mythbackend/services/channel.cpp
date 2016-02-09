@@ -67,10 +67,8 @@ DTC::ChannelInfoList* Channel::GetChannelInfoList( uint nSourceID,
 
     DTC::ChannelInfoList *pChannelInfos = new DTC::ChannelInfoList();
 
-    //uint nTotalAvailable = static_cast<uint>(chanList.size());
     nStartIndex   = (nStartIndex > 0) ? min( nStartIndex, nTotalAvailable ) : 0;
     nCount        = (nCount > 0) ? min( nCount, nTotalAvailable ) : nTotalAvailable;
-    int nEndIndex = min((nStartIndex + nCount), nTotalAvailable );
 
     ChannelInfoList::iterator chanIt;
     for( chanIt = chanList.begin(); chanIt != chanList.end(); ++chanIt)
