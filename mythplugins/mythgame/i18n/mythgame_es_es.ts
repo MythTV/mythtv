@@ -183,17 +183,17 @@ Remove it from the database?</source>
 <context>
     <name>GameScanner</name>
     <message>
-        <location filename="../mythgame/gamescan.cpp" line="67"/>
+        <location filename="../mythgame/gamescan.cpp" line="68"/>
         <source>Verifying game files...</source>
         <translation>Verificando archivos de juegos...</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamescan.cpp" line="110"/>
+        <location filename="../mythgame/gamescan.cpp" line="111"/>
         <source>Updating game database...</source>
         <translation>Actualizando la base de datos de los juegos...</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamescan.cpp" line="145"/>
+        <location filename="../mythgame/gamescan.cpp" line="146"/>
         <source>Searching for games...</source>
         <translation>Buscando juegos...</translation>
     </message>

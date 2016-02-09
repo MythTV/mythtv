@@ -5,17 +5,17 @@
 <context>
     <name>BookmarkEditor</name>
     <message>
-        <location filename="../mythbrowser/bookmarkeditor.cpp" line="56"/>
+        <location filename="../mythbrowser/bookmarkeditor.cpp" line="66"/>
         <source>Edit Bookmark Details</source>
         <translation>Editar detalles del marcador</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkeditor.cpp" line="58"/>
+        <location filename="../mythbrowser/bookmarkeditor.cpp" line="68"/>
         <source>Enter Bookmark Details</source>
         <translation>Introducir detalles del marcador</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkeditor.cpp" line="146"/>
+        <location filename="../mythbrowser/bookmarkeditor.cpp" line="139"/>
         <source>Select a category</source>
         <translation>Seleccione una categoría</translation>
     </message>
