@@ -3868,7 +3868,7 @@ static bool SysEventHandleAction(QKeyEvent *e, const QStringList &actions)
 QList<QKeyEvent> TV::ConvertScreenPressKeyMap(const QString &keyList)
 {
     QList<QKeyEvent> keyPressList;
-    int i;
+    int i = 0;
     QStringList stringKeyList = keyList.split(',');
     QStringList::const_iterator it;
     for (it = stringKeyList.begin(); it != stringKeyList.end(); ++it)
