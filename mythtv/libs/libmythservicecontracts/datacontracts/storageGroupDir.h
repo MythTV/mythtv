@@ -40,7 +40,10 @@ class SERVICE_PUBLIC StorageGroupDir : public QObject
 
         StorageGroupDir(QObject *parent = 0) 
             : QObject         ( parent ),
-              m_Id            ( 0      )
+              m_Id            ( 0      ),
+              m_DirRead       ( false  ),
+              m_DirWrite      ( false  ),
+              m_KiBFree       ( 0      )
         { 
         }
         
