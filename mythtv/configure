@@ -6285,7 +6285,7 @@ if ! disabled openmax; then
     check_header 'OMX_Core.h' && enable openmax
 fi
 if ! disabled openmax; then
-    if check_lib 'OMX_Broadcom.h' OMX_Init -lopenmaxil; then
+    if check_lib 'OMX_Broadcom.h' OMX_Init -L/opt/vc/lib -lopenmaxil; then
         enable openmax_broadcom
     elif check_lib 'bellagio/omxcore.h' OMX_Init -lomxil-bellagio; then
         enable openmax_bellagio
