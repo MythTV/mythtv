@@ -32,7 +32,7 @@
     <button>
         <type>TV_SEARCH_NEW_TITLES</type>
         <text>New Titles</text>
-        <description>Pick a program to record for a list of new titles</description>
+        <description>Pick a program to record from a list of new titles</description>
         <action>TV_SEARCH_NEW</action>
     </button>
 
