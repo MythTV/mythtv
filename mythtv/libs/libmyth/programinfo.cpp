@@ -5536,7 +5536,7 @@ bool LoadFromProgram(ProgramList &destination,
 
     // ------------------------------------------------------------------------
 
-    return LoadFromProgram(destination, sql, bindings, schedList, 0, 0, count);
+    return LoadFromProgram(destination, queryStr, bindings, schedList, 0, 0, count);
 }
 
 bool LoadFromProgram( ProgramList &destination,
