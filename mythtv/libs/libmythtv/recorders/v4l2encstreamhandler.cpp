@@ -571,7 +571,7 @@ bool V4L2encStreamHandler::StartEncoding(void)
                 {
                     LOG(VB_GENERAL, LOG_ERR, LOC +
                         "StartEncoding: Can't open video device." + ENO);
-                    _error = "Failed to start recording";
+                    m_error = "Failed to start recording";
                     return false;
                 }
             }
@@ -587,7 +587,7 @@ bool V4L2encStreamHandler::StartEncoding(void)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 "StartEncoding: read from video device failed." + ENO);
-            _error = "Failed to start recording";
+            m_error = "Failed to start recording";
             close(m_fd);
             m_fd = -1;
             return false;
