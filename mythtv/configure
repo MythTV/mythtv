@@ -5674,7 +5674,7 @@ enable_weak_pic() {
 enabled pic && enable_weak_pic
 
 is_qmake5(){
-    $1 --version 2>&1 | egrep -q -e "Qt version 5\.[0-9]\.[0-9]"
+    $1 --version 2>&1 | egrep -q -e "Qt version 5\.[2-9]\.[0-9]"
 }
 
 # qmake-qt5 /usr/lib64/qt5/bin/qmake /usr/lib/x86_64-linux-gnu/qt5/bin/qmake
