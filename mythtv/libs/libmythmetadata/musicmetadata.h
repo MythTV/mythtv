@@ -70,6 +70,11 @@ enum RepoType
 
 #define METADATA_INVALID_FILENAME "**NOT FOUND**"
 
+#define STREAMUPDATEURL "https://services.mythtv.org/music/data/?data=streams"
+#define STREAMURLCOUNT 5
+
+typedef QString UrlList[STREAMURLCOUNT];
+
 class META_PUBLIC MusicMetadata
 {
     Q_DECLARE_TR_FUNCTIONS(MusicMetadata)
@@ -115,17 +120,20 @@ class META_PUBLIC MusicMetadata
                    m_filename(lfilename),
                    m_fileSize(0),
                    m_changed(false),
-                   m_station(""),
+                   m_broadcaster(""),
                    m_channel(""),
+                   m_description(""),
                    m_logoUrl(""),
-                   m_metaFormat("")
+                   m_metaFormat(""),
+                   m_country(""),
+                   m_language("")
 
     {
         checkEmptyFields();
     }
 
-    MusicMetadata(int lid, QString lstation, QString lchannel, QString lurl, QString llogourl,
-             QString lgenre, QString lmetaformat, QString lformat);
+    MusicMetadata(int lid, QString lbroadcaster, QString lchannel, QString ldescription, UrlList lurls, QString llogourl,
+             QString lgenre, QString lmetaformat, QString lcountry, QString llanguage, QString lformat);
 
     ~MusicMetadata();
 
@@ -241,20 +249,30 @@ class META_PUBLIC MusicMetadata
     }
     bool determineIfCompilation(bool cd = false);
 
-    void setStation(const QString &station) { m_station = station; }
-    QString Station(void) { return m_station; }
+    // for radio streams
+    void setBroadcaster(const QString &broadcaster) { m_broadcaster = broadcaster; }
+    QString Broadcaster(void) { return m_broadcaster; }
 
     void setChannel(const QString &channel) { m_channel = channel; }
     QString Channel(void) { return m_channel; }
 
-    void setUrl(const QString &url) { m_filename = url; }
-    QString Url(void) { return m_filename; }
+    void setDescription(const QString &description) { m_description = description; }
+    QString Description(void) { return m_description; }
+
+    void setUrl(const QString &url, uint index = 0);
+    QString Url(uint index = 0);
 
     void setLogoUrl(const QString &logourl) { m_logoUrl = logourl; }
     QString LogoUrl(void) { return m_logoUrl; }
 
     void setMetadataFormat(const QString &metaformat) { m_metaFormat = metaformat; }
     QString MetadataFormat(void) { return m_metaFormat; }
+
+    void setCountry(const QString &country) { m_country = country; }
+    QString Country(void) { return m_country; }
+
+    void setLanguage(const QString &language) { m_language = language; }
+    QString Language(void) { return m_language; }
 
     void setEmbeddedAlbumArt(AlbumArtList &albumart);
 
@@ -275,6 +293,7 @@ class META_PUBLIC MusicMetadata
     static MusicMetadata *createFromID(int trackid);
     static void setArtistAndTrackFormats();
     static QStringList fillFieldList(QString field);
+    static bool updateStreamList(void);
 
     // this looks for any image available - preferring a front cover if available
     QString getAlbumArtFile(void);
@@ -333,10 +352,14 @@ class META_PUBLIC MusicMetadata
     bool     m_changed;
 
     // radio stream stuff
-    QString m_station;
+    QString m_broadcaster;
     QString m_channel;
+    QString m_description;
+    UrlList m_urls;
     QString m_logoUrl;
     QString m_metaFormat;
+    QString m_country;
+    QString m_language;
 
     // Various formatting strings
     static QString m_formatnormalfileartist;
@@ -354,6 +377,7 @@ bool operator==(MusicMetadata& a, MusicMetadata& b);
 bool operator!=(MusicMetadata& a, MusicMetadata& b);
 
 Q_DECLARE_METATYPE(MusicMetadata *)
+Q_DECLARE_METATYPE(MusicMetadata)
 
 typedef QList<MusicMetadata*> MetadataPtrList;
 Q_DECLARE_METATYPE(MetadataPtrList *)

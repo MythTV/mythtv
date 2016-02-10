@@ -21,6 +21,7 @@
 #include <mythdownloadmanager.h>
 #include <mythdirs.h>
 #include <musicutils.h>
+#include <mythcoreutil.h>
 
 // mythmusic
 #include "musicdata.h"
@@ -29,6 +30,7 @@
 #include "musicplayer.h"
 
 using namespace std;
+
 
 StreamView::StreamView(MythScreenStack *parent, MythScreenType *parentScreen)
            :MusicCommon(parent, parentScreen, "streamview"),
@@ -394,8 +396,8 @@ void StreamView::removeStream(void)
 
         if (mdata)
             ShowOkPopup(tr("Are you sure you want to delete this Stream?\n"
-                           "Station: %1 - Channel: %2")
-                           .arg(mdata->Station()).arg(mdata->Channel()),
+                           "Broadcaster: %1 - Channel: %2")
+                           .arg(mdata->Broadcaster()).arg(mdata->Channel()),
                         this, SLOT(doRemoveStream(bool)), true);
     }
 }
@@ -570,7 +572,7 @@ void StreamView::updateStream(MusicMetadata *mdata)
     MusicMetadata *currentMetadata = gPlayer->getCurrentMetadata();
     if (id == currentMetadata->ID())
     {
-        currentMetadata->setStation(mdata->Station());
+        currentMetadata->setBroadcaster(mdata->Broadcaster());
         currentMetadata->setChannel(mdata->Channel());
     }
 
@@ -584,7 +586,7 @@ void StreamView::updateStream(MusicMetadata *mdata)
 
             if (playedmdata && playedmdata->ID() == id)
             {
-                playedmdata->setStation(mdata->Station());
+                playedmdata->setBroadcaster(mdata->Broadcaster());
                 playedmdata->setChannel(mdata->Channel());
 
                 InfoMap metadataMap;
@@ -635,8 +637,10 @@ EditStreamMetadata::EditStreamMetadata(MythScreenStack *parentStack,
                                  MusicMetadata *mdata)
     : MythScreenType(parentStack, "editstreampopup"),
         m_parent(parent), m_streamMeta(mdata),
-    m_stationEdit(NULL),  m_channelEdit(NULL), m_urlEdit(NULL),
+    m_broadcasterEdit(NULL),  m_channelEdit(NULL), m_descEdit(NULL),
+    m_url1Edit(NULL), m_url2Edit(NULL),m_url3Edit(NULL),m_url4Edit(NULL),m_url5Edit(NULL),
     m_logourlEdit(NULL),  m_formatEdit(NULL),  m_genreEdit(NULL),
+    m_countryEdit(NULL), m_languageEdit(NULL),
     m_searchButton(NULL), m_cancelButton(NULL), m_saveButton(NULL)
 {
 }
@@ -647,15 +651,22 @@ bool EditStreamMetadata::Create()
         return false;
 
     bool err = false;
-    UIUtilE::Assign(this, m_stationEdit,  "stationedit", &err);
-    UIUtilE::Assign(this, m_channelEdit,  "channeledit", &err);
-    UIUtilE::Assign(this, m_urlEdit,      "urledit",     &err);
-    UIUtilE::Assign(this, m_logourlEdit,  "logourledit", &err);
-    UIUtilE::Assign(this, m_genreEdit,    "genreedit",   &err);
-    UIUtilE::Assign(this, m_formatEdit,   "formatedit",  &err);
-    UIUtilE::Assign(this, m_saveButton,   "savebutton",  &err);
-    UIUtilE::Assign(this, m_cancelButton, "cancelbutton",  &err);
-    UIUtilE::Assign(this, m_searchButton, "searchbutton",  &err);
+    UIUtilE::Assign(this, m_broadcasterEdit, "broadcasteredit",  &err);
+    UIUtilE::Assign(this, m_channelEdit,     "channeledit",  &err);
+    UIUtilE::Assign(this, m_descEdit,        "descriptionedit", &err);
+    UIUtilE::Assign(this, m_url1Edit,        "url1edit",     &err);
+    UIUtilE::Assign(this, m_url2Edit,        "url2edit",     &err);
+    UIUtilE::Assign(this, m_url3Edit,        "url3edit",     &err);
+    UIUtilE::Assign(this, m_url4Edit,        "url4edit",     &err);
+    UIUtilE::Assign(this, m_url5Edit,        "url5edit",     &err);
+    UIUtilE::Assign(this, m_logourlEdit,     "logourledit" , &err);
+    UIUtilE::Assign(this, m_genreEdit,       "genreedit",    &err);
+    UIUtilE::Assign(this, m_languageEdit,    "languageedit", &err);
+    UIUtilE::Assign(this, m_countryEdit,     "countryedit",  &err);
+    UIUtilE::Assign(this, m_formatEdit,      "formatedit",   &err);
+    UIUtilE::Assign(this, m_saveButton,      "savebutton",   &err);
+    UIUtilE::Assign(this, m_cancelButton,    "cancelbutton", &err);
+    UIUtilE::Assign(this, m_searchButton,    "searchbutton", &err);
 
     if (err)
     {
@@ -665,11 +676,18 @@ bool EditStreamMetadata::Create()
 
     if (m_streamMeta)
     {
-        m_stationEdit->SetText(m_streamMeta->Station());
+        m_broadcasterEdit->SetText(m_streamMeta->Broadcaster());
         m_channelEdit->SetText(m_streamMeta->Channel());
-        m_urlEdit->SetText(m_streamMeta->Url());
+        m_descEdit->SetText(m_streamMeta->Description());
+        m_url1Edit->SetText(m_streamMeta->Url(0));
+        m_url2Edit->SetText(m_streamMeta->Url(1));
+        m_url3Edit->SetText(m_streamMeta->Url(2));
+        m_url4Edit->SetText(m_streamMeta->Url(3));
+        m_url5Edit->SetText(m_streamMeta->Url(4));
         m_logourlEdit->SetText(m_streamMeta->LogoUrl());
         m_genreEdit->SetText(m_streamMeta->Genre());
+        m_countryEdit->SetText(m_streamMeta->Country());
+        m_languageEdit->SetText(m_streamMeta->Language());
         m_formatEdit->SetText(m_streamMeta->MetadataFormat());
     }
     else
@@ -707,13 +725,20 @@ void EditStreamMetadata::saveClicked(void)
         doUpdate = false;
     }
 
-    m_streamMeta->setStation(m_stationEdit->GetText());
+    m_streamMeta->setBroadcaster(m_broadcasterEdit->GetText());
     m_streamMeta->setChannel(m_channelEdit->GetText());
-    m_streamMeta->setUrl(m_urlEdit->GetText());
+    m_streamMeta->setUrl(m_url1Edit->GetText(), 0);
+    m_streamMeta->setUrl(m_url2Edit->GetText(), 1);
+    m_streamMeta->setUrl(m_url3Edit->GetText(), 2);
+    m_streamMeta->setUrl(m_url4Edit->GetText(), 3);
+    m_streamMeta->setUrl(m_url5Edit->GetText(), 4);
     m_streamMeta->setFormat("cast");
     m_streamMeta->setMetadataFormat(m_formatEdit->GetText());
     m_streamMeta->setLogoUrl(m_logourlEdit->GetText());
     m_streamMeta->setGenre(m_genreEdit->GetText());
+    m_streamMeta->setDescription(m_descEdit->GetText());
+    m_streamMeta->setLanguage(m_languageEdit->GetText());
+    m_streamMeta->setCountry(m_countryEdit->GetText());
 
     if (doUpdate)
         m_parent->updateStream(m_streamMeta);
@@ -727,12 +752,19 @@ void EditStreamMetadata::changeStreamMetadata(MusicMetadata* mdata)
 {
     if (mdata)
     {
-        m_stationEdit->SetText(mdata->Station());
+        m_broadcasterEdit->SetText(mdata->Broadcaster());
         m_channelEdit->SetText(mdata->Channel());
-        m_urlEdit->SetText(mdata->Url());
+        m_url1Edit->SetText(mdata->Url(0));
+        m_url2Edit->SetText(mdata->Url(1));
+        m_url3Edit->SetText(mdata->Url(2));
+        m_url4Edit->SetText(mdata->Url(3));
+        m_url5Edit->SetText(mdata->Url(4));
         m_logourlEdit->SetText(mdata->LogoUrl());
         m_genreEdit->SetText(mdata->Genre());
         m_formatEdit->SetText(mdata->MetadataFormat());
+        m_descEdit->SetText(mdata->Description());
+        m_countryEdit->SetText(mdata->Country());
+        m_languageEdit->SetText(mdata->Language());
     }
 }
 
@@ -741,8 +773,9 @@ void EditStreamMetadata::changeStreamMetadata(MusicMetadata* mdata)
 SearchStream::SearchStream(MythScreenStack *parentStack,
                            EditStreamMetadata *parent)
     : MythScreenType(parentStack, "searchstream"),
-    m_parent(NULL),  m_stationList(NULL), m_genreList(NULL),
-    m_channelEdit(NULL), m_streamList(NULL), m_matchesText(NULL)
+    m_parent(NULL),  m_broadcasterList(NULL), m_genreList(NULL),
+    m_countryList(NULL),m_languageList(NULL), m_channelEdit(NULL),
+    m_streamList(NULL), m_matchesText(NULL), m_updating(false)
 {
     m_parent = parent;
 }
@@ -753,11 +786,13 @@ bool SearchStream::Create()
         return false;
 
     bool err = false;
-    UIUtilE::Assign(this, m_stationList, "stationlist", &err);
-    UIUtilE::Assign(this, m_genreList,   "genrelist",   &err);
-    UIUtilE::Assign(this, m_streamList,  "streamlist",  &err);
-    UIUtilE::Assign(this, m_channelEdit, "channeledit", &err);
-    UIUtilE::Assign(this, m_matchesText, "matchestext", &err);
+    UIUtilE::Assign(this, m_broadcasterList, "broadcasterlist", &err);
+    UIUtilE::Assign(this, m_genreList,       "genrelist",       &err);
+    UIUtilW::Assign(this, m_languageList,    "languagelist",    &err);
+    UIUtilW::Assign(this, m_countryList,     "countrylist",     &err);
+    UIUtilE::Assign(this, m_streamList,      "streamlist",      &err);
+    UIUtilE::Assign(this, m_channelEdit,     "channeledit",     &err);
+    UIUtilE::Assign(this, m_matchesText,     "matchestext",     &err);
 
     if (err)
     {
@@ -765,25 +800,58 @@ bool SearchStream::Create()
         return false;
     }
 
+    new MythUIButtonListItem(m_broadcasterList, "");
+    new MythUIButtonListItem(m_genreList, "");
+    m_matchesText->SetText("");
+
     connect(m_streamList, SIGNAL(itemClicked(MythUIButtonListItem*)),
             this, SLOT(streamClicked(MythUIButtonListItem*)));
     connect(m_streamList, SIGNAL(itemVisible(MythUIButtonListItem*)),
             this, SLOT(streamVisible(MythUIButtonListItem*)));
-    connect(m_stationList, SIGNAL(itemSelected(MythUIButtonListItem*)),
+    connect(m_broadcasterList, SIGNAL(itemSelected(MythUIButtonListItem*)),
             this, SLOT(updateStreams()));
-    connect(m_genreList, SIGNAL(itemSelected(MythUIButtonListItem*)), 
+    connect(m_genreList, SIGNAL(itemSelected(MythUIButtonListItem*)),
             this, SLOT(updateStreams()));
-    connect(m_channelEdit, SIGNAL(valueChanged()), 
+    connect(m_countryList, SIGNAL(itemSelected(MythUIButtonListItem*)),
             this, SLOT(updateStreams()));
 
-    loadStreams();
-    updateStations();
-    updateGenres();
-    updateStreams();
+
+    if (m_countryList)
+    {
+        new MythUIButtonListItem(m_countryList, "");
+        connect(m_languageList, SIGNAL(itemSelected(MythUIButtonListItem*)),
+                this, SLOT(updateStreams()));
+    }
+
+    if (m_languageList)
+    {
+        new MythUIButtonListItem(m_languageList, "");
+        connect(m_channelEdit, SIGNAL(valueChanged()),
+                this, SLOT(updateStreams()));
+    }
+
+    connect(&m_updateTimer, SIGNAL(timeout()), this, SLOT(doUpdateStreams()));
+
+    LoadInBackground("Loading Streams...");
 
     BuildFocusList();
 
     return true;
+}
+
+void SearchStream::Load(void)
+{
+    loadStreams();
+    QTimer::singleShot(0, this, SLOT(doneLoading(void)));
+}
+
+void SearchStream::doneLoading(void)
+{
+    updateBroadcasters();
+    updateGenres();
+    updateLanguages();
+    updateCountries();
+    doUpdateStreams();
 }
 
 void SearchStream::streamClicked(MythUIButtonListItem *item)
@@ -791,9 +859,8 @@ void SearchStream::streamClicked(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    MusicMetadata *mdata = item->GetData().value<MusicMetadata *>();
-    if (mdata)
-        m_parent->changeStreamMetadata(mdata);
+    MusicMetadata mdata = item->GetData().value<MusicMetadata>();
+    m_parent->changeStreamMetadata(&mdata);
 
     Close();
 }
@@ -803,12 +870,12 @@ void SearchStream::streamVisible(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    MusicMetadata *mdata = item->GetData().value<MusicMetadata *>();
-    if (mdata)
+    MusicMetadata mdata =  item->GetData().value<MusicMetadata>();
+    if (!mdata.LogoUrl().isEmpty() && mdata.LogoUrl() != "-")
     {
         if (item->GetText("dummy") == " ")
         {
-            item->SetImage(mdata->LogoUrl());
+            item->SetImage(mdata.LogoUrl());
             item->SetText("", "dummy");
         }
     }
@@ -816,132 +883,271 @@ void SearchStream::streamVisible(MythUIButtonListItem *item)
 
 void SearchStream::loadStreams(void)
 {
-    m_streams.clear();
-    m_stations.clear();
-    m_genres.clear();
-
-    m_stations.append(tr("<All Stations>"));
-    m_genres.append(tr("<All Genres>"));
-
-    QString filename = QString("%1%2").arg(GetShareDir()).arg("mythmusic/streams.xml");
-
-    QFile xmlFile(filename);
-
-    if (!xmlFile.exists() || !xmlFile.open(QIODevice::ReadOnly))
-    {
-        LOG(VB_GENERAL, LOG_ERR, "SearchStream: Cannot open streams.xml");
-        return;
-    }
-
-    QString errorMsg;
-    int errorLine = 0;
-    int errorColumn = 0;
-
-    QDomDocument domDoc;
-
-    if (!domDoc.setContent(&xmlFile, false, &errorMsg,
-                           &errorLine, &errorColumn))
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            "SearchStream: Could not read content of streams.xml" +
-                QString("\n\t\t\tError parsing %1").arg(filename) +
-                QString("\n\t\t\tat line: %1  column: %2 msg: %3")
-                .arg(errorLine).arg(errorColumn).arg(errorMsg));
-        return;
-    }
-
-    QDomNodeList itemList = domDoc.elementsByTagName("item");
-
-    QDomNode itemNode;
-    for (int i = 0; i < itemList.count(); i++)
-    {
-        itemNode = itemList.item(i);
-
-        MusicMetadata mdata;
-        mdata.setStation(itemNode.namedItem(QString("station")).toElement().text());
-        mdata.setChannel(itemNode.namedItem(QString("channel")).toElement().text());
-        mdata.setUrl(itemNode.namedItem(QString("url")).toElement().text());
-        mdata.setLogoUrl(itemNode.namedItem(QString("logourl")).toElement().text());
-        mdata.setGenre(itemNode.namedItem(QString("genre")).toElement().text());
-        mdata.setMetadataFormat(itemNode.namedItem(QString("metadataformat")).toElement().text());
-
-        m_streams.insert(mdata.Station() + '-' + mdata.Channel(), mdata);
-
-        if (!m_stations.contains(mdata.Station()))
-            m_stations.append(mdata.Station());
-
-        QStringList genreList = mdata.Genre().split(',');
-
-        for (int x = 0; x < genreList.count(); x++)
-        {
-            if (!m_genres.contains(genreList[x].trimmed()))
-                m_genres.append(genreList[x].trimmed());
-        }
-    }
-
-    xmlFile.close();
-
-    m_stations.sort();
-    m_genres.sort();
+    MusicMetadata::updateStreamList();
 }
 
-void SearchStream::updateStations(void )
+void SearchStream::updateBroadcasters(void )
 {
-    m_stationList->Reset();
+    m_broadcasterList->Reset();
 
-    for (int x = 0; x < m_stations.count(); x++)
-        new MythUIButtonListItem(m_stationList, m_stations.at(x));
+    new MythUIButtonListItem(m_broadcasterList, tr("<All Broadcasters>"));
 
-    m_stationList->SetValue(tr("<All Stations>"));
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("SELECT DISTINCT broadcaster FROM music_streams ORDER BY broadcaster;");
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythDB::DBError("get broadcaster", query);
+        return;
+    }
+
+    while (query.next())
+    {
+        new MythUIButtonListItem(m_broadcasterList, query.value(0).toString());
+    }
+
+    m_broadcasterList->SetValue(tr("<All Broadcasters>"));
 }
 
 void SearchStream::updateGenres(void )
 {
     m_genreList->Reset();
 
-    for (int x = 0; x < m_genres.count(); x++)
-        new MythUIButtonListItem(m_genreList, m_genres.at(x));
+    new MythUIButtonListItem(m_genreList, tr("<All Genres>"));
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("SELECT DISTINCT genre FROM music_streams ORDER BY genre;");
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythDB::DBError("get genres", query);
+        return;
+    }
+
+    while (query.next())
+    {
+        new MythUIButtonListItem(m_genreList, query.value(0).toString());
+    }
 
     m_genreList->SetValue(tr("<All Genres>"));
 }
 
+void SearchStream::updateCountries(void )
+{
+    if (m_countryList)
+    {
+        m_countryList->Reset();
+
+        new MythUIButtonListItem(m_countryList, tr("<All Countries>"));
+
+        MSqlQuery query(MSqlQuery::InitCon());
+
+        query.prepare("SELECT DISTINCT country FROM music_streams ORDER BY country;");
+
+        if (!query.exec() || !query.isActive())
+        {
+            MythDB::DBError("get countries", query);
+            return;
+        }
+
+        while (query.next())
+        {
+            new MythUIButtonListItem(m_countryList, query.value(0).toString());
+        }
+
+        m_countryList->SetValue(tr("<All Countries>"));
+    }
+}
+
+void SearchStream::updateLanguages(void )
+{
+    if (m_languageList)
+    {
+        m_languageList->Reset();
+
+        new MythUIButtonListItem(m_languageList, tr("<All Languages>"));
+
+        MSqlQuery query(MSqlQuery::InitCon());
+
+        query.prepare("SELECT DISTINCT language FROM music_streams ORDER BY language;");
+
+        if (!query.exec() || !query.isActive())
+        {
+            MythDB::DBError("get languages", query);
+            return;
+        }
+
+        while (query.next())
+        {
+            new MythUIButtonListItem(m_languageList, query.value(0).toString());
+        }
+
+        m_languageList->SetValue(tr("<All Languages>"));
+    }
+}
+
 void SearchStream::updateStreams(void)
 {
-    m_streamList->Reset();
+    if (m_updateTimer.isActive())
+        m_updateTimer.stop();
 
-    QString station = m_stationList->GetValue();
+    m_updateTimer.start(500);
+}
+
+void SearchStream::doUpdateStreams(void)
+{
+    if (m_updating)
+        return;
+
+    QString broadcaster = m_broadcasterList->GetValue();
     QString genre = m_genreList->GetValue();
+    QString language = m_languageList ? m_languageList->GetValue() : tr("<All Languages>");
+    QString country = m_countryList ? m_countryList->GetValue() : tr("<All Countries>");
     QString channel = m_channelEdit->GetText();
 
-    bool searchStation = (station != tr("<All Stations>"));
+    // only update the buttonlist if something changed
+    if (m_oldBroadcaster == broadcaster && m_oldGenre == genre && m_oldChannel == channel &&
+        m_oldLanguage == language && m_oldCountry == country)
+        return;
+
+    m_oldBroadcaster = broadcaster;
+    m_oldGenre = genre;
+    m_oldChannel = channel;
+    m_oldLanguage = language;
+    m_oldCountry = country;
+
+    bool searchBroadcaster = (broadcaster != tr("<All Broadcasters>"));
     bool searchGenre = (genre != tr("<All Genres>"));
+    bool searchLanguage = (language != tr("<All Languages>"));
+    bool searchCountry = (country != tr("<All Countries>"));
     bool searchChannel = !channel.isEmpty();
 
-    QMap<QString, MusicMetadata>::iterator it;
+    m_streams.clear();
+    m_streamList->Reset();
 
-    for (it = m_streams.begin(); it != m_streams.end(); ++it)
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    QString sql = "SELECT broadcaster, channel, description, genre, url1, url2, url3, url4, url5, "
+                  "logourl, metaformat, country, language "
+                  "FROM music_streams ";
+    bool doneWhere = false;
+
+    if (searchBroadcaster)
     {
-        MusicMetadata *mdata = &(*it);
+        sql += "WHERE broadcaster = :BROADCASTER ";
+        doneWhere = true;
+    }
 
-        if (searchStation && station != mdata->Station())
-            continue;
+    if (searchGenre)
+    {
+        if (!doneWhere)
+        {
+            sql += "WHERE genre = :GENRE ";
+            doneWhere = true;
+        }
+        else
+            sql += "AND genre = :GENRE ";
+    }
 
-        if (searchGenre && !mdata->Genre().contains(genre, Qt::CaseInsensitive))
-            continue;
+    if (searchLanguage)
+    {
+        if (!doneWhere)
+        {
+            sql += "WHERE language = :LANGUAGE ";
+            doneWhere = true;
+        }
+        else
+            sql += "AND language = :LANGUAGE ";
+    }
 
-        if (searchChannel && !mdata->Channel().contains(channel, Qt::CaseInsensitive))
-            continue;
+    if (searchCountry)
+    {
+        if (!doneWhere)
+        {
+            sql += "WHERE country = :COUNTRY ";
+            doneWhere = true;
+        }
+        else
+            sql += "AND country = :COUNTRY ";
+    }
 
-        // if we got here we must have a match so add it to the list
-        MythUIButtonListItem *item = new MythUIButtonListItem(m_streamList, 
-                "", qVariantFromValue(mdata));
+    if (searchChannel)
+    {
+        if (!doneWhere)
+        {
+            sql += "WHERE channel LIKE " + QString("'%%1%'").arg(channel);
+            doneWhere = true;
+        }
+        else
+            sql += "AND channel LIKE " + QString("'%%1%' ").arg(channel);
+    }
 
+    sql += "ORDER BY broadcaster, channel;";
+
+    query.prepare(sql);
+
+    if (searchBroadcaster)
+        query.bindValue(":BROADCASTER", broadcaster);
+
+    if (searchGenre)
+        query.bindValue(":GENRE", genre);
+
+    if (searchLanguage)
+        query.bindValue(":LANGUAGE", language);
+
+    if (searchCountry)
+        query.bindValue(":COUNTRY", country);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythDB::DBError("search streams", query);
+        return;
+    }
+
+    if (query.size() > 500)
+    {
+        QString message = tr("Updating stream list. Please Wait ...");
+        OpenBusyPopup(message);
+    }
+
+    int count = 0;
+    while (query.next())
+    {
+        MusicMetadata mdata;
+        mdata.setBroadcaster(query.value(0).toString());
+        mdata.setChannel(query.value(1).toString());
+        mdata.setDescription(query.value(2).toString());
+        mdata.setGenre(query.value(3).toString());
+
+        for (int x = 0; x < STREAMURLCOUNT; x++)
+            mdata.setUrl(query.value(4 + x).toString(), x);
+
+        mdata.setLogoUrl(query.value(9).toString());
+        mdata.setMetadataFormat(query.value(10).toString());
+        mdata.setCountry(query.value(11).toString());
+        mdata.setLanguage(query.value(12).toString());
+
+        MythUIButtonListItem *item = new MythUIButtonListItem(m_streamList, "", qVariantFromValue(mdata));
         InfoMap metadataMap;
-        mdata->toMap(metadataMap);
+        mdata.toMap(metadataMap);
+
         item->SetTextFromMap(metadataMap);
 
         item->SetText(" ", "dummy");
+        count++;
+
+        if ((count % 500) == 0)
+        {
+            qApp->processEvents();
+        }
     }
 
     m_matchesText->SetText(QString("%1").arg(m_streamList->GetCount()));
+
+    if (query.size() > 500)
+        CloseBusyPopup();
+
+    m_updating = false;
 }

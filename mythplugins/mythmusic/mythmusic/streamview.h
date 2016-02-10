@@ -4,6 +4,7 @@
 // qt
 #include <QEvent>
 #include <QVector>
+#include <QTimer>
 
 // myth
 #include <mythscreentype.h>
@@ -70,12 +71,19 @@ class EditStreamMetadata : public MythScreenType
 
     MusicMetadata  *m_streamMeta;
 
-    MythUITextEdit *m_stationEdit;
+    MythUITextEdit *m_broadcasterEdit;
     MythUITextEdit *m_channelEdit;
-    MythUITextEdit *m_urlEdit;
+    MythUITextEdit *m_descEdit;
+    MythUITextEdit *m_url1Edit;
+    MythUITextEdit *m_url2Edit;
+    MythUITextEdit *m_url3Edit;
+    MythUITextEdit *m_url4Edit;
+    MythUITextEdit *m_url5Edit;
     MythUITextEdit *m_logourlEdit;
     MythUITextEdit *m_formatEdit;
     MythUITextEdit *m_genreEdit;
+    MythUITextEdit *m_countryEdit;
+    MythUITextEdit *m_languageEdit;
 
     MythUIButton   *m_searchButton;
     MythUIButton   *m_cancelButton;
@@ -92,24 +100,40 @@ class SearchStream : public MythScreenType
     bool Create();
 
   private slots:
+    void doneLoading(void);
     void updateStreams(void);
+    void doUpdateStreams(void);
     void streamClicked(MythUIButtonListItem *item);
     void streamVisible(MythUIButtonListItem *item);
 
   private:
+    void Load(void);
     void loadStreams(void);
-    void updateStations(void);
+    void updateBroadcasters(void);
     void updateGenres(void);
+    void updateCountries(void);
+    void updateLanguages(void);
 
-    EditStreamMetadata      *m_parent;
-    QMap<QString, MusicMetadata>  m_streams;
-    QStringList  m_stations;
+    EditStreamMetadata   *m_parent;
+    QList<MusicMetadata>  m_streams;
+    QStringList  m_broadcasters;
     QStringList  m_genres;
 
-    MythUIButtonList *m_stationList;
+    QString m_oldBroadcaster;
+    QString m_oldGenre;
+    QString m_oldChannel;
+    QString m_oldCountry;
+    QString m_oldLanguage;
+
+    MythUIButtonList *m_broadcasterList;
     MythUIButtonList *m_genreList;
+    MythUIButtonList *m_countryList;
+    MythUIButtonList *m_languageList;
     MythUITextEdit   *m_channelEdit;
     MythUIButtonList *m_streamList;
     MythUIText       *m_matchesText;
+
+    QTimer m_updateTimer;
+    bool m_updating;
 };
 #endif
