@@ -598,9 +598,11 @@ bool V4L2encStreamHandler::StartEncoding(void)
                 QString("%1 read attempts required to start encoding").arg(idx));
         }
 
-
-        m_drb->SetRequestPause(false);
-        m_drb->Start();
+        if (m_drb)
+        {
+            m_drb->SetRequestPause(false);
+            m_drb->Start();
+        }
     }
     else
         LOG(VB_RECORD, LOG_INFO, LOC + "Already encoding");
@@ -655,7 +657,7 @@ bool V4L2encStreamHandler::StopEncoding(void)
         m_v4l2.StopEncoding();
 
     // allow last bits of data through..
-    if (m_drb->IsRunning())
+    if (m_drb && m_drb->IsRunning())
         usleep(20 * 1000);
 #if 0
     // close the fd so streamoff/streamon work in V4LChannel    Close();
