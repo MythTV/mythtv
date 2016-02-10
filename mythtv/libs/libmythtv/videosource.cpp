@@ -2653,7 +2653,8 @@ void ExternalConfigurationGroup::probeApp(const QString & path)
 HDPVRConfigurationGroup::HDPVRConfigurationGroup(CaptureCard &a_parent) :
     VerticalConfigurationGroup(false, true, false, false),
     parent(a_parent), cardinfo(new TransLabelSetting()),
-    audioinput(new TunerCardAudioInput(parent, QString::null, "HDPVR"))
+    audioinput(new TunerCardAudioInput(parent, QString::null, "HDPVR")),
+    vbidevice(NULL)
 {
     VideoDevice *device =
         new VideoDevice(parent, 0, 15, QString::null, "hdpvr");
