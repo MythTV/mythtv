@@ -770,7 +770,7 @@ void StandardSettingDialog::settingSelected(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    StandardSetting *setting = qVariantValue<StandardSetting*>(item->GetData());
+    StandardSetting *setting = item->GetData().value<StandardSetting*>();
     if (setting && m_selectedSettingHelp)
     {
         m_selectedSettingHelp->SetText(setting->getHelpText());
