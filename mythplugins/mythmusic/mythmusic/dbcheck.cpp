@@ -12,7 +12,7 @@ using namespace std;
 
 #include "dbcheck.h"
 
-const QString currentDatabaseVersion = "1023";
+const QString currentDatabaseVersion = "1024";
 
 static bool doUpgradeMusicDatabaseSchema(QString &dbver);
 
@@ -935,6 +935,52 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
         };
 
         if (!performActualUpdate(updates, "1023", dbver))
+            return false;
+    }
+
+    if (dbver == "1023")
+    {
+        const QString updates[] =
+        {
+            "DROP INDEX station ON music_radios;",
+            "ALTER TABLE music_radios CHANGE COLUMN station broadcaster VARCHAR(100) NOT NULL default '';",
+            "ALTER TABLE music_radios MODIFY COLUMN channel VARCHAR(200) NOT NULL default '';",
+            "ALTER TABLE music_radios ADD description TEXT NOT NULL default '' AFTER channel;",
+            "ALTER TABLE music_radios CHANGE COLUMN url url1 VARCHAR(300) NOT NULL default '';",
+            "ALTER TABLE music_radios ADD COLUMN url2 VARCHAR(300) NOT NULL default '' AFTER url1;",
+            "ALTER TABLE music_radios ADD COLUMN url3 VARCHAR(300) NOT NULL default '' AFTER url2;",
+            "ALTER TABLE music_radios ADD COLUMN url4 VARCHAR(300) NOT NULL default '' AFTER url3;",
+            "ALTER TABLE music_radios ADD COLUMN url5 VARCHAR(300) NOT NULL default '' AFTER url4;",
+            "ALTER TABLE music_radios MODIFY COLUMN logourl VARCHAR(300) NOT NULL default '';",
+            "ALTER TABLE music_radios MODIFY COLUMN metaformat VARCHAR(50) NOT NULL default '';",
+            "ALTER TABLE music_radios ADD COLUMN country VARCHAR(50) NOT NULL default '' AFTER logourl;",
+            "ALTER TABLE music_radios ADD COLUMN language VARCHAR(50) NOT NULL default '' AFTER country;",
+            "CREATE INDEX broadcaster ON music_radios (broadcaster);",
+            "DROP TABLE IF EXISTS music_streams;",
+            "CREATE TABLE music_streams ("
+            "    intid INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,"
+            "    broadcaster VARCHAR(100) NOT NULL default '',"
+            "    channel VARCHAR(200) NOT NULL default '',"
+            "    description TEXT NOT NULL default '',"
+            "    url1 VARCHAR(300) NOT NULL default '',"
+            "    url2 VARCHAR(300) NOT NULL default '',"
+            "    url3 VARCHAR(300) NOT NULL default '',"
+            "    url4 VARCHAR(300) NOT NULL default '',"
+            "    url5 VARCHAR(300) NOT NULL default '',"
+            "    logourl VARCHAR(300) NOT NULL default '',"
+            "    genre VARCHAR(100) NOT NULL default '',"
+            "    metaformat VARCHAR(50) NOT NULL default '',"
+            "    country VARCHAR(50) NOT NULL default '',"
+            "    language VARCHAR(50) NOT NULL default '',"
+            "    INDEX (broadcaster),"
+            "    INDEX (channel),"
+            "    INDEX (country),"
+            "    INDEX (language)"
+            ");",
+            ""
+        };
+
+        if (!performActualUpdate(updates, "1024", dbver))
             return false;
     }
 

@@ -7,6 +7,7 @@
 #include <QDateTime>
 #include <QDir>
 #include <QScopedPointer>
+#include <QDomDocument>
 
 // mythtv
 #include "mythcontext.h"
@@ -19,6 +20,7 @@
 #include "remotefile.h"
 #include "storagegroup.h"
 #include "mythsystem.h"
+#include "mythcoreutil.h"
 
 // libmythui
 #include "mythprogressdialog.h"
@@ -54,8 +56,9 @@ bool operator!=(MusicMetadata& a, MusicMetadata& b)
 }
 
 // this ctor is for radio streams
-MusicMetadata::MusicMetadata(int lid, QString lstation, QString lchannel, QString lurl,
-                   QString llogourl, QString lgenre, QString lmetaformat, QString lformat)
+MusicMetadata::MusicMetadata(int lid, QString lbroadcaster, QString lchannel, QString ldescription,
+                             UrlList lurls, QString llogourl, QString lgenre, QString lmetaformat,
+                             QString lcountry, QString llanguage, QString lformat)
          :  m_artist(""),
             m_compilation_artist(""),
             m_album(""),
@@ -85,15 +88,21 @@ MusicMetadata::MusicMetadata(int lid, QString lstation, QString lchannel, QStrin
             m_albumArt(NULL),
             m_lyricsData(NULL),
             m_id(lid),
-            m_filename(lurl),
+            m_filename(lurls[0]),
             m_hostname(""),
             m_fileSize(0),
             m_changed(false),
-            m_station(lstation),
+            m_broadcaster(lbroadcaster),
             m_channel(lchannel),
+            m_description(ldescription),
             m_logoUrl(llogourl),
-            m_metaFormat(lmetaformat)
+            m_metaFormat(lmetaformat),
+            m_country(lcountry),
+            m_language(llanguage)
 {
+    for (int x = 0; x < STREAMURLCOUNT; x++)
+        m_urls[x] = lurls[x];
+
     setRepo(RT_Radio);
 }
 
@@ -149,10 +158,16 @@ MusicMetadata& MusicMetadata::operator=(const MusicMetadata &rhs)
     m_format = rhs.m_format;
     m_changed = rhs.m_changed;
     m_fileSize = rhs.m_fileSize;
-    m_station = rhs.m_station;
+    m_broadcaster = rhs.m_broadcaster;
     m_channel = rhs.m_channel;
+    m_description = rhs.m_description;
+
+    for (int x = 0; x < 5; x++)
+        m_urls[x] = rhs.m_urls[x];
     m_logoUrl = rhs.m_logoUrl;
     m_metaFormat = rhs.m_metaFormat;
+    m_country = rhs.m_country;
+    m_language = rhs.m_language;
 
     return *this;
 }
@@ -323,6 +338,107 @@ MusicMetadata *MusicMetadata::createFromID(int trackid)
     }
 
     return NULL;
+}
+
+// static
+bool MusicMetadata::updateStreamList(void)
+{
+    // make sure we are not already doing an update
+    if (gCoreContext->GetSetting("MusicStreamListModified") == "Updating")
+    {
+        LOG(VB_GENERAL, LOG_ERR, "MusicMetadata::updateStreamList: looks like we are already updating the stream list");
+        return false;
+    }
+
+    QByteArray compressedData;
+    QByteArray uncompressedData;
+
+    // check if the streamlist has been updated since we last checked
+    QDateTime lastModified = GetMythDownloadManager()->GetLastModified(QString(STREAMUPDATEURL));
+
+    QDateTime lastUpdate = QDateTime::fromString(gCoreContext->GetSetting("MusicStreamListModified"), Qt::ISODate);
+
+    if (lastModified <= lastUpdate)
+        return true;
+
+    gCoreContext->SaveSetting("MusicStreamListModified", "Updating");
+
+    // download compressed stream file
+    if (!GetMythDownloadManager()->download(QString(STREAMUPDATEURL), &compressedData), false)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "MusicMetadata::updateStreamList: Failed to download stream list");
+        gCoreContext->SaveSetting("MusicStreamListModified", "");
+        return false;
+    }
+
+    // uncompress the data
+    uncompressedData = gzipUncompress(compressedData);
+
+    QString errorMsg;
+    int errorLine = 0;
+    int errorColumn = 0;
+
+    // load the xml
+    QDomDocument domDoc;
+
+    if (!domDoc.setContent(uncompressedData, false, &errorMsg,
+                           &errorLine, &errorColumn))
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            "SearchStream: Could not read content of streams.xml" +
+                QString("\n\t\t\tError parsing %1").arg(STREAMUPDATEURL) +
+                QString("\n\t\t\tat line: %1  column: %2 msg: %3")
+                .arg(errorLine).arg(errorColumn).arg(errorMsg));
+        gCoreContext->SaveSetting("MusicStreamListModified", "");
+        return false;
+    }
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("DELETE FROM music_streams;");
+    if (!query.exec() || !query.isActive() || query.numRowsAffected() < 0)
+    {
+        MythDB::DBError("music delete radio streams", query);
+        gCoreContext->SaveSetting("MusicStreamListModified", "");
+        return false;
+    }
+
+    QDomNodeList itemList = domDoc.elementsByTagName("item");
+
+    QDomNode itemNode;
+    for (int i = 0; i < itemList.count(); i++)
+    {
+        itemNode = itemList.item(i);
+
+        query.prepare("INSERT INTO music_streams (broadcaster, channel, description, url1, url2, url3, url4, url5,"
+                      "  logourl, genre, metaformat, country, language) "
+                      "VALUES (:BROADCASTER, :CHANNEL, :DESC, :URL1, :URL2, :URL3, :URL4, :URL5,"
+                      " :LOGOURL, :GENRE, :META, :COUNTRY, :LANG);");
+
+        query.bindValue(":BROADCASTER", itemNode.namedItem(QString("broadcaster")).toElement().text());
+        query.bindValue(":CHANNEL",     itemNode.namedItem(QString("channel")).toElement().text());
+        query.bindValue(":DESC",        itemNode.namedItem(QString("description")).toElement().text());
+        query.bindValue(":URL1",        itemNode.namedItem(QString("url1")).toElement().text());
+        query.bindValue(":URL2",        itemNode.namedItem(QString("url2")).toElement().text());
+        query.bindValue(":URL3",        itemNode.namedItem(QString("url3")).toElement().text());
+        query.bindValue(":URL4",        itemNode.namedItem(QString("url4")).toElement().text());
+        query.bindValue(":URL5",        itemNode.namedItem(QString("url5")).toElement().text());
+        query.bindValue(":LOGOURL",     itemNode.namedItem(QString("logourl")).toElement().text());
+        query.bindValue(":GENRE",       itemNode.namedItem(QString("genre")).toElement().text());
+        query.bindValue(":META",        itemNode.namedItem(QString("metadataformat")).toElement().text());
+        query.bindValue(":COUNTRY",     itemNode.namedItem(QString("country")).toElement().text());
+        query.bindValue(":LANG",        itemNode.namedItem(QString("language")).toElement().text());
+
+        if (!query.exec() || !query.isActive() || query.numRowsAffected() <= 0)
+        {
+            MythDB::DBError("music insert radio stream", query);
+            gCoreContext->SaveSetting("MusicStreamListModified", "");
+            return false;
+        }
+    }
+
+    gCoreContext->SaveSetting("MusicStreamListModified", lastModified.toString(Qt::ISODate));
+
+    return true;
 }
 
 void MusicMetadata::reloadMetadata(void)
@@ -541,6 +657,20 @@ int MusicMetadata::getGenreId()
     }
 
     return m_genreid;
+}
+
+void MusicMetadata::setUrl(const QString& url, uint index)
+{
+    if (index < STREAMURLCOUNT)
+        m_urls[index] = url;
+}
+
+QString MusicMetadata::Url(uint index)
+{
+    if (index < STREAMURLCOUNT)
+        return m_urls[index];
+
+    return QString();
 }
 
 void MusicMetadata::dumpToDatabase()
@@ -804,6 +934,10 @@ void MusicMetadata::setFilename(const QString& lfilename)
 
 QString MusicMetadata::Filename(bool find)
 {
+    // FIXME: for now just use the first url for radio streams
+    if (isRadio())
+        return m_urls[0];
+
     // if not asked to find the file just return the raw filename from the DB
     if (find == false)
         return m_filename;
@@ -933,7 +1067,7 @@ void MusicMetadata::toMap(InfoMap &metadataMap, const QString &prefix)
     metadataMap[prefix + "compilationartist"] = m_compilation_artist;
 
     if (m_album.isEmpty() && ID_TO_REPO(m_id) == RT_Radio)
-        metadataMap[prefix + "album"] = QString("%1 - %2").arg(m_station).arg(m_channel);
+        metadataMap[prefix + "album"] = QString("%1 - %2").arg(m_broadcaster).arg(m_channel);
     else
         metadataMap[prefix + "album"] = m_album;
 
@@ -974,13 +1108,20 @@ void MusicMetadata::toMap(InfoMap &metadataMap, const QString &prefix)
     metadataMap[prefix + "filename"] = m_filename;
 
     // radio stream
-    metadataMap[prefix + "station"] = m_station;
+    if (!m_broadcaster.isEmpty())
+        metadataMap[prefix + "broadcasterchannel"] = m_broadcaster + " - " + m_channel;
+    else
+        metadataMap[prefix + "broadcasterchannel"] = m_channel;
+    metadataMap[prefix + "broadcaster"] = m_broadcaster;
     metadataMap[prefix + "channel"] = m_channel;
     metadataMap[prefix + "genre"] = m_genre;
+    metadataMap[prefix + "country"] = m_country;
+    metadataMap[prefix + "language"] = m_language;
+    metadataMap[prefix + "description"] = m_description;
 
     if (isRadio())
     {
-        QUrl url(m_filename);
+        QUrl url(m_urls[0]);
         metadataMap[prefix + "url"] = url.toString(QUrl::RemoveUserInfo);
     }
     else
@@ -1605,9 +1746,10 @@ void AllStream::loadStreams(void)
         m_streamList.pop_back();
     }
 
-    QString aquery = "SELECT intid, station, channel, url, logourl, genre, metaformat, format "
+    QString aquery = "SELECT intid, broadcaster, channel, description, url1, url2, url3, url4, url5,"
+                     "logourl, genre, metaformat, country, language, format "
                      "FROM music_radios "
-                     "ORDER BY station,channel;";
+                     "ORDER BY broadcaster,channel;";
 
     MSqlQuery query(MSqlQuery::InitCon());
     if (!query.exec(aquery))
@@ -1617,15 +1759,22 @@ void AllStream::loadStreams(void)
     {
         while (query.next())
         {
+            UrlList urls;
+            for (int x = 0; x < STREAMURLCOUNT; x++)
+                urls[x] = query.value(4 + x).toString();
+
             MusicMetadata *mdata = new MusicMetadata(
                     query.value(0).toInt(),        // intid
-                    query.value(1).toString(),     // station
+                    query.value(1).toString(),     // broadcaster
                     query.value(2).toString(),     // channel
-                    query.value(3).toString(),     // url
-                    query.value(4).toString(),     // logourl
-                    query.value(5).toString(),     // genre
-                    query.value(6).toString(),     // metadataformat
-                    query.value(7).toString());    // format
+                    query.value(3).toString(),     // description
+                    urls,                          // array of 5 urls
+                    query.value(9).toString(),     // logourl
+                    query.value(10).toString(),     // genre
+                    query.value(11).toString(),     // metadataformat
+                    query.value(12).toString(),     // country
+                    query.value(13).toString(),     // language
+                    query.value(14).toString());    // format
 
             mdata->setRepo(RT_Radio);
 
@@ -1642,13 +1791,23 @@ void AllStream::addStream(MusicMetadata* mdata)
 {
     // add the stream to the db
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("INSERT INTO music_radios (station, channel, url, logourl, genre, format, metaformat) " 
-                  "VALUES (:STATION, :CHANNEL, :URL, :LOGOURL, :GENRE, :FORMAT, :METAFORMAT);");
-    query.bindValue(":STATION", mdata->Station());
+    query.prepare("INSERT INTO music_radios (broadcaster, channel, description, "
+                   "url1, url2, url3, url4, url5, "
+                  "logourl, genre, country, language, format, metaformat) "
+                  "VALUES (:BROADCASTER, :CHANNEL, :DESCRIPTION, :URL1, :URL2, :URL3, :URL4, :URL5, "
+                  ":LOGOURL, :GENRE, :COUNTRY, :LANGUAGE, :FORMAT, :METAFORMAT);");
+    query.bindValue(":BROADCASTER", mdata->Broadcaster());
     query.bindValue(":CHANNEL", mdata->Channel());
-    query.bindValue(":URL", mdata->Url());
+    query.bindValue(":DESCRIPTION", mdata->Description());
+    query.bindValue(":URL1", mdata->Url(0));
+    query.bindValue(":URL2", mdata->Url(1));
+    query.bindValue(":URL3", mdata->Url(2));
+    query.bindValue(":URL4", mdata->Url(3));
+    query.bindValue(":URL5", mdata->Url(4));
     query.bindValue(":LOGOURL", mdata->LogoUrl());
     query.bindValue(":GENRE", mdata->Genre());
+    query.bindValue(":COUNTRY", mdata->Country());
+    query.bindValue(":LANGUAGE", mdata->Language());
     query.bindValue(":FORMAT", mdata->Format());
     query.bindValue(":METAFORMAT", mdata->MetadataFormat());
 
@@ -1662,7 +1821,6 @@ void AllStream::addStream(MusicMetadata* mdata)
     mdata->setRepo(RT_Radio);
 
     loadStreams();
-//    createPlaylist();
 }
 
 void AllStream::removeStream(MusicMetadata* mdata)
@@ -1680,7 +1838,6 @@ void AllStream::removeStream(MusicMetadata* mdata)
     }
 
     loadStreams();
-//    createPlaylist();
 }
 
 void AllStream::updateStream(MusicMetadata* mdata)
@@ -1688,14 +1845,23 @@ void AllStream::updateStream(MusicMetadata* mdata)
     // update the stream in the db
     int id = ID_TO_ID(mdata->ID());
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("UPDATE music_radios set station = :STATION, channel = :CHANNEL, url = :URL, "
-                  "logourl = :LOGOURL, genre = :GENRE, format = :FORMAT, metaformat = :METAFORMAT " 
+    query.prepare("UPDATE music_radios set broadcaster = :BROADCASTER, channel = :CHANNEL, description = :DESCRIPTION, "
+                   "url1 = :URL1, url2 = :URL2, url3 = :URL3, url4 = :URL4, url5 = :URL5, "
+                  "logourl = :LOGOURL, genre = :GENRE, country = :COUNTRY, language = :LANGUAGE, "
+                  "format = :FORMAT, metaformat = :METAFORMAT "
                   "WHERE intid = :ID");
-    query.bindValue(":STATION", mdata->Station());
+    query.bindValue(":BROADCASTER", mdata->Broadcaster());
     query.bindValue(":CHANNEL", mdata->Channel());
-    query.bindValue(":URL", mdata->Url());
+    query.bindValue(":DESCRIPTION", mdata->Description());
+    query.bindValue(":URL1", mdata->Url(0));
+    query.bindValue(":URL2", mdata->Url(1));
+    query.bindValue(":URL3", mdata->Url(2));
+    query.bindValue(":URL4", mdata->Url(3));
+    query.bindValue(":URL5", mdata->Url(4));
     query.bindValue(":LOGOURL", mdata->LogoUrl());
     query.bindValue(":GENRE", mdata->Genre());
+    query.bindValue(":COUNTRY", mdata->Country());
+    query.bindValue(":LANGUAGE", mdata->Language());
     query.bindValue(":FORMAT", mdata->Format());
     query.bindValue(":METAFORMAT", mdata->MetadataFormat());
     query.bindValue(":ID", id);
@@ -1707,25 +1873,7 @@ void AllStream::updateStream(MusicMetadata* mdata)
     }
 
     loadStreams();
-//    createPlaylist();
 }
-
-#if 0
-void AllStream::createPlaylist(void)
-{
-    gMusicData->all_playlists->getStreamPlaylist()->disableSaves();
-
-    gMusicData->all_playlists->getStreamPlaylist()->removeAllTracks();
-
-    for (int x = 0; x < m_streamList.count(); x++)
-    {
-        MusicMetadata *mdata = m_streamList.at(x);
-        gMusicData->all_playlists->getStreamPlaylist()->addTrack(mdata->ID(), false);
-    }
-
-    gMusicData->all_playlists->getStreamPlaylist()->enableSaves();
-}
-#endif
 
 /**************************************************************************/
 
@@ -1762,7 +1910,8 @@ void AlbumArtImages::findImages(void)
     if (repo == RT_Radio)
     {
         MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("SELECT logourl FROM music_radios WHERE url = :URL;");
+        //FIXME: this should work with the alternate urls as well eg url2, url3 etc
+        query.prepare("SELECT logourl FROM music_radios WHERE url1 = :URL;");
         query.bindValue(":URL", m_parent->Filename());
         if (query.exec())
         {

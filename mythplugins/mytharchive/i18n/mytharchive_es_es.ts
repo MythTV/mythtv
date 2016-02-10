@@ -758,8 +758,8 @@ Por favor, espere...</translation>
     </message>
     <message>
         <location filename="../mytharchive/recordingselector.cpp" line="112"/>
-        <location filename="../mytharchive/recordingselector.cpp" line="420"/>
-        <location filename="../mytharchive/recordingselector.cpp" line="525"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="416"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="521"/>
         <source>All Recordings</source>
         <translation>Todas las grabaciones</translation>
     </message>
@@ -1452,13 +1452,13 @@ Por favor, espere...</translation>
         <translation>Seleccionar todos</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="595"/>
+        <location filename="../mytharchive/videoselector.cpp" line="591"/>
         <source>You need to enter a valid password for this parental level</source>
         <translation>Debe introducir una contraseña válida para este nivel parental</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="368"/>
-        <location filename="../mytharchive/videoselector.cpp" line="538"/>
+        <location filename="../mytharchive/videoselector.cpp" line="364"/>
+        <location filename="../mytharchive/videoselector.cpp" line="534"/>
         <source>All Videos</source>
         <translation>Todos los vídeos</translation>
     </message>

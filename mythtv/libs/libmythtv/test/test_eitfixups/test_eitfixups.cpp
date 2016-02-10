@@ -351,6 +351,64 @@ void TestEITFixups::testUKFixups9()
     QCOMPARE(event9.description, QString("Includes sport and weather"));
 }
 
+void TestEITFixups::testUKLawAndOrder()
+{
+    EITFixUp fixup;
+
+    DBEventEIT *event = SimpleDBEventEIT (EITFixUp::kFixUK,
+                                         "Law & Order: Special Victims Unit",
+                                         "",
+                                         "Crime drama series. Detective Cassidy is accused of raping ...");
+
+    PRINT_EVENT(*event);
+    fixup.Fix(*event);
+    PRINT_EVENT(*event);
+    QCOMPARE(event->title,    QString("Law & Order: Special Victims Unit"));
+    QCOMPARE(event->subtitle, QString(""));
+    delete event;
+
+    DBEventEIT *event2 = SimpleDBEventEIT (EITFixUp::kFixUK,
+                                         "Law & Order: Special Victims Unit",
+                                         "",
+                                         "Sugar: New. Police drama series about an elite sex crime  ...");
+
+    PRINT_EVENT(*event2);
+    fixup.Fix(*event2);
+    PRINT_EVENT(*event2);
+    QCOMPARE(event2->title,    QString("Law & Order: Special Victims Unit"));
+    QCOMPARE(event2->subtitle, QString("Sugar"));
+    QCOMPARE(event2->description, QString("Police drama series about an elite sex crime  ..."));
+    delete event2;
+}
+
+void TestEITFixups::testUKMarvel()
+{
+    EITFixUp fixup;
+
+    DBEventEIT *event = SimpleDBEventEIT (EITFixUp::kFixUK,
+                                         "Marvel's Agents of S.H.I.E.L.D.",
+                                         "",
+                                         "");
+
+    PRINT_EVENT(*event);
+    fixup.Fix(*event);
+    PRINT_EVENT(*event);
+    QCOMPARE(event->title,    QString("Marvel's Agents of S.H.I.E.L.D."));
+    delete event;
+
+
+    DBEventEIT *event2 = SimpleDBEventEIT (EITFixUp::kFixUK,
+                                          "NEW: Marvel's Agents of S.H.I.E.L.D.",
+                                          "",
+                                          "");
+
+    PRINT_EVENT(*event2);
+    fixup.Fix(*event2);
+    PRINT_EVENT(*event2);
+    QCOMPARE(event2->title,    QString("Marvel's Agents of S.H.I.E.L.D."));
+    delete event2;
+}
+
 DBEventEIT *TestEITFixups::SimpleDBEventEIT (FixupValue fixup, QString title, QString subtitle, QString description)
 {
     DBEventEIT *event = new DBEventEIT (1, // channel id
@@ -375,6 +433,27 @@ DBEventEIT *TestEITFixups::SimpleDBEventEIT (FixupValue fixup, QString title, QS
     return event;
 }
 
+void TestEITFixups::testUKXFiles()
+{
+    // Make sure numbers don't get misinterpreted as episode number or similar.
+    EITFixUp fixup;
+
+    DBEventEIT event(1005,
+                      "New: The X-Files",
+                      "Hit sci-fi drama series returns. Mulder and Scully are reunited after the collapse of their relationship when a TV host contacts them, believing he has uncovered a significant conspiracy. (Ep 1)[AD,S]",
+                      QDateTime::fromString("2016-02-08T22:00:00Z", Qt::ISODate),
+                      QDateTime::fromString("2016-02-08T23:00:00Z", Qt::ISODate),
+                      EITFixUp::kFixGenericDVB | EITFixUp::kFixUK,
+                      SUB_UNKNOWN,
+                      AUD_STEREO,
+                      VID_UNKNOWN);
+
+    fixup.Fix(event);
+    PRINT_EVENT(event);
+    QCOMPARE(event.title,       QString("The X-Files"));
+    QCOMPARE(event.description, QString("Hit sci-fi drama series returns. Mulder and Scully are reunited after the collapse of their relationship when a TV host contacts them, believing he has uncovered a significant conspiracy. (Ep 1)"));
+}
+
 void TestEITFixups::testDEPro7Sat1()
 {
     EITFixUp fixup;
@@ -390,6 +469,7 @@ void TestEITFixups::testDEPro7Sat1()
     QCOMPARE(event->title,    QString("Titel"));
     QCOMPARE(event->subtitle, QString("Folgentitel"));
     QCOMPARE(event->airdate,  (unsigned short) 2011);
+    delete event;
 
     DBEventEIT *event2 = SimpleDBEventEIT (EITFixUp::kFixP7S1,
                                            "Titel",
@@ -400,6 +480,7 @@ void TestEITFixups::testDEPro7Sat1()
     PRINT_EVENT(*event2);
     QCOMPARE(event2->subtitle, QString(""));
     QCOMPARE(event2->airdate,  (unsigned short) 2015);
+    delete event2;
 
     DBEventEIT *event3 = SimpleDBEventEIT (EITFixUp::kFixP7S1,
                                            "Titel",
@@ -410,6 +491,7 @@ void TestEITFixups::testDEPro7Sat1()
     PRINT_EVENT(*event3);
     QCOMPARE(event3->subtitle, QString("Folgentitel"));
     QCOMPARE(event3->airdate,  (unsigned short) 0);
+    delete event3;
 
     DBEventEIT *event4 = SimpleDBEventEIT (EITFixUp::kFixP7S1,
                                            "Titel",
@@ -420,6 +502,7 @@ void TestEITFixups::testDEPro7Sat1()
     PRINT_EVENT(*event4);
     QCOMPARE(event4->subtitle, QString("\"Lokal\", Ort"));
     QCOMPARE(event4->airdate,  (unsigned short) 2015);
+    delete event4;
 
     DBEventEIT *event5 = SimpleDBEventEIT (EITFixUp::kFixP7S1,
                                            "Titel",
@@ -430,6 +513,7 @@ void TestEITFixups::testDEPro7Sat1()
     PRINT_EVENT(*event5);
     QCOMPARE(event5->subtitle, QString("In Morpheus' Armen"));
     QCOMPARE(event5->airdate,  (unsigned short) 2006);
+    delete event5;
 
     DBEventEIT *event6 = SimpleDBEventEIT (EITFixUp::kFixP7S1,
                                            "Titel",
@@ -440,6 +524,7 @@ void TestEITFixups::testDEPro7Sat1()
     PRINT_EVENT(*event6);
     QCOMPARE(event6->subtitle, QString("Drei Kleintiere durchschneiden (1)"));
     QCOMPARE(event6->airdate,  (unsigned short) 2014);
+    delete event6;
 
     /* #12151 */
     DBEventEIT *event7 = SimpleDBEventEIT (EITFixUp::kFixP7S1,
@@ -457,6 +542,7 @@ void TestEITFixups::testDEPro7Sat1()
     QCOMPARE(event7->subtitle, QString("<episode title>"));
     QCOMPARE(event7->airdate,  (unsigned short) 2011);
     QCOMPARE(event7->description, QString("<plot summary>"));
+    delete event7;
 }
 
 void TestEITFixups::testHTMLFixup()
@@ -529,6 +615,7 @@ void TestEITFixups::testSkyEpisodes()
     QCOMPARE(event->episode, 16u);
     /* FixPremiere should scrape the credits, too! */
     QVERIFY(event->HasCredits());
+    delete event;
 
     DBEventEIT *event2 = SimpleDBEventEIT (EITFixUp::kFixPremiere,
                                          "Titel",
@@ -541,6 +628,7 @@ void TestEITFixups::testSkyEpisodes()
     QCOMPARE(event2->description, QString("Washington, 1971: Vor dem Obersten Gerichtshof wird über die Kriegsdienstverweigerung von Box-Ikone Cassius Clay aka Muhammad Ali verhandelt. Während draußen Tausende gegen den Vietnamkrieg protestieren, verteidigen acht weiße, alte Bundesrichter unter dem Vorsitzenden Warren Burger (Frank Langella) die harte Linie der Regierung Nixon. Doch Kevin Connolly (Benjamin Walker), ein idealistischer junger Mitarbeiter von Richter Harlan (Christopher Plummer), gibt nicht auf. - Muhammad Alis Kiegsdienst-Verweigerungsprozess, als Mix aus Kammerspiel und Archivaufnahmen starbesetzt verfilmt. Ab 12 Jahren"));
     QCOMPARE(event2->season,  0u);
     QCOMPARE(event2->episode, 0u);
+    delete event2;
 
     DBEventEIT *event3 = SimpleDBEventEIT (EITFixUp::kFixPremiere,
                                          "Titel",
@@ -553,6 +641,7 @@ void TestEITFixups::testSkyEpisodes()
     QCOMPARE(event3->description, QString("Ab 12 Jahren"));
     QCOMPARE(event3->season,  0u);
     QCOMPARE(event3->episode, 0u);
+    delete event3;
 }
 
 void TestEITFixups::testUnitymedia()
@@ -583,6 +672,7 @@ void TestEITFixups::testUnitymedia()
     QCOMPARE(event->description, QString("Beschreibung ..."));
     QCOMPARE(event->stars, 0.89f);
     QCOMPARE(event->items.count(), 1);
+    delete event;
 }
 
 QTEST_APPLESS_MAIN(TestEITFixups)

@@ -601,7 +601,7 @@ void MusicPlayer::customEvent(QEvent *event)
             mdata->setID(getCurrentMetadata()->ID());
             mdata->setHostname(gCoreContext->GetMasterHostName());
             mdata->setTrack(m_playedList.count() + 1);
-            mdata->setStation(getCurrentMetadata()->Station());
+            mdata->setBroadcaster(getCurrentMetadata()->Broadcaster());
             mdata->setChannel(getCurrentMetadata()->Channel());
 
             getCurrentMetadata()->setTitle(mdata->Title());

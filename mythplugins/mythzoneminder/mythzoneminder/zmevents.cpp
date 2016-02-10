@@ -120,6 +120,10 @@ bool ZMEvents::Create(void)
 
 bool ZMEvents::keyPressEvent(QKeyEvent *event)
 {
+    // if there is a pending jump point pass the key press to the default handler
+    if (GetMythMainWindow()->IsExitingToMain())
+        return MythScreenType::keyPressEvent(event);
+
     if (GetFocusWidget()->keyPressEvent(event))
         return true;
 

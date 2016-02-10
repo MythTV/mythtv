@@ -95,6 +95,7 @@ EITFixUp::EITFixUp()
       m_ukCompleteDots("^\\.\\.+$"),
       m_ukQuotedSubtitle("(?:^')([\\w\\s\\-,]+)(?:\\.' )"),
       m_ukAllNew("All New To 4Music!\\s?"),
+      m_ukLaONoSplit("^Law & Order: (?:Criminal Intent|LA|Special Victims Unit|Trial by Jury|UK|You the Jury)"),
       m_comHemCountry("^(\\(.+\\))?\\s?([^ ]+)\\s([^\\.0-9]+)"
                       "(?:\\sfr\xE5n\\s([0-9]{4}))(?:\\smed\\s([^\\.]+))?\\.?"),
       m_comHemDirector("[Rr]egi"),
@@ -1001,6 +1002,7 @@ void EITFixUp::FixUK(DBEventEIT &event) const
 
     QRegExp tmp24ep = m_uk24ep;
     if (!event.title.startsWith("CSI:") && !event.title.startsWith("CD:") &&
+        !event.title.contains(m_ukLaONoSplit) &&
         !event.title.startsWith("Mission: Impossible"))
     {
         if (((position1=event.title.indexOf(m_ukDoubleDotEnd)) != -1) &&
@@ -1070,7 +1072,8 @@ void EITFixUp::FixUK(DBEventEIT &event) const
         }
     }
 
-    if (!isMovie && event.subtitle.isEmpty())
+    if (!isMovie && event.subtitle.isEmpty() &&
+        !event.title.startsWith("The X-Files"))
     {
         if ((position1=event.description.indexOf(m_ukTime)) != -1)
         {
@@ -2661,13 +2664,12 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event) const
     // Work out the season and episode numbers (if any)
     // Matching pattern "Επεισ[όο]διο:?|Επ 3 από 14|3/14" etc
     bool    series  = false;
-    int position1;
-    int position2;
     QRegExp tmpSeries = m_grSeason;
     // cap(2) is the season for ΑΒΓΔ
     // cap(3) is the season for 1234
-    if ((position1 = tmpSeries.indexIn(event.title)) != -1
-            || (position2 = tmpSeries.indexIn(event.description)) != -1)
+    int position1 = tmpSeries.indexIn(event.title);
+    int position2 = tmpSeries.indexIn(event.description);
+    if ((position1 != -1) || (position2 != -1))
     {
         if (!tmpSeries.cap(2).isEmpty()) // we found a letter representing a number
         {

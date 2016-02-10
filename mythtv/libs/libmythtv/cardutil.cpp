@@ -834,7 +834,7 @@ static uint clone_capturecard(uint src_inputid, uint orig_dst_inputid)
         "    livetvorder           = :V25,  "
         "    parentid              = :PARENTID "
         "WHERE cardid = :INPUTID");
-    for (uint i = 0; i < 24; ++i)
+    for (uint i = 0; i < 26; ++i)
         query2.bindValue(QString(":V%1").arg(i), query.value(i).toString());
     query2.bindValue(":INPUTID", dst_inputid);
     query2.bindValue(":PARENTID", src_inputid);

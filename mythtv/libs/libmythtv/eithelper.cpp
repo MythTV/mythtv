@@ -251,7 +251,6 @@ static void parse_dvb_event_descriptors(desc_list_t list, FixupValue fix,
             list, DescriptorID::short_event, languagePreferences);
 
     // from EN 300 468, Appendix A.2 - Selection of character table
-    unsigned char enc_0[0]  = { }; // ISO 6937 - no signalling!
     unsigned char enc_1[3]  = { 0x10, 0x00, 0x01 };
     unsigned char enc_2[3]  = { 0x10, 0x00, 0x02 };
     unsigned char enc_7[3]  = { 0x10, 0x00, 0x07 }; // Latin/Greek Alphabet
@@ -259,13 +258,6 @@ static void parse_dvb_event_descriptors(desc_list_t list, FixupValue fix,
     unsigned char enc_15[3] = { 0x10, 0x00, 0x0f }; // could use { 0x0B } instead
     int enc_len = 0;
     const unsigned char *enc = NULL;
-
-    // Use an encoding override of ISO 6937
-    if (fix & EITFixUp::kEFixForceISO6937)
-    {
-        enc = enc_0;
-        enc_len = sizeof(enc_0);
-    }
 
     // Is this BellExpressVU EIT (Canada) ?
     // Use an encoding override of ISO 8859-1 (Latin1)
@@ -385,44 +377,15 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
         return;
 
     uint descCompression = (eit->TableID() > 0x80) ? 2 : 1;
-    FixupValue fix = EITFixUp::kFixGenericDVB;
-
-    /* fixes that apply to the whole original_network_id */
-    fix |= fixup.value((FixupKey)eit->OriginalNetworkID() << 16);
-
-    /* fixes that apply to one transport_id of one orignal_network_id */
+    FixupValue fix = fixup.value((FixupKey)eit->OriginalNetworkID() << 16);
     fix |= fixup.value((((FixupKey)eit->TSID()) << 32) |
                  ((FixupKey)eit->OriginalNetworkID() << 16));
-
-    /* fixes that apply to one service_id of one original_network_id */
     fix |= fixup.value(((FixupKey)eit->OriginalNetworkID() << 16) |
                  (FixupKey)eit->ServiceID());
-
-    /* fixes that apply to one service_id of one original_network_id,
-     * but only if it is carried on one transport_id
-     */
     fix |= fixup.value((((FixupKey)eit->TSID()) << 32) |
                  ((FixupKey)eit->OriginalNetworkID() << 16) |
                   (FixupKey)eit->ServiceID());
-
-    /*
-     * fixes that depend on the source of the transmission, instead
-     * of the services that they describe, see #9480
-     */
-    if (eit->SourceNetworkID() && eit->SourceTransportID())
-    {
-        fix |= fixup[1ll<<48 | (FixupKey)eit->SourceNetworkID() << 16];
-
-        fix |= fixup[1ll<<48 | (((FixupKey)eit->SourceTransportID()) << 32) |
-                                ((FixupKey)eit->SourceNetworkID() << 16)];
-
-        fix |= fixup[1ll<<48 | ((FixupKey)eit->SourceNetworkID() << 16) |
-                                (FixupKey)eit->ServiceID()];
-
-        fix |= fixup[1ll<<48 | (((FixupKey)eit->SourceTransportID()) << 32) |
-                                ((FixupKey)eit->SourceNetworkID() << 16) |
-                                 (FixupKey)eit->ServiceID()];
-    }
+    fix |= EITFixUp::kFixGenericDVB;
 
     uint tableid   = eit->TableID();
     uint version   = eit->Version();
@@ -1097,9 +1060,6 @@ static void init_fixup(FixupMap &fix)
     ///////////////////////////////////////////////////////////////////////////
     // Fixups to make EIT provided listings more useful
     // transport_id<<32 | netword_id<<16 | service_id
-    //
-    // Bit 1<<48 is used to signal matching against the transport/network that
-    // carries the EIT, see #9480
 
     // Bell Express VU Canada
     fix[  256U << 16] = EITFixUp::kFixBell;
@@ -1410,14 +1370,8 @@ static void init_fixup(FixupMap &fix)
     // DVB-S Astra 19.2E DMAX Germany
     fix[  1113LL << 32 | 1 << 16 | 12602] = EITFixUp::kEFixForceISO8859_15;
 
-    // Premiere / Sky Germany
+    // Premiere
     fix[133 << 16] = EITFixUp::kEFixForceISO8859_15;
-
-    // Cyfra+ ISO-6937 (source ONID)
-    fix[1ll << 48 | 318 << 16] = EITFixUp::kEFixForceISO6937;
-
-    // Polsat ISO-8859-2 (source ONID)
-    fix[1ll << 48 | 113 << 16] = EITFixUp::kEFixForceISO8859_2;
 
     // DVB-S Astra 19.2E French channels
     fix[     1022LL << 32 | 1 << 16 |  6901 ] = // DIRECT 8

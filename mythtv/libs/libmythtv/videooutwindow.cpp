@@ -919,6 +919,26 @@ void VideoOutWindow::Zoom(ZoomDirection direction)
             mz_scale_v += zf;
         }
     }
+    else if (kZoomVerticalIn == direction)
+    {
+        if (mz_scale_v < kManualZoomMaxVerticalZoom)
+            mz_scale_v += zf;
+    }
+    else if (kZoomVerticalOut == direction)
+    {
+        if (mz_scale_v < kManualZoomMaxVerticalZoom)
+            mz_scale_v -= zf;
+    }
+    else if (kZoomHorizontalIn == direction)
+    {
+        if (mz_scale_h < kManualZoomMaxHorizontalZoom)
+            mz_scale_h += zf;
+    }
+    else if (kZoomHorizontalOut == direction)
+    {
+        if (mz_scale_h > kManualZoomMinHorizontalZoom)
+            mz_scale_h -= zf;
+    }
     else if (kZoomUp    == direction && (mz_move.y() < +kManualZoomMaxMove))
         mz_move.setY(mz_move.y() + 1);
     else if (kZoomDown  == direction && (mz_move.y() > -kManualZoomMaxMove))

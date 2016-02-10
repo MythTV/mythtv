@@ -306,9 +306,9 @@ void diskAppearedCallback(DADiskRef disk, void *context)
         return;
     }
 
-    model     = getModel(details);
+    model = getModel(details);
 
-    if (model.contains("Apple Disk Image"))
+    if (model.contains("Disk Image"))
     {
         LOG(VB_MEDIA, LOG_INFO, msg + QString("DMG %1 mounted, ignoring")
             .arg(BSDname));

@@ -405,14 +405,13 @@ bool ImportIconsWizard::initialLoad(QString name)
         m_progressDialog = NULL;
     }
 
+    /*: %1 is the current channel position,
+     *  %2 is the total number of channels,
+     */
     QString downloadMessage = tr("Downloading %1 of %2");
 
     while (!closeDialog && (m_iter != m_listEntries.end()))
     {
-        /*: %1 is the current channel position,
-         *  %2 is the total number of channels,
-         *  %3 is the channel name
-         */
         QString message = downloadMessage.arg(m_nCount+1)
                                          .arg(m_listEntries.size());
 

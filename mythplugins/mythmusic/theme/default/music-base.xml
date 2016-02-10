@@ -504,7 +504,7 @@
         <textarea name="channel" from="basetextarea">
             <area>150,82,500,34</area>
             <font>basemedium</font>
-            <template>%STATION% - %CHANNEL%</template>
+            <template>%BROADCASTER| - %%CHANNEL%</template>
         </textarea>
 
         <progressbar name="bufferprogress">

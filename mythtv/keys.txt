@@ -144,6 +144,10 @@ Playback Recording Zoom Mode:
 - Down          Move video Down
 - PageUp        Zoom In
 - PageDown      Zoom Out
+- 8             Vertical Zoom In
+- 2             Vertical Zoom Out
+- 6             Horizontal Zoom In
+- 4             Horizontal Zoom Out
 - Space/Enter   Exit Zoom mode leaving picture at current size and position
 - ESC           Exit Zoom mode and return to original size.
 

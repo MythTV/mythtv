@@ -77,33 +77,6 @@ extern "C" {
 #include "../mytharchive/archiveutil.h"
 #include "../mytharchive/remoteavformatcontext.h"
 
-namespace
-{
-    void cleanup()
-    {
-        delete gContext;
-        gContext = NULL;
-    }
-
-    class CleanupGuard
-    {
-      public:
-        typedef void (*CleanupFunc)();
-
-      public:
-        CleanupGuard(CleanupFunc cleanFunction) :
-            m_cleanFunction(cleanFunction) {}
-
-        ~CleanupGuard()
-        {
-            m_cleanFunction();
-        }
-
-      private:
-        CleanupFunc m_cleanFunction;
-    };
-}
-
 class NativeArchive
 {
   public:
@@ -2399,7 +2372,6 @@ int main(int argc, char **argv)
     // Don't listen to console input
     close(0);
 
-    //CleanupGuard callCleanup(cleanup);
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
     {

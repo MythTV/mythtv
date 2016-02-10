@@ -292,7 +292,7 @@ class BEConnection( object ):
             # lock socket access
             with self._socklock:
                 # send command string
-                self.socket.sendheader(data)
+                self.socket.sendheader(data.encode("utf-8"))
                 # wait timeout for data to be received on the socket
                 t = time()
                 timeout = (deadline-t) if (deadline-t>0) else 0.0

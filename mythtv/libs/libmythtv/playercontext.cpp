@@ -514,8 +514,12 @@ bool PlayerContext::ReloadTVChain(void)
     {
         SetPlayingInfo(pinfo);
         delete pinfo;
+        return true;
     }
-    return (bool) pinfo;
+    else
+    {
+        return false;
+    }
 }
 
 /**

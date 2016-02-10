@@ -22168,7 +22168,7 @@ wird bereits verwendet.</translation>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="77"/>
         <source>Enable servers on this machine to listen on link-local addresses. These are auto-configured addresses and not accessible outside the local network. This must be enabled for anything requiring Bonjour to work.</source>
-        <translation>Aktiviert die Link-lokale Adresse für Server auf dieser Maschine. Dies sind automatisch konfigurierte Adresse und sind nciht außerhalb des lokalen Netzes erreichbar. Diese Einstellung muß für alle Dienste die Bonjour benötigen aktiviert sein.</translation>
+        <translation>Aktiviert die Link-lokale Adresse für Server auf dieser Maschine. Dies sind automatisch konfigurierte Adresse und sind nicht außerhalb des lokalen Netzes erreichbar. Diese Einstellung muß für alle Dienste die Bonjour benötigen aktiviert sein.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="237"/>
@@ -29600,7 +29600,7 @@ Möchten Sie weitersehen?</translation>
     <message>
         <location filename="../programs/mythfrontend/themechooser.cpp" line="704"/>
         <source>Unable to install theme, %1 themes directory is not writable.</source>
-        <translation>Theme kann nciht installiert werden, %1 Themeverzeichnis ist nciht beschreibbar.</translation>
+        <translation>Theme kann nicht installiert werden, %1 Themeverzeichnis ist nicht beschreibbar.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/themechooser.cpp" line="725"/>

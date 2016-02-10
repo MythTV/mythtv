@@ -1466,6 +1466,17 @@ add_cxxppflags(){
     append CXXPPFLAGS $($cxxppflags_filter "$@")
 }
 
+is_python3() {
+    log is_python3
+    check_cmd $python << EOF
+import sys
+if sys.version_info > (3,0):
+    sys.exit(0)
+else:
+    sys.exit(1)
+EOF
+}
+
 check_python(){
     log check_python
     check_cmd $python <<EOF
@@ -5663,7 +5674,7 @@ enable_weak_pic() {
 enabled pic && enable_weak_pic
 
 is_qmake5(){
-    $1 --version 2>&1 | egrep -q -e "Qt version 5\.[0-9]\.[0-9]"
+    $1 --version 2>&1 | egrep -q -e "Qt version 5\.[2-9]\.[0-9]"
 }
 
 # qmake-qt5 /usr/lib64/qt5/bin/qmake /usr/lib/x86_64-linux-gnu/qt5/bin/qmake
@@ -5677,7 +5688,7 @@ found_qmake=''
 for i in $CHECK_QMAKE; do
     if is_qmake5 $i; then
         found_qmake=$i
-        check_cxxflags -DQT_DISABLE_DEPRECATED_BEFORE
+        check_cxxflags -DQT_DISABLE_DEPRECATED_BEFORE=0x050000
         break;
     fi
 done
@@ -6274,7 +6285,7 @@ if ! disabled openmax; then
     check_header 'OMX_Core.h' && enable openmax
 fi
 if ! disabled openmax; then
-    if check_lib 'OMX_Broadcom.h' OMX_Init -lopenmaxil; then
+    if check_lib 'OMX_Broadcom.h' OMX_Init -L/opt/vc/lib -lopenmaxil; then
         enable openmax_broadcom
     elif check_lib 'bellagio/omxcore.h' OMX_Init -lomxil-bellagio; then
         enable openmax_bellagio
@@ -7354,6 +7365,7 @@ fi
 
 # Check for python dependencies
 if enabled bindings_python; then
+    is_python3                 && python=python2
     check_python               || disable_bindings_python "Python 2.6"
     check_py_lib MySQLdb       || disable_bindings_python "MySQLdb"
     check_py_lib lxml          || disable_bindings_python "lxml"

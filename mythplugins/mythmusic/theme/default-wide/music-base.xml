@@ -786,7 +786,7 @@
        <textarea name="channel" from="basetextarea">
             <area>220,90,850,34</area>
             <font>basemedium</font>
-            <template>%STATION% - %CHANNEL%</template>
+            <template>%BROADCASTER| - %%CHANNEL%</template>
         </textarea>
 
         <textarea name="url" from="basetextarea">
@@ -907,6 +907,8 @@
         <textarea name="title" from="basetextarea">
             <area>120,10,930,34</area>
             <font>basemedium</font>
+            <cutdown>false</cutdown>
+            <scroll direction="left" rate="15" returnrate="35" startdelay="4" returndelay="4" />
             <template>Now Playing: %TITLE% by %ARTIST% on %ALBUM%</template>
         </textarea>
 

@@ -331,8 +331,9 @@ class Recorded( CMPRecord, DBDataWrite ):
         DBDataWrite.__init__(self, data, db)
 
     def _postinit(self):
-        self.seek = self._Seek(self._wheredat, self._db)
-        self.markup = self._Markup(self._wheredat, self._db)
+        wheredat = (self.chanid, self.starttime)
+        self.seek = self._Seek(wheredat, self._db)
+        self.markup = self._Markup(wheredat, self._db)
         wheredat = (self.chanid, self.progstart)
         self.cast = self._Cast(wheredat, self._db)
         self.rating = self._Rating(wheredat, self._db)

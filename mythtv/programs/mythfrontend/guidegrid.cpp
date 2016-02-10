@@ -914,75 +914,81 @@ bool GuideGrid::gestureEvent(MythGestureEvent *event)
                     {
                         MythUIButtonList* channelList = dynamic_cast<MythUIButtonList*>(object);
 
-                        handled = channelList->gestureEvent(event);
-                        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Guide Gesture Click channel list %1").arg(handled));
+                        if (channelList)
+                        {
+                            handled = channelList->gestureEvent(event);
+                            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Guide Gesture Click channel list %1").arg(handled));
+                        }
                     }
                     else if (name.startsWith("guidegrid"))
                     {
                         MythUIGuideGrid* guidegrid = dynamic_cast<MythUIGuideGrid*>(object);
 
-                        handled = true;
-
-                        QPoint rowCol = guidegrid->GetRowAndColumn(position - guidegrid->GetArea().topLeft());
-
-                        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Guide Gesture Click gg %1,%2 (%3,%4)")
-                            .arg(rowCol.y())
-                            .arg(rowCol.x())
-                            .arg(m_currentRow)
-                            .arg(m_currentCol)
-                            );
-                        if ((rowCol.y() >= 0) &&  (rowCol.x() >= 0))
+                        if (guidegrid)
                         {
-                            if ((rowCol.y() == m_currentRow) && (rowCol.x() == m_currentCol))
+                            handled = true;
+
+                            QPoint rowCol = guidegrid->GetRowAndColumn(position - guidegrid->GetArea().topLeft());
+
+                            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Guide Gesture Click gg %1,%2 (%3,%4)")
+                                .arg(rowCol.y())
+                                .arg(rowCol.x())
+                                .arg(m_currentRow)
+                                .arg(m_currentCol)
+                                );
+                            if ((rowCol.y() >= 0) &&  (rowCol.x() >= 0))
                             {
-                                if (m_player && (m_player->GetState(-1) == kState_WatchingLiveTV))
+                                if ((rowCol.y() == m_currentRow) && (rowCol.x() == m_currentCol))
                                 {
-                                    // See if this show is far enough into the future that it's
-                                    // probable that the user wanted to schedule it to record
-                                    // instead of changing the channel.
-                                    ProgramInfo *pginfo =
-                                        m_programInfos[m_currentRow][m_currentCol];
-                                    int secsTillStart =
-                                        (pginfo) ? MythDate::current().secsTo(
-                                            pginfo->GetScheduledStartTime()) : 0;
-                                    if (pginfo && (pginfo->GetTitle() != kUnknownTitle) &&
-                                        ((secsTillStart / 60) >= m_selectRecThreshold))
+                                    if (m_player && (m_player->GetState(-1) == kState_WatchingLiveTV))
                                     {
-                                        //EditRecording();
-                                        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Guide Gesture Click gg EditRec"));
+                                        // See if this show is far enough into the future that it's
+                                        // probable that the user wanted to schedule it to record
+                                        // instead of changing the channel.
+                                        ProgramInfo *pginfo =
+                                            m_programInfos[m_currentRow][m_currentCol];
+                                        int secsTillStart =
+                                            (pginfo) ? MythDate::current().secsTo(
+                                                pginfo->GetScheduledStartTime()) : 0;
+                                        if (pginfo && (pginfo->GetTitle() != kUnknownTitle) &&
+                                            ((secsTillStart / 60) >= m_selectRecThreshold))
+                                        {
+                                            //EditRecording();
+                                            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Guide Gesture Click gg EditRec"));
+                                        }
+                                        else
+                                        {
+                                            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Guide Gesture Click gg enter"));
+                                            enter();
+                                        }
                                     }
                                     else
                                     {
-                                        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Guide Gesture Click gg enter"));
-                                        enter();
+                                        //EditRecording();
+                                        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Guide Gesture Click gg not live"));
                                     }
                                 }
                                 else
                                 {
-                                    //EditRecording();
-                                    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Guide Gesture Click gg not live"));
-                                }
-                            }
-                            else
-                            {
-                                bool rowChanged = (rowCol.y() != m_currentRow);
-                                bool colChanged = (rowCol.x() != m_currentCol);
-                                if (rowChanged)
-                                    setStartChannel(m_currentStartChannel + rowCol.y() - m_currentRow);
+                                    bool rowChanged = (rowCol.y() != m_currentRow);
+                                    bool colChanged = (rowCol.x() != m_currentCol);
+                                    if (rowChanged)
+                                        setStartChannel(m_currentStartChannel + rowCol.y() - m_currentRow);
 
-                                m_currentRow = rowCol.y();
-                                m_currentCol = rowCol.x();
+                                    m_currentRow = rowCol.y();
+                                    m_currentCol = rowCol.x();
 
-                                fillProgramInfos();
-                                if (colChanged)
-                                {
-                                    m_currentStartTime = m_programInfos[m_currentRow][m_currentCol]->GetScheduledStartTime();
-                                    fillTimeInfos();
+                                    fillProgramInfos();
+                                    if (colChanged)
+                                    {
+                                        m_currentStartTime = m_programInfos[m_currentRow][m_currentCol]->GetScheduledStartTime();
+                                        fillTimeInfos();
+                                    }
+                                    if (rowChanged)
+                                        updateChannels();
+                                    if (colChanged)
+                                        updateDateText();
                                 }
-                                if (rowChanged)
-                                    updateChannels();
-                                if (colChanged)
-                                    updateDateText();
                             }
                         }
                     }

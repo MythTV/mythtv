@@ -209,7 +209,7 @@ void V4L2encStreamHandler::run(void)
     bool      gap = false;
     QDateTime gap_start;
 
-    int len, remainder;
+    int len, remainder = 0;
 
     QByteArray buffer;
     char* pkt_buf = new char[PACKET_SIZE + 1];

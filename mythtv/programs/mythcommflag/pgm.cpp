@@ -16,6 +16,7 @@ extern "C" {
  * means this has to be a C++ source file.
  */
 
+#if 0 /* compiler says its unused */
 static enum PixelFormat pixelTypeOfVideoFrameType(VideoFrameType codec)
 {
     /* XXX: how to map VideoFrameType values to PixelFormat values??? */
@@ -25,6 +26,7 @@ static enum PixelFormat pixelTypeOfVideoFrameType(VideoFrameType codec)
     }
     return PIX_FMT_NONE;
 }
+#endif
 
 int pgm_read(unsigned char *buf, int width, int height, const char *filename)
 {

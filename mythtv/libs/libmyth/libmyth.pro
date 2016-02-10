@@ -248,7 +248,11 @@ using_openmax {
     SOURCES += audio/audiooutput_omx.cpp
     contains( HAVE_OPENMAX_BROADCOM, yes ) {
         DEFINES += OMX_SKIP64BIT USING_BROADCOM
-        #LIBS += -lopenmaxil
+        # Raspbian
+        QMAKE_CXXFLAGS += -isystem /opt/vc/include -isystem /opt/vc/include/IL -isystem /opt/vc/include/interface/vcos/pthreads -isystem /opt/vc/include/interface/vmcs_host/linux
+        # Ubuntu
+        QMAKE_CXXFLAGS += -isystem /usr/include/IL -isystem /usr/include/interface/vcos/pthreads -isystem /usr/include/interface/vmcs_host/linux
+        LIBS += -L/opt/vc/lib -lopenmaxil
     }
     contains( HAVE_OPENMAX_BELLAGIO, yes ) {
         DEFINES += USING_BELLAGIO

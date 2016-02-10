@@ -279,7 +279,7 @@ macx {
     QMAKE_CXXFLAGS *= $$CXXPPFLAGS $$ECXXFLAGS
 }
 
-profile:CONFIG += debug
+profile:!win32:!macx:CONFIG += debug
 
 release:contains( ARCH_POWERPC, yes ) {
     # Auto-inlining causes some Qt moc methods to go missing

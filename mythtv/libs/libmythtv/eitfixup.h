@@ -61,7 +61,6 @@ class EITFixUp
         kFixUnitymedia       = 1ll << 32,
 
         // Early fixups
-        kEFixForceISO6937    = 1ll << 33,
         kEFixForceISO8859_1  = 1 << 22,
         kEFixForceISO8859_2  = 1 << 23,
         kEFixForceISO8859_9  = 1 << 24,
@@ -166,6 +165,7 @@ class EITFixUp
     const QRegExp m_ukCompleteDots;
     const QRegExp m_ukQuotedSubtitle;
     const QRegExp m_ukAllNew;
+    const QRegExp m_ukLaONoSplit;
     const QRegExp m_comHemCountry;
     const QRegExp m_comHemDirector;
     const QRegExp m_comHemActor;

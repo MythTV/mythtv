@@ -152,6 +152,12 @@ class TestIPTVRecorder: public QObject
                                    "#EXTINF:-1,[001] La 1\n"
                                    "rtp://@239.0.0.76:8208\n");
 
+        /*
+         * #12610 - iptv.ink / russion iptv plugin forum playlist with channel number in duration
+         */
+        QString rawdataIPTVInk ("#EXTM3U\n"
+                                "#EXTINF:0002 tvg-id=\"daserste.de\" group-title=\"DE Hauptsender\" tvg-logo=\"609281.png\", [COLOR gold]Das Erste[/COLOR]\n"
+                                "http://api.iptv.ink/pl.m3u8?ch=71565725\n");
 
         fbox_chan_map_t chanmap;
 
@@ -198,6 +204,12 @@ class TestIPTVRecorder: public QObject
         QVERIFY (chanmap["2275"].IsValid ());
         QVERIFY (chanmap["2275"].m_tuning.IsValid ());
         QCOMPARE (chanmap["2275"].m_name, QString ("Canal Sur Andalucía"));
+
+        /* test playlist from iptv.ink with channel number in duration */
+        chanmap = IPTVChannelFetcher::ParsePlaylist (rawdataIPTVInk, NULL);
+        QVERIFY (chanmap["0002"].IsValid ());
+        QVERIFY (chanmap["0002"].m_tuning.IsValid ());
+        QCOMPARE (chanmap["0002"].m_name, QString ("[COLOR gold]Das Erste[/COLOR]"));
     }
 
     /**

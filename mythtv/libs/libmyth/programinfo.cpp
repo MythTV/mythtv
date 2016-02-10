@@ -2280,12 +2280,13 @@ bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
  */
 bool ProgramInfo::IsSameProgramAndStartTime(const ProgramInfo& other) const
 {
+    if (startts != other.startts)
+        return false;
+    if (IsSameChannel(other))
+        return true;
     if (!IsSameProgram(other))
         return false;
-    if (startts == other.startts)
-        return true;
-
-    return false;
+    return true;
 }
 
 /**
@@ -5535,7 +5536,7 @@ bool LoadFromProgram(ProgramList &destination,
 
     // ------------------------------------------------------------------------
 
-    return LoadFromProgram(destination, sql, bindings, schedList, 0, 0, count);
+    return LoadFromProgram(destination, queryStr, bindings, schedList, 0, 0, count);
 }
 
 bool LoadFromProgram( ProgramList &destination,

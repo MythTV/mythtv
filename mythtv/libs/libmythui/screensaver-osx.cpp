@@ -5,10 +5,8 @@
 class ScreenSaverOSXPrivate
 {
 public:
-    static void timerCallback(CFRunLoopTimerRef timer, void *info)
+    static void timerCallback(CFRunLoopTimerRef /* timer */, void * /* info */)
     {
-        (void)timer;
-        (void)info;
         UpdateSystemActivity(OverallAct);
     };
 
