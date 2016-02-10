@@ -37,11 +37,11 @@
 // LyricsView
 
 LyricsView::LyricsView(MythScreenStack *parent, MythScreenType *parentScreen)
-         :MusicCommon(parent, parentScreen, "lyricsview")
+         :MusicCommon(parent, parentScreen, "lyricsview"),
+         m_lyricsList(NULL), m_statusText(NULL), m_loadingState(NULL), m_bufferStatus(NULL),
+         m_bufferProgress(NULL), m_lyricData(NULL), m_autoScroll(true)
 {
-    m_lyricData = NULL;
     m_currentView = MV_LYRICS;
-    m_autoScroll = true;
 
     gCoreContext->addListener(this);
 }
