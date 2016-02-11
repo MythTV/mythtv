@@ -608,15 +608,35 @@ QString Myth::GetSetting( const QString &sHostName,
                           const QString &sDefault )
 {
     if (sKey.isEmpty())
-        throw( QString("No setting name supplied") );
+        throw( QString("Missing or empty Key (settings.value)") );
 
-    QString hostname = sHostName;
-    if (sHostName.isEmpty())
-        hostname = gCoreContext->GetHostName();
+    if (sHostName == "_GLOBAL_")
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
 
-    // ----------------------------------------------------------------------
+        query.prepare("SELECT data FROM settings "
+                        "WHERE value = :VALUE "
+                        "AND (hostname IS NULL)" );
 
-    return gCoreContext->GetSettingOnHost(sKey, hostname, sDefault);
+        query.bindValue(":VALUE", sKey );
+
+        if (!query.exec())
+        {
+            MythDB::DBError("API Myth/GetSetting ", query);
+            throw( QString( "Database Error executing query." ));
+        }
+
+        return query.next() ? query.value(0).toString() : sDefault;
+    }
+    else
+    {
+        QString hostname = sHostName;
+
+        if (sHostName.isEmpty())
+            hostname = gCoreContext->GetHostName();
+
+        return gCoreContext->GetSettingOnHost(sKey, hostname, sDefault);
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////
