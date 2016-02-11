@@ -7,7 +7,7 @@
  * @package     MythWeb
  * @subpackage  Classes
  *
-/**/
+ **/
 
 class MythBase {
     public $cacheKey = null;
