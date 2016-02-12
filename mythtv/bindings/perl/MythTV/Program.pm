@@ -336,6 +336,8 @@ package MythTV::Program;
         $season = "0$season" if ($season && $season < 10);
         $episode = ($self->{'episode'} or '');
         $episode = "0$episode" if ($episode && $episode < 10);
+        # specials are encoded as season 0 on thetvdb.com
+        $season = "00" if ($season eq '' && $episode ne '');
         $inetref = ($self->{'inetref'} or '');
 
     # Build a list of name format options
