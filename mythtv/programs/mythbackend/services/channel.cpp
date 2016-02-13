@@ -67,11 +67,15 @@ DTC::ChannelInfoList* Channel::GetChannelInfoList( uint nSourceID,
 
     DTC::ChannelInfoList *pChannelInfos = new DTC::ChannelInfoList();
 
-    nStartIndex   = (nStartIndex > 0) ? min( nStartIndex, nTotalAvailable ) : 0;
-    nCount        = (nCount > 0) ? min( nCount, nTotalAvailable ) : nTotalAvailable;
+    nStartIndex = (nStartIndex > 0) ? min( nStartIndex, nTotalAvailable ) : 0;
+    nCount      = (nCount > 0) ? min(nCount, (nTotalAvailable - nStartIndex)) :
+                                             (nTotalAvailable - nStartIndex);
 
     ChannelInfoList::iterator chanIt;
-    for( chanIt = chanList.begin(); chanIt != chanList.end(); ++chanIt)
+    ChannelInfoList::iterator chanItBegin = chanList.begin() + nStartIndex;
+    ChannelInfoList::iterator chanItEnd   = chanItBegin      + nCount;
+
+    for( chanIt = chanItBegin; chanIt < chanItEnd; ++chanIt )
     {
         DTC::ChannelInfo *pChannelInfo = pChannelInfos->AddNewChannelInfo();
 
