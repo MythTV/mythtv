@@ -1296,7 +1296,7 @@ void MainServer::customEvent(QEvent *e)
                 if (tokens[0] == "FORCE_DELETE_RECORDING")
                     DoHandleDeleteRecording(recInfo, NULL, true, false, forget);
                 else
-                    DoHandleDeleteRecording(recInfo, NULL, false, force, forget);
+                    DoHandleDeleteRecording(recInfo, NULL, force, false, forget);
             }
             else
             {
