@@ -5495,6 +5495,28 @@ static bool FromProgramQuery(const QString &sql, const MSqlBindings &bindings,
     return true;
 }
 
+bool LoadFromProgram(ProgramList &destination, const QString &where,
+                     const QString &groupBy, const QString &orderBy,
+                     const MSqlBindings &bindings, const ProgramList &schedList)
+{
+    uint count = 0;
+
+    QString queryStr = "";
+
+    if (!where.isEmpty())
+        queryStr.append(QString("WHERE %1 ").arg(where));
+
+    if (!groupBy.isEmpty())
+        queryStr.append(QString("GROUP BY %1 ").arg(groupBy));
+
+    if (!orderBy.isEmpty())
+        queryStr.append(QString("ORDER BY %1 ").arg(orderBy));
+
+    // ------------------------------------------------------------------------
+
+    return LoadFromProgram(destination, queryStr, bindings, schedList, 0, 0, count);
+}
+
 bool LoadFromProgram(ProgramList &destination,
                      const QString &sql, const MSqlBindings &bindings,
                      const ProgramList &schedList)
@@ -5510,6 +5532,11 @@ bool LoadFromProgram(ProgramList &destination,
     //        the caller isn't getting what they asked for and to fix that they
     //        are forced to include a GROUP BY, ORDER BY or WHERE that they
     //        do not want
+    //
+    // See the new version of this method above. The plan is to convert existing
+    // users of this method and have them supply all of their own data for the
+    // queries (no defaults.)
+
     if (!queryStr.contains("WHERE"))
         queryStr += " WHERE visible != 0 ";
 

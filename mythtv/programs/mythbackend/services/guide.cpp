@@ -89,15 +89,17 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &rawStartTime ,
     ProgramList  schedList;
     MSqlBindings bindings;
 
-    // lpad is to allow natural sorting of numbers
-    QString      sSQL = "WHERE ";
+    QString sWhere   = "program.chanid = :CHANID "
+                       "AND program.endtime >= :STARTDATE "
+                       "AND program.starttime < :ENDDATE "
+                       "AND program.starttime >= :STARTDATELIMIT "
+                       "AND program.manualid = 0"; // Omit 'manual' recordings scheds
 
-    sSQL +=     "program.chanid = :CHANID "
-                "AND program.endtime >= :STARTDATE "
-                "AND program.starttime < :ENDDATE "
-                "AND program.starttime >= :STARTDATELIMIT "
-                "AND program.manualid = 0 " // Exclude programmes created purely for 'manual' recording schedules
-                "ORDER BY program.starttime ";
+    QString sGroupBy = "program.starttime, channel.channum,"
+                       "channel.callsign, program.title";
+
+    QString sOrderBy = "program.starttime";
+
     bindings[":STARTDATE"     ] = dtStartTime;
     bindings[":STARTDATELIMIT"] = dtStartTime.addDays(-1);
     bindings[":ENDDATE"       ] = dtEndTime;
@@ -129,7 +131,8 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &rawStartTime ,
         // Load the list of programmes for this channel
         ProgramList  progList;
         bindings[":CHANID"] = (*chan_it).chanid;
-        LoadFromProgram( progList, sSQL, bindings, schedList );
+        LoadFromProgram( progList, sWhere, sOrderBy, sOrderBy, bindings,
+                         schedList );
 
         // Create Program objects and add them to the channel object
         ProgramList::iterator progIt;

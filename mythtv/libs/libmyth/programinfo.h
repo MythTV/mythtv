@@ -788,6 +788,14 @@ class MPUBLIC ProgramInfo
 
 MPUBLIC bool LoadFromProgram(
     ProgramList        &destination,
+    const QString      &where,
+    const QString      &groupBy,
+    const QString      &orderBy,
+    const MSqlBindings &bindings,
+    const ProgramList  &schedList);
+
+MPUBLIC bool LoadFromProgram(
+    ProgramList        &destination,
     const QString      &sql,
     const MSqlBindings &bindings,
     const ProgramList  &schedList);
