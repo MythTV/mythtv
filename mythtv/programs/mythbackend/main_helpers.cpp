@@ -34,7 +34,6 @@
 #include "encoderlink.h"
 #include "remoteutil.h"
 #include "backendhousekeeper.h"
-#include "mythplugin.h"
 
 #include "mythcontext.h"
 #include "mythversion.h"
