@@ -15,9 +15,9 @@
 V4L2util::V4L2util(void)
     : m_fd(-1),
       m_vbi_fd(-1),
+      m_version(0),
       m_capabilities(0),
-      m_have_query_ext_ctrl(false),
-      m_version(0)
+      m_have_query_ext_ctrl(false)
 {
 }
 
