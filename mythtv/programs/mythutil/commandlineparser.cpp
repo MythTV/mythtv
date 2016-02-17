@@ -154,6 +154,9 @@ void MythUtilCommandLineParser::LoadArguments(void)
         << add("--scanmusic", "scanmusic", false,
                 "Scan the 'Music' Storage Group for music files", "")
                 ->SetGroup("Music Scanning")
+        << add("--updateradiostreams", "updateradiostreams", false,
+                "Downloads an updated radio stream list from the MythTV server", "")
+                ->SetGroup("Music Scanning")
         << add("--updatemeta", "updatemeta", false,
                 "Update a music tracks database record and tag with new metadata", "")
                 ->SetGroup("Metadata Reading/Writing")

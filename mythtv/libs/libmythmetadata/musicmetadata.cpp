@@ -346,7 +346,7 @@ bool MusicMetadata::updateStreamList(void)
     // make sure we are not already doing an update
     if (gCoreContext->GetSetting("MusicStreamListModified") == "Updating")
     {
-        LOG(VB_GENERAL, LOG_ERR, "MusicMetadata::updateStreamList: looks like we are already updating the stream list");
+        LOG(VB_GENERAL, LOG_ERR, "MusicMetadata: looks like we are already updating the radio streams list");
         return false;
     }
 
@@ -359,14 +359,19 @@ bool MusicMetadata::updateStreamList(void)
     QDateTime lastUpdate = QDateTime::fromString(gCoreContext->GetSetting("MusicStreamListModified"), Qt::ISODate);
 
     if (lastModified <= lastUpdate)
+    {
+        LOG(VB_GENERAL, LOG_INFO, "MusicMetadata: radio streams list is already up to date");
         return true;
+    }
 
     gCoreContext->SaveSetting("MusicStreamListModified", "Updating");
+
+    LOG(VB_GENERAL, LOG_INFO, "MusicMetadata: downloading radio streams list");
 
     // download compressed stream file
     if (!GetMythDownloadManager()->download(QString(STREAMUPDATEURL), &compressedData), false)
     {
-        LOG(VB_GENERAL, LOG_ERR, "MusicMetadata::updateStreamList: Failed to download stream list");
+        LOG(VB_GENERAL, LOG_ERR, "MusicMetadata: failed to download radio stream list");
         gCoreContext->SaveSetting("MusicStreamListModified", "");
         return false;
     }
@@ -385,7 +390,7 @@ bool MusicMetadata::updateStreamList(void)
                            &errorLine, &errorColumn))
     {
         LOG(VB_GENERAL, LOG_ERR,
-            "SearchStream: Could not read content of streams.xml" +
+            "MusicMetadata: Could not read content of streams.xml" +
                 QString("\n\t\t\tError parsing %1").arg(STREAMUPDATEURL) +
                 QString("\n\t\t\tat line: %1  column: %2 msg: %3")
                 .arg(errorLine).arg(errorColumn).arg(errorMsg));
@@ -401,6 +406,8 @@ bool MusicMetadata::updateStreamList(void)
         gCoreContext->SaveSetting("MusicStreamListModified", "");
         return false;
     }
+
+    LOG(VB_GENERAL, LOG_INFO, "MusicMetadata: processing radio streams list");
 
     QDomNodeList itemList = domDoc.elementsByTagName("item");
 
@@ -437,6 +444,8 @@ bool MusicMetadata::updateStreamList(void)
     }
 
     gCoreContext->SaveSetting("MusicStreamListModified", lastModified.toString(Qt::ISODate));
+
+    LOG(VB_GENERAL, LOG_INFO, "MusicMetadata: updating radio streams list completed OK");
 
     return true;
 }

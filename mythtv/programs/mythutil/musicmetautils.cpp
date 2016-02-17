@@ -195,6 +195,21 @@ static int ScanMusic(const MythUtilCommandLineParser &cmdline)
     return GENERIC_EXIT_OK;
 }
 
+static int UpdateRadioStreams(const MythUtilCommandLineParser &cmdline)
+{
+    // check we have the correct Music Schema Version (maybe the FE hasn't been run yet)
+    if (gCoreContext->GetNumSetting("MusicDBSchemaVer", 0) < 1024)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Can't update the radio streams the DB schema hasn't been updated yet! Aborting");
+        return GENERIC_EXIT_NOT_OK;
+    }
+
+    if (!MusicMetadata::updateStreamList())
+        return GENERIC_EXIT_NOT_OK;
+
+    return GENERIC_EXIT_OK;
+}
+
 static int CalcTrackLength(const MythUtilCommandLineParser &cmdline)
 {
     if (cmdline.toString("songid").isEmpty())
@@ -549,6 +564,7 @@ void registerMusicUtils(UtilMap &utilMap)
     utilMap["updatemeta"] = &UpdateMeta;
     utilMap["extractimage"] = &ExtractImage;
     utilMap["scanmusic"] = &ScanMusic;
+    utilMap["updateradiostreams"] = &UpdateRadioStreams;
     utilMap["calctracklen"] = &CalcTrackLength;
     utilMap["findlyrics"] = &FindLyrics;
 }
