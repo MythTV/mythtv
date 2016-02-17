@@ -24,6 +24,7 @@
 #include "recordingtypes.h"
 #include "mythcorecontext.h"
 #include "mythdownloadmanager.h"
+#include "musicmetadata.h"
 
 
 bool LogCleanerTask::DoRun(void)
@@ -457,6 +458,73 @@ void ThemeUpdateTask::Terminate(void)
     if (m_running)
         GetMythDownloadManager()->cancelDownload(m_url);
     m_running = false;
+}
+
+RadioStreamUpdateTask::RadioStreamUpdateTask(void) : DailyHouseKeeperTask("UpdateRadioStreams",
+                                                       kHKGlobal, kHKRunOnStartup),
+    m_msMU(NULL)
+{
+}
+
+bool RadioStreamUpdateTask::DoRun(void)
+{
+    if (m_msMU)
+    {
+        // this should never be defined, but terminate it anyway
+        if (m_msMU->GetStatus() == GENERIC_EXIT_RUNNING)
+            m_msMU->Term(true);
+        delete m_msMU;
+        m_msMU = NULL;
+    }
+
+    QString command = GetAppBinDir() + "mythutil";
+    QStringList args;
+    args << "--updateradiostreams";
+    args << logPropagateArgs;
+
+    LOG(VB_GENERAL, LOG_INFO, QString("Performing Radio Streams Update: %1 %2")
+        .arg(command).arg(args.join(" ")));
+
+    m_msMU = new MythSystemLegacy(command, args, kMSRunShell | kMSAutoCleanup);
+
+    m_msMU->Run();
+    uint result = m_msMU->Wait();
+
+    delete m_msMU;
+    m_msMU = NULL;
+
+    if (result != GENERIC_EXIT_OK)
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Update Radio Streams command '%1' failed")
+            .arg(command));
+        return false;
+    }
+
+    LOG(VB_GENERAL, LOG_INFO, QString("Radio Stream Update Complete"));
+    return true;
+}
+
+RadioStreamUpdateTask::~RadioStreamUpdateTask(void)
+{
+    delete m_msMU;
+    m_msMU = NULL;
+}
+
+bool RadioStreamUpdateTask::DoCheckRun(QDateTime now)
+{
+    // check we are not already running a radio stream update
+    if (gCoreContext->GetSetting("MusicStreamListModified") == "Updating" &&
+            PeriodicHouseKeeperTask::DoCheckRun(now))
+        return true;
+
+    return false;
+}
+
+void RadioStreamUpdateTask::Terminate(void)
+{
+    if (m_msMU && (m_msMU->GetStatus() == GENERIC_EXIT_RUNNING))
+        // just kill it, the runner thread will handle any necessary cleanup
+        m_msMU->Term(true);
 }
 
 ArtworkTask::ArtworkTask(void) : DailyHouseKeeperTask("RecordedArtworkUpdate",

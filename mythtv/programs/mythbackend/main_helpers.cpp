@@ -34,6 +34,7 @@
 #include "encoderlink.h"
 #include "remoteutil.h"
 #include "backendhousekeeper.h"
+#include "mythplugin.h"
 
 #include "mythcontext.h"
 #include "mythversion.h"
@@ -645,6 +646,12 @@ int run_backend(MythBackendCommandLineParser &cmdline)
             housekeeping->RegisterTask(new ThemeUpdateTask());
             housekeeping->RegisterTask(new ArtworkTask());
             housekeeping->RegisterTask(new MythFillDatabaseTask());
+
+            // only run this task if MythMusic is installed
+            MythPluginManager *pluginManager = gCoreContext->GetPluginManager();
+            MythPlugin *plugin = pluginManager->GetPlugin("mythmusic");
+            if (plugin)
+                housekeeping->RegisterTask(new RadioStreamUpdateTask());
         }
 
         housekeeping->RegisterTask(new JobQueueRecoverTask());
