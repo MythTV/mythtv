@@ -851,6 +851,8 @@ static void setupKeys(void)
         "Toggle shuffle mode"),    "");
     REG_KEY("Music", "TOGGLEREPEAT",  QT_TRANSLATE_NOOP("MythControls",
         "Toggle repeat mode"),     "");
+    REG_KEY("Music", "TOGGLELAST",  QT_TRANSLATE_NOOP("MythControls",
+        "Switch to previous radio stream"), "");
 
     // switch to view key bindings
     REG_KEY("Music", "SWITCHTOPLAYLIST",              QT_TRANSLATE_NOOP("MythControls",

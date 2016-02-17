@@ -360,9 +360,16 @@ bool StreamView::keyPressEvent(QKeyEvent *event)
         {
             removeStream();
         }
-        else if (action == "INFO")
+        else if (action == "TOGGLELAST")
         {
-            //TODO show stream info popup
+            if (m_lastStream && m_lastStream != m_currStream)
+            {
+                m_streamList->SetValueByData(qVariantFromValue(m_lastStream));
+
+                MythUIButtonListItem *item = m_streamList->GetItemCurrent();
+                if (item)
+                    streamItemClicked(item);
+            }
         }
         else
             handled = false;
