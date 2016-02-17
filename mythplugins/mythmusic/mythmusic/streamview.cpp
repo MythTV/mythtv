@@ -623,11 +623,20 @@ void StreamView::deleteStream(MusicMetadata *mdata)
         return;
     }
 
+    int currPos = m_streamList->GetCurrentPos();
+    int topPos = m_streamList->GetTopItemPos();
+
+    // if we are playing this radio stream stop playing
+    if (gPlayer->getCurrentMetadata() == mdata)
+        gPlayer->stop(true);
+
     gMusicData->all_streams->removeStream(mdata);
 
     gPlayer->loadStreamPlaylist();
 
     updateStreamList();
+
+    m_streamList->SetItemCurrent(currPos, topPos);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
