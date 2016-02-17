@@ -35,7 +35,7 @@ using namespace std;
 StreamView::StreamView(MythScreenStack *parent, MythScreenType *parentScreen)
            :MusicCommon(parent, parentScreen, "streamview"),
             m_streamList(NULL), m_noStreams(NULL), m_bufferStatus(NULL),
-            m_bufferProgress(NULL)
+            m_bufferProgress(NULL), m_currStream(NULL), m_lastStream(NULL)
 {
     m_currentView = MV_RADIO;
 }
@@ -146,35 +146,41 @@ void StreamView::customEvent(QEvent *event)
         if (!mpe)
             return;
 
-        int trackNo = mpe->TrackID;
-
         if (m_streamList)
         {
-            if (m_currentTrack >= 0 && m_currentTrack < m_streamList->GetCount())
+            MythUIButtonListItem *item = m_streamList->GetItemByData(qVariantFromValue(m_currStream));
+            if (item)
             {
-                MythUIButtonListItem *item = m_streamList->GetItemAt(m_currentTrack);
-                if (item)
-                {
-                    item->SetFontState("normal");
-                    item->DisplayState("default", "playstate");
-                }
+                item->SetFontState("normal");
+                item->DisplayState("default", "playstate");
             }
 
-            if (trackNo >= 0 && trackNo < m_streamList->GetCount())
+            if (m_currStream != gPlayer->getCurrentMetadata())
             {
-                if (m_currentTrack == m_streamList->GetCurrentPos())
-                    m_streamList->SetItemCurrent(trackNo);
+                m_lastStream = m_currStream;
+                m_currStream = gPlayer->getCurrentMetadata();
+            }
 
-                MythUIButtonListItem *item = m_streamList->GetItemAt(trackNo);
-                if (item)
+            item = m_streamList->GetItemByData(qVariantFromValue(m_currStream));
+            if (item)
+            {
+                if (gPlayer->isPlaying())
                 {
                     item->SetFontState("running");
                     item->DisplayState("playing", "playstate");
                 }
+                else if (gPlayer->isPaused())
+                {
+                    item->SetFontState("idle");
+                    item->DisplayState("paused", "playstate");
+                }
+                else
+                {
+                    item->SetFontState("normal");
+                    item->DisplayState("stopped", "playstate");
+                }
             }
         }
-
-        m_currentTrack = trackNo;
 
         updateTrackInfo(gPlayer->getCurrentMetadata());
     }
@@ -184,7 +190,7 @@ void StreamView::customEvent(QEvent *event)
         {
             if (m_streamList)
             {
-                MythUIButtonListItem *item = m_streamList->GetItemAt(m_currentTrack);
+                MythUIButtonListItem *item = m_streamList->GetItemByData(qVariantFromValue(m_currStream));
                 if (item)
                 {
                     item->SetFontState("running");
@@ -200,7 +206,7 @@ void StreamView::customEvent(QEvent *event)
     {
         if (m_streamList)
         {
-            MythUIButtonListItem *item = m_streamList->GetItemAt(m_currentTrack);
+            MythUIButtonListItem *item = m_streamList->GetItemByData(qVariantFromValue(m_currStream));
             if (item)
             {
                 item->SetFontState("normal");
@@ -460,6 +466,8 @@ void StreamView::updateStreamList(void)
 
             m_streamList->SetItemCurrent(item);
 
+            m_currStream = gPlayer->getCurrentMetadata();
+
             foundActiveStream = true;
         }
     }
@@ -533,7 +541,6 @@ void StreamView::addStream(MusicMetadata *mdata)
             if (url == itemsdata->Url())
             {
                 m_streamList->SetItemCurrent(item);
-                m_currentTrack = x;
                 break;
             }
         }
@@ -606,7 +613,6 @@ void StreamView::updateStream(MusicMetadata *mdata)
             if (mdata->ID() == itemsdata->ID())
             {
                 m_streamList->SetItemCurrent(item);
-                m_currentTrack = x;
                 break;
             }
         }
