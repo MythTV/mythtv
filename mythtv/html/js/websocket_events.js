@@ -5,7 +5,7 @@ var globalWSHandler = {};
 function InitWebSocketEventHandler()
 {
     console.log("Websocket Init");
-    globalWSHandler = new WebSocketEventHandler("ws://" + document.domain + ":6545/");
+    globalWSHandler = new WebSocketEventHandler("ws://" + document.domain + ":" + (Number(location.port) + 5) + "/");
 }
 window.addEventListener("DOMContentLoaded", InitWebSocketEventHandler);
 

@@ -74,8 +74,8 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
     LOG(VB_UPNP, LOG_INFO, "MediaServer::Init(): Begin");
 
     int     nPort     = g_pConfig->GetValue( "BackendStatusPort", 6544 );
-    int     nSSLPort  = g_pConfig->GetValue( "BackendSSLPort",    6554 );
-    int     nWSPort   = g_pConfig->GetValue( "BackendWSPort",     6545 );
+    int     nSSLPort  = g_pConfig->GetValue( "BackendSSLPort", (g_pConfig->GetValue( "BackendStatusPort", 6544 ) + 10) );
+    int     nWSPort   = (g_pConfig->GetValue( "BackendStatusPort", 6544 ) + 5);
 
     HttpServer *pHttpServer = new HttpServer();
 
