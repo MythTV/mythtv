@@ -22,6 +22,7 @@ using namespace std;
 #include "mythtranslation.h"
 #include "mythconfig.h"
 #include "commandlineparser.h"
+#include "loggingserver.h"
 #include "mythlogging.h"
 #include "signalhandling.h"
 
@@ -108,7 +109,7 @@ int main(int argc, char *argv[])
     signallist << SIGRTMIN;
 #endif
     SignalHandler::Init(signallist);
-    signal(SIGHUP, SIG_IGN);
+    SignalHandler::SetHandler(SIGHUP, logSigHup);
 #endif
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
