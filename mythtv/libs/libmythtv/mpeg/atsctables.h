@@ -221,9 +221,12 @@ class MTV_PUBLIC VirtualChannelTable : public PSIPTable
     uint ChannelCount()      const { return pesdata()[9]; }
 
     // for(i=0; i<num_channels_in_section; i++) {
-    //   short_name          7*16   0.0 (7 UTF-16 chars padded by 0x0000)
+    //   short_name          7*16   0.0 (7 UCS-2 chars padded by 0x0000)
     const QString ShortChannelName(uint i) const
     {
+        if (i >= ChannelCount())
+            return QString::null;
+
         QString str;
         const unsigned short* ustr =
             reinterpret_cast<const unsigned short*>(_ptrs[i]);

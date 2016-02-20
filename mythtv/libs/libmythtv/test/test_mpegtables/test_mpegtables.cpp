@@ -20,6 +20,10 @@
 
 #include "test_mpegtables.h"
 
+#include "atsctables.h"
+#include "mpegtables.h"
+#include "dvbtables.h"
+
 void TestMPEGTables::pat_test(void)
 {
     const unsigned char si_data[] = {
@@ -308,6 +312,30 @@ void TestMPEGTables::ExtendedEventDescriptor_test (void)
     QVERIFY (items.contains (QString ("Role Player")));
     QCOMPARE (items.count (QString ("Role Player")), 5);
     QCOMPARE (items.count (QString ("Role Player"), QString ("Nathan Fillion")), 1);
+}
+
+void TestMPEGTables::OTAChannelName_test (void)
+{
+    /* manually crafted according to A65/2013
+     * http://atsc.org/wp-content/uploads/2015/03/Program-System-Information-Protocol-for-Terrestrial-Broadcast-and-Cable.pdf
+     */
+    unsigned char tvct_data[] = {
+        0xc8, 0xf0, 0x2d, 0x00, 0x00, 0x00, 0x00, 0x00,  0x00, 0x01, 0x00,  'A', 0x00,  'B', 0x00,  'C',
+        0x00,  'D', 0x00,  'E', 0x00,  'F', 0x00, '\0',  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  0x00, 0x00, 0x00, 0x00, 0x60, 0xc4, 0x82, 0xb9
+    };
+
+    TerrestrialVirtualChannelTable table(tvct_data);
+
+    QVERIFY (table.HasCRC());
+    QCOMPARE (table.CalcCRC(), table.CRC());
+    QVERIFY (table.VerifyCRC());
+
+    QCOMPARE (table.SectionLength(), (unsigned int)sizeof (tvct_data));
+
+    QCOMPARE (table.ChannelCount(), 1u);
+    QCOMPARE (table.ShortChannelName(0), QString("ABCDEF"));
+    QCOMPARE (table.ShortChannelName(1), QString());
 }
 
 QTEST_APPLESS_MAIN(TestMPEGTables)

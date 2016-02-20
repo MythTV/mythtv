@@ -20,9 +20,6 @@
 
 #include <QtTest/QtTest>
 
-#include "mpegtables.h"
-#include "dvbtables.h"
-
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 #define MSKIP(MSG) QSKIP(MSG, SkipSingle)
 #else
@@ -78,4 +75,8 @@ class TestMPEGTables: public QObject
     /** test items from ExtendedEventDescriptor
      */
     void ExtendedEventDescriptor_test (void);
+
+    /** test US channel names for trailing \0 characters, #12612
+      */
+    void OTAChannelName_test (void);
 };
