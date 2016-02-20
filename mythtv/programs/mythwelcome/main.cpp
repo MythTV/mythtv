@@ -19,6 +19,7 @@
 #include "lcddevice.h"
 #include "commandlineparser.h"
 #include "tv.h"
+#include "loggingserver.h"
 #include "mythlogging.h"
 #include "signalhandling.h"
 
@@ -63,7 +64,7 @@ int main(int argc, char **argv)
         cmdline.PrintVersion();
         return GENERIC_EXIT_OK;
     }
-    
+
     QApplication a(argc, argv);
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHWELCOME);
 
@@ -82,7 +83,7 @@ int main(int argc, char **argv)
     signallist << SIGRTMIN;
 #endif
     SignalHandler::Init(signallist);
-    signal(SIGHUP, SIG_IGN);
+    SignalHandler::SetHandler(SIGHUP, logSigHup);
 #endif
 
     gContext = new MythContext(MYTH_BINARY_VERSION);

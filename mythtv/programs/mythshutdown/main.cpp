@@ -18,6 +18,7 @@ using namespace std;
 #include "remoteutil.h"
 #include "tvremoteutil.h"
 #include "compat.h"
+#include "loggingserver.h"
 #include "mythlogging.h"
 #include "commandlineparser.h"
 #include "programinfo.h"
@@ -67,7 +68,7 @@ static QString getGlobalSetting(const QString &key, const QString &defaultval)
     }
     else
     {
-        LOG(VB_STDIO|VB_FLUSH, LOG_ERR, 
+        LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
             QObject::tr("Error: Database not open while trying to "
                         "load setting: %1", "mythshutdown").arg(key) + "\n");
     }
@@ -847,7 +848,7 @@ int main(int argc, char **argv)
     signallist << SIGRTMIN;
 #endif
     SignalHandler::Init(signallist);
-    signal(SIGHUP, SIG_IGN);
+    SignalHandler::SetHandler(SIGHUP, logSigHup);
 #endif
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
@@ -901,7 +902,7 @@ int main(int argc, char **argv)
         }
     }
     else if (cmdline.toBool("safeshutdown"))
-    { 
+    {
         res = checkOKShutdown(true);
         if (res == 0)
         {

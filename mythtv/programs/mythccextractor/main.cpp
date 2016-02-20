@@ -19,6 +19,7 @@ using namespace std;
 #include "ringbuffer.h"
 #include "exitcodes.h"
 #include "signalhandling.h"
+#include "loggingserver.h"
 #include "cleanupguard.h"
 
 namespace {
@@ -145,7 +146,7 @@ int main(int argc, char *argv[])
     signallist << SIGRTMIN;
 #endif
     SignalHandler::Init(signallist);
-    signal(SIGHUP, SIG_IGN);
+    SignalHandler::SetHandler(SIGHUP, logSigHup);
 #endif
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
