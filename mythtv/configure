@@ -139,6 +139,7 @@ Advanced options (experts only):
   --disable-opengl-themepainter disable OpenGL based theme painting
   --disable-libass         disable libass SSA/ASS subtitle support
   --disable-systemd_notify disable systemd notify support
+  --disable-systemd_journal disable systemd journal support
 
   --enable-mac-bundle      produce standalone OS X apps (e.g. mythfrontend.app)
 
@@ -2361,6 +2362,7 @@ MYTHTV_CONFIG_LIST='
     debugtype
     mythlogserver
     systemd_notify
+    systemd_journal
 '
 
 MYTHTV_HAVE_LIST='
@@ -3555,6 +3557,7 @@ enable taglib
 disable mythlogserver
 enable exiv2
 enable systemd_notify
+enable systemd_journal
 
 # mythtv paths
 dvb_path_default="${sysinclude:-$sysroot/usr/include}"
@@ -7271,6 +7274,14 @@ if enabled systemd_notify ; then
     fi
 fi
 
+if enabled systemd_journal ; then
+   if check_pkg_config libsystemd systemd/sd-journal.h sd_journal_send ; then
+        require_pkg_config libsystemd systemd/sd-journal.h sd_journal_send
+   else
+        disable systemd_journal
+   fi
+fi
+
 # Check that all MythTV build "requirements" are met:
 enabled lamemp3 && check_lib2 lame/lame.h lame_init -lmp3lame -lm ||
     die "ERROR! You must have the Lame MP3 encoding library installed to compile MythTV."
@@ -8076,6 +8087,7 @@ echo "mythlogserver             ${mythlogserver-no}"
 echo "BD-J (Bluray java)        ${bdjava-no}"
 echo "BD-J type                 ${bdj_type}"
 echo "systemd_notify            ${systemd_notify-no}"
+echo "systemd_journal           ${systemd_journal-no}"
 echo
 
 echo "# Bindings"
