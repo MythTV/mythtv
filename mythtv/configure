@@ -156,6 +156,7 @@ Advanced options (experts only):
   --perl-config-opts=OPTS  Additional options to pass when generating
                            Makefile.perl for building Perl bindings.
   --enable-mythlogserver   Enable mythlogserver logging daemon facility
+  --disable-journal        Do not build journal support
   --enable-bdjava          Enable BD-J support for Blu-ray discs
 
 External codec library options (used for mythffmpeg and streaming transcode):
@@ -2358,6 +2359,7 @@ MYTHTV_CONFIG_LIST='
     profiletype
     debugtype
     mythlogserver
+    journal
     systemd_notify
 '
 
@@ -3549,6 +3551,7 @@ disable sdl
 enable libfftw3
 enable taglib
 disable mythlogserver
+enable journal
 enable exiv2
 enable systemd_notify
 
@@ -6606,6 +6609,9 @@ if enabled taglib; then
     fi
 fi
 
+# Check for libsystemd for journal support
+disabled journal || check_lib systemd/sd-journal.h sd_journal_send -lsystemd || disable journal
+
 # Attempt to use libudev for mediamonitor
 enabled libudev && check_lib2 libudev.h udev_new -ludev || disable libudev
 
@@ -8048,6 +8054,7 @@ echo "Frontend                  ${frontend-no}"
 echo "Backend                   ${backend-no}"
 echo "OpenGL ES 2.0             ${opengles-no}"
 echo "mythlogserver             ${mythlogserver-no}"
+echo "Journal                   ${journal-no}"
 echo "BD-J (Bluray java)        ${bdjava-no}"
 echo "BD-J type                 ${bdj_type}"
 echo "systemd_notify            ${systemd_notify-no}"

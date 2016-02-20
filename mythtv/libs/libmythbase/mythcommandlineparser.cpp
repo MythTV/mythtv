@@ -2419,6 +2419,11 @@ void MythCommandLineParser::addLogging(
         "Set the syslog logging facility.\nSet to \"none\" to disable, "
         "defaults to none.", "")
                 ->SetGroup("Logging");
+#if CONFIG_JOURNAL
+    add("--journal", "journal", "false",
+        "Use journal instead of syslog.", "")
+                ->SetGroup("Logging");
+#endif
     add("--nodblog", "nodblog", false, "Disable database logging.", "")
                 ->SetGroup("Logging")
                 ->SetDeprecated("this is now the default, see --enable-dblog");
@@ -2587,6 +2592,15 @@ int MythCommandLineParser::ConfigureLogging(QString mask, unsigned int progress)
     }
 
     int facility = GetSyslogFacility();
+#if CONFIG_JOURNAL
+    bool journal = toBool("journal");
+    if (journal)
+    {
+        if (facility >= 0)
+	    return GENERIC_EXIT_INVALID_CMDLINE;
+	facility = JOURNAL_FACILITY;
+    }
+#endif
     bool dblog = toBool("enabledblog");
     bool noserver = toBool("disablemythlogserver");
     LogLevel_t level = GetLogLevel();

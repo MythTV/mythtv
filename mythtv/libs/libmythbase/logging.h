@@ -33,6 +33,10 @@ namespace nzmqt {
     class ZMQContext;
 }
 
+#if CONFIG_JOURNAL
+#define JOURNAL_FACILITY -99
+#endif
+
 #define LOGLINE_MAX (2048-120)
 
 class QString;
