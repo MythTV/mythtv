@@ -30,7 +30,7 @@ class VAAPIContext
 {
   public:
     static bool IsFormatAccelerated(QSize size, MythCodecID codec,
-                                    PixelFormat &pix_fmt);
+                                    AVPixelFormat &pix_fmt);
     VAAPIContext(VAAPIDisplayType display_type, MythCodecID codec);
    ~VAAPIContext();
 
@@ -39,8 +39,8 @@ class VAAPIContext
     void* GetVideoSurface(int i);
     uint8_t* GetSurfaceIDPointer(void* buf);
     
-    int   GetNumBuffers(void)        const { return m_numSurfaces; }
-    PixelFormat GetPixelFormat(void) const { return m_pix_fmt;     }
+    int   GetNumBuffers(void)          const { return m_numSurfaces; }
+    AVPixelFormat GetPixelFormat(void) const { return m_pix_fmt;     }
 
     // X11 display
     bool  CopySurfaceToFrame(VideoFrame *frame, const void *buf);
@@ -65,7 +65,7 @@ class VAAPIContext
     VAAPIDisplay  *m_display;
     VAProfile      m_vaProfile;
     VAEntrypoint   m_vaEntrypoint;
-    PixelFormat    m_pix_fmt;
+    AVPixelFormat  m_pix_fmt;
     int            m_numSurfaces;
     VASurfaceID   *m_surfaces;
     vaapi_surface *m_surfaceData;

@@ -935,5 +935,5 @@ AVPixelFormat bcmpixfmt_to_pixfmt(BC_OUTPUT_FORMAT fmt)
         case OUTPUT_MODE422_YUY2: return AV_PIX_FMT_YUYV422;
         case OUTPUT_MODE422_UYVY: return AV_PIX_FMT_UYVY422;
     }
-    return PIX_FMT_YUV420P;
+    return AV_PIX_FMT_YUV420P;
 }

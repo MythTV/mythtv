@@ -1305,15 +1305,15 @@ int Transcode::TranscodeFile(const QString &inputname,
                 else
                 {
                     frame.buf = newFrame;
-                    avpicture_fill(&imageIn, lastDecode->buf, PIX_FMT_YUV420P,
+                    avpicture_fill(&imageIn, lastDecode->buf, AV_PIX_FMT_YUV420P,
                                    video_width, video_height);
-                    avpicture_fill(&imageOut, frame.buf, PIX_FMT_YUV420P,
+                    avpicture_fill(&imageOut, frame.buf, AV_PIX_FMT_YUV420P,
                                    newWidth, newHeight);
 
                     int bottomBand = (video_height == 1088) ? 8 : 0;
                     scontext = sws_getCachedContext(scontext, video_width,
-                                   video_height, PIX_FMT_YUV420P, newWidth,
-                                   newHeight, PIX_FMT_YUV420P,
+                                   video_height, AV_PIX_FMT_YUV420P, newWidth,
+                                   newHeight, AV_PIX_FMT_YUV420P,
                                    SWS_FAST_BILINEAR, NULL, NULL, NULL);
 
                     sws_scale(scontext, imageIn.data, imageIn.linesize, 0,
@@ -1363,15 +1363,15 @@ int Transcode::TranscodeFile(const QString &inputname,
             else
             {
                 frame.buf = newFrame;
-                avpicture_fill(&imageIn, lastDecode->buf, PIX_FMT_YUV420P,
+                avpicture_fill(&imageIn, lastDecode->buf, AV_PIX_FMT_YUV420P,
                                video_width, video_height);
-                avpicture_fill(&imageOut, frame.buf, PIX_FMT_YUV420P,
+                avpicture_fill(&imageOut, frame.buf, AV_PIX_FMT_YUV420P,
                                newWidth, newHeight);
 
                 int bottomBand = (video_height == 1088) ? 8 : 0;
                 scontext = sws_getCachedContext(scontext, video_width,
-                               video_height, PIX_FMT_YUV420P, newWidth,
-                               newHeight, PIX_FMT_YUV420P,
+                               video_height, AV_PIX_FMT_YUV420P, newWidth,
+                               newHeight, AV_PIX_FMT_YUV420P,
                                SWS_FAST_BILINEAR, NULL, NULL, NULL);
 
                 sws_scale(scontext, imageIn.data, imageIn.linesize, 0,

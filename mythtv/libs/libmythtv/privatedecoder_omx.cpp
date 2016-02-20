@@ -899,8 +899,8 @@ int PrivateDecoderOMX::GetBufferedFrame(AVStream *stream, AVFrame *picture)
     {
         VideoFrame vf;
         VideoFrameType frametype = FMT_YV12;
-        PixelFormat out_fmt = PIX_FMT_YUV420P; // == FMT_YV12
-        PixelFormat in_fmt  = AV_PIX_FMT_NONE;
+        AVPixelFormat out_fmt = AV_PIX_FMT_YUV420P; // == FMT_YV12
+        AVPixelFormat in_fmt  = AV_PIX_FMT_NONE;
         int pitches[3]; // Y, U, & V pitches
         int offsets[3]; // Y, U, & V offsets
         unsigned char *buf = 0;

@@ -647,13 +647,13 @@ int  PrivateDecoderVDA::GetFrame(AVStream *stream,
     picture->repeat_pict      = vdaframe.repeat_pict;
     VideoFrame *frame         = (VideoFrame*)picture->opaque;
 
-    PixelFormat in_fmt  = PIX_FMT_NONE;
+    AVPixelFormat in_fmt  = AV_PIX_FMT_NONE;
     if (vdaframe.format == 'BGRA')
-        in_fmt = PIX_FMT_BGRA;
+        in_fmt = AV_PIX_FMT_BGRA;
     else if (vdaframe.format == '2vuy')
-        in_fmt = PIX_FMT_UYVY422;
+        in_fmt = AV_PIX_FMT_UYVY422;
 
-    if (frame->codec == FMT_YV12 && in_fmt != PIX_FMT_NONE && frame->buf)
+    if (frame->codec == FMT_YV12 && in_fmt != AV_PIX_FMT_NONE && frame->buf)
     {
         CVPixelBufferLockBaseAddress(vdaframe.buffer, 0);
         uint8_t* base = (uint8_t*)CVPixelBufferGetBaseAddressOfPlane(vdaframe.buffer, 0);

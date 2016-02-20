@@ -10,10 +10,12 @@
 #define MythTV_mythavutil_h
 
 #include "mythtvexp.h" // for MUNUSED
-
 extern "C" {
 #include "libavcodec/avcodec.h"
 }
+
+struct AVFilterGraph;
+struct AVFilterContext;
 
 /** MythAVFrame
  * little utility class that act as a safe way to allocate an AVFrame
@@ -96,7 +98,7 @@ public:
      */
     int Copy(VideoFrame *frame, const AVPicture *pic,
              AVPixelFormat fmt = AV_PIX_FMT_YUV420P);
-    int Copy(AVPicture *dst, PixelFormat dst_pix_fmt,
+    int Copy(AVPicture *dst, AVPixelFormat dst_pix_fmt,
              const AVPicture *src, AVPixelFormat pix_fmt,
              int width, int height);
 
@@ -113,4 +115,21 @@ private:
 int MTV_PUBLIC AVPictureFill(AVPicture *pic, const VideoFrame *frame,
                              AVPixelFormat fmt = AV_PIX_FMT_NONE);
 
+class MTV_PUBLIC AVPictureDeinterlace
+{
+public:
+    AVPictureDeinterlace(enum AVPixelFormat pixfmt, int width, int height, float ar);
+    ~AVPictureDeinterlace();
+    int Deinterlace(AVPicture *dst, const AVPicture *src);
+private:
+    AVFilterGraph*      m_filter_graph;
+    AVFrame*            m_filter_frame;
+    AVFilterContext*    m_buffersink_ctx;
+    AVFilterContext*    m_buffersrc_ctx;
+    enum AVPixelFormat  m_pixfmt;
+    int                 m_width;
+    int                 m_height;
+    float               m_ar;
+    bool                m_errored;
+};
 #endif

@@ -1453,8 +1453,8 @@ float AvFormatDecoder::normalized_fps(AVStream *stream, AVCodecContext *enc)
 }
 
 #ifdef USING_VDPAU
-static enum PixelFormat get_format_vdpau(struct AVCodecContext *avctx,
-                                         const enum PixelFormat *fmt)
+static enum AVPixelFormat get_format_vdpau(struct AVCodecContext *avctx,
+                                           const enum AVPixelFormat *fmt)
 {
     AvFormatDecoder *nd = (AvFormatDecoder *)(avctx->opaque);
     if (nd && nd->GetPlayer())
@@ -1473,14 +1473,14 @@ static enum PixelFormat get_format_vdpau(struct AVCodecContext *avctx,
 
 #ifdef USING_DXVA2
 // Declared separately to allow attribute
-static enum PixelFormat get_format_dxva2(struct AVCodecContext *,
-                                         const enum PixelFormat *) MUNUSED;
+static enum AVPixelFormat get_format_dxva2(struct AVCodecContext *,
+                                           const enum AVPixelFormat *) MUNUSED;
 
-enum PixelFormat get_format_dxva2(struct AVCodecContext *avctx,
-                                         const enum PixelFormat *fmt)
+enum AVPixelFormat get_format_dxva2(struct AVCodecContext *avctx,
+                                    const enum AVPixelFormat *fmt)
 {
     if (!fmt)
-        return PIX_FMT_NONE;
+        return AV_PIX_FMT_NONE;
     AvFormatDecoder *nd = (AvFormatDecoder *)(avctx->opaque);
     if (nd && nd->GetPlayer())
     {
@@ -1488,27 +1488,27 @@ enum PixelFormat get_format_dxva2(struct AVCodecContext *avctx,
         avctx->hwaccel_context =
             (dxva_context*)nd->GetPlayer()->GetDecoderContext(NULL, dummy[0]);
     }
-    return avctx->hwaccel_context ? PIX_FMT_DXVA2_VLD : AV_PIX_FMT_YUV420P;
+    return avctx->hwaccel_context ? AV_PIX_FMT_DXVA2_VLD : AV_PIX_FMT_YUV420P;
 }
 #endif
 
 #ifdef USING_VAAPI
-static bool IS_VAAPI_PIX_FMT(enum PixelFormat fmt)
+static bool IS_VAAPI_PIX_FMT(enum AVPixelFormat fmt)
 {
-    return fmt == PIX_FMT_VAAPI_MOCO ||
-           fmt == PIX_FMT_VAAPI_IDCT ||
-           fmt == PIX_FMT_VAAPI_VLD;
+    return fmt == AV_PIX_FMT_VAAPI_MOCO ||
+           fmt == AV_PIX_FMT_VAAPI_IDCT ||
+           fmt == AV_PIX_FMT_VAAPI_VLD;
 }
 
 // Declared separately to allow attribute
-static enum PixelFormat get_format_vaapi(struct AVCodecContext *,
-                                         const enum PixelFormat *) MUNUSED;
+static enum AVPixelFormat get_format_vaapi(struct AVCodecContext *,
+                                         const enum AVPixelFormat *) MUNUSED;
 
-enum PixelFormat get_format_vaapi(struct AVCodecContext *avctx,
-                                         const enum PixelFormat *fmt)
+enum AVPixelFormat get_format_vaapi(struct AVCodecContext *avctx,
+                                         const enum AVPixelFormat *fmt)
 {
     if (!fmt)
-        return PIX_FMT_NONE;
+        return AV_PIX_FMT_NONE;
     AvFormatDecoder *nd = (AvFormatDecoder *)(avctx->opaque);
     if (nd && nd->GetPlayer())
     {
@@ -1516,16 +1516,16 @@ enum PixelFormat get_format_vaapi(struct AVCodecContext *avctx,
         avctx->hwaccel_context =
             (vaapi_context*)nd->GetPlayer()->GetDecoderContext(NULL, dummy[0]);
     }
-    return avctx->hwaccel_context ? PIX_FMT_VAAPI_VLD : AV_PIX_FMT_YUV420P;
+    return avctx->hwaccel_context ? AV_PIX_FMT_VAAPI_VLD : AV_PIX_FMT_YUV420P;
 }
 #endif
 
-static bool IS_DR1_PIX_FMT(const enum PixelFormat fmt)
+static bool IS_DR1_PIX_FMT(const enum AVPixelFormat fmt)
 {
     switch (fmt)
     {
-        case PIX_FMT_YUV420P:
-        case PIX_FMT_YUVJ420P:
+        case AV_PIX_FMT_YUV420P:
+        case AV_PIX_FMT_YUVJ420P:
             return true;
         default:
             return false;
@@ -2406,7 +2406,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 if (!foundgpudecoder)
                 {
                     MythCodecID vaapi_mcid;
-                    PixelFormat pix_fmt = PIX_FMT_YUV420P;
+                    AVPixelFormat pix_fmt = AV_PIX_FMT_YUV420P;
                     vaapi_mcid =
                         VideoOutputOpenGLVAAPI::GetBestSupportedCodec(width, height, dec,
                                                                       mpeg_version(enc->codec_id),
@@ -2425,7 +2425,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 if (!foundgpudecode)
                 {
                     MythCodecID dxva2_mcid;
-                    PixelFormat pix_fmt = PIX_FMT_YUV420P;
+                    AVPixelFormat pix_fmt = AV_PIX_FMT_YUV420P;
                     dxva2_mcid = VideoOutputD3D::GetBestSupportedCodec(
                         width, height, dec, mpeg_version(enc->codec_id),
                         false, pix_fmt);
@@ -3682,7 +3682,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
         picframe = m_parent->GetNextVideoFrame();
 
         unsigned char *buf = picframe->buf;
-        avpicture_fill(&tmppicture, buf, PIX_FMT_YUV420P, context->width,
+        avpicture_fill(&tmppicture, buf, AV_PIX_FMT_YUV420P, context->width,
                        context->height);
         tmppicture.data[0] = buf + picframe->offsets[0];
         tmppicture.data[1] = buf + picframe->offsets[1];
@@ -3695,7 +3695,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
         sws_ctx = sws_getCachedContext(sws_ctx, context->width,
                                        context->height, context->pix_fmt,
                                        context->width, context->height,
-                                       PIX_FMT_YUV420P, SWS_FAST_BILINEAR,
+                                       AV_PIX_FMT_YUV420P, SWS_FAST_BILINEAR,
                                        NULL, NULL, NULL);
         if (!sws_ctx)
         {
@@ -4675,7 +4675,9 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
 
         // Check if the number of channels or sampling rate have changed
         if (ctx->sample_rate != audioOut.sample_rate ||
-            ctx->channels    != audioOut.channels)
+            ctx->channels    != audioOut.channels ||
+            AudioOutputSettings::AVSampleFormatToFormat(ctx->sample_fmt,
+                                                        ctx->bits_per_raw_sample) != audioOut.format)
         {
             LOG(VB_GENERAL, LOG_INFO, LOC + "Audio stream changed");
             if (ctx->channels != audioOut.channels)

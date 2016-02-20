@@ -142,7 +142,7 @@ VideoOutputXv::VideoOutputXv()
       XJ_started(false),
 
       XJ_non_xv_image(0), non_xv_frames_shown(0), non_xv_show_frame(1),
-      non_xv_fps(0), non_xv_av_format(PIX_FMT_NB), non_xv_stop_time(0),
+      non_xv_fps(0), non_xv_av_format(AV_PIX_FMT_NB), non_xv_stop_time(0),
 
       xv_port(-1),      xv_hue_base(0),
       xv_colorkey(0),   xv_draw_colorkey(false),
@@ -1235,12 +1235,12 @@ bool VideoOutputXv::CreateBuffers(VOSType subtype)
 
         switch (XJ_non_xv_image->bits_per_pixel)
         {   // only allow these three output formats for non-xv videout
-            case 16: non_xv_av_format = PIX_FMT_RGB565; break;
-            case 24: non_xv_av_format = PIX_FMT_RGB24;  break;
-            case 32: non_xv_av_format = PIX_FMT_RGB32; break;
-            default: non_xv_av_format = PIX_FMT_NB;
+            case 16: non_xv_av_format = AV_PIX_FMT_RGB565; break;
+            case 24: non_xv_av_format = AV_PIX_FMT_RGB24;  break;
+            case 32: non_xv_av_format = AV_PIX_FMT_RGB32; break;
+            default: non_xv_av_format = AV_PIX_FMT_NB;
         }
-        if (PIX_FMT_NB == non_xv_av_format)
+        if (AV_PIX_FMT_NB == non_xv_av_format)
         {
             QString msg = QString(
                 "Non XVideo modes only support displays with 16,\n\t\t\t"
@@ -1450,13 +1450,13 @@ void VideoOutputXv::PrepareFrameMem(VideoFrame *buffer, FrameScanType /*scan*/)
         int size = buffersize(FMT_YV12, out_width, out_height);
         unsigned char *sbuf = (unsigned char*)av_malloc(size);
 
-        avpicture_fill(&image_out, (uint8_t *)sbuf, PIX_FMT_YUV420P,
+        avpicture_fill(&image_out, (uint8_t *)sbuf, AV_PIX_FMT_YUV420P,
                        out_width, out_height);
         AVPictureFill(&image_in, buffer);
         QMutexLocker locker(&lock);
         scontext = sws_getCachedContext(scontext, width, height,
-                       PIX_FMT_YUV420P, out_width,
-                       out_height, PIX_FMT_YUV420P,
+                       AV_PIX_FMT_YUV420P, out_width,
+                       out_height, AV_PIX_FMT_YUV420P,
                        SWS_FAST_BILINEAR, NULL, NULL, NULL);
 
         sws_scale(scontext, image_in.data, image_in.linesize, 0, height,
@@ -1466,7 +1466,7 @@ void VideoOutputXv::PrepareFrameMem(VideoFrame *buffer, FrameScanType /*scan*/)
     avpicture_fill(&image_in, (uint8_t *)XJ_non_xv_image->data,
                    non_xv_av_format, out_width, out_height);
 
-    m_copyFrame.Copy(&image_in, non_xv_av_format, &image_out, PIX_FMT_YUV420P,
+    m_copyFrame.Copy(&image_in, non_xv_av_format, &image_out, AV_PIX_FMT_YUV420P,
                 out_width, out_height);
 
     {

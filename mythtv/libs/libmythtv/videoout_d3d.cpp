@@ -466,9 +466,9 @@ void VideoOutputD3D::UpdateFrame(VideoFrame *frame, D3D9Image *img)
     {
         AVPicture image_out;
         avpicture_fill(&image_out, (uint8_t*)buf,
-                       PIX_FMT_RGB32, frame->width, frame->height);
+                       AV_PIX_FMT_RGB32, frame->width, frame->height);
         image_out.linesize[0] = pitch;
-        m_copyFrame.Copy(&image_out, frame,(uint8_t*)buf, PIX_FMT_RGB32);
+        m_copyFrame.Copy(&image_out, frame,(uint8_t*)buf, AV_PIX_FMT_RGB32);
     }
     img->ReleaseBuffer();
 }
@@ -674,14 +674,14 @@ bool VideoOutputD3D::ApproveDeintFilter(const QString& filtername) const
 MythCodecID VideoOutputD3D::GetBestSupportedCodec(
     uint width,       uint height, const QString &decoder,
     uint stream_type, bool no_acceleration,
-    PixelFormat &pix_fmt)
+    AVPixelFormat &pix_fmt)
 {
 #ifdef USING_DXVA2
     QSize size(width, height);
     bool use_cpu = no_acceleration;
     MythCodecID test_cid = (MythCodecID)(kCodec_MPEG1_DXVA2 + (stream_type - 1));
     use_cpu |= !codec_is_dxva2_hw(test_cid);
-    pix_fmt = PIX_FMT_DXVA2_VLD;
+    pix_fmt = AV_PIX_FMT_DXVA2_VLD;
     if ((decoder == "dxva2") && !getenv("NO_DXVA2") && !use_cpu)
         return test_cid;
 #endif

@@ -125,7 +125,7 @@ int mpeg_version(int codec_id);
 #endif
 
 #ifdef USING_DXVA2
-#define CODEC_IS_DXVA2(codec, enc) (codec && (enc->pix_fmt == PIX_FMT_DXVA2_VLD))
+#define CODEC_IS_DXVA2(codec, enc) (codec && (enc->pix_fmt == AV_PIX_FMT_DXVA2_VLD))
 #else
 #define CODEC_IS_DXVA2(codec, enc) (0)
 #endif

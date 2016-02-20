@@ -269,7 +269,7 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
     FilterManager *FiltMan;
 
     VideoFrameType inpixfmt;
-    PixelFormat picture_format;
+    AVPixelFormat picture_format;
     uint32_t v4l2_pixelformat;
     int w_out;
     int h_out;

@@ -250,14 +250,14 @@ QMutex VAAPIDisplay::s_VAAPIDisplayLock(QMutex::Recursive);
 VAAPIDisplay *VAAPIDisplay::s_VAAPIDisplay = NULL;
 
 bool VAAPIContext::IsFormatAccelerated(QSize size, MythCodecID codec,
-                                       PixelFormat &pix_fmt)
+                                       AVPixelFormat &pix_fmt)
 {
     bool result = false;
     VAAPIContext *ctx = new VAAPIContext(kVADisplayX11, codec);
     if (ctx->CreateDisplay(size, true))
     {
         pix_fmt = ctx->GetPixelFormat();
-        result = pix_fmt == PIX_FMT_VAAPI_VLD;
+        result = pix_fmt == AV_PIX_FMT_VAAPI_VLD;
     }
     delete ctx;
     return result;
@@ -270,7 +270,7 @@ VAAPIContext::VAAPIContext(VAAPIDisplayType display_type,
     m_display(NULL),
     m_vaProfile(VAProfileMPEG2Main)/* ?? */,
     m_vaEntrypoint(VAEntrypointEncSlice),
-    m_pix_fmt(PIX_FMT_YUV420P), m_numSurfaces(NUM_VAAPI_BUFFERS),
+    m_pix_fmt(AV_PIX_FMT_YUV420P), m_numSurfaces(NUM_VAAPI_BUFFERS),
     m_surfaces(NULL), m_surfaceData(NULL), m_pictureAttributes(NULL),
     m_pictureAttributeCount(0), m_hueBase(0), m_deriveSupport(false),
     m_copy(NULL)
@@ -586,7 +586,7 @@ bool VAAPIContext::InitProfiles(void)
     m_vaProfile = profile_wanted;
     m_vaEntrypoint = entry_found;
     if (VAEntrypointVLD == m_vaEntrypoint)
-        m_pix_fmt = PIX_FMT_VAAPI_VLD;
+        m_pix_fmt = AV_PIX_FMT_VAAPI_VLD;
     return true;
 }
 

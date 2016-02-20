@@ -56,7 +56,7 @@ PGMConverter::MythPlayerInited(const MythPlayer *player)
     height = buf_dim.height();
 
 #ifdef PGM_CONVERT_GREYSCALE
-    if (avpicture_alloc(&pgm, PIX_FMT_GRAY8, width, height))
+    if (avpicture_alloc(&pgm, AV_PIX_FMT_GRAY8, width, height))
     {
         LOG(VB_COMMFLAG, LOG_ERR, QString("PGMConverter::MythPlayerInited "
                                           "avpicture_alloc pgm (%1x%2) failed")
@@ -97,13 +97,13 @@ PGMConverter::getImage(const VideoFrame *frame, long long _frameno,
 
 #ifdef PGM_CONVERT_GREYSCALE
     (void)gettimeofday(&start, NULL);
-    if (m_copy->Copy(&pgm, frame, pgm.data[0], PIX_FMT_GRAY8) < 0)
+    if (m_copy->Copy(&pgm, frame, pgm.data[0], AV_PIX_FMT_GRAY8) < 0)
         goto error;
     (void)gettimeofday(&end, NULL);
     timersub(&end, &start, &elapsed);
     timeradd(&convert_time, &elapsed, &convert_time);
 #else  /* !PGM_CONVERT_GREYSCALE */
-    if (avpicture_fill(&pgm, frame->buf, PIX_FMT_GRAY8, width, height) == -1)
+    if (avpicture_fill(&pgm, frame->buf, AV_PIX_FMT_GRAY8, width, height) == -1)
     {
         LOG(VB_COMMFLAG, LOG_ERR,
             QString("PGMConverter::getImage error at frame %1 (%2x%3)")
