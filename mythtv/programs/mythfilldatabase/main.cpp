@@ -27,6 +27,7 @@ using namespace std;
 #include "videosource.h" // for is_grabber..
 #include "dbcheck.h"
 #include "mythsystemevent.h"
+#include "loggingserver.h"
 #include "mythlogging.h"
 #include "signalhandling.h"
 #include "cleanupguard.h"
@@ -134,7 +135,7 @@ int main(int argc, char *argv[])
     if (cmdline.toBool("ddfile"))
     {
         // datadirect file mode
-        if (!cmdline.toBool("sourceid") || 
+        if (!cmdline.toBool("sourceid") ||
             !cmdline.toBool("offset") ||
             !cmdline.toBool("lineupid") ||
             !cmdline.toBool("xmlfile"))
@@ -188,17 +189,17 @@ int main(int argc, char *argv[])
         cmdline.SetValue("refresh",
                 cmdline.toStringList("refresh") << "today");
     if (cmdline.toBool("dontrefreshtomorrow"))
-        cmdline.SetValue("refresh", 
+        cmdline.SetValue("refresh",
                 cmdline.toStringList("refresh") << "nottomorrow");
     if (cmdline.toBool("refreshsecond"))
-        cmdline.SetValue("refresh", 
+        cmdline.SetValue("refresh",
                 cmdline.toStringList("refresh") << "second");
     if (cmdline.toBool("refreshall"))
-        cmdline.SetValue("refresh", 
+        cmdline.SetValue("refresh",
                 cmdline.toStringList("refresh") << "all");
     if (cmdline.toBool("refreshday"))
         cmdline.SetValue("refresh",
-                cmdline.toStringList("refresh") << 
+                cmdline.toStringList("refresh") <<
                                         cmdline.toStringList("refreshday"));
 
     QStringList sl = cmdline.toStringList("refresh");
@@ -285,7 +286,7 @@ int main(int argc, char *argv[])
     signallist << SIGRTMIN;
 #endif
     SignalHandler::Init(signallist);
-    signal(SIGHUP, SIG_IGN);
+    SignalHandler::SetHandler(SIGHUP, logSigHup);
 #endif
 
     gContext = new MythContext(MYTH_BINARY_VERSION);

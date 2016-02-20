@@ -50,6 +50,7 @@ using namespace std;
 #include "mythsystemevent.h"
 #include "hardwareprofile.h"
 #include "signalhandling.h"
+#include "loggingserver.h"
 
 #include "compat.h"  // For SIG* on MinGW
 #include "exitcodes.h"
@@ -1705,7 +1706,7 @@ int main(int argc, char **argv)
     SignalHandler::Init(signallist);
     SignalHandler::SetHandler(SIGUSR1, handleSIGUSR1);
     SignalHandler::SetHandler(SIGUSR2, handleSIGUSR2);
-    signal(SIGHUP, SIG_IGN);
+    SignalHandler::SetHandler(SIGHUP, logSigHup);
 #endif
 
     int retval;
