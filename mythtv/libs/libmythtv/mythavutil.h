@@ -49,17 +49,29 @@ public:
     {
         return m_frame == NULL;
     }
-    AVFrame* operator->()
+    AVFrame* operator->() const
     {
         return m_frame;
     }
-    AVFrame& operator*()
+    AVFrame& operator*() const
     {
         return *m_frame;
     }
-    operator AVFrame*()
+    operator AVFrame*() const
     {
         return m_frame;
+    }
+    operator const AVFrame*() const
+    {
+        return m_frame;
+    }
+    operator AVPicture*() const
+    {
+        return reinterpret_cast<AVPicture*>(m_frame);
+    }
+    operator const AVPicture*() const
+    {
+        return reinterpret_cast<AVPicture*>(m_frame);
     }
 
 private:
