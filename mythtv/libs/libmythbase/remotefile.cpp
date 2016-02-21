@@ -4,6 +4,7 @@ using namespace std;
 #include <QUrl>
 #include <QFile>
 #include <QFileInfo>
+#include <QDataStream>
 
 // POSIX C headers
 #include <unistd.h>

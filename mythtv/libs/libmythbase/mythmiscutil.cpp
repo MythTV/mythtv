@@ -42,6 +42,7 @@ using namespace std;
 #include <QFile>
 #include <QDir>
 #include <QUrl>
+#include <QDataStream>
 
 // Myth headers
 #include "mythcorecontext.h"
