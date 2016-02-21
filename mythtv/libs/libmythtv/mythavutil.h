@@ -127,18 +127,18 @@ private:
 int MTV_PUBLIC AVPictureFill(AVPicture *pic, const VideoFrame *frame,
                              AVPixelFormat fmt = AV_PIX_FMT_NONE);
 
-class MTV_PUBLIC AVPictureDeinterlace
+class MTV_PUBLIC MythPictureDeinterlacer
 {
 public:
-    AVPictureDeinterlace(enum AVPixelFormat pixfmt, int width, int height, float ar);
-    ~AVPictureDeinterlace();
+    MythPictureDeinterlacer(AVPixelFormat pixfmt, int width, int height, float ar = 1.0f);
+    ~MythPictureDeinterlacer();
     int Deinterlace(AVPicture *dst, const AVPicture *src);
 private:
     AVFilterGraph*      m_filter_graph;
-    AVFrame*            m_filter_frame;
+    MythAVFrame         m_filter_frame;
     AVFilterContext*    m_buffersink_ctx;
     AVFilterContext*    m_buffersrc_ctx;
-    enum AVPixelFormat  m_pixfmt;
+    AVPixelFormat       m_pixfmt;
     int                 m_width;
     int                 m_height;
     float               m_ar;

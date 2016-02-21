@@ -230,9 +230,9 @@ int MythAVCopy::Copy(VideoFrame *frame, const AVPicture *pic, AVPixelFormat fmt)
     return Copy(&frame_out, fmt_out, pic, fmt, frame->width, frame->height);
 }
 
-AVPictureDeinterlace::AVPictureDeinterlace(enum AVPixelFormat pixfmt, int width, int height, float ar)
+MythPictureDeinterlacer::MythPictureDeinterlacer(AVPixelFormat pixfmt,
+                                                 int width, int height, float ar)
     : m_filter_graph(nullptr)
-    , m_filter_frame(nullptr)
     , m_buffersink_ctx(nullptr)
     , m_buffersrc_ctx(nullptr)
     , m_pixfmt(pixfmt)
@@ -274,7 +274,6 @@ AVPictureDeinterlace::AVPictureDeinterlace(enum AVPixelFormat pixfmt, int width,
         {
             break;
         }
-        m_filter_frame = av_frame_alloc();
         return;
     }
 
@@ -284,7 +283,7 @@ AVPictureDeinterlace::AVPictureDeinterlace(enum AVPixelFormat pixfmt, int width,
     return;
 }
 
-int AVPictureDeinterlace::Deinterlace(AVPicture *dst, const AVPicture *src)
+int MythPictureDeinterlacer::Deinterlace(AVPicture *dst, const AVPicture *src)
 {
     if (m_errored)
     {
@@ -318,11 +317,10 @@ int AVPictureDeinterlace::Deinterlace(AVPicture *dst, const AVPicture *src)
     return 0;
 }
 
-AVPictureDeinterlace::~AVPictureDeinterlace()
+MythPictureDeinterlacer::~MythPictureDeinterlacer()
 {
     if (m_filter_graph)
     {
-        av_frame_free(&m_filter_frame);
         avfilter_graph_free(&m_filter_graph);
     }
 }
