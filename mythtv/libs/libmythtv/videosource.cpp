@@ -2636,15 +2636,14 @@ void ExternalConfigurationGroup::probeApp(const QString & path)
     if (fileInfo.exists())
     {
         if (!fileInfo.isReadable() || !fileInfo.isFile())
-            ci = tr("File not readable: ");
+            ci = tr("File not readable: %1").arg(fileInfo.absoluteFilePath());
         if (!fileInfo.isExecutable())
-            ci = tr("File is not executable: ");
+            ci = tr("File is not executable: %1").arg(fileInfo.absoluteFilePath());
     }
     else
     {
-        ci = tr("File does not exist: ");
+        ci = tr("File does not exist: %1").arg(fileInfo.absoluteFilePath());
     }
-    ci += QString("'%1'").arg(fileInfo.absoluteFilePath());
 
     info->setValue(ci);
 }
