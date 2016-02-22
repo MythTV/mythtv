@@ -1696,12 +1696,16 @@ void RecordingProfile::CompleteLoad(int profileId, const QString &type,
 #endif
 
         QString tvFormat = gCoreContext->GetSetting("TVFormat");
-        // TODO: When mpegrecorder is remove, don't check for "HDPVR' anymore...
-        if (type != "HDPVR")
+        // TODO: When mpegrecorder is removed, don't check for "HDPVR' anymore...
+        if (type != "HDPVR" &&
+            (!v4l2util
 #ifdef USING_V4L2
-            if (v4l2util && v4l2util->UserAdjustableResolution())
-            addChild(new ImageSize(*this, tvFormat, profileName));
+             || v4l2util->UserAdjustableResolution()
 #endif
+            ))
+        {
+            addChild(new ImageSize(*this, tvFormat, profileName));
+        }
         videoSettings = new VideoCompressionSettings(*this, profileName,
                                                      v4l2util);
         addChild(videoSettings);
