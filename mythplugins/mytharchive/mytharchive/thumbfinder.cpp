@@ -835,7 +835,7 @@ bool ThumbFinder::getFrameImage(bool needKeyFrame, int64_t requiredPTS)
         avpicture_fill(&retbuf, m_outputbuf, AV_PIX_FMT_RGB32, m_frameWidth, m_frameHeight);
         AVPicture *tmp = m_frame;
 
-        m_deinterlacer->Deinterlace(tmp, tmp);
+        m_deinterlacer->DeinterlaceSingle(tmp, tmp);
 
         m_copy.Copy(&retbuf, AV_PIX_FMT_RGB32, tmp, m_codecCtx->pix_fmt,
                     m_frameWidth, m_frameHeight);

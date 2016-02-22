@@ -127,12 +127,25 @@ private:
 int MTV_PUBLIC AVPictureFill(AVPicture *pic, const VideoFrame *frame,
                              AVPixelFormat fmt = AV_PIX_FMT_NONE);
 
+/**
+ * MythPictureDeinterlacer
+ * simple deinterlacer based on FFmpeg's yadif filter.
+ * Yadif requires 3 frames before starting to return a deinterlaced frame.
+ */
 class MTV_PUBLIC MythPictureDeinterlacer
 {
 public:
     MythPictureDeinterlacer(AVPixelFormat pixfmt, int width, int height, float ar = 1.0f);
     ~MythPictureDeinterlacer();
+    // Will deinterlace src into dst. If EAGAIN is returned, more frames
+    // are needed to output a frame.
+    // To drain the deinterlacer, call Deinterlace with src = NULL until you
+    // get no more frames. Once drained, you must call Flush() to start
+    // deinterlacing again.
     int Deinterlace(AVPicture *dst, const AVPicture *src);
+    int DeinterlaceSingle(AVPicture *dst, const AVPicture *src);
+    // Flush and reset the deinterlacer.
+    int Flush();
 private:
     AVFilterGraph*      m_filter_graph;
     MythAVFrame         m_filter_frame;

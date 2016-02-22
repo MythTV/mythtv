@@ -241,20 +241,88 @@ MythPictureDeinterlacer::MythPictureDeinterlacer(AVPixelFormat pixfmt,
     , m_ar(ar)
     , m_errored(false)
 {
-    AVFilterInOut *inputs = NULL, *outputs = NULL;
-    char args[512];
-    int res;
+    if (Flush() < 0)
+    {
+        m_errored = true;
+    }
+}
 
-    QMutexLocker locker(avcodeclock);
-    avfilter_register_all();
+int MythPictureDeinterlacer::Deinterlace(AVPicture *dst, const AVPicture *src)
+{
+    if (m_errored)
+    {
+        return -1;
+    }
+    if (src)
+    {
+        memcpy(m_filter_frame->data, src->data, sizeof(src->data));
+        memcpy(m_filter_frame->linesize, src->linesize, sizeof(src->linesize));
+        m_filter_frame->width = m_width;
+        m_filter_frame->height = m_height;
+        m_filter_frame->format = m_pixfmt;
+    }
+    int res = av_buffersrc_add_frame(m_buffersrc_ctx, m_filter_frame);
+    if (res < 0)
+    {
+        return res;
+    }
+    res = av_buffersink_get_frame(m_buffersink_ctx, m_filter_frame);
+    if (res < 0)
+    {
+        return res;
+    }
+    av_picture_copy(dst, (const AVPicture*)m_filter_frame, m_pixfmt, m_width, m_height);
+    av_frame_unref(m_filter_frame);
+
+    return 0;
+}
+
+int MythPictureDeinterlacer::DeinterlaceSingle(AVPicture *dst, const AVPicture *src)
+{
+    if (m_errored)
+    {
+        return -1;
+    }
+    if (!m_filter_graph && Flush() < 0)
+    {
+        return -1;
+    }
+    int res = Deinterlace(dst, src);
+    if (res == AVERROR(EAGAIN))
+    {
+        res = Deinterlace(dst, NULL);
+        // We have drained the filter, we need to recreate it on the next run.
+        avfilter_graph_free(&m_filter_graph);
+    }
+    return res;
+}
+
+int MythPictureDeinterlacer::Flush()
+{
+    {
+        QMutexLocker locker(avcodeclock);
+        avfilter_register_all();
+    }
+
+    if (m_filter_graph)
+    {
+        avfilter_graph_free(&m_filter_graph);
+    }
 
     m_filter_graph = avfilter_graph_alloc();
+    if (!m_filter_graph)
+    {
+        return -1;
+    }
+
+    AVFilterInOut *inputs = NULL, *outputs = NULL;
+    char args[512];
     snprintf(args, sizeof(args),
              "buffer=video_size=%dx%d:pix_fmt=%d:time_base=1/1:pixel_aspect=%f [in];"
              "[in] yadif [out];"
              "[out] buffersink",
-             width, height, pixfmt, m_ar);
-    res = avfilter_graph_parse2(m_filter_graph, args, &inputs, &outputs);
+             m_width, m_height, m_pixfmt, m_ar);
+    int res = avfilter_graph_parse2(m_filter_graph, args, &inputs, &outputs);
     while (1)
     {
         if (res < 0 || inputs || outputs)
@@ -274,47 +342,11 @@ MythPictureDeinterlacer::MythPictureDeinterlacer(AVPixelFormat pixfmt,
         {
             break;
         }
-        return;
+        return 0;
     }
-
     avfilter_inout_free(&inputs);
     avfilter_inout_free(&outputs);
-    m_errored = true;
-    return;
-}
-
-int MythPictureDeinterlacer::Deinterlace(AVPicture *dst, const AVPicture *src)
-{
-    if (m_errored)
-    {
-        return -1;
-    }
-
-    memcpy(m_filter_frame->data, src->data, sizeof(src->data));
-    memcpy(m_filter_frame->linesize, src->linesize, sizeof(src->linesize));
-    m_filter_frame->width = m_width;
-    m_filter_frame->height = m_height;
-    m_filter_frame->format = m_pixfmt;
-    int res = av_buffersrc_add_frame(m_buffersrc_ctx, m_filter_frame);
-    if (res < 0)
-    {
-        return res;
-    }
-    // Feed EOS
-    res = av_buffersrc_add_frame(m_buffersrc_ctx, NULL);
-    if (res < 0)
-    {
-        return res;
-    }
-    res = av_buffersink_get_frame(m_buffersink_ctx, m_filter_frame);
-    if (res < 0)
-    {
-        return res;
-    }
-    av_picture_copy(dst, (const AVPicture*)m_filter_frame, m_pixfmt, m_width, m_height);
-    av_frame_unref(m_filter_frame);
-
-    return 0;
+    return -1;
 }
 
 MythPictureDeinterlacer::~MythPictureDeinterlacer()
