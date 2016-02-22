@@ -1953,7 +1953,7 @@ static int getFileInfo(QString inFile, QString outFile, int lenMethod)
                 stream.setAttribute("codec", codec.trimmed());
                 stream.setAttribute("width", st->codec->width);
                 stream.setAttribute("height", st->codec->height);
-                stream.setAttribute("bitrate", st->codec->bit_rate);
+                stream.setAttribute("bitrate", (qlonglong)st->codec->bit_rate);
 
                 float fps;
                 if (st->r_frame_rate.den && st->r_frame_rate.num)
@@ -2098,7 +2098,7 @@ static int getFileInfo(QString inFile, QString outFile, int lenMethod)
                 stream.setAttribute("id", st->id);
 
                 stream.setAttribute("samplerate", st->codec->sample_rate);
-                stream.setAttribute("bitrate", st->codec->bit_rate);
+                stream.setAttribute("bitrate", (qlonglong)st->codec->bit_rate);
 
                 if (st->start_time != (int) AV_NOPTS_VALUE)
                 {
