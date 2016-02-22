@@ -862,11 +862,7 @@ static int mpegts_set_stream_info(AVStream *st, PESContext *pes,
 
 static void new_pes_packet(PESContext *pes, AVPacket *pkt)
 {
-    av_init_packet(pkt);
-
-    pkt->destruct = av_destruct_packet;
-    pkt->data = pes->buffer;
-    pkt->size = pes->data_index;
+    av_packet_from_data(pkt, pes->buffer, pes->data_index);
 
     if(pes->total_size != MAX_PES_PAYLOAD &&
        pes->pes_header_size + pes->data_index != pes->total_size + PES_START_SIZE) {
@@ -2126,7 +2122,7 @@ static void mpegts_add_stream(MpegTSContext *ts, int id, pmt_entry_t* item,
             st->codec->codec_tag = item->dvbci.codec_tag;
 
             if (prog_reg_desc == AV_RL32("HDMV") && item->type == 0x83 && pes->sub_st) {
-                ff_program_add_stream_index(ts->stream, id, pes->sub_st->index);
+                av_program_add_stream_index(ts->stream, id, pes->sub_st->index);
                 pes->sub_st->codec->codec_tag = st->codec->codec_tag;
             }
 
@@ -2153,7 +2149,7 @@ static void mpegts_add_stream(MpegTSContext *ts, int id, pmt_entry_t* item,
                    ff_codec_type_string(st->codec->codec_type), st);
         }
         add_pid_to_pmt(ts, id, pid);
-        ff_program_add_stream_index(ts->stream, id, st->index);
+        av_program_add_stream_index(ts->stream, id, st->index);
     }
     else
     {

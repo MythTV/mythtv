@@ -763,7 +763,7 @@ bool PreviewGenerator::IsLocal(void) const
 }
 
 /**
- *  \brief Returns a PIX_FMT_RGBA32 buffer containg a frame from the video.
+ *  \brief Returns a AV_PIX_FMT_RGBA32 buffer containg a frame from the video.
  *
  *  \param pginfo       Recording to grab from.
  *  \param filename     File containing recording.

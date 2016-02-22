@@ -29,7 +29,7 @@
 #include "libavutil/log.h"
 #include "libavutil/opt.h"
 #include "libavformat/internal.h"
-#include "libavcodec/cpu.h"
+#include "libavcodec/dsputil.h"
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>

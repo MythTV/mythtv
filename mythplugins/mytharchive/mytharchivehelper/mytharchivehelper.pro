@@ -23,6 +23,8 @@ LIBS += -lmythavformat
 LIBS += -lmythavcodec
 LIBS += -lmythavcodec
 LIBS += -lmythavutil
+LIBS += -lmythpostproc
+LIBS += -lmythavfilter
 LIBS += -lz
 LIBS += -lmythtv-$$LIBVERSION
 # libmythtv dependencies

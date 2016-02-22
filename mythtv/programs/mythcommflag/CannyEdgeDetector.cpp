@@ -94,28 +94,28 @@ CannyEdgeDetector::resetBuffers(int newwidth, int newheight)
     const int   padded_width = newwidth + 2 * mask_radius;
     const int   padded_height = newheight + 2 * mask_radius;
 
-    if (avpicture_alloc(&s1, PIX_FMT_GRAY8, padded_width, padded_height))
+    if (avpicture_alloc(&s1, AV_PIX_FMT_GRAY8, padded_width, padded_height))
     {
         LOG(VB_COMMFLAG, LOG_ERR, "CannyEdgeDetector::resetBuffers "
                                   "avpicture_alloc s1 failed");
         return -1;
     }
 
-    if (avpicture_alloc(&s2, PIX_FMT_GRAY8, padded_width, padded_height))
+    if (avpicture_alloc(&s2, AV_PIX_FMT_GRAY8, padded_width, padded_height))
     {
         LOG(VB_COMMFLAG, LOG_ERR, "CannyEdgeDetector::resetBuffers "
                                   "avpicture_alloc s2 failed");
         goto free_s1;
     }
 
-    if (avpicture_alloc(&convolved, PIX_FMT_GRAY8, padded_width, padded_height))
+    if (avpicture_alloc(&convolved, AV_PIX_FMT_GRAY8, padded_width, padded_height))
     {
         LOG(VB_COMMFLAG, LOG_ERR, "CannyEdgeDetector::resetBuffers "
                                   "avpicture_alloc convolved failed");
         goto free_s2;
     }
 
-    if (avpicture_alloc(&edges, PIX_FMT_GRAY8, newwidth, newheight))
+    if (avpicture_alloc(&edges, AV_PIX_FMT_GRAY8, newwidth, newheight))
     {
         LOG(VB_COMMFLAG, LOG_ERR, "CannyEdgeDetector::resetBuffers "
                                   "avpicture_alloc edges failed");

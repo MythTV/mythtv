@@ -460,7 +460,7 @@ template_alloc(const unsigned int *scores, int width, int height,
     unsigned int            *sortedscores, threshscore;
     AVPicture               thresh;
 
-    if (avpicture_alloc(&thresh, PIX_FMT_GRAY8, width, height))
+    if (avpicture_alloc(&thresh, AV_PIX_FMT_GRAY8, width, height))
     {
         LOG(VB_COMMFLAG, LOG_ERR,
             QString("template_alloc avpicture_alloc thresh (%1x%2) failed")
@@ -506,7 +506,7 @@ template_alloc(const unsigned int *scores, int width, int height,
     {
         /* Scores, rescaled to [0..UCHAR_MAX]. */
         AVPicture scored;
-        if (avpicture_alloc(&scored, PIX_FMT_GRAY8, width, height))
+        if (avpicture_alloc(&scored, AV_PIX_FMT_GRAY8, width, height))
         {
             LOG(VB_COMMFLAG, LOG_ERR,
                 QString("template_alloc avpicture_alloc scored (%1x%2) failed")
@@ -542,7 +542,7 @@ template_alloc(const unsigned int *scores, int width, int height,
         goto free_thresh;
     }
 
-    if (avpicture_alloc(tmpl, PIX_FMT_GRAY8, *ptmplwidth, *ptmplheight))
+    if (avpicture_alloc(tmpl, AV_PIX_FMT_GRAY8, *ptmplwidth, *ptmplheight))
     {
         LOG(VB_COMMFLAG, LOG_ERR,
             QString("template_alloc avpicture_alloc tmpl (%1x%2) failed")
@@ -638,7 +638,7 @@ readTemplate(QString datafile, int *prow, int *pcol, int *pwidth, int *pheight,
     stream >> *prow >> *pcol >> *pwidth >> *pheight;
     dfile.close();
 
-    if (avpicture_alloc(tmpl, PIX_FMT_GRAY8, *pwidth, *pheight))
+    if (avpicture_alloc(tmpl, AV_PIX_FMT_GRAY8, *pwidth, *pheight))
     {
         LOG(VB_COMMFLAG, LOG_ERR,
             QString("readTemplate avpicture_alloc %1 (%2x%3) failed")
@@ -860,7 +860,7 @@ TemplateFinder::resetBuffers(int newwidth, int newheight)
 
     avpicture_free(&cropped);
 
-    if (avpicture_alloc(&cropped, PIX_FMT_GRAY8, newwidth, newheight))
+    if (avpicture_alloc(&cropped, AV_PIX_FMT_GRAY8, newwidth, newheight))
     {
         LOG(VB_COMMFLAG, LOG_ERR,
             QString("TemplateFinder::resetBuffers "

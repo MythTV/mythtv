@@ -20,6 +20,10 @@
 
 #include "test_mpegtables.h"
 
+#include "atsctables.h"
+#include "mpegtables.h"
+#include "dvbtables.h"
+
 void TestMPEGTables::pat_test(void)
 {
     const unsigned char si_data[] = {
@@ -308,6 +312,61 @@ void TestMPEGTables::ExtendedEventDescriptor_test (void)
     QVERIFY (items.contains (QString ("Role Player")));
     QCOMPARE (items.count (QString ("Role Player")), 5);
     QCOMPARE (items.count (QString ("Role Player"), QString ("Nathan Fillion")), 1);
+}
+
+void TestMPEGTables::OTAChannelName_test (void)
+{
+    /* manually crafted according to A65/2013
+     * http://atsc.org/wp-content/uploads/2015/03/Program-System-Information-Protocol-for-Terrestrial-Broadcast-and-Cable.pdf
+     */
+    unsigned char tvct_data[] = {
+        0xc8, 0xf0, 0x2d, 0x00, 0x00, 0x00, 0x00, 0x00,  0x00, 0x01, 0x00,  'A', 0x00,  'B', 0x00,  'C',
+        0x00,  'D', 0x00,  'E', 0x00,  'F', 0x00, '\0',  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  0x00, 0x00, 0x00, 0x00, 0x60, 0xc4, 0x82, 0xb9
+    };
+
+    TerrestrialVirtualChannelTable table(tvct_data);
+
+    QVERIFY (table.HasCRC());
+    QCOMPARE (table.CalcCRC(), table.CRC());
+    QVERIFY (table.VerifyCRC());
+
+    QCOMPARE (table.SectionLength(), (unsigned int)sizeof (tvct_data));
+
+    QCOMPARE (table.ChannelCount(), 1u);
+    QCOMPARE (table.ShortChannelName(0), QString("ABCDEF"));
+    QCOMPARE (table.ShortChannelName(1), QString());
+
+    TerrestrialVirtualChannelTable tvct(tvct_data_0000);
+    QVERIFY (tvct.VerifyCRC());
+    QVERIFY (tvct.VerifyPSIP(false));
+
+    QCOMPARE (tvct.ChannelCount(), 6u);
+    /*
+     * ShortChannelName is fixed width 7-8 characters.
+     * A65/2013 says to fill trailing characters with \0
+     * but here the space is used
+     */
+    QCOMPARE (tvct.ShortChannelName(0), QString("KYNM-HD"));
+    QCOMPARE (tvct.ShortChannelName(1), QString("TUFF-TV"));
+    QCOMPARE (tvct.ShortChannelName(2), QString("Retro  "));
+    QCOMPARE (tvct.ShortChannelName(3), QString("REV'N  "));
+    QCOMPARE (tvct.ShortChannelName(4), QString("QVC    "));
+    QCOMPARE (tvct.ShortChannelName(5), QString("Antenna"));
+    QCOMPARE (tvct.ShortChannelName(6), QString(""));
+    QCOMPARE (tvct.ShortChannelName(999), QString());
+    /*
+     * ExtendedChannelName has a \0 terminated string inside
+     * strings with length. That's uncommon.
+     */
+    QCOMPARE (tvct.GetExtendedChannelName(0), QString());
+    QCOMPARE (tvct.GetExtendedChannelName(1), QString("KYNM TUFF-T").append(QChar(0)));
+    QCOMPARE (tvct.GetExtendedChannelName(2), QString("KYNM Albuquerque, N").append(QChar(0)));
+    QCOMPARE (tvct.GetExtendedChannelName(3), QString("KYNM PBJ-T").append(QChar(0)));
+    QCOMPARE (tvct.GetExtendedChannelName(4), QString("KYNM QV").append(QChar(0)));
+    QCOMPARE (tvct.GetExtendedChannelName(5), QString());
+    QCOMPARE (tvct.GetExtendedChannelName(6), QString());
+    QCOMPARE (tvct.GetExtendedChannelName(999), QString());
 }
 
 QTEST_APPLESS_MAIN(TestMPEGTables)

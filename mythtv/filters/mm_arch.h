@@ -10,7 +10,7 @@
 #endif
 
 #if HAVE_MMX 
-  #include "libavutil/x86_cpu.h"
+  #include "libavutil/x86/asm.h"
 #else 
   #define emms()    ; 
 #endif

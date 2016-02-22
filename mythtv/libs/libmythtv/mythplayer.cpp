@@ -4484,6 +4484,10 @@ char *MythPlayer::GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
     memset(&orig,   0, sizeof(AVPicture));
     memset(&retbuf, 0, sizeof(AVPicture));
 
+    bufflen = 0;
+    vw = vh = 0;
+    ar = 0;
+
     if (OpenFile(0) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Could not open file for preview.");
@@ -4530,34 +4534,38 @@ char *MythPlayer::GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
 
     if (!(frame = videoOutput->GetLastDecodedFrame()))
     {
-        bufflen = 0;
-        vw = vh = 0;
-        ar = 0;
         return NULL;
     }
 
-    if (!(data = frame->buf))
+    while (1)
     {
-        bufflen = 0;
-        vw = vh = 0;
-        ar = 0;
-        DiscardVideoFrame(frame);
-        return NULL;
+        if (!(data = frame->buf))
+        {
+            break;
+        }
+
+        AVPictureFill(&orig, frame);
+        MythPictureDeinterlacer deinterlacer(AV_PIX_FMT_YUV420P,
+                                             video_dim.width(), video_dim.height(),
+                                             frame->aspect);
+        if (deinterlacer.DeinterlaceSingle(&orig, &orig) < 0)
+        {
+            break;
+        }
+
+        bufflen = video_dim.width() * video_dim.height() * 4;
+        outputbuf = new unsigned char[bufflen];
+        copyCtx.Copy(&retbuf, frame, outputbuf, AV_PIX_FMT_RGB32);
+
+        vw = video_disp_dim.width();
+        vh = video_disp_dim.height();
+        ar = frame->aspect;
+        break;
     }
-
-    AVPictureFill(&orig, frame);
-    avpicture_deinterlace(&orig, &orig, PIX_FMT_YUV420P,
-                          video_dim.width(), video_dim.height());
-
-    bufflen = video_dim.width() * video_dim.height() * 4;
-    outputbuf = new unsigned char[bufflen];
-    copyCtx.Copy(&retbuf, frame, outputbuf, AV_PIX_FMT_RGB32);
-
-    vw = video_disp_dim.width();
-    vh = video_disp_dim.height();
-    ar = frame->aspect;
-
-    DiscardVideoFrame(frame);
+    if (frame)
+    {
+        DiscardVideoFrame(frame);
+    }
     return (char *)outputbuf;
 }
 

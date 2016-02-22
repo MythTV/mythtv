@@ -1016,10 +1016,10 @@ void VideoOutput::DoPipResize(int pipwidth, int pipheight)
 
     pip_scaling_context = sws_getCachedContext(pip_scaling_context,
                               pip_video_size.width(), pip_video_size.height(),
-                              PIX_FMT_YUV420P,
+                              AV_PIX_FMT_YUV420P,
                               pip_display_size.width(),
                               pip_display_size.height(),
-                              PIX_FMT_YUV420P, SWS_FAST_BILINEAR,
+                              AV_PIX_FMT_YUV420P, SWS_FAST_BILINEAR,
                               NULL, NULL, NULL);
 }
 
@@ -1119,7 +1119,7 @@ void VideoOutput::ShowPIP(VideoFrame  *frame,
         {
             AVPicture img_in, img_out;
             avpicture_fill(
-                &img_out, (uint8_t *)pip_tmp_buf, PIX_FMT_YUV420P,
+                &img_out, (uint8_t *)pip_tmp_buf, AV_PIX_FMT_YUV420P,
                 pip_display_size.width(), pip_display_size.height());
 
             AVPictureFill(&img_in, pipimage);
@@ -1134,11 +1134,11 @@ void VideoOutput::ShowPIP(VideoFrame  *frame,
             {
                 AVPicture img_padded;
                 avpicture_fill( &img_padded, (uint8_t *)pip_tmp_buf2,
-                    PIX_FMT_YUV420P, pipw, piph);
+                    AV_PIX_FMT_YUV420P, pipw, piph);
 
                 int color[3] = { 20, 0, 200 }; //deep red YUV format
                 av_picture_pad(&img_padded, &img_out, piph, pipw,
-                               PIX_FMT_YUV420P, 4, 4, 4, 4, color);
+                               AV_PIX_FMT_YUV420P, 4, 4, 4, 4, color);
 
                 int offsets[3] = {0, int(img_padded.data[1] - img_padded.data[0]),
                                     int(img_padded.data[2] - img_padded.data[0]) };
@@ -1205,10 +1205,10 @@ void VideoOutput::DoVideoResize(const QSize &inDim, const QSize &outDim)
 
     vsz_scale_context = sws_getCachedContext(vsz_scale_context,
                               vsz_video_size.width(), vsz_video_size.height(),
-                              PIX_FMT_YUV420P,
+                              AV_PIX_FMT_YUV420P,
                               vsz_display_size.width(),
                               vsz_display_size.height(),
-                              PIX_FMT_YUV420P, SWS_FAST_BILINEAR,
+                              AV_PIX_FMT_YUV420P, SWS_FAST_BILINEAR,
                               NULL, NULL, NULL);
 }
 
@@ -1246,9 +1246,9 @@ void VideoOutput::ResizeVideo(VideoFrame *frame)
     {
         AVPicture img_in, img_out;
 
-        avpicture_fill(&img_out, (uint8_t *)vsz_tmp_buf, PIX_FMT_YUV420P,
+        avpicture_fill(&img_out, (uint8_t *)vsz_tmp_buf, AV_PIX_FMT_YUV420P,
                        resize.width(), resize.height());
-        avpicture_fill(&img_in, (uint8_t *)frame->buf, PIX_FMT_YUV420P,
+        avpicture_fill(&img_in, (uint8_t *)frame->buf, AV_PIX_FMT_YUV420P,
                        frame->width, frame->height);
         img_in.data[0] = frame->buf + frame->offsets[0];
         img_in.data[1] = frame->buf + frame->offsets[1];

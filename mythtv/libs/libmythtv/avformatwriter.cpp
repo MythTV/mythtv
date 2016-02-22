@@ -244,7 +244,7 @@ int AVFormatWriter::WriteVideoFrame(VideoFrame *frame)
     planes[0] = buf;
     planes[1] = planes[0] + frame->width * frame->height;
     planes[2] = planes[1] + (frame->width * frame->height) /
-        4; // (pictureFormat == PIX_FMT_YUV422P ? 2 : 4);
+        4; // (pictureFormat == AV_PIX_FMT_YUV422P ? 2 : 4);
 
     av_frame_unref(m_picture);
     m_picture->data[0] = planes[0];
@@ -254,7 +254,6 @@ int AVFormatWriter::WriteVideoFrame(VideoFrame *frame)
     m_picture->linesize[1] = frame->width / 2;
     m_picture->linesize[2] = frame->width / 2;
     m_picture->pts = framesEncoded + 1;
-    m_picture->type = FF_BUFFER_TYPE_SHARED;
 
     if ((framesEncoded % m_keyFrameDist) == 0)
         m_picture->pict_type = AV_PICTURE_TYPE_I;
@@ -495,7 +494,7 @@ AVStream* AVFormatWriter::AddVideoStream(void)
     st->r_frame_rate.den          = 0;
 
     c->gop_size                   = m_keyFrameDist;
-    c->pix_fmt                    = PIX_FMT_YUV420P;
+    c->pix_fmt                    = AV_PIX_FMT_YUV420P;
     c->thread_count               = m_encodingThreadCount;
     c->thread_type                = FF_THREAD_SLICE;
 
@@ -716,7 +715,7 @@ bool AVFormatWriter::OpenAudio(void)
     return true;
 }
 
-AVFrame* AVFormatWriter::AllocPicture(enum PixelFormat pix_fmt)
+AVFrame* AVFormatWriter::AllocPicture(enum AVPixelFormat pix_fmt)
 {
     AVFrame *picture;
     unsigned char *picture_buf;

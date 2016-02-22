@@ -74,8 +74,8 @@ class NuppelDecoder : public DecoderBase
     void SeekReset(long long newKey = 0, uint skipFrames = 0,
                    bool needFlush = false, bool discardFrames = false);
 
-    friend int get_nuppel_buffer(struct AVCodecContext *c, AVFrame *pic);
-    friend void release_nuppel_buffer(struct AVCodecContext *c, AVFrame *pic);
+    friend int get_nuppel_buffer(struct AVCodecContext *c, AVFrame *pic, int flags);
+    friend void release_nuppel_buffer(void *opaque, uint8_t *data);
 
     struct rtfileheader fileheader;
     struct rtframeheader frameheader;

@@ -49,7 +49,7 @@ class VideoOutputD3D : public VideoOutput
                                              const QString &decoder,
                                              uint stream_type,
                                              bool no_acceleration,
-                                             PixelFormat &pix_fmt);
+                                             AVPixelFormat &pix_fmt);
 
     void ShowPIP(VideoFrame  *frame,
                  MythPlayer  *pipplayer,

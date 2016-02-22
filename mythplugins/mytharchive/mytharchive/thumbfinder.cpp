@@ -642,6 +642,8 @@ bool ThumbFinder::initAVCodec(const QString &inFile)
 
     m_frameFile = getTempDirectory() + "work/frame.jpg";
 
+    m_deinterlacer.reset(new MythPictureDeinterlacer(m_codecCtx->pix_fmt,
+                                                     m_frameWidth, m_frameHeight));
     return true;
 }
 
@@ -830,13 +832,12 @@ bool ThumbFinder::getFrameImage(bool needKeyFrame, int64_t requiredPTS)
 
     if (frameFinished)
     {
-        avpicture_fill(&retbuf, m_outputbuf, PIX_FMT_RGB32, m_frameWidth, m_frameHeight);
-        AVPicture *tmp = (AVPicture*)(AVFrame*)m_frame;
+        avpicture_fill(&retbuf, m_outputbuf, AV_PIX_FMT_RGB32, m_frameWidth, m_frameHeight);
+        AVPicture *tmp = m_frame;
 
-        avpicture_deinterlace(tmp, tmp, m_codecCtx->pix_fmt,
-                              m_frameWidth, m_frameHeight);
+        m_deinterlacer->DeinterlaceSingle(tmp, tmp);
 
-        m_copy.Copy(&retbuf, PIX_FMT_RGB32, tmp, m_codecCtx->pix_fmt,
+        m_copy.Copy(&retbuf, AV_PIX_FMT_RGB32, tmp, m_codecCtx->pix_fmt,
                     m_frameWidth, m_frameHeight);
 
         QImage img(m_outputbuf, m_frameWidth, m_frameHeight,
