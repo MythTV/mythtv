@@ -877,8 +877,8 @@ void logPropagateCalc(void)
 #if CONFIG_SYSTEMD_JOURNAL
     else if (logPropagateOpts.facility == SYSTEMD_JOURNAL_FACILITY)
     {
-        logPropagateArgs += " --journal";
-        logPropagateArgList << "--journal";
+        logPropagateArgs += " --systemd-journal";
+        logPropagateArgList << "--systemd-journal";
     }
 #endif
 #endif
