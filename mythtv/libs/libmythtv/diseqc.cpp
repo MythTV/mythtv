@@ -426,12 +426,12 @@ bool DiSEqCDevTree::Exists(int cardid)
     return false;
 }
 
-/** \fn DiSEqCDevTree::Store(QString)
+/** \fn DiSEqCDevTree::Store(QString, uint)
  *  \brief Stores the device tree to the database.
  *  \param device.
  *  \return True if successful.
  */
-bool DiSEqCDevTree::Store(const QString &device)
+bool DiSEqCDevTree::Store(const QString &device, uint cardid)
 {
     MSqlQuery query0(MSqlQuery::InitCon());
 
@@ -476,11 +476,13 @@ bool DiSEqCDevTree::Store(const QString &device)
     query0.prepare(
         "UPDATE capturecard "
         "SET diseqcid = :DEVID "
-        "WHERE hostname = :HOSTNAME AND "
-        "      videodevice = :VIDEODEVICE");
+        "WHERE (hostname = :HOSTNAME AND "
+        "      videodevice = :VIDEODEVICE) "
+        "      OR cardid = :CARDID");
     query0.bindValue(":DEVID",  devid);
     query0.bindValue(":HOSTNAME", gCoreContext->GetHostName());
     query0.bindValue(":VIDEODEVICE", device);
+    query0.bindValue(":CARDID", cardid);
     if (!query0.exec())
     {
         MythDB::DBError("DiSEqCDevTree::Store 3", query0);
