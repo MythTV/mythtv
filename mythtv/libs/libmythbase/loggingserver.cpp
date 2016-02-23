@@ -28,7 +28,7 @@ using namespace std;
 #include <stdlib.h>
 #ifndef _WIN32
 #include <syslog.h>
-#if CONFIG_JOURNAL
+#if CONFIG_SYSTEMD_JOURNAL
 #define SD_JOURNAL_SUPPRESS_LOCATION 1
 #include <systemd/sd-journal.h>
 #endif
@@ -348,8 +348,8 @@ SyslogLogger *SyslogLogger::create(QMutex *mutex, bool open)
 /// \param item LoggingItem containing the log message to process
 bool SyslogLogger::logmsg(LoggingItem *item)
 {
-#if CONFIG_JOURNAL
-    if (item->facility() == JOURNAL_FACILITY)
+#if CONFIG_SYSTEMD_JOURNAL
+    if (item->facility() == SYSTEMD_JOURNAL_FACILITY)
     {
         sd_journal_send(
             "MESSAGE=%s", item->rawMessage(),
@@ -1434,8 +1434,8 @@ void LogForwardThread::forwardMessage(LogMessage *msg)
 #ifndef _WIN32
         // SyslogLogger from facility
         int facility = item->facility();
-#if CONFIG_JOURNAL
-        if ((facility > 0) || (facility == JOURNAL_FACILITY))
+#if CONFIG_SYSTEMD_JOURNAL
+        if ((facility > 0) || (facility == SYSTEMD_JOURNAL_FACILITY))
         {
             logger = SyslogLogger::create(lock2.mutex(), facility > 0);
 #else
