@@ -2422,6 +2422,12 @@ void MythCommandLineParser::addLogging(
 #if CONFIG_SYSTEMD_JOURNAL
     add("--systemd-journal", "systemd-journal", "false",
         "Use systemd-journal instead of syslog.", "")
+                ->SetBlocks(QStringList()
+                            << "syslog"
+#if CONFIG_MYTHLOGSERVER
+                            << "disablemythlogserver"
+#endif
+                )
                 ->SetGroup("Logging");
 #endif
     add("--nodblog", "nodblog", false, "Disable database logging.", "")
