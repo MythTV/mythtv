@@ -4382,7 +4382,7 @@ void DVBConfigurationGroup::Load(void)
 void DVBConfigurationGroup::Save(void)
 {
     VerticalConfigurationGroup::Save();
-    diseqc_tree->Store(cardnum->getValue(), parent.getCardID());
+    diseqc_tree->Store(parent.getCardID(), cardnum->getValue());
     DiSEqCDev trees;
     trees.InvalidateTrees();
 }
