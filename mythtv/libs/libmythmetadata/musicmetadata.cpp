@@ -343,6 +343,9 @@ MusicMetadata *MusicMetadata::createFromID(int trackid)
 // static
 bool MusicMetadata::updateStreamList(void)
 {
+    // we are only interested in the global setting so remove any local host setting just in case
+    GetMythDB()->ClearSetting("MusicStreamListModified");
+
     // make sure we are not already doing an update
     if (gCoreContext->GetSetting("MusicStreamListModified") == "Updating")
     {
@@ -364,7 +367,7 @@ bool MusicMetadata::updateStreamList(void)
         return true;
     }
 
-    gCoreContext->SaveSetting("MusicStreamListModified", "Updating");
+    gCoreContext->SaveSettingOnHost("MusicStreamListModified", "Updating", NULL);
 
     LOG(VB_GENERAL, LOG_INFO, "MusicMetadata: downloading radio streams list");
 
@@ -372,7 +375,7 @@ bool MusicMetadata::updateStreamList(void)
     if (!GetMythDownloadManager()->download(QString(STREAMUPDATEURL), &compressedData), false)
     {
         LOG(VB_GENERAL, LOG_ERR, "MusicMetadata: failed to download radio stream list");
-        gCoreContext->SaveSetting("MusicStreamListModified", "");
+        gCoreContext->SaveSettingOnHost("MusicStreamListModified", "", NULL);
         return false;
     }
 
@@ -394,7 +397,7 @@ bool MusicMetadata::updateStreamList(void)
                 QString("\n\t\t\tError parsing %1").arg(STREAMUPDATEURL) +
                 QString("\n\t\t\tat line: %1  column: %2 msg: %3")
                 .arg(errorLine).arg(errorColumn).arg(errorMsg));
-        gCoreContext->SaveSetting("MusicStreamListModified", "");
+        gCoreContext->SaveSettingOnHost("MusicStreamListModified", "", NULL);
         return false;
     }
 
@@ -403,7 +406,7 @@ bool MusicMetadata::updateStreamList(void)
     if (!query.exec() || !query.isActive() || query.numRowsAffected() < 0)
     {
         MythDB::DBError("music delete radio streams", query);
-        gCoreContext->SaveSetting("MusicStreamListModified", "");
+        gCoreContext->SaveSettingOnHost("MusicStreamListModified", "", NULL);
         return false;
     }
 
@@ -438,12 +441,12 @@ bool MusicMetadata::updateStreamList(void)
         if (!query.exec() || !query.isActive() || query.numRowsAffected() <= 0)
         {
             MythDB::DBError("music insert radio stream", query);
-            gCoreContext->SaveSetting("MusicStreamListModified", "");
+            gCoreContext->SaveSettingOnHost("MusicStreamListModified", "", NULL);
             return false;
         }
     }
 
-    gCoreContext->SaveSetting("MusicStreamListModified", lastModified.toString(Qt::ISODate));
+    gCoreContext->SaveSettingOnHost("MusicStreamListModified", lastModified.toString(Qt::ISODate), NULL);
 
     LOG(VB_GENERAL, LOG_INFO, "MusicMetadata: updating radio streams list completed OK");
 

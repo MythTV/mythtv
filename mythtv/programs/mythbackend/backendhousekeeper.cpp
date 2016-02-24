@@ -512,6 +512,9 @@ RadioStreamUpdateTask::~RadioStreamUpdateTask(void)
 
 bool RadioStreamUpdateTask::DoCheckRun(QDateTime now)
 {
+    // we are only interested in the global setting so remove any local host setting just in case
+    GetMythDB()->ClearSetting("MusicStreamListModified");
+
     // check we are not already running a radio stream update
     if (gCoreContext->GetSetting("MusicStreamListModified") == "Updating" &&
             PeriodicHouseKeeperTask::DoCheckRun(now))
