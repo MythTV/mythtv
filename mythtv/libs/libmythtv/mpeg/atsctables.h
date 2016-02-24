@@ -232,7 +232,7 @@ class MTV_PUBLIC VirtualChannelTable : public PSIPTable
             QChar c((ustr[j]<<8) | (ustr[j]>>8));
             if (c != QChar('\0')) str.append(c);
         }
-        return str;
+        return str.simplified();
     }
     //   reserved               4  13.0        0xf
 
