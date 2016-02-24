@@ -3277,6 +3277,8 @@ NULL
     // TODO #12612
     // strip \0 characters from channel/channelscan_channel callsign and name
     // UPDATE channel SET callsign=REPLACE(callsign,'\0',''), name=REPLACE(name,'\0','');
+    // TODO remove old settings
+    // "BackendWSPort" was removed in caaaeef8166722888012f4ecaf3e9b0f09df512a
 
     return true;
 }
