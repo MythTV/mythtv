@@ -845,6 +845,13 @@ char *PreviewGenerator::GetScreenGrab(
                 .arg(filename).arg(video_width).arg(video_height)
                 .arg(seektime).arg((time_in_secs) ? "s" : "f"));
     }
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Failed to grab preview '%0' %1x%2@%3%4")
+            .arg(filename).arg(video_width).arg(video_height)
+            .arg(seektime).arg((time_in_secs) ? "s" : "f"));
+    }
 
     return retbuf;
 }
