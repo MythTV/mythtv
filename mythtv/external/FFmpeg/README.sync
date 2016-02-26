@@ -1,31 +1,7 @@
 This code was resynced upstream to:
 
-git://source.ffmpeg.org/ffmpeg.git at SHA1 d3db8988 on March 31, 2012 (Beirdo)
-git://source.ffmpeg.org/ffmpeg.git at SHA1 ea5dab58 on May 23, 2012 (jya)
-git://source.ffmpeg.org/ffmpeg.git at SHA1 cc4d80c on June 1st, 2012 (jya)
-git://source.ffmpeg.org/ffmpeg.git at SHA1 f218121 on June 1st, 2012 (jya)
-git://source.ffmpeg.org/ffmpeg.git at SHA1 59d765e3 on December 12th, 2012 (jya) (release/1.0 branch)
-git://source.ffmpeg.org/ffmpeg.git at SHA1 553c9c77 on December 16th, 2012 (jya) (release/1.0 branch)
-git://source.ffmpeg.org/ffmpeg.git at SHA1 057051b8 on February 17th, 2013 (jya) (release/1.1 branch)
-git://source.ffmpeg.org/ffmpeg.git at SHA1 7c8beec4 on March 7th, 2013 (jya) (release/1.1 branch)
-git://source.ffmpeg.org/ffmpeg.git at SHA1 fc7071cb on March 30th, 2013 (jya) (release/1.1 branch)
-git://source.ffmpeg.org/ffmpeg.git at SHA1 33d699a4 on May 12th, 2013 (jya) (release/1.2 branch)
-git://source.ffmpeg.org/ffmpeg.git at SHA1 59549b5a on June 20th, 2013 (jya) (release/1.2 branch)
-git://source.ffmpeg.org/ffmpeg.git at SHA1 c9ea1f7f on July 16th, 2013 (jya) (release/1.2 branch)
-git://source.ffmpeg.org/ffmpeg.git at SHA1 875649bf on July 27th, 2013 (jya) (release/1.2 branch)
-git://source.ffmpeg.org/ffmpeg.git at SHA1 f9c87262 on August 12th, 2013 (jya) (release/1.2 branch)
-git://source.ffmpeg.org/ffmpeg.git at SHA1 3d79041f on May 4th, 2014 (jya) (release/1.2 branch, release 1.2.6)
-git://source.ffmpeg.org/ffmpeg.git at n2.2.2-30-gacafd18 on May 30th, 2014 (jya) (release/2.2 branch, release 2.2.2)
-git://source.ffmpeg.org/ffmpeg.git at n2.2.3 on May 6th, 2014 (jya) (release/2.2 branch, release 2.2.3)
-git://source.ffmpeg.org/ffmpeg.git at n2.2.4 on July 14th, 2014 (jya) (release/2.2 branch, release 2.2.4)
-git://source.ffmpeg.org/ffmpeg.git at n2.2.6 on August 9th, 2014 (jya) (release/2.2 branch, release 2.2.6)
-git://source.ffmpeg.org/ffmpeg.git at n2.2.6 on August 9th, 2014 (jya) (release/2.2 branch, release 2.2.6))
-git://source.ffmpeg.org/ffmpeg.git at n2.3.1 on August 10th, 2014 (jya) (release/2.3 branch, release 2.3.1)
-git://source.ffmpeg.org/ffmpeg.git at n2.8-2-gaa46ae8 on October 4th, 2015 (jya) (release/2.8 branch, release 2.8)
-git://source.ffmpeg.org/ffmpeg.git at n2.8.1-16-gfcb8ee9 on November 1st, 2015 (jya) (release/2.8 branch, release 2.8.1)
-git://source.ffmpeg.org/ffmpeg.git at n2.8.4-8-g3e3aa25 on January 10th, 2016 (jya) (release/2.8 branch, release 2.8.4)
-git://source.ffmpeg.org/ffmpeg.git at n2.8.5 on January 24th, 2016 (jya) (release/2.8 branch, release 2.8.5)
 git://source.ffmpeg.org/ffmpeg.git at n3.0-1-g0aa2fbd on February 19th, 2016 (jya) (release/3.0 branch, release 3.0)
+git://source.ffmpeg.org/ffmpeg.git at n3.0-3-gb80083a on February 36th, 2016 (jya) (release/3.0 branch, release 3.0)
 
 List of files modified from original FFmpeg:
 Makefile
