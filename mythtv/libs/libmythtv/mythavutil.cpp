@@ -317,7 +317,7 @@ int MythPictureDeinterlacer::Flush()
 
     AVFilterInOut *inputs = NULL, *outputs = NULL;
     AVRational ar = av_d2q(m_ar, 100000);
-    QString args = QString("buffer=video_size=%1x%2:pix_fmt=%3:time_base=1/1:pixel_aspect=%5/%6[in];"
+    QString args = QString("buffer=video_size=%1x%2:pix_fmt=%3:time_base=1/1:pixel_aspect=%4/%5[in];"
                            "[in]yadif[out];[out] buffersink")
                        .arg(m_width).arg(m_height).arg(m_pixfmt).arg(ar.num).arg(ar.den);
     int res = avfilter_graph_parse2(m_filter_graph, args.toLatin1().data(), &inputs, &outputs);
