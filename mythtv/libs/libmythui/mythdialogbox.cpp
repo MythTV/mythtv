@@ -298,24 +298,44 @@ void MythDialogBox::Select(MythUIButtonListItem* item)
             return;
         }
 
-                const char *slot = menuItem->Data.value < const char * >();
-        if (menuItem->UseSlot && slot)
+        if (menuItem->UseSlot)
         {
-            connect(this, SIGNAL(Selected()), m_currentMenu->m_retObject, slot,
-                    Qt::QueuedConnection);
-            emit Selected();
+            const char *slot = menuItem->Data.value < const char * >();
+            if (slot)
+            {
+                connect(this, SIGNAL(Selected()), m_currentMenu->m_retObject, slot,
+                        Qt::QueuedConnection);
+                emit Selected();
+            }
+            else if (menuItem->Data.value<MythUIButtonCallback>())
+            {
+                connect(this, &MythDialogBox::Selected, m_currentMenu->m_retObject,
+                        menuItem->Data.value<MythUIButtonCallback>(),
+                        Qt::QueuedConnection);
+                emit Selected();
+            }
         }
 
         SendEvent(m_buttonList->GetItemPos(item), item->GetText(), menuItem->Data);
     }
     else
     {
-        const char *slot = item->GetData().value<const char *>();
-        if (m_useSlots && slot)
+        if (m_useSlots)
         {
-            connect(this, SIGNAL(Selected()), m_retObject, slot,
-                    Qt::QueuedConnection);
-            emit Selected();
+            const char *slot = item->GetData().value<const char *>();
+            if (slot)
+            {
+                connect(this, SIGNAL(Selected()), m_retObject, slot,
+                        Qt::QueuedConnection);
+                emit Selected();
+            }
+            else if (item->GetData().value<MythUIButtonCallback>())
+            {
+                connect(this, &MythDialogBox::Selected, m_retObject,
+                        item->GetData().value<MythUIButtonCallback>(),
+                        Qt::QueuedConnection);
+                emit Selected();
+            }
         }
 
         SendEvent(m_buttonList->GetItemPos(item), item->GetText(), item->GetData());

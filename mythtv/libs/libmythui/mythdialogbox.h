@@ -9,6 +9,8 @@
 #include "mythscreentype.h"
 #include "mythuitextedit.h"
 
+#include <functional>
+
 class QTimer;
 
 class MythUIButtonListItem;
@@ -53,12 +55,16 @@ class MUI_PUBLIC DialogCompletionEvent : public QEvent
 };
 
 
+using MythUIButtonCallback = std::function<void(void)>;
+
 class MUI_PUBLIC MythMenuItem
 {
   public:
     MythMenuItem(const QString &text, QVariant data = 0, bool checked = false, MythMenu *subMenu = NULL) :
         Text(text), Data(data), Checked(checked), SubMenu(subMenu), UseSlot(false) { Init(); }
     MythMenuItem(const QString &text, const char *slot, bool checked = false, MythMenu *subMenu = NULL) :
+        Text(text), Data(qVariantFromValue(slot)), Checked(checked), SubMenu(subMenu), UseSlot(true) { Init(); }
+    MythMenuItem(const QString &text, const MythUIButtonCallback &slot, bool checked = false, MythMenu *subMenu = NULL) :
         Text(text), Data(qVariantFromValue(slot)), Checked(checked), SubMenu(subMenu), UseSlot(true) { Init(); }
 
     QString   Text;
@@ -84,6 +90,13 @@ class MUI_PUBLIC MythMenu
                  bool selected = false, bool checked = false);
     void AddItem(const QString &title, const char *slot, MythMenu *subMenu = NULL,
                  bool selected = false, bool checked = false);
+    void AddItem(const QString &title, const MythUIButtonCallback &slot,
+                 MythMenu *subMenu = NULL, bool selected = false,
+                 bool checked = false)
+    {
+        AddItem(title, QVariant::fromValue(slot), subMenu, selected, checked);
+    }
+
     void SetSelectedByTitle(const QString &title);
     void SetSelectedByData(QVariant data);
 
@@ -139,6 +152,12 @@ class MUI_PUBLIC MythDialogBox : public MythScreenType
                    bool newMenu = false, bool setCurrent = false);
     void AddButton(const QString &title, const char *slot,
                    bool newMenu = false, bool setCurrent = false);
+    void AddButton(const QString &title, const MythUIButtonCallback &slot,
+                   bool newMenu = false, bool setCurrent = false)
+    {
+        AddButton(title, QVariant::fromValue(slot), newMenu, setCurrent);
+        m_useSlots = true;
+    }
 
     virtual bool keyPressEvent(QKeyEvent *event);
     virtual bool gestureEvent(MythGestureEvent *event);
@@ -408,6 +427,7 @@ MUI_PUBLIC MythConfirmationDialog  *ShowOkPopup(const QString &message, QObject 
 
 Q_DECLARE_METATYPE(MythMenuItem*)
 Q_DECLARE_METATYPE(const char*)
+Q_DECLARE_METATYPE(MythUIButtonCallback)
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 Q_DECLARE_METATYPE(QFileInfo)
