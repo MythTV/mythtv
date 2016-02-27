@@ -9,3 +9,4 @@ CONFIG -= moc
 SOURCES += main.cpp
 
 QT += xml
+QT += widgets
