@@ -731,7 +731,7 @@ GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR</translation>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1388"/>
         <location filename="../mythmusic/musiccommon.cpp" line="2244"/>
-        <location filename="../mythmusic/streamview.cpp" line="99"/>
+        <location filename="../mythmusic/streamview.cpp" line="101"/>
         <source>Lyrics</source>
         <translation>Στίχοι</translation>
     </message>
@@ -898,7 +898,7 @@ GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR</translation>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1373"/>
         <location filename="../mythmusic/musiccommon.cpp" line="2241"/>
-        <location filename="../mythmusic/streamview.cpp" line="98"/>
+        <location filename="../mythmusic/streamview.cpp" line="100"/>
         <source>Fullscreen Visualizer</source>
         <translation>Οπτικοποίηση Πλήρους Οθόνης</translation>
     </message>
@@ -1136,13 +1136,13 @@ Resetting and trying again</source>
         <translation>Σφάλμα Χρήσης Αποκωδικοποιητή</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musicplayer.cpp" line="1446"/>
+        <location filename="../mythmusic/musicplayer.cpp" line="1451"/>
         <source>%1% (Muted)</source>
         <comment>Zero Audio Volume</comment>
         <translation>%1% (Σε Σίγαση)</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musicplayer.cpp" line="1450"/>
+        <location filename="../mythmusic/musicplayer.cpp" line="1455"/>
         <source>Muted</source>
         <translation>Σε Σίγαση</translation>
     </message>
@@ -1285,52 +1285,57 @@ Resetting and trying again</source>
         <translation>Εναλλαγή επανάληψης</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="856"/>
+        <location filename="../mythmusic/main.cpp" line="854"/>
+        <source>Switch to previous radio stream</source>
+        <translation>Προβολή της προηγούμενης ροής ραδιοφώνου</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="858"/>
         <source>Switch to the current playlist view</source>
         <translation>Προβολή στην τρέχουσας λίστας</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="858"/>
+        <location filename="../mythmusic/main.cpp" line="860"/>
         <source>Switch to the playlist editor tree view</source>
         <translation>Προβολή επεξεργασίας λίστας ως Δένδρο</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="860"/>
+        <location filename="../mythmusic/main.cpp" line="862"/>
         <source>Switch to the playlist editor gallery view</source>
         <translation>Προβολή επεξεργασίας λίστας ως Συλλογή </translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="862"/>
+        <location filename="../mythmusic/main.cpp" line="864"/>
         <source>Switch to the search view</source>
         <translation>Προβολή αναζήτησης</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="864"/>
+        <location filename="../mythmusic/main.cpp" line="866"/>
         <source>Switch to the fullscreen visualiser view</source>
         <translation>Προβολή πλήρους οθόνης οπτικοποίησης</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="866"/>
+        <location filename="../mythmusic/main.cpp" line="868"/>
         <source>Switch to the radio stream view</source>
         <translation>Προβολή αρχείου ραδιοφώνου</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="870"/>
+        <location filename="../mythmusic/main.cpp" line="872"/>
         <source>MythMusic Media Handler 1/2</source>
         <translation>Χειριστής Μέσων 1/2</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="871"/>
+        <location filename="../mythmusic/main.cpp" line="873"/>
         <source>MythMusic audio CD</source>
         <translation>CD ήχου του MythMusic</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="877"/>
+        <location filename="../mythmusic/main.cpp" line="879"/>
         <source>MythMusic Media Handler 2/2</source>
         <translation>Χειριστής Μέσων 2/2</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="878"/>
+        <location filename="../mythmusic/main.cpp" line="880"/>
         <source>MythMusic audio files</source>
         <translation>Αρχεία ήχου του MythMusic</translation>
     </message>
@@ -1785,18 +1790,39 @@ Do you want to permanently delete the existing file(s)?</source>
 <context>
     <name>SearchStream</name>
     <message>
-        <location filename="../mythmusic/streamview.cpp" line="823"/>
-        <location filename="../mythmusic/streamview.cpp" line="895"/>
-        <location filename="../mythmusic/streamview.cpp" line="916"/>
-        <source>&lt;All Stations&gt;</source>
+        <location filename="../mythmusic/streamview.cpp" line="915"/>
+        <location filename="../mythmusic/streamview.cpp" line="932"/>
+        <location filename="../mythmusic/streamview.cpp" line="1043"/>
+        <source>&lt;All Broadcasters&gt;</source>
         <translation>&lt;Όλοι οι Σταθμοί&gt;</translation>
     </message>
     <message>
-        <location filename="../mythmusic/streamview.cpp" line="824"/>
-        <location filename="../mythmusic/streamview.cpp" line="905"/>
-        <location filename="../mythmusic/streamview.cpp" line="917"/>
+        <location filename="../mythmusic/streamview.cpp" line="939"/>
+        <location filename="../mythmusic/streamview.cpp" line="956"/>
+        <location filename="../mythmusic/streamview.cpp" line="1044"/>
         <source>&lt;All Genres&gt;</source>
         <translation>&lt;Όλα τα Είδη&gt;</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/streamview.cpp" line="965"/>
+        <location filename="../mythmusic/streamview.cpp" line="982"/>
+        <location filename="../mythmusic/streamview.cpp" line="1029"/>
+        <location filename="../mythmusic/streamview.cpp" line="1046"/>
+        <source>&lt;All Countries&gt;</source>
+        <translation>&lt;Όλες οι Χώρες&gt;</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/streamview.cpp" line="992"/>
+        <location filename="../mythmusic/streamview.cpp" line="1009"/>
+        <location filename="../mythmusic/streamview.cpp" line="1028"/>
+        <location filename="../mythmusic/streamview.cpp" line="1045"/>
+        <source>&lt;All Languages&gt;</source>
+        <translation>&lt;Όλες οι Γλώσσες&gt;</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/streamview.cpp" line="1133"/>
+        <source>Updating stream list. Please Wait ...</source>
+        <translation>Ανανεώνω τη λίστα ροών. Παρακαλώ Περιμένετε ...</translation>
     </message>
 </context>
 <context>
@@ -1973,38 +1999,38 @@ Do you want to permanently delete the existing file(s)?</source>
 <context>
     <name>StreamView</name>
     <message>
-        <location filename="../mythmusic/streamview.cpp" line="89"/>
+        <location filename="../mythmusic/streamview.cpp" line="91"/>
         <source>Stream Actions</source>
         <translation>Ενέργειες Ροής</translation>
     </message>
     <message>
-        <location filename="../mythmusic/streamview.cpp" line="90"/>
-        <location filename="../mythmusic/streamview.cpp" line="301"/>
+        <location filename="../mythmusic/streamview.cpp" line="92"/>
+        <location filename="../mythmusic/streamview.cpp" line="309"/>
         <source>Add Stream</source>
         <translation>Προσθήκη Ροής</translation>
     </message>
     <message>
-        <location filename="../mythmusic/streamview.cpp" line="94"/>
-        <location filename="../mythmusic/streamview.cpp" line="315"/>
+        <location filename="../mythmusic/streamview.cpp" line="96"/>
+        <location filename="../mythmusic/streamview.cpp" line="323"/>
         <source>Edit Stream</source>
         <translation>Επεξεργασία Ροής</translation>
     </message>
     <message>
-        <location filename="../mythmusic/streamview.cpp" line="95"/>
-        <location filename="../mythmusic/streamview.cpp" line="311"/>
+        <location filename="../mythmusic/streamview.cpp" line="97"/>
+        <location filename="../mythmusic/streamview.cpp" line="319"/>
         <source>Remove Stream</source>
         <translation>Διαγραφή Ροής</translation>
     </message>
     <message>
-        <location filename="../mythmusic/streamview.cpp" line="101"/>
+        <location filename="../mythmusic/streamview.cpp" line="103"/>
         <source>More Options</source>
         <translation>Περισσότερες Επιλογές</translation>
     </message>
     <message>
-        <location filename="../mythmusic/streamview.cpp" line="396"/>
+        <location filename="../mythmusic/streamview.cpp" line="411"/>
         <source>Are you sure you want to delete this Stream?
-Station: %1 - Channel: %2</source>
-        <translation>Σίγουρα θέλετε να διαγράψετε τη Ροή;
+Broadcaster: %1 - Channel: %2</source>
+        <translation>Θέλετε σίγουρα να διαγράψετε αυτή τη Ροή;
 Σταθμός: %1 - Κανάλι: %2</translation>
     </message>
 </context>
@@ -3450,7 +3476,7 @@ Station: %1 - Channel: %2</source>
 <context>
     <name>avfDecoderFactory</name>
     <message>
-        <location filename="../mythmusic/avfdecoder.cpp" line="624"/>
+        <location filename="../mythmusic/avfdecoder.cpp" line="628"/>
         <source>Internal Decoder</source>
         <translation>Εσωτερικός Αποκωδικοποιητής</translation>
     </message>

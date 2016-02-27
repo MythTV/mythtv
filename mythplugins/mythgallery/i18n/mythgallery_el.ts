@@ -5,7 +5,7 @@
 <context>
     <name>(MythGalleryMain)</name>
     <message>
-        <location filename="../mythgallery/main.cpp" line="55"/>
+        <location filename="../mythgallery/main.cpp" line="60"/>
         <source>MythGallery cannot find its start directory.
 %1
 Check the directory exists, is readable and the setting is correct on MythGallery&apos;s settings page.</source>
@@ -17,7 +17,7 @@ Check the directory exists, is readable and the setting is correct on MythGaller
 <context>
     <name>GLSingleView</name>
     <message>
-        <location filename="../mythgallery/glsingleview.cpp" line="246"/>
+        <location filename="../mythgallery/glsingleview.cpp" line="249"/>
         <source>Press SELECT to play again</source>
         <translation>Πατήστε ΕΠΙΛΟΓΗ για να ξαναπαίξει</translation>
     </message>
@@ -545,225 +545,230 @@ Check the directory exists, is readable and the setting is correct on MythGaller
 <context>
     <name>IconView</name>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="146"/>
+        <location filename="../mythgallery/iconview.cpp" line="147"/>
         <source>MythGallery Directory &apos;%1&apos; does not exist or is unreadable.</source>
         <translation>Ο φάκελος &apos;%1&apos; δεν υπάρχει ή δεν είναι προσπελάσιμος.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="399"/>
+        <location filename="../mythgallery/iconview.cpp" line="400"/>
         <source>%1 of %2</source>
         <translation>%1 από %2</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="410"/>
+        <location filename="../mythgallery/iconview.cpp" line="411"/>
         <source>Gallery Home</source>
         <translation>Αρχή Συλλογής</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="569"/>
+        <location filename="../mythgallery/iconview.cpp" line="572"/>
         <source>Error</source>
         <translation>Σφάλμα</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="570"/>
+        <location filename="../mythgallery/iconview.cpp" line="573"/>
         <source>The selected device is no longer available</source>
         <translation>Η επιλεγμένη συσκευή δεν είναι πλέον διαθέσιμη</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="902"/>
+        <location filename="../mythgallery/iconview.cpp" line="916"/>
         <source>Gallery Options</source>
         <translation>Επιλογές Συλλογής</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="908"/>
+        <location filename="../mythgallery/iconview.cpp" line="922"/>
         <source>SlideShow</source>
         <translation>Προβολή Παρουσίασης</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="909"/>
+        <location filename="../mythgallery/iconview.cpp" line="923"/>
         <source>Random</source>
         <translation>Τυχαία</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="941"/>
+        <location filename="../mythgallery/iconview.cpp" line="958"/>
         <source>Metadata Options</source>
         <translation>Επιλογές Μεταπληροφοριών</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="945"/>
+        <location filename="../mythgallery/iconview.cpp" line="962"/>
         <source>Rotate CW</source>
         <translation>Περιστροφή Δεξιά</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="946"/>
+        <location filename="../mythgallery/iconview.cpp" line="963"/>
         <source>Rotate CCW</source>
         <translation>Περιστροφή Αριστερά</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="913"/>
-        <location filename="../mythgallery/iconview.cpp" line="953"/>
+        <location filename="../mythgallery/iconview.cpp" line="930"/>
+        <location filename="../mythgallery/iconview.cpp" line="970"/>
         <source>Marking Options</source>
         <translation>Επιλογές Σημαδέματος</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="957"/>
+        <location filename="../mythgallery/iconview.cpp" line="974"/>
         <source>Select One</source>
         <translation>Επιλογή Ενός</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="958"/>
+        <location filename="../mythgallery/iconview.cpp" line="975"/>
         <source>Clear One Marked</source>
         <translation>Καθαρισμός Ενός Σημαδεμένου</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="959"/>
+        <location filename="../mythgallery/iconview.cpp" line="976"/>
         <source>Select All</source>
         <translation>Επιλογή Όλων</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="960"/>
+        <location filename="../mythgallery/iconview.cpp" line="977"/>
         <source>Clear Marked</source>
         <translation>Καθαρισμός Σημαδεμένων</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="915"/>
-        <location filename="../mythgallery/iconview.cpp" line="980"/>
+        <location filename="../mythgallery/iconview.cpp" line="932"/>
+        <location filename="../mythgallery/iconview.cpp" line="997"/>
         <source>File Options</source>
         <translation>Επιλογές Αρχείων</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="206"/>
+        <location filename="../mythgallery/iconview.cpp" line="207"/>
         <source>No images found in this folder.</source>
         <translation>Δεν βρέθηκαν φωτογραφίες στο φάκελο.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="910"/>
+        <location filename="../mythgallery/iconview.cpp" line="925"/>
+        <source>Seasonal</source>
+        <translation>Εποχιακό</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/iconview.cpp" line="927"/>
         <source>Meta Data Options</source>
         <translation>Επιλογές Μεταπληροφοριών</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="914"/>
+        <location filename="../mythgallery/iconview.cpp" line="931"/>
         <source>Filter / Sort...</source>
         <translation>Φίλτρο / Ταξινόμηση...</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="916"/>
+        <location filename="../mythgallery/iconview.cpp" line="933"/>
         <source>Settings...</source>
         <translation>Ρυθμίσεις...</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="984"/>
+        <location filename="../mythgallery/iconview.cpp" line="1001"/>
         <source>Show Devices</source>
         <translation>Εμφάνιση Συσκευών</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="985"/>
+        <location filename="../mythgallery/iconview.cpp" line="1002"/>
         <source>Eject</source>
         <translation>Εξαγωγή</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="986"/>
+        <location filename="../mythgallery/iconview.cpp" line="1003"/>
         <source>Import</source>
         <translation>Εισαγωγή</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="990"/>
+        <location filename="../mythgallery/iconview.cpp" line="1007"/>
         <source>Copy here</source>
         <translation>Αντιγραφή εδώ</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="991"/>
+        <location filename="../mythgallery/iconview.cpp" line="1008"/>
         <source>Move here</source>
         <translation>Μετακίνηση εδώ</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="995"/>
+        <location filename="../mythgallery/iconview.cpp" line="1012"/>
         <source>Delete</source>
         <translation>Διαγραφή</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="997"/>
+        <location filename="../mythgallery/iconview.cpp" line="1014"/>
         <source>Create folder</source>
         <translation>Δημιουργία φακέλου</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1000"/>
-        <location filename="../mythgallery/iconview.cpp" line="1396"/>
+        <location filename="../mythgallery/iconview.cpp" line="1017"/>
+        <location filename="../mythgallery/iconview.cpp" line="1413"/>
         <source>Rename</source>
         <translation>Μετονομασία</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1052"/>
+        <location filename="../mythgallery/iconview.cpp" line="1069"/>
         <source>Delete Current File or Folder</source>
         <translation>Διαγραφή Τρέχοντος Αρχείου ή Φακέλου</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1054"/>
+        <location filename="../mythgallery/iconview.cpp" line="1071"/>
         <source>Deleting 1 folder, including any subfolders and files.</source>
         <translation>Διαγράφω 1 φάκελο, μαζί με τους υποφακέλους και τα αρχεία.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1055"/>
+        <location filename="../mythgallery/iconview.cpp" line="1072"/>
         <source>Deleting 1 image.</source>
         <translation>Διαγράφω 1 φωτογραφία.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1151"/>
+        <location filename="../mythgallery/iconview.cpp" line="1168"/>
         <source>Importing images from camera. Please wait...</source>
         <translation>Εισάγω φωτογραφίες από τη φωτ. μηχανή. Παρακαλώ περιμένετε...</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1181"/>
+        <location filename="../mythgallery/iconview.cpp" line="1198"/>
         <source>Found an import script (%1) but running them has been disabled in the settings!</source>
         <translation>Βρήκα ένα σκριπτάκι εισαγωγής (%1) αλλά η εκτέλεσή του έχει απαγορευτεί στις ρυθμίσεις!</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1192"/>
+        <location filename="../mythgallery/iconview.cpp" line="1209"/>
         <source>Could not read or execute %1</source>
         <translation>Αδυναμία ανάγνωσης ή εκτέλεσης %1</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1205"/>
+        <location filename="../mythgallery/iconview.cpp" line="1222"/>
         <source>Found %1 images</source>
         <translation>Βρέθηκαν %1 φωτογραφίες</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1200"/>
+        <location filename="../mythgallery/iconview.cpp" line="1217"/>
         <source>Nothing found to import</source>
         <translation>Δεν βρέθηκε τίποτε για εισαγωγή</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1302"/>
+        <location filename="../mythgallery/iconview.cpp" line="1319"/>
         <source>Deleting %1 images and folders, including any subfolders and files.</source>
         <translation>Διαγράφω %1 φωτογραφίες και φακέλους, μαζί με τους υποφακέλους και τα αρχεία.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1365"/>
+        <location filename="../mythgallery/iconview.cpp" line="1382"/>
         <source>New Folder</source>
         <translation>Νέος Φάκελος</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1367"/>
+        <location filename="../mythgallery/iconview.cpp" line="1384"/>
         <source>Create New Folder</source>
         <translation>Δημιουργία Νέου Φακέλου</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1432"/>
+        <location filename="../mythgallery/iconview.cpp" line="1449"/>
         <source>Failed to rename folder</source>
         <translation>Αδυναμία μετονομασίας φακέλου</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1434"/>
+        <location filename="../mythgallery/iconview.cpp" line="1451"/>
         <source>Failed to rename file</source>
         <translation>Αδυναμία μετονομασίας αρχείου</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1494"/>
+        <location filename="../mythgallery/iconview.cpp" line="1511"/>
         <source>Moving marked images...</source>
         <translation>Μετακινώ τις σημαδεμένες φωτογραφίες...</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1494"/>
+        <location filename="../mythgallery/iconview.cpp" line="1511"/>
         <source>Copying marked images...</source>
         <translation>Αντιγράφω τις σημαδεμένες φωτογραφίες...</translation>
     </message>
@@ -771,12 +776,17 @@ Check the directory exists, is readable and the setting is correct on MythGaller
 <context>
     <name>ImageView</name>
     <message>
-        <location filename="../mythgallery/imageview.cpp" line="118"/>
+        <location filename="../mythgallery/imageview.cpp" line="170"/>
         <source>Random Slideshow</source>
         <translation>Παρουσίαση με τυχαία Σειρά</translation>
     </message>
     <message>
-        <location filename="../mythgallery/imageview.cpp" line="124"/>
+        <location filename="../mythgallery/imageview.cpp" line="174"/>
+        <source>Seasonal Slideshow</source>
+        <translation>Εποχιακή Παρουσίαση</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/imageview.cpp" line="178"/>
         <source>Slideshow</source>
         <translation>Προβολή Παρουσίασης</translation>
     </message>
@@ -784,133 +794,142 @@ Check the directory exists, is readable and the setting is correct on MythGaller
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythgallery/main.cpp" line="87"/>
+        <location filename="../mythgallery/main.cpp" line="92"/>
         <source>Image viewer / slideshow</source>
         <translation>Προβολή Φωτογραφιών / Προβολή Διαφανειών</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="92"/>
+        <location filename="../mythgallery/main.cpp" line="97"/>
         <source>Start/Stop Slideshow</source>
         <translation>Εκκίνηση/Διακοπή Προβολής Διαφανειών</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="94"/>
+        <location filename="../mythgallery/main.cpp" line="99"/>
         <source>Go to the first image in thumbnail view</source>
         <translation>Πήγαινε στην πρώτη φωτογραφία της προβολής διαφανειών</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="96"/>
+        <location filename="../mythgallery/main.cpp" line="101"/>
         <source>Go to the last image in thumbnail view</source>
         <translation>Πήγαινε στην τελευταία φωτογραφία της προβολής διαφανειών</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="98"/>
-        <source>Start Slideshow in thumbnail view</source>
-        <translation>Εκκίνηση Προβολής διαφανειών σε σμίκρυνση</translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/main.cpp" line="89"/>
-        <location filename="../mythgallery/main.cpp" line="100"/>
+        <location filename="../mythgallery/main.cpp" line="94"/>
         <source>Start Random Slideshow in thumbnail view</source>
         <translation>Εκκίνηση Τυχαίας Προβολής διαφανειών σε σμίκρυνση</translation>
     </message>
     <message>
         <location filename="../mythgallery/main.cpp" line="103"/>
+        <source>Start slideshow in thumbnail view</source>
+        <translation>Εκκίνηση παρουσίασης σε προβολή μικρογραφιών</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="105"/>
+        <source>Start random slideshow in thumbnail view</source>
+        <translation>Εκκίνηση τυχαίας παρουσίασης σε προβολή μικρογραφιών</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="108"/>
+        <source>Start random slideshow with seasonal theme in thumbnail view</source>
+        <translation>Εκκίνηση παρουσίασης με εποχιακό θέμα σε προβολή μικρογραφιών</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="112"/>
         <source>Rotate image right 90 degrees</source>
         <translation>Περιστροφή φωτογρ. δεξιά 90 μοίρες</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="105"/>
+        <location filename="../mythgallery/main.cpp" line="114"/>
         <source>Rotate image left 90 degrees</source>
         <translation>Περιστροφή φωτογρ. αριστερά 90 μοίρες</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="107"/>
+        <location filename="../mythgallery/main.cpp" line="116"/>
         <source>Zoom image out</source>
         <translation>Σμίκρυνση φωτογραφίας</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="109"/>
+        <location filename="../mythgallery/main.cpp" line="118"/>
         <source>Zoom image in</source>
         <translation>Μεγέθυνση Φωτογραφίας</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="111"/>
+        <location filename="../mythgallery/main.cpp" line="120"/>
         <source>Scroll image up</source>
         <translation>Κύλιση φωτογραφίας προς τα πάνω</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="113"/>
+        <location filename="../mythgallery/main.cpp" line="122"/>
         <source>Scroll image left</source>
         <translation>Κύλιση φωτογραφίας προς τα αριστερά</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="115"/>
+        <location filename="../mythgallery/main.cpp" line="124"/>
         <source>Scroll image right</source>
         <translation>Κύλιση φωτογραφίας προς τα δεξιά</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="117"/>
+        <location filename="../mythgallery/main.cpp" line="126"/>
         <source>Scroll image down</source>
         <translation>Κύλιση φωτογραφίας προς τα κάτω</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="119"/>
+        <location filename="../mythgallery/main.cpp" line="128"/>
         <source>Recenter image</source>
         <translation>Κεντράρισμα φωτογραφίας</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="121"/>
+        <location filename="../mythgallery/main.cpp" line="130"/>
         <source>Full-size (un-zoom) image</source>
         <translation>Πλήρες μέγεθος (χωρίς μεγέθυνση)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="123"/>
+        <location filename="../mythgallery/main.cpp" line="132"/>
         <source>Go to the upper-left corner of the image</source>
         <translation>Στην πάνω-αριστερή γωνία της φωτογραφίας</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="125"/>
+        <location filename="../mythgallery/main.cpp" line="134"/>
         <source>Go to the lower-right corner of the image</source>
         <translation>Στην κάτω-δεξιά γωνία της φωτογραφίας</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="127"/>
+        <location filename="../mythgallery/main.cpp" line="136"/>
         <source>Mark image</source>
         <translation>Σημάδεμα φωτογραφίας</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="129"/>
+        <location filename="../mythgallery/main.cpp" line="138"/>
         <source>Toggle scale to fullscreen/scale to fit</source>
         <translation>Εναλλαγή κλίμακας μεταξύ Πλήρους οθόνης/όσο ταιριάζει</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="132"/>
+        <location filename="../mythgallery/main.cpp" line="141"/>
         <source>MythGallery Media Handler 1/3</source>
         <translation>Διαχείριση Φωτογραφικών Αρχείων 1/3</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="133"/>
+        <location filename="../mythgallery/main.cpp" line="142"/>
         <source>MythGallery mixed data</source>
         <translation>Μικτά αρχεία</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="145"/>
+        <location filename="../mythgallery/main.cpp" line="154"/>
         <source>MythGallery Media Handler 2/3</source>
         <translation>Διαχείριση Φωτογραφικών Αρχείων 2/3</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="146"/>
+        <location filename="../mythgallery/main.cpp" line="155"/>
         <source>MythGallery images</source>
         <translation>Αρχεία εικόνων </translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="158"/>
+        <location filename="../mythgallery/main.cpp" line="167"/>
         <source>MythGallery Media Handler 3/3</source>
         <translation>Διαχείριση Φωτογραφικών Αρχείων 3/3</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="159"/>
+        <location filename="../mythgallery/main.cpp" line="168"/>
         <source>MythGallery movies</source>
         <translation>Αρχεία ταινιών</translation>
     </message>
@@ -1080,24 +1099,24 @@ Check the directory exists, is readable and the setting is correct on MythGaller
 <context>
     <name>ThumbItem</name>
     <message>
-        <location filename="../mythgallery/thumbview.cpp" line="127"/>
+        <location filename="../mythgallery/thumbview.cpp" line="133"/>
         <source>Folder: %1</source>
         <translation>Φάκελος: %1</translation>
     </message>
     <message>
-        <location filename="../mythgallery/thumbview.cpp" line="129"/>
+        <location filename="../mythgallery/thumbview.cpp" line="135"/>
         <source>Created: %1</source>
         <extracomment>%1 is the creation date</extracomment>
         <translation>Δημιουργήθηκε: %1</translation>
     </message>
     <message>
-        <location filename="../mythgallery/thumbview.cpp" line="131"/>
+        <location filename="../mythgallery/thumbview.cpp" line="137"/>
         <source>Modified: %1</source>
         <extracomment>%1 is the modification date</extracomment>
         <translation>Τροποποιήθηκε: %1</translation>
     </message>
     <message numerus="yes">
-        <location filename="../mythgallery/thumbview.cpp" line="132"/>
+        <location filename="../mythgallery/thumbview.cpp" line="138"/>
         <source>Size: %n bytes</source>
         <translation>
             <numerusform>Μέγεθος: %n χαρακτήρας</numerusform>
@@ -1105,7 +1124,7 @@ Check the directory exists, is readable and the setting is correct on MythGaller
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../mythgallery/thumbview.cpp" line="133"/>
+        <location filename="../mythgallery/thumbview.cpp" line="139"/>
         <source>Width: %n pixel(s)</source>
         <translation>
             <numerusform>Πλάτος: %n εικονοστοιχείο</numerusform>
@@ -1113,7 +1132,7 @@ Check the directory exists, is readable and the setting is correct on MythGaller
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../mythgallery/thumbview.cpp" line="134"/>
+        <location filename="../mythgallery/thumbview.cpp" line="140"/>
         <source>Height: %n pixel(s)</source>
         <translation>
             <numerusform>Ύψος: %n εικονοστοιχείο</numerusform>
@@ -1121,12 +1140,12 @@ Check the directory exists, is readable and the setting is correct on MythGaller
         </translation>
     </message>
     <message>
-        <location filename="../mythgallery/thumbview.cpp" line="135"/>
+        <location filename="../mythgallery/thumbview.cpp" line="141"/>
         <source>Pixel Count: %1 megapixels</source>
         <translation>Πλήθος Εικονοστοιχείων: %1 εκατομμύρια</translation>
     </message>
     <message numerus="yes">
-        <location filename="../mythgallery/thumbview.cpp" line="137"/>
+        <location filename="../mythgallery/thumbview.cpp" line="143"/>
         <source>Rotation Angle: %n degree(s)</source>
         <translation>
             <numerusform>Γωνία Περιστροφής: %n μοίρα</numerusform>
