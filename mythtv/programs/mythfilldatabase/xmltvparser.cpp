@@ -346,8 +346,9 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
                     pginfo->category = cat;
                 }
 
-                if (cat == QObject::tr("Movie") || cat == QObject::tr("Film"))
-                {
+		if ((cat.compare(QObject::tr("movie"),Qt::CaseInsensitive) == 0) ||
+			(cat.compare(QObject::tr("film"),Qt::CaseInsensitive) == 0))
+		{
                     // Hack for tv_grab_uk_rt
                     pginfo->categoryType = ProgramInfo::kCategoryMovie;
                 }
