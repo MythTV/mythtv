@@ -4545,9 +4545,10 @@ char *MythPlayer::GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
         }
 
         AVPictureFill(&orig, frame);
+        float par = frame->aspect * video_dim.height() / video_dim.width();
         MythPictureDeinterlacer deinterlacer(AV_PIX_FMT_YUV420P,
                                              video_dim.width(), video_dim.height(),
-                                             frame->aspect);
+                                             par);
         if (deinterlacer.DeinterlaceSingle(&orig, &orig) < 0)
         {
             break;
