@@ -1260,7 +1260,7 @@ bool MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
     c->height = info->sequence->height;
     av_reduce(&c->time_base.num, &c->time_base.den,
               info->sequence->frame_period, 27000000LL, 100000);
-    c->pix_fmt = PIX_FMT_YUV420P;
+    c->pix_fmt = AV_PIX_FMT_YUV420P;
     c->max_b_frames = 0;
     c->has_b_frames = 0;
     c->rc_buffer_aggressivity = 1;
@@ -1278,7 +1278,6 @@ bool MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
     picture->pts = AV_NOPTS_VALUE;
     picture->key_frame = 1;
     picture->pict_type = AV_PICTURE_TYPE_NONE;
-    picture->type = 0;
     picture->quality = 0;
 
     if (avcodec_open2(c, out_codec, NULL) < 0)

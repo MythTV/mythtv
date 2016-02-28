@@ -308,11 +308,11 @@ QStringList VideoOutputOpenGLVAAPI::GetAllowedRenderers(
 MythCodecID VideoOutputOpenGLVAAPI::GetBestSupportedCodec(
     uint width,       uint height, const QString &decoder,
     uint stream_type, bool no_acceleration,
-    PixelFormat &pix_fmt)
+    AVPixelFormat &pix_fmt)
 {
     QSize size(width, height);
     bool use_cpu = no_acceleration;
-    PixelFormat fmt = PIX_FMT_YUV420P;
+    AVPixelFormat fmt = AV_PIX_FMT_YUV420P;
     MythCodecID test_cid = (MythCodecID)(kCodec_MPEG1_VAAPI + (stream_type - 1));
     if (codec_is_vaapi(test_cid) && decoder == "vaapi" && !getenv("NO_VAAPI"))
         use_cpu |= !VAAPIContext::IsFormatAccelerated(size, test_cid, fmt);

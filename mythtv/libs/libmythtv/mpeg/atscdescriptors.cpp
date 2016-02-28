@@ -123,7 +123,7 @@ QString MultipleStringStructure::GetFullString(uint i) const
     QString tmp = "";
     for (uint j = 0; j < SegmentCount(i); j++)
         tmp += GetSegment(i, j);
-    return tmp;
+    return tmp.simplified();
 }
 
 QString MultipleStringStructure::Uncompressed(
@@ -142,7 +142,8 @@ QString MultipleStringStructure::Uncompressed(
             LOG(VB_GENERAL, LOG_DEBUG, QString("str.append(0x%1:0x%2) -> %3")
                 .arg(mode, 0, 16) .arg(buf[j], 0, 16) .arg(QChar(hb|buf[j])));
 #endif
-            str.append( QChar( hb|buf[j] ) );
+            if (hb|buf[j])
+                str.append( QChar( hb|buf[j] ) );
         }
     } else if (mode==0x3e) {
         // Standard Compression Scheme for Unicode (SCSU)

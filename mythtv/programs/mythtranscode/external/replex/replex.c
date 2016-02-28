@@ -82,6 +82,76 @@ static int replex_check_id(struct replex *rx, uint16_t id)
 	return -1;
 }
 
+static int avcodec_encode_audio(AVCodecContext *avctx,
+                                uint8_t *buf, int buf_size,
+                                const short *samples)
+{
+    AVPacket pkt;
+    AVFrame *frame;
+    int ret, samples_size, got_packet;
+
+    av_init_packet(&pkt);
+    pkt.data = buf;
+    pkt.size = buf_size;
+
+    if (samples) {
+        frame = av_frame_alloc();
+        if (!frame)
+            return AVERROR(ENOMEM);
+
+        if (avctx->frame_size) {
+            frame->nb_samples = avctx->frame_size;
+        } else {
+            /* if frame_size is not set, the number of samples must be
+             * calculated from the buffer size */
+            int64_t nb_samples;
+            if (!av_get_bits_per_sample(avctx->codec_id)) {
+                av_log(avctx, AV_LOG_ERROR, "avcodec_encode_audio() does not "
+                                            "support this codec\n");
+                av_frame_free(&frame);
+                return AVERROR(EINVAL);
+            }
+            nb_samples = (int64_t)buf_size * 8 /
+                         (av_get_bits_per_sample(avctx->codec_id) *
+                          avctx->channels);
+            if (nb_samples >= INT_MAX) {
+                av_frame_free(&frame);
+                return AVERROR(EINVAL);
+            }
+            frame->nb_samples = nb_samples;
+        }
+
+        /* it is assumed that the samples buffer is large enough based on the
+         * relevant parameters */
+        samples_size = av_samples_get_buffer_size(NULL, avctx->channels,
+                                                  frame->nb_samples,
+                                                  avctx->sample_fmt, 1);
+        if ((ret = avcodec_fill_audio_frame(frame, avctx->channels,
+                                            avctx->sample_fmt,
+                                            (const uint8_t *)samples,
+                                            samples_size, 1)) < 0) {
+            av_frame_free(&frame);
+            return ret;
+        }
+
+        frame->pts = AV_NOPTS_VALUE;
+    } else {
+        frame = NULL;
+    }
+
+    got_packet = 0;
+    ret = avcodec_encode_audio2(avctx, &pkt, frame, &got_packet);
+
+    /* free any side data since we cannot return it */
+    av_packet_free_side_data(&pkt);
+
+    if (frame && frame->extended_data != frame->data)
+        av_freep(&frame->extended_data);
+
+    av_frame_free(&frame);
+    return ret ? ret : pkt.size;
+}
+
 static int encode_mp2_audio(audio_frame_t *aframe, uint8_t *buffer, int bufsize)
 {
 	AVCodec *codec;
@@ -92,7 +162,7 @@ static int encode_mp2_audio(audio_frame_t *aframe, uint8_t *buffer, int bufsize)
 	LOG(VB_GENERAL, LOG_INFO, "encoding an MP2 audio frame");
 
 	/* find the MP2 encoder */
-	codec = avcodec_find_encoder(CODEC_ID_MP2);
+	codec = avcodec_find_encoder(AV_CODEC_ID_MP2);
 	if (!codec) {
 		LOG(VB_GENERAL, LOG_ERR, "codec not found");
 		return 1;

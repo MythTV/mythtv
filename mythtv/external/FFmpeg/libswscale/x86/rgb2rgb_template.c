@@ -1434,7 +1434,9 @@ static inline void RENAME(planar2x)(const uint8_t *src, uint8_t *dst, int srcWid
     dst+= dstStride;
 
     for (y=1; y<srcHeight; y++) {
-        const x86_reg mmxSize= srcWidth&~15;
+        x86_reg mmxSize= srcWidth&~15;
+
+        if (mmxSize) {
         __asm__ volatile(
             "mov           %4, %%"REG_a"            \n\t"
             "movq        "MANGLE(mmx_ff)", %%mm0    \n\t"
@@ -1481,6 +1483,11 @@ static inline void RENAME(planar2x)(const uint8_t *src, uint8_t *dst, int srcWid
                NAMED_CONSTRAINTS_ADD(mmx_ff)
             : "%"REG_a
         );
+        } else {
+            mmxSize = 1;
+            dst[0]         = (src[0] * 3 + src[srcStride]) >> 2;
+            dst[dstStride] = (src[0] + 3 * src[srcStride]) >> 2;
+        }
 
         for (x=mmxSize-1; x<srcWidth-1; x++) {
             dst[2*x          +1]= (3*src[x+0] +   src[x+srcStride+1])>>2;
@@ -2450,7 +2457,7 @@ static void RENAME(yuyvtoyuv420)(uint8_t *ydst, uint8_t *udst, uint8_t *vdst, co
                                  int lumStride, int chromStride, int srcStride)
 {
     int y;
-    const int chromWidth = FF_CEIL_RSHIFT(width, 1);
+    const int chromWidth = AV_CEIL_RSHIFT(width, 1);
 
     for (y=0; y<height; y++) {
         RENAME(extract_even)(src, ydst, width);
@@ -2476,7 +2483,7 @@ static void RENAME(yuyvtoyuv422)(uint8_t *ydst, uint8_t *udst, uint8_t *vdst, co
                                  int lumStride, int chromStride, int srcStride)
 {
     int y;
-    const int chromWidth = FF_CEIL_RSHIFT(width, 1);
+    const int chromWidth = AV_CEIL_RSHIFT(width, 1);
 
     for (y=0; y<height; y++) {
         RENAME(extract_even)(src, ydst, width);
@@ -2500,7 +2507,7 @@ static void RENAME(uyvytoyuv420)(uint8_t *ydst, uint8_t *udst, uint8_t *vdst, co
                                  int lumStride, int chromStride, int srcStride)
 {
     int y;
-    const int chromWidth = FF_CEIL_RSHIFT(width, 1);
+    const int chromWidth = AV_CEIL_RSHIFT(width, 1);
 
     for (y=0; y<height; y++) {
         RENAME(extract_odd)(src, ydst, width);
@@ -2526,7 +2533,7 @@ static void RENAME(uyvytoyuv422)(uint8_t *ydst, uint8_t *udst, uint8_t *vdst, co
                                  int lumStride, int chromStride, int srcStride)
 {
     int y;
-    const int chromWidth = FF_CEIL_RSHIFT(width, 1);
+    const int chromWidth = AV_CEIL_RSHIFT(width, 1);
 
     for (y=0; y<height; y++) {
         RENAME(extract_odd)(src, ydst, width);

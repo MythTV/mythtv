@@ -388,7 +388,7 @@ TemplateMatcher::MythPlayerInited(MythPlayer *_player,
         return ANALYZE_FATAL;
     }
 
-    if (avpicture_alloc(&cropped, PIX_FMT_GRAY8, tmplwidth, tmplheight))
+    if (avpicture_alloc(&cropped, AV_PIX_FMT_GRAY8, tmplwidth, tmplheight))
     {
         LOG(VB_COMMFLAG, LOG_ERR,
             QString("TemplateMatcher::MythPlayerInited "

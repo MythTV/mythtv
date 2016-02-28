@@ -804,7 +804,7 @@ bool MythUIButtonList::DistributeButtons(void)
     // if there are no items to show make sure all the buttons are made invisible
     if (m_itemCount == 0)
     {
-        for (int i = 0; i < m_ButtonList.count(); i++)
+        for (int i = 0; i < m_ButtonList.count(); ++i)
         {
             if (m_ButtonList[i])
                 m_ButtonList[i]->SetVisible(false);
@@ -1335,12 +1335,19 @@ void MythUIButtonList::CalculateButtonPositions(void)
                                     m_columns * m_columns;
             }
 
+
+            if (m_selPosition - (static_cast<int>(m_itemsVisible) - 1)
+                < m_topPosition)
+                m_topPosition = m_selPosition -
+                                (static_cast<int>(m_itemsVisible) - 1);
+
             m_topPosition = qMax(m_topPosition, 0);
             break;
         }
     }
 
-    QList<MythUIButtonListItem *>::iterator it = m_itemList.begin() + m_topPosition;
+    QList<MythUIButtonListItem *>::iterator it = m_itemList.begin() +
+                                                 m_topPosition;
 
     if (m_scrollStyle == ScrollCenter || m_scrollStyle == ScrollGroupCenter)
     {
@@ -1363,7 +1370,7 @@ void MythUIButtonList::CalculateButtonPositions(void)
     else if (m_drawFromBottom && m_itemCount < (int)m_itemsVisible)
         button = m_itemsVisible - m_itemCount;
 
-    for (int i = 0; i < button; i++)
+    for (int i = 0; i < button; ++i)
         m_ButtonList[i]->SetVisible(false);
 
     bool seenSelected = false;
@@ -1408,10 +1415,10 @@ void MythUIButtonList::CalculateButtonPositions(void)
             ++curItem;
         }
 
-        button++;
+        ++button;
     }
 
-    for (; button < (int)m_itemsVisible; button++)
+    for (; button < (int)m_itemsVisible; ++button)
         m_ButtonList[button]->SetVisible(false);
 }
 
@@ -1498,15 +1505,15 @@ void MythUIButtonList::InsertItem(MythUIButtonListItem *item, int listPosition)
         m_itemList.insert(listPosition, item);
 
         if (listPosition <= m_selPosition)
-            m_selPosition++;
+            ++m_selPosition;
 
         if (listPosition <= m_topPosition)
-            m_topPosition++;
+            ++m_topPosition;
     }
     else
         m_itemList.append(item);
 
-    m_itemCount++;
+    ++m_itemCount;
 
     if (wasEmpty)
     {
@@ -1543,18 +1550,18 @@ void MythUIButtonList::RemoveItem(MythUIButtonListItem *item)
         m_topPosition > 0 &&
         m_topPosition == m_itemCount - 1)
     {
-        m_topPosition--;
+        --m_topPosition;
     }
 
     if (curIndex == m_selPosition &&
         m_selPosition > 0 &&
         m_selPosition == m_itemCount - 1)
     {
-        m_selPosition--;
+        --m_selPosition;
     }
 
     m_itemList.removeAt(curIndex);
-    m_itemCount--;
+    --m_itemCount;
 
     Update();
 
@@ -2316,7 +2323,7 @@ void MythUIButtonList::Init()
         int col = 1;
         int row = 1;
 
-        for (int i = 0; i < (int)m_itemsVisible; i++)
+        for (int i = 0; i < (int)m_itemsVisible; ++i)
         {
             QString name = QString("buttonlist button %1").arg(i);
             MythUIStateType *button = new MythUIStateType(this, name);
@@ -2326,11 +2333,11 @@ void MythUIButtonList::Init()
             if (col > m_columns)
             {
                 col = 1;
-                row++;
+                ++row;
             }
 
             button->SetPosition(GetButtonPosition(col, row));
-            col++;
+            ++col;
 
             m_ButtonList.push_back(button);
         }
@@ -2387,7 +2394,7 @@ bool MythUIButtonList::keyPressEvent(QKeyEvent *e)
     handled = GetMythMainWindow()->TranslateKeyPress("Global", e, actions);
 
     // Handle action remappings
-    for (int i = 0; i < actions.size(); i++)
+    for (int i = 0; i < actions.size(); ++i)
     {
         if (!m_actionRemap.contains(actions[i]))
             continue;
@@ -2403,7 +2410,7 @@ bool MythUIButtonList::keyPressEvent(QKeyEvent *e)
         int keyCode = a[0];
         Qt::KeyboardModifiers modifiers = Qt::NoModifier;
         QStringList parts = key.split('+');
-        for (int j = 0; j < parts.count(); j++)
+        for (int j = 0; j < parts.count(); ++j)
         {
             if (parts[j].toUpper() == "CTRL")
                 modifiers |= Qt::ControlModifier;
@@ -2426,7 +2433,7 @@ bool MythUIButtonList::keyPressEvent(QKeyEvent *e)
     }
 
     // handle actions for this container
-    for (int i = 0; i < actions.size() && !handled; i++)
+    for (int i = 0; i < actions.size() && !handled; ++i)
     {
         QString action = actions[i];
         handled = true;
@@ -2569,24 +2576,24 @@ bool MythUIButtonList::gestureEvent(MythGestureEvent *event)
             if ((m_layout == LayoutVertical) || (m_layout == LayoutGrid))
                 handled = MoveUp(MovePage);
             break;
-            
+
         case MythGestureEvent::UpLeft:
         case MythGestureEvent::UpRight:
             if ((m_layout == LayoutVertical) || (m_layout == LayoutGrid))
                 handled = MoveUp(MoveRow);
             break;
-            
+
         case MythGestureEvent::Down:
             if ((m_layout == LayoutVertical) || (m_layout == LayoutGrid))
                 handled = MoveDown(MovePage);
             break;
-            
+
         case MythGestureEvent::DownLeft:
         case MythGestureEvent::DownRight:
             if ((m_layout == LayoutVertical) || (m_layout == LayoutGrid))
                 handled = MoveDown(MoveRow);
             break;
-            
+
         case MythGestureEvent::Right:
             if (m_layout == LayoutHorizontal)
                 handled = MoveDown(MoveItem);
@@ -2598,7 +2605,7 @@ bool MythUIButtonList::gestureEvent(MythGestureEvent *event)
                     handled = MoveDown(MoveItem);
             }
             break;
-            
+
         case MythGestureEvent::Left:
             if (m_layout == LayoutHorizontal)
                 handled = MoveUp(MoveItem);
@@ -2610,7 +2617,7 @@ bool MythUIButtonList::gestureEvent(MythGestureEvent *event)
                     handled = MoveUp(MoveItem);
             }
             break;
-            
+
         default:
             break;
     }
@@ -2689,7 +2696,7 @@ void MythUIButtonList::CalculateVisibleItems(void)
         while (x <= m_contentsRect.width() - m_itemWidth)
         {
             x += m_itemWidth + m_itemHorizSpacing;
-            m_columns++;
+            ++m_columns;
         }
     }
 
@@ -2700,7 +2707,7 @@ void MythUIButtonList::CalculateVisibleItems(void)
         while (y <= m_contentsRect.height() - m_itemHeight)
         {
             y += m_itemHeight + m_itemVertSpacing;
-            m_rows++;
+            ++m_rows;
         }
     }
 
@@ -2905,7 +2912,7 @@ void MythUIButtonList::CopyFrom(MythUIType *base)
     m_downArrow = dynamic_cast<MythUIStateType *>(GetChild("downscrollarrow"));
     m_scrollBar = dynamic_cast<MythUIScrollBar *>(GetChild("scrollbar"));
 
-    for (int i = 0; i < (int)m_itemsVisible; i++)
+    for (int i = 0; i < (int)m_itemsVisible; ++i)
     {
         QString name = QString("buttonlist button %1").arg(i);
         DeleteChild(name);
@@ -2949,7 +2956,7 @@ void MythUIButtonList::updateLCD(void)
     int start = std::max(0, (int)(m_selPosition - lcddev->getLCDHeight()));
     int end = std::min(m_itemCount, (int)(start + (lcddev->getLCDHeight() * 2)));
 
-    for (int r = start; r < end; r++)
+    for (int r = start; r < end; ++r)
     {
         if (r == GetCurrentPos())
             selected = true;
@@ -2964,7 +2971,7 @@ void MythUIButtonList::updateLCD(void)
 
         QString text;
 
-        for (int x = 0; x < m_lcdColumns.count(); x++)
+        for (int x = 0; x < m_lcdColumns.count(); ++x)
         {
             if (!m_lcdColumns[x].isEmpty() && item->m_strings.contains(m_lcdColumns[x]))
             {
@@ -3059,14 +3066,14 @@ bool MythUIButtonList::DoFind(bool doMove, bool searchForward)
     {
         if (searchForward)
         {
-            currPos++;
+            ++currPos;
 
             if (currPos >= GetCount())
                 currPos = 0;
         }
         else
         {
-            currPos--;
+            --currPos;
 
             if (currPos < 0)
                 currPos = GetCount() - 1;
@@ -3085,14 +3092,14 @@ bool MythUIButtonList::DoFind(bool doMove, bool searchForward)
 
         if (searchForward)
         {
-            currPos++;
+            ++currPos;
 
             if (currPos >= GetCount())
                 currPos = 0;
         }
         else
         {
-            currPos--;
+            --currPos;
 
             if (currPos < 0)
                 currPos = GetCount() - 1;
@@ -3267,7 +3274,7 @@ bool MythUIButtonListItem::FindText(const QString &searchStr, const QString &fie
     {
         QStringList fields = fieldList.split(',', QString::SkipEmptyParts);
 
-        for (int x = 0; x < fields.count(); x++)
+        for (int x = 0; x < fields.count(); ++x)
         {
             if (m_strings.contains(fields.at(x).trimmed()))
             {
@@ -3753,7 +3760,7 @@ bool SearchButtonListDialog::keyPressEvent(QKeyEvent *event)
     QStringList actions;
     bool handled = GetMythMainWindow()->TranslateKeyPress("Global", event, actions, false);
 
-    for (int i = 0; i < actions.size() && !handled; i++)
+    for (int i = 0; i < actions.size() && !handled; ++i)
     {
         QString action = actions[i];
         handled = true;

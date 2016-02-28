@@ -3274,6 +3274,10 @@ NULL
             return false;
     }
 
+    // TODO #12612
+    // strip \0 characters from channel/channelscan_channel callsign and name
+    // UPDATE channel SET callsign=REPLACE(callsign,'\0',''), name=REPLACE(name,'\0','');
+
     return true;
 }
 

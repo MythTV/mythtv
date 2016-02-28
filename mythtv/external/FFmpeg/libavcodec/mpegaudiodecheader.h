@@ -54,8 +54,10 @@ int avpriv_mpegaudio_decode_header(MPADecodeHeader *s, uint32_t header);
 
 /* useful helper to get mpeg audio stream infos. Return -1 if error in
    header, otherwise the coded frame size in bytes */
-int avpriv_mpa_decode_header(AVCodecContext *avctx, uint32_t head, int *sample_rate, int *channels, int *frame_size, int *bitrate);
+int ff_mpa_decode_header(uint32_t head, int *sample_rate,
+                         int *channels, int *frame_size, int *bitrate, enum AVCodecID *codec_id, int *dual_language);
 
+int avpriv_mpa_decode_header(AVCodecContext *avctx, uint32_t head, int *sample_rate, int *channels, int *frame_size, int *bitrate);
 int avpriv_mpa_decode_header2(uint32_t head, int *sample_rate, int *channels, int *frame_size, int *bitrate, enum AVCodecID *codec_id, int *dual_langue);
 
 /* fast header check for resync */

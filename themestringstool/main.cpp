@@ -1,6 +1,7 @@
-#include <QApplication>
+#include <QCoreApplication>
 #include <QDomDocument>
 #include <QString>
+#include <QStringList>
 #include <QMap>
 #include <QMultiMap>
 #include <QStringList>
@@ -13,6 +14,10 @@
 #include <cstdlib>
 
 using namespace std;
+
+QString getFirstText(QDomElement element);
+void parseElement(QDomElement &element);
+void parseDirectory(QString dir);
 
 QString getFirstText(QDomElement element)
 {
@@ -165,17 +170,19 @@ void parseDirectory(QString dir)
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv, false);
+    QCoreApplication a(argc, argv);
 
-    if (a.argc() < 2)
+    QStringList args = a.arguments();
+
+    if (args.count() < 2)
     {
         cerr << "You must specify at least a starting directory." << endl;
         a.exit(-1);
     }
 
-    indir = a.argv()[1];
-    if (a.argc() == 3)
-        outfilebase = a.argv()[2];
+    indir = args.at(1);
+    if (args.count() == 3)
+        outfilebase = args.at(2);
     else
         outfilebase = indir;
 

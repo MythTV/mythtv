@@ -1874,7 +1874,7 @@ void MHIBitmap::CreateFromMPEG(const unsigned char *data, int length)
     m_image = QImage();
 
     // Find the mpeg2 video decoder.
-    AVCodec *codec = avcodec_find_decoder(CODEC_ID_MPEG2VIDEO);
+    AVCodec *codec = avcodec_find_decoder(AV_CODEC_ID_MPEG2VIDEO);
     if (!codec)
         return;
     if (!picture)
@@ -1923,11 +1923,11 @@ void MHIBitmap::CreateFromMPEG(const unsigned char *data, int length)
         int bufflen = nContentWidth * nContentHeight * 3;
         unsigned char *outputbuf = (unsigned char*)av_malloc(bufflen);
 
-        avpicture_fill(&retbuf, outputbuf, PIX_FMT_RGB24,
+        avpicture_fill(&retbuf, outputbuf, AV_PIX_FMT_RGB24,
                        nContentWidth, nContentHeight);
 
         AVFrame *tmp = picture;
-        m_copyCtx->Copy(&retbuf, PIX_FMT_RGB24, (AVPicture*)tmp, c->pix_fmt,
+        m_copyCtx->Copy(&retbuf, AV_PIX_FMT_RGB24, (AVPicture*)tmp, c->pix_fmt,
                      nContentWidth, nContentHeight);
 
         uint8_t * buf = outputbuf;
