@@ -1336,8 +1336,10 @@ void MythUIButtonList::CalculateButtonPositions(void)
             }
 
 
-            if (m_selPosition - (static_cast<int>(m_itemsVisible) - 1)
-                < m_topPosition)
+            if (((m_itemList.count() - m_topPosition)
+                 < static_cast<int>(m_itemsVisible)) &&
+                (m_selPosition - (static_cast<int>(m_itemsVisible) - 1)
+                 < m_topPosition))
                 m_topPosition = m_selPosition -
                                 (static_cast<int>(m_itemsVisible) - 1);
 
