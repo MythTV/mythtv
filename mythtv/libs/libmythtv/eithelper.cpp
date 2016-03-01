@@ -1,8 +1,5 @@
 // -*- Mode: c++ -*-
 
-// Std C headers
-#include <time.h>
-
 // Std C++ headers
 #include <algorithm>
 using namespace std;

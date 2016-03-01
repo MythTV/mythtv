@@ -3,7 +3,9 @@
 #ifndef EIT_HELPER_H
 #define EIT_HELPER_H
 
+// Std C headers
 #include <stdint.h>
+#include <time.h>
 
 // Qt includes
 #include <QDateTime>
