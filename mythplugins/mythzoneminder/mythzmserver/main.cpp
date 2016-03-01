@@ -247,7 +247,7 @@ int main(int argc, char **argv)
     myaddr.sin_addr.s_addr = INADDR_ANY;
     myaddr.sin_port = htons(port);
     memset(&(myaddr.sin_zero), '\0', 8);
-    if (bind(listener, (struct sockaddr *)&myaddr, sizeof(myaddr)) == -1)
+    if (::bind(listener, (struct sockaddr *)&myaddr, sizeof(myaddr)) == -1)
     {
         perror("bind");
         return EXIT_SOCKET_ERROR;
