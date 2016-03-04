@@ -1246,6 +1246,15 @@ PlaybackProfileConfigs::PlaybackProfileConfigs(const QString &str) :
     }
 #endif
 
+#ifdef USING_OPENMAX
+    if (!profiles.contains("OpenMAX Normal"))
+    {
+        VideoDisplayProfile::CreateOpenMAXProfiles(host);
+        profiles = VideoDisplayProfile::GetProfiles(host);
+    }
+#endif
+
+
     QString profile = VideoDisplayProfile::GetDefaultProfileName(host);
     if (!profiles.contains(profile))
     {
