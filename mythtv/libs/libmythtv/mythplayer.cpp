@@ -1884,6 +1884,20 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
         audio.Pause(false);
     }
 
+    if (!dropframe)
+    {
+        // PGB this was orignally in the calling methods 
+        // MythPlayer::DisplayNormalFrame and MythDVDPlayer::DisplayLastFrame
+        // Moved here to reduce CPU usage since the OSD was being merged
+        // into frames that were not being displayed, thereby causing 
+        // interruptions and slowdowns.
+        osdLock.lock();
+        videofiltersLock.lock();
+        videoOutput->ProcessFrame(buffer, osd, videoFilters, pip_players, ps);
+        videofiltersLock.unlock();
+        osdLock.unlock();
+    }
+
     if (dropframe)
     {
         // Reset A/V Sync
@@ -2248,12 +2262,6 @@ void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
     FrameScanType ps = m_scan;
     if (kScan_Detect == m_scan || kScan_Ignore == m_scan)
         ps = kScan_Progressive;
-
-    osdLock.lock();
-    videofiltersLock.lock();
-    videoOutput->ProcessFrame(frame, osd, videoFilters, pip_players, ps);
-    videofiltersLock.unlock();
-    osdLock.unlock();
 
     AVSync(frame, 0);
     // If PiP then keep this frame for MythPlayer::GetCurrentFrame
