@@ -62,6 +62,14 @@ void MythBDPlayer::DisplayPauseFrame(void)
     MythPlayer::DisplayPauseFrame();
 }
 
+void MythBDPlayer::VideoStart(void)
+{
+    if (!m_initialBDState.isEmpty())
+        player_ctx->buffer->BD()->RestoreBDStateSnapshot(m_initialBDState);
+
+    MythPlayer::VideoStart();
+}
+
 bool MythBDPlayer::VideoLoop(void)
 {
     if (!player_ctx->buffer->IsBD())
@@ -138,6 +146,14 @@ bool MythBDPlayer::VideoLoop(void)
     }
 
     return MythPlayer::VideoLoop();
+}
+
+bool MythBDPlayer::JumpToFrame(uint64_t frame)
+{
+    if (frame == ~0x0ULL)
+        return false;
+
+    return MythPlayer::JumpToFrame(frame);
 }
 
 void MythBDPlayer::EventStart(void)
@@ -351,6 +367,87 @@ bool MythBDPlayer::PrevAngle(void)
         prev = total;
 
     return SwitchAngle(prev);
+}
+
+void MythBDPlayer::SetBookmark(bool clear)
+{
+    QStringList fields;
+    QString name;
+    QString serialid;
+    QString bdstate;
+
+    if (!player_ctx->buffer->IsInMenu() &&
+        (player_ctx->buffer->IsBookmarkAllowed() || clear))
+    {
+        if (!player_ctx->buffer->BD()->GetNameAndSerialNum(name, serialid))
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                "BD has no name and serial number. Cannot set bookmark.");
+            return;
+        }
+
+        if (!clear && !player_ctx->buffer->BD()->GetBDStateSnapshot(bdstate))
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                "Unable to retrieve BD state. Cannot set bookmark.");
+            return;
+        }
+
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("BDState:%1").arg(bdstate));
+
+        player_ctx->LockPlayingInfo(__FILE__, __LINE__);
+        if (player_ctx->playingInfo)
+        {
+            fields += serialid;
+            fields += name;
+
+            if (!clear)
+            {
+                LOG(VB_PLAYBACK, LOG_INFO, LOC + "Set bookmark");
+                fields += bdstate;
+            }
+            else
+                LOG(VB_PLAYBACK, LOG_INFO, LOC + "Clear bookmark");
+
+            player_ctx->playingInfo->SaveBDBookmark(fields);
+
+        }
+        player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
+    }
+}
+
+uint64_t MythBDPlayer::GetBookmark(void)
+{
+    if (gCoreContext->IsDatabaseIgnored() || !player_ctx->buffer->IsBD())
+        return 0;
+
+    QStringList bdbookmark = QStringList();
+    QString name;
+    QString serialid;
+    uint64_t frames = 0;
+
+    player_ctx->LockPlayingInfo(__FILE__, __LINE__);
+
+    if (player_ctx->playingInfo)
+    {
+        if (!player_ctx->buffer->BD()->GetNameAndSerialNum(name, serialid))
+        {
+            player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
+            return 0;
+        }
+
+        bdbookmark = player_ctx->playingInfo->QueryBDBookmark(serialid);
+
+        if (!bdbookmark.empty())
+        {
+            m_initialBDState = bdbookmark[0];
+            frames = ~0x0ULL;
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Get Bookmark: bookmark found");
+        }
+    }
+
+    player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
+    return frames;;
 }
 
 void MythBDPlayer::CreateDecoder(char *testbuf, int testreadsize)

@@ -2865,6 +2865,68 @@ void ProgramInfo::SaveDVDBookmark(const QStringList &fields) const
         MythDB::DBError("SetDVDBookmark updating", query);
 }
 
+/** \brief Queries "bdbookmark" table for bookmarking BD serial number.
+ *  \return BD state string
+ */
+QStringList ProgramInfo::QueryBDBookmark(const QString &serialid) const
+{
+    QStringList fields = QStringList();
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    if (!(programflags & FL_IGNOREBOOKMARK))
+    {
+        query.prepare(" SELECT bdstate FROM bdbookmark "
+                        " WHERE serialid = :SERIALID ");
+        query.bindValue(":SERIALID", serialid);
+
+        if (query.exec() && query.next())
+            fields.append(query.value(0).toString());
+    }
+
+    return fields;
+}
+
+void ProgramInfo::SaveBDBookmark(const QStringList &fields) const
+{
+    QStringList::const_iterator it = fields.begin();
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    QString serialid    = *(it);
+    QString name        = *(++it);
+
+    if( fields.count() == 3 )
+    {
+        // We have a state field, so update/create the bookmark
+        QString state = *(++it);
+
+        query.prepare("INSERT IGNORE INTO bdbookmark "
+                        " (serialid, name)"
+                        " VALUES ( :SERIALID, :NAME );");
+        query.bindValue(":SERIALID", serialid);
+        query.bindValue(":NAME", name);
+
+        if (!query.exec())
+            MythDB::DBError("SetBDBookmark inserting", query);
+
+        query.prepare(" UPDATE bdbookmark "
+                        " SET bdstate    = :STATE , "
+                        "     timestamp  = NOW() "
+                        " WHERE serialid = :SERIALID");
+        query.bindValue(":STATE",state);
+        query.bindValue(":SERIALID",serialid);
+    }
+    else
+    {
+        // No state field, delete the bookmark
+        query.prepare("DELETE FROM bdbookmark "
+                        "WHERE serialid = :SERIALID");
+        query.bindValue(":SERIALID",serialid);
+    }
+
+    if (!query.exec())
+        MythDB::DBError("SetBDBookmark updating", query);
+}
+
 /** \brief Queries recordedprogram to get the category_type of the
  *         recording.
  *

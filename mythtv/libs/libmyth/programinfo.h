@@ -557,6 +557,7 @@ class MPUBLIC ProgramInfo
     uint64_t    QueryLastPlayPos(void) const;
     CategoryType QueryCategoryType(void) const;
     QStringList QueryDVDBookmark(const QString &serialid) const;
+    QStringList QueryBDBookmark(const QString &serialid) const;
     bool        QueryIsEditing(void) const;
     bool        QueryIsInUse(QStringList &byWho) const;
     bool        QueryIsInUse(QString &byWho) const;
@@ -581,6 +582,7 @@ class MPUBLIC ProgramInfo
     virtual void SaveFilesize(uint64_t fsize); /// TODO Move to RecordingInfo
     void SaveBookmark(uint64_t frame);
     void SaveDVDBookmark(const QStringList &fields) const;
+    void SaveBDBookmark(const QStringList &fields) const;
     void SaveEditing(bool edit);
     void SaveTranscodeStatus(TranscodingStatus transFlag);
     void SaveWatched(bool watchedFlag);

@@ -33,6 +33,8 @@ class MythBDPlayer : public MythPlayer
     virtual bool SwitchAngle(int angle);
     virtual bool PrevAngle(void);
     virtual bool NextAngle(void);
+    virtual void SetBookmark(bool clear);
+    virtual uint64_t GetBookmark(void);
 
     // Non-const gets
     // Disable screen grabs for Bluray
@@ -43,10 +45,14 @@ class MythBDPlayer : public MythPlayer
 
   protected:
     // Playback
+    virtual void VideoStart(void);
     virtual bool VideoLoop(void);
     virtual void EventStart(void);
     virtual void DisplayPauseFrame(void);
     virtual void PreProcessNormalFrame(void);
+
+    // Seek stuff
+    virtual bool JumpToFrame(uint64_t frame);
 
     // Private decoder stuff
     virtual void CreateDecoder(char *testbuf, int testreadsize);
@@ -57,8 +63,9 @@ class MythBDPlayer : public MythPlayer
                                    bool absolute) { return; }
 
   private:
-    void DisplayMenu(void);
-    bool m_stillFrameShowing;
+    void    DisplayMenu(void);
+    bool    m_stillFrameShowing;
+    QString m_initialBDState;
 };
 
 #endif // MYTHBDPLAYER_H
