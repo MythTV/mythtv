@@ -16,7 +16,7 @@ void yuv888_to_yv12(VideoFrame *frame, MythImage *osd_image,
                     int left, int top, int right, int bottom);
 void inline mmx_yuv888_to_yv12(VideoFrame *frame, MythImage *osd_image,
                                int left, int top, int right, int bottom);
-void inline c_yuv888_to_yv12(VideoFrame *frame, MythImage *osd_image,
+void c_yuv888_to_yv12(VideoFrame *frame, MythImage *osd_image,
                              int left, int top, int right, int bottom);
 void yuv888_to_i44(unsigned char *dest, MythImage *osd_image, QSize dst_size,
                    int left, int top, int right, int bottom, bool ifirst);
