@@ -187,7 +187,7 @@ MythCDROM::ImageType MythCDROM::inspectImage(const QString &path)
     {
         blockInput_t blockInput;
 
-        blockInput.file = new RemoteFile(path);
+        blockInput.file = new RemoteFile(path); // Normally deleted via a call to udfread_close
         blockInput.input.close = _def_close;
         blockInput.input.read = _def_read;
         blockInput.input.size = _def_size;
@@ -225,6 +225,11 @@ MythCDROM::ImageType MythCDROM::inspectImage(const QString &path)
                 }
 
                 udfread_close(udf);
+            }
+            else
+            {
+                // Open failed, so we have clean this up here
+                delete blockInput.file;
             }
         }
         else
