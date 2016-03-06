@@ -211,7 +211,7 @@ BDRingBuffer::BDRingBuffer(const QString &lfilename)
   : RingBuffer(kRingBuffer_BD),
     bdnav(NULL), m_isHDMVNavigation(false), m_tryHDMVNavigation(false),
     m_topMenuSupported(false), m_firstPlaySupported(false),
-    m_numTitles(0), m_imgHandle(-1),
+    m_numTitles(0), m_currentTitleInfo(NULL), m_imgHandle(-1),
     m_titleChanged(false), m_playerWait(false),
     m_ignorePlayerWait(true),
     m_stillTime(0), m_stillMode(BLURAY_STILL_NONE),
