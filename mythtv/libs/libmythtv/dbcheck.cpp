@@ -3277,6 +3277,7 @@ NULL
     if (dbver == "1343")
     {
         const char *updates[] = {
+            "DROP TABLE IF EXISTS bdbookmark;",
             "CREATE TABLE bdbookmark ("
             "  serialid varchar(40) NOT NULL DEFAULT '',"
             "  `name` varchar(128) DEFAULT NULL,"
@@ -3286,8 +3287,8 @@ NULL
             ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 
             // #12612 strip \0 characters from channel/channelscan_channel callsign and name
-            "UPDATE channel SET callsign=REPLACE(callsign,'\0',''),"
-            "name=REPLACE(name,'\0','');",
+            "UPDATE channel SET callsign=REPLACE(callsign,'\\0',''),"
+            "name=REPLACE(name,'\\0','');",
 
             // "BackendWSPort" was removed in caaaeef8166722888012f4ecaf3e9b0f09df512a
             "DELETE FROM settings WHERE value='BackendWSPort';",
