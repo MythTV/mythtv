@@ -269,6 +269,7 @@ static VideoFilter* GreedyHDeintFilter(VideoFrameType inpixfmt,
         /* TODO plain old C implementation */
         fprintf (stderr, "GreedyHDeint: Requires MMX extensions.\n");
         CleanupGreedyHDeintFilter(&filter->vf);
+        free(filter);
         return NULL;
     }
 
