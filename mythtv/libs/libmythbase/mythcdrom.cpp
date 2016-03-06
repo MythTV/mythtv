@@ -166,10 +166,13 @@ static uint32_t _def_size(udfread_block_input *p_gen)
 static int _def_read(udfread_block_input *p_gen, uint32_t lba, void *buf, uint32_t nblocks, int flags)
 {
     (void)flags;
+    int result = -1;
     blockInput_t *p = (blockInput_t *)p_gen;
 
-    p->file->Seek(lba * UDF_BLOCK_SIZE, SEEK_SET);
-    return(p->file->Read(buf, nblocks * UDF_BLOCK_SIZE) / UDF_BLOCK_SIZE);
+    if (p && p->file && (p->file->Seek(lba * UDF_BLOCK_SIZE, SEEK_SET) != -1))
+        result = p->file->Read(buf, nblocks * UDF_BLOCK_SIZE) / UDF_BLOCK_SIZE;
+
+    return result;
 }
 
 MythCDROM::ImageType MythCDROM::inspectImage(const QString &path)
