@@ -334,7 +334,7 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
             }
             else if (info.tagName() == "category")
             {
-                const QString cat = getFirstText(info).toLower();
+                const QString cat = getFirstText(info);
 
                 if (ProgramInfo::kCategoryNone == pginfo->categoryType &&
                     string_to_myth_category_type(cat) != ProgramInfo::kCategoryNone)
@@ -346,8 +346,9 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
                     pginfo->category = cat;
                 }
 
-                if (cat == QObject::tr("movie") || cat == QObject::tr("film"))
-                {
+		if ((cat.compare(QObject::tr("movie"),Qt::CaseInsensitive) == 0) ||
+			(cat.compare(QObject::tr("film"),Qt::CaseInsensitive) == 0))
+		{
                     // Hack for tv_grab_uk_rt
                     pginfo->categoryType = ProgramInfo::kCategoryMovie;
                 }
