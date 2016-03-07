@@ -14,6 +14,31 @@
 
 #include "ringbuffer.h"
 
+class MTV_PUBLIC BDInfo
+{
+    friend class BDRingBuffer;
+    Q_DECLARE_TR_FUNCTIONS(BDInfo)
+
+  public:
+    BDInfo(const QString &filename);
+   ~BDInfo(void);
+    bool IsValid(void) const { return !m_serialnumber.isEmpty(); }
+    bool GetNameAndSerialNum(QString &name, QString &serialnum);
+    QString GetLastError(void) const { return m_lastError; }
+
+protected:
+  static void GetNameAndSerialNum(BLURAY* nav,
+                                  QString &name,
+                                  QString &serialnum,
+                                  const QString &filename,
+                                  const QString &logPrefix);
+
+  protected:
+    QString     m_name;
+    QString     m_serialnumber;
+    QString     m_lastError;
+};
+
 /** \class BDRingBufferPriv
  *  \brief RingBuffer class for Blu-rays
  *
@@ -61,6 +86,8 @@ class MTV_PUBLIC BDRingBuffer : public RingBuffer
     virtual void IgnoreWaitStates(bool ignore) { m_ignorePlayerWait = ignore; }
     virtual bool StartFromBeginning(void);
     bool GetNameAndSerialNum(QString& _name, QString& _serialnum);
+    bool GetBDStateSnapshot(QString& state);
+    bool RestoreBDStateSnapshot(const QString &state);
 
     void ClearOverlays(void);
     BDOverlay* GetOverlay(void);
@@ -176,6 +203,8 @@ class MTV_PUBLIC BDRingBuffer : public RingBuffer
     QHash<uint32_t,BLURAY_TITLE_INFO*> m_cachedTitleInfo;
     QHash<uint32_t,BLURAY_TITLE_INFO*> m_cachedPlaylistInfo;
     QMutex             m_infoLock;
+    QString            m_name;
+    QString            m_serialNumber;
 
     QThread           *m_mainThread;
 };

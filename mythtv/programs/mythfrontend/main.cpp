@@ -98,8 +98,9 @@ using namespace std;
 // Gallery
 #include "gallerythumbview.h"
 
-// DVD
+// DVD & Bluray
 #include "DVD/dvdringbuffer.h"
+#include "Bluray/bdringbuffer.h"
 
 // AirPlay
 #ifdef USING_AIRPLAY
@@ -1198,6 +1199,30 @@ static int internal_play_media(const QString &mrl, const QString &plot,
             return res;
         }
         delete dvd;
+    }
+    else if (pginfo->IsVideoBD())
+    {
+        BDInfo bd(pginfo->GetPlaybackURL());
+        if (bd.IsValid())
+        {
+            QString name;
+            QString serialid;
+            if (bd.GetNameAndSerialNum(name, serialid))
+            {
+                QStringList fields = pginfo->QueryBDBookmark(serialid);
+                bookmarkPresent = (fields.count() > 0);
+            }
+        }
+        else
+        {
+            // ToDo: Change string to "BD Failure" after 0.28 is released
+            ShowNotificationError(qApp->translate("(MythFrontendMain)",
+                                                  "DVD Failure"),
+                                                  _Location,
+                                                  bd.GetLastError());
+            delete pginfo;
+            return res;
+        }
     }
     else if (pginfo->IsVideo())
         bookmarkPresent = (pginfo->QueryBookmark() > 0);
