@@ -260,27 +260,44 @@ void c_yuv888_to_yv12(VideoFrame *frame, MythImage *osd_image,
         for (int col = 0, maxcol = width / 2; col < maxcol; ++col)
         {
             QRgb rgb1 = p1[0], rgb2 = p1[1], rgb3 = p3[0], rgb4 = p3[1];
-
             int alpha1 = 255 - qAlpha(rgb1);
-            y1[0] = ((y1[0] * alpha1) >> 8) + qRed(rgb1);
-
             int alpha2 = 255 - qAlpha(rgb2);
-            y1[1] = ((y1[1] * alpha2) >> 8) + qRed(rgb2);
-
             int alpha3 = 255 - qAlpha(rgb3);
-            y3[0] = ((y3[0] * alpha3) >> 8) + qRed(rgb3);
-
             int alpha4 = 255 - qAlpha(rgb4);
-            y3[1] = ((y3[1] * alpha4) >> 8) + qRed(rgb4);
-
             int alphaUV = (alpha1 + alpha2 + alpha3 + alpha4) >> 2;
 
-            int u = (qGreen(rgb1) + qGreen(rgb2) + qGreen(rgb3) + qGreen(rgb4)) >> 2;
-            udest[col] = ((udest[col] * alphaUV) >> 8) + u;
+            // Note - in the code below qRed is not really red, it
+            // is Y, or luminance. qGreen is U chrominance and qBlue
+            // is V chrominance.
+            if (alphaUV == 0)
+            {
+                // Special case optimized for raspberry pi
+                // This code handles opaque images. In this
+                // case it is not necessary to merge in the background.
+                y1[0] = qRed(rgb1);
+                y1[1] = qRed(rgb2);
+                y3[0] = qRed(rgb3);
+                y3[1] = qRed(rgb4);
+                udest[col] = (qGreen(rgb1) + qGreen(rgb2) + qGreen(rgb3) + qGreen(rgb4)) >> 2;
+                vdest[col] = (qBlue(rgb1)  + qBlue(rgb2)  + qBlue(rgb3)  + qBlue(rgb4)) >> 2;
+            }
+            else if (alphaUV < 255)
+            {
+                // This code handles transparency. it is skipped
+                // if the image is invisible (alphaUV == 255)
+                // This section could handle all cases, but for
+                // optimizing CPU usage three cases are handled differently.
+                y1[0] = ((y1[0] * alpha1) >> 8) + qRed(rgb1);
+                y1[1] = ((y1[1] * alpha2) >> 8) + qRed(rgb2);
+                y3[0] = ((y3[0] * alpha3) >> 8) + qRed(rgb3);
+                y3[1] = ((y3[1] * alpha4) >> 8) + qRed(rgb4);
 
-            int v = (qBlue(rgb1)  + qBlue(rgb2)  + qBlue(rgb3)  + qBlue(rgb4)) >> 2;
-            vdest[col] = ((vdest[col] * alphaUV) >> 8) + v;
+                int u = (qGreen(rgb1) + qGreen(rgb2) + qGreen(rgb3) + qGreen(rgb4)) >> 2;
+                udest[col] = ((udest[col] * alphaUV) >> 8) + u;
 
+                int v = (qBlue(rgb1)  + qBlue(rgb2)  + qBlue(rgb3)  + qBlue(rgb4)) >> 2;
+                vdest[col] = ((vdest[col] * alphaUV) >> 8) + v;
+            }
             y1 += 2, y3 += 2;
             p1 += 2, p3 += 2;
         }
