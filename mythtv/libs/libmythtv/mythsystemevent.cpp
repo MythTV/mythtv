@@ -395,6 +395,8 @@ MythSystemEventEditor::MythSystemEventEditor(MythScreenStack *parent,
         tr("Recording expired");
     m_settings["EventCmdLivetvStarted"]        = // LIVETV_STARTED
         tr("LiveTV started");
+    m_settings["EventCmdLivetvEnded"]          = // LIVETV_ENDED
+        tr("LiveTV ended");
     m_settings["EventCmdPlayStarted"]          = // PLAY_STARTED
         tr("Playback started");
     m_settings["EventCmdPlayStopped"]          = // PLAY_STOPPED
