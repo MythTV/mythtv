@@ -337,6 +337,7 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags,
     bool playCompleted = false;
     ProgramInfo *curProgram = NULL;
     bool startSysEventSent = false;
+    bool startLivetvEventSent = false;
 
     if (tvrec)
     {
@@ -398,6 +399,7 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags,
             else if (!startSysEventSent)
             {
                 startSysEventSent = true;
+                startLivetvEventSent = true;
                 gCoreContext->SendSystemEvent("LIVETV_STARTED");
             }
 
@@ -506,6 +508,9 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags,
     }
 
     GetMythMainWindow()->PauseIdleTimer(false);
+
+    if (startLivetvEventSent)
+        gCoreContext->SendSystemEvent("LIVETV_ENDED");
 
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "-- end");
 
