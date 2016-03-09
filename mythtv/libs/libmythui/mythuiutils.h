@@ -6,16 +6,17 @@
 #include "mythuiexp.h"
 
 class QString;
+class MythUIType;
 
 struct MUI_PUBLIC ETPrintWarning
 {
-    static bool Child(const QString &container_name, const QString &child_name);
+    static bool Child(const MythUIType *container, const QString &child_name);
     static bool Container(const QString &child_name);
 };
 
 struct MUI_PUBLIC ETPrintError
 {
-    static bool Child(const QString &container_name, const QString &child_name);
+    static bool Child(const MythUIType *container, const QString &child_name);
     static bool Container(const QString &child_name);
 };
 
@@ -41,9 +42,9 @@ struct UIUtilDisp
             return false;
 
         if (err)
-            *err |= ErrorDispatch::Child(container->objectName(), name);
+            *err |= ErrorDispatch::Child(container, name);
         else
-            ErrorDispatch::Child(container->objectName(), name);
+            ErrorDispatch::Child(container, name);
         return true;
     }
 };
