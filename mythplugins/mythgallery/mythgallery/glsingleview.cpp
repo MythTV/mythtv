@@ -293,7 +293,8 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
     if (m_slideshow_running)
         GetMythMainWindow()->PauseIdleTimer(false);
     bool wasRunning = m_slideshow_running;
-    m_slideshow_timer->stop();
+    if (m_slideshow_timer)
+        m_slideshow_timer->stop();
     m_slideshow_running = false;
     GetMythUI()->RestoreScreensaver();
     m_effect_running = false;
@@ -486,7 +487,7 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
         }
     }
 
-    if (m_slideshow_running || m_info_show_short)
+    if (m_slideshow_timer && (m_slideshow_running || m_info_show_short))
     {
         m_slideshow_timer->stop();
         m_slideshow_timer->setSingleShot(true);
@@ -1458,7 +1459,7 @@ void GLSingleView::SlideTimeout(void)
     }
 
     updateGL();
-    if (m_slideshow_running)
+    if (m_slideshow_running && m_slideshow_timer)
     {
         m_slideshow_timer->stop();
         m_slideshow_timer->setSingleShot(true);
