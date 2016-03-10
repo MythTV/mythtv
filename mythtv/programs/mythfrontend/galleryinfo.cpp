@@ -50,8 +50,8 @@ static QSet<QString> kBasicInfoSet = QSet<QString>::fromList(kBasicInfoFields);
 
 //! Constructor
 InfoList::InfoList(MythScreenType &screen)
-    : m_screen(screen), m_infoVisible(kNoInfo),
-      m_mgr(ImageManagerFe::getInstance())
+    : m_screen(screen), m_btnList(NULL),
+      m_infoVisible(kNoInfo), m_mgr(ImageManagerFe::getInstance())
 {
     m_timer.setSingleShot(true);
     m_timer.setInterval(1000);
@@ -231,7 +231,7 @@ void InfoList::Display(ImageItemK &im, const QStringList &tagStrings)
         tagPath = tr("Storage Group");
         tagName = m_mgr.DeviceCaption(im);
     }
-    
+
     CreateButton(tr("Name"), tagName);
 
     // Only show non-local hostnames
@@ -240,7 +240,7 @@ void InfoList::Display(ImageItemK &im, const QStringList &tagStrings)
     CreateButton(tr("Path"), QString("%1%2 %3").arg(host, tagPath, clone));
 
     if (im.IsDevice())
-        CreateButton(tr("Last scan"), 
+        CreateButton(tr("Last scan"),
                      MythDate::toString(QDateTime::fromTime_t(im.m_date),
                                         MythDate::kDateTimeFull | MythDate::kAddYear));
 
@@ -248,7 +248,7 @@ void InfoList::Display(ImageItemK &im, const QStringList &tagStrings)
         CreateCount(im);
 
     if (!im.IsDevice())
-        CreateButton(tr("Modified"), 
+        CreateButton(tr("Modified"),
                      MythDate::toString(QDateTime::fromTime_t(im.m_modTime),
                                         MythDate::kDateTimeFull | MythDate::kAddYear));
 
