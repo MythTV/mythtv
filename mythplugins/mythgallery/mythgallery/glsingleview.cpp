@@ -166,7 +166,7 @@ void GLSingleView::CleanUp(void)
     makeCurrent();
 
     if (m_slideshow_running)
-    {  
+    {
         GetMythMainWindow()->PauseIdleTimer(false);
         GetMythUI()->RestoreScreensaver();
     }
@@ -703,7 +703,7 @@ int GLSingleView::GetNearestGLTextureSize(int v) const
         }
     }
 
-    if (n > 1)
+    if (n > 1 && last < 31)
         s = 1 << (last + 1);
     else
         s = 1 << last;
