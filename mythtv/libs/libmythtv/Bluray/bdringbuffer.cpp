@@ -60,7 +60,7 @@ static int _img_read(void *handle, void *buf, int lba, int num_blocks)
 
 BDInfo::BDInfo(const QString &filename)
 {
-    BLURAY* bdnav;
+    BLURAY* bdnav = NULL;
 
     LOG(VB_PLAYBACK, LOG_INFO, QString("BDInfo: Trying %1").arg(filename));
     QString name = filename;
