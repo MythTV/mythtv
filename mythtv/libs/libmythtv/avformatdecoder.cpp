@@ -436,7 +436,7 @@ AvFormatDecoder::~AvFormatDecoder()
     while (!storedPackets.isEmpty())
     {
         AVPacket *pkt = storedPackets.takeFirst();
-        av_free_packet(pkt);
+        av_packet_unref(pkt);
         delete pkt;
     }
 
@@ -813,7 +813,7 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
         while (!storedPackets.isEmpty())
         {
             AVPacket *pkt = storedPackets.takeFirst();
-            av_free_packet(pkt);
+            av_packet_unref(pkt);
             delete pkt;
         }
 
@@ -3500,7 +3500,7 @@ bool AvFormatDecoder::PreProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     if (framesRead == 0 && !justAfterChange &&
         !(pkt->flags & AV_PKT_FLAG_KEY))
     {
-        av_free_packet(pkt);
+        av_packet_unref(pkt);
         return false;
     }
 
@@ -4895,7 +4895,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
         {
             if (pkt)
             {
-                av_free_packet(pkt);
+                av_packet_unref(pkt);
                 delete pkt;
             }
             pkt = storedPackets.takeFirst();
@@ -4932,14 +4932,14 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
         if (!ic)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "No context");
-            av_free_packet(pkt);
+            av_packet_unref(pkt);
             continue;
         }
 
         if (pkt->stream_index >= (int)ic->nb_streams)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Bad stream");
-            av_free_packet(pkt);
+            av_packet_unref(pkt);
             continue;
         }
 
@@ -4948,7 +4948,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
         if (!curstream)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Bad stream (NULL)");
-            av_free_packet(pkt);
+            av_packet_unref(pkt);
             continue;
         }
 
@@ -4972,7 +4972,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             // have a fatal error, so check for this before continuing.
             if (m_parent->IsErrored())
             {
-                av_free_packet(pkt);
+                av_packet_unref(pkt);
                 delete pkt;
                 return false;
             }
@@ -4982,7 +4982,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             curstream->codec->codec_id == AV_CODEC_ID_TEXT)
         {
             ProcessRawTextPacket(pkt);
-            av_free_packet(pkt);
+            av_packet_unref(pkt);
             continue;
         }
 
@@ -4990,14 +4990,14 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             curstream->codec->codec_id == AV_CODEC_ID_DVB_TELETEXT)
         {
             ProcessDVBDataPacket(curstream, pkt);
-            av_free_packet(pkt);
+            av_packet_unref(pkt);
             continue;
         }
 
         if (codec_type == AVMEDIA_TYPE_DATA)
         {
             ProcessDataPacket(curstream, pkt, decodetype);
-            av_free_packet(pkt);
+            av_packet_unref(pkt);
             continue;
         }
 
@@ -5012,7 +5012,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                         .arg(ff_codec_id_string(curstream->codec->codec_id))
                         .arg(curstream->codec->codec_id));
             }
-            av_free_packet(pkt);
+            av_packet_unref(pkt);
             continue;
         }
 
@@ -5076,7 +5076,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
         if (!have_err)
             frame_decoded = 1;
 
-        av_free_packet(pkt);
+        av_packet_unref(pkt);
     }
 
     if (pkt)

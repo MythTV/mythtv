@@ -316,7 +316,7 @@ int AVFormatWriter::WriteVideoFrame(VideoFrame *frame)
     frame->timecode = tc + m_startingTimecodeOffset;
     m_framesWritten++;
 
-    av_free_packet(&pkt);
+    av_packet_unref(&pkt);
 
     return 1;
 }
@@ -427,7 +427,7 @@ int AVFormatWriter::WriteAudioFrame(unsigned char *buf, int fnum, long long &tim
                 "av_interleaved_write_frame couldn't write Audio");
     timecode = tc + m_startingTimecodeOffset;
 
-    av_free_packet(&pkt);
+    av_packet_unref(&pkt);
 
     return 1;
 }

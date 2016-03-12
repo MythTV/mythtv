@@ -41,7 +41,7 @@ void AvFormatDecoderDVD::ReleaseLastVideoPkt()
 {
     if (m_lastVideoPkt)
     {
-        av_free_packet(m_lastVideoPkt);
+        av_packet_unref(m_lastVideoPkt);
         delete m_lastVideoPkt;
         m_lastVideoPkt = NULL;
         m_lbaLastVideoPkt = INVALID_LBA;
@@ -330,7 +330,7 @@ bool AvFormatDecoderDVD::ProcessVideoPacket(AVStream *stream, AVPacket *pkt)
         }
         else
         {
-            av_free_packet(m_lastVideoPkt);
+            av_packet_unref(m_lastVideoPkt);
         }
 
         av_init_packet(m_lastVideoPkt);

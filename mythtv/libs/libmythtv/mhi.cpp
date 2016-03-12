@@ -1949,7 +1949,7 @@ void MHIBitmap::CreateFromMPEG(const unsigned char *data, int length)
 
 Close:
     pkt.data = buff;
-    av_free_packet(&pkt);
+    av_packet_unref(&pkt);
     avcodec_close(c);
     av_free(c);
 }

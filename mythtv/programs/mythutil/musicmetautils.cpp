@@ -289,7 +289,7 @@ static int CalcTrackLength(const MythUtilCommandLineParser &cmdline)
                     if (pkt.stream_index == (int)i)
                         time = time + pkt.duration;
 
-                    av_free_packet(&pkt);
+                    av_packet_unref(&pkt);
                 }
 
                 duration = time * av_q2d(inputFC->streams[i]->time_base);

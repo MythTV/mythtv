@@ -111,7 +111,7 @@ MPEG2frame::MPEG2frame(int size) :
 
 MPEG2frame::~MPEG2frame()
 {
-    av_free_packet(&pkt);
+    av_packet_unref(&pkt);
 }
 
 void MPEG2frame::ensure_size(int size)
@@ -131,7 +131,7 @@ void MPEG2frame::ensure_size(int size)
 void MPEG2frame::set_pkt(AVPacket *newpkt)
 {
     // TODO: Don't free + copy, attempt to re-use existing buffer
-    av_free_packet(&pkt);
+    av_packet_unref(&pkt);
     av_copy_packet(&pkt, newpkt);
 }
 
@@ -1402,14 +1402,14 @@ int MPEG2fixup::GetFrame(AVPacket *pkt)
                 {
                     LOG(VB_GENERAL, LOG_ERR,
                         "Found end of file without finding any frames");
-                    av_free_packet(pkt);
+                    av_packet_unref(pkt);
                     return 1;
                 }
 
                 MPEG2frame *tmpFrame = GetPoolFrame(&vFrame.last()->pkt);
                 if (tmpFrame == NULL)
                 {
-                    av_free_packet(pkt);
+                    av_packet_unref(pkt);
                     return 1;
                 }
 
@@ -1423,7 +1423,7 @@ int MPEG2fixup::GetFrame(AVPacket *pkt)
                   aFrame.contains(pkt->stream_index))
                 done = true;
             else 
-                av_free_packet(pkt);
+                av_packet_unref(pkt);
         }
         pkt->duration = framenum++;
         if ((showprogress || update_status) &&
@@ -1452,7 +1452,7 @@ int MPEG2fixup::GetFrame(AVPacket *pkt)
         MPEG2frame *tmpFrame = GetPoolFrame(pkt);
         if (tmpFrame == NULL)
         {
-            av_free_packet(pkt);
+            av_packet_unref(pkt);
             return 1;
         }
 
@@ -1460,7 +1460,7 @@ int MPEG2fixup::GetFrame(AVPacket *pkt)
         {
             case AVMEDIA_TYPE_VIDEO:
                 vFrame.append(tmpFrame);
-                av_free_packet(pkt);
+                av_packet_unref(pkt);
 
                 if (!ProcessVideo(vFrame.last(), header_decoder))
                     return 0;
@@ -1478,12 +1478,12 @@ int MPEG2fixup::GetFrame(AVPacket *pkt)
                         QString("Invalid stream ID %1, ignoring").arg(pkt->stream_index));
                     framePool.enqueue(tmpFrame);
                 }
-                av_free_packet(pkt);
+                av_packet_unref(pkt);
                 return 0;
 
             default:
                 framePool.enqueue(tmpFrame);
-                av_free_packet(pkt);
+                av_packet_unref(pkt);
                 return 1;
         }
     }
@@ -1834,7 +1834,7 @@ int MPEG2fixup::ConvertToI(FrameList *orderedFrames, int headPos)
                 .arg(i).arg(GetFrameTypeT(spare)).arg(fname));
 
         spare->set_pkt(&pkt);
-        av_free_packet(&pkt);
+        av_packet_unref(&pkt);
         SetFrameNum(spare->pkt.data, GetFrameNum(spare));
         ProcessVideo(spare, header_decoder); //process this new frame
     }
@@ -1904,7 +1904,7 @@ int MPEG2fixup::InsertFrame(int frameNum, int64_t deltaPTS,
         deltaPTS -= ptsIncrement;
     }
 
-    av_free_packet(&pkt);
+    av_packet_unref(&pkt);
     // update frame # for all later frames in this group
     index++;
     RenumberFrames(index, increment);
@@ -2340,7 +2340,7 @@ int MPEG2fixup::Start()
 
                 if (!Lreorder.isEmpty())
                 {
-                    av_free_packet(&lastRealvPkt);
+                    av_packet_unref(&lastRealvPkt);
                     av_copy_packet(&lastRealvPkt, &Lreorder.last()->pkt);
                 }
 
@@ -2830,7 +2830,7 @@ int MPEG2fixup::BuildKeyframeIndex(QString &file,
                 pkt.duration * 1000; // msec
             count++;
         }
-        av_free_packet(&pkt);
+        av_packet_unref(&pkt);
     }
 
     // Close input file

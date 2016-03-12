@@ -265,7 +265,7 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
         }
 
         m_spdifenc->WriteFrame((uint8_t *)pkt.data, pkt.size);
-        av_free_packet(&pkt);
+        av_packet_unref(&pkt);
 
         // Check if output buffer is big enough
         required_len = outlen + m_spdifenc->GetProcessedSize();

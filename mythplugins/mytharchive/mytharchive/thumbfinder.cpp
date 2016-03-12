@@ -811,7 +811,7 @@ bool ThumbFinder::getFrameImage(bool needKeyFrame, int64_t requiredPTS)
 
             if (!gotKeyFrame && needKeyFrame)
             {
-                av_free_packet(&pkt);
+                av_packet_unref(&pkt);
                 continue;
             }
 
@@ -827,7 +827,7 @@ bool ThumbFinder::getFrameImage(bool needKeyFrame, int64_t requiredPTS)
             m_currentPTS = pkt.dts;
         }
 
-        av_free_packet(&pkt);
+        av_packet_unref(&pkt);
     }
 
     if (frameFinished)
