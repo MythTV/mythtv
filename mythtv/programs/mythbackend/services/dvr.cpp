@@ -581,8 +581,10 @@ DTC::TitleInfoList* Dvr::GetTitleInfoList()
 
     QString querystr = QString(
         "SELECT title, inetref, count(title) as count "
-        "    FROM recorded "
-        "    WHERE deletepending = 0 "
+        "    FROM recorded AS r "
+        "    JOIN recgroups AS g ON r.recgroupid = g.recgroupid "
+        "    WHERE g.recgroup != 'LiveTV' "
+        "    AND r.deletepending = 0 "
         "    GROUP BY title, inetref "
         "    ORDER BY title");
 
