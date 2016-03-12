@@ -733,7 +733,7 @@ AVFrame* AVFormatWriter::AllocPicture(enum AVPixelFormat pix_fmt)
     if (!picture_buf)
     {
         LOG(VB_RECORD, LOG_ERR, LOC + "AllocPicture(): av_malloc() failed");
-        av_frame_free(picture);
+        av_frame_free(&picture);
         return NULL;
     }
     avpicture_fill((AVPicture *)picture, picture_buf,
