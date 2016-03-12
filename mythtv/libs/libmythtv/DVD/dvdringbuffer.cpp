@@ -1788,8 +1788,8 @@ bool DVDRingBuffer::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
                 {
                     for (i = 0; i < sub->num_rects; i++)
                     {
-                        av_free(sub->rects[i]->pict.data[0]);
-                        av_free(sub->rects[i]->pict.data[1]);
+                        av_free(sub->rects[i]->data[0]);
+                        av_free(sub->rects[i]->data[1]);
                         av_freep(&sub->rects[i]);
                     }
                     av_freep(&sub->rects);
@@ -1804,25 +1804,25 @@ bool DVDRingBuffer::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
                 {
                     sub->rects[i] = (AVSubtitleRect *) av_mallocz(sizeof(AVSubtitleRect));
                 }
-                sub->rects[0]->pict.data[1] = (uint8_t*)av_mallocz(4 * 4);
+                sub->rects[0]->data[1] = (uint8_t*)av_mallocz(4 * 4);
                 decode_rle(bitmap, w * 2, w, (h + 1) / 2,
                             spu_pkt, offset1 * 2, buf_size);
                 decode_rle(bitmap + w, w * 2, w, h / 2,
                             spu_pkt, offset2 * 2, buf_size);
-                guess_palette((uint32_t*)sub->rects[0]->pict.data[1], palette, alpha);
-                sub->rects[0]->pict.data[0] = bitmap;
+                guess_palette((uint32_t*)sub->rects[0]->data[1], palette, alpha);
+                sub->rects[0]->data[0] = bitmap;
                 sub->rects[0]->x = x1;
                 sub->rects[0]->y = y1;
                 sub->rects[0]->w = w;
                 sub->rects[0]->h = h;
                 sub->rects[0]->type = SUBTITLE_BITMAP;
                 sub->rects[0]->nb_colors = 4;
-                sub->rects[0]->pict.linesize[0] = w;
+                sub->rects[0]->linesize[0] = w;
                 if (NumMenuButtons() > 0)
                 {
                     sub->rects[1]->type = SUBTITLE_BITMAP;
-                    sub->rects[1]->pict.data[1] = (uint8_t*)av_malloc(4 *4);
-                    guess_palette((uint32_t*)sub->rects[1]->pict.data[1],
+                    sub->rects[1]->data[1] = (uint8_t*)av_malloc(4 *4);
+                    guess_palette((uint32_t*)sub->rects[1]->data[1],
                                 m_button_color, m_button_alpha);
                 }
                 else
@@ -1880,7 +1880,7 @@ bool DVDRingBuffer::DVDButtonUpdate(bool b_mode)
     // the correct palette for the current highlight is set
     if (m_dvdMenuButton.rects && (m_dvdMenuButton.num_rects > 1))
     {
-        guess_palette((uint32_t*)m_dvdMenuButton.rects[1]->pict.data[1],
+        guess_palette((uint32_t*)m_dvdMenuButton.rects[1]->data[1],
                     m_button_color, m_button_alpha);
     }
 
@@ -1902,8 +1902,8 @@ void DVDRingBuffer::ClearMenuButton(void)
         for (uint i = 0; i < m_dvdMenuButton.num_rects; i++)
         {
             AVSubtitleRect* rect = m_dvdMenuButton.rects[i];
-            av_free(rect->pict.data[0]);
-            av_free(rect->pict.data[1]);
+            av_free(rect->data[0]);
+            av_free(rect->data[1]);
             av_free(rect);
         }
         av_free(m_dvdMenuButton.rects);
@@ -2338,13 +2338,13 @@ int DVDRingBuffer::find_smallest_bounding_rectangle(AVSubtitle *s)
 
     for(i = 0; i < s->rects[0]->nb_colors; i++)
     {
-        if ((((uint32_t*)s->rects[0]->pict.data[1])[i] >> 24) == 0)
+        if ((((uint32_t*)s->rects[0]->data[1])[i] >> 24) == 0)
             transp_color[i] = 1;
     }
 
     y1 = 0;
     while (y1 < s->rects[0]->h &&
-            is_transp(s->rects[0]->pict.data[0] + y1 * s->rects[0]->pict.linesize[0],
+            is_transp(s->rects[0]->data[0] + y1 * s->rects[0]->linesize[0],
                     1, s->rects[0]->w, transp_color))
     {
         y1++;
@@ -2352,14 +2352,14 @@ int DVDRingBuffer::find_smallest_bounding_rectangle(AVSubtitle *s)
 
     if (y1 == s->rects[0]->h)
     {
-        av_freep(&s->rects[0]->pict.data[0]);
+        av_freep(&s->rects[0]->data[0]);
         s->rects[0]->w = s->rects[0]->h = 0;
         return 0;
     }
 
     y2 = s->rects[0]->h - 1;
     while (y2 > 0 &&
-            is_transp(s->rects[0]->pict.data[0] + y2 * s->rects[0]->pict.linesize[0], 1,
+            is_transp(s->rects[0]->data[0] + y2 * s->rects[0]->linesize[0], 1,
                     s->rects[0]->w, transp_color))
     {
         y2--;
@@ -2367,7 +2367,7 @@ int DVDRingBuffer::find_smallest_bounding_rectangle(AVSubtitle *s)
 
     x1 = 0;
     while (x1 < (s->rects[0]->w - 1) &&
-           is_transp(s->rects[0]->pict.data[0] + x1, s->rects[0]->pict.linesize[0],
+           is_transp(s->rects[0]->data[0] + x1, s->rects[0]->linesize[0],
                     s->rects[0]->h, transp_color))
     {
         x1++;
@@ -2375,7 +2375,7 @@ int DVDRingBuffer::find_smallest_bounding_rectangle(AVSubtitle *s)
 
     x2 = s->rects[0]->w - 1;
     while (x2 > 0 &&
-           is_transp(s->rects[0]->pict.data[0] + x2, s->rects[0]->pict.linesize[0],
+           is_transp(s->rects[0]->data[0] + x2, s->rects[0]->linesize[0],
                      s->rects[0]->h, transp_color))
     {
         x2--;
@@ -2389,13 +2389,13 @@ int DVDRingBuffer::find_smallest_bounding_rectangle(AVSubtitle *s)
 
     for(y = 0; y < h; y++)
     {
-        memcpy(bitmap + w * y, s->rects[0]->pict.data[0] + x1 +
-                (y1 + y) * s->rects[0]->pict.linesize[0], w);
+        memcpy(bitmap + w * y, s->rects[0]->data[0] + x1 +
+                (y1 + y) * s->rects[0]->linesize[0], w);
     }
 
-    av_freep(&s->rects[0]->pict.data[0]);
-    s->rects[0]->pict.data[0] = bitmap;
-    s->rects[0]->pict.linesize[0] = w;
+    av_freep(&s->rects[0]->data[0]);
+    s->rects[0]->data[0] = bitmap;
+    s->rects[0]->linesize[0] = w;
     s->rects[0]->w = w;
     s->rects[0]->h = h;
     s->rects[0]->x += x1;

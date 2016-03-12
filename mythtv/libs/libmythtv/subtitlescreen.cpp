@@ -1501,8 +1501,8 @@ void SubtitleScreen::DisplayDVDButton(AVSubtitle* dvdButton, QRect &buttonPos)
     uint h = hl_button->h;
     uint w = hl_button->w;
     QRect rect = QRect(hl_button->x, hl_button->y, w, h);
-    QImage bg_image(hl_button->pict.data[0], w, h, w, QImage::Format_Indexed8);
-    uint32_t *bgpalette = (uint32_t *)(hl_button->pict.data[1]);
+    QImage bg_image(hl_button->data[0], w, h, w, QImage::Format_Indexed8);
+    uint32_t *bgpalette = (uint32_t *)(hl_button->data[1]);
 
     QVector<uint32_t> bg_palette(4);
     for (int i = 0; i < 4; i++)
@@ -1513,7 +1513,7 @@ void SubtitleScreen::DisplayDVDButton(AVSubtitle* dvdButton, QRect &buttonPos)
     const QRect fg_rect(buttonPos.translated(-hl_button->x, -hl_button->y));
     QImage fg_image = bg_image.copy(fg_rect);
     QVector<uint32_t> fg_palette(4);
-    uint32_t *fgpalette = (uint32_t *)(dvdButton->rects[1]->pict.data[1]);
+    uint32_t *fgpalette = (uint32_t *)(dvdButton->rects[1]->data[1]);
     if (fgpalette)
     {
         for (int i = 0; i < 4; i++)
@@ -1975,8 +1975,8 @@ int SubtitleScreen::DisplayScaledAVSubtitles(const AVSubtitleRect *rect,
         for (int x = bbox.left(); x <= bbox.right(); ++x)
         {
             const uint8_t color =
-                rect->pict.data[0][y * rect->pict.linesize[0] + x];
-            const uint32_t pixel = *((uint32_t *)rect->pict.data[1] + color);
+                rect->data[0][y * rect->linesize[0] + x];
+            const uint32_t pixel = *((uint32_t *)rect->data[1] + color);
             if (pixel & 0xff000000)
             {
                 empty = false;
@@ -2038,8 +2038,8 @@ int SubtitleScreen::DisplayScaledAVSubtitles(const AVSubtitleRect *rect,
         {
             int xsrc = x + bbox.left();
             const uint8_t color =
-                rect->pict.data[0][ysrc * rect->pict.linesize[0] + xsrc];
-            const uint32_t pixel = *((uint32_t *)rect->pict.data[1] + color);
+                rect->data[0][ysrc * rect->linesize[0] + xsrc];
+            const uint32_t pixel = *((uint32_t *)rect->data[1] + color);
             qImage.setPixel(x, y, pixel);
         }
     }
