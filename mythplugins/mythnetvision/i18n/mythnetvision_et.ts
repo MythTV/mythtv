@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
 <TS version="2.0" language="et_EE">
+<defaultcodec>UTF-8</defaultcodec>
 <context>
     <name>MythControls</name>
     <message>
@@ -13,245 +14,241 @@
         <source>Internet Television Client - Site/Tree View</source>
         <translation>Internetitelevisiooni klient - Lehe/puu vaade</translation>
     </message>
-</context>
-<context>
-    <name>NetSearch</name>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="212"/>
-        <source>Search Options</source>
-        <translation>Otsinguvalikud</translation>
-    </message>
-    <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="234"/>
-        <source>Stream Video</source>
-        <translation>Video voogesitus</translation>
-    </message>
-    <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="235"/>
-        <source>Open Web Link</source>
-        <translation>Ava URL</translation>
-    </message>
-    <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="249"/>
-        <source>Play</source>
-        <translation>Mängi</translation>
-    </message>
-    <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="251"/>
-        <source>Save This Video</source>
-        <translation>Salvesta see video</translation>
-    </message>
-    <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="258"/>
-        <source>Delete</source>
-        <translation>Kustuta</translation>
-    </message>
-    <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="263"/>
+        <location filename="../mythnetvision/main.cpp" line="82"/>
         <source>Previous Page</source>
         <translation>Eelmine leht</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="265"/>
+        <location filename="../mythnetvision/main.cpp" line="84"/>
         <source>Next Page</source>
         <translation>Järgmine leht</translation>
     </message>
+</context>
+<context>
+    <name>NetBase</name>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="267"/>
-        <source>Manage Search Scripts</source>
-        <translation>Muuda otsinguskripte</translation>
-    </message>
-    <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="341"/>
-        <source>Searching %1 for &quot;%2&quot;...</source>
-        <translation>Otsin %1 &quot;%2&quot;-st ...</translation>
-    </message>
-    <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="363"/>
-        <location filename="../mythnetvision/netsearch.cpp" line="379"/>
-        <source>Changing to page %1 of search &quot;%2&quot;...</source>
-        <translation>Lähen lehele %1 otsingust &quot;%2&quot;...</translation>
-    </message>
-    <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="442"/>
-        <source>Timed out waiting for query to finish.  API might be down.</source>
-        <translation>Päringu ajalimiit lõppes. API võib maas olla.</translation>
-    </message>
-    <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="564"/>
-        <source>No browser command set! MythNetVision needs MythBrowser installed to display the video.</source>
-        <translation>Veebilehitseja käsku pole sisestatud! MythNetVision vajab MythBrowser-it videote näitamiseks.</translation>
-    </message>
-    <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="604"/>
-        <source>Are you sure you want to delete this file?</source>
-        <translation>Soovid kindlasti selle faili kustutada?</translation>
-    </message>
-    <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="708"/>
+        <location filename="../mythnetvision/netbase.cpp" line="58"/>
         <source>Downloading Video...</source>
         <translation>Laen videot alla...</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="854"/>
+        <location filename="../mythnetvision/netbase.cpp" line="152"/>
+        <source>No browser command set! MythNetTree needs MythBrowser installed to display the video.</source>
+        <translation>Veebilehitseja käsku pole sisestatud! MythNetVision vajab MythBrowser-it videote näitamiseks.</translation>
+    </message>
+    <message>
+        <location filename="../mythnetvision/netbase.cpp" line="189"/>
+        <source>Are you sure you want to delete this file?</source>
+        <translation>Oled kindel, et soovid selle faili kustutada?</translation>
+    </message>
+    <message>
+        <location filename="../mythnetvision/netbase.cpp" line="245"/>
         <source>Downloading Video...
 (%1 of %2 MB)</source>
         <translation>Laen videot alla...
 (%1 %2 MB-st)</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="880"/>
+        <location filename="../mythnetvision/netbase.cpp" line="275"/>
         <source>Error downloading video to backend.</source>
         <translation>Video taustaserverisse laadimine ebaõnnestus.</translation>
+    </message>
+</context>
+<context>
+    <name>NetEditorBase</name>
+    <message>
+        <location filename="../mythnetvision/neteditorbase.cpp" line="82"/>
+        <source>Querying Backend for Internet Content Sources...</source>
+        <translation>Uurin taustaserverist interneti sisu allikaid...</translation>
+    </message>
+</context>
+<context>
+    <name>NetSearch</name>
+    <message>
+        <location filename="../mythnetvision/netsearch.cpp" line="177"/>
+        <source>Search Options</source>
+        <translation>Otsinguvalikud</translation>
+    </message>
+    <message>
+        <location filename="../mythnetvision/netsearch.cpp" line="194"/>
+        <source>Stream Video</source>
+        <translation>Video voogesitus</translation>
+    </message>
+    <message>
+        <location filename="../mythnetvision/netsearch.cpp" line="196"/>
+        <source>Open Web Link</source>
+        <translation>Ava URL</translation>
+    </message>
+    <message>
+        <location filename="../mythnetvision/netsearch.cpp" line="211"/>
+        <source>Play</source>
+        <translation>Mängi</translation>
+    </message>
+    <message>
+        <location filename="../mythnetvision/netsearch.cpp" line="214"/>
+        <source>Save This Video</source>
+        <translation>Salvesta see video</translation>
+    </message>
+    <message>
+        <location filename="../mythnetvision/netsearch.cpp" line="222"/>
+        <source>Delete</source>
+        <translation>Kustuta</translation>
+    </message>
+    <message>
+        <location filename="../mythnetvision/netsearch.cpp" line="228"/>
+        <source>Previous Page</source>
+        <translation>Eelmine leht</translation>
+    </message>
+    <message>
+        <location filename="../mythnetvision/netsearch.cpp" line="230"/>
+        <source>Next Page</source>
+        <translation>Järgmine leht</translation>
+    </message>
+    <message>
+        <location filename="../mythnetvision/netsearch.cpp" line="232"/>
+        <source>Skip 10 Pages Back</source>
+        <translation>Tagasi 10 lehte</translation>
+    </message>
+    <message>
+        <location filename="../mythnetvision/netsearch.cpp" line="236"/>
+        <source>Skip 10 Pages Forward</source>
+        <translation>Edasi 10 lehte</translation>
+    </message>
+    <message>
+        <location filename="../mythnetvision/netsearch.cpp" line="239"/>
+        <source>Manage Search Scripts</source>
+        <translation>Muuda otsinguskripte</translation>
+    </message>
+    <message>
+        <location filename="../mythnetvision/netsearch.cpp" line="289"/>
+        <source>Searching %1 for &quot;%2&quot;...</source>
+        <translation>Otsin %1 &quot;%2&quot;-st ...</translation>
+    </message>
+    <message>
+        <location filename="../mythnetvision/netsearch.cpp" line="313"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="332"/>
+        <source>Changing to page %1 of search &quot;%2&quot;...</source>
+        <translation>Lähen lehele %1 otsingust &quot;%2&quot;...</translation>
+    </message>
+    <message>
+        <location filename="../mythnetvision/netsearch.cpp" line="409"/>
+        <source>Timed out waiting for query to finish.  API might be down.</source>
+        <translation>Päringu ajalimiit lõppes. API võib maas olla.</translation>
     </message>
 </context>
 <context>
     <name>NetTree</name>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="475"/>
+        <location filename="../mythnetvision/nettree.cpp" line="405"/>
         <source>Playback/Download Options</source>
         <translation>Esitus/allalaadimis valikud</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="498"/>
+        <location filename="../mythnetvision/nettree.cpp" line="429"/>
         <source>Stream Video</source>
         <translation>Video voogesitus</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="499"/>
+        <location filename="../mythnetvision/nettree.cpp" line="430"/>
         <source>Open Web Link</source>
         <translation>Ava URL</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="502"/>
+        <location filename="../mythnetvision/nettree.cpp" line="433"/>
         <source>Save This Video</source>
         <translation>Salvesta see video</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="505"/>
+        <location filename="../mythnetvision/nettree.cpp" line="436"/>
         <source>Scan/Manage Subscriptions</source>
         <translation>Otsi/muuda liitumisi</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="506"/>
+        <location filename="../mythnetvision/nettree.cpp" line="437"/>
         <source>Change View</source>
         <translation>Muuda kuva</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="518"/>
+        <location filename="../mythnetvision/nettree.cpp" line="450"/>
         <source>View Options</source>
         <translation>Vaata valikuid</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="523"/>
+        <location filename="../mythnetvision/nettree.cpp" line="455"/>
         <source>Switch to List View</source>
         <translation>Lülitu loendi vaatele</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="525"/>
+        <location filename="../mythnetvision/nettree.cpp" line="457"/>
         <source>Switch to Gallery View</source>
         <translation>Lülitu albumi vaatele</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="527"/>
+        <location filename="../mythnetvision/nettree.cpp" line="459"/>
         <source>Switch to Browse View</source>
         <translation>Lülitu sirvimis vaatele</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="534"/>
+        <location filename="../mythnetvision/nettree.cpp" line="466"/>
         <source>Subscription Management</source>
         <translation>Liitumiste muutmine</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="539"/>
+        <location filename="../mythnetvision/nettree.cpp" line="470"/>
         <source>Update Site Maps</source>
         <translation>Uuenda allikaid</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="540"/>
+        <location filename="../mythnetvision/nettree.cpp" line="471"/>
         <source>Update RSS</source>
         <translation>Uuenda RSS-i</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="541"/>
+        <location filename="../mythnetvision/nettree.cpp" line="472"/>
         <source>Manage Site Subscriptions</source>
         <translation>Muuda allikaid</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="542"/>
+        <location filename="../mythnetvision/nettree.cpp" line="473"/>
         <source>Manage RSS Subscriptions</source>
         <translation>Muuda RSS-i liitumisi</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="544"/>
+        <location filename="../mythnetvision/nettree.cpp" line="475"/>
         <source>Enable Automatic Site Updates</source>
         <translation>Luba automaatne allikate uuendamine</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="546"/>
+        <location filename="../mythnetvision/nettree.cpp" line="478"/>
         <source>Disable Automatic Site Updates</source>
         <translation>Keela automaatne allikate uuendamine</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="600"/>
-        <location filename="../mythnetvision/nettree.cpp" line="619"/>
-        <location filename="../mythnetvision/nettree.cpp" line="657"/>
-        <location filename="../mythnetvision/nettree.cpp" line="701"/>
+        <location filename="../mythnetvision/nettree.cpp" line="533"/>
+        <location filename="../mythnetvision/nettree.cpp" line="550"/>
+        <location filename="../mythnetvision/nettree.cpp" line="580"/>
+        <location filename="../mythnetvision/nettree.cpp" line="622"/>
         <source>Back</source>
         <translation>Tagasi</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="823"/>
-        <source>No browser command set! MythNetTree needs MythBrowser installed to display the video.</source>
-        <translation>Veebilehitseja käsku pole sisestatud! MythNetVision vajab MythBrowser-it videote näitamiseks.</translation>
-    </message>
-    <message>
-        <location filename="../mythnetvision/nettree.cpp" line="873"/>
-        <source>Are you sure you want to delete this file?</source>
-        <translation>Soovid kindlasti selle faili kustutada?</translation>
-    </message>
-    <message>
-        <location filename="../mythnetvision/nettree.cpp" line="969"/>
-        <source>Downloading Video...</source>
-        <translation>Laen videot alla...</translation>
-    </message>
-    <message>
-        <location filename="../mythnetvision/nettree.cpp" line="1210"/>
+        <location filename="../mythnetvision/nettree.cpp" line="901"/>
         <source>Updating RSS.  This could take a while...</source>
         <translation>Uuendan RSS-i. See võib natuke aega võtta...</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="1225"/>
+        <location filename="../mythnetvision/nettree.cpp" line="915"/>
         <source>Updating Site Maps.  This could take a while...</source>
         <translation>Uuendan allikaid. See võib natuke aega võtta...</translation>
-    </message>
-    <message>
-        <location filename="../mythnetvision/nettree.cpp" line="1312"/>
-        <source>Downloading Video...
-(%1 of %2 MB)</source>
-        <translation>Laen videot alla...
-(%1 %2 MB-st)</translation>
-    </message>
-    <message>
-        <location filename="../mythnetvision/nettree.cpp" line="1338"/>
-        <source>Error downloading video to backend.</source>
-        <translation>Video taustaserverisse laadimine ebaõnnestus.</translation>
     </message>
 </context>
 <context>
     <name>RSSEditor</name>
     <message>
-        <location filename="../mythnetvision/rsseditor.cpp" line="535"/>
+        <location filename="../mythnetvision/rsseditor.cpp" line="504"/>
         <source>Are you sure you want to unsubscribe from this feed?</source>
         <translation>Oled kindel, et ei soov seda voogu enam jälgida?</translation>
-    </message>
-</context>
-<context>
-    <name>SearchEditor</name>
-    <message>
-        <location filename="../mythnetvision/searcheditor.cpp" line="83"/>
-        <source>Querying Backend for Internet Content Sources...</source>
-        <translation>Uurin interneti allikaid taustaserverist...</translation>
     </message>
 </context>
 <context>
@@ -511,7 +508,7 @@ To add a site, press MENU, then choose &quot;Scan/Manage Subscriptions,&quot; th
         <translation>Vali pilt</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="65"/>
+        <location filename="themestrings.h" line="66"/>
         <source>Select to change image</source>
         <translation>Vali pildi muutmiseks</translation>
     </message>
@@ -568,51 +565,61 @@ To add a site, press MENU, then choose &quot;Scan/Manage Subscriptions,&quot; th
     </message>
     <message>
         <location filename="themestrings.h" line="64"/>
+        <source>%1</source>
+        <translation>%1</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="65"/>
         <source>Search Internet Video</source>
         <translation>Otsi interneti videoid</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="66"/>
+        <location filename="themestrings.h" line="67"/>
         <source>Internet Video List</source>
         <translation>Netivideote loend</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="67"/>
+        <location filename="themestrings.h" line="68"/>
         <source>User Rating: %1</source>
         <translation>Kasutajate hinnang: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="68"/>
+        <location filename="themestrings.h" line="69"/>
         <source>By: %1</source>
         <translation>%1 poolt</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="69"/>
+        <location filename="themestrings.h" line="70"/>
         <source>Internet Video Gallery</source>
         <translation>Netivideote galerii</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="70"/>
+        <location filename="themestrings.h" line="71"/>
+        <source>%|RATING| %%|(STARS|) %%DESCRIPTION%%
+
+Part |PARTNUMBER| of %%PARTTOTAL%%
+
+Author: |AUTHOR%</source>
+        <translation>%|RATING| %%|(STARS|) %%DESCRIPTION%%
+
+Osa |PARTNUMBER| of %%PARTTOTAL%%
+
+Autor: |AUTHOR%</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="72"/>
         <source>Search popular video sites</source>
         <translation>Otsi populaarseid video lehti</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="71"/>
+        <location filename="themestrings.h" line="73"/>
         <source>Browse Internet Video</source>
         <translation>Sirvi interneti videoid</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="72"/>
+        <location filename="themestrings.h" line="74"/>
         <source>Browse highlights and entire sites</source>
         <translation>Sirvi esile tõstetuid ja kogu lehti</translation>
-    </message>
-</context>
-<context>
-    <name>TreeEditor</name>
-    <message>
-        <location filename="../mythnetvision/treeeditor.cpp" line="91"/>
-        <source>Querying Backend for Internet Content Sources...</source>
-        <translation>Uurin interneti allikaid taustaserverist...</translation>
     </message>
 </context>
 </TS>
