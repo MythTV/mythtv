@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
 <TS version="2.0" language="et_EE">
+<defaultcodec>UTF-8</defaultcodec>
 <context>
     <name>(GameTypes)</name>
     <message>
@@ -182,17 +183,17 @@ Kustutada andmebaasist?</translation>
 <context>
     <name>GameScanner</name>
     <message>
-        <location filename="../mythgame/gamescan.cpp" line="67"/>
+        <location filename="../mythgame/gamescan.cpp" line="68"/>
         <source>Verifying game files...</source>
         <translation>Kontrollin mängude faile...</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamescan.cpp" line="110"/>
+        <location filename="../mythgame/gamescan.cpp" line="111"/>
         <source>Updating game database...</source>
         <translation>Uuendan mängude andmebaasi...</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamescan.cpp" line="145"/>
+        <location filename="../mythgame/gamescan.cpp" line="146"/>
         <source>Searching for games...</source>
         <translation>Otsin mänge...</translation>
     </message>

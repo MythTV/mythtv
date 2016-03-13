@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
 <TS version="2.0" language="et_EE">
+<defaultcodec>UTF-8</defaultcodec>
 <context>
     <name>MythControls</name>
     <message>
@@ -27,12 +28,12 @@
 <context>
     <name>MythNews</name>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="393"/>
+        <location filename="../mythnews/mythnews.cpp" line="392"/>
         <source>Updated</source>
         <translation>Uuendatud</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="400"/>
+        <location filename="../mythnews/mythnews.cpp" line="399"/>
         <source>Unknown</source>
         <translation>Tundmatu</translation>
     </message>
@@ -42,32 +43,32 @@
         <translation>Uudiste lugeja on konfigureerimata.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="595"/>
+        <location filename="../mythnews/mythnews.cpp" line="594"/>
         <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
         <translation>Veebilehitseja käsku pole! MythNews vajab MythBrowser-it.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="687"/>
+        <location filename="../mythnews/mythnews.cpp" line="686"/>
         <source>Manage Feeds</source>
         <translation>Halda uudisvooge</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="688"/>
+        <location filename="../mythnews/mythnews.cpp" line="687"/>
         <source>Add Feed</source>
         <translation>Lisa voog</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="691"/>
+        <location filename="../mythnews/mythnews.cpp" line="690"/>
         <source>Edit Feed</source>
         <translation>Muuda voogu</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="692"/>
+        <location filename="../mythnews/mythnews.cpp" line="691"/>
         <source>Delete Feed</source>
         <translation>Kustuta voog</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="674"/>
+        <location filename="../mythnews/mythnews.cpp" line="673"/>
         <source>Options</source>
         <translation>Valikud</translation>
     </message>
