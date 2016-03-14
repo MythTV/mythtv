@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="en_CA">
+<TS version="2.1" language="en_CA">
 <context>
     <name>MythControls</name>
     <message>
@@ -32,42 +32,42 @@
         <translation>You haven&apos;t configured MythNews to use any sites.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="393"/>
+        <location filename="../mythnews/mythnews.cpp" line="392"/>
         <source>Updated</source>
         <translation>Updated</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="400"/>
+        <location filename="../mythnews/mythnews.cpp" line="399"/>
         <source>Unknown</source>
         <translation>Unknown</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="595"/>
+        <location filename="../mythnews/mythnews.cpp" line="594"/>
         <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
         <translation>No browser command set! MythNews needs MythBrowser to be installed.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="674"/>
+        <location filename="../mythnews/mythnews.cpp" line="673"/>
         <source>Options</source>
         <translation>Options</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="687"/>
+        <location filename="../mythnews/mythnews.cpp" line="686"/>
         <source>Manage Feeds</source>
         <translation>Manage Feeds</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="688"/>
+        <location filename="../mythnews/mythnews.cpp" line="687"/>
         <source>Add Feed</source>
         <translation>Add Feed</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="691"/>
+        <location filename="../mythnews/mythnews.cpp" line="690"/>
         <source>Edit Feed</source>
         <translation>Edit Feed</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="692"/>
+        <location filename="../mythnews/mythnews.cpp" line="691"/>
         <source>Delete Feed</source>
         <translation>Delete Feed</translation>
     </message>
