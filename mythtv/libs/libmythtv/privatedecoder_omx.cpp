@@ -714,29 +714,27 @@ bool PrivateDecoderOMX::Reset(void)
 
     m_bStartTime = false;
 
-    if (m_bSettingsHaveChanged)
+    // Flush input
+    OMX_ERRORTYPE e;
+    e = m_videc.SendCommand(OMX_CommandFlush, m_videc.Base(), 0, 50);
+    if (e != OMX_ErrorNone)
+        return false;
+
+    // Flush output
+    e = m_videc.SendCommand(OMX_CommandFlush, m_videc.Base() + 1, 0, 50);
+    if (e != OMX_ErrorNone)
+        return false;
+
+    if (m_avctx && m_avctx->get_buffer2)
     {
-        // Flush input
-        OMX_ERRORTYPE e;
-        e = m_videc.SendCommand(OMX_CommandFlush, m_videc.Base(), 0, 50);
-        if (e != OMX_ErrorNone)
-            return false;
-
-        // Flush output
-        e = m_videc.SendCommand(OMX_CommandFlush, m_videc.Base() + 1, 0, 50);
-        if (e != OMX_ErrorNone)
-            return false;
-
-        if (m_avctx && m_avctx->get_buffer2)
-        {
-            // Request new buffers when GetFrame is next called
-            m_bSettingsChanged = true;
-        }
-        else
-        {
-            // Re-submit the empty output buffers
-            FillOutputBuffers();
-        }
+        // Request new buffers when GetFrame is next called
+        QMutexLocker lock(&m_lock);
+        m_bSettingsChanged = true;
+    }
+    else
+    {
+        // Re-submit the empty output buffers
+        FillOutputBuffers();
     }
 
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + __func__ + " - end");
@@ -765,10 +763,26 @@ int PrivateDecoderOMX::GetFrame(
 
     // Check for OMX_EventPortSettingsChanged notification
     if (SettingsChanged(stream->codec) != OMX_ErrorNone)
+    {
+        // PGB If there was an error, discard this packet
+        *got_picture_ptr = 0;
         return -1;
+    }
 
-    // Submit a packet for decoding
-    return (pkt && pkt->size) ? ProcessPacket(stream, pkt) : 0;
+    // PGB If settings have changed, discard this one packet
+    QMutexLocker lock(&m_lock);
+    if (m_bSettingsHaveChanged)
+    {
+        m_bSettingsHaveChanged = false;
+        *got_picture_ptr = 0;
+        return -1;
+    }
+    else 
+    {
+        // Submit a packet for decoding
+        lock.unlock();
+        return (pkt && pkt->size) ? ProcessPacket(stream, pkt) : 0;
+    }
 }
 
 // Submit a packet for decoding
