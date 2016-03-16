@@ -7,13 +7,14 @@
 
 // libmythbase headers
 #include "mythlogging.h"
+#include "mythuitype.h"
 
-bool ETPrintWarning::Child(const QString &container_name,
+bool ETPrintWarning::Child(const MythUIType *container,
                            const QString &child_name)
 {
     LOG(VB_GUI, LOG_NOTICE,
-        QString("Container '%1' is missing child '%2'")
-        .arg(container_name).arg(child_name));
+        QString("Container '%1' is missing child '%2' at %3")
+        .arg(container->GetXMLName()).arg(child_name).arg(container->GetXMLLocation()));
     return false;
 }
 
@@ -25,12 +26,12 @@ bool ETPrintWarning::Container(const QString &child_name)
     return false;
 }
 
-bool ETPrintError::Child(const QString &container_name,
+bool ETPrintError::Child(const MythUIType *container,
                          const QString &child_name)
 {
     LOG(VB_GENERAL, LOG_ERR,
-        QString("Container '%1' is missing child '%2'")
-        .arg(container_name).arg(child_name));
+        QString("Container '%1' is missing child '%2' at %3")
+        .arg(container->GetXMLName()).arg(child_name).arg(container->GetXMLLocation()));
     return true;
 }
 

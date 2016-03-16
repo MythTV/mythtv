@@ -1437,9 +1437,30 @@ void TVRec::run(void)
             }
             else
             {
-                scanner->StartActiveScan(this, eitTransportTimeout);
-                SetFlags(kFlagEITScannerRunning, __FILE__, __LINE__);
-                eitScanStartTime = MythDate::current().addYears(1);
+                // Check if another card in the same input group is
+                // busy.  This could be either virtual DVB-devices or
+                // a second tuner on a single card
+                bool allow_eit = true;
+                vector<uint> inputids =
+                    CardUtil::GetConflictingInputs(inputid);
+                InputInfo busy_input;
+                for (uint i = 0; i < inputids.size() && allow_eit; ++i)
+                    allow_eit = !RemoteIsBusy(inputids[i], busy_input);
+                if (allow_eit)
+                {
+                    scanner->StartActiveScan(this, eitTransportTimeout);
+                    SetFlags(kFlagEITScannerRunning, __FILE__, __LINE__);
+                    eitScanStartTime =
+                        QDateTime::currentDateTime().addYears(1);
+                }
+                else
+                {
+                    LOG(VB_CHANNEL, LOG_INFO, LOC + QString(
+                            "Postponing EIT scan on input %1 "
+                            "because input %2 is busy")
+                        .arg(inputid).arg(busy_input.inputid));
+                    eitScanStartTime = eitScanStartTime.addSecs(300);
+                }
             }
         }
 

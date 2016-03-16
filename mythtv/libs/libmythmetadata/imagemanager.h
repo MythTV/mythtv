@@ -199,6 +199,7 @@ public:
                 : m_videoFileExt.contains(ext) ? kVideoFile : kUnknown; }
 protected:
     ImageAdapterBase();
+    virtual ~ImageAdapterBase() {}
 
 private:
     //! A pre-configured dir for reading image/video files

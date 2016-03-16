@@ -554,6 +554,7 @@ MythUIType *XMLParseBase::ParseUIType(
         parentDependsMap.insert(name, dependee);
 
     QFileInfo fi(filename);
+    uitype->SetXMLName(name);
     uitype->SetXMLLocation(fi.fileName(), element.lineNumber());
 
     // If this was copied from another uitype then it already has a depends

@@ -821,6 +821,12 @@
          help_text="EventCmdLivetvStarted"
          data_type="string" />
       <setting
+         value="EventCmdLivetvEnded" label="LiveTV ended"
+         setting_type="host" default_data=""
+         placeholder_text="Enter a command to run when this occurs"
+         help_text="EventCmdLivetvEnded"
+         data_type="string" />
+      <setting
          value="EventCmdPlayStarted" label="Playback started"
          setting_type="host" default_data=""
          placeholder_text="Enter a command to run when this occurs"

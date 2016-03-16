@@ -560,46 +560,64 @@ To add a site, press MENU, then choose &quot;Scan/Manage Subscriptions,&quot; th
     </message>
     <message>
         <location filename="themestrings.h" line="64"/>
+        <source>%1</source>
+        <translation>%1</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="65"/>
         <source>Search Internet Video</source>
         <translation>Εύρεση Ταινιών Διαδικτύου</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="65"/>
+        <location filename="themestrings.h" line="66"/>
         <source>Select to change image</source>
         <translation>Επιλέξτε για αλλαγή εικόνας</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="66"/>
+        <location filename="themestrings.h" line="67"/>
         <source>Internet Video List</source>
         <translation>Λίστα Ταινιών Διαδικτύου</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="67"/>
+        <location filename="themestrings.h" line="68"/>
         <source>User Rating: %1</source>
         <translation>Αξιολόγηση Χρήστη: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="68"/>
+        <location filename="themestrings.h" line="69"/>
         <source>By: %1</source>
         <translation>Από: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="69"/>
+        <location filename="themestrings.h" line="70"/>
         <source>Internet Video Gallery</source>
         <translation>Έκθεση Ταινιών Διαδικτύου</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="70"/>
+        <location filename="themestrings.h" line="71"/>
+        <source>%|RATING| %%|(STARS|) %%DESCRIPTION%%
+
+Part |PARTNUMBER| of %%PARTTOTAL%%
+
+Author: |AUTHOR%</source>
+        <translation>%|RATING| %%|(STARS|) %%DESCRIPTION%%
+
+Μέρος |PARTNUMBER| από %%PARTTOTAL%%
+
+Συγγραφέας: |AUTHOR%</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="72"/>
         <source>Search popular video sites</source>
         <translation>Αναζήτηση δημοφιλών σελίδων ταινιών</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="71"/>
+        <location filename="themestrings.h" line="73"/>
         <source>Browse Internet Video</source>
         <translation>Περιήγηση Ταινιών Διαδικτύου</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="72"/>
+        <location filename="themestrings.h" line="74"/>
         <source>Browse highlights and entire sites</source>
         <translation>Περιήγηση στιγμιοτύπων και ολόκληρων ιστοσελίδων</translation>
     </message>
