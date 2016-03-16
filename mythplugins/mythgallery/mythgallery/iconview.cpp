@@ -1219,7 +1219,7 @@ void IconView::HandleImport(void)
         return;
     }
     else
-        ShowOkPopup(tr("Found %n image(s)").arg(importdir.count()));
+        ShowOkPopup(tr("Found %n image(s)", "", importdir.count()));
 
     LoadDirectory(m_currDir);
 }
