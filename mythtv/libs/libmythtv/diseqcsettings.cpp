@@ -116,7 +116,7 @@ class DeviceRepeatSetting : public SpinBoxSetting, public Storage
             "Number of repeat (command with repeat flag ON) or resend (the same command) DiSEqC commands. "
             "If value is higher than 10, command will be resend N-10 times. "
             "If value is lower than 10, command will be repeated N times. "
-            "Repeat useful for unreliable DiSEqC equipment; resend useful when unreliable DiSEq equipment has broken/unsuported repeat flag support.");
+            "Repeat useful for unreliable DiSEqC equipment; resend useful when unreliable DiSEqC equipment has broken/unsupported repeat flag support.");
         setHelpText(help);
     }
 
