@@ -50,13 +50,14 @@ class MBASE_PUBLIC ThreadedFileWriter
     bool ReOpen(QString newFilename = "");
 
     long long Seek(long long pos, int whence);
-    uint Write(const void *data, uint count);
+    int Write(const void *data, uint count);
 
     void SetWriteBufferMinWriteSize(uint newMinSize = kMinWriteSize);
 
     void Sync(void);
     void Flush(void);
     bool SetBlocking(bool block = true);
+    bool WritesFailing(void) const { return ignore_writes; }
 
   protected:
     void DiskLoop(void);
