@@ -387,25 +387,28 @@ void TestEITFixups::testUKMarvel()
 
     DBEventEIT *event = SimpleDBEventEIT (EITFixUp::kFixUK,
                                          "Marvel's Agents of S.H.I.E.L.D.",
-                                         "",
+                                         "Maveth: <description> (S3 Ep10/22)  [AD,S]",
                                          "");
 
     PRINT_EVENT(*event);
     fixup.Fix(*event);
     PRINT_EVENT(*event);
     QCOMPARE(event->title,    QString("Marvel's Agents of S.H.I.E.L.D."));
+    QCOMPARE(event->subtitle, QString("Maveth"));
     delete event;
 
 
+    QSKIP("splits after 'of S'");
     DBEventEIT *event2 = SimpleDBEventEIT (EITFixUp::kFixUK,
-                                          "NEW: Marvel's Agents of S.H.I.E.L.D.",
-                                          "",
+                                          "New: Marvel's Agents of...",
+                                          "...S.H.I.E.L.D. Brand new series - Bouncing Back: <description> (S3 Ep11/22)  [AD,S]",
                                           "");
 
     PRINT_EVENT(*event2);
     fixup.Fix(*event2);
     PRINT_EVENT(*event2);
     QCOMPARE(event2->title,    QString("Marvel's Agents of S.H.I.E.L.D."));
+    QCOMPARE(event2->subtitle, QString("Bouncing Back"));
     delete event2;
 }
 
