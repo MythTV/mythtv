@@ -2643,7 +2643,7 @@ void ExternalConfigurationGroup::probeApp(const QString & path)
     }
     else
     {
-        ci = tr("'%1' does not exist").arg(fileInfo.absoluteFilePath());
+        ci = tr("'%1' does not exist.").arg(fileInfo.absoluteFilePath());
     }
 
     info->setValue(ci);
