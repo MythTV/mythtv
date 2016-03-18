@@ -77,6 +77,7 @@ class VideoOutputOMX : public VideoOutput, private OMXComponentCtx
     QVector<void*> m_bufs;
     MythRenderEGL *m_context;
     MythPainter *m_osdpainter;
+    MythScreenType *m_backgroundscreen;
 };
 
 #endif // ndef VIDEOOUT_OMX_H
