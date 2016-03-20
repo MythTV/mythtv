@@ -68,7 +68,7 @@ EITFixUp::EITFixUp()
       m_ukNew("(New\\.|\\s*(Brand New|New)\\s*(Series|Episode)\\s*[:\\.\\-])",Qt::CaseInsensitive),
       m_ukNewTitle("^(Brand New|New:)\\s*",Qt::CaseInsensitive),
       m_ukAlsoInHD("\\s*Also in HD\\.",Qt::CaseInsensitive),
-      m_ukCEPQ("[:\\!\\.\\?]"),
+      m_ukCEPQ("[:\\!\\.\\?]\\s"),
       m_ukColonPeriod("[:\\.]"),
       m_ukDotSpaceStart("^\\. "),
       m_ukDotEnd("\\.$"),
@@ -1013,7 +1013,8 @@ void EITFixUp::FixUK(DBEventEIT &event) const
             if (isMovie &&
                 ((position1 = strFull.indexOf(m_ukCEPQ,strPart.length())) != -1))
             {
-                 if (strFull[position1] == '!' || strFull[position1] == '?')
+                 if (strFull[position1] == '!' || strFull[position1] == '?'
+                  || (position1>2 && strFull[position1] == '.' && strFull[position1-2] == '.'))
                      position1++;
                  event.title = strFull.left(position1);
                  event.description = strFull.mid(position1 + 1);
@@ -1021,7 +1022,8 @@ void EITFixUp::FixUK(DBEventEIT &event) const
             }
             else if ((position1 = strFull.indexOf(m_ukCEPQ)) != -1)
             {
-                 if (strFull[position1] == '!' || strFull[position1] == '?')
+                 if (strFull[position1] == '!' || strFull[position1] == '?'
+                  || (position1>2 && strFull[position1] == '.' && strFull[position1-2] == '.'))
                      position1++;
                  event.title = strFull.left(position1);
                  event.description = strFull.mid(position1 + 1);

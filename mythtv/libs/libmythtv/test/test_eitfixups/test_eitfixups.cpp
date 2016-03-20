@@ -398,7 +398,6 @@ void TestEITFixups::testUKMarvel()
     delete event;
 
 
-    QSKIP("splits after 'of S'");
     DBEventEIT *event2 = SimpleDBEventEIT (EITFixUp::kFixUK,
                                           "New: Marvel's Agents of...",
                                           "...S.H.I.E.L.D. Brand new series - Bouncing Back: <description> (S3 Ep11/22)  [AD,S]",
