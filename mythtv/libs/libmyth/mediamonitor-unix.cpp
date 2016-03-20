@@ -81,6 +81,10 @@ extern "C" {
 #define UDISKS_DEVADD   "DeviceAdded"
 #define UDISKS_DEVRMV   "DeviceRemoved"
 #define UDISKS_DEVSIG   "o" // OBJECT_PATH
+// DBus UDisks2 service - https://udisks.freedesktop.org/
+#define UDISKS2_SVC     "org.freedesktop.UDisks2"
+#define UDISKS2_PATH    "/org/freedesktop/UDisks2"
+#define UDISKS2_IFACE   "org.freedesktop.UDisks2.Drive"
 #endif
 
 const char * MediaMonitorUnix::kUDEV_FIFO = "/tmp/mythtv_media";
@@ -204,7 +208,16 @@ bool MediaMonitorUnix::CheckMountable(void)
             LOG(VB_GENERAL, LOG_ALERT, LOC +
                 "CheckMountable: DBus interface error: " +
                      iface.lastError().message() );
-            continue;
+            QDBusInterface iface2(UDISKS2_SVC, UDISKS2_PATH, UDISKS2_IFACE,
+                QDBusConnection::systemBus() );
+            if (iface2.isValid()) {
+                // We have udisks2 service on this system, give up quickly
+                // TODO: Implement device monitoring via udisks2 service
+                LOG(VB_GENERAL, LOG_WARNING, LOC +
+                    "UDisks2 service found. Media Monitor does not support this yet!");
+                return false;
+            } else
+                continue;
         }
 
         // Enumerate devices
