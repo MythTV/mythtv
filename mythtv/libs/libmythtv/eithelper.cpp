@@ -1183,13 +1183,14 @@ static void init_fixup(FixupMap &fix)
     fix[   2LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
     fix[   3LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
     fix[   4LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
-    fix[   6LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
-    fix[   8LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
-    fix[  10LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
-    fix[  11LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
-    fix[  12LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
-    fix[  13LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
-    fix[  14LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
+    fix[   6LL << 32 |  133 << 16] = EITFixUp::kFixPremiere | EITFixUp::kFixHDTV;
+    fix[   8LL << 32 |  133 << 16] = EITFixUp::kFixPremiere | EITFixUp::kFixHDTV;
+    fix[   9LL << 32 |  133 << 16] = EITFixUp::kFixPremiere | EITFixUp::kFixHDTV;
+    fix[  10LL << 32 |  133 << 16] = EITFixUp::kFixPremiere | EITFixUp::kFixHDTV;
+    fix[  11LL << 32 |  133 << 16] = EITFixUp::kFixPremiere | EITFixUp::kFixHDTV;
+    fix[  12LL << 32 |  133 << 16] = EITFixUp::kFixPremiere | EITFixUp::kFixHDTV;
+    fix[  13LL << 32 |  133 << 16] = EITFixUp::kFixPremiere | EITFixUp::kFixHDTV;
+    fix[  14LL << 32 |  133 << 16] = EITFixUp::kFixPremiere | EITFixUp::kFixHDTV;
     fix[  15LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
     fix[  17LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
     // Mark Premiere HD, AXN HD and Discovery HD as HDTV
