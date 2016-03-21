@@ -138,6 +138,8 @@ EITFixUp::EITFixUp()
       m_PRO7CrewOne("^(.*):\\s+(.*)$"),
       m_PRO7Cast("\n\nDarsteller:\n(.*)$"),
       m_PRO7CastOne("^([^\\(]*)\\((.*)\\)$"),
+      m_DisneyChannelSubtitle(",([^,]+)\\s{0,1}(\\d{4})$"),
+      m_ATVSubtitle(",{0,1}\\sFolge\\s(\\d{1,3})$"),
       m_RTLEpisodeNo1("^(Folge\\s\\d{1,4})\\.*\\s*"),
       m_RTLEpisodeNo2("^(\\d{1,2}\\/[IVX]+)\\.*\\s*"),
       m_fiRerun("\\ ?Uusinta[a-zA-Z\\ ]*\\.?"),
@@ -299,6 +301,12 @@ void EITFixUp::Fix(DBEventEIT &event) const
 
     if (kFixP7S1 & event.fixup)
         FixPRO7(event);
+
+    if (kFixATV & event.fixup)
+        FixATV(event);
+
+    if (kFixDisneyChannel & event.fixup)
+        FixDisneyChannel(event);
 
     if (kFixFI & event.fixup)
         FixFI(event);
@@ -1855,6 +1863,40 @@ void EITFixUp::FixPRO7(DBEventEIT &event) const
      * \n\nKoch: Jamie Oliver
      */
 }
+
+/** \fn EITFixUp::FixDisneyChannel(DBEventEIT&) const
+*  \brief Use this to standardise the Disney Channel guide in Germany.
+*/
+void EITFixUp::FixDisneyChannel(DBEventEIT &event) const
+{
+    QRegExp tmp = m_DisneyChannelSubtitle;
+    int pos = tmp.indexIn(event.subtitle);
+    if (pos != -1)
+    {
+        if (event.airdate == 0)
+        {
+            event.airdate = tmp.cap(3).toUInt();
+        }
+	event.subtitle.replace(tmp, "");
+    }
+    tmp = QRegExp("\\s[^\\s]+-(Serie)");
+    pos = tmp.indexIn(event.subtitle);
+    if (pos != -1)
+    {
+        event.categoryType = ProgramInfo::kCategorySeries;
+        event.category=tmp.cap(0).trimmed();
+        event.subtitle.replace(tmp, "");
+    }
+}
+
+/** \fn EITFixUp::FixATV(DBEventEIT&) const
+*  \brief Use this to standardise the ATV/ATV2 guide in Germany.
+**/
+void EITFixUp::FixATV(DBEventEIT &event) const
+{
+    event.subtitle.replace(m_ATVSubtitle, "");
+}
+
 
 /** \fn EITFixUp::FixFI(DBEventEIT&) const
  *  \brief Use this to clean DVB-T guide in Finland.

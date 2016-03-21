@@ -677,4 +677,50 @@ void TestEITFixups::testUnitymedia()
     delete event;
 }
 
+void TestEITFixups::testDeDisneyChannel()
+{
+    EITFixUp fixup;
+
+    DBEventEIT *event = SimpleDBEventEIT (EITFixUp::kFixDisneyChannel,
+                                         "Meine Schwester Charlie",
+                                         "Das Ablenkungsmanöver Familien-Serie, USA 2011",
+                                         "...");
+
+    PRINT_EVENT(*event);
+    fixup.Fix(*event);
+    PRINT_EVENT(*event);
+    QCOMPARE(event->title,    QString("Meine Schwester Charlie"));
+    QCOMPARE(event->subtitle, QString("Das Ablenkungsmanöver"));
+     QCOMPARE(event->category, QString("Familien-Serie"));
+     QCOMPARE(event->categoryType, ProgramInfo::kCategorySeries);
+
+    DBEventEIT *event2 = SimpleDBEventEIT (EITFixUp::kFixDisneyChannel,
+                                         "Phineas und Ferb",
+                                         "Das Achterbahn - Musical Zeichentrick-Serie, USA 2011",
+                                         "...");
+
+    PRINT_EVENT(*event2);
+    fixup.Fix(*event2);
+    PRINT_EVENT(*event2);
+    QCOMPARE(event2->title,    QString("Phineas und Ferb"));
+    QCOMPARE(event2->subtitle, QString("Das Achterbahn - Musical"));
+}
+
+void TestEITFixups::testATV()
+{
+    EITFixUp fixup;
+
+    DBEventEIT *event = SimpleDBEventEIT (EITFixUp::kFixATV,
+                                         "Gilmore Girls",
+                                         "Eine Hochzeit und ein Todesfall, Folge 17",
+                                         "Lorelai und Rory helfen Luke in seinem Café aus, der mit den Vorbereitungen für das ...");
+
+    PRINT_EVENT(*event);
+    fixup.Fix(*event);
+    PRINT_EVENT(*event);
+    QCOMPARE(event->title,    QString("Gilmore Girls"));
+    QCOMPARE(event->subtitle, QString("Eine Hochzeit und ein Todesfall"));
+
+}
+
 QTEST_APPLESS_MAIN(TestEITFixups)

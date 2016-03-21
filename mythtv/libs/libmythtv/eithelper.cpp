@@ -1178,6 +1178,19 @@ static void init_fixup(FixupMap &fix)
     fix[                  8468 << 16 | 16426] = EITFixUp::kFixP7S1; // ProSieben MAXX - DVB-T Rhein/Main
     fix[   8707LL << 32 | 8468 << 16]         = EITFixUp::kFixP7S1; // ProSieben Sat.1 Mux - DVB-T Rhein/Main
 
+    // ATV / ATV2
+    fix[   1117LL << 32 |  1 << 16 | 13012 ] = EITFixUp::kFixATV; // ATV
+    fix[   1003LL << 32 |  1 << 16 | 13223 ] = EITFixUp::kFixATV; // ATV2
+    fix[   1003LL << 32 |  1 << 16 | 13228 ] = EITFixUp::kFixHDTV | EITFixUp::kFixATV; // ATV HD
+
+    // Disney Channel Germany
+    fix[   1055LL << 32 |  1 << 16 | 5500 ] = EITFixUp::kFixHDTV | EITFixUp::kFixDisneyChannel; // Disney Channel HD
+    fix[   1055LL << 32 |  1 << 16 | 5510 ] = EITFixUp::kFixHDTV | EITFixUp::kFixDisneyChannel; // Disney Channel HD Austria
+    fix[   5LL << 32 |  133 << 16 | 1793 ] = EITFixUp::kFixDisneyChannel; // Disney Channel HD Austria
+    fix[   1109LL << 32 |  1 << 16 | 5401 ] = EITFixUp::kFixHDTV | EITFixUp::kFixDisneyChannel; // Tele 5 HD
+    fix[   1109LL << 32 |  1 << 16 | 5421 ] = EITFixUp::kFixHDTV | EITFixUp::kFixDisneyChannel; // Tele 5 HD Austria
+    fix[   33LL << 32 |  133 << 16 | 51 ] = EITFixUp::kFixDisneyChannel; // Tele 5
+
     // Premiere EIT processing
     fix[   1LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
     fix[   2LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
