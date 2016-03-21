@@ -567,9 +567,8 @@ OMX_ERRORTYPE PrivateDecoderOMX::FreeOutputBuffersCB()
         m_lock.unlock();
 
         VideoFrame *frame = HDR2FRAME(hdr);
-        if (frame)
+        if (frame && FRAME2HDR(frame) == hdr)
         {
-            assert(FRAME2HDR(frame) == hdr);
             FRAMESETHDR(frame, 0);
 
             AVBufferRef *ref = FRAME2REF(frame);
@@ -665,7 +664,6 @@ OMX_ERRORTYPE PrivateDecoderOMX::UseBuffersCB()
 
         VideoFrame *frame = (VideoFrame*)picture->opaque;
         assert(frame);
-        assert(unsigned(frame->size) >= def.nBufferSize);
 
         OMX_BUFFERHEADERTYPE *hdr;
         e = OMX_UseBuffer(m_videc.Handle(), &hdr, m_videc.Base() + index, frame,
@@ -950,11 +948,9 @@ int PrivateDecoderOMX::GetBufferedFrame(AVStream *stream, AVFrame *picture)
         picture->reordered_opaque = Ticks2Pts(stream, hdr->nTimeStamp);
 
         VideoFrame *frame = HDR2FRAME(hdr);
-        if (frame)
-        {
-            assert(FRAME2HDR(frame) == hdr);
-            assert(FRAME2REF(frame));
 
+        if (frame && FRAME2HDR(frame) == hdr)
+        {
             frame->bpp    = bitsperpixel(frametype);
             frame->codec  = frametype;
             frame->width  = vdef.nFrameWidth;
