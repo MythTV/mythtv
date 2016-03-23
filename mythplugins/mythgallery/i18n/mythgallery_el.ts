@@ -728,14 +728,17 @@ Check the directory exists, is readable and the setting is correct on MythGaller
         <translation>Αδυναμία ανάγνωσης ή εκτέλεσης %1</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1222"/>
-        <source>Found %1 images</source>
-        <translation>Βρέθηκαν %1 φωτογραφίες</translation>
-    </message>
-    <message>
         <location filename="../mythgallery/iconview.cpp" line="1217"/>
         <source>Nothing found to import</source>
         <translation>Δεν βρέθηκε τίποτε για εισαγωγή</translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../mythgallery/iconview.cpp" line="1222"/>
+        <source>Found %n image(s)</source>
+        <translation>
+            <numerusform>Βρέθηκε %n εικόνα</numerusform>
+            <numerusform>Βρέθηκαν %n εικόνες</numerusform>
+        </translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="1319"/>
@@ -945,14 +948,9 @@ Check the directory exists, is readable and the setting is correct on MythGaller
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="7"/>
         <source>%DATE%, %TIME%</source>
         <translation>%DATE%, %TIME%</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="21"/>
-        <source>No images are present in the pictures folder.</source>
-        <translation>Δεν υπάρχουν εικόνες στο φάκελο εικόνων.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="5"/>
@@ -965,133 +963,128 @@ Check the directory exists, is readable and the setting is correct on MythGaller
         <translation>Δεν βρέθηκαν εικόνες στον προκαθορισμένο φάκελο. Σίγουρα έχετε ρυθμίσει το πρόσθετο σωστά;</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="28"/>
+        <location filename="themestrings.h" line="31"/>
         <source>SELECT: View</source>
         <translation>ΕΠΙΛΟΓΗ: Προβολή</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="29"/>
+        <location filename="themestrings.h" line="32"/>
         <source>MENU: Activate Menu</source>
         <translation>ΕΠΙΛΟΓΕΣ: Εμφανίζει Επιλογές</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="8"/>
         <source>Filter/sort images</source>
         <translation>Φιλτράρισμα/ταξινόμιση εικόνων</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="7"/>
+        <location filename="themestrings.h" line="15"/>
         <source>Syncing image %1</source>
         <translation>Συγχρονίζω την εικόνα %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="8"/>
+        <location filename="themestrings.h" line="16"/>
         <source>Creating thumbnail %1</source>
         <translation>Δημιουργία μικρογραφίας %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="17"/>
         <source>Gallery Settings</source>
         <translation>Ρυθμίσεις Συλλογής</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
-        <source>Name of the storage group for the images:</source>
-        <translation>Όνομα ομάδας αποθήκευσης για φωτογραφίες: </translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="18"/>
         <source>Sorting order of the shown images:</source>
         <translation>Ταξινόμιση εμφάνισης φωτογραφιών:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="19"/>
         <source>Time to display each image during a slideshow (ms):</source>
         <translation>Χρόνος προβολής κάθε φωτογραφίας σε παρουσίαση (ms):</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="20"/>
         <source>Type of transition between two images:</source>
         <translation>Τύπος μετάβασης μεταξύ δύο εικόνων:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="21"/>
         <source>Duration of an image transition (ms):</source>
         <translation>Διάρκεια μετάβασης (ms):</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="22"/>
         <source>Show files that are marked as hidden:</source>
         <translation>Εμφάνιση κρυφών αρχείων:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="23"/>
         <source>Clear database contents (Resync required):</source>
         <translation>Άδειασμα περιεχομένων βάσης δεδομένων (Απαιτείται επανανίχνευση):</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="24"/>
         <source>Save</source>
         <translation>Αποθήκευση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="25"/>
         <source>Cancel</source>
         <translation>Ακύρωση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="26"/>
         <source>Image Loading...</source>
         <translation>Φόρτωμα Αρχείου...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="27"/>
         <source>Directory filter:</source>
         <translation>Φίλτρο φακέλου:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="28"/>
         <source>Type filter:</source>
         <translation>Τύπος Φίλτρου:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="29"/>
         <source>Sort by:</source>
         <translation>Ταξινόμηση κατά:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="27"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Enter your current location, nearest large town or city. In some countries postal codes are also supported.</source>
         <translation>Δώστε την τοποθεσία σας ή την πλησιέστερη μεγάλη πόλη. Σε μερικές χώρες υποστηρίζεται η χρήση ταχυδρ. κώδικα.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="9"/>
         <source>Folder filter :</source>
         <oldsource>Directory filter :</oldsource>
         <translation>Φίλτρο φακέλου :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="10"/>
         <source>Type filter :</source>
         <translation>Τύπος φίλτρου:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="11"/>
         <source>Sort by :</source>
         <translation>Ταξινόμηση κατά:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="12"/>
         <source>Check Filter</source>
         <translation>Έλεγχος Φίλτρου</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="30"/>
+        <location filename="themestrings.h" line="13"/>
         <source>Done</source>
         <translation>Ολοκλήρωση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="14"/>
         <source>Save as default</source>
         <translation>Αποθήκευση ως προεπιλογή</translation>
     </message>
@@ -1117,10 +1110,10 @@ Check the directory exists, is readable and the setting is correct on MythGaller
     </message>
     <message numerus="yes">
         <location filename="../mythgallery/thumbview.cpp" line="138"/>
-        <source>Size: %n bytes</source>
+        <source>Size: %n byte(s)</source>
         <translation>
-            <numerusform>Μέγεθος: %n χαρακτήρας</numerusform>
-            <numerusform>Μέγεθος: %n χαρακτήρες</numerusform>
+            <numerusform>Μέγεθος: %n byte</numerusform>
+            <numerusform>Μέγεθος: %n bytes</numerusform>
         </translation>
     </message>
     <message numerus="yes">

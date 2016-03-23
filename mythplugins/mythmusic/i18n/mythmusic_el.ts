@@ -1082,8 +1082,8 @@ Do you want to continue playing in the background?</source>
     </message>
     <message>
         <location filename="../mythmusic/musicplayer.cpp" line="349"/>
-        <source>Got to many track unavailable errors. Maybe the host with the music on is off-line?</source>
-        <translation>Υπάρχουν υπερβολικά πολλές αποτυχίες εύρεσης τραγουδιών. Μήπως ο Η/Υ που έχει τη μουσική είναι εκτός λειτουργίας;</translation>
+        <source>Got too many track unavailable errors. Maybe the host with the music on is off-line?</source>
+        <translation>Πάρα πολλά αρχεία φαίνεταιν να λείπουν. Μήπως ο διακομιστής που έχει τη μουσική είναι σβηστός;</translation>
     </message>
     <message>
         <location filename="../mythmusic/musicplayer.cpp" line="357"/>
@@ -2128,14 +2128,6 @@ Broadcaster: %1 - Channel: %2</source>
         <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
-        <source>Import Coverart</source>
-        <translation type="obsolete">Εισαγωγή Εξωφύλλου</translation>
-    </message>
-    <message>
-        <source>Browse cover images on your system.</source>
-        <translation type="obsolete">Ψάχνει εικόνες εξωφύλλων στον Η/Υ.</translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="60"/>
         <source>File:</source>
         <translation>Αρχείο:</translation>
@@ -2149,14 +2141,6 @@ Broadcaster: %1 - Channel: %2</source>
         <location filename="themestrings.h" line="62"/>
         <source>Image Type:</source>
         <translation>Τύπος Εικόνας:</translation>
-    </message>
-    <message>
-        <source>Previous</source>
-        <translation type="obsolete">Προηγούμενο</translation>
-    </message>
-    <message>
-        <source>Next</source>
-        <translation type="obsolete">Επόμενο</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="63"/>
@@ -2179,30 +2163,14 @@ Broadcaster: %1 - Channel: %2</source>
         <translation>Εισαγωγή Μουσικής</translation>
     </message>
     <message>
-        <source>Import local music files.</source>
-        <translation type="obsolete">Εισαγωγή τοπικών αρχείων μουσικής.</translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="47"/>
         <source>Location:</source>
         <translation>Θέση:</translation>
     </message>
     <message>
-        <source>Track is part of a compilation</source>
-        <translation type="obsolete">Το τραγούδι είναι μέρος σύνθεσης</translation>
-    </message>
-    <message>
-        <source>Click to browse directories...</source>
-        <translation type="obsolete">Πατήστε για περιήγηση στους φακέλους...</translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="53"/>
         <source>Search</source>
         <translation>Αναζήτηση</translation>
-    </message>
-    <message>
-        <source>Choose Coverart</source>
-        <translation type="obsolete">Επιλέξτε Εξώφυλλο</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="56"/>
@@ -2225,41 +2193,9 @@ Broadcaster: %1 - Channel: %2</source>
         <translation>Προσθήκη Όλων Νέων</translation>
     </message>
     <message>
-        <source>Rip A CD</source>
-        <translation type="obsolete">Αντιγραφή CD</translation>
-    </message>
-    <message>
-        <source>Input metadata for the CD you have inserted.</source>
-        <translation type="obsolete">Εισαγωγή στοιχείων για το CD που εισάγατε.</translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="31"/>
         <source>Quality:</source>
         <translation>Ποιότητα:</translation>
-    </message>
-    <message>
-        <source>Album Name:</source>
-        <translation type="obsolete">Όνομα Δίσκου:</translation>
-    </message>
-    <message>
-        <source>Album Year:</source>
-        <translation type="obsolete">Έτος Δίσκου:</translation>
-    </message>
-    <message>
-        <source>Album is a compilation</source>
-        <translation type="obsolete">Ο δίσκος αποτελεί Σύνθεση</translation>
-    </message>
-    <message>
-        <source>Click here to search existing artists...</source>
-        <translation type="obsolete">Πατήστε για αναζήτηση σε υπάρχοντες καλλιτέχνες...</translation>
-    </message>
-    <message>
-        <source>Click here to search existing albums...</source>
-        <translation type="obsolete">Πατήστε για αναζήτηση σε υπάρχοντες δίσκους...</translation>
-    </message>
-    <message>
-        <source>Click here to search existing genres...</source>
-        <translation type="obsolete">Πατήστε για αναζήτηση σε υπάρχοντα είδη...</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="37"/>
@@ -2625,42 +2561,6 @@ Broadcaster: %1 - Channel: %2</source>
         <location filename="themestrings.h" line="239"/>
         <source>%CHANNEL% (%STATION%)</source>
         <translation>%CHANNEL% (%STATION%)</translation>
-    </message>
-    <message>
-        <source>Track Title:</source>
-        <translation type="obsolete">Τίτλος Τραγουδιού:</translation>
-    </message>
-    <message>
-        <source>Track Artist:</source>
-        <translation type="obsolete">Καλλιτέχνης Τραγουδιού:</translation>
-    </message>
-    <message>
-        <source>Track:</source>
-        <translation type="obsolete">Τραγούδι:</translation>
-    </message>
-    <message>
-        <source>Click Here to Select Artist</source>
-        <translation type="obsolete">Πατήστε για Επιλογή Καλλιτέχνη</translation>
-    </message>
-    <message>
-        <source>Click Here to Select Compilation</source>
-        <translation type="obsolete">Πατήστε για Επιλογή Σύνθεσης</translation>
-    </message>
-    <message>
-        <source>Click Here to Select Album</source>
-        <translation type="obsolete">Πατήστε για Επιλογή Δίσκου</translation>
-    </message>
-    <message>
-        <source>Click Here to Select Genre</source>
-        <translation type="obsolete">Πατήστε για Επιλογή Είδους</translation>
-    </message>
-    <message>
-        <source>-</source>
-        <translation type="obsolete">-</translation>
-    </message>
-    <message>
-        <source>+</source>
-        <translation type="obsolete">+</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="212"/>
@@ -3386,6 +3286,11 @@ Broadcaster: %1 - Channel: %2</source>
         <location filename="themestrings.h" line="183"/>
         <source>Visualization Settings</source>
         <translation>Ρυθμίσεις Οπτικοποίησης</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="149"/>
+        <source>Add/Edit Station and Channel</source>
+        <translation>Προσθήκη/Επεξεργασία Σταθμού και Καναλιού</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="193"/>
