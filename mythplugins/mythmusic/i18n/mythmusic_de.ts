@@ -1498,7 +1498,7 @@ Soll im Hintergrund weiterhin abgespielt werden?</translation>
     <message>
         <location filename="../mythmusic/musicplayer.cpp" line="349"/>
         <source>Got too many track unavailable errors. Maybe the host with the music on is off-line?</source>
-        <translation type="unfinished"></translation>
+        <translation>Zu viele Fehler wegen fehlender Lieder. Vielleicht ist der Host auf dem die Musik ist off-line?</translation>
     </message>
     <message>
         <location filename="../mythmusic/musicplayer.cpp" line="357"/>
@@ -1508,7 +1508,7 @@ Soll im Hintergrund weiterhin abgespielt werden?</translation>
     <message>
         <location filename="../mythmusic/musicplayer.cpp" line="778"/>
         <source>A music file scan has started on %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ein Musik Scan wurde auf %1 gestartet</translation>
     </message>
     <message>
         <location filename="../mythmusic/musicplayer.cpp" line="779"/>
@@ -1516,28 +1516,29 @@ Soll im Hintergrund weiterhin abgespielt werden?</translation>
         <location filename="../mythmusic/musicplayer.cpp" line="815"/>
         <location filename="../mythmusic/musicplayer.cpp" line="819"/>
         <source>Music File Scanner</source>
-        <translation type="unfinished"></translation>
+        <translation>Musik Scanner</translation>
     </message>
     <message>
         <location filename="../mythmusic/musicplayer.cpp" line="780"/>
         <source>This may take a while I&apos;ll give a shout when finished</source>
-        <translation type="unfinished"></translation>
+        <translation>Das könnte eine Weile dauern. Ich melde mich nach Abschluß</translation>
     </message>
     <message>
         <location filename="../mythmusic/musicplayer.cpp" line="798"/>
         <source>A music file scan has finished on %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ein Musik Scan wurde auf %1 abgeschlossen</translation>
     </message>
     <message>
         <location filename="../mythmusic/musicplayer.cpp" line="816"/>
         <source>Can&apos;t run the music file scanner because it is already running on %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Kann den Musik Scanner nicht starte, weil er bereits auf %1 läuft</translation>
     </message>
     <message>
         <location filename="../mythmusic/musicplayer.cpp" line="820"/>
         <source>The music file scanner has been running for more than 60 minutes on %1.
 Resetting and trying again</source>
-        <translation type="unfinished"></translation>
+        <translation>Der Musik Scanner läuft seit mehr als 60 Minuten auf %1.
+Resette und versuche es nochmal</translation>
     </message>
     <message>
         <location filename="../mythmusic/musicplayer.cpp" line="857"/>
@@ -1676,12 +1677,12 @@ Resetting and trying again</source>
     <message>
         <location filename="../mythmusic/main.cpp" line="854"/>
         <source>Switch to previous radio stream</source>
-        <translation type="unfinished"></translation>
+        <translation>Zum letzten Radiostream wechseln</translation>
     </message>
     <message>
         <location filename="../mythmusic/main.cpp" line="880"/>
         <source>MythMusic audio files</source>
-        <translation type="unfinished"></translation>
+        <translation>MythMusic Audiodateien</translation>
     </message>
     <message>
         <source>Filter All My Music</source>
@@ -1758,7 +1759,7 @@ Resetting and trying again</source>
     <message>
         <location filename="../mythmusic/main.cpp" line="873"/>
         <source>MythMusic audio CD</source>
-        <translation type="unfinished"></translation>
+        <translation>MythMusic Audio-CD</translation>
     </message>
     <message>
         <location filename="../mythmusic/main.cpp" line="879"/>
@@ -1972,7 +1973,7 @@ Soll die Wiedergabe im Hintergrund fortgesetzt werden?</translation>
         <location filename="../mythmusic/playersettings.cpp" line="54"/>
         <location filename="../mythmusic/playersettings.cpp" line="60"/>
         <source>First</source>
-        <translation type="unfinished"></translation>
+        <translation>Erster</translation>
     </message>
     <message>
         <location filename="../mythmusic/playersettings.cpp" line="55"/>
@@ -2011,22 +2012,22 @@ Soll die Wiedergabe im Hintergrund fortgesetzt werden?</translation>
     <message>
         <location filename="../mythmusic/playersettings.cpp" line="85"/>
         <source>Playback screen - Resume playback at either the beginning of the active play queue, the beginning of the last track played, or an exact point within the last track played or not at all.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wiedergabemaske - Mit der Wiedergabe entweder am Anfang der aktuellen Playlist, dem Beginn des letzten Lieds oder an einem bestimmtem Punkt innerhalb des letzten Lieds oder gar nicht fortfahren.</translation>
     </message>
     <message>
         <location filename="../mythmusic/playersettings.cpp" line="88"/>
         <source>Playlist Editor screen - Resume playback at either the beginning of the active play queue, the beginning of the last track played, or an exact point within the last track played or not at all.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wiedergabelisteneditor - Mit der Wiedergabe entweder am Anfang der aktuellen Playlist, dem Beginn des letzten Lieds oder an einem bestimmtem Punkt innerhalb des letzten Lieds oder gar nicht fortfahren.</translation>
     </message>
     <message>
         <location filename="../mythmusic/playersettings.cpp" line="91"/>
         <source>Radio screen - Resume playback at the previous station or not at all</source>
-        <translation type="unfinished"></translation>
+        <translation>Radiomaske - Wiedergabe mit dem letzten Sender oder gar nicht fortsetzen</translation>
     </message>
     <message>
         <location filename="../mythmusic/playersettings.cpp" line="93"/>
         <source>Specify what action to take when exiting MythMusic plugin due to a jumppoint being executed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bestimmt, was beim Verlassen des MythMusic Plugins wegen eines ausfegührten Sprungpunktes geschieht.</translation>
     </message>
     <message>
         <source>Resume playback at either the beginning of the active play queue, the beginning of the last track, or an exact point within the last track.</source>
@@ -4829,17 +4830,17 @@ Station: %1 - Sender: %2</translation>
     <message>
         <location filename="themestrings.h" line="179"/>
         <source>Resume mode (Playlist Editor):</source>
-        <translation type="unfinished"></translation>
+        <translation>Wiederaufnahmemodus (Playlisteneditor):</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="180"/>
         <source>Resume mode (Radio):</source>
-        <translation type="unfinished"></translation>
+        <translation>Wiederaufnahmemodus (Radio):</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="181"/>
         <source>Action on jumppoint:</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktion bei Sprungpunkt:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="182"/>
@@ -4854,42 +4855,42 @@ Station: %1 - Sender: %2</translation>
     <message>
         <location filename="themestrings.h" line="194"/>
         <source>Add/Edit Lyrics</source>
-        <translation type="unfinished"></translation>
+        <translation>Liedtext hinzufügen/bearbeiten</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="195"/>
         <source>Grabber:</source>
-        <translation type="unfinished"></translation>
+        <translation>Grabber:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="196"/>
         <source>Syncronized</source>
-        <translation type="unfinished"></translation>
+        <translation>Synchronisiert</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="197"/>
         <source>Lyrics:</source>
-        <translation type="unfinished"></translation>
+        <translation>Liedtext:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="243"/>
         <source>Resume mode (Playlist):</source>
-        <translation type="unfinished"></translation>
+        <translation>Wiederaufnahmemodus (Playlist):</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="253"/>
         <source>%BROADCASTER| - %%CHANNEL%</source>
-        <translation type="unfinished"></translation>
+        <translation>%BROADCASTER| - %%CHANNEL%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="254"/>
         <source>Broadcaster:</source>
-        <translation type="unfinished"></translation>
+        <translation>Rundfunkveranstalter:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="255"/>
         <source>Description:</source>
-        <translation type="unfinished"></translation>
+        <translation>Beschreibung:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="256"/>
@@ -5199,22 +5200,22 @@ Station: %1 - Sender: %2</translation>
     <message>
         <location filename="themestrings.h" line="267"/>
         <source>Syncronized:</source>
-        <translation type="unfinished"></translation>
+        <translation>Synchronisiert:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="268"/>
         <source>Allow writing metadata to tags:</source>
-        <translation type="unfinished"></translation>
+        <translation>Erlaube das Schreiben von Metadaten zu Tags:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="269"/>
         <source>Reset Database</source>
-        <translation type="unfinished"></translation>
+        <translation>Datenbank zurücksetzen</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="270"/>
         <source>Broadcaster/Channel:</source>
-        <translation type="unfinished"></translation>
+        <translation>Rundfunkveranstalter/Sender:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="271"/>
@@ -5244,7 +5245,7 @@ Station: %1 - Sender: %2</translation>
     <message>
         <location filename="themestrings.h" line="276"/>
         <source>Genres/Format:</source>
-        <translation type="unfinished"></translation>
+        <translation>Genres/Format:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="277"/>

@@ -4956,7 +4956,8 @@ Gerät unterstützt bis zu %1</translation>
         <location filename="../programs/mythfrontend/galleryconfig.cpp" line="178"/>
         <source>When set all actions that modify the filesystem or database are protected (copy, move, transform, hiding, covers). Hidden items cannot be viewed. Applies to all frontends. 
 Disabled by an empty password. Privileges persist until Gallery exits to main menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle Aktionen die das Dateisystem oder die Datenbank verändern werden geschützt (kopieren, verschieben, umwandeln, Cover). Versteckte Dinge können nicht angesehen werden. Gilt für alle Frontends. 
+Ein leeres Passwort schaltet den Schutz ab. Berechtigung besteht bis die Galerie zum Hauptmenü verlassen wird.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/galleryconfig.cpp" line="193"/>
@@ -4966,7 +4967,7 @@ Disabled by an empty password. Privileges persist until Gallery exits to main me
     <message>
         <location filename="../programs/mythfrontend/galleryconfig.cpp" line="194"/>
         <source>Clears the database and thumbnails for the Image Storage Group. A rescan will be required. Images for local media will persist.</source>
-        <translation type="unfinished"></translation>
+        <translation>Leert die Datenbank und Vorschaubilder der Speichergruppe Bilder. Macht einen erneuten Scan notwendig. Bilder für lokale Medien bleiben bestehen.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/galleryconfig.cpp" line="202"/>
@@ -4976,7 +4977,7 @@ Disabled by an empty password. Privileges persist until Gallery exits to main me
     <message>
         <location filename="../programs/mythfrontend/galleryconfig.cpp" line="203"/>
         <source>Warning! This will erase settings for: hidden images, directory covers and re-orientations. You will have to set them again after re-scanning.</source>
-        <translation type="unfinished"></translation>
+        <translation>Achtung! Das löscht die Einstellungen für: versteckte Bilder, Ordnercover und Orientierung. Sie müssen diese alle nach dem Scannen neu setzen.</translation>
     </message>
 </context>
 <context>
@@ -5596,7 +5597,8 @@ Disabled by an empty password. Privileges persist until Gallery exits to main me
     <message>
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="115"/>
         <source>Number of repeat (command with repeat flag ON) or resend (the same command) DiSEqC commands. If value is higher than 10, command will be resend N-10 times. If value is lower than 10, command will be repeated N times. Repeat useful for unreliable DiSEqC equipment; resend useful when unreliable DiSEqC equipment has broken/unsupported repeat flag support.</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>What a monster, just give it two settings (count and kind of the repeats) and move on.</translatorcomment>
+        <translation>Anzahl der Wiederholungen (Kommando mit Wiederholungskennzeichen AN) oder Mehrfachübertragungen (das gleiche Kommando) der DiSEqC Kommandos. Werte über 10 übertragen N-10 mal. Werte unter 10 wiederholen N mal. Wiederholungen sind für instabile DiSEqC-Geräte nützlich; Mehrfachsendungen sind nützlich, wenn die instabilen Geräte Wiederholungen nicht oder fehlerhaft Unterstützen.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="152"/>
@@ -6134,9 +6136,10 @@ Disabled by an empty password. Privileges persist until Gallery exits to main me
 Scan storage group using menu,
 or insert/mount local media.
 </source>
-        <translation type="unfinished">Keine Bilder gefunden.
-Scanne die Speichergruppe über das Menü,
-oder lokales Speichermedium eingeben/</translation>
+        <translation>Keine Bilder gefunden.
+Scannen Sie die Speichergruppe über das Menü,
+oder geben/hängen Sie ein lokales Speichermedium ein.
+</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="896"/>
@@ -6435,33 +6438,33 @@ oder lokales Speichermedium eingeben/</translation>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1262"/>
         <source>Show Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Optionen anzeigen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1267"/>
         <source>Hide Pictures</source>
-        <translation type="unfinished"></translation>
+        <translation>Bilder verstecken</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1268"/>
         <source>Hide Videos</source>
-        <translation type="unfinished"></translation>
+        <translation>Videos verstecken</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1271"/>
         <source>Show Videos</source>
-        <translation type="unfinished"></translation>
+        <translation>Videos anzeigen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1271"/>
         <source>Show Pictures</source>
-        <translation type="unfinished"></translation>
+        <translation>Bilder anzeigen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1275"/>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1283"/>
         <source>Image Captions</source>
-        <translation type="unfinished"></translation>
+        <translation>Bildtitel</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1278"/>
@@ -6490,17 +6493,17 @@ oder lokales Speichermedium eingeben/</translation>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1286"/>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1292"/>
         <source>Directory Captions</source>
-        <translation type="unfinished"></translation>
+        <translation>Verzeichnistitel</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1297"/>
         <source>Hide Hidden Items</source>
-        <translation type="unfinished"></translation>
+        <translation>Versteckte Dinge verbergen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1299"/>
         <source>Show Hidden Items</source>
-        <translation type="unfinished"></translation>
+        <translation>Versteckte Dinge anzeigen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1303"/>
@@ -6525,23 +6528,23 @@ oder lokales Speichermedium eingeben/</translation>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1312"/>
         <source>Show</source>
-        <translation type="unfinished">Show</translation>
+        <translation>Anzeigen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1567"/>
         <source>Do you want to delete
 %1 ?</source>
-        <translation type="unfinished"></translation>
+        <translation>Möchten Sie %1 Löschen?</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1577"/>
         <source>Do you want to delete all marked files ?</source>
-        <translation type="unfinished"></translation>
+        <translation>Möchten Sie alle markierten Dateien löschen?</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1675"/>
         <source>Enter a new name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Geben Sie einen neuen Namen ein:</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1703"/>
@@ -6551,13 +6554,13 @@ oder lokales Speichermedium eingeben/</translation>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1817"/>
         <source>Enter name of new directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Geben Sie den Namen des neuen Verzeichnis ein</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1863"/>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1990"/>
         <source>No files specified</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine Dateien angegeben</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1874"/>
@@ -6567,14 +6570,14 @@ oder lokales Speichermedium eingeben/</translation>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1901"/>
         <source>Copying files</source>
-        <translation type="unfinished"></translation>
+        <translation>Kopiere Dateien</translation>
     </message>
     <message numerus="yes">
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1919"/>
         <source>Failed to copy %L1/%Ln file(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Kopieren von %L1/%Ln Datei fehlgeschlagen</numerusform>
+            <numerusform>Kopieren von %L1/%Ln Dateien fehlgeschlagen</numerusform>
         </translation>
     </message>
     <message>
@@ -6590,27 +6593,29 @@ oder lokales Speichermedium eingeben/</translation>
     <message numerus="yes">
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="2054"/>
         <source>Failed to move %L1/%Ln file(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Verschieben von %L1/%Ln Datei fehlgeschlagen</numerusform>
+            <numerusform>Verschieben von %L1/%Ln Dateien fehlgeschlagen</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="2083"/>
         <source>Failed to create temporary directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>Anlegen des temporären Verzeichnis fehlgeschlagen.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="2093"/>
         <source>Running Import command.
 Please wait...</source>
-        <translation type="unfinished"></translation>
+        <translation>Importbefehl läuft.
+Bitten warten...</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="2103"/>
         <source>Import command failed.
 Error: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Importbefehl fehlgeschlagen.
+Fehler: %1</translation>
     </message>
 </context>
 <context>
@@ -10723,7 +10728,7 @@ Error: %1</source>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="1462"/>
         <source>Full-size (un-zoom) image</source>
-        <translation type="unfinished"></translation>
+        <translation>Bild auf volle Größe (kein Zoom)</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="1464"/>
@@ -10733,27 +10738,27 @@ Error: %1</source>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="1466"/>
         <source>Scroll image up</source>
-        <translation type="unfinished"></translation>
+        <translation>Bild nach oben rollen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="1468"/>
         <source>Scroll image left</source>
-        <translation type="unfinished"></translation>
+        <translation>Bild nach links rollen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="1470"/>
         <source>Scroll image right</source>
-        <translation type="unfinished"></translation>
+        <translation>Bild nach rechts rollen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="1472"/>
         <source>Scroll image down</source>
-        <translation type="unfinished"></translation>
+        <translation>Bild nach unten rollen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="1474"/>
         <source>Recenter image</source>
-        <translation type="unfinished"></translation>
+        <translation>Bild wieder zentrieren</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="1535"/>
@@ -11026,7 +11031,7 @@ Error: %1</source>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="590"/>
         <source>Switch Recording Input view</source>
-        <translation type="unfinished"></translation>
+        <translation>Eingangsansicht ändern</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="598"/>
@@ -11551,22 +11556,22 @@ Error: %1</source>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="867"/>
         <source>Zoom mode - vertical zoom in</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoom - vertikal hineinzoomen</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="870"/>
         <source>Zoom mode - vertical zoom out</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoom - vertikal herauszoomen</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="873"/>
         <source>Zoom mode - horizontal zoom in</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoom - horizontal hineinzoomen</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="876"/>
         <source>Zoom mode - horizontal zoom out</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoom - horizontal herauszoomen</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="878"/>
@@ -17774,7 +17779,7 @@ Die meisten DVB-C Transponder senden mit einer Symbolrate von 6,9 oder 6,875 Mil
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="926"/>
         <source>Arguments</source>
-        <translation type="unfinished"></translation>
+        <translation>Argumente</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="937"/>
@@ -34763,7 +34768,7 @@ Zum Schluß können Sie die Regel testen, aktivieren, speichern oder löschen.</
     <message>
         <location filename="../themes/themestrings.h" line="1217"/>
         <source>A redesign of the MythMediaStream theme, inspired by the MediaStream Redux skin created by JezzX: This theme has been made to look like the original XBMC skin were posible and/or applicable. Looks best with the matching menu called &apos;MythMediaStream&apos; as this menu lay-out and items are tailored for this particular theme.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ein Redesign des Theme MythMediaStream, vom Skin MediaStream Redux von JezzX inspiriert: Dieses Theme wurde im Aussehen soweit möglich und/oder sinnvoll an die original XBMC Skin angepasst. Es sieht am Besten aus, wenn das Menü &apos;MythMediaStream&apos; übernommen wird, da das Theme Menü diesem angepasst wurde.</translation>
     </message>
     <message>
         <source>%EXTRA| %%ORIGIN%</source>
