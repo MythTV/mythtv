@@ -1179,7 +1179,7 @@ void VideoDisplayProfile::CreateOpenMAXProfiles(const QString &hostname)
     DeleteProfileGroup("OpenMAX Normal", hostname);
     uint groupid = CreateProfileGroup("OpenMAX Normal", hostname);
     CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
-                  "openmax", 1, true, "openmax", "softblend", false,
+                  "openmax", 4, true, "openmax", "softblend", false,
                   "openmaxadvanced", "onefield",
                   "");
 }
