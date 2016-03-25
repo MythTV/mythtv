@@ -48,7 +48,7 @@ class ArchiveFileSelector : public FileSelector
     Q_OBJECT
 
   public:
-    ArchiveFileSelector(MythScreenStack *parent);
+    explicit ArchiveFileSelector(MythScreenStack *parent);
     ~ArchiveFileSelector(void);
 
     bool Create(void);
