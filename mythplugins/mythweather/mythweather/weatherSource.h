@@ -44,7 +44,7 @@ class WeatherSource : public QObject
                               uint          &scriptTimeout);
     static bool ProbeInfo(ScriptInfo &scriptInfo);
 
-    WeatherSource(ScriptInfo *info);
+    explicit WeatherSource(ScriptInfo *info);
     ~WeatherSource();
 
     bool isReady() { return m_ready; }
