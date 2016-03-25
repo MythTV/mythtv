@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="en_GB">
+<TS version="2.0" language="en_GB">
+<defaultcodec>UTF-8</defaultcodec>
 <context>
     <name>(MythGalleryMain)</name>
     <message>
-        <location filename="../mythgallery/main.cpp" line="54"/>
+        <location filename="../mythgallery/main.cpp" line="60"/>
         <source>MythGallery cannot find its start directory.
 %1
 Check the directory exists, is readable and the setting is correct on MythGallery&apos;s settings page.</source>
@@ -16,7 +17,7 @@ Check the directory exists, is readable and the setting is correct on MythGaller
 <context>
     <name>GLSingleView</name>
     <message>
-        <location filename="../mythgallery/glsingleview.cpp" line="246"/>
+        <location filename="../mythgallery/glsingleview.cpp" line="249"/>
         <source>Press SELECT to play again</source>
         <translation>Press SELECT to play again</translation>
     </message>
@@ -544,241 +545,233 @@ Check the directory exists, is readable and the setting is correct on MythGaller
 <context>
     <name>IconView</name>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="146"/>
+        <location filename="../mythgallery/iconview.cpp" line="147"/>
         <source>MythGallery Directory &apos;%1&apos; does not exist or is unreadable.</source>
         <translation>MythGallery Directory &apos;%1&apos; does not exist or is unreadable.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="399"/>
+        <location filename="../mythgallery/iconview.cpp" line="400"/>
         <source>%1 of %2</source>
         <translation>%1 of %2</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="410"/>
+        <location filename="../mythgallery/iconview.cpp" line="411"/>
         <source>Gallery Home</source>
         <translation>Gallery Home</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="569"/>
+        <location filename="../mythgallery/iconview.cpp" line="572"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="570"/>
+        <location filename="../mythgallery/iconview.cpp" line="573"/>
         <source>The selected device is no longer available</source>
         <translation>The selected device is no longer available</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="902"/>
+        <location filename="../mythgallery/iconview.cpp" line="916"/>
         <source>Gallery Options</source>
         <translation>Gallery Options</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="908"/>
+        <location filename="../mythgallery/iconview.cpp" line="922"/>
         <source>SlideShow</source>
         <translation>SlideShow</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="909"/>
+        <location filename="../mythgallery/iconview.cpp" line="923"/>
         <source>Random</source>
         <translation>Random</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="941"/>
+        <location filename="../mythgallery/iconview.cpp" line="958"/>
         <source>Metadata Options</source>
         <translation>Metadata Options</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="945"/>
+        <location filename="../mythgallery/iconview.cpp" line="962"/>
         <source>Rotate CW</source>
         <translation>Rotate CW</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="946"/>
+        <location filename="../mythgallery/iconview.cpp" line="963"/>
         <source>Rotate CCW</source>
         <translation>Rotate CCW</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="913"/>
-        <location filename="../mythgallery/iconview.cpp" line="953"/>
+        <location filename="../mythgallery/iconview.cpp" line="930"/>
+        <location filename="../mythgallery/iconview.cpp" line="970"/>
         <source>Marking Options</source>
         <translation>Marking Options</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="957"/>
+        <location filename="../mythgallery/iconview.cpp" line="974"/>
         <source>Select One</source>
         <translation>Select One</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="958"/>
+        <location filename="../mythgallery/iconview.cpp" line="975"/>
         <source>Clear One Marked</source>
         <translation>Clear One Marked</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="959"/>
+        <location filename="../mythgallery/iconview.cpp" line="976"/>
         <source>Select All</source>
         <translation>Select All</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="960"/>
+        <location filename="../mythgallery/iconview.cpp" line="977"/>
         <source>Clear Marked</source>
         <translation>Clear Marked</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="915"/>
-        <location filename="../mythgallery/iconview.cpp" line="980"/>
+        <location filename="../mythgallery/iconview.cpp" line="932"/>
+        <location filename="../mythgallery/iconview.cpp" line="997"/>
         <source>File Options</source>
         <translation>File Options</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="206"/>
+        <location filename="../mythgallery/iconview.cpp" line="207"/>
         <source>No images found in this folder.</source>
         <translation>No images found in this folder.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="910"/>
+        <location filename="../mythgallery/iconview.cpp" line="925"/>
+        <source>Seasonal</source>
+        <translation>Seasonal</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/iconview.cpp" line="927"/>
         <source>Meta Data Options</source>
         <translation>Meta Data Options</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="914"/>
+        <location filename="../mythgallery/iconview.cpp" line="931"/>
         <source>Filter / Sort...</source>
         <translation>Filter / Sort...</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="916"/>
+        <location filename="../mythgallery/iconview.cpp" line="933"/>
         <source>Settings...</source>
         <translation>Settings...</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="984"/>
+        <location filename="../mythgallery/iconview.cpp" line="1001"/>
         <source>Show Devices</source>
         <translation>Show Devices</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="985"/>
+        <location filename="../mythgallery/iconview.cpp" line="1002"/>
         <source>Eject</source>
         <translation>Eject</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="986"/>
+        <location filename="../mythgallery/iconview.cpp" line="1003"/>
         <source>Import</source>
         <translation>Import</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="990"/>
+        <location filename="../mythgallery/iconview.cpp" line="1007"/>
         <source>Copy here</source>
         <translation>Copy here</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="991"/>
+        <location filename="../mythgallery/iconview.cpp" line="1008"/>
         <source>Move here</source>
         <translation>Move here</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="995"/>
+        <location filename="../mythgallery/iconview.cpp" line="1012"/>
         <source>Delete</source>
         <translation>Delete</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="997"/>
+        <location filename="../mythgallery/iconview.cpp" line="1014"/>
         <source>Create folder</source>
         <translation>Create folder</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1000"/>
-        <location filename="../mythgallery/iconview.cpp" line="1396"/>
+        <location filename="../mythgallery/iconview.cpp" line="1017"/>
+        <location filename="../mythgallery/iconview.cpp" line="1413"/>
         <source>Rename</source>
         <translation>Rename</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1052"/>
+        <location filename="../mythgallery/iconview.cpp" line="1069"/>
         <source>Delete Current File or Folder</source>
         <translation>Delete Current File or Folder</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1054"/>
+        <location filename="../mythgallery/iconview.cpp" line="1071"/>
         <source>Deleting 1 folder, including any subfolders and files.</source>
         <translation>Deleting 1 folder, including any subfolders and files.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1055"/>
+        <location filename="../mythgallery/iconview.cpp" line="1072"/>
         <source>Deleting 1 image.</source>
         <translation>Deleting 1 image.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1151"/>
+        <location filename="../mythgallery/iconview.cpp" line="1168"/>
         <source>Importing images from camera. Please wait...</source>
         <translation>Importing images from camera. Please wait...</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1181"/>
+        <location filename="../mythgallery/iconview.cpp" line="1198"/>
         <source>Found an import script (%1) but running them has been disabled in the settings!</source>
         <translation>Found an import script (%1) but running them has been disabled in the settings!</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1192"/>
+        <location filename="../mythgallery/iconview.cpp" line="1209"/>
         <source>Could not read or execute %1</source>
         <translation>Could not read or execute %1</translation>
     </message>
-    <message>
-        <location filename="../mythgallery/iconview.cpp" line="1205"/>
-        <source>Found %1 images</source>
-        <translation>Found %1 images</translation>
+    <message numerus="yes">
+        <location filename="../mythgallery/iconview.cpp" line="1222"/>
+        <source>Found %n image(s)</source>
+        <translation>
+            <numerusform>Found %n image</numerusform>
+            <numerusform>Found %n images</numerusform>
+        </translation>
     </message>
     <message>
-        <source>Import pictures?</source>
-        <translation type="vanished">Import pictures?</translation>
-    </message>
-    <message>
-        <source>No</source>
-        <translation type="vanished">No</translation>
-    </message>
-    <message>
-        <source>Yes</source>
-        <translation type="vanished">Yes</translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/iconview.cpp" line="1200"/>
+        <location filename="../mythgallery/iconview.cpp" line="1217"/>
         <source>Nothing found to import</source>
         <translation>Nothing found to import</translation>
     </message>
     <message>
-        <source>OK</source>
-        <translation type="vanished">OK</translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/iconview.cpp" line="1302"/>
+        <location filename="../mythgallery/iconview.cpp" line="1319"/>
         <source>Deleting %1 images and folders, including any subfolders and files.</source>
         <translation>Deleting %1 images and folders, including any subfolders and files.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1365"/>
+        <location filename="../mythgallery/iconview.cpp" line="1382"/>
         <source>New Folder</source>
         <translation>New Folder</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1367"/>
+        <location filename="../mythgallery/iconview.cpp" line="1384"/>
         <source>Create New Folder</source>
         <translation>Create New Folder</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1432"/>
+        <location filename="../mythgallery/iconview.cpp" line="1449"/>
         <source>Failed to rename folder</source>
         <translation>Failed to rename folder</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1434"/>
+        <location filename="../mythgallery/iconview.cpp" line="1451"/>
         <source>Failed to rename file</source>
         <translation>Failed to rename file</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1494"/>
+        <location filename="../mythgallery/iconview.cpp" line="1511"/>
         <source>Moving marked images...</source>
         <translation>Moving marked images...</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1494"/>
+        <location filename="../mythgallery/iconview.cpp" line="1511"/>
         <source>Copying marked images...</source>
         <translation>Copying marked images...</translation>
     </message>
@@ -786,12 +779,17 @@ Check the directory exists, is readable and the setting is correct on MythGaller
 <context>
     <name>ImageView</name>
     <message>
-        <location filename="../mythgallery/imageview.cpp" line="118"/>
+        <location filename="../mythgallery/imageview.cpp" line="170"/>
         <source>Random Slideshow</source>
         <translation>Random Slideshow</translation>
     </message>
     <message>
-        <location filename="../mythgallery/imageview.cpp" line="124"/>
+        <location filename="../mythgallery/imageview.cpp" line="174"/>
+        <source>Seasonal Slideshow</source>
+        <translation>Seasonal Slideshow</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/imageview.cpp" line="178"/>
         <source>Slideshow</source>
         <translation>Slideshow</translation>
     </message>
@@ -799,115 +797,144 @@ Check the directory exists, is readable and the setting is correct on MythGaller
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythgallery/main.cpp" line="89"/>
+        <location filename="../mythgallery/main.cpp" line="92"/>
         <source>Image viewer / slideshow</source>
         <translation>Image viewer / slideshow</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="94"/>
+        <location filename="../mythgallery/main.cpp" line="97"/>
         <source>Start/Stop Slideshow</source>
         <translation>Start/Stop Slideshow</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="96"/>
+        <location filename="../mythgallery/main.cpp" line="99"/>
         <source>Go to the first image in thumbnail view</source>
         <translation>Go to the first image in thumbnail view</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="98"/>
+        <location filename="../mythgallery/main.cpp" line="101"/>
         <source>Go to the last image in thumbnail view</source>
         <translation>Go to the last image in thumbnail view</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="100"/>
-        <source>Start Slideshow in thumbnail view</source>
-        <translation>Start Slideshow in thumbnail view</translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/main.cpp" line="91"/>
-        <location filename="../mythgallery/main.cpp" line="102"/>
+        <location filename="../mythgallery/main.cpp" line="94"/>
         <source>Start Random Slideshow in thumbnail view</source>
         <translation>Start Random Slideshow in thumbnail view</translation>
     </message>
     <message>
+        <location filename="../mythgallery/main.cpp" line="103"/>
+        <source>Start slideshow in thumbnail view</source>
+        <translation>Start slideshow in thumbnail view</translation>
+    </message>
+    <message>
         <location filename="../mythgallery/main.cpp" line="105"/>
+        <source>Start random slideshow in thumbnail view</source>
+        <translation>Start random slideshow in thumbnail view</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="108"/>
+        <source>Start random slideshow with seasonal theme in thumbnail view</source>
+        <translation>Start random slideshow with seasonal theme in thumbnail view</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="112"/>
         <source>Rotate image right 90 degrees</source>
         <translation>Rotate image right 90 degrees</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="107"/>
+        <location filename="../mythgallery/main.cpp" line="114"/>
         <source>Rotate image left 90 degrees</source>
         <translation>Rotate image left 90 degrees</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="109"/>
+        <location filename="../mythgallery/main.cpp" line="116"/>
         <source>Zoom image out</source>
         <translation>Zoom image out</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="111"/>
+        <location filename="../mythgallery/main.cpp" line="118"/>
         <source>Zoom image in</source>
         <translation>Zoom image in</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="113"/>
+        <location filename="../mythgallery/main.cpp" line="120"/>
         <source>Scroll image up</source>
         <translation>Scroll image up</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="115"/>
+        <location filename="../mythgallery/main.cpp" line="122"/>
         <source>Scroll image left</source>
         <translation>Scroll image left</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="117"/>
+        <location filename="../mythgallery/main.cpp" line="124"/>
         <source>Scroll image right</source>
         <translation>Scroll image right</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="119"/>
+        <location filename="../mythgallery/main.cpp" line="126"/>
         <source>Scroll image down</source>
         <translation>Scroll image down</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="121"/>
+        <location filename="../mythgallery/main.cpp" line="128"/>
         <source>Recenter image</source>
         <translation>Recenter image</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="123"/>
+        <location filename="../mythgallery/main.cpp" line="130"/>
         <source>Full-size (un-zoom) image</source>
         <translation>Full-size (un-zoom) image</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="125"/>
+        <location filename="../mythgallery/main.cpp" line="132"/>
         <source>Go to the upper-left corner of the image</source>
         <translation>Go to the upper-left corner of the image</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="127"/>
+        <location filename="../mythgallery/main.cpp" line="134"/>
         <source>Go to the lower-right corner of the image</source>
         <translation>Go to the lower-right corner of the image</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="129"/>
+        <location filename="../mythgallery/main.cpp" line="136"/>
         <source>Mark image</source>
         <translation>Mark image</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="131"/>
+        <location filename="../mythgallery/main.cpp" line="138"/>
         <source>Toggle scale to fullscreen/scale to fit</source>
         <translation>Toggle scale to fullscreen/scale to fit</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="133"/>
-        <source>MythGallery Media Handler 1/2</source>
-        <translation>MythGallery Media Handler (1/2)</translation>
+        <location filename="../mythgallery/main.cpp" line="141"/>
+        <source>MythGallery Media Handler 1/3</source>
+        <translation>MythGallery Media Handler (1/3)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="144"/>
-        <source>MythGallery Media Handler 2/2</source>
-        <translation>MythGallery Media Handler (2/2)</translation>
+        <location filename="../mythgallery/main.cpp" line="142"/>
+        <source>MythGallery mixed data</source>
+        <translation>MythGallery mixed data</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="154"/>
+        <source>MythGallery Media Handler 2/3</source>
+        <translation>MythGallery Media Handler (2/3)</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="155"/>
+        <source>MythGallery images</source>
+        <translation>MythGallery images</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="167"/>
+        <source>MythGallery Media Handler 3/3</source>
+        <translation>MythGallery Media Handler (3/3)</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="168"/>
+        <source>MythGallery movies</source>
+        <translation>MythGallery movies</translation>
     </message>
 </context>
 <context>
@@ -921,14 +948,9 @@ Check the directory exists, is readable and the setting is correct on MythGaller
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="7"/>
         <source>%DATE%, %TIME%</source>
         <translation>%DATE%, %TIME%</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="21"/>
-        <source>No images are present in the pictures folder.</source>
-        <translation>No images are present in the pictures folder.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="5"/>
@@ -941,133 +963,128 @@ Check the directory exists, is readable and the setting is correct on MythGaller
         <translation>No images found in configured directory.  Are you sure you have set up the plugin properly?</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="28"/>
+        <location filename="themestrings.h" line="31"/>
         <source>SELECT: View</source>
         <translation>SELECT: View</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="29"/>
+        <location filename="themestrings.h" line="32"/>
         <source>MENU: Activate Menu</source>
         <translation>MENU: Activate Menu</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="8"/>
         <source>Filter/sort images</source>
         <translation>Filter/sort images</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="27"/>
         <source>Directory filter:</source>
         <translation>Directory filter:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="28"/>
         <source>Type filter:</source>
         <translation>Type filter:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="12"/>
         <source>Check Filter</source>
         <translation>Check Filter</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="29"/>
         <source>Sort by:</source>
         <translation>Sort by:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="7"/>
+        <location filename="themestrings.h" line="15"/>
         <source>Syncing image %1</source>
         <translation>Syncing image %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="8"/>
+        <location filename="themestrings.h" line="16"/>
         <source>Creating thumbnail %1</source>
         <translation>Creating thumbnail %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="17"/>
         <source>Gallery Settings</source>
         <translation>Gallery Settings</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
-        <source>Name of the storage group for the images:</source>
-        <translation>Name of the storage group for the images:</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="18"/>
         <source>Sorting order of the shown images:</source>
         <translation>Sorting order of the shown images:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="19"/>
         <source>Time to display each image during a slideshow (ms):</source>
         <translation>Time to display each image during a slideshow (ms):</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="20"/>
         <source>Type of transition between two images:</source>
         <translation>Type of transition between two images:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="21"/>
         <source>Duration of an image transition (ms):</source>
         <translation>Duration of an image transition (ms):</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="22"/>
         <source>Show files that are marked as hidden:</source>
         <translation>Show files that are marked as hidden:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="23"/>
         <source>Clear database contents (Resync required):</source>
         <translation>Clear database contents (Resync required):</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="24"/>
         <source>Save</source>
         <translation>Save</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="25"/>
         <source>Cancel</source>
         <translation>Cancel</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="26"/>
         <source>Image Loading...</source>
         <translation>Image Loading...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="27"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Enter your current location, nearest large town or city. In some countries postal codes are also supported.</source>
         <translation>Enter your current location, nearest large town or city. In some countries postal codes are also supported.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="30"/>
+        <location filename="themestrings.h" line="13"/>
         <source>Done</source>
         <translation>Done</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="14"/>
         <source>Save as default</source>
         <translation>Save as default</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="9"/>
         <source>Folder filter :</source>
         <oldsource>Directory filter :</oldsource>
         <translation>Folder filter :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="10"/>
         <source>Type filter :</source>
         <translation>Type filter :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="11"/>
         <source>Sort by :</source>
         <translation>Sort by :</translation>
     </message>
@@ -1075,32 +1092,32 @@ Check the directory exists, is readable and the setting is correct on MythGaller
 <context>
     <name>ThumbItem</name>
     <message>
-        <location filename="../mythgallery/thumbview.cpp" line="127"/>
+        <location filename="../mythgallery/thumbview.cpp" line="133"/>
         <source>Folder: %1</source>
         <translation>Folder: %1</translation>
     </message>
     <message>
-        <location filename="../mythgallery/thumbview.cpp" line="129"/>
+        <location filename="../mythgallery/thumbview.cpp" line="135"/>
         <source>Created: %1</source>
         <extracomment>%1 is the creation date</extracomment>
         <translation>Created: %1</translation>
     </message>
     <message>
-        <location filename="../mythgallery/thumbview.cpp" line="131"/>
+        <location filename="../mythgallery/thumbview.cpp" line="137"/>
         <source>Modified: %1</source>
         <extracomment>%1 is the modification date</extracomment>
         <translation>Modified: %1</translation>
     </message>
     <message numerus="yes">
-        <location filename="../mythgallery/thumbview.cpp" line="132"/>
-        <source>Size: %n bytes</source>
+        <location filename="../mythgallery/thumbview.cpp" line="138"/>
+        <source>Size: %n byte(s)</source>
         <translation>
             <numerusform>Size: %n byte</numerusform>
             <numerusform>Size: %n bytes</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../mythgallery/thumbview.cpp" line="133"/>
+        <location filename="../mythgallery/thumbview.cpp" line="139"/>
         <source>Width: %n pixel(s)</source>
         <translation>
             <numerusform>Width: %n pixel</numerusform>
@@ -1108,7 +1125,7 @@ Check the directory exists, is readable and the setting is correct on MythGaller
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../mythgallery/thumbview.cpp" line="134"/>
+        <location filename="../mythgallery/thumbview.cpp" line="140"/>
         <source>Height: %n pixel(s)</source>
         <translation>
             <numerusform>Height: %n pixel</numerusform>
@@ -1116,12 +1133,12 @@ Check the directory exists, is readable and the setting is correct on MythGaller
         </translation>
     </message>
     <message>
-        <location filename="../mythgallery/thumbview.cpp" line="135"/>
+        <location filename="../mythgallery/thumbview.cpp" line="141"/>
         <source>Pixel Count: %1 megapixels</source>
         <translation>Pixel Count: %1 megapixels</translation>
     </message>
     <message numerus="yes">
-        <location filename="../mythgallery/thumbview.cpp" line="137"/>
+        <location filename="../mythgallery/thumbview.cpp" line="143"/>
         <source>Rotation Angle: %n degree(s)</source>
         <translation>
             <numerusform>Rotation Angle: %n degree</numerusform>
