@@ -31,7 +31,7 @@ typedef QList< RomFileInfo > RomFileInfoList;
 class GameScannerThread : public MThread
 {
   public:
-    GameScannerThread(QObject *parent);
+    explicit GameScannerThread(QObject *parent);
     ~GameScannerThread();
 
     virtual void run(void); // MThread

@@ -104,7 +104,7 @@ class MythGamePlayerSettings : public QObject, public ConfigurationWizard
     class Name : public LineEditSetting, public GameDBStorage
     {
       public:
-        Name(const MythGamePlayerSettings &parent) :
+        explicit Name(const MythGamePlayerSettings &parent) :
             LineEditSetting(this), GameDBStorage(this, parent, "playername")
         {
             setLabel(MythGamePlayerSettings::tr("Player Name"));
