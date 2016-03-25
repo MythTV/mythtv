@@ -1056,7 +1056,7 @@ static void init_fixup(FixupMap &fix)
 {
     ///////////////////////////////////////////////////////////////////////////
     // Fixups to make EIT provided listings more useful
-    // transport_id<<32 | netword_id<<16 | service_id
+    // transport_id<<32 | original_network_id<<16 | service_id
 
     // Bell Express VU Canada
     fix[  256U << 16] = EITFixUp::kFixBell;
