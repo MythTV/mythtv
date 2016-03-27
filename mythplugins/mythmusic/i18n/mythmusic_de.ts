@@ -4743,6 +4743,11 @@ Station: %1 - Sender: %2</translation>
         <translation>Intelligente Playlists - Treffer</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="149"/>
+        <source>Add/Edit Station and Channel</source>
+        <translation>Radiosender hinzufügen/bearbeiten</translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="155"/>
         <source>Search Radio Station</source>
         <translation>Suche Radiosender</translation>
