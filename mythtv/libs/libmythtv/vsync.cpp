@@ -43,6 +43,10 @@
 #include "videoout_xv.h"
 #endif
 
+#ifdef USING_XRANDR
+#include <X11/extensions/Xrandr.h>
+#endif
+
 #ifdef __linux__
 #include <linux/rtc.h>
 #endif
@@ -201,7 +205,9 @@ void VideoSync::KeepPhase()
 }
 
 #ifndef _WIN32
-#define DRM_VBLANK_RELATIVE 0x1;
+#define DRM_VBLANK_RELATIVE 0x1
+#define DRM_VBLANK_HIGH_CRTC_SHIFT 1
+#define DRM_VBLANK_HIGH_CRTC_MASK 0x0000003e
 
 struct drm_wait_vblank_request {
     int type;
@@ -244,6 +250,7 @@ DRMVideoSync::DRMVideoSync(VideoOutput *vo, int fr, int ri, bool intl) :
     VideoSync(vo, fr, ri, intl)
 {
     m_dri_fd = -1;
+    m_crtc = 0;
 }
 
 DRMVideoSync::~DRMVideoSync()
@@ -265,8 +272,42 @@ bool DRMVideoSync::TryInit(void)
                 .arg(sm_dri_dev).arg(strerror(errno)));
         return false; // couldn't open device
     }
+#ifdef USING_XRANDR
+    bool found = false;
+    MythXDisplay *disp = OpenMythXDisplay();
+    Display *d = disp->GetDisplay();
+    XRRScreenResources *res = XRRGetScreenResourcesCurrent(d, disp->GetRoot());
+    if (res) {
+        int i, j;
+        for (i = 0; i < res->noutput; i++) {
+	    XRROutputInfo *output = XRRGetOutputInfo(d, res, res->outputs[i]);
+	    if (output) {
+                if (output->connection == RR_Connected) {
+		    for (j = 0; j < res->ncrtc; j++) {
+		        if (res->crtcs[j] == output->crtc) {
+			    m_crtc = j;
+			    found = true;
+			    LOG(VB_PLAYBACK, LOG_INFO, LOC +
+			        QString("DRMVideoSync: trying with crtc %1")
+				    .arg(m_crtc));
+			    break;
+			}
+		    }
+		}
+		XRRFreeOutputInfo(output);
+		if (found)
+		    break;
+	    }
+	}
+        XRRFreeScreenResources(res);
+    }
+    delete disp;
+    if (!found)
+        LOG(VB_PLAYBACK, LOG_WARNING, LOC +
+	    QString("DRMVideoSync: no connected crtc found, defaulting to 0"));
+#endif
 
-    blank.request.type = DRM_VBLANK_RELATIVE;
+    blank.request.type = DRM_VBLANK_RELATIVE | ((m_crtc << DRM_VBLANK_HIGH_CRTC_SHIFT) & DRM_VBLANK_HIGH_CRTC_MASK);
     blank.request.sequence = 1;
     if (drmWaitVBlank(m_dri_fd, &blank))
     {
@@ -283,7 +324,7 @@ void DRMVideoSync::Start(void)
 {
     // Wait for a refresh so we start out synched
     drm_wait_vblank_t blank;
-    blank.request.type = DRM_VBLANK_RELATIVE;
+    blank.request.type = DRM_VBLANK_RELATIVE | ((m_crtc << DRM_VBLANK_HIGH_CRTC_SHIFT) & DRM_VBLANK_HIGH_CRTC_MASK);
     blank.request.sequence = 1;
     drmWaitVBlank(m_dri_fd, &blank);
     VideoSync::Start();
@@ -303,7 +344,7 @@ int DRMVideoSync::WaitForFrame(int sync_delay)
     if (m_delay > -(m_refresh_interval/2))
     {
         drm_wait_vblank_t blank;
-        blank.request.type = DRM_VBLANK_RELATIVE;
+        blank.request.type = DRM_VBLANK_RELATIVE | ((m_crtc << DRM_VBLANK_HIGH_CRTC_SHIFT) & DRM_VBLANK_HIGH_CRTC_MASK);
         blank.request.sequence = 1;
         drmWaitVBlank(m_dri_fd, &blank);
         m_delay = CalcDelay();
@@ -318,7 +359,7 @@ int DRMVideoSync::WaitForFrame(int sync_delay)
         int n = (m_delay + m_refresh_interval - 1) / m_refresh_interval;
 
         drm_wait_vblank_t blank;
-        blank.request.type = DRM_VBLANK_RELATIVE;
+        blank.request.type = DRM_VBLANK_RELATIVE | ((m_crtc << DRM_VBLANK_HIGH_CRTC_SHIFT) & DRM_VBLANK_HIGH_CRTC_MASK);
         blank.request.sequence = n;
         drmWaitVBlank(m_dri_fd, &blank);
         m_delay = CalcDelay();

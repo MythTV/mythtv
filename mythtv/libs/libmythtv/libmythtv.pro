@@ -455,6 +455,10 @@ using_frontend {
         LIBS += -lvdpau
     }
 
+    using_xrandr {
+        DEFINES += USING_XRANDR
+    }
+
     using_opengl {
         CONFIG += opengl
         DEFINES += USING_OPENGL
