@@ -129,6 +129,7 @@ class DRMVideoSync : public VideoSync
 
   private:
     int m_dri_fd;
+    int m_crtc;
     static const char *sm_dri_dev;
     
 };
