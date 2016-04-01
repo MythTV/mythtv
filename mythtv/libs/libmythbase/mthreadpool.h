@@ -18,7 +18,7 @@ class MBASE_PUBLIC MThreadPool
 {
     friend class MPoolThread;
   public:
-    MThreadPool(const QString &name);
+    explicit MThreadPool(const QString &name);
     ~MThreadPool();
 
     void Stop(void);

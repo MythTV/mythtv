@@ -213,7 +213,7 @@ uint MPoolThread::s_thread_num = 0;
 class MThreadPoolPrivate
 {
   public:
-    MThreadPoolPrivate(const QString &name) :
+    explicit MThreadPoolPrivate(const QString &name) :
         m_name(name),
         m_running(true),
         m_expiry_timeout(120 * 1000),

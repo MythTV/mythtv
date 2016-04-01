@@ -22,7 +22,7 @@ class MBASE_PUBLIC FileSystemInfo : public QObject
              int groupid, int blksize, int64_t total, int64_t used);
     FileSystemInfo(QStringList::const_iterator &it,
             QStringList::const_iterator end);
-    FileSystemInfo(const QStringList &slist);
+    explicit FileSystemInfo(const QStringList &slist);
 
    ~FileSystemInfo(void) {};
 

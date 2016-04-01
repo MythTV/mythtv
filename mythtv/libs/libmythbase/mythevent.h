@@ -15,7 +15,7 @@
 class MBASE_PUBLIC MythEvent : public QEvent
 {
   public:
-    MythEvent(int t) : QEvent((QEvent::Type)t)
+    explicit MythEvent(int t) : QEvent((QEvent::Type)t)
     { }
 
     // lmessage is passed by value for thread safety reasons per DanielK
@@ -32,7 +32,7 @@ class MBASE_PUBLIC MythEvent : public QEvent
     }
 
     // lmessage is passed by value for thread safety reasons per DanielK
-    MythEvent(const QString lmessage) : QEvent(MythEventMessage),
+    explicit MythEvent(const QString lmessage) : QEvent(MythEventMessage),
             m_message(lmessage),    m_extradata("empty")
     {
     }
@@ -85,7 +85,7 @@ class MBASE_PUBLIC MythEvent : public QEvent
 class MBASE_PUBLIC ExternalKeycodeEvent : public QEvent
 {
   public:
-    ExternalKeycodeEvent(const int key) :
+    explicit ExternalKeycodeEvent(const int key) :
         QEvent(kEventType), m_keycode(key) {}
 
     int getKeycode() { return m_keycode; }
@@ -99,7 +99,7 @@ class MBASE_PUBLIC ExternalKeycodeEvent : public QEvent
 class MBASE_PUBLIC UpdateBrowseInfoEvent : public QEvent
 {
   public:
-    UpdateBrowseInfoEvent(const InfoMap &infoMap) :
+    explicit UpdateBrowseInfoEvent(const InfoMap &infoMap) :
         QEvent(MythEvent::kUpdateBrowseInfoEventType), im(infoMap) {}
     InfoMap im;
 };

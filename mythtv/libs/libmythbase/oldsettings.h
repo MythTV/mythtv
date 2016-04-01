@@ -23,7 +23,7 @@
 class QPixmap;
 class MBASE_PUBLIC Settings {
 public:
-        Settings(QString strSettingFile = "settings.txt");
+        explicit Settings(QString strSettingFile = "settings.txt");
         ~Settings();
 
         // Setting retrieval functions

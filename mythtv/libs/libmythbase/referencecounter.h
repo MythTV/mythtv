@@ -66,7 +66,7 @@ class MBASE_PUBLIC ReferenceCounter
 class MBASE_PUBLIC ReferenceLocker
 {
   public:
-    ReferenceLocker(ReferenceCounter *counter) : m_counter(counter) { }
+    explicit ReferenceLocker(ReferenceCounter *counter) : m_counter(counter) { }
     ~ReferenceLocker()
     {
         if (m_counter)

@@ -27,7 +27,7 @@ class MythSystemLegacyPrivate : public QObject, public ReferenceCounter
     Q_OBJECT
 
   public:
-    MythSystemLegacyPrivate(const QString &debugName);
+    explicit MythSystemLegacyPrivate(const QString &debugName);
 
     virtual void Fork(time_t timeout) = 0;
     virtual void Manage(void) = 0;

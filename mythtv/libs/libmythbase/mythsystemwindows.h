@@ -27,7 +27,7 @@ typedef QList<MythSystemLegacyWindows *> MSList_t;
 class MythSystemLegacyIOHandler: public MThread
 {
     public:
-        MythSystemLegacyIOHandler(bool read);
+        explicit MythSystemLegacyIOHandler(bool read);
         ~MythSystemLegacyIOHandler() { wait(); }
         void   run(void);
 
@@ -85,7 +85,7 @@ class MBASE_PUBLIC MythSystemLegacyWindows : public MythSystemLegacyPrivate
     Q_OBJECT
 
     public:
-        MythSystemLegacyWindows(MythSystemLegacy *parent);
+        explicit MythSystemLegacyWindows(MythSystemLegacy *parent);
         ~MythSystemLegacyWindows();
 
         virtual void Fork(time_t timeout) MOVERRIDE;
