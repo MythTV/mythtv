@@ -18,7 +18,7 @@ extern "C" {
 class RemoteAVFormatContext
 {
   public:
-    RemoteAVFormatContext(const QString &filename = "") :
+    explicit RemoteAVFormatContext(const QString &filename = "") :
         m_inputFC(NULL), m_inputIsRemote(false), m_isOpen(false),
         m_rf(NULL), m_byteIOContext(NULL), m_buffer(NULL)
     { if (!filename.isEmpty()) Open(filename); }

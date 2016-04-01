@@ -28,7 +28,7 @@ struct Cddb
         Match(const QString &g, discid_t d, const QString &a, const QString &t) :
             discGenre(g), discID(d), artist(a), title(t)
         {}
-        Match(const Album& a) : discGenre(a.discGenre), discID(a.discID),
+        explicit Match(const Album& a) : discGenre(a.discGenre), discID(a.discID),
             artist(a.artist), title(a.title)
         {}
     };
@@ -79,7 +79,7 @@ struct Cddb
         Album(discid_t d = 0, const char* g = 0) :
             discGenre(g), discID(d), year(0), rev(1), isCompilation(false) {}
 
-        Album(const QString& s) { *this = s; }
+        explicit Album(const QString& s) { *this = s; }
 
         Album& operator = (const QString&);
         operator QString () const;

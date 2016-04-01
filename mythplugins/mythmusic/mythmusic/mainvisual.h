@@ -35,7 +35,7 @@ class MainVisual :  public QObject, public MythTV::Visual
     Q_OBJECT
 
   public:
-    MainVisual(MythUIVideo *visualizer);
+    explicit MainVisual(MythUIVideo *visualizer);
     virtual ~MainVisual();
 
     VisualBase *visual(void) const { return m_vis; }

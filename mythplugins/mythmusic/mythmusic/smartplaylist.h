@@ -72,7 +72,7 @@ class SmartPlaylistEditor : public MythScreenType
     Q_OBJECT
   public:
 
-    SmartPlaylistEditor(MythScreenStack *parent);
+    explicit SmartPlaylistEditor(MythScreenStack *parent);
    ~SmartPlaylistEditor(void);
 
     bool Create(void);
@@ -211,7 +211,7 @@ class SmartPLResultViewer : public MythScreenType
 
   public:
 
-    SmartPLResultViewer(MythScreenStack *parent);
+    explicit SmartPLResultViewer(MythScreenStack *parent);
    ~SmartPLResultViewer(void);
 
     bool Create(void);
@@ -236,7 +236,7 @@ class SmartPLOrderByDialog: public MythScreenType
 
   public:
 
-    SmartPLOrderByDialog(MythScreenStack *parent);
+    explicit SmartPLOrderByDialog(MythScreenStack *parent);
     ~SmartPLOrderByDialog();
 
     bool Create(void);
@@ -279,7 +279,7 @@ class SmartPLDateDialog: public MythScreenType
 
   public:
 
-    SmartPLDateDialog(MythScreenStack *parent);
+    explicit SmartPLDateDialog(MythScreenStack *parent);
     ~SmartPLDateDialog();
 
     bool Create(void);

@@ -1335,7 +1335,7 @@ void EditAlbumartDialog::doRemoveImageFromTag(bool doIt)
 class CopyImageThread: public MThread
 {
   public:
-    CopyImageThread(QStringList strList) :
+    explicit CopyImageThread(QStringList strList) :
             MThread("CopyImage"), m_strList(strList) {}
 
     virtual void run()

@@ -32,7 +32,7 @@ class PlaylistContainer
     Q_DECLARE_TR_FUNCTIONS(PlaylistContainer)
 
   public:
-    PlaylistContainer(AllMusic *all_music);
+    explicit PlaylistContainer(AllMusic *all_music);
    ~PlaylistContainer();
 
     void            load();

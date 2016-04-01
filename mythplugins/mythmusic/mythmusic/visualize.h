@@ -70,7 +70,7 @@ class VisualNode
 class VisualBase
 {
   public:
-    VisualBase(bool screensaverenable = false);
+    explicit VisualBase(bool screensaverenable = false);
     virtual ~VisualBase(void);
 
     // return true if the output should stop

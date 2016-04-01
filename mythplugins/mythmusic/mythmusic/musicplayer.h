@@ -53,7 +53,7 @@ class MusicPlayer : public QObject, public MythObservable
     Q_OBJECT
 
   public:
-     MusicPlayer(QObject *parent);
+     explicit MusicPlayer(QObject *parent);
     ~MusicPlayer(void);
 
     enum PlayMode

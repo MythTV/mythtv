@@ -20,7 +20,7 @@ class AllStream;
 class SendStringListThread : public QRunnable
 {
   public:
-    SendStringListThread(const QStringList &strList)
+    explicit SendStringListThread(const QStringList &strList)
     {
         m_strList = strList;
     }
