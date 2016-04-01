@@ -52,7 +52,7 @@ class META_PUBLIC LyricsData : public QObject
 
   public:
     LyricsData();
-    LyricsData(MusicMetadata *parent);
+    explicit LyricsData(MusicMetadata *parent);
     LyricsData(MusicMetadata *parent, const QString &grabber, const QString &artist,
                const QString &album, const QString &title, bool syncronized);
 
