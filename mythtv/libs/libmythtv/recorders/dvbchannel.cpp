@@ -1048,7 +1048,7 @@ double DVBChannel::GetSignalStrength(bool *ok) const
     int ret = ioctl(fd_frontend, FE_READ_SIGNAL_STRENGTH, &sig);
     if (ret < 0)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
+        LOG(VB_RECORD, LOG_ERR, LOC +
             "Getting Frontend signal strength failed." + ENO);
     }
 
