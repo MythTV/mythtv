@@ -645,8 +645,7 @@ void strings_null() {
     ThemeUI::tr("3");
     ThemeUI::tr("4");
     ThemeUI::tr("OSD Menu Editor");
-    ThemeUI::tr("Stati");
-    ThemeUI::tr("Categorie");
+    ThemeUI::tr("States");
     ThemeUI::tr("Key Shortcuts");
     ThemeUI::tr("%STARTTIME% - %ENDTIME% (%LENTIME%)");
     ThemeUI::tr("%CARD% - %OUTPUTFILTERS%");
@@ -1162,7 +1161,6 @@ void strings_null() {
     ThemeUI::tr("Icon import");
     ThemeUI::tr("Result:");
     ThemeUI::tr("%1 -");
-    ThemeUI::tr("States");
     ThemeUI::tr("Use this language for the Movie Metadata");
     ThemeUI::tr("Use this language for TV Metadata");
     ThemeUI::tr("Use this language for Game Metadata");
