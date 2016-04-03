@@ -1080,8 +1080,8 @@ Do you want to continue playing in the background?</translation>
     </message>
     <message>
         <location filename="../mythmusic/musicplayer.cpp" line="349"/>
-        <source>Got to many track unavailable errors. Maybe the host with the music on is off-line?</source>
-        <translation>Got to many track unavailable errors. Maybe the host with the music on is off-line?</translation>
+        <source>Got too many track unavailable errors. Maybe the host with the music on is off-line?</source>
+        <translation>Got too many track unavailable errors. Maybe the host with the music on is off-line?</translation>
     </message>
     <message>
         <location filename="../mythmusic/musicplayer.cpp" line="357"/>
@@ -3286,6 +3286,11 @@ Broadcaster: %1 - Channel: %2</translation>
         <location filename="themestrings.h" line="183"/>
         <source>Visualization Settings</source>
         <translation>Visualization Settings</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="149"/>
+        <source>Add/Edit Station and Channel</source>
+        <translation>Add/Edit Station and Channel</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="193"/>

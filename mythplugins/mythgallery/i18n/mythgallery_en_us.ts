@@ -730,14 +730,17 @@ Check the directory exists, is readable and the setting is correct on MythGaller
         <translation>Could not read or execute %1</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1222"/>
-        <source>Found %1 images</source>
-        <translation>Found %1 images</translation>
-    </message>
-    <message>
         <location filename="../mythgallery/iconview.cpp" line="1217"/>
         <source>Nothing found to import</source>
         <translation>Nothing found to import</translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../mythgallery/iconview.cpp" line="1222"/>
+        <source>Found %n image(s)</source>
+        <translation>
+            <numerusform>Found %n image</numerusform>
+            <numerusform>Found %n images</numerusform>
+        </translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="1319"/>
@@ -1109,8 +1112,7 @@ Check the directory exists, is readable and the setting is correct on MythGaller
     </message>
     <message numerus="yes">
         <location filename="../mythgallery/thumbview.cpp" line="138"/>
-        <source>Size: %n bytes</source>
-        <translatorcomment>Will have to change the source string. bytest -&gt; byte(s)</translatorcomment>
+        <source>Size: %n byte(s)</source>
         <translation>
             <numerusform>Size: %n byte</numerusform>
             <numerusform>Size: %n bytes</numerusform>
