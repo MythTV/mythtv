@@ -61,7 +61,7 @@ class MBASE_PUBLIC ServerPool : public QObject
     Q_OBJECT
 
   public:
-    ServerPool(QObject *parent=0);
+    explicit ServerPool(QObject *parent=0);
    ~ServerPool(void);
 
     static void RefreshDefaultListen(void);

@@ -12,7 +12,7 @@ class MPUBLIC ZMMiniPlayer : public ZMLivePlayer
   Q_OBJECT
 
   public:
-    ZMMiniPlayer(MythScreenStack *parent);
+    explicit ZMMiniPlayer(MythScreenStack *parent);
     ~ZMMiniPlayer();
 
     bool Create(void);

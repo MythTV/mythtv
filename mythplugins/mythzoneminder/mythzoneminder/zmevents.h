@@ -32,7 +32,7 @@ class ZMEvents : public MythScreenType
     Q_OBJECT
 
 public:
-    ZMEvents(MythScreenStack *parent);
+    explicit ZMEvents(MythScreenStack *parent);
     ~ZMEvents();
 
     bool Create(void);

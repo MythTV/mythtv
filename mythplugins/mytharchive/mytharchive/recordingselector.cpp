@@ -34,7 +34,7 @@
 class GetRecordingListThread : public MThread
 {
   public:
-    GetRecordingListThread(RecordingSelector *parent) :
+    explicit GetRecordingListThread(RecordingSelector *parent) :
         MThread("GetRecordingList"), m_parent(parent)
     {
         start();

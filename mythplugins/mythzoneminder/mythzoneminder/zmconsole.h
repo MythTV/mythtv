@@ -57,7 +57,7 @@ class ZMConsole : public MythScreenType
     Q_OBJECT
 
   public:
-    ZMConsole(MythScreenStack *parent);
+    explicit ZMConsole(MythScreenStack *parent);
     ~ZMConsole();
 
     bool Create(void);

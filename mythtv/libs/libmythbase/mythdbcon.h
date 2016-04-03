@@ -28,7 +28,7 @@ class MSqlDatabase
   friend class MDBManager;
   friend class MSqlQuery;
   public:
-    MSqlDatabase(const QString &name);
+    explicit MSqlDatabase(const QString &name);
    ~MSqlDatabase(void);
 
     bool OpenDatabase(bool skipdb = false);
@@ -127,7 +127,7 @@ class MBASE_PUBLIC MSqlQuery : private QSqlQuery
     MBASE_PUBLIC friend void MSqlEscapeAsAQuery(QString&, MSqlBindings&);
   public:
     /// \brief Get DB connection from pool
-    MSqlQuery(const MSqlQueryInfo &qi);
+    explicit MSqlQuery(const MSqlQueryInfo &qi);
     /// \brief Returns connection to pool
     ~MSqlQuery();
 

@@ -492,7 +492,7 @@ bool Dbase::Search(Cddb::Matches& res, const Cddb::discid_t discID)
                 QFile file(it2->canonicalFilePath());
                 if (file.open(QIODevice::ReadOnly | QIODevice::Text))
                 {
-                    Cddb::Album a = QTextStream(&file).readAll();
+                    Cddb::Album a(QTextStream(&file).readAll());
                     a.discGenre = genre;
                     a.discID = discID;
                     LOG(VB_MEDIA, LOG_INFO, QString("LocalCDDB found %1 in ").

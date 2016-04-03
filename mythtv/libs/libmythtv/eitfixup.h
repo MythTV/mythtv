@@ -15,18 +15,18 @@ typedef QMap<uint,uint> QMap_uint_t;
 class EITFixUp
 {
   protected:
-     // max length of subtitle field in db.
-     static const uint SUBTITLE_MAX_LEN = 128;
-     // max number of words included in a subtitle
-     static const uint kMaxToTitle = 14;
-     // max number of words up to a period, question mark
-     static const uint kDotToTitle = 9;
-     // max number of question/exclamation marks
-     static const uint kMaxQuestionExclamation = 2;
-     // max number of difference in words between a period and a colon
-     static const uint kMaxDotToColon = 5;
-     // minimum duration of an event to consider it as movie
-     static const int kMinMovieDuration = 75*60;
+    // max length of subtitle field in db.
+    static const uint SUBTITLE_MAX_LEN = 128;
+    // max number of words included in a subtitle
+    static const uint kMaxToTitle = 14;
+    // max number of words up to a period, question mark
+    static const uint kDotToTitle = 9;
+    // max number of question/exclamation marks
+    static const uint kMaxQuestionExclamation = 2;
+    // max number of difference in words between a period and a colon
+    static const uint kMaxDotToColon = 5;
+    // minimum duration of an event to consider it as movie
+    static const int kMinMovieDuration = 75*60;
 
   public:
     enum FixUpType

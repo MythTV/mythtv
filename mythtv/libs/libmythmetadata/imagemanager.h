@@ -70,7 +70,7 @@
     class QTemporaryDir
     {
     public:
-        QTemporaryDir(const QString &templatePath)
+        explicit QTemporaryDir(const QString &templatePath)
         {
             QString path(templatePath);
             QString dynamic(QString("%1").arg(++Count(), 6, 10, QChar('0')));

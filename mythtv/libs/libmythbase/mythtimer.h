@@ -18,7 +18,7 @@ class MBASE_PUBLIC MythTimer
         kStartInactive,
     } StartState;
 
-    MythTimer(StartState state = kStartInactive);
+    explicit MythTimer(StartState state = kStartInactive);
 
     void start(void);
     int restart(void);

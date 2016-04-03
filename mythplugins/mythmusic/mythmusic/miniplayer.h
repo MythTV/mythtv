@@ -12,7 +12,7 @@ class MPUBLIC MiniPlayer : public MusicCommon
   Q_OBJECT
 
   public:
-    MiniPlayer(MythScreenStack *parent);
+    explicit MiniPlayer(MythScreenStack *parent);
     ~MiniPlayer();
 
     bool Create(void);

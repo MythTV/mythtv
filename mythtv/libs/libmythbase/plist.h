@@ -8,7 +8,7 @@
 class MBASE_PUBLIC PList
 {
   public:
-    PList(const QByteArray &data);
+    explicit PList(const QByteArray &data);
 
     QVariant GetValue(const QString &key);
     QString  ToString(void);

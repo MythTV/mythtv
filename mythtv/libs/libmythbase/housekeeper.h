@@ -126,7 +126,7 @@ class MBASE_PUBLIC DailyHouseKeeperTask : public PeriodicHouseKeeperTask
 class HouseKeepingThread : public MThread
 {
   public:
-    HouseKeepingThread(HouseKeeper *p) :
+    explicit HouseKeepingThread(HouseKeeper *p) :
         MThread("HouseKeeping"), m_idle(true), m_keepRunning(true),
         m_parent(p) {}
    ~HouseKeepingThread() {}

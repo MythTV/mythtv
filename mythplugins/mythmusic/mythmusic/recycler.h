@@ -16,7 +16,7 @@ class Buffer;
 class Recycler
 {
 public:
-    Recycler(unsigned int sz); // sz = size in bytes
+    explicit Recycler(unsigned int sz); // sz = size in bytes
     ~Recycler();
 
     bool full() const;

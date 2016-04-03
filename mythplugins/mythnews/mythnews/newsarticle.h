@@ -19,7 +19,7 @@ class NewsArticle
                 const QString &enclosure);
     NewsArticle(const QString &title,
                 const QString &desc, const QString &artURL);
-    NewsArticle(const QString &title);
+    explicit NewsArticle(const QString &title);
 
     NewsArticle();
 

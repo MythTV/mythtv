@@ -26,7 +26,7 @@ class Decoder;
 class DecoderHandlerEvent : public MythEvent
 {
   public:
-    DecoderHandlerEvent(Type t)
+    explicit DecoderHandlerEvent(Type t)
         : MythEvent(t), m_msg(0), m_meta(0), m_available(0), m_maxSize(0) {}
 
     DecoderHandlerEvent(Type t, QString *e)

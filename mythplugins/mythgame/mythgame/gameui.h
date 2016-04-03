@@ -26,7 +26,7 @@ class GameUI : public MythScreenType
     Q_OBJECT
 
   public:
-    GameUI(MythScreenStack *parentStack);
+    explicit GameUI(MythScreenStack *parentStack);
     ~GameUI();
 
     bool Create();
