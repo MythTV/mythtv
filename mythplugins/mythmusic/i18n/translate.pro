@@ -16,3 +16,4 @@ TRANSLATIONS += mythmusic_nb.ts mythmusic_et.ts mythmusic_cs.ts
 TRANSLATIONS += mythmusic_pl.ts mythmusic_hu.ts mythmusic_en_gb.ts
 TRANSLATIONS += mythmusic_en_us.ts mythmusic_ru.ts mythmusic_el.ts
 TRANSLATIONS += mythmusic_en_ca.ts mythmusic_pt_br.ts mythmusic_es_es.ts
+TRANSLATIONS += mythmusic_bg.ts

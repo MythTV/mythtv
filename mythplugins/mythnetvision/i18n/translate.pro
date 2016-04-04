@@ -14,3 +14,4 @@ TRANSLATIONS += mythnetvision_cs.ts mythnetvision_es.ts mythnetvision_fi.ts
 TRANSLATIONS += mythnetvision_ja.ts mythnetvision_pl.ts mythnetvision_en_ca.ts
 TRANSLATIONS += mythnetvision_es_es.ts
 TRANSLATIONS += mythnetvision_it.ts
+TRANSLATIONS += mythnetvision_bg.ts
