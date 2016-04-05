@@ -257,9 +257,13 @@ bool Dvr::UpdateRecordedWatchedStatus ( int RecordedId,
     else
         pi = ProgramInfo(chanid, recstarttsRaw.toUTC());
 
-    pi.SaveWatched(watched);
+    if (pi.GetChanID() && pi.HasPathname())
+    {
+        pi.SaveWatched(watched);
+        return true;
+    }
 
-    return true;
+    return false;
 }
 
 /////////////////////////////////////////////////////////////////////////////
