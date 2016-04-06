@@ -215,7 +215,12 @@ DTC::ProgramList* Guide::GetProgramList(int              nStartIndex,
     else
         sSQL = "WHERE ";
 
-    sSQL +=    "visible != 0 AND program.manualid = 0 "; // Exclude programmes created purely for 'manual' recording schedules
+    if (bOnlyNew)
+        sSQL = "LEFT JOIN oldprogram ON oldprogram.oldtitle = program.title "
+                + sSQL
+                + "oldprogram.oldtitle IS NULL AND ";
+
+    sSQL += "visible != 0 AND program.manualid = 0 "; // Exclude programmes created purely for 'manual' recording schedules
 
     if (nChanId < 0)
         nChanId = 0;
