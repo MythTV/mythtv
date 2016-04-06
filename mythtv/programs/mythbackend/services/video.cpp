@@ -378,18 +378,18 @@ bool Video::AddVideo( const QString &sFileName,
 bool Video::UpdateVideoWatchedStatus ( int  nId,
                                        bool bWatched )
 {
-    bool bResut = false;
-    VideoMetadataListManager::VideoMetadataPtr metadata =
-                          VideoMetadataListManager::loadOneFromDatabase(nId);
+    VideoMetadataListManager::metadata_list videolist;
+    VideoMetadataListManager::loadAllFromDatabase(videolist);
+    VideoMetadataListManager *mlm = new VideoMetadataListManager();
+    mlm->setList(videolist);
+    VideoMetadataListManager::VideoMetadataPtr metadata = mlm->byID(nId);
 
-    if ( metadata )
-    {
-        metadata->SetWatched(bWatched);
-        metadata->UpdateDatabase();
-        bResut = true;
-    }
+    if ( !metadata )
+        throw( QString( "No metadata found for selected ID!" ) );
 
-    return bResut;
+    metadata->SetWatched(bWatched);
+    metadata->UpdateDatabase();
+    return true;
 }
 
 /////////////////////////////////////////////////////////////////////////////
