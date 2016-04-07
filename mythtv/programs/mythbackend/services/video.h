@@ -65,6 +65,9 @@ class Video : public VideoServices
         bool                      AddVideo           ( const QString  &FileName,
                                                        const QString  &HostName  );
 
+        bool                      UpdateVideoWatchedStatus ( int  Id,
+                                                             bool Watched );
+
         /* Bluray Methods */
 
         DTC::BlurayInfo*          GetBluray          ( const QString  &Path      );

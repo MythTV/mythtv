@@ -171,6 +171,10 @@ class Dvr : public DvrServices
         bool              EnableRecordSchedule ( uint             RecordId   );
 
         bool              DisableRecordSchedule( uint             RecordId   );
+
+        bool              UpdateRecordedWatchedStatus ( int   ChanId,
+                                                        const QDateTime &StartTime,
+                                                        bool  Watched);
 };
 
 // --------------------------------------------------------------------------

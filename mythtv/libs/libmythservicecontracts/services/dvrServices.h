@@ -39,13 +39,14 @@
 class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.9" );
+    Q_CLASSINFO( "version"    , "1.10" );
     Q_CLASSINFO( "RemoveRecordedItem_Method",                   "POST" )
     Q_CLASSINFO( "AddRecordSchedule_Method",                    "POST" )
     Q_CLASSINFO( "RemoveRecordSchedule_Method",                 "POST" )
     Q_CLASSINFO( "EnableRecordSchedule_Method",                 "POST" )
     Q_CLASSINFO( "DisableRecordSchedule_Method",                "POST" )
     Q_CLASSINFO( "UpdateRecordSchedule_Method",                 "POST" )
+    Q_CLASSINFO( "UpdateRecordedWatchedStatus_Method",          "POST" )
 
     public:
 
@@ -193,6 +194,10 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
         virtual bool               EnableRecordSchedule  ( uint             RecordId   ) = 0;
 
         virtual bool               DisableRecordSchedule ( uint             RecordId   ) = 0;
+
+        virtual bool               UpdateRecordedWatchedStatus ( int              ChanId,
+                                                                 const QDateTime &StartTime,
+                                                                 bool             Watched    ) = 0;
 
 };
 
