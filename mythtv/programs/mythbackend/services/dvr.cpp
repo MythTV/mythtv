@@ -949,5 +949,5 @@ bool Dvr::UpdateRecordedWatchedStatus ( int   chanid,
         return true;
     }
 
-    throw QString("No metadata found for selected ID!");
+    return false;
 }

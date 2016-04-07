@@ -360,7 +360,7 @@ bool Video::UpdateVideoWatchedStatus ( int  nId,
     VideoMetadataListManager::VideoMetadataPtr metadata = mlm->byID(nId);
 
     if ( !metadata )
-        throw( QString( "No metadata found for selected ID!" ) );
+        return false;
 
     metadata->SetWatched(bWatched);
     metadata->UpdateDatabase();
