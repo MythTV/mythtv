@@ -664,6 +664,14 @@ Vaata kas kataloog on olemas, loetav ja seaded on seadistuste lehel õiged.</tra
         <source>Nothing found to import</source>
         <translation>Ei leidnud midagi importimiseks</translation>
     </message>
+    <message numerus="yes">
+        <location filename="../mythgallery/iconview.cpp" line="1222"/>
+        <source>Found %n image(s)</source>
+        <translation>
+            <numerusform>Leidsin %n pildi</numerusform>
+            <numerusform>Leidsin %n pilti</numerusform>
+        </translation>
+    </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="1319"/>
         <source>Deleting %1 images and folders, including any subfolders and files.</source>
@@ -761,11 +769,6 @@ Vaata kas kataloog on olemas, loetav ja seaded on seadistuste lehel õiged.</tra
         <location filename="../mythgallery/iconview.cpp" line="1209"/>
         <source>Could not read or execute %1</source>
         <translation>%1 lugemine või käivitamine on keelatud</translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/iconview.cpp" line="1222"/>
-        <source>Found %1 images</source>
-        <translation>Leidsin %1 pilti</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="1451"/>
@@ -1107,7 +1110,7 @@ Vaata kas kataloog on olemas, loetav ja seaded on seadistuste lehel õiged.</tra
     </message>
     <message numerus="yes">
         <location filename="../mythgallery/thumbview.cpp" line="138"/>
-        <source>Size: %n bytes</source>
+        <source>Size: %n byte(s)</source>
         <translation>
             <numerusform>Suurus: %n bait</numerusform>
             <numerusform>Suurus: %n baiti</numerusform>

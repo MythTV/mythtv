@@ -1082,7 +1082,7 @@ Kas jätan muusika taustale mängima?</translation>
     </message>
     <message>
         <location filename="../mythmusic/musicplayer.cpp" line="349"/>
-        <source>Got to many track unavailable errors. Maybe the host with the music on is off-line?</source>
+        <source>Got too many track unavailable errors. Maybe the host with the music on is off-line?</source>
         <translation>Liiga palju lugusid on puudu. Äkki on lugude allikas välja lülitatud?</translation>
     </message>
     <message>
