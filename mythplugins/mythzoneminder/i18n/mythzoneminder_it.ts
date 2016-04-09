@@ -346,6 +346,11 @@
         <translation type="obsolete">Impossibile connettersi al server mythzmserve - È in esecuzione? È stato impostato correttamente l&apos;IP e la porta nelle impostazioni?</translation>
     </message>
     <message>
+        <location filename="../mythzoneminder/zmclient.cpp" line="117"/>
+        <source>Can&apos;t connect to the mythzmserver</source>
+        <translation>Impossibile connettersi a mythzmserver </translation>
+    </message>
+    <message>
         <location filename="../mythzoneminder/zmclient.cpp" line="118"/>
         <source>Is it running? Have you set the correct IP and port in the settings?</source>
         <translation>È in  eseguzione? Avete impostato il corretto ip e la porta nelle impostazioni?</translation>
@@ -401,8 +406,12 @@
     </message>
     <message>
         <location filename="../mythzoneminder/zmevents.cpp" line="459"/>
+        <source>Hide Continuous Events</source>
+        <translation>Nascondi eventi continui</translation>
+    </message>
+    <message>
         <source>Don&apos;t Show Continuous Events</source>
-        <translation>Non mostrare eventi continui</translation>
+        <translation type="obsolete">Non mostrare eventi continui</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmevents.cpp" line="461"/>
