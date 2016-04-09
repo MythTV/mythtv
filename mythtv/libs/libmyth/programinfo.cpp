@@ -6103,35 +6103,46 @@ void ProgramInfo::SaveFilesize(uint64_t fsize)
     updater->insert(recordedid, kPIUpdateFileSize, fsize);
 }
 
+//uint64_t ProgramInfo::GetFilesize(void) const
+//{
+    //LOG(VB_GENERAL, LOG_DEBUG, "FIXME: ProgramInfo::GetFilesize() called instead of RecordingInfo::GetFilesize()");
+//    return filesize;
+//}
+
+// Restore the original query. When a recording finishes, a
+// check is made on the filesize and it's 0 at times. If
+// less than 1000, commflag isn't queued. See #12290.
+
 uint64_t ProgramInfo::GetFilesize(void) const
 {
-    //LOG(VB_GENERAL, LOG_DEBUG, "FIXME: ProgramInfo::GetFilesize() called instead of RecordingInfo::GetFilesize()");
-    return filesize;
+
+    if (filesize)
+        return filesize;
+
+    // Always query in the 0 case because we can't
+    // tell if the filesize was 'lost'. Other than
+    // the 0 case, tests showed the DB and RI sizes
+    // were equal.
+
+    uint64_t db_filesize = 0;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare(
+        "SELECT filesize "
+        "FROM recorded "
+        "WHERE chanid    = :CHANID AND "
+        "      starttime = :STARTTIME");
+    query.bindValue(":CHANID",    chanid);
+    query.bindValue(":STARTTIME", recstartts);
+    if (query.exec() && query.next())
+        db_filesize = query.value(0).toULongLong();
+
+    if (db_filesize)
+        LOG(VB_RECORD, LOG_INFO, LOC + QString("RI Filesize=0, DB Filesize=%1")
+            .arg(db_filesize));
+
+    return db_filesize;
 }
-
-
-/// \brief Gets recording file size direct from the database.
-///
-/// In theory this should be redundant, the ProgramInfo updater should sync
-/// all instances on frontends and backends without the need
-/// for any one to go checking the database.
-// uint64_t ProgramInfo::QueryFilesize(void) const
-// {
-//     LOG(VB_GENERAL, LOG_DEBUG, "FIXME: ProgramInfo::QueryFilesize() called instead of RecordingInfo::GetFilesize()");
-//
-//     MSqlQuery query(MSqlQuery::InitCon());
-//
-//     query.prepare(
-//         "SELECT filesize "
-//         "FROM recorded "
-//         "WHERE chanid    = :CHANID AND "
-//         "      starttime = :STARTTIME");
-//     query.bindValue(":CHANID", chanid);
-//     query.bindValue(":STARTTIME", recstartts);
-//     if (query.exec() && query.next())
-//         return query.value(0).toULongLong();
-//
-//     return filesize;
-// }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
