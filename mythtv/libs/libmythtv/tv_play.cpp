@@ -2610,11 +2610,16 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
             QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
         mainWindow->setGeometry(player_bounds);
         mainWindow->ResizePainterWindow(player_bounds.size());
-        // PGB Do not disable the GUI when using openmax decoder,
+        // PGB Do not disable the GUI when using openmax renderer,
         // to ensure that space next to letterbox pictures
         // is painted.
-        QString decName = ctx->player->GetDecoder()->GetCodecDecoderName();
-        if (decName != "openmax" && !weDisabledGUI)
+        bool isOpenMaxRender = false;
+        if (ctx && ctx->player)
+        {
+            VideoOutput *vo = ctx->player->GetVideoOutput();
+            isOpenMaxRender = vo && vo->GetName() == "openmax";
+        }
+        if (!isOpenMaxRender && !weDisabledGUI)
         {
             weDisabledGUI = true;
             GetMythMainWindow()->PushDrawDisabled();
