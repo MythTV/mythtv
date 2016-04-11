@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="fr_FR">
+<TS version="2.1" language="fr_FR">
 <context>
     <name>(ArchiveUtils)</name>
     <message>
@@ -424,7 +424,7 @@ Place a blank DVD in the drive and select an option below.</source>
         <translation>Graver un DVD réinscriptible (forcer l&apos;effacement)</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1233"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1231"/>
         <source>It was not possible to run mytharchivehelper to burn the DVD.</source>
         <translation>Il n&apos;a pas été possible d&apos;exécuter &quot;mytharchivehelper&quot; pour graver le DVD.</translation>
     </message>
@@ -704,37 +704,37 @@ Veuillez patienter quelques minutes.</translation>
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mytharchive/main.cpp" line="302"/>
+        <location filename="../mytharchive/main.cpp" line="336"/>
         <source>Toggle use cut list state for selected program</source>
         <translation>Utiliser la liste de coupure pour le programme sélectionné</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="305"/>
+        <location filename="../mytharchive/main.cpp" line="339"/>
         <source>Create DVD</source>
         <translation>Créer un DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="307"/>
+        <location filename="../mytharchive/main.cpp" line="341"/>
         <source>Create Archive</source>
         <translation>Créer une archive</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="309"/>
+        <location filename="../mytharchive/main.cpp" line="343"/>
         <source>Import Archive</source>
         <translation>Importer une archive</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="311"/>
+        <location filename="../mytharchive/main.cpp" line="345"/>
         <source>View Archive Log</source>
         <translation>Afficher le journal du menu archive</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="313"/>
+        <location filename="../mytharchive/main.cpp" line="347"/>
         <source>Play Created DVD</source>
         <translation>Lire un DVD créé</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="315"/>
+        <location filename="../mytharchive/main.cpp" line="349"/>
         <source>Burn DVD</source>
         <translation>Graver un DVD</translation>
     </message>
@@ -760,8 +760,8 @@ Veuillez patienter...</translation>
     </message>
     <message>
         <location filename="../mytharchive/recordingselector.cpp" line="112"/>
-        <location filename="../mytharchive/recordingselector.cpp" line="420"/>
-        <location filename="../mytharchive/recordingselector.cpp" line="525"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="416"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="521"/>
         <source>All Recordings</source>
         <translation>Tous les enregistrements</translation>
     </message>
@@ -1426,17 +1426,17 @@ Veuillez patienter...</translation>
 <context>
     <name>ThumbFinder</name>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="922"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="890"/>
         <source>Exit, Save Thumbnails</source>
         <translation>Sortir, sauvegarder les miniatures</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="923"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="891"/>
         <source>Exit, Don&apos;t Save Thumbnails</source>
         <translation>Sortir, ne pas sauvegarder les miniatures</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="915"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="883"/>
         <source>Menu</source>
         <translation>Menu</translation>
     </message>
@@ -1454,13 +1454,13 @@ Veuillez patienter...</translation>
         <translation>Tout sélectionner</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="368"/>
-        <location filename="../mytharchive/videoselector.cpp" line="505"/>
+        <location filename="../mytharchive/videoselector.cpp" line="364"/>
+        <location filename="../mytharchive/videoselector.cpp" line="534"/>
         <source>All Videos</source>
         <translation>Toutes les vidéos</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="562"/>
+        <location filename="../mytharchive/videoselector.cpp" line="591"/>
         <source>You need to enter a valid password for this parental level</source>
         <translation>Vous devez entrer un mot de passe valide pour le contrôle parental</translation>
     </message>
