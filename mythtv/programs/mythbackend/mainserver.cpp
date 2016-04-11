@@ -1941,7 +1941,6 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             if (!controlSocketList.remove(socket))
                 return; // socket was disconnected
             ft = new FileTransfer(filename, socket, writemode);
-            fileTransferList.push_back(ft);
         }
         else
         {
@@ -1949,7 +1948,6 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             if (!controlSocketList.remove(socket))
                 return; // socket was disconnected
             ft = new FileTransfer(filename, socket, usereadahead, timeout_ms);
-            fileTransferList.push_back(ft);
         }
 
         if (!ft->isOpen())
@@ -1963,6 +1961,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             return;
         }
         ft->IncrRef();
+        fileTransferList.push_back(ft);
 
         retlist << QString::number(socket->GetSocketDescriptor());
         retlist << QString::number(ft->GetFileSize());
