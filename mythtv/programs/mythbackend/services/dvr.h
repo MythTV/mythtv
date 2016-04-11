@@ -75,6 +75,18 @@ class Dvr : public DvrServices
                                                         const QDateTime &StartTime,
                                                         bool  Watched);
 
+       long              GetSavedBookmark     ( int              RecordedId,
+                                                int              ChanId,
+                                                const QDateTime &StartTime,
+                                                const QString   &OffsetType );
+
+       bool              SetSavedBookmark     ( int              RecordedId,
+                                                int              ChanId,
+                                                const QDateTime &StartTime,
+                                                const QString   &OffsetType,
+                                                long             Offset
+                                                );
+
         DTC::CutList*     GetRecordedCutList  ( int              RecordedId,
                                                 int              ChanId,
                                                 const QDateTime &StartTime,
