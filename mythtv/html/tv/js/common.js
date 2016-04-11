@@ -40,7 +40,7 @@ var MythCommon = new function() {
     this.RecordProgram = function (chanID, startTime, type)
     {
         hideMenu("optMenu");
-        var url = "/tv/ajax_backends/dvr_util.qsp?_action=simpleRecord&ChanId=" + chanID + "&StartTime=" + startTime + "&type=" + type;
+        var url = "/tv/ajax_backends/dvr_util.qsp?_action=simpleRecord&ChanId=" + chanID + "&StartTime=" + startTime + "&Type=" + type;
         var ajaxRequest = $.ajax( url )
                                 .done(function()
                                 {
