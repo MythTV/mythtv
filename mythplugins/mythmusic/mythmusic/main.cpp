@@ -868,17 +868,15 @@ static void setupKeys(void)
     REG_KEY("Music", "SWITCHTORADIO",                 QT_TRANSLATE_NOOP("MythControls",
         "Switch to the radio stream view"), "");
 
-    REG_MEDIA_HANDLER(
-        QT_TRANSLATE_NOOP("MythControls", "MythMusic Media Handler 1/2"),
-        QT_TRANSLATE_NOOP("MythControls", "MythMusic audio CD"),
-        "", handleCDMedia, MEDIATYPE_AUDIO | MEDIATYPE_MIXED, QString::null);
+    REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
+        "MythMusic Media Handler 1/2"), "", "", handleCDMedia,
+        MEDIATYPE_AUDIO | MEDIATYPE_MIXED, QString::null);
     QString filt = MetaIO::ValidFileExtensions;
     filt.replace('|',',');
     filt.remove('.');
-    REG_MEDIA_HANDLER(
-        QT_TRANSLATE_NOOP("MythControls", "MythMusic Media Handler 2/2"),
-        QT_TRANSLATE_NOOP("MythControls", "MythMusic audio files"),
-         "", handleMedia, MEDIATYPE_MMUSIC, filt);
+    REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
+        "MythMusic Media Handler 2/2"), "", "", handleMedia,
+        MEDIATYPE_MMUSIC, filt);
 }
 
 int mythplugin_init(const char *libversion)

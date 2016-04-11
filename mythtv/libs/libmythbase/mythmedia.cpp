@@ -237,7 +237,7 @@ MythMediaType MythMediaDevice::DetectMediaType(void)
         else
         {
             LOG(VB_MEDIA, LOG_NOTICE, QString(
-                    "DetectMediaType(this=0x%1) unknown file type %2")
+                    "DetectMediaType(this=0x%1) unknown file type %1")
                 .arg(quintptr(this),0,16).arg(it.key()));
         }
     }

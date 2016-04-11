@@ -664,33 +664,10 @@ void MediaMonitor::JumpToMediaHandler(MythMediaDevice* pMedia)
         return;
     }
 
+
+    // TODO - Generate a dialog, add buttons for each description,
+    // if user didn't cancel, selected = handlers.at(choice);
     int selected = 0;
-    if (handlers.size() > 1)
-    {
-        QStringList buttonmsgs;
-        for (QList<MHData>::const_iterator it = handlers.begin(); it != handlers.end(); ++it)
-            buttonmsgs << ((!it->description.isEmpty()) ? it->description : it->destination);
-        buttonmsgs << tr("Cancel");
-
-        const DialogCode cancelbtn = DialogCode(
-            int(kDialogCodeButton0) + buttonmsgs.size() - 1);
-
-        DialogCode ret = MythPopupBox::ShowButtonPopup(GetMythMainWindow(),
-                                tr("Media Handler Selection"),
-                                tr("The new media contains mixed content "
-                                   "that can be rendered in different ways. "
-                                   "Select your preferred method."),
-                                buttonmsgs, cancelbtn);
-        if (kDialogCodeRejected == ret || cancelbtn == ret)
-        {
-            LOG(VB_MEDIA, LOG_INFO, "User cancelled media handler selection");
-            return;
-        }
-
-        selected = MythDialog::CalcItemIndex(ret);
-        LOG(VB_MEDIA, LOG_NOTICE, QString("User selected '%1'")
-            .arg(handlers.at(selected).destination) );
-    }
 
     handlers.at(selected).callback(pMedia);
 }
