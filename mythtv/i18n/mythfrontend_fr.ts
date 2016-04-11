@@ -3138,7 +3138,7 @@ Device supports up to %1</source>
     <message>
         <location filename="../libs/libmythtv/audioplayer.cpp" line="161"/>
         <source>Disabling Audio</source>
-        <translation>Désactiver l&apos;audio</translation>
+        <translation>Désactivation de l&apos;audio</translation>
     </message>
 </context>
 <context>
