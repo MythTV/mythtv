@@ -41,8 +41,8 @@ defineReplace(avLibName) {
 }
 
 #check QT major version
-contains(QT_MAJOR_VERSION, 3) {
-        error("Must build against Qt4")
+contains(QT_MAJOR_VERSION, 4) {
+        error("Must build against Qt5")
 }
 
 # Where binaries, includes and runtime assets are installed by 'make install'
