@@ -310,7 +310,7 @@ class MUI_PUBLIC MythRenderOpenGL : protected MythRenderContext, public MythRend
 class GLMatrix4x4
 {
   public:
-    GLMatrix4x4(const QMatrix4x4 &m)
+    explicit GLMatrix4x4(const QMatrix4x4 &m)
     {
         // Convert from Qt's row-major to GL's column-major order
         for (int c = 0, i = 0; c < 4; ++c)
@@ -318,7 +318,7 @@ class GLMatrix4x4
                 m_v[i++] = m(r, c);
     }
 
-    GLMatrix4x4(const GLfloat v[16])
+    explicit GLMatrix4x4(const GLfloat v[16])
     {
         for (int i = 0; i < 16; ++i)
             m_v[i] = v[i];
