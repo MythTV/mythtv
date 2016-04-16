@@ -307,6 +307,19 @@ class MUI_PUBLIC MythRenderOpenGL : protected MythRenderContext, public MythRend
 #endif
 };
 
+/**
+ * GLMatrix4x4 is a helper class to convert between QT and GT 4x4 matrices.
+ *
+ * Actually the conversion is a noop according to the QT 5 documentation.
+ * From http://doc.qt.io/qt-5/qmatrix4x4.html#details :
+ *
+ * Internally the data is stored as column-major format, so as to be
+ * optimal for passing to OpenGL functions, which expect column-major
+ * data.
+ *
+ * When using these functions be aware that they return data in
+ * column-major format: data(), constData()
+ */
 class GLMatrix4x4
 {
   public:
