@@ -683,7 +683,7 @@ bool VAAPIContext::InitImage(const void *buf)
 {
     if (!buf)
         return false;
-    if (!m_dispType == kVADisplayX11)
+    if (m_dispType != kVADisplayX11)
         return true;
 
     int num_formats = 0;
