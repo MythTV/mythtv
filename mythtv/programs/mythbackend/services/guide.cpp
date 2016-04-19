@@ -53,16 +53,16 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &rawStartTime ,
                                            int              nCount)
 {
     if (!rawStartTime.isValid())
-        throw( "StartTime is invalid" );
+        throw QString( "StartTime is invalid" );
 
     if (!rawEndTime.isValid())
-        throw( "EndTime is invalid" );
+        throw QString( "EndTime is invalid" );
 
     QDateTime dtStartTime = rawStartTime.toUTC();
     QDateTime dtEndTime = rawEndTime.toUTC();
 
     if (dtEndTime < dtStartTime)
-        throw( "EndTime is before StartTime");
+        throw QString( "EndTime is before StartTime");
 
     if (nStartIndex <= 0)
         nStartIndex = 0;
@@ -179,16 +179,16 @@ DTC::ProgramList* Guide::GetProgramList(int              nStartIndex,
                                         bool             bDescending)
 {
     if (!rawStartTime.isNull() && !rawStartTime.isValid())
-        throw( "StartTime is invalid" );
+        throw QString( "StartTime is invalid" );
 
     if (!rawEndTime.isNull() && !rawEndTime.isValid())
-        throw( "EndTime is invalid" );
+        throw QString( "EndTime is invalid" );
 
     QDateTime dtStartTime = rawStartTime;
     QDateTime dtEndTime = rawEndTime;
 
     if (!rawEndTime.isNull() && dtEndTime < dtStartTime)
-        throw( "EndTime is before StartTime");
+        throw QString( "EndTime is before StartTime");
 
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -333,9 +333,9 @@ DTC::Program* Guide::GetProgramDetails( int              nChanId,
 
 {
     if (!(nChanId > 0))
-        throw( "Channel ID is invalid" );
+        throw QString( "Channel ID is invalid" );
     if (!rawStartTime.isValid())
-        throw( "StartTime is invalid" );
+        throw QString( "StartTime is invalid" );
 
     QDateTime dtStartTime = rawStartTime.toUTC();
 
@@ -506,7 +506,7 @@ QStringList Guide::GetStoredSearches( const QString& sType )
 
     if (iType == kNoSearch)
     {
-        //throw( "Invalid Type" );
+        //throw QString( "Invalid Type" );
         return keywordList;
     }
 
