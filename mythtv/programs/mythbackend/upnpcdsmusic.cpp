@@ -549,7 +549,7 @@ bool UPnpCDSMusic::LoadAlbums(const UPnpCDSRequest *pRequest,
     QString orderString = "";
 
     if (tokens.contains("recently added"))
-        orderString = "ORDER BY s.date_entered DESC ";
+        orderString = "ORDER BY max(s.date_entered) DESC ";
     else
         orderString = "ORDER BY a.album_name ";
 
