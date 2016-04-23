@@ -44,9 +44,10 @@
  *       + <Track 1>                 Music/Album=789/Track=1
  *       + <Track 2>                 Music/Album=789/Track=2
  *
- *   - By Recently Added             // TODO
- *     + <Track 1>
- *     + <Track 2>
+ *   - By Recently Added             Music/Album (sorted by date_entered)
+ *     - <Album 1>                   Music/Album=789
+ *       + <Track 1>                 Music/Album=789/Track=1
+ *       + <Track 2>                 Music/Album=789/Track=2
  *
  *   - By Genre                      Music/Genre
  *     - <Genre 1>                   Music/Genre=252
@@ -74,6 +75,7 @@ UPnpCDSMusic::UPnpCDSMusic()
     m_shortcuts.insert(UPnPShortcutFeature::MUSIC_ALBUMS, "Music/Album");
     m_shortcuts.insert(UPnPShortcutFeature::MUSIC_ARTISTS, "Music/Artist");
     m_shortcuts.insert(UPnPShortcutFeature::MUSIC_GENRES, "Music/Genre");
+    m_shortcuts.insert(UPnPShortcutFeature::MUSIC_RECENTLY_ADDED, "Music/Recently Added");
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -166,6 +168,20 @@ void UPnpCDSMusic::CreateRoot()
                                               NULL );
     // HACK
     LoadGenres(pRequest, pResult, tokens);
+    pContainer->SetChildCount(pResult->m_nTotalMatches);
+    pContainer->SetChildContainerCount(pResult->m_nTotalMatches);
+    // END HACK
+    m_pRoot->AddChild(pContainer);
+
+    // -----------------------------------------------------------------------
+    // Recently Added
+    // -----------------------------------------------------------------------
+    pContainer = CDSObject::CreateContainer ( containerId.arg("Recently Added"),
+                                              QObject::tr("Recently Added"),
+                                              m_sExtensionId, // Parent Id
+                                              NULL );
+    // HACK
+    LoadAlbums(pRequest, pResult, tokens);
     pContainer->SetChildCount(pResult->m_nTotalMatches);
     pContainer->SetChildContainerCount(pResult->m_nTotalMatches);
     // END HACK
@@ -334,6 +350,10 @@ bool UPnpCDSMusic::LoadMetadata(const UPnpCDSRequest* pRequest,
     {
         return LoadTracks(pRequest, pResults, tokens);
     }
+    else if (currentToken == "recently added")
+    {
+        return LoadAlbums(pRequest, pResults, tokens);
+    }
     else
         LOG(VB_GENERAL, LOG_ERR,
             QString("UPnpCDSMusic::LoadMetadata(): "
@@ -385,6 +405,13 @@ bool UPnpCDSMusic::LoadChildren(const UPnpCDSRequest* pRequest,
     else if (currentToken == "album")
     {
         if (tokens["album"].toInt() > 0)
+            return LoadTracks(pRequest, pResults, tokens);
+        else
+            return LoadAlbums(pRequest, pResults, tokens);
+    }
+    else if (currentToken == "recently added")
+    {
+        if (tokens["recently added"].toInt() > 0)
             return LoadTracks(pRequest, pResults, tokens);
         else
             return LoadAlbums(pRequest, pResults, tokens);
@@ -514,13 +541,19 @@ bool UPnpCDSMusic::LoadAlbums(const UPnpCDSRequest *pRequest,
                   "LEFT JOIN music_albumart w ON s.song_id=w.song_id "
                   "%1 " // WHERE clauses
                   "GROUP BY a.album_id "
-                  "ORDER BY a.album_name "
+                  "%2 " // ORDER clauses
                   "LIMIT :OFFSET,:COUNT";
 
     QStringList clauses;
     QString whereString = BuildWhereClause(clauses, tokens);
+    QString orderString = "";
 
-    query.prepare(sql.arg(whereString));
+    if (tokens.contains("recently added"))
+        orderString = "ORDER BY s.date_entered DESC ";
+    else
+        orderString = "ORDER BY a.album_name ";
+
+    query.prepare(sql.arg(whereString).arg(orderString));
 
     BindValues(query, tokens);
 
@@ -973,6 +1006,8 @@ QString UPnpCDSMusic::BuildWhereClause( QStringList clauses,
         clauses.append("s.genre_id=:GENRE_ID");
     if (tokens["year"].toInt() > 0)
         clauses.append("s.year=:YEAR");
+    if (tokens["recently added"].toInt() > 0)
+        clauses.append("s.album_id=:ALBUM_ID");
     if (tokens["directory"].toInt() > 0)
         clauses.append("s.directory_id=:DIRECTORY_ID");
 
@@ -1010,6 +1045,8 @@ void UPnpCDSMusic::BindValues( MSqlQuery &query,
         query.bindValue(":GENRE_ID", tokens["genre"]);
     if (tokens["year"].toInt() > 0)
         query.bindValue(":YEAR", tokens["year"]);
+    if (tokens["recently added"].toInt() > 0)
+        query.bindValue(":ALBUM_ID", tokens["recently added"]);
     if (tokens["directory"].toInt() > 0)
         query.bindValue(":DIRECTORY_ID", tokens["directory"]);
 }
