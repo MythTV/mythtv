@@ -49,6 +49,11 @@
  *       + <Track 1>                 Music/Album=789/Track=1
  *       + <Track 2>                 Music/Album=789/Track=2
  *
+ *   - By Recently Played            Music/Album (sorted by lastplay)
+ *     - <Album 1>                   Music/Album=789
+ *       + <Track 1>                 Music/Album=789/Track=1
+ *       + <Track 2>                 Music/Album=789/Track=2
+ *
  *   - By Genre                      Music/Genre
  *     - <Genre 1>                   Music/Genre=252
  *       - By Artist                 Music/Genre=252/Artist
@@ -76,6 +81,7 @@ UPnpCDSMusic::UPnpCDSMusic()
     m_shortcuts.insert(UPnPShortcutFeature::MUSIC_ARTISTS, "Music/Artist");
     m_shortcuts.insert(UPnPShortcutFeature::MUSIC_GENRES, "Music/Genre");
     m_shortcuts.insert(UPnPShortcutFeature::MUSIC_RECENTLY_ADDED, "Music/Recently Added");
+    m_shortcuts.insert(UPnPShortcutFeature::MUSIC_LAST_PLAYED, "Music/Recently Played");
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -178,6 +184,20 @@ void UPnpCDSMusic::CreateRoot()
     // -----------------------------------------------------------------------
     pContainer = CDSObject::CreateContainer ( containerId.arg("Recently Added"),
                                               QObject::tr("Recently Added"),
+                                              m_sExtensionId, // Parent Id
+                                              NULL );
+    // HACK
+    LoadAlbums(pRequest, pResult, tokens);
+    pContainer->SetChildCount(pResult->m_nTotalMatches);
+    pContainer->SetChildContainerCount(pResult->m_nTotalMatches);
+    // END HACK
+    m_pRoot->AddChild(pContainer);
+
+    // -----------------------------------------------------------------------
+    // Recently Played
+    // -----------------------------------------------------------------------
+    pContainer = CDSObject::CreateContainer ( containerId.arg("Recently Played"),
+                                              QObject::tr("Recently Played"),
                                               m_sExtensionId, // Parent Id
                                               NULL );
     // HACK
@@ -354,6 +374,10 @@ bool UPnpCDSMusic::LoadMetadata(const UPnpCDSRequest* pRequest,
     {
         return LoadAlbums(pRequest, pResults, tokens);
     }
+    else if (currentToken == "recently played")
+    {
+        return LoadAlbums(pRequest, pResults, tokens);
+    }
     else
         LOG(VB_GENERAL, LOG_ERR,
             QString("UPnpCDSMusic::LoadMetadata(): "
@@ -412,6 +436,13 @@ bool UPnpCDSMusic::LoadChildren(const UPnpCDSRequest* pRequest,
     else if (currentToken == "recently added")
     {
         if (tokens["recently added"].toInt() > 0)
+            return LoadTracks(pRequest, pResults, tokens);
+        else
+            return LoadAlbums(pRequest, pResults, tokens);
+    }
+    else if (currentToken == "recently played")
+    {
+        if (tokens["recently played"].toInt() > 0)
             return LoadTracks(pRequest, pResults, tokens);
         else
             return LoadAlbums(pRequest, pResults, tokens);
@@ -550,6 +581,8 @@ bool UPnpCDSMusic::LoadAlbums(const UPnpCDSRequest *pRequest,
 
     if (tokens.contains("recently added"))
         orderString = "ORDER BY max(s.date_entered) DESC ";
+    else if (tokens.contains("recently played"))
+        orderString = "ORDER BY max(s.lastplay) DESC ";
     else
         orderString = "ORDER BY a.album_name ";
 
@@ -1008,6 +1041,8 @@ QString UPnpCDSMusic::BuildWhereClause( QStringList clauses,
         clauses.append("s.year=:YEAR");
     if (tokens["recently added"].toInt() > 0)
         clauses.append("s.album_id=:ALBUM_ID");
+    if (tokens["recently played"].toInt() > 0)
+        clauses.append("s.album_id=:ALBUM_ID");
     if (tokens["directory"].toInt() > 0)
         clauses.append("s.directory_id=:DIRECTORY_ID");
 
@@ -1047,6 +1082,8 @@ void UPnpCDSMusic::BindValues( MSqlQuery &query,
         query.bindValue(":YEAR", tokens["year"]);
     if (tokens["recently added"].toInt() > 0)
         query.bindValue(":ALBUM_ID", tokens["recently added"]);
+    if (tokens["recently played"].toInt() > 0)
+        query.bindValue(":ALBUM_ID", tokens["recently played"]);
     if (tokens["directory"].toInt() > 0)
         query.bindValue(":DIRECTORY_ID", tokens["directory"]);
 }
