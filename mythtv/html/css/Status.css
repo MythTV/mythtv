@@ -1,3 +1,14 @@
+  body {
+      font: normal 13px Verdana, Geneva, sans-serif;
+      color:            white;
+      background-color: #88a1bb;
+      border:           0px;
+      margin:           0px;
+      padding:          0px;
+      max-width:        100%;
+      overflow-x:       hidden;
+      box-sizing:       border-box; /* Most logical application of padding */
+  }
 
   div.status {
     font:11px verdana, arial, helvetica, sans-serif;
@@ -40,6 +51,8 @@
     border-radius:8px 0px 0px 8px;
     margin: auto;
     margin-bottom: 20px;
+    color: #000;
+    background-color: #fff;
   }
 
   div.schedule a {
