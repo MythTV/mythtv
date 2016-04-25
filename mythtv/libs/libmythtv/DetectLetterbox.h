@@ -21,8 +21,8 @@ private:
     int firstFrameChecked;
 
     AdjustFillMode detectLetterboxDefaultMode;
-    AdjustFillMode detectLetterboxDetectedMode; // Wich mode was last detected
-    long long detectLetterboxSwitchFrame; // On wich frame was the mode switch detected
+    AdjustFillMode detectLetterboxDetectedMode; ///< Which mode was last detected
+    long long detectLetterboxSwitchFrame; ///< On which frame was the mode switch detected
     long long detectLetterboxPossibleHalfFrame;
     long long detectLetterboxPossibleFullFrame;
     int detectLetterboxConsecutiveCounter;

@@ -41,8 +41,8 @@ defineReplace(avLibName) {
 }
 
 #check QT major version
-contains(QT_MAJOR_VERSION, 3) {
-        error("Must build against Qt4")
+contains(QT_MAJOR_VERSION, 4) {
+        error("Must build against Qt5")
 }
 
 # Where binaries, includes and runtime assets are installed by 'make install'
@@ -70,8 +70,8 @@ isEmpty( LIBDIR ) {
     LIBDIR = $${RUNPREFIX}/$${LIBDIRNAME}
 }
 
-LIBVERSION = 0.28
-VERSION = 0.28.0
+LIBVERSION = 29
+VERSION = 29.0
 
 # Die on the (common) case where OS X users inadvertently use Fink's
 # Qt/X11 install instead of Qt/Mac. '

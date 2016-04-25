@@ -144,8 +144,9 @@ EITFixUp::EITFixUp()
       m_RTLEpisodeNo2("^(\\d{1,2}\\/[IVX]+)\\.*\\s*"),
       m_fiRerun("\\ ?Uusinta[a-zA-Z\\ ]*\\.?"),
       m_fiRerun2("\\([Uu]\\)"),
-      m_dePremiereInfos("\\s*[0-9]+\\sMin\\.([^.]+)?\\s?([0-9]{4})\\.(?:\\sVon"
-                        "\\s([^,]+)(?:,|\\su\\.\\sa\\.)\\smit\\s(.+)\\.)?"),
+      m_dePremiereLength("\\s?[0-9]+\\sMin\\."),
+      m_dePremiereAirdate("\\s?([^\\s^\\.]+)\\s((?:1|2)[0-9]{3})\\."),
+      m_dePremiereCredits("\\sVon\\s([^,]+)(?:,|\\su\\.\\sa\\.)\\smit\\s([^\\.]*)\\."),
       m_dePremiereOTitle("\\s*\\(([^\\)]*)\\)$"),
       m_deSkyDescriptionSeasonEpisode("^(\\d{1,2}).\\sStaffel,\\sFolge\\s(\\d{1,2}):\\s"),
       m_nlTxt("txt"),
@@ -1934,23 +1935,35 @@ void EITFixUp::FixPremiere(DBEventEIT &event) const
 {
     QString country = "";
 
-    // Find infos about country and year, regisseur and actors
-    QRegExp tmpInfos =  m_dePremiereInfos;
-    if (tmpInfos.indexIn(event.description) != -1)
+    QRegExp tmplength =  m_dePremiereLength;
+    QRegExp tmpairdate =  m_dePremiereAirdate;
+    QRegExp tmpcredits =  m_dePremiereCredits;
+
+    event.description = event.description.replace(tmplength, "");
+
+    if (tmpairdate.indexIn(event.description) != -1)
     {
-        country = tmpInfos.cap(2).trimmed();
+        country = tmpairdate.cap(1).trimmed();
         bool ok;
-        uint y = tmpInfos.cap(1).toUInt(&ok);
+        uint y = tmpairdate.cap(2).toUInt(&ok);
         if (ok)
             event.airdate = y;
-        event.AddPerson(DBPerson::kDirector, tmpInfos.cap(3));
-        const QStringList actors = tmpInfos.cap(4).split(
+        event.description = event.description.replace(tmpairdate, "");
+    }
+
+    if (tmpcredits.indexIn(event.description) != -1)
+    {
+        event.AddPerson(DBPerson::kDirector, tmpcredits.cap(1));
+        const QStringList actors = tmpcredits.cap(2).split(
             ", ", QString::SkipEmptyParts);
         QStringList::const_iterator it = actors.begin();
         for (; it != actors.end(); ++it)
             event.AddPerson(DBPerson::kActor, *it);
-        event.description = event.description.replace(tmpInfos, "");
+        event.description = event.description.replace(tmpcredits, "");
     }
+
+    event.description = event.description.replace("\u000A$", "");
+    event.description = event.description.replace("\u000A", " ");
 
     // move the original titel from the title to subtitle
     QRegExp tmpOTitle = m_dePremiereOTitle;

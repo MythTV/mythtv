@@ -4391,7 +4391,7 @@ Gerät unterstützt bis zu %1</translation>
         <location filename="../programs/mythfrontend/customedit.cpp" line="466"/>
         <source>Category type (%1)</source>
         <comment>List of hardcoded category types</comment>
-        <translation>Kategorietyp (%!)</translation>
+        <translation>Kategorietyp (%1)</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="507"/>
