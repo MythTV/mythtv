@@ -36,6 +36,28 @@ static QVariant denullify(const QDateTime &dt)
     return dt.isNull() ? QVariant("0000-00-00 00:00:00") : QVariant(dt);
 }
 
+void add_genres(MSqlQuery &query, const QStringList &genres,
+                uint chanid, const QDateTime &starttime)
+{
+    QString relevance = QStringLiteral("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    QStringList::const_iterator it = genres.constBegin();
+    for (; (it != genres.end()) &&
+             ((it - genres.constBegin()) < relevance.size()); ++it)
+    {
+        query.prepare(
+           "INSERT INTO programgenres "
+           "       ( chanid,  starttime, genre,  relevance) "
+           "VALUES (:CHANID, :START,    :genre, :relevance)");
+        query.bindValue(":CHANID",    chanid);
+        query.bindValue(":START",     starttime);
+        query.bindValue(":genre",     *it);
+        query.bindValue(":relevance", relevance.at(it - genres.constBegin()));
+
+        if (!query.exec())
+            MythDB::DBError("programgenres insert", query);
+    }
+}
+
 DBPerson::DBPerson(const DBPerson &other) :
     role(other.role), name(other.name)
 {
@@ -179,6 +201,7 @@ DBEvent &DBEvent::operator=(const DBEvent &other)
     season          = other.season;
     episode         = other.episode;
     totalepisodes   = other.totalepisodes;
+    genres          = other.genres;
 
     Squeeze();
 
@@ -748,6 +771,8 @@ uint DBEvent::UpdateDB(
             MythDB::DBError("programrating insert", query);
     }
 
+    add_genres(query, genres, chanid, starttime);
+
     return 1;
 }
 
@@ -1052,6 +1077,8 @@ uint DBEvent::InsertDB(MSqlQuery &query, uint chanid) const
             (*credits)[i].InsertDB(query, chanid, starttime);
     }
 
+    add_genres(query, genres, chanid, starttime);
+
     return 1;
 }
 
@@ -1206,6 +1233,8 @@ uint ProgInfo::InsertDB(MSqlQuery &query, uint chanid) const
         for (uint i = 0; i < credits->size(); ++i)
             (*credits)[i].InsertDB(query, chanid, starttime);
     }
+
+    add_genres(query, genres, chanid, starttime);
 
     return 1;
 }

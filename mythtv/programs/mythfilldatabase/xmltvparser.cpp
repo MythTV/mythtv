@@ -352,6 +352,8 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
                     // Hack for tv_grab_uk_rt
                     pginfo->categoryType = ProgramInfo::kCategoryMovie;
                 }
+
+                pginfo->genres.append(cat);
             }
             else if (info.tagName() == "date" && !pginfo->airdate)
             {
