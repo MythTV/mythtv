@@ -390,7 +390,10 @@ int MONITOR::getLastWriteIndex(void)
     if (shared_data)
         return shared_data->last_write_index;
 
-    return shared_data26->last_write_index;
+    if (shared_data26)
+        return shared_data26->last_write_index;
+
+    return 0;
 }
 
 int MONITOR::getState(void)
@@ -398,7 +401,10 @@ int MONITOR::getState(void)
     if (shared_data)
         return shared_data->state;
 
-    return shared_data26->state;
+    if (shared_data26)
+        return shared_data26->state;
+
+    return 0;
 }
 
 int MONITOR::getSubpixelOrder(void)
@@ -411,7 +417,10 @@ int MONITOR::getSubpixelOrder(void)
             return ZM_SUBPIX_ORDER_RGB;
     }
 
-    return shared_data26->format;
+    if (shared_data26)
+      return shared_data26->format;
+
+    return ZM_SUBPIX_ORDER_NONE;
 }
 
 int MONITOR::getFrameSize(void)
@@ -419,7 +428,10 @@ int MONITOR::getFrameSize(void)
     if (shared_data)
         return width * height * bytes_per_pixel;
 
-    return shared_data26->imagesize;
+    if (shared_data26)
+      return shared_data26->imagesize;
+
+    return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////

@@ -233,67 +233,79 @@ void inline mmx_yuv888_to_yv12(VideoFrame *frame, MythImage *osd_image,
 #endif
 }
 
-void inline c_yuv888_to_yv12(VideoFrame *frame, MythImage *osd_image,
+void c_yuv888_to_yv12(VideoFrame *frame, MythImage *osd_image,
                              int left, int top, int right, int bottom)
 {
-    unsigned char *udest, *vdest, *src1, *src2;
-    int alpha1, alpha2, alpha3, alpha4, src_wrap, y_wrap, width, height;
-    unsigned char *y1, *y2, *y3, *y4, *a1, *a2, *a3, *a4, *r1, *r2, *r3, *r4;
-    unsigned char *g1, *g2, *g3, *g4, *b1, *b2, *b3, *b4;
+    const int width  = right - left;
+    const int height = bottom - top;
 
-    width  = right - left;
-    height = bottom - top;
+    unsigned char *udest = frame->buf + frame->offsets[1];
+    unsigned char *vdest = frame->buf + frame->offsets[2];
+    udest  += frame->pitches[1] * (top >> 1) + (left >> 1);
+    vdest  += frame->pitches[2] * (top >> 1) + (left >> 1);
 
-    udest   = frame->buf + frame->offsets[1];
-    vdest   = frame->buf + frame->offsets[2];
-    udest  += (frame->pitches[1] * (top >> 1)) + (left >> 1);
-    vdest  += (frame->pitches[2] * (top >> 1)) + (left >> 1);
+    unsigned char *y1 = frame->buf + frame->offsets[0]
+                      + frame->pitches[0] * top + left;
+    unsigned char *y3 = y1 + frame->pitches[0];
+    const int y_wrap = (frame->pitches[0] << 1) - width;
 
-    y1 = frame->buf + frame->offsets[0] + (frame->pitches[0] * top) + left;
-    y3 = frame->buf + frame->offsets[0] + (frame->pitches[0] * (top + 1)) + left;
-    y2 = y1 + 1; y4 = y3 + 1;
-
-    src1 = osd_image->scanLine(top) + (left << 2);
-    src2 = osd_image->scanLine(top + 1) + (left << 2);
-    b1 = src1 + B_OI; b2 = b1 + 4; b3 = src2 + B_OI; b4 = b3 + 4;
-    g1 = src1 + G_OI; g2 = g1 + 4; g3 = src2 + G_OI; g4 = g3 + 4;
-    r1 = src1 + R_OI; r2 = r1 + 4; r3 = src2 + R_OI; r4 = r3 + 4;
-    a1 = src1 + A_OI; a2 = a1 + 4; a3 = src2 + A_OI; a4 = a3 + 4;
-    src_wrap = (osd_image->bytesPerLine() << 1) - (width << 2);
-    y_wrap = (frame->pitches[0] << 1) - width;
+    const unsigned char *src = osd_image->scanLine(top) + left * sizeof(QRgb);
+    const int bpl = osd_image->bytesPerLine();
 
     for (int row = 0; row < height; row += 2)
     {
-        for (int col = 0; col < (width >> 1); col++)
+        const QRgb *p1 = reinterpret_cast<const QRgb* >(src);
+        const QRgb *p3 = reinterpret_cast<const QRgb* >(src + bpl);
+
+        for (int col = 0, maxcol = width / 2; col < maxcol; ++col)
         {
-            alpha1 = 255 - *a1; alpha2 = 255 - *a2;
-            alpha3 = 255 - *a3; alpha4 = 255 - *a4;
+            QRgb rgb1 = p1[0], rgb2 = p1[1], rgb3 = p3[0], rgb4 = p3[1];
+            int alpha1 = 255 - qAlpha(rgb1);
+            int alpha2 = 255 - qAlpha(rgb2);
+            int alpha3 = 255 - qAlpha(rgb3);
+            int alpha4 = 255 - qAlpha(rgb4);
+            int alphaUV = (alpha1 + alpha2 + alpha3 + alpha4) >> 2;
 
-            *y1 = ((*y1 * alpha1) >> 8) + *r1;
-            *y2 = ((*y2 * alpha2) >> 8) + *r2;
-            *y3 = ((*y3 * alpha3) >> 8) + *r3;
-            *y4 = ((*y4 * alpha4) >> 8) + *r4;
+            // Note - in the code below qRed is not really red, it
+            // is Y, or luminance. qGreen is U chrominance and qBlue
+            // is V chrominance.
+            if (alphaUV == 0)
+            {
+                // Special case optimized for raspberry pi
+                // This code handles opaque images. In this
+                // case it is not necessary to merge in the background.
+                y1[0] = qRed(rgb1);
+                y1[1] = qRed(rgb2);
+                y3[0] = qRed(rgb3);
+                y3[1] = qRed(rgb4);
+                udest[col] = (qGreen(rgb1) + qGreen(rgb2) + qGreen(rgb3) + qGreen(rgb4)) >> 2;
+                vdest[col] = (qBlue(rgb1)  + qBlue(rgb2)  + qBlue(rgb3)  + qBlue(rgb4)) >> 2;
+            }
+            else if (alphaUV < 255)
+            {
+                // This code handles transparency. it is skipped
+                // if the image is invisible (alphaUV == 255)
+                // This section could handle all cases, but for
+                // optimizing CPU usage three cases are handled differently.
+                y1[0] = ((y1[0] * alpha1) >> 8) + qRed(rgb1);
+                y1[1] = ((y1[1] * alpha2) >> 8) + qRed(rgb2);
+                y3[0] = ((y3[0] * alpha3) >> 8) + qRed(rgb3);
+                y3[1] = ((y3[1] * alpha4) >> 8) + qRed(rgb4);
 
-            alpha1 = (alpha1 + alpha2 + alpha3 + alpha4) >> 2;
-            udest[col] = ((udest[col] * alpha1) >> 8) +
-                         ((*g1 + *g2 + *g3 + *g4) >> 2);
-            vdest[col] = ((vdest[col] * alpha1) >> 8) +
-                         ((*b1 + *b2 + *b3 + *b4) >> 2);
+                int u = (qGreen(rgb1) + qGreen(rgb2) + qGreen(rgb3) + qGreen(rgb4)) >> 2;
+                udest[col] = ((udest[col] * alphaUV) >> 8) + u;
 
-            y1 += 2; y2 += 2; y3 += 2; y4 += 2;
-            r1 += 8; r2 += 8; r3 += 8; r4 += 8;
-            g1 += 8; g2 += 8; g3 += 8; g4 += 8;
-            b1 += 8; b2 += 8; b3 += 8; b4 += 8;
-            a1 += 8; a2 += 8; a3 += 8; a4 += 8;
-
+                int v = (qBlue(rgb1)  + qBlue(rgb2)  + qBlue(rgb3)  + qBlue(rgb4)) >> 2;
+                vdest[col] = ((vdest[col] * alphaUV) >> 8) + v;
+            }
+            y1 += 2, y3 += 2;
+            p1 += 2, p3 += 2;
         }
-        r1 += src_wrap; r2 += src_wrap; r3 += src_wrap; r4 += src_wrap;
-        g1 += src_wrap; g2 += src_wrap; g3 += src_wrap; g4 += src_wrap;
-        b1 += src_wrap; b2 += src_wrap; b3 += src_wrap; b4 += src_wrap;
-        a1 += src_wrap; a2 += src_wrap; a3 += src_wrap; a4 += src_wrap;
-        y1 += y_wrap;   y2 += y_wrap;   y3 += y_wrap;   y4 += y_wrap;
-        udest  += frame->pitches[1];
-        vdest  += frame->pitches[2];
+
+        y1 += y_wrap, y3 += y_wrap;
+        udest += frame->pitches[1];
+        vdest += frame->pitches[2];
+        src += bpl << 1;
     }
 }
 

@@ -642,6 +642,34 @@ void TestEITFixups::testSkyEpisodes()
     QCOMPARE(event3->season,  0u);
     QCOMPARE(event3->episode, 0u);
     delete event3;
+
+    DBEventEIT *event4 = SimpleDBEventEIT (EITFixUp::kFixPremiere,
+                                         "Schwerter des Königs - Zwei Welten",
+                                         "Subtitle",
+                                         "Ex-Marine und Kampfsportlehrer Granger (Dolph Lundgren) ... Star Dolph Lundgren. 92 Min.\u000AD/CDN 2011. Von Uwe Boll, mit Dolph Lundgren, Natassia Malthe, Lochlyn Munro.\u000AAb 16 Jahren");
+
+    fixup.Fix(*event4);
+    PRINT_EVENT(*event4);
+    QCOMPARE(event4->description, QString("Ex-Marine und Kampfsportlehrer Granger (Dolph Lundgren) ... Star Dolph Lundgren. Ab 16 Jahren"));
+    QCOMPARE(event4->season,  0u);
+    QCOMPARE(event4->episode, 0u);
+    QCOMPARE(event4->airdate,  (unsigned short) 2011);
+    QVERIFY(event4->HasCredits());
+    delete event4;
+
+    DBEventEIT *event5 = SimpleDBEventEIT (EITFixUp::kFixPremiere,
+                                         "Die wilden 70ern",
+                                            "Laurie zieht aus",
+                                            "2. Staffel, Folge 11: Lauries Auszug setzt Red zu, denn er hat ... ist.\u000AUSA 1999. 25 Min. Von David Trainer, mit Topher Grace, Mila Kunis, Ashton Kutcher.");
+
+    fixup.Fix(*event5);
+    PRINT_EVENT(*event5);
+    QCOMPARE(event5->description, QString("Lauries Auszug setzt Red zu, denn er hat ... ist."));
+    QCOMPARE(event5->season,  2u);
+    QCOMPARE(event5->episode, 11u);
+    QCOMPARE(event5->airdate,  (unsigned short) 1999);
+    QVERIFY(event5->HasCredits());
+    delete event5;
 }
 
 void TestEITFixups::testUnitymedia()

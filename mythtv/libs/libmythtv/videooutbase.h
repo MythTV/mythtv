@@ -145,6 +145,7 @@ class VideoOutput
 
     bool AllowPreviewEPG(void) const;
 
+    virtual QString GetName(void) const { return QString(); }
     virtual bool IsPIPSupported(void) const { return false; }
     virtual bool IsPBPSupported(void) const { return false; }
     virtual bool NeedExtraAudioDecode(void) const { return false; }

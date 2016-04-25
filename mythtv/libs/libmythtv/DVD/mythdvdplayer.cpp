@@ -234,13 +234,6 @@ void MythDVDPlayer::DisplayLastFrame(void)
     SetScanType(kScan_Progressive);
     DisplayDVDButton();
 
-    osdLock.lock();
-    videofiltersLock.lock();
-    videoOutput->ProcessFrame(NULL, osd, videoFilters, pip_players,
-                              kScan_Progressive);
-    videofiltersLock.unlock();
-    osdLock.unlock();
-
     AVSync(NULL, true);
 }
 
