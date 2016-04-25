@@ -1030,6 +1030,22 @@ uint DBEvent::InsertDB(MSqlQuery &query, uint chanid) const
         return 0;
     }
 
+    QList<EventRating>::const_iterator j = ratings.begin();
+    for (; j != ratings.end(); ++j)
+    {
+        query.prepare(
+            "INSERT INTO programrating "
+            "       ( chanid, starttime, system, rating) "
+            "VALUES (:CHANID, :START,    :SYS,  :RATING)");
+        query.bindValue(":CHANID", chanid);
+        query.bindValue(":START",  starttime);
+        query.bindValue(":SYS",    (*j).system);
+        query.bindValue(":RATING", (*j).rating);
+
+        if (!query.exec())
+            MythDB::DBError("programrating insert", query);
+    }
+
     if (credits)
     {
         for (uint i = 0; i < credits->size(); i++)
