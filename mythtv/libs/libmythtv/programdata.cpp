@@ -179,6 +179,7 @@ DBEvent &DBEvent::operator=(const DBEvent &other)
     season          = other.season;
     episode         = other.episode;
     totalepisodes   = other.totalepisodes;
+    genres          = other.genres;
 
     Squeeze();
 
