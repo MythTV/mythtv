@@ -30,7 +30,7 @@ class ImageProperties
     ImageProperties &operator=(const ImageProperties &other);
 
     void SetMaskImage(MythImage *image);
-    void SetMaskImageFilename(const QString filename)
+    void SetMaskImageFilename(const QString &filename)
     {
         maskImageFilename=filename;
     }
