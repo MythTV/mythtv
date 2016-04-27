@@ -734,20 +734,14 @@ void MythNews::customEvent(QEvent *event)
 
         if (resultid == "options")
         {
-            if (m_NewsSites.size() > 0)
-            {
-                if (buttonnum == 0)
-                    ShowFeedManager();
-                else if (buttonnum == 1)
-                    ShowEditDialog(false);
-                else if (buttonnum == 2)
-                    ShowEditDialog(true);
-                else if (buttonnum == 3)
-                    deleteNewsSite();
-            }
-            else
-                if (buttonnum == 0)
-                    ShowEditDialog(false);
+            if (buttonnum == 0)
+                ShowFeedManager();
+            else if (buttonnum == 1)
+                ShowEditDialog(false);
+            else if (buttonnum == 2)
+                ShowEditDialog(true);
+            else if (buttonnum == 3)
+                deleteNewsSite();
         }
 
         m_menuPopup = NULL;
