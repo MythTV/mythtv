@@ -276,6 +276,7 @@ class Recorded( CMPRecord, DBDataWrite ):
     Recorded(data=None, db=None) -> Recorded object
             'data' is a tuple containing (chanid, storagegroup)
     """
+    _key   = ['chanid','starttime']
     _defaults = {'title':u'Unknown', 'subtitle':'',          'description':'',
                  'category':'',      'hostname':'',          'bookmark':0,
                  'editing':0,        'cutlist':0,            'autoexpire':0,
