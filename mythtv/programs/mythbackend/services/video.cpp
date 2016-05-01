@@ -380,7 +380,7 @@ bool Video::UpdateVideoWatchedStatus ( int  nId,
 {
     VideoMetadataListManager::metadata_list videolist;
     VideoMetadataListManager::loadAllFromDatabase(videolist);
-    VideoMetadataListManager *mlm = new VideoMetadataListManager();
+    QScopedPointer<VideoMetadataListManager> mlm(new VideoMetadataListManager());
     mlm->setList(videolist);
     VideoMetadataListManager::VideoMetadataPtr metadata = mlm->byID(nId);
 
@@ -389,6 +389,7 @@ bool Video::UpdateVideoWatchedStatus ( int  nId,
 
     metadata->SetWatched(bWatched);
     metadata->UpdateDatabase();
+
     return true;
 }
 
