@@ -30,6 +30,7 @@ GallerySlideView::GallerySlideView(MythScreenStack *parent, const char *name,
       m_slides(),
       m_infoList(*this),
       m_slideShowTime(gCoreContext->GetNumSetting("GallerySlideShowTime", 3000)),
+      m_statusText(),
       m_playing(false),
       m_suspended(false),
       m_showCaptions(gCoreContext->GetNumSetting("GalleryShowSlideCaptions", true)),
@@ -519,7 +520,7 @@ void GallerySlideView::HideInfo()
 void GallerySlideView::ShowCaptions()
 {
     m_showCaptions = true;
-    m_uiHideCaptions->SetText("");
+    m_uiHideCaptions->Reset();
 }
 
 
@@ -702,7 +703,7 @@ void GallerySlideView::ShowNextSlide(int inc, bool useTransition)
         if (m_uiSlideCount)
             m_uiSlideCount->SetText("0/0");
         if (m_uiCaptionText)
-            m_uiCaptionText->SetText("");
+            m_uiCaptionText->Reset();
     }
 }
 
@@ -728,9 +729,9 @@ void GallerySlideView::PlayVideo()
 */
 void GallerySlideView::SetStatus(QString msg, bool delay)
 {
+    m_statusText = msg;
     if (m_uiStatus)
     {
-        m_uiStatus->SetText(msg);
         if (delay)
             m_delay.start();
         else
@@ -742,8 +743,9 @@ void GallerySlideView::SetStatus(QString msg, bool delay)
 void GallerySlideView::ShowStatus()
 {
     if (m_uiStatus)
-        m_uiStatus->SetVisible(true);
+        m_uiStatus->SetText(m_statusText);
 }
+
 
 void GallerySlideView::ClearStatus(Slide &slide)
 {
@@ -751,12 +753,12 @@ void GallerySlideView::ClearStatus(Slide &slide)
     {
         m_delay.stop();
 
-        if (!slide.FailedLoad())
-
-            m_uiStatus->SetVisible(false);
-
-        else if (ImagePtrK im = slide.GetImageData())
-
-            SetStatus(tr("Failed to load %1").arg(im->m_filePath));
+        if (slide.FailedLoad())
+        {
+            ImagePtrK im = slide.GetImageData();
+            SetStatus(tr("Failed to load %1").arg(im ? im->m_filePath : "?"));
+        }
+        else
+            m_uiStatus->Reset();
     }
 }
