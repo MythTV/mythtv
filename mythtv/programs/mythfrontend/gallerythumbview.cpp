@@ -615,7 +615,10 @@ void GalleryThumbView::LoadData(int parent)
     {
         m_imageList->SetVisible(true);
         if (m_emptyText)
+        {
             m_emptyText->SetVisible(false);
+            m_emptyText->Reset();
+        }
 
         // Construct the buttonlist
         BuildImageList();
@@ -858,9 +861,15 @@ void GalleryThumbView::UpdateScanProgress(const QString &scanner,
         if (m_scanActive.isEmpty())
         {
             if (m_scanProgressText)
+            {
                 m_scanProgressText->SetVisible(false);
+                m_scanProgressText->Reset();
+            }
             if (m_scanProgressBar)
+            {
                 m_scanProgressBar->SetVisible(false);
+                m_scanProgressBar->Reset();
+            }
 
             m_scanProgress.clear();
 

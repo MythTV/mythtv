@@ -84,12 +84,12 @@ private:
     int         m_slideShowTime; //!< Time to display a slide in a slideshow
     QTimer      m_timer;         //!< Slide duration timer
     QTimer      m_delay;         //!< Status delay timer
+    QString     m_statusText;    //!< Text to display as status
     bool        m_playing;       //!< True when slideshow is running
     bool        m_suspended;     //!< True when transition is running or video playing
     bool        m_showCaptions;  //!< If true, captions are shown
     bool        m_transitioning; //!< True when a transition is in progress
     bool        m_editsAllowed;  //!< True when edits are enabled
-
 };
 
 #endif // GALLERYWIDGET_H
