@@ -35,6 +35,7 @@ HEADERS += datacontracts/recording.h             datacontracts/settingList.h
 HEADERS += datacontracts/wolInfo.h               datacontracts/programList.h
 HEADERS += datacontracts/encoder.h               datacontracts/encoderList.h
 HEADERS += datacontracts/storageGroupDir.h       datacontracts/storageGroupDirList.h
+HEADERS += datacontracts/keyBind.h               datacontracts/KeyBindList.h
 HEADERS += datacontracts/channelInfoList.h       datacontracts/videoSource.h
 HEADERS += datacontracts/videoSourceList.h       datacontracts/videoMultiplex.h
 HEADERS += datacontracts/videoMultiplexList.h    datacontracts/videoMetadataInfo.h

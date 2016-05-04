@@ -696,6 +696,162 @@ DTC::SettingList *Myth::GetSettingList(const QString &sHostName)
 //
 /////////////////////////////////////////////////////////////////////////////
 
+DTC::KeyBindList *Myth::GetKeyBindList(const QString &sHostName,const bool IncludeDescriptions)
+{
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    if (!query.isConnected())
+    {
+        throw( QString("Database not open while trying to load settings for host: %1")
+                  .arg( sHostName ));
+    }
+
+    DTC::KeyBindList *pList = new DTC::KeyBindList();
+
+    // ------------------------------------------------------------------
+    // Looking to return all Setting for supplied hostname
+    // ------------------------------------------------------------------
+
+    if (sHostName.isEmpty())
+    {
+        query.prepare("SELECT context, action, keylist, hostname, description FROM keybindings" );
+    }
+    else
+    {
+        query.prepare("SELECT context, action, keylist, hostname, description FROM keybindings "
+                        "WHERE (hostname = :HOSTNAME)" );
+
+        query.bindValue(":HOSTNAME", sHostName );
+    }
+
+    if (!query.exec())
+    {
+        // clean up unused object we created.
+
+        delete pList;
+
+        MythDB::DBError("MythAPI::GetKeyBindList() w/o key ", query);
+        throw( QString( "Database Error executing query." ));
+    }
+    while (query.next())
+    {
+        DTC::KeyBind *pKeyBind = pList->AddNewKeyBind();
+
+        pKeyBind->setContext       ( query.value(0).toString()    );
+        pKeyBind->setAction        ( query.value(1).toString()    );
+        pKeyBind->setKeyList       ( query.value(2).toString()    );
+        pKeyBind->setHostName      ( query.value(3).toString()    );
+        if(IncludeDescriptions)
+        {
+            pKeyBind->setDescription   ( query.value(4).toString()    );
+        }
+    }
+    if (sHostName.isEmpty())
+    {
+        query.prepare("SELECT destination, keylist, hostname, description FROM jumppoints" );
+    }
+    else
+    {
+        query.prepare("SELECT destination, keylist, hostname, description FROM jumppoints "
+                        "WHERE (hostname = :HOSTNAME)" );
+
+        query.bindValue(":HOSTNAME", sHostName );
+    }
+    if (!query.exec())
+    {
+        // clean up unused object we created.
+
+        delete pList;
+
+        MythDB::DBError("MythAPI::GetKeyBindList() w/o key ", query);
+        throw( QString( "Database Error executing query." ));
+    }
+    while (query.next())
+    {
+        DTC::KeyBind *pKeyBind = pList->AddNewKeyBind();
+
+        pKeyBind->setContext       ( "JumpPoint"    );
+        pKeyBind->setAction        ( query.value(0).toString()    );
+        pKeyBind->setKeyList       ( query.value(1).toString()    );
+        pKeyBind->setHostName      ( query.value(2).toString()    );
+        if(IncludeDescriptions)
+        {
+            pKeyBind->setDescription   ( query.value(3).toString()    );
+        }
+    }
+    return pList;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool Myth::PutKeyBind( const QString &sHostName,
+                       const QString &sContext,
+                       const QString &sAction,
+                       const QString &sKeyList )
+{
+    bool bResult = false;
+    bool bIsJumpPoint = sContext.toLower() == "jumppoint";
+
+    if (sKeyList.isEmpty())
+    {
+        throw ( QString( "KeyList Required" ));
+    }
+    if (sContext.isEmpty())
+    {
+        throw ( QString( "Context Required" ));
+    }
+    if (sAction.isEmpty())
+    {
+        throw ( QString( "Action Required" ));
+    }
+    if (sHostName.isEmpty())
+    {
+        throw ( QString( "Hostname Required" ));
+    }
+    MSqlQuery query(MSqlQuery::InitCon());
+    if (bIsJumpPoint)
+    {
+        query.prepare(
+            "UPDATE jumppoints "
+            "SET keylist = :KEYLIST "
+            "WHERE hostname    = :HOSTNAME AND"
+            "      destination = :ACTION");
+    }
+    else
+    {
+        query.prepare(
+        "UPDATE keybindings "
+        "SET keylist = :KEYLIST "
+        "WHERE hostname = :HOSTNAME AND "
+        "      action   = :ACTION   AND "
+        "      context  = :CONTEXT");
+    }
+
+    query.bindValue(":KEYLIST",     sKeyList);
+    query.bindValue(":HOSTNAME",    sHostName);
+    query.bindValue(":ACTION",      sAction);
+    if(! bIsJumpPoint)
+    {
+        query.bindValue(":CONTEXT",      sContext);
+    }
+    if (!query.exec() || !query.isActive())
+    {
+        MythDB::DBError("MythAPI::PutKeyBind() ", query);
+        throw( QString( "Database Error executing query." ));
+    }
+    bResult = query.numRowsAffected() > 0; //technically this returns false when the value hasn't changed or its an invalid bind
+
+    return bResult;
+
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 bool Myth::PutSetting( const QString &sHostName,
                        const QString &sKey,
                        const QString &sValue )
