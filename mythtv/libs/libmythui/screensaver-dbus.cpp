@@ -53,7 +53,7 @@ class ScreenSaverDBusPrivate
     {
         if (!m_interface->isValid())
         {
-            LOG(VB_GENERAL, LOG_WARNING, LOC + "Could not connect to dbus: " +
+            LOG(VB_GENERAL, LOG_DEBUG, LOC + "Could not connect to dbus: " +
                 m_interface->lastError().message());
         }
         else
