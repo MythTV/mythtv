@@ -141,12 +141,13 @@ class PlaybackBox : public ScheduleCommon
     void ItemVisible(MythUIButtonListItem *item);
     void ItemLoaded(MythUIButtonListItem *item);
     void selected(MythUIButtonListItem *item);
-    void PlayFromBookmarkOrProgStart(MythUIButtonListItem *item = NULL);
+    void PlayFromAnyMark(MythUIButtonListItem *item = NULL);
     void PlayFromBookmark(MythUIButtonListItem *item = NULL);
     void PlayFromBeginning(MythUIButtonListItem *item = NULL);
     void PlayFromLastPlayPos(MythUIButtonListItem *item = NULL);
     void deleteSelected(MythUIButtonListItem *item);
-
+    void ClearBookmark();
+    void ClearLastPlayPos();
     void SwitchList(void);
 
     void ShowGroupPopup(void);
@@ -321,8 +322,7 @@ class PlaybackBox : public ScheduleCommon
     void HandlePreviewEvent(const QStringList &list);
     void HandleRecordingRemoveEvent(uint recordingID);
     void HandleRecordingAddEvent(const ProgramInfo &evinfo);
-    void HandleUpdateProgramInfoEvent(const ProgramInfo &evinfo);
-    void HandleUpdateProgramInfoFileSizeEvent(uint recordingID, uint64_t filesize);
+    void HandleUpdateItemEvent(uint recordingId, uint flags);
 
     void ScheduleUpdateUIList(void);
     void ShowMenu(void);

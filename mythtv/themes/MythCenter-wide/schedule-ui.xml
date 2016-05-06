@@ -513,6 +513,16 @@
             <statetype name="buttonitem">
                 <area>0,0,1200,24</area>
                 <state name="active">
+                    <progressbar name="buttonprogress">
+                        <area>10,2,1200,24</area>
+                        <layout>horizontal</layout>
+                        <style>reveal</style>
+                        <shape name="progressimage">
+                            <area>0,0,100%,100%</area>
+                            <type>box</type>
+                            <fill color="#000000" alpha="128"/>
+                        </shape>
+                    </progressbar>
                     <textarea name="shortstarttimedate" from="buttontext">
                         <area>10,2,250,24</area>
                     </textarea>
@@ -521,6 +531,7 @@
                     </textarea>
                     <textarea name="title" from="shortstarttimedate">
                         <area>480,2,655,24</area>
+                        <template>%title%% (|progresspercent|%)%</template>
                     </textarea>
                     <textarea name="card" from="shortstarttimedate">
                         <area>1145,2,40,24</area>
@@ -542,6 +553,7 @@
                     </textarea>
                     <textarea name="title" from="shortstarttimedate">
                         <area>480,2,655,24</area>
+                        <template>%title%% (|progresspercent|%)%</template>
                     </textarea>
                     <textarea name="card" from="shortstarttimedate">
                         <area>1145,2,40,24</area>
@@ -562,8 +574,14 @@
         </buttonlist>
 
         <textarea name="title" from="basetextarea">
-            <area>30,454,1200,50</area>
+            <area>30,454,1000,50</area>
             <font>baselarge</font>
+        </textarea>
+
+        <textarea name="progresspercent" from="basetextarea">
+            <area>1180,454,70,50</area>
+            <align>right,vcenter</align>
+            <template>%progresspercent|%%</template>
         </textarea>
 
         <textarea name="channel" from="basetextarea">

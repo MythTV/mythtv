@@ -69,7 +69,7 @@ class MPUBLIC ProgramInfo
   public:
     enum CategoryType { kCategoryNone, kCategoryMovie, kCategorySeries,
                         kCategorySports, kCategoryTVShow };
-                        
+
     /// Null constructor
     ProgramInfo(void);
     /// Copy constructor
@@ -548,6 +548,9 @@ class MPUBLIC ProgramInfo
     void SetPositionMapDBReplacement(PMapDBReplacement *pmap)
         { positionMapDBReplacement = pmap; }
 
+    uint GetProgressPercent() const        { return progressPercent; }
+    void SetProgressPercent(uint progress) { progressPercent = progress; }
+
     // Slow DB gets
     QString     QueryBasename(void) const;
 //  uint64_t    QueryFilesize(void) const; // TODO Remove
@@ -556,6 +559,7 @@ class MPUBLIC ProgramInfo
     uint64_t    QueryBookmark(void) const;
     uint64_t    QueryProgStart(void) const;
     uint64_t    QueryLastPlayPos(void) const;
+    uint64_t    QueryStartMark(void) const;
     CategoryType QueryCategoryType(void) const;
     QStringList QueryDVDBookmark(const QString &serialid) const;
     QStringList QueryBDBookmark(const QString &serialid) const;
@@ -581,6 +585,7 @@ class MPUBLIC ProgramInfo
 
     // Slow DB sets
     virtual void SaveFilesize(uint64_t fsize); /// TODO Move to RecordingInfo
+    void SaveLastPlayPos(uint64_t frame, bool notify = true);
     void SaveBookmark(uint64_t frame);
     void SaveDVDBookmark(const QStringList &fields) const;
     void SaveBDBookmark(const QStringList &fields) const;
@@ -702,6 +707,8 @@ class MPUBLIC ProgramInfo
     bool FromStringList(QStringList::const_iterator &it,
                         QStringList::const_iterator  end);
 
+    void UpdateMarkTimeStamp(bool bookmarked);
+
     static void QueryMarkupMap(
         const QString &video_pathname,
         frm_dir_map_t&, MarkTypes type, bool merge = false);
@@ -782,6 +789,8 @@ class MPUBLIC ProgramInfo
 
 // everything below this line is not serialized
     uint8_t availableStatus; // only used for playbackbox.cpp
+    uint  progressPercent; // only used by UI
+
   public:
     void SetAvailableStatus(AvailableStatusType status, const QString &where);
     AvailableStatusType GetAvailableStatus(void) const

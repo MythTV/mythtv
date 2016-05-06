@@ -282,13 +282,16 @@ void ViewScheduled::LoadList(bool useExistingData)
     if (!useExistingData)
         LoadFromScheduler(m_recList, m_conflictBool);
 
-    ProgramList::iterator pit = m_recList.begin();
-    QString currentDate;
     m_recgroupList[m_defaultGroup] = ProgramList(false);
     m_recgroupList[m_defaultGroup].setAutoDelete(false);
+
+    ProgramList::iterator pit = m_recList.begin();
     while (pit != m_recList.end())
     {
         ProgramInfo *pginfo = *pit;
+
+        CalcRecordedPercent(*pginfo);
+
         const RecStatus::Type recstatus = pginfo->GetRecordingStatus();
         if ((pginfo->GetRecordingEndTime() >= now ||
              pginfo->GetScheduledEndTime() >= now ||
@@ -392,6 +395,57 @@ void ViewScheduled::ChangeGroup(MythUIButtonListItem* item)
         FillList();
 }
 
+void ViewScheduled::UpdateUIListItem(MythUIButtonListItem* item,
+                                     const ProgramInfo &pginfo)
+{
+    QString state;
+
+    const RecStatus::Type recstatus = pginfo.GetRecordingStatus();
+    if (recstatus == RecStatus::Recording      ||
+        recstatus == RecStatus::Tuning)
+        state = "running";
+    else if (recstatus == RecStatus::Conflict  ||
+             recstatus == RecStatus::Offline   ||
+             recstatus == RecStatus::TunerBusy ||
+             recstatus == RecStatus::Failed    ||
+             recstatus == RecStatus::Failing   ||
+             recstatus == RecStatus::Aborted   ||
+             recstatus == RecStatus::Missed)
+        state = "error";
+    else if (recstatus == RecStatus::WillRecord)
+    {
+        if (m_curinput == 0 || pginfo.GetInputID() == m_curinput)
+        {
+            if (pginfo.GetRecordingPriority2() < 0)
+                state = "warning";
+            else
+                state = "normal";
+        }
+    }
+    else if (recstatus == RecStatus::Repeat ||
+             recstatus == RecStatus::NeverRecord ||
+             recstatus == RecStatus::DontRecord ||
+             (recstatus != RecStatus::DontRecord &&
+              recstatus <= RecStatus::EarlierShowing))
+        state = "disabled";
+    else
+        state = "warning";
+
+    InfoMap infoMap;
+    pginfo.ToMap(infoMap);
+    
+    infoMap["progresspercent"] = ProgressString(pginfo);
+
+    item->SetTextFromMap(infoMap, state);
+
+    if (!infoMap["progresspercent"].isEmpty())
+        item->SetProgress(0, 100, pginfo.GetProgressPercent());
+    
+    QString rating = QString::number(pginfo.GetStars(10));
+    item->DisplayState(rating, "ratingstate");
+    item->DisplayState(state, "status");    
+}
+
 void ViewScheduled::FillList()
 {
     m_schedulesList->Reset();
@@ -415,58 +469,14 @@ void ViewScheduled::FillList()
     ProgramList::iterator pit = plist.begin();
     while (pit != plist.end())
     {
-        ProgramInfo *pginfo = *pit;
-        if (!pginfo)
+        ProgramInfo* pginfo = *pit;
+        if (pginfo)
         {
-            ++pit;
-            continue;
+            MythUIButtonListItem *item =
+                    new MythUIButtonListItem(m_schedulesList,"",
+                                             qVariantFromValue(pginfo));
+            UpdateUIListItem(item, *pginfo);
         }
-
-        QString state;
-
-        const RecStatus::Type recstatus = pginfo->GetRecordingStatus();
-        if (recstatus == RecStatus::Recording      ||
-            recstatus == RecStatus::Tuning)
-            state = "running";
-        else if (recstatus == RecStatus::Conflict  ||
-                 recstatus == RecStatus::Offline   ||
-                 recstatus == RecStatus::TunerBusy ||
-                 recstatus == RecStatus::Failed    ||
-                 recstatus == RecStatus::Failing   ||
-                 recstatus == RecStatus::Aborted   ||
-                 recstatus == RecStatus::Missed)
-            state = "error";
-        else if (recstatus == RecStatus::WillRecord)
-        {
-            if (m_curinput == 0 || pginfo->GetInputID() == m_curinput)
-            {
-                if (pginfo->GetRecordingPriority2() < 0)
-                    state = "warning";
-                else
-                    state = "normal";
-            }
-        }
-        else if (recstatus == RecStatus::Repeat ||
-                 recstatus == RecStatus::NeverRecord ||
-                 recstatus == RecStatus::DontRecord ||
-                 (recstatus != RecStatus::DontRecord &&
-                  recstatus <= RecStatus::EarlierShowing))
-            state = "disabled";
-        else
-            state = "warning";
-
-        MythUIButtonListItem *item =
-                                new MythUIButtonListItem(m_schedulesList,"",
-                                                    qVariantFromValue(pginfo));
-
-        InfoMap infoMap;
-        pginfo->ToMap(infoMap);
-        item->SetTextFromMap(infoMap, state);
-
-        QString rating = QString::number(pginfo->GetStars(10));
-        item->DisplayState(rating, "ratingstate");
-        item->DisplayState(state, "status");
-
         ++pit;
     }
 
@@ -510,6 +520,13 @@ void ViewScheduled::FillList()
     }
 }
 
+QString ViewScheduled::ProgressString(const ProgramInfo &pg)
+{
+    // Only show progress value for active recordings
+    return pg.GetRecordingStatus() == RecStatus::Recording
+            ? QString::number(pg.GetProgressPercent()) : "";
+}
+
 void ViewScheduled::updateInfo(MythUIButtonListItem *item)
 {
     if (!item)
@@ -520,6 +537,9 @@ void ViewScheduled::updateInfo(MythUIButtonListItem *item)
     {
         InfoMap infoMap;
         pginfo->ToMap(infoMap);
+
+        infoMap["progresspercent"] = ProgressString(*pginfo);
+
         SetTextFromMap(infoMap);
 
         MythUIStateType *ratingState = dynamic_cast<MythUIStateType*>
@@ -600,19 +620,62 @@ void ViewScheduled::customEvent(QEvent *event)
         MythEvent *me = (MythEvent *)event;
         QString message = me->Message();
 
-        if (message != "SCHEDULE_CHANGE")
-            return;
+        if (message == "SCHEDULE_CHANGE")
+        {
+            m_needFill = true;
 
-        m_needFill = true;
+            if (m_inEvent)
+                return;
 
-        if (m_inEvent)
-            return;
+            m_inEvent = true;
 
-        m_inEvent = true;
+            LoadList();
 
-        LoadList();
+            m_inEvent = false;
+        }
+        else if (message.startsWith("UPDATE_FILE_SIZE"))
+        {
+            QStringList tokens = message.simplified().split(" ");
+            if (tokens.size() < 3)
+                return;
 
-        m_inEvent = false;
+            bool ok;
+            uint recordingID  = tokens[1].toUInt();
+            uint64_t filesize = tokens[2].toLongLong(&ok);
+
+            // Locate program
+            ProgramList::iterator pit = m_recList.begin();
+            while (pit != m_recList.end())
+            {
+                ProgramInfo* pginfo = *pit;
+                if (pginfo && pginfo->GetRecordingID() == recordingID)
+                {
+                    // Update size & progress
+                    pginfo->SetFilesize(filesize);
+                    uint current = pginfo->GetProgressPercent();
+                    CalcRecordedPercent(*pginfo);
+                    if (pginfo->GetProgressPercent() != current)
+                    {
+                        // Update display, if it's shown
+                        MythUIButtonListItem *item =
+                                m_schedulesList->
+                                GetItemByData(qVariantFromValue(pginfo));
+                        if (item)
+                        {
+                            UpdateUIListItem(item, *pginfo);
+
+                            // Update selected item if necessary
+                            MythUIButtonListItem *selected =
+                                    m_schedulesList->GetItemCurrent();
+                            if (item == selected)
+                                updateInfo(selected);
+                        }
+                    }
+                    break;
+                }
+                ++pit;
+            }
+        }
     }
     else if (event->type() == DialogCompletionEvent::kEventType)
     {
@@ -692,6 +755,23 @@ void ViewScheduled::customEvent(QEvent *event)
         else
             ScheduleCommon::customEvent(event);
     }
+}
+
+void ViewScheduled::CalcRecordedPercent(ProgramInfo &pg)
+{
+    QDateTime start = pg.GetRecordingStartTime();
+    int current = start.secsTo(MythDate::current());
+    uint recordedPercent = 0;
+    int duration = 0;
+    if (current > 0)
+    {
+        // Recording stops at end of the final minute
+        duration        = start.secsTo(pg.GetRecordingEndTime()) + 60;
+        recordedPercent = duration > current ? current * 100 / duration : 100;
+    }
+    pg.SetProgressPercent(recordedPercent);
+    LOG(VB_GUI, LOG_DEBUG, QString("%1  %2/%3 = %4%")
+        .arg(pg.GetTitle()).arg(current).arg(duration).arg(recordedPercent));
 }
 
 ProgramInfo *ViewScheduled::GetCurrentProgram(void) const

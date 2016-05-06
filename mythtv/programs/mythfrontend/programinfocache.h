@@ -20,6 +20,13 @@ class ProgramInfoLoader;
 class ProgramInfo;
 class QObject;
 
+typedef enum {
+    PIC_NONE              = 0x00,
+    PIC_MARK_CHANGED      = 0x01,
+    PIC_RECGROUP_CHANGED  = 0x02,
+    PIC_NO_ACTION         = 0x80,
+} UpdateState;
+
 class ProgramInfoCache
 {
     friend class ProgramInfoLoader;
@@ -35,9 +42,8 @@ class ProgramInfoCache
     void Refresh(void);
     void Add(const ProgramInfo&);
     bool Remove(uint recordingID);
-    bool Update(const ProgramInfo&);
-    bool UpdateFileSize(uint recordingID, uint64_t filesize);
-    QString GetRecGroup(uint recordingID) const;
+    uint32_t Update(const ProgramInfo& pginfo);
+    void UpdateFileSize(uint recordingID, uint64_t filesize, uint32_t flags);
     void GetOrdered(vector<ProgramInfo*> &list, bool newest_first = false);
     /// \note This must only be called from the UI thread.
     bool empty(void) const { return m_cache.empty(); }
@@ -46,6 +52,8 @@ class ProgramInfoCache
   private:
     void Load(const bool updateUI = true);
     void Clear(void);
+    void CalculateProgress(ProgramInfo &pg, int playPos);
+    void LoadProgressMarks();
 
   private:
     // NOTE: Hash would be faster for lookups and updates, but we need a sorted

@@ -684,7 +684,6 @@ class MTV_PUBLIC MythPlayer
 
     // Bookmark stuff
     uint64_t bookmarkseek;
-    int      clearSavedPosition;
     int      endExitPrompt;
 
     // Seek

@@ -366,7 +366,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     bool Init(bool createWindow = true);
     void InitFromDB(void);
     QList<QKeyEvent> ConvertScreenPressKeyMap(const QString& keyList);
-    
+
     // Top level playback methods
     bool LiveTV(bool showDialogs, const ChannelInfoList &selection);
     int  Playback(const ProgramInfo &rcinfo);
@@ -375,7 +375,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     // Private event handling
     bool ProcessKeypressOrGesture(PlayerContext*, QEvent *e);
     bool TranslateKeyPressOrGesture(const QString &context, QEvent *e,
-                                    QStringList &actions, bool isLiveTV, 
+                                    QStringList &actions, bool isLiveTV,
                                     bool allowJumps = true);
     bool TranslateGesture(const QString &context, MythGestureEvent *e,
                           QStringList &actions, bool isLiveTV);
@@ -483,8 +483,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
         kBookmarkNever,
         kBookmarkAuto // set iff db_playback_exit_prompt==2
     };
-    void PrepareToExitPlayer(PlayerContext*, int line,
-                             BookmarkAction bookmark = kBookmarkAuto);
+    void PrepareToExitPlayer(PlayerContext*, int line);
     void SetExitPlayer(bool set_it, bool wants_to);
 
     bool RequestNextRecorder(PlayerContext *, bool,
@@ -795,7 +794,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     bool    db_jump_prefer_osd;
     bool    db_use_gui_size_for_tv;
     bool    db_start_in_guide;
-    bool    db_clear_saved_position;
     bool    db_toggle_bookmark;
     bool    db_run_jobs_on_remote;
     bool    db_continue_embedded;
@@ -839,6 +837,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     bool allowRerecord;  ///< User wants to rerecord the last video if deleted
     bool doSmartForward;
     bool queuedTranscode;
+    bool savePosOnExit;  ///< False until first timer event
     /// Picture attribute type to modify.
     PictureAdjustType adjustingPicture;
     /// Picture attribute to modify (on arrow left or right)
@@ -899,7 +898,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     static const int screenPressRegionCount = 12;
     QList<QKeyEvent>    screenPressKeyMapPlayback;
     QList<QKeyEvent>    screenPressKeyMapLiveTV;
-    
+
     // Channel changing timeout notification variables
     QTime   lockTimer;
     bool    lockTimerOn;

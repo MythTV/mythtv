@@ -238,7 +238,6 @@ MythPlayer::MythPlayer(PlayerFlags flags)
     captionsEnabledbyDefault = gCoreContext->GetNumSetting("DefaultCCMode");
     decode_extra_audio = gCoreContext->GetNumSetting("DecodeExtraAudio", 0);
     itvEnabled         = gCoreContext->GetNumSetting("EnableMHEG", 0);
-    clearSavedPosition = gCoreContext->GetNumSetting("ClearSavedPosition", 1);
     endExitPrompt      = gCoreContext->GetNumSetting("EndOfRecordingExitPrompt");
     pip_default_loc    = (PIPLocation)gCoreContext->GetNumSetting("PIPLocation", kPIPTopLeft);
 
@@ -2901,8 +2900,6 @@ void MythPlayer::InitialSeek(void)
     if (bookmarkseek > 30)
     {
         DoJumpToFrame(bookmarkseek, kInaccuracyNone);
-        if (clearSavedPosition && !player_ctx->IsPIP())
-            SetBookmark(true);
     }
 }
 
@@ -3666,12 +3663,7 @@ uint64_t MythPlayer::GetBookmark(void)
         player_ctx->LockPlayingInfo(__FILE__, __LINE__);
         if (const ProgramInfo *pi = player_ctx->playingInfo)
         {
-            bookmark = pi->QueryBookmark();
-            // Disable progstart if the program has a cutlist.
-            if (bookmark == 0 && !pi->HasCutlist())
-                bookmark = pi->QueryProgStart();
-            if (bookmark == 0)
-                bookmark = pi->QueryLastPlayPos();
+            bookmark = pi->QueryStartMark();
         }
         player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
     }
