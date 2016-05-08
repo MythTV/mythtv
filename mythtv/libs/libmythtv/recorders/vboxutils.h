@@ -8,7 +8,7 @@
 // MythTV headers
 #include "vboxchannelfetcher.h"
 
-#define VBOX_MIN_API_VERSION  "VB.2.48"
+#define VBOX_MIN_API_VERSION  "VB.2.50"
 
 class VBox
 {
