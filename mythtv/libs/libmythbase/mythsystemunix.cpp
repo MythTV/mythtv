@@ -948,9 +948,12 @@ void MythSystemLegacyUnix::Fork(time_t timeout)
                         .arg(GetLogCmd()) .arg(timeout));
 
         /* close unused pipe ends */
-        close(p_stdin[0]);
-        close(p_stdout[1]);
-        close(p_stderr[1]);
+        if (p_stdin[0] >= 0)
+            close(p_stdin[0]);
+        if (p_stdout[1] >= 0)
+            close(p_stdout[1]);
+        if (p_stderr[1] >= 0)
+            close(p_stderr[1]);
 
         // store the rest
         m_stdpipe[0] = p_stdin[1];
