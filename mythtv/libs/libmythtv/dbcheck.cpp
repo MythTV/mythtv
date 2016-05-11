@@ -3299,6 +3299,13 @@ NULL
             return false;
     }
 
+    /*
+     * TODO the following settings are no more, clean them up with the next schema change
+     * to avoid confusion by stale settings in the database
+     *
+     * WatchTVGuide
+     */
+
     return true;
 }
 
