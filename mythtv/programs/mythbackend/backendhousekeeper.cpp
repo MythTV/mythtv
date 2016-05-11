@@ -388,7 +388,7 @@ bool ThemeUpdateTask::DoRun(void)
         result |= LoadVersion(MythVersion, LOG_ERR);
 
         // If a version of the theme for this tag exists, use it...
-        QRegExp subexp("v[0-9]+.[0-9]+.([0-9]+)-*");
+        QRegExp subexp("v[0-9]+\\.[0-9]+\\.([0-9]+)-*");
         int pos = subexp.indexIn(MYTH_SOURCE_VERSION);
         if (pos > -1)
         {
