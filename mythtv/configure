@@ -7349,7 +7349,7 @@ enabled libass && check_lib2 ass/ass.h ass_flush_events -lass || disable libass
 
 if enabled libcec ; then
     if pkg-config --exists libcec; then
-        libcec_path=`pkg-config --cflags libcec`
+        libcec_path=`pkg-config --variable includedir libcec`
     else
         check_cxx -I"$libcec_path" <<EOF || { disable libcec; }
 #include <libcec/cec.h>
