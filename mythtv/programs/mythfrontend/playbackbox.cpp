@@ -2328,6 +2328,13 @@ void PlaybackBox::PlayX(const ProgramInfo &pginfo,
     Close();
 }
 
+void PlaybackBox::ClearBookmark()
+{
+    ProgramInfo *pginfo = GetCurrentProgram();
+    if (pginfo)
+        pginfo->SaveBookmark(0);
+}
+
 void PlaybackBox::StopSelected(void)
 {
     ProgramInfo *pginfo = GetCurrentProgram();
@@ -3002,10 +3009,15 @@ MythMenu* PlaybackBox::createPlayFromMenu()
 
     if (pginfo->IsBookmarkSet())
         menu->AddItem(tr("Play from bookmark"), SLOT(PlayFromBookmark()));
+
     if (pginfo->QueryLastPlayPos())
         menu->AddItem(tr("Play from last played position"),
                       SLOT(PlayFromLastPlayPos()));
+
     menu->AddItem(tr("Play from beginning"), SLOT(PlayFromBeginning()));
+
+    if (pginfo->IsBookmarkSet())
+        menu->AddItem(tr("Clear bookmark"), SLOT(ClearBookmark()));
 
     return menu;
 }

@@ -146,7 +146,7 @@ class PlaybackBox : public ScheduleCommon
     void PlayFromBeginning(MythUIButtonListItem *item = NULL);
     void PlayFromLastPlayPos(MythUIButtonListItem *item = NULL);
     void deleteSelected(MythUIButtonListItem *item);
-
+    void ClearBookmark();
     void SwitchList(void);
 
     void ShowGroupPopup(void);
