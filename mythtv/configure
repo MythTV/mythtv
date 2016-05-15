@@ -7244,6 +7244,8 @@ EOF
 if enabled systemd_notify ; then
     if check_pkg_config libsystemd-daemon systemd/sd-daemon.h sd_notify ; then
         require_pkg_config libsystemd-daemon systemd/sd-daemon.h sd_notify
+    elif check_pkg_config libsystemd systemd/sd-daemon.h sd_notify ; then
+        require_pkg_config libsystemd systemd/sd-daemon.h sd_notify
     else
         disable systemd_notify
     fi
