@@ -4364,7 +4364,7 @@ void Scheduler::AddNewRecords(void)
         RecStatus::Type newrecstatus = RecStatus::Unknown;
         // Check for RecStatus::Offline
         if ((doRun || specsched) &&
-             (!cardMap.contains(p->GetInputID()) || !p->schedorder))
+            (!cardMap.contains(p->GetInputID()) || !p->schedorder))
         {
             newrecstatus = RecStatus::Offline;
             if (p->schedorder == 0)
