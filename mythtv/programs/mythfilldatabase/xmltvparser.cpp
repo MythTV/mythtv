@@ -500,7 +500,7 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
                     if (!parttotal.isEmpty() && partno > 0)
                     {
                         bool ok;
-                        uint partto = parttotal.toUInt(&ok);
+                        uint partto = parttotal.toUInt(&ok) + 1;
                         if (ok && partnumber <= parttotal)
                         {
                             pginfo->parttotal  = partto;
