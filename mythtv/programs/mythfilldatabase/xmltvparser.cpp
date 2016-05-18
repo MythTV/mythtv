@@ -139,7 +139,7 @@ static void fromXMLTVDate(QString &timestr, QDateTime &dt)
     // UTC/GMT, just strip
     if (ts.endsWith('Z'))
         ts.truncate(ts.length()-1);
-    
+
     if (ts.length() == 14)
     {
         tmpDT = QDateTime::fromString(ts, "yyyyMMddHHmmss");
@@ -168,11 +168,11 @@ static void fromXMLTVDate(QString &timestr, QDateTime &dt)
                 .arg(ts));
         return;
     }
-    
+
     if (split.size() > 1)
     {
         QString tmp = split[1].trimmed();
-        
+
         // These shouldn't be required and they aren't ISO 8601 but the
         // xmltv spec mentions these and just these so handle them just in
         // case
@@ -180,7 +180,7 @@ static void fromXMLTVDate(QString &timestr, QDateTime &dt)
             tmp = "+0000";
         else if (tmp == "BST")
             tmp = "+0100";
-        
+
         // While this seems like a hack, it's better than what was done before
         QString isoDateString = QString("%1 %2").arg(tmpDT.toString(Qt::ISODate))
                                                 .arg(tmp);
@@ -190,7 +190,7 @@ static void fromXMLTVDate(QString &timestr, QDateTime &dt)
             tmpDT.setTimeSpec(Qt::UTC);
         dt = tmpDT.toUTC();
     }
-    
+
     if (!dt.isValid())
     {
         static bool warned_once_on_implicit_utc = false;
@@ -206,7 +206,7 @@ static void fromXMLTVDate(QString &timestr, QDateTime &dt)
     }
 
     dt.setTimeSpec(Qt::UTC);
-    
+
     timestr = MythDate::toString(dt, MythDate::kFilename);
 }
 
@@ -711,4 +711,3 @@ bool XMLTVParser::parseFile(
 
     return true;
 }
-
