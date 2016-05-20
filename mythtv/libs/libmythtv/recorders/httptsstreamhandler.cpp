@@ -218,7 +218,9 @@ void HTTPReader::WriteBytes()
         }
     }
     LOG(VB_RECORD, LOG_DEBUG, LOC + QString("WriteBytes: %1/%2 bytes remain").arg(remainder).arg(m_size));
-    memcpy(m_buffer, m_buffer + (m_size - remainder), remainder);
+
+    /* move the remaining data to the beginning of the buffer */
+    memmove(m_buffer, m_buffer + (m_size - remainder), remainder);
     m_size = remainder;
 }
 
