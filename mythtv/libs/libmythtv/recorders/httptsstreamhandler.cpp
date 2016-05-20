@@ -206,7 +206,7 @@ void HTTPReader::WriteBytes()
     if (m_size < TS_SIZE)
         return;
 
-    QMutexLocker  replylock(&m_bufferlock);
+    QMutexLocker bufferlock(&m_bufferlock);
     int remainder = 0;
     {
         QMutexLocker locker(&m_parent->_listener_lock);
