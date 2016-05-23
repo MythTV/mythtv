@@ -530,3 +530,37 @@ QStringList Guide::GetStoredSearches( const QString& sType )
 
     return keywordList;
 }
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool Guide::AddToChannelGroup   ( int nChannelGroupId,
+                                  int nChanId )
+{
+    bool bResult = false;
+
+    if (!(nChanId > 0))
+        throw QString( "Channel ID is invalid" );
+
+    bResult = ChannelGroup::AddChannel(nChanId, nChannelGroupId);
+
+    return bResult;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool Guide::RemoveFromChannelGroup ( int nChannelGroupId,
+                                     int nChanId )
+{
+    bool bResult = false;
+
+    if (!(nChanId > 0))
+        throw QString( "Channel ID is invalid" );
+
+    bResult = ChannelGroup::DeleteChannel(nChanId, nChannelGroupId);
+
+    return bResult;
+}
