@@ -817,9 +817,9 @@ int PrivateDecoderOMX::ProcessPacket(AVStream *stream, AVPacket *pkt)
 
     while (size > 0)
     {
-        if (!m_ibufs_sema.tryAcquire(1, 5))
+        if (!m_ibufs_sema.tryAcquire(1, 10000))
         {
-            LOG(VB_PLAYBACK, LOG_DEBUG, LOC + __func__ + " - no input buffers");
+            LOG(VB_GENERAL, LOG_ERR, LOC + __func__ + " - no input buffers");
             ret = 0;
             break;
         }
