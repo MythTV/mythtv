@@ -621,9 +621,9 @@ bool ImportIconsWizard::search(const QString& strParam)
 
     CSVEntry entry2 = (*m_missingIter);
     QString channelcsv = QString("%1,%2,%3,%4,%5,%6,%7,%8\n")
-                                .arg(escape_csv(entry2.strName))
-                                .arg(escape_csv(entry2.strXmlTvId))
-                                .arg(escape_csv(entry2.strCallsign))
+                                .arg(escape_csv(QUrl::toPercentEncoding(entry2.strName)))
+                                .arg(escape_csv(QUrl::toPercentEncoding(entry2.strXmlTvId)))
+                                .arg(escape_csv(QUrl::toPercentEncoding(entry2.strCallsign)))
                                 .arg(escape_csv(entry2.strTransportId))
                                 .arg(escape_csv(entry2.strAtscMajorChan))
                                 .arg(escape_csv(entry2.strAtscMinorChan))
