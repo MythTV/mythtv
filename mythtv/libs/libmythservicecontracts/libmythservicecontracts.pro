@@ -90,6 +90,9 @@ incServices.files += services/frontendServices.h
 incServices.files += services/imageServices.h
 incServices.files += services/rttiServices.h
 
+incEnums.path = $${PREFIX}/include/mythtv/libmythservicecontracts/enums/
+incEnums.files = enums/recStatus.h
+
 incDatacontracts.path = $${PREFIX}/include/mythtv/libmythservicecontracts/datacontracts/
 incDatacontracts.files  = datacontracts/connectionInfo.h      datacontracts/databaseInfo.h
 incDatacontracts.files += datacontracts/programAndChannel.h   datacontracts/programGuide.h
@@ -120,7 +123,7 @@ incDatacontracts.files += datacontracts/cutting.h             datacontracts/cutL
 incDatacontracts.files += datacontracts/backendInfo.h         datacontracts/envInfo.h
 incDatacontracts.files += datacontracts/buildInfo.h           datacontracts/logInfo.h
 
-INSTALLS += inc incServices incDatacontracts
+INSTALLS += inc incServices incDatacontracts incEnums
 
 macx {
     QMAKE_LFLAGS_SHLIB += -flat_namespace

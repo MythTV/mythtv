@@ -13,6 +13,7 @@ TEMPLATE = app
 TARGET = test_audioconvert
 DEPENDPATH += . ../.. ../../audio ../../logging ../../../libmythbase
 INCLUDEPATH += . ../.. ../../audio ../../../../external/FFmpeg ../../logging ../../../libmythbase
+INCLUDEPATH += ../../../libmythservicecontracts
 LIBS += -L../../../libmythbase -lmythbase-$$LIBVERSION
 LIBS += -L../../../libmythui -lmythui-$$LIBVERSION
 LIBS += -L../../../libmythupnp -lmythupnp-$$LIBVERSION
