@@ -153,7 +153,8 @@ if ($VcVerIn)
     $VcVerIn = "14"
     $VsComnTools= (get-item env:$("VS" + $VcVerIn + "0COMNTOOLS")).value
 
-    Invoke-Environment "`"$VsComnTools\vsvars32.bat`""
+    Invoke-Environment "`"$VsComnTools..\..\VC\vcvarsall.bat`" amd64"
+    #Invoke-Environment "`"$VsComnTools\vsvars32.bat`""
 }
 
 $BuildType  = $BuildType.tolower();
