@@ -65,7 +65,7 @@ LIBS += -L../libmyth              -lmyth-$${LIBVERSION}
 LIBS += -L../libmythtv              -lmythtv-$${LIBVERSION}
 LIBS += -L../../external/libmythbluray     -lmythbluray-$${LIBVERSION}
 LIBS += -L../../external/FFmpeg/libswscale -lmythswscale
-LIBS += -L../../external/libudfread/libmythudfread -lmythudfread-$${LIBVERSION}
+LIBS += -L../../external/libudfread -lmythudfread-$${LIBVERSION}
 
 # for TagLib
 LIBS += $${CONFIG_TAGLIB_LIBS}

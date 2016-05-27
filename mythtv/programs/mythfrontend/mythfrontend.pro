@@ -18,7 +18,6 @@ using_qtdbus: QT += dbus
 }
 contains(QT_VERSION, ^5\\.[6-9]\\..*) {
 QT += widgets
-QT += webenginewidgets
 using_qtdbus: QT += dbus
 }
 

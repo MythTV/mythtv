@@ -11,7 +11,6 @@ android: QT += androidextras
 }
 contains(QT_VERSION, ^5\\.[6-9]\\..*) {
 QT += widgets
-QT += webenginewidgets
 android: QT += androidextras
 }
 
