@@ -13,6 +13,7 @@ TEMPLATE = app
 TARGET = test_eitfixups
 DEPENDPATH += . ../..
 INCLUDEPATH += . ../.. ../../mpeg ../../../libmythui ../../../libmyth ../../../libmythbase
+INCLUDEPATH += ../../../libmythservicecontracts
 
 LIBS += ../../eitfixup.o
 LIBS += ../../dishdescriptors.o

@@ -13,6 +13,7 @@ TEMPLATE = app
 TARGET = test_mpegtables
 DEPENDPATH += . ../..
 INCLUDEPATH += . ../.. ../../mpeg ../../../libmythui ../../../libmyth ../../../libmythbase
+INCLUDEPATH += ../../../libmythservicecontracts
 
 LIBS += ../../dvbdescriptors.o
 LIBS += ../../iso6937tables.o

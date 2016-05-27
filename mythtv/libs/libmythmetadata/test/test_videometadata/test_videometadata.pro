@@ -14,7 +14,8 @@ TARGET = test_videometadata
 DEPENDPATH += . ../.. ../../../libmythbase ../../../libmythtv ../../../libmyth
 DEPENDPATH += ../../../libmythui
 INCLUDEPATH += . ../.. ../../../libmythbase ../../../libmythtv ../../../libmyth
-INCLUDEPATH += ../../../libmythui
+INCLUDEPATH += ../../../libmythui ../../../libmythservicecontracts
+
 LIBS += -L../../../libmythbase -lmythbase-$$LIBVERSION
 LIBS += -L../.. -lmythmetadata-$$LIBVERSION
 # libmyth and libmythtv for ProgramInfo and RecordingInfo

@@ -14,6 +14,7 @@ TARGET = test_copyframes
 DEPENDPATH += . ../..
 INCLUDEPATH += . ../../ ../../../libmyth ../../../libmythbase
 INCLUDEPATH += . ../../../../external/FFmpeg ../../logging ../../../libmythbase
+INCLUDEPATH += ../../../libmythservicecontracts
 
 LIBS += -L../../../libmythbase -lmythbase-$$LIBVERSION
 LIBS += -L../../../libmythui -lmythui-$$LIBVERSION

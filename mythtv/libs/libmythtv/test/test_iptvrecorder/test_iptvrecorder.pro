@@ -13,6 +13,7 @@ TEMPLATE = app
 TARGET = test_iptvrecorder
 DEPENDPATH += . ../..
 INCLUDEPATH += . ../.. ../../mpeg ../../../libmythui ../../../libmyth ../../../libmythbase
+INCLUDEPATH += ../../../libmythservicecontracts
 
 LIBS += ../../iptvchannelfetcher.o
 LIBS += ../../scanmonitor.o
