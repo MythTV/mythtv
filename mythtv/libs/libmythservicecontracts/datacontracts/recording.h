@@ -135,6 +135,8 @@ inline void RecordingInfo::InitializeCustomTypes()
 {
     qRegisterMetaType< RecordingInfo  >();
     qRegisterMetaType< RecordingInfo* >();
+
+    RecStatus::InitializeCustomTypes();
 }
 }
 

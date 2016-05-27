@@ -43,6 +43,14 @@ bool Xsd::GetEnumXSD( HTTPRequest *pRequest, QString sEnumName )
 
     int nParentId = QMetaType::type( sParentFQN.toUtf8() );
 
+    if (nParentId == 0)
+    {
+        // Try it without the DTC Namespace
+
+        sParentFQN = lstTypeParts[0];
+        nParentId  = QMetaType::type(sParentFQN.toUtf8());
+    }
+
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     QObject *pParentClass = (QObject *)QMetaType::construct( nParentId );
 #else
@@ -124,6 +132,9 @@ bool Xsd::GetEnumXSD( HTTPRequest *pRequest, QString sEnumName )
         QDomElement oApp      = createElement( "xs:appinfo"       );
         QDomElement oEnumVal  = createElement( "EnumerationValue" );
         QDomElement oEnumDesc = createElement( "EnumerationDesc"  );
+
+        // The following namespace is needed for visual studio to generate negative enums correctly.
+        oEnumVal.setAttribute("xmlns", "http://schemas.microsoft.com/2003/10/Serialization/");
 
         oEnum.appendChild( oAnn      );
         oAnn .appendChild( oApp      );

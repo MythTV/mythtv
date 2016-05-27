@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:ms="http://schemas.microsoft.com/2003/10/Serialization/">
 	<xsl:output method="html" version="1.0" encoding="UTF-8" indent="yes"/>
 <xsl:template match="/"	>
 <html>
@@ -9,7 +11,6 @@
 		<link href="/css/wsdl.css" rel="stylesheet" type="text/css" />
 	</head>
 	<body>
-	
 		<div class="masthead">
 			<a href="http://www.mythtv.org"><img alt="mythTV" src="/images/mythtv.png" /></a>
 			<div class="title">
@@ -47,15 +48,12 @@
 </xsl:template>
 
 <xsl:template match="/xs:schema/xs:simpleType/xs:restriction/xs:enumeration" >
-
-	<tr>
-		<td></td>
-
-			<td class="enum_name" ><xsl:value-of select="@value"/></td>
-  		<td class="enum_value">= <xsl:value-of select="xs:annotation/xs:appinfo/EnumerationValue"/></td>
-      <td class="enum_value">[ <xsl:value-of select="xs:annotation/xs:appinfo/EnumerationDesc" /> ]</td>
-  </tr>
-
+    <tr>
+        <td></td>
+        <td class="enum_name" ><xsl:value-of select="@value"/></td>
+        <td class="enum_value">= <xsl:value-of select="xs:annotation/xs:appinfo/ms:EnumerationValue"/></td>
+        <td class="enum_value">[ <xsl:value-of select="xs:annotation/xs:appinfo/EnumerationDesc" /> ]</td>
+    </tr>
 </xsl:template>
 	
 </xsl:stylesheet>

@@ -8,9 +8,9 @@
 #include "serviceexp.h"
 #include "programtypes.h"
 
-class SERVICE_PUBLIC RecStatus
+class SERVICE_PUBLIC RecStatus : public QObject
 {
-  Q_GADGET
+  Q_OBJECT
 
   public:
     Q_ENUMS(Type)
@@ -51,6 +51,21 @@ class SERVICE_PUBLIC RecStatus
     static QString toString(Type, RecordingType type = kNotRecording);
     static QString toDescription(Type, RecordingType,
                                  const QDateTime &recstartts);
+    public:
+
+        static inline void InitializeCustomTypes();
+
+        RecStatus(QObject *parent = 0) : QObject(parent) {}
+        RecStatus(const RecStatus &src)					 {}
 };
+
+Q_DECLARE_METATYPE( RecStatus )
+Q_DECLARE_METATYPE( RecStatus*)
+
+inline void RecStatus::InitializeCustomTypes()
+{
+    qRegisterMetaType< RecStatus  >();
+    qRegisterMetaType< RecStatus* >();
+}
 
 #endif
