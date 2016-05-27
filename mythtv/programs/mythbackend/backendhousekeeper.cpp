@@ -26,6 +26,7 @@
 #include "mythdownloadmanager.h"
 #include "musicmetadata.h"
 
+#include "enums/recStatus.h"
 
 bool LogCleanerTask::DoRun(void)
 {

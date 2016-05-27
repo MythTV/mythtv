@@ -17,6 +17,8 @@ win32-msvc* {
   CONFIG_LIBMPEG2EXTERNAL = yes
   CONFIG_QTDBUS = no
 
+  QMAKE_CXXFLAGS_WARN_ON -= -w34100
+
 } else {
 
   include ( config.mak )

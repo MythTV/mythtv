@@ -61,8 +61,12 @@ HEADERS += datacontracts/cutting.h               datacontracts/cutList.h
 HEADERS += datacontracts/backendInfo.h           datacontracts/envInfo.h
 HEADERS += datacontracts/buildInfo.h             datacontracts/logInfo.h
 
-SOURCES += service.cpp
+HEADERS += enums/recStatus.h
 
+SOURCES += service.cpp
+SOURCES += enums/recStatus.cpp
+
+INCLUDEPATH += ./enums
 INCLUDEPATH += ./datacontracts
 INCLUDEPATH += ./services
 

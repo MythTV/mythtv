@@ -32,6 +32,7 @@ SOURCES += requesthandler/messagehandler.cpp
 
 INCLUDEPATH += ../libmythbase ../libmyth ../libmythtv ../libmythui
 INCLUDEPATH += ../../external/FFmpeg ../.. ../ ./
+INCLUDEPATH += ../libmythservicecontracts
 
 DEPENDPATH += ../ ../libmythbase ../libmythtv ../libmyth ../libmythui
 DEPENDPATH += ../libmythupnp ../libmythservicecontracts

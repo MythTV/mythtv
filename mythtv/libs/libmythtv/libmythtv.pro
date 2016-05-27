@@ -258,8 +258,16 @@ INSTALLS += inc
 #DVD stuff
 DEPENDPATH  += ../../external/libmythdvdnav/
 DEPENDPATH  += ../../external/libmythdvdnav/dvdread # for dvd_reader.h & dvd_input.h
-QMAKE_CXXFLAGS += -isystem ../../external/libmythdvdnav/dvdnav
-QMAKE_CXXFLAGS += -isystem ../../external/libmythdvdnav/dvdread
+
+!win32-msvc* {
+  QMAKE_CXXFLAGS += -isystem ../../external/libmythdvdnav/dvdnav
+  QMAKE_CXXFLAGS += -isystem ../../external/libmythdvdnav/dvdread
+}
+
+win32-msvc* {
+  INCLUDEPATH += ../../external/libmythdvdnav/dvdnav
+  INCLUDEPATH += ../../external/libmythdvdnav/dvdread
+}
 
 !win32-msvc*:POST_TARGETDEPS += ../../external/libmythdvdnav/libmythdvdnav-$${MYTH_LIB_EXT}
 
@@ -732,7 +740,15 @@ using_backend {
     # Support for HDHomeRun box
     using_hdhomerun {
         # MythTV HDHomeRun glue
-        QMAKE_CXXFLAGS += -isystem ../../external/libhdhomerun
+
+        !win32-msvc* {
+          QMAKE_CXXFLAGS += -isystem ../../external/libhdhomerun
+        }
+
+        win32-msvc* {
+          INCLUDEPATH += ../../external/libhdhomerun
+        }
+
         DEPENDPATH += ../../external/libhdhomerun
 
         HEADERS += recorders/hdhrsignalmonitor.h
@@ -874,6 +890,7 @@ mingw | win32-msvc* {
 win32-msvc* {
   LIBS += -lzlib
   QMAKE_CXXFLAGS += "/FI compat.h"
+  DEFINES += HAVE_STRUCT_TIMESPEC
 }
 
 

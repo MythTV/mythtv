@@ -1,9 +1,21 @@
+#pthreads directory has config.h, need path to be after library paths
+win32-msvc*:INCLUDEPATH -= $$SRC_PATH_BARE/../platform/win32/msvc/external/pthreads.2
+
 INCLUDEPATH += ../.. ../../libs/ ../../libs/libmyth ../../libs/libmyth/audio
 INCLUDEPATH +=  ../../libs/libmythtv ../../external/FFmpeg
 INCLUDEPATH += ../../libs/libmythupnp ../../libs/libmythui ../../libs/libmythmetadata
 INCLUDEPATH += ../../libs/libmythlivemedia ../../libs/libmythbase
-QMAKE_CXXFLAGS += -isystem ../../external/libmythdvdnav/dvdnav
-QMAKE_CXXFLAGS += -isystem ../../external/libmythdvdnav/dvdread
+
+!win32-msvc* {
+  QMAKE_CXXFLAGS += -isystem ../../external/libmythdvdnav/dvdnav
+  QMAKE_CXXFLAGS += -isystem ../../external/libmythdvdnav/dvdread
+}
+
+win32-msvc* {
+  INCLUDEPATH += ../../external/libmythdvdnav/dvdnav
+  INCLUDEPATH += ../../external/libmythdvdnav/dvdread
+}
+
 INCLUDEPATH += ../../external/libmythbluray
 INCLUDEPATH += ../../external/libmythsoundtouch
 INCLUDEPATH += ../../external/libudfread
@@ -12,6 +24,8 @@ INCLUDEPATH += ../../libs/libmythtv/mpeg
 INCLUDEPATH += ../../libs/libmythtv/vbitext
 INCLUDEPATH += ../../libs/libmythservicecontracts
 INCLUDEPATH += ../../libs/libmythprotoserver
+
+win32-msvc*:INCLUDEPATH += $$SRC_PATH_BARE/../platform/win32/msvc/external/pthreads.2
 
 LIBS += -L../../libs/libmyth -L../../libs/libmythtv
 LIBS += -L../../external/FFmpeg/libswresample

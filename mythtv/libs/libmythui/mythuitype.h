@@ -34,7 +34,10 @@ class MythUICheckBox;
 class MythUISpinBox;
 class MythUITextEdit;
 class MythUIProgressBar;
+
+#if ( QT_VERSION <= QT_VERSION_CHECK( 5, 5, 0 ))
 class MythUIWebBrowser;
+#endif
 
 /**
  * \defgroup MythUI MythTV User Interface Library

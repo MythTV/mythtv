@@ -91,12 +91,14 @@ INCLUDEPATH += ../libmythbase
 INCLUDEPATH += ../.. ../ ./ ../libmythupnp ../libmythui
 INCLUDEPATH += ../../external/FFmpeg
 #INCLUDEPATH += ../../external/libmythbluray
+INCLUDEPATH += ../libmythservicecontracts
 INCLUDEPATH += $${POSTINC}
 DEPENDPATH += ../../external/libsamplerate ../../external/libmythsoundtouch ../../external/libmythbluray
 DEPENDPATH += ../libmythfreesurround
 DEPENDPATH += ../ ../libmythui ../libmythbase
 DEPENDPATH += ../libmythupnp
 DEPENDPATH += ./audio
+DEPENDPATH += ../libmythservicecontracts
 
 #LIBS += -L../../external/libmythbluray -lmythbluray-$$LIBVERSION
 LIBS += -L../../external/libsamplerate   -lmythsamplerate-$${LIBVERSION}
@@ -109,6 +111,7 @@ LIBS += -L../../external/FFmpeg/libswresample -lmythswresample
 LIBS += -L../../external/FFmpeg/libavutil  -lmythavutil
 LIBS += -L../../external/FFmpeg/libavcodec -lmythavcodec
 LIBS += -L../../external/FFmpeg/libavformat  -lmythavformat
+LIBS += -L../libmythservicecontracts         -lmythservicecontracts-$${LIBVERSION}
 
 !win32-msvc* {
     POST_TARGETDEPS += ../../external/libsamplerate/libmythsamplerate-$${MYTH_LIB_EXT}

@@ -3,17 +3,18 @@ include ( ../../settings.pro )
 TEMPLATE = lib
 TARGET = mythudfread-$$LIBVERSION
 CONFIG += thread staticlib warn_off
-CONFIG -= qt
+# CONFIG -= qt
 target.path = $${LIBDIR}
 
 INCLUDEPATH += . ../../
+INCLUDEPATH += ../../libs/libmythbase
 
 win32-msvc* {
     # needed for vcxproj
-    QMAKE_CXXFLAGS += "/FI ../../libs/libmythbase/compat.h"
+    QMAKE_CXXFLAGS += /TP "/FI compat.h" "/FI fcntl.h"
 
     # needed for nmake
-    QMAKE_CFLAGS   += "/FI ../../libs/libmythbase/compat.h"
+    QMAKE_CFLAGS   += /TP "/FI compat.h" "/FI fcntl.h"
 }
 
 QMAKE_CLEAN += $(TARGET)

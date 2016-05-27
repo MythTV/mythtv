@@ -39,6 +39,11 @@ V4L2util::V4L2util(const QString& dev_name, const QString& vbi_dev_name)
     Open(dev_name, vbi_dev_name);
 }
 
+V4L2util::~V4L2util(void)
+{
+    Close();
+}
+
 bool V4L2util::Open(const QString& dev_name, const QString& vbi_dev_name)
 {
     if (m_fd >= 0 && dev_name == m_device_name)

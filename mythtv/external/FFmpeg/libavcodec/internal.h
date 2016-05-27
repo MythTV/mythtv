@@ -237,8 +237,16 @@ static av_always_inline int64_t ff_samples_to_time_base(AVCodecContext *avctx,
 {
     if(samples == AV_NOPTS_VALUE)
         return AV_NOPTS_VALUE;
+#ifndef _MSC_VER
     return av_rescale_q(samples, (AVRational){ 1, avctx->sample_rate },
                         avctx->time_base);
+#else
+    AVRational rational;
+    rational.num = 1;
+    rational.den = avctx->sample_rate;
+
+    return av_rescale_q(samples, rational, avctx->time_base);
+#endif
 }
 
 /**

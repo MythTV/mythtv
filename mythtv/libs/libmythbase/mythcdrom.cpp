@@ -1,6 +1,7 @@
 #include <QDir>
 #include <QFileInfo>
 
+#include "compat.h"
 #include "mythcdrom.h"
 #include "mythconfig.h"
 #include "remotefile.h"
