@@ -148,6 +148,9 @@ Function RunQMake()
 
 if ($VcVerIn)
 {
+    # hard code to Visual Studio 2015 until build slave config is fixed.
+
+    $VcVerIn = "14"
     $VsComnTools= (get-item env:$("VS" + $VcVerIn + "0COMNTOOLS")).value
 
     Invoke-Environment "`"$VsComnTools\vsvars32.bat`""
