@@ -9,8 +9,6 @@
 
 #include "programdata.h"
 
-typedef QMap<uint,uint> QMap_uint_t;
-
 /// EIT Fix Up Functions
 class EITFixUp
 {
