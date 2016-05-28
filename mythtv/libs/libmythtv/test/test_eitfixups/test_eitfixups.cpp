@@ -751,4 +751,23 @@ void TestEITFixups::testATV()
 
 }
 
+void TestEITFixups::test64BitEnum(void)
+{
+    QVERIFY(EITFixUp::kFixUnitymedia != EITFixUp::kFixNone);
+    QVERIFY(EITFixUp::kFixATV != EITFixUp::kFixNone);
+    QVERIFY(EITFixUp::kFixDisneyChannel != EITFixUp::kFixNone);
+#if 0
+    QCOMPARE(QString::number(EITFixUp::kFixUnitymedia), QString::number(EITFixUp::kFixNone));
+#endif
+
+#if 0
+    // needs some casting around
+    FixupValue theFixup = EITFixUp::kFixUnitymedia;
+    QCOMPARE(EITFixUp::kFixUnitymedia, theFixup);
+#endif
+
+    // this is likely what happens somewhere in the fixup pipeline
+    QCOMPARE((FixupValue)((uint32_t)EITFixUp::kFixUnitymedia), (FixupValue)EITFixUp::kFixNone);
+}
+
 QTEST_APPLESS_MAIN(TestEITFixups)
