@@ -27,7 +27,7 @@ class EITFixUp
     static const int kMinMovieDuration = 75*60;
 
   public:
-    enum FixUpType
+    enum FixUpType : FixupValue
     {
         kFixNone             =       0, // no bits set
 
@@ -56,9 +56,9 @@ class EITFixUp
         kFixAUSeven          = 1 << 21,
         kFixP7S1             = 1 << 26,
         kFixHTML             = 1 << 27,
-        kFixUnitymedia       = 1ll << 32,
-        kFixATV              = 1ll << 33,
-        kFixDisneyChannel    = 1ll << 34,
+        kFixUnitymedia       = 1ull << 32,
+        kFixATV              = 1ull << 33,
+        kFixDisneyChannel    = 1ull << 34,
 
         // Early fixups
         kEFixForceISO8859_1  = 1 << 22,
@@ -69,7 +69,7 @@ class EITFixUp
 
         kFixGreekSubtitle    = 1 << 29,
         kFixGreekEIT         = 1 << 30,
-        kFixGreekCategories  = 1 << 31,
+        kFixGreekCategories  = 1u << 31,
     };
 
     EITFixUp();
