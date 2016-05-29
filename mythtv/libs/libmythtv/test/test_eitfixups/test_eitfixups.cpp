@@ -777,6 +777,15 @@ void TestEITFixups::test64BitEnum(void)
     fix |= fixes.value(0xFFFFull<<32);
     QCOMPARE(fix, EITFixUp::kFixGenericDVB | EITFixUp::kFixDisneyChannel | EITFixUp::kFixATV);
     QVERIFY(EITFixUp::kFixATV & fix);
+
+    // did kFixGreekCategories = 1<<31 cause issues?
+#if 0
+    QCOMPARE(QString::number(1<<31, 16), QString::number(1u<<31, 16));
+#endif
+    // two different flags, fixed version
+    QVERIFY(!(1ull<<31 & 1ull<<32));
+    // oops, this is true, so setting the old kFixGreekCategories also set all flags following it
+    QVERIFY(1<<31 & 1ull<<32);
 }
 
 QTEST_APPLESS_MAIN(TestEITFixups)
