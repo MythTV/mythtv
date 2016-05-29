@@ -768,6 +768,15 @@ void TestEITFixups::test64BitEnum(void)
 
     // this is likely what happens somewhere in the fixup pipeline
     QCOMPARE((FixupValue)((uint32_t)EITFixUp::kFixUnitymedia), (FixupValue)EITFixUp::kFixNone);
+
+    FixupMap   fixes;
+    fixes[0xFFFFull<<32] = EITFixUp::kFixDisneyChannel;
+    fixes[0xFFFFull<<32] |= EITFixUp::kFixATV;
+    FixupValue fix;
+    fix = EITFixUp::kFixGenericDVB;
+    fix |= fixes.value(0xFFFFull<<32);
+    QCOMPARE(fix, EITFixUp::kFixGenericDVB | EITFixUp::kFixDisneyChannel | EITFixUp::kFixATV);
+    QVERIFY(EITFixUp::kFixATV & fix);
 }
 
 QTEST_APPLESS_MAIN(TestEITFixups)
