@@ -4,9 +4,13 @@ QT += xml sql network opengl
 contains(QT_VERSION, ^4\\.[0-9]\\..*) {
 QT += webkit
 }
-contains(QT_VERSION, ^5\\.[0-9]\\..*) {
+contains(QT_VERSION, ^5\\.[0-5]\\..*) {
 QT += widgets
 QT += webkitwidgets
+android: QT += androidextras
+}
+contains(QT_VERSION, ^5\\.[6-9]\\..*) {
+QT += widgets
 android: QT += androidextras
 }
 
@@ -33,7 +37,7 @@ HEADERS += mythuiimage.h mythuitext.h mythuistatetype.h  xmlparsebase.h
 HEADERS += mythuibutton.h myththemedmenu.h mythdialogbox.h
 HEADERS += mythuiclock.h mythuitextedit.h mythprogressdialog.h mythuispinbox.h
 HEADERS += mythuicheckbox.h mythuibuttonlist.h mythuigroup.h
-HEADERS += mythuiprogressbar.h mythuiwebbrowser.h mythuifilebrowser.h
+HEADERS += mythuiprogressbar.h mythuifilebrowser.h
 HEADERS += screensaver.h screensaver-null.h x11colors.h
 HEADERS += themeinfo.h mythxdisplay.h DisplayRes.h DisplayResScreen.h
 HEADERS += mythgenerictree.h mythuibuttontree.h mythuiutils.h
@@ -65,7 +69,11 @@ SOURCES += mythuisimpletext.cpp mythuistatetracker.cpp
 SOURCES += mythuianimation.cpp mythuiscrollbar.cpp
 SOURCES += mythnotificationcenter.cpp mythnotification.cpp
 SOURCES += mythuicomposite.cpp
+
+!contains(QT_VERSION, ^5\\.[6-9]\\..*) {
+HEADERS += mythuiwebbrowser.h
 SOURCES += mythuiwebbrowser.cpp
+}
 
 inc.path = $${PREFIX}/include/mythtv/libmythui/
 
@@ -170,6 +178,7 @@ mingw | win32-msvc*{
     HEADERS += mythpainter_d3d9.h   mythrender_d3d9.h
     SOURCES += mythpainter_d3d9.cpp mythrender_d3d9.cpp
     DEFINES += NODRAWTEXT
+    LIBS    += -lGdi32 -lUser32
 
     using_dxva2: DEFINES += USING_DXVA2
 }

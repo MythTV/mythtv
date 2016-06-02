@@ -39,10 +39,14 @@ VBoxChannelFetcher::VBoxChannelFetcher(uint cardid, const QString &inputname, ui
     if (list.count() == 3)
     {
         QString tunerType = list.at(2);
-        if (tunerType == "DVBT" || tunerType == "DVBT/T2")
+        if (tunerType == "DVBT")
             _transType = "T";
-        else if (tunerType == "DVBS" || tunerType == "DVBS/S2")
+        else if (tunerType == "DVBT/T2")
+            _transType = "T2";
+        else if (tunerType == "DVBS")
             _transType = "S";
+        else if (tunerType == "DVBS/S2")
+            _transType = "S2";
         else if (tunerType == "DVBC")
             _transType = "C";
         else if (tunerType == "ATSC")
@@ -195,7 +199,7 @@ void VBoxChannelFetcher::run(void)
                 _scan_monitor->ScanAppendTextToLog(tr("Ignoring Radio %1").arg(msg));
             }
         }
-        else if (transType != _transType && transType != "UNKNOWN")
+        else if (!SupportedTransmission(transType))
         {
             // ignore this channel
             if (_scan_monitor)
@@ -256,4 +260,24 @@ void VBoxChannelFetcher::SetNumChannelsInserted(uint val)
     uint pct = minval + (uint) truncf((((float)val) / _chan_cnt) * range);
     if (_scan_monitor)
         _scan_monitor->ScanPercentComplete(pct);
+}
+
+bool VBoxChannelFetcher::SupportedTransmission(const QString& transType)
+{
+    if (transType == "UNKNOWN")
+        return true;
+
+    // both S and S2 tuners can tune an S channel
+    if (transType == "S" && (_transType == "S" || _transType == "S2"))
+        return true;
+
+    // both T and T2 tuners can tune a T channel
+    if (transType == "T" && (_transType == "T" || _transType == "T2"))
+        return true;
+
+    // for S2, T2, A and C the channel and tuner transmission types must match
+    if (transType != _transType)
+        return false;
+
+    return true;
 }

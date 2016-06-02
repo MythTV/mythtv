@@ -571,7 +571,7 @@ bool V4L2encStreamHandler::StartEncoding(void)
                 {
                     LOG(VB_GENERAL, LOG_ERR, LOC +
                         "StartEncoding: Can't open video device." + ENO);
-                    _error = "Failed to start recording";
+                    m_error = "Failed to start recording";
                     return false;
                 }
             }
@@ -587,7 +587,7 @@ bool V4L2encStreamHandler::StartEncoding(void)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 "StartEncoding: read from video device failed." + ENO);
-            _error = "Failed to start recording";
+            m_error = "Failed to start recording";
             close(m_fd);
             m_fd = -1;
             return false;
@@ -598,9 +598,11 @@ bool V4L2encStreamHandler::StartEncoding(void)
                 QString("%1 read attempts required to start encoding").arg(idx));
         }
 
-
-        m_drb->SetRequestPause(false);
-        m_drb->Start();
+        if (m_drb)
+        {
+            m_drb->SetRequestPause(false);
+            m_drb->Start();
+        }
     }
     else
         LOG(VB_RECORD, LOG_INFO, LOC + "Already encoding");
@@ -655,7 +657,7 @@ bool V4L2encStreamHandler::StopEncoding(void)
         m_v4l2.StopEncoding();
 
     // allow last bits of data through..
-    if (m_drb->IsRunning())
+    if (m_drb && m_drb->IsRunning())
         usleep(20 * 1000);
 #if 0
     // close the fd so streamoff/streamon work in V4LChannel    Close();

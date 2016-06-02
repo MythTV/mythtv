@@ -68,7 +68,7 @@ EITFixUp::EITFixUp()
       m_ukNew("(New\\.|\\s*(Brand New|New)\\s*(Series|Episode)\\s*[:\\.\\-])",Qt::CaseInsensitive),
       m_ukNewTitle("^(Brand New|New:)\\s*",Qt::CaseInsensitive),
       m_ukAlsoInHD("\\s*Also in HD\\.",Qt::CaseInsensitive),
-      m_ukCEPQ("[:\\!\\.\\?]"),
+      m_ukCEPQ("[:\\!\\.\\?]\\s"),
       m_ukColonPeriod("[:\\.]"),
       m_ukDotSpaceStart("^\\. "),
       m_ukDotEnd("\\.$"),
@@ -138,12 +138,15 @@ EITFixUp::EITFixUp()
       m_PRO7CrewOne("^(.*):\\s+(.*)$"),
       m_PRO7Cast("\n\nDarsteller:\n(.*)$"),
       m_PRO7CastOne("^([^\\(]*)\\((.*)\\)$"),
+      m_DisneyChannelSubtitle(",([^,]+)\\s{0,1}(\\d{4})$"),
+      m_ATVSubtitle(",{0,1}\\sFolge\\s(\\d{1,3})$"),
       m_RTLEpisodeNo1("^(Folge\\s\\d{1,4})\\.*\\s*"),
       m_RTLEpisodeNo2("^(\\d{1,2}\\/[IVX]+)\\.*\\s*"),
       m_fiRerun("\\ ?Uusinta[a-zA-Z\\ ]*\\.?"),
       m_fiRerun2("\\([Uu]\\)"),
-      m_dePremiereInfos("\\s*[0-9]+\\sMin\\.([^.]+)?\\s?([0-9]{4})\\.(?:\\sVon"
-                        "\\s([^,]+)(?:,|\\su\\.\\sa\\.)\\smit\\s(.+)\\.)?"),
+      m_dePremiereLength("\\s?[0-9]+\\sMin\\."),
+      m_dePremiereAirdate("\\s?([^\\s^\\.]+)\\s((?:1|2)[0-9]{3})\\."),
+      m_dePremiereCredits("\\sVon\\s([^,]+)(?:,|\\su\\.\\sa\\.)\\smit\\s([^\\.]*)\\."),
       m_dePremiereOTitle("\\s*\\(([^\\)]*)\\)$"),
       m_deSkyDescriptionSeasonEpisode("^(\\d{1,2}).\\sStaffel,\\sFolge\\s(\\d{1,2}):\\s"),
       m_nlTxt("txt"),
@@ -299,6 +302,12 @@ void EITFixUp::Fix(DBEventEIT &event) const
 
     if (kFixP7S1 & event.fixup)
         FixPRO7(event);
+
+    if (kFixATV & event.fixup)
+        FixATV(event);
+
+    if (kFixDisneyChannel & event.fixup)
+        FixDisneyChannel(event);
 
     if (kFixFI & event.fixup)
         FixFI(event);
@@ -1013,7 +1022,8 @@ void EITFixUp::FixUK(DBEventEIT &event) const
             if (isMovie &&
                 ((position1 = strFull.indexOf(m_ukCEPQ,strPart.length())) != -1))
             {
-                 if (strFull[position1] == '!' || strFull[position1] == '?')
+                 if (strFull[position1] == '!' || strFull[position1] == '?'
+                  || (position1>2 && strFull[position1] == '.' && strFull[position1-2] == '.'))
                      position1++;
                  event.title = strFull.left(position1);
                  event.description = strFull.mid(position1 + 1);
@@ -1021,7 +1031,8 @@ void EITFixUp::FixUK(DBEventEIT &event) const
             }
             else if ((position1 = strFull.indexOf(m_ukCEPQ)) != -1)
             {
-                 if (strFull[position1] == '!' || strFull[position1] == '?')
+                 if (strFull[position1] == '!' || strFull[position1] == '?'
+                  || (position1>2 && strFull[position1] == '.' && strFull[position1-2] == '.'))
                      position1++;
                  event.title = strFull.left(position1);
                  event.description = strFull.mid(position1 + 1);
@@ -1854,6 +1865,40 @@ void EITFixUp::FixPRO7(DBEventEIT &event) const
      */
 }
 
+/** \fn EITFixUp::FixDisneyChannel(DBEventEIT&) const
+*  \brief Use this to standardise the Disney Channel guide in Germany.
+*/
+void EITFixUp::FixDisneyChannel(DBEventEIT &event) const
+{
+    QRegExp tmp = m_DisneyChannelSubtitle;
+    int pos = tmp.indexIn(event.subtitle);
+    if (pos != -1)
+    {
+        if (event.airdate == 0)
+        {
+            event.airdate = tmp.cap(3).toUInt();
+        }
+	event.subtitle.replace(tmp, "");
+    }
+    tmp = QRegExp("\\s[^\\s]+-(Serie)");
+    pos = tmp.indexIn(event.subtitle);
+    if (pos != -1)
+    {
+        event.categoryType = ProgramInfo::kCategorySeries;
+        event.category=tmp.cap(0).trimmed();
+        event.subtitle.replace(tmp, "");
+    }
+}
+
+/** \fn EITFixUp::FixATV(DBEventEIT&) const
+*  \brief Use this to standardise the ATV/ATV2 guide in Germany.
+**/
+void EITFixUp::FixATV(DBEventEIT &event) const
+{
+    event.subtitle.replace(m_ATVSubtitle, "");
+}
+
+
 /** \fn EITFixUp::FixFI(DBEventEIT&) const
  *  \brief Use this to clean DVB-T guide in Finland.
  */
@@ -1890,23 +1935,35 @@ void EITFixUp::FixPremiere(DBEventEIT &event) const
 {
     QString country = "";
 
-    // Find infos about country and year, regisseur and actors
-    QRegExp tmpInfos =  m_dePremiereInfos;
-    if (tmpInfos.indexIn(event.description) != -1)
+    QRegExp tmplength =  m_dePremiereLength;
+    QRegExp tmpairdate =  m_dePremiereAirdate;
+    QRegExp tmpcredits =  m_dePremiereCredits;
+
+    event.description = event.description.replace(tmplength, "");
+
+    if (tmpairdate.indexIn(event.description) != -1)
     {
-        country = tmpInfos.cap(2).trimmed();
+        country = tmpairdate.cap(1).trimmed();
         bool ok;
-        uint y = tmpInfos.cap(1).toUInt(&ok);
+        uint y = tmpairdate.cap(2).toUInt(&ok);
         if (ok)
             event.airdate = y;
-        event.AddPerson(DBPerson::kDirector, tmpInfos.cap(3));
-        const QStringList actors = tmpInfos.cap(4).split(
+        event.description = event.description.replace(tmpairdate, "");
+    }
+
+    if (tmpcredits.indexIn(event.description) != -1)
+    {
+        event.AddPerson(DBPerson::kDirector, tmpcredits.cap(1));
+        const QStringList actors = tmpcredits.cap(2).split(
             ", ", QString::SkipEmptyParts);
         QStringList::const_iterator it = actors.begin();
         for (; it != actors.end(); ++it)
             event.AddPerson(DBPerson::kActor, *it);
-        event.description = event.description.replace(tmpInfos, "");
+        event.description = event.description.replace(tmpcredits, "");
     }
+
+    event.description = event.description.replace("\u000A$", "");
+    event.description = event.description.replace("\u000A", " ");
 
     // move the original titel from the title to subtitle
     QRegExp tmpOTitle = m_dePremiereOTitle;

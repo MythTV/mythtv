@@ -166,7 +166,7 @@ void GLSingleView::CleanUp(void)
     makeCurrent();
 
     if (m_slideshow_running)
-    {  
+    {
         GetMythMainWindow()->PauseIdleTimer(false);
         GetMythUI()->RestoreScreensaver();
     }
@@ -293,7 +293,8 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
     if (m_slideshow_running)
         GetMythMainWindow()->PauseIdleTimer(false);
     bool wasRunning = m_slideshow_running;
-    m_slideshow_timer->stop();
+    if (m_slideshow_timer)
+        m_slideshow_timer->stop();
     m_slideshow_running = false;
     GetMythUI()->RestoreScreensaver();
     m_effect_running = false;
@@ -486,7 +487,7 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
         }
     }
 
-    if (m_slideshow_running || m_info_show_short)
+    if (m_slideshow_timer && (m_slideshow_running || m_info_show_short))
     {
         m_slideshow_timer->stop();
         m_slideshow_timer->setSingleShot(true);
@@ -703,7 +704,7 @@ int GLSingleView::GetNearestGLTextureSize(int v) const
         }
     }
 
-    if (n > 1)
+    if (n > 1 && last < 31)
         s = 1 << (last + 1);
     else
         s = 1 << last;
@@ -1458,7 +1459,7 @@ void GLSingleView::SlideTimeout(void)
     }
 
     updateGL();
-    if (m_slideshow_running)
+    if (m_slideshow_running && m_slideshow_timer)
     {
         m_slideshow_timer->stop();
         m_slideshow_timer->setSingleShot(true);

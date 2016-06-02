@@ -199,13 +199,13 @@ void ThemeChooser::Load(void)
     else
     {
 
-        MythVersion = MYTH_BINARY_VERSION; // Example: 0.25.20101017-1
+        MythVersion = MYTH_BINARY_VERSION; // Example: 29.20161017-1
         MythVersion.replace(QRegExp("\\.[0-9]{8,}.*"), "");
         LOG(VB_GUI, LOG_INFO, QString("Loading themes for %1").arg(MythVersion));
         LoadVersion(MythVersion, themesSeen, true);
 
         // If a version of the theme for this tag exists, use it...
-        QRegExp subexp("v[0-9]+.[0-9]+.([0-9]+)-*");
+        QRegExp subexp("v[0-9]+\\.([0-9]+)-*");
         int pos = subexp.indexIn(MYTH_SOURCE_VERSION);
         if (pos > -1)
         {

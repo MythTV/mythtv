@@ -19,7 +19,7 @@ class LogViewer : public MythScreenType
 
   public:
 
-    LogViewer(MythScreenStack *parent);
+    explicit LogViewer(MythScreenStack *parent);
    ~LogViewer(void);
 
     bool Create(void);

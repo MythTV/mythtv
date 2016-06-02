@@ -763,7 +763,7 @@ bool PreviewGenerator::IsLocal(void) const
 }
 
 /**
- *  \brief Returns a PIX_FMT_RGBA32 buffer containg a frame from the video.
+ *  \brief Returns a AV_PIX_FMT_RGBA32 buffer containg a frame from the video.
  *
  *  \param pginfo       Recording to grab from.
  *  \param filename     File containing recording.
@@ -844,6 +844,13 @@ char *PreviewGenerator::GetScreenGrab(
             QString("Grabbed preview '%0' %1x%2@%3%4")
                 .arg(filename).arg(video_width).arg(video_height)
                 .arg(seektime).arg((time_in_secs) ? "s" : "f"));
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Failed to grab preview '%0' %1x%2@%3%4")
+            .arg(filename).arg(video_width).arg(video_height)
+            .arg(seektime).arg((time_in_secs) ? "s" : "f"));
     }
 
     return retbuf;

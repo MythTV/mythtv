@@ -46,6 +46,7 @@
 #include "mythdate.h"
 #include "mythcorecontext.h"
 #include "mythtimer.h"
+#include "mythcoreutil.h"
 
 #include "serializers/xmlSerializer.h"
 #include "serializers/soapSerializer.h"
@@ -464,7 +465,8 @@ qint64 HTTPRequest::SendResponse( void )
     QString masterAddrPort = QString("%1:%2").arg(gCoreContext->GetMasterServerIP())
                                              .arg(gCoreContext->GetMasterServerStatusPort());
     QString masterTLSAddrPort = QString("%1:%2").arg(gCoreContext->GetMasterServerIP())
-                                                .arg(gCoreContext->GetSetting( "BackendSSLPort", "6554" ));
+                                                .arg(gCoreContext->GetSetting( "BackendSSLPort",
+                                                QString(gCoreContext->GetMasterServerStatusPort() + 10)));
 
     QStringList allowedOrigins;
     allowedOrigins << QString("http://%1").arg(masterAddrPort);

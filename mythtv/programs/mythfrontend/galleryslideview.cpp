@@ -30,6 +30,7 @@ GallerySlideView::GallerySlideView(MythScreenStack *parent, const char *name,
       m_slides(),
       m_infoList(*this),
       m_slideShowTime(gCoreContext->GetNumSetting("GallerySlideShowTime", 3000)),
+      m_statusText(),
       m_playing(false),
       m_suspended(false),
       m_showCaptions(gCoreContext->GetNumSetting("GalleryShowSlideCaptions", true)),
@@ -50,6 +51,11 @@ GallerySlideView::GallerySlideView(MythScreenStack *parent, const char *name,
     m_timer.setSingleShot(true);
     m_timer.setInterval(m_slideShowTime);
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(ShowNextSlide()));
+
+    // Initialise status delay timer
+    m_delay.setSingleShot(true);
+    m_delay.setInterval(gCoreContext->GetNumSetting("GalleryStatusDelay", 0));
+    connect(&m_delay, SIGNAL(timeout()), this, SLOT(ShowStatus()));
 }
 
 
@@ -142,9 +148,13 @@ bool GallerySlideView::keyPressEvent(QKeyEvent *event)
         handled = true;
 
         if (action == "LEFT")
-            ShowPrevSlide();
+            ShowPrevSlide(1);
         else if (action == "RIGHT")
-            ShowNextSlide();
+            ShowNextSlide(1);
+        else if (action == "UP")
+            ShowPrevSlide(10);
+        else if (action == "DOWN")
+            ShowNextSlide(10);
         else if (action == "INFO")
             ShowInfo();
         else if (action == "MENU")
@@ -416,13 +426,12 @@ void GallerySlideView::Stop()
 void GallerySlideView::Play(bool useTransition)
 {
     // Start from next slide
-    ShowNextSlide(useTransition);
+    ShowNextSlide(1, useTransition);
 
     m_playing = true;
     if (!m_suspended)
         m_timer.start();
-    if (m_uiStatus)
-        SetStatus(tr("Playing"));
+    SetStatus(tr("Playing"), true);
 }
 
 
@@ -511,7 +520,7 @@ void GallerySlideView::HideInfo()
 void GallerySlideView::ShowCaptions()
 {
     m_showCaptions = true;
-    m_uiHideCaptions->SetText("");
+    m_uiHideCaptions->Reset();
 }
 
 
@@ -544,7 +553,7 @@ void GallerySlideView::ShowSlide(int direction)
     // Load image from file
     if (!m_slides.Load(im, direction))
         // Image not yet available: show loading status
-        SetStatus(tr("Loading"));
+        SetStatus(tr("Loading"), true);
 }
 
 
@@ -574,16 +583,7 @@ void GallerySlideView::SlideAvailable(int count)
     Slide &next = m_slides.GetNext();
 
     // Update loading status
-    if (m_uiStatus)
-    {
-        if (!next.FailedLoad())
-
-            m_uiStatus->SetVisible(false);
-
-        else if (ImagePtrK im = next.GetImageData())
-
-            SetStatus(tr("Failed to load %1").arg(im->m_filePath));
-    }
+    ClearStatus(next);
 
     // Update slide counts
     if (m_uiSlideCount)
@@ -625,7 +625,7 @@ void GallerySlideView::TransitionComplete()
         return;
 
     // Preload next slide, if any
-    m_slides.Preload(m_view->HasNext());
+    m_slides.Preload(m_view->HasNext(1));
 
     // Populate display for new slide
     ImagePtrK im  = m_slides.GetCurrent().GetImageData();
@@ -662,14 +662,14 @@ void GallerySlideView::TransitionComplete()
 /*!
  \brief Display the previous slide in the sequence
 */
-void GallerySlideView::ShowPrevSlide()
+void GallerySlideView::ShowPrevSlide(int inc)
 {
-    if (m_playing && m_view->HasPrev() == NULL)
+    if (m_playing && m_view->HasPrev(inc) == NULL)
         // Prohibit back-wrapping during slideshow: it will cause premature end
         //: Cannot go back beyond first slide of slideshow
         SetStatus(tr("Start"));
 
-    else if (m_view->Prev())
+    else if (m_view->Prev(inc))
         ShowSlide(-1);
 }
 
@@ -678,17 +678,21 @@ void GallerySlideView::ShowPrevSlide()
  \brief Display the next slide in the sequence
  \param useTransition if false, slide will be updated instantly
 */
-void GallerySlideView::ShowNextSlide(bool useTransition)
+void GallerySlideView::ShowNextSlide(int inc, bool useTransition)
 {
     // Browsing always wraps; slideshows depend on repeat setting
-    if (m_playing && m_view->HasNext() == NULL
+    if (m_playing && m_view->HasNext(inc) == NULL
             && !gCoreContext->GetNumSetting("GalleryRepeat", false))
     {
-        Stop();
-        //: Slideshow has reached last slide
-        SetStatus(tr("End"));
+        // Don't stop due to jumping past end
+        if (inc == 1)
+        {
+            Stop();
+            //: Slideshow has reached last slide
+            SetStatus(tr("End"));
+        }
     }
-    else if (m_view->Next())
+    else if (m_view->Next(inc))
         ShowSlide(useTransition ? 1 : 0);
     else
     {
@@ -699,7 +703,7 @@ void GallerySlideView::ShowNextSlide(bool useTransition)
         if (m_uiSlideCount)
             m_uiSlideCount->SetText("0/0");
         if (m_uiCaptionText)
-            m_uiCaptionText->SetText("");
+            m_uiCaptionText->Reset();
     }
 }
 
@@ -723,11 +727,38 @@ void GallerySlideView::PlayVideo()
  \brief Displays status text (Loading, Paused etc.)
  \param msg Text to show
 */
-void GallerySlideView::SetStatus(QString msg)
+void GallerySlideView::SetStatus(QString msg, bool delay)
+{
+    m_statusText = msg;
+    if (m_uiStatus)
+    {
+        if (delay)
+            m_delay.start();
+        else
+            ShowStatus();
+    }
+}
+
+
+void GallerySlideView::ShowStatus()
+{
+    if (m_uiStatus)
+        m_uiStatus->SetText(m_statusText);
+}
+
+
+void GallerySlideView::ClearStatus(Slide &slide)
 {
     if (m_uiStatus)
     {
-        m_uiStatus->SetText(msg);
-        m_uiStatus->SetVisible(true);
+        m_delay.stop();
+
+        if (slide.FailedLoad())
+        {
+            ImagePtrK im = slide.GetImageData();
+            SetStatus(tr("Failed to load %1").arg(im ? im->m_filePath : "?"));
+        }
+        else
+            m_uiStatus->Reset();
     }
 }

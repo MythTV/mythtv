@@ -16,3 +16,4 @@ TRANSLATIONS += mythbrowser_pt.ts mythbrowser_ja.ts mythbrowser_pl.ts
 TRANSLATIONS += mythbrowser_en_ca.ts mythbrowser_es_es.ts
 TRANSLATIONS += mythbrowser_it.ts
 TRANSLATIONS += mythbrowser_zh_hk.ts
+TRANSLATIONS += mythbrowser_bg.ts

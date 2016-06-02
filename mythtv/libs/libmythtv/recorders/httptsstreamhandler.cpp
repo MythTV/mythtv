@@ -206,7 +206,7 @@ void HTTPReader::WriteBytes()
     if (m_size < TS_SIZE)
         return;
 
-    QMutexLocker  replylock(&m_bufferlock);
+    QMutexLocker bufferlock(&m_bufferlock);
     int remainder = 0;
     {
         QMutexLocker locker(&m_parent->_listener_lock);
@@ -218,7 +218,9 @@ void HTTPReader::WriteBytes()
         }
     }
     LOG(VB_RECORD, LOG_DEBUG, LOC + QString("WriteBytes: %1/%2 bytes remain").arg(remainder).arg(m_size));
-    memcpy(m_buffer, m_buffer + (m_size - remainder), remainder);
+
+    /* move the remaining data to the beginning of the buffer */
+    memmove(m_buffer, m_buffer + (m_size - remainder), remainder);
     m_size = remainder;
 }
 

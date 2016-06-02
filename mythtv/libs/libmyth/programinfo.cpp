@@ -2865,6 +2865,68 @@ void ProgramInfo::SaveDVDBookmark(const QStringList &fields) const
         MythDB::DBError("SetDVDBookmark updating", query);
 }
 
+/** \brief Queries "bdbookmark" table for bookmarking BD serial number.
+ *  \return BD state string
+ */
+QStringList ProgramInfo::QueryBDBookmark(const QString &serialid) const
+{
+    QStringList fields = QStringList();
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    if (!(programflags & FL_IGNOREBOOKMARK))
+    {
+        query.prepare(" SELECT bdstate FROM bdbookmark "
+                        " WHERE serialid = :SERIALID ");
+        query.bindValue(":SERIALID", serialid);
+
+        if (query.exec() && query.next())
+            fields.append(query.value(0).toString());
+    }
+
+    return fields;
+}
+
+void ProgramInfo::SaveBDBookmark(const QStringList &fields) const
+{
+    QStringList::const_iterator it = fields.begin();
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    QString serialid    = *(it);
+    QString name        = *(++it);
+
+    if( fields.count() == 3 )
+    {
+        // We have a state field, so update/create the bookmark
+        QString state = *(++it);
+
+        query.prepare("INSERT IGNORE INTO bdbookmark "
+                        " (serialid, name)"
+                        " VALUES ( :SERIALID, :NAME );");
+        query.bindValue(":SERIALID", serialid);
+        query.bindValue(":NAME", name);
+
+        if (!query.exec())
+            MythDB::DBError("SetBDBookmark inserting", query);
+
+        query.prepare(" UPDATE bdbookmark "
+                        " SET bdstate    = :STATE , "
+                        "     timestamp  = NOW() "
+                        " WHERE serialid = :SERIALID");
+        query.bindValue(":STATE",state);
+        query.bindValue(":SERIALID",serialid);
+    }
+    else
+    {
+        // No state field, delete the bookmark
+        query.prepare("DELETE FROM bdbookmark "
+                        "WHERE serialid = :SERIALID");
+        query.bindValue(":SERIALID",serialid);
+    }
+
+    if (!query.exec())
+        MythDB::DBError("SetBDBookmark updating", query);
+}
+
 /** \brief Queries recordedprogram to get the category_type of the
  *         recording.
  *
@@ -3909,169 +3971,169 @@ static const char *from_filemarkup_offset_asc =
     "SELECT mark, offset FROM filemarkup"
     " WHERE filename = :PATH"
     " AND type = :TYPE"
-    " AND mark >= :MARK"
+    " AND mark >= :QUERY_ARG"
     " ORDER BY filename ASC, type ASC, mark ASC LIMIT 1;";
 static const char *from_filemarkup_offset_desc =
     "SELECT mark, offset FROM filemarkup"
     " WHERE filename = :PATH"
     " AND type = :TYPE"
-    " AND mark <= :MARK"
+    " AND mark <= :QUERY_ARG"
     " ORDER BY filename DESC, type DESC, mark DESC LIMIT 1;";
 static const char *from_recordedseek_offset_asc =
     "SELECT mark, offset FROM recordedseek"
     " WHERE chanid = :CHANID"
     " AND starttime = :STARTTIME"
     " AND type = :TYPE"
-    " AND mark >= :MARK"
+    " AND mark >= :QUERY_ARG"
     " ORDER BY chanid ASC, starttime ASC, type ASC, mark ASC LIMIT 1;";
 static const char *from_recordedseek_offset_desc =
     "SELECT mark, offset FROM recordedseek"
     " WHERE chanid = :CHANID"
     " AND starttime = :STARTTIME"
     " AND type = :TYPE"
-    " AND mark <= :MARK"
+    " AND mark <= :QUERY_ARG"
+    " ORDER BY chanid DESC, starttime DESC, type DESC, mark DESC LIMIT 1;";
+static const char *from_filemarkup_mark_asc =
+    "SELECT offset,mark FROM filemarkup"
+    " WHERE filename = :PATH"
+    " AND type = :TYPE"
+    " AND offset >= :QUERY_ARG"
+    " ORDER BY filename ASC, type ASC, mark ASC LIMIT 1;";
+static const char *from_filemarkup_mark_desc =
+    "SELECT offset,mark FROM filemarkup"
+    " WHERE filename = :PATH"
+    " AND type = :TYPE"
+    " AND offset <= :QUERY_ARG"
+    " ORDER BY filename DESC, type DESC, mark DESC LIMIT 1;";    
+static const char *from_recordedseek_mark_asc =
+    "SELECT offset,mark FROM recordedseek"
+    " WHERE chanid = :CHANID"
+    " AND starttime = :STARTTIME"
+    " AND type = :TYPE"
+    " AND offset >= :QUERY_ARG"
+    " ORDER BY chanid ASC, starttime ASC, type ASC, mark ASC LIMIT 1;";
+static const char *from_recordedseek_mark_desc =
+    "SELECT offset,mark FROM recordedseek"
+    " WHERE chanid = :CHANID"
+    " AND starttime = :STARTTIME"
+    " AND type = :TYPE"
+    " AND offset <= :QUERY_ARG"
     " ORDER BY chanid DESC, starttime DESC, type DESC, mark DESC LIMIT 1;";
 
-bool ProgramInfo::QueryKeyFramePosition(uint64_t *position, uint64_t keyframe, bool backwards) const
+bool ProgramInfo::QueryKeyFrameInfo(uint64_t * result,
+                                    uint64_t position_or_keyframe,
+                                    bool backwards,
+                                    MarkTypes type,
+                                    const char *from_filemarkup_asc,
+                                    const char *from_filemarkup_desc,
+                                    const char *from_recordedseek_asc,
+                                    const char *from_recordedseek_desc) const
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
     if (IsVideo())
     {
         if (backwards)
-            query.prepare(from_filemarkup_offset_desc);
+            query.prepare(from_filemarkup_desc);
         else
-            query.prepare(from_filemarkup_offset_asc);
+            query.prepare(from_filemarkup_asc);
         query.bindValue(":PATH", StorageGroup::GetRelativePathname(pathname));
     }
     else if (IsRecording())
     {
         if (backwards)
-            query.prepare(from_recordedseek_offset_desc);
+            query.prepare(from_recordedseek_desc);
         else
-            query.prepare(from_recordedseek_offset_asc);
+            query.prepare(from_recordedseek_asc);
         query.bindValue(":CHANID", chanid);
         query.bindValue(":STARTTIME", recstartts);
     }
-    query.bindValue(":TYPE", MARK_GOP_BYFRAME);
-    query.bindValue(":MARK", (unsigned long long)keyframe);
+    query.bindValue(":TYPE", type);
+    query.bindValue(":QUERY_ARG", (unsigned long long)position_or_keyframe);
 
     if (!query.exec())
     {
-        MythDB::DBError("QueryKeyFramePosition", query);
+        MythDB::DBError("QueryKeyFrameInfo", query);
         return false;
     }
 
     if (query.next())
     {
-        *position = query.value(1).toULongLong();
+        *result = query.value(1).toULongLong();
         return true;
     }
 
     if (IsVideo())
     {
         if (backwards)
-            query.prepare(from_filemarkup_offset_asc);
+            query.prepare(from_filemarkup_asc);
         else
-            query.prepare(from_filemarkup_offset_desc);
+            query.prepare(from_filemarkup_desc);
         query.bindValue(":PATH", StorageGroup::GetRelativePathname(pathname));
     }
     else if (IsRecording())
     {
         if (backwards)
-            query.prepare(from_recordedseek_offset_asc);
+            query.prepare(from_recordedseek_asc);
         else
-            query.prepare(from_recordedseek_offset_desc);
+            query.prepare(from_recordedseek_desc);
         query.bindValue(":CHANID", chanid);
         query.bindValue(":STARTTIME", recstartts);
     }
-    query.bindValue(":TYPE", MARK_GOP_BYFRAME);
-    query.bindValue(":MARK", (unsigned long long)keyframe);
+    query.bindValue(":TYPE", type);
+    query.bindValue(":QUERY_ARG", (unsigned long long)position_or_keyframe);
 
     if (!query.exec())
     {
-        MythDB::DBError("QueryKeyFramePosition", query);
+        MythDB::DBError("QueryKeyFrameInfo", query);
         return false;
     }
 
     if (query.next())
     {
-        *position = query.value(1).toULongLong();
+        *result = query.value(1).toULongLong();
         return true;
     }
 
     return false;
+
 }
 
-bool ProgramInfo::QueryKeyFrameDuration(uint64_t *duration, uint64_t keyframe, bool backwards) const
+bool ProgramInfo::QueryPositionKeyFrame(uint64_t *keyframe, uint64_t position,
+                                        bool backwards) const
 {
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    if (IsVideo())
-    {
-        if (backwards)
-            query.prepare(from_filemarkup_offset_desc);
-        else
-            query.prepare(from_filemarkup_offset_asc);
-        query.bindValue(":PATH", StorageGroup::GetRelativePathname(pathname));
-    }
-    else if (IsRecording())
-    {
-        if (backwards)
-            query.prepare(from_recordedseek_offset_desc);
-        else
-            query.prepare(from_recordedseek_offset_asc);
-        query.bindValue(":CHANID", chanid);
-        query.bindValue(":STARTTIME", recstartts);
-    }
-    query.bindValue(":TYPE", MARK_DURATION_MS);
-    query.bindValue(":MARK", (unsigned long long)keyframe);
-
-    if (!query.exec())
-    {
-        MythDB::DBError("QueryKeyFrameDuration", query);
-        return false;
-    }
-
-    if (query.next())
-    {
-        *duration = query.value(1).toULongLong();
-        return true;
-    }
-
-    if (IsVideo())
-    {
-        if (backwards)
-            query.prepare(from_filemarkup_offset_asc);
-        else
-            query.prepare(from_filemarkup_offset_desc);
-        query.bindValue(":PATH", StorageGroup::GetRelativePathname(pathname));
-    }
-    else if (IsRecording())
-    {
-        if (backwards)
-            query.prepare(from_recordedseek_offset_asc);
-        else
-            query.prepare(from_recordedseek_offset_desc);
-        query.bindValue(":CHANID", chanid);
-        query.bindValue(":STARTTIME", recstartts);
-    }
-    query.bindValue(":TYPE", MARK_DURATION_MS);
-    query.bindValue(":MARK", (unsigned long long)keyframe);
-
-    if (!query.exec())
-    {
-        MythDB::DBError("QueryKeyFrameDuration", query);
-        return false;
-    }
-
-    if (query.next())
-    {
-        *duration = query.value(1).toULongLong();
-        return true;
-    }
-
-    return false;
+   return QueryKeyFrameInfo(keyframe, position, backwards, MARK_GOP_BYFRAME,
+                            from_filemarkup_mark_asc,
+                            from_filemarkup_mark_desc,
+                            from_recordedseek_mark_asc,
+                            from_recordedseek_mark_desc);
+}
+bool ProgramInfo::QueryKeyFramePosition(uint64_t *position, uint64_t keyframe,
+                                        bool backwards) const
+{
+   return QueryKeyFrameInfo(position, keyframe, backwards, MARK_GOP_BYFRAME,
+                            from_filemarkup_offset_asc,
+                            from_filemarkup_offset_desc,
+                            from_recordedseek_offset_asc,
+                            from_recordedseek_offset_desc);
+}
+bool ProgramInfo::QueryDurationKeyFrame(uint64_t *keyframe, uint64_t duration,
+                                        bool backwards) const
+{
+   return QueryKeyFrameInfo(keyframe, duration, backwards, MARK_DURATION_MS,
+                            from_filemarkup_mark_asc,
+                            from_filemarkup_mark_desc,
+                            from_recordedseek_mark_asc,
+                            from_recordedseek_mark_desc);
+}
+bool ProgramInfo::QueryKeyFrameDuration(uint64_t *duration, uint64_t keyframe,
+                                        bool backwards) const
+{
+   return QueryKeyFrameInfo(duration, keyframe, backwards, MARK_DURATION_MS,
+                            from_filemarkup_offset_asc,
+                            from_filemarkup_offset_desc,
+                            from_recordedseek_offset_asc,
+                            from_recordedseek_offset_desc);
 }
 
 /// \brief Store aspect ratio of a frame in the recordedmark table
@@ -5495,6 +5557,28 @@ static bool FromProgramQuery(const QString &sql, const MSqlBindings &bindings,
     return true;
 }
 
+bool LoadFromProgram(ProgramList &destination, const QString &where,
+                     const QString &groupBy, const QString &orderBy,
+                     const MSqlBindings &bindings, const ProgramList &schedList)
+{
+    uint count = 0;
+
+    QString queryStr = "";
+
+    if (!where.isEmpty())
+        queryStr.append(QString("WHERE %1 ").arg(where));
+
+    if (!groupBy.isEmpty())
+        queryStr.append(QString("GROUP BY %1 ").arg(groupBy));
+
+    if (!orderBy.isEmpty())
+        queryStr.append(QString("ORDER BY %1 ").arg(orderBy));
+
+    // ------------------------------------------------------------------------
+
+    return LoadFromProgram(destination, queryStr, bindings, schedList, 0, 0, count);
+}
+
 bool LoadFromProgram(ProgramList &destination,
                      const QString &sql, const MSqlBindings &bindings,
                      const ProgramList &schedList)
@@ -5510,6 +5594,11 @@ bool LoadFromProgram(ProgramList &destination,
     //        the caller isn't getting what they asked for and to fix that they
     //        are forced to include a GROUP BY, ORDER BY or WHERE that they
     //        do not want
+    //
+    // See the new version of this method above. The plan is to convert existing
+    // users of this method and have them supply all of their own data for the
+    // queries (no defaults.)
+
     if (!queryStr.contains("WHERE"))
         queryStr += " WHERE visible != 0 ";
 
@@ -6014,35 +6103,46 @@ void ProgramInfo::SaveFilesize(uint64_t fsize)
     updater->insert(recordedid, kPIUpdateFileSize, fsize);
 }
 
+//uint64_t ProgramInfo::GetFilesize(void) const
+//{
+    //LOG(VB_GENERAL, LOG_DEBUG, "FIXME: ProgramInfo::GetFilesize() called instead of RecordingInfo::GetFilesize()");
+//    return filesize;
+//}
+
+// Restore the original query. When a recording finishes, a
+// check is made on the filesize and it's 0 at times. If
+// less than 1000, commflag isn't queued. See #12290.
+
 uint64_t ProgramInfo::GetFilesize(void) const
 {
-    //LOG(VB_GENERAL, LOG_DEBUG, "FIXME: ProgramInfo::GetFilesize() called instead of RecordingInfo::GetFilesize()");
-    return filesize;
+
+    if (filesize)
+        return filesize;
+
+    // Always query in the 0 case because we can't
+    // tell if the filesize was 'lost'. Other than
+    // the 0 case, tests showed the DB and RI sizes
+    // were equal.
+
+    uint64_t db_filesize = 0;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare(
+        "SELECT filesize "
+        "FROM recorded "
+        "WHERE chanid    = :CHANID AND "
+        "      starttime = :STARTTIME");
+    query.bindValue(":CHANID",    chanid);
+    query.bindValue(":STARTTIME", recstartts);
+    if (query.exec() && query.next())
+        db_filesize = query.value(0).toULongLong();
+
+    if (db_filesize)
+        LOG(VB_RECORD, LOG_INFO, LOC + QString("RI Filesize=0, DB Filesize=%1")
+            .arg(db_filesize));
+
+    return db_filesize;
 }
-
-
-/// \brief Gets recording file size direct from the database.
-///
-/// In theory this should be redundant, the ProgramInfo updater should sync
-/// all instances on frontends and backends without the need
-/// for any one to go checking the database.
-// uint64_t ProgramInfo::QueryFilesize(void) const
-// {
-//     LOG(VB_GENERAL, LOG_DEBUG, "FIXME: ProgramInfo::QueryFilesize() called instead of RecordingInfo::GetFilesize()");
-//
-//     MSqlQuery query(MSqlQuery::InitCon());
-//
-//     query.prepare(
-//         "SELECT filesize "
-//         "FROM recorded "
-//         "WHERE chanid    = :CHANID AND "
-//         "      starttime = :STARTTIME");
-//     query.bindValue(":CHANID", chanid);
-//     query.bindValue(":STARTTIME", recstartts);
-//     if (query.exec() && query.next())
-//         return query.value(0).toULongLong();
-//
-//     return filesize;
-// }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

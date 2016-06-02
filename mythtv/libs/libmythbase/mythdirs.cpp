@@ -43,7 +43,10 @@ void InitializeMythDirs(void)
     appbindir = installprefix + "/";
     libdir    = appbindir;
 
-    sharedir = qgetenv( "ProgramData"  ) + "\\mythtv\\";
+    // Turn into Canonical Path for consistent compares
+
+    QDir sDir(qgetenv("ProgramData") + "\\mythtv\\");
+    sharedir = sDir.canonicalPath() + "/";
 
     if (confdir.length() == 0)
         confdir  = qgetenv( "LOCALAPPDATA" ) + "\\mythtv";

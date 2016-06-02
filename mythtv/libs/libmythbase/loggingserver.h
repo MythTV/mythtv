@@ -45,7 +45,7 @@ class LoggerBase : public QObject
 
   public:
     /// \brief LoggerBase Constructor
-    LoggerBase(const char *string);
+    explicit LoggerBase(const char *string);
     /// \brief LoggerBase Deconstructor
     virtual ~LoggerBase();
     /// \brief Process a log message for the logger instance
@@ -66,7 +66,7 @@ class FileLogger : public LoggerBase
     Q_OBJECT
 
   public:
-    FileLogger(const char *filename);
+    explicit FileLogger(const char *filename);
     ~FileLogger();
     bool logmsg(LoggingItem *item);
     void reopen(void);
@@ -111,7 +111,7 @@ class DatabaseLogger : public LoggerBase
 
     friend class DBLoggerThread;
   public:
-    DatabaseLogger(const char *table);
+    explicit DatabaseLogger(const char *table);
     ~DatabaseLogger();
     bool logmsg(LoggingItem *item);
     void reopen(void) { };
@@ -221,7 +221,7 @@ class QWaitCondition;
 class DBLoggerThread : public MThread
 {
   public:
-    DBLoggerThread(DatabaseLogger *logger);
+    explicit DBLoggerThread(DatabaseLogger *logger);
     ~DBLoggerThread();
     void run(void);
     void stop(void);

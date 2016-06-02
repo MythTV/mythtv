@@ -182,7 +182,7 @@ int DeviceManager::OpenDevice(const QString &name, const QString &mount,
         id = m_devices.isEmpty() ? 0 : (m_devices.constEnd() - 1).key() + 1;
         m_devices.insert(id, new Device(name, mount, media, dir));
     }
-    else
+    else if (m_devices.value(id))
         m_devices.value(id)->setPresent(media);
 
     LOG(VB_GENERAL, LOG_INFO, LOC +
@@ -2391,7 +2391,7 @@ QString ImageManagerFe::CrumbName(ImageItemK &im, bool getPath) const
         path.remove(0, DeviceMount(im.m_device).size());
         dev = DeviceName(im.m_device);
     }
-    return dev + path.replace("/", " : ");
+    return dev + path.replace("/", " > ");
 }
 
 

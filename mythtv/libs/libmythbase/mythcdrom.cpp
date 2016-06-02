@@ -1,6 +1,7 @@
 #include <QDir>
 #include <QFileInfo>
 
+#include "compat.h"
 #include "mythcdrom.h"
 #include "mythconfig.h"
 #include "remotefile.h"
@@ -166,10 +167,13 @@ static uint32_t _def_size(udfread_block_input *p_gen)
 static int _def_read(udfread_block_input *p_gen, uint32_t lba, void *buf, uint32_t nblocks, int flags)
 {
     (void)flags;
+    int result = -1;
     blockInput_t *p = (blockInput_t *)p_gen;
 
-    p->file->Seek(lba * UDF_BLOCK_SIZE, SEEK_SET);
-    return(p->file->Read(buf, nblocks * UDF_BLOCK_SIZE) / UDF_BLOCK_SIZE);
+    if (p && p->file && (p->file->Seek(lba * UDF_BLOCK_SIZE, SEEK_SET) != -1))
+        result = p->file->Read(buf, nblocks * UDF_BLOCK_SIZE) / UDF_BLOCK_SIZE;
+
+    return result;
 }
 
 MythCDROM::ImageType MythCDROM::inspectImage(const QString &path)
@@ -184,7 +188,7 @@ MythCDROM::ImageType MythCDROM::inspectImage(const QString &path)
     {
         blockInput_t blockInput;
 
-        blockInput.file = new RemoteFile(path);
+        blockInput.file = new RemoteFile(path); // Normally deleted via a call to udfread_close
         blockInput.input.close = _def_close;
         blockInput.input.read = _def_read;
         blockInput.input.size = _def_size;
@@ -222,6 +226,11 @@ MythCDROM::ImageType MythCDROM::inspectImage(const QString &path)
                 }
 
                 udfread_close(udf);
+            }
+            else
+            {
+                // Open failed, so we have clean this up here
+                delete blockInput.file;
             }
         }
         else

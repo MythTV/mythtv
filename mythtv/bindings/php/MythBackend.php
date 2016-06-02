@@ -5,7 +5,7 @@
  *
  * @package     MythTV
  *
-/**/
+ **/
 
 class MythBackend {
 
@@ -216,7 +216,7 @@ class MythBackend {
  * isn't specific to a single record entry (e.g. channel or record type
  * priorities), then use 0.  I don't think mythweb should need it, but if you
  * need to indicate every record rule is affected, then use -1.
-/**/
+ **/
     public function rescheduleRecording($recordid = -1) {
         if ($recordid == 0) {
             $this->sendCommand(array('RESCHEDULE_RECORDINGS ',
@@ -239,7 +239,7 @@ class MythBackend {
 /**
  * Request something from the backend's HTTP API and return it
  * as JSON. This is just syntactic sugar for httpRequest
-/**/
+ **/
    public function httpRequestAsJson($path, $args = array(), $opts = null) {
        if (!$opts) {
            $opts = array();
@@ -260,7 +260,7 @@ class MythBackend {
 
 /**
  * Request something from the backend's HTTP API
-/**/
+ **/
     public function httpRequest($path, $args = array(), $opts = null) {
         $url = "http://{$this->ip}:{$this->port_http}/{$path}?";
         foreach ($args as $key => $value) {

@@ -211,50 +211,6 @@ typedef enum SubtitleTypes {
 #define kSubtitlePropertyOffset (kAudioPropertyBits+kVideoPropertyBits)
 #define kSubtitlePropertyMask (0x0f<<kSubtitlePropertyOffset)
 
-class MPUBLIC RecStatus
-{
-  Q_GADGET
-
-  public:
-    Q_ENUMS(Type)
-
-    enum Type {
-        Failing = -14,
-        //OtherRecording = -13, (obsolete)
-        //OtherTuning = -12, (obsolete)
-        MissedFuture = -11,
-        Tuning = -10,
-        Failed = -9,
-        TunerBusy = -8,
-        LowDiskSpace = -7,
-        Cancelled = -6,
-        Missed = -5,
-        Aborted = -4,
-        Recorded = -3,
-        Recording = -2,
-        WillRecord = -1,
-        Unknown = 0,
-        DontRecord = 1,
-        PreviousRecording = 2,
-        CurrentRecording = 3,
-        EarlierShowing = 4,
-        TooManyRecordings = 5,
-        NotListed = 6,
-        Conflict = 7,
-        LaterShowing = 8,
-        Repeat = 9,
-        Inactive = 10,
-        NeverRecord = 11,
-        Offline = 12
-        //OtherShowing = 13 (obsolete)
-    }; // note stored in int8_t in ProgramInfo
-
-    static QString toUIState(Type);
-    static QString toString(Type, uint id);
-    static QString toString(Type, RecordingType type = kNotRecording);
-    static QString toDescription(Type, RecordingType,
-                                 const QDateTime &recstartts);
-};
 
 typedef enum AvailableStatusTypes {
     asAvailable = 0,

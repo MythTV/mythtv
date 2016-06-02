@@ -781,6 +781,34 @@ static bool delete_program(MSqlQuery &query, uint chanid, const QDateTime &st)
         return false;
     }
 
+    query.prepare(
+        "DELETE from programrating "
+        "WHERE chanid    = :CHANID AND "
+        "      starttime = :STARTTIME");
+
+    query.bindValue(":CHANID",    chanid);
+    query.bindValue(":STARTTIME", st);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("delete_rating", query);
+        return false;
+    }
+
+    query.prepare(
+        "DELETE from programgenres "
+        "WHERE chanid    = :CHANID AND "
+        "      starttime = :STARTTIME");
+
+    query.bindValue(":CHANID",    chanid);
+    query.bindValue(":STARTTIME", st);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("delete_genres", query);
+        return false;
+    }
+
     return true;
 }
 
@@ -837,6 +865,38 @@ static bool change_program(MSqlQuery &query, uint chanid, const QDateTime &st,
     if (!query.exec())
     {
         MythDB::DBError("change_credits", query);
+        return false;
+    }
+
+    query.prepare(
+        "UPDATE programrating "
+        "SET starttime = :NEWSTART "
+        "WHERE chanid    = :CHANID AND "
+        "      starttime = :OLDSTART");
+
+    query.bindValue(":CHANID",   chanid);
+    query.bindValue(":OLDSTART", st);
+    query.bindValue(":NEWSTART", new_st);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("change_rating", query);
+        return false;
+    }
+
+    query.prepare(
+        "UPDATE programgenres "
+        "SET starttime = :NEWSTART "
+        "WHERE chanid    = :CHANID AND "
+        "      starttime = :OLDSTART");
+
+    query.bindValue(":CHANID",   chanid);
+    query.bindValue(":OLDSTART", st);
+    query.bindValue(":NEWSTART", new_st);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("change_genres", query);
         return false;
     }
 
@@ -968,6 +1028,22 @@ uint DBEvent::InsertDB(MSqlQuery &query, uint chanid) const
     {
         MythDB::DBError("InsertDB", query);
         return 0;
+    }
+
+    QList<EventRating>::const_iterator j = ratings.begin();
+    for (; j != ratings.end(); ++j)
+    {
+        query.prepare(
+            "INSERT INTO programrating "
+            "       ( chanid, starttime, system, rating) "
+            "VALUES (:CHANID, :START,    :SYS,  :RATING)");
+        query.bindValue(":CHANID", chanid);
+        query.bindValue(":START",  starttime);
+        query.bindValue(":SYS",    (*j).system);
+        query.bindValue(":RATING", (*j).rating);
+
+        if (!query.exec())
+            MythDB::DBError("programrating insert", query);
     }
 
     if (credits)

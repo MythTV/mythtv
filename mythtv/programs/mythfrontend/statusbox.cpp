@@ -1108,7 +1108,7 @@ static const QString uptimeStr(time_t uptime)
     str = QString("   " + StatusBox::tr("Uptime") + ": ");
 
     if (uptime == 0)
-        return str + "unknown";
+        return str + StatusBox::tr("unknown", "unknown uptime");
 
     days = uptime/(60*60*24);
     uptime -= days*60*60*24;

@@ -75,7 +75,7 @@ class DBPurgeHandler : public QObject
 class MThreadInternal : public QThread
 {
   public:
-    MThreadInternal(MThread &parent) : m_parent(parent) {}
+    explicit MThreadInternal(MThread &parent) : m_parent(parent) {}
     virtual void run(void) { m_parent.run(); }
 
     void QThreadRun(void) { QThread::run(); }

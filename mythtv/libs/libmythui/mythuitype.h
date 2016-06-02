@@ -34,7 +34,10 @@ class MythUICheckBox;
 class MythUISpinBox;
 class MythUITextEdit;
 class MythUIProgressBar;
+
+#if ( QT_VERSION <= QT_VERSION_CHECK( 5, 5, 0 ))
 class MythUIWebBrowser;
+#endif
 
 /**
  * \defgroup MythUI MythTV User Interface Library
@@ -153,6 +156,9 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     { m_xmlLocation = QString("%1:%2").arg(filename).arg(where); }
     QString GetXMLLocation(void) const { return m_xmlLocation; }
 
+    void SetXMLName(const QString &name) { m_xmlName = name; }
+    QString GetXMLName(void) const { return m_xmlName; }
+
     bool IsDeferredLoading(bool recurse = false) const;
     void SetDeferLoad(bool defer) { m_deferload = defer; }
     virtual void LoadNow(void);
@@ -268,6 +274,8 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
 
     QList<MythUIAnimation*> m_animations;
     QString m_helptext;
+
+    QString m_xmlName;
     QString m_xmlLocation;
 
     bool m_deferload;

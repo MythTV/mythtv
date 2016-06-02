@@ -30,9 +30,9 @@ class AudioOutput;
 class DecoderEvent : public MythEvent
 {
   public:
-    DecoderEvent(Type t) : MythEvent(t), error_msg(NULL) { ; }
+    explicit DecoderEvent(Type t) : MythEvent(t), error_msg(NULL) { ; }
 
-    DecoderEvent(QString *e) : MythEvent(Error), error_msg(e) { ; }
+    explicit DecoderEvent(QString *e) : MythEvent(Error), error_msg(e) { ; }
 
     ~DecoderEvent()
     {

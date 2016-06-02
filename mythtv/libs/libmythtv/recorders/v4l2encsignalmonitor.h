@@ -37,7 +37,6 @@ class V4L2encSignalMonitor: public DTVSignalMonitor
     V4L2util           m_v4l2;
     V4L2encStreamHandler *m_stream_handler;
     bool               m_isTS;
-    int                m_lock_timeout;
 
   private:
     int      m_strength;

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="en_CA">
+<TS version="2.1" language="en_CA">
 <context>
     <name>(GameTypes)</name>
     <message>
@@ -182,17 +182,17 @@ Remove it from the database?</translation>
 <context>
     <name>GameScanner</name>
     <message>
-        <location filename="../mythgame/gamescan.cpp" line="67"/>
+        <location filename="../mythgame/gamescan.cpp" line="68"/>
         <source>Verifying game files...</source>
         <translation>Verifying game files...</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamescan.cpp" line="110"/>
+        <location filename="../mythgame/gamescan.cpp" line="111"/>
         <source>Updating game database...</source>
         <translation>Updating game database...</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamescan.cpp" line="145"/>
+        <location filename="../mythgame/gamescan.cpp" line="146"/>
         <source>Searching for games...</source>
         <translation>Searching for games...</translation>
     </message>

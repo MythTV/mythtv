@@ -147,7 +147,7 @@ NuppelVideoRecorder::NuppelVideoRecorder(TVRec *rec, ChannelBase *channel) :
     audio_samplerate = 44100;
     effectivedsp = 0;
 
-    picture_format = PIX_FMT_YUV420P;
+    picture_format = AV_PIX_FMT_YUV420P;
     v4l2_pixelformat = 0;
 
     avcodec_register_all();
@@ -545,9 +545,9 @@ bool NuppelVideoRecorder::SetupAVCodecVideo(void)
 
     switch (picture_format)
     {
-        case PIX_FMT_YUV420P:
-        case PIX_FMT_YUV422P:
-        case PIX_FMT_YUVJ420P:
+        case AV_PIX_FMT_YUV420P:
+        case AV_PIX_FMT_YUV422P:
+        case AV_PIX_FMT_YUVJ420P:
             mpa_vidctx->pix_fmt = picture_format;
             break;
         default:
@@ -631,7 +631,7 @@ bool NuppelVideoRecorder::SetupAVCodecVideo(void)
 
 void NuppelVideoRecorder::SetupRTjpeg(void)
 {
-    picture_format = PIX_FMT_YUV420P;
+    picture_format = AV_PIX_FMT_YUV420P;
 
     int setval;
     rtjc = new RTjpeg();
@@ -930,7 +930,7 @@ void NuppelVideoRecorder::InitBuffers(void)
 
     if (!video_buffer_size)
     {
-        if (picture_format == PIX_FMT_YUV422P)
+        if (picture_format == AV_PIX_FMT_YUV422P)
             video_buffer_size = w_out * h_out * 2;
         else
             video_buffer_size = w_out * h_out * 3 / 2;
@@ -1618,9 +1618,9 @@ void NuppelVideoRecorder::DoV4L2(void)
     if (v4l2_pixelformat == V4L2_PIX_FMT_YUYV ||
         v4l2_pixelformat == V4L2_PIX_FMT_UYVY)
     {
-        PixelFormat in_pixfmt = v4l2_pixelformat == V4L2_PIX_FMT_YUYV ?
-                                PIX_FMT_YUYV422 :
-                                PIX_FMT_UYVY422;
+        AVPixelFormat in_pixfmt = v4l2_pixelformat == V4L2_PIX_FMT_YUYV ?
+                                    AV_PIX_FMT_YUYV422 :
+                                    AV_PIX_FMT_UYVY422;
 
         output_buffer = (uint8_t*)av_malloc(height * width * 3 / 2);
         if (!output_buffer)
@@ -1631,7 +1631,7 @@ void NuppelVideoRecorder::DoV4L2(void)
         }
 
         convert_ctx = sws_getCachedContext(convert_ctx, width, height, in_pixfmt,
-                                           width, height, PIX_FMT_YUV420P,
+                                           width, height, AV_PIX_FMT_YUV420P,
                                            SWS_FAST_BILINEAR, NULL, NULL, NULL);
         if (!convert_ctx)
         {
@@ -1641,7 +1641,7 @@ void NuppelVideoRecorder::DoV4L2(void)
             return;
         }
 
-        avpicture_fill(&img_out, output_buffer, PIX_FMT_YUV420P, width, height);
+        avpicture_fill(&img_out, output_buffer, AV_PIX_FMT_YUV420P, width, height);
     }
 
     while (IsRecordingRequested() && !IsErrored())
@@ -1745,7 +1745,7 @@ again:
             if (v4l2_pixelformat == V4L2_PIX_FMT_YUYV)
             {
                 AVPicture img_in;
-                avpicture_fill(&img_in, buffers[frame], PIX_FMT_YUYV422, width, height);
+                avpicture_fill(&img_in, buffers[frame], AV_PIX_FMT_YUYV422, width, height);
                 sws_scale(convert_ctx, img_in.data, img_in.linesize,
                           0, height, img_out.data, img_out.linesize);
                 BufferIt(output_buffer, video_buffer_size);
@@ -1753,7 +1753,7 @@ again:
             else if (v4l2_pixelformat == V4L2_PIX_FMT_UYVY)
             {
                 AVPicture img_in;
-                avpicture_fill(&img_in, buffers[frame], PIX_FMT_UYVY422, width, height);
+                avpicture_fill(&img_in, buffers[frame], AV_PIX_FMT_UYVY422, width, height);
                 sws_scale(convert_ctx, img_in.data, img_in.linesize,
                           0, height, img_out.data, img_out.linesize);
                 BufferIt(output_buffer, video_buffer_size);
@@ -2889,7 +2889,7 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
     planes[0] = buf;
     planes[1] = planes[0] + frame->width * frame->height;
     planes[2] = planes[1] + (frame->width * frame->height) /
-                            (picture_format == PIX_FMT_YUV422P ? 2 : 4);
+                            (picture_format == AV_PIX_FMT_YUV422P ? 2 : 4);
 
     if (lf == 0)
     {   // this will be triggered every new file
@@ -2952,9 +2952,9 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
 
         switch (picture_format)
         {
-            case PIX_FMT_YUV420P:
-            case PIX_FMT_YUV422P:
-            case PIX_FMT_YUVJ420P:
+            case AV_PIX_FMT_YUV420P:
+            case AV_PIX_FMT_YUV422P:
+            case AV_PIX_FMT_YUVJ420P:
                 mpa_picture->linesize[0] = w_out;
                 mpa_picture->linesize[1] = w_out / 2;
                 mpa_picture->linesize[2] = w_out / 2;
@@ -2966,7 +2966,6 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
         mpa_picture->linesize[0] = frame->width;
         mpa_picture->linesize[1] = frame->width / 2;
         mpa_picture->linesize[2] = frame->width / 2;
-        mpa_picture->type = FF_BUFFER_TYPE_SHARED;
 
         if (wantkeyframe)
             mpa_picture->pict_type = AV_PICTURE_TYPE_I;

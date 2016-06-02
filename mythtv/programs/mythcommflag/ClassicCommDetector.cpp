@@ -135,6 +135,7 @@ ClassicCommDetector::ClassicCommDetector(SkipType commDetectMethod_in,
 
     commDetectMethod(commDetectMethod_in),
     commBreakMapUpdateRequested(false),        sendCommBreakMapUpdates(false),
+    commDetectBorder(0),
     verboseDebugging(false),
     lastFrameNumber(0),                        curFrameNumber(0),
     width(0),                                  height(0),

@@ -50,6 +50,9 @@ class TestEITFixups : public QObject
     void testHTMLFixup(void);
     void testSkyEpisodes(void);
     void testUnitymedia(void);
+    void testDeDisneyChannel(void);
+    void testATV(void);
+    void test64BitEnum(void);
 
   private:
     static DBEventEIT *SimpleDBEventEIT (FixupValue fix, QString title, QString subtitle, QString description);

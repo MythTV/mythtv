@@ -20,7 +20,11 @@
 
 // mythfrontend
 #include "scheduleeditor.h"
+
+#if QT_VERSION < QT_VERSION_CHECK(5,6,0)
 #include "progdetails.h"
+#endif
+
 #include "proglist.h"
 #include "customedit.h"
 #include "guidegrid.h"
@@ -34,6 +38,7 @@ void ScheduleCommon::ShowDetails(void) const
     if (!pginfo)
         return;
 
+#if QT_VERSION < QT_VERSION_CHECK(5,6,0)
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     ProgDetails *details_dialog  = new ProgDetails(mainStack, pginfo);
 
@@ -44,6 +49,7 @@ void ScheduleCommon::ShowDetails(void) const
     }
 
     mainStack->AddScreen(details_dialog);
+#endif
 }
 
 /**

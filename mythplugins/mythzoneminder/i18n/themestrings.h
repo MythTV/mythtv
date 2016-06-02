@@ -4,6 +4,8 @@
 void strings_null() {
     ThemeUI::tr("Edit Monitor Function");
     ThemeUI::tr("Enabled");
+    ThemeUI::tr("Show  Notifications");
+    ThemeUI::tr("OK");
     ThemeUI::tr("ZoneMinder Console");
     ThemeUI::tr("Status");
     ThemeUI::tr("Load: 0.12");
@@ -38,7 +40,21 @@ void strings_null() {
     ThemeUI::tr("Monitor 2");
     ThemeUI::tr("Monitor 3");
     ThemeUI::tr("Monitor 4");
+    ThemeUI::tr("Monitor 5");
+    ThemeUI::tr("Monitor 6");
+    ThemeUI::tr("Monitor 7");
+    ThemeUI::tr("Monitor 8");
+    ThemeUI::tr("Change Function");
+    ThemeUI::tr("%DATE%, %TIME%");
+    ThemeUI::tr("Zoneminder Console");
+    ThemeUI::tr("Configure Your zoneminder.");
     ThemeUI::tr("Status:");
+    ThemeUI::tr("Recorded Events");
+    ThemeUI::tr("Learn what your cameras caughtup.");
+    ThemeUI::tr("Event Playback");
+    ThemeUI::tr("Watch recorded event");
+    ThemeUI::tr("Live Camera");
+    ThemeUI::tr("Camera Live Playback");
     ThemeUI::tr("Name:");
     ThemeUI::tr("Duration:");
     ThemeUI::tr("ZoneMinder Live");

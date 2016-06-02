@@ -69,6 +69,7 @@ class VBoxChannelFetcher : public QRunnable
   private:
     void SetTotalNumChannels(uint val) { _chan_cnt = (val) ? val : 1; }
     void SetNumChannelsInserted(uint);
+    bool SupportedTransmission(const QString &transType);
 
   protected:
     virtual void run(void); // QRunnable

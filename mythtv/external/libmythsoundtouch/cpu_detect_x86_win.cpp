@@ -131,7 +131,7 @@ uint detectCPUextensions(void)
 
     // Visual C++ 64bit compilation doesn't support inline assembler. However,
     // all x64 compatible CPUs support MMX & SSE extensions.
-    res = SUPPORT_MMX | SUPPORT_SSE | SUPPORT_SSE2;
+    res = MM_MMX | MM_SSE | MM_SSE2; //SUPPORT_MMX | SUPPORT_SSE | SUPPORT_SSE2;
 
 #endif
 

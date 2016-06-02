@@ -46,7 +46,7 @@ class VideoOutputOpenGLVAAPI : public VideoOutputOpenGL
                                              const QString &decoder,
                                              uint stream_type,
                                              bool no_acceleration,
-                                             PixelFormat &pix_fmt);
+                                             AVPixelFormat &pix_fmt);
 
   private:
     VAAPIContext *m_ctx;

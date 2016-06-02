@@ -1,9 +1,21 @@
+#pthreads directory has config.h, need path to be after library paths
+win32-msvc*:INCLUDEPATH -= $$SRC_PATH_BARE/../platform/win32/msvc/external/pthreads.2
+
 INCLUDEPATH += ../.. ../../libs/ ../../libs/libmyth ../../libs/libmyth/audio
 INCLUDEPATH +=  ../../libs/libmythtv ../../external/FFmpeg
 INCLUDEPATH += ../../libs/libmythupnp ../../libs/libmythui ../../libs/libmythmetadata
 INCLUDEPATH += ../../libs/libmythlivemedia ../../libs/libmythbase
-QMAKE_CXXFLAGS += -isystem ../../external/libmythdvdnav/dvdnav
-QMAKE_CXXFLAGS += -isystem ../../external/libmythdvdnav/dvdread
+
+!win32-msvc* {
+  QMAKE_CXXFLAGS += -isystem ../../external/libmythdvdnav/dvdnav
+  QMAKE_CXXFLAGS += -isystem ../../external/libmythdvdnav/dvdread
+}
+
+win32-msvc* {
+  INCLUDEPATH += ../../external/libmythdvdnav/dvdnav
+  INCLUDEPATH += ../../external/libmythdvdnav/dvdread
+}
+
 INCLUDEPATH += ../../external/libmythbluray
 INCLUDEPATH += ../../external/libmythsoundtouch
 INCLUDEPATH += ../../external/libudfread
@@ -13,12 +25,16 @@ INCLUDEPATH += ../../libs/libmythtv/vbitext
 INCLUDEPATH += ../../libs/libmythservicecontracts
 INCLUDEPATH += ../../libs/libmythprotoserver
 
+win32-msvc*:INCLUDEPATH += $$SRC_PATH_BARE/../platform/win32/msvc/external/pthreads.2
+
 LIBS += -L../../libs/libmyth -L../../libs/libmythtv
 LIBS += -L../../external/FFmpeg/libswresample
 LIBS += -L../../external/FFmpeg/libavutil
 LIBS += -L../../external/FFmpeg/libavcodec
 LIBS += -L../../external/FFmpeg/libavformat
 LIBS += -L../../external/FFmpeg/libswscale
+LIBS += -L../../external/FFmpeg/libpostproc
+LIBS += -L../../external/FFmpeg/libavfilter
 LIBS += -L../../libs/libmythbase
 LIBS += -L../../libs/libmythui
 LIBS += -L../../libs/libmythupnp
@@ -31,6 +47,8 @@ LIBS += -lmythavformat
 LIBS += -lmythswresample
 LIBS += -lmythavutil
 LIBS += -lmythavcodec
+LIBS += -lmythpostproc
+LIBS += -lmythavfilter
 LIBS += -lmythtv-$$LIBVERSION
 LIBS += -lmythupnp-$$LIBVERSION
 LIBS += -lmythbase-$$LIBVERSION
@@ -59,6 +77,8 @@ win32 {
     POST_TARGETDEPS += ../../external/FFmpeg/libavformat/$$avLibName(avformat)
     POST_TARGETDEPS += ../../external/FFmpeg/libswscale/$$avLibName(swscale)
     POST_TARGETDEPS += ../../external/FFmpeg/libswresample/$$avLibName(swresample)
+    POST_TARGETDEPS += ../../external/FFmpeg/libpostproc/$$avLibName(postproc)
+    POST_TARGETDEPS += ../../external/FFmpeg/libavfilter/$$avLibName(avfilter)
     POST_TARGETDEPS += ../../libs/libmythupnp/libmythupnp-$${MYTH_SHLIB_EXT}
     POST_TARGETDEPS += ../../libs/libmythbase/libmythbase-$${MYTH_SHLIB_EXT}
     POST_TARGETDEPS += ../../libs/libmythservicecontracts/libmythservicecontracts-$${MYTH_SHLIB_EXT}

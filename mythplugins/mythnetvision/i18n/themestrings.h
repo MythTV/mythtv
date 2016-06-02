@@ -61,12 +61,14 @@ void strings_null() {
     ThemeUI::tr("Runtime");
     ThemeUI::tr("Author");
     ThemeUI::tr("Rating");
+    ThemeUI::tr("%1");
     ThemeUI::tr("Search Internet Video");
     ThemeUI::tr("Select to change image");
     ThemeUI::tr("Internet Video List");
     ThemeUI::tr("User Rating: %1");
     ThemeUI::tr("By: %1");
     ThemeUI::tr("Internet Video Gallery");
+    ThemeUI::tr("%|RATING| %%|(STARS|) %%DESCRIPTION%%\n\nPart |PARTNUMBER| of %%PARTTOTAL%%\n\nAuthor: |AUTHOR%");
     ThemeUI::tr("Search popular video sites");
     ThemeUI::tr("Browse Internet Video");
     ThemeUI::tr("Browse highlights and entire sites");

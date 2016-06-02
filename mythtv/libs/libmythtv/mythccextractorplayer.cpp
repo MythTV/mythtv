@@ -686,8 +686,8 @@ void MythCCExtractorPlayer::IngestDVBSubtitles(void)
                     const int w = rect->w;
                     const int h = rect->h;
                     const int cc = rect->nb_colors;
-                    const uchar *data = rect->pict.data[0];
-                    const QRgb *palette = (QRgb *) rect->pict.data[1];
+                    const uchar *data = rect->data[0];
+                    const QRgb *palette = (QRgb *) rect->data[1];
 
                     QImage img(data, w, h, QImage::Format_Indexed8);
                     img.setColorCount(cc);

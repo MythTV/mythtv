@@ -851,6 +851,8 @@ static void setupKeys(void)
         "Toggle shuffle mode"),    "");
     REG_KEY("Music", "TOGGLEREPEAT",  QT_TRANSLATE_NOOP("MythControls",
         "Toggle repeat mode"),     "");
+    REG_KEY("Music", "TOGGLELAST",  QT_TRANSLATE_NOOP("MythControls",
+        "Switch to previous radio stream"), "");
 
     // switch to view key bindings
     REG_KEY("Music", "SWITCHTOPLAYLIST",              QT_TRANSLATE_NOOP("MythControls",
@@ -866,17 +868,15 @@ static void setupKeys(void)
     REG_KEY("Music", "SWITCHTORADIO",                 QT_TRANSLATE_NOOP("MythControls",
         "Switch to the radio stream view"), "");
 
-    REG_MEDIA_HANDLER(
-        QT_TRANSLATE_NOOP("MythControls", "MythMusic Media Handler 1/2"),
-        QT_TRANSLATE_NOOP("MythControls", "MythMusic audio CD"),
-        "", handleCDMedia, MEDIATYPE_AUDIO | MEDIATYPE_MIXED, QString::null);
+    REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
+        "MythMusic Media Handler 1/2"), "", "", handleCDMedia,
+        MEDIATYPE_AUDIO | MEDIATYPE_MIXED, QString::null);
     QString filt = MetaIO::ValidFileExtensions;
     filt.replace('|',',');
     filt.remove('.');
-    REG_MEDIA_HANDLER(
-        QT_TRANSLATE_NOOP("MythControls", "MythMusic Media Handler 2/2"),
-        QT_TRANSLATE_NOOP("MythControls", "MythMusic audio files"),
-         "", handleMedia, MEDIATYPE_MMUSIC, filt);
+    REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
+        "MythMusic Media Handler 2/2"), "", "", handleMedia,
+        MEDIATYPE_MMUSIC, filt);
 }
 
 int mythplugin_init(const char *libversion)

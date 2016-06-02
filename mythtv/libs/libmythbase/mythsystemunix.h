@@ -30,7 +30,7 @@ typedef QList<QPointer<MythSystemLegacyUnix> > MSList_t;
 class MythSystemLegacyIOHandler: public MThread
 {
     public:
-        MythSystemLegacyIOHandler(bool read);
+        explicit MythSystemLegacyIOHandler(bool read);
         ~MythSystemLegacyIOHandler() { wait(); }
         void   run(void);
 
@@ -86,7 +86,7 @@ class MBASE_PUBLIC MythSystemLegacyUnix : public MythSystemLegacyPrivate
     Q_OBJECT
 
     public:
-        MythSystemLegacyUnix(MythSystemLegacy *parent);
+        explicit MythSystemLegacyUnix(MythSystemLegacy *parent);
         ~MythSystemLegacyUnix();
 
         virtual void Fork(time_t timeout) MOVERRIDE;

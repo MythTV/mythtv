@@ -2,6 +2,7 @@
 #include <cstdlib>
 
 #include <QDesktopWidget>
+#include <QRunnable>
 
 #include "osd.h"
 #include "mythplayer.h"
@@ -16,6 +17,7 @@
 #include "util-osd.h"
 #include "mythxdisplay.h"
 #include "mythavutil.h"
+#include "mthreadpool.h"
 
 #ifdef USING_XV
 #include "videoout_xv.h"
@@ -1016,10 +1018,10 @@ void VideoOutput::DoPipResize(int pipwidth, int pipheight)
 
     pip_scaling_context = sws_getCachedContext(pip_scaling_context,
                               pip_video_size.width(), pip_video_size.height(),
-                              PIX_FMT_YUV420P,
+                              AV_PIX_FMT_YUV420P,
                               pip_display_size.width(),
                               pip_display_size.height(),
-                              PIX_FMT_YUV420P, SWS_FAST_BILINEAR,
+                              AV_PIX_FMT_YUV420P, SWS_FAST_BILINEAR,
                               NULL, NULL, NULL);
 }
 
@@ -1119,7 +1121,7 @@ void VideoOutput::ShowPIP(VideoFrame  *frame,
         {
             AVPicture img_in, img_out;
             avpicture_fill(
-                &img_out, (uint8_t *)pip_tmp_buf, PIX_FMT_YUV420P,
+                &img_out, (uint8_t *)pip_tmp_buf, AV_PIX_FMT_YUV420P,
                 pip_display_size.width(), pip_display_size.height());
 
             AVPictureFill(&img_in, pipimage);
@@ -1134,11 +1136,11 @@ void VideoOutput::ShowPIP(VideoFrame  *frame,
             {
                 AVPicture img_padded;
                 avpicture_fill( &img_padded, (uint8_t *)pip_tmp_buf2,
-                    PIX_FMT_YUV420P, pipw, piph);
+                    AV_PIX_FMT_YUV420P, pipw, piph);
 
                 int color[3] = { 20, 0, 200 }; //deep red YUV format
                 av_picture_pad(&img_padded, &img_out, piph, pipw,
-                               PIX_FMT_YUV420P, 4, 4, 4, 4, color);
+                               AV_PIX_FMT_YUV420P, 4, 4, 4, 4, color);
 
                 int offsets[3] = {0, int(img_padded.data[1] - img_padded.data[0]),
                                     int(img_padded.data[2] - img_padded.data[0]) };
@@ -1205,10 +1207,10 @@ void VideoOutput::DoVideoResize(const QSize &inDim, const QSize &outDim)
 
     vsz_scale_context = sws_getCachedContext(vsz_scale_context,
                               vsz_video_size.width(), vsz_video_size.height(),
-                              PIX_FMT_YUV420P,
+                              AV_PIX_FMT_YUV420P,
                               vsz_display_size.width(),
                               vsz_display_size.height(),
-                              PIX_FMT_YUV420P, SWS_FAST_BILINEAR,
+                              AV_PIX_FMT_YUV420P, SWS_FAST_BILINEAR,
                               NULL, NULL, NULL);
 }
 
@@ -1246,9 +1248,9 @@ void VideoOutput::ResizeVideo(VideoFrame *frame)
     {
         AVPicture img_in, img_out;
 
-        avpicture_fill(&img_out, (uint8_t *)vsz_tmp_buf, PIX_FMT_YUV420P,
+        avpicture_fill(&img_out, (uint8_t *)vsz_tmp_buf, AV_PIX_FMT_YUV420P,
                        resize.width(), resize.height());
-        avpicture_fill(&img_in, (uint8_t *)frame->buf, PIX_FMT_YUV420P,
+        avpicture_fill(&img_in, (uint8_t *)frame->buf, AV_PIX_FMT_YUV420P,
                        frame->width, frame->height);
         img_in.data[0] = frame->buf + frame->offsets[0];
         img_in.data[1] = frame->buf + frame->offsets[1];
@@ -1375,6 +1377,70 @@ void VideoOutput::SetVideoScalingAllowed(bool change)
     window.SetVideoScalingAllowed(change);
 }
 
+#ifndef MMX
+#define THREADED_OSD_RENDER 1
+#endif
+
+#if THREADED_OSD_RENDER
+class OsdRender : public QRunnable
+{
+  public:
+    OsdRender(VideoFrame *frame, MythImage *osd_image, const QSize &dim, const QRect &vis) :
+        m_frame(frame), m_osd_image(osd_image), m_video_dim(dim), m_vis(vis)
+    { }
+
+    virtual void run()
+    {
+        switch (m_frame->codec)
+        {
+          case FMT_YV12: yv12(); break;
+          case FMT_AI44: i44(true); break;
+          case FMT_IA44: i44(false); break;
+        }
+    }
+
+  private:
+    inline void yv12()
+    {
+#define ROUNDUP( _x,_z) ((_x) + ((-(int)(_x)) & ((_z) - 1)) )
+#define ROUNDDN( _x,_z) ((_x) & ~((_z) - 1))
+        int left = m_vis.left();
+        left = ROUNDUP(left, ALIGN_C);
+        left = std::min(left, m_osd_image->width());
+
+        int right = m_vis.left() + m_vis.width();
+        right = ROUNDUP(right, ALIGN_C);
+        right = std::min(right, m_osd_image->width());
+
+        int top = m_vis.top();
+        top = ROUNDDN(top, ALIGN_C);
+
+        int bottom = m_vis.top() + m_vis.height();
+        bottom = ROUNDDN(bottom, ALIGN_C);
+
+        c_yuv888_to_yv12(m_frame, m_osd_image, left, top, right, bottom);
+    }
+
+    inline void i44(bool ifirst)
+    {
+        int left   = std::min(m_vis.left(), m_osd_image->width());
+        int top    = std::min(m_vis.top(), m_osd_image->height());
+        int right  = std::min(left + m_vis.width(), m_osd_image->width());
+        int bottom = std::min(top + m_vis.height(), m_osd_image->height());
+
+        memset(m_frame->buf, 0, m_video_dim.width() * m_video_dim.height());
+        yuv888_to_i44(m_frame->buf, m_osd_image, m_video_dim,
+                      left, top, right, bottom, ifirst);
+    }
+
+  private:
+    VideoFrame * const m_frame;
+    MythImage * const m_osd_image;
+    QSize const m_video_dim;
+    QRect const m_vis;
+};
+#endif
+
 /**
  * \fn VideoOutput::DisplayOSD(VideoFrame*,OSD *,int,int)
  * \brief If the OSD has changed, this will convert the OSD buffer
@@ -1432,6 +1498,18 @@ bool VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
         m_visual->Draw(QRect(), NULL, NULL);
     }
 
+    switch (frame->codec)
+    {
+      case FMT_YV12:
+      case FMT_AI44:
+      case FMT_IA44:
+        break;
+      default:
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "Display OSD: Frame format not supported.");
+        return false;
+    }
+
     QRegion dirty   = QRegion();
     QRegion visible = osd->Draw(osd_painter, osd_image, osd_size, dirty,
                                 frame->codec == FMT_YV12 ? ALIGN_X_MMX : 0,
@@ -1447,9 +1525,26 @@ bool VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
 
     QSize video_dim = window.GetVideoDim();
 
+#if THREADED_OSD_RENDER
+    static MThreadPool s_pool("OsdRender");
+
+    // Split visible region for greater concurrency
+    QRect r = osd_image->rect();
+    QPoint c = r.center();
+    QVector<QRect> vis = visible.intersected(QRect(r.topLeft(),c)).rects();
+    vis += visible.intersected(QRect(c,r.bottomRight())).rects();
+    vis += visible.intersected(QRect(r.bottomLeft(),c).normalized()).rects();
+    vis += visible.intersected(QRect(c,r.topRight()).normalized()).rects();
+#else
     QVector<QRect> vis = visible.rects();
+#endif
     for (int i = 0; i < vis.size(); i++)
     {
+#if THREADED_OSD_RENDER
+        OsdRender *job = new OsdRender(frame, osd_image, video_dim, vis[i]);
+        job->setAutoDelete(true);
+        s_pool.start(job, "OsdRender");
+#else
         int left   = min(vis[i].left(), osd_image->width());
         int top    = min(vis[i].top(), osd_image->height());
         int right  = min(left + vis[i].width(), osd_image->width());
@@ -1471,12 +1566,11 @@ bool VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
             yuv888_to_i44(frame->buf, osd_image, video_dim,
                           left, top, right, bottom, false);
         }
-        else
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                "Display OSD: Frame format not supported.");
-        }
+#endif
     }
+#if THREADED_OSD_RENDER
+    s_pool.waitForDone();
+#endif
     return show;
 }
 

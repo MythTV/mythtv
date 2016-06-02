@@ -1632,7 +1632,7 @@ bool MythRAOPConnection::CreateDecoder(void)
     av_register_all();
     avcodeclock->unlock();
 
-    m_codec = avcodec_find_decoder(CODEC_ID_ALAC);
+    m_codec = avcodec_find_decoder(AV_CODEC_ID_ALAC);
     if (!m_codec)
     {
         LOG(VB_PLAYBACK, LOG_ERR, LOC

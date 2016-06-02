@@ -36,7 +36,11 @@
 #include "mythuiguidegrid.h"
 #include "mythuicheckbox.h"
 #include "mythuispinbox.h"
+
+#if ( QT_VERSION < QT_VERSION_CHECK( 5, 6, 0 ))
 #include "mythuiwebbrowser.h"
+#endif
+
 #include "mythuiprogressbar.h"
 #include "mythuiscrollbar.h"
 #include "mythuieditbar.h"
@@ -1112,8 +1116,10 @@ QString NetworkControl::getWidgetType(MythUIType* type)
         return "MythUIImage";
     else if (dynamic_cast<MythUISpinBox *>(type))
         return "MythUISpinBox";
+#if ( QT_VERSION < QT_VERSION_CHECK( 5, 6, 0 ))
     else if (dynamic_cast<MythUIWebBrowser *>(type))
         return "MythUIWebBrowser";
+#endif
     else if (dynamic_cast<MythUIClock *>(type))
         return "MythUIClock";
     else if (dynamic_cast<MythUIStateType *>(type))

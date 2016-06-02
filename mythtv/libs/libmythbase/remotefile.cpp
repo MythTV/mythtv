@@ -36,6 +36,39 @@ using namespace std;
 
 #define MAX_FILE_CHECK 500  // in ms
 
+static bool RemoteSendReceiveStringList(const QString &host, QStringList &strlist)
+{
+    bool ok = false;
+
+    if (gCoreContext->IsMasterBackend())
+    {
+        // since the master backend cannot connect back around to
+        // itself, and the libraries do not have access to the list
+        // of connected slave backends to query an existing connection
+        // start up a new temporary connection directly to the slave
+        // backend to query the file list
+        QString ann = QString("ANN Playback %1 0")
+                        .arg(gCoreContext->GetHostName());
+        QString addr = gCoreContext->GetBackendServerIP(host);
+        int port = gCoreContext->GetBackendServerPort(host);
+        bool mismatch = false;
+
+        MythSocket *sock = gCoreContext->ConnectCommandSocket(
+                                            addr, port, ann, &mismatch);
+        if (sock)
+        {
+            ok = sock->SendReceiveStringList(strlist);
+            sock->DecrRef();
+        }
+        else
+            strlist.clear();
+    }
+    else
+        ok = gCoreContext->SendReceiveStringList(strlist);
+
+    return ok;
+}
+
 RemoteFile::RemoteFile(const QString &_path, bool write, bool useRA,
                        int _timeout_ms,
                        const QStringList *possibleAuxiliaryFiles) :
@@ -498,10 +531,8 @@ bool RemoteFile::Exists(const QString &url, struct stat *fileinfo)
     if (!sgroup.isEmpty())
         strlist << sgroup;
 
-    gCoreContext->SendReceiveStringList(strlist);
-
     bool result = false;
-    if (!strlist.isEmpty() && strlist[0] == "1")
+    if (RemoteSendReceiveStringList(host, strlist) && strlist[0] == "1")
     {
         if ((strlist.size() >= 15) && fileinfo)
         {
@@ -557,8 +588,7 @@ QString RemoteFile::GetFileHash(const QString &url)
     strlist << sgroup;
     strlist << hostname;
 
-    gCoreContext->SendReceiveStringList(strlist);
-    if (!strlist.isEmpty())
+    if (RemoteSendReceiveStringList(hostname, strlist))
     {
         result = strlist[0];
     }

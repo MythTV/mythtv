@@ -26,7 +26,7 @@ class Ripper;
 class CDScannerThread: public MThread
 {
   public:
-    CDScannerThread(Ripper *ripper);
+    explicit CDScannerThread(Ripper *ripper);
     virtual void run();
 
   private:
@@ -36,7 +36,7 @@ class CDScannerThread: public MThread
 class CDEjectorThread: public MThread
 {
     public:
-        CDEjectorThread(Ripper *ripper);
+        explicit CDEjectorThread(Ripper *ripper);
         virtual void run();
 
     private:

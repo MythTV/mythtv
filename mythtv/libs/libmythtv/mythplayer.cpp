@@ -1884,6 +1884,20 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
         audio.Pause(false);
     }
 
+    if (!dropframe)
+    {
+        // PGB this was orignally in the calling methods 
+        // MythPlayer::DisplayNormalFrame and MythDVDPlayer::DisplayLastFrame
+        // Moved here to reduce CPU usage since the OSD was being merged
+        // into frames that were not being displayed, thereby causing 
+        // interruptions and slowdowns.
+        osdLock.lock();
+        videofiltersLock.lock();
+        videoOutput->ProcessFrame(buffer, osd, videoFilters, pip_players, ps);
+        videofiltersLock.unlock();
+        osdLock.unlock();
+    }
+
     if (dropframe)
     {
         // Reset A/V Sync
@@ -2249,12 +2263,6 @@ void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
     if (kScan_Detect == m_scan || kScan_Ignore == m_scan)
         ps = kScan_Progressive;
 
-    osdLock.lock();
-    videofiltersLock.lock();
-    videoOutput->ProcessFrame(frame, osd, videoFilters, pip_players, ps);
-    videofiltersLock.unlock();
-    osdLock.unlock();
-
     AVSync(frame, 0);
     // If PiP then keep this frame for MythPlayer::GetCurrentFrame
     if (player_ctx->IsPIP())
@@ -2291,7 +2299,7 @@ bool MythPlayer::CanSupportDoubleRate(void)
 {
     if (!videosync)
         return false;
-    return (frame_interval / 2 > videosync->getRefreshInterval() * 0.995);
+    return (frame_interval / 2.0 > videosync->getRefreshInterval() * 0.995);
 }
 
 void MythPlayer::EnableFrameRateMonitor(bool enable)
@@ -4484,6 +4492,10 @@ char *MythPlayer::GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
     memset(&orig,   0, sizeof(AVPicture));
     memset(&retbuf, 0, sizeof(AVPicture));
 
+    bufflen = 0;
+    vw = vh = 0;
+    ar = 0;
+
     if (OpenFile(0) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Could not open file for preview.");
@@ -4530,34 +4542,39 @@ char *MythPlayer::GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
 
     if (!(frame = videoOutput->GetLastDecodedFrame()))
     {
-        bufflen = 0;
-        vw = vh = 0;
-        ar = 0;
         return NULL;
     }
 
-    if (!(data = frame->buf))
+    while (1)
     {
-        bufflen = 0;
-        vw = vh = 0;
-        ar = 0;
-        DiscardVideoFrame(frame);
-        return NULL;
+        if (!(data = frame->buf))
+        {
+            break;
+        }
+
+        AVPictureFill(&orig, frame);
+        float par = frame->aspect * video_dim.height() / video_dim.width();
+        MythPictureDeinterlacer deinterlacer(AV_PIX_FMT_YUV420P,
+                                             video_dim.width(), video_dim.height(),
+                                             par);
+        if (deinterlacer.DeinterlaceSingle(&orig, &orig) < 0)
+        {
+            break;
+        }
+
+        bufflen = video_dim.width() * video_dim.height() * 4;
+        outputbuf = new unsigned char[bufflen];
+        copyCtx.Copy(&retbuf, frame, outputbuf, AV_PIX_FMT_RGB32);
+
+        vw = video_disp_dim.width();
+        vh = video_disp_dim.height();
+        ar = frame->aspect;
+        break;
     }
-
-    AVPictureFill(&orig, frame);
-    avpicture_deinterlace(&orig, &orig, PIX_FMT_YUV420P,
-                          video_dim.width(), video_dim.height());
-
-    bufflen = video_dim.width() * video_dim.height() * 4;
-    outputbuf = new unsigned char[bufflen];
-    copyCtx.Copy(&retbuf, frame, outputbuf, AV_PIX_FMT_RGB32);
-
-    vw = video_disp_dim.width();
-    vh = video_disp_dim.height();
-    ar = frame->aspect;
-
-    DiscardVideoFrame(frame);
+    if (frame)
+    {
+        DiscardVideoFrame(frame);
+    }
     return (char *)outputbuf;
 }
 

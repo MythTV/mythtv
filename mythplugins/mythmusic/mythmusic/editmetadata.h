@@ -63,7 +63,7 @@ class EditMetadataDialog : public EditMetadataCommon
 
   public:
     EditMetadataDialog(MythScreenStack *parent, MusicMetadata *source_metadata);
-    EditMetadataDialog(MythScreenStack *parent);
+    explicit EditMetadataDialog(MythScreenStack *parent);
     ~EditMetadataDialog(void);
 
     bool Create(void);
@@ -144,7 +144,7 @@ class EditAlbumartDialog : public EditMetadataCommon
     Q_OBJECT
 
   public:
-    EditAlbumartDialog(MythScreenStack *parent);
+    explicit EditAlbumartDialog(MythScreenStack *parent);
     ~EditAlbumartDialog();
 
     bool Create(void);

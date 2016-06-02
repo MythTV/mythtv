@@ -337,6 +337,7 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags,
     bool playCompleted = false;
     ProgramInfo *curProgram = NULL;
     bool startSysEventSent = false;
+    bool startLivetvEventSent = false;
 
     if (tvrec)
     {
@@ -398,6 +399,7 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags,
             else if (!startSysEventSent)
             {
                 startSysEventSent = true;
+                startLivetvEventSent = true;
                 gCoreContext->SendSystemEvent("LIVETV_STARTED");
             }
 
@@ -506,6 +508,9 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags,
     }
 
     GetMythMainWindow()->PauseIdleTimer(false);
+
+    if (startLivetvEventSent)
+        gCoreContext->SendSystemEvent("LIVETV_ENDED");
 
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "-- end");
 
@@ -2605,7 +2610,16 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
             QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
         mainWindow->setGeometry(player_bounds);
         mainWindow->ResizePainterWindow(player_bounds.size());
-        if (!weDisabledGUI)
+        // PGB Do not disable the GUI when using openmax renderer,
+        // to ensure that space next to letterbox pictures
+        // is painted.
+        bool isOpenMaxRender = false;
+        if (ctx && ctx->player)
+        {
+            VideoOutput *vo = ctx->player->GetVideoOutput();
+            isOpenMaxRender = vo && vo->GetName() == "openmax";
+        }
+        if (!isOpenMaxRender && !weDisabledGUI)
         {
             weDisabledGUI = true;
             GetMythMainWindow()->PushDrawDisabled();

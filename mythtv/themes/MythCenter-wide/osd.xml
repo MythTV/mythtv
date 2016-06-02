@@ -507,6 +507,7 @@
                 <filename>cursor.png</filename>
             </imagetype>
             <textarea name="text">
+                <area>10, 0, 100%-10, 100%</area>
                 <font>basesmall</font>
                 <align>left,vcenter</align>
             </textarea>

@@ -14,6 +14,7 @@
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "dbutil.h"
+#include "loggingserver.h"
 #include "mythlogging.h"
 #include "mythversion.h"
 #include "langsettings.h"
@@ -295,7 +296,7 @@ int main(int argc, char *argv[])
     signallist << SIGRTMIN;
 #endif
     SignalHandler::Init(signallist);
-    signal(SIGHUP, SIG_IGN);
+    SignalHandler::SetHandler(SIGHUP, logSigHup);
 #endif
 
     if (cmdline.toBool("display"))
@@ -540,7 +541,7 @@ int main(int argc, char *argv[])
 
     if (!DBUtil::CheckTimeZoneSupport())
     {
-        LOG(VB_GENERAL, LOG_ERR, 
+        LOG(VB_GENERAL, LOG_ERR,
             "MySQL time zone support is missing.  "
             "Please install it and try again.  "
             "See 'mysql_tzinfo_to_sql' for assistance.");

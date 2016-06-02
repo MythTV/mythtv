@@ -180,7 +180,7 @@ QStringList VideoOutputOMX::GetAllowedRenderers(
 VideoOutputOMX::VideoOutputOMX() :
     m_render(gCoreContext->GetSetting("OMXVideoRender", VIDEO_RENDER), *this),
     m_imagefx(gCoreContext->GetSetting("OMXVideoFilter", IMAGE_FX), *this),
-    m_context(0), m_osdpainter(0)
+    m_context(0), m_osdpainter(0), m_backgroundscreen(0)
 {
     init(&av_pause_frame, FMT_YV12, NULL, 0, 0, 0);
 
@@ -229,6 +229,12 @@ VideoOutputOMX::~VideoOutputOMX()
     if (m_context)
         m_context->DecrRef(), m_context = 0;
 #endif
+
+    if (m_backgroundscreen)
+    {
+        m_backgroundscreen->Close();
+        m_backgroundscreen = 0;
+    }
 }
 
 // virtual
@@ -668,6 +674,24 @@ void VideoOutputOMX::PrepareFrame(VideoFrame *buffer, FrameScanType scan, OSD *o
     }
 
     framesPlayed = buffer->frameNumber + 1;
+
+    // PGB Set up a background window to prevent bleed through
+    // of theme when playing a video smaller than the play area
+    if (m_backgroundscreen == 0)
+    {
+        MythMainWindow *mainWindow = GetMythMainWindow();
+        MythScreenStack *mainStack = mainWindow->GetMainStack();
+        m_backgroundscreen = new MythScreenType(mainStack,"VideoBackground");
+
+        if (XMLParseBase::CopyWindowFromBase("videobackground",
+                                          m_backgroundscreen))
+        {
+            mainStack->AddScreen(m_backgroundscreen, false);
+            if (mainWindow->GetPaintWindow())
+                mainWindow->GetPaintWindow()->update();
+            qApp->processEvents();
+        }
+    }
 
     SetVideoRect( (hasFullScreenOSD() && vsz_enabled && !IsEmbedding()) ?
             vsz_desired_display_rect : window.GetDisplayVideoRect(),

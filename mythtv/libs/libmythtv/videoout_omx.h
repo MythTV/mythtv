@@ -32,6 +32,7 @@ class VideoOutputOMX : public VideoOutput, private OMXComponentCtx
     virtual bool ApproveDeintFilter(const QString&) const;
     virtual bool SetDeinterlacingEnabled(bool interlaced);
     virtual bool SetupDeinterlace(bool interlaced, const QString& ovrf="");
+    virtual QString GetName(void) const { return kName; } // = "openmax"
     virtual bool IsPIPSupported(void) const { return true; }
     virtual bool IsPBPSupported(void) const { return true; }
     virtual QRect GetPIPRect(PIPLocation, MythPlayer* = NULL, bool = true) const;
@@ -77,6 +78,7 @@ class VideoOutputOMX : public VideoOutput, private OMXComponentCtx
     QVector<void*> m_bufs;
     MythRenderEGL *m_context;
     MythPainter *m_osdpainter;
+    MythScreenType *m_backgroundscreen;
 };
 
 #endif // ndef VIDEOOUT_OMX_H

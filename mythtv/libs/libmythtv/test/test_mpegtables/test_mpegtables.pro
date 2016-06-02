@@ -13,6 +13,7 @@ TEMPLATE = app
 TARGET = test_mpegtables
 DEPENDPATH += . ../..
 INCLUDEPATH += . ../.. ../../mpeg ../../../libmythui ../../../libmyth ../../../libmythbase
+INCLUDEPATH += ../../../libmythservicecontracts
 
 LIBS += ../../dvbdescriptors.o
 LIBS += ../../iso6937tables.o
@@ -48,7 +49,9 @@ QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/FFmpeg/libswresample
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/FFmpeg/libavutil
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/FFmpeg/libswscale
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/FFmpeg/libavformat
+QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/FFmpeg/libavfilter
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/FFmpeg/libavcodec
+QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/FFmpeg/libpostproc
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/libhdhomerun
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythbase
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmyth

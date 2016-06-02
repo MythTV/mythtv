@@ -24,7 +24,9 @@
 #include "recordingtypes.h"
 #include "mythcorecontext.h"
 #include "mythdownloadmanager.h"
+#include "musicmetadata.h"
 
+#include "enums/recStatus.h"
 
 bool LogCleanerTask::DoRun(void)
 {
@@ -380,14 +382,14 @@ bool ThemeUpdateTask::DoRun(void)
     else
     {
 
-        MythVersion = MYTH_BINARY_VERSION; // Example: 0.25.20101017-1
+        MythVersion = MYTH_BINARY_VERSION; // Example: 29.20161017-1
         MythVersion.replace(QRegExp("\\.[0-9]{8,}.*"), "");
         LOG(VB_GENERAL, LOG_INFO,
             QString("Loading themes for %1").arg(MythVersion));
         result |= LoadVersion(MythVersion, LOG_ERR);
 
         // If a version of the theme for this tag exists, use it...
-        QRegExp subexp("v[0-9]+.[0-9]+.([0-9]+)-*");
+        QRegExp subexp("v[0-9]+\\.([0-9]+)-*");
         int pos = subexp.indexIn(MYTH_SOURCE_VERSION);
         if (pos > -1)
         {
@@ -457,6 +459,76 @@ void ThemeUpdateTask::Terminate(void)
     if (m_running)
         GetMythDownloadManager()->cancelDownload(m_url);
     m_running = false;
+}
+
+RadioStreamUpdateTask::RadioStreamUpdateTask(void) : DailyHouseKeeperTask("UpdateRadioStreams",
+                                                       kHKGlobal, kHKRunOnStartup),
+    m_msMU(NULL)
+{
+}
+
+bool RadioStreamUpdateTask::DoRun(void)
+{
+    if (m_msMU)
+    {
+        // this should never be defined, but terminate it anyway
+        if (m_msMU->GetStatus() == GENERIC_EXIT_RUNNING)
+            m_msMU->Term(true);
+        delete m_msMU;
+        m_msMU = NULL;
+    }
+
+    QString command = GetAppBinDir() + "mythutil";
+    QStringList args;
+    args << "--updateradiostreams";
+    args << logPropagateArgs;
+
+    LOG(VB_GENERAL, LOG_INFO, QString("Performing Radio Streams Update: %1 %2")
+        .arg(command).arg(args.join(" ")));
+
+    m_msMU = new MythSystemLegacy(command, args, kMSRunShell | kMSAutoCleanup);
+
+    m_msMU->Run();
+    uint result = m_msMU->Wait();
+
+    delete m_msMU;
+    m_msMU = NULL;
+
+    if (result != GENERIC_EXIT_OK)
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Update Radio Streams command '%1' failed")
+            .arg(command));
+        return false;
+    }
+
+    LOG(VB_GENERAL, LOG_INFO, QString("Radio Stream Update Complete"));
+    return true;
+}
+
+RadioStreamUpdateTask::~RadioStreamUpdateTask(void)
+{
+    delete m_msMU;
+    m_msMU = NULL;
+}
+
+bool RadioStreamUpdateTask::DoCheckRun(QDateTime now)
+{
+    // we are only interested in the global setting so remove any local host setting just in case
+    GetMythDB()->ClearSetting("MusicStreamListModified");
+
+    // check we are not already running a radio stream update
+    if (gCoreContext->GetSetting("MusicStreamListModified") == "Updating" &&
+            PeriodicHouseKeeperTask::DoCheckRun(now))
+        return true;
+
+    return false;
+}
+
+void RadioStreamUpdateTask::Terminate(void)
+{
+    if (m_msMU && (m_msMU->GetStatus() == GENERIC_EXIT_RUNNING))
+        // just kill it, the runner thread will handle any necessary cleanup
+        m_msMU->Term(true);
 }
 
 ArtworkTask::ArtworkTask(void) : DailyHouseKeeperTask("RecordedArtworkUpdate",

@@ -42,7 +42,7 @@ typedef enum
 class MTV_PUBLIC CardUtil
 {
   public:
-    using InputTypes = QMap<QString, QString>;
+    typedef QMap<QString, QString> InputTypes;
 
     /// \brief all the different inputs
     enum INPUT_TYPES

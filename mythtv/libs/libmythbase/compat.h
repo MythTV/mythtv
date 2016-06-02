@@ -249,6 +249,7 @@
 #   define getuid() 0
 #    define geteuid() 0
 #    define setuid(x) 0
+#    define seteuid(x) 0
 #endif // _WIN32
 
 #if defined(_WIN32) && !defined(gmtime_r)
@@ -390,6 +391,20 @@ static __inline struct tm *localtime_r(const time_t *timep, struct tm *result)
 #ifndef S_IWRITE
 #define S_IWRITE S_IRUSR
 #endif
+#endif
+
+#ifdef _WIN32
+#   ifdef LZO_COMPILE_TIME_ASSERT_HEADER
+#   undef LZO_COMPILE_TIME_ASSERT_HEADER
+#   endif
+
+#   define LZO_COMPILE_TIME_ASSERT_HEADER( a )
+
+#   ifdef LZO_COMPILE_TIME_ASSERT
+#   undef LZO_COMPILE_TIME_ASSERT
+#   endif
+
+#   define LZO_COMPILE_TIME_ASSERT( a )
 #endif
 
 #endif // __COMPAT_H__

@@ -135,7 +135,7 @@ QString ThumbItem::GetDescription(const QString &status,
     info += "\n" + tr("Created: %1").arg(fi.created().toString());
     //: %1 is the modification date
     info += "\n" + tr("Modified: %1").arg(fi.lastModified().toString());
-    info += "\n" + tr("Size: %n bytes", "", fi.size());
+    info += "\n" + tr("Size: %n byte(s)", "", fi.size());
     info += "\n" + tr("Width: %n pixel(s)", "", sz.width());
     info += "\n" + tr("Height: %n pixel(s)", "", sz.height());
     info += "\n" + tr("Pixel Count: %1 megapixels")

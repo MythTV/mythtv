@@ -16,6 +16,7 @@
 
 #include "serviceexp.h" 
 #include "datacontracthelper.h"
+#include "enums/recStatus.h"
 #include "programtypes.h"
 
 namespace DTC
@@ -134,6 +135,8 @@ inline void RecordingInfo::InitializeCustomTypes()
 {
     qRegisterMetaType< RecordingInfo  >();
     qRegisterMetaType< RecordingInfo* >();
+
+    RecStatus::InitializeCustomTypes();
 }
 }
 

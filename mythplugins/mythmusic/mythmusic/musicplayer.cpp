@@ -346,7 +346,7 @@ void MusicPlayer::play(void)
         // put an upper limit on the number of consecutive track unavailable errors
         if (m_errorCount >= 1000)
         {
-            ShowOkPopup(tr("Got to many track unavailable errors. Maybe the host with the music on is off-line?"));
+            ShowOkPopup(tr("Got too many track unavailable errors. Maybe the host with the music on is off-line?"));
             stop(true);
             m_errorCount = 0;
             return;
@@ -1021,6 +1021,8 @@ void MusicPlayer::loadPlaylist(void)
 
 void MusicPlayer::loadStreamPlaylist(void)
 {
+    MusicMetadata::IdType id = getCurrentMetadata() ? getCurrentMetadata()->ID() : -1;
+
     // create the radio playlist
     gMusicData->all_playlists->getStreamPlaylist()->disableSaves();
     gMusicData->all_playlists->getStreamPlaylist()->removeAllTracks();
@@ -1030,6 +1032,9 @@ void MusicPlayer::loadStreamPlaylist(void)
     {
         MusicMetadata *mdata = list->at(x);
         gMusicData->all_playlists->getStreamPlaylist()->addTrack(mdata->ID(), false);
+
+        if (mdata->ID() == id)
+            m_currentTrack = x;
     }
 
     gMusicData->all_playlists->getStreamPlaylist()->enableSaves();

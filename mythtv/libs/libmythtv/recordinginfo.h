@@ -7,6 +7,7 @@
 #include "mythtvexp.h"
 #include "programinfo.h"
 #include "recordingfile.h"
+#include "enums/recStatus.h"
 
 class RecordingRule;
 

@@ -2635,16 +2635,16 @@ void ExternalConfigurationGroup::probeApp(const QString & path)
 
     if (fileInfo.exists())
     {
+        ci = tr("'%1' is valid.").arg(fileInfo.absoluteFilePath());
         if (!fileInfo.isReadable() || !fileInfo.isFile())
-            ci = tr("File not readable: ");
+            ci = tr("'%1' is not readable.").arg(fileInfo.absoluteFilePath());
         if (!fileInfo.isExecutable())
-            ci = tr("File is not executable: ");
+            ci = tr("'%1' is not executable.").arg(fileInfo.absoluteFilePath());
     }
     else
     {
-        ci = tr("File does not exist: ");
+        ci = tr("'%1' does not exist.").arg(fileInfo.absoluteFilePath());
     }
-    ci += QString("'%1'").arg(fileInfo.absoluteFilePath());
 
     info->setValue(ci);
 }
@@ -2653,7 +2653,8 @@ void ExternalConfigurationGroup::probeApp(const QString & path)
 HDPVRConfigurationGroup::HDPVRConfigurationGroup(CaptureCard &a_parent) :
     VerticalConfigurationGroup(false, true, false, false),
     parent(a_parent), cardinfo(new TransLabelSetting()),
-    audioinput(new TunerCardAudioInput(parent, QString::null, "HDPVR"))
+    audioinput(new TunerCardAudioInput(parent, QString::null, "HDPVR")),
+    vbidevice(NULL)
 {
     VideoDevice *device =
         new VideoDevice(parent, 0, 15, QString::null, "hdpvr");
@@ -4381,7 +4382,7 @@ void DVBConfigurationGroup::Load(void)
 void DVBConfigurationGroup::Save(void)
 {
     VerticalConfigurationGroup::Save();
-    diseqc_tree->Store(cardnum->getValue());
+    diseqc_tree->Store(parent.getCardID(), cardnum->getValue());
     DiSEqCDev trees;
     trees.InvalidateTrees();
 }

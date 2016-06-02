@@ -6,6 +6,7 @@
 
 #ifdef _MSC_VER
 # include "exv_msvc.h"
+# define tzname _tzname
 #else
 # include "exv_conf.h"
 #endif

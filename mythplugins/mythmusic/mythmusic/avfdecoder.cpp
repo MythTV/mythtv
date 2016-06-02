@@ -523,7 +523,7 @@ void avfDecoder::run()
                 output()->AddData(m_outputBuffer, data_size, -1, 0);
             }
 
-            av_free_packet(&pkt);
+            av_packet_unref(&pkt);
 
             // Wait until we need to decode or supply more samples
             while (!m_finish && !m_userStop && m_seekTime <= 0.0)

@@ -26,6 +26,17 @@ class CleanupTask : public DailyHouseKeeperTask
     void CleanupProgramListings(void);
 };
 
+class RadioStreamUpdateTask : public DailyHouseKeeperTask
+{
+  public:
+    RadioStreamUpdateTask(void);
+    virtual ~RadioStreamUpdateTask(void);
+    bool DoRun(void);
+    virtual bool DoCheckRun(QDateTime now);
+    virtual void Terminate(void);
+  private:
+    MythSystemLegacy *m_msMU;
+};
 
 class ThemeUpdateTask : public DailyHouseKeeperTask
 {
@@ -41,7 +52,6 @@ class ThemeUpdateTask : public DailyHouseKeeperTask
     bool m_running;
     QString m_url;
 };
-
 
 class ArtworkTask : public DailyHouseKeeperTask
 {

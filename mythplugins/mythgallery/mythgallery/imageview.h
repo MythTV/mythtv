@@ -103,7 +103,6 @@ class ImageView
     // Common slideshow variables
     bool                   m_slideshow_running;
     const int              m_slideshow_sequencing;
-    int                    m_slideshow_sequencing_inc_order;
     int                    m_slideshow_frame_delay;
     int                    m_slideshow_frame_delay_state;
     QTimer                *m_slideshow_timer;

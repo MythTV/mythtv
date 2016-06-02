@@ -387,25 +387,27 @@ void TestEITFixups::testUKMarvel()
 
     DBEventEIT *event = SimpleDBEventEIT (EITFixUp::kFixUK,
                                          "Marvel's Agents of S.H.I.E.L.D.",
-                                         "",
+                                         "Maveth: <description> (S3 Ep10/22)  [AD,S]",
                                          "");
 
     PRINT_EVENT(*event);
     fixup.Fix(*event);
     PRINT_EVENT(*event);
     QCOMPARE(event->title,    QString("Marvel's Agents of S.H.I.E.L.D."));
+    QCOMPARE(event->subtitle, QString("Maveth"));
     delete event;
 
 
     DBEventEIT *event2 = SimpleDBEventEIT (EITFixUp::kFixUK,
-                                          "NEW: Marvel's Agents of S.H.I.E.L.D.",
-                                          "",
+                                          "New: Marvel's Agents of...",
+                                          "...S.H.I.E.L.D. Brand new series - Bouncing Back: <description> (S3 Ep11/22)  [AD,S]",
                                           "");
 
     PRINT_EVENT(*event2);
     fixup.Fix(*event2);
     PRINT_EVENT(*event2);
     QCOMPARE(event2->title,    QString("Marvel's Agents of S.H.I.E.L.D."));
+    QCOMPARE(event2->subtitle, QString("Bouncing Back"));
     delete event2;
 }
 
@@ -642,6 +644,34 @@ void TestEITFixups::testSkyEpisodes()
     QCOMPARE(event3->season,  0u);
     QCOMPARE(event3->episode, 0u);
     delete event3;
+
+    DBEventEIT *event4 = SimpleDBEventEIT (EITFixUp::kFixPremiere,
+                                         "Schwerter des Königs - Zwei Welten",
+                                         "Subtitle",
+                                         "Ex-Marine und Kampfsportlehrer Granger (Dolph Lundgren) ... Star Dolph Lundgren. 92 Min.\u000AD/CDN 2011. Von Uwe Boll, mit Dolph Lundgren, Natassia Malthe, Lochlyn Munro.\u000AAb 16 Jahren");
+
+    fixup.Fix(*event4);
+    PRINT_EVENT(*event4);
+    QCOMPARE(event4->description, QString("Ex-Marine und Kampfsportlehrer Granger (Dolph Lundgren) ... Star Dolph Lundgren. Ab 16 Jahren"));
+    QCOMPARE(event4->season,  0u);
+    QCOMPARE(event4->episode, 0u);
+    QCOMPARE(event4->airdate,  (unsigned short) 2011);
+    QVERIFY(event4->HasCredits());
+    delete event4;
+
+    DBEventEIT *event5 = SimpleDBEventEIT (EITFixUp::kFixPremiere,
+                                         "Die wilden 70ern",
+                                            "Laurie zieht aus",
+                                            "2. Staffel, Folge 11: Lauries Auszug setzt Red zu, denn er hat ... ist.\u000AUSA 1999. 25 Min. Von David Trainer, mit Topher Grace, Mila Kunis, Ashton Kutcher.");
+
+    fixup.Fix(*event5);
+    PRINT_EVENT(*event5);
+    QCOMPARE(event5->description, QString("Lauries Auszug setzt Red zu, denn er hat ... ist."));
+    QCOMPARE(event5->season,  2u);
+    QCOMPARE(event5->episode, 11u);
+    QCOMPARE(event5->airdate,  (unsigned short) 1999);
+    QVERIFY(event5->HasCredits());
+    delete event5;
 }
 
 void TestEITFixups::testUnitymedia()
@@ -673,6 +703,89 @@ void TestEITFixups::testUnitymedia()
     QCOMPARE(event->stars, 0.89f);
     QCOMPARE(event->items.count(), 1);
     delete event;
+}
+
+void TestEITFixups::testDeDisneyChannel()
+{
+    EITFixUp fixup;
+
+    DBEventEIT *event = SimpleDBEventEIT (EITFixUp::kFixDisneyChannel,
+                                         "Meine Schwester Charlie",
+                                         "Das Ablenkungsmanöver Familien-Serie, USA 2011",
+                                         "...");
+
+    PRINT_EVENT(*event);
+    fixup.Fix(*event);
+    PRINT_EVENT(*event);
+    QCOMPARE(event->title,    QString("Meine Schwester Charlie"));
+    QCOMPARE(event->subtitle, QString("Das Ablenkungsmanöver"));
+     QCOMPARE(event->category, QString("Familien-Serie"));
+     QCOMPARE(event->categoryType, ProgramInfo::kCategorySeries);
+
+    DBEventEIT *event2 = SimpleDBEventEIT (EITFixUp::kFixDisneyChannel,
+                                         "Phineas und Ferb",
+                                         "Das Achterbahn - Musical Zeichentrick-Serie, USA 2011",
+                                         "...");
+
+    PRINT_EVENT(*event2);
+    fixup.Fix(*event2);
+    PRINT_EVENT(*event2);
+    QCOMPARE(event2->title,    QString("Phineas und Ferb"));
+    QCOMPARE(event2->subtitle, QString("Das Achterbahn - Musical"));
+}
+
+void TestEITFixups::testATV()
+{
+    EITFixUp fixup;
+
+    DBEventEIT *event = SimpleDBEventEIT (EITFixUp::kFixATV,
+                                         "Gilmore Girls",
+                                         "Eine Hochzeit und ein Todesfall, Folge 17",
+                                         "Lorelai und Rory helfen Luke in seinem Café aus, der mit den Vorbereitungen für das ...");
+
+    PRINT_EVENT(*event);
+    fixup.Fix(*event);
+    PRINT_EVENT(*event);
+    QCOMPARE(event->title,    QString("Gilmore Girls"));
+    QCOMPARE(event->subtitle, QString("Eine Hochzeit und ein Todesfall"));
+
+}
+
+void TestEITFixups::test64BitEnum(void)
+{
+    QVERIFY(EITFixUp::kFixUnitymedia != EITFixUp::kFixNone);
+    QVERIFY(EITFixUp::kFixATV != EITFixUp::kFixNone);
+    QVERIFY(EITFixUp::kFixDisneyChannel != EITFixUp::kFixNone);
+#if 0
+    QCOMPARE(QString::number(EITFixUp::kFixUnitymedia), QString::number(EITFixUp::kFixNone));
+#endif
+
+#if 0
+    // needs some casting around
+    FixupValue theFixup = EITFixUp::kFixUnitymedia;
+    QCOMPARE(EITFixUp::kFixUnitymedia, theFixup);
+#endif
+
+    // this is likely what happens somewhere in the fixup pipeline
+    QCOMPARE((FixupValue)((uint32_t)EITFixUp::kFixUnitymedia), (FixupValue)EITFixUp::kFixNone);
+
+    FixupMap   fixes;
+    fixes[0xFFFFull<<32] = EITFixUp::kFixDisneyChannel;
+    fixes[0xFFFFull<<32] |= EITFixUp::kFixATV;
+    FixupValue fix;
+    fix = EITFixUp::kFixGenericDVB;
+    fix |= fixes.value(0xFFFFull<<32);
+    QCOMPARE(fix, EITFixUp::kFixGenericDVB | EITFixUp::kFixDisneyChannel | EITFixUp::kFixATV);
+    QVERIFY(EITFixUp::kFixATV & fix);
+
+    // did kFixGreekCategories = 1<<31 cause issues?
+#if 0
+    QCOMPARE(QString::number(1<<31, 16), QString::number(1u<<31, 16));
+#endif
+    // two different flags, fixed version
+    QVERIFY(!(1ull<<31 & 1ull<<32));
+    // oops, this is true, so setting the old kFixGreekCategories also set all flags following it
+    QVERIFY(1<<31 & 1ull<<32);
 }
 
 QTEST_APPLESS_MAIN(TestEITFixups)

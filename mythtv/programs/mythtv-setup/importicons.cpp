@@ -203,15 +203,15 @@ void ImportIconsWizard::menuSelection(MythUIButtonListItem *item)
 
     CSVEntry entry2 = (*m_missingIter);
     m_strMatches += QString("%1,%2,%3,%4,%5,%6,%7,%8,%9\n")
-                            .arg(escape_csv(entry.strID))
-                            .arg(escape_csv(entry2.strName))
-                            .arg(escape_csv(entry2.strXmlTvId))
-                            .arg(escape_csv(entry2.strCallsign))
-                            .arg(escape_csv(entry2.strTransportId))
-                            .arg(escape_csv(entry2.strAtscMajorChan))
-                            .arg(escape_csv(entry2.strAtscMinorChan))
-                            .arg(escape_csv(entry2.strNetworkId))
-                            .arg(escape_csv(entry2.strServiceId));
+                            .arg(QUrl::toPercentEncoding(entry.strID).constData())
+                            .arg(QUrl::toPercentEncoding(entry2.strName).constData())
+                            .arg(QUrl::toPercentEncoding(entry2.strXmlTvId).constData())
+                            .arg(QUrl::toPercentEncoding(entry2.strCallsign).constData())
+                            .arg(QUrl::toPercentEncoding(entry2.strTransportId).constData())
+                            .arg(QUrl::toPercentEncoding(entry2.strAtscMajorChan).constData())
+                            .arg(QUrl::toPercentEncoding(entry2.strAtscMinorChan).constData())
+                            .arg(QUrl::toPercentEncoding(entry2.strNetworkId).constData())
+                            .arg(QUrl::toPercentEncoding(entry2.strServiceId).constData());
 
     if (checkAndDownload(entry.strLogo, entry2.strChanId))
     {
@@ -356,16 +356,16 @@ bool ImportIconsWizard::initialLoad(QString name)
                 entry.strNetworkId=query.value(7).toString();
                 entry.strServiceId=query.value(8).toString();
                 entry.strIconCSV= QString("%1,%2,%3,%4,%5,%6,%7,%8,%9\n").
-                                arg(escape_csv(entry.strChanId)).
-                                arg(escape_csv(entry.strName)).
-                                arg(escape_csv(entry.strXmlTvId)).
-                                arg(escape_csv(entry.strCallsign)).
-                                arg(escape_csv(entry.strTransportId)).
-                                arg(escape_csv(entry.strAtscMajorChan)).
-                                arg(escape_csv(entry.strAtscMinorChan)).
-                                arg(escape_csv(entry.strNetworkId)).
-                                arg(escape_csv(entry.strServiceId));
-                entry.strNameCSV=escape_csv(entry.strName);
+                                arg(QUrl::toPercentEncoding(entry.strChanId).constData()).
+                                arg(QUrl::toPercentEncoding(entry.strName).constData()).
+                                arg(QUrl::toPercentEncoding(entry.strXmlTvId).constData()).
+                                arg(QUrl::toPercentEncoding(entry.strCallsign).constData()).
+                                arg(QUrl::toPercentEncoding(entry.strTransportId).constData()).
+                                arg(QUrl::toPercentEncoding(entry.strAtscMajorChan).constData()).
+                                arg(QUrl::toPercentEncoding(entry.strAtscMinorChan).constData()).
+                                arg(QUrl::toPercentEncoding(entry.strNetworkId).constData()).
+                                arg(QUrl::toPercentEncoding(entry.strServiceId).constData());
+                entry.strNameCSV=QUrl::toPercentEncoding(entry.strName).constData();
                 LOG(VB_CHANNEL, LOG_INFO,
                     QString("chanid %1").arg(entry.strIconCSV));
 
@@ -486,14 +486,6 @@ bool ImportIconsWizard::doLoad()
         m_statusText->Reset();
 
     return true;
-}
-
-QString ImportIconsWizard::escape_csv(const QString& str)
-{
-    QRegExp rxDblForEscape("\"");
-    QString str2 = str;
-    str2.replace(rxDblForEscape,"\\\"");
-    return "\""+str2+"\"";
 }
 
 QStringList ImportIconsWizard::extract_csv(const QString &line)
@@ -621,14 +613,14 @@ bool ImportIconsWizard::search(const QString& strParam)
 
     CSVEntry entry2 = (*m_missingIter);
     QString channelcsv = QString("%1,%2,%3,%4,%5,%6,%7,%8\n")
-                                .arg(escape_csv(entry2.strName))
-                                .arg(escape_csv(entry2.strXmlTvId))
-                                .arg(escape_csv(entry2.strCallsign))
-                                .arg(escape_csv(entry2.strTransportId))
-                                .arg(escape_csv(entry2.strAtscMajorChan))
-                                .arg(escape_csv(entry2.strAtscMinorChan))
-                                .arg(escape_csv(entry2.strNetworkId))
-                                .arg(escape_csv(entry2.strServiceId));
+                                .arg(QUrl::toPercentEncoding(entry2.strName).constData())
+                                .arg(QUrl::toPercentEncoding(entry2.strXmlTvId).constData())
+                                .arg(QUrl::toPercentEncoding(entry2.strCallsign).constData())
+                                .arg(QUrl::toPercentEncoding(entry2.strTransportId).constData())
+                                .arg(QUrl::toPercentEncoding(entry2.strAtscMajorChan).constData())
+                                .arg(QUrl::toPercentEncoding(entry2.strAtscMinorChan).constData())
+                                .arg(QUrl::toPercentEncoding(entry2.strNetworkId).constData())
+                                .arg(QUrl::toPercentEncoding(entry2.strServiceId).constData());
 
     QString message = QObject::tr("Searching for icons for channel %1")
                                                     .arg(entry2.strName);

@@ -293,6 +293,19 @@ bool GalleryThumbView::keyPressEvent(QKeyEvent *event)
             FlipHorizontal();
         else if (action == "FLIPVERTICAL")
             FlipVertical();
+        else if (action == "COVER")
+        {
+            ImagePtrK im = m_view->GetSelected();
+            if (m_editsAllowed && im)
+            {
+                if (im == m_view->GetParent())
+                    // Reset dir
+                    m_mgr.SetCover(im->m_id, 0);
+                else
+                    // Set parent cover
+                    m_mgr.SetCover(im->m_parentId, im->m_id);
+            }
+        }
         else if (action == "PLAY")
             Slideshow();
         else if (action == "RECURSIVESHOW")
@@ -602,7 +615,10 @@ void GalleryThumbView::LoadData(int parent)
     {
         m_imageList->SetVisible(true);
         if (m_emptyText)
+        {
             m_emptyText->SetVisible(false);
+            m_emptyText->Reset();
+        }
 
         // Construct the buttonlist
         BuildImageList();
@@ -845,9 +861,15 @@ void GalleryThumbView::UpdateScanProgress(const QString &scanner,
         if (m_scanActive.isEmpty())
         {
             if (m_scanProgressText)
+            {
                 m_scanProgressText->SetVisible(false);
+                m_scanProgressText->Reset();
+            }
             if (m_scanProgressBar)
+            {
                 m_scanProgressBar->SetVisible(false);
+                m_scanProgressBar->Reset();
+            }
 
             m_scanProgress.clear();
 

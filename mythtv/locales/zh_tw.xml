@@ -24,11 +24,11 @@
 
     <!-- Date/Time format -->
     <setting name="DateFormat">dddd M月d日</setting>
-    <setting name="TimeFormat">AP h:mm</setting>
-    <setting name="ShortDateFormat">M月d日</setting>
+    <setting name="TimeFormat">hh:mm</setting>
+    <setting name="ShortDateFormat">ddd M月d日</setting>
 
     <!-- Playback -->
-    <setting name="EnableMHEG">1</setting>
+    <setting name="EnableMHEG">1</setting> <!-- Enable interactive TV feature -->
 
   <!-- Plugins -->
     <!-- MythArchive -->

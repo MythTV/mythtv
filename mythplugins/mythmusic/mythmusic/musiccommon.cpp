@@ -607,6 +607,8 @@ bool MusicCommon::keyPressEvent(QKeyEvent *e)
     // if there is a pending jump point pass the key press to the default handler
     if (GetMythMainWindow()->IsExitingToMain())
     {
+        gPlayer->savePosition();
+
         // do we need to stop playing?
         if (gPlayer->isPlaying() && gCoreContext->GetSetting("MusicJumpPointAction", "stop") == "stop")
             gPlayer->stop(true);

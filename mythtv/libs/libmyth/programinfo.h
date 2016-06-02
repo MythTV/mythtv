@@ -18,6 +18,7 @@
 #include "mythexp.h"
 #include "mythdate.h"
 #include "mythtypes.h"
+#include "enums/recStatus.h"
 
 /* If NUMPROGRAMLINES gets updated, then MYTH_PROTO_VERSION and MYTH_PROTO_TOKEN
    in mythversion.h need to be bumped, and also follow the instructions in
@@ -557,6 +558,7 @@ class MPUBLIC ProgramInfo
     uint64_t    QueryLastPlayPos(void) const;
     CategoryType QueryCategoryType(void) const;
     QStringList QueryDVDBookmark(const QString &serialid) const;
+    QStringList QueryBDBookmark(const QString &serialid) const;
     bool        QueryIsEditing(void) const;
     bool        QueryIsInUse(QStringList &byWho) const;
     bool        QueryIsInUse(QString &byWho) const;
@@ -581,6 +583,7 @@ class MPUBLIC ProgramInfo
     virtual void SaveFilesize(uint64_t fsize); /// TODO Move to RecordingInfo
     void SaveBookmark(uint64_t frame);
     void SaveDVDBookmark(const QStringList &fields) const;
+    void SaveBDBookmark(const QStringList &fields) const;
     void SaveEditing(bool edit);
     void SaveTranscodeStatus(TranscodingStatus transFlag);
     void SaveWatched(bool watchedFlag);
@@ -624,9 +627,21 @@ class MPUBLIC ProgramInfo
                          int64_t min_frm = -1, int64_t max_frm = -1) const;
     void SavePositionMapDelta(frm_pos_map_t &, MarkTypes type) const;
 
-    // Get position/duration for keyframe
-    bool QueryKeyFramePosition(uint64_t *, uint64_t keyframe, bool backwards) const;
-    bool QueryKeyFrameDuration(uint64_t *, uint64_t keyframe, bool backwards) const;
+    // Get position/duration for keyframe and vice versa
+    bool QueryKeyFrameInfo(uint64_t *, uint64_t position_or_keyframe,
+                           bool backwards,
+                           MarkTypes type, const char *from_filemarkup_asc,
+                           const char *from_filemarkup_desc,
+                           const char *from_recordedseek_asc,
+                           const char *from_recordedseek_desc) const;
+    bool QueryKeyFramePosition(uint64_t *, uint64_t keyframe,
+                               bool backwards) const;
+    bool QueryPositionKeyFrame(uint64_t *, uint64_t position,
+                               bool backwards) const;
+    bool QueryKeyFrameDuration(uint64_t *, uint64_t keyframe,
+                               bool backwards) const;
+    bool QueryDurationKeyFrame(uint64_t *, uint64_t duration,
+                               bool backwards) const;
 
     // Get/set all markup
     struct MarkupEntry
@@ -785,6 +800,14 @@ class MPUBLIC ProgramInfo
     static ProgramInfoUpdater *updater;
     static bool usingProgIDAuth;
 };
+
+MPUBLIC bool LoadFromProgram(
+    ProgramList        &destination,
+    const QString      &where,
+    const QString      &groupBy,
+    const QString      &orderBy,
+    const MSqlBindings &bindings,
+    const ProgramList  &schedList);
 
 MPUBLIC bool LoadFromProgram(
     ProgramList        &destination,

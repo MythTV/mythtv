@@ -224,7 +224,8 @@ public:
         {
             vector<ssize_t>::iterator old_iter = std::find(seq.begin(),
                 seq.end(), _idx);
-            *old_iter = -1;
+            if (old_iter != seq.end())
+                *old_iter = -1;
         }
         else
         {

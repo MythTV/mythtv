@@ -64,7 +64,7 @@ bool GeneralSettings::Create()
     if (loadIgnoreTags == 1)
         m_ignoreID3Tags->SetCheckState(MythUIStateType::Full);
 
-    int allowTagWriting = gCoreContext->GetNumSetting("AllowTagWriting", 1);
+    int allowTagWriting = gCoreContext->GetNumSetting("AllowTagWriting", 0);
     if (allowTagWriting == 1)
         m_allowTagWriting->SetCheckState(MythUIStateType::Full);
 

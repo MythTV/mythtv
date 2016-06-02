@@ -9,27 +9,25 @@
 
 #include "programdata.h"
 
-typedef QMap<uint,uint> QMap_uint_t;
-
 /// EIT Fix Up Functions
 class EITFixUp
 {
   protected:
-     // max length of subtitle field in db.
-     static const uint SUBTITLE_MAX_LEN = 128;
-     // max number of words included in a subtitle
-     static const uint kMaxToTitle = 14;
-     // max number of words up to a period, question mark
-     static const uint kDotToTitle = 9;
-     // max number of question/exclamation marks
-     static const uint kMaxQuestionExclamation = 2;
-     // max number of difference in words between a period and a colon
-     static const uint kMaxDotToColon = 5;
-     // minimum duration of an event to consider it as movie
-     static const int kMinMovieDuration = 75*60;
+    // max length of subtitle field in db.
+    static const uint SUBTITLE_MAX_LEN = 128;
+    // max number of words included in a subtitle
+    static const uint kMaxToTitle = 14;
+    // max number of words up to a period, question mark
+    static const uint kDotToTitle = 9;
+    // max number of question/exclamation marks
+    static const uint kMaxQuestionExclamation = 2;
+    // max number of difference in words between a period and a colon
+    static const uint kMaxDotToColon = 5;
+    // minimum duration of an event to consider it as movie
+    static const int kMinMovieDuration = 75*60;
 
   public:
-    enum FixUpType
+    enum FixUpType : FixupValue
     {
         kFixNone             =       0, // no bits set
 
@@ -58,7 +56,9 @@ class EITFixUp
         kFixAUSeven          = 1 << 21,
         kFixP7S1             = 1 << 26,
         kFixHTML             = 1 << 27,
-        kFixUnitymedia       = 1ll << 32,
+        kFixUnitymedia       = 1ull << 32,
+        kFixATV              = 1ull << 33,
+        kFixDisneyChannel    = 1ull << 34,
 
         // Early fixups
         kEFixForceISO8859_1  = 1 << 22,
@@ -69,7 +69,7 @@ class EITFixUp
 
         kFixGreekSubtitle    = 1 << 29,
         kFixGreekEIT         = 1 << 30,
-        kFixGreekCategories  = 1 << 31,
+        kFixGreekCategories  = 1u << 31,
     };
 
     EITFixUp();
@@ -104,6 +104,8 @@ class EITFixUp
     void FixMCA(DBEventEIT &event) const;           // MultiChoice Africa DVB-S
     void FixRTL(DBEventEIT &event) const;           // RTL group DVB
     void FixPRO7(DBEventEIT &event) const;          // Pro7/Sat1 Group
+    void FixDisneyChannel(DBEventEIT &event) const; // Disney Channel
+    void FixATV(DBEventEIT &event) const;           // ATV/ATV2
     void FixFI(DBEventEIT &event) const;            // Finland DVB-T
     void FixPremiere(DBEventEIT &event) const;      // german pay-tv Premiere
     void FixNL(DBEventEIT &event) const;            // Netherlands DVB-C
@@ -204,11 +206,15 @@ class EITFixUp
     const QRegExp m_PRO7CrewOne;
     const QRegExp m_PRO7Cast;
     const QRegExp m_PRO7CastOne;
+    const QRegExp m_ATVSubtitle;
+    const QRegExp m_DisneyChannelSubtitle;
     const QRegExp m_RTLEpisodeNo1;
     const QRegExp m_RTLEpisodeNo2;
     const QRegExp m_fiRerun;
     const QRegExp m_fiRerun2;
-    const QRegExp m_dePremiereInfos;
+    const QRegExp m_dePremiereLength;
+    const QRegExp m_dePremiereAirdate;
+    const QRegExp m_dePremiereCredits;
     const QRegExp m_dePremiereOTitle;
     const QRegExp m_deSkyDescriptionSeasonEpisode;
     const QRegExp m_nlTxt;

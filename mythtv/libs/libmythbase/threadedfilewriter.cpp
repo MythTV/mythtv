@@ -209,7 +209,7 @@ ThreadedFileWriter::~ThreadedFileWriter()
  *  \param data  pointer to data to write to disk
  *  \param count size of data in bytes
  */
-uint ThreadedFileWriter::Write(const void *data, uint count)
+int ThreadedFileWriter::Write(const void *data, uint count)
 {
     if (count == 0)
         return 0;
@@ -217,7 +217,7 @@ uint ThreadedFileWriter::Write(const void *data, uint count)
     QMutexLocker locker(&buflock);
 
     if (ignore_writes)
-        return count;
+        return -1;
 
     uint written    = 0;
     uint left       = count;
@@ -238,7 +238,7 @@ uint ThreadedFileWriter::Write(const void *data, uint count)
                     "\n\t\t\tis insufficient to deal with the number of on-going "
                     "\n\t\t\trecordings, or you have a disk failure.");
                 ignore_writes = true;
-                return count;
+                return -1;
             }
             if (!m_warned)
             {

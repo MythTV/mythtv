@@ -8,7 +8,7 @@ template<typename T>
 class AutoDeleteDeque
 {
   public:
-    AutoDeleteDeque(bool auto_delete = true) : autodelete(auto_delete) {}
+    explicit AutoDeleteDeque(bool auto_delete = true) : autodelete(auto_delete) {}
     ~AutoDeleteDeque() { clear(); }
 
     typedef typename std::deque< T > List;

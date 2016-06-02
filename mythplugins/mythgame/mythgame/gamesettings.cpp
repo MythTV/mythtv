@@ -190,7 +190,7 @@ QString GameDBStorage::GetSetClause(MSqlBindings &bindings) const
 class AllowMultipleRoms : public CheckBoxSetting, public GameDBStorage
 {
   public:
-    AllowMultipleRoms(const MythGamePlayerSettings &parent) :
+    explicit AllowMultipleRoms(const MythGamePlayerSettings &parent) :
         CheckBoxSetting(this), GameDBStorage(this, parent, "spandisks")
     {
         setLabel(MythGamePlayerSettings::tr("Allow games to span multiple "
@@ -205,7 +205,7 @@ class AllowMultipleRoms : public CheckBoxSetting, public GameDBStorage
 class Command : public LineEditSetting, public GameDBStorage
 {
   public:
-    Command(const MythGamePlayerSettings &parent) :
+    explicit Command(const MythGamePlayerSettings &parent) :
         LineEditSetting(this), GameDBStorage(this, parent, "commandline")
     {
         setLabel(MythGamePlayerSettings::tr("Command"));
@@ -222,7 +222,7 @@ class Command : public LineEditSetting, public GameDBStorage
 class GameType : public ComboBoxSetting, public GameDBStorage
 {
   public:
-    GameType(const MythGamePlayerSettings &parent) :
+    explicit GameType(const MythGamePlayerSettings &parent) :
         ComboBoxSetting(this), GameDBStorage(this, parent, "gametype")
     {
         //: Game type
@@ -244,7 +244,7 @@ class GameType : public ComboBoxSetting, public GameDBStorage
 class RomPath : public LineEditSetting, public GameDBStorage
 {
   public:
-    RomPath(const MythGamePlayerSettings &parent) :
+    explicit RomPath(const MythGamePlayerSettings &parent) :
         LineEditSetting(this), GameDBStorage(this, parent, "rompath")
     {
         setLabel(MythGamePlayerSettings::tr("ROM Path"));
@@ -256,7 +256,7 @@ class RomPath : public LineEditSetting, public GameDBStorage
 class WorkingDirPath : public LineEditSetting, public GameDBStorage
 {
   public:
-    WorkingDirPath(const MythGamePlayerSettings &parent) :
+    explicit WorkingDirPath(const MythGamePlayerSettings &parent) :
         LineEditSetting(this), GameDBStorage(this, parent, "workingpath")
     {
         setLabel(MythGamePlayerSettings::tr("Working Directory"));
@@ -269,7 +269,7 @@ class WorkingDirPath : public LineEditSetting, public GameDBStorage
 class Extensions : public LineEditSetting, public GameDBStorage
 {
   public:
-    Extensions(const MythGamePlayerSettings &parent) :
+    explicit Extensions(const MythGamePlayerSettings &parent) :
         LineEditSetting(this), GameDBStorage(this, parent, "extensions")
     {
         setLabel(MythGamePlayerSettings::tr("File Extensions"));

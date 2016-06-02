@@ -343,10 +343,13 @@ MusicMetadata *MusicMetadata::createFromID(int trackid)
 // static
 bool MusicMetadata::updateStreamList(void)
 {
+    // we are only interested in the global setting so remove any local host setting just in case
+    GetMythDB()->ClearSetting("MusicStreamListModified");
+
     // make sure we are not already doing an update
     if (gCoreContext->GetSetting("MusicStreamListModified") == "Updating")
     {
-        LOG(VB_GENERAL, LOG_ERR, "MusicMetadata::updateStreamList: looks like we are already updating the stream list");
+        LOG(VB_GENERAL, LOG_ERR, "MusicMetadata: looks like we are already updating the radio streams list");
         return false;
     }
 
@@ -359,15 +362,20 @@ bool MusicMetadata::updateStreamList(void)
     QDateTime lastUpdate = QDateTime::fromString(gCoreContext->GetSetting("MusicStreamListModified"), Qt::ISODate);
 
     if (lastModified <= lastUpdate)
+    {
+        LOG(VB_GENERAL, LOG_INFO, "MusicMetadata: radio streams list is already up to date");
         return true;
+    }
 
-    gCoreContext->SaveSetting("MusicStreamListModified", "Updating");
+    gCoreContext->SaveSettingOnHost("MusicStreamListModified", "Updating", NULL);
+
+    LOG(VB_GENERAL, LOG_INFO, "MusicMetadata: downloading radio streams list");
 
     // download compressed stream file
     if (!GetMythDownloadManager()->download(QString(STREAMUPDATEURL), &compressedData), false)
     {
-        LOG(VB_GENERAL, LOG_ERR, "MusicMetadata::updateStreamList: Failed to download stream list");
-        gCoreContext->SaveSetting("MusicStreamListModified", "");
+        LOG(VB_GENERAL, LOG_ERR, "MusicMetadata: failed to download radio stream list");
+        gCoreContext->SaveSettingOnHost("MusicStreamListModified", "", NULL);
         return false;
     }
 
@@ -385,11 +393,11 @@ bool MusicMetadata::updateStreamList(void)
                            &errorLine, &errorColumn))
     {
         LOG(VB_GENERAL, LOG_ERR,
-            "SearchStream: Could not read content of streams.xml" +
+            "MusicMetadata: Could not read content of streams.xml" +
                 QString("\n\t\t\tError parsing %1").arg(STREAMUPDATEURL) +
                 QString("\n\t\t\tat line: %1  column: %2 msg: %3")
                 .arg(errorLine).arg(errorColumn).arg(errorMsg));
-        gCoreContext->SaveSetting("MusicStreamListModified", "");
+        gCoreContext->SaveSettingOnHost("MusicStreamListModified", "", NULL);
         return false;
     }
 
@@ -398,9 +406,11 @@ bool MusicMetadata::updateStreamList(void)
     if (!query.exec() || !query.isActive() || query.numRowsAffected() < 0)
     {
         MythDB::DBError("music delete radio streams", query);
-        gCoreContext->SaveSetting("MusicStreamListModified", "");
+        gCoreContext->SaveSettingOnHost("MusicStreamListModified", "", NULL);
         return false;
     }
+
+    LOG(VB_GENERAL, LOG_INFO, "MusicMetadata: processing radio streams list");
 
     QDomNodeList itemList = domDoc.elementsByTagName("item");
 
@@ -431,12 +441,14 @@ bool MusicMetadata::updateStreamList(void)
         if (!query.exec() || !query.isActive() || query.numRowsAffected() <= 0)
         {
             MythDB::DBError("music insert radio stream", query);
-            gCoreContext->SaveSetting("MusicStreamListModified", "");
+            gCoreContext->SaveSettingOnHost("MusicStreamListModified", "", NULL);
             return false;
         }
     }
 
-    gCoreContext->SaveSetting("MusicStreamListModified", lastModified.toString(Qt::ISODate));
+    gCoreContext->SaveSettingOnHost("MusicStreamListModified", lastModified.toString(Qt::ISODate), NULL);
+
+    LOG(VB_GENERAL, LOG_INFO, "MusicMetadata: updating radio streams list completed OK");
 
     return true;
 }

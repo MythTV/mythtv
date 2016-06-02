@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
 <TS version="2.0" language="bg_BG">
+<defaultcodec>UTF-8</defaultcodec>
 <context>
     <name>MythControls</name>
     <message>
@@ -27,53 +28,51 @@
 <context>
     <name>MythNews</name>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="123"/>
+        <location filename="../mythnews/mythnews.cpp" line="121"/>
         <source>You haven&apos;t configured MythNews to use any sites.</source>
         <translation>Не сте конфигурирали новинарски сайтове за MythNews.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="453"/>
+        <location filename="../mythnews/mythnews.cpp" line="392"/>
         <source>Updated</source>
         <translation>Обновен</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="460"/>
+        <location filename="../mythnews/mythnews.cpp" line="399"/>
         <source>Unknown</source>
         <translation>Непознат</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="471"/>
-        <location filename="../mythnews/mythnews.cpp" line="730"/>
         <source>%1 of %2 (%3 percent)</source>
-        <translation>%1 от %2 (%3 процент)</translation>
+        <translation type="obsolete">%1 от %2 (%3 процент)</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="808"/>
+        <location filename="../mythnews/mythnews.cpp" line="594"/>
         <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
         <translation>Не е зададена команда за търсене! MythNews изисква да бъде инсталиран MythBrowser.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="887"/>
+        <location filename="../mythnews/mythnews.cpp" line="673"/>
         <source>Options</source>
         <translation>Опции</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="900"/>
+        <location filename="../mythnews/mythnews.cpp" line="686"/>
         <source>Manage Feeds</source>
         <translation>Управление материали</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="901"/>
+        <location filename="../mythnews/mythnews.cpp" line="687"/>
         <source>Add Feed</source>
         <translation>Добавяне на материал</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="904"/>
+        <location filename="../mythnews/mythnews.cpp" line="690"/>
         <source>Edit Feed</source>
         <translation>Редакция материал</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="905"/>
+        <location filename="../mythnews/mythnews.cpp" line="691"/>
         <source>Delete Feed</source>
         <translation>Изтриване материал</translation>
     </message>
@@ -124,34 +123,34 @@
 <context>
     <name>NewsSite</name>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="226"/>
+        <location filename="../mythnews/newssite.cpp" line="227"/>
         <source>Retrieve Failed. </source>
         <translation>Неуспешна обработка.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="233"/>
-        <location filename="../mythnews/newssite.cpp" line="242"/>
-        <location filename="../mythnews/newssite.cpp" line="251"/>
+        <location filename="../mythnews/newssite.cpp" line="234"/>
+        <location filename="../mythnews/newssite.cpp" line="243"/>
+        <location filename="../mythnews/newssite.cpp" line="252"/>
         <source>Failed to retrieve news</source>
         <translation>Неуспешно получаване на новините</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="234"/>
+        <location filename="../mythnews/newssite.cpp" line="235"/>
         <source>No Cached News.</source>
         <translation>Няма кеширани новини.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="253"/>
+        <location filename="../mythnews/newssite.cpp" line="254"/>
         <source>Failed to read downloaded file.</source>
         <translation>Неуспешно четене на сваленият файл.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="261"/>
+        <location filename="../mythnews/newssite.cpp" line="262"/>
         <source>Showing Cached News.</source>
         <translation>Показване на кеширани новини.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="282"/>
+        <location filename="../mythnews/newssite.cpp" line="283"/>
         <source>XML-file is not valid RSS-feed</source>
         <translation>XML-файла не е валиден RSS-материал</translation>
     </message>
@@ -159,9 +158,8 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="703"/>
         <source>Downloading media...</source>
-        <translation>Сваляне медия...</translation>
+        <translation type="obsolete">Сваляне медия...</translation>
     </message>
 </context>
 <context>
@@ -247,36 +245,71 @@ When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to c
     </message>
     <message>
         <location filename="themestrings.h" line="20"/>
+        <source>News</source>
+        <translation>Новини</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="21"/>
+        <source>You Haven&apos;t Specified Any News Feeds.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="22"/>
+        <source>Edit News</source>
+        <translation>Редакция новини</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="23"/>
+        <source>Ok</source>
+        <translation>Да</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="24"/>
+        <source>News Config</source>
+        <translation>Настройки новини</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="25"/>
+        <source>Available Categories</source>
+        <translation>Достъпни категории</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="26"/>
+        <source>Available Sites</source>
+        <translation>Достъпни сайтове</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="27"/>
         <source>News Feeds</source>
         <translation>Новинарски материали</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="28"/>
         <source>Category</source>
         <translation>Категория</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="29"/>
         <source>[x]</source>
         <translation>[x]</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Web Site</source>
         <translation>Интернет страница</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Edit RSS News Feed</source>
         <translation>Редакция RSS новинарски материал</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="32"/>
         <source>Contexts</source>
         <translation>Контексти</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="33"/>
         <source>Actions</source>
         <translation>Действия</translation>
     </message>

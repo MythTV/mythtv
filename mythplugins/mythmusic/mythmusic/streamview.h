@@ -49,6 +49,9 @@ class StreamView : public MusicCommon
     MythUIText        *m_noStreams;
     MythUIText        *m_bufferStatus;
     MythUIProgressBar *m_bufferProgress;
+
+    MusicMetadata     *m_currStream;
+    MusicMetadata     *m_lastStream;
 };
 
 class EditStreamMetadata : public MythScreenType

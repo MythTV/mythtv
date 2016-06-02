@@ -1369,7 +1369,7 @@ class SendAsyncMessage : public QRunnable
     {
     }
 
-    SendAsyncMessage(const QString &msg) : m_message(msg) { }
+    explicit SendAsyncMessage(const QString &msg) : m_message(msg) { }
 
     void run(void)
     {

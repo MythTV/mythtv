@@ -33,7 +33,7 @@ class TypeListInfo
         location.detach();
     }
 
-    TypeListInfo(const QString &_name)
+    explicit TypeListInfo(const QString &_name)
         : name(_name), location(QString::null), src(NULL)
     {
         name.detach();

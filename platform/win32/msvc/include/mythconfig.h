@@ -13,7 +13,7 @@
 #define HAVE_MMX2 HAVE_MMXEXT
 #define ASMALIGN(ZEROBITS) ".p2align " #ZEROBITS "\n\t"
 #define SIZEOF_INT 4
-#define SIZEOF_LONG 4
+#define SIZEOF_LONG 8
 #define ARCH_AARCH64 0
 #define ARCH_ALPHA 0
 #define ARCH_ARM 0
@@ -37,7 +37,7 @@
 #define ARCH_TOMI 0
 #define ARCH_X86 0
 #define ARCH_X86_32 0
-#define ARCH_X86_64 0
+#define ARCH_X86_64 1
 #define HAVE_ARMV5TE 0
 #define HAVE_ARMV6 0
 #define HAVE_ARMV6T2 0
@@ -113,7 +113,7 @@
 #define HAVE_MIPS32R2_INLINE 0
 #define HAVE_MIPSDSPR1_INLINE 0
 #define HAVE_MIPSDSPR2_INLINE 0
-#define HAVE_INLINE_ASM 1
+#define HAVE_INLINE_ASM 0
 #define HAVE_SYMVER 1
 #define HAVE_YASM 0
 #define HAVE_BIGENDIAN 0
@@ -1582,6 +1582,6 @@
 #define CONFIG_X11 1
 #define CONFIG_XRANDR 0
 #define CONFIG_XV 0
-#define MYTH_BUILD_CONFIG " debug use_hidesyms using_alsa using_oss using_pulse using_pulseoutput using_backend using_bindings_php using_dvb using_frontend using_hdhomerun using_ceton using_hdpvr using_ivtv using_joystick_menu using_libdns_sd using_libfftw3 using_libxml2 using_lirc using_mheg using_opengl using_opengl_video using_qtwebkit using_qtscript using_qtdbus using_sdl using_taglib using_v4l2 using_x11 using_bindings_php using_mythtranscode using_opengl using_ffmpeg_threads using_mheg using_libxml2"
+#define MYTH_BUILD_CONFIG " debug use_hidesyms using_alsa using_oss using_pulse using_pulseoutput using_backend using_bindings_php using_dvb using_frontend using_hdhomerun using_ceton using_hdpvr using_ivtv using_joystick_menu using_libdns_sd using_libfftw3 using_libxml2 using_lirc using_mheg using_opengl using_opengl_video using_qtwebkit using_qtscript using_qtdbus using_sdl using_taglib using_bindings_php using_mythtranscode using_opengl using_ffmpeg_threads using_mheg using_libxml2"
 
 #endif /* MYTHTV_CONFIG_H */

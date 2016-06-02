@@ -14,6 +14,8 @@
 
 V4L2util::V4L2util(void)
     : m_fd(-1),
+      m_vbi_fd(-1),
+      m_version(0),
       m_capabilities(0),
       m_have_query_ext_ctrl(false)
 {
@@ -21,6 +23,7 @@ V4L2util::V4L2util(void)
 
 V4L2util::V4L2util(const QString& dev_name)
     : m_fd(-1),
+      m_vbi_fd(-1),
       m_capabilities(0),
       m_have_query_ext_ctrl(false)
 {
@@ -29,10 +32,16 @@ V4L2util::V4L2util(const QString& dev_name)
 
 V4L2util::V4L2util(const QString& dev_name, const QString& vbi_dev_name)
     : m_fd(0),
+      m_vbi_fd(-1),
       m_capabilities(0),
       m_have_query_ext_ctrl(false)
 {
     Open(dev_name, vbi_dev_name);
+}
+
+V4L2util::~V4L2util(void)
+{
+    Close();
 }
 
 bool V4L2util::Open(const QString& dev_name, const QString& vbi_dev_name)

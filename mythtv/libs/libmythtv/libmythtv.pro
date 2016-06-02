@@ -258,8 +258,16 @@ INSTALLS += inc
 #DVD stuff
 DEPENDPATH  += ../../external/libmythdvdnav/
 DEPENDPATH  += ../../external/libmythdvdnav/dvdread # for dvd_reader.h & dvd_input.h
-QMAKE_CXXFLAGS += -isystem ../../external/libmythdvdnav/dvdnav
-QMAKE_CXXFLAGS += -isystem ../../external/libmythdvdnav/dvdread
+
+!win32-msvc* {
+  QMAKE_CXXFLAGS += -isystem ../../external/libmythdvdnav/dvdnav
+  QMAKE_CXXFLAGS += -isystem ../../external/libmythdvdnav/dvdread
+}
+
+win32-msvc* {
+  INCLUDEPATH += ../../external/libmythdvdnav/dvdnav
+  INCLUDEPATH += ../../external/libmythdvdnav/dvdread
+}
 
 !win32-msvc*:POST_TARGETDEPS += ../../external/libmythdvdnav/libmythdvdnav-$${MYTH_LIB_EXT}
 
@@ -732,7 +740,15 @@ using_backend {
     # Support for HDHomeRun box
     using_hdhomerun {
         # MythTV HDHomeRun glue
-        QMAKE_CXXFLAGS += -isystem ../../external/libhdhomerun
+
+        !win32-msvc* {
+          QMAKE_CXXFLAGS += -isystem ../../external/libhdhomerun
+        }
+
+        win32-msvc* {
+          INCLUDEPATH += ../../external/libhdhomerun
+        }
+
         DEPENDPATH += ../../external/libhdhomerun
 
         HEADERS += recorders/hdhrsignalmonitor.h
@@ -874,6 +890,7 @@ mingw | win32-msvc* {
 win32-msvc* {
   LIBS += -lzlib
   QMAKE_CXXFLAGS += "/FI compat.h"
+  DEFINES += HAVE_STRUCT_TIMESPEC
 }
 
 
@@ -886,6 +903,8 @@ LIBS += -L../../external/FFmpeg/libavutil
 LIBS += -L../../external/FFmpeg/libavcodec
 LIBS += -L../../external/FFmpeg/libavformat
 LIBS += -L../../external/FFmpeg/libswscale
+LIBS += -L../../external/FFmpeg/libpostproc
+LIBS += -L../../external/FFmpeg/libavfilter
 LIBS += -L../libmythui -L../libmythupnp
 LIBS += -L../libmythbase
 LIBS += -L../libmythservicecontracts
@@ -894,6 +913,8 @@ LIBS += -lmythswscale
 LIBS += -lmythavformat
 LIBS += -lmythavcodec
 LIBS += -lmythavutil
+LIBS += -lmythpostproc
+LIBS += -lmythavfilter
 LIBS += -lmythui-$$LIBVERSION       -lmythupnp-$$LIBVERSION
 LIBS += -lmythbase-$$LIBVERSION
 LIBS += -lmythservicecontracts-$$LIBVERSION
@@ -911,6 +932,8 @@ LIBS += $$EXTRA_LIBS $$QMAKE_LIBS_DYNLOAD
     POST_TARGETDEPS += ../../external/FFmpeg/libavcodec/$$avLibName(avcodec)
     POST_TARGETDEPS += ../../external/FFmpeg/libavformat/$$avLibName(avformat)
     POST_TARGETDEPS += ../../external/FFmpeg/libswscale/$$avLibName(swscale)
+    POST_TARGETDEPS += ../../external/FFmpeg/libpostproc/$$avLibName(postproc)
+    POST_TARGETDEPS += ../../external/FFmpeg/libavfilter/$$avLibName(avfilter)
 
     using_mheg: POST_TARGETDEPS += ../libmythfreemheg/libmythfreemheg-$${MYTH_SHLIB_EXT}
     using_live: POST_TARGETDEPS += ../libmythlivemedia/libmythlivemedia-$${MYTH_SHLIB_EXT}

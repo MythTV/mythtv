@@ -16,7 +16,7 @@ Param(
     $Force    = $false,
 
     [Parameter( Mandatory=$false, ValueFromPipeline=$true )]
-    [ValidateSet( "10", "11", "12")]
+    [ValidateSet( "10", "11", "12", "13", "14")]
     [String]
     $VcVerIn
 
@@ -150,7 +150,8 @@ if ($VcVerIn)
 {
     $VsComnTools= (get-item env:$("VS" + $VcVerIn + "0COMNTOOLS")).value
 
-    Invoke-Environment "`"$VsComnTools\vsvars32.bat`""
+    Invoke-Environment "`"$VsComnTools..\..\VC\vcvarsall.bat`" amd64"
+    #Invoke-Environment "`"$VsComnTools\vsvars32.bat`""
 }
 
 $BuildType  = $BuildType.tolower();
@@ -365,6 +366,8 @@ switch ($tools.Get_Item( "mp3lame.lib"))
                     "nmake.exe"                          `
                     @( "-f Makefile.MSVC",
                        "comp=msvc",
+                       "MSVCVER=Win64",
+                       "MACHINE=/MACHINE:X64",
                        "asm=no",
                        "libmp3lame-static.lib" )
         }
@@ -411,7 +414,7 @@ switch ($tools.Get_Item( $pThreadName ))
                 $pThreadTarget = "VC-inlined"
             }
 
-            Run-Exe "$basePath\..\platform\win32\msvc\external\pthreads.2\" "nmake.exe" @( "clean", $pThreadTarget )
+            Run-Exe "$basePath\..\platform\win32\msvc\external\pthreads.2\" "nmake.exe" @( "clean", $pThreadTarget, "CPPFLAGS=`"/I. /DHAVE_STRUCT_TIMESPEC`"" )
         }
 
         # -- Copy lib to shared folder
@@ -536,15 +539,15 @@ switch ($tools.Get_Item( 'libexpat.lib'))
         Remove-Item $basePath\bin\debug\libexpat.*                                     -ErrorAction SilentlyContinue
         Remove-Item $basePath\bin\release\libexpat.*                                   -ErrorAction SilentlyContinue
 
-        Remove-Item $basePath\..\platform\win32\msvc\external\expat\win32\bin\debug\*.*   -ErrorAction SilentlyContinue
-        Remove-Item $basePath\..\platform\win32\msvc\external\expat\win32\bin\release\*.* -ErrorAction SilentlyContinue
+        Remove-Item $basePath\..\platform\win32\msvc\external\expat\x64\debug\*.*   -ErrorAction SilentlyContinue
+        Remove-Item $basePath\..\platform\win32\msvc\external\expat\x64\release\*.* -ErrorAction SilentlyContinue
     }
 
     Build
     {
         Write-Host "Building: expat" -foregroundcolor cyan
 
-        if (!(Test-Path $basePath\..\platform\win32\msvc\external\expat\win32\bin\$BuildType\*.lib ))
+        if (!(Test-Path $basePath\..\platform\win32\msvc\external\expat\x64\$BuildType\*.lib ))
         {
             if (!(Test-Path $basePath\..\platform\win32\msvc\external\expat\lib\expat.vcxproj ))
             {
@@ -570,8 +573,8 @@ switch ($tools.Get_Item( 'libexpat.lib'))
 
         # -- Copy dll & lib to shared folder
 
-        Copy-Item $basePath\..\platform\win32\msvc\external\expat\win32\bin\$BuildType\*.lib $DestDir
-        Copy-Item $basePath\..\platform\win32\msvc\external\expat\win32\bin\$BuildType\*.dll $DestDir
+        Copy-Item $basePath\..\platform\win32\msvc\external\expat\x64\$BuildType\*.lib $DestDir
+        Copy-Item $basePath\..\platform\win32\msvc\external\expat\x64\$BuildType\*.dll $DestDir
     }
 }
 
@@ -582,6 +585,11 @@ $exiv2_params = @( "/target:build", "/p:Configuration=$BuildType" )
 if ($VCVerStr -eq "Visual Studio 12")
 {
    $exiv2_params = $exiv2_params + "/p:PlatformToolset=v120"
+}
+
+if ($VCVerStr -eq "Visual Studio 14")
+{
+   $exiv2_params = $exiv2_params + "/p:PlatformToolset=v140"
 }
 
 # ---------------------------------------------------------------------------
@@ -611,7 +619,7 @@ switch ($tools.Get_Item( 'xmpsdk.lib'))
     {
         Write-Host "Building: xmpsdk" -foregroundcolor cyan
 
-        if (!(Test-Path $basePath\..\platform\win32\msvc\external\exiv2\win32\$BuildType\xmpsdk.lib ))
+        if (!(Test-Path $basePath\..\platform\win32\msvc\external\exiv2\x64\$BuildType\xmpsdk.lib ))
         {
             # -- Build Solution
 
@@ -624,7 +632,7 @@ switch ($tools.Get_Item( 'xmpsdk.lib'))
 
         # -- Copy lib to shared folder
 
-        Copy-Item $basePath\..\platform\win32\msvc\external\exiv2\win32\$BuildType\xmpsdk.lib $DestDir
+        Copy-Item $basePath\..\platform\win32\msvc\external\exiv2\x64\$BuildType\xmpsdk.lib $DestDir
     }
 }
 
@@ -668,8 +676,8 @@ switch ($tools.Get_Item( 'exiv2.lib'))
 
         # -- Copy lib & dll to shared folder
 
-        Copy-Item $basePath\..\platform\win32\msvc\external\exiv2\win32\$BuildType\exiv2.lib $DestDir
-        Copy-Item $basePath\..\platform\win32\msvc\external\exiv2\win32\$BuildType\exiv2.dll $DestDir
+        Copy-Item $basePath\..\platform\win32\msvc\external\exiv2\x64\$BuildType\exiv2.lib $DestDir
+        Copy-Item $basePath\..\platform\win32\msvc\external\exiv2\x64\$BuildType\exiv2.dll $DestDir
     }
 }
 
@@ -705,7 +713,7 @@ switch ($tools.Get_Item( 'libzmq.lib'))
     {
         Write-Host "Building: zeromq" -foregroundcolor cyan
 
-        if (!(Test-Path $basePath\external\zeromq\builds\msvc\$BuildType\*.lib ))
+        if (!(Test-Path $basePath\external\zeromq\builds\msvc\x64\$BuildType\*.lib ))
         {
             if (!(Test-Path $basePath\external\zeromq\builds\msvc\libzmq\libzmq.vcxproj ))
             {
@@ -730,8 +738,8 @@ switch ($tools.Get_Item( 'libzmq.lib'))
         }
 
         # -- Copy dll & lib to shared folder
-        Copy-Item $basePath\external\zeromq\builds\msvc\libzmq\$BuildType\*.lib $DestDir
-        Copy-Item $basePath\external\zeromq\lib\*.dll                    $DestDir
+        Copy-Item $basePath\external\zeromq\builds\msvc\libzmq\x64\$BuildType\*.lib $DestDir
+        Copy-Item $basePath\external\zeromq\lib\*.dll                               $DestDir
 
     }
 }
@@ -810,11 +818,12 @@ switch ($tools.Get_Item( 'FFmpeg'))
                                        "--bindir=$OutPath "       + `
                                        "--libdir=$OutPath "       + `
                                        "--shlibdir=$OutPath "     + `
-                                       "--extra-cflags='$ffmpegExtra' "      + `
-                                       "--extra-cxxflags='$ffmpegExtra' "    + `
+                                       "--extra-cflags='$ffmpegExtra' "   + `
+                                       "--extra-cxxflags='$ffmpegExtra' " + `
                                        "--host-cflags='$ffmpegExtra' "    + `
-                                       "--host-cppflags='$ffmpegExtra' "    + `
-                                       "--disable-decoder=mpeg_xvmc"
+                                       "--host-cppflags='$ffmpegExtra' "  + `
+                                       "--disable-decoder=mpeg_xvmc "     + `
+                                       "--enable-gpl"
 
         Out-File $scriptFile         -Encoding Ascii -InputObject "cd $rootPath/external/FFmpeg"
         Out-File $scriptFile -Append -Encoding Ascii -InputObject "pwd"

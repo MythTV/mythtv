@@ -567,9 +567,8 @@ OMX_ERRORTYPE PrivateDecoderOMX::FreeOutputBuffersCB()
         m_lock.unlock();
 
         VideoFrame *frame = HDR2FRAME(hdr);
-        if (frame)
+        if (frame && FRAME2HDR(frame) == hdr)
         {
-            assert(FRAME2HDR(frame) == hdr);
             FRAMESETHDR(frame, 0);
 
             AVBufferRef *ref = FRAME2REF(frame);
@@ -665,7 +664,6 @@ OMX_ERRORTYPE PrivateDecoderOMX::UseBuffersCB()
 
         VideoFrame *frame = (VideoFrame*)picture->opaque;
         assert(frame);
-        assert(unsigned(frame->size) >= def.nBufferSize);
 
         OMX_BUFFERHEADERTYPE *hdr;
         e = OMX_UseBuffer(m_videc.Handle(), &hdr, m_videc.Base() + index, frame,
@@ -714,29 +712,27 @@ bool PrivateDecoderOMX::Reset(void)
 
     m_bStartTime = false;
 
-    if (m_bSettingsHaveChanged)
+    // Flush input
+    OMX_ERRORTYPE e;
+    e = m_videc.SendCommand(OMX_CommandFlush, m_videc.Base(), 0, 50);
+    if (e != OMX_ErrorNone)
+        return false;
+
+    // Flush output
+    e = m_videc.SendCommand(OMX_CommandFlush, m_videc.Base() + 1, 0, 50);
+    if (e != OMX_ErrorNone)
+        return false;
+
+    if (m_avctx && m_avctx->get_buffer2)
     {
-        // Flush input
-        OMX_ERRORTYPE e;
-        e = m_videc.SendCommand(OMX_CommandFlush, m_videc.Base(), 0, 50);
-        if (e != OMX_ErrorNone)
-            return false;
-
-        // Flush output
-        e = m_videc.SendCommand(OMX_CommandFlush, m_videc.Base() + 1, 0, 50);
-        if (e != OMX_ErrorNone)
-            return false;
-
-        if (m_avctx && m_avctx->get_buffer2)
-        {
-            // Request new buffers when GetFrame is next called
-            m_bSettingsChanged = true;
-        }
-        else
-        {
-            // Re-submit the empty output buffers
-            FillOutputBuffers();
-        }
+        // Request new buffers when GetFrame is next called
+        QMutexLocker lock(&m_lock);
+        m_bSettingsChanged = true;
+    }
+    else
+    {
+        // Re-submit the empty output buffers
+        FillOutputBuffers();
     }
 
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + __func__ + " - end");
@@ -765,10 +761,26 @@ int PrivateDecoderOMX::GetFrame(
 
     // Check for OMX_EventPortSettingsChanged notification
     if (SettingsChanged(stream->codec) != OMX_ErrorNone)
+    {
+        // PGB If there was an error, discard this packet
+        *got_picture_ptr = 0;
         return -1;
+    }
 
-    // Submit a packet for decoding
-    return (pkt && pkt->size) ? ProcessPacket(stream, pkt) : 0;
+    // PGB If settings have changed, discard this one packet
+    QMutexLocker lock(&m_lock);
+    if (m_bSettingsHaveChanged)
+    {
+        m_bSettingsHaveChanged = false;
+        *got_picture_ptr = 0;
+        return -1;
+    }
+    else 
+    {
+        // Submit a packet for decoding
+        lock.unlock();
+        return (pkt && pkt->size) ? ProcessPacket(stream, pkt) : 0;
+    }
 }
 
 // Submit a packet for decoding
@@ -805,9 +817,9 @@ int PrivateDecoderOMX::ProcessPacket(AVStream *stream, AVPacket *pkt)
 
     while (size > 0)
     {
-        if (!m_ibufs_sema.tryAcquire(1, 5))
+        if (!m_ibufs_sema.tryAcquire(1, 10000))
         {
-            LOG(VB_PLAYBACK, LOG_DEBUG, LOC + __func__ + " - no input buffers");
+            LOG(VB_GENERAL, LOG_ERR, LOC + __func__ + " - no input buffers");
             ret = 0;
             break;
         }
@@ -899,8 +911,8 @@ int PrivateDecoderOMX::GetBufferedFrame(AVStream *stream, AVFrame *picture)
     {
         VideoFrame vf;
         VideoFrameType frametype = FMT_YV12;
-        PixelFormat out_fmt = PIX_FMT_YUV420P; // == FMT_YV12
-        PixelFormat in_fmt  = AV_PIX_FMT_NONE;
+        AVPixelFormat out_fmt = AV_PIX_FMT_YUV420P; // == FMT_YV12
+        AVPixelFormat in_fmt  = AV_PIX_FMT_NONE;
         int pitches[3]; // Y, U, & V pitches
         int offsets[3]; // Y, U, & V offsets
         unsigned char *buf = 0;
@@ -936,11 +948,9 @@ int PrivateDecoderOMX::GetBufferedFrame(AVStream *stream, AVFrame *picture)
         picture->reordered_opaque = Ticks2Pts(stream, hdr->nTimeStamp);
 
         VideoFrame *frame = HDR2FRAME(hdr);
-        if (frame)
-        {
-            assert(FRAME2HDR(frame) == hdr);
-            assert(FRAME2REF(frame));
 
+        if (frame && FRAME2HDR(frame) == hdr)
+        {
             frame->bpp    = bitsperpixel(frametype);
             frame->codec  = frametype;
             frame->width  = vdef.nFrameWidth;

@@ -107,7 +107,20 @@ HDHRStreamHandler::HDHRStreamHandler(const QString &device) :
  */
 void HDHRStreamHandler::run(void)
 {
+    int tunerLock = 0;
+    char *error = NULL;
+
     RunProlog();
+    /* Get a tuner lock */
+    tunerLock = hdhomerun_device_tuner_lockkey_request(_hdhomerun_device, &error);
+    if(tunerLock < 1)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Get tuner lock failed. Aborting. Error: %1").arg(error));
+        _error = true;
+        RunEpilog();
+        return;
+    }
     /* Create TS socket. */
     if (!hdhomerun_device_stream_start(_hdhomerun_device))
     {
@@ -137,7 +150,7 @@ void HDHRStreamHandler::run(void)
             last_update.restart();
         }
 
-        size_t read_size = 64 * 1024; // read about 64KB
+        size_t read_size = VIDEO_DATA_BUFFER_SIZE_1S / 8; // read up to 1/8s
         read_size /= VIDEO_DATA_PACKET_SIZE;
         read_size *= VIDEO_DATA_PACKET_SIZE;
 
@@ -180,7 +193,36 @@ void HDHRStreamHandler::run(void)
     RemoveAllPIDFilters();
 
     hdhomerun_device_stream_stop(_hdhomerun_device);
+
+    if (VERBOSE_LEVEL_CHECK(VB_RECORD, LOG_INFO))
+    {
+        struct hdhomerun_video_sock_t* vs;
+        struct hdhomerun_video_stats_t stats;
+        vs = hdhomerun_device_get_video_sock(_hdhomerun_device);
+        if (vs)
+        {
+            hdhomerun_video_get_stats(vs, &stats);
+            LOG(VB_RECORD, LOG_INFO, LOC + 
+                QString("stream stats: packet_count=%1 "
+                        "network_errors=%2 "
+                        "transport_errors=%3 "
+                        "sequence_errors=%4 "
+                        "overflow_errors=%5")
+                        .arg(stats.packet_count)
+                        .arg(stats.network_error_count)
+                        .arg(stats.transport_error_count)
+                        .arg(stats.sequence_error_count)
+                        .arg(stats.overflow_error_count));
+        }
+    }
+
     LOG(VB_RECORD, LOG_INFO, LOC + "RunTS(): " + "end");
+
+    if(tunerLock == 1)
+    {
+        LOG(VB_RECORD, LOG_INFO, LOC + "Release tuner lock.");
+        hdhomerun_device_tuner_lockkey_release(_hdhomerun_device);
+    }
 
     SetRunning(false, false, false);
     RunEpilog();

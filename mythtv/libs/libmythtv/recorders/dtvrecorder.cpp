@@ -340,8 +340,15 @@ void DTVRecorder::BufferedWrite(const TSPacket &tspacket, bool insert)
         }
     }
 
-    if (ringBuffer)
-        ringBuffer->Write(tspacket.data(), TSPacket::kSize);
+    if (ringBuffer && ringBuffer->Write(tspacket.data(), TSPacket::kSize) < 0 &&
+        curRecording && curRecording->GetRecordingStatus() != RecStatus::Failing)
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("BufferedWrite: Writes are failing, "
+                    "setting status to %1")
+            .arg(RecStatus::toString(RecStatus::Failing, kSingleRecord)));
+        SetRecordingStatus(RecStatus::Failing, __FILE__, __LINE__);
+    }
 }
 
 enum { kExtractPTS, kExtractDTS };

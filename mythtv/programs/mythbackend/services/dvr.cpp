@@ -257,8 +257,83 @@ bool Dvr::UpdateRecordedWatchedStatus ( int RecordedId,
     else
         pi = ProgramInfo(chanid, recstarttsRaw.toUTC());
 
-    pi.SaveWatched(watched);
+    if (pi.GetChanID() && pi.HasPathname())
+    {
+        pi.SaveWatched(watched);
+        return true;
+    }
 
+    return false;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+long Dvr::GetSavedBookmark( int RecordedId,
+                            int chanid,
+                            const QDateTime &recstarttsRaw,
+                            const QString &offsettype )
+{
+    if ((RecordedId <= 0) &&
+        (chanid <= 0 || !recstarttsRaw.isValid()))
+        throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
+
+    RecordingInfo ri;
+    if (RecordedId > 0)
+        ri = RecordingInfo(RecordedId);
+    else
+        ri = RecordingInfo(chanid, recstarttsRaw.toUTC());
+    uint64_t offset;
+    bool isend=true;
+    uint64_t position = ri.QueryBookmark();
+    if (offsettype.toLower() == "position"){
+    	ri.QueryKeyFramePosition(&offset, position, isend);
+    	return offset;
+    } 
+    else if (offsettype.toLower() == "duration"){
+        ri.QueryKeyFrameDuration(&offset, position, isend);
+        return offset;
+    }
+    else
+        return position;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool Dvr::SetSavedBookmark( int RecordedId,
+                            int chanid,
+                            const QDateTime &recstarttsRaw,
+                            const QString &offsettype,
+                            long Offset )
+{
+    if ((RecordedId <= 0) &&
+        (chanid <= 0 || !recstarttsRaw.isValid()))
+        throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
+
+    if (Offset < 0)
+        throw QString("Offset must be >= 0.");
+
+    RecordingInfo ri;
+    if (RecordedId > 0)
+        ri = RecordingInfo(RecordedId);
+    else
+        ri = RecordingInfo(chanid, recstarttsRaw.toUTC());
+    uint64_t position;
+    bool isend=true;
+    if (offsettype.toLower() == "position"){
+    	if (!ri.QueryPositionKeyFrame(&position, Offset, isend))
+    		return false;
+    } 
+    else if (offsettype.toLower() == "duration"){
+        if (!ri.QueryDurationKeyFrame(&position, Offset, isend))
+        	return false;
+    }
+    else
+        position = Offset;
+    ri.SaveBookmark(position);
     return true;
 }
 
@@ -581,8 +656,10 @@ DTC::TitleInfoList* Dvr::GetTitleInfoList()
 
     QString querystr = QString(
         "SELECT title, inetref, count(title) as count "
-        "    FROM recorded "
-        "    WHERE deletepending = 0 "
+        "    FROM recorded AS r "
+        "    JOIN recgroups AS g ON r.recgroupid = g.recgroupid "
+        "    WHERE g.recgroup != 'LiveTV' "
+        "    AND r.deletepending = 0 "
         "    GROUP BY title, inetref "
         "    ORDER BY title");
 

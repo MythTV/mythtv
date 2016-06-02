@@ -631,7 +631,15 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     return 0;
 }
 
-int get_nuppel_buffer(struct AVCodecContext *c, AVFrame *pic)
+void release_nuppel_buffer(void *opaque, uint8_t *data)
+{
+    VideoFrame *frame = (VideoFrame*)data;
+    NuppelDecoder *nd = (NuppelDecoder*)opaque;
+    if (nd && nd->GetPlayer())
+        nd->GetPlayer()->DeLimboFrame(frame);
+}
+
+int get_nuppel_buffer(struct AVCodecContext *c, AVFrame *pic, int flags)
 {
     NuppelDecoder *nd = (NuppelDecoder *)(c->opaque);
 
@@ -644,23 +652,13 @@ int get_nuppel_buffer(struct AVCodecContext *c, AVFrame *pic)
     }
 
     pic->opaque = nd->directframe;
-    pic->type = FF_BUFFER_TYPE_USER;
 
-    return 1;
-}
+    // Set release method
+    AVBufferRef *buffer =
+        av_buffer_create((uint8_t*)nd->directframe, 0, release_nuppel_buffer, nd, 0);
+    pic->buf[0] = buffer;
 
-void release_nuppel_buffer(struct AVCodecContext *c, AVFrame *pic)
-{
-    (void)c;
-    assert(pic->type == FF_BUFFER_TYPE_USER);
-
-    NuppelDecoder *nd = (NuppelDecoder *)(c->opaque);
-    if (nd && nd->GetPlayer())
-        nd->GetPlayer()->DeLimboFrame((VideoFrame*)pic->opaque);
-
-    int i;
-    for (i = 0; i < 4; i++)
-        pic->data[i] = NULL;
+    return 0;
 }
 
 bool NuppelDecoder::InitAVCodecVideo(int codec)
@@ -720,8 +718,7 @@ bool NuppelDecoder::InitAVCodecVideo(int codec)
     {
         mpa_vidctx->flags |= CODEC_FLAG_EMU_EDGE;
         mpa_vidctx->draw_horiz_band = NULL;
-        mpa_vidctx->get_buffer = get_nuppel_buffer;
-        mpa_vidctx->release_buffer = release_nuppel_buffer;
+        mpa_vidctx->get_buffer2 = get_nuppel_buffer;
         mpa_vidctx->opaque = (void *)this;
     }
     if (ffmpeg_extradatasize > 0)

@@ -31,7 +31,7 @@ typedef struct
 class FileScannerThread: public MThread
 {
     public:
-        FileScannerThread(ImportMusicDialog *parent);
+        explicit FileScannerThread(ImportMusicDialog *parent);
         virtual void run();
 
     private:
@@ -58,7 +58,7 @@ class ImportMusicDialog : public MythScreenType
     Q_OBJECT
 
   public:
-    ImportMusicDialog(MythScreenStack *parent);
+    explicit ImportMusicDialog(MythScreenStack *parent);
     ~ImportMusicDialog();
 
     bool Create(void);

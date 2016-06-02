@@ -21,7 +21,7 @@ class ThreadedFileWriter;
 class TFWWriteThread : public MThread
 {
   public:
-    TFWWriteThread(ThreadedFileWriter *p) : MThread("TFWWrite"), m_parent(p) {}
+    explicit TFWWriteThread(ThreadedFileWriter *p) : MThread("TFWWrite"), m_parent(p) {}
     virtual ~TFWWriteThread() { wait(); m_parent = NULL; }
     virtual void run(void);
   private:
@@ -31,7 +31,7 @@ class TFWWriteThread : public MThread
 class TFWSyncThread : public MThread
 {
   public:
-    TFWSyncThread(ThreadedFileWriter *p) : MThread("TFWSync"), m_parent(p) {}
+    explicit TFWSyncThread(ThreadedFileWriter *p) : MThread("TFWSync"), m_parent(p) {}
     virtual ~TFWSyncThread() { wait(); m_parent = NULL; }
     virtual void run(void);
   private:
@@ -50,13 +50,14 @@ class MBASE_PUBLIC ThreadedFileWriter
     bool ReOpen(QString newFilename = "");
 
     long long Seek(long long pos, int whence);
-    uint Write(const void *data, uint count);
+    int Write(const void *data, uint count);
 
     void SetWriteBufferMinWriteSize(uint newMinSize = kMinWriteSize);
 
     void Sync(void);
     void Flush(void);
     bool SetBlocking(bool block = true);
+    bool WritesFailing(void) const { return ignore_writes; }
 
   protected:
     void DiskLoop(void);

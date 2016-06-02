@@ -85,6 +85,7 @@ QStringList GalleryUtil::GetMovieFilter(void)
     filt.push_back("*.3gp");
     filt.push_back("*.wmv");
     filt.push_back("*.flv");
+    filt.push_back("*.mkv");
     return filt;
 }
 

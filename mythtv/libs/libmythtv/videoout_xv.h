@@ -144,7 +144,7 @@ class VideoOutputXv : public VideoOutput
     long long            non_xv_frames_shown;
     int                  non_xv_show_frame;
     int                  non_xv_fps;
-    PixelFormat          non_xv_av_format;
+    AVPixelFormat        non_xv_av_format;
     time_t               non_xv_stop_time;
 
     // Basic Xv drawing info

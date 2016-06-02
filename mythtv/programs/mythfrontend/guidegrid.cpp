@@ -1693,7 +1693,7 @@ void GuideUpdateProgramRow::fillProgramRowInfosWith(int row, int chanNum,
             else
             {
                 proginfo = new ProgramInfo(kUnknownTitle,
-                                           GuideGrid::tr("Unknown"),
+                                           GuideGrid::tr("Unknown", "Unknown program title"),
                                            ts, ts.addSecs(5*60));
                 unknownlist.push_back(proginfo);
                 proginfo->startCol = x;

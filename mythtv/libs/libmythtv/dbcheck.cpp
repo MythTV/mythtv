@@ -3274,6 +3274,38 @@ NULL
             return false;
     }
 
+    if (dbver == "1343")
+    {
+        const char *updates[] = {
+            "DROP TABLE IF EXISTS bdbookmark;",
+            "CREATE TABLE bdbookmark ("
+            "  serialid varchar(40) NOT NULL DEFAULT '',"
+            "  `name` varchar(128) DEFAULT NULL,"
+            "  bdstate varchar(4096) NOT NULL DEFAULT '',"
+            "  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,"
+            "  PRIMARY KEY (serialid)"
+            ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
+
+            // #12612 strip \0 characters from channel/channelscan_channel callsign and name
+            "UPDATE channel SET callsign=REPLACE(callsign,'\\0',''),"
+            "name=REPLACE(name,'\\0','');",
+
+            // "BackendWSPort" was removed in caaaeef8166722888012f4ecaf3e9b0f09df512a
+            "DELETE FROM settings WHERE value='BackendWSPort';",
+            NULL
+        };
+
+        if (!performActualUpdate(&updates[0], "1344", dbver))
+            return false;
+    }
+
+    /*
+     * TODO the following settings are no more, clean them up with the next schema change
+     * to avoid confusion by stale settings in the database
+     *
+     * WatchTVGuide
+     */
+
     return true;
 }
 

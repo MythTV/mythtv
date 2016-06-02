@@ -2,6 +2,7 @@
 
 #include <QDir>
 #include <QCoreApplication>
+#include <QCryptographicHash>
 
 #include "util/log_control.h"
 #include "libbluray/bdnav/mpls_parse.h"
@@ -49,15 +50,168 @@ static void bd_logger(const char* msg)
 
 static int _img_read(void *handle, void *buf, int lba, int num_blocks)
 {
-    mythfile_seek(*((int*)handle), lba * 2048, SEEK_SET);
-    return(mythfile_read(*((int*)handle), buf, num_blocks * 2048) / 2048);
+    int result = -1;
+
+    if (mythfile_seek(*((int*)handle), lba * 2048, SEEK_SET) != -1)
+        result = mythfile_read(*((int*)handle), buf, num_blocks * 2048) / 2048;
+
+    return result;
+}
+
+BDInfo::BDInfo(const QString &filename)
+{
+    BLURAY* bdnav = NULL;
+
+    LOG(VB_PLAYBACK, LOG_INFO, QString("BDInfo: Trying %1").arg(filename));
+    QString name = filename;
+
+    if (name.startsWith("bd://"))
+        name.remove(0,4);
+    else if (name.startsWith("bd:/"))
+        name.remove(0,3);
+    else if (name.startsWith("bd:"))
+        name.remove(0,3);
+
+    // clean path filename
+    name = QDir(QDir::cleanPath(name)).canonicalPath();
+    if (name.isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("BDInfo:%1 nonexistent").arg(name));
+        name = filename;
+    }
+
+    LOG(VB_GENERAL, LOG_INFO, QString("BDInfo: Opened BDRingBuffer device at %1")
+            .arg(name));
+
+    // Make sure log messages from the Bluray library appear in our logs
+    bd_set_debug_handler(bd_logger);
+    bd_set_debug_mask(DBG_CRIT | DBG_NAV | DBG_BLURAY);
+
+    // Use our own wrappers for file and directory access
+    redirectBDIO();
+
+    QString keyfile = QString("%1/KEYDB.cfg").arg(GetConfDir());
+    QByteArray keyarray = keyfile.toLatin1();
+    const char *keyfilepath = keyarray.data();
+    int imgHandle = -1;
+
+    if (filename.startsWith("myth:") && MythCDROM::inspectImage(filename) != MythCDROM::kUnknown)
+    {
+        // Use streaming for remote images.
+        // Streaming encrypted images causes a SIGSEGV in aacs code when
+        // using the makemkv libraries due to the missing "device" name.
+        // Since a local device (which is likely to be encrypted) can be
+        // opened directly, only use streaming for remote images, which
+        // presumably won't be encrypted.
+        imgHandle = mythfile_open(filename.toLocal8Bit().data(), O_RDONLY);
+
+        if (imgHandle >= 0)
+        {
+            bdnav = bd_init();
+
+            if (bdnav)
+                bd_open_stream(bdnav, &imgHandle, _img_read);
+        }
+    }
+    else
+        bdnav = bd_open(name.toLocal8Bit().data(), keyfilepath);
+
+    if (!bdnav)
+    {
+        m_lastError = tr("Could not open Blu-ray device: %1").arg(name);
+        LOG(VB_GENERAL, LOG_ERR, QString("BDInfo: ") + m_lastError);
+    }
+    else
+    {
+        GetNameAndSerialNum(bdnav, m_name, m_serialnumber, name, QString("BDInfo: "));
+        bd_close(bdnav);
+    }
+
+    if (imgHandle >= 0)
+        mythfile_close(imgHandle);
+
+    LOG(VB_PLAYBACK, LOG_INFO, QString("BDInfo: Done"));
+}
+
+BDInfo::~BDInfo(void)
+{
+}
+
+void BDInfo::GetNameAndSerialNum(BLURAY* bdnav,
+                                 QString &name,
+                                 QString &serialnum,
+                                 const QString &filename,
+                                 const QString &logPrefix)
+{
+    const meta_dl *metaDiscLibrary = bd_get_meta(bdnav);
+
+    if (metaDiscLibrary)
+        name = QString(metaDiscLibrary->di_name);
+    else
+    {
+        // Use the directory name for the Bluray name
+        QDir dir(filename);
+        name = dir.dirName();
+        LOG(VB_PLAYBACK, LOG_DEBUG, QString("%1Generated bd name - %2")
+            .arg(logPrefix)
+            .arg(name));
+    }
+
+    void*   pBuf = 0;
+    int64_t bufsize = 0;
+
+    serialnum.clear();
+
+    // Try to find the first clip info file and
+    // use its SHA1 hash as a serial number.
+    for (uint32_t idx = 0; idx < 100; idx++)
+    {
+        QString clip = QString("BDMV/CLIPINF/%1.clpi").arg(idx, 5, 10, QChar('0'));
+
+        if (bd_read_file(bdnav, clip.toLocal8Bit().data(), &pBuf, &bufsize) != 0)
+        {
+            QCryptographicHash crypto(QCryptographicHash::Sha1);
+
+            // Add the clip number to the hash
+            crypto.addData((const char*)&idx, sizeof(idx));
+            // then the length of the file
+            crypto.addData((const char*)&bufsize, sizeof(bufsize));
+            // and then the contents
+            crypto.addData((const char*)pBuf, bufsize);
+
+            serialnum = QString("%1__gen").arg(QString(crypto.result().toBase64()));
+            free(pBuf);
+
+            LOG(VB_PLAYBACK, LOG_DEBUG,
+                QString("%1Generated serial number - %2")
+                        .arg(logPrefix)
+                        .arg(serialnum));
+
+            break;
+        }
+    }
+
+    if (serialnum.isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("%1Unable to generate serial number").arg(logPrefix));
+    }
+}
+
+bool BDInfo::GetNameAndSerialNum(QString &name, QString &serial)
+{
+    name   = QString(m_name);
+    serial = QString(m_serialnumber);
+    if (name.isEmpty() && serial.isEmpty())
+        return false;
+    return true;
 }
 
 BDRingBuffer::BDRingBuffer(const QString &lfilename)
   : RingBuffer(kRingBuffer_BD),
     bdnav(NULL), m_isHDMVNavigation(false), m_tryHDMVNavigation(false),
     m_topMenuSupported(false), m_firstPlaySupported(false),
-    m_numTitles(0), m_imgHandle(-1),
+    m_numTitles(0), m_currentTitleInfo(NULL), m_imgHandle(-1),
     m_titleChanged(false), m_playerWait(false),
     m_ignorePlayerWait(true),
     m_stillTime(0), m_stillMode(BLURAY_STILL_NONE),
@@ -335,7 +489,7 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
         // presumably won't be encrypted.
         m_imgHandle = mythfile_open(filename.toLocal8Bit().data(), O_RDONLY);
 
-        if (m_imgHandle > 0)
+        if (m_imgHandle >= 0)
         {
             bdnav = bd_init();
 
@@ -367,6 +521,8 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
                     .arg(metaDiscLibrary->di_set_number)
                     .arg(metaDiscLibrary->di_num_sets));
     }
+
+    BDInfo::GetNameAndSerialNum(bdnav, m_name, m_serialNumber, safefilename, LOC);
 
     // Check disc to see encryption status, menu and navigation types.
     m_topMenuSupported   = false;
@@ -1102,6 +1258,9 @@ void BDRingBuffer::HandleBDEvent(BD_EVENT &ev)
             m_secondaryVideoIsFullscreen = ev.param;
             break;
 
+        case BD_EVENT_IDLE:
+            break;
+
         default:
             LOG(VB_PLAYBACK, LOG_ERR, LOC + QString("Unknown Event! %1 %2")
                                 .arg(ev.event).arg(ev.param));
@@ -1146,18 +1305,85 @@ bool BDRingBuffer::GetNameAndSerialNum(QString &name, QString &serial)
     if (!bdnav)
         return false;
 
-    const meta_dl *metaDiscLibrary = bd_get_meta(bdnav);
+    name   = m_name;
+    serial = m_serialNumber;
 
-    if (!metaDiscLibrary)
-        return false;
-
-    name   = QString(metaDiscLibrary->di_name);
-    serial = QString::number(metaDiscLibrary->di_set_number);
-
-    if (name.isEmpty() && serial.isEmpty())
-        return false;
-    return true;
+    return !serial.isEmpty();
 }
+
+/** \brief Get a snapshot of the current BD state
+ */
+bool BDRingBuffer::GetBDStateSnapshot(QString& state)
+{
+    int      title   = GetCurrentTitle();
+    uint64_t time    = m_currentTime;
+    uint64_t angle   = GetCurrentAngle();
+
+    if (title >= 0)
+    {
+        state = QString("title:%1,time:%2,angle:%3").arg(title)
+                .arg(time)
+                .arg(angle);
+    }
+    else
+    {
+        state.clear();
+    }
+
+    return(!state.isEmpty());
+}
+
+/** \brief Restore a BD snapshot
+ */
+bool BDRingBuffer::RestoreBDStateSnapshot(const QString& state)
+{
+    bool                     rc     = false;
+    QStringList              states = state.split(",", QString::SkipEmptyParts);
+    QHash<QString, uint64_t> settings;
+
+    foreach (const QString& entry, states)
+    {
+        QStringList keyvalue = entry.split(":", QString::SkipEmptyParts);
+
+        if (keyvalue.length() != 2)
+        {
+            LOG(VB_PLAYBACK, LOG_ERR, LOC +
+                QString("Invalid BD state: %1 (%2)")
+                        .arg(entry).arg(state));
+        }
+        else
+        {
+            settings[keyvalue[0]] = keyvalue[1].toULongLong();
+            //LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString( "%1 = %2" ).arg(keyvalue[0]).arg(keyvalue[1]));
+        }
+
+    }
+
+    uint32_t title;
+    uint64_t time;
+    uint64_t angle = 0;
+
+    if (settings.contains("title") &&
+        settings.contains("time") )
+    {
+        title = (uint32_t)settings["title"];
+        time  = (uint64_t)settings["time"];
+
+        if (settings.contains("angle"))
+            angle = (uint64_t)settings["angle"];
+
+        if(title != (uint32_t)m_currentTitle)
+            SwitchTitle(title);
+
+        SeekInternal(time, SEEK_SET);
+
+        SwitchAngle(angle);
+        rc = true;
+    }
+
+    return rc;
+}
+
 
 void BDRingBuffer::ClearOverlays(void)
 {

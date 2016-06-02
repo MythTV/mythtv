@@ -1084,14 +1084,14 @@ void ImportCoverArtDialog::copyPressed()
 
         // add the file to the database
         QString filename = m_saveFilename.section( '/', -1, -1);
-        AlbumArtImage *image = new AlbumArtImage;
-        image->description = "";
-        image->embedded = false;
-        image->filename = filename;
-        image->hostname = m_metadata->Hostname();
-        image->imageType = (ImageType)m_typeList->GetItemCurrent()->GetData().toInt();
+        AlbumArtImage image;
+        image.description = "";
+        image.embedded = false;
+        image.filename = filename;
+        image.hostname = m_metadata->Hostname();
+        image.imageType = (ImageType)m_typeList->GetItemCurrent()->GetData().toInt();
 
-        m_metadata->getAlbumArtImages()->addImage(image);
+        m_metadata->getAlbumArtImages()->addImage(&image);
         m_metadata->getAlbumArtImages()->dumpToDatabase();
 
         updateStatus();

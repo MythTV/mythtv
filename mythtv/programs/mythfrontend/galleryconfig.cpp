@@ -46,14 +46,19 @@ ThumbSettings::ThumbSettings() : VerticalConfigurationGroup()
 
     ADD_FORMAT(sampdate, "dd/MM/yy");
     ADD_FORMAT(sampdate, "dd-MM-yy");
+    ADD_FORMAT(sampdate, "dd.MM.yy");
     ADD_FORMAT(sampdate, "d/M/yy");
     ADD_FORMAT(sampdate, "d-M-yy");
+    ADD_FORMAT(sampdate, "d.M.yy");
     ADD_FORMAT(sampdate, "MM/dd/yy");
     ADD_FORMAT(sampdate, "MM-dd-yy");
+    ADD_FORMAT(sampdate, "MM.dd.yy");
     ADD_FORMAT(sampdate, "M/d/yy");
     ADD_FORMAT(sampdate, "M-d-yy");
+    ADD_FORMAT(sampdate, "M.d.yy");
     ADD_FORMAT(sampdate, "yyyy/MM/dd");
     ADD_FORMAT(sampdate, "yyyy-MM-dd");
+    ADD_FORMAT(sampdate, "yyyy.MM.dd");
     ADD_FORMAT(sampdate, QString("yyyy") % QChar(0x5E74) %
                "M" % QChar(0x6708) % "d" % QChar(0x65E5)); // yyyy年M月d日
 
@@ -92,6 +97,12 @@ SlideSettings::SlideSettings() : VerticalConfigurationGroup()
     transition->setLabel(tr("Transition Duration (ms)"));
     transition->setHelpText(tr("The time that each transition lasts, in milliseconds."));
     addChild(transition);
+
+    HostSpinBox *delay = new HostSpinBox("GalleryStatusDelay", 0, 10000, 50);
+    delay->setLabel(tr("Status Delay (ms)"));
+    delay->setHelpText(tr("The delay before showing the Loading/Playing status, "
+                          "in milliseconds."));
+    addChild(delay);
 
     HostCheckBox *browseTran = new HostCheckBox("GalleryBrowseTransition");
     browseTran->setLabel(tr("Use transitions when browsing"));

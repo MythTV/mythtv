@@ -38,250 +38,330 @@
         <translation>Ενεργοποιημένη</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="7"/>
+        <location filename="themestrings.h" line="9"/>
         <source>ZoneMinder Console</source>
         <oldsource>Zone Minder Console</oldsource>
         <translation>Διαχείριση Καμερών</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="8"/>
+        <location filename="themestrings.h" line="10"/>
         <source>Status</source>
         <translation>Κατάσταση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="11"/>
         <source>Load: 0.12</source>
         <translation>Φορτίο: 0.12</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
+        <location filename="themestrings.h" line="12"/>
         <source>Disk: 100%</source>
         <translation>Δίσκος: 100%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="13"/>
         <source>Camera</source>
         <translation>Κάμερα</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="14"/>
         <source>Function</source>
         <translation>Λειτουργία</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="15"/>
         <source>Source</source>
         <translation>Πηγή</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="16"/>
         <source>Events</source>
         <translation>Συμβάντα</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="18"/>
         <source>ZoneMinder Events</source>
         <translation>Συμβάντα ZoneMinder</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="28"/>
         <source>ZoneMinder Event Player</source>
         <translation>Αναπαραγωγή Συμβάντων ZoneMinder</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="36"/>
+        <location filename="themestrings.h" line="38"/>
         <source>ZoneMinder Live Player</source>
         <translation>Ζωντανή Λήψη ZoneMinder</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="61"/>
         <source>[R] = Running
 [S] = Stopped</source>
         <translation>[R] = Ενεργό
 [S] = Σταματημένο</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
+        <location filename="themestrings.h" line="62"/>
         <source>Select Camera:</source>
         <translation>Επιλογή Κάμερας:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="63"/>
         <source>Select Date:</source>
         <translation>Επιλογή Ημερομηνίας:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="64"/>
         <source>Test</source>
         <translation>Δοκιμή</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
+        <location filename="themestrings.h" line="65"/>
         <source>Record</source>
         <translation>Εγγραφή</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="66"/>
         <source>Cancel</source>
         <translation>Ακύρωση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="67"/>
         <source>Store</source>
         <translation>Αποθήκευση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="52"/>
+        <location filename="themestrings.h" line="68"/>
         <source>[x]</source>
         <translation>[x]</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="17"/>
         <source>[R] = Running [S] = Stopped</source>
         <translation>[R] = Ενεργό [S] = Σταματημένο</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="7"/>
+        <source>Show  Notifications</source>
+        <translation>Εμφάνιση Ειδοποιήσεων</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="8"/>
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="19"/>
         <source>Select Camera</source>
         <translation>Επιλογή Κάμερας</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="20"/>
         <source>Select Date</source>
         <translation>Επιλογή Ημερομηνίας</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="21"/>
         <source>0/0</source>
         <translation>0/0</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="22"/>
         <source>Event Name</source>
         <translation>Όνομα Συμβάντος</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="23"/>
         <source>Date/Time</source>
         <translation>Ημερομηνία/Ώρα</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="24"/>
         <source>Length</source>
         <translation>Μήκος</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="25"/>
         <source>Name</source>
         <translation>Όνομα</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="26"/>
         <source>Date</source>
         <translation>Ημερομηνία</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="27"/>
         <source>Duration</source>
         <translation>Διάρκεια</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="27"/>
+        <location filename="themestrings.h" line="29"/>
         <source>Event:</source>
         <translation>Συμβάν:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="28"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Event Name (1/123)</source>
         <translation>Όνομα Συμβάντος (1/123)</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="29"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Camera:</source>
         <translation>Κάμερα:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="30"/>
+        <location filename="themestrings.h" line="32"/>
         <source>Camera Name</source>
         <translation>Όνομα Κάμερας</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="33"/>
         <source>Frame:</source>
         <translation>Καρέ:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="34"/>
         <source>1/123</source>
         <translation>1/123</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="35"/>
         <source>Date:</source>
         <translation>Ημερομηνία:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="36"/>
         <source>Mon 01 Nov 2006 12:34</source>
         <translation>Mon 01 Nov 2006 12:34</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
+        <location filename="themestrings.h" line="37"/>
         <source>There are no events to show</source>
         <translation>Δευ υπάρχουν συμβάντα προς εμφάνιση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="37"/>
+        <location filename="themestrings.h" line="39"/>
         <source>Monitor 1</source>
         <translation>Οθόνη 1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="38"/>
+        <location filename="themestrings.h" line="40"/>
         <source>Monitor 2</source>
         <translation>Οθόνη 2</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="39"/>
+        <location filename="themestrings.h" line="41"/>
         <source>Monitor 3</source>
         <translation>Οθόνη 3</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="40"/>
+        <location filename="themestrings.h" line="42"/>
         <source>Monitor 4</source>
         <translation>Οθόνη 4</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="43"/>
+        <source>Monitor 5</source>
+        <translation>Οθόνη 5</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="44"/>
+        <source>Monitor 6</source>
+        <translation>Οθόνη 6</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="45"/>
+        <source>Monitor 7</source>
+        <translation>Οθόνη 7</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="46"/>
+        <source>Monitor 8</source>
+        <translation>Οθόνη 8</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="47"/>
+        <source>Change Function</source>
+        <translation>Αλλαγή Λειτουργίας</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="48"/>
+        <source>%DATE%, %TIME%</source>
+        <translation>%DATE%, %TIME%</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="49"/>
+        <source>Zoneminder Console</source>
+        <translation>Οθόνη Zoneminder</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="50"/>
+        <source>Configure Your zoneminder.</source>
+        <translation>Ρυθμίστε το zoneminder σας.</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="51"/>
         <source>Status:</source>
         <translation>Κατάσταση:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
+        <location filename="themestrings.h" line="52"/>
+        <source>Recorded Events</source>
+        <translation>Καταγραμμένα Συμβάντα</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="53"/>
+        <source>Learn what your cameras caughtup.</source>
+        <translation>Μάθετε τι έπιασαν οι κάμερές σας.</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="54"/>
+        <source>Event Playback</source>
+        <translation>Προβολή Συμβάντων</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="55"/>
+        <source>Watch recorded event</source>
+        <translation>Παρακολουθήστε καταγεγραμμένο συμβάν</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="56"/>
+        <source>Live Camera</source>
+        <translation>Ζωντανή Κάμερα</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="57"/>
+        <source>Camera Live Playback</source>
+        <translation>Ζωντανή Προβολή Κάμερας</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="58"/>
         <source>Name:</source>
         <translation>Όνομα:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="59"/>
         <source>Duration:</source>
         <translation>Διάρκεια:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="60"/>
         <source>ZoneMinder Live</source>
         <translation>Ζωντανή Λήψη</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="53"/>
+        <location filename="themestrings.h" line="69"/>
         <source>Show Console</source>
         <translation>Διαχείριση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="54"/>
+        <location filename="themestrings.h" line="70"/>
         <source>Show Live View</source>
         <translation>Ζωντανή Λήψη</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="55"/>
+        <location filename="themestrings.h" line="71"/>
         <source>Show Events</source>
         <translation>Συμβάντα</translation>
     </message>
@@ -330,50 +410,50 @@
         <translation>Διαγραφή</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="185"/>
-        <location filename="../mythzoneminder/zmevents.cpp" line="354"/>
-        <location filename="../mythzoneminder/zmevents.cpp" line="369"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="189"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="358"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="373"/>
         <source>All Cameras</source>
         <translation>Όλες οι Κάμερες</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="188"/>
-        <location filename="../mythzoneminder/zmevents.cpp" line="378"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="192"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="382"/>
         <source>All Dates</source>
         <translation>Όλες οι Ημερομηνίες</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="456"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="460"/>
         <source>Refresh</source>
         <translation>Ανανέωση</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="459"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="463"/>
         <source>Hide Continuous Events</source>
         <translation>Απόκρυψη Αδειάλειπτων Συμβάντων</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="461"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="465"/>
         <source>Show Continuous Events</source>
         <translation>Εμφάνιση Αδιάλειπτων Συμβάντων</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="463"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="467"/>
         <source>Change View</source>
         <translation>Αλλαγή Προβολής</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="464"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="468"/>
         <source>Delete All</source>
         <translation>Διαγραφή Όλων</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="482"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="486"/>
         <source>Delete All Events?</source>
         <translation>Να Διαγραφούν Όλα τα Συμβάντα;</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="483"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="487"/>
         <source>Deleting %1 events in this view.</source>
         <translation>Διαγράφω %1 συμβάντα.</translation>
     </message>

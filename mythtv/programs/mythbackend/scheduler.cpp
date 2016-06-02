@@ -4365,7 +4365,18 @@ void Scheduler::AddNewRecords(void)
         // Check for RecStatus::Offline
         if ((doRun || specsched) &&
             (!cardMap.contains(p->GetInputID()) || !p->schedorder))
+        {
             newrecstatus = RecStatus::Offline;
+            if (p->schedorder == 0)
+            {
+                LOG(VB_GENERAL, LOG_WARNING, LOC +
+                    QString("Channel %1, Title %2 %3 cardinput.schedorder = %4, "
+                            "it must be >0 to record from this input.")
+                    .arg(p->GetChannelName()).arg(p->GetTitle())
+                    .arg(p->GetScheduledStartTime().toString())
+                    .arg(p->schedorder));
+            }
+        }
 
         // Check for RecStatus::TooManyRecordings
         if (checkTooMany && tooManyMap[p->GetRecordingRuleID()] &&

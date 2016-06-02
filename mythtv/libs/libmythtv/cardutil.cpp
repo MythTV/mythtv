@@ -2157,7 +2157,7 @@ QString CardUtil::GetVBoxdesc(const QString &id, const QString &ip,
 
     if (!vbox->checkVersion(version))
     {
-        QString apiVersionErr = QObject::tr("The VBox software version is to old (%1), we require %2")
+        QString apiVersionErr = QObject::tr("The VBox software version is too old (%1), we require %2")
                                             .arg(version).arg(VBOX_MIN_API_VERSION);
         delete vbox;
         return apiVersionErr;

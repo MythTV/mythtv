@@ -1,8 +1,5 @@
 // -*- Mode: c++ -*-
 
-// Std C headers
-#include <time.h>
-
 // Std C++ headers
 #include <algorithm>
 using namespace std;
@@ -1059,7 +1056,7 @@ static void init_fixup(FixupMap &fix)
 {
     ///////////////////////////////////////////////////////////////////////////
     // Fixups to make EIT provided listings more useful
-    // transport_id<<32 | netword_id<<16 | service_id
+    // transport_id<<32 | original_network_id<<16 | service_id
 
     // Bell Express VU Canada
     fix[  256U << 16] = EITFixUp::kFixBell;
@@ -1086,6 +1083,7 @@ static void init_fixup(FixupMap &fix)
 
     for (int i = 2037; i <= 2057; ++i)
        fix[ (long long)i << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2059LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2061LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2063LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2064LL << 32 | 2U << 16] = EITFixUp::kFixUK;
@@ -1094,7 +1092,11 @@ static void init_fixup(FixupMap &fix)
     fix[ 2069LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2076LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2081LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2089LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2096LL << 32 | 2U << 16] = EITFixUp::kFixUK | EITFixUp::kFixHTML;
+    fix[ 2107LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2112LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2116LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2301LL << 32 | 2U << 16] = EITFixUp::kFixUK | EITFixUp::kFixHTML;
     fix[ 2302LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2303LL << 32 | 2U << 16] = EITFixUp::kFixUK;
@@ -1181,18 +1183,32 @@ static void init_fixup(FixupMap &fix)
     fix[                  8468 << 16 | 16426] = EITFixUp::kFixP7S1; // ProSieben MAXX - DVB-T Rhein/Main
     fix[   8707LL << 32 | 8468 << 16]         = EITFixUp::kFixP7S1; // ProSieben Sat.1 Mux - DVB-T Rhein/Main
 
+    // ATV / ATV2
+    fix[   1117LL << 32 |  1 << 16 | 13012 ] = EITFixUp::kFixATV; // ATV
+    fix[   1003LL << 32 |  1 << 16 | 13223 ] = EITFixUp::kFixATV; // ATV2
+    fix[   1003LL << 32 |  1 << 16 | 13228 ] = EITFixUp::kFixHDTV | EITFixUp::kFixATV; // ATV HD
+
+    // Disney Channel Germany
+    fix[   1055LL << 32 |  1 << 16 | 5500 ] = EITFixUp::kFixHDTV | EITFixUp::kFixDisneyChannel; // Disney Channel HD
+    fix[   1055LL << 32 |  1 << 16 | 5510 ] = EITFixUp::kFixHDTV | EITFixUp::kFixDisneyChannel; // Disney Channel HD Austria
+    fix[   5LL << 32 |  133 << 16 | 1793 ] = EITFixUp::kFixDisneyChannel; // Disney Channel HD Austria
+    fix[   1109LL << 32 |  1 << 16 | 5401 ] = EITFixUp::kFixHDTV | EITFixUp::kFixDisneyChannel; // Tele 5 HD
+    fix[   1109LL << 32 |  1 << 16 | 5421 ] = EITFixUp::kFixHDTV | EITFixUp::kFixDisneyChannel; // Tele 5 HD Austria
+    fix[   33LL << 32 |  133 << 16 | 51 ] = EITFixUp::kFixDisneyChannel; // Tele 5
+
     // Premiere EIT processing
     fix[   1LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
     fix[   2LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
     fix[   3LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
     fix[   4LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
-    fix[   6LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
-    fix[   8LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
-    fix[  10LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
-    fix[  11LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
-    fix[  12LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
-    fix[  13LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
-    fix[  14LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
+    fix[   6LL << 32 |  133 << 16] = EITFixUp::kFixPremiere | EITFixUp::kFixHDTV;
+    fix[   8LL << 32 |  133 << 16] = EITFixUp::kFixPremiere | EITFixUp::kFixHDTV;
+    fix[   9LL << 32 |  133 << 16] = EITFixUp::kFixPremiere | EITFixUp::kFixHDTV;
+    fix[  10LL << 32 |  133 << 16] = EITFixUp::kFixPremiere | EITFixUp::kFixHDTV;
+    fix[  11LL << 32 |  133 << 16] = EITFixUp::kFixPremiere | EITFixUp::kFixHDTV;
+    fix[  12LL << 32 |  133 << 16] = EITFixUp::kFixPremiere | EITFixUp::kFixHDTV;
+    fix[  13LL << 32 |  133 << 16] = EITFixUp::kFixPremiere | EITFixUp::kFixHDTV;
+    fix[  14LL << 32 |  133 << 16] = EITFixUp::kFixPremiere | EITFixUp::kFixHDTV;
     fix[  15LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
     fix[  17LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
     // Mark Premiere HD, AXN HD and Discovery HD as HDTV
