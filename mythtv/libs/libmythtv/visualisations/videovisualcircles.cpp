@@ -23,7 +23,7 @@ void VideoVisualCircles::DrawPriv(MythPainter *painter, QPaintDevice* device)
     painter->Begin(device);
     for (int i = 0; i < count; i++, rad += m_range, red += incr, green -= incr)
     {
-        double mag = abs((m_magnitudes[i] + m_magnitudes[i + count]) / 2.0);
+        double mag = qAbs((m_magnitudes[i] + m_magnitudes[i + count]) / 2.0);
         if (mag > 1.0)
         {
             pen.setWidth((int)mag);
