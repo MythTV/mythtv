@@ -731,6 +731,30 @@ vector<uint> CardUtil::GetChildInputIDs(uint inputid)
     return list;
 }
 
+uint CardUtil::GetRecLimit(uint inputid)
+{
+    if (!inputid)
+        return 1;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    QString qstr =
+        "SELECT reclimit "
+        "FROM capturecard "
+        "WHERE cardid = :INPUTID";
+
+    query.prepare(qstr);
+    query.bindValue(":INPUTID", inputid);
+
+    uint reclimit = 0;
+
+    if (!query.exec())
+        MythDB::DBError("CardUtil::GetRecLimit()", query);
+    else if (query.next())
+        reclimit = query.value(0).toUInt();
+
+    return reclimit;
+}
+
 static uint clone_capturecard(uint src_inputid, uint orig_dst_inputid)
 {
     uint dst_inputid = orig_dst_inputid;
@@ -787,7 +811,7 @@ static uint clone_capturecard(uint src_inputid, uint orig_dst_inputid)
         "       externalcommand,       changer_device,        changer_model,   "
         "       tunechan,              startchan,             displayname,     "
         "       dishnet_eit,           recpriority,           quicktune,       "
-        "       schedorder,            livetvorder "
+        "       schedorder,            livetvorder,           reclimit "
         "FROM capturecard "
         "WHERE cardid = :INPUTID");
     query.bindValue(":INPUTID", src_inputid);
@@ -831,10 +855,11 @@ static uint clone_capturecard(uint src_inputid, uint orig_dst_inputid)
         "    recpriority           = :V22, "
         "    quicktune             = :V23, "
         "    schedorder            = :V24, "
-        "    livetvorder           = :V25,  "
+        "    livetvorder           = :V25, "
+        "    reclimit              = :V26, "
         "    parentid              = :PARENTID "
         "WHERE cardid = :INPUTID");
-    for (uint i = 0; i < 26; ++i)
+    for (uint i = 0; i < 27; ++i)
         query2.bindValue(QString(":V%1").arg(i), query.value(i).toString());
     query2.bindValue(":INPUTID", dst_inputid);
     query2.bindValue(":PARENTID", src_inputid);

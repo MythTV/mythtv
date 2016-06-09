@@ -458,7 +458,6 @@ class VBoxConfigurationGroup : public VerticalConfigurationGroup
 
 class CetonDeviceID;
 class CetonSetting;
-class InstanceCount;
 class CetonConfigurationGroup : public VerticalConfigurationGroup
 {
     Q_OBJECT
@@ -472,7 +471,6 @@ class CetonConfigurationGroup : public VerticalConfigurationGroup
     CetonDeviceID       *deviceid;
     CetonSetting        *ip;
     CetonSetting        *tuner;
-    InstanceCount       *instances;
 };
 
 
@@ -530,7 +528,7 @@ class HDPVRConfigurationGroup: public VerticalConfigurationGroup
     VBIDevice           *vbidevice;
 };
 
-class InstanceCount;
+class ASIDevice;
 
 class V4L2encGroup: public TriggeredConfigurationGroup
 {
@@ -542,7 +540,6 @@ class V4L2encGroup: public TriggeredConfigurationGroup
   private:
     CaptureCard         &m_parent;
     TransLabelSetting   *m_cardinfo;
-    InstanceCount       *m_instances;
 
     QString m_DriverName;
 
@@ -550,8 +547,6 @@ class V4L2encGroup: public TriggeredConfigurationGroup
     virtual void triggerChanged(const QString& value);
     void probeCard(const QString &device);
 };
-
-class ASIDevice;
 
 class ASIConfigurationGroup: public VerticalConfigurationGroup
 {
@@ -567,10 +562,7 @@ class ASIConfigurationGroup: public VerticalConfigurationGroup
     CaptureCard       &parent;
     ASIDevice         *device;
     TransLabelSetting *cardinfo;
-    InstanceCount     *instances;
 };
-
-class InstanceCount;
 
 class ImportConfigurationGroup: public VerticalConfigurationGroup
 {
@@ -618,7 +610,6 @@ class ExternalConfigurationGroup: public VerticalConfigurationGroup
   private:
     CaptureCard       &parent;
     TransLabelSetting *info;
-    InstanceCount     *instances;
 };
 #endif
 
@@ -722,13 +713,6 @@ public:
     virtual void Save(void);
     virtual void Save(QString /*destination*/) { Save(); }
 
-    uint GetInstanceCount(void) const { return instance_count; }
-
-public slots:
-    void SetInstanceCount(uint cnt) { instance_count = cnt; }
-    // this is needed to connect valueChanged() signal from legacy settings
-    void SetInstanceCount(int cnt)  { instance_count = (uint)cnt; }
-
 private:
 
     class ID: public AutoIncrementDBSetting {
@@ -750,7 +734,6 @@ private:
 
 private:
     ID       *id;
-    uint      instance_count;
 };
 
 class CardInputDBStorage : public SimpleDBStorage
@@ -1128,8 +1111,6 @@ class CetonDeviceID : public LabelSetting, public CaptureCardDBStorage
     void LoadedIP(const QString&);
     void LoadedCard(const QString&);
     void LoadedTuner(const QString&);
-    void LoadedInstances(int);
-
 
   public slots:
     void SetIP(const QString&);

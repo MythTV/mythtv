@@ -259,6 +259,7 @@ class MTV_PUBLIC CardUtil
 
     static uint         GetChildInputCount(uint inputid);
     static vector<uint> GetChildInputIDs(uint inputid);
+    static uint         GetRecLimit(uint inputid);
 
     static bool         IsInputTypePresent(const QString &rawtype,
                                            QString hostname = QString::null);

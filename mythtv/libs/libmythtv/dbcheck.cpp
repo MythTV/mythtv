@@ -3299,6 +3299,26 @@ NULL
             return false;
     }
 
+    if (dbver == "1344")
+    {
+        const char *updates[] = {
+            "ALTER TABLE capturecard ADD COLUMN "
+            "    reclimit INT UNSIGNED DEFAULT 1 NOT NULL",
+            "UPDATE capturecard cc, "
+            "       ( SELECT IF(parentid>0, parentid, cardid) cardid, "
+            "                count(*) cnt "
+            "         FROM capturecard "
+            "         GROUP BY if(parentid>0, parentid, cardid) "
+            "       ) p "
+            "SET cc.reclimit = p.cnt "
+            "WHERE cc.cardid = p.cardid OR cc.parentid = p.cardid",
+            NULL
+        };
+
+        if (!performActualUpdate(&updates[0], "1345", dbver))
+            return false;
+    }
+
     /*
      * TODO the following settings are no more, clean them up with the next schema change
      * to avoid confusion by stale settings in the database
