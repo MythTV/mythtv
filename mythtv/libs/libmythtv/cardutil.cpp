@@ -985,7 +985,8 @@ bool CardUtil::GetInputInfo(InputInfo &input, vector<uint> *groupids)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT "
                   "inputname, sourceid, livetvorder, "
-                  "schedorder, displayname, recpriority, quicktune "
+                  "schedorder, displayname, recpriority, quicktune, "
+                  "reclimit "
                   "FROM capturecard "
                   "WHERE cardid = :INPUTID");
     query.bindValue(":INPUTID", input.inputid);
@@ -1006,6 +1007,7 @@ bool CardUtil::GetInputInfo(InputInfo &input, vector<uint> *groupids)
     input.displayName = query.value(4).toString();
     input.recPriority = query.value(5).toInt();
     input.quickTune = query.value(6).toBool();
+    input.reclimit = query.value(7).toUInt();
 
     if (input.displayName.isEmpty())
         input.displayName = QObject::tr("Input %1:%2")
@@ -1024,7 +1026,8 @@ QList<InputInfo> CardUtil::GetAllInputInfo()
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT cardid, "
                   "inputname, sourceid, livetvorder, "
-                  "schedorder, displayname, recpriority, quicktune "
+                  "schedorder, displayname, recpriority, quicktune, "
+                  "reclimit "
                   "FROM capturecard");
 
     if (!query.exec())
@@ -1044,6 +1047,7 @@ QList<InputInfo> CardUtil::GetAllInputInfo()
         input.displayName = query.value(5).toString();
         input.recPriority = query.value(6).toInt();
         input.quickTune = query.value(7).toBool();
+        input.reclimit = query.value(8).toUInt();
 
         infoInputList.push_back(input);
     }
@@ -1053,7 +1057,7 @@ QList<InputInfo> CardUtil::GetAllInputInfo()
 
 QString CardUtil::GetInputName(uint inputid)
 {
-    InputInfo info("None", 0, inputid, 0, 0, 0);
+    InputInfo info("None", 0, inputid, 0, 0, 0, 0);
     GetInputInfo(info);
     return info.name;
 }

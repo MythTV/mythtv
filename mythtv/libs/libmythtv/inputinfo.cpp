@@ -6,7 +6,7 @@
 InputInfo::InputInfo(
     const QString &_name,
     uint _sourceid, uint _inputid, uint _mplexid, uint _chanid,
-    uint _livetvorder) :
+    uint _livetvorder, uint _reclimit) :
     name(_name),
     sourceid(_sourceid),
     inputid(_inputid),
@@ -15,7 +15,8 @@ InputInfo::InputInfo(
     recPriority(0),
     scheduleOrder(0),
     livetvorder(_livetvorder),
-    quickTune(false)
+    quickTune(false),
+    reclimit(_reclimit)
 {
     name.detach();
 }
@@ -53,6 +54,7 @@ bool InputInfo::FromStringList(QStringList::const_iterator &it,
     scheduleOrder = (*it).toUInt(); NEXT();
     quickTune = (*it).toUInt(); NEXT();
     chanid   = (*it).toUInt(); ++it;
+    reclimit = (*it).toUInt(); ++it;
 
     return true;
 }
@@ -71,5 +73,6 @@ void InputInfo::ToStringList(QStringList &list) const
     list.push_back(QString::number(scheduleOrder));
     list.push_back(QString::number(quickTune));
     list.push_back(QString::number(chanid));
+    list.push_back(QString::number(reclimit));
 }
 

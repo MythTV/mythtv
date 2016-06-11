@@ -368,6 +368,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     int     overRecordSecCat;
     QString overRecordCategory;
     InputGroupMap igrp;
+    uint    recLimit;
 
     // Configuration variables from setup routines
     uint              inputid;
