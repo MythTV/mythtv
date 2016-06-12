@@ -59,11 +59,6 @@ class ViewScheduled : public ScheduleCommon
 
     void EmbedTVWindow(void);
 
-    void CalcRecordedPercent(ProgramInfo &pg);
-    void UpdateUIListItem(MythUIButtonListItem* item,
-                          const ProgramInfo &pginfo);
-    QString ProgressString(const ProgramInfo &pg);
-
     bool m_conflictBool;
     QDate m_conflictDate;
 

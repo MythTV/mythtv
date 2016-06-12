@@ -40,7 +40,6 @@
 #include "mythdb.h"
 #include "mythdate.h"
 #include "tv.h"
-#include "mconcurrent.h"
 
 #ifdef _MSC_VER
 #  include "compat.h"                   // for random
@@ -562,7 +561,7 @@ bool PlaybackBox::Create()
     connect(m_recordingList, SIGNAL(itemSelected(MythUIButtonListItem*)),
             SLOT(ItemSelected(MythUIButtonListItem*)));
     connect(m_recordingList, SIGNAL(itemClicked(MythUIButtonListItem*)),
-            SLOT(PlayFromAnyMark(MythUIButtonListItem*)));
+            SLOT(PlayFromBookmarkOrProgStart(MythUIButtonListItem*)));
     connect(m_recordingList, SIGNAL(itemVisible(MythUIButtonListItem*)),
             SLOT(ItemVisible(MythUIButtonListItem*)));
     connect(m_recordingList, SIGNAL(itemLoaded(MythUIButtonListItem*)),
@@ -1009,8 +1008,6 @@ void PlaybackBox::ItemVisible(MythUIButtonListItem *item)
 
     // Flagging status (queued, running, no, yes)
     item->DisplayState(extract_commflag_state(*pginfo), "commflagged");
-
-    item->SetProgress(0, 100, pginfo->GetProgressPercent());
 
     MythUIButtonListItem *sel_item = item->parent()->GetItemCurrent();
     if ((item != sel_item) && item->GetImageFilename("preview").isEmpty() &&
@@ -2206,7 +2203,7 @@ void PlaybackBox::playSelectedPlaylist(bool _random)
         this, new MythEvent("PLAY_PLAYLIST"));
 }
 
-void PlaybackBox::PlayFromAnyMark(MythUIButtonListItem *item)
+void PlaybackBox::PlayFromBookmarkOrProgStart(MythUIButtonListItem *item)
 {
     if (!item)
         item = m_recordingList->GetItemCurrent();
@@ -2218,7 +2215,7 @@ void PlaybackBox::PlayFromAnyMark(MythUIButtonListItem *item)
 
     const bool ignoreBookmark = false;
     const bool ignoreProgStart = false;
-    const bool ignoreLastPlayPos = false;
+    const bool ignoreLastPlayPos = true;
     const bool underNetworkControl = false;
     if (pginfo)
         PlayX(*pginfo, ignoreBookmark, ignoreProgStart, ignoreLastPlayPos,
@@ -2307,20 +2304,6 @@ void PlaybackBox::PlayX(const ProgramInfo &pginfo,
     Close();
 }
 
-void PlaybackBox::ClearBookmark()
-{
-    ProgramInfo *pginfo = GetCurrentProgram();
-    if (pginfo)
-        pginfo->SaveBookmark(0);
-}
-
-void PlaybackBox::ClearLastPlayPos()
-{
-    ProgramInfo *pginfo = GetCurrentProgram();
-    if (pginfo)
-        pginfo->SaveLastPlayPos(0);
-}
-
 void PlaybackBox::StopSelected(void)
 {
     ProgramInfo *pginfo = GetCurrentProgram();
@@ -2399,7 +2382,7 @@ void PlaybackBox::selected(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    PlayFromAnyMark(item);
+    PlayFromBookmarkOrProgStart(item);
 }
 
 void PlaybackBox::popupClosed(QString which, int result)
@@ -2533,6 +2516,14 @@ bool PlaybackBox::Play(
     {
         QCoreApplication::postEvent(
             this, new MythEvent("PLAY_PLAYLIST"));
+    }
+    else
+    {
+        // User may have saved or deleted a bookmark
+        // requiring update of bookmark icon..
+        ProgramInfo *pginfo = m_programInfoCache.GetRecordingInfo(tvrec.GetRecordingID());
+        if (pginfo)
+            UpdateUIListItem(pginfo, true);
     }
 
     if (m_needUpdate)
@@ -2983,18 +2974,11 @@ MythMenu* PlaybackBox::createPlayFromMenu()
     MythMenu *menu = new MythMenu(title, this, "slotmenu");
 
     if (pginfo->IsBookmarkSet())
-    {
         menu->AddItem(tr("Play from bookmark"), SLOT(PlayFromBookmark()));
-        menu->AddItem(tr("Clear bookmark"), SLOT(ClearBookmark()));
-    }
     menu->AddItem(tr("Play from beginning"), SLOT(PlayFromBeginning()));
     if (pginfo->QueryLastPlayPos())
-    {
         menu->AddItem(tr("Play from last played position"),
                       SLOT(PlayFromLastPlayPos()));
-        menu->AddItem(tr("Clear last played position"),
-                      SLOT(ClearLastPlayPos()));
-    }
 
     return menu;
 }
@@ -3234,7 +3218,7 @@ void PlaybackBox::ShowActionPopup(const ProgramInfo &pginfo)
             m_popupMenu->AddItem(tr("Play from..."), NULL, createPlayFromMenu());
         else
             m_popupMenu->AddItem(tr("Play"),
-                                 SLOT(PlayFromAnyMark()));
+                                 SLOT(PlayFromBookmarkOrProgStart()));
     }
 
     if (!m_player)
@@ -3963,7 +3947,7 @@ bool PlaybackBox::keyPressEvent(QKeyEvent *event)
             if (action == "DELETE")
                 deleteSelected(m_recordingList->GetItemCurrent());
             else if (action == ACTION_PLAYBACK)
-                PlayFromAnyMark();
+                PlayFromBookmarkOrProgStart();
             else if (action == "DETAILS" || action == "INFO")
                 ShowDetails();
             else if (action == "CUSTOMEDIT")
@@ -4019,11 +4003,7 @@ void PlaybackBox::customEvent(QEvent *event)
             {
                 ProgramInfo evinfo(me->ExtraDataList());
                 if (evinfo.HasPathname() || evinfo.GetChanID())
-                {
-                    uint32_t flags = m_programInfoCache.Update(evinfo);
-                    if (flags != PIC_NO_ACTION)
-                        HandleUpdateItemEvent(evinfo.GetRecordingID(), flags);
-                }
+                    HandleUpdateProgramInfoEvent(evinfo);
             }
             else if (recordingID && (tokens[1] == "ADD"))
             {
@@ -4074,18 +4054,18 @@ void PlaybackBox::customEvent(QEvent *event)
         else if (message.startsWith("UPDATE_FILE_SIZE"))
         {
             QStringList tokens = message.simplified().split(" ");
+            bool ok = false;
+            uint recordingID = 0;
+            uint64_t filesize = 0ULL;
             if (tokens.size() >= 3)
             {
-                bool ok = false;
-                uint recordingID  = tokens[1].toUInt();
-                uint64_t filesize = tokens[2].toLongLong(&ok);
-                if (ok)
-                {
-                    // Delegate to background thread
-                    MConcurrent::run("UpdateFileSize", &m_programInfoCache,
-                                     &ProgramInfoCache::UpdateFileSize,
-                                     recordingID, filesize, PIC_NONE);
-                }
+                recordingID = tokens[1].toUInt();
+                filesize   = tokens[2].toLongLong(&ok);
+            }
+            if (recordingID && ok)
+            {
+
+                HandleUpdateProgramInfoFileSizeEvent(recordingID, filesize);
             }
         }
         else if (message == "UPDATE_UI_LIST")
@@ -4097,18 +4077,6 @@ void PlaybackBox::customEvent(QEvent *event)
                 UpdateUILists();
                 m_helper.ForceFreeSpaceUpdate();
             }
-        }
-        else if (message.startsWith("UPDATE_UI_ITEM"))
-        {
-            QStringList tokens = message.simplified().split(" ");
-            if (tokens.size() < 3)
-                return;
-
-            uint recordingID  = tokens[1].toUInt();
-            UpdateState flags = static_cast<UpdateState>(tokens[2].toUInt());
-
-            if (flags != PIC_NO_ACTION)
-                HandleUpdateItemEvent(recordingID, flags);
         }
         else if (message == "UPDATE_USAGE_UI")
         {
@@ -4428,22 +4396,35 @@ void PlaybackBox::HandleRecordingAddEvent(const ProgramInfo &evinfo)
     ScheduleUpdateUIList();
 }
 
-void PlaybackBox::HandleUpdateItemEvent(uint recordingId, uint flags)
+void PlaybackBox::HandleUpdateProgramInfoEvent(const ProgramInfo &evinfo)
 {
-    // Changing recording group full reload
-    if (flags & PIC_RECGROUP_CHANGED)
+    QString old_recgroup = m_programInfoCache.GetRecGroup(
+        evinfo.GetRecordingID());
+
+    if (!m_programInfoCache.Update(evinfo))
+        return;
+
+    // If the recording group has changed, reload lists from the recently
+    // updated cache; if not, only update UI for the updated item
+    if (evinfo.GetRecordingGroup() == old_recgroup)
     {
-        ScheduleUpdateUIList();
+        ProgramInfo *dst = FindProgramInUILists(evinfo);
+        if (dst)
+            UpdateUIListItem(dst, true);
+        return;
     }
-    else
-    {
-        ProgramInfo *pginfo = FindProgramInUILists(recordingId);
-        if (pginfo)
-        {
-            bool genPreview = (flags & PIC_MARK_CHANGED);
-            UpdateUIListItem(pginfo, genPreview);
-        }
-    }
+
+    ScheduleUpdateUIList();
+}
+
+void PlaybackBox::HandleUpdateProgramInfoFileSizeEvent(uint recordingID,
+                                                       uint64_t filesize)
+{
+    m_programInfoCache.UpdateFileSize(recordingID, filesize);
+
+    ProgramInfo *dst = FindProgramInUILists(recordingID);
+    if (dst)
+        UpdateUIListItem(dst, false);
 }
 
 void PlaybackBox::ScheduleUpdateUIList(void)

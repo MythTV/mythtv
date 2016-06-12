@@ -10,8 +10,6 @@
 #include "programinfo.h"
 #include "remoteutil.h"
 #include "mythevent.h"
-#include "mythdb.h"
-#include "mconcurrent.h"
 
 #include <QCoreApplication>
 #include <QRunnable>
@@ -75,35 +73,6 @@ void ProgramInfoCache::ScheduleLoad(const bool updateUI)
     }
 }
 
-void ProgramInfoCache::CalculateProgress(ProgramInfo &pg, int pos)
-{
-    uint lastPlayPercent = 0;
-    if (pos > 0)
-    {
-        int total = 0;
-
-        switch (pg.GetRecordingStatus())
-        {
-        case RecStatus::Recorded:
-            total = pg.QueryTotalFrames();
-            break;
-        case RecStatus::Recording:
-            // Active recordings won't have total frames set yet.
-            total = pg.QueryLastFrameInPosMap();
-            break;
-        default:
-            break;
-        }
-
-        lastPlayPercent = (total > pos) ? (100 * pos) / total : 0;
-
-        LOG(VB_GUI, LOG_DEBUG, QString("%1 %2  %3/%4 = %5%")
-            .arg(pg.GetRecordingID()).arg(pg.GetTitle())
-            .arg(pos).arg(total).arg(lastPlayPercent));
-    }
-    pg.SetProgressPercent(lastPlayPercent);
-}
-
 void ProgramInfoCache::Load(const bool updateUI)
 {
     QMutexLocker locker(&m_lock);
@@ -115,45 +84,6 @@ void ProgramInfoCache::Load(const bool updateUI)
     // we sort the list later anyway.
     vector<ProgramInfo*> *tmp = RemoteGetRecordedList(0);
     /**/
-
-    // Calculate play positions for UI
-    if (tmp)
-    {
-        // Played progress
-        typedef QPair<uint, QDateTime> ProgId;
-        QHash<ProgId, uint> lastPlayFrames;
-
-        // Get all lastplaypos marks in a single lookup
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("SELECT chanid, starttime, mark "
-                      "FROM recordedmarkup "
-                      "WHERE type = :TYPE ");
-        query.bindValue(":TYPE", MARK_UTIL_LASTPLAYPOS);
-
-        if (query.exec())
-        {
-            while (query.next())
-            {
-                ProgId id = qMakePair(query.value(0).toUInt(),
-                                      MythDate::as_utc(query.value(1).toDateTime()));
-                lastPlayFrames[id] = query.value(2).toUInt();
-            }
-
-            // Determine progress of each prog
-            foreach (ProgramInfo* pg, *tmp)
-            {
-                // Enable last play pos for all recordings
-                pg->SetAllowLastPlayPos(true);
-
-                ProgId id = qMakePair(pg->GetChanID(),
-                                      pg->GetRecordingStartTime());
-                CalculateProgress(*pg, lastPlayFrames.value(id));
-            }
-        }
-        else
-            MythDB::DBError("Watched progress", query);
-    }
-
     locker.relock();
 
     free_vec(m_next_cache);
@@ -227,80 +157,54 @@ void ProgramInfoCache::Refresh(void)
 
 /** \brief Updates a ProgramInfo in the cache.
  *  \note This must only be called from the UI thread.
- *  \return Flags indicating the result of the update
- */
-uint32_t ProgramInfoCache::Update(const ProgramInfo& pginfo)
-{
-    QMutexLocker locker(&m_lock);
-
-    uint recordingId = pginfo.GetRecordingID();
-    Cache::iterator it = m_cache.find(recordingId);
-
-    if (it == m_cache.end())
-        return PIC_NO_ACTION;
-
-    ProgramInfo& pg = **it;
-    uint32_t flags = PIC_NONE;
-
-    if (pginfo.GetBookmarkUpdate() != pg.GetBookmarkUpdate())
-        flags |= PIC_MARK_CHANGED;
-
-    if (pginfo.GetRecordingGroup() != pg.GetRecordingGroup())
-        flags |= PIC_RECGROUP_CHANGED;
-
-    pg.clone(pginfo, true);
-    pg.SetAllowLastPlayPos(true);
-
-    if (flags & PIC_MARK_CHANGED)
-    {
-        // Delegate this update to a background task
-        MConcurrent::run("UpdateProg", this, &ProgramInfoCache::UpdateFileSize,
-                         recordingId, 0, flags);
-        // Ignore this update
-        flags = PIC_NO_ACTION;
-    }
-
-    LOG(VB_GUI, LOG_DEBUG, QString("Pg %1 %2 update state %3")
-        .arg(recordingId).arg(pg.GetTitle()).arg(flags));
-    return flags;
-}
-
-/** \brief Updates file size calculations of a ProgramInfo in the cache.
- *  \note This should only be run by a non-UI thread as it contains multiple
- *   Db queries
  *  \return True iff the ProgramInfo was in the cache and was updated.
  */
-void ProgramInfoCache::UpdateFileSize(uint recordingId, uint64_t filesize,
-                                      uint32_t flags)
+bool ProgramInfoCache::Update(const ProgramInfo &pginfo)
 {
     QMutexLocker locker(&m_lock);
 
-    Cache::iterator it = m_cache.find(recordingId);
-    if (it == m_cache.end())
-        return;
+    Cache::iterator it = m_cache.find(pginfo.GetRecordingID());
 
-    ProgramInfo& pg = **it;
+    if (it != m_cache.end())
+        (*it)->clone(pginfo, true);
 
-    CalculateProgress(pg, pg.QueryLastPlayPos());
+    return it != m_cache.end();
+}
 
-    if (filesize > 0)
+/** \brief Updates a ProgramInfo in the cache.
+ *  \note This must only be called from the UI thread.
+ *  \return True iff the ProgramInfo was in the cache and was updated.
+ */
+bool ProgramInfoCache::UpdateFileSize(uint recordingID, uint64_t filesize)
+{
+    QMutexLocker locker(&m_lock);
+
+    Cache::iterator it = m_cache.find(recordingID);
+
+    if (it != m_cache.end())
     {
-        // Filesize update
-        pg.SetFilesize(filesize);
-        pg.SetAvailableStatus(asAvailable, "PIC::UpdateFileSize");
-    }
-    else // Info update
-    {
-        // Don't keep regenerating previews of files being played
-        QString byWhom;
-        if (pg.QueryIsInUse(byWhom) && byWhom.contains(QObject::tr("Playing")))
-            flags &= ~PIC_MARK_CHANGED;
+        (*it)->SetFilesize(filesize);
+        if (filesize)
+            (*it)->SetAvailableStatus(asAvailable, "PIC::UpdateFileSize");
     }
 
-    QString mesg = QString("UPDATE_UI_ITEM %1 %2").arg(recordingId).arg(flags);
-    QCoreApplication::postEvent(m_listener, new MythEvent(mesg));
+    return it != m_cache.end();
+}
 
-    LOG(VB_GUI, LOG_DEBUG, mesg);
+/** \brief Returns the ProgramInfo::recgroup or an empty string if not found.
+ *  \note This must only be called from the UI thread.
+ */
+QString ProgramInfoCache::GetRecGroup(uint recordingID) const
+{
+    QMutexLocker locker(&m_lock);
+
+    Cache::const_iterator it = m_cache.find(recordingID);
+
+    QString recgroup;
+    if (it != m_cache.end())
+        recgroup = (*it)->GetRecordingGroup();
+
+    return recgroup;
 }
 
 /** \brief Adds a ProgramInfo to the cache.
@@ -308,14 +212,10 @@ void ProgramInfoCache::UpdateFileSize(uint recordingId, uint64_t filesize,
  */
 void ProgramInfoCache::Add(const ProgramInfo &pginfo)
 {
-    if (!pginfo.GetRecordingID() || Update(pginfo) != PIC_NO_ACTION)
+    if (!pginfo.GetRecordingID() || Update(pginfo))
         return;
 
-    QMutexLocker locker(&m_lock);
-
-    ProgramInfo* pg = new ProgramInfo(pginfo);
-    pg->SetAllowLastPlayPos(true);
-    m_cache[pginfo.GetRecordingID()] = pg;
+    m_cache[pginfo.GetRecordingID()] = new ProgramInfo(pginfo);
 }
 
 /** \brief Marks a ProgramInfo in the cache for deletion on the next

@@ -194,23 +194,17 @@ namespace
         Q_DECLARE_TR_FUNCTIONS(BookmarkDialog)
 
       public:
-        BookmarkDialog(ProgramInfo *pginfo, MythScreenStack *parent,
-                       bool bookmarkPresent, bool lastPlayPresent) :
+        BookmarkDialog(ProgramInfo *pginfo, MythScreenStack *parent) :
                 MythScreenType(parent, "bookmarkdialog"),
-                pgi(pginfo),
-                bookmarked(bookmarkPresent),
-                lastPlayed(lastPlayPresent),
-                btnPlayBookmark(tr("Play from bookmark")),
-                btnClearBookmark(tr("Clear bookmark")),
-                btnPlayBegin(tr("Play from beginning")),
-                btnPlayLast(tr("Play from last played position")),
-                btnClearLastPlay(tr("Clear last played position"))
+                pgi(pginfo)
         {
         }
 
         bool Create()
         {
             QString msg = tr("DVD/Video contains a bookmark");
+            QString btn0msg = tr("Play from bookmark");
+            QString btn1msg = tr("Play from beginning");
 
             MythDialogBox *popup = new MythDialogBox(msg, GetScreenStack(), "bookmarkdialog");
             if (!popup->Create())
@@ -222,19 +216,8 @@ namespace
             GetScreenStack()->AddScreen(popup);
 
             popup->SetReturnEvent(this, "bookmarkdialog");
-            if (bookmarked)
-            {
-                popup->AddButton(btnPlayBookmark);
-                popup->AddButton(btnClearBookmark);
-            }
-
-            popup->AddButton(btnPlayBegin);
-
-            if (lastPlayed)
-            {
-                popup->AddButton(btnPlayLast);
-                popup->AddButton(btnClearLastPlay);
-            }
+            popup->AddButton(btn0msg);
+            popup->AddButton(btn1msg);
             return true;
         }
 
@@ -243,30 +226,22 @@ namespace
             if (event->type() == DialogCompletionEvent::kEventType)
             {
                 DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
-                QString buttonText = dce->GetResultText();
+                int buttonnum = dce->GetResult();
 
                 if (dce->GetId() == "bookmarkdialog")
                 {
-                    if (buttonText == btnPlayBookmark)
+                    uint flags = kStartTVNoFlags;
+                    if (buttonnum == 1)
                     {
-                        TV::StartTV(pgi, kStartTVNoFlags );
+                        flags |= kStartTVIgnoreBookmark;
                     }
-                    else if (buttonText == btnPlayBegin)
+                    else if (buttonnum != 0)
                     {
-                        TV::StartTV(pgi, kStartTVNoFlags | kStartTVIgnoreBookmark);
+                        delete pgi;
+                        return;
                     }
-                    else if (buttonText == btnPlayLast)
-                    {
-                        TV::StartTV(pgi, kStartTVNoFlags | kStartTVAllowLastPlayPos);
-                    }
-                    else if (buttonText == btnClearBookmark)
-                    {
-                        pgi->SaveBookmark(0);
-                    }
-                    else if (buttonText == btnClearLastPlay)
-                    {
-                        pgi->SaveLastPlayPos(0);
-                    }
+
+                    TV::StartTV(pgi, flags);
 
                     delete pgi;
                 }
@@ -275,10 +250,6 @@ namespace
 
       private:
         ProgramInfo* pgi;
-        bool bookmarked, lastPlayed;
-        QString btnPlayBookmark, btnClearBookmark;
-        QString btnPlayBegin;
-        QString btnPlayLast, btnClearLastPlay;
     };
 
     void cleanup()
@@ -1203,7 +1174,6 @@ static int internal_play_media(const QString &mrl, const QString &plot,
     pginfo->SetProgramInfoType(pginfo->DiscoverProgramInfoType());
 
     bool bookmarkPresent = false;
-    bool lastPlayPresent = false;
 
     if (pginfo->IsVideoDVD())
     {
@@ -1254,20 +1224,13 @@ static int internal_play_media(const QString &mrl, const QString &plot,
             return res;
         }
     }
-    else if (useBookmark && pginfo->IsVideo())
-    {
-        pginfo->SetAllowLastPlayPos(true);
-        pginfo->SetIgnoreBookmark(false);
-        bookmarkPresent = pginfo->QueryBookmark() > 0;
-        lastPlayPresent = pginfo->QueryLastPlayPos() > 0;
-    }
+    else if (pginfo->IsVideo())
+        bookmarkPresent = (pginfo->QueryBookmark() > 0);
 
-    if (useBookmark && (bookmarkPresent || lastPlayPresent))
+    if (useBookmark && bookmarkPresent)
     {
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-        BookmarkDialog *bookmarkdialog = new BookmarkDialog(pginfo, mainStack,
-                                                            bookmarkPresent,
-                                                            lastPlayPresent);
+        BookmarkDialog *bookmarkdialog = new BookmarkDialog(pginfo, mainStack);
         if (!bookmarkdialog->Create())
         {
             delete bookmarkdialog;
@@ -1692,7 +1655,7 @@ static bool WasAutomaticStart(void)
 }
 
 // from https://www.raspberrypi.org/forums/viewtopic.php?f=33&t=16897
-// The old way of revoking root with setuid(getuid())
+// The old way of revoking root with setuid(getuid()) 
 // causes system hang in certain cases on raspberry pi
 
 static int revokeRoot (void)

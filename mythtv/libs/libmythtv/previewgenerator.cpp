@@ -618,9 +618,8 @@ bool PreviewGenerator::SavePreview(const QString &filename,
 bool PreviewGenerator::LocalPreviewRun(void)
 {
     m_programInfo.MarkAsInUse(true, kPreviewGeneratorInUseID);
-    m_programInfo.SetIgnoreProgStart(false);
-    m_programInfo.SetIgnoreBookmark(false);
-    m_programInfo.SetAllowLastPlayPos(true);
+    m_programInfo.SetIgnoreProgStart(true);
+    m_programInfo.SetAllowLastPlayPos(false);
 
     float aspect = 0;
     int   width, height, sz;
@@ -633,14 +632,15 @@ bool PreviewGenerator::LocalPreviewRun(void)
 
     if (captime < 0)
     {
-        uint64_t markFrame = m_programInfo.QueryStartMark();
-        LOG(VB_GENERAL, LOG_INFO,
-            QString("Preview from start mark (frame %1)").arg(markFrame));
-        if (markFrame > 0)
+        captime = m_programInfo.QueryBookmark();
+        if (captime > 0)
         {
             m_timeInSeconds = false;
-            captime         = markFrame;
+            LOG(VB_GENERAL, LOG_INFO,
+                QString("Preview from bookmark (frame %1)").arg(captime));
         }
+        else
+            captime = -1;
     }
 
     if (captime <= 0)

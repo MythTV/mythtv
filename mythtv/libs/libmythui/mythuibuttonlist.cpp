@@ -21,7 +21,6 @@
 #include "mythuigroup.h"
 #include "mythuiimage.h"
 #include "mythgesture.h"
-#include "mythuiprogressbar.h"
 
 #define LOC     QString("MythUIButtonList(%1): ").arg(objectName())
 
@@ -3134,9 +3133,6 @@ MythUIButtonListItem::MythUIButtonListItem(MythUIButtonList *lbtype,
     m_showArrow = showArrow;
     m_data      = 0;
     m_isVisible = false;
-    m_progress  = 0;
-    m_progressStart = 0;
-    m_progressTotal = 0;
 
     if (state >= NotChecked)
         m_checkable = true;
@@ -3162,9 +3158,6 @@ MythUIButtonListItem::MythUIButtonListItem(MythUIButtonList *lbtype,
     m_state     = CantCheck;
     m_showArrow = false;
     m_isVisible = false;
-    m_progress  = 0;
-    m_progressStart = 0;
-    m_progressTotal = 0;
 
     if (m_parent)
         m_parent->InsertItem(this, listPosition);
@@ -3418,16 +3411,6 @@ QString MythUIButtonListItem::GetImageFilename(const QString &name) const
         return *it;
 
     return QString();
-}
-
-void MythUIButtonListItem::SetProgress(int start, int total, int used)
-{
-    m_progress      = used;
-    m_progressStart = start;
-    m_progressTotal = total;
-
-    if (m_parent && m_isVisible)
-        m_parent->Update();
 }
 
 void MythUIButtonListItem::DisplayState(const QString &state,
@@ -3724,11 +3707,6 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
     // There is no need to check the return value here, since we already
     // checked that the state exists with GetState() earlier
     button->DisplayState(state);
-
-    MythUIProgressBar *progress = dynamic_cast<MythUIProgressBar *>
-                                  (buttonstate->GetChild("buttonprogress"));
-    if (progress)
-        progress->Set(m_progressStart, m_progressTotal, m_progress);
 }
 
 //---------------------------------------------------------

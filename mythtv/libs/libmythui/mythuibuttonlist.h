@@ -81,8 +81,6 @@ class MUI_PUBLIC MythUIButtonListItem
     void SetImageFromMap(const InfoMap &imageMap);
     QString GetImageFilename(const QString &name="") const;
 
-    void SetProgress(int start, int total, int used);
-    
     void DisplayState(const QString &state, const QString &name);
     void SetStatesFromMap(const InfoMap &stateMap);
 
@@ -115,9 +113,6 @@ class MUI_PUBLIC MythUIButtonListItem
     QVariant        m_data;
     bool            m_showArrow;
     bool            m_isVisible;
-    int             m_progress;
-    int             m_progressStart;
-    int             m_progressTotal;
 
     QMap<QString, TextProperties> m_strings;
     QMap<QString, MythImage*> m_images;

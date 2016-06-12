@@ -230,7 +230,6 @@ ProgramInfo::ProgramInfo(void) :
 
     // everything below this line is not serialized
     availableStatus(asAvailable),
-    progressPercent(0),
     spread(-1),
     startCol(-1),
     sortTitle(),
@@ -315,7 +314,6 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other) :
 
     // everything below this line is not serialized
     availableStatus(other.availableStatus),
-    progressPercent(other.progressPercent),
     spread(other.spread),
     startCol(other.startCol),
     sortTitle(other.sortTitle),
@@ -504,7 +502,6 @@ ProgramInfo::ProgramInfo(
 
     // everything below this line is not serialized
     availableStatus(asAvailable),
-    progressPercent(0),
     spread(-1),
     startCol(-1),
     sortTitle(),
@@ -623,7 +620,6 @@ ProgramInfo::ProgramInfo(
 
     // everything below this line is not serialized
     availableStatus(asAvailable),
-    progressPercent(0),
     spread(-1),
     startCol(-1),
     sortTitle(),
@@ -755,7 +751,6 @@ ProgramInfo::ProgramInfo(
 
     // everything below this line is not serialized
     availableStatus(asAvailable),
-    progressPercent(0),
     spread(-1),
     startCol(-1),
     sortTitle(),
@@ -910,7 +905,6 @@ ProgramInfo::ProgramInfo(
 
     // everything below this line is not serialized
     availableStatus(asAvailable),
-    progressPercent(0),
     spread(-1),
     startCol(-1),
     sortTitle(),
@@ -1265,7 +1259,6 @@ void ProgramInfo::clear(void)
     spread = -1;
     startCol = -1;
     availableStatus = asAvailable;
-    progressPercent = 0;
 
     // Private
     inUseForWhat.clear();
@@ -1708,9 +1701,6 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     {
         progMap["lentime"] = QObject::tr("%n hour(s)","", hours);
     }
-
-    progMap["progresspercent"] =
-            GetProgressPercent() > 0 ? QString::number(GetProgressPercent()) : "";
 
     progMap["rectypechar"] = toQChar(GetRecordingRuleType());
     progMap["rectype"] = ::toString(GetRecordingRuleType());
@@ -2675,31 +2665,6 @@ void ProgramInfo::SaveBookmark(uint64_t frame)
 
     set_flag(programflags, FL_BOOKMARK, is_valid);
 
-    UpdateMarkTimeStamp(is_valid);
-    SendUpdateEvent();
-}
-
-void ProgramInfo::SaveLastPlayPos(uint64_t frame, bool notify)
-{
-    LOG(VB_PLAYBACK, LOG_DEBUG,
-        QString("LastPlayPos frame=%1").arg(frame));
-    ClearMarkupMap(MARK_UTIL_LASTPLAYPOS);
-
-    if (frame > 0)
-    {
-        frm_dir_map_t lastPlayPosMap;
-        lastPlayPosMap[frame] = MARK_UTIL_LASTPLAYPOS;
-        SaveMarkupMap(lastPlayPosMap, MARK_UTIL_LASTPLAYPOS);
-    }
-
-    UpdateMarkTimeStamp(IsBookmarkSet());
-
-    if (notify)
-        SendUpdateEvent();
-}
-
-void ProgramInfo::UpdateMarkTimeStamp(bool bookmarked)
-{
     if (IsRecording())
     {
         MSqlQuery query(MSqlQuery::InitCon());
@@ -2707,13 +2672,17 @@ void ProgramInfo::UpdateMarkTimeStamp(bool bookmarked)
             "UPDATE recorded "
             "SET bookmarkupdate = CURRENT_TIMESTAMP, "
             "    bookmark       = :BOOKMARKFLAG "
-            "WHERE recordedid = :RECORDEDID");
+            "WHERE chanid    = :CHANID AND "
+            "      starttime = :STARTTIME");
 
-        query.bindValue(":BOOKMARKFLAG", bookmarked);
-        query.bindValue(":RECORDEDID",   recordedid);
+        query.bindValue(":BOOKMARKFLAG", is_valid);
+        query.bindValue(":CHANID",       chanid);
+        query.bindValue(":STARTTIME",    recstartts);
 
         if (!query.exec())
             MythDB::DBError("bookmark flag update", query);
+
+        SendUpdateEvent();
     }
 }
 
@@ -2798,23 +2767,6 @@ uint64_t ProgramInfo::QueryProgStart(void) const
     QueryMarkupMap(bookmarkmap, MARK_UTIL_PROGSTART);
 
     return (bookmarkmap.isEmpty()) ? 0 : bookmarkmap.begin().key();
-}
-
-uint64_t ProgramInfo::QueryStartMark(void) const
-{
-    uint64_t start = 0;
-    if ((start = QueryLastPlayPos()) > 0)
-        LOG(VB_PLAYBACK, LOG_INFO, QString("Using last position @ %1").arg(start));
-    else if ((start = QueryBookmark()) > 0)
-        LOG(VB_PLAYBACK, LOG_INFO, QString("Using bookmark @ %1").arg(start));
-    else if (HasCutlist())
-        // Disable progstart if the program has a cutlist.
-        LOG(VB_PLAYBACK, LOG_INFO, "Ignoring progstart as cutlist exists");
-    else if ((start = QueryProgStart()) > 0)
-        LOG(VB_PLAYBACK, LOG_INFO, QString("Using progstart @ %1").arg(start));
-    else 
-        LOG(VB_PLAYBACK, LOG_INFO, "Using file start");
-    return start;
 }
 
 /** \brief Gets any lastplaypos position in database,

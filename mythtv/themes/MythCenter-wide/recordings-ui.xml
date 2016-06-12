@@ -180,16 +180,6 @@
             <statetype name="buttonitem">
                 <state name="active">
                 <area>0,0,880,30</area>
-                <progressbar name="buttonprogress">
-                    <area>0,0,100%,100%</area>
-                    <layout>horizontal</layout>
-                    <style>reveal</style>
-                    <shape name="progressimage">
-                        <area>0,1,100%,100%-1</area>
-                        <type>box</type>
-                        <fill color="#000000" alpha="128"/>
-                    </shape>
-                </progressbar>
                 <statetype name="status">
                     <position>3,2</position>
                     <state name="disabled">
@@ -222,9 +212,8 @@
                     <textarea name="titlesubtitle" from="buttontext">
                         <area>32,2,656,28</area>
                         <align>vcenter</align>
-                        <template>%titlesubtitle%% (|progresspercent|%)%</template>
                     </textarea>
-                    <textarea name="shortstartdate" from="buttontext">
+                    <textarea name="shortstartdate" from="titlesubtitle">
                         <area>634,2,120,28</area>
                         <align>right,vcenter</align>
                     </textarea>
@@ -260,7 +249,8 @@
                     <shape name="selectbar">
                         <area>0,0,100%,30</area>
                     </shape>
-                    <textarea name="fonts" from="buttontext">
+                    <textarea name="titlesubtitle" from="buttontext">
+                        <area>32,2,656,28</area>
                         <font>basesmall_normal_selected</font>
                         <font state="disabled">basesmall_disabled_selected</font>
                         <font state="error">basesmall_error_selected</font>
@@ -269,16 +259,13 @@
                         <font state="running">basesmall_running_selected</font>
                         <align>vcenter</align>
                     </textarea>
-                    <textarea name="titlesubtitle" from="fonts">
-                        <area>32,2,656,28</area>
-                        <template>%titlesubtitle%% (|progresspercent|%)%</template>
-                    </textarea>
-                    <textarea name="shortstartdate" from="fonts">
+                    <textarea name="shortstartdate" from="titlesubtitle">
                         <area>634,2,120,28</area>
                         <align>right,vcenter</align>
                     </textarea>
                     <textarea name="starttime" from="shortstartdate">
                         <area>760,2,114,28</area>
+                        <align>right,vcenter</align>
                     </textarea>
                 </state>
             </statetype>
@@ -395,7 +382,6 @@
             <font>baselarge</font>
             <cutdown>yes</cutdown>
             <align>vcenter</align>
-            <template>%title%% (|progresspercent|%)%</template>
         </textarea>
 
         <textarea name="channel" from="basetextarea">
