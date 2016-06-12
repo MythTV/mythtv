@@ -57,69 +57,6 @@ enum {
     kArtworkCoverTimeout  = 50,
 };
 
-class WatchGroup
-{
-public:
-    WatchGroup() : m_count(0), m_season(NULL), m_episode(NULL), m_date(NULL) {}
-
-    ProgramInfo* GetFirst() const;
-    uint    GetCount() const { return m_count; }
-    QString GetTotal() const { return m_count > 1 ? QString::number(m_count) : ""; }
-
-    void AddSeason(ProgramInfo *pginfo)  { Add(m_season,  pginfo); }
-    void AddEpisode(ProgramInfo *pginfo) { Add(m_episode, pginfo); }
-    void AddDate(ProgramInfo *pginfo)    { Add(m_date,    pginfo); }
-
-private:
-    void Add(ProgramInfo *&current, ProgramInfo *pginfo);
-
-    /// Number of episodes with this title
-    uint m_count;
-    /// Oldest episode with a season defined
-    ProgramInfo *m_season;
-    /// Oldest episode with only an episode defined
-    ProgramInfo *m_episode;
-    /// Oldest episode with no season or season defined
-    ProgramInfo *m_date;
-};
-
-class WatchList
-{
-public:
-    static QString GroupOf(const ProgramInfo &pginfo);
-
-    WatchList();
-
-    void Clear()       { m_list.clear(); }
-    bool Empty() const { return m_list.empty(); }
-    QString GetTotal(const ProgramInfo &pginfo) const
-    { return m_list[GroupOf(pginfo)].GetTotal(); }
-    void Add(ProgramInfo *p);
-
-    typedef unsigned long long score_type; // 64 bit
-    // shows keyed by score
-    typedef QMultiMap<score_type, ProgramInfo*> ProgramOrder;
-    ProgramOrder Order();
-
-private:
-    QMap<QString, WatchGroup> m_list;
-    /// exclude recording not marked for auto-expire from the Watch List
-    bool    m_watchListAutoExpire;
-    /// add 1 to the Watch List score up to this many days
-    int     m_watchListMaxAge;
-    /// adjust exclusion of a title from the Watch List after a delete
-    int     m_watchListBlackOut;
-    /// recordings younger than this (hrs) go to the top
-    int     m_watchListRecentLimit;
-    /// recordings older than this got to the bottom
-    int     m_watchListOldLimit;
-    /// strategy for ordering the watchlist
-    QString m_watchListStrategy;
-
-    ProgramOrder OrderByClassicStrategy();
-    ProgramOrder OrderByOldestStrategy();
-};
-
 class PlaybackBox : public ScheduleCommon
 {
     Q_OBJECT
@@ -427,6 +364,12 @@ class PlaybackBox : public ScheduleCommon
     bool                m_useRecGroups;
     /// use the Watch List as the initial view
     bool                m_watchListStart;
+    /// exclude recording not marked for auto-expire from the Watch List
+    bool                m_watchListAutoExpire;
+    /// add 1 to the Watch List scord up to this many days
+    int                 m_watchListMaxAge;
+    /// adjust exclusion of a title from the Watch List after a delete
+    int                 m_watchListBlackOut;
     /// allOrder controls the ordering of the "All Programs" list
     int                 m_allOrder;
     /// listOrder controls the ordering of the recordings in the list
@@ -440,9 +383,6 @@ class PlaybackBox : public ScheduleCommon
     QString             m_watchGroupName;
     QString             m_watchGroupLabel;
     ViewMask            m_viewMask;
-
-    // Watchlist support
-    WatchList            m_watchlist;
 
     // Popup support //////////////////////////////////////////////////////////
     // General popup support
@@ -472,7 +412,7 @@ class PlaybackBox : public ScheduleCommon
     /// Recording[s] currently selected for deletion
     QStringList m_delList;
     /// Group currently selected
-    QString m_currentGroup; // in lower case
+    QString m_currentGroup;
 
     // Play List support
     QList<uint>         m_playList;   ///< list of selected items "play list"

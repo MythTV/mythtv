@@ -248,14 +248,6 @@ uint32_t ProgramInfoCache::Update(const ProgramInfo& pginfo)
     if (pginfo.GetRecordingGroup() != pg.GetRecordingGroup())
         flags |= PIC_RECGROUP_CHANGED;
 
-    if (pginfo.GetSeason() != pg.GetSeason()
-            || pginfo.GetEpisode() != pg.GetEpisode()
-            || pginfo.GetTitle() != pg.GetTitle())
-        flags |= PIC_WATCHLIST_CHANGED;
-
-    if (pg.GetProgressPercent() > 0)
-        flags |= PIC_PART_WATCHED;
-
     pg.clone(pginfo, true);
     pg.SetAllowLastPlayPos(true);
 
@@ -303,10 +295,6 @@ void ProgramInfoCache::UpdateFileSize(uint recordingId, uint64_t filesize,
         QString byWhom;
         if (pg.QueryIsInUse(byWhom) && byWhom.contains(QObject::tr("Playing")))
             flags &= ~PIC_MARK_CHANGED;
-
-        // Changing to or from part-watched may affect watchlist
-        if ((pg.GetProgressPercent() == 0) != !(flags & PIC_PART_WATCHED))
-            flags |= PIC_WATCHLIST_CHANGED;
     }
 
     QString mesg = QString("UPDATE_UI_ITEM %1 %2").arg(recordingId).arg(flags);

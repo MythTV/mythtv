@@ -134,10 +134,6 @@
                             </imagetype>
                         </state>
                     </statetype>
-                    <textarea name="watchtotal" from="basetextarea">
-                        <area>130,121,120,25</area>
-                        <align>right</align>
-                    </textarea>
                     <textarea name="title" from="basetextarea">
                         <area>8,148,240,60</area>
                         <font>basemedium</font>
@@ -170,9 +166,6 @@
                     <statetype name="status">
                         <position>236,124</position>
                     </statetype>
-                    <textarea name="watchtotal">
-                        <area>158,144,120,25</area>
-                    </textarea>
                     <textarea name="title">
                         <area>8,169,272,73</area>
                         <font>baselarge</font>

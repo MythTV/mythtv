@@ -212,9 +212,8 @@
                     <textarea name="titlesubtitle" from="buttontext">
                         <area>32,0,336,30</area>
                         <align>vcenter</align>
-                        <template>%title%% (|watchtotal|)%% - "|subtitle|"%</template>
                     </textarea>
-                    <textarea name="shortstartdate" from="buttontext">
+                    <textarea name="shortstartdate" from="titlesubtitle">
                         <area>295,0,130,30</area>
                         <align>right,vcenter</align>
                     </textarea>
@@ -250,24 +249,21 @@
                     <shape name="selectbar">
                         <area>0,0,100%,30</area>
                     </shape>
-                    <textarea name="fonts" from="buttontext">
+                    <textarea name="titlesubtitle" from="buttontext">
+                        <area>32,0,336,30</area>
                         <font>basesmall_normal_selected</font>
                         <font state="disabled">basesmall_disabled_selected</font>
                         <font state="error">basesmall_error_selected</font>
                         <font state="warning">basesmall_warning_selected</font>
                         <font state="normal">basesmall_normal_selected</font>
                         <font state="running">basesmall_running_selected</font>
-                    </textarea>
-                    <textarea name="titlesubtitle" from="fonts">
-                        <area>32,0,336,30</area>
                         <align>vcenter</align>
-                        <template>%title%% (|watchtotal|)%% - "|subtitle|"%</template>
                     </textarea>
-                    <textarea name="shortstartdate" from="fonts">
+                    <textarea name="shortstartdate" from="titlesubtitle">
                         <area>295,0,130,30</area>
                         <align>right,vcenter</align>
                     </textarea>
-                    <textarea name="starttime" from="fonts">
+                    <textarea name="starttime" from="shortstartdate">
                         <area>415,0,114,30</area>
                         <align>right,vcenter</align>
                     </textarea>

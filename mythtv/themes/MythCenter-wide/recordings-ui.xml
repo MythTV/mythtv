@@ -222,7 +222,7 @@
                     <textarea name="titlesubtitle" from="buttontext">
                         <area>32,2,656,28</area>
                         <align>vcenter</align>
-                        <template>%title%% (|watchtotal|)%% - "|subtitle|"%% [|progresspercent|%]%</template>
+                        <template>%titlesubtitle%% (|progresspercent|%)%</template>
                     </textarea>
                     <textarea name="shortstartdate" from="buttontext">
                         <area>634,2,120,28</area>
@@ -271,7 +271,7 @@
                     </textarea>
                     <textarea name="titlesubtitle" from="fonts">
                         <area>32,2,656,28</area>
-                        <template>%title%% (|watchtotal|)%% - "|subtitle|"%% [|progresspercent|%]%</template>
+                        <template>%titlesubtitle%% (|progresspercent|%)%</template>
                     </textarea>
                     <textarea name="shortstartdate" from="fonts">
                         <area>634,2,120,28</area>
@@ -395,7 +395,7 @@
             <font>baselarge</font>
             <cutdown>yes</cutdown>
             <align>vcenter</align>
-            <template>%title%% [|progresspercent|%]%</template>
+            <template>%title%% (|progresspercent|%)%</template>
         </textarea>
 
         <textarea name="channel" from="basetextarea">

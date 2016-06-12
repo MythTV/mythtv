@@ -3215,7 +3215,7 @@ static HostCheckBox *PlaybackWatchList()
     gc->setValue(true);
 
     gc->setHelpText(WatchListSettings::tr("The 'Watch List' is an abbreviated "
-                                          "list of recordings filtered to "
+                                          "list of recordings sorted to "
                                           "highlight series and shows that "
                                           "need attention in order to keep up "
                                           "to date."));
@@ -3254,21 +3254,6 @@ static HostCheckBox *PlaybackWLAutoExpire()
     return gc;
 }
 
-static HostComboBox *PlaybackWLStrategy()
-{
-    HostComboBox *gc = new HostComboBox("PlaybackWLOrder");
-
-    gc->setLabel(WatchListSettings::tr("Sort method"));
-    gc->addSelection(WatchListSettings::tr("Classic", "Watchlist"), "Classic");
-    gc->addSelection(WatchListSettings::tr(
-                         "Limited Oldest", "Watchlist"), "LimitedOldest");
-    gc->setHelpText(WatchListSettings::tr("The watchlist ordering method. "
-                         "'Classic' learns your viewing habits. "
-                         "'Limited Oldest' simply lists shows by age, but "
-                         "promotes new/popular titles and demotes old ones."));
-    return gc;
-}
-
 static HostSpinBox *PlaybackWLMaxAge()
 {
     HostSpinBox *gs = new HostSpinBox("PlaybackWLMaxAge", 30, 180, 10);
@@ -3304,78 +3289,25 @@ static HostSpinBox *PlaybackWLBlackOut()
     return gs;
 }
 
-static HostSpinBox *PlaybackWLRecentLimit()
-{
-    HostSpinBox *gs = new HostSpinBox("PlaybackWLRecentLimit", 0, 168, 6, true);
-
-    gs->setLabel(WatchListSettings::tr("Hours to keep at top"));
-
-    gs->setValue(6);
-
-    gs->setHelpText(WatchListSettings::tr(
-                        "Titles are promoted to the top when they are younger "
-                        "than, or previous episodes have been watched "
-                        "(on average) within, this interval. "
-                        "0 disables this behaviour."));
-    return gs;
-}
-
-static HostSpinBox *PlaybackWLOldLimit()
-{
-    HostSpinBox *gs = new HostSpinBox("PlaybackWLOldLimit", 7, 3650, 7, true);
-
-    gs->setLabel(WatchListSettings::tr("Days before relegating to bottom"));
-
-    gs->setValue(28);
-
-    gs->setHelpText(WatchListSettings::tr(
-                        "Titles are relegated to the bottom when they "
-                        "are older than, and previous episodes have not "
-                        "been watched (on average), within this interval. "
-                        "Use a high value to prevent this behaviour."));
-
-    return gs;
-}
-
-WatchListStrategy::WatchListStrategy() :
-    TriggeredConfigurationGroup(false, false, true, true)
-{
-     Setting* strategy = PlaybackWLStrategy();
-     addChild(strategy);
-     setTrigger(strategy);
-
-     ConfigurationGroup* classic = new VerticalConfigurationGroup(false,false);
-
-     classic->addChild(PlaybackWLMaxAge());
-     classic->addChild(PlaybackWLBlackOut());
-
-     addTarget("Classic", classic);
-
-     ConfigurationGroup* oldest = new VerticalConfigurationGroup(false,false);
-
-     oldest->addChild(PlaybackWLRecentLimit());
-     oldest->addChild(PlaybackWLOldLimit());
-
-     addTarget("LimitedOldest", oldest);
-}
-
 WatchListSettings::WatchListSettings() :
     TriggeredConfigurationGroup(false, false, true, true)
 {
+
      Setting* watchList = PlaybackWatchList();
      addChild(watchList);
      setTrigger(watchList);
 
-     ConfigurationGroup* settings =
-             new VerticalConfigurationGroup(false,false,true,true);
+     ConfigurationGroup* settings = new VerticalConfigurationGroup(false);
 
      settings->addChild(PlaybackWLStart());
      settings->addChild(PlaybackWLAutoExpire());
-     settings->addChild(new WatchListStrategy());
+     settings->addChild(PlaybackWLMaxAge());
+     settings->addChild(PlaybackWLBlackOut());
 
      addTarget("1", settings);
-     addTarget("0", new VerticalConfigurationGroup(false, false));
-}
+
+     addTarget("0", new VerticalConfigurationGroup(true));
+};
 
 static HostCheckBox *LCDShowTime()
 {
