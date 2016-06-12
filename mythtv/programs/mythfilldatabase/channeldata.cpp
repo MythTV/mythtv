@@ -124,31 +124,31 @@ QString ChannelData::normalizeChannelKey(const QString &chanName) const
     result = result.toLower();
     // Strip all whitespace
     result = result.replace(" ", "");
-    
+
     return result;
 }
 
-QHash<QString, ChannelInfo> ChannelData::channelList(int sourceId)
+ChannelList ChannelData::channelList(int sourceId)
 {
-    QHash<QString, ChannelInfo> retList;
+    ChannelList retList;
 
     ChannelInfoList channelList = ChannelUtil::GetChannels(sourceId, true);
-    
+
     ChannelInfoList::iterator it = channelList.begin();
     for ( ; it != channelList.end(); ++it)
     {
         QString chanName = (*it).name;
         QString key  = normalizeChannelKey(chanName);
-        retList[key] = (*it);
+        retList.insert(key, *it);
     }
 
     return retList;
 }
 
 ChannelInfo ChannelData::FindMatchingChannel(const ChannelInfo &chanInfo,
-                            QHash<QString, ChannelInfo> existingChannels) const
+                                             ChannelList existingChannels) const
 {
-    QHash<QString, ChannelInfo>::iterator it;
+    ChannelList::iterator it;
     for (it = existingChannels.begin(); it != existingChannels.end(); ++it)
     {
         if ((*it).xmltvid == chanInfo.xmltvid)
@@ -157,6 +157,27 @@ ChannelInfo ChannelData::FindMatchingChannel(const ChannelInfo &chanInfo,
 
     QString searchKey = normalizeChannelKey(chanInfo.name);
     ChannelInfo existChan = existingChannels.value(searchKey);
+
+    if (existChan.chanid < 1)
+    {
+        // Check if it is ATSC
+        int chansep = chanInfo.channum.indexOf(QRegExp("\\D"));
+        if (chansep > 0)
+        {
+            // Populate xmltvid for scanned ATSC channels
+            uint major = chanInfo.channum.left(chansep).toInt();
+            uint minor = chanInfo.channum.right
+                         (chanInfo.channum.length() - (chansep + 1)).toInt();
+
+            for (it = existingChannels.begin();
+                 it != existingChannels.end(); ++it)
+            {
+                if ((*it).atsc_major_chan == major &&
+                    (*it).atsc_minor_chan == minor)
+                    return (*it);
+            }
+        }
+    }
 
     return existChan;
 }
@@ -169,7 +190,7 @@ void ChannelData::handleChannels(int id, ChannelInfoList *chanlist)
         return;
     }
 
-    QHash<QString, ChannelInfo> existingChannels = channelList(id);
+    ChannelList existingChannels = channelList(id);
     QString fileprefix = SetupIconCacheDirectory();
 
     QDir::setCurrent(fileprefix);
@@ -234,7 +255,7 @@ void ChannelData::handleChannels(int id, ChannelInfoList *chanlist)
                 }
             }
         }
-        
+
         ChannelInfo dbChan = FindMatchingChannel(*i, existingChannels);
         if (dbChan.chanid > 0) // Channel exists, updating
         {
