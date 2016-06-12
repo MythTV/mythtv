@@ -7,6 +7,8 @@
 // libmythtv
 #include "channelinfo.h"
 
+using ChannelList = QMultiHash<QString, ChannelInfo>;
+
 class ChannelData
 {
   public:
@@ -21,8 +23,8 @@ class ChannelData
                                          unsigned int chanid);
 
     ChannelInfo FindMatchingChannel(const ChannelInfo &chanInfo,
-                            QHash<QString, ChannelInfo> existingChannels) const;
-    QHash<QString, ChannelInfo> channelList(int sourceId);
+                            ChannelList existingChannels) const;
+    ChannelList channelList(int sourceId);
     QString normalizeChannelKey(const QString &chanName) const;
 
   public:
