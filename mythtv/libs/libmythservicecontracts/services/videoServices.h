@@ -41,7 +41,7 @@
 class SERVICE_PUBLIC VideoServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.3" );
+    Q_CLASSINFO( "version"    , "1.4" );
     Q_CLASSINFO( "AddVideo_Method",                    "POST" )
     Q_CLASSINFO( "RemoveVideoFromDB_Method",           "POST" )
     Q_CLASSINFO( "UpdateVideoWatchedStatus_Method",    "POST" )
