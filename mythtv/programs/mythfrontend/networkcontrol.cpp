@@ -37,7 +37,7 @@
 #include "mythuicheckbox.h"
 #include "mythuispinbox.h"
 
-#if ( QT_VERSION < QT_VERSION_CHECK( 5, 6, 0 ))
+#ifdef CONFIG_QTWEBKIT
 #include "mythuiwebbrowser.h"
 #endif
 
@@ -1116,7 +1116,7 @@ QString NetworkControl::getWidgetType(MythUIType* type)
         return "MythUIImage";
     else if (dynamic_cast<MythUISpinBox *>(type))
         return "MythUISpinBox";
-#if ( QT_VERSION < QT_VERSION_CHECK( 5, 6, 0 ))
+#ifdef CONFIG_QTWEBKIT
     else if (dynamic_cast<MythUIWebBrowser *>(type))
         return "MythUIWebBrowser";
 #endif

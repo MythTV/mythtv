@@ -8,16 +8,12 @@ mingw | win32-msvc* {
    QT += scripttools
 }
 contains(QT_VERSION, ^4\\.[0-9]\\..*) {
-# QT += webkit
+QT += webkit
 using_qtdbus: CONFIG += qdbus
 }
-contains(QT_VERSION, ^5\\.[0-5]\\..*) {
+contains(QT_VERSION, ^5\\.[0-9]\\..*):using_qtwebkit {
 QT += widgets
 QT += webkitwidgets
-using_qtdbus: QT += dbus
-}
-contains(QT_VERSION, ^5\\.[6-9]\\..*) {
-QT += widgets
 using_qtdbus: QT += dbus
 }
 
@@ -90,10 +86,7 @@ HEADERS += serviceHosts/frontendServiceHost.h
 HEADERS += services/frontend.h
 SOURCES += services/frontend.cpp
 
-
-!contains(QT_VERSION, ^5\\.[6-9]\\..*) {
-    # temp disable features for Qt 5.6 until QtWebEngine is implemented correctly
-
+using_qtwebkit {
     HEADERS += progdetails.h
     SOURCES += progdetails.cpp
 }

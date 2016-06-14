@@ -4,13 +4,9 @@ QT += xml sql network opengl
 contains(QT_VERSION, ^4\\.[0-9]\\..*) {
 QT += webkit
 }
-contains(QT_VERSION, ^5\\.[0-5]\\..*) {
+contains(QT_VERSION, ^5\\.[0-9]\\..*):using_qtwebkit {
 QT += widgets
 QT += webkitwidgets
-android: QT += androidextras
-}
-contains(QT_VERSION, ^5\\.[6-9]\\..*) {
-QT += widgets
 android: QT += androidextras
 }
 
@@ -70,7 +66,7 @@ SOURCES += mythuianimation.cpp mythuiscrollbar.cpp
 SOURCES += mythnotificationcenter.cpp mythnotification.cpp
 SOURCES += mythuicomposite.cpp
 
-!contains(QT_VERSION, ^5\\.[6-9]\\..*) {
+using_qtwebkit {
 HEADERS += mythuiwebbrowser.h
 SOURCES += mythuiwebbrowser.cpp
 }
