@@ -306,12 +306,12 @@ static bool comp_recstart(RecordingInfo *a, RecordingInfo *b)
 {
     if (a->GetRecordingStartTime() != b->GetRecordingStartTime())
         return a->GetRecordingStartTime() < b->GetRecordingStartTime();
-    if (a->GetRecordingEndTime() != b->GetRecordingEndTime())
-        return a->GetRecordingEndTime() < b->GetRecordingEndTime();
     int cmp = a->GetChannelSchedulingID().compare(b->GetChannelSchedulingID(),
                                                   Qt::CaseInsensitive);
     if (cmp != 0)
         return cmp < 0;
+    if (a->GetRecordingEndTime() != b->GetRecordingEndTime())
+        return a->GetRecordingEndTime() < b->GetRecordingEndTime();
     if (a->GetRecordingStatus() != b->GetRecordingStatus())
         return a->GetRecordingStatus() < b->GetRecordingStatus();
     if (a->GetChanNum() != b->GetChanNum())
