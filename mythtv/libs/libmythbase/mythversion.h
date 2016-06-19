@@ -12,7 +12,7 @@
 /// Update this whenever the plug-in ABI changes.
 /// Including changes in the libmythbase, libmyth, libmythtv, libmythav* and
 /// libmythui class methods in exported headers.
-#define MYTH_BINARY_VERSION "29.20160611-1"
+#define MYTH_BINARY_VERSION "29.20160619-1"
 
 /** \brief Increment this whenever the MythTV network protocol changes.
  *   Note that the token currently cannot contain spaces.
@@ -44,8 +44,8 @@
  *       http://www.mythtv.org/wiki/Category:Myth_Protocol_Commands
  *       http://www.mythtv.org/wiki/Category:Myth_Protocol
  */
-#define MYTH_PROTO_VERSION "89"
-#define MYTH_PROTO_TOKEN "BuzzKill"
+#define MYTH_PROTO_VERSION "90"
+#define MYTH_PROTO_TOKEN "BuzzCut"
 
 /** \brief Increment this whenever the MythTV core database schema changes.
  *

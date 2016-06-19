@@ -2520,6 +2520,7 @@ bool TVRec::IsBusy(InputInfo *busy_input, int time_buffer) const
         busy_input->mplexid = ChannelUtil::GetMplexID(busy_input->chanid);
         busy_input->mplexid =
             (32767 == busy_input->mplexid) ? 0 : busy_input->mplexid;
+        busy_input->reccount = 1;
         busy_input->reclimit = recLimit;
     }
 
