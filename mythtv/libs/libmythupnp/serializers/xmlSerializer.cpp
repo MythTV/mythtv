@@ -120,14 +120,15 @@ void XmlSerializer::AddProperty( const QString       &sName,
 {
     m_pXmlWriter->writeStartElement( sName );
 
-    if ((pMetaProp != NULL) &&
-        (pMetaProp->isEnumType() || pMetaProp->isFlagType()))
+    if (pMetaProp != NULL)
     {
-        RenderEnum ( sName, vValue, pMetaProp );
+        if (pMetaProp->isEnumType() || pMetaProp->isFlagType())
+        {
+            RenderEnum( sName, vValue, pMetaProp );
+        }
+        else
+            RenderValue( GetContentName( sName, pMetaParent, pMetaProp ), vValue );
     }
-    else
-        RenderValue( GetContentName( sName, pMetaParent, pMetaProp ), vValue );
-
     m_pXmlWriter->writeEndElement();
 }
 
