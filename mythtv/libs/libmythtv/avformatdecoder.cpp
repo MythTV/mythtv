@@ -1021,6 +1021,12 @@ int AvFormatDecoder::FindStreamInfo(void)
         silence_ffmpeg_logging = true;
     int retval = avformat_find_stream_info(ic, NULL);
     silence_ffmpeg_logging = false;
+    // ffmpeg 3.0 is returning -1 code when there is a channel
+    // change or some encoding error just after the start
+    // of the file, but is has found the correct stream info
+    // Set rc to 0 so that playing can continue.
+    if (retval == -1)
+        retval = 0;
     return retval;
 }
 
