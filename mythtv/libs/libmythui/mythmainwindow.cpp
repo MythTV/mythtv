@@ -2711,6 +2711,13 @@ void MythMainWindow::customEvent(QEvent *ce)
             MythNotificationCenter::GetInstance()->Queue(mn);
             return;
         }
+        else if (message == "RECONNECT_SUCCESS" && d->standby == true)
+        {
+            // If the connection to the master backend has just been (re-)established
+            // but we're in standby, make sure the backend is not blocked from
+            // shutting down.
+            gCoreContext->AllowShutdown();
+        }
     }
     else if ((MythEvent::Type)(ce->type()) == MythEvent::MythUserMessage)
     {
