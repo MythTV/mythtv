@@ -963,7 +963,9 @@ void GalleryThumbView::SetUiSelection(MythUIButtonListItem *item)
             QStringList text;
             if (im->m_id != GALLERY_DB_ID)
             {
-                text << m_mgr.LongDateOf(im);
+                if (im->IsFile() || im->IsDevice())
+                    text << m_mgr.LongDateOf(im);
+
                 if (!im->m_comment.isEmpty())
                     text << im->m_comment;
             }
