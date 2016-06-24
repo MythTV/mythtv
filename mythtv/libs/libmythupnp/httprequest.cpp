@@ -2304,7 +2304,7 @@ void HTTPRequest::AddCORSHeaders( const QString &sOrigin )
     allowedOrigins << QString("http://%1").arg(masterAddrPort);
     allowedOrigins << QString("https://%2").arg(masterTLSAddrPort);
 
-    if (!gethostname(localhostname, HOST_NAME_MAX))
+    if (!gethostname(localhostname, 1024))
     {
         allowedOrigins << QString("http://%1:%2")
             .arg(localhostname).arg(serverStatusPort);
