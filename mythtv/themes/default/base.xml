@@ -788,19 +788,16 @@
         <!-- Shows 4 images for default folder -->
         <imagetype name="thumbimage0">
             <area>4%,15%,47%,47%</area>
-            <preserveaspect>false</preserveaspect>
+            <preserveaspect>true</preserveaspect>
         </imagetype>
-        <imagetype name="thumbimage1">
+        <imagetype name="thumbimage1" from="thumbimage0">
             <area>51%,15%,92%,47%</area>
-            <preserveaspect>false</preserveaspect>
         </imagetype>
-        <imagetype name="thumbimage2">
+        <imagetype name="thumbimage2" from="thumbimage0">
             <area>4%,57%,47%,93%</area>
-            <preserveaspect>false</preserveaspect>
         </imagetype>
-        <imagetype name="thumbimage3">
+        <imagetype name="thumbimage3" from="thumbimage0">
             <area>51%,57%,92%,93%</area>
-            <preserveaspect>false</preserveaspect>
         </imagetype>
         <!-- Show up arrow on parent dir with ancestors -->
         <statetype name="parenttype">
