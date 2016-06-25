@@ -4188,24 +4188,29 @@ void MainServer::HandleGetFreeInputInfo(PlaybackSock *pbs,
             groupids[info.inputid].insert(infogroups[i]);
 
         InputInfo busyinfo;
-        if (info.inputid != excluded_input && elink->IsBusy(&busyinfo))
+        elink->IsBusy(&busyinfo);
+        LOG(VB_CHANNEL, LOG_DEBUG,
+            LOC + QString("Input %1 status %2/%3/%4/%5")
+            .arg(info.inputid)
+            .arg(busyinfo.chanid).arg(busyinfo.mplexid)
+            .arg(busyinfo.reccount).arg(busyinfo.reclimit));
+
+        if ((info.inputid == excluded_input && busyinfo.reccount > 1) ||
+            (info.inputid != excluded_input && busyinfo.reccount > 0))
         {
             LOG(VB_CHANNEL, LOG_DEBUG,
-                LOC + QString("Input %1 is busy on %2/%3/%4/%5")
-                .arg(info.inputid)
-                .arg(busyinfo.chanid).arg(busyinfo.mplexid)
-                .arg(busyinfo.reccount).arg(busyinfo.reclimit));
+                LOC + QString("Input %1 is busy").arg(info.inputid));
             info.chanid = busyinfo.chanid;
             info.mplexid = busyinfo.mplexid;
             info.reccount = busyinfo.reccount;
             info.reclimit = busyinfo.reclimit;
             busyinputs.push_back(info);
         }
-        else if (info.livetvorder)
+        if (info.inputid != excluded_input && info.livetvorder &&
+            (busyinfo.reccount == 0 || busyinfo.reclimit == 0))
         {
             LOG(VB_CHANNEL, LOG_DEBUG,
-                LOC + QString("Input %1 is free")
-                .arg(info.inputid));
+                LOC + QString("Input %1 is free").arg(info.inputid));
             freeinputs.push_back(info);
         }
     }
