@@ -1972,7 +1972,8 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
         {
             if (!(*it).is_in_same_input_group)
                 (*it).is_conflicting = false;
-            else if (cardid == (uint)(*it).info->GetInputID())
+            else if (cardid == (uint)(*it).info->GetInputID() &&
+                     busy_input.reclimit)
                 (*it).is_conflicting = true;
             else if (!CardUtil::IsTunerShared(cardid, (*it).info->GetInputID()))
                 (*it).is_conflicting = true;
