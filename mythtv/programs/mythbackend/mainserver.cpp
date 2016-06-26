@@ -4206,11 +4206,16 @@ void MainServer::HandleGetFreeInputInfo(PlaybackSock *pbs,
             info.reclimit = busyinfo.reclimit;
             busyinputs.push_back(info);
         }
-        if (info.inputid != excluded_input && info.livetvorder &&
+        if (info.livetvorder &&
             (busyinfo.reccount == 0 || busyinfo.reclimit == 0))
         {
             LOG(VB_CHANNEL, LOG_DEBUG,
                 LOC + QString("Input %1 is free").arg(info.inputid));
+            if (info.inputid == excluded_input && info.reccount == 1)
+            {
+                info.chanid = 0;
+                info.mplexid = 0;
+            }
             freeinputs.push_back(info);
         }
     }
