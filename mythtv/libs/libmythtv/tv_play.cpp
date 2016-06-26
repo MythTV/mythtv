@@ -1791,7 +1791,7 @@ bool TV::RequestNextRecorder(PlayerContext *ctx, bool showDialogs,
             QString channum = selection[i].channum;
             if (!chanid || channum.isEmpty())
                 continue;
-            QSet<uint> cards = IsTunableOn(ctx, chanid, false, true);
+            QSet<uint> cards = IsTunableOn(ctx, chanid);
 
             if (chanid && !channum.isEmpty() && !cards.isEmpty())
             {
@@ -7178,30 +7178,20 @@ void TV::SwitchSource(PlayerContext *ctx, uint source_direction)
 {
     QMap<uint,InputInfo> sources;
     uint         cardid  = ctx->GetCardID();
-    vector<uint> cardids = RemoteRequestFreeRecorderList(cardid);
-    stable_sort(cardids.begin(), cardids.end());
 
     InfoMap info;
     ctx->recorder->GetChannelInfo(info);
     uint sourceid = info["sourceid"].toUInt();
 
-    vector<uint>::const_iterator it = cardids.begin();
-    for (; it != cardids.end(); ++it)
+    vector<InputInfo> inputs = RemoteRequestFreeInputInfo(cardid);
+    for (uint i = 0; i < inputs.size(); i++)
     {
-        vector<InputInfo> inputs = RemoteRequestFreeInputList(*it, cardid);
-
-        if (inputs.empty())
-            continue;
-
-        for (uint i = 0; i < inputs.size(); i++)
+        // prefer the current card's input in sources list
+        if ((sources.find(inputs[i].sourceid) == sources.end()) ||
+            ((cardid == inputs[i].inputid) &&
+             (cardid != sources[inputs[i].sourceid].inputid)))
         {
-            // prefer the current card's input in sources list
-            if ((sources.find(inputs[i].sourceid) == sources.end()) ||
-                ((cardid == inputs[i].inputid) &&
-                 (cardid != sources[inputs[i].sourceid].inputid)))
-            {
-                sources[inputs[i].sourceid] = inputs[i];
-            }
+            sources[inputs[i].sourceid] = inputs[i];
         }
     }
 
@@ -7775,7 +7765,7 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
         }
         else if (chanid)
         {
-            tunable_on = IsTunableOn(ctx, chanid, true, false);
+            tunable_on = IsTunableOn(ctx, chanid);
             getit = !tunable_on.contains(ctx->GetCardID());
         }
         else
@@ -7803,7 +7793,7 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
             {
                 if (!chanid)
                     chanid = get_chanid(ctx, cardid, chan);
-                tunable_on = IsTunableOn(ctx, chanid, true, false);
+                tunable_on = IsTunableOn(ctx, chanid);
                 getit = !tunable_on.contains(cardid);
             }
         }
@@ -7816,7 +7806,7 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
             {
                 if (!chanid)
                     chanid = get_chanid(ctx, ctx->GetCardID(), chan);
-                tunable_on = IsTunableOn(ctx, chanid, true, false);
+                tunable_on = IsTunableOn(ctx, chanid);
             }
             QStringList::const_iterator it = tmp.begin();
             for (; it != tmp.end(); ++it)
@@ -8504,14 +8494,14 @@ void TV::ShowLCDDVDInfo(const PlayerContext *ctx)
 }
 
 
-bool TV::IsTunable(const PlayerContext *ctx, uint chanid, bool use_cache)
+bool TV::IsTunable(const PlayerContext *ctx, uint chanid)
 {
-    return !IsTunableOn(this, ctx,chanid,use_cache,true).empty();
+    return !IsTunableOn(this, ctx, chanid).empty();
 }
 
 bool TV::IsTunable(uint chanid)
 {
-    return !IsTunableOn(NULL, NULL, chanid, false, true).empty();
+    return !IsTunableOn(NULL, NULL, chanid).empty();
 }
 
 static QString toCommaList(const QSet<uint> &list)
@@ -8527,18 +8517,15 @@ static QString toCommaList(const QSet<uint> &list)
 }
 
 QSet<uint> TV::IsTunableOn(
-    const PlayerContext *ctx, uint chanid, bool use_cache, bool early_exit)
+    const PlayerContext *ctx, uint chanid)
 {
-    return IsTunableOn(this, ctx, chanid, use_cache, early_exit);
+    return IsTunableOn(this, ctx, chanid);
 }
 
 QSet<uint> TV::IsTunableOn(TV *tv,
-    const PlayerContext *ctx, uint chanid, bool use_cache, bool early_exit)
+    const PlayerContext *ctx, uint chanid)
 {
     QSet<uint> tunable_cards;
-
-    if (tv == NULL)
-        use_cache = false;
 
     if (!chanid)
     {
@@ -8556,88 +8543,23 @@ QSet<uint> TV::IsTunableOn(TV *tv,
         excluded_input = ctx->GetCardID();
 
     uint sourceid = ChannelUtil::GetSourceIDForChannel(chanid);
-    vector<uint> connected   = RemoteRequestFreeRecorderList(excluded_input);
-    vector<uint> interesting = CardUtil::GetInputIDs(sourceid);
 
-    // filter disconnected cards
-    vector<uint> cardids;
-    if (excluded_input)
-        cardids.push_back(excluded_input);
-    for (uint i = 0; i < connected.size(); i++)
+    vector<InputInfo> inputs = RemoteRequestFreeInputInfo(excluded_input);
+
+    for (uint j = 0; j < inputs.size(); j++)
     {
-        for (uint j = 0; j < interesting.size(); j++)
-        {
-            if (connected[i] == interesting[j])
-            {
-                cardids.push_back(interesting[j]);
-                break;
-            }
-        }
-    }
+        if (inputs[j].sourceid != sourceid)
+            continue;
 
-#if 0
-    {
-        QString msg = QString("cardids[%1]: ").arg(sourceid);
-        for (uint i = 0; i < cardids.size(); i++)
-            msg += QString("%1, ").arg(cardids[i]);
-        LOG(VB_CHANNEL, LOG_INFO,  msg);
-    }
-#endif
+        if (inputs[j].mplexid &&
+            inputs[j].mplexid != mplexid)
+            continue;
 
-    for (uint i = 0; i < cardids.size(); i++)
-    {
-        vector<InputInfo> inputs;
+        if (!inputs[j].mplexid && inputs[j].chanid &&
+            inputs[j].chanid != chanid)
+            continue;
 
-        bool used_cache = false;
-        if (use_cache)
-        {
-            if (tv)
-            {
-                QMutexLocker locker(&tv->is_tunable_cache_lock);
-                if (tv->is_tunable_cache_inputs.contains(cardids[i]))
-                {
-                    inputs = tv->is_tunable_cache_inputs[cardids[i]];
-                    used_cache = true;
-                }
-            }
-        }
-
-        if (!used_cache)
-        {
-            inputs = RemoteRequestFreeInputList(cardids[i], excluded_input);
-            if (tv)
-            {
-                QMutexLocker locker(&tv->is_tunable_cache_lock);
-                tv->is_tunable_cache_inputs[cardids[i]] = inputs;
-            }
-        }
-
-#if 0
-    {
-        QString msg = QString("inputs[%1]: ").arg(cardids[i]);
-        for (uint j = 0; j < inputs.size(); j++)
-            msg += QString("%1, ").arg(inputs[j].inputid);
-        LOG(VB_CHANNEL, LOG_INFO, msg);
-    }
-#endif
-
-        for (uint j = 0; j < inputs.size(); j++)
-        {
-            if (inputs[j].mplexid &&
-                inputs[j].mplexid != mplexid)
-                continue;
-
-            if (!inputs[j].mplexid && inputs[j].chanid &&
-                inputs[j].chanid != chanid)
-                continue;
-
-            tunable_cards.insert(cardids[i]);
-
-            break;
-        }
-
-        if (early_exit && !tunable_cards.empty())
-            break;
+        tunable_cards.insert(inputs[j].inputid);
     }
 
     if (tunable_cards.empty())
@@ -8652,13 +8574,6 @@ QSet<uint> TV::IsTunableOn(TV *tv,
     }
 
     return tunable_cards;
-}
-
-void TV::ClearTunableCache(void)
-{
-    QMutexLocker locker(&is_tunable_cache_lock);
-    LOG(VB_CHANNEL, LOG_DEBUG, LOC);
-    is_tunable_cache_inputs.clear();
 }
 
 bool TV::StartEmbedding(const QRect &embedRect)
