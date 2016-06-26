@@ -3,10 +3,10 @@
 // Created     : Oct. 21, 2005
 //
 // Purpose     : Http Request/Response
-//                                                                            
+//
 // Copyright (c) 2005 David Blain <dblain@mythtv.org>
-//                                          
-// Licensed under the GPL v2 or later, see COPYING for details                    
+//
+// Licensed under the GPL v2 or later, see COPYING for details
 //
 //////////////////////////////////////////////////////////////////////////////
 
@@ -40,11 +40,14 @@
 #include "mythlogging.h"
 #include "mythversion.h"
 #include "mythdate.h"
+#include "mythcorecontext.h"
 
 #include "serializers/xmlSerializer.h"
 #include "serializers/soapSerializer.h"
 #include "serializers/jsonSerializer.h"
 #include "serializers/xmlplistSerializer.h"
+
+#include <unistd.h> // for gethostname
 
 #ifndef O_LARGEFILE
 #define O_LARGEFILE 0
@@ -106,7 +109,7 @@ static MIMETypes g_MIMETypes[] =
     { "ts"  , "video/mp2t"                 },
 };
 
-static const char *Static401Error = 
+static const char *Static401Error =
     "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\""
         "\"http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd\">"
     "<HTML>"
@@ -194,7 +197,7 @@ QString HTTPRequest::BuildHeader( long long nSize )
 
     // ----------------------------------------------------------------------
     // Temp Hack to process DLNA header
-                             
+
     QString sValue = GetHeaderValue( "getcontentfeatures.dlna.org", "0" );
 
     if (sValue == "1")
@@ -202,6 +205,11 @@ QString HTTPRequest::BuildHeader( long long nSize )
                    "DLNA.ORG_FLAGS=01500000000000000000000000000000\r\n";
 
     // ----------------------------------------------------------------------
+
+    sValue = GetHeaderValue( "Origin", "" );
+
+    if (!sValue.isEmpty())
+        AddCORSHeaders(sValue, sHeader);
 
     sHeader += "\r\n";
 
@@ -249,7 +257,7 @@ long HTTPRequest::SendResponse( void )
 
 #ifdef USE_SETSOCKOPT
     // Never send out partially complete segments
-    if (setsockopt(getSocketHandle(), SOL_TCP, TCP_CORK, 
+    if (setsockopt(getSocketHandle(), SOL_TCP, TCP_CORK,
                    &g_on, sizeof( g_on )) < 0)
     {
         LOG(VB_UPNP, LOG_INFO,
@@ -326,7 +334,7 @@ long HTTPRequest::SendResponse( void )
     // ----------------------------------------------------------------------
 
 #ifdef USE_SETSOCKOPT
-    if (setsockopt(getSocketHandle(), SOL_TCP, TCP_CORK, 
+    if (setsockopt(getSocketHandle(), SOL_TCP, TCP_CORK,
                    &g_off, sizeof( g_off )) < 0)
     {
         LOG(VB_UPNP, LOG_INFO,
@@ -370,7 +378,7 @@ long HTTPRequest::SendResponseFile( QString sFileName )
 
 #ifdef USE_SETSOCKOPT
     // Never send out partially complete segments
-    if (setsockopt(getSocketHandle(), SOL_TCP, TCP_CORK, 
+    if (setsockopt(getSocketHandle(), SOL_TCP, TCP_CORK,
                    &g_on, sizeof( g_on )) < 0)
     {
         LOG(VB_UPNP, LOG_INFO,
@@ -405,10 +413,10 @@ long HTTPRequest::SendResponseFile( QString sFileName )
         {
             bRange = ParseRange( sRange, llSize, &llStart, &llEnd );
 
-            // Adjust ranges that are too long.  
+            // Adjust ranges that are too long.
 
-            if (llEnd >= llSize) 
-                llEnd = llSize-1; 
+            if (llEnd >= llSize)
+                llEnd = llSize-1;
 
             if ((llSize > llStart) && (llSize > llEnd) && (llEnd > llStart))
             {
@@ -539,7 +547,7 @@ qint64 HTTPRequest::SendData( QIODevice *pDevice, qint64 llStart, qint64 llBytes
     while ((sent < llBytes) && !pDevice->atEnd())
     {
         llBytesToRead  = std::min( (qint64)SENDFILE_BUFFER_SIZE, llBytesRemaining );
-        
+
         if (( llBytesRead = pDevice->read( aBuffer, llBytesToRead )) != -1 )
         {
             if (( llBytesWritten = WriteBlockDirect( aBuffer, llBytesRead )) == -1)
@@ -559,7 +567,7 @@ qint64 HTTPRequest::SendData( QIODevice *pDevice, qint64 llStart, qint64 llBytes
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// 
+//
 /////////////////////////////////////////////////////////////////////////////
 
 qint64 HTTPRequest::SendFile( QFile &file, qint64 llStart, qint64 llBytes )
@@ -569,43 +577,43 @@ qint64 HTTPRequest::SendFile( QFile &file, qint64 llStart, qint64 llBytes )
 #ifndef __linux__
     sent = SendData( (QIODevice *)(&file), llStart, llBytes );
 #else
-    __off64_t  offset = llStart; 
-    int        fd     = file.handle( ); 
-  
-    if ( fd == -1 ) 
-    { 
+    __off64_t  offset = llStart;
+    int        fd     = file.handle( );
+
+    if ( fd == -1 )
+    {
         LOG(VB_UPNP, LOG_INFO,
-            QString("SendResponseFile( %1 ) Error: %2 [%3]") 
-                .arg(file.fileName()) .arg(file.error()) 
-                .arg(strerror(file.error()))); 
-        sent = -1; 
-    } 
-    else 
-    { 
+            QString("SendResponseFile( %1 ) Error: %2 [%3]")
+                .arg(file.fileName()) .arg(file.error())
+                .arg(strerror(file.error())));
+        sent = -1;
+    }
+    else
+    {
         qint64     llSent = 0;
 
-        do 
-        { 
-            // SSIZE_MAX should work in kernels 2.6.16 and later. 
-            // The loop is needed in any case. 
-  
-            sent = sendfile64(getSocketHandle(), fd, &offset, 
-                              (size_t)MIN(llBytes, INT_MAX)); 
-  
+        do
+        {
+            // SSIZE_MAX should work in kernels 2.6.16 and later.
+            // The loop is needed in any case.
+
+            sent = sendfile64(getSocketHandle(), fd, &offset,
+                              (size_t)MIN(llBytes, INT_MAX));
+
             if (sent >= 0)
             {
-                llBytes -= sent; 
+                llBytes -= sent;
                 llSent  += sent;
                 LOG(VB_UPNP, LOG_INFO,
                     QString("SendResponseFile : --- size = %1, "
-                            "offset = %2, sent = %3") 
-                        .arg(llBytes).arg(offset).arg(sent)); 
+                            "offset = %2, sent = %3")
+                        .arg(llBytes).arg(offset).arg(sent));
             }
-        } 
-        while (( sent >= 0 ) && ( llBytes > 0 )); 
+        }
+        while (( sent >= 0 ) && ( llBytes > 0 ));
 
         sent = llSent;
-    } 
+    }
 #endif
 
     return( sent );
@@ -1246,7 +1254,7 @@ bool HTTPRequest::ParseRange( QString sRange,
                               long long *pllEnd   )
 {
     // ----------------------------------------------------------------------
-    // -=>TODO: Only handle 1 range at this time... 
+    // -=>TODO: Only handle 1 range at this time...
     //          should make work with full spec.
     // ----------------------------------------------------------------------
 
@@ -1430,7 +1438,7 @@ bool HTTPRequest::ProcessSOAPPayload( const QString &sSOAPAction )
     QDomNodeList oNodeList = doc.elementsByTagNameNS( m_sNameSpace, m_sMethod );
 
     if (oNodeList.count() == 0)
-        oNodeList = 
+        oNodeList =
             doc.elementsByTagNameNS("http://schemas.xmlsoap.org/soap/envelope/",
                                     "Body");
 
@@ -1479,17 +1487,17 @@ Serializer *HTTPRequest::GetSerializer()
 {
     Serializer *pSerializer = NULL;
 
-    if (m_bSOAPRequest) 
+    if (m_bSOAPRequest)
         pSerializer = (Serializer *)new SoapSerializer(&m_response,
                                                        m_sNameSpace, m_sMethod);
     else
     {
         QString sAccept = GetHeaderValue( "Accept", "*/*" );
-        
-        if (sAccept.contains( "application/json", Qt::CaseInsensitive ))    
+
+        if (sAccept.contains( "application/json", Qt::CaseInsensitive ))
             pSerializer = (Serializer *)new JSONSerializer(&m_response,
                                                            m_sMethod);
-        else if (sAccept.contains( "text/javascript", Qt::CaseInsensitive ))    
+        else if (sAccept.contains( "text/javascript", Qt::CaseInsensitive ))
             pSerializer = (Serializer *)new JSONSerializer(&m_response,
                                                            m_sMethod);
         else if (sAccept.contains( "text/x-apple-plist+xml", Qt::CaseInsensitive ))
@@ -1512,7 +1520,7 @@ QString HTTPRequest::Encode(const QString &sIn)
 {
     QString sStr = sIn;
 #if 0
-    LOG(VB_UPNP, LOG_DEBUG, 
+    LOG(VB_UPNP, LOG_DEBUG,
         QString("HTTPRequest::Encode Input : %1").arg(sStr));
 #endif
     sStr.replace('&', "&amp;" ); // This _must_ come first
@@ -1573,19 +1581,19 @@ bool HTTPRequest::Authenticated()
         return false;
 
     QString sCredentials = QByteArray::fromBase64( oList[1].toUtf8() );
-    
+
     oList = sCredentials.split( ':' );
 
     if (oList.count() < 2)
         return false;
 
     QString sUserName = UPnp::GetConfiguration()->GetValue( "HTTP/Protected/UserName", "admin" );
-    
+
 
     if (oList[0].compare( sUserName, Qt::CaseInsensitive ) != 0)
         return false;
 
-    QString sPassword = UPnp::GetConfiguration()->GetValue( "HTTP/Protected/Password", 
+    QString sPassword = UPnp::GetConfiguration()->GetValue( "HTTP/Protected/Password",
                                  /* mythtv */ "8hDRxR1+E/n3/s3YUOhF+lUw7n4=" );
 
     QCryptographicHash crypto( QCryptographicHash::Sha1 );
@@ -1596,10 +1604,101 @@ bool HTTPRequest::Authenticated()
 
     if (sPasswordHash != sPassword )
         return false;
-    
+
     return true;
 }
 
+void HTTPRequest::AddCORSHeaders( const QString &sOrigin, QString &sHeader )
+{
+    // ----------------------------------------------------------------------
+    // SECURITY: Access-Control-Allow-Origin Wildcard
+    //
+    // This is a REALLY bad idea, so bad in fact that I'm including it here but
+    // commented out in the hope that anyone thinking of adding it in the future
+    // will see it and then read this comment.
+    //
+    // Browsers do not verify that the origin is on the same network. This means
+    // that a malicious script embedded or included into ANY webpage you visit
+    // could then access servers on your local network including MythTV. They
+    // can grab data, delete data including recordings and videos, schedule
+    // recordings and generally ruin your day.
+    //
+    // This might seem paranoid and a remote possibility, but then that's how
+    // a lot of exploits are born. Do NOT allow wildcards.
+    //
+    //m_mapRespHeaders[ "Access-Control-Allow-Origin" ] = "*";
+    // ----------------------------------------------------------------------
+
+    // ----------------------------------------------------------------------
+    // SECURITY: Allow the WebFrontend on the Master backend and ONLY this
+    // machine to access resources on a frontend or slave web server
+    //
+    // http://www.w3.org/TR/cors/#introduction
+    // ----------------------------------------------------------------------
+
+    QStringList allowedOrigins;
+    char localhostname[1024]; // about HOST_NAME_MAX * 4
+
+    int serverStatusPort = gCoreContext->GetMasterServerStatusPort();
+    int backendSSLPort = gCoreContext->GetNumSetting( "BackendSSLPort",
+                         serverStatusPort + 10);
+
+    QString masterAddrPort = QString("%1:%2")
+        .arg(gCoreContext->GetMasterServerIP())
+        .arg(serverStatusPort);
+    QString masterTLSAddrPort = QString("%1:%2")
+        .arg(gCoreContext->GetMasterServerIP())
+        .arg(backendSSLPort);
+
+    allowedOrigins << QString("http://%1").arg(masterAddrPort);
+    allowedOrigins << QString("https://%2").arg(masterTLSAddrPort);
+
+    if (!gethostname(localhostname, 1024))
+    {
+        allowedOrigins << QString("http://%1:%2")
+            .arg(localhostname).arg(serverStatusPort);
+        allowedOrigins << QString("https://%1:%2")
+            .arg(localhostname).arg(backendSSLPort);
+    }
+    QStringList allowedOriginsList =
+        gCoreContext->GetSetting("AllowedOriginsList", QString(
+            "https://chromecast.mythtv.org,"
+            "http://chromecast.mythtvcast.com"
+            )).split(",");
+
+    for (QStringList::const_iterator it = allowedOriginsList.begin();
+                                     it != allowedOriginsList.end(); it++)
+    {
+         if ((*it).isEmpty())
+            continue;
+
+        if (*it == "*" || (!(*it).startsWith("http://") &&
+            !(*it).startsWith("https://")))
+            LOG(VB_GENERAL, LOG_ERR, QString("Illegal AllowedOriginsList"
+                " entry '%1'. Must start with http[s]:// and not be *")
+                .arg(*it));
+        else
+            allowedOrigins << *it;
+    }
+
+    if (VERBOSE_LEVEL_CHECK(VB_UPNP, LOG_DEBUG))
+        for (QStringList::const_iterator it = allowedOrigins.begin();
+                                         it != allowedOrigins.end(); it++)
+            LOG(VB_UPNP, LOG_DEBUG, QString("Will allow Origin: %1").arg(*it));
+
+    if (allowedOrigins.contains(sOrigin))
+    {
+        sHeader += QString( "Access-Control-Allow-Origin: %1\r\n"
+                        "Access-Control-Allow-Credentials: true\r\n"
+                        "Access-Control-Allow-Headers: Content-Type\r\n" )
+                        .arg( sOrigin );
+        LOG(VB_UPNP, LOG_DEBUG, QString("Allow-Origin: %1)").arg(sOrigin));
+    }
+    else
+        LOG(VB_GENERAL, LOG_CRIT, QString("HTTPRequest: Cross-origin request "
+                                          "received with origin (%1)")
+                                          .arg(sOrigin));
+}
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
