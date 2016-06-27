@@ -812,74 +812,82 @@ void Scheduler::SlaveConnected(RecordingList &slavelist)
 {
     QMutexLocker lockit(&schedLock);
 
+    QMap<uint, bool> input_seen;
+
     RecordingList::iterator it = slavelist.begin();
     for (; it != slavelist.end(); ++it)
     {
         RecordingInfo *sp = *it;
         bool found = false;
 
-        RecIter ri = reclist.begin();
-        for ( ; ri != reclist.end(); ++ri)
+        if (!input_seen[sp->GetInputID()])
         {
-            RecordingInfo *rp = *ri;
+            input_seen[sp->GetInputID()] = true;
 
-            if (!sp->GetTitle().isEmpty() &&
-                sp->GetScheduledStartTime() == rp->GetScheduledStartTime() &&
-                sp->GetChannelSchedulingID().compare(
-                    rp->GetChannelSchedulingID(), Qt::CaseInsensitive) == 0 &&
-                sp->GetTitle().compare(rp->GetTitle(),
-                                       Qt::CaseInsensitive) == 0)
+            RecIter ri = reclist.begin();
+            for ( ; ri != reclist.end(); ++ri)
             {
-                if (sp->GetInputID() == rp->GetInputID())
+                RecordingInfo *rp = *ri;
+                if (sp->GetInputID() == rp->GetInputID() &&
+                    (rp->GetRecordingStatus() == RecStatus::Recording ||
+                     rp->GetRecordingStatus() == RecStatus::Tuning ||
+                     rp->GetRecordingStatus() == RecStatus::Failing))
                 {
-                    found = true;
-                    rp->SetRecordingStatus(sp->GetRecordingStatus());
+                    rp->SetRecordingStatus(RecStatus::Aborted);
                     reclist_changed = true;
                     rp->AddHistory(false);
                     LOG(VB_GENERAL, LOG_INFO,
-                        QString("setting %1/%2/\"%3\" as %4")
-                            .arg(sp->GetInputID())
-                            .arg(sp->GetChannelSchedulingID())
-                            .arg(sp->GetTitle())
-                            .arg(RecStatus::toUIState(sp->GetRecordingStatus())));
-                }
-                else
-                {
-                    LOG(VB_GENERAL, LOG_NOTICE,
-                        QString("%1/%2/\"%3\" is already recording on card %4")
-                            .arg(sp->GetInputID())
-                            .arg(sp->GetChannelSchedulingID())
-                            .arg(sp->GetTitle())
-                            .arg(rp->GetInputID()));
-                }
-            }
-            else if (sp->GetInputID() == rp->GetInputID() &&
-                     (rp->GetRecordingStatus() == RecStatus::Recording ||
-                      rp->GetRecordingStatus() == RecStatus::Tuning ||
-                      rp->GetRecordingStatus() == RecStatus::Failing))
-            {
-                rp->SetRecordingStatus(RecStatus::Aborted);
-                reclist_changed = true;
-                rp->AddHistory(false);
-                LOG(VB_GENERAL, LOG_INFO,
-                    QString("setting %1/%2/\"%3\" as aborted")
+                        QString("setting %1/%2/\"%3\" as aborted")
                         .arg(rp->GetInputID())
                         .arg(rp->GetChannelSchedulingID())
                         .arg(rp->GetTitle()));
+                }
             }
         }
 
-        if (sp->GetInputID() && !found)
+        if (!sp->GetTitle().isEmpty())
         {
-            sp->mplexid = sp->QueryMplexID();
-            reclist.push_back(new RecordingInfo(*sp));
-            reclist_changed = true;
-            sp->AddHistory(false);
-            LOG(VB_GENERAL, LOG_INFO,
-                QString("adding %1/%2/\"%3\" as recording")
+            RecIter ri = reclist.begin();
+            for ( ; ri != reclist.end(); ++ri)
+            {
+                RecordingInfo *rp = *ri;
+                if (sp->GetScheduledStartTime() ==
+                    rp->GetScheduledStartTime() &&
+                    sp->GetChannelSchedulingID().compare(
+                        rp->GetChannelSchedulingID(), Qt::CaseInsensitive) ==
+                    0 &&
+                    sp->GetTitle().compare(rp->GetTitle(),
+                                           Qt::CaseInsensitive) == 0)
+                {
+                    if (sp->GetInputID() == rp->GetInputID())
+                    {
+                        found = true;
+                        rp->SetRecordingStatus(sp->GetRecordingStatus());
+                        reclist_changed = true;
+                        rp->AddHistory(false);
+                        LOG(VB_GENERAL, LOG_INFO,
+                            QString("setting %1/%2/\"%3\" as %4")
+                            .arg(sp->GetInputID())
+                            .arg(sp->GetChannelSchedulingID())
+                            .arg(sp->GetTitle())
+                            .arg(RecStatus::toUIState(
+                                     sp->GetRecordingStatus())));
+                    }
+                }
+            }
+
+            if (!found)
+            {
+                sp->mplexid = sp->QueryMplexID();
+                reclist.push_back(new RecordingInfo(*sp));
+                reclist_changed = true;
+                sp->AddHistory(false);
+                LOG(VB_GENERAL, LOG_INFO,
+                    QString("adding %1/%2/\"%3\" as recording")
                     .arg(sp->GetInputID())
                     .arg(sp->GetChannelSchedulingID())
                     .arg(sp->GetTitle()));
+            }
         }
     }
 }
