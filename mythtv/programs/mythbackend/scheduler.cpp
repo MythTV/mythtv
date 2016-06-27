@@ -93,6 +93,7 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
         return;
     }
 
+    InitRecLimitMap();
     CreateConflictLists();
 
     fsInfoCacheFillTime = MythDate::current().addSecs(-1000);
@@ -1090,6 +1091,12 @@ bool Scheduler::FindNextConflict(
             continue;
         }
 
+        bool mplexid_ok =
+            (p->GetInputID() != q->GetInputID() ||
+             !reclimitmap[p->GetInputID()]) &&
+            ((p->mplexid && p->mplexid == q->mplexid) ||
+             (!p->mplexid && p->GetChanID() == q->GetChanID()));
+
         if (p->GetRecordingEndTime() == q->GetRecordingStartTime() ||
             p->GetRecordingStartTime() == q->GetRecordingEndTime())
         {
@@ -1097,18 +1104,14 @@ bool Scheduler::FindNextConflict(
                 (openEnd == openEndDiffChannel &&
                  p->GetChanID() == q->GetChanID()) ||
                 (openEnd == openEndAlways &&
-                 p->GetInputID() != q->GetInputID() &&
-                 ((p->mplexid && p->mplexid == q->mplexid) ||
-                  (!p->mplexid && p->GetChanID() == q->GetChanID()))))
+                 mplexid_ok))
             {
                 if (debugConflicts)
                     msg += "  no-overlap ";
                 if ((m_openEnd == openEndDiffChannel &&
                      p->GetChanID() == q->GetChanID()) ||
                     (m_openEnd == openEndAlways &&
-                     p->GetInputID() != q->GetInputID() &&
-                     ((p->mplexid && p->mplexid == q->mplexid) ||
-                      (!p->mplexid && p->GetChanID() == q->GetChanID()))))
+                     mplexid_ok))
                       ++affinity;
                 continue;
             }
@@ -1128,9 +1131,7 @@ bool Scheduler::FindNextConflict(
 
         // if two inputs are in the same input group we have a conflict
         // unless the programs are on the same multiplex.
-        if (p->GetInputID() != q->GetInputID() &&
-            ((p->mplexid && p->mplexid == q->mplexid) ||
-             (!p->mplexid && p->GetChanID() == q->GetChanID())))
+        if (mplexid_ok)
         {
             ++affinity;
             continue;
@@ -1888,13 +1889,23 @@ bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
     if (!m_tvList->contains(rcinfo->GetInputID()))
         return true;
 
+    InputInfo busy_input;
+
     EncoderLink *rctv = (*m_tvList)[rcinfo->GetInputID()];
     // first check the input we will be recording on...
-    if (rctv->IsBusyRecording())
-        return true;
+    if (rctv->IsBusy(&busy_input, -1))
+    {
+        if (busy_input.reclimit ||
+            ((busy_input.mplexid == 0 ||
+              busy_input.mplexid == 32767 ||
+              busy_input.mplexid != rcinfo->mplexid) &&
+             (busy_input.chanid == 0 ||
+              busy_input.chanid != rcinfo->GetChanID())))
+            return true;
+        return false;
+    }
 
     // now check other inputs in the same input group as the recording.
-    InputInfo busy_input;
     uint inputid = rcinfo->GetInputID();
     vector<uint> inputids = CardUtil::GetConflictingInputs(inputid);
     for (uint i = 0; i < inputids.size(); i++)
@@ -5465,6 +5476,22 @@ void Scheduler::CreateConflictLists(void)
             conflictlistmap[*sit] = conflictlists.back();
         }
     }
+}
+
+void Scheduler::InitRecLimitMap(void)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("SELECT cardid, reclimit "
+                  "FROM capturecard");
+    if (!query.exec())
+    {
+        MythDB::DBError("InitRecLimitMap", query);
+        return;
+    }
+
+    while (query.next())
+        reclimitmap[query.value(0).toUInt()] = query.value(1).toUInt();
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

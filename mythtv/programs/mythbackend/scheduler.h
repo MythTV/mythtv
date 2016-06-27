@@ -115,6 +115,7 @@ class Scheduler : public MThread, public MythScheduler
 
     bool VerifyCards(void);
 
+    void InitRecLimitMap(void);
     void CreateTempTables(void);
     void DeleteTempTables(void);
     void UpdateDuplicates(void);
@@ -221,6 +222,7 @@ class Scheduler : public MThread, public MythScheduler
     RecList reclist;
     RecList worklist;
     RecList livetvlist;
+    QMap<uint, uint> reclimitmap;
     vector<RecList *> conflictlists;
     QMap<uint, RecList *> conflictlistmap;
     QMap<uint, RecList> recordidlistmap;
