@@ -253,6 +253,8 @@ bool ChannelBase::IsInputAvailable(
         {
             if (info.reclimit)
             {
+                if (mplexid_restriction)
+                    chanid_restriction = 0;
                 LOG(VB_CHANNEL, LOG_DEBUG, LOC + QString("Parent is busy"));
                 return false;
             }
@@ -286,6 +288,8 @@ bool ChannelBase::IsInputAvailable(
         }            
     }
 
+    if (mplexid_restriction)
+        chanid_restriction = 0;
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Input is free on %1/%2")
         .arg(mplexid_restriction).arg(chanid_restriction));
     return true;
