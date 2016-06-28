@@ -114,6 +114,9 @@ void ProgDetails::Init()
 
 ProgDetails::~ProgDetails(void)
 {
+    if (!m_browser)
+        return;
+
     float zoom = m_browser->GetZoom();
     gCoreContext->SaveSetting("ProgDetailsZoom", QString().setNum(zoom));
 }

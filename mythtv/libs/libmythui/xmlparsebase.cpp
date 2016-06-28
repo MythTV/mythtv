@@ -13,6 +13,9 @@
 #include <QLinearGradient>
 #include <QRadialGradient>
 
+// libmythbase headers
+#include "mythconfig.h"
+
 // libmyth headers
 #include "mythlogging.h"
 
