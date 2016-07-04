@@ -812,82 +812,74 @@ void Scheduler::SlaveConnected(RecordingList &slavelist)
 {
     QMutexLocker lockit(&schedLock);
 
-    QMap<uint, bool> input_seen;
-
     RecordingList::iterator it = slavelist.begin();
     for (; it != slavelist.end(); ++it)
     {
         RecordingInfo *sp = *it;
         bool found = false;
 
-        if (!input_seen[sp->GetInputID()])
+        RecIter ri = reclist.begin();
+        for ( ; ri != reclist.end(); ++ri)
         {
-            input_seen[sp->GetInputID()] = true;
+            RecordingInfo *rp = *ri;
 
-            RecIter ri = reclist.begin();
-            for ( ; ri != reclist.end(); ++ri)
+            if (!sp->GetTitle().isEmpty() &&
+                sp->GetScheduledStartTime() == rp->GetScheduledStartTime() &&
+                sp->GetChannelSchedulingID().compare(
+                    rp->GetChannelSchedulingID(), Qt::CaseInsensitive) == 0 &&
+                sp->GetTitle().compare(rp->GetTitle(),
+                                       Qt::CaseInsensitive) == 0)
             {
-                RecordingInfo *rp = *ri;
-                if (sp->GetInputID() == rp->GetInputID() &&
-                    (rp->GetRecordingStatus() == RecStatus::Recording ||
-                     rp->GetRecordingStatus() == RecStatus::Tuning ||
-                     rp->GetRecordingStatus() == RecStatus::Failing))
+                if (sp->GetInputID() == rp->GetInputID())
                 {
-                    rp->SetRecordingStatus(RecStatus::Aborted);
+                    found = true;
+                    rp->SetRecordingStatus(sp->GetRecordingStatus());
                     reclist_changed = true;
                     rp->AddHistory(false);
                     LOG(VB_GENERAL, LOG_INFO,
-                        QString("setting %1/%2/\"%3\" as aborted")
-                        .arg(rp->GetInputID())
-                        .arg(rp->GetChannelSchedulingID())
-                        .arg(rp->GetTitle()));
-                }
-            }
-        }
-
-        if (!sp->GetTitle().isEmpty())
-        {
-            RecIter ri = reclist.begin();
-            for ( ; ri != reclist.end(); ++ri)
-            {
-                RecordingInfo *rp = *ri;
-                if (sp->GetScheduledStartTime() ==
-                    rp->GetScheduledStartTime() &&
-                    sp->GetChannelSchedulingID().compare(
-                        rp->GetChannelSchedulingID(), Qt::CaseInsensitive) ==
-                    0 &&
-                    sp->GetTitle().compare(rp->GetTitle(),
-                                           Qt::CaseInsensitive) == 0)
-                {
-                    if (sp->GetInputID() == rp->GetInputID())
-                    {
-                        found = true;
-                        rp->SetRecordingStatus(sp->GetRecordingStatus());
-                        reclist_changed = true;
-                        rp->AddHistory(false);
-                        LOG(VB_GENERAL, LOG_INFO,
-                            QString("setting %1/%2/\"%3\" as %4")
+                        QString("setting %1/%2/\"%3\" as %4")
                             .arg(sp->GetInputID())
                             .arg(sp->GetChannelSchedulingID())
                             .arg(sp->GetTitle())
-                            .arg(RecStatus::toUIState(
-                                     sp->GetRecordingStatus())));
-                    }
+                            .arg(RecStatus::toUIState(sp->GetRecordingStatus())));
+                }
+                else
+                {
+                    LOG(VB_GENERAL, LOG_NOTICE,
+                        QString("%1/%2/\"%3\" is already recording on card %4")
+                            .arg(sp->GetInputID())
+                            .arg(sp->GetChannelSchedulingID())
+                            .arg(sp->GetTitle())
+                            .arg(rp->GetInputID()));
                 }
             }
-
-            if (!found)
+            else if (sp->GetInputID() == rp->GetInputID() &&
+                     (rp->GetRecordingStatus() == RecStatus::Recording ||
+                      rp->GetRecordingStatus() == RecStatus::Tuning ||
+                      rp->GetRecordingStatus() == RecStatus::Failing))
             {
-                sp->mplexid = sp->QueryMplexID();
-                reclist.push_back(new RecordingInfo(*sp));
+                rp->SetRecordingStatus(RecStatus::Aborted);
                 reclist_changed = true;
-                sp->AddHistory(false);
+                rp->AddHistory(false);
                 LOG(VB_GENERAL, LOG_INFO,
-                    QString("adding %1/%2/\"%3\" as recording")
+                    QString("setting %1/%2/\"%3\" as aborted")
+                        .arg(rp->GetInputID())
+                        .arg(rp->GetChannelSchedulingID())
+                        .arg(rp->GetTitle()));
+            }
+        }
+
+        if (sp->GetInputID() && !found)
+        {
+            sp->mplexid = sp->QueryMplexID();
+            reclist.push_back(new RecordingInfo(*sp));
+            reclist_changed = true;
+            sp->AddHistory(false);
+            LOG(VB_GENERAL, LOG_INFO,
+                QString("adding %1/%2/\"%3\" as recording")
                     .arg(sp->GetInputID())
                     .arg(sp->GetChannelSchedulingID())
                     .arg(sp->GetTitle()));
-            }
         }
     }
 }
@@ -1100,8 +1092,8 @@ bool Scheduler::FindNextConflict(
         }
 
         bool mplexid_ok =
-            (p->GetInputID() != q->GetInputID() ||
-             !reclimitmap[p->GetInputID()]) &&
+            (p->GetInputID() != q->GetInputID() /*||
+             !reclimitmap[p->GetInputID()]*/) &&
             ((p->mplexid && p->mplexid == q->mplexid) ||
              (!p->mplexid && p->GetChanID() == q->GetChanID()));
 
@@ -1897,23 +1889,13 @@ bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
     if (!m_tvList->contains(rcinfo->GetInputID()))
         return true;
 
-    InputInfo busy_input;
-
     EncoderLink *rctv = (*m_tvList)[rcinfo->GetInputID()];
     // first check the input we will be recording on...
-    if (rctv->IsBusy(&busy_input, -1))
-    {
-        if (busy_input.reclimit ||
-            ((busy_input.mplexid == 0 ||
-              busy_input.mplexid == 32767 ||
-              busy_input.mplexid != rcinfo->mplexid) &&
-             (busy_input.chanid == 0 ||
-              busy_input.chanid != rcinfo->GetChanID())))
-            return true;
-        return false;
-    }
+    if (rctv->IsBusyRecording())
+        return true;
 
     // now check other inputs in the same input group as the recording.
+    InputInfo busy_input;
     uint inputid = rcinfo->GetInputID();
     vector<uint> inputids = CardUtil::GetConflictingInputs(inputid);
     for (uint i = 0; i < inputids.size(); i++)

@@ -238,46 +238,15 @@ bool ChannelBase::IsInputAvailable(
     mplexid_restriction = 0;
     chanid_restriction = 0;
 
-    // FIXME: When the recorder supports reclimit, we need to check it
-    // first.  Unfortunately, there is currently a logic/race
-    // condition where the recorder sets its state to recording before
-    // the channel is set.  This causes IsBusy() to return true with
-    // the wrong mplexid/chanid restriction.  For now, don't use the
-    // parent information.  This is effectively what the pre-reclimit
-    // code did by ignoring the IsBusy() result from the parent.
-#if 0
-    if (m_pParent)
-    {
-        m_pParent->IsBusy(&info);
-        if (info.reccount)
-        {
-            if (info.reclimit)
-            {
-                if (mplexid_restriction)
-                    chanid_restriction = 0;
-                LOG(VB_CHANNEL, LOG_DEBUG, LOC + QString("Parent is busy"));
-                return false;
-            }
-            mplexid_restriction = info.mplexid;
-            chanid_restriction = info.chanid;
-            LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Parent is free on %1/%2")
-                .arg(mplexid_restriction).arg(chanid_restriction));
-            return true;
-        }
-    }
-#endif
-
     vector<uint> inputids = CardUtil::GetConflictingInputs(m_inputid);
     for (uint i = 0; i < inputids.size(); ++i)
     {
-        RemoteIsBusy(inputids[i], info);
-        if (info.reccount)
+        if (RemoteIsBusy(inputids[i], info))
         {
             LOG(VB_CHANNEL, LOG_DEBUG, LOC +
-                QString("Input %1 is busy on %2/%3/%4/%5")
+                QString("Input %1 is busy on %2/%3")
                 .arg(info.inputid)
-                .arg(info.chanid).arg(info.mplexid)
-                .arg(info.reccount).arg(info.reclimit));
+                .arg(info.chanid).arg(info.mplexid));
             if (info.sourceid != m_sourceid)
             {
                 LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Input is busy"));
@@ -285,7 +254,7 @@ bool ChannelBase::IsInputAvailable(
             }
             mplexid_restriction = info.mplexid;
             chanid_restriction = info.chanid;
-        }            
+        }
     }
 
     if (mplexid_restriction)

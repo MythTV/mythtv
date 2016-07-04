@@ -148,9 +148,8 @@ vector<InputInfo> RemoteRequestFreeInputInfo(uint excluded_input)
             break;
         inputs.push_back(info);
         LOG(VB_CHANNEL, LOG_INFO,
-            QString("RemoteRequestFreeInputInfo got input %1 (%2/%3/%4/%5)")
-            .arg(info.inputid).arg(info.chanid).arg(info.mplexid)
-            .arg(info.reccount).arg(info.reclimit));
+            QString("RemoteRequestFreeInputInfo got input %1 (%2/%3)")
+            .arg(info.inputid).arg(info.chanid).arg(info.mplexid));
     }
 
     LOG(VB_CHANNEL, LOG_INFO,

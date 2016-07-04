@@ -6,7 +6,7 @@
 InputInfo::InputInfo(
     const QString &_name,
     uint _sourceid, uint _inputid, uint _mplexid, uint _chanid,
-    uint _livetvorder, uint _reclimit) :
+    uint _livetvorder) :
     name(_name),
     sourceid(_sourceid),
     inputid(_inputid),
@@ -15,9 +15,7 @@ InputInfo::InputInfo(
     recPriority(0),
     scheduleOrder(0),
     livetvorder(_livetvorder),
-    quickTune(false),
-    reccount(0),
-    reclimit(_reclimit)
+    quickTune(false)
 {
     name.detach();
 }
@@ -42,7 +40,6 @@ bool InputInfo::FromStringList(QStringList::const_iterator &it,
 
     sourceid = (*it).toUInt(); NEXT();
     inputid  = (*it).toUInt(); NEXT();
-    reccount = (*it).toUInt(); NEXT();
     mplexid  = (*it).toUInt(); NEXT();
     livetvorder = (*it).toUInt(); NEXT();
 
@@ -54,8 +51,7 @@ bool InputInfo::FromStringList(QStringList::const_iterator &it,
     recPriority = (*it).toInt(); NEXT();
     scheduleOrder = (*it).toUInt(); NEXT();
     quickTune = (*it).toUInt(); NEXT();
-    chanid   = (*it).toUInt(); NEXT();
-    reclimit = (*it).toUInt(); ++it;
+    chanid   = (*it).toUInt(); ++it;
 
     return true;
 }
@@ -66,7 +62,6 @@ void InputInfo::ToStringList(QStringList &list) const
     list.push_back(name.isEmpty() ? "<EMPTY>" : name);
     list.push_back(QString::number(sourceid));
     list.push_back(QString::number(inputid));
-    list.push_back(QString::number(reccount));
     list.push_back(QString::number(mplexid));
     list.push_back(QString::number(livetvorder));
     list.push_back(displayName.isEmpty() ? "<EMPTY>" : displayName);
@@ -74,6 +69,5 @@ void InputInfo::ToStringList(QStringList &list) const
     list.push_back(QString::number(scheduleOrder));
     list.push_back(QString::number(quickTune));
     list.push_back(QString::number(chanid));
-    list.push_back(QString::number(reclimit));
 }
 

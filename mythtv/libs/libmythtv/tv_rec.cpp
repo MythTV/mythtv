@@ -96,7 +96,6 @@ TVRec::TVRec(int _inputid)
       audioSampleRateDB(0),
       overRecordSecNrml(0),         overRecordSecCat(0),
       overRecordCategory(""),
-      recLimit(0),
       // Configuration variables from setup rutines
       inputid(_inputid), ispip(false),
       // State variables
@@ -174,7 +173,6 @@ bool TVRec::Init(void)
     overRecordSecNrml = gCoreContext->GetNumSetting("RecordOverTime");
     overRecordSecCat  = gCoreContext->GetNumSetting("CategoryOverTime") * 60;
     overRecordCategory= gCoreContext->GetSetting("OverTimeCategory");
-    recLimit = CardUtil::GetRecLimit(inputid);
 
     eventThread->start();
 
@@ -2520,8 +2518,6 @@ bool TVRec::IsBusy(InputInfo *busy_input, int time_buffer) const
         busy_input->mplexid = ChannelUtil::GetMplexID(busy_input->chanid);
         busy_input->mplexid =
             (32767 == busy_input->mplexid) ? 0 : busy_input->mplexid;
-        busy_input->reccount = 1;
-        busy_input->reclimit = recLimit;
     }
 
     return busy_input->inputid;
