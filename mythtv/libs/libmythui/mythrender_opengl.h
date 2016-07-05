@@ -271,6 +271,10 @@ class MUI_PUBLIC MythRenderOpenGL : protected MythRenderContext, public MythRend
     QMap<uint64_t,GLuint>   m_cachedVBOS;
     QList<uint64_t>         m_vboExpiry;
 
+    // For Performance improvement set false to disable glFlush.
+    // Needed for Raspberry pi
+    bool    m_flushEnabled;
+
     // 1D Textures (not available on GL ES 2.0)
     MYTH_GLTEXIMAGE1DPROC                m_glTexImage1D;
 

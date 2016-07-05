@@ -37,13 +37,13 @@ class MUI_PUBLIC MythOpenGLPainter : public MythPainter
 
     virtual void PushTransformation(const UIEffects &fx, QPointF center = QPointF());
     virtual void PopTransformation(void);
+    void       DeleteTextures(void);
 
   protected:
     virtual MythImage* GetFormatImagePriv(void) { return new MythImage(this); }
     virtual void DeleteFormatImagePriv(MythImage *im);
 
     void       ClearCache(void);
-    void       DeleteTextures(void);
     int        GetTextureFromCache(MythImage *im);
 
     QWidget          *realParent;

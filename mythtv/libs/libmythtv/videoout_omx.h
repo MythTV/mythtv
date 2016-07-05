@@ -12,6 +12,10 @@
 #include "omxcontext.h"
 
 class MythRenderEGL;
+class GlOsdThread;
+#ifdef OSD_EGL
+class MythOpenGLPainter;
+#endif
 
 class VideoOutputOMX : public VideoOutput, private OMXComponentCtx
 {
@@ -77,8 +81,13 @@ class VideoOutputOMX : public VideoOutput, private OMXComponentCtx
     QRect m_disp_rect, m_vid_rect;
     QVector<void*> m_bufs;
     MythRenderEGL *m_context;
-    MythPainter *m_osdpainter;
+#ifdef OSD_EGL   
+    MythOpenGLPainter *m_osdpainter;
+    MythPainter *m_threaded_osdpainter;
+#endif
     MythScreenType *m_backgroundscreen;
+    GlOsdThread *m_glOsdThread;
+    bool m_changed;
 };
 
 #endif // ndef VIDEOOUT_OMX_H

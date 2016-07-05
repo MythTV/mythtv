@@ -136,6 +136,7 @@ Advanced options (experts only):
   --disable-openmax        disable OpenMAX hardware accelerated video decoding
   --disable-dxva2          disable hardware accelerated decoding on windows
   --disable-opengl-video   disable OpenGL based video display
+  --disable-opengl-themepainter disable OpenGL based theme painting
   --disable-libass         disable libass SSA/ASS subtitle support
   --disable-systemd_notify disable systemd notify support
 
@@ -2344,6 +2345,7 @@ MYTHTV_CONFIG_LIST='
     mheg
     opengl
     opengl_video
+    opengl_themepainter
     qtwebkit
     qtscript
     qtdbus
@@ -3365,6 +3367,7 @@ mythtranscode_deps="backend frontend"
 opengl_deps_any="agl_h GL_gl_h EGL_egl_h GLES2_gl2_h darwin windows x11"
 opengles_deps="GLES2_gl2_h"
 opengl_video_deps="opengl"
+opengl_themepainter_deps="opengl"
 v4l2_deps="backend linux_videodev2_h"
 v4l1_deps="backend v4l2 linux_videodev_h"
 xrandr_deps="x11"
@@ -3538,6 +3541,7 @@ enable mythtranscode
 enable opengl
 enable opengles
 enable opengl_video
+enable opengl_themepainter
 enable symbol_visibility
 enable v4l1
 enable v4l2
@@ -8045,6 +8049,7 @@ if enabled x11 ; then
   fi
 fi
   echo "OpenGL video              ${opengl_video-no}"
+  echo "OpenGL ThemePainter       ${opengl_themepainter-no}"
   if test x"$target_os" = x"darwin" ; then
     echo "VDA support               ${vda-no}"
   fi

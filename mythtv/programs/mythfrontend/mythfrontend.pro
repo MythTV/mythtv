@@ -154,3 +154,27 @@ android {
 
     ANDROID_PACKAGE_SOURCE_DIR += $$(MYTHPACKAGEBASE)/android-package-source
 }
+
+using_openmax {
+    contains( HAVE_OPENMAX_BROADCOM, yes ) {
+        using_opengl {
+            # For raspberry Pi Raspbian
+            exists(/opt/vc/lib/libEGL.so) {
+                DEFINES += USING_OPENGLES
+                # For raspberry pi raspbian
+                QMAKE_RPATHDIR += $${RUNPREFIX}/share/mythtv/lib
+                createlinks.path = $${PREFIX}/share/mythtv/lib
+                createlinks.extra = ln -fs /opt/vc/lib/libEGL.so $(INSTALL_ROOT)/$${PREFIX}/share/mythtv/lib/libEGL.so.1.0.0 ;
+                createlinks.extra += ln -fs /opt/vc/lib/libEGL.so $(INSTALL_ROOT)/$${PREFIX}/share/mythtv/lib/libEGL.so.1 ;
+                createlinks.extra += ln -fs /opt/vc/lib/libGLESv2.so $(INSTALL_ROOT)/$${PREFIX}/share/mythtv/lib/libGLESv2.so.2.0.0 ;
+                createlinks.extra += ln -fs /opt/vc/lib/libGLESv2.so $(INSTALL_ROOT)/$${PREFIX}/share/mythtv/lib/libGLESv2.so.2 ;
+                INSTALLS += createlinks
+            }
+        } else {
+            # For raspberry pi ubuntu
+            exists(/usr/lib/arm-linux-gnueabihf/mesa-egl/libEGL.so) {
+                QMAKE_RPATHDIR += /usr/lib/arm-linux-gnueabihf/mesa-egl
+            }
+        }
+    }
+}
