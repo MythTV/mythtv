@@ -153,7 +153,7 @@ class MTV_PUBLIC VideoDisplayProfile
     static void        CreateVDAProfiles(const QString &hostname);
     static void        CreateOpenGLProfiles(const QString &hostname);
     static void        CreateVAAPIProfiles(const QString &hostname);
-    static void        CreateOpenMAXProfiles(const QString &hostname);
+    static void        CreateOpenMAXProfiles(const QString &hostname, int upgrade = 0);
 
     static QStringList GetVideoRenderers(const QString &decoder);
     static QString     GetVideoRendererHelp(const QString &renderer);
