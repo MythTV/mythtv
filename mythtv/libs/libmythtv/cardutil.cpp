@@ -731,30 +731,6 @@ vector<uint> CardUtil::GetChildInputIDs(uint inputid)
     return list;
 }
 
-uint CardUtil::GetRecLimit(uint inputid)
-{
-    if (!inputid)
-        return 1;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    QString qstr =
-        "SELECT reclimit "
-        "FROM capturecard "
-        "WHERE cardid = :INPUTID";
-
-    query.prepare(qstr);
-    query.bindValue(":INPUTID", inputid);
-
-    uint reclimit = 0;
-
-    if (!query.exec())
-        MythDB::DBError("CardUtil::GetRecLimit()", query);
-    else if (query.next())
-        reclimit = query.value(0).toUInt();
-
-    return reclimit;
-}
-
 static uint clone_capturecard(uint src_inputid, uint orig_dst_inputid)
 {
     uint dst_inputid = orig_dst_inputid;
@@ -803,15 +779,17 @@ static uint clone_capturecard(uint src_inputid, uint orig_dst_inputid)
     }
 
     query.prepare(
-        "SELECT videodevice,           audiodevice,           vbidevice,       "
-        "       cardtype,              hostname,              signal_timeout,  "
-        "       channel_timeout,       dvb_wait_for_seqstart, dvb_on_demand,   "
-        "       dvb_tuning_delay,      dvb_diseqc_type,       diseqcid,        "
-        "       dvb_eitscan,           inputname,             sourceid,        "
-        "       externalcommand,       changer_device,        changer_model,   "
-        "       tunechan,              startchan,             displayname,     "
-        "       dishnet_eit,           recpriority,           quicktune,       "
-        "       schedorder,            livetvorder,           reclimit "
+        "SELECT videodevice,           audiodevice,           vbidevice,      "
+        "       cardtype,              hostname,              signal_timeout, "
+        "       channel_timeout,       dvb_wait_for_seqstart, dvb_on_demand,  "
+        "       dvb_tuning_delay,      dvb_diseqc_type,       diseqcid,       "
+        "       dvb_eitscan,           inputname,             sourceid,       "
+        "       externalcommand,       changer_device,        changer_model,  "
+        "       tunechan,              startchan,             displayname,    "
+        "       dishnet_eit,           recpriority,           quicktune,      "
+        "       livetvorder,           reclimit,                              "
+        // See below for special handling of the following.
+        "       schedgroup,            schedorder                             "
         "FROM capturecard "
         "WHERE cardid = :INPUTID");
     query.bindValue(":INPUTID", src_inputid);
@@ -825,6 +803,17 @@ static uint clone_capturecard(uint src_inputid, uint orig_dst_inputid)
     {
         LOG(VB_GENERAL, LOG_ERR, "clone_cardinput -- get data 2");
         return 0;
+    }
+
+    // Hangel schedgroup and schedorder specially.  If schedgroup is
+    // set, schedgroup and schedorder should be false and 0,
+    // respectively, for all children.
+    bool schedgroup = query.value(26).toBool();
+    uint schedorder = query.value(27).toUInt();
+    if (schedgroup)
+    {
+        schedgroup = false;
+        schedorder = 0;
     }
 
     MSqlQuery query2(MSqlQuery::InitCon());
@@ -854,15 +843,18 @@ static uint clone_capturecard(uint src_inputid, uint orig_dst_inputid)
         "    dishnet_eit           = :V21, "
         "    recpriority           = :V22, "
         "    quicktune             = :V23, "
-        "    schedorder            = :V24, "
-        "    livetvorder           = :V25, "
-        "    reclimit              = :V26, "
+        "    livetvorder           = :V24, "
+        "    reclimit              = :V25, "
+        "    schedgroup            = :SCHEDGROUP, "
+        "    schedorder            = :SCHEDORDER, "
         "    parentid              = :PARENTID "
         "WHERE cardid = :INPUTID");
-    for (uint i = 0; i < 27; ++i)
+    for (uint i = 0; i < 26; ++i)
         query2.bindValue(QString(":V%1").arg(i), query.value(i).toString());
     query2.bindValue(":INPUTID", dst_inputid);
     query2.bindValue(":PARENTID", src_inputid);
+    query2.bindValue(":SCHEDGROUP", schedgroup);
+    query2.bindValue(":SCHEDORDER", schedorder);
 
     if (!query2.exec())
     {

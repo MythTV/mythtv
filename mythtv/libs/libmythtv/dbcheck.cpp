@@ -3319,6 +3319,18 @@ NULL
             return false;
     }
 
+    if (dbver == "1345")
+    {
+        const char *updates[] = {
+            "ALTER TABLE capturecard ADD COLUMN "
+            "    schedgroup TINYINT(1) DEFAULT 0 NOT NULL",
+            NULL
+        };
+
+        if (!performActualUpdate(&updates[0], "1346", dbver))
+            return false;
+    }
+
     /*
      * TODO the following settings are no more, clean them up with the next schema change
      * to avoid confusion by stale settings in the database

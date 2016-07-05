@@ -134,12 +134,31 @@ class InstanceCount : public SpinBoxSetting, public CardInputDBStorage
         setHelpText(
             QObject::tr(
                 "Maximum number of simultaneous recordings MythTV will "
-                "attempt using this device.  if set to a value other than "
+                "attempt using this device.  If set to a value other than "
                 "1, MythTV can sometimes record multiple programs on "
                 "the same multiplex or overlapping copies of the same "
-                "program on a single channel.  If set to 0, the number of "
-                "simultaneous recordings MythTV will attempt to record is "
-                "unlimited."
+                "program on a single channel."
+                ));
+    };
+};
+
+class SchedGroup : public CheckBoxSetting, public CardInputDBStorage
+{
+  public:
+    SchedGroup(const CardInput &parent) :
+        CheckBoxSetting(this),
+        CardInputDBStorage(this, parent, "schedgroup")
+    {
+        setLabel(QObject::tr("Schedule as group"));
+        setValue(false);
+        setHelpText(
+            QObject::tr(
+                "Schedule all virtual inputs on this device as a group.  "
+                "This is more efficient than scheduling each input "
+                "individually, but can result in scheduling more "
+                "simultaneous recordings than is allowed.  Be sure to set "
+                "the maximum number of simultaneous recordings above "
+                "high enough to handle all expected cases."
                 ));
     };
 };
@@ -3350,7 +3369,9 @@ CardInput::CardInput(const QString & cardtype, const QString & device,
     srcfetch(new TransButtonSetting()),
     externalInputSettings(new DiSEqCDevSettings()),
     inputgrp0(new InputGroup(*this, 0)),
-    inputgrp1(new InputGroup(*this, 1))
+    inputgrp1(new InputGroup(*this, 1)),
+    instancecount(NULL),
+    schedgroup(NULL)
 {
     addChild(id);
 
@@ -3410,7 +3431,12 @@ CardInput::CardInput(const QString & cardtype, const QString & device,
 
     interact->setLabel(QObject::tr("Interactions between inputs"));
     if (CardUtil::IsTunerSharingCapable(cardtype))
-        interact->addChild(new InstanceCount(*this, 1, kDefaultMultirecCount));
+    {
+        instancecount = new InstanceCount(*this, 1, kDefaultMultirecCount);
+        interact->addChild(instancecount);
+        //schedgroup = new SchedGroup(*this);
+        //interact->addChild(schedgroup);
+    }
     interact->addChild(new InputPriority(*this));
     interact->addChild(new ScheduleOrder(*this, _cardid));
     interact->addChild(new LiveTVOrder(*this, _cardid));
@@ -3438,6 +3464,9 @@ CardInput::CardInput(const QString & cardtype, const QString & device,
             this,     SLOT(  SetSourceID (const QString&)));
     connect(ingrpbtn, SIGNAL(pressed(QString)),
             this,     SLOT(  CreateNewInputGroup()));
+    if (schedgroup)
+        connect(instancecount, SIGNAL(valueChanged(int)),
+                this,     SLOT(UpdateSchedGroup(int)));
 }
 
 CardInput::~CardInput()
@@ -3457,6 +3486,13 @@ void CardInput::SetSourceID(const QString &sourceid)
     scan->setEnabled(enable && !raw_card_type.isEmpty() &&
                      !CardUtil::IsUnscanable(raw_card_type));
     srcfetch->setEnabled(enable);
+}
+
+void CardInput::UpdateSchedGroup(int value)
+{
+    if (value <= 1)
+        schedgroup->setValue(false);
+    schedgroup->setEnabled(value > 1);
 }
 
 QString CardInput::getSourceName(void) const
@@ -3658,14 +3694,20 @@ void CardInput::Save(void)
     ConfigurationWizard::Save();
     externalInputSettings->Store(getInputID());
 
-    uint instance_count = CardUtil::GetRecLimit(cardid);
-    if (!instance_count)
-        instance_count = 1;
+    uint icount = 1;
+    if (instancecount)
+    {
+        icount = instancecount->getValue().toUInt();
+        // If schedgroup is set, we need an additional instance since
+        // this one will not be used for recording.
+        if (schedgroup && schedgroup->getValue().toUInt())
+            icount += 1;
+    }
     vector<uint> cardids = CardUtil::GetChildInputIDs(cardid);
 
     // Delete old clone cards as required.
     for (uint i = cardids.size() + 1;
-         (i > instance_count) && !cardids.empty(); --i)
+         (i > icount) && !cardids.empty(); --i)
     {
         CardUtil::DeleteCard(cardids.back());
         cardids.pop_back();
@@ -3678,7 +3720,7 @@ void CardInput::Save(void)
     }
 
     // Create new clone cards as required.
-    for (uint i = cardids.size() + 1; i < instance_count; i++)
+    for (uint i = cardids.size() + 1; i < icount; i++)
     {
         CardUtil::CloneCard(cardid, 0);
     }

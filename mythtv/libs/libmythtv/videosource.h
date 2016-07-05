@@ -871,6 +871,7 @@ class CardInput : public QObject, public ConfigurationWizard
     void channelScanner();
     void sourceFetch();
     void SetSourceID(const QString &sourceid);
+    void UpdateSchedGroup(int value);
 
   private:
     class ID: public AutoIncrementDBSetting
@@ -892,6 +893,8 @@ class CardInput : public QObject, public ConfigurationWizard
     DiSEqCDevSettings  *externalInputSettings;
     InputGroup         *inputgrp0;
     InputGroup         *inputgrp1;
+    SpinBoxSetting  *instancecount;
+    CheckBoxSetting *schedgroup;
 };
 
 class HDHomeRunDeviceID;
