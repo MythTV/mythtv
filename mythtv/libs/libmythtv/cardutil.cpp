@@ -1412,29 +1412,41 @@ vector<uint> CardUtil::GetGroupInputIDs(uint inputgroupid)
 
 vector<uint> CardUtil::GetConflictingInputs(uint inputid)
 {
+    LOG(VB_RECORD, LOG_INFO,
+        LOC + QString("GetConflictingInputs() input %1").arg(inputid));
+
     vector<uint> inputids;
-    vector<uint> inputgroupids = CardUtil::GetInputGroups(inputid);
 
-    for (uint i = 0; i < inputgroupids.size(); i++)
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare(
+        "SELECT DISTINCT c.cardid "
+        "FROM ( "
+        "    SELECT inputgroupid "
+        "    FROM inputgroup "
+        "    WHERE cardinputid = :INPUTID1 "
+        ") g "
+        "JOIN inputgroup ig ON ig.inputgroupid = g.inputgroupid "
+        "JOIN capturecard c ON c.cardid = ig.cardinputid "
+        "                      AND c.schedgroup = 0 "
+        "                      AND c.cardid <> :INPUTID2 "
+        "ORDER BY c.cardid");
+
+    query.bindValue(":INPUTID1", inputid);
+    query.bindValue(":INPUTID2", inputid);
+
+    if (!query.exec())
     {
-        LOG(VB_RECORD, LOG_INFO, LOC + QString("  Group ID %1")
-                                     .arg(inputgroupids[i]));
-
-        vector<uint> tmp = CardUtil::GetGroupInputIDs(inputgroupids[i]);
-        for (uint j = 0; j < tmp.size(); j++)
-        {
-            if (tmp[j] == inputid)
-                continue;
-            if (find(inputids.begin(), inputids.end(), tmp[j])
-                != inputids.end())
-                continue;
-            inputids.push_back(tmp[j]);
-        }
+        MythDB::DBError("CardUtil::GetConflictingInputs()", query);
+        return inputids;
     }
 
-    for (uint i = 0; i < inputids.size(); i++)
+    while (query.next())
+    {
+        inputids.push_back(query.value(0).toUInt());
         LOG(VB_RECORD, LOG_INFO,
-            LOC + QString("  Input ID %1").arg(inputids[i]));
+            LOC + QString("GetConflictingInputs() got input %1").arg(inputids.back()));
+    }
 
     return inputids;
 }
