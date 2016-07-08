@@ -237,7 +237,8 @@ static inline bool Recording(const RecordingInfo *p)
     return (p->GetRecordingStatus() == RecStatus::Recording ||
             p->GetRecordingStatus() == RecStatus::Tuning ||
             p->GetRecordingStatus() == RecStatus::Failing ||
-            p->GetRecordingStatus() == RecStatus::WillRecord);
+            p->GetRecordingStatus() == RecStatus::WillRecord ||
+            p->GetRecordingStatus() == RecStatus::Pending);
 }
 
 static bool comp_overlap(RecordingInfo *a, RecordingInfo *b)
@@ -324,10 +325,12 @@ static bool comp_priority(RecordingInfo *a, RecordingInfo *b)
 {
     int arec = (a->GetRecordingStatus() != RecStatus::Recording &&
                 a->GetRecordingStatus() != RecStatus::Tuning &&
-                a->GetRecordingStatus() != RecStatus::Failing);
+                a->GetRecordingStatus() != RecStatus::Failing &&
+                a->GetRecordingStatus() != RecStatus::Pending);
     int brec = (b->GetRecordingStatus() != RecStatus::Recording &&
                 b->GetRecordingStatus() != RecStatus::Tuning &&
-                b->GetRecordingStatus() != RecStatus::Failing);
+                b->GetRecordingStatus() != RecStatus::Failing &&
+                b->GetRecordingStatus() != RecStatus::Pending);
 
     if (arec != brec)
         return arec < brec;
@@ -764,7 +767,8 @@ bool Scheduler::ChangeRecordingEnd(RecordingInfo *oldp, RecordingInfo *newp)
     oldp->SetRecordingRuleID(newp->GetRecordingRuleID());
     oldp->SetRecordingEndTime(newp->GetRecordingEndTime());
 
-    if (specsched)
+    if (specsched ||
+        oldp->GetRecordingStatus() == RecStatus::Pending)
     {
         if (newp->GetRecordingEndTime() < MythDate::current())
         {
@@ -793,16 +797,42 @@ bool Scheduler::ChangeRecordingEnd(RecordingInfo *oldp, RecordingInfo *newp)
     }
     else
     {
+        RecordingInfo *foundp = NULL;
         RecIter i = reclist.begin();
         for (; i != reclist.end(); ++i)
         {
             RecordingInfo *recp = *i;
-            if (recp->IsSameTitleStartTimeAndChannel(*oldp))
+            if (recp->GetInputID() == oldp->GetInputID() &&
+                recp->IsSameTitleStartTimeAndChannel(*oldp))
             {
                 *recp = *oldp;
+                PrintRec(recp, "##found ");
+                foundp = *i;
                 break;
             }
         }
+
+        // If any pending recordings are affected, set them to
+        // future conflicting and force a reschedule by marking
+        // reclist as changed.
+        LOG(VB_SCHEDULE, LOG_INFO, "##srart");
+        RecConstIter j = reclist.begin();
+        while (FindNextConflict(reclist, foundp, j, openEndNever, NULL))
+        {
+            RecordingInfo *recp = *j;
+            PrintRec(recp, "##check ");
+            if (recp->GetRecordingStatus() == RecStatus::Pending)
+            {
+                QString schedid = recp->MakeUniqueSchedulerKey();
+                recPendingList.remove(schedid);
+                recp->SetRecordingStatus(RecStatus::Conflict);
+                recp->AddHistory(false, false, true);
+                reclist_changed = true;
+                PrintRec(recp, "##miss  ");
+            }
+            ++j;
+        }
+        LOG(VB_SCHEDULE, LOG_INFO, "##done");
     }
 
     return rs == RecStatus::Recording;
@@ -896,11 +926,22 @@ void Scheduler::SlaveDisconnected(uint cardid)
         if (rp->GetInputID() == cardid &&
             (rp->GetRecordingStatus() == RecStatus::Recording ||
              rp->GetRecordingStatus() == RecStatus::Tuning ||
-             rp->GetRecordingStatus() == RecStatus::Failing))
+             rp->GetRecordingStatus() == RecStatus::Failing ||
+             rp->GetRecordingStatus() == RecStatus::Pending))
         {
-            rp->SetRecordingStatus(RecStatus::Aborted);
+            if (rp->GetRecordingStatus() == RecStatus::Pending)
+            {
+                QString schedid = rp->MakeUniqueSchedulerKey();
+                recPendingList.remove(schedid);
+                rp->SetRecordingStatus(RecStatus::Missed);
+                rp->AddHistory(false, false, true);
+            }
+            else
+            {
+                rp->SetRecordingStatus(RecStatus::Aborted);
+                rp->AddHistory(false);
+            }
             reclist_changed = true;
-            rp->AddHistory(false);
             LOG(VB_GENERAL, LOG_INFO, QString("setting %1/%2/\"%3\" as aborted")
                     .arg(rp->GetInputID()).arg(rp->GetChannelSchedulingID())
                     .arg(rp->GetTitle()));
@@ -916,7 +957,8 @@ void Scheduler::BuildWorkList(void)
         RecordingInfo *p = *i;
         if (p->GetRecordingStatus() == RecStatus::Recording ||
             p->GetRecordingStatus() == RecStatus::Tuning ||
-            p->GetRecordingStatus() == RecStatus::Failing)
+            p->GetRecordingStatus() == RecStatus::Failing ||
+            p->GetRecordingStatus() == RecStatus::Pending)
             worklist.push_back(new RecordingInfo(*p));
     }
 }
@@ -1005,6 +1047,7 @@ void Scheduler::BuildListMaps(void)
             p->GetRecordingStatus() == RecStatus::Tuning ||
             p->GetRecordingStatus() == RecStatus::Failing ||
             p->GetRecordingStatus() == RecStatus::WillRecord ||
+            p->GetRecordingStatus() == RecStatus::Pending ||
             p->GetRecordingStatus() == RecStatus::Unknown)
         {
             RecList *conflictlist = conflictlistmap[p->GetInputID()];
@@ -1248,7 +1291,8 @@ bool Scheduler::TryAnotherShowing(RecordingInfo *p, bool samePriority,
 
     if (p->GetRecordingStatus() == RecStatus::Recording ||
         p->GetRecordingStatus() == RecStatus::Tuning ||
-        p->GetRecordingStatus() == RecStatus::Failing)
+        p->GetRecordingStatus() == RecStatus::Failing ||
+        p->GetRecordingStatus() == RecStatus::Pending)
         return false;
 
     RecList *showinglist = &recordidlistmap[p->GetRecordingRuleID()];
@@ -1381,7 +1425,8 @@ void Scheduler::SchedNewRecords(void)
     for ( ; i != worklist.end(); ++i)
     {
         if ((*i)->GetRecordingStatus() != RecStatus::Recording &&
-            (*i)->GetRecordingStatus() != RecStatus::Tuning)
+            (*i)->GetRecordingStatus() != RecStatus::Tuning &&
+            (*i)->GetRecordingStatus() != RecStatus::Pending)
             break;
         MarkOtherShowings(*i);
     }
@@ -1606,8 +1651,8 @@ void Scheduler::PruneRedundants(void)
         }
         else
         {
-            // Flag lower priority showings that will recorded so we
-            // can warn the user about them
+            // Flag lower priority showings that will be recorded so
+            // we can warn the user about them
             if (lastp->GetRecordingStatus() == RecStatus::WillRecord &&
                 p->GetRecordingPriority2() >
                 lastrecpri2 - lastp->GetRecordingPriority2())
@@ -1634,7 +1679,8 @@ void Scheduler::UpdateNextRecord(void)
     while (i != reclist.end())
     {
         RecordingInfo *p = *i;
-        if (p->GetRecordingStatus() == RecStatus::WillRecord &&
+        if ((p->GetRecordingStatus() == RecStatus::WillRecord ||
+             p->GetRecordingStatus() == RecStatus::Pending) &&
             nextRecMap[p->GetRecordingRuleID()].isNull())
         {
             nextRecMap[p->GetRecordingRuleID()] = p->GetRecordingStartTime();
@@ -1642,7 +1688,8 @@ void Scheduler::UpdateNextRecord(void)
 
         if (p->GetRecordingRuleType() == kOverrideRecord &&
             p->GetParentRecordingRuleID() > 0 &&
-            p->GetRecordingStatus() == RecStatus::WillRecord &&
+            (p->GetRecordingStatus() == RecStatus::WillRecord ||
+             p->GetRecordingStatus() == RecStatus::Pending) &&
             nextRecMap[p->GetParentRecordingRuleID()].isNull())
         {
             nextRecMap[p->GetParentRecordingRuleID()] =
@@ -1784,7 +1831,8 @@ RecStatus::Type Scheduler::GetRecStatus(const ProgramInfo &pginfo)
         {
             return (RecStatus::Recording == (**it).GetRecordingStatus() ||
                     RecStatus::Tuning == (**it).GetRecordingStatus() ||
-                    RecStatus::Failing == (**it).GetRecordingStatus()) ?
+                    RecStatus::Failing == (**it).GetRecordingStatus() ||
+                    RecStatus::Pending == (**it).GetRecordingStatus()) ?
                 (**it).GetRecordingStatus() : pginfo.GetRecordingStatus();
         }
     }
@@ -1944,9 +1992,11 @@ void Scheduler::OldRecordedFixups(void)
 
     // Mark anything that was going to record as missed.
     query.prepare("UPDATE oldrecorded SET recstatus = :RSMISSED "
-                  "WHERE recstatus = :RSWILLRECORD");
+                  "WHERE recstatus = :RSWILLRECORD OR "
+                  "      recstatus = :RSPENDING");
     query.bindValue(":RSMISSED", RecStatus::Missed);
     query.bindValue(":RSWILLRECORD", RecStatus::WillRecord);
+    query.bindValue(":RSPENDING", RecStatus::Pending);
     if (!query.exec())
         MythDB::DBError("UpdateMissed", query);
 
@@ -2393,7 +2443,8 @@ bool Scheduler::HandleReschedule(void)
             if (p->GetRecordingEndTime() < schedTime)
                 p->AddHistory(false, false, false);
             else if (p->GetRecordingStartTime() < schedTime &&
-                     p->GetRecordingStatus() != RecStatus::WillRecord)
+                     p->GetRecordingStatus() != RecStatus::WillRecord &&
+                     p->GetRecordingStatus() != RecStatus::Pending)
                 p->AddHistory(false, false, false);
             else
                 p->AddHistory(false, false, true);
@@ -2426,7 +2477,8 @@ bool Scheduler::HandleRunSchedulerStartup(
     RecIter firstRunIter = reclist.begin();
     for ( ; firstRunIter != reclist.end(); ++firstRunIter)
     {
-        if ((*firstRunIter)->GetRecordingStatus() == RecStatus::WillRecord)
+        if ((*firstRunIter)->GetRecordingStatus() == RecStatus::WillRecord ||
+            (*firstRunIter)->GetRecordingStatus() == RecStatus::Pending)
             break;
     }
 
@@ -2577,7 +2629,8 @@ bool Scheduler::HandleRecording(
     QDateTime curtime     = MythDate::current();
     QDateTime nextrectime = ri.GetRecordingStartTime();
 
-    if (ri.GetRecordingStatus() != RecStatus::WillRecord)
+    if (ri.GetRecordingStatus() != RecStatus::WillRecord &&
+        ri.GetRecordingStatus() != RecStatus::Pending)
     {
         // If this recording is sufficiently after nextWakeTime,
         // nothing later can shorten nextWakeTime, so stop scanning.
@@ -2744,9 +2797,12 @@ bool Scheduler::HandleRecording(
 
     if (!recPendingList[schedid])
     {
+        recPendingList[schedid] = true;
+        ri.SetRecordingStatus(RecStatus::Pending);
+        tempri.SetRecordingStatus(RecStatus::Pending);
+        ri.AddHistory(false, false, true);
         schedLock.unlock();
         nexttv->RecordPending(&tempri, max(secsleft, 0), false);
-        recPendingList[schedid] = true;
         schedLock.lock();
         if (reclist_changed)
             return reclist_changed;
@@ -2776,7 +2832,8 @@ bool Scheduler::HandleRecording(
     RecStatus::Type recStatus = RecStatus::Offline;
     if (schedulingEnabled && nexttv->IsConnected())
     {
-        if (ri.GetRecordingStatus() == RecStatus::WillRecord)
+        if (ri.GetRecordingStatus() == RecStatus::WillRecord ||
+            ri.GetRecordingStatus() == RecStatus::Pending)
         {
             schedLock.unlock();
             recStatus = nexttv->StartRecording(&tempri);
@@ -2805,7 +2862,8 @@ void Scheduler::HandleRecordingStatusChange(
     ri.SetRecordingStatus(recStatus);
 
     bool doSchedAfterStart =
-        ((recStatus != RecStatus::Tuning && recStatus != RecStatus::Recording) ||
+        ((recStatus != RecStatus::Tuning &&
+          recStatus != RecStatus::Recording) ||
          schedAfterStartMap[ri.GetRecordingRuleID()] ||
          (ri.GetParentRecordingRuleID() &&
           schedAfterStartMap[ri.GetParentRecordingRuleID()]));
@@ -2894,7 +2952,9 @@ void Scheduler::HandleIdleShutdown(
                 RecIter idleIter = reclist.begin();
                 for ( ; idleIter != reclist.end(); ++idleIter)
                     if ((*idleIter)->GetRecordingStatus() ==
-                        RecStatus::WillRecord)
+                        RecStatus::WillRecord ||
+                        (*idleIter)->GetRecordingStatus() ==
+                        RecStatus::Pending)
                         break;
 
                 if (idleIter != reclist.end())
@@ -3084,7 +3144,8 @@ void Scheduler::ShutdownServer(int prerollseconds, QDateTime &idleSince)
 
     RecIter recIter = reclist.begin();
     for ( ; recIter != reclist.end(); ++recIter)
-        if ((*recIter)->GetRecordingStatus() == RecStatus::WillRecord)
+        if ((*recIter)->GetRecordingStatus() == RecStatus::WillRecord ||
+            (*recIter)->GetRecordingStatus() == RecStatus::Pending)
             break;
 
     // set the wakeuptime if needed
@@ -3222,7 +3283,8 @@ void Scheduler::PutInactiveSlavesToSleep(void)
         if (pginfo->GetRecordingStatus() != RecStatus::Recording &&
             pginfo->GetRecordingStatus() != RecStatus::Tuning &&
             pginfo->GetRecordingStatus() != RecStatus::Failing &&
-            pginfo->GetRecordingStatus() != RecStatus::WillRecord)
+            pginfo->GetRecordingStatus() != RecStatus::WillRecord &&
+            pginfo->GetRecordingStatus() != RecStatus::Pending)
             continue;
 
         secsleft = curtime.secsTo(
@@ -3236,7 +3298,8 @@ void Scheduler::PutInactiveSlavesToSleep(void)
             if ((!enc->IsLocal()) &&
                 (!SlavesInUse.contains(enc->GetHostName())))
             {
-                if (pginfo->GetRecordingStatus() == RecStatus::WillRecord)
+                if (pginfo->GetRecordingStatus() == RecStatus::WillRecord ||
+                    pginfo->GetRecordingStatus() == RecStatus::Pending)
                     LOG(VB_SCHEDULE, LOG_DEBUG,
                         QString("    Slave %1 will be in use in %2 minutes")
                             .arg(enc->GetHostName()) .arg(secsleft / 60));
@@ -4999,11 +5062,12 @@ int Scheduler::FillRecordingDir(
 
         if ((recendts < thispg->GetRecordingStartTime()) ||
             (recstartts > thispg->GetRecordingEndTime()) ||
-                (thispg->GetRecordingStatus() != RecStatus::WillRecord) ||
-                (thispg->GetInputID() == 0) ||
-                (recsCounted.contains(QString("%1:%2").arg(thispg->GetChanID())
-                    .arg(thispg->GetRecordingStartTime(MythDate::ISODate)))) ||
-                (thispg->GetPathname().isEmpty()))
+            (thispg->GetRecordingStatus() != RecStatus::WillRecord &&
+             thispg->GetRecordingStatus() != RecStatus::Pending) ||
+            (thispg->GetInputID() == 0) ||
+            (recsCounted.contains(QString("%1:%2").arg(thispg->GetChanID())
+                   .arg(thispg->GetRecordingStartTime(MythDate::ISODate)))) ||
+            (thispg->GetPathname().isEmpty()))
             continue;
 
         for (fslistit = fsInfoList.begin();

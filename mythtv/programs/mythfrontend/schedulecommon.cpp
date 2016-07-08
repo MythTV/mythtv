@@ -353,10 +353,12 @@ void ScheduleCommon::EditRecording(void)
     }
     else if (recinfo.GetRecordingStatus() == RecStatus::Recording ||
              recinfo.GetRecordingStatus() == RecStatus::Tuning    ||
-             recinfo.GetRecordingStatus() == RecStatus::Failing)
+             recinfo.GetRecordingStatus() == RecStatus::Failing   ||
+             recinfo.GetRecordingStatus() == RecStatus::Pending)
     {
-        menuPopup->AddButton(tr("Stop this recording"),
-                             qVariantFromValue(recinfo));
+        if (recinfo.GetRecordingStatus() != RecStatus::Pending)
+            menuPopup->AddButton(tr("Stop this recording"),
+                                 qVariantFromValue(recinfo));
         menuPopup->AddButton(tr("Modify recording options"),
                              qVariantFromValue(recinfo));
     }

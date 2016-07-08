@@ -57,6 +57,7 @@ INUSEOTHER     : 4194304
 
 // Recording Status
 var RecordingStatus = {
+PENDING           : -15
 FAILING           : -14,
 OTHERRECORDING    : -13,
 OTHERTUNING       : -12,

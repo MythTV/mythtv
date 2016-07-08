@@ -799,6 +799,7 @@ ProgramInfo::ProgramInfo(
         }
 
         if (s.recstatus == RecStatus::WillRecord ||
+            s.recstatus == RecStatus::Pending ||
             s.recstatus == RecStatus::Recording ||
             s.recstatus == RecStatus::Tuning ||
             s.recstatus == RecStatus::Failing)
@@ -6020,7 +6021,8 @@ bool GetNextRecordingList(QDateTime &nextRecordingStart,
     ProgramList::const_iterator it = progList.begin();
     for (; it != progList.end(); ++it)
     {
-        if (((*it)->GetRecordingStatus() == RecStatus::WillRecord) &&
+        if (((*it)->GetRecordingStatus() == RecStatus::WillRecord ||
+             (*it)->GetRecordingStatus() == RecStatus::Pending) &&
             (nextRecordingStart.isNull() ||
              nextRecordingStart > (*it)->GetRecordingStartTime()))
         {
@@ -6034,7 +6036,8 @@ bool GetNextRecordingList(QDateTime &nextRecordingStart,
     // save the details of the earliest recording(s)
     for (it = progList.begin(); it != progList.end(); ++it)
     {
-        if (((*it)->GetRecordingStatus()    == RecStatus::WillRecord) &&
+        if (((*it)->GetRecordingStatus()    == RecStatus::WillRecord ||
+             (*it)->GetRecordingStatus()    == RecStatus::Pending) &&
             ((*it)->GetRecordingStartTime() == nextRecordingStart))
         {
             list->push_back(ProgramInfo(**it));

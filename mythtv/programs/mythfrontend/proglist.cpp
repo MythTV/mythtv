@@ -1063,14 +1063,20 @@ class plTitleSort : public plCompare
         if (a->GetRecordingStatus() == b->GetRecordingStatus())
             return a->GetScheduledStartTime() < b->GetScheduledStartTime();
 
-        if (a->GetRecordingStatus() == RecStatus::Recording)
+        if (a->GetRecordingStatus() == RecStatus::Recording ||
+            a->GetRecordingStatus() == RecStatus::Tuning ||
+            a->GetRecordingStatus() == RecStatus::Failing)
             return true;
-        if (b->GetRecordingStatus() == RecStatus::Recording)
+        if (b->GetRecordingStatus() == RecStatus::Recording ||
+            b->GetRecordingStatus() == RecStatus::Tuning ||
+            b->GetRecordingStatus() == RecStatus::Failing)
             return false;
 
-        if (a->GetRecordingStatus() == RecStatus::WillRecord)
+        if (a->GetRecordingStatus() == RecStatus::WillRecord ||
+            a->GetRecordingStatus() == RecStatus::Pending)
             return true;
-        if (b->GetRecordingStatus() == RecStatus::WillRecord)
+        if (b->GetRecordingStatus() == RecStatus::WillRecord ||
+            b->GetRecordingStatus() == RecStatus::Pending)
             return false;
 
         return a->GetScheduledStartTime() < b->GetScheduledStartTime();

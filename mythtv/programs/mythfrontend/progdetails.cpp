@@ -527,7 +527,8 @@ void ProgDetails::loadPage(void)
     // Begin MythTV information not found in the listings info
 //    msg += "<br>";
     QDateTime statusDate;
-    if (m_progInfo.GetRecordingStatus() == RecStatus::WillRecord)
+    if (m_progInfo.GetRecordingStatus() == RecStatus::WillRecord ||
+        m_progInfo.GetRecordingStatus() == RecStatus::Pending)
         statusDate = m_progInfo.GetScheduledStartTime();
 
     RecordingType rectype = kSingleRecord; // avoid kNotRecording
