@@ -93,8 +93,7 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
         return;
     }
 
-    InitRecLimitMap();
-    CreateConflictLists();
+    InitInputInfoMap();
 
     fsInfoCacheFillTime = MythDate::current().addSecs(-1000);
 
@@ -140,6 +139,8 @@ Scheduler::~Scheduler()
         delete conflictlists.back();
         conflictlists.pop_back();
     }
+
+    sinputinfomap.clear();
 
     locker.unlock();
     wait();
@@ -806,7 +807,6 @@ bool Scheduler::ChangeRecordingEnd(RecordingInfo *oldp, RecordingInfo *newp)
                 recp->IsSameTitleStartTimeAndChannel(*oldp))
             {
                 *recp = *oldp;
-                PrintRec(recp, "##found ");
                 foundp = *i;
                 break;
             }
@@ -815,12 +815,10 @@ bool Scheduler::ChangeRecordingEnd(RecordingInfo *oldp, RecordingInfo *newp)
         // If any pending recordings are affected, set them to
         // future conflicting and force a reschedule by marking
         // reclist as changed.
-        LOG(VB_SCHEDULE, LOG_INFO, "##srart");
         RecConstIter j = reclist.begin();
         while (FindNextConflict(reclist, foundp, j, openEndNever, NULL))
         {
             RecordingInfo *recp = *j;
-            PrintRec(recp, "##check ");
             if (recp->GetRecordingStatus() == RecStatus::Pending)
             {
                 QString schedid = recp->MakeUniqueSchedulerKey();
@@ -828,11 +826,9 @@ bool Scheduler::ChangeRecordingEnd(RecordingInfo *oldp, RecordingInfo *newp)
                 recp->SetRecordingStatus(RecStatus::Conflict);
                 recp->AddHistory(false, false, true);
                 reclist_changed = true;
-                PrintRec(recp, "##miss  ");
             }
             ++j;
         }
-        LOG(VB_SCHEDULE, LOG_INFO, "##done");
     }
 
     return rs == RecStatus::Recording;
@@ -902,6 +898,7 @@ void Scheduler::SlaveConnected(RecordingList &slavelist)
         if (sp->GetInputID() && !found)
         {
             sp->mplexid = sp->QueryMplexID();
+            sp->sgroupid = sinputinfomap[sp->GetInputID()].sgroupid;
             reclist.push_back(new RecordingInfo(*sp));
             reclist_changed = true;
             sp->AddHistory(false);
@@ -1050,7 +1047,8 @@ void Scheduler::BuildListMaps(void)
             p->GetRecordingStatus() == RecStatus::Pending ||
             p->GetRecordingStatus() == RecStatus::Unknown)
         {
-            RecList *conflictlist = conflictlistmap[p->GetInputID()];
+            RecList *conflictlist =
+                sinputinfomap[p->GetInputID()].conflictlist;
             if (!conflictlist)
             {
                 ++badinputs[p->GetInputID()];
@@ -1202,7 +1200,7 @@ const RecordingInfo *Scheduler::FindConflict(
     uint *affinity,
     bool checkAll) const
 {
-    RecList &conflictlist = *conflictlistmap[p->GetInputID()];
+    RecList &conflictlist = *sinputinfomap[p->GetInputID()].conflictlist;
     RecConstIter k = conflictlist.begin();
     if (FindNextConflict(conflictlist, p, k, openend, affinity))
     {
@@ -1572,7 +1570,7 @@ void Scheduler::SchedNewRetryPass(RecIter i, RecIter end,
 
         // Try to move each conflict.  Restore the old status if we
         // can't.
-        RecList &conflictlist = *conflictlistmap[p->GetInputID()];
+        RecList &conflictlist = *sinputinfomap[p->GetInputID()].conflictlist;
         RecConstIter k = conflictlist.begin();
         for ( ; FindNextConflict(conflictlist, p, k); ++k)
         {
@@ -1908,6 +1906,7 @@ void Scheduler::AddRecording(const RecordingInfo &pi)
 
     RecordingInfo * new_pi = new RecordingInfo(pi);
     new_pi->mplexid = new_pi->QueryMplexID();
+    new_pi->sgroupid = sinputinfomap[new_pi->GetInputID()].sgroupid;
     reclist.push_back(new_pi);
     reclist_changed = true;
 
@@ -1945,7 +1944,7 @@ bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
     // now check other inputs in the same input group as the recording.
     InputInfo busy_input;
     uint inputid = rcinfo->GetInputID();
-    vector<uint> inputids = CardUtil::GetConflictingInputs(inputid);
+    vector<uint> &inputids = sinputinfomap[inputid].conflicting_inputs;
     for (uint i = 0; i < inputids.size(); i++)
     {
         if (!m_tvList->contains(inputids[i]))
@@ -4266,7 +4265,10 @@ void Scheduler::AddNewRecords(void)
         "     recordmatch.manualid  = p.manualid ) "
         "INNER JOIN channel AS c "
         "ON ( c.chanid = p.chanid ) "
-        "INNER JOIN capturecard ON (c.sourceid = capturecard.sourceid) "
+        "INNER JOIN capturecard "
+        "ON ( c.sourceid = capturecard.sourceid AND "
+        "     ( capturecard.schedorder <> 0 OR "
+        "       capturecard.parentid = 0 ) ) "
         "LEFT JOIN oldrecorded as oldrecstatus "
         "ON ( oldrecstatus.station   = c.callsign  AND "
         "     oldrecstatus.starttime = p.starttime AND "
@@ -4372,7 +4374,7 @@ void Scheduler::AddNewRecords(void)
             RecordingDupMethodType(result.value(22).toInt()),//dupmethod
 
             result.value(1).toUInt(),//sourceid
-            result.value(24).toUInt(),//cardid
+            result.value(24).toUInt(),//inputid
 
             result.value(35).toUInt(),//findid
 
@@ -4382,7 +4384,8 @@ void Scheduler::AddNewRecords(void)
             result.value(41).toUInt(),//audioproperties
             result.value(46).toInt(),//future
             result.value(47).toInt(),//schedorder
-            mplexid);                //mplexid
+            mplexid,                 //mplexid
+            result.value(24).toUInt()); //sgroupid
 
         if (!p->future && !p->IsReactivated() &&
             p->oldrecstatus != RecStatus::Aborted &&
@@ -5406,6 +5409,7 @@ void Scheduler::SchedLiveTV(void)
             dummy->SetRecordingEndTime(schedTime.addSecs(1800));
         dummy->SetInputID(enc->GetInputID());
         dummy->mplexid = dummy->QueryMplexID();
+        dummy->sgroupid = sinputinfomap[dummy->GetInputID()].sgroupid;
         dummy->SetRecordingStatus(RecStatus::Unknown);
 
         livetvlist.push_front(dummy);
@@ -5501,7 +5505,7 @@ void Scheduler::CreateConflictLists(void)
     for (mit = inputSets.begin(); mit != inputSets.end(); ++mit)
     {
         uint inputid = mit.key();
-        if (conflictlistmap.contains(inputid))
+        if (sinputinfomap[inputid].conflictlist)
             continue;
 
         // Find the union of all inputs grouped with those already in
@@ -5527,17 +5531,20 @@ void Scheduler::CreateConflictLists(void)
             LOG(VB_SCHEDULE, LOG_INFO,
                 QString("Assigning input %1 to conflict set %2")
                 .arg(*sit).arg(conflictlists.size()));
-            conflictlistmap[*sit] = conflictlists.back();
+            sinputinfomap[*sit].conflictlist = conflictlists.back();
         }
     }
 }
 
-void Scheduler::InitRecLimitMap(void)
+void Scheduler::InitInputInfoMap(void)
 {
+    // Cache some input related info so we don't have to keep
+    // rereading it from the database.
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare("SELECT cardid, reclimit "
-                  "FROM capturecard");
+    query.prepare("SELECT cardid, parentid, schedgroup "
+                  "FROM capturecard "
+                  "ORDER BY cardid");
     if (!query.exec())
     {
         MythDB::DBError("InitRecLimitMap", query);
@@ -5545,7 +5552,24 @@ void Scheduler::InitRecLimitMap(void)
     }
 
     while (query.next())
-        reclimitmap[query.value(0).toUInt()] = query.value(1).toUInt();
+    {
+        uint inputid = query.value(0).toUInt();
+        SchedInputInfo &siinfo = sinputinfomap[inputid];
+        siinfo.inputid = inputid;
+        uint parentid = query.value(1).toUInt();
+        if (parentid && sinputinfomap[parentid].schedgroup)
+            siinfo.sgroupid = parentid;
+        else
+            siinfo.sgroupid = inputid;
+        siinfo.schedgroup = query.value(2).toBool();
+        siinfo.child_inputs = CardUtil::GetChildInputIDs(inputid);
+        siinfo.conflicting_inputs = CardUtil::GetConflictingInputs(inputid);
+        LOG(VB_SCHEDULE, LOG_INFO,
+            QString("Added SchedInputInfo i=%1, g=%2, sg=%3")
+            .arg(inputid).arg(siinfo.sgroupid).arg(siinfo.schedgroup));
+    }
+
+    CreateConflictLists();
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

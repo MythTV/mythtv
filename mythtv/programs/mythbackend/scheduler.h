@@ -30,6 +30,26 @@ class AutoExpire;
 
 class Scheduler;
 
+class SchedInputInfo
+{
+  public:
+    SchedInputInfo(void) :
+        inputid(0),
+        sgroupid(0),
+        schedgroup(false),
+        child_inputs(),
+        conflicting_inputs(),
+        conflictlist(NULL) {};
+    ~SchedInputInfo(void) {};
+
+    uint inputid;
+    uint sgroupid;
+    bool schedgroup;
+    vector<uint> child_inputs;
+    vector<uint> conflicting_inputs;
+    RecList *conflictlist;
+};
+
 class Scheduler : public MThread, public MythScheduler
 {
   public:
@@ -115,7 +135,7 @@ class Scheduler : public MThread, public MythScheduler
 
     bool VerifyCards(void);
 
-    void InitRecLimitMap(void);
+    void InitInputInfoMap(void);
     void CreateTempTables(void);
     void DeleteTempTables(void);
     void UpdateDuplicates(void);
@@ -193,6 +213,7 @@ class Scheduler : public MThread, public MythScheduler
                          int prerollseconds);
     void HandleRecordingStatusChange(
         RecordingInfo &ri, RecStatus::Type recStatus, const QString &details);
+    void AssignVirtualInput(RecordingInfo &ri);
     void HandleIdleShutdown(
         bool &blockShutdown, QDateTime &idleSince, int prerollseconds,
         int idleTimeoutSecs, int idleWaitForRecordingTime,
@@ -222,9 +243,8 @@ class Scheduler : public MThread, public MythScheduler
     RecList reclist;
     RecList worklist;
     RecList livetvlist;
-    QMap<uint, uint> reclimitmap;
+    QMap<uint, SchedInputInfo> sinputinfomap;
     vector<RecList *> conflictlists;
-    QMap<uint, RecList *> conflictlistmap;
     QMap<uint, RecList> recordidlistmap;
     QMap<QString, RecList> titlelistmap;
     InputGroupMap igrp;
