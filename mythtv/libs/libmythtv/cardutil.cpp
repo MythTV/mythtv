@@ -1428,7 +1428,6 @@ vector<uint> CardUtil::GetConflictingInputs(uint inputid)
         ") g "
         "JOIN inputgroup ig ON ig.inputgroupid = g.inputgroupid "
         "JOIN capturecard c ON c.cardid = ig.cardinputid "
-        "                      AND c.schedgroup = 0 "
         "                      AND c.cardid <> :INPUTID2 "
         "ORDER BY c.cardid");
 

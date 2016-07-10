@@ -3696,13 +3696,7 @@ void CardInput::Save(void)
 
     uint icount = 1;
     if (instancecount)
-    {
         icount = instancecount->getValue().toUInt();
-        // If schedgroup is set, we need an additional instance since
-        // this one will not be used for recording.
-        if (schedgroup && schedgroup->getValue().toUInt())
-            icount += 1;
-    }
     vector<uint> cardids = CardUtil::GetChildInputIDs(cardid);
 
     // Delete old clone cards as required.
