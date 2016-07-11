@@ -70,6 +70,7 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
     m_isShuttingDown(false),
     error(0),
     livetvTime(QDateTime()),
+    lastPrepareTime(QDateTime()),
     m_openEnd(openEndNever)
 {
     char *debug = getenv("DEBUG_CONFLICTS");
@@ -597,7 +598,7 @@ void Scheduler::PrintList(RecList &list, bool onlyFutureRecordings)
 
     LOG(VB_SCHEDULE, LOG_INFO, "--- print list start ---");
     LOG(VB_SCHEDULE, LOG_INFO, "Title - Subtitle                     Ch Station "
-                               "Day Start  End   S  I  T  N Pri");
+                               "Day Start  End    G  I  T  N Pri");
 
     RecIter i = list.begin();
     for ( ; i != list.end(); ++i)
@@ -632,7 +633,7 @@ void Scheduler::PrintRec(const RecordingInfo *p, const QString &prefix)
         .arg(p->GetChannelSchedulingID().leftJustified(7, ' ', true))
         .arg(p->GetRecordingStartTime().toLocalTime().toString("dd hh:mm"))
         .arg(p->GetRecordingEndTime().toLocalTime().toString("hh:mm"))
-        .arg(p->GetSourceID())
+        .arg(QString::number(p->sgroupid).rightJustified(2, ' '))
         .arg(QString::number(p->GetInputID()).rightJustified(2, ' '));
     outstr += QString("%1 %2 %3")
         .arg(toQChar(p->GetRecordingRuleType()))
@@ -822,7 +823,6 @@ bool Scheduler::ChangeRecordingEnd(RecordingInfo *oldp, RecordingInfo *newp)
             if (recp->GetRecordingStatus() == RecStatus::Pending)
             {
                 QString schedid = recp->MakeUniqueSchedulerKey();
-                recPendingList.remove(schedid);
                 recp->SetRecordingStatus(RecStatus::Conflict);
                 recp->AddHistory(false, false, true);
                 reclist_changed = true;
@@ -856,7 +856,9 @@ void Scheduler::SlaveConnected(RecordingList &slavelist)
                 sp->GetTitle().compare(rp->GetTitle(),
                                        Qt::CaseInsensitive) == 0)
             {
-                if (sp->GetInputID() == rp->GetInputID())
+                if (sp->GetInputID() == rp->GetInputID() ||
+                    sinputinfomap[sp->GetInputID()].sgroupid ==
+                    rp->GetInputID())
                 {
                     found = true;
                     rp->SetRecordingStatus(sp->GetRecordingStatus());
@@ -929,7 +931,6 @@ void Scheduler::SlaveDisconnected(uint cardid)
             if (rp->GetRecordingStatus() == RecStatus::Pending)
             {
                 QString schedid = rp->MakeUniqueSchedulerKey();
-                recPendingList.remove(schedid);
                 rp->SetRecordingStatus(RecStatus::Missed);
                 rp->AddHistory(false, false, true);
             }
@@ -1133,8 +1134,8 @@ bool Scheduler::FindNextConflict(
         }
 
         bool mplexid_ok =
-            (p->GetInputID() != q->GetInputID() /*||
-             !reclimitmap[p->GetInputID()]*/) &&
+            (p->sgroupid != q->sgroupid ||
+             sinputinfomap[p->sgroupid].schedgroup) &&
             ((p->mplexid && p->mplexid == q->mplexid) ||
              (!p->mplexid && p->GetChanID() == q->GetChanID()));
 
@@ -1636,7 +1637,11 @@ void Scheduler::PruneRedundants(void)
         }
 
         if (!Recording(p))
+        {
             p->SetInputID(0);
+            p->SetSourceID(0);
+            p->sgroupid = 0;
+        }
 
         // Check for redundant against last non-deleted
         if (!lastp || lastp->GetRecordingRuleID() != p->GetRecordingRuleID() ||
@@ -1929,22 +1934,30 @@ bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             "IsBusyRecording() -> true, no tvList or no rcinfo");
-
         return true;
     }
 
     if (!m_tvList->contains(rcinfo->GetInputID()))
         return true;
 
+    InputInfo busy_input;
+
     EncoderLink *rctv = (*m_tvList)[rcinfo->GetInputID()];
     // first check the input we will be recording on...
-    if (rctv->IsBusyRecording())
+    bool is_busy = rctv->IsBusy(&busy_input, -1);
+    if (is_busy &&
+        (rcinfo->GetRecordingStatus() == RecStatus::Pending ||
+         !sinputinfomap[rcinfo->GetInputID()].schedgroup ||
+         ((!busy_input.mplexid || busy_input.mplexid != rcinfo->mplexid) &&
+          (busy_input.mplexid || busy_input.chanid != rcinfo->GetChanID()))))
+    {
         return true;
+    }
 
     // now check other inputs in the same input group as the recording.
-    InputInfo busy_input;
     uint inputid = rcinfo->GetInputID();
     vector<uint> &inputids = sinputinfomap[inputid].conflicting_inputs;
+    vector<uint> &group_inputs = sinputinfomap[inputid].group_inputs;
     for (uint i = 0; i < inputids.size(); i++)
     {
         if (!m_tvList->contains(inputids[i]))
@@ -1957,20 +1970,24 @@ bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
             return true;
         }
 
-        rctv = (*m_tvList)[inputids[i]];
+        EncoderLink *rctv = (*m_tvList)[inputids[i]];
         if (rctv->IsBusy(&busy_input, -1) &&
-            (busy_input.mplexid == 0 ||
-             busy_input.mplexid == 32767 ||
-             busy_input.mplexid != rcinfo->mplexid) &&
-            (busy_input.chanid == 0 ||
-             busy_input.chanid != rcinfo->GetChanID()) &&
+            (!busy_input.mplexid || busy_input.mplexid != rcinfo->mplexid) &&
+            (busy_input.mplexid || busy_input.chanid != rcinfo->GetChanID()) &&
             igrp.GetSharedInputGroup(busy_input.inputid, inputid))
         {
             return true;
         }
+
+        // This conflicting input is free.  If it's also a child
+        // input, then the group might still be considered free for
+        // starting a new recording.
+        if (std::find(group_inputs.begin(), group_inputs.end(),
+                      inputids[i]) != group_inputs.end())
+            is_busy = false;
     }
 
-    return false;
+    return is_busy;
 }
 
 void Scheduler::OldRecordedFixups(void)
@@ -2661,13 +2678,13 @@ bool Scheduler::HandleRecording(
 
     QString schedid = ri.MakeUniqueSchedulerKey();
 
-    if (!recPendingList.contains(schedid))
+    if (ri.GetRecordingStartTime() > lastPrepareTime)
     {
-        recPendingList[schedid] = false;
         // If we haven't rescheduled in a while, do so now to
         // accomodate LiveTV.
         if (schedTime.secsTo(curtime) > 30)
             EnqueuePlace("PrepareToRecord");
+        lastPrepareTime = ri.GetRecordingStartTime();
     }
 
     if (secsleft - prerollseconds > 35)
@@ -2794,9 +2811,16 @@ bool Scheduler::HandleRecording(
         tempri.SetPathname(recording_dir);
     }
 
-    if (!recPendingList[schedid])
+    if (ri.GetRecordingStatus() != RecStatus::Pending)
     {
-        recPendingList[schedid] = true;
+        if (sinputinfomap[ri.GetInputID()].schedgroup)
+        {
+            if (!AssignGroupInput(tempri))
+                return reclist_changed;
+            ri.SetInputID(tempri.GetInputID());
+            nexttv = (*m_tvList)[ri.GetInputID()];
+        }
+
         ri.SetRecordingStatus(RecStatus::Pending);
         tempri.SetRecordingStatus(RecStatus::Pending);
         ri.AddHistory(false, false, true);
@@ -2888,6 +2912,153 @@ void Scheduler::HandleRecordingStatusChange(
                      .arg(ri.GetRecordingStartTime(MythDate::ISODate)));
         gCoreContext->dispatch(me);
     }
+}
+
+bool Scheduler::AssignGroupInput(RecordingInfo &ri)
+{
+    if (!sinputinfomap[ri.GetInputID()].schedgroup)
+        return true;
+
+    LOG(VB_SCHEDULE, LOG_DEBUG,
+        QString("Assigning input for %1/%2/\"%3\"")
+        .arg(ri.GetInputID())
+        .arg(ri.GetChannelSchedulingID())
+        .arg(ri.GetTitle()));
+
+    uint bestid = 0;
+    uint betterid = 0;
+    uint goodid = 0;
+    QDateTime now = MythDate::current();
+
+    // Check each child input to find the best one to use.
+    vector<uint> inputs = sinputinfomap[ri.GetInputID()].group_inputs;
+    for (uint i = 0; !bestid && i < inputs.size(); ++i)
+    {
+        uint inputid = inputs[i];
+        RecordingInfo *pend = NULL;
+        RecordingInfo *rec = NULL;
+
+        // First, see if anything is already pending or still
+        // recording.
+        RecIter j = reclist.begin();
+        for ( ; j != reclist.end(); ++j)
+        {
+            RecordingInfo *p = (*j);
+            if (now.secsTo(p->GetRecordingStartTime()) > 300)
+                break;
+            if (p->GetInputID() != inputid)
+                continue;
+            if (p->GetRecordingStatus() == RecStatus::Pending)
+            {
+                pend = p;
+                break;
+            }
+            if (p->GetRecordingStatus() == RecStatus::Recording ||
+                p->GetRecordingStatus() == RecStatus::Tuning ||
+                p->GetRecordingStatus() == RecStatus::Failing)
+            {
+                rec = p;
+            }
+        }
+
+        if (pend)
+        {
+            LOG(VB_SCHEDULE, LOG_DEBUG,
+                QString("Input %1 has a pending recording").arg(inputid));
+            continue;
+        }
+
+        if (rec)
+        {
+            if (rec->GetRecordingEndTime() >
+                ri.GetRecordingStartTime())
+            {
+                LOG(VB_SCHEDULE, LOG_DEBUG,
+                    QString("Input %1 is recording").arg(inputid));
+            }
+            else if (rec->GetRecordingEndTime() <
+                ri.GetRecordingStartTime())
+            {
+                LOG(VB_SCHEDULE, LOG_DEBUG,
+                    QString("Input %1 is recording but will be free")
+                    .arg(inputid));
+                bestid = inputid;
+            }
+            else // rec->end == ri.start
+            {
+                if ((ri.mplexid && rec->mplexid != ri.mplexid) ||
+                    (!ri.mplexid && rec->GetChanID() != ri.GetChanID()))
+                {
+                    LOG(VB_SCHEDULE, LOG_DEBUG,
+                        QString("Input %1 is recording but has to stop")
+                        .arg(inputid));
+                    bestid = inputid;
+                }
+                else
+                {
+                    LOG(VB_SCHEDULE, LOG_DEBUG,
+                        QString("Input %1 is recording but could be free")
+                        .arg(inputid));
+                    if (!betterid)
+                        betterid = inputid;
+                }
+            }
+            continue;
+        }
+
+        InputInfo busy_info;
+        EncoderLink *rctv = (*m_tvList)[inputid];
+        schedLock.unlock();
+        bool isbusy = rctv->IsBusy(&busy_info, -1);
+        schedLock.lock();
+        if (reclist_changed)
+            return false;
+        if (!isbusy)
+        {
+            LOG(VB_SCHEDULE, LOG_DEBUG,
+                QString("Input %1 is free").arg(inputid));
+            bestid = inputid;
+        }
+        else if ((ri.mplexid && busy_info.mplexid != ri.mplexid) ||
+                 (!ri.mplexid && busy_info.chanid != ri.GetChanID()))
+        {
+            LOG(VB_SCHEDULE, LOG_DEBUG,
+                QString("Input %1 is on livetv but has to stop")
+                .arg(inputid));
+            bestid = inputid;
+        }
+        else
+        {
+            LOG(VB_SCHEDULE, LOG_DEBUG,
+                QString("Input %1 is on livetv but could be free")
+                .arg(inputid));
+            if (!goodid)
+                goodid = inputid;
+        }
+    }
+
+    if (!bestid)
+        bestid = (betterid ? betterid : goodid);
+
+    if (bestid)
+    {
+        LOG(VB_SCHEDULE, LOG_INFO,
+            QString("Assigned input %1 for %2/%3/\"%4\"")
+            .arg(bestid).arg(ri.GetInputID()).arg(ri.GetChannelSchedulingID())
+            .arg(ri.GetTitle()));
+        ri.SetInputID(bestid);
+    }
+    else
+    {
+        LOG(VB_SCHEDULE, LOG_WARNING,
+            QString("Failed to assign input for %1/%2/\"%3\"")
+            .arg(ri.GetInputID()).arg(ri.GetChannelSchedulingID())
+            .arg(ri.GetTitle()));
+        ri.SetRecordingStatus(RecStatus::TunerBusy);
+        ri.AddHistory(true);
+    }
+
+    return bestid;
 }
 
 void Scheduler::HandleIdleShutdown(
@@ -4407,7 +4578,7 @@ void Scheduler::AddNewRecords(void)
             RecordingInfo *r = *rec;
             if (p->IsSameTitleStartTimeAndChannel(*r))
             {
-                if (r->GetInputID() == p->GetInputID() &&
+                if (r->sgroupid == p->sgroupid &&
                     r->GetRecordingEndTime() != p->GetRecordingEndTime() &&
                     (r->GetRecordingRuleID() == p->GetRecordingRuleID() ||
                      p->GetRecordingRuleType() == kOverrideRecord))
@@ -5562,7 +5733,11 @@ void Scheduler::InitInputInfoMap(void)
         else
             siinfo.sgroupid = inputid;
         siinfo.schedgroup = query.value(2).toBool();
-        siinfo.child_inputs = CardUtil::GetChildInputIDs(inputid);
+        if (!parentid && siinfo.schedgroup)
+        {
+            siinfo.group_inputs = CardUtil::GetChildInputIDs(inputid);
+            siinfo.group_inputs.insert(siinfo.group_inputs.begin(), inputid);
+        }
         siinfo.conflicting_inputs = CardUtil::GetConflictingInputs(inputid);
         LOG(VB_SCHEDULE, LOG_INFO,
             QString("Added SchedInputInfo i=%1, g=%2, sg=%3")
