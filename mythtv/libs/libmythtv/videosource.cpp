@@ -3434,8 +3434,8 @@ CardInput::CardInput(const QString & cardtype, const QString & device,
     {
         instancecount = new InstanceCount(*this, 1, kDefaultMultirecCount);
         interact->addChild(instancecount);
-        //schedgroup = new SchedGroup(*this);
-        //interact->addChild(schedgroup);
+        schedgroup = new SchedGroup(*this);
+        interact->addChild(schedgroup);
     }
     interact->addChild(new InputPriority(*this));
     interact->addChild(new ScheduleOrder(*this, _cardid));
