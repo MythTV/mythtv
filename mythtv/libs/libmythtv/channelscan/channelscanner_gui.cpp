@@ -113,7 +113,12 @@ void ChannelScannerGUI::HandleEvent(const ScannerEvent *scanEvent)
             transports = sigmonScanner->GetChannelList();
         }
 
-        bool wasIPTV = iptvScanner != NULL;
+#ifdef USING_VBOX
+        bool success = (iptvScanner != NULL || vboxScanner != NULL);
+#else
+        bool success = iptvScanner != NULL;
+#endif
+
         Teardown();
 
         if (scanEvent->type() == ScannerEvent::ScanErrored)
@@ -127,7 +132,7 @@ void ChannelScannerGUI::HandleEvent(const ScannerEvent *scanEvent)
             int ret = scanEvent->intValue();
             if (!transports.empty() || (MythDialog::Rejected != ret))
             {
-                Process(transports, wasIPTV);
+                Process(transports, success);
             }
         }
     }
