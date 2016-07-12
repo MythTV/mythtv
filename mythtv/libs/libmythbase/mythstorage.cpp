@@ -9,8 +9,8 @@ void SimpleDBStorage::Load(void)
     MSqlQuery query(MSqlQuery::InitCon());
     MSqlBindings bindings;
     query.prepare(
-        "SELECT " + GetColumnName() +
-        "  FROM " + GetTableName() +
+        "SELECT CAST(" + GetColumnName() + " AS CHAR)"
+        " FROM " + GetTableName() +
         " WHERE " + GetWhereClause(bindings));
     query.bindValues(bindings);
 
