@@ -12,6 +12,7 @@ using namespace std;
 #include <QObject>
 #include <QString>
 #include <QMutex>
+#include <QQueue>
 #include <QSet>
 #include <QMap>
 
@@ -48,15 +49,14 @@ class ExpireThread : public MThread
     QPointer<AutoExpire> m_parent;
 };
 
-class UpdateThread : public QObject, public MThread
+class UpdateEntry
 {
-    Q_OBJECT
   public:
-    explicit UpdateThread(AutoExpire *p) : MThread("Update"), m_parent(p) {}
-    virtual ~UpdateThread() { wait(); }
-    virtual void run(void);
-  private:
-    QPointer<AutoExpire> m_parent;
+    UpdateEntry(int _encoder, int _fsID)
+        : encoder(_encoder), fsID(_fsID) {};
+
+    int encoder;
+    int fsID;
 };
 
 class AutoExpire : public QObject
@@ -64,7 +64,6 @@ class AutoExpire : public QObject
     Q_OBJECT
 
     friend class ExpireThread;
-    friend class UpdateThread;
   public:
     explicit AutoExpire(QMap<int, EncoderLink *> *encoderList);
     AutoExpire(void);
@@ -92,7 +91,6 @@ class AutoExpire : public QObject
 
   protected:
     void RunExpirer(void);
-    void RunUpdate(void);
 
   private:
     void ExpireLiveTV(int type);
@@ -126,8 +124,8 @@ class AutoExpire : public QObject
     MainServer   *main_server;    // protected by instance_lock
 
     // update info
-    bool          update_pending; // protected by instance_lock
-    UpdateThread *update_thread;
+    QMutex              update_lock;
+    QQueue<UpdateEntry> update_queue; // protected by update_lock
 };
 
 #endif

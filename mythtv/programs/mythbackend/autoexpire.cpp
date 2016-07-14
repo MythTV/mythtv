@@ -59,14 +59,6 @@ void ExpireThread::run(void)
     RunEpilog();
 }
 
-/// \brief This calls AutoExpire::RunUpdate() from within a new thread.
-void UpdateThread::run(void)
-{
-    RunProlog();
-    m_parent->RunUpdate();
-    RunEpilog();
-}
-
 /** \class AutoExpire
  *  \brief Used to expire recordings to make space for new recordings.
  */
@@ -81,9 +73,7 @@ AutoExpire::AutoExpire(QMap<int, EncoderLink *> *tvList) :
     expire_thread(new ExpireThread(this)),
     desired_freq(15),
     expire_thread_run(true),
-    main_server(NULL),
-    update_pending(false),
-    update_thread(NULL)
+    main_server(NULL)
 {
     expire_thread->start();
     gCoreContext->addListener(this);
@@ -97,9 +87,7 @@ AutoExpire::AutoExpire() :
     expire_thread(NULL),
     desired_freq(15),
     expire_thread_run(false),
-    main_server(NULL),
-    update_pending(false),
-    update_thread(NULL)
+    main_server(NULL)
 {
 }
 
@@ -115,9 +103,8 @@ AutoExpire::~AutoExpire()
     }
 
     {
-        QMutexLocker locker(&instance_lock);
-        while (update_pending)
-            instance_cond.wait(&instance_lock);
+        QMutexLocker locker(&update_lock);
+        update_queue.clear();
     }
 
     if (expire_thread)
@@ -303,6 +290,15 @@ void AutoExpire::RunExpirer(void)
         // recalculate auto expire parameters
         if (curTime >= next_expire)
         {
+            update_lock.lock();
+            while (!update_queue.empty())
+            {
+                UpdateEntry ue = update_queue.dequeue();
+                if (ue.encoder > 0)
+                    used_encoders[ue.encoder] = ue.fsID;
+            }
+            update_lock.unlock();
+
             locker.unlock();
             CalcParams();
             locker.relock();
@@ -1032,24 +1028,6 @@ void AutoExpire::FillDBOrdered(pginfolist_t &expireList, int expMethod)
     }
 }
 
-/** \brief This is used by Update(QMap<int, EncoderLink*> *, bool)
- *         to run CalcParams(vector<EncoderLink*>).
- *
- *  \param autoExpireInstance AutoExpire instance on which to call CalcParams.
- */
-void AutoExpire::RunUpdate(void)
-{
-    QMutexLocker locker(&instance_lock);
-    Sleep(5 * 1000);
-    locker.unlock();
-    CalcParams();
-    locker.relock();
-    update_pending = false;
-    update_thread->deleteLater();
-    update_thread = NULL;
-    instance_cond.wakeAll();
-}
-
 /**
  *  \brief This is used to update the global AutoExpire instance "expirer".
  *
@@ -1066,12 +1044,6 @@ void AutoExpire::Update(int encoder, int fsID, bool immediately)
     if (!expirer)
         return;
 
-    // make sure there is only one update pending
-    QMutexLocker locker(&expirer->instance_lock);
-    while (expirer->update_pending)
-        expirer->instance_cond.wait(&expirer->instance_lock);
-    expirer->update_pending = true;
-
     if (encoder > 0)
     {
         QString msg = QString("Cardid %1: is starting a recording on")
@@ -1080,28 +1052,25 @@ void AutoExpire::Update(int encoder, int fsID, bool immediately)
             msg.append(" an unknown fsID soon.");
         else
             msg.append(QString(" fsID %2 soon.").arg(fsID));
-
         LOG(VB_FILE, LOG_INFO, LOC + msg);
-        expirer->used_encoders[encoder] = fsID;
     }
 
-    // do it..
     if (immediately)
     {
-        locker.unlock();
+        if (encoder > 0)
+        {
+            expirer->instance_lock.lock();
+            expirer->used_encoders[encoder] = fsID;
+            expirer->instance_lock.unlock();
+        }
         expirer->CalcParams();
-        locker.relock();
-        expirer->update_pending = false;
         expirer->instance_cond.wakeAll();
     }
     else
     {
-        // create thread to do work, unless one is running still
-        if (!expirer->update_thread)
-        {
-            expirer->update_thread = new UpdateThread(expirer);
-            expirer->update_thread->start();
-        }
+        expirer->update_lock.lock();
+        expirer->update_queue.append(UpdateEntry(encoder, fsID));
+        expirer->update_lock.unlock();
     }
 }
 
