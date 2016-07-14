@@ -1150,11 +1150,8 @@ bool Scheduler::FindNextConflict(
             {
                 if (debugConflicts)
                     msg += "  no-overlap ";
-                if ((m_openEnd == openEndDiffChannel &&
-                     p->GetChanID() == q->GetChanID()) ||
-                    (m_openEnd == openEndAlways &&
-                     mplexid_ok))
-                      ++affinity;
+                if (mplexid_ok)
+                    ++affinity;
                 continue;
             }
         }
