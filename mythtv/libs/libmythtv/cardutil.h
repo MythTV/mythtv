@@ -241,6 +241,7 @@ class MTV_PUBLIC CardUtil
     static bool         DeleteCard(uint inputid);
     static bool         DeleteAllCards(void);
     static vector<uint> GetInputList(void);
+    static vector<uint> GetSchedInputList(void);
     static vector<uint> GetLiveTVInputList(void);
 
     /// Convenience function for GetInputIDs()

@@ -2095,7 +2095,7 @@ void SchedOptMixin::Load(void)
                                      QObject::tr("Use any available input"),
                                      qVariantFromValue(0));
 
-            vector<uint> inputids = CardUtil::GetInputList();
+            vector<uint> inputids = CardUtil::GetSchedInputList();
             for (uint i = 0; i < inputids.size(); ++i)
             {
                 new MythUIButtonListItem(m_inputList,

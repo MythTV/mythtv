@@ -2030,7 +2030,7 @@ vector<uint> CardUtil::GetInputList(void)
     return list;
 }
 
-vector<uint> CardUtil::GetLiveTVInputList(void)
+vector<uint> CardUtil::GetSchedInputList(void)
 {
     vector<uint> list;
 
@@ -2038,11 +2038,11 @@ vector<uint> CardUtil::GetLiveTVInputList(void)
     query.prepare(
         "SELECT DISTINCT cardid "
         "FROM capturecard "
-        "WHERE livetvorder <> 0 "
-        "ORDER BY livetvorder");
+        "WHERE schedorder <> 0 "
+        "ORDER BY schedorder, cardid");
 
     if (!query.exec())
-        MythDB::DBError("CardUtil::GetInputList()", query);
+        MythDB::DBError("CardUtil::GetSchedInputList()", query);
     else
     {
         while (query.next())
@@ -2052,6 +2052,27 @@ vector<uint> CardUtil::GetLiveTVInputList(void)
     return list;
 }
 
+vector<uint> CardUtil::GetLiveTVInputList(void)
+{
+    vector<uint> list;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT DISTINCT cardid "
+        "FROM capturecard "
+        "WHERE livetvorder <> 0 "
+        "ORDER BY livetvorder, cardid");
+
+    if (!query.exec())
+        MythDB::DBError("CardUtil::GetLiveTVInputList()", query);
+    else
+    {
+        while (query.next())
+            list.push_back(query.value(0).toUInt());
+    }
+
+    return list;
+}
 
 QString CardUtil::GetDeviceName(dvb_dev_type_t type, const QString &device)
 {
