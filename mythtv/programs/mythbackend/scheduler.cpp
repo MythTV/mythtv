@@ -1968,20 +1968,35 @@ bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
         }
 
         EncoderLink *rctv = (*m_tvList)[inputids[i]];
-        if (rctv->IsBusy(&busy_input, -1) &&
-            (!busy_input.mplexid || busy_input.mplexid != rcinfo->mplexid) &&
-            (busy_input.mplexid || busy_input.chanid != rcinfo->GetChanID()) &&
-            igrp.GetSharedInputGroup(busy_input.inputid, inputid))
+        if (rctv->IsBusy(&busy_input, -1))
         {
-            return true;
+            if ((!busy_input.mplexid ||
+                 busy_input.mplexid != rcinfo->mplexid) &&
+                (busy_input.mplexid ||
+                 busy_input.chanid != rcinfo->GetChanID()))
+            {
+                // This conflicting input is busy on a different
+                // multiplex than is desired.  There is no way the
+                // main input nor any of its children can be free.
+                return true;
+            }
+            else if (!is_busy)
+            {
+                // This conflicting input is busy on the desired
+                // multiplex and the main input is not busy.  Nothing
+                // else can conflict, so the main input is free.
+                return false;
+            }
         }
-
-        // This conflicting input is free.  If it's also a child
-        // input, then the group might still be considered free for
-        // starting a new recording.
-        if (std::find(group_inputs.begin(), group_inputs.end(),
-                      inputids[i]) != group_inputs.end())
-            is_busy = false;
+        else if (is_busy &&
+                 std::find(group_inputs.begin(), group_inputs.end(),
+                           inputids[i]) != group_inputs.end())
+        {
+            // This conflicting input is not busy, is also a child
+            // input and the main input is busy on the desired
+            // multiplex.  This input is therefore considered free.
+            return false;
+        }
     }
 
     return is_busy;
