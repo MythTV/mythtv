@@ -125,8 +125,8 @@ void VideoSourceSelector::Load(void)
 class InstanceCount : public SpinBoxSetting, public CardInputDBStorage
 {
   public:
-    InstanceCount(const CardInput &parent, int _minValue, int _initValue) :
-        SpinBoxSetting(this, _minValue, 5, 1),
+    InstanceCount(const CardInput &parent, int _initValue) :
+        SpinBoxSetting(this, 1, 10, _initValue),
         CardInputDBStorage(this, parent, "reclimit")
     {
         setLabel(QObject::tr("Max recordings"));
@@ -3432,7 +3432,7 @@ CardInput::CardInput(const QString & cardtype, const QString & device,
     interact->setLabel(QObject::tr("Interactions between inputs"));
     if (CardUtil::IsTunerSharingCapable(cardtype))
     {
-        instancecount = new InstanceCount(*this, 1, kDefaultMultirecCount);
+        instancecount = new InstanceCount(*this, kDefaultMultirecCount);
         interact->addChild(instancecount);
         schedgroup = new SchedGroup(*this);
         interact->addChild(schedgroup);
