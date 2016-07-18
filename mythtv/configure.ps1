@@ -502,7 +502,7 @@ switch ($tools.Get_Item( 'tag.lib'))
                     "cmake.exe"                            `
                     @("-G ""NMake Makefiles""";
                       "-DZLIB_INCLUDE_DIR=..\zlib";
-                      "-DZLIB_LIBRARY=..\zlib\zlib.lib";
+                      "-DZLIB_LIBRARY=..\..\zlib\zlib.lib";
                       "-DENABLE_STATIC=0";
                       "-DWITH_MP4=1";
                       "-DCMAKE_BUILD_TYPE=$BuildType";
