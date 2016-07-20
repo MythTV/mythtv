@@ -1090,6 +1090,11 @@ bool Scheduler::FindNextConflict(
             continue;
         }
 
+        bool mplexid_ok =
+            p->GetInputID() != q->GetInputID() &&
+            ((p->mplexid && p->mplexid == q->mplexid) ||
+             (!p->mplexid && p->GetChanID() == q->GetChanID()));
+
         if (p->GetRecordingEndTime() == q->GetRecordingStartTime() ||
             p->GetRecordingStartTime() == q->GetRecordingEndTime())
         {
@@ -1097,19 +1102,12 @@ bool Scheduler::FindNextConflict(
                 (openEnd == openEndDiffChannel &&
                  p->GetChanID() == q->GetChanID()) ||
                 (openEnd == openEndAlways &&
-                 p->GetInputID() != q->GetInputID() &&
-                 ((p->mplexid && p->mplexid == q->mplexid) ||
-                  (!p->mplexid && p->GetChanID() == q->GetChanID()))))
+                 mplexid_ok))
             {
                 if (debugConflicts)
                     msg += "  no-overlap ";
-                if ((m_openEnd == openEndDiffChannel &&
-                     p->GetChanID() == q->GetChanID()) ||
-                    (m_openEnd == openEndAlways &&
-                     p->GetInputID() != q->GetInputID() &&
-                     ((p->mplexid && p->mplexid == q->mplexid) ||
-                      (!p->mplexid && p->GetChanID() == q->GetChanID()))))
-                      ++affinity;
+                if (mplexid_ok)
+                    ++affinity;
                 continue;
             }
         }
@@ -1128,9 +1126,7 @@ bool Scheduler::FindNextConflict(
 
         // if two inputs are in the same input group we have a conflict
         // unless the programs are on the same multiplex.
-        if (p->GetInputID() != q->GetInputID() &&
-            ((p->mplexid && p->mplexid == q->mplexid) ||
-             (!p->mplexid && p->GetChanID() == q->GetChanID())))
+        if (mplexid_ok)
         {
             ++affinity;
             continue;
