@@ -746,7 +746,7 @@
         </imagetype>
 
         <textarea name="noevents_text">
-            <area>340,85,600,450</area>
+            <area>350,185,540,450</area>
             <font>data</font>
             <align>allcenter</align>
             <value>There are no events to show</value>
