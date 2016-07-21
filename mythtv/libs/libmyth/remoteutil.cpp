@@ -540,6 +540,8 @@ vector<ProgramInfo *> *RemoteGetCurrentlyRecordingList(void)
     {
         p = *it;
         if (p->GetRecordingStatus() == RecStatus::Recording ||
+            p->GetRecordingStatus() == RecStatus::Tuning ||
+            p->GetRecordingStatus() == RecStatus::Failing ||
             (p->GetRecordingStatus() == RecStatus::Recorded &&
              p->GetRecordingGroup() == "LiveTV"))
         {

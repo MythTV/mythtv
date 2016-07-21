@@ -224,144 +224,42 @@ uint ChannelBase::GetNextChannel(const QString &channum, ChannelChangeDirection 
     return GetNextChannel(chanid, direction);
 }
 
-static bool is_input_group_busy(
-    uint                       inputid,
-    uint                       groupid,
-    QMap<uint,bool>           &busygrp,
-    QMap<uint,bool>           &busyrec,
-    QMap<uint,InputInfo>      &busyin,
-    uint                      &mplexid_restriction,
-    uint                      &chanid_restriction)
-{
-    static QMutex        igrpLock;
-    static InputGroupMap igrp;
-
-    // If none are busy, we don't need to check further
-    QMap<uint,bool>::const_iterator bit = busygrp.find(groupid);
-    if ((bit != busygrp.end()) && !*bit)
-        return false;
-
-    vector<InputInfo> conflicts;
-    vector<uint> cardids = CardUtil::GetGroupInputIDs(groupid);
-    for (uint i = 0; i < cardids.size(); i++)
-    {
-        if (inputid == cardids[i])
-            continue;
-
-        InputInfo info;
-        QMap<uint,bool>::const_iterator it = busyrec.find(cardids[i]);
-        if (it == busyrec.end())
-        {
-            busyrec[cardids[i]] = RemoteIsBusy(cardids[i], info);
-            it = busyrec.find(cardids[i]);
-            if (*it)
-                busyin[cardids[i]] = info;
-        }
-
-        if (*it)
-        {
-            QMutexLocker locker(&igrpLock);
-            if (igrp.GetSharedInputGroup(busyin[cardids[i]].inputid, inputid))
-                conflicts.push_back(busyin[cardids[i]]);
-        }
-    }
-
-    // If none are busy, we don't need to check further
-    busygrp[groupid] = !conflicts.empty();
-    if (conflicts.empty())
-        return false;
-
-    InputInfo in;
-    in.inputid = inputid;
-    if (!CardUtil::GetInputInfo(in))
-        return true;
-
-    // If they aren't using the same source they are definately busy
-    bool is_busy_input = false;
-
-    for (uint i = 0; i < conflicts.size() && !is_busy_input; i++)
-        is_busy_input = (in.sourceid != conflicts[i].sourceid);
-
-    if (is_busy_input)
-        return true;
-
-    if (!is_busy_input && conflicts[0].chanid)
-    {
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare(
-            "SELECT mplexid "
-            "FROM channel "
-            "WHERE chanid = :CHANID");
-        query.bindValue(":CHANID", conflicts[0].chanid);
-        if (!query.exec())
-            MythDB::DBError("is_input_group_busy", query);
-        else if (query.next())
-        {
-            mplexid_restriction = query.value(0).toUInt();
-            mplexid_restriction = (32767 == mplexid_restriction) ?
-                0 : mplexid_restriction;
-            if (mplexid_restriction)
-                chanid_restriction = 0;
-            else
-                chanid_restriction = conflicts[0].chanid;
-        }
-    }
-
-    return is_busy_input;
-}
-
-static bool is_input_busy(
-    uint                       inputid,
-    const vector<uint>        &groupids,
-    QMap<uint,bool>           &busygrp,
-    QMap<uint,bool>           &busyrec,
-    QMap<uint,InputInfo>      &busyin,
-    uint                      &mplexid_restriction,
-    uint                      &chanid_restriction)
-{
-    bool is_busy = false;
-    for (uint i = 0; i < groupids.size() && !is_busy; i++)
-    {
-        is_busy |= is_input_group_busy(
-            inputid, groupids[i],
-            busygrp, busyrec, busyin, mplexid_restriction, chanid_restriction);
-    }
-    return is_busy;
-}
-
 bool ChannelBase::IsInputAvailable(
     uint &mplexid_restriction, uint &chanid_restriction) const
 {
     if (!m_inputid)
-        return false;
-
-    // Check each input to make sure it doesn't belong to an
-    // input group which is attached to a busy recorder.
-    QMap<uint,bool>           busygrp;
-    QMap<uint,bool>           busyrec;
-    QMap<uint,InputInfo>      busyin;
-
-    // Cache our busy input if applicable
-    if (m_pParent)
     {
-        InputInfo info;
-        busyrec[m_inputid] = m_pParent->IsBusy(&info);
-        if (busyrec[m_inputid])
-        {
-            busyin[m_inputid] = info;
-            info.chanid = GetChanID();
-        }
+        LOG(VB_CHANNEL, LOG_INFO, LOC + QString("no m_inputid"));
+        return false;
     }
+
+    InputInfo info;
 
     mplexid_restriction = 0;
     chanid_restriction = 0;
 
-    vector<uint> groupids = CardUtil::GetInputGroups(m_inputid);
+    vector<uint> inputids = CardUtil::GetConflictingInputs(m_inputid);
+    for (uint i = 0; i < inputids.size(); ++i)
+    {
+        if (RemoteIsBusy(inputids[i], info))
+        {
+            LOG(VB_CHANNEL, LOG_DEBUG, LOC +
+                QString("Input %1 is busy on %2/%3")
+                .arg(info.inputid)
+                .arg(info.chanid).arg(info.mplexid));
+            if (info.sourceid != m_sourceid)
+            {
+                LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Input is busy"));
+                return false;
+            }
+            mplexid_restriction = info.mplexid;
+            chanid_restriction = info.chanid;
+        }
+    }
 
-    bool res = !is_input_busy(m_inputid, groupids,
-                          busygrp, busyrec, busyin, mplexid_restriction,
-                          chanid_restriction);
-    return res;
+    LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Input is free on %1/%2")
+        .arg(mplexid_restriction).arg(chanid_restriction));
+    return true;
 }
 
 /// \note m_system_lock must be held when this is called

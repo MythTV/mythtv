@@ -187,10 +187,12 @@ void IdleScreen::UpdateScreen(void)
                 {
                     case RecStatus::Recording:
                     case RecStatus::Tuning:
+                    case RecStatus::Failing:
                         list = m_currentRecordings;
                         break;
 
                     case RecStatus::WillRecord:
+                    case RecStatus::Pending:
                         list = m_nextRecordings;
                         break;
 

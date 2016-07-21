@@ -365,7 +365,8 @@ void MythRenderOpenGL::Flush(bool use_fence)
     }
     else
     {
-        glFlush();
+        if (m_flushEnabled)
+            glFlush();
     }
 
     doneCurrent();
@@ -1136,6 +1137,7 @@ void MythRenderOpenGL::ResetVars(void)
     m_active_fb       = 0;
     m_blend           = false;
     m_background      = 0x00000000;
+    m_flushEnabled    = true;
 }
 
 void MythRenderOpenGL::ResetProcs(void)

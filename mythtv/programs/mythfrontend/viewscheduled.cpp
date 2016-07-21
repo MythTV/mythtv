@@ -296,7 +296,7 @@ void ViewScheduled::LoadList(bool useExistingData)
              recstatus == RecStatus::Tuning ||
              recstatus == RecStatus::Failing) &&
             (m_showAll ||
-             (recstatus >= RecStatus::Failing &&
+             (recstatus >= RecStatus::Pending &&
               recstatus <= RecStatus::WillRecord) ||
              recstatus == RecStatus::DontRecord ||
              (recstatus == RecStatus::TooManyRecordings &&
@@ -436,7 +436,8 @@ void ViewScheduled::FillList()
                  recstatus == RecStatus::Aborted   ||
                  recstatus == RecStatus::Missed)
             state = "error";
-        else if (recstatus == RecStatus::WillRecord)
+        else if (recstatus == RecStatus::WillRecord ||
+                 recstatus == RecStatus::Pending)
         {
             if (m_curinput == 0 || pginfo->GetInputID() == m_curinput)
             {

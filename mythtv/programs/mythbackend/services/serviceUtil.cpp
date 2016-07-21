@@ -372,6 +372,7 @@ void FillVideoMetadataInfo (
         QDateTime(pMetadata->GetInsertdate(),
                   QTime(0,0),Qt::LocalTime).toUTC());
     pVideoMetadataInfo->setUserRating(pMetadata->GetUserRating());
+    pVideoMetadataInfo->setChildID(pMetadata->GetChildID());
     pVideoMetadataInfo->setLength(pMetadata->GetLength());
     pVideoMetadataInfo->setPlayCount(pMetadata->GetPlayCount());
     pVideoMetadataInfo->setSeason(pMetadata->GetSeason());

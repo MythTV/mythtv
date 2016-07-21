@@ -454,7 +454,9 @@ RecStatus::Type EncoderLink::StartRecording(ProgramInfo *rec)
                     "but the backend is not there anymore\n")
                 .arg(m_inputid));
 
-    if (retval != RecStatus::Recording && retval != RecStatus::Tuning && retval != RecStatus::Failing)
+    if (retval != RecStatus::Recording &&
+        retval != RecStatus::Tuning &&
+        retval != RecStatus::Failing)
     {
         endRecordingTime = MythDate::current().addDays(-2);
         startRecordingTime = endRecordingTime;
@@ -481,7 +483,9 @@ RecStatus::Type EncoderLink::GetRecordingStatus(void)
                     "but the backend is not there anymore\n")
                 .arg(m_inputid));
 
-    if (retval != RecStatus::Recording && retval != RecStatus::Tuning && retval != RecStatus::Failing)
+    if (retval != RecStatus::Recording &&
+        retval != RecStatus::Tuning &&
+        retval != RecStatus::Failing)
     {
         endRecordingTime = MythDate::current().addDays(-2);
         startRecordingTime = endRecordingTime;

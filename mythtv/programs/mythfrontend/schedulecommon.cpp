@@ -21,13 +21,13 @@
 // mythfrontend
 #include "scheduleeditor.h"
 
-#if QT_VERSION < QT_VERSION_CHECK(5,6,0)
-#include "progdetails.h"
-#endif
-
 #include "proglist.h"
 #include "customedit.h"
 #include "guidegrid.h"
+
+#ifdef CONFIG_QTWEBKIT
+#include "progdetails.h"
+#endif
 
 /**
 *  \brief Show the Program Details screen
@@ -38,7 +38,7 @@ void ScheduleCommon::ShowDetails(void) const
     if (!pginfo)
         return;
 
-#if QT_VERSION < QT_VERSION_CHECK(5,6,0)
+#ifdef CONFIG_QTWEBKIT
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     ProgDetails *details_dialog  = new ProgDetails(mainStack, pginfo);
 
@@ -353,10 +353,12 @@ void ScheduleCommon::EditRecording(void)
     }
     else if (recinfo.GetRecordingStatus() == RecStatus::Recording ||
              recinfo.GetRecordingStatus() == RecStatus::Tuning    ||
-             recinfo.GetRecordingStatus() == RecStatus::Failing)
+             recinfo.GetRecordingStatus() == RecStatus::Failing   ||
+             recinfo.GetRecordingStatus() == RecStatus::Pending)
     {
-        menuPopup->AddButton(tr("Stop this recording"),
-                             qVariantFromValue(recinfo));
+        if (recinfo.GetRecordingStatus() != RecStatus::Pending)
+            menuPopup->AddButton(tr("Stop this recording"),
+                                 qVariantFromValue(recinfo));
         menuPopup->AddButton(tr("Modify recording options"),
                              qVariantFromValue(recinfo));
     }

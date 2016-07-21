@@ -122,7 +122,10 @@ void ViewScheduleDiff::showStatus(MythUIButtonListItem *item)
                 break;
             if (pa->GetRecordingEndTime() > pi->GetRecordingStartTime() &&
                 (pa->GetRecordingStatus() == RecStatus::WillRecord ||
-                 pa->GetRecordingStatus() == RecStatus::Recording))
+                 pa->GetRecordingStatus() == RecStatus::Pending ||
+                 pa->GetRecordingStatus() == RecStatus::Recording ||
+                 pa->GetRecordingStatus() == RecStatus::Tuning ||
+                 pa->GetRecordingStatus() == RecStatus::Failing))
             {
                 message += QString("%1 - %2  %3\n")
                     .arg(pa->GetRecordingStartTime()
@@ -173,7 +176,9 @@ static int comp_recstart(const ProgramInfo *a, const ProgramInfo *b)
     }
     if (a->GetRecordingPriority() != b->GetRecordingPriority() &&
         (a->GetRecordingStatus() == RecStatus::WillRecord ||
-         b->GetRecordingStatus() == RecStatus::WillRecord))
+         a->GetRecordingStatus() == RecStatus::Pending ||
+         b->GetRecordingStatus() == RecStatus::WillRecord ||
+         b->GetRecordingStatus() == RecStatus::Pending))
     {
         if (a->GetRecordingPriority() < b->GetRecordingPriority())
             return 1;

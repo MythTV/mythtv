@@ -779,15 +779,17 @@ static uint clone_capturecard(uint src_inputid, uint orig_dst_inputid)
     }
 
     query.prepare(
-        "SELECT videodevice,           audiodevice,           vbidevice,       "
-        "       cardtype,              hostname,              signal_timeout,  "
-        "       channel_timeout,       dvb_wait_for_seqstart, dvb_on_demand,   "
-        "       dvb_tuning_delay,      dvb_diseqc_type,       diseqcid,        "
-        "       dvb_eitscan,           inputname,             sourceid,        "
-        "       externalcommand,       changer_device,        changer_model,   "
-        "       tunechan,              startchan,             displayname,     "
-        "       dishnet_eit,           recpriority,           quicktune,       "
-        "       schedorder,            livetvorder "
+        "SELECT videodevice,           audiodevice,           vbidevice,      "
+        "       cardtype,              hostname,              signal_timeout, "
+        "       channel_timeout,       dvb_wait_for_seqstart, dvb_on_demand,  "
+        "       dvb_tuning_delay,      dvb_diseqc_type,       diseqcid,       "
+        "       dvb_eitscan,           inputname,             sourceid,       "
+        "       externalcommand,       changer_device,        changer_model,  "
+        "       tunechan,              startchan,             displayname,    "
+        "       dishnet_eit,           recpriority,           quicktune,      "
+        "       livetvorder,           reclimit,                              "
+        // See below for special handling of the following.
+        "       schedgroup,            schedorder                             "
         "FROM capturecard "
         "WHERE cardid = :INPUTID");
     query.bindValue(":INPUTID", src_inputid);
@@ -801,6 +803,17 @@ static uint clone_capturecard(uint src_inputid, uint orig_dst_inputid)
     {
         LOG(VB_GENERAL, LOG_ERR, "clone_cardinput -- get data 2");
         return 0;
+    }
+
+    // Hangel schedgroup and schedorder specially.  If schedgroup is
+    // set, schedgroup and schedorder should be false and 0,
+    // respectively, for all children.
+    bool schedgroup = query.value(26).toBool();
+    uint schedorder = query.value(27).toUInt();
+    if (schedgroup)
+    {
+        schedgroup = false;
+        schedorder = 0;
     }
 
     MSqlQuery query2(MSqlQuery::InitCon());
@@ -830,14 +843,18 @@ static uint clone_capturecard(uint src_inputid, uint orig_dst_inputid)
         "    dishnet_eit           = :V21, "
         "    recpriority           = :V22, "
         "    quicktune             = :V23, "
-        "    schedorder            = :V24, "
-        "    livetvorder           = :V25,  "
+        "    livetvorder           = :V24, "
+        "    reclimit              = :V25, "
+        "    schedgroup            = :SCHEDGROUP, "
+        "    schedorder            = :SCHEDORDER, "
         "    parentid              = :PARENTID "
         "WHERE cardid = :INPUTID");
     for (uint i = 0; i < 26; ++i)
         query2.bindValue(QString(":V%1").arg(i), query.value(i).toString());
     query2.bindValue(":INPUTID", dst_inputid);
     query2.bindValue(":PARENTID", src_inputid);
+    query2.bindValue(":SCHEDGROUP", schedgroup);
+    query2.bindValue(":SCHEDORDER", schedorder);
 
     if (!query2.exec())
     {
@@ -1395,29 +1412,40 @@ vector<uint> CardUtil::GetGroupInputIDs(uint inputgroupid)
 
 vector<uint> CardUtil::GetConflictingInputs(uint inputid)
 {
+    LOG(VB_RECORD, LOG_INFO,
+        LOC + QString("GetConflictingInputs() input %1").arg(inputid));
+
     vector<uint> inputids;
-    vector<uint> inputgroupids = CardUtil::GetInputGroups(inputid);
 
-    for (uint i = 0; i < inputgroupids.size(); i++)
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare(
+        "SELECT DISTINCT c.cardid "
+        "FROM ( "
+        "    SELECT inputgroupid "
+        "    FROM inputgroup "
+        "    WHERE cardinputid = :INPUTID1 "
+        ") g "
+        "JOIN inputgroup ig ON ig.inputgroupid = g.inputgroupid "
+        "JOIN capturecard c ON c.cardid = ig.cardinputid "
+        "                      AND c.cardid <> :INPUTID2 "
+        "ORDER BY c.cardid");
+
+    query.bindValue(":INPUTID1", inputid);
+    query.bindValue(":INPUTID2", inputid);
+
+    if (!query.exec())
     {
-        LOG(VB_RECORD, LOG_INFO, LOC + QString("  Group ID %1")
-                                     .arg(inputgroupids[i]));
-
-        vector<uint> tmp = CardUtil::GetGroupInputIDs(inputgroupids[i]);
-        for (uint j = 0; j < tmp.size(); j++)
-        {
-            if (tmp[j] == inputid)
-                continue;
-            if (find(inputids.begin(), inputids.end(), tmp[j])
-                != inputids.end())
-                continue;
-            inputids.push_back(tmp[j]);
-        }
+        MythDB::DBError("CardUtil::GetConflictingInputs()", query);
+        return inputids;
     }
 
-    for (uint i = 0; i < inputids.size(); i++)
+    while (query.next())
+    {
+        inputids.push_back(query.value(0).toUInt());
         LOG(VB_RECORD, LOG_INFO,
-            LOC + QString("  Input ID %1").arg(inputids[i]));
+            LOC + QString("GetConflictingInputs() got input %1").arg(inputids.back()));
+    }
 
     return inputids;
 }
@@ -2002,7 +2030,7 @@ vector<uint> CardUtil::GetInputList(void)
     return list;
 }
 
-vector<uint> CardUtil::GetLiveTVInputList(void)
+vector<uint> CardUtil::GetSchedInputList(void)
 {
     vector<uint> list;
 
@@ -2010,11 +2038,11 @@ vector<uint> CardUtil::GetLiveTVInputList(void)
     query.prepare(
         "SELECT DISTINCT cardid "
         "FROM capturecard "
-        "WHERE livetvorder <> 0 "
-        "ORDER BY livetvorder");
+        "WHERE schedorder <> 0 "
+        "ORDER BY schedorder, cardid");
 
     if (!query.exec())
-        MythDB::DBError("CardUtil::GetInputList()", query);
+        MythDB::DBError("CardUtil::GetSchedInputList()", query);
     else
     {
         while (query.next())
@@ -2024,6 +2052,27 @@ vector<uint> CardUtil::GetLiveTVInputList(void)
     return list;
 }
 
+vector<uint> CardUtil::GetLiveTVInputList(void)
+{
+    vector<uint> list;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT DISTINCT cardid "
+        "FROM capturecard "
+        "WHERE livetvorder <> 0 "
+        "ORDER BY livetvorder, cardid");
+
+    if (!query.exec())
+        MythDB::DBError("CardUtil::GetLiveTVInputList()", query);
+    else
+    {
+        while (query.next())
+            list.push_back(query.value(0).toUInt());
+    }
+
+    return list;
+}
 
 QString CardUtil::GetDeviceName(dvb_dev_type_t type, const QString &device)
 {

@@ -8,16 +8,12 @@ mingw | win32-msvc* {
    QT += scripttools
 }
 contains(QT_VERSION, ^4\\.[0-9]\\..*) {
-# QT += webkit
+QT += webkit
 using_qtdbus: CONFIG += qdbus
 }
-contains(QT_VERSION, ^5\\.[0-5]\\..*) {
+contains(QT_VERSION, ^5\\.[0-9]\\..*):using_qtwebkit {
 QT += widgets
 QT += webkitwidgets
-using_qtdbus: QT += dbus
-}
-contains(QT_VERSION, ^5\\.[6-9]\\..*) {
-QT += widgets
 using_qtdbus: QT += dbus
 }
 
@@ -90,10 +86,7 @@ HEADERS += serviceHosts/frontendServiceHost.h
 HEADERS += services/frontend.h
 SOURCES += services/frontend.cpp
 
-
-!contains(QT_VERSION, ^5\\.[6-9]\\..*) {
-    # temp disable features for Qt 5.6 until QtWebEngine is implemented correctly
-
+using_qtwebkit {
     HEADERS += progdetails.h
     SOURCES += progdetails.cpp
 }
@@ -165,4 +158,28 @@ android {
     ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIB)libmythprotoserver-0.28.so
 
     ANDROID_PACKAGE_SOURCE_DIR += $$(MYTHPACKAGEBASE)/android-package-source
+}
+
+using_openmax {
+    contains( HAVE_OPENMAX_BROADCOM, yes ) {
+        using_opengl {
+            # For raspberry Pi Raspbian
+            exists(/opt/vc/lib/libEGL.so) {
+                DEFINES += USING_OPENGLES
+                # For raspberry pi raspbian
+                QMAKE_RPATHDIR += $${RUNPREFIX}/share/mythtv/lib
+                createlinks.path = $${PREFIX}/share/mythtv/lib
+                createlinks.extra = ln -fs /opt/vc/lib/libEGL.so $(INSTALL_ROOT)/$${PREFIX}/share/mythtv/lib/libEGL.so.1.0.0 ;
+                createlinks.extra += ln -fs /opt/vc/lib/libEGL.so $(INSTALL_ROOT)/$${PREFIX}/share/mythtv/lib/libEGL.so.1 ;
+                createlinks.extra += ln -fs /opt/vc/lib/libGLESv2.so $(INSTALL_ROOT)/$${PREFIX}/share/mythtv/lib/libGLESv2.so.2.0.0 ;
+                createlinks.extra += ln -fs /opt/vc/lib/libGLESv2.so $(INSTALL_ROOT)/$${PREFIX}/share/mythtv/lib/libGLESv2.so.2 ;
+                INSTALLS += createlinks
+            }
+        } else {
+            # For raspberry pi ubuntu
+            exists(/usr/lib/arm-linux-gnueabihf/mesa-egl/libEGL.so) {
+                QMAKE_RPATHDIR += /usr/lib/arm-linux-gnueabihf/mesa-egl
+            }
+        }
+    }
 }

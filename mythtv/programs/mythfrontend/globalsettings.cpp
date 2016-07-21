@@ -1205,9 +1205,17 @@ static HostComboBoxSetting * CurrentPlaybackProfile()
 #endif
 
 #ifdef USING_OPENMAX
-    if (!profiles.contains("OpenMAX Normal"))
+    if (!profiles.contains("OpenMAX Normal") &&
+        !profiles.contains("OpenMAX High Quality"))
     {
         VideoDisplayProfile::CreateOpenMAXProfiles(host);
+        profiles = VideoDisplayProfile::GetProfiles(host);
+    }
+    // Special case for user upgrading from version that only
+    // has OpenMAX Normal
+    else if (!profiles.contains("OpenMAX High Quality"))
+    {
+        VideoDisplayProfile::CreateOpenMAXProfiles(host,1);
         profiles = VideoDisplayProfile::GetProfiles(host);
     }
 #endif
@@ -2538,7 +2546,7 @@ static HostComboBoxSetting *ThemePainter()
     gc->addSelection(QCoreApplication::translate("(Common)", "Qt"), QT_PAINTER);
     gc->addSelection(QCoreApplication::translate("(Common)", "Auto", "Automatic"),
                      AUTO_PAINTER);
-#ifdef USING_OPENGL
+#if defined USING_OPENGL && ! defined USING_OPENGLES
     gc->addSelection(QCoreApplication::translate("(Common)", "OpenGL 2"),
                      OPENGL2_PAINTER);
     gc->addSelection(QCoreApplication::translate("(Common)", "OpenGL 1"),

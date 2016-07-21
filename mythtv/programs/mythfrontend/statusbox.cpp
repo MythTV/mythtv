@@ -730,7 +730,11 @@ void StatusBox::doScheduleStatus()
 
         ++statusMatch[recstatus];
 
-        if (recstatus == RecStatus::WillRecord || recstatus == RecStatus::Recording)
+        if (recstatus == RecStatus::WillRecord ||
+            recstatus == RecStatus::Pending ||
+            recstatus == RecStatus::Recording ||
+            recstatus == RecStatus::Tuning ||
+            recstatus == RecStatus::Failing)
         {
             ++sourceMatch[s->GetSourceID()];
             ++cardMatch[s->GetInputID()];
@@ -751,6 +755,9 @@ void StatusBox::doScheduleStatus()
         }                                                       \
     } while (0)
     ADD_STATUS_LOG_LINE(RecStatus::Recording, "");
+    ADD_STATUS_LOG_LINE(RecStatus::Tuning, "");
+    ADD_STATUS_LOG_LINE(RecStatus::Failing, "error");
+    ADD_STATUS_LOG_LINE(RecStatus::Pending, "");
     ADD_STATUS_LOG_LINE(RecStatus::WillRecord, "");
     ADD_STATUS_LOG_LINE(RecStatus::Conflict, "error");
     ADD_STATUS_LOG_LINE(RecStatus::TooManyRecordings, "warning");

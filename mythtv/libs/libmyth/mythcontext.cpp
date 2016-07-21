@@ -696,6 +696,7 @@ QString MythContextPrivate::TestDBconnection(void)
 
     if (doPing && !ping(host, 3))  // Fail after trying for 3 seconds
     {
+        LOG(VB_GENERAL, LOG_WARNING, QString("Pinging to %1 failed, database will be unavailable").arg(host));
         SilenceDBerrors();
         err = QObject::tr(
             "Cannot find (ping) database host %1 on the network",

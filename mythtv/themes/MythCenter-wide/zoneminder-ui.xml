@@ -127,7 +127,6 @@
             <area>60,165,300,40</area>
             <font>info</font>
             <multiline>no</multiline>
-            <value>Load: 0.12</value>
         </textarea>
 
         <textarea name="disk_text" from="basetextarea">
@@ -135,7 +134,6 @@
             <align>right</align>
             <font>info</font>
             <multiline>no</multiline>
-            <value>Disk: 100%</value>
         </textarea>
 
         <textarea name="label1" from="basetextarea">
@@ -353,7 +351,6 @@
             <area>1090,125,130,50</area>
             <font>label</font>
             <align>right</align>
-            <value>0/0</value>
         </textarea>
 
 
@@ -702,7 +699,6 @@
             <area>170,95,450,40</area>
             <align>left,vcenter</align>
             <font>data</font>
-            <value>Event Name (1/123)</value>
         </textarea>
 
         <textarea name="label2">
@@ -716,7 +712,6 @@
             <area>780,95,450,40</area>
             <align>left,vcenter</align>
             <font>data</font>
-            <value>Camera Name</value>
         </textarea>
 
         <textarea name="label3">
@@ -730,7 +725,6 @@
             <area>170,125,400,40</area>
             <align>left,vcenter</align>
             <font>data</font>
-            <value>1/123</value>
         </textarea>
 
         <textarea name="label4">
@@ -744,7 +738,6 @@
             <area>780,125,450,40</area>
             <align>left,vcenter</align>
             <font>data</font>
-            <value>Mon 01 Nov 2006 12:34</value>
         </textarea>
 
         <imagetype name="frameimage">
@@ -753,7 +746,7 @@
         </imagetype>
 
         <textarea name="noevents_text">
-            <area>340,85,600,450</area>
+            <area>350,185,540,450</area>
             <font>data</font>
             <align>allcenter</align>
             <value>There are no events to show</value>

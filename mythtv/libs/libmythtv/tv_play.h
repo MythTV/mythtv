@@ -68,7 +68,6 @@ typedef void (*EMBEDRETURNVOIDSCHEDIT) (const ProgramInfo *, void *);
 //            -> progListLock    -> osdLock
 //            -> chanEditMapLock -> osdLock
 //            -> lastProgramLock
-//            -> is_tunable_cache_lock
 //            -> recorderPlaybackInfoLock
 //            -> timerIdLock
 //            -> mainLoopCondLock
@@ -424,13 +423,9 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
                       int editType = kScheduleProgramGuide);
     bool StartEmbedding(const QRect&);
     void StopEmbedding(void);
-    bool IsTunable(const PlayerContext*, uint chanid,
-                   bool use_cache = false);
-    QSet<uint> IsTunableOn(const PlayerContext*, uint chanid,
-                           bool use_cache, bool early_exit);
-    static QSet<uint> IsTunableOn(TV *tv, const PlayerContext*, uint chanid,
-                                  bool use_cache, bool early_exit);
-    void ClearTunableCache(void);
+    bool IsTunable(const PlayerContext*, uint chanid);
+    QSet<uint> IsTunableOn(const PlayerContext*, uint chanid);
+    static QSet<uint> IsTunableOn(TV *tv, const PlayerContext*, uint chanid);
     void ChangeChannel(const PlayerContext*, const ChannelInfoList &options);
     void DrawUnusedRects(void);
     void DoEditSchedule(int editType = kScheduleProgramGuide);
@@ -955,10 +950,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     bool         isEmbedded;       ///< are we currently embedded
     bool         ignoreKeyPresses; ///< should we ignore keypresses
     vector<bool> saved_pause;      ///< saved pause state before embedding
-
-    // IsTunable() cache, used by embedded program guide
-    mutable QMutex                 is_tunable_cache_lock;
-    QMap< uint,vector<InputInfo> > is_tunable_cache_inputs;
 
     // Channel group stuff
     /// \brief Lock necessary when modifying channel group variables.

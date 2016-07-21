@@ -3,23 +3,31 @@
 
 QString RecStatus::toUIState(RecStatus::Type recstatus)
 {
-    if (recstatus == RecStatus::Recorded     || recstatus == RecStatus::WillRecord)
+    if (recstatus == RecStatus::Recorded ||
+        recstatus == RecStatus::WillRecord ||
+        recstatus == RecStatus::Pending)
         return "normal";
 
-    if (recstatus == RecStatus::Recording    || recstatus == RecStatus::Tuning)
+    if (recstatus == RecStatus::Recording ||
+        recstatus == RecStatus::Tuning)
         return "running";
 
-    if (recstatus == RecStatus::Conflict     || recstatus == RecStatus::Offline      ||
-        recstatus == RecStatus::TunerBusy    || recstatus == RecStatus::Failed       ||
-        recstatus == RecStatus::Aborted      || recstatus == RecStatus::Missed       ||
+    if (recstatus == RecStatus::Conflict ||
+        recstatus == RecStatus::Offline ||
+        recstatus == RecStatus::TunerBusy ||
+        recstatus == RecStatus::Failed ||
+        recstatus == RecStatus::Aborted ||
+        recstatus == RecStatus::Missed ||
         recstatus == RecStatus::Failing)
     {
         return "error";
     }
 
-    if (recstatus == RecStatus::Repeat       ||
-        recstatus == RecStatus::NeverRecord  || recstatus == RecStatus::DontRecord   ||
-        (recstatus != RecStatus::DontRecord && recstatus <= RecStatus::EarlierShowing))
+    if (recstatus == RecStatus::Repeat ||
+        recstatus == RecStatus::NeverRecord ||
+        recstatus == RecStatus::DontRecord   ||
+        (recstatus != RecStatus::DontRecord &&
+         recstatus <= RecStatus::EarlierShowing))
     {
         return "disabled";
     }
@@ -49,6 +57,9 @@ QString RecStatus::toString(RecStatus::Type recstatus, uint id)
             ret = QString::number(id);
             break;
         case RecStatus::WillRecord:
+            ret = QString::number(id);
+            break;
+        case RecStatus::Pending:
             ret = QString::number(id);
             break;
         case RecStatus::DontRecord:
@@ -130,6 +141,8 @@ QString RecStatus::toString(RecStatus::Type recstatus, RecordingType rectype)
             return QObject::tr("Failing");
         case RecStatus::WillRecord:
             return QObject::tr("Will Record");
+        case RecStatus::Pending:
+            return QObject::tr("Pending");
         case RecStatus::DontRecord:
             return QObject::tr("Don't Record");
         case RecStatus::PreviousRecording:
@@ -188,6 +201,9 @@ QString RecStatus::toDescription(RecStatus::Type recstatus, RecordingType rectyp
         {
             case RecStatus::WillRecord:
                 message = QObject::tr("This showing will be recorded.");
+                break;
+            case RecStatus::Pending:
+                message = QObject::tr("This showing is about to record.");
                 break;
             case RecStatus::Recording:
                 message = QObject::tr("This showing is being recorded.");

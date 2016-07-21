@@ -40,6 +40,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         future(false),
         schedorder(0),
         mplexid(0),
+        sgroupid(0),
         desiredrecstartts(),
         desiredrecendts(),
         record(NULL),
@@ -51,6 +52,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         future(other.future),
         schedorder(other.schedorder),
         mplexid(other.mplexid),
+        sgroupid(other.sgroupid),
         desiredrecstartts(other.desiredrecstartts),
         desiredrecendts(other.desiredrecendts),
         record(NULL),
@@ -62,6 +64,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         future(false),
         schedorder(0),
         mplexid(0),
+        sgroupid(0),
         desiredrecstartts(startts),
         desiredrecendts(endts),
         record(NULL),
@@ -73,6 +76,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         future(false),
         schedorder(0),
         mplexid(0),
+        sgroupid(0),
         desiredrecstartts(startts),
         desiredrecendts(endts),
         record(NULL),
@@ -84,6 +88,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         future(false),
         schedorder(0),
         mplexid(0),
+        sgroupid(0),
         desiredrecstartts(startts),
         desiredrecendts(endts),
         record(NULL),
@@ -96,6 +101,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         future(false),
         schedorder(0),
         mplexid(0),
+        sgroupid(0),
         desiredrecstartts(startts),
         desiredrecendts(endts),
         record(NULL),
@@ -164,7 +170,8 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         uint audioproperties,
         bool future,
         int schedorder,
-        uint mplexid);
+        uint mplexid,
+        uint sgroupid);
 
     /// Create RecordingInfo from 'record'+'channel' tables,
     /// user in scheduler.cpp  @ ~ 3566 & ~ 3643
@@ -307,6 +314,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
     bool future;
     int schedorder;
     uint mplexid; // Only valid within the scheduler
+    uint sgroupid; // Only valid within the scheduler
     QDateTime desiredrecstartts;
     QDateTime desiredrecendts;
 

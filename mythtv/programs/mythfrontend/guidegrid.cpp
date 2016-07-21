@@ -1254,7 +1254,7 @@ uint GuideGrid::GetAlternateChannelIndex(
         if (with_same_channum != same_channum)
             continue;
 
-        if (!m_player->IsTunable(ctx, ciinfo->chanid, true))
+        if (!m_player->IsTunable(ctx, ciinfo->chanid))
             continue;
 
         if (with_same_channum)
@@ -2102,9 +2102,6 @@ void GuideGrid::updateChannelsNonUI(QVector<ChannelInfo *> &chinfos,
 {
     ChannelInfo *chinfo = GetChannelInfo(m_currentStartChannel);
 
-    if (m_player)
-        m_player->ClearTunableCache();
-
     for (unsigned int y = 0; (y < (unsigned int)m_channelCount) && chinfo; ++y)
     {
         unsigned int chanNumber = y + m_currentStartChannel;
@@ -2122,7 +2119,7 @@ void GuideGrid::updateChannelsNonUI(QVector<ChannelInfo *> &chinfos,
             const PlayerContext *ctx = m_player->GetPlayerReadLock(
                 -1, __FILE__, __LINE__);
             if (ctx && chinfo)
-                try_alt = !m_player->IsTunable(ctx, chinfo->chanid, true);
+                try_alt = !m_player->IsTunable(ctx, chinfo->chanid);
             m_player->ReturnPlayerLock(ctx);
         }
 

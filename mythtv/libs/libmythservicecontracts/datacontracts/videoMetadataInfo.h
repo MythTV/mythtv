@@ -44,6 +44,7 @@ class SERVICE_PUBLIC VideoMetadataInfo : public QObject
     Q_PROPERTY( QDateTime       ReleaseDate     READ ReleaseDate      WRITE setReleaseDate    )
     Q_PROPERTY( QDateTime       AddDate         READ AddDate          WRITE setAddDate        )
     Q_PROPERTY( float           UserRating      READ UserRating       WRITE setUserRating     )
+    Q_PROPERTY( int             ChildID         READ ChildID          WRITE setChildID        )
     Q_PROPERTY( int             Length          READ Length           WRITE setLength         )
     Q_PROPERTY( int             PlayCount       READ PlayCount        WRITE setPlayCount      )
     Q_PROPERTY( int             Season          READ Season           WRITE setSeason         )
@@ -79,6 +80,7 @@ class SERVICE_PUBLIC VideoMetadataInfo : public QObject
     PROPERTYIMP    ( QDateTime  , ReleaseDate    )
     PROPERTYIMP    ( QDateTime  , AddDate        )
     PROPERTYIMP    ( float      , UserRating     )
+    PROPERTYIMP    ( int        , ChildID        )
     PROPERTYIMP    ( int        , Length         )
     PROPERTYIMP    ( int        , PlayCount      )
     PROPERTYIMP    ( int        , Season         )
@@ -114,6 +116,7 @@ class SERVICE_PUBLIC VideoMetadataInfo : public QObject
                           m_Id            ( 0      ),
                           m_Collectionref ( 0      ),
                           m_UserRating    ( 0      ),
+                          m_ChildID       ( 0      ),
                           m_Length        ( 0      ),
                           m_PlayCount     ( 0      ),
                           m_Season        ( 0      ),

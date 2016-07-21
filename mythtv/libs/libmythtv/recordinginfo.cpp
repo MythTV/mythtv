@@ -92,7 +92,8 @@ RecordingInfo::RecordingInfo(
     uint _audioproperties,
     bool _future,
     int _schedorder,
-    uint _mplexid) :
+    uint _mplexid,
+    uint _sgroupid) :
     ProgramInfo(
         _title, _subtitle, _description, _season, _episode, _totalepisodes,
         _category, _chanid, _chanstr, _chansign, _channame,
@@ -104,6 +105,7 @@ RecordingInfo::RecordingInfo(
     future(_future),
     schedorder(_schedorder),
     mplexid(_mplexid),
+    sgroupid(_sgroupid),
     desiredrecstartts(_startts),
     desiredrecendts(_endts),
     record(NULL),
@@ -206,6 +208,7 @@ RecordingInfo::RecordingInfo(
     future(false),
     schedorder(0),
     mplexid(0),
+    sgroupid(0),
     desiredrecstartts(_startts),
     desiredrecendts(_endts),
     record(NULL),
@@ -244,6 +247,7 @@ RecordingInfo::RecordingInfo(
     future(false),
     schedorder(0),
     mplexid(0),
+    sgroupid(0),
     desiredrecstartts(),
     desiredrecendts(),
     record(NULL),
@@ -399,6 +403,7 @@ void RecordingInfo::clone(const RecordingInfo &other,
         future         = other.future;
         schedorder     = other.schedorder;
         mplexid        = other.mplexid;
+        sgroupid       = other.sgroupid;
         desiredrecstartts = other.desiredrecstartts;
         desiredrecendts = other.desiredrecendts;
     }
@@ -431,6 +436,7 @@ void RecordingInfo::clone(const ProgramInfo &other,
     future         = false;
     schedorder     = 0;
     mplexid        = 0;
+    sgroupid       = 0;
     desiredrecstartts = QDateTime();
     desiredrecendts = QDateTime();
 
@@ -451,6 +457,7 @@ void RecordingInfo::clear(void)
     future = false;
     schedorder = 0;
     mplexid = 0;
+    sgroupid = 0;
     desiredrecstartts = QDateTime();
     desiredrecendts = QDateTime();
 

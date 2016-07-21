@@ -122,23 +122,44 @@ void VideoSourceSelector::Load(void)
     }
 }
 
-class InstanceCount : public TransSpinBoxSetting
+class InstanceCount : public SpinBoxSetting, public CardInputDBStorage
 {
   public:
-    InstanceCount(const CaptureCard &parent) : TransSpinBoxSetting(1, 5, 1)
+    InstanceCount(const CardInput &parent, int _initValue) :
+        SpinBoxSetting(this, 1, 10, _initValue),
+        CardInputDBStorage(this, parent, "reclimit")
     {
         setLabel(QObject::tr("Max recordings"));
+        setValue(_initValue);
         setHelpText(
             QObject::tr(
-                "Maximum number of simultaneous recordings this device "
-                "should make. Some digital transmitters transmit multiple "
-                "programs on a multiplex, if this is set to a value greater "
-                "than one MythTV can sometimes take advantage of this. "
-                "If only a single program is available, setting this to 2 "
-                "allows overlapping schedules to record."));
-        uint cnt = parent.GetInstanceCount();
-        cnt = (!cnt) ? kDefaultMultirecCount : cnt;
-        setValue(cnt);
+                "Maximum number of simultaneous recordings MythTV will "
+                "attempt using this device.  If set to a value other than "
+                "1, MythTV can sometimes record multiple programs on "
+                "the same multiplex or overlapping copies of the same "
+                "program on a single channel."
+                ));
+    };
+};
+
+class SchedGroup : public CheckBoxSetting, public CardInputDBStorage
+{
+  public:
+    SchedGroup(const CardInput &parent) :
+        CheckBoxSetting(this),
+        CardInputDBStorage(this, parent, "schedgroup")
+    {
+        setLabel(QObject::tr("Schedule as group"));
+        setValue(false);
+        setHelpText(
+            QObject::tr(
+                "Schedule all virtual inputs on this device as a group.  "
+                "This is more efficient than scheduling each input "
+                "individually, but can result in scheduling more "
+                "simultaneous recordings than is allowed.  Be sure to set "
+                "the maximum number of simultaneous recordings above "
+                "high enough to handle all expected cases."
+                ));
     };
 };
 
@@ -1821,23 +1842,17 @@ class IPTVConfigurationGroup : public VerticalConfigurationGroup
   public:
     IPTVConfigurationGroup(CaptureCard& a_parent) :
        VerticalConfigurationGroup(false, true, false, false),
-       parent(a_parent),
-       instances(new InstanceCount(parent))
+       parent(a_parent)
     {
         setUseLabel(false);
         addChild(new IPTVHost(parent));
         addChild(new ChannelTimeout(parent, 30000, 1750));
         addChild(new EmptyAudioDevice(parent));
         addChild(new EmptyVBIDevice(parent));
-        addChild(instances);
-
-        connect(instances, SIGNAL(valueChanged(int)),
-                &parent,   SLOT(  SetInstanceCount(int)));
     };
 
   private:
     CaptureCard   &parent;
-    InstanceCount *instances;
 };
 
 class ASIDevice : public ComboBoxSetting, public CaptureCardDBStorage
@@ -1924,19 +1939,15 @@ ASIConfigurationGroup::ASIConfigurationGroup(CaptureCard& a_parent):
     VerticalConfigurationGroup(false, true, false, false),
     parent(a_parent),
     device(new ASIDevice(parent)),
-    cardinfo(new TransLabelSetting()),
-    instances(new InstanceCount(parent))
+    cardinfo(new TransLabelSetting())
 {
     addChild(device);
     addChild(new EmptyAudioDevice(parent));
     addChild(new EmptyVBIDevice(parent));
     addChild(cardinfo);
-    addChild(instances);
 
     connect(device, SIGNAL(valueChanged(const QString&)),
             this,   SLOT(  probeCard(   const QString&)));
-    connect(instances, SIGNAL(valueChanged(int)),
-            &parent,   SLOT(  SetInstanceCount(int)));
 
     probeCard(device->getValue());
 };
@@ -2029,17 +2040,9 @@ class HDHomeRunExtra : public ConfigurationWizard
 {
   public:
     HDHomeRunExtra(HDHomeRunConfigurationGroup &parent);
-    uint GetInstanceCount(void) const
-    {
-        return (uint) count->intValue();
-    }
-
-  private:
-    InstanceCount *count;
 };
 
-HDHomeRunExtra::HDHomeRunExtra(HDHomeRunConfigurationGroup &parent) :
-    count(new InstanceCount(parent.parent))
+HDHomeRunExtra::HDHomeRunExtra(HDHomeRunConfigurationGroup &parent)
 {
     VerticalConfigurationGroup* rec = new VerticalConfigurationGroup(false);
     rec->setLabel(QObject::tr("Recorder Options"));
@@ -2047,7 +2050,6 @@ HDHomeRunExtra::HDHomeRunExtra(HDHomeRunConfigurationGroup &parent) :
 
     rec->addChild(new SignalTimeout(parent.parent, 1000, 250));
     rec->addChild(new ChannelTimeout(parent.parent, 3000, 1750));
-    rec->addChild(count);
 
     addChild(rec);
 }
@@ -2218,7 +2220,6 @@ void HDHomeRunConfigurationGroup::HDHomeRunExtraPanel(void)
 
     HDHomeRunExtra acw(*this);
     acw.exec();
-    parent.SetInstanceCount(acw.GetInstanceCount());
 }
 
 // -----------------------
@@ -2229,17 +2230,9 @@ class VBoxExtra : public ConfigurationWizard
 {
   public:
     VBoxExtra(VBoxConfigurationGroup &parent);
-    uint GetInstanceCount(void) const
-    {
-        return (uint) count->intValue();
-    }
-
-  private:
-    InstanceCount *count;
 };
 
-VBoxExtra::VBoxExtra(VBoxConfigurationGroup &parent) :
-    count(new InstanceCount(parent.parent))
+VBoxExtra::VBoxExtra(VBoxConfigurationGroup &parent)
 {
     VerticalConfigurationGroup* rec = new VerticalConfigurationGroup(false);
     rec->setLabel(QObject::tr("Recorder Options"));
@@ -2247,7 +2240,6 @@ VBoxExtra::VBoxExtra(VBoxConfigurationGroup &parent) :
 
     rec->addChild(new SignalTimeout(parent.parent, 1000, 250));
     rec->addChild(new ChannelTimeout(parent.parent, 3000, 1750));
-    rec->addChild(count);
 
     addChild(rec);
 }
@@ -2343,7 +2335,6 @@ void VBoxConfigurationGroup::VBoxExtraPanel(void)
 
     VBoxExtra acw(*this);
     acw.exec();
-    parent.SetInstanceCount(acw.GetInstanceCount());
 }
 
 // -----------------------
@@ -2411,13 +2402,11 @@ void CetonDeviceID::UpdateValues(void)
         emit LoadedIP(newstyle.cap(1));
         emit LoadedTuner(newstyle.cap(3));
     }
-    if (_parent.getCardID())
-        emit LoadedInstances((int)_parent.GetInstanceCount());
 }
 
 CetonConfigurationGroup::CetonConfigurationGroup(CaptureCard& a_parent) :
     VerticalConfigurationGroup(false, true, false, false),
-    parent(a_parent), instances(new InstanceCount(parent))
+    parent(a_parent)
 {
     setUseLabel(false);
 
@@ -2435,7 +2424,6 @@ CetonConfigurationGroup::CetonConfigurationGroup(CaptureCard& a_parent) :
     addChild(tuner);
     addChild(deviceid);
     addChild(desc);
-    addChild(instances);
 
     connect(ip,       SIGNAL(NewValue(const QString&)),
             deviceid, SLOT(  SetIP(const QString&)));
@@ -2446,11 +2434,6 @@ CetonConfigurationGroup::CetonConfigurationGroup(CaptureCard& a_parent) :
             ip,       SLOT(  LoadValue(const QString&)));
     connect(deviceid, SIGNAL(LoadedTuner(const QString&)),
             tuner,    SLOT(  LoadValue(const QString&)));
-    connect(deviceid, SIGNAL(LoadedInstances(int)),
-            instances, SLOT(  setValue(int)));
-    connect(instances, SIGNAL(valueChanged(int)),
-            &parent,   SLOT(  SetInstanceCount(int)));
-
 };
 
 V4LConfigurationGroup::V4LConfigurationGroup(CaptureCard& a_parent) :
@@ -2604,8 +2587,7 @@ void DemoConfigurationGroup::probeCard(const QString &device)
 ExternalConfigurationGroup::ExternalConfigurationGroup(CaptureCard &a_parent) :
     VerticalConfigurationGroup(false, true, false, false),
     parent(a_parent),
-    info(new TransLabelSetting()),
-    instances(new InstanceCount(parent))
+    info(new TransLabelSetting())
 {
     FileDevice *device = new FileDevice(parent);
     device->setHelpText(tr("A 'black box' application controlled via "
@@ -2615,12 +2597,9 @@ ExternalConfigurationGroup::ExternalConfigurationGroup(CaptureCard &a_parent) :
 
     info->setLabel(tr("File info"));
     addChild(info);
-    addChild(instances);
 
     connect(device, SIGNAL(valueChanged(const QString&)),
             this,   SLOT(  probeApp(   const QString&)));
-    connect(instances, SIGNAL(valueChanged(int)),
-            &parent,   SLOT(  SetInstanceCount(int)));
 
     probeApp(device->getValue());
 }
@@ -2695,8 +2674,7 @@ void HDPVRConfigurationGroup::probeCard(const QString &device)
 V4L2encGroup::V4L2encGroup(CaptureCard &parent) :
     TriggeredConfigurationGroup(false),
     m_parent(parent),
-    m_cardinfo(new TransLabelSetting()),
-    m_instances(new InstanceCount(m_parent))
+    m_cardinfo(new TransLabelSetting())
 {
     setLabel(QObject::tr("V4L2 encoder devices (multirec capable)"));
     VideoDevice *device = new VideoDevice(m_parent, 0, 15);
@@ -2704,7 +2682,6 @@ V4L2encGroup::V4L2encGroup(CaptureCard &parent) :
     addChild(device);
     m_cardinfo->setLabel(tr("Probed info"));
     addChild(m_cardinfo);
-    m_parent.SetInstanceCount(2);
 
     // Choose children to show based on which device is active
     setTrigger(device);
@@ -2849,7 +2826,7 @@ void CaptureCardGroup::triggerChanged(const QString& value)
 }
 
 CaptureCard::CaptureCard(bool use_card_group)
-    : id(new ID), instance_count(0)
+    : id(new ID)
 {
     addChild(id);
     if (use_card_group)
@@ -2897,10 +2874,6 @@ void CaptureCard::loadByID(int cardid)
 {
     id->setValue(cardid);
     Load();
-
-    // Update instance count for cloned cards.
-    if (cardid)
-        instance_count = CardUtil::GetChildInputCount(cardid) + 1;
 }
 
 void CaptureCard::Save(void)
@@ -2909,7 +2882,6 @@ void CaptureCard::Save(void)
     QString init_type = CardUtil::GetRawInputType(init_cardid);
     QString init_dev = CardUtil::GetVideoDevice(init_cardid);
     QString init_input = CardUtil::GetInputName(init_cardid);
-    vector<uint> cardids = CardUtil::GetChildInputIDs(init_cardid);
 
     ////////
 
@@ -2938,33 +2910,12 @@ void CaptureCard::Save(void)
         }
     }
 
-    if (!CardUtil::IsTunerSharingCapable(type))
-        return;
-
-    if (!instance_count)
+    // Handle any cloning we may need to do
+    if (CardUtil::IsTunerSharingCapable(type))
     {
-        instance_count = (init_cardid) ?
-            max((size_t)1, cardids.size() + 1) : kDefaultMultirecCount;
-    }
-
-    // Delete old clone cards as required.
-    for (uint i = cardids.size() + 1;
-         (i > instance_count) && !cardids.empty(); --i)
-    {
-        CardUtil::DeleteCard(cardids.back());
-        cardids.pop_back();
-    }
-
-    // Clone this config to existing clone cards.
-    for (uint i = 0; i < cardids.size(); ++i)
-    {
-        CardUtil::CloneCard(cardid, cardids[i]);
-    }
-
-    // Create new clone cards as required.
-    for (uint i = cardids.size() + 1; i < instance_count; i++)
-    {
-        CardUtil::CloneCard(cardid, 0);
+        vector<uint> clones = CardUtil::GetChildInputIDs(cardid);
+        for (uint i = 0; i < clones.size(); i++)
+            CardUtil::CloneCard(cardid, clones[i]);
     }
 }
 
@@ -3418,7 +3369,9 @@ CardInput::CardInput(const QString & cardtype, const QString & device,
     srcfetch(new TransButtonSetting()),
     externalInputSettings(new DiSEqCDevSettings()),
     inputgrp0(new InputGroup(*this, 0)),
-    inputgrp1(new InputGroup(*this, 1))
+    inputgrp1(new InputGroup(*this, 1)),
+    instancecount(NULL),
+    schedgroup(NULL)
 {
     addChild(id);
 
@@ -3477,6 +3430,13 @@ CardInput::CardInput(const QString & cardtype, const QString & device,
         new VerticalConfigurationGroup(false, false, true, true);
 
     interact->setLabel(QObject::tr("Interactions between inputs"));
+    if (CardUtil::IsTunerSharingCapable(cardtype))
+    {
+        instancecount = new InstanceCount(*this, kDefaultMultirecCount);
+        interact->addChild(instancecount);
+        schedgroup = new SchedGroup(*this);
+        interact->addChild(schedgroup);
+    }
     interact->addChild(new InputPriority(*this));
     interact->addChild(new ScheduleOrder(*this, _cardid));
     interact->addChild(new LiveTVOrder(*this, _cardid));
@@ -3504,6 +3464,9 @@ CardInput::CardInput(const QString & cardtype, const QString & device,
             this,     SLOT(  SetSourceID (const QString&)));
     connect(ingrpbtn, SIGNAL(pressed(QString)),
             this,     SLOT(  CreateNewInputGroup()));
+    if (schedgroup)
+        connect(instancecount, SIGNAL(valueChanged(int)),
+                this,     SLOT(UpdateSchedGroup(int)));
 }
 
 CardInput::~CardInput()
@@ -3523,6 +3486,13 @@ void CardInput::SetSourceID(const QString &sourceid)
     scan->setEnabled(enable && !raw_card_type.isEmpty() &&
                      !CardUtil::IsUnscanable(raw_card_type));
     srcfetch->setEnabled(enable);
+}
+
+void CardInput::UpdateSchedGroup(int value)
+{
+    if (value <= 1)
+        schedgroup->setValue(false);
+    schedgroup->setEnabled(value > 1);
 }
 
 QString CardInput::getSourceName(void) const
@@ -3719,18 +3689,34 @@ void CardInput::loadByInput(int _cardid, QString _inputname)
 
 void CardInput::Save(void)
 {
-    uint src_cardid = id->getValue().toUInt();
-    QString init_input = CardUtil::GetInputName(src_cardid);
+    uint cardid = id->getValue().toUInt();
+    QString init_input = CardUtil::GetInputName(cardid);
     ConfigurationWizard::Save();
     externalInputSettings->Store(getInputID());
 
-    // Handle any cloning we may need to do
-    QString type = CardUtil::GetRawInputType(src_cardid);
-    if (CardUtil::IsTunerSharingCapable(type))
+    uint icount = 1;
+    if (instancecount)
+        icount = instancecount->getValue().toUInt();
+    vector<uint> cardids = CardUtil::GetChildInputIDs(cardid);
+
+    // Delete old clone cards as required.
+    for (uint i = cardids.size() + 1;
+         (i > icount) && !cardids.empty(); --i)
     {
-        vector<uint> clones = CardUtil::GetChildInputIDs(src_cardid);
-        for (uint i = 0; i < clones.size(); i++)
-            CardUtil::CloneCard(src_cardid, clones[i]);
+        CardUtil::DeleteCard(cardids.back());
+        cardids.pop_back();
+    }
+
+    // Clone this config to existing clone cards.
+    for (uint i = 0; i < cardids.size(); ++i)
+    {
+        CardUtil::CloneCard(cardid, cardids[i]);
+    }
+
+    // Create new clone cards as required.
+    for (uint i = cardids.size() + 1; i < icount; i++)
+    {
+        CardUtil::CloneCard(cardid, 0);
     }
 
     // Delete any unused input groups
@@ -4267,23 +4253,14 @@ class DVBExtra : public ConfigurationWizard
 {
   public:
     DVBExtra(DVBConfigurationGroup &parent);
-    uint GetInstanceCount(void) const
-    {
-        return (uint) count->intValue();
-    }
-
-  private:
-    InstanceCount *count;
 };
 
 DVBExtra::DVBExtra(DVBConfigurationGroup &parent)
-    : count(new InstanceCount(parent.parent))
 {
     VerticalConfigurationGroup* rec = new VerticalConfigurationGroup(false);
     rec->setLabel(QObject::tr("Recorder Options"));
     rec->setUseLabel(false);
 
-    rec->addChild(count);
     rec->addChild(new DVBNoSeqStart(parent.parent));
     rec->addChild(new DVBOnDemand(parent.parent));
     rec->addChild(new DVBEITScan(parent.parent));
@@ -4393,6 +4370,4 @@ void DVBConfigurationGroup::DVBExtraPanel(void)
 
     DVBExtra acw(*this);
     acw.exec();
-    parent.SetInstanceCount(acw.GetInstanceCount());
-
 }

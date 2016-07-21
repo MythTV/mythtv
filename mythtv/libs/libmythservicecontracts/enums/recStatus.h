@@ -16,6 +16,7 @@ class SERVICE_PUBLIC RecStatus : public QObject
     Q_ENUMS(Type)
 
     enum Type {
+        Pending = -15,
         Failing = -14,
         //OtherRecording = -13, (obsolete)
         //OtherTuning = -12, (obsolete)

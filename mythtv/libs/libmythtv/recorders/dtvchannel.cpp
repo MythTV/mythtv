@@ -222,7 +222,8 @@ bool DTVChannel::SetChannelByString(const QString &channum)
     }
 
     if ((mplexid_restriction && (mplexid != mplexid_restriction)) ||
-        (chanid_restriction && (chanid != chanid_restriction)))
+        (!mplexid_restriction &&
+         chanid_restriction && (chanid != chanid_restriction)))
     {
         LOG(VB_GENERAL, LOG_ERR, loc +
             QString("Requested channel '%1' is not available because "

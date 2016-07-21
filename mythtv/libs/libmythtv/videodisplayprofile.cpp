@@ -695,6 +695,11 @@ QString VideoDisplayProfile::GetDecoderHelp(QString decoder)
             "accelerate video decoding. "
             "(H264 only, requires Mac OS 10.6.3)");
 
+    if (decoder == "openmax")
+        msg += QObject::tr(
+            "Openmax will use the graphics hardware to "
+            "accelerate video decoding on Raspberry Pi. ");
+
     return msg;
 }
 
@@ -1173,15 +1178,27 @@ void VideoDisplayProfile::CreateVAAPIProfiles(const QString &hostname)
                   "");
 }
 
-void VideoDisplayProfile::CreateOpenMAXProfiles(const QString &hostname)
+// upgrade = 1 means adding high quality
+void VideoDisplayProfile::CreateOpenMAXProfiles(const QString &hostname, int upgrade)
 {
-    (void) QObject::tr("OpenMAX Normal", "Sample: OpenMAX Normal");
-    DeleteProfileGroup("OpenMAX Normal", hostname);
-    uint groupid = CreateProfileGroup("OpenMAX Normal", hostname);
+#ifdef USING_OPENGLES
+    (void) QObject::tr("OpenMAX High Quality", "Sample: OpenMAX High Quality");
+    DeleteProfileGroup("OpenMAX High Quality", hostname);
+    uint groupid = CreateProfileGroup("OpenMAX High Quality", hostname);
     CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
-                  "openmax", 4, true, "openmax", "softblend", false,
+                  "openmax", 4, true, "openmax", "opengl", true,
                   "openmaxadvanced", "onefield",
                   "");
+#endif
+    if (!upgrade) {
+        (void) QObject::tr("OpenMAX Normal", "Sample: OpenMAX Normal");
+        DeleteProfileGroup("OpenMAX Normal", hostname);
+        uint groupid = CreateProfileGroup("OpenMAX Normal", hostname);
+        CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
+                      "openmax", 4, true, "openmax", "softblend", false,
+                      "openmaxadvanced", "onefield",
+                      "");
+    }
 }
 
 void VideoDisplayProfile::CreateProfiles(const QString &hostname)
@@ -1449,6 +1466,12 @@ QString VideoDisplayProfile::GetOSDHelp(const QString &osd)
     {
         msg = QObject::tr(
             "Uses OpenGL to alpha blend the OSD onto the video.");
+    }
+
+    if (osd =="threaded")
+    {
+        msg = QObject::tr(
+            "Uses OpenGL in a separate thread to overlay the OSD onto the video.");
     }
 
 #ifdef USING_OPENMAX

@@ -35,7 +35,7 @@ class MythUISpinBox;
 class MythUITextEdit;
 class MythUIProgressBar;
 
-#if ( QT_VERSION <= QT_VERSION_CHECK( 5, 5, 0 ))
+#ifdef CONFIG_QTWEBKIT
 class MythUIWebBrowser;
 #endif
 

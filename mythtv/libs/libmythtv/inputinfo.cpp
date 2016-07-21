@@ -40,7 +40,6 @@ bool InputInfo::FromStringList(QStringList::const_iterator &it,
 
     sourceid = (*it).toUInt(); NEXT();
     inputid  = (*it).toUInt(); NEXT();
-    NEXT(); // obsolete cardid
     mplexid  = (*it).toUInt(); NEXT();
     livetvorder = (*it).toUInt(); NEXT();
 
@@ -63,7 +62,6 @@ void InputInfo::ToStringList(QStringList &list) const
     list.push_back(name.isEmpty() ? "<EMPTY>" : name);
     list.push_back(QString::number(sourceid));
     list.push_back(QString::number(inputid));
-    list.push_back(QString::number(inputid)); // obsolete cardid
     list.push_back(QString::number(mplexid));
     list.push_back(QString::number(livetvorder));
     list.push_back(displayName.isEmpty() ? "<EMPTY>" : displayName);

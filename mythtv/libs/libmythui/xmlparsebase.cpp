@@ -13,6 +13,9 @@
 #include <QLinearGradient>
 #include <QRadialGradient>
 
+// libmythbase headers
+#include "mythconfig.h"
+
 // libmyth headers
 #include "mythlogging.h"
 
@@ -34,7 +37,7 @@
 #include "mythuiscrollbar.h"
 #include "mythuigroup.h"
 
-#if ( QT_VERSION < QT_VERSION_CHECK( 5, 6, 0 ))
+#ifdef CONFIG_QTWEBKIT
 #include "mythuiwebbrowser.h"
 #endif
 
@@ -495,7 +498,7 @@ MythUIType *XMLParseBase::ParseUIType(
         uitype = new MythUIProgressBar(parent, name);
     else if (type == "scrollbar")
         uitype = new MythUIScrollBar(parent, name);
-#if ( QT_VERSION < QT_VERSION_CHECK( 5, 6, 0 ))
+#ifdef CONFIG_QTWEBKIT
     else if (type == "webbrowser")
         uitype = new MythUIWebBrowser(parent, name);
 #endif
