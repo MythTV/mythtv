@@ -8,6 +8,7 @@
 // MythTV headers
 #include <standardsettings.h>
 #include <mythcontext.h>
+#include <settings.h>
 
 // The real work.
 

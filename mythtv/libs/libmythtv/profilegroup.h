@@ -5,7 +5,6 @@
 #include <QCoreApplication>
 
 #include "mythtvexp.h"
-#include "settings.h"
 #include "standardsettings.h"
 #include "mythwidgets.h"
 

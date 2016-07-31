@@ -21,6 +21,7 @@
 #include "audiogeneralsettings.h"
 #include "mythdialogbox.h"
 #include "mythlogging.h"
+#include "mythmainwindow.h"
 
 extern "C" {
 #include "libavformat/avformat.h"

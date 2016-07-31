@@ -1,15 +1,13 @@
 #ifndef STANDARDSETTINGS_H_
 #define STANDARDSETTINGS_H_
 
+#include "mythexp.h"
 #include "mythuibuttonlist.h"
-#include <mythdialogbox.h>
-#include <mythuibuttontree.h>
-#include <mythgenerictree.h>
+#include "mythdialogbox.h"
+#include "mythstorage.h"
+
 #include <QMap>
-#include "settings.h"
-
-#include "mythlogging.h"
-
+#include <QObject>
 #include <initializer_list>
 
 class StandardSetting;

@@ -26,6 +26,7 @@ using namespace std;
 #include <myththemedmenu.h>
 #include <mythuihelper.h>
 #include <mythdialogbox.h>
+#include <mythmainwindow.h>
 
 // mytharchive
 #include "archivesettings.h"
