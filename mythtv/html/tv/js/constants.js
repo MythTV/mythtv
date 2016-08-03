@@ -57,7 +57,7 @@ INUSEOTHER     : 4194304
 
 // Recording Status
 var RecordingStatus = {
-PENDING           : -15
+PENDING           : -15,
 FAILING           : -14,
 OTHERRECORDING    : -13,
 OTHERTUNING       : -12,
@@ -89,7 +89,8 @@ OTHERSHOWING      : 13
 };
 
 var RecordingStatusString = {
-"-14" : "Failing", // Deprecated
+"-15" : "Pending",
+"-14" : "Failing",
 "-13" : "Other Recording", // Deprecated
 "-12" : "Other Tuning",    // Deprecated
 "-11" : "Missed",
