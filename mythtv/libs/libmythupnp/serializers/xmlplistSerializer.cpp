@@ -216,7 +216,11 @@ void XmlPListSerializer::BeginObject(const QString &sName,
                                      const QObject *pObject)
 {
     const QMetaObject *pMeta = pObject->metaObject();
-    int nIdx = pMeta->indexOfClassInfo("version");
+
+    int nIdx = -1;
+
+    if (pMeta)
+        nIdx = pMeta->indexOfClassInfo("version");
 
     if (nIdx >=0)
     {

@@ -923,7 +923,10 @@ QString Xsd::ReadPropertyMetadata( QObject *pObject, QString sPropName, QString 
 {
     const QMetaObject *pMeta = pObject->metaObject();
 
-    int nIdx = pMeta->indexOfClassInfo( sPropName.toUtf8() );
+    int nIdx = -1;
+
+    if (pMeta)
+        nIdx = pMeta->indexOfClassInfo( sPropName.toUtf8() );
 
     if (nIdx >=0)
     {
