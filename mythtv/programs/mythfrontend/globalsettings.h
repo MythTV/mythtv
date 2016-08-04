@@ -55,29 +55,20 @@ class VideoModeSettings : public HostCheckBoxSetting
     virtual void updateButton(MythUIButtonListItem *item);
 };
 
-class LcdSettings : public TriggeredConfigurationGroup
+class LcdSettings
 {
-    Q_OBJECT
-
-  public:
-    LcdSettings();
+    Q_DECLARE_TR_FUNCTIONS(LcdSettings)
 };
 
 
-class WatchListSettings : public TriggeredConfigurationGroup
+class WatchListSettings
 {
-    Q_OBJECT
-
-  public:
-    WatchListSettings();
+    Q_DECLARE_TR_FUNCTIONS(WatchListSettings)
 };
 
-class ChannelGroupSettings : public TriggeredConfigurationGroup
+class ChannelGroupSettings
 {
-    Q_OBJECT
-
-  public:
-    ChannelGroupSettings();
+    Q_DECLARE_TR_FUNCTIONS(ChannelGroupSettings)
 };
 
 #if CONFIG_DARWIN
