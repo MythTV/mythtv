@@ -91,7 +91,10 @@ void XmlSerializer::BeginObject( const QString &sName, const QObject  *pObject )
 
     const QMetaObject *pMeta = pObject->metaObject();
 
-    int nIdx = pMeta->indexOfClassInfo( "version" );
+    int nIdx = -1;
+
+    if (pMeta)
+        nIdx = pMeta->indexOfClassInfo( "version" );
 
     if (nIdx >=0)
         m_pXmlWriter->writeAttribute( "version", pMeta->classInfo( nIdx ).value() );
