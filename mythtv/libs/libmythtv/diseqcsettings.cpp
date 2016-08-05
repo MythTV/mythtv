@@ -1,5 +1,5 @@
 /*
- * \file dvbdevtree_cfg.cpp
+ * \file diseqcsettings.cpp
  * \brief DVB-S Device Tree Configuration Classes.
  * \author Copyright (C) 2006, Yeasah Pell
  */
@@ -14,9 +14,9 @@
 
 /* Lat/Long items relocated from videosource.cpp */
 
-static GlobalLineEdit *DiSEqCLatitude(void)
+static GlobalTextEditSetting *DiSEqCLatitude(void)
 {
-    GlobalLineEdit *gc = new GlobalLineEdit("latitude");
+    GlobalTextEditSetting *gc = new GlobalTextEditSetting("latitude");
     gc->setLabel("Latitude");
     gc->setHelpText(
         DeviceTree::tr("The Cartesian latitude for your location. "
@@ -24,9 +24,9 @@ static GlobalLineEdit *DiSEqCLatitude(void)
     return gc;
 }
 
-static GlobalLineEdit *DiSEqCLongitude(void)
+static GlobalTextEditSetting *DiSEqCLongitude(void)
 {
-    GlobalLineEdit *gc = new GlobalLineEdit("longitude");
+    GlobalTextEditSetting *gc = new GlobalTextEditSetting("longitude");
     gc->setLabel("Longitude");
     gc->setHelpText(
         DeviceTree::tr("The Cartesian longitude for your location. "
@@ -36,13 +36,14 @@ static GlobalLineEdit *DiSEqCLongitude(void)
 
 //////////////////////////////////////// DeviceTypeSetting
 
-class DeviceTypeSetting : public ComboBoxSetting, public Storage
+class DeviceTypeSetting : public TransMythUIComboBoxSetting
 {
   public:
-    DeviceTypeSetting(DiSEqCDevDevice &device) :
-        ComboBoxSetting(this), m_device(device)
+    DeviceTypeSetting() : m_device(NULL)
     {
         setLabel(DeviceTree::tr("Device Type"));
+        addSelection(DeviceTree::tr("Unconnected"),
+                     QString::number((uint) 0xFFFF));
         addSelection(DeviceTree::tr("Switch"),
                      QString::number((uint) DiSEqCDevDevice::kTypeSwitch));
         addSelection(DeviceTree::tr("Rotor"),
@@ -55,29 +56,41 @@ class DeviceTypeSetting : public ComboBoxSetting, public Storage
 
     virtual void Load(void)
     {
-        QString tmp = QString::number((uint) m_device.GetDeviceType());
-        setValue(getValueIndex(tmp));
+        if (m_device)
+        {
+            QString tmp = QString::number((uint) m_device->GetDeviceType());
+            setValue(getValueIndex(tmp));
+        }
+        setChanged(false);
     }
 
-    virtual void Save(void)
+    void SetDevice(DiSEqCDevDevice* dev)
     {
-        m_device.SetDeviceType(
-            (DiSEqCDevDevice::dvbdev_t) getValue().toUInt());
+        m_device = dev;
     }
 
-    virtual void Save(QString /*destination*/) { }
+    void DeleteDevice()
+    {
+        SetDevice(NULL);
+        clearSettings();
+    }
+
+    DiSEqCDevDevice * GetDevice()
+    {
+        return m_device;
+    }
 
   private:
-    DiSEqCDevDevice &m_device;
+    DiSEqCDevDevice *m_device;
 };
 
 //////////////////////////////////////// DeviceDescrSetting
 
-class DeviceDescrSetting : public LineEditSetting, public Storage
+class DeviceDescrSetting : public TransTextEditSetting
 {
   public:
     DeviceDescrSetting(DiSEqCDevDevice &device) :
-        LineEditSetting(this), m_device(device)
+        TransTextEditSetting(), m_device(device)
     {
         setLabel(DeviceTree::tr("Description"));
         QString help = DeviceTree::tr(
@@ -89,14 +102,13 @@ class DeviceDescrSetting : public LineEditSetting, public Storage
     virtual void Load(void)
     {
         setValue(m_device.GetDescription());
+        setChanged(false);
     }
 
     virtual void Save(void)
     {
         m_device.SetDescription(getValue());
     }
-
-    virtual void Save(QString /*destination*/) { }
 
   private:
     DiSEqCDevDevice &m_device;
@@ -105,11 +117,11 @@ class DeviceDescrSetting : public LineEditSetting, public Storage
 
 //////////////////////////////////////// DeviceRepeatSetting
 
-class DeviceRepeatSetting : public SpinBoxSetting, public Storage
+class DeviceRepeatSetting : public TransMythUISpinBoxSetting
 {
   public:
     DeviceRepeatSetting(DiSEqCDevDevice &device) :
-        SpinBoxSetting(this, 0, 15, 1), m_device(device)
+        TransMythUISpinBoxSetting(0, 15, 1), m_device(device)
     {
         setLabel(DeviceTree::tr("Repeat Count"));
         QString help = DeviceTree::tr(
@@ -123,6 +135,7 @@ class DeviceRepeatSetting : public SpinBoxSetting, public Storage
     virtual void Load(void)
     {
         setValue(m_device.GetRepeatCount());
+        setChanged(false);
     }
 
     virtual void Save(void)
@@ -130,19 +143,17 @@ class DeviceRepeatSetting : public SpinBoxSetting, public Storage
         m_device.SetRepeatCount(getValue().toUInt());
     }
 
-    virtual void Save(QString /*destination*/) { }
-
   private:
     DiSEqCDevDevice &m_device;
 };
 
 //////////////////////////////////////// SwitchTypeSetting
 
-class SwitchTypeSetting : public ComboBoxSetting, public Storage
+class SwitchTypeSetting : public TransMythUIComboBoxSetting
 {
   public:
     SwitchTypeSetting(DiSEqCDevSwitch &switch_dev) :
-        ComboBoxSetting(this), m_switch(switch_dev)
+        TransMythUIComboBoxSetting(), m_switch(switch_dev)
     {
         setLabel(DeviceTree::tr("Switch Type"));
         setHelpText(DeviceTree::tr("Select the type of switch from the list."));
@@ -170,6 +181,7 @@ class SwitchTypeSetting : public ComboBoxSetting, public Storage
     virtual void Load(void)
     {
         setValue(getValueIndex(QString::number((uint) m_switch.GetType())));
+        setChanged(false);
     }
 
     virtual void Save(void)
@@ -178,19 +190,17 @@ class SwitchTypeSetting : public ComboBoxSetting, public Storage
                          getValue().toUInt());
     }
 
-    virtual void Save(QString /*destination*/) { }
-
   private:
     DiSEqCDevSwitch &m_switch;
 };
 
 //////////////////////////////////////// SwitchAddressSetting
 
-class SwitchAddressSetting : public LineEditSetting, public Storage
+class SwitchAddressSetting : public TransTextEditSetting
 {
   public:
     SwitchAddressSetting(DiSEqCDevSwitch &switch_dev) :
-           LineEditSetting(this), m_switch(switch_dev)
+           TransTextEditSetting(), m_switch(switch_dev)
     {
         setLabel(DeviceTree::tr("Address of switch"));
         setHelpText(DeviceTree::tr("The DiSEqC address of the switch."));
@@ -199,13 +209,13 @@ class SwitchAddressSetting : public LineEditSetting, public Storage
     virtual void Load(void)
     {
         setValue(QString("0x%1").arg(m_switch.GetAddress(), 0, 16));
+        setChanged(false);
     }
 
     virtual void Save(void)
     {
         m_switch.SetAddress(getValue().toUInt(0, 16));
     }
-    virtual void Save(QString /*destination*/) { Save(); }
 
   private:
     DiSEqCDevSwitch &m_switch;
@@ -213,11 +223,11 @@ class SwitchAddressSetting : public LineEditSetting, public Storage
 
 //////////////////////////////////////// SwitchPortsSetting
 
-class SwitchPortsSetting : public LineEditSetting, public Storage
+class SwitchPortsSetting : public TransTextEditSetting
 {
   public:
     SwitchPortsSetting(DiSEqCDevSwitch &switch_dev) :
-        LineEditSetting(this), m_switch(switch_dev)
+        TransTextEditSetting(), m_switch(switch_dev)
     {
         setLabel(DeviceTree::tr("Number of ports"));
         setHelpText(DeviceTree::tr("The number of ports this switch has."));
@@ -226,6 +236,7 @@ class SwitchPortsSetting : public LineEditSetting, public Storage
     virtual void Load(void)
     {
         setValue(QString::number(m_switch.GetNumPorts()));
+        setChanged(false);
     }
 
     virtual void Save(void)
@@ -233,33 +244,38 @@ class SwitchPortsSetting : public LineEditSetting, public Storage
         m_switch.SetNumPorts(getValue().toUInt());
     }
 
-    virtual void Save(QString /*destination*/) { }
-
   private:
     DiSEqCDevSwitch &m_switch;
 };
 
 //////////////////////////////////////// SwitchConfig
 
-SwitchConfig::SwitchConfig(DiSEqCDevSwitch &switch_dev)
+SwitchConfig::SwitchConfig(DiSEqCDevSwitch &switch_dev, StandardSetting *parent)
 {
-    ConfigurationGroup *group =
-        new VerticalConfigurationGroup(false, false);
-    group->setLabel(DeviceTree::tr("Switch Configuration"));
+    setLabel(DeviceTree::tr("Switch Configuration"));
 
-    group->addChild(new DeviceDescrSetting(switch_dev));
-    group->addChild(new DeviceRepeatSetting(switch_dev));
+    parent = this;
+    m_deviceDescr = new DeviceDescrSetting(switch_dev);
+    parent->addChild(m_deviceDescr);
+    parent->addChild(new DeviceRepeatSetting(switch_dev));
     m_type = new SwitchTypeSetting(switch_dev);
-    group->addChild(m_type);
+    parent->addChild(m_type);
     m_address = new SwitchAddressSetting(switch_dev);
-    group->addChild(m_address);
+    parent->addChild(m_address);
     m_ports = new SwitchPortsSetting(switch_dev);
-    group->addChild(m_ports);
+    parent->addChild(m_ports);
 
     connect(m_type, SIGNAL(valueChanged(const QString&)),
             this,   SLOT(  update(void)));
+    connect(m_deviceDescr, SIGNAL(valueChanged(const QString&)),
+            SLOT(setValue(const QString&)));
+}
 
-    addChild(group);
+void SwitchConfig::Load(void)
+{
+    StandardSetting::Load();
+    setValue(m_deviceDescr->getValue());
+    update();
 }
 
 void SwitchConfig::update(void)
@@ -290,13 +306,33 @@ void SwitchConfig::update(void)
     }
 }
 
+bool DiseqcConfigBase::keyPressEvent(QKeyEvent *e)
+{
+    QStringList actions;
+    if (GetMythMainWindow()->TranslateKeyPress("Global", e, actions))
+        return true;
+
+    bool handled = false;
+    foreach(const QString &action, actions)
+    {
+        if (action == "DELETE")
+        {
+            handled = true;
+            emit DeleteClicked();
+            break;
+        }
+    }
+
+    return handled;
+}
+
 //////////////////////////////////////// RotorTypeSetting
 
-class RotorTypeSetting : public ComboBoxSetting, public Storage
+class RotorTypeSetting : public TransMythUIComboBoxSetting
 {
   public:
     RotorTypeSetting(DiSEqCDevRotor &rotor) :
-        ComboBoxSetting(this), m_rotor(rotor)
+        TransMythUIComboBoxSetting(), m_rotor(rotor)
     {
         setLabel(DeviceTree::tr("Rotor Type"));
         setHelpText(DeviceTree::tr("Select the type of rotor from the list."));
@@ -309,6 +345,7 @@ class RotorTypeSetting : public ComboBoxSetting, public Storage
     virtual void Load(void)
     {
         setValue(getValueIndex(QString::number((uint)m_rotor.GetType())));
+        setChanged(false);
     }
 
     virtual void Save(void)
@@ -316,19 +353,17 @@ class RotorTypeSetting : public ComboBoxSetting, public Storage
         m_rotor.SetType((DiSEqCDevRotor::dvbdev_rotor_t)getValue().toUInt());
     }
 
-    virtual void Save(QString /*destination*/) { }
-
   private:
     DiSEqCDevRotor &m_rotor;
 };
 
 //////////////////////////////////////// RotorLoSpeedSetting
 
-class RotorLoSpeedSetting : public LineEditSetting, public Storage
+class RotorLoSpeedSetting : public TransTextEditSetting
 {
   public:
     RotorLoSpeedSetting(DiSEqCDevRotor &rotor) :
-        LineEditSetting(this), m_rotor(rotor)
+        TransTextEditSetting(), m_rotor(rotor)
     {
         setLabel(DeviceTree::tr("Rotor Low Speed (deg/sec)"));
         QString help = DeviceTree::tr(
@@ -340,6 +375,7 @@ class RotorLoSpeedSetting : public LineEditSetting, public Storage
     virtual void Load(void)
     {
         setValue(QString::number(m_rotor.GetLoSpeed()));
+        setChanged(false);
     }
 
     virtual void Save(void)
@@ -347,19 +383,17 @@ class RotorLoSpeedSetting : public LineEditSetting, public Storage
         m_rotor.SetLoSpeed(getValue().toDouble());
     }
 
-    virtual void Save(QString /*destination*/) { }
-
   private:
     DiSEqCDevRotor &m_rotor;
 };
 
 //////////////////////////////////////// RotorHiSpeedSetting
 
-class RotorHiSpeedSetting : public LineEditSetting, public Storage
+class RotorHiSpeedSetting : public TransTextEditSetting
 {
   public:
     RotorHiSpeedSetting(DiSEqCDevRotor &rotor) :
-        LineEditSetting(this), m_rotor(rotor)
+        TransTextEditSetting(), m_rotor(rotor)
     {
         setLabel(DeviceTree::tr("Rotor High Speed (deg/sec)"));
         QString help = DeviceTree::tr(
@@ -371,14 +405,13 @@ class RotorHiSpeedSetting : public LineEditSetting, public Storage
     virtual void Load(void)
     {
         setValue(QString::number(m_rotor.GetHiSpeed()));
+        setChanged(false);
     }
 
     virtual void Save(void)
     {
         m_rotor.SetHiSpeed(getValue().toDouble());
     }
-
-    virtual void Save(QString /*destination*/) { }
 
   private:
     DiSEqCDevRotor &m_rotor;
@@ -435,11 +468,8 @@ static double AngleToFloat(const QString &angle, bool translated = true)
 }
 
 RotorPosMap::RotorPosMap(DiSEqCDevRotor &rotor) :
-    ListBoxSetting(this), m_rotor(rotor)
+    GroupSetting(), m_rotor(rotor)
 {
-    connect(this, SIGNAL(editButtonPressed(int)),   SLOT(edit(void)));
-    connect(this, SIGNAL(deleteButtonPressed(int)), SLOT(del(void)));
-    connect(this, SIGNAL(accepted(int)),            SLOT(edit(void)));
 }
 
 void RotorPosMap::Load(void)
@@ -453,100 +483,88 @@ void RotorPosMap::Save(void)
     m_rotor.SetPosMap(m_posmap);
 }
 
-void RotorPosMap::edit(void)
+class RotorPosTextEdit : public TransTextEditSetting
 {
-    uint id = getValue().toUInt();
-
-    QString angle;
-    if (MythPopupBox::showGetTextPopup(
-            GetMythMainWindow(),
-            DeviceTree::tr("Position Index %1").arg(id),
-            DeviceTree::tr("Orbital Position"), angle))
+public:
+    RotorPosTextEdit(const QString &label, uint id, const QString &value) :
+        TransTextEditSetting(), m_id(id)
     {
-        m_posmap[id] = AngleToFloat(angle);
-        PopulateList();
+        setLabel(label);
+        setValue(value);
     }
-}
 
-void RotorPosMap::del(void)
+    void updateButton(MythUIButtonListItem *item)
+    {
+        TransTextEditSetting::updateButton(item);
+        if (getValue().isEmpty())
+            item->SetText(DeviceTree::tr("None"), "value");
+    }
+
+    uint m_id;
+};
+
+void RotorPosMap::valueChanged(StandardSetting *setting)
 {
-    uint id = getValue().toUInt();
-    m_posmap.erase(m_posmap.find(id));
-    PopulateList();
+    RotorPosTextEdit *posEdit = static_cast<RotorPosTextEdit*>(setting);
+    QString value = posEdit->getValue();
+    if (value.isEmpty())
+        m_posmap.erase(m_posmap.find(posEdit->m_id));
+    else
+        m_posmap[posEdit->m_id] = AngleToFloat(posEdit->getValue());
 }
 
 void RotorPosMap::PopulateList(void)
 {
-    int old_sel = getValueIndex(getValue());
-    clearSelections();
     uint num_pos = 64;
     for (uint pos = 1; pos < num_pos; pos++)
     {
         uint_to_dbl_t::const_iterator it = m_posmap.find(pos);
-        QString posval = DeviceTree::tr("None");
+        QString posval;
         if (it != m_posmap.end())
             posval = AngleToString(*it);
 
-        addSelection(DeviceTree::tr("Position #%1 (%2)").arg(pos).arg(posval),
-                     QString::number(pos));
+        RotorPosTextEdit *posEdit =
+            new RotorPosTextEdit(DeviceTree::tr("Position #%1").arg(pos),
+                                 pos,
+                                 posval);
+        connect(posEdit, SIGNAL(valueChanged(StandardSetting*)),
+                SLOT(valueChanged(StandardSetting*)));
+        addChild(posEdit);
     }
-    setCurrentItem(old_sel);
 }
-
-//////////////////////////////////////// RotorPosConfig
-
-class RotorPosConfig : public ConfigurationDialog
-{
-  public:
-    RotorPosConfig(DiSEqCDevRotor &rotor)
-    {
-        setLabel(DeviceTree::tr("Rotor Position Map"));
-        addChild(new RotorPosMap(rotor));
-    }
-
-    virtual DialogCode exec(void)
-    {
-        while (ConfigurationDialog::exec() == kDialogCodeAccepted);
-        return kDialogCodeRejected;
-    }
-    virtual DialogCode exec(bool /*saveOnExec*/, bool /*doLoad*/)
-        { return exec(); }
-};
 
 //////////////////////////////////////// RotorConfig
 
-RotorConfig::RotorConfig(DiSEqCDevRotor &rotor) : m_rotor(rotor)
+RotorConfig::RotorConfig(DiSEqCDevRotor &rotor, StandardSetting *parent)
+    : m_rotor(rotor)
 {
-    ConfigurationGroup *group =
-        new VerticalConfigurationGroup(false, false);
-    group->setLabel(DeviceTree::tr("Rotor Configuration"));
+    setLabel(DeviceTree::tr("Rotor Configuration"));
+    setValue(rotor.GetDescription());
 
-    group->addChild(new DeviceDescrSetting(rotor));
-    group->addChild(new DeviceRepeatSetting(rotor));
-
-    ConfigurationGroup *tgroup =
-        new HorizontalConfigurationGroup(false, false, true, true);
+    parent = this;
+    parent->addChild(new DeviceDescrSetting(rotor));
+    parent->addChild(new DeviceRepeatSetting(rotor));
 
     RotorTypeSetting *rtype = new RotorTypeSetting(rotor);
     connect(rtype, SIGNAL(valueChanged(const QString&)),
             this,  SLOT(  SetType(     const QString&)));
-    tgroup->addChild(rtype);
+    parent->addChild(rtype);
 
-    m_pos = new TransButtonSetting();
+    m_pos = new RotorPosMap(rotor);
     m_pos->setLabel(DeviceTree::tr("Positions"));
     m_pos->setHelpText(DeviceTree::tr("Rotor position setup."));
-    m_pos->setEnabled(rotor.GetType() == DiSEqCDevRotor::kTypeDiSEqC_1_2);
-    connect(m_pos, SIGNAL(pressed(void)),
-            this,  SLOT(  RunRotorPositionsDialog(void)));
-    tgroup->addChild(m_pos);
+    parent->addChild(m_pos);
 
-    group->addChild(tgroup);
-    group->addChild(new RotorLoSpeedSetting(rotor));
-    group->addChild(new RotorHiSpeedSetting(rotor));
-    group->addChild(DiSEqCLatitude());
-    group->addChild(DiSEqCLongitude());
+    parent->addChild(new RotorLoSpeedSetting(rotor));
+    parent->addChild(new RotorHiSpeedSetting(rotor));
+    parent->addChild(DiSEqCLatitude());
+    parent->addChild(DiSEqCLongitude());
+}
 
-    addChild(group);
+void RotorConfig::Load()
+{
+    m_pos->setEnabled(m_rotor.GetType() == DiSEqCDevRotor::kTypeDiSEqC_1_2);
+    GroupSetting::Load();
 }
 
 void RotorConfig::SetType(const QString &type)
@@ -556,20 +574,13 @@ void RotorConfig::SetType(const QString &type)
     m_pos->setEnabled(rtype == DiSEqCDevRotor::kTypeDiSEqC_1_2);
 }
 
-void RotorConfig::RunRotorPositionsDialog(void)
-{
-    RotorPosConfig config(m_rotor);
-    config.exec();
-    config.Save();
-}
-
 //////////////////////////////////////// SCRUserBandSetting
 
-class SCRUserBandSetting : public SpinBoxSetting, public Storage
+class SCRUserBandSetting : public TransMythUISpinBoxSetting
 {
   public:
     SCRUserBandSetting(DiSEqCDevSCR &scr) :
-        SpinBoxSetting(this, 0, 8, 1), m_scr(scr)
+        TransMythUISpinBoxSetting(0, 8, 1), m_scr(scr)
     {
         setLabel(DeviceTree::tr("Userband"));
         setHelpText(DeviceTree::tr("Unicable userband ID (0-7) or sometimes (1-8)"));
@@ -578,6 +589,7 @@ class SCRUserBandSetting : public SpinBoxSetting, public Storage
     virtual void Load(void)
     {
         setValue(m_scr.GetUserBand());
+        setChanged(false);
     }
 
     virtual void Save(void)
@@ -585,18 +597,16 @@ class SCRUserBandSetting : public SpinBoxSetting, public Storage
         m_scr.SetUserBand(intValue());
     }
 
-    virtual void Save(QString /*destination*/) { }
-
   private:
     DiSEqCDevSCR &m_scr;
 };
 
 //////////////////////////////////////// SCRFrequencySetting
 
-class SCRFrequencySetting : public LineEditSetting, public Storage
+class SCRFrequencySetting : public TransTextEditSetting
 {
   public:
-    SCRFrequencySetting(DiSEqCDevSCR &scr) : LineEditSetting(this), m_scr(scr)
+    SCRFrequencySetting(DiSEqCDevSCR &scr) : TransTextEditSetting(), m_scr(scr)
     {
         setLabel(DeviceTree::tr("Frequency (MHz)"));
         setHelpText(DeviceTree::tr("Unicable userband frequency (usually 1210, 1420, 1680 and 2040 MHz)"));
@@ -605,6 +615,7 @@ class SCRFrequencySetting : public LineEditSetting, public Storage
     virtual void Load(void)
     {
         setValue(QString::number(m_scr.GetFrequency()));
+        setChanged(false);
     }
 
     virtual void Save(void)
@@ -612,18 +623,16 @@ class SCRFrequencySetting : public LineEditSetting, public Storage
         m_scr.SetFrequency(getValue().toUInt());
     }
 
-    virtual void Save(QString /*destination*/) { }
-
   private:
     DiSEqCDevSCR &m_scr;
 };
 
 //////////////////////////////////////// SCRPINSetting
 
-class SCRPINSetting : public LineEditSetting, public Storage
+class SCRPINSetting : public TransTextEditSetting
 {
   public:
-    SCRPINSetting(DiSEqCDevSCR &scr) : LineEditSetting(this), m_scr(scr)
+    SCRPINSetting(DiSEqCDevSCR &scr) : TransTextEditSetting(), m_scr(scr)
     {
         setLabel(DeviceTree::tr("PIN code"));
         setHelpText(DeviceTree::tr("Unicable PIN code (-1 disabled, 0 - 255)"));
@@ -632,6 +641,7 @@ class SCRPINSetting : public LineEditSetting, public Storage
     virtual void Load(void)
     {
         setValue(QString::number(m_scr.GetPIN()));
+        setChanged(false);
     }
 
     virtual void Save(void)
@@ -639,26 +649,21 @@ class SCRPINSetting : public LineEditSetting, public Storage
         m_scr.SetPIN(getValue().toInt());
     }
 
-    virtual void Save(QString /*destination*/) { }
-
   private:
     DiSEqCDevSCR &m_scr;
 };
 
 //////////////////////////////////////// SCRConfig
 
-SCRConfig::SCRConfig(DiSEqCDevSCR &scr) : m_scr(scr)
+SCRConfig::SCRConfig(DiSEqCDevSCR &scr, StandardSetting *parent) : m_scr(scr)
 {
-    ConfigurationGroup *group =
-        new VerticalConfigurationGroup(false, false);
-    group->setLabel(DeviceTree::tr("Unicable Configuration"));
+    setLabel(DeviceTree::tr("Unicable Configuration"));
 
-    group->addChild(new SCRUserBandSetting(scr));
-    group->addChild(new SCRFrequencySetting(scr));
-    group->addChild(new SCRPINSetting(scr));
-    group->addChild(new DeviceRepeatSetting(scr));
-
-    addChild(group);
+    parent = this;
+    parent->addChild(new SCRUserBandSetting(scr));
+    parent->addChild(new SCRFrequencySetting(scr));
+    parent->addChild(new SCRPINSetting(scr));
+    parent->addChild(new DeviceRepeatSetting(scr));
 }
 
 //////////////////////////////////////// LnbPresetSetting
@@ -719,10 +724,10 @@ static uint FindPreset(const DiSEqCDevLNB &lnb)
     return i;
 }
 
-class LNBPresetSetting : public ComboBoxSetting, public Storage
+class LNBPresetSetting : public MythUIComboBoxSetting
 {
   public:
-    LNBPresetSetting(DiSEqCDevLNB &lnb) : ComboBoxSetting(this), m_lnb(lnb)
+    LNBPresetSetting(DiSEqCDevLNB &lnb) : MythUIComboBoxSetting(), m_lnb(lnb)
     {
         setLabel(DeviceTree::tr("LNB Preset"));
         QString help = DeviceTree::tr(
@@ -740,13 +745,10 @@ class LNBPresetSetting : public ComboBoxSetting, public Storage
     virtual void Load(void)
     {
         setValue(FindPreset(m_lnb));
+        setChanged(false);
     }
 
     virtual void Save(void)
-    {
-    }
-
-    virtual void Save(QString /*destination*/)
     {
     }
 
@@ -756,10 +758,10 @@ class LNBPresetSetting : public ComboBoxSetting, public Storage
 
 //////////////////////////////////////// LNBTypeSetting
 
-class LNBTypeSetting : public ComboBoxSetting, public Storage
+class LNBTypeSetting : public MythUIComboBoxSetting
 {
   public:
-    LNBTypeSetting(DiSEqCDevLNB &lnb) : ComboBoxSetting(this), m_lnb(lnb)
+    LNBTypeSetting(DiSEqCDevLNB &lnb) : MythUIComboBoxSetting(), m_lnb(lnb)
     {
         setLabel(DeviceTree::tr("LNB Type"));
         setHelpText(DeviceTree::tr("Select the type of LNB from the list."));
@@ -778,6 +780,7 @@ class LNBTypeSetting : public ComboBoxSetting, public Storage
     virtual void Load(void)
     {
         setValue(getValueIndex(QString::number((uint) m_lnb.GetType())));
+        setChanged(false);
     }
 
     virtual void Save(void)
@@ -785,18 +788,16 @@ class LNBTypeSetting : public ComboBoxSetting, public Storage
         m_lnb.SetType((DiSEqCDevLNB::dvbdev_lnb_t) getValue().toUInt());
     }
 
-    virtual void Save(QString /*destination*/) { }
-
   private:
     DiSEqCDevLNB &m_lnb;
 };
 
 //////////////////////////////////////// LNBLOFSwitchSetting
 
-class LNBLOFSwitchSetting : public LineEditSetting, public Storage
+class LNBLOFSwitchSetting : public TransTextEditSetting
 {
   public:
-    LNBLOFSwitchSetting(DiSEqCDevLNB &lnb) : LineEditSetting(this), m_lnb(lnb)
+    LNBLOFSwitchSetting(DiSEqCDevLNB &lnb) : TransTextEditSetting(), m_lnb(lnb)
     {
         setLabel(DeviceTree::tr("LNB LOF Switch (MHz)"));
         QString help = DeviceTree::tr(
@@ -808,6 +809,7 @@ class LNBLOFSwitchSetting : public LineEditSetting, public Storage
     virtual void Load(void)
     {
         setValue(QString::number(m_lnb.GetLOFSwitch() / 1000));
+        setChanged(false);
     }
 
     virtual void Save(void)
@@ -815,18 +817,16 @@ class LNBLOFSwitchSetting : public LineEditSetting, public Storage
         m_lnb.SetLOFSwitch(getValue().toUInt() * 1000);
     }
 
-    virtual void Save(QString /*destination*/) { }
-
   private:
     DiSEqCDevLNB &m_lnb;
 };
 
 //////////////////////////////////////// LNBLOFLowSetting
 
-class LNBLOFLowSetting : public LineEditSetting, public Storage
+class LNBLOFLowSetting : public TransTextEditSetting
 {
   public:
-    LNBLOFLowSetting(DiSEqCDevLNB &lnb) : LineEditSetting(this), m_lnb(lnb)
+    LNBLOFLowSetting(DiSEqCDevLNB &lnb) : TransTextEditSetting(), m_lnb(lnb)
     {
         setLabel(DeviceTree::tr("LNB LOF Low (MHz)"));
         QString help = DeviceTree::tr(
@@ -839,6 +839,7 @@ class LNBLOFLowSetting : public LineEditSetting, public Storage
     virtual void Load(void)
     {
         setValue(QString::number(m_lnb.GetLOFLow() / 1000));
+        setChanged(false);
     }
 
     virtual void Save(void)
@@ -846,18 +847,16 @@ class LNBLOFLowSetting : public LineEditSetting, public Storage
         m_lnb.SetLOFLow(getValue().toUInt() * 1000);
     }
 
-    virtual void Save(QString /*destination*/) { }
-
   private:
     DiSEqCDevLNB &m_lnb;
 };
 
 //////////////////////////////////////// LNBLOFHighSetting
 
-class LNBLOFHighSetting : public LineEditSetting, public Storage
+class LNBLOFHighSetting : public TransTextEditSetting
 {
   public:
-    LNBLOFHighSetting(DiSEqCDevLNB &lnb) : LineEditSetting(this), m_lnb(lnb)
+    LNBLOFHighSetting(DiSEqCDevLNB &lnb) : TransTextEditSetting(), m_lnb(lnb)
     {
         setLabel(DeviceTree::tr("LNB LOF High (MHz)"));
         QString help = DeviceTree::tr(
@@ -870,6 +869,7 @@ class LNBLOFHighSetting : public LineEditSetting, public Storage
     virtual void Load(void)
     {
         setValue(QString::number(m_lnb.GetLOFHigh() / 1000));
+        setChanged(false);
     }
 
     virtual void Save(void)
@@ -877,17 +877,15 @@ class LNBLOFHighSetting : public LineEditSetting, public Storage
         m_lnb.SetLOFHigh(getValue().toUInt() * 1000);
     }
 
-    virtual void Save(QString /*destination*/) { }
-
   private:
     DiSEqCDevLNB &m_lnb;
 };
 
-class LNBPolarityInvertedSetting : public CheckBoxSetting, public Storage
+class LNBPolarityInvertedSetting : public MythUICheckBoxSetting
 {
   public:
     LNBPolarityInvertedSetting(DiSEqCDevLNB &lnb) :
-        CheckBoxSetting(this), m_lnb(lnb)
+        MythUICheckBoxSetting(), m_lnb(lnb)
     {
         setLabel(DeviceTree::tr("LNB Reversed"));
         QString help = DeviceTree::tr(
@@ -901,6 +899,7 @@ class LNBPolarityInvertedSetting : public CheckBoxSetting, public Storage
     virtual void Load(void)
     {
         setValue(m_lnb.IsPolarityInverted());
+        setChanged(false);
     }
 
     virtual void Save(void)
@@ -908,38 +907,44 @@ class LNBPolarityInvertedSetting : public CheckBoxSetting, public Storage
         m_lnb.SetPolarityInverted(boolValue());
     }
 
-    virtual void Save(QString /*destination*/) { }
-
   private:
     DiSEqCDevLNB &m_lnb;
 };
 
 //////////////////////////////////////// LNBConfig
 
-LNBConfig::LNBConfig(DiSEqCDevLNB &lnb)
+LNBConfig::LNBConfig(DiSEqCDevLNB &lnb, StandardSetting *parent)
 {
-    ConfigurationGroup *group =
-        new VerticalConfigurationGroup(false, false);
-    group->setLabel(DeviceTree::tr("LNB Configuration"));
+    setLabel(DeviceTree::tr("LNB Configuration"));
+    setValue(lnb.GetDescription());
 
-    group->addChild(new DeviceDescrSetting(lnb));
-    LNBPresetSetting *preset = new LNBPresetSetting(lnb);
-    group->addChild(preset);
+    parent = this;
+    DeviceDescrSetting *deviceDescr = new DeviceDescrSetting(lnb);
+    parent->addChild(deviceDescr);
+    m_preset = new LNBPresetSetting(lnb);
+    parent->addChild(m_preset);
     m_type = new LNBTypeSetting(lnb);
-    group->addChild(m_type);
+    parent->addChild(m_type);
     m_lof_switch = new LNBLOFSwitchSetting(lnb);
-    group->addChild(m_lof_switch);
+    parent->addChild(m_lof_switch);
     m_lof_lo = new LNBLOFLowSetting(lnb);
-    group->addChild(m_lof_lo);
+    parent->addChild(m_lof_lo);
     m_lof_hi = new LNBLOFHighSetting(lnb);
-    group->addChild(m_lof_hi);
+    parent->addChild(m_lof_hi);
     m_pol_inv = new LNBPolarityInvertedSetting(lnb);
-    group->addChild(m_pol_inv);
+    parent->addChild(m_pol_inv);
     connect(m_type, SIGNAL(valueChanged(const QString&)),
             this,   SLOT(  UpdateType(  void)));
-    connect(preset, SIGNAL(valueChanged(const QString&)),
+    connect(m_preset, SIGNAL(valueChanged(const QString&)),
             this,   SLOT(  SetPreset(   const QString&)));
-    addChild(group);
+    connect(deviceDescr, SIGNAL(valueChanged(const QString&)),
+            SLOT(setValue(const QString&)));
+}
+
+void LNBConfig::Load(void)
+{
+    StandardSetting::Load();
+    SetPreset(m_preset->getValue());
 }
 
 void LNBConfig::SetPreset(const QString &value)
@@ -1002,43 +1007,48 @@ void LNBConfig::UpdateType(void)
 //////////////////////////////////////// DeviceTree
 
 DeviceTree::DeviceTree(DiSEqCDevTree &tree) :
-    ListBoxSetting(this), m_tree(tree)
+    GroupSetting(), m_tree(tree)
 {
-    connect(this, SIGNAL(editButtonPressed(int)),   SLOT(edit(void)));
-    connect(this, SIGNAL(deleteButtonPressed(int)), SLOT(del(void)));
-    connect(this, SIGNAL(accepted(int)),            SLOT(edit(void)));
 }
 
 void DeviceTree::Load(void)
 {
     PopulateTree();
+    GroupSetting::Load();
 }
 
-void DeviceTree::Save(void)
+void DeviceTree::DeleteDevice(DeviceTypeSetting *devtype)
 {
-}
-
-bool DeviceTree::EditNodeDialog(uint nodeid)
-{
-    DiSEqCDevDevice *dev = m_tree.FindDevice(nodeid);
-    if (!dev)
+    DiSEqCDevDevice *dev = devtype->GetDevice();
+    if (dev)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("DeviceTree::EditNodeDialog(%1) "
-                                         "-- device not found").arg(nodeid));
-        return false;
+        DiSEqCDevDevice *parent = dev->GetParent();
+        if (parent)
+            parent->SetChild(dev->GetOrdinal(), NULL);
+        else
+            m_tree.SetRoot(NULL);
     }
 
-    bool changed = false;
+    devtype->DeleteDevice();
+}
+
+void DeviceTree::PopulateTree(void)
+{
+    clearSettings();
+    PopulateTree(m_tree.Root());
+}
+
+DiseqcConfigBase* DiseqcConfigBase::CreateByType(DiSEqCDevDevice *dev,
+                                                 StandardSetting *parent)
+{
+    DiseqcConfigBase *setting = NULL;
     switch (dev->GetDeviceType())
     {
         case DiSEqCDevDevice::kTypeSwitch:
         {
             DiSEqCDevSwitch *sw = dynamic_cast<DiSEqCDevSwitch*>(dev);
             if (sw)
-            {
-                SwitchConfig config(*sw);
-                changed = (config.exec() == MythDialog::Accepted);
-            }
+                setting = new SwitchConfig(*sw, parent);
         }
         break;
 
@@ -1046,10 +1056,7 @@ bool DeviceTree::EditNodeDialog(uint nodeid)
         {
             DiSEqCDevRotor *rotor = dynamic_cast<DiSEqCDevRotor*>(dev);
             if (rotor)
-            {
-                RotorConfig config(*rotor);
-                changed = (config.exec() == MythDialog::Accepted);
-            }
+                setting = new RotorConfig(*rotor, parent);
         }
         break;
 
@@ -1057,10 +1064,7 @@ bool DeviceTree::EditNodeDialog(uint nodeid)
         {
             DiSEqCDevSCR *scr = dynamic_cast<DiSEqCDevSCR*>(dev);
             if (scr)
-            {
-                SCRConfig config(*scr);
-                changed = (config.exec() == MythDialog::Accepted);
-            }
+                setting = new SCRConfig(*scr, parent);
         }
         break;
 
@@ -1068,10 +1072,7 @@ bool DeviceTree::EditNodeDialog(uint nodeid)
         {
             DiSEqCDevLNB *lnb = dynamic_cast<DiSEqCDevLNB*>(dev);
             if (lnb)
-            {
-                LNBConfig config(*lnb);
-                changed = (config.exec() == MythDialog::Accepted);
-            }
+                setting = new LNBConfig(*lnb, parent);
         }
         break;
 
@@ -1079,179 +1080,123 @@ bool DeviceTree::EditNodeDialog(uint nodeid)
             break;
     }
 
-    if (changed)
-        PopulateTree();
-
-    return changed;
-}
-
-bool DeviceTree::RunTypeDialog(DiSEqCDevDevice::dvbdev_t &type)
-{
-    MythPopupBox *popup = new MythPopupBox(GetMythMainWindow(), "");
-    popup->addLabel(tr("Select Type of Device"));
-
-    MythListBox *list = new MythListBox(popup);
-    list->insertItem(tr("Switch"));
-    list->insertItem(tr("Rotor"));
-    list->insertItem(tr("Unicable"));
-    list->insertItem(tr("LNB"));
-    list->setCurrentRow(0, QItemSelectionModel::Select);
-
-    popup->addWidget(list);
-    connect(list,  SIGNAL(accepted(int)),
-            popup, SLOT(  AcceptItem(int)));
-    list->setFocus();
-
-    DialogCode res = popup->ExecPopup();
-    type = (DiSEqCDevDevice::dvbdev_t)(list->currentRow());
-
-    popup->hide();
-    popup->deleteLater();
-
-    return kDialogCodeRejected != res;
-}
-
-void DeviceTree::CreateRootNodeDialog(void)
-{
-    DiSEqCDevDevice::dvbdev_t type;
-    if (!RunTypeDialog(type))
-        return;
-
-    DiSEqCDevDevice *dev = DiSEqCDevDevice::CreateByType(m_tree, type);
-    if (dev)
-    {
-        m_tree.SetRoot(dev);
-
-        if (!EditNodeDialog(dev->GetDeviceID()))
-            m_tree.SetRoot(NULL);
-
-        PopulateTree();
-    }
-}
-
-void DeviceTree::CreateNewNodeDialog(uint parentid, uint child_num)
-{
-    DiSEqCDevDevice *parent = m_tree.FindDevice(parentid);
-    if (!parent)
-        return;
-
-    DiSEqCDevDevice::dvbdev_t type;
-    if (RunTypeDialog(type))
-    {
-        DiSEqCDevDevice *dev = DiSEqCDevDevice::CreateByType(m_tree, type);
-        if (!dev)
-            return;
-
-        if (parent->SetChild(child_num, dev))
-        {
-            if (!EditNodeDialog(dev->GetDeviceID()))
-                parent->SetChild(child_num, NULL);
-            PopulateTree();
-        }
-        else
-        {
-            delete dev;
-        }
-    }
-}
-
-void DeviceTree::edit(void)
-{
-    QString id = getValue();
-    if (id.indexOf(':') == -1)
-    {
-        EditNodeDialog(id.toUInt());
-    }
-    else
-    {
-        QStringList vals = id.split(':');
-        if (vals[0].isEmpty())
-            CreateRootNodeDialog();
-        else
-            CreateNewNodeDialog(vals[0].toUInt(), vals[1].toUInt());
-    }
-    setFocus();
-}
-
-void DeviceTree::del(void)
-{
-    QString id = getValue();
-
-    if (id.indexOf(':') == -1)
-    {
-        uint nodeid = id.toUInt();
-        DiSEqCDevDevice *dev = m_tree.FindDevice(nodeid);
-        if (dev)
-        {
-            DiSEqCDevDevice *parent = dev->GetParent();
-            if (parent)
-                parent->SetChild(dev->GetOrdinal(), NULL);
-            else
-                m_tree.SetRoot(NULL);
-
-            PopulateTree();
-        }
-    }
-
-    setFocus();
-}
-
-void DeviceTree::PopulateTree(void)
-{
-    int old_sel = getValueIndex(getValue());
-    clearSelections();
-    PopulateTree(m_tree.Root());
-    setCurrentItem(old_sel);
+    return setting;
 }
 
 void DeviceTree::PopulateTree(DiSEqCDevDevice *node,
                               DiSEqCDevDevice *parent,
                               uint childnum,
-                              uint depth)
+                              GroupSetting *parentSetting)
 {
-    QString indent;
-    indent.fill(' ', 8 * depth);
-
     if (node)
     {
-        QString id = QString::number(node->GetDeviceID());
-        addSelection(indent + node->GetDescription(), id);
-        uint num_ch = node->GetChildCount();
-        for (uint ch = 0; ch < num_ch; ch++)
-            PopulateTree(node->GetChild(ch), node, ch, depth+1);
+        DeviceTypeSetting *devtype = new DeviceTypeSetting();
+        devtype->SetDevice(node);
+        devtype->Load();
+        DiseqcConfigBase *setting = DiseqcConfigBase::CreateByType(node,
+                                                                   devtype);
+
+        if (setting)
+        {
+            setting->Load();
+            devtype->addChild(setting);
+            PopulateChildren(node, setting);
+
+            AddDeviceTypeSetting(devtype, parent, childnum, parentSetting);
+        }
+        else
+            delete devtype;
     }
     else
     {
-        QString id;
-        if (parent)
-            id = QString::number(parent->GetDeviceID());
-        id += ":" + QString::number(childnum);
-
-        addSelection(indent + "(Unconnected)", id);
+        DeviceTypeSetting *devtype = new DeviceTypeSetting();
+        AddDeviceTypeSetting(devtype, parent, childnum, parentSetting);
     }
 }
 
-//////////////////////////////////////// DTVDeviceTreeWizard
-
-DTVDeviceTreeWizard::DTVDeviceTreeWizard(DiSEqCDevTree &tree)
+void DeviceTree::AddDeviceTypeSetting(DeviceTypeSetting *devtype,
+                                      DiSEqCDevDevice *parent,
+                                      uint childnum,
+                                      GroupSetting *parentSetting)
 {
-    setLabel(DeviceTree::tr("DiSEqC Device Tree"));
-    addChild(new DeviceTree(tree));
+    if (parentSetting)
+        parentSetting->addChild(devtype);
+    else // Root node
+        addChild(devtype);
+
+    ConnectToValueChanged(devtype, parent, childnum);
 }
 
-DialogCode DTVDeviceTreeWizard::exec(void)
+void DeviceTree::ConnectToValueChanged(DeviceTypeSetting *devtype,
+                                       DiSEqCDevDevice *parent,
+                                       uint childnum)
 {
-    while (ConfigurationDialog::exec() == kDialogCodeAccepted);
-    return kDialogCodeRejected;
+    auto slot = [devtype, parent, childnum, this](const QString &value)
+    {
+        ValueChanged(value, devtype, parent, childnum);
+    };
+
+    connect(devtype,
+            static_cast<void (StandardSetting::*)(const QString&)>(
+                                                &StandardSetting::valueChanged),
+            this,
+            slot);
+}
+
+void DeviceTree::PopulateChildren(DiSEqCDevDevice *node,
+                                  GroupSetting *parentSetting)
+{
+    uint num_ch = node->GetChildCount();
+    for (uint ch = 0; ch < num_ch; ch++)
+    {
+        PopulateTree(node->GetChild(ch), node, ch, parentSetting);
+    }
+}
+
+void DeviceTree::ValueChanged(const QString &value,
+                              DeviceTypeSetting *devtype,
+                              DiSEqCDevDevice *parent,
+                              uint childnum)
+{
+    // Remove old setting from m_tree
+    DeleteDevice(devtype);
+
+    const DiSEqCDevDevice::dvbdev_t type =
+        static_cast<DiSEqCDevDevice::dvbdev_t>(value.toUInt());
+
+    DiSEqCDevDevice *dev = DiSEqCDevDevice::CreateByType(m_tree, type);
+    if (dev)
+    {
+        if (!parent)
+        {
+            m_tree.SetRoot(dev);
+            PopulateTree();
+        }
+        else if (parent->SetChild(childnum, dev))
+        {
+            DiseqcConfigBase *newConfig =
+                DiseqcConfigBase::CreateByType(dev, devtype);
+            newConfig->Load();
+
+            PopulateChildren(dev, newConfig);
+
+            devtype->addChild(newConfig);
+            devtype->SetDevice(dev);
+        }
+        else
+            delete dev;
+    }
+
+    emit settingsChanged(this);
 }
 
 //////////////////////////////////////// SwitchSetting
 
-class SwitchSetting : public ComboBoxSetting, public Storage
+class SwitchSetting : public MythUIComboBoxSetting
 {
   public:
     SwitchSetting(DiSEqCDevDevice &node, DiSEqCDevSettings &settings)
-        : ComboBoxSetting(this), m_node(node), m_settings(settings)
+        : MythUIComboBoxSetting(), m_node(node), m_settings(settings)
     {
         setLabel(node.GetDescription());
         setHelpText(DeviceTree::tr("Choose a port to use for this switch."));
@@ -1272,14 +1217,13 @@ class SwitchSetting : public ComboBoxSetting, public Storage
     {
         double value = m_settings.GetValue(m_node.GetDeviceID());
         setValue((uint)value);
+        setChanged(false);
     }
 
     virtual void Save(void)
     {
         m_settings.SetValue(m_node.GetDeviceID(), getValue().toDouble());
     }
-
-    virtual void Save(QString /*destination*/) {}
 
   private:
     DiSEqCDevDevice   &m_node;
@@ -1288,11 +1232,11 @@ class SwitchSetting : public ComboBoxSetting, public Storage
 
 //////////////////////////////////////// RotorSetting
 
-class RotorSetting : public ComboBoxSetting, public Storage
+class RotorSetting : public MythUIComboBoxSetting
 {
   public:
     RotorSetting(DiSEqCDevDevice &node, DiSEqCDevSettings &settings)
-        : ComboBoxSetting(this), m_node(node), m_settings(settings)
+        : MythUIComboBoxSetting(), m_node(node), m_settings(settings)
     {
         setLabel(node.GetDescription());
         setHelpText(DeviceTree::tr("Choose a satellite position."));
@@ -1312,14 +1256,13 @@ class RotorSetting : public ComboBoxSetting, public Storage
 
         double angle = m_settings.GetValue(m_node.GetDeviceID());
         setValue(getValueIndex(QString::number(angle)));
+        setChanged(false);
     }
 
     virtual void Save(void)
     {
         m_settings.SetValue(m_node.GetDeviceID(), getValue().toDouble());
     }
-
-    virtual void Save(QString /*destination*/) { }
 
   private:
     DiSEqCDevDevice   &m_node;
@@ -1329,13 +1272,12 @@ class RotorSetting : public ComboBoxSetting, public Storage
 
 //////////////////////////////////////// USALSRotorSetting
 
-class USALSRotorSetting : public HorizontalConfigurationGroup
+class USALSRotorSetting : public GroupSetting
 {
   public:
     USALSRotorSetting(DiSEqCDevDevice &node, DiSEqCDevSettings &settings) :
-        HorizontalConfigurationGroup(false, false, true, true),
-        numeric(new TransLineEditSetting()),
-        hemisphere(new TransComboBoxSetting(false)),
+        numeric(new TransTextEditSetting()),
+        hemisphere(new TransMythUIComboBoxSetting(/*false*/)),
         m_node(node), m_settings(settings)
     {
         QString help =
@@ -1353,6 +1295,8 @@ class USALSRotorSetting : public HorizontalConfigurationGroup
 
         addChild(numeric);
         addChild(hemisphere);
+
+        addChild(new RotorConfig(static_cast<DiSEqCDevRotor&>(node), this));
     }
 
     virtual void Load(void)
@@ -1362,6 +1306,7 @@ class USALSRotorSetting : public HorizontalConfigurationGroup
         double  eval = AngleToEdit(val, hemi);
         numeric->setValue(QString::number(eval));
         hemisphere->setValue(hemisphere->getValueIndex(hemi));
+        GroupSetting::Load();
     }
 
     virtual void Save(void)
@@ -1371,22 +1316,20 @@ class USALSRotorSetting : public HorizontalConfigurationGroup
         m_settings.SetValue(m_node.GetDeviceID(), AngleToFloat(val, false));
     }
 
-    virtual void Save(QString /*destination*/) { }
-
   private:
-    TransLineEditSetting *numeric;
-    TransComboBoxSetting *hemisphere;
+    TransTextEditSetting *numeric;
+    TransMythUIComboBoxSetting *hemisphere;
     DiSEqCDevDevice      &m_node;
     DiSEqCDevSettings    &m_settings;
 };
 
 //////////////////////////////////////// SCRPositionSetting
 
-class SCRPositionSetting : public ComboBoxSetting, public Storage
+class SCRPositionSetting : public MythUIComboBoxSetting
 {
   public:
     SCRPositionSetting(DiSEqCDevDevice &node, DiSEqCDevSettings &settings)
-        : ComboBoxSetting(this), m_node(node), m_settings(settings)
+        : MythUIComboBoxSetting(), m_node(node), m_settings(settings)
     {
         setLabel("Position");
         setHelpText(DeviceTree::tr("Unicable satellite position (A/B)"));
@@ -1400,14 +1343,13 @@ class SCRPositionSetting : public ComboBoxSetting, public Storage
     {
         double value = m_settings.GetValue(m_node.GetDeviceID());
         setValue(getValueIndex(QString::number((uint)value)));
+        setChanged(false);
     }
 
     virtual void Save(void)
     {
         m_settings.SetValue(m_node.GetDeviceID(), getValue().toDouble());
     }
-
-    virtual void Save(QString /*destination*/) { }
 
   private:
     DiSEqCDevDevice      &m_node;
@@ -1418,7 +1360,6 @@ class SCRPositionSetting : public ComboBoxSetting, public Storage
 
 DTVDeviceConfigGroup::DTVDeviceConfigGroup(
     DiSEqCDevSettings &settings, uint cardid, bool switches_enabled) :
-    VerticalConfigurationGroup(false, false, true, true),
     m_settings(settings), m_switches_enabled(switches_enabled)
 {
     setLabel(DeviceTree::tr("DTV Device Configuration"));
@@ -1435,12 +1376,12 @@ DTVDeviceConfigGroup::~DTVDeviceConfigGroup(void)
 }
 
 void DTVDeviceConfigGroup::AddNodes(
-    ConfigurationGroup *group, const QString &trigger, DiSEqCDevDevice *node)
+    StandardSetting *group, const QString &trigger, DiSEqCDevDevice *node)
 {
     if (!node)
         return;
 
-    Setting *setting = NULL;
+    StandardSetting *setting = NULL;
     switch (node->GetDeviceType())
     {
         case DiSEqCDevDevice::kTypeSwitch:
@@ -1466,28 +1407,17 @@ void DTVDeviceConfigGroup::AddNodes(
     }
 
     if (!setting)
-    {
-        AddChild(group, trigger, new TransLabelSetting());
         return;
-    }
 
     m_devs[node->GetDeviceID()] = setting;
 
     uint num_ch = node->GetChildCount();
     if (DiSEqCDevDevice::kTypeSwitch == node->GetDeviceType())
     {
-        bool useframe = (node != m_tree.Root());
-        bool zerospace = !useframe;
-        TriggeredConfigurationGroup *cgrp = new TriggeredConfigurationGroup(
-            false, useframe, true, true, false, false, true, zerospace);
-
-        cgrp->addChild(setting);
-        cgrp->setTrigger(setting);
-
         for (uint i = 0; i < num_ch; i++)
-            AddNodes(cgrp, QString::number(i), node->GetChild(i));
+            AddNodes(setting, QString::number(i), node->GetChild(i));
 
-        AddChild(group, trigger, cgrp);
+        AddChild(group, trigger, setting);
         return;
     }
 
@@ -1497,24 +1427,16 @@ void DTVDeviceConfigGroup::AddNodes(
         return;
     }
 
-    VerticalConfigurationGroup *cgrp =
-        new VerticalConfigurationGroup(false, false, true, true);
-
-    AddChild(cgrp, QString::null, setting);
+    AddChild(group, trigger, setting);
     for (uint i = 0; i < num_ch; i++)
-        AddNodes(cgrp, QString::null, node->GetChild(i));
-
-    AddChild(group, trigger, cgrp);
+        AddNodes(group, trigger, node->GetChild(i));
 }
 
 void DTVDeviceConfigGroup::AddChild(
-    ConfigurationGroup *group, const QString &trigger, Setting *setting)
+    StandardSetting *group, const QString &trigger, StandardSetting *setting)
 {
-    TriggeredConfigurationGroup *grp =
-        dynamic_cast<TriggeredConfigurationGroup*>(group);
-
-    if (grp && !trigger.isEmpty())
-        grp->addTarget(trigger, setting);
+    if (!trigger.isEmpty())
+        group->addTargetedChild(trigger, setting);
     else
         group->addChild(setting);
 }

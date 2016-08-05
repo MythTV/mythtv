@@ -3345,8 +3345,8 @@ CardInput::CardInput(const QString & cardtype, const QString & device,
 
     if (CardUtil::IsInNeedOfExternalInputConf(_cardid))
     {
-//        addChild(new DTVDeviceConfigGroup(*externalInputSettings,
-//                                          _cardid, isNewInput));
+        addChild(new DTVDeviceConfigGroup(*externalInputSettings,
+                                          _cardid, true /*isNewInput*/));
     }
 
     addChild(inputname);
@@ -4145,11 +4145,14 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent,
     cardType.addTargetedChild("DVB", new DVBOnDemand(parent));
     cardType.addTargetedChild("DVB", new DVBEITScan(parent));
 
-//    diseqc_btn->setLabel(tr("DiSEqC (Switch, LNB, and Rotor Configuration)"));
-//    diseqc_btn->setHelpText(tr("Input and satellite settings."));
-//
+    diseqc_btn = new DeviceTree(*diseqc_tree);
+    diseqc_btn->setLabel(tr("DiSEqC (Switch, LNB, and Rotor Configuration)"));
+    diseqc_btn->setHelpText(tr("Input and satellite settings."));
+    diseqc_btn->setVisible(false);
+
     tuning_delay = new DVBTuningDelay(parent);
     cardType.addTargetedChild("DVB", tuning_delay);
+    cardType.addTargetedChild("DVB", diseqc_btn);
     tuning_delay->setVisible(false);
 
     connect(cardnum,      SIGNAL(valueChanged(const QString&)),
@@ -4167,18 +4170,11 @@ DVBConfigurationGroup::~DVBConfigurationGroup()
     }
 }
 
-void DVBConfigurationGroup::DiSEqCPanel()
-{
-    parent.reload(); // ensure card id is valid
-
-    DTVDeviceTreeWizard diseqcWiz(*diseqc_tree);
-    diseqcWiz.exec();
-}
-
 void DVBConfigurationGroup::Load(void)
 {
-    GroupSetting::Load();
     reloadDiseqcTree(cardnum->getValue());
+    diseqc_btn->Load();
+    GroupSetting::Load();
     if (cardtype->getValue() == "DVB-S" ||
         cardtype->getValue() == "DVB-S2" ||
         DiSEqCDevTree::Exists(parent.getCardID()))

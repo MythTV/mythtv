@@ -19,6 +19,7 @@ class CardInput;
 class CardID;
 class InputName;
 class SourceID;
+class DeviceTree;
 class DiSEqCDevTree;
 class DiSEqCDevSettings;
 class InputGroup;
@@ -610,12 +611,10 @@ class DVBConfigurationGroup : public GroupSetting
     virtual void Load(void);
 
     virtual void Save(void);
-    virtual void Save(QString /*destination*/) { Save(); }
 
   public slots:
     void probeCard(const QString& cardNumber);
     void reloadDiseqcTree(const QString &device);
-    void DiSEqCPanel(void);
 
   private:
     CaptureCard                  &parent;
@@ -630,7 +629,7 @@ class DVBConfigurationGroup : public GroupSetting
 #endif
     DVBTuningDelay               *tuning_delay;
     DiSEqCDevTree                *diseqc_tree;
-    TransButtonSetting           *diseqc_btn;
+    DeviceTree                   *diseqc_btn;
 };
 
 class FirewireGUID;
