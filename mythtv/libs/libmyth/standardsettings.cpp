@@ -690,12 +690,6 @@ void MythUISpinBoxSetting::edit(MythScreenType * screen)
     if (settingdialog->Create())
     {
         settingdialog->SetRange(m_min, m_max, m_step);
-        //Add custom values
-        for (int i = m_min; i <= m_max; i += m_step)
-        {
-            QString value = QString::number(i);
-            settingdialog->AddSelection(value, i);
-        }
         if (!m_special_value_text.isEmpty())
             settingdialog->AddSelection(m_special_value_text, m_min);
         settingdialog->SetValue(m_settingValue);
