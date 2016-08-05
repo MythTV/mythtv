@@ -79,7 +79,6 @@ class MPUBLIC StandardSetting : public QObject, public StorageUser
                              std::initializer_list<StandardSetting *> settings);
     void removeTargetedChild(const QString &value, StandardSetting *child);
 
-    //not sure I want to do that yet
     virtual bool keyPressEvent(QKeyEvent *);
 
     void MoveToThread(QThread *thread);
