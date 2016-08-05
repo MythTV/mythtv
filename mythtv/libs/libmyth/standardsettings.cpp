@@ -171,13 +171,16 @@ void StandardSetting::setValue(int newValue)
 
 void StandardSetting::setValue(const QString &newValue)
 {
-    m_haveChanged = m_settingValue != newValue;
-    m_settingValue = newValue;
-    emit valueChanged(newValue);
-    emit valueChanged(this);
+    if (m_settingValue != newValue)
+    {
+        m_settingValue = newValue;
+        m_haveChanged = true;
+
+        emit valueChanged(newValue);
+        emit valueChanged(this);
+    }
     emit ShouldRedraw(this);
 }
-
 
 /**
  * Return true if the setting have changed or any of its children
@@ -726,13 +729,15 @@ bool MythUICheckBoxSetting::boolValue()
 void MythUICheckBoxSetting::setValue(const QString &value)
 {
     StandardSetting::setValue(value);
-    emit valueChanged(value == "1");
+    if (haveChanged())
+        emit valueChanged(value == "1");
 }
 
 void MythUICheckBoxSetting::setValue(bool value)
 {
     StandardSetting::setValue(value ? "1" : "0");
-    emit valueChanged(value);
+    if (haveChanged())
+        emit valueChanged(value);
 }
 
 void MythUICheckBoxSetting::updateButton(MythUIButtonListItem *item)
