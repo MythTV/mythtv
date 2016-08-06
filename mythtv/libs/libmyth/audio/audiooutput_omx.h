@@ -12,12 +12,8 @@
 #include "audiooutputbase.h"
 #include "omxcontext.h"
 
-class AudioDecoderOMX;
-
 class AudioOutputOMX : public AudioOutputBase, private OMXComponentCtx
 {
-    friend class AudioDecoderOMX;
-
     // No copying
     AudioOutputOMX(const AudioOutputOMX&);
     AudioOutputOMX & operator =(const AudioOutputOMX&);
@@ -29,9 +25,6 @@ class AudioOutputOMX : public AudioOutputBase, private OMXComponentCtx
     // VolumeBase implementation
     virtual int GetVolumeChannel(int channel) const; // Returns 0-100
     virtual void SetVolumeChannel(int channel, int volume); // range 0-100 for vol
-
-    // AudioOutput overrides
-    virtual int DecodeAudio(AVCodecContext*, uint8_t*, int&, const AVPacket*);
 
   protected:
     // AudioOutputBase implementation
@@ -58,7 +51,6 @@ class AudioOutputOMX : public AudioOutputBase, private OMXComponentCtx
 
   private:
     OMXComponent m_audiorender;
-    AudioDecoderOMX *m_audiodecoder;
 
     QSemaphore m_ibufs_sema;    // EmptyBufferDone signal
     QMutex mutable m_lock;      // Protects data following
