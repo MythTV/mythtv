@@ -15,7 +15,7 @@ import lxml.html
 import os
 import stat
 
-BASEURL = 'http://mythtv.org/wiki'
+BASEURL = 'https://www.mythtv.org/wiki'
 
 def getScripts():
     return Script.getAll()
@@ -23,7 +23,7 @@ def getScripts():
 def getPage(**kwargs):
     url = "{0}?{1}".format(BASEURL,
             '&'.join(['{0}={1}'.format(k,v) for k,v in kwargs.items()]))
-    return lxml.html.parse(url).getroot()
+    return lxml.html.parse(urlopen(url)).getroot()
 
 def getWhatLinksHere(page):
     root = getPage(title='Special:WhatLinksHere',
