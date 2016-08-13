@@ -327,9 +327,12 @@ QString XmlSerializer::GetContentName( const QString        &sName,
 {
     // Try to read Name or TypeName from classinfo metadata.
 
-    int nClassIdx = pMetaObject->indexOfClassInfo( sName.toLatin1() );
+    int nClassIdx = -1;
 
-    if (nClassIdx >=0)
+    if ( pMetaObject )
+        nClassIdx = pMetaObject->indexOfClassInfo( sName.toLatin1() );
+
+    if (nClassIdx >=0 )
     {
         QString     sOptionData = pMetaObject->classInfo( nClassIdx ).value();
         QStringList sOptions    = sOptionData.split( ';' );
