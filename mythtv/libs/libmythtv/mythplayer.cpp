@@ -1387,7 +1387,10 @@ void MythPlayer::DisableCaptions(uint mode, bool osd_msg)
 
     QMutexLocker locker(&osdLock);
 
-    textDesired = textDisplayMode & kDisplayAllTextCaptions;
+    bool newTextDesired = textDisplayMode & kDisplayAllTextCaptions;
+    // Only turn off textDesired if the Operator requested it.
+    if (osd_msg || newTextDesired)
+        textDesired = newTextDesired;
     QString msg = "";
     if (kDisplayNUVTeletextCaptions & mode)
         msg += tr("TXT CAP");
@@ -1424,7 +1427,10 @@ void MythPlayer::DisableCaptions(uint mode, bool osd_msg)
 void MythPlayer::EnableCaptions(uint mode, bool osd_msg)
 {
     QMutexLocker locker(&osdLock);
-    textDesired = mode & kDisplayAllTextCaptions;
+    bool newTextDesired = mode & kDisplayAllTextCaptions;
+    // Only turn off textDesired if the Operator requested it.
+    if (osd_msg || newTextDesired)
+        textDesired = newTextDesired;
     QString msg = "";
     if ((kDisplayCC608 & mode) || (kDisplayCC708 & mode) ||
         (kDisplayAVSubtitle & mode) || kDisplayRawTextSubtitle & mode)
@@ -1494,7 +1500,9 @@ void MythPlayer::SetCaptionsEnabled(bool enable, bool osd_msg)
     enableCaptions = disableCaptions = false;
     uint origMode = textDisplayMode;
 
-    textDesired = enable;
+    // Only turn off textDesired if the Operator requested it.
+    if (osd_msg || enable)
+        textDesired = enable;
 
     if (!enable)
     {
