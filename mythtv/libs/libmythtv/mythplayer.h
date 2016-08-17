@@ -826,6 +826,11 @@ class MTV_PUBLIC MythPlayer
     int        repeat_delay;
     int64_t    disp_timecode;
     bool       avsync_audiopaused;
+    float      max_diverge;  // from setting PlayerMaxDiverge default 2
+    // AVSync for Raspberry Pi digital streams
+    int        avsync_averaging; // Number of frames to average
+    int        avsync_interval;  // Number of frames skip between sync checks
+    int        avsync_next;      // Frames till next sync check
 
     // Time Code stuff
     int        prevtc;        ///< 32 bit timecode if last VideoFrame shown

@@ -201,6 +201,8 @@ class AudioOutputBase : public AudioOutput, public MThread
         QUALITY_HIGH     =  2,
     };
     int src_quality;
+    long source_bitrate;
+    int source_samplerate;
 
  private:
     bool SetupPassthrough(int codec, int codec_profile,
@@ -219,7 +221,6 @@ class AudioOutputBase : public AudioOutput, public MThread
     FreeSurround              *upmixer;
 
     int source_channels;
-    int source_samplerate;
     int source_bytes_per_frame;
     bool upmix_default;
     bool needs_upmix;
@@ -265,7 +266,6 @@ class AudioOutputBase : public AudioOutput, public MThread
     QMutex killAudioLock;
 
     long current_seconds;
-    long source_bitrate;
 
     float *src_in;
 
