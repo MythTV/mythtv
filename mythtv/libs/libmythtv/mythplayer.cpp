@@ -211,6 +211,10 @@ MythPlayer::MythPlayer(PlayerFlags flags)
       refreshrate(0),
       lastsync(false),              repeat_delay(0),
       disp_timecode(0),             avsync_audiopaused(false),
+      // AVSync for Raspberry Pi digital streams
+      avsync_averaging(4),  // Number of frames to average
+      avsync_interval(0),   // Number of frames skip between sync checks
+      avsync_next(0),      // Frames till next sync check
       // Time Code stuff
       prevtc(0),                    prevrp(0),
       savedAudioTimecodeOffset(0),
@@ -222,6 +226,10 @@ MythPlayer::MythPlayer(PlayerFlags flags)
 {
     memset(&tc_lastval, 0, sizeof(tc_lastval));
     memset(&tc_wrap,    0, sizeof(tc_wrap));
+    max_diverge = float(gCoreContext->GetFloatSetting
+        ("PlayerMaxDiverge", 3.0));
+    if (max_diverge < 1.0f)
+        max_diverge = 1.0f;
 
     playerThread = QThread::currentThread();
 #ifdef Q_OS_ANDROID
@@ -1782,6 +1790,7 @@ void MythPlayer::ResetAVSync(void)
     if (!avsync_predictor_enabled || avsync_predictor >= refreshrate)
         avsync_predictor = 0;
     prevtc = 0;
+    avsync_next = avsync_interval;      // Frames till next sync check
     LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC + "A/V sync reset");
 }
 
@@ -1794,6 +1803,24 @@ void MythPlayer::InitAVSync(void)
     repeat_delay = 0;
 
     refreshrate = MythDisplay::GetDisplayInfo(frame_interval).Rate();
+
+    // Number of frames over which to average time divergence
+    avsync_averaging=4;
+
+    // Special averaging default of 60 for OpenMAX passthru
+    QString device = gCoreContext->GetSetting("AudioOutputDevice","");
+    int ac3pass = gCoreContext->GetNumSetting("AC3PassThru",-1);
+    if (device == "OpenMAX:hdmi" && ac3pass == 1)
+        avsync_averaging=60;
+
+    // Allow override of averaging value
+    avsync_averaging = gCoreContext->GetNumSetting("AVSyncAveraging", avsync_averaging);  // Number of frames to average
+    if (avsync_averaging < 4)
+        avsync_averaging = 4;
+    avsync_interval = avsync_averaging / max_diverge - 1;   // Number of frames skip between sync checks
+    if (avsync_interval < 0)
+        avsync_interval = 0;
+    avsync_next = avsync_interval;      // Frames till next sync check
 
     if (!FlagIsSet(kVideoIsNull))
     {
@@ -1823,8 +1850,6 @@ int64_t MythPlayer::AVSyncGetAudiotime(void)
     return currentaudiotime;
 }
 
-#define MAXDIVERGE  3.0f
-#define DIVERGELIMIT 30.0f
 void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
 {
     int repeat_pict  = 0;
@@ -1850,18 +1875,25 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
         return;
     }
 
-    if (normal_speed)
+    if (normal_speed && avsync_next==0)
     {
         diverge = (float)avsync_avg / (float)frame_interval;
-        diverge = max(diverge, -DIVERGELIMIT);
-        diverge = min(diverge, +DIVERGELIMIT);
+    }
+
+    if (avsync_next > 0)
+        avsync_next--;
+    else {
+        int divisor = int(abs(diverge) - max_diverge - 1.0f);
+        if (divisor < 1)
+            divisor=1;
+        avsync_next = avsync_interval/divisor;
     }
 
     FrameScanType ps = m_scan;
     if (kScan_Detect == m_scan || kScan_Ignore == m_scan)
         ps = kScan_Progressive;
 
-    bool max_video_behind = diverge < -MAXDIVERGE;
+    bool max_video_behind = diverge < -max_diverge;
     bool dropframe = false;
     QString dbg;
 
@@ -1998,7 +2030,7 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
 
     avsync_adjustment = 0;
 
-    if (diverge > MAXDIVERGE)
+    if (diverge > max_diverge)
     {
         // If audio is way behind of video, adjust for it...
         // by cutting the frame rate in half for the length of this frame
@@ -2016,7 +2048,8 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
         int64_t currentaudiotime = audio.GetAudioTime();
         LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC +
             QString("A/V timecodes audio %1 video %2 frameinterval %3 "
-                    "avdel %4 avg %5 tcoffset %6 avp %7 avpen %8 avdc %9")
+                    "avdel %4 avg %5 tcoffset %6 avp %7 avpen %8 avdc %9 "
+                    "diverge %10")
                 .arg(currentaudiotime)
                 .arg(timecode)
                 .arg(frame_interval)
@@ -2027,6 +2060,7 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
                 .arg(avsync_predictor)
                 .arg(avsync_predictor_enabled)
                 .arg(vsync_delay_clock)
+                .arg(diverge)
                  );
         if (currentaudiotime != 0 && timecode != 0)
         { // currentaudiotime == 0 after a seek
@@ -2064,7 +2098,7 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
             // prevents major jitter when pts resets during dvd title
             if (avsync_delay > 2000000 && limit_delay)
                 avsync_delay = 90000;
-            avsync_avg = (avsync_delay + (avsync_avg * 3)) / 4;
+            avsync_avg = (avsync_delay + (avsync_avg * (avsync_averaging-1))) / avsync_averaging;
 
             int avsync_used = avsync_avg;
             if (labs(avsync_used) > labs(avsync_delay))
@@ -2390,6 +2424,7 @@ void MythPlayer::VideoStart(void)
 
     avsync_delay = 0;
     avsync_avg = 0;
+    avsync_next = avsync_interval;      // Frames till next sync check
     refreshrate = 0;
     lastsync = false;
 

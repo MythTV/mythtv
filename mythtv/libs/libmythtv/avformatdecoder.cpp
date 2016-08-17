@@ -42,6 +42,8 @@ using namespace std;
 
 #include "lcddevice.h"
 
+#include "audiooutput.h"
+
 #ifdef USING_VDPAU
 #include "videoout_vdpau.h"
 extern "C" {
@@ -5331,6 +5333,9 @@ bool AvFormatDecoder::SetupAudioStream(void)
                             audioOut.codec_id, audioOut.sample_rate,
                             audioOut.do_passthru, audioOut.codec_profile);
     m_audio->ReinitAudio();
+    AudioOutput *audioOutput = m_audio->GetAudioOutput();
+    if (audioOutput)
+        audioOutput->SetSourceBitrate(ctx->bit_rate);
 
     if (LCD *lcd = LCD::Get())
     {
