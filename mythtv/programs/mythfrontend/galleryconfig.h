@@ -18,11 +18,11 @@ public:
 
 
 //! Settings page 2
-class DatabaseSettings : public VerticalConfigurationGroup
+class GalleryDbSettings : public VerticalConfigurationGroup
 {
     Q_OBJECT
 public:
-    explicit DatabaseSettings(bool enable);
+    explicit GalleryDbSettings(bool enable);
 
 signals:
     void ClearDbPressed();
@@ -36,14 +36,14 @@ public:
     explicit GalleryConfig(bool editMode)
     {
         addChild(new GallerySettings());
-        m_dbGroup = new DatabaseSettings(editMode);
+        m_dbGroup = new GalleryDbSettings(editMode);
         addChild(m_dbGroup);
     }
 
-    DatabaseSettings *GetClearPage() { return m_dbGroup; }
+    GalleryDbSettings *GetClearPage() { return m_dbGroup; }
 
 private:
-    DatabaseSettings *m_dbGroup;
+    GalleryDbSettings *m_dbGroup;
 };
 
 
