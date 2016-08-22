@@ -149,7 +149,7 @@ ImportSettings::ImportSettings(bool enable) : VerticalConfigurationGroup()
  \brief Settings Page 2
  \param enable True if password has been entered
 */
-DatabaseSettings::DatabaseSettings(bool enable)
+GalleryDbSettings::GalleryDbSettings(bool enable)
     : VerticalConfigurationGroup(false)
 {
     setLabel(tr("Database Settings") + (enable ? "" : tr(" (Requires edit privileges)")));
