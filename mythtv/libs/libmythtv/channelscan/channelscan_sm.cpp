@@ -1389,9 +1389,16 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
         if ((info.si_standard == "mpeg") ||
             (info.si_standard == "scte") ||
             (info.si_standard == "opencable"))
-            info.chan_num = QString("%1-%2")
-                              .arg(info.freqid)
-                              .arg(info.service_id);
+        {
+            if (info.freqid.isEmpty())
+                info.chan_num = QString("%1-%2")
+                    .arg(info.source_id)
+                    .arg(info.service_id);
+            else
+                info.chan_num = QString("%1-%2")
+                    .arg(info.freqid)
+                    .arg(info.service_id);
+        }
     }
 
     // Check for decryption success
