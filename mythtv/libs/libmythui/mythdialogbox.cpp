@@ -274,6 +274,10 @@ void MythDialogBox::updateMenu(void)
         if (m_currentMenu->m_selectedItem == x)
             m_buttonList->SetItemCurrent(button);
     }
+    // GetVisibleCount here makes sure that the dialog size is
+    // calculated correctly
+    m_buttonList->GetVisibleCount();
+    GetMythMainWindow()->GetMainStack()->GetTopScreen()->SetRedraw();
 }
 
 void MythDialogBox::Select(MythUIButtonListItem* item)
@@ -354,6 +358,9 @@ void MythDialogBox::AddButton(const QString &title, QVariant data, bool newMenu,
 
     if (setCurrent)
         m_buttonList->SetItemCurrent(button);
+    // GetVisibleCount here makes sure that the dialog size is
+    // calculated correctly
+    m_buttonList->GetVisibleCount();
 }
 
 void MythDialogBox::AddButton(const QString &title, const char *slot,
@@ -369,6 +376,9 @@ void MythDialogBox::AddButton(const QString &title, const char *slot,
 
     if (setCurrent)
         m_buttonList->SetItemCurrent(button);
+    // GetVisibleCount here makes sure that the dialog size is
+    // calculated correctly
+    m_buttonList->GetVisibleCount();
 }
 
 bool MythDialogBox::keyPressEvent(QKeyEvent *event)
