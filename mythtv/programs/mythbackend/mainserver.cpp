@@ -473,11 +473,21 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     QStringList listline;
     if (pbs)
     {
+        sock->SetReadyReadCallbackEnabled(false);
         if (!pbs->ReadStringList(listline) || listline.empty())
         {
+            sock->SetReadyReadCallbackEnabled(true);
             pbs->DecrRef();
             LOG(VB_GENERAL, LOG_INFO, "No data in ProcessRequestWork()");
             return;
+        }
+        sock->SetReadyReadCallbackEnabled(true);
+        if (sock->IsDataAvailable())
+        {
+            LOG(VB_GENERAL, LOG_INFO, "Remaining data after ReadStringList()");
+            threadPool.startReserved(
+                new ProcessRequestRunnable(*this, sock),
+                "ProcessRequest", PRT_TIMEOUT);
         }
         pbs->DecrRef();
     }
