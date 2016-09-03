@@ -469,8 +469,7 @@ void ProgDetails::loadPage(void)
                         execProducers = plist.join(", ");
                     else if (rstr == "writer")
                         writers = plist.join(", ");
-                    else if (rstr == "guest_star" ||
-                             (rstr == "guest" && !actors.isEmpty()))
+                    else if (rstr == "guest_star")
                         guestStars = plist.join(", ");
                     else if (rstr == "host")
                         hosts = plist.join(", ");
@@ -499,8 +498,7 @@ void ProgDetails::loadPage(void)
                 execProducers = plist.join(", ");
             else if (rstr == "writer")
                 writers = plist.join(", ");
-            else if (rstr == "guest_star" ||
-                     (rstr == "guest" && !actors.isEmpty()))
+            else if (rstr == "guest_star")
                 guestStars = plist.join(", ");
             else if (rstr == "host")
                 hosts = plist.join(", ");
