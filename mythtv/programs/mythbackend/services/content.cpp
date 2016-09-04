@@ -494,6 +494,7 @@ QFileInfo Content::GetPreviewImage(        int        nRecordedId,
                                            int        nWidth,
                                            int        nHeight,
                                            int        nSecsIn,
+                                           int        nFramesIn,
                                      const QString   &sFormat )
 {
     if ((nRecordedId <= 0) &&
@@ -552,10 +553,19 @@ QFileInfo Content::GetPreviewImage(        int        nRecordedId,
     if (nSecsIn <= 0)
     {
         nSecsIn = -1;
-        sPreviewFileName = QString("%1.png").arg(sFileName);
+        if (nFramesIn <= 0)
+        {
+            nFramesIn = -1;
+            sPreviewFileName = QString("%1.png").arg(sFileName);
+        }
+        else
+        {
+            sPreviewFileName = QString("%1.f%2.png").arg(sFileName).arg(nFramesIn);
+        }
     }
     else
     {
+        nFramesIn = -1;
         sPreviewFileName = QString("%1.%2.png").arg(sFileName).arg(nSecsIn);
     }
 
@@ -573,7 +583,14 @@ QFileInfo Content::GetPreviewImage(        int        nRecordedId,
         PreviewGenerator *previewgen = new PreviewGenerator( &pginfo,
                                                              QString(),
                                                              PreviewGenerator::kLocal);
-        previewgen->SetPreviewTimeAsSeconds( nSecsIn          );
+        if (nFramesIn > 0)
+        {
+            previewgen->SetPreviewTimeAsFrameNumber( nFramesIn );
+        }
+        else
+        {
+            previewgen->SetPreviewTimeAsSeconds( nSecsIn );
+        }
         previewgen->SetOutputFilename      ( sPreviewFileName );
 
         bool ok = previewgen->Run();
@@ -592,9 +609,10 @@ QFileInfo Content::GetPreviewImage(        int        nRecordedId,
         sNewFileName = sPreviewFileName;
     else
     {
-        sNewFileName = QString( "%1.%2.%3x%4.%5" )
+        sNewFileName = QString( "%1.%2%3.%4x%5.%6" )
                           .arg( sFileName )
-                          .arg( nSecsIn   )
+                          .arg( nFramesIn == -1 ? "" : "f" )
+                          .arg( nFramesIn == -1 ? nSecsIn : nFramesIn )
                           .arg( nWidth == 0 ? -1 : nWidth )
                           .arg( nHeight == 0 ? -1 : nHeight )
                           .arg( sImageFormat.toLower() );
@@ -644,7 +662,14 @@ QFileInfo Content::GetPreviewImage(        int        nRecordedId,
     PreviewGenerator *previewgen = new PreviewGenerator( &pginfo,
                                                          QString(),
                                                          PreviewGenerator::kLocal);
-    previewgen->SetPreviewTimeAsSeconds( nSecsIn             );
+    if (nFramesIn > 0)
+    {
+        previewgen->SetPreviewTimeAsFrameNumber( nFramesIn );
+    }
+    else
+    {
+        previewgen->SetPreviewTimeAsSeconds( nSecsIn );
+    }
     previewgen->SetOutputFilename      ( sNewFileName        );
     previewgen->SetOutputSize          (QSize(nWidth,nHeight));
 
