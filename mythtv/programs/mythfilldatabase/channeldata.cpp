@@ -132,7 +132,7 @@ ChannelList ChannelData::channelList(int sourceId)
 {
     ChannelList retList;
 
-    ChannelInfoList channelList = ChannelUtil::GetChannels(sourceId, true);
+    ChannelInfoList channelList = ChannelUtil::GetChannels(sourceId, false);
 
     ChannelInfoList::iterator it = channelList.begin();
     for ( ; it != channelList.end(); ++it)
