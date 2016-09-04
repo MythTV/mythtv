@@ -86,10 +86,8 @@ HEADERS += serviceHosts/frontendServiceHost.h
 HEADERS += services/frontend.h
 SOURCES += services/frontend.cpp
 
-using_qtwebkit {
-    HEADERS += progdetails.h
-    SOURCES += progdetails.cpp
-}
+HEADERS += progdetails.h proginfolist.h
+SOURCES += progdetails.cpp proginfolist.cpp
 
 macx {
     mac_bundle {

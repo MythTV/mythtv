@@ -7,8 +7,8 @@
 
 // myth
 #include "mythscreentype.h"
-#include "mythuiwebbrowser.h"
 #include "programinfo.h"
+#include "proginfolist.h"
 
 class ProgDetails : public MythScreenType
 {
@@ -18,26 +18,19 @@ class ProgDetails : public MythScreenType
     ~ProgDetails();
 
     bool Create(void);
-    bool keyPressEvent(QKeyEvent *event);
     void Init(void);
+    bool keyPressEvent(QKeyEvent *event);
 
   private:
     QString getRatings(bool recorded, uint chanid, QDateTime startts);
-    void loadPage(void);
     void updatePage(void);
-    bool loadHTML(void);
-    void addItem(const QString &key, const QString &title, const QString &data);
-    void removeItem(const QString &key);
-    void showMenu(void);
-    void customEvent(QEvent *event);
+    void addItem(const QString &title, const QString &value,
+                 ProgInfoList::VisibleLevel level);
+    void loadPage(void);
 
     ProgramInfo        m_progInfo;
-    MythUIWebBrowser  *m_browser;
-
-    int                m_currentPage;
-    QString            m_page[2];
-
-    QStringList        m_html;
+    ProgInfoList       m_infoList;
+    ProgInfoList::DataList m_data;
 };
 
 #endif
