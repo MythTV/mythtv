@@ -93,6 +93,7 @@ class SERVICE_PUBLIC ContentServices : public Service  //, public QScriptable ??
                                                           int              Width,
                                                           int              Height,
                                                           int              SecsIn,
+                                                          int              FramesIn,
                                                           const QString   &Format) = 0;
 
         virtual QFileInfo           GetRecording        ( int              RecordedId,

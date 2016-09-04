@@ -76,6 +76,7 @@ class Content : public ContentServices
                                                   int              Width,
                                                   int              Height,
                                                   int              SecsIn,
+                                                  int              FramesIn,
                                                   const QString   &Format);
 
         QFileInfo           GetRecording        ( int              RecordedId,

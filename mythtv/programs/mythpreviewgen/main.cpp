@@ -122,7 +122,7 @@ int preview_helper(uint chanid, QDateTime starttime,
     if (previewFrameNumber >= 0)
         previewgen->SetPreviewTimeAsFrameNumber(previewFrameNumber);
 
-    if (previewSeconds >= 0)
+    else if (previewSeconds >= 0)
         previewgen->SetPreviewTimeAsSeconds(previewSeconds);
 
     previewgen->SetOutputSize(previewSize);
