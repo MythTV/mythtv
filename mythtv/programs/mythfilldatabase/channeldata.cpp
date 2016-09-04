@@ -124,7 +124,7 @@ QString ChannelData::normalizeChannelKey(const QString &chanName) const
     result = result.toLower();
     // Strip all whitespace
     result = result.replace(" ", "");
-    
+
     return result;
 }
 
@@ -132,8 +132,8 @@ QHash<QString, ChannelInfo> ChannelData::channelList(int sourceId)
 {
     QHash<QString, ChannelInfo> retList;
 
-    ChannelInfoList channelList = ChannelUtil::GetChannels(sourceId, true);
-    
+    ChannelInfoList channelList = ChannelUtil::GetChannels(sourceId, false);
+
     ChannelInfoList::iterator it = channelList.begin();
     for ( ; it != channelList.end(); ++it)
     {
@@ -234,7 +234,7 @@ void ChannelData::handleChannels(int id, ChannelInfoList *chanlist)
                 }
             }
         }
-        
+
         ChannelInfo dbChan = FindMatchingChannel(*i, existingChannels);
         if (dbChan.chanid > 0) // Channel exists, updating
         {
