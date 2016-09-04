@@ -510,6 +510,8 @@ QString ServiceDescriptorMapping::toString() const
         str.append(" (Radio)");
     else if (IsHDTV())
         str.append(" (HDTV)");
+    else if (IsUHDTV())
+        str.append(" (UHDTV)");
     else if (IsTeletext())
         str.append(" (Teletext)");
     else
