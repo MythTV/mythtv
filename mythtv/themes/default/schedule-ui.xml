@@ -1153,11 +1153,11 @@
             <buttonarea>20,0,-25,100%</buttonarea>
 
             <statetype name="buttonitem">
-                <area>0,0,100%,120</area>
+                <area>0,0,100%,240</area>
                 <minsize shrink="short">100%,5</minsize>
 
                 <state name="active">
-                    <area>0,0,100%,120</area>
+                    <area>0,0,100%,100%</area>
                     <minsize shrink="short">100%,6</minsize>
                     <shape name="background">
                         <!-- work around a stack / minsize display bug by using
