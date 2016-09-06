@@ -874,6 +874,13 @@ void logPropagateCalc(void)
         logPropagateArgs += QString(" --syslog %1").arg(syslogname->c_name);
         logPropagateArgList << "--syslog" << syslogname->c_name;
     }
+#if CONFIG_SYSTEMD_JOURNAL
+    else if (logPropagateOpts.facility == SYSTEMD_JOURNAL_FACILITY)
+    {
+        logPropagateArgs += " --systemd-journal";
+        logPropagateArgList << "--systemd-journal";
+    }
+#endif
 #endif
 
     if (logPropagateOpts.noserver)
