@@ -87,6 +87,7 @@ class SyslogLogger : public LoggerBase
     Q_OBJECT
 
   public:
+    SyslogLogger();
     SyslogLogger(bool open);
     ~SyslogLogger();
     bool logmsg(LoggingItem *item);
