@@ -20,6 +20,7 @@ using namespace std;
 #include "programinfo.h" // for subtitle types and audio and video properties
 #include "scheduledrecording.h" // for ScheduledRecording
 #include "compat.h" // for gmtime_r on windows.
+#include "eitcachedvb.h"
 
 const uint EITHelper::kChunkSize = 20;
 EITCache *EITHelper::eitcache = new EITCache();
@@ -353,6 +354,9 @@ static inline void parse_dvb_component_descriptors(desc_list_t list,
 
 void EITHelper::AddEIT(const DVBEventInformationTable *eit)
 {
+    EitCacheDVB& TestEITCache = EitCacheDVB::GetInstance();
+    TestEITCache.ProcessSection(eit);
+    
     uint chanid = 0;
     if ((eit->TableID() == TableID::PF_EIT) ||
         ((eit->TableID() >= TableID::SC_EITbeg) && (eit->TableID() <= TableID::SC_EITend)))
