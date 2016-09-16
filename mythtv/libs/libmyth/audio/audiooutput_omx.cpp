@@ -366,9 +366,8 @@ bool AudioOutputOMX::OpenDevice(void)
     // NB the OpenMAX spec requires PCM buffer size >= 5mS data
     m_audiorender.GetPortDef();
     OMX_PARAM_PORTDEFINITIONTYPE &def = m_audiorender.PortDef();
-#define OUT_CHANNELS(n) (((n) > 4) ? 8U: ((n) > 2) ? 4U: unsigned(n))
     def.nBufferSize = std::max(
-        OMX_U32((1024 * nBitPerSample * OUT_CHANNELS(channels)) / 8),
+        OMX_U32((1024 * nBitPerSample * channels) / 8),
         def.nBufferSize);
     def.nBufferCountActual = std::max(OMX_U32(10), def.nBufferCountActual);
     //def.bBuffersContiguous = OMX_FALSE;
