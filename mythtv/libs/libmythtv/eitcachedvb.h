@@ -6,6 +6,11 @@
 // Qt includes
 #include <QMap>
 
+/** \file eitcachedvb.h
+ *  \code
+ *  \endcode
+ */
+
 class DVBEventInformationTable;
 
 class EitCacheDVB
@@ -38,13 +43,43 @@ class EitCacheDVB
 	protected: // Data
 		// NONE
 	private: // Declarations
+		enum RunningStatus
+		{
+			UNDEFINED = 0,
+			NOT_RUNNING = 1,
+			STARTS_IN_A_FEW_SECONDS = 2,
+			PAUSING = 3,
+			RUNNING = 4
+		};
+		
+		enum EventStatus
+		{
+			UNINITIALISED = 0,
+			VALID = 1,
+			EMPTY = 3
+		};
+			
 		struct Event
 		{
+			Event(){}
+			Event(uint event_id, time_t start_time,
+					uint durationInSeconds,
+					RunningStatus runningStatus,
+					bool isScrambled, bool isValid) :
+						event_id(event_id), start_time(start_time),
+						durationInSeconds(durationInSeconds),
+						isScrambled(isScrambled),
+						runningStatus(runningStatus),
+						eventStatus(EventStatus::UNINITIALISED) {}
+					
 			uint event_id;
 			time_t start_time;
 			uint durationInSeconds;
-			uint runningStatus;
 			bool isScrambled;
+			
+			RunningStatus runningStatus;
+			
+			EventStatus eventStatus;
 			// TODO Need to decide how/whether to handle descriptors
 		};
 		
@@ -76,10 +111,9 @@ class EitCacheDVB
 			uint transport_stream_id;
 			uint original_network_id;
 			uint current_version_number;
-			bool definitive_source; // True if the section contains
-									// data from the "actual" transport
+			bool version_from_actual; // True if the section contains
+									// a version from the "actual" transport
 									// stream and original network.
-			uint event_count;
 		};
 		
 		struct ScheduleTable : public TableBase
@@ -97,10 +131,12 @@ class EitCacheDVB
 			PfTable();	
 			bool ProcessSection(const DVBEventInformationTable *eit,
 								const bool actual);
-		private: // Data
-			
-			struct Section present;
-			struct Section following;
+		private: // Declarations
+				// None
+				
+		private: // Data			
+			struct Event present;
+			struct Event following;
 		};
 		
 	private: // Methods
