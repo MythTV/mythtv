@@ -1680,9 +1680,8 @@ Resette und versuche es nochmal</translation>
         <translation>Zum letzten Radiostream wechseln</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="880"/>
         <source>MythMusic audio files</source>
-        <translation>MythMusic Audiodateien</translation>
+        <translation type="vanished">MythMusic Audiodateien</translation>
     </message>
     <message>
         <source>Filter All My Music</source>
@@ -1752,17 +1751,16 @@ Resette und versuche es nochmal</translation>
         <translation>Zum Radiostream wechseln</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="872"/>
+        <location filename="../mythmusic/main.cpp" line="871"/>
         <source>MythMusic Media Handler 1/2</source>
         <translation>MythMusic Medienhandler 1/2</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="873"/>
         <source>MythMusic audio CD</source>
-        <translation>MythMusic Audio-CD</translation>
+        <translation type="vanished">MythMusic Audio-CD</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="879"/>
+        <location filename="../mythmusic/main.cpp" line="877"/>
         <source>MythMusic Media Handler 2/2</source>
         <translation>MythMusic Medienhandler 2/2</translation>
     </message>

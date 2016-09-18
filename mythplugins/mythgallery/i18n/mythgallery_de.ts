@@ -982,34 +982,31 @@ Prüfen Sie ob das Verzeichnis existiert, lesbar ist und die MythGallery-Einstel
         <translation>Umschalten zwischen Vollbild und Einpassen</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="141"/>
+        <location filename="../mythgallery/main.cpp" line="140"/>
         <source>MythGallery Media Handler 1/3</source>
         <translation>MythGallery Medienhandler 1/3</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="142"/>
         <source>MythGallery mixed data</source>
-        <translation>MythGallery gemischte Daten</translation>
+        <translation type="vanished">MythGallery gemischte Daten</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="154"/>
+        <location filename="../mythgallery/main.cpp" line="152"/>
         <source>MythGallery Media Handler 2/3</source>
         <translation>MythGallery Medienhandler 2/3</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="155"/>
         <source>MythGallery images</source>
-        <translation>MythGallery Bilder</translation>
+        <translation type="vanished">MythGallery Bilder</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="167"/>
+        <location filename="../mythgallery/main.cpp" line="164"/>
         <source>MythGallery Media Handler 3/3</source>
         <translation>MythGallery Medienhandler 3/3</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="168"/>
         <source>MythGallery movies</source>
-        <translation>MythGallery Filme</translation>
+        <translation type="vanished">MythGallery Filme</translation>
     </message>
     <message>
         <source>MythGallery Media Handler 1/2</source>
