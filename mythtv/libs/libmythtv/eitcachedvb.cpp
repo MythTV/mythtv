@@ -382,6 +382,7 @@ bool EitCacheDVB::PfTable::ProcessSection(
                     "No previous table - no events in incoming section"));
             candidateEventStatus = EMPTY;
         }
+        current_version_number = version_number; // for tidyness
     }
     else
     {
@@ -469,6 +470,7 @@ bool EitCacheDVB::PfTable::ProcessSection(
     LOG(VB_EIT, LOG_DEBUG, LOC + QString(
             "section_number %1 event id %2 start time %3 end time %4 "
             "running status %5 scrambled %6 event status %7")
+            .arg(section_number)
             .arg(eit->EventID(0))
             .arg(eit->StartTimeUnixUTC(0))
             .arg(eit->EndTimeUnixUTC(0))
