@@ -17,7 +17,7 @@
  * 4.1.4.1 EIT Present/Following information
  * 
  * The following rule simplifies the acquisition of the EIT
- * Present/Following information. The SI specificationmstates that an
+ * Present/Following information. The SI specification states that an
  * EIT section has a maximum size of 4096 bytes.
  * 
  * The SI bit stream shall have two sections per service for an EIT
@@ -314,8 +314,9 @@ bool EitCacheDVB::PfTable::ProcessSection(
     // Check the version number against the current table if any
     if (VERSION_UNINITIALISED == current_version_number)
     {
-        // No previous table - I will use this one wherever it came from
-        // provided the event times (if present) are reasonable
+        // No previous table - I will initilaise the version number
+        // from this section provided the event times (if present) are
+        // reasonable.
         if (event_count > 0)
         {
             time_t current_time = QDateTime::currentDateTimeUtc()
@@ -325,8 +326,7 @@ bool EitCacheDVB::PfTable::ProcessSection(
             if (0 == section_number)
             {
                 // "Present" section (0)
-                // Event (0) should span the current transport stream time
-                // TODO - use transport stream time instead of system time
+                // Event (0) should span the current time
                 if ((start_time > current_time) || (end_time < current_time))
                 {
                     LOG(VB_EIT, LOG_DEBUG, LOC + QString(
@@ -379,7 +379,6 @@ bool EitCacheDVB::PfTable::ProcessSection(
         }
         else
         {
-            // Do I need to flush events here
             LOG(VB_EIT, LOG_DEBUG, LOC + QString(
                     "No previous table - no events in incoming section"));
             candidateEventStatus = EventStatusEnum::EMPTY;
@@ -391,11 +390,6 @@ bool EitCacheDVB::PfTable::ProcessSection(
         // Previous table version exists
         if ((current_version_number + 1) % 32 == version_number)
         {
-            if (!actual)
-            {
-                LOG(VB_EIT, LOG_DEBUG, LOC + QString(
-                        "PfTable new version - not actual do more checks"));
-            }
             // Invalidate the other section
             if (0 == section_number)
                 following.eventStatus = EventStatusEnum::UNINITIALISED;
@@ -403,7 +397,10 @@ bool EitCacheDVB::PfTable::ProcessSection(
                 present.eventStatus = EventStatusEnum::UNINITIALISED;
         }
         else if (current_version_number == version_number)
-        {              
+        {
+            // TODO more work needed on this logic. !!!!!!!!!
+            // It needs to discard real duplicates
+            // and treat everything else as a discontinuity
             if (((0 == section_number)
                     && (EventStatusEnum::UNINITIALISED
                             != present.eventStatus))
