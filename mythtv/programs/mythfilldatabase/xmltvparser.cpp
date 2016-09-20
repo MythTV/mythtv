@@ -545,7 +545,8 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
         pginfo->categoryType != ProgramInfo::kCategoryNone)
         pginfo->category = myth_category_type_to_string(pginfo->categoryType);
 
-    if (!pginfo->airdate)
+    if (!pginfo->airdate
+        && ProgramInfo::kCategorySeries != pginfo->categoryType)
         pginfo->airdate = current_year;
 
     /* Let's build ourself a programid */
