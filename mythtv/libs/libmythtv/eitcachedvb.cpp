@@ -220,8 +220,8 @@
 EitCacheDVB::PfTable::PfTable()
 {
     LOG(VB_EIT, LOG_DEBUG, LOC + QString("Constructing a PfTable"));
-    present.eventStatus = EventStatus::UNINITIALISED;
-    following.eventStatus = EventStatus::UNINITIALISED;
+    present.eventStatus = EventStatusEnum::UNINITIALISED;
+    following.eventStatus = EventStatusEnum::UNINITIALISED;
 }
 
 bool EitCacheDVB::ProcessSection(const DVBEventInformationTable *eit)
@@ -240,16 +240,18 @@ bool actual)
 {
     // See if this section is for the pf table or the schedule table
     uint tableid = eit->TableID();
+    long original_network_id = eit->OriginalNetworkID();
     uint transport_stream_id = eit->TSID();
-    uint original_network_id = eit->OriginalNetworkID();
-    int key = transport_stream_id  << 16 | original_network_id;
+    uint service_id = eit->ServiceID();
+    long key = original_network_id << 32 | transport_stream_id  << 16 | service_id;
     if ((tableid == TableID::PF_EIT) || (tableid == TableID::PF_EITo))
     {
         if (!pfTables.contains(key))
         {
             struct PfTable new_table;
-            new_table.SetTransportStreamId(transport_stream_id);
             new_table.SetOriginalNetworkId(original_network_id);
+            new_table.SetTransportStreamId(transport_stream_id);
+            new_table.SetServiceId(service_id);
             pfTables.insert(key, new_table);
         }
 
@@ -263,8 +265,9 @@ bool actual)
         if (!scheduleTables.contains(key))
         {
             struct ScheduleTable new_table;
-            new_table.SetTransportStreamId(transport_stream_id);
             new_table.SetOriginalNetworkId(original_network_id);
+            new_table.SetTransportStreamId(transport_stream_id);
+            new_table.SetServiceId(service_id);
             scheduleTables.insert(key, new_table);
         }
         
@@ -286,15 +289,14 @@ bool EitCacheDVB::PfTable::ProcessSection(
     uint last_section_number = eit->LastSection();
     uint event_count = eit->EventCount();
     struct Event *pfEvent;
-    EventStatus candidateEventStatus = UNINITIALISED;
+    EventStatus candidateEventStatus = EventStatusEnum::UNINITIALISED;
     
     LOG(VB_EIT, LOG_DEBUG, LOC + QString(
-        "Processing Table %1/%2")
+        "Processing Table %1/%2/%3")
+        .arg(original_network_id)
         .arg(transport_stream_id)
-        .arg(original_network_id));
+        .arg(service_id));
         
-    
-    
     if ((section_number > 1) || (last_section_number > 1) ||
             (event_count > 1))
     {
@@ -340,8 +342,8 @@ bool EitCacheDVB::PfTable::ProcessSection(
                 // "Following" section (1) 
                 // If Event (0) does not have the running_status
                 // "Paused" it should be in the future.
-                if (RunningStatus::PAUSING
-                            == eit->RunningStatus(0))
+                if (RunningStatusEnum::PAUSING
+                            == RunningStatusEnum(eit->RunningStatus(0)))
                 {
                     // Event is paused it should start some time in the
                     // past and finish some time in the future
@@ -373,14 +375,14 @@ bool EitCacheDVB::PfTable::ProcessSection(
                     }
                 }
             }
-            candidateEventStatus = VALID;
+            candidateEventStatus = EventStatusEnum::VALID;
         }
         else
         {
             // Do I need to flush events here
             LOG(VB_EIT, LOG_DEBUG, LOC + QString(
                     "No previous table - no events in incoming section"));
-            candidateEventStatus = EMPTY;
+            candidateEventStatus = EventStatusEnum::EMPTY;
         }
         current_version_number = version_number; // for tidyness
     }
@@ -396,17 +398,17 @@ bool EitCacheDVB::PfTable::ProcessSection(
             }
             // Invalidate the other section
             if (0 == section_number)
-                following.eventStatus = UNINITIALISED;
+                following.eventStatus = EventStatusEnum::UNINITIALISED;
             else
-                present.eventStatus = UNINITIALISED;
+                present.eventStatus = EventStatusEnum::UNINITIALISED;
         }
         else if (current_version_number == version_number)
         {              
             if (((0 == section_number)
-                    && (EventStatus::UNINITIALISED
+                    && (EventStatusEnum::UNINITIALISED
                             != present.eventStatus))
                 || ((0 != section_number) 
-                    && (EventStatus::UNINITIALISED
+                    && (EventStatusEnum::UNINITIALISED
                             != following.eventStatus)))
             {
                 LOG(VB_EIT, LOG_DEBUG, LOC + QString(
@@ -431,11 +433,12 @@ bool EitCacheDVB::PfTable::ProcessSection(
             // If actual transport then allow jump
             if (!actual)
             {
-                LOG(VB_EIT, LOG_DEBUG, LOC + QString("PfTable %1/%2 "
+                LOG(VB_EIT, LOG_DEBUG, LOC + QString("PfTable %1/%2/%3 "
                     "ProcessSection-version discontinuity "
-                    " current %3 new %4 - actual %5")
-                    .arg(transport_stream_id)
+                    " current %4 new %5 - actual %6")
                     .arg(original_network_id)
+                    .arg(transport_stream_id)
+                    .arg(service_id)
                     .arg(current_version_number)
                     .arg(version_number)
                     .arg(actual));
@@ -444,18 +447,19 @@ bool EitCacheDVB::PfTable::ProcessSection(
             }
         }
         if (event_count > 0)
-            candidateEventStatus = VALID;
+            candidateEventStatus = EventStatusEnum::VALID;
         else
-            candidateEventStatus = EMPTY;
+            candidateEventStatus = EventStatusEnum::EMPTY;
 
     }
     
     // Section has passed all the checks - it should contain zero or one event
     
     LOG(VB_EIT, LOG_DEBUG, LOC + QString(
-            "Updating PfTable %1/%2 new version %3 - actual %4")
-            .arg(transport_stream_id)
+            "Updating PfTable %1/%2/%3 new version %4 - actual %5")
             .arg(original_network_id)
+            .arg(transport_stream_id)
+            .arg(service_id)
             .arg(version_number)
             .arg(actual));
             
@@ -476,7 +480,7 @@ bool EitCacheDVB::PfTable::ProcessSection(
             .arg(eit->EndTimeUnixUTC(0))
             .arg(eit->RunningStatus(0))
             .arg(eit->IsScrambled(0))
-            .arg(candidateEventStatus));
+            .arg(int(candidateEventStatus)));
             
     *pfEvent = Event(eit->EventID(0),
                         eit->StartTimeUnixUTC(0),
