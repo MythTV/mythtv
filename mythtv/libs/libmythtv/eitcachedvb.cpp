@@ -277,6 +277,81 @@ bool actual)
         return false;
 }
 
+bool EitCacheDVB::PfTable::ValidateEventTimes(
+                const DVBEventInformationTable *eit, 
+                uint event_count,
+                uint section_number,
+                EventStatus& candidateEventStatus)
+{
+    if (event_count > 0)
+    {
+        time_t current_time = QDateTime::currentDateTimeUtc()
+            .toTime_t();
+        time_t start_time = eit->StartTimeUnixUTC(0);
+        time_t end_time = eit->EndTimeUnixUTC(0);
+        if (0 == section_number)
+        {
+            // "Present" section (0)
+            // Event (0) should span the current time
+            if ((start_time > current_time) || (end_time < current_time))
+            {
+                LOG(VB_EIT, LOG_DEBUG, LOC + QString(
+                    "Present event does not span current time %1 %2 %3")
+                    .arg(start_time)
+                    .arg(end_time)
+                    .arg(current_time));
+                return false;
+            }
+        }
+        else
+        {
+            // "Following" section (1) 
+            // If Event (0) does not have the running_status
+            // "Paused" it should be in the future.
+            if (RunningStatusEnum::PAUSING
+                        == RunningStatusEnum(eit->RunningStatus(0)))
+            {
+                // Event is paused it should start some time in the
+                // past and finish some time in the future
+                if ((start_time >= current_time) ||
+                        (end_time <= current_time))
+                {
+                    LOG(VB_EIT, LOG_DEBUG, LOC + QString(
+                        "Paused following event must "
+                        "start some time in the past and finish "
+                        "some time in the future %1 %2 %3")
+                        .arg(start_time)
+                        .arg(end_time)
+                        .arg(current_time));
+                    return false;
+                }
+            }
+            else
+            {
+                // Event must be in the the future
+                if (start_time < current_time)
+                {
+                    LOG(VB_EIT, LOG_DEBUG, LOC + QString(
+                        "Following event must be in the "
+                        "future %1 %2 %3")
+                        .arg(start_time)
+                        .arg(end_time)
+                        .arg(current_time));
+                    return false;
+                }
+            }
+        }
+        candidateEventStatus = EventStatusEnum::VALID;
+    }
+    else
+    {
+        LOG(VB_EIT, LOG_DEBUG, LOC + QString(
+                "No previous table - no events in incoming section"));
+        candidateEventStatus = EventStatusEnum::EMPTY;
+    }
+    return true;
+}
+
 bool EitCacheDVB::PfTable::ProcessSection(
                 const DVBEventInformationTable *eit, const bool actual)
 {
@@ -311,78 +386,17 @@ bool EitCacheDVB::PfTable::ProcessSection(
                 .arg(actual));
         return false;
     }
+    
     // Check the version number against the current table if any
     if (VERSION_UNINITIALISED == current_version_number)
     {
         // No previous table - I will initilaise the version number
         // from this section provided the event times (if present) are
         // reasonable.
-        if (event_count > 0)
-        {
-            time_t current_time = QDateTime::currentDateTimeUtc()
-                .toTime_t();
-            time_t start_time = eit->StartTimeUnixUTC(0);
-            time_t end_time = eit->EndTimeUnixUTC(0);
-            if (0 == section_number)
-            {
-                // "Present" section (0)
-                // Event (0) should span the current time
-                if ((start_time > current_time) || (end_time < current_time))
-                {
-                    LOG(VB_EIT, LOG_DEBUG, LOC + QString(
-                        "Present event does not span current time %1 %2 %3")
-                        .arg(start_time)
-                        .arg(end_time)
-                        .arg(current_time));
-                    return false;
-                }
-            }
-            else
-            {
-                // "Following" section (1) 
-                // If Event (0) does not have the running_status
-                // "Paused" it should be in the future.
-                if (RunningStatusEnum::PAUSING
-                            == RunningStatusEnum(eit->RunningStatus(0)))
-                {
-                    // Event is paused it should start some time in the
-                    // past and finish some time in the future
-                    if ((start_time >= current_time) ||
-                            (end_time <= current_time))
-                    {
-                        LOG(VB_EIT, LOG_DEBUG, LOC + QString(
-                            "Paused following event must "
-                            "start some time in the past and finish "
-                            "some time in the future %1 %2 %3")
-                            .arg(start_time)
-                            .arg(end_time)
-                            .arg(current_time));
-                        return false;
-                    }
-                }
-                else
-                {
-                    // Event must be in the the future
-                    if (start_time < current_time)
-                    {
-                        LOG(VB_EIT, LOG_DEBUG, LOC + QString(
-                            "Following event must be in the "
-                            "future %1 %2 %3")
-                            .arg(start_time)
-                            .arg(end_time)
-                            .arg(current_time));
-                        return false;
-                    }
-                }
-            }
-            candidateEventStatus = EventStatusEnum::VALID;
-        }
-        else
-        {
-            LOG(VB_EIT, LOG_DEBUG, LOC + QString(
-                    "No previous table - no events in incoming section"));
-            candidateEventStatus = EventStatusEnum::EMPTY;
-        }
+        if (!ValidateEventTimes(eit, event_count, section_number,
+                candidateEventStatus))
+            return false;
+            
         current_version_number = version_number; // for tidyness
     }
     else
@@ -390,57 +404,70 @@ bool EitCacheDVB::PfTable::ProcessSection(
         // Previous table version exists
         if ((current_version_number + 1) % 32 == version_number)
         {
+            // Ignore if event times are invalid
+            if (!ValidateEventTimes(eit, event_count, section_number,
+                    candidateEventStatus))
+                return false;
             // Invalidate the other section
             if (0 == section_number)
                 following.eventStatus = EventStatusEnum::UNINITIALISED;
             else
                 present.eventStatus = EventStatusEnum::UNINITIALISED;
         }
-        else if (current_version_number == version_number)
-        {
-            // TODO more work needed on this logic. !!!!!!!!!
-            // It needs to discard real duplicates
-            // and treat everything else as a discontinuity
-            if (((0 == section_number)
-                    && (EventStatusEnum::UNINITIALISED
-                            != present.eventStatus))
-                || ((0 != section_number) 
-                    && (EventStatusEnum::UNINITIALISED
-                            != following.eventStatus)))
-            {
-                LOG(VB_EIT, LOG_DEBUG, LOC + QString(
-                        "PfTable same version existing section "
-                        "not UNITIALISED"));
-                return false;
-            }
-                
-            if (!actual)
-            {
-                LOG(VB_EIT, LOG_DEBUG, LOC + QString(
-                        "PfTable same version not actual - ignore"));
-                return false;
-            }
-            else
-                LOG(VB_EIT, LOG_DEBUG, LOC + QString(
-                        "Same version actual - allow update")); // TODO I think I should check the event times here
-        }
         else
         {
-            // discontinuity
-            // If actual transport then allow jump
-            if (!actual)
+            // It is either a duplicate or a discontinuity
+            if (0 == section_number)
+                pfEvent = &present;
+            else
+                pfEvent = &following;
+            if (current_version_number == version_number)
             {
-                LOG(VB_EIT, LOG_DEBUG, LOC + QString("PfTable %1/%2/%3 "
-                    "ProcessSection-version discontinuity "
-                    " current %4 new %5 - actual %6")
-                    .arg(original_network_id)
-                    .arg(transport_stream_id)
-                    .arg(service_id)
-                    .arg(current_version_number)
-                    .arg(version_number)
-                    .arg(actual));
-                
-                return false;
+                // Possible duplicate
+                if (event_count == 0)
+                {
+                    // Same version number no incoming events
+                    if (pfEvent->eventStatus == EventStatusEnum::EMPTY)
+                        // No events available to compare
+                        // reject as duplicate
+                        return false;
+                    // At this point I have the same version number,
+                    // no events in the incoming section,
+                    // some events in the stored section.
+                    if (!actual)
+                    {
+                        // On the "other" stream reject as duplicate
+                        return false;
+                    }
+                    // On the "actual" stream accept
+                    // the incoming section as a wrap around
+                    // discontinuity. 
+                }
+                else
+                {
+                    // Same version number some incoming events
+                    if (pfEvent->eventStatus == EventStatusEnum::VALID)
+                    {
+                        // Some events to compare
+                        if (Event(eit->EventID(0),
+                                eit->StartTimeUnixUTC(0),
+                                eit->EndTimeUnixUTC(0),
+                                RunningStatus(eit->RunningStatus(0)),
+                                eit->IsScrambled(0),
+                                EventStatusEnum::VALID) ==
+                                *pfEvent)
+                            return false;
+                    }
+                    // Ignore if event times are invalid
+                    if (!ValidateEventTimes(eit, event_count, section_number,
+                            candidateEventStatus))
+                        return false;
+                    // Some data is better than no data
+                }
+            }
+            else
+            {
+                // Discontinuity
             }
         }
         if (event_count > 0)

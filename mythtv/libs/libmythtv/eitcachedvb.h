@@ -108,6 +108,16 @@ class EitCacheDVB
 			bool isScrambled;			
 			EventStatusEnum eventStatus;
 			// TODO Need to decide how/whether to handle descriptors
+			
+			bool operator== (const Event &e2) const
+			{
+				return (event_id == e2.event_id) &&
+						(start_time == e2.start_time) &&
+						(end_time == e2.end_time) &&
+						(runningStatus == e2.runningStatus) &&
+						(isScrambled == e2.isScrambled) &&
+						(eventStatus == e2.eventStatus);
+			}
 		};
 		
 		struct Section
@@ -163,12 +173,15 @@ class EitCacheDVB
 		
 		struct PfTable : public TableBase
 		{
-			// Functions
+			// Methods
 			PfTable();	
 			bool ProcessSection(const DVBEventInformationTable *eit,
 								const bool actual);
-		private: // Declarations
-				// None
+		private: // Methods
+			bool ValidateEventTimes(const DVBEventInformationTable *eit,
+					uint event_count,
+					uint section_number,
+					EventStatus& candidateEventStatus);
 				
 		private: // Data			
 			struct Event present;
