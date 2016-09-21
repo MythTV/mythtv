@@ -10809,7 +10809,7 @@ Fehler: %1</translation>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="1476"/>
         <source>Set or clear cover image</source>
-        <translation type="unfinished"></translation>
+        <translation>Coverbild setzen oder löschen</translation>
     </message>
     <message>
         <source>MythDVD media</source>
@@ -17745,17 +17745,17 @@ Die meisten DVB-C Transponder senden mit einer Symbolrate von 6,9 oder 6,875 Mil
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="135"/>
         <source>Maximum number of simultaneous recordings MythTV will attempt using this device.  If set to a value other than 1, MythTV can sometimes record multiple programs on the same multiplex or overlapping copies of the same program on a single channel.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Maximalzahl der gleichzeitig laufenden Aufnahmen für dieses Gerät.  Bei anderen Werten als 1 kann MythTV manchmal mehrere Sendungen vom gleichen Multiplex oder überlappende Sendungen vom gleichen Sender aufnehmen.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="152"/>
         <source>Schedule as group</source>
-        <translation type="unfinished"></translation>
+        <translation>Als Gruppe planen</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="155"/>
         <source>Schedule all virtual inputs on this device as a group.  This is more efficient than scheduling each input individually, but can result in scheduling more simultaneous recordings than is allowed.  Be sure to set the maximum number of simultaneous recordings above high enough to handle all expected cases.</source>
-        <translation type="unfinished"></translation>
+        <translation>Plane alle virtuellen Eingänge dieses Gerät als Gruppe.  Das ist effizienter als jeden Eingang einzeln zu planen, kann aber dazu führen, das mehr gleichzeitige Aufnahmen als erlaubt geplant werden.  Stelle sicher, das die maximale Anzahl gleichzeitiger Aufnahmen für alle zu erwartenden Fälle ausreicht.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="253"/>
@@ -21728,7 +21728,7 @@ Ihr Grabber übergibt keine Sendernummern, diese müssen Sie manuell setzen.</tr
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="699"/>
         <source>Openmax will use the graphics hardware to accelerate video decoding on Raspberry Pi. </source>
-        <translation type="unfinished"></translation>
+        <translation>OpenMAX wird die Grafikkartenhardware zur Beschleunigung der Videodekodierung aus Raspberry Pi zu verwenden.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="713"/>
@@ -21881,7 +21881,7 @@ Ihr Grabber übergibt keine Sendernummern, diese müssen Sie manuell setzen.</tr
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1185"/>
         <source>OpenMAX High Quality</source>
         <comment>Sample: OpenMAX High Quality</comment>
-        <translation type="unfinished"></translation>
+        <translation>OpenMAX hohe Qualität</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1194"/>
@@ -21927,7 +21927,7 @@ Ihr Grabber übergibt keine Sendernummern, diese müssen Sie manuell setzen.</tr
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1473"/>
         <source>Uses OpenGL in a separate thread to overlay the OSD onto the video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Verwendet OpenGL in einem getrennten Thread, um das OSD über das Videobild einzublenden.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1480"/>
@@ -27980,12 +27980,12 @@ und ist unter %2 zu finden</translation>
     <message>
         <location filename="../programs/mythfrontend/galleryconfig.cpp" line="102"/>
         <source>Status Delay (ms)</source>
-        <translation type="unfinished"></translation>
+        <translation>Statusverzögerung (ms)</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/galleryconfig.cpp" line="103"/>
         <source>The delay before showing the Loading/Playing status, in milliseconds.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Verzögerung, in Millisekunden, bevor der Lade/Spiele Status angezeigt wird.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/galleryconfig.cpp" line="108"/>
