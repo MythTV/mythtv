@@ -180,8 +180,7 @@ class EitCacheDVB
 		private: // Methods
 			bool ValidateEventTimes(const DVBEventInformationTable *eit,
 					uint event_count,
-					uint section_number,
-					EventStatus& candidateEventStatus);
+					uint section_number);
 				
 		private: // Data			
 			struct Event present;

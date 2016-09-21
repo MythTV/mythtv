@@ -280,8 +280,7 @@ bool actual)
 bool EitCacheDVB::PfTable::ValidateEventTimes(
                 const DVBEventInformationTable *eit, 
                 uint event_count,
-                uint section_number,
-                EventStatus& candidateEventStatus)
+                uint section_number)
 {
     if (event_count > 0)
     {
@@ -341,13 +340,6 @@ bool EitCacheDVB::PfTable::ValidateEventTimes(
                 }
             }
         }
-        candidateEventStatus = EventStatusEnum::VALID;
-    }
-    else
-    {
-        LOG(VB_EIT, LOG_DEBUG, LOC + QString(
-                "No previous table - no events in incoming section"));
-        candidateEventStatus = EventStatusEnum::EMPTY;
     }
     return true;
 }
@@ -364,7 +356,6 @@ bool EitCacheDVB::PfTable::ProcessSection(
     uint last_section_number = eit->LastSection();
     uint event_count = eit->EventCount();
     struct Event *pfEvent;
-    EventStatus candidateEventStatus = EventStatusEnum::UNINITIALISED;
     
     LOG(VB_EIT, LOG_DEBUG, LOC + QString(
         "Processing Table %1/%2/%3")
@@ -393,8 +384,7 @@ bool EitCacheDVB::PfTable::ProcessSection(
         // No previous table - I will initilaise the version number
         // from this section provided the event times (if present) are
         // reasonable.
-        if (!ValidateEventTimes(eit, event_count, section_number,
-                candidateEventStatus))
+        if (!ValidateEventTimes(eit, event_count, section_number))
             return false;
             
         current_version_number = version_number; // for tidyness
@@ -405,8 +395,7 @@ bool EitCacheDVB::PfTable::ProcessSection(
         if ((current_version_number + 1) % 32 == version_number)
         {
             // Ignore if event times are invalid
-            if (!ValidateEventTimes(eit, event_count, section_number,
-                    candidateEventStatus))
+            if (!ValidateEventTimes(eit, event_count, section_number))
                 return false;
             // Invalidate the other section
             if (0 == section_number)
@@ -459,8 +448,7 @@ bool EitCacheDVB::PfTable::ProcessSection(
                             return false;
                     }
                     // Ignore if event times are invalid
-                    if (!ValidateEventTimes(eit, event_count, section_number,
-                            candidateEventStatus))
+                    if (!ValidateEventTimes(eit, event_count, section_number))
                         return false;
                     // Some data is better than no data
                 }
@@ -470,11 +458,6 @@ bool EitCacheDVB::PfTable::ProcessSection(
                 // Discontinuity
             }
         }
-        if (event_count > 0)
-            candidateEventStatus = EventStatusEnum::VALID;
-        else
-            candidateEventStatus = EventStatusEnum::EMPTY;
-
     }
     
     // Section has passed all the checks - it should contain zero or one event
@@ -497,20 +480,23 @@ bool EitCacheDVB::PfTable::ProcessSection(
         
     LOG(VB_EIT, LOG_DEBUG, LOC + QString(
             "section_number %1 event id %2 start time %3 end time %4 "
-            "running status %5 scrambled %6 event status %7")
+            "running status %5 scrambled %6 event event_count %7")
             .arg(section_number)
             .arg(eit->EventID(0))
             .arg(eit->StartTimeUnixUTC(0))
             .arg(eit->EndTimeUnixUTC(0))
             .arg(eit->RunningStatus(0))
             .arg(eit->IsScrambled(0))
-            .arg(int(candidateEventStatus)));
+            .arg(event_count));
             
     *pfEvent = Event(eit->EventID(0),
                         eit->StartTimeUnixUTC(0),
                         eit->EndTimeUnixUTC(0),
                         RunningStatus(eit->RunningStatus(0)),
-                        eit->IsScrambled(0), candidateEventStatus);
+                        eit->IsScrambled(0),
+                        (event_count > 0) ?
+                            EventStatusEnum::VALID :
+                            EventStatusEnum::EMPTY);
     
     return true;
 }
