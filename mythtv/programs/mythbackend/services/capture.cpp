@@ -295,7 +295,7 @@ int Capture::AddCardInput       ( const uint nCardId,
     int nResult = CardUtil::CreateCardInput(nCardId, nSourceId, sInputName,
                       sExternalCommand, sChangerDevice, sChangerModel,
                       sHostName, sTuneChan, sStartChan, sDisplayName,
-                      bDishnetEIT, nRecPriority, nQuicktune, nSchedOrder, 
+                      bDishnetEIT, nRecPriority, nQuicktune, nSchedOrder,
                       nLiveTVOrder);
 
     return nResult;
@@ -310,4 +310,3 @@ bool Capture::UpdateCardInput    ( int              nCardInputId,
 
     return set_on_input(sSetting, nCardInputId, sValue);
 }
-

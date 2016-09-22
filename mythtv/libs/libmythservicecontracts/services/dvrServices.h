@@ -2,10 +2,10 @@
 // Program Name: dvrServices.h
 // Created     : Mar. 7, 2011
 //
-// Purpose - DVR Services API Interface definition 
+// Purpose - DVR Services API Interface definition
 //
 // Copyright (c) 2010 David Blain <dblain@mythtv.org>
-//                                          
+//
 // Licensed under the GPL v2 or later, see COPYING for details
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -77,7 +77,7 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 
     public slots:
 
-        virtual DTC::ProgramList*  GetExpiringList       ( int              StartIndex, 
+        virtual DTC::ProgramList*  GetExpiringList       ( int              StartIndex,
                                                            int              Count      ) = 0;
 
         virtual DTC::ProgramList*  GetRecordedList       ( bool             Descending,
@@ -289,4 +289,3 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 };
 
 #endif
-

@@ -93,4 +93,3 @@ class SERVICE_PUBLIC VideoServices : public Service  //, public QScriptable ???
 };
 
 #endif
-

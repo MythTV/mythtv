@@ -263,5 +263,3 @@ class ScriptableContent : public QObject
 Q_SCRIPT_DECLARE_QMETAOBJECT_MYTHTV( ScriptableContent, QObject*);
 
 #endif
-
-
