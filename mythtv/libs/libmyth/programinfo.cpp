@@ -1338,6 +1338,28 @@ bool ProgramInfo::QueryKeyFromPathname(
     return ExtractKeyFromPathname(pathname, chanid, recstartts);
 }
 
+bool ProgramInfo::QueryRecordedIdFromPathname(const QString &pathname,
+                                              uint &recordedid)
+{
+    QString basename = pathname.section('/', -1);
+    if (basename.isEmpty())
+        return false;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT recordedid "
+        "FROM recorded "
+        "WHERE basename = :BASENAME");
+    query.bindValue(":BASENAME", basename);
+    if (query.exec() && query.next())
+    {
+        recordedid = query.value(0).toUInt();
+        return true;
+    }
+
+    return false;
+}
+
 #define INT_TO_LIST(x)       do { list << QString::number(x); } while (0)
 
 #define DATETIME_TO_LIST(x)  INT_TO_LIST((x).toTime_t())
@@ -4004,7 +4026,7 @@ static const char *from_filemarkup_mark_desc =
     " WHERE filename = :PATH"
     " AND type = :TYPE"
     " AND offset <= :QUERY_ARG"
-    " ORDER BY filename DESC, type DESC, mark DESC LIMIT 1;";    
+    " ORDER BY filename DESC, type DESC, mark DESC LIMIT 1;";
 static const char *from_recordedseek_mark_asc =
     "SELECT offset,mark FROM recordedseek"
     " WHERE chanid = :CHANID"

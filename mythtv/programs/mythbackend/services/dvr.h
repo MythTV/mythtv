@@ -234,6 +234,8 @@ class Dvr : public DvrServices
 
         bool              DisableRecordSchedule( uint             RecordId   );
 
+        int               RecordedIdForPathname( const QString   &Filename );
+
         QString           RecStatusToString    ( int              RecStatus );
 
         QString           RecStatusToDescription ( int            RecStatus,

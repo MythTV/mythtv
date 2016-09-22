@@ -1356,6 +1356,16 @@ bool Dvr::DisableRecordSchedule( uint nRecordId )
     return bResult;
 }
 
+int Dvr::RecordedIdForPathname(const QString & pathname)
+{
+    uint recordedid;
+
+    if (!ProgramInfo::QueryRecordedIdFromPathname(pathname, recordedid))
+        return -1;
+
+    return recordedid;
+}
+
 QString Dvr::RecStatusToString(int RecStatus)
 {
     RecStatus::Type type = static_cast<RecStatus::Type>(RecStatus);

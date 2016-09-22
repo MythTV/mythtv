@@ -270,6 +270,8 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 
         virtual bool               DisableRecordSchedule ( uint             RecordId   ) = 0;
 
+        virtual int                RecordedIdForPathname ( const QString   &Pathname   ) = 0;
+
         // The following are all temporary, pending implementation of a
         // 'enum metadata' endpoint
         virtual QString            RecStatusToString     ( int              RecStatus  ) = 0;
