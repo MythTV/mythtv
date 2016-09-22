@@ -133,6 +133,9 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
                                                            const QDateTime &StartTime,
                                                            const QString   &OffsetType ) = 0;
 
+        virtual DTC::CutList*      GetRecordedSeek       ( int              RecordedId,
+                                                           const QString   &OffsetType ) = 0;
+
         virtual DTC::ProgramList*  GetConflictList       ( int              StartIndex,
                                                            int              Count,
                                                            int              RecordId ) = 0;

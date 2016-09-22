@@ -80,4 +80,7 @@ void FillCutList( DTC::CutList* pCutList, RecordingInfo* rInfo, int marktype);
 
 void FillCommBreak( DTC::CutList* pCutList, RecordingInfo* rInfo, int marktype);
 
+void FillSeek(DTC::CutList* pCutList, RecordingInfo* rInfo, MarkTypes marktype);
+
+
 #endif

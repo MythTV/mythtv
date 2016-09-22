@@ -619,3 +619,25 @@ void FillCommBreak(DTC::CutList* pCutList, RecordingInfo* rInfo, int marktype)
         }
     }
 }
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+void FillSeek(DTC::CutList* pCutList, RecordingInfo* rInfo, MarkTypes marktype)
+{
+    frm_pos_map_t markMap;
+    frm_pos_map_t::const_iterator it;
+
+    if (rInfo && rInfo->GetChanID())
+    {
+        rInfo->QueryPositionMap(markMap, marktype);
+
+        for (it = markMap.begin(); it != markMap.end(); ++it)
+        {
+            DTC::Cutting *pCutting = pCutList->AddNewCutting();
+            pCutting->setMark(it.key());
+            pCutting->setOffset(it.value());
+        }
+    }
+}

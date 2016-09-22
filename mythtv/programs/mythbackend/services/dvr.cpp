@@ -407,6 +407,33 @@ DTC::CutList* Dvr::GetRecordedCommBreak ( int RecordedId,
 //
 /////////////////////////////////////////////////////////////////////////////
 
+DTC::CutList* Dvr::GetRecordedSeek ( int RecordedId,
+                                     const QString &offsettype )
+{
+    MarkTypes marktype;
+    if (RecordedId <= 0)
+        throw QString("Recorded ID appears invalid.");
+
+    RecordingInfo ri;
+    ri = RecordingInfo(RecordedId);
+
+    DTC::CutList* pCutList = new DTC::CutList();
+    if (offsettype == "BYTES")
+        marktype = MARK_GOP_BYFRAME;
+    else if (offsettype == "DURATION")
+        marktype = MARK_DURATION_MS;
+    else
+        throw QString("Type must be 'BYTES' or 'DURATION'.");
+
+    FillSeek(pCutList, &ri, marktype);
+
+    return pCutList;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 DTC::ProgramList* Dvr::GetExpiringList( int nStartIndex,
                                         int nCount      )
 {
