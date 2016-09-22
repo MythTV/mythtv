@@ -288,9 +288,9 @@ long Dvr::GetSavedBookmark( int RecordedId,
     bool isend=true;
     uint64_t position = ri.QueryBookmark();
     if (offsettype.toLower() == "position"){
-    	ri.QueryKeyFramePosition(&offset, position, isend);
-    	return offset;
-    } 
+        ri.QueryKeyFramePosition(&offset, position, isend);
+        return offset;
+    }
     else if (offsettype.toLower() == "duration"){
         ri.QueryKeyFrameDuration(&offset, position, isend);
         return offset;
@@ -324,12 +324,12 @@ bool Dvr::SetSavedBookmark( int RecordedId,
     uint64_t position;
     bool isend=true;
     if (offsettype.toLower() == "position"){
-    	if (!ri.QueryPositionKeyFrame(&position, Offset, isend))
-    		return false;
-    } 
+        if (!ri.QueryPositionKeyFrame(&position, Offset, isend))
+                return false;
+    }
     else if (offsettype.toLower() == "duration"){
         if (!ri.QueryDurationKeyFrame(&position, Offset, isend))
-        	return false;
+                return false;
     }
     else
         position = Offset;
@@ -470,7 +470,7 @@ DTC::EncoderList* Dvr::GetEncoderList()
         if (elink != NULL)
         {
             DTC::Encoder *pEncoder = pList->AddNewEncoder();
-            
+
             pEncoder->setId            ( elink->GetInputID()      );
             pEncoder->setState         ( elink->GetState()        );
             pEncoder->setLocal         ( elink->IsLocal()         );
@@ -762,7 +762,7 @@ DTC::ProgramList* Dvr::GetUpcomingList( int  nStartIndex,
     pPrograms->setAsOf          ( MythDate::current() );
     pPrograms->setVersion       ( MYTH_BINARY_VERSION );
     pPrograms->setProtoVer      ( MYTH_PROTO_VERSION  );
-    
+
     return pPrograms;
 }
 
@@ -1232,7 +1232,7 @@ DTC::RecRuleList* Dvr::GetRecordScheduleList( int nStartIndex,
         delete recList.back();
         recList.pop_back();
     }
-    
+
     return pRecRules;
 }
 

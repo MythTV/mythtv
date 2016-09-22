@@ -2,10 +2,10 @@
 // Program Name: guideservices.h
 // Created     : Mar. 7, 2011
 //
-// Purpose - Program Guide Services API Interface definition 
+// Purpose - Program Guide Services API Interface definition
 //
 // Copyright (c) 2010 David Blain <dblain@mythtv.org>
-//                                          
+//
 // Licensed under the GPL v2 or later, see COPYING for details
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -94,4 +94,3 @@ class SERVICE_PUBLIC GuideServices : public Service  //, public QScriptable ???
 };
 
 #endif
-

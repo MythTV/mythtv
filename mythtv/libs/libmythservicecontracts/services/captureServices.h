@@ -123,4 +123,3 @@ class SERVICE_PUBLIC CaptureServices : public Service
 };
 
 #endif
-
