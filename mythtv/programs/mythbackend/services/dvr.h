@@ -70,6 +70,12 @@ class Dvr : public DvrServices
                                                 int              ChanId,
                                                 const QDateTime &StartTime );
 
+        bool              StopRecording       ( int              RecordedId );
+
+        bool              ReactivateRecording ( int              RecordedId );
+
+        bool              RescheduleRecordings( void );
+
         bool              UpdateRecordedWatchedStatus ( int   RecordedId,
                                                         int   ChanId,
                                                         const QDateTime &StartTime,
