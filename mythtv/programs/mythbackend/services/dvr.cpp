@@ -241,6 +241,62 @@ bool Dvr::UnDeleteRecording(int RecordedId,
 //
 /////////////////////////////////////////////////////////////////////////////
 
+bool Dvr::StopRecording(int RecordedId)
+{
+    if (RecordedId <= 0)
+        throw QString("Recorded ID is invalid.");
+
+    RecordingInfo ri = RecordingInfo(RecordedId);
+
+    if (ri.GetChanID())
+    {
+        QString cmd = QString("STOP_RECORDING %1 %2")
+                      .arg(ri.GetChanID())
+                      .arg(ri.GetRecordingStartTime(MythDate::ISODate));
+        MythEvent me(cmd);
+
+        gCoreContext->dispatch(me);
+        return true;
+    }
+    else
+        throw QString("RecordID %1 not found").arg(RecordedId);
+
+    return false;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool Dvr::ReactivateRecording(int RecordedId)
+{
+    if (RecordedId <= 0)
+        throw QString("Recorded ID is invalid.");
+
+    RecordingInfo ri = RecordingInfo(RecordedId);
+
+    ri.ReactivateRecording();
+
+    return true;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool Dvr::RescheduleRecordings(void)
+{
+    QString cmd = QString("RESCHEDULE_RECORDINGS");
+    MythEvent me(cmd);
+
+    gCoreContext->dispatch(me);
+    return true;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 bool Dvr::UpdateRecordedWatchedStatus ( int RecordedId,
                                         int   chanid,
                                         const QDateTime &recstarttsRaw,
